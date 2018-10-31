@@ -12,8 +12,10 @@ def test_entity_slots_as_length_of_factor():
     assert len(f1) == 1
 
 def test_content_with_entities():
+    """Entities are just strings for now"""
+
     f1 = Factor("{} was a motel")
-    assert f1.content_with_entities(["Motel 6"]) == "Motel 6 was a motel"
+    assert f1.content_with_entities(["rAnDoM STriNg"]) == "rAnDoM STriNg was a motel"
 
 def test_content_with_wrong_number_of_entities():
     f1 = Factor("{} was a motel")
