@@ -1,24 +1,41 @@
 from typing import Dict, Union
 
-class Factor:
+class Entity:
+    def __init__(self, name: str):
+        self.name = name
 
-    def __init__(self, predicate: str, truth_of_predicate: bool = True,
-        level: str = "Fact", reciprocal: bool = False):
+class Person(Entity):
+    pass
 
-        self.predicate = predicate
-        self.truth_of_predicate = truth_of_predicate
-        self.level = level
+class Predicate:
+
+    def __init__(self, content: str, reciprocal: bool = False):
+        self.content = content
         self.reciprocal = reciprocal
 
         if len(self) != 2 and self.reciprocal:
             raise ValueError(
                 f'"Reciprocal" flag is only allowed with exactly 2 entities.')
 
-    def __str__(self):
-        return f'{self.level}: {self.predicate_with_truth()}'
-
     def __len__(self):
-        return self.predicate.count("{}")
+        return self.content.count("{}")
+
+    def __str__(self):
+        return self.content
+
+
+class Factor:
+    pass
+
+class Fact:
+
+    def __init__(self, predicate: Predicate, truth_of_predicate: bool = True):
+
+        self.predicate = predicate
+        self.truth_of_predicate = truth_of_predicate
+
+    def __str__(self):
+        return f'Fact: {self.predicate_with_truth()}'
 
     def predicate_with_truth(self):
         truth = "It is false that " if not self.truth_of_predicate else ""
@@ -28,9 +45,9 @@ class Factor:
         """Creates a sentence by substituting the names of entities
         from a particular case."""
 
-        if len(entities) != len(self):
+        if len(entities) != len(self.predicate):
             raise ValueError(
-                f'Exactly {len(self)} entities needed to complete ' +
+                f'Exactly {len(self.predicate)} entities needed to complete ' +
                 f'"{self.predicate}", but {len(entities)} were given.')
         return self.predicate_with_truth().format(*entities)
 
@@ -40,4 +57,3 @@ class Holding:
                  rule_valid: Union[bool, None] = True):
 
         self.rule_valid = rule_valid
-        pass

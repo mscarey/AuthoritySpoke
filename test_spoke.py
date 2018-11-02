@@ -1,13 +1,14 @@
-from spoke import Factor
+from spoke import Fact
 from typing import Dict
 
 import pytest
 
 
 @pytest.fixture
-def make_factor() -> Dict[str, Factor]:
-    f1 = Factor("{} was a motel")
-    f7 = Factor("the distance between {} and {} was more than 35 feet",
+def make_factor() -> Dict[str, Fact]:
+    # Make predicates first
+    f1 = Fact("{} was a motel")
+    f7 = Fact("the distance between {} and {} was more than 35 feet",
                 truth_of_predicate=False, reciprocal=True)
     return {"f1": f1, "f7": f7}
 
