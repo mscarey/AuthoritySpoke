@@ -1,8 +1,11 @@
-from typing import Dict, Union
+from typing import Dict, List, Union
 
 class Entity:
     def __init__(self, name: str):
         self.name = name
+
+    def __str__(self):
+        return self.name
 
 class Person(Entity):
     pass
@@ -39,17 +42,17 @@ class Fact:
 
     def predicate_with_truth(self):
         truth = "It is false that " if not self.truth_of_predicate else ""
-        return f'{truth}{self.predicate}'
+        return f'{truth}{str(self.predicate)}'
 
-    def predicate_with_entities(self, entities: list) -> str:
+    def predicate_with_entities(self, entities: List[Entity]) -> str:
         """Creates a sentence by substituting the names of entities
-        from a particular case."""
+        from a particular case into the predicate_with_truth."""
 
         if len(entities) != len(self.predicate):
             raise ValueError(
                 f'Exactly {len(self.predicate)} entities needed to complete ' +
                 f'"{self.predicate}", but {len(entities)} were given.')
-        return self.predicate_with_truth().format(*entities)
+        return self.predicate_with_truth().format(*(str(e) for e in entities))
 
 class Holding:
 
