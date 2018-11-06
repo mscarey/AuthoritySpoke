@@ -1,16 +1,24 @@
-from typing import Dict, Sequence, Union
+from typing import Dict, Optional, Sequence, Union
 
 class Entity:
+    """A person, place, thing, or event that needs to be mentioned in
+    multiple predicates/factors in a holding."""
+
     def __init__(self, name: str):
         self.name = name
 
     def __str__(self):
         return self.name
 
-class Person(Entity):
+class Human(Entity):
+    """A "natural person". See Slaughter-House Cases, 83 U.S. 36, 99,
+    https://www.courtlistener.com/opinion/88661/slaughter-house-cases/"""
     pass
 
 class Predicate:
+    """A statement about real events or about legal conclusions.
+    Predicates may be "alleged" by a pleading, "supported" by evidence, or
+    "found" to be factual by a jury verdict or a judge's finding of fact"""
 
     def __init__(self, content: str, reciprocal: bool = False):
         self.content = content
@@ -45,9 +53,16 @@ class Predicate:
             *(str(e) for e in entities))
 
 class Factor:
+    """A factor is something used to determine the applicability of a legal
+    procedure. Factors can be both inputs and outputs of legal procedures.
+    In a chain of legal procedures, the outputs of one may become inputs for
+    another. Common types of factors include Facts, Evidence, Allegations,
+    Motions, and Arguments."""
     pass
 
-class Fact:
+class Fact(Factor):
+    """An assertion accepted as factual by a court, often through factfinding by
+    a judge or jury."""
 
     def __init__(self, predicate: Predicate, truth_of_predicate: bool = True):
 
@@ -57,15 +72,33 @@ class Fact:
     def __str__(self):
         return f'Fact: {self.predicate}'
 
-    def str_in_context(self, entities: Sequence[Entity]):
+    def str_in_context(self, entities: Sequence[Entity]) -> str:
         content = self.predicate.content_with_entities(
-            entities, self.truth_of_predicate)
+            entities, self.truth_of_predicate
+            )
         return f'Fact: {content}'
 
 
 class Holding:
+    """A statement of law about how courts should resolve litigation. Holdings
+    can be described as legal procedures in terms of inputs and outputs. When
+    holdings appear in judicial opinions they are often hypothetical and
+    don't necessarily imply that the court accepts the factual assertions or
+    other factors that make up their inputs or outputs."""
 
-    def __init__(self, inputs: Dict[Factor, str], outputs: Dict[Factor, str],
+    def __init__(self, outputs: Dict[Factor, Sequence[int]],
+                 inputs: Optional[Dict[Factor, Sequence[int]]] = None,
+                 even_if: Optional[Dict[Factor, Sequence[int]]] = None,
+                 mandatory: bool = False,
+                 universal: bool = False,
                  rule_valid: Union[bool, None] = True):
 
+        self.outputs = outputs
+        self.inputs = inputs
+        self.even_if = even_if
+        self.mandatory = mandatory
+        self.universal = universal
         self.rule_valid = rule_valid
+
+    def __eq__(self, other):
+        return False
