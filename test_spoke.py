@@ -39,13 +39,13 @@ def make_holding(make_factor) -> Dict[str, Holding]:
     return {
         "h1": Holding(
             outputs={f3: (0, 1)},
-            inputs={f1: (0), f2: (1, 0)},),
+            inputs={f1: (0,), f2: (1, 0)},),
         "h_one": Holding(
             outputs={f3: (0, 1)},
-            inputs={f1: (0), f2: (1, 0)},),
+            inputs={f1: (0,), f2: (1, 0)},),
         "h_different": Holding(
             outputs={f3: (0, 1)},
-            inputs={f1: (0), f2: (0, 1)},)
+            inputs={f1: (0,), f2: (0, 1)},)
             }
 
 def test_string_representation_of_factor(make_factor):

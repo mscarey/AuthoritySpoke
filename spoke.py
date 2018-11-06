@@ -72,6 +72,14 @@ class Fact(Factor):
     def __str__(self):
         return f'Fact: {self.predicate}'
 
+    def __repr__(self):
+        return f'Fact("{self.predicate}", {self.truth_of_predicate})'
+
+    def __gt__(self, other):
+        if other.predicate:
+            return str(self.predicate) > str(other.predicate)
+        return NotImplemented
+
     def str_in_context(self, entities: Sequence[Entity]) -> str:
         content = self.predicate.content_with_entities(
             entities, self.truth_of_predicate
@@ -94,11 +102,40 @@ class Holding:
                  rule_valid: Union[bool, None] = True):
 
         self.outputs = outputs
-        self.inputs = inputs
-        self.even_if = even_if
+        self.inputs = inputs or {}
+        self.even_if = even_if or {}
         self.mandatory = mandatory
         self.universal = universal
         self.rule_valid = rule_valid
+        self.index_pattern = None
+
+    def get_indices(self):
+        """Puts the factors in order, and finds the pattern of entity
+        names fit into the blank spaces in the predicates. Intended
+        for equality comparisons."""
+
+        entities = []
+        for x in (self.outputs, self.inputs, self.even_if):
+            for factor in sorted(x):
+                entities.append(x[factor])
+        return (*entities,)
+        """        concordance = {number: [] for number in entities}
+                for n in range(len(entities)):
+                    concordance[entities[n]].append(n)
+                return set(tuple(group) for group in concordance.values())"""
 
     def __eq__(self, other):
-        return False
+        if (str(self.inputs.keys()) != str(other.inputs.keys())) or \
+            (str(self.outputs.keys()) != str(other.outputs.keys())) or \
+            (str(self.even_if.keys()) != str(other.even_if.keys())) or \
+            (self.mandatory != other.mandatory) or \
+            (self.universal != other.universal) or \
+            (self.rule_valid != other.rule_valid):
+            return False
+        if not self.index_pattern:
+            self.index_pattern = self.get_indices()
+        return self.index_pattern == other.get_indices()
+
+    def __repr__(self):
+        return (f'Holding({self.outputs}, {self.inputs}, {self.even_if}, ' +
+        f'{self.mandatory}, {self.universal}, {self.rule_valid})')
