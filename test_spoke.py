@@ -32,9 +32,8 @@ def test_entity_slots_as_length_of_factor(make_factor):
     assert len(make_factor["f1"].predicate) == 1
 
 def test_predicate_with_entities(make_entity, make_factor):
-    """Entities are just strings for now"""
-    assert make_factor["f1"].predicate_with_entities(
-        [make_entity["e_motel"]]) == "Hideaway Lodge was a motel"
+    assert make_factor["f1"].predicate.content_with_entities(
+        (make_entity["e_motel"])) == "Hideaway Lodge was a motel"
 
 def test_predicate_with_wrong_number_of_entities(make_factor):
     with pytest.raises(ValueError):
@@ -42,24 +41,24 @@ def test_predicate_with_wrong_number_of_entities(make_factor):
 
 def test_reciprocal_with_wrong_number_of_entities(make_entity, make_factor):
     with pytest.raises(ValueError):
-        make_factor["f1"].predicate_with_entities(
-            [make_entity["e_motel"], make_entity["e_watt"]])
+        make_factor["f1"].predicate.content_with_entities(
+            (make_entity["e_motel"], make_entity["e_watt"]))
 
 def test_false_predicate_with_entities(make_factor):
-    assert make_factor["f7"].predicate_with_entities(
-        ["the trees", "Hideaway Lodge"]) == str("It is false that the " +
-        "distance between the trees and Hideaway Lodge was more than 35 feet")
-    assert make_factor["f7"].predicate_with_entities(
-        ["the trees", "Hideaway Lodge"]) == str("It is false that the " +
+    assert make_factor["f7"].predicate.content_with_entities(
+        ("the trees", "Hideaway Lodge"), False) == str("It is false that the " +
         "distance between the trees and Hideaway Lodge was more than 35 feet")
 
 def test_entity_and_person_in_predicate(make_entity, make_factor):
-    assert make_factor["f2"].predicate_with_entities(
-        [make_entity["e_watt"], make_entity["e_motel"]]
+    assert make_factor["f2"].predicate.content_with_entities(
+        (make_entity["e_watt"], make_entity["e_motel"])
         ) == "Wattenburg operated and lived at Hideaway Lodge"
 
-"""Need a test for a fact labeled as "Fact" followed by the predicate with
-entities"""
+def test_fact_label_with_entities(make_entity, make_factor):
+    assert make_factor["f2"].str_in_context(
+        (make_entity["e_watt"], make_entity["e_motel"])
+    ) == "Fact: Wattenburg operated and lived at Hideaway Lodge"
+
 
 def test_holding_equality():
     """
