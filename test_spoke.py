@@ -3,6 +3,7 @@ from spoke import Predicate, Fact
 from spoke import Holding
 from typing import Dict
 
+import pprint
 import pytest
 
 
@@ -82,11 +83,24 @@ def test_fact_label_with_entities(make_entity, make_factor):
         (make_entity["e_watt"], make_entity["e_motel"])
     ) == "Fact: Wattenburg operated and lived at Hideaway Lodge"
 
+# Holding tests
 
-def test_identical_holdings_equal(make_entity, make_factor, make_holding):
+def test_representation_of_factor(make_holding):
+    assert repr(make_holding["h1"]) == " ".join("""
+    Holding({Fact("{} was {}’s abode", True): (0, 1)},
+
+            {Fact("{} was a motel", True): (0,),
+            Fact("{} operated and lived at {}", True): (1, 0)},
+
+            {},
+
+            False, False, True)""".strip().split())
+
+
+def test_identical_holdings_equal(make_factor, make_holding):
     assert make_holding["h1"] == make_holding["h_one"]
 
-def test_holdings_different_entities_unequal(make_entity, make_factor, make_holding):
+def test_holdings_different_entities_unequal(make_factor, make_holding):
     assert make_holding["h1"] != make_holding["h_different"]
 
 def test_holdings_differing_in_entity_order_equal(make_entity, make_factor, make_holding):
