@@ -41,12 +41,15 @@ def make_holding(make_factor) -> Dict[str, Holding]:
         "h1": Holding(
             outputs={f3: (0, 1)},
             inputs={f1: (0,), f2: (1, 0)},),
-        "h_one": Holding(
+        "h1_again": Holding(
             outputs={f3: (0, 1)},
             inputs={f1: (0,), f2: (1, 0)},),
-        "h_different": Holding(
+        "h1_different": Holding(
             outputs={f3: (0, 1)},
-            inputs={f1: (0,), f2: (0, 1)},)
+            inputs={f1: (0,), f2: (0, 1)},),
+        "h1_really_the_same": Holding(
+            outputs={f3: (1, 0)},
+            inputs={f1: (1,), f2: (0, 1)},),
             }
 
 def test_string_representation_of_factor(make_factor):
@@ -97,20 +100,17 @@ def test_representation_of_factor(make_holding):
             False, False, True)""".strip().split())
 
 
-def test_identical_holdings_equal(make_factor, make_holding):
-    assert make_holding["h1"] == make_holding["h_one"]
+def test_identical_holdings_equal(make_holding):
+    assert make_holding["h1"] == make_holding["h1_again"]
 
-def test_holdings_different_entities_unequal(make_factor, make_holding):
-    assert make_holding["h1"] != make_holding["h_different"]
+def test_holdings_different_entities_unequal(make_holding):
+    assert make_holding["h1"] != make_holding["h1_different"]
 
-def test_holdings_differing_in_entity_order_equal(make_entity, make_factor, make_holding):
+def test_holdings_differing_in_entity_order_equal(make_holding):
     """
     Test that holdings are considered equal if they have the same factors
     and the numbers they use to refer to entities are different but in an
     equivalent order.
     e.g. {"F1": "121", "F2": "233"} and {"F2": "122", "F1": "313"}
-
-    On second thought, maybe I should normalize the entity numbers when
-    saving the holdings instead.
     """
-    pass
+    assert make_holding["h1"] == make_holding["h1_really_the_same"]

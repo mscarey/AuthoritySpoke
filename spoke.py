@@ -106,34 +106,62 @@ class Holding:
         self.outputs = outputs
         self.inputs = inputs or {}
         self.even_if = even_if or {}
+
+        """TODO: Maybe what's currently called a Holding object should be
+        called a Procedure object, except that I should factor out the next
+        three flags and put them on a new object type called a
+        Holding which is a relation between an Opinion and a Procedure."""
+
         self.mandatory = mandatory
         self.universal = universal
         self.rule_valid = rule_valid
-        self.index_pattern = None
 
-    def get_indices(self):
-        """Puts the factors in order, and finds the pattern of entity
-        names that fit into the blank spaces in the predicates. Intended
-        for equality comparisons."""
+    def match_entity_roles(self, other):
+        """Make a temporary dict for information from other.
+        For each entity slot in each factor in self, check the matching
+        entity slot in other. If it contains something that's not already
+        in the temp dict, add it and the corresponding symbol from self
+        as a key and value. If it contains something that the temp dict
+        doesn't match to self's value for that slot, return False. If
+        none of the slots return False, return True."""
 
-        entities = []
-        for x in (self.outputs, self.inputs, self.even_if):
-            for factor in sorted(x, key=str):
-                entities.append(x[factor])
-        return (*entities,)
+        entity_roles = {}
+        for x in zip((self.outputs, self.inputs, self.even_if),
+                     (other.outputs, other.inputs, other.even_if)):
+            self_factor_list = sorted(x[0], key=str)
+            other_factor_list = sorted(x[1], key=str)
+            if len(self_factor_list) != len(other_factor_list):
+                return False
+            factor_pairs = zip(self_factor_list, other_factor_list)
+            for pair in factor_pairs:
+                if str(pair[0]) != str(pair[1]):
+                    return False
+                for i in range(len(x[0][pair[0]])):
+                    self_entity_label = x[0][pair[0]][i]
+                    other_entity_label = x[1][pair[1]][i]
+                    if self_entity_label not in entity_roles:
+                        entity_roles[self_entity_label] = other_entity_label
+                    if entity_roles[self_entity_label] != other_entity_label:
+                        return False
+        return True
 
     def __eq__(self, other):
-        if (str(self.inputs.keys()) != str(other.inputs.keys())) or \
-            (str(self.outputs.keys()) != str(other.outputs.keys())) or \
-            (str(self.even_if.keys()) != str(other.even_if.keys())) or \
-            (self.mandatory != other.mandatory) or \
+        """Determines if the two holdings have all the same factors
+        with the same entities in the same roles, not whether they're
+        actually the same Python object."""
+
+        if not isinstance(other, Holding):
+            return NotImplemented
+
+        if (self.mandatory != other.mandatory) or \
             (self.universal != other.universal) or \
             (self.rule_valid != other.rule_valid):
             return False
-        for h in (self, other):
-            if not h.index_pattern:
-                h.index_pattern = h.get_indices()
-        return self.index_pattern == other.index_pattern
+
+        if not self.match_entity_roles(other):
+            return False
+
+        return other.match_entity_roles(self)
 
     def __repr__(self):
         return (f'{self.__class__.__name__}('
