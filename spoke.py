@@ -1,4 +1,4 @@
-from typing import Dict, Optional, Sequence, Union
+from typing import Dict, Optional, Sequence, Tuple, Union
 
 class Entity:
     """A person, place, thing, or event that needs to be mentioned in
@@ -27,7 +27,10 @@ class Predicate:
 
         if len(self) != 2 and self.reciprocal:
             raise ValueError(
-                f'"Reciprocal" flag is only allowed with exactly 2 entities.')
+                '"reciprocal" flag is only allowed with exactly 2 entities.')
+
+    def __hash__(self):
+        return hash((self.content, self.reciprocal))
 
     def __len__(self):
         return self.content.count("{}")
@@ -37,6 +40,11 @@ class Predicate:
 
     def __str__(self):
         return self.content
+
+    def __eq__(self, other):
+        if not isinstance(other, Predicate):
+            return False
+        return self.content == other.content and self.reciprocal == other.reciprocal
 
     def content_with_truth(self, truth_of_predicate=True) -> str:
         truth_prefix = "It is false that " if not truth_of_predicate else ""
@@ -73,6 +81,9 @@ class Fact(Factor):
         self.predicate = predicate
         self.truth_of_predicate = truth_of_predicate
 
+    def __hash__(self):
+        return hash((self.predicate, self.truth_of_predicate))
+
     def __str__(self):
         return f'Fact: {self.predicate}'
 
@@ -81,6 +92,11 @@ class Fact(Factor):
 
     def __gt__(self, other):
         return NotImplemented
+
+    def __eq__(self, other):
+        if not isinstance(other, Fact):
+            return False
+        return (self.predicate == other.predicate) & (self.truth_of_predicate == other.truth_of_predicate)
 
     def str_in_context(self, entities: Sequence[Entity]) -> str:
         content = self.predicate.content_with_entities(
@@ -96,9 +112,9 @@ class Holding:
     don't necessarily imply that the court accepts the factual assertions or
     other factors that make up their inputs or outputs."""
 
-    def __init__(self, outputs: Dict[Factor, Sequence[int]],
-                 inputs: Optional[Dict[Factor, Sequence[int]]] = None,
-                 even_if: Optional[Dict[Factor, Sequence[int]]] = None,
+    def __init__(self, outputs: Dict[Factor, Tuple[int]],
+                 inputs: Optional[Dict[Factor, Tuple[int]]] = None,
+                 even_if: Optional[Dict[Factor, Tuple[int]]] = None,
                  mandatory: bool = False,
                  universal: bool = False,
                  rule_valid: Union[bool, None] = True):
@@ -115,6 +131,12 @@ class Holding:
         self.mandatory = mandatory
         self.universal = universal
         self.rule_valid = rule_valid
+
+    def __hash__(self):
+        return hash((tuple(self.outputs), tuple(self.inputs), tuple(self.even_if),
+                self.mandatory, self.universal, self.rule_valid))
+
+
 
     def match_entity_roles(self, other):
         """Make a temporary dict for information from other.
@@ -151,7 +173,7 @@ class Holding:
         actually the same Python object."""
 
         if not isinstance(other, Holding):
-            return NotImplemented
+            return False
 
         if (self.mandatory != other.mandatory) or \
             (self.universal != other.universal) or \

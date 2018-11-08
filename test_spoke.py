@@ -1,35 +1,44 @@
 from spoke import Entity, Human
-from spoke import Predicate, Fact
+from spoke import Predicate, Factor, Fact
 from spoke import Holding
 from typing import Dict
 
-import pprint
 import pytest
 
 
 
 @pytest.fixture
 def make_entity() -> Dict[str, Entity]:
-    return {"e_watt": Human("Wattenburg"),
-            "e_motel": Entity("Hideaway Lodge"),
-            "e_trees": Entity("a stockpile of trees")}
+    return {
+        "e_watt": Human("Wattenburg"),
+        "e_motel": Entity("Hideaway Lodge"),
+        "e_trees": Entity("a stockpile of trees")}
 
 @pytest.fixture
-def make_factor() -> Dict[str, Fact]:
-    # Make predicates first
-    p1 = Predicate("{} was a motel")
-    p2 = Predicate("{} operated and lived at {}")
-    p3 = Predicate("{} was {}’s abode")
+def make_predicate() -> Dict[str, Predicate]:
 
-    p7 = Predicate("the distance between {} and {} was more than 35 feet",
-                   reciprocal=True)
-    f1 = Fact(p1)
-    f2 = Fact(p2)
-    f3 = Fact(p3)
+    return {
+        "p1": Predicate("{} was a motel"),
+        "p1_again": Predicate("{} was a motel"),
+        "p2": Predicate("{} operated and lived at {}"),
+        "p2_reciprocal": Predicate("{} operated and lived at {}", reciprocal=True),
+        "p3": Predicate("{} was {}’s abode"),
+        "p7": Predicate("the distance between {} and {} was more than 35 feet",
+                        reciprocal=True),}
 
-    f7 = Fact(p7, truth_of_predicate=False)
+@pytest.fixture
+def make_factor(make_predicate) -> Dict[str, Factor]:
+    p = make_predicate
 
-    return {"f1": f1, "f2": f2, "f3": f3, "f7": f7}
+    return {"f1": Fact(p["p1"]),
+            "f1b": Fact(p["p1"]),
+            "f1c": Fact(p["p1_again"]),
+            "f2": Fact(p["p2"]),
+            "f2_reciprocal": Fact(p["p2_reciprocal"]),
+            "f3": Fact(p["p3"]),
+            "f7": Fact(p["p7"], truth_of_predicate=False),
+            "f7_true": Fact(p["p7"]),
+            }
 
 @pytest.fixture
 def make_holding(make_factor) -> Dict[str, Holding]:
@@ -76,7 +85,7 @@ def test_false_predicate_with_entities(make_factor):
         ("the trees", "Hideaway Lodge"), False) == str("It is false that the " +
         "distance between the trees and Hideaway Lodge was more than 35 feet")
 
-def test_entity_and_Human_in_predicate(make_entity, make_factor):
+def test_entity_and_human_in_predicate(make_entity, make_factor):
     assert make_factor["f2"].predicate.content_with_entities(
         (make_entity["e_watt"], make_entity["e_motel"])
         ) == "Wattenburg operated and lived at Hideaway Lodge"
@@ -85,6 +94,22 @@ def test_fact_label_with_entities(make_entity, make_factor):
     assert make_factor["f2"].str_in_context(
         (make_entity["e_watt"], make_entity["e_motel"])
     ) == "Fact: Wattenburg operated and lived at Hideaway Lodge"
+
+def test_predicate_equality(make_predicate):
+    assert make_predicate["p1"] == make_predicate["p1_again"]
+
+def test_predicate_inequality(make_predicate):
+    assert make_predicate["p2"] != make_predicate["p2_reciprocal"]
+
+def test_factor_equality(make_factor):
+    assert make_factor["f1"] == make_factor["f1b"]
+    assert make_factor["f1"] == make_factor["f1c"]
+
+def test_factor_reciprocal_unequal(make_factor):
+    assert make_factor["f2"] != make_factor["f2_reciprocal"]
+
+def test_factor_unequal_truth_value(make_factor):
+    assert make_factor["f7"] != make_factor["f7_true"]
 
 # Holding tests
 
@@ -98,7 +123,6 @@ def test_representation_of_factor(make_holding):
             {},
 
             False, False, True)""".strip().split())
-
 
 def test_identical_holdings_equal(make_holding):
     assert make_holding["h1"] == make_holding["h1_again"]
