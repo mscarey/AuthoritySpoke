@@ -2,3 +2,6 @@ __pycache__/
 .pytest_cache
 .vscode
 .mypy_cache/
+xml/
+html/
+json/

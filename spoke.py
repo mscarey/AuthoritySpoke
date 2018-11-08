@@ -2,13 +2,19 @@ from typing import Dict, Optional, Sequence, Tuple, Union
 
 class Entity:
     """A person, place, thing, or event that needs to be mentioned in
-    multiple predicates/factors in a holding."""
+    multiple predicates/factors in a holding.
 
-    def __init__(self, name: str):
+    TODO: consider using dataclass decorator"""
+
+    def __init__(self, name: str, plural: bool = False):
         self.name = name
+        self.plural = plural
 
     def __str__(self):
         return self.name
+
+    def __repr__(self):
+        return f'{self.__class__.__name__}({self.name}, {self.plural})'
 
 class Human(Entity):
     """A "natural person" mentioned as an entity in a factor.
@@ -36,7 +42,7 @@ class Predicate:
         return self.content.count("{}")
 
     def __repr__(self):
-        return f'Predicate({self.content}, {self.reciprocal})'
+        return f'{self.__class__.__name__}({self.content}, {self.reciprocal})'
 
     def __str__(self):
         return self.content
@@ -88,7 +94,7 @@ class Fact(Factor):
         return f'Fact: {self.predicate}'
 
     def __repr__(self):
-        return f'Fact("{self.predicate}", {self.truth_of_predicate})'
+        return f'{self.__class__.__name__}("{self.predicate}", {self.truth_of_predicate})'
 
     def __gt__(self, other):
         return NotImplemented
@@ -135,8 +141,6 @@ class Holding:
     def __hash__(self):
         return hash((tuple(self.outputs), tuple(self.inputs), tuple(self.even_if),
                 self.mandatory, self.universal, self.rule_valid))
-
-
 
     def match_entity_roles(self, other):
         """Make a temporary dict for information from other.
@@ -189,3 +193,6 @@ class Holding:
         return (f'{self.__class__.__name__}('
         f'{self.outputs}, {self.inputs}, {self.even_if}, '
         f'{self.mandatory}, {self.universal}, {self.rule_valid})')
+
+class Opinion():
+    pass
