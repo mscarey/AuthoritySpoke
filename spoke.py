@@ -1,8 +1,11 @@
+import datetime
+import json
+
 from typing import Dict, Optional, Sequence, Tuple, Union
 from dataclasses import dataclass
 
 
-@dataclass(frozen=True)
+@dataclass()
 class Entity:
     """A person, place, thing, or event that needs to be mentioned in
     multiple predicates/factors in a holding."""
@@ -14,13 +17,14 @@ class Entity:
         return self.name
 
 
-@dataclass(frozen=True)
+@dataclass()
 class Human(Entity):
     """A "natural person" mentioned as an entity in a factor.
     See Slaughter-House Cases, 83 U.S. 36, 99,
     https://www.courtlistener.com/opinion/88661/slaughter-house-cases/"""
 
     pass
+
 
 @dataclass(frozen=True)
 class Predicate:
@@ -64,6 +68,7 @@ class Predicate:
             *(str(e) for e in entities)
         )
 
+
 @dataclass(frozen=True)
 class Factor:
     """A factor is something used to determine the applicability of a legal
@@ -73,6 +78,7 @@ class Factor:
     Motions, and Arguments."""
 
     pass
+
 
 @dataclass(frozen=True)
 class Fact(Factor):
@@ -194,16 +200,38 @@ class Holding:
         )
 
 
-class Opinion:
-    """Analysis of what holdings an opinion posits obviously won't be over
-    when the Opinion object is created. So can holdings be added to the
-    Opinion later, making it mutable? Or are determinations about
-    Holdings created by analysts/users and overlaid on the Opinion later?
+def opinion_from_file(path):
+    with open(path, "r") as f:
+        opinion_dict = json.load(f)
 
-    Nothing about holdings can be used to create the Opinion's hash.
+    citations = tuple(c["cite"] for c in opinion_dict["citations"])
+
+    return Opinion(
+        opinion_dict["name"],
+        opinion_dict["name_abbreviation"],
+        citations,
+        int(opinion_dict["first_page"]),
+        int(opinion_dict["last_page"]),
+        datetime.date.fromisoformat(opinion_dict["decision_date"]),
+        opinion_dict["court"]["slug"],
+        # TODO: create multiple Opinions if available, label majority/concur/dissent
+        # TODO: include author field.
+    )
+
+
+@dataclass
+class Opinion:
+    """A document that resolves legal issues in a case and posits legal holdings.
+    Usually only a majority opinion will create holdings binding on any courts.
     """
 
-    pass
+    name: str
+    name_abbreviation: str
+    citations: Tuple[str]
+    first_page: int
+    last_page: int
+    decision_date: datetime.date
+    court: str
 
 
 class Attribution:

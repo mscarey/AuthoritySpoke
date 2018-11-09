@@ -1,6 +1,8 @@
 from spoke import Entity, Human
 from spoke import Predicate, Factor, Fact
 from spoke import Holding, Opinion
+from spoke import opinion_from_file
+
 from typing import Dict
 
 import pytest
@@ -65,7 +67,8 @@ def make_holding(make_factor) -> Dict[str, Holding]:
 
 @pytest.fixture
 def make_opinion() -> Dict[str, Opinion]:
-    pass
+    test_cases = ("watt", "brad")
+    return {case: opinion_from_file(f"json/{case}_h.json") for case in test_cases}
 
 
 class TestFactors:
@@ -172,4 +175,10 @@ class TestOpinions:
         assert "388 F.2d 853" in make_opinion["watt"].citations
 
     def test_opinion_date(self, make_opinion):
-        assert make_opinion["watt"].date < make_opinion["brad"].date
+        assert make_opinion["watt"].decision_date < make_opinion["brad"].decision_date
+        assert make_opinion["brad"].decision_date == make_opinion["brad_dissent"].decision_date
+
+    def test_opinion_author(self, make_opinion):
+        assert make_opinion["watt"].author == "HAMLEY, Circuit Judge"
+        assert make_opinion["brad"].author == "BURKE, J."
+        assert make_opinion["brad_dissent"].author == "TOBRINER, J."
