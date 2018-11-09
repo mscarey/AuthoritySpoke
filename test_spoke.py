@@ -7,13 +7,14 @@ import pytest
 import json
 
 
-
 @pytest.fixture
 def make_entity() -> Dict[str, Entity]:
     return {
         "e_watt": Human("Wattenburg"),
         "e_motel": Entity("Hideaway Lodge"),
-        "e_trees": Entity("a stockpile of trees")}
+        "e_trees": Entity("a stockpile of trees"),
+    }
+
 
 @pytest.fixture
 def make_predicate() -> Dict[str, Predicate]:
@@ -24,22 +25,27 @@ def make_predicate() -> Dict[str, Predicate]:
         "p2": Predicate("{} operated and lived at {}"),
         "p2_reciprocal": Predicate("{} operated and lived at {}", reciprocal=True),
         "p3": Predicate("{} was {}’s abode"),
-        "p7": Predicate("the distance between {} and {} was more than 35 feet",
-                        reciprocal=True),}
+        "p7": Predicate(
+            "the distance between {} and {} was more than 35 feet", reciprocal=True
+        ),
+    }
+
 
 @pytest.fixture
 def make_factor(make_predicate) -> Dict[str, Factor]:
     p = make_predicate
 
-    return {"f1": Fact(p["p1"]),
-            "f1b": Fact(p["p1"]),
-            "f1c": Fact(p["p1_again"]),
-            "f2": Fact(p["p2"]),
-            "f2_reciprocal": Fact(p["p2_reciprocal"]),
-            "f3": Fact(p["p3"]),
-            "f7": Fact(p["p7"], truth_of_predicate=False),
-            "f7_true": Fact(p["p7"]),
-            }
+    return {
+        "f1": Fact(p["p1"]),
+        "f1b": Fact(p["p1"]),
+        "f1c": Fact(p["p1_again"]),
+        "f2": Fact(p["p2"]),
+        "f2_reciprocal": Fact(p["p2_reciprocal"]),
+        "f3": Fact(p["p3"]),
+        "f7": Fact(p["p7"], predicate_truth=False),
+        "f7_true": Fact(p["p7"]),
+    }
+
 
 @pytest.fixture
 def make_holding(make_factor) -> Dict[str, Holding]:
@@ -48,27 +54,21 @@ def make_holding(make_factor) -> Dict[str, Holding]:
     f3 = make_factor["f3"]
 
     return {
-        "h1": Holding(
-            outputs={f3: (0, 1)},
-            inputs={f1: (0,), f2: (1, 0)},),
-        "h1_again": Holding(
-            outputs={f3: (0, 1)},
-            inputs={f1: (0,), f2: (1, 0)},),
-        "h1_different": Holding(
-            outputs={f3: (0, 1)},
-            inputs={f1: (0,), f2: (0, 1)},),
+        "h1": Holding(outputs={f3: (0, 1)}, inputs={f1: (0,), f2: (1, 0)}),
+        "h1_again": Holding(outputs={f3: (0, 1)}, inputs={f1: (0,), f2: (1, 0)}),
+        "h1_different": Holding(outputs={f3: (0, 1)}, inputs={f1: (0,), f2: (0, 1)}),
         "h1_really_the_same": Holding(
-            outputs={f3: (1, 0)},
-            inputs={f1: (1,), f2: (0, 1)},),
-            }
+            outputs={f3: (1, 0)}, inputs={f1: (1,), f2: (0, 1)}
+        ),
+    }
+
 
 @pytest.fixture
 def make_opinion() -> Dict[str, Opinion]:
     pass
 
 
-class TestFactors():
-
+class TestFactors:
     def test_string_representation_of_factor(self, make_factor):
         assert str(make_factor["f1"]) == "Fact: {} was a motel"
 
@@ -76,8 +76,10 @@ class TestFactors():
         assert len(make_factor["f1"].predicate) == 1
 
     def test_predicate_with_entities(self, make_entity, make_factor):
-        assert make_factor["f1"].predicate.content_with_entities(
-            (make_entity["e_motel"])) == "Hideaway Lodge was a motel"
+        assert (
+            make_factor["f1"].predicate.content_with_entities((make_entity["e_motel"]))
+            == "Hideaway Lodge was a motel"
+        )
 
     def test_predicate_with_wrong_number_of_entities(self, make_factor):
         with pytest.raises(ValueError):
@@ -86,22 +88,32 @@ class TestFactors():
     def test_reciprocal_with_wrong_number_of_entities(self, make_entity, make_factor):
         with pytest.raises(ValueError):
             make_factor["f1"].predicate.content_with_entities(
-                (make_entity["e_motel"], make_entity["e_watt"]))
+                (make_entity["e_motel"], make_entity["e_watt"])
+            )
 
     def test_false_predicate_with_entities(self, make_factor):
         assert make_factor["f7"].predicate.content_with_entities(
-            ("the trees", "Hideaway Lodge"), False) == str("It is false that the " +
-            "distance between the trees and Hideaway Lodge was more than 35 feet")
+            ("the trees", "Hideaway Lodge"), False
+        ) == str(
+            "It is false that the "
+            + "distance between the trees and Hideaway Lodge was more than 35 feet"
+        )
 
     def test_entity_and_human_in_predicate(self, make_entity, make_factor):
-        assert make_factor["f2"].predicate.content_with_entities(
-            (make_entity["e_watt"], make_entity["e_motel"])
-            ) == "Wattenburg operated and lived at Hideaway Lodge"
+        assert (
+            make_factor["f2"].predicate.content_with_entities(
+                (make_entity["e_watt"], make_entity["e_motel"])
+            )
+            == "Wattenburg operated and lived at Hideaway Lodge"
+        )
 
     def test_fact_label_with_entities(self, make_entity, make_factor):
-        assert make_factor["f2"].str_in_context(
-            (make_entity["e_watt"], make_entity["e_motel"])
-        ) == "Fact: Wattenburg operated and lived at Hideaway Lodge"
+        assert (
+            make_factor["f2"].str_in_context(
+                (make_entity["e_watt"], make_entity["e_motel"])
+            )
+            == "Fact: Wattenburg operated and lived at Hideaway Lodge"
+        )
 
     def test_predicate_equality(self, make_predicate):
         assert make_predicate["p1"] == make_predicate["p1_again"]
@@ -119,18 +131,19 @@ class TestFactors():
     def test_factor_unequal_truth_value(self, make_factor):
         assert make_factor["f7"] != make_factor["f7_true"]
 
-class TestHoldings():
 
-    def test_representation_of_factor(self, make_holding):
-        assert repr(make_holding["h1"]) == " ".join("""
-        Holding({Fact("{} was {}’s abode", True): (0, 1)},
-
-                {Fact("{} was a motel", True): (0,),
-                Fact("{} operated and lived at {}", True): (1, 0)},
-
-                {},
-
-                False, False, True)""".strip().split())
+class TestHoldings:
+    def test_representation_of_holding(self, make_holding):
+        assert repr(make_holding["h1"]) == " ".join(
+            """
+        Holding({Fact(predicate=Predicate(content='{} was {}’s abode',
+        reciprocal=False), predicate_truth=True): (0, 1)},
+        {Fact(predicate=Predicate(content='{} was a motel',
+        reciprocal=False), predicate_truth=True): (0,),
+        Fact(predicate=Predicate(content='{} operated and lived at {}',
+        reciprocal=False), predicate_truth=True): (1, 0)}, {},
+        False, False, True)""".strip().split()
+        )
 
     def test_identical_holdings_equal(self, make_holding):
         assert make_holding["h1"] == make_holding["h1_again"]
@@ -147,15 +160,15 @@ class TestHoldings():
         """
         assert make_holding["h1"] == make_holding["h1_really_the_same"]
 
-class TestOpinions():
 
+class TestOpinions:
     def test_load_opinion_in_Harvard_format(self):
-        with open("json/watt_h.json", 'r') as f:
+        with open("json/watt_h.json", "r") as f:
             watt_dict = json.load(f)
         assert watt_dict["name_abbreviation"] == "Wattenburg v. United States"
 
     def test_opinion_features(self, make_opinion):
-        assert make_opinion["watt"].court = "9th-cir"
+        assert make_opinion["watt"].court == "9th-cir"
         assert "388 F.2d 853" in make_opinion["watt"].citations
 
     def test_opinion_date(self, make_opinion):

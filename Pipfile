@@ -10,6 +10,7 @@ pytest = "*"
 pylint = "*"
 mypy = "*"
 rope = "*"
+black = "*"
 
 [requires]
 python_version = "3.7"

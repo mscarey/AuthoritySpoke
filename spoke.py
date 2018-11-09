@@ -1,114 +1,96 @@
 from typing import Dict, Optional, Sequence, Tuple, Union
+from dataclasses import dataclass
 
+
+@dataclass(frozen=True)
 class Entity:
     """A person, place, thing, or event that needs to be mentioned in
-    multiple predicates/factors in a holding.
+    multiple predicates/factors in a holding."""
 
-    TODO: consider using dataclass decorator"""
-
-    def __init__(self, name: str, plural: bool = False):
-        self.name = name
-        self.plural = plural
+    name: str
+    plural: bool = False
 
     def __str__(self):
         return self.name
 
-    def __repr__(self):
-        return f'{self.__class__.__name__}({self.name}, {self.plural})'
 
+@dataclass(frozen=True)
 class Human(Entity):
     """A "natural person" mentioned as an entity in a factor.
     See Slaughter-House Cases, 83 U.S. 36, 99,
     https://www.courtlistener.com/opinion/88661/slaughter-house-cases/"""
+
     pass
 
+@dataclass(frozen=True)
 class Predicate:
     """A statement about real events or about legal conclusions.
     Predicates may be "alleged" by a pleading, "supported" by evidence, or
     "found" to be factual by a jury verdict or a judge's finding of fact"""
 
-    def __init__(self, content: str, reciprocal: bool = False):
-        self.content = content
-        self.reciprocal = reciprocal
+    content: str
+    reciprocal: bool = False
 
+    def __post_init__(self):
         if len(self) != 2 and self.reciprocal:
             raise ValueError(
-                '"reciprocal" flag is only allowed with exactly 2 entities.')
-
-    def __hash__(self):
-        return hash((self.content, self.reciprocal))
+                f'"reciprocal" flag not allowed because {self.content} '
+                f"has {len(self)} entities, not 2."
+            )
 
     def __len__(self):
         return self.content.count("{}")
 
-    def __repr__(self):
-        return f'{self.__class__.__name__}({self.content}, {self.reciprocal})'
-
     def __str__(self):
         return self.content
 
-    def __eq__(self, other):
-        if not isinstance(other, Predicate):
-            return False
-        return self.content == other.content and self.reciprocal == other.reciprocal
-
-    def content_with_truth(self, truth_of_predicate=True) -> str:
-        truth_prefix = "It is false that " if not truth_of_predicate else ""
+    def content_with_truth(self, predicate_truth=True) -> str:
+        truth_prefix = "It is false that " if not predicate_truth else ""
         return truth_prefix + self.content
 
-    def content_with_entities(self, entities: Union[Entity, Sequence[Entity]],
-                              truth_of_predicate=True) -> str:
+    def content_with_entities(
+        self, entities: Union[Entity, Sequence[Entity]], predicate_truth=True
+    ) -> str:
         """Creates a sentence by substituting the names of entities
         from a particular case into the predicate_with_truth."""
         if isinstance(entities, Entity):
             entities = (entities,)
         if len(entities) != len(self):
             raise ValueError(
-                f'Exactly {len(self)} entities needed to complete ' +
-                f'"{self.content}", but {len(entities)} were given.')
+                f"Exactly {len(self)} entities needed to complete "
+                + f'"{self.content}", but {len(entities)} were given.'
+            )
+        return self.content_with_truth(predicate_truth).format(
+            *(str(e) for e in entities)
+        )
 
-        return self.content_with_truth(truth_of_predicate).format(
-            *(str(e) for e in entities))
-
+@dataclass(frozen=True)
 class Factor:
     """A factor is something used to determine the applicability of a legal
     procedure. Factors can be both inputs and outputs of legal procedures.
     In a chain of legal procedures, the outputs of one may become inputs for
     another. Common types of factors include Facts, Evidence, Allegations,
     Motions, and Arguments."""
+
     pass
 
+@dataclass(frozen=True)
 class Fact(Factor):
     """An assertion accepted as factual by a court, often through factfinding by
     a judge or jury."""
 
-    def __init__(self, predicate: Predicate, truth_of_predicate: bool = True):
-
-        self.predicate = predicate
-        self.truth_of_predicate = truth_of_predicate
-
-    def __hash__(self):
-        return hash((self.predicate, self.truth_of_predicate))
+    predicate: Predicate
+    predicate_truth: bool = True
 
     def __str__(self):
-        return f'Fact: {self.predicate}'
-
-    def __repr__(self):
-        return f'{self.__class__.__name__}("{self.predicate}", {self.truth_of_predicate})'
+        return f"{self.__class__.__name__}: {self.predicate}"
 
     def __gt__(self, other):
         return NotImplemented
 
-    def __eq__(self, other):
-        if not isinstance(other, Fact):
-            return False
-        return (self.predicate == other.predicate) & (self.truth_of_predicate == other.truth_of_predicate)
-
     def str_in_context(self, entities: Sequence[Entity]) -> str:
-        content = self.predicate.content_with_entities(
-            entities, self.truth_of_predicate
-            )
-        return f'Fact: {content}'
+        content = self.predicate.content_with_entities(entities, self.predicate_truth)
+        return f"{self.__class__.__name__}: {content}"
 
 
 class Holding:
@@ -118,12 +100,15 @@ class Holding:
     don't necessarily imply that the court accepts the factual assertions or
     other factors that make up their inputs or outputs."""
 
-    def __init__(self, outputs: Dict[Factor, Tuple[int]],
-                 inputs: Optional[Dict[Factor, Tuple[int]]] = None,
-                 even_if: Optional[Dict[Factor, Tuple[int]]] = None,
-                 mandatory: bool = False,
-                 universal: bool = False,
-                 rule_valid: Union[bool, None] = True):
+    def __init__(
+        self,
+        outputs: Dict[Factor, Tuple[int]],
+        inputs: Optional[Dict[Factor, Tuple[int]]] = None,
+        even_if: Optional[Dict[Factor, Tuple[int]]] = None,
+        mandatory: bool = False,
+        universal: bool = False,
+        rule_valid: Union[bool, None] = True,
+    ):
 
         self.outputs = outputs
         self.inputs = inputs or {}
@@ -139,8 +124,16 @@ class Holding:
         self.rule_valid = rule_valid
 
     def __hash__(self):
-        return hash((tuple(self.outputs), tuple(self.inputs), tuple(self.even_if),
-                self.mandatory, self.universal, self.rule_valid))
+        return hash(
+            (
+                tuple(self.outputs),
+                tuple(self.inputs),
+                tuple(self.even_if),
+                self.mandatory,
+                self.universal,
+                self.rule_valid,
+            )
+        )
 
     def match_entity_roles(self, other):
         """Make a temporary dict for information from other.
@@ -152,8 +145,10 @@ class Holding:
         none of the slots return False, return True."""
 
         entity_roles = {}
-        for x in zip((self.outputs, self.inputs, self.even_if),
-                     (other.outputs, other.inputs, other.even_if)):
+        for x in zip(
+            (self.outputs, self.inputs, self.even_if),
+            (other.outputs, other.inputs, other.even_if),
+        ):
             self_factor_list = sorted(x[0], key=str)
             other_factor_list = sorted(x[1], key=str)
             if len(self_factor_list) != len(other_factor_list):
@@ -179,9 +174,11 @@ class Holding:
         if not isinstance(other, Holding):
             return False
 
-        if (self.mandatory != other.mandatory) or \
-            (self.universal != other.universal) or \
-            (self.rule_valid != other.rule_valid):
+        if (
+            (self.mandatory != other.mandatory)
+            or (self.universal != other.universal)
+            or (self.rule_valid != other.rule_valid)
+        ):
             return False
 
         if not self.match_entity_roles(other):
@@ -190,9 +187,28 @@ class Holding:
         return other.match_entity_roles(self)
 
     def __repr__(self):
-        return (f'{self.__class__.__name__}('
-        f'{self.outputs}, {self.inputs}, {self.even_if}, '
-        f'{self.mandatory}, {self.universal}, {self.rule_valid})')
+        return (
+            f"{self.__class__.__name__}("
+            f"{self.outputs}, {self.inputs}, {self.even_if}, "
+            f"{self.mandatory}, {self.universal}, {self.rule_valid})"
+        )
 
-class Opinion():
+
+class Opinion:
+    """Analysis of what holdings an opinion posits obviously won't be over
+    when the Opinion object is created. So can holdings be added to the
+    Opinion later, making it mutable? Or are determinations about
+    Holdings created by analysts/users and overlaid on the Opinion later?
+
+    Nothing about holdings can be used to create the Opinion's hash.
+    """
+
+    pass
+
+
+class Attribution:
+    """An assertion about the meaning of a prior Opinion. Either a user or an Opinion
+    may make an Attribution to an Opinion. An Attribution may attribute either
+    a Holding or a further Attribution."""
+
     pass
