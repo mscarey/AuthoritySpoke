@@ -1,6 +1,6 @@
 from spoke import Entity, Human
 from spoke import Predicate, Factor, Fact
-from spoke import Holding, Opinion
+from spoke import Procedure, Holding, Opinion
 from spoke import opinion_from_file
 
 from typing import Dict
@@ -14,7 +14,7 @@ def make_entity() -> Dict[str, Entity]:
     return {
         "e_watt": Human("Wattenburg"),
         "e_motel": Entity("Hideaway Lodge"),
-        "e_trees": Entity("a stockpile of trees"),
+        "e_trees": Entity("the stockpile of trees"),
     }
 
 
@@ -56,11 +56,15 @@ def make_holding(make_factor) -> Dict[str, Holding]:
     f3 = make_factor["f3"]
 
     return {
-        "h1": Holding(outputs={f3: (0, 1)}, inputs={f1: (0,), f2: (1, 0)}),
-        "h1_again": Holding(outputs={f3: (0, 1)}, inputs={f1: (0,), f2: (1, 0)}),
-        "h1_different": Holding(outputs={f3: (0, 1)}, inputs={f1: (0,), f2: (0, 1)}),
+        "h1": Holding(Procedure(outputs={f3: (0, 1)}, inputs={f1: (0,), f2: (1, 0)})),
+        "h1_again": Holding(
+            Procedure(outputs={f3: (0, 1)}, inputs={f1: (0,), f2: (1, 0)})
+        ),
+        "h1_different": Holding(
+            Procedure(outputs={f3: (0, 1)}, inputs={f1: (0,), f2: (0, 1)})
+        ),
         "h1_really_the_same": Holding(
-            outputs={f3: (1, 0)}, inputs={f1: (1,), f2: (0, 1)}
+            Procedure(outputs={f3: (1, 0)}, inputs={f1: (1,), f2: (0, 1)})
         ),
     }
 
@@ -98,12 +102,12 @@ class TestFactors:
                 (make_entity["e_motel"], make_entity["e_watt"])
             )
 
-    def test_false_predicate_with_entities(self, make_factor):
-        assert make_factor["f7"].predicate.content_with_entities(
-            ("the trees", "Hideaway Lodge"), False
+    def test_false_predicate_with_entities(self, make_entity, make_factor):
+        assert make_factor["f7"].predicate_in_context(
+            (make_entity["e_trees"], make_entity["e_motel"])
         ) == str(
-            "It is false that the "
-            + "distance between the trees and Hideaway Lodge was more than 35 feet"
+            "Fact: It is false that the distance between the stockpile of trees "
+            + "and Hideaway Lodge was more than 35 feet"
         )
 
     def test_entity_and_human_in_predicate(self, make_entity, make_factor):
@@ -116,7 +120,7 @@ class TestFactors:
 
     def test_fact_label_with_entities(self, make_entity, make_factor):
         assert (
-            make_factor["f2"].str_in_context(
+            make_factor["f2"].predicate_in_context(
                 (make_entity["e_watt"], make_entity["e_motel"])
             )
             == "Fact: Wattenburg operated and lived at Hideaway Lodge"
@@ -141,15 +145,16 @@ class TestFactors:
 
 class TestHoldings:
     def test_representation_of_holding(self, make_holding):
-        assert repr(make_holding["h1"]) == " ".join(
-            """
-        Holding({Fact(predicate=Predicate(content='{} was {}’s abode',
-        reciprocal=False), predicate_truth=True): (0, 1)},
-        {Fact(predicate=Predicate(content='{} was a motel',
-        reciprocal=False), predicate_truth=True): (0,),
-        Fact(predicate=Predicate(content='{} operated and lived at {}',
-        reciprocal=False), predicate_truth=True): (1, 0)}, {},
-        False, False, True)""".strip().split()
+        assert (
+            repr(make_holding["h1"])
+            == " ".join(
+                """Holding(procedure=Procedure(outputs={Fact(predicate=Predicate(content='{}
+        was {}’s abode', reciprocal=False), predicate_truth=True): (0, 1)},
+        inputs={Fact(predicate=Predicate(content='{} was a motel', reciprocal=False),
+        predicate_truth=True): (0,), Fact(predicate=Predicate(content='{} operated
+        and lived at {}', reciprocal=False), predicate_truth=True): (1, 0)},
+        even_if=None), mandatory=False, universal=False, rule_valid=True)""".split()
+            ).strip()
         )
 
     def test_identical_holdings_equal(self, make_holding):

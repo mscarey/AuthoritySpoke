@@ -30,13 +30,16 @@ class Human(Entity):
 class Predicate:
     """A statement about real events or about legal conclusions.
     Predicates may be "alleged" by a pleading, "supported" by evidence, or
-    "found" to be factual by a jury verdict or a judge's finding of fact"""
+    "found" to be factual by a jury verdict or a judge's finding of fact.
+
+    If reciprocal==True, then the order of the first two entities will
+    be considered interchangeable."""
 
     content: str
     reciprocal: bool = False
 
     def __post_init__(self):
-        if len(self) != 2 and self.reciprocal:
+        if len(self) < 2 and self.reciprocal:
             raise ValueError(
                 f'"reciprocal" flag not allowed because {self.content} '
                 f"has {len(self)} entities, not 2."
@@ -48,13 +51,7 @@ class Predicate:
     def __str__(self):
         return self.content
 
-    def content_with_truth(self, predicate_truth=True) -> str:
-        truth_prefix = "It is false that " if not predicate_truth else ""
-        return truth_prefix + self.content
-
-    def content_with_entities(
-        self, entities: Union[Entity, Sequence[Entity]], predicate_truth=True
-    ) -> str:
+    def content_with_entities(self, entities: Union[Entity, Sequence[Entity]]) -> str:
         """Creates a sentence by substituting the names of entities
         from a particular case into the predicate_with_truth."""
         if isinstance(entities, Entity):
@@ -64,9 +61,7 @@ class Predicate:
                 f"Exactly {len(self)} entities needed to complete "
                 + f'"{self.content}", but {len(entities)} were given.'
             )
-        return self.content_with_truth(predicate_truth).format(
-            *(str(e) for e in entities)
-        )
+        return str(self).format(*(str(e) for e in entities))
 
 
 @dataclass(frozen=True)
@@ -89,57 +84,26 @@ class Fact(Factor):
     predicate_truth: bool = True
 
     def __str__(self):
-        return f"{self.__class__.__name__}: {self.predicate}"
+        truth_prefix = "It is false that " if not self.predicate_truth else ""
+        return f"{self.__class__.__name__}: {truth_prefix}{self.predicate}"
 
     def __gt__(self, other):
         return NotImplemented
 
-    def str_in_context(self, entities: Sequence[Entity]) -> str:
-        content = self.predicate.content_with_entities(entities, self.predicate_truth)
-        return f"{self.__class__.__name__}: {content}"
+    def predicate_in_context(self, entities: Sequence[Entity]) -> str:
+        truth_prefix = "It is false that " if not self.predicate_truth else ""
+        return f"{self.__class__.__name__}: {truth_prefix}{self.predicate.content_with_entities(entities)}"
 
 
-class Holding:
-    """A statement of law about how courts should resolve litigation. Holdings
-    can be described as legal procedures in terms of inputs and outputs. When
-    holdings appear in judicial opinions they are often hypothetical and
-    don't necessarily imply that the court accepts the factual assertions or
-    other factors that make up their inputs or outputs."""
+@dataclass(frozen=True)
+class Procedure:
+    """A (potential) rule for courts to use in resolving litigation. Described in
+    terms of inputs and outputs, and also potentially "even if" factors, which could
+    be considered "failed undercutters" in defeasible logic."""
 
-    def __init__(
-        self,
-        outputs: Dict[Factor, Tuple[int]],
-        inputs: Optional[Dict[Factor, Tuple[int]]] = None,
-        even_if: Optional[Dict[Factor, Tuple[int]]] = None,
-        mandatory: bool = False,
-        universal: bool = False,
-        rule_valid: Union[bool, None] = True,
-    ):
-
-        self.outputs = outputs
-        self.inputs = inputs or {}
-        self.even_if = even_if or {}
-
-        """TODO: Maybe what's currently called a Holding object should be
-        called a Procedure object, except that I should factor out the next
-        three flags and put them on a new object type called a
-        Holding which is a relation between an Opinion and a Procedure."""
-
-        self.mandatory = mandatory
-        self.universal = universal
-        self.rule_valid = rule_valid
-
-    def __hash__(self):
-        return hash(
-            (
-                tuple(self.outputs),
-                tuple(self.inputs),
-                tuple(self.even_if),
-                self.mandatory,
-                self.universal,
-                self.rule_valid,
-            )
-        )
+    outputs: Dict[Factor, Tuple[int]]
+    inputs: Optional[Dict[Factor, Tuple[int]]] = None
+    even_if: Optional[Dict[Factor, Tuple[int]]] = None
 
     def match_entity_roles(self, other):
         """Make a temporary dict for information from other.
@@ -151,9 +115,10 @@ class Holding:
         none of the slots return False, return True."""
 
         entity_roles = {}
-        for x in zip(
-            (self.outputs, self.inputs, self.even_if),
-            (other.outputs, other.inputs, other.even_if),
+        for x in (
+            (self.outputs, other.outputs),
+            (self.inputs or {}, other.inputs or {}),
+            (self.even_if or {}, other.even_if or {}),
         ):
             self_factor_list = sorted(x[0], key=str)
             other_factor_list = sorted(x[1], key=str)
@@ -182,14 +147,7 @@ class Holding:
         with the same entities in the same roles, not whether they're
         actually the same Python object."""
 
-        if not isinstance(other, Holding):
-            return False
-
-        if (
-            (self.mandatory != other.mandatory)
-            or (self.universal != other.universal)
-            or (self.rule_valid != other.rule_valid)
-        ):
+        if not isinstance(other, Procedure):
             return False
 
         if not self.match_entity_roles(other):
@@ -197,12 +155,26 @@ class Holding:
 
         return other.match_entity_roles(self)
 
-    def __repr__(self):
-        return (
-            f"{self.__class__.__name__}("
-            f"{self.outputs}, {self.inputs}, {self.even_if}, "
-            f"{self.mandatory}, {self.universal}, {self.rule_valid})"
-        )
+
+@dataclass
+class Holding:
+    """A statement in which a court posits a legal rule as authoritative,
+    deciding some aspect of the current litigation but also potentially
+    binding future courts to follow the rule. When holdings appear in
+    judicial opinions they are often hypothetical and don't necessarily
+    imply that the court accepts the factual assertions or other factors
+    that make up the inputs or outputs of the procedure mentioned in the
+    holding."""
+
+    procedure: Optional[Procedure] = None
+    mandatory: bool = False
+    universal: bool = False
+    rule_valid: Union[bool, None] = True
+
+    """TODO: Maybe what's currently called a Holding object should be
+    called a Procedure object, except that I should factor out the next
+    three flags and put them on a new object type called a
+    Holding which is a relation between an Opinion and a Procedure."""
 
 
 def opinion_from_file(path):
