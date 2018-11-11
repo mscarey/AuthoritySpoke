@@ -68,7 +68,11 @@ def make_holding(make_factor) -> Dict[str, Holding]:
 @pytest.fixture
 def make_opinion() -> Dict[str, Opinion]:
     test_cases = ("watt", "brad")
-    return {case: opinion_from_file(f"json/{case}_h.json") for case in test_cases}
+    opinions = {}
+    for case in test_cases:
+        for opinion in opinion_from_file(f"json/{case}_h.json"):
+            opinions[f"{case}_{opinion.position}"] = opinion
+    return opinions
 
 
 class TestFactors:
@@ -171,14 +175,25 @@ class TestOpinions:
         assert watt_dict["name_abbreviation"] == "Wattenburg v. United States"
 
     def test_opinion_features(self, make_opinion):
-        assert make_opinion["watt"].court == "9th-cir"
-        assert "388 F.2d 853" in make_opinion["watt"].citations
+        assert make_opinion["watt_majority"].court == "9th-cir"
+        assert "388 F.2d 853" in make_opinion["watt_majority"].citations
 
     def test_opinion_date(self, make_opinion):
-        assert make_opinion["watt"].decision_date < make_opinion["brad"].decision_date
-        assert make_opinion["brad"].decision_date == make_opinion["brad_dissent"].decision_date
+        assert (
+            make_opinion["watt_majority"].decision_date
+            < make_opinion["brad_majority"].decision_date
+        )
+        assert (
+            make_opinion["brad_majority"].decision_date
+            == make_opinion[
+                "brad_concurring-in-part-and-dissenting-in-part"
+            ].decision_date
+        )
 
     def test_opinion_author(self, make_opinion):
-        assert make_opinion["watt"].author == "HAMLEY, Circuit Judge"
-        assert make_opinion["brad"].author == "BURKE, J."
-        assert make_opinion["brad_dissent"].author == "TOBRINER, J."
+        assert make_opinion["watt_majority"].author == "HAMLEY, Circuit Judge"
+        assert make_opinion["brad_majority"].author == "BURKE, J."
+        assert (
+            make_opinion["brad_concurring-in-part-and-dissenting-in-part"].author
+            == "TOBRINER, J."
+        )

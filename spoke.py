@@ -157,6 +157,11 @@ class Holding:
         ):
             self_factor_list = sorted(x[0], key=str)
             other_factor_list = sorted(x[1], key=str)
+
+            # TODO: to create a __gt__ test, test whether each factor in one holding
+            # implies a factor in the other...and also has the entity markers
+            # in the right order
+
             if len(self_factor_list) != len(other_factor_list):
                 return False
             factor_pairs = zip(self_factor_list, other_factor_list)
@@ -201,22 +206,31 @@ class Holding:
 
 
 def opinion_from_file(path):
+    """This is a generator that gets one opinion from a
+    Harvard-format case file every time it's called. Exhaust the
+    generator to get the lead opinion and all non-lead opinions."""
+
     with open(path, "r") as f:
         opinion_dict = json.load(f)
 
     citations = tuple(c["cite"] for c in opinion_dict["citations"])
 
-    return Opinion(
-        opinion_dict["name"],
-        opinion_dict["name_abbreviation"],
-        citations,
-        int(opinion_dict["first_page"]),
-        int(opinion_dict["last_page"]),
-        datetime.date.fromisoformat(opinion_dict["decision_date"]),
-        opinion_dict["court"]["slug"],
-        # TODO: create multiple Opinions if available, label majority/concur/dissent
-        # TODO: include author field.
-    )
+    for opinion in opinion_dict["casebody"]["data"]["opinions"]:
+        author = None
+        position = opinion["type"]
+        author = opinion["author"].strip(",:")
+
+        yield Opinion(
+            opinion_dict["name"],
+            opinion_dict["name_abbreviation"],
+            citations,
+            int(opinion_dict["first_page"]),
+            int(opinion_dict["last_page"]),
+            datetime.date.fromisoformat(opinion_dict["decision_date"]),
+            opinion_dict["court"]["slug"],
+            position,
+            author,
+        )
 
 
 @dataclass
@@ -232,6 +246,8 @@ class Opinion:
     last_page: int
     decision_date: datetime.date
     court: str
+    position: str
+    author: str
 
 
 class Attribution:
