@@ -128,7 +128,7 @@ class Procedure:
     inputs: Optional[Dict[Factor, Tuple[int]]] = None
     even_if: Optional[Dict[Factor, Tuple[int]]] = None
 
-    def match_entity_roles(self, other):
+    def match_entity_roles(self, self_factors, other_factors):
         """Make a temporary dict for information from other.
         For each entity slot in each factor in self, check the matching
         entity slot in other. If it contains something that's not already
@@ -138,31 +138,37 @@ class Procedure:
         none of the slots return False, return True."""
 
         entity_roles = {}
-        for x in (
-            (self.outputs, other.outputs),
-            (self.inputs or {}, other.inputs or {}),
-            (self.even_if or {}, other.even_if or {}),
-        ):
-            self_factor_list = sorted(x[0], key=str)
-            other_factor_list = sorted(x[1], key=str)
 
-            # TODO: to create a __gt__ test, test whether each factor in one holding
-            # implies a factor in the other...and also has the entity markers
-            # in the right order
+        self_factor_list = sorted(self_factors, key=str)
+        other_factor_list = sorted(other_factors, key=str)
 
-            if len(self_factor_list) != len(other_factor_list):
+        # TODO: to create a __gt__ test, test whether each factor in one holding
+        # implies a factor in the other...and also has the entity markers
+        # in the right order
+
+        if len(self_factor_list) != len(other_factor_list):
+            return False
+        factor_pairs = zip(self_factor_list, other_factor_list)
+        for pair in factor_pairs:
+
+            # tests whether the corresponding factors have the
+            # same string representation
+
+            if str(pair[0]) != str(pair[1]):
                 return False
-            factor_pairs = zip(self_factor_list, other_factor_list)
-            for pair in factor_pairs:
-                if str(pair[0]) != str(pair[1]):
+
+            # tests whether the corresponding factors have the
+            # same number of entities (unnecessary?)
+
+            if len(self_factors[pair[0]]) != len(other_factors[pair[1]]):
+                return False
+            for i in range(len(self_factors[pair[0]])):
+                self_entity_label = self_factors[pair[0]][i]
+                other_entity_label = other_factors[pair[1]][i]
+                if self_entity_label not in entity_roles:
+                    entity_roles[self_entity_label] = other_entity_label
+                if entity_roles[self_entity_label] != other_entity_label:
                     return False
-                for i in range(len(x[0][pair[0]])):
-                    self_entity_label = x[0][pair[0]][i]
-                    other_entity_label = x[1][pair[1]][i]
-                    if self_entity_label not in entity_roles:
-                        entity_roles[self_entity_label] = other_entity_label
-                    if entity_roles[self_entity_label] != other_entity_label:
-                        return False
         return True
 
     def __eq__(self, other):
@@ -173,10 +179,15 @@ class Procedure:
         if not isinstance(other, Procedure):
             return False
 
-        if not self.match_entity_roles(other):
-            return False
+        for x in (
+            (self.outputs, other.outputs),
+            (self.inputs or {}, other.inputs or {}),
+            (self.even_if or {}, other.even_if or {}),
+        ):
+            if not self.match_entity_roles(x[0], x[1]):
+                return False
 
-        return other.match_entity_roles(self)
+        return True
 
 
 @dataclass
@@ -193,11 +204,6 @@ class Holding:
     mandatory: bool = False
     universal: bool = False
     rule_valid: Union[bool, None] = True
-
-    """TODO: Maybe what's currently called a Holding object should be
-    called a Procedure object, except that I should factor out the next
-    three flags and put them on a new object type called a
-    Holding which is a relation between an Opinion and a Procedure."""
 
 
 def opinion_from_file(path):

@@ -56,6 +56,24 @@ def make_factor(make_predicate) -> Dict[str, Factor]:
         "f7_true": Fact(p["p7_true"]),
     }
 
+@pytest.fixture
+def make_procedure(make_factor) -> Dict[str, Procedure]:
+    f1 = make_factor["f1"]
+    f2 = make_factor["f2"]
+    f3 = make_factor["f3"]
+
+    return {
+        "c1": Procedure(outputs={f3: (0, 1)}, inputs={f1: (0,), f2: (1, 0)}),
+        "c1_again": Procedure(outputs={f3: (1, 0)}, inputs={f2: (0, 1), f1: (1,)}),
+        "c1_easy": Procedure(outputs={f3: (0, 1)}, inputs={f2: (1, 0)}),
+    }
+
+class TestProcedure:
+
+    def test_procedure_equality(self, make_procedure):
+        assert make_procedure["c1"] == make_procedure["c1_again"]
+    def test_implies_same_output_fewer_inputs(self, make_procedure):
+        assert make_procedure["c1_easy"].implies(make_procedure["c1"])
 
 @pytest.fixture
 def make_holding(make_factor) -> Dict[str, Holding]:
@@ -110,6 +128,7 @@ class TestPredicates:
 class TestFactors:
     def test_string_representation_of_factor(self, make_factor):
         assert str(make_factor["f1"]) == "Fact: {} was a motel"
+        assert str(make_factor["f3_absent"]) == "Absent Fact: {} was {}’s abode"
 
     def test_entity_slots_as_length_of_factor(self, make_factor):
         assert len(make_factor["f1"].predicate) == 1
