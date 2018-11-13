@@ -28,7 +28,14 @@ def make_predicate() -> Dict[str, Predicate]:
         "p2_reciprocal": Predicate("{} operated and lived at {}", reciprocal=True),
         "p3": Predicate("{} was {}’s abode"),
         "p7": Predicate(
-            "the distance between {} and {} was more than 35 feet", reciprocal=True
+            "the distance between {} and {} was more than 35 feet",
+            truth=False,
+            reciprocal=True,
+        ),
+        "p7_true": Predicate(
+            "the distance between {} and {} was more than 35 feet",
+            truth=True,
+            reciprocal=True,
         ),
     }
 
@@ -44,8 +51,9 @@ def make_factor(make_predicate) -> Dict[str, Factor]:
         "f2": Fact(p["p2"]),
         "f2_reciprocal": Fact(p["p2_reciprocal"]),
         "f3": Fact(p["p3"]),
-        "f7": Fact(p["p7"], predicate_truth=False),
-        "f7_true": Fact(p["p7"]),
+        "f3_absent": Fact(p["p3"], absent=True),
+        "f7": Fact(p["p7"]),
+        "f7_true": Fact(p["p7_true"]),
     }
 
 
@@ -79,6 +87,26 @@ def make_opinion() -> Dict[str, Opinion]:
     return opinions
 
 
+class TestPredicates:
+
+    def test_predicate_with_wrong_number_of_entities(self):
+        with pytest.raises(ValueError):
+            f = Predicate("{} was a motel", reciprocal=True)
+
+    def test_predicate_contradictions(self, make_predicate):
+        assert make_predicate["p7"].contradicts(make_predicate["p7_true"])
+        assert not make_predicate["p1"].contradicts(make_predicate["p1_again"])
+        assert not make_predicate["p3"].contradicts(make_predicate["p7"])
+
+    def test_predicate_does_not_contradict_factor(self, make_predicate, make_factor):
+        assert not make_predicate["p7_true"].contradicts(make_factor["f7"])
+
+    def test_predicate_equality(self, make_predicate):
+        assert make_predicate["p1"] == make_predicate["p1_again"]
+
+    def test_predicate_inequality(self, make_predicate):
+        assert make_predicate["p2"] != make_predicate["p2_reciprocal"]
+
 class TestFactors:
     def test_string_representation_of_factor(self, make_factor):
         assert str(make_factor["f1"]) == "Fact: {} was a motel"
@@ -91,10 +119,6 @@ class TestFactors:
             make_factor["f1"].predicate.content_with_entities((make_entity["e_motel"]))
             == "Hideaway Lodge was a motel"
         )
-
-    def test_predicate_with_wrong_number_of_entities(self, make_factor):
-        with pytest.raises(ValueError):
-            f = Predicate("{} was a motel", reciprocal=True)
 
     def test_reciprocal_with_wrong_number_of_entities(self, make_entity, make_factor):
         with pytest.raises(ValueError):
@@ -126,12 +150,6 @@ class TestFactors:
             == "Fact: Wattenburg operated and lived at Hideaway Lodge"
         )
 
-    def test_predicate_equality(self, make_predicate):
-        assert make_predicate["p1"] == make_predicate["p1_again"]
-
-    def test_predicate_inequality(self, make_predicate):
-        assert make_predicate["p2"] != make_predicate["p2_reciprocal"]
-
     def test_factor_equality(self, make_factor):
         assert make_factor["f1"] == make_factor["f1b"]
         assert make_factor["f1"] == make_factor["f1c"]
@@ -139,8 +157,16 @@ class TestFactors:
     def test_factor_reciprocal_unequal(self, make_factor):
         assert make_factor["f2"] != make_factor["f2_reciprocal"]
 
-    def test_factor_unequal_truth_value(self, make_factor):
+    def test_factor_unequal_predicate_truth(self, make_factor):
         assert make_factor["f7"] != make_factor["f7_true"]
+        assert make_factor["f7"].contradicts(make_factor["f7_true"])
+
+    def test_factor_does_not_contradict_predicate(self, make_predicate, make_factor):
+        assert not make_factor["f7"].contradicts(make_predicate["p7_true"])
+
+    def test_factor_contradiction_absent_predicate(self, make_factor):
+        assert make_factor["f3"].contradicts(make_factor["f3_absent"])
+        assert make_factor["f3_absent"].contradicts(make_factor["f3"])
 
 
 class TestHoldings:
@@ -148,12 +174,7 @@ class TestHoldings:
         assert (
             repr(make_holding["h1"])
             == " ".join(
-                """Holding(procedure=Procedure(outputs={Fact(predicate=Predicate(content='{}
-        was {}’s abode', reciprocal=False), predicate_truth=True): (0, 1)},
-        inputs={Fact(predicate=Predicate(content='{} was a motel', reciprocal=False),
-        predicate_truth=True): (0,), Fact(predicate=Predicate(content='{} operated
-        and lived at {}', reciprocal=False), predicate_truth=True): (1, 0)},
-        even_if=None), mandatory=False, universal=False, rule_valid=True)""".split()
+                """Holding(procedure=Procedure(outputs={Fact(predicate=Predicate(content='{} was {}’s abode', truth=True, reciprocal=False), absent=False): (0, 1)}, inputs={Fact(predicate=Predicate(content='{} was a motel', truth=True, reciprocal=False), absent=False): (0,), Fact(predicate=Predicate(content='{} operated and lived at {}', truth=True, reciprocal=False), absent=False): (1, 0)}, even_if=None), mandatory=False, universal=False, rule_valid=True)""".split()
             ).strip()
         )
 

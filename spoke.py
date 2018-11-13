@@ -36,20 +36,30 @@ class Predicate:
     be considered interchangeable."""
 
     content: str
+    truth: bool = True
     reciprocal: bool = False
 
     def __post_init__(self):
         if len(self) < 2 and self.reciprocal:
             raise ValueError(
                 f'"reciprocal" flag not allowed because {self.content} '
-                f"has {len(self)} entities, not 2."
+                f"has {len(self)} entities, fewer than 2."
             )
 
     def __len__(self):
         return self.content.count("{}")
 
     def __str__(self):
-        return self.content
+        truth_prefix = "It is false that " if not self.truth else ""
+        return f'{truth_prefix}{self.content}'
+
+    def contradicts(self, other):
+        """This returns false only if the content is exactly the same and self.truth is
+        different. Will break if symbols for entities are allowed to appear in self.content.
+        """
+        if isinstance(other, self.__class__):
+            return self.content == other.content and self.truth != other.truth
+        return False
 
     def content_with_entities(self, entities: Union[Entity, Sequence[Entity]]) -> str:
         """Creates a sentence by substituting the names of entities
@@ -63,6 +73,8 @@ class Predicate:
             )
         return str(self).format(*(str(e) for e in entities))
 
+    # TODO: allow the same entity to be mentioned more than once
+
 
 @dataclass(frozen=True)
 class Factor:
@@ -72,8 +84,6 @@ class Factor:
     another. Common types of factors include Facts, Evidence, Allegations,
     Motions, and Arguments."""
 
-    pass
-
 
 @dataclass(frozen=True)
 class Fact(Factor):
@@ -81,18 +91,31 @@ class Fact(Factor):
     a judge or jury."""
 
     predicate: Predicate
-    predicate_truth: bool = True
+    absent: bool = False
 
     def __str__(self):
-        truth_prefix = "It is false that " if not self.predicate_truth else ""
-        return f"{self.__class__.__name__}: {truth_prefix}{self.predicate}"
+        return f"{'Absent ' if self.absent else ''}{self.__class__.__name__}: {self.predicate}"
 
     def __gt__(self, other):
         return NotImplemented
 
     def predicate_in_context(self, entities: Sequence[Entity]) -> str:
-        truth_prefix = "It is false that " if not self.predicate_truth else ""
-        return f"{self.__class__.__name__}: {truth_prefix}{self.predicate.content_with_entities(entities)}"
+        return (f"{'Absent ' if self.absent else ''}{self.__class__.__name__}: " +
+               f"{self.predicate.content_with_entities(entities)}")
+
+    def contradicts(self, other):
+        if not isinstance(other, self.__class__):
+            return False
+        if self.predicate.contradicts(other.predicate) and not (self.absent | other.absent):
+            return True
+        if (self.predicate == other.predicate) and (self.absent != other.absent):
+            return True
+        return False
+
+
+    # TODO: I'd like a function to determine if a factor implies another,
+    # but it would need entity context,
+    # and I guess it would have to be from the point of view of a particular court.
 
 
 @dataclass(frozen=True)
