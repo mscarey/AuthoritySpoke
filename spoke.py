@@ -184,6 +184,7 @@ class Procedure:
             (self.inputs or {}, other.inputs or {}),
             (self.even_if or {}, other.even_if or {}),
         ):
+
             if not self.match_entity_roles(x[0], x[1]):
                 return False
 

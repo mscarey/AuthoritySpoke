@@ -27,6 +27,9 @@ def make_predicate() -> Dict[str, Predicate]:
         "p2": Predicate("{} operated and lived at {}"),
         "p2_reciprocal": Predicate("{} operated and lived at {}", reciprocal=True),
         "p3": Predicate("{} was {}’s abode"),
+        "p4": Predicate("{} was on the premises of {}"),
+        "p5": Predicate("{} was a stockpile of Christmas trees"),
+        "p6": Predicate("{} was among some standing trees"),
         "p7": Predicate(
             "the distance between {} and {} was more than 35 feet",
             truth=False,
@@ -37,6 +40,15 @@ def make_predicate() -> Dict[str, Predicate]:
             truth=True,
             reciprocal=True,
         ),
+        "p8": Predicate(
+            "The distance between {} and {} was at least 20 feet",
+            truth=True,
+            reciprocal=True,
+        ),
+        "p9": Predicate(
+            "{} was within as little as 5 feet of a parking area used by personnel and patrons of {}"
+        ),
+        "p10": Predicate("{} was within the curtilage of {}"),
     }
 
 
@@ -52,28 +64,65 @@ def make_factor(make_predicate) -> Dict[str, Factor]:
         "f2_reciprocal": Fact(p["p2_reciprocal"]),
         "f3": Fact(p["p3"]),
         "f3_absent": Fact(p["p3"], absent=True),
+        "f4": Fact(p["p4"]),
+        "f5": Fact(p["p5"]),
+        "f6": Fact(p["p6"]),
         "f7": Fact(p["p7"]),
         "f7_true": Fact(p["p7_true"]),
+        "f8": Fact(p["p8"]),
+        "f9": Fact(p["p9"]),
+        "f10": Fact(p["p10"]),
     }
+
 
 @pytest.fixture
 def make_procedure(make_factor) -> Dict[str, Procedure]:
-    f1 = make_factor["f1"]
-    f2 = make_factor["f2"]
-    f3 = make_factor["f3"]
+    f = make_factor
 
     return {
-        "c1": Procedure(outputs={f3: (0, 1)}, inputs={f1: (0,), f2: (1, 0)}),
-        "c1_again": Procedure(outputs={f3: (1, 0)}, inputs={f2: (0, 1), f1: (1,)}),
-        "c1_easy": Procedure(outputs={f3: (0, 1)}, inputs={f2: (1, 0)}),
+        "c1": Procedure(
+            outputs={f["f3"]: (0, 1)}, inputs={f["f1"]: (0,), f["f2"]: (1, 0)}
+        ),
+        "c1_again": Procedure(
+            outputs={f["f3"]: (1, 0)}, inputs={f["f2"]: (0, 1), f["f1"]: (1,)}
+        ),
+        "c1_easy": Procedure(outputs={f["f3"]: (0, 1)}, inputs={f["f2"]: (1, 0)}),
+        "c2": Procedure(
+            outputs={f["f10"]: (0, 1)},
+            inputs={
+                f["f4"]: (0, 1),
+                f["f5"]: (0,),
+                f["f6"]: (0,),
+                f["f7"]: (0, 1),
+                f["f8"]: (0, 1),
+                f["f9"]: (0, 1),
+            },
+        ),
+        "c2_reciprocal_swap": Procedure(
+            outputs={f["f10"]: (0, 1)},
+            inputs={
+                f["f4"]: (0, 1),
+                f["f5"]: (0,),
+                f["f6"]: (0,),
+                f["f7"]: (0, 1),
+                f["f8"]: (1, 0),
+                f["f9"]: (0, 1),
+            },
+        ),
+        "c2_nonreciprocal_swap": Procedure(
+            outputs={f["f10"]: (0, 1)},
+            inputs={
+                f["f4"]: (1, 0),
+                f["f5"]: (0,),
+                f["f6"]: (0,),
+                f["f7"]: (0, 1),
+                f["f8"]: (0, 1),
+                f["f9"]: (0, 1),
+            },
+        ),
     }
 
-class TestProcedure:
 
-    def test_procedure_equality(self, make_procedure):
-        assert make_procedure["c1"] == make_procedure["c1_again"]
-    def test_implies_same_output_fewer_inputs(self, make_procedure):
-        assert make_procedure["c1_easy"].implies(make_procedure["c1"])
 
 @pytest.fixture
 def make_holding(make_factor) -> Dict[str, Holding]:
@@ -106,7 +155,6 @@ def make_opinion() -> Dict[str, Opinion]:
 
 
 class TestPredicates:
-
     def test_predicate_with_wrong_number_of_entities(self):
         with pytest.raises(ValueError):
             f = Predicate("{} was a motel", reciprocal=True)
@@ -124,6 +172,7 @@ class TestPredicates:
 
     def test_predicate_inequality(self, make_predicate):
         assert make_predicate["p2"] != make_predicate["p2_reciprocal"]
+
 
 class TestFactors:
     def test_string_representation_of_factor(self, make_factor):
@@ -187,6 +236,19 @@ class TestFactors:
         assert make_factor["f3"].contradicts(make_factor["f3_absent"])
         assert make_factor["f3_absent"].contradicts(make_factor["f3"])
 
+
+class TestProcedure:
+    def test_procedure_equality(self, make_procedure):
+        assert make_procedure["c1"] == make_procedure["c1_again"]
+
+    def test_implies_same_output_fewer_inputs(self, make_procedure):
+        assert make_procedure["c1_easy"].implies(make_procedure["c1"])
+
+    def test_still_equal_after_swapping_reciprocal_entities(self, make_procedure):
+        assert make_procedure["c2"] == (make_procedure["c2_reciprocal_swap"])
+
+    def test_unequal_after_swapping_nonreciprocal_entities(self, make_procedure):
+        assert make_procedure["c2"] != (make_procedure["c2_nonreciprocal_swap"])
 
 class TestHoldings:
     def test_representation_of_holding(self, make_holding):
