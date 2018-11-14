@@ -4,6 +4,8 @@ import json
 from typing import Dict, List, Mapping, Optional, Sequence, Set, Tuple, Union
 from dataclasses import dataclass
 
+import pint
+
 
 @dataclass()
 class Entity:

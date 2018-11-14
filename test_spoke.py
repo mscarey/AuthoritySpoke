@@ -21,6 +21,8 @@ def make_entity() -> Dict[str, Entity]:
 @pytest.fixture
 def make_predicate() -> Dict[str, Predicate]:
 
+    # TODO: add pint units
+
     return {
         "p1": Predicate("{} was a motel"),
         "p1_again": Predicate("{} was a motel"),
@@ -94,9 +96,9 @@ def make_procedure(make_factor) -> Dict[str, Procedure]:
                 f["f5"]: (0,),
                 f["f6"]: (0,),
                 f["f7"]: (0, 1),
-                f["f8"]: (0, 1),
                 f["f9"]: (0, 1),
             },
+            even_if={f["f8"]: (0, 1),}
         ),
         "c2_reciprocal_swap": Procedure(
             outputs={f["f10"]: (0, 1)},
@@ -104,10 +106,11 @@ def make_procedure(make_factor) -> Dict[str, Procedure]:
                 f["f4"]: (0, 1),
                 f["f5"]: (0,),
                 f["f6"]: (0,),
-                f["f7"]: (0, 1),
-                f["f8"]: (1, 0),
+                f["f7"]: (1, 0),
                 f["f9"]: (0, 1),
             },
+            even_if={
+                f["f8"]: (0, 1),}
         ),
         "c2_nonreciprocal_swap": Procedure(
             outputs={f["f10"]: (0, 1)},
@@ -116,9 +119,9 @@ def make_procedure(make_factor) -> Dict[str, Procedure]:
                 f["f5"]: (0,),
                 f["f6"]: (0,),
                 f["f7"]: (0, 1),
-                f["f8"]: (0, 1),
                 f["f9"]: (0, 1),
             },
+            even_if={f["f8"]: (0, 1),}
         ),
     }
 
