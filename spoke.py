@@ -51,7 +51,7 @@ class Predicate:
 
     def __str__(self):
         truth_prefix = "It is false that " if not self.truth else ""
-        return f'{truth_prefix}{self.content}'
+        return f"{truth_prefix}{self.content}"
 
     def contradicts(self, other):
         """This returns false only if the content is exactly the same and self.truth is
@@ -100,18 +100,21 @@ class Fact(Factor):
         return NotImplemented
 
     def predicate_in_context(self, entities: Sequence[Entity]) -> str:
-        return (f"{'Absent ' if self.absent else ''}{self.__class__.__name__}: " +
-               f"{self.predicate.content_with_entities(entities)}")
+        return (
+            f"{'Absent ' if self.absent else ''}{self.__class__.__name__}: "
+            + f"{self.predicate.content_with_entities(entities)}"
+        )
 
     def contradicts(self, other):
         if not isinstance(other, self.__class__):
             return False
-        if self.predicate.contradicts(other.predicate) and not (self.absent | other.absent):
+        if self.predicate.contradicts(other.predicate) and not (
+            self.absent | other.absent
+        ):
             return True
         if (self.predicate == other.predicate) and (self.absent != other.absent):
             return True
         return False
-
 
     # TODO: I'd like a function to determine if a factor implies another,
     # but it would need entity context,
@@ -128,7 +131,7 @@ class Procedure:
     inputs: Optional[Dict[Factor, Tuple[int]]] = None
     even_if: Optional[Dict[Factor, Tuple[int]]] = None
 
-    def match_entity_roles(self, self_factors, other_factors):
+    def match_entity_roles(self, self_entities, other_entities):
         """Make a temporary dict for information from other.
         For each entity slot in each factor in self, check the matching
         entity slot in other. If it contains something that's not already
@@ -139,36 +142,16 @@ class Procedure:
 
         entity_roles = {}
 
-        self_factor_list = sorted(self_factors, key=str)
-        other_factor_list = sorted(other_factors, key=str)
-
-        # TODO: to create a __gt__ test, test whether each factor in one holding
-        # implies a factor in the other...and also has the entity markers
-        # in the right order
-
-        if len(self_factor_list) != len(other_factor_list):
+        if len(self_entities) != len(other_entities):
             return False
-        factor_pairs = zip(self_factor_list, other_factor_list)
-        for pair in factor_pairs:
 
-            # tests whether the corresponding factors have the
-            # same string representation
-
-            if str(pair[0]) != str(pair[1]):
+        entity_pairs = zip(self_entities, other_entities)
+        for pair in entity_pairs:
+            if pair[0] not in entity_roles:
+                entity_roles[pair[0]] = pair[1]
+            if entity_roles[pair[0]] != pair[1]:
                 return False
 
-            # tests whether the corresponding factors have the
-            # same number of entities (unnecessary?)
-
-            if len(self_factors[pair[0]]) != len(other_factors[pair[1]]):
-                return False
-            for i in range(len(self_factors[pair[0]])):
-                self_entity_label = self_factors[pair[0]][i]
-                other_entity_label = other_factors[pair[1]][i]
-                if self_entity_label not in entity_roles:
-                    entity_roles[self_entity_label] = other_entity_label
-                if entity_roles[self_entity_label] != other_entity_label:
-                    return False
         return True
 
     def all_factors(self) -> Dict[Factor, Tuple[int]]:
@@ -188,24 +171,36 @@ class Procedure:
         all_factors = self.all_factors()
         sorted_factors = self.sorted_factors()
 
-        def add_some_entities(all_factors: Mapping[Factor, Tuple[int]], entity_permutations: list, entity_list: list, sorted_factors: list, i: int) -> Optional[list]:
+        def add_some_entities(
+            all_factors: Mapping[Factor, Tuple[int]],
+            entity_permutations: list,
+            entity_list: list,
+            sorted_factors: list,
+            i: int,
+        ) -> Optional[Set[Tuple[int]]]:
             if i >= len(sorted_factors):
-                entity_permutations.append(entity_list)
+                entity_permutations.append(tuple(entity_list))
                 return None
             if sorted_factors[i].predicate.reciprocal:
                 new_entity_list = entity_list.copy()
                 reciprocal_entities = [*all_factors[sorted_factors[i]]]
                 new_entity_list.append(reciprocal_entities[1])
                 new_entity_list.append(reciprocal_entities[0])
-                new_entity_list.append(*reciprocal_entities[2:])
-                add_some_entities(all_factors, entity_permutations, new_entity_list, sorted_factors, i+1)
-            entity_list.append(*all_factors[sorted_factors[i]])
-            add_some_entities(all_factors, entity_permutations, entity_list, sorted_factors, i+1)
-            return entity_permutations
+                new_entity_list.extend(reciprocal_entities[2:])
+                add_some_entities(
+                    all_factors,
+                    entity_permutations,
+                    new_entity_list,
+                    sorted_factors,
+                    i + 1,
+                )
+            entity_list.extend(all_factors[sorted_factors[i]])
+            add_some_entities(
+                all_factors, entity_permutations, entity_list, sorted_factors, i + 1
+            )
+            return set(entity_permutations)
 
         return add_some_entities(all_factors, [], [], sorted_factors, 0)
-
-
 
     def __eq__(self, other):
         """Determines if the two holdings have all the same factors
@@ -223,28 +218,15 @@ class Procedure:
             if x[0].keys() != x[1].keys():
                 return False
 
+        return any(
+            (self.match_entity_roles(x, y) and self.match_entity_roles(y, x))
+            for x in self.entity_permutations()
+            for y in other.entity_permutations()
+        )
 
-
-        # TODO: Two big bugs here. First, "reciprocal" isn't handled.
-        # Second, it needs to compare the entire sequence of entities
-        # Need to make a function that creates all the permutations of
-        # entities that will work, taking into account that some factors
-        # are reciprocal, then call the same function for the other Procedure,
-        # then check to see whether any permutation from one list is an alphabetic
-        # variant of any permutation on the other.
-
-        # But then I'm going to need a more general solution to matching
-        # variables if I add an "implies" function that takes into account
-        # that some predicates imply one another.
-
-        # Maybe instead of modeling predicates implying one another, I can
-        # just show that factors can generate the factors they imply through
-        # Procedures...reusing the idiom I have to create anyway.
-
-            if not self.match_entity_roles(x[0], x[1]):
-                return False
-
-        return True
+    # TODO: to create a __gt__ test, test whether each factor in one holding
+    # implies a factor in the other...and also has the entity markers
+    # in the right order
 
 
 @dataclass

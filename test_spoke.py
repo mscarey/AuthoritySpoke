@@ -240,9 +240,6 @@ class TestProcedure:
     def test_procedure_equality(self, make_procedure):
         assert make_procedure["c1"] == make_procedure["c1_again"]
 
-    def test_implies_same_output_fewer_inputs(self, make_procedure):
-        assert make_procedure["c1_easy"].implies(make_procedure["c1"])
-
     def test_still_equal_after_swapping_reciprocal_entities(self, make_procedure):
         assert make_procedure["c2"] == (make_procedure["c2_reciprocal_swap"])
 
@@ -311,8 +308,21 @@ class TestProcedure:
         ]
 
     def test_entity_permutations(self, make_procedure):
-        pass
+        """
+        "The distance between {the trees} and {the hotel} was at least 20 feet"
+        and "...was at least 35 feet" can be swapped to say
+        "The distance between {the hotel} and {the trees}"
+        but otherwise the order of entities has to be the same.
+        """
+        assert make_procedure["c2"].entity_permutations() == {
+            (0,1,0,1,0,0,0,1,0,1,0,1),
+            (0,1,1,0,0,0,0,1,0,1,0,1),
+            (1,0,0,1,0,0,0,1,0,1,0,1),
+            (1,0,1,0,0,0,0,1,0,1,0,1),
+        }
 
+    def test_implies_same_output_fewer_inputs(self, make_procedure):
+        assert make_procedure["c1_easy"].implies(make_procedure["c1"])
 
 class TestHoldings:
     def test_representation_of_holding(self, make_holding):
