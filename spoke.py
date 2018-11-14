@@ -1,7 +1,7 @@
 import datetime
 import json
 
-from typing import Dict, Optional, Sequence, Tuple, Union
+from typing import Dict, List, Mapping, Optional, Sequence, Set, Tuple, Union
 from dataclasses import dataclass
 
 
@@ -171,6 +171,42 @@ class Procedure:
                     return False
         return True
 
+    def all_factors(self) -> Dict[Factor, Tuple[int]]:
+        """Used for the entity_permutations function."""
+        inputs = self.inputs or {}
+        even_if = self.even_if or {}
+        return {**self.outputs, **inputs, **even_if}
+
+    def sorted_factors(self) -> List[Factor]:
+        """Used for the entity_permutations function."""
+        return sorted(self.all_factors(), key=repr)
+
+    def entity_permutations(self) -> Set[List[int]]:
+        """Returns every possible ordering of entities that could be
+        substituted into an ordered list of the factors in the procedure."""
+
+        all_factors = self.all_factors()
+        sorted_factors = self.sorted_factors()
+
+        def add_some_entities(all_factors: Mapping[Factor, Tuple[int]], entity_permutations: list, entity_list: list, sorted_factors: list, i: int) -> Optional[list]:
+            if i >= len(sorted_factors):
+                entity_permutations.append(entity_list)
+                return None
+            if sorted_factors[i].predicate.reciprocal:
+                new_entity_list = entity_list.copy()
+                reciprocal_entities = [*all_factors[sorted_factors[i]]]
+                new_entity_list.append(reciprocal_entities[1])
+                new_entity_list.append(reciprocal_entities[0])
+                new_entity_list.append(*reciprocal_entities[2:])
+                add_some_entities(all_factors, entity_permutations, new_entity_list, sorted_factors, i+1)
+            entity_list.append(*all_factors[sorted_factors[i]])
+            add_some_entities(all_factors, entity_permutations, entity_list, sorted_factors, i+1)
+            return entity_permutations
+
+        return add_some_entities(all_factors, [], [], sorted_factors, 0)
+
+
+
     def __eq__(self, other):
         """Determines if the two holdings have all the same factors
         with the same entities in the same roles, not whether they're
@@ -184,6 +220,26 @@ class Procedure:
             (self.inputs or {}, other.inputs or {}),
             (self.even_if or {}, other.even_if or {}),
         ):
+            if x[0].keys() != x[1].keys():
+                return False
+
+
+
+        # TODO: Two big bugs here. First, "reciprocal" isn't handled.
+        # Second, it needs to compare the entire sequence of entities
+        # Need to make a function that creates all the permutations of
+        # entities that will work, taking into account that some factors
+        # are reciprocal, then call the same function for the other Procedure,
+        # then check to see whether any permutation from one list is an alphabetic
+        # variant of any permutation on the other.
+
+        # But then I'm going to need a more general solution to matching
+        # variables if I add an "implies" function that takes into account
+        # that some predicates imply one another.
+
+        # Maybe instead of modeling predicates implying one another, I can
+        # just show that factors can generate the factors they imply through
+        # Procedures...reusing the idiom I have to create anyway.
 
             if not self.match_entity_roles(x[0], x[1]):
                 return False

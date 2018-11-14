@@ -123,7 +123,6 @@ def make_procedure(make_factor) -> Dict[str, Procedure]:
     }
 
 
-
 @pytest.fixture
 def make_holding(make_factor) -> Dict[str, Holding]:
     f1 = make_factor["f1"]
@@ -249,6 +248,71 @@ class TestProcedure:
 
     def test_unequal_after_swapping_nonreciprocal_entities(self, make_procedure):
         assert make_procedure["c2"] != (make_procedure["c2_nonreciprocal_swap"])
+
+    def test_sorted_factors_from_procedure(self, make_predicate, make_procedure):
+
+        """The sorted_factors method sorts them alphabetically by __repr__."""
+
+        assert make_procedure["c2"].sorted_factors() == [
+            Fact(
+                predicate=Predicate(
+                    content="The distance between {} and {} was at least 20 feet",
+                    truth=True,
+                    reciprocal=True,
+                ),
+                absent=False,
+            ),
+            Fact(
+                predicate=Predicate(
+                    content="the distance between {} and {} was more than 35 feet",
+                    truth=False,
+                    reciprocal=True,
+                ),
+                absent=False,
+            ),
+            Fact(
+                predicate=Predicate(
+                    content="{} was a stockpile of Christmas trees",
+                    truth=True,
+                    reciprocal=False,
+                ),
+                absent=False,
+            ),
+            Fact(
+                predicate=Predicate(
+                    content="{} was among some standing trees",
+                    truth=True,
+                    reciprocal=False,
+                ),
+                absent=False,
+            ),
+            Fact(
+                predicate=Predicate(
+                    content="{} was on the premises of {}", truth=True, reciprocal=False
+                ),
+                absent=False,
+            ),
+            Fact(
+                predicate=Predicate(
+                    content="{} was within as little as 5 feet of a parking area used by personnel and patrons of {}",
+                    truth=True,
+                    reciprocal=False,
+                ),
+                absent=False,
+            ),
+            Fact(
+                predicate=Predicate(
+                    content="{} was within the curtilage of {}",
+                    truth=True,
+                    reciprocal=False,
+                ),
+                absent=False,
+            ),
+        ]
+
+    def test_entity_permutations(self, make_procedure):
+        pass
+
 
 class TestHoldings:
     def test_representation_of_holding(self, make_holding):
