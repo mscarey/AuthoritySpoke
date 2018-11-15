@@ -24,7 +24,7 @@ class Entity:
 @dataclass()
 class Human(Entity):
     """A "natural person" mentioned as an entity in a factor. On the distinction
-    between "human" and "person", see Slaughter-House Cases, 83 U.S. 36, 99,
+    between "human" and "person", see Slaughter-House Cases, 83 U.S. 36, 99.
     https://www.courtlistener.com/opinion/88661/slaughter-house-cases/"""
 
     pass
@@ -82,14 +82,17 @@ class Predicate:
         return slots
 
     def __str__(self):
-        truth_prefix = "It is false that " if not self.truth else ""
+        truth_prefix = "it is false that " if not self.truth else ""
         if self.quantity:
             slots = ("{}" for slot in range(len(self)))
-            content = self.content.format(*slots, self.quantity_str())
+            content = self.content.format(*slots, self.quantity_comparison())
         else: content = self.content
         return f"{truth_prefix}{content}"
 
-    def quantity_str(self):
+    def quantity_comparison(self):
+        """String representation of a comparison with a quantity,
+        which can include units due to the pint library."""
+
         if not self.quantity:
             return None
         comparison = self.comparison or "="

@@ -200,6 +200,11 @@ class TestPredicates:
     def test_quantity_string(self, make_predicate):
         assert str(make_predicate["p7"].quantity) == "35 foot"
 
+    def test_quantity_comparison(self, make_predicate):
+        assert make_predicate["p7"].quantity_comparison() == "greater than 35 foot"
+        assert make_predicate["p9"].quantity_comparison() == "no more than 5 foot"
+        assert make_predicate["p1"].quantity_comparison() is None
+
 
 class TestFactors:
     def test_string_representation_of_factor(self, make_factor):
@@ -225,7 +230,7 @@ class TestFactors:
         assert make_factor["f7"].predicate_in_context(
             (make_entity["e_trees"], make_entity["e_motel"])
         ) == str(
-            "Fact: It is false that the distance between the stockpile of trees "
+            "Fact: it is false that the distance between the stockpile of trees "
             + "and Hideaway Lodge was greater than 35 foot"
         )
 
