@@ -8,6 +8,10 @@ from typing import Dict
 import pytest
 import json
 
+from pint import UnitRegistry
+
+from spoke import ureg, Q_
+
 
 @pytest.fixture
 def make_entity() -> Dict[str, Entity]:
@@ -21,8 +25,6 @@ def make_entity() -> Dict[str, Entity]:
 @pytest.fixture
 def make_predicate() -> Dict[str, Predicate]:
 
-    # TODO: add pint units
-
     return {
         "p1": Predicate("{} was a motel"),
         "p1_again": Predicate("{} was a motel"),
@@ -33,22 +35,30 @@ def make_predicate() -> Dict[str, Predicate]:
         "p5": Predicate("{} was a stockpile of Christmas trees"),
         "p6": Predicate("{} was among some standing trees"),
         "p7": Predicate(
-            "the distance between {} and {} was more than 35 feet",
+            "the distance between {} and {} was {}",
             truth=False,
             reciprocal=True,
+            comparison=">",
+            quantity=Q_("35 feet"),
         ),
         "p7_true": Predicate(
-            "the distance between {} and {} was more than 35 feet",
+            "the distance between {} and {} was {}",
             truth=True,
             reciprocal=True,
+            comparison="<",
+            quantity=Q_("35 feet"),
         ),
         "p8": Predicate(
-            "The distance between {} and {} was at least 20 feet",
+            "The distance between {} and {} was {}",
             truth=True,
             reciprocal=True,
+            comparison=">=",
+            quantity=Q_("20 feet"),
         ),
         "p9": Predicate(
-            "{} was within as little as 5 feet of a parking area used by personnel and patrons of {}"
+            "The distance between {} and a parking area used by personnel and patrons of {} was {}",
+            comparison="<=",
+            quantity=Q_("5 feet"),
         ),
         "p10": Predicate("{} was within the curtilage of {}"),
     }
@@ -98,7 +108,7 @@ def make_procedure(make_factor) -> Dict[str, Procedure]:
                 f["f7"]: (0, 1),
                 f["f9"]: (0, 1),
             },
-            even_if={f["f8"]: (0, 1),}
+            even_if={f["f8"]: (0, 1)},
         ),
         "c2_reciprocal_swap": Procedure(
             outputs={f["f10"]: (0, 1)},
@@ -109,8 +119,7 @@ def make_procedure(make_factor) -> Dict[str, Procedure]:
                 f["f7"]: (1, 0),
                 f["f9"]: (0, 1),
             },
-            even_if={
-                f["f8"]: (0, 1),}
+            even_if={f["f8"]: (0, 1)},
         ),
         "c2_nonreciprocal_swap": Procedure(
             outputs={f["f10"]: (0, 1)},
@@ -121,7 +130,7 @@ def make_procedure(make_factor) -> Dict[str, Procedure]:
                 f["f7"]: (0, 1),
                 f["f9"]: (0, 1),
             },
-            even_if={f["f8"]: (0, 1),}
+            even_if={f["f8"]: (0, 1)},
         ),
     }
 
@@ -161,6 +170,16 @@ class TestPredicates:
         with pytest.raises(ValueError):
             f = Predicate("{} was a motel", reciprocal=True)
 
+    def test_predicate_with_wrong_comparison_symbol(self):
+        with pytest.raises(ValueError):
+            h = (
+                Predicate(
+                    "the height of {} was {}",
+                    comparison=">>",
+                    quantity=Q_("160 centimeters"),
+                ),
+            )
+
     def test_predicate_contradictions(self, make_predicate):
         assert make_predicate["p7"].contradicts(make_predicate["p7_true"])
         assert not make_predicate["p1"].contradicts(make_predicate["p1_again"])
@@ -174,6 +193,12 @@ class TestPredicates:
 
     def test_predicate_inequality(self, make_predicate):
         assert make_predicate["p2"] != make_predicate["p2_reciprocal"]
+
+    def test_quantity_type(self, make_predicate):
+        assert type(make_predicate["p7"].quantity) == ureg.Quantity
+
+    def test_quantity_string(self, make_predicate):
+        assert str(make_predicate["p7"].quantity) == "35 foot"
 
 
 class TestFactors:
@@ -201,7 +226,7 @@ class TestFactors:
             (make_entity["e_trees"], make_entity["e_motel"])
         ) == str(
             "Fact: It is false that the distance between the stockpile of trees "
-            + "and Hideaway Lodge was more than 35 feet"
+            + "and Hideaway Lodge was greater than 35 foot"
         )
 
     def test_entity_and_human_in_predicate(self, make_entity, make_factor):
@@ -256,17 +281,31 @@ class TestProcedure:
         assert make_procedure["c2"].sorted_factors() == [
             Fact(
                 predicate=Predicate(
-                    content="The distance between {} and {} was at least 20 feet",
+                    content="The distance between {} and a parking area used by personnel and patrons of {} was {}",
                     truth=True,
-                    reciprocal=True,
+                    reciprocal=False,
+                    comparison="<=",
+                    quantity=ureg.Quantity(5, "foot"),
                 ),
                 absent=False,
             ),
             Fact(
                 predicate=Predicate(
-                    content="the distance between {} and {} was more than 35 feet",
+                    content="The distance between {} and {} was {}",
+                    truth=True,
+                    reciprocal=True,
+                    comparison=">=",
+                    quantity=ureg.Quantity(20, "foot"),
+                ),
+                absent=False,
+            ),
+            Fact(
+                predicate=Predicate(
+                    content="the distance between {} and {} was {}",
                     truth=False,
                     reciprocal=True,
+                    comparison=">",
+                    quantity=ureg.Quantity(35, "foot"),
                 ),
                 absent=False,
             ),
@@ -294,14 +333,6 @@ class TestProcedure:
             ),
             Fact(
                 predicate=Predicate(
-                    content="{} was within as little as 5 feet of a parking area used by personnel and patrons of {}",
-                    truth=True,
-                    reciprocal=False,
-                ),
-                absent=False,
-            ),
-            Fact(
-                predicate=Predicate(
                     content="{} was within the curtilage of {}",
                     truth=True,
                     reciprocal=False,
@@ -318,23 +349,17 @@ class TestProcedure:
         but otherwise the order of entities has to be the same.
         """
         assert make_procedure["c2"].entity_permutations() == {
-            (0,1,0,1,0,0,0,1,0,1,0,1),
-            (0,1,1,0,0,0,0,1,0,1,0,1),
-            (1,0,0,1,0,0,0,1,0,1,0,1),
-            (1,0,1,0,0,0,0,1,0,1,0,1),
+            (0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1),
+            (0, 1, 0, 1, 1, 0, 0, 0, 0, 1, 0, 1),
+            (0, 1, 1, 0, 0, 1, 0, 0, 0, 1, 0, 1),
+            (0, 1, 1, 0, 1, 0, 0, 0, 0, 1, 0, 1),
         }
 
     def test_implies_same_output_fewer_inputs(self, make_procedure):
-        assert make_procedure["c1_easy"].implies(make_procedure["c1"])
+        assert make_procedure["c1_easy"] > (make_procedure["c1"])
+
 
 class TestHoldings:
-    def test_representation_of_holding(self, make_holding):
-        assert (
-            repr(make_holding["h1"])
-            == " ".join(
-                """Holding(procedure=Procedure(outputs={Fact(predicate=Predicate(content='{} was {}’s abode', truth=True, reciprocal=False), absent=False): (0, 1)}, inputs={Fact(predicate=Predicate(content='{} was a motel', truth=True, reciprocal=False), absent=False): (0,), Fact(predicate=Predicate(content='{} operated and lived at {}', truth=True, reciprocal=False), absent=False): (1, 0)}, even_if=None), mandatory=False, universal=False, rule_valid=True)""".split()
-            ).strip()
-        )
 
     def test_identical_holdings_equal(self, make_holding):
         assert make_holding["h1"] == make_holding["h1_again"]

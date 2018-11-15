@@ -4,8 +4,10 @@ import json
 from typing import Dict, List, Mapping, Optional, Sequence, Set, Tuple, Union
 from dataclasses import dataclass
 
-import pint
+from pint import UnitRegistry
 
+ureg = UnitRegistry()
+Q_ = ureg.Quantity
 
 @dataclass()
 class Entity:
@@ -21,8 +23,8 @@ class Entity:
 
 @dataclass()
 class Human(Entity):
-    """A "natural person" mentioned as an entity in a factor.
-    See Slaughter-House Cases, 83 U.S. 36, 99,
+    """A "natural person" mentioned as an entity in a factor. On the distinction
+    between "human" and "person", see Slaughter-House Cases, 83 U.S. 36, 99,
     https://www.courtlistener.com/opinion/88661/slaughter-house-cases/"""
 
     pass
@@ -30,16 +32,30 @@ class Human(Entity):
 
 @dataclass(frozen=True)
 class Predicate:
-    """A statement about real events or about legal conclusions.
+    """
+    A statement about real events or about legal conclusions.
     Predicates may be "alleged" by a pleading, "supported" by evidence, or
     "found" to be factual by a jury verdict or a judge's finding of fact.
 
     If reciprocal==True, then the order of the first two entities will
-    be considered interchangeable."""
+    be considered interchangeable. There's no way to make any entities
+    interchangeable other than the first two.
+
+    A predicate can also end with a comparison to some quantity, as described
+    by a ureg.Quantity object from the pint library. See pint.readthedocs.io.
+
+    If a quantity is defined, a "comparison" should also be defined. That's
+    a string indicating whether the thing described by the predicate is
+    greater than, less than, or equal to the quantity. Even though "="
+    is the default, it's the least useful, because courts almost always state
+    rules that are intended to apply to quantities above or below some threshold.
+    """
 
     content: str
     truth: bool = True
     reciprocal: bool = False
+    comparison: Optional[str] = None
+    quantity: Optional[Union[int, float, ureg.Quantity]] = None
 
     def __post_init__(self):
         if len(self) < 2 and self.reciprocal:
@@ -47,13 +63,45 @@ class Predicate:
                 f'"reciprocal" flag not allowed because {self.content} '
                 f"has {len(self)} entities, fewer than 2."
             )
+        if self.comparison == "==":
+            self.comparison = "="
+        comparison_options = ("<", "<=", "=", ">=", ">")
+        if self.comparison and self.comparison not in comparison_options:
+            raise ValueError(
+                f'"comparison" string parameter must be one of {comparison_options}.'
+            )
 
     def __len__(self):
-        return self.content.count("{}")
+        """Returns the number of entities that can fit in the bracketed slots
+        in the predicate. self.quantity doesn't count as one of these entities,
+        even though it does go in a slot."""
+
+        slots = self.content.count("{}")
+        if self.quantity:
+            slots -= 1
+        return slots
 
     def __str__(self):
         truth_prefix = "It is false that " if not self.truth else ""
-        return f"{truth_prefix}{self.content}"
+        if self.quantity:
+            slots = ("{}" for slot in range(len(self)))
+            content = self.content.format(*slots, self.quantity_str())
+        else: content = self.content
+        return f"{truth_prefix}{content}"
+
+    def quantity_str(self):
+        if not self.quantity:
+            return None
+        comparison = self.comparison or "="
+        expand = {
+            "=": "equal to",
+            ">": "greater than",
+            "<": "less than",
+            ">=": "at least",
+            "<=": "no more than",
+                }
+        return f'{expand[comparison]} {self.quantity}'
+
 
     def contradicts(self, other):
         """This returns false only if the content is exactly the same and self.truth is
