@@ -9,6 +9,15 @@ from pint import UnitRegistry
 ureg = UnitRegistry()
 Q_ = ureg.Quantity
 
+OPPOSITE_COMPARISONS = {
+    ">": "<=",
+    ">=": "<",
+    "=": "!=",
+    "<>": "=",
+    "<": ">=",
+    "<=": ">",
+}
+
 @dataclass()
 class Entity:
     """A person, place, thing, or event that needs to be mentioned in
@@ -63,12 +72,19 @@ class Predicate:
                 f'"reciprocal" flag not allowed because {self.content} '
                 f"has {len(self)} entities, fewer than 2."
             )
+        # Assumes that the obverse of a statement about a quantity is
+        # necessarily logically equivalent
         if self.comparison == "==":
-            self.comparison = "="
-        comparison_options = ("<", "<=", "=", ">=", ">")
-        if self.comparison and self.comparison not in comparison_options:
+            object.__setattr__(self, "comparison", "=")
+        if self.comparison == "!=":
+            object.__setattr__(self, "comparison", "<>")
+        if self.comparison and not self.truth:
+            object.__setattr__(self, "truth", True)
+            object.__setattr__(self, "comparison", OPPOSITE_COMPARISONS[self.comparison])
+
+        if self.comparison and self.comparison not in OPPOSITE_COMPARISONS.keys():
             raise ValueError(
-                f'"comparison" string parameter must be one of {comparison_options}.'
+                f'"comparison" string parameter must be one of {OPPOSITE_COMPARISONS.keys()}.'
             )
 
     def __len__(self):
@@ -86,8 +102,65 @@ class Predicate:
         if self.quantity:
             slots = ("{}" for slot in range(len(self)))
             content = self.content.format(*slots, self.quantity_comparison())
-        else: content = self.content
+        else:
+            content = self.content
         return f"{truth_prefix}{content}"
+
+    def __eq__(self, other) -> bool:
+        if not isinstance(other, self.__class__):
+            return False
+
+        if (
+            self.content == other.content
+            and self.reciprocal == other.reciprocal
+            and self.quantity == other.quantity
+        ):
+            if self.truth == other.truth and self.comparison == other.comparison:
+                return True # Equal if everything is same
+            if (
+                self.comparison
+                and OPPOSITE_COMPARISONS[self.comparison] == other.comparison
+                and self.truth != other.truth
+            ):
+                # Equal if everything is same except obverse quantity statement.
+                return True
+        return False
+
+    def __gt__(self, other) -> bool:
+        """Indicates whether self implies the other predicate, which is True if
+        they're equal or if their statements about quantity imply it."""
+
+        if not isinstance(other, self.__class__):
+            return False
+        if self == other:
+            return True
+        # Assumes no predicate implies another based on meaning of their content text
+        if not (self.content == other.content and self.reciprocal == other.reciprocal):
+            return False
+        if not (self.quantity and other.quantity and self.comparison and other.comparison):
+            return False
+
+        if (type(self.quantity) == ureg.Quantity) != (
+            type(other.quantity) == ureg.Quantity
+        ):
+            return False
+        if not self.truth: # could be redundant
+            return False
+
+        if ">" in self.comparison and ">" in other.comparison:
+            if self.quantity > other.quantity:
+                return True
+        if "<" in self.comparison and "<" in other.comparison:
+            if self.quantity < other.quantity:
+                return True
+        if "=" in self.comparison and "=" in other.comparison:
+            if self.quantity == other.quantity:
+                return True
+        return False
+
+
+
+
 
     def quantity_comparison(self):
         """String representation of a comparison with a quantity,
@@ -98,13 +171,13 @@ class Predicate:
         comparison = self.comparison or "="
         expand = {
             "=": "equal to",
+            "!=": "not equal to",
             ">": "greater than",
             "<": "less than",
             ">=": "at least",
             "<=": "no more than",
-                }
-        return f'{expand[comparison]} {self.quantity}'
-
+        }
+        return f"{expand[comparison]} {self.quantity}"
 
     def contradicts(self, other):
         """This returns false only if the content is exactly the same and self.truth is
@@ -207,53 +280,53 @@ class Procedure:
 
         return True
 
-    def all_factors(self) -> Dict[Factor, Tuple[int]]:
+    def all_entities(self) -> Dict[Factor, Tuple[int]]:
         """Used for the entity_permutations function."""
         inputs = self.inputs or {}
         even_if = self.even_if or {}
         return {**self.outputs, **inputs, **even_if}
 
-    def sorted_factors(self) -> List[Factor]:
+    def sorted_entities(self) -> List[Factor]:
         """Used for the entity_permutations function."""
-        return sorted(self.all_factors(), key=repr)
+        return sorted(self.all_entities(), key=repr)
 
-    def entity_permutations(self) -> Set[List[int]]:
+    def entity_permutations(self) -> Optional[Set[Tuple[int]]]:
         """Returns every possible ordering of entities that could be
         substituted into an ordered list of the factors in the procedure."""
 
-        all_factors = self.all_factors()
-        sorted_factors = self.sorted_factors()
+        all_entities = self.all_entities()
+        sorted_entities = self.sorted_entities()
 
         def add_some_entities(
-            all_factors: Mapping[Factor, Tuple[int]],
+            all_entities: Mapping[Factor, Tuple[int]],
             entity_permutations: list,
             entity_list: list,
-            sorted_factors: list,
+            sorted_entities: list,
             i: int,
         ) -> Optional[Set[Tuple[int]]]:
-            if i >= len(sorted_factors):
+            if i >= len(sorted_entities):
                 entity_permutations.append(tuple(entity_list))
                 return None
-            if sorted_factors[i].predicate.reciprocal:
+            if sorted_entities[i].predicate.reciprocal:
                 new_entity_list = entity_list.copy()
-                reciprocal_entities = [*all_factors[sorted_factors[i]]]
+                reciprocal_entities = [*all_entities[sorted_entities[i]]]
                 new_entity_list.append(reciprocal_entities[1])
                 new_entity_list.append(reciprocal_entities[0])
                 new_entity_list.extend(reciprocal_entities[2:])
                 add_some_entities(
-                    all_factors,
+                    all_entities,
                     entity_permutations,
                     new_entity_list,
-                    sorted_factors,
+                    sorted_entities,
                     i + 1,
                 )
-            entity_list.extend(all_factors[sorted_factors[i]])
+            entity_list.extend(all_entities[sorted_entities[i]])
             add_some_entities(
-                all_factors, entity_permutations, entity_list, sorted_factors, i + 1
+                all_entities, entity_permutations, entity_list, sorted_entities, i + 1
             )
             return set(entity_permutations)
 
-        return add_some_entities(all_factors, [], [], sorted_factors, 0)
+        return add_some_entities(all_entities, [], [], sorted_entities, 0)
 
     def __eq__(self, other):
         """Determines if the two holdings have all the same factors

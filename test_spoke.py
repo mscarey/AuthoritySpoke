@@ -41,6 +41,13 @@ def make_predicate() -> Dict[str, Predicate]:
             comparison=">",
             quantity=Q_("35 feet"),
         ),
+        "p7_obverse": Predicate(
+            "the distance between {} and {} was {}",
+            truth=True,
+            reciprocal=True,
+            comparison="<=",
+            quantity=Q_("35 feet"),
+        ),
         "p7_true": Predicate(
             "the distance between {} and {} was {}",
             truth=True,
@@ -50,10 +57,33 @@ def make_predicate() -> Dict[str, Predicate]:
         ),
         "p8": Predicate(
             "The distance between {} and {} was {}",
-            truth=True,
             reciprocal=True,
             comparison=">=",
             quantity=Q_("20 feet"),
+        ),
+        "p8_meters": Predicate(
+            "The distance between {} and {} was {}",
+            reciprocal=True,
+            comparison=">=",
+            quantity=Q_("10 meters"),
+        ),
+        "p8_int": Predicate(
+            "The distance between {} and {} was {}",
+            reciprocal=True,
+            comparison=">=",
+            quantity=20,
+        ),
+        "p8_float": Predicate(
+            "The distance between {} and {} was {}",
+            reciprocal=True,
+            comparison=">=",
+            quantity=20.0,
+        ),
+        "p8_higher_int": Predicate(
+            "The distance between {} and {} was {}",
+            reciprocal=True,
+            comparison=">=",
+            quantity=30,
         ),
         "p9": Predicate(
             "The distance between {} and a parking area used by personnel and patrons of {} was {}",
@@ -201,9 +231,27 @@ class TestPredicates:
         assert str(make_predicate["p7"].quantity) == "35 foot"
 
     def test_quantity_comparison(self, make_predicate):
-        assert make_predicate["p7"].quantity_comparison() == "greater than 35 foot"
+        assert make_predicate["p7"].quantity_comparison() == "no more than 35 foot"
         assert make_predicate["p9"].quantity_comparison() == "no more than 5 foot"
         assert make_predicate["p1"].quantity_comparison() is None
+
+    def test_obverse_predicates_equal(self, make_predicate):
+        assert make_predicate["p7"] == make_predicate["p7_obverse"]
+
+    def test_greater_than_because_of_quantity(self, make_predicate):
+        assert make_predicate["p8_meters"] > make_predicate["p8"]
+
+    def test_equal_float_and_int(self, make_predicate):
+        assert make_predicate["p8_int"] == make_predicate["p8_float"]
+
+    def test_greater_float_and_int(self, make_predicate):
+        assert make_predicate["p8_higher_int"] > make_predicate["p8_float"]
+        assert make_predicate["p8_int"] < make_predicate["p8_higher_int"]
+
+    def test_str_for_predicate_with_number_quantity(self, make_predicate):
+        assert str(make_predicate["p8_int"]) == "The distance between {} and {} was at least 20"
+        assert str(make_predicate["p8_float"]) == "The distance between {} and {} was at least 20.0"
+        assert str(make_predicate["p8"]) == "The distance between {} and {} was at least 20 foot"
 
 
 class TestFactors:
@@ -230,8 +278,8 @@ class TestFactors:
         assert make_factor["f7"].predicate_in_context(
             (make_entity["e_trees"], make_entity["e_motel"])
         ) == str(
-            "Fact: it is false that the distance between the stockpile of trees "
-            + "and Hideaway Lodge was greater than 35 foot"
+            "Fact: the distance between the stockpile of trees "
+            + "and Hideaway Lodge was no more than 35 foot"
         )
 
     def test_entity_and_human_in_predicate(self, make_entity, make_factor):
@@ -279,11 +327,11 @@ class TestProcedure:
     def test_unequal_after_swapping_nonreciprocal_entities(self, make_procedure):
         assert make_procedure["c2"] != (make_procedure["c2_nonreciprocal_swap"])
 
-    def test_sorted_factors_from_procedure(self, make_predicate, make_procedure):
+    def test_sorted_entities_from_procedure(self, make_predicate, make_procedure):
 
-        """The sorted_factors method sorts them alphabetically by __repr__."""
+        """The sorted_entities method sorts them alphabetically by __repr__."""
 
-        assert make_procedure["c2"].sorted_factors() == [
+        assert make_procedure["c2"].sorted_entities() == [
             Fact(
                 predicate=Predicate(
                     content="The distance between {} and a parking area used by personnel and patrons of {} was {}",
