@@ -144,20 +144,51 @@ class Predicate:
             type(other.quantity) == ureg.Quantity
         ):
             return False
-        if not self.truth: # could be redundant
-            return False
 
-        if ">" in self.comparison and ">" in other.comparison:
-            if self.quantity > other.quantity:
-                return True
         if "<" in self.comparison and "<" in other.comparison:
             if self.quantity < other.quantity:
+                return True
+        if ">" in self.comparison and ">" in other.comparison:
+            if self.quantity > other.quantity:
                 return True
         if "=" in self.comparison and "=" in other.comparison:
             if self.quantity == other.quantity:
                 return True
+        if "=" not in self.comparison and "=" not in other.comparison:
+            if self.quantity == other.quantity:
+                return True
         return False
 
+    def contradicts(self, other):
+        """This returns false only if the content is exactly the same and self.truth is
+        different. Will break if symbols for entities are allowed to appear in self.content.
+        """
+        if not isinstance(other, self.__class__):
+            return False
+
+        if (type(self.quantity) == ureg.Quantity) != (
+            type(other.quantity) == ureg.Quantity
+        ):
+            return False
+
+        if not (self.content == other.content and self.reciprocal == other.reciprocal):
+            return False
+
+        if self.quantity and other.quantity:
+            if "<" in self.comparison and "<" in other.comparison:
+                if self.quantity > other.quantity:
+                    return True
+            if ">" in self.comparison and ">" in other.comparison:
+                if self.quantity < other.quantity:
+                    return True
+            if "=" in self.comparison and "=" not in other.comparison:
+                if self.quantity == other.quantity:
+                    return True
+            if "=" not in self.comparison and "=" in other.comparison:
+                if self.quantity != other.quantity:
+                    return True
+            return False
+        return self.content == other.content and self.truth != other.truth
 
 
 
@@ -179,13 +210,7 @@ class Predicate:
         }
         return f"{expand[comparison]} {self.quantity}"
 
-    def contradicts(self, other):
-        """This returns false only if the content is exactly the same and self.truth is
-        different. Will break if symbols for entities are allowed to appear in self.content.
-        """
-        if isinstance(other, self.__class__):
-            return self.content == other.content and self.truth != other.truth
-        return False
+
 
     def content_with_entities(self, entities: Union[Entity, Sequence[Entity]]) -> str:
         """Creates a sentence by substituting the names of entities
