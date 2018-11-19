@@ -112,6 +112,9 @@ def make_factor(make_predicate) -> Dict[str, Factor]:
         "f7": Fact(p["p7"]),
         "f7_true": Fact(p["p7_true"]),
         "f8": Fact(p["p8"]),
+        "f8_meters": Fact(p["p8_meters"]),
+        "f8_float": Fact(p["p8_float"]),
+        "f8_higher_int": Fact(p["p8_higher_int"]),
         "f9": Fact(p["p9"]),
         "f10": Fact(p["p10"]),
     }
@@ -210,25 +213,24 @@ class TestPredicates:
                 ),
             )
 
-    def test_predicate_contradictions(self, make_predicate):
-        assert make_predicate["p7"].contradicts(make_predicate["p7_true"])
-        assert not make_predicate["p1"].contradicts(make_predicate["p1_again"])
-        assert not make_predicate["p3"].contradicts(make_predicate["p7"])
-
-    def test_predicate_does_not_contradict_factor(self, make_predicate, make_factor):
-        assert not make_predicate["p7_true"].contradicts(make_factor["f7"])
-
-    def test_predicate_equality(self, make_predicate):
-        assert make_predicate["p1"] == make_predicate["p1_again"]
-
-    def test_predicate_inequality(self, make_predicate):
-        assert make_predicate["p2"] != make_predicate["p2_reciprocal"]
+    def test_convert_false_statement_about_quantity_to_obverse(self, make_predicate):
+        assert make_predicate["p7_obverse"].truth is True
+        assert make_predicate["p7_obverse"].quantity == ureg.Quantity(35, "foot")
+        assert make_predicate["p7"].truth is True
+        assert make_predicate["p7"].comparison == "<="
+        assert make_predicate["p7_obverse"].comparison == "<="
 
     def test_quantity_type(self, make_predicate):
         assert type(make_predicate["p7"].quantity) == ureg.Quantity
 
     def test_quantity_string(self, make_predicate):
         assert str(make_predicate["p7"].quantity) == "35 foot"
+
+    def test_predicate_equality(self, make_predicate):
+        assert make_predicate["p1"] == make_predicate["p1_again"]
+
+    def test_predicate_inequality(self, make_predicate):
+        assert make_predicate["p2"] != make_predicate["p2_reciprocal"]
 
     def test_quantity_comparison(self, make_predicate):
         assert make_predicate["p7"].quantity_comparison() == "no more than 35 foot"
@@ -253,6 +255,13 @@ class TestPredicates:
         assert str(make_predicate["p8_float"]) == "The distance between {} and {} was at least 20.0"
         assert str(make_predicate["p8"]) == "The distance between {} and {} was at least 20 foot"
 
+    def test_predicate_contradictions(self, make_predicate):
+        assert make_predicate["p7"].contradicts(make_predicate["p7_true"])
+        assert not make_predicate["p1"].contradicts(make_predicate["p1_again"])
+        assert not make_predicate["p3"].contradicts(make_predicate["p7"])
+
+    def test_predicate_does_not_contradict_factor(self, make_predicate, make_factor):
+        assert not make_predicate["p7_true"].contradicts(make_factor["f7"])
 
 class TestFactors:
     def test_string_representation_of_factor(self, make_factor):
@@ -316,6 +325,10 @@ class TestFactors:
         assert make_factor["f3"].contradicts(make_factor["f3_absent"])
         assert make_factor["f3_absent"].contradicts(make_factor["f3"])
 
+    def test_factor_implies_because_of_quantity(self, make_factor):
+        assert make_predicate["f8_meters"] > make_predicate["f8"]
+        assert make_predicate["f8_higher_int"] > make_predicate["f8_float"]
+        assert make_predicate["f8_int"] < make_predicate["f8_higher_int"]
 
 class TestProcedure:
     def test_procedure_equality(self, make_procedure):

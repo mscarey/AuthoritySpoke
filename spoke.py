@@ -160,8 +160,10 @@ class Predicate:
         return False
 
     def contradicts(self, other):
-        """This returns false only if the content is exactly the same and self.truth is
-        different. Will break if symbols for entities are allowed to appear in self.content.
+        """This first tries to find a contradiction based on the relationship 
+        between the quantities in the predicates. If there are no quantities, it
+        returns false only if the content is exactly the same and self.truth is
+        different.
         """
         if not isinstance(other, self.__class__):
             return False
