@@ -160,7 +160,7 @@ class Predicate:
         return False
 
     def contradicts(self, other):
-        """This first tries to find a contradiction based on the relationship 
+        """This first tries to find a contradiction based on the relationship
         between the quantities in the predicates. If there are no quantities, it
         returns false only if the content is exactly the same and self.truth is
         different.
@@ -250,7 +250,12 @@ class Fact(Factor):
         return f"{'Absent ' if self.absent else ''}{self.__class__.__name__}: {self.predicate}"
 
     def __gt__(self, other):
-        return NotImplemented
+        if not isinstance(other, self.__class__):
+            return False
+        if self.predicate > other.predicate and self.absent == other.absent:
+            return True
+        return False
+
 
     def predicate_in_context(self, entities: Sequence[Entity]) -> str:
         return (

@@ -112,6 +112,7 @@ def make_factor(make_predicate) -> Dict[str, Factor]:
         "f7": Fact(p["p7"]),
         "f7_true": Fact(p["p7_true"]),
         "f8": Fact(p["p8"]),
+        "f8_int": Fact(p["p8_int"]),
         "f8_meters": Fact(p["p8_meters"]),
         "f8_float": Fact(p["p8_float"]),
         "f8_higher_int": Fact(p["p8_higher_int"]),
@@ -325,10 +326,20 @@ class TestFactors:
         assert make_factor["f3"].contradicts(make_factor["f3_absent"])
         assert make_factor["f3_absent"].contradicts(make_factor["f3"])
 
+
+    def test_factor_does_not_imply_predicate(self, make_predicate, make_factor):
+        assert not make_factor["f8_meters"] > make_predicate["p8"]
+
     def test_factor_implies_because_of_quantity(self, make_factor):
-        assert make_predicate["f8_meters"] > make_predicate["f8"]
-        assert make_predicate["f8_higher_int"] > make_predicate["f8_float"]
-        assert make_predicate["f8_int"] < make_predicate["f8_higher_int"]
+        assert make_factor["f8_meters"] > make_factor["f8"]
+        assert make_factor["f8_higher_int"] > make_factor["f8_float"]
+        assert make_factor["f8_int"] < make_factor["f8_higher_int"]
+
+    def test_absent_factor_implies_absent_factor_with_greater_quantity(self, make_factor):
+        pass
+
+    def absent_factor_contradicts_factor_with_greater_quantity(self, make_factor):
+        pass
 
 class TestProcedure:
     def test_procedure_equality(self, make_procedure):
