@@ -18,6 +18,7 @@ OPPOSITE_COMPARISONS = {
     "<=": ">",
 }
 
+
 @dataclass()
 class Entity:
     """A person, place, thing, or event that needs to be mentioned in
@@ -46,18 +47,21 @@ class Predicate:
     Predicates may be "alleged" by a pleading, "supported" by evidence, or
     "found" to be factual by a jury verdict or a judge's finding of fact.
 
-    If reciprocal==True, then the order of the first two entities will
+    If self.reciprocal is True, then the order of the first two entities will
     be considered interchangeable. There's no way to make any entities
     interchangeable other than the first two.
 
     A predicate can also end with a comparison to some quantity, as described
-    by a ureg.Quantity object from the pint library. See pint.readthedocs.io.
+    by a ureg. Quantity object from the pint library. See pint.readthedocs.io.
 
     If a quantity is defined, a "comparison" should also be defined. That's
     a string indicating whether the thing described by the predicate is
     greater than, less than, or equal to the quantity. Even though "="
     is the default, it's the least useful, because courts almost always state
     rules that are intended to apply to quantities above or below some threshold.
+
+    The quantity comparison can only be mentioned last. No entities may be mentioned
+    after the quantity comparison is mentioned.
     """
 
     content: str
@@ -80,7 +84,9 @@ class Predicate:
             object.__setattr__(self, "comparison", "<>")
         if self.comparison and not self.truth:
             object.__setattr__(self, "truth", True)
-            object.__setattr__(self, "comparison", OPPOSITE_COMPARISONS[self.comparison])
+            object.__setattr__(
+                self, "comparison", OPPOSITE_COMPARISONS[self.comparison]
+            )
 
         if self.comparison and self.comparison not in OPPOSITE_COMPARISONS.keys():
             raise ValueError(
@@ -116,7 +122,7 @@ class Predicate:
             and self.quantity == other.quantity
         ):
             if self.truth == other.truth and self.comparison == other.comparison:
-                return True # Equal if everything is same
+                return True  # Equal if everything is same
             if (
                 self.comparison
                 and OPPOSITE_COMPARISONS[self.comparison] == other.comparison
@@ -137,11 +143,19 @@ class Predicate:
         # Assumes no predicate implies another based on meaning of their content text
         if not (self.content == other.content and self.reciprocal == other.reciprocal):
             return False
-        if not (self.quantity and other.quantity and self.comparison and other.comparison):
+        if not (
+            self.quantity and other.quantity and self.comparison and other.comparison
+        ):
             return False
 
         if (type(self.quantity) == ureg.Quantity) != (
             type(other.quantity) == ureg.Quantity
+        ):
+            return False
+
+        if (
+            isinstance(self.quantity, ureg.Quantity)
+            and self.quantity.dimensionality != other.quantity.dimensionality
         ):
             return False
 
@@ -173,6 +187,12 @@ class Predicate:
         ):
             return False
 
+        if (
+            isinstance(self.quantity, ureg.Quantity)
+            and self.quantity.dimensionality != other.quantity.dimensionality
+        ):
+            return False
+
         if not (self.content == other.content and self.reciprocal == other.reciprocal):
             return False
 
@@ -192,9 +212,6 @@ class Predicate:
             return False
         return self.content == other.content and self.truth != other.truth
 
-
-
-
     def quantity_comparison(self):
         """String representation of a comparison with a quantity,
         which can include units due to the pint library."""
@@ -211,8 +228,6 @@ class Predicate:
             "<=": "no more than",
         }
         return f"{expand[comparison]} {self.quantity}"
-
-
 
     def content_with_entities(self, entities: Union[Entity, Sequence[Entity]]) -> str:
         """Creates a sentence by substituting the names of entities
@@ -249,13 +264,15 @@ class Fact(Factor):
     def __str__(self):
         return f"{'Absent ' if self.absent else ''}{self.__class__.__name__}: {self.predicate}"
 
-    def __gt__(self, other):
+    def __gt__(self, other) -> bool:
+        """Indicates whether self implies other, taking into account the implication
+        test for predicates and whether self and other are labeled 'absent'"""
+
         if not isinstance(other, self.__class__):
             return False
         if self.predicate > other.predicate and self.absent == other.absent:
             return True
         return False
-
 
     def predicate_in_context(self, entities: Sequence[Entity]) -> str:
         return (
@@ -263,20 +280,23 @@ class Fact(Factor):
             + f"{self.predicate.content_with_entities(entities)}"
         )
 
-    def contradicts(self, other):
+    def contradicts(self, other) -> bool:
         if not isinstance(other, self.__class__):
             return False
         if self.predicate.contradicts(other.predicate) and not (
             self.absent | other.absent
         ):
             return True
-        if (self.predicate == other.predicate) and (self.absent != other.absent):
+        if self.predicate > other.predicate and other.absent and not self.absent:
+            return True
+        if other.predicate > self.predicate and self.absent and not other.absent:
             return True
         return False
 
-    # TODO: I'd like a function to determine if a factor implies another,
-    # but it would need entity context,
-    # and I guess it would have to be from the point of view of a particular court.
+    # TODO: A function to determine if a factor implies another (transitively)
+    # given a list of factors that imply one another or a function for determining
+    # which implication relations (represented by production rules?)
+    # are binding from the point of view of a particular court.
 
 
 @dataclass(frozen=True)
@@ -313,13 +333,17 @@ class Procedure:
         return True
 
     def all_entities(self) -> Dict[Factor, Tuple[int]]:
-        """Used for the entity_permutations function."""
+        """Returns a dict of all factors, with their entity labels as values."""
+
         inputs = self.inputs or {}
         even_if = self.even_if or {}
         return {**self.outputs, **inputs, **even_if}
 
     def sorted_entities(self) -> List[Factor]:
-        """Used for the entity_permutations function."""
+        """Sorts the procedure's factors into an order that will always be
+        the same for the same set of factors, but that doesn't correspond to
+        whether the factors are inputs, outputs, or "even if" factors."""
+
         return sorted(self.all_entities(), key=repr)
 
     def entity_permutations(self) -> Optional[Set[Tuple[int]]]:
@@ -336,6 +360,13 @@ class Procedure:
             sorted_entities: list,
             i: int,
         ) -> Optional[Set[Tuple[int]]]:
+            """Recursive function that flattens the list of entities for
+            all the factors into a list, except that if the order of
+            entities can vary, the function continues writing one variant of
+            the list but calls a second instance of itself to continue
+            writing the other variant list. It may split multiple times
+            before it reaches the end of the sequence."""
+
             if i >= len(sorted_entities):
                 entity_permutations.append(tuple(entity_list))
                 return None

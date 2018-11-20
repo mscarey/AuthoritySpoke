@@ -90,6 +90,17 @@ def make_predicate() -> Dict[str, Predicate]:
             comparison="<=",
             quantity=Q_("5 feet"),
         ),
+        "p9_miles": Predicate(
+            "The distance between {} and a parking area used by personnel and patrons of {} was {}",
+            comparison="<=",
+            quantity=Q_("5 miles"),
+            ),
+        "p9_acres": Predicate(
+            "The distance between {} and a parking area used by personnel and patrons of {} was {}",
+            comparison="<=",
+            quantity=Q_("5 acres"),
+            ),
+
         "p10": Predicate("{} was within the curtilage of {}"),
     }
 
@@ -112,11 +123,14 @@ def make_factor(make_predicate) -> Dict[str, Factor]:
         "f7": Fact(p["p7"]),
         "f7_true": Fact(p["p7_true"]),
         "f8": Fact(p["p8"]),
+        "f8_absent": Fact(p["p8"], absent=True),
         "f8_int": Fact(p["p8_int"]),
         "f8_meters": Fact(p["p8_meters"]),
         "f8_float": Fact(p["p8_float"]),
         "f8_higher_int": Fact(p["p8_higher_int"]),
         "f9": Fact(p["p9"]),
+        "f9_absent": Fact(p["p9"], absent=True),
+        "f9_absent_miles": Fact(p["p9_miles"], absent=True),
         "f10": Fact(p["p10"]),
     }
 
@@ -264,6 +278,17 @@ class TestPredicates:
     def test_predicate_does_not_contradict_factor(self, make_predicate, make_factor):
         assert not make_predicate["p7_true"].contradicts(make_factor["f7"])
 
+    def test_no_implication_with_inconsistent_dimensionality(self, make_predicate):
+        assert not make_predicate["p9"] > make_predicate["p9_acres"]
+        assert not make_predicate["p9"] < make_predicate["p9_acres"]
+
+    def test_no_contradiction_with_inconsistent_dimensionality(self, make_predicate):
+        assert not make_predicate["p9"].contradicts(make_predicate["p9_acres"])
+        assert not make_predicate["p9_acres"].contradicts(make_predicate["p9"])
+
+    def test_no_equality_with_inconsistent_dimensionality(self, make_predicate):
+        assert make_predicate["p9"] != make_predicate["p9_acres"]
+
 class TestFactors:
     def test_string_representation_of_factor(self, make_factor):
         assert str(make_factor["f1"]) == "Fact: {} was a motel"
@@ -336,10 +361,13 @@ class TestFactors:
         assert make_factor["f8_int"] < make_factor["f8_higher_int"]
 
     def test_absent_factor_implies_absent_factor_with_greater_quantity(self, make_factor):
-        pass
+        assert make_factor["f9_absent"] > make_factor["f9_absent_miles"]
 
-    def absent_factor_contradicts_factor_with_greater_quantity(self, make_factor):
-        pass
+    def test_absent_factor_contradicts_broader_quantity_statement(self, make_factor):
+        assert make_factor["f8_absent"].contradicts(make_factor["f8_meters"])
+        assert make_factor["f8_meters"].contradicts(make_factor["f8_absent"])
+        assert make_factor["f9_absent_miles"].contradicts(make_factor["f9"])
+        assert make_factor["f9"].contradicts(make_factor["f9_absent_miles"])
 
 class TestProcedure:
     def test_procedure_equality(self, make_procedure):
