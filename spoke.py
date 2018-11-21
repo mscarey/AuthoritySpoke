@@ -346,7 +346,7 @@ class Procedure:
 
         return sorted(self.all_entities(), key=repr)
 
-    def entity_permutations(self) -> Optional[Set[Tuple[int]]]:
+    def get_entity_permutations(self) -> Optional[Set[Tuple[int]]]:
         """Returns every possible ordering of entities that could be
         substituted into an ordered list of the factors in the procedure."""
 
@@ -360,8 +360,8 @@ class Procedure:
             sorted_entities: list,
             i: int,
         ) -> Optional[Set[Tuple[int]]]:
-            """Recursive function that flattens the list of entities for
-            all the factors into a list, except that if the order of
+            """Recursive function that flattens the entity labels for
+            each of the factors into a list, except that if the order of
             entities can vary, the function continues writing one variant of
             the list but calls a second instance of itself to continue
             writing the other variant list. It may split multiple times
@@ -409,13 +409,36 @@ class Procedure:
 
         return any(
             (self.match_entity_roles(x, y) and self.match_entity_roles(y, x))
-            for x in self.entity_permutations()
-            for y in other.entity_permutations()
+            for x in self.get_entity_permutations()
+            for y in other.get_entity_permutations()
         )
 
-    # TODO: to create a __gt__ test, test whether each factor in one holding
-    # implies a factor in the other...and also has the entity markers
-    # in the right order
+    def __gt__(self, other):
+        """
+        For self to imply other:
+        All outputs of other are implied by outputs of self with matching entities
+        All inputs of self are implied by inputs of other with matching entities
+        All even_if factors of other are implied by even_if factors or inputs of self
+        """
+
+        if not isinstance(other, Procedure):
+            return False
+        pass
+
+    def exhaustive_implies(self, other):
+        """
+        This is a different process for checking whether one procedure implies another,
+        used when the list of self's inputs is considered an exhaustive list of the
+        circumstances needed to invoke the procedure (i.e. when the rule "always" applies
+        when the inputs are present).
+
+        For self to imply other:
+        All outputs of other are implied by outputs of self with matching entities
+        All inputs of self are implied by inputs of other with matching entities
+        No even_if factors of other are contradicted by inputs of self
+        """
+
+        pass
 
 
 @dataclass

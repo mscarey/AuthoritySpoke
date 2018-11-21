@@ -94,13 +94,12 @@ def make_predicate() -> Dict[str, Predicate]:
             "The distance between {} and a parking area used by personnel and patrons of {} was {}",
             comparison="<=",
             quantity=Q_("5 miles"),
-            ),
+        ),
         "p9_acres": Predicate(
             "The distance between {} and a parking area used by personnel and patrons of {} was {}",
             comparison="<=",
             quantity=Q_("5 acres"),
-            ),
-
+        ),
         "p10": Predicate("{} was within the curtilage of {}"),
     }
 
@@ -266,9 +265,18 @@ class TestPredicates:
         assert make_predicate["p8_int"] < make_predicate["p8_higher_int"]
 
     def test_str_for_predicate_with_number_quantity(self, make_predicate):
-        assert str(make_predicate["p8_int"]) == "The distance between {} and {} was at least 20"
-        assert str(make_predicate["p8_float"]) == "The distance between {} and {} was at least 20.0"
-        assert str(make_predicate["p8"]) == "The distance between {} and {} was at least 20 foot"
+        assert (
+            str(make_predicate["p8_int"])
+            == "The distance between {} and {} was at least 20"
+        )
+        assert (
+            str(make_predicate["p8_float"])
+            == "The distance between {} and {} was at least 20.0"
+        )
+        assert (
+            str(make_predicate["p8"])
+            == "The distance between {} and {} was at least 20 foot"
+        )
 
     def test_predicate_contradictions(self, make_predicate):
         assert make_predicate["p7"].contradicts(make_predicate["p7_true"])
@@ -288,6 +296,7 @@ class TestPredicates:
 
     def test_no_equality_with_inconsistent_dimensionality(self, make_predicate):
         assert make_predicate["p9"] != make_predicate["p9_acres"]
+
 
 class TestFactors:
     def test_string_representation_of_factor(self, make_factor):
@@ -351,7 +360,6 @@ class TestFactors:
         assert make_factor["f3"].contradicts(make_factor["f3_absent"])
         assert make_factor["f3_absent"].contradicts(make_factor["f3"])
 
-
     def test_factor_does_not_imply_predicate(self, make_predicate, make_factor):
         assert not make_factor["f8_meters"] > make_predicate["p8"]
 
@@ -360,7 +368,9 @@ class TestFactors:
         assert make_factor["f8_higher_int"] > make_factor["f8_float"]
         assert make_factor["f8_int"] < make_factor["f8_higher_int"]
 
-    def test_absent_factor_implies_absent_factor_with_greater_quantity(self, make_factor):
+    def test_absent_factor_implies_absent_factor_with_greater_quantity(
+        self, make_factor
+    ):
         assert make_factor["f9_absent"] > make_factor["f9_absent_miles"]
 
     def test_absent_factor_contradicts_broader_quantity_statement(self, make_factor):
@@ -368,6 +378,7 @@ class TestFactors:
         assert make_factor["f8_meters"].contradicts(make_factor["f8_absent"])
         assert make_factor["f9_absent_miles"].contradicts(make_factor["f9"])
         assert make_factor["f9"].contradicts(make_factor["f9_absent_miles"])
+
 
 class TestProcedure:
     def test_procedure_equality(self, make_procedure):
@@ -453,7 +464,7 @@ class TestProcedure:
         "The distance between {the hotel} and {the trees}"
         but otherwise the order of entities has to be the same.
         """
-        assert make_procedure["c2"].entity_permutations() == {
+        assert make_procedure["c2"].get_entity_permutations() == {
             (0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1),
             (0, 1, 0, 1, 1, 0, 0, 0, 0, 1, 0, 1),
             (0, 1, 1, 0, 0, 1, 0, 0, 0, 1, 0, 1),
@@ -465,7 +476,6 @@ class TestProcedure:
 
 
 class TestHoldings:
-
     def test_identical_holdings_equal(self, make_holding):
         assert make_holding["h1"] == make_holding["h1_again"]
 
