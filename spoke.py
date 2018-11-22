@@ -220,7 +220,7 @@ class Predicate:
             return None
         comparison = self.comparison or "="
         expand = {
-            "=": "equal to",
+            "=": "exactly equal to",
             "!=": "not equal to",
             ">": "greater than",
             "<": "less than",
@@ -413,6 +413,28 @@ class Procedure:
             for y in other.get_entity_permutations()
         )
 
+    def entities_of_implied_inputs(
+        self, other
+    ) -> Dict[Factor, Optional[Tuple[Tuple[int, ...], ...]]]:
+        """
+        Gets every order of entities from every factor in other that
+        implies each factor of self. Includes swapped entities
+        for reciprocal factors.
+        """
+        normal_order = {
+            f: list(other.inputs[x] for x in other.inputs.keys() if x > f)
+            for f in self.inputs.keys()
+        }
+        reciprocal_order = {
+            f: list(
+                tuple(other.inputs[x][1], other.inputs[x][1], *other.inputs[x][2:])
+                for x in other.inputs.keys()
+                if x.predicate.reciprocal and x > f
+            )
+            for f in self.inputs.keys()
+        }
+        return {f: tuple((*normal_order[f], *reciprocal_order[f])) for f in self.inputs.keys()}
+
     def __gt__(self, other):
         """
         For self to imply other:
@@ -420,6 +442,7 @@ class Procedure:
         All inputs of self are implied by inputs of other with matching entities
         All even_if factors of other are implied by even_if factors or inputs of self
         """
+        corresponding_inputs = {}
 
         if not isinstance(other, Procedure):
             return False

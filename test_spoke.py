@@ -61,6 +61,12 @@ def make_predicate() -> Dict[str, Predicate]:
             comparison=">=",
             quantity=Q_("20 feet"),
         ),
+        "p8_exact": Predicate(
+            "The distance between {} and {} was {}",
+            reciprocal=True,
+            comparison="=",
+            quantity=Q_("25 feet"),
+        ),
         "p8_meters": Predicate(
             "The distance between {} and {} was {}",
             reciprocal=True,
@@ -123,6 +129,7 @@ def make_factor(make_predicate) -> Dict[str, Factor]:
         "f7_true": Fact(p["p7_true"]),
         "f8": Fact(p["p8"]),
         "f8_absent": Fact(p["p8"], absent=True),
+        "f8_exact": Fact(p["p8_exact"]),
         "f8_int": Fact(p["p8_int"]),
         "f8_meters": Fact(p["p8_meters"]),
         "f8_float": Fact(p["p8_float"]),
@@ -143,6 +150,9 @@ def make_procedure(make_factor) -> Dict[str, Procedure]:
             outputs={f["f3"]: (0, 1)}, inputs={f["f1"]: (0,), f["f2"]: (1, 0)}
         ),
         "c1_again": Procedure(
+            outputs={f["f3"]: (0, 1)}, inputs={f["f1"]: (0,), f["f2"]: (1, 0)}
+        ),
+        "c1_entity_order": Procedure(
             outputs={f["f3"]: (1, 0)}, inputs={f["f2"]: (0, 1), f["f1"]: (1,)}
         ),
         "c1_easy": Procedure(outputs={f["f3"]: (0, 1)}, inputs={f["f2"]: (1, 0)}),
@@ -156,6 +166,21 @@ def make_procedure(make_factor) -> Dict[str, Procedure]:
                 f["f9"]: (0, 1),
             },
             even_if={f["f8"]: (0, 1)},
+        ),
+        "c2_exact_quantity": Procedure(
+            outputs={f["f10"]: (0, 1)},
+            inputs={
+                f["f4"]: (0, 1),
+                f["f5"]: (0,),
+                f["f6"]: (0,),
+                f["f7"]: (0, 1),
+                f["f8_exact"]: (0, 1),
+            },
+        ),
+        "c2_exact_in_even_if": Procedure(
+            outputs={f["f10"]: (0, 1)},
+            inputs={f["f4"]: (0, 1), f["f5"]: (0,), f["f6"]: (0,), f["f7"]: (0, 1)},
+            even_if={f["f8_exact"]: (0, 1)},
         ),
         "c2_reciprocal_swap": Procedure(
             outputs={f["f10"]: (0, 1)},
@@ -383,6 +408,7 @@ class TestFactors:
 class TestProcedure:
     def test_procedure_equality(self, make_procedure):
         assert make_procedure["c1"] == make_procedure["c1_again"]
+        assert make_procedure["c1"] == make_procedure["c1_entity_order"]
 
     def test_still_equal_after_swapping_reciprocal_entities(self, make_procedure):
         assert make_procedure["c2"] == (make_procedure["c2_reciprocal_swap"])
@@ -471,8 +497,48 @@ class TestProcedure:
             (0, 1, 1, 0, 1, 0, 0, 0, 0, 1, 0, 1),
         }
 
+    def test_entities_of_implied_inputs_for_identical_procedure(
+        self, make_factor, make_procedure
+    ):
+        f = make_factor
+        c1 = make_procedure["c1"]
+        c1_again = make_procedure["c1_again"]
+        assert c1.inputs[f["f1"]] == (0,)
+        assert c1.inputs[f["f2"]] == (1, 0)
+        assert (0,) in c1.entities_of_implied_inputs(c1_again)[f["f1"]]
+        assert (1, 0) in c1.entities_of_implied_inputs(c1_again)[f["f2"]]
+
+    def test_entities_of_implied_inputs_for_implied_procedure(
+        self, make_factor, make_procedure
+    ):
+        f = make_factor
+        c1_easy = make_procedure["c1_easy"]
+        c1_again = make_procedure["c1_again"]
+        assert f["f2"] in c1_easy.inputs
+        assert c1_again.inputs[f["f2"]] in c1_easy.entities_of_implied_inputs(c1_again)[f["f2"]]
+
+        assert f["f1"] not in c1_easy.inputs
+        assert c1_again.inputs[f["f1"]] not in c1_easy.entities_of_implied_inputs(c1_again)[f["f2"]]
+
+    def test_reciprocal_entities_of_implied_inputs_for_implied_procedure(
+        self, make_factor, make_procedure
+    ):
+        f = make_factor
+        c2 = make_procedure["c2"]
+        c1_again = make_procedure["c2_exact"]
+        pass
+
     def test_implies_same_output_fewer_inputs(self, make_procedure):
         assert make_procedure["c1_easy"] > (make_procedure["c1"])
+
+    def test_procedure_implies_identical_procedure(self, make_procedure):
+        assert make_procedure["c1"] > (make_procedure["c1_again"])
+
+    def test_procedure_implies_broader_quantity_statement(self, make_procedure):
+        assert make_procedure["c2_exact"] > (make_procedure["c2"])
+
+    def test_procedure_exact_quantity_in_even_if_implication(self, make_procedure):
+        assert make_procedure["c2_exact"] > (make_procedure["c2"])
 
 
 class TestHoldings:
