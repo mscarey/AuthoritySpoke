@@ -427,13 +427,16 @@ class Procedure:
         }
         reciprocal_order = {
             f: list(
-                tuple(other.inputs[x][1], other.inputs[x][1], *other.inputs[x][2:])
+                (other.inputs[x][1], other.inputs[x][0], *other.inputs[x][2:])
                 for x in other.inputs.keys()
                 if x.predicate.reciprocal and x > f
             )
             for f in self.inputs.keys()
         }
-        return {f: tuple((*normal_order[f], *reciprocal_order[f])) for f in self.inputs.keys()}
+        return {
+            f: tuple((*normal_order[f], *reciprocal_order[f]))
+            for f in self.inputs.keys()
+        }
 
     def __gt__(self, other):
         """

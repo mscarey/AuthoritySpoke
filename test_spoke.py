@@ -173,7 +173,6 @@ def make_procedure(make_factor) -> Dict[str, Procedure]:
                 f["f4"]: (0, 1),
                 f["f5"]: (0,),
                 f["f6"]: (0,),
-                f["f7"]: (0, 1),
                 f["f8_exact"]: (0, 1),
             },
         ),
@@ -520,13 +519,24 @@ class TestProcedure:
         assert f["f1"] not in c1_easy.inputs
         assert c1_again.inputs[f["f1"]] not in c1_easy.entities_of_implied_inputs(c1_again)[f["f2"]]
 
-    def test_reciprocal_entities_of_implied_inputs_for_implied_procedure(
+    def test_entities_of_implied_quantity_inputs_for_implied_procedure(
         self, make_factor, make_procedure
     ):
         f = make_factor
         c2 = make_procedure["c2"]
-        c1_again = make_procedure["c2_exact"]
-        pass
+        c2_exact = make_procedure["c2_exact_quantity"]
+        assert f["f7"] in c2.inputs
+        assert f["f7"] not in c2_exact.inputs
+
+        # This is meant to indicate that the function is recognizing that
+        # "exactly 25" implies "more than 20".
+
+        assert c2_exact.inputs[f["f8_exact"]] in c2.entities_of_implied_inputs(c2_exact)[f["f7"]]
+
+    def test_reciprocal_entities_of_implied_inputs_for_implied_procedure(
+        self, make_factor, make_procedure
+    ):
+        assert False
 
     def test_implies_same_output_fewer_inputs(self, make_procedure):
         assert make_procedure["c1_easy"] > (make_procedure["c1"])
@@ -535,10 +545,10 @@ class TestProcedure:
         assert make_procedure["c1"] > (make_procedure["c1_again"])
 
     def test_procedure_implies_broader_quantity_statement(self, make_procedure):
-        assert make_procedure["c2_exact"] > (make_procedure["c2"])
+        assert make_procedure["c2_exact_quantity"] > (make_procedure["c2"])
 
     def test_procedure_exact_quantity_in_even_if_implication(self, make_procedure):
-        assert make_procedure["c2_exact"] > (make_procedure["c2"])
+        assert make_procedure["c2_exact_quantity"] > (make_procedure["c2"])
 
 
 class TestHoldings:
