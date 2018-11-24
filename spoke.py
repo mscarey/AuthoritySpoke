@@ -117,7 +117,7 @@ class Predicate:
             return False
 
         if (
-            self.content == other.content
+            self.content.lower() == other.content.lower()
             and self.reciprocal == other.reciprocal
             and self.quantity == other.quantity
         ):
@@ -141,7 +141,10 @@ class Predicate:
         if self == other:
             return True
         # Assumes no predicate implies another based on meaning of their content text
-        if not (self.content == other.content and self.reciprocal == other.reciprocal):
+        if not (
+            self.content.lower() == other.content.lower()
+            and self.reciprocal == other.reciprocal
+        ):
             return False
         if not (
             self.quantity and other.quantity and self.comparison and other.comparison
@@ -159,10 +162,20 @@ class Predicate:
         ):
             return False
 
-        if "<" in self.comparison and "<" in other.comparison:
+        if "<" in self.comparison and (
+            "<" in other.comparison or "=" in other.comparison
+        ):
             if self.quantity < other.quantity:
                 return True
-        if ">" in self.comparison and ">" in other.comparison:
+        if ">" in self.comparison and (
+            ">" in other.comparison or "=" in other.comparison
+        ):
+            if self.quantity > other.quantity:
+                return True
+        if "=" in self.comparison and "<" in other.comparison:
+            if self.quantity < other.quantity:
+                return True
+        if "=" in self.comparison and ">" in other.comparison:
             if self.quantity > other.quantity:
                 return True
         if "=" in self.comparison and "=" in other.comparison:
@@ -172,6 +185,9 @@ class Predicate:
             if self.quantity == other.quantity:
                 return True
         return False
+
+    def __lt__(self, other) -> bool:
+        return other > self
 
     def contradicts(self, other):
         """This first tries to find a contradiction based on the relationship
@@ -197,10 +213,20 @@ class Predicate:
             return False
 
         if self.quantity and other.quantity:
-            if "<" in self.comparison and "<" in other.comparison:
+            if (
+                "<" in self.comparison or "=" in self.comparison
+            ) and "<" in other.comparison:
                 if self.quantity > other.quantity:
                     return True
-            if ">" in self.comparison and ">" in other.comparison:
+            if (
+                ">" in self.comparison or "=" in self.comparison
+            ) and ">" in other.comparison:
+                if self.quantity < other.quantity:
+                    return True
+            if ">" in self.comparison and "=" in other.comparison:
+                if self.quantity > other.quantity:
+                    return True
+            if "<" in self.comparison and "=" in other.comparison:
                 if self.quantity < other.quantity:
                     return True
             if "=" in self.comparison and "=" not in other.comparison:
@@ -418,8 +444,13 @@ class Procedure:
     ) -> Dict[Factor, Optional[Tuple[Tuple[int, ...], ...]]]:
         """
         Gets every order of entities from every factor in other that
-        implies each factor of self. Includes swapped entities
-        for reciprocal factors.
+        would cause each factor of self to be implied by other.
+        Takes into account swapped entities for reciprocal factors.
+
+        This method doesn't reveal which factor of other will imply any
+        particular factor of self, if the factor of self has the correct
+        entities. It shouldn't matter, if the purpose is to tell which
+        entities to select to cause each factor of self to be implied by other.
         """
         normal_order = {
             f: list(other.inputs[x] for x in other.inputs.keys() if x > f)

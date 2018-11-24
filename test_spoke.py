@@ -35,21 +35,21 @@ def make_predicate() -> Dict[str, Predicate]:
         "p5": Predicate("{} was a stockpile of Christmas trees"),
         "p6": Predicate("{} was among some standing trees"),
         "p7": Predicate(
-            "the distance between {} and {} was {}",
+            "The distance between {} and {} was {}",
             truth=False,
             reciprocal=True,
             comparison=">",
             quantity=Q_("35 feet"),
         ),
         "p7_obverse": Predicate(
-            "the distance between {} and {} was {}",
+            "The distance between {} and {} was {}",
             truth=True,
             reciprocal=True,
             comparison="<=",
             quantity=Q_("35 feet"),
         ),
         "p7_true": Predicate(
-            "the distance between {} and {} was {}",
+            "The distance between {} and {} was {}",
             truth=True,
             reciprocal=True,
             comparison="<",
@@ -321,6 +321,8 @@ class TestPredicates:
     def test_no_equality_with_inconsistent_dimensionality(self, make_predicate):
         assert make_predicate["p9"] != make_predicate["p9_acres"]
 
+    def test_predicate_content_comparison(self, make_predicate):
+        assert make_predicate["p8_exact"].content == make_predicate["p7"].content
 
 class TestFactors:
     def test_string_representation_of_factor(self, make_factor):
@@ -346,7 +348,7 @@ class TestFactors:
         assert make_factor["f7"].predicate_in_context(
             (make_entity["e_trees"], make_entity["e_motel"])
         ) == str(
-            "Fact: the distance between the stockpile of trees "
+            "Fact: The distance between the stockpile of trees "
             + "and Hideaway Lodge was no more than 35 foot"
         )
 
@@ -392,6 +394,9 @@ class TestFactors:
         assert make_factor["f8_higher_int"] > make_factor["f8_float"]
         assert make_factor["f8_int"] < make_factor["f8_higher_int"]
 
+    def test_factor_implies_because_of_exact_quantity(self, make_factor):
+        assert make_factor["f8_exact"] > make_factor["f7"]
+
     def test_absent_factor_implies_absent_factor_with_greater_quantity(
         self, make_factor
     ):
@@ -433,20 +438,20 @@ class TestProcedure:
             Fact(
                 predicate=Predicate(
                     content="The distance between {} and {} was {}",
-                    truth=True,
-                    reciprocal=True,
-                    comparison=">=",
-                    quantity=ureg.Quantity(20, "foot"),
-                ),
-                absent=False,
-            ),
-            Fact(
-                predicate=Predicate(
-                    content="the distance between {} and {} was {}",
                     truth=False,
                     reciprocal=True,
                     comparison=">",
                     quantity=ureg.Quantity(35, "foot"),
+                ),
+                absent=False,
+            ),
+                        Fact(
+                predicate=Predicate(
+                    content="The distance between {} and {} was {}",
+                    truth=True,
+                    reciprocal=True,
+                    comparison=">=",
+                    quantity=ureg.Quantity(20, "foot"),
                 ),
                 absent=False,
             ),
@@ -522,15 +527,19 @@ class TestProcedure:
     def test_entities_of_implied_quantity_inputs_for_implied_procedure(
         self, make_factor, make_procedure
     ):
+        """This is meant to show that the function finds the "distance is
+        exactly 25" factor in c2_exact, and recognizes that factor can imply
+        the "distance is more than 20" factor in c2 if they have the same entities.
+        """
+
         f = make_factor
         c2 = make_procedure["c2"]
         c2_exact = make_procedure["c2_exact_quantity"]
         assert f["f7"] in c2.inputs
         assert f["f7"] not in c2_exact.inputs
 
-        # This is meant to indicate that the function is recognizing that
-        # "exactly 25" implies "more than 20".
 
+        y = c2.entities_of_implied_inputs(c2_exact)
         assert c2_exact.inputs[f["f8_exact"]] in c2.entities_of_implied_inputs(c2_exact)[f["f7"]]
 
     def test_reciprocal_entities_of_implied_inputs_for_implied_procedure(
