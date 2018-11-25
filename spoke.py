@@ -482,6 +482,17 @@ class Procedure:
             return False
         pass
 
+    def __len__(self):
+        """
+        Returns the number of entities that need to be specified for the procedure.
+        """
+
+        return len(
+            set(
+                (slot for factor in self.all_entities().values() for slot in factor)
+            )
+        )
+
     def exhaustive_implies(self, other):
         """
         This is a different process for checking whether one procedure implies another,

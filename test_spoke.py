@@ -420,6 +420,10 @@ class TestProcedure:
     def test_unequal_after_swapping_nonreciprocal_entities(self, make_procedure):
         assert make_procedure["c2"] != (make_procedure["c2_nonreciprocal_swap"])
 
+    def test_procedure_length(self, make_procedure):
+        assert len(make_procedure["c1"]) == 2
+        assert len(make_procedure["c2"]) == 2
+
     def test_sorted_entities_from_procedure(self, make_predicate, make_procedure):
 
         """The sorted_entities method sorts them alphabetically by __repr__."""
@@ -535,17 +539,26 @@ class TestProcedure:
         f = make_factor
         c2 = make_procedure["c2"]
         c2_exact = make_procedure["c2_exact_quantity"]
+
         assert f["f7"] in c2.inputs
         assert f["f7"] not in c2_exact.inputs
-
-
-        y = c2.entities_of_implied_inputs(c2_exact)
         assert c2_exact.inputs[f["f8_exact"]] in c2.entities_of_implied_inputs(c2_exact)[f["f7"]]
 
     def test_reciprocal_entities_of_implied_inputs_for_implied_procedure(
         self, make_factor, make_procedure
     ):
-        assert False
+        """
+        Because both procedures have a form of the The distance between {} and {} was {}"
+        factor and those factors are reciprocal, the entities of one of them in reversed
+        order can be used as the entities of the other, and one will still imply the other.
+        (But if there had been more than two entities, only the first two would have been
+        reversed.)
+        """
+
+        f = make_factor
+        c2 = make_procedure["c2"]
+        c2_exact = make_procedure["c2_exact_quantity"]
+        c2_exact.inputs[f["f8_exact"]][::-1] in c2.entities_of_implied_inputs(c2_exact)[f["f7"]]
 
     def test_implies_same_output_fewer_inputs(self, make_procedure):
         assert make_procedure["c1_easy"] > (make_procedure["c1"])
