@@ -343,9 +343,17 @@ class Procedure:
     terms of inputs and outputs, and also potentially "even if" factors, which could
     be considered "failed undercutters" in defeasible logic."""
 
-    outputs: Dict[Factor, Tuple[int]]
-    inputs: Optional[Dict[Factor, Tuple[int]]] = None
-    even_if: Optional[Dict[Factor, Tuple[int]]] = None
+    outputs: Dict[Factor, Tuple[int, ...]]
+    inputs: Optional[Dict[Factor, Tuple[int, ...]]] = None
+    even_if: Optional[Dict[Factor, Tuple[int, ...]]] = None
+
+    def __str__(self):
+        text = 'Procedure:'
+        if self.inputs:
+            text += '    Inputs:'
+            for i in self.inputs:
+                text += '\n' + str(i).format(*self.inputs[i])
+        return text
 
     def match_entity_roles(self, self_entities, other_entities):
         """Make a temporary dict for information from other.
@@ -520,20 +528,23 @@ class Procedure:
         if not isinstance(other, Procedure):
             return False
 
+        # matching["inputs"] shows the entities each factor in self.inputs would
+        # have to take to be implied by other.inputs with other's default entities.
+
+        # matching["outputs"] and matching["even_if"] show the entities each factor
+        # in other.outputs and other.even_if would have to take to be implied by self
+        # with self's default entities.
+
         matching = {
             "inputs": self.entities_of_implied_factors(other, "inputs"),
             "outputs": other.entities_of_implied_factors(self, "outputs"),
             "even_if": other.entities_of_implied_factors(self, "even_if"),
         }
 
-        """
-        matching["inputs"] shows the entities each factor in self.inputs would
-        have to take to be implied by other.inputs with other's default entities.
 
-        matching["outputs"] and matching["even_if"] shows the entities each factor
-        in other.outputs and other.even_if would have to take to be implied by self
-        with self's default entities.
-        """
+
+        # If any factor doesn't match with any entity set, that part of the problem is
+        # unsatisfiable and other can't imply self.
 
         if any(
             any(not matching[group][factor] for factor in matching[group])

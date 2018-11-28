@@ -1,15 +1,15 @@
+from copy import copy
+import json
+from typing import Dict
+
+
+from pint import UnitRegistry
+import pytest
+
 from spoke import Entity, Human
 from spoke import Predicate, Factor, Fact
 from spoke import Procedure, Holding, Opinion
 from spoke import opinion_from_file
-
-from typing import Dict
-
-import pytest
-import json
-
-from pint import UnitRegistry
-
 from spoke import ureg, Q_
 
 
@@ -107,6 +107,10 @@ def make_predicate() -> Dict[str, Predicate]:
             quantity=Q_("5 acres"),
         ),
         "p10": Predicate("{} was within the curtilage of {}"),
+        "p_irrelevant_0": Predicate("{} was a clown"),
+        "p_irrelevant_1": Predicate("{} was a bear"),
+        "p_irrelevant_2": Predicate("{} was a circus"),
+        "p_irrelevant_3": Predicate("{} performed at {}"),
     }
 
 
@@ -138,6 +142,11 @@ def make_factor(make_predicate) -> Dict[str, Factor]:
         "f9_absent": Fact(p["p9"], absent=True),
         "f9_absent_miles": Fact(p["p9_miles"], absent=True),
         "f10": Fact(p["p10"]),
+        "f_irrelevant_0": Fact(p["p_irrelevant_0"]),
+        "f_irrelevant_1": Fact(p["p_irrelevant_1"]),
+        "f_irrelevant_2": Fact(p["p_irrelevant_2"]),
+        "f_irrelevant_3": Fact(p["p_irrelevant_3"]),
+        "f_irrelevant_3_again": copy(Fact(p["p_irrelevant_3"])),
     }
 
 
@@ -181,6 +190,22 @@ def make_procedure(make_factor) -> Dict[str, Procedure]:
             outputs={f["f10"]: (0, 1)},
             inputs={f["f4"]: (0, 1), f["f5"]: (0,), f["f6"]: (0,), f["f7"]: (0, 1)},
             even_if={f["f8_exact"]: (0, 1)},
+        ),
+        "c2_irrelevant_inputs": Procedure(
+            outputs={f["f10"]: (0, 1)},
+            inputs={
+                f["f4"]: (0, 1),
+                f["f5"]: (0,),
+                f["f6"]: (0,),
+                f["f7"]: (0, 1),
+                f["f9"]: (0, 1),
+                f["f_irrelevant_0"]: (2,),
+                f["f_irrelevant_1"]: (3,),
+                f["f_irrelevant_2"]: (4,),
+                f["f_irrelevant_3"]: (2, 4),
+                f["f_irrelevant_3_again"]: (3, 4),
+            },
+            even_if={f["f8"]: (0, 1)},
         ),
         "c2_reciprocal_swap": Procedure(
             outputs={f["f10"]: (0, 1)},
@@ -430,6 +455,12 @@ class TestFactors:
         assert make_factor["f9_absent_miles"].contradicts(make_factor["f9"])
         assert make_factor["f9"].contradicts(make_factor["f9_absent_miles"])
 
+    def test_copies_of_identical_factor(self, make_factor, make_predicate):
+        p = make_predicate
+        assert make_factor["f_irrelevant_3_again"] == make_factor["f_irrelevant_3"]
+        assert hash(make_factor["f_irrelevant_3_again"]) != hash(make_factor["f_irrelevant_3"])
+        assert id(Fact(p["p_irrelevant_3"])) != id(copy(Fact(p["p_irrelevant_3"])))
+        assert hash(Fact(p["p_irrelevant_3"])) != hash(copy(Fact(p["p_irrelevant_3"])))
 
 class TestProcedure:
     def test_procedure_equality(self, make_procedure):
@@ -672,8 +703,13 @@ class TestProcedure:
         assert not make_procedure["c2"] > make_procedure["c2_exact_quantity"]
 
     def test_procedure_exact_quantity_in_even_if_implication(self, make_procedure):
-        assert make_procedure["c2_exact_quantity"] > (make_procedure["c2"])
+        assert make_procedure["c2_exact_quantity"] > make_procedure["c2"]
 
+    def test_procedure_implication_despite_irrelevant_factors(self, make_procedure):
+        assert make_procedure["c2_irrelevant_inputs"] > make_procedure["c2"]
+
+    def test_procedure_string(self, make_procedure):
+        assert str(make_procedure["c2_irrelevant_inputs"]) == "Hi."
 
 class TestHoldings:
     def test_identical_holdings_equal(self, make_holding):
