@@ -1,8 +1,8 @@
 import datetime
 import json
-
-from typing import Dict, List, Mapping, Optional, Sequence, Set, Tuple, Union
+from typing import Dict, FrozenSet, List, Mapping, Optional, Sequence, Set, Tuple, Union
 from dataclasses import dataclass
+from collections import namedtuple
 
 from pint import UnitRegistry
 
@@ -336,6 +336,7 @@ class Fact(Factor):
     # which implication relations (represented by production rules?)
     # are binding from the point of view of a particular court.
 
+Context = namedtuple('Context', ['factor', 'markers'], defaults=[(0)])
 
 @dataclass(frozen=True)
 class Procedure:
@@ -343,16 +344,21 @@ class Procedure:
     terms of inputs and outputs, and also potentially "even if" factors, which could
     be considered "failed undercutters" in defeasible logic."""
 
-    outputs: Dict[Factor, Tuple[int, ...]]
-    inputs: Optional[Dict[Factor, Tuple[int, ...]]] = None
-    even_if: Optional[Dict[Factor, Tuple[int, ...]]] = None
+    outputs: FrozenSet[Context]
+    inputs: FrozenSet[Context] = frozenset([])
+    even_if: FrozenSet[Context] = frozenset([])
+
+    # TODO: change input/output/even_if category to a field in the Context namedtuple
+
+
 
     def __str__(self):
         text = 'Procedure:'
         if self.inputs:
             text += '    Inputs:'
             for i in self.inputs:
-                text += '\n' + str(i).format(*self.inputs[i])
+                text += '\n' + str(i.factor).format(*i.markers)
+        # TODO: add Outputs and Despite after API change
         return text
 
     def match_entity_roles(self, self_entities, other_entities):
@@ -524,6 +530,12 @@ class Procedure:
         All inputs of self are implied by inputs of other with matching entities
         All even_if factors of other are implied by even_if factors or inputs of self
         """
+
+        # TODO: maybe generate every combination of self's factors where every factor
+        # that needs to be implied is implied, and for each factor combination,
+        # check every entity marker combination. Only need one match to return True.
+        # If the factors have a consistent order by repr, the entity markers can just be
+        # a sequence of ints.
 
         if not isinstance(other, Procedure):
             return False
