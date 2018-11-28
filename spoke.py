@@ -524,9 +524,24 @@ class Procedure:
             "inputs": self.entities_of_implied_factors(other, "inputs"),
             "outputs": other.entities_of_implied_factors(self, "outputs"),
             "even_if": other.entities_of_implied_factors(self, "even_if"),
-            }
+        }
 
-        return matching
+        """
+        matching["inputs"] shows the entities each factor in self.inputs would
+        have to take to be implied by other.inputs with other's default entities.
+
+        matching["outputs"] and matching["even_if"] shows the entities each factor
+        in other.outputs and other.even_if would have to take to be implied by self
+        with self's default entities.
+        """
+
+        if any(
+            any(not matching[group][factor] for factor in matching[group])
+            for group in matching
+        ):
+            return False
+
+        return False
 
     def exhaustive_implies(self, other):
         """

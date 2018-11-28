@@ -668,6 +668,9 @@ class TestProcedure:
     def test_procedure_implies_broader_quantity_statement(self, make_procedure):
         assert make_procedure["c2_exact_quantity"] > (make_procedure["c2"])
 
+    def test_procedure_does_not_imply_narrower_quantity_statement(self, make_procedure):
+        assert not make_procedure["c2"] > make_procedure["c2_exact_quantity"]
+
     def test_procedure_exact_quantity_in_even_if_implication(self, make_procedure):
         assert make_procedure["c2_exact_quantity"] > (make_procedure["c2"])
 
