@@ -534,8 +534,8 @@ class TestProcedure:
         c1_again = make_procedure["c1_again"]
         assert c1.inputs[f["f1"]] == (0,)
         assert c1.inputs[f["f2"]] == (1, 0)
-        assert (0,) in c1.entities_of_implied_inputs(c1_again)[f["f1"]]
-        assert (1, 0) in c1.entities_of_implied_inputs(c1_again)[f["f2"]]
+        assert (0,) in c1.entities_of_implied_factors(c1_again, "inputs")[f["f1"]]
+        assert (1, 0) in c1.entities_of_implied_factors(c1_again, "inputs")[f["f2"]]
 
     def test_entities_of_implied_inputs_for_implied_procedure(
         self, make_factor, make_procedure
@@ -546,13 +546,17 @@ class TestProcedure:
         assert f["f2"] in c1_easy.inputs
         assert (
             c1_again.inputs[f["f2"]]
-            in c1_easy.entities_of_implied_inputs(c1_again)[f["f2"]]
+            in c1_easy.entities_of_implied_factors(c1_again, factor_group="inputs")[
+                f["f2"]
+            ]
         )
 
         assert f["f1"] not in c1_easy.inputs
         assert (
             c1_again.inputs[f["f1"]]
-            not in c1_easy.entities_of_implied_inputs(c1_again)[f["f2"]]
+            not in c1_easy.entities_of_implied_factors(c1_again, factor_group="inputs")[
+                f["f2"]
+            ]
         )
 
     def test_entities_of_implied_quantity_inputs_for_implied_procedure(
@@ -571,7 +575,7 @@ class TestProcedure:
         assert f["f7"] not in c2_exact.inputs
         assert (
             c2_exact.inputs[f["f8_exact"]]
-            in c2.entities_of_implied_inputs(c2_exact)[f["f7"]]
+            in c2.entities_of_implied_factors(c2_exact, factor_group="inputs")[f["f7"]]
         )
 
     def test_reciprocal_entities_of_implied_inputs_for_implied_procedure(
@@ -588,9 +592,9 @@ class TestProcedure:
         f = make_factor
         c2 = make_procedure["c2"]
         c2_exact = make_procedure["c2_exact_quantity"]
-        c2_exact.inputs[f["f8_exact"]][::-1] in c2.entities_of_implied_inputs(c2_exact)[
-            f["f7"]
-        ]
+        c2_exact.inputs[f["f8_exact"]][::-1] in c2.entities_of_implied_factors(
+            c2_exact, factor_group="inputs"
+        )[f["f7"]]
 
     def test_reciprocal_entities_of_implied_inputs_for_implied_procedure(
         self, make_factor, make_procedure
@@ -606,9 +610,9 @@ class TestProcedure:
         f = make_factor
         c2 = make_procedure["c2"]
         c2_exact = make_procedure["c2_exact_quantity"]
-        c2_exact.inputs[f["f8_exact"]][::-1] in c2.entities_of_implied_inputs(c2_exact)[
-            f["f7"]
-        ]
+        c2_exact.inputs[f["f8_exact"]][::-1] in c2.entities_of_implied_factors(
+            c2_exact, factor_group="inputs"
+        )[f["f7"]]
 
     def test_entities_of_implied_quantity_outputs_for_implied_procedure(
         self, make_factor, make_procedure
@@ -646,10 +650,13 @@ class TestProcedure:
         c2_narrow = make_procedure["c2_narrow_output"]
 
         with pytest.raises(ValueError):
-            c2_narrow.outputs[f["f8_higher_int"]] in c2_broad.entities_of_implied_factors(
+            c2_narrow.outputs[
+                f["f8_higher_int"]
+            ] in c2_broad.entities_of_implied_factors(
                 c2_narrow, factor_group="bogus_group"
-            )[f["f8_int"]]
-
+            )[
+                f["f8_int"]
+            ]
 
     def test_implies_same_output_fewer_inputs(self, make_procedure):
         assert make_procedure["c1_easy"] > (make_procedure["c1"])

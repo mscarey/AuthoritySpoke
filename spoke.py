@@ -462,36 +462,6 @@ class Procedure:
             for y in other.get_entity_permutations()
         )
 
-    def entities_of_implied_inputs(
-        self, other: Factor
-    ) -> Dict[Factor, Optional[Tuple[Tuple[int, ...], ...]]]:
-        """
-        Gets every order of entities from every factor in other that
-        would cause each factor of self to be implied by other.
-        Takes into account swapped entities for reciprocal factors.
-
-        This method doesn't reveal which factor of other will imply any
-        particular factor of self, if the factor of self has the correct
-        entities. It shouldn't matter, if the purpose is to tell which
-        entities to select to cause each factor of self to be implied by other.
-        """
-        normal_order = {
-            f: list(other.inputs[x] for x in other.inputs.keys() if x > f)
-            for f in self.inputs.keys()
-        }
-        reciprocal_order = {
-            f: list(
-                (other.inputs[x][1], other.inputs[x][0], *other.inputs[x][2:])
-                for x in other.inputs.keys()
-                if x.predicate.reciprocal and x > f
-            )
-            for f in self.inputs.keys()
-        }
-        return {
-            f: tuple((*normal_order[f], *reciprocal_order[f]))
-            for f in self.inputs.keys()
-        }
-
     def entities_of_implied_factors(
             self, other: Factor, factor_group: str = "outputs"
         ) -> Dict[Factor, Optional[Tuple[Tuple[int, ...], ...]]]:
@@ -505,8 +475,7 @@ class Procedure:
         entities. It shouldn't matter, if the purpose is to tell which
         entities to select to cause each factor of self to be implied by other.
 
-        When finished, this should replace entities_of_implied_inputs
-        and handle other entity matching for the __gt__ function.
+        This should handle entity matching for the __gt__ function.
         """
 
         if factor_group == "inputs":
