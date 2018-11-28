@@ -435,9 +435,7 @@ class Procedure:
         """
 
         return len(
-            set(
-                (slot for factor in self.all_entities().values() for slot in factor)
-            )
+            set((slot for factor in self.all_entities().values() for slot in factor))
         )
 
     def __eq__(self, other):
@@ -463,8 +461,8 @@ class Procedure:
         )
 
     def entities_of_implied_factors(
-            self, other: Factor, factor_group: str = "outputs"
-        ) -> Dict[Factor, Optional[Tuple[Tuple[int, ...], ...]]]:
+        self, other: Factor, factor_group: str = "outputs"
+    ) -> Dict[Factor, Optional[Tuple[Tuple[int, ...], ...]]]:
         """
         Gets every order of entities from every factor in other that
         would cause each factor of self to be implied by other.
@@ -479,15 +477,18 @@ class Procedure:
         """
 
         if factor_group == "inputs":
-            self_factors = self.inputs
-            other_factors = other.inputs
+            self_factors = self.inputs or {}
+            other_factors = other.inputs or {}
         elif factor_group == "outputs":
             self_factors = self.outputs
             other_factors = other.outputs
         elif factor_group == "even_if":
-            self_factors = self.even_if
-            other_factors = {**other.even_if, **other.inputs}
-        else: raise ValueError(
+            self_factors = self.even_if or {}
+            other_even_if = other.even_if or {}
+            other_inputs = other.inputs or {}
+            other_factors = {**other_even_if, **other_inputs}
+        else:
+            raise ValueError(
                 f'"factor_group" must be "inputs", "outputs", or "even_if", not {factor_group}.'
             )
 
@@ -508,19 +509,24 @@ class Procedure:
             for f in self_factors.keys()
         }
 
-    def __gt__(self, other):
+    def __lt__(self, other):
         """
-        For self to imply other:
+        For other to imply self:
         All outputs of other are implied by outputs of self with matching entities
         All inputs of self are implied by inputs of other with matching entities
         All even_if factors of other are implied by even_if factors or inputs of self
         """
-        corresponding_inputs = {}
 
         if not isinstance(other, Procedure):
             return False
-        pass
 
+        matching = {
+            "inputs": self.entities_of_implied_factors(other, "inputs"),
+            "outputs": other.entities_of_implied_factors(self, "outputs"),
+            "even_if": other.entities_of_implied_factors(self, "even_if"),
+            }
+
+        return matching
 
     def exhaustive_implies(self, other):
         """
@@ -529,7 +535,7 @@ class Procedure:
         circumstances needed to invoke the procedure (i.e. when the rule "always" applies
         when the inputs are present).
 
-        For self to imply other:
+        For other to imply self:
         All outputs of other are implied by outputs of self with matching entities
         All inputs of self are implied by inputs of other with matching entities
         No even_if factors of other are contradicted by inputs of self

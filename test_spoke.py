@@ -174,6 +174,7 @@ def make_procedure(make_factor) -> Dict[str, Procedure]:
                 f["f5"]: (0,),
                 f["f6"]: (0,),
                 f["f8_exact"]: (0, 1),
+                f["f9"]: (0, 1),
             },
         ),
         "c2_exact_in_even_if": Procedure(
