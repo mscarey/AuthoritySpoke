@@ -43,9 +43,16 @@ class Human(Entity):
 @dataclass(frozen=True)
 class Predicate:
     """
-    A statement about real events or about legal conclusions.
+    A statement about real events or about a legal conclusion.
     Predicates may be "alleged" by a pleading, "supported" by evidence, or
     "found" to be factual by a jury verdict or a judge's finding of fact.
+
+    A predicate's self.content string shows where references to specific
+    entities from the case can be used as subjects or objects of the predicate.
+
+    Events may be referenced as entities in a predicate's content.
+    See Lepore, Ernest. Meaning and Argument: An Introduction to Logic
+    Through Language. Section 17.2: The Event Approach
 
     If self.reciprocal is True, then the order of the first two entities will
     be considered interchangeable. There's no way to make any entities
@@ -60,8 +67,8 @@ class Predicate:
     is the default, it's the least useful, because courts almost always state
     rules that are intended to apply to quantities above or below some threshold.
 
-    The quantity comparison can only be mentioned last. No entities may be mentioned
-    after the quantity comparison is mentioned.
+    The quantity comparison can only be mentioned last. No entities may be
+    mentioned after the quantity comparison is mentioned.
     """
 
     content: str
@@ -94,9 +101,14 @@ class Predicate:
             )
 
     def __len__(self):
-        """Returns the number of entities that can fit in the bracketed slots
+        """
+        Returns the number of entities that can fit in the pairs of brackets
         in the predicate. self.quantity doesn't count as one of these entities,
-        even though it does go in a slot."""
+        even though the place where self.quantity goes in represented by brackets
+        in the "content" string.
+
+        Also called the linguistic valency, arity, or adicity.
+        """
 
         slots = self.content.count("{}")
         if self.quantity:
@@ -417,6 +429,17 @@ class Procedure:
 
         return add_some_entities(all_entities, [], [], sorted_entities, 0)
 
+    def __len__(self):
+        """
+        Returns the number of entities that need to be specified for the procedure.
+        """
+
+        return len(
+            set(
+                (slot for factor in self.all_entities().values() for slot in factor)
+            )
+        )
+
     def __eq__(self, other):
         """Determines if the two holdings have all the same factors
         with the same entities in the same roles, not whether they're
@@ -440,7 +463,7 @@ class Procedure:
         )
 
     def entities_of_implied_inputs(
-        self, other
+        self, other: Factor
     ) -> Dict[Factor, Optional[Tuple[Tuple[int, ...], ...]]]:
         """
         Gets every order of entities from every factor in other that
@@ -469,6 +492,53 @@ class Procedure:
             for f in self.inputs.keys()
         }
 
+    def entities_of_implied_factors(
+            self, other: Factor, factor_group: str = "outputs"
+        ) -> Dict[Factor, Optional[Tuple[Tuple[int, ...], ...]]]:
+        """
+        Gets every order of entities from every factor in other that
+        would cause each factor of self to be implied by other.
+        Takes into account swapped entities for reciprocal factors.
+
+        This method doesn't reveal which factor of other will imply any
+        particular factor of self, if the factor of self has the correct
+        entities. It shouldn't matter, if the purpose is to tell which
+        entities to select to cause each factor of self to be implied by other.
+
+        When finished, this should replace entities_of_implied_inputs
+        and handle other entity matching for the __gt__ function.
+        """
+
+        if factor_group == "inputs":
+            self_factors = self.inputs
+            other_factors = other.inputs
+        elif factor_group == "outputs":
+            self_factors = self.outputs
+            other_factors = other.outputs
+        elif factor_group == "even_if":
+            self_factors = self.even_if
+            other_factors = {**other.even_if, **other.inputs}
+        else: raise ValueError(
+                f'"factor_group" must be "inputs", "outputs", or "even_if", not {factor_group}.'
+            )
+
+        normal_order = {
+            f: list(other_factors[x] for x in other_factors.keys() if x > f)
+            for f in self_factors.keys()
+        }
+        reciprocal_order = {
+            f: list(
+                (other_factors[x][1], other_factors[x][0], *other_factors[x][2:])
+                for x in other_factors.keys()
+                if x.predicate.reciprocal and x > f
+            )
+            for f in self_factors.keys()
+        }
+        return {
+            f: tuple((*normal_order[f], *reciprocal_order[f]))
+            for f in self_factors.keys()
+        }
+
     def __gt__(self, other):
         """
         For self to imply other:
@@ -482,16 +552,6 @@ class Procedure:
             return False
         pass
 
-    def __len__(self):
-        """
-        Returns the number of entities that need to be specified for the procedure.
-        """
-
-        return len(
-            set(
-                (slot for factor in self.all_entities().values() for slot in factor)
-            )
-        )
 
     def exhaustive_implies(self, other):
         """

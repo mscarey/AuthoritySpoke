@@ -203,6 +203,26 @@ def make_procedure(make_factor) -> Dict[str, Procedure]:
             },
             even_if={f["f8"]: (0, 1)},
         ),
+        "c2_broad_output": Procedure(
+            outputs={f["f8_int"]: (0, 1)},
+            inputs={
+                f["f4"]: (1, 0),
+                f["f5"]: (0,),
+                f["f6"]: (0,),
+                f["f7"]: (0, 1),
+                f["f9"]: (0, 1),
+            },
+        ),
+        "c2_narrow_output": Procedure(
+            outputs={f["f8_higher_int"]: (0, 1)},
+            inputs={
+                f["f4"]: (1, 0),
+                f["f5"]: (0,),
+                f["f6"]: (0,),
+                f["f7"]: (0, 1),
+                f["f9"]: (0, 1),
+            },
+        ),
     }
 
 
@@ -323,6 +343,7 @@ class TestPredicates:
 
     def test_predicate_content_comparison(self, make_predicate):
         assert make_predicate["p8_exact"].content == make_predicate["p7"].content
+
 
 class TestFactors:
     def test_string_representation_of_factor(self, make_factor):
@@ -449,7 +470,7 @@ class TestProcedure:
                 ),
                 absent=False,
             ),
-                        Fact(
+            Fact(
                 predicate=Predicate(
                     content="The distance between {} and {} was {}",
                     truth=True,
@@ -523,10 +544,16 @@ class TestProcedure:
         c1_easy = make_procedure["c1_easy"]
         c1_again = make_procedure["c1_again"]
         assert f["f2"] in c1_easy.inputs
-        assert c1_again.inputs[f["f2"]] in c1_easy.entities_of_implied_inputs(c1_again)[f["f2"]]
+        assert (
+            c1_again.inputs[f["f2"]]
+            in c1_easy.entities_of_implied_inputs(c1_again)[f["f2"]]
+        )
 
         assert f["f1"] not in c1_easy.inputs
-        assert c1_again.inputs[f["f1"]] not in c1_easy.entities_of_implied_inputs(c1_again)[f["f2"]]
+        assert (
+            c1_again.inputs[f["f1"]]
+            not in c1_easy.entities_of_implied_inputs(c1_again)[f["f2"]]
+        )
 
     def test_entities_of_implied_quantity_inputs_for_implied_procedure(
         self, make_factor, make_procedure
@@ -542,13 +569,16 @@ class TestProcedure:
 
         assert f["f7"] in c2.inputs
         assert f["f7"] not in c2_exact.inputs
-        assert c2_exact.inputs[f["f8_exact"]] in c2.entities_of_implied_inputs(c2_exact)[f["f7"]]
+        assert (
+            c2_exact.inputs[f["f8_exact"]]
+            in c2.entities_of_implied_inputs(c2_exact)[f["f7"]]
+        )
 
     def test_reciprocal_entities_of_implied_inputs_for_implied_procedure(
         self, make_factor, make_procedure
     ):
         """
-        Because both procedures have a form of the The distance between {} and {} was {}"
+        Because both procedures have a form of "The distance between {} and {} was {}"
         factor and those factors are reciprocal, the entities of one of them in reversed
         order can be used as the entities of the other, and one will still imply the other.
         (But if there had been more than two entities, only the first two would have been
@@ -558,7 +588,68 @@ class TestProcedure:
         f = make_factor
         c2 = make_procedure["c2"]
         c2_exact = make_procedure["c2_exact_quantity"]
-        c2_exact.inputs[f["f8_exact"]][::-1] in c2.entities_of_implied_inputs(c2_exact)[f["f7"]]
+        c2_exact.inputs[f["f8_exact"]][::-1] in c2.entities_of_implied_inputs(c2_exact)[
+            f["f7"]
+        ]
+
+    def test_reciprocal_entities_of_implied_inputs_for_implied_procedure(
+        self, make_factor, make_procedure
+    ):
+        """
+        Because both procedures have a form of "The distance between {} and {} was {}"
+        factor and those factors are reciprocal, the entities of one of them in reversed
+        order can be used as the entities of the other, and one will still imply the other.
+        (But if there had been more than two entities, only the first two would have been
+        reversed.)
+        """
+
+        f = make_factor
+        c2 = make_procedure["c2"]
+        c2_exact = make_procedure["c2_exact_quantity"]
+        c2_exact.inputs[f["f8_exact"]][::-1] in c2.entities_of_implied_inputs(c2_exact)[
+            f["f7"]
+        ]
+
+    def test_entities_of_implied_quantity_outputs_for_implied_procedure(
+        self, make_factor, make_procedure
+    ):
+        """
+        Here, if c2_narrow was "self" and c2_broad was "other", the output of
+        c2_broad would be implied by the output of c2_narrow.
+        """
+
+        f = make_factor
+        c2_broad = make_procedure["c2_broad_output"]
+        c2_narrow = make_procedure["c2_narrow_output"]
+
+        c2_narrow.outputs[f["f8_higher_int"]] in c2_broad.entities_of_implied_factors(
+            c2_narrow, factor_group="outputs"
+        )[f["f8_int"]]
+
+    def test_entities_of_implied_quantity_even_if_for_implied_procedure(
+        self, make_factor, make_procedure
+    ):
+        f = make_factor
+        c2 = make_procedure["c2"]
+        c2_exact_in_even_if = make_procedure["c2_exact_in_even_if"]
+
+        c2_exact_in_even_if.even_if[f["f8_exact"]] in c2.entities_of_implied_factors(
+            c2_exact_in_even_if, factor_group="even_if"
+        )[f["f8"]]
+
+    def test_entities_of_implied_factors_invalid_group_name(
+        self, make_factor, make_procedure
+    ):
+
+        f = make_factor
+        c2_broad = make_procedure["c2_broad_output"]
+        c2_narrow = make_procedure["c2_narrow_output"]
+
+        with pytest.raises(ValueError):
+            c2_narrow.outputs[f["f8_higher_int"]] in c2_broad.entities_of_implied_factors(
+                c2_narrow, factor_group="bogus_group"
+            )[f["f8_int"]]
+
 
     def test_implies_same_output_fewer_inputs(self, make_procedure):
         assert make_procedure["c1_easy"] > (make_procedure["c1"])
