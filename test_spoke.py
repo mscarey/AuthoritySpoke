@@ -398,6 +398,11 @@ class TestPredicates:
 
 
 class TestFactors:
+
+    def test_default_entity_context_for_fact(self, make_predicate):
+        f2 = Fact(make_predicate["p2"])
+        f2.entity_context == (0, 1)
+
     def test_string_representation_of_factor(self, make_factor):
         assert str(make_factor["f1"]) == "Fact: {} was a motel"
         assert str(make_factor["f3_absent"]) == "Absent Fact: {} was {}’s abode"

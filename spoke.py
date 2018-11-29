@@ -283,7 +283,7 @@ class Predicate:
     # TODO: allow the same entity to be mentioned more than once
 
 
-@dataclass(frozen=True)
+@dataclass
 class Factor:
     """A factor is something used to determine the applicability of a legal
     procedure. Factors can be both inputs and outputs of legal procedures.
@@ -292,14 +292,18 @@ class Factor:
     Motions, and Arguments."""
 
 
-@dataclass(frozen=True)
+@dataclass
 class Fact(Factor):
     """An assertion accepted as factual by a court, often through factfinding by
     a judge or jury."""
 
     predicate: Predicate
     absent: bool = False
+    entity_context: Optional[Tuple[int, ...]] = None
 
+    def __post_init__(self):
+        if not self.entity_context:
+            self.entity_context = tuple(range(len(self.predicate)))
     def __str__(self):
         return f"{'Absent ' if self.absent else ''}{self.__class__.__name__}: {self.predicate}"
 
