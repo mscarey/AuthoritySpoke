@@ -7,7 +7,7 @@ from pint import UnitRegistry
 import pytest
 
 from spoke import Entity, Human
-from spoke import Predicate, Factor, Fact, Context
+from spoke import Predicate, Factor, Fact
 from spoke import Procedure, Holding, Opinion
 from spoke import opinion_from_file
 from spoke import ureg, Q_
@@ -20,6 +20,7 @@ def make_entity() -> Dict[str, Entity]:
         "e_motel": Entity("Hideaway Lodge"),
         "e_trees": Entity("the stockpile of trees"),
     }
+
 
 @pytest.fixture
 def make_predicate() -> Dict[str, Predicate]:
@@ -154,126 +155,56 @@ def make_procedure(make_factor) -> Dict[str, Procedure]:
     f = make_factor
 
     return {
-        "c1": Procedure(
-            outputs=frozenset([Context(f["f3"], (0, 1))]),
-            inputs=frozenset([Context(f["f1"], (0,)), Context(f["f2"], (1, 0))]),
-        ),
-        "c1_again": Procedure(
-            outputs=frozenset([Context(f["f3"], (0, 1))]),
-            inputs=frozenset([Context(f["f1"], (0,)), Context(f["f2"], (1, 0))]),
-        ),
-        "c1_entity_order": Procedure(
-            outputs=frozenset([Context(f["f3"], (1, 0))]),
-            inputs=frozenset([Context(f["f2"], (0, 1)), Context(f["f1"], (1,))]),
-        ),
-        "c1_easy": Procedure(
-            outputs=frozenset([Context(f["f3"], (0, 1))]),
-            inputs=frozenset([Context(f["f2"], (1, 0))]),
-        ),
+        "c1": Procedure(outputs=(f["f3"],), inputs=(f["f1"], f["f2"])),
+        "c1_again": Procedure(outputs=(f["f3"],), inputs=(f["f1"], f["f2"])),
+        "c1_entity_order": Procedure(outputs=(f["f3"],), inputs=(f["f2"], f["f1"])),
+        "c1_easy": Procedure(outputs=(f["f3"],), inputs=(f["f2"])),
         "c2": Procedure(
-            outputs=frozenset([Context(f["f10"], (0, 1))]),
-            inputs=frozenset(
-                [
-                    Context(f["f4"], (0, 1)),
-                    Context(f["f5"], (0,)),
-                    Context(f["f6"], (0,)),
-                    Context(f["f7"], (0, 1)),
-                    Context(f["f9"], (0, 1)),
-                ]
-            ),
-            even_if=frozenset([Context(f["f8"], (0, 1))]),
+            outputs=(f["f10"],),
+            inputs=(f["f4"], f["f5"], f["f6"], f["f7"], f["f9"]),
+            even_if=(f["f8"],),
         ),
         "c2_exact_quantity": Procedure(
-            outputs=frozenset([Context(f["f10"], (0, 1))]),
-            inputs=frozenset(
-                [
-                    Context(f["f4"], (0, 1)),
-                    Context(f["f5"], (0,)),
-                    Context(f["f6"], (0,)),
-                    Context(f["f8_exact"], (0, 1)),
-                    Context(f["f9"], (0, 1)),
-                ]
-            ),
+            outputs=(f["f10"],),
+            inputs=(f["f4"], f["f5"], f["f6"], f["f8_exact"], f["f9"]),
         ),
         "c2_exact_in_even_if": Procedure(
-            outputs=frozenset([Context(f["f10"], (0, 1))]),
-            inputs=frozenset(
-                [
-                    Context(f["f4"], (0, 1)),
-                    Context(f["f5"], (0,)),
-                    Context(f["f6"], (0,)),
-                    Context(f["f7"], (0, 1)),
-                ]
-            ),
-            even_if=frozenset([Context(f["f8_exact"], (0, 1))]),
+            outputs=(f["f10"],),
+            inputs=(f["f4"], f["f5"], f["f6"], f["f7"]),
+            even_if=(f["f8_exact"],),
         ),
         "c2_irrelevant_inputs": Procedure(
-            outputs=frozenset([Context(f["f10"], (0, 1))]),
-            inputs=frozenset(
-                [
-                    Context(f["f4"], (0, 1)),
-                    Context(f["f5"], (0,)),
-                    Context(f["f6"], (0,)),
-                    Context(f["f7"], (0, 1)),
-                    Context(f["f9"], (0, 1)),
-                    Context(f["f_irrelevant_0"], (2,)),
-                    Context(f["f_irrelevant_1"], (3,)),
-                    Context(f["f_irrelevant_2"], (4,)),
-                    Context(f["f_irrelevant_3"], (2, 4)),
-                    Context(f["f_irrelevant_3_new_context"], (3, 4)),
-                ]
+            outputs=(f["f10"],),
+            inputs=(
+                f["f4"],
+                f["f5"],
+                f["f6"],
+                f["f7"],
+                f["f9"],
+                f["f_irrelevant_0"],
+                f["f_irrelevant_1"],
+                f["f_irrelevant_2"],
+                f["f_irrelevant_3"],
+                f["f_irrelevant_3_new_context"],
             ),
-            even_if=frozenset([Context(f["f8"], (0, 1))]),
+            even_if=(f["f8"],),
         ),
         "c2_reciprocal_swap": Procedure(
-            outputs=frozenset([Context(f["f10"], (0, 1))]),
-            inputs=frozenset(
-                [
-                    Context(f["f4"], (0, 1)),
-                    Context(f["f5"], (0,)),
-                    Context(f["f6"], (0,)),
-                    Context(f["f7"], (1, 0)),
-                    Context(f["f9"], (0, 1)),
-                ]
-            ),
-            even_if=frozenset([Context(f["f8"], (0, 1))]),
+            outputs=(f["f10"],),
+            inputs=(f["f4"], f["f5"], f["f6"], f["f7"], f["f9"]),
+            even_if=(f["f8"],),
         ),
         "c2_nonreciprocal_swap": Procedure(
-            outputs=frozenset([Context(f["f10"], (0, 1))]),
-            inputs=frozenset(
-                [
-                    Context(f["f4"], (1, 0)),
-                    Context(f["f5"], (0,)),
-                    Context(f["f6"], (0,)),
-                    Context(f["f7"], (0, 1)),
-                    Context(f["f9"], (0, 1)),
-                ]
-            ),
-            even_if=frozenset([Context(f["f8"], (0, 1))]),
+            outputs=(f["f10"],),
+            inputs=(f["f4"], f["f5"], f["f6"], f["f7"], f["f9"]),
+            even_if=(f["f8"],),
         ),
         "c2_broad_output": Procedure(
-            outputs=frozenset([Context(f["f8_int"], (0, 1))]),
-            inputs=frozenset(
-                [
-                    Context(f["f4"], (1, 0)),
-                    Context(f["f5"], (0,)),
-                    Context(f["f6"], (0,)),
-                    Context(f["f7"], (0, 1)),
-                    Context(f["f9"], (0, 1)),
-                ]
-            ),
+            outputs=(f["f8_int"],), inputs=(f["f4"], f["f5"], f["f6"], f["f7"], f["f9"])
         ),
         "c2_narrow_output": Procedure(
-            outputs=frozenset([Context(f["f8_higher_int"], (0, 1))]),
-            inputs=frozenset(
-                [
-                    Context(f["f4"], (1, 0)),
-                    Context(f["f5"], (0,)),
-                    Context(f["f6"], (0,)),
-                    Context(f["f7"], (0, 1)),
-                    Context(f["f9"], (0, 1)),
-                ]
-            ),
+            outputs=(f["f8_higher_int"],),
+            inputs=(f["f4"], f["f5"], f["f6"], f["f7"], f["f9"]),
         ),
     }
 
@@ -398,14 +329,13 @@ class TestPredicates:
 
 
 class TestFactors:
-
     def test_default_entity_context_for_fact(self, make_predicate):
         f2 = Fact(make_predicate["p2"])
         assert f2.entity_context == (0, 1)
 
     def test_convert_int_entity_context_to_tuple(self, make_predicate):
         f = Fact(make_predicate["p_irrelevant_1"], 3)
-        assert f.entity_context == (3, )
+        assert f.entity_context == (3,)
 
     def test_string_representation_of_factor(self, make_factor):
         assert str(make_factor["f1"]) == "Fact: {} was a motel"
@@ -491,14 +421,11 @@ class TestFactors:
         assert make_factor["f9"].contradicts(make_factor["f9_absent_miles"])
 
     def test_copies_of_identical_factor(self, make_factor, make_predicate):
-        p = make_predicate
-        assert make_factor["f_irrelevant_3_again"] == make_factor["f_irrelevant_3"]
-        assert Context(make_factor["f_irrelevant_3_again"]) == Context(make_factor["f_irrelevant_3"])
-        assert Context(make_factor["f_irrelevant_3"], (2, 4)) != Context(make_factor["f_irrelevant_3"], (3, 4))
+        assert make_factor["f_irrelevant_3"] == make_factor["f_irrelevant_3"]
+        assert make_factor["f_irrelevant_3"] != make_factor["f_irrelevant_3_new_context"]
 
 
 class TestProcedure:
-
     def test_exception_for_wrong_type_for_procedure(self, make_predicate):
         with pytest.raises(TypeError):
             x = Procedure(inputs=make_predicate["p1"], outputs=make_predicate["p2"])
@@ -513,8 +440,6 @@ class TestProcedure:
 
     def test_still_equal_after_swapping_reciprocal_entities(self, make_procedure):
         assert make_procedure["c2"] == (make_procedure["c2_reciprocal_swap"])
-
-
 
     def test_unequal_after_swapping_nonreciprocal_entities(self, make_procedure):
         assert make_procedure["c2"] != (make_procedure["c2_nonreciprocal_swap"])

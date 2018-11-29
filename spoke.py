@@ -283,7 +283,7 @@ class Predicate:
     # TODO: allow the same entity to be mentioned more than once
 
 
-@dataclass
+@dataclass(frozen=True)
 class Factor:
     """A factor is something used to determine the applicability of a legal
     procedure. Factors can be both inputs and outputs of legal procedures.
@@ -292,7 +292,7 @@ class Factor:
     Motions, and Arguments."""
 
 
-@dataclass
+@dataclass(frozen=True)
 class Fact(Factor):
     """An assertion accepted as factual by a court, often through factfinding by
     a judge or jury."""
@@ -303,9 +303,9 @@ class Fact(Factor):
 
     def __post_init__(self):
         if not self.entity_context:
-            self.entity_context = tuple(range(len(self.predicate)))
+            object.__setattr__(self, "entity_context", tuple(range(len(self.predicate))))
         if isinstance(self.entity_context, int):
-            self.entity_context = (self.entity_context,)
+            object.__setattr__(self, "entity_context", (self.entity_context,))
 
     def __str__(self):
         return f"{'Absent ' if self.absent else ''}{self.__class__.__name__}: {self.predicate}"
@@ -345,9 +345,6 @@ class Fact(Factor):
     # are binding from the point of view of a particular court.
 
 
-Context = namedtuple("Context", ["factor", "markers"], defaults=[(0)])
-
-
 @dataclass(frozen=True)
 class Procedure:
     """A (potential) rule for courts to use in resolving litigation. Described in
@@ -358,12 +355,15 @@ class Procedure:
     inputs: Union[Factor, Iterable[Factor]] = frozenset([])
     even_if: Union[Factor, Iterable[Factor]] = frozenset([])
 
-    # TODO: change input/output/even_if category to a field in the Context namedtuple
-
     def __post_init__(self):
+
+        if isinstance(self.outputs, Factor):
+            object.__setattr__(self, "outputs", frozenset((self.outputs,)))
+        if isinstance(self.inputs, Factor):
+            object.__setattr__(self, "inputs", frozenset((self.inputs,)))
+        if isinstance(self.even_if, Factor):
+            object.__setattr__(self, "even_if", frozenset((self.even_if,)))
         for group in (self.outputs, self.inputs, self.even_if):
-            if isinstance(group, Factor):
-                group = frozenset((group,))
             for x in group:
                 if not isinstance(x, Factor):
                     raise TypeError(
@@ -372,7 +372,7 @@ class Procedure:
                             f"but {x} was type {type(x)}",
                         )
                     )
-        # all(isinstance(x, int) for x in lst)
+
         object.__setattr__(self, "outputs", frozenset(self.outputs))
         object.__setattr__(self, "inputs", frozenset(self.inputs))
         object.__setattr__(self, "even_if", frozenset(self.even_if))
@@ -423,17 +423,16 @@ class Procedure:
 
         return True
 
-    def all_contexts(self) -> Set[Context]:
-        """Returns a set of all factor contexts."""
+    def all_contexts(self) -> Set[Factor]:
+        """Returns a set of all factors."""
 
-        inputs = self.inputs or {}
-        even_if = self.even_if or {}
+        inputs = self.inputs or set()
+        even_if = self.even_if or set()
         return {*self.outputs, *inputs, *even_if}
 
-    def sorted_contexts(self) -> List[Context]:
-        """Sorts the procedure's factors (in Context objects with entity
-        markers) into an order that will always be the same for the same
-        set of factors, but that doesn't correspond to
+    def sorted_contexts(self) -> List[Factor]:
+        """Sorts the procedure's factors into an order that will always be
+        the same for the same set of factors, but that doesn't correspond to
         whether the factors are inputs, outputs, or "even if" factors."""
 
         return sorted(self.all_contexts(), key=repr)
