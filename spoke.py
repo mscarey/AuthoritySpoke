@@ -298,12 +298,15 @@ class Fact(Factor):
     a judge or jury."""
 
     predicate: Predicate
-    absent: bool = False
     entity_context: Optional[Tuple[int, ...]] = None
+    absent: bool = False
 
     def __post_init__(self):
         if not self.entity_context:
             self.entity_context = tuple(range(len(self.predicate)))
+        if isinstance(self.entity_context, int):
+            self.entity_context = (self.entity_context,)
+
     def __str__(self):
         return f"{'Absent ' if self.absent else ''}{self.__class__.__name__}: {self.predicate}"
 
@@ -351,13 +354,25 @@ class Procedure:
     terms of inputs and outputs, and also potentially "even if" factors, which could
     be considered "failed undercutters" in defeasible logic."""
 
-    outputs: Iterable[Context]
-    inputs: Iterable[Context] = frozenset([])
-    even_if: Iterable[Context] = frozenset([])
+    outputs: Union[Factor, Iterable[Factor]]
+    inputs: Union[Factor, Iterable[Factor]] = frozenset([])
+    even_if: Union[Factor, Iterable[Factor]] = frozenset([])
 
     # TODO: change input/output/even_if category to a field in the Context namedtuple
 
     def __post_init__(self):
+        for group in (self.outputs, self.inputs, self.even_if):
+            if isinstance(group, Factor):
+                group = frozenset((group,))
+            for x in group:
+                if not isinstance(x, Factor):
+                    raise TypeError(
+                        (
+                            f"{group} must contain only type Factor,",
+                            f"but {x} was type {type(x)}",
+                        )
+                    )
+        # all(isinstance(x, int) for x in lst)
         object.__setattr__(self, "outputs", frozenset(self.outputs))
         object.__setattr__(self, "inputs", frozenset(self.inputs))
         object.__setattr__(self, "even_if", frozenset(self.even_if))

@@ -121,7 +121,7 @@ def make_factor(make_predicate) -> Dict[str, Factor]:
         "f1": Fact(p["p1"]),
         "f1b": Fact(p["p1"]),
         "f1c": Fact(p["p1_again"]),
-        "f2": Fact(p["p2"]),
+        "f2": Fact(p["p2"], (1, 0)),
         "f2_reciprocal": Fact(p["p2_reciprocal"]),
         "f3": Fact(p["p3"]),
         "f3_absent": Fact(p["p3"], absent=True),
@@ -141,11 +141,11 @@ def make_factor(make_predicate) -> Dict[str, Factor]:
         "f9_absent": Fact(p["p9"], absent=True),
         "f9_absent_miles": Fact(p["p9_miles"], absent=True),
         "f10": Fact(p["p10"]),
-        "f_irrelevant_0": Fact(p["p_irrelevant_0"]),
-        "f_irrelevant_1": Fact(p["p_irrelevant_1"]),
-        "f_irrelevant_2": Fact(p["p_irrelevant_2"]),
-        "f_irrelevant_3": Fact(p["p_irrelevant_3"]),
-        "f_irrelevant_3_again": copy(Fact(p["p_irrelevant_3"])),
+        "f_irrelevant_0": Fact(p["p_irrelevant_0"], (2,)),
+        "f_irrelevant_1": Fact(p["p_irrelevant_1"], (3,)),
+        "f_irrelevant_2": Fact(p["p_irrelevant_2"], (4,)),
+        "f_irrelevant_3": Fact(p["p_irrelevant_3"], (2, 4)),
+        "f_irrelevant_3_new_context": copy(Fact(p["p_irrelevant_3"], (3, 4))),
     }
 
 
@@ -220,7 +220,7 @@ def make_procedure(make_factor) -> Dict[str, Procedure]:
                     Context(f["f_irrelevant_1"], (3,)),
                     Context(f["f_irrelevant_2"], (4,)),
                     Context(f["f_irrelevant_3"], (2, 4)),
-                    Context(f["f_irrelevant_3_again"], (3, 4)),
+                    Context(f["f_irrelevant_3_new_context"], (3, 4)),
                 ]
             ),
             even_if=frozenset([Context(f["f8"], (0, 1))]),
@@ -401,7 +401,11 @@ class TestFactors:
 
     def test_default_entity_context_for_fact(self, make_predicate):
         f2 = Fact(make_predicate["p2"])
-        f2.entity_context == (0, 1)
+        assert f2.entity_context == (0, 1)
+
+    def test_convert_int_entity_context_to_tuple(self, make_predicate):
+        f = Fact(make_predicate["p_irrelevant_1"], 3)
+        assert f.entity_context == (3, )
 
     def test_string_representation_of_factor(self, make_factor):
         assert str(make_factor["f1"]) == "Fact: {} was a motel"
@@ -494,12 +498,23 @@ class TestFactors:
 
 
 class TestProcedure:
+
+    def test_exception_for_wrong_type_for_procedure(self, make_predicate):
+        with pytest.raises(TypeError):
+            x = Procedure(inputs=make_predicate["p1"], outputs=make_predicate["p2"])
+
+    def test_exception_for_wrong_type_in_tuple_for_procedure(self, make_predicate):
+        with pytest.raises(TypeError):
+            x = Procedure(inputs=(make_predicate["p1"]), outputs=(make_predicate["p2"]))
+
     def test_procedure_equality(self, make_procedure):
         assert make_procedure["c1"] == make_procedure["c1_again"]
         assert make_procedure["c1"] == make_procedure["c1_entity_order"]
 
     def test_still_equal_after_swapping_reciprocal_entities(self, make_procedure):
         assert make_procedure["c2"] == (make_procedure["c2_reciprocal_swap"])
+
+
 
     def test_unequal_after_swapping_nonreciprocal_entities(self, make_procedure):
         assert make_procedure["c2"] != (make_procedure["c2_nonreciprocal_swap"])
