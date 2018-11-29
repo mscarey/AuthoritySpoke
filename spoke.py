@@ -337,7 +337,9 @@ class Fact(Factor):
     # which implication relations (represented by production rules?)
     # are binding from the point of view of a particular court.
 
-Context = namedtuple('Context', ['factor', 'markers'], defaults=[(0)])
+
+Context = namedtuple("Context", ["factor", "markers"], defaults=[(0)])
+
 
 @dataclass(frozen=True)
 class Procedure:
@@ -356,12 +358,26 @@ class Procedure:
         object.__setattr__(self, "inputs", frozenset(self.inputs))
         object.__setattr__(self, "even_if", frozenset(self.even_if))
 
+    def __len__(self):
+        """
+        Returns the number of entities that need to be specified for the procedure.
+        Works by flattening a series of "markers" fields from the Context objects.
+        """
+
+        return len(
+            set(
+                marker
+                for markertuple in (context.markers for context in self.all_contexts())
+                for marker in markertuple
+            )
+        )
+
     def __str__(self):
-        text = 'Procedure:'
+        text = "Procedure:"
         if self.inputs:
-            text += '    Inputs:'
+            text += "    Inputs:"
             for i in self.inputs:
-                text += '\n' + str(i.factor).format(*i.markers)
+                text += "\n" + str(i.factor).format(*i.markers)
         # TODO: add Outputs and Despite after API change
         return text
 
@@ -388,32 +404,33 @@ class Procedure:
 
         return True
 
-    def all_entities(self) -> Dict[Factor, Tuple[int]]:
-        """Returns a dict of all factors, with their entity labels as values."""
+    def all_contexts(self) -> Set[Context]:
+        """Returns a set of all factor contexts."""
 
         inputs = self.inputs or {}
         even_if = self.even_if or {}
-        return {**self.outputs, **inputs, **even_if}
+        return {*self.outputs, *inputs, *even_if}
 
-    def sorted_entities(self) -> List[Factor]:
-        """Sorts the procedure's factors into an order that will always be
-        the same for the same set of factors, but that doesn't correspond to
+    def sorted_contexts(self) -> List[Context]:
+        """Sorts the procedure's factors (in Context objects with entity
+        markers) into an order that will always be the same for the same
+        set of factors, but that doesn't correspond to
         whether the factors are inputs, outputs, or "even if" factors."""
 
-        return sorted(self.all_entities(), key=repr)
+        return sorted(self.all_contexts(), key=repr)
 
     def get_entity_permutations(self) -> Optional[Set[Tuple[int]]]:
         """Returns every possible ordering of entities that could be
         substituted into an ordered list of the factors in the procedure."""
 
-        all_entities = self.all_entities()
-        sorted_entities = self.sorted_entities()
+        all_contexts = self.all_contexts()
+        sorted_contexts = self.sorted_contexts()
 
         def add_some_entities(
-            all_entities: Mapping[Factor, Tuple[int]],
+            all_contexts: Mapping[Factor, Tuple[int]],
             entity_permutations: list,
             entity_list: list,
-            sorted_entities: list,
+            sorted_contexts: list,
             i: int,
         ) -> Optional[Set[Tuple[int]]]:
             """Recursive function that flattens the entity labels for
@@ -423,38 +440,29 @@ class Procedure:
             writing the other variant list. It may split multiple times
             before it reaches the end of the sequence."""
 
-            if i >= len(sorted_entities):
+            if i >= len(sorted_contexts):
                 entity_permutations.append(tuple(entity_list))
                 return None
-            if sorted_entities[i].predicate.reciprocal:
+            if sorted_contexts[i].predicate.reciprocal:
                 new_entity_list = entity_list.copy()
-                reciprocal_entities = [*all_entities[sorted_entities[i]]]
+                reciprocal_entities = [*all_contexts[sorted_contexts[i]]]
                 new_entity_list.append(reciprocal_entities[1])
                 new_entity_list.append(reciprocal_entities[0])
                 new_entity_list.extend(reciprocal_entities[2:])
                 add_some_entities(
-                    all_entities,
+                    all_contexts,
                     entity_permutations,
                     new_entity_list,
-                    sorted_entities,
+                    sorted_contexts,
                     i + 1,
                 )
-            entity_list.extend(all_entities[sorted_entities[i]])
+            entity_list.extend(all_contexts[sorted_contexts[i]])
             add_some_entities(
-                all_entities, entity_permutations, entity_list, sorted_entities, i + 1
+                all_contexts, entity_permutations, entity_list, sorted_contexts, i + 1
             )
             return set(entity_permutations)
 
-        return add_some_entities(all_entities, [], [], sorted_entities, 0)
-
-    def __len__(self):
-        """
-        Returns the number of entities that need to be specified for the procedure.
-        """
-
-        return len(
-            set((slot for factor in self.all_entities().values() for slot in factor))
-        )
+        return add_some_entities(all_contexts, [], [], sorted_contexts, 0)
 
     def __eq__(self, other):
         """Determines if the two holdings have all the same factors
@@ -469,7 +477,9 @@ class Procedure:
             (self.inputs or {}, other.inputs or {}),
             (self.even_if or {}, other.even_if or {}),
         ):
-            if x[0].keys() != x[1].keys():
+            if {context.factor for context in x[0]} != {
+                context.factor for context in x[1]
+            }:
                 return False
 
         return any(
@@ -556,8 +566,6 @@ class Procedure:
             "outputs": other.entities_of_implied_factors(self, "outputs"),
             "even_if": other.entities_of_implied_factors(self, "even_if"),
         }
-
-
 
         # If any factor doesn't match with any entity set, that part of the problem is
         # unsatisfiable and other can't imply self.

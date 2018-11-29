@@ -21,7 +21,6 @@ def make_entity() -> Dict[str, Entity]:
         "e_trees": Entity("the stockpile of trees"),
     }
 
-
 @pytest.fixture
 def make_predicate() -> Dict[str, Predicate]:
 
