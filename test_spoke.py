@@ -485,11 +485,8 @@ class TestFactors:
     def test_copies_of_identical_factor(self, make_factor, make_predicate):
         p = make_predicate
         assert make_factor["f_irrelevant_3_again"] == make_factor["f_irrelevant_3"]
-        assert hash(make_factor["f_irrelevant_3_again"]) != hash(
-            make_factor["f_irrelevant_3"]
-        )
-        assert id(Fact(p["p_irrelevant_3"])) != id(copy(Fact(p["p_irrelevant_3"])))
-        assert hash(Fact(p["p_irrelevant_3"])) != hash(copy(Fact(p["p_irrelevant_3"])))
+        assert Context(make_factor["f_irrelevant_3_again"]) == Context(make_factor["f_irrelevant_3"])
+        assert Context(make_factor["f_irrelevant_3"], (2, 4)) != Context(make_factor["f_irrelevant_3"], (3, 4))
 
 
 class TestProcedure:

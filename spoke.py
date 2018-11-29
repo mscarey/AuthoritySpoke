@@ -1,6 +1,7 @@
 import datetime
 import json
-from typing import Dict, FrozenSet, List, Mapping, Optional, Sequence, Set, Tuple, Union
+from typing import Dict, FrozenSet, Iterable, List, Mapping
+from typing import Optional, Sequence, Set, Tuple, Union
 from dataclasses import dataclass
 from collections import namedtuple
 
@@ -344,13 +345,16 @@ class Procedure:
     terms of inputs and outputs, and also potentially "even if" factors, which could
     be considered "failed undercutters" in defeasible logic."""
 
-    outputs: FrozenSet[Context]
-    inputs: FrozenSet[Context] = frozenset([])
-    even_if: FrozenSet[Context] = frozenset([])
+    outputs: Iterable[Context]
+    inputs: Iterable[Context] = frozenset([])
+    even_if: Iterable[Context] = frozenset([])
 
     # TODO: change input/output/even_if category to a field in the Context namedtuple
 
-
+    def __post_init__(self):
+        object.__setattr__(self, "outputs", frozenset(self.outputs))
+        object.__setattr__(self, "inputs", frozenset(self.inputs))
+        object.__setattr__(self, "even_if", frozenset(self.even_if))
 
     def __str__(self):
         text = 'Procedure:'
