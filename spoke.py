@@ -303,12 +303,29 @@ class Fact(Factor):
 
     def __post_init__(self):
         if not self.entity_context:
-            object.__setattr__(self, "entity_context", tuple(range(len(self.predicate))))
+            object.__setattr__(
+                self, "entity_context", tuple(range(len(self.predicate)))
+            )
         if isinstance(self.entity_context, int):
             object.__setattr__(self, "entity_context", (self.entity_context,))
+        if len(self) != len(self.predicate):
+            raise ValueError(
+                (
+                    "entity_context must have one item for each entity slot ",
+                    "in self.predicate, but ",
+                    f'len(entity_context) == {len(self.entity_context)} ',
+                    f"and len(self.predicate) == {len(self.predicate)}",
+                )
+            )
 
     def __str__(self):
-        return f"{'Absent ' if self.absent else ''}{self.__class__.__name__}: {self.predicate}"
+        predicate = str(self.predicate).format(*self.entity_context)
+        return (
+            f"{'Absent ' if self.absent else ''}{self.__class__.__name__}: {predicate}"
+        )
+
+    def __len__(self):
+        return len(self.entity_context)
 
     def __gt__(self, other) -> bool:
         """Indicates whether self implies other, taking into account the implication
@@ -395,9 +412,16 @@ class Procedure:
         text = "Procedure:"
         if self.inputs:
             text += "    Inputs:"
-            for i in self.inputs:
-                text += "\n" + str(i.factor).format(*i.markers)
-        # TODO: add Outputs and Despite after API change
+            for f in self.inputs:
+                text += "\n" + str(f)
+        if self.even_if:
+            text += "    Even if:"
+            for f in self.even_if:
+                text += "\n" + str(f)
+        if self.outputs:
+            text += "    Outputs:"
+            for f in self.outputs:
+                text += "\n" + str(f)
         return text
 
     def match_entity_roles(self, self_entities, other_entities):

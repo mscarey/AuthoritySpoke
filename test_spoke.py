@@ -146,7 +146,7 @@ def make_factor(make_predicate) -> Dict[str, Factor]:
         "f_irrelevant_1": Fact(p["p_irrelevant_1"], (3,)),
         "f_irrelevant_2": Fact(p["p_irrelevant_2"], (4,)),
         "f_irrelevant_3": Fact(p["p_irrelevant_3"], (2, 4)),
-        "f_irrelevant_3_new_context": copy(Fact(p["p_irrelevant_3"], (3, 4))),
+        "f_irrelevant_3_new_context": Fact(p["p_irrelevant_3"], (3, 4)),
     }
 
 
@@ -338,17 +338,22 @@ class TestFactors:
         assert f.entity_context == (3,)
 
     def test_string_representation_of_factor(self, make_factor):
-        assert str(make_factor["f1"]) == "Fact: {} was a motel"
-        assert str(make_factor["f3_absent"]) == "Absent Fact: {} was {}’s abode"
+        assert str(make_factor["f1"]) == "Fact: 0 was a motel"
+        assert str(make_factor["f3_absent"]) == "Absent Fact: 0 was 1’s abode"
 
     def test_entity_slots_as_length_of_factor(self, make_factor):
         assert len(make_factor["f1"].predicate) == 1
+        assert len(make_factor["f1"]) == 1
 
     def test_predicate_with_entities(self, make_entity, make_factor):
         assert (
             make_factor["f1"].predicate.content_with_entities((make_entity["e_motel"]))
             == "Hideaway Lodge was a motel"
         )
+
+    def test_factor_entity_context_does_not_match_predicate(self, make_predicate):
+        with pytest.raises(ValueError):
+            x = Fact(make_predicate["p1"], (0, 1, 2))
 
     def test_reciprocal_with_wrong_number_of_entities(self, make_entity, make_factor):
         with pytest.raises(ValueError):
@@ -448,11 +453,11 @@ class TestProcedure:
         assert len(make_procedure["c1"]) == 2
         assert len(make_procedure["c2"]) == 2
 
-    def test_sorted_entities_from_procedure(self, make_predicate, make_procedure):
+    def test_sorted_factors_from_procedure(self, make_predicate, make_procedure):
 
         """The sorted_entities method sorts them alphabetically by __repr__."""
 
-        assert make_procedure["c2"].sorted_entities() == [
+        assert make_procedure["c2"].sorted_contexts() == [
             Fact(
                 predicate=Predicate(
                     content="The distance between {} and a parking area used by personnel and patrons of {} was {}",
