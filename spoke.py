@@ -537,14 +537,16 @@ class Procedure:
                         or not matches[s.entity_context[i]]
                         for i in range(len(s))
                     ):
-                        for i in s.entity_context:
-                            matches[i] = o.entity_context[i]
+                        for i in range(len(s)):
+                            matches[s.entity_context[i]] = o.entity_context[i]
                         matchlist = find_matches(sf, other_factors, matches, matchlist)
                     if s.predicate.reciprocal:  # please refactor
                         swapped = list(
-                            o.entity_context[1],
-                            o.entity_context[0],
-                            o.entity_context[2:],
+                            [
+                                o.entity_context[1],
+                                o.entity_context[0],
+                                o.entity_context[2:],
+                            ]
                         )
                         if all(
                             matches[s.entity_context[i]] == swapped[i]
@@ -558,9 +560,7 @@ class Procedure:
                             )
             return matchlist
 
-        matchlist = [
-            [None for i in range(len(self))]
-        ]
+        matchlist = [[None for i in range(len(self))]]
 
         for x in (
             (self.outputs, other.outputs),
@@ -577,7 +577,12 @@ class Procedure:
             for other_factor in x[1]:
                 if not any(factor == other_factor for factor in x[0]):
                     return False
-            for m in matchlist:
+
+            # converting to prior_list to start over searching for new matches
+            # when moving from outputs to inputs or to even_if
+            prior_list = matchlist.copy()
+            matchlist = []
+            for m in prior_list:
                 matchlist = find_matches(x[0], x[1], m, matchlist)
 
         return bool(matchlist)
