@@ -127,17 +127,19 @@ def make_factor(make_predicate) -> Dict[str, Factor]:
         "f3": Fact(p["p3"]),
         "f3_absent": Fact(p["p3"], absent=True),
         "f4": Fact(p["p4"]),
+        "f4_swap_entities": Fact(p["p4"], (1, 0)),
         "f5": Fact(p["p5"]),
         "f6": Fact(p["p6"]),
         "f7": Fact(p["p7"]),
+        "f7_swap_entities": Fact(p["p7"], (1, 0)),
         "f7_true": Fact(p["p7_true"]),
         "f8": Fact(p["p8"]),
         "f8_absent": Fact(p["p8"], absent=True),
         "f8_exact": Fact(p["p8_exact"]),
-        "f8_int": Fact(p["p8_int"]),
-        "f8_meters": Fact(p["p8_meters"]),
         "f8_float": Fact(p["p8_float"]),
         "f8_higher_int": Fact(p["p8_higher_int"]),
+        "f8_int": Fact(p["p8_int"]),
+        "f8_meters": Fact(p["p8_meters"]),
         "f9": Fact(p["p9"]),
         "f9_absent": Fact(p["p9"], absent=True),
         "f9_absent_miles": Fact(p["p9_miles"], absent=True),
@@ -191,12 +193,12 @@ def make_procedure(make_factor) -> Dict[str, Procedure]:
         ),
         "c2_reciprocal_swap": Procedure(
             outputs=(f["f10"],),
-            inputs=(f["f4"], f["f5"], f["f6"], f["f7"], f["f9"]),
+            inputs=(f["f4"], f["f5"], f["f6"], f["f7_swap_entities"], f["f9"]),
             even_if=(f["f8"],),
         ),
         "c2_nonreciprocal_swap": Procedure(
             outputs=(f["f10"],),
-            inputs=(f["f4"], f["f5"], f["f6"], f["f7"], f["f9"]),
+            inputs=(f["f4_swap_entities"], f["f5"], f["f6"], f["f7"], f["f9"]),
             even_if=(f["f8"],),
         ),
         "c2_broad_output": Procedure(
@@ -432,7 +434,9 @@ class TestFactors:
         arbitrary.
         """
         assert make_factor["f_irrelevant_3"] == make_factor["f_irrelevant_3"]
-        assert make_factor["f_irrelevant_3"] == make_factor["f_irrelevant_3_new_context"]
+        assert (
+            make_factor["f_irrelevant_3"] == make_factor["f_irrelevant_3_new_context"]
+        )
 
 
 class TestProcedure:
