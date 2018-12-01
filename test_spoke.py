@@ -426,8 +426,13 @@ class TestFactors:
         assert make_factor["f9"].contradicts(make_factor["f9_absent_miles"])
 
     def test_copies_of_identical_factor(self, make_factor, make_predicate):
+        """
+        Even if the two factors have different entity markers in self.entity_context,
+        I expect them to evaluate equal because the choice of entity markers is
+        arbitrary.
+        """
         assert make_factor["f_irrelevant_3"] == make_factor["f_irrelevant_3"]
-        assert make_factor["f_irrelevant_3"] != make_factor["f_irrelevant_3_new_context"]
+        assert make_factor["f_irrelevant_3"] == make_factor["f_irrelevant_3_new_context"]
 
 
 class TestProcedure:

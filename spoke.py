@@ -313,10 +313,15 @@ class Fact(Factor):
                 (
                     "entity_context must have one item for each entity slot ",
                     "in self.predicate, but ",
-                    f'len(entity_context) == {len(self.entity_context)} ',
+                    f"len(entity_context) == {len(self.entity_context)} ",
                     f"and len(self.predicate) == {len(self.predicate)}",
                 )
             )
+
+    def __eq__(self, other):
+        if not isinstance(other, self.__class__):
+            return False
+        return self.predicate == other.predicate and self.absent == other.absent
 
     def __str__(self):
         predicate = str(self.predicate).format(*self.entity_context)
@@ -403,7 +408,9 @@ class Procedure:
         return len(
             set(
                 marker
-                for markertuple in (context.markers for context in self.all_contexts())
+                for markertuple in (
+                    factor.entity_context for factor in self.all_factors()
+                )
                 for marker in markertuple
             )
         )
@@ -447,32 +454,32 @@ class Procedure:
 
         return True
 
-    def all_contexts(self) -> Set[Factor]:
+    def all_factors(self) -> Set[Factor]:
         """Returns a set of all factors."""
 
         inputs = self.inputs or set()
         even_if = self.even_if or set()
         return {*self.outputs, *inputs, *even_if}
 
-    def sorted_contexts(self) -> List[Factor]:
+    def sorted_factors(self) -> List[Factor]:
         """Sorts the procedure's factors into an order that will always be
         the same for the same set of factors, but that doesn't correspond to
         whether the factors are inputs, outputs, or "even if" factors."""
 
-        return sorted(self.all_contexts(), key=repr)
+        return sorted(self.all_factors(), key=repr)
 
     def get_entity_permutations(self) -> Optional[Set[Tuple[int]]]:
         """Returns every possible ordering of entities that could be
         substituted into an ordered list of the factors in the procedure."""
 
-        all_contexts = self.all_contexts()
-        sorted_contexts = self.sorted_contexts()
+        all_factors = self.all_factors()
+        sorted_factors = self.sorted_factors()
 
         def add_some_entities(
-            all_contexts: Mapping[Factor, Tuple[int]],
+            all_factors: Mapping[Factor, Tuple[int]],
             entity_permutations: list,
             entity_list: list,
-            sorted_contexts: list,
+            sorted_factors: list,
             i: int,
         ) -> Optional[Set[Tuple[int]]]:
             """Recursive function that flattens the entity labels for
@@ -482,53 +489,98 @@ class Procedure:
             writing the other variant list. It may split multiple times
             before it reaches the end of the sequence."""
 
-            if i >= len(sorted_contexts):
+            if i >= len(sorted_factors):
                 entity_permutations.append(tuple(entity_list))
                 return None
-            if sorted_contexts[i].predicate.reciprocal:
+            if sorted_factors[i].predicate.reciprocal:
                 new_entity_list = entity_list.copy()
-                reciprocal_entities = [*all_contexts[sorted_contexts[i]]]
+                reciprocal_entities = [*all_factors[sorted_factors[i]]]
                 new_entity_list.append(reciprocal_entities[1])
                 new_entity_list.append(reciprocal_entities[0])
                 new_entity_list.extend(reciprocal_entities[2:])
                 add_some_entities(
-                    all_contexts,
+                    all_factors,
                     entity_permutations,
                     new_entity_list,
-                    sorted_contexts,
+                    sorted_factors,
                     i + 1,
                 )
-            entity_list.extend(all_contexts[sorted_contexts[i]])
+            entity_list.extend(all_factors[sorted_factors[i]])
             add_some_entities(
-                all_contexts, entity_permutations, entity_list, sorted_contexts, i + 1
+                all_factors, entity_permutations, entity_list, sorted_factors, i + 1
             )
             return set(entity_permutations)
 
-        return add_some_entities(all_contexts, [], [], sorted_contexts, 0)
+        return add_some_entities(all_factors, [], [], sorted_factors, 0)
 
     def __eq__(self, other):
-        """Determines if the two holdings have all the same factors
+        """Determines if the two procedures have all the same factors
         with the same entities in the same roles, not whether they're
         actually the same Python object."""
 
         if not isinstance(other, Procedure):
             return False
 
+        if len(other) != len(self):  # redundant?
+            return False
+
+        def find_matches(self_factors, other_factors, matches, matchlist):
+            sf = {f for f in self_factors}
+            if not sf:
+                matchlist.append(matches)
+                return matchlist
+            s = sf.pop()
+            for o in other_factors:
+                if s == o:
+                    if all(
+                        matches[s.entity_context[i]] == o.entity_context[i]
+                        or not matches[s.entity_context[i]]
+                        for i in range(len(s))
+                    ):
+                        for i in s.entity_context:
+                            matches[i] = o.entity_context[i]
+                        matchlist = find_matches(sf, other_factors, matches, matchlist)
+                    if s.predicate.reciprocal:  # please refactor
+                        swapped = list(
+                            o.entity_context[1],
+                            o.entity_context[0],
+                            o.entity_context[2:],
+                        )
+                        if all(
+                            matches[s.entity_context[i]] == swapped[i]
+                            or not matches[s.entity_context[i]]
+                            for i in range(len(s))
+                        ):
+                            for i in s.entity_context:
+                                matches[i] = swapped[i]
+                            matchlist = find_matches(
+                                sf, other_factors, matches, matchlist
+                            )
+            return matchlist
+
+        matchlist = [
+            [None for i in range(len(self))]
+        ]
+
         for x in (
             (self.outputs, other.outputs),
-            (self.inputs or {}, other.inputs or {}),
-            (self.even_if or {}, other.even_if or {}),
+            (self.inputs, other.inputs),
+            (self.even_if, other.even_if),
         ):
-            if {context.factor for context in x[0]} != {
-                context.factor for context in x[1]
-            }:
-                return False
 
-        return any(
-            (self.match_entity_roles(x, y) and self.match_entity_roles(y, x))
-            for x in self.get_entity_permutations()
-            for y in other.get_entity_permutations()
-        )
+            # Not equal if self has any factor other lacks
+            for factor in x[0]:
+                if not any(factor == other_factor for other_factor in x[1]):
+                    return False
+
+            # Not equal if other has any factor self lacks
+            for other_factor in x[1]:
+                if not any(factor == other_factor for factor in x[0]):
+                    return False
+            for m in matchlist:
+                matchlist = find_matches(x[0], x[1], m, matchlist)
+
+        return bool(matchlist)
 
     def entities_of_implied_factors(
         self, other: Factor, factor_group: str = "outputs"
