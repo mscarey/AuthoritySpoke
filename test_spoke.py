@@ -464,9 +464,9 @@ class TestProcedure:
 
     def test_sorted_factors_from_procedure(self, make_predicate, make_procedure):
 
-        """The sorted_entities method sorts them alphabetically by __repr__."""
+        """The sorted_factors method sorts them alphabetically by __repr__."""
 
-        assert make_procedure["c2"].sorted_contexts() == [
+        assert make_procedure["c2"].sorted_factors() == [
             Fact(
                 predicate=Predicate(
                     content="The distance between {} and a parking area used by personnel and patrons of {} was {}",
@@ -675,7 +675,7 @@ class TestProcedure:
                 f["f8_int"]
             ]
 
-    def test_implies_same_output_fewer_inputs(self, make_procedure):
+    def test_procedure_implies_same_output_fewer_inputs(self, make_procedure):
         assert make_procedure["c1_easy"] > (make_procedure["c1"])
 
     def test_procedure_implies_identical_procedure(self, make_procedure):

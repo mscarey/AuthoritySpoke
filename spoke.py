@@ -513,6 +513,44 @@ class Procedure:
 
         return add_some_entities(all_factors, [], [], sorted_factors, 0)
 
+    def find_matches(
+        self, self_factors, other_factors, matches, matchlist, comparison="="
+    ):
+        sf = {f for f in self_factors}
+        if not sf:
+            matchlist.append(matches)
+            return matchlist
+        s = sf.pop()
+        for o in other_factors:
+            if (
+                (comparison == "=" and s == o)
+                or (comparison == "<" and s < o)
+                or (comparison == ">" and s > o)
+            ):
+                if all(
+                    matches[s.entity_context[i]] == o.entity_context[i]
+                    or not matches[s.entity_context[i]]
+                    for i in range(len(s))
+                ):
+                    for i in range(len(s)):
+                        matches[s.entity_context[i]] = o.entity_context[i]
+                    matchlist = self.find_matches(sf, other_factors, matches, matchlist)
+                if s.predicate.reciprocal:  # please refactor
+                    swapped = list(
+                        [o.entity_context[1], o.entity_context[0], o.entity_context[2:]]
+                    )
+                    if all(
+                        matches[s.entity_context[i]] == swapped[i]
+                        or not matches[s.entity_context[i]]
+                        for i in range(len(s))
+                    ):
+                        for i in s.entity_context:
+                            matches[i] = swapped[i]
+                        matchlist = self.find_matches(
+                            sf, other_factors, matches, matchlist
+                        )
+        return matchlist
+
     def __eq__(self, other):
         """Determines if the two procedures have all the same factors
         with the same entities in the same roles, not whether they're
@@ -523,42 +561,6 @@ class Procedure:
 
         if len(other) != len(self):  # redundant?
             return False
-
-        def find_matches(self_factors, other_factors, matches, matchlist):
-            sf = {f for f in self_factors}
-            if not sf:
-                matchlist.append(matches)
-                return matchlist
-            s = sf.pop()
-            for o in other_factors:
-                if s == o:
-                    if all(
-                        matches[s.entity_context[i]] == o.entity_context[i]
-                        or not matches[s.entity_context[i]]
-                        for i in range(len(s))
-                    ):
-                        for i in range(len(s)):
-                            matches[s.entity_context[i]] = o.entity_context[i]
-                        matchlist = find_matches(sf, other_factors, matches, matchlist)
-                    if s.predicate.reciprocal:  # please refactor
-                        swapped = list(
-                            [
-                                o.entity_context[1],
-                                o.entity_context[0],
-                                o.entity_context[2:],
-                            ]
-                        )
-                        if all(
-                            matches[s.entity_context[i]] == swapped[i]
-                            or not matches[s.entity_context[i]]
-                            for i in range(len(s))
-                        ):
-                            for i in s.entity_context:
-                                matches[i] = swapped[i]
-                            matchlist = find_matches(
-                                sf, other_factors, matches, matchlist
-                            )
-            return matchlist
 
         matchlist = [[None for i in range(len(self))]]
 
@@ -583,7 +585,62 @@ class Procedure:
             prior_list = matchlist.copy()
             matchlist = []
             for m in prior_list:
-                matchlist = find_matches(x[0], x[1], m, matchlist)
+                matchlist = self.find_matches(x[0], x[1], m, matchlist)
+
+        return bool(matchlist)
+
+    def __lt__(self, other):
+        """
+        For other to imply self:
+        All outputs of other are implied by outputs of self with matching entities
+        All inputs of self are implied by inputs of other with matching entities
+        All even_if factors of other are implied by even_if factors or inputs of self
+        """
+
+        if not isinstance(other, Procedure):
+            return False
+
+        matchlist = [[None for i in range(len(self))]]
+
+        # Self not implied by other if any output of other
+        # is not implied by some output of self
+        for other_factor in other.outputs:
+            if not any(other_factor < factor for factor in self.outputs):
+                return False
+
+        prior_list = matchlist.copy()
+        matchlist = []
+        for m in prior_list:
+            matchlist = self.find_matches(
+                other.outputs, self.outputs, m, matchlist, "<"
+            )
+
+        # Self not implied by other if any input of self
+        # is not implied by some input of other
+        for factor in self.inputs:
+            if not any(other_factor > factor for other_factor in other.inputs):
+                return False
+
+        prior_list = matchlist.copy()
+        matchlist = []
+        for m in prior_list:
+            matchlist = self.find_matches(
+                self.inputs, other.inputs, m, matchlist, "<"
+            )
+
+        # Self not implied by other if any even_if of other
+        # is not implied by some even_if or input of self
+        even_or_input = {*self.even_if, *self.inputs}
+        for other_factor in other.even_if:
+            if not any(other_factor < factor for factor in even_or_input):
+                return False
+
+        prior_list = matchlist.copy()
+        matchlist = []
+        for m in prior_list:
+            matchlist = self.find_matches(
+                other.even_if, even_or_input, m, matchlist, "<"
+            )
 
         return bool(matchlist)
 
@@ -635,47 +692,6 @@ class Procedure:
             f: tuple((*normal_order[f], *reciprocal_order[f]))
             for f in self_factors.keys()
         }
-
-    def __lt__(self, other):
-        """
-        For other to imply self:
-        All outputs of other are implied by outputs of self with matching entities
-        All inputs of self are implied by inputs of other with matching entities
-        All even_if factors of other are implied by even_if factors or inputs of self
-        """
-
-        # TODO: maybe generate every combination of self's factors where every factor
-        # that needs to be implied is implied, and for each factor combination,
-        # check every entity marker combination. Only need one match to return True.
-        # If the factors have a consistent order by repr, the entity markers can just be
-        # a sequence of ints.
-
-        if not isinstance(other, Procedure):
-            return False
-
-        # matching["inputs"] shows the entities each factor in self.inputs would
-        # have to take to be implied by other.inputs with other's default entities.
-
-        # matching["outputs"] and matching["even_if"] show the entities each factor
-        # in other.outputs and other.even_if would have to take to be implied by self
-        # with self's default entities.
-
-        matching = {
-            "inputs": self.entities_of_implied_factors(other, "inputs"),
-            "outputs": other.entities_of_implied_factors(self, "outputs"),
-            "even_if": other.entities_of_implied_factors(self, "even_if"),
-        }
-
-        # If any factor doesn't match with any entity set, that part of the problem is
-        # unsatisfiable and other can't imply self.
-
-        if any(
-            any(not matching[group][factor] for factor in matching[group])
-            for group in matching
-        ):
-            return False
-
-        return False
 
     def exhaustive_implies(self, other):
         """
