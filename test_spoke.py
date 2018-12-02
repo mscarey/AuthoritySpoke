@@ -675,23 +675,23 @@ class TestProcedure:
                 f["f8_int"]
             ]
 
-    def test_procedure_implies_same_output_fewer_inputs(self, make_procedure):
-        assert make_procedure["c1_easy"] > (make_procedure["c1"])
-
     def test_procedure_implies_identical_procedure(self, make_procedure):
         assert make_procedure["c1"] > (make_procedure["c1_again"])
 
-    def test_procedure_implies_broader_quantity_statement(self, make_procedure):
-        assert make_procedure["c2_exact_quantity"] > (make_procedure["c2"])
+    def test_procedure_implies_same_procedure_more_inputs(self, make_procedure):
+        assert make_procedure["c1_easy"] > make_procedure["c1"]
 
-    def test_procedure_does_not_imply_narrower_quantity_statement(self, make_procedure):
-        assert not make_procedure["c2"] > make_procedure["c2_exact_quantity"]
+    def test_imply_procedure_with_more_specific_quantity_input(self, make_procedure):
+        assert make_procedure["c2"] > make_procedure["c2_exact_quantity"]
+
+    def test_procedure_does_not_imply_broader_quantity_input(self, make_procedure):
+        assert not make_procedure["c2_exact_quantity"] > make_procedure["c2"]
 
     def test_procedure_exact_quantity_in_even_if_implication(self, make_procedure):
-        assert make_procedure["c2_exact_quantity"] > make_procedure["c2"]
+        assert make_procedure["c2_exact_in_even_if"] > make_procedure["c2"]
 
     def test_procedure_implication_despite_irrelevant_factors(self, make_procedure):
-        assert make_procedure["c2_irrelevant_inputs"] > make_procedure["c2"]
+        assert make_procedure["c2"] > make_procedure["c2_irrelevant_inputs"]
 
     def test_procedure_string(self, make_procedure):
         assert "Fact: 2 performed at 4" in str(make_procedure["c2_irrelevant_inputs"])

@@ -371,7 +371,12 @@ class Fact(Factor):
 class Procedure:
     """A (potential) rule for courts to use in resolving litigation. Described in
     terms of inputs and outputs, and also potentially "even if" factors, which could
-    be considered "failed undercutters" in defeasible logic."""
+    be considered "failed undercutters" in defeasible logic.
+
+    Input factors are not treated as potential undercutters.
+    Instead, they're assumed to be additional support in favor of the output.
+    If a factor is relevant both as support for the output and as a potential
+    undercutter, include it in both 'inputs' and 'even_if'."""
 
     outputs: Union[Factor, Iterable[Factor]]
     inputs: Union[Factor, Iterable[Factor]] = frozenset([])
@@ -589,12 +594,9 @@ class Procedure:
 
         return bool(matchlist)
 
-    def __lt__(self, other):
+    def __gt__(self, other):
         """
-        For other to imply self:
-        All outputs of other are implied by outputs of self with matching entities
-        All inputs of self are implied by inputs of other with matching entities
-        All even_if factors of other are implied by even_if factors or inputs of self
+        Tests whether self implies other.
         """
 
         if not isinstance(other, Procedure):
@@ -602,23 +604,10 @@ class Procedure:
 
         matchlist = [[None for i in range(len(self))]]
 
-        # Self not implied by other if any output of other
-        # is not implied by some output of self
-        for other_factor in other.outputs:
-            if not any(other_factor < factor for factor in self.outputs):
-                return False
-
-        prior_list = matchlist.copy()
-        matchlist = []
-        for m in prior_list:
-            matchlist = self.find_matches(
-                other.outputs, self.outputs, m, matchlist, "<"
-            )
-
-        # Self not implied by other if any input of self
+        # Self does not imply other if any input of self
         # is not implied by some input of other
         for factor in self.inputs:
-            if not any(other_factor > factor for other_factor in other.inputs):
+            if not any(factor < other_factor for other_factor in other.inputs):
                 return False
 
         prior_list = matchlist.copy()
@@ -628,7 +617,18 @@ class Procedure:
                 self.inputs, other.inputs, m, matchlist, "<"
             )
 
-        # Self not implied by other if any even_if of other
+        # Self does not imply other if any output of other
+        # is not implied by some output of self
+        for other_factor in other.outputs:
+            if not any(other_factor < factor for factor in self.outputs):
+                return False
+
+        prior_list = matchlist.copy()
+        matchlist = []
+        for m in prior_list:
+            matchlist = self.find_matches(other.outputs, self.outputs, m, matchlist, "<")
+
+        # Self does not imply other if any even_if of other
         # is not implied by some even_if or input of self
         even_or_input = {*self.even_if, *self.inputs}
         for other_factor in other.even_if:
