@@ -120,11 +120,14 @@ def make_factor(make_predicate) -> Dict[str, Factor]:
 
     return {
         "f1": Fact(p["p1"]),
+        "f1_entity_order": Fact(p["p1"], (1,)),
         "f1b": Fact(p["p1"]),
         "f1c": Fact(p["p1_again"]),
         "f2": Fact(p["p2"], (1, 0)),
+        "f2_entity_order": Fact(p["p2"]),
         "f2_reciprocal": Fact(p["p2_reciprocal"]),
         "f3": Fact(p["p3"]),
+        "f3_entity_order": Fact(p["p3"], (1, 0)),
         "f3_absent": Fact(p["p3"], absent=True),
         "f4": Fact(p["p4"]),
         "f4_swap_entities": Fact(p["p4"], (1, 0)),
@@ -159,7 +162,10 @@ def make_procedure(make_factor) -> Dict[str, Procedure]:
     return {
         "c1": Procedure(outputs=(f["f3"],), inputs=(f["f1"], f["f2"])),
         "c1_again": Procedure(outputs=(f["f3"],), inputs=(f["f1"], f["f2"])),
-        "c1_entity_order": Procedure(outputs=(f["f3"],), inputs=(f["f2"], f["f1"])),
+        "c1_entity_order": Procedure(
+            outputs=(f["f3_entity_order"],),
+            inputs=(f["f2_entity_order"], f["f1_entity_order"]),
+        ),
         "c1_easy": Procedure(outputs=(f["f3"],), inputs=(f["f2"])),
         "c2": Procedure(
             outputs=(f["f10"],),
@@ -529,54 +535,30 @@ class TestProcedure:
             ),
         ]
 
-    def test_entity_permutations(self, make_procedure):
-        """
-        "The distance between {the trees} and {the hotel} was at least 20 feet"
-        and "...was at least 35 feet" can be swapped to say
-        "The distance between {the hotel} and {the trees}"
-        but otherwise the order of entities has to be the same.
-        """
-        assert make_procedure["c2"].get_entity_permutations() == {
-            (0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1),
-            (0, 1, 0, 1, 1, 0, 0, 0, 0, 1, 0, 1),
-            (0, 1, 1, 0, 0, 1, 0, 0, 0, 1, 0, 1),
-            (0, 1, 1, 0, 1, 0, 0, 0, 0, 1, 0, 1),
-        }
-
-    def test_entities_of_implied_inputs_for_identical_procedure(
+    def test_entities_of_inputs_for_identical_procedure(
         self, make_factor, make_procedure
     ):
         f = make_factor
         c1 = make_procedure["c1"]
         c1_again = make_procedure["c1_again"]
-        assert c1.inputs[f["f1"]] == (0,)
-        assert c1.inputs[f["f2"]] == (1, 0)
-        assert (0,) in c1.entities_of_implied_factors(c1_again, "inputs")[f["f1"]]
-        assert (1, 0) in c1.entities_of_implied_factors(c1_again, "inputs")[f["f2"]]
+        assert f["f1"] in c1.inputs
+        assert f["f1"].entity_context == (0,)
+        assert f["f2"] in c1.inputs
+        assert f["f2"].entity_context == (1, 0)
 
     def test_entities_of_implied_inputs_for_implied_procedure(
         self, make_factor, make_procedure
     ):
         f = make_factor
         c1_easy = make_procedure["c1_easy"]
-        c1_again = make_procedure["c1_again"]
-        assert f["f2"] in c1_easy.inputs
-        assert (
-            c1_again.inputs[f["f2"]]
-            in c1_easy.entities_of_implied_factors(c1_again, factor_group="inputs")[
-                f["f2"]
-            ]
-        )
+        c1_order = make_procedure["c1_entity_order"]
+        assert any(factor == f["f2"] for factor in c1_easy.inputs)
+        assert all(factor != f["f1"] for factor in c1_easy.inputs)
+        assert c1_easy > c1_order
+        assert c1_order < c1_easy
+        assert c1_easy != c1_order
 
-        assert f["f1"] not in c1_easy.inputs
-        assert (
-            c1_again.inputs[f["f1"]]
-            not in c1_easy.entities_of_implied_factors(c1_again, factor_group="inputs")[
-                f["f2"]
-            ]
-        )
-
-    def test_entities_of_implied_quantity_inputs_for_implied_procedure(
+    def test_procedure_implication_with_exact_quantity(
         self, make_factor, make_procedure
     ):
         """This is meant to show that the function finds the "distance is
@@ -586,14 +568,12 @@ class TestProcedure:
 
         f = make_factor
         c2 = make_procedure["c2"]
-        c2_exact = make_procedure["c2_exact_quantity"]
+        c2_exact_quantity = make_procedure["c2_exact_quantity"]
 
         assert f["f7"] in c2.inputs
-        assert f["f7"] not in c2_exact.inputs
-        assert (
-            c2_exact.inputs[f["f8_exact"]]
-            in c2.entities_of_implied_factors(c2_exact, factor_group="inputs")[f["f7"]]
-        )
+        assert f["f7"] not in c2_exact_quantity.inputs
+        assert f["f8_exact"] > f["f7"]
+        assert c2 > c2_exact_quantity
 
     def test_reciprocal_entities_of_implied_inputs_for_implied_procedure(
         self, make_factor, make_procedure
@@ -676,7 +656,7 @@ class TestProcedure:
             ]
 
     def test_procedure_implies_identical_procedure(self, make_procedure):
-        assert make_procedure["c1"] > (make_procedure["c1_again"])
+        assert make_procedure["c1"] > make_procedure["c1_again"]
 
     def test_procedure_implies_same_procedure_more_inputs(self, make_procedure):
         assert make_procedure["c1_easy"] > make_procedure["c1"]

@@ -473,54 +473,10 @@ class Procedure:
 
         return sorted(self.all_factors(), key=repr)
 
-    def get_entity_permutations(self) -> Optional[Set[Tuple[int]]]:
-        """Returns every possible ordering of entities that could be
-        substituted into an ordered list of the factors in the procedure."""
-
-        all_factors = self.all_factors()
-        sorted_factors = self.sorted_factors()
-
-        def add_some_entities(
-            all_factors: Mapping[Factor, Tuple[int]],
-            entity_permutations: list,
-            entity_list: list,
-            sorted_factors: list,
-            i: int,
-        ) -> Optional[Set[Tuple[int]]]:
-            """Recursive function that flattens the entity labels for
-            each of the factors into a list, except that if the order of
-            entities can vary, the function continues writing one variant of
-            the list but calls a second instance of itself to continue
-            writing the other variant list. It may split multiple times
-            before it reaches the end of the sequence."""
-
-            if i >= len(sorted_factors):
-                entity_permutations.append(tuple(entity_list))
-                return None
-            if sorted_factors[i].predicate.reciprocal:
-                new_entity_list = entity_list.copy()
-                reciprocal_entities = [*all_factors[sorted_factors[i]]]
-                new_entity_list.append(reciprocal_entities[1])
-                new_entity_list.append(reciprocal_entities[0])
-                new_entity_list.extend(reciprocal_entities[2:])
-                add_some_entities(
-                    all_factors,
-                    entity_permutations,
-                    new_entity_list,
-                    sorted_factors,
-                    i + 1,
-                )
-            entity_list.extend(all_factors[sorted_factors[i]])
-            add_some_entities(
-                all_factors, entity_permutations, entity_list, sorted_factors, i + 1
-            )
-            return set(entity_permutations)
-
-        return add_some_entities(all_factors, [], [], sorted_factors, 0)
-
     def find_matches(
-        self, self_factors, other_factors, matches, matchlist, comparison="="
+        self, self_factors, other_factors, m, matchlist, comparison="="
     ):
+        matches = m.copy()
         sf = {f for f in self_factors}
         if not sf:
             matchlist.append(matches)
@@ -539,7 +495,7 @@ class Procedure:
                 ):
                     for i in range(len(s)):
                         matches[s.entity_context[i]] = o.entity_context[i]
-                    matchlist = self.find_matches(sf, other_factors, matches, matchlist)
+                    matchlist = self.find_matches(sf, other_factors, matches, matchlist, comparison)
                 if s.predicate.reciprocal:  # please refactor
                     swapped = list(
                         [o.entity_context[1], o.entity_context[0], o.entity_context[2:]]
@@ -552,7 +508,7 @@ class Procedure:
                         for i in s.entity_context:
                             matches[i] = swapped[i]
                         matchlist = self.find_matches(
-                            sf, other_factors, matches, matchlist
+                            sf, other_factors, matches, matchlist, comparison
                         )
         return matchlist
 
@@ -602,7 +558,7 @@ class Procedure:
         if not isinstance(other, Procedure):
             return False
 
-        matchlist = [[None for i in range(len(self))]]
+        matchlist_0 = [[None for i in range(len(self))]]
 
         # Self does not imply other if any input of self
         # is not implied by some input of other
@@ -610,11 +566,10 @@ class Procedure:
             if not any(factor < other_factor for other_factor in other.inputs):
                 return False
 
-        prior_list = matchlist.copy()
-        matchlist = []
-        for m in prior_list:
-            matchlist = self.find_matches(
-                self.inputs, other.inputs, m, matchlist, "<"
+        matchlist_1 = []
+        for m in matchlist_0:
+            matchlist_1 = self.find_matches(
+                self.inputs, other.inputs, m, matchlist_1, "<"
             )
 
         # Self does not imply other if any output of other
@@ -623,10 +578,9 @@ class Procedure:
             if not any(other_factor < factor for factor in self.outputs):
                 return False
 
-        prior_list = matchlist.copy()
-        matchlist = []
-        for m in prior_list:
-            matchlist = self.find_matches(other.outputs, self.outputs, m, matchlist, "<")
+        matchlist_2 = []
+        for m in matchlist_1:
+            matchlist_2 = self.find_matches(other.outputs, self.outputs, m, matchlist_2, "<")
 
         # Self does not imply other if any even_if of other
         # is not implied by some even_if or input of self
@@ -635,63 +589,14 @@ class Procedure:
             if not any(other_factor < factor for factor in even_or_input):
                 return False
 
-        prior_list = matchlist.copy()
-        matchlist = []
-        for m in prior_list:
-            matchlist = self.find_matches(
-                other.even_if, even_or_input, m, matchlist, "<"
+        matchlist_3 = []
+        for m in matchlist_2:
+            matchlist_3 = self.find_matches(
+                other.even_if, even_or_input, m, matchlist_3, "<"
             )
 
-        return bool(matchlist)
+        return bool(matchlist_3)
 
-    def entities_of_implied_factors(
-        self, other: Factor, factor_group: str = "outputs"
-    ) -> Dict[Factor, Optional[Tuple[Tuple[int, ...], ...]]]:
-        """
-        Gets every order of entities from every factor in other that
-        would cause each factor of self to be implied by other.
-        Takes into account swapped entities for reciprocal factors.
-
-        This method doesn't reveal which factor of other will imply any
-        particular factor of self, if the factor of self has the correct
-        entities. It shouldn't matter, if the purpose is to tell which
-        entities to select to cause each factor of self to be implied by other.
-
-        This should handle entity matching for the __gt__ function.
-        """
-
-        if factor_group == "inputs":
-            self_factors = self.inputs or {}
-            other_factors = other.inputs or {}
-        elif factor_group == "outputs":
-            self_factors = self.outputs
-            other_factors = other.outputs
-        elif factor_group == "even_if":
-            self_factors = self.even_if or {}
-            other_even_if = other.even_if or {}
-            other_inputs = other.inputs or {}
-            other_factors = {**other_even_if, **other_inputs}
-        else:
-            raise ValueError(
-                f'"factor_group" must be "inputs", "outputs", or "even_if", not {factor_group}.'
-            )
-
-        normal_order = {
-            f: list(other_factors[x] for x in other_factors.keys() if x > f)
-            for f in self_factors.keys()
-        }
-        reciprocal_order = {
-            f: list(
-                (other_factors[x][1], other_factors[x][0], *other_factors[x][2:])
-                for x in other_factors.keys()
-                if x.predicate.reciprocal and x > f
-            )
-            for f in self_factors.keys()
-        }
-        return {
-            f: tuple((*normal_order[f], *reciprocal_order[f]))
-            for f in self_factors.keys()
-        }
 
     def exhaustive_implies(self, other):
         """
