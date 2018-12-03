@@ -575,8 +575,8 @@ class TestProcedure:
         assert f["f8_exact"] > f["f7"]
         assert c2 > c2_exact_quantity
 
-    def test_reciprocal_entities_of_implied_inputs_for_implied_procedure(
-        self, make_factor, make_procedure
+    def test_implied_procedure_with_reciprocal_entities(
+        self, make_procedure
     ):
         """
         Because both procedures have a form of "The distance between {} and {} was {}"
@@ -586,57 +586,25 @@ class TestProcedure:
         reversed.)
         """
 
-        f = make_factor
         c2 = make_procedure["c2"]
-        c2_exact = make_procedure["c2_exact_quantity"]
-        c2_exact.inputs[f["f8_exact"]][::-1] in c2.entities_of_implied_factors(
-            c2_exact, factor_group="inputs"
-        )[f["f7"]]
+        c2_reciprocal_swap = make_procedure["c2_reciprocal_swap"]
+        assert c2 == c2_reciprocal_swap
+        assert c2 > c2_reciprocal_swap
 
-    def test_reciprocal_entities_of_implied_inputs_for_implied_procedure(
-        self, make_factor, make_procedure
-    ):
-        """
-        Because both procedures have a form of "The distance between {} and {} was {}"
-        factor and those factors are reciprocal, the entities of one of them in reversed
-        order can be used as the entities of the other, and one will still imply the other.
-        (But if there had been more than two entities, only the first two would have been
-        reversed.)
-        """
-
-        f = make_factor
-        c2 = make_procedure["c2"]
-        c2_exact = make_procedure["c2_exact_quantity"]
-        c2_exact.inputs[f["f8_exact"]][::-1] in c2.entities_of_implied_factors(
-            c2_exact, factor_group="inputs"
-        )[f["f7"]]
 
     def test_entities_of_implied_quantity_outputs_for_implied_procedure(
-        self, make_factor, make_procedure
+        self, make_procedure
     ):
         """
-        Here, if c2_narrow was "self" and c2_broad was "other", the output of
-        c2_broad would be implied by the output of c2_narrow.
+        If c2_narrow was "self" and c2_broad was "other", the output of
+        c2_broad (with f["f8_int"]) would be implied by the output of
+        c2_narrow (with f["f8_higher_int"]).
         """
 
-        f = make_factor
         c2_broad = make_procedure["c2_broad_output"]
         c2_narrow = make_procedure["c2_narrow_output"]
 
-        c2_narrow.outputs[f["f8_higher_int"]] in c2_broad.entities_of_implied_factors(
-            c2_narrow, factor_group="outputs"
-        )[f["f8_int"]]
-
-    def test_entities_of_implied_quantity_even_if_for_implied_procedure(
-        self, make_factor, make_procedure
-    ):
-        f = make_factor
-        c2 = make_procedure["c2"]
-        c2_exact_in_even_if = make_procedure["c2_exact_in_even_if"]
-
-        c2_exact_in_even_if.even_if[f["f8_exact"]] in c2.entities_of_implied_factors(
-            c2_exact_in_even_if, factor_group="even_if"
-        )[f["f8"]]
+        assert c2_narrow > c2_broad
 
     def test_entities_of_implied_factors_invalid_group_name(
         self, make_factor, make_procedure

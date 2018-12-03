@@ -473,9 +473,7 @@ class Procedure:
 
         return sorted(self.all_factors(), key=repr)
 
-    def find_matches(
-        self, self_factors, other_factors, m, matchlist, comparison="="
-    ):
+    def find_matches(self, self_factors, other_factors, m, matchlist, comparison="="):
         matches = m.copy()
         sf = {f for f in self_factors}
         if not sf:
@@ -495,7 +493,9 @@ class Procedure:
                 ):
                     for i in range(len(s)):
                         matches[s.entity_context[i]] = o.entity_context[i]
-                    matchlist = self.find_matches(sf, other_factors, matches, matchlist, comparison)
+                    matchlist = self.find_matches(
+                        sf, other_factors, matches, matchlist, comparison
+                    )
                 if s.predicate.reciprocal:  # please refactor
                     swapped = list(
                         [o.entity_context[1], o.entity_context[0], o.entity_context[2:]]
@@ -580,7 +580,9 @@ class Procedure:
 
         matchlist_2 = []
         for m in matchlist_1:
-            matchlist_2 = self.find_matches(other.outputs, self.outputs, m, matchlist_2, "<")
+            matchlist_2 = self.find_matches(
+                other.outputs, self.outputs, m, matchlist_2, "<"
+            )
 
         # Self does not imply other if any even_if of other
         # is not implied by some even_if or input of self
@@ -596,7 +598,6 @@ class Procedure:
             )
 
         return bool(matchlist_3)
-
 
     def exhaustive_implies(self, other):
         """
