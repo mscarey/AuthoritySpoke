@@ -632,6 +632,17 @@ class Holding:
     universal: bool = False
     rule_valid: Union[bool, None] = True
 
+    def __eq__(self, other) -> bool:
+        if not isinstance(other, self.__class__):
+            return False
+
+        return (
+            self.procedure == other.procedure
+            and self.mandatory == other.mandatory
+            and self.universal == other.universal
+            and self.rule_valid == other.rule_valid
+        )
+
 
 def opinion_from_file(path):
     """This is a generator that gets one opinion from a

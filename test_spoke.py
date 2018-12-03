@@ -218,22 +218,14 @@ def make_procedure(make_factor) -> Dict[str, Procedure]:
 
 
 @pytest.fixture
-def make_holding(make_factor) -> Dict[str, Holding]:
-    f1 = make_factor["f1"]
-    f2 = make_factor["f2"]
-    f3 = make_factor["f3"]
+def make_holding(make_procedure) -> Dict[str, Holding]:
+    c = make_procedure
 
     return {
-        "h1": Holding(Procedure(outputs={f3: (0, 1)}, inputs={f1: (0,), f2: (1, 0)})),
-        "h1_again": Holding(
-            Procedure(outputs={f3: (0, 1)}, inputs={f1: (0,), f2: (1, 0)})
-        ),
-        "h1_different": Holding(
-            Procedure(outputs={f3: (0, 1)}, inputs={f1: (0,), f2: (0, 1)})
-        ),
-        "h1_really_the_same": Holding(
-            Procedure(outputs={f3: (1, 0)}, inputs={f1: (1,), f2: (0, 1)})
-        ),
+        "h1": Holding(c["c1"]),
+        "h1_again": Holding(c["c1"]),
+        "h1_entity_order": Holding(c["c1_entity_order"]),
+        "h1_easy": Holding(c["c1_easy"]),
     }
 
 
@@ -542,8 +534,10 @@ class TestProcedure:
         c1 = make_procedure["c1"]
         c1_again = make_procedure["c1_again"]
         assert f["f1"] in c1.inputs
+        assert f["f1"] in c1_again.inputs
         assert f["f1"].entity_context == (0,)
         assert f["f2"] in c1.inputs
+        assert f["f2"] in c1_again.inputs
         assert f["f2"].entity_context == (1, 0)
 
     def test_entities_of_implied_inputs_for_implied_procedure(
@@ -574,6 +568,7 @@ class TestProcedure:
         assert f["f7"] not in c2_exact_quantity.inputs
         assert f["f8_exact"] > f["f7"]
         assert c2 > c2_exact_quantity
+        assert not c2_exact_quantity > c2
 
     def test_implied_procedure_with_reciprocal_entities(
         self, make_procedure
@@ -591,7 +586,6 @@ class TestProcedure:
         assert c2 == c2_reciprocal_swap
         assert c2 > c2_reciprocal_swap
 
-
     def test_entities_of_implied_quantity_outputs_for_implied_procedure(
         self, make_procedure
     ):
@@ -606,34 +600,11 @@ class TestProcedure:
 
         assert c2_narrow > c2_broad
 
-    def test_entities_of_implied_factors_invalid_group_name(
-        self, make_factor, make_procedure
-    ):
-
-        f = make_factor
-        c2_broad = make_procedure["c2_broad_output"]
-        c2_narrow = make_procedure["c2_narrow_output"]
-
-        with pytest.raises(ValueError):
-            c2_narrow.outputs[
-                f["f8_higher_int"]
-            ] in c2_broad.entities_of_implied_factors(
-                c2_narrow, factor_group="bogus_group"
-            )[
-                f["f8_int"]
-            ]
-
     def test_procedure_implies_identical_procedure(self, make_procedure):
         assert make_procedure["c1"] > make_procedure["c1_again"]
 
     def test_procedure_implies_same_procedure_more_inputs(self, make_procedure):
         assert make_procedure["c1_easy"] > make_procedure["c1"]
-
-    def test_imply_procedure_with_more_specific_quantity_input(self, make_procedure):
-        assert make_procedure["c2"] > make_procedure["c2_exact_quantity"]
-
-    def test_procedure_does_not_imply_broader_quantity_input(self, make_procedure):
-        assert not make_procedure["c2_exact_quantity"] > make_procedure["c2"]
 
     def test_procedure_exact_quantity_in_even_if_implication(self, make_procedure):
         assert make_procedure["c2_exact_in_even_if"] > make_procedure["c2"]
@@ -641,7 +612,7 @@ class TestProcedure:
     def test_procedure_implication_despite_irrelevant_factors(self, make_procedure):
         assert make_procedure["c2"] > make_procedure["c2_irrelevant_inputs"]
 
-    def test_procedure_string(self, make_procedure):
+    def test_procedure_string_with_entities(self, make_procedure):
         assert "Fact: 2 performed at 4" in str(make_procedure["c2_irrelevant_inputs"])
         assert "Fact: 3 performed at 4" in str(make_procedure["c2_irrelevant_inputs"])
 
@@ -650,17 +621,21 @@ class TestHoldings:
     def test_identical_holdings_equal(self, make_holding):
         assert make_holding["h1"] == make_holding["h1_again"]
 
-    def test_holdings_different_entities_unequal(self, make_holding):
-        assert make_holding["h1"] != make_holding["h1_different"]
-
-    def test_holdings_differing_in_entity_order_equal(self, make_holding):
+    def test_holdings_equivalent_entity_orders_equal(self, make_holding):
         """
         Test that holdings are considered equal if they have the same factors
         and the numbers they use to refer to entities are different but in an
         equivalent order.
-        e.g. {"F1": "121", "F2": "233"} and {"F2": "122", "F1": "313"}
+        e.g. {"F1": "1,2,1", "F2": "2,0,0"} and {"F2": "1,2,2", "F1": "0,1,0"}
         """
-        assert make_holding["h1"] == make_holding["h1_really_the_same"]
+        assert make_holding["h1"] == make_holding["h1_entity_order"]
+
+    def test_holdings_different_entities_unequal(self, make_holding):
+        assert make_holding["h1"] != make_holding["h1_easy"]
+
+    def test_holdings_differing_in_entity_order_equal(self, make_holding):
+
+        assert make_holding["h1"] == make_holding["h1_entity_order"]
 
 
 class TestOpinions:
