@@ -474,7 +474,7 @@ class Procedure:
         return sorted(self.all_factors(), key=repr)
 
     def find_matches(self, self_factors, other_factors, m, matchlist, comparison="="):
-        matches = m.copy()
+        matches = tuple(m)
         sf = {f for f in self_factors}
         if not sf:
             matchlist.append(matches)
@@ -491,10 +491,11 @@ class Procedure:
                     or not matches[s.entity_context[i]]
                     for i in range(len(s))
                 ):
+                    matches_next = list(matches)
                     for i in range(len(s)):
-                        matches[s.entity_context[i]] = o.entity_context[i]
+                        matches_next[s.entity_context[i]] = o.entity_context[i]
                     matchlist = self.find_matches(
-                        sf, other_factors, matches, matchlist, comparison
+                        sf, other_factors, matches_next, matchlist, comparison
                     )
                 if s.predicate.reciprocal:  # please refactor
                     swapped = list(
@@ -505,10 +506,11 @@ class Procedure:
                         or not matches[s.entity_context[i]]
                         for i in range(len(s))
                     ):
+                        matches_next = list(matches)
                         for i in s.entity_context:
-                            matches[i] = swapped[i]
+                            matches_next[i] = swapped[i]
                         matchlist = self.find_matches(
-                            sf, other_factors, matches, matchlist, comparison
+                            sf, other_factors, matches_next, matchlist, comparison
                         )
         return matchlist
 
