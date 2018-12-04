@@ -394,11 +394,11 @@ class Procedure:
     Input factors are not treated as potential undercutters.
     Instead, they're assumed to be additional support in favor of the output.
     If a factor is relevant both as support for the output and as a potential
-    undercutter, include it in both 'inputs' and 'even_if'."""
+    undercutter, include it in both 'inputs' and 'despite'."""
 
     outputs: Union[Factor, Iterable[Factor]]
     inputs: Union[Factor, Iterable[Factor]] = frozenset([])
-    even_if: Union[Factor, Iterable[Factor]] = frozenset([])
+    despite: Union[Factor, Iterable[Factor]] = frozenset([])
 
     def __post_init__(self):
 
@@ -406,9 +406,9 @@ class Procedure:
             object.__setattr__(self, "outputs", frozenset((self.outputs,)))
         if isinstance(self.inputs, Factor):
             object.__setattr__(self, "inputs", frozenset((self.inputs,)))
-        if isinstance(self.even_if, Factor):
-            object.__setattr__(self, "even_if", frozenset((self.even_if,)))
-        for group in (self.outputs, self.inputs, self.even_if):
+        if isinstance(self.despite, Factor):
+            object.__setattr__(self, "despite", frozenset((self.despite,)))
+        for group in (self.outputs, self.inputs, self.despite):
             for x in group:
                 if not isinstance(x, Factor):
                     raise TypeError(
@@ -420,7 +420,7 @@ class Procedure:
 
         object.__setattr__(self, "outputs", frozenset(self.outputs))
         object.__setattr__(self, "inputs", frozenset(self.inputs))
-        object.__setattr__(self, "even_if", frozenset(self.even_if))
+        object.__setattr__(self, "despite", frozenset(self.despite))
 
     def __len__(self):
         """
@@ -444,9 +444,9 @@ class Procedure:
             text += "    Inputs:"
             for f in self.inputs:
                 text += "\n" + str(f)
-        if self.even_if:
+        if self.despite:
             text += "    Even if:"
-            for f in self.even_if:
+            for f in self.despite:
                 text += "\n" + str(f)
         if self.outputs:
             text += "    Outputs:"
@@ -481,8 +481,8 @@ class Procedure:
         """Returns a set of all factors."""
 
         inputs = self.inputs or set()
-        even_if = self.even_if or set()
-        return {*self.outputs, *inputs, *even_if}
+        despite = self.despite or set()
+        return {*self.outputs, *inputs, *despite}
 
     def sorted_factors(self) -> List[Factor]:
         """Sorts the procedure's factors into an order that will always be
@@ -548,7 +548,7 @@ class Procedure:
         for x in (
             (self.outputs, other.outputs),
             (self.inputs, other.inputs),
-            (self.even_if, other.even_if),
+            (self.despite, other.despite),
         ):
 
             # Not equal if self has any factor other lacks
@@ -578,8 +578,8 @@ class Procedure:
         Self does not imply other if any output of other
         is not equal to or implied by some output of self.
 
-        Self does not imply other if any even_if of other
-        is not equal to or implied by some even_if or input of self.
+        Self does not imply other if any despite of other
+        is not equal to or implied by some despite or input of self.
         """
 
         if not isinstance(other, Procedure):
@@ -589,12 +589,12 @@ class Procedure:
             return False
 
         matchlist = [tuple([None for i in range(len(self))])]
-        even_or_input = {*self.even_if, *self.inputs}
+        despite_or_input = {*self.despite, *self.inputs}
 
         for x in (
             (self.inputs, other.inputs),
             (other.outputs, self.outputs),
-            (other.even_if, even_or_input),
+            (other.despite, despite_or_input),
         ):
 
             for factor in x[0]:
@@ -626,7 +626,7 @@ class Procedure:
         Self does not imply other if any output of other
         is not equal to or implied by some output of self.
 
-        Self does not imply other if any even_if factors of other
+        Self does not imply other if any despite factors of other
         are contradicted by inputs of self.
         """
 
@@ -643,7 +643,7 @@ class Procedure:
         if any(
             [
                 any([factor.contradicts(other_factor) for factor in self.inputs])
-                for other_factor in other.even_if
+                for other_factor in other.despite
             ]
         ):
             return False
@@ -662,6 +662,19 @@ class Procedure:
                 matchlist = self.find_matches(x[0], x[1], m, matchlist, "<")
 
         return bool(matchlist)
+
+    def contradicts(self, other):
+        raise NotImplementedError(
+            "Procedures do not contradict one another unless one of them ",
+            "is designated 'exhaustive'. Consider using the 'exhaustive_implies' method.")
+
+    def exhaustive_contradicts(self, other):
+
+        """
+        Self contradicts other if:
+        Other has all the inputs of self, but an output of self
+        contradicts an output of other.
+        """
 
 
 @dataclass

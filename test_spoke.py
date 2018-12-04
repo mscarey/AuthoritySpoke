@@ -170,7 +170,7 @@ def make_procedure(make_factor) -> Dict[str, Procedure]:
         "c2": Procedure(
             outputs=(f["f10"],),
             inputs=(f["f4"], f["f5"], f["f6"], f["f7"], f["f9"]),
-            even_if=(f["f8"],),
+            despite=(f["f8"],),
         ),
         "c2_exact_quantity": Procedure(
             outputs=(f["f10"],),
@@ -181,10 +181,10 @@ def make_procedure(make_factor) -> Dict[str, Procedure]:
             inputs=(f["f4"], f["f5"], f["f6"], f["f7"], f["f8_higher_int"], f["f9"]),
         ),
 
-        "c2_exact_in_even_if": Procedure(
+        "c2_exact_in_despite": Procedure(
             outputs=(f["f10"],),
             inputs=(f["f4"], f["f5"], f["f6"], f["f7"]),
-            even_if=(f["f8_exact"],),
+            despite=(f["f8_exact"],),
         ),
         "c2_irrelevant_inputs": Procedure(
             outputs=(f["f10"],),
@@ -200,12 +200,12 @@ def make_procedure(make_factor) -> Dict[str, Procedure]:
                 f["f_irrelevant_3"],
                 f["f_irrelevant_3_new_context"],
             ),
-            even_if=(f["f8"],),
+            despite=(f["f8"],),
         ),
-        "c2_irrelevant_even_if": Procedure(
+        "c2_irrelevant_despite": Procedure(
             outputs=(f["f10"],),
             inputs=(f["f4"], f["f5"], f["f6"], f["f7"], f["f9"]),
-            even_if=(
+            despite=(
                 f["f8"],
                 f["f_irrelevant_0"],
                 f["f_irrelevant_1"],
@@ -217,12 +217,12 @@ def make_procedure(make_factor) -> Dict[str, Procedure]:
         "c2_reciprocal_swap": Procedure(
             outputs=(f["f10"],),
             inputs=(f["f4"], f["f5"], f["f6"], f["f7_swap_entities"], f["f9"]),
-            even_if=(f["f8"],),
+            despite=(f["f8"],),
         ),
         "c2_nonreciprocal_swap": Procedure(
             outputs=(f["f10"],),
             inputs=(f["f4_swap_entities"], f["f5"], f["f6"], f["f7"], f["f9"]),
-            even_if=(f["f8"],),
+            despite=(f["f8"],),
         ),
         "c2_broad_output": Procedure(
             outputs=(f["f8_int"],), inputs=(f["f4"], f["f5"], f["f6"], f["f7"], f["f9"])
@@ -638,31 +638,43 @@ class TestProcedure:
         assert make_procedure["c1_easy"] > make_procedure["c1_entity_order"]
         assert make_procedure["c1_easy"] != make_procedure["c1_entity_order"]
 
-    def test_procedure_exact_quantity_in_even_if_implication(self, make_procedure):
-        assert make_procedure["c2_exact_in_even_if"] > make_procedure["c2"]
+    def test_procedure_exact_quantity_in_despite_implication(self, make_procedure):
+        assert make_procedure["c2_exact_in_despite"] > make_procedure["c2"]
 
     def test_procedure_implication_despite_irrelevant_factors(self, make_procedure):
         assert make_procedure["c2"] > make_procedure["c2_irrelevant_inputs"]
 
     def test_exhaustive_implies(self, make_procedure):
-        assert not make_procedure["c2"] > make_procedure["c2_irrelevant_even_if"]
-        assert make_procedure["c2"].exhaustive_implies(make_procedure["c2_irrelevant_even_if"])
+        assert not make_procedure["c2"] > make_procedure["c2_irrelevant_despite"]
+        assert make_procedure["c2"].exhaustive_implies(make_procedure["c2_irrelevant_despite"])
 
-    def test_exhaustive_implies_input_of_self_same_as_even_if_of_other(self, make_procedure):
+    def test_exhaustive_implies_input_of_self_same_as_despite_of_other(self, make_procedure):
         """
-        Every input of c2_exact_in_even_if is equal to or implied by
-        some input of c2, and an input of c2 implies the even_if of c2_exact_in_even_if.
+        Every input of c2_exact_in_despite is equal to or implied by
+        some input of c2, and an input of c2 implies the despite of c2_exact_in_despite.
         """
         p = make_procedure
-        assert p["c2_exact_in_even_if"].exhaustive_implies(p["c2"])
+        assert p["c2_exact_in_despite"].exhaustive_implies(p["c2"])
 
-    def test_no_exhaustive_implies_when_input_contradicts_even_if(self, make_procedure):
+    def test_no_exhaustive_implies_when_input_contradicts_despite(self, make_procedure):
         """
         c2_higher_quantity has the right inputs, but it also has an
-        input that contradicts the even_if factor of c2_exact_in_even_if.
+        input that contradicts the despite factor of c2_exact_in_despite.
         """
         p = make_procedure
-        assert not p["c2_higher_quantity"].exhaustive_implies(p["c2_exact_in_even_if"])
+        assert not p["c2_higher_quantity"].exhaustive_implies(p["c2_exact_in_despite"])
+
+    def test_no_contradict_between_procedures(self, make_procedure):
+        """
+        It's not completely clear to me what assumptions are being made about
+        the context of a procedure when comparing them with __gt__,
+        exhaustive_implies, and exhaustive_contradicts.
+
+        I don't think "contradicts" is meaningful for Procedures, but I could be wrong.
+        """
+        p = make_procedure
+        with pytest.raises(NotImplementedError):
+            assert p["c2_higher_quantity"].contradicts(p["c2_exact_in_despite"])
 
 
 class TestHoldings:
