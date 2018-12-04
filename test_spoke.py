@@ -267,6 +267,8 @@ class TestPredicates:
     def test_quantity_string(self, make_predicate):
         assert str(make_predicate["p7"].quantity) == "35 foot"
 
+    def test_predicate_content_comparison(self, make_predicate):
+        assert make_predicate["p8_exact"].content == make_predicate["p7"].content
     def test_predicate_equality(self, make_predicate):
         assert make_predicate["p1"] == make_predicate["p1_again"]
 
@@ -283,6 +285,7 @@ class TestPredicates:
 
     def test_greater_than_because_of_quantity(self, make_predicate):
         assert make_predicate["p8_meters"] > make_predicate["p8"]
+        assert make_predicate["p8_meters"] != make_predicate["p8"]
 
     def test_equal_float_and_int(self, make_predicate):
         assert make_predicate["p8_int"] == make_predicate["p8_float"]
@@ -314,8 +317,8 @@ class TestPredicates:
         assert not make_predicate["p7_true"].contradicts(make_factor["f7"])
 
     def test_no_implication_with_inconsistent_dimensionality(self, make_predicate):
-        assert not make_predicate["p9"] > make_predicate["p9_acres"]
-        assert not make_predicate["p9"] < make_predicate["p9_acres"]
+        assert not make_predicate["p9"] >= make_predicate["p9_acres"]
+        assert not make_predicate["p9"] <= make_predicate["p9_acres"]
 
     def test_no_contradiction_with_inconsistent_dimensionality(self, make_predicate):
         assert not make_predicate["p9"].contradicts(make_predicate["p9_acres"])
@@ -323,9 +326,6 @@ class TestPredicates:
 
     def test_no_equality_with_inconsistent_dimensionality(self, make_predicate):
         assert make_predicate["p9"] != make_predicate["p9_acres"]
-
-    def test_predicate_content_comparison(self, make_predicate):
-        assert make_predicate["p8_exact"].content == make_predicate["p7"].content
 
 
 class TestFactors:
@@ -425,16 +425,21 @@ class TestFactors:
         assert make_factor["f9_absent_miles"].contradicts(make_factor["f9"])
         assert make_factor["f9"].contradicts(make_factor["f9_absent_miles"])
 
-    def test_copies_of_identical_factor(self, make_factor, make_predicate):
+    def test_copies_of_identical_factor(self, make_factor):
         """
         Even if the two factors have different entity markers in self.entity_context,
         I expect them to evaluate equal because the choice of entity markers is
         arbitrary.
         """
-        assert make_factor["f_irrelevant_3"] == make_factor["f_irrelevant_3"]
-        assert (
-            make_factor["f_irrelevant_3"] == make_factor["f_irrelevant_3_new_context"]
-        )
+        f = make_factor
+        assert f["f_irrelevant_3"] == f["f_irrelevant_3"]
+        assert f["f_irrelevant_3"] == f["f_irrelevant_3_new_context"]
+
+    def test_equal_factors_not_gt(self, make_factor):
+        f = make_factor
+        assert f["f_irrelevant_3"] >= f["f_irrelevant_3_new_context"]
+        assert f["f_irrelevant_3"] <= f["f_irrelevant_3_new_context"]
+        assert not f["f_irrelevant_3"] > f["f_irrelevant_3_new_context"]
 
 
 class TestProcedure:
@@ -548,9 +553,7 @@ class TestProcedure:
         c1_order = make_procedure["c1_entity_order"]
         assert any(factor == f["f2"] for factor in c1_easy.inputs)
         assert all(factor != f["f1"] for factor in c1_easy.inputs)
-        assert c1_easy > c1_order
-        assert c1_order < c1_easy
-        assert c1_easy != c1_order
+
 
     def test_procedure_implication_with_exact_quantity(
         self, make_factor, make_procedure
@@ -584,7 +587,7 @@ class TestProcedure:
         c2 = make_procedure["c2"]
         c2_reciprocal_swap = make_procedure["c2_reciprocal_swap"]
         assert c2 == c2_reciprocal_swap
-        assert c2 > c2_reciprocal_swap
+        assert c2 >= c2_reciprocal_swap
 
     def test_entities_of_implied_quantity_outputs_for_implied_procedure(
         self, make_procedure
@@ -601,10 +604,20 @@ class TestProcedure:
         assert c2_narrow > c2_broad
 
     def test_procedure_implies_identical_procedure(self, make_procedure):
-        assert make_procedure["c1"] > make_procedure["c1_again"]
+        assert make_procedure["c1"] >= make_procedure["c1_again"]
+        assert make_procedure["c1"] == make_procedure["c1_again"]
 
     def test_procedure_implies_same_procedure_more_inputs(self, make_procedure):
+
         assert make_procedure["c1_easy"] > make_procedure["c1"]
+        assert make_procedure["c1_easy"] >= make_procedure["c1"]
+        assert make_procedure["c1_easy"] != make_procedure["c1"]
+
+    def test_procedure_implies_reordered_entities_more_inputs(self, make_procedure):
+
+        assert make_procedure["c1_entity_order"] < make_procedure["c1_easy"]
+        assert make_procedure["c1_easy"] > make_procedure["c1_entity_order"]
+        assert make_procedure["c1_easy"] != make_procedure["c1_entity_order"]
 
     def test_procedure_exact_quantity_in_even_if_implication(self, make_procedure):
         assert make_procedure["c2_exact_in_even_if"] > make_procedure["c2"]

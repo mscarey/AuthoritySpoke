@@ -146,13 +146,13 @@ class Predicate:
         return False
 
     def __gt__(self, other) -> bool:
-        """Indicates whether self implies the other predicate, which is True if
-        they're equal or if their statements about quantity imply it."""
+        """Indicates whether self implies the other predicate, which is True
+        if their statements about quantity imply it."""
 
         if not isinstance(other, self.__class__):
             return False
         if self == other:
-            return True
+            return False
         # Assumes no predicate implies another based on meaning of their content text
         if not (
             self.content.lower() == other.content.lower()
@@ -199,8 +199,10 @@ class Predicate:
                 return True
         return False
 
-    def __lt__(self, other) -> bool:
-        return other > self
+    def __ge__(self, other):
+        if self == other:
+            return True
+        return self > other
 
     def contradicts(self, other):
         """This first tries to find a contradiction based on the relationship
@@ -338,9 +340,16 @@ class Fact(Factor):
 
         if not isinstance(other, self.__class__):
             return False
-        if self.predicate > other.predicate and self.absent == other.absent:
+        if self == other:
+            return False
+        if self.predicate >= other.predicate and self.absent == other.absent:
             return True
         return False
+
+    def __ge__(self, other):
+        if self == other:
+            return True
+        return self > other
 
     def predicate_in_context(self, entities: Sequence[Entity]) -> str:
         return (
@@ -355,9 +364,9 @@ class Fact(Factor):
             self.absent | other.absent
         ):
             return True
-        if self.predicate > other.predicate and other.absent and not self.absent:
+        if self.predicate >= other.predicate and other.absent and not self.absent:
             return True
-        if other.predicate > self.predicate and self.absent and not other.absent:
+        if other.predicate >= self.predicate and self.absent and not other.absent:
             return True
         return False
 
@@ -483,8 +492,8 @@ class Procedure:
         for o in other_factors:
             if (
                 (comparison == "=" and s == o)
-                or (comparison == "<" and s < o)
-                or (comparison == ">" and s > o)
+                or (comparison == "<" and s <= o)
+                or (comparison == ">" and s >= o)
             ):
                 if all(
                     matches[s.entity_context[i]] == o.entity_context[i]
@@ -560,12 +569,15 @@ class Procedure:
         if not isinstance(other, Procedure):
             return False
 
+        if self == other:
+            return False
+
         matchlist_0 = [[None for i in range(len(self))]]
 
         # Self does not imply other if any input of self
         # is not implied by some input of other
         for factor in self.inputs:
-            if not any(factor < other_factor for other_factor in other.inputs):
+            if not any(factor <= other_factor for other_factor in other.inputs):
                 return False
 
         matchlist_1 = []
@@ -577,7 +589,7 @@ class Procedure:
         # Self does not imply other if any output of other
         # is not implied by some output of self
         for other_factor in other.outputs:
-            if not any(other_factor < factor for factor in self.outputs):
+            if not any(other_factor <= factor for factor in self.outputs):
                 return False
 
         matchlist_2 = []
@@ -590,7 +602,7 @@ class Procedure:
         # is not implied by some even_if or input of self
         even_or_input = {*self.even_if, *self.inputs}
         for other_factor in other.even_if:
-            if not any(other_factor < factor for factor in even_or_input):
+            if not any(other_factor <= factor for factor in even_or_input):
                 return False
 
         matchlist_3 = []
@@ -600,6 +612,11 @@ class Procedure:
             )
 
         return bool(matchlist_3)
+
+    def __ge__(self, other):
+        if self == other:
+            return True
+        return self > other
 
     def exhaustive_implies(self, other):
         """
@@ -632,16 +649,6 @@ class Holding:
     universal: bool = False
     rule_valid: Union[bool, None] = True
 
-    def __eq__(self, other) -> bool:
-        if not isinstance(other, self.__class__):
-            return False
-
-        return (
-            self.procedure == other.procedure
-            and self.mandatory == other.mandatory
-            and self.universal == other.universal
-            and self.rule_valid == other.rule_valid
-        )
 
 
 def opinion_from_file(path):
