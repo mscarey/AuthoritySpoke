@@ -42,6 +42,7 @@ class Human(Entity):
 
     pass
 
+
 @dataclass()
 class Event(Entity):
     """
@@ -49,6 +50,7 @@ class Event(Entity):
     See Lepore, Ernest. Meaning and Argument: An Introduction to Logic
     Through Language. Section 17.2: The Event Approach
     """
+
 
 @dataclass(frozen=True)
 class Predicate:
@@ -602,9 +604,7 @@ class Procedure:
             prior_list = tuple(matchlist)
             matchlist = []
             for m in prior_list:
-                matchlist = self.find_matches(
-                    x[0], x[1], m, matchlist, "<"
-                )
+                matchlist = self.find_matches(x[0], x[1], m, matchlist, "<")
 
         return bool(matchlist)
 
@@ -620,13 +620,48 @@ class Procedure:
         circumstances needed to invoke the procedure (i.e. when the rule "always" applies
         when the inputs are present).
 
-        For other to imply self:
-        All outputs of other are implied by outputs of self with matching entities
-        All inputs of self are implied by inputs of other with matching entities
-        No even_if factors of other are contradicted by inputs of self
+        Self does not imply other if any input of self
+        is not equal to or implied by some input of other.
+
+        Self does not imply other if any output of other
+        is not equal to or implied by some output of self.
+
+        Self does not imply other if any even_if factors of other
+        are contradicted by inputs of self.
         """
 
-        pass
+        if not isinstance(other, Procedure):
+            return False
+
+        # This is more consistent with __ge__ than __gt__.
+        # I can't think of a use case for the __gt__ behavior of
+        # returning False when the Procedures are equal.
+
+        if self == other:
+            return True
+
+        if any(
+            [
+                any([factor.contradicts(other_factor) for factor in self.inputs])
+                for other_factor in other.even_if
+            ]
+        ):
+            return False
+
+        matchlist = [tuple([None for i in range(len(self))])]
+
+        for x in ((self.inputs, other.inputs), (other.outputs, self.outputs)):
+
+            for factor in x[0]:
+                if not any(factor <= other_factor for other_factor in x[1]):
+                    return False
+
+            prior_list = tuple(matchlist)
+            matchlist = []
+            for m in prior_list:
+                matchlist = self.find_matches(x[0], x[1], m, matchlist, "<")
+
+        return bool(matchlist)
 
 
 @dataclass
@@ -643,7 +678,6 @@ class Holding:
     mandatory: bool = False
     universal: bool = False
     rule_valid: Union[bool, None] = True
-
 
 
 def opinion_from_file(path):

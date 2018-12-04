@@ -176,6 +176,11 @@ def make_procedure(make_factor) -> Dict[str, Procedure]:
             outputs=(f["f10"],),
             inputs=(f["f4"], f["f5"], f["f6"], f["f8_exact"], f["f9"]),
         ),
+        "c2_higher_quantity": Procedure(
+            outputs=(f["f10"],),
+            inputs=(f["f4"], f["f5"], f["f6"], f["f7"], f["f8_higher_int"], f["f9"]),
+        ),
+
         "c2_exact_in_even_if": Procedure(
             outputs=(f["f10"],),
             inputs=(f["f4"], f["f5"], f["f6"], f["f7"]),
@@ -196,6 +201,18 @@ def make_procedure(make_factor) -> Dict[str, Procedure]:
                 f["f_irrelevant_3_new_context"],
             ),
             even_if=(f["f8"],),
+        ),
+        "c2_irrelevant_even_if": Procedure(
+            outputs=(f["f10"],),
+            inputs=(f["f4"], f["f5"], f["f6"], f["f7"], f["f9"]),
+            even_if=(
+                f["f8"],
+                f["f_irrelevant_0"],
+                f["f_irrelevant_1"],
+                f["f_irrelevant_2"],
+                f["f_irrelevant_3"],
+                f["f_irrelevant_3_new_context"],
+            ),
         ),
         "c2_reciprocal_swap": Procedure(
             outputs=(f["f10"],),
@@ -269,6 +286,7 @@ class TestPredicates:
 
     def test_predicate_content_comparison(self, make_predicate):
         assert make_predicate["p8_exact"].content == make_predicate["p7"].content
+
     def test_predicate_equality(self, make_predicate):
         assert make_predicate["p1"] == make_predicate["p1_again"]
 
@@ -532,6 +550,10 @@ class TestProcedure:
             ),
         ]
 
+    def test_procedure_string_with_entities(self, make_procedure):
+        assert "Fact: 2 performed at 4" in str(make_procedure["c2_irrelevant_inputs"])
+        assert "Fact: 3 performed at 4" in str(make_procedure["c2_irrelevant_inputs"])
+
     def test_entities_of_inputs_for_identical_procedure(
         self, make_factor, make_procedure
     ):
@@ -554,7 +576,6 @@ class TestProcedure:
         assert any(factor == f["f2"] for factor in c1_easy.inputs)
         assert all(factor != f["f1"] for factor in c1_easy.inputs)
 
-
     def test_procedure_implication_with_exact_quantity(
         self, make_factor, make_procedure
     ):
@@ -573,9 +594,7 @@ class TestProcedure:
         assert c2 > c2_exact_quantity
         assert not c2_exact_quantity > c2
 
-    def test_implied_procedure_with_reciprocal_entities(
-        self, make_procedure
-    ):
+    def test_implied_procedure_with_reciprocal_entities(self, make_procedure):
         """
         Because both procedures have a form of "The distance between {} and {} was {}"
         factor and those factors are reciprocal, the entities of one of them in reversed
@@ -625,9 +644,25 @@ class TestProcedure:
     def test_procedure_implication_despite_irrelevant_factors(self, make_procedure):
         assert make_procedure["c2"] > make_procedure["c2_irrelevant_inputs"]
 
-    def test_procedure_string_with_entities(self, make_procedure):
-        assert "Fact: 2 performed at 4" in str(make_procedure["c2_irrelevant_inputs"])
-        assert "Fact: 3 performed at 4" in str(make_procedure["c2_irrelevant_inputs"])
+    def test_exhaustive_implies(self, make_procedure):
+        assert not make_procedure["c2"] > make_procedure["c2_irrelevant_even_if"]
+        assert make_procedure["c2"].exhaustive_implies(make_procedure["c2_irrelevant_even_if"])
+
+    def test_exhaustive_implies_input_of_self_same_as_even_if_of_other(self, make_procedure):
+        """
+        Every input of c2_exact_in_even_if is equal to or implied by
+        some input of c2, and an input of c2 implies the even_if of c2_exact_in_even_if.
+        """
+        p = make_procedure
+        assert p["c2_exact_in_even_if"].exhaustive_implies(p["c2"])
+
+    def test_no_exhaustive_implies_when_input_contradicts_even_if(self, make_procedure):
+        """
+        c2_higher_quantity has the right inputs, but it also has an
+        input that contradicts the even_if factor of c2_exact_in_even_if.
+        """
+        p = make_procedure
+        assert not p["c2_higher_quantity"].exhaustive_implies(p["c2_exact_in_even_if"])
 
 
 class TestHoldings:
