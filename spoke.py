@@ -34,12 +34,21 @@ class Entity:
 
 @dataclass()
 class Human(Entity):
-    """A "natural person" mentioned as an entity in a factor. On the distinction
+    """
+    A "natural person" mentioned as an entity in a factor. On the distinction
     between "human" and "person", see Slaughter-House Cases, 83 U.S. 36, 99.
-    https://www.courtlistener.com/opinion/88661/slaughter-house-cases/"""
+    https://www.courtlistener.com/opinion/88661/slaughter-house-cases/
+    """
 
     pass
 
+@dataclass()
+class Event(Entity):
+    """
+    Events may be referenced as entities in a predicate's content.
+    See Lepore, Ernest. Meaning and Argument: An Introduction to Logic
+    Through Language. Section 17.2: The Event Approach
+    """
 
 @dataclass(frozen=True)
 class Predicate:
@@ -51,16 +60,12 @@ class Predicate:
     A predicate's self.content string shows where references to specific
     entities from the case can be used as subjects or objects of the predicate.
 
-    Events may be referenced as entities in a predicate's content.
-    See Lepore, Ernest. Meaning and Argument: An Introduction to Logic
-    Through Language. Section 17.2: The Event Approach
-
     If self.reciprocal is True, then the order of the first two entities will
     be considered interchangeable. There's no way to make any entities
     interchangeable other than the first two.
 
     A predicate can also end with a comparison to some quantity, as described
-    by a ureg. Quantity object from the pint library. See pint.readthedocs.io.
+    by a ureg.Quantity object from the pint library. See pint.readthedocs.io.
 
     If a quantity is defined, a "comparison" should also be defined. That's
     a string indicating whether the thing described by the predicate is
@@ -146,13 +151,15 @@ class Predicate:
         return False
 
     def __gt__(self, other) -> bool:
-        """Indicates whether self implies the other predicate, which is True
-        if their statements about quantity imply it."""
+        """Indicates whether self implies the other predicate,
+        which is True if their statements about quantity imply it.
+        Returns False if self and other are equal."""
 
         if not isinstance(other, self.__class__):
             return False
         if self == other:
             return False
+
         # Assumes no predicate implies another based on meaning of their content text
         if not (
             self.content.lower() == other.content.lower()
@@ -516,8 +523,8 @@ class Procedure:
                         for i in range(len(s))
                     ):
                         matches_next = list(matches)
-                        for i in s.entity_context:
-                            matches_next[i] = swapped[i]
+                        for i in range(len(s)):
+                            matches_next[s.entity_context[i]] = swapped[i]
                         matchlist = self.find_matches(
                             sf, other_factors, matches_next, matchlist, comparison
                         )
@@ -534,7 +541,7 @@ class Procedure:
         if len(other) != len(self):  # redundant?
             return False
 
-        matchlist = [[None for i in range(len(self))]]
+        matchlist = [tuple([None for i in range(len(self))])]
 
         for x in (
             (self.outputs, other.outputs),
@@ -552,9 +559,7 @@ class Procedure:
                 if not any(factor == other_factor for factor in x[0]):
                     return False
 
-            # converting to prior_list to start over searching for new matches
-            # when moving from outputs to inputs or to even_if
-            prior_list = matchlist.copy()
+            prior_list = tuple(matchlist)
             matchlist = []
             for m in prior_list:
                 matchlist = self.find_matches(x[0], x[1], m, matchlist)
@@ -564,6 +569,15 @@ class Procedure:
     def __gt__(self, other):
         """
         Tests whether self implies other.
+
+        Self does not imply other if any input of self
+        is not equal to or implied by some input of other.
+
+        Self does not imply other if any output of other
+        is not equal to or implied by some output of self.
+
+        Self does not imply other if any even_if of other
+        is not equal to or implied by some even_if or input of self.
         """
 
         if not isinstance(other, Procedure):
@@ -572,46 +586,27 @@ class Procedure:
         if self == other:
             return False
 
-        matchlist_0 = [[None for i in range(len(self))]]
-
-        # Self does not imply other if any input of self
-        # is not implied by some input of other
-        for factor in self.inputs:
-            if not any(factor <= other_factor for other_factor in other.inputs):
-                return False
-
-        matchlist_1 = []
-        for m in matchlist_0:
-            matchlist_1 = self.find_matches(
-                self.inputs, other.inputs, m, matchlist_1, "<"
-            )
-
-        # Self does not imply other if any output of other
-        # is not implied by some output of self
-        for other_factor in other.outputs:
-            if not any(other_factor <= factor for factor in self.outputs):
-                return False
-
-        matchlist_2 = []
-        for m in matchlist_1:
-            matchlist_2 = self.find_matches(
-                other.outputs, self.outputs, m, matchlist_2, "<"
-            )
-
-        # Self does not imply other if any even_if of other
-        # is not implied by some even_if or input of self
+        matchlist = [tuple([None for i in range(len(self))])]
         even_or_input = {*self.even_if, *self.inputs}
-        for other_factor in other.even_if:
-            if not any(other_factor <= factor for factor in even_or_input):
-                return False
 
-        matchlist_3 = []
-        for m in matchlist_2:
-            matchlist_3 = self.find_matches(
-                other.even_if, even_or_input, m, matchlist_3, "<"
-            )
+        for x in (
+            (self.inputs, other.inputs),
+            (other.outputs, self.outputs),
+            (other.even_if, even_or_input),
+        ):
 
-        return bool(matchlist_3)
+            for factor in x[0]:
+                if not any(factor <= other_factor for other_factor in x[1]):
+                    return False
+
+            prior_list = tuple(matchlist)
+            matchlist = []
+            for m in prior_list:
+                matchlist = self.find_matches(
+                    x[0], x[1], m, matchlist, "<"
+                )
+
+        return bool(matchlist)
 
     def __ge__(self, other):
         if self == other:
