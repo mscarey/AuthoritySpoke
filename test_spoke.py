@@ -8,8 +8,8 @@ import pytest
 
 from spoke import Entity, Human
 from spoke import Predicate, Factor, Fact
-from spoke import Procedure, Holding, Opinion
-from spoke import opinion_from_file
+from spoke import Procedure, Holding, ProceduralHolding
+from spoke import Opinion, opinion_from_file
 from spoke import ureg, Q_
 
 
@@ -235,14 +235,14 @@ def make_procedure(make_factor) -> Dict[str, Procedure]:
 
 
 @pytest.fixture
-def make_holding(make_procedure) -> Dict[str, Holding]:
+def make_holding(make_procedure) -> Dict[str, ProceduralHolding]:
     c = make_procedure
 
     return {
-        "h1": Holding(c["c1"]),
-        "h1_again": Holding(c["c1"]),
-        "h1_entity_order": Holding(c["c1_entity_order"]),
-        "h1_easy": Holding(c["c1_easy"]),
+        "h1": ProceduralHolding(c["c1"]),
+        "h1_again": ProceduralHolding(c["c1"]),
+        "h1_entity_order": ProceduralHolding(c["c1_entity_order"]),
+        "h1_easy": ProceduralHolding(c["c1_easy"]),
     }
 
 
@@ -692,6 +692,9 @@ class TestHoldings:
 
     def test_holdings_different_entities_unequal(self, make_holding):
         assert make_holding["h1"] != make_holding["h1_easy"]
+
+    def test_holdings_fewer_inputs_implies_more(self, make_holding):
+        assert make_holding["h1_easy"] > make_holding["h1"]
 
     def test_holdings_differing_in_entity_order_equal(self, make_holding):
 

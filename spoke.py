@@ -666,31 +666,110 @@ class Procedure:
     def contradicts(self, other):
         raise NotImplementedError(
             "Procedures do not contradict one another unless one of them ",
-            "is designated 'exhaustive'. Consider using the 'exhaustive_implies' method.")
+            "is designated 'exhaustive'. Consider using the 'exhaustive_implies' method.",
+        )
 
     def exhaustive_contradicts(self, other):
-
         """
         Self contradicts other if:
         Other has all the inputs of self, but an output of self
         contradicts an output of other.
         """
+        pass
 
 
 @dataclass
 class Holding:
-    """A statement in which a court posits a legal rule as authoritative,
+    """
+    A statement in which a court posits a legal rule as authoritative,
     deciding some aspect of the current litigation but also potentially
     binding future courts to follow the rule. When holdings appear in
     judicial opinions they are often hypothetical and don't necessarily
     imply that the court accepts the factual assertions or other factors
     that make up the inputs or outputs of the procedure mentioned in the
-    holding."""
+    holding.
 
-    procedure: Optional[Procedure] = None
+
+    Parameters:
+        rule_valid (bool): True means the procedure or attribution
+        is a valid legal rule. False means it's not a valid legal
+        rule. None means that the rule should be deemed undecided.
+        However, if an opinion merely says the court is not deciding
+        whether a procedure or attribution is valid, there is no
+        holding, and no Holding object should be created. Deciding not
+        to decide a rule's validity is not the same thing
+        as deciding that a rule is undecided.
+    """
+
+
+@dataclass
+class ProceduralHolding(Holding):
+
+    """
+    procedure (Procedure): optional because a holding can contain
+    an attribution instead of a holding
+
+    mandatory (bool): whether the procedure is mandatory for the
+    court to apply whenever the holding is properly invoked. False
+    may be used for procedures deemed "discretionary".
+    Not applicable to attributions.
+
+    universal (bool): True if the procedure is applicable whenever
+    its inputs are present. False means that the procedure is
+    applicable in "some" situation where the facts are present.
+    Not applicable to attributions.
+    """
+
+    procedure: Procedure
     mandatory: bool = False
     universal: bool = False
     rule_valid: Union[bool, None] = True
+
+    def __gt__(self, other) -> bool:
+        """Returns a boolean indicating whether self implies other,
+        where other is another Holding."""
+
+        if not isinstance(other, self.__class__):
+            return False
+
+        if self.rule_valid != other.rule_valid:
+            return False
+
+        # In SOME cases where A, the output MUST/MAY be X
+        # does imply:
+        # In ALL cases where A, the output MAY be X
+        if (
+            self.rule_valid
+            and other.rule_valid
+            and not self.universal
+            and not other.universal
+            and self.mandatory >= other.mandatory
+        ):
+            return self.procedure >= other.procedure
+
+        # In SOME cases where A, the output MUST/MAY be X
+        # can never imply:
+        # In ALL cases where A, the output MUST/MAY be X
+        if (
+            self.rule_valid
+            and other.rule_valid
+            and other.universal
+            and not self.universal
+        ):
+            return False
+
+        # In NO cases where A, the output MUST/MAY be X
+        # does imply:
+        # In NOT ALL/NO cases where A, the output MUST be X
+        if (
+            not self.rule_valid
+            and not other.rule_valid
+            and other.universal >= self.universal
+            and other.mandatory >= self.mandatory
+        ):
+            return self.procedure.exhaustive_implies(other.procedure)
+
+        raise NotImplementedError("Haven't reached that case yet.")
 
 
 def opinion_from_file(path):
