@@ -386,6 +386,15 @@ class Fact(Factor):
 
 
 @dataclass(frozen=True)
+class Evidence(Factor):
+
+    form: Optional[str] = None
+    physical_object: Optional[Entity] = None
+    derived_from: Optional[Entity] = None
+    to_effect: Optional[Predicate] = None
+    absent: bool = False
+
+@dataclass(frozen=True)
 class Procedure:
     """A (potential) rule for courts to use in resolving litigation. Described in
     terms of inputs and outputs, and also potentially "even if" factors, which could
@@ -678,6 +687,8 @@ class Procedure:
         pass
 
 
+
+
 @dataclass
 class Holding:
     """
@@ -690,15 +701,6 @@ class Holding:
     holding.
 
 
-    Parameters:
-        rule_valid (bool): True means the procedure or attribution
-        is a valid legal rule. False means it's not a valid legal
-        rule. None means that the rule should be deemed undecided.
-        However, if an opinion merely says the court is not deciding
-        whether a procedure or attribution is valid, there is no
-        holding, and no Holding object should be created. Deciding not
-        to decide a rule's validity is not the same thing
-        as deciding that a rule is undecided.
     """
 
 
@@ -718,6 +720,15 @@ class ProceduralHolding(Holding):
     its inputs are present. False means that the procedure is
     applicable in "some" situation where the facts are present.
     Not applicable to attributions.
+
+    rule_valid (bool): True means the procedure or attribution
+    is a valid legal rule. False means it's not a valid legal
+    rule. None means that the rule should be deemed undecided.
+    However, if an opinion merely says the court is not deciding
+    whether a procedure or attribution is valid, there is no
+    holding, and no Holding object should be created. Deciding not
+    to decide a rule's validity is not the same thing
+    as deciding that a rule is undecided.
     """
 
     procedure: Procedure
@@ -771,6 +782,13 @@ class ProceduralHolding(Holding):
 
         raise NotImplementedError("Haven't reached that case yet.")
 
+    def contradicts(self, other):
+        """
+        Accomplished by testing whether self would imply other if
+        other had an opposite value for rule_valid? What if
+        rule_valid was None (undecided)?
+        """
+        pass
 
 def opinion_from_file(path):
     """This is a generator that gets one opinion from a

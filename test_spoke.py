@@ -107,6 +107,19 @@ def make_predicate() -> Dict[str, Predicate]:
             quantity=Q_("5 acres"),
         ),
         "p10": Predicate("{} was within the curtilage of {}"),
+        "p11": Predicate("{} was a warrantless search and seizure"),
+        "p12": Predicate("{} was performed by federal law enforcement officers"),
+        "p13": Predicate("{} constituted an intrusion upon {}"),
+        "p14": Predicate("{} sought to preserve {} as private"),
+        "p15": Predicate("{} was in an area adjacent to {}"),
+        "p16": Predicate("{} was in an area accessible to the public"),
+        "p17": Predicate(
+            "In {}, several law enforcement officials meticulously went through {}"
+        ),
+        "p18": Predicate(
+            "{} continued for {}", comparison=">=", quantity=Q_("385 minutes")
+        ),
+        "p19": Predicate("{} continued after night fell"),
         "p_irrelevant_0": Predicate("{} was a clown"),
         "p_irrelevant_1": Predicate("{} was a bear"),
         "p_irrelevant_2": Predicate("{} was a circus"),
@@ -147,6 +160,15 @@ def make_factor(make_predicate) -> Dict[str, Factor]:
         "f9_absent": Fact(p["p9"], absent=True),
         "f9_absent_miles": Fact(p["p9_miles"], absent=True),
         "f10": Fact(p["p10"]),
+        "f11": Fact(p["p11"]),
+        "f12": Fact(p["p12"]),
+        "f13": Fact(p["p13"]),
+        "f14": Fact(p["p14"]),
+        "f15": Fact(p["p15"]),
+        "f16": Fact(p["p16"]),
+        "f17": Fact(p["p17"]),
+        "f18": Fact(p["p18"]),
+        "f19": Fact(p["p19"]),
         "f_irrelevant_0": Fact(p["p_irrelevant_0"], (2,)),
         "f_irrelevant_1": Fact(p["p_irrelevant_1"], (3,)),
         "f_irrelevant_2": Fact(p["p_irrelevant_2"], (4,)),
@@ -180,7 +202,6 @@ def make_procedure(make_factor) -> Dict[str, Procedure]:
             outputs=(f["f10"],),
             inputs=(f["f4"], f["f5"], f["f6"], f["f7"], f["f8_higher_int"], f["f9"]),
         ),
-
         "c2_exact_in_despite": Procedure(
             outputs=(f["f10"],),
             inputs=(f["f4"], f["f5"], f["f6"], f["f7"]),
@@ -231,6 +252,11 @@ def make_procedure(make_factor) -> Dict[str, Procedure]:
             outputs=(f["f8_higher_int"],),
             inputs=(f["f4"], f["f5"], f["f6"], f["f7"], f["f9"]),
         ),
+        #"c3": Procedure(
+        #    outputs=f["f20"],
+        #    inputs=(f["f3"], f["f11"], f["12"], f["13"], f["14"], f["15"]),
+        #    despite=(f["f16"]),
+        #)
     }
 
 
@@ -243,6 +269,9 @@ def make_holding(make_procedure) -> Dict[str, ProceduralHolding]:
         "h1_again": ProceduralHolding(c["c1"]),
         "h1_entity_order": ProceduralHolding(c["c1_entity_order"]),
         "h1_easy": ProceduralHolding(c["c1_easy"]),
+        "h2": ProceduralHolding(c["c2"]),
+        "h2_exact_quantity": ProceduralHolding(c["c2_exact_quantity"]),
+        "h2_reciprocal_swap": ProceduralHolding(c["c2_reciprocal_swap"]),
     }
 
 
@@ -583,7 +612,7 @@ class TestProcedure:
         exactly 25" factor in c2_exact, and recognizes that factor can imply
         the "distance is more than 20" factor in c2 if they have the same entities.
         """
-
+        # BUG: inconsistent with test_holdings_more_specific_quantity_implies_less_specific
         f = make_factor
         c2 = make_procedure["c2"]
         c2_exact_quantity = make_procedure["c2_exact_quantity"]
@@ -646,9 +675,13 @@ class TestProcedure:
 
     def test_exhaustive_implies(self, make_procedure):
         assert not make_procedure["c2"] > make_procedure["c2_irrelevant_despite"]
-        assert make_procedure["c2"].exhaustive_implies(make_procedure["c2_irrelevant_despite"])
+        assert make_procedure["c2"].exhaustive_implies(
+            make_procedure["c2_irrelevant_despite"]
+        )
 
-    def test_exhaustive_implies_input_of_self_same_as_despite_of_other(self, make_procedure):
+    def test_exhaustive_implies_input_of_self_same_as_despite_of_other(
+        self, make_procedure
+    ):
         """
         Every input of c2_exact_in_despite is equal to or implied by
         some input of c2, and an input of c2 implies the despite of c2_exact_in_despite.
@@ -693,13 +726,14 @@ class TestHoldings:
     def test_holdings_different_entities_unequal(self, make_holding):
         assert make_holding["h1"] != make_holding["h1_easy"]
 
+    def test_holdings_differing_in_entity_order_equal(self, make_holding):
+        assert make_holding["h1"] == make_holding["h1_entity_order"]
+
     def test_holdings_fewer_inputs_implies_more(self, make_holding):
         assert make_holding["h1_easy"] > make_holding["h1"]
 
-    def test_holdings_differing_in_entity_order_equal(self, make_holding):
-
-        assert make_holding["h1"] == make_holding["h1_entity_order"]
-
+    def test_holdings_more_specific_quantity_implies_less_specific(self, make_holding):
+        assert make_holding["h2_exact_quantity"] > make_holding["h2"]
 
 class TestOpinions:
     def test_load_opinion_in_Harvard_format(self):
