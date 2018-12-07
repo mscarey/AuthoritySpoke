@@ -204,7 +204,7 @@ def make_procedure(make_factor) -> Dict[str, Procedure]:
         ),
         "c2_exact_in_despite": Procedure(
             outputs=(f["f10"],),
-            inputs=(f["f4"], f["f5"], f["f6"], f["f7"]),
+            inputs=(f["f4"], f["f5"], f["f6"], f["f7"], f["f9"]),
             despite=(f["f8_exact"],),
         ),
         "c2_irrelevant_inputs": Procedure(
@@ -460,6 +460,7 @@ class TestFactors:
 
     def test_factor_implies_because_of_exact_quantity(self, make_factor):
         assert make_factor["f8_exact"] > make_factor["f7"]
+        assert make_factor["f8_exact"] >= make_factor["f8"]
 
     def test_absent_factor_implies_absent_factor_with_greater_quantity(
         self, make_factor
@@ -612,7 +613,7 @@ class TestProcedure:
         exactly 25" factor in c2_exact, and recognizes that factor can imply
         the "distance is more than 20" factor in c2 if they have the same entities.
         """
-        # BUG: inconsistent with test_holdings_more_specific_quantity_implies_less_specific
+
         f = make_factor
         c2 = make_procedure["c2"]
         c2_exact_quantity = make_procedure["c2_exact_quantity"]
@@ -620,8 +621,8 @@ class TestProcedure:
         assert f["f7"] in c2.inputs
         assert f["f7"] not in c2_exact_quantity.inputs
         assert f["f8_exact"] > f["f7"]
-        assert c2 > c2_exact_quantity
-        assert not c2_exact_quantity > c2
+        assert c2 < c2_exact_quantity
+        assert not c2_exact_quantity < c2
 
     def test_implied_procedure_with_reciprocal_entities(self, make_procedure):
         """
@@ -655,23 +656,23 @@ class TestProcedure:
         assert make_procedure["c1"] >= make_procedure["c1_again"]
         assert make_procedure["c1"] == make_procedure["c1_again"]
 
-    def test_procedure_implies_same_procedure_more_inputs(self, make_procedure):
+    def test_procedure_implies_same_procedure_fewer_inputs(self, make_procedure):
 
-        assert make_procedure["c1_easy"] > make_procedure["c1"]
-        assert make_procedure["c1_easy"] >= make_procedure["c1"]
+        assert make_procedure["c1_easy"] < make_procedure["c1"]
+        assert make_procedure["c1_easy"] <= make_procedure["c1"]
         assert make_procedure["c1_easy"] != make_procedure["c1"]
 
-    def test_procedure_implies_reordered_entities_more_inputs(self, make_procedure):
+    def test_procedure_implies_reordered_entities_fewer_inputs(self, make_procedure):
 
-        assert make_procedure["c1_entity_order"] < make_procedure["c1_easy"]
-        assert make_procedure["c1_easy"] > make_procedure["c1_entity_order"]
+        assert make_procedure["c1_entity_order"] > make_procedure["c1_easy"]
+        assert make_procedure["c1_easy"] < make_procedure["c1_entity_order"]
         assert make_procedure["c1_easy"] != make_procedure["c1_entity_order"]
 
     def test_procedure_exact_quantity_in_despite_implication(self, make_procedure):
         assert make_procedure["c2_exact_in_despite"] > make_procedure["c2"]
 
     def test_procedure_implication_despite_irrelevant_factors(self, make_procedure):
-        assert make_procedure["c2"] > make_procedure["c2_irrelevant_inputs"]
+        assert make_procedure["c2"] < make_procedure["c2_irrelevant_inputs"]
 
     def test_exhaustive_implies(self, make_procedure):
         assert not make_procedure["c2"] > make_procedure["c2_irrelevant_despite"]
@@ -729,8 +730,8 @@ class TestHoldings:
     def test_holdings_differing_in_entity_order_equal(self, make_holding):
         assert make_holding["h1"] == make_holding["h1_entity_order"]
 
-    def test_holdings_fewer_inputs_implies_more(self, make_holding):
-        assert make_holding["h1_easy"] > make_holding["h1"]
+    def test_holdings_more_inputs_implies_fewer(self, make_holding):
+        assert make_holding["h1"] > make_holding["h1_easy"]
 
     def test_holdings_more_specific_quantity_implies_less_specific(self, make_holding):
         assert make_holding["h2_exact_quantity"] > make_holding["h2"]

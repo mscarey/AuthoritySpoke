@@ -502,12 +502,12 @@ class Procedure:
 
     def find_matches(self, self_factors, other_factors, m, matchlist, comparison="="):
         matches = tuple(m)
-        sf = {f for f in self_factors}
-        if not sf:
+        others = {f for f in other_factors}
+        if not others:
             matchlist.append(matches)
             return matchlist
-        s = sf.pop()
-        for o in other_factors:
+        o = others.pop()
+        for s in self_factors:
             if (
                 (comparison == "=" and s == o)
                 or (comparison == "<" and s <= o)
@@ -522,7 +522,7 @@ class Procedure:
                     for i in range(len(s)):
                         matches_next[s.entity_context[i]] = o.entity_context[i]
                     matchlist = self.find_matches(
-                        sf, other_factors, matches_next, matchlist, comparison
+                        self_factors, others, matches_next, matchlist, comparison
                     )
                 if s.predicate.reciprocal:  # please refactor
                     swapped = list(
@@ -537,7 +537,7 @@ class Procedure:
                         for i in range(len(s)):
                             matches_next[s.entity_context[i]] = swapped[i]
                         matchlist = self.find_matches(
-                            sf, other_factors, matches_next, matchlist, comparison
+                            self_factors, others, matches_next, matchlist, comparison
                         )
         return matchlist
 
@@ -579,10 +579,11 @@ class Procedure:
 
     def __gt__(self, other):
         """
-        Tests whether self implies other.
+        Tests whether the assertion that self applies in some cases
+        implies that the procedure "other" applies in some cases.
 
-        Self does not imply other if any input of self
-        is not equal to or implied by some input of other.
+        Self does not imply other if any input of other
+        is not equal to or implied by some input of self.
 
         Self does not imply other if any output of other
         is not equal to or implied by some output of self.
@@ -602,18 +603,18 @@ class Procedure:
 
         for x in (
             (self.inputs, other.inputs),
-            (other.outputs, self.outputs),
-            (other.despite, despite_or_input),
+            (self.outputs, other.outputs),
+            (despite_or_input, other.despite),
         ):
 
-            for factor in x[0]:
-                if not any(factor <= other_factor for other_factor in x[1]):
+            for other_factor in x[1]:
+                if not any(factor >= other_factor for factor in x[0]):
                     return False
 
             prior_list = tuple(matchlist)
             matchlist = []
             for m in prior_list:
-                matchlist = self.find_matches(x[0], x[1], m, matchlist, "<")
+                matchlist = self.find_matches(x[0], x[1], m, matchlist, ">")
 
         return bool(matchlist)
 
