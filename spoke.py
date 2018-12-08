@@ -640,7 +640,7 @@ class Procedure:
         are contradicted by inputs of self.
         """
 
-        if not isinstance(other, Procedure):
+        if not isinstance(other, self.__class__):
             return False
 
         # This is more consistent with __ge__ than __gt__.

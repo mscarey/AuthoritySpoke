@@ -252,11 +252,11 @@ def make_procedure(make_factor) -> Dict[str, Procedure]:
             outputs=(f["f8_higher_int"],),
             inputs=(f["f4"], f["f5"], f["f6"], f["f7"], f["f9"]),
         ),
-        #"c3": Procedure(
+        # "c3": Procedure(
         #    outputs=f["f20"],
         #    inputs=(f["f3"], f["f11"], f["12"], f["13"], f["14"], f["15"]),
         #    despite=(f["f16"]),
-        #)
+        # )
     }
 
 
@@ -271,7 +271,13 @@ def make_holding(make_procedure) -> Dict[str, ProceduralHolding]:
         "h1_easy": ProceduralHolding(c["c1_easy"]),
         "h2": ProceduralHolding(c["c2"]),
         "h2_exact_quantity": ProceduralHolding(c["c2_exact_quantity"]),
+        "h2_irrelevant_inputs": ProceduralHolding(c["c2_reciprocal_swap"]),
         "h2_reciprocal_swap": ProceduralHolding(c["c2_reciprocal_swap"]),
+        "h2_exact_in_despite": ProceduralHolding(c["c2_exact_in_despite"]),
+        "h2_ALL": ProceduralHolding(c["c2"], mandatory=False, universal=True),
+        "h2_exact_quantity_ALL": ProceduralHolding(
+            c["c2_exact_quantity"], mandatory=False, universal=True
+        ),
     }
 
 
@@ -732,9 +738,22 @@ class TestHoldings:
 
     def test_holdings_more_inputs_implies_fewer(self, make_holding):
         assert make_holding["h1"] > make_holding["h1_easy"]
+        assert make_holding["h2_irrelevant_inputs"] > make_holding["h2"]
+
+    def test_holding_narrower_despite_implies_broader(self, make_holding):
+        assert make_holding["h2_exact_in_despite"] > make_holding["h2"]
+        assert not make_holding["h2"] > make_holding["h2_exact_in_despite"]
 
     def test_holdings_more_specific_quantity_implies_less_specific(self, make_holding):
         assert make_holding["h2_exact_quantity"] > make_holding["h2"]
+
+    def test_holdings_less_specific_with_all_implies_more_specific(self, make_holding):
+        assert make_holding["h2_ALL"] > make_holding["h2_exact_quantity_ALL"]
+        assert not make_holding["h2_exact_quantity_ALL"] > make_holding["h2_ALL"]
+
+    def test_specific_holding_with_all_implies_more_general_with_some(self, make_holding):
+        assert make_holding["h2_exact_quantity_ALL"] > make_holding["h2"]
+
 
 class TestOpinions:
     def test_load_opinion_in_Harvard_format(self):
