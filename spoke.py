@@ -503,41 +503,41 @@ class Procedure:
 
         return sorted(self.all_factors(), key=repr)
 
-    def find_matches(self, self_factors, other_factors, m, matchlist, comparison):
+    def find_matches(self, self_matches, other_factors, m, matchlist, comparison):
         matches = tuple(m)
-        others = {f for f in other_factors}
-        if not others:
+        need_matches = {f for f in other_factors}
+        if not need_matches:
             matchlist.append(matches)
             return matchlist
-        o = others.pop()
-        for s in self_factors:
-            if comparison(s, o):
+        n = need_matches.pop()
+        available = {a for a in self_matches if comparison(a, n)}
+        for a in available:
+            if all(
+                matches[a.entity_context[i]] == n.entity_context[i]
+                or not matches[a.entity_context[i]]
+                for i in range(len(a))
+            ):
+                matches_next = list(matches)
+                for i in range(len(a)):
+                    matches_next[a.entity_context[i]] = n.entity_context[i]
+                matchlist = self.find_matches(
+                    self_matches, need_matches, matches_next, matchlist, comparison
+                )
+            if a.predicate.reciprocal:  # please refactor
+                swapped = list(
+                    [n.entity_context[1], n.entity_context[0], n.entity_context[2:]]
+                )
                 if all(
-                    matches[s.entity_context[i]] == o.entity_context[i]
-                    or not matches[s.entity_context[i]]
-                    for i in range(len(s))
+                    matches[a.entity_context[i]] == swapped[i]
+                    or not matches[a.entity_context[i]]
+                    for i in range(len(a))
                 ):
                     matches_next = list(matches)
-                    for i in range(len(s)):
-                        matches_next[s.entity_context[i]] = o.entity_context[i]
+                    for i in range(len(a)):
+                        matches_next[a.entity_context[i]] = swapped[i]
                     matchlist = self.find_matches(
-                        self_factors, others, matches_next, matchlist, comparison
+                        self_matches, need_matches, matches_next, matchlist, comparison
                     )
-                if s.predicate.reciprocal:  # please refactor
-                    swapped = list(
-                        [o.entity_context[1], o.entity_context[0], o.entity_context[2:]]
-                    )
-                    if all(
-                        matches[s.entity_context[i]] == swapped[i]
-                        or not matches[s.entity_context[i]]
-                        for i in range(len(s))
-                    ):
-                        matches_next = list(matches)
-                        for i in range(len(s)):
-                            matches_next[s.entity_context[i]] = swapped[i]
-                        matchlist = self.find_matches(
-                            self_factors, others, matches_next, matchlist, comparison
-                        )
         return matchlist
 
     def __eq__(self, other):
@@ -559,20 +559,19 @@ class Procedure:
             (self.despite, other.despite),
         ):
 
-            # Not equal if self has any factor other lacks
-            for factor in x[0]:
-                if not any(factor == other_factor for other_factor in x[1]):
-                    return False
-
-            # Not equal if other has any factor self lacks
-            for other_factor in x[1]:
-                if not any(factor == other_factor for factor in x[0]):
-                    return False
+            # Verifying that every factor in self is in other.
 
             prior_list = tuple(matchlist)
             matchlist = []
             for m in prior_list:
                 matchlist = self.find_matches(x[0], x[1], m, matchlist, operator.eq)
+
+            # Also verifying that every factor in other is in self.
+
+            prior_list = tuple(matchlist)
+            matchlist = []
+            for m in prior_list:
+                matchlist = self.find_matches(x[1], x[0], m, matchlist, operator.eq)
 
         return bool(matchlist)
 
@@ -605,10 +604,6 @@ class Procedure:
             (self.outputs, other.outputs),
             (despite_or_input, other.despite),
         ):
-
-            for other_factor in x[1]:
-                if not any(factor >= other_factor for factor in x[0]):
-                    return False
 
             prior_list = tuple(matchlist)
             matchlist = []
@@ -656,11 +651,9 @@ class Procedure:
         # because they would be contradicted by inputs of other.
 
         for x in (
-            (other.inputs, self.inputs, operator.gt),
-            (self.outputs, other.outputs, operator.gt),
+            (other.inputs, self.inputs, operator.ge),
+            (self.outputs, other.outputs, operator.ge),
         ):
-
-            # omitting check for factors with no possible match
 
             prior_list = tuple(matchlist)
             matchlist = []
