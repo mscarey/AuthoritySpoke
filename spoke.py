@@ -1,5 +1,7 @@
 import datetime
 import json
+import operator
+
 from typing import Dict, FrozenSet, Iterable, List, Mapping
 from typing import Optional, Sequence, Set, Tuple, Union
 from dataclasses import dataclass
@@ -394,6 +396,7 @@ class Evidence(Factor):
     to_effect: Optional[Predicate] = None
     absent: bool = False
 
+
 @dataclass(frozen=True)
 class Procedure:
     """A (potential) rule for courts to use in resolving litigation. Described in
@@ -500,7 +503,7 @@ class Procedure:
 
         return sorted(self.all_factors(), key=repr)
 
-    def find_matches(self, self_factors, other_factors, m, matchlist, comparison="="):
+    def find_matches(self, self_factors, other_factors, m, matchlist, comparison):
         matches = tuple(m)
         others = {f for f in other_factors}
         if not others:
@@ -508,11 +511,7 @@ class Procedure:
             return matchlist
         o = others.pop()
         for s in self_factors:
-            if (
-                (comparison == "=" and s == o)
-                or (comparison == "<" and s <= o)
-                or (comparison == ">" and s >= o)
-            ):
+            if comparison(s, o):
                 if all(
                     matches[s.entity_context[i]] == o.entity_context[i]
                     or not matches[s.entity_context[i]]
@@ -573,7 +572,7 @@ class Procedure:
             prior_list = tuple(matchlist)
             matchlist = []
             for m in prior_list:
-                matchlist = self.find_matches(x[0], x[1], m, matchlist)
+                matchlist = self.find_matches(x[0], x[1], m, matchlist, operator.eq)
 
         return bool(matchlist)
 
@@ -614,7 +613,7 @@ class Procedure:
             prior_list = tuple(matchlist)
             matchlist = []
             for m in prior_list:
-                matchlist = self.find_matches(x[0], x[1], m, matchlist, ">")
+                matchlist = self.find_matches(x[0], x[1], m, matchlist, operator.ge)
 
         return bool(matchlist)
 
@@ -650,26 +649,23 @@ class Procedure:
         if self == other:
             return True
 
-        if any(
-            [
-                any([factor.contradicts(other_factor) for factor in self.inputs])
-                for other_factor in other.despite
-            ]
-        ):
-            return False
-
         matchlist = [tuple([None for i in range(len(self))])]
 
-        for x in ((self.inputs, other.inputs), (other.outputs, self.outputs)):
+        # Not checking whether despite factors of other are
+        # contradicted by inputs of self, assuming they can't be
+        # because they would be contradicted by inputs of other.
 
-            for factor in x[0]:
-                if not any(factor <= other_factor for other_factor in x[1]):
-                    return False
+        for x in (
+            (other.inputs, self.inputs, operator.gt),
+            (self.outputs, other.outputs, operator.gt),
+        ):
+
+            # omitting check for factors with no possible match
 
             prior_list = tuple(matchlist)
             matchlist = []
             for m in prior_list:
-                matchlist = self.find_matches(x[0], x[1], m, matchlist, "<")
+                matchlist = self.find_matches(x[0], x[1], m, matchlist, x[2])
 
         return bool(matchlist)
 
@@ -686,8 +682,6 @@ class Procedure:
         contradicts an output of other.
         """
         pass
-
-
 
 
 @dataclass
@@ -790,6 +784,7 @@ class ProceduralHolding(Holding):
         rule_valid was None (undecided)?
         """
         pass
+
 
 def opinion_from_file(path):
     """This is a generator that gets one opinion from a
