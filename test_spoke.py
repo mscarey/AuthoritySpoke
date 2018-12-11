@@ -31,6 +31,7 @@ def make_predicate() -> Dict[str, Predicate]:
         "p2": Predicate("{} operated and lived at {}"),
         "p2_reciprocal": Predicate("{} operated and lived at {}", reciprocal=True),
         "p3": Predicate("{} was {}’s abode"),
+        "p3_false": Predicate("{} was {}’s abode", truth=False),
         "p4": Predicate("{} was on the premises of {}"),
         "p5": Predicate("{} was a stockpile of Christmas trees"),
         "p6": Predicate("{} was among some standing trees"),
@@ -46,6 +47,13 @@ def make_predicate() -> Dict[str, Predicate]:
             truth=True,
             reciprocal=True,
             comparison="<=",
+            quantity=Q_("35 feet"),
+        ),
+        "p7_opposite": Predicate(
+            "The distance between {} and {} was {}",
+            truth=True,
+            reciprocal=True,
+            comparison=">",
             quantity=Q_("35 feet"),
         ),
         "p7_true": Predicate(
@@ -379,6 +387,10 @@ class TestPredicates:
 
     def test_no_equality_with_inconsistent_dimensionality(self, make_predicate):
         assert make_predicate["p9"] != make_predicate["p9_acres"]
+
+    def test_negated_method(self, make_predicate):
+        assert make_predicate["p7"].negated() == make_predicate["p7_opposite"]
+        assert make_predicate["p3"].negated() == make_predicate["p3_false"]
 
 
 class TestFactors:

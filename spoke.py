@@ -293,6 +293,15 @@ class Predicate:
             )
         return str(self).format(*(str(e) for e in entities))
 
+    def negated(self):
+        return Predicate(
+            content=self.content,
+            truth=not self.truth,
+            reciprocal=self.reciprocal,
+            comparison=self.comparison,
+            quantity=self.quantity,
+        )
+
     # TODO: allow the same entity to be mentioned more than once
 
 
