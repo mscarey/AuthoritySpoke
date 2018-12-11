@@ -633,8 +633,8 @@ class Procedure:
         circumstances needed to invoke the procedure (i.e. when the rule "always" applies
         when the inputs are present).
 
-        Self does not imply other if any input of self
-        is not equal to or implied by some input of other.
+        For self to imply other, every input of self must be
+        equal to or implied by some input of other.
 
         Self does not imply other if any output of other
         is not equal to or implied by some output of self.
@@ -642,6 +642,10 @@ class Procedure:
         Self does not imply other if any despite factors of other
         are contradicted by inputs of self.
         """
+
+        # TODO: Does this method apply only when self.universal > other.universal?
+        # TODO: Check to see whether this will also work when every
+        # input of other is equal to or implied by some input of self.
 
         if not isinstance(other, self.__class__):
             return False
@@ -674,7 +678,8 @@ class Procedure:
     def contradicts(self, other):
         raise NotImplementedError(
             "Procedures do not contradict one another unless one of them ",
-            "is designated 'exhaustive'. Consider using the 'exhaustive_implies' method.",
+            "is designated 'exhaustive'. Consider using the ",
+            "'exhaustive_contradicts' method.",
         )
 
     def exhaustive_contradicts(self, other):
@@ -738,6 +743,19 @@ class ProceduralHolding(Holding):
     universal: bool = False
     rule_valid: bool = True
     decided: bool = True
+
+    def implies_if_valid(self, other) -> bool:
+        """Simplified version of the __gt__ implication function
+        covering only cases where rule_valid and decided are
+        True for both Holdings."""
+
+        if other.mandatory > self.mandatory:
+            return False
+
+        if other.universal > self.universal:
+            return False
+
+        return "Not finished."
 
     def __gt__(self, other) -> bool:
         """Returns a boolean indicating whether self implies other,
