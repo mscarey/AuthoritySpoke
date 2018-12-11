@@ -277,9 +277,10 @@ def make_holding(make_procedure) -> Dict[str, ProceduralHolding]:
         "h1_again": ProceduralHolding(c["c1"]),
         "h1_entity_order": ProceduralHolding(c["c1_entity_order"]),
         "h1_easy": ProceduralHolding(c["c1_easy"]),
+        "h1_opposite": ProceduralHolding(c["c1"], rule_valid=False),
         "h2": ProceduralHolding(c["c2"]),
         "h2_exact_quantity": ProceduralHolding(c["c2_exact_quantity"]),
-        "h2_irrelevant_inputs": ProceduralHolding(c["c2_reciprocal_swap"]),
+        "h2_irrelevant_inputs": ProceduralHolding(c["c2_irrelevant_inputs"]),
         "h2_reciprocal_swap": ProceduralHolding(c["c2_reciprocal_swap"]),
         "h2_exact_in_despite": ProceduralHolding(c["c2_exact_in_despite"]),
         "h2_ALL": ProceduralHolding(c["c2"], mandatory=False, universal=True),
@@ -766,6 +767,8 @@ class TestHoldings:
     def test_specific_holding_with_all_implies_more_general_with_some(self, make_holding):
         assert make_holding["h2_exact_quantity_ALL"] > make_holding["h2"]
 
+    def test_negated_method(self, make_holding):
+        assert make_holding["h1"].negated() == make_holding["h1_opposite"]
 
 class TestOpinions:
     def test_load_opinion_in_Harvard_format(self):

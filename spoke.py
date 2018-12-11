@@ -175,8 +175,8 @@ class Predicate:
         ):
             return False
 
-        if (type(self.quantity) == ureg.Quantity) != (
-            type(other.quantity) == ureg.Quantity
+        if (isinstance(self.quantity, ureg.Quantity) != (
+            isinstance(other.quantity, ureg.Quantity))
         ):
             return False
 
@@ -718,20 +718,26 @@ class ProceduralHolding(Holding):
     applicable in "some" situation where the facts are present.
     Not applicable to attributions.
 
-    rule_valid (bool): True means the procedure or attribution
+    rule_valid (bool): True means the holding asserts the procedure
     is a valid legal rule. False means it's not a valid legal
-    rule. None means that the rule should be deemed undecided.
-    However, if an opinion merely says the court is not deciding
-    whether a procedure or attribution is valid, there is no
-    holding, and no Holding object should be created. Deciding not
-    to decide a rule's validity is not the same thing
-    as deciding that a rule is undecided.
+    rule.
+
+    decided (bool): False means that it should be deemed undecided
+    whether the rule is valid, and thus can have the effect of
+    overruling prior holdings finding the rule to be either
+    valid or invalid. Seemingly, decided=False should render the
+    "rule_valid" flag irrelevant. Note that if an opinion merely
+    says the court is not deciding whether a procedure or attribution
+    is valid, there is no holding, and no Holding object should be
+    created. Deciding not to decide a rule's validity is not the same
+    thing as deciding that a rule is undecided.
     """
 
     procedure: Procedure
     mandatory: bool = False
     universal: bool = False
-    rule_valid: Union[bool, None] = True
+    rule_valid: bool = True
+    decided: bool = True
 
     def __gt__(self, other) -> bool:
         """Returns a boolean indicating whether self implies other,
@@ -778,6 +784,14 @@ class ProceduralHolding(Holding):
             return self.procedure.exhaustive_implies(other.procedure)
 
         raise NotImplementedError("Haven't reached that case yet.")
+
+    def negated(self):
+        return ProceduralHolding(
+            procedure=self.procedure,
+            mandatory=self.mandatory,
+            universal=self.universal,
+            rule_valid=not self.rule_valid,
+            decided=self.decided,)
 
     def contradicts(self, other):
         """
