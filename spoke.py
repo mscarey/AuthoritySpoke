@@ -175,8 +175,8 @@ class Predicate:
         ):
             return False
 
-        if (isinstance(self.quantity, ureg.Quantity) != (
-            isinstance(other.quantity, ureg.Quantity))
+        if isinstance(self.quantity, ureg.Quantity) != (
+            isinstance(other.quantity, ureg.Quantity)
         ):
             return False
 
@@ -185,6 +185,10 @@ class Predicate:
             and self.quantity.dimensionality != other.quantity.dimensionality
         ):
             return False
+
+        # TODO: check that there's a reasonable answer for which supporting input should be
+        # considered more specific: "x was greater than 20" or "x was exactly 25"
+        # (remembering that more information in a supporting input is not deemed to undercut).
 
         if "<" in self.comparison and (
             "<" in other.comparison or "=" in other.comparison
@@ -589,8 +593,8 @@ class Procedure:
         Tests whether the assertion that self applies in some cases
         implies that the procedure "other" applies in some cases.
 
-        Self does not imply other if any input of other
-        is not equal to or implied by some input of self.
+        Self does not imply other if any input of self
+        is not equal to or implied by some input of other. *just changed
 
         Self does not imply other if any output of other
         is not equal to or implied by some output of self.
@@ -609,15 +613,15 @@ class Procedure:
         despite_or_input = {*self.despite, *self.inputs}
 
         for x in (
-            (self.inputs, other.inputs),
-            (self.outputs, other.outputs),
-            (despite_or_input, other.despite),
+            (self.inputs, other.inputs, operator.le),
+            (self.outputs, other.outputs, operator.ge),
+            (despite_or_input, other.despite, operator.ge),
         ):
 
             prior_list = tuple(matchlist)
             matchlist = []
             for m in prior_list:
-                matchlist = self.find_matches(x[0], x[1], m, matchlist, operator.ge)
+                matchlist = self.find_matches(x[0], x[1], m, matchlist, x[2])
 
         return bool(matchlist)
 
@@ -643,7 +647,6 @@ class Procedure:
         are contradicted by inputs of self.
         """
 
-        # TODO: Does this method apply only when self.universal > other.universal?
         # TODO: Check to see whether this will also work when every
         # input of other is equal to or implied by some input of self.
 
@@ -662,6 +665,11 @@ class Procedure:
         # Not checking whether despite factors of other are
         # contradicted by inputs of self, assuming they can't be
         # because they would be contradicted by inputs of other.
+
+        # TODO: should this be checking whether self.inputs implies other.inputs | vice versa?
+        # does each factor individually need to imply or be implied, or the whole set of factors?
+        # Can it be sufficient for a factor to be not contradicted but not implied?
+
 
         for x in (
             (other.inputs, self.inputs, operator.ge),
@@ -755,7 +763,10 @@ class ProceduralHolding(Holding):
         if other.universal > self.universal:
             return False
 
-        return "Not finished."
+        if self.universal > other.universal:
+            return self.procedure.exhaustive_implies(other.procedure)
+
+        return self.procedure > other.procedure
 
     def __gt__(self, other) -> bool:
         """Returns a boolean indicating whether self implies other,
@@ -764,37 +775,16 @@ class ProceduralHolding(Holding):
         if not isinstance(other, self.__class__):
             return False
 
-        if self.rule_valid != other.rule_valid:
-            return False
-
-        # In SOME cases where A, the output MUST/MAY be X
-        # does imply:
-        # In ALL cases where A, the output MAY be X
-        if (
-            self.rule_valid
-            and other.rule_valid
-            and not self.universal
-            and not other.universal
-            and self.mandatory >= other.mandatory
-        ):
-            return self.procedure >= other.procedure
-
-        # In SOME cases where A, the output MUST/MAY be X
-        # can never imply:
-        # In ALL cases where A, the output MUST/MAY be X
-        if (
-            self.rule_valid
-            and other.rule_valid
-            and other.universal
-            and not self.universal
-        ):
-            return False
+        if self.rule_valid and other.rule_valid and self.decided and other.decided:
+            return self.implies_if_valid(other)
 
         # In NO cases where A, the output MUST/MAY be X
         # does imply:
         # In NOT ALL/NO cases where A, the output MUST be X
         if (
-            not self.rule_valid
+            self.decided
+            and other.decided
+            and not self.rule_valid
             and not other.rule_valid
             and other.universal >= self.universal
             and other.mandatory >= self.mandatory
@@ -809,7 +799,8 @@ class ProceduralHolding(Holding):
             mandatory=self.mandatory,
             universal=self.universal,
             rule_valid=not self.rule_valid,
-            decided=self.decided,)
+            decided=self.decided,
+        )
 
     def contradicts(self, other):
         """
