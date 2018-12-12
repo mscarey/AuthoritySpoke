@@ -588,7 +588,7 @@ class Procedure:
 
         return bool(matchlist)
 
-    def __gt__(self, other):
+    def __ge__(self, other):
         """
         Tests whether the assertion that self applies in some cases
         implies that the procedure "other" applies in some cases.
@@ -604,9 +604,6 @@ class Procedure:
         """
 
         if not isinstance(other, Procedure):
-            return False
-
-        if self == other:
             return False
 
         matchlist = [tuple([None for i in range(len(self))])]
@@ -625,10 +622,10 @@ class Procedure:
 
         return bool(matchlist)
 
-    def __ge__(self, other):
+    def __gt__(self, other):
         if self == other:
-            return True
-        return self > other
+            return False
+        return self >= other
 
     def exhaustive_implies(self, other):
         """
@@ -753,7 +750,7 @@ class ProceduralHolding(Holding):
     decided: bool = True
 
     def implies_if_valid(self, other) -> bool:
-        """Simplified version of the __gt__ implication function
+        """Simplified version of the __ge__ implication function
         covering only cases where rule_valid and decided are
         True for both Holdings."""
 
@@ -769,6 +766,11 @@ class ProceduralHolding(Holding):
         return self.procedure > other.procedure
 
     def __gt__(self, other) -> bool:
+        if self == other:
+            return False
+        return self >= other
+
+    def __ge__(self, other) -> bool:
         """Returns a boolean indicating whether self implies other,
         where other is another Holding."""
 
