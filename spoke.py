@@ -161,8 +161,6 @@ class Predicate:
 
         if not isinstance(other, self.__class__):
             return False
-        if self == other:
-            return False
 
         # Assumes no predicate implies another based on meaning of their content text
         if not (
@@ -593,8 +591,8 @@ class Procedure:
         Tests whether the assertion that self applies in some cases
         implies that the procedure "other" applies in some cases.
 
-        Self does not imply other if any input of self
-        is not equal to or implied by some input of other. *just changed
+        Self does not imply other if any input of other
+        is not equal to or implied by some input of self.
 
         Self does not imply other if any output of other
         is not equal to or implied by some output of self.
@@ -610,7 +608,7 @@ class Procedure:
         despite_or_input = {*self.despite, *self.inputs}
 
         for x in (
-            (self.inputs, other.inputs, operator.le),
+            (self.inputs, other.inputs, operator.ge),
             (self.outputs, other.outputs, operator.ge),
             (despite_or_input, other.despite, operator.ge),
         ):
@@ -678,7 +676,24 @@ class Procedure:
             for m in prior_list:
                 matchlist = self.find_matches(x[0], x[1], m, matchlist, x[2])
 
+        if bool(matchlist):
+            return True
+
+        # Repeating the process with the same parameters as the __gt__
+        # function, except there's no consideration of despite factors.
+
+        for x in (
+            (self.inputs, other.inputs, operator.ge),
+            (self.outputs, other.outputs, operator.ge),
+        ):
+
+            prior_list = tuple(matchlist)
+            matchlist = []
+            for m in prior_list:
+                matchlist = self.find_matches(x[0], x[1], m, matchlist, x[2])
+
         return bool(matchlist)
+
 
     def contradicts(self, other):
         raise NotImplementedError(

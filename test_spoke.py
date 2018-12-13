@@ -640,8 +640,8 @@ class TestProcedure:
         assert f["f7"] in c2.inputs
         assert f["f7"] not in c2_exact_quantity.inputs
         assert f["f8_exact"] > f["f7"]
-        assert c2 < c2_exact_quantity
-        assert not c2_exact_quantity < c2
+        assert c2 <= c2_exact_quantity
+        assert not c2_exact_quantity <= c2
 
     def test_implied_procedure_with_reciprocal_entities(self, make_procedure):
         """
