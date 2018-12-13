@@ -710,11 +710,13 @@ class Procedure:
         # that are consistent with matchlist and that don't cause the factor
         # to contradict any factor of self.
 
+        other_despite_or_input = {*other.despite, *other.inputs}
+
         prior_list = tuple(matchlist)
         matchlist = []
         for m in prior_list:
             matchlist = self.find_consistent_factors(
-                other.inputs, self.inputs, m, matchlist
+                other_despite_or_input, self.inputs, m, matchlist
             )
 
         return bool(matchlist)

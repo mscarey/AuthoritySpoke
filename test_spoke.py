@@ -202,6 +202,11 @@ def make_procedure(make_factor) -> Dict[str, Procedure]:
             inputs=(f["f4"], f["f5"], f["f6"], f["f7"], f["f9"]),
             despite=(f["f8"],),
         ),
+        "c2_absent": Procedure(
+            outputs=(f["f10"],),
+            inputs=(f["f4"], f["f5"], f["f6"], f["f7"]),
+            despite=(f["f8_exact"], f["f9_absent"]),
+        ),
         "c2_exact_quantity": Procedure(
             outputs=(f["f10"],),
             inputs=(f["f4"], f["f5"], f["f6"], f["f8_exact"], f["f9"]),
@@ -715,7 +720,7 @@ class TestProcedure:
         input that contradicts the despite factor of c2_exact_in_despite.
         """
         p = make_procedure
-        assert not p["c2_higher_quantity"].exhaustive_implies(p["c2_exact_in_despite"])
+        assert not p["c2"].exhaustive_implies(p["c2_absent"])
 
     def test_no_contradict_between_procedures(self, make_procedure):
         """
