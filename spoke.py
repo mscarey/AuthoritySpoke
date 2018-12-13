@@ -516,6 +516,14 @@ class Procedure:
         return sorted(self.all_factors(), key=repr)
 
     def find_consistent_factors(self, self_matches, other_factors, m, matchlist):
+        """
+        Recursively searches for a list of entity assignments that can
+        cause all of 'other_factors' to not contradict any of the factors in
+        self_matches. When one such list is found, the function adds that
+        list to matchlist and continues searching. It finally returns
+        matchlist when all possibilities have been searched.
+        """
+
         matches = tuple(m)
         need_matches = {f for f in other_factors}
         if not need_matches:
@@ -549,10 +557,19 @@ class Procedure:
                     matchlist = self.find_consistent_factors(
                         self_matches, need_matches, matches_next, matchlist
                     )
-            # reciprocal case not handled
+            # BUG: reciprocal case not handled
         return matchlist
 
     def find_matches(self, self_matches, other_factors, m, matchlist, comparison):
+        """
+        Recursively searches for a list of entity assignments that can
+        cause all of 'other_factors' to satisfy the relation described by
+        'comparison' with a factor from self_matches. When one such list
+        is found, the function adds that list to matchlist and continues
+        searching. It finally returns matchlist when all possibilities
+        have been searched.
+        """
+
         matches = tuple(m)
         need_matches = {f for f in other_factors}
         if not need_matches:
@@ -629,6 +646,8 @@ class Procedure:
         Tests whether the assertion that self applies in some cases
         implies that the procedure "other" applies in some cases.
 
+        When self and other are holdings that both apply in SOME cases:
+
         Self does not imply other if any input of other
         is not equal to or implied by some input of self.
 
@@ -656,6 +675,9 @@ class Procedure:
             for m in prior_list:
                 matchlist = self.find_matches(x[0], x[1], m, matchlist, x[2])
 
+            if not matchlist:
+                return False
+
         return bool(matchlist)
 
     def __gt__(self, other):
@@ -663,12 +685,59 @@ class Procedure:
             return False
         return self >= other
 
+    def implies_all_to_all(self, other):
+        """
+        Tests whether the assertion that self applies in ALL cases
+        implies that the procedure "other" applies in ALL cases.
+
+        For self to imply other, every input of self
+        must be implied by some input of other.
+
+        Self does not imply other if any output of other
+        is not equal to or implied by some output of self.
+
+        Self does not imply other if any despite of other
+        contradicts an input of self.
+        """
+
+        if not isinstance(other, self.__class__):
+            return False
+
+        if self == other:
+            return True
+
+        matchlist = [tuple([None for i in range(len(self))])]
+
+        for x in ((other.inputs, self.inputs, operator.ge),
+                    (self.outputs, other.outputs, operator.ge),):
+
+            prior_list = tuple(matchlist)
+            matchlist = []
+            for m in prior_list:
+                matchlist = self.find_matches(x[0], x[1], m, matchlist, x[2])
+
+            if not matchlist:
+                return False
+
+        # For every factor in other, find the permutations of entity slots
+        # that are consistent with matchlist and that don't cause the factor
+        # to contradict any factor of self.
+
+        prior_list = tuple(matchlist)
+        matchlist = []
+        for m in prior_list:
+            matchlist = self.find_consistent_factors(
+                self.inputs, other.despite, m, matchlist
+            )
+
+        return bool(matchlist)
+
     def exhaustive_implies(self, other):
         """
         This is a different process for checking whether one procedure implies another,
         used when the list of self's inputs is considered an exhaustive list of the
         circumstances needed to invoke the procedure (i.e. when the rule "always" applies
-        when the inputs are present).
+        when the inputs are present), but the list of other's inputs is not exhaustive.
 
         For self to imply other, every input of self must not be
         contradicted by any input of other.
@@ -699,12 +768,14 @@ class Procedure:
             for m in prior_list:
                 matchlist = self.find_matches(x[0], x[1], m, matchlist, x[2])
 
+            if not matchlist:
+                return False
+
         # Not checking whether despite factors of other are
         # contradicted by inputs of self, assuming they can't be
         # because they would be contradicted by inputs of other.
 
-        if not matchlist:
-            return False
+
 
         # For every factor in other, find the permutations of entity slots
         # that are consistent with matchlist and that don't cause the factor
@@ -803,6 +874,9 @@ class ProceduralHolding(Holding):
 
         if self.universal > other.universal:
             return self.procedure.exhaustive_implies(other.procedure)
+
+        if other.universal:
+            return self.procedure.implies_all_to_all(other.procedure)
 
         return self.procedure > other.procedure
 
