@@ -694,10 +694,10 @@ class TestProcedure:
         assert make_procedure["c2"] < make_procedure["c2_irrelevant_inputs"]
 
     def test_exhaustive_implies(self, make_procedure):
-        assert not make_procedure["c2"] > make_procedure["c2_irrelevant_despite"]
         assert make_procedure["c2"].exhaustive_implies(
             make_procedure["c2_irrelevant_despite"]
         )
+        assert not make_procedure["c2"] > make_procedure["c2_irrelevant_despite"]
 
     def test_exhaustive_implies_input_of_self_same_as_despite_of_other(
         self, make_procedure

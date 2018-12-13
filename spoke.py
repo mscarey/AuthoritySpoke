@@ -1,4 +1,5 @@
 import datetime
+import itertools
 import json
 import operator
 
@@ -514,6 +515,43 @@ class Procedure:
 
         return sorted(self.all_factors(), key=repr)
 
+    def find_consistent_factors(self, self_matches, other_factors, m, matchlist):
+        matches = tuple(m)
+        need_matches = {f for f in other_factors}
+        if not need_matches:
+            matchlist.append(matches)
+            return matchlist
+        n = need_matches.pop()
+        available_slots = {
+            i: (
+                slot
+                for slot in matches
+                if (not matches[slot] or matches[slot] == n.entity_context[i])
+            )
+            for i in range(len(n))
+        }
+        keys, values = zip(*available_slots.items())
+        combinations = (
+            dict(zip(keys, v))
+            for v in itertools.product(*values)
+            if len(v) == len(set(v))
+        )
+        for c in combinations:
+            if not any(
+                (
+                    a.contradicts(n) and (a.entity_context[i] == c[i] for i in c)
+                    for a in self_matches
+                )
+            ):
+                matches_next = list(matches)
+                for i in c:
+                    matches_next[i] = c[i]
+                    matchlist = self.find_consistent_factors(
+                        self_matches, need_matches, matches_next, matchlist
+                    )
+            # reciprocal case not handled
+        return matchlist
+
     def find_matches(self, self_matches, other_factors, m, matchlist, comparison):
         matches = tuple(m)
         need_matches = {f for f in other_factors}
@@ -632,18 +670,15 @@ class Procedure:
         circumstances needed to invoke the procedure (i.e. when the rule "always" applies
         when the inputs are present).
 
-        For self to imply other, every input of self must be
-        equal to or implied by some input of other.
+        For self to imply other, every input of self must not be
+        contradicted by any input of other.
 
-        Self does not imply other if any output of other
-        is not equal to or implied by some output of self.
+        For self to imply other, every output of other
+        must be equal to or implied by some output of self.
 
         Self does not imply other if any despite factors of other
         are contradicted by inputs of self.
         """
-
-        # TODO: Check to see whether this will also work when every
-        # input of other is equal to or implied by some input of self.
 
         if not isinstance(other, self.__class__):
             return False
@@ -657,43 +692,32 @@ class Procedure:
 
         matchlist = [tuple([None for i in range(len(self))])]
 
+        for x in ((self.outputs, other.outputs, operator.ge),):
+
+            prior_list = tuple(matchlist)
+            matchlist = []
+            for m in prior_list:
+                matchlist = self.find_matches(x[0], x[1], m, matchlist, x[2])
+
         # Not checking whether despite factors of other are
         # contradicted by inputs of self, assuming they can't be
         # because they would be contradicted by inputs of other.
 
-        # TODO: should this be checking whether self.inputs implies other.inputs | vice versa?
-        # does each factor individually need to imply or be implied, or the whole set of factors?
-        # Can it be sufficient for a factor to be not contradicted but not implied?
+        if not matchlist:
+            return False
 
+        # For every factor in other, find the permutations of entity slots
+        # that are consistent with matchlist and that don't cause the factor
+        # to contradict any factor of self.
 
-        for x in (
-            (other.inputs, self.inputs, operator.ge),
-            (self.outputs, other.outputs, operator.ge),
-        ):
-
-            prior_list = tuple(matchlist)
-            matchlist = []
-            for m in prior_list:
-                matchlist = self.find_matches(x[0], x[1], m, matchlist, x[2])
-
-        if bool(matchlist):
-            return True
-
-        # Repeating the process with the same parameters as the __gt__
-        # function, except there's no consideration of despite factors.
-
-        for x in (
-            (self.inputs, other.inputs, operator.ge),
-            (self.outputs, other.outputs, operator.ge),
-        ):
-
-            prior_list = tuple(matchlist)
-            matchlist = []
-            for m in prior_list:
-                matchlist = self.find_matches(x[0], x[1], m, matchlist, x[2])
+        prior_list = tuple(matchlist)
+        matchlist = []
+        for m in prior_list:
+            matchlist = self.find_consistent_factors(
+                other.inputs, self.inputs, m, matchlist
+            )
 
         return bool(matchlist)
-
 
     def contradicts(self, other):
         raise NotImplementedError(
