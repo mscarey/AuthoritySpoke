@@ -513,7 +513,7 @@ class TestFactors:
         assert f["f_irrelevant_3"] <= f["f_irrelevant_3_new_context"]
         assert not f["f_irrelevant_3"] > f["f_irrelevant_3_new_context"]
 
-    def test_check_entity_consistency(self, make_factor):
+    def test_check_entity_consistency_true(self, make_factor):
         f = make_factor
         assert f["f_irrelevant_3"].check_entity_consistency(f["f_irrelevant_3_new_context"], (None, None, None, 2, None))[0]
         assert f["f_irrelevant_3"].check_entity_consistency(f["f_irrelevant_3_new_context"], (1, 0, 3, 2, 4))[0]

@@ -529,28 +529,6 @@ class Procedure:
                 text += "\n" + str(f)
         return text
 
-    def match_entity_roles(self, self_entities, other_entities):
-        """Make a temporary dict for information from other.
-        For each entity slot in each factor in self, check the matching
-        entity slot in other. If it contains something that's not already
-        in the temp dict, add it and the corresponding symbol from self
-        as a key and value. If it contains something that the temp dict
-        doesn't match to self's value for that slot, return False. If
-        none of the slots return False, return True."""
-
-        entity_roles = {}
-
-        if len(self_entities) != len(other_entities):
-            return False
-
-        entity_pairs = zip(self_entities, other_entities)
-        for pair in entity_pairs:
-            if pair[0] not in entity_roles:
-                entity_roles[pair[0]] = pair[1]
-            if entity_roles[pair[0]] != pair[1]:
-                return False
-
-        return True
 
     def all_factors(self) -> Set[Factor]:
         """Returns a set of all factors."""
