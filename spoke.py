@@ -560,6 +560,30 @@ class Procedure:
             # BUG: reciprocal case not handled
         return matchlist
 
+    def check_factor_consistency(self, a, n, matches, reciprocal=False):
+        """
+        Given one pair of factors, determines whether the factors
+        have consistent entity assignments such that both can
+        be true at the same time.
+
+        reciprocal (bool): When this is set to True, the function will
+        swap the first two entity slots of n before comparing n
+        to a. The function will only make a comparison with the slots
+        swapped. The function also needs to be called with reciprocal=False
+        to get a normal comparison with the slots not swapped.
+        """
+        if reciprocal:
+            need_list = list(
+                [n.entity_context[1], n.entity_context[0], n.entity_context[2:]]
+            )
+        else:
+            need_list = n.entity_context
+        return all(
+            matches[a.entity_context[i]] == need_list[i]
+            or not matches[a.entity_context[i]]
+            for i in range(len(a))
+        )
+
     def find_matches(self, self_matches, other_factors, m, matchlist, comparison):
         """
         Recursively searches for a list of entity assignments that can
@@ -578,32 +602,25 @@ class Procedure:
         n = need_matches.pop()
         available = {a for a in self_matches if comparison(a, n)}
         for a in available:
-            if all(
-                matches[a.entity_context[i]] == n.entity_context[i]
-                or not matches[a.entity_context[i]]
-                for i in range(len(a))
-            ):
+            if self.check_factor_consistency(a, n, matches):
                 matches_next = list(matches)
                 for i in range(len(a)):
                     matches_next[a.entity_context[i]] = n.entity_context[i]
                 matchlist = self.find_matches(
                     self_matches, need_matches, matches_next, matchlist, comparison
                 )
-            if a.predicate.reciprocal:  # please refactor
+            if a.predicate.reciprocal and self.check_factor_consistency(
+                a, n, matches, reciprocal=True
+            ):
                 swapped = list(
                     [n.entity_context[1], n.entity_context[0], n.entity_context[2:]]
                 )
-                if all(
-                    matches[a.entity_context[i]] == swapped[i]
-                    or not matches[a.entity_context[i]]
-                    for i in range(len(a))
-                ):
-                    matches_next = list(matches)
-                    for i in range(len(a)):
-                        matches_next[a.entity_context[i]] = swapped[i]
-                    matchlist = self.find_matches(
-                        self_matches, need_matches, matches_next, matchlist, comparison
-                    )
+                matches_next = list(matches)
+                for i in range(len(a)):
+                    matches_next[a.entity_context[i]] = swapped[i]
+                matchlist = self.find_matches(
+                    self_matches, need_matches, matches_next, matchlist, comparison
+                )
         return matchlist
 
     def __eq__(self, other):
@@ -708,8 +725,10 @@ class Procedure:
 
         matchlist = [tuple([None for i in range(len(self))])]
 
-        for x in ((other.inputs, self.inputs, operator.ge),
-                    (self.outputs, other.outputs, operator.ge),):
+        for x in (
+            (other.inputs, self.inputs, operator.ge),
+            (self.outputs, other.outputs, operator.ge),
+        ):
 
             prior_list = tuple(matchlist)
             matchlist = []
@@ -774,8 +793,6 @@ class Procedure:
         # Not checking whether despite factors of other are
         # contradicted by inputs of self, assuming they can't be
         # because they would be contradicted by inputs of other.
-
-
 
         # For every factor in other, find the permutations of entity slots
         # that are consistent with matchlist and that don't cause the factor
