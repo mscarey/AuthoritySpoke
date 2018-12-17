@@ -406,12 +406,20 @@ class Fact(Factor):
         to self with the first two entity slots of self_entities transposed.
         The function will return a tuple of booleans indicating whether
         the factors match with, and without, the transposition.
+
+        Parameters:
+
+        other (Fact)
+
+        matches (list): a list the same length as len(self). The indices represent
+        self's entity slots, and the value at each index represents other's
+        corresponding entity slots that have already been assigned, if any.
         """
 
         def all_matches(need_list):
             return all(
                 matches[other.entity_context[i]] == need_list[i]
-                or not matches[other.entity_context[i]]
+                or matches[other.entity_context[i]] is None
                 for i in range(len(other))
             )
 

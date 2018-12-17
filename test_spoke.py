@@ -513,6 +513,17 @@ class TestFactors:
         assert f["f_irrelevant_3"] <= f["f_irrelevant_3_new_context"]
         assert not f["f_irrelevant_3"] > f["f_irrelevant_3_new_context"]
 
+    def test_check_entity_consistency(self, make_factor):
+        f = make_factor
+        assert f["f_irrelevant_3"].check_entity_consistency(f["f_irrelevant_3_new_context"], (None, None, None, 2, None))[0]
+        assert f["f_irrelevant_3"].check_entity_consistency(f["f_irrelevant_3_new_context"], (1, 0, 3, 2, 4))[0]
+
+    def test_check_entity_consistency_false(self, make_factor):
+        f = make_factor
+        assert not f["f_irrelevant_3"].check_entity_consistency(f["f_irrelevant_3_new_context"], (None, None, None, None, 0))[0]
+        assert not f["f_irrelevant_3"].check_entity_consistency(f["f_irrelevant_3_new_context"], (None, None, None, 3, None))[0]
+
+
 
 class TestProcedure:
     def test_exception_for_wrong_type_for_procedure(self, make_predicate):
