@@ -393,6 +393,49 @@ class Fact(Factor):
             return True
         return False
 
+    def check_entity_consistency(self, other, matches):
+        """
+        Given entity assignments for self and other, determines whether
+        the factors have consistent entity assignments such that both can
+        be true at the same time.
+
+        All of self's entities must match other's, but other may have entities
+        that don't match self.
+
+        if self.predicate.reciprocal, the function will also compare other
+        to self with the first two entity slots of self_entities transposed.
+        The function will return a tuple of booleans indicating whether
+        the factors match with, and without, the transposition.
+        """
+
+        def all_matches(need_list):
+            return all(
+                matches[other.entity_context[i]] == need_list[i]
+                or not matches[other.entity_context[i]]
+                for i in range(len(other))
+            )
+
+        if not isinstance(other, self.__class__):
+            return False
+
+        if not self.entity_context:
+            return not other.entity_context
+
+        swapped = (
+            list(
+                [
+                    self.entity_context[1],
+                    self.entity_context[0],
+                    self.entity_context[2:],
+                ]
+            )
+            if self.predicate.reciprocal
+            else False
+        )
+
+        reciprocal_answer = all_matches(swapped) if self.predicate.reciprocal else False
+        return all_matches(self.entity_context), reciprocal_answer, swapped
+
     # TODO: A function to determine if a factor implies another (transitively)
     # given a list of factors that imply one another or a function for determining
     # which implication relations (represented by production rules?)
@@ -560,30 +603,6 @@ class Procedure:
             # BUG: reciprocal case not handled
         return matchlist
 
-    def check_factor_consistency(self, a, n, matches, reciprocal=False):
-        """
-        Given one pair of factors, determines whether the factors
-        have consistent entity assignments such that both can
-        be true at the same time.
-
-        reciprocal (bool): When this is set to True, the function will
-        swap the first two entity slots of n before comparing n
-        to a. The function will only make a comparison with the slots
-        swapped. The function also needs to be called with reciprocal=False
-        to get a normal comparison with the slots not swapped.
-        """
-        if reciprocal:
-            need_list = list(
-                [n.entity_context[1], n.entity_context[0], n.entity_context[2:]]
-            )
-        else:
-            need_list = n.entity_context
-        return all(
-            matches[a.entity_context[i]] == need_list[i]
-            or not matches[a.entity_context[i]]
-            for i in range(len(a))
-        )
-
     def find_matches(self, self_matches, other_factors, m, matchlist, comparison):
         """
         Recursively searches for a list of entity assignments that can
@@ -602,25 +621,21 @@ class Procedure:
         n = need_matches.pop()
         available = {a for a in self_matches if comparison(a, n)}
         for a in available:
-            if self.check_factor_consistency(a, n, matches):
-                matches_next = list(matches)
-                for i in range(len(a)):
-                    matches_next[a.entity_context[i]] = n.entity_context[i]
-                matchlist = self.find_matches(
-                    self_matches, need_matches, matches_next, matchlist, comparison
-                )
-            if a.predicate.reciprocal and self.check_factor_consistency(
-                a, n, matches, reciprocal=True
+            normal_match, reciprocal_match, swapped = n.check_entity_consistency(
+                a, matches
+            )
+            for match_found, source_list in (
+                (normal_match, n.entity_context),
+                (reciprocal_match, swapped),
             ):
-                swapped = list(
-                    [n.entity_context[1], n.entity_context[0], n.entity_context[2:]]
-                )
-                matches_next = list(matches)
-                for i in range(len(a)):
-                    matches_next[a.entity_context[i]] = swapped[i]
-                matchlist = self.find_matches(
-                    self_matches, need_matches, matches_next, matchlist, comparison
-                )
+                if match_found:
+                    matches_next = list(matches)
+                    for i in range(len(a)):
+                        matches_next[a.entity_context[i]] = source_list[i]
+                    matchlist = self.find_matches(
+                        self_matches, need_matches, matches_next, matchlist, comparison
+                    )
+
         return matchlist
 
     def __eq__(self, other):
