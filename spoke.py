@@ -516,15 +516,15 @@ class Procedure:
     def __str__(self):
         text = "Procedure:"
         if self.inputs:
-            text += "    Inputs:"
+            text += "\nInputs:"
             for f in self.inputs:
                 text += "\n" + str(f)
         if self.despite:
-            text += "    Even if:"
+            text += "\nEven if:"
             for f in self.despite:
                 text += "\n" + str(f)
         if self.outputs:
-            text += "    Outputs:"
+            text += "\nOutputs:"
             for f in self.outputs:
                 text += "\n" + str(f)
         return text
@@ -878,6 +878,15 @@ class ProceduralHolding(Holding):
     universal: bool = False
     rule_valid: bool = True
     decided: bool = True
+
+    def __str__(self):
+        text = ''.join((
+            f"Holding: It is {'' if self.decided else 'not decided whether it is '}",
+            f"{str(self.rule_valid)} that in {'ALL' if self.universal else 'SOME'} cases ",
+            f"where the inputs of the following procedure are present, the court ",
+            f"{'MUST' if self.mandatory else 'MAY'} accept the procedure's output(s):\n"))
+        text += str(self.procedure)
+        return text
 
     def implies_if_valid(self, other) -> bool:
         """Simplified version of the __ge__ implication function

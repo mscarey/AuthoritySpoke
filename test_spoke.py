@@ -153,13 +153,16 @@ def make_factor(make_predicate) -> Dict[str, Factor]:
         "f4": Fact(p["p4"]),
         "f4_swap_entities": Fact(p["p4"], (1, 0)),
         "f5": Fact(p["p5"]),
+        "f5_swap_entities": Fact(p["p5"], (1,)),
         "f6": Fact(p["p6"]),
+        "f6_swap_entities": Fact(p["p6"], (1,)),
         "f7": Fact(p["p7"]),
         "f7_swap_entities": Fact(p["p7"], (1, 0)),
         "f7_true": Fact(p["p7_true"]),
         "f8": Fact(p["p8"]),
         "f8_absent": Fact(p["p8"], absent=True),
         "f8_exact": Fact(p["p8_exact"]),
+        "f8_exact_swap_entities": Fact(p["p8_exact"], (1, 0)),
         "f8_float": Fact(p["p8_float"]),
         "f8_higher_int": Fact(p["p8_higher_int"]),
         "f8_int": Fact(p["p8_int"]),
@@ -167,7 +170,9 @@ def make_factor(make_predicate) -> Dict[str, Factor]:
         "f9": Fact(p["p9"]),
         "f9_absent": Fact(p["p9"], absent=True),
         "f9_absent_miles": Fact(p["p9_miles"], absent=True),
+        "f9_swap_entities": Fact(p["p9"], (1, 0)),
         "f10": Fact(p["p10"]),
+        "f10_swap_entities": Fact(p["p10"], (1, 0)),
         "f11": Fact(p["p11"]),
         "f12": Fact(p["p12"]),
         "f13": Fact(p["p13"]),
@@ -219,6 +224,11 @@ def make_procedure(make_factor) -> Dict[str, Procedure]:
             outputs=(f["f10"],),
             inputs=(f["f4"], f["f5"], f["f6"], f["f7"], f["f9"]),
             despite=(f["f8_exact"],),
+        ),
+        "c2_exact_in_despite_entity_order": Procedure(
+            outputs=(f["f10"],),
+            inputs=(f["f4_swap_entities"], f["f5_swap_entities"], f["f6_swap_entities"], f["f7_swap_entities"], f["f9_swap_entities"]),
+            despite=(f["f8_exact_swap_entities"],),
         ),
         "c2_irrelevant_inputs": Procedure(
             outputs=(f["f10"],),
@@ -288,6 +298,8 @@ def make_holding(make_procedure) -> Dict[str, ProceduralHolding]:
         "h2_irrelevant_inputs": ProceduralHolding(c["c2_irrelevant_inputs"]),
         "h2_reciprocal_swap": ProceduralHolding(c["c2_reciprocal_swap"]),
         "h2_exact_in_despite": ProceduralHolding(c["c2_exact_in_despite"]),
+        "h2_exact_in_despite_ALL": ProceduralHolding(c["c2_exact_in_despite"], mandatory=False, universal=True),
+        "h2_exact_in_despite_ALL_entity_order": ProceduralHolding(c["c2_exact_in_despite_entity_order"], mandatory=False, universal=True),
         "h2_ALL": ProceduralHolding(c["c2"], mandatory=False, universal=True),
         "h2_exact_quantity_ALL": ProceduralHolding(
             c["c2_exact_quantity"], mandatory=False, universal=True
@@ -782,6 +794,16 @@ class TestHoldings:
 
     def test_specific_holding_with_all_implies_more_general_with_some(self, make_holding):
         assert make_holding["h2_exact_quantity_ALL"] > make_holding["h2"]
+
+    def test_all_to_all_with_reciprocal(self, make_holding):
+        """This is supposed to test reciprocal predicates in despite factors
+        in the Predicate.find_consistent_factors method.
+        The entity order shouldn't matter because it's the mirror image of the
+        normal entity order.
+        """
+
+        assert make_holding["h2_exact_in_despite_ALL"] > make_holding["h2_ALL"]
+        assert make_holding["h2_exact_in_despite_ALL_entity_order"] > make_holding["h2_ALL"]
 
     def test_negated_method(self, make_holding):
         assert make_holding["h1"].negated() == make_holding["h1_opposite"]
