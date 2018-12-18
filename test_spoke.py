@@ -226,7 +226,7 @@ def make_procedure(make_factor) -> Dict[str, Procedure]:
             despite=(f["f8_exact"],),
         ),
         "c2_exact_in_despite_entity_order": Procedure(
-            outputs=(f["f10"],),
+            outputs=(f["f10_swap_entities"],),
             inputs=(f["f4_swap_entities"], f["f5_swap_entities"], f["f6_swap_entities"], f["f7_swap_entities"], f["f9_swap_entities"]),
             despite=(f["f8_exact_swap_entities"],),
         ),
@@ -801,7 +801,6 @@ class TestHoldings:
         The entity order shouldn't matter because it's the mirror image of the
         normal entity order.
         """
-
         assert make_holding["h2_exact_in_despite_ALL"] > make_holding["h2_ALL"]
         assert make_holding["h2_exact_in_despite_ALL_entity_order"] > make_holding["h2_ALL"]
 

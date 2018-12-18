@@ -559,34 +559,40 @@ class Procedure:
             matchlist.append(matches)
             return matchlist
         n = need_matches.pop()
-        available_slots = {
-            i: (
-                slot
-                for slot in matches
-                if (not matches[slot] or matches[slot] == n.entity_context[i])
-            )
-            for i in range(len(n))
-        }
-        keys, values = zip(*available_slots.items())
-        combinations = (
-            dict(zip(keys, v))
-            for v in itertools.product(*values)
-            if len(v) == len(set(v))
-        )
-        for c in combinations:
-            if not any(
-                (
-                    a.contradicts(n) and (a.entity_context[i] == c[i] for i in c)
-                    for a in self_matches
+        source_lists = [n.entity_context]
+        if n.predicate.reciprocal:
+            swapped = list(n.entity_context)
+            swapped[0], swapped[1] = swapped[1], swapped[0]
+            source_lists.append(tuple(swapped))
+        for source_list in source_lists:
+            available_slots = {
+                i: (
+                    slot
+                    for slot in matches
+                    if (not matches[slot] or matches[slot] == source_list[i])
                 )
-            ):
-                matches_next = list(matches)
-                for i in c:
-                    matches_next[i] = c[i]
-                    matchlist = self.find_consistent_factors(
-                        self_matches, need_matches, matches_next, matchlist
+                for i in range(len(n))
+            }
+            keys, values = zip(*available_slots.items())
+            combinations = (
+                dict(zip(keys, v))
+                for v in itertools.product(*values)
+                if len(v) == len(set(v))
+            )
+            for c in combinations:
+                if not any(
+                    (
+                        a.contradicts(n) and (a.entity_context[i] == c[i] for i in c)
+                        for a in self_matches
                     )
-            # BUG: reciprocal case not handled
+                ):
+                    matches_next = list(matches)
+                    for i in c:
+                        matches_next[i] = c[i]
+                        matchlist = self.find_consistent_factors(
+                            self_matches, need_matches, matches_next, matchlist
+                        )
+
         return matchlist
 
     def find_matches(self, self_matches, other_factors, m, matchlist, comparison):
@@ -621,7 +627,6 @@ class Procedure:
                     matchlist = self.find_matches(
                         self_matches, need_matches, matches_next, matchlist, comparison
                     )
-
         return matchlist
 
     def __eq__(self, other):
