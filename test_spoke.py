@@ -115,6 +115,7 @@ def make_predicate() -> Dict[str, Predicate]:
             quantity=Q_("5 acres"),
         ),
         "p10": Predicate("{} was within the curtilage of {}"),
+        "p10_false": Predicate("{} was within the curtilage of {}", truth=False),
         "p11": Predicate("{} was a warrantless search and seizure"),
         "p12": Predicate("{} was performed by federal law enforcement officers"),
         "p13": Predicate("{} constituted an intrusion upon {}"),
@@ -172,6 +173,9 @@ def make_factor(make_predicate) -> Dict[str, Factor]:
         "f9_absent_miles": Fact(p["p9_miles"], absent=True),
         "f9_swap_entities": Fact(p["p9"], (1, 0)),
         "f10": Fact(p["p10"]),
+        "f10_absent": Fact(p["p10"], absent=True),
+        "f10_false": Fact(p["p10_false"]),
+        "f10_absent_false": Fact(p["p10_false"], absent=True),
         "f10_swap_entities": Fact(p["p10"], (1, 0)),
         "f11": Fact(p["p11"]),
         "f12": Fact(p["p12"]),
@@ -207,7 +211,7 @@ def make_procedure(make_factor) -> Dict[str, Procedure]:
             inputs=(f["f4"], f["f5"], f["f6"], f["f7"], f["f9"]),
             despite=(f["f8"],),
         ),
-        "c2_absent": Procedure(
+        "c2_absent_despite": Procedure(
             outputs=(f["f10"],),
             inputs=(f["f4"], f["f5"], f["f6"], f["f7"]),
             despite=(f["f8_exact"], f["f9_absent"]),
@@ -281,6 +285,21 @@ def make_procedure(make_factor) -> Dict[str, Procedure]:
             outputs=(f["f8_higher_int"],),
             inputs=(f["f4"], f["f5"], f["f6"], f["f7"], f["f9"]),
         ),
+        "c2_output_absent": Procedure(
+            outputs=(f["f10_absent"],),
+            inputs=(f["f4"], f["f5"], f["f6"], f["f7"], f["f9"]),
+            despite=(f["f8"],),
+        ),
+        "c2_output_false": Procedure(
+            outputs=(f["f10_false"],),
+            inputs=(f["f4"], f["f5"], f["f6"], f["f7"], f["f9"]),
+            despite=(f["f8"],),
+        ),
+        "c2_output_absent_false": Procedure(
+            outputs=(f["f10_absent_false"],),
+            inputs=(f["f4"], f["f5"], f["f6"], f["f7"], f["f9"]),
+            despite=(f["f8"],),
+        ),
         # "c3": Procedure(
         #    outputs=f["f20"],
         #    inputs=(f["f3"], f["f11"], f["12"], f["13"], f["14"], f["15"]),
@@ -301,7 +320,9 @@ def make_holding(make_procedure) -> Dict[str, ProceduralHolding]:
         "h1_opposite": ProceduralHolding(c["c1"], rule_valid=False),
         "h2": ProceduralHolding(c["c2"]),
         "h2_exact_quantity": ProceduralHolding(c["c2_exact_quantity"]),
+        "h2_invalid": ProceduralHolding(c["c2"], rule_valid=False),
         "h2_irrelevant_inputs": ProceduralHolding(c["c2_irrelevant_inputs"]),
+        "h2_irrelevant_inputs_invalid": ProceduralHolding(c["c2_irrelevant_inputs"], rule_valid=False),
         "h2_reciprocal_swap": ProceduralHolding(c["c2_reciprocal_swap"]),
         "h2_exact_in_despite": ProceduralHolding(c["c2_exact_in_despite"]),
         "h2_exact_in_despite_ALL": ProceduralHolding(
@@ -314,6 +335,11 @@ def make_holding(make_procedure) -> Dict[str, ProceduralHolding]:
         "h2_exact_quantity_ALL": ProceduralHolding(
             c["c2_exact_quantity"], mandatory=False, universal=True
         ),
+        "h2_output_absent": ProceduralHolding(c["c2_output_absent"]),
+        "h2_output_false": ProceduralHolding(c["c2_output_false"]),
+        "h2_output_absent_false": ProceduralHolding(c["c2_output_absent_false"]),
+        "h2_SOME_MUST_output_false": ProceduralHolding(c["c2_output_false"], mandatory=True, universal=False),
+        "h2_SOME_MUST_output_absent": ProceduralHolding(c["c2_output_absent"], mandatory=True, universal=False),
     }
 
 
@@ -767,7 +793,7 @@ class TestProcedure:
         input that contradicts the despite factor of c2_exact_in_despite.
         """
         p = make_procedure
-        assert not p["c2"].exhaustive_implies(p["c2_absent"])
+        assert not p["c2"].exhaustive_implies(p["c2_absent_despite"])
 
     def test_no_contradict_between_procedures(self, make_procedure):
         """
@@ -836,6 +862,30 @@ class TestHoldings:
     def test_negated_method(self, make_holding):
         assert make_holding["h1"].negated() == make_holding["h1_opposite"]
 
+    # Contradictions
+
+    def test_holding_contradicts_invalid_version_of_self(self, make_holding):
+        assert make_holding["h2"].negated() == make_holding["h2_invalid"]
+        assert make_holding["h2"].contradicts(make_holding["h2_invalid"])
+        assert make_holding["h2"] >= make_holding["h2_invalid"].negated()
+
+    def test_some_holding_consistent_with_absent_output(self, make_holding):
+        assert not make_holding["h2"].contradicts(make_holding["h2_output_absent"])
+
+    def test_some_holding_consistent_with_false_output(self, make_holding):
+        assert not make_holding["h2"].contradicts(make_holding["h2_output_false"])
+
+    def test_some_holding_consistent_with_absent_false_output(self, make_holding):
+        assert not make_holding["h2"].contradicts(make_holding["h2_output_false"])
+
+    def test_always_may_contradicts_sometimes_must_not(self, make_holding):
+        assert make_holding["h2_ALL"].contradicts(make_holding["h2_SOME_MUST_output_false"])
+
+    def test_always_may_contradicts_sometimes_must_omit_output(self, make_holding):
+        assert make_holding["h2_ALL"].contradicts(make_holding["h2_SOME_MUST_output_absent"])
+
+    def test_h2_contradicts_negation_of_holding_that_implies_h2(self, make_holding):
+        assert make_holding["h2"].contradicts(make_holding["h2_irrelevant_inputs_invalid"])
 
 class TestOpinions:
     def test_load_opinion_in_Harvard_format(self):

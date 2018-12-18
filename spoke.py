@@ -590,7 +590,6 @@ class Procedure:
         matchlist when all possibilities have been searched.
         """
 
-
         matches = tuple(m)
         need_matches = {f for f in other_factors}
         if not need_matches:
@@ -598,7 +597,6 @@ class Procedure:
             return matchlist
         n = need_matches.pop()
         valid_combinations = n.consistent_entity_combinations(self_matches, matches)
-
         for c in valid_combinations:
             matches_next = list(matches)
             for i in c:
@@ -606,7 +604,6 @@ class Procedure:
                 matchlist = self.find_consistent_factors(
                     self_matches, need_matches, matches_next, matchlist
                 )
-
         return matchlist
 
     def find_matches(self, self_matches, other_factors, m, matchlist, comparison):
@@ -618,7 +615,6 @@ class Procedure:
         searching. It finally returns matchlist when all possibilities
         have been searched.
         """
-
         matches = tuple(m)
         need_matches = {f for f in other_factors}
         if not need_matches:
@@ -968,7 +964,7 @@ class ProceduralHolding(Holding):
         other had an opposite value for rule_valid? What if
         rule_valid was None (undecided)?
         """
-        pass
+        return self > other.negated()
 
 
 def opinion_from_file(path):
