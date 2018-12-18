@@ -227,7 +227,13 @@ def make_procedure(make_factor) -> Dict[str, Procedure]:
         ),
         "c2_exact_in_despite_entity_order": Procedure(
             outputs=(f["f10_swap_entities"],),
-            inputs=(f["f4_swap_entities"], f["f5_swap_entities"], f["f6_swap_entities"], f["f7_swap_entities"], f["f9_swap_entities"]),
+            inputs=(
+                f["f4_swap_entities"],
+                f["f5_swap_entities"],
+                f["f6_swap_entities"],
+                f["f7_swap_entities"],
+                f["f9_swap_entities"],
+            ),
             despite=(f["f8_exact_swap_entities"],),
         ),
         "c2_irrelevant_inputs": Procedure(
@@ -298,8 +304,12 @@ def make_holding(make_procedure) -> Dict[str, ProceduralHolding]:
         "h2_irrelevant_inputs": ProceduralHolding(c["c2_irrelevant_inputs"]),
         "h2_reciprocal_swap": ProceduralHolding(c["c2_reciprocal_swap"]),
         "h2_exact_in_despite": ProceduralHolding(c["c2_exact_in_despite"]),
-        "h2_exact_in_despite_ALL": ProceduralHolding(c["c2_exact_in_despite"], mandatory=False, universal=True),
-        "h2_exact_in_despite_ALL_entity_order": ProceduralHolding(c["c2_exact_in_despite_entity_order"], mandatory=False, universal=True),
+        "h2_exact_in_despite_ALL": ProceduralHolding(
+            c["c2_exact_in_despite"], mandatory=False, universal=True
+        ),
+        "h2_exact_in_despite_ALL_entity_order": ProceduralHolding(
+            c["c2_exact_in_despite_entity_order"], mandatory=False, universal=True
+        ),
         "h2_ALL": ProceduralHolding(c["c2"], mandatory=False, universal=True),
         "h2_exact_quantity_ALL": ProceduralHolding(
             c["c2_exact_quantity"], mandatory=False, universal=True
@@ -527,14 +537,28 @@ class TestFactors:
 
     def test_check_entity_consistency_true(self, make_factor):
         f = make_factor
-        assert f["f_irrelevant_3"].check_entity_consistency(f["f_irrelevant_3_new_context"], (None, None, None, 2, None))[0]
-        assert f["f_irrelevant_3"].check_entity_consistency(f["f_irrelevant_3_new_context"], (1, 0, 3, 2, 4))[0]
+        assert f["f_irrelevant_3"].check_entity_consistency(
+            f["f_irrelevant_3_new_context"], (None, None, None, 2, None)
+        )
+        assert f["f_irrelevant_3"].check_entity_consistency(
+            f["f_irrelevant_3_new_context"], (1, 0, 3, 2, 4)
+        )
 
     def test_check_entity_consistency_false(self, make_factor):
         f = make_factor
-        assert not f["f_irrelevant_3"].check_entity_consistency(f["f_irrelevant_3_new_context"], (None, None, None, None, 0))[0]
-        assert not f["f_irrelevant_3"].check_entity_consistency(f["f_irrelevant_3_new_context"], (None, None, None, 3, None))[0]
+        assert not f["f_irrelevant_3"].check_entity_consistency(
+            f["f_irrelevant_3_new_context"], (None, None, None, None, 0)
+        )
+        assert not f["f_irrelevant_3"].check_entity_consistency(
+            f["f_irrelevant_3_new_context"], (None, None, None, 3, None)
+        )
 
+    def test_check_entity_consistency_type_error(self, make_factor, make_holding):
+        f = make_factor
+        with pytest.raises(TypeError):
+            f["f_irrelevant_3"].check_entity_consistency(
+                make_holding["h2"], (None, None, None, None, 0)
+            )
 
 
 class TestProcedure:
@@ -792,7 +816,9 @@ class TestHoldings:
         assert make_holding["h2_ALL"] > make_holding["h2_exact_quantity_ALL"]
         assert not make_holding["h2_exact_quantity_ALL"] > make_holding["h2_ALL"]
 
-    def test_specific_holding_with_all_implies_more_general_with_some(self, make_holding):
+    def test_specific_holding_with_all_implies_more_general_with_some(
+        self, make_holding
+    ):
         assert make_holding["h2_exact_quantity_ALL"] > make_holding["h2"]
 
     def test_all_to_all_with_reciprocal(self, make_holding):
@@ -802,10 +828,14 @@ class TestHoldings:
         normal entity order.
         """
         assert make_holding["h2_exact_in_despite_ALL"] > make_holding["h2_ALL"]
-        assert make_holding["h2_exact_in_despite_ALL_entity_order"] > make_holding["h2_ALL"]
+        assert (
+            make_holding["h2_exact_in_despite_ALL_entity_order"]
+            > make_holding["h2_ALL"]
+        )
 
     def test_negated_method(self, make_holding):
         assert make_holding["h1"].negated() == make_holding["h1_opposite"]
+
 
 class TestOpinions:
     def test_load_opinion_in_Harvard_format(self):

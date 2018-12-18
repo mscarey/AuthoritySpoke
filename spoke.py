@@ -393,7 +393,9 @@ class Fact(Factor):
             return True
         return False
 
-    def check_entity_consistency(self, other, matches):
+    def check_entity_consistency(
+        self, other, matches
+    ) -> List[Optional[Tuple[int, ...]]]:
         """
         Given entity assignments for self and other, determines whether
         the factors have consistent entity assignments such that both can
@@ -404,19 +406,21 @@ class Fact(Factor):
 
         if self.predicate.reciprocal, the function will also compare other
         to self with the first two entity slots of self_entities transposed.
-        The function will return a tuple of booleans indicating whether
-        the factors match with, and without, the transposition.
 
         Parameters:
 
         other (Fact)
 
-        matches (list): a list the same length as len(self). The indices represent
+        matches (tuple): a list the same length as len(self). The indices represent
         self's entity slots, and the value at each index represents other's
         corresponding entity slots that have already been assigned, if any.
+
+        Returns a list containing self's normal entity tuple, self's reciprocal
+        entity tuple, both, or neither, depending on which ones match with other.
+
         """
 
-        def all_matches(need_list):
+        def all_matches(need_list) -> bool:
             return all(
                 matches[other.entity_context[i]] == need_list[i]
                 or matches[other.entity_context[i]] is None
@@ -424,25 +428,58 @@ class Fact(Factor):
             )
 
         if not isinstance(other, self.__class__):
-            return False
+            raise TypeError(f"other must be type {self.__class__}")
 
-        if not self.entity_context:
-            return not other.entity_context
+        answer = []
 
-        swapped = (
-            list(
-                [
-                    self.entity_context[1],
-                    self.entity_context[0],
-                    self.entity_context[2:],
-                ]
+        if all_matches(self.entity_context):
+            answer.append(self.entity_context)
+
+        if self.predicate.reciprocal:
+            swapped = list(self.entity_context)
+            swapped[0], swapped[1] = swapped[1], swapped[0]
+            if all_matches(swapped):
+                answer.append(tuple(swapped))
+
+        return answer
+
+    def consistent_entity_combinations(self, factors_from_other_procedure, matches) -> List[Dict]:
+        """Finds all possible non-contradictory entity marker
+        combinations for self. The time to call this function
+        repeatedly during a recursive search should explode
+        as the possibilities increase, so it should only be run
+        when matches has been narrowed as much as possible."""
+
+        source_lists = [self.entity_context]
+        answer = []
+        if self.predicate.reciprocal:
+            swapped = list(self.entity_context)
+            swapped[0], swapped[1] = swapped[1], swapped[0]
+            source_lists.append(tuple(swapped))
+        for source_list in source_lists:
+            available_slots = {
+                i: (
+                    slot
+                    for slot in matches
+                    if (not matches[slot] or matches[slot] == source_list[i])
+                )
+                for i in range(len(self))
+            }
+            keys, values = zip(*available_slots.items())
+            combinations = (
+                dict(zip(keys, v))
+                for v in itertools.product(*values)
+                if len(v) == len(set(v))
             )
-            if self.predicate.reciprocal
-            else False
-        )
-
-        reciprocal_answer = all_matches(swapped) if self.predicate.reciprocal else False
-        return all_matches(self.entity_context), reciprocal_answer, swapped
+            for c in combinations:
+                if not any(
+                    (
+                        a.contradicts(self) and (a.entity_context[i] == c[i] for i in c)
+                        for a in factors_from_other_procedure
+                    )
+                ):
+                    answer.append(c)
+        return answer
 
     # TODO: A function to determine if a factor implies another (transitively)
     # given a list of factors that imply one another or a function for determining
@@ -529,7 +566,6 @@ class Procedure:
                 text += "\n" + str(f)
         return text
 
-
     def all_factors(self) -> Set[Factor]:
         """Returns a set of all factors."""
 
@@ -544,14 +580,16 @@ class Procedure:
 
         return sorted(self.all_factors(), key=repr)
 
+
     def find_consistent_factors(self, self_matches, other_factors, m, matchlist):
         """
         Recursively searches for a list of entity assignments that can
         cause all of 'other_factors' to not contradict any of the factors in
-        self_matches. When one such list is found, the function adds that
-        list to matchlist and continues searching. It finally returns
+        self_matches. Calls a new instance of consistent_entity_combinations
+        for each such list that is found. It finally returns
         matchlist when all possibilities have been searched.
         """
+
 
         matches = tuple(m)
         need_matches = {f for f in other_factors}
@@ -559,39 +597,15 @@ class Procedure:
             matchlist.append(matches)
             return matchlist
         n = need_matches.pop()
-        source_lists = [n.entity_context]
-        if n.predicate.reciprocal:
-            swapped = list(n.entity_context)
-            swapped[0], swapped[1] = swapped[1], swapped[0]
-            source_lists.append(tuple(swapped))
-        for source_list in source_lists:
-            available_slots = {
-                i: (
-                    slot
-                    for slot in matches
-                    if (not matches[slot] or matches[slot] == source_list[i])
+        valid_combinations = n.consistent_entity_combinations(self_matches, matches)
+
+        for c in valid_combinations:
+            matches_next = list(matches)
+            for i in c:
+                matches_next[i] = c[i]
+                matchlist = self.find_consistent_factors(
+                    self_matches, need_matches, matches_next, matchlist
                 )
-                for i in range(len(n))
-            }
-            keys, values = zip(*available_slots.items())
-            combinations = (
-                dict(zip(keys, v))
-                for v in itertools.product(*values)
-                if len(v) == len(set(v))
-            )
-            for c in combinations:
-                if not any(
-                    (
-                        a.contradicts(n) and (a.entity_context[i] == c[i] for i in c)
-                        for a in self_matches
-                    )
-                ):
-                    matches_next = list(matches)
-                    for i in c:
-                        matches_next[i] = c[i]
-                        matchlist = self.find_consistent_factors(
-                            self_matches, need_matches, matches_next, matchlist
-                        )
 
         return matchlist
 
@@ -613,20 +627,14 @@ class Procedure:
         n = need_matches.pop()
         available = {a for a in self_matches if comparison(a, n)}
         for a in available:
-            normal_match, reciprocal_match, swapped = n.check_entity_consistency(
-                a, matches
-            )
-            for match_found, source_list in (
-                (normal_match, n.entity_context),
-                (reciprocal_match, swapped),
-            ):
-                if match_found:
-                    matches_next = list(matches)
-                    for i in range(len(a)):
-                        matches_next[a.entity_context[i]] = source_list[i]
-                    matchlist = self.find_matches(
-                        self_matches, need_matches, matches_next, matchlist, comparison
-                    )
+            matches_found = n.check_entity_consistency(a, matches)
+            for source_list in matches_found:
+                matches_next = list(matches)
+                for i in range(len(a)):
+                    matches_next[a.entity_context[i]] = source_list[i]
+                matchlist = self.find_matches(
+                    self_matches, need_matches, matches_next, matchlist, comparison
+                )
         return matchlist
 
     def __eq__(self, other):
@@ -885,11 +893,14 @@ class ProceduralHolding(Holding):
     decided: bool = True
 
     def __str__(self):
-        text = ''.join((
-            f"Holding: It is {'' if self.decided else 'not decided whether it is '}",
-            f"{str(self.rule_valid)} that in {'ALL' if self.universal else 'SOME'} cases ",
-            f"where the inputs of the following procedure are present, the court ",
-            f"{'MUST' if self.mandatory else 'MAY'} accept the procedure's output(s):\n"))
+        text = "".join(
+            (
+                f"Holding: It is {'' if self.decided else 'not decided whether it is '}",
+                f"{str(self.rule_valid)} that in {'ALL' if self.universal else 'SOME'} cases ",
+                f"where the inputs of the following procedure are present, the court ",
+                f"{'MUST' if self.mandatory else 'MAY'} accept the procedure's output(s):\n",
+            )
+        )
         text += str(self.procedure)
         return text
 
