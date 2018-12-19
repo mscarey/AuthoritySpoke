@@ -460,11 +460,11 @@ class Fact(Factor):
             source_lists.append(tuple(swapped))
         for source_list in source_lists:
             available_slots = {
-                i: (
+                i: [
                     slot
                     for slot in matches
-                    if (not matches[slot] or matches[slot] == source_list[i])
-                )
+                    if slot != None and (not matches[slot] or matches[slot] == source_list[i])
+                ]
                 for i in range(len(self))
             }
             keys, values = zip(*available_slots.items())

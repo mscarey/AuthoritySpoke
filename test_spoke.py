@@ -612,6 +612,29 @@ class TestFactors:
                 make_holding["h2"], (None, None, None, None, 0)
             )
 
+    def test_consistent_entity_combinations(self, make_factor):
+        """
+        Finds that for factor f["f7"], it would be consistent with the
+        other group of factors for f["f7"]'s two slots to be assigned
+        (0, 1) or (1, 0).
+        """
+
+        f = make_factor
+        assert (
+            f["f7"].consistent_entity_combinations(
+                factors_from_other_procedure=[
+                    f["f4"],
+                    f["f5"],
+                    f["f6"],
+                    f["f7"],
+                    f["f8"],
+                    f["f9"],
+                ],
+                matches=(0, 1, None, None, None),
+            )
+            == [{0: 0, 1: 1}, {0: 1, 1: 0}]
+        )
+
 
 class TestProcedure:
     def test_exception_for_wrong_type_for_procedure(self, make_predicate):
@@ -803,9 +826,7 @@ class TestProcedure:
         )
         assert not make_procedure["c2"] > make_procedure["c2_irrelevant_despite"]
 
-    def test_exhaustive_implies_input_of_self_same_as_despite_of_other(
-        self, make_procedure
-    ):
+    def test_exhaustive_implies_input_same_as_despite_of_other(self, make_procedure):
         """
         Every input of c2_exact_in_despite is equal to or implied by
         some input of c2, and an input of c2 implies the despite of c2_exact_in_despite.
@@ -943,7 +964,7 @@ class TestHoldings:
             make_holding["h2_invalid"]
         )
 
-    def test_invalidity_of_holding_that_implies_h2_contradicts_h2(self, make_holding):
+    def test_invalid_holding_contradicts_h2(self, make_holding):
 
         # You NEVER MAY follow X
         # will contradict
