@@ -394,9 +394,7 @@ class Fact(Factor):
             return True
         return False
 
-    def check_entity_consistency(
-        self, other, matches
-    ) -> List[Tuple[int, ...]]:
+    def check_entity_consistency(self, other, matches) -> List[Tuple[int, ...]]:
         """
         Given entity assignments for self and other, determines whether
         the factors have consistent entity assignments such that both can
@@ -444,7 +442,9 @@ class Fact(Factor):
 
         return answer
 
-    def consistent_entity_combinations(self, factors_from_other_procedure, matches) -> List[Dict]:
+    def consistent_entity_combinations(
+        self, factors_from_other_procedure, matches
+    ) -> List[Dict]:
         """Finds all possible entity marker combinations for self that
         don't result in a contradiction with any of the factors of
         other. The time to call this function
@@ -581,7 +581,6 @@ class Procedure:
         whether the factors are inputs, outputs, or "even if" factors."""
 
         return sorted(self.all_factors(), key=repr)
-
 
     def find_consistent_factors(self, self_matches, other_factors, m, matchlist):
         """
@@ -783,13 +782,6 @@ class Procedure:
         if not isinstance(other, self.__class__):
             return False
 
-        # This is more consistent with __ge__ than __gt__.
-        # I can't think of a use case for the __gt__ behavior of
-        # returning False when the Procedures are equal.
-
-        if self == other:
-            return True
-
         matchlist = [tuple([None for i in range(len(self))])]
 
         for x in ((self.outputs, other.outputs, operator.ge),):
@@ -941,19 +933,14 @@ class ProceduralHolding(Holding):
             if not self.rule_valid and not other.rule_valid:
                 return other.implies_if_valid(self)
 
+            # Looking for implication where self.rule_valid != other.rule_valid
+            # is equivalent to looking for contradiction.
 
-        # In NO cases where A, the output MUST/MAY be X
-        # does imply:
-        # In NOT ALL/NO cases where A, the output MUST be X
-        if (
-            self.decided
-            and other.decided
-            and not self.rule_valid
-            and not other.rule_valid
-            and other.universal >= self.universal
-            and other.mandatory >= self.mandatory
-        ):
-            return self.procedure.exhaustive_implies(other.procedure)
+            # If decided rule A contradicts B, then B also contradicts A
+
+            if self.rule_valid != other.rule_valid:
+                return self.implies_if_valid(other) or other.implies_if_valid(self)
+
 
         raise NotImplementedError("Haven't reached that case yet.")
 

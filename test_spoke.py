@@ -319,10 +319,31 @@ def make_holding(make_procedure) -> Dict[str, ProceduralHolding]:
         "h1_easy": ProceduralHolding(c["c1_easy"]),
         "h1_opposite": ProceduralHolding(c["c1"], rule_valid=False),
         "h2": ProceduralHolding(c["c2"]),
+        "h2_ALL": ProceduralHolding(c["c2"], mandatory=False, universal=True),
+        "h2_ALL_MAY_output_false": ProceduralHolding(
+            c["c2_output_false"], mandatory=False, universal=True
+        ),
+        "h2_ALL_MUST_output_false": ProceduralHolding(
+            c["c2_output_false"], mandatory=True, universal=True
+        ),
         "h2_exact_quantity": ProceduralHolding(c["c2_exact_quantity"]),
         "h2_invalid": ProceduralHolding(c["c2"], rule_valid=False),
         "h2_irrelevant_inputs": ProceduralHolding(c["c2_irrelevant_inputs"]),
-        "h2_irrelevant_inputs_invalid": ProceduralHolding(c["c2_irrelevant_inputs"], rule_valid=False),
+        "h2_irrelevant_inputs_invalid": ProceduralHolding(
+            c["c2_irrelevant_inputs"], rule_valid=False
+        ),
+        "h2_irrelevant_inputs_ALL_MUST": ProceduralHolding(
+            c["c2_irrelevant_inputs"], mandatory=True, universal=True
+        ),
+        "h2_irrelevant_inputs_ALL_MUST_invalid": ProceduralHolding(
+            c["c2_irrelevant_inputs"], mandatory=True, universal=True, rule_valid=False
+        ),
+        "h2_irrelevant_inputs_ALL_invalid": ProceduralHolding(
+            c["c2_irrelevant_inputs"], universal=True, rule_valid=False
+        ),
+        "h2_irrelevant_inputs_MUST_invalid": ProceduralHolding(
+            c["c2_irrelevant_inputs"], mandatory=True, rule_valid=False
+        ),
         "h2_reciprocal_swap": ProceduralHolding(c["c2_reciprocal_swap"]),
         "h2_exact_in_despite": ProceduralHolding(c["c2_exact_in_despite"]),
         "h2_exact_in_despite_ALL": ProceduralHolding(
@@ -331,15 +352,20 @@ def make_holding(make_procedure) -> Dict[str, ProceduralHolding]:
         "h2_exact_in_despite_ALL_entity_order": ProceduralHolding(
             c["c2_exact_in_despite_entity_order"], mandatory=False, universal=True
         ),
-        "h2_ALL": ProceduralHolding(c["c2"], mandatory=False, universal=True),
         "h2_exact_quantity_ALL": ProceduralHolding(
             c["c2_exact_quantity"], mandatory=False, universal=True
         ),
+        "h2_MUST": ProceduralHolding(c["c2"], mandatory=True, universal=False),
+        "h2_MUST_invalid": ProceduralHolding(c["c2"], mandatory=True, rule_valid=False),
         "h2_output_absent": ProceduralHolding(c["c2_output_absent"]),
         "h2_output_false": ProceduralHolding(c["c2_output_false"]),
         "h2_output_absent_false": ProceduralHolding(c["c2_output_absent_false"]),
-        "h2_SOME_MUST_output_false": ProceduralHolding(c["c2_output_false"], mandatory=True, universal=False),
-        "h2_SOME_MUST_output_absent": ProceduralHolding(c["c2_output_absent"], mandatory=True, universal=False),
+        "h2_SOME_MUST_output_false": ProceduralHolding(
+            c["c2_output_false"], mandatory=True, universal=False
+        ),
+        "h2_SOME_MUST_output_absent": ProceduralHolding(
+            c["c2_output_absent"], mandatory=True, universal=False
+        ),
     }
 
 
@@ -809,6 +835,9 @@ class TestProcedure:
 
 
 class TestHoldings:
+
+    # Equality
+
     def test_identical_holdings_equal(self, make_holding):
         assert make_holding["h1"] == make_holding["h1_again"]
 
@@ -826,6 +855,8 @@ class TestHoldings:
 
     def test_holdings_differing_in_entity_order_equal(self, make_holding):
         assert make_holding["h1"] == make_holding["h1_entity_order"]
+
+    # Implication
 
     def test_holdings_more_inputs_implies_fewer(self, make_holding):
         assert make_holding["h1"] > make_holding["h1_easy"]
@@ -862,7 +893,7 @@ class TestHoldings:
     def test_negated_method(self, make_holding):
         assert make_holding["h1"].negated() == make_holding["h1_opposite"]
 
-    # Contradictions
+    # Contradiction
 
     def test_holding_contradicts_invalid_version_of_self(self, make_holding):
         assert make_holding["h2"].negated() == make_holding["h2_invalid"]
@@ -879,13 +910,74 @@ class TestHoldings:
         assert not make_holding["h2"].contradicts(make_holding["h2_output_false"])
 
     def test_always_may_contradicts_sometimes_must_not(self, make_holding):
-        assert make_holding["h2_ALL"].contradicts(make_holding["h2_SOME_MUST_output_false"])
+        assert make_holding["h2_ALL"].contradicts(
+            make_holding["h2_SOME_MUST_output_false"]
+        )
 
     def test_always_may_contradicts_sometimes_must_omit_output(self, make_holding):
-        assert make_holding["h2_ALL"].contradicts(make_holding["h2_SOME_MUST_output_absent"])
+        assert make_holding["h2_ALL"].contradicts(
+            make_holding["h2_SOME_MUST_output_absent"]
+        )
 
-    def test_h2_contradicts_negation_of_holding_that_implies_h2(self, make_holding):
-        assert make_holding["h2"].contradicts(make_holding["h2_irrelevant_inputs_invalid"])
+    def test_sometimes_must_contradicts_always_may_not(self, make_holding):
+        assert make_holding["h2_MUST"].contradicts(
+            make_holding["h2_ALL_MAY_output_false"]
+        )
+
+    def test_sometimes_must_contradicts_always_must_not(self, make_holding):
+        assert make_holding["h2_MUST"].contradicts(
+            make_holding["h2_ALL_MUST_output_false"]
+        )
+
+    def test_negation_of_h2_contradicts_holding_that_implies_h2(self, make_holding):
+        assert make_holding["h2_invalid"].contradicts(
+            make_holding["h2_irrelevant_inputs"]
+        )
+
+    def test_holding_that_implies_h2_contradicts_negation_of_h2(self, make_holding):
+        """
+        Tests whether "contradicts" works reciprocally in this case.
+        It should be reciprocal in every case so far, but maybe not for 'decided.'"""
+
+        assert make_holding["h2_irrelevant_inputs"].contradicts(
+            make_holding["h2_invalid"]
+        )
+
+    def test_invalidity_of_holding_that_implies_h2_contradicts_h2(self, make_holding):
+
+        # You NEVER MAY follow X
+        # will contradict
+        # You SOMEtimes MAY follow Y
+        # if X implies Y or Y implies X
+
+        assert make_holding["h2_irrelevant_inputs_invalid"].contradicts(
+            make_holding["h2"]
+        )
+
+    def test_invalidity_of_holding_that_implies_h2_contradicts_h2_with_MUST(
+        self, make_holding
+    ):
+
+        # You NEVER MUST follow X
+        # will contradict
+        # You SOMEtimes MUST follow Y
+        # if X implies Y or Y implies X
+
+        assert make_holding["h2_irrelevant_inputs_MUST_invalid"].contradicts(
+            make_holding["h2_MUST"]
+        )
+
+    def test_implication_with_ALL_MUST_and_invalid_SOME_MUST(self, make_holding):
+
+        # You ALWAYS MUST follow X
+        # will contradict
+        # You NEVER MUST follow Y
+        # if X implies Y or Y implies X
+
+        assert make_holding["h2_irrelevant_inputs_ALL_MUST"].contradicts(
+            make_holding["h2_MUST_invalid"]
+        )
+
 
 class TestOpinions:
     def test_load_opinion_in_Harvard_format(self):
