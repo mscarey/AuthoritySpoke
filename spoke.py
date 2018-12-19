@@ -323,7 +323,7 @@ class Fact(Factor):
     a judge or jury."""
 
     predicate: Predicate
-    entity_context: Optional[Tuple[int, ...]] = None
+    entity_context: Tuple[int, ...] = ()
     absent: bool = False
 
     def __post_init__(self):
@@ -383,6 +383,7 @@ class Fact(Factor):
     def contradicts(self, other) -> bool:
         if not isinstance(other, self.__class__):
             return False
+
         if self.predicate.contradicts(other.predicate) and not (
             self.absent | other.absent
         ):
@@ -395,7 +396,7 @@ class Fact(Factor):
 
     def check_entity_consistency(
         self, other, matches
-    ) -> List[Optional[Tuple[int, ...]]]:
+    ) -> List[Tuple[int, ...]]:
         """
         Given entity assignments for self and other, determines whether
         the factors have consistent entity assignments such that both can
@@ -444,8 +445,9 @@ class Fact(Factor):
         return answer
 
     def consistent_entity_combinations(self, factors_from_other_procedure, matches) -> List[Dict]:
-        """Finds all possible non-contradictory entity marker
-        combinations for self. The time to call this function
+        """Finds all possible entity marker combinations for self that
+        don't result in a contradiction with any of the factors of
+        other. The time to call this function
         repeatedly during a recursive search should explode
         as the possibilities increase, so it should only be run
         when matches has been narrowed as much as possible."""
@@ -917,7 +919,7 @@ class ProceduralHolding(Holding):
         if other.universal:
             return self.procedure.implies_all_to_all(other.procedure)
 
-        return self.procedure > other.procedure
+        return self.procedure >= other.procedure
 
     def __gt__(self, other) -> bool:
         if self == other:
@@ -931,8 +933,14 @@ class ProceduralHolding(Holding):
         if not isinstance(other, self.__class__):
             return False
 
-        if self.rule_valid and other.rule_valid and self.decided and other.decided:
-            return self.implies_if_valid(other)
+        if self.decided and other.decided:
+
+            if self.rule_valid and other.rule_valid:
+                return self.implies_if_valid(other)
+
+            if not self.rule_valid and not other.rule_valid:
+                return other.implies_if_valid(self)
+
 
         # In NO cases where A, the output MUST/MAY be X
         # does imply:
@@ -964,7 +972,7 @@ class ProceduralHolding(Holding):
         other had an opposite value for rule_valid? What if
         rule_valid was None (undecided)?
         """
-        return self > other.negated()
+        return self >= other.negated()
 
 
 def opinion_from_file(path):
