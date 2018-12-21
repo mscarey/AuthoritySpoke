@@ -822,9 +822,17 @@ class Procedure:
 
     def exhaustive_contradicts(self, other):
         """
-        Self contradicts other if:
-        Other has all the inputs of self, but an output of self
-        contradicts an output of other.
+        Self contradicts other
+        (given what values for mandatory and universal??)
+        if:
+        All of other's inputs are implied by inputs of self,
+        but an output of self contradicts an output of other.
+
+        or if:
+
+        All of self's inputs are implied by inputs of other,
+        but an output of self contradicts an output of other.
+
         """
         pass
 
@@ -894,10 +902,33 @@ class ProceduralHolding(Holding):
         text += str(self.procedure)
         return text
 
+    def contradicts_if_valid(self, other) -> bool:
+        """Determines whether self contradicts other,
+        assuming that rule_valid and decided are
+        True for both Holdings."""
+
+        if not isinstance(other, self.__class__):
+            return False
+
+        if not self.mandatory and not other.mandatory:
+            return False
+
+        if not self.universal and not other.universal:
+            return False
+
+        raise NotImplementedError()
+
+
+
+
+
     def implies_if_valid(self, other) -> bool:
         """Simplified version of the __ge__ implication function
         covering only cases where rule_valid and decided are
         True for both Holdings."""
+
+        if not isinstance(other, self.__class__):
+            return False
 
         if other.mandatory > self.mandatory:
             return False

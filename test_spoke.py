@@ -75,6 +75,12 @@ def make_predicate() -> Dict[str, Predicate]:
             comparison="=",
             quantity=Q_("25 feet"),
         ),
+        "p8_less": Predicate(
+            "The distance between {} and {} was {}",
+            reciprocal=True,
+            comparison="<=",
+            quantity=Q_("20 feet"),
+        ),
         "p8_meters": Predicate(
             "The distance between {} and {} was {}",
             reciprocal=True,
@@ -167,6 +173,7 @@ def make_factor(make_predicate) -> Dict[str, Factor]:
         "f8_float": Fact(p["p8_float"]),
         "f8_higher_int": Fact(p["p8_higher_int"]),
         "f8_int": Fact(p["p8_int"]),
+        "f8_less": Fact(p["p8_less"]),
         "f8_meters": Fact(p["p8_meters"]),
         "f9": Fact(p["p9"]),
         "f9_absent": Fact(p["p9"], absent=True),
@@ -300,6 +307,16 @@ def make_procedure(make_factor) -> Dict[str, Procedure]:
             inputs=(f["f4"], f["f5"], f["f6"], f["f7"], f["f9"]),
             despite=(f["f8"],),
         ),
+        "c_near_means_no_curtilage": Procedure(
+            outputs=(f["f10_false"],), inputs=(f["f7_true"])
+        ),
+        "c_nearer_means_curtilage": Procedure(
+            outputs=(f["f10"],), inputs=(f["f8_less"])
+        ),
+        "c_near_means_curtilage": Procedure(outputs=(f["f10"],), inputs=(f["f7"])),
+        "c_far_means_no_curtilage": Procedure(
+            outputs=(f["f10_false"],), inputs=(f["f8"])
+        ),
         # "c3": Procedure(
         #    outputs=f["f20"],
         #    inputs=(f["f3"], f["f11"], f["12"], f["13"], f["14"], f["15"]),
@@ -365,6 +382,22 @@ def make_holding(make_procedure) -> Dict[str, ProceduralHolding]:
         ),
         "h2_SOME_MUST_output_absent": ProceduralHolding(
             c["c2_output_absent"], mandatory=True, universal=False
+        ),
+        "h_near_means_no_curtilage": ProceduralHolding(c["c_near_means_no_curtilage"]),
+        "h_nearer_means_curtilage_ALL": ProceduralHolding(
+            c["c_nearer_means_curtilage"], mandatory=True, universal=True
+        ),
+        "h_near_means_no_curtilage_ALL": ProceduralHolding(
+            c["c_near_means_no_curtilage"], mandatory=True, universal=True
+        ),
+        "h_nearer_means_curtilage": ProceduralHolding(
+            c["c_nearer_means_curtilage"], mandatory=True, universal=True
+        ),
+        "h_far_means_no_curtilage": ProceduralHolding(
+            c["c_far_means_no_curtilage"], mandatory=True, universal=True
+        ),
+        "h_near_means_curtilage": ProceduralHolding(
+            c["c_near_means_curtilage"], mandatory=True, universal=True
         ),
     }
 
@@ -620,20 +653,17 @@ class TestFactors:
         """
 
         f = make_factor
-        assert (
-            f["f7"].consistent_entity_combinations(
-                factors_from_other_procedure=[
-                    f["f4"],
-                    f["f5"],
-                    f["f6"],
-                    f["f7"],
-                    f["f8"],
-                    f["f9"],
-                ],
-                matches=(0, 1, None, None, None),
-            )
-            == [{0: 0, 1: 1}, {0: 1, 1: 0}]
-        )
+        assert f["f7"].consistent_entity_combinations(
+            factors_from_other_procedure=[
+                f["f4"],
+                f["f5"],
+                f["f6"],
+                f["f7"],
+                f["f8"],
+                f["f9"],
+            ],
+            matches=(0, 1, None, None, None),
+        ) == [{0: 0, 1: 1}, {0: 1, 1: 0}]
 
 
 class TestProcedure:
@@ -930,6 +960,90 @@ class TestHoldings:
     def test_some_holding_consistent_with_absent_false_output(self, make_holding):
         assert not make_holding["h2"].contradicts(make_holding["h2_output_false"])
 
+    def test_contradicts_if_valid(self, make_holding):
+        """
+        This helper method should return the same value as "contradicts"
+        because both holdings are valid.
+        """
+
+        make_holding["h2_ALL"].contradicts_if_valid(
+            make_holding["h2_SOME_MUST_output_false"]
+        )
+
+    def test_contradicts_if_valid_invalid_holding(self, make_holding):
+
+        """
+        In the current design, contradicts calls implies;
+        implies calls contradicts_if_valid.
+        """
+
+        assert make_holding["h2_irrelevant_inputs_invalid"].contradicts(
+            make_holding["h2"]
+        ) != make_holding["h2_irrelevant_inputs_invalid"].contradicts_if_valid(
+            make_holding["h2"]
+        )
+
+    def test_contradicts_if_valid_some_vs_all(self, make_holding):
+
+        """
+        This test and the one below show that you can change whether two
+        holdings contradict one another by exchanging the SOME/MAY from one
+        with the ALL/MUST from the other.
+
+        The assertion here is:
+        In SOME cases where the distance between A and B is less than 35 feet
+        the court MAY find that
+        A is not in the curtilage of B
+
+        does not contradict
+
+        In ALL cases where the distance between A and B is less than 20 feet
+        the court MUST find that
+        A is in the curtilage of B
+        """
+
+        assert make_holding["h_near_means_no_curtilage"].contradicts_if_valid(
+            make_holding["h_nearer_means_curtilage_ALL"]
+        )
+
+    def test_contradicts_if_valid_all_vs_some(self, make_holding):
+
+        """
+        The assertion here is:
+        In ALL cases where the distance between A and B is less than 35 feet
+        the court MUST find that
+        A is not in the curtilage of B
+
+        contradicts
+
+        In SOME cases where the distance between A and B is less than 20 feet
+        the court MAY find that
+        A is in the curtilage of B
+        """
+
+        assert make_holding["h_near_means_no_curtilage_ALL"].contradicts_if_valid(
+            make_holding["h_nearer_means_curtilage"]
+        )
+
+    def test_contradicts_if_valid_all_vs_all(self, make_holding):
+
+        """
+        The assertion here is:
+        In ALL cases where the distance between A and B is less than 35 feet
+        the court MUST find that
+        A is in the curtilage of B
+
+        contradicts
+
+        In ALL cases where the distance between A and B is more than 20 feet
+        the court MAY find that
+        A is not in the curtilage of B
+        """
+
+        assert make_holding["h_near_means_curtilage"].contradicts_if_valid(
+            make_holding["h_far_means_no_curtilage"]
+        )
+
     def test_always_may_contradicts_sometimes_must_not(self, make_holding):
         assert make_holding["h2_ALL"].contradicts(
             make_holding["h2_SOME_MUST_output_false"]
@@ -960,8 +1074,8 @@ class TestHoldings:
         Tests whether "contradicts" works reciprocally in this case.
         It should be reciprocal in every case so far, but maybe not for 'decided.'"""
 
-        assert make_holding["h2_irrelevant_inputs"].contradicts(
-            make_holding["h2_invalid"]
+        assert make_holding["h2_ALL"].contradicts(
+            make_holding["h2_SOME_MUST_output_false"]
         )
 
     def test_invalid_holding_contradicts_h2(self, make_holding):
@@ -988,7 +1102,7 @@ class TestHoldings:
             make_holding["h2_MUST"]
         )
 
-    def test_implication_with_ALL_MUST_and_invalid_SOME_MUST(self, make_holding):
+    def test_contradiction_with_ALL_MUST_and_invalid_SOME_MUST(self, make_holding):
 
         # You ALWAYS MUST follow X
         # will contradict
