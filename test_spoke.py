@@ -337,12 +337,13 @@ def make_holding(make_procedure) -> Dict[str, ProceduralHolding]:
         "h1_opposite": ProceduralHolding(c["c1"], rule_valid=False),
         "h2": ProceduralHolding(c["c2"]),
         "h2_ALL": ProceduralHolding(c["c2"], mandatory=False, universal=True),
+        "h2_ALL_MAY_invalid": ProceduralHolding(
+            c["c2"], mandatory=False, universal=True, rule_valid=False
+        ),
         "h2_ALL_MAY_output_false": ProceduralHolding(
             c["c2_output_false"], mandatory=False, universal=True
         ),
-        "h2_ALL_MUST": ProceduralHolding(
-            c["c2"], mandatory=True, universal=True
-        ),
+        "h2_ALL_MUST": ProceduralHolding(c["c2"], mandatory=True, universal=True),
         "h2_ALL_MUST_output_false": ProceduralHolding(
             c["c2_output_false"], mandatory=True, universal=True
         ),
@@ -382,6 +383,7 @@ def make_holding(make_procedure) -> Dict[str, ProceduralHolding]:
         "h2_MUST_invalid": ProceduralHolding(c["c2"], mandatory=True, rule_valid=False),
         "h2_output_absent": ProceduralHolding(c["c2_output_absent"]),
         "h2_output_false": ProceduralHolding(c["c2_output_false"]),
+        "h2_output_false_ALL": ProceduralHolding(c["c2_output_false"], universal=True),
         "h2_output_absent_false": ProceduralHolding(c["c2_output_absent_false"]),
         "h2_SOME_MUST_output_false": ProceduralHolding(
             c["c2_output_false"], mandatory=True, universal=False
@@ -389,9 +391,7 @@ def make_holding(make_procedure) -> Dict[str, ProceduralHolding]:
         "h2_SOME_MUST_output_absent": ProceduralHolding(
             c["c2_output_absent"], mandatory=True, universal=False
         ),
-        "h_near_means_curtilage": ProceduralHolding(
-            c["c_near_means_curtilage"]
-        ),
+        "h_near_means_curtilage": ProceduralHolding(c["c_near_means_curtilage"]),
         "h_near_means_curtilage_ALL_MUST": ProceduralHolding(
             c["c_near_means_curtilage"], mandatory=True, universal=True
         ),
@@ -402,18 +402,14 @@ def make_holding(make_procedure) -> Dict[str, ProceduralHolding]:
         "h_near_means_no_curtilage_ALL_MUST": ProceduralHolding(
             c["c_near_means_no_curtilage"], mandatory=True, universal=True
         ),
-        "h_nearer_means_curtilage": ProceduralHolding(
-            c["c_nearer_means_curtilage"]
-        ),
+        "h_nearer_means_curtilage": ProceduralHolding(c["c_nearer_means_curtilage"]),
         "h_nearer_means_curtilage_ALL": ProceduralHolding(
             c["c_nearer_means_curtilage"], universal=True
         ),
         "h_nearer_means_curtilage_MUST": ProceduralHolding(
             c["c_nearer_means_curtilage"], mandatory=True
         ),
-        "h_far_means_no_curtilage": ProceduralHolding(
-            c["c_far_means_no_curtilage"]
-        ),
+        "h_far_means_no_curtilage": ProceduralHolding(c["c_far_means_no_curtilage"]),
         "h_far_means_no_curtilage_ALL": ProceduralHolding(
             c["c_far_means_no_curtilage"], universal=True
         ),
@@ -1024,7 +1020,6 @@ class TestHoldings:
             make_holding["h_near_means_no_curtilage_ALL"]
         )
 
-
     def test_contradicts_if_valid_some_vs_all_no_contradiction(self, make_holding):
 
         """
@@ -1131,9 +1126,7 @@ class TestHoldings:
             make_holding["h2_irrelevant_inputs"]
         )
 
-    def test_invalidity_of_implying_holding_contradicts_implied(
-        self, make_holding
-    ):
+    def test_invalidity_of_implying_holding_contradicts_implied(self, make_holding):
 
         # You NEVER MUST follow X
         # will contradict
@@ -1155,6 +1148,26 @@ class TestHoldings:
             make_holding["h2_irrelevant_inputs_MUST_invalid"]
         )
 
+    def test_contradiction_with_ALL_MUST_and_invalid_ALL_MAY(self, make_holding):
+
+        # You ALWAYS MUST follow X
+        # will contradict
+        # You MAY NOT ALWAYS follow Y
+        # if Y implies X
+
+        assert make_holding["h2_ALL_MUST"].contradicts(
+            make_holding["h2_ALL_MAY_invalid"]
+        )
+    def test_contradiction_with_ALL_MUST_and_false_output_ALL_MAY(self, make_holding):
+
+        # You ALWAYS MUST follow X
+        # will contradict
+        # You MAY NOT ALWAYS follow Y
+        # if Y implies X
+
+        assert make_holding["h2_ALL_MUST"].contradicts(
+            make_holding["h2_output_false_ALL"]
+        )
 
 class TestOpinions:
     def test_load_opinion_in_Harvard_format(self):
