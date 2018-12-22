@@ -537,117 +537,6 @@ class Procedure:
         object.__setattr__(self, "inputs", frozenset(self.inputs))
         object.__setattr__(self, "despite", frozenset(self.despite))
 
-    def __len__(self):
-        """
-        Returns the number of entities that need to be specified for the procedure.
-        Works by flattening a series of "markers" fields from the Context objects.
-        """
-
-        return len(
-            set(
-                marker
-                for markertuple in (
-                    factor.entity_context for factor in self.all_factors()
-                )
-                for marker in markertuple
-            )
-        )
-
-    def __str__(self):
-        text = "Procedure:"
-        if self.inputs:
-            text += "\nInputs:"
-            for f in self.inputs:
-                text += "\n" + str(f)
-        if self.despite:
-            text += "\nEven if:"
-            for f in self.despite:
-                text += "\n" + str(f)
-        if self.outputs:
-            text += "\nOutputs:"
-            for f in self.outputs:
-                text += "\n" + str(f)
-        return text
-
-    def all_factors(self) -> Set[Factor]:
-        """Returns a set of all factors."""
-
-        inputs = self.inputs or set()
-        despite = self.despite or set()
-        return {*self.outputs, *inputs, *despite}
-
-    def sorted_factors(self) -> List[Factor]:
-        """Sorts the procedure's factors into an order that will always be
-        the same for the same set of factors, but that doesn't correspond to
-        whether the factors are inputs, outputs, or "even if" factors."""
-
-        return sorted(self.all_factors(), key=repr)
-
-    def find_consistent_factors(self, self_matches, other_factors, m, matchlist):
-        """
-        Recursively searches for a list of entity assignments that can
-        cause all of 'other_factors' to not contradict any of the factors in
-        self_matches. Calls a new instance of consistent_entity_combinations
-        for each such list that is found. It finally returns
-        matchlist when all possibilities have been searched.
-        """
-
-        matches = tuple(m)
-        need_matches = {f for f in other_factors}
-        if not need_matches:
-            matchlist.append(matches)
-            return matchlist
-        n = need_matches.pop()
-        valid_combinations = n.consistent_entity_combinations(self_matches, matches)
-        for c in valid_combinations:
-            matches_next = list(matches)
-            for i in c:
-                matches_next[i] = c[i]
-                matchlist = self.find_consistent_factors(
-                    self_matches, need_matches, matches_next, matchlist
-                )
-        return matchlist
-
-    def contradiction_between_outputs(self, other, m):
-        """
-        Returns a boolean indicating if any factor assignment can be found that
-        makes a factor in the output of other contradict a factor in the
-        output of self.
-        """
-        return any(
-            other_factor.contradicts(self_factor)
-            and (other_factor.check_entity_consistency(self_factor, m)
-            for self_factor in self.outputs)
-            for other_factor in other.outputs
-            for self_factor in self.outputs
-        )
-
-    def find_matches(self, self_matches, other_factors, m, matchlist, comparison):
-        """
-        Recursively searches for a list of entity assignments that can
-        cause all of 'other_factors' to satisfy the relation described by
-        'comparison' with a factor from self_matches. When one such list
-        is found, the function adds that list to matchlist and continues
-        searching. It finally returns matchlist when all possibilities
-        have been searched.
-        """
-        matches = tuple(m)
-        need_matches = {f for f in other_factors}
-        if not need_matches:
-            matchlist.append(matches)
-            return matchlist
-        n = need_matches.pop()
-        available = {a for a in self_matches if comparison(a, n)}
-        for a in available:
-            matches_found = n.check_entity_consistency(a, matches)
-            for source_list in matches_found:
-                matches_next = list(matches)
-                for i in range(len(a)):
-                    matches_next[a.entity_context[i]] = source_list[i]
-                matchlist = self.find_matches(
-                    self_matches, need_matches, matches_next, matchlist, comparison
-                )
-        return matchlist
 
     def __eq__(self, other):
         """Determines if the two procedures have all the same factors
@@ -729,6 +618,122 @@ class Procedure:
             return False
         return self >= other
 
+
+    def __len__(self):
+        """
+        Returns the number of entities that need to be specified for the procedure.
+        Works by flattening a series of "markers" fields from the Context objects.
+        """
+
+        return len(
+            set(
+                marker
+                for markertuple in (
+                    factor.entity_context for factor in self.factors_all()
+                )
+                for marker in markertuple
+            )
+        )
+
+    def __str__(self):
+        text = "Procedure:"
+        if self.inputs:
+            text += "\nInputs:"
+            for f in self.inputs:
+                text += "\n" + str(f)
+        if self.despite:
+            text += "\nEven if:"
+            for f in self.despite:
+                text += "\n" + str(f)
+        if self.outputs:
+            text += "\nOutputs:"
+            for f in self.outputs:
+                text += "\n" + str(f)
+        return text
+
+    def contradiction_between_outputs(self, other, m):
+        """
+        Returns a boolean indicating if any factor assignment can be found that
+        makes a factor in the output of other contradict a factor in the
+        output of self.
+        """
+        return any(
+            other_factor.contradicts(self_factor)
+            and (
+                other_factor.check_entity_consistency(self_factor, m)
+                for self_factor in self.outputs
+            )
+            for other_factor in other.outputs
+            for self_factor in self.outputs
+        )
+
+    def factors_all(self) -> Set[Factor]:
+        """Returns a set of all factors."""
+
+        inputs = self.inputs or set()
+        despite = self.despite or set()
+        return {*self.outputs, *inputs, *despite}
+
+    def factors_sorted(self) -> List[Factor]:
+        """Sorts the procedure's factors into an order that will always be
+        the same for the same set of factors, but that doesn't correspond to
+        whether the factors are inputs, outputs, or "even if" factors."""
+
+        return sorted(self.factors_all(), key=repr)
+
+    def find_consistent_factors(self, self_matches, other_factors, m, matchlist):
+        """
+        Recursively searches for a list of entity assignments that can
+        cause all of 'other_factors' to not contradict any of the factors in
+        self_matches. Calls a new instance of consistent_entity_combinations
+        for each such list that is found. It finally returns
+        matchlist when all possibilities have been searched.
+        """
+
+        matches = tuple(m)
+        need_matches = {f for f in other_factors}
+        if not need_matches:
+            matchlist.append(matches)
+            return matchlist
+        n = need_matches.pop()
+        valid_combinations = n.consistent_entity_combinations(self_matches, matches)
+        for c in valid_combinations:
+            matches_next = list(matches)
+            for i in c:
+                matches_next[i] = c[i]
+                matchlist = self.find_consistent_factors(
+                    self_matches, need_matches, matches_next, matchlist
+                )
+        return matchlist
+
+
+    def find_matches(self, self_matches, other_factors, m, matchlist, comparison):
+        """
+        Recursively searches for a list of entity assignments that can
+        cause all of 'other_factors' to satisfy the relation described by
+        'comparison' with a factor from self_matches. When one such list
+        is found, the function adds that list to matchlist and continues
+        searching. It finally returns matchlist when all possibilities
+        have been searched.
+        """
+        matches = tuple(m)
+        need_matches = {f for f in other_factors}
+        if not need_matches:
+            matchlist.append(matches)
+            return matchlist
+        n = need_matches.pop()
+        available = {a for a in self_matches if comparison(a, n)}
+        for a in available:
+            matches_found = n.check_entity_consistency(a, matches)
+            for source_list in matches_found:
+                matches_next = list(matches)
+                for i in range(len(a)):
+                    matches_next[a.entity_context[i]] = source_list[i]
+                matchlist = self.find_matches(
+                    self_matches, need_matches, matches_next, matchlist, comparison
+                )
+        return matchlist
+
     def contradicts_some_to_all(self, other):
         """
         Tests whether the assertion that self applies in SOME cases
@@ -760,10 +765,7 @@ class Procedure:
         # For self to contradict other, some output of other
         # must be contradicted by some output of self.
 
-        return any(
-            self.contradiction_between_outputs(other, m)
-            for m in prior_list
-        )
+        return any(self.contradiction_between_outputs(other, m) for m in prior_list)
 
     def implies_all_to_all(self, other):
         """
@@ -958,7 +960,6 @@ class ProceduralHolding(Holding):
         if self.universal and not other.universal:
             return other.procedure.contradicts_some_to_all(self.procedure)
 
-
         raise NotImplementedError()
 
     def implies_if_valid(self, other) -> bool:
@@ -1009,7 +1010,7 @@ class ProceduralHolding(Holding):
             # If decided rule A contradicts B, then B also contradicts A
 
             if self.rule_valid != other.rule_valid:
-                return self.implies_if_valid(other) or other.implies_if_valid(self)
+                return self.contradicts_if_valid(other) or other.implies_if_valid(self)
 
         raise NotImplementedError("Haven't reached that case yet.")
 

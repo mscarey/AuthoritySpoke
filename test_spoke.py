@@ -340,6 +340,9 @@ def make_holding(make_procedure) -> Dict[str, ProceduralHolding]:
         "h2_ALL_MAY_output_false": ProceduralHolding(
             c["c2_output_false"], mandatory=False, universal=True
         ),
+        "h2_ALL_MUST": ProceduralHolding(
+            c["c2"], mandatory=True, universal=True
+        ),
         "h2_ALL_MUST_output_false": ProceduralHolding(
             c["c2_output_false"], mandatory=True, universal=True
         ),
@@ -357,6 +360,9 @@ def make_holding(make_procedure) -> Dict[str, ProceduralHolding]:
         ),
         "h2_irrelevant_inputs_ALL_invalid": ProceduralHolding(
             c["c2_irrelevant_inputs"], universal=True, rule_valid=False
+        ),
+        "h2_irrelevant_inputs_MUST": ProceduralHolding(
+            c["c2_irrelevant_inputs"], mandatory=True
         ),
         "h2_irrelevant_inputs_MUST_invalid": ProceduralHolding(
             c["c2_irrelevant_inputs"], mandatory=True, rule_valid=False
@@ -697,9 +703,9 @@ class TestProcedure:
 
     def test_sorted_factors_from_procedure(self, make_predicate, make_procedure):
 
-        """The sorted_factors method sorts them alphabetically by __repr__."""
+        """The factors_sorted method sorts them alphabetically by __repr__."""
 
-        assert make_procedure["c2"].sorted_factors() == [
+        assert make_procedure["c2"].factors_sorted() == [
             Fact(
                 predicate=Predicate(
                     content="The distance between {} and a parking area used by personnel and patrons of {} was {}",
@@ -983,10 +989,10 @@ class TestHoldings:
         implies calls contradicts_if_valid.
         """
 
-        assert make_holding["h2_irrelevant_inputs_invalid"].contradicts(
-            make_holding["h2"]
-        ) != make_holding["h2_irrelevant_inputs_invalid"].contradicts_if_valid(
-            make_holding["h2"]
+        assert make_holding["h2_invalid"].contradicts(
+            make_holding["h2_irrelevant_inputs"]
+        ) != make_holding["h2_invalid"].contradicts_if_valid(
+            make_holding["h2_irrelevant_inputs"]
         )
 
     def test_contradicts_if_valid_some_vs_all(self, make_holding):
@@ -1113,13 +1119,13 @@ class TestHoldings:
         # You NEVER MAY follow X
         # will contradict
         # You SOMEtimes MAY follow Y
-        # if X implies Y or Y implies X
+        # if X implies Y
 
-        assert make_holding["h2_irrelevant_inputs_invalid"].contradicts(
-            make_holding["h2"]
+        assert make_holding["h2_invalid"].contradicts(
+            make_holding["h2_irrelevant_inputs"]
         )
 
-    def test_invalidity_of_holding_that_implies_h2_contradicts_h2_with_MUST(
+    def test_invalidity_of_implying_holding_contradicts_implied(
         self, make_holding
     ):
 
@@ -1128,8 +1134,8 @@ class TestHoldings:
         # You SOMEtimes MUST follow Y
         # if X implies Y or Y implies X
 
-        assert make_holding["h2_irrelevant_inputs_MUST_invalid"].contradicts(
-            make_holding["h2_MUST"]
+        assert make_holding["h2_MUST_invalid"].contradicts(
+            make_holding["h2_irrelevant_inputs_MUST"]
         )
 
     def test_contradiction_with_ALL_MUST_and_invalid_SOME_MUST(self, make_holding):
@@ -1139,8 +1145,8 @@ class TestHoldings:
         # You NEVER MUST follow Y
         # if X implies Y or Y implies X
 
-        assert make_holding["h2_irrelevant_inputs_ALL_MUST"].contradicts(
-            make_holding["h2_MUST_invalid"]
+        assert make_holding["h2_ALL_MUST"].contradicts(
+            make_holding["h2_irrelevant_inputs_MUST_invalid"]
         )
 
 
