@@ -393,6 +393,9 @@ def make_holding(make_procedure) -> Dict[str, ProceduralHolding]:
         "h_near_means_no_curtilage_ALL": ProceduralHolding(
             c["c_near_means_no_curtilage"], universal=True
         ),
+        "h_near_means_no_curtilage_ALL_MUST": ProceduralHolding(
+            c["c_near_means_no_curtilage"], mandatory=True, universal=True
+        ),
         "h_nearer_means_curtilage": ProceduralHolding(
             c["c_nearer_means_curtilage"]
         ),
@@ -1048,7 +1051,7 @@ class TestHoldings:
         A is in the curtilage of B
         """
 
-        assert make_holding["h_near_means_no_curtilage_ALL"].contradicts_if_valid(
+        assert make_holding["h_near_means_no_curtilage_ALL_MUST"].contradicts_if_valid(
             make_holding["h_nearer_means_curtilage"]
         )
 

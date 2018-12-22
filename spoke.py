@@ -463,8 +463,8 @@ class Fact(Factor):
                 i: [
                     slot
                     for slot in matches
-                    if slot != None
-                    and (not matches[slot] or matches[slot] == source_list[i])
+                    if slot is not None
+                    and (matches[slot] is None or matches[slot] == source_list[i])
                 ]
                 for i in range(len(self))
             }
@@ -616,9 +616,10 @@ class Procedure:
         """
         return any(
             other_factor.contradicts(self_factor)
-            and other_factor.consistent_entity_combinations(self.outputs, m)
-            for self_factor in self.outputs
+            and (other_factor.check_entity_consistency(self_factor, m)
+            for self_factor in self.outputs)
             for other_factor in other.outputs
+            for self_factor in self.outputs
         )
 
     def find_matches(self, self_matches, other_factors, m, matchlist, comparison):
@@ -739,7 +740,7 @@ class Procedure:
         if not isinstance(other, self.__class__):
             return False
 
-        prior_list = (tuple([None for i in range(len(self))]),)
+        prior_list = (tuple([None] * len(self)),)
         self_despite_or_input = {*self.despite, *self.inputs}
         matchlist = []
 
@@ -748,7 +749,7 @@ class Procedure:
 
         for m in prior_list:
             matchlist = self.find_matches(
-                other.inputs, self_despite_or_input, m, matchlist, operator.lt
+                self_despite_or_input, other.inputs, m, matchlist, operator.ge
             )
         if not matchlist:
             return False
@@ -953,6 +954,10 @@ class ProceduralHolding(Holding):
 
         if other.universal and not self.universal:
             return self.procedure.contradicts_some_to_all(other.procedure)
+
+        if self.universal and not other.universal:
+            return other.procedure.contradicts_some_to_all(self.procedure)
+
 
         raise NotImplementedError()
 
