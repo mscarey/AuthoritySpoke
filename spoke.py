@@ -762,7 +762,7 @@ class Procedure:
 
         return bool(matchlist)
 
-    def exhaustive_implies(self, other):
+    def implies_all_to_some(self, other):
         """
         This is a different process for checking whether one procedure implies another,
         used when the list of self's inputs is considered an exhaustive list of the
@@ -937,7 +937,7 @@ class ProceduralHolding(Holding):
             return False
 
         if self.universal > other.universal:
-            return self.procedure.exhaustive_implies(other.procedure)
+            return self.procedure.implies_all_to_some(other.procedure)
 
         if other.universal:
             return self.procedure.implies_all_to_all(other.procedure)

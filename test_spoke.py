@@ -850,8 +850,8 @@ class TestProcedure:
     def test_procedure_implication_despite_irrelevant_factors(self, make_procedure):
         assert make_procedure["c2"] < make_procedure["c2_irrelevant_inputs"]
 
-    def test_exhaustive_implies(self, make_procedure):
-        assert make_procedure["c2"].exhaustive_implies(
+    def test_implies_all_to_some(self, make_procedure):
+        assert make_procedure["c2"].implies_all_to_some(
             make_procedure["c2_irrelevant_despite"]
         )
         assert not make_procedure["c2"] > make_procedure["c2_irrelevant_despite"]
@@ -862,7 +862,7 @@ class TestProcedure:
         some input of c2, and an input of c2 implies the despite of c2_exact_in_despite.
         """
         p = make_procedure
-        assert p["c2_exact_in_despite"].exhaustive_implies(p["c2"])
+        assert p["c2_exact_in_despite"].implies_all_to_some(p["c2"])
 
     def test_no_exhaustive_implies_when_input_contradicts_despite(self, make_procedure):
         """
@@ -870,13 +870,13 @@ class TestProcedure:
         input that contradicts the despite factor of c2_exact_in_despite.
         """
         p = make_procedure
-        assert not p["c2"].exhaustive_implies(p["c2_absent_despite"])
+        assert not p["c2"].implies_all_to_some(p["c2_absent_despite"])
 
     def test_no_contradict_between_procedures(self, make_procedure):
         """
         It's not completely clear to me what assumptions are being made about
         the context of a procedure when comparing them with __gt__,
-        exhaustive_implies, and exhaustive_contradicts.
+        implies_all_to_some, and exhaustive_contradicts.
 
         I don't think "contradicts" is meaningful for Procedures, but I could be wrong.
         """
