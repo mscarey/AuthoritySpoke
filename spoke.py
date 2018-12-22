@@ -463,7 +463,8 @@ class Fact(Factor):
                 i: [
                     slot
                     for slot in matches
-                    if slot != None and (not matches[slot] or matches[slot] == source_list[i])
+                    if slot != None
+                    and (not matches[slot] or matches[slot] == source_list[i])
                 ]
                 for i in range(len(self))
             }
@@ -607,6 +608,19 @@ class Procedure:
                 )
         return matchlist
 
+    def contradiction_between_outputs(self, other, m):
+        """
+        Returns a boolean indicating if any factor assignment can be found that
+        makes a factor in the output of other contradict a factor in the
+        output of self.
+        """
+        return any(
+            other_factor.contradicts(self_factor)
+            and other_factor.consistent_entity_combinations(self.outputs, m)
+            for self_factor in self.outputs
+            for other_factor in other.outputs
+        )
+
     def find_matches(self, self_matches, other_factors, m, matchlist, comparison):
         """
         Recursively searches for a list of entity assignments that can
@@ -658,6 +672,7 @@ class Procedure:
             prior_list = tuple(matchlist)
             matchlist = []
             for m in prior_list:
+                # TODO: try rewriting without matchlist as parameter
                 matchlist = self.find_matches(x[0], x[1], m, matchlist, operator.eq)
 
             # Also verifying that every factor in other is in self.
@@ -712,6 +727,42 @@ class Procedure:
         if self == other:
             return False
         return self >= other
+
+    def contradicts_some_to_all(self, other):
+        """
+        Tests whether the assertion that self applies in SOME cases
+        contradicts that the procedure "other" applies in ALL cases,
+        where at least one of the holdings is mandatory.
+
+        """
+
+        if not isinstance(other, self.__class__):
+            return False
+
+        prior_list = (tuple([None for i in range(len(self))]),)
+        self_despite_or_input = {*self.despite, *self.inputs}
+        matchlist = []
+
+        # For self to contradict other, every input of other
+        # must be implied by some input or despite factor of self.
+
+        for m in prior_list:
+            matchlist = self.find_matches(
+                other.inputs, self_despite_or_input, m, matchlist, operator.lt
+            )
+        if not matchlist:
+            return False
+
+        prior_list = tuple(matchlist)
+        matchlist = []
+
+        # For self to contradict other, some output of other
+        # must be contradicted by some output of self.
+
+        return any(
+            self.contradiction_between_outputs(other, m)
+            for m in prior_list
+        )
 
     def implies_all_to_all(self, other):
         """
@@ -820,22 +871,6 @@ class Procedure:
             "'exhaustive_contradicts' method.",
         )
 
-    def exhaustive_contradicts(self, other):
-        """
-        Self contradicts other
-        (given what values for mandatory and universal??)
-        if:
-        All of other's inputs are implied by inputs of self,
-        but an output of self contradicts an output of other.
-
-        or if:
-
-        All of self's inputs are implied by inputs of other,
-        but an output of self contradicts an output of other.
-
-        """
-        pass
-
 
 @dataclass
 class Holding:
@@ -916,11 +951,10 @@ class ProceduralHolding(Holding):
         if not self.universal and not other.universal:
             return False
 
+        if other.universal and not self.universal:
+            return self.procedure.contradicts_some_to_all(other.procedure)
+
         raise NotImplementedError()
-
-
-
-
 
     def implies_if_valid(self, other) -> bool:
         """Simplified version of the __ge__ implication function
@@ -971,7 +1005,6 @@ class ProceduralHolding(Holding):
 
             if self.rule_valid != other.rule_valid:
                 return self.implies_if_valid(other) or other.implies_if_valid(self)
-
 
         raise NotImplementedError("Haven't reached that case yet.")
 

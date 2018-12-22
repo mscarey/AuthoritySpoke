@@ -385,19 +385,22 @@ def make_holding(make_procedure) -> Dict[str, ProceduralHolding]:
         ),
         "h_near_means_no_curtilage": ProceduralHolding(c["c_near_means_no_curtilage"]),
         "h_nearer_means_curtilage_ALL": ProceduralHolding(
-            c["c_nearer_means_curtilage"], mandatory=True, universal=True
+            c["c_nearer_means_curtilage"], universal=True
+        ),
+        "h_nearer_means_curtilage_MUST": ProceduralHolding(
+            c["c_nearer_means_curtilage"], mandatory=True
         ),
         "h_near_means_no_curtilage_ALL": ProceduralHolding(
-            c["c_near_means_no_curtilage"], mandatory=True, universal=True
+            c["c_near_means_no_curtilage"], universal=True
         ),
         "h_nearer_means_curtilage": ProceduralHolding(
-            c["c_nearer_means_curtilage"], mandatory=True, universal=True
+            c["c_nearer_means_curtilage"]
         ),
         "h_far_means_no_curtilage": ProceduralHolding(
-            c["c_far_means_no_curtilage"], mandatory=True, universal=True
+            c["c_far_means_no_curtilage"]
         ),
         "h_near_means_curtilage": ProceduralHolding(
-            c["c_near_means_curtilage"], mandatory=True, universal=True
+            c["c_near_means_curtilage"]
         ),
     }
 
@@ -991,6 +994,30 @@ class TestHoldings:
         with the ALL/MUST from the other.
 
         The assertion here is:
+        In SOME cases where the distance between A and B is less than 20 feet
+        the court MUST find that
+        A is in the curtilage of B
+
+        contradicts
+
+        In ALL cases where the distance between A and B is less than 35 feet
+        the court MAY find that
+        A is not in the curtilage of B
+        """
+
+        assert not make_holding["h_nearer_means_curtilage_MUST"].contradicts_if_valid(
+            make_holding["h_near_means_no_curtilage_ALL"]
+        )
+
+
+    def test_contradicts_if_valid_some_vs_all_no_contradiction(self, make_holding):
+
+        """
+        This test and the one below show that you can change whether two
+        holdings contradict one another by exchanging the SOME/MAY from one
+        with the ALL/MUST from the other.
+
+        The assertion here is:
         In SOME cases where the distance between A and B is less than 35 feet
         the court MAY find that
         A is not in the curtilage of B
@@ -1002,7 +1029,7 @@ class TestHoldings:
         A is in the curtilage of B
         """
 
-        assert make_holding["h_near_means_no_curtilage"].contradicts_if_valid(
+        assert not make_holding["h_near_means_no_curtilage"].contradicts_if_valid(
             make_holding["h_nearer_means_curtilage_ALL"]
         )
 
