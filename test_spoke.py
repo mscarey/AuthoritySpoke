@@ -391,6 +391,15 @@ def make_holding(make_procedure) -> Dict[str, ProceduralHolding]:
         "h2_SOME_MUST_output_absent": ProceduralHolding(
             c["c2_output_absent"], mandatory=True, universal=False
         ),
+        "h2_undecided": ProceduralHolding(
+            c["c2"], decided=False
+        ),
+        "h2_irrelevant_inputs_undecided": ProceduralHolding(
+            c["c2_irrelevant_inputs"], decided=False
+        ),
+        "h2_MUST_undecided": ProceduralHolding(
+            c["c2"], mandatory=True, decided=False
+        ),
         "h_near_means_curtilage": ProceduralHolding(c["c_near_means_curtilage"]),
         "h_near_means_curtilage_ALL_MUST": ProceduralHolding(
             c["c_near_means_curtilage"], mandatory=True, universal=True
@@ -958,6 +967,41 @@ class TestHoldings:
     def test_negated_method(self, make_holding):
         assert make_holding["h1"].negated() == make_holding["h1_opposite"]
 
+    def test_undecided_holding_no_implication(self, make_holding):
+
+        """h2 beind undecided doesn't imply that a version of
+        h2 with more supporting factors is undecided"""
+
+        assert not make_holding["h2_undecided"] >= make_holding["h2_irrelevant_inputs_undecided"]
+
+    def test_undecided_holding_implication(self, make_holding):
+
+        """h2_irrelevant_inputs beind undecided implies that h2
+        is undecided. If courts SOMEtimes MAY use the procedure in h2,
+        then they sometimes may use the procedure in h2_irrelevant_inputs
+        as well, because it has all of h2's supporting factors and no
+        more undercutting factors.
+
+        And if courts MAY not EVER use the procedure in h2, then
+        they can't use h2_irrelevant_inputs, the more specific form
+        of h2.
+        """
+
+        assert make_holding["h2_irrelevant_inputs_undecided"] >= make_holding["h2_undecided"]
+
+    def test_undecided_holding_implication_with_MUST(self, make_holding):
+
+        """If it's undecided whether courts MUST follow the procedure in h2,
+        it still could be decided that they MAY do so"""
+
+        assert not make_holding["h2_MUST_undecided"] >= make_holding["h2_undecided"]
+
+        """If it's undecided whether courts MAY follow the procedure in h2,
+        the rule that they MUST do so still could have been decided to be not valid."""
+
+        assert not make_holding["h2_undecided"] >= make_holding["h2_MUST_undecided"]
+
+
     # Contradiction
 
     def test_holding_contradicts_invalid_version_of_self(self, make_holding):
@@ -1168,6 +1212,7 @@ class TestHoldings:
         assert make_holding["h2_ALL_MUST"].contradicts(
             make_holding["h2_output_false_ALL"]
         )
+
 
 class TestOpinions:
     def test_load_opinion_in_Harvard_format(self):

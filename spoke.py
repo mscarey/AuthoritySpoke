@@ -537,7 +537,6 @@ class Procedure:
         object.__setattr__(self, "inputs", frozenset(self.inputs))
         object.__setattr__(self, "despite", frozenset(self.despite))
 
-
     def __eq__(self, other):
         """Determines if the two procedures have all the same factors
         with the same entities in the same roles, not whether they're
@@ -617,7 +616,6 @@ class Procedure:
         if self == other:
             return False
         return self >= other
-
 
     def __len__(self):
         """
@@ -705,7 +703,6 @@ class Procedure:
                     self_matches, need_matches, matches_next, matchlist
                 )
         return matchlist
-
 
     def find_matches(self, self_matches, other_factors, m, matchlist, comparison):
         """
@@ -960,7 +957,33 @@ class ProceduralHolding(Holding):
         if self.universal and not other.universal:
             return other.procedure.contradicts_some_to_all(self.procedure)
 
-        raise NotImplementedError()
+        # This last option is for the ALL contradicts ALL case (regardless of MAY or MUST)
+        # It could use more tests.
+
+        return other.procedure.contradicts_some_to_all(
+            self.procedure
+        ) or self.procedure.contradicts_some_to_all(other.procedure)
+
+    def implies_if_decided(self, other) -> bool:
+
+        """Simplified version of the __ge__ implication function
+        covering only cases where decided is True for both Holdings,
+        although rule_valid can be False."""
+
+        if self.rule_valid and other.rule_valid:
+                return self.implies_if_valid(other)
+
+        if not self.rule_valid and not other.rule_valid:
+            return other.implies_if_valid(self)
+
+        # Looking for implication where self.rule_valid != other.rule_valid
+        # is equivalent to looking for contradiction.
+
+        # If decided rule A contradicts B, then B also contradicts A
+
+        if self.rule_valid != other.rule_valid:
+            return self.contradicts_if_valid(other) or other.implies_if_valid(self)
+
 
     def implies_if_valid(self, other) -> bool:
         """Simplified version of the __ge__ implication function
@@ -996,21 +1019,15 @@ class ProceduralHolding(Holding):
         if not isinstance(other, self.__class__):
             return False
 
+        if not self.decided and not other.decided:
+            return False
+
+        if self.decided and not other.decided:
+            return NotImplementedError
+
         if self.decided and other.decided:
 
-            if self.rule_valid and other.rule_valid:
-                return self.implies_if_valid(other)
-
-            if not self.rule_valid and not other.rule_valid:
-                return other.implies_if_valid(self)
-
-            # Looking for implication where self.rule_valid != other.rule_valid
-            # is equivalent to looking for contradiction.
-
-            # If decided rule A contradicts B, then B also contradicts A
-
-            if self.rule_valid != other.rule_valid:
-                return self.contradicts_if_valid(other) or other.implies_if_valid(self)
+            return self.implies_if_decided(other)
 
         raise NotImplementedError("Haven't reached that case yet.")
 
