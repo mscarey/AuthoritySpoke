@@ -1214,6 +1214,31 @@ class TestHoldings:
         )
 
 
+    def test_undecided_holding_contradiction(self, make_holding):
+        """When a lower court issues a holding deciding a legal issue
+        and a higher court posits that the issue should be considered
+        undecided, the lower court's prior holding is "contradicted"
+        in the sense of being rendered ineffective."""
+
+        assert make_holding["h2_undecided"].contradicts(make_holding["h2"])
+        assert make_holding["h2_undecided"].contradicts(make_holding["h2_invalid"])
+
+    def test_no_contradiction_of_undecided_holding(self, make_holding):
+        """A court's act of deciding a legal issue doesn't "contradict" another
+        court's prior act of positing that the issue was undecided."""
+
+        assert not make_holding["h2"].contradicts(make_holding["h2_undecided"])
+        assert not make_holding["h2_invalid"].contradicts(make_holding["h2_undecided"])
+
+    def test_undecided_holding_implied_contradiction(self, make_holding):
+
+        assert make_holding["h2_irrelevant_inputs_undecided"].contradicts(make_holding["h2"])
+
+    def test_undecided_holding_no_implied_contradiction(self, make_holding):
+
+        assert not make_holding["h2_irrelevant_inputs_undecided"].contradicts(make_holding["h2_ALL_MAY_invalid"])
+
+
 class TestOpinions:
     def test_load_opinion_in_Harvard_format(self):
         with open("json/watt_h.json", "r") as f:
