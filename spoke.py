@@ -882,8 +882,6 @@ class Holding:
     imply that the court accepts the factual assertions or other factors
     that make up the inputs or outputs of the procedure mentioned in the
     holding.
-
-
     """
 
 
@@ -1019,15 +1017,11 @@ class ProceduralHolding(Holding):
         if not isinstance(other, self.__class__):
             return False
 
-        if not self.decided and not other.decided:
-            return False
-
-        if self.decided and not other.decided:
-            return NotImplementedError
-
         if self.decided and other.decided:
-
             return self.implies_if_decided(other)
+
+        if not self.decided and not other.decided:
+            return self == other or self == other.negated()
 
         raise NotImplementedError("Haven't reached that case yet.")
 

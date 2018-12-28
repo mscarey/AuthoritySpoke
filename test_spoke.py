@@ -314,6 +314,9 @@ def make_procedure(make_factor) -> Dict[str, Procedure]:
             outputs=(f["f10"],), inputs=(f["f8_less"])
         ),
         "c_near_means_curtilage": Procedure(outputs=(f["f10"],), inputs=(f["f7"])),
+        "c_near_means_curtilage_even_if": Procedure(
+            outputs=(f["f10"],), inputs=(f["f7"]), despite=(f["f8"])
+        ),
         "c_far_means_no_curtilage": Procedure(
             outputs=(f["f10_false"],), inputs=(f["f8"])
         ),
@@ -379,6 +382,7 @@ def make_holding(make_procedure) -> Dict[str, ProceduralHolding]:
         "h2_exact_quantity_ALL": ProceduralHolding(
             c["c2_exact_quantity"], mandatory=False, universal=True
         ),
+        "h2_invalid_undecided": ProceduralHolding(c["c2"], rule_valid=False, decided=False),
         "h2_MUST": ProceduralHolding(c["c2"], mandatory=True, universal=False),
         "h2_MUST_invalid": ProceduralHolding(c["c2"], mandatory=True, rule_valid=False),
         "h2_output_absent": ProceduralHolding(c["c2_output_absent"]),
@@ -391,18 +395,20 @@ def make_holding(make_procedure) -> Dict[str, ProceduralHolding]:
         "h2_SOME_MUST_output_absent": ProceduralHolding(
             c["c2_output_absent"], mandatory=True, universal=False
         ),
-        "h2_undecided": ProceduralHolding(
-            c["c2"], decided=False
-        ),
+        "h2_undecided": ProceduralHolding(c["c2"], decided=False),
         "h2_irrelevant_inputs_undecided": ProceduralHolding(
             c["c2_irrelevant_inputs"], decided=False
         ),
-        "h2_MUST_undecided": ProceduralHolding(
-            c["c2"], mandatory=True, decided=False
-        ),
+        "h2_MUST_undecided": ProceduralHolding(c["c2"], mandatory=True, decided=False),
         "h_near_means_curtilage": ProceduralHolding(c["c_near_means_curtilage"]),
+        "h_near_means_curtilage_even_if": ProceduralHolding(
+            c["c_near_means_curtilage_even_if"]
+        ),
         "h_near_means_curtilage_ALL_MUST": ProceduralHolding(
             c["c_near_means_curtilage"], mandatory=True, universal=True
+        ),
+        "h_near_means_curtilage_ALL_undecided": ProceduralHolding(
+            c["c_near_means_curtilage"], universal=True, decided=False
         ),
         "h_near_means_no_curtilage": ProceduralHolding(c["c_near_means_no_curtilage"]),
         "h_near_means_no_curtilage_ALL": ProceduralHolding(
@@ -964,32 +970,47 @@ class TestHoldings:
             > make_holding["h2_ALL"]
         )
 
+    def test_some_holding_does_not_imply_version_with_more_supporting_factors(self, make_holding):
+        """A version of h2 with some supporting factors removed does not imply
+        h2.
+
+        A SOME holding means that a court has actually applied the procedure in
+        some case. If it also implied variations of itself with other supporting
+        inputs added, that would mean that every SOME holding would imply every
+        possible variation of itself that could be constructed by substituting
+        any different set of supporting inputs."""
+
+        assert not make_holding["h_near_means_curtilage_even_if"] >= make_holding["h2"]
+        assert make_holding["h_near_means_curtilage_even_if"] <= make_holding["h2"]
+
     def test_negated_method(self, make_holding):
         assert make_holding["h1"].negated() == make_holding["h1_opposite"]
 
-    def test_undecided_holding_no_implication(self, make_holding):
+    def test_undecided_holding_no_implication_more_inputs(self, make_holding):
 
         """h2 beind undecided doesn't imply that a version of
         h2 with more supporting factors is undecided"""
 
-        assert not make_holding["h2_undecided"] >= make_holding["h2_irrelevant_inputs_undecided"]
+        assert (
+            not make_holding["h2_undecided"]
+            >= make_holding["h2_irrelevant_inputs_undecided"]
+        )
 
-    def test_undecided_holding_implication(self, make_holding):
+    def test_undecided_holding_no_implication_fewer_inputs(self, make_holding):
 
-        """h2_irrelevant_inputs beind undecided implies that h2
+        """h2_irrelevant_inputs being undecided does not imply that h2
         is undecided. If courts SOMEtimes MAY use the procedure in h2,
-        then they sometimes may use the procedure in h2_irrelevant_inputs
-        as well, because it has all of h2's supporting factors and no
-        more undercutting factors.
-
-        And if courts MAY not EVER use the procedure in h2, then
-        they can't use h2_irrelevant_inputs, the more specific form
-        of h2.
+        it may or may not be decided whether any court has been allowed
+        to apply h2_irrelevant_inputs, even though it has all of h2's
+        supporting factors and no more undercutting factors.
         """
 
-        assert make_holding["h2_irrelevant_inputs_undecided"] >= make_holding["h2_undecided"]
+        assert not (
+            make_holding["h2_irrelevant_inputs_undecided"]
+            >= make_holding["h2_undecided"]
+        )
 
-    def test_undecided_holding_implication_with_MUST(self, make_holding):
+    def test_no_undecided_holding_implication_with_MUST(self, make_holding):
 
         """If it's undecided whether courts MUST follow the procedure in h2,
         it still could be decided that they MAY do so"""
@@ -1001,6 +1022,17 @@ class TestHoldings:
 
         assert not make_holding["h2_undecided"] >= make_holding["h2_MUST_undecided"]
 
+    def test_no_undecided_holding_implication_with_ALL(self, make_holding):
+
+        """If it's undecided whether courts ALWAYS MAY follow the procedure in h2,
+        it still could be decided (in the negative) whether they ALWAYS MAY
+        follow a version with fewer supporting inputs."""
+
+        assert not (make_holding["h_near_means_curtilage_ALL_undecided"] >= make_holding["h2_undecided"])
+
+    def test_undecided_implies_negation_is_undecided(self, make_holding):
+        assert make_holding["h2_invalid_undecided"] >= make_holding["h2_undecided"]
+        assert make_holding["h2_undecided"] >= make_holding["h2_invalid_undecided"]
 
     # Contradiction
 
@@ -1202,6 +1234,7 @@ class TestHoldings:
         assert make_holding["h2_ALL_MUST"].contradicts(
             make_holding["h2_ALL_MAY_invalid"]
         )
+
     def test_contradiction_with_ALL_MUST_and_false_output_ALL_MAY(self, make_holding):
 
         # You ALWAYS MUST follow X
@@ -1212,7 +1245,6 @@ class TestHoldings:
         assert make_holding["h2_ALL_MUST"].contradicts(
             make_holding["h2_output_false_ALL"]
         )
-
 
     def test_undecided_holding_contradiction(self, make_holding):
         """When a lower court issues a holding deciding a legal issue
@@ -1232,11 +1264,15 @@ class TestHoldings:
 
     def test_undecided_holding_implied_contradiction(self, make_holding):
 
-        assert make_holding["h2_irrelevant_inputs_undecided"].contradicts(make_holding["h2"])
+        assert make_holding["h2_irrelevant_inputs_undecided"].contradicts(
+            make_holding["h2"]
+        )
 
     def test_undecided_holding_no_implied_contradiction(self, make_holding):
 
-        assert not make_holding["h2_irrelevant_inputs_undecided"].contradicts(make_holding["h2_ALL_MAY_invalid"])
+        assert not make_holding["h2_irrelevant_inputs_undecided"].contradicts(
+            make_holding["h2_ALL_MAY_invalid"]
+        )
 
 
 class TestOpinions:
