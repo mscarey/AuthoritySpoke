@@ -1246,13 +1246,15 @@ class TestHoldings:
             make_holding["h2_output_false_ALL"]
         )
 
-    def test_undecided_holding_contradiction(self, make_holding):
+    def test_undecided_contradicts_holding(self, make_holding):
         """When a lower court issues a holding deciding a legal issue
         and a higher court posits that the issue should be considered
         undecided, the lower court's prior holding is "contradicted"
         in the sense of being rendered ineffective."""
 
         assert make_holding["h2_undecided"].contradicts(make_holding["h2"])
+
+    def test_undecided_contradicts_decided_invalid_holding(self, make_holding):
         assert make_holding["h2_undecided"].contradicts(make_holding["h2_invalid"])
 
     def test_no_contradiction_of_undecided_holding(self, make_holding):

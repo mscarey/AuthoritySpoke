@@ -1020,10 +1020,27 @@ class ProceduralHolding(Holding):
         if self.decided and other.decided:
             return self.implies_if_decided(other)
 
+        # A holding being undecided doesn't seem to imply that
+        # any other holding in undecided, except itself and the
+        # negation of itself.
+
         if not self.decided and not other.decided:
             return self == other or self == other.negated()
 
-        raise NotImplementedError("Haven't reached that case yet.")
+        # A decided holding doesn't "contradict" the previous
+        # statement that the rule was undecided.
+
+        if self.decided and not other.decided:
+            return False
+
+        # If holding A implies holding B, then the statement
+        # that A is undecided contradicts the prior holding B.
+
+        if not self.decided and other.decided:
+            if self.rule_valid != other.rule_valid:
+                return self.implies_if_valid(other)
+
+        return False
 
     def negated(self):
         return ProceduralHolding(
