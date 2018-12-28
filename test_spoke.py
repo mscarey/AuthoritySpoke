@@ -340,7 +340,7 @@ def make_holding(make_procedure) -> Dict[str, ProceduralHolding]:
         "h1_opposite": ProceduralHolding(c["c1"], rule_valid=False),
         "h2": ProceduralHolding(c["c2"]),
         "h2_ALL": ProceduralHolding(c["c2"], mandatory=False, universal=True),
-        "h2_ALL_MAY_invalid": ProceduralHolding(
+        "h2_ALL_invalid": ProceduralHolding(
             c["c2"], mandatory=False, universal=True, rule_valid=False
         ),
         "h2_ALL_MAY_output_false": ProceduralHolding(
@@ -1232,7 +1232,7 @@ class TestHoldings:
         # if Y implies X
 
         assert make_holding["h2_ALL_MUST"].contradicts(
-            make_holding["h2_ALL_MAY_invalid"]
+            make_holding["h2_ALL_invalid"]
         )
 
     def test_contradiction_with_ALL_MUST_and_false_output_ALL_MAY(self, make_holding):
@@ -1273,7 +1273,7 @@ class TestHoldings:
     def test_undecided_holding_no_implied_contradiction(self, make_holding):
 
         assert not make_holding["h2_irrelevant_inputs_undecided"].contradicts(
-            make_holding["h2_ALL_MAY_invalid"]
+            make_holding["h2_ALL_invalid"]
         )
 
 

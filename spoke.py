@@ -980,7 +980,7 @@ class ProceduralHolding(Holding):
         # If decided rule A contradicts B, then B also contradicts A
 
         if self.rule_valid != other.rule_valid:
-            return self.contradicts_if_valid(other) or other.implies_if_valid(self)
+            return self.contradicts_if_valid(other) or other.contradicts_if_valid(self)
 
 
     def implies_if_valid(self, other) -> bool:
@@ -1027,20 +1027,7 @@ class ProceduralHolding(Holding):
         if not self.decided and not other.decided:
             return self == other or self == other.negated()
 
-        # A decided holding doesn't "contradict" the previous
-        # statement that the rule was undecided.
-
-        if self.decided and not other.decided:
-            return False
-
-        # If holding A implies holding B, then the statement
-        # that A is undecided contradicts the prior holding B.
-
-        if not self.decided and other.decided:
-            if self.rule_valid != other.rule_valid:
-                return self.implies_if_valid(other)
-
-        return False
+        return NotImplementedError("Haven't reached this case.")
 
     def negated(self):
         return ProceduralHolding(
@@ -1057,7 +1044,26 @@ class ProceduralHolding(Holding):
         other had an opposite value for rule_valid? What if
         rule_valid was None (undecided)?
         """
-        return self >= other.negated()
+
+        if self.decided and other.decided:
+            return self >= other.negated()
+
+        if not self.decided and not other.decided:
+            return self == other or self == other.negated()
+
+        # A decided holding doesn't "contradict" a previous
+        # statement that any rule was undecided.
+
+        if self.decided and not other.decided:
+            return False
+
+        # If holding A implies holding B, then the statement
+        # that A is undecided contradicts the prior holding B.
+
+        if not self.decided and other.decided:
+            return self.implies_if_decided(other)
+
+
 
 
 def opinion_from_file(path):
