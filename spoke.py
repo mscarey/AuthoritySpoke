@@ -979,8 +979,11 @@ class ProceduralHolding(Holding):
 
         # If decided rule A contradicts B, then B also contradicts A
 
-        if self.rule_valid != other.rule_valid:
-            return self.contradicts_if_valid(other) or other.contradicts_if_valid(self)
+        if other.rule_valid and not self.rule_valid:
+            return self.contradicts_if_valid(other) or other.implies_if_valid(self)
+
+        if self.rule_valid and not other.rule_valid:
+            return other.contradicts_if_valid(self) or self.implies_if_valid(other)
 
 
     def implies_if_valid(self, other) -> bool:
