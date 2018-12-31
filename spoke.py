@@ -916,6 +916,14 @@ class Enactment:
             return False
         return str(self) == str(other)
 
+    def __ge___(self, other):
+        return str(other) in str(self)
+
+    def __gt__(self, other):
+        if self == other:
+            return False
+        return self >= other
+
 
 @dataclass
 class Holding:

@@ -1320,6 +1320,12 @@ class TestEnactments:
     def test_unequal_enactment_text(self, make_enactment):
         assert make_enactment["search_clause"] != make_enactment["fourth_a"]
 
+    def test_enactment_subset(self, make_enactment):
+        assert make_enactment["search_clause"] < make_enactment["fourth_a"]
+
+    def test_enactment_subset_or_equal(self, make_enactment):
+        assert make_enactment["due_process_5"] >= make_enactment["due_process_14"]
+
 
 class TestOpinions:
     def test_load_opinion_in_Harvard_format(self):
