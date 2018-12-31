@@ -872,17 +872,17 @@ class Procedure:
             "'exhaustive_contradicts' method.",
         )
 
+
 @dataclass
 class Code:
     """
     A constitution, code of statutes, code of regulations,
     or collection of court rules.
     """
+
     path: str
     sovereign: str = "federal"
     level: str = "constitution"
-
-
 
 
 @dataclass
@@ -894,6 +894,27 @@ class Enactment:
     section: str
     start: Optional[str] = None
     end: Optional[str] = None
+
+    def __str__(self):
+        with open(self.code.path) as fp:
+            e = bs(fp, features="lxml")
+        text = e.find(id=self.section).find(name="text").text
+        if self.start:
+            l = text.find(self.start)
+        else:
+            l = 0
+        if self.end:
+            r = text.find(self.end) + len(self.end)
+        else:
+            r = len(text)
+        return text[l:r]
+
+    def __eq__(self, other):
+        if self.code.sovereign != other.code.sovereign:
+            return False
+        if self.code.level != other.code.level:
+            return False
+        return str(self) == str(other)
 
 
 @dataclass
@@ -1009,7 +1030,6 @@ class ProceduralHolding(Holding):
         if self.rule_valid and not other.rule_valid:
             return other.contradicts_if_valid(self) or self.implies_if_valid(other)
 
-
     def implies_if_valid(self, other) -> bool:
         """Simplified version of the __ge__ implication function
         covering only cases where rule_valid and decided are
@@ -1089,8 +1109,6 @@ class ProceduralHolding(Holding):
 
         if not self.decided and other.decided:
             return self.implies_if_decided(other)
-
-
 
 
 def opinion_from_file(path):

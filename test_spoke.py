@@ -383,7 +383,9 @@ def make_holding(make_procedure) -> Dict[str, ProceduralHolding]:
         "h2_exact_quantity_ALL": ProceduralHolding(
             c["c2_exact_quantity"], mandatory=False, universal=True
         ),
-        "h2_invalid_undecided": ProceduralHolding(c["c2"], rule_valid=False, decided=False),
+        "h2_invalid_undecided": ProceduralHolding(
+            c["c2"], rule_valid=False, decided=False
+        ),
         "h2_MUST": ProceduralHolding(c["c2"], mandatory=True, universal=False),
         "h2_MUST_invalid": ProceduralHolding(c["c2"], mandatory=True, rule_valid=False),
         "h2_output_absent": ProceduralHolding(c["c2_output_absent"]),
@@ -431,9 +433,32 @@ def make_holding(make_procedure) -> Dict[str, ProceduralHolding]:
         ),
     }
 
+
 @pytest.fixture
 def make_code() -> Dict[str, Code]:
     return {"const": Code("xml/constitution.xml", "federal", "constitution")}
+
+@pytest.fixture
+def make_enactment(make_code) -> Dict[str, Enactment]:
+    const = make_code["const"]
+
+    return {
+        "search_clause": Enactment(const, "amendment-IV", end="violated"),
+        "fourth_a": Enactment(const, "amendment-IV"),
+        "due_process_5": Enactment(
+            const,
+            "amendment-V",
+            start="life, liberty, or property",
+            end="due process of law",
+        ),
+        "due_process_14": Enactment(
+            const,
+            "amendment-XIV-1",
+            start="life, liberty, or property",
+            end="due process of law",
+        ),
+    }
+
 
 @pytest.fixture
 def make_opinion() -> Dict[str, Opinion]:
@@ -974,7 +999,9 @@ class TestHoldings:
             > make_holding["h2_ALL"]
         )
 
-    def test_some_holding_does_not_imply_version_with_more_supporting_factors(self, make_holding):
+    def test_some_holding_does_not_imply_version_with_more_supporting_factors(
+        self, make_holding
+    ):
         """A version of h2 with some supporting factors removed does not imply
         h2.
 
@@ -1032,7 +1059,10 @@ class TestHoldings:
         it still could be decided (in the negative) whether they ALWAYS MAY
         follow a version with fewer supporting inputs."""
 
-        assert not (make_holding["h_near_means_curtilage_ALL_undecided"] >= make_holding["h2_undecided"])
+        assert not (
+            make_holding["h_near_means_curtilage_ALL_undecided"]
+            >= make_holding["h2_undecided"]
+        )
 
     def test_undecided_implies_negation_is_undecided(self, make_holding):
         assert make_holding["h2_invalid_undecided"] >= make_holding["h2_undecided"]
@@ -1235,9 +1265,7 @@ class TestHoldings:
         # You MAY NOT ALWAYS follow Y
         # if Y implies X
 
-        assert make_holding["h2_ALL_MUST"].contradicts(
-            make_holding["h2_ALL_invalid"]
-        )
+        assert make_holding["h2_ALL_MUST"].contradicts(make_holding["h2_ALL_invalid"])
 
     def test_contradiction_with_ALL_MUST_and_false_output_ALL_MAY(self, make_holding):
 
@@ -1280,11 +1308,18 @@ class TestHoldings:
             make_holding["h2_ALL_invalid"]
         )
 
+
 class TestEnactments:
-    def test_make_enactment(self, make_code):
-        const = make_code["const"]
-        search_clause = Enactment(const, "amendment-IV", end="violated")
+    def test_make_enactment(self, make_code, make_enactment):
+        search_clause = make_enactment["search_clause"]
         assert str(search_clause).endswith("shall not be violated")
+
+    def test_equal_enactment_text(self, make_enactment):
+        assert make_enactment["due_process_5"] == make_enactment["due_process_14"]
+
+    def test_unequal_enactment_text(self, make_enactment):
+        assert make_enactment["search_clause"] != make_enactment["fourth_a"]
+
 
 class TestOpinions:
     def test_load_opinion_in_Harvard_format(self):
