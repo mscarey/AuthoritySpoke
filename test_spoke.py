@@ -10,6 +10,7 @@ from spoke import Entity, Human
 from spoke import Predicate, Factor, Fact
 from spoke import Procedure, Holding, ProceduralHolding
 from spoke import Opinion, opinion_from_file
+from spoke import Code, Enactment
 from spoke import ureg, Q_
 
 
@@ -430,6 +431,9 @@ def make_holding(make_procedure) -> Dict[str, ProceduralHolding]:
         ),
     }
 
+@pytest.fixture
+def make_code() -> Dict[str, Code]:
+    return {"const": Code("xml/constitution.xml", "federal", "constitution")}
 
 @pytest.fixture
 def make_opinion() -> Dict[str, Opinion]:
@@ -1276,6 +1280,11 @@ class TestHoldings:
             make_holding["h2_ALL_invalid"]
         )
 
+class TestEnactments:
+    def test_make_enactment(self, make_code):
+        const = make_code["const"]
+        search_clause = Enactment(const, "amendment-IV", end="violated")
+        assert str(search_clause).endswith("shall not be violated")
 
 class TestOpinions:
     def test_load_opinion_in_Harvard_format(self):

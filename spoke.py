@@ -9,6 +9,7 @@ from dataclasses import dataclass
 from collections import namedtuple
 
 from pint import UnitRegistry
+from bs4 import BeautifulSoup as bs
 
 ureg = UnitRegistry()
 Q_ = ureg.Quantity
@@ -871,6 +872,29 @@ class Procedure:
             "'exhaustive_contradicts' method.",
         )
 
+@dataclass
+class Code:
+    """
+    A constitution, code of statutes, code of regulations,
+    or collection of court rules.
+    """
+    path: str
+    sovereign: str = "federal"
+    level: str = "constitution"
+
+
+
+
+@dataclass
+class Enactment:
+    # TODO: put legislative text in enactment objects,
+    # find way to calculate when one enactment is a subset of another
+    # link enactments to Holdings
+    code: Code
+    section: str
+    start: Optional[str] = None
+    end: Optional[str] = None
+
 
 @dataclass
 class Holding:
@@ -969,7 +993,7 @@ class ProceduralHolding(Holding):
         although rule_valid can be False."""
 
         if self.rule_valid and other.rule_valid:
-                return self.implies_if_valid(other)
+            return self.implies_if_valid(other)
 
         if not self.rule_valid and not other.rule_valid:
             return other.implies_if_valid(self)
