@@ -885,44 +885,49 @@ class Code:
     level: str = "constitution"
 
 
-@dataclass
 class Enactment:
-    # TODO: put legislative text in enactment objects,
-    # find way to calculate when one enactment is a subset of another
-    # link enactments to Holdings
-    code: Code
-    section: str
-    start: Optional[str] = None
-    end: Optional[str] = None
+    def __init__(
+        self,
+        code: Code,
+        section: str,
+        start: Optional[str] = None,
+        end: Optional[str] = None,
+    ):
+        self.code = code
+        self.section = section
+        self.start = start
+        self.end = end
 
-    def __str__(self):
         with open(self.code.path) as fp:
-            e = BeautifulSoup(fp.read(), 'lxml-xml')
+            e = BeautifulSoup(fp.read(), "lxml-xml")
         text = e.find(id=self.section).find(name="text").text
-        if self.start:
-            l = text.find(self.start)
+        if start:
+            l = text.find(start)
         else:
             l = 0
-        if self.end:
-            r = text.find(self.end) + len(self.end)
+        if end:
+            r = text.find(end) + len(end)
         else:
             r = len(text)
-        return text[l:r]
+        self.text = text[l:r]
+
+    def __str__(self):
+        return self.text
 
     def __eq__(self, other):
         if self.code.sovereign != other.code.sovereign:
             return False
         if self.code.level != other.code.level:
             return False
-        return str(self) == str(other)
+        return self.text == other.text
 
-    def __ge___(self, other):
-        return str(other) in str(self)
+    def __ge__(self, other):
+        return other.text in self.text
 
     def __gt__(self, other):
         if self == other:
             return False
-        return self >= other
+        return other.text in self.text
 
 
 @dataclass
