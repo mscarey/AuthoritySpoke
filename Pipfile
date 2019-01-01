@@ -5,6 +5,8 @@ name = "pypi"
 
 [packages]
 beautifulsoup4 = "*"
+ipykernel = "*"
+lxml = "*"
 
 [dev-packages]
 pytest = "*"

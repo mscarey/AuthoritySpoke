@@ -9,7 +9,7 @@ from dataclasses import dataclass
 from collections import namedtuple
 
 from pint import UnitRegistry
-from bs4 import BeautifulSoup as bs
+from bs4 import BeautifulSoup
 
 ureg = UnitRegistry()
 Q_ = ureg.Quantity
@@ -897,7 +897,7 @@ class Enactment:
 
     def __str__(self):
         with open(self.code.path) as fp:
-            e = bs(fp, features="lxml")
+            e = BeautifulSoup(fp.read(), 'lxml-xml')
         text = e.find(id=self.section).find(name="text").text
         if self.start:
             l = text.find(self.start)
@@ -1035,8 +1035,8 @@ class ProceduralHolding(Holding):
         if other.rule_valid and not self.rule_valid:
             return self.contradicts_if_valid(other) or other.implies_if_valid(self)
 
-        if self.rule_valid and not other.rule_valid:
-            return other.contradicts_if_valid(self) or self.implies_if_valid(other)
+        # if self.rule_valid and not other.rule_valid
+        return other.contradicts_if_valid(self) or self.implies_if_valid(other)
 
     def implies_if_valid(self, other) -> bool:
         """Simplified version of the __ge__ implication function
