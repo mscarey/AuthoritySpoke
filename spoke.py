@@ -884,8 +884,16 @@ class Code:
     sovereign: str = "federal"
     level: str = "constitution"
 
+    def get_xml(self):
+        with open(self.path) as fp:
+            xml = BeautifulSoup(fp.read(), "lxml-xml")
+        return xml
 
-class Enactment:
+    def title(self):
+        return self.get_xml().find("dc:title").text
+
+
+class Enactment(Factor):
     def __init__(
         self,
         code: Code,
@@ -898,8 +906,7 @@ class Enactment:
         self.start = start
         self.end = end
 
-        with open(self.code.path) as fp:
-            e = BeautifulSoup(fp.read(), "lxml-xml")
+        e = self.code.get_xml()
         text = e.find(id=self.section).find(name="text").text
         if start:
             l = text.find(start)
@@ -911,15 +918,18 @@ class Enactment:
             r = len(text)
         self.text = text[l:r]
 
+    def __hash__(self):
+        return hash((self.text, self.code.sovereign, self.code.level))
+
     def __str__(self):
         return self.text
 
     def __eq__(self, other):
-        if self.code.sovereign != other.code.sovereign:
-            return False
-        if self.code.level != other.code.level:
-            return False
-        return self.text == other.text
+        return (
+            self.text == other.text
+            and self.code.sovereign == other.code.sovereign
+            and self.code.level == other.code.level
+        )
 
     def __ge__(self, other):
         return other.text in self.text

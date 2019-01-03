@@ -14,7 +14,7 @@ from spoke import Code, Enactment
 from spoke import ureg, Q_
 
 
-@pytest.fixture
+@pytest.fixture(scope="class")
 def make_entity() -> Dict[str, Entity]:
     return {
         "e_watt": Human("Wattenburg"),
@@ -23,7 +23,7 @@ def make_entity() -> Dict[str, Entity]:
     }
 
 
-@pytest.fixture
+@pytest.fixture(scope="class")
 def make_predicate() -> Dict[str, Predicate]:
 
     return {
@@ -143,7 +143,7 @@ def make_predicate() -> Dict[str, Predicate]:
     }
 
 
-@pytest.fixture
+@pytest.fixture(scope="class")
 def make_factor(make_predicate) -> Dict[str, Factor]:
     p = make_predicate
 
@@ -202,10 +202,36 @@ def make_factor(make_predicate) -> Dict[str, Factor]:
     }
 
 
-@pytest.fixture
-def make_procedure(make_factor) -> Dict[str, Procedure]:
-    f = make_factor
+@pytest.fixture(scope="module")
+def make_code() -> Dict[str, Code]:
+    return {"const": Code("xml/constitution.xml", "United States", "constitution")}
 
+@pytest.fixture(scope="module")
+def make_enactment(make_code) -> Dict[str, Enactment]:
+    const = make_code["const"]
+
+    return {
+        "search_clause": Enactment(const, "amendment-IV", end="violated"),
+        "fourth_a": Enactment(const, "amendment-IV"),
+        "due_process_5": Enactment(
+            const,
+            "amendment-V",
+            start="life, liberty, or property",
+            end="due process of law",
+        ),
+        "due_process_14": Enactment(
+            const,
+            "amendment-XIV-1",
+            start="life, liberty, or property",
+            end="due process of law",
+        ),
+    }
+
+
+@pytest.fixture(scope="class")
+def make_procedure(make_factor, make_enactment) -> Dict[str, Procedure]:
+    f = make_factor
+    e = make_enactment
     return {
         "c1": Procedure(outputs=(f["f3"],), inputs=(f["f1"], f["f2"])),
         "c1_again": Procedure(outputs=(f["f3"],), inputs=(f["f1"], f["f2"])),
@@ -214,6 +240,11 @@ def make_procedure(make_factor) -> Dict[str, Procedure]:
             inputs=(f["f2_entity_order"], f["f1_entity_order"]),
         ),
         "c1_easy": Procedure(outputs=(f["f3"],), inputs=(f["f2"])),
+        "c2_with_cite": Procedure(
+            outputs=(f["f10"],),
+            inputs=(e["search_clause"], f["f4"], f["f5"], f["f6"], f["f7"], f["f9"]),
+            despite=(f["f8"],),
+        ),
         "c2": Procedure(
             outputs=(f["f10"],),
             inputs=(f["f4"], f["f5"], f["f6"], f["f7"], f["f9"]),
@@ -329,7 +360,7 @@ def make_procedure(make_factor) -> Dict[str, Procedure]:
     }
 
 
-@pytest.fixture
+@pytest.fixture(scope="class")
 def make_holding(make_procedure) -> Dict[str, ProceduralHolding]:
     c = make_procedure
 
@@ -340,6 +371,7 @@ def make_holding(make_procedure) -> Dict[str, ProceduralHolding]:
         "h1_easy": ProceduralHolding(c["c1_easy"]),
         "h1_opposite": ProceduralHolding(c["c1"], rule_valid=False),
         "h2": ProceduralHolding(c["c2"]),
+        "h2_with_cite": ProceduralHolding(c["c2_with_cite"]),
         "h2_ALL": ProceduralHolding(c["c2"], mandatory=False, universal=True),
         "h2_ALL_invalid": ProceduralHolding(
             c["c2"], mandatory=False, universal=True, rule_valid=False
@@ -434,33 +466,7 @@ def make_holding(make_procedure) -> Dict[str, ProceduralHolding]:
     }
 
 
-@pytest.fixture
-def make_code() -> Dict[str, Code]:
-    return {"const": Code("xml/constitution.xml", "federal", "constitution")}
-
-@pytest.fixture
-def make_enactment(make_code) -> Dict[str, Enactment]:
-    const = make_code["const"]
-
-    return {
-        "search_clause": Enactment(const, "amendment-IV", end="violated"),
-        "fourth_a": Enactment(const, "amendment-IV"),
-        "due_process_5": Enactment(
-            const,
-            "amendment-V",
-            start="life, liberty, or property",
-            end="due process of law",
-        ),
-        "due_process_14": Enactment(
-            const,
-            "amendment-XIV-1",
-            start="life, liberty, or property",
-            end="due process of law",
-        ),
-    }
-
-
-@pytest.fixture
+@pytest.fixture(scope="class")
 def make_opinion() -> Dict[str, Opinion]:
     test_cases = ("watt", "brad")
     opinions = {}
@@ -1308,6 +1314,10 @@ class TestHoldings:
             make_holding["h2_ALL_invalid"]
         )
 
+class TestCodes:
+    def test_get_code_title(self, make_code):
+        const = make_code["const"]
+        assert const.title() == 'Constitution of the United States'
 
 class TestEnactments:
     def test_make_enactment(self, make_code, make_enactment):
@@ -1325,6 +1335,9 @@ class TestEnactments:
 
     def test_enactment_subset_or_equal(self, make_enactment):
         assert make_enactment["due_process_5"] >= make_enactment["due_process_14"]
+
+    def test_enactment_as_factor(self, make_enactment):
+        assert isinstance(make_enactment["due_process_5"], Factor)
 
 
 class TestOpinions:
