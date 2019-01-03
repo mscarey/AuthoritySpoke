@@ -428,7 +428,7 @@ class Fact(Factor):
             )
 
         if not isinstance(other, self.__class__):
-            raise TypeError(f"other must be type {self.__class__}")
+            raise TypeError(f"other must be type {self.__class__}") # Why?
 
         answer = []
 
@@ -628,7 +628,9 @@ class Procedure:
             set(
                 marker
                 for markertuple in (
-                    factor.entity_context for factor in self.factors_all()
+                    factor.entity_context
+                    for factor in self.factors_all()
+                    if hasattr(factor, "entity_context")
                 )
                 for marker in markertuple
             )
@@ -925,6 +927,9 @@ class Enactment(Factor):
         return self.text
 
     def __eq__(self, other):
+        if not isinstance(other, self.__class__):
+            return False
+
         return (
             self.text == other.text
             and self.code.sovereign == other.code.sovereign
@@ -932,12 +937,15 @@ class Enactment(Factor):
         )
 
     def __ge__(self, other):
+        if not isinstance(other, self.__class__):
+            return False
+
         return other.text in self.text
 
     def __gt__(self, other):
         if self == other:
             return False
-        return other.text in self.text
+        return self >= other
 
 
 @dataclass

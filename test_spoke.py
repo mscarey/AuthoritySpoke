@@ -136,6 +136,7 @@ def make_predicate() -> Dict[str, Predicate]:
             "{} continued for {}", comparison=">=", quantity=Q_("385 minutes")
         ),
         "p19": Predicate("{} continued after night fell"),
+        # Use the irrelevant predicates/factors to make sure they don't affect an outcome.
         "p_irrelevant_0": Predicate("{} was a clown"),
         "p_irrelevant_1": Predicate("{} was a bear"),
         "p_irrelevant_2": Predicate("{} was a circus"),
@@ -233,44 +234,44 @@ def make_procedure(make_factor, make_enactment) -> Dict[str, Procedure]:
     f = make_factor
     e = make_enactment
     return {
-        "c1": Procedure(outputs=(f["f3"],), inputs=(f["f1"], f["f2"])),
-        "c1_again": Procedure(outputs=(f["f3"],), inputs=(f["f1"], f["f2"])),
+        "c1": Procedure(outputs=(f["f3"],), inputs=(e["search_clause"], f["f1"], f["f2"])),
+        "c1_again": Procedure(outputs=(f["f3"],), inputs=(e["search_clause"], f["f1"], f["f2"])),
         "c1_entity_order": Procedure(
             outputs=(f["f3_entity_order"],),
-            inputs=(f["f2_entity_order"], f["f1_entity_order"]),
+            inputs=(e["search_clause"], f["f2_entity_order"], f["f1_entity_order"]),
         ),
-        "c1_easy": Procedure(outputs=(f["f3"],), inputs=(f["f2"])),
-        "c2_with_cite": Procedure(
+        "c1_easy": Procedure(outputs=(f["f3"],), inputs=(e["search_clause"], f["f2"])),
+        "c2_without_cite": Procedure(
             outputs=(f["f10"],),
-            inputs=(e["search_clause"], f["f4"], f["f5"], f["f6"], f["f7"], f["f9"]),
+            inputs=(f["f4"], f["f5"], f["f6"], f["f7"], f["f9"]),
             despite=(f["f8"],),
         ),
         "c2": Procedure(
             outputs=(f["f10"],),
-            inputs=(f["f4"], f["f5"], f["f6"], f["f7"], f["f9"]),
+            inputs=(e["search_clause"], f["f4"], f["f5"], f["f6"], f["f7"], f["f9"]),
             despite=(f["f8"],),
         ),
         "c2_absent_despite": Procedure(
             outputs=(f["f10"],),
-            inputs=(f["f4"], f["f5"], f["f6"], f["f7"]),
+            inputs=(e["search_clause"], f["f4"], f["f5"], f["f6"], f["f7"]),
             despite=(f["f8_exact"], f["f9_absent"]),
         ),
         "c2_exact_quantity": Procedure(
             outputs=(f["f10"],),
-            inputs=(f["f4"], f["f5"], f["f6"], f["f8_exact"], f["f9"]),
+            inputs=(e["search_clause"], f["f4"], f["f5"], f["f6"], f["f8_exact"], f["f9"]),
         ),
         "c2_higher_quantity": Procedure(
             outputs=(f["f10"],),
-            inputs=(f["f4"], f["f5"], f["f6"], f["f7"], f["f8_higher_int"], f["f9"]),
+            inputs=(e["search_clause"], f["f4"], f["f5"], f["f6"], f["f7"], f["f8_higher_int"], f["f9"]),
         ),
         "c2_exact_in_despite": Procedure(
             outputs=(f["f10"],),
-            inputs=(f["f4"], f["f5"], f["f6"], f["f7"], f["f9"]),
+            inputs=(e["search_clause"], f["f4"], f["f5"], f["f6"], f["f7"], f["f9"]),
             despite=(f["f8_exact"],),
         ),
         "c2_exact_in_despite_entity_order": Procedure(
             outputs=(f["f10_swap_entities"],),
-            inputs=(
+            inputs=(e["search_clause"],
                 f["f4_swap_entities"],
                 f["f5_swap_entities"],
                 f["f6_swap_entities"],
@@ -281,7 +282,7 @@ def make_procedure(make_factor, make_enactment) -> Dict[str, Procedure]:
         ),
         "c2_irrelevant_inputs": Procedure(
             outputs=(f["f10"],),
-            inputs=(
+            inputs=(e["search_clause"],
                 f["f4"],
                 f["f5"],
                 f["f6"],
@@ -297,7 +298,7 @@ def make_procedure(make_factor, make_enactment) -> Dict[str, Procedure]:
         ),
         "c2_irrelevant_despite": Procedure(
             outputs=(f["f10"],),
-            inputs=(f["f4"], f["f5"], f["f6"], f["f7"], f["f9"]),
+            inputs=(e["search_clause"], f["f4"], f["f5"], f["f6"], f["f7"], f["f9"]),
             despite=(
                 f["f8"],
                 f["f_irrelevant_0"],
@@ -309,52 +310,52 @@ def make_procedure(make_factor, make_enactment) -> Dict[str, Procedure]:
         ),
         "c2_reciprocal_swap": Procedure(
             outputs=(f["f10"],),
-            inputs=(f["f4"], f["f5"], f["f6"], f["f7_swap_entities"], f["f9"]),
+            inputs=(e["search_clause"], f["f4"], f["f5"], f["f6"], f["f7_swap_entities"], f["f9"]),
             despite=(f["f8"],),
         ),
         "c2_nonreciprocal_swap": Procedure(
             outputs=(f["f10"],),
-            inputs=(f["f4_swap_entities"], f["f5"], f["f6"], f["f7"], f["f9"]),
+            inputs=(e["search_clause"], f["f4_swap_entities"], f["f5"], f["f6"], f["f7"], f["f9"]),
             despite=(f["f8"],),
         ),
         "c2_broad_output": Procedure(
-            outputs=(f["f8_int"],), inputs=(f["f4"], f["f5"], f["f6"], f["f7"], f["f9"])
+            outputs=(f["f8_int"],), inputs=(e["search_clause"], f["f4"], f["f5"], f["f6"], f["f7"], f["f9"])
         ),
         "c2_narrow_output": Procedure(
             outputs=(f["f8_higher_int"],),
-            inputs=(f["f4"], f["f5"], f["f6"], f["f7"], f["f9"]),
+            inputs=(e["search_clause"], f["f4"], f["f5"], f["f6"], f["f7"], f["f9"]),
         ),
         "c2_output_absent": Procedure(
             outputs=(f["f10_absent"],),
-            inputs=(f["f4"], f["f5"], f["f6"], f["f7"], f["f9"]),
+            inputs=(e["search_clause"], f["f4"], f["f5"], f["f6"], f["f7"], f["f9"]),
             despite=(f["f8"],),
         ),
         "c2_output_false": Procedure(
             outputs=(f["f10_false"],),
-            inputs=(f["f4"], f["f5"], f["f6"], f["f7"], f["f9"]),
+            inputs=(e["search_clause"], f["f4"], f["f5"], f["f6"], f["f7"], f["f9"]),
             despite=(f["f8"],),
         ),
         "c2_output_absent_false": Procedure(
             outputs=(f["f10_absent_false"],),
-            inputs=(f["f4"], f["f5"], f["f6"], f["f7"], f["f9"]),
+            inputs=(e["search_clause"], f["f4"], f["f5"], f["f6"], f["f7"], f["f9"]),
             despite=(f["f8"],),
         ),
         "c_near_means_no_curtilage": Procedure(
-            outputs=(f["f10_false"],), inputs=(f["f7_true"])
+            outputs=(f["f10_false"],), inputs=(e["search_clause"], f["f7_true"])
         ),
         "c_nearer_means_curtilage": Procedure(
-            outputs=(f["f10"],), inputs=(f["f8_less"])
+            outputs=(f["f10"],), inputs=(e["search_clause"], f["f8_less"])
         ),
-        "c_near_means_curtilage": Procedure(outputs=(f["f10"],), inputs=(f["f7"])),
+        "c_near_means_curtilage": Procedure(outputs=(f["f10"],), inputs=(e["search_clause"], f["f7"])),
         "c_near_means_curtilage_even_if": Procedure(
-            outputs=(f["f10"],), inputs=(f["f7"]), despite=(f["f8"])
+            outputs=(f["f10"],), inputs=(e["search_clause"], f["f7"]), despite=(f["f8"])
         ),
         "c_far_means_no_curtilage": Procedure(
-            outputs=(f["f10_false"],), inputs=(f["f8"])
+            outputs=(f["f10_false"],), inputs=(e["search_clause"], f["f8"])
         ),
         # "c3": Procedure(
         #    outputs=f["f20"],
-        #    inputs=(f["f3"], f["f11"], f["12"], f["13"], f["14"], f["15"]),
+        #    inputs=(e["search_clause"], f["f3"], f["f11"], f["12"], f["13"], f["14"], f["15"]),
         #    despite=(f["f16"]),
         # )
     }
@@ -371,7 +372,7 @@ def make_holding(make_procedure) -> Dict[str, ProceduralHolding]:
         "h1_easy": ProceduralHolding(c["c1_easy"]),
         "h1_opposite": ProceduralHolding(c["c1"], rule_valid=False),
         "h2": ProceduralHolding(c["c2"]),
-        "h2_with_cite": ProceduralHolding(c["c2_with_cite"]),
+        "h2_without_cite": ProceduralHolding(c["c2_without_cite"]),
         "h2_ALL": ProceduralHolding(c["c2"], mandatory=False, universal=True),
         "h2_ALL_invalid": ProceduralHolding(
             c["c2"], mandatory=False, universal=True, rule_valid=False
