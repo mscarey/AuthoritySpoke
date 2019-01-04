@@ -994,6 +994,8 @@ class ProceduralHolding(Holding):
     """
 
     procedure: Procedure
+    enactment: Union[Enactment, Iterable[Enactment]] = frozenset([])
+    enactment_despite: Union[Enactment, Iterable[Enactment]] = frozenset([])
     mandatory: bool = False
     universal: bool = False
     rule_valid: bool = True
@@ -1110,6 +1112,8 @@ class ProceduralHolding(Holding):
     def negated(self):
         return ProceduralHolding(
             procedure=self.procedure,
+            enactment=self.enactment,
+            enactment_despite=self.enactment_despite,
             mandatory=self.mandatory,
             universal=self.universal,
             rule_valid=not self.rule_valid,
