@@ -375,6 +375,23 @@ def make_holding(make_procedure, make_enactment) -> Dict[str, ProceduralHolding]
         "h2": ProceduralHolding(c["c2"], enactments=e["search_clause"]),
         "h2_without_cite": ProceduralHolding(c["c2"]),
         "h2_fourth_a_cite": ProceduralHolding(c["c2"], enactments=e["fourth_a"]),
+        "h2_despite_due_process": ProceduralHolding(
+            c["c2"], enactments=e["search_clause"], enactments_despite=e["due_process_5"]
+        ),
+        "h2_ALL_due_process": ProceduralHolding(
+            c["c2"],
+            enactments=(e["search_clause"], e["due_process_5"]),
+            mandatory=False,
+            universal=True,
+            rule_valid=True,
+        ),
+        "h2_ALL_due_process_invalid": ProceduralHolding(
+            c["c2"],
+            enactments=(e["search_clause"], e["due_process_5"]),
+            mandatory=False,
+            universal=True,
+            rule_valid=False,
+        ),
         "h2_ALL": ProceduralHolding(
             c["c2"], enactments=e["search_clause"], mandatory=False, universal=True
         ),
@@ -528,7 +545,9 @@ def make_holding(make_procedure, make_enactment) -> Dict[str, ProceduralHolding]
             c["c_near_means_no_curtilage"], enactments=e["search_clause"]
         ),
         "h_near_means_no_curtilage_ALL": ProceduralHolding(
-            c["c_near_means_no_curtilage"], enactments=e["search_clause"], universal=True
+            c["c_near_means_no_curtilage"],
+            enactments=e["search_clause"],
+            universal=True,
         ),
         "h_near_means_no_curtilage_ALL_MUST": ProceduralHolding(
             c["c_near_means_no_curtilage"],
@@ -1418,7 +1437,7 @@ class TestHoldings:
         the court would require it pursuant to its common law power to make laws."""
         assert not make_holding["h2"] >= make_holding["h2_without_cite"]
 
-    def test_no_implication_common_law_and_constitutional(self, make_holding):
+    def test_implication_common_law_and_constitutional(self, make_holding):
         """When a court asserts a holding as valid without legislative support,
         the court is actually making a broader statement than it would be making
         if it cited legislative support. The holding without legislative support
@@ -1429,6 +1448,22 @@ class TestHoldings:
         matter. Statutory holdings trump common law holdings, and constitutional
         trumps statutory."""
         assert make_holding["h2"] <= make_holding["h2_without_cite"]
+
+    def test_no_implication_of_holding_with_added_despite_enactment(self, make_holding):
+        assert not make_holding["h2"] >= make_holding["h2_despite_due_process"]
+
+    def test_implication_of_holding_with_removed_despite_enactment(self, make_holding):
+        assert make_holding["h2_despite_due_process"] >= make_holding["h2"]
+
+    def test_no_contradiction_when_added_enactment_makes_rule_valid(self, make_holding):
+        assert not make_holding["h2_ALL_due_process"].contradicts(make_holding["h2_ALL_invalid"])
+        assert not make_holding["h2_ALL_invalid"].contradicts(make_holding["h2_ALL_due_process"])
+
+    def test_contradiction_with_fewer_enactments(self, make_holding):
+        """This and the previous enactment contradiction test passed on their own.
+        Does there need to be something about enactments in the contradicts method?"""
+        assert make_holding["h2_ALL_due_process_invalid"].contradicts(make_holding["h2_ALL"])
+
 
 class TestCodes:
     def test_get_code_title(self, make_code):

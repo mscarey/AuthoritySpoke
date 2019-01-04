@@ -428,7 +428,7 @@ class Fact(Factor):
             )
 
         if not isinstance(other, self.__class__):
-            raise TypeError(f"other must be type {self.__class__}") # Why?
+            raise TypeError(f"other must be type {self.__class__}")  # Why?
 
         answer = []
 
@@ -524,19 +524,19 @@ class Procedure:
             object.__setattr__(self, "inputs", frozenset((self.inputs,)))
         if isinstance(self.despite, Factor):
             object.__setattr__(self, "despite", frozenset((self.despite,)))
-        for group in (self.outputs, self.inputs, self.despite):
-            for x in group:
-                if not isinstance(x, Factor):
-                    raise TypeError(
-                        (
-                            f"{group} must contain only type Factor,",
-                            f"but {x} was type {type(x)}",
-                        )
-                    )
-
         object.__setattr__(self, "outputs", frozenset(self.outputs))
         object.__setattr__(self, "inputs", frozenset(self.inputs))
         object.__setattr__(self, "despite", frozenset(self.despite))
+
+        for x in (self.outputs | self.inputs | self.despite):
+            if not isinstance(x, Factor):
+                raise TypeError(
+                    (
+                        f"{group} must contain only type Factor,",
+                        f"but {x} was type {type(x)}",
+                    )
+                )
+
 
     def __eq__(self, other):
         """Determines if the two procedures have all the same factors
@@ -968,6 +968,13 @@ class ProceduralHolding(Holding):
     procedure (Procedure): optional because a holding can contain
     an attribution instead of a holding
 
+    enactments (Union[Enactment, Iterable[Enactment]]): the set of
+    enactments cited as authority for the holding
+
+    enactments_despite (Union[Enactment, Iterable[Enactment]]):
+    the set of enactments specifically cited as failing to undercut
+    the holding
+
     mandatory (bool): whether the procedure is mandatory for the
     court to apply whenever the holding is properly invoked. False
     may be used for procedures deemed "discretionary".
@@ -1005,7 +1012,11 @@ class ProceduralHolding(Holding):
         if isinstance(self.enactments, Enactment):
             object.__setattr__(self, "enactments", frozenset((self.enactments,)))
         if isinstance(self.enactments_despite, Enactment):
-            object.__setattr__(self, "enactments_despite", frozenset((self.enactments_despite,)))
+            object.__setattr__(
+                self, "enactments_despite", frozenset((self.enactments_despite,))
+            )
+        object.__setattr__(self, "enactments", frozenset(self.enactments))
+        object.__setattr__(self, "enactments_despite", frozenset(self.enactments_despite))
 
     def __str__(self):
         text = "".join(
@@ -1077,6 +1088,23 @@ class ProceduralHolding(Holding):
         if not isinstance(other, self.__class__):
             return False
 
+        # If self relies for support on some enactment text that
+        # other doesn't, then self doesn't imply other.
+
+        if not all(
+            any(other_e >= e for other_e in other.enactments) for e in self.enactments
+        ):
+            return False
+
+        # If other specifies that it applies notwithstanding some
+        # enactment not mentioned by self, then self doesn't imply other.
+
+        if not all(
+            any(e >= other_d for e in (self.enactments | self.enactments_despite))
+            for other_d in other.enactments_despite
+        ):
+            return False
+
         if other.mandatory > self.mandatory:
             return False
 
@@ -1107,13 +1135,16 @@ class ProceduralHolding(Holding):
             return self.implies_if_decided(other)
 
         # A holding being undecided doesn't seem to imply that
-        # any other holding in undecided, except itself and the
+        # any other holding is undecided, except itself and the
         # negation of itself.
 
         if not self.decided and not other.decided:
             return self == other or self == other.negated()
 
-        return NotImplementedError("Haven't reached this case.")
+        # It doesn't seem that any holding being undecided implies
+        # that any holding is decided, or vice versa.
+
+        return False
 
     def negated(self):
         return ProceduralHolding(
