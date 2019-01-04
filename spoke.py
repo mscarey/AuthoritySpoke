@@ -994,12 +994,18 @@ class ProceduralHolding(Holding):
     """
 
     procedure: Procedure
-    enactment: Union[Enactment, Iterable[Enactment]] = frozenset([])
-    enactment_despite: Union[Enactment, Iterable[Enactment]] = frozenset([])
+    enactments: Union[Enactment, Iterable[Enactment]] = frozenset([])
+    enactments_despite: Union[Enactment, Iterable[Enactment]] = frozenset([])
     mandatory: bool = False
     universal: bool = False
     rule_valid: bool = True
     decided: bool = True
+
+    def __post_init__(self):
+        if isinstance(self.enactments, Enactment):
+            object.__setattr__(self, "enactments", frozenset((self.enactments,)))
+        if isinstance(self.enactments_despite, Enactment):
+            object.__setattr__(self, "enactments_despite", frozenset((self.enactments_despite,)))
 
     def __str__(self):
         text = "".join(
@@ -1112,8 +1118,8 @@ class ProceduralHolding(Holding):
     def negated(self):
         return ProceduralHolding(
             procedure=self.procedure,
-            enactment=self.enactment,
-            enactment_despite=self.enactment_despite,
+            enactments=self.enactments,
+            enactments_despite=self.enactments_despite,
             mandatory=self.mandatory,
             universal=self.universal,
             rule_valid=not self.rule_valid,

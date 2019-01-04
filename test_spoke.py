@@ -363,191 +363,191 @@ def make_holding(make_procedure, make_enactment) -> Dict[str, ProceduralHolding]
     e = make_enactment
 
     return {
-        "h1": ProceduralHolding(c["c1"], enactment=e["search_clause"]),
-        "h1_again": ProceduralHolding(c["c1"], enactment=e["search_clause"]),
+        "h1": ProceduralHolding(c["c1"], enactments=e["search_clause"]),
+        "h1_again": ProceduralHolding(c["c1"], enactments=e["search_clause"]),
         "h1_entity_order": ProceduralHolding(
-            c["c1_entity_order"], enactment=e["search_clause"]
+            c["c1_entity_order"], enactments=e["search_clause"]
         ),
-        "h1_easy": ProceduralHolding(c["c1_easy"], enactment=e["search_clause"]),
+        "h1_easy": ProceduralHolding(c["c1_easy"], enactments=e["search_clause"]),
         "h1_opposite": ProceduralHolding(
-            c["c1"], enactment=e["search_clause"], rule_valid=False
+            c["c1"], enactments=e["search_clause"], rule_valid=False
         ),
-        "h2": ProceduralHolding(c["c2"], enactment=e["search_clause"]),
+        "h2": ProceduralHolding(c["c2"], enactments=e["search_clause"]),
         "h2_without_cite": ProceduralHolding(c["c2"]),
-        "h2_fourth_a_cite": ProceduralHolding(c["c2"], enactment=e["fourth_a"]),
+        "h2_fourth_a_cite": ProceduralHolding(c["c2"], enactments=e["fourth_a"]),
         "h2_ALL": ProceduralHolding(
-            c["c2"], enactment=e["search_clause"], mandatory=False, universal=True
+            c["c2"], enactments=e["search_clause"], mandatory=False, universal=True
         ),
         "h2_ALL_invalid": ProceduralHolding(
             c["c2"],
-            enactment=e["search_clause"],
+            enactments=e["search_clause"],
             mandatory=False,
             universal=True,
             rule_valid=False,
         ),
         "h2_ALL_MAY_output_false": ProceduralHolding(
             c["c2_output_false"],
-            enactment=e["search_clause"],
+            enactments=e["search_clause"],
             mandatory=False,
             universal=True,
         ),
         "h2_ALL_MUST": ProceduralHolding(
-            c["c2"], enactment=e["search_clause"], mandatory=True, universal=True
+            c["c2"], enactments=e["search_clause"], mandatory=True, universal=True
         ),
         "h2_ALL_MUST_output_false": ProceduralHolding(
             c["c2_output_false"],
-            enactment=e["search_clause"],
+            enactments=e["search_clause"],
             mandatory=True,
             universal=True,
         ),
         "h2_exact_quantity": ProceduralHolding(
-            c["c2_exact_quantity"], enactment=e["search_clause"]
+            c["c2_exact_quantity"], enactments=e["search_clause"]
         ),
         "h2_invalid": ProceduralHolding(
-            c["c2"], enactment=e["search_clause"], rule_valid=False
+            c["c2"], enactments=e["search_clause"], rule_valid=False
         ),
         "h2_irrelevant_inputs": ProceduralHolding(
-            c["c2_irrelevant_inputs"], enactment=e["search_clause"]
+            c["c2_irrelevant_inputs"], enactments=e["search_clause"]
         ),
         "h2_irrelevant_inputs_invalid": ProceduralHolding(
-            c["c2_irrelevant_inputs"], enactment=e["search_clause"], rule_valid=False
+            c["c2_irrelevant_inputs"], enactments=e["search_clause"], rule_valid=False
         ),
         "h2_irrelevant_inputs_ALL_MUST": ProceduralHolding(
             c["c2_irrelevant_inputs"],
-            enactment=e["search_clause"],
+            enactments=e["search_clause"],
             mandatory=True,
             universal=True,
         ),
         "h2_irrelevant_inputs_ALL_MUST_invalid": ProceduralHolding(
             c["c2_irrelevant_inputs"],
-            enactment=e["search_clause"],
+            enactments=e["search_clause"],
             mandatory=True,
             universal=True,
             rule_valid=False,
         ),
         "h2_irrelevant_inputs_ALL_invalid": ProceduralHolding(
             c["c2_irrelevant_inputs"],
-            enactment=e["search_clause"],
+            enactments=e["search_clause"],
             universal=True,
             rule_valid=False,
         ),
         "h2_irrelevant_inputs_MUST": ProceduralHolding(
-            c["c2_irrelevant_inputs"], enactment=e["search_clause"], mandatory=True
+            c["c2_irrelevant_inputs"], enactments=e["search_clause"], mandatory=True
         ),
         "h2_irrelevant_inputs_MUST_invalid": ProceduralHolding(
             c["c2_irrelevant_inputs"],
-            enactment=e["search_clause"],
+            enactments=e["search_clause"],
             mandatory=True,
             rule_valid=False,
         ),
         "h2_reciprocal_swap": ProceduralHolding(
-            c["c2_reciprocal_swap"], enactment=e["search_clause"]
+            c["c2_reciprocal_swap"], enactments=e["search_clause"]
         ),
         "h2_exact_in_despite": ProceduralHolding(
-            c["c2_exact_in_despite"], enactment=e["search_clause"]
+            c["c2_exact_in_despite"], enactments=e["search_clause"]
         ),
         "h2_exact_in_despite_ALL": ProceduralHolding(
             c["c2_exact_in_despite"],
-            enactment=e["search_clause"],
+            enactments=e["search_clause"],
             mandatory=False,
             universal=True,
         ),
         "h2_exact_in_despite_ALL_entity_order": ProceduralHolding(
             c["c2_exact_in_despite_entity_order"],
-            enactment=e["search_clause"],
+            enactments=e["search_clause"],
             mandatory=False,
             universal=True,
         ),
         "h2_exact_quantity_ALL": ProceduralHolding(
             c["c2_exact_quantity"],
-            enactment=e["search_clause"],
+            enactments=e["search_clause"],
             mandatory=False,
             universal=True,
         ),
         "h2_invalid_undecided": ProceduralHolding(
-            c["c2"], enactment=e["search_clause"], rule_valid=False, decided=False
+            c["c2"], enactments=e["search_clause"], rule_valid=False, decided=False
         ),
         "h2_MUST": ProceduralHolding(
-            c["c2"], enactment=e["search_clause"], mandatory=True, universal=False
+            c["c2"], enactments=e["search_clause"], mandatory=True, universal=False
         ),
         "h2_MUST_invalid": ProceduralHolding(
-            c["c2"], enactment=e["search_clause"], mandatory=True, rule_valid=False
+            c["c2"], enactments=e["search_clause"], mandatory=True, rule_valid=False
         ),
         "h2_output_absent": ProceduralHolding(
-            c["c2_output_absent"], enactment=e["search_clause"]
+            c["c2_output_absent"], enactments=e["search_clause"]
         ),
         "h2_output_false": ProceduralHolding(
-            c["c2_output_false"], enactment=e["search_clause"]
+            c["c2_output_false"], enactments=e["search_clause"]
         ),
         "h2_output_false_ALL": ProceduralHolding(
-            c["c2_output_false"], enactment=e["search_clause"], universal=True
+            c["c2_output_false"], enactments=e["search_clause"], universal=True
         ),
         "h2_output_absent_false": ProceduralHolding(
-            c["c2_output_absent_false"], enactment=e["search_clause"]
+            c["c2_output_absent_false"], enactments=e["search_clause"]
         ),
         "h2_SOME_MUST_output_false": ProceduralHolding(
             c["c2_output_false"],
-            enactment=e["search_clause"],
+            enactments=e["search_clause"],
             mandatory=True,
             universal=False,
         ),
         "h2_SOME_MUST_output_absent": ProceduralHolding(
             c["c2_output_absent"],
-            enactment=e["search_clause"],
+            enactments=e["search_clause"],
             mandatory=True,
             universal=False,
         ),
         "h2_undecided": ProceduralHolding(
-            c["c2"], enactment=e["search_clause"], decided=False
+            c["c2"], enactments=e["search_clause"], decided=False
         ),
         "h2_irrelevant_inputs_undecided": ProceduralHolding(
-            c["c2_irrelevant_inputs"], enactment=e["search_clause"], decided=False
+            c["c2_irrelevant_inputs"], enactments=e["search_clause"], decided=False
         ),
         "h2_MUST_undecided": ProceduralHolding(
-            c["c2"], enactment=e["search_clause"], mandatory=True, decided=False
+            c["c2"], enactments=e["search_clause"], mandatory=True, decided=False
         ),
         "h_near_means_curtilage": ProceduralHolding(
-            c["c_near_means_curtilage"], enactment=e["search_clause"]
+            c["c_near_means_curtilage"], enactments=e["search_clause"]
         ),
         "h_near_means_curtilage_even_if": ProceduralHolding(
-            c["c_near_means_curtilage_even_if"], enactment=e["search_clause"]
+            c["c_near_means_curtilage_even_if"], enactments=e["search_clause"]
         ),
         "h_near_means_curtilage_ALL_MUST": ProceduralHolding(
             c["c_near_means_curtilage"],
-            enactment=e["search_clause"],
+            enactments=e["search_clause"],
             mandatory=True,
             universal=True,
         ),
         "h_near_means_curtilage_ALL_undecided": ProceduralHolding(
             c["c_near_means_curtilage"],
-            enactment=e["search_clause"],
+            enactments=e["search_clause"],
             universal=True,
             decided=False,
         ),
         "h_near_means_no_curtilage": ProceduralHolding(
-            c["c_near_means_no_curtilage"], enactment=e["search_clause"]
+            c["c_near_means_no_curtilage"], enactments=e["search_clause"]
         ),
         "h_near_means_no_curtilage_ALL": ProceduralHolding(
-            c["c_near_means_no_curtilage"], enactment=e["search_clause"], universal=True
+            c["c_near_means_no_curtilage"], enactments=e["search_clause"], universal=True
         ),
         "h_near_means_no_curtilage_ALL_MUST": ProceduralHolding(
             c["c_near_means_no_curtilage"],
-            enactment=e["search_clause"],
+            enactments=e["search_clause"],
             mandatory=True,
             universal=True,
         ),
         "h_nearer_means_curtilage": ProceduralHolding(
-            c["c_nearer_means_curtilage"], enactment=e["search_clause"]
+            c["c_nearer_means_curtilage"], enactments=e["search_clause"]
         ),
         "h_nearer_means_curtilage_ALL": ProceduralHolding(
-            c["c_nearer_means_curtilage"], enactment=e["search_clause"], universal=True
+            c["c_nearer_means_curtilage"], enactments=e["search_clause"], universal=True
         ),
         "h_nearer_means_curtilage_MUST": ProceduralHolding(
-            c["c_nearer_means_curtilage"], enactment=e["search_clause"], mandatory=True
+            c["c_nearer_means_curtilage"], enactments=e["search_clause"], mandatory=True
         ),
         "h_far_means_no_curtilage": ProceduralHolding(c["c_far_means_no_curtilage"]),
         "h_far_means_no_curtilage_ALL": ProceduralHolding(
-            c["c_far_means_no_curtilage"], enactment=e["search_clause"], universal=True
+            c["c_far_means_no_curtilage"], enactments=e["search_clause"], universal=True
         ),
     }
 
@@ -1402,16 +1402,15 @@ class TestHoldings:
 
     # Enactments cited in Holdings
 
+    def test_single_enactment_converted_to_frozenset(self, make_holding):
+        assert isinstance(make_holding["h2"].enactments, frozenset)
+
     def test_holdings_citing_different_enactment_text_unequal(self, make_holding):
-        """The implied holding is based on enactment text that is a superset
-        of the implying holding's enactment text, and it doesn't include any
-        newer text or text from a higher level of legislation."""
         assert make_holding["h2"] != make_holding["h2_fourth_a_cite"]
 
     def test_holding_based_on_less_text_implies_more(self, make_holding):
         """The implied holding is based on enactment text that is a superset
-        of the implying holding's enactment text, and it doesn't include any
-        newer text or text from a higher level of legislation."""
+        of the implying holding's enactment text."""
         assert make_holding["h2"] > make_holding["h2_fourth_a_cite"]
 
     def test_holding_with_enactment_cite_does_not_imply_without(self, make_holding):
@@ -1420,9 +1419,16 @@ class TestHoldings:
         assert not make_holding["h2"] >= make_holding["h2_without_cite"]
 
     def test_no_implication_common_law_and_constitutional(self, make_holding):
-        """A common law holding can't always be elevated to a constitutional
-        holding by adding a constitutional cite (which could be irrelevant)."""
-        assert not make_holding["h2"] <= make_holding["h2_without_cite"]
+        """When a court asserts a holding as valid without legislative support,
+        the court is actually making a broader statement than it would be making
+        if it cited legislative support. The holding without legislative support
+        doesn't depend for its validity on the enactment remaining in effect without
+        being repealed.
+
+        The relative priority of the holdings is a different
+        matter. Statutory holdings trump common law holdings, and constitutional
+        trumps statutory."""
+        assert make_holding["h2"] <= make_holding["h2_without_cite"]
 
 class TestCodes:
     def test_get_code_title(self, make_code):
