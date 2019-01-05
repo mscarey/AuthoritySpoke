@@ -2,6 +2,7 @@ import datetime
 import itertools
 import json
 import operator
+import re
 
 from typing import Dict, FrozenSet, Iterable, List, Mapping
 from typing import Optional, Sequence, Set, Tuple, Union
@@ -10,6 +11,7 @@ from collections import namedtuple
 
 from pint import UnitRegistry
 from bs4 import BeautifulSoup
+import roman
 
 ureg = UnitRegistry()
 Q_ = ureg.Quantity
@@ -528,7 +530,7 @@ class Procedure:
         object.__setattr__(self, "inputs", frozenset(self.inputs))
         object.__setattr__(self, "despite", frozenset(self.despite))
 
-        for x in (self.outputs | self.inputs | self.despite):
+        for x in self.outputs | self.inputs | self.despite:
             if not isinstance(x, Factor):
                 raise TypeError(
                     (
@@ -536,7 +538,6 @@ class Procedure:
                         f"but {x} was type {type(x)}",
                     )
                 )
-
 
     def __eq__(self, other):
         """Determines if the two procedures have all the same factors
@@ -883,9 +884,8 @@ class Code:
 
     def __init__(self, path: str):
         self.path = path
-        with open(self.path) as fp:
-            xml = BeautifulSoup(fp.read(), "lxml-xml")
-        self.title = xml.find("dc:title").text
+        self.xml = self.get_xml()
+        self.title = self.xml.find("dc:title").text
         if "Constitution" in self.title:
             self.level = "constitutional"
         if "United States" in self.title:
@@ -899,6 +899,38 @@ class Code:
             xml = BeautifulSoup(fp.read(), "lxml-xml")
         return xml
 
+    def provision_effective_date(self, cite):
+        """
+        Given the "citation" of a legislative provision
+        (only XML element names are used as citations so far),
+        retrieves the effective date of the provision from
+        the United States Legislative Markup (USLM) XML version
+        of the code where the provision is located.
+
+        So far this only covers the US Constitution.
+        """
+
+        if self.level == "constitutional" and self.sovereign == "federal":
+            if "amendment" not in cite.lower():
+                return datetime.date(1788, 9, 13)
+            roman_numeral = cite.split("-")[1]
+            amendment_number = roman.from_roman(roman_numeral)
+            if amendment_number < 11:
+                return datetime.date(1791, 12, 15)
+            section = self.xml.find(id=cite)
+            if section.name == "level":
+                enactment_text = section.find('note').p.text
+            else:
+                enactment_text = section.parent.find('note').p.text
+            month_first = re.compile(r"(?:Secretary of State|Administrator of General Services|certificate of the Archivist),? dated (\w+ \d\d?, \d{4}),")
+            day_first = re.compile(r"(?:Congress|Secretary of State),? dated the (\d\d?th of \w+, \d{4}),")
+            result = month_first.search(enactment_text)
+            if result:
+                return datetime.datetime.strptime(result.group(1), "%B %d, %Y").date()
+            result = day_first.search(enactment_text)
+            return datetime.datetime.strptime(result.group(1), "%dth of %B, %Y").date()
+
+        return NotImplementedError
 
 class Enactment(Factor):
     def __init__(
@@ -913,17 +945,25 @@ class Enactment(Factor):
         self.start = start
         self.end = end
 
-        e = self.code.get_xml()
-        text = e.find(id=self.section).find(name="text").text
-        if start:
-            l = text.find(start)
+        xml = self.code.get_xml()
+        self.text = self.get_cited_passage(xml)
+
+        self.effective_date = self.code.provision_effective_date(section)
+
+
+
+    def get_cited_passage(self, xml):
+        passages = xml.find(id=self.section).find_all(name="text")
+        text = "".join(passage.text for passage in passages)
+        if self.start:
+            l = text.find(self.start)
         else:
             l = 0
-        if end:
-            r = text.find(end) + len(end)
+        if self.end:
+            r = text.find(self.end) + len(self.end)
         else:
             r = len(text)
-        self.text = text[l:r]
+        return text[l:r]
 
     def __hash__(self):
         return hash((self.text, self.code.sovereign, self.code.level))
@@ -1021,18 +1061,25 @@ class ProceduralHolding(Holding):
                 self, "enactments_despite", frozenset((self.enactments_despite,))
             )
         object.__setattr__(self, "enactments", frozenset(self.enactments))
-        object.__setattr__(self, "enactments_despite", frozenset(self.enactments_despite))
+        object.__setattr__(
+            self, "enactments_despite", frozenset(self.enactments_despite)
+        )
 
     def __str__(self):
         support = despite = None
         if self.enactments:
-            support = "Supporting enactments:\n" + "\n".join([str(e) for e in self.enactments])
+            support = "Supporting enactments:\n" + "\n".join(
+                [str(e) for e in self.enactments]
+            )
         if self.enactments_despite:
-            despite = "Despite the following enactments:\n" + "\n".join([str(e) for e in self.enactments_despite])
+            despite = "Despite the following enactments:\n" + "\n".join(
+                [str(e) for e in self.enactments_despite]
+            )
         text = "".join(
             (
                 "Holding:\n",
-                f"{support}", f"{despite}",
+                f"{support}",
+                f"{despite}",
                 f"It is {'' if self.decided else 'not decided whether it is '}",
                 f"{str(self.rule_valid)} that in {'ALL' if self.universal else 'SOME'} cases ",
                 f"where the inputs of the following procedure are present, the court ",

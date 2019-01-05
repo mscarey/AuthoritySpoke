@@ -1,4 +1,5 @@
 from copy import copy
+import datetime
 import json
 from typing import Dict
 
@@ -376,7 +377,9 @@ def make_holding(make_procedure, make_enactment) -> Dict[str, ProceduralHolding]
         "h2_without_cite": ProceduralHolding(c["c2"]),
         "h2_fourth_a_cite": ProceduralHolding(c["c2"], enactments=e["fourth_a"]),
         "h2_despite_due_process": ProceduralHolding(
-            c["c2"], enactments=e["search_clause"], enactments_despite=e["due_process_5"]
+            c["c2"],
+            enactments=e["search_clause"],
+            enactments_despite=e["due_process_5"],
         ),
         "h2_ALL_due_process": ProceduralHolding(
             c["c2"],
@@ -1055,7 +1058,6 @@ class TestProcedure:
 
 
 class TestHoldings:
-
     def test_enactment_type_in_str(self, make_holding):
         assert "constitution" in str(make_holding["h1"]).lower()
 
@@ -1462,19 +1464,30 @@ class TestHoldings:
         assert make_holding["h2_despite_due_process"] >= make_holding["h2"]
 
     def test_no_contradiction_when_added_enactment_makes_rule_valid(self, make_holding):
-        assert not make_holding["h2_ALL_due_process"].contradicts(make_holding["h2_ALL_invalid"])
-        assert not make_holding["h2_ALL_invalid"].contradicts(make_holding["h2_ALL_due_process"])
+        assert not make_holding["h2_ALL_due_process"].contradicts(
+            make_holding["h2_ALL_invalid"]
+        )
+        assert not make_holding["h2_ALL_invalid"].contradicts(
+            make_holding["h2_ALL_due_process"]
+        )
 
     def test_contradiction_with_fewer_enactments(self, make_holding):
         """This and the previous enactment contradiction test passed on their own.
         Does there need to be something about enactments in the contradicts method?"""
-        assert make_holding["h2_ALL_due_process_invalid"].contradicts(make_holding["h2_ALL"])
+        assert make_holding["h2_ALL_due_process_invalid"].contradicts(
+            make_holding["h2_ALL"]
+        )
 
 
 class TestCodes:
-    def test_get_code_title(self, make_code):
+    def test_making_code(self, make_code):
         const = make_code["const"]
         assert const.title == "Constitution of the United States"
+
+    def test_get_provision_effective_date(self, make_code):
+        const = make_code["const"]
+        bill_of_rights_date = datetime.date(1791, 12, 15)
+        assert const.provision_effective_date("amendment-V") == bill_of_rights_date
 
 
 class TestEnactments:
@@ -1499,6 +1512,18 @@ class TestEnactments:
 
     def test_enactment_as_factor(self, make_enactment):
         assert isinstance(make_enactment["due_process_5"], Factor)
+
+    def test_bill_of_rights_effective_date(self, make_enactment):
+        # December 15, 1791
+        assert make_enactment["search_clause"].effective_date == datetime.date(
+            1791, 12, 15
+        )
+
+    def test_14th_A_effective_date(self, make_enactment):
+        # July 28, 1868
+        assert make_enactment["due_process_14"].effective_date == datetime.date(
+            1868, 7, 28
+        )
 
 
 class TestOpinions:
