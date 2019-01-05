@@ -155,6 +155,9 @@ def make_factor(make_predicate) -> Dict[str, Factor]:
         "f1b": Fact(p["p1"]),
         "f1c": Fact(p["p1_again"]),
         "f2": Fact(p["p2"], (1, 0)),
+        "f2_preponderance_of_evidence": Fact(p["p2"], (1, 0), standard_of_proof="preponderance of evidence"),
+        "f2_clear_and_convincing": Fact(p["p2"], (1, 0), standard_of_proof="clear and convincing"),
+        "f2_beyond_reasonable_doubt": Fact(p["p2"], (1, 0), standard_of_proof="beyond reasonable doubt"),
         "f2_entity_order": Fact(p["p2"]),
         "f2_reciprocal": Fact(p["p2_reciprocal"]),
         "f3": Fact(p["p3"]),
@@ -837,6 +840,27 @@ class TestFactors:
             matches=(0, 1, None, None, None),
         ) == [{0: 0, 1: 1}, {0: 1, 1: 0}]
 
+    def test_standard_of_proof_comparison(self, make_factor):
+
+        f = make_factor
+        assert f["f2_clear_and_convincing"] >= f["f2_preponderance_of_evidence"]
+        assert f["f2_beyond_reasonable_doubt"] >= f["f2_clear_and_convincing"]
+
+    def test_standard_of_proof_inequality(self, make_factor):
+
+        f = make_factor
+        assert f["f2_clear_and_convincing"] != f["f2_preponderance_of_evidence"]
+        assert f["f2_clear_and_convincing"] != f["f2"]
+
+    def test_no_implication_between_factors_with_and_without_standards(self, make_factor):
+
+        f = make_factor
+        assert not f["f2_clear_and_convincing"] > f["f2"]
+        assert not f["f2"] > f["f2_preponderance_of_evidence"]
+
+    def test_standard_of_proof_must_be_listed(self, make_predicate):
+        with pytest.raises(ValueError):
+            f = Fact(make_predicate["p2"], standard_of_proof="probably so"),
 
 class TestProcedure:
     def test_exception_for_wrong_type_for_procedure(self, make_predicate):
@@ -1063,6 +1087,9 @@ class TestHoldings:
 
     def test_enactment_text_in_str(self, make_holding):
         assert "secure in their persons" in str(make_holding["h1"])
+
+    def test_None_not_in_str(self, make_holding):
+        assert "None" not in str(make_holding["h2"])
 
     # Equality
 

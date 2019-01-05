@@ -320,6 +320,14 @@ class Factor:
     Motions, and Arguments."""
 
 
+STANDARDS_OF_PROOF = {
+    "scintilla of evidence": 1,
+    "preponderance of evidence": 2,
+    "clear and convincing": 3,
+    "beyond reasonable doubt": 4,
+}
+
+
 @dataclass(frozen=True)
 class Fact(Factor):
     """An assertion accepted as factual by a court, often through factfinding by
@@ -328,6 +336,7 @@ class Fact(Factor):
     predicate: Predicate
     entity_context: Tuple[int, ...] = ()
     absent: bool = False
+    standard_of_proof: Optional[str] = None
 
     def __post_init__(self):
         if not self.entity_context:
@@ -345,16 +354,30 @@ class Fact(Factor):
                     f"and len(self.predicate) == {len(self.predicate)}",
                 )
             )
+        if self.standard_of_proof and self.standard_of_proof not in STANDARDS_OF_PROOF:
+            raise ValueError(
+                f"standard of proof must be one of {STANDARDS_OF_PROOF.keys()} or None."
+            )
 
     def __eq__(self, other):
         if not isinstance(other, self.__class__):
             return False
-        return self.predicate == other.predicate and self.absent == other.absent
+        return (
+            self.predicate == other.predicate
+            and self.absent == other.absent
+            and self.standard_of_proof == other.standard_of_proof
+        )
 
     def __str__(self):
         predicate = str(self.predicate).format(*self.entity_context)
         return (
             f"{'Absent ' if self.absent else ''}{self.__class__.__name__}: {predicate}"
+        )
+
+    def predicate_in_context(self, entities: Sequence[Entity]) -> str:
+        return (
+            f"{'Absent ' if self.absent else ''}{self.__class__.__name__}: "
+            + f"{self.predicate.content_with_entities(entities)}"
         )
 
     def __len__(self):
@@ -366,6 +389,16 @@ class Fact(Factor):
 
         if not isinstance(other, self.__class__):
             return False
+
+        if bool(self.standard_of_proof) != bool(other.standard_of_proof):
+            return False
+        if (
+            self.standard_of_proof
+            and STANDARDS_OF_PROOF[self.standard_of_proof]
+            < STANDARDS_OF_PROOF[other.standard_of_proof]
+        ):
+            return False
+
         if self == other:
             return False
         if self.predicate >= other.predicate and self.absent == other.absent:
@@ -376,12 +409,6 @@ class Fact(Factor):
         if self == other:
             return True
         return self > other
-
-    def predicate_in_context(self, entities: Sequence[Entity]) -> str:
-        return (
-            f"{'Absent ' if self.absent else ''}{self.__class__.__name__}: "
-            + f"{self.predicate.content_with_entities(entities)}"
-        )
 
     def contradicts(self, other) -> bool:
         if not isinstance(other, self.__class__):
@@ -640,7 +667,7 @@ class Procedure:
     def __str__(self):
         text = "Procedure:"
         if self.inputs:
-            text += "\nInputs:"
+            text += "\nSupporting inputs:"
             for f in self.inputs:
                 text += "\n" + str(f)
         if self.despite:
@@ -979,7 +1006,7 @@ class Enactment(Factor):
             return False
 
         return (
-            self.text == other.text
+            self.text.strip(",:;. ") == other.text.strip(",:;. ")
             and self.code.sovereign == other.code.sovereign
             and self.code.level == other.code.level
         )
@@ -988,7 +1015,7 @@ class Enactment(Factor):
         if not isinstance(other, self.__class__):
             return False
 
-        return other.text in self.text
+        return other.text.strip(",:;. ") in self.text
 
     def __gt__(self, other):
         if self == other:
@@ -1071,19 +1098,19 @@ class ProceduralHolding(Holding):
     def __str__(self):
         support = despite = None
         if self.enactments:
-            support = "Supporting enactments:\n" + "\n".join(
+            support = "Based on this legislation:\n" + "\n".join(
                 [str(e) for e in self.enactments]
             )
         if self.enactments_despite:
-            despite = "Despite the following enactments:\n" + "\n".join(
+            despite = "Despite the following legislation:\n" + "\n".join(
                 [str(e) for e in self.enactments_despite]
             )
         text = "".join(
             (
                 "Holding:\n",
-                f"{support}",
-                f"{despite}",
-                f"It is {'' if self.decided else 'not decided whether it is '}",
+                f"{support or ''}",
+                f"{despite or ''}",
+                f"\nIt is {'' if self.decided else 'not decided whether it is '}",
                 f"{str(self.rule_valid)} that in {'ALL' if self.universal else 'SOME'} cases ",
                 f"where the inputs of the following procedure are present, the court ",
                 f"{'MUST' if self.mandatory else 'MAY'} accept the procedure's output(s):\n",
