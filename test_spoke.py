@@ -205,7 +205,7 @@ def make_factor(make_predicate) -> Dict[str, Factor]:
 
 @pytest.fixture(scope="module")
 def make_code() -> Dict[str, Code]:
-    return {"const": Code("xml/constitution.xml", "United States", "constitution")}
+    return {"const": Code("xml/constitution.xml")}
 
 
 @pytest.fixture(scope="module")
@@ -1056,6 +1056,12 @@ class TestProcedure:
 
 class TestHoldings:
 
+    def test_enactment_type_in_str(self, make_holding):
+        assert "constitution" in str(make_holding["h1"]).lower()
+
+    def test_enactment_text_in_str(self, make_holding):
+        assert "secure in their persons" in str(make_holding["h1"])
+
     # Equality
 
     def test_identical_holdings_equal(self, make_holding):
@@ -1468,13 +1474,16 @@ class TestHoldings:
 class TestCodes:
     def test_get_code_title(self, make_code):
         const = make_code["const"]
-        assert const.title() == "Constitution of the United States"
+        assert const.title == "Constitution of the United States"
 
 
 class TestEnactments:
     def test_make_enactment(self, make_code, make_enactment):
         search_clause = make_enactment["search_clause"]
-        assert str(search_clause).endswith("shall not be violated")
+        assert search_clause.text.endswith("shall not be violated")
+
+    def test_code_title_in_str(self, make_enactment):
+        assert "secure in their persons" in str(make_enactment["search_clause"])
 
     def test_equal_enactment_text(self, make_enactment):
         assert make_enactment["due_process_5"] == make_enactment["due_process_14"]

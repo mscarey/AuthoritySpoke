@@ -875,24 +875,29 @@ class Procedure:
         )
 
 
-@dataclass
 class Code:
     """
     A constitution, code of statutes, code of regulations,
     or collection of court rules.
     """
 
-    path: str
-    sovereign: str = "federal"
-    level: str = "constitution"
+    def __init__(self, path: str):
+        self.path = path
+        with open(self.path) as fp:
+            xml = BeautifulSoup(fp.read(), "lxml-xml")
+        self.title = xml.find("dc:title").text
+        if "Constitution" in self.title:
+            self.level = "constitutional"
+        if "United States" in self.title:
+            self.sovereign = "federal"
+
+    def __str__(self):
+        return self.title
 
     def get_xml(self):
         with open(self.path) as fp:
             xml = BeautifulSoup(fp.read(), "lxml-xml")
         return xml
-
-    def title(self):
-        return self.get_xml().find("dc:title").text
 
 
 class Enactment(Factor):
@@ -924,7 +929,7 @@ class Enactment(Factor):
         return hash((self.text, self.code.sovereign, self.code.level))
 
     def __str__(self):
-        return self.text
+        return f'"{self.text}" ({self.code.title}, {self.section})'
 
     def __eq__(self, other):
         if not isinstance(other, self.__class__):
@@ -1019,9 +1024,16 @@ class ProceduralHolding(Holding):
         object.__setattr__(self, "enactments_despite", frozenset(self.enactments_despite))
 
     def __str__(self):
+        support = despite = None
+        if self.enactments:
+            support = "Supporting enactments:\n" + "\n".join([str(e) for e in self.enactments])
+        if self.enactments_despite:
+            despite = "Despite the following enactments:\n" + "\n".join([str(e) for e in self.enactments_despite])
         text = "".join(
             (
-                f"Holding: It is {'' if self.decided else 'not decided whether it is '}",
+                "Holding:\n",
+                f"{support}", f"{despite}",
+                f"It is {'' if self.decided else 'not decided whether it is '}",
                 f"{str(self.rule_valid)} that in {'ALL' if self.universal else 'SOME'} cases ",
                 f"where the inputs of the following procedure are present, the court ",
                 f"{'MUST' if self.mandatory else 'MAY'} accept the procedure's output(s):\n",
@@ -1157,11 +1169,12 @@ class ProceduralHolding(Holding):
             decided=self.decided,
         )
 
-    def contradicts(self, other):
+    def contradicts(self, other) -> bool:
         """
-        Accomplished by testing whether self would imply other if
-        other had an opposite value for rule_valid? What if
-        rule_valid was None (undecided)?
+        A holding contradicts another holding if it implies
+        that the other holding is false. Generally checked
+        by testing whether self would imply other if
+        other had an opposite value for rule_valid.
         """
 
         if self.decided and other.decided:
@@ -1179,8 +1192,8 @@ class ProceduralHolding(Holding):
         # If holding A implies holding B, then the statement
         # that A is undecided contradicts the prior holding B.
 
-        if not self.decided and other.decided:
-            return self.implies_if_decided(other)
+        # if not self.decided and other.decided:
+        return self.implies_if_decided(other)
 
 
 def opinion_from_file(path):
