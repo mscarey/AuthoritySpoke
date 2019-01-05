@@ -860,7 +860,11 @@ class TestFactors:
 
     def test_standard_of_proof_must_be_listed(self, make_predicate):
         with pytest.raises(ValueError):
-            f = Fact(make_predicate["p2"], standard_of_proof="probably so"),
+            f = Fact(make_predicate["p2"], standard_of_proof="probably so")
+
+    def test_standard_of_proof_in_str(self, make_factor):
+        factor = make_factor["f2_preponderance_of_evidence"]
+        assert factor.standard_of_proof in str(factor)
 
 class TestProcedure:
     def test_exception_for_wrong_type_for_procedure(self, make_predicate):

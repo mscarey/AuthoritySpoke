@@ -370,8 +370,12 @@ class Fact(Factor):
 
     def __str__(self):
         predicate = str(self.predicate).format(*self.entity_context)
-        return (
-            f"{'Absent ' if self.absent else ''}{self.__class__.__name__}: {predicate}"
+        standard = f" ({self.standard_of_proof})" if self.standard_of_proof else ""
+        return "".join(
+            [
+                f"{'Absent ' if self.absent else ''}{self.__class__.__name__}",
+                f"{standard}: {predicate}",
+            ]
         )
 
     def predicate_in_context(self, entities: Sequence[Entity]) -> str:
