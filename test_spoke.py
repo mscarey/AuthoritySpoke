@@ -1484,10 +1484,15 @@ class TestCodes:
         const = make_code["const"]
         assert const.title == "Constitution of the United States"
 
-    def test_get_provision_effective_date(self, make_code):
+    def test_get_bill_of_rights_effective_date(self, make_code):
         const = make_code["const"]
         bill_of_rights_date = datetime.date(1791, 12, 15)
         assert const.provision_effective_date("amendment-V") == bill_of_rights_date
+
+    def test_get_14th_A_effective_date(self, make_code):
+        const = make_code["const"]
+        equal_protection_date = datetime.date(1868, 7, 28)
+        assert const.provision_effective_date("amendment-XIV") == equal_protection_date
 
 
 class TestEnactments:
@@ -1525,6 +1530,11 @@ class TestEnactments:
             1868, 7, 28
         )
 
+    def test_compare_effective_dates(self, make_enactment):
+        dp5 = make_enactment["due_process_5"]
+        dp14 = make_enactment["due_process_14"]
+
+        assert dp14.effective_date > dp5.effective_date
 
 class TestOpinions:
     def test_load_opinion_in_Harvard_format(self):

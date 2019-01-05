@@ -919,11 +919,15 @@ class Code:
                 return datetime.date(1791, 12, 15)
             section = self.xml.find(id=cite)
             if section.name == "level":
-                enactment_text = section.find('note').p.text
+                enactment_text = section.find("note").p.text
             else:
-                enactment_text = section.parent.find('note').p.text
-            month_first = re.compile(r"(?:Secretary of State|Administrator of General Services|certificate of the Archivist),? dated (\w+ \d\d?, \d{4}),")
-            day_first = re.compile(r"(?:Congress|Secretary of State),? dated the (\d\d?th of \w+, \d{4}),")
+                enactment_text = section.parent.find("note").p.text
+            month_first = re.compile(
+                r"""(?:Secretary of State|Administrator of General Services|certificate of the Archivist)(?: accordingly issued a proclamation)?,? dated (\w+ \d\d?, \d{4}),"""
+            )
+            day_first = re.compile(
+                r"(?:Congress|Secretary of State),? dated the (\d\d?th of \w+, \d{4}),"
+            )
             result = month_first.search(enactment_text)
             if result:
                 return datetime.datetime.strptime(result.group(1), "%B %d, %Y").date()
@@ -931,6 +935,7 @@ class Code:
             return datetime.datetime.strptime(result.group(1), "%dth of %B, %Y").date()
 
         return NotImplementedError
+
 
 class Enactment(Factor):
     def __init__(
@@ -949,8 +954,6 @@ class Enactment(Factor):
         self.text = self.get_cited_passage(xml)
 
         self.effective_date = self.code.provision_effective_date(section)
-
-
 
     def get_cited_passage(self, xml):
         passages = xml.find(id=self.section).find_all(name="text")
