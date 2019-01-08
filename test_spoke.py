@@ -165,12 +165,14 @@ def make_factor(make_predicate) -> Dict[str, Factor]:
         "f3_absent": Fact(p["p3"], absent=True),
         "f4": Fact(p["p4"]),
         "f4_swap_entities": Fact(p["p4"], (1, 0)),
+        "f4_swap_entities_4": Fact(p["p4"], (1, 4)),
         "f5": Fact(p["p5"]),
         "f5_swap_entities": Fact(p["p5"], (1,)),
         "f6": Fact(p["p6"]),
         "f6_swap_entities": Fact(p["p6"], (1,)),
         "f7": Fact(p["p7"]),
         "f7_swap_entities": Fact(p["p7"], (1, 0)),
+        "f7_swap_entities_4": Fact(p["p7"], (1, 0)),
         "f7_true": Fact(p["p7_true"]),
         "f8": Fact(p["p8"]),
         "f8_absent": Fact(p["p8"], absent=True),
@@ -185,11 +187,13 @@ def make_factor(make_predicate) -> Dict[str, Factor]:
         "f9_absent": Fact(p["p9"], absent=True),
         "f9_absent_miles": Fact(p["p9_miles"], absent=True),
         "f9_swap_entities": Fact(p["p9"], (1, 0)),
+        "f9_swap_entities_4": Fact(p["p9"], (1, 4)),
         "f10": Fact(p["p10"]),
         "f10_absent": Fact(p["p10"], absent=True),
         "f10_false": Fact(p["p10_false"]),
         "f10_absent_false": Fact(p["p10_false"], absent=True),
         "f10_swap_entities": Fact(p["p10"], (1, 0)),
+        "f10_swap_entities_4": Fact(p["p10"], (1, 4)),
         "f11": Fact(p["p11"]),
         "f12": Fact(p["p12"]),
         "f13": Fact(p["p13"]),
@@ -204,6 +208,7 @@ def make_factor(make_predicate) -> Dict[str, Factor]:
         "f_irrelevant_2": Fact(p["p_irrelevant_2"], (4,)),
         "f_irrelevant_3": Fact(p["p_irrelevant_3"], (2, 4)),
         "f_irrelevant_3_new_context": Fact(p["p_irrelevant_3"], (3, 4)),
+        "f_irrelevant_3_context_0": Fact(p["p_irrelevant_3"], (3, 0)),
     }
 
 
@@ -295,6 +300,21 @@ def make_procedure(make_factor) -> Dict[str, Procedure]:
                 f["f_irrelevant_3_new_context"],
             ),
             despite=(f["f8"],),
+        ),
+        "c2_irrelevant_outputs": Procedure(
+            outputs=(f["f10_swap_entities_4"],
+                f["f_irrelevant_0"],
+                f["f_irrelevant_1"],
+                f["f_irrelevant_2"],
+                f["f_irrelevant_3"],
+                f["f_irrelevant_3_context_0"],),
+            inputs=(
+                f["f4_swap_entities_4"],
+                f["f5_swap_entities"],
+                f["f6_swap_entities"],
+                f["f7_swap_entities_4"],
+                f["f9_swap_entities_4"],
+            ),
         ),
         "c2_irrelevant_despite": Procedure(
             outputs=(f["f10"],),
@@ -1072,6 +1092,10 @@ class TestProcedure:
         p = make_procedure
         assert not p["c2"].implies_all_to_some(p["c2_absent_despite"])
 
+    def test_implication_with_more_outputs_than_inputs(self, make_procedure):
+        p = make_procedure
+        assert p["c2_irrelevant_outputs"].implies_all_to_all(p["c2"])
+
     def test_no_contradict_between_procedures(self, make_procedure):
         """
         It's not completely clear to me what assumptions are being made about
@@ -1217,6 +1241,7 @@ class TestHoldings:
     def test_undecided_implies_negation_is_undecided(self, make_holding):
         assert make_holding["h2_invalid_undecided"] >= make_holding["h2_undecided"]
         assert make_holding["h2_undecided"] >= make_holding["h2_invalid_undecided"]
+
 
     # Contradiction
 

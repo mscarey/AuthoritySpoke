@@ -4,7 +4,7 @@ import json
 import operator
 import re
 
-from typing import Dict, FrozenSet, Iterable, List, Mapping
+from typing import Callable, Dict, FrozenSet, Iterable, List
 from typing import Optional, Sequence, Set, Tuple, Union
 from dataclasses import dataclass
 from collections import namedtuple
@@ -138,7 +138,7 @@ class Predicate:
             content = self.content
         return f"{truth_prefix}{content}"
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: "Predicate") -> bool:
         if not isinstance(other, self.__class__):
             return False
 
@@ -158,7 +158,7 @@ class Predicate:
                 return True
         return False
 
-    def __gt__(self, other) -> bool:
+    def __gt__(self, other: "Predicate") -> bool:
         """Indicates whether self implies the other predicate,
         which is True if their statements about quantity imply it.
         Returns False if self and other are equal."""
@@ -216,12 +216,12 @@ class Predicate:
                 return True
         return False
 
-    def __ge__(self, other):
+    def __ge__(self, other: "Predicate") -> bool:
         if self == other:
             return True
         return self > other
 
-    def contradicts(self, other):
+    def contradicts(self, other: "Predicate") -> bool:
         """This first tries to find a contradiction based on the relationship
         between the quantities in the predicates. If there are no quantities, it
         returns false only if the content is exactly the same and self.truth is
@@ -270,7 +270,7 @@ class Predicate:
             return False
         return self.content == other.content and self.truth != other.truth
 
-    def quantity_comparison(self):
+    def quantity_comparison(self) -> str:
         """String representation of a comparison with a quantity,
         which can include units due to the pint library."""
 
@@ -290,6 +290,7 @@ class Predicate:
     def content_with_entities(self, entities: Union[Entity, Sequence[Entity]]) -> str:
         """Creates a sentence by substituting the names of entities
         from a particular case into the predicate_with_truth."""
+
         if isinstance(entities, Entity):
             entities = (entities,)
         if len(entities) != len(self):
@@ -350,7 +351,7 @@ class Fact(Factor):
                 (
                     "entity_context must have one item for each entity slot ",
                     "in self.predicate, but ",
-                    f"len(entity_context) == {len(self.entity_context)} ",
+                    f"len(entity_context) for {str(self.predicate)} == {len(self.entity_context)} ",
                     f"and len(self.predicate) == {len(self.predicate)}",
                 )
             )
@@ -359,7 +360,7 @@ class Fact(Factor):
                 f"standard of proof must be one of {STANDARDS_OF_PROOF.keys()} or None."
             )
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         if not isinstance(other, self.__class__):
             return False
         return (
@@ -379,6 +380,11 @@ class Fact(Factor):
         )
 
     def predicate_in_context(self, entities: Sequence[Entity]) -> str:
+        """Prints the representation of the Predicate with Entities
+        added into the slots, with added text from the Fact object
+        indicating the class name and whether the Predicate is
+        "Absent" or not."""
+
         return (
             f"{'Absent ' if self.absent else ''}{self.__class__.__name__}: "
             + f"{self.predicate.content_with_entities(entities)}"
@@ -409,12 +415,15 @@ class Fact(Factor):
             return True
         return False
 
-    def __ge__(self, other):
+    def __ge__(self, other) -> bool:
         if self == other:
             return True
         return self > other
 
     def contradicts(self, other) -> bool:
+        """Returns True if self and other can't both be true at the same time.
+        Otherwise returns False."""
+
         if not isinstance(other, self.__class__):
             return False
 
@@ -428,7 +437,9 @@ class Fact(Factor):
             return True
         return False
 
-    def check_entity_consistency(self, other, matches) -> List[Tuple[int, ...]]:
+    def check_entity_consistency(
+        self, other: Factor, matches: tuple
+    ) -> List[Tuple[int, ...]]:
         """
         Given entity assignments for self and other, determines whether
         the factors have consistent entity assignments such that both can
@@ -440,28 +451,33 @@ class Fact(Factor):
         if self.predicate.reciprocal, the function will also compare other
         to self with the first two entity slots of self_entities transposed.
 
-        Parameters:
+        :param other:
 
-        other (Fact)
-
-        matches (tuple): a list the same length as len(self). The indices represent
+        :param matches: a list the same length as len(self). The indices represent
         self's entity slots, and the value at each index represents other's
         corresponding entity slots that have already been assigned, if any.
 
-        Returns a list containing self's normal entity tuple, self's reciprocal
+        :returns: a list containing self's normal entity tuple, self's reciprocal
         entity tuple, both, or neither, depending on which ones match with other.
 
         """
 
-        def all_matches(need_list) -> bool:
+        def all_matches(needed: Tuple[int]) -> bool:
+            """
+            Determines whether the entity slots assigned so far are
+            consistent for the Factors designated self and other,
+            regardless of whether it's possible to make consistent
+            assignments for the remaining slots.
+            """
+
             return all(
-                matches[other.entity_context[i]] == need_list[i]
+                matches[other.entity_context[i]] == needed[i]
                 or matches[other.entity_context[i]] is None
                 for i in range(len(other))
             )
 
-        if not isinstance(other, self.__class__):
-            raise TypeError(f"other must be type {self.__class__}")  # Why?
+        if not isinstance(other, Factor):
+            raise TypeError(f"other must be type Factor")
 
         answer = []
 
@@ -595,14 +611,14 @@ class Procedure:
             matchlist = []
             for m in prior_list:
                 # TODO: try rewriting without matchlist as parameter
-                matchlist = self.find_matches(x[0], x[1], m, matchlist, operator.eq)
+                matchlist = self.find_matches(x[0], set(x[1]), m, matchlist, operator.eq)
 
             # Also verifying that every factor in other is in self.
 
             prior_list = tuple(matchlist)
             matchlist = []
             for m in prior_list:
-                matchlist = self.find_matches(x[1], x[0], m, matchlist, operator.eq)
+                matchlist = self.find_matches(x[1], set(x[0]), m, matchlist, operator.eq)
 
         return bool(matchlist)
 
@@ -638,7 +654,7 @@ class Procedure:
             prior_list = tuple(matchlist)
             matchlist = []
             for m in prior_list:
-                matchlist = self.find_matches(x[0], x[1], m, matchlist, x[2])
+                matchlist = self.find_matches(x[0], set(x[1]), m, matchlist, x[2])
 
             if not matchlist:
                 return False
@@ -739,30 +755,48 @@ class Procedure:
                 )
         return matchlist
 
-    def find_matches(self, self_matches, other_factors, m, matchlist, comparison):
+    def find_matches(
+        self,
+        for_matching: FrozenSet[Factor],
+        need_matches: Set[Factor],
+        matches: Tuple[Optional[int], ...],
+        matchlist: List[Tuple[Optional[int], ...]],
+        comparison: Callable[[Factor, Factor], bool],
+    ):
         """
         Recursively searches for a list of entity assignments that can
-        cause all of 'other_factors' to satisfy the relation described by
-        'comparison' with a factor from self_matches. When one such list
+        cause all of 'need_matches' to satisfy the relation described by
+        'comparison' with a factor from for_matching. When one such list
         is found, the function adds that list to matchlist and continues
         searching. It finally returns matchlist when all possibilities
         have been searched.
+
+        :param for_matching: A frozenset of all of self's factors. These
+        factors aren't removed when they're matched to a factor from other,
+        because it's possible that one factor in self could imply two
+        different factors in other.
+
+        :param need_matches: A set of factors from other that have
+        not yet been matched to any factor from self.
+
+        :param matches: A tuple showing which factors from for_matching have
+        been matched.
         """
-        matches = tuple(m)
-        need_matches = {f for f in other_factors}
+
         if not need_matches:
             matchlist.append(matches)
             return matchlist
         n = need_matches.pop()
-        available = {a for a in self_matches if comparison(a, n)}
+        available = {a for a in for_matching if comparison(a, n)}
         for a in available:
             matches_found = n.check_entity_consistency(a, matches)
             for source_list in matches_found:
                 matches_next = list(matches)
                 for i in range(len(a)):
                     matches_next[a.entity_context[i]] = source_list[i]
+                matches_next = tuple(matches_next)
                 matchlist = self.find_matches(
-                    self_matches, need_matches, matches_next, matchlist, comparison
+                    for_matching, need_matches, matches_next, matchlist, comparison
                 )
         return matchlist
 
@@ -786,7 +820,7 @@ class Procedure:
 
         for m in prior_list:
             matchlist = self.find_matches(
-                self_despite_or_input, other.inputs, m, matchlist, operator.ge
+                self_despite_or_input, set(other.inputs), m, matchlist, operator.ge
             )
         if not matchlist:
             return False
@@ -799,7 +833,7 @@ class Procedure:
 
         return any(self.contradiction_between_outputs(other, m) for m in prior_list)
 
-    def implies_all_to_all(self, other):
+    def implies_all_to_all(self, other: "Procedure"):
         """
         Tests whether the assertion that self applies in ALL cases
         implies that the procedure "other" applies in ALL cases.
@@ -812,6 +846,8 @@ class Procedure:
 
         Self does not imply other if any despite of other
         contradicts an input of self.
+
+        :param other:
         """
 
         if not isinstance(other, self.__class__):
@@ -830,7 +866,7 @@ class Procedure:
             prior_list = tuple(matchlist)
             matchlist = []
             for m in prior_list:
-                matchlist = self.find_matches(x[0], x[1], m, matchlist, x[2])
+                matchlist = self.find_matches(x[0], set(x[1]), m, matchlist, x[2])
 
             if not matchlist:
                 return False
@@ -875,7 +911,7 @@ class Procedure:
             prior_list = tuple(matchlist)
             matchlist = []
             for m in prior_list:
-                matchlist = self.find_matches(x[0], x[1], m, matchlist, x[2])
+                matchlist = self.find_matches(x[0], set(x[1]), m, matchlist, x[2])
 
             if not matchlist:
                 return False
