@@ -365,6 +365,8 @@ class Fact(Factor):
             )
         if isinstance(self.entity_context, int):
             object.__setattr__(self, "entity_context", (self.entity_context,))
+        object.__setattr__(self, "entity_orders", self.get_entity_orders())
+
         if len(self) != len(self.predicate):
             raise ValueError(
                 (
@@ -378,6 +380,7 @@ class Fact(Factor):
             raise ValueError(
                 f"standard of proof must be one of {STANDARDS_OF_PROOF.keys()} or None."
             )
+
 
     def __eq__(self, other) -> bool:
         if not isinstance(other, self.__class__):
@@ -480,7 +483,7 @@ class Fact(Factor):
         entity tuple, both, or neither, depending on which ones match with other.
         """
 
-        def all_matches(self_order: Tuple[int]) -> bool:
+        def all_matches(self_order: Tuple[int], other_order: Tuple[int]) -> bool:
             """
             Determines whether the entity slots assigned so far are
             consistent for the Factors designated self and other,
@@ -489,9 +492,9 @@ class Fact(Factor):
             """
 
             return all(
-                matches[other.entity_context[i]] == self_order[i]
-                or matches[other.entity_context[i]] is None
-                for i in range(len(other))
+                matches[other_order[i]] == self_order[i]
+                or matches[other_order[i]] is None
+                for i in range(len(other_order))
             )
 
         if not isinstance(other, Factor):
@@ -499,9 +502,10 @@ class Fact(Factor):
 
         answers = set()
 
-        for self_order in self.entity_orders():
-            if all_matches(self_order):
-                answers.add(self_order)
+        for self_order in self.entity_orders:
+            for other_order in other.entity_orders:
+                if all_matches(self_order, other_order):
+                    answers.add(self_order)
 
         return answers
 
@@ -515,13 +519,8 @@ class Fact(Factor):
         as the possibilities increase, so it should only be run
         when matches has been narrowed as much as possible."""
 
-        source_lists = [self.entity_context]
         answer = []
-        if self.predicate.reciprocal:
-            swapped = list(self.entity_context)
-            swapped[0], swapped[1] = swapped[1], swapped[0]
-            source_lists.append(tuple(swapped))
-        for source_list in source_lists:
+        for source_list in self.entity_orders:
             available_slots = {
                 i: [
                     slot
@@ -547,7 +546,7 @@ class Fact(Factor):
                     answer.append(c)
         return answer
 
-    def entity_orders(self):
+    def get_entity_orders(self):
 
         """
         Currently the only possible arrangements are derived from
@@ -641,21 +640,24 @@ class Procedure:
             # Verifying that every factor in self is in other.
 
             prior_list = tuple(matchlist)
-            matchlist = []
+            matchlist = set()
             for m in prior_list:
-                # TODO: try rewriting without matchlist as parameter
-                matchlist = self.find_matches(
-                    x[0], set(x[1]), m, matchlist, operator.eq
-                )
+
+                for y in self.find_matches(
+                    x[0], set(x[1]), m, operator.eq
+                ):
+                    matchlist.add(y)
 
             # Also verifying that every factor in other is in self.
 
             prior_list = tuple(matchlist)
-            matchlist = []
+            matchlist = set()
             for m in prior_list:
-                matchlist = self.find_matches(
-                    x[1], set(x[0]), m, matchlist, operator.eq
-                )
+
+                for y in self.find_matches(
+                    x[1], set(x[0]), m, operator.eq
+                ):
+                    matchlist.add(y)
 
         return bool(matchlist)
 
@@ -797,7 +799,6 @@ class Procedure:
         for_matching: FrozenSet[Factor],
         need_matches: Set[Factor],
         matches: Tuple[Optional[int], ...],
-        matchlist: List[Tuple[Optional[int], ...]],
         comparison: Callable[[Factor, Factor], bool],
     ):
         """
@@ -834,21 +835,22 @@ class Procedure:
         """
 
         if not need_matches:
-            matchlist.append(matches)
-            return matchlist
-        n = need_matches.pop()
-        available = {a for a in for_matching if comparison(a, n)}
-        for a in available:
-            matches_found = n.check_entity_consistency(a, matches)
-            for source_list in matches_found:
-                matches_next = list(matches)
-                for i in range(len(a)):
-                    matches_next[a.entity_context[i]] = source_list[i]
-                matches_next = tuple(matches_next)
-                matchlist = self.find_matches(
-                    for_matching, need_matches, matches_next, matchlist, comparison
-                )
-        return matchlist
+            yield matches
+        else:
+            n = need_matches.pop()
+            available = {a for a in for_matching if comparison(a, n)}
+            for a in available:
+                matches_found = n.check_entity_consistency(a, matches)
+                for source_list in matches_found:
+                    matches_next = list(matches)
+                    for i in range(len(a)):
+                        matches_next[a.entity_context[i]] = source_list[i]
+                    matches_next = tuple(matches_next)
+                    for m in self.find_matches(
+                        for_matching, need_matches, matches_next, comparison
+                    ):
+                        yield m
+
 
     def contradicts_some_to_all(self, other):
         """

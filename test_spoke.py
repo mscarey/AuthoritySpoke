@@ -722,7 +722,7 @@ class TestFactors:
         assert len(make_factor["f1"]) == 1
 
     def test_entity_orders(self, make_factor):
-        assert make_factor["f7_swap_entities_4"].entity_orders() == {(1,4), (4,1)}
+        assert make_factor["f7_swap_entities_4"].entity_orders == {(1,4), (4,1)}
 
     def test_predicate_with_entities(self, make_entity, make_factor):
         assert (
