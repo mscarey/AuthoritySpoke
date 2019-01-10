@@ -312,13 +312,20 @@ class Predicate:
 
     def entity_orders(self):
         """
-        Returns a set of tuples indicating the ways the entities
-        could be rearranged without changing the meaning of the predicate.
-
         Currently the only possible rearrangement is to swap the
         order of the first two entities if self.reciprocal.
+
+        :returns: a set of tuples indicating the ways the entities
+        could be rearranged without changing the meaning of the predicate.
+
         """
+
         orders = {(tuple(n for n in range(len(self))))}
+
+        if self.reciprocal:
+            swapped = tuple([1, 0] + [n for n in range(2, len(self))])
+            orders.add(swapped)
+
         return orders
 
     # TODO: allow the same entity to be mentioned more than once
@@ -451,7 +458,7 @@ class Fact(Factor):
 
     def check_entity_consistency(
         self, other: Factor, matches: tuple
-    ) -> List[Tuple[int, ...]]:
+    ) -> Set[Tuple[int, ...]]:
         """
         Given entity assignments for self and other, determines whether
         the factors have consistent entity assignments such that both can
@@ -460,7 +467,7 @@ class Fact(Factor):
         All of self's entities must match other's, but other may have entities
         that don't match self.
 
-        if self.predicate.reciprocal, the function will also compare other
+        If self.predicate.reciprocal, the function will also compare other
         to self with the first two entity slots of self_entities transposed.
 
         :param other:
@@ -471,10 +478,9 @@ class Fact(Factor):
 
         :returns: a list containing self's normal entity tuple, self's reciprocal
         entity tuple, both, or neither, depending on which ones match with other.
-
         """
 
-        def all_matches(needed: Tuple[int]) -> bool:
+        def all_matches(self_order: Tuple[int]) -> bool:
             """
             Determines whether the entity slots assigned so far are
             consistent for the Factors designated self and other,
@@ -483,7 +489,7 @@ class Fact(Factor):
             """
 
             return all(
-                matches[other.entity_context[i]] == needed[i]
+                matches[other.entity_context[i]] == self_order[i]
                 or matches[other.entity_context[i]] is None
                 for i in range(len(other))
             )
@@ -491,18 +497,13 @@ class Fact(Factor):
         if not isinstance(other, Factor):
             raise TypeError(f"other must be type Factor")
 
-        answer = []
+        answers = set()
 
-        if all_matches(self.entity_context):
-            answer.append(self.entity_context)
+        for self_order in self.entity_orders():
+            if all_matches(self_order):
+                answers.add(self_order)
 
-        if self.predicate.reciprocal:
-            swapped = list(self.entity_context)
-            swapped[0], swapped[1] = swapped[1], swapped[0]
-            if all_matches(swapped):
-                answer.append(tuple(swapped))
-
-        return answer
+        return answers
 
     def consistent_entity_combinations(
         self, factors_from_other_procedure, matches
@@ -545,6 +546,26 @@ class Fact(Factor):
                 ):
                     answer.append(c)
         return answer
+
+    def entity_orders(self):
+
+        """
+        Currently the only possible arrangements are derived from
+        the predicate attribute.
+
+        Each tuple in the returned set is an ordering of
+        self.entity_context, using the indices from one of
+        self.predicate.entity_orders.
+
+        :returns: a set of tuples indicating the ways the entities
+        could be rearranged without changing the meaning of the Fact.
+
+        """
+
+        return set(
+            tuple([x for i, x in sorted(zip(order, self.entity_context))])
+            for order in self.predicate.entity_orders()
+        )
 
     # TODO: A function to determine if a factor implies another (transitively)
     # given a list of factors that imply one another or a function for determining
@@ -623,14 +644,18 @@ class Procedure:
             matchlist = []
             for m in prior_list:
                 # TODO: try rewriting without matchlist as parameter
-                matchlist = self.find_matches(x[0], set(x[1]), m, matchlist, operator.eq)
+                matchlist = self.find_matches(
+                    x[0], set(x[1]), m, matchlist, operator.eq
+                )
 
             # Also verifying that every factor in other is in self.
 
             prior_list = tuple(matchlist)
             matchlist = []
             for m in prior_list:
-                matchlist = self.find_matches(x[1], set(x[0]), m, matchlist, operator.eq)
+                matchlist = self.find_matches(
+                    x[1], set(x[0]), m, matchlist, operator.eq
+                )
 
         return bool(matchlist)
 

@@ -172,7 +172,7 @@ def make_factor(make_predicate) -> Dict[str, Factor]:
         "f6_swap_entities": Fact(p["p6"], (1,)),
         "f7": Fact(p["p7"]),
         "f7_swap_entities": Fact(p["p7"], (1, 0)),
-        "f7_swap_entities_4": Fact(p["p7"], (1, 0)),
+        "f7_swap_entities_4": Fact(p["p7"], (1, 4)),
         "f7_true": Fact(p["p7_true"]),
         "f8": Fact(p["p8"]),
         "f8_absent": Fact(p["p8"], absent=True),
@@ -720,6 +720,9 @@ class TestFactors:
     def test_entity_slots_as_length_of_factor(self, make_factor):
         assert len(make_factor["f1"].predicate) == 1
         assert len(make_factor["f1"]) == 1
+
+    def test_entity_orders(self, make_factor):
+        assert make_factor["f7_swap_entities_4"].entity_orders() == {(1,4), (4,1)}
 
     def test_predicate_with_entities(self, make_entity, make_factor):
         assert (
