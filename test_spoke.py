@@ -649,6 +649,9 @@ class TestPredicates:
         assert make_predicate["p9"].quantity_comparison() == "no more than 5 foot"
         assert make_predicate["p1"].quantity_comparison() is None
 
+    def test_entity_orders(self, make_predicate):
+        assert make_predicate["p7"].entity_orders() == {(0,1), (1,0)}
+
     def test_obverse_predicates_equal(self, make_predicate):
         assert make_predicate["p7"] == make_predicate["p7_obverse"]
 

@@ -188,10 +188,6 @@ class Predicate:
         ):
             return False
 
-        # TODO: check that there's a reasonable answer for which supporting input should be
-        # considered more specific: "x was greater than 20" or "x was exactly 25"
-        # (remembering that more information in a supporting input is not deemed to undercut).
-
         if "<" in self.comparison and (
             "<" in other.comparison or "=" in other.comparison
         ):
@@ -300,7 +296,12 @@ class Predicate:
             )
         return str(self).format(*(str(e) for e in entities))
 
-    def negated(self):
+    def negated(self) -> "Predicate":
+        """
+        Returns a copy of the same Predicate, but with the opposite
+        truth value.
+        """
+
         return Predicate(
             content=self.content,
             truth=not self.truth,
@@ -308,6 +309,17 @@ class Predicate:
             comparison=self.comparison,
             quantity=self.quantity,
         )
+
+    def entity_orders(self):
+        """
+        Returns a set of tuples indicating the ways the entities
+        could be rearranged without changing the meaning of the predicate.
+
+        Currently the only possible rearrangement is to swap the
+        order of the first two entities if self.reciprocal.
+        """
+        orders = {(tuple(n for n in range(len(self))))}
+        return orders
 
     # TODO: allow the same entity to be mentioned more than once
 
