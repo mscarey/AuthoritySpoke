@@ -764,10 +764,10 @@ class Procedure:
         comparison: Callable[[Factor, Factor], bool],
     ):
         """
-        Recursively searches for a list of entity assignments that can
+        Recursively searches for a tuple of entity assignments that can
         cause all of 'need_matches' to satisfy the relation described by
-        'comparison' with a factor from for_matching. When one such list
-        is found, the function adds that list to matchlist and continues
+        'comparison' with a factor from for_matching. When one such tuple
+        is found, the function adds that tuple to matchlist and continues
         searching. It finally returns matchlist when all possibilities
         have been searched.
 
@@ -779,8 +779,21 @@ class Procedure:
         :param need_matches: A set of factors from other that have
         not yet been matched to any factor from self.
 
-        :param matches: A tuple showing which factors from for_matching have
-        been matched.
+        :param matches: A tuple showing which factors from
+        for_matching have been matched.
+
+        :param matchlist: A list of "matches" objects known to be
+        consistent with the factors that have been considered so far,
+        including need_matches.
+
+        :param comparison: A function used to filter the for_matching
+        factors into the "available" collection. A factor must have
+        the "comparison" relation with the factor from the need_matches
+        set to be included as "available".
+
+        :returns: a new version of matchlist, which may have new tuples
+        of entity assignments that weren't present in the version of
+        matchlist that was used as an input parameter.
         """
 
         if not need_matches:
