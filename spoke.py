@@ -771,7 +771,12 @@ class Procedure:
 
         return sorted(self.factors_all(), key=repr)
 
-    def find_consistent_factors(self, self_matches, other_factors, m, matchlist):
+    def find_consistent_factors(
+        self,
+        for_matching: FrozenSet[Factor],
+        need_matches: Set[Factor],
+        matches: Tuple[Optional[int], ...],
+    ) -> Iterator[Tuple[Optional[int], ...]]:
         """
         Recursively searches for a list of entity assignments that can
         cause all of 'other_factors' to not contradict any of the factors in
@@ -780,21 +785,20 @@ class Procedure:
         matchlist when all possibilities have been searched.
         """
 
-        matches = tuple(m)
-        need_matches = {f for f in other_factors}
         if not need_matches:
-            matchlist.append(matches)
-            return matchlist
-        n = need_matches.pop()
-        valid_combinations = n.consistent_entity_combinations(self_matches, matches)
-        for c in valid_combinations:
-            matches_next = list(matches)
-            for i in c:
-                matches_next[i] = c[i]
-                matchlist = self.find_consistent_factors(
-                    self_matches, need_matches, matches_next, matchlist
-                )
-        return matchlist
+            yield matches
+        else:
+            n = need_matches.pop()
+            valid_combinations = n.consistent_entity_combinations(for_matching, matches)
+            for c in valid_combinations:
+                matches_next = list(matches)
+                for i in c:
+                    matches_next[i] = c[i]
+                matches_next = tuple(matches_next)
+                for m in self.find_consistent_factors(
+                    for_matching, need_matches, matches_next
+                ):
+                    yield m
 
     def find_matches(
         self,
@@ -853,6 +857,7 @@ class Procedure:
         contradicts that the procedure "other" applies in ALL cases,
         where at least one of the holdings is mandatory.
 
+        :param other:
         """
 
         if not isinstance(other, self.__class__):
@@ -895,9 +900,7 @@ class Procedure:
         if self == other:
             return True
 
-        matchlist = self.evolve_match_list(
-            other.inputs, self.inputs, operator.ge
-        )
+        matchlist = self.evolve_match_list(other.inputs, self.inputs, operator.ge)
         matchlist = self.evolve_match_list(
             self.outputs, other.outputs, operator.ge, matchlist
         )
@@ -906,17 +909,17 @@ class Procedure:
         # that are consistent with matchlist and that don't cause the factor
         # to contradict any factor of self.
 
-        prior_list = tuple(matchlist)
-        matchlist = []
-        for m in prior_list:
-            # TODO: convert to generator, use any()
-            matchlist = self.find_consistent_factors(
-                self.inputs, other.despite, m, matchlist
+        return any(
+            any(
+                match
+                for match in self.find_consistent_factors(
+                    self.inputs, set(other.despite), m
+                )
             )
+            for m in matchlist
+        )
 
-        return bool(matchlist)
-
-    def implies_all_to_some(self, other):
+    def implies_all_to_some(self, other: "Procedure") -> bool:
         """
         This is a different process for checking whether one procedure implies another,
         used when the list of self's inputs is considered an exhaustive list of the
@@ -931,14 +934,14 @@ class Procedure:
 
         Self does not imply other if any despite factors of other
         are contradicted by inputs of self.
+
+        :param other:
         """
 
         if not isinstance(other, self.__class__):
             return False
 
-        matchlist = self.evolve_match_list(
-            self.outputs, other.outputs, operator.ge
-        )
+        matchlist = self.evolve_match_list(self.outputs, other.outputs, operator.ge)
 
         # Not checking whether despite factors of other are
         # contradicted by inputs of self, assuming they can't be
@@ -950,14 +953,15 @@ class Procedure:
 
         other_despite_or_input = {*other.despite, *other.inputs}
 
-        prior_list = tuple(matchlist)
-        matchlist = []
-        for m in prior_list:
-            matchlist = self.find_consistent_factors(
-                other_despite_or_input, self.inputs, m, matchlist
+        return any(
+            any(
+                match
+                for match in self.find_consistent_factors(
+                    other_despite_or_input, set(self.inputs), m
+                )
             )
-
-        return bool(matchlist)
+            for m in matchlist
+        )
 
     def contradicts(self, other):
         raise NotImplementedError(
