@@ -381,7 +381,6 @@ class Fact(Factor):
                 f"standard of proof must be one of {STANDARDS_OF_PROOF.keys()} or None."
             )
 
-
     def __eq__(self, other) -> bool:
         if not isinstance(other, self.__class__):
             return False
@@ -613,10 +612,35 @@ class Procedure:
             if not isinstance(x, Factor):
                 raise TypeError(
                     (
-                        f"{group} must contain only type Factor,",
-                        f"but {x} was type {type(x)}",
+                        f"Input, Output, and Despite groups must contain only ",
+                        f"type Factor, but {x} was type {type(x)}",
                     )
                 )
+
+    def evolve_match_list(
+        self,
+        need_matches: FrozenSet[Factor],
+        available: FrozenSet[Factor],
+        comparison: Callable[[Factor, Factor], bool],
+        prior_matches: Optional[FrozenSet[Tuple[Optional[int], ...]]] = None,
+    ) -> FrozenSet[Tuple[Optional[int], ...]]:
+
+        """
+        Takes all the tuples of entity assignments in prior_matches, and
+        updates them with every consistent tuple of entity assignments
+        that would cause every Factor in need_matches to be related to
+        a Factor in "available" by the relation described by "comparison".
+        """
+        if prior_matches is None:
+            # Should this instead depend on the length of need_matches?
+            prior_matches = frozenset([tuple([None for i in range(len(self))])])
+
+        new_matches = set()
+        for m in prior_matches:
+            for y in self.find_matches(available, set(need_matches), m, comparison):
+                new_matches.add(y)
+        return new_matches
+
 
     def __eq__(self, other: "Procedure") -> bool:
         """Determines if the two procedures have all the same factors
@@ -629,9 +653,7 @@ class Procedure:
         if len(other) != len(self):  # redundant?
             return False
 
-        matchlist = [tuple([None for i in range(len(self))])]
-
-        # TODO: look again at refactoring this.
+        matchlist = None
 
         for x in (
             (self.outputs, other.outputs),
@@ -640,26 +662,10 @@ class Procedure:
         ):
 
             # Verifying that every factor in self is in other.
-
-            prior_list = tuple(matchlist)
-            matchlist = set()
-            for m in prior_list:
-
-                for y in self.find_matches(
-                    x[0], set(x[1]), m, operator.eq
-                ):
-                    matchlist.add(y)
+            matchlist = self.evolve_match_list(x[0], x[1], operator.eq, matchlist)
 
             # Also verifying that every factor in other is in self.
-
-            prior_list = tuple(matchlist)
-            matchlist = set()
-            for m in prior_list:
-
-                for y in self.find_matches(
-                    x[1], set(x[0]), m, operator.eq
-                ):
-                    matchlist.add(y)
+            matchlist = self.evolve_match_list(x[1], x[0], operator.eq, matchlist)
 
         return bool(matchlist)
 
@@ -742,7 +748,9 @@ class Procedure:
                 text += "\n" + str(f)
         return text
 
-    def contradiction_between_outputs(self, other: "Procedure", m: Tuple[int, ...]) -> bool:
+    def contradiction_between_outputs(
+        self, other: "Procedure", m: Tuple[int, ...]
+    ) -> bool:
         """
         Returns a boolean indicating if any factor assignment can be found that
         makes a factor in the output of other contradict a factor in the
@@ -850,7 +858,6 @@ class Procedure:
                     ):
                         yield m
 
-
     def contradicts_some_to_all(self, other):
         """
         Tests whether the assertion that self applies in SOME cases
@@ -864,7 +871,6 @@ class Procedure:
 
         prior_list = (tuple([None] * len(self)),)
         self_despite_or_input = {*self.despite, *self.inputs}
-
 
         # For self to contradict other, every input of other
         # must be implied by some input or despite factor of self.
