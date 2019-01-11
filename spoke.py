@@ -652,21 +652,22 @@ class Procedure:
         if len(other) != len(self):  # redundant?
             return False
 
-        matchlist = None
-
-        for x in (
-            (self.outputs, other.outputs),
-            (self.inputs, other.inputs),
-            (self.despite, other.despite),
-        ):
-
             # Verifying that every factor in self is in other.
-            matchlist = self.evolve_match_list(x[0], x[1], operator.eq, matchlist)
-
             # Also verifying that every factor in other is in self.
-            matchlist = self.evolve_match_list(x[1], x[0], operator.eq, matchlist)
 
-        return bool(matchlist)
+        return self.check_factor_equality(other) and other.check_factor_equality(self)
+
+    def check_factor_equality(self, other: "Procedure") -> bool:
+        """
+        Determines whether every factor in other is in self, with matching entity slots.
+        """
+        matchlist = self.evolve_match_list(self.outputs, other.outputs, operator.eq)
+        matchlist = self.evolve_match_list(
+            self.inputs, other.inputs, operator.eq, matchlist
+        )
+        return bool(
+            self.evolve_match_list(self.despite, other.despite, operator.eq, matchlist)
+        )
 
     def __ge__(self, other: "Procedure") -> bool:
         """
@@ -844,7 +845,10 @@ class Procedure:
                 for source_list in matches_found:
                     matches_next = list(matches)
                     for i in range(len(a)):
-                        matches_next[a.entity_context[i]] = source_list[i]
+                        if comparison == operator.le:
+                            matches_next[source_list[i]] = a.entity_context[i]
+                        else:
+                            matches_next[a.entity_context[i]] = source_list[i]
                     matches_next = tuple(matches_next)
                     for m in self.find_matches(
                         for_matching, need_matches, matches_next, comparison
@@ -900,7 +904,8 @@ class Procedure:
         if self == other:
             return True
 
-        matchlist = self.evolve_match_list(other.inputs, self.inputs, operator.ge)
+        matchlist_from_other = other.evolve_match_list(other.inputs, self.inputs, operator.ge)
+        matchlist = self.get_foreign_match_list(matchlist_from_other)
         matchlist = self.evolve_match_list(
             self.outputs, other.outputs, operator.ge, matchlist
         )
@@ -918,6 +923,19 @@ class Procedure:
             )
             for m in matchlist
         )
+
+    def get_foreign_match_list(
+        self, foreign: FrozenSet[Tuple[int, ...]]
+    ) -> FrozenSet[Tuple[int, ...]]:
+        def get_foreign_match(length, foreign_match: Tuple[int, ...]) -> Tuple[int, ...]:
+            blank = [None] * len(self)
+            for e in enumerate(foreign_match):
+                if e[1] is not None:
+                    blank[e[1]] = e[0]
+            return tuple(blank)
+
+        length = len(self)
+        return frozenset([get_foreign_match(length, match) for match in foreign])
 
     def implies_all_to_some(self, other: "Procedure") -> bool:
         """

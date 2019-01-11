@@ -908,8 +908,15 @@ class TestProcedures:
     def test_still_equal_after_swapping_reciprocal_entities(self, make_procedure):
         assert make_procedure["c2"] == make_procedure["c2_reciprocal_swap"]
 
+    def test_foreign_match_list(self, make_procedure):
+        assert make_procedure["c2_irrelevant_inputs"].get_foreign_match_list(frozenset([
+            (None, None, 1, 0, None), (None, 1, 3, None, None),
+        ])) == frozenset([
+            (3, 2, None, None, None), (None, 1, None, 2, None),
+        ])
+
     def test_unequal_after_swapping_nonreciprocal_entities(self, make_procedure):
-        assert make_procedure["c2"] != (make_procedure["c2_nonreciprocal_swap"])
+        assert make_procedure["c2"] != make_procedure["c2_nonreciprocal_swap"]
 
     def test_procedure_length(self, make_procedure):
         assert len(make_procedure["c1"]) == 2
