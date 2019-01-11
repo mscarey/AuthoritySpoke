@@ -892,7 +892,7 @@ class TestFactors:
         factor = make_factor["f2_preponderance_of_evidence"]
         assert factor.standard_of_proof in str(factor)
 
-class TestProcedure:
+class TestProcedures:
     def test_exception_for_wrong_type_for_procedure(self, make_predicate):
         with pytest.raises(TypeError):
             x = Procedure(inputs=make_predicate["p1"], outputs=make_predicate["p2"])

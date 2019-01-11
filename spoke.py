@@ -619,8 +619,8 @@ class Procedure:
 
     def evolve_match_list(
         self,
-        need_matches: FrozenSet[Factor],
         available: FrozenSet[Factor],
+        need_matches: FrozenSet[Factor],
         comparison: Callable[[Factor, Factor], bool],
         prior_matches: Optional[FrozenSet[Tuple[Optional[int], ...]]] = None,
     ) -> FrozenSet[Tuple[Optional[int], ...]]:
@@ -639,8 +639,7 @@ class Procedure:
         for m in prior_matches:
             for y in self.find_matches(available, set(need_matches), m, comparison):
                 new_matches.add(y)
-        return new_matches
-
+        return frozenset(new_matches)
 
     def __eq__(self, other: "Procedure") -> bool:
         """Determines if the two procedures have all the same factors
@@ -689,23 +688,15 @@ class Procedure:
         if not isinstance(other, Procedure):
             return False
 
-        matchlist = [tuple([None for i in range(len(self))])]
         despite_or_input = {*self.despite, *self.inputs}
 
-        for x in (
-            (self.inputs, other.inputs, operator.ge),
-            (self.outputs, other.outputs, operator.ge),
-            (despite_or_input, other.despite, operator.ge),
-        ):
-
-            prior_list = tuple(matchlist)
-            matchlist = set()
-            for m in prior_list:
-                for y in self.find_matches(x[0], set(x[1]), m, x[2]):
-                    matchlist.add(y)
-
-            if not matchlist:
-                return False
+        matchlist = self.evolve_match_list(self.inputs, other.inputs, operator.ge)
+        matchlist = self.evolve_match_list(
+            self.outputs, other.outputs, operator.ge, matchlist
+        )
+        matchlist = self.evolve_match_list(
+            despite_or_input, other.despite, operator.ge, matchlist
+        )
 
         return bool(matchlist)
 
