@@ -4,10 +4,10 @@ import json
 import operator
 import re
 
-from typing import Callable, Dict, FrozenSet, Iterable, List
-from typing import Optional, Sequence, Set, Tuple, Union
+from typing import Callable, Dict, FrozenSet, List, Set, Tuple
+from typing import Iterable, Iterator
+from typing import Optional, Sequence, Union
 from dataclasses import dataclass
-from collections import namedtuple
 
 from pint import UnitRegistry
 from bs4 import BeautifulSoup
@@ -802,14 +802,12 @@ class Procedure:
         need_matches: Set[Factor],
         matches: Tuple[Optional[int], ...],
         comparison: Callable[[Factor, Factor], bool],
-    ):
+    ) -> Iterator[Tuple[Optional[int], ...]]:
         """
-        Recursively searches for a tuple of entity assignments that can
-        cause all of 'need_matches' to satisfy the relation described by
-        'comparison' with a factor from for_matching. When one such tuple
-        is found, the function adds that tuple to matchlist and continues
-        searching. It finally returns matchlist when all possibilities
-        have been searched.
+        Generator that recursively searches for a tuple of entity
+        assignments that can cause all of 'need_matches' to satisfy
+        the relation described by 'comparison' with a factor
+        from for_matching.
 
         :param for_matching: A frozenset of all of self's factors. These
         factors aren't removed when they're matched to a factor from other,
@@ -827,9 +825,9 @@ class Procedure:
         the "comparison" relation with the factor from the need_matches
         set to be included as "available".
 
-        :returns: a new version of matchlist, which may have new tuples
-        of entity assignments that weren't present in the version of
-        matchlist that was used as an input parameter.
+        :returns: iterator that yields tuples of entity assignments that can
+        cause all of 'need_matches' to satisfy the relation described by
+        'comparison' with a factor from for_matching.
         """
 
         if not need_matches:
@@ -849,7 +847,7 @@ class Procedure:
                     ):
                         yield m
 
-    def contradicts_some_to_all(self, other):
+    def contradicts_some_to_all(self, other: "Procedure") -> bool:
         """
         Tests whether the assertion that self applies in SOME cases
         contradicts that the procedure "other" applies in ALL cases,
@@ -860,31 +858,21 @@ class Procedure:
         if not isinstance(other, self.__class__):
             return False
 
-        prior_list = (tuple([None] * len(self)),)
         self_despite_or_input = {*self.despite, *self.inputs}
 
         # For self to contradict other, every input of other
         # must be implied by some input or despite factor of self.
 
-        matchlist = set()
-        for m in prior_list:
-
-            for y in self.find_matches(
-                self_despite_or_input, set(other.inputs), m, operator.ge
-            ):
-                matchlist.add(y)
-        if not matchlist:
-            return False
-
-        prior_list = tuple(matchlist)
-        matchlist = []
+        matchlist = self.evolve_match_list(
+            self_despite_or_input, other.inputs, operator.ge
+        )
 
         # For self to contradict other, some output of other
         # must be contradicted by some output of self.
 
-        return any(self.contradiction_between_outputs(other, m) for m in prior_list)
+        return any(self.contradiction_between_outputs(other, m) for m in matchlist)
 
-    def implies_all_to_all(self, other: "Procedure"):
+    def implies_all_to_all(self, other: "Procedure") -> bool:
         """
         Tests whether the assertion that self applies in ALL cases
         implies that the procedure "other" applies in ALL cases.
@@ -907,22 +895,12 @@ class Procedure:
         if self == other:
             return True
 
-        matchlist = [tuple([None for i in range(len(self))])]
-
-        for x in (
-            (other.inputs, self.inputs, operator.ge),
-            (self.outputs, other.outputs, operator.ge),
-        ):
-
-            prior_list = tuple(matchlist)
-
-            matchlist = set()
-            for m in prior_list:
-                for y in self.find_matches(x[0], set(x[1]), m, x[2]):
-                    matchlist.add(y)
-
-            if not matchlist:
-                return False
+        matchlist = self.evolve_match_list(
+            other.inputs, self.inputs, operator.ge
+        )
+        matchlist = self.evolve_match_list(
+            self.outputs, other.outputs, operator.ge, matchlist
+        )
 
         # For every factor in other, find the permutations of entity slots
         # that are consistent with matchlist and that don't cause the factor
@@ -931,6 +909,7 @@ class Procedure:
         prior_list = tuple(matchlist)
         matchlist = []
         for m in prior_list:
+            # TODO: convert to generator, use any()
             matchlist = self.find_consistent_factors(
                 self.inputs, other.despite, m, matchlist
             )
@@ -957,17 +936,9 @@ class Procedure:
         if not isinstance(other, self.__class__):
             return False
 
-        matchlist = [tuple([None for i in range(len(self))])]
-
-        for x in ((self.outputs, other.outputs, operator.ge),):
-
-            prior_list = tuple(matchlist)
-            matchlist = []
-            for m in prior_list:
-                matchlist = self.find_matches(x[0], set(x[1]), m, x[2])
-
-            if not matchlist:
-                return False
+        matchlist = self.evolve_match_list(
+            self.outputs, other.outputs, operator.ge
+        )
 
         # Not checking whether despite factors of other are
         # contradicted by inputs of self, assuming they can't be
