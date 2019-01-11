@@ -906,7 +906,7 @@ class TestProcedure:
         assert make_procedure["c1"] == make_procedure["c1_entity_order"]
 
     def test_still_equal_after_swapping_reciprocal_entities(self, make_procedure):
-        assert make_procedure["c2"] == (make_procedure["c2_reciprocal_swap"])
+        assert make_procedure["c2"] == make_procedure["c2_reciprocal_swap"]
 
     def test_unequal_after_swapping_nonreciprocal_entities(self, make_procedure):
         assert make_procedure["c2"] != (make_procedure["c2_nonreciprocal_swap"])

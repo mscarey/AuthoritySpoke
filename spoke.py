@@ -618,7 +618,7 @@ class Procedure:
                     )
                 )
 
-    def __eq__(self, other):
+    def __eq__(self, other: "Procedure") -> bool:
         """Determines if the two procedures have all the same factors
         with the same entities in the same roles, not whether they're
         actually the same Python object."""
@@ -630,6 +630,8 @@ class Procedure:
             return False
 
         matchlist = [tuple([None for i in range(len(self))])]
+
+        # TODO: look again at refactoring this.
 
         for x in (
             (self.outputs, other.outputs),
@@ -661,7 +663,7 @@ class Procedure:
 
         return bool(matchlist)
 
-    def __ge__(self, other):
+    def __ge__(self, other: "Procedure") -> bool:
         """
         Tests whether the assertion that self applies in some cases
         implies that the procedure "other" applies in some cases.
@@ -691,16 +693,17 @@ class Procedure:
         ):
 
             prior_list = tuple(matchlist)
-            matchlist = []
+            matchlist = set()
             for m in prior_list:
-                matchlist = self.find_matches(x[0], set(x[1]), m, matchlist, x[2])
+                for y in self.find_matches(x[0], set(x[1]), m, x[2]):
+                    matchlist.add(y)
 
             if not matchlist:
                 return False
 
         return bool(matchlist)
 
-    def __gt__(self, other):
+    def __gt__(self, other: "Procedure") -> bool:
         if self == other:
             return False
         return self >= other
@@ -739,7 +742,7 @@ class Procedure:
                 text += "\n" + str(f)
         return text
 
-    def contradiction_between_outputs(self, other, m):
+    def contradiction_between_outputs(self, other: "Procedure", m: Tuple[int, ...]) -> bool:
         """
         Returns a boolean indicating if any factor assignment can be found that
         makes a factor in the output of other contradict a factor in the
@@ -820,10 +823,6 @@ class Procedure:
         :param matches: A tuple showing which factors from
         for_matching have been matched.
 
-        :param matchlist: A list of "matches" objects known to be
-        consistent with the factors that have been considered so far,
-        including need_matches.
-
         :param comparison: A function used to filter the for_matching
         factors into the "available" collection. A factor must have
         the "comparison" relation with the factor from the need_matches
@@ -865,15 +864,18 @@ class Procedure:
 
         prior_list = (tuple([None] * len(self)),)
         self_despite_or_input = {*self.despite, *self.inputs}
-        matchlist = []
+
 
         # For self to contradict other, every input of other
         # must be implied by some input or despite factor of self.
 
+        matchlist = set()
         for m in prior_list:
-            matchlist = self.find_matches(
-                self_despite_or_input, set(other.inputs), m, matchlist, operator.ge
-            )
+
+            for y in self.find_matches(
+                self_despite_or_input, set(other.inputs), m, operator.ge
+            ):
+                matchlist.add(y)
         if not matchlist:
             return False
 
@@ -916,9 +918,11 @@ class Procedure:
         ):
 
             prior_list = tuple(matchlist)
-            matchlist = []
+
+            matchlist = set()
             for m in prior_list:
-                matchlist = self.find_matches(x[0], set(x[1]), m, matchlist, x[2])
+                for y in self.find_matches(x[0], set(x[1]), m, x[2]):
+                    matchlist.add(y)
 
             if not matchlist:
                 return False
@@ -963,7 +967,7 @@ class Procedure:
             prior_list = tuple(matchlist)
             matchlist = []
             for m in prior_list:
-                matchlist = self.find_matches(x[0], set(x[1]), m, matchlist, x[2])
+                matchlist = self.find_matches(x[0], set(x[1]), m, x[2])
 
             if not matchlist:
                 return False
