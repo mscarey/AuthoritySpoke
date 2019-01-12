@@ -571,35 +571,18 @@ class Fact(Factor):
     # are binding from the point of view of a particular court.
 
 
-@dataclass(init=False, frozen=True)
+@dataclass(frozen=True)
 class Evidence(Factor):
 
-    def __init__(
-        self,
-        form: Optional[str] = None,
-        statement: Optional[Predicate] = None,
-        to_effect: Optional[Predicate] = None,
-        entity_context: Tuple[int, ...] = (),
-        absent: bool = False,
-        derived_from: Optional[Union[Entity, Iterable[Entity]]] = None,
-        introduced_by: Optional[Union[Entity, Iterable[Entity]]] = None,
-        physical_object: Optional[Entity] = None):
+    form: Optional[str] = None
+    statement: Optional[Predicate] = None
+    to_effect: Optional[Predicate] = None
+    entity_context: Tuple[int, ...] = ()
+    absent: bool = False
+    derived_from: Iterable[Entity] = frozenset([])
+    introduced_by: Iterable[Entity] = frozenset([])
+    physical_object: Optional[Entity] = None
 
-        self.form = form
-        self.statement = statement
-        self.to_effect = to_effect
-        self.entity_context = entity_context
-        self.absent = absent
-
-        if isinstance(derived_from, Iterable):
-            self.derived_from = frozenset(derived_from)
-        else:
-            self.derived_from = frozenset([derived_from])
-        if isinstance(introduced_by, Iterable):
-            self.introduced_by = frozenset(introduced_by)
-        else:
-            self.introduced_by = frozenset([introduced_by])
-        self.physical_object = physical_object
 
 
 @dataclass(frozen=True)

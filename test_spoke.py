@@ -8,7 +8,7 @@ from pint import UnitRegistry
 import pytest
 
 from spoke import Entity, Human
-from spoke import Predicate, Factor, Fact
+from spoke import Predicate, Factor, Fact, Evidence
 from spoke import Procedure, Holding, ProceduralHolding
 from spoke import Opinion, opinion_from_file
 from spoke import Code, Enactment
@@ -704,7 +704,7 @@ class TestPredicates:
         assert make_predicate["p3"].negated() == make_predicate["p3_false"]
 
 
-class TestFactors:
+class TestFacts:
     def test_default_entity_context_for_fact(self, make_predicate):
         f2 = Fact(make_predicate["p2"])
         assert f2.entity_context == (0, 1)
@@ -891,6 +891,11 @@ class TestFactors:
     def test_standard_of_proof_in_str(self, make_factor):
         factor = make_factor["f2_preponderance_of_evidence"]
         assert factor.standard_of_proof in str(factor)
+
+class TestEvidence:
+    def test_default_entity_context_for_evidence(self, make_entity, make_predicate):
+        e = Evidence(form="Testimony", to_effect=make_predicate["p2"])
+        assert not e.absent
 
 class TestProcedures:
     def test_exception_for_wrong_type_for_procedure(self, make_predicate):
