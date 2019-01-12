@@ -775,7 +775,7 @@ class Procedure:
     def find_consistent_factors(
         self,
         for_matching: FrozenSet[Factor],
-        need_matches: Set[Factor],
+        need_matches: FrozenSet[Factor],
         matches: Tuple[Optional[int], ...],
     ) -> Iterator[Tuple[Optional[int], ...]]:
         """
@@ -789,6 +789,7 @@ class Procedure:
         if not need_matches:
             yield matches
         else:
+            need_matches = set(need_matches)
             n = need_matches.pop()
             valid_combinations = n.consistent_entity_combinations(for_matching, matches)
             for c in valid_combinations:
@@ -797,7 +798,7 @@ class Procedure:
                     matches_next[i] = c[i]
                 matches_next = tuple(matches_next)
                 for m in self.find_consistent_factors(
-                    for_matching, need_matches, matches_next
+                    for_matching, frozenset(need_matches), matches_next
                 ):
                     yield m
 
@@ -904,7 +905,9 @@ class Procedure:
         if self == other:
             return True
 
-        matchlist_from_other = other.evolve_match_list(other.inputs, self.inputs, operator.ge)
+        matchlist_from_other = other.evolve_match_list(
+            other.inputs, self.inputs, operator.ge
+        )
         matchlist = self.get_foreign_match_list(matchlist_from_other)
         matchlist = self.evolve_match_list(
             self.outputs, other.outputs, operator.ge, matchlist
@@ -918,7 +921,7 @@ class Procedure:
             any(
                 match
                 for match in self.find_consistent_factors(
-                    self.inputs, set(other.despite), m
+                    self.inputs, other.despite, m
                 )
             )
             for m in matchlist
@@ -927,7 +930,9 @@ class Procedure:
     def get_foreign_match_list(
         self, foreign: FrozenSet[Tuple[int, ...]]
     ) -> FrozenSet[Tuple[int, ...]]:
-        def get_foreign_match(length, foreign_match: Tuple[int, ...]) -> Tuple[int, ...]:
+        def get_foreign_match(
+            length, foreign_match: Tuple[int, ...]
+        ) -> Tuple[int, ...]:
             blank = [None] * len(self)
             for e in enumerate(foreign_match):
                 if e[1] is not None:
@@ -975,7 +980,7 @@ class Procedure:
             any(
                 match
                 for match in self.find_consistent_factors(
-                    other_despite_or_input, set(self.inputs), m
+                    other_despite_or_input, self.inputs, m
                 )
             )
             for m in matchlist
