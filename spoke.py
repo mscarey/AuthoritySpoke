@@ -571,14 +571,35 @@ class Fact(Factor):
     # are binding from the point of view of a particular court.
 
 
-@dataclass(frozen=True)
+@dataclass(init=False, frozen=True)
 class Evidence(Factor):
 
-    form: Optional[str] = None
-    physical_object: Optional[Entity] = None
-    derived_from: Optional[Entity] = None
-    to_effect: Optional[Predicate] = None
-    absent: bool = False
+    def __init__(
+        self,
+        form: Optional[str] = None,
+        statement: Optional[Predicate] = None,
+        to_effect: Optional[Predicate] = None,
+        entity_context: Tuple[int, ...] = (),
+        absent: bool = False,
+        derived_from: Optional[Union[Entity, Iterable[Entity]]] = None,
+        introduced_by: Optional[Union[Entity, Iterable[Entity]]] = None,
+        physical_object: Optional[Entity] = None):
+
+        self.form = form
+        self.statement = statement
+        self.to_effect = to_effect
+        self.entity_context = entity_context
+        self.absent = absent
+
+        if isinstance(derived_from, Iterable):
+            self.derived_from = frozenset(derived_from)
+        else:
+            self.derived_from = frozenset([derived_from])
+        if isinstance(introduced_by, Iterable):
+            self.introduced_by = frozenset(introduced_by)
+        else:
+            self.introduced_by = frozenset([introduced_by])
+        self.physical_object = physical_object
 
 
 @dataclass(frozen=True)
@@ -637,7 +658,7 @@ class Procedure:
 
         new_matches = set()
         for m in prior_matches:
-            for y in self.find_matches(available, set(need_matches), m, comparison):
+            for y in self.find_matches(available, need_matches, m, comparison):
                 new_matches.add(y)
         return frozenset(new_matches)
 
@@ -839,6 +860,7 @@ class Procedure:
         if not need_matches:
             yield matches
         else:
+            need_matches = set(need_matches)
             n = need_matches.pop()
             available = {a for a in for_matching if comparison(a, n)}
             for a in available:
@@ -852,7 +874,7 @@ class Procedure:
                             matches_next[a.entity_context[i]] = source_list[i]
                     matches_next = tuple(matches_next)
                     for m in self.find_matches(
-                        for_matching, need_matches, matches_next, comparison
+                        for_matching, frozenset(need_matches), matches_next, comparison
                     ):
                         yield m
 
