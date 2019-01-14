@@ -403,7 +403,7 @@ class Fact(Factor):
     a judge or jury."""
 
     predicate: Predicate
-    entity_context: Tuple[int, ...] = ()
+    entity_context: Union[int, Tuple[int, ...]] = ()
     absent: bool = False
     standard_of_proof: Optional[str] = None
 
@@ -579,7 +579,7 @@ class Evidence(Factor):
     form: Optional[str] = None
     to_effect: Optional[Fact] = None
     statement: Optional[Predicate] = None
-    statement_context: Tuple[int, ...] = ()
+    statement_context: Union[int, Tuple[int, ...]] = ()
     stated_by: Optional[int] = None
     derived_from: Optional[int] = None
     absent: bool = False
@@ -656,7 +656,7 @@ class Evidence(Factor):
         if (self.stated_by == self.derived_from) != (other.stated_by == other.derived_from):
             return False
 
-        matches = [None] * len(self)
+        matches = [None] * (max(self.get_entity_orders().pop()) + 1)
         if self.stated_by is not None:
             matches[self.stated_by] = other.stated_by
 

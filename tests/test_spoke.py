@@ -350,9 +350,21 @@ class TestEvidence:
         e = make_evidence
         assert e["e_no_shooting"] == e["e_no_shooting_entity_order"]
 
-    def test_inequality_due_to_entity_order(self, make_predicate, make_evidence):
+    def test_inequality_due_to_entity_order(self, make_evidence):
         e = make_evidence
         assert e["e_no_shooting"] != e["e_no_shooting_different_witness"]
+
+    def test_implication_missing_witness(self, make_evidence):
+        e = make_evidence
+        assert e["e_no_shooting"] >= e["e_no_shooting_witness_unknown"]
+
+    def test_implication_missing_effect(self, make_evidence):
+        e = make_evidence
+        assert e["e_no_shooting"] >= e["e_no_shooting_no_effect"]
+
+    def test_implication_procedures_with_same_evidence(self, make_procedure):
+        c = make_procedure
+        assert c["c3_fewer_inputs"] > c["c3"]
 
 
 class TestProcedures:

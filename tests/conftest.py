@@ -10,6 +10,7 @@ from spoke import Opinion, opinion_from_file
 from spoke import Code, Enactment
 from spoke import ureg, Q_
 
+
 @pytest.fixture(scope="class")
 def make_entity() -> Dict[str, Entity]:
     return {
@@ -137,6 +138,7 @@ def make_predicate() -> Dict[str, Predicate]:
         "p_irrelevant_1": Predicate("{} was a bear"),
         "p_irrelevant_2": Predicate("{} was a circus"),
         "p_irrelevant_3": Predicate("{} performed at {}"),
+        "p_crime": Predicate("{} commited a crime"),
         "p_no_shooting": Predicate("{} shot {}", truth=False),
         "p_no_crime": Predicate("{} commited a crime", truth=False),
     }
@@ -197,21 +199,22 @@ def make_factor(make_predicate) -> Dict[str, Factor]:
         "f10_absent_false": Fact(p["p10_false"], absent=True),
         "f10_swap_entities": Fact(p["p10"], (1, 0)),
         "f10_swap_entities_4": Fact(p["p10"], (1, 4)),
-        "f11": Fact(p["p11"]),
-        "f12": Fact(p["p12"]),
-        "f13": Fact(p["p13"]),
-        "f14": Fact(p["p14"]),
-        "f15": Fact(p["p15"]),
-        "f16": Fact(p["p16"]),
-        "f17": Fact(p["p17"]),
-        "f18": Fact(p["p18"]),
-        "f19": Fact(p["p19"]),
+        "f11": Fact(p["p11"], 2),
+        "f12": Fact(p["p12"], 2),
+        "f13": Fact(p["p13"], (2, 3)),
+        "f14": Fact(p["p14"], (1, 3)),
+        "f15": Fact(p["p15"], (3, 0)),
+        "f16": Fact(p["p16"], 3),
+        "f17": Fact(p["p17"], (2, 3)),
+        "f18": Fact(p["p18"], 2),
+        "f19": Fact(p["p19"], 2),
         "f_irrelevant_0": Fact(p["p_irrelevant_0"], (2,)),
         "f_irrelevant_1": Fact(p["p_irrelevant_1"], (3,)),
         "f_irrelevant_2": Fact(p["p_irrelevant_2"], (4,)),
         "f_irrelevant_3": Fact(p["p_irrelevant_3"], (2, 4)),
         "f_irrelevant_3_new_context": Fact(p["p_irrelevant_3"], (3, 4)),
         "f_irrelevant_3_context_0": Fact(p["p_irrelevant_3"], (3, 0)),
+        "f_crime": Fact(p["p_crime"]),
         "f_no_crime": Fact(p["p_no_crime"]),
         "f_no_crime_entity_order": Fact(p["p_no_crime"], (1,)),
     }
@@ -235,6 +238,17 @@ def make_evidence(make_predicate, make_factor) -> Dict[str, Evidence]:
             stated_by=1,
             statement_context=(1, 0),
         ),
+        "e_no_shooting_witness_unknown": Evidence(
+            form="testimony",
+            to_effect=f["f_no_crime"],
+            statement=p["p_no_shooting"],
+        ),
+        "e_no_shooting_no_effect": Evidence(
+            form="testimony",
+            statement=p["p_no_shooting"],
+            stated_by=1,
+            statement_context=(1, 0),
+        ),
         "e_no_shooting_different_witness": Evidence(
             form="testimony",
             to_effect=f["f_no_crime"],
@@ -242,11 +256,9 @@ def make_evidence(make_predicate, make_factor) -> Dict[str, Evidence]:
             stated_by=1,
         ),
         "e_reciprocal": Evidence(
-            form="testimony",
-            to_effect=f["f_no_crime"],
-            statement=p["p7"],
-            stated_by=2,
+            form="testimony", to_effect=f["f_no_crime"], statement=p["p7"], stated_by=2
         ),
+        "e_crime": Evidence(to_effect=f["f_crime"], derived_from=2),
     }
 
 
@@ -278,7 +290,8 @@ def make_enactment(make_code) -> Dict[str, Enactment]:
 
 
 @pytest.fixture(scope="class")
-def make_procedure(make_factor) -> Dict[str, Procedure]:
+def make_procedure(make_evidence, make_factor) -> Dict[str, Procedure]:
+    e = make_evidence
     f = make_factor
 
     return {
@@ -413,11 +426,16 @@ def make_procedure(make_factor) -> Dict[str, Procedure]:
         "c_far_means_no_curtilage": Procedure(
             outputs=(f["f10_false"],), inputs=(f["f8"])
         ),
-        # "c3": Procedure(
-        #    outputs=f["f20"],
-        #    inputs=(f["f3"], f["f11"], f["12"], f["13"], f["14"], f["15"]),
-        #    despite=(f["f16"]),
-        # )
+        "c3": Procedure(
+            outputs=e["e_crime"],
+            inputs=(f["f3"], f["f11"], f["f12"], f["f13"], f["f14"], f["f15"]),
+            despite=(f["f16"]),
+        ),
+        "c3_fewer_inputs": Procedure(
+            outputs=e["e_crime"],
+            inputs=(f["f3"], f["f11"], f["f12"], f["f15"]),
+            despite=(f["f16"]),
+        ),
     }
 
 
