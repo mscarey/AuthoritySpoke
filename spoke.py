@@ -369,11 +369,11 @@ class Fact(Factor):
 
         if len(self) != len(self.predicate):
             raise ValueError(
-                (
+                "".join([
                     "entity_context must have one item for each entity slot ",
                     "in self.predicate, but the number of slots ",
                     f"for {str(self.predicate)} == {len(self.entity_context)} ",
-                    f"and len(self.predicate) == {len(self.predicate)}",
+                    f"and len(self.predicate) == {len(self.predicate)}",]
                 )
             )
         if self.standard_of_proof and self.standard_of_proof not in STANDARDS_OF_PROOF:
@@ -577,9 +577,10 @@ class Evidence(Factor):
     form: Optional[str] = None
     to_effect: Optional[Fact] = None
     statement: Optional[Predicate] = None
+    statement_context: Tuple[int, ...] = ()
     stated_by: Optional[int] = None
-    derived_from: Optional[Iterable[int]] = None
-    statement_entities: Tuple[int, ...] = ()
+    derived_from: Optional[int] = None
+
     absent: bool = False
 
 
@@ -587,14 +588,16 @@ class Evidence(Factor):
 
         """
         The possible entity arrangements are based on the
-        entities for the referenced Fact object (to_effect),
-        the referenced Predicate, and the integer local
-        attributes self.stated_by and self.derived_from.
+        entities for the referenced Predicate statement,
+        and the integer local attributes self.stated_by
+        and self.derived_from.
+
+        Theoretically, the Entities in the Fact referenced by the
+        to_effect attribute don't need to be included here.
 
         Entity slots should be collected from each parameter
         in the order they're listed:
-            self.to_effect
-            self.statement
+            self.statement_context
             self.stated_by
             self.derived_from
 
@@ -603,35 +606,39 @@ class Evidence(Factor):
         Evidence object.
 
         """
-
-        pass
+        int_attrs = []
+        if self.stated_by is not None:
+            int_attrs.append(self.stated_by)
+        if self.derived_from is not None:
+            int_attrs.append(self.derived_from)
+        return set(
+            tuple([x for i, x in sorted(zip(order, self.statement_context))] + int_attrs)
+            for order in self.statement.entity_orders()
+        )
 
 
     def __post_init__(self):
-        if not self.statement_entities:
+        if not self.statement_context:
             object.__setattr__(
-                self, "statement_entities", tuple(range(len(self.statement)))
+                self, "statement_context", tuple(range(len(self.statement)))
             )
-        if isinstance(self.statement_entities, int):
-            object.__setattr__(self, "statement_entities", (self.statement_entities,))
+        if isinstance(self.statement_context, int):
+            object.__setattr__(self, "statement_context", (self.statement_context,))
         object.__setattr__(self, "entity_orders", self.get_entity_orders())
 
         if self.stated_by and not self.statement:
             raise ValueError(
-                "Parameter self.stated_by is only for ",
-                "referencing the Entity who made the statement",
-                "in self.statement, and it should not be used",
+                "Parameter self.stated_by is only for " +
+                "referencing the Entity who made the statement " +
+                "in self.statement, and it should not be used " +
                 "when self.statement is None.")
 
-        # TODO: update for Evidence
-        if len(self) != len(self.predicate):
+        if len(self.statement) != len(self.statement_context):
             raise ValueError(
-                (
-                    "entity_context must have one item for each entity slot ",
-                    "in self.predicate, but the number of slots ",
-                    f"for {str(self.predicate)} == {len(self.entity_context)} ",
-                    f"and len(self.predicate) == {len(self.predicate)}",
-                )
+                "statement_context must have one item for each entity slot " +
+                "in self.statement, but the number of slots " +
+                f"for {str(self.statement)} == {len(self.statement_context)} " +
+                f"and len(self.statement) == {len(self.statement)}"
             )
 
 @dataclass(frozen=True)

@@ -142,6 +142,8 @@ def make_predicate() -> Dict[str, Predicate]:
         "p_irrelevant_1": Predicate("{} was a bear"),
         "p_irrelevant_2": Predicate("{} was a circus"),
         "p_irrelevant_3": Predicate("{} performed at {}"),
+        "p_no_shooting": Predicate("{} shot {}", truth=False),
+        "p_no_crime": Predicate("{} commited a crime", truth=False),
     }
 
 
@@ -155,9 +157,15 @@ def make_factor(make_predicate) -> Dict[str, Factor]:
         "f1b": Fact(p["p1"]),
         "f1c": Fact(p["p1_again"]),
         "f2": Fact(p["p2"], (1, 0)),
-        "f2_preponderance_of_evidence": Fact(p["p2"], (1, 0), standard_of_proof="preponderance of evidence"),
-        "f2_clear_and_convincing": Fact(p["p2"], (1, 0), standard_of_proof="clear and convincing"),
-        "f2_beyond_reasonable_doubt": Fact(p["p2"], (1, 0), standard_of_proof="beyond reasonable doubt"),
+        "f2_preponderance_of_evidence": Fact(
+            p["p2"], (1, 0), standard_of_proof="preponderance of evidence"
+        ),
+        "f2_clear_and_convincing": Fact(
+            p["p2"], (1, 0), standard_of_proof="clear and convincing"
+        ),
+        "f2_beyond_reasonable_doubt": Fact(
+            p["p2"], (1, 0), standard_of_proof="beyond reasonable doubt"
+        ),
         "f2_entity_order": Fact(p["p2"]),
         "f2_reciprocal": Fact(p["p2_reciprocal"]),
         "f3": Fact(p["p3"]),
@@ -209,6 +217,41 @@ def make_factor(make_predicate) -> Dict[str, Factor]:
         "f_irrelevant_3": Fact(p["p_irrelevant_3"], (2, 4)),
         "f_irrelevant_3_new_context": Fact(p["p_irrelevant_3"], (3, 4)),
         "f_irrelevant_3_context_0": Fact(p["p_irrelevant_3"], (3, 0)),
+        "f_no_crime": Fact(p["p_no_crime"]),
+        "f_no_crime_entity_order": Fact(p["p_no_crime"], (1,)),
+    }
+
+
+@pytest.fixture(scope="class")
+def make_evidence(make_predicate, make_factor) -> Dict[str, Evidence]:
+    p = make_predicate
+    f = make_factor
+    return {
+        "e_no_shooting": Evidence(
+            form="testimony",
+            to_effect=f["f_no_crime"],
+            statement=p["p_no_shooting"],
+            stated_by=0,
+        ),
+        "e_no_shooting_entity_order": Evidence(
+            form="testimony",
+            to_effect=f["f_no_crime_entity_order"],
+            statement=p["p_no_shooting"],
+            stated_by=1,
+            statement_context=(1, 0),
+        ),
+        "e_no_shooting_different_witness": Evidence(
+            form="testimony",
+            to_effect=f["f_no_crime"],
+            statement=p["p_no_shooting"],
+            stated_by=1,
+        ),
+        "e_reciprocal": Evidence(
+            form="testimony",
+            to_effect=f["f_no_crime"],
+            statement=p["p7"],
+            stated_by=2,
+        ),
     }
 
 
@@ -302,12 +345,14 @@ def make_procedure(make_factor) -> Dict[str, Procedure]:
             despite=(f["f8"],),
         ),
         "c2_irrelevant_outputs": Procedure(
-            outputs=(f["f10_swap_entities_4"],
+            outputs=(
+                f["f10_swap_entities_4"],
                 f["f_irrelevant_0"],
                 f["f_irrelevant_1"],
                 f["f_irrelevant_2"],
                 f["f_irrelevant_3"],
-                f["f_irrelevant_3_context_0"],),
+                f["f_irrelevant_3_context_0"],
+            ),
             inputs=(
                 f["f4_swap_entities_4"],
                 f["f5_swap_entities"],
@@ -650,7 +695,7 @@ class TestPredicates:
         assert make_predicate["p1"].quantity_comparison() is None
 
     def test_entity_orders(self, make_predicate):
-        assert make_predicate["p7"].entity_orders() == {(0,1), (1,0)}
+        assert make_predicate["p7"].entity_orders() == {(0, 1), (1, 0)}
 
     def test_obverse_predicates_equal(self, make_predicate):
         assert make_predicate["p7"] == make_predicate["p7_obverse"]
@@ -722,7 +767,7 @@ class TestFacts:
         assert len(make_factor["f1"]) == 1
 
     def test_entity_orders(self, make_factor):
-        assert make_factor["f7_swap_entities_4"].entity_orders == {(1,4), (4,1)}
+        assert make_factor["f7_swap_entities_4"].entity_orders == {(1, 4), (4, 1)}
 
     def test_predicate_with_entities(self, make_entity, make_factor):
         assert (
@@ -878,7 +923,9 @@ class TestFacts:
         assert f["f2_clear_and_convincing"] != f["f2_preponderance_of_evidence"]
         assert f["f2_clear_and_convincing"] != f["f2"]
 
-    def test_no_implication_between_factors_with_and_without_standards(self, make_factor):
+    def test_no_implication_between_factors_with_and_without_standards(
+        self, make_factor
+    ):
 
         f = make_factor
         assert not f["f2_clear_and_convincing"] > f["f2"]
@@ -892,18 +939,49 @@ class TestFacts:
         factor = make_factor["f2_preponderance_of_evidence"]
         assert factor.standard_of_proof in str(factor)
 
+
 class TestEvidence:
     def test_make_evidence_object(self, make_predicate):
-        e = Evidence(form="Testimony", to_effect=make_predicate["p2"])
+        e = Evidence(form="testimony", to_effect=make_predicate["p2"])
         assert not e.absent
 
-    def test_default_len_based_on_unique_entity_slots(self, make_predicate, make_factor):
+    def test_default_len_based_on_unique_entity_slots(
+        self, make_predicate, make_factor
+    ):
+        """same as e["e_no_shooting"]"""
+
         e = Evidence(
-            form="Testimony",
+            form="testimony",
             to_effect=Fact(Predicate("{} commited a crime", truth=False)),
             statement=Predicate("{} did not shoot {}"),
-            stated_by=0,)
+            stated_by=0,
+        )
         assert len(e) == 2
+
+    def test_exception_for_wrong_number_of_entities(self, make_predicate, make_factor):
+        """The Predicate in statement has two entity slots, but three
+        entities are provided."""
+
+        with pytest.raises(ValueError):
+            e = Evidence(
+                form="testimony",
+                to_effect=make_factor["f_no_crime"],
+                statement=make_predicate["p_no_shooting"],
+                stated_by=1,
+                statement_context=(1, 0, 2),
+            )
+
+    def test_get_entity_orders(self, make_evidence):
+        assert make_evidence["e_no_shooting"].entity_orders == {(0, 1, 0)}
+        assert make_evidence["e_reciprocal"].entity_orders == {(0, 1, 2), (1, 0, 2)}
+
+    def test_equality_with_entity_order(self, make_predicate, make_evidence):
+        e = make_evidence
+        assert e["e_no_shooting"] == e["e_no_shooting_entity_order"]
+
+    def test_inequality_due_to_entity_order(self, make_predicate, make_evidence):
+        e = make_evidence
+        assert e["e_no_shooting"] != e["e_no_shooting_different_witness"]
 
 
 class TestProcedures:
@@ -923,11 +1001,9 @@ class TestProcedures:
         assert make_procedure["c2"] == make_procedure["c2_reciprocal_swap"]
 
     def test_foreign_match_list(self, make_procedure):
-        assert make_procedure["c2_irrelevant_inputs"].get_foreign_match_list(frozenset([
-            (None, None, 1, 0, None), (None, 1, 3, None, None),
-        ])) == frozenset([
-            (3, 2, None, None, None), (None, 1, None, 2, None),
-        ])
+        assert make_procedure["c2_irrelevant_inputs"].get_foreign_match_list(
+            frozenset([(None, None, 1, 0, None), (None, 1, 3, None, None)])
+        ) == frozenset([(3, 2, None, None, None), (None, 1, None, 2, None)])
 
     def test_unequal_after_swapping_nonreciprocal_entities(self, make_procedure):
         assert make_procedure["c2"] != make_procedure["c2_nonreciprocal_swap"]
@@ -1268,7 +1344,6 @@ class TestHoldings:
     def test_undecided_implies_negation_is_undecided(self, make_holding):
         assert make_holding["h2_invalid_undecided"] >= make_holding["h2_undecided"]
         assert make_holding["h2_undecided"] >= make_holding["h2_invalid_undecided"]
-
 
     # Contradiction
 
@@ -1618,6 +1693,7 @@ class TestEnactments:
         dp14 = make_enactment["due_process_14"]
 
         assert dp14.effective_date > dp5.effective_date
+
 
 class TestOpinions:
     def test_load_opinion_in_Harvard_format(self):
