@@ -371,8 +371,8 @@ class Fact(Factor):
             raise ValueError(
                 (
                     "entity_context must have one item for each entity slot ",
-                    "in self.predicate, but ",
-                    f"len(entity_context) for {str(self.predicate)} == {len(self.entity_context)} ",
+                    "in self.predicate, but the number of slots ",
+                    f"for {str(self.predicate)} == {len(self.entity_context)} ",
                     f"and len(self.predicate) == {len(self.predicate)}",
                 )
             )
@@ -575,16 +575,43 @@ class Fact(Factor):
 class Evidence(Factor):
 
     form: Optional[str] = None
+    to_effect: Optional[Fact] = None
     statement: Optional[Predicate] = None
-    to_effect: Optional[Predicate] = None
+    stated_by: Optional[int] = None
+    derived_from: Optional[Iterable[Entity]] = None
     entity_context: Tuple[int, ...] = ()
     absent: bool = False
-    derived_from: Iterable[Entity] = frozenset([])
-    introduced_by: Iterable[Entity] = frozenset([])
-    physical_object: Optional[Entity] = None
+
+    """    def default_entity_context(self):
+        entities = set()
+        for predicate_attr in (self.to_effect, self.statement):
+            if predicate_attr is not None:
 
 
 
+    def __post_init__(self):
+        if not self.entity_context:
+            object.__setattr__(
+                self, "entity_context", self.default_entity_context())
+            )
+        if isinstance(self.entity_context, int):
+            object.__setattr__(self, "entity_context", (self.entity_context,))
+        object.__setattr__(self, "entity_orders", self.get_entity_orders())
+
+        if len(self) != len(self.predicate):
+            raise ValueError(
+                (
+                    "entity_context must have one item for each entity slot ",
+                    "in self.predicate, but the number of slots ",
+                    f"for {str(self.predicate)} == {len(self.entity_context)} ",
+                    f"and len(self.predicate) == {len(self.predicate)}",
+                )
+            )
+        if self.standard_of_proof and self.standard_of_proof not in STANDARDS_OF_PROOF:
+            raise ValueError(
+                f"standard of proof must be one of {STANDARDS_OF_PROOF.keys()} or None."
+            )
+    """
 @dataclass(frozen=True)
 class Procedure:
     """A (potential) rule for courts to use in resolving litigation. Described in

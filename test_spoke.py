@@ -893,9 +893,18 @@ class TestFacts:
         assert factor.standard_of_proof in str(factor)
 
 class TestEvidence:
-    def test_default_entity_context_for_evidence(self, make_entity, make_predicate):
+    def test_make_evidence_object(self, make_predicate):
         e = Evidence(form="Testimony", to_effect=make_predicate["p2"])
         assert not e.absent
+
+    def test_default_len_based_on_unique_entity_slots(self, make_predicate, make_factor):
+        e = Evidence(
+            form="Testimony",
+            to_effect=Fact(Predicate("{} commited a crime", truth=False)),
+            statement=Predicate("{} did not shoot {}"),
+            stated_by=0,)
+        assert len(e) == 2
+
 
 class TestProcedures:
     def test_exception_for_wrong_type_for_procedure(self, make_predicate):
