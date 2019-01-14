@@ -578,26 +578,52 @@ class Evidence(Factor):
     to_effect: Optional[Fact] = None
     statement: Optional[Predicate] = None
     stated_by: Optional[int] = None
-    derived_from: Optional[Iterable[Entity]] = None
-    entity_context: Tuple[int, ...] = ()
+    derived_from: Optional[Iterable[int]] = None
+    statement_entities: Tuple[int, ...] = ()
     absent: bool = False
 
-    """    def default_entity_context(self):
-        entities = set()
-        for predicate_attr in (self.to_effect, self.statement):
-            if predicate_attr is not None:
 
+    def get_entity_orders(self):
+
+        """
+        The possible entity arrangements are based on the
+        entities for the referenced Fact object (to_effect),
+        the referenced Predicate, and the integer local
+        attributes self.stated_by and self.derived_from.
+
+        Entity slots should be collected from each parameter
+        in the order they're listed:
+            self.to_effect
+            self.statement
+            self.stated_by
+            self.derived_from
+
+        :returns: a set of tuples indicating the ways the entities
+        could be rearranged without changing the meaning of the
+        Evidence object.
+
+        """
+
+        pass
 
 
     def __post_init__(self):
-        if not self.entity_context:
+        if not self.statement_entities:
             object.__setattr__(
-                self, "entity_context", self.default_entity_context())
+                self, "statement_entities", tuple(range(len(self.statement)))
             )
-        if isinstance(self.entity_context, int):
-            object.__setattr__(self, "entity_context", (self.entity_context,))
+        if isinstance(self.statement_entities, int):
+            object.__setattr__(self, "statement_entities", (self.statement_entities,))
         object.__setattr__(self, "entity_orders", self.get_entity_orders())
 
+        if self.stated_by and not self.statement:
+            raise ValueError(
+                "Parameter self.stated_by is only for ",
+                "referencing the Entity who made the statement",
+                "in self.statement, and it should not be used",
+                "when self.statement is None.")
+
+        # TODO: update for Evidence
         if len(self) != len(self.predicate):
             raise ValueError(
                 (
@@ -607,11 +633,7 @@ class Evidence(Factor):
                     f"and len(self.predicate) == {len(self.predicate)}",
                 )
             )
-        if self.standard_of_proof and self.standard_of_proof not in STANDARDS_OF_PROOF:
-            raise ValueError(
-                f"standard of proof must be one of {STANDARDS_OF_PROOF.keys()} or None."
-            )
-    """
+
 @dataclass(frozen=True)
 class Procedure:
     """A (potential) rule for courts to use in resolving litigation. Described in
