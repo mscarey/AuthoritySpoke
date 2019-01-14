@@ -339,6 +339,55 @@ class Factor:
     another. Common types of factors include Facts, Evidence, Allegations,
     Motions, and Arguments."""
 
+    def check_entity_consistency(
+        self, other: 'Factor', matches: tuple
+    ) -> Set[Tuple[int, ...]]:
+        """
+        Given entity assignments for self and other, determines whether
+        the factors have consistent entity assignments such that both can
+        be true at the same time.
+
+        All of self's entities must match other's, but other may have entities
+        that don't match self.
+
+        If self.predicate.reciprocal, the function will also compare other
+        to self with the first two entity slots of self_entities transposed.
+
+        :param other:
+
+        :param matches: a tuple the same length as len(self). The indices represent
+        self's entity slots, and the value at each index represents other's
+        corresponding entity slots that have already been assigned, if any.
+
+        :returns: a set containing self's normal entity tuple, self's reciprocal
+        entity tuple, both, or neither, depending on which ones match with other.
+        """
+
+        def all_matches(self_order: Tuple[int], other_order: Tuple[int]) -> bool:
+            """
+            Determines whether the entity slots assigned so far are
+            consistent for the Factors designated self and other,
+            regardless of whether it's possible to make consistent
+            assignments for the remaining slots.
+            """
+
+            return all(
+                matches[other_order[i]] == self_order[i]
+                or matches[other_order[i]] is None
+                for i in range(len(other_order))
+            )
+
+        if not isinstance(other, self.__class__):
+            raise TypeError(f"other must be type Factor")
+
+        answers = set()
+
+        for self_order in self.entity_orders:
+            for other_order in other.entity_orders:
+                if all_matches(self_order, other_order):
+                    answers.add(self_order)
+
+        return answers
 
 STANDARDS_OF_PROOF = {
     "scintilla of evidence": 1,
@@ -369,11 +418,13 @@ class Fact(Factor):
 
         if len(self) != len(self.predicate):
             raise ValueError(
-                "".join([
-                    "entity_context must have one item for each entity slot ",
-                    "in self.predicate, but the number of slots ",
-                    f"for {str(self.predicate)} == {len(self.entity_context)} ",
-                    f"and len(self.predicate) == {len(self.predicate)}",]
+                "".join(
+                    [
+                        "entity_context must have one item for each entity slot ",
+                        "in self.predicate, but the number of slots ",
+                        f"for {str(self.predicate)} == {len(self.entity_context)} ",
+                        f"and len(self.predicate) == {len(self.predicate)}",
+                    ]
                 )
             )
         if self.standard_of_proof and self.standard_of_proof not in STANDARDS_OF_PROOF:
@@ -458,55 +509,6 @@ class Fact(Factor):
             return True
         return False
 
-    def check_entity_consistency(
-        self, other: Factor, matches: tuple
-    ) -> Set[Tuple[int, ...]]:
-        """
-        Given entity assignments for self and other, determines whether
-        the factors have consistent entity assignments such that both can
-        be true at the same time.
-
-        All of self's entities must match other's, but other may have entities
-        that don't match self.
-
-        If self.predicate.reciprocal, the function will also compare other
-        to self with the first two entity slots of self_entities transposed.
-
-        :param other:
-
-        :param matches: a list the same length as len(self). The indices represent
-        self's entity slots, and the value at each index represents other's
-        corresponding entity slots that have already been assigned, if any.
-
-        :returns: a list containing self's normal entity tuple, self's reciprocal
-        entity tuple, both, or neither, depending on which ones match with other.
-        """
-
-        def all_matches(self_order: Tuple[int], other_order: Tuple[int]) -> bool:
-            """
-            Determines whether the entity slots assigned so far are
-            consistent for the Factors designated self and other,
-            regardless of whether it's possible to make consistent
-            assignments for the remaining slots.
-            """
-
-            return all(
-                matches[other_order[i]] == self_order[i]
-                or matches[other_order[i]] is None
-                for i in range(len(other_order))
-            )
-
-        if not isinstance(other, Factor):
-            raise TypeError(f"other must be type Factor")
-
-        answers = set()
-
-        for self_order in self.entity_orders:
-            for other_order in other.entity_orders:
-                if all_matches(self_order, other_order):
-                    answers.add(self_order)
-
-        return answers
 
     def consistent_entity_combinations(
         self, factors_from_other_procedure, matches
@@ -580,9 +582,7 @@ class Evidence(Factor):
     statement_context: Tuple[int, ...] = ()
     stated_by: Optional[int] = None
     derived_from: Optional[int] = None
-
     absent: bool = False
-
 
     def get_entity_orders(self):
 
@@ -611,14 +611,17 @@ class Evidence(Factor):
             int_attrs.append(self.stated_by)
         if self.derived_from is not None:
             int_attrs.append(self.derived_from)
+        if not self.statement_context:
+            return set([tuple(int_attrs)])
         return set(
-            tuple([x for i, x in sorted(zip(order, self.statement_context))] + int_attrs)
+            tuple(
+                [x for i, x in sorted(zip(order, self.statement_context))] + int_attrs
+            )
             for order in self.statement.entity_orders()
         )
 
-
     def __post_init__(self):
-        if not self.statement_context:
+        if self.statement and not self.statement_context:
             object.__setattr__(
                 self, "statement_context", tuple(range(len(self.statement)))
             )
@@ -628,18 +631,53 @@ class Evidence(Factor):
 
         if self.stated_by and not self.statement:
             raise ValueError(
-                "Parameter self.stated_by is only for " +
-                "referencing the Entity who made the statement " +
-                "in self.statement, and it should not be used " +
-                "when self.statement is None.")
-
-        if len(self.statement) != len(self.statement_context):
-            raise ValueError(
-                "statement_context must have one item for each entity slot " +
-                "in self.statement, but the number of slots " +
-                f"for {str(self.statement)} == {len(self.statement_context)} " +
-                f"and len(self.statement) == {len(self.statement)}"
+                "Parameter self.stated_by is only for "
+                + "referencing the Entity who made the statement "
+                + "in self.statement, and it should not be used "
+                + "when self.statement is None."
             )
+
+        if self.statement and len(self.statement) != len(self.statement_context):
+            raise ValueError(
+                "statement_context must have one item for each entity slot "
+                + "in self.statement, but the number of slots "
+                + f"for {str(self.statement)} == {len(self.statement_context)} "
+                + f"and len(self.statement) == {len(self.statement)}"
+            )
+
+    def __eq__(self, other):
+        if not isinstance(other, self.__class__):
+            return False
+
+        if (self.stated_by is None) != (other.stated_by is None):
+            return False
+        if (self.derived_from is None) != (other.derived_from is None):
+            return False
+        if (self.stated_by == self.derived_from) != (other.stated_by == other.derived_from):
+            return False
+
+        matches = [None] * len(self)
+        if self.stated_by is not None:
+            matches[self.stated_by] = other.stated_by
+
+        if self.derived_from is not None:
+            matches[self.derived_from] = other.derived_from
+
+        if not self.check_entity_consistency(other, tuple(matches)):
+            return False
+
+        return (
+            self.statement == other.statement
+            and self.to_effect == other.to_effect
+            and self.absent == other.absent
+        )
+
+    def __len__(self):
+        if self.statement_context == self.stated_by == self.derived_from == None:
+            return 0
+        entities = self.entity_orders.pop()
+        return len(set(entities))
+
 
 @dataclass(frozen=True)
 class Procedure:
@@ -981,9 +1019,7 @@ class Procedure:
         return any(
             any(
                 match
-                for match in self.find_consistent_factors(
-                    self.inputs, other.despite, m
-                )
+                for match in self.find_consistent_factors(self.inputs, other.despite, m)
             )
             for m in matchlist
         )

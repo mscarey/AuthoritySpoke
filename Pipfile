@@ -10,7 +10,7 @@ lxml = "*"
 pint = "*"
 
 [dev-packages]
-pytest = "*"
+pytest = "==4.0.2"
 pylint = "*"
 mypy = "*"
 rope = "*"
