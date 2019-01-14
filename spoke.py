@@ -675,7 +675,7 @@ class Evidence(Factor):
     def __len__(self):
         if self.statement_context == self.stated_by == self.derived_from == None:
             return 0
-        entities = self.entity_orders.pop()
+        entities = self.get_entity_orders().pop()
         return len(set(entities))
 
 
