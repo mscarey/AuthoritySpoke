@@ -175,9 +175,18 @@ class TestFacts:
     def test_factor_equality(self, make_factor):
         assert make_factor["f1"] == make_factor["f1b"]
         assert make_factor["f1"] == make_factor["f1c"]
+        assert make_factor["f9_swap_entities_4"] == make_factor["f9"]
 
     def test_factor_reciprocal_unequal(self, make_factor):
         assert make_factor["f2"] != make_factor["f2_reciprocal"]
+
+    @pytest.mark.xfail
+    def test_unequal_due_to_repeating_entity(self, make_factor):
+        """I'm not convinced that a model of a Fact ever needs to include
+        multiple references to the same Entity just because the name of the
+        Entity appears more than once in the Predicate."""
+        f = make_factor
+        assert f["f_three_entities"] != f["f_repeating_entity"]
 
     def test_factor_unequal_predicate_truth(self, make_factor):
         assert make_factor["f7"] != make_factor["f7_true"]
@@ -340,9 +349,7 @@ class TestEvidence:
 
     def test_get_entity_orders_no_statement(self, make_factor):
         e = Evidence(
-            form="testimony",
-            to_effect=make_factor["f_no_crime"],
-            derived_from=1,
+            form="testimony", to_effect=make_factor["f_no_crime"], derived_from=1
         )
         assert e.entity_orders == {(1,)}
 
@@ -350,9 +357,18 @@ class TestEvidence:
         e = make_evidence
         assert e["e_no_shooting"] == e["e_no_shooting_entity_order"]
 
-    def test_inequality_due_to_entity_order(self, make_evidence):
+    def test_equality_with_no_statement(self, make_evidence):
+        assert make_evidence["e_crime"] == make_evidence["e_crime"]
+
+    def test_unequal_due_to_entity_order(self, make_evidence):
         e = make_evidence
         assert e["e_no_shooting"] != e["e_no_shooting_different_witness"]
+
+    def test_unequal_different_attributes(self, make_evidence):
+        assert (
+            make_evidence["e_no_shooting_no_effect"]
+            != make_evidence["e_no_shooting_derived_from"]
+        )
 
     def test_implication_missing_witness(self, make_evidence):
         e = make_evidence

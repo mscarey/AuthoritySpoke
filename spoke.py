@@ -340,7 +340,7 @@ class Factor:
     Motions, and Arguments."""
 
     def check_entity_consistency(
-        self, other: 'Factor', matches: tuple
+        self, other: "Factor", matches: tuple
     ) -> Set[Tuple[int, ...]]:
         """
         Given entity assignments for self and other, determines whether
@@ -349,9 +349,6 @@ class Factor:
 
         All of self's entities must match other's, but other may have entities
         that don't match self.
-
-        If self.predicate.reciprocal, the function will also compare other
-        to self with the first two entity slots of self_entities transposed.
 
         :param other:
 
@@ -370,12 +367,13 @@ class Factor:
             regardless of whether it's possible to make consistent
             assignments for the remaining slots.
             """
-
-            return all(
-                matches[other_order[i]] == self_order[i]
-                or matches[other_order[i]] is None
-                for i in range(len(other_order))
-            )
+            m = list(matches)
+            for i, slot in enumerate(other_order):
+                if m[slot] == self_order[i] or m[slot] is None:
+                    m[slot] = self_order[i]
+                else:
+                    return False
+            return True
 
         if not isinstance(other, self.__class__):
             raise TypeError(f"other must be type Factor")
@@ -388,6 +386,7 @@ class Factor:
                     answers.add(self_order)
 
         return answers
+
 
 STANDARDS_OF_PROOF = {
     "scintilla of evidence": 1,
@@ -509,7 +508,6 @@ class Fact(Factor):
             return True
         return False
 
-
     def consistent_entity_combinations(
         self, factors_from_other_procedure, matches
     ) -> List[Dict]:
@@ -584,42 +582,6 @@ class Evidence(Factor):
     derived_from: Optional[int] = None
     absent: bool = False
 
-    def get_entity_orders(self):
-
-        """
-        The possible entity arrangements are based on the
-        entities for the referenced Predicate statement,
-        and the integer local attributes self.stated_by
-        and self.derived_from.
-
-        Theoretically, the Entities in the Fact referenced by the
-        to_effect attribute don't need to be included here.
-
-        Entity slots should be collected from each parameter
-        in the order they're listed:
-            self.statement_context
-            self.stated_by
-            self.derived_from
-
-        :returns: a set of tuples indicating the ways the entities
-        could be rearranged without changing the meaning of the
-        Evidence object.
-
-        """
-        int_attrs = []
-        if self.stated_by is not None:
-            int_attrs.append(self.stated_by)
-        if self.derived_from is not None:
-            int_attrs.append(self.derived_from)
-        if not self.statement_context:
-            return set([tuple(int_attrs)])
-        return set(
-            tuple(
-                [x for i, x in sorted(zip(order, self.statement_context))] + int_attrs
-            )
-            for order in self.statement.entity_orders()
-        )
-
     def __post_init__(self):
         if self.statement and not self.statement_context:
             object.__setattr__(
@@ -627,6 +589,16 @@ class Evidence(Factor):
             )
         if isinstance(self.statement_context, int):
             object.__setattr__(self, "statement_context", (self.statement_context,))
+
+        int_attrs = []
+        if self.stated_by is not None:
+            int_attrs.append(self.stated_by)
+        if self.derived_from is not None:
+            int_attrs.append(self.derived_from)
+        object.__setattr__(self, "int_attrs", tuple(int_attrs))
+        object.__setattr__(
+            self, "entity_context", tuple(list(self.statement_context) + int_attrs)
+        )
         object.__setattr__(self, "entity_orders", self.get_entity_orders())
 
         if self.stated_by and not self.statement:
@@ -653,16 +625,12 @@ class Evidence(Factor):
             return False
         if (self.derived_from is None) != (other.derived_from is None):
             return False
-        if (self.stated_by == self.derived_from) != (other.stated_by == other.derived_from):
+        if (self.stated_by == self.derived_from) != (
+            other.stated_by == other.derived_from
+        ):
             return False
 
-        matches = [None] * (max(self.get_entity_orders().pop()) + 1)
-        if self.stated_by is not None:
-            matches[self.stated_by] = other.stated_by
-
-        if self.derived_from is not None:
-            matches[self.derived_from] = other.derived_from
-
+        matches = [None for slot in range(max(self.entity_context) + 1)]
         if not self.check_entity_consistency(other, tuple(matches)):
             return False
 
@@ -677,6 +645,38 @@ class Evidence(Factor):
             return 0
         entities = self.get_entity_orders().pop()
         return len(set(entities))
+
+    def get_entity_orders(self):
+
+        """
+        The possible entity arrangements are based on the
+        entities for the referenced Predicate statement,
+        and the integer local attributes self.stated_by
+        and self.derived_from.
+
+        Theoretically, the Entities in the Fact referenced by the
+        to_effect attribute don't need to be included here.
+
+        Entity slots should be collected from each parameter
+        in the order they're listed:
+            self.statement_context
+            self.stated_by
+            self.derived_from
+
+        :returns: a set of tuples indicating the ways the entities
+        could be rearranged without changing the meaning of the
+        Evidence object.
+
+        """
+        if not self.statement_context:
+            return set([tuple(self.int_attrs)])
+        return set(
+            tuple(
+                [x for i, x in sorted(zip(order, self.statement_context))]
+                + list(self.int_attrs)
+            )
+            for order in self.statement.entity_orders()
+        )
 
 
 @dataclass(frozen=True)

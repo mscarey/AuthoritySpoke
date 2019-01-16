@@ -141,6 +141,7 @@ def make_predicate() -> Dict[str, Predicate]:
         "p_crime": Predicate("{} commited a crime"),
         "p_no_shooting": Predicate("{} shot {}", truth=False),
         "p_no_crime": Predicate("{} commited a crime", truth=False),
+        "p_three_entities": Predicate("{} threw {} to {}"),
     }
 
 
@@ -217,6 +218,8 @@ def make_factor(make_predicate) -> Dict[str, Factor]:
         "f_crime": Fact(p["p_crime"]),
         "f_no_crime": Fact(p["p_no_crime"]),
         "f_no_crime_entity_order": Fact(p["p_no_crime"], (1,)),
+        "f_three_entities": Fact(p["p_three_entities"], (0, 1, 2)),
+        "f_repeating_entity": Fact(p["p_three_entities"], (0, 1, 0)),
     }
 
 
@@ -246,8 +249,14 @@ def make_evidence(make_predicate, make_factor) -> Dict[str, Evidence]:
         "e_no_shooting_no_effect": Evidence(
             form="testimony",
             statement=p["p_no_shooting"],
-            stated_by=1,
             statement_context=(1, 0),
+            stated_by=1,
+        ),
+        "e_no_shooting_derived_from": Evidence(
+            form="testimony",
+            statement=p["p_no_shooting"],
+            statement_context=(1, 0),
+            derived_from=1,
         ),
         "e_no_shooting_different_witness": Evidence(
             form="testimony",
