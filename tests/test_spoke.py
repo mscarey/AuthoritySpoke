@@ -58,7 +58,7 @@ class TestPredicates:
         assert make_predicate["p1"].quantity_comparison() is None
 
     def test_entity_orders(self, make_predicate):
-        assert make_predicate["p7"].entity_orders() == {(0, 1), (1, 0)}
+        assert make_predicate["p7"].entity_orders == {(0, 1), (1, 0)}
 
     def test_obverse_predicates_equal(self, make_predicate):
         assert make_predicate["p7"] == make_predicate["p7_obverse"]
@@ -346,14 +346,15 @@ class TestEvidence:
             )
 
     def test_get_entity_orders(self, make_evidence):
-        assert make_evidence["e_no_shooting"].entity_orders == {(0, 1, 0)}
-        assert make_evidence["e_reciprocal"].entity_orders == {(0, 1, 2), (1, 0, 2)}
+        # TODO: check this after making Evidence.__str__ method
+        assert make_evidence["e_no_shooting"].entity_orders == {(0, 1, 0, 0)}
+        assert make_evidence["e_reciprocal"].entity_orders == {(0, 1, 0, 2), (1, 0, 0, 2)}
 
     def test_get_entity_orders_no_statement(self, make_factor):
         e = Evidence(
             form="testimony", to_effect=make_factor["f_no_crime"], derived_from=1
         )
-        assert e.entity_orders == {(1,)}
+        assert e.entity_orders == {(0, 1)}
 
     def test_equality_with_entity_order(self, make_predicate, make_evidence):
         e = make_evidence

@@ -108,7 +108,7 @@ class Predicate:
             object.__setattr__(
                 self, "comparison", OPPOSITE_COMPARISONS[self.comparison]
             )
-
+        object.__setattr__(self, "entity_orders", self.get_entity_orders())
         if self.comparison and self.comparison not in OPPOSITE_COMPARISONS.keys():
             raise ValueError(
                 f'"comparison" string parameter must be one of {OPPOSITE_COMPARISONS.keys()}.'
@@ -310,7 +310,7 @@ class Predicate:
             quantity=self.quantity,
         )
 
-    def entity_orders(self):
+    def get_entity_orders(self):
         """
         Currently the only possible rearrangement is to swap the
         order of the first two entities if self.reciprocal.
@@ -574,7 +574,7 @@ class Fact(Factor):
 
         return set(
             tuple([x for i, x in sorted(zip(order, self.entity_context))])
-            for order in self.predicate.entity_orders()
+            for order in self.predicate.entity_orders
         )
 
     # TODO: A function to determine if a factor implies another (transitively)
@@ -608,6 +608,10 @@ class Evidence(Factor):
         if self.derived_from is not None:
             int_attrs.append(self.derived_from)
         object.__setattr__(self, "int_attrs", tuple(int_attrs))
+
+        # The Entities in entity_context now include the Entities used in
+        # the Fact referenced in self.to_effect
+
         if self.statement_context:
             int_attrs = list(self.statement_context) + int_attrs
         if self.to_effect:
@@ -711,15 +715,28 @@ class Evidence(Factor):
         Evidence object.
 
         """
-        if not self.statement_context:
-            return set([tuple(self.int_attrs)])
-        return set(
-            tuple(
-                [x for i, x in sorted(zip(order, self.statement_context))]
-                + list(self.int_attrs)
+        int_attrs = list(self.int_attrs) or []
+
+        if self.statement:
+            statement_orders = set(
+                tuple([x for i, x in sorted(zip(order, self.statement_context))])
+                for order in self.statement.entity_orders
             )
-            for order in self.statement.entity_orders()
-        )
+        else:
+            statement_orders = ((),)
+
+        if self.to_effect:
+            effect_orders = self.to_effect.entity_orders
+        else:
+            effect_orders = ((),)
+
+        entity_orders = set()
+
+        for sc in statement_orders:
+            for eo in effect_orders:
+                entity_orders.add(tuple(list(sc) + list(eo) + int_attrs))
+
+        return entity_orders
 
 
 @dataclass(frozen=True)
