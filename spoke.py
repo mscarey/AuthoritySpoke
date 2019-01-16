@@ -608,8 +608,12 @@ class Evidence(Factor):
         if self.derived_from is not None:
             int_attrs.append(self.derived_from)
         object.__setattr__(self, "int_attrs", tuple(int_attrs))
+        if self.statement_context:
+            int_attrs = list(self.statement_context) + int_attrs
+        if self.to_effect:
+            int_attrs += list(self.to_effect.entity_context)
         object.__setattr__(
-            self, "entity_context", tuple(list(self.statement_context) + int_attrs)
+            self, "entity_context", tuple(int_attrs)
         )
         object.__setattr__(self, "entity_orders", self.get_entity_orders())
 
@@ -663,6 +667,18 @@ class Evidence(Factor):
             )
 
         if self.form != other.form and other.form is not None:
+            return False
+
+        if not self.to_effect >= other.to_effect:
+            return False
+
+        if not self.statement >= other.statement:
+            return False
+
+        if self.stated_by != other.stated_by and other.stated_by is not None:
+            return False
+
+        if self.derived_from != other.derived_from and other.derived_from is not None:
             return False
 
 

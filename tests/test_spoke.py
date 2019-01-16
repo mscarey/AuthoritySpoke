@@ -315,8 +315,8 @@ class TestFacts:
 
 
 class TestEvidence:
-    def test_make_evidence_object(self, make_predicate):
-        e = Evidence(form="testimony", to_effect=make_predicate["p2"])
+    def test_make_evidence_object(self, make_factor):
+        e = Evidence(form="testimony", to_effect=make_factor["f2"])
         assert not e.absent
 
     def test_default_len_based_on_unique_entity_slots(
