@@ -464,12 +464,18 @@ class Fact(Factor):
     def __len__(self):
         return len(self.entity_context)
 
-    def __gt__(self, other) -> bool:
+    def __gt__(self, other: Optional['Fact']) -> bool:
         """Indicates whether self implies other, taking into account the implication
         test for predicates and whether self and other are labeled 'absent'"""
 
+        if other is None:
+            return True
+
         if not isinstance(other, self.__class__):
-            return False
+            raise TypeError(
+                f"'Implies' not supported between instances of " +
+                f"'{self.__class__.__name__}' and '{other.__class__.__name__}'."
+            )
 
         if bool(self.standard_of_proof) != bool(other.standard_of_proof):
             return False
@@ -486,17 +492,23 @@ class Fact(Factor):
             return True
         return False
 
-    def __ge__(self, other) -> bool:
+    def __ge__(self, other: Optional['Fact']) -> bool:
         if self == other:
             return True
         return self > other
 
-    def contradicts(self, other) -> bool:
+    def contradicts(self, other: Optional['Fact']) -> bool:
         """Returns True if self and other can't both be true at the same time.
         Otherwise returns False."""
 
-        if not isinstance(other, self.__class__):
+        if other is None:
             return False
+
+        if not isinstance(other, self.__class__):
+            raise TypeError(
+                f"'Contradicts' not supported between instances of " +
+                f"'{self.__class__.__name__}' and '{other.__class__.__name__}'."
+            )
 
         if self.predicate.contradicts(other.predicate) and not (
             self.absent | other.absent
@@ -639,6 +651,21 @@ class Evidence(Factor):
             and self.to_effect == other.to_effect
             and self.absent == other.absent
         )
+
+    def __gt__(self, other):
+        return self >= other and self != other
+
+    def __ge__(self, other):
+        if not isinstance(other, self.__class__):
+            raise TypeError(
+                f"'Implies' not supported between instances of " +
+                f"'{self.__class__.__name__}' and '{other.__class__.__name__}'."
+            )
+
+        if self.form != other.form and other.form is not None:
+            return False
+
+
 
     def __len__(self):
         if self.statement_context == self.stated_by == self.derived_from == None:
@@ -1406,7 +1433,10 @@ class ProceduralHolding(Holding):
         where other is another Holding."""
 
         if not isinstance(other, self.__class__):
-            return False
+            raise TypeError(
+                f"'Implies' not supported between instances of " +
+                f"'{self.__class__.__name__}' and '{other.__class__.__name__}'."
+            )
 
         if self.decided and other.decided:
             return self.implies_if_decided(other)
@@ -1441,6 +1471,12 @@ class ProceduralHolding(Holding):
         by testing whether self would imply other if
         other had an opposite value for rule_valid.
         """
+
+        if not isinstance(other, self.__class__):
+            raise TypeError(
+                f"'Contradicts' not supported between instances of " +
+                f"'{self.__class__.__name__}' and '{other.__class__.__name__}'."
+            )
 
         if self.decided and other.decided:
             return self >= other.negated()

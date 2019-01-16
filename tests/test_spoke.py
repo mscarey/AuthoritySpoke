@@ -193,14 +193,16 @@ class TestFacts:
         assert make_factor["f7"].contradicts(make_factor["f7_true"])
 
     def test_factor_does_not_contradict_predicate(self, make_predicate, make_factor):
-        assert not make_factor["f7"].contradicts(make_predicate["p7_true"])
+        with pytest.raises(TypeError):
+            a = make_factor["f7"].contradicts(make_predicate["p7_true"])
 
     def test_factor_contradiction_absent_predicate(self, make_factor):
         assert make_factor["f3"].contradicts(make_factor["f3_absent"])
         assert make_factor["f3_absent"].contradicts(make_factor["f3"])
 
     def test_factor_does_not_imply_predicate(self, make_predicate, make_factor):
-        assert not make_factor["f8_meters"] > make_predicate["p8"]
+        with pytest.raises(TypeError):
+            assert not make_factor["f8_meters"] > make_predicate["p8"]
 
     def test_factor_implies_because_of_quantity(self, make_factor):
         assert make_factor["f8_meters"] > make_factor["f8"]
