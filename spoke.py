@@ -283,12 +283,16 @@ class Predicate:
         }
         return f"{expand[comparison]} {self.quantity}"
 
-    def content_with_entities(self, entities: Union[Entity, Sequence[Entity]]) -> str:
+    def content_with_entities(
+        self, entities: Union[Entity, Sequence[Union[int, Entity]]]
+    ) -> str:
         """Creates a sentence by substituting the names of entities
         from a particular case into the predicate_with_truth."""
 
         if isinstance(entities, Entity):
             entities = (entities,)
+        if all(isinstance(item, int) for item in entities):
+            entities = [f'<{item}>' for item in entities]
         if len(entities) != len(self):
             raise ValueError(
                 f"Exactly {len(self)} entities needed to complete "
@@ -441,7 +445,7 @@ class Fact(Factor):
         )
 
     def __str__(self):
-        predicate = str(self.predicate).format(*self.entity_context)
+        predicate = str(self.predicate.content_with_entities(self.entity_context))
         standard = f" ({self.standard_of_proof})" if self.standard_of_proof else ""
         return "".join(
             [
@@ -464,7 +468,7 @@ class Fact(Factor):
     def __len__(self):
         return len(self.entity_context)
 
-    def __gt__(self, other: Optional['Fact']) -> bool:
+    def __gt__(self, other: Optional["Fact"]) -> bool:
         """Indicates whether self implies other, taking into account the implication
         test for predicates and whether self and other are labeled 'absent'"""
 
@@ -473,8 +477,8 @@ class Fact(Factor):
 
         if not isinstance(other, self.__class__):
             raise TypeError(
-                f"'Implies' not supported between instances of " +
-                f"'{self.__class__.__name__}' and '{other.__class__.__name__}'."
+                f"'Implies' not supported between instances of "
+                + f"'{self.__class__.__name__}' and '{other.__class__.__name__}'."
             )
 
         if bool(self.standard_of_proof) != bool(other.standard_of_proof):
@@ -492,12 +496,12 @@ class Fact(Factor):
             return True
         return False
 
-    def __ge__(self, other: Optional['Fact']) -> bool:
+    def __ge__(self, other: Optional["Fact"]) -> bool:
         if self == other:
             return True
         return self > other
 
-    def contradicts(self, other: Optional['Fact']) -> bool:
+    def contradicts(self, other: Optional["Fact"]) -> bool:
         """Returns True if self and other can't both be true at the same time.
         Otherwise returns False."""
 
@@ -506,8 +510,8 @@ class Fact(Factor):
 
         if not isinstance(other, self.__class__):
             raise TypeError(
-                f"'Contradicts' not supported between instances of " +
-                f"'{self.__class__.__name__}' and '{other.__class__.__name__}'."
+                f"'Contradicts' not supported between instances of "
+                + f"'{self.__class__.__name__}' and '{other.__class__.__name__}'."
             )
 
         if self.predicate.contradicts(other.predicate) and not (
@@ -616,9 +620,7 @@ class Evidence(Factor):
             int_attrs = list(self.statement_context) + int_attrs
         if self.to_effect:
             int_attrs += list(self.to_effect.entity_context)
-        object.__setattr__(
-            self, "entity_context", tuple(int_attrs)
-        )
+        object.__setattr__(self, "entity_context", tuple(int_attrs))
         object.__setattr__(self, "entity_orders", self.get_entity_orders())
 
         if self.stated_by and not self.statement:
@@ -636,6 +638,24 @@ class Evidence(Factor):
                 + f"for {str(self.statement)} == {len(self.statement_context)} "
                 + f"and len(self.statement) == {len(self.statement)}"
             )
+
+    def __str__(self):
+        if self.form:
+            s = self.form
+        else:
+            s = self.__class__.__name__
+        if self.derived_from:
+            s += f", derived from <{self.derived_from}>"
+        if self.stated_by:
+            s += f", with a statement by <{self.stated_by}>"
+        if self.statement:
+            statement_text = self.statement.content_with_entities(
+                self.statement_context
+            )
+            s += f", stating that {statement_text}"
+        if self.to_effect:
+            s += f', supporting the factual conclusion: "{str(self.to_effect)}"'
+        return s.capitalize() + "."
 
     def __eq__(self, other):
         if not isinstance(other, self.__class__):
@@ -666,8 +686,8 @@ class Evidence(Factor):
     def __ge__(self, other):
         if not isinstance(other, self.__class__):
             raise TypeError(
-                f"'Implies' not supported between instances of " +
-                f"'{self.__class__.__name__}' and '{other.__class__.__name__}'."
+                f"'Implies' not supported between instances of "
+                + f"'{self.__class__.__name__}' and '{other.__class__.__name__}'."
             )
 
         if self.form != other.form and other.form is not None:
@@ -684,8 +704,6 @@ class Evidence(Factor):
 
         if self.derived_from != other.derived_from and other.derived_from is not None:
             return False
-
-
 
     def __len__(self):
         if self.statement_context == self.stated_by == self.derived_from == None:
@@ -1467,8 +1485,8 @@ class ProceduralHolding(Holding):
 
         if not isinstance(other, self.__class__):
             raise TypeError(
-                f"'Implies' not supported between instances of " +
-                f"'{self.__class__.__name__}' and '{other.__class__.__name__}'."
+                f"'Implies' not supported between instances of "
+                + f"'{self.__class__.__name__}' and '{other.__class__.__name__}'."
             )
 
         if self.decided and other.decided:
@@ -1507,8 +1525,8 @@ class ProceduralHolding(Holding):
 
         if not isinstance(other, self.__class__):
             raise TypeError(
-                f"'Contradicts' not supported between instances of " +
-                f"'{self.__class__.__name__}' and '{other.__class__.__name__}'."
+                f"'Contradicts' not supported between instances of "
+                + f"'{self.__class__.__name__}' and '{other.__class__.__name__}'."
             )
 
         if self.decided and other.decided:

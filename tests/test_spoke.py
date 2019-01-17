@@ -122,8 +122,8 @@ class TestFacts:
         assert f.entity_context == (3,)
 
     def test_string_representation_of_factor(self, make_factor):
-        assert str(make_factor["f1"]) == "Fact: 0 was a motel"
-        assert str(make_factor["f3_absent"]) == "Absent Fact: 0 was 1’s abode"
+        assert str(make_factor["f1"]) == "Fact: <0> was a motel"
+        assert str(make_factor["f3_absent"]) == "Absent Fact: <0> was <1>’s abode"
 
     def test_entity_slots_as_length_of_factor(self, make_factor):
         assert len(make_factor["f1"].predicate) == 1
@@ -348,13 +348,21 @@ class TestEvidence:
     def test_get_entity_orders(self, make_evidence):
         # TODO: check this after making Evidence.__str__ method
         assert make_evidence["e_no_shooting"].entity_orders == {(0, 1, 0, 0)}
-        assert make_evidence["e_reciprocal"].entity_orders == {(0, 1, 0, 2), (1, 0, 0, 2)}
+        assert make_evidence["e_reciprocal"].entity_orders == {
+            (0, 1, 0, 2),
+            (1, 0, 0, 2),
+        }
 
     def test_get_entity_orders_no_statement(self, make_factor):
         e = Evidence(
             form="testimony", to_effect=make_factor["f_no_crime"], derived_from=1
         )
         assert e.entity_orders == {(0, 1)}
+
+    def test_evidence_str(self, make_evidence):
+        assert str(make_evidence["e_reciprocal"]).startswith(
+            "Testimony, with a statement by <2>"
+        )
 
     def test_equality_with_entity_order(self, make_predicate, make_evidence):
         e = make_evidence
@@ -482,8 +490,12 @@ class TestProcedures:
         ]
 
     def test_procedure_string_with_entities(self, make_procedure):
-        assert "Fact: 2 performed at 4" in str(make_procedure["c2_irrelevant_inputs"])
-        assert "Fact: 3 performed at 4" in str(make_procedure["c2_irrelevant_inputs"])
+        assert "Fact: <2> performed at <4>" in str(
+            make_procedure["c2_irrelevant_inputs"]
+        )
+        assert "Fact: <3> performed at <4>" in str(
+            make_procedure["c2_irrelevant_inputs"]
+        )
 
     def test_entities_of_inputs_for_identical_procedure(
         self, make_factor, make_procedure
