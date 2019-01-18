@@ -713,8 +713,41 @@ class Evidence(Factor):
         if other.derived_from is not None and self.derived_from is None:
             return False
 
+        if self.absent != other.absent:
+            return False
+
         matches = [None for slot in range(max(self.entity_context) + 1)]
         return self.check_entity_consistency(other, tuple(matches))
+
+    # TODO: make a version of check_entity_consistency using dicts of the
+    # different groups of entity slots from the two factors, not a tuple
+
+    def make_absent(self) -> 'Evidence':
+        return Evidence(
+            form=self.form,
+            to_effect=self.to_effect,
+            statement=self.statement,
+            statement_context=self.statement_context,
+            stated_by=self.stated_by,
+            derived_from=self.derived_from,
+            absent=not self.absent,
+        )
+
+    def contradicts(self, other: Optional[Factor]) -> bool:
+
+        if other is None:
+            return False
+
+        if not isinstance(other, Factor):
+            raise TypeError(
+                f"'Contradicts' not supported between instances of "
+                + f"'{self.__class__.__name__}' and '{other.__class__.__name__}'."
+            )
+
+        if not isinstance(other, self.__class__):
+            return False
+
+        return self >= other.make_absent()
 
     def __len__(self):
 
