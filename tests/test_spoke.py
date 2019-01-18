@@ -389,6 +389,10 @@ class TestEvidence:
         e = make_evidence
         assert e["e_no_shooting"] >= e["e_no_shooting_no_effect"]
 
+    def test_no_implication_of_fact(self, make_predicate, make_evidence):
+        assert not make_evidence["e_no_shooting"] > Fact(make_predicate["p_no_shooting"])
+        assert not Fact(make_predicate["p_no_shooting"]) > make_evidence["e_no_shooting"]
+
     def test_implication_procedures_with_same_evidence(self, make_procedure):
         c = make_procedure
         assert c["c3_fewer_inputs"].implies_all_to_all(c["c3"])

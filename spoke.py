@@ -436,7 +436,7 @@ class Fact(Factor):
             )
 
     def __eq__(self, other) -> bool:
-        if not isinstance(other, self.__class__):
+        if not isinstance(other, Factor):
             return False
         return (
             self.predicate == other.predicate
@@ -468,18 +468,21 @@ class Fact(Factor):
     def __len__(self):
         return len(self.entity_context)
 
-    def __gt__(self, other: Optional["Fact"]) -> bool:
+    def __gt__(self, other: Optional[Factor]) -> bool:
         """Indicates whether self implies other, taking into account the implication
         test for predicates and whether self and other are labeled 'absent'"""
 
         if other is None:
             return True
 
-        if not isinstance(other, self.__class__):
+        if not isinstance(other, Factor):
             raise TypeError(
                 f"'Implies' not supported between instances of "
                 + f"'{self.__class__.__name__}' and '{other.__class__.__name__}'."
             )
+
+        if not isinstance(other, self.__class__):
+            return False
 
         if bool(self.standard_of_proof) != bool(other.standard_of_proof):
             return False
@@ -501,18 +504,21 @@ class Fact(Factor):
             return True
         return self > other
 
-    def contradicts(self, other: Optional["Fact"]) -> bool:
+    def contradicts(self, other: Optional[Factor]) -> bool:
         """Returns True if self and other can't both be true at the same time.
         Otherwise returns False."""
 
         if other is None:
             return False
 
-        if not isinstance(other, self.__class__):
+        if not isinstance(other, Factor):
             raise TypeError(
                 f"'Contradicts' not supported between instances of "
                 + f"'{self.__class__.__name__}' and '{other.__class__.__name__}'."
             )
+
+        if not isinstance(other, self.__class__):
+            return False
 
         if self.predicate.contradicts(other.predicate) and not (
             self.absent | other.absent
@@ -561,7 +567,7 @@ class Fact(Factor):
                     answer.append(c)
         return answer
 
-    def get_entity_orders(self):
+    def get_entity_orders(self) -> Set[Tuple[int, ...]]:
 
         """
         Currently the only possible arrangements are derived from
@@ -684,11 +690,13 @@ class Evidence(Factor):
         return self >= other and self != other
 
     def __ge__(self, other):
-        if not isinstance(other, self.__class__):
+        if not isinstance(other, Factor):
             raise TypeError(
                 f"'Implies' not supported between instances of "
                 + f"'{self.__class__.__name__}' and '{other.__class__.__name__}'."
             )
+        if not isinstance(other, self.__class__):
+            return False
 
         if self.form != other.form and other.form is not None:
             return False
@@ -721,12 +729,10 @@ class Evidence(Factor):
         and the integer local attributes self.stated_by
         and self.derived_from.
 
-        Theoretically, the Entities in the Fact referenced by the
-        to_effect attribute don't need to be included here.
-
         Entity slots should be collected from each parameter
         in the order they're listed:
             self.statement_context
+            self.to_effect
             self.stated_by
             self.derived_from
 
@@ -864,8 +870,11 @@ class Procedure:
         is not equal to or implied by some despite or input of self.
         """
 
-        if not isinstance(other, Procedure):
-            return False
+        if not isinstance(other, self.__class__):
+            raise TypeError(
+                f"'Implies' not supported between instances of "
+                + f"'{self.__class__.__name__}' and '{other.__class__.__name__}'."
+            )
 
         despite_or_input = {*self.despite, *self.inputs}
 
