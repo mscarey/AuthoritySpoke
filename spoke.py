@@ -292,7 +292,7 @@ class Predicate:
         if isinstance(entities, Entity):
             entities = (entities,)
         if all(isinstance(item, int) for item in entities):
-            entities = [f'<{item}>' for item in entities]
+            entities = [f"<{item}>" for item in entities]
         if len(entities) != len(self):
             raise ValueError(
                 f"Exactly {len(self)} entities needed to complete "
@@ -699,15 +699,17 @@ class Evidence(Factor):
         if not self.statement >= other.statement:
             return False
 
-        if self.stated_by != other.stated_by and other.stated_by is not None:
+        if other.stated_by is not None and self.stated_by is None:
             return False
 
-        if self.derived_from != other.derived_from and other.derived_from is not None:
+        if other.derived_from is not None and self.derived_from is None:
             return False
+
+        matches = [None for slot in range(max(self.entity_context) + 1)]
+        return self.check_entity_consistency(other, tuple(matches))
 
     def __len__(self):
-        if self.statement_context == self.stated_by == self.derived_from == None:
-            return 0
+
         entities = self.get_entity_orders().pop()
         return len(set(entities))
 
@@ -1105,6 +1107,13 @@ class Procedure:
     def get_foreign_match_list(
         self, foreign: FrozenSet[Tuple[int, ...]]
     ) -> FrozenSet[Tuple[int, ...]]:
+        """Gets a version of matchlist in which the indices represent
+        other's entity slots and the values represent self's entity slots.
+
+        Compare this to the regular matchlist objects, in which the
+        indices represent self's entity slots and the values represent
+        other's."""
+
         def get_foreign_match(
             length, foreign_match: Tuple[int, ...]
         ) -> Tuple[int, ...]:
@@ -1164,8 +1173,8 @@ class Procedure:
     def contradicts(self, other):
         raise NotImplementedError(
             "Procedures do not contradict one another unless one of them ",
-            "is designated 'exhaustive'. Consider using the ",
-            "'exhaustive_contradicts' method.",
+            "is applies in 'ALL' cases. Consider using the ",
+            "'contradicts_some_to_all' method.",
         )
 
 
