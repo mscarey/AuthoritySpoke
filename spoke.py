@@ -696,7 +696,7 @@ class Evidence(Factor):
         if not self.to_effect >= other.to_effect:
             return False
 
-        if not self.statement >= other.statement:
+        if self.statement != other.statement and not self.statement > other.statement:
             return False
 
         if other.stated_by is not None and self.stated_by is None:

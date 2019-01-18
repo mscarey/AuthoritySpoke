@@ -391,7 +391,7 @@ class TestEvidence:
 
     def test_implication_procedures_with_same_evidence(self, make_procedure):
         c = make_procedure
-        assert c["c3_fewer_inputs"] > c["c3"]
+        assert c["c3_fewer_inputs"].implies_all_to_all(c["c3"])
 
 
 class TestProcedures:
