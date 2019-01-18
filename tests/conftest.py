@@ -139,6 +139,7 @@ def make_predicate() -> Dict[str, Predicate]:
         "p_irrelevant_2": Predicate("{} was a circus"),
         "p_irrelevant_3": Predicate("{} performed at {}"),
         "p_crime": Predicate("{} commited a crime"),
+        "p_shooting": Predicate("{} shot {}"),
         "p_no_shooting": Predicate("{} shot {}", truth=False),
         "p_no_crime": Predicate("{} commited a crime", truth=False),
         "p_three_entities": Predicate("{} threw {} to {}"),
@@ -228,11 +229,24 @@ def make_evidence(make_predicate, make_factor) -> Dict[str, Evidence]:
     p = make_predicate
     f = make_factor
     return {
+        "e_shooting": Evidence(
+            form="testimony",
+            to_effect=f["f_crime"],
+            statement=p["p_shooting"],
+            stated_by=0,
+        ),
         "e_no_shooting": Evidence(
             form="testimony",
             to_effect=f["f_no_crime"],
             statement=p["p_no_shooting"],
             stated_by=0,
+        ),
+        "e_no_shooting_absent": Evidence(
+            form="testimony",
+            to_effect=f["f_no_crime"],
+            statement=p["p_no_shooting"],
+            stated_by=0,
+            absent=True,
         ),
         "e_no_shooting_entity_order": Evidence(
             form="testimony",
@@ -245,6 +259,12 @@ def make_evidence(make_predicate, make_factor) -> Dict[str, Evidence]:
             form="testimony",
             to_effect=f["f_no_crime"],
             statement=p["p_no_shooting"],
+        ),
+        "e_no_shooting_witness_unknown_absent": Evidence(
+            form="testimony",
+            to_effect=f["f_no_crime"],
+            statement=p["p_no_shooting"],
+            absent=True,
         ),
         "e_no_shooting_no_effect": Evidence(
             form="testimony",

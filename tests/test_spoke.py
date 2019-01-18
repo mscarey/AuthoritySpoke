@@ -393,6 +393,31 @@ class TestEvidence:
         assert not make_evidence["e_no_shooting"] > Fact(make_predicate["p_no_shooting"])
         assert not Fact(make_predicate["p_no_shooting"]) > make_evidence["e_no_shooting"]
 
+    def test_no_contradiction_of_fact(self, make_predicate, make_evidence):
+        assert not make_evidence["e_no_shooting"].contradicts(Fact(make_predicate["p_no_shooting"]))
+
+    def test_no_contradiction_from_supporting_contradictory_facts(self, make_evidence):
+        assert not make_evidence["e_no_shooting"].contradicts(make_evidence["e_shooting"])
+
+    def test_contradiction_of_absent_version_of_self(self, make_evidence):
+        e = make_evidence
+        assert e["e_no_shooting"].contradicts(e["e_no_shooting_absent"])
+
+    def test_contradict_absent_version_of_implied_factor(self, make_evidence):
+        e = make_evidence
+        assert e["e_no_shooting"].contradicts(e["e_no_shooting_witness_unknown_absent"])
+        assert e["e_no_shooting_witness_unknown_absent"].contradicts(e["e_no_shooting"])
+
+
+    def test_no_contradiction_absent_version_of_implying_factor(self, make_evidence):
+        e = make_evidence
+        assert not e["e_no_shooting_absent"].contradicts(e["e_no_shooting_witness_unknown"])
+        assert not e["e_no_shooting_witness_unknown"].contradicts(e["e_no_shooting_absent"])
+
+    def test_no_contradiction_of_implied_factor(self, make_evidence):
+        e = make_evidence
+        assert not e["e_no_shooting"].contradicts(e["e_no_shooting_witness_unknown"])
+
     def test_implication_procedures_with_same_evidence(self, make_procedure):
         c = make_procedure
         assert c["c3_fewer_inputs"].implies_all_to_all(c["c3"])
