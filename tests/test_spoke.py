@@ -13,6 +13,7 @@ from spoke import Procedure, Holding, ProceduralHolding
 from spoke import Opinion, opinion_from_file
 from spoke import Code, Enactment
 from spoke import ureg, Q_
+from spoke import check_entity_consistency
 
 
 class TestPredicates:
@@ -242,27 +243,31 @@ class TestFacts:
 
     def test_check_entity_consistency_true(self, make_factor):
         f = make_factor
-        assert f["f_irrelevant_3"].check_entity_consistency(
-            f["f_irrelevant_3_new_context"], (None, None, None, 2, None)
+        assert check_entity_consistency(
+            f["f_irrelevant_3"],
+            f["f_irrelevant_3_new_context"],
+            (None, None, None, 2, None),
         )
-        assert f["f_irrelevant_3"].check_entity_consistency(
+        assert check_entity_consistency(f["f_irrelevant_3"],
             f["f_irrelevant_3_new_context"], (1, 0, 3, 2, 4)
         )
 
     def test_check_entity_consistency_false(self, make_factor):
         f = make_factor
-        assert not f["f_irrelevant_3"].check_entity_consistency(
-            f["f_irrelevant_3_new_context"], (None, None, None, None, 0)
+        assert not check_entity_consistency(
+            f["f_irrelevant_3"],
+            f["f_irrelevant_3_new_context"],
+            (None, None, None, None, 0),
         )
-        assert not f["f_irrelevant_3"].check_entity_consistency(
+        assert not check_entity_consistency(f["f_irrelevant_3"],
             f["f_irrelevant_3_new_context"], (None, None, None, 3, None)
         )
 
     def test_check_entity_consistency_type_error(self, make_factor, make_holding):
         f = make_factor
         with pytest.raises(TypeError):
-            f["f_irrelevant_3"].check_entity_consistency(
-                make_holding["h2"], (None, None, None, None, 0)
+            check_entity_consistency(
+                f["f_irrelevant_3"], make_holding["h2"], (None, None, None, None, 0)
             )
 
     def test_consistent_entity_combinations(self, make_factor):
@@ -390,14 +395,22 @@ class TestEvidence:
         assert e["e_no_shooting"] >= e["e_no_shooting_no_effect"]
 
     def test_no_implication_of_fact(self, make_predicate, make_evidence):
-        assert not make_evidence["e_no_shooting"] > Fact(make_predicate["p_no_shooting"])
-        assert not Fact(make_predicate["p_no_shooting"]) > make_evidence["e_no_shooting"]
+        assert not make_evidence["e_no_shooting"] > Fact(
+            make_predicate["p_no_shooting"]
+        )
+        assert (
+            not Fact(make_predicate["p_no_shooting"]) > make_evidence["e_no_shooting"]
+        )
 
     def test_no_contradiction_of_fact(self, make_predicate, make_evidence):
-        assert not make_evidence["e_no_shooting"].contradicts(Fact(make_predicate["p_no_shooting"]))
+        assert not make_evidence["e_no_shooting"].contradicts(
+            Fact(make_predicate["p_no_shooting"])
+        )
 
     def test_no_contradiction_from_supporting_contradictory_facts(self, make_evidence):
-        assert not make_evidence["e_no_shooting"].contradicts(make_evidence["e_shooting"])
+        assert not make_evidence["e_no_shooting"].contradicts(
+            make_evidence["e_shooting"]
+        )
 
     def test_contradiction_of_absent_version_of_self(self, make_evidence):
         e = make_evidence
@@ -408,11 +421,14 @@ class TestEvidence:
         assert e["e_no_shooting"].contradicts(e["e_no_shooting_witness_unknown_absent"])
         assert e["e_no_shooting_witness_unknown_absent"].contradicts(e["e_no_shooting"])
 
-
     def test_no_contradiction_absent_version_of_implying_factor(self, make_evidence):
         e = make_evidence
-        assert not e["e_no_shooting_absent"].contradicts(e["e_no_shooting_witness_unknown"])
-        assert not e["e_no_shooting_witness_unknown"].contradicts(e["e_no_shooting_absent"])
+        assert not e["e_no_shooting_absent"].contradicts(
+            e["e_no_shooting_witness_unknown"]
+        )
+        assert not e["e_no_shooting_witness_unknown"].contradicts(
+            e["e_no_shooting_absent"]
+        )
 
     def test_no_contradiction_of_implied_factor(self, make_evidence):
         e = make_evidence

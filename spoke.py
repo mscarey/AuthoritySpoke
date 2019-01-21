@@ -108,11 +108,19 @@ class Predicate:
             object.__setattr__(
                 self, "comparison", OPPOSITE_COMPARISONS[self.comparison]
             )
-        object.__setattr__(self, "entity_orders", self.get_entity_orders())
         if self.comparison and self.comparison not in OPPOSITE_COMPARISONS.keys():
             raise ValueError(
                 f'"comparison" string parameter must be one of {OPPOSITE_COMPARISONS.keys()}.'
             )
+        # TODO: prevent len() from breaking when there's an entity
+        # reference between the brackets in the text.
+
+        slots = self.content.count("{}")
+        if self.quantity:
+            slots -= 1
+        object.__setattr__(self, "entity_context", tuple(range(slots)))
+        object.__setattr__(self, "entity_orders", self.get_entity_orders(self.entity_context))
+        return slots
 
     def __len__(self):
         """
@@ -314,7 +322,7 @@ class Predicate:
             quantity=self.quantity,
         )
 
-    def get_entity_orders(self):
+    def get_entity_orders(self, entity_context):
         """
         Currently the only possible rearrangement is to swap the
         order of the first two entities if self.reciprocal.
@@ -324,7 +332,7 @@ class Predicate:
 
         """
 
-        orders = {(tuple(n for n in range(len(self))))}
+        orders = {entity_context}
 
         if self.reciprocal:
             swapped = tuple([1, 0] + [n for n in range(2, len(self))])
@@ -343,54 +351,54 @@ class Factor:
     another. Common types of factors include Facts, Evidence, Allegations,
     Motions, and Arguments."""
 
-    def check_entity_consistency(
-        self, other: "Factor", matches: tuple
-    ) -> Set[Tuple[int, ...]]:
+
+def check_entity_consistency(
+    left: Factor, right: Factor, matches: tuple
+) -> Set[Tuple[int, ...]]:
+    """
+    Given entity assignments for self and other, determines whether
+    the factors have consistent entity assignments such that both can
+    be true at the same time.
+
+    All of self's entities must match other's, but other may have entities
+    that don't match self.
+
+    :param other:
+
+    :param matches: a tuple the same length as len(self). The indices represent
+    self's entity slots, and the value at each index represents other's
+    corresponding entity slots that have already been assigned, if any.
+
+    :returns: a set containing self's normal entity tuple, self's reciprocal
+    entity tuple, both, or neither, depending on which ones match with other.
+    """
+
+    def all_matches(self_order: Tuple[int], other_order: Tuple[int]) -> bool:
         """
-        Given entity assignments for self and other, determines whether
-        the factors have consistent entity assignments such that both can
-        be true at the same time.
-
-        All of self's entities must match other's, but other may have entities
-        that don't match self.
-
-        :param other:
-
-        :param matches: a tuple the same length as len(self). The indices represent
-        self's entity slots, and the value at each index represents other's
-        corresponding entity slots that have already been assigned, if any.
-
-        :returns: a set containing self's normal entity tuple, self's reciprocal
-        entity tuple, both, or neither, depending on which ones match with other.
+        Determines whether the entity slots assigned so far are
+        consistent for the Factors designated self and other,
+        regardless of whether it's possible to make consistent
+        assignments for the remaining slots.
         """
+        m = list(matches)
+        for i, slot in enumerate(other_order):
+            if m[slot] == self_order[i] or m[slot] is None:
+                m[slot] = self_order[i]
+            else:
+                return False
+        return True
 
-        def all_matches(self_order: Tuple[int], other_order: Tuple[int]) -> bool:
-            """
-            Determines whether the entity slots assigned so far are
-            consistent for the Factors designated self and other,
-            regardless of whether it's possible to make consistent
-            assignments for the remaining slots.
-            """
-            m = list(matches)
-            for i, slot in enumerate(other_order):
-                if m[slot] == self_order[i] or m[slot] is None:
-                    m[slot] = self_order[i]
-                else:
-                    return False
-            return True
+    if not isinstance(right, left.__class__):
+        raise TypeError(f"other must be type Factor")
 
-        if not isinstance(other, self.__class__):
-            raise TypeError(f"other must be type Factor")
+    answers = set()
 
-        answers = set()
+    for self_order in left.entity_orders:
+        for other_order in right.entity_orders:
+            if all_matches(self_order, other_order):
+                answers.add(self_order)
 
-        for self_order in self.entity_orders:
-            for other_order in other.entity_orders:
-                if all_matches(self_order, other_order):
-                    answers.add(self_order)
-
-        return answers
-
+    return answers
 
 STANDARDS_OF_PROOF = {
     "scintilla of evidence": 1,
@@ -677,7 +685,7 @@ class Evidence(Factor):
             return False
 
         matches = [None for slot in range(max(self.entity_context) + 1)]
-        if not self.check_entity_consistency(other, tuple(matches)):
+        if not check_entity_consistency(self, other, tuple(matches)):
             return False
 
         return (
@@ -701,28 +709,116 @@ class Evidence(Factor):
         if self.form != other.form and other.form is not None:
             return False
 
-        if not self.to_effect >= other.to_effect:
-            return False
-
-        if self.statement != other.statement and not self.statement > other.statement:
-            return False
+        matches = [None for slot in range(max(self.entity_context) + 1)]
 
         if other.stated_by is not None and self.stated_by is None:
             return False
 
+        if other.stated_by is not None:
+            matches[self.stated_by] = other.stated_by
+
         if other.derived_from is not None and self.derived_from is None:
             return False
+
+        if other.derived_from is not None:
+            matches[self.derived_from] = other.derived_from
 
         if self.absent != other.absent:
             return False
 
-        matches = [None for slot in range(max(self.entity_context) + 1)]
-        return self.check_entity_consistency(other, tuple(matches))
+        if not self.to_effect >= other.to_effect:
+            return False
 
-    # TODO: make a version of check_entity_consistency using dicts of the
-    # different groups of entity slots from the two factors, not a tuple
+        matchset = {tuple(matches)}
 
-    def make_absent(self) -> 'Evidence':
+        if other.to_effect is not None:
+            matchset = {
+                m
+                for m in self.find_matches(
+                    frozenset([self.to_effect]),
+                    {other.to_effect},
+                    tuple(matches),
+                    operator.ge,
+                )
+            }
+            if not matchset:
+                return False
+
+        if self.statement != other.statement and not self.statement > other.statement:
+            return False
+
+        if other.statement is None:
+            return True
+
+        return any(
+                {
+                    m
+                    for m in self.find_matches(
+                        frozenset([self.statement]),
+                        {other.statement},
+                        tuple(match),
+                        operator.ge,
+                    )
+                }
+                for match in matchset
+            )
+
+    def find_matches(
+        self,
+        for_matching: FrozenSet[Factor],
+        need_matches: Set[Factor],
+        matches: Tuple[Optional[int], ...],
+        comparison: Callable[[Factor, Factor], bool],
+    ) -> Iterator[Tuple[Optional[int], ...]]:
+        """
+        Generator that recursively searches for a tuple of entity
+        assignments that can cause all of 'need_matches' to satisfy
+        the relation described by 'comparison' with a factor
+        from for_matching.
+
+        :param for_matching: A frozenset of all of self's factors. These
+        factors aren't removed when they're matched to a factor from other,
+        because it's possible that one factor in self could imply two
+        different factors in other.
+
+        :param need_matches: A set of factors from other that have
+        not yet been matched to any factor from self.
+
+        :param matches: A tuple showing which factors from
+        for_matching have been matched.
+
+        :param comparison: A function used to filter the for_matching
+        factors into the "available" collection. A factor must have
+        the "comparison" relation with the factor from the need_matches
+        set to be included as "available".
+
+        :returns: iterator that yields tuples of entity assignments that can
+        cause all of 'need_matches' to satisfy the relation described by
+        'comparison' with a factor from for_matching.
+        """
+
+        if not need_matches:
+            yield matches
+        else:
+            need_matches = set(need_matches)
+            n = need_matches.pop()
+            available = {a for a in for_matching if comparison(a, n)}
+            for a in available:
+                matches_found = check_entity_consistency(n, a, matches)
+                for source_list in matches_found:
+                    matches_next = list(matches)
+                    for i in range(len(a)):
+                        if comparison == operator.le:
+                            matches_next[source_list[i]] = a.entity_context[i]
+                        else:
+                            matches_next[a.entity_context[i]] = source_list[i]
+                    matches_next = tuple(matches_next)
+                    for m in self.find_matches(
+                        for_matching, frozenset(need_matches), matches_next, comparison
+                    ):
+                        yield m
+
+    def make_absent(self) -> "Evidence":
         return Evidence(
             form=self.form,
             to_effect=self.to_effect,
@@ -971,7 +1067,7 @@ class Procedure:
         return any(
             other_factor.contradicts(self_factor)
             and (
-                other_factor.check_entity_consistency(self_factor, m)
+                check_entity_consistency(other_factor, self_factor, m)
                 for self_factor in self.outputs
             )
             for other_factor in other.outputs
@@ -1063,7 +1159,7 @@ class Procedure:
             n = need_matches.pop()
             available = {a for a in for_matching if comparison(a, n)}
             for a in available:
-                matches_found = n.check_entity_consistency(a, matches)
+                matches_found = check_entity_consistency(n, a, matches)
                 for source_list in matches_found:
                     matches_next = list(matches)
                     for i in range(len(a)):
@@ -1215,7 +1311,7 @@ class Procedure:
     def contradicts(self, other):
         raise NotImplementedError(
             "Procedures do not contradict one another unless one of them ",
-            "is applies in 'ALL' cases. Consider using the ",
+            "applies in 'ALL' cases. Consider using the ",
             "'contradicts_some_to_all' method.",
         )
 
