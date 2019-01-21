@@ -462,7 +462,7 @@ def evolve_match_list(
     available: FrozenSet[Factor],
     need_matches: FrozenSet[Factor],
     comparison: Callable[[Factor, Factor], bool],
-    prior_matches: Optional[FrozenSet[Tuple[Optional[int], ...]]] = None,
+    prior_matches: FrozenSet[Tuple[Optional[int], ...]],
 ) -> FrozenSet[Tuple[Optional[int], ...]]:
 
     """
@@ -475,9 +475,6 @@ def evolve_match_list(
         available = frozenset([available])
     if isinstance(need_matches, Factor):
         need_matches = {need_matches}
-    if prior_matches is None:
-        # Should this instead depend on the length of need_matches?
-        prior_matches = frozenset([tuple([None for i in range(len(self))])])
 
     new_matches = set()
     for m in prior_matches:
@@ -763,9 +760,7 @@ class Evidence(Factor):
         )
 
         return bool(
-            evolve_match_list(
-                self.statement, other.statement, operator.eq, matchlist
-            )
+            evolve_match_list(self.statement, other.statement, operator.eq, matchlist)
         )
 
     def __gt__(self, other):
@@ -848,8 +843,6 @@ class Evidence(Factor):
             return self.implies_if_present(other)
 
         return False
-
-
 
     def make_absent(self) -> "Evidence":
         return Evidence(
@@ -962,30 +955,6 @@ class Procedure:
                     )
                 )
 
-    def evolve_match_list(
-        self,
-        available: FrozenSet[Factor],
-        need_matches: FrozenSet[Factor],
-        comparison: Callable[[Factor, Factor], bool],
-        prior_matches: Optional[FrozenSet[Tuple[Optional[int], ...]]] = None,
-    ) -> FrozenSet[Tuple[Optional[int], ...]]:
-
-        """
-        Takes all the tuples of entity assignments in prior_matches, and
-        updates them with every consistent tuple of entity assignments
-        that would cause every Factor in need_matches to be related to
-        a Factor in "available" by the relation described by "comparison".
-        """
-        if prior_matches is None:
-            # Should this instead depend on the length of need_matches?
-            prior_matches = frozenset([tuple([None for i in range(len(self))])])
-
-        new_matches = set()
-        for m in prior_matches:
-            for y in self.find_matches(available, need_matches, m, comparison):
-                new_matches.add(y)
-        return frozenset(new_matches)
-
     def __eq__(self, other: "Procedure") -> bool:
         """Determines if the two procedures have all the same factors
         with the same entities in the same roles, not whether they're
@@ -1006,12 +975,13 @@ class Procedure:
         """
         Determines whether every factor in other is in self, with matching entity slots.
         """
-        matchlist = self.evolve_match_list(self.outputs, other.outputs, operator.eq)
-        matchlist = self.evolve_match_list(
+        matchlist = frozenset([tuple([None for i in range(len(self))])])
+        matchlist = evolve_match_list(self.outputs, other.outputs, operator.eq, matchlist)
+        matchlist = evolve_match_list(
             self.inputs, other.inputs, operator.eq, matchlist
         )
         return bool(
-            self.evolve_match_list(self.despite, other.despite, operator.eq, matchlist)
+            evolve_match_list(self.despite, other.despite, operator.eq, matchlist)
         )
 
     def __ge__(self, other: "Procedure") -> bool:
@@ -1039,11 +1009,12 @@ class Procedure:
 
         despite_or_input = {*self.despite, *self.inputs}
 
-        matchlist = self.evolve_match_list(self.inputs, other.inputs, operator.ge)
-        matchlist = self.evolve_match_list(
+        matchlist = frozenset([tuple([None for i in range(len(self))])])
+        matchlist = evolve_match_list(self.inputs, other.inputs, operator.ge, matchlist)
+        matchlist = evolve_match_list(
             self.outputs, other.outputs, operator.ge, matchlist
         )
-        matchlist = self.evolve_match_list(
+        matchlist = evolve_match_list(
             despite_or_input, other.despite, operator.ge, matchlist
         )
 
@@ -1150,61 +1121,6 @@ class Procedure:
                 ):
                     yield m
 
-    def find_matches(
-        self,
-        for_matching: FrozenSet[Factor],
-        need_matches: Set[Factor],
-        matches: Tuple[Optional[int], ...],
-        comparison: Callable[[Factor, Factor], bool],
-    ) -> Iterator[Tuple[Optional[int], ...]]:
-        """
-        Generator that recursively searches for a tuple of entity
-        assignments that can cause all of 'need_matches' to satisfy
-        the relation described by 'comparison' with a factor
-        from for_matching.
-
-        :param for_matching: A frozenset of all of self's factors. These
-        factors aren't removed when they're matched to a factor from other,
-        because it's possible that one factor in self could imply two
-        different factors in other.
-
-        :param need_matches: A set of factors from other that have
-        not yet been matched to any factor from self.
-
-        :param matches: A tuple showing which factors from
-        for_matching have been matched.
-
-        :param comparison: A function used to filter the for_matching
-        factors into the "available" collection. A factor must have
-        the "comparison" relation with the factor from the need_matches
-        set to be included as "available".
-
-        :returns: iterator that yields tuples of entity assignments that can
-        cause all of 'need_matches' to satisfy the relation described by
-        'comparison' with a factor from for_matching.
-        """
-
-        if not need_matches:
-            yield matches
-        else:
-            need_matches = set(need_matches)
-            n = need_matches.pop()
-            available = {a for a in for_matching if comparison(a, n)}
-            for a in available:
-                matches_found = check_entity_consistency(n, a, matches)
-                for source_list in matches_found:
-                    matches_next = list(matches)
-                    for i in range(len(a)):
-                        if comparison == operator.le:
-                            matches_next[source_list[i]] = a.entity_context[i]
-                        else:
-                            matches_next[a.entity_context[i]] = source_list[i]
-                    matches_next = tuple(matches_next)
-                    for m in self.find_matches(
-                        for_matching, frozenset(need_matches), matches_next, comparison
-                    ):
-                        yield m
-
     def contradicts_some_to_all(self, other: "Procedure") -> bool:
         """
         Tests whether the assertion that self applies in SOME cases
@@ -1221,9 +1137,9 @@ class Procedure:
 
         # For self to contradict other, every input of other
         # must be implied by some input or despite factor of self.
-
-        matchlist = self.evolve_match_list(
-            self_despite_or_input, other.inputs, operator.ge
+        matchlist = frozenset([tuple([None for i in range(len(self))])])
+        matchlist = evolve_match_list(
+            self_despite_or_input, other.inputs, operator.ge, matchlist
         )
 
         # For self to contradict other, some output of other
@@ -1253,12 +1169,12 @@ class Procedure:
 
         if self == other:
             return True
-
-        matchlist_from_other = other.evolve_match_list(
-            other.inputs, self.inputs, operator.ge
+        matchlist = frozenset([tuple([None for i in range(len(self))])])
+        matchlist_from_other = evolve_match_list(
+            other.inputs, self.inputs, operator.ge, matchlist
         )
         matchlist = self.get_foreign_match_list(matchlist_from_other)
-        matchlist = self.evolve_match_list(
+        matchlist = evolve_match_list(
             self.outputs, other.outputs, operator.ge, matchlist
         )
 
@@ -1318,7 +1234,8 @@ class Procedure:
         if not isinstance(other, self.__class__):
             return False
 
-        matchlist = self.evolve_match_list(self.outputs, other.outputs, operator.ge)
+        matchlist = frozenset([tuple([None for i in range(len(self))])])
+        matchlist = evolve_match_list(self.outputs, other.outputs, operator.ge, matchlist)
 
         # Not checking whether despite factors of other are
         # contradicted by inputs of self, assuming they can't be
