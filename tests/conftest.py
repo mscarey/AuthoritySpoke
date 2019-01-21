@@ -219,6 +219,9 @@ def make_factor(make_predicate) -> Dict[str, Factor]:
         "f_crime": Fact(p["p_crime"]),
         "f_no_crime": Fact(p["p_no_crime"]),
         "f_no_crime_entity_order": Fact(p["p_no_crime"], (1,)),
+        "f_shooting": Fact(p["p_shooting"]),
+        "f_no_shooting": Fact(p["p_no_shooting"]),
+        "f_no_shooting_entity_order": Fact(p["p_no_shooting"], (1, 0)),
         "f_three_entities": Fact(p["p_three_entities"], (0, 1, 2)),
         "f_repeating_entity": Fact(p["p_three_entities"], (0, 1, 0)),
     }
@@ -232,60 +235,57 @@ def make_evidence(make_predicate, make_factor) -> Dict[str, Evidence]:
         "e_shooting": Evidence(
             form="testimony",
             to_effect=f["f_crime"],
-            statement=p["p_shooting"],
+            statement=f["f_shooting"],
             stated_by=0,
         ),
         "e_no_shooting": Evidence(
             form="testimony",
             to_effect=f["f_no_crime"],
-            statement=p["p_no_shooting"],
+            statement=f["f_no_shooting"],
             stated_by=0,
         ),
         "e_no_shooting_absent": Evidence(
             form="testimony",
             to_effect=f["f_no_crime"],
-            statement=p["p_no_shooting"],
+            statement=f["f_no_shooting"],
             stated_by=0,
             absent=True,
         ),
         "e_no_shooting_entity_order": Evidence(
             form="testimony",
             to_effect=f["f_no_crime_entity_order"],
-            statement=p["p_no_shooting"],
+            statement=f["f_no_shooting_entity_order"],
             stated_by=1,
-            statement_context=(1, 0),
         ),
         "e_no_shooting_witness_unknown": Evidence(
             form="testimony",
             to_effect=f["f_no_crime"],
-            statement=p["p_no_shooting"],
+            statement=f["f_no_shooting"],
         ),
         "e_no_shooting_witness_unknown_absent": Evidence(
             form="testimony",
             to_effect=f["f_no_crime"],
-            statement=p["p_no_shooting"],
+            statement=f["f_no_shooting"],
             absent=True,
         ),
-        "e_no_shooting_no_effect": Evidence(
+        "e_no_shooting_no_effect_entity_order": Evidence(
             form="testimony",
-            statement=p["p_no_shooting"],
-            statement_context=(1, 0),
+            statement=f["f_no_shooting_entity_order"],
             stated_by=1,
         ),
-        "e_no_shooting_derived_from": Evidence(
+        "e_no_shooting_derived_from_entity_order": Evidence(
             form="testimony",
-            statement=p["p_no_shooting"],
-            statement_context=(1, 0),
+            statement=f["f_no_shooting_entity_order"],
             derived_from=1,
         ),
         "e_no_shooting_different_witness": Evidence(
             form="testimony",
             to_effect=f["f_no_crime"],
-            statement=p["p_no_shooting"],
+            statement=f["f_no_shooting"],
             stated_by=1,
         ),
         "e_reciprocal": Evidence(
-            form="testimony", to_effect=f["f_no_crime"], statement=p["p7"], stated_by=2
+            form="testimony", to_effect=f["f_no_crime"], statement=f["f7"], stated_by=2
         ),
         "e_crime": Evidence(to_effect=f["f_crime"], derived_from=2),
     }

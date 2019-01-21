@@ -13,7 +13,8 @@ from spoke import Procedure, Holding, ProceduralHolding
 from spoke import Opinion, opinion_from_file
 from spoke import Code, Enactment
 from spoke import ureg, Q_
-from spoke import check_entity_consistency
+from spoke import check_entity_consistency  # move this back into a class?
+from spoke import find_matches, evolve_match_list
 
 
 class TestPredicates:
@@ -248,8 +249,8 @@ class TestFacts:
             f["f_irrelevant_3_new_context"],
             (None, None, None, 2, None),
         )
-        assert check_entity_consistency(f["f_irrelevant_3"],
-            f["f_irrelevant_3_new_context"], (1, 0, 3, 2, 4)
+        assert check_entity_consistency(
+            f["f_irrelevant_3"], f["f_irrelevant_3_new_context"], (1, 0, 3, 2, 4)
         )
 
     def test_check_entity_consistency_false(self, make_factor):
@@ -259,8 +260,10 @@ class TestFacts:
             f["f_irrelevant_3_new_context"],
             (None, None, None, None, 0),
         )
-        assert not check_entity_consistency(f["f_irrelevant_3"],
-            f["f_irrelevant_3_new_context"], (None, None, None, 3, None)
+        assert not check_entity_consistency(
+            f["f_irrelevant_3"],
+            f["f_irrelevant_3_new_context"],
+            (None, None, None, 3, None),
         )
 
     def test_check_entity_consistency_type_error(self, make_factor, make_holding):
@@ -332,23 +335,10 @@ class TestEvidence:
         e = Evidence(
             form="testimony",
             to_effect=Fact(Predicate("{} commited a crime", truth=False)),
-            statement=Predicate("{} did not shoot {}"),
+            statement=Fact(Predicate("{} did not shoot {}")),
             stated_by=0,
         )
         assert len(e) == 2
-
-    def test_exception_for_wrong_number_of_entities(self, make_predicate, make_factor):
-        """The Predicate in statement has two entity slots, but three
-        entities are provided."""
-
-        with pytest.raises(ValueError):
-            e = Evidence(
-                form="testimony",
-                to_effect=make_factor["f_no_crime"],
-                statement=make_predicate["p_no_shooting"],
-                stated_by=1,
-                statement_context=(1, 0, 2),
-            )
 
     def test_get_entity_orders(self, make_evidence):
         # TODO: check this after making Evidence.__str__ method
@@ -382,8 +372,8 @@ class TestEvidence:
 
     def test_unequal_different_attributes(self, make_evidence):
         assert (
-            make_evidence["e_no_shooting_no_effect"]
-            != make_evidence["e_no_shooting_derived_from"]
+            make_evidence["e_no_shooting_no_effect_entity_order"]
+            != make_evidence["e_no_shooting_derived_from_entity_order"]
         )
 
     def test_implication_missing_witness(self, make_evidence):
@@ -392,7 +382,7 @@ class TestEvidence:
 
     def test_implication_missing_effect(self, make_evidence):
         e = make_evidence
-        assert e["e_no_shooting"] >= e["e_no_shooting_no_effect"]
+        assert e["e_no_shooting"] >= e["e_no_shooting_no_effect_entity_order"]
 
     def test_no_implication_of_fact(self, make_predicate, make_evidence):
         assert not make_evidence["e_no_shooting"] > Fact(
@@ -418,16 +408,19 @@ class TestEvidence:
 
     def test_contradict_absent_version_of_implied_factor(self, make_evidence):
         e = make_evidence
-        assert e["e_no_shooting"].contradicts(e["e_no_shooting_witness_unknown_absent"])
         assert e["e_no_shooting_witness_unknown_absent"].contradicts(e["e_no_shooting"])
+        assert e["e_no_shooting"].contradicts(e["e_no_shooting_witness_unknown_absent"])
 
-    def test_no_contradiction_absent_version_of_implying_factor(self, make_evidence):
+    def test_no_contradiction_absent_same_witness(self, make_evidence):
         e = make_evidence
         assert not e["e_no_shooting_absent"].contradicts(
             e["e_no_shooting_witness_unknown"]
         )
         assert not e["e_no_shooting_witness_unknown"].contradicts(
             e["e_no_shooting_absent"]
+        )
+        assert not e["e_no_shooting_absent"].contradicts(
+            e["e_no_shooting_different_witness"]
         )
 
     def test_no_contradiction_of_implied_factor(self, make_evidence):

@@ -119,7 +119,9 @@ class Predicate:
         if self.quantity:
             slots -= 1
         object.__setattr__(self, "entity_context", tuple(range(slots)))
-        object.__setattr__(self, "entity_orders", self.get_entity_orders(self.entity_context))
+        object.__setattr__(
+            self, "entity_orders", self.get_entity_orders(self.entity_context)
+        )
         return slots
 
     def __len__(self):
@@ -400,6 +402,90 @@ def check_entity_consistency(
 
     return answers
 
+
+def find_matches(
+    for_matching: FrozenSet[Factor],
+    need_matches: Set[Factor],
+    matches: Tuple[Optional[int], ...],
+    comparison: Callable[[Factor, Factor], bool],
+) -> Iterator[Tuple[Optional[int], ...]]:
+    """
+    Generator that recursively searches for a tuple of entity
+    assignments that can cause all of 'need_matches' to satisfy
+    the relation described by 'comparison' with a factor
+    from for_matching.
+
+    :param for_matching: A frozenset of all of self's factors. These
+    factors aren't removed when they're matched to a factor from other,
+    because it's possible that one factor in self could imply two
+    different factors in other.
+
+    :param need_matches: A set of factors from other that have
+    not yet been matched to any factor from self.
+
+    :param matches: A tuple showing which factors from
+    for_matching have been matched.
+
+    :param comparison: A function used to filter the for_matching
+    factors into the "available" collection. A factor must have
+    the "comparison" relation with the factor from the need_matches
+    set to be included as "available".
+
+    :returns: iterator that yields tuples of entity assignments that can
+    cause all of 'need_matches' to satisfy the relation described by
+    'comparison' with a factor from for_matching.
+    """
+
+    if not need_matches:
+        yield matches
+    else:
+        need_matches = set(need_matches)
+        n = need_matches.pop()
+        available = {a for a in for_matching if comparison(a, n)}
+        for a in available:
+            matches_found = check_entity_consistency(n, a, matches)
+            for source_list in matches_found:
+                matches_next = list(matches)
+                for i in range(len(a)):
+                    if comparison == operator.le:
+                        matches_next[source_list[i]] = a.entity_context[i]
+                    else:
+                        matches_next[a.entity_context[i]] = source_list[i]
+                matches_next = tuple(matches_next)
+                for m in find_matches(
+                    for_matching, frozenset(need_matches), matches_next, comparison
+                ):
+                    yield m
+
+
+def evolve_match_list(
+    available: FrozenSet[Factor],
+    need_matches: FrozenSet[Factor],
+    comparison: Callable[[Factor, Factor], bool],
+    prior_matches: Optional[FrozenSet[Tuple[Optional[int], ...]]] = None,
+) -> FrozenSet[Tuple[Optional[int], ...]]:
+
+    """
+    Takes all the tuples of entity assignments in prior_matches, and
+    updates them with every consistent tuple of entity assignments
+    that would cause every Factor in need_matches to be related to
+    a Factor in "available" by the relation described by "comparison".
+    """
+    if isinstance(available, Factor):
+        available = frozenset([available])
+    if isinstance(need_matches, Factor):
+        need_matches = {need_matches}
+    if prior_matches is None:
+        # Should this instead depend on the length of need_matches?
+        prior_matches = frozenset([tuple([None for i in range(len(self))])])
+
+    new_matches = set()
+    for m in prior_matches:
+        for y in find_matches(available, need_matches, m, comparison):
+            new_matches.add(y)
+    return frozenset(new_matches)
+
+
 STANDARDS_OF_PROOF = {
     "scintilla of evidence": 1,
     "preponderance of evidence": 2,
@@ -606,20 +692,12 @@ class Evidence(Factor):
 
     form: Optional[str] = None
     to_effect: Optional[Fact] = None
-    statement: Optional[Predicate] = None
-    statement_context: Union[int, Tuple[int, ...]] = ()
+    statement: Optional[Fact] = None
     stated_by: Optional[int] = None
     derived_from: Optional[int] = None
     absent: bool = False
 
     def __post_init__(self):
-        if self.statement and not self.statement_context:
-            object.__setattr__(
-                self, "statement_context", tuple(range(len(self.statement)))
-            )
-        if isinstance(self.statement_context, int):
-            object.__setattr__(self, "statement_context", (self.statement_context,))
-
         int_attrs = []
         if self.stated_by is not None:
             int_attrs.append(self.stated_by)
@@ -630,28 +708,12 @@ class Evidence(Factor):
         # The Entities in entity_context now include the Entities used in
         # the Fact referenced in self.to_effect
 
-        if self.statement_context:
-            int_attrs = list(self.statement_context) + int_attrs
+        if self.statement:
+            int_attrs = list(self.statement.entity_context) + int_attrs
         if self.to_effect:
             int_attrs += list(self.to_effect.entity_context)
         object.__setattr__(self, "entity_context", tuple(int_attrs))
         object.__setattr__(self, "entity_orders", self.get_entity_orders())
-
-        if self.stated_by and not self.statement:
-            raise ValueError(
-                "Parameter self.stated_by is only for "
-                + "referencing the Entity who made the statement "
-                + "in self.statement, and it should not be used "
-                + "when self.statement is None."
-            )
-
-        if self.statement and len(self.statement) != len(self.statement_context):
-            raise ValueError(
-                "statement_context must have one item for each entity slot "
-                + "in self.statement, but the number of slots "
-                + f"for {str(self.statement)} == {len(self.statement_context)} "
-                + f"and len(self.statement) == {len(self.statement)}"
-            )
 
     def __str__(self):
         if self.form:
@@ -661,12 +723,9 @@ class Evidence(Factor):
         if self.derived_from:
             s += f", derived from <{self.derived_from}>"
         if self.stated_by:
-            s += f", with a statement by <{self.stated_by}>"
+            s += f", with a statement by <{self.stated_by}>, "
         if self.statement:
-            statement_text = self.statement.content_with_entities(
-                self.statement_context
-            )
-            s += f", stating that {statement_text}"
+            s += f', asserting the fact: "{str(self.statement)}"'
         if self.to_effect:
             s += f', supporting the factual conclusion: "{str(self.to_effect)}"'
         return s.capitalize() + "."
@@ -677,21 +736,36 @@ class Evidence(Factor):
 
         if (self.stated_by is None) != (other.stated_by is None):
             return False
+
+        if self.absent != other.absent:
+            return False
+
+        matches = [None for slot in range(max(self.entity_context) + 1)]
+
+        if other.stated_by is not None:
+            matches[self.stated_by] = other.stated_by
+
         if (self.derived_from is None) != (other.derived_from is None):
             return False
+
+        if other.derived_from is not None:
+            matches[self.derived_from] = other.derived_from
+
         if (self.stated_by == self.derived_from) != (
             other.stated_by == other.derived_from
         ):
             return False
 
-        matches = [None for slot in range(max(self.entity_context) + 1)]
-        if not check_entity_consistency(self, other, tuple(matches)):
-            return False
+        matchlist = {tuple(matches)}
 
-        return (
-            self.statement == other.statement
-            and self.to_effect == other.to_effect
-            and self.absent == other.absent
+        matchlist = evolve_match_list(
+            self.to_effect, other.to_effect, operator.eq, matchlist
+        )
+
+        return bool(
+            evolve_match_list(
+                self.statement, other.statement, operator.eq, matchlist
+            )
         )
 
     def __gt__(self, other):
@@ -734,7 +808,7 @@ class Evidence(Factor):
         if other.to_effect is not None:
             matchset = {
                 m
-                for m in self.find_matches(
+                for m in find_matches(
                     frozenset([self.to_effect]),
                     {other.to_effect},
                     tuple(matches),
@@ -751,79 +825,23 @@ class Evidence(Factor):
             return True
 
         return any(
-                {
-                    m
-                    for m in self.find_matches(
-                        frozenset([self.statement]),
-                        {other.statement},
-                        tuple(match),
-                        operator.ge,
-                    )
-                }
-                for match in matchset
-            )
-
-    def find_matches(
-        self,
-        for_matching: FrozenSet[Factor],
-        need_matches: Set[Factor],
-        matches: Tuple[Optional[int], ...],
-        comparison: Callable[[Factor, Factor], bool],
-    ) -> Iterator[Tuple[Optional[int], ...]]:
-        """
-        Generator that recursively searches for a tuple of entity
-        assignments that can cause all of 'need_matches' to satisfy
-        the relation described by 'comparison' with a factor
-        from for_matching.
-
-        :param for_matching: A frozenset of all of self's factors. These
-        factors aren't removed when they're matched to a factor from other,
-        because it's possible that one factor in self could imply two
-        different factors in other.
-
-        :param need_matches: A set of factors from other that have
-        not yet been matched to any factor from self.
-
-        :param matches: A tuple showing which factors from
-        for_matching have been matched.
-
-        :param comparison: A function used to filter the for_matching
-        factors into the "available" collection. A factor must have
-        the "comparison" relation with the factor from the need_matches
-        set to be included as "available".
-
-        :returns: iterator that yields tuples of entity assignments that can
-        cause all of 'need_matches' to satisfy the relation described by
-        'comparison' with a factor from for_matching.
-        """
-
-        if not need_matches:
-            yield matches
-        else:
-            need_matches = set(need_matches)
-            n = need_matches.pop()
-            available = {a for a in for_matching if comparison(a, n)}
-            for a in available:
-                matches_found = check_entity_consistency(n, a, matches)
-                for source_list in matches_found:
-                    matches_next = list(matches)
-                    for i in range(len(a)):
-                        if comparison == operator.le:
-                            matches_next[source_list[i]] = a.entity_context[i]
-                        else:
-                            matches_next[a.entity_context[i]] = source_list[i]
-                    matches_next = tuple(matches_next)
-                    for m in self.find_matches(
-                        for_matching, frozenset(need_matches), matches_next, comparison
-                    ):
-                        yield m
+            {
+                m
+                for m in find_matches(
+                    frozenset([self.statement]),
+                    {other.statement},
+                    tuple(match),
+                    operator.ge,
+                )
+            }
+            for match in matchset
+        )
 
     def make_absent(self) -> "Evidence":
         return Evidence(
             form=self.form,
             to_effect=self.to_effect,
             statement=self.statement,
-            statement_context=self.statement_context,
             stated_by=self.stated_by,
             derived_from=self.derived_from,
             absent=not self.absent,
@@ -843,7 +861,10 @@ class Evidence(Factor):
         if not isinstance(other, self.__class__):
             return False
 
-        return self >= other.make_absent()
+        if self >= other.make_absent():
+            return True
+
+        return other > self.make_absent()
 
     def __len__(self):
 
@@ -873,10 +894,7 @@ class Evidence(Factor):
         int_attrs = list(self.int_attrs) or []
 
         if self.statement:
-            statement_orders = set(
-                tuple([x for i, x in sorted(zip(order, self.statement_context))])
-                for order in self.statement.entity_orders
-            )
+            statement_orders = self.statement.entity_orders
         else:
             statement_orders = ((),)
 
