@@ -771,14 +771,9 @@ class Evidence(Factor):
     def __gt__(self, other):
         return self >= other and self != other
 
-    def __ge__(self, other):
-        if not isinstance(other, Factor):
-            raise TypeError(
-                f"'Implies' not supported between instances of "
-                + f"'{self.__class__.__name__}' and '{other.__class__.__name__}'."
-            )
-        if not isinstance(other, self.__class__):
-            return False
+    def implies_if_present(self, other):
+        """Determines whether self would imply other assuming
+        both of them have self.absent == False."""
 
         if self.form != other.form and other.form is not None:
             return False
@@ -836,6 +831,25 @@ class Evidence(Factor):
             }
             for match in matchset
         )
+
+    def __ge__(self, other):
+        if not isinstance(other, Factor):
+            raise TypeError(
+                f"'Implies' not supported between instances of "
+                + f"'{self.__class__.__name__}' and '{other.__class__.__name__}'."
+            )
+        if not isinstance(other, self.__class__):
+            return False
+
+        if self.absent and other.absent:
+            return other.implies_if_present(self)
+
+        if self.absent == other.absent == False:
+            return self.implies_if_present(other)
+
+        return False
+
+
 
     def make_absent(self) -> "Evidence":
         return Evidence(
