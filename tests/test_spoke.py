@@ -1110,6 +1110,9 @@ class TestHoldings:
     def test_no_contradiction_holding_with_evidence(self, make_holding):
         assert not make_holding["h3_fewer_inputs_ALL_undecided"].contradicts(make_holding["h3_ALL"])
 
+    def test_holding_len(self, make_holding):
+        assert len(make_holding["h1"]) == 2
+        assert len(make_holding["h3"]) == 4
 class TestCodes:
     def test_making_code(self, make_code):
         const = make_code["const"]
@@ -1177,6 +1180,12 @@ class TestOpinions:
     def test_opinion_features(self, make_opinion):
         assert make_opinion["watt_majority"].court == "9th-cir"
         assert "388 F.2d 853" in make_opinion["watt_majority"].citations
+
+    def test_opinion_holding_list(self, make_opinion, real_holding):
+        assert real_holding["h3"] in make_opinion["watt_majority"].holdings
+
+    def test_opinion_entity_list(self, make_opinion, make_entity):
+        assert make_entity["e_watt"] in make_opinion["watt_majority"].get_entities()
 
     def test_opinion_date(self, make_opinion):
         assert (

@@ -1385,7 +1385,7 @@ class Enactment(Factor):
         return self >= other
 
 
-@dataclass
+@dataclass(frozen=True)
 class Holding:
     """
     A statement in which a court posits a legal rule as authoritative,
@@ -1398,7 +1398,7 @@ class Holding:
     """
 
 
-@dataclass
+@dataclass(frozen=True)
 class ProceduralHolding(Holding):
 
     """
@@ -1480,6 +1480,13 @@ class ProceduralHolding(Holding):
         )
         text += str(self.procedure)
         return text
+
+    def __len__(self):
+        """Returns the number of entities needed to provide context
+        for the Holding, which currently is just the entities needed
+        for the Holding's Procedure."""
+
+        return len(self.procedure)
 
     def contradicts_if_valid(self, other) -> bool:
         """Determines whether self contradicts other,
@@ -1687,6 +1694,30 @@ class Opinion:
     court: str
     position: str
     author: str
+
+    def __post_init__(self):
+        self.holdings = {}
+
+    def get_entities(self):
+        return [e for t in self.holdings.values() for e in t]
+
+    def posits(self, holding: Holding, entities: Optional[Tuple[Entity, ...]] = None) -> None:
+        if entities is None:
+            entities = self.get_entities()[:len(holding)] # write test
+
+        if len(holding) > len(entities):
+            raise ValueError(
+                f"The 'entities' parameter must be a tuple with " +
+                f"{len(holding)} entities. This opinion doesn't have "+
+                "enough known entities to create context for this holding.")
+
+        if holding not in self.holdings:
+            self.holdings[holding] = entities
+
+        return None
+
+
+
 
 
 class Attribution:

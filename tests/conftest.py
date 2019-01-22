@@ -14,9 +14,12 @@ from spoke import ureg, Q_
 @pytest.fixture(scope="class")
 def make_entity() -> Dict[str, Entity]:
     return {
-        "e_watt": Human("Wattenburg"),
         "e_motel": Entity("Hideaway Lodge"),
+        "e_watt": Human("Wattenburg"),
         "e_trees": Entity("the stockpile of trees"),
+        "e_tree_search": Entity(
+            "law enforcement officers' search of the stockpile of trees"
+            ),
     }
 
 
@@ -171,9 +174,11 @@ def make_factor(make_predicate) -> Dict[str, Factor]:
         "f3_entity_order": Fact(p["p3"], (1, 0)),
         "f3_absent": Fact(p["p3"], absent=True),
         "f4": Fact(p["p4"]),
+        "f4_h4": Fact(p["p4"], (3, 0)),
         "f4_swap_entities": Fact(p["p4"], (1, 0)),
         "f4_swap_entities_4": Fact(p["p4"], (1, 4)),
         "f5": Fact(p["p5"]),
+        "f5_h4": Fact(p["p5"], (3,)),
         "f5_swap_entities": Fact(p["p5"], (1,)),
         "f6": Fact(p["p6"]),
         "f6_swap_entities": Fact(p["p6"], (1,)),
@@ -258,9 +263,7 @@ def make_evidence(make_predicate, make_factor) -> Dict[str, Evidence]:
             stated_by=1,
         ),
         "e_no_shooting_witness_unknown": Evidence(
-            form="testimony",
-            to_effect=f["f_no_crime"],
-            statement=f["f_no_shooting"],
+            form="testimony", to_effect=f["f_no_crime"], statement=f["f_no_shooting"]
         ),
         "e_no_shooting_witness_unknown_absent": Evidence(
             form="testimony",
@@ -269,14 +272,10 @@ def make_evidence(make_predicate, make_factor) -> Dict[str, Evidence]:
             absent=True,
         ),
         "e_no_shooting_no_effect_entity_order": Evidence(
-            form="testimony",
-            statement=f["f_no_shooting_entity_order"],
-            stated_by=1,
+            form="testimony", statement=f["f_no_shooting_entity_order"], stated_by=1
         ),
         "e_no_shooting_derived_from_entity_order": Evidence(
-            form="testimony",
-            statement=f["f_no_shooting_entity_order"],
-            derived_from=1,
+            form="testimony", statement=f["f_no_shooting_entity_order"], derived_from=1
         ),
         "e_no_shooting_different_witness": Evidence(
             form="testimony",
@@ -326,17 +325,26 @@ def make_procedure(make_evidence, make_factor) -> Dict[str, Procedure]:
 
     return {
         "c1": Procedure(outputs=(f["f3"],), inputs=(f["f1"], f["f2"])),
+        "c2": Procedure(
+            outputs=(f["f10"],),
+            inputs=(f["f4"], f["f5"], f["f6"], f["f7"], f["f9"]),
+            despite=(f["f8"],),
+        ),
+        "c3": Procedure(
+            outputs=e["e_crime_absent"],
+            inputs=(f["f3"], f["f11"], f["f12"], f["f13"], f["f14"], f["f15"]),
+            despite=(f["f16"]),
+        ),
+        "c4": Procedure(
+            outputs=f["f13"],
+            inputs=(f["f1"], f["f2"], f["f4_h4"], f["f5_h4"], f["f11"], f["f12"], f["f17"], f["f18"], f["f19"]),
+        ),
         "c1_again": Procedure(outputs=(f["f3"],), inputs=(f["f1"], f["f2"])),
         "c1_entity_order": Procedure(
             outputs=(f["f3_entity_order"],),
             inputs=(f["f2_entity_order"], f["f1_entity_order"]),
         ),
         "c1_easy": Procedure(outputs=(f["f3"],), inputs=(f["f2"])),
-        "c2": Procedure(
-            outputs=(f["f10"],),
-            inputs=(f["f4"], f["f5"], f["f6"], f["f7"], f["f9"]),
-            despite=(f["f8"],),
-        ),
         "c2_absent_despite": Procedure(
             outputs=(f["f10"],),
             inputs=(f["f4"], f["f5"], f["f6"], f["f7"]),
@@ -456,16 +464,29 @@ def make_procedure(make_evidence, make_factor) -> Dict[str, Procedure]:
         "c_far_means_no_curtilage": Procedure(
             outputs=(f["f10_false"],), inputs=(f["f8"])
         ),
-        "c3": Procedure(
-            outputs=e["e_crime_absent"],
-            inputs=(f["f3"], f["f11"], f["f12"], f["f13"], f["f14"], f["f15"]),
-            despite=(f["f16"]),
-        ),
         "c3_fewer_inputs": Procedure(
             outputs=e["e_crime_absent"],
             inputs=(f["f3"], f["f11"], f["f12"], f["f15"]),
             despite=(f["f16"]),
         ),
+    }
+
+
+@pytest.fixture(scope="class")
+def real_holding(make_procedure, make_enactment) -> Dict[str, ProceduralHolding]:
+    """These holdings can be changed in case they don't accurately reflect
+    what's in real cases, or in case there are API improvements that
+    allow them to become more accurate. I'll try not to write any tests
+    that depend on them remaining the same."""
+
+    c = make_procedure
+    e = make_enactment
+
+    return {
+        "h1": ProceduralHolding(c["c1"], enactments=e["search_clause"], mandatory=True),
+        "h2": ProceduralHolding(c["c2"], enactments=e["search_clause"], mandatory=True),
+        "h3": ProceduralHolding(c["c3"], enactments=e["search_clause"], mandatory=True),
+        "h4": ProceduralHolding(c["c4"], enactments=e["search_clause"], mandatory=True),
     }
 
 
@@ -486,7 +507,6 @@ def make_holding(make_procedure, make_enactment) -> Dict[str, ProceduralHolding]
         "h1_opposite": ProceduralHolding(
             c["c1"], enactments=e["search_clause"], rule_valid=False
         ),
-
         "h2_without_cite": ProceduralHolding(c["c2"]),
         "h2_fourth_a_cite": ProceduralHolding(c["c2"], enactments=e["fourth_a"]),
         "h2_despite_due_process": ProceduralHolding(
@@ -640,7 +660,7 @@ def make_holding(make_procedure, make_enactment) -> Dict[str, ProceduralHolding]
             c["c2"], enactments=e["search_clause"], mandatory=True, decided=False
         ),
         "h3_ALL": ProceduralHolding(
-            c["c3"], enactments=e["search_clause"], universal=True,
+            c["c3"], enactments=e["search_clause"], universal=True
         ),
         "h3_fewer_inputs": ProceduralHolding(
             c["c3_fewer_inputs"], enactments=e["search_clause"]
@@ -649,16 +669,19 @@ def make_holding(make_procedure, make_enactment) -> Dict[str, ProceduralHolding]
             c["c3"], enactments=e["search_clause"], decided=False
         ),
         "h3_ALL_undecided": ProceduralHolding(
-            c["c3"], enactments=e["search_clause"], decided=False, universal=True,
+            c["c3"], enactments=e["search_clause"], decided=False, universal=True
         ),
         "h3_fewer_inputs_ALL": ProceduralHolding(
-            c["c3_fewer_inputs"], enactments=e["search_clause"], universal=True,
+            c["c3_fewer_inputs"], enactments=e["search_clause"], universal=True
         ),
         "h3_fewer_inputs_undecided": ProceduralHolding(
             c["c3_fewer_inputs"], enactments=e["search_clause"], decided=False
         ),
         "h3_fewer_inputs_ALL_undecided": ProceduralHolding(
-            c["c3_fewer_inputs"], enactments=e["search_clause"], universal=True, decided=False
+            c["c3_fewer_inputs"],
+            enactments=e["search_clause"],
+            universal=True,
+            decided=False,
         ),
         "h_near_means_curtilage": ProceduralHolding(
             c["c_near_means_curtilage"], enactments=e["search_clause"]
@@ -709,10 +732,19 @@ def make_holding(make_procedure, make_enactment) -> Dict[str, ProceduralHolding]
 
 
 @pytest.fixture(scope="class")
-def make_opinion() -> Dict[str, Opinion]:
+def make_opinion(make_entity, real_holding) -> Dict[str, Opinion]:
+    h = real_holding
+    e = make_entity
+
     test_cases = ("watt", "brad")
     opinions = {}
     for case in test_cases:
         for opinion in opinion_from_file(f"json/{case}_h.json"):
             opinions[f"{case}_{opinion.position}"] = opinion
+    opinions["watt_majority"].posits(h["h1"], (e["e_motel"], e["e_watt"]))
+    opinions["watt_majority"].posits(h["h2"], (e["e_trees"], e["e_motel"]))
+    opinions["watt_majority"].posits(h["h3"], (e["e_motel"], e["e_watt"],
+            e["e_tree_search"], e["e_trees"],))
+    opinions["watt_majority"].posits(h["h4"], (e["e_motel"], e["e_watt"],
+            e["e_tree_search"], e["e_trees"],))
     return opinions
