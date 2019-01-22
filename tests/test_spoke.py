@@ -1088,6 +1088,14 @@ class TestHoldings:
             make_holding["h2_ALL"]
         )
 
+    def test_implication_with_evidence(self, make_holding):
+        assert make_holding["h3"] > make_holding["h3_fewer_inputs"]
+
+    def test_contradiction_with_evidence(self, make_holding):
+        assert make_holding["h3_ALL_undecided"].contradicts(make_holding["h3_fewer_inputs_ALL"])
+
+    def test_no_contradiction_holding_with_evidence(self, make_holding):
+        assert not make_holding["h3_fewer_inputs_ALL_undecided"].contradicts(make_holding["h3_ALL"])
 
 class TestCodes:
     def test_making_code(self, make_code):

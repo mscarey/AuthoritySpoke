@@ -288,6 +288,7 @@ def make_evidence(make_predicate, make_factor) -> Dict[str, Evidence]:
             form="testimony", to_effect=f["f_no_crime"], statement=f["f7"], stated_by=2
         ),
         "e_crime": Evidence(to_effect=f["f_crime"], derived_from=2),
+        "e_crime_absent": Evidence(to_effect=f["f_crime"], derived_from=2, absent=True),
     }
 
 
@@ -456,7 +457,7 @@ def make_procedure(make_evidence, make_factor) -> Dict[str, Procedure]:
             outputs=(f["f10_false"],), inputs=(f["f8"])
         ),
         "c3": Procedure(
-            outputs=e["e_crime"],
+            outputs=e["e_crime_absent"],
             inputs=(f["f3"], f["f11"], f["f12"], f["f13"], f["f14"], f["f15"]),
             despite=(f["f16"]),
         ),
@@ -475,6 +476,8 @@ def make_holding(make_procedure, make_enactment) -> Dict[str, ProceduralHolding]
 
     return {
         "h1": ProceduralHolding(c["c1"], enactments=e["search_clause"]),
+        "h2": ProceduralHolding(c["c2"], enactments=e["search_clause"]),
+        "h3": ProceduralHolding(c["c3"], enactments=e["search_clause"]),
         "h1_again": ProceduralHolding(c["c1"], enactments=e["search_clause"]),
         "h1_entity_order": ProceduralHolding(
             c["c1_entity_order"], enactments=e["search_clause"]
@@ -483,7 +486,7 @@ def make_holding(make_procedure, make_enactment) -> Dict[str, ProceduralHolding]
         "h1_opposite": ProceduralHolding(
             c["c1"], enactments=e["search_clause"], rule_valid=False
         ),
-        "h2": ProceduralHolding(c["c2"], enactments=e["search_clause"]),
+
         "h2_without_cite": ProceduralHolding(c["c2"]),
         "h2_fourth_a_cite": ProceduralHolding(c["c2"], enactments=e["fourth_a"]),
         "h2_despite_due_process": ProceduralHolding(
@@ -635,6 +638,27 @@ def make_holding(make_procedure, make_enactment) -> Dict[str, ProceduralHolding]
         ),
         "h2_MUST_undecided": ProceduralHolding(
             c["c2"], enactments=e["search_clause"], mandatory=True, decided=False
+        ),
+        "h3_ALL": ProceduralHolding(
+            c["c3"], enactments=e["search_clause"], universal=True,
+        ),
+        "h3_fewer_inputs": ProceduralHolding(
+            c["c3_fewer_inputs"], enactments=e["search_clause"]
+        ),
+        "h3_undecided": ProceduralHolding(
+            c["c3"], enactments=e["search_clause"], decided=False
+        ),
+        "h3_ALL_undecided": ProceduralHolding(
+            c["c3"], enactments=e["search_clause"], decided=False, universal=True,
+        ),
+        "h3_fewer_inputs_ALL": ProceduralHolding(
+            c["c3_fewer_inputs"], enactments=e["search_clause"], universal=True,
+        ),
+        "h3_fewer_inputs_undecided": ProceduralHolding(
+            c["c3_fewer_inputs"], enactments=e["search_clause"], decided=False
+        ),
+        "h3_fewer_inputs_ALL_undecided": ProceduralHolding(
+            c["c3_fewer_inputs"], enactments=e["search_clause"], universal=True, decided=False
         ),
         "h_near_means_curtilage": ProceduralHolding(
             c["c_near_means_curtilage"], enactments=e["search_clause"]
