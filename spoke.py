@@ -1641,7 +1641,7 @@ class ProceduralHolding(Holding):
         # that A is undecided contradicts the prior holding B.
 
         # if not self.decided and other.decided:
-        return self.implies_if_decided(other)
+        return other.implies_if_decided(self)
 
 
 def opinion_from_file(path):

@@ -1026,8 +1026,21 @@ class TestHoldings:
         assert not make_holding["h2_invalid"].contradicts(make_holding["h2_undecided"])
 
     def test_undecided_holding_implied_contradiction(self, make_holding):
-
         assert make_holding["h2_irrelevant_inputs_undecided"].contradicts(
+            make_holding["h2_ALL"]
+        )
+
+    def test_undecided_holding_no_implied_contradiction_with_SOME(self, make_holding):
+        """Because a SOME holding doesn't imply a version of the same holding
+        with added supporting inputs,
+
+        make_holding["h2_irrelevant_inputs_undecided"]
+        does not contradict
+        make_holding["h2"]
+
+        which seems questionable."""
+
+        assert not make_holding["h2_irrelevant_inputs_undecided"].contradicts(
             make_holding["h2"]
         )
 

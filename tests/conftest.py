@@ -462,7 +462,7 @@ def make_procedure(make_evidence, make_factor) -> Dict[str, Procedure]:
             despite=(f["f16"]),
         ),
         "c3_fewer_inputs": Procedure(
-            outputs=e["e_crime"],
+            outputs=e["e_crime_absent"],
             inputs=(f["f3"], f["f11"], f["f12"], f["f15"]),
             despite=(f["f16"]),
         ),
