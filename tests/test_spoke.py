@@ -102,6 +102,14 @@ class TestPredicates:
         assert not make_predicate["p9"] >= make_predicate["p9_acres"]
         assert not make_predicate["p9"] <= make_predicate["p9_acres"]
 
+    def test_implication_with_no_truth_value(self, make_predicate):
+        assert not make_predicate["p2_no_truth"] > make_predicate["p2"]
+        assert make_predicate["p2"] > make_predicate["p2_no_truth"]
+
+    def test_no_contradiction_with_no_truth_value(self, make_predicate):
+        assert not make_predicate["p2_no_truth"].contradicts(make_predicate["p2"])
+        assert not make_predicate["p2"].contradicts(make_predicate["p2_no_truth"])
+
     def test_no_contradiction_with_inconsistent_dimensionality(self, make_predicate):
         assert not make_predicate["p9"].contradicts(make_predicate["p9_acres"])
         assert not make_predicate["p9_acres"].contradicts(make_predicate["p9"])
@@ -112,6 +120,8 @@ class TestPredicates:
     def test_negated_method(self, make_predicate):
         assert make_predicate["p7"].negated() == make_predicate["p7_opposite"]
         assert make_predicate["p3"].negated() == make_predicate["p3_false"]
+
+
 
 
 class TestFacts:
@@ -211,6 +221,10 @@ class TestFacts:
         assert make_factor["f8_higher_int"] > make_factor["f8_float"]
         assert make_factor["f8_int"] < make_factor["f8_higher_int"]
 
+    def test_factor_implies_no_truth_value(self, make_factor):
+        assert make_factor["f2"] > make_factor["f2_no_truth"]
+        assert not make_factor["f2_no_truth"] > make_factor["f2"]
+
     def test_factor_implies_because_of_exact_quantity(self, make_factor):
         assert make_factor["f8_exact"] > make_factor["f7"]
         assert make_factor["f8_exact"] >= make_factor["f8"]
@@ -219,6 +233,10 @@ class TestFacts:
         self, make_factor
     ):
         assert make_factor["f9_absent"] > make_factor["f9_absent_miles"]
+
+    def test_factor_no_contradiction_no_truth_value(self, make_factor):
+        assert not make_factor["f2"].contradicts(make_factor["f2_no_truth"])
+        assert not make_factor["f2_no_truth"].contradicts(make_factor["f2_false"])
 
     def test_absent_factor_contradicts_broader_quantity_statement(self, make_factor):
         assert make_factor["f8_absent"].contradicts(make_factor["f8_meters"])

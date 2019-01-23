@@ -86,7 +86,7 @@ class Predicate:
     """
 
     content: str
-    truth: bool = True
+    truth: Optional[bool] = True
     reciprocal: bool = False
     comparison: Optional[str] = None
     quantity: Optional[Union[int, float, ureg.Quantity]] = None
@@ -103,7 +103,7 @@ class Predicate:
             object.__setattr__(self, "comparison", "=")
         if self.comparison == "!=":
             object.__setattr__(self, "comparison", "<>")
-        if self.comparison and not self.truth:
+        if self.comparison and self.truth is False:
             object.__setattr__(self, "truth", True)
             object.__setattr__(
                 self, "comparison", OPPOSITE_COMPARISONS[self.comparison]
@@ -162,7 +162,10 @@ class Predicate:
             if (
                 self.comparison
                 and OPPOSITE_COMPARISONS[self.comparison] == other.comparison
-                and self.truth != other.truth
+                and (
+                    (self.truth == True and other.truth == False)
+                    or (self.truth == False and other.truth == True)
+                )
             ):
                 # Equal if everything is same except obverse quantity statement.
                 return True
@@ -182,6 +185,13 @@ class Predicate:
             and self.reciprocal == other.reciprocal
         ):
             return False
+
+        if other.truth is None:
+            return True
+
+        if self.truth is None:
+            return False
+
         if not (
             self.quantity and other.quantity and self.comparison and other.comparison
         ):
@@ -239,6 +249,9 @@ class Predicate:
         if (type(self.quantity) == ureg.Quantity) != (
             type(other.quantity) == ureg.Quantity
         ):
+            return False
+
+        if self.truth is None or other.truth is None:
             return False
 
         if (
@@ -976,10 +989,10 @@ class Procedure:
         Determines whether every factor in other is in self, with matching entity slots.
         """
         matchlist = frozenset([tuple([None for i in range(len(self))])])
-        matchlist = evolve_match_list(self.outputs, other.outputs, operator.eq, matchlist)
         matchlist = evolve_match_list(
-            self.inputs, other.inputs, operator.eq, matchlist
+            self.outputs, other.outputs, operator.eq, matchlist
         )
+        matchlist = evolve_match_list(self.inputs, other.inputs, operator.eq, matchlist)
         return bool(
             evolve_match_list(self.despite, other.despite, operator.eq, matchlist)
         )
@@ -1235,7 +1248,9 @@ class Procedure:
             return False
 
         matchlist = frozenset([tuple([None for i in range(len(self))])])
-        matchlist = evolve_match_list(self.outputs, other.outputs, operator.ge, matchlist)
+        matchlist = evolve_match_list(
+            self.outputs, other.outputs, operator.ge, matchlist
+        )
 
         # Not checking whether despite factors of other are
         # contradicted by inputs of self, assuming they can't be
@@ -1701,23 +1716,23 @@ class Opinion:
     def get_entities(self):
         return [e for t in self.holdings.values() for e in t]
 
-    def posits(self, holding: Holding, entities: Optional[Tuple[Entity, ...]] = None) -> None:
+    def posits(
+        self, holding: Holding, entities: Optional[Tuple[Entity, ...]] = None
+    ) -> None:
         if entities is None:
-            entities = self.get_entities()[:len(holding)] # write test
+            entities = self.get_entities()[: len(holding)]  # write test
 
         if len(holding) > len(entities):
             raise ValueError(
-                f"The 'entities' parameter must be a tuple with " +
-                f"{len(holding)} entities. This opinion doesn't have "+
-                "enough known entities to create context for this holding.")
+                f"The 'entities' parameter must be a tuple with "
+                + f"{len(holding)} entities. This opinion doesn't have "
+                + "enough known entities to create context for this holding."
+            )
 
         if holding not in self.holdings:
             self.holdings[holding] = entities
 
         return None
-
-
-
 
 
 class Attribution:

@@ -31,6 +31,8 @@ def make_predicate() -> Dict[str, Predicate]:
         "p1_again": Predicate("{} was a motel"),
         "p2": Predicate("{} operated and lived at {}"),
         "p2_reciprocal": Predicate("{} operated and lived at {}", reciprocal=True),
+        "p2_no_truth": Predicate("{} operated and lived at {}", truth=None),
+        "p2_false": Predicate("{} operated and lived at {}", truth=False),
         "p3": Predicate("{} was {}’s abode"),
         "p3_false": Predicate("{} was {}’s abode", truth=False),
         "p4": Predicate("{} was on the premises of {}"),
@@ -169,6 +171,8 @@ def make_factor(make_predicate) -> Dict[str, Factor]:
             p["p2"], (1, 0), standard_of_proof="beyond reasonable doubt"
         ),
         "f2_entity_order": Fact(p["p2"]),
+        "f2_no_truth": Fact(p["p2_no_truth"]),
+        "f2_false": Fact(p["p2_false"]),
         "f2_reciprocal": Fact(p["p2_reciprocal"]),
         "f3": Fact(p["p3"]),
         "f3_entity_order": Fact(p["p3"], (1, 0)),
