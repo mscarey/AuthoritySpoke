@@ -2,6 +2,7 @@ import datetime
 import itertools
 import json
 import operator
+import pathlib
 import re
 
 from typing import Callable, Dict, FrozenSet, List, Set, Tuple
@@ -1286,8 +1287,8 @@ class Code:
     or collection of court rules.
     """
 
-    def __init__(self, path: str):
-        self.path = path
+    def __init__(self, filename: str):
+        self.path = pathlib.Path("xml") / filename
         self.xml = self.get_xml()
         self.title = self.xml.find("dc:title").text
         if "Constitution" in self.title:
@@ -1733,6 +1734,20 @@ class Opinion:
             self.holdings[holding] = entities
 
         return None
+
+    def holding_in_context(holding: Holding):
+        if not isinstance(holding, Holding):
+            raise TypeError("holding must be type 'Holding'.")
+        if holding not in self.holdings:
+            raise ValueError
+            (
+                f"That holding has not been posited by {self.name}. "
+                + "Try using the posits() method to add the holding to self.holdings."
+            )
+        pass # TODO
+
+    def holdings_from_json(path: str):
+        pass
 
 
 class Attribution:

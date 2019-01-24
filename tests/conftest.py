@@ -1,3 +1,4 @@
+import json
 from typing import Dict
 
 from pint import UnitRegistry
@@ -18,7 +19,7 @@ def make_entity() -> Dict[str, Entity]:
         "e_watt": Human("Wattenburg"),
         "e_trees": Entity("the stockpile of trees"),
         "e_tree_search": Entity(
-            "law enforcement officers' search of the stockpile of trees"
+            "officers' search of the stockpile of trees"
             ),
     }
 
@@ -297,7 +298,7 @@ def make_evidence(make_predicate, make_factor) -> Dict[str, Evidence]:
 
 @pytest.fixture(scope="module")
 def make_code() -> Dict[str, Code]:
-    return {"const": Code("xml/constitution.xml")}
+    return {"const": Code("constitution.xml")}
 
 
 @pytest.fixture(scope="module")
