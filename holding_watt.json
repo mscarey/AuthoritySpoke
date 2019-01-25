@@ -1,0 +1,163 @@
+[
+    {
+        "procedure": {
+            "inputs": [
+                {
+                    "type": "fact",
+                    "content": "{Hideaway Lodge} was a motel"
+                },
+                {
+                    "type": "fact",
+                    "content": "{Wattenburg} operated and lived at {Hideaway Lodge}"
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "fact",
+                    "content": "{Hideaway Lodge} was {Wattenburg}’s abode"
+                }
+            ]
+        },
+        "enactments": {
+            "code": "consitution.xml",
+            "section": "amendment-IV",
+            "end": "violated"
+        },
+        "mandatory": true
+    },
+    {
+        "procedure": {
+            "inputs": [
+                {
+                    "type": "fact",
+                    "content": "{the stockpile of trees} was on the premises of {Hideaway Lodge}"
+                },
+                {
+                    "type": "fact",
+                    "content": "{the stockpile of trees} was a stockpile of Christmas trees"
+                },
+                {
+                    "type": "fact",
+                    "content": "{the stockpile of trees} was among some standing trees"
+                },
+                {
+                    "type": "fact",
+                    "content": "The distance between {the stockpile of trees} and {Hideaway Lodge} was {> 35 feet}",
+                    "truth": false,
+                    "reciprocal": true
+                },
+                {
+                    "type": "fact",
+                    "content": "The distance between {the stockpile of trees} and a parking area used by personnel and patrons of {Hideaway Lodge} was {< 5 feet}"
+                }
+            ],
+            "despite": {
+                "type": "fact",
+                "content": "The distance between {the stockpile of trees} and {Hideaway Lodge} was {>= 20 feet}"
+            },
+            "outputs": {
+                "type": "fact",
+                "facts": "{the stockpile of trees} was within the curtilage of {Hideaway Lodge}"
+            }
+        },
+        "enactments": {
+            "code": "consitution.xml",
+            "section": "amendment-IV",
+            "end": "violated"
+        },
+        "mandatory": true
+    },
+    {
+        "procedure": {
+            "inputs": [
+                {
+                    "type": "fact",
+                    "content": "{Hideaway Lodge} was {Wattenburg}’s abode"
+                },
+                {
+                    "type": "fact",
+                    "content": "{officers' search of the stockpile of trees} was a warrantless search and seizure"
+                },
+                {
+                    "type": "fact",
+                    "content": "{officers' search of the stockpile of trees} was performed by federal law enforcement officers"
+                },
+                {
+                    "type": "fact",
+                    "content": "{officers' search of the stockpile of trees} constituted an intrusion upon {the stockpile of trees}"
+                },
+                {
+                    "type": "fact",
+                    "content": "{Wattenburg} sought to preserve {the stockpile of trees} as private"
+                }
+            ],
+            "despite": {
+                "type": "fact",
+                "content": "{the stockpile of trees} was in an area accessible to the public"
+            },
+            "outputs": {
+                "type": "evidence",
+                "derived_from": "officers' search of the stockpile of trees",
+                "to_effect": {
+                    "type": "fact",
+                    "content": "{Wattenburg} commited a crime",
+                    "absent": true
+                }
+            }
+        },
+        "enactments": {
+            "code": "consitution.xml",
+            "section": "amendment-IV",
+            "end": "violated"
+        },
+        "mandatory": true
+    },
+    {
+        "procedure": {
+            "inputs": [
+                {
+                    "type": "fact",
+                    "content": "{Hideaway Lodge} was a motel"
+                },
+                {
+                    "type": "fact",
+                    "content": "{Wattenburg} operated and lived at {Hideaway Lodge}"
+                },
+                {
+                    "type": "fact",
+                    "content": "{the stockpile of trees} was on the premises of {Hideaway Lodge}"
+                },
+                {
+                    "type": "fact",
+                    "content": "{the stockpile of trees} was a stockpile of Christmas trees"
+                },
+                {
+                    "type": "fact",
+                    "content": "{officers' search of the stockpile of trees} was a warrantless search and seizure"
+                },
+                {
+                    "type": "fact",
+                    "content": "{officers' search of the stockpile of trees} was performed by federal law enforcement officers"
+                },
+                {
+                    "type": "fact",
+                    "content": "In {officers' search of the stockpile of trees}, several law enforcement officials meticulously went through {the stockpile of trees}"
+                },
+                {
+                    "type": "fact",
+                    "content": "{officers' search of the stockpile of trees} continued for {>= 385 minutes}"
+                }
+            ],
+            "outputs": {
+                "type": "fact",
+                "facts": "{officers' search of the stockpile of trees} constituted an intrusion upon {the stockpile of trees}"
+            }
+        },
+        "enactments": {
+            "code": "consitution.xml",
+            "section": "amendment-IV",
+            "end": "violated"
+        },
+        "mandatory": true
+    }
+]

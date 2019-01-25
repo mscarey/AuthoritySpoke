@@ -125,6 +125,17 @@ class Predicate:
         )
         return slots
 
+    def from_string(
+        content: str, truth: Optional[bool] = True, reciprocal: bool = False
+    ) -> "Predicate":
+        # TODO collect entities from the Predicate string and pass them
+        # out through the Factor and Predicate, at least to the Holding,
+        # maybe to the Opinion, so the Holding can be printed with the
+        # Entities from the Opinion.
+
+        pass
+
+
     def __len__(self):
         """
         Returns the number of entities that can fit in the pairs of brackets
@@ -366,6 +377,18 @@ class Factor:
     In a chain of legal procedures, the outputs of one may become inputs for
     another. Common types of factors include Facts, Evidence, Allegations,
     Motions, and Arguments."""
+
+    def from_dict(factor: dict) -> "Factor":
+        """
+        Turns a dict recently created from a chunk of JSON into a Factor object.
+        """
+        class_options = (Fact, Evidence)
+        for c in class_options:
+            if factor["type"].capitalize() == c.__name__:
+                return c.from_dict(factor)
+        raise ValueError(
+            f'"type" value in input must be one of {class_options}, not {factor["type"]}'
+        )
 
 
 def check_entity_consistency(
@@ -692,6 +715,25 @@ class Fact(Factor):
             for order in self.predicate.entity_orders
         )
 
+    def from_dict(factor: Optional[dict]) -> Optional["Fact"]:
+        if factor is None:
+            return None
+        if factor["type"].capitalize() != "Fact":
+            raise ValueError(
+                f'"type" value in input must be "fact", not {factor["type"]}'
+            )
+        predicate, entities = Predicate.from_string(
+            content=factor.get("content"),
+            truth=factor.get("truth", True),
+            reciprocal=factor.get("reciprocal", False),
+        )
+        return Fact(
+            predicate,
+            entities,
+            factor.get("absent", False),
+            factor.get("standard_of_proof", None),
+        )
+
     # TODO: A function to determine if a factor implies another (transitively)
     # given a list of factors that imply one another or a function for determining
     # which implication relations (represented by production rules?)
@@ -931,6 +973,22 @@ class Evidence(Factor):
                 entity_orders.add(tuple(list(sc) + list(eo) + int_attrs))
 
         return entity_orders
+
+    def from_dict(factor: Optional[dict]) -> Optional["Evidence"]:
+        if factor is None:
+            return None
+        if factor["type"].capitalize() != "Evidence":
+            raise ValueError(
+                f'"type" value in input must be "evidence", not {factor["type"]}'
+            )
+        return Evidence(
+            form=factor.get("form"),
+            to_effect=Fact.from_dict(factor.get("to_effect")),
+            statement=Fact.from_dict(factor.get("statement")),
+            stated_by=factor.get("stated_by"),
+            derived_from=factor.get("derived_from"),
+            absent=factor.get("absent"),
+        )
 
 
 @dataclass(frozen=True)
@@ -1288,7 +1346,7 @@ class Code:
     """
 
     def __init__(self, filename: str):
-        self.path = pathlib.Path("xml") / filename
+        self.path = pathlib.Path("codes") / filename
         self.xml = self.get_xml()
         self.title = self.xml.find("dc:title").text
         if "Constitution" in self.title:
@@ -1721,7 +1779,7 @@ class Opinion:
         self, holding: Holding, entities: Optional[Tuple[Entity, ...]] = None
     ) -> None:
         if entities is None:
-            entities = self.get_entities()[: len(holding)]  # write test
+            entities = self.get_entities()[: len(holding)]  # TODO: write test
 
         if len(holding) > len(entities):
             raise ValueError(
@@ -1735,7 +1793,7 @@ class Opinion:
 
         return None
 
-    def holding_in_context(holding: Holding):
+    def holding_in_context(self, holding: Holding):
         if not isinstance(holding, Holding):
             raise TypeError("holding must be type 'Holding'.")
         if holding not in self.holdings:
@@ -1744,10 +1802,51 @@ class Opinion:
                 f"That holding has not been posited by {self.name}. "
                 + "Try using the posits() method to add the holding to self.holdings."
             )
-        pass # TODO
+        pass  # TODO: tests
 
-    def holdings_from_json(path: str):
-        pass
+    def holdings_from_json(self, filename: str):
+        path = pathlib.Path('.') / filename
+        with open(path, "r") as f:
+            holding_list = json.load(f)
+        for record in holding_list:
+            factor_groups = {"inputs": set(), "outputs": set(), "despite": set()}
+            for factor_type in factor_groups:
+                factor_list = record["procedure"].get(factor_type, {})
+                if isinstance(factor_list, dict):
+                    factor_list = [factor_list]
+                for factor_dict in factor_list:
+                    factor = Factor.from_dict(factor_dict)
+                    factor_groups[factor_type].add(factor)
+            procedure = Procedure(
+                inputs=factor_groups["inputs"],
+                outputs=factor_groups["outputs"],
+                despite=factor_groups["despite"],
+            )
+
+            enactment_groups = {"enactments": set(), "enactments_despite": set()}
+            for enactment_type in enactment_groups:
+                enactment_list = record.get(enactment_type, {})
+                if isinstance(enactment_list, dict):
+                    enactment_list = [enactment_list]
+                for enactment_dict in enactment_list:
+                    enactment = Enactment(
+                        code=enactment_dict.get("code", None),
+                        section=enactment_dict.get("section", None),
+                        start=enactment_dict.get("start", None),
+                        end=enactment_dict.get("end", None),
+                    )
+                    enactment_groups[enactment_type].add(enactment)
+            holding = Holding(
+                procedure=procedure,
+                enactments=enactment_groups["enactments"],
+                enactments_despite=enactment_groups["enactments_despite"],
+                mandatory=record.get("mandatory", False),
+                universal=record.get("universal", False),
+                rule_valid=record.get("rule_valid", True),
+                decided=record.get("decided", True),
+            )
+            self.holdings.add(holding)
+        return self.holdings
 
 
 class Attribution:
