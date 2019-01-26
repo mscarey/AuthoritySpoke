@@ -28,7 +28,7 @@ OPPOSITE_COMPARISONS = {
 }
 
 
-@dataclass()
+@dataclass(frozen=True)
 class Entity:
     """A person, place, thing, or event that needs to be mentioned in
     multiple predicates/factors in a holding."""
@@ -40,7 +40,7 @@ class Entity:
         return self.name
 
 
-@dataclass()
+@dataclass(frozen=True)
 class Human(Entity):
     """
     A "natural person" mentioned as an entity in a factor. On the distinction
@@ -51,7 +51,7 @@ class Human(Entity):
     pass
 
 
-@dataclass()
+@dataclass(frozen=True)
 class Event(Entity):
     """
     Events may be referenced as entities in a predicate's content.
@@ -412,10 +412,11 @@ class Factor:
         """
         class_options = (Fact, Evidence)
         for c in class_options:
-            if factor["type"].capitalize() == c.__name__:
+            cname = factor.get("type", "")
+            if cname.capitalize() == c.__name__:
                 return c.from_dict(factor)
         raise ValueError(
-            f'"type" value in input must be one of {class_options}, not {factor["type"]}'
+            f'"type" value in input must be one of {class_options}, not {cname}'
         )
 
 
@@ -755,11 +756,61 @@ class Fact(Factor):
             truth=factor.get("truth", True),
             reciprocal=factor.get("reciprocal", False),
         )
-        return Fact(
+        yield Fact(
             predicate,
             entities,
             factor.get("absent", False),
             factor.get("standard_of_proof", None),
+        )
+
+        for entity in entities:
+            yield entity
+
+    def make_abstract(self, entity_slots: Iterable[Entity]) -> 'Fact':
+        """
+        Creates a new Fact object, this time with numbered
+        entity slots instead of actual entities. The indices of
+        the Entities in entity_slots correspond to the numbers
+        that will be assigned to the slots in the new object's
+        self.entity_context.
+        """
+
+        if any(not isinstance(s, Entity) for s in entity_slots):
+            raise TypeError(
+                "entity_slots must be an interable containing only Entity objects.")
+        if any(e not in entity_slots for e in self.entity_context):
+            raise ValueError(
+                f'Every entity in self.entity_context must be present in ' +
+                f'entity_slots, but {e} is missing.'
+            )
+        slots = [entity_slots.index(e) for e in self.entity_context]
+        return Fact(
+            self.predicate,
+            tuple(slots),
+            self.absent,
+            self.standard_of_proof
+        )
+
+    def make_concrete(self, entities: Iterable[Entity]) -> 'Fact':
+        """
+        Creates a new Fact object, replacing the numbered
+        entity slots with entities in the order they're mentioned
+        in the Prodicate. The integer indices in self.entity_context
+        will not be used in creating the new object.
+        """
+        if any(not isinstance(s, Entity) for s in entities):
+            raise TypeError(
+                "entities must be an interable containing only Entity objects.")
+        if len(entities) != len(self.entity_context):
+            raise ValueError(
+                f'The number of entities should be equal to the number of slots ' +
+                f'in self.entity_context, which is {len(self.entity_context)}.'
+            )
+        return Fact(
+            self.predicate,
+            tuple(entities),
+            self.absent,
+            self.standard_of_proof
         )
 
     # TODO: A function to determine if a factor implies another (transitively)
@@ -1441,7 +1492,7 @@ class Enactment(Factor):
         self.start = start
         self.end = end
 
-        xml = self.code.get_xml()
+        xml = self.code.xml
         self.text = self.get_cited_passage(xml)
 
         self.effective_date = self.code.provision_effective_date(section)
@@ -1842,7 +1893,7 @@ class Opinion:
         for record in holding_list:
             factor_groups = {"inputs": set(), "outputs": set(), "despite": set()}
             for factor_type in factor_groups:
-                factor_list = record["procedure"].get(factor_type, {})
+                factor_list = record["procedure"].get(factor_type, [])
                 if isinstance(factor_list, dict):
                     factor_list = [factor_list]
                 for factor_dict in factor_list:
@@ -1856,18 +1907,19 @@ class Opinion:
 
             enactment_groups = {"enactments": set(), "enactments_despite": set()}
             for enactment_type in enactment_groups:
-                enactment_list = record.get(enactment_type, {})
+                enactment_list = record.get(enactment_type, [])
                 if isinstance(enactment_list, dict):
                     enactment_list = [enactment_list]
                 for enactment_dict in enactment_list:
+                    code = Code(enactment_dict.get("code"))
                     enactment = Enactment(
-                        code=enactment_dict.get("code", None),
+                        code=code,
                         section=enactment_dict.get("section", None),
                         start=enactment_dict.get("start", None),
                         end=enactment_dict.get("end", None),
                     )
                     enactment_groups[enactment_type].add(enactment)
-            holding = Holding(
+            holding = ProceduralHolding(
                 procedure=procedure,
                 enactments=enactment_groups["enactments"],
                 enactments_despite=enactment_groups["enactments_despite"],

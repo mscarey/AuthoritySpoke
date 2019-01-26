@@ -137,6 +137,23 @@ class TestFacts:
         assert str(make_factor["f1"]) == "Fact: <0> was a motel"
         assert str(make_factor["f3_absent"]) == "Absent Fact: <0> was <1>’s abode"
 
+    def test_abstract_to_concrete(self, make_factor):
+        different = make_factor["f2"].make_concrete([
+            Human("He-Man"),
+            Entity("Castle Grayskull")])
+
+        assert "He-Man operated" in str(different)
+
+    def test_concrete_to_abstract(self, make_entity, make_predicate, make_factor):
+        motel = make_entity["e_motel"]
+        d = make_entity["e_watt"]
+        concrete = Fact(
+            predicate=make_predicate["p2"],
+            entity_context=(d, motel)
+        )
+        abstract = concrete.make_abstract((motel, d))
+        assert abstract.entity_context == (1, 0)
+
     def test_entity_slots_as_length_of_factor(self, make_factor):
         assert len(make_factor["f1"].predicate) == 1
         assert len(make_factor["f1"]) == 1
