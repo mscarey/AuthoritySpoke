@@ -17,9 +17,10 @@ from spoke import find_matches, evolve_match_list
 
 class TestPredicateImport:
     def test_import_predicate_with_quantity(self):
-        story = Predicate.from_string(
+        story, entities = Predicate.from_string(
             "Once there was a {king} who had {> 3} castles"
         )
+        assert len(entities) == 1
         assert story.content.startswith("Once")
         assert story.comparison == ">"
         assert story.quantity == 3

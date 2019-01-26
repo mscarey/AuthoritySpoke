@@ -18,12 +18,13 @@ ureg = UnitRegistry()
 Q_ = ureg.Quantity
 
 OPPOSITE_COMPARISONS = {
-    ">": "<=",
     ">=": "<",
-    "=": "!=",
+    "==": "!=",
     "<>": "=",
-    "<": ">=",
     "<=": ">",
+    "=": "!=",
+    ">": "<=",
+    "<": ">=",
 }
 
 
@@ -127,14 +128,41 @@ class Predicate:
 
     def from_string(
         content: str, truth: Optional[bool] = True, reciprocal: bool = False
-    ) -> "Predicate":
-        # TODO collect entities from the Predicate string and pass them
-        # out through the Factor and Predicate, at least to the Holding,
-        # maybe to the Opinion, so the Holding can be printed with the
-        # Entities from the Opinion.
+    ) -> Tuple["Predicate", Tuple[Entity, ...]]:
 
-        pass
+        """Generates a Predicate object and Entities from a string that
+        has curly brackets around the Entities and the comparison/quantity.
+        Assumes the comparison/quantity can only come last."""
 
+        comparison = None
+        quantity = None
+        pattern = r"\{([^\{]+)\}"
+
+        entities = re.findall(pattern, content)
+        for c in OPPOSITE_COMPARISONS:
+            if entities[-1].startswith(c):
+                comparison = c
+                quantity = entities.pop(-1)
+                quantity = quantity[2:].strip()
+                if quantity.isdigit():
+                    quantity = int(quantity)
+                elif quantity.isdecimal():
+                    quantity = float(quantity)
+                else:
+                    quantity = Q_(quantity)
+
+        entities = (Entity(e) for e in entities)
+
+        return (
+            Predicate(
+                content=re.sub(pattern, "{}", content),
+                truth=truth,
+                reciprocal=reciprocal,
+                comparison=comparison,
+                quantity=quantity,
+            ),
+            tuple(entities),
+        )
 
     def __len__(self):
         """
@@ -1804,8 +1832,11 @@ class Opinion:
             )
         pass  # TODO: tests
 
-    def holdings_from_json(self, filename: str):
-        path = pathlib.Path('.') / filename
+    def holdings_from_json(self, filename: str) -> Dict["Holding", Tuple[Entity, ...]]:
+        """Creates a set of holdings from a JSON file in the input subdirectory,
+        adds those holdings to self.holdings, and returns self.holdings."""
+
+        path = pathlib.Path("input") / filename
         with open(path, "r") as f:
             holding_list = json.load(f)
         for record in holding_list:
@@ -1845,7 +1876,8 @@ class Opinion:
                 rule_valid=record.get("rule_valid", True),
                 decided=record.get("decided", True),
             )
-            self.holdings.add(holding)
+            # There's currently no way to get the entities from the Predicates.
+            self.holdings[holding] = entities
         return self.holdings
 
 
