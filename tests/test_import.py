@@ -26,6 +26,12 @@ class TestPredicateImport:
         assert story.quantity == 3
 
 class TestHoldingImport:
+    """
+    Maybe hold off on trying to make these tests pass until deciding
+    whether to update the JSON format they rely on to match
+    the format in holding_nested_factor.json
+    """
+
     def test_import_some_holdings(self, make_opinion):
         watt = make_opinion["watt_majority"]
         holdings = watt.holdings_from_json("holding_watt.json")
@@ -36,3 +42,17 @@ class TestHoldingImport:
         watt = make_opinion["watt_majority"]
         watt.holdings_from_json("holding_watt.json")
         assert any(h == make_holding["h1"] for h in watt.holdings)
+
+class TestNestedFactorImport:
+
+    def test_import_holding(self, make_opinion):
+        """
+        This test uses the brad_majority opinion but links it to
+        the completely fake Entity and Holding data from
+        holding_nested_factor.json. (The data isn't based on Bradley.)
+        """
+        fake_case = make_opinion["brad_majority"]
+        # The holdings_from_json method is designed for the old
+        # JSON format and needs to be rewritten.
+        fake_case.holdings_from_json("holding_nested_factor.json")
+        assert len(fake_case.holdings) == 1

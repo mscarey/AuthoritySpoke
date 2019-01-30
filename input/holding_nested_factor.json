@@ -1,0 +1,66 @@
+{
+    "mentioned_entities": [
+        {
+            "type": "Human",
+            "name": "defendant"
+        },
+        {
+            "type": "Human",
+            "name": "parole officer"
+        },
+        {
+            "type": "Exhibit",
+            "name": "officer's testimony that defendant was a gang member",
+            "form": "testimony",
+            "statement": "defendant was a gang member",
+            "stated_by": "parole officer"
+        },
+        {
+            "type": "Fact",
+            "name": "defendant committed an assault",
+            "to_effect": "defendant committed an assault"
+        }
+    ],
+    "holdings": [
+        {
+            "inputs": [
+                "officer's testimony that defendant was a gang member",
+                {
+                    "type": "Fact",
+                    "to_effect": "officer's testimony that defendant was a gang member was relevant to show defendant committed an assault."
+                },
+                {
+                    "type": "Fact",
+                    "to_effect": "the probative effect of officer's testimony that defendant was a gang member in showing that defendant committed an assault outweighed any unfair prejudice to defendant."
+                }
+            ],
+            "outputs": [
+                {
+                    "type": "Evidence",
+                    "name": "officer's testimony that defendant was a gang member",
+                    "form": "testimony",
+                    "statement": "defendant was a gang member",
+                    "stated_by": "parole officer",
+                    "to_effect": "defendant committed an assault"
+                }
+            ],
+            "mandatory": true,
+            "enactments": [
+                {
+                    "code": "ca_evidence.html",
+                    "section": "210"
+                },
+                {
+                    "code": "ca_evidence.html",
+                    "section": "352",
+                    "end": "its admission will"
+                },
+                {
+                    "code": "ca_evidence.html",
+                    "section": "352(b)",
+                    "end": "undue prejudice"
+                }
+            ]
+        }
+    ]
+}
