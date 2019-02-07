@@ -1758,26 +1758,27 @@ class Opinion:
             )
         pass  # TODO: tests
 
-    def dict_from_input_json(self, filename: str) -> Dict:
+    def dict_from_input_json(self, filename: str) -> Tuple[Dict, Dict]:
         """
-        Makes a dict from a JSON file in the format that lists
+        Makes entity and holding dicts from a JSON file in the format that lists
         mentioned_entities followed by a list of holdings.
         """
 
         path = pathlib.Path("input") / filename
         with open(path, "r") as f:
-            return json.load(f)
+            case = json.load(f)
+        return case["mentioned_entities"], case["holdings"]
 
     def holdings_from_json(self, filename: str) -> Dict["Rule", Tuple[Entity, ...]]:
         """Creates a set of holdings from a JSON file in the input subdirectory,
         adds those holdings to self.holdings, and returns self.holdings."""
 
-        holding_list = self.dict_from_input_json(filename)
+        entity_list, holding_list = self.dict_from_input_json(filename)
         for record in holding_list:
             factor_groups = {"inputs": set(), "outputs": set(), "despite": set()}
             for factor_type in factor_groups:
-                factor_list = record["procedure"].get(factor_type, [])
-                if isinstance(factor_list, dict):
+                factor_list = record.get(factor_type, [])
+                if not isinstance(factor_list, list):
                     factor_list = [factor_list]
                 for factor_dict in factor_list:
                     factor = Factor.from_dict(factor_dict)

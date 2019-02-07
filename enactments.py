@@ -7,6 +7,7 @@ from bs4 import BeautifulSoup
 
 import roman
 
+
 class Code:
     """
     A constitution, code of statutes, code of regulations,
@@ -16,11 +17,18 @@ class Code:
     def __init__(self, filename: str):
         self.path = pathlib.Path("codes") / filename
         self.xml = self.get_xml()
-        self.title = self.xml.find("dc:title").text
+        if filename.startswith("ca_"):
+            self.title = self.xml.find("h3").find("b").text.split(" - ")[0]
+            self.sovereign = "California"
+        else:
+            self.title = self.xml.find("dc:title").text
+            if "United States" in self.title:
+                self.sovereign = "federal"
+
         if "Constitution" in self.title:
             self.level = "constitutional"
-        if "United States" in self.title:
-            self.sovereign = "federal"
+        else:
+            self.level = "statutory"
 
     def __str__(self):
         return self.title
@@ -68,7 +76,7 @@ class Code:
         return NotImplementedError
 
 
-class Enactment():
+class Enactment:
     def __init__(
         self,
         code: Code,
@@ -82,13 +90,32 @@ class Enactment():
         self.end = end
 
         xml = self.code.xml
-        self.text = self.get_cited_passage(xml)
+        self.text = self.get_cited_passage(xml, code)
 
         self.effective_date = self.code.provision_effective_date(section)
 
-    def get_cited_passage(self, xml):
-        passages = xml.find(id=self.section).find_all(name="text")
+    def get_cited_passage(self, xml, code):
+        def cal_href(href):
+            """
+            Tests whether an XML element has an attribute labeling it as the text
+            of the statutory section "self.section".
+
+            Uses the California statute XML format from http://leginfo.legislature.ca.gov/.
+            """
+
+            return href and re.compile(
+                r"^javascript:submitCodesValues\('" + self.section
+            ).search(href)
+
+        if self.code.sovereign == "federal":
+            passages = xml.find(id=self.section).find_all(name="text")
+        if self.code.sovereign == "California":
+            passages = xml.find(href=cal_href).parent.find_next_siblings(
+                style="margin:0;display:inline;"
+            )
+
         text = "".join(passage.text for passage in passages)
+        text = re.sub(r"\s+", " ", text).strip()
         if self.start:
             l = text.find(self.start)
         else:
@@ -126,7 +153,7 @@ class Enactment():
             return False
         return self >= other
 
-    def from_dict(self, enactment_dict: Dict[str, Optional[str]]) -> 'Enactment':
+    def from_dict(enactment_dict: Dict[str, Optional[str]]) -> "Enactment":
         code = Code(enactment_dict.get("code", None))
         return Enactment(
             code=code,

@@ -25,14 +25,15 @@ class TestPredicateImport:
         assert story.comparison == ">"
         assert story.quantity == 3
 
-class TestEnactmentImport:
 
+class TestEnactmentImport:
     def test_enactment_import(self, make_opinion):
         cardenas = make_opinion["cardenas_majority"]
-        d = cardenas.dict_from_input_json("holding_cardenas.json")
-        enactment_list = d["holdings"][0]["enactments"]
+        entities, d = cardenas.dict_from_input_json("holding_cardenas.json")
+        enactment_list = d[0]["enactments"]
         enactment = Enactment.from_dict(enactment_list[0])
         assert "all relevant evidence is admissible" in enactment.text
+
 
 class TestRuleImport:
     """
@@ -52,8 +53,8 @@ class TestRuleImport:
         watt.holdings_from_json("holding_watt.json")
         assert any(h == make_holding["h1"] for h in watt.holdings)
 
-class TestNestedFactorImport:
 
+class TestNestedFactorImport:
     def test_import_holding(self, make_opinion):
         """
         Based on this text:

@@ -62,7 +62,8 @@
                 },
                 {
                     "code": "ca_evidence.html",
-                    "section": "352(b)",
+                    "section": "352",
+                    "start": "create substantial danger",
                     "end": "undue prejudice"
                 },
                 {
@@ -113,7 +114,8 @@
                 },
                 {
                     "code": "ca_evidence.html",
-                    "section": "352(b)",
+                    "section": "352",
+                    "start": "create substantial danger",
                     "end": "undue prejudice"
                 },
                 {
