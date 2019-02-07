@@ -7,7 +7,7 @@ import pytest
 
 from spoke import Entity, Human
 from spoke import Predicate, Factor, Fact, Evidence
-from spoke import Procedure, Holding, ProceduralHolding
+from spoke import Procedure, Rule, ProceduralRule
 from spoke import Opinion, opinion_from_file
 from spoke import Code, Enactment
 from spoke import ureg, Q_
@@ -25,11 +25,12 @@ class TestPredicateImport:
         assert story.comparison == ">"
         assert story.quantity == 3
 
-class TestHoldingImport:
+
+class TestRuleImport:
     """
     Maybe hold off on trying to make these tests pass until deciding
     whether to update the JSON format they rely on to match
-    the format in holding_nested_factor.json
+    the format in holding_cardenas.json
     """
 
     def test_import_some_holdings(self, make_opinion):
@@ -47,12 +48,16 @@ class TestNestedFactorImport:
 
     def test_import_holding(self, make_opinion):
         """
-        This test uses the brad_majority opinion but links it to
-        the completely fake Entity and Holding data from
-        holding_nested_factor.json. (The data isn't based on Bradley.)
+        Based on this text:
+        This testimony tended “only remotely” to prove that appellant
+        had committed the attempted robbery of money from the 7-Eleven
+        store. In addition, the probative value of the evidence was
+        substantially outweighed by the inflammatory effect of the
+        testimony on the jury. Hence, admission of the testimony
+        concerning appellant’s use of narcotics was improper.
         """
-        fake_case = make_opinion["brad_majority"]
+        cardenas = make_opinion["cardenas_majority"]
         # The holdings_from_json method is designed for the old
         # JSON format and needs to be rewritten.
-        fake_case.holdings_from_json("holding_nested_factor.json")
-        assert len(fake_case.holdings) == 1
+        cardenas.holdings_from_json("holding_cardenas.json")
+        assert len(cardenas.holdings) == 2

@@ -6,7 +6,7 @@ import pytest
 
 from spoke import Entity, Human
 from spoke import Predicate, Factor, Fact, Evidence
-from spoke import Procedure, Holding, ProceduralHolding
+from spoke import Procedure, Rule, ProceduralRule
 from spoke import Opinion, opinion_from_file
 from spoke import Code, Enactment
 from spoke import ureg, Q_
@@ -478,7 +478,7 @@ def make_procedure(make_evidence, make_factor) -> Dict[str, Procedure]:
 
 
 @pytest.fixture(scope="class")
-def real_holding(make_procedure, make_enactment) -> Dict[str, ProceduralHolding]:
+def real_holding(make_procedure, make_enactment) -> Dict[str, ProceduralRule]:
     """These holdings can be changed in case they don't accurately reflect
     what's in real cases, or in case there are API improvements that
     allow them to become more accurate. I'll try not to write any tests
@@ -488,249 +488,249 @@ def real_holding(make_procedure, make_enactment) -> Dict[str, ProceduralHolding]
     e = make_enactment
 
     return {
-        "h1": ProceduralHolding(c["c1"], enactments=e["search_clause"], mandatory=True),
-        "h2": ProceduralHolding(c["c2"], enactments=e["search_clause"], mandatory=True),
-        "h3": ProceduralHolding(c["c3"], enactments=e["search_clause"], mandatory=True),
-        "h4": ProceduralHolding(c["c4"], enactments=e["search_clause"], mandatory=True),
+        "h1": ProceduralRule(c["c1"], enactments=e["search_clause"], mandatory=True),
+        "h2": ProceduralRule(c["c2"], enactments=e["search_clause"], mandatory=True),
+        "h3": ProceduralRule(c["c3"], enactments=e["search_clause"], mandatory=True),
+        "h4": ProceduralRule(c["c4"], enactments=e["search_clause"], mandatory=True),
     }
 
 
 @pytest.fixture(scope="class")
-def make_holding(make_procedure, make_enactment) -> Dict[str, ProceduralHolding]:
+def make_holding(make_procedure, make_enactment) -> Dict[str, ProceduralRule]:
     c = make_procedure
     e = make_enactment
 
     return {
-        "h1": ProceduralHolding(c["c1"], enactments=e["search_clause"]),
-        "h2": ProceduralHolding(c["c2"], enactments=e["search_clause"]),
-        "h3": ProceduralHolding(c["c3"], enactments=e["search_clause"]),
-        "h1_again": ProceduralHolding(c["c1"], enactments=e["search_clause"]),
-        "h1_entity_order": ProceduralHolding(
+        "h1": ProceduralRule(c["c1"], enactments=e["search_clause"]),
+        "h2": ProceduralRule(c["c2"], enactments=e["search_clause"]),
+        "h3": ProceduralRule(c["c3"], enactments=e["search_clause"]),
+        "h1_again": ProceduralRule(c["c1"], enactments=e["search_clause"]),
+        "h1_entity_order": ProceduralRule(
             c["c1_entity_order"], enactments=e["search_clause"]
         ),
-        "h1_easy": ProceduralHolding(c["c1_easy"], enactments=e["search_clause"]),
-        "h1_opposite": ProceduralHolding(
+        "h1_easy": ProceduralRule(c["c1_easy"], enactments=e["search_clause"]),
+        "h1_opposite": ProceduralRule(
             c["c1"], enactments=e["search_clause"], rule_valid=False
         ),
-        "h2_without_cite": ProceduralHolding(c["c2"]),
-        "h2_fourth_a_cite": ProceduralHolding(c["c2"], enactments=e["fourth_a"]),
-        "h2_despite_due_process": ProceduralHolding(
+        "h2_without_cite": ProceduralRule(c["c2"]),
+        "h2_fourth_a_cite": ProceduralRule(c["c2"], enactments=e["fourth_a"]),
+        "h2_despite_due_process": ProceduralRule(
             c["c2"],
             enactments=e["search_clause"],
             enactments_despite=e["due_process_5"],
         ),
-        "h2_ALL_due_process": ProceduralHolding(
+        "h2_ALL_due_process": ProceduralRule(
             c["c2"],
             enactments=(e["search_clause"], e["due_process_5"]),
             mandatory=False,
             universal=True,
             rule_valid=True,
         ),
-        "h2_ALL_due_process_invalid": ProceduralHolding(
+        "h2_ALL_due_process_invalid": ProceduralRule(
             c["c2"],
             enactments=(e["search_clause"], e["due_process_5"]),
             mandatory=False,
             universal=True,
             rule_valid=False,
         ),
-        "h2_ALL": ProceduralHolding(
+        "h2_ALL": ProceduralRule(
             c["c2"], enactments=e["search_clause"], mandatory=False, universal=True
         ),
-        "h2_ALL_invalid": ProceduralHolding(
+        "h2_ALL_invalid": ProceduralRule(
             c["c2"],
             enactments=e["search_clause"],
             mandatory=False,
             universal=True,
             rule_valid=False,
         ),
-        "h2_ALL_MAY_output_false": ProceduralHolding(
+        "h2_ALL_MAY_output_false": ProceduralRule(
             c["c2_output_false"],
             enactments=e["search_clause"],
             mandatory=False,
             universal=True,
         ),
-        "h2_ALL_MUST": ProceduralHolding(
+        "h2_ALL_MUST": ProceduralRule(
             c["c2"], enactments=e["search_clause"], mandatory=True, universal=True
         ),
-        "h2_ALL_MUST_output_false": ProceduralHolding(
+        "h2_ALL_MUST_output_false": ProceduralRule(
             c["c2_output_false"],
             enactments=e["search_clause"],
             mandatory=True,
             universal=True,
         ),
-        "h2_exact_quantity": ProceduralHolding(
+        "h2_exact_quantity": ProceduralRule(
             c["c2_exact_quantity"], enactments=e["search_clause"]
         ),
-        "h2_invalid": ProceduralHolding(
+        "h2_invalid": ProceduralRule(
             c["c2"], enactments=e["search_clause"], rule_valid=False
         ),
-        "h2_irrelevant_inputs": ProceduralHolding(
+        "h2_irrelevant_inputs": ProceduralRule(
             c["c2_irrelevant_inputs"], enactments=e["search_clause"]
         ),
-        "h2_irrelevant_inputs_invalid": ProceduralHolding(
+        "h2_irrelevant_inputs_invalid": ProceduralRule(
             c["c2_irrelevant_inputs"], enactments=e["search_clause"], rule_valid=False
         ),
-        "h2_irrelevant_inputs_ALL_MUST": ProceduralHolding(
+        "h2_irrelevant_inputs_ALL_MUST": ProceduralRule(
             c["c2_irrelevant_inputs"],
             enactments=e["search_clause"],
             mandatory=True,
             universal=True,
         ),
-        "h2_irrelevant_inputs_ALL_MUST_invalid": ProceduralHolding(
+        "h2_irrelevant_inputs_ALL_MUST_invalid": ProceduralRule(
             c["c2_irrelevant_inputs"],
             enactments=e["search_clause"],
             mandatory=True,
             universal=True,
             rule_valid=False,
         ),
-        "h2_irrelevant_inputs_ALL_invalid": ProceduralHolding(
+        "h2_irrelevant_inputs_ALL_invalid": ProceduralRule(
             c["c2_irrelevant_inputs"],
             enactments=e["search_clause"],
             universal=True,
             rule_valid=False,
         ),
-        "h2_irrelevant_inputs_MUST": ProceduralHolding(
+        "h2_irrelevant_inputs_MUST": ProceduralRule(
             c["c2_irrelevant_inputs"], enactments=e["search_clause"], mandatory=True
         ),
-        "h2_irrelevant_inputs_MUST_invalid": ProceduralHolding(
+        "h2_irrelevant_inputs_MUST_invalid": ProceduralRule(
             c["c2_irrelevant_inputs"],
             enactments=e["search_clause"],
             mandatory=True,
             rule_valid=False,
         ),
-        "h2_reciprocal_swap": ProceduralHolding(
+        "h2_reciprocal_swap": ProceduralRule(
             c["c2_reciprocal_swap"], enactments=e["search_clause"]
         ),
-        "h2_exact_in_despite": ProceduralHolding(
+        "h2_exact_in_despite": ProceduralRule(
             c["c2_exact_in_despite"], enactments=e["search_clause"]
         ),
-        "h2_exact_in_despite_ALL": ProceduralHolding(
+        "h2_exact_in_despite_ALL": ProceduralRule(
             c["c2_exact_in_despite"],
             enactments=e["search_clause"],
             mandatory=False,
             universal=True,
         ),
-        "h2_exact_in_despite_ALL_entity_order": ProceduralHolding(
+        "h2_exact_in_despite_ALL_entity_order": ProceduralRule(
             c["c2_exact_in_despite_entity_order"],
             enactments=e["search_clause"],
             mandatory=False,
             universal=True,
         ),
-        "h2_exact_quantity_ALL": ProceduralHolding(
+        "h2_exact_quantity_ALL": ProceduralRule(
             c["c2_exact_quantity"],
             enactments=e["search_clause"],
             mandatory=False,
             universal=True,
         ),
-        "h2_invalid_undecided": ProceduralHolding(
+        "h2_invalid_undecided": ProceduralRule(
             c["c2"], enactments=e["search_clause"], rule_valid=False, decided=False
         ),
-        "h2_MUST": ProceduralHolding(
+        "h2_MUST": ProceduralRule(
             c["c2"], enactments=e["search_clause"], mandatory=True, universal=False
         ),
-        "h2_MUST_invalid": ProceduralHolding(
+        "h2_MUST_invalid": ProceduralRule(
             c["c2"], enactments=e["search_clause"], mandatory=True, rule_valid=False
         ),
-        "h2_output_absent": ProceduralHolding(
+        "h2_output_absent": ProceduralRule(
             c["c2_output_absent"], enactments=e["search_clause"]
         ),
-        "h2_output_false": ProceduralHolding(
+        "h2_output_false": ProceduralRule(
             c["c2_output_false"], enactments=e["search_clause"]
         ),
-        "h2_output_false_ALL": ProceduralHolding(
+        "h2_output_false_ALL": ProceduralRule(
             c["c2_output_false"], enactments=e["search_clause"], universal=True
         ),
-        "h2_output_absent_false": ProceduralHolding(
+        "h2_output_absent_false": ProceduralRule(
             c["c2_output_absent_false"], enactments=e["search_clause"]
         ),
-        "h2_SOME_MUST_output_false": ProceduralHolding(
+        "h2_SOME_MUST_output_false": ProceduralRule(
             c["c2_output_false"],
             enactments=e["search_clause"],
             mandatory=True,
             universal=False,
         ),
-        "h2_SOME_MUST_output_absent": ProceduralHolding(
+        "h2_SOME_MUST_output_absent": ProceduralRule(
             c["c2_output_absent"],
             enactments=e["search_clause"],
             mandatory=True,
             universal=False,
         ),
-        "h2_undecided": ProceduralHolding(
+        "h2_undecided": ProceduralRule(
             c["c2"], enactments=e["search_clause"], decided=False
         ),
-        "h2_irrelevant_inputs_undecided": ProceduralHolding(
+        "h2_irrelevant_inputs_undecided": ProceduralRule(
             c["c2_irrelevant_inputs"], enactments=e["search_clause"], decided=False
         ),
-        "h2_MUST_undecided": ProceduralHolding(
+        "h2_MUST_undecided": ProceduralRule(
             c["c2"], enactments=e["search_clause"], mandatory=True, decided=False
         ),
-        "h3_ALL": ProceduralHolding(
+        "h3_ALL": ProceduralRule(
             c["c3"], enactments=e["search_clause"], universal=True
         ),
-        "h3_fewer_inputs": ProceduralHolding(
+        "h3_fewer_inputs": ProceduralRule(
             c["c3_fewer_inputs"], enactments=e["search_clause"]
         ),
-        "h3_undecided": ProceduralHolding(
+        "h3_undecided": ProceduralRule(
             c["c3"], enactments=e["search_clause"], decided=False
         ),
-        "h3_ALL_undecided": ProceduralHolding(
+        "h3_ALL_undecided": ProceduralRule(
             c["c3"], enactments=e["search_clause"], decided=False, universal=True
         ),
-        "h3_fewer_inputs_ALL": ProceduralHolding(
+        "h3_fewer_inputs_ALL": ProceduralRule(
             c["c3_fewer_inputs"], enactments=e["search_clause"], universal=True
         ),
-        "h3_fewer_inputs_undecided": ProceduralHolding(
+        "h3_fewer_inputs_undecided": ProceduralRule(
             c["c3_fewer_inputs"], enactments=e["search_clause"], decided=False
         ),
-        "h3_fewer_inputs_ALL_undecided": ProceduralHolding(
+        "h3_fewer_inputs_ALL_undecided": ProceduralRule(
             c["c3_fewer_inputs"],
             enactments=e["search_clause"],
             universal=True,
             decided=False,
         ),
-        "h_near_means_curtilage": ProceduralHolding(
+        "h_near_means_curtilage": ProceduralRule(
             c["c_near_means_curtilage"], enactments=e["search_clause"]
         ),
-        "h_near_means_curtilage_even_if": ProceduralHolding(
+        "h_near_means_curtilage_even_if": ProceduralRule(
             c["c_near_means_curtilage_even_if"], enactments=e["search_clause"]
         ),
-        "h_near_means_curtilage_ALL_MUST": ProceduralHolding(
+        "h_near_means_curtilage_ALL_MUST": ProceduralRule(
             c["c_near_means_curtilage"],
             enactments=e["search_clause"],
             mandatory=True,
             universal=True,
         ),
-        "h_near_means_curtilage_ALL_undecided": ProceduralHolding(
+        "h_near_means_curtilage_ALL_undecided": ProceduralRule(
             c["c_near_means_curtilage"],
             enactments=e["search_clause"],
             universal=True,
             decided=False,
         ),
-        "h_near_means_no_curtilage": ProceduralHolding(
+        "h_near_means_no_curtilage": ProceduralRule(
             c["c_near_means_no_curtilage"], enactments=e["search_clause"]
         ),
-        "h_near_means_no_curtilage_ALL": ProceduralHolding(
+        "h_near_means_no_curtilage_ALL": ProceduralRule(
             c["c_near_means_no_curtilage"],
             enactments=e["search_clause"],
             universal=True,
         ),
-        "h_near_means_no_curtilage_ALL_MUST": ProceduralHolding(
+        "h_near_means_no_curtilage_ALL_MUST": ProceduralRule(
             c["c_near_means_no_curtilage"],
             enactments=e["search_clause"],
             mandatory=True,
             universal=True,
         ),
-        "h_nearer_means_curtilage": ProceduralHolding(
+        "h_nearer_means_curtilage": ProceduralRule(
             c["c_nearer_means_curtilage"], enactments=e["search_clause"]
         ),
-        "h_nearer_means_curtilage_ALL": ProceduralHolding(
+        "h_nearer_means_curtilage_ALL": ProceduralRule(
             c["c_nearer_means_curtilage"], enactments=e["search_clause"], universal=True
         ),
-        "h_nearer_means_curtilage_MUST": ProceduralHolding(
+        "h_nearer_means_curtilage_MUST": ProceduralRule(
             c["c_nearer_means_curtilage"], enactments=e["search_clause"], mandatory=True
         ),
-        "h_far_means_no_curtilage": ProceduralHolding(c["c_far_means_no_curtilage"]),
-        "h_far_means_no_curtilage_ALL": ProceduralHolding(
+        "h_far_means_no_curtilage": ProceduralRule(c["c_far_means_no_curtilage"]),
+        "h_far_means_no_curtilage_ALL": ProceduralRule(
             c["c_far_means_no_curtilage"], enactments=e["search_clause"], universal=True
         ),
     }
@@ -741,7 +741,7 @@ def make_opinion(make_entity, real_holding) -> Dict[str, Opinion]:
     h = real_holding
     e = make_entity
 
-    test_cases = ("watt", "brad")
+    test_cases = ("brad", "cardenas", "watt")
     opinions = {}
     for case in test_cases:
         for opinion in opinion_from_file(f"json/{case}_h.json"):

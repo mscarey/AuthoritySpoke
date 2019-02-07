@@ -766,7 +766,7 @@ class Fact(Factor):
         for entity in entities:
             yield entity
 
-    def make_abstract(self, entity_slots: Iterable[Entity]) -> 'Fact':
+    def make_abstract(self, entity_slots: Iterable[Entity]) -> "Fact":
         """
         Creates a new Fact object, this time with numbered
         entity slots instead of actual entities. The indices of
@@ -777,21 +777,17 @@ class Fact(Factor):
 
         if any(not isinstance(s, Entity) for s in entity_slots):
             raise TypeError(
-                "entity_slots must be an interable containing only Entity objects.")
+                "entity_slots must be an interable containing only Entity objects."
+            )
         if any(e not in entity_slots for e in self.entity_context):
             raise ValueError(
-                f'Every entity in self.entity_context must be present in ' +
-                f'entity_slots, but {e} is missing.'
+                f"Every entity in self.entity_context must be present in "
+                + f"entity_slots, but {e} is missing."
             )
         slots = [entity_slots.index(e) for e in self.entity_context]
-        return Fact(
-            self.predicate,
-            tuple(slots),
-            self.absent,
-            self.standard_of_proof
-        )
+        return Fact(self.predicate, tuple(slots), self.absent, self.standard_of_proof)
 
-    def make_concrete(self, entities: Iterable[Entity]) -> 'Fact':
+    def make_concrete(self, entities: Iterable[Entity]) -> "Fact":
         """
         Creates a new Fact object, replacing the numbered
         entity slots with entities in the order they're mentioned
@@ -800,17 +796,15 @@ class Fact(Factor):
         """
         if any(not isinstance(s, Entity) for s in entities):
             raise TypeError(
-                "entities must be an interable containing only Entity objects.")
+                "entities must be an interable containing only Entity objects."
+            )
         if len(entities) != len(self.entity_context):
             raise ValueError(
-                f'The number of entities should be equal to the number of slots ' +
-                f'in self.entity_context, which is {len(self.entity_context)}.'
+                f"The number of entities should be equal to the number of slots "
+                + f"in self.entity_context, which is {len(self.entity_context)}."
             )
         return Fact(
-            self.predicate,
-            tuple(entities),
-            self.absent,
-            self.standard_of_proof
+            self.predicate, tuple(entities), self.absent, self.standard_of_proof
         )
 
     # TODO: A function to determine if a factor implies another (transitively)
@@ -1537,9 +1531,17 @@ class Enactment(Factor):
             return False
         return self >= other
 
+    def from_dict(enactment_dict: Dict[str, str]) -> 'Enactment':
+        code = Code(enactment_dict.get("code"))
+        return Enactment(
+            code=code,
+            section=enactment_dict.get("section", None),
+            start=enactment_dict.get("start", None),
+            end=enactment_dict.get("end", None),
+        )
 
 @dataclass(frozen=True)
-class Holding:
+class Rule:
     """
     A statement in which a court posits a legal rule as authoritative,
     deciding some aspect of the current litigation but also potentially
@@ -1552,7 +1554,7 @@ class Holding:
 
 
 @dataclass(frozen=True)
-class ProceduralHolding(Holding):
+class ProceduralRule(Rule):
 
     """
     procedure (Procedure): optional because a holding can contain
@@ -1585,7 +1587,7 @@ class ProceduralHolding(Holding):
     valid or invalid. Seemingly, decided=False should render the
     "rule_valid" flag irrelevant. Note that if an opinion merely
     says the court is not deciding whether a procedure or attribution
-    is valid, there is no holding, and no Holding object should be
+    is valid, there is no holding, and no Rule object should be
     created. Deciding not to decide a rule's validity is not the same
     thing as deciding that a rule is undecided.
     """
@@ -1622,7 +1624,7 @@ class ProceduralHolding(Holding):
             )
         text = "".join(
             (
-                "Holding:\n",
+                "Rule:\n",
                 f"{support or ''}",
                 f"{despite or ''}",
                 f"\nIt is {'' if self.decided else 'not decided whether it is '}",
@@ -1636,15 +1638,15 @@ class ProceduralHolding(Holding):
 
     def __len__(self):
         """Returns the number of entities needed to provide context
-        for the Holding, which currently is just the entities needed
-        for the Holding's Procedure."""
+        for the Rule, which currently is just the entities needed
+        for the Rule's Procedure."""
 
         return len(self.procedure)
 
     def contradicts_if_valid(self, other) -> bool:
         """Determines whether self contradicts other,
         assuming that rule_valid and decided are
-        True for both Holdings."""
+        True for both Rules."""
 
         if not isinstance(other, self.__class__):
             return False
@@ -1671,7 +1673,7 @@ class ProceduralHolding(Holding):
     def implies_if_decided(self, other) -> bool:
 
         """Simplified version of the __ge__ implication function
-        covering only cases where decided is True for both Holdings,
+        covering only cases where decided is True for both Rules,
         although rule_valid can be False."""
 
         if self.rule_valid and other.rule_valid:
@@ -1694,7 +1696,7 @@ class ProceduralHolding(Holding):
     def implies_if_valid(self, other) -> bool:
         """Simplified version of the __ge__ implication function
         covering only cases where rule_valid and decided are
-        True for both Holdings."""
+        True for both Rules."""
 
         if not isinstance(other, self.__class__):
             return False
@@ -1737,7 +1739,7 @@ class ProceduralHolding(Holding):
 
     def __ge__(self, other) -> bool:
         """Returns a boolean indicating whether self implies other,
-        where other is another Holding."""
+        where other is another Rule."""
 
         if not isinstance(other, self.__class__):
             raise TypeError(
@@ -1761,7 +1763,7 @@ class ProceduralHolding(Holding):
         return False
 
     def negated(self):
-        return ProceduralHolding(
+        return ProceduralRule(
             procedure=self.procedure,
             enactments=self.enactments,
             enactments_despite=self.enactments_despite,
@@ -1855,7 +1857,7 @@ class Opinion:
         return [e for t in self.holdings.values() for e in t]
 
     def posits(
-        self, holding: Holding, entities: Optional[Tuple[Entity, ...]] = None
+        self, holding: Rule, entities: Optional[Tuple[Entity, ...]] = None
     ) -> None:
         if entities is None:
             entities = self.get_entities()[: len(holding)]  # TODO: write test
@@ -1872,9 +1874,9 @@ class Opinion:
 
         return None
 
-    def holding_in_context(self, holding: Holding):
-        if not isinstance(holding, Holding):
-            raise TypeError("holding must be type 'Holding'.")
+    def holding_in_context(self, holding: Rule):
+        if not isinstance(holding, Rule):
+            raise TypeError("holding must be type 'Rule'.")
         if holding not in self.holdings:
             raise ValueError
             (
@@ -1883,13 +1885,21 @@ class Opinion:
             )
         pass  # TODO: tests
 
-    def holdings_from_json(self, filename: str) -> Dict["Holding", Tuple[Entity, ...]]:
-        """Creates a set of holdings from a JSON file in the input subdirectory,
-        adds those holdings to self.holdings, and returns self.holdings."""
+    def dict_from_input_json(self, filename: str) -> Dict:
+        """
+        Makes a dict from a JSON file in the format that lists
+        mentioned_entities followed by a list of holdings.
+        """
 
         path = pathlib.Path("input") / filename
         with open(path, "r") as f:
-            holding_list = json.load(f)
+            return json.load(f)
+
+    def holdings_from_json(self, filename: str) -> Dict["Rule", Tuple[Entity, ...]]:
+        """Creates a set of holdings from a JSON file in the input subdirectory,
+        adds those holdings to self.holdings, and returns self.holdings."""
+
+        holding_list = self.dict_from_input_json(filename)
         for record in holding_list:
             factor_groups = {"inputs": set(), "outputs": set(), "despite": set()}
             for factor_type in factor_groups:
@@ -1911,15 +1921,11 @@ class Opinion:
                 if isinstance(enactment_list, dict):
                     enactment_list = [enactment_list]
                 for enactment_dict in enactment_list:
-                    code = Code(enactment_dict.get("code"))
-                    enactment = Enactment(
-                        code=code,
-                        section=enactment_dict.get("section", None),
-                        start=enactment_dict.get("start", None),
-                        end=enactment_dict.get("end", None),
+                    enactment_groups[enactment_type].add(
+                        Enactment.from_dict(enactment_dict)
                     )
-                    enactment_groups[enactment_type].add(enactment)
-            holding = ProceduralHolding(
+
+            holding = ProceduralRule(
                 procedure=procedure,
                 enactments=enactment_groups["enactments"],
                 enactments_despite=enactment_groups["enactments_despite"],
@@ -1936,6 +1942,6 @@ class Opinion:
 class Attribution:
     """An assertion about the meaning of a prior Opinion. Either a user or an Opinion
     may make an Attribution to an Opinion. An Attribution may attribute either
-    a Holding or a further Attribution."""
+    a Rule or a further Attribution."""
 
     pass

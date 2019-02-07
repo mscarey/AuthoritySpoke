@@ -9,7 +9,7 @@ import pytest
 
 from spoke import Entity, Human
 from spoke import Predicate, Factor, Fact, Evidence
-from spoke import Procedure, Holding, ProceduralHolding
+from spoke import Procedure, Rule, ProceduralRule
 from spoke import Opinion, opinion_from_file
 from spoke import Code, Enactment
 from spoke import ureg, Q_
@@ -699,7 +699,7 @@ class TestProcedures:
             assert p["c2_higher_quantity"].contradicts(p["c2_exact_in_despite"])
 
 
-class TestHoldings:
+class TestRules:
     def test_enactment_type_in_str(self, make_holding):
         assert "constitution" in str(make_holding["h1"]).lower()
 
@@ -1085,7 +1085,7 @@ class TestHoldings:
             make_holding["h2_ALL_invalid"]
         )
 
-    # Enactments cited in Holdings
+    # Enactments cited in Rules
 
     def test_single_enactment_converted_to_frozenset(self, make_holding):
         assert isinstance(make_holding["h2"].enactments, frozenset)
