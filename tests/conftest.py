@@ -4,11 +4,11 @@ from typing import Dict
 from pint import UnitRegistry
 import pytest
 
+from enactments import Code, Enactment
 from spoke import Entity, Human
 from spoke import Predicate, Factor, Fact, Evidence
 from spoke import Procedure, Rule, ProceduralRule
 from spoke import Opinion, opinion_from_file
-from spoke import Code, Enactment
 from spoke import ureg, Q_
 
 

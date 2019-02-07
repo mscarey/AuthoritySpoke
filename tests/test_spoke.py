@@ -7,11 +7,11 @@ from typing import Dict
 from pint import UnitRegistry
 import pytest
 
+from enactments import Code, Enactment
 from spoke import Entity, Human
 from spoke import Predicate, Factor, Fact, Evidence
 from spoke import Procedure, Rule, ProceduralRule
 from spoke import Opinion, opinion_from_file
-from spoke import Code, Enactment
 from spoke import ureg, Q_
 from spoke import check_entity_consistency  # move this back into a class?
 from spoke import find_matches, evolve_match_list
@@ -1184,7 +1184,12 @@ class TestEnactments:
     def test_enactment_subset_or_equal(self, make_enactment):
         assert make_enactment["due_process_5"] >= make_enactment["due_process_14"]
 
+    @pytest.mark.xfail
     def test_enactment_as_factor(self, make_enactment):
+        """
+        Removed. Probably a remnant of an experiment in putting enactments
+        under "input" "despite" and "output"
+        """
         assert isinstance(make_enactment["due_process_5"], Factor)
 
     def test_bill_of_rights_effective_date(self, make_enactment):

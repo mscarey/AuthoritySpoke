@@ -5,11 +5,11 @@ from typing import Dict
 from pint import UnitRegistry
 import pytest
 
+from enactments import Code, Enactment
 from spoke import Entity, Human
 from spoke import Predicate, Factor, Fact, Evidence
 from spoke import Procedure, Rule, ProceduralRule
 from spoke import Opinion, opinion_from_file
-from spoke import Code, Enactment
 from spoke import ureg, Q_
 from spoke import check_entity_consistency
 from spoke import find_matches, evolve_match_list
@@ -25,6 +25,14 @@ class TestPredicateImport:
         assert story.comparison == ">"
         assert story.quantity == 3
 
+class TestEnactmentImport:
+
+    def test_enactment_import(self, make_opinion):
+        cardenas = make_opinion["cardenas_majority"]
+        d = cardenas.dict_from_input_json("holding_cardenas.json")
+        enactment_list = d["holdings"][0]["enactments"]
+        enactment = Enactment.from_dict(enactment_list[0])
+        assert "all relevant evidence is admissible" in enactment.text
 
 class TestRuleImport:
     """
