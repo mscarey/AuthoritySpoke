@@ -5,7 +5,7 @@ from pint import UnitRegistry
 import pytest
 
 from enactments import Code, Enactment
-from spoke import Entity, Human
+from spoke import Entity, Event, Human
 from spoke import Predicate, Factor, Fact, Evidence
 from spoke import Procedure, Rule, ProceduralRule
 from spoke import Opinion, opinion_from_file
@@ -16,9 +16,11 @@ from spoke import ureg, Q_
 def make_entity() -> Dict[str, Entity]:
     return {
         "e_motel": Entity("Hideaway Lodge"),
+        "e_motel_specific": Entity("Hideaway Lodge", generic=False),
         "e_watt": Human("Wattenburg"),
         "e_trees": Entity("the stockpile of trees"),
-        "e_tree_search": Entity(
+        "e_trees_specific": Entity("the stockpile of trees", generic=False),
+        "e_tree_search": Event(
             "officers' search of the stockpile of trees"
             ),
     }

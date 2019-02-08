@@ -17,6 +17,18 @@ from spoke import check_entity_consistency  # move this back into a class?
 from spoke import find_matches, evolve_match_list
 
 
+class TestEntities:
+
+    def test_equality_generic_entities(self, make_entity):
+        e = make_entity
+        assert e["e_motel"] == e["e_trees"]
+        assert e["e_motel"] is not e["e_trees"]
+
+    def test_implication_generic_entities(self, make_entity):
+        e = make_entity
+        assert e["e_motel_specific"] > e["e_trees"]
+        assert not e["e_motel_specific"] < e["e_trees"]
+
 class TestPredicates:
     def test_predicate_with_wrong_number_of_entities(self):
         with pytest.raises(ValueError):
@@ -144,15 +156,15 @@ class TestFacts:
 
         assert "He-Man operated" in str(different)
 
-    def test_concrete_to_abstract(self, make_entity, make_predicate, make_factor):
+    def test_concrete_to_abstract(self, make_entity, make_predicate):
         motel = make_entity["e_motel"]
         d = make_entity["e_watt"]
-        concrete = Fact(
+        fact = Fact(
             predicate=make_predicate["p2"],
             entity_context=(d, motel)
         )
-        abstract = concrete.make_abstract((motel, d))
-        assert abstract.entity_context == (1, 0)
+        assert "Wattenburg operated and lived" in str(fact)
+        assert "{1} operated and lived" in fact.generic()
 
     def test_entity_slots_as_length_of_factor(self, make_factor):
         assert len(make_factor["f1"].predicate) == 1

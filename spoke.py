@@ -30,15 +30,54 @@ OPPOSITE_COMPARISONS = {
 
 
 @dataclass(frozen=True)
-class Entity:
+class Factor:
+    """A factor is something used to determine the applicability of a legal
+    procedure. Factors can be both inputs and outputs of legal procedures.
+    In a chain of legal procedures, the outputs of one may become inputs for
+    another. Common types of factors include Facts, Evidence, Allegations,
+    Motions, and Arguments."""
+
+    @staticmethod
+    def from_dict(factor: dict) -> "Factor":
+        """
+        Turns a dict recently created from a chunk of JSON into a Factor object.
+        """
+        class_options = (Fact, Evidence)
+        for c in class_options:
+            cname = factor.get("type", "")
+            if cname.capitalize() == c.__name__:
+                return c.from_dict(factor)
+        raise ValueError(
+            f'"type" value in input must be one of {class_options}, not {cname}'
+        )
+
+
+@dataclass(frozen=True)
+class Entity(Factor):
     """A person, place, thing, or event that needs to be mentioned in
     multiple predicates/factors in a holding."""
 
     name: str
     plural: bool = False
+    generic: bool = True
 
     def __str__(self):
         return self.name
+
+    def __eq__(self, other = "Entity"):
+        if isinstance(other, self.__class__) or isinstance(self, other.__class__):
+            if self.generic == other.generic == True:
+                return True
+        return (
+            (self.name == other.name)
+            and (self.plural == other.plural)
+            and (self.generic == other.generic)
+        )
+
+    def __gt__(self, other = "Entity"):
+        if isinstance(self, other.__class__):
+            return other.generic
+
 
 
 @dataclass(frozen=True)
@@ -399,28 +438,6 @@ class Predicate:
     # TODO: allow the same entity to be mentioned more than once
 
 
-@dataclass(frozen=True)
-class Factor:
-    """A factor is something used to determine the applicability of a legal
-    procedure. Factors can be both inputs and outputs of legal procedures.
-    In a chain of legal procedures, the outputs of one may become inputs for
-    another. Common types of factors include Facts, Evidence, Allegations,
-    Motions, and Arguments."""
-
-    def from_dict(factor: dict) -> "Factor":
-        """
-        Turns a dict recently created from a chunk of JSON into a Factor object.
-        """
-        class_options = (Fact, Evidence)
-        for c in class_options:
-            cname = factor.get("type", "")
-            if cname.capitalize() == c.__name__:
-                return c.from_dict(factor)
-        raise ValueError(
-            f'"type" value in input must be one of {class_options}, not {cname}'
-        )
-
-
 def check_entity_consistency(
     left: Factor, right: Factor, matches: tuple
 ) -> Set[Tuple[int, ...]]:
@@ -611,6 +628,19 @@ class Fact(Factor):
                 f"{standard}: {predicate}",
             ]
         )
+
+    def generic(self):
+        # TODO: get this to find the correct layer of abstraction based on
+        # what objects have the generic flac
+        predicate = str(self.predicate)
+        standard = f" ({self.standard_of_proof})" if self.standard_of_proof else ""
+        return "".join(
+            [
+                f"{'Absent ' if self.absent else ''}{self.__class__.__name__}",
+                f"{standard}: {predicate}",
+            ]
+        )
+
 
     def predicate_in_context(self, entities: Sequence[Entity]) -> str:
         """Prints the representation of the Predicate with Entities
@@ -1767,7 +1797,7 @@ class Opinion:
         path = pathlib.Path("input") / filename
         with open(path, "r") as f:
             case = json.load(f)
-        return case["mentioned_entities"], case["holdings"]
+        return case["mentioned_factors"], case["holdings"]
 
     def holdings_from_json(self, filename: str) -> Dict["Rule", Tuple[Entity, ...]]:
         """Creates a set of holdings from a JSON file in the input subdirectory,

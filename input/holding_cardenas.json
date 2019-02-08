@@ -1,5 +1,5 @@
 {
-    "mentioned_entities": [
+    "mentioned_factors": [
         {
             "type": "Human",
             "name": "defendant"
@@ -9,8 +9,8 @@
             "name": "parole officer"
         },
         {
-            "type": "Agency",
-            "name": "prosecuting agency"
+            "type": "State",
+            "name": "The People of California"
         },
         {
             "type": "Exhibit",

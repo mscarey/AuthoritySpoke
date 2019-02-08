@@ -89,12 +89,17 @@ class Enactment:
         self.start = start
         self.end = end
 
-        xml = self.code.xml
-        self.text = self.get_cited_passage(xml, code)
+        self.text = self.get_cited_passage()
 
         self.effective_date = self.code.provision_effective_date(section)
 
-    def get_cited_passage(self, xml, code):
+    def get_cited_passage(self):
+
+        """
+        Given the attributes describing the section and the start and end points
+        of the cited text, collects the full text of the cited passage from the XML.
+        """
+
         def cal_href(href):
             """
             Tests whether an XML element has an attribute labeling it as the text
@@ -108,9 +113,9 @@ class Enactment:
             ).search(href)
 
         if self.code.sovereign == "federal":
-            passages = xml.find(id=self.section).find_all(name="text")
+            passages = self.code.xml.find(id=self.section).find_all(name="text")
         if self.code.sovereign == "California":
-            passages = xml.find(href=cal_href).parent.find_next_siblings(
+            passages = self.code.xml.find(href=cal_href).parent.find_next_siblings(
                 style="margin:0;display:inline;"
             )
 
