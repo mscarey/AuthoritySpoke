@@ -68,5 +68,9 @@ class TestNestedFactorImport:
         cardenas = make_opinion["cardenas_majority"]
         # The holdings_from_json method is designed for the old
         # JSON format and needs to be rewritten.
+
+        # Not working in part because it has no way to parse a string
+        # containing Factor names, to make either a ne Factor or a dict
+        # that can be converted to the new Factor
         cardenas.holdings_from_json("holding_cardenas.json")
         assert len(cardenas.holdings) == 2

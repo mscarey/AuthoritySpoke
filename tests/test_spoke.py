@@ -29,6 +29,11 @@ class TestEntities:
         assert e["e_motel_specific"] > e["e_trees"]
         assert not e["e_motel_specific"] < e["e_trees"]
 
+    def test_implication_same_except_generic(self, make_entity):
+        e = make_entity
+        assert e["e_motel_specific"] > e["e_motel"]
+        assert not e["e_motel_specific"] < e["e_motel"]
+
 class TestPredicates:
     def test_predicate_with_wrong_number_of_entities(self):
         with pytest.raises(ValueError):
@@ -164,7 +169,7 @@ class TestFacts:
             entity_context=(d, motel)
         )
         assert "Wattenburg operated and lived" in str(fact)
-        assert "{1} operated and lived" in fact.generic()
+        assert "{} operated and lived" in str(fact.make_generic())
 
     def test_entity_slots_as_length_of_factor(self, make_factor):
         assert len(make_factor["f1"].predicate) == 1
@@ -217,6 +222,20 @@ class TestFacts:
         assert make_factor["f1"] == make_factor["f1b"]
         assert make_factor["f1"] == make_factor["f1c"]
         assert make_factor["f9_swap_entities_4"] == make_factor["f9"]
+
+    def test_generic_factors_equal(self, make_factor):
+        assert make_factor["f2_generic"] == make_factor["f2_false_generic"]
+        assert make_factor["f2_generic"] == make_factor["f3_generic"]
+
+    def test_generic_and_specific_factors_unequal(self, make_factor):
+        assert make_factor["f2"] != make_factor["f2_generic"]
+
+    def test_specific_factor_implies_generic(self, make_factor):
+        assert make_factor["f2"] > make_factor["f2_generic"]
+        assert make_factor["f2"] > make_factor["f3_generic"]
+
+    def test_specific_fact_does_not_imply_generic_entity(self, make_entity, make_factor):
+        assert not make_factor["f2"] > make_entity["e_motel"]
 
     def test_factor_reciprocal_unequal(self, make_factor):
         assert make_factor["f2"] != make_factor["f2_reciprocal"]

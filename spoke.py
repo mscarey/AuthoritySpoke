@@ -12,7 +12,6 @@ from dataclasses import dataclass
 
 from pint import UnitRegistry
 from bs4 import BeautifulSoup
-import roman
 from enactments import Code, Enactment
 
 ureg = UnitRegistry()
@@ -29,7 +28,6 @@ OPPOSITE_COMPARISONS = {
 }
 
 
-@dataclass(frozen=True)
 class Factor:
     """A factor is something used to determine the applicability of a legal
     procedure. Factors can be both inputs and outputs of legal procedures.
@@ -37,12 +35,18 @@ class Factor:
     another. Common types of factors include Facts, Evidence, Allegations,
     Motions, and Arguments."""
 
-    @staticmethod
-    def from_dict(factor: dict) -> "Factor":
+    def __init__(self, name: Optional[str] = None, generic: bool = True):
+        self.name = name or f"a {self.__class__.__name__.lower()}"
+        self.generic = generic
+
+    @classmethod
+    def from_dict(cls, factor: dict) -> "Factor":
         """
         Turns a dict recently created from a chunk of JSON into a Factor object.
         """
-        class_options = (Fact, Evidence)
+
+        # TODO: make subclass search recursive, or make a different factory function
+        class_options = cls.__subclasses__()
         for c in class_options:
             cname = factor.get("type", "")
             if cname.capitalize() == c.__name__:
@@ -51,36 +55,52 @@ class Factor:
             f'"type" value in input must be one of {class_options}, not {cname}'
         )
 
+    def __eq__(self, other: "Factor") -> bool:
+        if self.__class__ != other.__class__:
+            return False
+        if self.generic == other.generic == True:
+            return True
+        return self.__dict__ == other.__dict__
 
-@dataclass(frozen=True)
+    def __gt__(self, other: "Factor") -> bool:
+        if self == other:
+            return False
+        if isinstance(self, other.__class__):
+            if other.generic:
+                return True
+        for entry in other.__dict__:
+            if other.__dict__[entry] is not None:
+                if type(other.__dict__.get(entry)) in (str, bool):
+                    if self.__dict__.get(entry) != other.__dict__.get(entry):
+                        return False
+                else:
+                    if not self.__dict__.get(entry) >= other.__dict__.get(entry):
+                        return False
+        return True
+
+    def __hash__(self):
+        return hash(
+            (
+                self.__class__.__name__,
+                *[v for v in self.__dict__.values() if not isinstance(v, set)],
+            )
+        )
+
+
 class Entity(Factor):
     """A person, place, thing, or event that needs to be mentioned in
     multiple predicates/factors in a holding."""
 
-    name: str
-    plural: bool = False
-    generic: bool = True
+    def __init__(
+        self, name: Optional[str] = None, generic: bool = True, plural: bool = False
+    ):
+        Factor.__init__(self, name, generic)
+        self.plural = plural
 
     def __str__(self):
         return self.name
 
-    def __eq__(self, other = "Entity"):
-        if isinstance(other, self.__class__) or isinstance(self, other.__class__):
-            if self.generic == other.generic == True:
-                return True
-        return (
-            (self.name == other.name)
-            and (self.plural == other.plural)
-            and (self.generic == other.generic)
-        )
 
-    def __gt__(self, other = "Entity"):
-        if isinstance(self, other.__class__):
-            return other.generic
-
-
-
-@dataclass(frozen=True)
 class Human(Entity):
     """
     A "natural person" mentioned as an entity in a factor. On the distinction
@@ -91,7 +111,6 @@ class Human(Entity):
     pass
 
 
-@dataclass(frozen=True)
 class Event(Entity):
     """
     Events may be referenced as entities in a predicate's content.
@@ -100,7 +119,7 @@ class Event(Entity):
     """
 
 
-@dataclass(frozen=True)
+@dataclass()
 class Predicate:
     """
     A statement about real events or about a legal conclusion.
@@ -166,6 +185,7 @@ class Predicate:
         )
         return slots
 
+    @staticmethod
     def from_string(
         content: str, truth: Optional[bool] = True, reciprocal: bool = False
     ) -> Tuple["Predicate", Tuple[Entity, ...]]:
@@ -316,6 +336,14 @@ class Predicate:
         if self == other:
             return True
         return self > other
+
+    def __hash__(self):
+        return hash(
+            (
+                self.__class__.__name__,
+                *[v for v in self.__dict__.values() if not isinstance(v, set)],
+            )
+        )
 
     def contradicts(self, other: "Predicate") -> bool:
         """This first tries to find a contradiction based on the relationship
@@ -575,15 +603,16 @@ STANDARDS_OF_PROOF = {
 }
 
 
-@dataclass(frozen=True)
+@dataclass()
 class Fact(Factor):
     """An assertion accepted as factual by a court, often through factfinding by
     a judge or jury."""
 
-    predicate: Predicate
+    predicate: Optional[Predicate] = None
     entity_context: Union[int, Tuple[int, ...]] = ()
     absent: bool = False
     standard_of_proof: Optional[str] = None
+    generic: bool = False
 
     def __post_init__(self):
         if not self.entity_context:
@@ -619,6 +648,19 @@ class Fact(Factor):
             and self.standard_of_proof == other.standard_of_proof
         )
 
+    def __hash__(self):
+        """
+        Even though this is duplicative, it needs to be here as long as the
+        class defines its own __eq__ function.
+        """
+
+        return hash(
+            (
+                self.__class__.__name__,
+                *[v for v in self.__dict__.values() if not isinstance(v, set)],
+            )
+        )
+
     def __str__(self):
         predicate = str(self.predicate.content_with_entities(self.entity_context))
         standard = f" ({self.standard_of_proof})" if self.standard_of_proof else ""
@@ -629,9 +671,10 @@ class Fact(Factor):
             ]
         )
 
-    def generic(self):
-        # TODO: get this to find the correct layer of abstraction based on
-        # what objects have the generic flac
+    def make_generic(self):
+        # TODO: change this to return a new form of the Fact, with any referenced
+        # Factors marked as generic replaced by blank versions of themselves
+        # (but still with the generic flag)
         predicate = str(self.predicate)
         standard = f" ({self.standard_of_proof})" if self.standard_of_proof else ""
         return "".join(
@@ -640,7 +683,6 @@ class Fact(Factor):
                 f"{standard}: {predicate}",
             ]
         )
-
 
     def predicate_in_context(self, entities: Sequence[Entity]) -> str:
         """Prints the representation of the Predicate with Entities
@@ -844,7 +886,7 @@ class Fact(Factor):
     # are binding from the point of view of a particular court.
 
 
-@dataclass(frozen=True)
+@dataclass()
 class Evidence(Factor):
 
     form: Optional[str] = None
@@ -871,6 +913,14 @@ class Evidence(Factor):
             int_attrs += list(self.to_effect.entity_context)
         object.__setattr__(self, "entity_context", tuple(int_attrs))
         object.__setattr__(self, "entity_orders", self.get_entity_orders())
+
+    def __hash__(self):
+        return hash(
+            (
+                self.__class__.__name__,
+                *[v for v in self.__dict__.values() if not isinstance(v, set)],
+            )
+        )
 
     def __str__(self):
         if self.form:
@@ -1095,7 +1145,7 @@ class Evidence(Factor):
         )
 
 
-@dataclass(frozen=True)
+@dataclass()
 class Procedure:
     """A (potential) rule for courts to use in resolving litigation. Described in
     terms of inputs and outputs, and also potentially "even if" factors, which could
@@ -1146,6 +1196,7 @@ class Procedure:
             # Also verifying that every factor in other is in self.
 
         return self.check_factor_equality(other) and other.check_factor_equality(self)
+
 
     def check_factor_equality(self, other: "Procedure") -> bool:
         """
@@ -1200,6 +1251,14 @@ class Procedure:
         if self == other:
             return False
         return self >= other
+
+    def __hash__(self):
+        return hash(
+            (
+                self.__class__.__name__,
+                *[v for v in self.__dict__.values() if not isinstance(v, set)],
+            )
+        )
 
     def __len__(self):
         """
@@ -1443,7 +1502,7 @@ class Procedure:
         )
 
 
-@dataclass(frozen=True)
+@dataclass()
 class Rule:
     """
     A statement in which a court posits a legal rule as authoritative,
@@ -1456,7 +1515,7 @@ class Rule:
     """
 
 
-@dataclass(frozen=True)
+@dataclass()
 class ProceduralRule(Rule):
 
     """
@@ -1664,6 +1723,14 @@ class ProceduralRule(Rule):
         # that any holding is decided, or vice versa.
 
         return False
+
+    def __hash__(self):
+        return hash(
+            (
+                self.__class__.__name__,
+                *[v for v in self.__dict__.values() if not isinstance(v, set)],
+            )
+        )
 
     def negated(self):
         return ProceduralRule(
