@@ -1,15 +1,13 @@
-import json
 from typing import Dict
 
-from pint import UnitRegistry
 import pytest
 
 from enactments import Code, Enactment
-from spoke import Entity, Event, Human
+from entities import Entity, Event, Human
+from opinions import Opinion
+from rules import Procedure, ProceduralRule
 from spoke import Predicate, Factor, Fact, Evidence
-from spoke import Procedure, Rule, ProceduralRule
-from spoke import Opinion, opinion_from_file
-from spoke import ureg, Q_
+from spoke import Q_
 
 
 @pytest.fixture(scope="class")
@@ -749,7 +747,7 @@ def make_opinion(make_entity, real_holding) -> Dict[str, Opinion]:
     test_cases = ("brad", "cardenas", "watt")
     opinions = {}
     for case in test_cases:
-        for opinion in opinion_from_file(f"json/{case}_h.json"):
+        for opinion in Opinion.from_file(f"json/{case}_h.json"):
             opinions[f"{case}_{opinion.position}"] = opinion
     opinions["watt_majority"].posits(h["h1"], (e["e_motel"], e["e_watt"]))
     opinions["watt_majority"].posits(h["h2"], (e["e_trees"], e["e_motel"]))

@@ -8,10 +8,10 @@ from pint import UnitRegistry
 import pytest
 
 from enactments import Code, Enactment
-from spoke import Entity, Human
+from entities import Entity, Human
+from rules import Procedure, Rule, ProceduralRule
+from opinions import Opinion
 from spoke import Predicate, Factor, Fact, Evidence
-from spoke import Procedure, Rule, ProceduralRule
-from spoke import Opinion, opinion_from_file
 from spoke import ureg, Q_
 from spoke import check_entity_consistency  # move this back into a class?
 from spoke import find_matches, evolve_match_list
@@ -137,7 +137,6 @@ class TestPredicates:
     def test_negated_method(self, make_predicate):
         assert make_predicate["p7"].negated() == make_predicate["p7_opposite"]
         assert make_predicate["p3"].negated() == make_predicate["p3_false"]
-
 
 
 

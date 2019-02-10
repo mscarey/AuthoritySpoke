@@ -1,18 +1,8 @@
-import json
-from typing import Dict
-
-
-from pint import UnitRegistry
-import pytest
-
-from enactments import Code, Enactment
-from spoke import Entity, Human
+from enactments import Enactment
+from entities import Entity, Human
+from opinions import Opinion
+from rules import Procedure, Rule, ProceduralRule
 from spoke import Predicate, Factor, Fact, Evidence
-from spoke import Procedure, Rule, ProceduralRule
-from spoke import Opinion, opinion_from_file
-from spoke import ureg, Q_
-from spoke import check_entity_consistency
-from spoke import find_matches, evolve_match_list
 
 
 class TestPredicateImport:

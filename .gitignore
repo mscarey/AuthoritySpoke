@@ -3,12 +3,11 @@ tests/__pycache__/
 .pytest_cache
 .vscode
 .mypy_cache/
-pint/
-xml/
-html/
-json/
 codes/ca_evidence.html
 codes/ca_penal.html
 input/holding_brad.json
 input/holding_watt.json
-examples*
+html/
+json/
+notebooks/
+xml/
