@@ -18,9 +18,12 @@ def make_entity() -> Dict[str, Entity]:
         "e_watt": Human("Wattenburg"),
         "e_trees": Entity("the stockpile of trees"),
         "e_trees_specific": Entity("the stockpile of trees", generic=False),
-        "e_tree_search": Event(
-            "officers' search of the stockpile of trees"
-            ),
+        "e_tree_search": Event("officers' search of the stockpile of trees"),
+        "e_alice": Human("Alice"),
+        "e_bob": Human("Alice"),
+        "e_craig": Human("Alice"),
+        "e_dan": Human("Alice"),
+        "e_circus": Entity("circus"),
     }
 
 
@@ -151,12 +154,14 @@ def make_predicate() -> Dict[str, Predicate]:
         "p_three_entities": Predicate("{} threw {} to {}"),
     }
 
+
 @pytest.fixture(scope="class")
 def watt_factor(make_predicate, make_entity) -> Dict[str, Factor]:
     p = make_predicate
     e = make_entity
 
     c = [e["e_motel"], e["e_watt"], e["e_trees"], e["e_tree_search"]]
+
     return {
         "f1": Fact(p["p1"], case_factors=c),
         "f1_entity_order": Fact(p["p1"], (1,), case_factors=c),
@@ -164,14 +169,17 @@ def watt_factor(make_predicate, make_entity) -> Dict[str, Factor]:
         "f1c": Fact(p["p1_again"], case_factors=c),
         "f2": Fact(p["p2"], (1, 0), case_factors=c),
         "f2_preponderance_of_evidence": Fact(
-            p["p2"], (1, 0), standard_of_proof="preponderance of evidence"
-        , case_factors=c),
+            p["p2"],
+            (1, 0),
+            standard_of_proof="preponderance of evidence",
+            case_factors=c,
+        ),
         "f2_clear_and_convincing": Fact(
-            p["p2"], (1, 0), standard_of_proof="clear and convincing"
-        , case_factors=c),
+            p["p2"], (1, 0), standard_of_proof="clear and convincing", case_factors=c
+        ),
         "f2_beyond_reasonable_doubt": Fact(
-            p["p2"], (1, 0), standard_of_proof="beyond reasonable doubt"
-        , case_factors=c),
+            p["p2"], (1, 0), standard_of_proof="beyond reasonable doubt", case_factors=c
+        ),
         "f2_entity_order": Fact(p["p2"], case_factors=c),
         "f2_no_truth": Fact(p["p2_no_truth"], case_factors=c),
         "f2_false": Fact(p["p2_false"], case_factors=c),
@@ -224,30 +232,31 @@ def watt_factor(make_predicate, make_entity) -> Dict[str, Factor]:
         "f17": Fact(p["p17"], (2, 3), case_factors=c),
         "f18": Fact(p["p18"], 2, case_factors=c),
         "f19": Fact(p["p19"], 2, case_factors=c),
-        }
+    }
+
 
 @pytest.fixture(scope="class")
 def make_factor(make_predicate, make_entity) -> Dict[str, Factor]:
     p = make_predicate
     e = make_entity
 
-    c = [e["e_motel"], e["e_watt"], e["e_trees"], e["e_tree_search"]]
+    c = [e["e_alice"], e["e_bob"], e["e_craig"], e["e_dan"], e["e_circus"]]
 
     return {
-        "f_irrelevant_0": Fact(p["p_irrelevant_0"], (2,)),
-        "f_irrelevant_1": Fact(p["p_irrelevant_1"], (3,)),
-        "f_irrelevant_2": Fact(p["p_irrelevant_2"], (4,)),
-        "f_irrelevant_3": Fact(p["p_irrelevant_3"], (2, 4)),
-        "f_irrelevant_3_new_context": Fact(p["p_irrelevant_3"], (3, 4)),
-        "f_irrelevant_3_context_0": Fact(p["p_irrelevant_3"], (3, 0)),
-        "f_crime": Fact(p["p_crime"]),
-        "f_no_crime": Fact(p["p_no_crime"]),
-        "f_no_crime_entity_order": Fact(p["p_no_crime"], (1,)),
-        "f_shooting": Fact(p["p_shooting"]),
-        "f_no_shooting": Fact(p["p_no_shooting"]),
-        "f_no_shooting_entity_order": Fact(p["p_no_shooting"], (1, 0)),
-        "f_three_entities": Fact(p["p_three_entities"], (0, 1, 2)),
-        "f_repeating_entity": Fact(p["p_three_entities"], (0, 1, 0)),
+        "f_irrelevant_0": Fact(p["p_irrelevant_0"], (2,), case_factors=c),
+        "f_irrelevant_1": Fact(p["p_irrelevant_1"], (3,), case_factors=c),
+        "f_irrelevant_2": Fact(p["p_irrelevant_2"], (4,), case_factors=c),
+        "f_irrelevant_3": Fact(p["p_irrelevant_3"], (2, 4), case_factors=c),
+        "f_irrelevant_3_new_context": Fact(p["p_irrelevant_3"], (3, 4), case_factors=c),
+        "f_irrelevant_3_context_0": Fact(p["p_irrelevant_3"], (3, 0), case_factors=c),
+        "f_crime": Fact(p["p_crime"], case_factors=c),
+        "f_no_crime": Fact(p["p_no_crime"], case_factors=c),
+        "f_no_crime_entity_order": Fact(p["p_no_crime"], (1,), case_factors=c),
+        "f_shooting": Fact(p["p_shooting"], case_factors=c),
+        "f_no_shooting": Fact(p["p_no_shooting"], case_factors=c),
+        "f_no_shooting_entity_order": Fact(p["p_no_shooting"], (1, 0), case_factors=c),
+        "f_three_entities": Fact(p["p_three_entities"], (0, 1, 2), case_factors=c),
+        "f_repeating_entity": Fact(p["p_three_entities"], (0, 1, 0), case_factors=c),
     }
 
 
@@ -338,9 +347,10 @@ def make_enactment(make_code) -> Dict[str, Enactment]:
 
 
 @pytest.fixture(scope="class")
-def make_procedure(make_evidence, make_factor) -> Dict[str, Procedure]:
+def make_procedure(make_evidence, make_factor, watt_factor) -> Dict[str, Procedure]:
     e = make_evidence
-    f = make_factor
+    f = watt_factor
+    m = make_factor
 
     return {
         "c1": Procedure(outputs=(f["f3"],), inputs=(f["f1"], f["f2"])),
@@ -356,7 +366,17 @@ def make_procedure(make_evidence, make_factor) -> Dict[str, Procedure]:
         ),
         "c4": Procedure(
             outputs=f["f13"],
-            inputs=(f["f1"], f["f2"], f["f4_h4"], f["f5_h4"], f["f11"], f["f12"], f["f17"], f["f18"], f["f19"]),
+            inputs=(
+                f["f1"],
+                f["f2"],
+                f["f4_h4"],
+                f["f5_h4"],
+                f["f11"],
+                f["f12"],
+                f["f17"],
+                f["f18"],
+                f["f19"],
+            ),
         ),
         "c1_again": Procedure(outputs=(f["f3"],), inputs=(f["f1"], f["f2"])),
         "c1_entity_order": Procedure(
@@ -401,22 +421,22 @@ def make_procedure(make_evidence, make_factor) -> Dict[str, Procedure]:
                 f["f6"],
                 f["f7"],
                 f["f9"],
-                f["f_irrelevant_0"],
-                f["f_irrelevant_1"],
-                f["f_irrelevant_2"],
-                f["f_irrelevant_3"],
-                f["f_irrelevant_3_new_context"],
+                m["f_irrelevant_0"],
+                m["f_irrelevant_1"],
+                m["f_irrelevant_2"],
+                m["f_irrelevant_3"],
+                m["f_irrelevant_3_new_context"],
             ),
             despite=(f["f8"],),
         ),
         "c2_irrelevant_outputs": Procedure(
             outputs=(
                 f["f10_swap_entities_4"],
-                f["f_irrelevant_0"],
-                f["f_irrelevant_1"],
-                f["f_irrelevant_2"],
-                f["f_irrelevant_3"],
-                f["f_irrelevant_3_context_0"],
+                m["f_irrelevant_0"],
+                m["f_irrelevant_1"],
+                m["f_irrelevant_2"],
+                m["f_irrelevant_3"],
+                m["f_irrelevant_3_context_0"],
             ),
             inputs=(
                 f["f4_swap_entities_4"],
@@ -762,8 +782,10 @@ def make_opinion(make_entity, real_holding) -> Dict[str, Opinion]:
             opinions[f"{case}_{opinion.position}"] = opinion
     opinions["watt_majority"].posits(h["h1"], (e["e_motel"], e["e_watt"]))
     opinions["watt_majority"].posits(h["h2"], (e["e_trees"], e["e_motel"]))
-    opinions["watt_majority"].posits(h["h3"], (e["e_motel"], e["e_watt"],
-            e["e_tree_search"], e["e_trees"],))
-    opinions["watt_majority"].posits(h["h4"], (e["e_motel"], e["e_watt"],
-            e["e_tree_search"], e["e_trees"],))
+    opinions["watt_majority"].posits(
+        h["h3"], (e["e_motel"], e["e_watt"], e["e_tree_search"], e["e_trees"])
+    )
+    opinions["watt_majority"].posits(
+        h["h4"], (e["e_motel"], e["e_watt"], e["e_tree_search"], e["e_trees"])
+    )
     return opinions

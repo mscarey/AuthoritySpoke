@@ -585,13 +585,18 @@ class Fact(Factor):
             self.entity_context = (self.entity_context,)
 
         if any(isinstance(x, int) for x in self.entity_context):
-            self.entity_context = tuple(case_factors[i] for i in self.entity_context)
+            if case_factors:
+                self.entity_context = tuple(case_factors[i] for i in self.entity_context)
+            else:
+                raise ValueError("Items in the entity_context parameter should " +
+                "be Factor or a  subclass of Factor, or should be integers " +
+                "referring to a non-empty case_factors parameter.")
 
         if predicate and len(self.entity_context) < len(predicate):
             if len(case_factors) < len(predicate):
                 raise ValueError(
-                    f"Must supply {len(self.predicate)}"
-                    + "factors to fill the slots in self.predicate, either"
+                    f"Must supply exactly {len(self.predicate)} "
+                    + "factor(s) to fill the slots in self.predicate, either "
                     + "as entity_context or case_factors."
                 )
             self.entity_context = case_factors[: len(predicate)]
