@@ -68,15 +68,7 @@ class Factor:
         if isinstance(self, other.__class__):
             if other.generic:
                 return True
-        for entry in other.__dict__:
-            if other.__dict__[entry] is not None:
-                if type(other.__dict__.get(entry)) in (str, bool):
-                    if self.__dict__.get(entry) != other.__dict__.get(entry):
-                        return False
-                else:
-                    if not self.__dict__.get(entry) >= other.__dict__.get(entry):
-                        return False
-        return True
+        return False
 
     def __hash__(self):
         return hash(
@@ -481,13 +473,12 @@ def check_entity_consistency(
 
     return answers
 
-
 def find_matches(
-    for_matching: FrozenSet[Factor],
-    need_matches: Set[Factor],
-    matches: Tuple[Optional[int], ...],
-    comparison: Callable[[Factor, Factor], bool],
-) -> Iterator[Tuple[Optional[int], ...]]:
+        for_matching: FrozenSet[Factor],
+        need_matches: Set[Factor],
+        matches: Tuple[Optional[int], ...],
+        comparison: Callable[[Factor, Factor], bool],
+    ) -> Iterator[Tuple[Optional[int], ...]]:
     """
     Generator that recursively searches for a tuple of entity
     assignments that can cause all of 'need_matches' to satisfy
