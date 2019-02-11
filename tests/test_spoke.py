@@ -112,8 +112,8 @@ class TestPredicates:
         assert not make_predicate["p1"].contradicts(make_predicate["p1_again"])
         assert not make_predicate["p3"].contradicts(make_predicate["p7"])
 
-    def test_predicate_does_not_contradict_factor(self, make_predicate, make_factor):
-        assert not make_predicate["p7_true"].contradicts(make_factor["f7"])
+    def test_predicate_does_not_contradict_factor(self, make_predicate, watt_factor):
+        assert not make_predicate["p7_true"].contradicts(watt_factor["f7"])
 
     def test_no_implication_with_inconsistent_dimensionality(self, make_predicate):
         assert not make_predicate["p9"] >= make_predicate["p9_acres"]
@@ -141,20 +141,36 @@ class TestPredicates:
 
 
 class TestFacts:
-    def test_default_entity_context_for_fact(self, make_predicate):
-        f2 = Fact(make_predicate["p2"])
-        assert f2.entity_context == (0, 1)
+    def test_default_entity_context_for_fact(self, make_entity, make_predicate, watt_mentioned):
+        e = make_entity
 
-    def test_convert_int_entity_context_to_tuple(self, make_predicate):
-        f = Fact(make_predicate["p_irrelevant_1"], 3)
-        assert f.entity_context == (3,)
+        f2 = Fact(make_predicate["p1"], case_factors=watt_mentioned)
+        assert f2.entity_context == (e["e_motel"],)
 
-    def test_string_representation_of_factor(self, make_factor):
-        assert str(make_factor["f1"]) == "Fact: <0> was a motel"
-        assert str(make_factor["f3_absent"]) == "Absent Fact: <0> was <1>’s abode"
+    def test_entity_context_from_case_factor_indices(self, make_entity, make_predicate, watt_mentioned):
+        """
+        If you pass in integers instead of Factor objects to fill the blanks
+        in the Predicate (which was the only way to do things in the first
+        version of the Fact class's __init__ method), then the integers
+        you pass in should be used as indices to select Factor objects
+        from case_factors.
+        """
 
-    def test_abstract_to_concrete(self, make_factor):
-        different = make_factor["f2"].make_concrete([
+        e = make_entity
+
+        f2 = Fact(make_predicate["p2"], entity_context=(1, 0), case_factors=watt_mentioned)
+        assert f2.entity_context == (e["e_watt"], e["e_motel"])
+
+    def test_convert_int_entity_context_to_tuple(self, make_predicate, watt_mentioned):
+        f = Fact(make_predicate["p_irrelevant_1"], 3, case_factors=watt_mentioned)
+        assert f.entity_context == (watt_mentioned[3],)
+
+    def test_string_representation_of_factor(self, watt_factor):
+        assert str(watt_factor["f1"]) == "Fact: <Hideaway Lodge> was a motel"
+        assert str(watt_factor["f3_absent"]) == "Absent Fact: <Hideaway Lodge> was <Wattenburg>’s abode"
+
+    def test_abstract_to_concrete(self, watt_factor):
+        different = watt_factor["f2"].make_concrete([
             Human("He-Man"),
             Entity("Castle Grayskull")])
 
@@ -170,16 +186,16 @@ class TestFacts:
         assert "Wattenburg operated and lived" in str(fact)
         assert "{} operated and lived" in str(fact.make_generic())
 
-    def test_entity_slots_as_length_of_factor(self, make_factor):
-        assert len(make_factor["f1"].predicate) == 1
-        assert len(make_factor["f1"]) == 1
+    def test_entity_slots_as_length_of_factor(self, watt_factor):
+        assert len(watt_factor["f1"].predicate) == 1
+        assert len(watt_factor["f1"]) == 1
 
-    def test_entity_orders(self, make_factor):
-        assert make_factor["f7_swap_entities_4"].entity_orders == {(1, 4), (4, 1)}
+    def test_entity_orders(self, watt_factor):
+        assert watt_factor["f7_swap_entities_4"].entity_orders == {(1, 4), (4, 1)}
 
-    def test_predicate_with_entities(self, make_entity, make_factor):
+    def test_predicate_with_entities(self, make_entity, watt_factor):
         assert (
-            make_factor["f1"].predicate.content_with_entities((make_entity["e_motel"]))
+            watt_factor["f1"].predicate.content_with_entities((make_entity["e_motel"]))
             == "Hideaway Lodge was a motel"
         )
 
@@ -187,57 +203,57 @@ class TestFacts:
         with pytest.raises(ValueError):
             x = Fact(make_predicate["p1"], (0, 1, 2))
 
-    def test_reciprocal_with_wrong_number_of_entities(self, make_entity, make_factor):
+    def test_reciprocal_with_wrong_number_of_entities(self, make_entity, watt_factor):
         with pytest.raises(ValueError):
-            make_factor["f1"].predicate.content_with_entities(
+            watt_factor["f1"].predicate.content_with_entities(
                 (make_entity["e_motel"], make_entity["e_watt"])
             )
 
-    def test_false_predicate_with_entities(self, make_entity, make_factor):
-        assert make_factor["f7"].predicate_in_context(
+    def test_false_predicate_with_entities(self, make_entity, watt_factor):
+        assert watt_factor["f7"].predicate_in_context(
             (make_entity["e_trees"], make_entity["e_motel"])
         ) == str(
             "Fact: The distance between the stockpile of trees "
             + "and Hideaway Lodge was no more than 35 foot"
         )
 
-    def test_entity_and_human_in_predicate(self, make_entity, make_factor):
+    def test_entity_and_human_in_predicate(self, make_entity, watt_factor):
         assert (
-            make_factor["f2"].predicate.content_with_entities(
+            watt_factor["f2"].predicate.content_with_entities(
                 (make_entity["e_watt"], make_entity["e_motel"])
             )
             == "Wattenburg operated and lived at Hideaway Lodge"
         )
 
-    def test_fact_label_with_entities(self, make_entity, make_factor):
+    def test_fact_label_with_entities(self, make_entity, watt_factor):
         assert (
-            make_factor["f2"].predicate_in_context(
+            watt_factor["f2"].predicate_in_context(
                 (make_entity["e_watt"], make_entity["e_motel"])
             )
             == "Fact: Wattenburg operated and lived at Hideaway Lodge"
         )
 
-    def test_factor_equality(self, make_factor):
-        assert make_factor["f1"] == make_factor["f1b"]
-        assert make_factor["f1"] == make_factor["f1c"]
-        assert make_factor["f9_swap_entities_4"] == make_factor["f9"]
+    def test_factor_equality(self, watt_factor):
+        assert watt_factor["f1"] == watt_factor["f1b"]
+        assert watt_factor["f1"] == watt_factor["f1c"]
+        assert watt_factor["f9_swap_entities_4"] == watt_factor["f9"]
 
-    def test_generic_factors_equal(self, make_factor):
-        assert make_factor["f2_generic"] == make_factor["f2_false_generic"]
-        assert make_factor["f2_generic"] == make_factor["f3_generic"]
+    def test_generic_factors_equal(self, watt_factor):
+        assert watt_factor["f2_generic"] == watt_factor["f2_false_generic"]
+        assert watt_factor["f2_generic"] == watt_factor["f3_generic"]
 
-    def test_generic_and_specific_factors_unequal(self, make_factor):
-        assert make_factor["f2"] != make_factor["f2_generic"]
+    def test_generic_and_specific_factors_unequal(self, watt_factor):
+        assert watt_factor["f2"] != watt_factor["f2_generic"]
 
-    def test_specific_factor_implies_generic(self, make_factor):
-        assert make_factor["f2"] > make_factor["f2_generic"]
-        assert make_factor["f2"] > make_factor["f3_generic"]
+    def test_specific_factor_implies_generic(self, watt_factor):
+        assert watt_factor["f2"] > watt_factor["f2_generic"]
+        assert watt_factor["f2"] > watt_factor["f3_generic"]
 
-    def test_specific_fact_does_not_imply_generic_entity(self, make_entity, make_factor):
-        assert not make_factor["f2"] > make_entity["e_motel"]
+    def test_specific_fact_does_not_imply_generic_entity(self, make_entity, watt_factor):
+        assert not watt_factor["f2"] > make_entity["e_motel"]
 
-    def test_factor_reciprocal_unequal(self, make_factor):
-        assert make_factor["f2"] != make_factor["f2_reciprocal"]
+    def test_factor_reciprocal_unequal(self, watt_factor):
+        assert watt_factor["f2"] != watt_factor["f2_reciprocal"]
 
     @pytest.mark.xfail
     def test_unequal_due_to_repeating_entity(self, make_factor):
@@ -247,49 +263,49 @@ class TestFacts:
         f = make_factor
         assert f["f_three_entities"] != f["f_repeating_entity"]
 
-    def test_factor_unequal_predicate_truth(self, make_factor):
-        assert make_factor["f7"] != make_factor["f7_true"]
-        assert make_factor["f7"].contradicts(make_factor["f7_true"])
+    def test_factor_unequal_predicate_truth(self, watt_factor):
+        assert watt_factor["f7"] != watt_factor["f7_true"]
+        assert watt_factor["f7"].contradicts(watt_factor["f7_true"])
 
-    def test_factor_does_not_contradict_predicate(self, make_predicate, make_factor):
+    def test_factor_does_not_contradict_predicate(self, make_predicate, watt_factor):
         with pytest.raises(TypeError):
-            a = make_factor["f7"].contradicts(make_predicate["p7_true"])
+            a = watt_factor["f7"].contradicts(make_predicate["p7_true"])
 
-    def test_factor_contradiction_absent_predicate(self, make_factor):
-        assert make_factor["f3"].contradicts(make_factor["f3_absent"])
-        assert make_factor["f3_absent"].contradicts(make_factor["f3"])
+    def test_factor_contradiction_absent_predicate(self, watt_factor):
+        assert watt_factor["f3"].contradicts(watt_factor["f3_absent"])
+        assert watt_factor["f3_absent"].contradicts(watt_factor["f3"])
 
-    def test_factor_does_not_imply_predicate(self, make_predicate, make_factor):
+    def test_factor_does_not_imply_predicate(self, make_predicate, watt_factor):
         with pytest.raises(TypeError):
-            assert not make_factor["f8_meters"] > make_predicate["p8"]
+            assert not watt_factor["f8_meters"] > make_predicate["p8"]
 
-    def test_factor_implies_because_of_quantity(self, make_factor):
-        assert make_factor["f8_meters"] > make_factor["f8"]
-        assert make_factor["f8_higher_int"] > make_factor["f8_float"]
-        assert make_factor["f8_int"] < make_factor["f8_higher_int"]
+    def test_factor_implies_because_of_quantity(self, watt_factor):
+        assert watt_factor["f8_meters"] > watt_factor["f8"]
+        assert watt_factor["f8_higher_int"] > watt_factor["f8_float"]
+        assert watt_factor["f8_int"] < watt_factor["f8_higher_int"]
 
-    def test_factor_implies_no_truth_value(self, make_factor):
-        assert make_factor["f2"] > make_factor["f2_no_truth"]
-        assert not make_factor["f2_no_truth"] > make_factor["f2"]
+    def test_factor_implies_no_truth_value(self, watt_factor):
+        assert watt_factor["f2"] > watt_factor["f2_no_truth"]
+        assert not watt_factor["f2_no_truth"] > watt_factor["f2"]
 
-    def test_factor_implies_because_of_exact_quantity(self, make_factor):
-        assert make_factor["f8_exact"] > make_factor["f7"]
-        assert make_factor["f8_exact"] >= make_factor["f8"]
+    def test_factor_implies_because_of_exact_quantity(self, watt_factor):
+        assert watt_factor["f8_exact"] > watt_factor["f7"]
+        assert watt_factor["f8_exact"] >= watt_factor["f8"]
 
     def test_absent_factor_implies_absent_factor_with_greater_quantity(
-        self, make_factor
+        self, watt_factor
     ):
-        assert make_factor["f9_absent"] > make_factor["f9_absent_miles"]
+        assert watt_factor["f9_absent"] > watt_factor["f9_absent_miles"]
 
-    def test_factor_no_contradiction_no_truth_value(self, make_factor):
-        assert not make_factor["f2"].contradicts(make_factor["f2_no_truth"])
-        assert not make_factor["f2_no_truth"].contradicts(make_factor["f2_false"])
+    def test_factor_no_contradiction_no_truth_value(self, watt_factor):
+        assert not watt_factor["f2"].contradicts(watt_factor["f2_no_truth"])
+        assert not watt_factor["f2_no_truth"].contradicts(watt_factor["f2_false"])
 
-    def test_absent_factor_contradicts_broader_quantity_statement(self, make_factor):
-        assert make_factor["f8_absent"].contradicts(make_factor["f8_meters"])
-        assert make_factor["f8_meters"].contradicts(make_factor["f8_absent"])
-        assert make_factor["f9_absent_miles"].contradicts(make_factor["f9"])
-        assert make_factor["f9"].contradicts(make_factor["f9_absent_miles"])
+    def test_absent_factor_contradicts_broader_quantity_statement(self, watt_factor):
+        assert watt_factor["f8_absent"].contradicts(watt_factor["f8_meters"])
+        assert watt_factor["f8_meters"].contradicts(watt_factor["f8_absent"])
+        assert watt_factor["f9_absent_miles"].contradicts(watt_factor["f9"])
+        assert watt_factor["f9"].contradicts(watt_factor["f9_absent_miles"])
 
     def test_copies_of_identical_factor(self, make_factor):
         """
@@ -331,21 +347,22 @@ class TestFacts:
             (None, None, None, 3, None),
         )
 
-    def test_check_entity_consistency_type_error(self, make_factor, make_holding):
-        f = make_factor
+    def test_check_entity_consistency_type_error(self, make_factor, watt_factor, make_holding):
+        m = make_factor
+        f = watt_factor
         with pytest.raises(TypeError):
             check_entity_consistency(
-                f["f_irrelevant_3"], make_holding["h2"], (None, None, None, None, 0)
+                m["f_irrelevant_3"], make_holding["h2"], (None, None, None, None, 0)
             )
 
-    def test_consistent_entity_combinations(self, make_factor):
+    def test_consistent_entity_combinations(self, watt_factor):
         """
         Finds that for factor f["f7"], it would be consistent with the
         other group of factors for f["f7"]'s two slots to be assigned
         (0, 1) or (1, 0).
         """
 
-        f = make_factor
+        f = watt_factor
         assert f["f7"].consistent_entity_combinations(
             factors_from_other_procedure=[
                 f["f4"],
@@ -358,23 +375,23 @@ class TestFacts:
             matches=(0, 1, None, None, None),
         ) == [{0: 0, 1: 1}, {0: 1, 1: 0}]
 
-    def test_standard_of_proof_comparison(self, make_factor):
+    def test_standard_of_proof_comparison(self, watt_factor):
 
-        f = make_factor
+        f = watt_factor
         assert f["f2_clear_and_convincing"] >= f["f2_preponderance_of_evidence"]
         assert f["f2_beyond_reasonable_doubt"] >= f["f2_clear_and_convincing"]
 
-    def test_standard_of_proof_inequality(self, make_factor):
+    def test_standard_of_proof_inequality(self, watt_factor):
 
-        f = make_factor
+        f = watt_factor
         assert f["f2_clear_and_convincing"] != f["f2_preponderance_of_evidence"]
         assert f["f2_clear_and_convincing"] != f["f2"]
 
     def test_no_implication_between_factors_with_and_without_standards(
-        self, make_factor
+        self, watt_factor
     ):
 
-        f = make_factor
+        f = watt_factor
         assert not f["f2_clear_and_convincing"] > f["f2"]
         assert not f["f2"] > f["f2_preponderance_of_evidence"]
 
@@ -382,14 +399,14 @@ class TestFacts:
         with pytest.raises(ValueError):
             f = Fact(make_predicate["p2"], standard_of_proof="probably so")
 
-    def test_standard_of_proof_in_str(self, make_factor):
-        factor = make_factor["f2_preponderance_of_evidence"]
+    def test_standard_of_proof_in_str(self, watt_factor):
+        factor = watt_factor["f2_preponderance_of_evidence"]
         assert factor.standard_of_proof in str(factor)
 
 
 class TestEvidence:
-    def test_make_evidence_object(self, make_factor):
-        e = Evidence(form="testimony", to_effect=make_factor["f2"])
+    def test_make_evidence_object(self, watt_factor):
+        e = Evidence(form="testimony", to_effect=watt_factor["f2"])
         assert not e.absent
 
     def test_default_len_based_on_unique_entity_slots(
@@ -603,7 +620,7 @@ class TestProcedures:
     def test_entities_of_inputs_for_identical_procedure(
         self, make_factor, make_procedure
     ):
-        f = make_factor
+        f = watt_factor
         c1 = make_procedure["c1"]
         c1_again = make_procedure["c1_again"]
         assert f["f1"] in c1.inputs
@@ -614,23 +631,23 @@ class TestProcedures:
         assert f["f2"].entity_context == (1, 0)
 
     def test_entities_of_implied_inputs_for_implied_procedure(
-        self, make_factor, make_procedure
+        self, watt_factor, make_procedure
     ):
-        f = make_factor
+        f = watt_factor
         c1_easy = make_procedure["c1_easy"]
         c1_order = make_procedure["c1_entity_order"]
         assert any(factor == f["f2"] for factor in c1_easy.inputs)
         assert all(factor != f["f1"] for factor in c1_easy.inputs)
 
     def test_procedure_implication_with_exact_quantity(
-        self, make_factor, make_procedure
+        self, watt_factor, make_procedure
     ):
         """This is meant to show that the function finds the "distance is
         exactly 25" factor in c2_exact, and recognizes that factor can imply
         the "distance is more than 20" factor in c2 if they have the same entities.
         """
 
-        f = make_factor
+        f = watt_factor
         c2 = make_procedure["c2"]
         c2_exact_quantity = make_procedure["c2_exact_quantity"]
 

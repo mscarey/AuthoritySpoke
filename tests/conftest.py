@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, Tuple
 
 import pytest
 
@@ -154,13 +154,17 @@ def make_predicate() -> Dict[str, Predicate]:
         "p_three_entities": Predicate("{} threw {} to {}"),
     }
 
+@pytest.fixture(scope="class")
+def watt_mentioned(make_entity) -> Tuple[Entity, ...]:
+    e = make_entity
+    return (e["e_motel"], e["e_watt"], e["e_trees"], e["e_tree_search"], e["e_motel_specific"])
 
 @pytest.fixture(scope="class")
-def watt_factor(make_predicate, make_entity) -> Dict[str, Factor]:
+def watt_factor(make_predicate, make_entity, watt_mentioned) -> Dict[str, Factor]:
     p = make_predicate
     e = make_entity
 
-    c = [e["e_motel"], e["e_watt"], e["e_trees"], e["e_tree_search"]]
+    c = watt_mentioned
 
     return {
         "f1": Fact(p["p1"], case_factors=c),
@@ -240,7 +244,7 @@ def make_factor(make_predicate, make_entity) -> Dict[str, Factor]:
     p = make_predicate
     e = make_entity
 
-    c = [e["e_alice"], e["e_bob"], e["e_craig"], e["e_dan"], e["e_circus"]]
+    c = (e["e_alice"], e["e_bob"], e["e_craig"], e["e_dan"], e["e_circus"])
 
     return {
         "f_irrelevant_0": Fact(p["p_irrelevant_0"], (2,), case_factors=c),
@@ -261,9 +265,10 @@ def make_factor(make_predicate, make_entity) -> Dict[str, Factor]:
 
 
 @pytest.fixture(scope="class")
-def make_evidence(make_predicate, make_factor) -> Dict[str, Evidence]:
+def make_evidence(make_predicate, make_factor, watt_factor) -> Dict[str, Evidence]:
     p = make_predicate
     f = make_factor
+    w = watt_factor
     return {
         "e_shooting": Evidence(
             form="testimony",
@@ -312,7 +317,7 @@ def make_evidence(make_predicate, make_factor) -> Dict[str, Evidence]:
             stated_by=1,
         ),
         "e_reciprocal": Evidence(
-            form="testimony", to_effect=f["f_no_crime"], statement=f["f7"], stated_by=2
+            form="testimony", to_effect=f["f_no_crime"], statement=w["f7"], stated_by=2
         ),
         "e_crime": Evidence(to_effect=f["f_crime"], derived_from=2),
         "e_crime_absent": Evidence(to_effect=f["f_crime"], derived_from=2, absent=True),
@@ -451,11 +456,11 @@ def make_procedure(make_evidence, make_factor, watt_factor) -> Dict[str, Procedu
             inputs=(f["f4"], f["f5"], f["f6"], f["f7"], f["f9"]),
             despite=(
                 f["f8"],
-                f["f_irrelevant_0"],
-                f["f_irrelevant_1"],
-                f["f_irrelevant_2"],
-                f["f_irrelevant_3"],
-                f["f_irrelevant_3_new_context"],
+                m["f_irrelevant_0"],
+                m["f_irrelevant_1"],
+                m["f_irrelevant_2"],
+                m["f_irrelevant_3"],
+                m["f_irrelevant_3_new_context"],
             ),
         ),
         "c2_reciprocal_swap": Procedure(

@@ -377,14 +377,16 @@ class Predicate:
 
         if isinstance(entities, Factor):
             entities = (entities,)
-        if all(isinstance(item, int) for item in entities):
-            entities = [f"<{item}>" for item in entities]
         if len(entities) != len(self):
             raise ValueError(
                 f"Exactly {len(self)} entities needed to complete "
                 + f'"{self.content}", but {len(entities)} were given.'
             )
-        return str(self).format(*(str(e) for e in entities))
+        if any(isinstance(item, int) for item in entities):
+            names = [f"<{item}>" for item in entities]
+        else:
+            names = [f"<{str(item)}>" for item in entities]
+        return str(self).format(*(str(e) for e in names))
 
     def negated(self) -> "Predicate":
         """
@@ -581,16 +583,22 @@ class Fact(Factor):
         self.generic = generic
         self.entity_context = entity_context
 
-        if isinstance(self.entity_context, Factor):
+        if isinstance(self.entity_context, Factor) or isinstance(
+            self.entity_context, int
+        ):
             self.entity_context = (self.entity_context,)
 
         if any(isinstance(x, int) for x in self.entity_context):
             if case_factors:
-                self.entity_context = tuple(case_factors[i] for i in self.entity_context)
+                self.entity_context = tuple(
+                    case_factors[i] for i in self.entity_context
+                )
             else:
-                raise ValueError("Items in the entity_context parameter should " +
-                "be Factor or a  subclass of Factor, or should be integers " +
-                "referring to a non-empty case_factors parameter.")
+                raise ValueError(
+                    "Items in the entity_context parameter should "
+                    + "be Factor or a subclass of Factor, or should be integers "
+                    + "referring to a non-empty case_factors parameter."
+                )
 
         if predicate and len(self.entity_context) < len(predicate):
             if len(case_factors) < len(predicate):
