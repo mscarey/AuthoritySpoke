@@ -1,18 +1,14 @@
-import datetime
 import itertools
-import json
 import operator
-import pathlib
 import re
 
 from typing import Callable, Dict, FrozenSet, List, Set, Tuple
 from typing import Iterable, Iterator
 from typing import Optional, Sequence, Union
-from dataclasses import dataclass
 
 from pint import UnitRegistry
-from bs4 import BeautifulSoup
-from enactments import Code, Enactment
+
+from dataclasses import dataclass
 
 ureg = UnitRegistry()
 Q_ = ureg.Quantity
@@ -35,8 +31,7 @@ class Factor:
     another. Common types of factors include Facts, Evidence, Allegations,
     Motions, and Arguments."""
 
-    def __init__(self, name: Optional[str] = None, generic: bool = True):
-        self.name = name or f"a {self.__class__.__name__.lower()}"
+    def __init__(self, generic: bool = True):
         self.generic = generic
 
     @classmethod
@@ -77,6 +72,7 @@ class Factor:
                 *[v for v in self.__dict__.values() if not isinstance(v, set)],
             )
         )
+
 
 @dataclass()
 class Predicate:
@@ -473,12 +469,13 @@ def check_entity_consistency(
 
     return answers
 
+
 def find_matches(
-        for_matching: FrozenSet[Factor],
-        need_matches: Set[Factor],
-        matches: Tuple[Optional[int], ...],
-        comparison: Callable[[Factor, Factor], bool],
-    ) -> Iterator[Tuple[Optional[int], ...]]:
+    for_matching: FrozenSet[Factor],
+    need_matches: Set[Factor],
+    matches: Tuple[Optional[int], ...],
+    comparison: Callable[[Factor, Factor], bool],
+) -> Iterator[Tuple[Optional[int], ...]]:
     """
     Generator that recursively searches for a tuple of entity
     assignments that can cause all of 'need_matches' to satisfy
@@ -561,40 +558,46 @@ STANDARDS_OF_PROOF = {
 }
 
 
-@dataclass()
 class Fact(Factor):
     """An assertion accepted as factual by a court, often through factfinding by
     a judge or jury."""
 
-    # TODO: remove dataclass decorator, make this invoke Factor's init method,
-    # add a name parameter, change entity_context to be a tuple of Factors
+    # TODO: rename entity_context
 
-    predicate: Optional[Predicate] = None
-    entity_context: Union[int, Tuple[int, ...]] = ()
-    absent: bool = False
-    standard_of_proof: Optional[str] = None
-    generic: bool = False
+    def __init__(
+        self,
+        predicate: Optional[Predicate] = None,
+        entity_context: Union[Factor, Iterable[Factor]] = (),
+        standard_of_proof: Optional[str] = None,
+        absent: bool = False,
+        generic: bool = False,
+        case_factors: Iterable[Factor] = (),
+    ):
 
-    def __post_init__(self):
-        if not self.entity_context:
-            object.__setattr__(
-                self, "entity_context", tuple(range(len(self.predicate)))
-            )
-        if isinstance(self.entity_context, int):
-            object.__setattr__(self, "entity_context", (self.entity_context,))
-        object.__setattr__(self, "entity_orders", self.get_entity_orders())
+        Factor.__init__(self, generic)
+        self.predicate = predicate
+        self.standard_of_proof = standard_of_proof
+        self.absent = absent
+        self.generic = generic
+        self.entity_context = entity_context
 
-        if len(self) != len(self.predicate):
-            raise ValueError(
-                "".join(
-                    [
-                        "entity_context must have one item for each entity slot ",
-                        "in self.predicate, but the number of slots ",
-                        f"for {str(self.predicate)} == {len(self.entity_context)} ",
-                        f"and len(self.predicate) == {len(self.predicate)}",
-                    ]
+        if isinstance(self.entity_context, Factor):
+            self.entity_context = (self.entity_context,)
+
+        if any(isinstance(x, int) for x in self.entity_context):
+            self.entity_context = tuple(case_factors[i] for i in self.entity_context)
+
+        if predicate and len(self.entity_context) < len(predicate):
+            if len(case_factors) < len(predicate):
+                raise ValueError(
+                    f"Must supply {len(self.predicate)}"
+                    + "factors to fill the slots in self.predicate, either"
+                    + "as entity_context or case_factors."
                 )
-            )
+            self.entity_context = case_factors[: len(predicate)]
+
+        self.entity_orders = self.get_entity_orders()
+
         if self.standard_of_proof and self.standard_of_proof not in STANDARDS_OF_PROOF:
             raise ValueError(
                 f"standard of proof must be one of {STANDARDS_OF_PROOF.keys()} or None."
@@ -773,10 +776,12 @@ class Fact(Factor):
 
         """
 
-        return set(
-            tuple([x for i, x in sorted(zip(order, self.entity_context))])
-            for order in self.predicate.entity_orders
-        )
+        if self.predicate:
+            return set(
+                tuple([x for i, x in sorted(zip(order, self.entity_context))])
+                for order in self.predicate.entity_orders
+            )
+        return set()
 
     @staticmethod
     def from_dict(factor: Optional[dict]) -> Optional["Fact"]:

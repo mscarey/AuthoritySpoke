@@ -18,7 +18,8 @@ class Entity(Factor):
     def __init__(
         self, name: Optional[str] = None, generic: bool = True, plural: bool = False
     ):
-        Factor.__init__(self, name, generic)
+        Factor.__init__(self, generic)
+        self.name = name
         self.plural = plural
 
     def __str__(self):
