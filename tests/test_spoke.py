@@ -18,11 +18,14 @@ from spoke import find_matches, evolve_match_list
 
 
 class TestEntities:
-
     def test_equality_generic_entities(self, make_entity):
         e = make_entity
         assert e["e_motel"] == e["e_trees"]
         assert e["e_motel"] is not e["e_trees"]
+
+    def test_conversion_to_generic(self, make_entity):
+        e = make_entity
+        assert e["e_motel_specific"].make_generic() == e["e_motel"]
 
     def test_implication_generic_entities(self, make_entity):
         e = make_entity
@@ -33,6 +36,7 @@ class TestEntities:
         e = make_entity
         assert e["e_motel_specific"] > e["e_motel"]
         assert not e["e_motel_specific"] < e["e_motel"]
+
 
 class TestPredicates:
     def test_predicate_with_wrong_number_of_entities(self):
@@ -139,15 +143,18 @@ class TestPredicates:
         assert make_predicate["p3"].negated() == make_predicate["p3_false"]
 
 
-
 class TestFacts:
-    def test_default_entity_context_for_fact(self, make_entity, make_predicate, watt_mentioned):
+    def test_default_entity_context_for_fact(
+        self, make_entity, make_predicate, watt_mentioned
+    ):
         e = make_entity
 
         f2 = Fact(make_predicate["p1"], case_factors=watt_mentioned)
         assert f2.entity_context == (e["e_motel"],)
 
-    def test_entity_context_from_case_factor_indices(self, make_entity, make_predicate, watt_mentioned):
+    def test_entity_context_from_case_factor_indices(
+        self, make_entity, make_predicate, watt_mentioned
+    ):
         """
         If you pass in integers instead of Factor objects to fill the blanks
         in the Predicate (which was the only way to do things in the first
@@ -158,8 +165,19 @@ class TestFacts:
 
         e = make_entity
 
-        f2 = Fact(make_predicate["p2"], entity_context=(1, 0), case_factors=watt_mentioned)
+        f2 = Fact(
+            make_predicate["p2"], entity_context=(1, 0), case_factors=watt_mentioned
+        )
         assert f2.entity_context == (e["e_watt"], e["e_motel"])
+
+    def test_invalid_index_for_case_factors_in_init(self, make_predicate, make_entity):
+
+        with pytest.raises(ValueError):
+            new = Fact(
+                make_predicate["p1"],
+                entity_context=2,
+                case_factors=make_entity["e_watt"],
+            )
 
     def test_convert_int_entity_context_to_tuple(self, make_predicate, watt_mentioned):
         f = Fact(make_predicate["p_irrelevant_1"], 3, case_factors=watt_mentioned)
@@ -167,24 +185,32 @@ class TestFacts:
 
     def test_string_representation_of_factor(self, watt_factor):
         assert str(watt_factor["f1"]) == "Fact: <Hideaway Lodge> was a motel"
-        assert str(watt_factor["f3_absent"]) == "Absent Fact: <Hideaway Lodge> was <Wattenburg>’s abode"
+        assert (
+            str(watt_factor["f3_absent"])
+            == "Absent Fact: <Hideaway Lodge> was <Wattenburg>’s abode"
+        )
 
-    def test_abstract_to_concrete(self, watt_factor):
-        different = watt_factor["f2"].make_concrete([
-            Human("He-Man"),
-            Entity("Castle Grayskull")])
+    def test_string_representation_with_concrete_entities(self, watt_factor):
+        """
+        "Hideaway Lodge" is still a string representation of an Entity
+        object, but it's not in angle brackets because it can't be
+        replaced by another Entity object without changing the meaning
+        of the Fact.
+        """
+        assert str(watt_factor["f1_specific"]) == "Fact: Hideaway Lodge was a motel"
 
-        assert "He-Man operated" in str(different)
+    def test_new_concrete_context(self, watt_factor):
+        different = watt_factor["f2"].new_context(
+            [Human("He-Man"), Entity("Castle Grayskull")]
+        )
+        assert "<He-Man> operated" in str(different)
 
     def test_concrete_to_abstract(self, make_entity, make_predicate):
-        motel = make_entity["e_motel"]
+        motel = make_entity["e_motel_specific"]
         d = make_entity["e_watt"]
-        fact = Fact(
-            predicate=make_predicate["p2"],
-            predicate_context=(d, motel)
-        )
-        assert "Wattenburg operated and lived" in str(fact)
-        assert "{} operated and lived" in str(fact.make_generic())
+        fact = Fact(predicate=make_predicate["p2"], entity_context=(d, motel))
+        assert "<Wattenburg> operated and lived at Hideaway Lodge" in str(fact)
+        assert "<Wattenburg> operated and lived at <Hideaway Lodge>" in str(fact.make_generic())
 
     def test_entity_slots_as_length_of_factor(self, watt_factor):
         assert len(watt_factor["f1"].predicate) == 1
@@ -249,7 +275,9 @@ class TestFacts:
         assert watt_factor["f2"] > watt_factor["f2_generic"]
         assert watt_factor["f2"] > watt_factor["f3_generic"]
 
-    def test_specific_fact_does_not_imply_generic_entity(self, make_entity, watt_factor):
+    def test_specific_fact_does_not_imply_generic_entity(
+        self, make_entity, watt_factor
+    ):
         assert not watt_factor["f2"] > make_entity["e_motel"]
 
     def test_factor_reciprocal_unequal(self, watt_factor):
@@ -347,7 +375,9 @@ class TestFacts:
             (None, None, None, 3, None),
         )
 
-    def test_check_entity_consistency_type_error(self, make_factor, watt_factor, make_holding):
+    def test_check_entity_consistency_type_error(
+        self, make_factor, watt_factor, make_holding
+    ):
         m = make_factor
         f = watt_factor
         with pytest.raises(TypeError):
@@ -1187,14 +1217,20 @@ class TestRules:
         assert make_holding["h3"] > make_holding["h3_fewer_inputs"]
 
     def test_contradiction_with_evidence(self, make_holding):
-        assert make_holding["h3_ALL_undecided"].contradicts(make_holding["h3_fewer_inputs_ALL"])
+        assert make_holding["h3_ALL_undecided"].contradicts(
+            make_holding["h3_fewer_inputs_ALL"]
+        )
 
     def test_no_contradiction_holding_with_evidence(self, make_holding):
-        assert not make_holding["h3_fewer_inputs_ALL_undecided"].contradicts(make_holding["h3_ALL"])
+        assert not make_holding["h3_fewer_inputs_ALL_undecided"].contradicts(
+            make_holding["h3_ALL"]
+        )
 
     def test_holding_len(self, make_holding):
         assert len(make_holding["h1"]) == 2
         assert len(make_holding["h3"]) == 4
+
+
 class TestCodes:
     def test_making_code(self, make_code):
         const = make_code["const"]

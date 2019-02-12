@@ -28,6 +28,16 @@ class Entity(Factor):
     def __str__(self):
         return self.name
 
+    def make_generic(self):
+        if not self.generic:
+            return self.__class__(
+                name=self.name,
+                generic=True,
+                plural=self.plural
+            )
+        else:
+            return self
+
 
 class Human(Entity):
     """

@@ -169,6 +169,7 @@ def watt_factor(make_predicate, make_entity, watt_mentioned) -> Dict[str, Factor
     return {
         "f1": Fact(p["p1"], case_factors=c),
         "f1_entity_order": Fact(p["p1"], (1,), case_factors=c),
+        "f1_specific": Fact(p["p1"], (4,), case_factors=c),
         "f1b": Fact(p["p1"], case_factors=c),
         "f1c": Fact(p["p1_again"], case_factors=c),
         "f2": Fact(p["p2"], (1, 0), case_factors=c),

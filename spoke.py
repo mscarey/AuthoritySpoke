@@ -385,7 +385,7 @@ class Predicate:
         if any(isinstance(item, int) for item in entities):
             names = [f"<{item}>" for item in entities]
         else:
-            names = [f"<{str(item)}>" for item in entities]
+            names = [f"<{str(item)}>" if item.generic else str(item) for item in entities]
         return str(self).format(*(str(e) for e in names))
 
     def negated(self) -> "Predicate":
@@ -581,23 +581,32 @@ class Fact(Factor):
         self.standard_of_proof = standard_of_proof
         self.absent = absent
         self.generic = generic
-        self.entity_context = entity_context
 
-        if isinstance(self.entity_context, Factor) or isinstance(
-            self.entity_context, int
-        ):
-            self.entity_context = (self.entity_context,)
+        def wrap_with_tuple(item) -> Tuple[Union[int, Factor], ...]:
+            if isinstance(item, list):
+                return tuple(item)
+            if not isinstance(item, tuple):
+                return (item,)
+            return item
 
-        if any(isinstance(x, int) for x in self.entity_context):
-            if case_factors:
+        case_factors = wrap_with_tuple(case_factors)
+        self.entity_context = wrap_with_tuple(entity_context)
+
+        if any(not isinstance(s, Factor) for s in self.entity_context):
+            if any(not isinstance(s, int) for s in self.entity_context):
+                raise TypeError(
+                    "entity_context parameter must contain all integers "
+                    + "or all Factor objects."
+                )
+            if len(case_factors) >= max(self.entity_context):
                 self.entity_context = tuple(
                     case_factors[i] for i in self.entity_context
                 )
             else:
                 raise ValueError(
                     "Items in the entity_context parameter should "
-                    + "be Factor or a subclass of Factor, or should be integers "
-                    + "referring to a non-empty case_factors parameter."
+                    + "be Factor or a subclass of Factor, or should be integer "
+                    + "indices of Factor objects in the case_factors parameter."
                 )
 
         if predicate and len(self.entity_context) < len(predicate):
@@ -648,17 +657,21 @@ class Fact(Factor):
             ]
         )
 
-    def make_generic(self):
-        # TODO: change this to return a new form of the Fact, with any referenced
-        # Factors marked as generic replaced by blank versions of themselves
-        # (but still with the generic flag)
-        predicate = str(self.predicate)
-        standard = f" ({self.standard_of_proof})" if self.standard_of_proof else ""
-        return "".join(
-            [
-                f"{'Absent ' if self.absent else ''}{self.__class__.__name__}",
-                f"{standard}: {predicate}",
-            ]
+    def make_generic(self) -> 'Fact':
+        """
+        This changes generic to True and calls make_generic recursively
+        on all the Factors in entity_context. But it does preserve the
+        predicate attribute. For a Fact with no features specified, use:
+
+        Fact(generic=True)
+        """
+        new_context = tuple([f.make_generic() for f in self.entity_context])
+        return Fact(
+            predicate=self.predicate,
+            entity_context=new_context,
+            standard_of_proof=None,
+            absent=self.absent,
+            generic=True
         )
 
     def predicate_in_context(self, entities: Sequence[Factor]) -> str:
@@ -840,24 +853,23 @@ class Fact(Factor):
         slots = [entity_slots.index(e) for e in self.entity_context]
         return Fact(self.predicate, tuple(slots), self.absent, self.standard_of_proof)
 
-    def make_concrete(self, entities: Iterable[Factor]) -> "Fact":
+    def new_context(
+        self,
+        entity_context: Union[Iterable[int], Iterable[Factor]],
+        case_factors: Iterable[Factor] = (),
+    ) -> "Fact":
         """
-        Creates a new Fact object, replacing the numbered
-        entity slots with entities in the order they're mentioned
-        in the Prodicate. The integer indices in self.entity_context
-        will not be used in creating the new object.
+        Creates a new Fact object, replacing the old entity_context
+        attribute with a new one.
         """
-        if any(not isinstance(s, Factor) for s in entities):
-            raise TypeError(
-                "entities must be an interable containing only Factor objects."
-            )
-        if len(entities) != len(self.entity_context):
+
+        if len(entity_context) != len(self.entity_context):
             raise ValueError(
                 f"The number of entities should be equal to the number of slots "
                 + f"in self.entity_context, which is {len(self.entity_context)}."
             )
         return Fact(
-            self.predicate, tuple(entities), self.absent, self.standard_of_proof
+            self.predicate, entity_context, self.absent, self.standard_of_proof, case_factors
         )
 
     # TODO: A function to determine if a factor implies another (transitively)
