@@ -265,10 +265,17 @@ class TestFacts:
             == "Fact: <Wattenburg> operated and lived at <Hideaway Lodge>"
         )
 
-    def test_factor_equality(self, watt_factor):
+    def test_equality_factor_from_same_predicate(self, watt_factor):
         assert watt_factor["f1"] == watt_factor["f1b"]
+
+    def test_equality_factor_from_equal_predicate(self, watt_factor):
         assert watt_factor["f1"] == watt_factor["f1c"]
-        assert watt_factor["f9_swap_entities_4"] == watt_factor["f9"]
+
+    def test_equality_because_factors_are_generic_entities(self, watt_factor):
+        assert watt_factor["f1"] == watt_factor["f1_entity_2"]
+
+    def test_unequal_because_a_factor_is_not_generic(self, watt_factor):
+        assert watt_factor["f9_swap_entities_4"] != watt_factor["f9"]
 
     def test_generic_factors_equal(self, watt_factor):
         assert watt_factor["f2_generic"] == watt_factor["f2_false_generic"]

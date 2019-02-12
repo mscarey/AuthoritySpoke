@@ -385,7 +385,9 @@ class Predicate:
         if any(isinstance(item, int) for item in entities):
             names = [f"<{item}>" for item in entities]
         else:
-            names = [f"<{str(item)}>" if item.generic else str(item) for item in entities]
+            names = [
+                f"<{str(item)}>" if item.generic else str(item) for item in entities
+            ]
         return str(self).format(*(str(e) for e in names))
 
     def negated(self) -> "Predicate":
@@ -625,15 +627,6 @@ class Fact(Factor):
                 f"standard of proof must be one of {STANDARDS_OF_PROOF.keys()} or None."
             )
 
-    def __eq__(self, other) -> bool:
-        if not isinstance(other, Factor):
-            return False
-        return (
-            self.predicate == other.predicate
-            and self.absent == other.absent
-            and self.standard_of_proof == other.standard_of_proof
-        )
-
     def __hash__(self):
         """
         Even though this is duplicative, it needs to be here as long as the
@@ -647,6 +640,9 @@ class Fact(Factor):
             )
         )
 
+    def __repr__(self):
+        return f"{self.__class__.__name__}({self.__dict__})"
+
     def __str__(self):
         predicate = str(self.predicate.content_with_entities(self.entity_context))
         standard = f" ({self.standard_of_proof})" if self.standard_of_proof else ""
@@ -657,7 +653,23 @@ class Fact(Factor):
             ]
         )
 
-    def make_generic(self) -> 'Fact':
+    def __eq__(self, other: "Factor") -> bool:
+        if self.__class__ != other.__class__:
+            return False
+        if self.generic == other.generic == True:
+            return True
+        return (
+            self.predicate == other.predicate
+            and all(
+                row[0] == row[1]
+                for row in zip(self.entity_context, other.entity_context)
+            )
+            and self.standard_of_proof == other.standard_of_proof
+            and self.absent == other.absent
+            and self.generic == other.generic
+        )
+
+    def make_generic(self) -> "Fact":
         """
         This changes generic to True and calls make_generic recursively
         on all the Factors in entity_context. But it does preserve the
@@ -671,7 +683,7 @@ class Fact(Factor):
             entity_context=new_context,
             standard_of_proof=None,
             absent=self.absent,
-            generic=True
+            generic=True,
         )
 
     def predicate_in_context(self, entities: Sequence[Factor]) -> str:
@@ -869,7 +881,11 @@ class Fact(Factor):
                 + f"in self.entity_context, which is {len(self.entity_context)}."
             )
         return Fact(
-            self.predicate, entity_context, self.absent, self.standard_of_proof, case_factors
+            self.predicate,
+            entity_context,
+            self.absent,
+            self.standard_of_proof,
+            case_factors,
         )
 
     # TODO: A function to determine if a factor implies another (transitively)

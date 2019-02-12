@@ -30,11 +30,7 @@ class Entity(Factor):
 
     def make_generic(self):
         if not self.generic:
-            return self.__class__(
-                name=self.name,
-                generic=True,
-                plural=self.plural
-            )
+            return self.__class__(name=self.name, generic=True, plural=self.plural)
         else:
             return self
 
