@@ -646,11 +646,9 @@ class Fact(Factor):
     def __str__(self):
         predicate = str(self.predicate.content_with_entities(self.entity_context))
         standard = f" ({self.standard_of_proof})" if self.standard_of_proof else ""
-        return "".join(
-            [
-                f"{'Absent ' if self.absent else ''}{self.__class__.__name__}",
-                f"{standard}: {predicate}",
-            ]
+        return (
+            f"{'Absent ' if self.absent else ''}{self.__class__.__name__}"
+            + f"{standard}: {predicate}"
         )
 
     def __eq__(self, other: "Factor") -> bool:

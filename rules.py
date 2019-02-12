@@ -10,6 +10,7 @@ from dataclasses import dataclass
 from enactments import Enactment
 from spoke import Factor, evolve_match_list
 
+
 @dataclass()
 class Procedure:
     """A (potential) rule for courts to use in resolving litigation. Described in
@@ -61,7 +62,6 @@ class Procedure:
             # Also verifying that every factor in other is in self.
 
         return self.check_factor_equality(other) and other.check_factor_equality(self)
-
 
     def check_factor_equality(self, other: "Procedure") -> bool:
         """
@@ -192,11 +192,11 @@ class Procedure:
         return sorted(self.factors_all(), key=repr)
 
     def find_consistent_factors(
-            self,
-            for_matching: FrozenSet[Factor],
-            need_matches: FrozenSet[Factor],
-            matches: Tuple[Optional[int], ...],
-        ) -> Iterator[Tuple[Optional[int], ...]]:
+        self,
+        for_matching: FrozenSet[Factor],
+        need_matches: FrozenSet[Factor],
+        matches: Tuple[Optional[int], ...],
+    ) -> Iterator[Tuple[Optional[int], ...]]:
         """
         Recursively searches for a list of entity assignments that can
         cause all of 'other_factors' to not contradict any of the factors in
@@ -382,7 +382,6 @@ class Rule:
     def __len__(self):
         return 0
 
-
     @staticmethod
     def holdings_from_json(self, filename: str) -> Dict["Rule", Tuple[Factor, ...]]:
         """Creates a set of holdings from a JSON file in the input subdirectory,
@@ -508,16 +507,14 @@ class ProceduralRule(Rule):
             despite = "Despite the following legislation:\n" + "\n".join(
                 [str(e) for e in self.enactments_despite]
             )
-        text = "".join(
-            (
-                "Rule:\n",
-                f"{support or ''}",
-                f"{despite or ''}",
-                f"\nIt is {'' if self.decided else 'not decided whether it is '}",
-                f"{str(self.rule_valid)} that in {'ALL' if self.universal else 'SOME'} cases ",
-                f"where the inputs of the following procedure are present, the court ",
-                f"{'MUST' if self.mandatory else 'MAY'} accept the procedure's output(s):\n",
-            )
+        text = (
+            "Rule:\n"
+            + f"{support or ''}"
+            + f"{despite or ''}"
+            + f"\nIt is {'' if self.decided else 'not decided whether it is '}"
+            + f"{str(self.rule_valid)} that in {'ALL' if self.universal else 'SOME'} cases "
+            + f"where the inputs of the following procedure are present, the court "
+            + f"{'MUST' if self.mandatory else 'MAY'} accept the procedure's output(s):\n"
         )
         text += str(self.procedure)
         return text
@@ -698,7 +695,6 @@ class ProceduralRule(Rule):
 
         # if not self.decided and other.decided:
         return other.implies_if_decided(self)
-
 
 
 class Attribution:

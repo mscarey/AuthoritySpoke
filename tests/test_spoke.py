@@ -265,6 +265,16 @@ class TestFacts:
             == "Fact: <Wattenburg> operated and lived at <Hideaway Lodge>"
         )
 
+    def test_standard_of_proof_must_be_listed(self, make_predicate):
+        with pytest.raises(ValueError):
+            f = Fact(make_predicate["p2"], standard_of_proof="probably so")
+
+    def test_standard_of_proof_in_str(self, watt_factor):
+        factor = watt_factor["f2_preponderance_of_evidence"]
+        assert factor.standard_of_proof in str(factor)
+
+    # Equality
+
     def test_equality_factor_from_same_predicate(self, watt_factor):
         assert watt_factor["f1"] == watt_factor["f1b"]
 
@@ -284,17 +294,22 @@ class TestFacts:
     def test_generic_and_specific_factors_unequal(self, watt_factor):
         assert watt_factor["f2"] != watt_factor["f2_generic"]
 
-    def test_specific_factor_implies_generic(self, watt_factor):
-        assert watt_factor["f2"] > watt_factor["f2_generic"]
-        assert watt_factor["f2"] > watt_factor["f3_generic"]
-
-    def test_specific_fact_does_not_imply_generic_entity(
-        self, make_entity, watt_factor
-    ):
-        assert not watt_factor["f2"] > make_entity["e_motel"]
-
     def test_factor_reciprocal_unequal(self, watt_factor):
         assert watt_factor["f2"] != watt_factor["f2_reciprocal"]
+
+    def test_factor_unequal_predicate_truth(self, watt_factor):
+        assert watt_factor["f7"] != watt_factor["f7_true"]
+        assert watt_factor["f7"].contradicts(watt_factor["f7_true"])
+
+    def test_copies_of_identical_factor(self, make_factor):
+        """
+        Even if the two factors have different entity markers in self.entity_context,
+        I expect them to evaluate equal because the choice of entity markers is
+        arbitrary.
+        """
+        f = make_factor
+        assert f["f_irrelevant_3"] == f["f_irrelevant_3"]
+        assert f["f_irrelevant_3"] == f["f_irrelevant_3_new_context"]
 
     @pytest.mark.xfail
     def test_unequal_due_to_repeating_entity(self, make_factor):
@@ -304,17 +319,22 @@ class TestFacts:
         f = make_factor
         assert f["f_three_entities"] != f["f_repeating_entity"]
 
-    def test_factor_unequal_predicate_truth(self, watt_factor):
-        assert watt_factor["f7"] != watt_factor["f7_true"]
-        assert watt_factor["f7"].contradicts(watt_factor["f7_true"])
+    def test_standard_of_proof_inequality(self, watt_factor):
 
-    def test_factor_does_not_contradict_predicate(self, make_predicate, watt_factor):
-        with pytest.raises(TypeError):
-            a = watt_factor["f7"].contradicts(make_predicate["p7_true"])
+        f = watt_factor
+        assert f["f2_clear_and_convincing"] != f["f2_preponderance_of_evidence"]
+        assert f["f2_clear_and_convincing"] != f["f2"]
 
-    def test_factor_contradiction_absent_predicate(self, watt_factor):
-        assert watt_factor["f3"].contradicts(watt_factor["f3_absent"])
-        assert watt_factor["f3_absent"].contradicts(watt_factor["f3"])
+    # Implication
+
+    def test_specific_factor_implies_generic(self, watt_factor):
+        assert watt_factor["f2"] > watt_factor["f2_generic"]
+        assert watt_factor["f2"] > watt_factor["f3_generic"]
+
+    def test_specific_fact_does_not_imply_generic_entity(
+        self, make_entity, watt_factor
+    ):
+        assert not watt_factor["f2"] > make_entity["e_motel"]
 
     def test_factor_does_not_imply_predicate(self, make_predicate, watt_factor):
         with pytest.raises(TypeError):
@@ -338,6 +358,34 @@ class TestFacts:
     ):
         assert watt_factor["f9_absent"] > watt_factor["f9_absent_miles"]
 
+    def test_equal_factors_not_gt(self, make_factor):
+        f = make_factor
+        assert f["f_irrelevant_3"] >= f["f_irrelevant_3_new_context"]
+        assert f["f_irrelevant_3"] <= f["f_irrelevant_3_new_context"]
+        assert not f["f_irrelevant_3"] > f["f_irrelevant_3_new_context"]
+
+    def test_standard_of_proof_comparison(self, watt_factor):
+        f = watt_factor
+        assert f["f2_clear_and_convincing"] >= f["f2_preponderance_of_evidence"]
+        assert f["f2_beyond_reasonable_doubt"] >= f["f2_clear_and_convincing"]
+
+    def test_no_implication_between_factors_with_and_without_standards(
+        self, watt_factor
+    ):
+        f = watt_factor
+        assert not f["f2_clear_and_convincing"] > f["f2"]
+        assert not f["f2"] > f["f2_preponderance_of_evidence"]
+
+    # Contradiction
+
+    def test_factor_does_not_contradict_predicate(self, make_predicate, watt_factor):
+        with pytest.raises(TypeError):
+            a = watt_factor["f7"].contradicts(make_predicate["p7_true"])
+
+    def test_factor_contradiction_absent_predicate(self, watt_factor):
+        assert watt_factor["f3"].contradicts(watt_factor["f3_absent"])
+        assert watt_factor["f3_absent"].contradicts(watt_factor["f3"])
+
     def test_factor_no_contradiction_no_truth_value(self, watt_factor):
         assert not watt_factor["f2"].contradicts(watt_factor["f2_no_truth"])
         assert not watt_factor["f2_no_truth"].contradicts(watt_factor["f2_false"])
@@ -348,21 +396,7 @@ class TestFacts:
         assert watt_factor["f9_absent_miles"].contradicts(watt_factor["f9"])
         assert watt_factor["f9"].contradicts(watt_factor["f9_absent_miles"])
 
-    def test_copies_of_identical_factor(self, make_factor):
-        """
-        Even if the two factors have different entity markers in self.entity_context,
-        I expect them to evaluate equal because the choice of entity markers is
-        arbitrary.
-        """
-        f = make_factor
-        assert f["f_irrelevant_3"] == f["f_irrelevant_3"]
-        assert f["f_irrelevant_3"] == f["f_irrelevant_3_new_context"]
-
-    def test_equal_factors_not_gt(self, make_factor):
-        f = make_factor
-        assert f["f_irrelevant_3"] >= f["f_irrelevant_3_new_context"]
-        assert f["f_irrelevant_3"] <= f["f_irrelevant_3_new_context"]
-        assert not f["f_irrelevant_3"] > f["f_irrelevant_3_new_context"]
+    # Consistency with Entity/Factor assignments
 
     def test_check_entity_consistency_true(self, make_factor):
         f = make_factor
@@ -417,34 +451,6 @@ class TestFacts:
             ],
             matches=(0, 1, None, None, None),
         ) == [{0: 0, 1: 1}, {0: 1, 1: 0}]
-
-    def test_standard_of_proof_comparison(self, watt_factor):
-
-        f = watt_factor
-        assert f["f2_clear_and_convincing"] >= f["f2_preponderance_of_evidence"]
-        assert f["f2_beyond_reasonable_doubt"] >= f["f2_clear_and_convincing"]
-
-    def test_standard_of_proof_inequality(self, watt_factor):
-
-        f = watt_factor
-        assert f["f2_clear_and_convincing"] != f["f2_preponderance_of_evidence"]
-        assert f["f2_clear_and_convincing"] != f["f2"]
-
-    def test_no_implication_between_factors_with_and_without_standards(
-        self, watt_factor
-    ):
-
-        f = watt_factor
-        assert not f["f2_clear_and_convincing"] > f["f2"]
-        assert not f["f2"] > f["f2_preponderance_of_evidence"]
-
-    def test_standard_of_proof_must_be_listed(self, make_predicate):
-        with pytest.raises(ValueError):
-            f = Fact(make_predicate["p2"], standard_of_proof="probably so")
-
-    def test_standard_of_proof_in_str(self, watt_factor):
-        factor = watt_factor["f2_preponderance_of_evidence"]
-        assert factor.standard_of_proof in str(factor)
 
 
 class TestEvidence:
