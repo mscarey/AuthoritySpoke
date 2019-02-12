@@ -80,7 +80,8 @@ class TestPredicates:
         assert make_predicate["p9"].quantity_comparison() == "no more than 5 foot"
         assert make_predicate["p1"].quantity_comparison() is None
 
-    def test_entity_orders(self, make_predicate):
+    def test_entity_orders(self, make_entity, make_predicate):
+        e = make_entity
         assert make_predicate["p7"].entity_orders == {(0, 1), (1, 0)}
 
     def test_obverse_predicates_equal(self, make_predicate):
@@ -210,19 +211,24 @@ class TestFacts:
         d = make_entity["e_watt"]
         fact = Fact(predicate=make_predicate["p2"], entity_context=(d, motel))
         assert "<Wattenburg> operated and lived at Hideaway Lodge" in str(fact)
-        assert "<Wattenburg> operated and lived at <Hideaway Lodge>" in str(fact.make_generic())
+        assert "<Wattenburg> operated and lived at <Hideaway Lodge>" in str(
+            fact.make_generic()
+        )
 
     def test_entity_slots_as_length_of_factor(self, watt_factor):
         assert len(watt_factor["f1"].predicate) == 1
         assert len(watt_factor["f1"]) == 1
 
-    def test_entity_orders(self, watt_factor):
-        assert watt_factor["f7_swap_entities_4"].entity_orders == {(1, 4), (4, 1)}
+    def test_entity_orders(self, make_entity, watt_factor):
+        assert watt_factor["f7_swap_entities_4"].entity_orders == {
+            (make_entity["e_watt"], make_entity["e_motel_specific"]),
+            (make_entity["e_motel_specific"], make_entity["e_watt"]),
+        }
 
     def test_predicate_with_entities(self, make_entity, watt_factor):
         assert (
             watt_factor["f1"].predicate.content_with_entities((make_entity["e_motel"]))
-            == "Hideaway Lodge was a motel"
+            == "<Hideaway Lodge> was a motel"
         )
 
     def test_factor_entity_context_does_not_match_predicate(self, make_predicate):
@@ -239,8 +245,8 @@ class TestFacts:
         assert watt_factor["f7"].predicate_in_context(
             (make_entity["e_trees"], make_entity["e_motel"])
         ) == str(
-            "Fact: The distance between the stockpile of trees "
-            + "and Hideaway Lodge was no more than 35 foot"
+            "Fact: The distance between <the stockpile of trees> "
+            + "and <Hideaway Lodge> was no more than 35 foot"
         )
 
     def test_entity_and_human_in_predicate(self, make_entity, watt_factor):
@@ -248,7 +254,7 @@ class TestFacts:
             watt_factor["f2"].predicate.content_with_entities(
                 (make_entity["e_watt"], make_entity["e_motel"])
             )
-            == "Wattenburg operated and lived at Hideaway Lodge"
+            == "<Wattenburg> operated and lived at <Hideaway Lodge>"
         )
 
     def test_fact_label_with_entities(self, make_entity, watt_factor):
@@ -256,7 +262,7 @@ class TestFacts:
             watt_factor["f2"].predicate_in_context(
                 (make_entity["e_watt"], make_entity["e_motel"])
             )
-            == "Fact: Wattenburg operated and lived at Hideaway Lodge"
+            == "Fact: <Wattenburg> operated and lived at <Hideaway Lodge>"
         )
 
     def test_factor_equality(self, watt_factor):
