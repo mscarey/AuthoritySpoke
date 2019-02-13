@@ -26,6 +26,19 @@ class TestEntities:
         e = make_entity
         assert e["e_motel_specific"].make_generic() == e["e_motel"]
 
+    def test_same_object_after_make_generic(self, make_entity):
+        e = make_entity
+        motel = e["e_motel"]
+        motel_b = motel.make_generic()
+        assert motel is motel_b
+
+    def test_specific_to_generic_different_object(self, make_entity):
+        e = make_entity
+        motel = e["e_motel_specific"]
+        motel_b = motel.make_generic()
+        assert not motel is motel_b
+
+
     def test_implication_generic_entities(self, make_entity):
         e = make_entity
         assert e["e_motel_specific"] > e["e_trees"]
@@ -396,15 +409,21 @@ class TestFacts:
 
     # Consistency with Entity/Factor assignments
 
-    def test_check_entity_consistency_true(self, make_factor):
+    def test_check_entity_consistency_true(self, make_entity, make_factor):
         f = make_factor
+        e = make_entity
         assert check_entity_consistency(
             f["f_irrelevant_3"],
             f["f_irrelevant_3_new_context"],
-            (None, None, None, 2, None),
+            {e["e_dan"]: e["e_craig"]},
         )
         assert check_entity_consistency(
-            f["f_irrelevant_3"], f["f_irrelevant_3_new_context"], (1, 0, 3, 2, 4)
+            f["f_irrelevant_3"], f["f_irrelevant_3_new_context"], {
+                e["e_alice"]: e["e_bob"],
+                e["e_bob"]: e["e_alice"],
+                e["e_craig"]: e["e_dan"],
+                e["e_dan"]: e["e_craig"],
+                e["e_circus"]: e["e_circus"]}
         )
 
     def test_check_entity_consistency_false(self, make_factor):

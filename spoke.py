@@ -2,6 +2,8 @@ import itertools
 import operator
 import re
 
+from types import MappingProxyType
+
 from typing import Callable, Dict, FrozenSet, List, Set, Tuple
 from typing import Iterable, Iterator
 from typing import Optional, Sequence, Union
@@ -426,7 +428,7 @@ class Predicate:
 
 
 def check_entity_consistency(
-    left: Factor, right: Factor, matches: tuple
+    left: Factor, right: Factor, matches: Dict[Factor, Factor]
 ) -> Set[Tuple[Factor, ...]]:
     """
     Given entity assignments for self and other, determines whether
@@ -446,16 +448,17 @@ def check_entity_consistency(
     entity tuple, both, or neither, depending on which ones match with other.
     """
 
-    def all_matches(self_order: Tuple[int], other_order: Tuple[int]) -> bool:
+    def all_matches(self_order: Tuple[Factor], other_order: Tuple[Factor]) -> bool:
         """
         Determines whether the entity slots assigned so far are
         consistent for the Factors designated self and other,
         regardless of whether it's possible to make consistent
         assignments for the remaining slots.
         """
-        m = list(matches)
+        m = dict(matches_proxy)
         for i, slot in enumerate(other_order):
-            if m[slot] == self_order[i] or m[slot] is None:
+            self_factor = m.get(slot, None)
+            if self_factor == self_order[i] or self_factor is None:
                 m[slot] = self_order[i]
             else:
                 return False
@@ -463,6 +466,8 @@ def check_entity_consistency(
 
     if not isinstance(right, Factor):
         raise TypeError(f"other must be type Factor")
+
+    matches_proxy = MappingProxyType(matches)
 
     answers = set()
 

@@ -147,10 +147,10 @@ def make_predicate() -> Dict[str, Predicate]:
         "p_irrelevant_1": Predicate("{} was a bear"),
         "p_irrelevant_2": Predicate("{} was a circus"),
         "p_irrelevant_3": Predicate("{} performed at {}"),
-        "p_crime": Predicate("{} commited a crime"),
+        "p_crime": Predicate("{} committed a crime"),
         "p_shooting": Predicate("{} shot {}"),
         "p_no_shooting": Predicate("{} shot {}", truth=False),
-        "p_no_crime": Predicate("{} commited a crime", truth=False),
+        "p_no_crime": Predicate("{} committed a crime", truth=False),
         "p_three_entities": Predicate("{} threw {} to {}"),
     }
 
