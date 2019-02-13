@@ -11,7 +11,6 @@ from enactments import Enactment
 from spoke import Factor, evolve_match_list
 
 
-@dataclass()
 class Procedure:
     """A (potential) rule for courts to use in resolving litigation. Described in
     terms of inputs and outputs, and also potentially "even if" factors, which could
@@ -22,30 +21,28 @@ class Procedure:
     If a factor is relevant both as support for the output and as a potential
     undercutter, include it in both 'inputs' and 'despite'."""
 
-    outputs: Union[Factor, Iterable[Factor]]
-    inputs: Union[Factor, Iterable[Factor]] = frozenset([])
-    despite: Union[Factor, Iterable[Factor]] = frozenset([])
+    def __init__(
+        self,
+        outputs: Union[Factor, Iterable[Factor]],
+        inputs: Union[Factor, Iterable[Factor]] = (),
+        despite: Union[Factor, Iterable[Factor]] = (),
+    ):
+        def wrap_with_tuple(item) -> Tuple[Factor, ...]:
+            if isinstance(item, Iterable):
+                return tuple(item)
+            return (item,)
 
-    def __post_init__(self):
+        self.outputs = wrap_with_tuple(outputs)
+        self.inputs = wrap_with_tuple(inputs)
+        self.despite = wrap_with_tuple(despite)
 
-        if isinstance(self.outputs, Factor):
-            object.__setattr__(self, "outputs", frozenset((self.outputs,)))
-        if isinstance(self.inputs, Factor):
-            object.__setattr__(self, "inputs", frozenset((self.inputs,)))
-        if isinstance(self.despite, Factor):
-            object.__setattr__(self, "despite", frozenset((self.despite,)))
-        object.__setattr__(self, "outputs", frozenset(self.outputs))
-        object.__setattr__(self, "inputs", frozenset(self.inputs))
-        object.__setattr__(self, "despite", frozenset(self.despite))
-
-        for x in self.outputs | self.inputs | self.despite:
-            if not isinstance(x, Factor):
-                raise TypeError(
-                    (
-                        f"Input, Output, and Despite groups must contain only ",
-                        f"type Factor, but {x} was type {type(x)}",
+        for group in (self.outputs, self.inputs, self.despite):
+            for factor_obj in group:
+                if not isinstance(factor_obj, Factor):
+                    raise TypeError(
+                        "Input, Output, and Despite groups must contain only "
+                        + f"type Factor, but {factor_obj} was type {type(factor_obj)}"
                     )
-                )
 
     def __eq__(self, other: "Procedure") -> bool:
         """Determines if the two procedures have all the same factors

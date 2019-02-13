@@ -590,11 +590,9 @@ class Fact(Factor):
         self.generic = generic
 
         def wrap_with_tuple(item) -> Tuple[Union[int, Factor], ...]:
-            if isinstance(item, list):
+            if isinstance(item, Iterable):
                 return tuple(item)
-            if not isinstance(item, tuple):
-                return (item,)
-            return item
+            return (item,)
 
         case_factors = wrap_with_tuple(case_factors)
         self.entity_context = wrap_with_tuple(entity_context)
