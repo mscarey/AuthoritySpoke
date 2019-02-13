@@ -20,9 +20,9 @@ def make_entity() -> Dict[str, Entity]:
         "e_trees_specific": Entity("the stockpile of trees", generic=False),
         "e_tree_search": Event("officers' search of the stockpile of trees"),
         "e_alice": Human("Alice"),
-        "e_bob": Human("Alice"),
-        "e_craig": Human("Alice"),
-        "e_dan": Human("Alice"),
+        "e_bob": Human("Bob"),
+        "e_craig": Human("Craig"),
+        "e_dan": Human("Dan"),
         "e_circus": Entity("circus"),
     }
 

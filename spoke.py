@@ -427,7 +427,7 @@ class Predicate:
 
 def check_entity_consistency(
     left: Factor, right: Factor, matches: tuple
-) -> Set[Tuple[int, ...]]:
+) -> Set[Tuple[Factor, ...]]:
     """
     Given entity assignments for self and other, determines whether
     the factors have consistent entity assignments such that both can
@@ -461,7 +461,7 @@ def check_entity_consistency(
                 return False
         return True
 
-    if not isinstance(right, left.__class__):
+    if not isinstance(right, Factor):
         raise TypeError(f"other must be type Factor")
 
     answers = set()
