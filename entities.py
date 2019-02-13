@@ -23,7 +23,9 @@ class Entity(Factor):
         self.plural = plural
 
     def __repr__(self):
-        return f"{self.__class__.__name__}: {self.name}"
+        return (f"{self.__class__.__name__}({self.name}"+
+        f'{", generic=False" if not self.generic else ""}'+
+        f'{", plural=True" if self.plural else ""})')
 
     def __str__(self):
         return self.name

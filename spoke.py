@@ -435,9 +435,6 @@ def check_entity_consistency(
     the factors have consistent entity assignments such that both can
     be true at the same time.
 
-    All of self's entities must match other's, but other may have entities
-    that don't match self.
-
     :param other:
 
     :param matches: a tuple the same length as len(self). The indices represent
@@ -447,6 +444,7 @@ def check_entity_consistency(
     :returns: a set containing self's normal entity tuple, self's reciprocal
     entity tuple, both, or neither, depending on which ones match with other.
     """
+    # TODO: update docstring
 
     def all_matches(self_order: Tuple[Factor], other_order: Tuple[Factor]) -> bool:
         """
@@ -457,8 +455,8 @@ def check_entity_consistency(
         """
         m = dict(matches_proxy)
         for i, slot in enumerate(other_order):
-            self_factor = m.get(slot, None)
-            if self_factor == self_order[i] or self_factor is None:
+            other_factor = m.get(slot, None)
+            if other_factor is self_order[i] or other_factor is None:
                 m[slot] = self_order[i]
             else:
                 return False
@@ -473,7 +471,9 @@ def check_entity_consistency(
 
     for self_order in left.entity_orders:
         for other_order in right.entity_orders:
-            if all_matches(self_order, other_order):
+            if all_matches(self_order, other_order) and all_matches(
+                other_order, self_order
+            ):
                 answers.add(self_order)
 
     return answers

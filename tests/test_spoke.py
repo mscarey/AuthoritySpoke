@@ -426,17 +426,18 @@ class TestFacts:
                 e["e_circus"]: e["e_circus"]}
         )
 
-    def test_check_entity_consistency_false(self, make_factor):
-        f = make_factor
+    def test_check_entity_consistency_false(self, make_entity, make_factor):
         assert not check_entity_consistency(
-            f["f_irrelevant_3"],
-            f["f_irrelevant_3_new_context"],
-            (None, None, None, None, 0),
+            make_factor["f_irrelevant_3"],
+            make_factor["f_irrelevant_3_new_context"],
+            {make_entity["e_circus"]: make_entity["e_alice"]},
         )
+
+    def test_entity_consistency_identity_not_equality(self, make_entity, make_factor):
         assert not check_entity_consistency(
-            f["f_irrelevant_3"],
-            f["f_irrelevant_3_new_context"],
-            (None, None, None, 3, None),
+            make_factor["f_irrelevant_3"],
+            make_factor["f_irrelevant_3_new_context"],
+            {make_entity["e_dan"]: make_entity["e_dan"]},
         )
 
     def test_check_entity_consistency_type_error(self, make_factor, make_holding):
