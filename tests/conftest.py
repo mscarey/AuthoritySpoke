@@ -186,6 +186,7 @@ def watt_factor(make_predicate, make_entity, watt_mentioned) -> Dict[str, Factor
         "f2_beyond_reasonable_doubt": Fact(
             p["p2"], (1, 0), standard_of_proof="beyond reasonable doubt", case_factors=c
         ),
+        "f2_different_entity": Fact(p["p2"], (1, 2), case_factors=c),
         "f2_entity_order": Fact(p["p2"], case_factors=c),
         "f2_no_truth": Fact(p["p2_no_truth"], case_factors=c),
         "f2_false": Fact(p["p2_false"], case_factors=c),

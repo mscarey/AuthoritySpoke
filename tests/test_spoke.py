@@ -3,7 +3,6 @@ import datetime
 import json
 from typing import Dict
 
-
 from pint import UnitRegistry
 import pytest
 
@@ -41,11 +40,11 @@ class TestEntities:
 class TestPredicates:
     def test_predicate_with_wrong_number_of_entities(self):
         with pytest.raises(ValueError):
-            f = Predicate("{} was a motel", reciprocal=True)
+            _ = Predicate("{} was a motel", reciprocal=True)
 
     def test_predicate_with_wrong_comparison_symbol(self):
         with pytest.raises(ValueError):
-            h = (
+            _ = (
                 Predicate(
                     "the height of {} was {}",
                     comparison=">>",
@@ -61,7 +60,7 @@ class TestPredicates:
         assert make_predicate["p7_obverse"].comparison == "<="
 
     def test_quantity_type(self, make_predicate):
-        assert type(make_predicate["p7"].quantity) == ureg.Quantity
+        assert isinstance(make_predicate["p7"].quantity, ureg.Quantity)
 
     def test_quantity_string(self, make_predicate):
         assert str(make_predicate["p7"].quantity) == "35 foot"
@@ -80,8 +79,7 @@ class TestPredicates:
         assert make_predicate["p9"].quantity_comparison() == "no more than 5 foot"
         assert make_predicate["p1"].quantity_comparison() is None
 
-    def test_entity_orders(self, make_entity, make_predicate):
-        e = make_entity
+    def test_entity_orders(self, make_predicate):
         assert make_predicate["p7"].entity_orders == {(0, 1), (1, 0)}
 
     def test_obverse_predicates_equal(self, make_predicate):
@@ -149,7 +147,6 @@ class TestFacts:
         self, make_entity, make_predicate, watt_mentioned
     ):
         e = make_entity
-
         f2 = Fact(make_predicate["p1"], case_factors=watt_mentioned)
         assert f2.entity_context == (e["e_motel"],)
 
@@ -172,9 +169,8 @@ class TestFacts:
         assert f2.entity_context == (e["e_watt"], e["e_motel"])
 
     def test_invalid_index_for_case_factors_in_init(self, make_predicate, make_entity):
-
         with pytest.raises(ValueError):
-            new = Fact(
+            _ = Fact(
                 make_predicate["p1"],
                 entity_context=2,
                 case_factors=make_entity["e_watt"],
@@ -233,7 +229,7 @@ class TestFacts:
 
     def test_factor_entity_context_does_not_match_predicate(self, make_predicate):
         with pytest.raises(ValueError):
-            x = Fact(make_predicate["p1"], (0, 1, 2))
+            _ = Fact(make_predicate["p1"], (0, 1, 2))
 
     def test_reciprocal_with_wrong_number_of_entities(self, make_entity, watt_factor):
         with pytest.raises(ValueError):
@@ -267,7 +263,7 @@ class TestFacts:
 
     def test_standard_of_proof_must_be_listed(self, make_predicate):
         with pytest.raises(ValueError):
-            f = Fact(make_predicate["p2"], standard_of_proof="probably so")
+            _ = Fact(make_predicate["p2"], standard_of_proof="probably so")
 
     def test_standard_of_proof_in_str(self, watt_factor):
         factor = watt_factor["f2_preponderance_of_evidence"]
@@ -329,6 +325,8 @@ class TestFacts:
 
     def test_specific_factor_implies_generic(self, watt_factor):
         assert watt_factor["f2"] > watt_factor["f2_generic"]
+
+    def test_specific_implies_generic_form_of_another_fact(self, watt_factor):
         assert watt_factor["f2"] > watt_factor["f3_generic"]
 
     def test_specific_fact_does_not_imply_generic_entity(
@@ -358,11 +356,11 @@ class TestFacts:
     ):
         assert watt_factor["f9_absent"] > watt_factor["f9_absent_miles"]
 
-    def test_equal_factors_not_gt(self, make_factor):
-        f = make_factor
-        assert f["f_irrelevant_3"] >= f["f_irrelevant_3_new_context"]
-        assert f["f_irrelevant_3"] <= f["f_irrelevant_3_new_context"]
-        assert not f["f_irrelevant_3"] > f["f_irrelevant_3_new_context"]
+    def test_equal_factors_not_gt(self, watt_factor):
+        f = watt_factor
+        assert f["f2"] >= f["f2_entity_order"]
+        assert f["f2"] <= f["f2_entity_order"]
+        assert not f["f2"] > f["f2_different_entity"]
 
     def test_standard_of_proof_comparison(self, watt_factor):
         f = watt_factor
@@ -380,7 +378,7 @@ class TestFacts:
 
     def test_factor_does_not_contradict_predicate(self, make_predicate, watt_factor):
         with pytest.raises(TypeError):
-            a = watt_factor["f7"].contradicts(make_predicate["p7_true"])
+            _ = watt_factor["f7"].contradicts(make_predicate["p7_true"])
 
     def test_factor_contradiction_absent_predicate(self, watt_factor):
         assert watt_factor["f3"].contradicts(watt_factor["f3_absent"])
@@ -422,11 +420,8 @@ class TestFacts:
             (None, None, None, 3, None),
         )
 
-    def test_check_entity_consistency_type_error(
-        self, make_factor, watt_factor, make_holding
-    ):
+    def test_check_entity_consistency_type_error(self, make_factor, make_holding):
         m = make_factor
-        f = watt_factor
         with pytest.raises(TypeError):
             check_entity_consistency(
                 m["f_irrelevant_3"], make_holding["h2"], (None, None, None, None, 0)
@@ -598,7 +593,10 @@ class TestProcedures:
         assert make_procedure["c2"].factors_sorted() == [
             Fact(
                 predicate=Predicate(
-                    content="The distance between {} and a parking area used by personnel and patrons of {} was {}",
+                    content=(
+                        "The distance between {} and a parking area used by personnel "
+                        + "and patrons of {} was {}"
+                    ),
                     truth=True,
                     reciprocal=False,
                     comparison="<=",

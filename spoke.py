@@ -571,7 +571,7 @@ class Fact(Factor):
     def __init__(
         self,
         predicate: Optional[Predicate] = None,
-        entity_context: Union[Factor, Iterable[Factor]] = (),
+        entity_context: Union[Factor, Iterable[Factor], int, Iterable[int]] = (),
         standard_of_proof: Optional[str] = None,
         absent: bool = False,
         generic: bool = False,
@@ -641,7 +641,10 @@ class Fact(Factor):
         )
 
     def __repr__(self):
-        return f"{self.__class__.__name__}({self.__dict__})"
+        return (
+            f"{self.__class__.__name__}({repr(self.predicate)}, {self.entity_context}, "
+            + f"{self.standard_of_proof}, absent={self.absent}, generic={self.generic})"
+        )
 
     def __str__(self):
         predicate = str(self.predicate.content_with_entities(self.entity_context))
@@ -702,7 +705,12 @@ class Fact(Factor):
         """Indicates whether self implies other, taking into account the implication
         test for predicates and whether self and other are labeled 'absent'"""
 
-        if other is None:
+        if self == other:
+            return False
+        return self >= other
+
+    def __ge__(self, other: Optional["Fact"]) -> bool:
+        if other is None:  # TODO: remember why this is here
             return True
 
         if not isinstance(other, Factor):
@@ -711,11 +719,18 @@ class Fact(Factor):
                 + f"'{self.__class__.__name__}' and '{other.__class__.__name__}'."
             )
 
-        if not isinstance(other, self.__class__):
+        if not isinstance(self, other.__class__):
             return False
+
+        if self == other:
+            return False
+
+        if other.generic:
+            return True
 
         if bool(self.standard_of_proof) != bool(other.standard_of_proof):
             return False
+
         if (
             self.standard_of_proof
             and STANDARDS_OF_PROOF[self.standard_of_proof]
@@ -723,16 +738,9 @@ class Fact(Factor):
         ):
             return False
 
-        if self == other:
-            return False
         if self.predicate >= other.predicate and self.absent == other.absent:
             return True
         return False
-
-    def __ge__(self, other: Optional["Fact"]) -> bool:
-        if self == other:
-            return True
-        return self > other
 
     def contradicts(self, other: Optional[Factor]) -> bool:
         """Returns True if self and other can't both be true at the same time.
