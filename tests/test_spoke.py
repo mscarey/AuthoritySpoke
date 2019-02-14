@@ -607,100 +607,45 @@ class TestProcedures:
     def test_unequal_after_swapping_nonreciprocal_entities(self, make_procedure):
         assert make_procedure["c2"] != make_procedure["c2_nonreciprocal_swap"]
 
+    @pytest.mark.xfail
     def test_procedure_length(self, make_procedure):
+        """Consider deleting Procedure.__len__() and this test."""
         assert len(make_procedure["c1"]) == 2
         assert len(make_procedure["c2"]) == 2
 
-    def test_sorted_factors_from_procedure(self, make_predicate, make_procedure):
-
+    def test_sorted_factors_from_procedure(self, watt_factor, make_procedure):
         """The factors_sorted method sorts them alphabetically by __repr__."""
-
+        f = watt_factor
         assert make_procedure["c2"].factors_sorted() == [
-            Fact(
-                predicate=Predicate(
-                    content=(
-                        "The distance between {} and a parking area used by personnel "
-                        + "and patrons of {} was {}"
-                    ),
-                    truth=True,
-                    reciprocal=False,
-                    comparison="<=",
-                    quantity=ureg.Quantity(5, "foot"),
-                ),
-                absent=False,
-            ),
-            Fact(
-                predicate=Predicate(
-                    content="The distance between {} and {} was {}",
-                    truth=False,
-                    reciprocal=True,
-                    comparison=">",
-                    quantity=ureg.Quantity(35, "foot"),
-                ),
-                absent=False,
-            ),
-            Fact(
-                predicate=Predicate(
-                    content="The distance between {} and {} was {}",
-                    truth=True,
-                    reciprocal=True,
-                    comparison=">=",
-                    quantity=ureg.Quantity(20, "foot"),
-                ),
-                absent=False,
-            ),
-            Fact(
-                predicate=Predicate(
-                    content="{} was a stockpile of Christmas trees",
-                    truth=True,
-                    reciprocal=False,
-                ),
-                absent=False,
-            ),
-            Fact(
-                predicate=Predicate(
-                    content="{} was among some standing trees",
-                    truth=True,
-                    reciprocal=False,
-                ),
-                absent=False,
-            ),
-            Fact(
-                predicate=Predicate(
-                    content="{} was on the premises of {}", truth=True, reciprocal=False
-                ),
-                absent=False,
-            ),
-            Fact(
-                predicate=Predicate(
-                    content="{} was within the curtilage of {}",
-                    truth=True,
-                    reciprocal=False,
-                ),
-                absent=False,
-            ),
+            f["f9"],
+            f["f7"],
+            f["f8"],
+            f["f5"],
+            f["f6"],
+            f["f4"],
+            f["f10"],
         ]
 
     def test_procedure_string_with_entities(self, make_procedure):
-        assert "Fact: <2> performed at <4>" in str(
+        assert "Fact: <Craig> performed at <circus>" in str(
             make_procedure["c2_irrelevant_inputs"]
         )
-        assert "Fact: <3> performed at <4>" in str(
+        assert "Fact: <Dan> performed at <circus>" in str(
             make_procedure["c2_irrelevant_inputs"]
         )
 
     def test_entities_of_inputs_for_identical_procedure(
-        self, make_factor, make_procedure
+        self, watt_factor, make_procedure, watt_mentioned
     ):
         f = watt_factor
         c1 = make_procedure["c1"]
         c1_again = make_procedure["c1_again"]
         assert f["f1"] in c1.inputs
         assert f["f1"] in c1_again.inputs
-        assert f["f1"].entity_context == (0,)
+        assert f["f1"].entity_context == (watt_mentioned[0],)
         assert f["f2"] in c1.inputs
         assert f["f2"] in c1_again.inputs
-        assert f["f2"].entity_context == (1, 0)
+        assert f["f2"].entity_context == (watt_mentioned[1], watt_mentioned[0])
 
     def test_entities_of_implied_inputs_for_implied_procedure(
         self, watt_factor, make_procedure
@@ -708,8 +653,8 @@ class TestProcedures:
         f = watt_factor
         c1_easy = make_procedure["c1_easy"]
         c1_order = make_procedure["c1_entity_order"]
-        assert any(factor == f["f2"] for factor in c1_easy.inputs)
-        assert all(factor != f["f1"] for factor in c1_easy.inputs)
+        assert f["f2"] in c1_easy.inputs
+        assert f["f1"] not in c1_easy.inputs
 
     def test_procedure_implication_with_exact_quantity(
         self, watt_factor, make_procedure
