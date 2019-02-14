@@ -553,7 +553,9 @@ def evolve_match_list(
     new_matches = []
     for m in prior_matches:
         for y in find_matches(available, need_matches, MappingProxyType(m), comparison):
-            new_matches.append(y)
+            y = dict(y)
+            if all(existing_dict != y for existing_dict in new_matches):
+                new_matches.append(y)
     return new_matches
 
 

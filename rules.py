@@ -315,11 +315,10 @@ class Procedure:
         other's."""  # TODO: docstring
 
         def get_foreign_match(
-            foreign_match: Dict[Factor, Factor]
+            match: Dict[Factor, Factor]
         ) -> Optional[Dict[Factor, Factor]]:
-            if len(foreign_match.values()) != len(set(foreign_match.values())):
-                return None
-            return {v: k for k, v in foreign_match.items()}
+        # TODO: write test for multiple keys of match with same value (other than None)
+            return {v: k for k, v in match.items() if v is not None}
 
         return [
             get_foreign_match(match)
