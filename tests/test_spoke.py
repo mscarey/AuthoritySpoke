@@ -683,7 +683,7 @@ class TestProcedures:
         f = watt_factor
         c2 = make_procedure["c2"]
         c2_exact_quantity = make_procedure["c2_exact_quantity"]
-        assert c2 <= c2_exact_quantity
+        assert c2_exact_quantity >= c2
 
     def test_procedure_general_quantity_does_not_imply_exact(
         self, watt_factor, make_procedure

@@ -460,21 +460,21 @@ def check_entity_consistency(
                 m[slot] = self_order[i]
             else:
                 return False
-        return True
+        return m
 
     if not isinstance(right, Factor):
         raise TypeError(f"other must be type Factor")
 
     matches_proxy = MappingProxyType(matches)
 
-    answers = set()
+    answers = []
 
     for self_order in left.entity_orders:
         for other_order in right.entity_orders:
             if all_matches(self_order, other_order) and all_matches(
                 other_order, self_order
             ):
-                answers.add(self_order)
+                answers.append([all_matches(self_order, other_order), all_matches(other_order, self_order)])
 
     return answers
 
@@ -521,15 +521,12 @@ def find_matches(
         for a in available:
             matches_found = check_entity_consistency(n, a, matches)
             for source_list in matches_found:
-                matches_next = dict(matches)
-                for i in range(len(a)):
-                    if comparison == operator.le:
-                        matches_next[source_list[i]] = a.entity_context[i]
-                    else:
-                        matches_next[a.entity_context[i]] = source_list[i]
-                matches_next = MappingProxyType(matches_next)
+                if comparison == operator.le:
+                    matches_next = source_list[1]
+                else:
+                    matches_next = source_list[0]
                 for m in find_matches(
-                    for_matching, frozenset(need_matches), matches_next, comparison
+                    for_matching, tuple(need_matches), MappingProxyType(matches_next), comparison
                 ):
                     yield m
 
@@ -555,7 +552,7 @@ def evolve_match_list(
 
     new_matches = []
     for m in prior_matches:
-        for y in find_matches(available, need_matches, m, comparison):
+        for y in find_matches(available, need_matches, MappingProxyType(m), comparison):
             new_matches.append(y)
     return new_matches
 
