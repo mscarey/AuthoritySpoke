@@ -595,8 +595,9 @@ class TestProcedures:
 
     def test_procedure_length(self, make_procedure):
         """Consider deleting Procedure.__len__() and this test."""
+        assert len(make_procedure["c2"]) == 2
         assert len(make_procedure["c1"]) == 2
-        assert len(make_procedure["c2"]) == 3
+
 
     # Equality
 

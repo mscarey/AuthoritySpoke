@@ -1,8 +1,11 @@
 import json
 import pathlib
 import operator
-from typing import Dict, FrozenSet, List, Set, Tuple
-from typing import Iterable, Iterator
+
+from types import MappingProxyType
+
+from typing import Dict, List, Set, Tuple
+from typing import Iterable, Iterator, Mapping
 from typing import Optional, Union
 
 from dataclasses import dataclass
@@ -64,7 +67,7 @@ class Procedure:
         """
         Determines whether every factor in other is in self, with matching entity slots.
         """
-        matchlist = [{factor: None for factor in self.factors_all()}]
+        matchlist = [{context: None for context in self.get_context_factors()}]
         matchlist = evolve_match_list(
             self.outputs, other.outputs, operator.eq, matchlist
         )
@@ -198,10 +201,10 @@ class Procedure:
 
     def find_consistent_factors(
         self,
-        for_matching: FrozenSet[Factor],
-        need_matches: FrozenSet[Factor],
-        matches: Tuple[Optional[int], ...],
-    ) -> Iterator[Tuple[Optional[int], ...]]:
+        for_matching: Tuple[Factor],
+        need_matches: Iterable[Factor],
+        matches: Mapping[Factor, Optional[Factor]],
+    ) -> Iterator[Mapping[Factor, Optional[Factor]]]:
         """
         Recursively searches for a list of entity assignments that can
         cause all of 'other_factors' to not contradict any of the factors in
@@ -211,18 +214,17 @@ class Procedure:
         """
 
         if not need_matches:
-            yield matches
+            yield dict(matches)
         else:
-            need_matches = set(need_matches)
+            need_matches = list(need_matches)
             n = need_matches.pop()
             valid_combinations = n.consistent_entity_combinations(for_matching, matches)
             for c in valid_combinations:
-                matches_next = list(matches)
+                matches_next = dict(matches)
                 for i in c:
                     matches_next[i] = c[i]
-                matches_next = tuple(matches_next)
                 for m in self.find_consistent_factors(
-                    for_matching, frozenset(need_matches), matches_next
+                    for_matching, tuple(need_matches), MappingProxyType(matches_next)
                 ):
                     yield m
 
@@ -249,7 +251,7 @@ class Procedure:
 
         # For self to contradict other, every input of other
         # must be implied by some input or despite factor of self.
-        matchlist = frozenset([tuple([None for i in range(len(self))])])
+        matchlist = [{context: None for context in self.get_context_factors()}]
         matchlist = evolve_match_list(
             self_despite_or_input, other.inputs, operator.ge, matchlist
         )
@@ -281,7 +283,7 @@ class Procedure:
 
         if self == other:
             return True
-        matchlist = frozenset([tuple([None for i in range(len(self))])])
+        matchlist = [{context: None for context in self.get_context_factors()}]
         matchlist_from_other = evolve_match_list(
             other.inputs, self.inputs, operator.ge, matchlist
         )
@@ -347,7 +349,7 @@ class Procedure:
         if not isinstance(other, self.__class__):
             return False
 
-        matchlist = frozenset([tuple([None for i in range(len(self))])])
+        matchlist = [{context: None for context in self.get_context_factors()}]
         matchlist = evolve_match_list(
             self.outputs, other.outputs, operator.ge, matchlist
         )
@@ -366,7 +368,7 @@ class Procedure:
             any(
                 match
                 for match in self.find_consistent_factors(
-                    other_despite_or_input, self.inputs, m
+                    other_despite_or_input, self.inputs, MappingProxyType(m)
                 )
             )
             for m in matchlist

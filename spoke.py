@@ -484,7 +484,7 @@ def find_matches(
     need_matches: Iterable[Factor],
     matches: Mapping[Factor, Optional[Factor]],
     comparison: Callable[[Factor, Factor], bool],
-) -> Dict[Factor, Optional[Factor]]:
+) -> Iterator[Mapping[Factor, Optional[Factor]]]:
     """
     Generator that recursively searches for a tuple of entity
     assignments that can cause all of 'need_matches' to satisfy
