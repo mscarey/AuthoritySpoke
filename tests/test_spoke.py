@@ -38,7 +38,6 @@ class TestEntities:
         motel_b = motel.make_generic()
         assert not motel is motel_b
 
-
     def test_implication_generic_entities(self, make_entity):
         e = make_entity
         assert e["e_motel_specific"] > e["e_trees"]
@@ -418,12 +417,15 @@ class TestFacts:
             {e["e_dan"]: e["e_craig"]},
         )
         assert check_entity_consistency(
-            f["f_irrelevant_3"], f["f_irrelevant_3_new_context"], {
+            f["f_irrelevant_3"],
+            f["f_irrelevant_3_new_context"],
+            {
                 e["e_alice"]: e["e_bob"],
                 e["e_bob"]: e["e_alice"],
                 e["e_craig"]: e["e_dan"],
                 e["e_dan"]: e["e_craig"],
-                e["e_circus"]: e["e_circus"]}
+                e["e_circus"]: e["e_circus"],
+            },
         )
 
     def test_check_entity_consistency_false(self, make_entity, make_factor):
@@ -589,15 +591,18 @@ class TestProcedures:
 
     def test_procedure_equality(self, make_procedure):
         assert make_procedure["c1"] == make_procedure["c1_again"]
+
+    def test_procedure_equality_entity_order(self, make_procedure):
         assert make_procedure["c1"] == make_procedure["c1_entity_order"]
 
     def test_still_equal_after_swapping_reciprocal_entities(self, make_procedure):
         assert make_procedure["c2"] == make_procedure["c2_reciprocal_swap"]
 
-    def test_foreign_match_list(self, make_procedure):
+    def test_foreign_match_list(self, make_procedure, watt_mentioned):
+        w = watt_mentioned
         assert make_procedure["c2_irrelevant_inputs"].get_foreign_match_list(
-            frozenset([(None, None, 1, 0, None), (None, 1, 3, None, None)])
-        ) == frozenset([(3, 2, None, None, None), (None, 1, None, 2, None)])
+            [{w[2]: w[1], w[3]: w[0]}, {w[1]: w[1], w[2]: w[3]}]
+        ) == [{w[1]: w[2], w[0]: w[3]}, {w[1]: w[1], w[3]: w[2]}]
 
     def test_unequal_after_swapping_nonreciprocal_entities(self, make_procedure):
         assert make_procedure["c2"] != make_procedure["c2_nonreciprocal_swap"]

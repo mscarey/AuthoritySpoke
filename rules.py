@@ -64,7 +64,7 @@ class Procedure:
         """
         Determines whether every factor in other is in self, with matching entity slots.
         """
-        matchlist = frozenset([tuple([None for i in range(len(self))])])
+        matchlist = [{factor: None for factor in self.factors_all()}]
         matchlist = evolve_match_list(
             self.outputs, other.outputs, operator.eq, matchlist
         )
@@ -288,26 +288,27 @@ class Procedure:
         )
 
     def get_foreign_match_list(
-        self, foreign: FrozenSet[Tuple[int, ...]]
-    ) -> FrozenSet[Tuple[int, ...]]:
+        self, foreign: List[Dict[Factor, Factor]]
+    ) -> List[Dict[Factor, Factor]]:
         """Gets a version of matchlist in which the indices represent
         other's entity slots and the values represent self's entity slots.
 
         Compare this to the regular matchlist objects, in which the
         indices represent self's entity slots and the values represent
-        other's."""
+        other's."""  # TODO: docstring
 
         def get_foreign_match(
-            length, foreign_match: Tuple[int, ...]
-        ) -> Tuple[int, ...]:
-            blank = [None] * len(self)
-            for e in enumerate(foreign_match):
-                if e[1] is not None:
-                    blank[e[1]] = e[0]
-            return tuple(blank)
+            foreign_match: Dict[Factor, Factor]
+        ) -> Optional[Dict[Factor, Factor]]:
+            if len(foreign_match.values()) != len(set(foreign_match.values())):
+                return None
+            return {v: k for k, v in foreign_match.items()}
 
-        length = len(self)
-        return frozenset([get_foreign_match(length, match) for match in foreign])
+        return [
+            get_foreign_match(match)
+            for match in foreign
+            if get_foreign_match(match) is not None
+        ]
 
     def implies_all_to_some(self, other: "Procedure") -> bool:
         """

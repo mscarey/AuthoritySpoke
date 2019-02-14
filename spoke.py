@@ -5,7 +5,7 @@ import re
 from types import MappingProxyType
 
 from typing import Callable, Dict, FrozenSet, List, Set, Tuple
-from typing import Iterable, Iterator
+from typing import Iterable, Iterator, Mapping
 from typing import Optional, Sequence, Union
 
 from pint import UnitRegistry
@@ -480,11 +480,11 @@ def check_entity_consistency(
 
 
 def find_matches(
-    for_matching: FrozenSet[Factor],
-    need_matches: Set[Factor],
-    matches: Tuple[Optional[int], ...],
+    for_matching: Tuple[Factor],
+    need_matches: Iterable[Factor],
+    matches: Mapping[Factor, Optional[Factor]],
     comparison: Callable[[Factor, Factor], bool],
-) -> Iterator[Tuple[Optional[int], ...]]:
+) -> Dict[Factor, Optional[Factor]]:
     """
     Generator that recursively searches for a tuple of entity
     assignments that can cause all of 'need_matches' to satisfy
@@ -515,19 +515,19 @@ def find_matches(
     if not need_matches:
         yield matches
     else:
-        need_matches = set(need_matches)
+        need_matches = list(need_matches)
         n = need_matches.pop()
         available = {a for a in for_matching if comparison(a, n)}
         for a in available:
             matches_found = check_entity_consistency(n, a, matches)
             for source_list in matches_found:
-                matches_next = list(matches)
+                matches_next = dict(matches)
                 for i in range(len(a)):
                     if comparison == operator.le:
                         matches_next[source_list[i]] = a.entity_context[i]
                     else:
                         matches_next[a.entity_context[i]] = source_list[i]
-                matches_next = tuple(matches_next)
+                matches_next = MappingProxyType(matches_next)
                 for m in find_matches(
                     for_matching, frozenset(need_matches), matches_next, comparison
                 ):
@@ -535,28 +535,29 @@ def find_matches(
 
 
 def evolve_match_list(
-    available: FrozenSet[Factor],
-    need_matches: FrozenSet[Factor],
+    available: Iterable[Factor],
+    need_matches: Iterable[Factor],
     comparison: Callable[[Factor, Factor], bool],
-    prior_matches: FrozenSet[Tuple[Optional[int], ...]],
-) -> FrozenSet[Tuple[Optional[int], ...]]:
+    prior_matches: List[Dict[Factor, Optional[Factor]]],
+) -> List[Dict[Factor, Optional[Factor]]]:
 
     """
     Takes all the tuples of entity assignments in prior_matches, and
     updates them with every consistent tuple of entity assignments
     that would cause every Factor in need_matches to be related to
     a Factor in "available" by the relation described by "comparison".
-    """
-    if isinstance(available, Factor):
-        available = frozenset([available])
-    if isinstance(need_matches, Factor):
-        need_matches = {need_matches}
+    """ # TODO: update docstring
 
-    new_matches = set()
+    if isinstance(available, Factor):
+        available = (available,)
+    if isinstance(need_matches, Factor):
+        need_matches = (need_matches,)
+
+    new_matches = []
     for m in prior_matches:
         for y in find_matches(available, need_matches, m, comparison):
-            new_matches.add(y)
-    return frozenset(new_matches)
+            new_matches.append(y)
+    return new_matches
 
 
 STANDARDS_OF_PROOF = {
