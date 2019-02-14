@@ -589,6 +589,17 @@ class TestProcedures:
         with pytest.raises(TypeError):
             x = Procedure(inputs=(make_predicate["p1"]), outputs=(make_predicate["p2"]))
 
+    def test_get_context_factors(self, make_procedure):
+        len(make_procedure["c1"].get_context_factors()) == 2
+        len(make_procedure["c2"].get_context_factors()) == 3
+
+    def test_procedure_length(self, make_procedure):
+        """Consider deleting Procedure.__len__() and this test."""
+        assert len(make_procedure["c1"]) == 2
+        assert len(make_procedure["c2"]) == 3
+
+    # Equality
+
     def test_procedure_equality(self, make_procedure):
         assert make_procedure["c1"] == make_procedure["c1_again"]
 
@@ -606,12 +617,6 @@ class TestProcedures:
 
     def test_unequal_after_swapping_nonreciprocal_entities(self, make_procedure):
         assert make_procedure["c2"] != make_procedure["c2_nonreciprocal_swap"]
-
-    @pytest.mark.xfail
-    def test_procedure_length(self, make_procedure):
-        """Consider deleting Procedure.__len__() and this test."""
-        assert len(make_procedure["c1"]) == 2
-        assert len(make_procedure["c2"]) == 2
 
     def test_sorted_factors_from_procedure(self, watt_factor, make_procedure):
         """The factors_sorted method sorts them alphabetically by __repr__."""
@@ -656,6 +661,17 @@ class TestProcedures:
         assert f["f2"] in c1_easy.inputs
         assert f["f1"] not in c1_easy.inputs
 
+    def test_factor_implication_with_exact_quantity(self, watt_factor, make_procedure):
+        """This test is mostly to demonstrate the relationships
+        between the Factors in the Procedures that will be
+        tested below."""
+        f = watt_factor
+        assert f["f7"] in make_procedure["c2"].inputs
+        assert f["f7"] not in make_procedure["c2_exact_quantity"].inputs
+        assert f["f8_exact"] in make_procedure["c2_exact_quantity"].inputs
+        assert f["f8_exact"] > f["f7"]
+        assert not f["f7"] >= f["f8_exact"]
+
     def test_procedure_implication_with_exact_quantity(
         self, watt_factor, make_procedure
     ):
@@ -667,11 +683,14 @@ class TestProcedures:
         f = watt_factor
         c2 = make_procedure["c2"]
         c2_exact_quantity = make_procedure["c2_exact_quantity"]
-
-        assert f["f7"] in c2.inputs
-        assert f["f7"] not in c2_exact_quantity.inputs
-        assert f["f8_exact"] > f["f7"]
         assert c2 <= c2_exact_quantity
+
+    def test_procedure_general_quantity_does_not_imply_exact(
+        self, watt_factor, make_procedure
+    ):
+        f = watt_factor
+        c2 = make_procedure["c2"]
+        c2_exact_quantity = make_procedure["c2_exact_quantity"]
         assert not c2_exact_quantity <= c2
 
     def test_implied_procedure_with_reciprocal_entities(self, make_procedure):

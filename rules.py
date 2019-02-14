@@ -98,7 +98,7 @@ class Procedure:
 
         despite_or_input = {*self.despite, *self.inputs}
 
-        matchlist = frozenset([tuple([None for i in range(len(self))])])
+        matchlist = [{context: None for context in self.get_context_factors()}]
         matchlist = evolve_match_list(self.inputs, other.inputs, operator.ge, matchlist)
         matchlist = evolve_match_list(
             self.outputs, other.outputs, operator.ge, matchlist
@@ -138,6 +138,14 @@ class Procedure:
                 )
                 for marker in markertuple
             )
+        )
+
+    def __repr__(self):
+        return (
+            f"{self.__class__.__name__}(outputs=("
+            + f"{', '.join(repr(factor) for factor in self.outputs)}), "
+            + f"inputs=({', '.join(repr(factor) for factor in self.inputs)}), "
+            + f"despite=({', '.join(repr(factor) for factor in self.despite)}))"
         )
 
     def __str__(self):
@@ -217,6 +225,13 @@ class Procedure:
                     for_matching, frozenset(need_matches), matches_next
                 ):
                     yield m
+
+    def get_context_factors(self) -> Set[Factor]:
+        return set(
+            context
+            for factor in self.factors_all()
+            for context in factor.entity_context
+        )
 
     def contradicts_some_to_all(self, other: "Procedure") -> bool:
         """

@@ -517,7 +517,7 @@ def find_matches(
     else:
         need_matches = list(need_matches)
         n = need_matches.pop()
-        available = {a for a in for_matching if comparison(a, n)}
+        available = [a for a in for_matching if comparison(a, n)]
         for a in available:
             matches_found = check_entity_consistency(n, a, matches)
             for source_list in matches_found:
@@ -566,7 +566,6 @@ STANDARDS_OF_PROOF = {
     "clear and convincing": 3,
     "beyond reasonable doubt": 4,
 }
-
 
 class Fact(Factor):
     """An assertion accepted as factual by a court, often through factfinding by
@@ -724,9 +723,6 @@ class Fact(Factor):
             )
 
         if not isinstance(self, other.__class__):
-            return False
-
-        if self == other:
             return False
 
         if other.generic:
