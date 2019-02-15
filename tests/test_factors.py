@@ -8,11 +8,12 @@ import pytest
 
 from enactments import Code, Enactment
 from entities import Entity, Human
+from evidence import Evidence
 from rules import Procedure, Rule, ProceduralRule
 from opinions import Opinion
-from spoke import Predicate, Factor, Fact, Evidence
+from spoke import Predicate, Factor, Fact
 from spoke import ureg, Q_
-from spoke import check_entity_consistency  # move this back into a class?
+from spoke import check_entity_consistency
 from spoke import find_matches, evolve_match_list
 
 

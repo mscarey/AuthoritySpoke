@@ -8,9 +8,10 @@ import pytest
 
 from enactments import Code, Enactment
 from entities import Entity, Human
+from evidence import Evidence
 from rules import Procedure, Rule, ProceduralRule
 from opinions import Opinion
-from spoke import Predicate, Factor, Fact, Evidence
+from spoke import Predicate, Factor, Fact
 from spoke import ureg, Q_
 from spoke import check_entity_consistency  # move this back into a class?
 from spoke import find_matches, evolve_match_list
@@ -164,8 +165,8 @@ class TestProcedures:
             x = Procedure(inputs=(make_predicate["p1"]), outputs=(make_predicate["p2"]))
 
     def test_get_context_factors(self, make_procedure):
-        len(make_procedure["c1"].get_context_factors()) == 2
-        len(make_procedure["c2"].get_context_factors()) == 3
+        assert len(make_procedure["c1"].get_context_factors()) == 2
+        assert len(make_procedure["c2"].get_context_factors()) == 3
 
     def test_procedure_length(self, make_procedure):
         """Consider deleting Procedure.__len__() and this test."""

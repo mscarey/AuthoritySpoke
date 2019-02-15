@@ -28,6 +28,8 @@ class Entity(Factor):
         f'{", plural=True" if self.plural else ""})')
 
     def __str__(self):
+        if self.generic:
+            return f'<{self.name}>'
         return self.name
 
     def make_generic(self):

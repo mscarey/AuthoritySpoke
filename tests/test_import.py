@@ -1,8 +1,9 @@
 from enactments import Enactment
 from entities import Entity, Human
+from evidence import Evidence
 from opinions import Opinion
 from rules import Procedure, Rule, ProceduralRule
-from spoke import Predicate, Factor, Fact, Evidence
+from spoke import Predicate, Factor, Fact
 
 
 class TestPredicateImport:
