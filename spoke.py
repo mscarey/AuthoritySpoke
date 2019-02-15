@@ -474,7 +474,12 @@ def check_entity_consistency(
             if all_matches(self_order, other_order) and all_matches(
                 other_order, self_order
             ):
-                answers.append([all_matches(self_order, other_order), all_matches(other_order, self_order)])
+                answers.append(
+                    [
+                        all_matches(self_order, other_order),
+                        all_matches(other_order, self_order),
+                    ]
+                )
 
     return answers
 
@@ -526,7 +531,10 @@ def find_matches(
                 else:
                     matches_next = source_list[0]
                 for m in find_matches(
-                    for_matching, tuple(need_matches), MappingProxyType(matches_next), comparison
+                    for_matching,
+                    tuple(need_matches),
+                    MappingProxyType(matches_next),
+                    comparison,
                 ):
                     yield m
 
@@ -543,7 +551,7 @@ def evolve_match_list(
     updates them with every consistent tuple of entity assignments
     that would cause every Factor in need_matches to be related to
     a Factor in "available" by the relation described by "comparison".
-    """ # TODO: update docstring
+    """  # TODO: update docstring
 
     if isinstance(available, Factor):
         available = (available,)
@@ -565,6 +573,7 @@ STANDARDS_OF_PROOF = {
     "clear and convincing": 3,
     "beyond reasonable doubt": 4,
 }
+
 
 class Fact(Factor):
     """An assertion accepted as factual by a court, often through factfinding by
@@ -776,17 +785,29 @@ class Fact(Factor):
         repeatedly during a recursive search should explode
         as the possibilities increase, so it should only be run
         when matches has been narrowed as much as possible."""
+        # TODO: docstring
+
+        def compare_dict_for_identical_entries(left, right):
+            """Compares two dicts to see whether the
+            keys and values of one are the same objects
+            as the keys and values of the other, not just
+            whether they evaluate equal."""
+
+            return all(
+                any((l_key is r_key and left[l_key] is right[r_key]) for r_key in right)
+                for l_key in left
+            )
 
         answer = []
         for source_list in self.entity_orders:
             available_slots = {
-                i: [
-                    slot
-                    for slot in matches
-                    if slot is not None
-                    and (matches[slot] is None or matches[slot] == source_list[i])
+                factor: [
+                    key
+                    for key in matches
+                    if key is not None
+                    and (matches.get(key) is None or matches.get(key) == factor)
                 ]
-                for i in range(len(self))
+                for factor in source_list
             }
             keys, values = zip(*available_slots.items())
             combinations = (
@@ -796,12 +817,13 @@ class Fact(Factor):
             )
             for c in combinations:
                 if not any(
-                    (
                         a.contradicts(self) and (a.entity_context[i] == c[i] for i in c)
                         for a in factors_from_other_procedure
-                    )
                 ):
-                    answer.append(c)
+                    if all(
+                        not compare_dict_for_identical_entries(c, d) for d in answer
+                    ):
+                        answer.append(c)
         return answer
 
     def get_entity_orders(self) -> Set[Tuple[int, ...]]:

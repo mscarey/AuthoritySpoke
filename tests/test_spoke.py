@@ -290,7 +290,7 @@ class TestFacts:
         assert watt_factor["f1"] == watt_factor["f1c"]
 
     def test_equality_because_factors_are_generic_entities(self, watt_factor):
-        assert watt_factor["f1"] == watt_factor["f1_entity_2"]
+        assert watt_factor["f1"] == watt_factor["f1_different_entity"]
 
     def test_unequal_because_a_factor_is_not_generic(self, watt_factor):
         assert watt_factor["f9_swap_entities_4"] != watt_factor["f9"]
@@ -449,13 +449,13 @@ class TestFacts:
                 m["f_irrelevant_3"], make_holding["h2"], (None, None, None, None, 0)
             )
 
-    def test_consistent_entity_combinations(self, watt_factor):
+    def test_consistent_entity_combinations(self, watt_factor, watt_mentioned):
         """
         Finds that for factor f["f7"], it would be consistent with the
         other group of factors for f["f7"]'s two slots to be assigned
         (0, 1) or (1, 0).
         """
-
+        w = watt_mentioned
         f = watt_factor
         assert f["f7"].consistent_entity_combinations(
             factors_from_other_procedure=[
@@ -466,8 +466,8 @@ class TestFacts:
                 f["f8"],
                 f["f9"],
             ],
-            matches=(0, 1, None, None, None),
-        ) == [{0: 0, 1: 1}, {0: 1, 1: 0}]
+            matches={w[2]: None, w[0]: None},
+        ) == [{w[2]: w[2], w[0]: w[0]}, {w[2]: w[0], w[0]: w[2]}]
 
 
 class TestEvidence:
