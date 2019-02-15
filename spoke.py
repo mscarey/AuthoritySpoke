@@ -776,6 +776,17 @@ class Fact(Factor):
             return True
         return False
 
+    def copy_with_foreign_context(self, context_assignment):
+        # TODO: move to Factor class, handle inheritance
+        new_context = [context_assignment.get(entity) for entity in self.entity_context]
+        return Fact(
+            predicate=self.predicate,
+            entity_context=new_context,
+            standard_of_proof=self.standard_of_proof,
+            absent=self.absent,
+            generic=self.generic,
+        )
+
     def consistent_entity_combinations(
         self, factors_from_other_procedure, matches
     ) -> List[Dict]:
@@ -815,15 +826,15 @@ class Fact(Factor):
                 for v in itertools.product(*values)
                 if len(v) == len(set(v))
             )
-            for c in combinations:
+            for context in combinations:
                 if not any(
-                        a.contradicts(self) and (a.entity_context[i] == c[i] for i in c)
-                        for a in factors_from_other_procedure
+                    a.contradicts(self.copy_with_foreign_context(context))
+                    for a in factors_from_other_procedure
                 ):
                     if all(
-                        not compare_dict_for_identical_entries(c, d) for d in answer
+                        not compare_dict_for_identical_entries(context, d) for d in answer
                     ):
-                        answer.append(c)
+                        answer.append(context)
         return answer
 
     def get_entity_orders(self) -> Set[Tuple[int, ...]]:

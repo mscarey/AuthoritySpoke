@@ -408,6 +408,13 @@ class TestFacts:
 
     # Consistency with Entity/Factor assignments
 
+    def test_copy_with_foreign_context(self, watt_mentioned, watt_factor):
+        w = watt_mentioned
+        assert (
+            watt_factor["f1"].copy_with_foreign_context({w[0]: w[2]})
+            == watt_factor["f1_different_entity"]
+        )
+
     def test_check_entity_consistency_true(self, make_entity, make_factor):
         f = make_factor
         e = make_entity
@@ -597,7 +604,6 @@ class TestProcedures:
         """Consider deleting Procedure.__len__() and this test."""
         assert len(make_procedure["c2"]) == 2
         assert len(make_procedure["c1"]) == 2
-
 
     # Equality
 
