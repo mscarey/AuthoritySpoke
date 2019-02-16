@@ -10,7 +10,6 @@ from rules import Procedure, ProceduralRule
 from spoke import Predicate, Factor, Fact
 from spoke import Q_
 
-
 @pytest.fixture(scope="class")
 def make_entity() -> Dict[str, Entity]:
     return {

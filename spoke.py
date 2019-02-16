@@ -75,6 +75,13 @@ class Factor:
             )
         )
 
+    def generic_factors(self) -> Iterable['Factor']:
+        """Returns an iterable of self's generic Factors,
+        which must be matched to other generic Factors to
+        perform equality tests between Factors."""
+
+        if self.generic:
+            yield self
 
 @dataclass()
 class Predicate:
@@ -692,6 +699,18 @@ class Fact(Factor):
             absent=self.absent,
             generic=True,
         )
+
+    def generic_factors(self) -> Iterable[Factor]:
+        """Returns an iterable of self's generic Factors,
+        which must be matched to other generic Factors to
+        perform equality tests between Factors."""
+
+        if self.generic:
+            yield self
+        else:
+            for factor in self.entity_context:
+                for generic_factor in factor.generic_factors():
+                    yield generic_factor
 
     def predicate_in_context(self, entities: Sequence[Factor]) -> str:
         """Prints the representation of the Predicate with Entities

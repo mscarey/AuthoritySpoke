@@ -346,15 +346,15 @@ class TestEvidence:
         assert not e.absent
 
     def test_default_len_based_on_unique_entity_slots(
-        self, make_predicate, make_factor
+        self, make_entity, make_factor
     ):
         """same as e["e_no_shooting"]"""
 
         e = Evidence(
             form="testimony",
-            to_effect=Fact(Predicate("{} commited a crime", truth=False)),
-            statement=Fact(Predicate("{} did not shoot {}")),
-            stated_by=0,
+            to_effect=make_factor["f_no_crime"],
+            statement=make_factor["f_no_shooting"],
+            stated_by=make_entity["e_alice"],
         )
         assert len(e) == 2
 

@@ -28,6 +28,7 @@ class Evidence(Factor):
         self.derived_from = derived_from
         self.absent = absent
         self.generic = generic
+        self.entity_context = self.generic_factors()
 
     def __hash__(self):
         return hash(
@@ -90,6 +91,23 @@ class Evidence(Factor):
 
     def __gt__(self, other):
         return self >= other and self != other
+
+    def generic_factors(self) -> Iterable[Factor]:
+        """Returns an iterable of self's generic Factors,
+        which must be matched to other generic Factors to
+        perform equality tests between Factors."""
+
+        if self.generic:
+            yield self
+        else:
+            for factor in (
+                self.to_effect,
+                self.statement,
+                self.stated_by,
+                self.derived_from,
+            ):
+                for generic_factor in factor.generic_factors():
+                    yield generic_factor
 
     def implies_if_present(self, other):
         """Determines whether self would imply other assuming

@@ -6,7 +6,7 @@ as parameters, so they won't (probably?) need to incorporate
 ordered tuples of other Factors.
 """
 
-from typing import Optional
+from typing import Iterable, Optional
 
 from spoke import Factor
 
@@ -37,6 +37,14 @@ class Entity(Factor):
             return self.__class__(name=self.name, generic=True, plural=self.plural)
         else:
             return self
+
+    def generic_factors(self) -> Iterable[Factor]:
+        """Returns an iterable of self's generic Factors,
+        which must be matched to other generic Factors to
+        perform equality tests between Factors."""
+
+        if self.generic:
+            yield self
 
 
 class Human(Entity):
