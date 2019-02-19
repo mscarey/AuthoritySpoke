@@ -162,6 +162,9 @@ class TestFacts:
         assert watt_factor["f2_generic"] == watt_factor["f2_false_generic"]
         assert watt_factor["f2_generic"] == watt_factor["f3_generic"]
 
+    def test_equal_referencing_diffent_generic_factors(self, make_factor):
+        assert make_factor["f_murder"] == make_factor["f_murder_craig"]
+
     def test_generic_and_specific_factors_unequal(self, watt_factor):
         assert watt_factor["f2"] != watt_factor["f2_generic"]
 
@@ -182,6 +185,9 @@ class TestFacts:
         assert f["f_irrelevant_3"] == f["f_irrelevant_3"]
         assert f["f_irrelevant_3"] == f["f_irrelevant_3_new_context"]
 
+    def test_equal_with_different_generic_subfactors(self, make_complex_fact):
+        assert make_complex_fact["f_relevant_murder"] == make_complex_fact["f_relevant_murder_craig"]
+
     @pytest.mark.xfail
     def test_unequal_due_to_repeating_entity(self, make_factor):
         """I'm not convinced that a model of a Fact ever needs to include
@@ -195,6 +201,7 @@ class TestFacts:
         f = watt_factor
         assert f["f2_clear_and_convincing"] != f["f2_preponderance_of_evidence"]
         assert f["f2_clear_and_convincing"] != f["f2"]
+
 
     # Implication
 
@@ -249,6 +256,13 @@ class TestFacts:
         assert not f["f2_clear_and_convincing"] > f["f2"]
         assert not f["f2"] > f["f2_preponderance_of_evidence"]
 
+    def test_implication_complex(self, make_complex_fact):
+        assert make_complex_fact["f_relevant_murder"] > make_complex_fact["f_relevant_murder_whether"]
+
+    def test_no_implication_complex(self, make_complex_fact):
+        assert not make_complex_fact["f_relevant_murder"] >= make_complex_fact["f_relevant_murder_alice_craig"]
+
+
     # Contradiction
 
     def test_factor_does_not_contradict_predicate(self, make_predicate, watt_factor):
@@ -268,6 +282,12 @@ class TestFacts:
         assert watt_factor["f8_meters"].contradicts(watt_factor["f8_absent"])
         assert watt_factor["f9_absent_miles"].contradicts(watt_factor["f9"])
         assert watt_factor["f9"].contradicts(watt_factor["f9_absent_miles"])
+
+    def test_contradiction_complex(self, make_complex_fact):
+        assert make_complex_fact["f_irrelevant_murder"].contradicts(make_complex_fact["f_relevant_murder_craig"])
+
+    def test_no_contradiction_complex(self, make_complex_fact):
+        assert not make_complex_fact["f_irrelevant_murder"].contradicts(make_complex_fact["f_relevant_murder_alice_craig"])
 
     # Consistency with Entity/Factor assignments
 

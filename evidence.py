@@ -44,9 +44,9 @@ class Evidence(Factor):
         else:
             s = self.__class__.__name__
         if self.derived_from:
-            s += f", derived from <{self.derived_from}>"
+            s += f", derived from {self.derived_from}"
         if self.stated_by:
-            s += f", with a statement by <{self.stated_by}>, "
+            s += f", with a statement by {self.stated_by}, "
         if self.statement:
             s += f', asserting the fact: "{str(self.statement)}"'
         if self.to_effect:

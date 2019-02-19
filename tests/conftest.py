@@ -147,9 +147,16 @@ def make_predicate() -> Dict[str, Predicate]:
         "p_irrelevant_1": Predicate("{} was a bear"),
         "p_irrelevant_2": Predicate("{} was a circus"),
         "p_irrelevant_3": Predicate("{} performed at {}"),
+
         "p_crime": Predicate("{} committed a crime"),
+        "p_murder": Predicate("{} murdered {}"),
+        "p_murder_whether": Predicate("{} murdered {}", truth=None),
+        "p_irrelevant": Predicate("{} is relevant to show {}", truth=False),
+        "p_relevant": Predicate("{} is relevant to show {}"),
+        "p_relevant_whether": Predicate("{} is relevant to show {}", truth=None),
         "p_shooting": Predicate("{} shot {}"),
         "p_no_shooting": Predicate("{} shot {}", truth=False),
+        "p_shooting_whether": Predicate("{} shot {}", truth=None),
         "p_no_crime": Predicate("{} committed a crime", truth=False),
         "p_three_entities": Predicate("{} threw {} to {}"),
     }
@@ -260,13 +267,34 @@ def make_factor(make_predicate, make_entity) -> Dict[str, Factor]:
         "f_crime": Fact(p["p_crime"], case_factors=c),
         "f_no_crime": Fact(p["p_no_crime"], case_factors=c),
         "f_no_crime_entity_order": Fact(p["p_no_crime"], (1,), case_factors=c),
+        "f_murder": Fact(p["p_murder"], case_factors=c),
+        "f_murder_entity_swap": Fact(p["p_murder"], (1, 0), case_factors=c),
+        "f_murder_craig": Fact(p["p_murder"], (2, 3), case_factors=c),
+        "f_murder_whether": Fact(p["p_murder_whether"], case_factors=c),
         "f_shooting": Fact(p["p_shooting"], case_factors=c),
+        "f_shooting_craig": Fact(p["p_shooting"], (2, 3), case_factors=c),
         "f_no_shooting": Fact(p["p_no_shooting"], case_factors=c),
+        "f_shooting_whether": Fact(p["p_shooting_whether"], case_factors=c),
         "f_no_shooting_entity_order": Fact(p["p_no_shooting"], (1, 0), case_factors=c),
         "f_three_entities": Fact(p["p_three_entities"], (0, 1, 2), case_factors=c),
         "f_repeating_entity": Fact(p["p_three_entities"], (0, 1, 0), case_factors=c),
     }
 
+@pytest.fixture(scope="class")
+def make_complex_fact(make_predicate, make_factor) -> Dict[str, Evidence]:
+    p = make_predicate
+    f = make_factor
+
+    return {
+        "f_irrelevant_murder": Fact(p["p_irrelevant"], (f["f_shooting"], f["f_murder"])),
+        "f_relevant_murder": Fact(p["p_relevant"], (f["f_shooting"], f["f_murder"])),
+        "f_relevant_murder_swap_entities": Fact(p["p_relevant"], (f["f_shooting"], f["f_murder"])),
+        "f_relevant_murder_whether": Fact(p["p_relevant"], (f["f_shooting"], f["f_murder_whether"])),
+        "f_whether_relevant_murder_whether": Fact(p["p_relevant"], (f["f_shooting_whether"], f["f_murder_whether"])),
+        "f_relevant_murder_swap": Fact(p["p_relevant"], (f["f_shooting"], f["f_murder_entity_swap"])),
+        "f_relevant_murder_craig": Fact(p["p_relevant"], (f["f_shooting_craig"], f["f_murder_craig"])),
+        "f_relevant_murder_alice_craig": Fact(p["p_relevant"], (f["f_shooting"], f["f_murder_craig"])),
+    }
 
 @pytest.fixture(scope="class")
 def make_evidence(make_predicate, make_factor, watt_factor) -> Dict[str, Evidence]:
