@@ -18,53 +18,56 @@ from spoke import find_matches, evolve_match_list
 
 
 class TestEntities:
-    def test_equality_generic_entities(self, make_entity):
-        e = make_entity
-        assert e["e_motel"] == e["e_trees"]
-        assert e["e_motel"] is not e["e_trees"]
-
     def test_conversion_to_generic(self, make_entity):
         e = make_entity
-        assert e["e_motel_specific"].make_generic() == e["e_motel"]
+        assert e["motel_specific"].make_generic() == e["motel"]
 
     def test_same_object_after_make_generic(self, make_entity):
         e = make_entity
-        motel = e["e_motel"]
+        motel = e["motel"]
         motel_b = motel.make_generic()
         assert motel is motel_b
 
+    def test_context_register(self, make_entity):
+        motel = make_entity["motel"]
+        watt = make_entity["watt"]
+        assert motel.context_register(watt) == {motel: watt}
+
+    # Equality
+
     def test_specific_to_generic_different_object(self, make_entity):
         e = make_entity
-        motel = e["e_motel_specific"]
+        motel = e["motel_specific"]
         motel_b = motel.make_generic()
         assert not motel is motel_b
         assert not motel == motel_b
 
-    def test_implication_generic_entities(self, make_entity):
+    def test_equality_generic_entities(self, make_entity):
         e = make_entity
-        assert e["e_motel_specific"] > e["e_trees"]
-        assert not e["e_motel_specific"] < e["e_trees"]
-
-    def test_implication_same_except_generic(self, make_entity):
-        e = make_entity
-        assert e["e_motel_specific"] > e["e_motel"]
-        assert not e["e_motel_specific"] < e["e_motel"]
+        assert e["motel"] == e["trees"]
+        assert e["motel"] is not e["trees"]
 
     def test_generic_human_and_event_not_equal(self, make_entity):
         """Neither is a subclass of the other."""
         e = make_entity
-        assert e["e_tree_search"] != e["e_watt"]
+        assert e["tree_search"] != e["watt"]
 
     def test_generic_human_and_entity_not_equal(self, make_entity):
         """Human is a subclass of Entity."""
         e = make_entity
-        assert e["e_motel"] != e["e_watt"]
+        assert e["motel"] != e["watt"]
 
-    def test_context_register(self, make_entity):
-        motel = make_entity["e_motel"]
-        watt = make_entity["e_watt"]
-        assert motel.context_register(watt) == {motel: watt}
+    # Implication
 
+    def test_implication_generic_entities(self, make_entity):
+        e = make_entity
+        assert e["motel_specific"] > e["trees"]
+        assert not e["motel_specific"] < e["trees"]
+
+    def test_implication_same_except_generic(self, make_entity):
+        e = make_entity
+        assert e["motel_specific"] > e["motel"]
+        assert not e["motel_specific"] < e["motel"]
 
 class TestPredicates:
     def test_predicate_with_wrong_number_of_entities(self):
@@ -909,7 +912,7 @@ class TestOpinions:
         assert real_holding["h3"] in make_opinion["watt_majority"].holdings
 
     def test_opinion_entity_list(self, make_opinion, make_entity):
-        assert make_entity["e_watt"] in make_opinion["watt_majority"].get_entities()
+        assert make_entity["watt"] in make_opinion["watt_majority"].get_entities()
 
     def test_opinion_date(self, make_opinion):
         assert (

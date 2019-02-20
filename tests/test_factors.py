@@ -23,7 +23,7 @@ class TestFacts:
     ):
         e = make_entity
         f2 = Fact(make_predicate["p1"], case_factors=watt_mentioned)
-        assert f2.entity_context == (e["e_motel"],)
+        assert f2.entity_context == (e["motel"],)
 
     def test_entity_context_from_case_factor_indices(
         self, make_entity, make_predicate, watt_mentioned
@@ -41,14 +41,14 @@ class TestFacts:
         f2 = Fact(
             make_predicate["p2"], entity_context=(1, 0), case_factors=watt_mentioned
         )
-        assert f2.entity_context == (e["e_watt"], e["e_motel"])
+        assert f2.entity_context == (e["watt"], e["motel"])
 
     def test_invalid_index_for_case_factors_in_init(self, make_predicate, make_entity):
         with pytest.raises(ValueError):
             _ = Fact(
                 make_predicate["p1"],
                 entity_context=2,
-                case_factors=make_entity["e_watt"],
+                case_factors=make_entity["watt"],
             )
 
     def test_convert_int_entity_context_to_tuple(self, make_predicate, watt_mentioned):
@@ -78,8 +78,8 @@ class TestFacts:
         assert "<He-Man> operated" in str(different)
 
     def test_concrete_to_abstract(self, make_entity, make_predicate):
-        motel = make_entity["e_motel_specific"]
-        d = make_entity["e_watt"]
+        motel = make_entity["motel_specific"]
+        d = make_entity["watt"]
         fact = Fact(predicate=make_predicate["p2"], entity_context=(d, motel))
         assert "<Wattenburg> operated and lived at Hideaway Lodge" in str(fact)
         assert "<Wattenburg> operated and lived at <Hideaway Lodge>" in str(
@@ -92,13 +92,13 @@ class TestFacts:
 
     def test_entity_orders(self, make_entity, watt_factor):
         assert watt_factor["f7_swap_entities_4"].entity_orders == {
-            (make_entity["e_watt"], make_entity["e_motel_specific"]),
-            (make_entity["e_motel_specific"], make_entity["e_watt"]),
+            (make_entity["watt"], make_entity["motel_specific"]),
+            (make_entity["motel_specific"], make_entity["watt"]),
         }
 
     def test_predicate_with_entities(self, make_entity, watt_factor):
         assert (
-            watt_factor["f1"].predicate.content_with_entities((make_entity["e_motel"]))
+            watt_factor["f1"].predicate.content_with_entities((make_entity["motel"]))
             == "<Hideaway Lodge> was a motel"
         )
 
@@ -109,12 +109,12 @@ class TestFacts:
     def test_reciprocal_with_wrong_number_of_entities(self, make_entity, watt_factor):
         with pytest.raises(ValueError):
             watt_factor["f1"].predicate.content_with_entities(
-                (make_entity["e_motel"], make_entity["e_watt"])
+                (make_entity["motel"], make_entity["watt"])
             )
 
     def test_false_predicate_with_entities(self, make_entity, watt_factor):
         assert watt_factor["f7"].predicate_in_context(
-            (make_entity["e_trees"], make_entity["e_motel"])
+            (make_entity["trees"], make_entity["motel"])
         ) == str(
             "Fact: The distance between <the stockpile of trees> "
             + "and <Hideaway Lodge> was no more than 35 foot"
@@ -123,7 +123,7 @@ class TestFacts:
     def test_entity_and_human_in_predicate(self, make_entity, watt_factor):
         assert (
             watt_factor["f2"].predicate.content_with_entities(
-                (make_entity["e_watt"], make_entity["e_motel"])
+                (make_entity["watt"], make_entity["motel"])
             )
             == "<Wattenburg> operated and lived at <Hideaway Lodge>"
         )
@@ -131,7 +131,7 @@ class TestFacts:
     def test_fact_label_with_entities(self, make_entity, watt_factor):
         assert (
             watt_factor["f2"].predicate_in_context(
-                (make_entity["e_watt"], make_entity["e_motel"])
+                (make_entity["watt"], make_entity["motel"])
             )
             == "Fact: <Wattenburg> operated and lived at <Hideaway Lodge>"
         )
@@ -214,7 +214,7 @@ class TestFacts:
     def test_specific_fact_does_not_imply_generic_entity(
         self, make_entity, watt_factor
     ):
-        assert not watt_factor["f2"] > make_entity["e_motel"]
+        assert not watt_factor["f2"] > make_entity["motel"]
 
     def test_factor_does_not_imply_predicate(self, make_predicate, watt_factor):
         with pytest.raises(TypeError):
@@ -304,17 +304,17 @@ class TestFacts:
         assert check_entity_consistency(
             f["f_irrelevant_3"],
             f["f_irrelevant_3_new_context"],
-            {e["e_dan"]: e["e_craig"]},
+            {e["dan"]: e["craig"]},
         )
         assert check_entity_consistency(
             f["f_irrelevant_3"],
             f["f_irrelevant_3_new_context"],
             {
-                e["e_alice"]: e["e_bob"],
-                e["e_bob"]: e["e_alice"],
-                e["e_craig"]: e["e_dan"],
-                e["e_dan"]: e["e_craig"],
-                e["e_circus"]: e["e_circus"],
+                e["alice"]: e["bob"],
+                e["bob"]: e["alice"],
+                e["craig"]: e["dan"],
+                e["dan"]: e["craig"],
+                e["circus"]: e["circus"],
             },
         )
 
@@ -322,14 +322,14 @@ class TestFacts:
         assert not check_entity_consistency(
             make_factor["f_irrelevant_3"],
             make_factor["f_irrelevant_3_new_context"],
-            {make_entity["e_circus"]: make_entity["e_alice"]},
+            {make_entity["circus"]: make_entity["alice"]},
         )
 
     def test_entity_consistency_identity_not_equality(self, make_entity, make_factor):
         assert not check_entity_consistency(
             make_factor["f_irrelevant_3"],
             make_factor["f_irrelevant_3_new_context"],
-            {make_entity["e_dan"]: make_entity["e_dan"]},
+            {make_entity["dan"]: make_entity["dan"]},
         )
 
     def test_check_entity_consistency_type_error(self, make_factor, make_holding):
@@ -368,20 +368,20 @@ class TestEvidence:
     def test_default_len_based_on_unique_entity_slots(
         self, make_entity, make_factor
     ):
-        """same as e["e_no_shooting"]"""
+        """same as e["no_shooting"]"""
 
         e = Evidence(
             form="testimony",
             to_effect=make_factor["f_no_crime"],
             statement=make_factor["f_no_shooting"],
-            stated_by=make_entity["e_alice"],
+            stated_by=make_entity["alice"],
         )
         assert len(e) == 2
 
     def test_get_entity_orders(self, make_evidence):
         # TODO: check this after making Evidence.__str__ method
-        assert make_evidence["e_no_shooting"].entity_orders == {(0, 1, 0, 0)}
-        assert make_evidence["e_reciprocal"].entity_orders == {
+        assert make_evidence["no_shooting"].entity_orders == {(0, 1, 0, 0)}
+        assert make_evidence["reciprocal"].entity_orders == {
             (0, 1, 0, 2),
             (1, 0, 0, 2),
         }
@@ -393,74 +393,74 @@ class TestEvidence:
         assert e.entity_orders == {(0, 1)}
 
     def test_evidence_str(self, make_evidence):
-        assert str(make_evidence["e_reciprocal"]).startswith(
+        assert str(make_evidence["reciprocal"]).startswith(
             "Testimony, with a statement by <2>"
         )
 
     def test_equality_with_entity_order(self, make_predicate, make_evidence):
         e = make_evidence
-        assert e["e_no_shooting"] == e["e_no_shooting_entity_order"]
+        assert e["no_shooting"] == e["no_shooting_entity_order"]
 
     def test_equality_with_no_statement(self, make_evidence):
-        assert make_evidence["e_crime"] == make_evidence["e_crime"]
+        assert make_evidence["crime"] == make_evidence["crime"]
 
     def test_unequal_due_to_entity_order(self, make_evidence):
         e = make_evidence
-        assert e["e_no_shooting"] != e["e_no_shooting_different_witness"]
+        assert e["no_shooting"] != e["no_shooting_different_witness"]
 
     def test_unequal_different_attributes(self, make_evidence):
         assert (
-            make_evidence["e_no_shooting_no_effect_entity_order"]
-            != make_evidence["e_no_shooting_derived_from_entity_order"]
+            make_evidence["no_shooting_no_effect_entity_order"]
+            != make_evidence["no_shooting_derived_from_entity_order"]
         )
 
     def test_implication_missing_witness(self, make_evidence):
         e = make_evidence
-        assert e["e_no_shooting"] >= e["e_no_shooting_witness_unknown"]
+        assert e["no_shooting"] >= e["no_shooting_witness_unknown"]
 
     def test_implication_missing_effect(self, make_evidence):
         e = make_evidence
-        assert e["e_no_shooting"] >= e["e_no_shooting_no_effect_entity_order"]
+        assert e["no_shooting"] >= e["no_shooting_no_effect_entity_order"]
 
     def test_no_implication_of_fact(self, make_predicate, make_evidence):
-        assert not make_evidence["e_no_shooting"] > Fact(
+        assert not make_evidence["no_shooting"] > Fact(
             make_predicate["p_no_shooting"]
         )
         assert (
-            not Fact(make_predicate["p_no_shooting"]) > make_evidence["e_no_shooting"]
+            not Fact(make_predicate["p_no_shooting"]) > make_evidence["no_shooting"]
         )
 
     def test_no_contradiction_of_fact(self, make_predicate, make_evidence):
-        assert not make_evidence["e_no_shooting"].contradicts(
+        assert not make_evidence["no_shooting"].contradicts(
             Fact(make_predicate["p_no_shooting"])
         )
 
     def test_no_contradiction_from_supporting_contradictory_facts(self, make_evidence):
-        assert not make_evidence["e_no_shooting"].contradicts(
-            make_evidence["e_shooting"]
+        assert not make_evidence["no_shooting"].contradicts(
+            make_evidence["shooting"]
         )
 
     def test_contradiction_of_absent_version_of_self(self, make_evidence):
         e = make_evidence
-        assert e["e_no_shooting"].contradicts(e["e_no_shooting_absent"])
+        assert e["no_shooting"].contradicts(e["no_shooting_absent"])
 
     def test_contradict_absent_version_of_implied_factor(self, make_evidence):
         e = make_evidence
-        assert e["e_no_shooting_witness_unknown_absent"].contradicts(e["e_no_shooting"])
-        assert e["e_no_shooting"].contradicts(e["e_no_shooting_witness_unknown_absent"])
+        assert e["no_shooting_witness_unknown_absent"].contradicts(e["no_shooting"])
+        assert e["no_shooting"].contradicts(e["no_shooting_witness_unknown_absent"])
 
     def test_no_contradiction_absent_same_witness(self, make_evidence):
         e = make_evidence
-        assert not e["e_no_shooting_absent"].contradicts(
-            e["e_no_shooting_witness_unknown"]
+        assert not e["no_shooting_absent"].contradicts(
+            e["no_shooting_witness_unknown"]
         )
-        assert not e["e_no_shooting_witness_unknown"].contradicts(
-            e["e_no_shooting_absent"]
+        assert not e["no_shooting_witness_unknown"].contradicts(
+            e["no_shooting_absent"]
         )
-        assert not e["e_no_shooting_absent"].contradicts(
-            e["e_no_shooting_different_witness"]
+        assert not e["no_shooting_absent"].contradicts(
+            e["no_shooting_different_witness"]
         )
 
     def test_no_contradiction_of_implied_factor(self, make_evidence):
         e = make_evidence
-        assert not e["e_no_shooting"].contradicts(e["e_no_shooting_witness_unknown"])
+        assert not e["no_shooting"].contradicts(e["no_shooting_witness_unknown"])

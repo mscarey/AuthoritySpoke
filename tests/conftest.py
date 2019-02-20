@@ -13,17 +13,18 @@ from spoke import Q_
 @pytest.fixture(scope="class")
 def make_entity() -> Dict[str, Entity]:
     return {
-        "e_motel": Entity.new("Hideaway Lodge"),
-        "e_motel_specific": Entity("Hideaway Lodge", generic=False),
-        "e_watt": Human("Wattenburg"),
-        "e_trees": Entity("the stockpile of trees"),
-        "e_trees_specific": Entity.new("the stockpile of trees", generic=False),
-        "e_tree_search": Event("officers' search of the stockpile of trees"),
-        "e_alice": Human("Alice"),
-        "e_bob": Human("Bob"),
-        "e_craig": Human("Craig"),
-        "e_dan": Human("Dan"),
-        "e_circus": Entity("circus"),
+        "motel": Entity.new("Hideaway Lodge"),
+        "motel_specific": Entity("Hideaway Lodge", generic=False),
+        "watt": Human("Wattenburg"),
+        "trees": Entity("the stockpile of trees"),
+        "trees_specific": Entity.new("the stockpile of trees", generic=False),
+        "tree_search": Event("officers' search of the stockpile of trees"),
+        "tree_search_specific": Event("officers' search of the stockpile of trees", generic=False),
+        "alice": Human("Alice"),
+        "bob": Human("Bob"),
+        "craig": Human("Craig"),
+        "dan": Human("Dan"),
+        "circus": Entity("circus"),
     }
 
 
@@ -164,7 +165,7 @@ def make_predicate() -> Dict[str, Predicate]:
 @pytest.fixture(scope="class")
 def watt_mentioned(make_entity) -> Tuple[Entity, ...]:
     e = make_entity
-    return (e["e_motel"], e["e_watt"], e["e_trees"], e["e_tree_search"], e["e_motel_specific"])
+    return (e["motel"], e["watt"], e["trees"], e["tree_search"], e["motel_specific"])
 
 @pytest.fixture(scope="class")
 def watt_factor(make_predicate, make_entity, watt_mentioned) -> Dict[str, Factor]:
@@ -255,7 +256,7 @@ def make_factor(make_predicate, make_entity) -> Dict[str, Factor]:
     p = make_predicate
     e = make_entity
 
-    c = (e["e_alice"], e["e_bob"], e["e_craig"], e["e_dan"], e["e_circus"])
+    c = (e["alice"], e["bob"], e["craig"], e["dan"], e["circus"])
 
     return {
         "f_irrelevant_0": Fact(p["p_irrelevant_0"], (2,), case_factors=c),
@@ -302,57 +303,57 @@ def make_evidence(make_predicate, make_factor, watt_factor) -> Dict[str, Evidenc
     f = make_factor
     w = watt_factor
     return {
-        "e_shooting": Evidence(
+        "shooting": Evidence(
             form="testimony",
             to_effect=f["f_crime"],
             statement=f["f_shooting"],
             stated_by=0,
         ),
-        "e_no_shooting": Evidence(
+        "no_shooting": Evidence(
             form="testimony",
             to_effect=f["f_no_crime"],
             statement=f["f_no_shooting"],
             stated_by=0,
         ),
-        "e_no_shooting_absent": Evidence(
+        "no_shooting_absent": Evidence(
             form="testimony",
             to_effect=f["f_no_crime"],
             statement=f["f_no_shooting"],
             stated_by=0,
             absent=True,
         ),
-        "e_no_shooting_entity_order": Evidence(
+        "no_shooting_entity_order": Evidence(
             form="testimony",
             to_effect=f["f_no_crime_entity_order"],
             statement=f["f_no_shooting_entity_order"],
             stated_by=1,
         ),
-        "e_no_shooting_witness_unknown": Evidence(
+        "no_shooting_witness_unknown": Evidence(
             form="testimony", to_effect=f["f_no_crime"], statement=f["f_no_shooting"]
         ),
-        "e_no_shooting_witness_unknown_absent": Evidence(
+        "no_shooting_witness_unknown_absent": Evidence(
             form="testimony",
             to_effect=f["f_no_crime"],
             statement=f["f_no_shooting"],
             absent=True,
         ),
-        "e_no_shooting_no_effect_entity_order": Evidence(
+        "no_shooting_no_effect_entity_order": Evidence(
             form="testimony", statement=f["f_no_shooting_entity_order"], stated_by=1
         ),
-        "e_no_shooting_derived_from_entity_order": Evidence(
+        "no_shooting_derived_from_entity_order": Evidence(
             form="testimony", statement=f["f_no_shooting_entity_order"], derived_from=1
         ),
-        "e_no_shooting_different_witness": Evidence(
+        "no_shooting_different_witness": Evidence(
             form="testimony",
             to_effect=f["f_no_crime"],
             statement=f["f_no_shooting"],
             stated_by=1,
         ),
-        "e_reciprocal": Evidence(
+        "reciprocal": Evidence(
             form="testimony", to_effect=f["f_no_crime"], statement=w["f7"], stated_by=2
         ),
-        "e_crime": Evidence(to_effect=f["f_crime"], derived_from=2),
-        "e_crime_absent": Evidence(to_effect=f["f_crime"], derived_from=2, absent=True),
+        "crime": Evidence(to_effect=f["f_crime"], derived_from=2),
+        "crime_absent": Evidence(to_effect=f["f_crime"], derived_from=2, absent=True),
     }
 
 
@@ -397,7 +398,7 @@ def make_procedure(make_evidence, make_factor, watt_factor) -> Dict[str, Procedu
             despite=(f["f8"],),
         ),
         "c3": Procedure(
-            outputs=e["e_crime_absent"],
+            outputs=e["crime_absent"],
             inputs=(f["f3"], f["f11"], f["f12"], f["f13"], f["f14"], f["f15"]),
             despite=(f["f16"]),
         ),
@@ -541,7 +542,7 @@ def make_procedure(make_evidence, make_factor, watt_factor) -> Dict[str, Procedu
             outputs=(f["f10_false"],), inputs=(f["f8"])
         ),
         "c3_fewer_inputs": Procedure(
-            outputs=e["e_crime_absent"],
+            outputs=e["crime_absent"],
             inputs=(f["f3"], f["f11"], f["f12"], f["f15"]),
             despite=(f["f16"]),
         ),
@@ -817,12 +818,12 @@ def make_opinion(make_entity, real_holding) -> Dict[str, Opinion]:
     for case in test_cases:
         for opinion in Opinion.from_file(f"json/{case}_h.json"):
             opinions[f"{case}_{opinion.position}"] = opinion
-    opinions["watt_majority"].posits(h["h1"], (e["e_motel"], e["e_watt"]))
-    opinions["watt_majority"].posits(h["h2"], (e["e_trees"], e["e_motel"]))
+    opinions["watt_majority"].posits(h["h1"], (e["motel"], e["watt"]))
+    opinions["watt_majority"].posits(h["h2"], (e["trees"], e["motel"]))
     opinions["watt_majority"].posits(
-        h["h3"], (e["e_motel"], e["e_watt"], e["e_tree_search"], e["e_trees"])
+        h["h3"], (e["motel"], e["watt"], e["tree_search"], e["trees"])
     )
     opinions["watt_majority"].posits(
-        h["h4"], (e["e_motel"], e["e_watt"], e["e_tree_search"], e["e_trees"])
+        h["h4"], (e["motel"], e["watt"], e["tree_search"], e["trees"])
     )
     return opinions
