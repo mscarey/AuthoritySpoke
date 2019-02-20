@@ -22,7 +22,7 @@ class TestFacts:
         self, make_entity, make_predicate, watt_mentioned
     ):
         e = make_entity
-        f2 = Fact(make_predicate["p1"], case_factors=watt_mentioned)
+        f2 = Fact.new(make_predicate["p1"], case_factors=watt_mentioned)
         assert f2.entity_context == (e["motel"],)
 
     def test_entity_context_from_case_factor_indices(
@@ -38,21 +38,19 @@ class TestFacts:
 
         e = make_entity
 
-        f2 = Fact(
+        f2 = Fact.new(
             make_predicate["p2"], entity_context=(1, 0), case_factors=watt_mentioned
         )
         assert f2.entity_context == (e["watt"], e["motel"])
 
     def test_invalid_index_for_case_factors_in_init(self, make_predicate, make_entity):
         with pytest.raises(ValueError):
-            _ = Fact(
-                make_predicate["p1"],
-                entity_context=2,
-                case_factors=make_entity["watt"],
+            _ = Fact.new(
+                make_predicate["p1"], entity_context=2, case_factors=make_entity["watt"]
             )
 
     def test_convert_int_entity_context_to_tuple(self, make_predicate, watt_mentioned):
-        f = Fact(make_predicate["p_irrelevant_1"], 3, case_factors=watt_mentioned)
+        f = Fact.new(make_predicate["p_irrelevant_1"], 3, case_factors=watt_mentioned)
         assert f.entity_context == (watt_mentioned[3],)
 
     def test_string_representation_of_factor(self, watt_factor):
@@ -80,7 +78,7 @@ class TestFacts:
     def test_concrete_to_abstract(self, make_entity, make_predicate):
         motel = make_entity["motel_specific"]
         d = make_entity["watt"]
-        fact = Fact(predicate=make_predicate["p2"], entity_context=(d, motel))
+        fact = Fact.new(predicate=make_predicate["p2"], entity_context=(d, motel))
         assert "<Wattenburg> operated and lived at Hideaway Lodge" in str(fact)
         assert "<Wattenburg> operated and lived at <Hideaway Lodge>" in str(
             fact.make_generic()
@@ -104,7 +102,7 @@ class TestFacts:
 
     def test_factor_entity_context_does_not_match_predicate(self, make_predicate):
         with pytest.raises(ValueError):
-            _ = Fact(make_predicate["p1"], (0, 1, 2))
+            _ = Fact.new(make_predicate["p1"], (0, 1, 2))
 
     def test_reciprocal_with_wrong_number_of_entities(self, make_entity, watt_factor):
         with pytest.raises(ValueError):
@@ -138,7 +136,7 @@ class TestFacts:
 
     def test_standard_of_proof_must_be_listed(self, make_predicate):
         with pytest.raises(ValueError):
-            _ = Fact(make_predicate["p2"], standard_of_proof="probably so")
+            _ = Fact.new(make_predicate["p2"], standard_of_proof="probably so")
 
     def test_standard_of_proof_in_str(self, watt_factor):
         factor = watt_factor["f2_preponderance_of_evidence"]
@@ -186,7 +184,10 @@ class TestFacts:
         assert f["f_irrelevant_3"] == f["f_irrelevant_3_new_context"]
 
     def test_equal_with_different_generic_subfactors(self, make_complex_fact):
-        assert make_complex_fact["f_relevant_murder"] == make_complex_fact["f_relevant_murder_craig"]
+        assert (
+            make_complex_fact["f_relevant_murder"]
+            == make_complex_fact["f_relevant_murder_craig"]
+        )
 
     @pytest.mark.xfail
     def test_unequal_due_to_repeating_entity(self, make_factor):
@@ -201,7 +202,6 @@ class TestFacts:
         f = watt_factor
         assert f["f2_clear_and_convincing"] != f["f2_preponderance_of_evidence"]
         assert f["f2_clear_and_convincing"] != f["f2"]
-
 
     # Implication
 
@@ -257,11 +257,16 @@ class TestFacts:
         assert not f["f2"] > f["f2_preponderance_of_evidence"]
 
     def test_implication_complex(self, make_complex_fact):
-        assert make_complex_fact["f_relevant_murder"] > make_complex_fact["f_relevant_murder_whether"]
+        assert (
+            make_complex_fact["f_relevant_murder"]
+            > make_complex_fact["f_relevant_murder_whether"]
+        )
 
     def test_no_implication_complex(self, make_complex_fact):
-        assert not make_complex_fact["f_relevant_murder"] >= make_complex_fact["f_relevant_murder_alice_craig"]
-
+        assert (
+            not make_complex_fact["f_relevant_murder"]
+            >= make_complex_fact["f_relevant_murder_alice_craig"]
+        )
 
     # Contradiction
 
@@ -284,10 +289,14 @@ class TestFacts:
         assert watt_factor["f9"].contradicts(watt_factor["f9_absent_miles"])
 
     def test_contradiction_complex(self, make_complex_fact):
-        assert make_complex_fact["f_irrelevant_murder"].contradicts(make_complex_fact["f_relevant_murder_craig"])
+        assert make_complex_fact["f_irrelevant_murder"].contradicts(
+            make_complex_fact["f_relevant_murder_craig"]
+        )
 
     def test_no_contradiction_complex(self, make_complex_fact):
-        assert not make_complex_fact["f_irrelevant_murder"].contradicts(make_complex_fact["f_relevant_murder_alice_craig"])
+        assert not make_complex_fact["f_irrelevant_murder"].contradicts(
+            make_complex_fact["f_relevant_murder_alice_craig"]
+        )
 
     # Consistency with Entity/Factor assignments
 
@@ -302,9 +311,7 @@ class TestFacts:
         f = make_factor
         e = make_entity
         assert check_entity_consistency(
-            f["f_irrelevant_3"],
-            f["f_irrelevant_3_new_context"],
-            {e["dan"]: e["craig"]},
+            f["f_irrelevant_3"], f["f_irrelevant_3_new_context"], {e["dan"]: e["craig"]}
         )
         assert check_entity_consistency(
             f["f_irrelevant_3"],
@@ -365,9 +372,7 @@ class TestEvidence:
         e = Evidence(form="testimony", to_effect=watt_factor["f2"])
         assert not e.absent
 
-    def test_default_len_based_on_unique_entity_slots(
-        self, make_entity, make_factor
-    ):
+    def test_default_len_based_on_unique_entity_slots(self, make_entity, make_factor):
         """same as e["no_shooting"]"""
 
         e = Evidence(
@@ -381,10 +386,7 @@ class TestEvidence:
     def test_get_entity_orders(self, make_evidence):
         # TODO: check this after making Evidence.__str__ method
         assert make_evidence["no_shooting"].entity_orders == {(0, 1, 0, 0)}
-        assert make_evidence["reciprocal"].entity_orders == {
-            (0, 1, 0, 2),
-            (1, 0, 0, 2),
-        }
+        assert make_evidence["reciprocal"].entity_orders == {(0, 1, 0, 2), (1, 0, 0, 2)}
 
     def test_get_entity_orders_no_statement(self, make_factor):
         e = Evidence(
@@ -423,22 +425,20 @@ class TestEvidence:
         assert e["no_shooting"] >= e["no_shooting_no_effect_entity_order"]
 
     def test_no_implication_of_fact(self, make_predicate, make_evidence):
-        assert not make_evidence["no_shooting"] > Fact(
+        assert not make_evidence["no_shooting"] > Fact.new(
             make_predicate["p_no_shooting"]
         )
         assert (
-            not Fact(make_predicate["p_no_shooting"]) > make_evidence["no_shooting"]
+            not Fact.new(make_predicate["p_no_shooting"]) > make_evidence["no_shooting"]
         )
 
     def test_no_contradiction_of_fact(self, make_predicate, make_evidence):
         assert not make_evidence["no_shooting"].contradicts(
-            Fact(make_predicate["p_no_shooting"])
+            Fact.new(make_predicate["p_no_shooting"])
         )
 
     def test_no_contradiction_from_supporting_contradictory_facts(self, make_evidence):
-        assert not make_evidence["no_shooting"].contradicts(
-            make_evidence["shooting"]
-        )
+        assert not make_evidence["no_shooting"].contradicts(make_evidence["shooting"])
 
     def test_contradiction_of_absent_version_of_self(self, make_evidence):
         e = make_evidence
@@ -451,12 +451,8 @@ class TestEvidence:
 
     def test_no_contradiction_absent_same_witness(self, make_evidence):
         e = make_evidence
-        assert not e["no_shooting_absent"].contradicts(
-            e["no_shooting_witness_unknown"]
-        )
-        assert not e["no_shooting_witness_unknown"].contradicts(
-            e["no_shooting_absent"]
-        )
+        assert not e["no_shooting_absent"].contradicts(e["no_shooting_witness_unknown"])
+        assert not e["no_shooting_witness_unknown"].contradicts(e["no_shooting_absent"])
         assert not e["no_shooting_absent"].contradicts(
             e["no_shooting_different_witness"]
         )

@@ -76,13 +76,14 @@ class Factor:
             )
         )
 
-    def generic_factors(self) -> Iterable['Factor']:
+    def generic_factors(self) -> Iterable["Factor"]:
         """Returns an iterable of self's generic Factors,
         which must be matched to other generic Factors to
         perform equality tests between Factors."""
 
         if self.generic:
             yield self
+
 
 @dataclass()
 class Predicate:
@@ -393,7 +394,7 @@ class Predicate:
                 + f'"{self.content}", but {len(entities)} were given.'
             )
         if any(isinstance(item, int) for item in entities):
-            entities = [f"<{item}>" for item in entities] # not reachable?
+            entities = [f"<{item}>" for item in entities]  # not reachable?
         return str(self).format(*(str(e) for e in entities))
 
     def negated(self) -> "Predicate":
@@ -579,45 +580,45 @@ STANDARDS_OF_PROOF = {
 }
 
 
+@dataclass(frozen=True)
 class Fact(Factor):
     """An assertion accepted as factual by a court, often through factfinding by
     a judge or jury."""
 
     # TODO: rename entity_context
 
-    def __init__(
-        self,
+    predicate: Optional[Predicate] = None
+    entity_context: Tuple[Factor, ...] = ()
+    standard_of_proof: Optional[str] = None
+    absent: bool = False
+    generic: bool = False
+
+    @classmethod
+    def new(
+        cls,
         predicate: Optional[Predicate] = None,
         entity_context: Union[Factor, Iterable[Factor], int, Iterable[int]] = (),
         standard_of_proof: Optional[str] = None,
         absent: bool = False,
         generic: bool = False,
-        case_factors: Iterable[Factor] = (),
+        case_factors: Union[Factor, Iterable[Factor]] = (),
     ):
-
-        Factor.__init__(self, generic)
-        self.predicate = predicate
-        self.standard_of_proof = standard_of_proof
-        self.absent = absent
-
         def wrap_with_tuple(item) -> Tuple[Union[int, Factor], ...]:
             if isinstance(item, Iterable):
                 return tuple(item)
             return (item,)
 
         case_factors = wrap_with_tuple(case_factors)
-        self.entity_context = wrap_with_tuple(entity_context)
+        entity_context = wrap_with_tuple(entity_context)
 
-        if any(not isinstance(s, Factor) for s in self.entity_context):
-            if any(not isinstance(s, int) for s in self.entity_context):
+        if any(not isinstance(s, Factor) for s in entity_context):
+            if any(not isinstance(s, int) for s in entity_context):
                 raise TypeError(
                     "entity_context parameter must contain all integers "
                     + "or all Factor objects."
                 )
-            if len(case_factors) >= max(self.entity_context):
-                self.entity_context = tuple(
-                    case_factors[i] for i in self.entity_context
-                )
+            if len(case_factors) >= max(entity_context):
+                entity_context = tuple(case_factors[i] for i in entity_context)
             else:
                 raise ValueError(
                     "Items in the entity_context parameter should "
@@ -625,40 +626,20 @@ class Fact(Factor):
                     + "indices of Factor objects in the case_factors parameter."
                 )
 
-        if predicate and len(self.entity_context) < len(predicate):
+        if predicate and len(entity_context) < len(predicate):
             if len(case_factors) < len(predicate):
                 raise ValueError(
-                    f"Must supply exactly {len(self.predicate)} "
+                    f"Must supply exactly {len(predicate)} "
                     + "factor(s) to fill the slots in self.predicate, either "
                     + "as entity_context or case_factors."
                 )
-            self.entity_context = case_factors[: len(predicate)]
+            entity_context = case_factors[: len(predicate)]
 
-        self.entity_orders = self.get_entity_orders()
-
-        if self.standard_of_proof and self.standard_of_proof not in STANDARDS_OF_PROOF:
+        if standard_of_proof and standard_of_proof not in STANDARDS_OF_PROOF:
             raise ValueError(
                 f"standard of proof must be one of {STANDARDS_OF_PROOF.keys()} or None."
             )
-
-    def __hash__(self):
-        """
-        Even though this is duplicative, it needs to be here as long as the
-        class defines its own __eq__ function.
-        """
-
-        return hash(
-            (
-                self.__class__.__name__,
-                *[v for v in self.__dict__.values() if not isinstance(v, set)],
-            )
-        )
-
-    def __repr__(self):
-        return (
-            f"{self.__class__.__name__}({repr(self.predicate)}, {self.entity_context}, "
-            + f"{self.standard_of_proof}, absent={self.absent}, generic={self.generic})"
-        )
+        return cls(predicate, entity_context, standard_of_proof, absent, generic)
 
     def __str__(self):
         predicate = str(self.predicate.content_with_entities(self.entity_context))
@@ -853,7 +834,8 @@ class Fact(Factor):
                         answer.append(context)
         return answer
 
-    def get_entity_orders(self) -> Set[Tuple[int, ...]]:
+    @property
+    def entity_orders(self) -> Set[Tuple[int, ...]]:
 
         """
         Currently the only possible arrangements are derived from
