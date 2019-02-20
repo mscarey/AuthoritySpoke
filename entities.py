@@ -29,12 +29,24 @@ class Entity(Factor):
         """Placeholder for normalizing inputs before initializing."""
         return cls(name, generic, plural)
 
-    def __eq__(self, other: "Entity"):
+    def __eq__(self, other: Factor):
         if type(self) != type(other):
             return False
         if self.generic and other.generic:
             return True
         return astuple(self) == astuple(other)
+
+    def __ge__(self, other: Factor):
+        return self == other or self > other
+
+    def __gt__(self, other: Factor):
+        if not isinstance(self, other.__class__):
+            return False
+        if self == other:
+            return False
+        if self.generic == False and self.name == other.name:
+            return True
+        return other.generic
 
     def __str__(self):
         if self.generic:

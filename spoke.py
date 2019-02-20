@@ -33,7 +33,8 @@ class Factor:
     another. Common types of factors include Facts, Evidence, Allegations,
     Motions, and Arguments."""
 
-    def __init__(self, generic: bool = True):
+    def __init__(self, name: Optional[str] = None, generic: bool = True):
+        self.name = name
         self.generic = generic
 
     @classmethod

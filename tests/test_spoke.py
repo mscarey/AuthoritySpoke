@@ -49,25 +49,28 @@ class TestEntities:
 
     def test_generic_human_and_event_not_equal(self, make_entity):
         """Neither is a subclass of the other."""
-        e = make_entity
-        assert e["tree_search"] != e["watt"]
+        assert make_entity["tree_search"] != make_entity["watt"]
 
     def test_generic_human_and_entity_not_equal(self, make_entity):
         """Human is a subclass of Entity."""
-        e = make_entity
-        assert e["motel"] != e["watt"]
+        assert make_entity["motel"] != make_entity["watt"]
 
     # Implication
 
     def test_implication_generic_entities(self, make_entity):
-        e = make_entity
-        assert e["motel_specific"] > e["trees"]
-        assert not e["motel_specific"] < e["trees"]
+        assert make_entity["motel_specific"] > make_entity["trees"]
+        assert not make_entity["motel_specific"] < make_entity["trees"]
 
     def test_implication_same_except_generic(self, make_entity):
-        e = make_entity
-        assert e["motel_specific"] > e["motel"]
-        assert not e["motel_specific"] < e["motel"]
+        assert make_entity["motel_specific"] > make_entity["motel"]
+        assert not make_entity["motel_specific"] < make_entity["motel"]
+
+    def test_implication_subclass(self, make_entity):
+        assert make_entity["tree_search_specific"] >= make_entity["motel"]
+        assert make_entity["tree_search"] > make_entity["motel"]
+
+    def test_implication_superclass(self, make_entity):
+        assert not make_entity["trees"] >= make_entity["tree_search"]
 
 class TestPredicates:
     def test_predicate_with_wrong_number_of_entities(self):
