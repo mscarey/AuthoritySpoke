@@ -10,41 +10,45 @@ from typing import Iterable, Optional
 
 from spoke import Factor
 
+from dataclasses import astuple, dataclass
 
+
+@dataclass(frozen=True)
 class Entity(Factor):
     """A person, place, thing, or event that needs to be mentioned in
     multiple predicates/factors in a holding."""
 
-    def __init__(
-        self, name: Optional[str] = None, generic: bool = True, plural: bool = False
-    ):
-        Factor.__init__(self, generic)
-        self.name = name
-        self.plural = plural
+    name: Optional[str] = None
+    generic: bool = True
+    plural: bool = False
 
-    def __repr__(self):
-        return (f"{self.__class__.__name__}({self.name}"+
-        f'{", generic=False" if not self.generic else ""}'+
-        f'{", plural=True" if self.plural else ""})')
+    @classmethod
+    def new(
+        cls, name: Optional[str] = None, generic: bool = True, plural: bool = False
+    ):
+        """Placeholder for normalizing inputs before initializing."""
+        return cls(name, generic, plural)
+
+    def __eq__(self, other: "Entity"):
+        if type(self) != type(other):
+            return False
+        if self.generic and other.generic:
+            return True
+        return astuple(self) == astuple(other)
 
     def __str__(self):
         if self.generic:
-            return f'<{self.name}>'
+            return f"<{self.name}>"
         return self.name
+
+    def context_register(self, other):
+        return {self: other}
 
     def make_generic(self):
         if not self.generic:
             return self.__class__(name=self.name, generic=True, plural=self.plural)
         else:
             return self
-
-    def generic_factors(self) -> Iterable[Factor]:
-        """Returns an iterable of self's generic Factors,
-        which must be matched to other generic Factors to
-        perform equality tests between Factors."""
-
-        if self.generic:
-            yield self
 
 
 class Human(Entity):

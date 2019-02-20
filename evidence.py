@@ -8,6 +8,9 @@ from entities import Entity
 from spoke import Factor, Fact
 from spoke import evolve_match_list
 
+# TODO: Exhibit class, with all the attributes of the current
+# Evidence class except to_effect. Exhibit will be an attribute
+# of Evidence.
 
 class Evidence(Factor):
     def __init__(
@@ -28,7 +31,7 @@ class Evidence(Factor):
         self.derived_from = derived_from
         self.absent = absent
         self.generic = generic
-        self.entity_context = self.generic_factors()
+        # self.entity_context = self.generic_factors()
 
     def __hash__(self):
         return hash(

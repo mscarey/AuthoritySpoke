@@ -1,5 +1,6 @@
 __pycache__/
 tests/__pycache__/
+.pylintrc
 .pytest_cache
 .vscode
 .mypy_cache/

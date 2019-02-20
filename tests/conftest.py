@@ -13,11 +13,11 @@ from spoke import Q_
 @pytest.fixture(scope="class")
 def make_entity() -> Dict[str, Entity]:
     return {
-        "e_motel": Entity("Hideaway Lodge"),
+        "e_motel": Entity.new("Hideaway Lodge"),
         "e_motel_specific": Entity("Hideaway Lodge", generic=False),
         "e_watt": Human("Wattenburg"),
         "e_trees": Entity("the stockpile of trees"),
-        "e_trees_specific": Entity("the stockpile of trees", generic=False),
+        "e_trees_specific": Entity.new("the stockpile of trees", generic=False),
         "e_tree_search": Event("officers' search of the stockpile of trees"),
         "e_alice": Human("Alice"),
         "e_bob": Human("Bob"),

@@ -38,6 +38,7 @@ class TestEntities:
         motel = e["e_motel_specific"]
         motel_b = motel.make_generic()
         assert not motel is motel_b
+        assert not motel == motel_b
 
     def test_implication_generic_entities(self, make_entity):
         e = make_entity
@@ -48,6 +49,21 @@ class TestEntities:
         e = make_entity
         assert e["e_motel_specific"] > e["e_motel"]
         assert not e["e_motel_specific"] < e["e_motel"]
+
+    def test_generic_human_and_event_not_equal(self, make_entity):
+        """Neither is a subclass of the other."""
+        e = make_entity
+        assert e["e_tree_search"] != e["e_watt"]
+
+    def test_generic_human_and_entity_not_equal(self, make_entity):
+        """Human is a subclass of Entity."""
+        e = make_entity
+        assert e["e_motel"] != e["e_watt"]
+
+    def test_context_register(self, make_entity):
+        motel = make_entity["e_motel"]
+        watt = make_entity["e_watt"]
+        assert motel.context_register(watt) == {motel: watt}
 
 
 class TestPredicates:
