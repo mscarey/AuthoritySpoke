@@ -81,12 +81,11 @@ class Factor:
         return False
 
     def __hash__(self):
+        # TODO: make Factor a dataclass and get rid of this.
         return hash(
-            (
                 self.__class__.__name__,
-                *[v for v in self.__dict__.values() if not isinstance(v, set)],
-            )
-        )
+                *[v for v in self.__dict__.values() if not isinstance(v, set)],)
+
 
     def generic_factors(self) -> Iterable["Factor"]:
         """Returns an iterable of self's generic Factors,
@@ -319,7 +318,11 @@ class Predicate:
         return hash(
             (
                 self.__class__.__name__,
-                *[v for v in self.__dict__.values() if not isinstance(v, set)],
+                *[
+                    v
+                    for v in self.__dict__.values()
+                    if not isinstance(v, set) and not isinstance(v, list)
+                ],
             )
         )
 
@@ -661,21 +664,35 @@ class Fact(Factor):
             + f"{standard}: {predicate}"
         )
 
+    def _find_matching_context(
+        self,
+        context_register: List[Dict[Factor, Factor]],
+        comparison: Callable = operator.eq,
+    ) -> bool:
+        """Checks whether every key-value pair is related by the function
+        in the "comparison" parameter. Whichever object is calling this
+        method locally takes itself out of the context before comparing,
+        avoiding infinite recursion."""
+        for context in context_register:
+            context.pop(self)
+            if all(item[0] == item[1] for item in context.items()):
+                return True
+        return False
+
     def __eq__(self, other: Factor) -> bool:
         if self.__class__ != other.__class__:
             return False
         if self.generic == other.generic == True:
             return True
-        return (
-            self.predicate == other.predicate
-            and all(
-                row[0] == row[1]
-                for row in zip(self.entity_context, other.entity_context)
-            )
-            and self.standard_of_proof == other.standard_of_proof
-            and self.absent == other.absent
-            and self.generic == other.generic
-        )
+        if (
+            self.predicate != other.predicate
+            or self.standard_of_proof != other.standard_of_proof
+            or self.absent != other.absent
+            or self.generic != other.generic
+        ):
+            return False
+        register = self.context_register(other)
+        return self._find_matching_context(register, operator.eq)
 
     def _import_to_mapping(self, self_mapping, incoming_mapping):
         """If the same factor in self appears to match to two
@@ -838,7 +855,9 @@ class Fact(Factor):
 
     def copy_with_foreign_context(self, context_assignment):
         # TODO: move to Factor class, handle inheritance
-        new_context = [context_assignment.get(entity) for entity in self.entity_context]
+        new_context = tuple(
+            [context_assignment.get(entity) for entity in self.entity_context]
+        )
         return Fact(
             predicate=self.predicate,
             entity_context=new_context,
