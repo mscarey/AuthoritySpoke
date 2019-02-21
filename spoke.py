@@ -665,17 +665,12 @@ class Fact(Factor):
             and self.generic == other.generic
         )
 
-    def context_register(self, other: Factor) -> Union[bool, Dict[Factor, Factor]]:
-        """Searches through the context factors of self and other, making
-        a list of dicts, where each dicts is a valid way to make matches between
-        corresponding factors. The dict is empty if there are no matches."""
-
-        def import_to_mapping(self_mapping, incoming_mapping):
+    def _import_to_mapping(self, self_mapping, incoming_mapping):
             """If the same factor in self appears to match to two
             different factors in other, the function
             return False. Otherwise it returns the dict of matches."""
             if not incoming_mapping:
-                return False
+                return self_mapping
             for item in incoming_mapping:
                 # TODO: replace "is" test on next line with a lambda that can be __ge__?
                 if (
@@ -687,29 +682,36 @@ class Fact(Factor):
                     return False
             return self_mapping
 
-        def update_mapping(mapping, other_order):
-            longest = max(len(self.entity_context), len(other_order))
-            all_mappings = [mapping]
-            for index in range(longest):
-                incoming_mappings = [
-                    mapping
-                    for mapping in self.entity_context[index].context_register(
-                        other_order[index]
-                    )
-                ]
-                all_mappings = [
-                    import_to_mapping(mapping, incoming_mapping)
-                    for mapping in all_mappings
-                    for incoming_mapping in incoming_mappings
-                ]
 
-            return all_mappings
+    def _update_mapping(self, self_mapping, other_order):
+        longest = max(len(self.entity_context), len(other_order))
+        all_mappings = [self_mapping]
+        for index in range(longest):
+            incoming_mappings = [
+                mapping
+                for mapping in self.entity_context[index].context_register(
+                    other_order[index]
+                )
+            ]
+            all_mappings = [
+                self._import_to_mapping(mapping, incoming_mapping)
+                for mapping in all_mappings
+                for incoming_mapping in incoming_mappings
+                if mapping is not False
+            ]
+
+        return all_mappings
+
+    def context_register(self, other: Factor) -> Union[bool, Dict[Factor, Factor]]:
+        """Searches through the context factors of self and other, making
+        a list of dicts, where each dicts is a valid way to make matches between
+        corresponding factors. The dict is empty if there are no matches."""
 
         register = [{self: other}]
         if self.generic or other.generic:
             return register
         new_register = [
-            update_mapping(mapping, other_order)
+            self._update_mapping(mapping, other_order)
             for mapping in register
             for other_order in other.entity_orders
         ]

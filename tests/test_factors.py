@@ -143,10 +143,48 @@ class TestFacts:
         assert factor.standard_of_proof in str(factor)
 
     def test_context_register(self, make_entity, watt_factor):
-        assert watt_factor["f1"].context_register(watt_factor["f1_entity_order"]) == [{
-            make_entity["motel"]: make_entity["watt"],
-            watt_factor["f1"]: watt_factor["f1_entity_order"]
-        }]
+        assert watt_factor["f1"].context_register(watt_factor["f1_entity_order"]) == [
+            {
+                make_entity["motel"]: make_entity["watt"],
+                watt_factor["f1"]: watt_factor["f1_entity_order"],
+            }
+        ]
+
+    def test_import_to_mapping_conflict(self, make_entity, watt_factor):
+        f = watt_factor["f7"]
+        assert (
+            f._import_to_mapping(
+                {make_entity["motel"]: make_entity["trees"]},
+                {make_entity["motel"]: make_entity["motel"]},
+            )
+            == False
+        )
+
+    def test_import_to_mapping(self, make_entity, watt_factor):
+        f = watt_factor["f7"]
+        assert len(
+            f._import_to_mapping(
+                {
+                    watt_factor["f7"]: watt_factor["f7_swap_entities"],
+                    make_entity["motel"]: make_entity["trees"],
+                },
+                {make_entity["trees"]: make_entity["motel"]},
+            )
+        ) == 3
+
+    def test_reciprocal_context_register(self, make_entity, watt_factor):
+        d = watt_factor["f7"].context_register(watt_factor["f7_swap_entities"])
+        assert len(d) == 2
+        assert {
+            make_entity["motel"]: make_entity["trees"],
+            make_entity["trees"]: make_entity["motel"],
+            watt_factor["f7"]: watt_factor["f7_entity_order"],
+        } in d
+        assert {
+            make_entity["motel"]: make_entity["motel"],
+            make_entity["trees"]: make_entity["trees"],
+            watt_factor["f7"]: watt_factor["f7_entity_order"],
+        } in d
 
     # Equality
 
