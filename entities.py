@@ -29,6 +29,7 @@ class Entity(Factor):
         """Placeholder for normalizing inputs before initializing."""
         return cls(name, generic, plural)
 
+
     def __eq__(self, other: Factor):
         if type(self) != type(other):
             return False

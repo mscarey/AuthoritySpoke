@@ -150,6 +150,34 @@ class TestFacts:
             }
         ]
 
+    def test_import_to_mapping(self, make_entity, watt_factor):
+        f = watt_factor["f7"]
+        assert (
+            len(
+                f._import_to_mapping(
+                    {
+                        watt_factor["f7"]: watt_factor["f7_swap_entities"],
+                        make_entity["motel"]: make_entity["trees"],
+                    },
+                    {make_entity["trees"]: make_entity["motel"]},
+                )
+            )
+            == 3
+        )
+
+    def test_import_to_mapping_no_change(self, make_entity, watt_factor):
+        f = watt_factor["f7"]
+        old_mapping = {
+            watt_factor["f7"]: watt_factor["f7_swap_entities"],
+            make_entity["motel"]: make_entity["trees"],
+        }
+        assert (
+            f._import_to_mapping(
+                old_mapping, {make_entity["motel"]: make_entity["trees"]}
+            )
+            == old_mapping
+        )
+
     def test_import_to_mapping_conflict(self, make_entity, watt_factor):
         f = watt_factor["f7"]
         assert (
@@ -160,30 +188,18 @@ class TestFacts:
             == False
         )
 
-    def test_import_to_mapping(self, make_entity, watt_factor):
-        f = watt_factor["f7"]
-        assert len(
-            f._import_to_mapping(
-                {
-                    watt_factor["f7"]: watt_factor["f7_swap_entities"],
-                    make_entity["motel"]: make_entity["trees"],
-                },
-                {make_entity["trees"]: make_entity["motel"]},
-            )
-        ) == 3
-
     def test_reciprocal_context_register(self, make_entity, watt_factor):
         d = watt_factor["f7"].context_register(watt_factor["f7_swap_entities"])
         assert len(d) == 2
         assert {
             make_entity["motel"]: make_entity["trees"],
             make_entity["trees"]: make_entity["motel"],
-            watt_factor["f7"]: watt_factor["f7_entity_order"],
+            watt_factor["f7"]: watt_factor["f7_swap_entities"],
         } in d
         assert {
             make_entity["motel"]: make_entity["motel"],
             make_entity["trees"]: make_entity["trees"],
-            watt_factor["f7"]: watt_factor["f7_entity_order"],
+            watt_factor["f7"]: watt_factor["f7_swap_entities"],
         } in d
 
     # Equality

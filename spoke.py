@@ -26,6 +26,18 @@ OPPOSITE_COMPARISONS = {
 }
 
 
+def compare_dict_for_identical_entries(left, right):
+    """Compares two dicts to see whether the
+    keys and values of one are the same objects
+    as the keys and values of the other, not just
+    whether they evaluate equal."""
+
+    return all(
+        any((l_key is r_key and left[l_key] is right[r_key]) for r_key in right)
+        for l_key in left
+    )
+
+
 class Factor:
     """A factor is something used to determine the applicability of a legal
     procedure. Factors can be both inputs and outputs of legal procedures.
@@ -666,57 +678,56 @@ class Fact(Factor):
         )
 
     def _import_to_mapping(self, self_mapping, incoming_mapping):
-            """If the same factor in self appears to match to two
+        """If the same factor in self appears to match to two
             different factors in other, the function
             return False. Otherwise it returns the dict of matches."""
-            if not incoming_mapping:
-                return self_mapping
-            for item in incoming_mapping:
-                # TODO: replace "is" test on next line with a lambda that can be __ge__?
-                if (
-                    item not in self_mapping
-                    or self_mapping[item] is incoming_mapping[item]
-                ):
-                    self_mapping[item] = incoming_mapping[item]
-                else:
-                    return False
-            return self_mapping
+        for item in incoming_mapping:
+            # TODO: replace "is" test on next line with a lambda that can be __ge__?
+            if item not in self_mapping or self_mapping[item] is incoming_mapping[item]:
+                self_mapping[item] = incoming_mapping[item]
+            else:
+                return False
+        return MappingProxyType(self_mapping)
 
-
-    def _update_mapping(self, self_mapping, other_order):
+    def _update_mapping(self, self_mapping_proxy, other_order):
         longest = max(len(self.entity_context), len(other_order))
-        all_mappings = [self_mapping]
+        all_mappings = [self_mapping_proxy]
         for index in range(longest):
             incoming_mappings = [
-                mapping
-                for mapping in self.entity_context[index].context_register(
+                incoming
+                for incoming in self.entity_context[index].context_register(
                     other_order[index]
                 )
             ]
             all_mappings = [
-                self._import_to_mapping(mapping, incoming_mapping)
+                self._import_to_mapping(dict(mapping), incoming)
                 for mapping in all_mappings
-                for incoming_mapping in incoming_mappings
-                if mapping is not False
+                for incoming in incoming_mappings
+                if incoming and mapping
             ]
 
-        return all_mappings
+        for mapping in all_mappings:
+            yield mapping
 
     def context_register(self, other: Factor) -> Union[bool, Dict[Factor, Factor]]:
         """Searches through the context factors of self and other, making
         a list of dicts, where each dicts is a valid way to make matches between
         corresponding factors. The dict is empty if there are no matches."""
 
-        register = [{self: other}]
+        register = [MappingProxyType({self: other})]
         if self.generic or other.generic:
             return register
-        new_register = [
-            self._update_mapping(mapping, other_order)
-            for mapping in register
-            for other_order in other.entity_orders
-        ]
-        new_register = [item for sublist in new_register for item in sublist]
-        return [x for x in new_register if x is not False]
+        new_register = []
+        for mapping in register:
+            for other_order in other.entity_orders:
+                for m in self._update_mapping(mapping, other_order):
+                    if not any(
+                        compare_dict_for_identical_entries(m, other_dict)
+                        for other_dict in new_register
+                    ):
+                        new_register.append(m)
+
+        return [dict(m) for m in new_register]
 
     def make_generic(self) -> "Fact":
         """
@@ -846,17 +857,6 @@ class Fact(Factor):
         as the possibilities increase, so it should only be run
         when matches has been narrowed as much as possible."""
         # TODO: docstring
-
-        def compare_dict_for_identical_entries(left, right):
-            """Compares two dicts to see whether the
-            keys and values of one are the same objects
-            as the keys and values of the other, not just
-            whether they evaluate equal."""
-
-            return all(
-                any((l_key is r_key and left[l_key] is right[r_key]) for r_key in right)
-                for l_key in left
-            )
 
         answer = []
         for source_list in self.entity_orders:
