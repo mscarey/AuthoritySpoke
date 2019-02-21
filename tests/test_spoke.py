@@ -31,7 +31,7 @@ class TestEntities:
     def test_context_register(self, make_entity):
         motel = make_entity["motel"]
         watt = make_entity["watt"]
-        assert motel.context_register(watt) == {motel: watt}
+        assert motel.context_register(watt) == [{motel: watt}]
 
     # Equality
 

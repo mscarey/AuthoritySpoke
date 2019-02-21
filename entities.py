@@ -6,7 +6,7 @@ as parameters, so they won't (probably?) need to incorporate
 ordered tuples of other Factors.
 """
 
-from typing import Iterable, Optional
+from typing import Dict, List, Optional
 
 from spoke import Factor
 
@@ -53,8 +53,11 @@ class Entity(Factor):
             return f"<{self.name}>"
         return self.name
 
-    def context_register(self, other):
-        return {self: other}
+    def context_register(self, other: Factor) -> List[Dict[Factor, Factor]]:
+        """Returns a list of possible ways the context of self can be
+        mapped onto the context of other. Other subclasses of Factor
+        will have more complex lists."""
+        return [{self: other}]
 
     def make_generic(self):
         if not self.generic:

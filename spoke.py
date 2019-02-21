@@ -649,7 +649,7 @@ class Fact(Factor):
             + f"{standard}: {predicate}"
         )
 
-    def __eq__(self, other: "Factor") -> bool:
+    def __eq__(self, other: Factor) -> bool:
         if self.__class__ != other.__class__:
             return False
         if self.generic == other.generic == True:
@@ -664,6 +664,57 @@ class Fact(Factor):
             and self.absent == other.absent
             and self.generic == other.generic
         )
+
+    def context_register(self, other: Factor) -> Union[bool, Dict[Factor, Factor]]:
+        """Searches through the context factors of self and other, making
+        a list of dicts, where each dicts is a valid way to make matches between
+        corresponding factors. The dict is empty if there are no matches."""
+
+        def import_to_mapping(self_mapping, incoming_mapping):
+            """If the same factor in self appears to match to two
+            different factors in other, the function
+            return False. Otherwise it returns the dict of matches."""
+            if not incoming_mapping:
+                return False
+            for item in incoming_mapping:
+                # TODO: replace "is" test on next line with a lambda that can be __ge__?
+                if (
+                    item not in self_mapping
+                    or self_mapping[item] is incoming_mapping[item]
+                ):
+                    self_mapping[item] = incoming_mapping[item]
+                else:
+                    return False
+            return self_mapping
+
+        def update_mapping(mapping, other_order):
+            longest = max(len(self.entity_context), len(other_order))
+            all_mappings = [mapping]
+            for index in range(longest):
+                incoming_mappings = [
+                    mapping
+                    for mapping in self.entity_context[index].context_register(
+                        other_order[index]
+                    )
+                ]
+                all_mappings = [
+                    import_to_mapping(mapping, incoming_mapping)
+                    for mapping in all_mappings
+                    for incoming_mapping in incoming_mappings
+                ]
+
+            return all_mappings
+
+        register = [{self: other}]
+        if self.generic or other.generic:
+            return register
+        new_register = [
+            update_mapping(mapping, other_order)
+            for mapping in register
+            for other_order in other.entity_orders
+        ]
+        new_register = [item for sublist in new_register for item in sublist]
+        return [x for x in new_register if x is not False]
 
     def make_generic(self) -> "Fact":
         """

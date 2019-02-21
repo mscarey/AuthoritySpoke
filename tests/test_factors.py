@@ -142,6 +142,12 @@ class TestFacts:
         factor = watt_factor["f2_preponderance_of_evidence"]
         assert factor.standard_of_proof in str(factor)
 
+    def test_context_register(self, make_entity, watt_factor):
+        assert watt_factor["f1"].context_register(watt_factor["f1_entity_order"]) == [{
+            make_entity["motel"]: make_entity["watt"],
+            watt_factor["f1"]: watt_factor["f1_entity_order"]
+        }]
+
     # Equality
 
     def test_equality_factor_from_same_predicate(self, watt_factor):
