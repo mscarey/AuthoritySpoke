@@ -664,6 +664,38 @@ class Fact(Factor):
             + f"{standard}: {predicate}"
         )
 
+    def _update_mapping(self, self_mapping_proxy, other_order):
+        longest = max(len(self.entity_context), len(other_order))
+        all_mappings = [self_mapping_proxy]
+        for index in range(longest):
+            incoming_mappings = [
+                incoming
+                for incoming in self.entity_context[index].context_register(
+                    other_order[index]
+                )
+            ]
+            all_mappings = [
+                self._import_to_mapping(dict(mapping), incoming)
+                for mapping in all_mappings
+                for incoming in incoming_mappings
+                if incoming and mapping
+            ]
+
+        for mapping in all_mappings:
+            yield mapping
+
+    def _import_to_mapping(self, self_mapping, incoming_mapping):
+        """If the same factor in self appears to match to two
+        different factors in other, the function
+        return False. Otherwise it returns the dict of matches."""
+        for item in incoming_mapping:
+            # TODO: replace "is" test on next line with a lambda that can be __ge__?
+            if item not in self_mapping or self_mapping[item] is incoming_mapping[item]:
+                self_mapping[item] = incoming_mapping[item]
+            else:
+                return False
+        return MappingProxyType(self_mapping)
+
     def _find_matching_context(
         self,
         context_register: List[Dict[Factor, Factor]],
@@ -694,41 +726,12 @@ class Fact(Factor):
         register = self.context_register(other)
         return self._find_matching_context(register, operator.eq)
 
-    def _import_to_mapping(self, self_mapping, incoming_mapping):
-        """If the same factor in self appears to match to two
-            different factors in other, the function
-            return False. Otherwise it returns the dict of matches."""
-        for item in incoming_mapping:
-            # TODO: replace "is" test on next line with a lambda that can be __ge__?
-            if item not in self_mapping or self_mapping[item] is incoming_mapping[item]:
-                self_mapping[item] = incoming_mapping[item]
-            else:
-                return False
-        return MappingProxyType(self_mapping)
 
-    def _update_mapping(self, self_mapping_proxy, other_order):
-        longest = max(len(self.entity_context), len(other_order))
-        all_mappings = [self_mapping_proxy]
-        for index in range(longest):
-            incoming_mappings = [
-                incoming
-                for incoming in self.entity_context[index].context_register(
-                    other_order[index]
-                )
-            ]
-            all_mappings = [
-                self._import_to_mapping(dict(mapping), incoming)
-                for mapping in all_mappings
-                for incoming in incoming_mappings
-                if incoming and mapping
-            ]
 
-        for mapping in all_mappings:
-            yield mapping
 
     def context_register(self, other: Factor) -> Union[bool, Dict[Factor, Factor]]:
         """Searches through the context factors of self and other, making
-        a list of dicts, where each dicts is a valid way to make matches between
+        a list of dicts, where each dict is a valid way to make matches between
         corresponding factors. The dict is empty if there are no matches."""
 
         register = [MappingProxyType({self: other})]

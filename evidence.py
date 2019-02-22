@@ -205,12 +205,10 @@ class Evidence(Factor):
 
     def make_absent(self) -> "Evidence":
         return Evidence(
-            form=self.form,
+            exhibit=self.exhibit,
             to_effect=self.to_effect,
-            statement=self.statement,
-            stated_by=self.stated_by,
-            derived_from=self.derived_from,
             absent=not self.absent,
+            generic=self.generic,
         )
 
     def contradicts(self, other: Optional[Factor]) -> bool:
