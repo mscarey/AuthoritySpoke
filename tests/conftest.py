@@ -387,41 +387,33 @@ def make_evidence(make_predicate, make_factor, watt_factor) -> Dict[str, Evidenc
         "no_shooting_absent": Evidence(
             Exhibit("no_shooting_testimony"),
             to_effect=f["f_no_crime"],
-            statement=f["f_no_shooting"],
-            stated_by=0,
             absent=True,
         ),
         "no_shooting_entity_order": Evidence(
             Exhibit("no_shooting_entity_order_testimony"),
             to_effect=f["f_no_crime_entity_order"],
-            statement=f["f_no_shooting_entity_order"],
-            stated_by=1,
         ),
         "no_shooting_witness_unknown": Evidence(
-            Exhibit("no_shooting_witness_unknown_testimony"), to_effect=f["f_no_crime"], statement=f["f_no_shooting"]
+            Exhibit("no_shooting_witness_unknown_testimony"), to_effect=f["f_no_crime"]
         ),
         # Here the Exhibit is absent, not the Evidence. Pointless distinction?
         "no_shooting_witness_unknown_absent": Evidence(
             Exhibit("no_shooting_witness_unknown_absent_testimony"),
             to_effect=f["f_no_crime"],
-            statement=f["f_no_shooting"],
         ),
         "no_shooting_no_effect_entity_order": Evidence(
-            Exhibit("no_shooting_no_effect_entity_order_testimony"), statement=f["f_no_shooting_entity_order"], stated_by=1
+            Exhibit("no_shooting_no_effect_entity_order_testimony")
         ),
         "no_shooting_different_witness": Evidence(
             Exhibit("no_shooting_different_witness_testimony"),
             to_effect=f["f_no_crime"],
-            statement=f["f_no_shooting"],
-            stated_by=1,
         ),
         "reciprocal": Evidence(
-            Exhibit("reciprocal_testimony"), to_effect=f["f_no_crime"], statement=w["f7"], stated_by=2
+            Exhibit("reciprocal_testimony"), to_effect=f["f_no_crime"]
         ),
         "crime": Evidence(Exhibit("generic_exhibit"), generic=True),
         "crime_absent": Evidence(Exhibit("generic_exhibit"), absent=True, generic=True),
     }
-
 
 @pytest.fixture(scope="module")
 def make_code() -> Dict[str, Code]:
