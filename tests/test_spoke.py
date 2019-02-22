@@ -229,6 +229,26 @@ class TestProcedures:
             [{w[2]: w[1], w[3]: w[0]}, {w[1]: w[1], w[2]: w[3]}]
         ) == [{w[1]: w[2], w[0]: w[3]}, {w[1]: w[1], w[3]: w[2]}]
 
+    def test_consistent_entity_combinations(self, watt_factor, watt_mentioned):
+        """
+        Finds that for factor f["f7"], it would be consistent with the
+        other group of factors for f["f7"]'s two slots to be assigned
+        (0, 1) or (1, 0).
+        """
+        w = watt_mentioned
+        f = watt_factor
+        assert f["f7"].consistent_entity_combinations(
+            factors_from_other_procedure=[
+                f["f4"],
+                f["f5"],
+                f["f6"],
+                f["f7"],
+                f["f8"],
+                f["f9"],
+            ],
+            matches={w[2]: None, w[0]: None},
+        ) == [{w[2]: w[2], w[0]: w[0]}, {w[2]: w[0], w[0]: w[2]}]
+
     def test_unequal_after_swapping_nonreciprocal_entities(self, make_procedure):
         assert make_procedure["c2"] != make_procedure["c2_nonreciprocal_swap"]
 
