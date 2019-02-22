@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 import operator
 
 from typing import Callable, Dict, List, Set, Tuple
@@ -12,32 +13,44 @@ from spoke import evolve_match_list
 # Evidence class except to_effect. Exhibit will be an attribute
 # of Evidence.
 
-class Evidence(Factor):
-    def __init__(
-        self,
-        form: Optional[str] = None,
-        to_effect: Optional[Fact] = None,
-        statement: Optional[Fact] = None,
-        stated_by: Optional[Entity] = None,
-        derived_from: Optional[Entity] = None,
-        absent: bool = False,
-        generic: bool = False,
-    ):
+@dataclass(frozen=True)
+class Exhibit(Factor):
+    """A source of information for use in litigation.
 
-        self.form = form
-        self.to_effect = to_effect
-        self.statement = statement
-        self.stated_by = stated_by
-        self.derived_from = derived_from
-        self.absent = absent
-        self.generic = generic
-        # self.entity_context = self.generic_factors()
+    "derived_from" and and "offered_by" parameters were removed
+    because the former is probably better represented as a Fact,
+    and the latter as a Motion.
+
+    Allowed inputs for "form" will need to be limited.
+    """
+
+    form: Optional[str] = None
+    statement: Optional[Fact] = None
+    stated_by: Optional[Entity] = None
+    absent: bool = False
+    generic: bool = False
+
+
+@dataclass(frozen=True)
+class Evidence(Factor):
+    """An Exhibit that has been admitted by the court to aid a
+    factual determination."""
+    exhibit: Optional[Exhibit] = None
+    to_effect: Optional[Fact] = None
+    absent: bool = False
+    generic: bool = False
+
+    # self.entity_context = self.generic_factors()
 
     def __hash__(self):
         return hash(
             (
                 self.__class__.__name__,
-                *[v for v in self.__dict__.values() if not isinstance(v, set)],
+                *[
+                    v
+                    for v in self.__dict__.values()
+                    if not isinstance(v, set) and not isinstance(v, list)
+                ],
             )
         )
 

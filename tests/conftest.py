@@ -4,11 +4,12 @@ import pytest
 
 from enactments import Code, Enactment
 from entities import Entity, Event, Human
-from evidence import Evidence
+from evidence import Evidence, Exhibit
 from opinions import Opinion
 from rules import Procedure, ProceduralRule
 from spoke import Predicate, Factor, Fact
 from spoke import Q_
+
 
 @pytest.fixture(scope="class")
 def make_entity() -> Dict[str, Entity]:
@@ -19,7 +20,9 @@ def make_entity() -> Dict[str, Entity]:
         "trees": Entity("the stockpile of trees"),
         "trees_specific": Entity.new("the stockpile of trees", generic=False),
         "tree_search": Event("officers' search of the stockpile of trees"),
-        "tree_search_specific": Event("officers' search of the stockpile of trees", generic=False),
+        "tree_search_specific": Event(
+            "officers' search of the stockpile of trees", generic=False
+        ),
         "alice": Human("Alice"),
         "bob": Human("Bob"),
         "craig": Human("Craig"),
@@ -148,7 +151,6 @@ def make_predicate() -> Dict[str, Predicate]:
         "p_irrelevant_1": Predicate("{} was a bear"),
         "p_irrelevant_2": Predicate("{} was a circus"),
         "p_irrelevant_3": Predicate("{} performed at {}"),
-
         "p_crime": Predicate("{} committed a crime"),
         "p_murder": Predicate("{} murdered {}"),
         "p_murder_whether": Predicate("{} murdered {}", truth=None),
@@ -163,10 +165,12 @@ def make_predicate() -> Dict[str, Predicate]:
         "p_three_entities": Predicate("{} threw {} to {}"),
     }
 
+
 @pytest.fixture(scope="class")
 def watt_mentioned(make_entity) -> Tuple[Entity, ...]:
     e = make_entity
     return (e["motel"], e["watt"], e["trees"], e["tree_search"], e["motel_specific"])
+
 
 @pytest.fixture(scope="class")
 def watt_factor(make_predicate, make_entity, watt_mentioned) -> Dict[str, Factor]:
@@ -265,8 +269,12 @@ def make_factor(make_predicate, make_entity) -> Dict[str, Factor]:
         "f_irrelevant_1": Fact.new(p["p_irrelevant_1"], (3,), case_factors=c),
         "f_irrelevant_2": Fact.new(p["p_irrelevant_2"], (4,), case_factors=c),
         "f_irrelevant_3": Fact.new(p["p_irrelevant_3"], (2, 4), case_factors=c),
-        "f_irrelevant_3_new_context": Fact.new(p["p_irrelevant_3"], (3, 4), case_factors=c),
-        "f_irrelevant_3_context_0": Fact.new(p["p_irrelevant_3"], (3, 0), case_factors=c),
+        "f_irrelevant_3_new_context": Fact.new(
+            p["p_irrelevant_3"], (3, 4), case_factors=c
+        ),
+        "f_irrelevant_3_context_0": Fact.new(
+            p["p_irrelevant_3"], (3, 0), case_factors=c
+        ),
         "f_crime": Fact.new(p["p_crime"], case_factors=c),
         "f_no_crime": Fact.new(p["p_no_crime"], case_factors=c),
         "f_no_crime_entity_order": Fact.new(p["p_no_crime"], (1,), case_factors=c),
@@ -278,10 +286,15 @@ def make_factor(make_predicate, make_entity) -> Dict[str, Factor]:
         "f_shooting_craig": Fact.new(p["p_shooting"], (2, 3), case_factors=c),
         "f_no_shooting": Fact.new(p["p_no_shooting"], case_factors=c),
         "f_shooting_whether": Fact.new(p["p_shooting_whether"], case_factors=c),
-        "f_no_shooting_entity_order": Fact.new(p["p_no_shooting"], (1, 0), case_factors=c),
+        "f_no_shooting_entity_order": Fact.new(
+            p["p_no_shooting"], (1, 0), case_factors=c
+        ),
         "f_three_entities": Fact.new(p["p_three_entities"], (0, 1, 2), case_factors=c),
-        "f_repeating_entity": Fact.new(p["p_three_entities"], (0, 1, 0), case_factors=c),
+        "f_repeating_entity": Fact.new(
+            p["p_three_entities"], (0, 1, 0), case_factors=c
+        ),
     }
+
 
 @pytest.fixture(scope="class")
 def make_complex_fact(make_predicate, make_factor) -> Dict[str, Evidence]:
@@ -289,15 +302,73 @@ def make_complex_fact(make_predicate, make_factor) -> Dict[str, Evidence]:
     f = make_factor
 
     return {
-        "f_irrelevant_murder": Fact.new(p["p_irrelevant"], (f["f_shooting"], f["f_murder"])),
-        "f_relevant_murder": Fact.new(p["p_relevant"], (f["f_shooting"], f["f_murder"])),
-        "f_relevant_murder_swap_entities": Fact.new(p["p_relevant"], (f["f_shooting"], f["f_murder"])),
-        "f_relevant_murder_whether": Fact.new(p["p_relevant"], (f["f_shooting"], f["f_murder_whether"])),
-        "f_whether_relevant_murder_whether": Fact.new(p["p_relevant"], (f["f_shooting_whether"], f["f_murder_whether"])),
-        "f_relevant_murder_swap": Fact.new(p["p_relevant"], (f["f_shooting"], f["f_murder_entity_swap"])),
-        "f_relevant_murder_craig": Fact.new(p["p_relevant"], (f["f_shooting_craig"], f["f_murder_craig"])),
-        "f_relevant_murder_alice_craig": Fact.new(p["p_relevant"], (f["f_shooting"], f["f_murder_craig"])),
+        "f_irrelevant_murder": Fact.new(
+            p["p_irrelevant"], (f["f_shooting"], f["f_murder"])
+        ),
+        "f_relevant_murder": Fact.new(
+            p["p_relevant"], (f["f_shooting"], f["f_murder"])
+        ),
+        "f_relevant_murder_swap_entities": Fact.new(
+            p["p_relevant"], (f["f_shooting"], f["f_murder"])
+        ),
+        "f_relevant_murder_whether": Fact.new(
+            p["p_relevant"], (f["f_shooting"], f["f_murder_whether"])
+        ),
+        "f_whether_relevant_murder_whether": Fact.new(
+            p["p_relevant"], (f["f_shooting_whether"], f["f_murder_whether"])
+        ),
+        "f_relevant_murder_swap": Fact.new(
+            p["p_relevant"], (f["f_shooting"], f["f_murder_entity_swap"])
+        ),
+        "f_relevant_murder_craig": Fact.new(
+            p["p_relevant"], (f["f_shooting_craig"], f["f_murder_craig"])
+        ),
+        "f_relevant_murder_alice_craig": Fact.new(
+            p["p_relevant"], (f["f_shooting"], f["f_murder_craig"])
+        ),
     }
+
+
+@pytest.fixture(scope="class")
+def make_exhibit(
+    make_entity, make_predicate, make_factor, watt_factor
+) -> Dict[str, Exhibit]:
+    e = make_entity
+    f = make_factor
+    p = make_predicate
+    w = watt_factor
+    return {
+        "shooting_testimony": Exhibit(
+            form="testimony", statement=f["f_shooting"], stated_by=e["alice"]
+        ),
+        "no_shooting_testimony": Exhibit(
+            form="testimony", statement=f["f_no_shooting"], stated_by=e["alice"]
+        ),
+        "no_shooting_entity_order_testimony": Exhibit(
+            form="testimony",
+            statement=f["f_no_shooting_entity_order"],
+            stated_by=e["bob"],
+        ),
+        "no_shooting_witness_unknown_testimony": Exhibit(
+            form="testimony", statement=f["f_no_shooting"]
+        ),
+        "no_shooting_witness_unknown_absent_testimony": Exhibit(
+            form="testimony", statement=f["f_no_shooting"], absent=True
+        ),
+        "no_shooting_no_effect_entity_order_testimony": Exhibit(
+            form="testimony",
+            statement=f["f_no_shooting_entity_order"],
+            stated_by=e["bob"],
+        ),
+        "no_shooting_different_witness_testimony": Exhibit(
+            form="testimony", statement=f["f_no_shooting"], stated_by=e["bob"]
+        ),
+        "reciprocal_testimony": Exhibit(
+            form="testimony", statement=w["f7"], stated_by=e["craig"]
+        ),
+        "generic_exhibit": Exhibit(),
+    }
+
 
 @pytest.fixture(scope="class")
 def make_evidence(make_predicate, make_factor, watt_factor) -> Dict[str, Evidence]:
@@ -306,56 +377,49 @@ def make_evidence(make_predicate, make_factor, watt_factor) -> Dict[str, Evidenc
     w = watt_factor
     return {
         "shooting": Evidence(
-            form="testimony",
+            Exhibit("shooting_testimony"),
             to_effect=f["f_crime"],
-            statement=f["f_shooting"],
-            stated_by=0,
         ),
         "no_shooting": Evidence(
-            form="testimony",
+            Exhibit("no_shooting_testimony"),
             to_effect=f["f_no_crime"],
-            statement=f["f_no_shooting"],
-            stated_by=0,
         ),
         "no_shooting_absent": Evidence(
-            form="testimony",
+            Exhibit("no_shooting_testimony"),
             to_effect=f["f_no_crime"],
             statement=f["f_no_shooting"],
             stated_by=0,
             absent=True,
         ),
         "no_shooting_entity_order": Evidence(
-            form="testimony",
+            Exhibit("no_shooting_entity_order_testimony"),
             to_effect=f["f_no_crime_entity_order"],
             statement=f["f_no_shooting_entity_order"],
             stated_by=1,
         ),
         "no_shooting_witness_unknown": Evidence(
-            form="testimony", to_effect=f["f_no_crime"], statement=f["f_no_shooting"]
+            Exhibit("no_shooting_witness_unknown_testimony"), to_effect=f["f_no_crime"], statement=f["f_no_shooting"]
         ),
+        # Here the Exhibit is absent, not the Evidence. Pointless distinction?
         "no_shooting_witness_unknown_absent": Evidence(
-            form="testimony",
+            Exhibit("no_shooting_witness_unknown_absent_testimony"),
             to_effect=f["f_no_crime"],
             statement=f["f_no_shooting"],
-            absent=True,
         ),
         "no_shooting_no_effect_entity_order": Evidence(
-            form="testimony", statement=f["f_no_shooting_entity_order"], stated_by=1
-        ),
-        "no_shooting_derived_from_entity_order": Evidence(
-            form="testimony", statement=f["f_no_shooting_entity_order"], derived_from=1
+            Exhibit("no_shooting_no_effect_entity_order_testimony"), statement=f["f_no_shooting_entity_order"], stated_by=1
         ),
         "no_shooting_different_witness": Evidence(
-            form="testimony",
+            Exhibit("no_shooting_different_witness_testimony"),
             to_effect=f["f_no_crime"],
             statement=f["f_no_shooting"],
             stated_by=1,
         ),
         "reciprocal": Evidence(
-            form="testimony", to_effect=f["f_no_crime"], statement=w["f7"], stated_by=2
+            Exhibit("reciprocal_testimony"), to_effect=f["f_no_crime"], statement=w["f7"], stated_by=2
         ),
-        "crime": Evidence(to_effect=f["f_crime"], derived_from=2),
-        "crime_absent": Evidence(to_effect=f["f_crime"], derived_from=2, absent=True),
+        "crime": Evidence(Exhibit("generic_exhibit"), generic=True),
+        "crime_absent": Evidence(Exhibit("generic_exhibit"), absent=True, generic=True),
     }
 
 
