@@ -103,12 +103,6 @@ class TestPredicates:
     def test_predicate_content_comparison(self, make_predicate):
         assert make_predicate["p8_exact"].content == make_predicate["p7"].content
 
-    def test_predicate_equality(self, make_predicate):
-        assert make_predicate["p1"] == make_predicate["p1_again"]
-
-    def test_predicate_inequality(self, make_predicate):
-        assert make_predicate["p2"] != make_predicate["p2_reciprocal"]
-
     def test_quantity_comparison(self, make_predicate):
         assert make_predicate["p7"].quantity_comparison() == "no more than 35 foot"
         assert make_predicate["p9"].quantity_comparison() == "no more than 5 foot"
@@ -116,20 +110,6 @@ class TestPredicates:
 
     def test_entity_orders(self, make_predicate):
         assert make_predicate["p7"].entity_orders == {(0, 1), (1, 0)}
-
-    def test_obverse_predicates_equal(self, make_predicate):
-        assert make_predicate["p7"] == make_predicate["p7_obverse"]
-
-    def test_greater_than_because_of_quantity(self, make_predicate):
-        assert make_predicate["p8_meters"] > make_predicate["p8"]
-        assert make_predicate["p8_meters"] != make_predicate["p8"]
-
-    def test_equal_float_and_int(self, make_predicate):
-        assert make_predicate["p8_int"] == make_predicate["p8_float"]
-
-    def test_greater_float_and_int(self, make_predicate):
-        assert make_predicate["p8_higher_int"] > make_predicate["p8_float"]
-        assert make_predicate["p8_int"] < make_predicate["p8_higher_int"]
 
     def test_str_for_predicate_with_number_quantity(self, make_predicate):
         assert (
@@ -144,6 +124,47 @@ class TestPredicates:
             str(make_predicate["p8"])
             == "The distance between {} and {} was at least 20 foot"
         )
+
+    def test_negated_method(self, make_predicate):
+        assert make_predicate["p7"].negated() == make_predicate["p7_opposite"]
+        assert make_predicate["p3"].negated() == make_predicate["p3_false"]
+
+    # Equality
+
+    def test_predicate_equality(self, make_predicate):
+        assert make_predicate["p1"] == make_predicate["p1_again"]
+
+    def test_predicate_inequality(self, make_predicate):
+        assert make_predicate["p2"] != make_predicate["p2_reciprocal"]
+
+    def test_obverse_predicates_equal(self, make_predicate):
+        assert make_predicate["p7"] == make_predicate["p7_obverse"]
+
+    def test_equal_float_and_int(self, make_predicate):
+        assert make_predicate["p8_int"] == make_predicate["p8_float"]
+
+    def test_no_equality_with_inconsistent_dimensionality(self, make_predicate):
+        assert make_predicate["p9"] != make_predicate["p9_acres"]
+
+    def test_different_truth_value_prevents_equality(self, make_predicate):
+        assert make_predicate["p_murder"] != make_predicate["p_murder_whether"]
+        assert make_predicate["p_murder_false"] != make_predicate["p_murder_whether"]
+        assert make_predicate["p_murder_false"] != make_predicate["p_murder"]
+
+    # Implication
+
+    def test_greater_than_because_of_quantity(self, make_predicate):
+        assert make_predicate["p8_meters"] > make_predicate["p8"]
+        assert make_predicate["p8_meters"] != make_predicate["p8"]
+
+    def test_greater_float_and_int(self, make_predicate):
+        assert make_predicate["p8_higher_int"] > make_predicate["p8_float"]
+        assert make_predicate["p8_int"] < make_predicate["p8_higher_int"]
+
+    def test_any_truth_value_implies_none(self, make_predicate):
+        assert make_predicate["p_murder"] > make_predicate["p_murder_whether"]
+        assert make_predicate["p_murder_false"] > make_predicate["p_murder_whether"]
+
 
     def test_predicate_contradictions(self, make_predicate):
         assert make_predicate["p7"].contradicts(make_predicate["p7_true"])
@@ -161,6 +182,8 @@ class TestPredicates:
         assert not make_predicate["p2_no_truth"] > make_predicate["p2"]
         assert make_predicate["p2"] > make_predicate["p2_no_truth"]
 
+    # Contradiction
+
     def test_no_contradiction_with_no_truth_value(self, make_predicate):
         assert not make_predicate["p2_no_truth"].contradicts(make_predicate["p2"])
         assert not make_predicate["p2"].contradicts(make_predicate["p2_no_truth"])
@@ -169,12 +192,6 @@ class TestPredicates:
         assert not make_predicate["p9"].contradicts(make_predicate["p9_acres"])
         assert not make_predicate["p9_acres"].contradicts(make_predicate["p9"])
 
-    def test_no_equality_with_inconsistent_dimensionality(self, make_predicate):
-        assert make_predicate["p9"] != make_predicate["p9_acres"]
-
-    def test_negated_method(self, make_predicate):
-        assert make_predicate["p7"].negated() == make_predicate["p7_opposite"]
-        assert make_predicate["p3"].negated() == make_predicate["p3_false"]
 
 
 class TestProcedures:

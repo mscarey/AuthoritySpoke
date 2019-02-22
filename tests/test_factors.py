@@ -300,9 +300,9 @@ class TestFacts:
 
     def test_equal_factors_not_gt(self, watt_factor):
         f = watt_factor
-        assert f["f2"] >= f["f2_entity_order"]
-        assert f["f2"] <= f["f2_entity_order"]
-        assert not f["f2"] > f["f2_different_entity"]
+        assert f["f7"] >= f["f7_swap_entities"]
+        assert f["f7"] <= f["f7_swap_entities"]
+        assert not f["f7"] > f["f7_swap_entities"]
 
     def test_standard_of_proof_comparison(self, watt_factor):
         f = watt_factor

@@ -152,6 +152,7 @@ def make_predicate() -> Dict[str, Predicate]:
         "p_crime": Predicate("{} committed a crime"),
         "p_murder": Predicate("{} murdered {}"),
         "p_murder_whether": Predicate("{} murdered {}", truth=None),
+        "p_murder_false": Predicate("{} murdered {}", truth=False),
         "p_irrelevant": Predicate("{} is relevant to show {}", truth=False),
         "p_relevant": Predicate("{} is relevant to show {}"),
         "p_relevant_whether": Predicate("{} is relevant to show {}", truth=None),
