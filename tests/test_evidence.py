@@ -16,10 +16,55 @@ from spoke import ureg, Q_
 from spoke import check_entity_consistency
 from spoke import find_matches, evolve_match_list
 
+
 class TestExhibits:
-    def test_make_evidence_object(self, watt_factor):
+    def test_make_exhibit_object(self, watt_factor):
         e = Exhibit(form="testimony")
         assert not e.absent
+
+    # Equality
+
+    def test_equality(self, make_exhibit):
+        assert (
+            make_exhibit["no_shooting_entity_order_testimony"]
+            == make_exhibit["no_shooting_testimony"]
+        )
+
+    # Implication
+
+    def test_implication(self, make_exhibit):
+        assert (
+            make_exhibit["no_shooting_testimony"]
+            > make_exhibit["no_shooting_witness_unknown_testimony"]
+        )
+
+    def test_no_implication_different_speaker(self, make_exhibit):
+        assert (
+            not make_exhibit["no_shooting_different_witness_testimony"]
+            >= make_exhibit["no_shooting_testimony"]
+        )
+
+    def test_any_exhibit_implies_generic(self, make_exhibit):
+        assert make_exhibit["reciprocal_testimony"] >= make_exhibit["generic_exhibit"]
+
+    def test_implication_more_specific_testimony(self, make_exhibit):
+        assert make_exhibit["reciprocal_testimony_specific"] < make_exhibit["reciprocal_testimony"]
+
+    # Contradiction
+
+    def test_conflicting_exhibits_not_contradictory(self, make_exhibit):
+        assert not make_exhibit["shooting_testimony"].contradicts(
+            make_exhibit["no_shooting_testimony"]
+        )
+
+    def test_absent_contradicts_same_present(self, make_exhibit):
+        assert make_exhibit["no_shooting_witness_unknown_absent_testimony"].contradicts(
+            make_exhibit["no_shooting_witness_unknown_testimony"]
+        )
+        assert make_exhibit["no_shooting_witness_unknown_testimony"].contradicts(
+            make_exhibit["no_shooting_witness_unknown_absent_testimony"]
+        )
+
 
 class TestEvidence:
     def test_make_evidence_object(self, watt_factor):
@@ -43,9 +88,7 @@ class TestEvidence:
         assert make_evidence["reciprocal"].entity_orders == {(0, 1, 0, 2), (1, 0, 0, 2)}
 
     def test_get_entity_orders_no_statement(self, make_factor):
-        e = Evidence(
-            Exhibit(form="testimony"), to_effect=make_factor["f_no_crime"]
-        )
+        e = Evidence(Exhibit(form="testimony"), to_effect=make_factor["f_no_crime"])
         assert e.entity_orders == {(0, 1)}
 
     def test_evidence_str(self, make_evidence):

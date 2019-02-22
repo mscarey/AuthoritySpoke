@@ -364,7 +364,10 @@ def make_exhibit(
             form="testimony", statement=f["f_no_shooting"], stated_by=e["bob"]
         ),
         "reciprocal_testimony": Exhibit(
-            form="testimony", statement=w["f7"], stated_by=e["craig"]
+            form="testimony", statement=w["f8"], stated_by=e["craig"]
+        ),
+        "reciprocal_testimony_specific": Exhibit(
+            form="testimony", statement=w["f8_meters"], stated_by=e["craig"]
         ),
         "generic_exhibit": Exhibit(),
     }
