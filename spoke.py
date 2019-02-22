@@ -675,7 +675,7 @@ class Fact(Factor):
         avoiding infinite recursion."""
         for context in context_register:
             context.pop(self)
-            if all(item[0] == item[1] for item in context.items()):
+            if all(comparison(item[0], item[1]) for item in context.items()):
                 return True
         return False
 
