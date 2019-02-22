@@ -204,7 +204,7 @@ def watt_factor(make_predicate, make_entity, watt_mentioned) -> Dict[str, Factor
         ),
         "f2_different_entity": Fact.new(p["p2"], (1, 2), case_factors=c),
         "f2_entity_order": Fact.new(p["p2"], case_factors=c),
-        "f2_no_truth": Fact.new(p["p2_no_truth"], case_factors=c),
+        "f2_no_truth": Fact.new(p["p2_no_truth"], (1, 0), case_factors=c),
         "f2_false": Fact.new(p["p2_false"], case_factors=c),
         "f2_reciprocal": Fact.new(p["p2_reciprocal"], case_factors=c),
         "f2_generic": Fact.new(p["p2"], generic=True, case_factors=c),
