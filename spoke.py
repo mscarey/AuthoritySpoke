@@ -847,15 +847,24 @@ class Fact(Factor):
 
         if not isinstance(other, self.__class__):
             return False
+        # TODO: Make register inside _find_matching_context()
+        register = self.context_register(other)
+        if self._find_matching_context(register, operator.ge):
+            if self.predicate.contradicts(other.predicate) and not (
+                self.absent | other.absent
+            ):
+                return True
+            if self.predicate >= other.predicate and other.absent and not self.absent:
+                return True
 
-        if self.predicate.contradicts(other.predicate) and not (
-            self.absent | other.absent
-        ):
-            return True
-        if self.predicate >= other.predicate and other.absent and not self.absent:
-            return True
-        if other.predicate >= self.predicate and self.absent and not other.absent:
-            return True
+        register = self.context_register(other)
+        if self._find_matching_context(register, operator.le):
+            if self.predicate.contradicts(other.predicate) and not (
+                self.absent | other.absent
+            ):
+                return True
+            if other.predicate >= self.predicate and self.absent and not other.absent:
+                return True
         return False
 
     def copy_with_foreign_context(self, context_assignment):

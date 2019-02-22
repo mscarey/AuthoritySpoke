@@ -230,8 +230,8 @@ class TestFacts:
         assert watt_factor["f2"] != watt_factor["f2_reciprocal"]
 
     def test_factor_unequal_predicate_truth(self, watt_factor):
-        assert watt_factor["f7"] != watt_factor["f7_true"]
-        assert watt_factor["f7"].contradicts(watt_factor["f7_true"])
+        assert watt_factor["f7"] != watt_factor["f7_opposite"]
+        assert watt_factor["f7"].contradicts(watt_factor["f7_opposite"])
 
     def test_copies_of_identical_factor(self, make_factor):
         """
@@ -345,8 +345,11 @@ class TestFacts:
     def test_absent_factor_contradicts_broader_quantity_statement(self, watt_factor):
         assert watt_factor["f8_absent"].contradicts(watt_factor["f8_meters"])
         assert watt_factor["f8_meters"].contradicts(watt_factor["f8_absent"])
-        assert watt_factor["f9_absent_miles"].contradicts(watt_factor["f9"])
-        assert watt_factor["f9"].contradicts(watt_factor["f9_absent_miles"])
+
+    def test_absent_does_not_contradict_narrower_quantity_statement(self, watt_factor):
+        assert not watt_factor["f9_absent_miles"].contradicts(watt_factor["f9"])
+        assert not watt_factor["f9"].contradicts(watt_factor["f9_absent_miles"])
+
 
     def test_contradiction_complex(self, make_complex_fact):
         assert make_complex_fact["f_irrelevant_murder"].contradicts(
