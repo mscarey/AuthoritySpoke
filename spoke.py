@@ -83,9 +83,9 @@ class Factor:
     def __hash__(self):
         # TODO: make Factor a dataclass and get rid of this.
         return hash(
-                self.__class__.__name__,
-                *[v for v in self.__dict__.values() if not isinstance(v, set)],)
-
+            self.__class__.__name__,
+            *[v for v in self.__dict__.values() if not isinstance(v, set)],
+        )
 
     def generic_factors(self) -> Iterable["Factor"]:
         """Returns an iterable of self's generic Factors,
@@ -737,14 +737,14 @@ class Fact(Factor):
         new_register = []
         for mapping in register:
             for other_order in other.entity_orders:
-                for m in self._update_mapping(mapping, other_order):
-                    if not any(
-                        compare_dict_for_identical_entries(m, other_dict)
+                for updated_mapping in self._update_mapping(mapping, other_order):
+                    if updated_mapping is not False and not any(
+                        compare_dict_for_identical_entries(updated_mapping, other_dict)
                         for other_dict in new_register
                     ):
-                        new_register.append(m)
+                        new_register.append(updated_mapping)
 
-        return [dict(m) for m in new_register]
+        return [dict(proxy) for proxy in new_register]
 
     def make_generic(self) -> "Fact":
         """
@@ -797,7 +797,7 @@ class Fact(Factor):
             return False
         return self >= other
 
-    def __ge__(self, other: Optional["Fact"]) -> bool:
+    def __ge__(self, other: Optional[Factor]) -> bool:
         if other is None:  # TODO: remember why this is here
             return True
 
@@ -813,6 +813,9 @@ class Fact(Factor):
         if other.generic:
             return True
 
+        if self.generic:
+            return False
+
         if bool(self.standard_of_proof) != bool(other.standard_of_proof):
             return False
 
@@ -823,9 +826,11 @@ class Fact(Factor):
         ):
             return False
 
-        if self.predicate >= other.predicate and self.absent == other.absent:
-            return True
-        return False
+        if not (self.predicate >= other.predicate and self.absent == other.absent):
+            return False
+
+        register = self.context_register(other)
+        return self._find_matching_context(register, operator.ge)
 
     def contradicts(self, other: Optional[Factor]) -> bool:
         """Returns True if self and other can't both be true at the same time.
