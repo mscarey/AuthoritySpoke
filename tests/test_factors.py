@@ -54,10 +54,9 @@ class TestFacts:
         assert f.entity_context == (watt_mentioned[3],)
 
     def test_string_representation_of_factor(self, watt_factor):
-        assert str(watt_factor["f1"]) == "Fact: <Hideaway Lodge> was a motel"
+        assert "<Hideaway Lodge> was a motel" in str(watt_factor["f1"])
         assert (
-            str(watt_factor["f3_absent"])
-            == "Absent Fact: <Hideaway Lodge> was <Wattenburg>’s abode"
+            "the absence of the fact" in str(watt_factor["f3_absent"])
         )
 
     def test_string_representation_with_concrete_entities(self, watt_factor):
@@ -67,7 +66,7 @@ class TestFacts:
         replaced by another Entity object without changing the meaning
         of the Fact.
         """
-        assert str(watt_factor["f1_specific"]) == "Fact: Hideaway Lodge was a motel"
+        assert "Hideaway Lodge was a motel" in str(watt_factor["f1_specific"])
 
     def test_new_concrete_context(self, watt_factor):
         different = watt_factor["f2"].new_context(

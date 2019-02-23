@@ -127,8 +127,10 @@ class Factor:
                 or self_mapping[item] is incoming_mapping[item]
             ) and (
                 # TODO: find out why this condition broke tests
-                item not in self_mapping.values()
-                or self_mapping.get(incoming_mapping[item]) == item
+                # because of variations in entity_orders?
+                # Was it limited to reciprocal == True?
+                all(item is not value for value in self_mapping.values())
+                or self_mapping.get(incoming_mapping[item]) is item
             ):
                 self_mapping[item] = incoming_mapping[item]
             else:
