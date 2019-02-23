@@ -96,9 +96,7 @@ class Factor:
         if self.generic:
             yield self
 
-    def context_register(
-        self, other: "Factor"
-    ) -> Union[bool, Dict["Factor", "Factor"]]:
+    def context_register(self, other: "Factor") -> List[Mapping["Factor", "Factor"]]:
         """Searches through the context factors of self and other, making
         a list of dicts, where each dict is a valid way to make matches between
         corresponding factors. The dict is empty if there are no matches."""
@@ -124,7 +122,14 @@ class Factor:
         if not self_mapping:
             return False
         for item in incoming_mapping:
-            if item not in self_mapping or self_mapping[item] is incoming_mapping[item]:
+            if (
+                item not in self_mapping
+                or self_mapping[item] is incoming_mapping[item]
+            ) and (
+                # TODO: find out why this condition broke tests
+                item not in self_mapping.values()
+                or self_mapping.get(incoming_mapping[item]) == item
+            ):
                 self_mapping[item] = incoming_mapping[item]
             else:
                 return False
