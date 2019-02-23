@@ -30,6 +30,45 @@ class Exhibit(Factor):
     absent: bool = False
     generic: bool = False
 
+    def _compare_factor_attributes(self, other, mapping):
+        """
+        This function should be the only part of the context-matching
+        process that needs to be unique for each subclass of Factor.
+        It specifies what attributes of self and other to look in to find
+        Factor objects to match.
+
+        For Fact, it creates zero or more updated mappings for each other_order in
+        other.entity_orders. Each time, it starts with mapping, and
+        updates it with matches from self.entity_context and other_order.
+        """
+
+        """for other_order in other.entity_orders:
+            for updated_mapping in self._update_mapping(
+                mapping, self.entity_context, other_order
+            ):
+                yield updated_mapping
+        """
+
+    def __eq__(self, other: Factor) -> bool:
+        if self.__class__ != other.__class__:
+            return False
+
+        if self.generic == other.generic == True:
+            return True
+
+        if (
+            self.form != other.form
+            or self.statement != other.statement
+            or self.stated_by != other.stated_by
+            or self.absent != other.absent
+            or self.generic != other.generic
+        ):
+            return False
+        return True
+
+        # register = self.context_register(other)
+        # return self._find_matching_context(register, operator.eq)
+
 
 @dataclass(frozen=True)
 class Evidence(Factor):

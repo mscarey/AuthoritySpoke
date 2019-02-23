@@ -30,6 +30,24 @@ class TestExhibits:
             == make_exhibit["no_shooting_testimony"]
         )
 
+    def test_not_equal_different_speaker(self, make_exhibit):
+        assert (
+            make_exhibit["no_shooting_different_witness_testimony"]
+            != make_exhibit["no_shooting_testimony"]
+        )
+
+    def test_equal_complex_statement(self, make_exhibit):
+        assert (
+            make_exhibit["relevant_murder_nested_swap_testimony"]
+            == make_exhibit["relevant_murder_testimony"]
+        )
+
+    def test_not_equal_complex_statement(self, make_exhibit):
+        assert (
+            make_exhibit["relevant_murder_alice_craig_testimony"]
+            != make_exhibit["relevant_murder_testimony"]
+        )
+
     # Implication
 
     def test_implication(self, make_exhibit):
@@ -48,7 +66,10 @@ class TestExhibits:
         assert make_exhibit["reciprocal_testimony"] >= make_exhibit["generic_exhibit"]
 
     def test_implication_more_specific_testimony(self, make_exhibit):
-        assert make_exhibit["reciprocal_testimony_specific"] < make_exhibit["reciprocal_testimony"]
+        assert (
+            make_exhibit["reciprocal_testimony_specific"]
+            < make_exhibit["reciprocal_testimony"]
+        )
 
     # Contradiction
 

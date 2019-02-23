@@ -96,6 +96,97 @@ class Factor:
         if self.generic:
             yield self
 
+    def context_register(self, other: "Factor") -> Union[bool, Dict["Factor", "Factor"]]:
+        """Searches through the context factors of self and other, making
+        a list of dicts, where each dict is a valid way to make matches between
+        corresponding factors. The dict is empty if there are no matches."""
+
+        mapping = MappingProxyType({self: other})
+        if self.generic or other.generic:
+            return [mapping]
+        new_register = []
+        for updated_mapping in self._compare_factor_attributes(other, mapping):
+            if updated_mapping is not False:
+                if not any(
+                    compare_dict_for_identical_entries(updated_mapping, other_dict)
+                    for other_dict in new_register
+                ):
+                    new_register.append(updated_mapping)
+        return [dict(proxy) for proxy in new_register]
+
+    @staticmethod
+    def _import_to_mapping(self_mapping, incoming_mapping):
+        """If the same factor in self appears to match to two
+        different factors in other, the function
+        return False. Otherwise it returns the dict of matches."""
+        if not self_mapping:
+            return False
+        for item in incoming_mapping:
+            if (
+                item not in self_mapping
+                or self_mapping[item] is incoming_mapping[item]
+            ):
+                self_mapping[item] = incoming_mapping[item]
+            else:
+                return False
+        return self_mapping
+
+    def _update_mapping(self, self_mapping_proxy, self_factors, other_order):
+        """
+        :param self_mapping_proxy: A view on a dict with keys representing
+        factors in self and values representing factors in other. The keys
+        and values have been found in corresponding positions in self and
+        other.
+
+        :param self_factors: factors from self that will be matched with
+        other_order. This function is expected to be called with various
+        permutations of other_order, but no other permutations of self_factors.
+
+        :param other_order: an ordering of factors from other.entity_orders
+
+        :returns: a bool indicating whether the factors in other_order can
+        be matched to the tuple of factors in self_factors in
+        self_matching_proxy, without making the same factor from other_order
+        match to two different factors in self_matching_proxy.
+        """
+
+        def import_to_register(self_register, incoming_register):
+            new_register = [
+                self._import_to_mapping(self_mapping, incoming_mapping)
+                for self_mapping in self_register
+                for incoming_mapping in incoming_register
+            ]
+            return [
+                mapping
+                for mapping in new_register
+                if mapping is not False
+            ]
+
+        longest = max(len(self_factors), len(other_order))
+        incoming_registers = [
+            self_factors[index].context_register(other_order[index])
+            for index in range(longest)
+        ]
+        new_register = reduce(
+            import_to_register, incoming_registers, [dict(self_mapping_proxy)]
+        )
+        for mapping in new_register:
+            yield MappingProxyType(mapping)
+
+    def _find_matching_context(
+        self,
+        context_register: List[Dict["Factor", "Factor"]],
+        comparison: Callable = operator.eq,
+    ) -> bool:
+        """Checks whether every key-value pair is related by the function
+        in the "comparison" parameter. Whichever object is calling this
+        method locally takes itself out of the context before comparing,
+        avoiding infinite recursion."""
+        for context in context_register:
+            context.pop(self)
+            if all(comparison(item[0], item[1]) for item in context.items()):
+                return True
+        return False
 
 @dataclass()
 class Predicate:
@@ -665,64 +756,7 @@ class Fact(Factor):
             + f"{standard}: {predicate}"
         )
 
-    @staticmethod
-    def _import_to_mapping(self_mapping, incoming_mapping):
-        """If the same factor in self appears to match to two
-        different factors in other, the function
-        return False. Otherwise it returns the dict of matches."""
-        if not self_mapping:
-            return False
-        for item in incoming_mapping:
-            if (
-                item not in self_mapping
-                or self_mapping[item] is incoming_mapping[item]
-            ):
-                self_mapping[item] = incoming_mapping[item]
-            else:
-                return False
-        return self_mapping
 
-    def _update_mapping(self, self_mapping_proxy, self_factors, other_order):
-        """
-        :param self_mapping_proxy: A view on a dict with keys representing
-        factors in self and values representing factors in other. The keys
-        and values have been found in corresponding positions in self and
-        other.
-
-        :param self_factors: factors from self that will be matched with
-        other_order. This function is expected to be called with various
-        permutations of other_order, but no other permutations of self_factors.
-
-        :param other_order: an ordering of factors from other.entity_orders
-
-        :returns: a bool indicating whether the factors in other_order can
-        be matched to the tuple of factors in self_factors in
-        self_matching_proxy, without making the same factor from other_order
-        match to two different factors in self_matching_proxy.
-        """
-
-        def import_to_register(self_register, incoming_register):
-            new_register = [
-                self._import_to_mapping(self_mapping, incoming_mapping)
-                for self_mapping in self_register
-                for incoming_mapping in incoming_register
-            ]
-            return [
-                mapping
-                for mapping in new_register
-                if mapping is not False
-            ]
-
-        longest = max(len(self_factors), len(other_order))
-        incoming_registers = [
-            self_factors[index].context_register(other_order[index])
-            for index in range(longest)
-        ]
-        new_register = reduce(
-            import_to_register, incoming_registers, [dict(self_mapping_proxy)]
-        )
-        for mapping in new_register:
-            yield MappingProxyType(mapping)
 
     def _compare_factor_attributes(self, other, mapping):
         """
@@ -741,20 +775,6 @@ class Fact(Factor):
             ):
                 yield updated_mapping
 
-    def _find_matching_context(
-        self,
-        context_register: List[Dict[Factor, Factor]],
-        comparison: Callable = operator.eq,
-    ) -> bool:
-        """Checks whether every key-value pair is related by the function
-        in the "comparison" parameter. Whichever object is calling this
-        method locally takes itself out of the context before comparing,
-        avoiding infinite recursion."""
-        for context in context_register:
-            context.pop(self)
-            if all(comparison(item[0], item[1]) for item in context.items()):
-                return True
-        return False
 
     def __eq__(self, other: Factor) -> bool:
         if self.__class__ != other.__class__:
@@ -771,24 +791,6 @@ class Fact(Factor):
         register = self.context_register(other)
         return self._find_matching_context(register, operator.eq)
 
-    def context_register(self, other: Factor) -> Union[bool, Dict[Factor, Factor]]:
-        """Searches through the context factors of self and other, making
-        a list of dicts, where each dict is a valid way to make matches between
-        corresponding factors. The dict is empty if there are no matches."""
-
-        mapping = MappingProxyType({self: other})
-        if self.generic or other.generic:
-            return [mapping]
-        new_register = []
-        for updated_mapping in self._compare_factor_attributes(other, mapping):
-            if updated_mapping is not False:
-                if not any(
-                    compare_dict_for_identical_entries(updated_mapping, other_dict)
-                    for other_dict in new_register
-                ):
-                    new_register.append(updated_mapping)
-
-        return [dict(proxy) for proxy in new_register]
 
     def make_generic(self) -> "Fact":
         """
@@ -987,8 +989,8 @@ class Fact(Factor):
             )
         return set()
 
-    @staticmethod
-    def from_dict(factor: Optional[dict]) -> Optional["Fact"]:
+    @classmethod
+    def from_dict(cls, factor: Optional[dict]) -> Optional["Fact"]:
         if factor is None:
             return None
         if factor["type"].capitalize() != "Fact":
@@ -1000,7 +1002,7 @@ class Fact(Factor):
             truth=factor.get("truth", True),
             reciprocal=factor.get("reciprocal", False),
         )
-        yield Fact(
+        yield cls(
             predicate,
             entities,
             factor.get("absent", False),
