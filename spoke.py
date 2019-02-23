@@ -96,7 +96,9 @@ class Factor:
         if self.generic:
             yield self
 
-    def context_register(self, other: "Factor") -> Union[bool, Dict["Factor", "Factor"]]:
+    def context_register(
+        self, other: "Factor"
+    ) -> Union[bool, Dict["Factor", "Factor"]]:
         """Searches through the context factors of self and other, making
         a list of dicts, where each dict is a valid way to make matches between
         corresponding factors. The dict is empty if there are no matches."""
@@ -122,10 +124,7 @@ class Factor:
         if not self_mapping:
             return False
         for item in incoming_mapping:
-            if (
-                item not in self_mapping
-                or self_mapping[item] is incoming_mapping[item]
-            ):
+            if item not in self_mapping or self_mapping[item] is incoming_mapping[item]:
                 self_mapping[item] = incoming_mapping[item]
             else:
                 return False
@@ -156,11 +155,7 @@ class Factor:
                 for self_mapping in self_register
                 for incoming_mapping in incoming_register
             ]
-            return [
-                mapping
-                for mapping in new_register
-                if mapping is not False
-            ]
+            return [mapping for mapping in new_register if mapping is not False]
 
         longest = max(len(self_factors), len(other_order))
         incoming_registers = [
@@ -187,6 +182,7 @@ class Factor:
             if all(comparison(item[0], item[1]) for item in context.items()):
                 return True
         return False
+
 
 @dataclass()
 class Predicate:
@@ -309,7 +305,12 @@ class Predicate:
         return slots
 
     def __str__(self):
-        truth_prefix = "it is false that " if not self.truth else ""
+        if self.truth is None:
+            truth_prefix = "whether "
+        elif self.truth is False:
+            truth_prefix = "it is false that "
+        else:
+            truth_prefix = ""
         if self.quantity:
             slots = ("{}" for slot in range(len(self)))
             content = self.content.format(*slots, self.quantity_comparison())
@@ -750,13 +751,15 @@ class Fact(Factor):
 
     def __str__(self):
         predicate = str(self.predicate.content_with_entities(self.entity_context))
-        standard = f" ({self.standard_of_proof})" if self.standard_of_proof else ""
-        return (
-            f"{'Absent ' if self.absent else ''}{self.__class__.__name__}"
-            + f"{standard}: {predicate}"
+        standard = (
+            f" by the standard {self.standard_of_proof},"
+            if self.standard_of_proof
+            else ""
         )
-
-
+        return (
+            f"{'the absence of ' if self.absent else ''}the fact"
+            + f"{standard} {predicate}"
+        )
 
     def _compare_factor_attributes(self, other, mapping):
         """
@@ -775,7 +778,6 @@ class Fact(Factor):
             ):
                 yield updated_mapping
 
-
     def __eq__(self, other: Factor) -> bool:
         if self.__class__ != other.__class__:
             return False
@@ -790,7 +792,6 @@ class Fact(Factor):
             return False
         register = self.context_register(other)
         return self._find_matching_context(register, operator.eq)
-
 
     def make_generic(self) -> "Fact":
         """
