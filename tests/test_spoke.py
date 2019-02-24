@@ -75,12 +75,12 @@ class TestEntities:
 class TestPredicates:
     def test_predicate_with_wrong_number_of_entities(self):
         with pytest.raises(ValueError):
-            _ = Predicate("{} was a motel", reciprocal=True)
+            _ = Predicate.new("{} was a motel", reciprocal=True)
 
     def test_predicate_with_wrong_comparison_symbol(self):
         with pytest.raises(ValueError):
             _ = (
-                Predicate(
+                Predicate.new(
                     "the height of {} was {}",
                     comparison=">>",
                     quantity=Q_("160 centimeters"),
@@ -108,8 +108,8 @@ class TestPredicates:
         assert make_predicate["p9"].quantity_comparison() == "no more than 5 foot"
         assert make_predicate["p1"].quantity_comparison() is None
 
-    def test_entity_orders(self, make_predicate):
-        assert make_predicate["p7"].entity_orders == {(0, 1), (1, 0)}
+    def test_context_slots(self, make_predicate):
+        assert make_predicate["p7"].context_slots == 2
 
     def test_str_for_predicate_with_number_quantity(self, make_predicate):
         assert (

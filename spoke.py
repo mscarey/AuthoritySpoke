@@ -123,8 +123,7 @@ class Factor:
             return False
         for item in incoming_mapping:
             if (
-                item not in self_mapping
-                or self_mapping[item] is incoming_mapping[item]
+                item not in self_mapping or self_mapping[item] is incoming_mapping[item]
             ) and (
                 # TODO: find out why this condition broke tests
                 # because of variations in entity_orders?
@@ -223,39 +222,41 @@ class Predicate:
     reciprocal: bool = False
     comparison: Optional[str] = None
     quantity: Optional[Union[int, float, ureg.Quantity]] = None
+    context_slots: int = 0
 
-    def __post_init__(self):
-        if len(self) < 2 and self.reciprocal:
+    @classmethod
+    def new(
+        cls,
+        content: str,
+        truth: Optional[bool] = True,
+        reciprocal: bool = False,
+        comparison: Optional[str] = None,
+        quantity: Optional[Union[int, float, ureg.Quantity]] = None,
+    ):
+
+        slots = content.count("{}")
+        if quantity:
+            slots -= 1
+
+        if slots < 2 and reciprocal:
             raise ValueError(
-                f'"reciprocal" flag not allowed because {self.content} '
-                f"has {len(self)} entities, fewer than 2."
+                f'"reciprocal" flag not allowed because {content} has '
+                f"{slots} spaces for context entities. At least 2 spaces needed."
             )
         # Assumes that the obverse of a statement about a quantity is
         # necessarily logically equivalent
-        if self.comparison == "==":
-            object.__setattr__(self, "comparison", "=")
-        if self.comparison == "!=":
-            object.__setattr__(self, "comparison", "<>")
-        if self.comparison and self.truth is False:
-            object.__setattr__(self, "truth", True)
-            object.__setattr__(
-                self, "comparison", OPPOSITE_COMPARISONS[self.comparison]
-            )
-        if self.comparison and self.comparison not in OPPOSITE_COMPARISONS.keys():
+        if comparison == "==":
+            comparison = "="
+        if comparison == "!=":
+            comparison = "<>"
+        if comparison and truth is False:
+            truth = True
+            comparison = OPPOSITE_COMPARISONS[comparison]
+        if comparison and comparison not in OPPOSITE_COMPARISONS.keys():
             raise ValueError(
                 f'"comparison" string parameter must be one of {OPPOSITE_COMPARISONS.keys()}.'
             )
-        # TODO: prevent len() from breaking when there's an entity
-        # reference between the brackets in the text.
-
-        slots = self.content.count("{}")
-        if self.quantity:
-            slots -= 1
-        object.__setattr__(self, "entity_context", tuple(range(slots)))
-        object.__setattr__(
-            self, "entity_orders", self.get_entity_orders(self.entity_context)
-        )
-        return slots
+        return Predicate(content, truth, reciprocal, comparison, quantity, slots)
 
     @staticmethod
     def from_string(
@@ -306,10 +307,7 @@ class Predicate:
         Also called the linguistic valency, arity, or adicity.
         """
 
-        slots = self.content.count("{}")
-        if self.quantity:
-            slots -= 1
-        return slots
+        return self.context_slots
 
     def __str__(self):
         if self.truth is None:
@@ -526,26 +524,6 @@ class Predicate:
             quantity=self.quantity,
         )
 
-    def get_entity_orders(self, entity_context):
-        """
-        Currently the only possible rearrangement is to swap the
-        order of the first two entities if self.reciprocal.
-
-        :returns: a set of tuples indicating the ways the entities
-        could be rearranged without changing the meaning of the predicate.
-
-        """
-
-        orders = {entity_context}
-
-        if self.reciprocal:
-            swapped = tuple([1, 0] + [n for n in range(2, len(self))])
-            orders.add(swapped)
-
-        return orders
-
-    # TODO: allow the same entity to be mentioned more than once
-
 
 def check_entity_consistency(
     left: Factor, right: Factor, matches: Dict[Factor, Factor]
@@ -712,7 +690,9 @@ class Fact(Factor):
     def new(
         cls,
         predicate: Optional[Predicate] = None,
-        entity_context: Union[Factor, Iterable[Factor], int, Iterable[int]] = (),
+        entity_context: Optional[
+            Union[Factor, Iterable[Factor], int, Iterable[int]]
+        ] = None,
         standard_of_proof: Optional[str] = None,
         absent: bool = False,
         generic: bool = False,
@@ -723,8 +703,16 @@ class Fact(Factor):
                 return tuple(item)
             return (item,)
 
+        if not entity_context:
+            entity_context = range(len(predicate))
         case_factors = wrap_with_tuple(case_factors)
         entity_context = wrap_with_tuple(entity_context)
+
+        if len(entity_context) != len(predicate):
+            raise ValueError(
+                "The number of items in 'entity_context' must be "
+                + f"{len(predicate)}, to match predicate.context_slots"
+            )
 
         if any(not isinstance(s, Factor) for s in entity_context):
             if any(not isinstance(s, int) for s in entity_context):
@@ -741,14 +729,11 @@ class Fact(Factor):
                     + "indices of Factor objects in the case_factors parameter."
                 )
 
-        if predicate and len(entity_context) < len(predicate):
-            if len(case_factors) < len(predicate):
-                raise ValueError(
-                    f"Must supply exactly {len(predicate)} "
-                    + "factor(s) to fill the slots in self.predicate, either "
-                    + "as entity_context or case_factors."
-                )
-            entity_context = case_factors[: len(predicate)]
+        if predicate.reciprocal:
+            entity_context = tuple(
+                sorted([entity_context[0], entity_context[1]], key=str)
+                + list(entity_context[2:])
+            )
 
         if standard_of_proof and standard_of_proof not in STANDARDS_OF_PROOF:
             raise ValueError(
@@ -778,12 +763,12 @@ class Fact(Factor):
         For Fact, it creates zero or more updated mappings for each other_order in
         other.entity_orders. Each time, it starts with mapping, and
         updates it with matches from self.entity_context and other_order.
-        """
-        for other_order in other.entity_orders:
-            for updated_mapping in self._update_mapping(
-                mapping, self.entity_context, other_order
-            ):
-                yield updated_mapping
+        """# TODO: docstring
+
+        for updated_mapping in self._update_mapping(
+            mapping, self.entity_context, other.entity_context
+        ):
+            yield updated_mapping
 
     def __eq__(self, other: Factor) -> bool:
         if self.__class__ != other.__class__:
@@ -974,28 +959,6 @@ class Fact(Factor):
                         answer.append(context)
         return answer
 
-    @property
-    def entity_orders(self) -> Set[Tuple[int, ...]]:
-
-        """
-        Currently the only possible arrangements are derived from
-        the predicate attribute.
-
-        Each tuple in the returned set is an ordering of
-        self.entity_context, using the indices from one of
-        self.predicate.entity_orders.
-
-        :returns: a set of tuples indicating the ways the entities
-        could be rearranged without changing the meaning of the Fact.
-
-        """
-
-        if self.predicate:
-            return set(
-                tuple([x for i, x in sorted(zip(order, self.entity_context))])
-                for order in self.predicate.entity_orders
-            )
-        return set()
 
     @classmethod
     def from_dict(cls, factor: Optional[dict]) -> Optional["Fact"]:
