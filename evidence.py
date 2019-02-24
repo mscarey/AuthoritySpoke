@@ -40,11 +40,9 @@ class Exhibit(Factor):
         self_attributes = (self.statement, self.stated_by)
         other_attributes = (other.statement, other.stated_by)
 
-        for updated_mapping in self._update_mapping(
+        return self._update_mapping(
             mapping, self_attributes, other_attributes
-        ):
-            yield updated_mapping
-
+        )
 
     def __eq__(self, other: Factor) -> bool:
         if self.__class__ != other.__class__:

@@ -113,17 +113,22 @@ class Factor:
         return False. Otherwise it returns the dict of matches."""
         if not self_mapping:
             return False
-        for item in incoming_mapping:
+        # TODO: find better solution.
+        # The key-value relationship isn't symmetrical when the root Factors
+        # are being compared for implication. What about contradiction?
+        for in_key, in_value in incoming_mapping.items():
             if (
-                item not in self_mapping or self_mapping[item] is incoming_mapping[item]
+                in_key not in self_mapping or self_mapping[in_key] is in_value
             ) and (
-                # TODO: find out why this condition broke tests
-                # because of variations in entity_orders?
-                # Was it limited to reciprocal == True?
-                all(item is not value for value in self_mapping.values())
-                or self_mapping.get(incoming_mapping[item]) is item
+                in_value not in self_mapping or self_mapping[in_value] is in_key
+            ) and (
+                all(item is not in_value for item in self_mapping.values())
+                or self_mapping.get(in_key) is in_value
+            ) and (
+                all(item is not in_key for item in self_mapping.values())
+                or self_mapping.get(in_value) is in_key
             ):
-                self_mapping[item] = incoming_mapping[item]
+                self_mapping[in_key] = in_value
             else:
                 return False
         return self_mapping
