@@ -96,23 +96,15 @@ class Factor:
         if self.generic:
             yield self
 
-    def context_register(self, other: "Factor") -> List[Mapping["Factor", "Factor"]]:
+    def context_register(self, other: "Factor") -> Dict["Factor", "Factor"]:
         """Searches through the context factors of self and other, making
         a list of dicts, where each dict is a valid way to make matches between
         corresponding factors. The dict is empty if there are no matches."""
 
-        mapping = MappingProxyType({self: other})
+        mapping = {self: other} # TODO: just changed this. Make the rest of the functions work with it.
         if self.generic or other.generic:
-            return [mapping]
-        new_register = []
-        for updated_mapping in self._compare_factor_attributes(other, mapping):
-            if updated_mapping is not False:
-                if not any(
-                    compare_dict_for_identical_entries(updated_mapping, other_dict)
-                    for other_dict in new_register
-                ):
-                    new_register.append(updated_mapping)
-        return [dict(proxy) for proxy in new_register]
+            return mapping
+        return self._compare_factor_attributes(other, mapping)
 
     @staticmethod
     def _import_to_mapping(self_mapping, incoming_mapping):
@@ -155,40 +147,29 @@ class Factor:
         match to two different factors in self_matching_proxy.
         """
 
-        def import_to_register(self_register, incoming_register):
-            new_register = [
-                self._import_to_mapping(self_mapping, incoming_mapping)
-                for self_mapping in self_register
-                for incoming_mapping in incoming_register
-            ]
-            return [mapping for mapping in new_register if mapping is not False]
-
         longest = max(len(self_factors), len(other_order))
         incoming_registers = [
             self_factors[index].context_register(other_order[index])
             for index in range(longest)
         ]
         new_register = reduce(
-            import_to_register, incoming_registers, [dict(self_mapping_proxy)]
+            self._import_to_mapping, incoming_registers, self_mapping_proxy
         )
-        for mapping in new_register:
-            yield MappingProxyType(mapping)
+        return new_register
 
     def _find_matching_context(
         self,
-        context_register: List[Dict["Factor", "Factor"]],
+        context_register: Dict["Factor", "Factor"],
         comparison: Callable = operator.eq,
     ) -> bool:
         """Checks whether every key-value pair is related by the function
         in the "comparison" parameter. Whichever object is calling this
         method locally takes itself out of the context before comparing,
         avoiding infinite recursion."""
-        for context in context_register:
-            context.pop(self)
-            if all(comparison(item[0], item[1]) for item in context.items()):
-                return True
-        return False
-
+        if not context_register:
+            return False
+        context_register.pop(self)
+        return all(comparison(item[0], item[1]) for item in context_register.items())
 
 @dataclass()
 class Predicate:
@@ -731,7 +712,9 @@ class Fact(Factor):
 
         if predicate.reciprocal:
             entity_context = tuple(
-                sorted([entity_context[0], entity_context[1]], key=str)
+                sorted(
+                    [entity_context[0], entity_context[1]], key=lambda x: str(x).lower()
+                )
                 + list(entity_context[2:])
             )
 
@@ -763,12 +746,11 @@ class Fact(Factor):
         For Fact, it creates zero or more updated mappings for each other_order in
         other.entity_orders. Each time, it starts with mapping, and
         updates it with matches from self.entity_context and other_order.
-        """# TODO: docstring
+        """  # TODO: docstring
 
-        for updated_mapping in self._update_mapping(
+        return self._update_mapping(
             mapping, self.entity_context, other.entity_context
-        ):
-            yield updated_mapping
+        )
 
     def __eq__(self, other: Factor) -> bool:
         if self.__class__ != other.__class__:
@@ -958,7 +940,6 @@ class Fact(Factor):
                     ):
                         answer.append(context)
         return answer
-
 
     @classmethod
     def from_dict(cls, factor: Optional[dict]) -> Optional["Fact"]:

@@ -55,9 +55,7 @@ class TestFacts:
 
     def test_string_representation_of_factor(self, watt_factor):
         assert "<Hideaway Lodge> was a motel" in str(watt_factor["f1"])
-        assert (
-            "the absence of the fact" in str(watt_factor["f3_absent"])
-        )
+        assert "the absence of the fact" in str(watt_factor["f3_absent"])
 
     def test_string_representation_with_concrete_entities(self, watt_factor):
         """
@@ -87,11 +85,16 @@ class TestFacts:
         assert len(watt_factor["f1"].predicate) == 1
         assert len(watt_factor["f1"]) == 1
 
-    def test_entity_orders(self, make_entity, watt_factor):
-        assert watt_factor["f7_swap_entities_4"].entity_orders == {
-            (make_entity["watt"], make_entity["motel_specific"]),
-            (make_entity["motel_specific"], make_entity["watt"]),
-        }
+    def test_entity_context_reciprocal(self, make_entity, watt_factor):
+        """Predicate.new() should have kept only this order, because
+        the string representation of watt is generic and starts with
+        an open angle bracket, which comes before H in alphabetical order."""
+        motel_near_watt = watt_factor["f7_swap_entities_4"]
+
+        assert motel_near_watt.entity_context == (
+            make_entity["watt"],
+            make_entity["motel_specific"],
+            )
 
     def test_predicate_with_entities(self, make_entity, watt_factor):
         assert (
@@ -142,12 +145,10 @@ class TestFacts:
         assert factor.standard_of_proof in str(factor)
 
     def test_context_register(self, make_entity, watt_factor):
-        assert watt_factor["f1"].context_register(watt_factor["f1_entity_order"]) == [
-            {
+        assert watt_factor["f1"].context_register(watt_factor["f1_entity_order"]) == {
                 make_entity["motel"]: make_entity["watt"],
                 watt_factor["f1"]: watt_factor["f1_entity_order"],
             }
-        ]
 
     def test_import_to_mapping(self, make_entity, watt_factor):
         f = watt_factor["f7"]
@@ -188,18 +189,27 @@ class TestFacts:
         )
 
     def test_reciprocal_context_register(self, make_entity, watt_factor):
+        """Because the reciprocal factors have been put in alphabetical
+        order, each context factor in f7 should match with the identical
+        factor is f7_swap_entities.
+
+        This test compares the strings (could also use repr) because the Fact
+        objects don't have the same id (can't use "is"), but the Entity
+        objects evaluate equal because they're both generic (can't use ==).
+
+        This test describes something that shouldn't happen in practice,
+        because it means two objects that should be identical have been
+        made in two different ways, each with a different id.
+
+        This situation risks creating a lot of bugs. Will it be possible
+        to avoid creating multiple objects representing the same
+        Fact in practice, so "(A is B) == False" guarantees they refer to
+        different things?
+        """
         d = watt_factor["f7"].context_register(watt_factor["f7_swap_entities"])
-        assert len(d) == 2
-        assert {
-            make_entity["motel"]: make_entity["trees"],
-            make_entity["trees"]: make_entity["motel"],
-            watt_factor["f7"]: watt_factor["f7_swap_entities"],
-        } in d
-        assert {
-            make_entity["motel"]: make_entity["motel"],
-            make_entity["trees"]: make_entity["trees"],
-            watt_factor["f7"]: watt_factor["f7_swap_entities"],
-        } in d
+        for k in d:
+            assert repr(d[k]) == repr(k)
+            assert str(d[k]) == str(k)
 
     # Equality
 
@@ -348,7 +358,6 @@ class TestFacts:
     def test_absent_does_not_contradict_narrower_quantity_statement(self, watt_factor):
         assert not watt_factor["f9_absent_miles"].contradicts(watt_factor["f9"])
         assert not watt_factor["f9"].contradicts(watt_factor["f9_absent_miles"])
-
 
     def test_contradiction_complex(self, make_complex_fact):
         assert make_complex_fact["f_irrelevant_murder"].contradicts(
