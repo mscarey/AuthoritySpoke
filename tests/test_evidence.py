@@ -65,6 +65,9 @@ class TestExhibits:
     def test_any_exhibit_implies_generic(self, make_exhibit):
         assert make_exhibit["reciprocal_testimony"] >= make_exhibit["generic_exhibit"]
 
+    def test_exhibit_with_features_implies_featureless(self, make_exhibit):
+        assert make_exhibit["reciprocal_testimony"] >= make_exhibit["specific_but_featureless"]
+
     def test_implication_more_specific_testimony(self, make_exhibit):
         assert (
             make_exhibit["reciprocal_testimony_specific"]

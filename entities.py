@@ -41,6 +41,8 @@ class Entity(Factor):
         return self == other or self > other
 
     def __gt__(self, other: Factor):
+        if other is None:
+            return True
         if not isinstance(self, other.__class__):
             return False
         if self == other:

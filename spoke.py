@@ -101,8 +101,8 @@ class Factor:
         a list of dicts, where each dict is a valid way to make matches between
         corresponding factors. The dict is empty if there are no matches."""
 
-        mapping = {self: other} # TODO: just changed this. Make the rest of the functions work with it.
-        if self.generic or other.generic:
+        mapping = {self: other}
+        if other is None or self.generic or other.generic:
             return mapping
         return self._compare_factor_attributes(other, mapping)
 
@@ -164,13 +164,14 @@ class Factor:
 
     def _find_matching_context(
         self,
-        context_register: Dict["Factor", "Factor"],
+        other: "Factor",
         comparison: Callable = operator.eq,
     ) -> bool:
         """Checks whether every key-value pair is related by the function
         in the "comparison" parameter. Whichever object is calling this
         method locally takes itself out of the context before comparing,
         avoiding infinite recursion."""
+        context_register = self.context_register(other)
         if not context_register:
             return False
         context_register.pop(self)
@@ -769,8 +770,8 @@ class Fact(Factor):
             or self.generic != other.generic
         ):
             return False
-        register = self.context_register(other)
-        return self._find_matching_context(register, operator.eq)
+
+        return self._find_matching_context(other, operator.eq)
 
     def make_generic(self) -> "Fact":
         """
@@ -824,7 +825,7 @@ class Fact(Factor):
         return self >= other
 
     def __ge__(self, other: Optional[Factor]) -> bool:
-        if other is None:  # TODO: remember why this is here
+        if other is None:
             return True
 
         if not isinstance(other, Factor):
@@ -855,8 +856,7 @@ class Fact(Factor):
         if not (self.predicate >= other.predicate and self.absent == other.absent):
             return False
 
-        register = self.context_register(other)
-        return self._find_matching_context(register, operator.ge)
+        return self._find_matching_context(other, operator.ge)
 
     def contradicts(self, other: Optional[Factor]) -> bool:
         """Returns True if self and other can't both be true at the same time.
@@ -873,9 +873,8 @@ class Fact(Factor):
 
         if not isinstance(other, self.__class__):
             return False
-        # TODO: Make register inside _find_matching_context()
-        register = self.context_register(other)
-        if self._find_matching_context(register, operator.ge):
+
+        if self._find_matching_context(other, operator.ge):
             if self.predicate.contradicts(other.predicate) and not (
                 self.absent | other.absent
             ):
@@ -883,8 +882,7 @@ class Fact(Factor):
             if self.predicate >= other.predicate and other.absent and not self.absent:
                 return True
 
-        register = self.context_register(other)
-        if self._find_matching_context(register, operator.le):
+        if self._find_matching_context(other, operator.le):
             if self.predicate.contradicts(other.predicate) and not (
                 self.absent | other.absent
             ):

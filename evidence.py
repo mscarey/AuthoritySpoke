@@ -60,8 +60,45 @@ class Exhibit(Factor):
         ):
             return False
 
-        register = self.context_register(other)
-        return self._find_matching_context(register, operator.eq)
+        return self._find_matching_context(other, operator.eq)
+
+    def __ge__(self, other: Optional[Factor]) -> bool:
+        if other is None:
+            return True
+
+        if not isinstance(other, Factor):
+            raise TypeError(
+                f"'Implies' not supported between instances of "
+                + f"'{self.__class__.__name__}' and '{other.__class__.__name__}'."
+            )
+
+        if not isinstance(self, other.__class__):
+            return False
+
+        if other.generic:
+            return True
+
+        if self.generic:
+            return False
+
+        if not (self.form == other.form or other.form is None):
+            return False
+
+        if not (
+            self.statement >= other.statement
+            and self.stated_by >= other.stated_by
+            and self.absent == other.absent
+        ):
+            return False
+
+        return self._find_matching_context(other, operator.ge)
+
+    def __gt__(self, other: Optional[Factor]) -> bool:
+        if other is None:
+            return True
+        if self == other:
+            return False
+        return self >= other
 
     def __str__(self):
         string = (f'{"absent " if self.absent else ""}{self.form if self.form else "exhibit"}'

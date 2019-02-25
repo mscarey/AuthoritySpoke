@@ -387,7 +387,8 @@ def make_exhibit(
         "relevant_murder_alice_craig_testimony": Exhibit(
             form="testimony", statement=x["f_relevant_murder_alice_craig"], stated_by=e["alice"]
         ),
-        "generic_exhibit": Exhibit(),
+        "generic_exhibit": Exhibit(generic=True),
+        "specific_but_featureless": Exhibit(),
     }
 
 
