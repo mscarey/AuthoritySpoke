@@ -121,26 +121,27 @@ class TestEvidence:
     def test_default_len_based_on_unique_entity_slots(self, make_entity, make_factor):
         """same as e["no_shooting"]"""
 
-        e = Evidence(
+        e = Evidence(Exhibit(
             form="testimony",
-            to_effect=make_factor["f_no_crime"],
             statement=make_factor["f_no_shooting"],
-            stated_by=make_entity["alice"],
+            stated_by=make_entity["alice"],),
+            to_effect=make_factor["f_no_crime"],
         )
-        assert len(e) == 2
+        assert not e.generic
 
     def test_get_entity_orders(self, make_evidence):
         # TODO: check this after making Evidence.__str__ method
-        assert make_evidence["no_shooting"].entity_orders == {(0, 1, 0, 0)}
-        assert make_evidence["reciprocal"].entity_orders == {(0, 1, 0, 2), (1, 0, 0, 2)}
+        context = make_evidence["no_shooting_testimony"].exhibit.statement.entity_context
+        assert str(context[0]) == "Alice"
+        assert str(context[1]) == "Bob"
 
     def test_get_entity_orders_no_statement(self, make_factor):
         e = Evidence(Exhibit(form="testimony"), to_effect=make_factor["f_no_crime"])
-        assert e.entity_orders == {(0, 1)}
+        assert len(e.to_effect.entity_context) == 1
 
     def test_evidence_str(self, make_evidence):
-        assert str(make_evidence["reciprocal"]).startswith(
-            "Testimony, with a statement by <2>"
+        assert str(make_evidence["reciprocal"]).lower.startswith(
+            "testimony, with a statement by <2>"
         )
 
     def test_equality_with_entity_order(self, make_predicate, make_evidence):

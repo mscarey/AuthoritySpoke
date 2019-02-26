@@ -47,6 +47,9 @@ class Exhibit(Factor):
         if self.__class__ != other.__class__:
             return False
 
+        if self.absent != other.absent:
+            return False
+
         if self.generic == other.generic == True:
             return True
 
@@ -54,7 +57,6 @@ class Exhibit(Factor):
             self.form != other.form
             or self.statement != other.statement
             or self.stated_by != other.stated_by
-            or self.absent != other.absent
             or self.generic != other.generic
         ):
             return False
@@ -94,11 +96,13 @@ class Exhibit(Factor):
         if not (self.form == other.form or other.form is None):
             return False
 
-        if not (other.statement is None or self.statement >= other.statement):
-            return False
+        if other.statement:
+            if not (self.statement and self.statement > other.statement):
+                return False
 
-        if not (other.stated_by is None or self.stated_by >= other.stated_by):
-            return False
+        if other.stated_by:
+            if not (self.stated_by and self.stated_by > other.stated_by):
+                return False
 
         return self._find_matching_context(other, operator.ge)
 
@@ -145,55 +149,32 @@ class Evidence(Factor):
         )
 
     def __str__(self):
-        if self.form:
-            s = self.form
+        if self.exhibit:
+            s = self.exhibit
         else:
             s = self.__class__.__name__
-        if self.derived_from:
-            s += f", derived from {self.derived_from}"
-        if self.stated_by:
-            s += f", with a statement by {self.stated_by}, "
-        if self.statement:
-            s += f', asserting the fact: "{str(self.statement)}"'
         if self.to_effect:
-            s += f', supporting the factual conclusion: "{str(self.to_effect)}"'
-        return s.capitalize() + "."
+            s += f", which supports {str(self.to_effect)}"
+        return s
 
     def __eq__(self, other):
         if not isinstance(other, self.__class__):
             return False
 
-        if (self.stated_by is None) != (other.stated_by is None):
-            return False
-
         if self.absent != other.absent:
             return False
 
-        matches = [None for slot in range(max(self.entity_context) + 1)]
+        if self.generic == other.generic == True:
+            return True
 
-        if other.stated_by is not None:
-            matches[self.stated_by] = other.stated_by
-
-        if (self.derived_from is None) != (other.derived_from is None):
-            return False
-
-        if other.derived_from is not None:
-            matches[self.derived_from] = other.derived_from
-
-        if (self.stated_by == self.derived_from) != (
-            other.stated_by == other.derived_from
+        if not (
+            self.exhibit == other.exhibit
+            and self.to_effect == other.to_effect
+            and self.generic == other.generic
         ):
             return False
 
-        matchlist = {tuple(matches)}
-
-        matchlist = evolve_match_list(
-            self.to_effect, other.to_effect, operator.eq, matchlist
-        )
-
-        return bool(
-            evolve_match_list(self.statement, other.statement, operator.eq, matchlist)
-        )
+        return self._find_matching_context(other, operator.eq)
 
     def __gt__(self, other):
         return self >= other and self != other
@@ -215,66 +196,34 @@ class Evidence(Factor):
                 for generic_factor in factor.generic_factors():
                     yield generic_factor
 
-    def implies_if_present(self, other):
+    def _compare_factor_attributes(self, other, mapping):
+        """
+        This function should be the only part of the context-matching
+        process that needs to be unique for each subclass of Factor.
+        It specifies what attributes of self and other to look in to find
+        Factor objects to match.
+        """
+        self_attributes = (self.exhibit, self.to_effect)
+        other_attributes = (other.exhibit, other.to_effect)
+
+        return self._update_mapping(mapping, self_attributes, other_attributes)
+
+    def implies_if_present(self, other: Factor):
         """Determines whether self would imply other assuming
         both of them have self.absent == False."""
 
-        if self.form != other.form and other.form is not None:
+        if not isinstance(self, other.__class__):
             return False
 
-        matches = [None for slot in range(max(self.entity_context) + 1)]
-
-        if other.stated_by is not None and self.stated_by is None:
-            return False
-
-        if other.stated_by is not None:
-            matches[self.stated_by] = other.stated_by
-
-        if other.derived_from is not None and self.derived_from is None:
-            return False
-
-        if other.derived_from is not None:
-            matches[self.derived_from] = other.derived_from
-
-        if self.absent != other.absent:
-            return False
-
-        if not self.to_effect >= other.to_effect:
-            return False
-
-        matchset = {tuple(matches)}
-
-        if other.to_effect is not None:
-            matchset = {
-                m
-                for m in find_matches(
-                    frozenset([self.to_effect]),
-                    {other.to_effect},
-                    tuple(matches),
-                    operator.ge,
-                )
-            }
-            if not matchset:
+        if other.exhibit:
+            if not self.exhibit or not self.exhibit >= other.exhibit:
                 return False
 
-        if self.statement != other.statement and not self.statement > other.statement:
-            return False
+        if other.to_effect:
+            if not self.to_effect or not self.to_effect >= other.to_effect:
+                return False
 
-        if other.statement is None:
-            return True
-
-        return any(
-            {
-                m
-                for m in find_matches(
-                    frozenset([self.statement]),
-                    {other.statement},
-                    tuple(match),
-                    operator.ge,
-                )
-            }
-            for match in matchset
-        )
+        return self._find_matching_context(other, operator.ge)
 
     def __ge__(self, other):
         if not isinstance(other, Factor):
@@ -282,8 +231,6 @@ class Evidence(Factor):
                 f"'Implies' not supported between instances of "
                 + f"'{self.__class__.__name__}' and '{other.__class__.__name__}'."
             )
-        if not isinstance(other, self.__class__):
-            return False
 
         if self.absent and other.absent:
             return other.implies_if_present(self)
