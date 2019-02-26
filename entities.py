@@ -30,17 +30,17 @@ class Entity(Factor):
         return cls(name, generic, plural)
 
 
-    def __eq__(self, other: Factor):
+    def __eq__(self, other: Optional[Factor]):
         if type(self) != type(other):
             return False
         if self.generic and other.generic:
             return True
         return astuple(self) == astuple(other)
 
-    def __ge__(self, other: Factor):
+    def __ge__(self, other: Optional[Factor]):
         return self == other or self > other
 
-    def __gt__(self, other: Factor):
+    def __gt__(self, other: Optional[Factor]):
         if other is None:
             return True
         if not isinstance(self, other.__class__):

@@ -117,20 +117,26 @@ class Factor:
         # The key-value relationship isn't symmetrical when the root Factors
         # are being compared for implication. What about contradiction?
         for in_key, in_value in incoming_mapping.items():
-            if (
-                in_key not in self_mapping or self_mapping[in_key] is in_value
-            ) and (
-                in_value not in self_mapping or self_mapping[in_value] is in_key
-            ) and (
-                all(item is not in_value for item in self_mapping.values())
-                or self_mapping.get(in_key) is in_value
-            ) and (
-                all(item is not in_key for item in self_mapping.values())
-                or self_mapping.get(in_value) is in_key
-            ):
-                self_mapping[in_key] = in_value
-            else:
-                return False
+            # The "if in_value" test prevents a failure when in_value is
+            # None, but the function still returns False when in_value is
+            # equal but not identical to self_mapping[in_key]. Or when
+            # in_value implies or is implied by self_mapping[in_key].
+            # What's the correct behavior?
+            if in_value:
+                if (
+                    in_key not in self_mapping or self_mapping[in_key] is in_value
+                ) and (
+                    in_value not in self_mapping or self_mapping[in_value] is in_key
+                ) and (
+                    all(item is not in_value for item in self_mapping.values())
+                    or self_mapping.get(in_key) is in_value
+                ) and (
+                    all(item is not in_key for item in self_mapping.values())
+                    or self_mapping.get(in_value) is in_key
+                ):
+                    self_mapping[in_key] = in_value
+                else:
+                    return False
         return self_mapping
 
     def _update_mapping(self, self_mapping_proxy, self_factors, other_order):
