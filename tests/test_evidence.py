@@ -9,12 +9,12 @@ import pytest
 from enactments import Code, Enactment
 from entities import Entity, Human
 from evidence import Evidence, Exhibit
-from rules import Procedure, Rule, ProceduralRule
+from rules import Procedure, Rule, ProceduralRule, evolve_match_list
 from opinions import Opinion
 from spoke import Predicate, Factor, Fact
 from spoke import ureg, Q_
 from spoke import check_entity_consistency
-from spoke import find_matches, evolve_match_list
+from spoke import find_matches
 
 
 class TestExhibits:

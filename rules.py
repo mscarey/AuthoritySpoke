@@ -6,14 +6,43 @@ from types import MappingProxyType
 
 from typing import Dict, List, Set, Tuple
 from typing import Iterable, Iterator, Mapping
-from typing import Optional, Union
+from typing import Callable, Optional, Union
 
 from dataclasses import dataclass
 
 from enactments import Enactment
-from spoke import Factor, evolve_match_list
+from spoke import Factor
 
 
+def evolve_match_list(
+    available: Iterable[Factor],
+    need_matches: Iterable[Factor],
+    comparison: Callable[[Factor, Factor], bool],
+    prior_matches: List[Dict[Factor, Optional[Factor]]],
+) -> List[Dict[Factor, Optional[Factor]]]:
+
+    """
+    Takes all the tuples of entity assignments in prior_matches, and
+    updates them with every consistent tuple of entity assignments
+    that would cause every Factor in need_matches to be related to
+    a Factor in "available" by the relation described by "comparison".
+    """  # TODO: update docstring
+
+    if isinstance(available, Factor):
+        available = (available,)
+    if isinstance(need_matches, Factor):
+        need_matches = (need_matches,)
+
+    new_matches = []
+    for m in prior_matches:
+        for y in find_matches(available, need_matches, MappingProxyType(m), comparison):
+            y = dict(y)
+            if all(existing_dict != y for existing_dict in new_matches):
+                new_matches.append(y)
+    return new_matches
+
+
+@dataclass(frozen=True)
 class Procedure:
     """A (potential) rule for courts to use in resolving litigation. Described in
     terms of inputs and outputs, and also potentially "even if" factors, which could
@@ -24,8 +53,13 @@ class Procedure:
     If a factor is relevant both as support for the output and as a potential
     undercutter, include it in both 'inputs' and 'despite'."""
 
-    def __init__(
-        self,
+    outputs: Tuple[Factor, ...]
+    inputs: Tuple[Factor, ...]
+    despite: Tuple[Factor, ...]
+
+    @classmethod
+    def new(
+        cls,
         outputs: Union[Factor, Iterable[Factor]],
         inputs: Union[Factor, Iterable[Factor]] = (),
         despite: Union[Factor, Iterable[Factor]] = (),
@@ -35,17 +69,19 @@ class Procedure:
                 return tuple(item)
             return (item,)
 
-        self.outputs = wrap_with_tuple(outputs)
-        self.inputs = wrap_with_tuple(inputs)
-        self.despite = wrap_with_tuple(despite)
+        outputs = wrap_with_tuple(outputs)
+        inputs = wrap_with_tuple(inputs)
+        despite = wrap_with_tuple(despite)
 
-        for group in (self.outputs, self.inputs, self.despite):
+        for group in (outputs, inputs, despite):
             for factor_obj in group:
                 if not isinstance(factor_obj, Factor):
                     raise TypeError(
-                        "Input, Output, and Despite groups must contain only "
-                        + f"type Factor, but {factor_obj} was type {type(factor_obj)}"
+                        "Input, Output, and Despite groups must contain "
+                        + "only subclasses of Factor, but "
+                        + f"{factor_obj} was type {type(factor_obj)}"
                     )
+        return cls(outputs, inputs, despite)
 
     def __eq__(self, other: "Procedure") -> bool:
         """Determines if the two procedures have all the same factors
@@ -158,7 +194,7 @@ class Procedure:
             for f in self.inputs:
                 text += "\n" + str(f)
         if self.despite:
-            text += "\nEven if:"
+            text += "\nDespite:"
             for f in self.despite:
                 text += "\n" + str(f)
         if self.outputs:
@@ -317,7 +353,7 @@ class Procedure:
         def get_foreign_match(
             match: Dict[Factor, Factor]
         ) -> Optional[Dict[Factor, Factor]]:
-        # TODO: write test for multiple keys of match with same value (other than None)
+            # TODO: write test for multiple keys of match with same value (other than None)
             return {v: k for k, v in match.items() if v is not None}
 
         return [

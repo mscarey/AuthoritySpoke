@@ -480,18 +480,18 @@ def make_procedure(make_evidence, make_factor, watt_factor) -> Dict[str, Procedu
     m = make_factor
 
     return {
-        "c1": Procedure(outputs=(f["f3"],), inputs=(f["f1"], f["f2"])),
-        "c2": Procedure(
+        "c1": Procedure.new(outputs=(f["f3"],), inputs=(f["f1"], f["f2"])),
+        "c2": Procedure.new(
             outputs=(f["f10"],),
             inputs=(f["f4"], f["f5"], f["f6"], f["f7"], f["f9"]),
             despite=(f["f8"],),
         ),
-        "c3": Procedure(
+        "c3": Procedure.new(
             outputs=e["crime_absent"],
             inputs=(f["f3"], f["f11"], f["f12"], f["f13"], f["f14"], f["f15"]),
             despite=(f["f16"]),
         ),
-        "c4": Procedure(
+        "c4": Procedure.new(
             outputs=f["f13"],
             inputs=(
                 f["f1"],
@@ -505,31 +505,31 @@ def make_procedure(make_evidence, make_factor, watt_factor) -> Dict[str, Procedu
                 f["f19"],
             ),
         ),
-        "c1_again": Procedure(outputs=(f["f3"],), inputs=(f["f1"], f["f2"])),
-        "c1_entity_order": Procedure(
+        "c1_again": Procedure.new(outputs=(f["f3"],), inputs=(f["f1"], f["f2"])),
+        "c1_entity_order": Procedure.new(
             outputs=(f["f3_different_entity"],),
             inputs=(f["f2_different_entity"], f["f1_different_entity"]),
         ),
-        "c1_easy": Procedure(outputs=(f["f3"],), inputs=(f["f2"])),
-        "c2_absent_despite": Procedure(
+        "c1_easy": Procedure.new(outputs=(f["f3"],), inputs=(f["f2"])),
+        "c2_absent_despite": Procedure.new(
             outputs=(f["f10"],),
             inputs=(f["f4"], f["f5"], f["f6"], f["f7"]),
             despite=(f["f8_exact"], f["f9_absent"]),
         ),
-        "c2_exact_quantity": Procedure(
+        "c2_exact_quantity": Procedure.new(
             outputs=(f["f10"],),
             inputs=(f["f4"], f["f5"], f["f6"], f["f8_exact"], f["f9"]),
         ),
-        "c2_higher_quantity": Procedure(
+        "c2_higher_quantity": Procedure.new(
             outputs=(f["f10"],),
             inputs=(f["f4"], f["f5"], f["f6"], f["f7"], f["f8_higher_int"], f["f9"]),
         ),
-        "c2_exact_in_despite": Procedure(
+        "c2_exact_in_despite": Procedure.new(
             outputs=(f["f10"],),
             inputs=(f["f4"], f["f5"], f["f6"], f["f7"], f["f9"]),
             despite=(f["f8_exact"],),
         ),
-        "c2_exact_in_despite_entity_order": Procedure(
+        "c2_exact_in_despite_entity_order": Procedure.new(
             outputs=(f["f10_swap_entities"],),
             inputs=(
                 f["f4_swap_entities"],
@@ -540,7 +540,7 @@ def make_procedure(make_evidence, make_factor, watt_factor) -> Dict[str, Procedu
             ),
             despite=(f["f8_exact_swap_entities"],),
         ),
-        "c2_irrelevant_inputs": Procedure(
+        "c2_irrelevant_inputs": Procedure.new(
             outputs=(f["f10"],),
             inputs=(
                 f["f4"],
@@ -556,7 +556,7 @@ def make_procedure(make_evidence, make_factor, watt_factor) -> Dict[str, Procedu
             ),
             despite=(f["f8"],),
         ),
-        "c2_irrelevant_outputs": Procedure(
+        "c2_irrelevant_outputs": Procedure.new(
             outputs=(
                 f["f10_swap_entities"],
                 m["f_irrelevant_0"],
@@ -573,7 +573,7 @@ def make_procedure(make_evidence, make_factor, watt_factor) -> Dict[str, Procedu
                 f["f9_swap_entities"],
             ),
         ),
-        "c2_irrelevant_despite": Procedure(
+        "c2_irrelevant_despite": Procedure.new(
             outputs=(f["f10"],),
             inputs=(f["f4"], f["f5"], f["f6"], f["f7"], f["f9"]),
             despite=(
@@ -585,52 +585,52 @@ def make_procedure(make_evidence, make_factor, watt_factor) -> Dict[str, Procedu
                 m["f_irrelevant_3_new_context"],
             ),
         ),
-        "c2_reciprocal_swap": Procedure(
+        "c2_reciprocal_swap": Procedure.new(
             outputs=(f["f10"],),
             inputs=(f["f4"], f["f5"], f["f6"], f["f7_swap_entities"], f["f9"]),
             despite=(f["f8"],),
         ),
-        "c2_nonreciprocal_swap": Procedure(
+        "c2_nonreciprocal_swap": Procedure.new(
             outputs=(f["f10"],),
             inputs=(f["f4_swap_entities"], f["f5"], f["f6"], f["f7"], f["f9"]),
             despite=(f["f8"],),
         ),
-        "c2_broad_output": Procedure(
+        "c2_broad_output": Procedure.new(
             outputs=(f["f8_int"],), inputs=(f["f4"], f["f5"], f["f6"], f["f7"], f["f9"])
         ),
-        "c2_narrow_output": Procedure(
+        "c2_narrow_output": Procedure.new(
             outputs=(f["f8_higher_int"],),
             inputs=(f["f4"], f["f5"], f["f6"], f["f7"], f["f9"]),
         ),
-        "c2_output_absent": Procedure(
+        "c2_output_absent": Procedure.new(
             outputs=(f["f10_absent"],),
             inputs=(f["f4"], f["f5"], f["f6"], f["f7"], f["f9"]),
             despite=(f["f8"],),
         ),
-        "c2_output_false": Procedure(
+        "c2_output_false": Procedure.new(
             outputs=(f["f10_false"],),
             inputs=(f["f4"], f["f5"], f["f6"], f["f7"], f["f9"]),
             despite=(f["f8"],),
         ),
-        "c2_output_absent_false": Procedure(
+        "c2_output_absent_false": Procedure.new(
             outputs=(f["f10_absent_false"],),
             inputs=(f["f4"], f["f5"], f["f6"], f["f7"], f["f9"]),
             despite=(f["f8"],),
         ),
-        "c_near_means_no_curtilage": Procedure(
+        "c_near_means_no_curtilage": Procedure.new(
             outputs=(f["f10_false"],), inputs=(f["f7_true"])
         ),
-        "c_nearer_means_curtilage": Procedure(
+        "c_nearer_means_curtilage": Procedure.new(
             outputs=(f["f10"],), inputs=(f["f8_less"])
         ),
-        "c_near_means_curtilage": Procedure(outputs=(f["f10"],), inputs=(f["f7"])),
-        "c_near_means_curtilage_even_if": Procedure(
+        "c_near_means_curtilage": Procedure.new(outputs=(f["f10"],), inputs=(f["f7"])),
+        "c_near_means_curtilage_even_if": Procedure.new(
             outputs=(f["f10"],), inputs=(f["f7"]), despite=(f["f8"])
         ),
-        "c_far_means_no_curtilage": Procedure(
+        "c_far_means_no_curtilage": Procedure.new(
             outputs=(f["f10_false"],), inputs=(f["f8"])
         ),
-        "c3_fewer_inputs": Procedure(
+        "c3_fewer_inputs": Procedure.new(
             outputs=e["crime_absent"],
             inputs=(f["f3"], f["f11"], f["f12"], f["f15"]),
             despite=(f["f16"]),

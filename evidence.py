@@ -7,11 +7,6 @@ from typing import Optional, Sequence, Union
 
 from entities import Entity
 from spoke import Factor, Fact
-from spoke import evolve_match_list
-
-# TODO: Exhibit class, with all the attributes of the current
-# Evidence class except to_effect. Exhibit will be an attribute
-# of Evidence.
 
 
 @dataclass(frozen=True)

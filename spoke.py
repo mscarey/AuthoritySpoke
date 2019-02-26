@@ -26,7 +26,6 @@ OPPOSITE_COMPARISONS = {
     "<": ">=",
 }
 
-
 def compare_dict_for_identical_entries(left, right):
     """Compares two dicts to see whether the
     keys and values of one are the same objects
@@ -643,42 +642,12 @@ def find_matches(
                 ):
                     yield m
 
-
-def evolve_match_list(
-    available: Iterable[Factor],
-    need_matches: Iterable[Factor],
-    comparison: Callable[[Factor, Factor], bool],
-    prior_matches: List[Dict[Factor, Optional[Factor]]],
-) -> List[Dict[Factor, Optional[Factor]]]:
-
-    """
-    Takes all the tuples of entity assignments in prior_matches, and
-    updates them with every consistent tuple of entity assignments
-    that would cause every Factor in need_matches to be related to
-    a Factor in "available" by the relation described by "comparison".
-    """  # TODO: update docstring
-
-    if isinstance(available, Factor):
-        available = (available,)
-    if isinstance(need_matches, Factor):
-        need_matches = (need_matches,)
-
-    new_matches = []
-    for m in prior_matches:
-        for y in find_matches(available, need_matches, MappingProxyType(m), comparison):
-            y = dict(y)
-            if all(existing_dict != y for existing_dict in new_matches):
-                new_matches.append(y)
-    return new_matches
-
-
 STANDARDS_OF_PROOF = {
     "scintilla of evidence": 1,
     "preponderance of evidence": 2,
     "clear and convincing": 3,
     "beyond reasonable doubt": 4,
 }
-
 
 @dataclass(frozen=True)
 class Fact(Factor):
@@ -1015,7 +984,6 @@ class Fact(Factor):
         Creates a new Fact object, replacing the old entity_context
         attribute with a new one.
         """
-
         if len(entity_context) != len(self.entity_context):
             raise ValueError(
                 f"The number of entities should be equal to the number of slots "
@@ -1028,8 +996,3 @@ class Fact(Factor):
             self.standard_of_proof,
             case_factors,
         )
-
-    # TODO: A function to determine if a factor implies another (transitively)
-    # given a list of factors that imply one another or a function for determining
-    # which implication relations (represented by production rules?)
-    # are binding from the point of view of a particular court.

@@ -2,11 +2,11 @@
 class TestProcedures:
     def test_exception_for_wrong_type_for_procedure(self, make_predicate):
         with pytest.raises(TypeError):
-            x = Procedure(inputs=make_predicate["p1"], outputs=make_predicate["p2"])
+            Procedure.new(inputs=make_predicate["p1"], outputs=make_predicate["p2"])
 
     def test_exception_for_wrong_type_in_tuple_for_procedure(self, make_predicate):
         with pytest.raises(TypeError):
-            x = Procedure(inputs=(make_predicate["p1"]), outputs=(make_predicate["p2"]))
+            Procedure.new(inputs=(make_predicate["p1"]), outputs=(make_predicate["p2"]))
 
     def test_get_context_factors(self, make_procedure):
         assert len(make_procedure["c1"].get_context_factors()) == 2
