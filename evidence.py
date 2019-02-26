@@ -97,11 +97,11 @@ class Exhibit(Factor):
             return False
 
         if other.statement:
-            if not (self.statement and self.statement > other.statement):
+            if not (self.statement and self.statement >= other.statement):
                 return False
 
         if other.stated_by:
-            if not (self.stated_by and self.stated_by > other.stated_by):
+            if not (self.stated_by and self.stated_by >= other.stated_by):
                 return False
 
         return self._find_matching_context(other, operator.ge)
@@ -150,7 +150,7 @@ class Evidence(Factor):
 
     def __str__(self):
         if self.exhibit:
-            s = self.exhibit
+            s = str(self.exhibit)
         else:
             s = self.__class__.__name__
         if self.to_effect:
