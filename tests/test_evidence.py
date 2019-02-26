@@ -74,6 +74,25 @@ class TestExhibits:
             > make_exhibit["reciprocal_testimony"]
         )
 
+    def test_implication_present_and_absent_testimony(self, make_exhibit):
+        assert not (
+            make_exhibit["reciprocal_testimony_specific_absent"]
+            > make_exhibit["reciprocal_testimony"]
+        )
+
+    def test_absent_implies_more_specific_absent(self, make_exhibit):
+        assert (
+            make_exhibit["reciprocal_testimony_absent"]
+            > make_exhibit["reciprocal_testimony_specific_absent"]
+        )
+
+    def test_absent_does_not_imply_less_specific_absent(self, make_exhibit):
+        assert not (
+            make_exhibit["reciprocal_testimony_specific_absent"]
+            > make_exhibit["reciprocal_testimony_absent"]
+        )
+
+
     # Contradiction
 
     def test_conflicting_exhibits_not_contradictory(self, make_exhibit):

@@ -72,6 +72,14 @@ class Exhibit(Factor):
                 + f"'{self.__class__.__name__}' and '{other.__class__.__name__}'."
             )
 
+        if self.absent == other.absent == False:
+            return self.implies_if_present(other)
+        if self.absent == other.absent == True:
+            return other.implies_if_present(self)
+        return False
+
+    def implies_if_present(self, other: "Exhibit"):
+
         if not isinstance(self, other.__class__):
             return False
 
@@ -82,13 +90,6 @@ class Exhibit(Factor):
             return False
 
         if not (self.form == other.form or other.form is None):
-            return False
-
-        if not (
-            self.statement >= other.statement
-            and self.stated_by >= other.stated_by
-            and self.absent == other.absent
-        ):
             return False
 
         return self._find_matching_context(other, operator.ge)
