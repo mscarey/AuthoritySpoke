@@ -46,9 +46,12 @@ class Factor:
     another. Common types of factors include Facts, Evidence, Allegations,
     Motions, and Arguments."""
 
-    def __init__(self, name: Optional[str] = None, generic: bool = True):
+    def __init__(
+        self, name: Optional[str] = None, generic: bool = True, absent: bool = False
+    ):
         self.name = name
         self.generic = generic
+        self.absent = absent
 
     @classmethod
     def from_dict(cls, factor: dict) -> "Factor":
@@ -96,6 +99,14 @@ class Factor:
         if self.generic:
             yield self
 
+    def make_absent(self) -> "Factor":
+        """Returns a new object the same as self except with the
+        opposite value for 'absent'"""
+
+        new_attrs = self.__dict__.copy()
+        new_attrs["absent"] = not new_attrs["absent"]
+        return self.__class__(**new_attrs)
+
     def context_register(self, other: "Factor") -> Dict["Factor", "Factor"]:
         """Searches through the context factors of self and other, making
         a list of dicts, where each dict is a valid way to make matches between
@@ -124,15 +135,18 @@ class Factor:
             # What's the correct behavior?
             if in_value:
                 if (
-                    in_key not in self_mapping or self_mapping[in_key] is in_value
-                ) and (
-                    in_value not in self_mapping or self_mapping[in_value] is in_key
-                ) and (
-                    all(item is not in_value for item in self_mapping.values())
-                    or self_mapping.get(in_key) is in_value
-                ) and (
-                    all(item is not in_key for item in self_mapping.values())
-                    or self_mapping.get(in_value) is in_key
+                    (in_key not in self_mapping or self_mapping[in_key] is in_value)
+                    and (
+                        in_value not in self_mapping or self_mapping[in_value] is in_key
+                    )
+                    and (
+                        all(item is not in_value for item in self_mapping.values())
+                        or self_mapping.get(in_key) is in_value
+                    )
+                    and (
+                        all(item is not in_key for item in self_mapping.values())
+                        or self_mapping.get(in_value) is in_key
+                    )
                 ):
                     self_mapping[in_key] = in_value
                 else:
@@ -162,6 +176,7 @@ class Factor:
         incoming_registers = [
             self_factors[index].context_register(other_order[index])
             for index in range(longest)
+            if self_factors[index] is not None
         ]
         new_register = reduce(
             self._import_to_mapping, incoming_registers, self_mapping_proxy
@@ -169,9 +184,7 @@ class Factor:
         return new_register
 
     def _find_matching_context(
-        self,
-        other: "Factor",
-        comparison: Callable = operator.eq,
+        self, other: "Factor", comparison: Callable = operator.eq
     ) -> bool:
         """Checks whether every key-value pair is related by the function
         in the "comparison" parameter. Whichever object is calling this
@@ -182,6 +195,7 @@ class Factor:
             return False
         context_register.pop(self)
         return all(comparison(item[0], item[1]) for item in context_register.items())
+
 
 @dataclass()
 class Predicate:
@@ -760,9 +774,7 @@ class Fact(Factor):
         updates it with matches from self.entity_context and other_order.
         """  # TODO: docstring
 
-        return self._update_mapping(
-            mapping, self.entity_context, other.entity_context
-        )
+        return self._update_mapping(mapping, self.entity_context, other.entity_context)
 
     def __eq__(self, other: Factor) -> bool:
         if self.__class__ != other.__class__:

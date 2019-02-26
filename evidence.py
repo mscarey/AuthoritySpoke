@@ -13,6 +13,7 @@ from spoke import evolve_match_list
 # Evidence class except to_effect. Exhibit will be an attribute
 # of Evidence.
 
+
 @dataclass(frozen=True)
 class Exhibit(Factor):
     """A source of information for use in litigation.
@@ -40,9 +41,7 @@ class Exhibit(Factor):
         self_attributes = (self.statement, self.stated_by)
         other_attributes = (other.statement, other.stated_by)
 
-        return self._update_mapping(
-            mapping, self_attributes, other_attributes
-        )
+        return self._update_mapping(mapping, self_attributes, other_attributes)
 
     def __eq__(self, other: Factor) -> bool:
         if self.__class__ != other.__class__:
@@ -78,6 +77,9 @@ class Exhibit(Factor):
             return other.implies_if_present(self)
         return False
 
+    def contradicts(self, other: Factor):
+        return self >= other.make_absent()
+
     def implies_if_present(self, other: "Exhibit"):
 
         if not isinstance(self, other.__class__):
@@ -92,6 +94,12 @@ class Exhibit(Factor):
         if not (self.form == other.form or other.form is None):
             return False
 
+        if not (other.statement is None or self.statement >= other.statement):
+            return False
+
+        if not (other.stated_by is None or self.stated_by >= other.stated_by):
+            return False
+
         return self._find_matching_context(other, operator.ge)
 
     def __gt__(self, other: Optional[Factor]) -> bool:
@@ -102,11 +110,13 @@ class Exhibit(Factor):
         return self >= other
 
     def __str__(self):
-        string = (f'{"absent " if self.absent else ""}{self.form if self.form else "exhibit"}'
-        + f'{(" by " + str(self.stated_by)) if self.stated_by else ""}'
-        + f'{(", asserting " + str(self.statement)) if self.statement else ""}')
+        string = (
+            f'{"absent " if self.absent else ""}{self.form if self.form else "exhibit"}'
+            + f'{(" by " + str(self.stated_by)) if self.stated_by else ""}'
+            + f'{(", asserting " + str(self.statement)) if self.statement else ""}'
+        )
         if self.generic:
-            string = f'<{string}>'
+            string = f"<{string}>"
         return string
 
 
@@ -114,6 +124,7 @@ class Exhibit(Factor):
 class Evidence(Factor):
     """An Exhibit that has been admitted by the court to aid a
     factual determination."""
+
     exhibit: Optional[Exhibit] = None
     to_effect: Optional[Fact] = None
     absent: bool = False

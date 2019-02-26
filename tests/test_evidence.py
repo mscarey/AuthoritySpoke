@@ -66,7 +66,10 @@ class TestExhibits:
         assert make_exhibit["reciprocal_testimony"] >= make_exhibit["generic_exhibit"]
 
     def test_exhibit_with_features_implies_featureless(self, make_exhibit):
-        assert make_exhibit["reciprocal_testimony"] >= make_exhibit["specific_but_featureless"]
+        assert (
+            make_exhibit["reciprocal_testimony"]
+            >= make_exhibit["specific_but_featureless"]
+        )
 
     def test_implication_more_specific_testimony(self, make_exhibit):
         assert (
@@ -92,7 +95,6 @@ class TestExhibits:
             > make_exhibit["reciprocal_testimony_absent"]
         )
 
-
     # Contradiction
 
     def test_conflicting_exhibits_not_contradictory(self, make_exhibit):
@@ -104,8 +106,10 @@ class TestExhibits:
         assert make_exhibit["no_shooting_witness_unknown_absent_testimony"].contradicts(
             make_exhibit["no_shooting_witness_unknown_testimony"]
         )
-        assert make_exhibit["no_shooting_witness_unknown_testimony"].contradicts(
-            make_exhibit["no_shooting_witness_unknown_absent_testimony"]
+
+    def test_present_contradicts_same_absent(self, make_exhibit):
+        assert make_exhibit["no_shooting_witness_unknown_absent_testimony"].contradicts(
+            make_exhibit["no_shooting_witness_unknown_testimony"]
         )
 
 
