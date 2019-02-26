@@ -71,7 +71,7 @@ class TestExhibits:
     def test_implication_more_specific_testimony(self, make_exhibit):
         assert (
             make_exhibit["reciprocal_testimony_specific"]
-            < make_exhibit["reciprocal_testimony"]
+            > make_exhibit["reciprocal_testimony"]
         )
 
     # Contradiction
