@@ -108,7 +108,10 @@ class Procedure(Factor):
             new_matchlist = []
             for matches in matchlist:
                 for answer in self.compare_factors(
-                    matches, set(self.__dict__[group]), other.__dict__[group], operator.eq
+                    matches,
+                    set(self.__dict__[group]),
+                    other.__dict__[group],
+                    operator.eq,
                 ):
                     new_matchlist.append(answer)
             matchlist = new_matchlist
@@ -122,7 +125,10 @@ class Procedure(Factor):
             new_matchlist = []
             for matches in matchlist:
                 for answer in self.compare_factors(
-                    matches, set(other.__dict__[group]), self.__dict__[group], operator.eq
+                    matches,
+                    set(other.__dict__[group]),
+                    self.__dict__[group],
+                    operator.eq,
                 ):
                     new_matchlist.append(answer)
             matchlist = new_matchlist
@@ -188,14 +194,24 @@ class Procedure(Factor):
 
         despite_or_input = {*self.despite, *self.inputs}
 
-        matchlist = [{context: None for context in self.get_context_factors()}]
-        matchlist = evolve_match_list(self.inputs, other.inputs, operator.ge, matchlist)
-        matchlist = evolve_match_list(
-            self.outputs, other.outputs, operator.ge, matchlist
+        groups = (
+            (other.outputs, self.outputs, operator.le),
+            (other.inputs, self.inputs, operator.le),
+            (other.despite, despite_or_input, operator.le),
         )
-        matchlist = evolve_match_list(
-            despite_or_input, other.despite, operator.ge, matchlist
-        )
+
+        matchlist = [{}]
+        for group in groups:
+            new_matchlist = []
+            for matches in matchlist:
+                for answer in self.compare_factors(
+                    matches,
+                    set(group[0]),
+                    group[1],
+                    group[2],
+                ):
+                    new_matchlist.append(answer)
+            matchlist = new_matchlist
 
         return bool(matchlist)
 
