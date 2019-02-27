@@ -66,7 +66,7 @@ class Procedure(Factor):
     ):
         def wrap_with_tuple(item) -> Tuple[Factor, ...]:
             if isinstance(item, Iterable):
-                return tuple(sorted(item, key=lambda x: str(x).lower()))
+                return tuple(sorted(item, key=repr))
             return (item,)
 
         outputs = wrap_with_tuple(outputs)
@@ -88,7 +88,13 @@ class Procedure(Factor):
         with the same entities in the same roles, not whether they're
         actually the same Python object."""
 
-        if not isinstance(other, Procedure):
+        if not isinstance(other, Factor):
+            raise TypeError(
+                f"__eq__ not supported between instances of "
+                + f"'{self.__class__.__name__}' and '{other.__class__.__name__}'."
+            )
+
+        if not isinstance(other, self.__class__):
             return False
 
         if len(other) != len(self):  # redundant?
@@ -110,7 +116,9 @@ class Procedure(Factor):
                 # Procedure.output, .input, and .despite, but not in
                 # attributes of other kinds of Factors. Likely cause
                 # of bugs.
-                if self._update_mapping(dict(matches), tuple(matches.keys()), tuple(matches.values())):
+                if self._update_mapping(
+                    dict(matches), tuple(matches.keys()), tuple(matches.values())
+                ):
                     return matches
                 return False
             groups = ("outputs", "inputs", "despite")
@@ -140,7 +148,6 @@ class Procedure(Factor):
         available_for_matching = other.factors_all()
         return bool(add_to_matches(matches, need_matches, available_for_matching))
 
-
     def __ge__(self, other: "Procedure") -> bool:
         """
         Tests whether the assertion that self applies in some cases
@@ -158,11 +165,14 @@ class Procedure(Factor):
         is not equal to or implied by some despite or input of self.
         """
 
-        if not isinstance(other, self.__class__):
+        if not isinstance(other, Factor):
             raise TypeError(
                 f"'Implies' not supported between instances of "
                 + f"'{self.__class__.__name__}' and '{other.__class__.__name__}'."
             )
+
+        if not isinstance(other, self.__class__):
+            return False
 
         despite_or_input = {*self.despite, *self.inputs}
 
@@ -262,7 +272,7 @@ class Procedure(Factor):
         the same for the same set of factors, but that doesn't correspond to
         whether the factors are inputs, outputs, or "even if" factors."""
 
-        return sorted(self.factors_all(), key=str(x).lower())
+        return sorted(self.factors_all(), key=repr)
 
     def find_consistent_factors(
         self,

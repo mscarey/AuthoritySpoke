@@ -721,7 +721,7 @@ class Fact(Factor):
         if predicate.reciprocal:
             entity_context = tuple(
                 sorted(
-                    [entity_context[0], entity_context[1]], key=lambda x: str(x).lower()
+                    [entity_context[0], entity_context[1]], key=repr
                 )
                 + list(entity_context[2:])
             )

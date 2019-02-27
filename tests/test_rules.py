@@ -86,10 +86,10 @@ class TestProcedures:
         ]
 
     def test_procedure_string_with_entities(self, make_procedure):
-        assert "Fact: <Craig> performed at <circus>" in str(
+        assert "fact <Craig> performed at <circus>" in str(
             make_procedure["c2_irrelevant_inputs"]
         )
-        assert "Fact: <Dan> performed at <circus>" in str(
+        assert "fact <Dan> performed at <circus>" in str(
             make_procedure["c2_irrelevant_inputs"]
         )
 
