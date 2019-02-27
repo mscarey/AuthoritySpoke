@@ -110,7 +110,7 @@ class Procedure(Factor):
                 # Procedure.output, .input, and .despite, but not in
                 # attributes of other kinds of Factors. Likely cause
                 # of bugs.
-                if self._update_mapping(matches, matches.keys(), matches.values()):
+                if self._update_mapping(dict(matches), tuple(matches.keys()), tuple(matches.values())):
                     return matches
                 return False
             groups = ("outputs", "inputs", "despite")

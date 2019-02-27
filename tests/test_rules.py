@@ -1,3 +1,14 @@
+import pytest
+
+from enactments import Code, Enactment
+from entities import Entity, Human
+from evidence import Evidence, Exhibit
+from rules import Procedure, Rule, ProceduralRule, evolve_match_list
+from opinions import Opinion
+from spoke import Predicate, Factor, Fact
+from spoke import ureg, Q_
+from spoke import check_entity_consistency
+from spoke import find_matches
 
 class TestProcedures:
     def test_exception_for_wrong_type_for_procedure(self, make_predicate):
@@ -9,8 +20,10 @@ class TestProcedures:
             Procedure.new(inputs=(make_predicate["p1"]), outputs=(make_predicate["p2"]))
 
     def test_get_context_factors(self, make_procedure):
+        # motel, watt
         assert len(make_procedure["c1"].get_context_factors()) == 2
-        assert len(make_procedure["c2"].get_context_factors()) == 3
+        # trees, motel
+        assert len(make_procedure["c2"].get_context_factors()) == 2
 
     def test_procedure_length(self, make_procedure):
         """Consider deleting Procedure.__len__() and this test."""
