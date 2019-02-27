@@ -43,7 +43,7 @@ def evolve_match_list(
 
 
 @dataclass(frozen=True)
-class Procedure:
+class Procedure(Factor):
     """A (potential) rule for courts to use in resolving litigation. Described in
     terms of inputs and outputs, and also potentially "even if" factors, which could
     be considered "failed undercutters" in defeasible logic.
@@ -66,7 +66,7 @@ class Procedure:
     ):
         def wrap_with_tuple(item) -> Tuple[Factor, ...]:
             if isinstance(item, Iterable):
-                return tuple(item)
+                return tuple(sorted(item, key=lambda x: str(x).lower()))
             return (item,)
 
         outputs = wrap_with_tuple(outputs)
@@ -103,14 +103,43 @@ class Procedure:
         """
         Determines whether every factor in other is in self, with matching entity slots.
         """
-        matchlist = [{context: None for context in self.get_context_factors()}]
-        matchlist = evolve_match_list(
-            self.outputs, other.outputs, operator.eq, matchlist
-        )
-        matchlist = evolve_match_list(self.inputs, other.inputs, operator.eq, matchlist)
-        return bool(
-            evolve_match_list(self.despite, other.despite, operator.eq, matchlist)
-        )
+
+        def add_to_matches(matches, need_matches, available_for_matching):
+            if not need_matches:
+                # This seems to allow duplicate values in
+                # Procedure.output, .input, and .despite, but not in
+                # attributes of other kinds of Factors. Likely cause
+                # of bugs.
+                if self._update_mapping(matches, matches.keys(), matches.values()):
+                    return matches
+                return False
+            groups = ("outputs", "inputs", "despite")
+            self_factor = need_matches.pop()
+            for other_factor in available_for_matching:
+                if (
+                    all(
+                        (self_factor in self.__dict__[group])
+                        == (other_factor in other.__dict__[group])
+                        for group in groups
+                    )
+                    and self_factor == other_factor
+                ):
+                    new_matches = dict(matches)
+                    # should other_factor really be removed?
+                    new_matches[self_factor] = other_factor
+                    available_for_matching.remove(other_factor)
+                    return add_to_matches(
+                        MappingProxyType(new_matches),
+                        need_matches,
+                        available_for_matching,
+                    )
+            return False
+
+        matches = {factor: None for factor in self.factors_all()}
+        need_matches = self.factors_all()
+        available_for_matching = other.factors_all()
+        return bool(add_to_matches(matches, need_matches, available_for_matching))
+
 
     def __ge__(self, other: "Procedure") -> bool:
         """
@@ -233,7 +262,7 @@ class Procedure:
         the same for the same set of factors, but that doesn't correspond to
         whether the factors are inputs, outputs, or "even if" factors."""
 
-        return sorted(self.factors_all(), key=repr)
+        return sorted(self.factors_all(), key=str(x).lower())
 
     def find_consistent_factors(
         self,
