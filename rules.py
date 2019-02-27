@@ -6,7 +6,7 @@ from types import MappingProxyType
 
 from typing import Dict, List, Set, Tuple
 from typing import Iterable, Iterator, Mapping
-from typing import Callable, Optional, Union
+from typing import Callable, Generator, Optional, Union
 
 from dataclasses import dataclass
 
@@ -102,51 +102,63 @@ class Procedure(Factor):
 
             # Verifying that every factor in self is in other.
             # Also verifying that every factor in other is in self.
-
-        return self.check_factor_equality(other) and other.check_factor_equality(self)
-
-    def check_factor_equality(self, other: "Procedure") -> bool:
-        """
-        Determines whether every factor in other is in self, with matching entity slots.
-        """
-
-        def add_to_matches(matches, need_matches, available_for_matching):
-            if not need_matches:
-                # This seems to allow duplicate values in
-                # Procedure.output, .input, and .despite, but not in
-                # attributes of other kinds of Factors. Likely cause
-                # of bugs.
-                if self._update_mapping(
-                    dict(matches), tuple(matches.keys()), tuple(matches.values())
+        groups = ("outputs", "inputs", "despite")
+        matchlist = [{}]
+        for group in groups:
+            new_matchlist = []
+            for matches in matchlist:
+                for answer in self.compare_factors(
+                    matches, set(self.__dict__[group]), other.__dict__[group], operator.eq
                 ):
-                    return matches
-                return False
-            groups = ("outputs", "inputs", "despite")
+                    new_matchlist.append(answer)
+            matchlist = new_matchlist
+
+        if not bool(matches):
+            return False
+
+        # Now doing the same thing in reverse
+        matchlist = [{}]
+        for group in groups:
+            new_matchlist = []
+            for matches in matchlist:
+                for answer in self.compare_factors(
+                    matches, set(other.__dict__[group]), self.__dict__[group], operator.eq
+                ):
+                    new_matchlist.append(answer)
+            matchlist = new_matchlist
+        return bool(matchlist)
+
+    def compare_factors(
+        self, matches, need_matches, available_for_matching, comparison
+    ) -> Dict[Factor, Optional[Factor]]:
+        """
+        Determines whether all factors in need_matches have the relation
+        "comparison" with a factor in available_for_matching, with matching
+        entity slots.
+        """
+
+        if not need_matches:
+            # This seems to allow duplicate values in
+            # Procedure.output, .input, and .despite, but not in
+            # attributes of other kinds of Factors. Likely cause
+            # of bugs.
+            if self._update_mapping(
+                dict(matches), tuple(matches.keys()), tuple(matches.values())
+            ):
+                yield matches
+        else:
             self_factor = need_matches.pop()
             for other_factor in available_for_matching:
-                if (
-                    all(
-                        (self_factor in self.__dict__[group])
-                        == (other_factor in other.__dict__[group])
-                        for group in groups
-                    )
-                    and self_factor == other_factor
-                ):
+                if comparison(self_factor, other_factor):
                     new_matches = dict(matches)
-                    # should other_factor really be removed?
                     new_matches[self_factor] = other_factor
-                    available_for_matching.remove(other_factor)
-                    return add_to_matches(
+                    for answer in self.compare_factors(
                         MappingProxyType(new_matches),
                         need_matches,
                         available_for_matching,
-                    )
-            return False
-
-        matches = {factor: None for factor in self.factors_all()}
-        need_matches = self.factors_all()
-        available_for_matching = other.factors_all()
-        return bool(add_to_matches(matches, need_matches, available_for_matching))
+                        comparison,
+                    ):
+                        yield answer
 
     def __ge__(self, other: "Procedure") -> bool:
         """
