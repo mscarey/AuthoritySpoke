@@ -1,3 +1,4 @@
+import logging
 import pytest
 
 from enactments import Code, Enactment
@@ -38,7 +39,8 @@ class TestProcedures:
     def test_procedure_equality_entity_order(self, make_procedure):
         assert make_procedure["c1"] == make_procedure["c1_entity_order"]
 
-    def test_still_equal_after_swapping_reciprocal_entities(self, make_procedure):
+    def test_still_equal_after_swapping_reciprocal_entities(self, make_procedure, caplog):
+        caplog.set_level(logging.DEBUG)
         assert make_procedure["c2"] == make_procedure["c2_reciprocal_swap"]
 
     def test_foreign_match_list(self, make_procedure, watt_mentioned):

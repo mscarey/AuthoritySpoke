@@ -1,5 +1,6 @@
 from functools import reduce
 import itertools
+import logging
 import operator
 import re
 
@@ -12,6 +13,8 @@ from typing import Optional, Sequence, Union
 from pint import UnitRegistry
 
 from dataclasses import dataclass
+
+
 
 ureg = UnitRegistry()
 Q_ = ureg.Quantity
@@ -118,9 +121,11 @@ class Factor:
 
     @staticmethod
     def _import_to_mapping(self_mapping, incoming_mapping):
-        """If the same factor in self appears to match to two
-        different factors in other, the function
-        return False. Otherwise it returns the dict of matches."""
+        """If the same factor in one mapping appears to match
+        to two different factors in the other, the function
+        return False. Otherwise it returns a merged dict of
+        matches."""
+        logger = logging.getLogger('context_match_logger')
         if not self_mapping:
             return False
         # TODO: find better solution.
@@ -128,28 +133,36 @@ class Factor:
         # are being compared for implication. What about contradiction?
         for in_key, in_value in incoming_mapping.items():
             # The "if in_value" test prevents a failure when in_value is
-            # None, but the function still returns False when in_value is
-            # equal but not identical to self_mapping[in_key]. Or when
-            # in_value implies or is implied by self_mapping[in_key].
-            # What's the correct behavior?
+            # None, but an "is" test returns False when in_value is
+            # equal but not identical to self_mapping[in_key], while
+            # equality incorrectly matches generically equal Factors
+            # that don't refer to the same thing. Can this be
+            # made a nonissue by making it impossible for duplicate
+            # Factor objects to exist?
+
+            # Resorting to comparing __repr__ for now. What will be
+            # the correct behavior when testing for implication rather
+            # than equality?
             if in_value:
-                if (
-                    (in_key not in self_mapping or self_mapping[in_key] is in_value)
-                    and (
-                        in_value not in self_mapping or self_mapping[in_value] is in_key
-                    )
-                    and (
-                        all(item is not in_value for item in self_mapping.values())
-                        or self_mapping.get(in_key) is in_value
-                    )
-                    and (
-                        all(item is not in_key for item in self_mapping.values())
-                        or self_mapping.get(in_value) is in_key
-                    )
-                ):
-                    self_mapping[in_key] = in_value
-                else:
+                if not (in_key not in self_mapping or repr(self_mapping[in_key]) == repr(in_value)):
+                    logger.debug(f'{in_key} already in mapping with value '+
+                        f'{self_mapping[in_key]}, not {in_value}')
                     return False
+                if not (in_value not in self_mapping or repr(self_mapping[in_value]) == repr(in_key)):
+                    logger.debug(f'value {in_value} already in mapping with value '+
+                        f'{self_mapping[in_value]}, not {in_key}')
+                    return False
+                if not (all(item is not in_value for item in self_mapping.values())
+                        or repr(self_mapping.get(in_key)) == repr(in_value)):
+                    logger.debug(f'value {in_value} already a value in mapping,'+
+                        f'but key {in_key} is mapped to {self_mapping.get(in_key)}')
+                    return False
+                if not (all(item is not in_key for item in self_mapping.values())
+                        or repr(self_mapping.get(in_value)) == repr(in_key)):
+                    logger.debug(f'key {in_key} already a value in mapping,'+
+                        f'but value {in_value} is mapped to {self_mapping.get(in_value)}')
+                    return False
+                self_mapping[in_key] = in_value
         return self_mapping
 
     def _update_mapping(self, self_mapping_proxy, self_factors, other_order):

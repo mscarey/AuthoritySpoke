@@ -8,7 +8,6 @@ from typing import Optional, Sequence, Union
 from entities import Entity
 from spoke import Factor, Fact
 
-
 @dataclass(frozen=True)
 class Exhibit(Factor):
     """A source of information for use in litigation.

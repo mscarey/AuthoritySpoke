@@ -1,6 +1,7 @@
 from copy import copy
 import datetime
 import json
+import logging
 from typing import Dict
 
 from pint import UnitRegistry
@@ -15,7 +16,6 @@ from spoke import Predicate, Factor, Fact
 from spoke import ureg, Q_
 from spoke import check_entity_consistency
 from spoke import find_matches
-
 
 class TestFacts:
     def test_default_entity_context_for_fact(
@@ -94,7 +94,7 @@ class TestFacts:
         assert motel_near_watt.entity_context == (
             make_entity["watt"],
             make_entity["motel_specific"],
-            )
+        )
 
     def test_predicate_with_entities(self, make_entity, watt_factor):
         assert (
@@ -146,9 +146,9 @@ class TestFacts:
 
     def test_context_register(self, make_entity, watt_factor):
         assert watt_factor["f1"].context_register(watt_factor["f1_entity_order"]) == {
-                make_entity["motel"]: make_entity["watt"],
-                watt_factor["f1"]: watt_factor["f1_entity_order"],
-            }
+            make_entity["motel"]: make_entity["watt"],
+            watt_factor["f1"]: watt_factor["f1_entity_order"],
+        }
 
     def test_import_to_mapping(self, make_entity, watt_factor):
         f = watt_factor["f7"]
@@ -210,6 +210,14 @@ class TestFacts:
         for k in d:
             assert repr(d[k]) == repr(k)
             assert str(d[k]) == str(k)
+
+    def test_import_to_mapping_reciprocal(self, make_entity, watt_factor, caplog):
+        caplog.set_level(logging.DEBUG)
+        mapping = Factor._import_to_mapping(
+            {watt_factor["f7"]: watt_factor["f7"]},
+            {watt_factor["f7_swap_entities"]: watt_factor["f7_swap_entities"]},
+        )
+        assert mapping[watt_factor["f7"]] == watt_factor["f7"]
 
     # Equality
 
