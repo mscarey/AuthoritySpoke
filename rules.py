@@ -1,3 +1,4 @@
+from collections import namedtuple
 import json
 import pathlib
 import operator
@@ -13,11 +14,13 @@ from dataclasses import dataclass
 from enactments import Enactment
 from spoke import Factor
 
+Comparison = namedtuple("Comparison", ["need_matches", "available", "relation"])
+
 
 def evolve_match_list(
     available: Iterable[Factor],
     need_matches: Iterable[Factor],
-    comparison: Callable[[Factor, Factor], bool],
+    relation: Callable[[Factor, Factor], bool],
     prior_matches: List[Dict[Factor, Optional[Factor]]],
 ) -> List[Dict[Factor, Optional[Factor]]]:
 
@@ -25,7 +28,7 @@ def evolve_match_list(
     Takes all the tuples of entity assignments in prior_matches, and
     updates them with every consistent tuple of entity assignments
     that would cause every Factor in need_matches to be related to
-    a Factor in "available" by the relation described by "comparison".
+    a Factor in "available" by the relation described by "relation".
     """  # TODO: update docstring
 
     if isinstance(available, Factor):
@@ -35,7 +38,7 @@ def evolve_match_list(
 
     new_matches = []
     for m in prior_matches:
-        for y in find_matches(available, need_matches, MappingProxyType(m), comparison):
+        for y in find_matches(available, need_matches, MappingProxyType(m), relation):
             y = dict(y)
             if all(existing_dict != y for existing_dict in new_matches):
                 new_matches.append(y)
@@ -135,11 +138,11 @@ class Procedure(Factor):
         return bool(matchlist)
 
     def compare_factors(
-        self, matches, need_matches, available_for_matching, comparison
+        self, matches, need_matches, available_for_matching, relation
     ) -> Dict[Factor, Optional[Factor]]:
         """
         Determines whether all factors in need_matches have the relation
-        "comparison" with a factor in available_for_matching, with matching
+        "relation" with a factor in available_for_matching, with matching
         entity slots.
         """
 
@@ -155,14 +158,14 @@ class Procedure(Factor):
         else:
             self_factor = need_matches.pop()
             for other_factor in available_for_matching:
-                if comparison(self_factor, other_factor):
+                if relation(self_factor, other_factor):
                     new_matches = dict(matches)
                     new_matches[self_factor] = other_factor
                     for answer in self.compare_factors(
                         MappingProxyType(new_matches),
                         need_matches,
                         available_for_matching,
-                        comparison,
+                        relation,
                     ):
                         yield answer
 
@@ -194,26 +197,30 @@ class Procedure(Factor):
 
         despite_or_input = {*self.despite, *self.inputs}
 
-        groups = (
-            (other.outputs, self.outputs, operator.le),
-            (other.inputs, self.inputs, operator.le),
-            (other.despite, despite_or_input, operator.le),
+        comparisons = (
+            Comparison(other.outputs, self.outputs, operator.le),
+            Comparison(other.inputs, self.inputs, operator.le),
+            Comparison(other.despite, despite_or_input, operator.le),
         )
 
+        return bool(self.all_comparison_matches(comparisons))
+
+    def all_comparison_matches(self,
+        comparisons: Tuple[Comparison, ...]
+    ) -> List[Dict[Factor, Optional[Factor]]]:
         matchlist = [{}]
-        for group in groups:
+        for comparison in comparisons:
             new_matchlist = []
             for matches in matchlist:
                 for answer in self.compare_factors(
                     matches,
-                    set(group[0]),
-                    group[1],
-                    group[2],
+                    set(comparison.need_matches),
+                    comparison.available,
+                    comparison.relation,
                 ):
                     new_matchlist.append(answer)
             matchlist = new_matchlist
-
-        return bool(matchlist)
+        return matchlist
 
     def __gt__(self, other: "Procedure") -> bool:
         if self == other:
@@ -369,11 +376,11 @@ class Procedure(Factor):
         Tests whether the assertion that self applies in ALL cases
         implies that the procedure "other" applies in ALL cases.
 
-        For self to imply other, every input of self
-        must be implied by some input of other.
-
         Self does not imply other if any output of other
         is not equal to or implied by some output of self.
+
+        For self to imply other, every input of self
+        must be implied by some input of other.
 
         Self does not imply other if any despite of other
         contradicts an input of self.
@@ -386,14 +393,12 @@ class Procedure(Factor):
 
         if self == other:
             return True
-        matchlist = [{context: None for context in self.get_context_factors()}]
-        matchlist_from_other = evolve_match_list(
-            other.inputs, self.inputs, operator.ge, matchlist
+
+        comparisons = (
+            Comparison(other.outputs, self.outputs, operator.le),
+            Comparison(self.inputs, other.inputs, operator.le),
         )
-        matchlist = self.get_foreign_match_list(matchlist_from_other)
-        matchlist = evolve_match_list(
-            self.outputs, other.outputs, operator.ge, matchlist
-        )
+        matchlist = self.all_comparison_matches(comparisons)
 
         # For every factor in other, find the permutations of entity slots
         # that are consistent with matchlist and that don't cause the factor
