@@ -143,7 +143,7 @@ class Factor:
             # Resorting to comparing __repr__ for now. What will be
             # the correct behavior when testing for implication rather
             # than equality?
-            if in_value:
+            if in_value and in_value.generic:
                 if not (in_key not in self_mapping or repr(self_mapping[in_key]) == repr(in_value)):
                     logger.debug(f'{in_key} already in mapping with value '+
                         f'{self_mapping[in_key]}, not {in_value}')

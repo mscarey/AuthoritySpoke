@@ -128,14 +128,13 @@ class TestProcedures:
         assert not f["f7"] >= f["f8_exact"]
 
     def test_procedure_implication_with_exact_quantity(
-        self, watt_factor, make_procedure
+        self, make_procedure
     ):
         """This is meant to show that the function finds the "distance is
         exactly 25" factor in c2_exact, and recognizes that factor can imply
         the "distance is more than 20" factor in c2 if they have the same entities.
         """
 
-        f = watt_factor
         c2 = make_procedure["c2"]
         c2_exact_quantity = make_procedure["c2_exact_quantity"]
         assert c2_exact_quantity >= c2
@@ -143,7 +142,7 @@ class TestProcedures:
     def test_procedure_general_quantity_does_not_imply_exact(
         self, watt_factor, make_procedure
     ):
-        f = watt_factor
+
         c2 = make_procedure["c2"]
         c2_exact_quantity = make_procedure["c2_exact_quantity"]
         assert not c2_exact_quantity <= c2

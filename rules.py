@@ -157,7 +157,7 @@ class Procedure(Factor):
             for other_factor in available_for_matching:
                 if relation(self_factor, other_factor):
                     new_matches = self._update_mapping(
-                        matches, (self_factor,), (other_factor,),
+                        matches, (self_factor,), (other_factor,)
                     )
                     if new_matches:
                         for answer in self.compare_factors(
@@ -430,9 +430,7 @@ class Procedure(Factor):
         if not isinstance(other, self.__class__):
             return False
 
-        comparisons = (
-            Comparison(other.outputs, self.outputs, operator.le),
-        )
+        comparisons = (Comparison(other.outputs, self.outputs, operator.le),)
 
         matchlist = self.all_comparison_matches(comparisons)
 
@@ -491,8 +489,6 @@ class Procedure(Factor):
             for match in foreign
             if get_foreign_match(match) is not None
         ]
-
-
 
     def contradicts(self, other):
         raise NotImplementedError(
