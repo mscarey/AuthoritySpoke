@@ -111,7 +111,7 @@ class Procedure(Factor):
             new_matchlist = []
             for matches in matchlist:
                 for answer in self.compare_factors(
-                    matches,
+                    MappingProxyType(matches),
                     set(self.__dict__[group]),
                     other.__dict__[group],
                     operator.eq,
@@ -128,7 +128,7 @@ class Procedure(Factor):
             new_matchlist = []
             for matches in matchlist:
                 for answer in self.compare_factors(
-                    matches,
+                    MappingProxyType(matches),
                     set(other.__dict__[group]),
                     self.__dict__[group],
                     operator.eq,
@@ -151,23 +151,22 @@ class Procedure(Factor):
             # Procedure.output, .input, and .despite, but not in
             # attributes of other kinds of Factors. Likely cause
             # of bugs.
-            if self._update_mapping(
-                dict(matches), tuple(matches.keys()), tuple(matches.values())
-            ):
-                yield matches
+            yield matches
         else:
             self_factor = need_matches.pop()
             for other_factor in available_for_matching:
                 if relation(self_factor, other_factor):
-                    new_matches = dict(matches)
-                    new_matches[self_factor] = other_factor
-                    for answer in self.compare_factors(
-                        MappingProxyType(new_matches),
-                        need_matches,
-                        available_for_matching,
-                        relation,
-                    ):
-                        yield answer
+                    new_matches = self._update_mapping(
+                        matches, (self_factor,), (other_factor,),
+                    )
+                    if new_matches:
+                        for answer in self.compare_factors(
+                            MappingProxyType(new_matches),
+                            need_matches,
+                            available_for_matching,
+                            relation,
+                        ):
+                            yield answer
 
     def __ge__(self, other: "Procedure") -> bool:
         """
@@ -205,20 +204,20 @@ class Procedure(Factor):
 
         return bool(self.all_comparison_matches(comparisons))
 
-    def all_comparison_matches(self,
-        comparisons: Tuple[Comparison, ...]
+    def all_comparison_matches(
+        self, comparisons: Tuple[Comparison, ...]
     ) -> List[Dict[Factor, Optional[Factor]]]:
         matchlist = [{}]
         for comparison in comparisons:
             new_matchlist = []
             for matches in matchlist:
                 for answer in self.compare_factors(
-                    matches,
+                    MappingProxyType(matches),
                     set(comparison.need_matches),
                     comparison.available,
                     comparison.relation,
                 ):
-                    new_matchlist.append(answer)
+                    new_matchlist.append(dict(answer))
             matchlist = new_matchlist
         return matchlist
 
@@ -404,13 +403,39 @@ class Procedure(Factor):
         # that are consistent with matchlist and that don't cause the factor
         # to contradict any factor of self.
 
-        return any(
-            any(
-                match
-                for match in self.find_consistent_factors(self.inputs, other.despite, m)
-            )
-            for m in matchlist
-        )
+        if any(
+            self.consistent_factor_groups(self.inputs, other.despite, matches)
+            for matches in matchlist
+        ):
+            return True
+        return False
+
+    def consistent_factor_groups(self, self_factors, other_factors, matches):
+        """Determines whether unassigned context factors can
+        be assigned in such a way that there's no contradiction
+        between any factor in self_factors and other_factors,
+        given that some factors have already been assigned as
+        described by matches.
+
+        Try first determining whether one factor can contradict
+        another (imply the absence of the other given matching
+        context assignments), and then determine whether it's
+        possible to make the contexts not match?
+
+        Does Factor: None in matches always mean that Factor
+        can avoid being matched in a contradictory way?"""
+        # proxy = MappingProxyType(matches)
+        for self_factor in self_factors:
+            for other_factor in other_factors:
+                if self_factor.contradicts(other_factor):
+                    context_register = self_factor.context_register(other_factor)
+                    if all(
+                        matches.get(key) == context_register[key]
+                        or matches.get(context_register[key] == key)
+                        for key in self_factor.generic_factors()
+                    ):
+                        return False
+        return True
 
     def get_foreign_match_list(
         self, foreign: List[Dict[Factor, Factor]]

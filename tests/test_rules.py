@@ -33,7 +33,8 @@ class TestProcedures:
 
     # Equality
 
-    def test_procedure_equality(self, make_procedure):
+    def test_procedure_equality(self, make_procedure, caplog):
+        caplog.set_level(logging.DEBUG)
         assert make_procedure["c1"] == make_procedure["c1_again"]
 
     def test_procedure_equality_entity_order(self, make_procedure):

@@ -558,7 +558,7 @@ def make_procedure(make_evidence, make_factor, watt_factor) -> Dict[str, Procedu
         ),
         "c2_irrelevant_outputs": Procedure.new(
             outputs=(
-                f["f10_swap_entities"],
+                f["f10"],
                 m["f_irrelevant_0"],
                 m["f_irrelevant_1"],
                 m["f_irrelevant_2"],
@@ -566,11 +566,11 @@ def make_procedure(make_evidence, make_factor, watt_factor) -> Dict[str, Procedu
                 m["f_irrelevant_3_context_0"],
             ),
             inputs=(
-                f["f4_swap_entities"],
-                f["f5_swap_entities"],
-                f["f6_swap_entities"],
-                f["f7_swap_entities"],
-                f["f9_swap_entities"],
+                f["f4"],
+                f["f5"],
+                f["f6"],
+                f["f7"],
+                f["f9"],
             ),
         ),
         "c2_irrelevant_despite": Procedure.new(

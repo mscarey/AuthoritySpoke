@@ -73,6 +73,22 @@ class Exhibit(Factor):
             return other.implies_if_present(self)
         return False
 
+    def generic_factors(self) -> Iterable[Factor]:
+        """Returns an iterable of self's generic Factors,
+        which must be matched to other generic Factors to
+        perform equality tests between Factors."""
+
+        if self.generic:
+            yield self
+        else:
+            for factor in (
+                self.statement,
+                self.stated_by,
+            ):
+                if factor:
+                    for generic_factor in factor.generic_factors():
+                        yield generic_factor
+
     def contradicts(self, other: Factor):
         return self >= other.make_absent()
 
@@ -128,8 +144,6 @@ class Evidence(Factor):
     absent: bool = False
     generic: bool = False
 
-    # self.entity_context = self.generic_factors()
-
     def __hash__(self):
         return hash(
             (
@@ -183,12 +197,11 @@ class Evidence(Factor):
         else:
             for factor in (
                 self.to_effect,
-                self.statement,
-                self.stated_by,
-                self.derived_from,
+                self.exhibit,
             ):
-                for generic_factor in factor.generic_factors():
-                    yield generic_factor
+                if factor:
+                    for generic_factor in factor.generic_factors():
+                        yield generic_factor
 
     def _compare_factor_attributes(self, other, mapping):
         """
@@ -260,11 +273,6 @@ class Evidence(Factor):
             return True
 
         return other > self.make_absent()
-
-    def __len__(self):
-
-        entities = self.get_entity_orders().pop()
-        return len(set(entities))
 
     def get_entity_orders(self):
 

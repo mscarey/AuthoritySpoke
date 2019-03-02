@@ -126,7 +126,7 @@ class Factor:
         return False. Otherwise it returns a merged dict of
         matches."""
         logger = logging.getLogger('context_match_logger')
-        if not self_mapping:
+        if self_mapping is False:
             return False
         # TODO: find better solution.
         # The key-value relationship isn't symmetrical when the root Factors
@@ -162,6 +162,7 @@ class Factor:
                     logger.debug(f'key {in_key} already a value in mapping,'+
                         f'but value {in_value} is mapped to {self_mapping.get(in_value)}')
                     return False
+                self_mapping = dict(self_mapping)
                 self_mapping[in_key] = in_value
         return self_mapping
 
@@ -182,12 +183,12 @@ class Factor:
         be matched to the tuple of factors in self_factors in
         self_matching_proxy, without making the same factor from other_order
         match to two different factors in self_matching_proxy.
-        """
+        """# TODO: docstring
 
-        longest = max(len(self_factors), len(other_order))
+        shortest = min(len(self_factors), len(other_order))
         incoming_registers = [
             self_factors[index].context_register(other_order[index])
-            for index in range(longest)
+            for index in range(shortest)
             if self_factors[index] is not None
         ]
         new_register = reduce(
