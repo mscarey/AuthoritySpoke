@@ -179,8 +179,8 @@ class TestProcedures:
         assert make_procedure["c1"] >= make_procedure["c1_again"]
         assert make_procedure["c1"] == make_procedure["c1_again"]
 
-    def test_procedure_implies_same_procedure_fewer_inputs(self, make_procedure):
-
+    def test_procedure_implies_same_procedure_fewer_inputs(self, make_procedure, caplog):
+        caplog.set_level(logging.DEBUG)
         assert make_procedure["c1_easy"] < make_procedure["c1"]
         assert make_procedure["c1_easy"] <= make_procedure["c1"]
         assert make_procedure["c1_easy"] != make_procedure["c1"]

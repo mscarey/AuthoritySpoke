@@ -100,9 +100,6 @@ class Procedure(Factor):
         if not isinstance(other, self.__class__):
             return False
 
-        if len(other) != len(self):  # redundant?
-            return False
-
             # Verifying that every factor in self is in other.
             # Also verifying that every factor in other is in self.
         groups = ("outputs", "inputs", "despite")
@@ -119,7 +116,7 @@ class Procedure(Factor):
                     new_matchlist.append(answer)
             matchlist = new_matchlist
 
-        if not bool(matches):
+        if not bool(matchlist):
             return False
 
         # Now doing the same thing in reverse
