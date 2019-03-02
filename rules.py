@@ -139,7 +139,7 @@ class Procedure(Factor):
 
     def compare_factors(
         self, matches, need_matches, available_for_matching, relation
-    ) -> Dict[Factor, Optional[Factor]]:
+    ) -> Iterator[Dict[Factor, Optional[Factor]]]:
         """
         Determines whether all factors in need_matches have the relation
         "relation" with a factor in available_for_matching, with matching
@@ -403,12 +403,45 @@ class Procedure(Factor):
         # that are consistent with matchlist and that don't cause the factor
         # to contradict any factor of self.
 
-        if any(
+        return any(
             self.consistent_factor_groups(self.inputs, other.despite, matches)
             for matches in matchlist
-        ):
-            return True
-        return False
+        )
+
+    def implies_all_to_some(self, other: "Procedure") -> bool:
+        """
+        This is a different process for checking whether one procedure implies another,
+        used when the list of self's inputs is considered an exhaustive list of the
+        circumstances needed to invoke the procedure (i.e. when the rule "always" applies
+        when the inputs are present), but the list of other's inputs is not exhaustive.
+
+        For self to imply other, every output of other
+        must be equal to or implied by some output of self.
+
+        For self to imply other, every input of self must not be
+        contradicted by any input of other.
+
+        Self does not imply other if any despite factors of other
+        are contradicted by inputs of self.
+
+        :param other:
+        """
+
+        if not isinstance(other, self.__class__):
+            return False
+
+        comparisons = (
+            Comparison(other.outputs, self.outputs, operator.le),
+        )
+
+        matchlist = self.all_comparison_matches(comparisons)
+
+        other_despite_or_input = {*other.despite, *other.inputs}
+
+        return any(
+            self.consistent_factor_groups(self.inputs, other_despite_or_input, matches)
+            for matches in matchlist
+        )
 
     def consistent_factor_groups(self, self_factors, other_factors, matches):
         """Determines whether unassigned context factors can
@@ -459,52 +492,7 @@ class Procedure(Factor):
             if get_foreign_match(match) is not None
         ]
 
-    def implies_all_to_some(self, other: "Procedure") -> bool:
-        """
-        This is a different process for checking whether one procedure implies another,
-        used when the list of self's inputs is considered an exhaustive list of the
-        circumstances needed to invoke the procedure (i.e. when the rule "always" applies
-        when the inputs are present), but the list of other's inputs is not exhaustive.
 
-        For self to imply other, every input of self must not be
-        contradicted by any input of other.
-
-        For self to imply other, every output of other
-        must be equal to or implied by some output of self.
-
-        Self does not imply other if any despite factors of other
-        are contradicted by inputs of self.
-
-        :param other:
-        """
-
-        if not isinstance(other, self.__class__):
-            return False
-
-        matchlist = [{context: None for context in self.get_context_factors()}]
-        matchlist = evolve_match_list(
-            self.outputs, other.outputs, operator.ge, matchlist
-        )
-
-        # Not checking whether despite factors of other are
-        # contradicted by inputs of self, assuming they can't be
-        # because they would be contradicted by inputs of other.
-
-        # For every factor in other, find the permutations of entity slots
-        # that are consistent with matchlist and that don't cause the factor
-        # to contradict any factor of self.
-
-        other_despite_or_input = {*other.despite, *other.inputs}
-
-        return any(
-            any(
-                match
-                for match in self.find_consistent_factors(
-                    other_despite_or_input, self.inputs, MappingProxyType(m)
-                )
-            )
-            for m in matchlist
-        )
 
     def contradicts(self, other):
         raise NotImplementedError(
