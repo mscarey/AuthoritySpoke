@@ -67,14 +67,10 @@ class Procedure(Factor):
         inputs: Union[Factor, Iterable[Factor]] = (),
         despite: Union[Factor, Iterable[Factor]] = (),
     ):
-        def wrap_with_tuple(item) -> Tuple[Factor, ...]:
-            if isinstance(item, Iterable):
-                return tuple(sorted(item, key=repr))
-            return (item,)
 
-        outputs = wrap_with_tuple(outputs)
-        inputs = wrap_with_tuple(inputs)
-        despite = wrap_with_tuple(despite)
+        outputs = cls.sort_in_tuple(outputs)
+        inputs = cls.sort_in_tuple(inputs)
+        despite = cls.sort_in_tuple(despite)
 
         for group in (outputs, inputs, despite):
             for factor_obj in group:
@@ -625,6 +621,7 @@ class ProceduralRule(Rule):
     universal: bool = False
     rule_valid: bool = True
     decided: bool = True
+    generic: bool = False
 
     def __post_init__(self):
         if isinstance(self.enactments, Enactment):

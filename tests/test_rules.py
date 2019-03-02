@@ -23,9 +23,9 @@ class TestProcedures:
 
     def test_get_context_factors(self, make_procedure):
         # motel, watt
-        assert len(make_procedure["c1"].get_context_factors()) == 2
+        assert len(tuple(make_procedure["c1"].generic_factors())) == 2
         # trees, motel
-        assert len(make_procedure["c2"].get_context_factors()) == 2
+        assert len(tuple(make_procedure["c2"].generic_factors())) == 2
 
     def test_procedure_length(self, make_procedure):
         """Consider deleting Procedure.__len__() and this test."""

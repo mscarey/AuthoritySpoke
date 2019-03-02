@@ -114,10 +114,30 @@ class Factor:
         a list of dicts, where each dict is a valid way to make matches between
         corresponding factors. The dict is empty if there are no matches."""
 
+        if (
+            other is not None
+            and not isinstance(other, self.__class__)
+            and not isinstance(other, super().__class__)
+        ):
+            raise TypeError(
+                "Can only create a context_register between Factors or None"
+            )
         mapping = {self: other}
         if other is None or self.generic or other.generic:
             return mapping
         return self._compare_factor_attributes(other, mapping)
+
+    @staticmethod
+    def sort_in_tuple(item) -> Tuple["Factor", ...]:
+        if isinstance(item, Iterable):
+            return tuple(sorted(item, key=repr))
+        return (item,)
+
+    @classmethod
+    def wrap_with_tuple(cls, item):
+        if isinstance(item, Iterable):
+            return tuple(item)
+        return (item,)
 
     @staticmethod
     def _import_to_mapping(self_mapping, incoming_mapping):
@@ -143,7 +163,7 @@ class Factor:
             # Resorting to comparing __repr__ for now. What will be
             # the correct behavior when testing for implication rather
             # than equality?
-            if in_value and in_value.generic:
+            if in_value:
                 if not (
                     in_key not in self_mapping
                     or repr(self_mapping[in_key]) == repr(in_value)
@@ -202,6 +222,9 @@ class Factor:
         self_matching_proxy, without making the same factor from other_order
         match to two different factors in self_matching_proxy.
         """  # TODO: docstring
+
+        self_factors = self.wrap_with_tuple(self_factors)
+        other_order = self.wrap_with_tuple(other_order)
 
         shortest = min(len(self_factors), len(other_order))
         incoming_registers = [
@@ -708,15 +731,11 @@ class Fact(Factor):
         generic: bool = False,
         case_factors: Union[Factor, Iterable[Factor]] = (),
     ):
-        def wrap_with_tuple(item) -> Tuple[Union[int, Factor], ...]:
-            if isinstance(item, Iterable):
-                return tuple(item)
-            return (item,)
 
         if not entity_context:
             entity_context = range(len(predicate))
-        case_factors = wrap_with_tuple(case_factors)
-        entity_context = wrap_with_tuple(entity_context)
+        case_factors = cls.wrap_with_tuple(case_factors)
+        entity_context = cls.wrap_with_tuple(entity_context)
 
         if len(entity_context) != len(predicate):
             raise ValueError(

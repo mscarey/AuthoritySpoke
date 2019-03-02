@@ -17,6 +17,7 @@ from spoke import ureg, Q_
 from spoke import check_entity_consistency
 from spoke import find_matches
 
+
 class TestFacts:
     def test_default_entity_context_for_fact(
         self, make_entity, make_predicate, watt_mentioned
@@ -386,14 +387,11 @@ class TestFacts:
         )
 
     def test_check_entity_consistency_true(self, make_entity, make_factor):
-        f = make_factor
+        left = make_factor["f_irrelevant_3"]
+        right = make_factor["f_irrelevant_3_new_context"]
         e = make_entity
-        assert check_entity_consistency(
-            f["f_irrelevant_3"], f["f_irrelevant_3_new_context"], {e["dan"]: e["craig"]}
-        )
-        assert check_entity_consistency(
-            f["f_irrelevant_3"],
-            f["f_irrelevant_3_new_context"],
+        assert left._update_mapping({e["dan"]: e["craig"]}, left, right)
+        assert left._update_mapping(
             {
                 e["alice"]: e["bob"],
                 e["bob"]: e["alice"],
@@ -401,25 +399,29 @@ class TestFacts:
                 e["dan"]: e["craig"],
                 e["circus"]: e["circus"],
             },
+            left,
+            right,
         )
 
     def test_check_entity_consistency_false(self, make_entity, make_factor):
-        assert not check_entity_consistency(
+        assert not make_factor["f_irrelevant_3"]._update_mapping(
+            {make_entity["circus"]: make_entity["alice"]},
             make_factor["f_irrelevant_3"],
             make_factor["f_irrelevant_3_new_context"],
-            {make_entity["circus"]: make_entity["alice"]},
         )
 
     def test_entity_consistency_identity_not_equality(self, make_entity, make_factor):
-        assert not check_entity_consistency(
+        assert not make_factor["f_irrelevant_3"]._update_mapping(
+            {make_entity["dan"]: make_entity["dan"]},
             make_factor["f_irrelevant_3"],
             make_factor["f_irrelevant_3_new_context"],
-            {make_entity["dan"]: make_entity["dan"]},
         )
 
-    def test_check_entity_consistency_type_error(self, make_factor, make_holding):
+    def test_check_entity_consistency_type_error(self, make_entity, make_factor, make_predicate):
         m = make_factor
         with pytest.raises(TypeError):
-            check_entity_consistency(
-                m["f_irrelevant_3"], make_holding["h2"], (None, None, None, None, 0)
+            make_factor["f_irrelevant_3"]._update_mapping(
+                {make_entity["dan"]: make_entity["dan"]},
+                m["f_irrelevant_3"],
+                make_predicate["p2"],
             )
