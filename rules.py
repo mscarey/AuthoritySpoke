@@ -416,10 +416,10 @@ class Procedure(Factor):
         must be equal to or implied by some output of self.
 
         For self to imply other, every input of self must not be
-        contradicted by any input of other.
+        contradicted by any input or despite of other.
 
         Self does not imply other if any despite factors of other
-        are contradicted by inputs of self.
+        are not implied by inputs of self.
 
         :param other:
         """
@@ -427,11 +427,18 @@ class Procedure(Factor):
         if not isinstance(other, self.__class__):
             return False
 
-        comparisons = (Comparison(other.outputs, self.outputs, operator.le),)
-
-        matchlist = self.all_comparison_matches(comparisons)
+        if self.implies_all_to_all(other):
+            return True
 
         other_despite_or_input = {*other.despite, *other.inputs}
+        self_despite_or_input = {*self.despite, *self.inputs}
+
+        comparisons = (
+            Comparison(other.outputs, self.outputs, operator.le),
+            Comparison(other.despite, self_despite_or_input, operator.le),
+        )
+
+        matchlist = self.all_comparison_matches(comparisons)
 
         return any(
             self.consistent_factor_groups(self.inputs, other_despite_or_input, matches)
