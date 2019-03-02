@@ -522,7 +522,7 @@ def make_procedure(make_evidence, make_factor, watt_factor) -> Dict[str, Procedu
         ),
         "c2_higher_quantity": Procedure.new(
             outputs=(f["f10"],),
-            inputs=(f["f4"], f["f5"], f["f6"], f["f7"], f["f8_higher_int"], f["f9"]),
+            inputs=(f["f4"], f["f5"], f["f6"], f["f7"], f["f8_meters"], f["f9"]),
         ),
         "c2_exact_in_despite": Procedure.new(
             outputs=(f["f10"],),

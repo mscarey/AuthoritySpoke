@@ -11,6 +11,7 @@ from spoke import ureg, Q_
 from spoke import check_entity_consistency
 from spoke import find_matches
 
+
 class TestProcedures:
     def test_exception_for_wrong_type_for_procedure(self, make_predicate):
         with pytest.raises(TypeError):
@@ -40,7 +41,9 @@ class TestProcedures:
     def test_procedure_equality_entity_order(self, make_procedure):
         assert make_procedure["c1"] == make_procedure["c1_entity_order"]
 
-    def test_still_equal_after_swapping_reciprocal_entities(self, make_procedure, caplog):
+    def test_still_equal_after_swapping_reciprocal_entities(
+        self, make_procedure, caplog
+    ):
         caplog.set_level(logging.DEBUG)
         assert make_procedure["c2"] == make_procedure["c2_reciprocal_swap"]
 
@@ -127,9 +130,7 @@ class TestProcedures:
         assert f["f8_exact"] > f["f7"]
         assert not f["f7"] >= f["f8_exact"]
 
-    def test_procedure_implication_with_exact_quantity(
-        self, make_procedure
-    ):
+    def test_procedure_implication_with_exact_quantity(self, make_procedure):
         """This is meant to show that the function finds the "distance is
         exactly 25" factor in c2_exact, and recognizes that factor can imply
         the "distance is more than 20" factor in c2 if they have the same entities.
@@ -179,7 +180,9 @@ class TestProcedures:
         assert make_procedure["c1"] >= make_procedure["c1_again"]
         assert make_procedure["c1"] == make_procedure["c1_again"]
 
-    def test_procedure_implies_same_procedure_fewer_inputs(self, make_procedure, caplog):
+    def test_procedure_implies_same_procedure_fewer_inputs(
+        self, make_procedure, caplog
+    ):
         caplog.set_level(logging.DEBUG)
         assert make_procedure["c1_easy"] < make_procedure["c1"]
         assert make_procedure["c1_easy"] <= make_procedure["c1"]
@@ -217,7 +220,13 @@ class TestProcedures:
         input that contradicts the despite factor of c2_exact_in_despite.
         """
         p = make_procedure
-        assert not p["c2"].implies_all_to_some(p["c2_absent_despite"])
+        assert not p["c2_higher_quantity"].implies_all_to_some(p["c2_exact_in_despite"])
+
+    def test_implication_added_despite_factors(self, make_procedure):
+
+        assert not make_procedure["c2"].implies_all_to_some(
+            make_procedure["c2_absent_despite"]
+        )
 
     def test_implication_with_more_outputs_than_inputs(self, make_procedure):
         p = make_procedure
