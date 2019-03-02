@@ -334,12 +334,18 @@ class Procedure(Factor):
                 ):
                     yield m
 
-    def get_context_factors(self) -> Set[Factor]:
-        return set(
-            context
+    def generic_factors(self) -> Iterable[Factor]:
+        """Returns an iterable of self's generic Factors,
+        which must be matched to other generic Factors to
+        perform equality tests between Factors."""
+
+        collected_factors = [
+            generic
             for factor in self.factors_all()
-            for context in factor.entity_context
-        )
+            for generic in factor.generic_factors()
+        ]
+        for output in set(collected_factors):
+            yield output
 
     def contradicts_some_to_all(self, other: "Procedure") -> bool:
         """

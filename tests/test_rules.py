@@ -53,25 +53,24 @@ class TestProcedures:
             [{w[2]: w[1], w[3]: w[0]}, {w[1]: w[1], w[2]: w[3]}]
         ) == [{w[1]: w[2], w[0]: w[3]}, {w[1]: w[1], w[3]: w[2]}]
 
-    def test_consistent_entity_combinations(self, watt_factor, watt_mentioned):
+    def test_generic_factors(
+        self, watt_factor, make_entity, make_evidence, make_procedure
+    ):
         """
         Finds that for factor f["f7"], it would be consistent with the
         other group of factors for f["f7"]'s two slots to be assigned
         (0, 1) or (1, 0).
         """
-        w = watt_mentioned
+        e = make_entity
         f = watt_factor
-        assert f["f7"].consistent_entity_combinations(
-            factors_from_other_procedure=[
-                f["f4"],
-                f["f5"],
-                f["f6"],
-                f["f7"],
-                f["f8"],
-                f["f9"],
-            ],
-            matches={w[2]: None, w[0]: None},
-        ) == [{w[2]: w[2], w[0]: w[0]}, {w[2]: w[0], w[0]: w[2]}]
+        c = make_procedure
+        assert set(make_procedure["c3"].generic_factors()) == {
+            e["motel"],
+            e["tree_search"],
+            e["trees"],
+            e["watt"],
+            make_evidence["crime_absent"],
+        }
 
     def test_unequal_after_swapping_nonreciprocal_entities(self, make_procedure):
         assert make_procedure["c2"] != make_procedure["c2_nonreciprocal_swap"]
@@ -222,7 +221,7 @@ class TestProcedures:
         p = make_procedure
         assert not p["c2_higher_quantity"].implies_all_to_some(p["c2_exact_in_despite"])
 
-    def test_implication_added_despite_factors(self, make_procedure):
+    def test_all_some_implication_added_despite_factors(self, make_procedure):
 
         assert not make_procedure["c2"].implies_all_to_some(
             make_procedure["c2_absent_despite"]

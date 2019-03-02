@@ -87,13 +87,12 @@ class TestFacts:
 
     def test_entity_context_reciprocal(self, make_entity, watt_factor):
         """Predicate.new() should have kept only this order, because
-        the string representation of watt is generic and starts with
-        an open angle bracket, which comes before H in alphabetical order."""
+        the factors are ordered by __repr__."""
         motel_near_watt = watt_factor["f7_swap_entities_4"]
 
         assert motel_near_watt.entity_context == (
-            make_entity["watt"],
             make_entity["motel_specific"],
+            make_entity["watt"],
         )
 
     def test_predicate_with_entities(self, make_entity, watt_factor):

@@ -8,6 +8,7 @@ from typing import Optional, Sequence, Union
 from entities import Entity
 from spoke import Factor, Fact
 
+
 @dataclass(frozen=True)
 class Exhibit(Factor):
     """A source of information for use in litigation.
@@ -81,13 +82,13 @@ class Exhibit(Factor):
         if self.generic:
             yield self
         else:
-            for factor in (
-                self.statement,
-                self.stated_by,
-            ):
-                if factor:
-                    for generic_factor in factor.generic_factors():
-                        yield generic_factor
+            collected_factors = [
+                generic
+                for factor in (self.statement, self.stated_by)
+                for generic in factor.generic_factors()
+            ]
+            for output in set(collected_factors):
+                yield output
 
     def contradicts(self, other: Factor):
         return self >= other.make_absent()
@@ -195,13 +196,13 @@ class Evidence(Factor):
         if self.generic:
             yield self
         else:
-            for factor in (
-                self.to_effect,
-                self.exhibit,
-            ):
-                if factor:
-                    for generic_factor in factor.generic_factors():
-                        yield generic_factor
+            collected_factors = [
+                generic
+                for factor in (self.to_effect, self.exhibit)
+                for generic in factor.generic_factors()
+            ]
+            for output in set(collected_factors):
+                yield output
 
     def _compare_factor_attributes(self, other, mapping):
         """

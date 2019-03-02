@@ -15,7 +15,6 @@ from pint import UnitRegistry
 from dataclasses import dataclass
 
 
-
 ureg = UnitRegistry()
 Q_ = ureg.Quantity
 
@@ -28,6 +27,7 @@ OPPOSITE_COMPARISONS = {
     ">": "<=",
     "<": ">=",
 }
+
 
 def compare_dict_for_identical_entries(left, right):
     """Compares two dicts to see whether the
@@ -125,7 +125,7 @@ class Factor:
         to two different factors in the other, the function
         return False. Otherwise it returns a merged dict of
         matches."""
-        logger = logging.getLogger('context_match_logger')
+        logger = logging.getLogger("context_match_logger")
         if self_mapping is False:
             return False
         # TODO: find better solution.
@@ -144,23 +144,41 @@ class Factor:
             # the correct behavior when testing for implication rather
             # than equality?
             if in_value and in_value.generic:
-                if not (in_key not in self_mapping or repr(self_mapping[in_key]) == repr(in_value)):
-                    logger.debug(f'{in_key} already in mapping with value '+
-                        f'{self_mapping[in_key]}, not {in_value}')
+                if not (
+                    in_key not in self_mapping
+                    or repr(self_mapping[in_key]) == repr(in_value)
+                ):
+                    logger.debug(
+                        f"{in_key} already in mapping with value "
+                        + f"{self_mapping[in_key]}, not {in_value}"
+                    )
                     return False
-                if not (in_value not in self_mapping or repr(self_mapping[in_value]) == repr(in_key)):
-                    logger.debug(f'value {in_value} already in mapping with value '+
-                        f'{self_mapping[in_value]}, not {in_key}')
+                if not (
+                    in_value not in self_mapping
+                    or repr(self_mapping[in_value]) == repr(in_key)
+                ):
+                    logger.debug(
+                        f"value {in_value} already in mapping with value "
+                        + f"{self_mapping[in_value]}, not {in_key}"
+                    )
                     return False
-                if not (all(item is not in_value for item in self_mapping.values())
-                        or repr(self_mapping.get(in_key)) == repr(in_value)):
-                    logger.debug(f'value {in_value} already a value in mapping,'+
-                        f'but key {in_key} is mapped to {self_mapping.get(in_key)}')
+                if not (
+                    all(item is not in_value for item in self_mapping.values())
+                    or repr(self_mapping.get(in_key)) == repr(in_value)
+                ):
+                    logger.debug(
+                        f"value {in_value} already a value in mapping,"
+                        + f"but key {in_key} is mapped to {self_mapping.get(in_key)}"
+                    )
                     return False
-                if not (all(item is not in_key for item in self_mapping.values())
-                        or repr(self_mapping.get(in_value)) == repr(in_key)):
-                    logger.debug(f'key {in_key} already a value in mapping,'+
-                        f'but value {in_value} is mapped to {self_mapping.get(in_value)}')
+                if not (
+                    all(item is not in_key for item in self_mapping.values())
+                    or repr(self_mapping.get(in_value)) == repr(in_key)
+                ):
+                    logger.debug(
+                        f"key {in_key} already a value in mapping,"
+                        + f"but value {in_value} is mapped to {self_mapping.get(in_value)}"
+                    )
                     return False
                 self_mapping = dict(self_mapping)
                 self_mapping[in_key] = in_value
@@ -183,7 +201,7 @@ class Factor:
         be matched to the tuple of factors in self_factors in
         self_matching_proxy, without making the same factor from other_order
         match to two different factors in self_matching_proxy.
-        """# TODO: docstring
+        """  # TODO: docstring
 
         shortest = min(len(self_factors), len(other_order))
         incoming_registers = [
@@ -656,12 +674,14 @@ def find_matches(
                 ):
                     yield m
 
+
 STANDARDS_OF_PROOF = {
     "scintilla of evidence": 1,
     "preponderance of evidence": 2,
     "clear and convincing": 3,
     "beyond reasonable doubt": 4,
 }
+
 
 @dataclass(frozen=True)
 class Fact(Factor):
@@ -721,9 +741,7 @@ class Fact(Factor):
 
         if predicate.reciprocal:
             entity_context = tuple(
-                sorted(
-                    [entity_context[0], entity_context[1]], key=repr
-                )
+                sorted([entity_context[0], entity_context[1]], key=repr)
                 + list(entity_context[2:])
             )
 
@@ -799,9 +817,13 @@ class Fact(Factor):
         if self.generic:
             yield self
         else:
-            for factor in self.entity_context:
-                for generic_factor in factor.generic_factors():
-                    yield generic_factor
+            collected_factors = [
+                generic
+                for factor in self.entity_context
+                for generic in factor.generic_factors()
+            ]
+            for output in set(collected_factors):
+                yield output
 
     def predicate_in_context(self, entities: Sequence[Factor]) -> str:
         """Prints the representation of the Predicate with Entities
