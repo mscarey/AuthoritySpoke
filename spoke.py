@@ -172,21 +172,22 @@ class Factor:
             # Resorting to comparing __repr__ for now. What will be
             # the correct behavior when testing for implication rather
             # than equality?
-            if self_mapping.get(in_key) and repr(self_mapping.get(in_key)) != repr(in_value):
-                logger.debug(
-                    f"{in_key} already in mapping with value "
-                    + f"{self_mapping[in_key]}, not {in_value}"
-                )
-                return None
-            if self_mapping.get(in_value) and repr(self_mapping.get(in_value)) != repr(in_key):
-                logger.debug(
-                    f"key {in_value} already in mapping with value "
-                    + f"{self_mapping[in_value]}, not {in_key}"
-                )
-                return None
-            if in_key.generic or in_value.generic:
-                self_mapping[in_key] = in_value
-                self_mapping[in_value] = in_key
+            if in_key and in_value:
+                if self_mapping.get(in_key) and repr(self_mapping.get(in_key)) != repr(in_value):
+                    logger.debug(
+                        f"{in_key} already in mapping with value "
+                        + f"{self_mapping[in_key]}, not {in_value}"
+                    )
+                    return None
+                if self_mapping.get(in_value) and repr(self_mapping.get(in_value)) != repr(in_key):
+                    logger.debug(
+                        f"key {in_value} already in mapping with value "
+                        + f"{self_mapping[in_value]}, not {in_key}"
+                    )
+                    return None
+                if in_key.generic or in_value.generic:
+                    self_mapping[in_key] = in_value
+                    self_mapping[in_value] = in_key
         return self_mapping
 
     def _update_mapping(

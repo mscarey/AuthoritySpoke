@@ -1,6 +1,7 @@
 from copy import copy
 import datetime
 import json
+import logging
 from typing import Dict
 
 from pint import UnitRegistry
@@ -50,7 +51,8 @@ class TestExhibits:
 
     # Implication
 
-    def test_implication(self, make_exhibit):
+    def test_implication(self, make_exhibit, caplog):
+        caplog.set_level(logging.DEBUG)
         assert (
             make_exhibit["no_shooting_testimony"]
             > make_exhibit["no_shooting_witness_unknown_testimony"]

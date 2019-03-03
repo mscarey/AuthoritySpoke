@@ -243,10 +243,10 @@ class Evidence(Factor):
             )
 
         if self.absent and other.absent:
-            return other.implies_if_present(self)
+            return bool(other.implies_if_present(self))
 
         if self.absent == other.absent == False:
-            return self.implies_if_present(other)
+            return bool(self.implies_if_present(other))
 
         return False
 
