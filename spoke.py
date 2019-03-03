@@ -111,7 +111,7 @@ class Factor:
 
     def context_register(
         self, other: "Factor", comparison: Callable
-    ) -> Dict["Factor", "Factor"]:
+    ) -> Optional[Dict["Factor", "Factor"]]:
         """Searches through the context factors of self and other, making
         a list of dicts, where each dict is a valid way to make matches between
         corresponding factors. The dict is empty if there are no matches."""
@@ -122,10 +122,11 @@ class Factor:
             raise TypeError(
                 "Can only create a context_register between Factors or None"
             )
-        mapping = {self: other}
-        if other is None or self.generic or other.generic:
-            return mapping
-        return self._compare_factor_attributes(other, mapping, comparison)
+        if other is None:
+            return {}
+        if self.generic or other.generic:
+            return {self: other, other: self}
+        return self._compare_factor_attributes(other, comparison)
 
     @staticmethod
     def sort_in_tuple(item) -> Tuple["Factor", ...]:
@@ -140,7 +141,7 @@ class Factor:
         return (item,)
 
     @staticmethod
-    def _import_to_mapping(self_mapping, incoming_mapping, comparison):
+    def _import_to_mapping(self_mapping, incoming_mapping):
         """If the same factor in one mapping appears to match
         to two different factors in the other, the function
         return False. Otherwise it returns a merged dict of
@@ -154,8 +155,8 @@ class Factor:
         the implication goes.
         """
         logger = logging.getLogger("context_match_logger")
-        if self_mapping is False:
-            return False
+        if self_mapping is None:
+            return None
         # TODO: find better solution.
         # The key-value relationship isn't symmetrical when the root Factors
         # are being compared for implication. What about contradiction?
@@ -171,45 +172,21 @@ class Factor:
             # Resorting to comparing __repr__ for now. What will be
             # the correct behavior when testing for implication rather
             # than equality?
-            if in_value:
-                if not (
-                    in_key not in self_mapping
-                    or repr(self_mapping[in_key]) == repr(in_value)
-                ):
-                    logger.debug(
-                        f"{in_key} already in mapping with value "
-                        + f"{self_mapping[in_key]}, not {in_value}"
-                    )
-                    return False
-                if not (
-                    in_value not in self_mapping
-                    or repr(self_mapping[in_value]) == repr(in_key)
-                ):
-                    logger.debug(
-                        f"value {in_value} already in mapping with value "
-                        + f"{self_mapping[in_value]}, not {in_key}"
-                    )
-                    return False
-                if not (
-                    all(item is not in_value for item in self_mapping.values())
-                    or repr(self_mapping.get(in_key)) == repr(in_value)
-                ):
-                    logger.debug(
-                        f"value {in_value} already a value in mapping,"
-                        + f"but key {in_key} is mapped to {self_mapping.get(in_key)}"
-                    )
-                    return False
-                if not (
-                    all(item is not in_key for item in self_mapping.values())
-                    or repr(self_mapping.get(in_value)) == repr(in_key)
-                ):
-                    logger.debug(
-                        f"key {in_key} already a value in mapping,"
-                        + f"but value {in_value} is mapped to {self_mapping.get(in_value)}"
-                    )
-                    return False
-                self_mapping = dict(self_mapping)
+            if self_mapping.get(in_key) and repr(self_mapping.get(in_key)) != repr(in_value):
+                logger.debug(
+                    f"{in_key} already in mapping with value "
+                    + f"{self_mapping[in_key]}, not {in_value}"
+                )
+                return None
+            if self_mapping.get(in_value) and repr(self_mapping.get(in_value)) != repr(in_key):
+                logger.debug(
+                    f"key {in_value} already in mapping with value "
+                    + f"{self_mapping[in_value]}, not {in_key}"
+                )
+                return None
+            if in_key.generic or in_value.generic:
                 self_mapping[in_key] = in_value
+                self_mapping[in_value] = in_key
         return self_mapping
 
     def _update_mapping(
@@ -245,7 +222,7 @@ class Factor:
             or comparison(self_factors[index], other_factors[index])
             for index in range(shortest)
         ):
-            return False
+            return None
 
         incoming_registers = [
             self_factors[index].context_register(other_factors[index], comparison)
@@ -254,7 +231,7 @@ class Factor:
         ]
         for incoming_register in incoming_registers:
             self_mapping_proxy = self._import_to_mapping(
-                self_mapping_proxy, incoming_register, comparison
+                self_mapping_proxy, incoming_register
             )
         return self_mapping_proxy
 
@@ -790,7 +767,7 @@ class Fact(Factor):
             + f"{standard} {predicate}"
         )
 
-    def _compare_factor_attributes(self, other, mapping, comparison):
+    def _compare_factor_attributes(self, other, comparison):
         """
         This function should be the only part of the context-matching
         process that needs to be unique for each subclass of Factor.
@@ -803,7 +780,7 @@ class Fact(Factor):
         """  # TODO: docstring
 
         return self._update_mapping(
-            mapping, self.entity_context, other.entity_context, comparison
+            {}, self.entity_context, other.entity_context, comparison
         )
 
     def __eq__(self, other: Factor) -> bool:

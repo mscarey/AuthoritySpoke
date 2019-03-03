@@ -1,11 +1,6 @@
-from copy import copy
-import datetime
-import json
 import logging
 import operator
-from typing import Dict
 
-from pint import UnitRegistry
 import pytest
 
 from enactments import Code, Enactment
@@ -145,10 +140,24 @@ class TestFacts:
         factor = watt_factor["f2_preponderance_of_evidence"]
         assert factor.standard_of_proof in str(factor)
 
-    def test_context_register(self, make_entity, watt_factor):
-        assert watt_factor["f1"].context_register(watt_factor["f1_entity_order"], operator.ge) == {
+    def test_context_register_None(self, make_entity, watt_factor):
+        """
+        Returns None because the Entity in f1 doesn't imply the Human
+        in f1_entity_order.
+        """
+        assert (
+            watt_factor["f1"].context_register(
+                watt_factor["f1_entity_order"], operator.ge
+            )
+            is None
+        )
+
+    def test_context_register_valid(self, make_entity, watt_factor):
+        assert watt_factor["f1"].context_register(
+            watt_factor["f1_entity_order"], operator.le
+        ) == {
+            make_entity["watt"]: make_entity["motel"],
             make_entity["motel"]: make_entity["watt"],
-            watt_factor["f1"]: watt_factor["f1_entity_order"],
         }
 
     def test_import_to_mapping(self, make_entity, watt_factor):
@@ -180,13 +189,12 @@ class TestFacts:
         )
 
     def test_import_to_mapping_conflict(self, make_entity, watt_factor):
-        f = watt_factor["f7"]
         assert (
-            f._import_to_mapping(
+            watt_factor["f7"]._import_to_mapping(
                 {make_entity["motel"]: make_entity["trees"]},
                 {make_entity["motel"]: make_entity["motel"]},
             )
-            == False
+            is None
         )
 
     def test_reciprocal_context_register(self, make_entity, watt_factor):
@@ -207,7 +215,9 @@ class TestFacts:
         Fact in practice, so "(A is B) == False" guarantees they refer to
         different things?
         """
-        d = watt_factor["f7"].context_register(watt_factor["f7_swap_entities"])
+        d = watt_factor["f7"].context_register(
+            watt_factor["f7_swap_entities"], operator.eq
+        )
         for k in d:
             assert repr(d[k]) == repr(k)
             assert str(d[k]) == str(k)
@@ -391,7 +401,7 @@ class TestFacts:
         left = make_factor["f_irrelevant_3"]
         right = make_factor["f_irrelevant_3_new_context"]
         e = make_entity
-        assert left._update_mapping({e["dan"]: e["craig"]}, left, right)
+        assert left._update_mapping({e["dan"]: e["craig"]}, left, right, operator.eq)
         assert left._update_mapping(
             {
                 e["alice"]: e["bob"],
