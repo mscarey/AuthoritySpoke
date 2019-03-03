@@ -131,7 +131,7 @@ class Procedure(Factor):
         return bool(matchlist)
 
     def compare_factors(
-        self, matches, need_matches, available_for_matching, relation
+        self, matches, need_matches, available_for_matching, comparison
     ) -> Iterator[Dict[Factor, Optional[Factor]]]:
         """
         Determines whether all factors in need_matches have the relation
@@ -148,16 +148,16 @@ class Procedure(Factor):
         else:
             self_factor = need_matches.pop()
             for other_factor in available_for_matching:
-                if relation(self_factor, other_factor):
+                if comparison(self_factor, other_factor):
                     new_matches = self._update_mapping(
-                        matches, (self_factor,), (other_factor,)
+                        matches, (self_factor,), (other_factor,), comparison
                     )
                     if new_matches:
                         for answer in self.compare_factors(
                             MappingProxyType(new_matches),
                             need_matches,
                             available_for_matching,
-                            relation,
+                            comparison,
                         ):
                             yield answer
 

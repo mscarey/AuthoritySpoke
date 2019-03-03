@@ -2,6 +2,7 @@ from copy import copy
 import datetime
 import json
 import logging
+import operator
 from typing import Dict
 
 from pint import UnitRegistry
@@ -145,7 +146,7 @@ class TestFacts:
         assert factor.standard_of_proof in str(factor)
 
     def test_context_register(self, make_entity, watt_factor):
-        assert watt_factor["f1"].context_register(watt_factor["f1_entity_order"]) == {
+        assert watt_factor["f1"].context_register(watt_factor["f1_entity_order"], operator.ge) == {
             make_entity["motel"]: make_entity["watt"],
             watt_factor["f1"]: watt_factor["f1_entity_order"],
         }
@@ -401,6 +402,7 @@ class TestFacts:
             },
             left,
             right,
+            operator.eq,
         )
 
     def test_check_entity_consistency_false(self, make_entity, make_factor):
@@ -408,6 +410,7 @@ class TestFacts:
             {make_entity["circus"]: make_entity["alice"]},
             make_factor["f_irrelevant_3"],
             make_factor["f_irrelevant_3_new_context"],
+            operator.eq,
         )
 
     def test_entity_consistency_identity_not_equality(self, make_entity, make_factor):
@@ -415,13 +418,21 @@ class TestFacts:
             {make_entity["dan"]: make_entity["dan"]},
             make_factor["f_irrelevant_3"],
             make_factor["f_irrelevant_3_new_context"],
+            operator.eq,
         )
 
-    def test_check_entity_consistency_type_error(self, make_entity, make_factor, make_predicate):
+    def test_check_entity_consistency_type_error(
+        self, make_entity, make_factor, make_predicate
+    ):
+        """
+        There would be no TypeError if it used operator.eq
+        instead of .gt. The comparison would just return False.
+        """
         m = make_factor
         with pytest.raises(TypeError):
             make_factor["f_irrelevant_3"]._update_mapping(
                 {make_entity["dan"]: make_entity["dan"]},
                 m["f_irrelevant_3"],
                 make_predicate["p2"],
+                operator.gt,
             )

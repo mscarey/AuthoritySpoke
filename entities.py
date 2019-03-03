@@ -56,11 +56,16 @@ class Entity(Factor):
             return f"<{self.name}>"
         return self.name
 
-    def context_register(self, other: Factor) -> Dict[Factor, Factor]:
+    def context_register(self, other: Factor, comparison) -> Dict[Factor, Factor]:
         """Returns a list of possible ways the context of self can be
         mapped onto the context of other. Other subclasses of Factor
         will have more complex lists."""
-        return {self: other}
+        register = {}
+        if self >= other:
+            register[self] = other
+        if self <= other:
+            register[other] = self
+        return register
 
     def make_generic(self):
         if not self.generic:

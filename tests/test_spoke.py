@@ -1,6 +1,7 @@
 from copy import copy
 import datetime
 import json
+import operator
 from typing import Dict
 
 from pint import UnitRegistry
@@ -29,9 +30,10 @@ class TestEntities:
         assert motel is motel_b
 
     def test_context_register(self, make_entity):
+        """Class "Human" implies "Entity" but not vice versa."""
         motel = make_entity["motel"]
         watt = make_entity["watt"]
-        assert motel.context_register(watt) == {motel: watt}
+        assert motel.context_register(watt, operator.ge) == {watt: motel}
 
     # Equality
 

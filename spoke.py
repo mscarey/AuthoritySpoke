@@ -109,15 +109,15 @@ class Factor:
         new_attrs["absent"] = not new_attrs["absent"]
         return self.__class__(**new_attrs)
 
-    def context_register(self, other: "Factor") -> Dict["Factor", "Factor"]:
+    def context_register(
+        self, other: "Factor", comparison: Callable
+    ) -> Dict["Factor", "Factor"]:
         """Searches through the context factors of self and other, making
         a list of dicts, where each dict is a valid way to make matches between
         corresponding factors. The dict is empty if there are no matches."""
 
-        if (
-            other is not None
-            and not isinstance(other, self.__class__)
-            and not isinstance(other, super().__class__)
+        if other is not None and all(
+            other_class.__name__ != "Factor" for other_class in other.__class__.__mro__
         ):
             raise TypeError(
                 "Can only create a context_register between Factors or None"
@@ -125,7 +125,7 @@ class Factor:
         mapping = {self: other}
         if other is None or self.generic or other.generic:
             return mapping
-        return self._compare_factor_attributes(other, mapping)
+        return self._compare_factor_attributes(other, mapping, comparison)
 
     @staticmethod
     def sort_in_tuple(item) -> Tuple["Factor", ...]:
@@ -140,11 +140,19 @@ class Factor:
         return (item,)
 
     @staticmethod
-    def _import_to_mapping(self_mapping, incoming_mapping):
+    def _import_to_mapping(self_mapping, incoming_mapping, comparison):
         """If the same factor in one mapping appears to match
         to two different factors in the other, the function
         return False. Otherwise it returns a merged dict of
         matches."""
+
+        """
+        Leaning toward making this a dict of implication relations.
+        So the values need to be lists of Factors that the key implies.
+        Need to start by changing the simple context_register function
+        for Entity, to take into account the 'comparison' to see which way
+        the implication goes.
+        """
         logger = logging.getLogger("context_match_logger")
         if self_mapping is False:
             return False
@@ -204,7 +212,9 @@ class Factor:
                 self_mapping[in_key] = in_value
         return self_mapping
 
-    def _update_mapping(self, self_mapping_proxy, self_factors, other_order):
+    def _update_mapping(
+        self, self_mapping_proxy, self_factors, other_factors, comparison
+    ):
         """
         :param self_mapping_proxy: A view on a dict with keys representing
         factors in self and values representing factors in other. The keys
@@ -212,43 +222,41 @@ class Factor:
         other.
 
         :param self_factors: factors from self that will be matched with
-        other_order. This function is expected to be called with various
-        permutations of other_order, but no other permutations of self_factors.
+        other_factors. This function is expected to be called with various
+        permutations of other_factors, but no other permutations of self_factors.
 
-        :param other_order: an ordering of factors from other.entity_orders
+        :param other_factors: an ordering of factors from other.entity_orders
 
-        :returns: a bool indicating whether the factors in other_order can
+        :returns: a bool indicating whether the factors in other_factors can
         be matched to the tuple of factors in self_factors in
-        self_matching_proxy, without making the same factor from other_order
+        self_matching_proxy, without making the same factor from other_factors
         match to two different factors in self_matching_proxy.
         """  # TODO: docstring
 
         self_factors = self.wrap_with_tuple(self_factors)
-        other_order = self.wrap_with_tuple(other_order)
+        other_factors = self.wrap_with_tuple(other_factors)
 
-        shortest = min(len(self_factors), len(other_order))
+        # why am I allowing the __len__s to be different?
+        shortest = min(len(self_factors), len(other_factors))
+
+        # The "is" comparison is for None values.
+        if not all(
+            self_factors[index] is other_factors[index]
+            or comparison(self_factors[index], other_factors[index])
+            for index in range(shortest)
+        ):
+            return False
+
         incoming_registers = [
-            self_factors[index].context_register(other_order[index])
+            self_factors[index].context_register(other_factors[index], comparison)
             for index in range(shortest)
             if self_factors[index] is not None
         ]
-        new_register = reduce(
-            self._import_to_mapping, incoming_registers, self_mapping_proxy
-        )
-        return new_register
-
-    def _find_matching_context(
-        self, other: "Factor", comparison: Callable = operator.eq
-    ) -> bool:
-        """Checks whether every key-value pair is related by the function
-        in the "comparison" parameter. Whichever object is calling this
-        method locally takes itself out of the context before comparing,
-        avoiding infinite recursion."""
-        context_register = self.context_register(other)
-        if not context_register:
-            return False
-        context_register.pop(self)
-        return all(comparison(item[0], item[1]) for item in context_register.items())
+        for incoming_register in incoming_registers:
+            self_mapping_proxy = self._import_to_mapping(
+                self_mapping_proxy, incoming_register, comparison
+            )
+        return self_mapping_proxy
 
 
 @dataclass()
@@ -782,7 +790,7 @@ class Fact(Factor):
             + f"{standard} {predicate}"
         )
 
-    def _compare_factor_attributes(self, other, mapping):
+    def _compare_factor_attributes(self, other, mapping, comparison):
         """
         This function should be the only part of the context-matching
         process that needs to be unique for each subclass of Factor.
@@ -794,9 +802,13 @@ class Fact(Factor):
         updates it with matches from self.entity_context and other_order.
         """  # TODO: docstring
 
-        return self._update_mapping(mapping, self.entity_context, other.entity_context)
+        return self._update_mapping(
+            mapping, self.entity_context, other.entity_context, comparison
+        )
 
     def __eq__(self, other: Factor) -> bool:
+        if not isinstance(other, Factor):
+            raise TypeError("")
         if self.__class__ != other.__class__:
             return False
         if self.generic == other.generic == True:
@@ -809,7 +821,7 @@ class Fact(Factor):
         ):
             return False
 
-        return self._find_matching_context(other, operator.eq)
+        return self.context_register(other, operator.eq)
 
     def make_generic(self) -> "Fact":
         """
@@ -898,7 +910,7 @@ class Fact(Factor):
         if not (self.predicate >= other.predicate and self.absent == other.absent):
             return False
 
-        return self._find_matching_context(other, operator.ge)
+        return self.context_register(other, operator.ge)
 
     def contradicts(self, other: Optional[Factor]) -> bool:
         """Returns True if self and other can't both be true at the same time.
@@ -916,7 +928,7 @@ class Fact(Factor):
         if not isinstance(other, self.__class__):
             return False
 
-        if self._find_matching_context(other, operator.ge):
+        if self.context_register(other, operator.ge):
             if self.predicate.contradicts(other.predicate) and not (
                 self.absent | other.absent
             ):
@@ -924,7 +936,7 @@ class Fact(Factor):
             if self.predicate >= other.predicate and other.absent and not self.absent:
                 return True
 
-        if self._find_matching_context(other, operator.le):
+        if self.context_register(other, operator.le):
             if self.predicate.contradicts(other.predicate) and not (
                 self.absent | other.absent
             ):
