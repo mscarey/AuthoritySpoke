@@ -26,7 +26,7 @@ class Exhibit(Factor):
     absent: bool = False
     generic: bool = False
 
-    def _compare_factor_attributes(self, other, mapping):
+    def _compare_factor_attributes(self, other, comparison):
         """
         This function should be the only part of the context-matching
         process that needs to be unique for each subclass of Factor.
@@ -36,7 +36,7 @@ class Exhibit(Factor):
         self_attributes = (self.statement, self.stated_by)
         other_attributes = (other.statement, other.stated_by)
 
-        return self._update_mapping(mapping, self_attributes, other_attributes)
+        return self._update_mapping({}, self_attributes, other_attributes, comparison)
 
     def __eq__(self, other: Factor) -> bool:
         if self.__class__ != other.__class__:
@@ -56,7 +56,7 @@ class Exhibit(Factor):
         ):
             return False
 
-        return self._find_matching_context(other, operator.eq)
+        return self.context_register(other, operator.eq)
 
     def __ge__(self, other: Optional[Factor]) -> bool:
         if other is None:
@@ -115,7 +115,7 @@ class Exhibit(Factor):
             if not (self.stated_by and self.stated_by >= other.stated_by):
                 return False
 
-        return self._find_matching_context(other, operator.ge)
+        return self.context_register(other, operator.ge)
 
     def __gt__(self, other: Optional[Factor]) -> bool:
         if other is None:
@@ -183,7 +183,7 @@ class Evidence(Factor):
         ):
             return False
 
-        return self._find_matching_context(other, operator.eq)
+        return self.context_register(other, operator.eq)
 
     def __gt__(self, other):
         return self >= other and self != other
@@ -204,7 +204,7 @@ class Evidence(Factor):
             for output in set(collected_factors):
                 yield output
 
-    def _compare_factor_attributes(self, other, mapping):
+    def _compare_factor_attributes(self, other, comparison):
         """
         This function should be the only part of the context-matching
         process that needs to be unique for each subclass of Factor.
@@ -214,7 +214,9 @@ class Evidence(Factor):
         self_attributes = (self.exhibit, self.to_effect)
         other_attributes = (other.exhibit, other.to_effect)
 
-        return self._update_mapping(mapping, self_attributes, other_attributes)
+        return self._update_mapping(
+            {}, self_attributes, other_attributes, comparison
+        )
 
     def implies_if_present(self, other: Factor):
         """Determines whether self would imply other assuming
@@ -231,7 +233,7 @@ class Evidence(Factor):
             if not self.to_effect or not self.to_effect >= other.to_effect:
                 return False
 
-        return self._find_matching_context(other, operator.ge)
+        return self.context_register(other, operator.ge)
 
     def __ge__(self, other):
         if not isinstance(other, Factor):

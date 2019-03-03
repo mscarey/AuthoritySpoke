@@ -30,10 +30,13 @@ class TestEntities:
         assert motel is motel_b
 
     def test_context_register(self, make_entity):
-        """Class "Human" implies "Entity" but not vice versa."""
+        """
+        Class "Human" implies "Entity" but not vice versa.
+        """
         motel = make_entity["motel"]
         watt = make_entity["watt"]
-        assert motel.context_register(watt, operator.ge) == {watt: motel}
+        assert motel.context_register(watt, operator.ge) == None
+        assert motel.context_register(watt, operator.le) == {motel: watt, watt: motel}
 
     # Equality
 
