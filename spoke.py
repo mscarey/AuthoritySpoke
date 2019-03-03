@@ -186,9 +186,10 @@ class Factor:
                     )
                     return None
                 if in_key.generic or in_value.generic:
+                    self_mapping = dict(self_mapping)
                     self_mapping[in_key] = in_value
                     self_mapping[in_value] = in_key
-        return self_mapping
+        return MappingProxyType(self_mapping)
 
     def _update_mapping(
         self, self_mapping_proxy, self_factors, other_factors, comparison

@@ -461,11 +461,14 @@ class Procedure(Factor):
 
         Does Factor: None in matches always mean that Factor
         can avoid being matched in a contradictory way?"""
+
         # proxy = MappingProxyType(matches)
         for self_factor in self_factors:
             for other_factor in other_factors:
                 if self_factor.contradicts(other_factor):
-                    context_register = self_factor.context_register(other_factor)
+                    context_register = self_factor.context_register(
+                        other_factor, operator.eq
+                    )
                     if all(
                         matches.get(key) == context_register[key]
                         or matches.get(context_register[key] == key)

@@ -29,7 +29,6 @@ class Entity(Factor):
         """Placeholder for normalizing inputs before initializing."""
         return cls(name, generic, plural)
 
-
     def __eq__(self, other: Optional[Factor]):
         if type(self) != type(other):
             return False
@@ -56,13 +55,23 @@ class Entity(Factor):
             return f"<{self.name}>"
         return self.name
 
-    def context_register(self, other: Factor, comparison) -> Optional[Dict[Factor, Factor]]:
+    def context_register(
+        self, other: Factor, comparison
+    ) -> Optional[Dict[Factor, Factor]]:
         """Returns a list of possible ways the context of self can be
         mapped onto the context of other. Other subclasses of Factor
         will have more complex lists."""
         if comparison(self, other) and (self.generic or other.generic):
             return {self: other, other: self}
         return None
+
+    def contradicts(self, other: Factor) -> bool:
+        if not isinstance(other, Factor):
+            raise TypeError(
+                f"'Contradicts' not supported between class "
+                + f"{self.__class__.__name__} and class {other.__class__.__name__}."
+            )
+        return False
 
     def make_generic(self):
         if not self.generic:
