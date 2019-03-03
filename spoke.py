@@ -799,7 +799,7 @@ class Fact(Factor):
         ):
             return False
 
-        return self.context_register(other, operator.eq)
+        return self.context_register(other, operator.eq) is not None
 
     def make_generic(self) -> "Fact":
         """

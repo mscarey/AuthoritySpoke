@@ -56,7 +56,7 @@ class Exhibit(Factor):
         ):
             return False
 
-        return self.context_register(other, operator.eq)
+        return self.context_register(other, operator.eq) is not None
 
     def __ge__(self, other: Optional[Factor]) -> bool:
         if other is None:
@@ -115,7 +115,7 @@ class Exhibit(Factor):
             if not (self.stated_by and self.stated_by >= other.stated_by):
                 return False
 
-        return self.context_register(other, operator.ge)
+        return self.context_register(other, operator.ge) is not None
 
     def __gt__(self, other: Optional[Factor]) -> bool:
         if other is None:
@@ -183,7 +183,7 @@ class Evidence(Factor):
         ):
             return False
 
-        return self.context_register(other, operator.eq)
+        return self.context_register(other, operator.eq) is not None
 
     def __gt__(self, other):
         return self >= other and self != other
@@ -233,7 +233,7 @@ class Evidence(Factor):
             if not self.to_effect or not self.to_effect >= other.to_effect:
                 return False
 
-        return self.context_register(other, operator.ge)
+        return self.context_register(other, operator.ge) is not None
 
     def __ge__(self, other):
         if not isinstance(other, Factor):
