@@ -178,15 +178,16 @@ class TestFacts:
     def test_import_to_mapping_no_change(self, make_entity, watt_factor):
         f = watt_factor["f7"]
         old_mapping = {
-            watt_factor["f7"]: watt_factor["f7_swap_entities"],
             make_entity["motel"]: make_entity["trees"],
         }
-        assert (
+        assert dict(
             f._import_to_mapping(
                 old_mapping, {make_entity["motel"]: make_entity["trees"]}
-            )
-            == old_mapping
-        )
+            )) == {
+            make_entity["motel"]: make_entity["trees"],
+            make_entity["trees"]: make_entity["motel"],
+        }
+
 
     def test_import_to_mapping_conflict(self, make_entity, watt_factor):
         assert (

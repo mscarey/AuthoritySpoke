@@ -32,20 +32,13 @@ class TestProcedures:
         assert len(make_procedure["c2"]) == 2
         assert len(make_procedure["c1"]) == 2
 
-    # Equality
-
-    def test_procedure_equality(self, make_procedure, caplog):
-        caplog.set_level(logging.DEBUG)
-        assert make_procedure["c1"] == make_procedure["c1_again"]
-
-    def test_procedure_equality_entity_order(self, make_procedure):
-        assert make_procedure["c1"] == make_procedure["c1_entity_order"]
-
-    def test_still_equal_after_swapping_reciprocal_entities(
-        self, make_procedure, caplog
-    ):
-        caplog.set_level(logging.DEBUG)
-        assert make_procedure["c2"] == make_procedure["c2_reciprocal_swap"]
+    def test_procedure_string_with_entities(self, make_procedure):
+        assert "fact <Craig> performed at <circus>" in str(
+            make_procedure["c2_irrelevant_inputs"]
+        )
+        assert "fact <Dan> performed at <circus>" in str(
+            make_procedure["c2_irrelevant_inputs"]
+        )
 
     def test_foreign_match_list(self, make_procedure, watt_mentioned):
         w = watt_mentioned
@@ -72,9 +65,6 @@ class TestProcedures:
             make_evidence["crime_absent"],
         }
 
-    def test_unequal_after_swapping_nonreciprocal_entities(self, make_procedure):
-        assert make_procedure["c2"] != make_procedure["c2_nonreciprocal_swap"]
-
     def test_sorted_factors_from_procedure(self, watt_factor, make_procedure):
         """The factors_sorted method sorts them alphabetically by __repr__."""
         f = watt_factor
@@ -88,14 +78,6 @@ class TestProcedures:
             f["f10"],
         ]
 
-    def test_procedure_string_with_entities(self, make_procedure):
-        assert "fact <Craig> performed at <circus>" in str(
-            make_procedure["c2_irrelevant_inputs"]
-        )
-        assert "fact <Dan> performed at <circus>" in str(
-            make_procedure["c2_irrelevant_inputs"]
-        )
-
     def test_entities_of_inputs_for_identical_procedure(
         self, watt_factor, make_procedure, watt_mentioned
     ):
@@ -108,6 +90,26 @@ class TestProcedures:
         assert f["f2"] in c1.inputs
         assert f["f2"] in c1_again.inputs
         assert f["f2"].entity_context == (watt_mentioned[1], watt_mentioned[0])
+
+    # Equality
+
+    def test_procedure_equality(self, make_procedure, caplog):
+        caplog.set_level(logging.DEBUG)
+        assert make_procedure["c1"] == make_procedure["c1_again"]
+
+    def test_procedure_equality_entity_order(self, make_procedure):
+        assert make_procedure["c1"] == make_procedure["c1_entity_order"]
+
+    def test_still_equal_after_swapping_reciprocal_entities(
+        self, make_procedure, caplog
+    ):
+        caplog.set_level(logging.DEBUG)
+        assert make_procedure["c2"] == make_procedure["c2_reciprocal_swap"]
+
+    def test_unequal_after_swapping_nonreciprocal_entities(self, make_procedure):
+        assert make_procedure["c2"] != make_procedure["c2_nonreciprocal_swap"]
+
+    # Implication
 
     def test_entities_of_implied_inputs_for_implied_procedure(
         self, watt_factor, make_procedure
@@ -205,7 +207,7 @@ class TestProcedures:
         )
         assert not make_procedure["c2"] > make_procedure["c2_irrelevant_despite"]
 
-    def test_exhaustive_implies_input_same_as_despite_of_other(self, make_procedure):
+    def test_all_to_some_implies_input_same_as_despite_of_other(self, make_procedure):
         """
         Every input of c2_exact_in_despite is equal to or implied by
         some input of c2, and an input of c2 implies the despite of c2_exact_in_despite.
@@ -213,7 +215,7 @@ class TestProcedures:
         p = make_procedure
         assert p["c2_exact_in_despite"].implies_all_to_some(p["c2"])
 
-    def test_no_exhaustive_implies_when_input_contradicts_despite(self, make_procedure):
+    def test_no_all_to_some_implies_input_contradicts_despite(self, make_procedure):
         """
         c2_higher_quantity has the right inputs, but it also has an
         input that contradicts the despite factor of c2_exact_in_despite.
@@ -221,31 +223,38 @@ class TestProcedures:
         p = make_procedure
         assert not p["c2_higher_quantity"].implies_all_to_some(p["c2_exact_in_despite"])
 
-    def test_all_some_implication_added_despite_factors(self, make_procedure):
+    def test_all_to_some_implication_added_despite_factors(self, make_procedure):
 
         assert not make_procedure["c2"].implies_all_to_some(
             make_procedure["c2_absent_despite"]
         )
-
     def test_implication_with_more_outputs_than_inputs(self, make_procedure):
         p = make_procedure
         assert p["c2_irrelevant_outputs"].implies_all_to_all(p["c2"])
 
+    def test_fewer_inputs_implies_all_to_all(self, make_procedure):
+        c = make_procedure
+        assert c["c3_fewer_inputs"].implies_all_to_all(c["c3"])
+
+    def test_all_to_all_implies_reciprocal(self, make_procedure, caplog):
+        """
+        These are the same Procedures below in
+        TestHoldings.test_implication_all_to_all_reciprocal
+        """
+        caplog.set_level(logging.DEBUG)
+        assert make_procedure["c2_exact_in_despite_entity_order"].implies_all_to_all(
+            make_procedure["c2"]
+        )
+
+    # Contradiction
+
     def test_no_contradict_between_procedures(self, make_procedure):
         """
-        It's not completely clear to me what assumptions are being made about
-        the context of a procedure when comparing them with __gt__,
-        implies_all_to_some, and exhaustive_contradicts.
-
-        I don't think "contradicts" is meaningful for Procedures, but I could be wrong.
+        I don't think some-to-some contradiction is possible for Procedures
         """
         p = make_procedure
         with pytest.raises(NotImplementedError):
             assert p["c2_higher_quantity"].contradicts(p["c2_exact_in_despite"])
-
-    def test_implication_procedures_with_same_evidence(self, make_procedure):
-        c = make_procedure
-        assert c["c3_fewer_inputs"].implies_all_to_all(c["c3"])
 
 
 class TestRules:
@@ -300,13 +309,16 @@ class TestRules:
     ):
         assert make_holding["h2_exact_quantity_ALL"] > make_holding["h2"]
 
-    def test_all_to_all_with_reciprocal(self, make_holding):
-        """This is supposed to test reciprocal predicates in despite factors
-        in the Predicate.find_consistent_factors method.
-        The entity order shouldn't matter because it's the mirror image of the
-        normal entity order.
-        """
+    def test_all_to_all(self, make_holding):
+        """This is supposed to test reciprocal predicates in despite factors."""
         assert make_holding["h2_exact_in_despite_ALL"] > make_holding["h2_ALL"]
+
+    def test_all_to_all_reciprocal(self, make_holding, caplog):
+        """
+        The entity order shouldn't matter, compared to test_all_to_all,
+        because it's the mirror image of the normal entity order.
+        """
+        caplog.set_level(logging.DEBUG)
         assert (
             make_holding["h2_exact_in_despite_ALL_entity_order"]
             > make_holding["h2_ALL"]

@@ -141,25 +141,24 @@ class Factor:
         return (item,)
 
     @staticmethod
-    def _import_to_mapping(self_mapping, incoming_mapping):
+    def _import_to_mapping(
+        self_mapping: Mapping[Factor, Factor], incoming_mapping: Dict[Factor, Factor]
+    ) -> Optional[Mapping[Factor, Factor]]:
         """If the same factor in one mapping appears to match
         to two different factors in the other, the function
         return False. Otherwise it returns a merged dict of
-        matches."""
+        matches.
 
-        """
-        Leaning toward making this a dict of implication relations.
+        This is a dict of implication relations.
         So the values need to be lists of Factors that the key implies.
         Need to start by changing the simple context_register function
         for Entity, to take into account the 'comparison' to see which way
         the implication goes.
         """
         logger = logging.getLogger("context_match_logger")
-        if self_mapping is None:
-            return None
-        # TODO: find better solution.
+        self_mapping = dict(self_mapping)
         # The key-value relationship isn't symmetrical when the root Factors
-        # are being compared for implication. What about contradiction?
+        # are being compared for implication.
         for in_key, in_value in incoming_mapping.items():
             # The "if in_value" test prevents a failure when in_value is
             # None, but an "is" test returns False when in_value is
@@ -173,26 +172,33 @@ class Factor:
             # the correct behavior when testing for implication rather
             # than equality?
             if in_key and in_value:
-                if self_mapping.get(in_key) and repr(self_mapping.get(in_key)) != repr(in_value):
+                if self_mapping.get(in_key) and repr(self_mapping.get(in_key)) != repr(
+                    in_value
+                ):
                     logger.debug(
                         f"{in_key} already in mapping with value "
                         + f"{self_mapping[in_key]}, not {in_value}"
                     )
                     return None
-                if self_mapping.get(in_value) and repr(self_mapping.get(in_value)) != repr(in_key):
+                if self_mapping.get(in_value) and repr(
+                    self_mapping.get(in_value)
+                ) != repr(in_key):
                     logger.debug(
                         f"key {in_value} already in mapping with value "
                         + f"{self_mapping[in_value]}, not {in_key}"
                     )
                     return None
                 if in_key.generic or in_value.generic:
-                    self_mapping = dict(self_mapping)
                     self_mapping[in_key] = in_value
                     self_mapping[in_value] = in_key
         return MappingProxyType(self_mapping)
 
     def _update_mapping(
-        self, self_mapping_proxy, self_factors, other_factors, comparison
+        self,
+        self_mapping_proxy: Mapping,
+        self_factors: Tuple[Factor],
+        other_factors: Tuple[Factor],
+        comparison: Callable,
     ):
         """
         :param self_mapping_proxy: A view on a dict with keys representing

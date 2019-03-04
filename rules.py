@@ -105,7 +105,7 @@ class Procedure(Factor):
             for matches in matchlist:
                 for answer in self.compare_factors(
                     MappingProxyType(matches),
-                    set(self.__dict__[group]),
+                    list(self.__dict__[group]),
                     other.__dict__[group],
                     operator.eq,
                 ):
@@ -122,7 +122,7 @@ class Procedure(Factor):
             for matches in matchlist:
                 for answer in self.compare_factors(
                     MappingProxyType(matches),
-                    set(other.__dict__[group]),
+                    list(other.__dict__[group]),
                     self.__dict__[group],
                     operator.eq,
                 ):
@@ -131,7 +131,11 @@ class Procedure(Factor):
         return bool(matchlist)
 
     def compare_factors(
-        self, matches, need_matches, available_for_matching, comparison
+        self,
+        matches: Mapping,
+        need_matches: List,
+        available_for_matching: Tuple,
+        comparison: Callable,
     ) -> Iterator[Dict[Factor, Optional[Factor]]]:
         """
         Determines whether all factors in need_matches have the relation
@@ -206,7 +210,7 @@ class Procedure(Factor):
             for matches in matchlist:
                 for answer in self.compare_factors(
                     MappingProxyType(matches),
-                    set(comparison.need_matches),
+                    list(comparison.need_matches),
                     comparison.available,
                     comparison.relation,
                 ):
