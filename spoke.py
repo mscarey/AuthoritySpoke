@@ -142,8 +142,8 @@ class Factor:
 
     @staticmethod
     def _import_to_mapping(
-        self_mapping: Mapping[Factor, Factor], incoming_mapping: Dict[Factor, Factor]
-    ) -> Optional[Mapping[Factor, Factor]]:
+        self_mapping: Mapping["Factor", "Factor"], incoming_mapping: Dict["Factor", "Factor"]
+    ) -> Optional[Mapping["Factor", "Factor"]]:
         """If the same factor in one mapping appears to match
         to two different factors in the other, the function
         return False. Otherwise it returns a merged dict of
@@ -196,8 +196,8 @@ class Factor:
     def _update_mapping(
         self,
         self_mapping_proxy: Mapping,
-        self_factors: Tuple[Factor],
-        other_factors: Tuple[Factor],
+        self_factors: Tuple["Factor"],
+        other_factors: Tuple["Factor"],
         comparison: Callable,
     ):
         """
@@ -793,7 +793,8 @@ class Fact(Factor):
 
     def __eq__(self, other: Factor) -> bool:
         if not isinstance(other, Factor):
-            raise TypeError("")
+            raise TypeError(f"{self.__class__} objects may only be compared for " +
+            "equality with other Factor objects.")
         if self.__class__ != other.__class__:
             return False
         if self.generic == other.generic == True:
