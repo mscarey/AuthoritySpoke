@@ -142,7 +142,8 @@ class Factor:
 
     @staticmethod
     def _import_to_mapping(
-        self_mapping: Mapping["Factor", "Factor"], incoming_mapping: Dict["Factor", "Factor"]
+        self_mapping: Mapping["Factor", "Factor"],
+        incoming_mapping: Dict["Factor", "Factor"],
     ) -> Optional[Mapping["Factor", "Factor"]]:
         """If the same factor in one mapping appears to match
         to two different factors in the other, the function
@@ -501,7 +502,7 @@ class Predicate:
         ):
             return False
 
-        if not (self.content == other.content and self.reciprocal == other.reciprocal):
+        if not (self.content.lower() == other.content.lower() and self.reciprocal == other.reciprocal):
             return False
 
         if self.quantity and other.quantity:
@@ -793,8 +794,10 @@ class Fact(Factor):
 
     def __eq__(self, other: Factor) -> bool:
         if not isinstance(other, Factor):
-            raise TypeError(f"{self.__class__} objects may only be compared for " +
-            "equality with other Factor objects.")
+            raise TypeError(
+                f"{self.__class__} objects may only be compared for "
+                + "equality with other Factor objects."
+            )
         if self.__class__ != other.__class__:
             return False
         if self.generic == other.generic == True:

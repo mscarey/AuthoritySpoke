@@ -61,7 +61,7 @@ def make_predicate() -> Dict[str, Predicate]:
             quantity=Q_("35 feet"),
         ),
         "p7_opposite": Predicate.new(
-            "The distance between {} and {} was {}",
+            "the distance between {} and {} was {}",
             truth=True,
             reciprocal=True,
             comparison=">",

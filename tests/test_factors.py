@@ -112,7 +112,7 @@ class TestFacts:
         assert watt_factor["f7"].predicate_in_context(
             (make_entity["trees"], make_entity["motel"])
         ) == str(
-            "Fact: The distance between <the stockpile of trees> "
+            "Fact: the distance between <the stockpile of trees> "
             + "and <Hideaway Lodge> was no more than 35 foot"
         )
 
@@ -258,9 +258,8 @@ class TestFacts:
     def test_factor_reciprocal_unequal(self, watt_factor):
         assert watt_factor["f2"] != watt_factor["f2_reciprocal"]
 
-    def test_factor_unequal_predicate_truth(self, watt_factor):
+    def test_factor_different_predicate_truth_unequal(self, watt_factor):
         assert watt_factor["f7"] != watt_factor["f7_opposite"]
-        assert watt_factor["f7"].contradicts(watt_factor["f7_opposite"])
 
     def test_copies_of_identical_factor(self, make_factor):
         """
@@ -359,6 +358,8 @@ class TestFacts:
 
     # Contradiction
 
+    def test_factor_different_predicate_truth_contradicts(self, watt_factor):
+        assert watt_factor["f7"].contradicts(watt_factor["f7_opposite"])
     def test_factor_does_not_contradict_predicate(self, make_predicate, watt_factor):
         with pytest.raises(TypeError):
             _ = watt_factor["f7"].contradicts(make_predicate["p7_true"])
