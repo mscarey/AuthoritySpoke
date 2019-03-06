@@ -194,7 +194,7 @@ class Factor:
                 if in_key.generic or in_value.generic:
                     self_mapping[in_key] = in_value
                     self_mapping[in_value] = in_key
-        return MappingProxyType(self_mapping)
+        return self_mapping
 
     def _update_mapping(
         self,
@@ -221,6 +221,8 @@ class Factor:
         match to two different factors in self_matching_proxy.
         """  # TODO: docstring
 
+        new_mapping_choices = [self_mapping_proxy]
+
         self_factors = self.wrap_with_tuple(self_factors)
         other_factors = self.wrap_with_tuple(other_factors)
 
@@ -228,6 +230,8 @@ class Factor:
         shortest = min(len(self_factors), len(other_factors))
 
         # The "is" comparison is for None values.
+        # TODO: Find a way to skip this step and only use the
+        # result of the incoming_registers process below
         if not all(
             self_factors[index] is other_factors[index]
             or comparison(self_factors[index], other_factors[index])
@@ -235,16 +239,21 @@ class Factor:
         ):
             return None
 
-        incoming_registers = [
-            self_factors[index].context_register(other_factors[index], comparison)
-            for index in range(shortest)
-            if self_factors[index] is not None
-        ]
-        for incoming_register in incoming_registers:
-            self_mapping_proxy = self._import_to_mapping(
-                self_mapping_proxy, incoming_register
-            )
-        return self_mapping_proxy
+        # TODO: change to depth-first
+        for index in range(shortest):
+            mapping_choices = new_mapping_choices
+            new_mapping_choices = []
+            for mapping in mapping_choices:
+                for incoming_register in self_factors[index].context_register(
+                    other_factors[index], comparison
+                ):
+                    updated_mapping = self._import_to_mapping(
+                        mapping, incoming_register
+                    )
+                    if updated_mapping not in new_mapping_choices:
+                        new_mapping_choices += updated_mapping
+        for choice in new_mapping_choices:
+            yield choice
 
 
 @dataclass()
@@ -797,16 +806,20 @@ class Fact(Factor):
         It specifies what attributes of self and other to look in to find
         Factor objects to match.
 
-        For Fact, it creates zero or more updated mappings for each other_order in
-        other.entity_orders. Each time, it starts with mapping, and
-        updates it with matches from self.entity_context and other_order.
+        For Fact, it creates zero or more updated mappings for each
+        other_order in ther.entity_orders. Each time, it starts with mapping,
+        and updates it with matches from self.entity_context and other_order.
         """  # TODO: docstring
 
+        already_returned = []
         for self_order in self.entity_orders():
             for other_order in other.entity_orders():
-                next_registry = self._update_mapping({}, self_order, other_order, comparison)
-                if next_registry:
-                    yield next_registry
+                for next_registry in self._update_mapping(
+                    {}, self_order, other_order, comparison
+                ):
+                    if next_registry and next_registry not in already_returned:
+                        already_returned.append(next_registry)
+                        yield next_registry
 
     def __eq__(self, other: Factor) -> bool:
         if not isinstance(other, Factor):
@@ -826,7 +839,10 @@ class Fact(Factor):
         ):
             return False
 
-        return self.context_register(other, operator.eq) is not None
+        return any(
+            register is not None
+            for register in self.context_register(other, operator.eq)
+        )
 
     def make_generic(self) -> "Fact":
         """

@@ -147,14 +147,17 @@ class TestFacts:
         the Human in f1_entity_order.
         """
         with pytest.raises(StopIteration):
-            next(watt_factor["f1"].context_register(
-                watt_factor["f1_entity_order"], operator.ge
-            )
+            next(
+                watt_factor["f1"].context_register(
+                    watt_factor["f1_entity_order"], operator.ge
+                )
             )
 
     def test_context_register_valid(self, make_entity, watt_factor):
-        assert watt_factor["f1"].context_register(
-            watt_factor["f1_entity_order"], operator.le
+        assert next(
+            watt_factor["f1"].context_register(
+                watt_factor["f1_entity_order"], operator.le
+            )
         ) == {
             make_entity["watt"]: make_entity["motel"],
             make_entity["motel"]: make_entity["watt"],
@@ -214,12 +217,14 @@ class TestFacts:
         Fact in practice, so "(A is B) == False" guarantees they refer to
         different things?
         """
-        d = watt_factor["f7"].context_register(
-            watt_factor["f7_swap_entities"], operator.eq
+        registers = list(
+            watt_factor["f7"].context_register(
+                watt_factor["f7_swap_entities"], operator.eq
+            )
         )
-        for k in d:
-            assert repr(d[k]) == repr(k)
-            assert str(d[k]) == str(k)
+        assert any(
+            repr(register[k]) == repr(k) for register in registers for k in register
+        )
 
     def test_import_to_mapping_reciprocal(self, make_entity, watt_factor, caplog):
         caplog.set_level(logging.DEBUG)

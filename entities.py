@@ -61,9 +61,8 @@ class Entity(Factor):
         """Returns a list of possible ways the context of self can be
         mapped onto the context of other. Other subclasses of Factor
         will have more complex lists."""
-        if comparison(self, other) and (self.generic or other.generic):
-            return {self: other, other: self}
-        return None
+        if comparison(self, other):
+            yield {self: other, other: self}
 
     def contradicts(self, other: Factor) -> bool:
         if not isinstance(other, Factor):
