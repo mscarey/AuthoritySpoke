@@ -132,7 +132,7 @@ class Enactment:
         return text[l:r]
 
     def __hash__(self):
-        return hash((self.text, self.code.sovereign, self.code.level))
+        return hash((self.text, self.code.sovereign, self.code.level, self.code.title, self.section))
 
     def __str__(self):
         return f'"{self.text}" ({self.code.title}, {self.section})'

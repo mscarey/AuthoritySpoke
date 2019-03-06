@@ -157,17 +157,21 @@ class Procedure(Factor):
             self_factor = need_matches.pop()
             for other_factor in available_for_matching:
                 if comparison(self_factor, other_factor):
-                    updated_mappings = iter(self._update_mapping(
-                        matches, (self_factor,), (other_factor,), comparison
-                    ))
+                    updated_mappings = iter(
+                        self._update_mapping(
+                            matches, (self_factor,), (other_factor,), comparison
+                        )
+                    )
                     for new_matches in updated_mappings:
                         if new_matches:
-                            next_steps = iter(self.compare_factors(
-                                new_matches,
-                                need_matches,
-                                available_for_matching,
-                                comparison,
-                            ))
+                            next_steps = iter(
+                                self.compare_factors(
+                                    new_matches,
+                                    need_matches,
+                                    available_for_matching,
+                                    comparison,
+                                )
+                            )
                             for next_step in next_steps:
                                 yield next_step
 
@@ -369,9 +373,7 @@ class Procedure(Factor):
 
         # For self to contradict other, every input of other
         # must be implied by some input or despite factor of self.
-        comparisons = (
-            Comparison(other.inputs, self_despite_or_input, operator.le),
-        )
+        comparisons = (Comparison(other.inputs, self_despite_or_input, operator.le),)
         matchlist = self.all_comparison_matches(comparisons)
 
         # For self to contradict other, some output of other
@@ -442,8 +444,8 @@ class Procedure(Factor):
         if self.implies_all_to_all(other):
             return True
 
-        other_despite_or_input = {*other.despite, *other.inputs}
-        self_despite_or_input = {*self.despite, *self.inputs}
+        other_despite_or_input = (*other.despite, *other.inputs)
+        self_despite_or_input = (*self.despite, *self.inputs)
 
         comparisons = (
             Comparison(other.outputs, self.outputs, operator.le),
@@ -590,7 +592,7 @@ class Rule:
         return self.holdings
 
 
-@dataclass()
+@dataclass(frozen=True)
 class ProceduralRule(Rule):
 
     """
@@ -638,16 +640,38 @@ class ProceduralRule(Rule):
     decided: bool = True
     generic: bool = False
 
-    def __post_init__(self):
-        if isinstance(self.enactments, Enactment):
-            object.__setattr__(self, "enactments", frozenset((self.enactments,)))
-        if isinstance(self.enactments_despite, Enactment):
-            object.__setattr__(
-                self, "enactments_despite", frozenset((self.enactments_despite,))
-            )
-        object.__setattr__(self, "enactments", frozenset(self.enactments))
-        object.__setattr__(
-            self, "enactments_despite", frozenset(self.enactments_despite)
+    @classmethod
+    def new(
+        cls,
+        procedure: Procedure,
+        enactments: Optional[Union[Enactment, Iterable[Enactment]]] = (),
+        enactments_despite: Optional[Union[Enactment, Iterable[Enactment]]] = (),
+        mandatory: bool = False,
+        universal: bool = False,
+        rule_valid: bool = True,
+        decided: bool = True,
+        generic: bool = False,
+    ):
+
+        def wrap_with_tuple(item):
+            if isinstance(item, Iterable):
+                return tuple(item)
+            return (item,)
+
+        if isinstance(enactments, Enactment):
+            enactments = wrap_with_tuple(enactments)
+        if isinstance(enactments_despite, Enactment):
+            enactments_despite = wrap_with_tuple(enactments_despite)
+
+        return cls(
+            procedure,
+            enactments,
+            enactments_despite,
+            mandatory,
+            universal,
+            rule_valid,
+            decided,
+            generic,
         )
 
     def __str__(self):
@@ -749,7 +773,7 @@ class ProceduralRule(Rule):
         # enactment not mentioned by self, then self doesn't imply other.
 
         if not all(
-            any(e >= other_d for e in (self.enactments | self.enactments_despite))
+            any(e >= other_d for e in (self.enactments + self.enactments_despite))
             for other_d in other.enactments_despite
         ):
             return False
