@@ -185,7 +185,8 @@ class Evidence(Factor):
         ):
             return False
 
-        return self.context_register(other, operator.eq) is not None
+        context_registers = iter(self.context_register(other, operator.eq))
+        return any(register is not None for register in context_registers)
 
     def __gt__(self, other):
         return self >= other and self != other
@@ -235,7 +236,8 @@ class Evidence(Factor):
             if not self.to_effect or not self.to_effect >= other.to_effect:
                 return False
 
-        return self.context_register(other, operator.ge) is not None
+        context_registers = iter(self.context_register(other, operator.ge))
+        return any(register is not None for register in context_registers)
 
     def __ge__(self, other):
         if not isinstance(other, Factor):

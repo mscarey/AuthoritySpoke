@@ -35,8 +35,11 @@ class TestEntities:
         """
         motel = make_entity["motel"]
         watt = make_entity["watt"]
-        assert motel.context_register(watt, operator.ge) == None
-        assert motel.context_register(watt, operator.le) == {motel: watt, watt: motel}
+        empty_update = motel.context_register(watt, operator.ge)
+        assert not any(register is not None for register in empty_update)
+
+        update = motel.context_register(watt, operator.le)
+        assert any(register == {motel: watt, watt: motel} for register in update)
 
     # Equality
 
