@@ -199,33 +199,6 @@ class TestFacts:
             is None
         )
 
-    def test_reciprocal_context_register(self, make_entity, watt_factor):
-        """Because the reciprocal factors have been put in alphabetical
-        order, each context factor in f7 should match with the identical
-        factor is f7_swap_entities.
-
-        This test compares the strings (could also use repr) because the Fact
-        objects don't have the same id (can't use "is"), but the Entity
-        objects evaluate equal because they're both generic (can't use ==).
-
-        This test describes something that shouldn't happen in practice,
-        because it means two objects that should be identical have been
-        made in two different ways, each with a different id.
-
-        This situation risks creating a lot of bugs. Will it be possible
-        to avoid creating multiple objects representing the same
-        Fact in practice, so "(A is B) == False" guarantees they refer to
-        different things?
-        """
-        registers = list(
-            watt_factor["f7"].context_register(
-                watt_factor["f7_swap_entities"], operator.eq
-            )
-        )
-        assert any(
-            repr(register[k]) == repr(k) for register in registers for k in register
-        )
-
     def test_import_to_mapping_reciprocal(self, make_entity, watt_factor, caplog):
         caplog.set_level(logging.DEBUG)
         mapping = Factor._import_to_mapping(
@@ -279,6 +252,19 @@ class TestFacts:
             make_complex_fact["f_relevant_murder"]
             == make_complex_fact["f_relevant_murder_craig"]
         )
+
+    def test_reciprocal_context_register(self, watt_factor):
+        """
+        This test describes something that shouldn't happen in practice,
+        because it means two objects with the same meaning have been
+        made in two different ways, each with a different id and repr.
+
+        This situation risks creating a lot of bugs. Will it be possible
+        to avoid creating multiple objects representing the same
+        Fact in practice, so "(A is B) == False" guarantees they refer to
+        different things?
+        """
+        assert watt_factor["f7"] == watt_factor["f7_swap_entities"]
 
     @pytest.mark.xfail
     def test_unequal_due_to_repeating_entity(self, make_factor):

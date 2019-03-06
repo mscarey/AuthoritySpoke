@@ -839,10 +839,8 @@ class Fact(Factor):
         ):
             return False
 
-        return any(
-            register is not None
-            for register in self.context_register(other, operator.eq)
-        )
+        context_registers = iter(self.context_register(other, operator.eq))
+        return any(register is not None for register in context_registers)
 
     def make_generic(self) -> "Fact":
         """
@@ -931,7 +929,8 @@ class Fact(Factor):
         if not (self.predicate >= other.predicate and self.absent == other.absent):
             return False
 
-        return self.context_register(other, operator.ge)
+        context_registers = iter(self.context_register(other, operator.ge))
+        return any(register is not None for register in context_registers)
 
     def contradicts(self, other: Optional[Factor]) -> bool:
         """Returns True if self and other can't both be true at the same time.
@@ -949,7 +948,8 @@ class Fact(Factor):
         if not isinstance(other, self.__class__):
             return False
 
-        if self.context_register(other, operator.ge):
+        self_implies_other = iter(self.context_register(other, operator.ge))
+        if any(register is not None for register in self_implies_other):
             if self.predicate.contradicts(other.predicate) and not (
                 self.absent | other.absent
             ):
@@ -957,7 +957,8 @@ class Fact(Factor):
             if self.predicate >= other.predicate and other.absent and not self.absent:
                 return True
 
-        if self.context_register(other, operator.le):
+        other_implies_self = iter(self.context_register(other, operator.le))
+        if any(register is not None for register in other_implies_self):
             if self.predicate.contradicts(other.predicate) and not (
                 self.absent | other.absent
             ):
