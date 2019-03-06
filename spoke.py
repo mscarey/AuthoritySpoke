@@ -251,7 +251,7 @@ class Factor:
                         mapping, incoming_register
                     )
                     if updated_mapping not in new_mapping_choices:
-                        new_mapping_choices += updated_mapping
+                        new_mapping_choices.append(updated_mapping)
         for choice in new_mapping_choices:
             yield choice
 
