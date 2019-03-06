@@ -1,4 +1,3 @@
-
 import json
 import pathlib
 import operator
@@ -20,6 +19,7 @@ class Comparison(NamedTuple):
     need_matches: List[Factor]
     available: Tuple[Factor]
     relation: Callable
+
 
 def evolve_match_list(
     available: Iterable[Factor],
@@ -157,17 +157,17 @@ class Procedure(Factor):
             self_factor = need_matches.pop()
             for other_factor in available_for_matching:
                 if comparison(self_factor, other_factor):
-                    new_matches = self._update_mapping(
+                    for new_matches in self._update_mapping(
                         matches, (self_factor,), (other_factor,), comparison
-                    )
-                    if new_matches:
-                        for answer in self.compare_factors(
-                            MappingProxyType(new_matches),
-                            need_matches,
-                            available_for_matching,
-                            comparison,
-                        ):
-                            yield answer
+                    ):
+                        if new_matches:
+                            for answer in self.compare_factors(
+                                MappingProxyType(new_matches),
+                                need_matches,
+                                available_for_matching,
+                                comparison,
+                            ):
+                                yield answer
 
     def __ge__(self, other: "Procedure") -> bool:
         """
@@ -474,13 +474,15 @@ class Procedure(Factor):
         for self_factor in self_factors:
             for other_factor in other_factors:
                 if self_factor.contradicts(other_factor):
-                    context_register = self_factor.context_register(
-                        other_factor, operator.eq
-                    )
                     if all(
-                        matches.get(key) == context_register[key]
-                        or matches.get(context_register[key] == key)
-                        for key in self_factor.generic_factors()
+                        all(
+                            matches.get(key) == context_register[key]
+                            or matches.get(context_register[key] == key)
+                            for key in self_factor.generic_factors()
+                        )
+                        for context_register in self_factor.context_register(
+                            other_factor, operator.eq
+                        )
                     ):
                         return False
         return True
