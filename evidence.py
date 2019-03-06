@@ -56,7 +56,8 @@ class Exhibit(Factor):
         ):
             return False
 
-        return self.context_register(other, operator.eq) is not None
+        context_registers = iter(self.context_register(other, operator.eq))
+        return any(register is not None for register in context_registers)
 
     def __ge__(self, other: Optional[Factor]) -> bool:
         if other is None:
@@ -115,7 +116,8 @@ class Exhibit(Factor):
             if not (self.stated_by and self.stated_by >= other.stated_by):
                 return False
 
-        return self.context_register(other, operator.ge) is not None
+        context_registers = iter(self.context_register(other, operator.ge))
+        return any(register is not None for register in context_registers)
 
     def __gt__(self, other: Optional[Factor]) -> bool:
         if other is None:

@@ -236,15 +236,18 @@ class Factor:
             mapping_choices = new_mapping_choices
             new_mapping_choices = []
             for mapping in mapping_choices:
-                register_iter = iter(self_factors[index].context_register(
-                    other_factors[index], comparison
-                ))
-                for incoming_register in register_iter:
-                    updated_mapping = self._import_to_mapping(
-                        mapping, incoming_register
-                    )
-                    if updated_mapping not in new_mapping_choices:
-                        new_mapping_choices.append(updated_mapping)
+                if self_factors[index] is None:
+                    new_mapping_choices.append(mapping)
+                else:
+                    register_iter = iter(self_factors[index].context_register(
+                        other_factors[index], comparison
+                    ))
+                    for incoming_register in register_iter:
+                        updated_mapping = self._import_to_mapping(
+                            mapping, incoming_register
+                        )
+                        if updated_mapping not in new_mapping_choices:
+                            new_mapping_choices.append(updated_mapping)
         for choice in new_mapping_choices:
             yield choice
 
