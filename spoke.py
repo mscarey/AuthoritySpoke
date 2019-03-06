@@ -239,9 +239,11 @@ class Factor:
                 if self_factors[index] is None:
                     new_mapping_choices.append(mapping)
                 else:
-                    register_iter = iter(self_factors[index].context_register(
-                        other_factors[index], comparison
-                    ))
+                    register_iter = iter(
+                        self_factors[index].context_register(
+                            other_factors[index], comparison
+                        )
+                    )
                     for incoming_register in register_iter:
                         updated_mapping = self._import_to_mapping(
                             mapping, incoming_register
@@ -808,11 +810,14 @@ class Fact(Factor):
         """  # TODO: docstring
 
         already_returned = []
-        for self_order in self.entity_orders():
-            for other_order in other.entity_orders():
-                for next_registry in self._update_mapping(
-                    {}, self_order, other_order, comparison
-                ):
+        self_orders = iter(self.entity_orders())
+        for self_order in self_orders:
+            other_orders = iter(other.entity_orders())
+            for other_order in other_orders:
+                updated_mappings = iter(
+                    self._update_mapping({}, self_order, other_order, comparison)
+                )
+                for next_registry in updated_mappings:
                     if next_registry and next_registry not in already_returned:
                         already_returned.append(next_registry)
                         yield next_registry

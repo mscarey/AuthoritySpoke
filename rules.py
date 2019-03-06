@@ -16,8 +16,8 @@ from spoke import Factor
 
 
 class Comparison(NamedTuple):
-    need_matches: List[Factor]
-    available: Tuple[Factor]
+    need_matches: Tuple[Factor, ...]
+    available: Tuple[Factor, ...]
     relation: Callable
 
 
@@ -108,7 +108,7 @@ class Procedure(Factor):
             new_matchlist = []
             for matches in matchlist:
                 for answer in self.compare_factors(
-                    MappingProxyType(matches),
+                    matches,
                     list(self.__dict__[group]),
                     other.__dict__[group],
                     operator.eq,
@@ -125,7 +125,7 @@ class Procedure(Factor):
             new_matchlist = []
             for matches in matchlist:
                 for answer in self.compare_factors(
-                    MappingProxyType(matches),
+                    matches,
                     list(other.__dict__[group]),
                     self.__dict__[group],
                     operator.eq,
@@ -137,8 +137,8 @@ class Procedure(Factor):
     def compare_factors(
         self,
         matches: Mapping,
-        need_matches: List,
-        available_for_matching: Tuple,
+        need_matches: List[Factor],
+        available_for_matching: Tuple[Factor, ...],
         comparison: Callable,
     ) -> Iterator[Dict[Factor, Optional[Factor]]]:
         """
@@ -157,17 +157,19 @@ class Procedure(Factor):
             self_factor = need_matches.pop()
             for other_factor in available_for_matching:
                 if comparison(self_factor, other_factor):
-                    for new_matches in self._update_mapping(
+                    updated_mappings = iter(self._update_mapping(
                         matches, (self_factor,), (other_factor,), comparison
-                    ):
+                    ))
+                    for new_matches in updated_mappings:
                         if new_matches:
-                            for answer in self.compare_factors(
-                                MappingProxyType(new_matches),
+                            next_steps = iter(self.compare_factors(
+                                new_matches,
                                 need_matches,
                                 available_for_matching,
                                 comparison,
-                            ):
-                                yield answer
+                            ))
+                            for next_step in next_steps:
+                                yield next_step
 
     def __ge__(self, other: "Procedure") -> bool:
         """
