@@ -197,7 +197,7 @@ class Procedure(Factor):
         if not isinstance(other, self.__class__):
             return False
 
-        despite_or_input = {*self.despite, *self.inputs}
+        despite_or_input = (*self.despite, *self.inputs)
 
         comparisons = (
             Comparison(other.outputs, self.outputs, operator.le),
@@ -365,14 +365,14 @@ class Procedure(Factor):
         if not isinstance(other, self.__class__):
             return False
 
-        self_despite_or_input = {*self.despite, *self.inputs}
+        self_despite_or_input = (*self.despite, *self.inputs)
 
         # For self to contradict other, every input of other
         # must be implied by some input or despite factor of self.
-        matchlist = [{context: None for context in self.get_context_factors()}]
-        matchlist = evolve_match_list(
-            self_despite_or_input, other.inputs, operator.ge, matchlist
+        comparisons = (
+            Comparison(other.inputs, self_despite_or_input, operator.le),
         )
+        matchlist = self.all_comparison_matches(comparisons)
 
         # For self to contradict other, some output of other
         # must be contradicted by some output of self.

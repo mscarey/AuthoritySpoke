@@ -805,7 +805,7 @@ class Fact(Factor):
         Factor objects to match.
 
         For Fact, it creates zero or more updated mappings for each
-        other_order in ther.entity_orders. Each time, it starts with mapping,
+        other_order in other.entity_orders. Each time, it starts with mapping,
         and updates it with matches from self.entity_context and other_order.
         """  # TODO: docstring
 
