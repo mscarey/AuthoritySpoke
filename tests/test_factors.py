@@ -393,8 +393,8 @@ class TestFacts:
         left = make_factor["f_irrelevant_3"]
         right = make_factor["f_irrelevant_3_new_context"]
         e = make_entity
-        assert left._update_mapping({e["dan"]: e["craig"]}, left, right, operator.eq)
-        assert left._update_mapping(
+        easy_update = left._update_mapping({e["dan"]: e["craig"]}, left, right, operator.eq)
+        harder_update = left._update_mapping(
             {
                 e["alice"]: e["bob"],
                 e["bob"]: e["alice"],
@@ -406,22 +406,28 @@ class TestFacts:
             right,
             operator.eq,
         )
+        assert any(register is not None for register in easy_update)
+        assert any(register is not None for register in harder_update)
 
     def test_check_entity_consistency_false(self, make_entity, make_factor):
-        assert not make_factor["f_irrelevant_3"]._update_mapping(
+        update = make_factor["f_irrelevant_3"]._update_mapping(
             {make_entity["circus"]: make_entity["alice"]},
             make_factor["f_irrelevant_3"],
             make_factor["f_irrelevant_3_new_context"],
             operator.eq,
         )
+        assert not any(register is not None for register in update)
+
 
     def test_entity_consistency_identity_not_equality(self, make_entity, make_factor):
-        assert not make_factor["f_irrelevant_3"]._update_mapping(
+
+        update = make_factor["f_irrelevant_3"]._update_mapping(
             {make_entity["dan"]: make_entity["dan"]},
             make_factor["f_irrelevant_3"],
             make_factor["f_irrelevant_3_new_context"],
             operator.eq,
         )
+        assert not any(register is not None for register in update)
 
     def test_check_entity_consistency_type_error(
         self, make_entity, make_factor, make_predicate
@@ -431,10 +437,11 @@ class TestFacts:
         instead of .gt. The comparison would just return False.
         """
         m = make_factor
-        with pytest.raises(TypeError):
-            make_factor["f_irrelevant_3"]._update_mapping(
+        update = make_factor["f_irrelevant_3"]._update_mapping(
                 {make_entity["dan"]: make_entity["dan"]},
                 m["f_irrelevant_3"],
                 make_predicate["p2"],
                 operator.gt,
             )
+        with pytest.raises(TypeError):
+            any(register is not None for register in update)

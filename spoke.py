@@ -116,12 +116,6 @@ class Factor:
         a list of dicts, where each dict is a valid way to make matches between
         corresponding factors. The dict is empty if there are no matches."""
 
-        if other is not None and all(
-            other_class.__name__ != "Factor" for other_class in other.__class__.__mro__
-        ):
-            raise TypeError(
-                "Can only create a context_register between Factors or None"
-            )
         if other is None:
             yield {}
         elif self.generic or other.generic:
@@ -228,7 +222,6 @@ class Factor:
 
         # why am I allowing the __len__s to be different?
         shortest = min(len(self_factors), len(other_factors))
-
         # The "is" comparison is for None values.
         # TODO: Find a way to skip this step and only use the
         # result of the incoming_registers process below
@@ -238,15 +231,15 @@ class Factor:
             for index in range(shortest)
         ):
             return None
-
         # TODO: change to depth-first
         for index in range(shortest):
             mapping_choices = new_mapping_choices
             new_mapping_choices = []
             for mapping in mapping_choices:
-                for incoming_register in self_factors[index].context_register(
+                register_iter = iter(self_factors[index].context_register(
                     other_factors[index], comparison
-                ):
+                ))
+                for incoming_register in register_iter:
                     updated_mapping = self._import_to_mapping(
                         mapping, incoming_register
                     )
