@@ -83,14 +83,15 @@ class TestFacts:
         assert len(watt_factor["f1"]) == 1
 
     def test_entity_context_reciprocal(self, make_entity, watt_factor):
-        """Predicate.new() should have kept only this order, because
-        the factors are ordered by __repr__."""
-        motel_near_watt = watt_factor["f7_swap_entities_4"]
+        """Predicate.new() no longer coerces the order of self.entity_context.
+        Instead, Fact.entity_orders() returns every possible order."""
 
-        assert motel_near_watt.entity_context == (
+        motel_near_watt = watt_factor["f7_swap_entities_4"]
+        assert len(tuple(motel_near_watt.entity_orders())) == 2
+        assert (
             make_entity["motel_specific"],
             make_entity["watt"],
-        )
+        ) in motel_near_watt.entity_orders()
 
     def test_predicate_with_entities(self, make_entity, watt_factor):
         assert (
@@ -140,17 +141,16 @@ class TestFacts:
         factor = watt_factor["f2_preponderance_of_evidence"]
         assert factor.standard_of_proof in str(factor)
 
-    def test_context_register_None(self, make_entity, watt_factor):
+    def test_context_register_empty(self, watt_factor):
         """
-        Returns None because the Entity in f1 doesn't imply the Human
-        in f1_entity_order.
+        Yields no context_register because the Entity in f1 doesn't imply
+        the Human in f1_entity_order.
         """
-        assert (
-            watt_factor["f1"].context_register(
+        with pytest.raises(StopIteration):
+            next(watt_factor["f1"].context_register(
                 watt_factor["f1_entity_order"], operator.ge
             )
-            is None
-        )
+            )
 
     def test_context_register_valid(self, make_entity, watt_factor):
         assert watt_factor["f1"].context_register(
@@ -177,17 +177,15 @@ class TestFacts:
 
     def test_import_to_mapping_no_change(self, make_entity, watt_factor):
         f = watt_factor["f7"]
-        old_mapping = {
-            make_entity["motel"]: make_entity["trees"],
-        }
+        old_mapping = {make_entity["motel"]: make_entity["trees"]}
         assert dict(
             f._import_to_mapping(
                 old_mapping, {make_entity["motel"]: make_entity["trees"]}
-            )) == {
+            )
+        ) == {
             make_entity["motel"]: make_entity["trees"],
             make_entity["trees"]: make_entity["motel"],
         }
-
 
     def test_import_to_mapping_conflict(self, make_entity, watt_factor):
         assert (
@@ -360,6 +358,7 @@ class TestFacts:
 
     def test_factor_different_predicate_truth_contradicts(self, watt_factor):
         assert watt_factor["f7"].contradicts(watt_factor["f7_opposite"])
+
     def test_factor_does_not_contradict_predicate(self, make_predicate, watt_factor):
         with pytest.raises(TypeError):
             _ = watt_factor["f7"].contradicts(make_predicate["p7_true"])

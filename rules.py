@@ -1,4 +1,4 @@
-from collections import namedtuple
+
 import json
 import pathlib
 import operator
@@ -8,14 +8,18 @@ from types import MappingProxyType
 from typing import Dict, List, Set, Tuple
 from typing import Iterable, Iterator, Mapping
 from typing import Callable, Generator, Optional, Union
+from typing import NamedTuple
 
 from dataclasses import dataclass
 
 from enactments import Enactment
 from spoke import Factor
 
-Comparison = namedtuple("Comparison", ["need_matches", "available", "relation"])
 
+class Comparison(NamedTuple):
+    need_matches: List[Factor]
+    available: Tuple[Factor]
+    relation: Callable
 
 def evolve_match_list(
     available: Iterable[Factor],

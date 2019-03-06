@@ -111,7 +111,7 @@ class Factor:
 
     def context_register(
         self, other: "Factor", comparison: Callable
-    ) -> Optional[Dict["Factor", "Factor"]]:
+    ) -> Iterator[Optional[Dict["Factor", "Factor"]]]:
         """Searches through the context factors of self and other, making
         a list of dicts, where each dict is a valid way to make matches between
         corresponding factors. The dict is empty if there are no matches."""
@@ -123,10 +123,12 @@ class Factor:
                 "Can only create a context_register between Factors or None"
             )
         if other is None:
-            return {}
-        if self.generic or other.generic:
-            return {self: other, other: self}
-        return self._compare_factor_attributes(other, comparison)
+            yield {}
+        elif self.generic or other.generic:
+            yield {self: other, other: self}
+        else:
+            for register in self._compare_factor_attributes(other, comparison):
+                yield register
 
     @staticmethod
     def sort_in_tuple(item) -> Tuple["Factor", ...]:
@@ -502,7 +504,10 @@ class Predicate:
         ):
             return False
 
-        if not (self.content.lower() == other.content.lower() and self.reciprocal == other.reciprocal):
+        if not (
+            self.content.lower() == other.content.lower()
+            and self.reciprocal == other.reciprocal
+        ):
             return False
 
         if self.quantity and other.quantity:
@@ -752,12 +757,6 @@ class Fact(Factor):
                     + "indices of Factor objects in the case_factors parameter."
                 )
 
-        if predicate.reciprocal:
-            entity_context = tuple(
-                sorted([entity_context[0], entity_context[1]], key=repr)
-                + list(entity_context[2:])
-            )
-
         if standard_of_proof and standard_of_proof not in STANDARDS_OF_PROOF:
             raise ValueError(
                 f"standard of proof must be one of {STANDARDS_OF_PROOF.keys()} or None."
@@ -776,6 +775,21 @@ class Fact(Factor):
             + f"{standard} {predicate}"
         )
 
+    def entity_orders(self):
+        """
+        Yields the ways the context factors referenced by the Fact object
+        can be reordered without changing the truth value of the Fact.
+        Currently the predicate must be phrased either in a way that doesn't
+        make any context factors interchangeable, or if the "reciprocal" flag
+        is set, in a way that allows only the first two context factors to switch
+        places.
+        """
+        yield self.entity_context
+        if self.predicate.reciprocal:
+            yield (self.entity_context[1], self.entity_context[0]) + (
+                self.entity_context[2:]
+            )
+
     def _compare_factor_attributes(self, other, comparison):
         """
         This function should be the only part of the context-matching
@@ -788,9 +802,11 @@ class Fact(Factor):
         updates it with matches from self.entity_context and other_order.
         """  # TODO: docstring
 
-        return self._update_mapping(
-            {}, self.entity_context, other.entity_context, comparison
-        )
+        for self_order in self.entity_orders():
+            for other_order in other.entity_orders():
+                next_registry = self._update_mapping({}, self_order, other_order, comparison)
+                if next_registry:
+                    yield next_registry
 
     def __eq__(self, other: Factor) -> bool:
         if not isinstance(other, Factor):
