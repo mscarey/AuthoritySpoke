@@ -1,4 +1,3 @@
-from functools import reduce
 import itertools
 import logging
 import operator
@@ -40,20 +39,13 @@ def compare_dict_for_identical_entries(left, right):
         for l_key in left
     )
 
-
+@dataclass(frozen=True)
 class Factor:
     """A factor is something used to determine the applicability of a legal
     procedure. Factors can be both inputs and outputs of legal procedures.
     In a chain of legal procedures, the outputs of one may become inputs for
     another. Common types of factors include Facts, Evidence, Allegations,
     Motions, and Arguments."""
-
-    def __init__(
-        self, name: Optional[str] = None, generic: bool = True, absent: bool = False
-    ):
-        self.name = name
-        self.generic = generic
-        self.absent = absent
 
     @classmethod
     def from_dict(cls, factor: dict) -> "Factor":
@@ -69,28 +61,6 @@ class Factor:
                 return c.from_dict(factor)
         raise ValueError(
             f'"type" value in input must be one of {class_options}, not {cname}'
-        )
-
-    def __eq__(self, other: "Factor") -> bool:
-        if self.__class__ != other.__class__:
-            return False
-        if self.generic == other.generic == True:
-            return True
-        return self.__dict__ == other.__dict__
-
-    def __gt__(self, other: "Factor") -> bool:
-        if self == other:
-            return False
-        if isinstance(self, other.__class__):
-            if other.generic:
-                return True
-        return False
-
-    def __hash__(self):
-        # TODO: make Factor a dataclass and get rid of this.
-        return hash(
-            self.__class__.__name__,
-            *[v for v in self.__dict__.values() if not isinstance(v, set)],
         )
 
     def generic_factors(self) -> Iterable["Factor"]:
@@ -254,7 +224,7 @@ class Factor:
             yield choice
 
 
-@dataclass()
+@dataclass(frozen=True)
 class Predicate:
     """
     A statement about real events or about a legal conclusion.
@@ -347,8 +317,6 @@ class Predicate:
                     quantity = float(quantity)
                 else:
                     quantity = Q_(quantity)
-
-        entities = (Factor(e) for e in entities)
 
         return (
             Predicate(
@@ -475,18 +443,6 @@ class Predicate:
         if self == other:
             return True
         return self > other
-
-    def __hash__(self):
-        return hash(
-            (
-                self.__class__.__name__,
-                *[
-                    v
-                    for v in self.__dict__.values()
-                    if not isinstance(v, set) and not isinstance(v, list)
-                ],
-            )
-        )
 
     def contradicts(self, other: "Predicate") -> bool:
         """This first tries to find a contradiction based on the relationship
@@ -721,6 +677,7 @@ class Fact(Factor):
 
     predicate: Optional[Predicate] = None
     entity_context: Tuple[Factor, ...] = ()
+    name: Optional[str] = None
     standard_of_proof: Optional[str] = None
     absent: bool = False
     generic: bool = False
@@ -732,6 +689,7 @@ class Fact(Factor):
         entity_context: Optional[
             Union[Factor, Iterable[Factor], int, Iterable[int]]
         ] = None,
+        name: Optional[str] = None,
         standard_of_proof: Optional[str] = None,
         absent: bool = False,
         generic: bool = False,
@@ -768,9 +726,11 @@ class Fact(Factor):
             raise ValueError(
                 f"standard of proof must be one of {STANDARDS_OF_PROOF.keys()} or None."
             )
-        return cls(predicate, entity_context, standard_of_proof, absent, generic)
+        return cls(predicate, entity_context, name, standard_of_proof, absent, generic)
 
     def __str__(self):
+        if self.name:
+            return self.name
         predicate = str(self.predicate.content_with_entities(self.entity_context))
         standard = (
             f" by the standard {self.standard_of_proof},"

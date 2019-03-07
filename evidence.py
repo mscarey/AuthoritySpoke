@@ -23,8 +23,22 @@ class Exhibit(Factor):
     form: Optional[str] = None
     statement: Optional[Fact] = None
     stated_by: Optional[Entity] = None
+    name: Optional[str] = None
     absent: bool = False
     generic: bool = False
+
+    @classmethod
+    def new(
+        cls,
+        form: Optional[str] = None,
+        statement: Optional[Fact] = None,
+        stated_by: Optional[Entity] = None,
+        name: Optional[str] = None,
+        absent: bool = False,
+        generic: bool = False,
+    ):
+        """Placeholder for normalizing inputs before initializing."""
+        return cls(form, statement, stated_by, name, absent, generic)
 
     def _compare_factor_attributes(self, other, comparison):
         """
@@ -147,18 +161,6 @@ class Evidence(Factor):
     absent: bool = False
     generic: bool = False
 
-    def __hash__(self):
-        return hash(
-            (
-                self.__class__.__name__,
-                *[
-                    v
-                    for v in self.__dict__.values()
-                    if not isinstance(v, set) and not isinstance(v, list)
-                ],
-            )
-        )
-
     def __str__(self):
         if self.exhibit:
             s = str(self.exhibit)
@@ -217,9 +219,7 @@ class Evidence(Factor):
         self_attributes = (self.exhibit, self.to_effect)
         other_attributes = (other.exhibit, other.to_effect)
 
-        return self._update_mapping(
-            {}, self_attributes, other_attributes, comparison
-        )
+        return self._update_mapping({}, self_attributes, other_attributes, comparison)
 
     def implies_if_present(self, other: Factor):
         """Determines whether self would imply other assuming

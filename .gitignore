@@ -1,5 +1,6 @@
 __pycache__/
 tests/__pycache__/
+.coverage
 .pylintrc
 .pytest_cache
 .vscode

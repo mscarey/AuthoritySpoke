@@ -6,7 +6,7 @@ from types import MappingProxyType
 
 from typing import Dict, List, Set, Tuple
 from typing import Iterable, Iterator, Mapping
-from typing import Callable, Generator, Optional, Union
+from typing import Callable, Optional, Union
 from typing import NamedTuple
 
 from dataclasses import dataclass
@@ -60,9 +60,12 @@ class Procedure(Factor):
     If a factor is relevant both as support for the output and as a potential
     undercutter, include it in both 'inputs' and 'despite'."""
 
-    outputs: Tuple[Factor, ...]
-    inputs: Tuple[Factor, ...]
-    despite: Tuple[Factor, ...]
+    outputs: Tuple[Factor, ...] = ()
+    inputs: Tuple[Factor, ...] = ()
+    despite: Tuple[Factor, ...] = ()
+    absent: bool = False
+    generic: bool = True
+    name: Optional[str] = None
 
     @classmethod
     def new(
@@ -232,14 +235,6 @@ class Procedure(Factor):
         if self == other:
             return False
         return self >= other
-
-    def __hash__(self):
-        return hash(
-            (
-                self.__class__.__name__,
-                *[v for v in self.__dict__.values() if not isinstance(v, set)],
-            )
-        )
 
     def __len__(self):
         """
