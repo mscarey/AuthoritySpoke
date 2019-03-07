@@ -384,6 +384,9 @@ class TestFacts:
             make_complex_fact["f_relevant_murder_alice_craig"]
         )
 
+    def test_no_contradiction_of_None(self, watt_factor):
+        assert not watt_factor["f1"].contradicts(None)
+
     # Consistency with Entity/Factor assignments
 
     def test_copy_with_foreign_context(self, watt_mentioned, watt_factor):

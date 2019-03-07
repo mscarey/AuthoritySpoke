@@ -670,7 +670,7 @@ class Fact(Factor):
         if not isinstance(other, Factor):
             raise TypeError(
                 f"{self.__class__} objects may only be compared for "
-                + "equality with other Factor objects."
+                + "equality with other Factor objects or None."
             )
         if self.__class__ != other.__class__:
             return False
@@ -745,11 +745,10 @@ class Fact(Factor):
     def __ge__(self, other: Optional[Factor]) -> bool:
         if other is None:
             return True
-
         if not isinstance(other, Factor):
             raise TypeError(
-                f"'Implies' not supported between instances of "
-                + f"'{self.__class__.__name__}' and '{other.__class__.__name__}'."
+                f"{self.__class__} objects may only be compared for "
+                + "implication with other Factor objects or None."
             )
 
         if not isinstance(self, other.__class__):
@@ -783,11 +782,10 @@ class Fact(Factor):
 
         if other is None:
             return False
-
         if not isinstance(other, Factor):
             raise TypeError(
-                f"'Contradicts' not supported between instances of "
-                + f"'{self.__class__.__name__}' and '{other.__class__.__name__}'."
+                f"{self.__class__} objects may only be compared for "
+                + "contradiction with other Factor objects or None."
             )
 
         if not isinstance(other, self.__class__):
@@ -825,68 +823,31 @@ class Fact(Factor):
             generic=self.generic,
         )
 
-    def consistent_entity_combinations(
-        self, factors_from_other_procedure, matches
-    ) -> List[Dict]:
-        """Finds all possible entity marker combinations for self that
-        don't result in a contradiction with any of the factors of
-        other. The time to call this function
-        repeatedly during a recursive search should explode
-        as the possibilities increase, so it should only be run
-        when matches has been narrowed as much as possible."""
-        # TODO: docstring
-
-        answer = []
-        for source_list in self.entity_orders:
-            available_slots = {
-                factor: [
-                    key
-                    for key in matches
-                    if key is not None
-                    and (matches.get(key) is None or matches.get(key) == factor)
-                ]
-                for factor in source_list
-            }
-            keys, values = zip(*available_slots.items())
-            combinations = (
-                dict(zip(keys, v))
-                for v in itertools.product(*values)
-                if len(v) == len(set(v))
-            )
-            for context in combinations:
-                if not any(
-                    a.contradicts(self.copy_with_foreign_context(context))
-                    for a in factors_from_other_procedure
-                ):
-                    if all(
-                        not compare_dict_for_identical_entries(context, d)
-                        for d in answer
-                    ):
-                        answer.append(context)
-        return answer
-
     @classmethod
     def from_dict(cls, factor: Optional[dict]) -> Optional["Fact"]:
+        """This has no tests, possibly because subclasses of Factor
+        can't be imported here."""
         if factor is None:
             return None
         if factor["type"].capitalize() != "Fact":
             raise ValueError(
                 f'"type" value in input must be "fact", not {factor["type"]}'
             )
-        predicate, entities = Predicate.from_string(
+        predicate, context_factors = Predicate.from_string(
             content=factor.get("content"),
             truth=factor.get("truth", True),
             reciprocal=factor.get("reciprocal", False),
         )
+        # TODO: get rid of this idea of yielding different types
         yield cls(
             predicate,
-            entities,
+            context_factors,
             factor.get("absent", False),
             factor.get("standard_of_proof", None),
         )
 
-        for entity in entities:
-            yield entity
+        for context in context_factors:
+            yield context
 
     def make_abstract(self, entity_slots: Iterable[Factor]) -> "Fact":
         """
