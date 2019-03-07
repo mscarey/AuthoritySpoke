@@ -517,7 +517,7 @@ class Predicate:
         return f"{expand[comparison]} {self.quantity}"
 
     def content_with_entities(
-        self, entities: Union[Factor, Sequence[Union[int, Factor]]]
+        self, entities: Union[Factor, Sequence[Factor]]
     ) -> str:
         """Creates a sentence by substituting the names of entities
         from a particular case into the predicate_with_truth."""
@@ -529,8 +529,6 @@ class Predicate:
                 f"Exactly {len(self)} entities needed to complete "
                 + f'"{self.content}", but {len(entities)} were given.'
             )
-        if any(isinstance(item, int) for item in entities):
-            entities = [f"<{item}>" for item in entities]  # not reachable?
         return str(self).format(*(str(e) for e in entities))
 
     def negated(self) -> "Predicate":
@@ -547,126 +545,12 @@ class Predicate:
             quantity=self.quantity,
         )
 
-
-def check_entity_consistency(
-    left: Factor, right: Factor, matches: Dict[Factor, Factor]
-) -> Set[Tuple[Factor, ...]]:
-    """
-    Given entity assignments for self and other, determines whether
-    the factors have consistent entity assignments such that both can
-    be true at the same time.
-
-    :param other:
-
-    :param matches: a tuple the same length as len(self). The indices represent
-    self's entity slots, and the value at each index represents other's
-    corresponding entity slots that have already been assigned, if any.
-
-    :returns: a set containing self's normal entity tuple, self's reciprocal
-    entity tuple, both, or neither, depending on which ones match with other.
-    """
-    # TODO: update docstring
-
-    def all_matches(self_order: Tuple[Factor], other_order: Tuple[Factor]) -> bool:
-        """
-        Determines whether the entity slots assigned so far are
-        consistent for the Factors designated self and other,
-        regardless of whether it's possible to make consistent
-        assignments for the remaining slots.
-        """
-        m = dict(matches_proxy)
-        for i, slot in enumerate(other_order):
-            other_factor = m.get(slot, None)
-            if other_factor is self_order[i] or other_factor is None:
-                m[slot] = self_order[i]
-            else:
-                return False
-        return m
-
-    if not isinstance(right, Factor):
-        raise TypeError(f"other must be type Factor")
-
-    matches_proxy = MappingProxyType(matches)
-
-    answers = []
-
-    for self_order in left.entity_orders:
-        for other_order in right.entity_orders:
-            if all_matches(self_order, other_order) and all_matches(
-                other_order, self_order
-            ):
-                answers.append(
-                    [
-                        all_matches(self_order, other_order),
-                        all_matches(other_order, self_order),
-                    ]
-                )
-
-    return answers
-
-
-def find_matches(
-    for_matching: Tuple[Factor],
-    need_matches: Iterable[Factor],
-    matches: Mapping[Factor, Optional[Factor]],
-    comparison: Callable[[Factor, Factor], bool],
-) -> Iterator[Mapping[Factor, Optional[Factor]]]:
-    """
-    Generator that recursively searches for a tuple of entity
-    assignments that can cause all of 'need_matches' to satisfy
-    the relation described by 'comparison' with a factor
-    from for_matching.
-
-    :param for_matching: A frozenset of all of self's factors. These
-    factors aren't removed when they're matched to a factor from other,
-    because it's possible that one factor in self could imply two
-    different factors in other.
-
-    :param need_matches: A set of factors from other that have
-    not yet been matched to any factor from self.
-
-    :param matches: A tuple showing which factors from
-    for_matching have been matched.
-
-    :param comparison: A function used to filter the for_matching
-    factors into the "available" collection. A factor must have
-    the "comparison" relation with the factor from the need_matches
-    set to be included as "available".
-
-    :returns: iterator that yields tuples of entity assignments that can
-    cause all of 'need_matches' to satisfy the relation described by
-    'comparison' with a factor from for_matching.
-    """
-
-    if not need_matches:
-        yield matches
-    else:
-        need_matches = list(need_matches)
-        n = need_matches.pop()
-        available = [a for a in for_matching if comparison(a, n)]
-        for a in available:
-            matches_found = check_entity_consistency(n, a, matches)
-            for source_list in matches_found:
-                if comparison == operator.le:
-                    matches_next = source_list[1]
-                else:
-                    matches_next = source_list[0]
-                for m in find_matches(
-                    for_matching,
-                    tuple(need_matches),
-                    MappingProxyType(matches_next),
-                    comparison,
-                ):
-                    yield m
-
-
 STANDARDS_OF_PROOF = {
     "scintilla of evidence": 1,
     "preponderance of evidence": 2,
     "clear and convincing": 3,
     "beyond reasonable doubt": 4,
 }
-
 
 @dataclass(frozen=True)
 class Fact(Factor):

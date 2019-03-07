@@ -10,8 +10,6 @@ from rules import Procedure, Rule, ProceduralRule, evolve_match_list
 from opinions import Opinion
 from spoke import Predicate, Factor, Fact
 from spoke import ureg, Q_
-from spoke import check_entity_consistency
-from spoke import find_matches
 
 
 class TestFacts:
@@ -54,6 +52,8 @@ class TestFacts:
         assert "<Hideaway Lodge> was a motel" in str(watt_factor["f1"])
         assert "the absence of the fact" in str(watt_factor["f3_absent"])
 
+    def test_string_no_truth_value(self, watt_factor):
+        assert "whether" in str(watt_factor["f2_no_truth"])
     def test_string_representation_with_concrete_entities(self, watt_factor):
         """
         "Hideaway Lodge" is still a string representation of an Entity
@@ -309,6 +309,10 @@ class TestFacts:
     def test_factor_implies_because_of_exact_quantity(self, watt_factor):
         assert watt_factor["f8_exact"] > watt_factor["f7"]
         assert watt_factor["f8_exact"] >= watt_factor["f8"]
+
+    def test_no_implication_pint_quantity_and_int(self, watt_factor):
+        assert not watt_factor["f8"] > watt_factor["f8_int"]
+        assert not watt_factor["f8"] < watt_factor["f8_int"]
 
     def test_absent_factor_implies_absent_factor_with_greater_quantity(
         self, watt_factor

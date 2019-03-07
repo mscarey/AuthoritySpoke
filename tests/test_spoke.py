@@ -14,9 +14,6 @@ from rules import Procedure, Rule, ProceduralRule, evolve_match_list
 from opinions import Opinion
 from spoke import Predicate, Factor, Fact
 from spoke import ureg, Q_
-from spoke import check_entity_consistency  # move this back into a class?
-from spoke import find_matches
-
 
 class TestEntities:
     def test_conversion_to_generic(self, make_entity):

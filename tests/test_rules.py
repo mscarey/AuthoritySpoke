@@ -8,9 +8,6 @@ from rules import Procedure, Rule, ProceduralRule, evolve_match_list
 from opinions import Opinion
 from spoke import Predicate, Factor, Fact
 from spoke import ureg, Q_
-from spoke import check_entity_consistency
-from spoke import find_matches
-
 
 class TestProcedures:
     def test_exception_for_wrong_type_for_procedure(self, make_predicate):
