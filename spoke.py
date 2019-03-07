@@ -852,27 +852,6 @@ class Fact(Factor):
         for context in context_factors:
             yield context
 
-    def make_abstract(self, entity_slots: Iterable[Factor]) -> "Fact":
-        """
-        Creates a new Fact object, this time with numbered
-        entity slots instead of actual entities. The indices of
-        the Entities in entity_slots correspond to the numbers
-        that will be assigned to the slots in the new object's
-        self.entity_context.
-        """
-
-        if any(not isinstance(s, Factor) for s in entity_slots):
-            raise TypeError(
-                "entity_slots must be an interable containing only Factor objects."
-            )
-        if any(e not in entity_slots for e in self.entity_context):
-            raise ValueError(
-                f"Every entity in self.entity_context must be present in "
-                + f"entity_slots, but {e} is missing."
-            )
-        slots = [entity_slots.index(e) for e in self.entity_context]
-        return Fact(self.predicate, tuple(slots), self.absent, self.standard_of_proof)
-
     def new_context(
         self,
         entity_context: Union[Iterable[int], Iterable[Factor]],
