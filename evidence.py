@@ -163,12 +163,14 @@ class Evidence(Factor):
 
     def __str__(self):
         if self.exhibit:
-            s = str(self.exhibit)
+            string = str(self.exhibit)
         else:
-            s = self.__class__.__name__
+            string = self.__class__.__name__
         if self.to_effect:
-            s += f", which supports {str(self.to_effect)}"
-        return s
+            string += f", which supports {str(self.to_effect)}"
+        if self.generic:
+            return f"<{string}>"
+        return string
 
     def __eq__(self, other):
         if not isinstance(other, self.__class__):

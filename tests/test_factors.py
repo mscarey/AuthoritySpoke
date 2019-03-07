@@ -74,7 +74,7 @@ class TestFacts:
         d = make_entity["watt"]
         fact = Fact.new(predicate=make_predicate["p2"], entity_context=(d, motel))
         assert "<Wattenburg> operated and lived at Hideaway Lodge" in str(fact)
-        assert "<Wattenburg> operated and lived at <Hideaway Lodge>" in str(
+        assert "<Wattenburg> operated and lived at Hideaway Lodge>" in str(
             fact.make_generic()
         )
 

@@ -614,17 +614,21 @@ class Fact(Factor):
 
     def __str__(self):
         if self.name:
-            return self.name
-        predicate = str(self.predicate.content_with_entities(self.entity_context))
-        standard = (
-            f" by the standard {self.standard_of_proof},"
-            if self.standard_of_proof
-            else ""
-        )
-        return (
-            f"{'the absence of ' if self.absent else ''}the fact"
-            + f"{standard} {predicate}"
-        )
+            string = self.name
+        else:
+            predicate = str(self.predicate.content_with_entities(self.entity_context))
+            standard = (
+                f" by the standard {self.standard_of_proof},"
+                if self.standard_of_proof
+                else ""
+            )
+            string = (
+                f"{'the absence of ' if self.absent else ''}the fact"
+                + f"{standard} {predicate}"
+            )
+        if self.generic:
+            return f"<{string}>"
+        return string
 
     def entity_orders(self):
         """
@@ -689,20 +693,19 @@ class Fact(Factor):
 
     def make_generic(self) -> "Fact":
         """
-        This changes generic to True and calls make_generic recursively
-        on all the Factors in entity_context. But it does preserve the
-        predicate attribute. For a Fact with no features specified, use:
-
-        Fact(generic=True)
+        This returns a new object changing generic to True. But it does
+        preserve the predicate attribute.
+        For a Fact with no features specified, use: Fact(generic=True)
         """
-        new_context = tuple([f.make_generic() for f in self.entity_context])
+
         return Fact(
             predicate=self.predicate,
-            entity_context=new_context,
-            standard_of_proof=None,
+            entity_context=self.entity_context,
+            standard_of_proof=self.standard_of_proof,
             absent=self.absent,
             generic=True,
         )
+
 
     def generic_factors(self) -> Iterable[Factor]:
         """Returns an iterable of self's generic Factors,
