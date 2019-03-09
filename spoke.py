@@ -39,6 +39,7 @@ def compare_dict_for_identical_entries(left, right):
         for l_key in left
     )
 
+
 @dataclass(frozen=True)
 class Factor:
     """A factor is something used to determine the applicability of a legal
@@ -81,7 +82,7 @@ class Factor:
 
     def context_register(
         self, other: "Factor", comparison: Callable
-    ) -> Iterator[Optional[Dict["Factor", "Factor"]]]:
+    ) -> Iterator[Dict["Factor", "Factor"]]:
         """Searches through the context factors of self and other, making
         a list of dicts, where each dict is a valid way to make matches between
         corresponding factors. The dict is empty if there are no matches."""
@@ -91,8 +92,23 @@ class Factor:
         elif self.generic or other.generic:
             yield {self: other, other: self}
         else:
-            for register in self._compare_factor_attributes(other, comparison):
-                yield register
+            already_returned: List[Dict["Factor", "Factor"]] = []
+            updated_mappings = iter(
+                self._update_mapping(
+                    {}, self.context_factors, other.context_factors, comparison
+                )
+            )
+            for next_registry in updated_mappings:
+                if next_registry and next_registry not in already_returned:
+                    already_returned.append(next_registry)
+                    yield next_registry
+                for replacement_dict in self.interchangeable_factors:
+                    changed_registry = next_registry.copy()
+                    for key in replacement_dict:
+                        changed_registry[key] = replacement_dict[key]
+                    if changed_registry not in already_returned:
+                        already_returned.append(next_registry)
+                        yield next_registry
 
     @staticmethod
     def sort_in_tuple(item) -> Tuple["Factor", ...]:
@@ -516,9 +532,7 @@ class Predicate:
         }
         return f"{expand[comparison]} {self.quantity}"
 
-    def content_with_entities(
-        self, entities: Union[Factor, Sequence[Factor]]
-    ) -> str:
+    def content_with_entities(self, entities: Union[Factor, Sequence[Factor]]) -> str:
         """Creates a sentence by substituting the names of entities
         from a particular case into the predicate_with_truth."""
 
@@ -545,12 +559,14 @@ class Predicate:
             quantity=self.quantity,
         )
 
+
 STANDARDS_OF_PROOF = {
     "scintilla of evidence": 1,
     "preponderance of evidence": 2,
     "clear and convincing": 3,
     "beyond reasonable doubt": 4,
 }
+
 
 @dataclass(frozen=True)
 class Fact(Factor):
@@ -630,7 +646,23 @@ class Fact(Factor):
             return f"<{string}>"
         return string
 
-    def entity_orders(self):
+    @property
+    def context_factors(self) -> Tuple[Factor, ...]:
+        """
+        This function and interchangeable_factors should be the only parts
+        of the context-matching process that need to be unique for each
+        subclass of Factor. It specifies what attributes of self and other
+        to look in to find Factor objects to match.
+
+        For Fact, it returns the entity_context, which can't contain None.
+        Other classes should need the annotation Tuple[Optional[Factor], ...]
+        instead.
+        """
+
+        return self.entity_context
+
+    @property
+    def interchangeable_factors(self) -> List[Dict[Factor, Factor]]:
         """
         Yields the ways the context factors referenced by the Fact object
         can be reordered without changing the truth value of the Fact.
@@ -638,37 +670,19 @@ class Fact(Factor):
         make any context factors interchangeable, or if the "reciprocal" flag
         is set, in a way that allows only the first two context factors to switch
         places.
+
+        Each dict returned has factors to replace as keys, and factors to
+        replace them with as values. If there's more than one way to
+        rearrange the context factors, more than one dict should be returned.
         """
-        yield self.entity_context
-        if self.predicate.reciprocal:
-            yield (self.entity_context[1], self.entity_context[0]) + (
-                self.entity_context[2:]
-            )
-
-    def _compare_factor_attributes(self, other, comparison):
-        """
-        This function should be the only part of the context-matching
-        process that needs to be unique for each subclass of Factor.
-        It specifies what attributes of self and other to look in to find
-        Factor objects to match.
-
-        For Fact, it creates zero or more updated mappings for each
-        other_order in other.entity_orders. Each time, it starts with mapping,
-        and updates it with matches from self.entity_context and other_order.
-        """  # TODO: docstring
-
-        already_returned = []
-        self_orders = iter(self.entity_orders())
-        for self_order in self_orders:
-            other_orders = iter(other.entity_orders())
-            for other_order in other_orders:
-                updated_mappings = iter(
-                    self._update_mapping({}, self_order, other_order, comparison)
-                )
-                for next_registry in updated_mappings:
-                    if next_registry and next_registry not in already_returned:
-                        already_returned.append(next_registry)
-                        yield next_registry
+        if self.predicate and self.predicate.reciprocal:
+            return [
+                {
+                    self.entity_context[1]: self.entity_context[0],
+                    self.entity_context[0]: self.entity_context[1],
+                }
+            ]
+        return []
 
     def __eq__(self, other: Factor) -> bool:
         if not isinstance(other, Factor):
@@ -705,7 +719,6 @@ class Fact(Factor):
             absent=self.absent,
             generic=True,
         )
-
 
     def generic_factors(self) -> Iterable[Factor]:
         """Returns an iterable of self's generic Factors,

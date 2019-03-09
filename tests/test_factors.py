@@ -87,11 +87,8 @@ class TestFacts:
         Instead, Fact.entity_orders() returns every possible order."""
 
         motel_near_watt = watt_factor["f7_swap_entities_4"]
-        assert len(tuple(motel_near_watt.entity_orders())) == 2
-        assert (
-            make_entity["motel_specific"],
-            make_entity["watt"],
-        ) in motel_near_watt.entity_orders()
+        assert len(motel_near_watt.interchangeable_factors[0]) == 2
+        assert make_entity["motel_specific"] in motel_near_watt.interchangeable_factors[0]
 
     def test_predicate_with_entities(self, make_entity, watt_factor):
         assert (
