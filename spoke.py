@@ -103,35 +103,42 @@ class Factor:
         elif self.generic or other.generic:
             yield {self: other, other: self}
         else:
-            for registry in self.compare_factors(
+            for registry in self.update_mapping(
                 {}, self.context_factors, other.context_factors, comparison
             ):
                 yield registry
 
-    def compare_factors(
-        self,
-        matches: Dict["Factor", "Factor"],
-        self_factors: Tuple["Factor", ...],
-        other_factors: Tuple["Factor", ...],
-        comparison: Callable,
+    def registers_for_interchangeable_context(
+        self, other: "Factor", matches: Dict["Factor", "Factor"]
     ) -> Iterator[Dict["Factor", "Factor"]]:
-        already_returned: List[Dict["Factor", "Factor"]] = []
-        updated_mappings = iter(
-            self._update_mapping(
-                matches, self_factors, other_factors, comparison
-            )
-        )
-        for next_registry in updated_mappings:
-            if next_registry is not None and next_registry not in already_returned:
-                already_returned.append(next_registry)
-                yield next_registry
-            for replacement_dict in self.interchangeable_factors:
-                changed_registry = next_registry.copy()
-                for key in replacement_dict:
-                    changed_registry[key] = replacement_dict[key]
-                if changed_registry not in already_returned:
-                    already_returned.append(next_registry)
-                    yield next_registry
+        """
+        Returns context registries with every possible combination of
+        self and other's interchangeable context factors.
+        """
+        yield matches
+        already_returned: List[Dict["Factor", "Factor"]] = [matches]
+        for replacement_dict in self.interchangeable_factors:
+            changed_registry = matches.copy()
+            for key in replacement_dict:
+                changed_registry[key] = replacement_dict[key]
+            if changed_registry not in already_returned:
+                already_returned.append(changed_registry)
+                yield changed_registry
+            # same thing with other factor
+        if other:
+            for other_replacement_dict in other.interchangeable_factors:
+                # assumes changed_registry was created only once
+                for used_registry in (matches, changed_registry):
+                    other_keys = used_registry.keys()
+                    other_values = used_registry.values()
+                    other_values = [
+                        other_replacement_dict.get(factor) or factor
+                        for factor in other_values
+                    ]
+                    other_registry = dict(zip(other_keys, other_values))
+                    if other_registry not in already_returned:
+                        already_returned.append(other_registry)
+                        yield other_registry
 
     @staticmethod
     def sort_in_tuple(item) -> Tuple["Factor", ...]:
@@ -199,7 +206,7 @@ class Factor:
                     self_mapping[in_value] = in_key
         return self_mapping
 
-    def _update_mapping(
+    def update_mapping(
         self,
         self_mapping_proxy: Mapping,
         self_factors: Tuple["Factor"],
@@ -254,11 +261,16 @@ class Factor:
                         )
                     )
                     for incoming_register in register_iter:
-                        updated_mapping = self._import_to_mapping(
-                            mapping, incoming_register
-                        )
-                        if updated_mapping not in new_mapping_choices:
-                            new_mapping_choices.append(updated_mapping)
+                        for transposed_register in self_factors[
+                            index
+                        ].registers_for_interchangeable_context(
+                            other_factors[index], incoming_register
+                        ):
+                            updated_mapping = self._import_to_mapping(
+                                mapping, transposed_register
+                            )
+                            if updated_mapping not in new_mapping_choices:
+                                new_mapping_choices.append(updated_mapping)
         for choice in new_mapping_choices:
             yield choice
 
