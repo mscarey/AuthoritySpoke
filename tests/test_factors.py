@@ -207,6 +207,33 @@ class TestFacts:
         )
         assert mapping[watt_factor["f7"]] == watt_factor["f7"]
 
+    def test_registers_for_interchangeable_context(self, make_entity, watt_factor):
+        """
+        The entity equality test is causing Python to think the
+        correct object is in the output when it isn't.
+        It's probably also the issue preventing the correct object
+        from being in the output.
+
+        Try putting Entity's custom hash method back? Will that help?
+        """
+
+        matches = {
+            make_entity["motel"]: make_entity["trees"],
+            make_entity["trees"]: make_entity["motel"],
+            make_entity["watt"]: make_entity["watt"],
+        }
+        new_matches = [match for match in
+            watt_factor["f7"].registers_for_interchangeable_context(
+                watt_factor["f7_swap_entities"], matches
+            )
+        ]
+        print("breakpoint allowed here")
+        assert {
+            make_entity["trees"]: make_entity["trees"],
+            make_entity["motel"]: make_entity["motel"],
+            make_entity["watt"]: make_entity["watt"],
+        } in new_matches
+
     # Equality
 
     def test_equality_factor_from_same_predicate(self, watt_factor):
