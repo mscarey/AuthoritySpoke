@@ -54,6 +54,7 @@ class TestFacts:
 
     def test_string_no_truth_value(self, watt_factor):
         assert "whether" in str(watt_factor["f2_no_truth"])
+
     def test_string_representation_with_concrete_entities(self, watt_factor):
         """
         "Hideaway Lodge" is still a string representation of an Entity
@@ -88,7 +89,9 @@ class TestFacts:
 
         motel_near_watt = watt_factor["f7_swap_entities_4"]
         assert len(motel_near_watt.interchangeable_factors[0]) == 2
-        assert make_entity["motel_specific"] in motel_near_watt.interchangeable_factors[0]
+        assert (
+            make_entity["motel_specific"] in motel_near_watt.interchangeable_factors[0]
+        )
 
     def test_predicate_with_entities(self, make_entity, watt_factor):
         assert (
@@ -397,7 +400,9 @@ class TestFacts:
         left = make_factor["f_irrelevant_3"]
         right = make_factor["f_irrelevant_3_new_context"]
         e = make_entity
-        easy_update = left._update_mapping({e["dan"]: e["craig"]}, left, right, operator.eq)
+        easy_update = left._update_mapping(
+            {e["dan"]: e["craig"]}, left, right, operator.eq
+        )
         harder_update = left._update_mapping(
             {
                 e["alice"]: e["bob"],
@@ -422,7 +427,6 @@ class TestFacts:
         )
         assert not any(register is not None for register in update)
 
-
     def test_entity_consistency_identity_not_equality(self, make_entity, make_factor):
 
         update = make_factor["f_irrelevant_3"]._update_mapping(
@@ -442,10 +446,10 @@ class TestFacts:
         """
         m = make_factor
         update = make_factor["f_irrelevant_3"]._update_mapping(
-                {make_entity["dan"]: make_entity["dan"]},
-                m["f_irrelevant_3"],
-                make_predicate["p2"],
-                operator.gt,
-            )
+            {make_entity["dan"]: make_entity["dan"]},
+            m["f_irrelevant_3"],
+            make_predicate["p2"],
+            operator.gt,
+        )
         with pytest.raises(TypeError):
             any(register is not None for register in update)

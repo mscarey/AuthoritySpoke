@@ -110,7 +110,7 @@ class Factor:
                 )
             )
             for next_registry in updated_mappings:
-                if next_registry and next_registry not in already_returned:
+                if next_registry is not None and next_registry not in already_returned:
                     already_returned.append(next_registry)
                     yield next_registry
                 for replacement_dict in self.interchangeable_factors:
