@@ -81,7 +81,7 @@ class Factor:
         return self.__class__(**new_attrs)
 
     @property
-    def interchangeable_factors(self) -> List[Dict['Factor', 'Factor']]:
+    def interchangeable_factors(self) -> List[Dict["Factor", "Factor"]]:
         """
         Yields the ways the context factors referenced by the Factor object
         can be reordered without changing the truth value of the Factor.
@@ -103,23 +103,35 @@ class Factor:
         elif self.generic or other.generic:
             yield {self: other, other: self}
         else:
-            already_returned: List[Dict["Factor", "Factor"]] = []
-            updated_mappings = iter(
-                self._update_mapping(
-                    {}, self.context_factors, other.context_factors, comparison
-                )
+            for registry in self.compare_factors(
+                {}, self.context_factors, other.context_factors, comparison
+            ):
+                yield registry
+
+    def compare_factors(
+        self,
+        matches: Dict["Factor", "Factor"],
+        self_factors: Tuple["Factor", ...],
+        other_factors: Tuple["Factor", ...],
+        comparison: Callable,
+    ) -> Iterator[Dict["Factor", "Factor"]]:
+        already_returned: List[Dict["Factor", "Factor"]] = []
+        updated_mappings = iter(
+            self._update_mapping(
+                matches, self_factors, other_factors, comparison
             )
-            for next_registry in updated_mappings:
-                if next_registry is not None and next_registry not in already_returned:
+        )
+        for next_registry in updated_mappings:
+            if next_registry is not None and next_registry not in already_returned:
+                already_returned.append(next_registry)
+                yield next_registry
+            for replacement_dict in self.interchangeable_factors:
+                changed_registry = next_registry.copy()
+                for key in replacement_dict:
+                    changed_registry[key] = replacement_dict[key]
+                if changed_registry not in already_returned:
                     already_returned.append(next_registry)
                     yield next_registry
-                for replacement_dict in self.interchangeable_factors:
-                    changed_registry = next_registry.copy()
-                    for key in replacement_dict:
-                        changed_registry[key] = replacement_dict[key]
-                    if changed_registry not in already_returned:
-                        already_returned.append(next_registry)
-                        yield next_registry
 
     @staticmethod
     def sort_in_tuple(item) -> Tuple["Factor", ...]:
