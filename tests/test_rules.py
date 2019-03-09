@@ -646,7 +646,7 @@ class TestRules:
     # Enactments cited in Rules
 
     def test_single_enactment_converted_to_frozenset(self, make_holding):
-        assert isinstance(make_holding["h2"].enactments, frozenset)
+        assert isinstance(make_holding["h2"].enactments, tuple)
 
     def test_holdings_citing_different_enactment_text_unequal(self, make_holding):
         assert make_holding["h2"] != make_holding["h2_fourth_a_cite"]

@@ -40,17 +40,20 @@ class Exhibit(Factor):
         """Placeholder for normalizing inputs before initializing."""
         return cls(form, statement, stated_by, name, absent, generic)
 
-    def _compare_factor_attributes(self, other, comparison):
+    @property
+    def context_factors(self) -> Tuple[Optional[Fact], Optional[Entity]]:
         """
-        This function should be the only part of the context-matching
-        process that needs to be unique for each subclass of Factor.
-        It specifies what attributes of self and other to look in to find
-        Factor objects to match.
-        """
-        self_attributes = (self.statement, self.stated_by)
-        other_attributes = (other.statement, other.stated_by)
+        This function and interchangeable_factors should be the only parts
+        of the context-matching process that need to be unique for each
+        subclass of Factor. It specifies what attributes of self and other
+        to look in to find Factor objects to match.
 
-        return self._update_mapping({}, self_attributes, other_attributes, comparison)
+        For Fact, it returns the entity_context, which can't contain None.
+        Other classes should need the annotation Tuple[Optional[Factor], ...]
+        instead.
+        """
+
+        return (self.statement, self.stated_by)
 
     def __eq__(self, other: Factor) -> bool:
         if self.__class__ != other.__class__:
@@ -195,6 +198,21 @@ class Evidence(Factor):
     def __gt__(self, other):
         return self >= other and self != other
 
+    @property
+    def context_factors(self) -> Tuple[Optional[Exhibit], Optional[Fact]]:
+        """
+        This function and interchangeable_factors should be the only parts
+        of the context-matching process that need to be unique for each
+        subclass of Factor. It specifies what attributes of self and other
+        to look in to find Factor objects to match.
+
+        For Fact, it returns the entity_context, which can't contain None.
+        Other classes should need the annotation Tuple[Optional[Factor], ...]
+        instead.
+        """
+
+        return (self.exhibit, self.to_effect)
+
     def generic_factors(self) -> Iterable[Factor]:
         """Returns an iterable of self's generic Factors,
         which must be matched to other generic Factors to
@@ -203,25 +221,13 @@ class Evidence(Factor):
         if self.generic:
             yield self
         else:
-            collected_factors = [
-                generic
-                for factor in (self.to_effect, self.exhibit)
-                for generic in factor.generic_factors()
-            ]
-            for output in set(collected_factors):
+            collected_factors = []
+            for factor in (self.to_effect, self.exhibit):
+                if factor:
+                    for generic in factor.generic_factors():
+                        collected_factors.append(generic)
+            for output in collected_factors:
                 yield output
-
-    def _compare_factor_attributes(self, other, comparison):
-        """
-        This function should be the only part of the context-matching
-        process that needs to be unique for each subclass of Factor.
-        It specifies what attributes of self and other to look in to find
-        Factor objects to match.
-        """
-        self_attributes = (self.exhibit, self.to_effect)
-        other_attributes = (other.exhibit, other.to_effect)
-
-        return self._update_mapping({}, self_attributes, other_attributes, comparison)
 
     def implies_if_present(self, other: Factor):
         """Determines whether self would imply other assuming

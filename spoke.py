@@ -80,6 +80,17 @@ class Factor:
         new_attrs["absent"] = not new_attrs["absent"]
         return self.__class__(**new_attrs)
 
+    @property
+    def interchangeable_factors(self) -> List[Dict['Factor', 'Factor']]:
+        """
+        Yields the ways the context factors referenced by the Factor object
+        can be reordered without changing the truth value of the Factor.
+
+        This is the default version for subclasses that don't have any
+        interchangeable context factors.
+        """
+        return []
+
     def context_register(
         self, other: "Factor", comparison: Callable
     ) -> Iterator[Dict["Factor", "Factor"]]:
