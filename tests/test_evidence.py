@@ -10,7 +10,7 @@ import pytest
 from enactments import Code, Enactment
 from entities import Entity, Human
 from evidence import Evidence, Exhibit
-from rules import Procedure, Rule, ProceduralRule, evolve_match_list
+from rules import Procedure, Rule, ProceduralRule
 from opinions import Opinion
 from spoke import Predicate, Factor, Fact
 from spoke import ureg, Q_

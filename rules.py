@@ -21,34 +21,6 @@ class Comparison(NamedTuple):
     relation: Callable
 
 
-def evolve_match_list(
-    available: Iterable[Factor],
-    need_matches: Iterable[Factor],
-    relation: Callable[[Factor, Factor], bool],
-    prior_matches: List[Dict[Factor, Optional[Factor]]],
-) -> List[Dict[Factor, Optional[Factor]]]:
-
-    """
-    Takes all the tuples of entity assignments in prior_matches, and
-    updates them with every consistent tuple of entity assignments
-    that would cause every Factor in need_matches to be related to
-    a Factor in "available" by the relation described by "relation".
-    """  # TODO: update docstring
-
-    if isinstance(available, Factor):
-        available = (available,)
-    if isinstance(need_matches, Factor):
-        need_matches = (need_matches,)
-
-    new_matches = []
-    for m in prior_matches:
-        for y in find_matches(available, need_matches, MappingProxyType(m), relation):
-            y = dict(y)
-            if all(existing_dict != y for existing_dict in new_matches):
-                new_matches.append(y)
-    return new_matches
-
-
 @dataclass(frozen=True)
 class Procedure(Factor):
     """A (potential) rule for courts to use in resolving litigation. Described in
