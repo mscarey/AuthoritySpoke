@@ -381,6 +381,9 @@ class TestFacts:
     def test_factor_different_predicate_truth_contradicts(self, watt_factor):
         assert watt_factor["f7"].contradicts(watt_factor["f7_opposite"])
 
+    def test_same_predicate_true_vs_false(self, watt_factor):
+        assert watt_factor["f10"].contradicts(watt_factor["f10_false"])
+
     def test_factor_does_not_contradict_predicate(self, make_predicate, watt_factor):
         with pytest.raises(TypeError):
             _ = watt_factor["f7"].contradicts(make_predicate["p7_true"])
@@ -413,6 +416,7 @@ class TestFacts:
 
     def test_no_contradiction_of_None(self, watt_factor):
         assert not watt_factor["f1"].contradicts(None)
+
 
     # Consistency with Entity/Factor assignments
 
