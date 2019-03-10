@@ -118,17 +118,24 @@ class Factor:
         yield matches
         already_returned: List[Dict["Factor", "Factor"]] = [matches]
         for replacement_dict in self.interchangeable_factors:
-            changed_registry = matches.copy()
-            for key in replacement_dict:
-                changed_registry[key] = replacement_dict[key]
-            if changed_registry not in already_returned:
+            self_keys = matches.keys()
+            self_values = matches.values()
+            self_keys = [
+                replacement_dict.get(factor) or factor
+                for factor in self_keys
+            ]
+            changed_registry = dict(zip(self_keys, self_values))
+            if not any(
+                compare_dict_for_identical_entries(changed_registry, returned_dict)
+                for returned_dict in already_returned
+            ):
                 already_returned.append(changed_registry)
                 yield changed_registry
-            # same thing with other factor
+        # Unclear whether it's ever necessary to switch values from
+        # other as well as keys from self
         if other:
             for other_replacement_dict in other.interchangeable_factors:
-                # assumes changed_registry was created only once
-                for used_registry in (matches, changed_registry):
+                for used_registry in already_returned.copy():
                     other_keys = used_registry.keys()
                     other_values = used_registry.values()
                     other_values = [
@@ -136,7 +143,12 @@ class Factor:
                         for factor in other_values
                     ]
                     other_registry = dict(zip(other_keys, other_values))
-                    if other_registry not in already_returned:
+                    if not any(
+                        compare_dict_for_identical_entries(
+                            other_registry, returned_dict
+                        )
+                        for returned_dict in already_returned
+                    ):
                         already_returned.append(other_registry)
                         yield other_registry
 
