@@ -111,6 +111,9 @@ class TestExhibits:
             make_exhibit["no_shooting_witness_unknown_testimony"]
         )
 
+    def test_more_specific_contradicts_absent(self, make_exhibit):
+        assert make_exhibit["reciprocal_testimony_absent"].contradicts(make_exhibit["reciprocal_testimony_specific"])
+        assert make_exhibit["reciprocal_testimony_specific"].contradicts(make_exhibit["reciprocal_testimony_absent"])
 
 class TestEvidence:
     def test_make_evidence_object(self, watt_factor):

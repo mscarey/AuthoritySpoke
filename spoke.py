@@ -28,18 +28,6 @@ OPPOSITE_COMPARISONS = {
 }
 
 
-def compare_dict_for_identical_entries(left, right):
-    """Compares two dicts to see whether the
-    keys and values of one are the same objects
-    as the keys and values of the other, not just
-    whether they evaluate equal."""
-
-    return all(
-        any((l_key is r_key and left[l_key] is right[r_key]) for r_key in right)
-        for l_key in left
-    )
-
-
 @dataclass(frozen=True)
 class Factor:
     """A factor is something used to determine the applicability of a legal
@@ -112,7 +100,7 @@ class Factor:
         self, other: "Factor", matches: Dict["Factor", "Factor"]
     ) -> Iterator[Dict["Factor", "Factor"]]:
         """
-        Returns context registries with every possible combination of
+        Returns context registers with every possible combination of
         self and other's interchangeable context factors.
         """
 
@@ -125,6 +113,10 @@ class Factor:
                 raise ValueError("'to_replace' parameter must be 'keys' or 'values'")
             keys = matches.keys()
             values = matches.values()
+            # Consider adding a condition here to see whether the Factors to be swapped
+            # are equal or generically equal, and swap them to create a new context
+            # register only if the condition is passed.
+            # But first write a unit test to prove the condition is needed.
             if to_replace == "keys":
                 keys = [replacement_dict.get(factor) or factor for factor in keys]
             else:
@@ -259,8 +251,7 @@ class Factor:
         # why am I allowing the __len__s to be different?
         shortest = min(len(self_factors), len(other_factors))
         # The "is" comparison is for None values.
-        # TODO: Find a way to skip this step and only use the
-        # result of the incoming_registers process below
+
         if not all(
             self_factors[index] is other_factors[index]
             or comparison(self_factors[index], other_factors[index])
@@ -614,6 +605,16 @@ class Predicate:
             quantity=self.quantity,
         )
 
+def compare_dict_for_identical_entries(left: Dict[Factor, Factor], right: Dict[Factor, Factor]) -> bool:
+    """Compares two dicts to see whether the
+    keys and values of one are the same objects
+    as the keys and values of the other, not just
+    whether they evaluate equal."""
+
+    return all(
+        any((l_key is r_key and left[l_key] is right[r_key]) for r_key in right)
+        for l_key in left
+    )
 
 STANDARDS_OF_PROOF = {
     "scintilla of evidence": 1,

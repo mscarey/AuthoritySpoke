@@ -454,7 +454,12 @@ class Procedure(Factor):
             for matches in matchlist
         )
 
-    def consistent_factor_groups(self, self_factors, other_factors, matches):
+    def consistent_factor_groups(
+        self,
+        self_factors: Tuple[Factor],
+        other_factors: Tuple[Factor],
+        matches: Dict[Factor, Factor],
+    ):
         """Determines whether unassigned context factors can
         be assigned in such a way that there's no contradiction
         between any factor in self_factors and other_factors,
@@ -647,7 +652,6 @@ class ProceduralRule(Rule):
         decided: bool = True,
         generic: bool = False,
     ):
-
         def wrap_with_tuple(item):
             if isinstance(item, Iterable):
                 return tuple(item)

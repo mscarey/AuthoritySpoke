@@ -175,7 +175,7 @@ class Evidence(Factor):
             return f"<{string}>"
         return string
 
-    def __eq__(self, other):
+    def __eq__(self, other: Factor) -> bool:
         if not isinstance(other, self.__class__):
             return False
 
@@ -195,7 +195,7 @@ class Evidence(Factor):
         context_registers = iter(self.context_register(other, operator.eq))
         return any(register is not None for register in context_registers)
 
-    def __gt__(self, other):
+    def __gt__(self, other: Factor) -> bool:
         return self >= other and self != other
 
     @property
@@ -247,7 +247,7 @@ class Evidence(Factor):
         context_registers = iter(self.context_register(other, operator.ge))
         return any(register is not None for register in context_registers)
 
-    def __ge__(self, other):
+    def __ge__(self, other: Factor) -> bool:
         if not isinstance(other, Factor):
             raise TypeError(
                 f"'Implies' not supported between instances of "
@@ -289,45 +289,6 @@ class Evidence(Factor):
 
         return other > self.make_absent()
 
-    def get_entity_orders(self):
-
-        """
-        The possible entity arrangements are based on the
-        entities for the referenced Predicate statement,
-        and the integer local attributes self.stated_by
-        and self.derived_from.
-
-        Factor slots should be collected from each parameter
-        in the order they're listed:
-            self.statement_context
-            self.to_effect
-            self.stated_by
-            self.derived_from
-
-        :returns: a set of tuples indicating the ways the entities
-        could be rearranged without changing the meaning of the
-        Evidence object.
-
-        """
-        int_attrs = list(self.int_attrs) or []
-
-        if self.statement:
-            statement_orders = self.statement.entity_orders
-        else:
-            statement_orders = ((),)
-
-        if self.to_effect:
-            effect_orders = self.to_effect.entity_orders
-        else:
-            effect_orders = ((),)
-
-        entity_orders = set()
-
-        for sc in statement_orders:
-            for eo in effect_orders:
-                entity_orders.add(tuple(list(sc) + list(eo) + int_attrs))
-
-        return entity_orders
 
     def from_dict(factor: Optional[dict]) -> Optional["Evidence"]:
         if factor is None:
