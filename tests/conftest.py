@@ -240,7 +240,7 @@ def watt_factor(make_predicate, make_entity, watt_mentioned) -> Dict[str, Factor
         "f9_absent_miles": Fact.new(p["p9_miles"], absent=True, case_factors=c),
         "f9_swap_entities": Fact.new(p["p9"], (0, 2), case_factors=c),
         "f9_swap_entities_4": Fact.new(p["p9"], (1, 4), case_factors=c),
-        "f10_absent": Fact.new(p["p10"], absent=True, case_factors=c),
+        "f10_absent": Fact.new(p["p10"], (2, 0), absent=True, case_factors=c),
         "f10_false": Fact.new(p["p10_false"], (2, 0), case_factors=c),
         "f10_absent_false": Fact.new(p["p10_false"], absent=True, case_factors=c),
         "f10_swap_entities": Fact.new(p["p10"], (0, 2), case_factors=c),
