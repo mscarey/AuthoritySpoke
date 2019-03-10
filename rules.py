@@ -282,35 +282,6 @@ class Procedure(Factor):
 
         return sorted(self.factors_all(), key=repr)
 
-    def find_consistent_factors(
-        self,
-        for_matching: Tuple[Factor],
-        need_matches: Iterable[Factor],
-        matches: Mapping[Factor, Optional[Factor]],
-    ) -> Iterator[Mapping[Factor, Optional[Factor]]]:
-        """
-        Recursively searches for a list of entity assignments that can
-        cause all of 'other_factors' to not contradict any of the factors in
-        self_matches. Calls a new instance of consistent_entity_combinations
-        for each such list that is found. It finally returns
-        matchlist when all possibilities have been searched.
-        """
-
-        if not need_matches:
-            yield dict(matches)
-        else:
-            need_matches = list(need_matches)
-            n = need_matches.pop()
-            valid_combinations = n.consistent_entity_combinations(for_matching, matches)
-            for c in valid_combinations:
-                matches_next = dict(matches)
-                for i in c:
-                    matches_next[i] = c[i]
-                for m in self.find_consistent_factors(
-                    for_matching, tuple(need_matches), MappingProxyType(matches_next)
-                ):
-                    yield m
-
     def generic_factors(self) -> Iterable[Factor]:
         """Returns an iterable of self's generic Factors,
         which must be matched to other generic Factors to
