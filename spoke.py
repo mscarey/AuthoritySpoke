@@ -115,16 +115,28 @@ class Factor:
         Returns context registries with every possible combination of
         self and other's interchangeable context factors.
         """
+
+        def replace_factors_in_dict(
+            matches: Dict["Factor", "Factor"],
+            replacement_dict: Dict["Factor", "Factor"],
+            to_replace: str = "keys",
+        ):
+            if to_replace not in ("keys", "values"):
+                raise ValueError("'to_replace' parameter must be 'keys' or 'values'")
+            keys = matches.keys()
+            values = matches.values()
+            if to_replace == "keys":
+                keys = [replacement_dict.get(factor) or factor for factor in keys]
+            else:
+                values = [replacement_dict.get(factor) or factor for factor in values]
+            return dict(zip(keys, values))
+
         yield matches
         already_returned: List[Dict["Factor", "Factor"]] = [matches]
         for replacement_dict in self.interchangeable_factors:
-            self_keys = matches.keys()
-            self_values = matches.values()
-            self_keys = [
-                replacement_dict.get(factor) or factor
-                for factor in self_keys
-            ]
-            changed_registry = dict(zip(self_keys, self_values))
+            changed_registry = replace_factors_in_dict(
+                matches, replacement_dict, "keys"
+            )
             if not any(
                 compare_dict_for_identical_entries(changed_registry, returned_dict)
                 for returned_dict in already_returned
@@ -132,17 +144,13 @@ class Factor:
                 already_returned.append(changed_registry)
                 yield changed_registry
         # Unclear whether it's ever necessary to switch values from
-        # other as well as keys from self
+        # other as well as keys from self. If not, function could end here.
         if other:
             for other_replacement_dict in other.interchangeable_factors:
                 for used_registry in already_returned.copy():
-                    other_keys = used_registry.keys()
-                    other_values = used_registry.values()
-                    other_values = [
-                        other_replacement_dict.get(factor) or factor
-                        for factor in other_values
-                    ]
-                    other_registry = dict(zip(other_keys, other_values))
+                    other_registry = replace_factors_in_dict(
+                        used_registry, other_replacement_dict, "values"
+                    )
                     if not any(
                         compare_dict_for_identical_entries(
                             other_registry, returned_dict
