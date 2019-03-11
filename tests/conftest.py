@@ -35,134 +35,134 @@ def make_entity() -> Dict[str, Entity]:
 def make_predicate() -> Dict[str, Predicate]:
 
     return {
-        "p1": Predicate.new("{} was a motel"),
-        "p1_again": Predicate.new("{} was a motel"),
-        "p2": Predicate.new("{} operated and lived at {}"),
-        "p2_reciprocal": Predicate.new("{} operated and lived at {}", reciprocal=True),
-        "p2_no_truth": Predicate.new("{} operated and lived at {}", truth=None),
-        "p2_false": Predicate.new("{} operated and lived at {}", truth=False),
-        "p3": Predicate.new("{} was {}’s abode"),
-        "p3_false": Predicate.new("{} was {}’s abode", truth=False),
-        "p4": Predicate.new("{} was on the premises of {}"),
-        "p5": Predicate.new("{} was a stockpile of Christmas trees"),
-        "p6": Predicate.new("{} was among some standing trees"),
-        "p7": Predicate.new(
+        "p1": Predicate("{} was a motel"),
+        "p1_again": Predicate("{} was a motel"),
+        "p2": Predicate("{} operated and lived at {}"),
+        "p2_reciprocal": Predicate("{} operated and lived at {}", reciprocal=True),
+        "p2_no_truth": Predicate("{} operated and lived at {}", truth=None),
+        "p2_false": Predicate("{} operated and lived at {}", truth=False),
+        "p3": Predicate("{} was {}’s abode"),
+        "p3_false": Predicate("{} was {}’s abode", truth=False),
+        "p4": Predicate("{} was on the premises of {}"),
+        "p5": Predicate("{} was a stockpile of Christmas trees"),
+        "p6": Predicate("{} was among some standing trees"),
+        "p7": Predicate(
             "the distance between {} and {} was {}",
             truth=False,
             reciprocal=True,
             comparison=">",
             quantity=Q_("35 feet"),
         ),
-        "p7_obverse": Predicate.new(
+        "p7_obverse": Predicate(
             "the distance between {} and {} was {}",
             truth=True,
             reciprocal=True,
             comparison="<=",
             quantity=Q_("35 feet"),
         ),
-        "p7_opposite": Predicate.new(
+        "p7_opposite": Predicate(
             "the distance between {} and {} was {}",
             truth=True,
             reciprocal=True,
             comparison=">",
             quantity=Q_("35 feet"),
         ),
-        "p7_true": Predicate.new(
+        "p7_true": Predicate(
             "the distance between {} and {} was {}",
             truth=True,
             reciprocal=True,
             comparison="<",
             quantity=Q_("35 feet"),
         ),
-        "p8": Predicate.new(
+        "p8": Predicate(
             "the distance between {} and {} was {}",
             reciprocal=True,
             comparison=">=",
             quantity=Q_("20 feet"),
         ),
-        "p8_exact": Predicate.new(
+        "p8_exact": Predicate(
             "the distance between {} and {} was {}",
             reciprocal=True,
             comparison="=",
             quantity=Q_("25 feet"),
         ),
-        "p8_less": Predicate.new(
+        "p8_less": Predicate(
             "the distance between {} and {} was {}",
             reciprocal=True,
             comparison="<=",
             quantity=Q_("20 feet"),
         ),
-        "p8_meters": Predicate.new(
+        "p8_meters": Predicate(
             "the distance between {} and {} was {}",
             reciprocal=True,
             comparison=">=",
             quantity=Q_("10 meters"),
         ),
-        "p8_int": Predicate.new(
+        "p8_int": Predicate(
             "the distance between {} and {} was {}",
             reciprocal=True,
             comparison=">=",
             quantity=20,
         ),
-        "p8_float": Predicate.new(
+        "p8_float": Predicate(
             "the distance between {} and {} was {}",
             reciprocal=True,
             comparison=">=",
             quantity=20.0,
         ),
-        "p8_higher_int": Predicate.new(
+        "p8_higher_int": Predicate(
             "the distance between {} and {} was {}",
             reciprocal=True,
             comparison=">=",
             quantity=30,
         ),
-        "p9": Predicate.new(
+        "p9": Predicate(
             "the distance between {} and a parking area used by personnel and patrons of {} was {}",
             comparison="<=",
             quantity=Q_("5 feet"),
         ),
-        "p9_miles": Predicate.new(
+        "p9_miles": Predicate(
             "the distance between {} and a parking area used by personnel and patrons of {} was {}",
             comparison="<=",
             quantity=Q_("5 miles"),
         ),
-        "p9_acres": Predicate.new(
+        "p9_acres": Predicate(
             "the distance between {} and a parking area used by personnel and patrons of {} was {}",
             comparison="<=",
             quantity=Q_("5 acres"),
         ),
-        "p10": Predicate.new("{} was within the curtilage of {}"),
-        "p10_false": Predicate.new("{} was within the curtilage of {}", truth=False),
-        "p11": Predicate.new("{} was a warrantless search and seizure"),
-        "p12": Predicate.new("{} was performed by federal law enforcement officers"),
-        "p13": Predicate.new("{} constituted an intrusion upon {}"),
-        "p14": Predicate.new("{} sought to preserve {} as private"),
-        "p15": Predicate.new("{} was in an area adjacent to {}"),
-        "p16": Predicate.new("{} was in an area accessible to the public"),
-        "p17": Predicate.new(
+        "p10": Predicate("{} was within the curtilage of {}"),
+        "p10_false": Predicate("{} was within the curtilage of {}", truth=False),
+        "p11": Predicate("{} was a warrantless search and seizure"),
+        "p12": Predicate("{} was performed by federal law enforcement officers"),
+        "p13": Predicate("{} constituted an intrusion upon {}"),
+        "p14": Predicate("{} sought to preserve {} as private"),
+        "p15": Predicate("{} was in an area adjacent to {}"),
+        "p16": Predicate("{} was in an area accessible to the public"),
+        "p17": Predicate(
             "In {}, several law enforcement officials meticulously went through {}"
         ),
-        "p18": Predicate.new(
+        "p18": Predicate(
             "{} continued for {}", comparison=">=", quantity=Q_("385 minutes")
         ),
-        "p19": Predicate.new("{} continued after night fell"),
+        "p19": Predicate("{} continued after night fell"),
         # Use the irrelevant predicates/factors to make sure they don't affect an outcome.
-        "p_irrelevant_0": Predicate.new("{} was a clown"),
-        "p_irrelevant_1": Predicate.new("{} was a bear"),
-        "p_irrelevant_2": Predicate.new("{} was a circus"),
-        "p_irrelevant_3": Predicate.new("{} performed at {}"),
-        "p_crime": Predicate.new("{} committed a crime"),
-        "p_murder": Predicate.new("{} murdered {}"),
-        "p_murder_whether": Predicate.new("{} murdered {}", truth=None),
-        "p_murder_false": Predicate.new("{} murdered {}", truth=False),
-        "p_irrelevant": Predicate.new("{} is relevant to show {}", truth=False),
-        "p_relevant": Predicate.new("{} is relevant to show {}"),
-        "p_relevant_whether": Predicate.new("{} is relevant to show {}", truth=None),
-        "p_shooting": Predicate.new("{} shot {}"),
-        "p_no_shooting": Predicate.new("{} shot {}", truth=False),
-        "p_shooting_whether": Predicate.new("{} shot {}", truth=None),
-        "p_no_crime": Predicate.new("{} committed a crime", truth=False),
-        "p_three_entities": Predicate.new("{} threw {} to {}"),
+        "p_irrelevant_0": Predicate("{} was a clown"),
+        "p_irrelevant_1": Predicate("{} was a bear"),
+        "p_irrelevant_2": Predicate("{} was a circus"),
+        "p_irrelevant_3": Predicate("{} performed at {}"),
+        "p_crime": Predicate("{} committed a crime"),
+        "p_murder": Predicate("{} murdered {}"),
+        "p_murder_whether": Predicate("{} murdered {}", truth=None),
+        "p_murder_false": Predicate("{} murdered {}", truth=False),
+        "p_irrelevant": Predicate("{} is relevant to show {}", truth=False),
+        "p_relevant": Predicate("{} is relevant to show {}"),
+        "p_relevant_whether": Predicate("{} is relevant to show {}", truth=None),
+        "p_shooting": Predicate("{} shot {}"),
+        "p_no_shooting": Predicate("{} shot {}", truth=False),
+        "p_shooting_whether": Predicate("{} shot {}", truth=None),
+        "p_no_crime": Predicate("{} committed a crime", truth=False),
+        "p_three_entities": Predicate("{} threw {} to {}"),
     }
 
 

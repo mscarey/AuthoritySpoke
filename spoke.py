@@ -318,41 +318,44 @@ class Predicate:
     reciprocal: bool = False
     comparison: Optional[str] = None
     quantity: Optional[Union[int, float, ureg.Quantity]] = None
-    context_slots: int = 0
 
-    @classmethod
-    def new(
-        cls,
-        content: str,
-        truth: Optional[bool] = True,
-        reciprocal: bool = False,
-        comparison: Optional[str] = None,
-        quantity: Optional[Union[int, float, ureg.Quantity]] = None,
-    ):
+    def __post_init__(self):
 
-        slots = content.count("{}")
-        if quantity:
-            slots -= 1
-
-        if slots < 2 and reciprocal:
-            raise ValueError(
-                f'"reciprocal" flag not allowed because {content} has '
-                f"{slots} spaces for context entities. At least 2 spaces needed."
-            )
-        # Assumes that the obverse of a statement about a quantity is
-        # necessarily logically equivalent
-        if comparison == "==":
-            comparison = "="
-        if comparison == "!=":
-            comparison = "<>"
-        if comparison and truth is False:
-            truth = True
-            comparison = OPPOSITE_COMPARISONS[comparison]
-        if comparison and comparison not in OPPOSITE_COMPARISONS.keys():
+        if self.comparison and self.comparison not in OPPOSITE_COMPARISONS.keys():
             raise ValueError(
                 f'"comparison" string parameter must be one of {OPPOSITE_COMPARISONS.keys()}.'
             )
-        return Predicate(content, truth, reciprocal, comparison, quantity, slots)
+
+        slots = self.content.count("{}")
+        if self.quantity:
+            slots -= 1
+        if slots < 2 and self.reciprocal:
+            raise ValueError(
+                f'"reciprocal" flag not allowed because {self.content} has '
+                f"{slots} spaces for context entities. At least 2 spaces needed."
+            )
+
+        # Assumes that the obverse of a statement about a quantity is
+        # necessarily logically equivalent
+        normalize_comparison = {"==": "=", "!=": "<>"}
+
+        if self.comparison in normalize_comparison:
+            object.__setattr__(
+                self, "comparison", normalize_comparison[self.comparison]
+            )
+
+        if self.comparison and self.truth is False:
+            object.__setattr__(self, "truth", True)
+            object.__setattr__(
+                self, "comparison", OPPOSITE_COMPARISONS[self.comparison]
+            )
+
+    @property
+    def context_slots(self):
+        slots = self.content.count("{}")
+        if self.quantity:
+            slots -= 1
+        return slots
 
     @staticmethod
     def from_string(
@@ -605,7 +608,10 @@ class Predicate:
             quantity=self.quantity,
         )
 
-def compare_dict_for_identical_entries(left: Dict[Factor, Factor], right: Dict[Factor, Factor]) -> bool:
+
+def compare_dict_for_identical_entries(
+    left: Dict[Factor, Factor], right: Dict[Factor, Factor]
+) -> bool:
     """Compares two dicts to see whether the
     keys and values of one are the same objects
     as the keys and values of the other, not just
@@ -615,6 +621,7 @@ def compare_dict_for_identical_entries(left: Dict[Factor, Factor], right: Dict[F
         any((l_key is r_key and left[l_key] is right[r_key]) for r_key in right)
         for l_key in left
     )
+
 
 STANDARDS_OF_PROOF = {
     "scintilla of evidence": 1,

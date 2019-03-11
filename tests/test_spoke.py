@@ -80,17 +80,15 @@ class TestEntities:
 class TestPredicates:
     def test_predicate_with_wrong_number_of_entities(self):
         with pytest.raises(ValueError):
-            _ = Predicate.new("{} was a motel", reciprocal=True)
+            _ = Predicate("{} was a motel", reciprocal=True)
 
     def test_predicate_with_wrong_comparison_symbol(self):
         with pytest.raises(ValueError):
-            _ = (
-                Predicate.new(
+            _ = Predicate(
                     "the height of {} was {}",
                     comparison=">>",
                     quantity=Q_("160 centimeters"),
-                ),
-            )
+                )
 
     def test_convert_false_statement_about_quantity_to_obverse(self, make_predicate):
         assert make_predicate["p7_obverse"].truth is True
