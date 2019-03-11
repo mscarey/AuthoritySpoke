@@ -17,7 +17,7 @@ class TestFacts:
         self, make_entity, make_predicate, watt_mentioned
     ):
         e = make_entity
-        f2 = Fact.new(make_predicate["p1"], case_factors=watt_mentioned)
+        f2 = Fact(make_predicate["p1"], case_factors=watt_mentioned)
         assert f2.entity_context == (e["motel"],)
 
     def test_entity_context_from_case_factor_indices(
@@ -33,19 +33,19 @@ class TestFacts:
 
         e = make_entity
 
-        f2 = Fact.new(
+        f2 = Fact(
             make_predicate["p2"], entity_context=(1, 0), case_factors=watt_mentioned
         )
         assert f2.entity_context == (e["watt"], e["motel"])
 
     def test_invalid_index_for_case_factors_in_init(self, make_predicate, make_entity):
         with pytest.raises(ValueError):
-            _ = Fact.new(
+            _ = Fact(
                 make_predicate["p1"], entity_context=2, case_factors=make_entity["watt"]
             )
 
     def test_convert_int_entity_context_to_tuple(self, make_predicate, watt_mentioned):
-        f = Fact.new(make_predicate["p_irrelevant_1"], 3, case_factors=watt_mentioned)
+        f = Fact(make_predicate["p_irrelevant_1"], 3, case_factors=watt_mentioned)
         assert f.entity_context == (watt_mentioned[3],)
 
     def test_string_representation_of_factor(self, watt_factor):
@@ -73,7 +73,7 @@ class TestFacts:
     def test_concrete_to_abstract(self, make_entity, make_predicate):
         motel = make_entity["motel_specific"]
         d = make_entity["watt"]
-        fact = Fact.new(predicate=make_predicate["p2"], entity_context=(d, motel))
+        fact = Fact(predicate=make_predicate["p2"], entity_context=(d, motel))
         assert "<Wattenburg> operated and lived at Hideaway Lodge" in str(fact)
         assert "<Wattenburg> operated and lived at Hideaway Lodge>" in str(
             fact.make_generic()
@@ -101,7 +101,7 @@ class TestFacts:
 
     def test_factor_entity_context_does_not_match_predicate(self, make_predicate):
         with pytest.raises(ValueError):
-            _ = Fact.new(make_predicate["p1"], (0, 1, 2))
+            _ = Fact(make_predicate["p1"], (0, 1, 2))
 
     def test_reciprocal_with_wrong_number_of_entities(self, make_entity, watt_factor):
         with pytest.raises(ValueError):
@@ -135,7 +135,7 @@ class TestFacts:
 
     def test_standard_of_proof_must_be_listed(self, make_predicate):
         with pytest.raises(ValueError):
-            _ = Fact.new(make_predicate["p2"], standard_of_proof="probably so")
+            _ = Fact(make_predicate["p2"], standard_of_proof="probably so")
 
     def test_standard_of_proof_in_str(self, watt_factor):
         factor = watt_factor["f2_preponderance_of_evidence"]
@@ -199,7 +199,7 @@ class TestFacts:
             is None
         )
 
-    def test_import_to_mapping_reciprocal(self, make_entity, watt_factor, caplog):
+    def test_import_to_mapping_reciprocal(self, watt_factor, caplog):
         caplog.set_level(logging.DEBUG)
         mapping = Factor._import_to_mapping(
             {watt_factor["f7"]: watt_factor["f7"]},

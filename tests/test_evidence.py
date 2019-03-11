@@ -174,7 +174,7 @@ class TestEvidence:
     def test_no_implication_of_fact(
         self, make_predicate, make_evidence, watt_mentioned
     ):
-        cool_fact = Fact.new(
+        cool_fact = Fact(
             make_predicate["p_no_shooting"], case_factors=watt_mentioned
         )
         assert not make_evidence["no_shooting"] > cool_fact
@@ -184,7 +184,7 @@ class TestEvidence:
         self, make_predicate, make_evidence, watt_mentioned
     ):
         assert not make_evidence["no_shooting"].contradicts(
-            Fact.new(make_predicate["p_no_shooting"], case_factors=watt_mentioned)
+            Fact(make_predicate["p_no_shooting"], case_factors=watt_mentioned)
         )
 
     def test_no_contradiction_from_supporting_contradictory_facts(self, make_evidence):

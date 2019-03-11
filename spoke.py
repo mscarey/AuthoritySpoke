@@ -644,30 +644,27 @@ class Fact(Factor):
     standard_of_proof: Optional[str] = None
     absent: bool = False
     generic: bool = False
+    case_factors: Tuple[Factor, ...] = ()
 
-    @classmethod
-    def new(
-        cls,
-        predicate: Optional[Predicate] = None,
-        entity_context: Optional[
-            Union[Factor, Iterable[Factor], int, Iterable[int]]
-        ] = None,
-        name: Optional[str] = None,
-        standard_of_proof: Optional[str] = None,
-        absent: bool = False,
-        generic: bool = False,
-        case_factors: Union[Factor, Iterable[Factor]] = (),
-    ):
+    def __post_init__(self):
+
+        if self.standard_of_proof and self.standard_of_proof not in STANDARDS_OF_PROOF:
+            raise ValueError(
+                f"standard of proof must be one of {STANDARDS_OF_PROOF.keys()} or None."
+            )
+        entity_context = self.entity_context
+        case_factors = self.case_factors
+        object.__delattr__(self, 'case_factors')
 
         if not entity_context:
-            entity_context = range(len(predicate))
-        case_factors = cls.wrap_with_tuple(case_factors)
-        entity_context = cls.wrap_with_tuple(entity_context)
+            entity_context = range(len(self.predicate))
+        case_factors = self.__class__.wrap_with_tuple(case_factors)
+        entity_context = self.__class__.wrap_with_tuple(entity_context)
 
-        if len(entity_context) != len(predicate):
+        if len(entity_context) != len(self.predicate):
             raise ValueError(
                 "The number of items in 'entity_context' must be "
-                + f"{len(predicate)}, to match predicate.context_slots"
+                + f"{len(self.predicate)}, to match predicate.context_slots"
             )
 
         if any(not isinstance(s, Factor) for s in entity_context):
@@ -684,12 +681,9 @@ class Fact(Factor):
                     + "be Factor or a subclass of Factor, or should be integer "
                     + "indices of Factor objects in the case_factors parameter."
                 )
+        object.__setattr__(self, 'entity_context', entity_context)
 
-        if standard_of_proof and standard_of_proof not in STANDARDS_OF_PROOF:
-            raise ValueError(
-                f"standard of proof must be one of {STANDARDS_OF_PROOF.keys()} or None."
-            )
-        return cls(predicate, entity_context, name, standard_of_proof, absent, generic)
+
 
     def __str__(self):
         if self.name:

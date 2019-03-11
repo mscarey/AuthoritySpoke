@@ -180,80 +180,80 @@ def watt_factor(make_predicate, make_entity, watt_mentioned) -> Dict[str, Factor
     c = watt_mentioned
 
     return {
-        "f1": Fact.new(p["p1"], case_factors=c),
-        "f2": Fact.new(p["p2"], (1, 0), case_factors=c),
-        "f3": Fact.new(p["p3"], case_factors=c),
-        "f4": Fact.new(p["p4"], (2, 0), case_factors=c),
-        "f5": Fact.new(p["p5"], 2, case_factors=c),
-        "f6": Fact.new(p["p6"], 2, case_factors=c),
-        "f7": Fact.new(p["p7"], (0, 2), case_factors=c),
-        "f8": Fact.new(p["p8"], (0, 2), case_factors=c),
-        "f9": Fact.new(p["p9"], (2, 0), case_factors=c),
-        "f10": Fact.new(p["p10"], (2, 0), case_factors=c),
-        "f1_entity_order": Fact.new(p["p1"], (1,), case_factors=c),
-        "f1_different_entity": Fact.new(p["p1"], (2,), case_factors=c),
-        "f1_specific": Fact.new(p["p1"], (4,), case_factors=c),
-        "f1b": Fact.new(p["p1"], case_factors=c),
-        "f1c": Fact.new(p["p1_again"], case_factors=c),
-        "f2_preponderance_of_evidence": Fact.new(
+        "f1": Fact(p["p1"], case_factors=c),
+        "f2": Fact(p["p2"], (1, 0), case_factors=c),
+        "f3": Fact(p["p3"], case_factors=c),
+        "f4": Fact(p["p4"], (2, 0), case_factors=c),
+        "f5": Fact(p["p5"], 2, case_factors=c),
+        "f6": Fact(p["p6"], 2, case_factors=c),
+        "f7": Fact(p["p7"], (0, 2), case_factors=c),
+        "f8": Fact(p["p8"], (0, 2), case_factors=c),
+        "f9": Fact(p["p9"], (2, 0), case_factors=c),
+        "f10": Fact(p["p10"], (2, 0), case_factors=c),
+        "f1_entity_order": Fact(p["p1"], (1,), case_factors=c),
+        "f1_different_entity": Fact(p["p1"], (2,), case_factors=c),
+        "f1_specific": Fact(p["p1"], (4,), case_factors=c),
+        "f1b": Fact(p["p1"], case_factors=c),
+        "f1c": Fact(p["p1_again"], case_factors=c),
+        "f2_preponderance_of_evidence": Fact(
             p["p2"],
             (1, 0),
             standard_of_proof="preponderance of evidence",
             case_factors=c,
         ),
-        "f2_clear_and_convincing": Fact.new(
+        "f2_clear_and_convincing": Fact(
             p["p2"], (1, 0), standard_of_proof="clear and convincing", case_factors=c
         ),
-        "f2_beyond_reasonable_doubt": Fact.new(
+        "f2_beyond_reasonable_doubt": Fact(
             p["p2"], (1, 0), standard_of_proof="beyond reasonable doubt", case_factors=c
         ),
-        "f2_different_entity": Fact.new(p["p2"], (1, 2), case_factors=c),
-        "f2_entity_order": Fact.new(p["p2"], case_factors=c),
-        "f2_no_truth": Fact.new(p["p2_no_truth"], (1, 0), case_factors=c),
-        "f2_false": Fact.new(p["p2_false"], case_factors=c),
-        "f2_reciprocal": Fact.new(p["p2_reciprocal"], case_factors=c),
-        "f2_generic": Fact.new(p["p2"], generic=True, case_factors=c),
-        "f2_false_generic": Fact.new(p["p2_false"], generic=True, case_factors=c),
-        "f3_generic": Fact.new(p["p3"], generic=True, case_factors=c),
-        "f3_different_entity": Fact.new(p["p3"], (2, 1), case_factors=c),
-        "f3_entity_order": Fact.new(p["p3"], (1, 0), case_factors=c),
-        "f3_absent": Fact.new(p["p3"], absent=True, case_factors=c),
-        "f4_h4": Fact.new(p["p4"], (3, 0), case_factors=c),
-        "f4_swap_entities": Fact.new(p["p4"], (0, 2), case_factors=c),
-        "f4_swap_entities_4": Fact.new(p["p4"], (1, 4), case_factors=c),
-        "f5_h4": Fact.new(p["p5"], (3,), case_factors=c),
-        "f5_swap_entities": Fact.new(p["p5"], (0,), case_factors=c),
-        "f6_swap_entities": Fact.new(p["p6"], (0,), case_factors=c),
-        "f7_opposite": Fact.new(p["p7_opposite"], (0, 2), case_factors=c),
-        "f7_swap_entities": Fact.new(p["p7"], (2, 0), case_factors=c),
-        "f7_swap_entities_4": Fact.new(p["p7"], (1, 4), case_factors=c),
-        "f7_true": Fact.new(p["p7_true"], (0, 2), case_factors=c),
-        "f8_absent": Fact.new(p["p8"], (0, 2), absent=True, case_factors=c),
-        "f8_exact": Fact.new(p["p8_exact"], (0, 2), case_factors=c),
-        "f8_exact_swap_entities": Fact.new(p["p8_exact"], (2, 0), case_factors=c),
-        "f8_float": Fact.new(p["p8_float"], (0, 2), case_factors=c),
-        "f8_higher_int": Fact.new(p["p8_higher_int"], (0, 2), case_factors=c),
-        "f8_int": Fact.new(p["p8_int"], (0, 2), case_factors=c),
-        "f8_less": Fact.new(p["p8_less"], (0, 2), case_factors=c),
-        "f8_meters": Fact.new(p["p8_meters"], (0, 2), case_factors=c),
-        "f9_absent": Fact.new(p["p9"], absent=True, case_factors=c),
-        "f9_absent_miles": Fact.new(p["p9_miles"], absent=True, case_factors=c),
-        "f9_swap_entities": Fact.new(p["p9"], (0, 2), case_factors=c),
-        "f9_swap_entities_4": Fact.new(p["p9"], (1, 4), case_factors=c),
-        "f10_absent": Fact.new(p["p10"], (2, 0), absent=True, case_factors=c),
-        "f10_false": Fact.new(p["p10_false"], (2, 0), case_factors=c),
-        "f10_absent_false": Fact.new(p["p10_false"], absent=True, case_factors=c),
-        "f10_swap_entities": Fact.new(p["p10"], (0, 2), case_factors=c),
-        "f10_swap_entities_4": Fact.new(p["p10"], (1, 4), case_factors=c),
-        "f11": Fact.new(p["p11"], 2, case_factors=c),
-        "f12": Fact.new(p["p12"], 2, case_factors=c),
-        "f13": Fact.new(p["p13"], (2, 3), case_factors=c),
-        "f14": Fact.new(p["p14"], (1, 3), case_factors=c),
-        "f15": Fact.new(p["p15"], (3, 0), case_factors=c),
-        "f16": Fact.new(p["p16"], 3, case_factors=c),
-        "f17": Fact.new(p["p17"], (2, 3), case_factors=c),
-        "f18": Fact.new(p["p18"], 2, case_factors=c),
-        "f19": Fact.new(p["p19"], 2, case_factors=c),
+        "f2_different_entity": Fact(p["p2"], (1, 2), case_factors=c),
+        "f2_entity_order": Fact(p["p2"], case_factors=c),
+        "f2_no_truth": Fact(p["p2_no_truth"], (1, 0), case_factors=c),
+        "f2_false": Fact(p["p2_false"], case_factors=c),
+        "f2_reciprocal": Fact(p["p2_reciprocal"], case_factors=c),
+        "f2_generic": Fact(p["p2"], generic=True, case_factors=c),
+        "f2_false_generic": Fact(p["p2_false"], generic=True, case_factors=c),
+        "f3_generic": Fact(p["p3"], generic=True, case_factors=c),
+        "f3_different_entity": Fact(p["p3"], (2, 1), case_factors=c),
+        "f3_entity_order": Fact(p["p3"], (1, 0), case_factors=c),
+        "f3_absent": Fact(p["p3"], absent=True, case_factors=c),
+        "f4_h4": Fact(p["p4"], (3, 0), case_factors=c),
+        "f4_swap_entities": Fact(p["p4"], (0, 2), case_factors=c),
+        "f4_swap_entities_4": Fact(p["p4"], (1, 4), case_factors=c),
+        "f5_h4": Fact(p["p5"], (3,), case_factors=c),
+        "f5_swap_entities": Fact(p["p5"], (0,), case_factors=c),
+        "f6_swap_entities": Fact(p["p6"], (0,), case_factors=c),
+        "f7_opposite": Fact(p["p7_opposite"], (0, 2), case_factors=c),
+        "f7_swap_entities": Fact(p["p7"], (2, 0), case_factors=c),
+        "f7_swap_entities_4": Fact(p["p7"], (1, 4), case_factors=c),
+        "f7_true": Fact(p["p7_true"], (0, 2), case_factors=c),
+        "f8_absent": Fact(p["p8"], (0, 2), absent=True, case_factors=c),
+        "f8_exact": Fact(p["p8_exact"], (0, 2), case_factors=c),
+        "f8_exact_swap_entities": Fact(p["p8_exact"], (2, 0), case_factors=c),
+        "f8_float": Fact(p["p8_float"], (0, 2), case_factors=c),
+        "f8_higher_int": Fact(p["p8_higher_int"], (0, 2), case_factors=c),
+        "f8_int": Fact(p["p8_int"], (0, 2), case_factors=c),
+        "f8_less": Fact(p["p8_less"], (0, 2), case_factors=c),
+        "f8_meters": Fact(p["p8_meters"], (0, 2), case_factors=c),
+        "f9_absent": Fact(p["p9"], absent=True, case_factors=c),
+        "f9_absent_miles": Fact(p["p9_miles"], absent=True, case_factors=c),
+        "f9_swap_entities": Fact(p["p9"], (0, 2), case_factors=c),
+        "f9_swap_entities_4": Fact(p["p9"], (1, 4), case_factors=c),
+        "f10_absent": Fact(p["p10"], (2, 0), absent=True, case_factors=c),
+        "f10_false": Fact(p["p10_false"], (2, 0), case_factors=c),
+        "f10_absent_false": Fact(p["p10_false"], absent=True, case_factors=c),
+        "f10_swap_entities": Fact(p["p10"], (0, 2), case_factors=c),
+        "f10_swap_entities_4": Fact(p["p10"], (1, 4), case_factors=c),
+        "f11": Fact(p["p11"], 2, case_factors=c),
+        "f12": Fact(p["p12"], 2, case_factors=c),
+        "f13": Fact(p["p13"], (2, 3), case_factors=c),
+        "f14": Fact(p["p14"], (1, 3), case_factors=c),
+        "f15": Fact(p["p15"], (3, 0), case_factors=c),
+        "f16": Fact(p["p16"], 3, case_factors=c),
+        "f17": Fact(p["p17"], (2, 3), case_factors=c),
+        "f18": Fact(p["p18"], 2, case_factors=c),
+        "f19": Fact(p["p19"], 2, case_factors=c),
     }
 
 
@@ -265,34 +265,34 @@ def make_factor(make_predicate, make_entity) -> Dict[str, Factor]:
     c = (e["alice"], e["bob"], e["craig"], e["dan"], e["circus"])
 
     return {
-        "f_irrelevant_0": Fact.new(p["p_irrelevant_0"], (2,), case_factors=c),
-        "f_irrelevant_1": Fact.new(p["p_irrelevant_1"], (3,), case_factors=c),
-        "f_irrelevant_2": Fact.new(p["p_irrelevant_2"], (4,), case_factors=c),
-        "f_irrelevant_3": Fact.new(p["p_irrelevant_3"], (2, 4), case_factors=c),
-        "f_irrelevant_3_new_context": Fact.new(
+        "f_irrelevant_0": Fact(p["p_irrelevant_0"], (2,), case_factors=c),
+        "f_irrelevant_1": Fact(p["p_irrelevant_1"], (3,), case_factors=c),
+        "f_irrelevant_2": Fact(p["p_irrelevant_2"], (4,), case_factors=c),
+        "f_irrelevant_3": Fact(p["p_irrelevant_3"], (2, 4), case_factors=c),
+        "f_irrelevant_3_new_context": Fact(
             p["p_irrelevant_3"], (3, 4), case_factors=c
         ),
-        "f_irrelevant_3_context_0": Fact.new(
+        "f_irrelevant_3_context_0": Fact(
             p["p_irrelevant_3"], (3, 0), case_factors=c
         ),
-        "f_crime": Fact.new(p["p_crime"], case_factors=c),
-        "f_no_crime": Fact.new(p["p_no_crime"], case_factors=c),
-        "f_no_crime_entity_order": Fact.new(p["p_no_crime"], (1,), case_factors=c),
-        "f_murder": Fact.new(p["p_murder"], case_factors=c),
-        "f_no_murder": Fact.new(p["p_murder_false"], case_factors=c),
-        "f_murder_entity_swap": Fact.new(p["p_murder"], (1, 0), case_factors=c),
-        "f_murder_craig": Fact.new(p["p_murder"], (2, 3), case_factors=c),
-        "f_murder_whether": Fact.new(p["p_murder_whether"], case_factors=c),
-        "f_shooting": Fact.new(p["p_shooting"], case_factors=c),
-        "f_shooting_craig": Fact.new(p["p_shooting"], (2, 3), case_factors=c),
-        "f_shooting_entity_order": Fact.new(p["p_shooting"], (1, 0), case_factors=c),
-        "f_no_shooting": Fact.new(p["p_no_shooting"], case_factors=c),
-        "f_shooting_whether": Fact.new(p["p_shooting_whether"], case_factors=c),
-        "f_no_shooting_entity_order": Fact.new(
+        "f_crime": Fact(p["p_crime"], case_factors=c),
+        "f_no_crime": Fact(p["p_no_crime"], case_factors=c),
+        "f_no_crime_entity_order": Fact(p["p_no_crime"], (1,), case_factors=c),
+        "f_murder": Fact(p["p_murder"], case_factors=c),
+        "f_no_murder": Fact(p["p_murder_false"], case_factors=c),
+        "f_murder_entity_swap": Fact(p["p_murder"], (1, 0), case_factors=c),
+        "f_murder_craig": Fact(p["p_murder"], (2, 3), case_factors=c),
+        "f_murder_whether": Fact(p["p_murder_whether"], case_factors=c),
+        "f_shooting": Fact(p["p_shooting"], case_factors=c),
+        "f_shooting_craig": Fact(p["p_shooting"], (2, 3), case_factors=c),
+        "f_shooting_entity_order": Fact(p["p_shooting"], (1, 0), case_factors=c),
+        "f_no_shooting": Fact(p["p_no_shooting"], case_factors=c),
+        "f_shooting_whether": Fact(p["p_shooting_whether"], case_factors=c),
+        "f_no_shooting_entity_order": Fact(
             p["p_no_shooting"], (1, 0), case_factors=c
         ),
-        "f_three_entities": Fact.new(p["p_three_entities"], (0, 1, 2), case_factors=c),
-        "f_repeating_entity": Fact.new(
+        "f_three_entities": Fact(p["p_three_entities"], (0, 1, 2), case_factors=c),
+        "f_repeating_entity": Fact(
             p["p_three_entities"], (0, 1, 0), case_factors=c
         ),
     }
@@ -304,31 +304,31 @@ def make_complex_fact(make_predicate, make_factor) -> Dict[str, Evidence]:
     f = make_factor
 
     return {
-        "f_irrelevant_murder": Fact.new(
+        "f_irrelevant_murder": Fact(
             p["p_irrelevant"], (f["f_shooting"], f["f_murder"])
         ),
-        "f_relevant_murder": Fact.new(
+        "f_relevant_murder": Fact(
             p["p_relevant"], (f["f_shooting"], f["f_murder"])
         ),
-        "f_relevant_murder_swap_entities": Fact.new(
+        "f_relevant_murder_swap_entities": Fact(
             p["p_relevant"], (f["f_shooting"], f["f_murder"])
         ),
-        "f_relevant_murder_nested_swap": Fact.new(
+        "f_relevant_murder_nested_swap": Fact(
             p["p_relevant"], (f["f_shooting_entity_order"], f["f_murder_entity_swap"])
         ),
-        "f_relevant_murder_whether": Fact.new(
+        "f_relevant_murder_whether": Fact(
             p["p_relevant"], (f["f_shooting"], f["f_murder_whether"])
         ),
-        "f_whether_relevant_murder_whether": Fact.new(
+        "f_whether_relevant_murder_whether": Fact(
             p["p_relevant"], (f["f_shooting_whether"], f["f_murder_whether"])
         ),
-        "f_relevant_murder_swap": Fact.new(
+        "f_relevant_murder_swap": Fact(
             p["p_relevant"], (f["f_shooting"], f["f_murder_entity_swap"])
         ),
-        "f_relevant_murder_craig": Fact.new(
+        "f_relevant_murder_craig": Fact(
             p["p_relevant"], (f["f_shooting_craig"], f["f_murder_craig"])
         ),
-        "f_relevant_murder_alice_craig": Fact.new(
+        "f_relevant_murder_alice_craig": Fact(
             p["p_relevant"], (f["f_shooting"], f["f_murder_craig"])
         ),
     }
