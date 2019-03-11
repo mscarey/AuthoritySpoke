@@ -158,8 +158,8 @@ class Factor:
             return tuple(sorted(item, key=repr))
         return (item,)
 
-    @classmethod
-    def wrap_with_tuple(cls, item):
+    @staticmethod
+    def wrap_with_tuple(item):
         if isinstance(item, Iterable):
             return tuple(item)
         return (item,)
@@ -682,7 +682,6 @@ class Fact(Factor):
                     + "indices of Factor objects in the case_factors parameter."
                 )
         object.__setattr__(self, 'entity_context', entity_context)
-
 
 
     def __str__(self):

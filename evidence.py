@@ -27,18 +27,6 @@ class Exhibit(Factor):
     absent: bool = False
     generic: bool = False
 
-    @classmethod
-    def new(
-        cls,
-        form: Optional[str] = None,
-        statement: Optional[Fact] = None,
-        stated_by: Optional[Entity] = None,
-        name: Optional[str] = None,
-        absent: bool = False,
-        generic: bool = False,
-    ):
-        """Placeholder for normalizing inputs before initializing."""
-        return cls(form, statement, stated_by, name, absent, generic)
 
     @property
     def context_factors(self) -> Tuple[Optional[Fact], Optional[Entity]]:

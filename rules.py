@@ -39,27 +39,22 @@ class Procedure(Factor):
     generic: bool = True
     name: Optional[str] = None
 
-    @classmethod
-    def new(
-        cls,
-        outputs: Union[Factor, Iterable[Factor]],
-        inputs: Union[Factor, Iterable[Factor]] = (),
-        despite: Union[Factor, Iterable[Factor]] = (),
-    ):
+    def __post_init__(self):
 
-        outputs = cls.sort_in_tuple(outputs)
-        inputs = cls.sort_in_tuple(inputs)
-        despite = cls.sort_in_tuple(despite)
+        outputs = self.__class__.sort_in_tuple(self.outputs)
+        inputs = self.__class__.sort_in_tuple(self.inputs)
+        despite = self.__class__.sort_in_tuple(self.despite)
 
-        for group in (outputs, inputs, despite):
-            for factor_obj in group:
+        groups = {"outputs": outputs, "inputs": inputs, "despite": despite}
+        for group in groups:
+            for factor_obj in groups[group]:
                 if not isinstance(factor_obj, Factor):
                     raise TypeError(
                         "Input, Output, and Despite groups must contain "
                         + "only subclasses of Factor, but "
                         + f"{factor_obj} was type {type(factor_obj)}"
                     )
-        return cls(outputs, inputs, despite)
+            object.__setattr__(self, group, groups[group])
 
     def __eq__(self, other: "Procedure") -> bool:
         """Determines if the two procedures have all the same factors
@@ -465,7 +460,7 @@ class Procedure(Factor):
 
 
 @dataclass()
-class Rule:
+class Rule(Factor):
     """
     A statement in which a court posits a legal rule as authoritative,
     deciding some aspect of the current litigation but also potentially
@@ -575,46 +570,20 @@ class ProceduralRule(Rule):
     """
 
     procedure: Procedure
-    enactments: Union[Enactment, Iterable[Enactment]] = frozenset([])
-    enactments_despite: Union[Enactment, Iterable[Enactment]] = frozenset([])
+    enactments: Union[Enactment, Iterable[Enactment]] = ()
+    enactments_despite: Union[Enactment, Iterable[Enactment]] = ()
     mandatory: bool = False
     universal: bool = False
     rule_valid: bool = True
     decided: bool = True
     generic: bool = False
 
-    @classmethod
-    def new(
-        cls,
-        procedure: Procedure,
-        enactments: Optional[Union[Enactment, Iterable[Enactment]]] = (),
-        enactments_despite: Optional[Union[Enactment, Iterable[Enactment]]] = (),
-        mandatory: bool = False,
-        universal: bool = False,
-        rule_valid: bool = True,
-        decided: bool = True,
-        generic: bool = False,
-    ):
-        def wrap_with_tuple(item):
-            if isinstance(item, Iterable):
-                return tuple(item)
-            return (item,)
+    def __post_init__(self):
 
-        if isinstance(enactments, Enactment):
-            enactments = wrap_with_tuple(enactments)
-        if isinstance(enactments_despite, Enactment):
-            enactments_despite = wrap_with_tuple(enactments_despite)
-
-        return cls(
-            procedure,
-            enactments,
-            enactments_despite,
-            mandatory,
-            universal,
-            rule_valid,
-            decided,
-            generic,
-        )
+        for attr in ("enactments", "enactments_despite"):
+            value = self.__dict__[attr]
+            if isinstance(value, Enactment):
+                object.__setattr__(self, attr, self.wrap_with_tuple(value))
 
     def __str__(self):
         support = despite = None
@@ -763,14 +732,6 @@ class ProceduralRule(Rule):
         # that any holding is decided, or vice versa.
 
         return False
-
-    def __hash__(self):
-        return hash(
-            (
-                self.__class__.__name__,
-                *[v for v in self.__dict__.values() if not isinstance(v, set)],
-            )
-        )
 
     def negated(self):
         return ProceduralRule(

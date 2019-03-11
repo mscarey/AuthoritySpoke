@@ -22,13 +22,6 @@ class Entity(Factor):
     generic: bool = True
     plural: bool = False
 
-    @classmethod
-    def new(
-        cls, name: Optional[str] = None, generic: bool = True, plural: bool = False
-    ):
-        """Placeholder for normalizing inputs before initializing."""
-        return cls(name, generic, plural)
-
     def __eq__(self, other: Optional[Factor]):
         if type(self) != type(other):
             return False

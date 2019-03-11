@@ -12,11 +12,11 @@ from spoke import ureg, Q_
 class TestProcedures:
     def test_exception_for_wrong_type_for_procedure(self, make_predicate):
         with pytest.raises(TypeError):
-            Procedure.new(inputs=make_predicate["p1"], outputs=make_predicate["p2"])
+            Procedure(inputs=make_predicate["p1"], outputs=make_predicate["p2"])
 
     def test_exception_for_wrong_type_in_tuple_for_procedure(self, make_predicate):
         with pytest.raises(TypeError):
-            Procedure.new(inputs=(make_predicate["p1"]), outputs=(make_predicate["p2"]))
+            Procedure(inputs=(make_predicate["p1"]), outputs=(make_predicate["p2"]))
 
     def test_get_context_factors(self, make_procedure):
         # motel, watt
