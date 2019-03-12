@@ -48,6 +48,12 @@ class Entity(Factor):
             return f"<{self.name}>"
         return self.name
 
+    @classmethod
+    def from_dict(cls, entity_dict):
+        return cls(name=entity_dict.get("name"),
+        generic=entity_dict.get("generic", True),
+        plural=entity_dict.get("generic", False))
+
     def context_register(
         self, other: Factor, comparison
     ) -> Optional[Dict[Factor, Factor]]:

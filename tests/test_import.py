@@ -19,6 +19,15 @@ class TestPredicateImport:
         assert story.comparison == ">"
         assert story.quantity == 3
 
+    def test_json_import(self):
+        with open("input/holding_watt.json") as file:
+            watt_summary = json.load(file)
+        # Write test and function for creating the mentioned list first.
+        mentioned = [x.pop("type")(entity_dict=x) for x in watt_summary["mentioned_factors"]]
+        watt = Entity.from_dict(mentioned[1])
+        assert isinstance(watt, Human)
+        assert "Watt" in str(watt)
+
 
 class TestEnactmentImport:
     def test_enactment_import(self):
@@ -28,6 +37,15 @@ class TestEnactmentImport:
         enactment = Enactment.from_dict(enactment_list[0])
         assert "all relevant evidence is admissible" in enactment.text
 
+class TestFactorImport:
+    def test_fact_import(self):
+        with open("input/holding_watt.json") as file:
+            watt_summary = json.load(file)
+        mentioned = watt_summary["mentioned_factors"]
+        fact_dict = watt_summary["holdings"][0]["inputs"][1]
+        new_fact = Fact.from_dict(fact_dict, mentioned)
+        assert "Wattenburg operated and lived at Hideaway Lodge" in str(new_fact)
+        assert isinstance(new_fact.entity_context[0], Entity)
 
 class TestRuleImport:
     """
