@@ -1,0 +1,207 @@
+{
+    "mentioned_factors": [
+
+        {
+            "type": "Entity",
+            "name": "Hideaway Lodge"
+        },
+        {
+            "type": "Human",
+            "name": "Wattenburg"
+        },
+        {
+            "type": "Entity",
+            "name": "the stockpile of trees"
+        },
+        {
+            "type": "Event",
+            "name": "officers' search of the stockpile"
+        }
+    ],
+    "holdings": [
+        {
+            "inputs": [
+                {
+                    "type": "fact",
+                    "content": "Hideaway Lodge was a motel"
+                },
+                {
+                    "type": "fact",
+                    "content": "Wattenburg operated and lived at Hideaway Lodge"
+                }
+            ],
+            "outputs": [{
+                "type": "fact",
+                "content": "Hideaway Lodge was Wattenburg’s abode"
+            }],
+            "enactments": [{
+                "code": "constitution.xml",
+                "section": "amendment-IV",
+                "end": "violated",
+                "name": "search clause"
+            }],
+            "mandatory": true
+        },
+        {
+
+            "inputs": [{
+                    "type": "fact",
+                    "content": "the stockpile of trees was on the premises of Hideaway Lodge"
+                },
+                {
+                    "type": "fact",
+                    "content": "the stockpile of trees was a stockpile of Christmas trees"
+                },
+                {
+                    "type": "fact",
+                    "content": "the stockpile of trees was among some standing trees"
+                },
+                {
+                    "type": "fact",
+                    "content": "the distance between the stockpile of trees and Hideaway Lodge was > 35 feet",
+                    "truth": false,
+                    "reciprocal": true
+                },
+                {
+                    "type": "fact",
+                    "content": "the distance between the stockpile of trees and a parking area used by personnel and patrons of Hideaway Lodge was < 5 feet"
+                }
+            ],
+            "despite": [{
+                "type": "fact",
+                "content": "The distance between the stockpile of trees and Hideaway Lodge was >= 20 feet"
+            }],
+            "outputs": [{
+                "type": "fact",
+                "facts": "the stockpile of trees was within the curtilage of Hideaway Lodge"
+            }],
+            "enactments": ["search clause"],
+            "mandatory": true
+        },
+        {
+            "inputs": [{
+                    "type": "fact",
+                    "content": "Hideaway Lodge was a motel"
+                },
+                {
+                    "type": "fact",
+                    "content": "the stockpile of trees was on the premises of Hideaway Lodge"
+                },
+                {
+                    "type": "fact",
+                    "content": "the stockpile of trees was a stockpile of Christmas trees"
+                },
+                {
+                    "type": "fact",
+                    "content": "officers' search of the stockpile was a warrantless search and seizure"
+                },
+                {
+                    "type": "fact",
+                    "content": "officers' search of the stockpile was performed by federal law enforcement officers"
+                },
+                {
+                    "type": "fact",
+                    "content": "in officers' search of the stockpile, several law enforcement officials meticulously went through the stockpile of trees"
+                },
+                {
+                    "type": "fact",
+                    "content": "officers' search of the stockpile continued for >= 385 minutes"
+                }
+            ],
+            "outputs": {
+                "type": "fact",
+                "facts": "officers' search of the stockpile constituted an intrusion upon the stockpile of trees"
+            },
+            "enactments": ["search clause"],
+            "mandatory": true
+        },
+        {
+            "inputs": [{
+                "type": "fact",
+                "content": "Hideaway Lodge was Wattenburg’s abode"
+            },
+            {
+                "type": "fact",
+                "content": "the stockpile of trees was on the premises of Hideaway Lodge"
+            },
+            {
+                "type": "fact",
+                "content": "the stockpile of trees was a stockpile of Christmas trees"
+            },
+            {
+                "type": "fact",
+                "content": "the stockpile of trees was among some standing trees"
+            },
+            {
+                "type": "fact",
+                "content": "the distance between the stockpile of trees and Hideaway Lodge was > 35 feet",
+                "truth": false,
+                "reciprocal": true
+            },
+            {
+                "type": "fact",
+                "content": "the distance between the stockpile of trees and a parking area used by personnel and patrons of Hideaway Lodge was < 5 feet"
+            }
+            ],
+            "outputs": {
+                "type": "fact",
+                "content": "Wattenburg sought to preserve the stockpile of trees as private"
+            },
+            "enactments": ["search clause"],
+            "mandatory": true
+        },
+        {
+            "inputs": [{
+                    "type": "fact",
+                    "content": "Hideaway Lodge was Wattenburg’s abode"
+                },
+                {
+                    "type": "fact",
+                    "content": "officers' search of the stockpile of trees was a warrantless search and seizure"
+                },
+                {
+                    "type": "fact",
+                    "content": "officers' search of the stockpile of trees was performed by federal law enforcement officers"
+                },
+                {
+                    "type": "fact",
+                    "content": "officers' search of the stockpile constituted an intrusion upon the stockpile of trees"
+                },
+                {
+                    "type": "fact",
+                    "content": "the stockpile of trees was on the premises of Hideaway Lodge"
+                },
+                {
+                    "type": "fact",
+                    "content": "Wattenburg sought to preserve the stockpile of trees as private"
+                },
+                {
+                    "type": "fact",
+                    "content": "the distance between the stockpile of trees and Hideaway Lodge was > 35 feet",
+                    "truth": false,
+                    "reciprocal": true
+                }
+            ],
+            "despite": [{
+                "type": "fact",
+                "content": "the stockpile of trees was in an area accessible to the public"
+            },
+            {
+                "type": "fact",
+                "content": "The distance between the stockpile of trees and Hideaway Lodge was >= 20 feet"
+            }],
+            "outputs": [{
+                "type": "evidence",
+                "exhibit": {"type": "Exhibit", "generic": "true"},
+                "to_effect": {
+                    "type": "fact",
+                    "content": "Wattenburg committed a crime"
+                },
+                "absent": true
+            }],
+            "enactments": ["search clause"],
+            "mandatory": true
+        }
+
+    ]
+}

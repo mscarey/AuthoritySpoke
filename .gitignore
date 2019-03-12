@@ -7,8 +7,6 @@ tests/__pycache__/
 .mypy_cache/
 codes/ca_evidence.html
 codes/ca_penal.html
-input/holding_brad.json
-input/holding_watt.json
 html/
 json/
 notebooks/
