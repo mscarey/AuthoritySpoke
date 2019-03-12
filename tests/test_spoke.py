@@ -1,18 +1,11 @@
-from copy import copy
 import datetime
 import json
 import operator
-from typing import Dict
 
 from pint import UnitRegistry
 import pytest
 
-from enactments import Code, Enactment
-from entities import Entity, Human
-from evidence import Evidence
-from rules import Procedure, Rule, ProceduralRule
-from opinions import Opinion
-from spoke import Predicate, Factor, Fact
+from spoke import Predicate, Factor
 from spoke import ureg, Q_
 
 class TestEntities:

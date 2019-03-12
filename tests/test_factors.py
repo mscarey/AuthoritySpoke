@@ -6,9 +6,10 @@ import pytest
 from enactments import Code, Enactment
 from entities import Entity, Human
 from evidence import Evidence, Exhibit
+from facts import Fact
 from rules import Procedure, Rule, ProceduralRule
 from opinions import Opinion
-from spoke import Predicate, Factor, Fact
+from spoke import Predicate, Factor
 from spoke import ureg, Q_
 
 

@@ -6,7 +6,8 @@ from typing import Iterable, Iterator, Mapping
 from typing import Optional, Sequence, Union
 
 from entities import Entity
-from spoke import Factor, Fact
+from facts import Fact
+from spoke import Factor
 
 
 @dataclass(frozen=True)

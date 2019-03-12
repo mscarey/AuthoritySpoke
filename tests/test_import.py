@@ -3,9 +3,10 @@ import json
 from enactments import Enactment
 from entities import Entity, Human
 from evidence import Evidence
+from facts import Fact
 from opinions import Opinion
 from rules import Procedure, Rule, ProceduralRule
-from spoke import Predicate, Factor, Fact
+from spoke import Predicate, Factor
 
 
 class TestPredicateImport:
@@ -36,9 +37,13 @@ class TestRuleImport:
     """
 
     def test_import_some_holdings(self, make_opinion):
+        """
+        Don't expect the holdings imported from the JSON to
+        exactly match the holdings created for testing in conftest.
+        """
         watt = make_opinion["watt_majority"]
         holdings = watt.holdings_from_json("holding_watt.json")
-        assert len(watt.holdings) == 4
+        assert len(watt.holdings) == 5
         assert holdings == watt.holdings
 
     def test_imported_holding_same_as_test_object(self, make_holding, make_opinion):
