@@ -5,8 +5,9 @@ from typing import Dict, Optional
 
 from bs4 import BeautifulSoup
 
-from utils import roman
+from dataclasses import dataclass
 
+from utils import roman
 
 class Code:
     """
@@ -75,25 +76,20 @@ class Code:
 
         return NotImplementedError
 
-
+@dataclass(frozen=True)
 class Enactment:
-    def __init__(
-        self,
-        code: Code,
-        section: str,
-        start: Optional[str] = None,
-        end: Optional[str] = None,
-    ):
-        self.code = code
-        self.section = section
-        self.start = start
-        self.end = end
 
-        self.text = self.get_cited_passage()
+    code: Code
+    section: str
+    start: Optional[str] = None
+    end: Optional[str] = None
 
-        self.effective_date = self.code.provision_effective_date(section)
+    @property
+    def effective_date(self):
+        return self.code.provision_effective_date(self.section)
 
-    def get_cited_passage(self):
+    @property
+    def text(self):
 
         """
         Given the attributes describing the section and the start and end points
@@ -132,7 +128,15 @@ class Enactment:
         return text[l:r]
 
     def __hash__(self):
-        return hash((self.text, self.code.sovereign, self.code.level, self.code.title, self.section))
+        return hash(
+            (
+                self.text,
+                self.code.sovereign,
+                self.code.level,
+                self.code.title,
+                self.section,
+            )
+        )
 
     def __str__(self):
         return f'"{self.text}" ({self.code.title}, {self.section})'

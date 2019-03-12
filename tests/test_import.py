@@ -1,3 +1,5 @@
+import json
+
 from enactments import Enactment
 from entities import Entity, Human
 from evidence import Evidence
@@ -18,10 +20,10 @@ class TestPredicateImport:
 
 
 class TestEnactmentImport:
-    def test_enactment_import(self, make_opinion):
-        cardenas = make_opinion["cardenas_majority"]
-        entities, d = cardenas.dict_from_input_json("holding_cardenas.json")
-        enactment_list = d[0]["enactments"]
+    def test_enactment_import(self):
+        with open("input/holding_cardenas.json") as file:
+            cardenas_summary = json.load(file)
+        enactment_list = cardenas_summary["holdings"][0]["enactments"]
         enactment = Enactment.from_dict(enactment_list[0])
         assert "all relevant evidence is admissible" in enactment.text
 
@@ -61,7 +63,7 @@ class TestNestedFactorImport:
         # JSON format and needs to be rewritten.
 
         # Not working in part because it has no way to parse a string
-        # containing Factor names, to make either a ne Factor or a dict
+        # containing Factor names, to make either a new Factor or a dict
         # that can be converted to the new Factor
         cardenas.holdings_from_json("holding_cardenas.json")
         assert len(cardenas.holdings) == 2
