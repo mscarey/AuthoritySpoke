@@ -47,9 +47,10 @@ class TestFactorImport:
         with open("input/holding_watt.json") as file:
             watt_summary = json.load(file)
         mentioned = watt_summary["mentioned_factors"]
+        mentioned_factors = Opinion.get_mentioned_factors(mentioned)
         fact_dict = watt_summary["holdings"][0]["inputs"][1]
-        new_fact = Fact.from_dict(fact_dict, mentioned)
-        assert "Wattenburg operated and lived at Hideaway Lodge" in str(new_fact)
+        new_fact = Fact.from_dict(fact_dict, mentioned_factors)
+        assert "<Wattenburg> operated and lived at <Hideaway Lodge>" in str(new_fact)
         assert isinstance(new_fact.entity_context[0], Entity)
 
 class TestRuleImport:
