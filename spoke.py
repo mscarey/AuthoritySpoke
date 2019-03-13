@@ -42,10 +42,13 @@ class Factor:
         Turns a dict recently created from a chunk of JSON into a Factor object.
         """
 
-        # TODO: make subclass search recursive, or make a different factory function
-        class_options = cls.__subclasses__()
+        def all_subclasses(cls):
+            return set(cls.__subclasses__()).union(
+                [s for c in cls.__subclasses__() for s in all_subclasses(c)])
+
+        class_options = all_subclasses(cls)
+        cname = factor.pop("type", "")
         for c in class_options:
-            cname = factor.get("type", "")
             if cname.capitalize() == c.__name__:
                 return c.from_dict(factor)
         raise ValueError(
@@ -169,7 +172,8 @@ class Factor:
         self_mapping: Mapping["Factor", "Factor"],
         incoming_mapping: Dict["Factor", "Factor"],
     ) -> Optional[Mapping["Factor", "Factor"]]:
-        """If the same factor in one mapping appears to match
+        """
+        If the same factor in one mapping appears to match
         to two different factors in the other, the function
         return False. Otherwise it returns a merged dict of
         matches.

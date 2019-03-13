@@ -1,4 +1,4 @@
-from typing import Dict, Tuple
+from typing import Dict, List, Tuple
 from typing import Optional
 
 import datetime
@@ -58,6 +58,20 @@ class Opinion:
                 position,
                 author,
             )
+
+    @classmethod
+    def get_mentioned_factors(cls, mentioned_dict: List[Dict[str, str]]) -> List[Factor]:
+        """
+        :param mentioned_dict: A dict in the JSON format used in the
+        "input" folder.
+
+        :returns: A list of Factors mentioned in the Opinion's holdings.
+        Especially the context factors referenced in Predicates, since
+        there's currently no other way to import those using the JSON
+        format.
+        """
+        return [Factor.from_dict(factor_dict) for factor_dict in mentioned_dict]
+
 
     def get_entities(self):
         return [e for t in self.holdings.values() for e in t]

@@ -22,11 +22,16 @@ class TestPredicateImport:
     def test_json_import(self):
         with open("input/holding_watt.json") as file:
             watt_summary = json.load(file)
-        # Write test and function for creating the mentioned list first.
-        mentioned = [x.pop("type")(entity_dict=x) for x in watt_summary["mentioned_factors"]]
-        watt = Entity.from_dict(mentioned[1])
-        assert isinstance(watt, Human)
-        assert "Watt" in str(watt)
+
+
+class TestEntityImport:
+    def test_mentioned_factors(self):
+        with open("input/holding_watt.json") as file:
+            watt_summary = json.load(file)
+        mentioned_factors = watt_summary["mentioned_factors"]
+        mentioned = Opinion.get_mentioned_factors(mentioned_factors)
+        assert isinstance(mentioned[1], Human)
+        assert "Watt" in str(mentioned[1])
 
 
 class TestEnactmentImport:

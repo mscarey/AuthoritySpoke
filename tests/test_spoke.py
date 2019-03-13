@@ -258,10 +258,28 @@ class TestOpinions:
         assert make_opinion["watt_majority"].court == "9th-cir"
         assert "388 F.2d 853" in make_opinion["watt_majority"].citations
 
-    def test_opinion_holding_list(self, make_opinion, real_holding):
-        assert real_holding["h3"] in make_opinion["watt_majority"].holdings
+    def test_opinion_holding_list(self, make_opinion, real_holding, make_entity):
+        watt = make_opinion["watt_majority"]
+        h = real_holding
+        e = make_entity
 
-    def test_opinion_entity_list(self, make_opinion, make_entity):
+        watt.posits(h["h3"], (e["motel"], e["watt"], e["tree_search"], e["trees"])
+        )
+        assert h["h3"] in watt.holdings
+
+    def test_opinion_entity_list(self, make_opinion, real_holding, make_entity):
+        watt = make_opinion["watt_majority"]
+        h = real_holding
+        e = make_entity
+
+        watt.posits(h["h1"], (e["motel"], e["watt"]))
+        watt.posits(h["h2"], (e["trees"], e["motel"]))
+        watt.posits(
+            h["h3"], (e["motel"], e["watt"], e["tree_search"], e["trees"])
+        )
+        watt.posits(
+            h["h4"], (e["motel"], e["watt"], e["tree_search"], e["trees"])
+        )
         assert make_entity["watt"] in make_opinion["watt_majority"].get_entities()
 
     def test_opinion_date(self, make_opinion):
