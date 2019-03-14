@@ -15,10 +15,10 @@ from enactments import Enactment
 from spoke import Factor
 
 
-class Comparison(NamedTuple):
+class Relation(NamedTuple):
     need_matches: Tuple[Factor, ...]
     available: Tuple[Factor, ...]
-    relation: Callable
+    comparison: Callable
 
 
 @dataclass(frozen=True)
@@ -113,7 +113,7 @@ class Procedure(Factor):
     ) -> Iterator[Dict[Factor, Optional[Factor]]]:
         """
         Determines whether all factors in need_matches have the relation
-        "relation" with a factor in available_for_matching, with matching
+        "comparison" with a factor in available_for_matching, with matching
         entity slots.
         """
 
@@ -173,26 +173,26 @@ class Procedure(Factor):
 
         despite_or_input = (*self.despite, *self.inputs)
 
-        comparisons = (
-            Comparison(other.outputs, self.outputs, operator.le),
-            Comparison(other.inputs, self.inputs, operator.le),
-            Comparison(other.despite, despite_or_input, operator.le),
+        relations = (
+            Relation(other.outputs, self.outputs, operator.le),
+            Relation(other.inputs, self.inputs, operator.le),
+            Relation(other.despite, despite_or_input, operator.le),
         )
 
-        return bool(self.all_comparison_matches(comparisons))
+        return bool(self.all_relation_matches(relations))
 
-    def all_comparison_matches(
-        self, comparisons: Tuple[Comparison, ...]
+    def all_relation_matches(
+        self, relations: Tuple[Relation, ...]
     ) -> List[Dict[Factor, Optional[Factor]]]:
         matchlist = [{}]
-        for comparison in comparisons:
+        for relation in relations:
             new_matchlist = []
             for matches in matchlist:
                 for answer in self.compare_factors(
                     MappingProxyType(matches),
-                    list(comparison.need_matches),
-                    comparison.available,
-                    comparison.relation,
+                    list(relation.need_matches),
+                    relation.available,
+                    relation.comparison,
                 ):
                     new_matchlist.append(dict(answer))
             matchlist = new_matchlist
@@ -306,8 +306,8 @@ class Procedure(Factor):
 
         # For self to contradict other, every input of other
         # must be implied by some input or despite factor of self.
-        comparisons = (Comparison(other.inputs, self_despite_or_input, operator.le),)
-        matchlist = self.all_comparison_matches(comparisons)
+        relations = (Relation(other.inputs, self_despite_or_input, operator.le),)
+        matchlist = self.all_relation_matches(relations)
 
         # For self to contradict other, some output of other
         # must be contradicted by some output of self.
@@ -337,11 +337,11 @@ class Procedure(Factor):
         if self == other:
             return True
 
-        comparisons = (
-            Comparison(other.outputs, self.outputs, operator.le),
-            Comparison(self.inputs, other.inputs, operator.le),
+        relations = (
+            Relation(other.outputs, self.outputs, operator.le),
+            Relation(self.inputs, other.inputs, operator.le),
         )
-        matchlist = self.all_comparison_matches(comparisons)
+        matchlist = self.all_relation_matches(relations)
 
         # For every factor in other, find the permutations of entity slots
         # that are consistent with matchlist and that don't cause the factor
@@ -380,12 +380,12 @@ class Procedure(Factor):
         other_despite_or_input = (*other.despite, *other.inputs)
         self_despite_or_input = (*self.despite, *self.inputs)
 
-        comparisons = (
-            Comparison(other.outputs, self.outputs, operator.le),
-            Comparison(other.despite, self_despite_or_input, operator.le),
+        relations = (
+            Relation(other.outputs, self.outputs, operator.le),
+            Relation(other.despite, self_despite_or_input, operator.le),
         )
 
-        matchlist = self.all_comparison_matches(comparisons)
+        matchlist = self.all_relation_matches(relations)
 
         return any(
             self.consistent_factor_groups(self.inputs, other_despite_or_input, matches)
