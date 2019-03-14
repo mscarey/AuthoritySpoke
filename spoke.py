@@ -44,7 +44,8 @@ class Factor:
 
         def all_subclasses(cls):
             return set(cls.__subclasses__()).union(
-                [s for c in cls.__subclasses__() for s in all_subclasses(c)])
+                [s for c in cls.__subclasses__() for s in all_subclasses(c)]
+            )
 
         class_options = all_subclasses(cls)
         cname = factor.pop("type", "")
@@ -330,13 +331,10 @@ class Predicate:
                 f'"comparison" string parameter must be one of {OPPOSITE_COMPARISONS.keys()}.'
             )
 
-        slots = self.content.count("{}")
-        if self.quantity:
-            slots -= 1
-        if slots < 2 and self.reciprocal:
+        if self.context_slots < 2 and self.reciprocal:
             raise ValueError(
-                f'"reciprocal" flag not allowed because {self.content} has '
-                f"{slots} spaces for context entities. At least 2 spaces needed."
+                f'"reciprocal" flag not allowed because "{self.content}" has '
+                f"{self.context_slots} spaces for context entities. At least 2 spaces needed."
             )
 
         # Assumes that the obverse of a statement about a quantity is
@@ -362,13 +360,28 @@ class Predicate:
         return slots
 
     @staticmethod
+    def str_to_quantity(quantity: str) -> Union[float, int, ureg.Quantity]:
+        if quantity.isdigit():
+            return int(quantity)
+        elif quantity.isdecimal():
+            return float(quantity)
+        else:
+            return Q_(quantity)
+
+    @classmethod
     def from_string(
-        content: str, truth: Optional[bool] = True, reciprocal: bool = False
+        cls, content: str, truth: Optional[bool] = True, reciprocal: bool = False
     ) -> Tuple["Predicate", Tuple[Factor, ...]]:
 
         """Generates a Predicate object and Entities from a string that
         has curly brackets around the Entities and the comparison/quantity.
-        Assumes the comparison/quantity can only come last."""
+        Assumes the comparison/quantity can only come last.
+
+        This may never be used because it's an alternative to
+        Fact.from_dict(). This function identifies Entities
+        by finding brackets around them, while Fact.from_dict()
+        depends on knowing the names of the Entities in advance.
+        """
 
         comparison = None
         quantity = None
@@ -380,12 +393,7 @@ class Predicate:
                 comparison = c
                 quantity = entities.pop(-1)
                 quantity = quantity[2:].strip()
-                if quantity.isdigit():
-                    quantity = int(quantity)
-                elif quantity.isdecimal():
-                    quantity = float(quantity)
-                else:
-                    quantity = Q_(quantity)
+                quantity = cls.str_to_quantity(quantity)
 
         return (
             Predicate(

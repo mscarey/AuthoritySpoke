@@ -1,5 +1,8 @@
 import json
 
+import pint
+ureg = pint.UnitRegistry()
+
 from enactments import Enactment
 from entities import Entity, Human
 from evidence import Evidence
@@ -10,6 +13,10 @@ from spoke import Predicate, Factor
 
 
 class TestPredicateImport:
+    """
+    This tests a function for importing a Predicate by itself,
+    but Predicate imports can also happen as part of a Fact import.
+    """
     def test_import_predicate_with_quantity(self):
         story, entities = Predicate.from_string(
             "Once there was a {king} who had {> 3} castles"
@@ -18,11 +25,6 @@ class TestPredicateImport:
         assert story.content.startswith("Once")
         assert story.comparison == ">"
         assert story.quantity == 3
-
-    def test_json_import(self):
-        with open("input/holding_watt.json") as file:
-            watt_summary = json.load(file)
-
 
 class TestEntityImport:
     def test_mentioned_factors(self):
@@ -52,6 +54,15 @@ class TestFactorImport:
         new_fact = Fact.from_dict(fact_dict, mentioned_factors)
         assert "<Wattenburg> operated and lived at <Hideaway Lodge>" in str(new_fact)
         assert isinstance(new_fact.entity_context[0], Entity)
+
+    def test_fact_with_quantity(self):
+        with open("input/holding_watt.json") as file:
+            watt_summary = json.load(file)
+        mentioned = watt_summary["mentioned_factors"]
+        mentioned_factors = Opinion.get_mentioned_factors(mentioned)
+        fact_dict = watt_summary["holdings"][1]["inputs"][3]
+        new_fact = Fact.from_dict(fact_dict, mentioned_factors)
+        assert "was no more than 35 foot" in str(new_fact)
 
 class TestRuleImport:
     """

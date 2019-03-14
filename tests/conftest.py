@@ -908,14 +908,4 @@ def make_opinion(make_entity, real_holding) -> Dict[str, Opinion]:
     for case in test_cases:
         for opinion in Opinion.from_file(f"json/{case}_h.json"):
             opinions[f"{case}_{opinion.position}"] = opinion
-    """
-    opinions["watt_majority"].posits(h["h1"], (e["motel"], e["watt"]))
-    opinions["watt_majority"].posits(h["h2"], (e["trees"], e["motel"]))
-    opinions["watt_majority"].posits(
-        h["h3"], (e["motel"], e["watt"], e["tree_search"], e["trees"])
-    )
-    opinions["watt_majority"].posits(
-        h["h4"], (e["motel"], e["watt"], e["tree_search"], e["trees"])
-    )
-    """
     return opinions
