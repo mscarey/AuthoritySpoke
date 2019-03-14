@@ -474,61 +474,6 @@ class Rule(Factor):
     def __len__(self):
         return 0
 
-    @staticmethod
-    def holdings_from_json(self, filename: str) -> Dict["Rule", Tuple[Factor, ...]]:
-        """Creates a set of holdings from a JSON file in the input subdirectory,
-        adds those holdings to self.holdings, and returns self.holdings."""
-
-        def dict_from_input_json(filename: str) -> Tuple[Dict, Dict]:
-            """
-            Makes entity and holding dicts from a JSON file in the format that lists
-            mentioned_entities followed by a list of holdings.
-            """
-
-            path = pathlib.Path("input") / filename
-            with open(path, "r") as f:
-                case = json.load(f)
-            return case["mentioned_factors"], case["holdings"]
-
-        entity_list, holding_list = self.dict_from_input_json(filename)
-        for record in holding_list:
-            factor_groups = {"inputs": set(), "outputs": set(), "despite": set()}
-            for factor_type in factor_groups:
-                factor_list = record.get(factor_type, [])
-                if not isinstance(factor_list, list):
-                    factor_list = [factor_list]
-                for factor_dict in factor_list:
-                    factor = Factor.from_dict(factor_dict)
-                    factor_groups[factor_type].add(factor)
-            procedure = Procedure(
-                inputs=factor_groups["inputs"],
-                outputs=factor_groups["outputs"],
-                despite=factor_groups["despite"],
-            )
-
-            enactment_groups = {"enactments": set(), "enactments_despite": set()}
-            for enactment_type in enactment_groups:
-                enactment_list = record.get(enactment_type, [])
-                if isinstance(enactment_list, dict):
-                    enactment_list = [enactment_list]
-                for enactment_dict in enactment_list:
-                    enactment_groups[enactment_type].add(
-                        Enactment.from_dict(enactment_dict)
-                    )
-
-            holding = ProceduralRule(
-                procedure=procedure,
-                enactments=enactment_groups["enactments"],
-                enactments_despite=enactment_groups["enactments_despite"],
-                mandatory=record.get("mandatory", False),
-                universal=record.get("universal", False),
-                rule_valid=record.get("rule_valid", True),
-                decided=record.get("decided", True),
-            )
-            # There's currently no way to get the entities from the Predicates.
-            self.holdings[holding] = entities
-        return self.holdings
-
 
 @dataclass(frozen=True)
 class ProceduralRule(Rule):
@@ -613,6 +558,80 @@ class ProceduralRule(Rule):
         for the Rule's Procedure."""
 
         return len(self.procedure)
+
+    @classmethod
+    def from_dict(
+        cls, record: Dict, context_list: List[Factor], enactments: List[Enactment]
+    ) -> "ProceduralRule":
+        factor_groups = {"inputs": [], "outputs": [], "despite": []}
+        for factor_type in factor_groups:
+            factor_list = record.get(factor_type, [])
+            if not isinstance(factor_list, list):
+                factor_list = [factor_list]
+            for factor_record in factor_list:
+                if isinstance(factor_record, str):
+                    for context_factor in context_list:
+                        if context_factor.name == factor_record:
+                            factor = context_factor
+                    # Same test, but raises an error if factor_record fails this time
+                    if isinstance(factor_record, str):
+                        raise ValueError(
+                            f'An object included in "{factor_type}" '
+                            + "must be type Factor, not string, unless it "
+                            + "is the name of a Factor included in context_list."
+                        )
+                else:
+                    cname = factor_record.get("type")
+                    target_class = Factor.class_from_str(cname)
+                    factor = target_class.from_dict(
+                        factor_record, context_list
+                    )
+                factor_groups[factor_type].append(factor)
+                if factor.name:
+                    context_list.append(factor)
+        procedure = Procedure(
+            inputs=factor_groups["inputs"],
+            outputs=factor_groups["outputs"],
+            despite=factor_groups["despite"],
+        )
+
+        enactment_groups: Dict[str, List[Enactment]] = {"enactments": [], "enactments_despite": []}
+        for enactment_type in enactment_groups:
+            enactment_list = record.get(enactment_type, [])
+            if isinstance(enactment_list, dict):
+                enactment_list = [enactment_list]
+            for enactment_record in enactment_list:
+                if isinstance(enactment_record, str):
+                    for context_enactment in enactments:
+                        if context_enactment.name and context_enactment.name == enactment_record:
+                            enactment = context_enactment
+                    # Same test, but raises an error if factor_record fails this time
+                    if isinstance(factor_record, str):
+                        raise ValueError(
+                            f'An object included in "{enactment_type}" '
+                            + "must be type Enactment, not string, unless it "
+                            + "is the name of a Enactment included in enactments."
+                        )
+                else:
+                    enactment = Enactment(
+                            enactment_record.get("code"),
+                            enactment_record.get("section"),
+                            enactment_record.get("start"),
+                            enactment_record.get("end"),
+                            enactment_record.get("name"),)
+                    if enactment.name:
+                        enactments.append(enactment)
+                enactment_groups[enactment_type].append(enactment)
+
+        return (ProceduralRule(
+            procedure=procedure,
+            enactments=enactment_groups["enactments"],
+            enactments_despite=enactment_groups["enactments_despite"],
+            mandatory=record.get("mandatory", False),
+            universal=record.get("universal", False),
+            rule_valid=record.get("rule_valid", True),
+            decided=record.get("decided", True),
+        ), context_list, enactments)
 
     def contradicts_if_valid(self, other) -> bool:
         """Determines whether self contradicts other,

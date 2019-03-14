@@ -73,7 +73,7 @@
             }],
             "outputs": [{
                 "type": "fact",
-                "facts": "the stockpile of trees was within the curtilage of Hideaway Lodge"
+                "content": "the stockpile of trees was within the curtilage of Hideaway Lodge"
             }],
             "enactments": ["search clause"],
             "mandatory": true
@@ -110,7 +110,7 @@
             ],
             "outputs": {
                 "type": "fact",
-                "facts": "officers' search of the stockpile constituted an intrusion upon the stockpile of trees"
+                "content": "officers' search of the stockpile constituted an intrusion upon the stockpile of trees"
             },
             "enactments": ["search clause"],
             "mandatory": true

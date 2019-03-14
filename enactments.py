@@ -83,6 +83,7 @@ class Enactment:
     section: str
     start: Optional[str] = None
     end: Optional[str] = None
+    name: Optional[str] = None
 
     @property
     def effective_date(self):

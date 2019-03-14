@@ -37,10 +37,7 @@ class Factor:
     Motions, and Arguments."""
 
     @classmethod
-    def from_dict(cls, factor: dict) -> "Factor":
-        """
-        Turns a dict recently created from a chunk of JSON into a Factor object.
-        """
+    def class_from_str(cls, name: str):
 
         def all_subclasses(cls):
             return set(cls.__subclasses__()).union(
@@ -48,13 +45,23 @@ class Factor:
             )
 
         class_options = all_subclasses(cls)
-        cname = factor.pop("type", "")
         for c in class_options:
-            if cname.capitalize() == c.__name__:
-                return c.from_dict(factor)
+            if name.capitalize() == c.__name__:
+                return c
         raise ValueError(
-            f'"type" value in input must be one of {class_options}, not {cname}'
+            f'"type" value in input must be one of {class_options}, not {name}'
         )
+
+    @classmethod
+    def from_dict(cls, factor: dict) -> "Factor":
+        """
+        Turns a dict recently created from a chunk of JSON into a Factor object.
+        """
+
+        cname = factor.pop("type", "")
+        target_class = cls.class_from_str(cname)
+        return target_class.from_dict(factor)
+
 
     def generic_factors(self) -> Iterable["Factor"]:
         """Returns an iterable of self's generic Factors,

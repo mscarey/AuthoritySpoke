@@ -7,6 +7,8 @@ import pathlib
 
 from dataclasses import dataclass
 
+from facts import Fact
+from evidence import Exhibit, Evidence
 from enactments import Enactment
 from rules import Procedure, Rule, ProceduralRule
 from spoke import Factor
@@ -30,6 +32,38 @@ class Opinion:
 
     def __post_init__(self):
         self.holdings = {}
+
+    def holdings_from_json(self, filename: str) -> List["Rule"]:
+        """
+        Creates a list of holdings from a JSON file in the input subdirectory,
+        and returns the list.
+
+        Should this also cause the Opinion to posit the Rules as holdings?
+        """
+
+        def dict_from_input_json(filename: str) -> Tuple[Dict, Dict]:
+            """
+            Makes entity and holding dicts from a JSON file in the format that lists
+            mentioned_entities followed by a list of holdings.
+            """
+
+            path = pathlib.Path("input") / filename
+            with open(path, "r") as f:
+                case = json.load(f)
+            return case["mentioned_factors"], case["holdings"]
+
+        context_list, rule_list = dict_from_input_json(filename)
+        context_list = self.__class__.get_mentioned_factors(context_list)
+        enactments: List[Enactment] = []
+        finished_rules: List["Rule"] = []
+        for rule in rule_list:
+            # This will need to change for Attribution holdings
+            finished_rule, context_list, enactments = ProceduralRule.from_dict(
+                rule, context_list, enactments
+            )
+            finished_rules.append(finished_rule)
+        return finished_rules
+
 
     @staticmethod
     def from_file(path):
@@ -60,7 +94,9 @@ class Opinion:
             )
 
     @classmethod
-    def get_mentioned_factors(cls, mentioned_dict: List[Dict[str, str]]) -> List[Factor]:
+    def get_mentioned_factors(
+        cls, mentioned_dict: List[Dict[str, str]]
+    ) -> List[Factor]:
         """
         :param mentioned_dict: A dict in the JSON format used in the
         "input" folder.
@@ -72,15 +108,14 @@ class Opinion:
         """
         return [Factor.from_dict(factor_dict) for factor_dict in mentioned_dict]
 
-
     def get_entities(self):
         return [e for t in self.holdings.values() for e in t]
 
     def posits(
         self, holding: Rule, entities: Optional[Tuple[Factor, ...]] = None
     ) -> None:
-    # TODO: the "entities" parameter is now misnamed because they can be
-    # any subclass of Factor.
+        # TODO: the "entities" parameter is now misnamed because they can be
+        # any subclass of Factor.
         if entities is None:
             entities = self.get_entities()[: len(holding)]  # TODO: write test
 
