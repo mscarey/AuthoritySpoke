@@ -49,10 +49,13 @@ class Entity(Factor):
         return self.name
 
     @classmethod
-    def from_dict(cls, entity_dict):
-        return cls(name=entity_dict.get("name"),
+    def from_dict(cls, entity_dict, mentioned):
+        factor = cls(name=entity_dict.get("name"),
         generic=entity_dict.get("generic", True),
         plural=entity_dict.get("generic", False))
+        if factor.name:
+            mentioned.append(factor)
+        return factor, mentioned
 
     def context_register(
         self, other: Factor, comparison

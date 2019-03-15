@@ -95,7 +95,7 @@ class Opinion:
 
     @classmethod
     def get_mentioned_factors(
-        cls, mentioned: List[Dict[str, str]]
+        cls, mentioned_list: List[Dict[str, str]]
     ) -> List[Factor]:
         """
         :param mentioned_dict: A dict in the JSON format used in the
@@ -106,7 +106,10 @@ class Opinion:
         there's currently no other way to import those using the JSON
         format.
         """
-        return [Factor.from_dict(factor_dict) for factor_dict in mentioned]
+        mentioned: List[Factor] = []
+        for factor_dict in mentioned_list:
+            _, mentioned = Factor.from_dict(factor_dict, mentioned)
+        return mentioned
 
     def get_entities(self):
         return [e for t in self.holdings.values() for e in t]

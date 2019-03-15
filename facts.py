@@ -282,7 +282,7 @@ class Fact(Factor):
     @classmethod
     def from_dict(
         cls, fact_dict: Optional[Dict[str, Union[str, bool]]], mentioned: List[Factor]
-    ) -> Optional["Fact"]:
+    ) -> Tuple[Optional["Fact"], List[Factor]]:
         """Constructs and returns a Fact object from a dict imported from
         a JSON file in the format used in the "input" folder."""
 
@@ -321,7 +321,7 @@ class Fact(Factor):
             quantity=quantity
         )
 
-        return cls(
+        factor = cls(
             predicate,
             context_factors,
             name=fact_dict.get("name", None),
@@ -329,6 +329,9 @@ class Fact(Factor):
             absent=fact_dict.get("absent", False),
             generic=fact_dict.get("generic", False),
         )
+        if factor.name:
+            mentioned.append(factor)
+        return factor, mentioned
 
     def new_context(
         self,

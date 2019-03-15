@@ -1,7 +1,6 @@
 import json
 
 import pint
-ureg = pint.UnitRegistry()
 
 from enactments import Enactment
 from entities import Entity, Human
@@ -11,6 +10,7 @@ from opinions import Opinion
 from rules import Procedure, Rule, ProceduralRule
 from spoke import Predicate, Factor
 
+ureg = pint.UnitRegistry()
 
 class TestPredicateImport:
     """

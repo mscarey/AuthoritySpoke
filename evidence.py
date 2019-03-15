@@ -52,14 +52,14 @@ class Exhibit(Factor):
             raise ValueError(
                 f'"type" value in input must be "evidence", not {factor["type"]}'
             )
-        return cls(
+        return (cls(
             form=factor.get("form"),
             to_effect=Fact.from_dict(factor.get("to_effect")),
             statement=Fact.from_dict(factor.get("statement")),
             stated_by=factor.get("stated_by"),
             derived_from=factor.get("derived_from"),
             absent=factor.get("absent"),
-        )
+        ), mentioned)
 
     def __eq__(self, other: Factor) -> bool:
         if self.__class__ != other.__class__:
