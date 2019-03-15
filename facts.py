@@ -281,28 +281,29 @@ class Fact(Factor):
 
     @classmethod
     def from_dict(
-        cls, fact_dict: Dict[str, Union[str, bool]], mentioned: List[Factor]
-    ) -> "Fact":
+        cls, fact_dict: Optional[Dict[str, Union[str, bool]]], mentioned: List[Factor]
+    ) -> Optional["Fact"]:
         """Constructs and returns a Fact object from a dict imported from
         a JSON file in the format used in the "input" folder."""
 
+        if fact_dict is None:
+            return fact_dict
         if fact_dict.get("type") and fact_dict["type"].lower() != "fact":
             raise ValueError(
                 f'"type" value in input must be "fact", not {fact_dict["type"]}'
             )
-        context_factors = []
+        context_with_indices: Dict[Factor, int] = {}
         comparison = None
         quantity = None
         if fact_dict.get("content"):
             for factor in mentioned:
                 if factor.name and factor.name in fact_dict["content"]:
-                    context_factors.append(factor)
+                    context_with_indices[factor] = fact_dict["content"].find(factor.name)
+                    fact_dict["content"] = fact_dict["content"].replace(factor.name, "{}")
             context_factors = sorted(
-                context_factors,
-                key=lambda factor: fact_dict["content"].find(factor.name),
+                context_with_indices,
+                key=lambda k: context_with_indices[k],
             )
-            for factor in context_factors:
-                fact_dict["content"] = fact_dict["content"].replace(factor.name, "{}")
             for item in OPPOSITE_COMPARISONS:
                 if item in fact_dict["content"]:
                     comparison = item

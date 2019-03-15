@@ -563,32 +563,19 @@ class ProceduralRule(Rule):
     def from_dict(
         cls, record: Dict, context_list: List[Factor], enactments: List[Enactment]
     ) -> "ProceduralRule":
-        factor_groups = {"inputs": [], "outputs": [], "despite": []}
-        for factor_type in factor_groups:
-            factor_list = record.get(factor_type, [])
+        def list_of_factors_from_dict(
+            factor_list: List[Dict[str, str]], context_list: List[Factor]) -> List[Factor]:
             if not isinstance(factor_list, list):
                 factor_list = [factor_list]
             for factor_record in factor_list:
-                if isinstance(factor_record, str):
-                    for context_factor in context_list:
-                        if context_factor.name == factor_record:
-                            factor = context_factor
-                    # Same test, but raises an error if factor_record fails this time
-                    if isinstance(factor_record, str):
-                        raise ValueError(
-                            f'An object included in "{factor_type}" '
-                            + "must be type Factor, not string, unless it "
-                            + "is the name of a Factor included in context_list."
-                        )
-                else:
-                    cname = factor_record.get("type")
-                    target_class = Factor.class_from_str(cname)
-                    factor = target_class.from_dict(
-                        factor_record, context_list
-                    )
+                factor = Factor.from_dict(factor_record, context_list)
                 factor_groups[factor_type].append(factor)
                 if factor.name:
                     context_list.append(factor)
+        factor_groups = {"inputs": [], "outputs": [], "despite": []}
+        for factor_type in factor_groups:
+            factor_groups[factor_type] = list_of_factors_from_dict(record.get(factor_type, []))
+
         procedure = Procedure(
             inputs=factor_groups["inputs"],
             outputs=factor_groups["outputs"],

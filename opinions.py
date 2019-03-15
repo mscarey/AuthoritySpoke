@@ -53,13 +53,13 @@ class Opinion:
             return case["mentioned_factors"], case["holdings"]
 
         context_list, rule_list = dict_from_input_json(filename)
-        context_list = self.__class__.get_mentioned_factors(context_list)
+        mentioned = self.__class__.get_mentioned_factors(context_list)
         enactments: List[Enactment] = []
         finished_rules: List["Rule"] = []
         for rule in rule_list:
             # This will need to change for Attribution holdings
             finished_rule, context_list, enactments = ProceduralRule.from_dict(
-                rule, context_list, enactments
+                rule, mentioned, enactments
             )
             finished_rules.append(finished_rule)
         return finished_rules
@@ -95,7 +95,7 @@ class Opinion:
 
     @classmethod
     def get_mentioned_factors(
-        cls, mentioned_dict: List[Dict[str, str]]
+        cls, mentioned: List[Dict[str, str]]
     ) -> List[Factor]:
         """
         :param mentioned_dict: A dict in the JSON format used in the
@@ -106,7 +106,7 @@ class Opinion:
         there's currently no other way to import those using the JSON
         format.
         """
-        return [Factor.from_dict(factor_dict) for factor_dict in mentioned_dict]
+        return [Factor.from_dict(factor_dict) for factor_dict in mentioned]
 
     def get_entities(self):
         return [e for t in self.holdings.values() for e in t]

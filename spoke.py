@@ -53,14 +53,29 @@ class Factor:
         )
 
     @classmethod
-    def from_dict(cls, factor: dict) -> "Factor":
+    def from_dict(cls, factor_record: Dict, context_list: List["Factor"]) -> "Factor":
         """
         Turns a dict recently created from a chunk of JSON into a Factor object.
         """
 
-        cname = factor.pop("type", "")
-        target_class = cls.class_from_str(cname)
-        return target_class.from_dict(factor)
+        if isinstance(factor_record, str):
+            for context_factor in context_list:
+                if context_factor.name == factor_record:
+                    factor = context_factor
+            # Same test, but raises an error if factor_record fails this time
+            if isinstance(factor_record, str):
+                raise ValueError(
+                    f'The object "{factor_record}" should be a dict '
+                    + "representing a Factor or a string "
+                    + "representing the name of a Factor included in context_list."
+                )
+        else:
+            cname = factor_record["type"]
+            target_class = cls.class_from_str(cname)
+            factor = target_class.from_dict(
+                factor_record, context_list
+            )
+        return factor
 
 
     def generic_factors(self) -> Iterable["Factor"]:

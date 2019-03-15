@@ -2,14 +2,13 @@ from typing import Dict, Tuple
 
 import pytest
 
+from spoke import Predicate, Factor, Q_
 from enactments import Code, Enactment
 from entities import Entity, Event, Human
 from evidence import Evidence, Exhibit
 from facts import Fact
 from opinions import Opinion
 from rules import Procedure, ProceduralRule
-from spoke import Predicate, Factor
-from spoke import Q_
 
 
 @pytest.fixture(scope="class")
