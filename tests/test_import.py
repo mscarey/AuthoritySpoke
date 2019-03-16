@@ -9,7 +9,7 @@ from facts import Fact
 from opinions import Opinion
 from rules import Procedure, Rule, ProceduralRule
 from spoke import Predicate, Factor
-from spoke import log_mentioned_context
+from file_import import log_mentioned_context
 
 ureg = pint.UnitRegistry()
 
@@ -92,6 +92,25 @@ class TestRuleImport:
         watt.holdings_from_json("holding_watt.json")
         assert any(h == make_holding["h1"] for h in watt.holdings)
 
+    def test_same_enactment_objects_equal(self, make_opinion):
+        """
+        Don't expect the holdings imported from the JSON to
+        exactly match the holdings created for testing in conftest.
+        """
+        watt = make_opinion["watt_majority"]
+        holdings = watt.holdings_from_json("holding_watt.json")
+        assert holdings[0].enactments[0] == holdings[1].enactments[0]
+
+    def test_same_code_object_in_multiple_enactments(self, make_opinion):
+        """
+        Don't expect the holdings imported from the JSON to
+        exactly match the holdings created for testing in conftest.
+        """
+        watt = make_opinion["watt_majority"]
+        holdings = watt.holdings_from_json("holding_watt.json")
+        assert holdings[0].enactments[0].code == holdings[1].enactments[0].code
+
+
 
 class TestNestedFactorImport:
     def test_import_holding(self, make_opinion):
@@ -104,6 +123,6 @@ class TestNestedFactorImport:
         testimony on the jury. Hence, admission of the testimony
         concerning appellant’s use of narcotics was improper.
         """
-        watt = make_opinion["watt_majority"]
-        watt.holdings_from_json("holding_watt.json")
-        assert len(watt.holdings) == 2
+        cardenas = make_opinion["cardenas_majority"]
+        cardenas.holdings_from_json("holding_cardenas.json")
+        assert len(cardenas.holdings) == 2

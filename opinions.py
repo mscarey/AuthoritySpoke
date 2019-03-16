@@ -7,9 +7,10 @@ import pathlib
 
 from dataclasses import dataclass
 
-from facts import Fact
 from evidence import Exhibit, Evidence
 from enactments import Enactment
+from facts import Fact
+from file_import import log_mentioned_context
 from rules import Procedure, Rule, ProceduralRule
 from spoke import Factor
 
@@ -41,7 +42,7 @@ class Opinion:
         Should this also cause the Opinion to posit the Rules as holdings?
         """
 
-        def dict_from_input_json(filename: str) -> Tuple[Dict, Dict]:
+        def dict_from_input_json(filename: str) -> Tuple[List[Dict], List[Dict]]:
             """
             Makes entity and holding dicts from a JSON file in the format that lists
             mentioned_entities followed by a list of holdings.
@@ -54,12 +55,11 @@ class Opinion:
 
         context_list, rule_list = dict_from_input_json(filename)
         mentioned = self.__class__.get_mentioned_factors(context_list)
-        enactments: List[Enactment] = []
         finished_rules: List["Rule"] = []
         for rule in rule_list:
             # This will need to change for Attribution holdings
-            finished_rule, context_list, enactments = ProceduralRule.from_dict(
-                rule, mentioned, enactments
+            finished_rule, context_list = ProceduralRule.from_dict(
+                rule, mentioned
             )
             finished_rules.append(finished_rule)
         return finished_rules

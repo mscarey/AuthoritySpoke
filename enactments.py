@@ -1,13 +1,15 @@
 import datetime
 import pathlib
 import re
-from typing import Dict, Optional
+from typing import Dict, List, Optional
 
 from bs4 import BeautifulSoup
 
 from dataclasses import dataclass
 
 from utils import roman
+
+from file_import import log_mentioned_context
 
 class Code:
     """
@@ -163,11 +165,15 @@ class Enactment:
             return False
         return self >= other
 
-    def from_dict(enactment_dict: Dict[str, Optional[str]]) -> "Enactment":
-        code = Code(enactment_dict.get("code", None))
+    @classmethod
+    @log_mentioned_context
+    def from_dict(cls, enactment_dict: Dict[str, str], mentioned: List[Dict[str, str]]) -> "Enactment":
+        # No way to use an existing code object currently
+        code = Code(enactment_dict.get("code"))
         return Enactment(
             code=code,
-            section=enactment_dict.get("section", None),
-            start=enactment_dict.get("start", None),
-            end=enactment_dict.get("end", None),
+            section=enactment_dict.get("section"),
+            start=enactment_dict.get("start"),
+            end=enactment_dict.get("end"),
+            name=enactment_dict.get("name"),
         )

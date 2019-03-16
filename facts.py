@@ -3,8 +3,8 @@ from typing import Callable, Dict, List, Set, Tuple
 from typing import Iterable, Iterator, Mapping
 from typing import Optional, Sequence, Union
 
-from spoke import Factor, Predicate
-from spoke import log_mentioned_context, OPPOSITE_COMPARISONS
+from spoke import Factor, Predicate, OPPOSITE_COMPARISONS
+from file_import import log_mentioned_context
 from entities import Entity
 
 from dataclasses import dataclass

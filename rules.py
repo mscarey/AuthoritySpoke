@@ -12,6 +12,7 @@ from typing import NamedTuple
 from dataclasses import dataclass
 
 from enactments import Enactment
+from file_import import log_mentioned_context
 from spoke import Factor
 
 
@@ -561,22 +562,26 @@ class ProceduralRule(Rule):
 
     @classmethod
     def from_dict(
-        cls, record: Dict, context_list: List[Factor], enactments: List[Enactment]
-    ) -> Tuple["ProceduralRule", List[Factor], List[Enactment]]:
-        def list_of_factors_from_dict(
-            factor_list: List[Dict[str, str]], context_list: List[Factor]
+        cls, record: Dict, context_list: List[Factor]
+    ) -> Tuple["ProceduralRule", List[Factor]]:
+        def list_from_records(
+            record_list: List[Dict[str, str]], context_list: List[Factor]
         ) -> List[Factor]:
-            factors: List[Factor] = []
-            if not isinstance(factor_list, list):
-                factor_list = [factor_list]
-            for factor_record in factor_list:
-                factor, context_list = Factor.from_dict(factor_record, context_list)
-                factors.append(factor)
-            return factors
+            factors_or_enactments: List[Union[Factor, Enactment]] = []
+            if not isinstance(record_list, list):
+                record_list = [record_list]
+            for record in record_list:
+                if record.get("code") is not None: # assuming Enactment has "code"
+                    record, context_list = Enactment.from_dict(record, context_list)
+                else:
+                    record, context_list = Factor.from_dict(record, context_list)
+                factors_or_enactments.append(record)
+            return factors_or_enactments
 
-        factor_groups: Dict[str, List] = {"inputs": [], "outputs": [], "despite": []}
+        factor_groups: Dict[str, List] = {"inputs": [], "outputs": [], "despite": [], "enactments": [],
+            "enactments_despite": [],}
         for factor_type in factor_groups:
-            factor_groups[factor_type] = list_of_factors_from_dict(
+            factor_groups[factor_type] = list_from_records(
                 record.get(factor_type, []), context_list
             )
 
@@ -586,53 +591,17 @@ class ProceduralRule(Rule):
             despite=factor_groups["despite"],
         )
 
-        enactment_groups: Dict[str, List[Enactment]] = {
-            "enactments": [],
-            "enactments_despite": [],
-        }
-        for enactment_type in enactment_groups:
-            enactment_list = record.get(enactment_type, [])
-            if isinstance(enactment_list, dict):
-                enactment_list = [enactment_list]
-            for enactment_record in enactment_list:
-                if isinstance(enactment_record, str):
-                    for context_enactment in enactments:
-                        if (
-                            context_enactment.name
-                            and context_enactment.name == enactment_record
-                        ):
-                            enactment = context_enactment
-                    # Same test, but raises an error if factor_record fails this time
-                    if isinstance(enactment_record, str):
-                        raise ValueError(
-                            f'An object included in "{enactment_type}" '
-                            + "must be type Enactment, not string, unless it "
-                            + "is the name of a Enactment included in enactments."
-                        )
-                else:
-                    enactment = Enactment(
-                        enactment_record.get("code"),
-                        enactment_record.get("section"),
-                        enactment_record.get("start"),
-                        enactment_record.get("end"),
-                        enactment_record.get("name"),
-                    )
-                    if enactment.name:
-                        enactments.append(enactment)
-                enactment_groups[enactment_type].append(enactment)
-
         return (
             ProceduralRule(
                 procedure=procedure,
-                enactments=enactment_groups["enactments"],
-                enactments_despite=enactment_groups["enactments_despite"],
+                enactments=factor_groups["enactments"],
+                enactments_despite=factor_groups["enactments_despite"],
                 mandatory=record.get("mandatory", False),
                 universal=record.get("universal", False),
                 rule_valid=record.get("rule_valid", True),
                 decided=record.get("decided", True),
             ),
             context_list,
-            enactments,
         )
 
     def contradicts_if_valid(self, other) -> bool:
