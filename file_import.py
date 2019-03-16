@@ -3,8 +3,6 @@ from typing import Callable, Dict, List, Set, Tuple
 from typing import Iterable, Iterator, Mapping
 from typing import Optional, Sequence, Union
 
-from spoke import Factor
-
 def log_mentioned_context(func: Callable):
     """
     Decorator for make_dict() methods of Factor subclasses.
@@ -19,8 +17,8 @@ def log_mentioned_context(func: Callable):
     def wrapper(
         cls,
         factor_record: Union[str, Optional[Dict[str, Union[str, bool]]]],
-        mentioned: List[Union[Factor, "Enactment"]],
-    ) -> Tuple[Optional[Factor], List[Factor]]:
+        mentioned: List[Union["Factor", "Enactment"]],
+    ) -> Tuple[Optional["Factor"], List["Factor"]]:
         if factor_record is None:
             return factor_record, mentioned
         if isinstance(factor_record, str):

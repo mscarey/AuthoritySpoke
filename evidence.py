@@ -302,7 +302,7 @@ class Evidence(Factor):
     def from_dict(factor: Optional[dict]) -> Optional["Evidence"]:
         if factor is None:
             return None
-        if factor["type"].capitalize() != "Evidence":
+        if factor["type"].lower() != "evidence":
             raise ValueError(
                 f'"type" value in input must be "evidence", not {factor["type"]}'
             )

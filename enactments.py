@@ -11,6 +11,8 @@ from utils import roman
 
 from file_import import log_mentioned_context
 
+from spoke import Factor
+
 class Code:
     """
     A constitution, code of statutes, code of regulations,
@@ -79,7 +81,7 @@ class Code:
         return NotImplementedError
 
 @dataclass(frozen=True)
-class Enactment:
+class Enactment(Factor):
 
     code: Code
     section: str

@@ -571,10 +571,7 @@ class ProceduralRule(Rule):
             if not isinstance(record_list, list):
                 record_list = [record_list]
             for record in record_list:
-                if record.get("code") is not None: # assuming Enactment has "code"
-                    record, context_list = Enactment.from_dict(record, context_list)
-                else:
-                    record, context_list = Factor.from_dict(record, context_list)
+                record, context_list = Factor.from_dict(record, context_list)
                 factors_or_enactments.append(record)
             return factors_or_enactments
 
