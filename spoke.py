@@ -1,3 +1,4 @@
+import functools
 import itertools
 import logging
 import operator
@@ -28,6 +29,34 @@ OPPOSITE_COMPARISONS = {
 }
 
 
+def log_mentioned_context(func: Callable):
+    @functools.wraps(func)
+    def wrapper(
+        cls,
+        factor_record: Union[str, Optional[Dict[str, Union[str, bool]]]],
+        mentioned: List[Factor],
+    ) -> Tuple[Optional["Fact"], List[Factor]]:
+        if factor_record is None:
+            return factor_record, mentioned
+        if isinstance(factor_record, str):
+            for context_factor in mentioned:
+                if context_factor.name == factor_record:
+                    return context_factor, mentioned
+            # Same test, but raises an error if factor_record fails this time
+            if isinstance(factor_record, str):
+                raise ValueError(
+                    f'The object "{factor_record}" should be a dict '
+                    + "representing a Factor or a string "
+                    + "representing the name of a Factor included in context_list."
+                )
+        else:
+            factor, mentioned = func(cls, factor_record, mentioned)
+            if factor.name:
+                mentioned.append(factor)
+        return factor, mentioned
+    return wrapper
+
+
 @dataclass(frozen=True)
 class Factor:
     """A factor is something used to determine the applicability of a legal
@@ -38,7 +67,6 @@ class Factor:
 
     @classmethod
     def class_from_str(cls, name: str):
-
         def all_subclasses(cls):
             return set(cls.__subclasses__()).union(
                 [s for c in cls.__subclasses__() for s in all_subclasses(c)]
@@ -58,25 +86,10 @@ class Factor:
         Turns a dict recently created from a chunk of JSON into a Factor object.
         """
 
-        if isinstance(factor_record, str):
-            for context_factor in context_list:
-                if context_factor.name == factor_record:
-                    factor = context_factor
-            # Same test, but raises an error if factor_record fails this time
-            if isinstance(factor_record, str):
-                raise ValueError(
-                    f'The object "{factor_record}" should be a dict '
-                    + "representing a Factor or a string "
-                    + "representing the name of a Factor included in context_list."
-                )
-        else:
-            cname = factor_record["type"]
-            target_class = cls.class_from_str(cname)
-            factor = target_class.from_dict(
-                factor_record, context_list
-            )
+        cname = factor_record["type"]
+        target_class = cls.class_from_str(cname)
+        factor = target_class.from_dict(factor_record, context_list)
         return factor
-
 
     def generic_factors(self) -> Iterable["Factor"]:
         """Returns an iterable of self's generic Factors,

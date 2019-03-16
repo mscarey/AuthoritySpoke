@@ -9,14 +9,17 @@ from facts import Fact
 from opinions import Opinion
 from rules import Procedure, Rule, ProceduralRule
 from spoke import Predicate, Factor
+from spoke import log_mentioned_context
 
 ureg = pint.UnitRegistry()
+
 
 class TestPredicateImport:
     """
     This tests a function for importing a Predicate by itself,
     but Predicate imports can also happen as part of a Fact import.
     """
+
     def test_import_predicate_with_quantity(self):
         story, entities = Predicate.from_string(
             "Once there was a {king} who had {> 3} castles"
@@ -25,6 +28,7 @@ class TestPredicateImport:
         assert story.content.startswith("Once")
         assert story.comparison == ">"
         assert story.quantity == 3
+
 
 class TestEntityImport:
     def test_mentioned_factors(self):
@@ -44,6 +48,7 @@ class TestEnactmentImport:
         enactment = Enactment.from_dict(enactment_list[0])
         assert "all relevant evidence is admissible" in enactment.text
 
+
 class TestFactorImport:
     def test_fact_import(self):
         with open("input/holding_watt.json") as file:
@@ -51,7 +56,7 @@ class TestFactorImport:
         mentioned = watt_summary["mentioned_factors"]
         mentioned_factors = Opinion.get_mentioned_factors(mentioned)
         fact_dict = watt_summary["holdings"][0]["inputs"][1]
-        new_fact = Fact.from_dict(fact_dict, mentioned_factors)
+        new_fact, mentioned_factors = Fact.from_dict(fact_dict, mentioned_factors)
         assert "<Wattenburg> operated and lived at <Hideaway Lodge>" in str(new_fact)
         assert isinstance(new_fact.entity_context[0], Entity)
 
@@ -61,8 +66,9 @@ class TestFactorImport:
         mentioned = watt_summary["mentioned_factors"]
         mentioned_factors = Opinion.get_mentioned_factors(mentioned)
         fact_dict = watt_summary["holdings"][1]["inputs"][3]
-        new_fact = Fact.from_dict(fact_dict, mentioned_factors)
+        new_fact, mentioned_factors = Fact.from_dict(fact_dict, mentioned_factors)
         assert "was no more than 35 foot" in str(new_fact)
+
 
 class TestRuleImport:
     """

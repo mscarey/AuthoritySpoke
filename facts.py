@@ -3,7 +3,8 @@ from typing import Callable, Dict, List, Set, Tuple
 from typing import Iterable, Iterator, Mapping
 from typing import Optional, Sequence, Union
 
-from spoke import Factor, Predicate, OPPOSITE_COMPARISONS
+from spoke import Factor, Predicate
+from spoke import log_mentioned_context, OPPOSITE_COMPARISONS
 from entities import Entity
 
 from dataclasses import dataclass
@@ -280,14 +281,13 @@ class Fact(Factor):
         )
 
     @classmethod
+    @log_mentioned_context
     def from_dict(
         cls, fact_dict: Optional[Dict[str, Union[str, bool]]], mentioned: List[Factor]
     ) -> Tuple[Optional["Fact"], List[Factor]]:
         """Constructs and returns a Fact object from a dict imported from
         a JSON file in the format used in the "input" folder."""
 
-        if fact_dict is None:
-            return fact_dict
         if fact_dict.get("type") and fact_dict["type"].lower() != "fact":
             raise ValueError(
                 f'"type" value in input must be "fact", not {fact_dict["type"]}'
