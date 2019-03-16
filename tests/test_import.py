@@ -45,7 +45,7 @@ class TestEnactmentImport:
         with open("input/holding_cardenas.json") as file:
             cardenas_summary = json.load(file)
         enactment_list = cardenas_summary["holdings"][0]["enactments"]
-        enactment = Enactment.from_dict(enactment_list[0])
+        enactment, mentioned = Enactment.from_dict(enactment_list[0], [])
         assert "all relevant evidence is admissible" in enactment.text
 
 

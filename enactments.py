@@ -168,12 +168,15 @@ class Enactment:
     @classmethod
     @log_mentioned_context
     def from_dict(cls, enactment_dict: Dict[str, str], mentioned: List[Dict[str, str]]) -> "Enactment":
-        # No way to use an existing code object currently
+        """
+        No way to use an existing code object currently.
+        Also, handing "mentioned" through this method is pointless.
+        """
         code = Code(enactment_dict.get("code"))
-        return Enactment(
+        return (Enactment(
             code=code,
             section=enactment_dict.get("section"),
             start=enactment_dict.get("start"),
             end=enactment_dict.get("end"),
             name=enactment_dict.get("name"),
-        )
+        ), mentioned)

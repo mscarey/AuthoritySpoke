@@ -5,8 +5,10 @@ from typing import Callable, Dict, List, Set, Tuple
 from typing import Iterable, Iterator, Mapping
 from typing import Optional, Sequence, Union
 
+from enactments import Enactment
 from entities import Entity
 from facts import Fact
+from file_import import log_mentioned_context
 from spoke import Factor
 
 
@@ -45,20 +47,21 @@ class Exhibit(Factor):
         return (self.statement, self.stated_by)
 
     @classmethod
-    def from_dict(cls, factor: Optional[dict], mentioned: List[Factor]) -> Optional["Exhibit"]:
-        if factor is None:
-            return None
-        if factor["type"].capitalize() != "Exhibit":
+    @log_mentioned_context
+    def from_dict(cls, factor_dict: Dict, mentioned: List[Union[Factor, Enactment]]) -> "Exhibit":
+        if factor_dict.get("type").lower() != "exhibit":
             raise ValueError(
-                f'"type" value in input must be "evidence", not {factor["type"]}'
+                f'"type" value in input must be "exhibit", not {factor_dict.get("type")}'
             )
+        statement, mentioned = Fact.from_dict(factor_dict.get("statement"), mentioned)
+        stated_by, mentioned = Entity.from_dict(factor_dict.get("stated_by"), mentioned)
         return (cls(
-            form=factor.get("form"),
-            to_effect=Fact.from_dict(factor.get("to_effect")),
-            statement=Fact.from_dict(factor.get("statement")),
-            stated_by=factor.get("stated_by"),
-            derived_from=factor.get("derived_from"),
-            absent=factor.get("absent"),
+            form=factor_dict.get("form"),
+            statement=statement,
+            stated_by=stated_by,
+            name=factor_dict.get("name"),
+            absent=factor_dict.get("absent"),
+            generic=factor_dict.get("generic"),
         ), mentioned)
 
     def __eq__(self, other: Factor) -> bool:
