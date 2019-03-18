@@ -105,21 +105,18 @@ class Exhibit(Factor):
             return other.implies_if_present(self)
         return False
 
-    def generic_factors(self) -> Iterable[Factor]:
+    def generic_factors(self) -> Dict[Factor, None]:
         """Returns an iterable of self's generic Factors,
         which must be matched to other generic Factors to
         perform equality tests between Factors."""
 
         if self.generic:
-            yield self
-        else:
-            collected_factors = [
-                generic
-                for factor in (self.statement, self.stated_by)
-                for generic in factor.generic_factors()
-            ]
-            for output in set(collected_factors):
-                yield output
+            return {self: None}
+        return {
+            generic: None
+            for factor in [x for x in (self.statement, self.stated_by) if x]
+            for generic in factor.generic_factors()
+        }
 
     def contradicts(self, other: Factor):
         return self >= other.make_absent()
@@ -227,21 +224,18 @@ class Evidence(Factor):
 
         return (self.exhibit, self.to_effect)
 
-    def generic_factors(self) -> Iterable[Factor]:
+    def generic_factors(self) -> Dict[Factor, None]:
         """Returns an iterable of self's generic Factors,
         which must be matched to other generic Factors to
         perform equality tests between Factors."""
 
         if self.generic:
-            yield self
-        else:
-            collected_factors = []
-            for factor in (self.to_effect, self.exhibit):
-                if factor:
-                    for generic in factor.generic_factors():
-                        collected_factors.append(generic)
-            for output in collected_factors:
-                yield output
+            return {self: None}
+        return {
+            generic: None
+            for factor in [x for x in (self.exhibit, self.to_effect) if x]
+            for generic in factor.generic_factors()
+        }
 
     def implies_if_present(self, other: Factor):
         """Determines whether self would imply other assuming
@@ -321,10 +315,13 @@ class Evidence(Factor):
         else:
             to_effect = None
 
-        return Evidence(
-            exhibit=exhibit,
-            to_effect=to_effect,
-            name=factor_dict.get("name"),
-            absent=factor_dict.get("absent"),
-            generic=factor_dict.get("generic"),
-        ), mentioned
+        return (
+            Evidence(
+                exhibit=exhibit,
+                to_effect=to_effect,
+                name=factor_dict.get("name"),
+                absent=factor_dict.get("absent"),
+                generic=factor_dict.get("generic"),
+            ),
+            mentioned,
+        )

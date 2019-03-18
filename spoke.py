@@ -60,13 +60,15 @@ class Factor:
         factor = target_class.from_dict(factor_record, context_list)
         return factor
 
-    def generic_factors(self) -> Iterable["Factor"]:
+    def generic_factors(self) -> Dict["Factor", None]:
         """Returns an iterable of self's generic Factors,
         which must be matched to other generic Factors to
         perform equality tests between Factors."""
 
         if self.generic:
-            yield self
+            return {self: None}
+        else:
+            return {}
 
     def make_absent(self) -> "Factor":
         """Returns a new object the same as self except with the

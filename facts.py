@@ -161,21 +161,18 @@ class Fact(Factor):
             generic=True,
         )
 
-    def generic_factors(self) -> Iterable[Factor]:
+    def generic_factors(self) -> Dict[Factor, None]:
         """Returns an iterable of self's generic Factors,
         which must be matched to other generic Factors to
         perform equality tests between Factors."""
 
         if self.generic:
-            yield self
-        else:
-            collected_factors = [
-                generic
+            return {self: None}
+        return {
+                generic: None
                 for factor in self.entity_context
                 for generic in factor.generic_factors()
-            ]
-            for output in set(collected_factors):
-                yield output
+        }
 
     def predicate_in_context(self, entities: Sequence[Factor]) -> str:
         """Prints the representation of the Predicate with Entities

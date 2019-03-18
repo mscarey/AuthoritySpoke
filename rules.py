@@ -33,9 +33,9 @@ class Procedure(Factor):
     If a factor is relevant both as support for the output and as a potential
     undercutter, include it in both 'inputs' and 'despite'."""
 
-    outputs: Tuple[Factor, ...] = ()
-    inputs: Tuple[Factor, ...] = ()
-    despite: Tuple[Factor, ...] = ()
+    outputs: Iterable[Factor] = ()
+    inputs: Iterable[Factor] = ()
+    despite: Iterable[Factor] = ()
     absent: bool = False
     generic: bool = True
     name: Optional[str] = None
@@ -278,18 +278,16 @@ class Procedure(Factor):
 
         return sorted(self.factors_all(), key=repr)
 
-    def generic_factors(self) -> Iterable[Factor]:
+    def generic_factors(self) -> Dict[Factor, None]:
         """Returns an iterable of self's generic Factors,
         which must be matched to other generic Factors to
         perform equality tests between Factors."""
 
-        collected_factors = [
-            generic
+        return {
+            generic: None
             for factor in self.factors_all()
             for generic in factor.generic_factors()
-        ]
-        for output in set(collected_factors):
-            yield output
+        }
 
     def contradicts_some_to_all(self, other: "Procedure") -> bool:
         """
@@ -565,15 +563,16 @@ class ProceduralRule(Rule):
         cls, record: Dict, context_list: List[Factor]
     ) -> Tuple["ProceduralRule", List[Factor]]:
         def list_from_records(
-            # TODO: turn into separate classmethods for Factor and Enactment
-            record_list: List[Dict[str, str]], context_list: List[Factor], class_to_create
-        ) -> List[Factor]:
+            record_list: Union[Dict[str, str], List[Dict[str, str]]],
+            context_list: List[Factor],
+            class_to_create,
+        ) -> List[Union[Factor, Enactment]]:
             factors_or_enactments: List[Union[Factor, Enactment]] = []
             if not isinstance(record_list, list):
                 record_list = [record_list]
             for record in record_list:
-                record, context_list = class_to_create.from_dict(record, context_list)
-                factors_or_enactments.append(record)
+                created, context_list = class_to_create.from_dict(record, context_list)
+                factors_or_enactments.append(created)
             return factors_or_enactments
 
         factor_groups: Dict[str, List] = {"inputs": [], "outputs": [], "despite": []}
@@ -581,8 +580,7 @@ class ProceduralRule(Rule):
             factor_groups[factor_type] = list_from_records(
                 record.get(factor_type, []), context_list, Factor
             )
-        enactment_groups: Dict[str, List] = {"enactments": [],
-            "enactments_despite": [],}
+        enactment_groups: Dict[str, List] = {"enactments": [], "enactments_despite": []}
         for enactment_type in enactment_groups:
             enactment_groups[enactment_type] = list_from_records(
                 record.get(enactment_type, []), context_list, Enactment
@@ -606,6 +604,9 @@ class ProceduralRule(Rule):
             ),
             context_list,
         )
+
+    def generic_factors(self):
+        return self.procedure.generic_factors()
 
     def contradicts_if_valid(self, other) -> bool:
         """Determines whether self contradicts other,

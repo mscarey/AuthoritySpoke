@@ -84,13 +84,12 @@ class TestRuleImport:
         """
         watt = make_opinion["watt_majority"]
         holdings = watt.holdings_from_json("holding_watt.json")
-        assert len(watt.holdings) == 5
-        assert holdings == watt.holdings
+        assert len(holdings) == 5
 
-    def test_imported_holding_same_as_test_object(self, make_holding, make_opinion):
+    def test_imported_holding_same_as_test_object(self, real_holding, make_opinion):
         watt = make_opinion["watt_majority"]
-        watt.holdings_from_json("holding_watt.json")
-        assert any(h == make_holding["h1"] for h in watt.holdings)
+        watt_holdings = watt.holdings_from_json("holding_watt.json")
+        assert watt_holdings[0] == real_holding["h1"]
 
     def test_same_enactment_objects_equal(self, make_opinion):
         """

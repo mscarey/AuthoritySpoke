@@ -21,9 +21,9 @@ class TestProcedures:
 
     def test_get_context_factors(self, make_procedure):
         # motel, watt
-        assert len(tuple(make_procedure["c1"].generic_factors())) == 2
+        assert len(make_procedure["c1"].generic_factors()) == 2
         # trees, motel
-        assert len(tuple(make_procedure["c2"].generic_factors())) == 2
+        assert len(make_procedure["c2"].generic_factors()) == 2
 
     def test_procedure_length(self, make_procedure):
         """Consider deleting Procedure.__len__() and this test."""
@@ -264,6 +264,18 @@ class TestRules:
 
     def test_None_not_in_str(self, make_holding):
         assert "None" not in str(make_holding["h2"])
+
+    def test_new_concrete_context(self, make_holding):
+        different = make_holding["h1"].new_context(
+            [Entity("Castle Grayskull"), Human("He-Man")]
+        )
+        assert "<He-Man> operated" in str(different)
+
+    def test_generic_factors(self, make_entity, make_holding):
+        generics = make_holding["h3"].generic_factors()
+        assert make_entity["motel"] in generics
+        assert make_entity["tree_search"] in generics
+
 
     # Equality
 
