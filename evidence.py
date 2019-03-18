@@ -30,7 +30,6 @@ class Exhibit(Factor):
     absent: bool = False
     generic: bool = False
 
-
     @property
     def context_factors(self) -> Tuple[Optional[Fact], Optional[Entity]]:
         """
@@ -48,21 +47,26 @@ class Exhibit(Factor):
 
     @classmethod
     @log_mentioned_context
-    def from_dict(cls, factor_dict: Dict, mentioned: List[Union[Factor, Enactment]]) -> "Exhibit":
+    def from_dict(
+        cls, factor_dict: Dict, mentioned: List[Union[Factor, Enactment]]
+    ) -> "Exhibit":
         if factor_dict.get("type").lower() != "exhibit":
             raise ValueError(
                 f'"type" value in input must be "exhibit", not {factor_dict.get("type")}'
             )
         statement, mentioned = Fact.from_dict(factor_dict.get("statement"), mentioned)
         stated_by, mentioned = Entity.from_dict(factor_dict.get("stated_by"), mentioned)
-        return (cls(
-            form=factor_dict.get("form"),
-            statement=statement,
-            stated_by=stated_by,
-            name=factor_dict.get("name"),
-            absent=factor_dict.get("absent"),
-            generic=factor_dict.get("generic"),
-        ), mentioned)
+        return (
+            cls(
+                form=factor_dict.get("form"),
+                statement=statement,
+                stated_by=stated_by,
+                name=factor_dict.get("name"),
+                absent=factor_dict.get("absent"),
+                generic=factor_dict.get("generic"),
+            ),
+            mentioned,
+        )
 
     def __eq__(self, other: Factor) -> bool:
         if self.__class__ != other.__class__:
@@ -170,6 +174,7 @@ class Evidence(Factor):
 
     exhibit: Optional[Exhibit] = None
     to_effect: Optional[Fact] = None
+    name: Optional[str] = None
     absent: bool = False
     generic: bool = False
 
@@ -298,19 +303,28 @@ class Evidence(Factor):
 
         return other > self.make_absent()
 
-
-    def from_dict(factor: Optional[dict]) -> Optional["Evidence"]:
-        if factor is None:
-            return None
-        if factor["type"].lower() != "evidence":
+    @classmethod
+    @log_mentioned_context
+    def from_dict(
+        cls, factor_dict: Dict, mentioned: List[Factor]
+    ) -> Tuple["Evidence", List[Factor]]:
+        if factor_dict["type"].lower() != "evidence":
             raise ValueError(
-                f'"type" value in input must be "evidence", not {factor["type"]}'
+                f'"type" value in input must be "evidence", not {factor_dict["type"]}'
             )
+        if factor_dict.get("exhibit"):
+            exhibit = Exhibit.from_dict(factor_dict.get("exhibit"), mentioned)
+        else:
+            exhibit = None
+        if factor_dict.get("to_effect"):
+            to_effect = Fact.from_dict(factor_dict.get("to_effect"), mentioned)
+        else:
+            to_effect = None
+
         return Evidence(
-            form=factor.get("form"),
-            to_effect=Fact.from_dict(factor.get("to_effect")),
-            statement=Fact.from_dict(factor.get("statement")),
-            stated_by=factor.get("stated_by"),
-            derived_from=factor.get("derived_from"),
-            absent=factor.get("absent"),
-        )
+            exhibit=exhibit,
+            to_effect=to_effect,
+            name=factor_dict.get("name"),
+            absent=factor_dict.get("absent"),
+            generic=factor_dict.get("generic"),
+        ), mentioned

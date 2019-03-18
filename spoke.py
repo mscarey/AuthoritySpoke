@@ -55,10 +55,7 @@ class Factor:
         Turns a dict recently created from a chunk of JSON into a Factor object.
         """
 
-        if factor_record.get("code") is not None:
-            cname = "Enactment"
-        else:
-            cname = factor_record["type"]
+        cname = factor_record["type"]
         target_class = cls.class_from_str(cname)
         factor = target_class.from_dict(factor_record, context_list)
         return factor

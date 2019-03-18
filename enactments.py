@@ -81,7 +81,7 @@ class Code:
         return NotImplementedError
 
 @dataclass(frozen=True)
-class Enactment(Factor):
+class Enactment():
 
     code: Code
     section: str

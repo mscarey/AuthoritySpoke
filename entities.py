@@ -9,6 +9,7 @@ ordered tuples of other Factors.
 from typing import Dict, List, Optional
 
 from spoke import Factor
+from file_import import log_mentioned_context
 
 from dataclasses import astuple, dataclass
 
@@ -49,12 +50,11 @@ class Entity(Factor):
         return self.name
 
     @classmethod
+    @log_mentioned_context
     def from_dict(cls, entity_dict, mentioned):
         factor = cls(name=entity_dict.get("name"),
         generic=entity_dict.get("generic", True),
         plural=entity_dict.get("generic", False))
-        if factor.name:
-            mentioned.append(factor)
         return factor, mentioned
 
     def context_register(

@@ -565,21 +565,27 @@ class ProceduralRule(Rule):
         cls, record: Dict, context_list: List[Factor]
     ) -> Tuple["ProceduralRule", List[Factor]]:
         def list_from_records(
-            record_list: List[Dict[str, str]], context_list: List[Factor]
+            # TODO: turn into separate classmethods for Factor and Enactment
+            record_list: List[Dict[str, str]], context_list: List[Factor], class_to_create
         ) -> List[Factor]:
             factors_or_enactments: List[Union[Factor, Enactment]] = []
             if not isinstance(record_list, list):
                 record_list = [record_list]
             for record in record_list:
-                record, context_list = Factor.from_dict(record, context_list)
+                record, context_list = class_to_create.from_dict(record, context_list)
                 factors_or_enactments.append(record)
             return factors_or_enactments
 
-        factor_groups: Dict[str, List] = {"inputs": [], "outputs": [], "despite": [], "enactments": [],
-            "enactments_despite": [],}
+        factor_groups: Dict[str, List] = {"inputs": [], "outputs": [], "despite": []}
         for factor_type in factor_groups:
             factor_groups[factor_type] = list_from_records(
-                record.get(factor_type, []), context_list
+                record.get(factor_type, []), context_list, Factor
+            )
+        enactment_groups: Dict[str, List] = {"enactments": [],
+            "enactments_despite": [],}
+        for enactment_type in enactment_groups:
+            enactment_groups[enactment_type] = list_from_records(
+                record.get(enactment_type, []), context_list, Enactment
             )
 
         procedure = Procedure(
@@ -591,8 +597,8 @@ class ProceduralRule(Rule):
         return (
             ProceduralRule(
                 procedure=procedure,
-                enactments=factor_groups["enactments"],
-                enactments_despite=factor_groups["enactments_despite"],
+                enactments=enactment_groups["enactments"],
+                enactments_despite=enactment_groups["enactments_despite"],
                 mandatory=record.get("mandatory", False),
                 universal=record.get("universal", False),
                 rule_valid=record.get("rule_valid", True),
