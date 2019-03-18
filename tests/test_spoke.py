@@ -5,6 +5,7 @@ import operator
 from pint import UnitRegistry
 import pytest
 
+from entities import Entity, Human, Event
 from spoke import Predicate, Factor
 from spoke import ureg, Q_
 
@@ -30,6 +31,11 @@ class TestEntities:
 
         update = motel.context_register(watt, operator.le)
         assert any(register == {motel: watt, watt: motel} for register in update)
+
+    def test_new_context(self, make_entity):
+        changes = {make_entity["motel"]: Entity("Death Star"), make_entity["watt"]: Human("Darth Vader")}
+        motel = make_entity["motel"]
+        assert motel.new_context(changes) == changes[make_entity["motel"]]
 
     # Equality
 

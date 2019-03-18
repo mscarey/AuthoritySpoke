@@ -63,6 +63,8 @@ class Entity(Factor):
         """Returns a list of possible ways the context of self can be
         mapped onto the context of other. Other subclasses of Factor
         will have more complex lists."""
+
+        # If there was a way to compare an Entity to None, should it return {}?
         if comparison(self, other):
             yield {self: other, other: self}
 
@@ -77,8 +79,12 @@ class Entity(Factor):
     def make_generic(self):
         if not self.generic:
             return self.__class__(name=self.name, generic=True, plural=self.plural)
-        else:
-            return self
+        return self
+
+    def new_context(self, changes: Dict[Factor, Factor]):
+        if self in changes:
+            return changes[self]
+        return self
 
 
 class Human(Entity):

@@ -65,11 +65,23 @@ class TestFacts:
         """
         assert "Hideaway Lodge was a motel" in str(watt_factor["f1_specific"])
 
-    def test_new_concrete_context(self, watt_factor):
-        different = watt_factor["f2"].new_context(
-            [Human("He-Man"), Entity("Castle Grayskull")]
+    def test_new_context_replace_fact(self, make_entity, watt_factor):
+        changes = {
+            make_entity["watt"]: Human("Darth Vader"),
+            watt_factor["f2"]: watt_factor["f10"],
+        }
+        assert "was within the curtilage of <Hideaway Lodge>" in str(
+            watt_factor["f2"].new_context(changes)
         )
-        assert "<He-Man> operated" in str(different)
+
+    def test_new_concrete_context(self, make_entity, watt_factor):
+        different = watt_factor["f2"].new_context(
+            {
+                make_entity["watt"]: Human("Darth Vader"),
+                make_entity["motel"]: Entity("Death Star"),
+            }
+        )
+        assert "<Darth Vader> operated" in str(different)
 
     def test_concrete_to_abstract(self, make_entity, make_predicate):
         motel = make_entity["motel_specific"]
@@ -223,8 +235,9 @@ class TestFacts:
             make_entity["trees"]: make_entity["motel"],
             make_entity["watt"]: make_entity["watt"],
         }
-        new_matches = [match for match in
-            watt_factor["f7"].registers_for_interchangeable_context(
+        new_matches = [
+            match
+            for match in watt_factor["f7"].registers_for_interchangeable_context(
                 watt_factor["f7_swap_entities"], matches
             )
         ]
@@ -417,7 +430,6 @@ class TestFacts:
 
     def test_no_contradiction_of_None(self, watt_factor):
         assert not watt_factor["f1"].contradicts(None)
-
 
     # Consistency with Entity/Factor assignments
 

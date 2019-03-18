@@ -332,22 +332,25 @@ class Fact(Factor):
 
     def new_context(
         self,
-        entity_context: Union[Iterable[int], Iterable[Factor]],
-        case_factors: Iterable[Factor] = (),
-    ) -> "Fact":
+        changes: Dict[Factor, Factor],
+    ) -> Factor:
         """
         Creates a new Fact object, replacing the old entity_context
         attribute with a new one.
         """
-        if len(entity_context) != len(self.entity_context):
-            raise ValueError(
-                f"The number of entities should be equal to the number of slots "
-                + f"in self.entity_context, which is {len(self.entity_context)}."
-            )
+        if self in changes:
+            return changes[self]
+        new_entity_context = []
+        for factor in self.entity_context:
+            if factor in changes:
+                new_entity_context.append(changes[factor])
+            else:
+                new_entity_context.append(factor)
         return Fact(
             self.predicate,
-            entity_context,
-            self.absent,
+            tuple(new_entity_context),
+            self.name,
             self.standard_of_proof,
-            case_factors,
+            self.absent,
+            self.generic,
         )
