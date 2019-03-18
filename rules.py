@@ -566,14 +566,14 @@ class ProceduralRule(Rule):
             record_list: Union[Dict[str, str], List[Dict[str, str]]],
             context_list: List[Factor],
             class_to_create,
-        ) -> List[Union[Factor, Enactment]]:
+        ) -> Tuple[Union[Factor, Enactment]]:
             factors_or_enactments: List[Union[Factor, Enactment]] = []
             if not isinstance(record_list, list):
                 record_list = [record_list]
             for record in record_list:
                 created, context_list = class_to_create.from_dict(record, context_list)
                 factors_or_enactments.append(created)
-            return factors_or_enactments
+            return tuple(factors_or_enactments)
 
         factor_groups: Dict[str, List] = {"inputs": [], "outputs": [], "despite": []}
         for factor_type in factor_groups:
