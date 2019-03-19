@@ -42,9 +42,9 @@ class Procedure(Factor):
 
     def __post_init__(self):
 
-        outputs = self.__class__.sort_in_tuple(self.outputs)
-        inputs = self.__class__.sort_in_tuple(self.inputs)
-        despite = self.__class__.sort_in_tuple(self.despite)
+        outputs = self.__class__.wrap_with_tuple(self.outputs)
+        inputs = self.__class__.wrap_with_tuple(self.inputs)
+        despite = self.__class__.wrap_with_tuple(self.despite)
 
         groups = {"outputs": outputs, "inputs": inputs, "despite": despite}
         for group in groups:
@@ -269,7 +269,7 @@ class Procedure(Factor):
 
         inputs = self.inputs or set()
         despite = self.despite or set()
-        return {*self.outputs, *inputs, *despite}
+        return [*inputs, *despite, *self.outputs]
 
     def factors_sorted(self) -> List[Factor]:
         """Sorts the procedure's factors into an order that will always be

@@ -9,6 +9,7 @@ from entities import Entity, Human, Event
 from spoke import Predicate, Factor
 from spoke import ureg, Q_
 
+
 class TestEntities:
     def test_conversion_to_generic(self, make_entity):
         e = make_entity
@@ -33,7 +34,10 @@ class TestEntities:
         assert any(register == {motel: watt, watt: motel} for register in update)
 
     def test_new_context(self, make_entity):
-        changes = {make_entity["motel"]: Entity("Death Star"), make_entity["watt"]: Human("Darth Vader")}
+        changes = {
+            make_entity["motel"]: Entity("Death Star"),
+            make_entity["watt"]: Human("Darth Vader"),
+        }
         motel = make_entity["motel"]
         assert motel.new_context(changes) == changes[make_entity["motel"]]
 
@@ -76,6 +80,7 @@ class TestEntities:
     def test_implication_superclass(self, make_entity):
         assert not make_entity["trees"] >= make_entity["tree_search"]
 
+
 class TestPredicates:
     def test_predicate_with_wrong_number_of_entities(self):
         with pytest.raises(ValueError):
@@ -84,10 +89,10 @@ class TestPredicates:
     def test_predicate_with_wrong_comparison_symbol(self):
         with pytest.raises(ValueError):
             _ = Predicate(
-                    "the height of {} was {}",
-                    comparison=">>",
-                    quantity=Q_("160 centimeters"),
-                )
+                "the height of {} was {}",
+                comparison=">>",
+                quantity=Q_("160 centimeters"),
+            )
 
     def test_convert_false_statement_about_quantity_to_obverse(self, make_predicate):
         assert make_predicate["p7_obverse"].truth is True
@@ -114,14 +119,14 @@ class TestPredicates:
         assert make_predicate["p7"].context_slots == 2
 
     def test_str_for_predicate_with_number_quantity(self, make_predicate):
-        assert (
-            "distance between {} and {} was at least 20" in str(make_predicate["p8_int"])
+        assert "distance between {} and {} was at least 20" in str(
+            make_predicate["p8_int"]
         )
-        assert (
-            "distance between {} and {} was at least 20.0" in str(make_predicate["p8_float"])
+        assert "distance between {} and {} was at least 20.0" in str(
+            make_predicate["p8_float"]
         )
-        assert (
-            "distance between {} and {} was at least 20 foot" in str(make_predicate["p8"])
+        assert "distance between {} and {} was at least 20 foot" in str(
+            make_predicate["p8"]
         )
 
     def test_negated_method(self, make_predicate):
@@ -164,7 +169,6 @@ class TestPredicates:
         assert make_predicate["p_murder"] > make_predicate["p_murder_whether"]
         assert make_predicate["p_murder_false"] > make_predicate["p_murder_whether"]
 
-
     def test_predicate_contradictions(self, make_predicate):
         assert make_predicate["p7"].contradicts(make_predicate["p7_true"])
         assert not make_predicate["p1"].contradicts(make_predicate["p1_again"])
@@ -190,6 +194,7 @@ class TestPredicates:
     def test_no_contradiction_with_inconsistent_dimensionality(self, make_predicate):
         assert not make_predicate["p9"].contradicts(make_predicate["p9_acres"])
         assert not make_predicate["p9_acres"].contradicts(make_predicate["p9"])
+
 
 class TestCodes:
     def test_making_code(self, make_code):
@@ -269,8 +274,7 @@ class TestOpinions:
         h = real_holding
         e = make_entity
 
-        watt.posits(h["h3"], (e["motel"], e["watt"], e["tree_search"], e["trees"])
-        )
+        watt.posits(h["h3"], (e["motel"], e["watt"], e["tree_search"], e["trees"]))
         assert h["h3"] in watt.holdings
 
     def test_opinion_entity_list(self, make_opinion, real_holding, make_entity):
@@ -280,12 +284,8 @@ class TestOpinions:
 
         watt.posits(h["h1"], (e["motel"], e["watt"]))
         watt.posits(h["h2"], (e["trees"], e["motel"]))
-        watt.posits(
-            h["h3"], (e["motel"], e["watt"], e["tree_search"], e["trees"])
-        )
-        watt.posits(
-            h["h4"], (e["motel"], e["watt"], e["tree_search"], e["trees"])
-        )
+        watt.posits(h["h3"], (e["motel"], e["watt"], e["tree_search"], e["trees"]))
+        watt.posits(h["h4"], (e["motel"], e["watt"], e["tree_search"], e["trees"]))
         assert make_entity["watt"] in make_opinion["watt_majority"].get_entities()
 
     def test_opinion_date(self, make_opinion):

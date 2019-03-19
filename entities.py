@@ -81,10 +81,6 @@ class Entity(Factor):
             return self.__class__(name=self.name, generic=True, plural=self.plural)
         return self
 
-    def new_context(self, changes: Dict[Factor, Factor]):
-        if self in changes:
-            return changes[self]
-        return self
 
 
 class Human(Entity):
