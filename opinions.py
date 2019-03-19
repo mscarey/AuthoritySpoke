@@ -7,6 +7,7 @@ import pathlib
 
 from dataclasses import dataclass
 
+from allegations import Allegation
 from evidence import Exhibit, Evidence
 from enactments import Enactment
 from facts import Fact
