@@ -153,6 +153,23 @@ class Exhibit(Factor):
             return False
         return self >= other
 
+    def new_context(self, changes: Dict[Factor, Factor]) -> Factor:
+        """
+        Creates new Factor object, replacing keys of "changes" with their values.
+        """
+        if self in changes:
+            return changes[self]
+        statement = self.statement.new_context(changes) if self.statement else None
+        stated_by = self.stated_by.new_context(changes) if self.stated_by else None
+        return Exhibit(
+                form=self.form,
+                statement=statement,
+                stated_by=stated_by,
+                name=self.name,
+                absent=self.absent,
+                generic=self.generic,
+            )
+
     def __str__(self):
         string = (
             f'{"absent " if self.absent else ""}{self.form if self.form else "exhibit"}'
@@ -224,6 +241,25 @@ class Evidence(Factor):
 
         return (self.exhibit, self.to_effect)
 
+    def contradicts(self, other: Optional[Factor]) -> bool:
+
+        if other is None:
+            return False
+
+        if not isinstance(other, Factor):
+            raise TypeError(
+                f"'Contradicts' not supported between instances of "
+                + f"'{self.__class__.__name__}' and '{other.__class__.__name__}'."
+            )
+
+        if not isinstance(other, self.__class__):
+            return False
+
+        if self >= other.make_absent():
+            return True
+
+        return other > self.make_absent()
+
     def generic_factors(self) -> Dict[Factor, None]:
         """Returns an iterable of self's generic Factors,
         which must be matched to other generic Factors to
@@ -278,24 +314,21 @@ class Evidence(Factor):
             generic=self.generic,
         )
 
-    def contradicts(self, other: Optional[Factor]) -> bool:
-
-        if other is None:
-            return False
-
-        if not isinstance(other, Factor):
-            raise TypeError(
-                f"'Contradicts' not supported between instances of "
-                + f"'{self.__class__.__name__}' and '{other.__class__.__name__}'."
+    def new_context(self, changes: Dict[Factor, Factor]) -> Factor:
+        """
+        Creates new Factor object, replacing keys of "changes" with their values.
+        """
+        if self in changes:
+            return changes[self]
+        exhibit = self.exhibit.new_context(changes) if self.exhibit else None
+        to_effect = self.to_effect.new_context(changes) if self.to_effect else None
+        return Evidence(
+                exhibit=exhibit,
+                to_effect=to_effect,
+                name=self.name,
+                absent=self.absent,
+                generic=self.generic,
             )
-
-        if not isinstance(other, self.__class__):
-            return False
-
-        if self >= other.make_absent():
-            return True
-
-        return other > self.make_absent()
 
     @classmethod
     @log_mentioned_context

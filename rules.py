@@ -36,9 +36,9 @@ class Procedure(Factor):
     outputs: Iterable[Factor] = ()
     inputs: Iterable[Factor] = ()
     despite: Iterable[Factor] = ()
+    name: Optional[str] = None
     absent: bool = False
     generic: bool = True
-    name: Optional[str] = None
 
     def __post_init__(self):
 
@@ -457,6 +457,41 @@ class Procedure(Factor):
             "'contradicts_some_to_all' method.",
         )
 
+    def _new_context_to_dict(self, changes: List[Factor]) -> Dict[Factor, Factor]:
+        generic_factors = self.generic_factors()
+        if len(generic_factors) != len(changes):
+            raise ValueError(
+                'If the parameter "changes" is not a list of '
+                + "replacements for every element of self.generic_factors, "
+                + 'then "changes" must be a dict where each key is a Factor '
+                + "to be replaced and each value is the corresponding "
+                + "replacement Factor."
+            )
+        return dict(zip(generic_factors.keys(), changes))
+
+    def new_context(
+        self, changes: Union[List[Factor], Dict[Factor, Factor]]
+    ) -> 'Procedure':
+        """
+        Creates new Procedure object, converting "changes" from a List
+        to a Dict if needed, and replacing keys of "changes" with their
+        values.
+
+        Even though Procedure is a subclass of Factor, there is no way
+        to replace a Rule's Procedure with this method.
+        """
+        if isinstance(changes, list):
+            changes = self._new_context_to_dict(changes)
+
+        return Procedure(
+            outputs=tuple([factor.new_context(changes) for factor in self.outputs]),
+            inputs=tuple([factor.new_context(changes) for factor in self.inputs]),
+            despite=tuple([factor.new_context(changes) for factor in self.inputs]),
+            name=self.name,
+            absent=self.absent,
+            generic=self.generic,
+        )
+
 
 @dataclass()
 class Rule(Factor):
@@ -521,6 +556,7 @@ class ProceduralRule(Rule):
     rule_valid: bool = True
     decided: bool = True
     generic: bool = False
+    name: Optional[str] = None
 
     def __post_init__(self):
 
@@ -737,6 +773,27 @@ class ProceduralRule(Rule):
             rule_valid=not self.rule_valid,
             decided=self.decided,
         )
+
+    def new_context(
+        self, changes: Union[List[Factor], Dict[Factor, Factor]]
+    ) -> 'ProceduralRule':
+        """
+        Creates new ProceduralRule object, converting "changes" from a
+        List to a Dict if needed, and replacing keys of "changes" with
+        their values.
+        """
+        if isinstance(changes, list):
+            changes = self.procedure._new_context_to_dict(changes)
+        return ProceduralRule(
+            procedure=self.procedure.new_context(changes),
+            enactments=self.enactments,
+            enactments_despite=self.enactments_despite,
+            mandatory=self.mandatory,
+            universal=self.universal,
+            rule_valid=self.rule_valid,
+            decided=self.decided,
+        )
+
 
     def contradicts(self, other) -> bool:
         """

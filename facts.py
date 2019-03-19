@@ -169,9 +169,9 @@ class Fact(Factor):
         if self.generic:
             return {self: None}
         return {
-                generic: None
-                for factor in self.entity_context
-                for generic in factor.generic_factors()
+            generic: None
+            for factor in self.entity_context
+            for generic in factor.generic_factors()
         }
 
     def predicate_in_context(self, entities: Sequence[Factor]) -> str:
@@ -295,11 +295,14 @@ class Fact(Factor):
         if fact_dict.get("content"):
             for factor in mentioned:
                 if factor.name and factor.name in fact_dict["content"]:
-                    context_with_indices[factor] = fact_dict["content"].find(factor.name)
-                    fact_dict["content"] = fact_dict["content"].replace(factor.name, "{}")
+                    context_with_indices[factor] = fact_dict["content"].find(
+                        factor.name
+                    )
+                    fact_dict["content"] = fact_dict["content"].replace(
+                        factor.name, "{}"
+                    )
             context_factors = sorted(
-                context_with_indices,
-                key=lambda k: context_with_indices[k],
+                context_with_indices, key=lambda k: context_with_indices[k]
             )
             for item in OPPOSITE_COMPARISONS:
                 if item in fact_dict["content"]:
@@ -315,7 +318,7 @@ class Fact(Factor):
             truth=fact_dict.get("truth", True),
             reciprocal=fact_dict.get("reciprocal", False),
             comparison=comparison,
-            quantity=quantity
+            quantity=quantity,
         )
 
         factor = cls(
@@ -330,22 +333,15 @@ class Fact(Factor):
             mentioned.append(factor)
         return factor, mentioned
 
-    def new_context(
-        self,
-        changes: Dict[Factor, Factor],
-    ) -> Factor:
+    def new_context(self, changes: Dict[Factor, Factor]) -> Factor:
         """
-        Creates a new Fact object, replacing the old entity_context
-        attribute with a new one.
+        Creates new Fact object, replacing keys of "changes" with their values.
         """
         if self in changes:
             return changes[self]
-        new_entity_context = []
-        for factor in self.entity_context:
-            if factor in changes:
-                new_entity_context.append(changes[factor])
-            else:
-                new_entity_context.append(factor)
+        new_entity_context = [
+            factor.new_context(changes) for factor in self.entity_context
+        ]
         return Fact(
             self.predicate,
             tuple(new_entity_context),

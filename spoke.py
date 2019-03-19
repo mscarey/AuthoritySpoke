@@ -106,6 +106,11 @@ class Factor:
             ):
                 yield registry
 
+    def new_context(self, changes: Dict['Factor', 'Factor']):
+        if self in changes:
+            return changes[self]
+        return self
+
     def registers_for_interchangeable_context(
         self, other: "Factor", matches: Dict["Factor", "Factor"]
     ) -> Iterator[Dict["Factor", "Factor"]]:
