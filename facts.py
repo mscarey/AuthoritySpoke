@@ -16,7 +16,6 @@ STANDARDS_OF_PROOF = {
     "beyond reasonable doubt": 4,
 }
 
-
 @dataclass(frozen=True)
 class Fact(Factor):
     """An assertion accepted as factual by a court, often through factfinding by
@@ -329,8 +328,6 @@ class Fact(Factor):
             absent=fact_dict.get("absent", False),
             generic=fact_dict.get("generic", False),
         )
-        if factor.name:
-            mentioned.append(factor)
         return factor, mentioned
 
     def new_context(self, changes: Dict[Factor, Factor]) -> Factor:

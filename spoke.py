@@ -37,9 +37,10 @@ class Factor:
     @classmethod
     def class_from_str(cls, name: str):
         def all_subclasses(cls):
-            return set(cls.__subclasses__()).union(
+            subclasses = set(cls.__subclasses__()).union(
                 [s for c in cls.__subclasses__() for s in all_subclasses(c)]
             )
+            return subclasses
 
         class_options = all_subclasses(cls)
         for c in class_options:

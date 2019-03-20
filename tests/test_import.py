@@ -110,7 +110,6 @@ class TestRuleImport:
         assert holdings[0].enactments[0].code == holdings[1].enactments[0].code
 
 
-
 class TestNestedFactorImport:
     def test_import_holding(self, make_opinion):
         """
@@ -123,5 +122,5 @@ class TestNestedFactorImport:
         concerning appellant’s use of narcotics was improper.
         """
         cardenas = make_opinion["cardenas_majority"]
-        cardenas.holdings_from_json("holding_cardenas.json")
-        assert len(cardenas.holdings) == 2
+        cardenas_holdings = cardenas.holdings_from_json("holding_cardenas.json")
+        assert len(cardenas_holdings) == 2
