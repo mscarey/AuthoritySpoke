@@ -13,6 +13,8 @@ from pint import UnitRegistry
 
 from dataclasses import dataclass
 
+from file_import import log_mentioned_context
+
 ureg = UnitRegistry()
 Q_ = ureg.Quantity
 
@@ -25,6 +27,7 @@ OPPOSITE_COMPARISONS = {
     ">": "<=",
     "<": ">=",
 }
+
 
 @dataclass(frozen=True)
 class Factor:
@@ -51,14 +54,21 @@ class Factor:
         )
 
     @classmethod
-    def from_dict(cls, factor_record: Dict, context_list: List["Factor"]) -> "Factor":
+    def from_dict(
+        cls, factor_record: Dict, mentioned: List["Factor"]
+    ) -> Optional["Factor"]:
         """
         Turns a dict recently created from a chunk of JSON into a Factor object.
+
+        BUG: If some functions call Factor.from_dict() and others call subclasses'
+        from_dict() methods, then Factor as well as its subclasses need to be
+        decorated with log_mentioned_context, which results in log_mentioned_context
+        wastefully being called twice for Factor.from_dict.
         """
 
         cname = factor_record["type"]
         target_class = cls.class_from_str(cname)
-        factor = target_class.from_dict(factor_record, context_list)
+        factor = target_class.from_dict(factor_record, mentioned)
         return factor
 
     def generic_factors(self) -> Dict["Factor", None]:
@@ -107,7 +117,7 @@ class Factor:
             ):
                 yield registry
 
-    def new_context(self, changes: Dict['Factor', 'Factor']):
+    def new_context(self, changes: Dict["Factor", "Factor"]):
         if self in changes:
             return changes[self]
         return self

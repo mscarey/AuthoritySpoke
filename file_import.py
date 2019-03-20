@@ -20,7 +20,7 @@ def log_mentioned_context(func: Callable):
         mentioned: List[Union["Factor", "Enactment"]],
     ) -> Tuple[Optional["Factor"], List["Factor"]]:
         if factor_record is None:
-            return factor_record, mentioned
+            return None, mentioned
         if isinstance(factor_record, str):
             for context_factor in mentioned:
                 if context_factor.name == factor_record:
