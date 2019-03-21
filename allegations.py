@@ -9,7 +9,6 @@ from typing import Optional, Sequence, Union
 
 from entities import Entity
 from facts import Fact
-from file_import import log_mentioned_context
 from spoke import Factor
 
 
@@ -44,7 +43,6 @@ class Pleading(Factor):
         return (self.filer)
 
     @classmethod
-    @log_mentioned_context
     def from_dict(
         cls, factor_dict: Dict, mentioned: List[Union[Factor]]
     ) -> "Pleading":
@@ -52,7 +50,7 @@ class Pleading(Factor):
             raise ValueError(
                 f'"type" value in input must be "{cls.__name__}", not {factor_dict.get("type")}'
             )
-        filer, mentioned = Entity.from_dict(factor_dict.get("filer"), mentioned)
+        filer, mentioned = Factor.from_dict(factor_dict.get("filer"), mentioned)
         return (
             cls(
                 filer=filer,
@@ -201,7 +199,6 @@ class Allegation(Factor):
         return (self.to_effect, self.pleading)
 
     @classmethod
-    @log_mentioned_context
     def from_dict(
         cls, factor_dict: Dict, mentioned: List[Union[Factor]]
     ) -> "Allegation":
@@ -209,8 +206,8 @@ class Allegation(Factor):
             raise ValueError(
                 f'"type" value in input must be "allegation", not {factor_dict.get("type")}'
             )
-        to_effect, mentioned = Fact.from_dict(factor_dict.get("to_effect"), mentioned)
-        pleading, mentioned = Pleading.from_dict(factor_dict.get("pleading"), mentioned)
+        to_effect, mentioned = Factor.from_dict(factor_dict.get("to_effect"), mentioned)
+        pleading, mentioned = Factor.from_dict(factor_dict.get("pleading"), mentioned)
         return (
             cls(
                 to_effect=to_effect,

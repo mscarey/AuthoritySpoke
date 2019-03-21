@@ -11,7 +11,6 @@ from allegations import Allegation
 from evidence import Exhibit, Evidence
 from enactments import Enactment
 from facts import Fact
-from file_import import log_mentioned_context
 from rules import Procedure, Rule, ProceduralRule
 from spoke import Factor
 

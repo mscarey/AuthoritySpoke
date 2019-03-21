@@ -8,7 +8,6 @@ from typing import Optional, Sequence, Union
 from enactments import Enactment
 from entities import Entity
 from facts import Fact
-from file_import import log_mentioned_context
 from spoke import Factor
 
 
@@ -46,7 +45,6 @@ class Exhibit(Factor):
         return (self.statement, self.stated_by)
 
     @classmethod
-    @log_mentioned_context
     def from_dict(
         cls, factor_dict: Dict, mentioned: List[Union[Factor, Enactment]]
     ) -> "Exhibit":
@@ -54,8 +52,8 @@ class Exhibit(Factor):
             raise ValueError(
                 f'"type" value in input must be "exhibit", not {factor_dict.get("type")}'
             )
-        statement, mentioned = Fact.from_dict(factor_dict.get("statement"), mentioned)
-        stated_by, mentioned = Entity.from_dict(factor_dict.get("stated_by"), mentioned)
+        statement, mentioned = Factor.from_dict(factor_dict.get("statement"), mentioned)
+        stated_by, mentioned = Factor.from_dict(factor_dict.get("stated_by"), mentioned)
         return (
             cls(
                 form=factor_dict.get("form"),
@@ -331,7 +329,6 @@ class Evidence(Factor):
             )
 
     @classmethod
-    @log_mentioned_context
     def from_dict(
         cls, factor_dict: Dict, mentioned: List[Factor]
     ) -> Tuple["Evidence", List[Factor]]:
@@ -340,11 +337,11 @@ class Evidence(Factor):
                 f'"type" value in input must be "evidence", not {factor_dict["type"]}'
             )
         if factor_dict.get("exhibit"):
-            exhibit = Exhibit.from_dict(factor_dict.get("exhibit"), mentioned)
+            exhibit = Factor.from_dict(factor_dict.get("exhibit"), mentioned)
         else:
             exhibit = None
         if factor_dict.get("to_effect"):
-            to_effect = Fact.from_dict(factor_dict.get("to_effect"), mentioned)
+            to_effect = Factor.from_dict(factor_dict.get("to_effect"), mentioned)
         else:
             to_effect = None
 

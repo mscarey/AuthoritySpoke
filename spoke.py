@@ -54,6 +54,7 @@ class Factor:
         )
 
     @classmethod
+    @log_mentioned_context
     def from_dict(
         cls, factor_record: Dict, mentioned: List["Factor"]
     ) -> Optional["Factor"]:
@@ -65,7 +66,6 @@ class Factor:
         decorated with log_mentioned_context, which results in log_mentioned_context
         wastefully being called twice for Factor.from_dict.
         """
-
         cname = factor_record["type"]
         target_class = cls.class_from_str(cname)
         factor = target_class.from_dict(factor_record, mentioned)

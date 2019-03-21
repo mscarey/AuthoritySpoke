@@ -50,7 +50,6 @@ class Entity(Factor):
         return self.name
 
     @classmethod
-    @log_mentioned_context
     def from_dict(cls, entity_dict, mentioned):
         factor = cls(name=entity_dict.get("name"),
         generic=entity_dict.get("generic", True),

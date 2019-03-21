@@ -12,7 +12,6 @@ from typing import NamedTuple
 from dataclasses import dataclass
 
 from enactments import Enactment
-from file_import import log_mentioned_context
 from spoke import Factor
 
 

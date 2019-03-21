@@ -4,7 +4,6 @@ from typing import Iterable, Iterator, Mapping
 from typing import Optional, Sequence, Union
 
 from spoke import Factor, Predicate, OPPOSITE_COMPARISONS
-from file_import import log_mentioned_context
 from entities import Entity
 
 from dataclasses import dataclass
@@ -277,7 +276,6 @@ class Fact(Factor):
         )
 
     @classmethod
-    @log_mentioned_context
     def from_dict(
         cls, fact_dict: Optional[Dict[str, Union[str, bool]]], mentioned: List[Factor]
     ) -> Tuple[Optional["Fact"], List[Factor]]:
