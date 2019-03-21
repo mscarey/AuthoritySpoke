@@ -12,19 +12,21 @@
             "name": "The People of California"
         },
         {
+            "type": "Fact",
+            "name": "fact that defendant was addicted to heroin",
+            "content": "the defendant was addicted to heroin"
+        },
+        {
             "type": "Exhibit",
             "name": "officer's testimony that defendant was addicted to heroin",
             "form": "testimony",
-            "statement": {
-                "type": "Fact",
-                "content": "defendant was addicted to heroin"
-            },
+            "statement": "fact that defendant was addicted to heroin",
             "stated_by": "parole officer"
         },
         {
             "type": "Fact",
             "name": "fact that defendant committed an attempted robbery",
-            "content": "defendant committed an attempted robbery"
+            "content": "the defendant committed an attempted robbery"
         },
         {
             "type": "Allegation",
@@ -40,11 +42,11 @@
             ],
             "despite": [{
                 "type": "Fact",
-                "content": "officer's testimony that defendant was addicted to heroin was relevant to show defendant had a motive to commit an attempted robbery"
+                "content": "officer's testimony that defendant was addicted to heroin was relevant to show the defendant had a motive to commit an attempted robbery"
             }],
             "outputs": [{
                 "type": "Fact",
-                "content": "the probative value of officer's testimony that defendant was addicted to heroin in showing that defendant committed an attempted robbery was outweighed by unfair prejudice to defendant."
+                "content": "the probative value of officer's testimony that defendant was addicted to heroin in showing fact that defendant committed an attempted robbery was outweighed by unfair prejudice to defendant"
             }],
             "mandatory": true,
             "enactments": [{
@@ -85,9 +87,7 @@
             "outputs": [{
                 "type": "Evidence",
                 "name": "evidence of officer's testimony that defendant was addicted to heroin",
-                "form": "testimony",
-                "statement": "defendant was addicted to heroin",
-                "stated_by": "parole officer",
+                "exhibit": "officer's testimony that defendant was addicted to heroin",
                 "to_effect": "fact that defendant committed an attempted robbery",
                 "absent": true
             }],

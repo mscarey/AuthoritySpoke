@@ -194,9 +194,9 @@ class Evidence(Factor):
         if self.exhibit:
             string = str(self.exhibit)
         else:
-            string = self.__class__.__name__
+            string = self.__class__.__name__.lower()
         if self.to_effect:
-            string += f", which supports {str(self.to_effect)}"
+            string += f", which supports {self.to_effect}"
         if self.generic:
             return f"<{string}>"
         return string
@@ -337,11 +337,11 @@ class Evidence(Factor):
                 f'"type" value in input must be "evidence", not {factor_dict["type"]}'
             )
         if factor_dict.get("exhibit"):
-            exhibit = Factor.from_dict(factor_dict.get("exhibit"), mentioned)
+            exhibit, mentioned = Factor.from_dict(factor_dict.get("exhibit"), mentioned)
         else:
             exhibit = None
         if factor_dict.get("to_effect"):
-            to_effect = Factor.from_dict(factor_dict.get("to_effect"), mentioned)
+            to_effect, mentioned = Factor.from_dict(factor_dict.get("to_effect"), mentioned)
         else:
             to_effect = None
 

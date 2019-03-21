@@ -470,7 +470,7 @@ class Procedure(Factor):
 
     def new_context(
         self, changes: Union[List[Factor], Dict[Factor, Factor]]
-    ) -> 'Procedure':
+    ) -> "Procedure":
         """
         Creates new Procedure object, converting "changes" from a List
         to a Dict if needed, and replacing keys of "changes" with their
@@ -565,26 +565,27 @@ class ProceduralRule(Rule):
                 object.__setattr__(self, attr, self.wrap_with_tuple(value))
 
     def __str__(self):
-        support = despite = None
-        if self.enactments:
-            support = "Based on this legislation:\n" + "\n".join(
-                [str(e) for e in self.enactments]
-            )
-        if self.enactments_despite:
-            despite = "Despite the following legislation:\n" + "\n".join(
-                [str(e) for e in self.enactments_despite]
-            )
-        text = (
-            "Rule:\n"
-            + f"{support or ''}"
-            + f"{despite or ''}"
-            + f"\nIt is {'' if self.decided else 'not decided whether it is '}"
-            + f"{str(self.rule_valid)} that in {'ALL' if self.universal else 'SOME'} cases "
-            + f"where the inputs of the following procedure are present, the court "
-            + f"{'MUST' if self.mandatory else 'MAY'} accept the procedure's output(s):\n"
+        def factor_catalog(factors: List[Factor]) -> str:
+            if len(factors) > 1:
+                lines = [f" ({i + 1}) {factors[i]}" for i in range(len(factors))]
+                lines[0] = "s:" + lines[0]
+            else:
+                lines = [": " + str(factors[0])]
+            for line in lines:
+                line += ","
+            if len(lines) > 2:
+                lines[-2] += " and"
+            return "".join(lines)
+
+        return (
+            f"the rule that it is {'not ' if not self.rule_valid else ''}valid that the court "
+            + f"{'MUST' if self.mandatory else 'MAY'} {'ALWAYS' if self.universal else 'SOMETIMES'} "
+            + f"accept the outcome{str(factor_catalog(self.procedure.outputs))} "
+            + f"{'based on the input' + str(factor_catalog(self.procedure.inputs)) if self.procedure.inputs else ''} "
+            + f"{'and despite the factor' + str(factor_catalog(self.procedure.despite)) if self.procedure.despite else ''} "
+            + f"{'according to the legislation ' + ', '.join([str(e) for e in self.enactments]) if self.enactments else ''} "
+            + f"{'and despite the legislation ' + ', '.join([str(e) for e in self.enactments_despite]) if self.enactments_despite else ''}"
         )
-        text += str(self.procedure)
-        return text
 
     def __len__(self):
         """Returns the number of entities needed to provide context
@@ -640,8 +641,21 @@ class ProceduralRule(Rule):
             context_list,
         )
 
+    @property
     def generic_factors(self):
         return self.procedure.generic_factors()
+
+    @property
+    def despite(self):
+        return self.procedure.despite
+
+    @property
+    def inputs(self):
+        return self.procedure.inputs
+
+    @property
+    def outputs(self):
+        return self.procedure.outputs
 
     def contradicts_if_valid(self, other) -> bool:
         """Determines whether self contradicts other,
@@ -775,7 +789,7 @@ class ProceduralRule(Rule):
 
     def new_context(
         self, changes: Union[List[Factor], Dict[Factor, Factor]]
-    ) -> 'ProceduralRule':
+    ) -> "ProceduralRule":
         """
         Creates new ProceduralRule object, converting "changes" from a
         List to a Dict if needed, and replacing keys of "changes" with
@@ -792,7 +806,6 @@ class ProceduralRule(Rule):
             rule_valid=self.rule_valid,
             decided=self.decided,
         )
-
 
     def contradicts(self, other) -> bool:
         """

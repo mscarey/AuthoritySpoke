@@ -898,7 +898,7 @@ def make_holding(make_procedure, make_enactment) -> Dict[str, ProceduralRule]:
 
 
 @pytest.fixture(scope="class")
-def make_opinion(make_entity, real_holding) -> Dict[str, Opinion]:
+def make_opinion(make_entity) -> Dict[str, Opinion]:
     h = real_holding
     e = make_entity
 

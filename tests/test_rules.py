@@ -272,16 +272,25 @@ class TestRules:
         assert "<He-Man> operated" in str(different)
 
     def test_generic_factors(self, make_entity, make_holding):
-        generics = make_holding["h3"].generic_factors()
+        generics = make_holding["h3"].generic_factors
         assert make_entity["motel"] in generics
         assert make_entity["tree_search"] in generics
 
     def test_generic_factors_order(self, make_entity, make_holding):
         """The motel is mentioned in the first input in the JSON,
         so it should be first."""
-        generics = make_holding["h1"].generic_factors()
+        generics = make_holding["h1"].generic_factors
         assert list(generics) == [make_entity["motel"], make_entity["watt"]]
 
+    def test_string_with_numbered_inputs(self, make_opinion):
+        cardenas = make_opinion["cardenas_majority"]
+        cardenas_holdings = cardenas.holdings_from_json("holding_cardenas.json")
+        assert "(2)" in str(cardenas_holdings[0])
+
+    def test_factor_properties_for_rule(self, make_opinion):
+        cardenas = make_opinion["cardenas_majority"]
+        cardenas_holdings = cardenas.holdings_from_json("holding_cardenas.json")
+        assert len(cardenas_holdings[1].inputs) == 1
 
     # Equality
 

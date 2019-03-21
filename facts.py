@@ -68,19 +68,16 @@ class Fact(Factor):
         object.__setattr__(self, "entity_context", entity_context)
 
     def __str__(self):
-        if self.name:
-            string = self.name
-        else:
-            predicate = str(self.predicate.content_with_entities(self.entity_context))
-            standard = (
-                f" by the standard {self.standard_of_proof},"
-                if self.standard_of_proof
-                else ""
-            )
-            string = (
-                f"{'the absence of ' if self.absent else ''}the fact"
-                + f"{standard} {predicate}"
-            )
+        predicate = str(self.predicate.content_with_entities(self.entity_context))
+        standard = (
+            f" by the standard {self.standard_of_proof},"
+            if self.standard_of_proof
+            else ""
+        )
+        string = (
+            f"{'the absence of ' if self.absent else ''}the fact"
+            + f"{standard} {predicate}"
+        )
         if self.generic:
             return f"<{string}>"
         return string
