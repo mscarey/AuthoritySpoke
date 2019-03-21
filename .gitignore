@@ -8,7 +8,7 @@ tests/__pycache__/
 codes/ca_evidence.html
 codes/ca_penal.html
 html/
-json/
+json/flf/
 notebooks/
 xml/
 *.ipynb
