@@ -3,6 +3,7 @@ from typing import Callable, Dict, List, Set, Tuple
 from typing import Iterable, Iterator, Mapping
 from typing import Optional, Sequence, Union
 
+
 def log_mentioned_context(func: Callable):
     """
     Decorator for make_dict() methods of Factor subclasses.
@@ -36,5 +37,7 @@ def log_mentioned_context(func: Callable):
             factor, mentioned = func(cls, factor_record, mentioned)
             if factor.name:
                 mentioned.append(factor)
+                mentioned = sorted(mentioned, key=lambda f: len(f.name), reverse=True)
         return factor, mentioned
+
     return wrapper

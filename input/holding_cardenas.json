@@ -1,7 +1,7 @@
 {
     "mentioned_factors": [{
             "type": "Human",
-            "name": "the defendant"
+            "name": "defendant"
         },
         {
             "type": "Human",
@@ -26,7 +26,7 @@
         {
             "type": "Fact",
             "name": "fact that defendant committed an attempted robbery",
-            "content": "the defendant committed an attempted robbery"
+            "content": "defendant committed an attempted robbery"
         },
         {
             "type": "Allegation",
@@ -42,11 +42,11 @@
             ],
             "despite": [{
                 "type": "Fact",
-                "content": "officer's testimony that defendant was addicted to heroin was relevant to show the defendant had a motive to commit an attempted robbery"
+                "content": "officer's testimony that defendant was addicted to heroin, was relevant to show the defendant had a motive to commit an attempted robbery"
             }],
             "outputs": [{
                 "type": "Fact",
-                "content": "the probative value of officer's testimony that defendant was addicted to heroin in showing fact that defendant committed an attempted robbery was outweighed by unfair prejudice to defendant"
+                "content": "the probative value of officer's testimony that defendant was addicted to heroin, in showing fact that defendant committed an attempted robbery, was outweighed by unfair prejudice to defendant"
             }],
             "mandatory": true,
             "enactments": [{
@@ -78,7 +78,7 @@
         {
             "inputs": [{
                 "type": "Fact",
-                "content": "the probative value of officer's testimony that defendant was addicted to heroin in indicating that defendant committed an attempted robbery was outweighed by unfair prejudice to defendant."
+                "content": "the probative value of officer's testimony that defendant was addicted to heroin in indicating fact that defendant committed an attempted robbery was outweighed by unfair prejudice to defendant."
             }],
             "despite": [{
                 "type": "Fact",

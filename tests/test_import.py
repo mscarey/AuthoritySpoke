@@ -36,8 +36,8 @@ class TestEntityImport:
             watt_summary = json.load(file)
         mentioned_factors = watt_summary["mentioned_factors"]
         mentioned = Opinion.get_mentioned_factors(mentioned_factors)
-        assert isinstance(mentioned[1], Human)
-        assert "Watt" in str(mentioned[1])
+        assert isinstance(mentioned[1], Entity)
+        assert any("Watt" in str(factor) for factor in mentioned)
 
 
 class TestEnactmentImport:

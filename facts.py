@@ -15,6 +15,7 @@ STANDARDS_OF_PROOF = {
     "beyond reasonable doubt": 4,
 }
 
+
 @dataclass(frozen=True)
 class Fact(Factor):
     """An assertion accepted as factual by a court, often through factfinding by
@@ -274,41 +275,67 @@ class Fact(Factor):
 
     @classmethod
     def from_dict(
-        cls, fact_dict: Optional[Dict[str, Union[str, bool]]], mentioned: List[Factor]
+        cls, fact_dict: Dict[str, Union[str, bool]], mentioned: List[Factor]
     ) -> Tuple[Optional["Fact"], List[Factor]]:
         """Constructs and returns a Fact object from a dict imported from
         a JSON file in the format used in the "input" folder."""
+
+        placeholder = "{}"  # to be replaced in the Fact's string method
+
+        def add_content_references(
+            content: str, mentioned: List[Factor], placeholder: str
+        ) -> Tuple[str, List[Factor]]:
+            """
+            :param content: the content for the Fact's Predicate
+
+            :param mentioned: list of Factors with names that could be
+            referenced in content
+
+            :param placeholder: a string to replace the names of
+            referenced Factors in content
+
+            :returns: the content string with any referenced Factors
+            replaced by placeholder, and a list of referenced Factors
+            in the order they appeared in content.
+            """
+            context_with_indices: List[List[Factor, int]] = []
+            for factor in mentioned:
+                if factor.name and factor.name in content:
+                    factor_index = content.find(factor.name)
+                    for pair in context_with_indices:
+                        if pair[1] > factor_index:
+                            pair[1] -= len(factor.name) - len(placeholder)
+                    context_with_indices.append([factor, factor_index])
+                    content = content.replace(factor.name, placeholder)
+            context_factors = [
+                k[0] for k in sorted(context_with_indices, key=lambda k: k[1])
+            ]
+            return content, context_factors
 
         if fact_dict.get("type") and fact_dict["type"].lower() != "fact":
             raise ValueError(
                 f'"type" value in input must be "fact", not {fact_dict["type"]}'
             )
-        context_with_indices: Dict[Factor, int] = {}
+
         comparison = None
         quantity = None
+        content = fact_dict.get("content")
         if fact_dict.get("content"):
-            for factor in mentioned:
-                if factor.name and factor.name in fact_dict["content"]:
-                    context_with_indices[factor] = fact_dict["content"].find(
-                        factor.name
-                    )
-                    fact_dict["content"] = fact_dict["content"].replace(
-                        factor.name, "{}"
-                    )
-            context_factors = sorted(
-                context_with_indices, key=lambda k: context_with_indices[k]
+            content = fact_dict.get("content")
+            content, context_factors = add_content_references(
+                content, mentioned, placeholder
             )
-            for item in OPPOSITE_COMPARISONS:
-                if item in fact_dict["content"]:
-                    comparison = item
-                    fact_dict["content"], quantity = fact_dict["content"].split(item)
-                    quantity = Predicate.str_to_quantity(quantity)
-                    fact_dict["content"] += "{}"
+        for item in OPPOSITE_COMPARISONS:
+            if item in content:
+                comparison = item
+                content, quantity = content.split(item)
+                quantity = Predicate.str_to_quantity(quantity)
+                content += placeholder
 
         # TODO: get default attributes from the classes instead of
         # rewriting them here.
         predicate = Predicate(
-            content=fact_dict.get("content"),
+            content=content,
             truth=fact_dict.get("truth", True),
             reciprocal=fact_dict.get("reciprocal", False),
             comparison=comparison,
