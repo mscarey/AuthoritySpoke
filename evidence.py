@@ -195,6 +195,8 @@ class Evidence(Factor):
             string = str(self.exhibit)
         else:
             string = self.__class__.__name__.lower()
+        if self.absent:
+            string = "the absence of " + string
         if self.to_effect:
             string += f", which supports {self.to_effect}"
         if self.generic:

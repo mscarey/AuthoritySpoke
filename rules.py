@@ -571,8 +571,7 @@ class ProceduralRule(Rule):
                 lines[0] = "s:" + lines[0]
             else:
                 lines = [": " + str(factors[0])]
-            for line in lines:
-                line += ","
+            lines = [line + "," for line in lines]
             if len(lines) > 2:
                 lines[-2] += " and"
             return "".join(lines)
@@ -582,7 +581,7 @@ class ProceduralRule(Rule):
             + f"{'MUST' if self.mandatory else 'MAY'} {'ALWAYS' if self.universal else 'SOMETIMES'} "
             + f"accept the outcome{str(factor_catalog(self.procedure.outputs))} "
             + f"{'based on the input' + str(factor_catalog(self.procedure.inputs)) if self.procedure.inputs else ''} "
-            + f"{'and despite the factor' + str(factor_catalog(self.procedure.despite)) if self.procedure.despite else ''} "
+            + f"{'and despite' + str(factor_catalog(self.procedure.despite)) if self.procedure.despite else ''} "
             + f"{'according to the legislation ' + ', '.join([str(e) for e in self.enactments]) if self.enactments else ''} "
             + f"{'and despite the legislation ' + ', '.join([str(e) for e in self.enactments_despite]) if self.enactments_despite else ''}"
         )

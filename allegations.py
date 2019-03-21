@@ -318,10 +318,11 @@ class Allegation(Factor):
 
     def __str__(self):
         string = (
-            f'{"absent " if self.absent else ""}allegation'
-            + f'{(" in " + str(self.pleading) if self.pleading else "")}'
-            + f'{(", asserting " + str(self.to_effect)) if self.to_effect else ""}'
+            f'{"absent " if self.absent else ""}an allegation '
+            + f'{(" in " + str(self.pleading) + "," if self.pleading else "")}'
+            + f'{("claiming " + str(self.to_effect)) + "," if self.to_effect else ""}'
         )
+        string = string.strip(",")
         if self.generic:
             string = f"<{string}>"
         return string
