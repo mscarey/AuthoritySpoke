@@ -16,6 +16,11 @@
         {
             "type": "Event",
             "name": "officers' search of the stockpile"
+        },
+        {
+            "type": "Exhibit",
+            "name": "proof of Wattenburg's guilt",
+            "generic": "true"
         }
     ],
     "holdings": [
@@ -27,7 +32,11 @@
                 },
                 {
                     "type": "fact",
-                    "content": "Wattenburg operated and lived at Hideaway Lodge"
+                    "content": "Wattenburg lived at Hideaway Lodge"
+                },
+                {
+                    "type": "fact",
+                    "content": "Wattenburg operated Hideaway Lodge as a business"
                 }
             ],
             "outputs": [{
@@ -180,6 +189,10 @@
                     "content": "the distance between the stockpile of trees and Hideaway Lodge was > 35 feet",
                     "truth": false,
                     "reciprocal": true
+                },
+                {
+                    "type": "fact",
+                    "content": "proof of Wattenburg's guilt was derived from officers' search of the stockpile of trees"
                 }
             ],
             "despite": [{
@@ -192,7 +205,7 @@
             }],
             "outputs": [{
                 "type": "evidence",
-                "exhibit": {"type": "Exhibit", "generic": "true"},
+                "exhibit": "proof of Wattenburg's guilt",
                 "to_effect": {
                     "type": "fact",
                     "content": "Wattenburg committed a crime"

@@ -1,0 +1,81 @@
+{
+    "mentioned_factors": [
+
+        {
+            "type": "Entity",
+            "name": "Bradley's house"
+        },
+        {
+            "type": "Human",
+            "name": "Bradley"
+        },
+        {
+            "type": "Entity",
+            "name": "Bradley's marijuana patch"
+        },
+        {
+            "type": "Event",
+            "name": "officers' search of the yard"
+        },
+        {
+            "type": "Exhibit",
+            "name": "proof of Bradley's guilt",
+            "generic": "true"
+        },
+        {
+            "type": "fact",
+            "name": "fact that Bradley committed a crime",
+            "content": "Bradley committed a crime"
+        }
+    ],
+    "holdings": [{
+            "inputs": [{
+                    "type": "fact",
+                    "content": "officers' search of the yard was a warrantless search and seizure"
+                },
+                {
+                    "type": "fact",
+                    "content": "Bradley's house was a house"
+                },
+                {
+                    "type": "fact",
+                    "content": "Bradley lived at Bradley's house"
+                },
+                {
+                    "type": "fact",
+                    "content": "officers' search of the yard was performed in the grounds around Bradley's house"
+                },
+                {
+                    "type": "fact",
+                    "content": "Bradley exhibited an expectation of privacy in Bradley's marijuana patch"
+                },
+                {
+                    "type": "fact",
+                    "content": "it was reasonable for Bradley to hold an expectation of privacy in Bradley's marijuana patch"
+                },
+                {
+                    "type": "fact",
+                    "content": "officers' search of the yard violated Bradley's expectation of privacy in Bradley's marijuana patch"
+                },
+                {
+                    "type": "fact",
+                    "content": "officers' search of the yard was an unreasonable governmental intrusion upon Bradley's marijuana patch"
+                },
+                {
+                    "type": "fact",
+                    "content": "proof of Bradley's guilt was derived from officers' search of the yard"
+                }
+            ],
+            "outputs": {
+                "type": "evidence",
+                "exhibit": "proof of Bradley's guilt",
+                "to_effect": "fact that Bradley committed a crime",
+                "name": "evidence of Bradley's guilt",
+                "absent": true
+            },
+            "must": true,
+            "always": true
+        }]
+
+
+        }
