@@ -23,10 +23,8 @@
             "generic": "true"
         }
     ],
-    "holdings": [
-        {
-            "inputs": [
-                {
+    "holdings": [{
+            "inputs": [{
                     "type": "fact",
                     "content": "Hideaway Lodge was a motel"
                 },
@@ -106,7 +104,11 @@
                 },
                 {
                     "type": "fact",
-                    "content": "officers' search of the stockpile was performed by federal law enforcement officers"
+                    "content": "officers' search of the stockpile of trees was performed by law enforcement officers"
+                },
+                {
+                    "type": "fact",
+                    "content": "officers' search of the stockpile of trees was performed by federal officers"
                 },
                 {
                     "type": "fact",
@@ -126,31 +128,31 @@
         },
         {
             "inputs": [{
-                "type": "fact",
-                "content": "Hideaway Lodge was Wattenburg’s abode"
-            },
-            {
-                "type": "fact",
-                "content": "the stockpile of trees was on the premises of Hideaway Lodge"
-            },
-            {
-                "type": "fact",
-                "content": "the stockpile of trees was a stockpile of Christmas trees"
-            },
-            {
-                "type": "fact",
-                "content": "the stockpile of trees was among some standing trees"
-            },
-            {
-                "type": "fact",
-                "content": "the distance between the stockpile of trees and Hideaway Lodge was > 35 feet",
-                "truth": false,
-                "reciprocal": true
-            },
-            {
-                "type": "fact",
-                "content": "the distance between the stockpile of trees and a parking area used by personnel and patrons of Hideaway Lodge was < 5 feet"
-            }
+                    "type": "fact",
+                    "content": "Hideaway Lodge was Wattenburg’s abode"
+                },
+                {
+                    "type": "fact",
+                    "content": "the stockpile of trees was on the premises of Hideaway Lodge"
+                },
+                {
+                    "type": "fact",
+                    "content": "the stockpile of trees was a stockpile of Christmas trees"
+                },
+                {
+                    "type": "fact",
+                    "content": "the stockpile of trees was among some standing trees"
+                },
+                {
+                    "type": "fact",
+                    "content": "the distance between the stockpile of trees and Hideaway Lodge was > 35 feet",
+                    "truth": false,
+                    "reciprocal": true
+                },
+                {
+                    "type": "fact",
+                    "content": "the distance between the stockpile of trees and a parking area used by personnel and patrons of Hideaway Lodge was < 5 feet"
+                }
             ],
             "outputs": {
                 "type": "fact",
@@ -170,7 +172,11 @@
                 },
                 {
                     "type": "fact",
-                    "content": "officers' search of the stockpile of trees was performed by federal law enforcement officers"
+                    "content": "officers' search of the stockpile of trees was performed by law enforcement officers"
+                },
+                {
+                    "type": "fact",
+                    "content": "officers' search of the stockpile of trees was performed by federal officers"
                 },
                 {
                     "type": "fact",
@@ -196,13 +202,14 @@
                 }
             ],
             "despite": [{
-                "type": "fact",
-                "content": "the stockpile of trees was in an area accessible to the public"
-            },
-            {
-                "type": "fact",
-                "content": "the distance between the stockpile of trees and Hideaway Lodge was >= 20 feet"
-            }],
+                    "type": "fact",
+                    "content": "the stockpile of trees was in an area accessible to the public"
+                },
+                {
+                    "type": "fact",
+                    "content": "the distance between the stockpile of trees and Hideaway Lodge was >= 20 feet"
+                }
+            ],
             "outputs": [{
                 "type": "evidence",
                 "exhibit": "proof of Wattenburg's guilt",

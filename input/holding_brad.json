@@ -43,6 +43,10 @@
                 },
                 {
                     "type": "fact",
+                    "content": "officers' search of the yard was performed by law enforcement officers"
+                },
+                {
+                    "type": "fact",
                     "content": "officers' search of the yard was performed in the grounds around Bradley's house"
                 },
                 {
@@ -105,6 +109,10 @@
                 },
                 {
                     "type": "fact",
+                    "content": "officers' search of the yard was performed by law enforcement officers"
+                },
+                {
+                    "type": "fact",
                     "content": "officers' search of the yard was performed in the grounds around Bradley's house"
                 },
                 {
@@ -156,6 +164,10 @@
                 },
                 {
                     "type": "fact",
+                    "content": "officers' search of the yard was performed by law enforcement officers"
+                },
+                {
+                    "type": "fact",
                     "content": "officers' search of the yard was performed in the grounds around Bradley's house"
                 },
 
@@ -169,7 +181,7 @@
                 },
                 {
                     "type": "fact",
-                    "content": "officers' search of the yard was an unreasonable governmental intrusion upon Bradley's marijuana patch"
+                    "content": "officers' search of the yard was an unreasonable intrusion upon Bradley's marijuana patch"
                 },
                 {
                     "type": "fact",
@@ -205,6 +217,11 @@
                 {
                     "type": "fact",
                     "content": "Bradley lived at Bradley's house"
+                },
+
+                {
+                    "type": "fact",
+                    "content": "officers' search of the yard was performed by law enforcement officers"
                 },
                 {
                     "type": "fact",
@@ -256,6 +273,11 @@
                 {
                     "type": "fact",
                     "content": "Bradley lived at Bradley's house"
+                },
+
+                {
+                    "type": "fact",
+                    "content": "officers' search of the yard was performed by law enforcement officers"
                 },
                 {
                     "type": "fact",
@@ -326,7 +348,7 @@
                 },
                 {
                     "type": "fact",
-                    "content": "Part of Bradley's marijuana patch was in plain sight from a distance of as >= 1 foot"
+                    "content": "part of Bradley's marijuana patch was in plain sight from a distance of as >= 1 foot"
                 },
                 {
                     "type": "fact",
@@ -415,7 +437,6 @@
                     "type": "fact",
                     "content": "Bradley's marijuana patch was in the fenced rear yard of Bradley's house"
                 }
-
             ],
             "outputs": {
                 "type": "fact",

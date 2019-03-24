@@ -568,7 +568,7 @@ class ProceduralRule(Rule):
         def factor_catalog(factors: List[Factor]) -> str:
             if len(factors) > 1:
                 lines = [f" ({i + 1}) {factors[i]}" for i in range(len(factors))]
-                lines[0] = "s:" + lines[0]
+                lines[0] = ":" + lines[0]
             else:
                 lines = [": " + str(factors[0])]
             lines = [line + "," for line in lines]
@@ -577,12 +577,12 @@ class ProceduralRule(Rule):
             return "".join(lines)
 
         return (
-            f"the rule that it is {'not ' if not self.rule_valid else ''}valid that the court "
+            f"the rule that {'it is not valid that ' if not self.rule_valid else ''}the court "
             + f"{'MUST' if self.mandatory else 'MAY'} {'ALWAYS' if self.universal else 'SOMETIMES'} "
             + f"accept the outcome{str(factor_catalog(self.procedure.outputs))} "
-            + f"{'based on the input' + str(factor_catalog(self.procedure.inputs)) if self.procedure.inputs else ''} "
-            + f"{'and despite' + str(factor_catalog(self.procedure.despite)) if self.procedure.despite else ''} "
-            + f"{'according to the legislation ' + ', '.join([str(e) for e in self.enactments]) if self.enactments else ''} "
+            + f"{'based on the input' + str(factor_catalog(self.procedure.inputs) + ' ') if self.procedure.inputs else ''}"
+            + f"{'and despite' + str(factor_catalog(self.procedure.despite)) + ' ' if self.procedure.despite else ''}"
+            + f"{'according to the legislation ' + ', '.join([str(e) for e in self.enactments]) + '' if self.enactments else ''}"
             + f"{'and despite the legislation ' + ', '.join([str(e) for e in self.enactments_despite]) if self.enactments_despite else ''}"
         )
 

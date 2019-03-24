@@ -31,10 +31,10 @@ class TestProcedures:
         assert len(make_procedure["c1"]) == 2
 
     def test_procedure_string_with_entities(self, make_procedure):
-        assert "fact <Craig> performed at <circus>" in str(
+        assert "<Craig> performed at <circus>" in str(
             make_procedure["c2_irrelevant_inputs"]
         )
-        assert "fact <Dan> performed at <circus>" in str(
+        assert "<Dan> performed at <circus>" in str(
             make_procedure["c2_irrelevant_inputs"]
         )
 

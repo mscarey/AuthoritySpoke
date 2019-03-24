@@ -175,6 +175,8 @@ class Exhibit(Factor):
             + f'{(", asserting " + str(self.statement)) if self.statement else ""}'
         )
         if self.generic:
+            if self.name:
+                string = self.name
             string = f"<{string}>"
         return string
 

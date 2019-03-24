@@ -25,7 +25,10 @@ def log_mentioned_context(func: Callable):
             return None, mentioned
         if isinstance(factor_record, str):
             for context_factor in mentioned:
-                if hasattr(context_factor, "name") and context_factor.name == factor_record:
+                if (
+                    hasattr(context_factor, "name")
+                    and context_factor.name == factor_record
+                ):
                     return context_factor, mentioned
             raise ValueError(
                 f'The object "{factor_record}" should be a dict '
@@ -38,7 +41,9 @@ def log_mentioned_context(func: Callable):
                 if context_factor == factor:
                     return context_factor, mentioned
         mentioned.append(factor)
-        mentioned = sorted(mentioned, key=lambda f: len(f.name) if f.name else 0, reverse=True)
+        mentioned = sorted(
+            mentioned, key=lambda f: len(f.name) if f.name else 0, reverse=True
+        )
         return factor, mentioned
 
     return wrapper

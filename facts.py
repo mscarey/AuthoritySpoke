@@ -76,7 +76,7 @@ class Fact(Factor):
             else ""
         )
         string = (
-            f"{'the absence of ' if self.absent else ''}the fact"
+            f"{'the absence of the fact' if self.absent else ''}"
             + f"{standard} {predicate}"
         )
         if self.generic:

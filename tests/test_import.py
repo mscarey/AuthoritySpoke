@@ -138,6 +138,12 @@ class TestRuleImport:
         assert any(brad_holdings[6].inputs[0] == x for x in brad_holdings[5].inputs)
         assert any(brad_holdings[6].inputs[0] is x for x in brad_holdings[5].inputs)
 
+    def test_use_int_not_pint_without_dimension(self, make_opinion):
+
+        brad = make_opinion["brad_majority"]
+        brad_holdings = brad.holdings_from_json("holding_brad.json")
+        assert "dimensionless" not in str(brad_holdings[6])
+        assert isinstance(brad_holdings[6].inputs[0].predicate.quantity, int)
 
 class TestNestedFactorImport:
     def test_import_holding(self, make_opinion):
