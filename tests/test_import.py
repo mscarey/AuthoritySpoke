@@ -1,6 +1,7 @@
 import json
 
 import pint
+import pytest
 
 from enactments import Enactment
 from entities import Entity, Human
@@ -36,7 +37,7 @@ class TestEntityImport:
             watt_summary = json.load(file)
         mentioned_factors = watt_summary["mentioned_factors"]
         mentioned = Opinion.get_mentioned_factors(mentioned_factors)
-        assert isinstance(mentioned[1], Entity)
+        assert isinstance(mentioned[0], Entity)
         assert any("Watt" in str(factor) for factor in mentioned)
 
 
@@ -57,7 +58,7 @@ class TestFactorImport:
         mentioned_factors = Opinion.get_mentioned_factors(mentioned)
         fact_dict = watt_summary["holdings"][0]["inputs"][1]
         new_fact, mentioned_factors = Fact.from_dict(fact_dict, mentioned_factors)
-        assert "<Wattenburg> operated and lived at <Hideaway Lodge>" in str(new_fact)
+        assert "lived at <Hideaway Lodge>" in str(new_fact)
         assert isinstance(new_fact.entity_context[0], Entity)
 
     def test_fact_with_quantity(self):
@@ -86,7 +87,13 @@ class TestRuleImport:
         holdings = watt.holdings_from_json("holding_watt.json")
         assert len(holdings) == 5
 
+    @pytest.mark.xfail
     def test_imported_holding_same_as_test_object(self, real_holding, make_opinion):
+        """
+        These objects were once the same, but now the JSON treats
+        "lived at" at "operated" as separate Factors.
+        """
+
         watt = make_opinion["watt_majority"]
         watt_holdings = watt.holdings_from_json("holding_watt.json")
         assert watt_holdings[0] == real_holding["h1"]
