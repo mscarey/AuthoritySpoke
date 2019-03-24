@@ -20,24 +20,25 @@ def log_mentioned_context(func: Callable):
         factor_record: Union[str, Optional[Dict[str, Union[str, bool]]]],
         mentioned: List[Union["Factor", "Enactment"]],
     ) -> Tuple[Optional["Factor"], List["Factor"]]:
+
         if factor_record is None:
             return None, mentioned
         if isinstance(factor_record, str):
             for context_factor in mentioned:
-                if context_factor.name == factor_record:
+                if hasattr(context_factor, "name") and context_factor.name == factor_record:
                     return context_factor, mentioned
-            # Same test, but raises an error if factor_record fails this time
-            if isinstance(factor_record, str):
-                raise ValueError(
-                    f'The object "{factor_record}" should be a dict '
-                    + "representing a Factor or a string "
-                    + "representing the name of a Factor included in context_list."
-                )
-        else:
-            factor, mentioned = func(cls, factor_record, mentioned)
-            if factor.name:
-                mentioned.append(factor)
-                mentioned = sorted(mentioned, key=lambda f: len(f.name), reverse=True)
+            raise ValueError(
+                f'The object "{factor_record}" should be a dict '
+                + "representing a Factor or a string "
+                + "representing the name of a Factor included in context_list."
+            )
+        factor, mentioned = func(cls, factor_record, mentioned)
+        if not factor.name and (not hasattr(factor, "generic") or not factor.generic):
+            for context_factor in mentioned:
+                if context_factor == factor:
+                    return context_factor, mentioned
+        mentioned.append(factor)
+        mentioned = sorted(mentioned, key=lambda f: len(f.name) if f.name else 0, reverse=True)
         return factor, mentioned
 
     return wrapper

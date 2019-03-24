@@ -122,11 +122,6 @@ class Fact(Factor):
         return []
 
     def __eq__(self, other: Factor) -> bool:
-        if not isinstance(other, Factor):
-            raise TypeError(
-                f"{self.__class__} objects may only be compared for "
-                + "equality with other Factor objects or None."
-            )
         if self.__class__ != other.__class__:
             return False
         if self.generic == other.generic == True:

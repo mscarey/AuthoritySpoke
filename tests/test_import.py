@@ -126,6 +126,18 @@ class TestRuleImport:
             for brad_enactment in brad_holdings[0].enactments
         )
 
+    def test_same_object_for_enactment_in_import(self, make_opinion):
+        """
+        The JSON for Bradley repeats identical fields to create the same Factor
+        for multiple Rules, instead of using the "name" field as a shortcut.
+        This tests whether the from_json method uses the same Factor object anyway,
+        as if the JSON file had referred to the object by its name field.
+        """
+        brad = make_opinion["brad_majority"]
+        brad_holdings = brad.holdings_from_json("holding_brad.json")
+        assert any(brad_holdings[6].inputs[0] == x for x in brad_holdings[5].inputs)
+        assert any(brad_holdings[6].inputs[0] is x for x in brad_holdings[5].inputs)
+
 
 class TestNestedFactorImport:
     def test_import_holding(self, make_opinion):
