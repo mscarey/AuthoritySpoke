@@ -608,16 +608,16 @@ class ProceduralRule(Rule):
             for record in record_list:
                 created, context_list = class_to_create.from_dict(record, context_list)
                 factors_or_enactments.append(created)
-            return tuple(factors_or_enactments)
+            return tuple(factors_or_enactments), context_list
 
         factor_groups: Dict[str, List] = {"inputs": [], "outputs": [], "despite": []}
         for factor_type in factor_groups:
-            factor_groups[factor_type] = list_from_records(
+            factor_groups[factor_type], context_list = list_from_records(
                 record.get(factor_type, []), context_list, Factor
             )
         enactment_groups: Dict[str, List] = {"enactments": [], "enactments_despite": []}
         for enactment_type in enactment_groups:
-            enactment_groups[enactment_type] = list_from_records(
+            enactment_groups[enactment_type], context_list = list_from_records(
                 record.get(enactment_type, []), context_list, Enactment
             )
 

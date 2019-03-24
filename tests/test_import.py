@@ -116,6 +116,16 @@ class TestRuleImport:
         holdings = watt.holdings_from_json("holding_watt.json")
         assert holdings[0].enactments[0].code == holdings[1].enactments[0].code
 
+    def test_same_enactment_in_two_opinions(self, make_opinion):
+        watt = make_opinion["watt_majority"]
+        watt_holdings = watt.holdings_from_json("holding_watt.json")
+        brad = make_opinion["brad_majority"]
+        brad_holdings = brad.holdings_from_json("holding_brad.json")
+        assert any(
+            watt_holdings[0].enactments[0] == brad_enactment
+            for brad_enactment in brad_holdings[0].enactments
+        )
+
 
 class TestNestedFactorImport:
     def test_import_holding(self, make_opinion):

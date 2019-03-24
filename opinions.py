@@ -58,7 +58,7 @@ class Opinion:
         finished_rules: List["Rule"] = []
         for rule in rule_list:
             # This will need to change for Attribution holdings
-            finished_rule, context_list = ProceduralRule.from_dict(
+            finished_rule, mentioned = ProceduralRule.from_dict(
                 rule, mentioned
             )
             finished_rules.append(finished_rule)
