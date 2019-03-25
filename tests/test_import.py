@@ -145,12 +145,33 @@ class TestRuleImport:
         assert "dimensionless" not in str(brad_holdings[6])
         assert isinstance(brad_holdings[6].inputs[0].predicate.quantity, int)
 
-    def test_opinion_posits_holding(self, make_opinion, make_entity):
+    def test_opinion_posits_holding(self, make_opinion):
         brad = make_opinion["brad_majority"]
         brad_holdings = brad.holdings_from_json("holding_brad.json")
         for holding in brad_holdings:
             brad.posits(holding)
         assert "warrantless search and seizure" in str(brad.holdings[0])
+
+    def test_opinion_posits_holding_tuple_context(self, make_opinion, make_entity):
+        """
+        Having the Watt case posit a holding from the Brad
+        case, but with generic factors from Watt.
+        """
+        watt = make_opinion["watt_majority"]
+        brad_holdings = watt.holdings_from_json("holding_brad.json")
+        watt.posits(brad_holdings[6], (make_entity["watt"], make_entity["trees"], make_entity["motel"]))
+        assert "TK" in str(watt.holdings[0])
+
+    def test_opinion_posits_holding_dict_context(self, make_opinion, make_entity):
+        """
+        Having the Watt case posit a holding from the Brad
+        case, but replacing one generic factor with a factor
+        from Watt.
+        """
+        watt = make_opinion["watt_majority"]
+        brad_holdings = watt.holdings_from_json("holding_brad.json")
+        watt.posits(brad_holdings[6], {brad_holdings[6].generic_factors[0]: make_entity["watt"]})
+        assert "TK" in str(watt.holdings[0])
 
 class TestNestedFactorImport:
     def test_import_holding(self, make_opinion):
