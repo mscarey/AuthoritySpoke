@@ -261,12 +261,12 @@ class Procedure(Factor):
             for self_factor in self.outputs
         )
 
-    def factors_all(self) -> Set[Factor]:
+    def factors_all(self) -> List[Factor]:
         """Returns a set of all factors."""
 
-        inputs = self.inputs or set()
-        despite = self.despite or set()
-        return [*inputs, *despite, *self.outputs]
+        inputs = self.inputs or ()
+        despite = self.despite or ()
+        return [*self.outputs, *inputs, *despite]
 
     def factors_sorted(self) -> List[Factor]:
         """Sorts the procedure's factors into an order that will always be
@@ -275,16 +275,16 @@ class Procedure(Factor):
 
         return sorted(self.factors_all(), key=repr)
 
-    def generic_factors(self) -> Dict[Factor, None]:
+    def generic_factors(self) -> List[Factor]:
         """Returns an iterable of self's generic Factors,
         which must be matched to other generic Factors to
         perform equality tests between Factors."""
 
-        return {
+        return list({
             generic: None
             for factor in self.factors_all()
             for generic in factor.generic_factors()
-        }
+        })
 
     def contradicts_some_to_all(self, other: "Procedure") -> bool:
         """
@@ -464,7 +464,7 @@ class Procedure(Factor):
                 + "to be replaced and each value is the corresponding "
                 + "replacement Factor."
             )
-        return dict(zip(generic_factors.keys(), changes))
+        return dict(zip(generic_factors, changes))
 
     def new_context(
         self, changes: Union[List[Factor], Dict[Factor, Factor]]
