@@ -10,7 +10,6 @@ from facts import Fact
 from opinions import Opinion
 from rules import Procedure, ProceduralRule
 
-
 @pytest.fixture(scope="class")
 def make_entity() -> Dict[str, Entity]:
     return {

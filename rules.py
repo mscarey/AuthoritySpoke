@@ -1,5 +1,3 @@
-import json
-import pathlib
 import operator
 
 from types import MappingProxyType

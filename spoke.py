@@ -1,11 +1,7 @@
-import itertools
 import logging
-import operator
 import re
 
-from types import MappingProxyType
-
-from typing import Callable, Dict, List, Set, Tuple
+from typing import Callable, Dict, List, Tuple
 from typing import Iterable, Iterator, Mapping
 from typing import Optional, Sequence, Union
 
@@ -61,10 +57,8 @@ class Factor:
         """
         Turns a dict recently created from a chunk of JSON into a Factor object.
 
-        BUG: If some functions call Factor.from_dict() and others call subclasses'
-        from_dict() methods, then Factor as well as its subclasses need to be
-        decorated with log_mentioned_context, which results in log_mentioned_context
-        wastefully being called twice for Factor.from_dict.
+        TODO: make log_mentioned_context work properly when from_dict() is called
+        directly from a subclass.
         """
         cname = factor_record["type"]
         target_class = cls.class_from_str(cname)
@@ -383,6 +377,7 @@ class Predicate:
 
     @staticmethod
     def str_to_quantity(quantity: str) -> Union[float, int, ureg.Quantity]:
+        quantity = quantity.strip()
         if quantity.isdigit():
             return int(quantity)
         elif quantity.isdecimal():

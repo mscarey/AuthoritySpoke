@@ -23,8 +23,8 @@ class Entity(Factor):
     generic: bool = True
     plural: bool = False
 
-    def __eq__(self, other: Optional[Factor]):
-        if type(self) != type(other):
+    def __eq__(self, other):
+        if not isinstance(other, self.__class__):
             return False
         if self.generic and other.generic:
             return True

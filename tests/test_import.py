@@ -145,6 +145,13 @@ class TestRuleImport:
         assert "dimensionless" not in str(brad_holdings[6])
         assert isinstance(brad_holdings[6].inputs[0].predicate.quantity, int)
 
+    def test_opinion_posits_holding(self, make_opinion, make_entity):
+        brad = make_opinion["brad_majority"]
+        brad_holdings = brad.holdings_from_json("holding_brad.json")
+        for holding in brad_holdings:
+            brad.posits(holding)
+        assert "warrantless search and seizure" in str(brad.holdings[0])
+
 class TestNestedFactorImport:
     def test_import_holding(self, make_opinion):
         """

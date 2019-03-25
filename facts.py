@@ -71,13 +71,13 @@ class Fact(Factor):
     def __str__(self):
         predicate = str(self.predicate.content_with_entities(self.entity_context))
         standard = (
-            f" by the standard {self.standard_of_proof},"
+            f"by the standard {self.standard_of_proof}, "
             if self.standard_of_proof
             else ""
         )
         string = (
-            f"{'the absence of the fact' if self.absent else ''}"
-            + f"{standard} {predicate}"
+            f"{'the absence of the fact ' if self.absent else ''}"
+            + f"{standard}{predicate}"
         )
         if self.generic:
             return f"<{string}>"

@@ -10,13 +10,14 @@ lxml = "*"
 pint = "*"
 
 [dev-packages]
-pytest = "==4.0.2"
+pytest = "*"
 pylint = "*"
 mypy = "*"
 rope = "*"
 black = "*"
 pytest-cov = "*"
 v = {editable = true,version = "*"}
+pytest-profiling = "*"
 
 [requires]
 python_version = "3.7.1"

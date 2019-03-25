@@ -1,5 +1,4 @@
 __pycache__/
-tests/__pycache__/
 .coverage
 .pylintrc
 .pytest_cache
@@ -10,5 +9,7 @@ codes/ca_penal.html
 html/
 json/flf/
 notebooks/
+prof/
+tests/__pycache__/
 xml/
 *.ipynb
