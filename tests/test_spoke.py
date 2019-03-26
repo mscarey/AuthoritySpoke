@@ -6,6 +6,7 @@ from pint import UnitRegistry
 import pytest
 
 from entities import Entity, Human, Event
+from opinions import Holding
 from spoke import Predicate, Factor
 from spoke import ureg, Q_
 
@@ -277,16 +278,30 @@ class TestOpinions:
         watt.posits(h["h3"], (e["motel"], e["watt"], e["tree_search"], e["trees"]))
         assert h["h3"] in watt.holdings
 
-    def test_opinion_entity_list(self, make_opinion, real_holding, make_entity):
+    def test_opinion_entity_list(
+        self, make_opinion, real_holding, make_entity, make_evidence
+    ):
         watt = make_opinion["watt_majority"]
         h = real_holding
         e = make_entity
 
-        watt.posits(h["h1"], (e["motel"], e["watt"]))
-        watt.posits(h["h2"], (e["trees"], e["motel"]))
-        watt.posits(h["h3"], (e["motel"], e["watt"], e["tree_search"], e["trees"]))
-        watt.posits(h["h4"], (e["motel"], e["watt"], e["tree_search"], e["trees"]))
-        assert make_entity["watt"] in make_opinion["watt_majority"].get_entities()
+        watt.posits(Holding(h["h1"], (e["motel"], e["watt"])))
+        watt.posits(Holding(h["h2"], (e["trees"], e["motel"])))
+        watt.posits(
+            Holding(h["h3"], (make_evidence["generic"], e["motel"], e["watt"], e["trees"], e["tree_search"]))
+        )
+        watt.posits(
+            Holding(
+                h["h4"],
+                (
+                    e["trees"],
+                    e["tree_search"],
+                    e["motel"],
+                    e["watt"],
+                ),
+            )
+        )
+        assert make_entity["watt"] in make_opinion["watt_majority"].generic_factors
 
     def test_opinion_date(self, make_opinion):
         assert (

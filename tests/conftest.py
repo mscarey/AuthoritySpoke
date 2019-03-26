@@ -440,8 +440,10 @@ def make_evidence(
             x["no_shooting_different_witness_testimony"], to_effect=f["f_no_crime"]
         ),
         "reciprocal": Evidence(x["reciprocal_testimony"], to_effect=f["f_no_crime"]),
-        "crime": Evidence(x["generic_exhibit"], generic=True),
-        "crime_absent": Evidence(x["generic_exhibit"], absent=True, generic=True),
+        "crime": Evidence(x["generic_exhibit"], to_effect=f["f_crime"], generic=True),
+        "crime_absent": Evidence(x["generic_exhibit"], to_effect=f["f_crime"], absent=True, generic=True),
+        "generic": Evidence(x["generic_exhibit"], generic=True),
+        "generic_absent": Evidence(x["generic_exhibit"], absent=True, generic=True),
     }
 
 

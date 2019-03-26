@@ -7,8 +7,8 @@ from enactments import Enactment
 from entities import Entity, Human
 from evidence import Evidence
 from facts import Fact
-from opinions import Opinion
-from rules import Procedure, Rule, ProceduralRule, Holding
+from opinions import Holding, Opinion
+from rules import Procedure, Rule, ProceduralRule
 from spoke import Predicate, Factor
 from context import log_mentioned_context
 
