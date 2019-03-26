@@ -9,7 +9,7 @@ ordered tuples of other Factors.
 from typing import Dict, List, Optional
 
 from spoke import Factor
-from file_import import log_mentioned_context
+from context import log_mentioned_context
 
 from dataclasses import astuple, dataclass
 

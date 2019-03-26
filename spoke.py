@@ -9,7 +9,7 @@ from pint import UnitRegistry
 
 from dataclasses import dataclass
 
-from file_import import log_mentioned_context
+from context import log_mentioned_context
 
 ureg = UnitRegistry()
 Q_ = ureg.Quantity

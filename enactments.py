@@ -9,7 +9,7 @@ from dataclasses import dataclass
 
 from utils import roman
 
-from file_import import log_mentioned_context
+from context import log_mentioned_context
 
 from spoke import Factor
 

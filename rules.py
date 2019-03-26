@@ -873,7 +873,14 @@ class Holding:
                 + "number of generic factors in the referenced ProceduralRule."
             )
         self.rule = rule
-        self.context = context
+        self.context = tuple(context)
+
+    def __str__(self):
+        string = str(self.rule)
+        string = string.replace("the rule that", "the holding that", 1)
+        for i in range(len(self.context)):
+            string = string.replace(self.rule.generic_factors[i], self.context[i])
+        return string
 
 
 class Attribution:

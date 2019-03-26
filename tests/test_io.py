@@ -10,7 +10,7 @@ from facts import Fact
 from opinions import Opinion
 from rules import Procedure, Rule, ProceduralRule, Holding
 from spoke import Predicate, Factor
-from file_import import log_mentioned_context
+from context import log_mentioned_context
 
 ureg = pint.UnitRegistry()
 
