@@ -61,7 +61,7 @@ class Holding:
         string = str(self.rule)
         string = string.replace("the rule that", "the holding that", 1)
         for i in range(len(self.context)):
-            string = string.replace(self.rule.generic_factors[i], self.context[i])
+            string = string.replace(str(self.rule.generic_factors[i]), str(self.context[i]))
         return string
 
 
@@ -159,10 +159,13 @@ class Opinion:
         return mentioned
 
     def posits(self, holding: Holding) -> None:
+        """
+        Adds holding to the opinion's holdings list, replacing any other
+        Holdings with the same meaning.
+        """
         if not isinstance(holding, Holding):
             raise TypeError('"holding" must be an object of type Holding.')
-        if not any(holding == existing for existing in self.holdings):
-            self.holdings.append(holding)
+        self.holdings.append(holding)
 
     @property
     def generic_factors(self) -> List[Factor]:

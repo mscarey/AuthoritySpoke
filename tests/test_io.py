@@ -165,7 +165,7 @@ class TestRuleImport:
             (make_entity["watt"], make_entity["trees"], make_entity["motel"]),
         )
         watt.posits(context_holding)
-        assert "TK" in str(watt.holdings[0])
+        assert "the number of marijuana plants in <the stockpile of trees> was at least 3" in str(watt.holdings[0])
 
     def test_opinion_posits_holding_dict_context(self, make_opinion, make_entity):
         """
@@ -178,8 +178,11 @@ class TestRuleImport:
         context_holding = Holding(
             brad_holdings[6], context={brad_holdings[6].generic_factors[0]: make_entity["watt"]}
         )
+        # resetting Holdings because of class scope of fixture
+        watt.holdings = []
         watt.posits(context_holding)
-        assert "TK" in str(watt.holdings[0])
+        assert "<Wattenburg> lived at <Bradley's house>" in str(context_holding)
+        assert "<Wattenburg> lived at <Bradley's house>" in str(watt.holdings[0])[1000:1100]
 
     def test_holding_with_non_generic_value_raises_error(
         self, make_opinion, make_entity
