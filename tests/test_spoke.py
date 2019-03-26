@@ -270,13 +270,13 @@ class TestOpinions:
         assert make_opinion["watt_majority"].court == "9th-cir"
         assert "388 F.2d 853" in make_opinion["watt_majority"].citations
 
-    def test_opinion_holding_list(self, make_opinion, real_holding, make_entity):
+    def test_opinion_holding_list(self, make_opinion, real_holding, make_evidence, make_entity):
         watt = make_opinion["watt_majority"]
         h = real_holding
         e = make_entity
-
-        watt.posits(h["h3"], (e["motel"], e["watt"], e["tree_search"], e["trees"]))
-        assert h["h3"] in watt.holdings
+        h3_specific = Holding(h["h3"])
+        watt.posits(h3_specific)
+        assert h3_specific in watt.holdings
 
     def test_opinion_entity_list(
         self, make_opinion, real_holding, make_entity, make_evidence
@@ -288,18 +288,19 @@ class TestOpinions:
         watt.posits(Holding(h["h1"], (e["motel"], e["watt"])))
         watt.posits(Holding(h["h2"], (e["trees"], e["motel"])))
         watt.posits(
-            Holding(h["h3"], (make_evidence["generic"], e["motel"], e["watt"], e["trees"], e["tree_search"]))
-        )
-        watt.posits(
             Holding(
-                h["h4"],
+                h["h3"],
                 (
-                    e["trees"],
-                    e["tree_search"],
+                    make_evidence["generic"],
                     e["motel"],
                     e["watt"],
+                    e["trees"],
+                    e["tree_search"],
                 ),
             )
+        )
+        watt.posits(
+            Holding(h["h4"], (e["trees"], e["tree_search"], e["motel"], e["watt"]))
         )
         assert make_entity["watt"] in make_opinion["watt_majority"].generic_factors
 

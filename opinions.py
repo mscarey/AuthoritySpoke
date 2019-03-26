@@ -159,7 +159,6 @@ class Opinion:
             raise TypeError('"holding" must be an object of type Holding.')
         if not any(holding == existing for existing in self.holdings):
             self.holdings.append(holding)
-        return None
 
     @property
     def generic_factors(self) -> List[Factor]:
