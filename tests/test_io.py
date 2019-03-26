@@ -181,14 +181,6 @@ class TestRuleImport:
         watt.posits(context_holding)
         assert "TK" in str(watt.holdings[0])
 
-    def test_holding_with_key_not_in_generic_context_raises_error(
-        self, make_opinion, make_entity
-    ):
-        watt = make_opinion["watt_majority"]
-        brad_holdings = watt.holdings_from_json("holding_brad.json")
-        with pytest.raises(ValueError):
-            Holding(brad_holdings[6], context={make_entity["trees"]: make_entity["motel"]})
-
     def test_holding_with_non_generic_value_raises_error(
         self, make_opinion, make_entity
     ):

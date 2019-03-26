@@ -41,12 +41,18 @@ class Holding:
                     + "must be a Factor that replaces the key in the "
                     + "context of the current Holding."
                 )
-            context = [context[item] for item in rule.generic_factors]
+            # TODO: validate compatible Entity subclasses
+            context = [context.get(item, item) for item in rule.generic_factors]
         if len(context) != len(rule.generic_factors):
             raise ValueError(
                 f'For this {self.__class__.__name__}, "context" must have exactly '
                 + f"{len(rule.generic_factors)} factors, to correspond with the "
                 + "number of generic factors in the referenced ProceduralRule."
+            )
+        if any(not factor.generic for factor in context):
+            raise ValueError(
+                'Every Factor in "context" must be generic '
+                + "(must have the attribute generic=True)"
             )
         self.rule = rule
         self.context = tuple(context)
@@ -57,6 +63,7 @@ class Holding:
         for i in range(len(self.context)):
             string = string.replace(self.rule.generic_factors[i], self.context[i])
         return string
+
 
 @dataclass
 class Opinion:
@@ -151,10 +158,7 @@ class Opinion:
             _, mentioned = Factor.from_dict(factor_dict, mentioned)
         return mentioned
 
-    def posits(
-        self,
-        holding: Holding
-    ) -> None:
+    def posits(self, holding: Holding) -> None:
         if not isinstance(holding, Holding):
             raise TypeError('"holding" must be an object of type Holding.')
         if not any(holding == existing for existing in self.holdings):
@@ -163,9 +167,5 @@ class Opinion:
     @property
     def generic_factors(self) -> List[Factor]:
         return list(
-                    {
-                        generic: None
-                        for holding in self.holdings
-                        for generic in holding.context
-                    }
-                )
+            {generic: None for holding in self.holdings for generic in holding.context}
+        )
