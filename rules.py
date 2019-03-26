@@ -2,7 +2,7 @@ import operator
 
 from types import MappingProxyType
 
-from typing import Dict, List, Set, Tuple
+from typing import Dict, List, Sequence, Tuple
 from typing import Iterable, Iterator, Mapping
 from typing import Callable, Optional, Union
 from typing import NamedTuple
@@ -280,11 +280,13 @@ class Procedure(Factor):
         which must be matched to other generic Factors to
         perform equality tests between Factors."""
 
-        return list({
-            generic: None
-            for factor in self.factors_all()
-            for generic in factor.generic_factors()
-        })
+        return list(
+            {
+                generic: None
+                for factor in self.factors_all()
+                for generic in factor.generic_factors()
+            }
+        )
 
     def contradicts_some_to_all(self, other: "Procedure") -> bool:
         """
@@ -837,9 +839,48 @@ class ProceduralRule(Rule):
         return other.implies_if_decided(self)
 
 
+@dataclass()
+class Holding:
+    """
+    A ProceduralRule, plus a tuple of generic Factors to substitute
+    for the Factors in ProceduralRule.generic_factors().
+    """
+
+    def __init__(
+        self,
+        rule: ProceduralRule,
+        context: Optional[Union[Dict[Factor, Factor], Sequence[Factor]]] = None,
+    ):
+        if context is None:
+            context = rule.generic_factors
+        if any(not isinstance(item, Factor) for item in context):
+            raise TypeError('Each item in "context" must be type Factor')
+        if isinstance(context, dict):
+            if not all(
+                to_replace in rule.generic_factors for to_replace in context.keys()
+            ):
+                raise ValueError(
+                    'If "context" is a dictionary, then each of its keys must '
+                    + "be a generic Factor from rule, and each corresponding value "
+                    + "must be a Factor that replaces the key in the "
+                    + "context of the current Holding."
+                )
+            context = [context[item] for item in rule.generic_factors]
+        if len(context) != len(rule.generic_factors):
+            raise ValueError(
+                f'For this {self.__class__.__name__}, "context" must have exactly '
+                + f"{len(rule.generic_factors)} factors, to correspond with the "
+                + "number of generic factors in the referenced ProceduralRule."
+            )
+        self.rule = rule
+        self.context = context
+
+
 class Attribution:
-    """An assertion about the meaning of a prior Opinion. Either a user or an Opinion
+    """
+    An assertion about the meaning of a prior Opinion. Either a user or an Opinion
     may make an Attribution to an Opinion. An Attribution may attribute either
-    a Rule or a further Attribution."""
+    a Rule or a further Attribution.
+    """
 
     pass

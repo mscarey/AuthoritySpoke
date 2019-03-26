@@ -237,7 +237,7 @@ class TestProcedures:
     def test_all_to_all_implies_reciprocal(self, make_procedure, caplog):
         """
         These are the same Procedures below in
-        TestHoldings.test_implication_all_to_all_reciprocal
+        test_implication_all_to_all_reciprocal
         """
         caplog.set_level(logging.DEBUG)
         assert make_procedure["c2_exact_in_despite_entity_order"].implies_all_to_all(

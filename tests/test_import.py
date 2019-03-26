@@ -8,7 +8,7 @@ from entities import Entity, Human
 from evidence import Evidence
 from facts import Fact
 from opinions import Opinion
-from rules import Procedure, Rule, ProceduralRule
+from rules import Procedure, Rule, ProceduralRule, Holding
 from spoke import Predicate, Factor
 from file_import import log_mentioned_context
 
@@ -148,8 +148,9 @@ class TestRuleImport:
     def test_opinion_posits_holding(self, make_opinion):
         brad = make_opinion["brad_majority"]
         brad_holdings = brad.holdings_from_json("holding_brad.json")
-        for holding in brad_holdings:
-            brad.posits(holding)
+        for rule in brad_holdings:
+            context_holding = Holding(rule)
+            brad.posits(context_holding)
         assert "warrantless search and seizure" in str(brad.holdings[0])
 
     def test_opinion_posits_holding_tuple_context(self, make_opinion, make_entity):
@@ -159,7 +160,11 @@ class TestRuleImport:
         """
         watt = make_opinion["watt_majority"]
         brad_holdings = watt.holdings_from_json("holding_brad.json")
-        watt.posits(brad_holdings[6], (make_entity["watt"], make_entity["trees"], make_entity["motel"]))
+        context_holding = Holding(
+            brad_holdings[6],
+            (make_entity["watt"], make_entity["trees"], make_entity["motel"]),
+        )
+        watt.posits(context_holding)
         assert "TK" in str(watt.holdings[0])
 
     def test_opinion_posits_holding_dict_context(self, make_opinion, make_entity):
@@ -170,8 +175,31 @@ class TestRuleImport:
         """
         watt = make_opinion["watt_majority"]
         brad_holdings = watt.holdings_from_json("holding_brad.json")
-        watt.posits(brad_holdings[6], {brad_holdings[6].generic_factors[0]: make_entity["watt"]})
+        context_holding = Holding(
+            brad_holdings[6], context={brad_holdings[6].generic_factors[0]: make_entity["watt"]}
+        )
+        watt.posits(context_holding)
         assert "TK" in str(watt.holdings[0])
+
+    def test_holding_with_key_not_in_generic_context_raises_error(
+        self, make_opinion, make_entity
+    ):
+        watt = make_opinion["watt_majority"]
+        brad_holdings = watt.holdings_from_json("holding_brad.json")
+        with pytest.raises(ValueError):
+            Holding(brad_holdings[6], context={make_entity["trees"]: make_entity["motel"]})
+
+    def test_holding_with_non_generic_value_raises_error(
+        self, make_opinion, make_entity
+    ):
+        watt = make_opinion["watt_majority"]
+        brad_holdings = watt.holdings_from_json("holding_brad.json")
+        with pytest.raises(ValueError):
+            Holding(
+                brad_holdings[6],
+                context={brad_holdings[6].generic_factors[0]: make_entity["trees_specific"]},
+            )
+
 
 class TestNestedFactorImport:
     def test_import_holding(self, make_opinion):

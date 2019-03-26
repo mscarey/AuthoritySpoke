@@ -1,5 +1,5 @@
 from typing import Dict, List, Tuple
-from typing import Optional
+from typing import Optional, Sequence, Union
 
 import datetime
 import json
@@ -58,12 +58,9 @@ class Opinion:
         finished_rules: List["Rule"] = []
         for rule in rule_list:
             # This will need to change for Attribution holdings
-            finished_rule, mentioned = ProceduralRule.from_dict(
-                rule, mentioned
-            )
+            finished_rule, mentioned = ProceduralRule.from_dict(rule, mentioned)
             finished_rules.append(finished_rule)
         return finished_rules
-
 
     @staticmethod
     def from_file(path):
@@ -115,12 +112,12 @@ class Opinion:
         return [e for t in self.holdings.values() for e in t]
 
     def posits(
-        self, holding: Rule, entities: Optional[Tuple[Factor, ...]] = None
+        self,
+        holding: Rule,
+        context: Optional[Union[Dict[Factor, Factor], Sequence[Factor]]] = None,
     ) -> None:
-        # TODO: the "entities" parameter is now misnamed because they can be
-        # any subclass of Factor.
-        if entities is None:
-            entities = self.get_entities()[: len(holding)]  # TODO: write test
+        if context is None:
+            context = self.get_entities()[: len(holding)]  # TODO: write test
 
         if len(holding) > len(entities):
             raise ValueError(
