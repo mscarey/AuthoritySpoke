@@ -906,6 +906,6 @@ def make_opinion(make_entity) -> Dict[str, Opinion]:
     test_cases = ("brad", "cardenas", "watt")
     opinions = {}
     for case in test_cases:
-        for opinion in Opinion.from_file(f"json/{case}_h.json"):
+        for opinion in Opinion.from_file(f"{case}_h.json"):
             opinions[f"{case}_{opinion.position}"] = opinion
     return opinions

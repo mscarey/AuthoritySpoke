@@ -11,17 +11,21 @@ from utils import roman
 
 from authorityspoke.context import log_mentioned_context
 
+def get_directory_path(stem):
+    directory = pathlib.Path.cwd()
+    if directory.stem != stem:
+        directory = directory / stem
+        if not directory.exists():
+            directory = pathlib.Path.cwd().parent / stem
+    return directory
+
 class Code:
     """
     A constitution, code of statutes, code of regulations,
     or collection of court rules.
     """
 
-    directory = pathlib.Path.cwd()
-    if directory.stem != "codes":
-        directory = directory / "codes"
-        if not directory.exists():
-            directory = pathlib.Path.cwd().parent / "codes"
+    directory = get_directory_path("codes")
 
     def __init__(self, filename: str):
         self.path = self.__class__.directory / filename

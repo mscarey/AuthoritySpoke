@@ -8,7 +8,7 @@ AuthoritySpoke.egg-info
 codes/ca_evidence.html
 codes/ca_penal.html
 html/
-json/flf/
+opinions/flf/
 notebooks/
 prof/
 tests/__pycache__/

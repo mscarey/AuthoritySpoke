@@ -261,9 +261,8 @@ class TestEnactments:
 
 class TestOpinions:
     def test_load_opinion_in_Harvard_format(self):
-        with open("json/watt_h.json", "r") as f:
-            watt_dict = json.load(f)
-        assert watt_dict["name_abbreviation"] == "Wattenburg v. United States"
+        watt_dict = next(Opinion.from_file("watt_h.json"))
+        assert watt_dict.name_abbreviation == "Wattenburg v. United States"
 
     def test_opinion_features(self, make_opinion):
         assert make_opinion["watt_majority"].court == "9th-cir"

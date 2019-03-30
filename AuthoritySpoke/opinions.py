@@ -7,6 +7,7 @@ import pathlib
 
 from dataclasses import dataclass
 
+from authorityspoke.enactments import get_directory_path
 from authorityspoke.factors import Factor
 from authorityspoke.rules import ProceduralRule
 
@@ -76,6 +77,8 @@ class Opinion:
     position: str
     author: str
 
+    directory = get_directory_path("opinions")
+
     def __post_init__(self):
         self.holdings = []
 
@@ -107,13 +110,13 @@ class Opinion:
             finished_rules.append(finished_rule)
         return finished_rules
 
-    @staticmethod
-    def from_file(path):
+    @classmethod
+    def from_file(cls, name):
         """This is a generator that gets one opinion from a
         Harvard-format case file every time it's called. Exhaust the
         generator to get the lead opinion and all non-lead opinions."""
 
-        with open(path, "r") as f:
+        with open(cls.directory / name, "r") as f:
             opinion_dict = json.load(f)
 
         citations = tuple(c["cite"] for c in opinion_dict["citations"])
