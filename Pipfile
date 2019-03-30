@@ -8,6 +8,7 @@ beautifulsoup4 = "==4.7.1"
 ipykernel = "*"
 lxml = "*"
 pint = "*"
+authorityspoke = "*"
 
 [dev-packages]
 pytest = "*"

@@ -3,14 +3,11 @@ import operator
 
 import pytest
 
-from enactments import Code, Enactment
-from entities import Entity, Human
-from evidence import Evidence, Exhibit
-from facts import Fact
-from rules import Procedure, Rule, ProceduralRule
-from opinions import Opinion
-from spoke import Predicate, Factor
-from spoke import ureg, Q_
+from AuthoritySpoke.entities import Human, Event
+from AuthoritySpoke.factors import Factor, Entity, Fact
+from AuthoritySpoke.rules import Rule, ProceduralRule
+from AuthoritySpoke.opinions import Opinion, Holding
+from AuthoritySpoke.factors import ureg, Q_
 
 
 class TestFacts:

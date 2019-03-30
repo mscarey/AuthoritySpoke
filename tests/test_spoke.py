@@ -5,10 +5,10 @@ import operator
 from pint import UnitRegistry
 import pytest
 
-from entities import Entity, Human, Event
-from opinions import Holding
-from spoke import Predicate, Factor
-from spoke import ureg, Q_
+from AuthoritySpoke.entities import Human, Event
+from AuthoritySpoke.factors import Predicate, Factor, Entity, Fact
+from AuthoritySpoke.opinions import Opinion, Holding
+from AuthoritySpoke.factors import ureg, Q_
 
 
 class TestEntities:

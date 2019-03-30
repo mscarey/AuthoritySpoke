@@ -9,9 +9,7 @@ from dataclasses import dataclass
 
 from utils import roman
 
-from context import log_mentioned_context
-
-from spoke import Factor
+from AuthoritySpoke.context import log_mentioned_context
 
 class Code:
     """

@@ -2,13 +2,13 @@ from typing import Dict, Tuple
 
 import pytest
 
-from spoke import Predicate, Factor, Q_
-from enactments import Code, Enactment
-from entities import Entity, Event, Human
-from evidence import Evidence, Exhibit
-from facts import Fact
-from opinions import Opinion
-from rules import Procedure, ProceduralRule
+from AuthoritySpoke.factors import Predicate, Factor, Q_
+from AuthoritySpoke.enactments import Code, Enactment
+from AuthoritySpoke.entities import Entity, Event, Human
+from AuthoritySpoke.factors import Evidence, Exhibit
+from AuthoritySpoke.factors import Fact
+from AuthoritySpoke.opinions import Opinion
+from AuthoritySpoke.rules import Procedure, ProceduralRule
 
 @pytest.fixture(scope="class")
 def make_entity() -> Dict[str, Entity]:
