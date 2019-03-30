@@ -8,7 +8,7 @@ ordered tuples of other Factors.
 
 from typing import Dict, Optional
 
-from AuthoritySpoke.factors import Factor, Entity
+from authorityspoke.factors import Factor, Entity
 
 from dataclasses import astuple, dataclass
 

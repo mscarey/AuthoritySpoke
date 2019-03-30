@@ -1,7 +1,6 @@
 import functools
-from typing import Callable, Dict, List, Set, Tuple
-from typing import Iterable, Iterator, Mapping
-from typing import Optional, Sequence, Union
+from typing import Callable, Dict, List, Tuple
+from typing import Optional, Union
 
 
 def log_mentioned_context(func: Callable):

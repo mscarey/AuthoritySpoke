@@ -3,11 +3,14 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 name = "pypi"
 
+[pipenv]
+allow_prereleases = true
+
 [packages]
-beautifulsoup4 = "==4.7.1"
+beautifulsoup4 = ">=4.7.1"
 ipykernel = "*"
 lxml = "*"
-pint = "*"
+pint = ">=0.9"
 authorityspoke = "*"
 
 [dev-packages]
@@ -21,4 +24,4 @@ v = {editable = true,version = "*"}
 pytest-profiling = "*"
 
 [requires]
-python_version = "3.7.1"
+python_version = "3.7"

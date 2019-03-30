@@ -3,11 +3,11 @@ import operator
 
 import pytest
 
-from AuthoritySpoke.entities import Human, Event
-from AuthoritySpoke.factors import Factor, Entity, Fact
-from AuthoritySpoke.rules import Rule, ProceduralRule
-from AuthoritySpoke.opinions import Opinion, Holding
-from AuthoritySpoke.factors import ureg, Q_
+from authorityspoke.entities import Human, Event
+from authorityspoke.factors import Factor, Entity, Fact
+from authorityspoke.rules import Rule, ProceduralRule
+from authorityspoke.opinions import Opinion, Holding
+from authorityspoke.factors import ureg, Q_
 
 
 class TestFacts:

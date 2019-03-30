@@ -9,7 +9,7 @@ from dataclasses import dataclass
 
 from utils import roman
 
-from AuthoritySpoke.context import log_mentioned_context
+from authorityspoke.context import log_mentioned_context
 
 class Code:
     """
@@ -17,8 +17,14 @@ class Code:
     or collection of court rules.
     """
 
+    directory = pathlib.Path.cwd()
+    if directory.stem != "codes":
+        directory = directory / "codes"
+        if not directory.exists():
+            directory = pathlib.Path.cwd().parent / "codes"
+
     def __init__(self, filename: str):
-        self.path = pathlib.Path("codes") / filename
+        self.path = self.__class__.directory / filename
         self.xml = self.get_xml()
         if filename.startswith("ca_"):
             self.title = self.xml.find("h3").find("b").text.split(" - ")[0]

@@ -5,11 +5,10 @@ import operator
 from pint import UnitRegistry
 import pytest
 
-from AuthoritySpoke.entities import Human, Event
-from AuthoritySpoke.factors import Predicate, Factor, Entity, Fact
-from AuthoritySpoke.opinions import Opinion, Holding
-from AuthoritySpoke.factors import ureg, Q_
-
+from authorityspoke.entities import Human, Event
+from authorityspoke.factors import Predicate, Factor, Entity, Fact
+from authorityspoke.opinions import Opinion, Holding
+from authorityspoke.factors import ureg, Q_
 
 class TestEntities:
     def test_conversion_to_generic(self, make_entity):

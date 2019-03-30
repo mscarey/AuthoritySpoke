@@ -1,4 +1,5 @@
 __pycache__/
+AuthoritySpoke.egg-info
 .coverage
 .pylintrc
 .pytest_cache

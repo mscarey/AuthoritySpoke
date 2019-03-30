@@ -7,8 +7,8 @@ import pathlib
 
 from dataclasses import dataclass
 
-from AuthoritySpoke.factors import Factor
-from AuthoritySpoke.rules import ProceduralRule
+from authorityspoke.factors import Factor
+from authorityspoke.rules import ProceduralRule
 
 @dataclass()
 class Holding:

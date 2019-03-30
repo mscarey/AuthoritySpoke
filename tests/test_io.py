@@ -3,17 +3,12 @@ import json
 import pint
 import pytest
 
-from AuthoritySpoke.enactments import Code, Enactment
-from AuthoritySpoke.entities import Human, Event
-from AuthoritySpoke.factors import Predicate, Factor, Entity, Fact
-from AuthoritySpoke.factors import Evidence, Exhibit
-from AuthoritySpoke.rules import Procedure, Rule, ProceduralRule
-from AuthoritySpoke.opinions import Opinion, Holding
-from AuthoritySpoke.factors import ureg, Q_
-from AuthoritySpoke.context import log_mentioned_context
+from authorityspoke.enactments import Code, Enactment
+from authorityspoke.entities import Human, Event
+from authorityspoke.factors import Predicate, Factor, Entity, Fact
+from authorityspoke.opinions import Opinion, Holding
 
 ureg = pint.UnitRegistry()
-
 
 class TestPredicateImport:
     """

@@ -1,7 +1,7 @@
 import logging
 
-from AuthoritySpoke.factors import Fact
-from AuthoritySpoke.factors import Evidence, Exhibit
+from authorityspoke.factors import Fact
+from authorityspoke.factors import Evidence, Exhibit
 
 class TestExhibits:
     def test_make_exhibit_object(self, watt_factor):

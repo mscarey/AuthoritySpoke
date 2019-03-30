@@ -10,8 +10,8 @@ from typing import Optional, Sequence, Union
 
 from pint import UnitRegistry
 
-from AuthoritySpoke.context import log_mentioned_context
-from AuthoritySpoke.enactments import Enactment
+from authorityspoke.context import log_mentioned_context
+from authorityspoke.enactments import Enactment
 
 from dataclasses import astuple, dataclass
 

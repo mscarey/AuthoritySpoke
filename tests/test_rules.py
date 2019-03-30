@@ -1,14 +1,14 @@
 import logging
 import pytest
 
-from AuthoritySpoke.enactments import Code, Enactment
-from AuthoritySpoke.entities import Human, Event
-from AuthoritySpoke.factors import Predicate, Factor, Entity, Fact
-from AuthoritySpoke.factors import Evidence, Exhibit
-from AuthoritySpoke.rules import Procedure, Rule, ProceduralRule
-from AuthoritySpoke.opinions import Opinion, Holding
-from AuthoritySpoke.factors import ureg, Q_
-from AuthoritySpoke.context import log_mentioned_context
+from authorityspoke.enactments import Code, Enactment
+from authorityspoke.entities import Human, Event
+from authorityspoke.factors import Predicate, Factor, Entity, Fact
+from authorityspoke.factors import Evidence, Exhibit
+from authorityspoke.rules import Procedure, Rule, ProceduralRule
+from authorityspoke.opinions import Opinion, Holding
+from authorityspoke.factors import ureg, Q_
+from authorityspoke.context import log_mentioned_context
 
 class TestProcedures:
     def test_exception_for_wrong_type_for_procedure(self, make_predicate):

@@ -9,8 +9,8 @@ from typing import NamedTuple
 
 from dataclasses import dataclass
 
-from AuthoritySpoke.enactments import Enactment
-from AuthoritySpoke.factors import Factor
+from authorityspoke.enactments import Enactment
+from authorityspoke.factors import Factor
 
 
 class Relation(NamedTuple):
