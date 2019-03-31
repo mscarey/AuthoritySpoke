@@ -9,15 +9,7 @@ from dataclasses import dataclass
 
 from utils import roman
 
-from authorityspoke.context import log_mentioned_context
-
-def get_directory_path(stem):
-    directory = pathlib.Path.cwd()
-    if directory.stem != stem:
-        directory = directory / stem
-        if not directory.exists():
-            directory = pathlib.Path.cwd().parent / stem
-    return directory
+from authorityspoke.context import log_mentioned_context, get_directory_path
 
 class Code:
     """

@@ -1,3 +1,4 @@
+import json
 import operator
 
 from types import MappingProxyType
@@ -9,6 +10,7 @@ from typing import NamedTuple
 
 from dataclasses import dataclass
 
+from authorityspoke.context import get_directory_path
 from authorityspoke.enactments import Enactment
 from authorityspoke.factors import Factor
 
@@ -504,8 +506,52 @@ class Rule(Factor):
     holding.
     """
 
+    directory = get_directory_path("input")
+
     def __len__(self):
         return 0
+
+    @classmethod
+    def from_json(cls, filename: str) -> List["Rule"]:
+        """
+        Creates a list of holdings from a JSON file in the input
+        subdirectory, from a JSON file in the format hat lists
+        mentioned_entities followed by a list of holdings.
+        Then returns the list.
+
+        Does not cause an Opinion to posit the Rules as holdings.
+        """
+
+        with open(cls.directory / filename, "r") as f:
+            case = json.load(f)
+        context_list = case["mentioned_factors"]
+        rule_list = case["holdings"]
+
+        mentioned = cls.get_mentioned_factors(context_list)
+        finished_rules: List["Rule"] = []
+        for rule in rule_list:
+            # This will need to change for Attribution holdings
+            finished_rule, mentioned = ProceduralRule.from_dict(rule, mentioned)
+            finished_rules.append(finished_rule)
+        return finished_rules
+
+    @classmethod
+    def get_mentioned_factors(
+        cls, mentioned_list: List[Dict[str, str]]
+    ) -> List[Factor]:
+        """
+        :param mentioned_dict: A dict in the JSON format used in the
+        "input" folder.
+
+        :returns: A list of Factors mentioned in the Opinion's holdings.
+        Especially the context factors referenced in Predicates, since
+        there's currently no other way to import those using the JSON
+        format.
+        """
+        mentioned: List[Factor] = []
+        for factor_dict in mentioned_list:
+            _, mentioned = Factor.from_dict(factor_dict, mentioned)
+        return mentioned
 
 
 @dataclass(frozen=True)

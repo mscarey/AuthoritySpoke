@@ -1,4 +1,6 @@
 import functools
+import pathlib
+
 from typing import Callable, Dict, List, Tuple
 from typing import Optional, Union
 
@@ -46,3 +48,11 @@ def log_mentioned_context(func: Callable):
         return factor, mentioned
 
     return wrapper
+
+def get_directory_path(stem):
+    directory = pathlib.Path.cwd()
+    if directory.stem != stem:
+        directory = directory / stem
+        if not directory.exists():
+            directory = pathlib.Path.cwd().parent / stem
+    return directory

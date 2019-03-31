@@ -7,7 +7,7 @@ import pathlib
 
 from dataclasses import dataclass
 
-from authorityspoke.enactments import get_directory_path
+from authorityspoke.context import get_directory_path
 from authorityspoke.factors import Factor
 from authorityspoke.rules import ProceduralRule
 
@@ -82,41 +82,13 @@ class Opinion:
     def __post_init__(self):
         self.holdings = []
 
-    def holdings_from_json(self, filename: str) -> List["Rule"]:
-        """
-        Creates a list of holdings from a JSON file in the input subdirectory,
-        and returns the list.
-
-        Should this also cause the Opinion to posit the Rules as holdings?
-        """
-
-        def dict_from_input_json(filename: str) -> Tuple[List[Dict], List[Dict]]:
-            """
-            Makes entity and holding dicts from a JSON file in the format that lists
-            mentioned_entities followed by a list of holdings.
-            """
-
-            path = pathlib.Path("input") / filename
-            with open(path, "r") as f:
-                case = json.load(f)
-            return case["mentioned_factors"], case["holdings"]
-
-        context_list, rule_list = dict_from_input_json(filename)
-        mentioned = self.__class__.get_mentioned_factors(context_list)
-        finished_rules: List["Rule"] = []
-        for rule in rule_list:
-            # This will need to change for Attribution holdings
-            finished_rule, mentioned = ProceduralRule.from_dict(rule, mentioned)
-            finished_rules.append(finished_rule)
-        return finished_rules
-
     @classmethod
-    def from_file(cls, name):
+    def from_file(cls, filename: str):
         """This is a generator that gets one opinion from a
         Harvard-format case file every time it's called. Exhaust the
         generator to get the lead opinion and all non-lead opinions."""
 
-        with open(cls.directory / name, "r") as f:
+        with open(cls.directory / filename, "r") as f:
             opinion_dict = json.load(f)
 
         citations = tuple(c["cite"] for c in opinion_dict["citations"])
@@ -137,24 +109,6 @@ class Opinion:
                 position,
                 author,
             )
-
-    @classmethod
-    def get_mentioned_factors(
-        cls, mentioned_list: List[Dict[str, str]]
-    ) -> List[Factor]:
-        """
-        :param mentioned_dict: A dict in the JSON format used in the
-        "input" folder.
-
-        :returns: A list of Factors mentioned in the Opinion's holdings.
-        Especially the context factors referenced in Predicates, since
-        there's currently no other way to import those using the JSON
-        format.
-        """
-        mentioned: List[Factor] = []
-        for factor_dict in mentioned_list:
-            _, mentioned = Factor.from_dict(factor_dict, mentioned)
-        return mentioned
 
     def posits(self, holding: Holding) -> None:
         """
