@@ -282,18 +282,15 @@ class TestRules:
         generics = make_holding["h1"].generic_factors
         assert list(generics) == [make_entity["motel"], make_entity["watt"]]
 
-    def test_string_with_numbered_inputs(self, make_opinion):
-        cardenas = make_opinion["cardenas_majority"]
+    def test_string_with_line_breaks(self, make_opinion):
         cardenas_holdings = Rule.from_json("holding_cardenas.json")
-        assert "was addicted to heroin, (2)" in str(cardenas_holdings[0])
+        assert "was addicted to heroin\n" in str(cardenas_holdings[0])
 
     def test_string_mentions_absence(self, make_opinion):
-        cardenas = make_opinion["cardenas_majority"]
         cardenas_holdings = Rule.from_json("holding_cardenas.json")
         assert "the absence of testimony by <parole officer>" in str(cardenas_holdings[1])
 
     def test_factor_properties_for_rule(self, make_opinion):
-        cardenas = make_opinion["cardenas_majority"]
         cardenas_holdings = Rule.from_json("holding_cardenas.json")
         assert len(cardenas_holdings[1].inputs) == 1
 

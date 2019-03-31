@@ -611,25 +611,18 @@ class ProceduralRule(Rule):
                 object.__setattr__(self, attr, self.wrap_with_tuple(value))
 
     def __str__(self):
-        def factor_catalog(factors: List[Factor]) -> str:
-            if len(factors) > 1:
-                lines = [f" ({i + 1}) {factors[i]}" for i in range(len(factors))]
-                lines[0] = ":" + lines[0]
-            else:
-                lines = [": " + str(factors[0])]
-            lines = [line + "," for line in lines]
-            if len(lines) > 2:
-                lines[-2] += " and"
-            return "".join(lines)
+        def factor_catalog(factors: List[Union[Factor, Enactment]], tag: str) -> str:
+            lines = [f"{tag}: {factors[i]}\n" for i in range(len(factors))]
+            return "\n" + "".join(lines)
 
         return (
             f"the rule that {'it is not valid that ' if not self.rule_valid else ''}the court "
             + f"{'MUST' if self.mandatory else 'MAY'} {'ALWAYS' if self.universal else 'SOMETIMES'} "
-            + f"accept the outcome{str(factor_catalog(self.procedure.outputs))} "
-            + f"{'based on the input' + str(factor_catalog(self.procedure.inputs) + ' ') if self.procedure.inputs else ''}"
-            + f"{'and despite' + str(factor_catalog(self.procedure.despite)) + ' ' if self.procedure.despite else ''}"
-            + f"{'according to the legislation ' + ', '.join([str(e) for e in self.enactments]) + '' if self.enactments else ''}"
-            + f"{'and despite the legislation ' + ', '.join([str(e) for e in self.enactments_despite]) if self.enactments_despite else ''}"
+            + f"accept the outcome:{str(factor_catalog(self.procedure.outputs, 'OUT'))}"
+            + f"{'based on the input:' + str(factor_catalog(self.procedure.inputs, 'IN')) if self.procedure.inputs else ''}"
+            + f"{'and despite:' + str(factor_catalog(self.procedure.despite, 'DESPITE')) if self.procedure.despite else ''}"
+            + f"{'according to the legislation:' + str(factor_catalog(self.enactments, 'SUPPORT')) if self.enactments else ''}"
+            + f"{'and despite the legislation:' + str(factor_catalog(self.enactments, 'DESPITE')) if self.enactments_despite else ''}"
         )
 
     def __len__(self):
