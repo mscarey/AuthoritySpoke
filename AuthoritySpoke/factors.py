@@ -70,6 +70,7 @@ class Factor:
         factor = target_class.from_dict(factor_record, mentioned)
         return factor
 
+    @property
     def generic_factors(self) -> Dict["Factor", None]:
         """Returns an iterable of self's generic Factors,
         which must be matched to other generic Factors to
@@ -115,11 +116,6 @@ class Factor:
                 {}, self.context_factors, other.context_factors, comparison
             ):
                 yield registry
-
-    def new_context(self, changes: Dict["Factor", "Factor"]):
-        if self in changes:
-            return changes[self]
-        return self
 
     def registers_for_interchangeable_context(
         self, other: "Factor", matches: Dict["Factor", "Factor"]
@@ -321,8 +317,27 @@ def new_context_helper(func: Callable):
         factor: Factor,
         context: Optional[Union[Sequence[Factor], Dict[Factor, Factor]]],
     ) -> Factor:
-        if any(not isinstance(item, Factor) for item in context):
-            raise TypeError('Each item in "context" must be type Factor')
+
+        if context is not None:
+            if any(not isinstance(item, Factor) for item in context):
+                raise TypeError('Each item in "context" must be type Factor')
+            if not isinstance(context, dict):
+                if not isinstance(context, Sequence):
+                    raise TypeError('"context" must be a dict or Sequence')
+                generic_factors = factor.generic_factors
+                if len(generic_factors) != len(context):
+                    raise ValueError(
+                        'If the parameter "changes" is not a list of '
+                        + "replacements for every element of factor.generic_factors, "
+                        + 'then "changes" must be a dict where each key is a Factor '
+                        + "to be replaced and each value is the corresponding "
+                        + "replacement Factor."
+                    )
+                context = dict(zip(generic_factors, context))
+            # BUG: needs an equality test, not an "in" test?
+            if factor in context:
+                return context[factor]
+
         return func(factor, context)
 
     return wrapper
@@ -802,6 +817,7 @@ class Fact(Factor):
             generic=True,
         )
 
+    @property
     def generic_factors(self) -> Dict[Factor, None]:
         """Returns an iterable of self's generic Factors,
         which must be matched to other generic Factors to
@@ -812,7 +828,7 @@ class Fact(Factor):
         return {
             generic: None
             for factor in self.entity_context
-            for generic in factor.generic_factors()
+            for generic in factor.generic_factors
         }
 
     def predicate_in_context(self, entities: Sequence[Factor]) -> str:
@@ -990,8 +1006,6 @@ class Fact(Factor):
         """
         Creates new Fact object, replacing keys of "changes" with their values.
         """
-        if self in changes:
-            return changes[self]
         new_entity_context = [
             factor.new_context(changes) for factor in self.entity_context
         ]
@@ -1072,6 +1086,9 @@ class Entity(Factor):
             return self.__class__(name=self.name, generic=True, plural=self.plural)
         return self
 
+    @new_context_helper
+    def new_context(self, context: Dict[Factor, Factor]) -> "Entity":
+        return self
 
 @dataclass(frozen=True)
 class Pleading(Factor):
@@ -1159,6 +1176,7 @@ class Pleading(Factor):
             return other.implies_if_present(self)
         return False
 
+    @property
     def generic_factors(self) -> Dict[Factor, None]:
         """Returns an iterable of self's generic Factors,
         which must be matched to other generic Factors to
@@ -1169,7 +1187,7 @@ class Pleading(Factor):
         return {
             generic: None
             for factor in [x for x in (self.filer,) if x]
-            for generic in factor.generic_factors()
+            for generic in factor.generic_factors
         }
 
     def contradicts(self, other: Factor):
@@ -1208,8 +1226,6 @@ class Pleading(Factor):
         """
         Creates new Factor object, replacing keys of "changes" with their values.
         """
-        if self in changes:
-            return changes[self]
         filer = self.filer.new_context(changes) if self.filer else None
         return self.__class__(
                 filer=filer,
@@ -1317,6 +1333,7 @@ class Allegation(Factor):
             return other.implies_if_present(self)
         return False
 
+    @property
     def generic_factors(self) -> Dict[Factor, None]:
         """Returns an iterable of self's generic Factors,
         which must be matched to other generic Factors to
@@ -1327,7 +1344,7 @@ class Allegation(Factor):
         return {
             generic: None
             for factor in [x for x in (self.to_effect, self.pleading) if x]
-            for generic in factor.generic_factors()
+            for generic in factor.generic_factors
         }
 
     def contradicts(self, other: Factor):
@@ -1365,10 +1382,8 @@ class Allegation(Factor):
     @new_context_helper
     def new_context(self, changes: Dict[Factor, Factor]) -> "Allegation":
         """
-        Creates new Factor object, replacing keys of "changes" with their values.
+        Creates new Allegation object, replacing keys of "changes" with their values.
         """
-        if self in changes:
-            return changes[self]
         to_effect = self.to_effect.new_context(changes) if self.to_effect else None
         pleading = self.pleading.new_context(changes) if self.pleading else None
         return Allegation(
@@ -1483,6 +1498,7 @@ class Exhibit(Factor):
             return other.implies_if_present(self)
         return False
 
+    @property
     def generic_factors(self) -> Dict[Factor, None]:
         """Returns an iterable of self's generic Factors,
         which must be matched to other generic Factors to
@@ -1493,7 +1509,7 @@ class Exhibit(Factor):
         return {
             generic: None
             for factor in [x for x in (self.statement, self.stated_by) if x]
-            for generic in factor.generic_factors()
+            for generic in factor.generic_factors
         }
 
     def contradicts(self, other: Factor):
@@ -1532,12 +1548,10 @@ class Exhibit(Factor):
         return self >= other
 
     @new_context_helper
-    def new_context(self, changes: Dict[Factor, Factor]) -> Factor:
+    def new_context(self, changes: Dict[Factor, Factor]) -> "Exhibit":
         """
-        Creates new Factor object, replacing keys of "changes" with their values.
+        Creates new Exhibit object, replacing keys of "changes" with their values.
         """
-        if self in changes:
-            return changes[self]
         statement = self.statement.new_context(changes) if self.statement else None
         stated_by = self.stated_by.new_context(changes) if self.stated_by else None
         return Exhibit(
@@ -1643,6 +1657,7 @@ class Evidence(Factor):
 
         return other > self.make_absent()
 
+    @property
     def generic_factors(self) -> Dict[Factor, None]:
         """Returns an iterable of self's generic Factors,
         which must be matched to other generic Factors to
@@ -1653,7 +1668,7 @@ class Evidence(Factor):
         return {
             generic: None
             for factor in [x for x in (self.exhibit, self.to_effect) if x]
-            for generic in factor.generic_factors()
+            for generic in factor.generic_factors
         }
 
     def implies_if_present(self, other: Factor):
@@ -1698,12 +1713,10 @@ class Evidence(Factor):
         )
 
     @new_context_helper
-    def new_context(self, changes: Dict[Factor, Factor]) -> Evidence:
+    def new_context(self, changes: Dict[Factor, Factor]) -> "Evidence":
         """
         Creates new Evidence object, replacing keys of "changes" with their values.
         """
-        if self in changes:
-            return changes[self]
         exhibit = self.exhibit.new_context(changes) if self.exhibit else None
         to_effect = self.to_effect.new_context(changes) if self.to_effect else None
         return Evidence(

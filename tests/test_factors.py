@@ -433,7 +433,7 @@ class TestFacts:
     def test_copy_with_foreign_context(self, watt_mentioned, watt_factor):
         w = watt_mentioned
         assert (
-            watt_factor["f1"].copy_with_foreign_context({w[0]: w[2]})
+            watt_factor["f1"].new_context({w[0]: w[2]})
             == watt_factor["f1_different_entity"]
         )
 

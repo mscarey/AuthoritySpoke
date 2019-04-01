@@ -277,6 +277,7 @@ class Procedure(Factor):
 
         return sorted(self.factors_all(), key=repr)
 
+    @property
     def generic_factors(self) -> List[Factor]:
         """Returns an iterable of self's generic Factors,
         which must be matched to other generic Factors to
@@ -286,7 +287,7 @@ class Procedure(Factor):
             {
                 generic: None
                 for factor in self.factors_all()
-                for generic in factor.generic_factors()
+                for generic in factor.generic_factors
             }
         )
 
@@ -420,7 +421,7 @@ class Procedure(Factor):
                         all(
                             matches.get(key) == context_register[key]
                             or matches.get(context_register[key] == key)
-                            for key in self_factor.generic_factors()
+                            for key in self_factor.generic_factors
                         )
                         for context_register in self_factor.context_register(
                             other_factor, operator.eq
@@ -458,17 +459,7 @@ class Procedure(Factor):
             "'contradicts_some_to_all' method.",
         )
 
-    def _new_context_to_dict(self, changes: List[Factor]) -> Dict[Factor, Factor]:
-        generic_factors = self.generic_factors()
-        if len(generic_factors) != len(changes):
-            raise ValueError(
-                'If the parameter "changes" is not a list of '
-                + "replacements for every element of self.generic_factors, "
-                + 'then "changes" must be a dict where each key is a Factor '
-                + "to be replaced and each value is the corresponding "
-                + "replacement Factor."
-            )
-        return dict(zip(generic_factors, changes))
+
 
     @new_context_helper
     def new_context(
@@ -682,7 +673,7 @@ class ProceduralRule(Rule):
 
     @property
     def generic_factors(self):
-        return self.procedure.generic_factors()
+        return self.procedure.generic_factors
 
     @property
     def despite(self):

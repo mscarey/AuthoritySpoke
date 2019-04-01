@@ -11,6 +11,7 @@ from authorityspoke.context import get_directory_path
 from authorityspoke.factors import Factor
 from authorityspoke.rules import Rule, ProceduralRule
 
+
 @dataclass()
 class Holding:
     """
@@ -54,7 +55,9 @@ class Holding:
         string = str(self.rule)
         string = string.replace("the rule that", "the holding that", 1)
         for i in range(len(self.context)):
-            string = string.replace(str(self.rule.generic_factors[i]), str(self.context[i]))
+            string = string.replace(
+                str(self.rule.generic_factors[i]), str(self.context[i])
+            )
         return string
 
 
@@ -121,5 +124,9 @@ class Opinion:
     @property
     def generic_factors(self) -> List[Factor]:
         return list(
-            {generic: None for holding in self.holdings for generic in holding.context}
+            {
+                generic: None
+                for holding in self.holdings
+                for generic in holding.generic_factors
+            }
         )
