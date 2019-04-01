@@ -23,10 +23,7 @@ class Holding:
         rule: ProceduralRule,
         context: Optional[Union[Dict[Factor, Factor], Sequence[Factor]]] = None,
     ):
-        if context is None:
-            context = rule.generic_factors
-        if any(not isinstance(item, Factor) for item in context):
-            raise TypeError('Each item in "context" must be type Factor')
+
         if isinstance(context, dict):
             if not all(
                 to_replace in rule.generic_factors for to_replace in context.keys()

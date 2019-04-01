@@ -18,6 +18,8 @@ from dataclasses import astuple, dataclass
 ureg = UnitRegistry()
 Q_ = ureg.Quantity
 
+
+
 OPPOSITE_COMPARISONS = {
     ">=": "<",
     "==": "!=",
@@ -27,7 +29,6 @@ OPPOSITE_COMPARISONS = {
     ">": "<=",
     "<": ">=",
 }
-
 
 @dataclass(frozen=True)
 class Factor:
@@ -310,6 +311,21 @@ class Factor:
         for choice in new_mapping_choices:
             yield choice
 
+def new_context_helper(func: Callable):
+    """
+    Decorator for make_dict() methods of Factor subclasses, including Rule.
+    """
+
+    @functools.wraps(func)
+    def wrapper(
+        factor: Factor,
+        context: Optional[Union[Sequence[Factor], Dict[Factor, Factor]]],
+    ) -> Factor:
+        if any(not isinstance(item, Factor) for item in context):
+            raise TypeError('Each item in "context" must be type Factor')
+        return func(factor, context)
+
+    return wrapper
 
 @dataclass(frozen=True)
 class Predicate:

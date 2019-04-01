@@ -169,7 +169,8 @@ class TestRuleImport:
         # resetting holdings because of class scope of fixture
         watt.holdings = []
         watt.posits(context_holding)
-        assert "<Wattenburg> lived at <Bradley's house>" in str(context_holding)
+        string = str(context_holding)
+        assert "<Wattenburg> lived at <Bradley's house>" in string
         assert (
             "<Wattenburg> lived at <Bradley's house>"
             in str(watt.holdings[0])[1000:1100]

@@ -10,6 +10,7 @@ from authorityspoke.opinions import Opinion, Holding
 from authorityspoke.factors import ureg, Q_
 from authorityspoke.context import log_mentioned_context
 
+
 class TestProcedures:
     def test_exception_for_wrong_type_for_procedure(self, make_predicate):
         with pytest.raises(TypeError):
@@ -226,6 +227,7 @@ class TestProcedures:
         assert not make_procedure["c2"].implies_all_to_some(
             make_procedure["c2_absent_despite"]
         )
+
     def test_implication_with_more_outputs_than_inputs(self, make_procedure):
         p = make_procedure
         assert p["c2_irrelevant_outputs"].implies_all_to_all(p["c2"])
@@ -283,6 +285,14 @@ class TestRules:
                 [watt_factor["f1"], watt_factor["f7"], watt_factor["f2"]]
             )
 
+    def test_new_context_dict_must_contain_only_factors(
+        self, make_holding, make_predicate
+    ):
+        with pytest.raises(TypeError):
+            different = make_holding["h1"].new_context(
+                {make_predicate["p1"]: make_predicate["p7"]}
+            )
+
     def test_generic_factors(self, make_entity, make_holding):
         generics = make_holding["h3"].generic_factors
         assert make_entity["motel"] in generics
@@ -300,7 +310,9 @@ class TestRules:
 
     def test_string_mentions_absence(self, make_opinion):
         cardenas_holdings = Rule.from_json("holding_cardenas.json")
-        assert "the absence of testimony by <parole officer>" in str(cardenas_holdings[1])
+        assert "the absence of testimony by <parole officer>" in str(
+            cardenas_holdings[1]
+        )
 
     def test_factor_properties_for_rule(self, make_opinion):
         cardenas_holdings = Rule.from_json("holding_cardenas.json")

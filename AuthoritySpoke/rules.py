@@ -12,7 +12,7 @@ from dataclasses import dataclass
 
 from authorityspoke.context import get_directory_path
 from authorityspoke.enactments import Enactment
-from authorityspoke.factors import Factor
+from authorityspoke.factors import Factor, new_context_helper
 
 
 class Relation(NamedTuple):
@@ -470,6 +470,7 @@ class Procedure(Factor):
             )
         return dict(zip(generic_factors, changes))
 
+    @new_context_helper
     def new_context(
         self, changes: Union[List[Factor], Dict[Factor, Factor]]
     ) -> "Procedure":
@@ -484,14 +485,15 @@ class Procedure(Factor):
         if isinstance(changes, list):
             changes = self._new_context_to_dict(changes)
 
-        return Procedure(
+        new_procedure = Procedure(
             outputs=tuple([factor.new_context(changes) for factor in self.outputs]),
             inputs=tuple([factor.new_context(changes) for factor in self.inputs]),
-            despite=tuple([factor.new_context(changes) for factor in self.inputs]),
+            despite=tuple([factor.new_context(changes) for factor in self.despite]),
             name=self.name,
             absent=self.absent,
             generic=self.generic,
         )
+        return new_procedure
 
 
 @dataclass()
@@ -825,6 +827,7 @@ class ProceduralRule(Rule):
             decided=self.decided,
         )
 
+    @new_context_helper
     def new_context(
         self, changes: Union[Sequence[Factor], Dict[Factor, Factor]]
     ) -> "ProceduralRule":
