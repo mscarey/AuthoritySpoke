@@ -485,7 +485,7 @@ class Procedure(Factor):
         if isinstance(changes, list):
             changes = self._new_context_to_dict(changes)
 
-        new_procedure = Procedure(
+        return Procedure(
             outputs=tuple([factor.new_context(changes) for factor in self.outputs]),
             inputs=tuple([factor.new_context(changes) for factor in self.inputs]),
             despite=tuple([factor.new_context(changes) for factor in self.despite]),
@@ -493,7 +493,6 @@ class Procedure(Factor):
             absent=self.absent,
             generic=self.generic,
         )
-        return new_procedure
 
 
 @dataclass()

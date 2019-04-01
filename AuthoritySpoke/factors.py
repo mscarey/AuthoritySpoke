@@ -905,18 +905,6 @@ class Fact(Factor):
                 return True
         return False
 
-    def copy_with_foreign_context(self, context_assignment):
-        # TODO: move to Factor class, handle inheritance
-        new_context = tuple(
-            [context_assignment.get(entity) for entity in self.entity_context]
-        )
-        return Fact(
-            predicate=self.predicate,
-            entity_context=new_context,
-            standard_of_proof=self.standard_of_proof,
-            absent=self.absent,
-            generic=self.generic,
-        )
 
     @classmethod
     def from_dict(
@@ -997,6 +985,7 @@ class Fact(Factor):
         )
         return factor, mentioned
 
+    @new_context_helper
     def new_context(self, changes: Dict[Factor, Factor]) -> Factor:
         """
         Creates new Fact object, replacing keys of "changes" with their values.
@@ -1214,6 +1203,7 @@ class Pleading(Factor):
             return False
         return self >= other
 
+    @new_context_helper
     def new_context(self, changes: Dict[Factor, Factor]) -> "Pleading":
         """
         Creates new Factor object, replacing keys of "changes" with their values.
@@ -1372,6 +1362,7 @@ class Allegation(Factor):
             return False
         return self >= other
 
+    @new_context_helper
     def new_context(self, changes: Dict[Factor, Factor]) -> "Allegation":
         """
         Creates new Factor object, replacing keys of "changes" with their values.
@@ -1540,6 +1531,7 @@ class Exhibit(Factor):
             return False
         return self >= other
 
+    @new_context_helper
     def new_context(self, changes: Dict[Factor, Factor]) -> Factor:
         """
         Creates new Factor object, replacing keys of "changes" with their values.
@@ -1705,9 +1697,10 @@ class Evidence(Factor):
             generic=self.generic,
         )
 
-    def new_context(self, changes: Dict[Factor, Factor]) -> Factor:
+    @new_context_helper
+    def new_context(self, changes: Dict[Factor, Factor]) -> Evidence:
         """
-        Creates new Factor object, replacing keys of "changes" with their values.
+        Creates new Evidence object, replacing keys of "changes" with their values.
         """
         if self in changes:
             return changes[self]
