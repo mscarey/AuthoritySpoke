@@ -497,7 +497,7 @@ class Procedure(Factor):
 @dataclass()
 class Rule(Factor):
     """
-    A statement in which a court posits a legal rule as authoritative,
+    A statement of a legal rule which a court may posit as authoritative,
     deciding some aspect of the current litigation but also potentially
     binding future courts to follow the rule. When holdings appear in
     judicial opinions they are often hypothetical and don't necessarily
@@ -826,7 +826,7 @@ class ProceduralRule(Rule):
         )
 
     def new_context(
-        self, changes: Union[List[Factor], Dict[Factor, Factor]]
+        self, changes: Union[Sequence[Factor], Dict[Factor, Factor]]
     ) -> "ProceduralRule":
         """
         Creates new ProceduralRule object, converting "changes" from a

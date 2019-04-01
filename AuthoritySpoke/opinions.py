@@ -9,7 +9,7 @@ from dataclasses import dataclass
 
 from authorityspoke.context import get_directory_path
 from authorityspoke.factors import Factor
-from authorityspoke.rules import ProceduralRule
+from authorityspoke.rules import Rule, ProceduralRule
 
 @dataclass()
 class Holding:
@@ -110,13 +110,15 @@ class Opinion:
                 author,
             )
 
-    def posits(self, holding: Holding) -> None:
+    def posits(self, holding: Rule, context: Optional[Sequence[Factor]] = None) -> None:
         """
         Adds holding to the opinion's holdings list, replacing any other
         Holdings with the same meaning.
         """
-        if not isinstance(holding, Holding):
-            raise TypeError('"holding" must be an object of type Holding.')
+        if not isinstance(holding, Rule):
+            raise TypeError('"holding" must be an object of type Rule.')
+        if context is not None and isinstance(holding, ProceduralRule):
+            holding = holding.new_context(context)
         self.holdings.append(holding)
 
     @property

@@ -49,7 +49,16 @@ def log_mentioned_context(func: Callable):
 
     return wrapper
 
+# def new_context_helper
+
 def get_directory_path(stem):
+    """
+    This function finds a data directory for importing files, if cwd
+    is that directory, is its parent directory, or is a sibling
+    directory. Otherwise it won't find the right directory.
+
+    This function doesn't obviously belong in the context module.
+    """
     directory = pathlib.Path.cwd()
     if directory.stem != stem:
         directory = directory / stem

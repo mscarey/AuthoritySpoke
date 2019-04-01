@@ -271,6 +271,18 @@ class TestRules:
         )
         assert "<He-Man> operated" in str(different)
 
+    def test_new_context_non_generic(self, make_holding, watt_factor):
+        different = make_holding["h1"].new_context(
+            {watt_factor["f1"]: watt_factor["f7"]}
+        )
+        assert "the distance between <Hideaway Lodge> and" in str(different)
+
+    def test_new_context_non_generic_from_list_error(self, make_holding, watt_factor):
+        with pytest.raises(ValueError):
+            different = make_holding["h1"].new_context(
+                [watt_factor["f1"], watt_factor["f7"], watt_factor["f2"]]
+            )
+
     def test_generic_factors(self, make_entity, make_holding):
         generics = make_holding["h3"].generic_factors
         assert make_entity["motel"] in generics

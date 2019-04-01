@@ -6,10 +6,11 @@ import pytest
 from authorityspoke.enactments import Code, Enactment
 from authorityspoke.entities import Human, Event
 from authorityspoke.factors import Predicate, Factor, Entity, Fact
-from authorityspoke.opinions import Opinion, Holding
+from authorityspoke.opinions import Opinion
 from authorityspoke.rules import Rule
 
 ureg = pint.UnitRegistry()
+
 
 class TestPredicateImport:
     """
@@ -42,6 +43,7 @@ class TestEnactmentImport:
         holdings = Rule.from_json("holding_cardenas.json")
         enactment_list = holdings[0].enactments
         assert "all relevant evidence is admissible" in enactment_list[0].text
+
 
 class TestFactorImport:
     def test_fact_import(self):
@@ -134,8 +136,7 @@ class TestRuleImport:
         brad = make_opinion["brad_majority"]
         brad_holdings = Rule.from_json("holding_brad.json")
         for rule in brad_holdings:
-            context_holding = Holding(rule)
-            brad.posits(context_holding)
+            brad.posits(rule)
         assert "warrantless search and seizure" in str(brad.holdings[0])
 
     def test_opinion_posits_holding_tuple_context(self, make_opinion, make_entity):
@@ -145,12 +146,14 @@ class TestRuleImport:
         """
         watt = make_opinion["watt_majority"]
         brad_holdings = Rule.from_json("holding_brad.json")
-        context_holding = Holding(
-            brad_holdings[6],
-            (make_entity["watt"], make_entity["trees"], make_entity["motel"]),
+        context_holding = brad_holdings[6].new_context(
+            [make_entity["watt"], make_entity["trees"], make_entity["motel"]]
         )
         watt.posits(context_holding)
-        assert "the number of marijuana plants in <the stockpile of trees> was at least 3" in str(watt.holdings[0])
+        assert (
+            "the number of marijuana plants in <the stockpile of trees> was at least 3"
+            in str(watt.holdings[0])
+        )
 
     def test_opinion_posits_holding_dict_context(self, make_opinion, make_entity):
         """
@@ -160,25 +163,31 @@ class TestRuleImport:
         """
         watt = make_opinion["watt_majority"]
         brad_holdings = Rule.from_json("holding_brad.json")
-        context_holding = Holding(
-            brad_holdings[6], context={brad_holdings[6].generic_factors[0]: make_entity["watt"]}
+        context_holding = brad_holdings[6].new_context(
+            {brad_holdings[6].generic_factors[0]: make_entity["watt"]}
         )
-        # resetting Holdings because of class scope of fixture
+        # resetting holdings because of class scope of fixture
         watt.holdings = []
         watt.posits(context_holding)
         assert "<Wattenburg> lived at <Bradley's house>" in str(context_holding)
-        assert "<Wattenburg> lived at <Bradley's house>" in str(watt.holdings[0])[1000:1100]
+        assert (
+            "<Wattenburg> lived at <Bradley's house>"
+            in str(watt.holdings[0])[1000:1100]
+        )
 
-    def test_holding_with_non_generic_value_raises_error(
+    def test_holding_with_non_generic_value(
         self, make_opinion, make_entity
     ):
+        """
+        This test originally required a ValueError, but why should it?
+        """
         watt = make_opinion["watt_majority"]
         brad_holdings = Rule.from_json("holding_brad.json")
-        with pytest.raises(ValueError):
-            Holding(
-                brad_holdings[6],
-                context={brad_holdings[6].generic_factors[0]: make_entity["trees_specific"]},
+        context_change = brad_holdings[6].new_context(
+                {brad_holdings[6].generic_factors[1]: make_entity["trees_specific"]}
             )
+        string = str(context_change)
+        assert "plants in the stockpile of trees was at least 3" in string
 
 
 class TestNestedFactorImport:
