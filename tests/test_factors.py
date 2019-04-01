@@ -6,7 +6,7 @@ import pytest
 from authorityspoke.entities import Human, Event
 from authorityspoke.factors import Factor, Entity, Fact
 from authorityspoke.rules import Rule, ProceduralRule
-from authorityspoke.opinions import Opinion, Holding
+from authorityspoke.opinions import Opinion
 from authorityspoke.factors import ureg, Q_
 
 
