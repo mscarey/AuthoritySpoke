@@ -49,24 +49,6 @@ def log_mentioned_context(func: Callable):
 
     return wrapper
 
-
-def new_context_helper(func: Callable):
-    """
-    Decorator for make_dict() methods of Factor subclasses, including Rule.
-    """
-
-    @functools.wraps(func)
-    def wrapper(
-        self_factor: "Factor",
-        context: Optional[Union[Sequence["Factor"], Dict["Factor", "Factor"]]],
-    ) -> "Factor":
-        if any(not isinstance(item, "Factor") for item in context):
-            raise TypeError('Each item in "context" must be type Factor')
-        return func(self_factor, context)
-
-    return wrapper
-
-
 def get_directory_path(stem):
     """
     This function finds a data directory for importing files, if cwd
