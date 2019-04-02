@@ -2,7 +2,7 @@ import functools
 import pathlib
 
 from typing import Callable, Dict, List, Tuple
-from typing import Optional, Union
+from typing import Optional, Sequence, Union
 
 
 def log_mentioned_context(func: Callable):

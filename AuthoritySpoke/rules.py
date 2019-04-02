@@ -504,18 +504,7 @@ class Rule(Factor):
         return 0
 
     @classmethod
-    def from_json(cls, filename: str) -> List["Rule"]:
-        """
-        Creates a list of holdings from a JSON file in the input
-        subdirectory, from a JSON file in the format hat lists
-        mentioned_entities followed by a list of holdings.
-        Then returns the list.
-
-        Does not cause an Opinion to posit the Rules as holdings.
-        """
-
-        with open(cls.directory / filename, "r") as f:
-            case = json.load(f)
+    def collection_from_dict(cls, case: Dict) -> List["Rule"]:
         context_list = case["mentioned_factors"]
         rule_list = case["holdings"]
 
@@ -526,6 +515,21 @@ class Rule(Factor):
             finished_rule, mentioned = ProceduralRule.from_dict(rule, mentioned)
             finished_rules.append(finished_rule)
         return finished_rules
+
+    @classmethod
+    def from_json(cls, filename: str) -> List["Rule"]:
+        """
+        Creates a list of holdings from a JSON file in the input
+        subdirectory, from a JSON file in the format that lists
+        mentioned_entities followed by a list of holdings.
+        Then returns the list.
+
+        Does not cause an Opinion to posit the Rules as holdings.
+        """
+
+        with open(cls.directory / filename, "r") as f:
+            case = json.load(f)
+        return cls.collection_from_dict(case)
 
     @classmethod
     def get_mentioned_factors(

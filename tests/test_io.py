@@ -176,19 +176,38 @@ class TestRuleImport:
             in str(watt.holdings[0])[1000:1100]
         )
 
-    def test_holding_with_non_generic_value(
-        self, make_opinion, make_entity
-    ):
+    def test_holding_with_non_generic_value(self, make_opinion, make_entity):
         """
         This test originally required a ValueError, but why should it?
         """
         watt = make_opinion["watt_majority"]
         brad_holdings = Rule.from_json("holding_brad.json")
         context_change = brad_holdings[6].new_context(
-                {brad_holdings[6].generic_factors[1]: make_entity["trees_specific"]}
-            )
+            {brad_holdings[6].generic_factors[1]: make_entity["trees_specific"]}
+        )
         string = str(context_change)
         assert "plants in the stockpile of trees was at least 3" in string
+
+    def test_error_because_string_does_not_match_factor_name(self):
+        rule_dict = {
+            "mentioned_factors": [
+                {"type": "Entity", "name": "the dog"},
+                {"type": "Human", "name": "the man"},
+            ],
+            "holdings": [
+                {
+                    "inputs": ["this factor hasn't been mentioned"],
+                    "outputs": [{"type": "fact", "content": "the dog bit the man"}],
+                    "enactments": [
+                        {"code": "constitution.xml", "section": "amendment-IV"}
+                    ],
+                    "mandatory": True,
+                }
+            ],
+        }
+        with pytest.raises(ValueError):
+            Rule.collection_from_dict(rule_dict)
+
 
 
 class TestNestedFactorImport:

@@ -20,8 +20,6 @@ class Human(Entity):
     https://www.courtlistener.com/opinion/88661/slaughter-house-cases/
     """
 
-    pass
-
 
 class Event(Entity):
     """
