@@ -200,7 +200,7 @@ class TestPredicates:
 class TestCodes:
     def test_making_code(self, make_code):
         const = make_code["const"]
-        assert const.title == "Constitution of the United States"
+        assert str(const) == "Constitution of the United States"
 
     def test_get_bill_of_rights_effective_date(self, make_code):
         const = make_code["const"]
@@ -223,6 +223,7 @@ class TestEnactments:
 
     def test_equal_enactment_text(self, make_enactment):
         assert make_enactment["due_process_5"] == make_enactment["due_process_14"]
+        assert not make_enactment["due_process_5"] > make_enactment["due_process_14"]
 
     def test_unequal_enactment_text(self, make_enactment):
         assert make_enactment["search_clause"] != make_enactment["fourth_a"]
@@ -232,6 +233,23 @@ class TestEnactments:
 
     def test_enactment_subset_or_equal(self, make_enactment):
         assert make_enactment["due_process_5"] >= make_enactment["due_process_14"]
+
+    def test_comparison_to_factor_false(self, make_enactment, watt_factor):
+        dp5 = make_enactment["due_process_5"]
+        f1 = watt_factor["f1"]
+        assert not dp5 == f1
+
+    def test_implication_of_factor_fails(self, make_enactment, watt_factor):
+        dp5 = make_enactment["due_process_5"]
+        f1 = watt_factor["f1"]
+        with pytest.raises(TypeError):
+            assert not dp5 > f1
+
+    def test_implication_by_factor_fails(self, make_enactment, watt_factor):
+        dp5 = make_enactment["due_process_5"]
+        f1 = watt_factor["f1"]
+        with pytest.raises(TypeError):
+            assert not dp5 < f1
 
     @pytest.mark.xfail
     def test_enactment_as_factor(self, make_enactment):
@@ -256,7 +274,6 @@ class TestEnactments:
     def test_compare_effective_dates(self, make_enactment):
         dp5 = make_enactment["due_process_5"]
         dp14 = make_enactment["due_process_14"]
-
         assert dp14.effective_date > dp5.effective_date
 
 

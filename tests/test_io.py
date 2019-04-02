@@ -1,8 +1,11 @@
 import json
+import os
+import pathlib
 
 import pint
 import pytest
 
+from authorityspoke.context import get_directory_path
 from authorityspoke.enactments import Code, Enactment
 from authorityspoke.entities import Human, Event
 from authorityspoke.factors import Predicate, Factor, Entity, Fact
@@ -56,6 +59,13 @@ class TestFactorImport:
         holdings = Rule.from_json("holding_watt.json")
         new_fact = holdings[1].inputs[3]
         assert "was no more than 35 foot" in str(new_fact)
+
+    def test_find_directory_for_json(self):
+        directory = pathlib.Path.cwd() / "tests"
+        if directory.exists():
+            os.chdir(directory)
+        input_directory = get_directory_path("input") / "holding_watt.json"
+        assert input_directory.exists()
 
 
 class TestRuleImport:

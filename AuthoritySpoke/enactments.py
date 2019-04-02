@@ -160,7 +160,10 @@ class Enactment:
 
     def __ge__(self, other):
         if not isinstance(other, self.__class__):
-            return False
+            raise TypeError(
+                f"{self.__class__} objects may only be compared for "
+                + "implication with other Enactment objects."
+            )
 
         return other.text.strip(",:;. ") in self.text
 
