@@ -40,6 +40,31 @@ class TestEntityImport:
         assert isinstance(mentioned[0], Entity)
         assert any("Watt" in str(factor) for factor in mentioned)
 
+    def test_specific_entity(self):
+        smith_dict = { "mentioned_factors": [
+                {"type": "Human", "name": "Smith", "generic": False},
+                {"type": "Human", "name": "Smythe"},
+            ],
+                    "holdings": [
+                        {
+                            "inputs": [{
+                            "type": "fact",
+                            "content": "Smith stole a car"
+                        }],
+                            "outputs": [{"type": "fact", "content": "Smith committed theft"}]
+                        },
+                                                {
+                            "inputs": [{
+                            "type": "fact",
+                            "content": "Smythe stole a car"
+                        }],
+                            "outputs": [{"type": "fact", "content": "Smythe committed theft"}]
+                        }
+                    ],
+                }
+        holdings = Rule.collection_from_dict(smith_dict)
+        assert not holdings[1] >= holdings[0]
+        assert holdings[1].generic_factors != holdings[0].generic_factors
 
 class TestEnactmentImport:
     def test_enactment_import(self):
