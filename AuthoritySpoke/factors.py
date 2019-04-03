@@ -19,7 +19,6 @@ ureg = UnitRegistry()
 Q_ = ureg.Quantity
 
 
-
 OPPOSITE_COMPARISONS = {
     ">=": "<",
     "==": "!=",
@@ -29,6 +28,7 @@ OPPOSITE_COMPARISONS = {
     ">": "<=",
     "<": ">=",
 }
+
 
 @dataclass(frozen=True)
 class Factor:
@@ -57,7 +57,9 @@ class Factor:
         of known subclasses.
         """
         name = name.capitalize()
-        class_options = {class_obj.__name__: class_obj for class_obj in cls.all_subclasses()}
+        class_options = {
+            class_obj.__name__: class_obj for class_obj in cls.all_subclasses()
+        }
         answer = class_options.get(name)
         if answer is None:
             raise ValueError(
@@ -129,7 +131,7 @@ class Factor:
                 yield registry
 
     def registers_for_interchangeable_context(
-        self, other: "Factor", matches: Dict["Factor", "Factor"]
+        self, matches: Dict["Factor", "Factor"]
     ) -> Iterator[Dict["Factor", "Factor"]]:
         """
         Returns context registers with every possible combination of
@@ -165,22 +167,6 @@ class Factor:
             ):
                 already_returned.append(changed_registry)
                 yield changed_registry
-        # Unclear whether it's ever necessary to switch values from
-        # other as well as keys from self. If not, function could end here.
-        if other:
-            for other_replacement_dict in other.interchangeable_factors:
-                for used_registry in already_returned.copy():
-                    other_registry = replace_factors_in_dict(
-                        used_registry, other_replacement_dict, replace_values=True
-                    )
-                    if not any(
-                        compare_dict_for_identical_entries(
-                            other_registry, returned_dict
-                        )
-                        for returned_dict in already_returned
-                    ):
-                        already_returned.append(other_registry)
-                        yield other_registry
 
     @staticmethod
     def sort_in_tuple(item) -> Tuple["Factor", ...]:
@@ -305,9 +291,7 @@ class Factor:
                     for incoming_register in register_iter:
                         for transposed_register in self_factors[
                             index
-                        ].registers_for_interchangeable_context(
-                            other_factors[index], incoming_register
-                        ):
+                        ].registers_for_interchangeable_context(incoming_register):
                             updated_mapping = self._import_to_mapping(
                                 mapping, transposed_register
                             )
@@ -316,6 +300,7 @@ class Factor:
         for choice in new_mapping_choices:
             yield choice
 
+
 def new_context_helper(func: Callable):
     """
     Decorator for make_dict() methods of Factor subclasses, including Rule.
@@ -323,8 +308,7 @@ def new_context_helper(func: Callable):
 
     @functools.wraps(func)
     def wrapper(
-        factor: Factor,
-        context: Optional[Union[Sequence[Factor], Dict[Factor, Factor]]],
+        factor: Factor, context: Optional[Union[Sequence[Factor], Dict[Factor, Factor]]]
     ) -> Factor:
 
         if context is not None:
@@ -350,6 +334,7 @@ def new_context_helper(func: Callable):
         return func(factor, context)
 
     return wrapper
+
 
 @dataclass(frozen=True)
 class Predicate:
@@ -930,7 +915,6 @@ class Fact(Factor):
                 return True
         return False
 
-
     @classmethod
     def from_dict(
         cls, fact_dict: Dict[str, Union[str, bool]], mentioned: List[Factor]
@@ -1028,7 +1012,6 @@ class Fact(Factor):
         )
 
 
-
 @dataclass(frozen=True)
 class Entity(Factor):
     """A person, place, thing, or event that needs to be mentioned in
@@ -1066,9 +1049,11 @@ class Entity(Factor):
 
     @classmethod
     def from_dict(cls, entity_dict, mentioned):
-        factor = cls(name=entity_dict.get("name"),
-        generic=entity_dict.get("generic", True),
-        plural=entity_dict.get("generic", False))
+        factor = cls(
+            name=entity_dict.get("name"),
+            generic=entity_dict.get("generic", True),
+            plural=entity_dict.get("generic", False),
+        )
         return factor, mentioned
 
     def context_register(
@@ -1099,6 +1084,7 @@ class Entity(Factor):
     def new_context(self, context: Dict[Factor, Factor]) -> "Entity":
         return self
 
+
 @dataclass(frozen=True)
 class Pleading(Factor):
     """
@@ -1127,12 +1113,10 @@ class Pleading(Factor):
         instead.
         """
 
-        return (self.filer)
+        return self.filer
 
     @classmethod
-    def from_dict(
-        cls, factor_dict: Dict, mentioned: List[Union[Factor]]
-    ) -> "Pleading":
+    def from_dict(cls, factor_dict: Dict, mentioned: List[Union[Factor]]) -> "Pleading":
         if factor_dict.get("type").capitalize() != cls.__name__:
             raise ValueError(
                 f'"type" value in input must be "{cls.__name__}", not {factor_dict.get("type")}'
@@ -1237,12 +1221,12 @@ class Pleading(Factor):
         """
         filer = self.filer.new_context(changes) if self.filer else None
         return self.__class__(
-                filer=filer,
-                date=self.date,
-                name=self.name,
-                absent=self.absent,
-                generic=self.generic,
-            )
+            filer=filer,
+            date=self.date,
+            name=self.name,
+            absent=self.absent,
+            generic=self.generic,
+        )
 
     def __str__(self):
         string = (
@@ -1396,12 +1380,12 @@ class Allegation(Factor):
         to_effect = self.to_effect.new_context(changes) if self.to_effect else None
         pleading = self.pleading.new_context(changes) if self.pleading else None
         return Allegation(
-                to_effect=to_effect,
-                pleading=pleading,
-                name=self.name,
-                absent=self.absent,
-                generic=self.generic,
-            )
+            to_effect=to_effect,
+            pleading=pleading,
+            name=self.name,
+            absent=self.absent,
+            generic=self.generic,
+        )
 
     def __str__(self):
         string = (
@@ -1564,13 +1548,13 @@ class Exhibit(Factor):
         statement = self.statement.new_context(changes) if self.statement else None
         stated_by = self.stated_by.new_context(changes) if self.stated_by else None
         return Exhibit(
-                form=self.form,
-                statement=statement,
-                stated_by=stated_by,
-                name=self.name,
-                absent=self.absent,
-                generic=self.generic,
-            )
+            form=self.form,
+            statement=statement,
+            stated_by=stated_by,
+            name=self.name,
+            absent=self.absent,
+            generic=self.generic,
+        )
 
     def __str__(self):
         string = (
@@ -1729,12 +1713,12 @@ class Evidence(Factor):
         exhibit = self.exhibit.new_context(changes) if self.exhibit else None
         to_effect = self.to_effect.new_context(changes) if self.to_effect else None
         return Evidence(
-                exhibit=exhibit,
-                to_effect=to_effect,
-                name=self.name,
-                absent=self.absent,
-                generic=self.generic,
-            )
+            exhibit=exhibit,
+            to_effect=to_effect,
+            name=self.name,
+            absent=self.absent,
+            generic=self.generic,
+        )
 
     @classmethod
     def from_dict(
@@ -1749,7 +1733,9 @@ class Evidence(Factor):
         else:
             exhibit = None
         if factor_dict.get("to_effect"):
-            to_effect, mentioned = Factor.from_dict(factor_dict.get("to_effect"), mentioned)
+            to_effect, mentioned = Factor.from_dict(
+                factor_dict.get("to_effect"), mentioned
+            )
         else:
             to_effect = None
 
@@ -1763,6 +1749,7 @@ class Evidence(Factor):
             ),
             mentioned,
         )
+
 
 def compare_dict_for_identical_entries(
     left: Dict[Factor, Factor], right: Dict[Factor, Factor]

@@ -235,10 +235,9 @@ class TestFacts:
         new_matches = [
             match
             for match in watt_factor["f7"].registers_for_interchangeable_context(
-                watt_factor["f7_swap_entities"], matches
+                matches
             )
         ]
-        print("breakpoint allowed here")
         assert {
             make_entity["trees"]: make_entity["trees"],
             make_entity["motel"]: make_entity["motel"],
