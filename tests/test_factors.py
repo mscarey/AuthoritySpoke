@@ -71,6 +71,14 @@ class TestFacts:
             watt_factor["f2"].new_context(changes)
         )
 
+    def test_new_context_from_factor(
+        self, watt_factor
+    ):
+        different = watt_factor["f1"].new_context(
+                Entity("Great Northern", generic=False)
+            )
+        assert str(different) == "Great Northern was a motel"
+
     def test_new_concrete_context(self, make_entity, watt_factor):
         different = watt_factor["f2"].new_context(
             {

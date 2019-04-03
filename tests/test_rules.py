@@ -293,6 +293,15 @@ class TestRules:
                 {make_predicate["p1"]: make_predicate["p7"]}
             )
 
+    def test_new_context_dict_must_be_dict(
+        self, make_holding, make_predicate
+    ):
+        with pytest.raises(TypeError):
+            different = make_holding["h1"].new_context(
+                make_predicate["p1"]
+            )
+
+
     def test_generic_factors(self, make_entity, make_holding):
         generics = make_holding["h3"].generic_factors
         assert make_entity["motel"] in generics

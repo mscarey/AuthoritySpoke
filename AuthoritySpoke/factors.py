@@ -296,12 +296,14 @@ def new_context_helper(func: Callable):
         factor: Factor, context: Optional[Union[Sequence[Factor], Dict[Factor, Factor]]]
     ) -> Factor:
 
+        if isinstance(context, Factor):
+            context = context.wrap_with_tuple(context)
         if context is not None:
+            if not isinstance(context, Iterable):
+                raise TypeError('"context" must be a dict or Sequence')
             if any(not isinstance(item, Factor) for item in context):
                 raise TypeError('Each item in "context" must be type Factor')
             if not isinstance(context, dict):
-                if not isinstance(context, Sequence):
-                    raise TypeError('"context" must be a dict or Sequence')
                 generic_factors = factor.generic_factors
                 if len(generic_factors) != len(context):
                     raise ValueError(
