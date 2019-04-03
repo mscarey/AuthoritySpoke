@@ -486,7 +486,7 @@ class Procedure(Factor):
         )
 
 
-@dataclass()
+@dataclass(frozen=True)
 class Rule(Factor):
     """
     A statement of a legal rule which a court may posit as authoritative,
