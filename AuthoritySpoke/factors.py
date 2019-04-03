@@ -40,31 +40,30 @@ class Factor:
 
     @classmethod
     def all_subclasses(cls):
+        """
+        The set of subclasses available could change if the user imports
+        more classes after calling the method once.
+        """
         return set(cls.__subclasses__()).union(
             [s for c in cls.__subclasses__() for s in c.all_subclasses()]
         )
 
     @classmethod
+    @functools.lru_cache()
     def class_from_str(cls, name: str):
         """
         Part of the JSON deserialization process. Obtains a classname
-        of a Factor subclass from a string, checking first in a dict
+        of a Factor subclass from a string, checking first in the lru_cache
         of known subclasses.
         """
-        known_classes: Dict[str, Type] = {}
-        while True:
-            name = name.capitalize()
-            answer = known_classes.get(name)
-            if answer is None:
-                class_options = {class_obj.__name__: class_obj for class_obj in cls.all_subclasses()}
-                answer = class_options.get(name)
-            if answer is None:
-                raise ValueError(
-                    f'"type" value in input must be one of {known_classes}, not {name}'
-                )
-            else:
-                known_classes.update(class_options)
-                yield answer
+        name = name.capitalize()
+        class_options = {class_obj.__name__: class_obj for class_obj in cls.all_subclasses()}
+        answer = class_options.get(name)
+        if answer is None:
+            raise ValueError(
+                f'"type" value in input must be one of {class_options}, not {name}'
+            )
+        return answer
 
     @classmethod
     @log_mentioned_context
@@ -78,7 +77,7 @@ class Factor:
         directly from a subclass.
         """
         cname = factor_record["type"]
-        target_class = next(cls.class_from_str(cname))
+        target_class = cls.class_from_str(cname)
         factor = target_class.from_dict(factor_record, mentioned)
         return factor
 
