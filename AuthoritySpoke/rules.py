@@ -505,8 +505,8 @@ class Rule(Factor):
 
     @classmethod
     def collection_from_dict(cls, case: Dict) -> List["Rule"]:
-        context_list = case["mentioned_factors"]
-        rule_list = case["holdings"]
+        context_list = case.get("mentioned_factors")
+        rule_list = case.get("holdings")
 
         mentioned = cls.get_mentioned_factors(context_list)
         finished_rules: List["Rule"] = []
@@ -533,7 +533,7 @@ class Rule(Factor):
 
     @classmethod
     def get_mentioned_factors(
-        cls, mentioned_list: List[Dict[str, str]]
+        cls, mentioned_list: Optional[List[Dict[str, str]]]
     ) -> List[Factor]:
         """
         :param mentioned_dict: A dict in the JSON format used in the
@@ -545,8 +545,9 @@ class Rule(Factor):
         format.
         """
         mentioned: List[Factor] = []
-        for factor_dict in mentioned_list:
-            _, mentioned = Factor.from_dict(factor_dict, mentioned)
+        if mentioned_list:
+            for factor_dict in mentioned_list:
+                _, mentioned = Factor.from_dict(factor_dict, mentioned)
         return mentioned
 
 

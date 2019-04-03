@@ -139,27 +139,25 @@ class Factor:
         def replace_factors_in_dict(
             matches: Dict["Factor", "Factor"],
             replacement_dict: Dict["Factor", "Factor"],
-            to_replace: str = "keys",
+            replace_values: bool = False,
         ):
-            if to_replace not in ("keys", "values"):
-                raise ValueError("'to_replace' parameter must be 'keys' or 'values'")
             keys = matches.keys()
             values = matches.values()
             # Consider adding a condition here to see whether the Factors to be swapped
             # are equal or generically equal, and swap them to create a new context
             # register only if the condition is passed.
             # But first write a unit test to prove the condition is needed.
-            if to_replace == "keys":
-                keys = [replacement_dict.get(factor) or factor for factor in keys]
-            else:
+            if replace_values:
                 values = [replacement_dict.get(factor) or factor for factor in values]
+            else:
+                keys = [replacement_dict.get(factor) or factor for factor in keys]
             return dict(zip(keys, values))
 
         yield matches
         already_returned: List[Dict["Factor", "Factor"]] = [matches]
         for replacement_dict in self.interchangeable_factors:
             changed_registry = replace_factors_in_dict(
-                matches, replacement_dict, "keys"
+                matches, replacement_dict, replace_values=False
             )
             if not any(
                 compare_dict_for_identical_entries(changed_registry, returned_dict)
@@ -173,7 +171,7 @@ class Factor:
             for other_replacement_dict in other.interchangeable_factors:
                 for used_registry in already_returned.copy():
                     other_registry = replace_factors_in_dict(
-                        used_registry, other_replacement_dict, "values"
+                        used_registry, other_replacement_dict, replace_values=True
                     )
                     if not any(
                         compare_dict_for_identical_entries(

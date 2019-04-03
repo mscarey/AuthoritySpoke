@@ -218,6 +218,23 @@ class TestRuleImport:
         with pytest.raises(ValueError):
             Rule.collection_from_dict(rule_dict)
 
+    def test_error_classname_does_not_exist(self):
+        rule_dict = {
+            "holdings": [
+                {
+                    "inputs": [{
+                    "type": "RidiculousFakeClassName",
+                    "content": "officers' search of the yard was a warrantless search and seizure"
+                }],
+                    "outputs": [{"type": "fact", "content": "the dog bit the man"}],
+                    "enactments": [
+                        {"code": "constitution.xml", "section": "amendment-IV"}
+                    ]
+                }
+            ],
+        }
+        with pytest.raises(ValueError):
+            Rule.collection_from_dict(rule_dict)
 
 
 class TestNestedFactorImport:
