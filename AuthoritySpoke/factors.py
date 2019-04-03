@@ -140,26 +140,17 @@ class Factor:
 
         def replace_factors_in_dict(
             matches: Dict["Factor", "Factor"],
-            replacement_dict: Dict["Factor", "Factor"],
-            replace_values: bool = False,
+            replacement_dict: Dict["Factor", "Factor"]
         ):
-            keys = matches.keys()
             values = matches.values()
-            # Consider adding a condition here to see whether the Factors to be swapped
-            # are equal or generically equal, and swap them to create a new context
-            # register only if the condition is passed.
-            # But first write a unit test to prove the condition is needed.
-            if replace_values:
-                values = [replacement_dict.get(factor) or factor for factor in values]
-            else:
-                keys = [replacement_dict.get(factor) or factor for factor in keys]
+            keys = [replacement_dict.get(factor) or factor for factor in matches.keys()]
             return dict(zip(keys, values))
 
         yield matches
         already_returned: List[Dict["Factor", "Factor"]] = [matches]
         for replacement_dict in self.interchangeable_factors:
             changed_registry = replace_factors_in_dict(
-                matches, replacement_dict, replace_values=False
+                matches, replacement_dict
             )
             if not any(
                 compare_dict_for_identical_entries(changed_registry, returned_dict)
