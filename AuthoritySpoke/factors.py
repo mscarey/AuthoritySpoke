@@ -140,7 +140,7 @@ class Factor:
 
         def replace_factors_in_dict(
             matches: Dict["Factor", "Factor"],
-            replacement_dict: Dict["Factor", "Factor"]
+            replacement_dict: Dict["Factor", "Factor"],
         ):
             values = matches.values()
             keys = [replacement_dict.get(factor) or factor for factor in matches.keys()]
@@ -149,9 +149,7 @@ class Factor:
         yield matches
         already_returned: List[Dict["Factor", "Factor"]] = [matches]
         for replacement_dict in self.interchangeable_factors:
-            changed_registry = replace_factors_in_dict(
-                matches, replacement_dict
-            )
+            changed_registry = replace_factors_in_dict(matches, replacement_dict)
             if not any(
                 compare_dict_for_identical_entries(changed_registry, returned_dict)
                 for returned_dict in already_returned
@@ -397,7 +395,9 @@ class Predicate:
         if quantity.isdigit():
             return int(quantity)
         float_parts = quantity.split(".")
-        if len(float_parts) == 2 and all(substring.isnumeric() for substring in float_parts):
+        if len(float_parts) == 2 and all(
+            substring.isnumeric() for substring in float_parts
+        ):
             return float(quantity)
         return Q_(quantity)
 
@@ -474,19 +474,7 @@ class Predicate:
             and self.reciprocal == other.reciprocal
             and self.quantity == other.quantity
         ):
-            if self.truth == other.truth and self.comparison == other.comparison:
-                return True  # Equal if everything is same
-            if (
-                self.comparison
-                and OPPOSITE_COMPARISONS[self.comparison] == other.comparison
-                and (
-                    (self.truth == True and other.truth == False)
-                    or (self.truth == False and other.truth == True)
-                )
-            ):
-                # Equal if everything is same except obverse quantity statement.
-                return True
-        return False
+            return self.truth == other.truth and self.comparison == other.comparison
 
     def __gt__(self, other: "Predicate") -> bool:
         """Indicates whether self implies the other predicate,
