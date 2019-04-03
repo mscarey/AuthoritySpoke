@@ -160,12 +160,6 @@ class Factor:
                 yield changed_registry
 
     @staticmethod
-    def sort_in_tuple(item) -> Tuple["Factor", ...]:
-        if isinstance(item, Iterable):
-            return tuple(sorted(item, key=repr))
-        return (item,)
-
-    @staticmethod
     def wrap_with_tuple(item):
         if isinstance(item, Iterable):
             return tuple(item)
