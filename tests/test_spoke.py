@@ -139,8 +139,9 @@ class TestPredicates:
     def test_predicate_equality(self, make_predicate):
         assert make_predicate["p1"] == make_predicate["p1_again"]
 
-    def test_predicate_inequality(self, make_predicate):
+    def test_predicate_inequality(self, make_predicate, watt_factor):
         assert make_predicate["p2"] != make_predicate["p2_reciprocal"]
+        assert make_predicate["p2"] != watt_factor["f2"]
 
     def test_obverse_predicates_equal(self, make_predicate):
         assert make_predicate["p7"] == make_predicate["p7_obverse"]
@@ -165,6 +166,10 @@ class TestPredicates:
     def test_greater_float_and_int(self, make_predicate):
         assert make_predicate["p8_higher_int"] > make_predicate["p8_float"]
         assert make_predicate["p8_int"] < make_predicate["p8_higher_int"]
+        p8_float_more = Predicate.from_string(
+            "the distance between {Ann} and {Lee} was {>= 20.1}", reciprocal=True
+        )[0]
+        assert p8_float_more > make_predicate["p8_int"]
 
     def test_any_truth_value_implies_none(self, make_predicate):
         assert make_predicate["p_murder"] > make_predicate["p_murder_whether"]

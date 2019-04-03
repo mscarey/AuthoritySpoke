@@ -396,10 +396,10 @@ class Predicate:
         quantity = quantity.strip()
         if quantity.isdigit():
             return int(quantity)
-        elif quantity.isdecimal():
+        float_parts = quantity.split(".")
+        if len(float_parts) == 2 and all(substring.isnumeric() for substring in float_parts):
             return float(quantity)
-        else:
-            return Q_(quantity)
+        return Q_(quantity)
 
     @classmethod
     def from_string(
