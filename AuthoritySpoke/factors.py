@@ -105,9 +105,9 @@ class Factor:
         """
 
         if isinstance(other, self.__class__):
-            if self.generic:
-                return True
             if other.generic:
+                return True
+            if self.generic:
                 return False
             return bool(self.implies_if_concrete(other))
         return False
@@ -170,22 +170,10 @@ class Factor:
                 + "implication with other Factor objects or None."
             )
         if self.absent and other.__dict__.get("absent"):
-            if isinstance(other, self.__class__):
-                if self.generic:
-                    return True
-                if other.generic:
-                    return False
-                return bool(other.implies_if_present(self))
-            return False
+            return bool(other.implies_if_present(self))
 
-        if self.absent == other.__dict__.get("absent") == False:
-            if isinstance(self, other.__class__):
-                if other.generic:
-                    return True
-                if self.generic:
-                    return False
-                return bool(self.implies_if_present(other))
-            return False
+        if not self.absent and not other.__dict__.get("absent"):
+            return bool(self.implies_if_present(other))
 
         return False
 
