@@ -84,15 +84,18 @@ class Factor:
         return factor
 
     @property
-    def generic_factors(self) -> Dict["Factor", None]:
+    def generic_factors(self) -> Dict['Factor', None]:
         """Returns an iterable of self's generic Factors,
         which must be matched to other generic Factors to
         perform equality tests between Factors."""
 
         if self.generic:
             return {self: None}
-        else:
-            return {}
+        return {
+            generic: None
+            for factor in self.context_factors
+            for generic in factor.generic_factors
+        }
 
     def make_absent(self) -> "Factor":
         """Returns a new object the same as self except with the
@@ -101,6 +104,20 @@ class Factor:
         new_attrs = self.__dict__.copy()
         new_attrs["absent"] = not new_attrs["absent"]
         return self.__class__(**new_attrs)
+
+    @property
+    def context_factors(self) -> Tuple:
+        """
+        This function and interchangeable_factors should be the only parts
+        of the context-matching process that need to be unique for each
+        subclass of Factor. It specifies what attributes of self and other
+        to look in to find Factor objects to match.
+
+        For Fact, it returns the context_factors, which can't contain None.
+        Other classes will return a Tuple[Optional[Factor], ...]
+        """
+
+        return ()
 
     @property
     def interchangeable_factors(self) -> List[Dict["Factor", "Factor"]]:
@@ -786,20 +803,6 @@ class Fact(Factor):
             generic=True,
         )
 
-    @property
-    def generic_factors(self) -> Dict[Factor, None]:
-        """Returns an iterable of self's generic Factors,
-        which must be matched to other generic Factors to
-        perform equality tests between Factors."""
-
-        if self.generic:
-            return {self: None}
-        return {
-            generic: None
-            for factor in self.context_factors
-            for generic in factor.generic_factors
-        }
-
     def predicate_in_context(self, entities: Sequence[Factor]) -> str:
         """Prints the representation of the Predicate with Entities
         added into the slots, with added text from the Fact object
@@ -1076,19 +1079,8 @@ class Pleading(Factor):
     generic: bool = False
 
     @property
-    def context_factors(self) -> Tuple[Optional[Fact], Optional[Entity]]:
-        """
-        This function and interchangeable_factors should be the only parts
-        of the context-matching process that need to be unique for each
-        subclass of Factor. It specifies what attributes of self and other
-        to look in to find Factor objects to match.
-
-        For Fact, it returns the context_factors, which can't contain None.
-        Other classes should need the annotation Tuple[Optional[Factor], ...]
-        instead.
-        """
-
-        return self.filer
+    def context_factors(self) -> Tuple[Optional[Entity]]:
+        return (self.filer,)
 
     @classmethod
     def from_dict(cls, factor_dict: Dict, mentioned: List[Union[Factor]]) -> "Pleading":
@@ -1143,20 +1135,6 @@ class Pleading(Factor):
         if self.absent == other.absent == True:
             return other.implies_if_present(self)
         return False
-
-    @property
-    def generic_factors(self) -> Dict[Factor, None]:
-        """Returns an iterable of self's generic Factors,
-        which must be matched to other generic Factors to
-        perform equality tests between Factors."""
-
-        if self.generic:
-            return {self: None}
-        return {
-            generic: None
-            for factor in [x for x in (self.filer,) if x]
-            for generic in factor.generic_factors
-        }
 
     def contradicts(self, other: Factor):
         return self >= other.make_absent()
@@ -1230,18 +1208,7 @@ class Allegation(Factor):
     generic: bool = False
 
     @property
-    def context_factors(self) -> Tuple[Optional[Fact], Optional[Entity]]:
-        """
-        This function and interchangeable_factors should be the only parts
-        of the context-matching process that need to be unique for each
-        subclass of Factor. It specifies what attributes of self and other
-        to look in to find Factor objects to match.
-
-        For Fact, it returns the context_factors, which can't contain None.
-        Other classes should need the annotation Tuple[Optional[Factor], ...]
-        instead.
-        """
-
+    def context_factors(self) -> Tuple[Optional[Fact], Optional[Pleading]]:
         return (self.to_effect, self.pleading)
 
     @classmethod
@@ -1300,20 +1267,6 @@ class Allegation(Factor):
         if self.absent == other.absent == True:
             return other.implies_if_present(self)
         return False
-
-    @property
-    def generic_factors(self) -> Dict[Factor, None]:
-        """Returns an iterable of self's generic Factors,
-        which must be matched to other generic Factors to
-        perform equality tests between Factors."""
-
-        if self.generic:
-            return {self: None}
-        return {
-            generic: None
-            for factor in [x for x in (self.to_effect, self.pleading) if x]
-            for generic in factor.generic_factors
-        }
 
     def contradicts(self, other: Factor):
         return self >= other.make_absent()
@@ -1394,17 +1347,6 @@ class Exhibit(Factor):
 
     @property
     def context_factors(self) -> Tuple[Optional[Fact], Optional[Entity]]:
-        """
-        This function and interchangeable_factors should be the only parts
-        of the context-matching process that need to be unique for each
-        subclass of Factor. It specifies what attributes of self and other
-        to look in to find Factor objects to match.
-
-        For Fact, it returns the context_factors, which can't contain None.
-        Other classes should need the annotation Tuple[Optional[Factor], ...]
-        instead.
-        """
-
         return (self.statement, self.stated_by)
 
     @classmethod
@@ -1465,20 +1407,6 @@ class Exhibit(Factor):
         if self.absent == other.absent == True:
             return other.implies_if_present(self)
         return False
-
-    @property
-    def generic_factors(self) -> Dict[Factor, None]:
-        """Returns an iterable of self's generic Factors,
-        which must be matched to other generic Factors to
-        perform equality tests between Factors."""
-
-        if self.generic:
-            return {self: None}
-        return {
-            generic: None
-            for factor in [x for x in (self.statement, self.stated_by) if x]
-            for generic in factor.generic_factors
-        }
 
     def contradicts(self, other: Factor):
         return self >= other.make_absent()
@@ -1593,17 +1521,6 @@ class Evidence(Factor):
 
     @property
     def context_factors(self) -> Tuple[Optional[Exhibit], Optional[Fact]]:
-        """
-        This function and interchangeable_factors should be the only parts
-        of the context-matching process that need to be unique for each
-        subclass of Factor. It specifies what attributes of self and other
-        to look in to find Factor objects to match.
-
-        For Fact, it returns the context_factors, which can't contain None.
-        Other classes should need the annotation Tuple[Optional[Factor], ...]
-        instead.
-        """
-
         return (self.exhibit, self.to_effect)
 
     def contradicts(self, other: Optional[Factor]) -> bool:
@@ -1624,20 +1541,6 @@ class Evidence(Factor):
             return True
 
         return other > self.make_absent()
-
-    @property
-    def generic_factors(self) -> Dict[Factor, None]:
-        """Returns an iterable of self's generic Factors,
-        which must be matched to other generic Factors to
-        perform equality tests between Factors."""
-
-        if self.generic:
-            return {self: None}
-        return {
-            generic: None
-            for factor in [x for x in (self.exhibit, self.to_effect) if x]
-            for generic in factor.generic_factors
-        }
 
     def implies_if_present(self, other: Factor):
         """Determines whether self would imply other assuming
