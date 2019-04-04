@@ -36,6 +36,28 @@ class TestFacts:
         )
         assert f2.entity_context == (e["watt"], e["motel"])
 
+    def test_mix_of_factors_and_indices_in_init(
+        self, make_entity, make_predicate, watt_mentioned
+    ):
+        e = make_entity
+        f2 = Fact(
+            make_predicate["p2"],
+            entity_context=(1, e["trees"]),
+            case_factors=watt_mentioned,
+        )
+        assert f2.entity_context == (e["watt"], e["trees"])
+
+    def test_wrong_type_in_entity_context_in_init(
+        self, make_entity, make_predicate, watt_mentioned
+    ):
+        e = make_entity
+        with pytest.raises(TypeError):
+            f2 = Fact(
+                make_predicate["p2"],
+                entity_context=(1, "nonsense"),
+                case_factors=watt_mentioned,
+            )
+
     def test_invalid_index_for_case_factors_in_init(self, make_predicate, make_entity):
         with pytest.raises(ValueError):
             _ = Fact(
@@ -71,12 +93,10 @@ class TestFacts:
             watt_factor["f2"].new_context(changes)
         )
 
-    def test_new_context_from_factor(
-        self, watt_factor
-    ):
+    def test_new_context_from_factor(self, watt_factor):
         different = watt_factor["f1"].new_context(
-                Entity("Great Northern", generic=False)
-            )
+            Entity("Great Northern", generic=False)
+        )
         assert str(different) == "Great Northern was a motel"
 
     def test_new_concrete_context(self, make_entity, watt_factor):

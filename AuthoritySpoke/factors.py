@@ -690,21 +690,33 @@ class Fact(Factor):
                 "The number of items in 'entity_context' must be "
                 + f"{len(self.predicate)}, to match predicate.context_slots"
             )
+        if any(
+            not isinstance(s, Factor) and not isinstance(s, int) for s in entity_context
+        ):
+            raise TypeError(
+                "Items in the entity_context parameter should "
+                + "be Factor or a subclass of Factor, or should be integer "
+                + "indices of Factor objects in the case_factors parameter."
+            )
 
-        if any(not isinstance(s, Factor) for s in entity_context):
-            if any(not isinstance(s, int) for s in entity_context):
-                raise TypeError(
-                    "entity_context parameter must contain all integers "
-                    + "or all Factor objects."
-                )
-            if len(case_factors) >= max(entity_context):
-                entity_context = tuple(case_factors[i] for i in entity_context)
-            else:
-                raise ValueError(
-                    "Items in the entity_context parameter should "
-                    + "be Factor or a subclass of Factor, or should be integer "
-                    + "indices of Factor objects in the case_factors parameter."
-                )
+        def get_factor_by_index(
+            factor_or_index: Union[Factor, int], case_factors: List[Factor]
+        ) -> Factor:
+            if isinstance(factor_or_index, int):
+                if 0 <= factor_or_index < len(case_factors):
+                    factor_or_index = case_factors[factor_or_index]
+                else:
+                    raise ValueError(
+                        f"The integer {factor_or_index} could not be interpreted as "
+                        + f"the index of an item from case_factors, which has length "
+                        + f"{len(case_factors)}."
+                    )
+            return factor_or_index
+
+        if any(isinstance(s, int) for s in entity_context):
+            entity_context = tuple(
+                get_factor_by_index(i, case_factors) for i in entity_context
+            )
         object.__setattr__(self, "entity_context", entity_context)
 
     def __str__(self):
