@@ -581,12 +581,12 @@ class Predicate:
 
         if self.quantity and other.quantity:
             if (
-                "<" in self.comparison or "=" in self.comparison
+                ">" in self.comparison or "=" in self.comparison
             ) and "<" in other.comparison:
                 if self.quantity > other.quantity:
                     return True
             if (
-                ">" in self.comparison or "=" in self.comparison
+                "<" in self.comparison or "=" in self.comparison
             ) and ">" in other.comparison:
                 if self.quantity < other.quantity:
                     return True
@@ -596,11 +596,8 @@ class Predicate:
             if "<" in self.comparison and "=" in other.comparison:
                 if self.quantity < other.quantity:
                     return True
-            if "=" in self.comparison and "=" not in other.comparison:
+            if ("=" in self.comparison) != ("=" in other.comparison):
                 if self.quantity == other.quantity:
-                    return True
-            if "=" not in self.comparison and "=" in other.comparison:
-                if self.quantity != other.quantity:
                     return True
             return False
         return self.content == other.content and self.truth != other.truth

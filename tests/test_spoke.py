@@ -205,6 +205,10 @@ class TestPredicates:
         assert not make_predicate["p1"].contradicts(make_predicate["p1_again"])
         assert not make_predicate["p3"].contradicts(make_predicate["p7"])
 
+    def test_contradiction_with_exact(self, make_predicate):
+        assert make_predicate["p8_exact"].contradicts(make_predicate["p8_less"])
+        assert make_predicate["p8_less"].contradicts(make_predicate["p8_exact"])
+
     def test_error_predicate_contradict_factor(self, make_predicate, watt_factor):
         with pytest.raises(TypeError):
             make_predicate["p7_true"].contradicts(watt_factor["f7"])
@@ -217,6 +221,8 @@ class TestPredicates:
         assert not make_predicate["p9"].contradicts(make_predicate["p9_acres"])
         assert not make_predicate["p9_acres"].contradicts(make_predicate["p9"])
 
+    def test_no_contradiction_of_none(self, make_predicate):
+        assert not make_predicate["p7_true"].contradicts(None)
 
 class TestCodes:
     def test_making_code(self, make_code):

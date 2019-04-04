@@ -398,6 +398,7 @@ class TestFacts:
 
     def test_factor_different_predicate_truth_contradicts(self, watt_factor):
         assert watt_factor["f7"].contradicts(watt_factor["f7_opposite"])
+        assert watt_factor["f7_opposite"].contradicts(watt_factor["f7"])
 
     def test_same_predicate_true_vs_false(self, watt_factor):
         assert watt_factor["f10"].contradicts(watt_factor["f10_false"])
