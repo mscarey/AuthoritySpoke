@@ -66,6 +66,13 @@ def make_predicate() -> Dict[str, Predicate]:
             comparison=">",
             quantity=Q_("35 feet"),
         ),
+        "p7_not_equal": Predicate(
+            "the distance between {} and {} was {}",
+            truth=True,
+            reciprocal=True,
+            comparison="!=",
+            quantity=Q_("35 feet"),
+        ),
         "p7_true": Predicate(
             "the distance between {} and {} was {}",
             truth=True,
@@ -118,6 +125,11 @@ def make_predicate() -> Dict[str, Predicate]:
         "p9": Predicate(
             "the distance between {} and a parking area used by personnel and patrons of {} was {}",
             comparison="<=",
+            quantity=Q_("5 feet"),
+        ),
+        "p9_exact": Predicate(
+            "the distance between {} and a parking area used by personnel and patrons of {} was {}",
+            comparison="=",
             quantity=Q_("5 feet"),
         ),
         "p9_miles": Predicate(

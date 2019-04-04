@@ -356,6 +356,12 @@ class Predicate:
 
     def __post_init__(self):
 
+        normalize_comparison = {"==": "=", "!=": "<>"}
+        if self.comparison in normalize_comparison:
+            object.__setattr__(
+                self, "comparison", normalize_comparison[self.comparison]
+            )
+
         if self.comparison and self.comparison not in OPPOSITE_COMPARISONS.keys():
             raise ValueError(
                 f'"comparison" string parameter must be one of {OPPOSITE_COMPARISONS.keys()}.'
@@ -365,15 +371,6 @@ class Predicate:
             raise ValueError(
                 f'"reciprocal" flag not allowed because "{self.content}" has '
                 f"{self.context_slots} spaces for context entities. At least 2 spaces needed."
-            )
-
-        # Assumes that the obverse of a statement about a quantity is
-        # necessarily logically equivalent
-        normalize_comparison = {"==": "=", "!=": "<>"}
-
-        if self.comparison in normalize_comparison:
-            object.__setattr__(
-                self, "comparison", normalize_comparison[self.comparison]
             )
 
         if self.comparison and self.truth is False:
@@ -476,13 +473,18 @@ class Predicate:
         ):
             return self.truth == other.truth and self.comparison == other.comparison
 
-    def __gt__(self, other: "Predicate") -> bool:
+    def __gt__(self, other: Optional["Predicate"]) -> bool:
         """Indicates whether self implies the other predicate,
         which is True if their statements about quantity imply it.
         Returns False if self and other are equal."""
 
+        if other is None:
+            return True
         if not isinstance(other, self.__class__):
-            return False
+            raise TypeError(
+                f"{self.__class__} objects may only be compared for "
+                + f"implication with other {self.__class__} objects or None."
+            )
 
         # Assumes no predicate implies another based on meaning of their content text
         if not (
@@ -542,14 +544,20 @@ class Predicate:
             return True
         return self > other
 
-    def contradicts(self, other: "Predicate") -> bool:
+    def contradicts(self, other: Optional["Predicate"]) -> bool:
         """This first tries to find a contradiction based on the relationship
         between the quantities in the predicates. If there are no quantities, it
         returns false only if the content is exactly the same and self.truth is
         different.
         """
-        if not isinstance(other, self.__class__):
+        if other is None:
             return False
+
+        if not isinstance(other, self.__class__):
+            raise TypeError(
+                f"{self.__class__} objects may only be compared for "
+                + "contradiction with other {self.__class__} objects or None."
+            )
 
         if (type(self.quantity) == ureg.Quantity) != (
             type(other.quantity) == ureg.Quantity

@@ -175,13 +175,11 @@ class TestPredicates:
         assert make_predicate["p_murder"] > make_predicate["p_murder_whether"]
         assert make_predicate["p_murder_false"] > make_predicate["p_murder_whether"]
 
-    def test_predicate_contradictions(self, make_predicate):
-        assert make_predicate["p7"].contradicts(make_predicate["p7_true"])
-        assert not make_predicate["p1"].contradicts(make_predicate["p1_again"])
-        assert not make_predicate["p3"].contradicts(make_predicate["p7"])
+    def test_equal_implies_greater_or_equal(self, make_predicate):
+        assert make_predicate["p9_exact"] > make_predicate["p9"]
 
-    def test_predicate_does_not_contradict_factor(self, make_predicate, watt_factor):
-        assert not make_predicate["p7_true"].contradicts(watt_factor["f7"])
+    def test_implication_with_not_equal(self, make_predicate):
+        assert make_predicate["p7_opposite"] > make_predicate["p7_not_equal"]
 
     def test_no_implication_with_inconsistent_dimensionality(self, make_predicate):
         assert not make_predicate["p9"] >= make_predicate["p9_acres"]
@@ -191,7 +189,25 @@ class TestPredicates:
         assert not make_predicate["p2_no_truth"] > make_predicate["p2"]
         assert make_predicate["p2"] > make_predicate["p2_no_truth"]
 
+    def test_error_predicate_imply_factor(self, make_predicate, watt_factor):
+        with pytest.raises(TypeError):
+            assert make_predicate["p7_true"] > (watt_factor["f7"])
+        with pytest.raises(TypeError):
+            assert make_predicate["p7_true"] >= (watt_factor["f7"])
+
+    def test_predicate_implies_none(self, make_predicate):
+        assert make_predicate["p7_true"] > None
+
     # Contradiction
+
+    def test_predicate_contradictions(self, make_predicate):
+        assert make_predicate["p7"].contradicts(make_predicate["p7_true"])
+        assert not make_predicate["p1"].contradicts(make_predicate["p1_again"])
+        assert not make_predicate["p3"].contradicts(make_predicate["p7"])
+
+    def test_error_predicate_contradict_factor(self, make_predicate, watt_factor):
+        with pytest.raises(TypeError):
+            make_predicate["p7_true"].contradicts(watt_factor["f7"])
 
     def test_no_contradiction_with_no_truth_value(self, make_predicate):
         assert not make_predicate["p2_no_truth"].contradicts(make_predicate["p2"])
