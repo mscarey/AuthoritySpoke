@@ -98,6 +98,26 @@ class Factor:
         }
 
     def implies_if_present(self, other: "Factor"):
+        """
+        Determines whether self would imply other, under
+        the assumption that neither self nor other is an
+        "absent" Factor.
+        """
+
+        if isinstance(other, self.__class__):
+            if self.generic:
+                return True
+            if other.generic:
+                return False
+            return bool(self.implies_if_concrete(other))
+        return False
+
+    def implies_if_concrete(self, other: "Factor"):
+        """
+        Determines whether self would imply other, under the assumptions
+        that neither self nor other has the attribute absent, neither
+        has the attribute generic, and other is an instance of self's class.
+        """
 
         if len(other.context_factors) < len(self.context_factors):
             return False
@@ -863,10 +883,7 @@ class Fact(Factor):
     def __len__(self):
         return len(self.context_factors)
 
-    def implies_if_present(self, other: Factor) -> bool:
-        if not super().implies_if_present(other):
-            return False
-
+    def implies_if_concrete(self, other: Factor) -> bool:
         if bool(self.standard_of_proof) != bool(other.standard_of_proof):
             return False
 
@@ -877,9 +894,9 @@ class Fact(Factor):
         ):
             return False
 
-        return self.predicate >= other.predicate
-
-
+        if not self.predicate >= other.predicate:
+            return False
+        return super().implies_if_concrete(other)
 
     def contradicts(self, other: Optional[Factor]) -> bool:
         """Returns True if self and other can't both be true at the same time.
@@ -1142,45 +1159,15 @@ class Pleading(Factor):
         context_registers = iter(self.context_register(other, operator.eq))
         return any(register is not None for register in context_registers)
 
-    def __ge__(self, other: Optional[Factor]) -> bool:
-        if other is None:
-            return True
-
-        if not isinstance(other, Factor):
-            raise TypeError(
-                f"'Implies' not supported between instances of "
-                + f"'{self.__class__.__name__}' and '{other.__class__.__name__}'."
-            )
-
-        if self.absent == other.absent == False:
-            return self.implies_if_present(other)
-        if self.absent == other.absent == True:
-            return other.implies_if_present(self)
-        return False
-
     def contradicts(self, other: Factor):
         return self >= other.make_absent()
 
-    def implies_if_present(self, other: "Pleading"):
-
-        if not isinstance(self, other.__class__):
-            return False
-
-        if other.generic:
-            return True
-
-        if self.generic:
-            return False
-
-        if other.filer:
-            if not (self.filer and self.filer >= other.filer):
-                return False
+    def implies_if_concrete(self, other: "Pleading"):
 
         if self.date != other.date:
             return False
 
-        context_registers = iter(self.context_register(other, operator.ge))
-        return any(register is not None for register in context_registers)
+        return super().implies_if_concrete(other)
 
     @new_context_helper
     def new_context(self, changes: Dict[Factor, Factor]) -> "Pleading":
@@ -1212,8 +1199,6 @@ class Allegation(Factor):
     """
     A formal assertion of a Fact, included by a party in a Pleading
     to establish a cause of action.
-
-    # TODO: inherit generic functions from Factor
     """
 
     to_effect: Optional[Fact] = None
@@ -1267,46 +1252,9 @@ class Allegation(Factor):
         context_registers = iter(self.context_register(other, operator.eq))
         return any(register is not None for register in context_registers)
 
-    def __ge__(self, other: Optional[Factor]) -> bool:
-        if other is None:
-            return True
-
-        if not isinstance(other, Factor):
-            raise TypeError(
-                f"'Implies' not supported between instances of "
-                + f"'{self.__class__.__name__}' and '{other.__class__.__name__}'."
-            )
-
-        if self.absent == other.absent == False:
-            return self.implies_if_present(other)
-        if self.absent == other.absent == True:
-            return other.implies_if_present(self)
-        return False
 
     def contradicts(self, other: Factor):
         return self >= other.make_absent()
-
-    def implies_if_present(self, other: "Allegation"):
-
-        if not isinstance(self, other.__class__):
-            return False
-
-        if other.generic:
-            return True
-
-        if self.generic:
-            return False
-
-        if other.to_effect:
-            if not (self.to_effect and self.to_effect >= other.to_effect):
-                return False
-
-        if other.pleading:
-            if not (self.pleading and self.pleading >= other.pleading):
-                return False
-
-        context_registers = iter(self.context_register(other, operator.ge))
-        return any(register is not None for register in context_registers)
 
     @new_context_helper
     def new_context(self, changes: Dict[Factor, Factor]) -> "Allegation":
@@ -1400,49 +1348,16 @@ class Exhibit(Factor):
         context_registers = iter(self.context_register(other, operator.eq))
         return any(register is not None for register in context_registers)
 
-    def __ge__(self, other: Optional[Factor]) -> bool:
-        if other is None:
-            return True
-
-        if not isinstance(other, Factor):
-            raise TypeError(
-                f"'Implies' not supported between instances of "
-                + f"'{self.__class__.__name__}' and '{other.__class__.__name__}'."
-            )
-
-        if self.absent == other.absent == False:
-            return self.implies_if_present(other)
-        if self.absent == other.absent == True:
-            return other.implies_if_present(self)
-        return False
 
     def contradicts(self, other: Factor):
         return self >= other.make_absent()
 
-    def implies_if_present(self, other: "Exhibit"):
-
-        if not isinstance(self, other.__class__):
-            return False
-
-        if other.generic:
-            return True
-
-        if self.generic:
-            return False
+    def implies_if_concrete(self, other: "Exhibit"):
 
         if not (self.form == other.form or other.form is None):
             return False
 
-        if other.statement:
-            if not (self.statement and self.statement >= other.statement):
-                return False
-
-        if other.stated_by:
-            if not (self.stated_by and self.stated_by >= other.stated_by):
-                return False
-
-        context_registers = iter(self.context_register(other, operator.ge))
-        return any(register is not None for register in context_registers)
+        return super().implies_if_concrete(other)
 
     @new_context_helper
     def new_context(self, changes: Dict[Factor, Factor]) -> "Exhibit":
@@ -1539,24 +1454,6 @@ class Evidence(Factor):
             return True
 
         return other > self.make_absent()
-
-    def implies_if_present(self, other: Factor):
-        """Determines whether self would imply other assuming
-        both of them have self.absent == False."""
-
-        if not isinstance(self, other.__class__):
-            return False
-
-        if other.exhibit:
-            if not self.exhibit or not self.exhibit >= other.exhibit:
-                return False
-
-        if other.to_effect:
-            if not self.to_effect or not self.to_effect >= other.to_effect:
-                return False
-
-        context_registers = iter(self.context_register(other, operator.ge))
-        return any(register is not None for register in context_registers)
 
     @new_context_helper
     def new_context(self, changes: Dict[Factor, Factor]) -> "Evidence":
