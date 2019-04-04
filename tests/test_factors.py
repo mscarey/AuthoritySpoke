@@ -349,6 +349,7 @@ class TestFacts:
 
     def test_specific_factor_implies_generic(self, watt_factor):
         assert watt_factor["f2"] > watt_factor["f2_generic"]
+        assert not watt_factor["f2_generic"] > watt_factor["f2"]
 
     def test_specific_implies_generic_form_of_another_fact(self, watt_factor):
         assert watt_factor["f2"] > watt_factor["f3_generic"]
@@ -379,10 +380,10 @@ class TestFacts:
         assert not watt_factor["f8"] > watt_factor["f8_int"]
         assert not watt_factor["f8"] < watt_factor["f8_int"]
 
-    def test_absent_factor_implies_absent_factor_with_greater_quantity(
+    def test_absent_factor_implies_absent_factor_with_lesser_quantity(
         self, watt_factor
     ):
-        assert watt_factor["f9_absent"] > watt_factor["f9_absent_miles"]
+        assert watt_factor["f9_absent_miles"] > watt_factor["f9_absent"]
 
     def test_equal_factors_not_gt(self, watt_factor):
         f = watt_factor

@@ -84,7 +84,7 @@ class Factor:
         return factor
 
     @property
-    def generic_factors(self) -> Dict['Factor', None]:
+    def generic_factors(self) -> Dict["Factor", None]:
         """Returns an iterable of self's generic Factors,
         which must be matched to other generic Factors to
         perform equality tests between Factors."""
@@ -96,6 +96,48 @@ class Factor:
             for factor in self.context_factors
             for generic in factor.generic_factors
         }
+
+    def implies_if_present(self, other: "Factor"):
+
+        if len(other.context_factors) < len(self.context_factors):
+            return False
+
+        for i, self_factor in enumerate(self.context_factors):
+            if other.context_factors[i]:
+                if not (self_factor and self_factor >= other.context_factors[i]):
+                    return False
+
+        context_registers = iter(self.context_register(other, operator.ge))
+        return any(register is not None for register in context_registers)
+
+    def __ge__(self, other: "Factor") -> bool:
+        if other is None:
+            return True
+
+        if not isinstance(other, Factor):
+            raise TypeError(
+                f"{self.__class__} objects may only be compared for "
+                + "implication with other Factor objects or None."
+            )
+        if self.absent and other.__dict__.get("absent"):
+            if isinstance(other, self.__class__):
+                if self.generic:
+                    return True
+                if other.generic:
+                    return False
+                return bool(other.implies_if_present(self))
+            return False
+
+        if self.absent == other.__dict__.get("absent") == False:
+            if isinstance(self, other.__class__):
+                if other.generic:
+                    return True
+                if self.generic:
+                    return False
+                return bool(self.implies_if_present(other))
+            return False
+
+        return False
 
     def __gt__(self, other: Optional["Factor"]) -> bool:
         return self >= other and self != other
@@ -709,7 +751,8 @@ class Fact(Factor):
                 + f"{len(self.predicate)}, to match predicate.context_slots"
             )
         if any(
-            not isinstance(s, Factor) and not isinstance(s, int) for s in context_factors
+            not isinstance(s, Factor) and not isinstance(s, int)
+            for s in context_factors
         ):
             raise TypeError(
                 "Items in the context_factors parameter should "
@@ -820,22 +863,8 @@ class Fact(Factor):
     def __len__(self):
         return len(self.context_factors)
 
-    def __ge__(self, other: Optional[Factor]) -> bool:
-        if other is None:
-            return True
-        if not isinstance(other, Factor):
-            raise TypeError(
-                f"{self.__class__} objects may only be compared for "
-                + "implication with other Factor objects or None."
-            )
-
-        if not isinstance(self, other.__class__):
-            return False
-
-        if other.generic:
-            return True
-
-        if self.generic:
+    def implies_if_present(self, other: Factor) -> bool:
+        if not super().implies_if_present(other):
             return False
 
         if bool(self.standard_of_proof) != bool(other.standard_of_proof):
@@ -848,11 +877,9 @@ class Fact(Factor):
         ):
             return False
 
-        if not (self.predicate >= other.predicate and self.absent == other.absent):
-            return False
+        return self.predicate >= other.predicate
 
-        context_registers = iter(self.context_register(other, operator.ge))
-        return any(register is not None for register in context_registers)
+
 
     def contradicts(self, other: Optional[Factor]) -> bool:
         """Returns True if self and other can't both be true at the same time.
@@ -1530,29 +1557,6 @@ class Evidence(Factor):
 
         context_registers = iter(self.context_register(other, operator.ge))
         return any(register is not None for register in context_registers)
-
-    def __ge__(self, other: Factor) -> bool:
-        if not isinstance(other, Factor):
-            raise TypeError(
-                f"'Implies' not supported between instances of "
-                + f"'{self.__class__.__name__}' and '{other.__class__.__name__}'."
-            )
-
-        if self.absent and other.absent:
-            return bool(other.implies_if_present(self))
-
-        if self.absent == other.absent == False:
-            return bool(self.implies_if_present(other))
-
-        return False
-
-    def make_absent(self) -> "Evidence":
-        return Evidence(
-            exhibit=self.exhibit,
-            to_effect=self.to_effect,
-            absent=not self.absent,
-            generic=self.generic,
-        )
 
     @new_context_helper
     def new_context(self, changes: Dict[Factor, Factor]) -> "Evidence":
