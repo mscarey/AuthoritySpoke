@@ -130,6 +130,36 @@ class Factor:
         context_registers = iter(self.context_register(other, operator.ge))
         return any(register is not None for register in context_registers)
 
+    def equal_if_concrete(self, other: 'Factor') -> bool:
+        """
+        Determines whether self would imply other, under the assumptions
+        that neither self nor other has the attribute absent, neither
+        has the attribute generic, and other is an instance of self's class.
+
+        Most subclasses will inject their own tests before calling this.
+        """
+        for i, self_factor in enumerate(self.context_factors):
+            if self_factor != other.context_factors[i]:
+                return False
+
+        context_registers = iter(self.context_register(other, operator.eq))
+        return any(register is not None for register in context_registers)
+
+    def __eq__(self, other) -> bool:
+        if self.__class__ != other.__class__:
+            return False
+
+        if self.absent != other.absent:
+            return False
+
+        if self.generic == other.generic == True:
+            return True
+
+        if self.generic != other.generic:
+            return False
+
+        return self.equal_if_concrete(other)
+
     def __ge__(self, other: "Factor") -> bool:
         if other is None:
             return True
@@ -838,21 +868,16 @@ class Fact(Factor):
             ]
         return []
 
-    def __eq__(self, other: Factor) -> bool:
-        if self.__class__ != other.__class__:
-            return False
-        if self.generic == other.generic == True:
-            return True
+    def equal_if_concrete(self, other: Factor) -> bool:
         if (
             self.predicate != other.predicate
             or self.standard_of_proof != other.standard_of_proof
-            or self.absent != other.absent
-            or self.generic != other.generic
         ):
             return False
+        return super().equal_if_concrete(other)
 
-        context_registers = iter(self.context_register(other, operator.eq))
-        return any(register is not None for register in context_registers)
+    def __eq__(self, other) -> bool:
+        return super().__eq__(other)
 
     def make_generic(self) -> "Fact":
         """
@@ -1107,8 +1132,6 @@ class Pleading(Factor):
     """
     A formal assertion of a Fact, included by a party in a Pleading
     to establish a cause of action.
-
-    # TODO: inherit generic functions from Factor
     """
 
     filer: Optional[Entity] = None
@@ -1139,25 +1162,13 @@ class Pleading(Factor):
             mentioned,
         )
 
+    def equal_if_concrete(self, other: 'Pleading') -> bool:
+        if self.date != other.date:
+            return False
+        return super().equal_if_concrete(other)
+
     def __eq__(self, other: Factor) -> bool:
-        if self.__class__ != other.__class__:
-            return False
-
-        if self.absent != other.absent:
-            return False
-
-        if self.generic == other.generic == True:
-            return True
-
-        if (
-            self.filer != other.filer
-            or self.date != other.date
-            or self.generic != other.generic
-        ):
-            return False
-
-        context_registers = iter(self.context_register(other, operator.eq))
-        return any(register is not None for register in context_registers)
+        return super.__eq__(other)
 
     def contradicts(self, other: Factor):
         return self >= other.make_absent()
@@ -1233,25 +1244,10 @@ class Allegation(Factor):
         )
 
     def __eq__(self, other: Factor) -> bool:
-        if self.__class__ != other.__class__:
-            return False
-
-        if self.absent != other.absent:
-            return False
-
-        if self.generic == other.generic == True:
-            return True
-
-        if (
-            self.to_effect != other.to_effect
-            or self.pleading != other.pleading
-            or self.generic != other.generic
-        ):
-            return False
-
-        context_registers = iter(self.context_register(other, operator.eq))
-        return any(register is not None for register in context_registers)
-
+        """
+        dataclass behaves confusingly if this isn't included.
+        """
+        return super().__eq__(other)
 
     def contradicts(self, other: Factor):
         return self >= other.make_absent()
@@ -1327,27 +1323,13 @@ class Exhibit(Factor):
             mentioned,
         )
 
+    def equal_if_concrete(self, other: 'Pleading') -> bool:
+        if self.form != other.form:
+            return False
+        return super().equal_if_concrete(other)
+
     def __eq__(self, other: Factor) -> bool:
-        if self.__class__ != other.__class__:
-            return False
-
-        if self.absent != other.absent:
-            return False
-
-        if self.generic == other.generic == True:
-            return True
-
-        if (
-            self.form != other.form
-            or self.statement != other.statement
-            or self.stated_by != other.stated_by
-            or self.generic != other.generic
-        ):
-            return False
-
-        context_registers = iter(self.context_register(other, operator.eq))
-        return any(register is not None for register in context_registers)
-
+        return super().__eq__(other)
 
     def contradicts(self, other: Factor):
         return self >= other.make_absent()
@@ -1413,24 +1395,7 @@ class Evidence(Factor):
         return string
 
     def __eq__(self, other: Factor) -> bool:
-        if not isinstance(other, self.__class__):
-            return False
-
-        if self.absent != other.absent:
-            return False
-
-        if self.generic == other.generic == True:
-            return True
-
-        if not (
-            self.exhibit == other.exhibit
-            and self.to_effect == other.to_effect
-            and self.generic == other.generic
-        ):
-            return False
-
-        context_registers = iter(self.context_register(other, operator.eq))
-        return any(register is not None for register in context_registers)
+        return super().__eq__(other)
 
     @property
     def context_factors(self) -> Tuple[Optional[Exhibit], Optional[Fact]]:
