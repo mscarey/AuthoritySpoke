@@ -97,6 +97,9 @@ class Factor:
             for generic in factor.generic_factors
         }
 
+    def __gt__(self, other: Optional["Factor"]) -> bool:
+        return self >= other and self != other
+
     def make_absent(self) -> "Factor":
         """Returns a new object the same as self except with the
         opposite value for 'absent'"""
@@ -817,14 +820,6 @@ class Fact(Factor):
     def __len__(self):
         return len(self.context_factors)
 
-    def __gt__(self, other: Optional[Factor]) -> bool:
-        """Indicates whether self implies other, taking into account the implication
-        test for predicates and whether self and other are labeled 'absent'"""
-
-        if self == other:
-            return False
-        return self >= other
-
     def __ge__(self, other: Optional[Factor]) -> bool:
         if other is None:
             return True
@@ -1160,13 +1155,6 @@ class Pleading(Factor):
         context_registers = iter(self.context_register(other, operator.ge))
         return any(register is not None for register in context_registers)
 
-    def __gt__(self, other: Optional[Factor]) -> bool:
-        if other is None:
-            return True
-        if self == other:
-            return False
-        return self >= other
-
     @new_context_helper
     def new_context(self, changes: Dict[Factor, Factor]) -> "Pleading":
         """
@@ -1292,13 +1280,6 @@ class Allegation(Factor):
 
         context_registers = iter(self.context_register(other, operator.ge))
         return any(register is not None for register in context_registers)
-
-    def __gt__(self, other: Optional[Factor]) -> bool:
-        if other is None:
-            return True
-        if self == other:
-            return False
-        return self >= other
 
     @new_context_helper
     def new_context(self, changes: Dict[Factor, Factor]) -> "Allegation":
@@ -1436,13 +1417,6 @@ class Exhibit(Factor):
         context_registers = iter(self.context_register(other, operator.ge))
         return any(register is not None for register in context_registers)
 
-    def __gt__(self, other: Optional[Factor]) -> bool:
-        if other is None:
-            return True
-        if self == other:
-            return False
-        return self >= other
-
     @new_context_helper
     def new_context(self, changes: Dict[Factor, Factor]) -> "Exhibit":
         """
@@ -1515,9 +1489,6 @@ class Evidence(Factor):
 
         context_registers = iter(self.context_register(other, operator.eq))
         return any(register is not None for register in context_registers)
-
-    def __gt__(self, other: Factor) -> bool:
-        return self >= other and self != other
 
     @property
     def context_factors(self) -> Tuple[Optional[Exhibit], Optional[Fact]]:
