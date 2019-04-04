@@ -85,10 +85,10 @@ class TestProcedures:
         c1_again = make_procedure["c1_again"]
         assert f["f1"] in c1.inputs
         assert f["f1"] in c1_again.inputs
-        assert f["f1"].entity_context == (watt_mentioned[0],)
+        assert f["f1"].context_factors == (watt_mentioned[0],)
         assert f["f2"] in c1.inputs
         assert f["f2"] in c1_again.inputs
-        assert f["f2"].entity_context == (watt_mentioned[1], watt_mentioned[0])
+        assert f["f2"].context_factors == (watt_mentioned[1], watt_mentioned[0])
 
     # Equality
 
@@ -772,4 +772,4 @@ class TestRules:
 
     def test_holding_len(self, make_holding):
         assert len(make_holding["h1"]) == 2
-        assert len(make_holding["h3"]) == 4
+        assert len(make_holding["h3"]) == 5

@@ -11,14 +11,14 @@ from authorityspoke.factors import ureg, Q_
 
 
 class TestFacts:
-    def test_default_entity_context_for_fact(
+    def test_default_context_factors_for_fact(
         self, make_entity, make_predicate, watt_mentioned
     ):
         e = make_entity
         f2 = Fact(make_predicate["p1"], case_factors=watt_mentioned)
-        assert f2.entity_context == (e["motel"],)
+        assert f2.context_factors == (e["motel"],)
 
-    def test_entity_context_from_case_factor_indices(
+    def test_context_factors_from_case_factor_indices(
         self, make_entity, make_predicate, watt_mentioned
     ):
         """
@@ -32,9 +32,9 @@ class TestFacts:
         e = make_entity
 
         f2 = Fact(
-            make_predicate["p2"], entity_context=(1, 0), case_factors=watt_mentioned
+            make_predicate["p2"], context_factors=(1, 0), case_factors=watt_mentioned
         )
-        assert f2.entity_context == (e["watt"], e["motel"])
+        assert f2.context_factors == (e["watt"], e["motel"])
 
     def test_mix_of_factors_and_indices_in_init(
         self, make_entity, make_predicate, watt_mentioned
@@ -42,31 +42,31 @@ class TestFacts:
         e = make_entity
         f2 = Fact(
             make_predicate["p2"],
-            entity_context=(1, e["trees"]),
+            context_factors=(1, e["trees"]),
             case_factors=watt_mentioned,
         )
-        assert f2.entity_context == (e["watt"], e["trees"])
+        assert f2.context_factors == (e["watt"], e["trees"])
 
-    def test_wrong_type_in_entity_context_in_init(
+    def test_wrong_type_in_context_factors_in_init(
         self, make_entity, make_predicate, watt_mentioned
     ):
         e = make_entity
         with pytest.raises(TypeError):
             f2 = Fact(
                 make_predicate["p2"],
-                entity_context=(1, "nonsense"),
+                context_factors=(1, "nonsense"),
                 case_factors=watt_mentioned,
             )
 
     def test_invalid_index_for_case_factors_in_init(self, make_predicate, make_entity):
         with pytest.raises(ValueError):
             _ = Fact(
-                make_predicate["p1"], entity_context=2, case_factors=make_entity["watt"]
+                make_predicate["p1"], context_factors=2, case_factors=make_entity["watt"]
             )
 
-    def test_convert_int_entity_context_to_tuple(self, make_predicate, watt_mentioned):
+    def test_convert_int_context_factors_to_tuple(self, make_predicate, watt_mentioned):
         f = Fact(make_predicate["p_irrelevant_1"], 3, case_factors=watt_mentioned)
-        assert f.entity_context == (watt_mentioned[3],)
+        assert f.context_factors == (watt_mentioned[3],)
 
     def test_string_representation_of_factor(self, watt_factor):
         assert "<Hideaway Lodge> was a motel" in str(watt_factor["f1"])
@@ -111,7 +111,7 @@ class TestFacts:
     def test_concrete_to_abstract(self, make_entity, make_predicate):
         motel = make_entity["motel_specific"]
         d = make_entity["watt"]
-        fact = Fact(predicate=make_predicate["p2"], entity_context=(d, motel))
+        fact = Fact(predicate=make_predicate["p2"], context_factors=(d, motel))
         assert "<Wattenburg> operated and lived at Hideaway Lodge" in str(fact)
         assert "<Wattenburg> operated and lived at Hideaway Lodge>" in str(
             fact.make_generic()
@@ -121,8 +121,8 @@ class TestFacts:
         assert len(watt_factor["f1"].predicate) == 1
         assert len(watt_factor["f1"]) == 1
 
-    def test_entity_context_reciprocal(self, make_entity, watt_factor):
-        """Predicate.new() no longer coerces the order of self.entity_context.
+    def test_context_factors_reciprocal(self, make_entity, watt_factor):
+        """Predicate.new() no longer coerces the order of self.context_factors.
         Instead, Fact.entity_orders() returns every possible order."""
 
         motel_near_watt = watt_factor["f7_swap_entities_4"]
@@ -137,7 +137,7 @@ class TestFacts:
             == "<Hideaway Lodge> was a motel"
         )
 
-    def test_factor_entity_context_does_not_match_predicate(self, make_predicate):
+    def test_factor_context_factors_does_not_match_predicate(self, make_predicate):
         with pytest.raises(ValueError):
             _ = Fact(make_predicate["p1"], (0, 1, 2))
 
@@ -304,7 +304,7 @@ class TestFacts:
 
     def test_copies_of_identical_factor(self, make_factor):
         """
-        Even if the two factors have different entity markers in self.entity_context,
+        Even if the two factors have different entity markers in self.context_factors,
         I expect them to evaluate equal because the choice of entity markers is
         arbitrary.
         """

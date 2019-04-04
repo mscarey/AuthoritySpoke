@@ -78,7 +78,7 @@ class TestFactorImport:
         holdings = Rule.from_json("holding_watt.json")
         new_fact = holdings[0].inputs[1]
         assert "lived at <Hideaway Lodge>" in str(new_fact)
-        assert isinstance(new_fact.entity_context[0], Entity)
+        assert isinstance(new_fact.context_factors[0], Entity)
 
     def test_fact_with_quantity(self):
         holdings = Rule.from_json("holding_watt.json")

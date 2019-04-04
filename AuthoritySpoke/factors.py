@@ -660,10 +660,8 @@ class Fact(Factor):
     """An assertion accepted as factual by a court, often through factfinding by
     a judge or jury."""
 
-    # TODO: rename entity_context
-
     predicate: Optional[Predicate] = None
-    entity_context: Tuple[Factor, ...] = ()
+    context_factors: Tuple[Factor, ...] = ()
     name: Optional[str] = None
     standard_of_proof: Optional[str] = None
     absent: bool = False
@@ -676,25 +674,25 @@ class Fact(Factor):
             raise ValueError(
                 f"standard of proof must be one of {STANDARDS_OF_PROOF.keys()} or None."
             )
-        entity_context = self.entity_context
+        context_factors = self.context_factors
         case_factors = self.case_factors
         object.__delattr__(self, "case_factors")
 
-        if not entity_context:
-            entity_context = range(len(self.predicate))
+        if not context_factors:
+            context_factors = range(len(self.predicate))
         case_factors = self.__class__.wrap_with_tuple(case_factors)
-        entity_context = self.__class__.wrap_with_tuple(entity_context)
+        context_factors = self.__class__.wrap_with_tuple(context_factors)
 
-        if len(entity_context) != len(self.predicate):
+        if len(context_factors) != len(self.predicate):
             raise ValueError(
-                "The number of items in 'entity_context' must be "
+                "The number of items in 'context_factors' must be "
                 + f"{len(self.predicate)}, to match predicate.context_slots"
             )
         if any(
-            not isinstance(s, Factor) and not isinstance(s, int) for s in entity_context
+            not isinstance(s, Factor) and not isinstance(s, int) for s in context_factors
         ):
             raise TypeError(
-                "Items in the entity_context parameter should "
+                "Items in the context_factors parameter should "
                 + "be Factor or a subclass of Factor, or should be integer "
                 + "indices of Factor objects in the case_factors parameter."
             )
@@ -713,14 +711,14 @@ class Fact(Factor):
                     )
             return factor_or_index
 
-        if any(isinstance(s, int) for s in entity_context):
-            entity_context = tuple(
-                get_factor_by_index(i, case_factors) for i in entity_context
+        if any(isinstance(s, int) for s in context_factors):
+            context_factors = tuple(
+                get_factor_by_index(i, case_factors) for i in context_factors
             )
-        object.__setattr__(self, "entity_context", entity_context)
+        object.__setattr__(self, "context_factors", context_factors)
 
     def __str__(self):
-        predicate = str(self.predicate.content_with_entities(self.entity_context))
+        predicate = str(self.predicate.content_with_entities(self.context_factors))
         standard = (
             f"by the standard {self.standard_of_proof}, "
             if self.standard_of_proof
@@ -733,21 +731,6 @@ class Fact(Factor):
         if self.generic:
             return f"<{string}>"
         return string
-
-    @property
-    def context_factors(self) -> Tuple[Factor, ...]:
-        """
-        This function and interchangeable_factors should be the only parts
-        of the context-matching process that need to be unique for each
-        subclass of Factor. It specifies what attributes of self and other
-        to look in to find Factor objects to match.
-
-        For Fact, it returns the entity_context, which can't contain None.
-        Other classes should need the annotation Tuple[Optional[Factor], ...]
-        instead.
-        """
-
-        return self.entity_context
 
     @property
     def interchangeable_factors(self) -> List[Dict[Factor, Factor]]:
@@ -766,8 +749,8 @@ class Fact(Factor):
         if self.predicate and self.predicate.reciprocal:
             return [
                 {
-                    self.entity_context[1]: self.entity_context[0],
-                    self.entity_context[0]: self.entity_context[1],
+                    self.context_factors[1]: self.context_factors[0],
+                    self.context_factors[0]: self.context_factors[1],
                 }
             ]
         return []
@@ -797,7 +780,7 @@ class Fact(Factor):
 
         return Fact(
             predicate=self.predicate,
-            entity_context=self.entity_context,
+            context_factors=self.context_factors,
             standard_of_proof=self.standard_of_proof,
             absent=self.absent,
             generic=True,
@@ -813,7 +796,7 @@ class Fact(Factor):
             return {self: None}
         return {
             generic: None
-            for factor in self.entity_context
+            for factor in self.context_factors
             for generic in factor.generic_factors
         }
 
@@ -829,7 +812,7 @@ class Fact(Factor):
         )
 
     def __len__(self):
-        return len(self.entity_context)
+        return len(self.context_factors)
 
     def __gt__(self, other: Optional[Factor]) -> bool:
         """Indicates whether self implies other, taking into account the implication
@@ -991,12 +974,12 @@ class Fact(Factor):
         """
         Creates new Fact object, replacing keys of "changes" with their values.
         """
-        new_entity_context = [
-            factor.new_context(changes) for factor in self.entity_context
+        new_context_factors = [
+            factor.new_context(changes) for factor in self.context_factors
         ]
         return Fact(
             self.predicate,
-            tuple(new_entity_context),
+            tuple(new_context_factors),
             self.name,
             self.standard_of_proof,
             self.absent,
@@ -1100,7 +1083,7 @@ class Pleading(Factor):
         subclass of Factor. It specifies what attributes of self and other
         to look in to find Factor objects to match.
 
-        For Fact, it returns the entity_context, which can't contain None.
+        For Fact, it returns the context_factors, which can't contain None.
         Other classes should need the annotation Tuple[Optional[Factor], ...]
         instead.
         """
@@ -1254,7 +1237,7 @@ class Allegation(Factor):
         subclass of Factor. It specifies what attributes of self and other
         to look in to find Factor objects to match.
 
-        For Fact, it returns the entity_context, which can't contain None.
+        For Fact, it returns the context_factors, which can't contain None.
         Other classes should need the annotation Tuple[Optional[Factor], ...]
         instead.
         """
@@ -1417,7 +1400,7 @@ class Exhibit(Factor):
         subclass of Factor. It specifies what attributes of self and other
         to look in to find Factor objects to match.
 
-        For Fact, it returns the entity_context, which can't contain None.
+        For Fact, it returns the context_factors, which can't contain None.
         Other classes should need the annotation Tuple[Optional[Factor], ...]
         instead.
         """
@@ -1616,7 +1599,7 @@ class Evidence(Factor):
         subclass of Factor. It specifies what attributes of self and other
         to look in to find Factor objects to match.
 
-        For Fact, it returns the entity_context, which can't contain None.
+        For Fact, it returns the context_factors, which can't contain None.
         Other classes should need the annotation Tuple[Optional[Factor], ...]
         instead.
         """

@@ -205,21 +205,10 @@ class Procedure(Factor):
 
     def __len__(self):
         """
-        Returns the number of entities that need to be specified for the procedure.
-        Works by flattening a series of "markers" fields from the Context objects.
+        Returns the number of context factors that need to be specified for the procedure.
         """
 
-        return len(
-            set(
-                marker
-                for markertuple in (
-                    factor.entity_context
-                    for factor in self.factors_all()
-                    if hasattr(factor, "entity_context")
-                )
-                for marker in markertuple
-            )
-        )
+        return len(self.generic_factors)
 
     def __repr__(self):
         return (

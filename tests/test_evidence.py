@@ -123,13 +123,13 @@ class TestEvidence:
 
     def test_get_entity_orders(self, make_evidence):
         # TODO: check this after making Evidence.__str__ method
-        context = make_evidence["no_shooting"].exhibit.statement.entity_context
+        context = make_evidence["no_shooting"].exhibit.statement.context_factors
         assert "Alice" in str(context[0])
         assert "Bob" in str(context[1])
 
     def test_get_entity_orders_no_statement(self, make_factor):
         e = Evidence(Exhibit(form="testimony"), to_effect=make_factor["f_no_crime"])
-        assert len(e.to_effect.entity_context) == 1
+        assert len(e.to_effect.context_factors) == 1
 
     def test_evidence_str(self, make_evidence):
         assert str(make_evidence["reciprocal"]).lower().startswith("testimony by")
