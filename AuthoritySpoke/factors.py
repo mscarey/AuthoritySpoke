@@ -68,20 +68,29 @@ class Factor:
         return answer
 
     @classmethod
+    def _build_from_dict(cls, factor_dict: Dict, mentioned: List[Union["Factor"]]) -> "Factor":
+        example = cls()
+        new_factor_dict = example.__dict__
+        for attr in new_factor_dict:
+            if attr in example.context_factor_names:
+                value, mentioned = Factor.from_dict(factor_dict.get(attr), mentioned)
+            else:
+                value = factor_dict.get(attr)
+            if value is not None:
+                new_factor_dict[attr] = value
+        return (cls(**new_factor_dict), mentioned)
+
+    @classmethod
     @log_mentioned_context
     def from_dict(
         cls, factor_record: Dict, mentioned: List["Factor"]
     ) -> Optional["Factor"]:
         """
         Turns a dict recently created from a chunk of JSON into a Factor object.
-
-        TODO: make log_mentioned_context work properly when from_dict() is called
-        directly from a subclass.
         """
         cname = factor_record["type"]
         target_class = cls.class_from_str(cname)
-        factor = target_class._build_from_dict(factor_record, mentioned)
-        return factor
+        return target_class._build_from_dict(factor_record, mentioned)
 
     @property
     def generic_factors(self) -> Dict["Factor", None]:
@@ -211,6 +220,11 @@ class Factor:
 
     @property
     def context_factors(self) -> Tuple:
+
+        return tuple(self.__dict__.get(factor_name) for factor_name in self.context_factor_names)
+
+    @property
+    def context_factor_names(self) -> Tuple[str, ...]:
         """
         This function and interchangeable_factors should be the only parts
         of the context-matching process that need to be unique for each
@@ -1005,12 +1019,7 @@ class Fact(Factor):
                 k[0] for k in sorted(context_with_indices, key=lambda k: k[1])
             ]
             return content, context_factors
-
-        if fact_dict.get("type") and fact_dict["type"].lower() != "fact":
-            raise ValueError(
-                f'"type" value in input must be "fact", not {fact_dict["type"]}'
-            )
-
+        # TODO: inherit the later part of this function from Factor
         comparison = None
         quantity = None
         content = fact_dict.get("content")
@@ -1099,15 +1108,6 @@ class Entity(Factor):
             return f"<{self.name}>"
         return self.name
 
-    @classmethod
-    def _build_from_dict(cls, entity_dict, mentioned):
-        factor = cls(
-            name=entity_dict.get("name"),
-            generic=entity_dict.get("generic", True),
-            plural=entity_dict.get("plural", False),
-        )
-        return factor, mentioned
-
     def context_register(
         self, other: Factor, comparison
     ) -> Optional[Dict[Factor, Factor]]:
@@ -1151,26 +1151,8 @@ class Pleading(Factor):
     generic: bool = False
 
     @property
-    def context_factors(self) -> Tuple[Optional[Entity]]:
+    def context_factor_names(self) -> Tuple[Optional[Entity]]:
         return (self.filer,)
-
-    @classmethod
-    def _build_from_dict(cls, factor_dict: Dict, mentioned: List[Union[Factor]]) -> "Pleading":
-        if factor_dict.get("type").capitalize() != cls.__name__:
-            raise ValueError(
-                f'"type" value in input must be "{cls.__name__}", not {factor_dict.get("type")}'
-            )
-        filer, mentioned = Factor.from_dict(factor_dict.get("filer"), mentioned)
-        return (
-            cls(
-                filer=filer,
-                date=factor_dict.get("date"),
-                name=factor_dict.get("name"),
-                absent=factor_dict.get("absent"),
-                generic=factor_dict.get("generic"),
-            ),
-            mentioned,
-        )
 
     def equal_if_concrete(self, other: "Pleading") -> bool:
         if self.date != other.date:
@@ -1226,29 +1208,8 @@ class Allegation(Factor):
     generic: bool = False
 
     @property
-    def context_factors(self) -> Tuple[Optional[Fact], Optional[Pleading]]:
-        return (self.to_effect, self.pleading)
-
-    @classmethod
-    def _build_from_dict(
-        cls, factor_dict: Dict, mentioned: List[Union[Factor]]
-    ) -> "Allegation":
-        if factor_dict.get("type").lower() != "allegation":
-            raise ValueError(
-                f'"type" value in input must be "allegation", not {factor_dict.get("type")}'
-            )
-        to_effect, mentioned = Factor.from_dict(factor_dict.get("to_effect"), mentioned)
-        pleading, mentioned = Factor.from_dict(factor_dict.get("pleading"), mentioned)
-        return (
-            cls(
-                to_effect=to_effect,
-                pleading=pleading,
-                name=factor_dict.get("name"),
-                absent=factor_dict.get("absent"),
-                generic=factor_dict.get("generic"),
-            ),
-            mentioned,
-        )
+    def context_factor_names(self) -> Tuple[str, ...]:
+        return ("to_effect", "pleading")
 
     def __eq__(self, other: Factor) -> bool:
         """
@@ -1302,30 +1263,8 @@ class Exhibit(Factor):
     generic: bool = False
 
     @property
-    def context_factors(self) -> Tuple[Optional[Fact], Optional[Entity]]:
-        return (self.statement, self.stated_by)
-
-    @classmethod
-    def _build_from_dict(
-        cls, factor_dict: Dict, mentioned: List[Union[Factor, Enactment]]
-    ) -> "Exhibit":
-        if factor_dict.get("type").lower() != "exhibit":
-            raise ValueError(
-                f'"type" value in input must be "exhibit", not {factor_dict.get("type")}'
-            )
-        statement, mentioned = Factor.from_dict(factor_dict.get("statement"), mentioned)
-        stated_by, mentioned = Factor.from_dict(factor_dict.get("stated_by"), mentioned)
-        return (
-            cls(
-                form=factor_dict.get("form"),
-                statement=statement,
-                stated_by=stated_by,
-                name=factor_dict.get("name"),
-                absent=factor_dict.get("absent"),
-                generic=factor_dict.get("generic"),
-            ),
-            mentioned,
-        )
+    def context_factor_names(self) -> Tuple[str, ...]:
+        return ("statement", "stated_by")
 
     def equal_if_concrete(self, other: "Pleading") -> bool:
         if self.form != other.form:
@@ -1399,8 +1338,8 @@ class Evidence(Factor):
         return super().__eq__(other)
 
     @property
-    def context_factors(self) -> Tuple[Optional[Exhibit], Optional[Fact]]:
-        return (self.exhibit, self.to_effect)
+    def context_factor_names(self) -> Tuple[str, ...]:
+        return ("exhibit", "to_effect")
 
     @new_context_helper
     def new_context(self, changes: Dict[Factor, Factor]) -> "Evidence":
@@ -1416,37 +1355,6 @@ class Evidence(Factor):
             absent=self.absent,
             generic=self.generic,
         )
-
-    @classmethod
-    def _build_from_dict(
-        cls, factor_dict: Dict, mentioned: List[Factor]
-    ) -> Tuple["Evidence", List[Factor]]:
-        if factor_dict["type"].lower() != "evidence":
-            raise ValueError(
-                f'"type" value in input must be "evidence", not {factor_dict["type"]}'
-            )
-        if factor_dict.get("exhibit"):
-            exhibit, mentioned = Factor.from_dict(factor_dict.get("exhibit"), mentioned)
-        else:
-            exhibit = None
-        if factor_dict.get("to_effect"):
-            to_effect, mentioned = Factor.from_dict(
-                factor_dict.get("to_effect"), mentioned
-            )
-        else:
-            to_effect = None
-
-        return (
-            Evidence(
-                exhibit=exhibit,
-                to_effect=to_effect,
-                name=factor_dict.get("name"),
-                absent=factor_dict.get("absent"),
-                generic=factor_dict.get("generic"),
-            ),
-            mentioned,
-        )
-
 
 def compare_dict_for_identical_entries(
     left: Dict[Factor, Factor], right: Dict[Factor, Factor]
