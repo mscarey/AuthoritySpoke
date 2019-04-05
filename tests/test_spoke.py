@@ -84,6 +84,16 @@ class TestEntities:
     def test_implication_superclass(self, make_entity):
         assert not make_entity["trees"] >= make_entity["tree_search"]
 
+    # Contradiction
+
+    def test_error_contradiction_with_non_factor(self, make_entity, make_predicate):
+        with pytest.raises(TypeError):
+            assert make_entity["trees"].contradicts(make_predicate["p3"])
+
+    def test_no_contradiction_of_other_factor(self, make_entity, watt_factor):
+        assert not make_entity["trees"].contradicts(make_entity["watt"])
+        assert not make_entity["trees"].contradicts(watt_factor["f1"])
+
 
 class TestPredicates:
     def test_predicate_with_wrong_number_of_entities(self):
