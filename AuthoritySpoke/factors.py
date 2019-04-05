@@ -1180,9 +1180,6 @@ class Pleading(Factor):
     def __eq__(self, other: Factor) -> bool:
         return super.__eq__(other)
 
-    def contradicts(self, other: Factor):
-        return self >= other.make_absent()
-
     def implies_if_concrete(self, other: "Pleading"):
 
         if self.date != other.date:
@@ -1258,9 +1255,6 @@ class Allegation(Factor):
         dataclass behaves confusingly if this isn't included.
         """
         return super().__eq__(other)
-
-    def contradicts(self, other: Factor):
-        return self >= other.make_absent()
 
     @new_context_helper
     def new_context(self, changes: Dict[Factor, Factor]) -> "Allegation":
@@ -1341,9 +1335,6 @@ class Exhibit(Factor):
     def __eq__(self, other: Factor) -> bool:
         return super().__eq__(other)
 
-    def contradicts(self, other: Factor):
-        return self >= other.make_absent()
-
     def implies_if_concrete(self, other: "Exhibit"):
 
         if not (self.form == other.form or other.form is None):
@@ -1410,25 +1401,6 @@ class Evidence(Factor):
     @property
     def context_factors(self) -> Tuple[Optional[Exhibit], Optional[Fact]]:
         return (self.exhibit, self.to_effect)
-
-    def contradicts(self, other: Optional[Factor]) -> bool:
-
-        if other is None:
-            return False
-
-        if not isinstance(other, Factor):
-            raise TypeError(
-                f"'Contradicts' not supported between instances of "
-                + f"'{self.__class__.__name__}' and '{other.__class__.__name__}'."
-            )
-
-        if not isinstance(other, self.__class__):
-            return False
-
-        if self >= other.make_absent():
-            return True
-
-        return other > self.make_absent()
 
     @new_context_helper
     def new_context(self, changes: Dict[Factor, Factor]) -> "Evidence":
