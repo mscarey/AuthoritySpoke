@@ -224,6 +224,10 @@ class TestPredicates:
     def test_no_contradiction_of_none(self, make_predicate):
         assert not make_predicate["p7_true"].contradicts(None)
 
+    def test_contradiction_with_quantity(self, make_predicate):
+        assert make_predicate["p8_less"].contradicts(make_predicate["p8_meters"])
+
+
 class TestCodes:
     def test_making_code(self, make_code):
         const = make_code["const"]

@@ -390,6 +390,9 @@ def make_exhibit(
         "reciprocal_testimony_absent": Exhibit(
             form="testimony", statement=w["f8"], stated_by=e["craig"], absent=True
         ),
+        "reciprocal_testimony_less": Exhibit(
+            form="testimony", statement=w["f8_less"], stated_by=e["craig"]
+        ),
         "reciprocal_testimony_specific": Exhibit(
             form="testimony", statement=w["f8_meters"], stated_by=e["craig"]
         ),

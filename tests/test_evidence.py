@@ -103,6 +103,10 @@ class TestExhibits:
         assert make_exhibit["reciprocal_testimony_absent"].contradicts(make_exhibit["reciprocal_testimony_specific"])
         assert make_exhibit["reciprocal_testimony_specific"].contradicts(make_exhibit["reciprocal_testimony_absent"])
 
+    def test_no_contradiction_with_factor_subclass(self, make_exhibit, watt_factor):
+        assert not make_exhibit["shooting_testimony"].contradicts(watt_factor["f4"])
+        assert not watt_factor["f4"].contradicts(make_exhibit["shooting_testimony"])
+
 class TestEvidence:
     def test_make_evidence_object(self, watt_factor):
         e = Evidence(Exhibit(form="testimony"), to_effect=watt_factor["f2"])
