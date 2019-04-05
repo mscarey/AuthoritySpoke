@@ -74,6 +74,9 @@ class TestEntities:
         assert make_entity["motel_specific"] > make_entity["motel"]
         assert not make_entity["motel_specific"] < make_entity["motel"]
 
+    def test_same_entity_not_ge(self, make_entity):
+        assert not make_entity["motel"] > make_entity["motel"]
+
     def test_implication_subclass(self, make_entity):
         assert make_entity["tree_search_specific"] >= make_entity["motel"]
         assert make_entity["tree_search"] > make_entity["motel"]

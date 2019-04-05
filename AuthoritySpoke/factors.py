@@ -80,7 +80,7 @@ class Factor:
         """
         cname = factor_record["type"]
         target_class = cls.class_from_str(cname)
-        factor = target_class.from_dict(factor_record, mentioned)
+        factor = target_class._build_from_dict(factor_record, mentioned)
         return factor
 
     @property
@@ -968,7 +968,7 @@ class Fact(Factor):
         return self.contradicts_if_present(other)
 
     @classmethod
-    def from_dict(
+    def _build_from_dict(
         cls, fact_dict: Dict[str, Union[str, bool]], mentioned: List[Factor]
     ) -> Tuple[Optional["Fact"], List[Factor]]:
         """Constructs and returns a Fact object from a dict imported from
@@ -1100,11 +1100,11 @@ class Entity(Factor):
         return self.name
 
     @classmethod
-    def from_dict(cls, entity_dict, mentioned):
+    def _build_from_dict(cls, entity_dict, mentioned):
         factor = cls(
             name=entity_dict.get("name"),
             generic=entity_dict.get("generic", True),
-            plural=entity_dict.get("generic", False),
+            plural=entity_dict.get("plural", False),
         )
         return factor, mentioned
 
@@ -1155,7 +1155,7 @@ class Pleading(Factor):
         return (self.filer,)
 
     @classmethod
-    def from_dict(cls, factor_dict: Dict, mentioned: List[Union[Factor]]) -> "Pleading":
+    def _build_from_dict(cls, factor_dict: Dict, mentioned: List[Union[Factor]]) -> "Pleading":
         if factor_dict.get("type").capitalize() != cls.__name__:
             raise ValueError(
                 f'"type" value in input must be "{cls.__name__}", not {factor_dict.get("type")}'
@@ -1230,7 +1230,7 @@ class Allegation(Factor):
         return (self.to_effect, self.pleading)
 
     @classmethod
-    def from_dict(
+    def _build_from_dict(
         cls, factor_dict: Dict, mentioned: List[Union[Factor]]
     ) -> "Allegation":
         if factor_dict.get("type").lower() != "allegation":
@@ -1306,7 +1306,7 @@ class Exhibit(Factor):
         return (self.statement, self.stated_by)
 
     @classmethod
-    def from_dict(
+    def _build_from_dict(
         cls, factor_dict: Dict, mentioned: List[Union[Factor, Enactment]]
     ) -> "Exhibit":
         if factor_dict.get("type").lower() != "exhibit":
@@ -1418,7 +1418,7 @@ class Evidence(Factor):
         )
 
     @classmethod
-    def from_dict(
+    def _build_from_dict(
         cls, factor_dict: Dict, mentioned: List[Factor]
     ) -> Tuple["Evidence", List[Factor]]:
         if factor_dict["type"].lower() != "evidence":
