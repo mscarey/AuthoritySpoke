@@ -112,25 +112,30 @@ class Factor:
             return bool(self.implies_if_concrete(other))
         return False
 
-    def implies_if_concrete(self, other: "Factor"):
+    def any_context_register(self, other: "Factor", comparison: Callable) -> bool:
+        """
+        Returns a bool indicating whether there's at least one way to
+        match the generic context factors of self and other, such that they
+        fit the relationship "comparison".
+        """
+
+        context_registers = iter(self.context_register(other, operator.ge))
+        return any(register is not None for register in context_registers)
+
+    def implies_if_concrete(self, other: "Factor") -> bool:
         """
         Determines whether self would imply other, under the assumptions
         that neither self nor other has the attribute absent, neither
         has the attribute generic, and other is an instance of self's class.
         """
 
-        if len(other.context_factors) < len(self.context_factors):
-            return False
-
         for i, self_factor in enumerate(self.context_factors):
             if other.context_factors[i]:
                 if not (self_factor and self_factor >= other.context_factors[i]):
                     return False
+        return self.any_context_register(other, operator.ge)
 
-        context_registers = iter(self.context_register(other, operator.ge))
-        return any(register is not None for register in context_registers)
-
-    def equal_if_concrete(self, other: 'Factor') -> bool:
+    def equal_if_concrete(self, other: "Factor") -> bool:
         """
         Determines whether self would imply other, under the assumptions
         that neither self nor other has the attribute absent, neither
@@ -142,8 +147,7 @@ class Factor:
             if self_factor != other.context_factors[i]:
                 return False
 
-        context_registers = iter(self.context_register(other, operator.eq))
-        return any(register is not None for register in context_registers)
+        return self.any_context_register(other, operator.eq)
 
     def __eq__(self, other) -> bool:
         if self.__class__ != other.__class__:
@@ -159,6 +163,22 @@ class Factor:
             return False
 
         return self.equal_if_concrete(other)
+
+    def contradicts_if_factor(self, other: "Factor") -> bool:
+        return self >= other.make_absent()
+
+    def contradicts(self, other: Optional["Factor"]) -> bool:
+        """Returns True if self and other can't both be true at the same time.
+        Otherwise returns False."""
+
+        if other is None:
+            return False
+        if not isinstance(other, Factor):
+            raise TypeError(
+                f"{self.__class__} objects may only be compared for "
+                + "contradiction with other Factor objects or None."
+            )
+        return self.contradicts_if_factor(other)
 
     def __ge__(self, other: "Factor") -> bool:
         if other is None:
@@ -185,7 +205,8 @@ class Factor:
         opposite value for 'absent'"""
 
         new_attrs = self.__dict__.copy()
-        new_attrs["absent"] = not new_attrs["absent"]
+        if new_attrs.get("absent") is not None:
+            new_attrs["absent"] = not new_attrs["absent"]
         return self.__class__(**new_attrs)
 
     @property
@@ -747,14 +768,6 @@ class Predicate:
         )
 
 
-STANDARDS_OF_PROOF = {
-    "scintilla of evidence": 1,
-    "preponderance of evidence": 2,
-    "clear and convincing": 3,
-    "beyond reasonable doubt": 4,
-}
-
-
 @dataclass(frozen=True)
 class Fact(Factor):
     """An assertion accepted as factual by a court, often through factfinding by
@@ -770,9 +783,12 @@ class Fact(Factor):
 
     def __post_init__(self):
 
-        if self.standard_of_proof and self.standard_of_proof not in STANDARDS_OF_PROOF:
+        if (
+            self.standard_of_proof
+            and self.standard_of_proof not in self.standards_of_proof()
+        ):
             raise ValueError(
-                f"standard of proof must be one of {STANDARDS_OF_PROOF.keys()} or None."
+                f"standard of proof must be one of {self.standards_of_proof()} or None."
             )
         context_factors = self.context_factors
         case_factors = self.case_factors
@@ -832,6 +848,24 @@ class Fact(Factor):
         if self.generic:
             return f"<{string}>"
         return string
+
+    @classmethod
+    def standards_of_proof(cls) -> Tuple[str, ...]:
+        """
+        Returns a tuple with every allowable name for a standard of proof,
+        in order from weakest to strongest.
+
+        If any courts anywhere disagree about the relative strength of
+        these standards of proof, or if any court considers the order
+        context-specific, this representation will have to change.
+        """
+        return (
+            "scintilla of evidence",
+            "substantial evidence",
+            "preponderance of evidence",
+            "clear and convincing",
+            "beyond reasonable doubt",
+        )
 
     @property
     def interchangeable_factors(self) -> List[Dict[Factor, Factor]]:
@@ -900,50 +934,38 @@ class Fact(Factor):
         if bool(self.standard_of_proof) != bool(other.standard_of_proof):
             return False
 
-        if (
+        if self.standard_of_proof and self.standards_of_proof().index(
             self.standard_of_proof
-            and STANDARDS_OF_PROOF[self.standard_of_proof]
-            < STANDARDS_OF_PROOF[other.standard_of_proof]
-        ):
+        ) < self.standards_of_proof().index(other.standard_of_proof):
             return False
 
         if not self.predicate >= other.predicate:
             return False
         return super().implies_if_concrete(other)
 
-    def contradicts(self, other: Optional[Factor]) -> bool:
-        """Returns True if self and other can't both be true at the same time.
-        Otherwise returns False."""
+    def contradicts_if_present(self, other: "Fact") -> bool:
+        """
+        Indicates whether self contradicts the Fact other under the assumption that
+        self.absent == False.
+        """
+        if (self.predicate.contradicts(other.predicate) and not other.absent) or (
+            self.predicate >= other.predicate and other.absent
+        ):
+            return self.any_context_register(other, operator.ge)
+        return False
 
-        if other is None:
-            return False
-        if not isinstance(other, Factor):
-            raise TypeError(
-                f"{self.__class__} objects may only be compared for "
-                + "contradiction with other Factor objects or None."
-            )
+    def contradicts_if_factor(self, other: Factor) -> bool:
+        """
+        Returns True if self and other can't both be true at the same time.
+        Otherwise returns False.
+        """
 
         if not isinstance(other, self.__class__):
             return False
 
-        self_implies_other = iter(self.context_register(other, operator.ge))
-        if any(register is not None for register in self_implies_other):
-            if self.predicate.contradicts(other.predicate) and not (
-                self.absent | other.absent
-            ):
-                return True
-            if self.predicate >= other.predicate and other.absent and not self.absent:
-                return True
-
-        other_implies_self = iter(self.context_register(other, operator.le))
-        if any(register is not None for register in other_implies_self):
-            if self.predicate.contradicts(other.predicate) and not (
-                self.absent | other.absent
-            ):
-                return True
-            if other.predicate >= self.predicate and self.absent and not other.absent:
-                return True
-        return False
+        if self.absent:
+            return other.contradicts_if_present(self)
+        return self.contradicts_if_present(other)
 
     @classmethod
     def from_dict(
@@ -1150,7 +1172,7 @@ class Pleading(Factor):
             mentioned,
         )
 
-    def equal_if_concrete(self, other: 'Pleading') -> bool:
+    def equal_if_concrete(self, other: "Pleading") -> bool:
         if self.date != other.date:
             return False
         return super().equal_if_concrete(other)
@@ -1311,7 +1333,7 @@ class Exhibit(Factor):
             mentioned,
         )
 
-    def equal_if_concrete(self, other: 'Pleading') -> bool:
+    def equal_if_concrete(self, other: "Pleading") -> bool:
         if self.form != other.form:
             return False
         return super().equal_if_concrete(other)

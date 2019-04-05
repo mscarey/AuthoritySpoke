@@ -372,6 +372,10 @@ class TestFacts:
         assert watt_factor["f2"] > watt_factor["f2_no_truth"]
         assert not watt_factor["f2_no_truth"] > watt_factor["f2"]
 
+    def test_implication_standard_of_proof(self, make_factor):
+        assert not make_factor["f_shooting_craig_poe"] > make_factor["f_shooting_craig_brd"]
+        assert make_factor["f_shooting_craig_brd"] > make_factor["f_shooting_craig_poe"]
+
     def test_factor_implies_because_of_exact_quantity(self, watt_factor):
         assert watt_factor["f8_exact"] > watt_factor["f7"]
         assert watt_factor["f8_exact"] >= watt_factor["f8"]

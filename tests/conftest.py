@@ -10,6 +10,7 @@ from authorityspoke.factors import Fact
 from authorityspoke.opinions import Opinion
 from authorityspoke.rules import Procedure, ProceduralRule
 
+
 @pytest.fixture(scope="class")
 def make_entity() -> Dict[str, Entity]:
     return {
@@ -280,12 +281,8 @@ def make_factor(make_predicate, make_entity) -> Dict[str, Factor]:
         "f_irrelevant_1": Fact(p["p_irrelevant_1"], (3,), case_factors=c),
         "f_irrelevant_2": Fact(p["p_irrelevant_2"], (4,), case_factors=c),
         "f_irrelevant_3": Fact(p["p_irrelevant_3"], (2, 4), case_factors=c),
-        "f_irrelevant_3_new_context": Fact(
-            p["p_irrelevant_3"], (3, 4), case_factors=c
-        ),
-        "f_irrelevant_3_context_0": Fact(
-            p["p_irrelevant_3"], (3, 0), case_factors=c
-        ),
+        "f_irrelevant_3_new_context": Fact(p["p_irrelevant_3"], (3, 4), case_factors=c),
+        "f_irrelevant_3_context_0": Fact(p["p_irrelevant_3"], (3, 0), case_factors=c),
         "f_crime": Fact(p["p_crime"], case_factors=c),
         "f_no_crime": Fact(p["p_no_crime"], case_factors=c),
         "f_no_crime_entity_order": Fact(p["p_no_crime"], (1,), case_factors=c),
@@ -296,16 +293,24 @@ def make_factor(make_predicate, make_entity) -> Dict[str, Factor]:
         "f_murder_whether": Fact(p["p_murder_whether"], case_factors=c),
         "f_shooting": Fact(p["p_shooting"], case_factors=c),
         "f_shooting_craig": Fact(p["p_shooting"], (2, 3), case_factors=c),
+        "f_shooting_craig_poe": Fact(
+            p["p_shooting"],
+            (2, 3),
+            case_factors=c,
+            standard_of_proof="preponderance of evidence",
+        ),
+        "f_shooting_craig_brd": Fact(
+            p["p_shooting"],
+            (2, 3),
+            case_factors=c,
+            standard_of_proof="beyond reasonable doubt",
+        ),
         "f_shooting_entity_order": Fact(p["p_shooting"], (1, 0), case_factors=c),
         "f_no_shooting": Fact(p["p_no_shooting"], case_factors=c),
         "f_shooting_whether": Fact(p["p_shooting_whether"], case_factors=c),
-        "f_no_shooting_entity_order": Fact(
-            p["p_no_shooting"], (1, 0), case_factors=c
-        ),
+        "f_no_shooting_entity_order": Fact(p["p_no_shooting"], (1, 0), case_factors=c),
         "f_three_entities": Fact(p["p_three_entities"], (0, 1, 2), case_factors=c),
-        "f_repeating_entity": Fact(
-            p["p_three_entities"], (0, 1, 0), case_factors=c
-        ),
+        "f_repeating_entity": Fact(p["p_three_entities"], (0, 1, 0), case_factors=c),
     }
 
 
@@ -318,9 +323,7 @@ def make_complex_fact(make_predicate, make_factor) -> Dict[str, Evidence]:
         "f_irrelevant_murder": Fact(
             p["p_irrelevant"], (f["f_shooting"], f["f_murder"])
         ),
-        "f_relevant_murder": Fact(
-            p["p_relevant"], (f["f_shooting"], f["f_murder"])
-        ),
+        "f_relevant_murder": Fact(p["p_relevant"], (f["f_shooting"], f["f_murder"])),
         "f_relevant_murder_swap_entities": Fact(
             p["p_relevant"], (f["f_shooting"], f["f_murder"])
         ),
@@ -453,7 +456,9 @@ def make_evidence(
         ),
         "reciprocal": Evidence(x["reciprocal_testimony"], to_effect=f["f_no_crime"]),
         "crime": Evidence(x["generic_exhibit"], to_effect=f["f_crime"], generic=True),
-        "crime_absent": Evidence(x["generic_exhibit"], to_effect=f["f_crime"], absent=True, generic=True),
+        "crime_absent": Evidence(
+            x["generic_exhibit"], to_effect=f["f_crime"], absent=True, generic=True
+        ),
         "generic": Evidence(x["generic_exhibit"], generic=True),
         "generic_absent": Evidence(x["generic_exhibit"], absent=True, generic=True),
     }
@@ -578,13 +583,7 @@ def make_procedure(make_evidence, make_factor, watt_factor) -> Dict[str, Procedu
                 m["f_irrelevant_3"],
                 m["f_irrelevant_3_context_0"],
             ),
-            inputs=(
-                f["f4"],
-                f["f5"],
-                f["f6"],
-                f["f7"],
-                f["f9"],
-            ),
+            inputs=(f["f4"], f["f5"], f["f6"], f["f7"], f["f9"]),
         ),
         "c2_irrelevant_despite": Procedure(
             outputs=(f["f10"],),
