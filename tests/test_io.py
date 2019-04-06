@@ -41,30 +41,26 @@ class TestEntityImport:
         assert any("Watt" in str(factor) for factor in mentioned)
 
     def test_specific_entity(self):
-        smith_dict = { "mentioned_factors": [
+        smith_dict = {
+            "mentioned_factors": [
                 {"type": "Human", "name": "Smith", "generic": False},
                 {"type": "Human", "name": "Smythe"},
             ],
-                    "holdings": [
-                        {
-                            "inputs": [{
-                            "type": "fact",
-                            "content": "Smith stole a car"
-                        }],
-                            "outputs": [{"type": "fact", "content": "Smith committed theft"}]
-                        },
-                                                {
-                            "inputs": [{
-                            "type": "fact",
-                            "content": "Smythe stole a car"
-                        }],
-                            "outputs": [{"type": "fact", "content": "Smythe committed theft"}]
-                        }
-                    ],
-                }
+            "holdings": [
+                {
+                    "inputs": [{"type": "fact", "content": "Smith stole a car"}],
+                    "outputs": [{"type": "fact", "content": "Smith committed theft"}],
+                },
+                {
+                    "inputs": [{"type": "fact", "content": "Smythe stole a car"}],
+                    "outputs": [{"type": "fact", "content": "Smythe committed theft"}],
+                },
+            ],
+        }
         holdings = Rule.collection_from_dict(smith_dict)
         assert not holdings[1] >= holdings[0]
         assert holdings[1].generic_factors != holdings[0].generic_factors
+
 
 class TestEnactmentImport:
     def test_enactment_import(self):
@@ -206,10 +202,7 @@ class TestRuleImport:
         watt.posits(context_holding)
         string = str(context_holding)
         assert "<Wattenburg> lived at <Bradley's house>" in string
-        assert (
-            "<Wattenburg> lived at <Bradley's house>"
-            in str(watt.holdings[0])
-        )
+        assert "<Wattenburg> lived at <Bradley's house>" in str(watt.holdings[0])
 
     def test_holding_with_non_generic_value(self, make_opinion, make_entity):
         """
@@ -247,19 +240,37 @@ class TestRuleImport:
         rule_dict = {
             "holdings": [
                 {
-                    "inputs": [{
-                    "type": "RidiculousFakeClassName",
-                    "content": "officers' search of the yard was a warrantless search and seizure"
-                }],
+                    "inputs": [
+                        {
+                            "type": "RidiculousFakeClassName",
+                            "content": "officers' search of the yard was a warrantless search and seizure",
+                        }
+                    ],
                     "outputs": [{"type": "fact", "content": "the dog bit the man"}],
                     "enactments": [
                         {"code": "constitution.xml", "section": "amendment-IV"}
-                    ]
+                    ],
                 }
-            ],
+            ]
         }
         with pytest.raises(ValueError):
             Rule.collection_from_dict(rule_dict)
+
+    def test_new_context_creates_equal_rule(self, make_opinion_with_holding):
+        """
+        This needs to reuse an existing function for finding a Factor
+        from a name.
+        """
+        watt = make_opinion_with_holding["watt_majority"]
+        brad = make_opinion_with_holding["brad_majority"]
+        context_pairs = {
+            "proof of Bradley's guilt": "proof of Wattenburg's guilt",
+            "Bradley": "Wattenburg",
+            "officers' search of the yard": "officers' search of the stockpile",
+            "Bradley's marijuana patch": "the stockpile of trees",
+        }
+        watt.posits(brad.holdings[0], context_pairs)
+        assert watt.holdings[-1] == brad.holdings[0]
 
 
 class TestNestedFactorImport:

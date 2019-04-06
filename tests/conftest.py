@@ -8,7 +8,7 @@ from authorityspoke.entities import Entity, Event, Human
 from authorityspoke.factors import Evidence, Exhibit
 from authorityspoke.factors import Fact
 from authorityspoke.opinions import Opinion
-from authorityspoke.rules import Procedure, ProceduralRule
+from authorityspoke.rules import Procedure, ProceduralRule, Rule
 
 
 @pytest.fixture(scope="class")
@@ -914,7 +914,6 @@ def make_holding(make_procedure, make_enactment) -> Dict[str, ProceduralRule]:
 
 @pytest.fixture(scope="class")
 def make_opinion(make_entity) -> Dict[str, Opinion]:
-    h = real_holding
     e = make_entity
 
     test_cases = ("brad", "cardenas", "watt")
@@ -922,4 +921,18 @@ def make_opinion(make_entity) -> Dict[str, Opinion]:
     for case in test_cases:
         for opinion in Opinion.from_file(f"{case}_h.json"):
             opinions[f"{case}_{opinion.position}"] = opinion
+    return opinions
+
+@pytest.fixture(scope="class")
+def make_opinion_with_holding(make_opinion, make_entity) -> Dict[str, Opinion]:
+    e = make_entity
+
+    test_cases = ("brad", "cardenas", "watt")
+    opinions = {}
+    for case in test_cases:
+        opinion = make_opinion[f"{case}_majority"]
+        holdings = Rule.from_json(f"holding_{case}.json")
+        for holding in holdings:
+            opinion.posits(holding)
+        opinions[f"{case}_majority"] = opinion
     return opinions
