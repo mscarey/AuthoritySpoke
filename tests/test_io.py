@@ -208,7 +208,7 @@ class TestRuleImport:
         assert "<Wattenburg> lived at <Bradley's house>" in string
         assert (
             "<Wattenburg> lived at <Bradley's house>"
-            in str(watt.holdings[0])[1000:1100]
+            in str(watt.holdings[0])
         )
 
     def test_holding_with_non_generic_value(self, make_opinion, make_entity):

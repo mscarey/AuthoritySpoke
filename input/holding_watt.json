@@ -76,7 +76,7 @@
             ],
             "despite": [{
                 "type": "fact",
-                "content": "The distance between the stockpile of trees and Hideaway Lodge was >= 20 feet"
+                "content": "the distance between the stockpile of trees and Hideaway Lodge was >= 20 feet"
             }],
             "outputs": [{
                 "type": "fact",

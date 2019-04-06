@@ -348,10 +348,6 @@
                 },
                 {
                     "type": "fact",
-                    "content": "part of Bradley's marijuana patch was in plain sight from a distance of as >= 1 foot"
-                },
-                {
-                    "type": "fact",
                     "content": "a house that did not belong to Bradley had access to the rear yard where Bradley's marijuana patch was located"
                 }
             ],
@@ -410,10 +406,6 @@
                     "type": "fact",
                     "content": "the distance between Bradley's marijuana patch and Bradley's house was >= 20 feet",
                     "reciprocal": true
-                },
-                {
-                    "type": "fact",
-                    "content": "Part of Bradley's marijuana patch was in plain sight from a distance of as >= 1 foot"
                 },
                 {
                     "type": "fact",

@@ -1,6 +1,7 @@
 __pycache__/
 AuthoritySpoke.egg-info
 .coverage
+.env
 .pylintrc
 .pytest_cache
 .vscode
@@ -8,7 +9,9 @@ AuthoritySpoke.egg-info
 codes/ca_evidence.html
 codes/ca_penal.html
 html/
+input/unused
 opinions/flf/
+opinions/unused
 notebooks/
 prof/
 tests/__pycache__/
