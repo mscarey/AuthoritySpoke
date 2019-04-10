@@ -94,7 +94,7 @@ class Opinion:
             factor = holding.get_factor_by_name(name)
             if factor is not None:
                 return factor
-        return None
+        raise ValueError(f'No factor by the name "{name}" was found')
 
     @property
     def generic_factors(self) -> List[Factor]:

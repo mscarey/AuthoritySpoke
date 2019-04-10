@@ -9,6 +9,7 @@ from authorityspoke.opinions import Opinion
 from authorityspoke.factors import ureg, Q_
 from authorityspoke.context import log_mentioned_context
 
+
 class TestOpinions:
     def test_load_opinion_in_Harvard_format(self):
         watt_dict = next(Opinion.from_file("watt_h.json"))
@@ -73,3 +74,26 @@ class TestOpinions:
     def test_positing_non_rule_error(self, make_opinion, make_procedure):
         with pytest.raises(TypeError):
             make_opinion["watt_majority"].posits(make_procedure["c1"])
+
+    def test_new_context_non_iterable_changes(self, make_opinion, make_holding):
+        """
+        The context here (a Factor outside an iterable) only changes the first
+        generic factor of the Rule being posited, which may not be what the user
+        expects.
+        """
+        brad = make_opinion["brad_majority"]
+        brad.posits(make_holding["h1"], context=Entity("House on Haunted Hill"))
+        assert "Haunted Hill" in str(brad.holdings[0])
+
+    def test_new_context_naming_nonexistent_factor(self, make_opinion, make_holding):
+        """
+        The context here (a Factor outside an iterable) only changes the first
+        generic factor of the Rule being posited, which may not be what the user
+        expects.
+        """
+        brad = make_opinion["brad_majority"]
+        with pytest.raises(ValueError):
+            brad.posits(
+            make_holding["h1"],
+            context=(Entity("House on Haunted Hill"), "nonexistent factor"),
+        )
