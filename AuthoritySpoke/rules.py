@@ -61,12 +61,6 @@ class Procedure(Factor):
         with the same entities in the same roles, not whether they're
         actually the same Python object."""
 
-        if not isinstance(other, Factor):
-            raise TypeError(
-                f"__eq__ not supported between instances of "
-                + f"'{self.__class__.__name__}' and '{other.__class__.__name__}'."
-            )
-
         if not isinstance(other, self.__class__):
             return False
 
@@ -233,6 +227,10 @@ class Procedure(Factor):
             for f in self.outputs:
                 text += "\n" + str(f)
         return text
+
+    @property
+    def context_factor_names(self):
+        return ("outputs", "inputs", "despite")
 
     def contradiction_between_outputs(
         self, other: "Procedure", m: Tuple[int, ...]
@@ -447,8 +445,6 @@ class Procedure(Factor):
             "applies in 'ALL' cases. Consider using the ",
             "'contradicts_some_to_all' method.",
         )
-
-
 
     @new_context_helper
     def new_context(
@@ -680,6 +676,12 @@ class ProceduralRule(Rule):
     @property
     def outputs(self):
         return self.procedure.outputs
+
+    @property
+    def context_factors(self) -> Tuple:
+
+        return self.procedure.context_factors
+
 
     def contradicts_if_valid(self, other) -> bool:
         """Determines whether self contradicts other,

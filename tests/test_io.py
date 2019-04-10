@@ -257,10 +257,6 @@ class TestRuleImport:
             Rule.collection_from_dict(rule_dict)
 
     def test_new_context_creates_equal_rule(self, make_opinion_with_holding):
-        """
-        This needs to reuse an existing function for finding a Factor
-        from a name.
-        """
         watt = make_opinion_with_holding["watt_majority"]
         brad = make_opinion_with_holding["brad_majority"]
         context_pairs = {

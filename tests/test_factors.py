@@ -61,7 +61,9 @@ class TestFacts:
     def test_invalid_index_for_case_factors_in_init(self, make_predicate, make_entity):
         with pytest.raises(ValueError):
             _ = Fact(
-                make_predicate["p1"], context_factors=2, case_factors=make_entity["watt"]
+                make_predicate["p1"],
+                context_factors=2,
+                case_factors=make_entity["watt"],
             )
 
     def test_convert_int_context_factors_to_tuple(self, make_predicate, watt_mentioned):
@@ -91,6 +93,16 @@ class TestFacts:
         }
         assert "was within the curtilage of <Hideaway Lodge>" in str(
             watt_factor["f2"].new_context(changes)
+        )
+
+    def test_get_factor_from_recursive_search(self, make_opinion_with_holding):
+        factor_list = list(
+            make_opinion_with_holding["cardenas_majority"].holdings[0].recursive_factors
+        )
+        factor = factor_list[1]
+        assert any(
+            factor == Human("parole officer") and factor.name == "parole officer"
+            for factor in factor_list
         )
 
     def test_new_context_from_factor(self, watt_factor):
@@ -373,7 +385,10 @@ class TestFacts:
         assert not watt_factor["f2_no_truth"] > watt_factor["f2"]
 
     def test_implication_standard_of_proof(self, make_factor):
-        assert not make_factor["f_shooting_craig_poe"] > make_factor["f_shooting_craig_brd"]
+        assert (
+            not make_factor["f_shooting_craig_poe"]
+            > make_factor["f_shooting_craig_brd"]
+        )
         assert make_factor["f_shooting_craig_brd"] > make_factor["f_shooting_craig_poe"]
 
     def test_factor_implies_because_of_exact_quantity(self, watt_factor):

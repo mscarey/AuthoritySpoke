@@ -68,9 +68,29 @@ class Opinion:
         """
         if not isinstance(holding, Rule):
             raise TypeError('"holding" must be an object of type Rule.')
+
+        # These lines repeat lines in new_context_helper
+        if isinstance(context, Factor) or isinstance(context, str):
+            context = context.wrap_with_tuple(context)
+
         if context is not None and isinstance(holding, ProceduralRule):
+            if isinstance(context, dict):
+                for factor in context:
+                    if isinstance(context[factor], str):
+                        context[factor] = self.get_factor_by_name(factor)
+            else:
+                for factor in context:
+                    if isinstance(factor, str):
+                        factor = self.get_factor_by_name(factor)
             holding = holding.new_context(context)
         self.holdings.append(holding)
+
+    def get_factor_by_name(self, name: str) -> Optional[Factor]:
+        for holding in self.holdings:
+            factor = holding.get_factor_by_name(name)
+            if factor is not None:
+                return factor
+        return None
 
     @property
     def generic_factors(self) -> List[Factor]:

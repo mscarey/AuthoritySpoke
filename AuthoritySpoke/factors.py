@@ -68,7 +68,9 @@ class Factor:
         return answer
 
     @classmethod
-    def _build_from_dict(cls, factor_dict: Dict, mentioned: List[Union["Factor"]]) -> "Factor":
+    def _build_from_dict(
+        cls, factor_dict: Dict, mentioned: List[Union["Factor"]]
+    ) -> "Factor":
         example = cls()
         new_factor_dict = example.__dict__
         for attr in new_factor_dict:
@@ -221,7 +223,29 @@ class Factor:
     @property
     def context_factors(self) -> Tuple:
 
-        return tuple(self.__dict__.get(factor_name) for factor_name in self.context_factor_names)
+        return tuple(
+            self.__dict__.get(factor_name) for factor_name in self.context_factor_names
+        )
+
+    @property
+    def recursive_factors(self) -> Dict["Factor", None]:
+        """
+        Using dict instead of set to preserve order
+        """
+        answers: Dict[Factor, None] = {self: None}
+        for context in filter(lambda x: x is not None, self.context_factors):
+            if isinstance(context, Iterable):
+                for item in context:
+                    answers.update(item.recursive_factors)
+            else:
+                answers.update(context.recursive_factors)
+        return answers
+
+    def get_factor_by_name(self, name: str) -> Optional["Factor"]:
+        for factor in self.recursive_factors:
+            if factor.name == name:
+                return factor
+        return None
 
     @property
     def context_factor_names(self) -> Tuple[str, ...]:
@@ -429,13 +453,15 @@ def new_context_helper(func: Callable):
         factor: Factor, context: Optional[Union[Sequence[Factor], Dict[Factor, Factor]]]
     ) -> Factor:
 
-        if isinstance(context, Factor):
+        if isinstance(context, Factor) or isinstance(context, str):
             context = context.wrap_with_tuple(context)
         if context is not None:
             if not isinstance(context, Iterable):
                 raise TypeError('"context" must be a dict or Sequence')
-            if any(not isinstance(item, Factor) for item in context):
-                raise TypeError('Each item in "context" must be type Factor')
+            if any(not isinstance(item, (Factor, str)) for item in context):
+                raise TypeError(
+                    'Each item in "context" must be a Factor or the name of a Factor'
+                )
             if not isinstance(context, dict):
                 generic_factors = factor.generic_factors
                 if len(generic_factors) != len(context):
@@ -448,8 +474,11 @@ def new_context_helper(func: Callable):
                     )
                 context = dict(zip(generic_factors, context))
             # BUG: needs an equality test, not an "in" test?
-            if factor in context:
-                return context[factor]
+            for context_factor in context:
+                if factor.name == context_factor or (
+                    factor == context_factor and factor.name == context_factor.name
+                ):
+                    return context[context_factor]
 
         return func(factor, context)
 
@@ -819,7 +848,7 @@ class Fact(Factor):
                 + f"{len(self.predicate)}, to match predicate.context_slots"
             )
         if any(
-            not isinstance(s, Factor) and not isinstance(s, int)
+            not isinstance(s, (Factor, int))
             for s in context_factors
         ):
             raise TypeError(
@@ -1019,6 +1048,7 @@ class Fact(Factor):
                 k[0] for k in sorted(context_with_indices, key=lambda k: k[1])
             ]
             return content, context_factors
+
         # TODO: inherit the later part of this function from Factor
         comparison = None
         quantity = None
@@ -1355,6 +1385,7 @@ class Evidence(Factor):
             absent=self.absent,
             generic=self.generic,
         )
+
 
 def compare_dict_for_identical_entries(
     left: Dict[Factor, Factor], right: Dict[Factor, Factor]
