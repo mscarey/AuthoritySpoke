@@ -20,7 +20,7 @@
         {
             "type": "Exhibit",
             "name": "proof of Wattenburg's guilt",
-            "generic": "true"
+            "generic": true
         }
     ],
     "holdings": [{

@@ -77,7 +77,7 @@ class Opinion:
             if isinstance(context, dict):
                 for factor in context:
                     if isinstance(context[factor], str):
-                        context[factor] = self.get_factor_by_name(factor)
+                        context[factor] = self.get_factor_by_name(context[factor])
             else:
                 for factor in context:
                     if isinstance(factor, str):
