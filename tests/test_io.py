@@ -281,6 +281,7 @@ class TestRuleImport:
         watt.posits(brad.holdings[0], context_items)
         assert watt.holdings[-1] == brad.holdings[0]
 
+
 class TestNestedFactorImport:
     def test_import_holding(self, make_opinion):
         """

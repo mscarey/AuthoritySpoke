@@ -175,6 +175,14 @@ class Factor:
 
         return self.equal_if_concrete(other)
 
+    def __str__(self):
+        string = f"{self.__class__.__name__.lower()}" + " {}"
+        if self.generic:
+            string = f"<{string}>"
+        if self.absent:
+            string = "absence of " + string
+        return string
+
     def contradicts_if_factor(self, other: "Factor") -> bool:
         return self >= other.make_absent()
 
@@ -847,10 +855,7 @@ class Fact(Factor):
                 "The number of items in 'context_factors' must be "
                 + f"{len(self.predicate)}, to match predicate.context_slots"
             )
-        if any(
-            not isinstance(s, (Factor, int))
-            for s in context_factors
-        ):
+        if any(not isinstance(s, (Factor, int)) for s in context_factors):
             raise TypeError(
                 "Items in the context_factors parameter should "
                 + "be Factor or a subclass of Factor, or should be integer "
@@ -884,13 +889,8 @@ class Fact(Factor):
             if self.standard_of_proof
             else ""
         )
-        string = (
-            f"{'the absence of the fact ' if self.absent else ''}"
-            + f"{standard}{predicate}"
-        )
-        if self.generic:
-            return f"<{string}>"
-        return string
+        string = f"{standard}{predicate}"
+        return super().__str__().format(string)
 
     @classmethod
     def standards_of_proof(cls) -> Tuple[str, ...]:
@@ -1193,10 +1193,9 @@ class Pleading(Factor):
         return super.__eq__(other)
 
     def implies_if_concrete(self, other: "Pleading"):
-
+        # TODO: allow the same kind of comparisons as Predicate.quantity
         if self.date != other.date:
             return False
-
         return super().implies_if_concrete(other)
 
     @new_context_helper
@@ -1215,13 +1214,10 @@ class Pleading(Factor):
 
     def __str__(self):
         string = (
-            f'{"absent " if self.absent else ""}{self.__class__.__name__}'
-            + f'{(" filed by " + str(self.filer) if self.filer else "")}'
+            f'{(" filed by " + str(self.filer) if self.filer else "")}'
             + f'{(" on " + str(self.date)) if self.date else ""}'
         )
-        if self.generic:
-            string = f"<{string}>"
-        return string
+        return super().__str__().format(string)
 
 
 @dataclass(frozen=True)
@@ -1264,14 +1260,11 @@ class Allegation(Factor):
 
     def __str__(self):
         string = (
-            f'{"absent " if self.absent else ""}an allegation '
-            + f'{(" in " + str(self.pleading) + "," if self.pleading else "")}'
-            + f'{("claiming " + str(self.to_effect)) + "," if self.to_effect else ""}'
+            f'{("in " + str(self.pleading) + ",") if self.pleading else ""}'
+            + f'{("claiming " + str(self.to_effect) + ",") if self.to_effect else ""}'
         )
         string = string.strip(",")
-        if self.generic:
-            string = f"<{string}>"
-        return string
+        return super().__str__().format(string)
 
 
 @dataclass(frozen=True)
@@ -1329,15 +1322,11 @@ class Exhibit(Factor):
 
     def __str__(self):
         string = (
-            f'{"absent " if self.absent else ""}{self.form if self.form else "exhibit"}'
-            + f'{(" by " + str(self.stated_by)) if self.stated_by else ""}'
+            f'{("by " + str(self.stated_by) + " ") if self.stated_by else ""}'
             + f'{(", asserting " + str(self.statement)) if self.statement else ""}'
         )
-        if self.generic:
-            if self.name:
-                string = self.name
-            string = f"<{string}>"
-        return string
+        string = super().__str__().format(string)
+        return string.replace("exhibit", self.form or "exhibit")
 
 
 @dataclass(frozen=True)
@@ -1352,17 +1341,11 @@ class Evidence(Factor):
     generic: bool = False
 
     def __str__(self):
-        if self.exhibit:
-            string = str(self.exhibit)
-        else:
-            string = self.__class__.__name__.lower()
-        if self.absent:
-            string = "the absence of " + string
-        if self.to_effect:
-            string += f", which supports {self.to_effect}"
-        if self.generic:
-            return f"<{string}>"
-        return string
+        string = (
+            f'{("of " + str(self.exhibit)) if self.exhibit else ""}'
+            + f'{(", which supports " + str(self.to_effect)) if self.to_effect else ""}'
+        )
+        return super().__str__().format(string)
 
     def __eq__(self, other: Factor) -> bool:
         return super().__eq__(other)

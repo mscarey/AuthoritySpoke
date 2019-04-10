@@ -72,7 +72,7 @@ class TestRules:
 
     def test_string_mentions_absence(self, make_opinion):
         cardenas_holdings = Rule.from_json("holding_cardenas.json")
-        assert "the absence of testimony by <parole officer>" in str(
+        assert "absence of evidence of testimony by <parole officer>" in str(
             cardenas_holdings[1]
         )
 

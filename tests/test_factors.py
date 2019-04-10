@@ -72,7 +72,7 @@ class TestFacts:
 
     def test_string_representation_of_factor(self, watt_factor):
         assert "<Hideaway Lodge> was a motel" in str(watt_factor["f1"])
-        assert "the absence of the fact" in str(watt_factor["f3_absent"])
+        assert "absence of fact" in str(watt_factor["f3_absent"])
 
     def test_string_no_truth_value(self, watt_factor):
         assert "whether" in str(watt_factor["f2_no_truth"])
@@ -109,7 +109,7 @@ class TestFacts:
         different = watt_factor["f1"].new_context(
             Entity("Great Northern", generic=False)
         )
-        assert str(different) == "Great Northern was a motel"
+        assert "Great Northern was a motel" in str(different)
 
     def test_new_concrete_context(self, make_entity, watt_factor):
         different = watt_factor["f2"].new_context(

@@ -136,7 +136,7 @@ class TestEvidence:
         assert len(e.to_effect.context_factors) == 1
 
     def test_evidence_str(self, make_evidence):
-        assert str(make_evidence["reciprocal"]).lower().startswith("testimony by")
+        assert str(make_evidence["reciprocal"]).lower().startswith("evidence of testimony by")
 
     def test_equality_with_entity_order(self, make_predicate, make_evidence):
         e = make_evidence
