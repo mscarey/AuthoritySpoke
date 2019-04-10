@@ -30,6 +30,47 @@ OPPOSITE_COMPARISONS = {
 }
 
 
+def new_context_helper(func: Callable):
+    """
+    Decorator for make_dict() methods of Factor subclasses, including Rule.
+    """
+
+    @functools.wraps(func)
+    def wrapper(
+        factor: "Factor",
+        context: Optional[Union[Sequence["Factor"], Dict["Factor", "Factor"]]],
+    ) -> "Factor":
+
+        if context is not None:
+            if not isinstance(context, Iterable):
+                context = (context,)
+            if any(not isinstance(item, (Factor, str)) for item in context):
+                raise TypeError(
+                    'Each item in "context" must be a Factor or the name of a Factor'
+                )
+            if not isinstance(context, dict):
+                generic_factors = factor.generic_factors
+                if len(generic_factors) != len(context):
+                    raise ValueError(
+                        'If the parameter "changes" is not a list of '
+                        + "replacements for every element of factor.generic_factors, "
+                        + 'then "changes" must be a dict where each key is a Factor '
+                        + "to be replaced and each value is the corresponding "
+                        + "replacement Factor."
+                    )
+                context = dict(zip(generic_factors, context))
+            # BUG: needs an equality test, not an "in" test?
+            for context_factor in context:
+                if factor.name == context_factor or (
+                    factor == context_factor and factor.name == context_factor.name
+                ):
+                    return context[context_factor]
+
+        return func(factor, context)
+
+    return wrapper
+
+
 @dataclass(frozen=True)
 class Factor:
     """A factor is something used to determine the applicability of a legal
@@ -450,47 +491,23 @@ class Factor:
         for choice in new_mapping_choices:
             yield choice
 
+    @new_context_helper
+    def new_context(self, changes: Dict["Factor", "Factor"]) -> "Factor":
+        """
+        Creates new Factor object, replacing keys of "changes" with their values.
+        """
+        if isinstance(changes, list):
+            changes = self._new_context_to_dict(changes)
 
-def new_context_helper(func: Callable):
-    """
-    Decorator for make_dict() methods of Factor subclasses, including Rule.
-    """
-
-    @functools.wraps(func)
-    def wrapper(
-        factor: Factor, context: Optional[Union[Sequence[Factor], Dict[Factor, Factor]]]
-    ) -> Factor:
-
-        if isinstance(context, Factor) or isinstance(context, str):
-            context = context.wrap_with_tuple(context)
-        if context is not None:
-            if not isinstance(context, Iterable):
-                raise TypeError('"context" must be a dict or Sequence')
-            if any(not isinstance(item, (Factor, str)) for item in context):
-                raise TypeError(
-                    'Each item in "context" must be a Factor or the name of a Factor'
+        new_dict = self.__dict__.copy()
+        for name in self.context_factor_names:
+            if isinstance(self.__dict__[name], Iterable):
+                new_dict[name] = tuple(
+                    [factor.new_context(changes) for factor in self.__dict__[name]]
                 )
-            if not isinstance(context, dict):
-                generic_factors = factor.generic_factors
-                if len(generic_factors) != len(context):
-                    raise ValueError(
-                        'If the parameter "changes" is not a list of '
-                        + "replacements for every element of factor.generic_factors, "
-                        + 'then "changes" must be a dict where each key is a Factor '
-                        + "to be replaced and each value is the corresponding "
-                        + "replacement Factor."
-                    )
-                context = dict(zip(generic_factors, context))
-            # BUG: needs an equality test, not an "in" test?
-            for context_factor in context:
-                if factor.name == context_factor or (
-                    factor == context_factor and factor.name == context_factor.name
-                ):
-                    return context[context_factor]
-
-        return func(factor, context)
-
-    return wrapper
+            else:
+                new_dict[name] = self.__dict__[name].new_context(changes)
+        return self.__class__(**new_dict)
 
 
 @dataclass(frozen=True)
@@ -1198,20 +1215,6 @@ class Pleading(Factor):
             return False
         return super().implies_if_concrete(other)
 
-    @new_context_helper
-    def new_context(self, changes: Dict[Factor, Factor]) -> "Pleading":
-        """
-        Creates new Factor object, replacing keys of "changes" with their values.
-        """
-        filer = self.filer.new_context(changes) if self.filer else None
-        return self.__class__(
-            filer=filer,
-            date=self.date,
-            name=self.name,
-            absent=self.absent,
-            generic=self.generic,
-        )
-
     def __str__(self):
         string = (
             f'{(" filed by " + str(self.filer) if self.filer else "")}'
@@ -1242,21 +1245,6 @@ class Allegation(Factor):
         dataclass behaves confusingly if this isn't included.
         """
         return super().__eq__(other)
-
-    @new_context_helper
-    def new_context(self, changes: Dict[Factor, Factor]) -> "Allegation":
-        """
-        Creates new Allegation object, replacing keys of "changes" with their values.
-        """
-        to_effect = self.to_effect.new_context(changes) if self.to_effect else None
-        pleading = self.pleading.new_context(changes) if self.pleading else None
-        return Allegation(
-            to_effect=to_effect,
-            pleading=pleading,
-            name=self.name,
-            absent=self.absent,
-            generic=self.generic,
-        )
 
     def __str__(self):
         string = (
@@ -1304,22 +1292,6 @@ class Exhibit(Factor):
 
         return super().implies_if_concrete(other)
 
-    @new_context_helper
-    def new_context(self, changes: Dict[Factor, Factor]) -> "Exhibit":
-        """
-        Creates new Exhibit object, replacing keys of "changes" with their values.
-        """
-        statement = self.statement.new_context(changes) if self.statement else None
-        stated_by = self.stated_by.new_context(changes) if self.stated_by else None
-        return Exhibit(
-            form=self.form,
-            statement=statement,
-            stated_by=stated_by,
-            name=self.name,
-            absent=self.absent,
-            generic=self.generic,
-        )
-
     def __str__(self):
         string = (
             f'{("by " + str(self.stated_by) + " ") if self.stated_by else ""}'
@@ -1353,22 +1325,6 @@ class Evidence(Factor):
     @property
     def context_factor_names(self) -> Tuple[str, ...]:
         return ("exhibit", "to_effect")
-
-    @new_context_helper
-    def new_context(self, changes: Dict[Factor, Factor]) -> "Evidence":
-        """
-        Creates new Evidence object, replacing keys of "changes" with their values.
-        """
-        exhibit = self.exhibit.new_context(changes) if self.exhibit else None
-        to_effect = self.to_effect.new_context(changes) if self.to_effect else None
-        return Evidence(
-            exhibit=exhibit,
-            to_effect=to_effect,
-            name=self.name,
-            absent=self.absent,
-            generic=self.generic,
-        )
-
 
 def compare_dict_for_identical_entries(
     left: Dict[Factor, Factor], right: Dict[Factor, Factor]
