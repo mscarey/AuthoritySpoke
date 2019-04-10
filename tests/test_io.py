@@ -257,11 +257,6 @@ class TestRuleImport:
             Rule.collection_from_dict(rule_dict)
 
     def test_new_context_creates_equal_rule(self, make_opinion_with_holding):
-        """
-        For this test to pass, posits() needs to replace every instance of the
-        context factor, not just one.
-        """
-
         watt = make_opinion_with_holding["watt_majority"]
         brad = make_opinion_with_holding["brad_majority"]
         context_pairs = {
@@ -273,6 +268,18 @@ class TestRuleImport:
         watt.posits(brad.holdings[0], context_pairs)
         assert watt.holdings[-1] == brad.holdings[0]
 
+    def test_new_context_inferring_factors_to_change(self, make_opinion_with_holding):
+        watt = make_opinion_with_holding["watt_majority"]
+        brad = make_opinion_with_holding["brad_majority"]
+        context_items = [
+            "proof of Wattenburg's guilt",
+            "Wattenburg",
+            "officers' search of the stockpile",
+            "Hideaway Lodge",
+            "the stockpile of trees",
+        ]
+        watt.posits(brad.holdings[0], context_items)
+        assert watt.holdings[-1] == brad.holdings[0]
 
 class TestNestedFactorImport:
     def test_import_holding(self, make_opinion):

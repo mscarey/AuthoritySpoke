@@ -79,9 +79,13 @@ class Opinion:
                     if isinstance(context[factor], str):
                         context[factor] = self.get_factor_by_name(context[factor])
             else:
+                new_context: List[Factor] = []
                 for factor in context:
                     if isinstance(factor, str):
-                        factor = self.get_factor_by_name(factor)
+                        new_context.append(self.get_factor_by_name(factor))
+                    else:
+                        new_context.append(factor)
+                context = dict(zip(holding.generic_factors, new_context))
             holding = holding.new_context(context)
         self.holdings.append(holding)
 
