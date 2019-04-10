@@ -496,9 +496,6 @@ class Factor:
         """
         Creates new Factor object, replacing keys of "changes" with their values.
         """
-        if isinstance(changes, list):
-            changes = self._new_context_to_dict(changes)
-
         new_dict = self.__dict__.copy()
         for name in self.context_factor_names:
             if isinstance(self.__dict__[name], Iterable):

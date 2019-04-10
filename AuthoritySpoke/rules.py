@@ -822,8 +822,6 @@ class ProceduralRule(Rule):
         List to a Dict if needed, and replacing keys of "changes" with
         their values.
         """
-        if isinstance(changes, list):
-            changes = self.procedure._new_context_to_dict(changes)
         return ProceduralRule(
             procedure=self.procedure.new_context(changes),
             enactments=self.enactments,
