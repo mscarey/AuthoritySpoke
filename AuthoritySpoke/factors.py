@@ -498,12 +498,7 @@ class Factor:
         """
         new_dict = self.__dict__.copy()
         for name in self.context_factor_names:
-            if isinstance(self.__dict__[name], Iterable):
-                new_dict[name] = tuple(
-                    [factor.new_context(changes) for factor in self.__dict__[name]]
-                )
-            else:
-                new_dict[name] = self.__dict__[name].new_context(changes)
+            new_dict[name] = self.__dict__[name].new_context(changes)
         return self.__class__(**new_dict)
 
 
@@ -1196,7 +1191,7 @@ class Pleading(Factor):
 
     @property
     def context_factor_names(self) -> Tuple[Optional[Entity]]:
-        return (self.filer,)
+        return ("filer",)
 
     def equal_if_concrete(self, other: "Pleading") -> bool:
         if self.date != other.date:

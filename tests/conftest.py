@@ -387,6 +387,9 @@ def make_exhibit(
         "reciprocal_testimony": Exhibit(
             form="testimony", statement=w["f8"], stated_by=e["craig"]
         ),
+        "reciprocal_declaration": Exhibit(
+            form="declaration", statement=w["f8"], stated_by=e["craig"]
+        ),
         "reciprocal_testimony_absent": Exhibit(
             form="testimony", statement=w["f8"], stated_by=e["craig"], absent=True
         ),

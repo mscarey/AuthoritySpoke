@@ -58,6 +58,16 @@ class TestExhibits:
             >= make_exhibit["specific_but_featureless"]
         )
 
+    def test_exhibit_no_implication_different_form(self, make_exhibit):
+        assert (
+            not make_exhibit["reciprocal_testimony"]
+            >= make_exhibit["reciprocal_declaration"]
+        )
+        assert (
+            not make_exhibit["reciprocal_testimony"]
+            == make_exhibit["reciprocal_declaration"]
+        )
+
     def test_implication_more_specific_testimony(self, make_exhibit):
         assert (
             make_exhibit["reciprocal_testimony_specific"]
