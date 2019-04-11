@@ -573,7 +573,8 @@ class ProceduralRule(Rule):
             return "\n" + "".join(lines)
 
         return (
-            f"the rule that {'it is not valid that ' if not self.rule_valid else ''}the court "
+            f"the rule that {'it is not decided whether ' if not self.decided else ''}"
+            + f"{'it is not valid that ' if not self.rule_valid else ''}the court "
             + f"{'MUST' if self.mandatory else 'MAY'} {'ALWAYS' if self.universal else 'SOMETIMES'} "
             + f"accept the outcome:{str(factor_catalog(self.procedure.outputs, 'OUT'))}"
             + f"{'based on the input:' + str(factor_catalog(self.procedure.inputs, 'IN')) if self.procedure.inputs else ''}"
@@ -662,9 +663,6 @@ class ProceduralRule(Rule):
         """Determines whether self contradicts other,
         assuming that rule_valid and decided are
         True for both Rules."""
-
-        if not isinstance(other, self.__class__):
-            return False
 
         if not self.mandatory and not other.mandatory:
             return False

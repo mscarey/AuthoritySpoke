@@ -10,6 +10,7 @@ from authorityspoke.opinions import Opinion
 from authorityspoke.factors import ureg, Q_
 from authorityspoke.context import log_mentioned_context
 
+
 class TestRules:
     def test_enactment_type_in_str(self, make_holding):
         assert "constitution" in str(make_holding["h1"]).lower()
@@ -46,14 +47,9 @@ class TestRules:
                 {make_predicate["p1"]: make_predicate["p7"]}
             )
 
-    def test_new_context_dict_must_be_dict(
-        self, make_holding, make_predicate
-    ):
+    def test_new_context_dict_must_be_dict(self, make_holding, make_predicate):
         with pytest.raises(TypeError):
-            different = make_holding["h1"].new_context(
-                make_predicate["p1"]
-            )
-
+            different = make_holding["h1"].new_context(make_predicate["p1"])
 
     def test_generic_factors(self, make_entity, make_holding):
         generics = make_holding["h3"].generic_factors
@@ -217,12 +213,15 @@ class TestRules:
 
     def test_some_holding_consistent_with_absent_output(self, make_holding):
         assert not make_holding["h2"].contradicts(make_holding["h2_output_absent"])
+        assert not make_holding["h2_output_absent"].contradicts(make_holding["h2"])
 
     def test_some_holding_consistent_with_false_output(self, make_holding):
         assert not make_holding["h2"].contradicts(make_holding["h2_output_false"])
+        assert not make_holding["h2_output_false"].contradicts(make_holding["h2"])
 
     def test_some_holding_consistent_with_absent_false_output(self, make_holding):
-        assert not make_holding["h2"].contradicts(make_holding["h2_output_false"])
+        assert not make_holding["h2"].contradicts(make_holding["h2_output_absent_false"])
+        assert not make_holding["h2_output_absent_false"].contradicts(make_holding["h2"])
 
     def test_contradicts_if_valid(self, make_holding):
         """
@@ -230,7 +229,10 @@ class TestRules:
         because both holdings are valid.
         """
 
-        make_holding["h2_ALL"].contradicts_if_valid(
+        assert make_holding["h2_ALL"].contradicts(
+            make_holding["h2_SOME_MUST_output_false"]
+        )
+        assert make_holding["h2_ALL"].contradicts_if_valid(
             make_holding["h2_SOME_MUST_output_false"]
         )
 
@@ -269,6 +271,9 @@ class TestRules:
         assert make_holding["h_nearer_means_curtilage_MUST"].contradicts_if_valid(
             make_holding["h_near_means_no_curtilage_ALL"]
         )
+        assert make_holding["h_near_means_no_curtilage_ALL"].contradicts_if_valid(
+            make_holding["h_nearer_means_curtilage_MUST"]
+        )
 
     def test_contradicts_if_valid_some_vs_all_no_contradiction(self, make_holding):
 
@@ -292,6 +297,9 @@ class TestRules:
         assert not make_holding["h_near_means_no_curtilage"].contradicts_if_valid(
             make_holding["h_nearer_means_curtilage_ALL"]
         )
+        assert not make_holding["h_nearer_means_curtilage_ALL"].contradicts_if_valid(
+            make_holding["h_near_means_no_curtilage"]
+        )
 
     def test_contradicts_if_valid_all_vs_some(self, make_holding):
 
@@ -308,8 +316,11 @@ class TestRules:
         A is in the curtilage of B
         """
 
-        assert make_holding["h_near_means_no_curtilage_ALL_MUST"].contradicts_if_valid(
+        assert make_holding["h_near_means_no_curtilage_ALL_MUST"].contradicts(
             make_holding["h_nearer_means_curtilage"]
+        )
+        assert make_holding["h_nearer_means_curtilage"].contradicts(
+            make_holding["h_near_means_no_curtilage_ALL_MUST"]
         )
 
     def test_contradicts_if_valid_all_vs_all(self, make_holding):
@@ -330,30 +341,52 @@ class TestRules:
         assert make_holding["h_near_means_curtilage_ALL_MUST"].contradicts_if_valid(
             make_holding["h_far_means_no_curtilage"]
         )
+        assert make_holding["h_far_means_no_curtilage"].contradicts_if_valid(
+            make_holding["h_near_means_curtilage_ALL_MUST"]
+        )
 
     def test_always_may_contradicts_sometimes_must_not(self, make_holding):
         assert make_holding["h2_ALL"].contradicts(
             make_holding["h2_SOME_MUST_output_false"]
+        )
+        assert make_holding["h2_SOME_MUST_output_false"].contradicts(
+            make_holding["h2_ALL"]
         )
 
     def test_always_may_contradicts_sometimes_must_omit_output(self, make_holding):
         assert make_holding["h2_ALL"].contradicts(
             make_holding["h2_SOME_MUST_output_absent"]
         )
+        assert make_holding["h2_SOME_MUST_output_absent"].contradicts(
+            make_holding["h2_ALL"]
+        )
 
     def test_sometimes_must_contradicts_always_may_not(self, make_holding):
         assert make_holding["h2_MUST"].contradicts(
             make_holding["h2_ALL_MAY_output_false"]
+        )
+        assert make_holding["h2_ALL_MAY_output_false"].contradicts(
+            make_holding["h2_MUST"]
         )
 
     def test_sometimes_must_contradicts_always_must_not(self, make_holding):
         assert make_holding["h2_MUST"].contradicts(
             make_holding["h2_ALL_MUST_output_false"]
         )
+        assert make_holding["h2_ALL_MUST_output_false"].contradicts(
+            make_holding["h2_MUST"]
+        )
+
+    def test_some_must_no_contradict_some_may(self, make_holding):
+        assert not make_holding["h2_MUST"].contradicts(make_holding["h2"])
+        assert not make_holding["h2"].contradicts(make_holding["h2_MUST"])
 
     def test_negation_of_h2_contradicts_holding_that_implies_h2(self, make_holding):
         assert make_holding["h2_invalid"].contradicts(
             make_holding["h2_irrelevant_inputs"]
+        )
+        assert make_holding["h2_irrelevant_inputs"].contradicts(
+            make_holding["h2_invalid"]
         )
 
     def test_holding_that_implies_h2_contradicts_negation_of_h2(self, make_holding):
@@ -363,6 +396,9 @@ class TestRules:
 
         assert make_holding["h2_ALL"].contradicts(
             make_holding["h2_SOME_MUST_output_false"]
+        )
+        assert make_holding["h2_SOME_MUST_output_false"].contradicts(
+            make_holding["h2_ALL"]
         )
 
     def test_invalid_holding_contradicts_h2(self, make_holding):
@@ -375,6 +411,9 @@ class TestRules:
         assert make_holding["h2_invalid"].contradicts(
             make_holding["h2_irrelevant_inputs"]
         )
+        assert make_holding["h2_irrelevant_inputs"].contradicts(
+            make_holding["h2_invalid"]
+        )
 
     def test_invalidity_of_implying_holding_contradicts_implied(self, make_holding):
 
@@ -385,6 +424,9 @@ class TestRules:
 
         assert make_holding["h2_MUST_invalid"].contradicts(
             make_holding["h2_irrelevant_inputs_MUST"]
+        )
+        assert make_holding["h2_irrelevant_inputs_MUST"].contradicts(
+            make_holding["h2_MUST_invalid"]
         )
 
     def test_contradiction_with_ALL_MUST_and_invalid_SOME_MUST(self, make_holding):
@@ -397,6 +439,9 @@ class TestRules:
         assert make_holding["h2_ALL_MUST"].contradicts(
             make_holding["h2_irrelevant_inputs_MUST_invalid"]
         )
+        assert make_holding["h2_irrelevant_inputs_MUST_invalid"].contradicts(
+            make_holding["h2_ALL_MUST"]
+        )
 
     def test_contradiction_with_ALL_MUST_and_invalid_ALL_MAY(self, make_holding):
 
@@ -406,6 +451,7 @@ class TestRules:
         # if Y implies X
 
         assert make_holding["h2_ALL_MUST"].contradicts(make_holding["h2_ALL_invalid"])
+        assert make_holding["h2_ALL_invalid"].contradicts(make_holding["h2_ALL_MUST"])
 
     def test_contradiction_with_ALL_MUST_and_false_output_ALL_MAY(self, make_holding):
 
@@ -417,6 +463,9 @@ class TestRules:
         assert make_holding["h2_ALL_MUST"].contradicts(
             make_holding["h2_output_false_ALL"]
         )
+        assert make_holding["h2_output_false_ALL"].contradicts(
+            make_holding["h2_ALL_MUST"]
+        )
 
     def test_undecided_contradicts_holding(self, make_holding):
         """When a lower court issues a holding deciding a legal issue
@@ -426,8 +475,13 @@ class TestRules:
 
         assert make_holding["h2_undecided"].contradicts(make_holding["h2"])
 
+    def test_undecided_contradicts_holding_reverse(self, make_holding):
+        assert make_holding["h2"].contradicts(make_holding["h2_undecided"])
+
     def test_undecided_contradicts_decided_invalid_holding(self, make_holding):
         assert make_holding["h2_undecided"].contradicts(make_holding["h2_invalid"])
+    def test_undecided_contradicts_decided_invalid_holding_reverse(self, make_holding):
+        assert make_holding["h2_invalid"].contradicts(make_holding["h2_undecided"])
 
     def test_no_contradiction_of_undecided_holding(self, make_holding):
         """A court's act of deciding a legal issue doesn't "contradict" another
@@ -437,9 +491,14 @@ class TestRules:
         assert not make_holding["h2_invalid"].contradicts(make_holding["h2_undecided"])
 
     def test_undecided_holding_implied_contradiction(self, make_holding):
+        assert make_holding["h2_ALL"].contradicts(
+            make_holding["h2_irrelevant_inputs_undecided"]
+        )
+    def test_undecided_holding_implied_contradiction_reverse(self, make_holding):
         assert make_holding["h2_irrelevant_inputs_undecided"].contradicts(
             make_holding["h2_ALL"]
         )
+
 
     def test_undecided_holding_no_implied_contradiction_with_SOME(self, make_holding):
         """Because a SOME holding doesn't imply a version of the same holding
@@ -454,11 +513,17 @@ class TestRules:
         assert not make_holding["h2_irrelevant_inputs_undecided"].contradicts(
             make_holding["h2"]
         )
+        assert not make_holding["h2"].contradicts(
+            make_holding["h2_irrelevant_inputs_undecided"]
+        )
 
     def test_undecided_holding_no_implied_contradiction(self, make_holding):
 
         assert not make_holding["h2_irrelevant_inputs_undecided"].contradicts(
             make_holding["h2_ALL_invalid"]
+        )
+        assert not make_holding["h2_ALL_invalid"].contradicts(
+            make_holding["h2_irrelevant_inputs_undecided"]
         )
 
     # Enactments cited in Rules
