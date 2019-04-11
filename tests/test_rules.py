@@ -120,6 +120,10 @@ class TestRules:
     ):
         assert make_holding["h2_exact_quantity_ALL"] > make_holding["h2"]
 
+    def test_mandatory_implies_permissive(self, make_holding):
+        assert make_holding["h2_MUST"] > make_holding["h2"]
+        assert not make_holding["h2"] > make_holding["h2_MUST"]
+
     def test_all_to_all(self, make_holding):
         """This is supposed to test reciprocal predicates in despite factors."""
         assert make_holding["h2_exact_in_despite_ALL"] > make_holding["h2_ALL"]
@@ -204,7 +208,19 @@ class TestRules:
         assert make_holding["h2_invalid_undecided"] >= make_holding["h2_undecided"]
         assert make_holding["h2_undecided"] >= make_holding["h2_invalid_undecided"]
 
+    def test_no_implication_between_decided_and_undecided(self, make_holding):
+        assert not make_holding["h2_undecided"] >= make_holding["h2"]
+        assert not make_holding["h2"] > make_holding["h2_invalid_undecided"]
+
+    def test_error_implication_with_procedure(self, make_holding, make_procedure):
+        with pytest.raises(TypeError):
+            make_holding["h2_undecided"] >= make_procedure["c2"]
+
     # Contradiction
+
+    def test_error_contradiction_with_procedure(self, make_holding, make_procedure):
+            with pytest.raises(TypeError):
+                make_holding["h2_undecided"].contradicts(make_procedure["c2"])
 
     def test_holding_contradicts_invalid_version_of_self(self, make_holding):
         assert make_holding["h2"].negated() == make_holding["h2_invalid"]
@@ -499,8 +515,6 @@ class TestRules:
         assert not make_holding["h2_ALL"].contradicts(
             make_holding["h2_irrelevant_inputs_undecided"]
         )
-
-
 
     def test_undecided_holding_no_implied_contradiction_with_SOME(self, make_holding):
         """Because a SOME holding doesn't imply a version of the same holding

@@ -704,23 +704,22 @@ class ProceduralRule(Rule):
         return self.contradicts_if_valid(other)
 
     def implies_if_valid(self, other) -> bool:
-        """Simplified version of the __ge__ implication function
-        covering only cases where rule_valid and decided are
-        True for both Rules."""
+        """
+        Partial version of the __ge__ implication function covering
+        only cases where other is an instance of self's class, and
+        rule_valid and decided are True for both of them.
 
-        if not isinstance(other, self.__class__):
-            return False
+        If self relies for support on some enactment text that
+        other doesn't, then self doesn't imply other.
 
-        # If self relies for support on some enactment text that
-        # other doesn't, then self doesn't imply other.
+        Also, if other specifies that it applies notwithstanding some
+        enactment not mentioned by self, then self doesn't imply other.
+        """
 
         if not all(
             any(other_e >= e for other_e in other.enactments) for e in self.enactments
         ):
             return False
-
-        # If other specifies that it applies notwithstanding some
-        # enactment not mentioned by self, then self doesn't imply other.
 
         if not all(
             any(e >= other_d for e in (self.enactments + self.enactments_despite))
@@ -741,11 +740,6 @@ class ProceduralRule(Rule):
             return self.procedure.implies_all_to_all(other.procedure)
 
         return self.procedure >= other.procedure
-
-    def __gt__(self, other) -> bool:
-        if self == other:
-            return False
-        return self >= other
 
     def __ge__(self, other) -> bool:
         """Returns a boolean indicating whether self implies other,
