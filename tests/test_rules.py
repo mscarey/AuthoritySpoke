@@ -79,6 +79,8 @@ class TestRules:
     def test_factor_properties_for_rule(self, make_opinion):
         cardenas_holdings = Rule.from_json("holding_cardenas.json")
         assert len(cardenas_holdings[1].inputs) == 1
+        assert len(cardenas_holdings[1].outputs) == 1
+        assert len(cardenas_holdings[1].despite) == 1
 
     # Equality
 

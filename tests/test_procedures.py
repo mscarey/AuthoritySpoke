@@ -11,7 +11,6 @@ from authorityspoke.factors import ureg, Q_
 from authorityspoke.context import log_mentioned_context
 
 
-
 class TestProcedures:
     def test_exception_for_wrong_type_for_procedure(self, make_predicate):
         with pytest.raises(TypeError):
@@ -247,6 +246,10 @@ class TestProcedures:
             make_procedure["c2"]
         )
 
+    def test_no_implication_of_other_factor(self, make_procedure, watt_factor):
+        assert not make_procedure["c1"].implies_all_to_all(watt_factor["f1"])
+        assert not make_procedure["c1"].implies_all_to_some(watt_factor["f1"])
+
     # Contradiction
 
     def test_no_contradict_between_procedures(self, make_procedure):
@@ -256,3 +259,6 @@ class TestProcedures:
         p = make_procedure
         with pytest.raises(NotImplementedError):
             assert p["c2_higher_quantity"].contradicts(p["c2_exact_in_despite"])
+
+    def test_no_contradiction_of_other_factor(self, make_procedure, watt_factor):
+        assert not make_procedure["c1"].contradicts_some_to_all(watt_factor["f1"])

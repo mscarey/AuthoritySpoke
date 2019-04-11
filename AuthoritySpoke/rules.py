@@ -442,21 +442,11 @@ class Procedure(Factor):
         Creates new Procedure object, converting "changes" from a List
         to a Dict if needed, and replacing keys of "changes" with their
         values.
-
-        Even though Procedure is a subclass of Factor, there is no way
-        to replace a Rule's Procedure with this method.
         """
-        if isinstance(changes, list):
-            changes = self._new_context_to_dict(changes)
-
-        return Procedure(
-            outputs=tuple([factor.new_context(changes) for factor in self.outputs]),
-            inputs=tuple([factor.new_context(changes) for factor in self.inputs]),
-            despite=tuple([factor.new_context(changes) for factor in self.despite]),
-            name=self.name,
-            absent=self.absent,
-            generic=self.generic,
-        )
+        new_dict = self.__dict__.copy()
+        for name in self.context_factor_names:
+            new_dict[name] = tuple([factor.new_context(changes) for factor in new_dict[name]])
+        return self.__class__(**new_dict)
 
 
 @dataclass(frozen=True)
@@ -472,9 +462,6 @@ class Rule(Factor):
     """
 
     directory = get_directory_path("input")
-
-    def __len__(self):
-        return 0
 
     @classmethod
     def collection_from_dict(cls, case: Dict) -> List["Rule"]:
@@ -801,24 +788,9 @@ class ProceduralRule(Rule):
             decided=self.decided,
         )
 
-    @new_context_helper
-    def new_context(
-        self, changes: Union[Sequence[Factor], Dict[Factor, Factor]]
-    ) -> "ProceduralRule":
-        """
-        Creates new ProceduralRule object, converting "changes" from a
-        List to a Dict if needed, and replacing keys of "changes" with
-        their values.
-        """
-        return ProceduralRule(
-            procedure=self.procedure.new_context(changes),
-            enactments=self.enactments,
-            enactments_despite=self.enactments_despite,
-            mandatory=self.mandatory,
-            universal=self.universal,
-            rule_valid=self.rule_valid,
-            decided=self.decided,
-        )
+    @property
+    def context_factor_names(self):
+        return ("procedure",)
 
     def contradicts(self, other) -> bool:
         """
