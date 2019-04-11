@@ -249,10 +249,11 @@ class Factor:
                 f"{self.__class__} objects may only be compared for "
                 + "implication with other Factor objects or None."
             )
-        if self.absent and other.__dict__.get("absent"):
+
+        if self.__dict__.get("absent") and other.__dict__.get("absent"):
             return bool(other.implies_if_present(self))
 
-        if not self.absent and not other.__dict__.get("absent"):
+        if not self.__dict__.get("absent") and not other.__dict__.get("absent"):
             return bool(self.implies_if_present(other))
 
         return False
@@ -1317,6 +1318,7 @@ class Evidence(Factor):
     @property
     def context_factor_names(self) -> Tuple[str, ...]:
         return ("exhibit", "to_effect")
+
 
 def compare_dict_for_identical_entries(
     left: Dict[Factor, Factor], right: Dict[Factor, Factor]

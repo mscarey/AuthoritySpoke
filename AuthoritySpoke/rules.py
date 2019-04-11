@@ -139,10 +139,12 @@ class Procedure(Factor):
                             for next_step in next_steps:
                                 yield next_step
 
-    def __ge__(self, other: "Procedure") -> bool:
+    def implies_if_present(self, other: Factor) -> bool:
         """
         Tests whether the assertion that self applies in some cases
         implies that the procedure "other" applies in some cases.
+        Despite the "if_present" in the method name, there's no "absent"
+        attribute for Procedures.
 
         When self and other are holdings that both apply in SOME cases:
 
@@ -155,15 +157,6 @@ class Procedure(Factor):
         Self does not imply other if any despite of other
         is not equal to or implied by some despite or input of self.
         """
-
-        if not isinstance(other, Factor):
-            raise TypeError(
-                f"'Implies' not supported between instances of "
-                + f"'{self.__class__.__name__}' and '{other.__class__.__name__}'."
-            )
-
-        if not isinstance(other, self.__class__):
-            return False
 
         despite_or_input = (*self.despite, *self.inputs)
 
@@ -191,11 +184,6 @@ class Procedure(Factor):
                     new_matchlist.append(dict(answer))
             matchlist = new_matchlist
         return matchlist
-
-    def __gt__(self, other: "Procedure") -> bool:
-        if self == other:
-            return False
-        return self >= other
 
     def __len__(self):
         """
