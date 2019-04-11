@@ -476,12 +476,14 @@ class TestRules:
         assert make_holding["h2_undecided"].contradicts(make_holding["h2"])
 
     def test_undecided_contradicts_holding_reverse(self, make_holding):
-        assert make_holding["h2"].contradicts(make_holding["h2_undecided"])
+        """
+        Remember that the "contradicts" relation is not symmetric between
+        decided and undecided Rules.
+        """
+        assert not make_holding["h2"].contradicts(make_holding["h2_undecided"])
 
     def test_undecided_contradicts_decided_invalid_holding(self, make_holding):
         assert make_holding["h2_undecided"].contradicts(make_holding["h2_invalid"])
-    def test_undecided_contradicts_decided_invalid_holding_reverse(self, make_holding):
-        assert make_holding["h2_invalid"].contradicts(make_holding["h2_undecided"])
 
     def test_no_contradiction_of_undecided_holding(self, make_holding):
         """A court's act of deciding a legal issue doesn't "contradict" another
@@ -491,13 +493,13 @@ class TestRules:
         assert not make_holding["h2_invalid"].contradicts(make_holding["h2_undecided"])
 
     def test_undecided_holding_implied_contradiction(self, make_holding):
-        assert make_holding["h2_ALL"].contradicts(
-            make_holding["h2_irrelevant_inputs_undecided"]
-        )
-    def test_undecided_holding_implied_contradiction_reverse(self, make_holding):
         assert make_holding["h2_irrelevant_inputs_undecided"].contradicts(
             make_holding["h2_ALL"]
         )
+        assert not make_holding["h2_ALL"].contradicts(
+            make_holding["h2_irrelevant_inputs_undecided"]
+        )
+
 
 
     def test_undecided_holding_no_implied_contradiction_with_SOME(self, make_holding):
@@ -518,7 +520,6 @@ class TestRules:
         )
 
     def test_undecided_holding_no_implied_contradiction(self, make_holding):
-
         assert not make_holding["h2_irrelevant_inputs_undecided"].contradicts(
             make_holding["h2_ALL_invalid"]
         )
@@ -583,6 +584,11 @@ class TestRules:
     def test_contradiction_with_evidence(self, make_holding):
         assert make_holding["h3_ALL_undecided"].contradicts(
             make_holding["h3_fewer_inputs_ALL"]
+        )
+
+    def test_no_contradiction_same_undecided_holding(self, make_holding):
+        assert not make_holding["h3_ALL_undecided"].contradicts(
+            make_holding["h3_ALL_undecided"]
         )
 
     def test_no_contradiction_holding_with_evidence(self, make_holding):

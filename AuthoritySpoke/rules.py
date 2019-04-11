@@ -445,7 +445,9 @@ class Procedure(Factor):
         """
         new_dict = self.__dict__.copy()
         for name in self.context_factor_names:
-            new_dict[name] = tuple([factor.new_context(changes) for factor in new_dict[name]])
+            new_dict[name] = tuple(
+                [factor.new_context(changes) for factor in new_dict[name]]
+            )
         return self.__class__(**new_dict)
 
 
@@ -658,7 +660,6 @@ class ProceduralRule(Rule):
 
         return self.procedure.context_factors
 
-
     def contradicts_if_valid(self, other) -> bool:
         """Determines whether self contradicts other,
         assuming that rule_valid and decided are
@@ -700,11 +701,7 @@ class ProceduralRule(Rule):
 
         # If decided rule A contradicts B, then B also contradicts A
 
-        if other.rule_valid and not self.rule_valid:
-            return self.contradicts_if_valid(other) or other.implies_if_valid(self)
-
-        # if self.rule_valid and not other.rule_valid
-        return other.contradicts_if_valid(self) or self.implies_if_valid(other)
+        return self.contradicts_if_valid(other)
 
     def implies_if_valid(self, other) -> bool:
         """Simplified version of the __ge__ implication function
@@ -796,6 +793,16 @@ class ProceduralRule(Rule):
         that the other holding is false. Generally checked
         by testing whether self would imply other if
         other had an opposite value for rule_valid.
+
+        This function takes three main paths depending on
+        whether the holdings "self" and "other" assert that
+        rules are decided or undecided.
+
+        A decided holding can never contradict a previous
+        statement that any rule was undecided.
+
+        If rule A implies rule B, then a holding that B is undecided
+        contradicts a prior holding deciding that rule A is valid or invalid.
         """
 
         if not isinstance(other, self.__class__):
@@ -804,23 +811,11 @@ class ProceduralRule(Rule):
                 + f"'{self.__class__.__name__}' and '{other.__class__.__name__}'."
             )
 
-        if self.decided and other.decided:
-            return self >= other.negated()
-
-        if not self.decided and not other.decided:
-            return self == other or self == other.negated()
-
-        # A decided holding doesn't "contradict" a previous
-        # statement that any rule was undecided.
-
-        if self.decided and not other.decided:
+        if not other.decided:
             return False
-
-        # If holding A implies holding B, then the statement
-        # that A is undecided contradicts the prior holding B.
-
-        # if not self.decided and other.decided:
-        return other.implies_if_decided(self)
+        if self.decided:
+            return self >= other.negated()
+        return other.implies_if_decided(self) or other.implies_if_decided(self.negated())
 
 
 class Attribution:
