@@ -1,0 +1,80 @@
+{
+    "mentioned_factors": [
+
+        {
+            "type": "Association",
+            "name": "Lotus Development Corporation"
+        },
+        {
+            "type": "Association",
+            "name": "Borland International, Inc."
+        },
+        {
+            "type": "Entity",
+            "name": "Lotus 1-2-3"
+        },
+        {
+            "type": "Entity",
+            "name": "Quattro"
+        }
+    ],
+    "holdings": [{
+        "inputs": [{
+                "type": "fact",
+                "content": "Lotus Development Corporation owned a valid copyright in Lotus 1-2-3"
+            },
+            {
+                "type": "fact",
+                "content": "Borland International, Inc. copied constituent elements of Lotus 1-2-3 that were original"
+            }
+        ],
+        "outputs": [{
+            "type": "fact",
+            "content": "Borland International, Inc. infringed Lotus Development Corporation's copyright in Lotus 1-2-3"
+        }],
+        "enactments": [{
+                "code": "usc17.xml",
+                "section": "102",
+                "subsection": "b",
+                "end": "extend to any",
+                "name": "copyright exceptions"
+            },
+            {
+                "code": "usc17.xml",
+                "section": "102",
+                "subsection": "b",
+                "text": "method of operation"
+            }
+        ]
+    },
+    {
+        "inputs": [{
+                "type": "fact",
+                "content": "Lotus Development Corporation owned a valid copyright in Lotus 1-2-3",
+                "absent": true
+            }
+        ],
+        "outputs": [{
+            "type": "fact",
+            "content": "Borland International, Inc. infringed Lotus Development Corporation's copyright in Lotus 1-2-3",
+            "absent": true
+        }],
+        "universal": true,
+        "enactments": ["copyright exceptions", "method of operation"]
+    },
+    {
+        "inputs": [{
+                "type": "fact",
+                "content": "Borland International, Inc. copied constituent elements of Lotus 1-2-3 that were original",
+                "absent": true
+            }
+        ],
+        "outputs": [{
+            "type": "fact",
+            "content": "Borland International, Inc. infringed Lotus Development Corporation's copyright in Lotus 1-2-3",
+            "absent": true
+        }],
+        "universal": true,
+        "enactments": ["copyright exceptions", "method of operation"]
+    }]
+}
