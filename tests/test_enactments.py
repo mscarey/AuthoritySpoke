@@ -1,4 +1,3 @@
-
 import datetime
 import json
 import operator
@@ -11,6 +10,7 @@ from authorityspoke.enactments import Code, Enactment
 from authorityspoke.factors import Predicate, Factor, Entity, Fact
 from authorityspoke.opinions import Opinion
 from authorityspoke.factors import ureg, Q_
+
 
 class TestCodes:
     def test_making_code(self, make_code):
@@ -28,15 +28,35 @@ class TestCodes:
         assert const.provision_effective_date("amendment-XIV") == equal_protection_date
 
     def test_uslm_code(self, make_code):
-        # usc17 = make_code["usc17"]
-        usc17 = Code("usc17.xml")
+        usc17 = make_code["usc17"]
         assert usc17.title == "USC Title 17"
 
 
 class TestEnactments:
-    def test_make_enactment(self, make_code, make_enactment):
+    def test_make_enactment(self, make_enactment):
         search_clause = make_enactment["search_clause"]
         assert search_clause.text.endswith("shall not be violated")
+
+    def test_passage_from_uslm_code(self, make_code):
+        usc17 = make_code["usc17"]
+        copyright_exceptions = Enactment(
+            usc17, section="102", subsection="b", end="extend to any"
+        )
+        assert copyright_exceptions.text == (
+            "In no case does copyright protection "
+            + "for an original work of authorship extend to any"
+        )
+
+    def test_short_passage_from_uslm_code(self, make_code):
+        usc17 = make_code["usc17"]
+        method = Enactment(
+            usc17,
+            section="102",
+            subsection="b",
+            start="method of operation",
+            end="method of operation",
+        )
+        assert method.text == "method of operation"
 
     def test_code_title_in_str(self, make_enactment):
         assert "secure in their persons" in str(make_enactment["search_clause"])
