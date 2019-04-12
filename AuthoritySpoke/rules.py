@@ -809,7 +809,9 @@ class ProceduralRule(Rule):
             return False
         if self.decided:
             return self >= other.negated()
-        return other.implies_if_decided(self) or other.implies_if_decided(self.negated())
+        return other.implies_if_decided(self) or other.implies_if_decided(
+            self.negated()
+        )
 
 
 class Attribution:

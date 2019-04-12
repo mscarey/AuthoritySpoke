@@ -26,6 +26,10 @@ class Code:
         if filename.startswith("ca_"):
             self.title = self.xml.find("h3").find("b").text.split(" - ")[0]
             self.sovereign = "California"
+        elif filename.startswith("usc"):
+            self.title_number = int(self.xml.find("meta").find("docNumber").text)
+            self.title = f"USC Title {self.title_number}"
+            self.sovereign = "federal"
         else:
             self.title = self.xml.find("dc:title").text
             if "United States" in self.title:
@@ -87,6 +91,7 @@ class Enactment:
 
     code: Code
     section: str
+    subsection: Optional[str] = None
     start: Optional[str] = None
     end: Optional[str] = None
     name: Optional[str] = None
@@ -116,8 +121,16 @@ class Enactment:
             ).search(href)
 
         if self.code.sovereign == "federal":
-            passages = self.code.xml.find(id=self.section).find_all(name="text")
-        if self.code.sovereign == "California":
+            if hasattr(self.code, 'title_number'):
+                section_identifier = f"/us/usc/t{self.code.title_number}/s{self.section}"
+                section = self.code.xml.find(name="section", identifier=section_identifier)
+                if self.subsection:
+                    subsection_identifier = f"{section_identifier}/{self.subsection}"
+                section = section.find(name="subsection", identifier=subsection_identifier)
+                passages = section.find_all(["chapeau", "paragraph", "content"])
+            else:
+                passages = self.code.xml.find(id=self.section).find_all(name="text")
+        elif self.code.sovereign == "California":
             passages = self.code.xml.find(href=cal_href).parent.find_next_siblings(
                 style="margin:0;display:inline;"
             )

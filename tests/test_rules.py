@@ -219,8 +219,8 @@ class TestRules:
     # Contradiction
 
     def test_error_contradiction_with_procedure(self, make_holding, make_procedure):
-            with pytest.raises(TypeError):
-                make_holding["h2_undecided"].contradicts(make_procedure["c2"])
+        with pytest.raises(TypeError):
+            make_holding["h2_undecided"].contradicts(make_procedure["c2"])
 
     def test_holding_contradicts_invalid_version_of_self(self, make_holding):
         assert make_holding["h2"].negated() == make_holding["h2_invalid"]
@@ -236,8 +236,12 @@ class TestRules:
         assert not make_holding["h2_output_false"].contradicts(make_holding["h2"])
 
     def test_some_holding_consistent_with_absent_false_output(self, make_holding):
-        assert not make_holding["h2"].contradicts(make_holding["h2_output_absent_false"])
-        assert not make_holding["h2_output_absent_false"].contradicts(make_holding["h2"])
+        assert not make_holding["h2"].contradicts(
+            make_holding["h2_output_absent_false"]
+        )
+        assert not make_holding["h2_output_absent_false"].contradicts(
+            make_holding["h2"]
+        )
 
     def test_contradicts_if_valid(self, make_holding):
         """

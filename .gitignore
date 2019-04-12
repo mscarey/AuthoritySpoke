@@ -8,6 +8,7 @@ AuthoritySpoke.egg-info
 .mypy_cache/
 codes/ca_evidence.html
 codes/ca_penal.html
+codes/usc17.xml
 html/
 input/unused
 opinions/flf/
@@ -15,5 +16,7 @@ opinions/unused
 notebooks/
 prof/
 tests/__pycache__/
+tests/.pytest_cache/
+tests/prof/
 xml/
 *.ipynb

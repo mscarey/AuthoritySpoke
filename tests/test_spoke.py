@@ -256,6 +256,11 @@ class TestCodes:
         equal_protection_date = datetime.date(1868, 7, 28)
         assert const.provision_effective_date("amendment-XIV") == equal_protection_date
 
+    def test_uslm_code(self, make_code):
+        # usc17 = make_code["usc17"]
+        usc17 = Code("usc17.xml")
+        assert usc17.title == "USC Title 17"
+
 
 class TestEnactments:
     def test_make_enactment(self, make_code, make_enactment):

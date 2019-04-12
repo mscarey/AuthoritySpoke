@@ -12,6 +12,12 @@ from authorityspoke.factors import Factor, Entity
 
 from dataclasses import astuple, dataclass
 
+class Association(Entity):
+    """
+    An entity representing a set of people such as members or shareholders,
+    or a business such as a corporation or LLC, but not an unincorporated
+    business such as a sole proprietorship.
+    """
 
 class Human(Entity):
     """
