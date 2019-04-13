@@ -203,6 +203,7 @@
                     "code": "usc17.xml",
                     "section": "102",
                     "subsection": "b",
+                    "name": "method of operation provision",
                     "text": "method of operation"
                 }
             ]
@@ -233,7 +234,7 @@
                 "type": "fact",
                 "content": "the Lotus menu command hierarchy was a method of operation"
             }],
-            "enactments": ["copyright exceptions", "method of operation"]
+            "enactments": ["copyright exceptions", "method of operation provision"]
         },
         {
             "inputs": [{
@@ -248,7 +249,7 @@
                 "type": "fact",
                 "content": "the Lotus menu command hierarchy was a method of operation"
             }],
-            "enactments": ["copyright exceptions", "method of operation"]
+            "enactments": ["copyright exceptions", "method of operation provision"]
         },
         {
             "inputs": [{
@@ -257,7 +258,7 @@
                 },
                 {
                     "type": "fact",
-                    "content": "the precise formulation of Lotus 1-2-3's code was not necessary for Lotus 1-2-3 to work"
+                    "content": "the precise formulation of Lotus 1-2-3's code was not necessary for it to work"
                 }
             ],
             "despite": [{
@@ -268,7 +269,8 @@
                 "type": "fact",
                 "content": "Lotus 1-2-3 was a method of operation",
                 "truth": false
-            }]
+            }],
+            "enactments": ["copyright exceptions", "method of operation provision"]
         }
     ]
 }

@@ -102,7 +102,7 @@ class TestRuleImport:
         exactly match the holdings created for testing in conftest.
         """
         holdings = Rule.from_json("holding_lotus.json")
-        assert len(holdings) == 5
+        assert len(holdings) == 12
 
     @pytest.mark.xfail
     def test_imported_holding_same_as_test_object(self, real_holding, make_opinion):

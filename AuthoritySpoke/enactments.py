@@ -202,8 +202,6 @@ class Enactment:
         if text and not (start or end):
             start = text
             end = text
-        if text and not name:
-            name = text
 
         return (
             Enactment(
