@@ -101,8 +101,7 @@ class TestRuleImport:
         Don't expect the holdings imported from the JSON to
         exactly match the holdings created for testing in conftest.
         """
-        watt = make_opinion["watt_majority"]
-        holdings = Rule.from_json("holding_watt.json")
+        holdings = Rule.from_json("holding_lotus.json")
         assert len(holdings) == 5
 
     @pytest.mark.xfail

@@ -126,7 +126,7 @@ class Enactment:
                 section = self.code.xml.find(name="section", identifier=section_identifier)
                 if self.subsection:
                     subsection_identifier = f"{section_identifier}/{self.subsection}"
-                section = section.find(name="subsection", identifier=subsection_identifier)
+                    section = section.find(name="subsection", identifier=subsection_identifier)
                 passages = section.find_all(["chapeau", "paragraph", "content"])
             else:
                 passages = self.code.xml.find(id=self.section).find_all(name="text")
@@ -195,13 +195,23 @@ class Enactment:
         Also, handing "mentioned" through this method is pointless.
         """
         code = Code(enactment_dict.get("code"))
+        start = enactment_dict.get("start")
+        end = enactment_dict.get("end")
+        name = enactment_dict.get("name")
+        text = enactment_dict.get("text")
+        if text and not (start or end):
+            start = text
+            end = text
+        if text and not name:
+            name = text
+
         return (
             Enactment(
                 code=code,
-                section=enactment_dict.get("section"),
-                start=enactment_dict.get("start"),
-                end=enactment_dict.get("end"),
-                name=enactment_dict.get("name"),
+                section=enactment_dict["section"],
+                start=start,
+                end=end,
+                name=name,
             ),
             mentioned,
         )

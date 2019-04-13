@@ -2,23 +2,23 @@
     "mentioned_factors": [
 
         {
-            "type": "Entity",
+            "type": "entity",
             "name": "Hideaway Lodge"
         },
         {
-            "type": "Human",
+            "type": "human",
             "name": "Wattenburg"
         },
         {
-            "type": "Entity",
+            "type": "entity",
             "name": "the stockpile of trees"
         },
         {
-            "type": "Event",
+            "type": "event",
             "name": "officers' search of the stockpile"
         },
         {
-            "type": "Exhibit",
+            "type": "exhibit",
             "name": "proof of Wattenburg's guilt",
             "generic": true
         }

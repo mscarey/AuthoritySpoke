@@ -2,23 +2,23 @@
     "mentioned_factors": [
 
         {
-            "type": "Entity",
+            "type": "entity",
             "name": "Bradley's house"
         },
         {
-            "type": "Human",
+            "type": "human",
             "name": "Bradley"
         },
         {
-            "type": "Entity",
+            "type": "entity",
             "name": "Bradley's marijuana patch"
         },
         {
-            "type": "Event",
+            "type": "event",
             "name": "officers' search of the yard"
         },
         {
-            "type": "Exhibit",
+            "type": "exhibit",
             "name": "proof of Bradley's guilt",
             "generic": true
         },
