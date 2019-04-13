@@ -922,7 +922,7 @@ def make_holding(make_procedure, make_enactment) -> Dict[str, ProceduralRule]:
 def make_opinion(make_entity) -> Dict[str, Opinion]:
     e = make_entity
 
-    test_cases = ("brad", "cardenas", "watt")
+    test_cases = ("brad", "cardenas", "lotus", "watt")
     opinions = {}
     for case in test_cases:
         for opinion in Opinion.from_file(f"{case}_h.json"):
@@ -933,7 +933,7 @@ def make_opinion(make_entity) -> Dict[str, Opinion]:
 def make_opinion_with_holding(make_opinion, make_entity) -> Dict[str, Opinion]:
     e = make_entity
 
-    test_cases = ("brad", "cardenas", "watt")
+    test_cases = ("brad", "cardenas", "lotus", "watt")
     opinions = {}
     for case in test_cases:
         opinion = make_opinion[f"{case}_majority"]

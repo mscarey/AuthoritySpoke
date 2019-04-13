@@ -135,6 +135,16 @@ class TestEvidence:
         )
         assert not e.generic
 
+
+    def test_no_extra_space_around_exhibit_in_string(self, make_opinion_with_holding):
+        """
+        Don't expect the holdings imported from the JSON to
+        exactly match the holdings created for testing in conftest.
+        """
+
+        lotus = make_opinion_with_holding["lotus_majority"]
+        assert " , " not in str(lotus.holdings[4].inputs[0])
+
     def test_get_entity_orders(self, make_evidence):
         # TODO: check this after making Evidence.__str__ method
         context = make_evidence["no_shooting"].exhibit.statement.context_factors

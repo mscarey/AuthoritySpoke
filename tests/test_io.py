@@ -96,13 +96,14 @@ class TestRuleImport:
     the format in holding_cardenas.json
     """
 
-    def test_import_some_holdings(self, make_opinion):
+    def test_import_some_holdings(self, make_opinion_with_holding):
         """
         Don't expect the holdings imported from the JSON to
         exactly match the holdings created for testing in conftest.
         """
-        holdings = Rule.from_json("holding_lotus.json")
-        assert len(holdings) == 12
+        lotus = make_opinion_with_holding["lotus_majority"]
+        assert len(lotus.holdings) == 12
+
 
     @pytest.mark.xfail
     def test_imported_holding_same_as_test_object(self, real_holding, make_opinion):
