@@ -1287,11 +1287,11 @@ class Exhibit(Factor):
 
     def __str__(self):
         string = (
-            f'{("by " + str(self.stated_by) + " ") if self.stated_by else ""}'
+            f'{("by " + str(self.stated_by)) if self.stated_by else ""}'
             + f'{(", asserting " + str(self.statement)) if self.statement else ""}'
         )
         string = super().__str__().format(string)
-        return string.replace("exhibit", self.form or "exhibit")
+        return string.replace("exhibit", self.form or "exhibit").strip()
 
 
 @dataclass(frozen=True)

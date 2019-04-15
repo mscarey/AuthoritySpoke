@@ -147,17 +147,6 @@ class Enactment:
             r = len(text)
         return text[l:r]
 
-    def __hash__(self):
-        return hash(
-            (
-                self.text,
-                self.code.sovereign,
-                self.code.level,
-                self.code.title,
-                self.section,
-            )
-        )
-
     def __str__(self):
         return f'"{self.text}" ({self.code.title}, {self.section})'
 
@@ -206,7 +195,8 @@ class Enactment:
         return (
             Enactment(
                 code=code,
-                section=enactment_dict["section"],
+                section=enactment_dict.get("section"),
+                subsection=enactment_dict.get("subsection"),
                 start=start,
                 end=end,
                 name=name,

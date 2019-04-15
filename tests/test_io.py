@@ -104,6 +104,13 @@ class TestRuleImport:
         lotus = make_opinion_with_holding["lotus_majority"]
         assert len(lotus.holdings) == 12
 
+    def test_enactment_has_subsection(self, make_opinion_with_holding):
+        lotus = make_opinion_with_holding["lotus_majority"]
+        assert lotus.holdings[8].enactments[0].subsection == "b"
+
+    def test_enactment_text_limited_to_subsection(self, make_opinion_with_holding):
+        lotus = make_opinion_with_holding["lotus_majority"]
+        assert "architectural works" not in str(lotus.holdings[8].enactments[0])
 
     @pytest.mark.xfail
     def test_imported_holding_same_as_test_object(self, real_holding, make_opinion):
@@ -116,23 +123,22 @@ class TestRuleImport:
         watt_holdings = Rule.from_json("holding_watt.json")
         assert watt_holdings[0] == real_holding["h1"]
 
-    def test_same_enactment_objects_equal(self, make_opinion):
+    def test_same_enactment_objects_equal(self, make_opinion_with_holding):
         """
         Don't expect the holdings imported from the JSON to
         exactly match the holdings created for testing in conftest.
         """
-        watt = make_opinion["watt_majority"]
-        holdings = Rule.from_json("holding_watt.json")
-        assert holdings[0].enactments[0] == holdings[1].enactments[0]
+        watt = make_opinion_with_holding["watt_majority"]
+        assert watt.holdings[0].enactments[0] == watt.holdings[1].enactments[0]
 
-    def test_same_code_object_in_multiple_enactments(self, make_opinion):
+    def test_different_enactments_same_code(self, make_opinion_with_holding):
         """
         Don't expect the holdings imported from the JSON to
         exactly match the holdings created for testing in conftest.
         """
-        watt = make_opinion["watt_majority"]
-        holdings = Rule.from_json("holding_watt.json")
-        assert holdings[0].enactments[0].code == holdings[1].enactments[0].code
+        lotus = make_opinion_with_holding["lotus_majority"]
+        assert lotus.holdings[0].enactments[0].code == lotus.holdings[1].enactments[0].code
+        assert lotus.holdings[0].enactments[0].code is lotus.holdings[1].enactments[0].code
 
     def test_same_enactment_in_two_opinions(self, make_opinion):
         watt = make_opinion["watt_majority"]
