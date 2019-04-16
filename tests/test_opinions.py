@@ -97,3 +97,47 @@ class TestOpinions:
             make_holding["h1"],
             context=(Entity("House on Haunted Hill"), "nonexistent factor"),
         )
+
+    def test_new_context_creates_equal_rule(self, make_opinion):
+        watt = make_opinion["watt_majority"]
+        brad = make_opinion["brad_majority"]
+        watt_holdings = Rule.from_json(f"holding_watt.json")
+        brad_holdings = Rule.from_json(f"holding_brad.json")
+        for holding in watt_holdings:
+            watt.posits(holding)
+        for holding in brad_holdings:
+            brad.posits(holding)
+        context_pairs = {
+            "proof of Bradley's guilt": "proof of Wattenburg's guilt",
+            "Bradley": "Wattenburg",
+            "officers' search of the yard": "officers' search of the stockpile",
+            "Bradley's marijuana patch": "the stockpile of trees",
+        }
+        watt.posits(brad.holdings[0], context_pairs)
+        assert watt.holdings[-1] == brad.holdings[0]
+
+    def test_new_context_inferring_factors_to_change(self, make_opinion):
+        """
+        This changes watt's holdings; may break tests below.
+        """
+
+        watt = make_opinion["watt_majority"]
+        brad = make_opinion["brad_majority"]
+        watt.holdings = []
+        brad.holdings = []
+        watt_holdings = Rule.from_json(f"holding_watt.json")
+        brad_holdings = Rule.from_json(f"holding_brad.json")
+        for holding in watt_holdings:
+            watt.posits(holding)
+        for holding in brad_holdings:
+            brad.posits(holding)
+
+        context_items = [
+            "proof of Wattenburg's guilt",
+            "Wattenburg",
+            "officers' search of the stockpile",
+            "Hideaway Lodge",
+            "the stockpile of trees",
+        ]
+        watt.posits(brad.holdings[0], context_items)
+        assert watt.holdings[-1] == brad.holdings[0]

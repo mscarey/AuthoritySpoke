@@ -189,7 +189,7 @@ class TestRuleImport:
         watt.posits(context_holding)
         assert (
             "the number of marijuana plants in <the stockpile of trees> was at least 3"
-            in str(watt.holdings[0])
+            in str(watt.holdings[-1])
         )
 
     def test_opinion_posits_holding_dict_context(self, make_opinion, make_entity):
@@ -261,31 +261,6 @@ class TestRuleImport:
         }
         with pytest.raises(ValueError):
             Rule.collection_from_dict(rule_dict)
-
-    def test_new_context_creates_equal_rule(self, make_opinion_with_holding):
-        watt = make_opinion_with_holding["watt_majority"]
-        brad = make_opinion_with_holding["brad_majority"]
-        context_pairs = {
-            "proof of Bradley's guilt": "proof of Wattenburg's guilt",
-            "Bradley": "Wattenburg",
-            "officers' search of the yard": "officers' search of the stockpile",
-            "Bradley's marijuana patch": "the stockpile of trees",
-        }
-        watt.posits(brad.holdings[0], context_pairs)
-        assert watt.holdings[-1] == brad.holdings[0]
-
-    def test_new_context_inferring_factors_to_change(self, make_opinion_with_holding):
-        watt = make_opinion_with_holding["watt_majority"]
-        brad = make_opinion_with_holding["brad_majority"]
-        context_items = [
-            "proof of Wattenburg's guilt",
-            "Wattenburg",
-            "officers' search of the stockpile",
-            "Hideaway Lodge",
-            "the stockpile of trees",
-        ]
-        watt.posits(brad.holdings[0], context_items)
-        assert watt.holdings[-1] == brad.holdings[0]
 
 
 class TestNestedFactorImport:
