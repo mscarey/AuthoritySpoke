@@ -1210,8 +1210,8 @@ class Pleading(Factor):
 
     def __str__(self):
         string = (
-            f'{(" filed by " + str(self.filer) if self.filer else "")}'
-            + f'{(" on " + str(self.date)) if self.date else ""}'
+            f'{("filed by " + str(self.filer) if self.filer else "")}'
+            + f'{("received on " + str(self.date)) if self.date else ""}'
         )
         return super().__str__().format(string)
 
@@ -1287,8 +1287,8 @@ class Exhibit(Factor):
 
     def __str__(self):
         string = (
-            f'{("by " + str(self.stated_by)) if self.stated_by else ""}'
-            + f'{(", asserting " + str(self.statement)) if self.statement else ""}'
+            f'{("by " + str(self.stated_by) + ", ") if self.stated_by else ""}'
+            + f'{("asserting " + str(self.statement)) if self.statement else ""}'
         )
         string = super().__str__().format(string)
         return string.replace("exhibit", self.form or "exhibit").strip()
@@ -1307,10 +1307,10 @@ class Evidence(Factor):
 
     def __str__(self):
         string = (
-            f'{("of " + str(self.exhibit)) if self.exhibit else ""}'
-            + f'{(", which supports " + str(self.to_effect)) if self.to_effect else ""}'
+            f'{("of " + str(self.exhibit)) + ", " if self.exhibit else ""}'
+            + f'{("which supports " + str(self.to_effect)) if self.to_effect else ""}'
         )
-        return super().__str__().format(string)
+        return super().__str__().format(string).strip()
 
     def __eq__(self, other: Factor) -> bool:
         return super().__eq__(other)

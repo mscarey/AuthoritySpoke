@@ -11,7 +11,8 @@ beautifulsoup4 = ">=4.7.1"
 ipykernel = "*"
 lxml = "*"
 pint = ">=0.9"
-authorityspoke = "*"
+requests = "*"
+"authorityspoke" = {path = ".", editable = true}
 
 [dev-packages]
 pytest = "*"
@@ -20,8 +21,6 @@ mypy = "*"
 rope = "*"
 black = "*"
 pytest-cov = "*"
-v = {editable = true,version = "*"}
-pytest-profiling = "*"
 
 [requires]
 python_version = "3.7"

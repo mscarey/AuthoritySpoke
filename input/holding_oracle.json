@@ -1,0 +1,280 @@
+{
+    "mentioned_factors": [
+
+        {
+            "type": "association",
+            "name": "Oracle America"
+        },
+        {
+            "type": "association",
+            "name": "Google"
+        },
+        {
+            "type": "association",
+            "name": "Sun Microsystems"
+        },
+        {
+            "type": "entity",
+            "name": "the Java API"
+        },
+        {
+            "type": "entity",
+            "name": "the Java language"
+        }
+    ],
+    "holdings": [{
+            "inputs": {
+                "type": "fact",
+                "content": "the Java API was an original work",
+                "truth": false
+            },
+            "outputs": {
+                "type": "fact",
+                "content": "the Java API was copyrightable",
+                "truth": false
+            },
+            "mandatory": true,
+            "enactments": {
+                "code": "usc17.xml",
+                "section": "102",
+                "subsection": "a",
+                "end": "machine or device.",
+                "name": "copyright protection"
+            }
+        },
+        {
+            "inputs": [{
+                    "type": "fact",
+                    "content": "the Java API was independently created by the author, as opposed to copied from other works"
+                },
+                {
+                    "type": "fact",
+                    "content": "the Java API possessed at least some minimal degree of creativity"
+                }
+            ],
+            "outputs": {
+                "type": "fact",
+                "content": "the Java API was an original work"
+            },
+            "mandatory": true,
+            "universal": true,
+            "enactments": "copyright protection"
+        },
+        {
+            "inputs": [{
+                    "type": "fact",
+                    "content": "the Java API was an original work"
+                }, {
+                    "type": "fact",
+                    "content": "the Java API was the expression of an idea"
+                },
+                {
+                    "type": "fact",
+                    "content": "the Java API was an idea",
+                    "truth": false
+                }
+            ],
+            "despite": [{
+                    "type": "fact",
+                    "content": "the Java API was essentially the only way to express the idea that it embodied"
+                },
+                {
+                    "type": "fact",
+                    "content": "the Java API was a scene a faire"
+                }
+            ],
+            "outputs": {
+                "type": "fact",
+                "content": "the Java API was copyrightable"
+            },
+            "mandatory": true,
+            "enactments": "copyright protection",
+            "enactments_despite": {
+                "code": "usc17.xml",
+                "section": "102",
+                "subsection": "b",
+                "name": "copyrightability exceptions"
+            }
+        },
+        {
+            "inputs": [{
+                    "type": "fact",
+                    "content": "the Java language was a computer program"
+                },
+                {
+                    "type": "fact",
+                    "content": "the Java API was the source code of the Java language"
+                }
+            ],
+            "outputs": {
+                "type": "fact",
+                "content": "the Java API was a literal element of the Java language"
+            },
+            "mandatory": true,
+            "universal": true,
+            "enactments": ["copyright protection", "copyrightability exceptions"]
+        },
+        {
+            "inputs": [{
+                    "type": "fact",
+                    "content": "the Java language was a computer program"
+                },
+                {
+                    "type": "fact",
+                    "content": "the Java API was the object code of the Java language"
+                }
+            ],
+            "outputs": {
+                "type": "fact",
+                "content": "the Java API was a literal element of the Java language"
+            },
+            "mandatory": true,
+            "universal": true,
+            "enactments": ["copyright protection", "copyrightability exceptions"]
+        },
+        {
+            "inputs": [{
+                    "type": "fact",
+                    "content": "the Java language was a computer program"
+                },
+                {
+                    "type": "fact",
+                    "content": "the Java API was a literal element of the Java language"
+                }
+            ],
+            "outputs": {
+                "type": "fact",
+                "content": "the Java API was copyrightable"
+            },
+            "mandatory": true,
+            "enactments": "copyright protection",
+            "enactments_despite": "copyrightability exceptions"
+        },
+        {
+            "inputs": [{
+                    "type": "fact",
+                    "content": "the Java language was a computer program"
+                },
+                {
+                    "type": "fact",
+                    "content": "the Java API was the sequence, structure, and organization of the Java language"
+                }
+            ],
+            "outputs": {
+                "type": "fact",
+                "content": "the Java API was a non-literal element of the Java language"
+            },
+            "mandatory": true,
+            "universal": true,
+            "enactments": ["copyright protection", "copyrightability exceptions"]
+        },
+        {
+            "inputs": [{
+                    "type": "fact",
+                    "content": "the Java language was a computer program"
+                },
+                {
+                    "type": "fact",
+                    "content": "the Java API was the user interface of the Java language"
+                }
+            ],
+            "outputs": {
+                "type": "fact",
+                "content": "the Java API was a non-literal element of the Java language"
+            },
+            "mandatory": true,
+            "universal": true,
+            "enactments": ["copyright protection", "copyrightability exceptions"]
+        },
+        {
+            "inputs": [{
+                    "type": "fact",
+                    "content": "the Java language was a computer program"
+                },
+                {
+                    "type": "fact",
+                    "content": "the Java API was a non-literal element of the Java language"
+                },
+                {
+                    "type": "fact",
+                    "content": "the Java API was the expression of an idea"
+                },
+                {
+                    "type": "fact",
+                    "content": "the Java API was an idea",
+                    "truth": false
+                }
+            ],
+            "outputs": {
+                "type": "fact",
+                "content": "the Java API was copyrightable"
+            },
+            "mandatory": true,
+            "enactments": "copyright protection",
+            "enactments_despite": "copyrightability exceptions"
+        },
+        {
+            "inputs": [{
+                    "type": "fact",
+                    "content": "the Java language was a computer program"
+                },
+                {
+                    "type": "fact",
+                    "content": "the Java API was a non-literal element of the Java language"
+                },
+                {
+                    "type": "fact",
+                    "content": "the Java API was the expression of an idea",
+                    "truth": false
+                },
+                {
+                    "type": "fact",
+                    "content": "the Java API was an idea"
+                }
+            ],
+            "outputs": {
+                "type": "fact",
+                "content": "the Java API was copyrightable",
+                "truth": false
+            },
+            "mandatory": true,
+            "enactments": "copyrightability exceptions",
+            "enactments_despite": "copyright protection"
+        },
+        {
+            "inputs": {
+                "type": "fact",
+                "content": "the Java API was the expression of an idea"
+            },
+            "despite": {
+                "type": "fact",
+                "content": "the Java API was a method of operation"
+            },
+            "outputs": {
+                "type": "fact",
+                "content": "the Java API was copyrightable"
+            },
+            "mandatory": true,
+            "enactments": "copyright protection",
+            "enactments_despite": [{
+                    "code": "usc17.xml",
+                    "section": "102",
+                    "subsection": "b",
+                    "end": "extend to any",
+                    "name": "in no case clause"
+                },
+                {
+                    "code": "usc17.xml",
+                    "section": "102",
+                    "subsection": "b",
+                    "name": "method of operation clause",
+                    "text": "method of operation"
+                }
+            ]
+        },
+
+        {
+
+        },
+    ]
+}

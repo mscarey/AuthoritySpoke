@@ -579,7 +579,7 @@ class ProceduralRule(Rule):
             + f"{'it is not valid that ' if not self.rule_valid else ''}the court "
             + f"{'MUST' if self.mandatory else 'MAY'} {'ALWAYS' if self.universal else 'SOMETIMES'} "
             + f"accept the outcome:{str(factor_catalog(self.procedure.outputs, 'OUT'))}"
-            + f"{'based on the input:' + str(factor_catalog(self.procedure.inputs, 'IN')) if self.procedure.inputs else ''}"
+            + f"{'based on the input:' + str(factor_catalog(self.procedure.inputs, 'SUPPORT')) if self.procedure.inputs else ''}"
             + f"{'and despite:' + str(factor_catalog(self.procedure.despite, 'DESPITE')) if self.procedure.despite else ''}"
             + f"{'according to the legislation:' + str(factor_catalog(self.enactments, 'SUPPORT')) if self.enactments else ''}"
             + f"{'and despite the legislation:' + str(factor_catalog(self.enactments, 'DESPITE')) if self.enactments_despite else ''}"
