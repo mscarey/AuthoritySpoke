@@ -65,9 +65,10 @@ class Opinion:
     def make_opinion_with_holdings(cls, party_name: str):
         """
         This generates a majority Opinion with all its holdings, under
-        the assumption that the text of the Opinion is in the opinions
-        folder with the name [party_name]_h.json, and the holdings are
-        in the input folder with the name holding_[party_name].json.
+        the assumption that the text of the Opinion is in the
+        example_data/opinions folder with the name [party_name]_h.json,
+        and the holdings are in the example_data/holdings folder with
+        the name holding_[party_name].json.
         """
         opinion = next(cls.from_file(f"{party_name}_h.json"))
         holdings = Rule.from_json(f"holding_{party_name}.json")
@@ -105,6 +106,12 @@ class Opinion:
         self.holdings.append(holding)
 
     def get_factor_by_name(self, name: str) -> Optional[Factor]:
+        """
+        Performs a recursive search of each holding in the
+        Opinion for a Factor with the specified name attribute.
+        Returns such a Factor if it exists, otherwise returns None.
+        """
+
         for holding in self.holdings:
             factor = holding.get_factor_by_name(name)
             if factor is not None:

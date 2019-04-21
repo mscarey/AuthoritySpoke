@@ -104,7 +104,8 @@ class Factor:
         answer = class_options.get(name)
         if answer is None:
             raise ValueError(
-                f'"type" value in input must be one of {class_options}, not {name}'
+                f'"type" value in input must be one of '
+                + f'{list(class_options.keys())}, not {name}'
             )
         return answer
 
@@ -280,7 +281,11 @@ class Factor:
     @property
     def recursive_factors(self) -> Dict["Factor", None]:
         """
-        Using dict instead of set to preserve order
+        Returns a collection of factors including self's
+        context_factors, and each of those factors'
+        context_factors, recursively.
+
+        Uses a dict instead of a set to preserve order.
         """
         answers: Dict[Factor, None] = {self: None}
         for context in filter(lambda x: x is not None, self.context_factors):
@@ -292,6 +297,11 @@ class Factor:
         return answers
 
     def get_factor_by_name(self, name: str) -> Optional["Factor"]:
+        """
+        Performs a recursive search of self and self's attributes
+        for a Factor with the specified name attribute. Returns
+        such a Factor if it exists, otherwise returns None.
+        """
         for factor in self.recursive_factors:
             if factor.name == name:
                 return factor

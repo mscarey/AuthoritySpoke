@@ -2,6 +2,7 @@ __pycache__/
 AuthoritySpoke.egg-info
 .coverage
 .env
+.ipynb_checkpoints/
 .pylintrc
 .pytest_cache
 .vscode
@@ -20,4 +21,3 @@ tests/__pycache__/
 tests/.pytest_cache/
 tests/prof/
 xml/
-*.ipynb
