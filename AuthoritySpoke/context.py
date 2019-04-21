@@ -58,8 +58,11 @@ def get_directory_path(stem):
     This function doesn't obviously belong in the context module.
     """
     directory = pathlib.Path.cwd()
-    if directory.stem != stem:
-        directory = directory / stem
-        if not directory.exists():
-            directory = pathlib.Path.cwd().parent / stem
+    if directory.stem == stem:
+        return directory
+    if directory.stem != "example_data":
+        directory = directory / "example_data"
+    directory = directory / stem
+    if not directory.exists():
+        directory = pathlib.Path.cwd().parent / "example_data" / stem
     return directory

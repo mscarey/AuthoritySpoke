@@ -61,6 +61,21 @@ class Opinion:
                 author,
             )
 
+    @classmethod
+    def make_opinion_with_holdings(cls, party_name: str):
+        """
+        This generates a majority Opinion with all its holdings, under
+        the assumption that the text of the Opinion is in the opinions
+        folder with the name [party_name]_h.json, and the holdings are
+        in the input folder with the name holding_[party_name].json.
+        """
+        opinion = next(cls.from_file(f"{party_name}_h.json"))
+        holdings = Rule.from_json(f"holding_{party_name}.json")
+        for holding in holdings:
+            opinion.posits(holding)
+        return opinion
+
+
     def posits(self, holding: Rule, context: Optional[Sequence[Factor]] = None) -> None:
         """
         Adds holding to the opinion's holdings list, replacing any other

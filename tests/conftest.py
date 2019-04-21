@@ -930,15 +930,10 @@ def make_opinion(make_entity) -> Dict[str, Opinion]:
     return opinions
 
 @pytest.fixture(scope="class")
-def make_opinion_with_holding(make_opinion, make_entity) -> Dict[str, Opinion]:
-    e = make_entity
-
+def make_opinion_with_holding() -> Dict[str, Opinion]:
     test_cases = ("brad", "cardenas", "lotus", "watt")
     opinions = {}
     for case in test_cases:
-        opinion = make_opinion[f"{case}_majority"]
-        holdings = Rule.from_json(f"holding_{case}.json")
-        for holding in holdings:
-            opinion.posits(holding)
+        opinion = Opinion.make_opinion_with_holdings(case)
         opinions[f"{case}_majority"] = opinion
     return opinions

@@ -85,7 +85,7 @@ class TestFactorImport:
         directory = pathlib.Path.cwd() / "tests"
         if directory.exists():
             os.chdir(directory)
-        input_directory = get_directory_path("input") / "holding_watt.json"
+        input_directory = Rule.directory / "holding_watt.json"
         assert input_directory.exists()
 
 

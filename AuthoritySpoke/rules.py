@@ -463,7 +463,7 @@ class Rule(Factor):
     holding.
     """
 
-    directory = get_directory_path("input")
+    directory = get_directory_path("holdings")
 
     @classmethod
     def collection_from_dict(cls, case: Dict) -> List["Rule"]:
