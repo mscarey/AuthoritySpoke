@@ -51,6 +51,11 @@ class TestEnactments:
             + "for an original work of authorship extend to any"
         )
 
+    def test_passage_from_imported_statute(self, make_code):
+        oracle_majority = Opinion.make_opinion_with_holdings("oracle")
+        despite_text = str(oracle_majority.holdings[5])
+        assert 'DESPITE: "In no case does copyright protection ' in despite_text
+
     def test_short_passage_from_uslm_code(self, make_code):
         usc17 = make_code["usc17"]
         method = Enactment(
@@ -63,14 +68,9 @@ class TestEnactments:
         assert method.text == "method of operation"
 
     def test_passage_from_cfr_code(self, make_code):
-        cfr=make_code["cfr37"]
-        slogans = Enactment(
-            cfr,
-            section=202.1,
-            end="names, titles, and slogans"
-        )
+        cfr = make_code["cfr37"]
+        slogans = Enactment(cfr, section=202.1, end="names, titles, and slogans")
         assert "Words and short phrases such as names" in slogans.text
-
 
     def test_code_title_in_str(self, make_enactment):
         assert "secure in their persons" in str(make_enactment["search_clause"])
