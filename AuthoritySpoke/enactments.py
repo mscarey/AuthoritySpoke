@@ -30,6 +30,10 @@ class Code:
             self.title_number = int(self.xml.find("meta").find("docNumber").text)
             self.title = f"USC Title {self.title_number}"
             self.sovereign = "federal"
+        elif filename.startswith("cfr"):
+            self.title_number = int(self.xml.CFRGRANULE.FDSYS.CFRTITLE.text)
+            self.title = f"Code of Federal Regulations Title {self.title_number}"
+            self.sovereign = "federal"
         else:
             self.title = self.xml.find("dc:title").text
             if "United States" in self.title:
@@ -37,6 +41,8 @@ class Code:
 
         if "Constitution" in self.title:
             self.level = "constitutional"
+        elif "Regulations" in self.title:
+            self.level = "regulation"
         else:
             self.level = "statutory"
 
@@ -120,14 +126,23 @@ class Enactment:
                 r"^javascript:submitCodesValues\('" + self.section
             ).search(href)
 
+        def usc_statute_text():
+            section_identifier = f"/us/usc/t{self.code.title_number}/s{self.section}"
+            section = self.code.xml.find(name="section", identifier=section_identifier)
+            if self.subsection:
+                subsection_identifier = f"{section_identifier}/{self.subsection}"
+                section = section.find(
+                    name="subsection", identifier=subsection_identifier
+                )
+            return section.find_all(["chapeau", "paragraph", "content"])
+
         if self.code.sovereign == "federal":
-            if hasattr(self.code, 'title_number'):
-                section_identifier = f"/us/usc/t{self.code.title_number}/s{self.section}"
-                section = self.code.xml.find(name="section", identifier=section_identifier)
-                if self.subsection:
-                    subsection_identifier = f"{section_identifier}/{self.subsection}"
-                    section = section.find(name="subsection", identifier=subsection_identifier)
-                passages = section.find_all(["chapeau", "paragraph", "content"])
+            if self.code.level == "regulation":
+                passages = self.code.xml.find(
+                    name="SECTNO", text=f"§ {202.1}"
+                ).parent.find_all(name="P")
+            elif hasattr(self.code, "title_number"):
+                passages = usc_statute_text()
             else:
                 passages = self.code.xml.find(id=self.section).find_all(name="text")
         elif self.code.sovereign == "California":

@@ -105,7 +105,7 @@ class Factor:
         if answer is None:
             raise ValueError(
                 f'"type" value in input must be one of '
-                + f'{list(class_options.keys())}, not {name}'
+                + f"{list(class_options.keys())}, not {name}"
             )
         return answer
 

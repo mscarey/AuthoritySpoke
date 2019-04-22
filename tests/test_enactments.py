@@ -17,6 +17,10 @@ class TestCodes:
         const = make_code["const"]
         assert str(const) == "Constitution of the United States"
 
+    def test_make_cfr(self, make_code):
+        cfr = make_code["cfr37"]
+        assert str(cfr) == "Code of Federal Regulations Title 37"
+
     def test_get_bill_of_rights_effective_date(self, make_code):
         const = make_code["const"]
         bill_of_rights_date = datetime.date(1791, 12, 15)
@@ -58,6 +62,16 @@ class TestEnactments:
         )
         assert method.text == "method of operation"
 
+    def test_passage_from_cfr_code(self, make_code):
+        cfr=make_code["cfr37"]
+        slogans = Enactment(
+            cfr,
+            section=202.1,
+            end="names, titles, and slogans"
+        )
+        assert "Words and short phrases such as names" in slogans.text
+
+
     def test_code_title_in_str(self, make_enactment):
         assert "secure in their persons" in str(make_enactment["search_clause"])
 
@@ -90,14 +104,6 @@ class TestEnactments:
         f1 = watt_factor["f1"]
         with pytest.raises(TypeError):
             assert not dp5 < f1
-
-    @pytest.mark.xfail
-    def test_enactment_as_factor(self, make_enactment):
-        """
-        Removed. Probably a remnant of an experiment in putting enactments
-        under "input" "despite" and "output"
-        """
-        assert isinstance(make_enactment["due_process_5"], Factor)
 
     def test_bill_of_rights_effective_date(self, make_enactment):
         # December 15, 1791

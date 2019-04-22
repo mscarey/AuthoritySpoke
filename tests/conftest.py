@@ -474,7 +474,12 @@ def make_evidence(
 def make_code() -> Dict[str, Code]:
     return {
         "const": Code("constitution.xml"),
-        "usc17": Code("usc17.xml"), # USC Title 17 in USLM format
+
+        # USC Title 17 in USLM format
+        "usc17": Code("usc17.xml"),
+
+        # one section of the 2012 edition of CFR Title 37 from govinfo.gov
+        "cfr37": Code("cfr37.xml"),
             }
 
 
