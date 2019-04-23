@@ -15,7 +15,7 @@
         },
         {
             "type": "entity",
-            "name": "Lotus menu command hierarchy"
+            "name": "the Lotus menu command hierarchy"
         },
         {
             "type": "entity",
@@ -80,7 +80,7 @@
         {
             "inputs": [{
                 "type": "fact",
-                "content": "the Lotus menu command hierarchy as a whole was original",
+                "content": "the Lotus menu command hierarchy was an original work",
                 "absent": true
             }],
             "outputs": [{
@@ -183,7 +183,7 @@
                 },
                 {
                     "type": "fact",
-                    "content": "the Lotus menu command hierarchy as a whole was original"
+                    "content": "the Lotus menu command hierarchy was an original work"
                 }
             ],
             "outputs": [{
