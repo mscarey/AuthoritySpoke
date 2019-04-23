@@ -7,7 +7,7 @@
         },
         {
             "type": "association",
-            "name": "Borland International, Inc."
+            "name": "Borland International"
         },
         {
             "type": "entity",
@@ -30,16 +30,16 @@
     "holdings": [{
             "inputs": [{
                     "type": "fact",
-                    "content": "Lotus Development Corporation owned a valid copyright in the Lotus menu command hierarchy"
+                    "content": "the Lotus menu command hierarchy was copyrightable"
                 },
                 {
                     "type": "fact",
-                    "content": "Borland International, Inc. copied constituent elements of the Lotus menu command hierarchy that were original"
+                    "content": "Borland International copied constituent elements of the Lotus menu command hierarchy that were original"
                 }
             ],
             "outputs": [{
                 "type": "fact",
-                "content": "Borland International, Inc. infringed Lotus Development Corporation's copyright in the Lotus menu command hierarchy"
+                "content": "Borland International infringed the copyright in the Lotus menu command hierarchy"
             }],
             "enactments": [{
                 "code": "usc17.xml",
@@ -52,12 +52,12 @@
         {
             "inputs": [{
                 "type": "fact",
-                "content": "Lotus Development Corporation owned a valid copyright in the Lotus menu command hierarchy",
+                "content": "the Lotus menu command hierarchy was copyrightable",
                 "absent": true
             }],
             "outputs": [{
                 "type": "fact",
-                "content": "Borland International, Inc. infringed Lotus Development Corporation's copyright in the Lotus menu command hierarchy",
+                "content": "Borland International infringed the copyright in the Lotus menu command hierarchy",
                 "absent": true
             }],
             "universal": true,
@@ -66,12 +66,12 @@
         {
             "inputs": [{
                 "type": "fact",
-                "content": "Borland International, Inc. copied constituent elements of the Lotus menu command hierarchy that were original",
+                "content": "Borland International copied constituent elements of the Lotus menu command hierarchy that were original",
                 "absent": true
             }],
             "outputs": [{
                 "type": "fact",
-                "content": "Borland International, Inc. infringed Lotus Development Corporation's copyright in the Lotus menu command hierarchy",
+                "content": "Borland International infringed the copyright in the Lotus menu command hierarchy",
                 "absent": true
             }],
             "universal": true,
@@ -85,7 +85,7 @@
             }],
             "outputs": [{
                 "type": "fact",
-                "content": "Lotus Development Corporation owned a valid copyright in the Lotus menu command hierarchy",
+                "content": "the Lotus menu command hierarchy was copyrightable",
                 "absent": true
             }],
             "universal": true,
@@ -102,13 +102,13 @@
                 "name": "evidence of Lotus's copyright registration"
             }, {
                 "type": "fact",
-                "content": "Lotus Development Corporation owned a valid copyright in the Lotus menu command hierarchy",
+                "content": "the Lotus menu command hierarchy was copyrightable",
                 "truth": false,
                 "absent": true
             }],
             "outputs": [{
                 "type": "fact",
-                "content": "Lotus Development Corporation owned a valid copyright in the Lotus menu command hierarchy"
+                "content": "the Lotus menu command hierarchy was copyrightable"
             }],
             "enactments": [{
                 "code": "usc17.xml",
@@ -121,12 +121,12 @@
                 "type": "evidence",
                 "to_effect": {
                     "type": "fact",
-                    "content": "Borland International, Inc. copied the Lotus menu command hierarchy"
+                    "content": "Borland International copied the Lotus menu command hierarchy in creating Quattro's Lotus Emulation Interface"
                 }
             }],
             "outputs": [{
                 "type": "fact",
-                "content": "Borland International, Inc. copied the Lotus menu command hierarchy"
+                "content": "Borland International copied the Lotus menu command hierarchy in creating Quattro's Lotus Emulation Interface"
             }],
             "enactments": ["copyright protection"]
         },
@@ -135,12 +135,12 @@
                     "type": "evidence",
                     "to_effect": {
                         "type": "fact",
-                        "content": "Borland International, Inc. had access to the Lotus menu command hierarchy"
+                        "content": "Borland International had access to the Lotus menu command hierarchy"
                     }
                 },
                 {
                     "type": "fact",
-                    "content": "Borland International, Inc. published Quattro's Lotus Emulation Interface"
+                    "content": "Borland International published Quattro's Lotus Emulation Interface"
                 },
                 {
                     "type": "evidence",
@@ -152,14 +152,14 @@
             ],
             "outputs": [{
                 "type": "fact",
-                "content": "Borland International, Inc. copied the Lotus menu command hierarchy with Quattro's Lotus Emulation Interface"
+                "content": "Borland International copied the Lotus menu command hierarchy in creating Quattro's Lotus Emulation Interface"
             }],
             "enactments": ["copyright protection"]
         },
         {
             "inputs": [{
                     "type": "fact",
-                    "content": "Borland International, Inc. copied the Lotus menu command hierarchy in creating Quattro's Lotus Emulation Interface"
+                    "content": "Borland International copied the Lotus menu command hierarchy in creating Quattro's Lotus Emulation Interface"
                 },
                 {
                     "type": "fact",
@@ -168,7 +168,7 @@
             ],
             "outputs": [{
                 "type": "fact",
-                "content": "Borland International, Inc. copied constituent elements of the Lotus menu command hierarchy that were original"
+                "content": "Borland International copied constituent elements of the Lotus menu command hierarchy that were original"
             }],
             "enactments": ["copyright protection"]
         },
@@ -188,7 +188,7 @@
             ],
             "outputs": [{
                 "type": "fact",
-                "content": "Lotus Development Corporation owned a valid copyright in the Lotus menu command hierarchy",
+                "content": "the Lotus menu command hierarchy was copyrightable",
                 "truth": false
             }],
             "mandatory": true,
@@ -240,7 +240,7 @@
         {
             "inputs": [{
                 "type": "fact",
-                "content": "the Lotus menu command hierarchy was the means by which a person operated something, whether it be a car, a food processor, or a computer"
+                "content": "the Lotus menu command hierarchy was the means by which a person operated Lotus 1-2-3"
             }],
             "despite": {
                 "type": "fact",
@@ -259,7 +259,8 @@
                 },
                 {
                     "type": "fact",
-                    "content": "the precise formulation of Lotus 1-2-3's code was not necessary for it to work"
+                    "content": "the precise formulation of Lotus 1-2-3's code was necessary for it to work",
+                    "truth": false
                 }
             ],
             "despite": [{
