@@ -29,7 +29,7 @@ class Opinion:
     decision_date: datetime.date
     court: str
     position: str
-    author: str
+    author: Optional[str]
 
     directory = get_directory_path("opinions")
 
@@ -87,7 +87,7 @@ class Opinion:
             directory: pathlib.Path,
             filename: Optional[str] = None,
             save_to_file: bool = save_to_file,
-            to_dict: bool = True,
+            to_dict: bool = False,
         ):
             if save_to_file:
                 with open(directory / filename, "w") as fp:
@@ -105,7 +105,6 @@ class Opinion:
             )
         if full_case and not api_key:
             raise ValueError("A CAP API key must be provided when full_case is True.")
-
         if not directory:
             directory = cls.directory
         params = {}
@@ -131,14 +130,16 @@ class Opinion:
             results = downloaded["results"]
 
         opinions = []
-        for n, case in enumerate(results):
+        for number, case in enumerate(results):
             if not filename:
-                mangled_name = f'{case["id"]}.json'
+                mangled_filename = f'{case["id"]}.json'
             elif n > 0:
-                mangled_name = filename.replace(".", f"_{n}.")
+                mangled_filename = filename.replace(".", f"_{number}.")
             else:
-                mangled_name = filename
-            for opinion in save_opinion(case, directory, mangled_name, to_dict):
+                mangled_filename = filename
+            for opinion in save_opinion(
+                case, directory, mangled_filename, save_to_file, to_dict
+            ):
                 opinions.append(opinion)
 
         if len(opinions) == 1:
@@ -149,11 +150,14 @@ class Opinion:
     @classmethod
     def from_dict(cls, opinion_dict: Dict):
         citations = tuple(c["cite"] for c in opinion_dict["citations"])
-
-        for opinion in opinion_dict["casebody"]["data"]["opinions"]:
-            author = None
+        opinions = opinion_dict.get("casebody", {}).get("data", {}).get("opinions")
+        if not opinions:
+            opinions = [{"type": "majority", "author": None}]
+        for opinion in opinions:
             position = opinion["type"]
-            author = opinion["author"].strip(",:")
+            author = opinion["author"]
+            if author:
+                author = author.strip(",:")
 
             yield Opinion(
                 opinion_dict["name"],
