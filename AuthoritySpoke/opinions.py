@@ -109,6 +109,11 @@ class Opinion:
         else:
             params["cite"] = cite
         downloaded = requests.get(endpoint, params=params, headers=api_key).json()
+
+        # Replacing one-item results list with its only member
+        if downloaded.get("results") and len(downloaded["results"]) == 1:
+            downloaded = downloaded["results"][0]
+
         if downloaded.get("results") is None:
             save_opinion(downloaded, directory, filename)
             return downloaded
