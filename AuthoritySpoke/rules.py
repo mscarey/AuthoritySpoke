@@ -580,7 +580,7 @@ class ProceduralRule(Rule):
             + f"{'MUST' if self.mandatory else 'MAY'} {'ALWAYS' if self.universal else 'SOMETIMES'} "
             + f"accept the result{str(factor_catalog(self.procedure.outputs, 'RESULT'))}"
             + f"{'based on the input' + str(factor_catalog(self.procedure.inputs, 'GIVEN')) if self.procedure.inputs else ''}"
-            + f"{'and despite' + str(factor_catalog(self.procedure.despite, 'DESPITE')) if self.procedure.despite else ''}"
+            + f"{str(factor_catalog(self.procedure.despite, 'DESPITE')) if self.procedure.despite else ''}"
             + f"{'according to the legislation' + str(factor_catalog(self.enactments, 'GIVEN')) if self.enactments else ''}"
             + f"{'and despite the legislation' + str(factor_catalog(self.enactments_despite, 'DESPITE')) if self.enactments_despite else ''}"
         )

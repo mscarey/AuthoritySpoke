@@ -1,3 +1,4 @@
+import json
 import pytest
 
 from authorityspoke.enactments import Code, Enactment
@@ -8,7 +9,6 @@ from authorityspoke.rules import Procedure, Rule, ProceduralRule
 from authorityspoke.opinions import Opinion
 from authorityspoke.factors import ureg, Q_
 from authorityspoke.context import log_mentioned_context
-
 
 class TestOpinions:
     def test_load_opinion_in_Harvard_format(self):

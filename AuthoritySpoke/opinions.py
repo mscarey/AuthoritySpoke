@@ -3,7 +3,10 @@ from typing import Optional, Sequence, Union
 
 import datetime
 import json
+import os
 import pathlib
+
+import requests
 
 from dataclasses import dataclass
 
@@ -34,12 +37,104 @@ class Opinion:
         self.holdings = []
 
     @classmethod
-    def from_file(cls, filename: str):
+    def cap_download(
+        cls,
+        cap_id: Optional[int] = None,
+        cite: Optional[str] = None,
+        save_to_file: bool = True,
+        filename: Optional[str] = None,
+        directory: Optional[pathlib.Path] = None,
+        full_case: bool = False,
+        api_key: Optional[str] = None,
+    ) -> Union[Dict, List[Dict]]:
+        """
+        :param cap_id: an integer identifier for an opinion in the CAP
+        database, e.g. 4066790 for Oracle America, Inc. v. Google Inc.
+
+        :param cite: a string representing a citation linked to an opinion
+        in the CAP database. Usually these will be in the traditional format
+        "[Volume Number] [Reporter Name Abbreviation] [Page Number]", e.g.
+        "750 F.3d 1339" for Oracle America, Inc. v. Google Inc. If the id
+        field is given, the cite field will be ignored. If neither field
+        is given, the download will fail.
+
+        :param save_to_file: whether to save the opinion to disk in addition
+        to returning it as a dict. Defaults to True.
+
+        :param filename: the filename (not including the directory) for the
+        file where the downloaded opinion should be saved.
+
+        :param directory: a Path object specifying the directory where the
+        downloaded opinion should be saved. If None is given, the current
+        default is example_data/opinions.
+
+        :param full_case: whether to request the full text of the opinion
+        from the CAP API. If this is True, the api_key parameter must be
+        provided.
+
+        :param api_key: a Case Access Project API key. Visit
+        https://case.law/user/register/ to obtain one. Not needed if you
+        only want to download metadata about the opinion without the
+        full text.
+        """
+
+        def save_opinion(
+            downloaded: dict,
+            directory: pathlib.Path,
+            filename: Optional[str] = None,
+            save_to_file: bool = save_to_file,
+        ):
+            if save_to_file:
+                if not filename:
+                    filename = f'{downloaded["id"]}.json'
+                with open(directory / filename, "w") as fp:
+                    json.dump(downloaded, fp, ensure_ascii=False)
+            return None
+
+        if not (cap_id or cite):
+            raise ValueError(
+                "To identify the desired opinion, either 'cap_id' or 'cite' "
+                "must be provided."
+            )
+        if full_case and not api_key:
+            raise ValueError("A CAP API key must be provided when full_case is True.")
+        if not directory:
+            directory = cls.directory
+        params = {}
+        if full_case:
+            params["full_case"] = "true"
+        endpoint = "https://api.case.law/v1/cases/"
+        if cap_id:
+            endpoint += f"{cap_id}/"
+        else:
+            params["cite"] = cite
+        downloaded = requests.get(endpoint, params=params, headers=api_key).json()
+        if downloaded.get("results") is None:
+            save_opinion(downloaded, directory, filename)
+            return downloaded
+        else:
+            if not downloaded["results"]:
+                if cap_id:
+                    message = f"API returned no cases with id {cap_id}"
+                else:
+                    message = f"API returned no cases with cite {cite}"
+                raise ValueError(message)
+            opinions = []
+            for n, result in enumerate(downloaded["results"]):
+                save_opinion(result, directory, filename.replace(".", f"_{n}."))
+                opinions.append(result)
+            return opinions
+
+    @classmethod
+    def from_file(cls, filename: str, directory: Optional[pathlib.Path] = None):
         """This is a generator that gets one opinion from a
         Harvard-format case file every time it's called. Exhaust the
         generator to get the lead opinion and all non-lead opinions."""
 
-        with open(cls.directory / filename, "r") as f:
+        if not directory:
+            directory = cls.directory
+
+        with open(directory / filename, "r") as f:
             opinion_dict = json.load(f)
 
         citations = tuple(c["cite"] for c in opinion_dict["citations"])
@@ -75,7 +170,6 @@ class Opinion:
         for holding in holdings:
             opinion.posits(holding)
         return opinion
-
 
     def posits(self, holding: Rule, context: Optional[Sequence[Factor]] = None) -> None:
         """

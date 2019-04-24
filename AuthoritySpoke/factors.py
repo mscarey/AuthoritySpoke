@@ -454,7 +454,7 @@ class Factor:
         other_factors. This function is expected to be called with various
         permutations of other_factors, but no other permutations of self_factors.
 
-        :param other_factors: an ordering of factors from other.entity_orders
+        :param other_factors: an ordering of factors from other.entity_orders.
 
         :returns: a bool indicating whether the factors in other_factors can
         be matched to the tuple of factors in self_factors in
