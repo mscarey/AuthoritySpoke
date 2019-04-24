@@ -46,6 +46,7 @@ class Opinion:
         directory: Optional[pathlib.Path] = None,
         full_case: bool = False,
         api_key: Optional[str] = None,
+        to_dict: bool = False,
     ) -> Union[Dict, List[Dict]]:
         """
         :param cap_id: an integer identifier for an opinion in the CAP
@@ -76,6 +77,9 @@ class Opinion:
         https://case.law/user/register/ to obtain one. Not needed if you
         only want to download metadata about the opinion without the
         full text.
+
+        :param to_dict: if True, opinion records remain dict objects
+        rather than being converted to authorityspoke Opinion objects.
         """
 
         def save_opinion(
@@ -83,13 +87,16 @@ class Opinion:
             directory: pathlib.Path,
             filename: Optional[str] = None,
             save_to_file: bool = save_to_file,
+            to_dict: bool = True,
         ):
             if save_to_file:
-                if not filename:
-                    filename = f'{downloaded["id"]}.json'
                 with open(directory / filename, "w") as fp:
                     json.dump(downloaded, fp, ensure_ascii=False)
-            return None
+            if to_dict:
+                yield downloaded
+            else:
+                for opinion in Opinion.from_dict(downloaded):
+                    yield opinion
 
         if not (cap_id or cite):
             raise ValueError(
@@ -98,6 +105,7 @@ class Opinion:
             )
         if full_case and not api_key:
             raise ValueError("A CAP API key must be provided when full_case is True.")
+
         if not directory:
             directory = cls.directory
         params = {}
@@ -110,38 +118,36 @@ class Opinion:
             params["cite"] = cite
         downloaded = requests.get(endpoint, params=params, headers=api_key).json()
 
-        # Replacing one-item results list with its only member
-        if downloaded.get("results") and len(downloaded["results"]) == 1:
-            downloaded = downloaded["results"][0]
+        if downloaded.get("results") is not None and not downloaded["results"]:
+            if cap_id:
+                message = f"API returned no cases with id {cap_id}"
+            else:
+                message = f"API returned no cases with cite {cite}"
+            raise ValueError(message)
 
-        if downloaded.get("results") is None:
-            save_opinion(downloaded, directory, filename)
-            return downloaded
+        if not downloaded.get("results"):
+            results = [downloaded]
         else:
-            if not downloaded["results"]:
-                if cap_id:
-                    message = f"API returned no cases with id {cap_id}"
-                else:
-                    message = f"API returned no cases with cite {cite}"
-                raise ValueError(message)
-            opinions = []
-            for n, result in enumerate(downloaded["results"]):
-                save_opinion(result, directory, filename.replace(".", f"_{n}."))
-                opinions.append(result)
+            results = downloaded["results"]
+
+        opinions = []
+        for n, case in enumerate(results):
+            if not filename:
+                mangled_name = f'{case["id"]}.json'
+            elif n > 0:
+                mangled_name = filename.replace(".", f"_{n}.")
+            else:
+                mangled_name = filename
+            for opinion in save_opinion(case, directory, mangled_name, to_dict):
+                opinions.append(opinion)
+
+        if len(opinions) == 1:
+            return opinions[0]
+        else:
             return opinions
 
     @classmethod
-    def from_file(cls, filename: str, directory: Optional[pathlib.Path] = None):
-        """This is a generator that gets one opinion from a
-        Harvard-format case file every time it's called. Exhaust the
-        generator to get the lead opinion and all non-lead opinions."""
-
-        if not directory:
-            directory = cls.directory
-
-        with open(directory / filename, "r") as f:
-            opinion_dict = json.load(f)
-
+    def from_dict(cls, opinion_dict: Dict):
         citations = tuple(c["cite"] for c in opinion_dict["citations"])
 
         for opinion in opinion_dict["casebody"]["data"]["opinions"]:
@@ -160,6 +166,21 @@ class Opinion:
                 position,
                 author,
             )
+
+    @classmethod
+    def from_file(cls, filename: str, directory: Optional[pathlib.Path] = None):
+        """This is a generator that gets one opinion from a
+        Harvard-format case file every time it's called. Exhaust the
+        generator to get the lead opinion and all non-lead opinions."""
+
+        if not directory:
+            directory = cls.directory
+
+        with open(directory / filename, "r") as f:
+            opinion_dict = json.load(f)
+
+        for opinion in Opinion.from_dict(opinion_dict):
+            yield opinion
 
     @classmethod
     def make_opinion_with_holdings(cls, party_name: str):
