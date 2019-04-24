@@ -103,8 +103,16 @@ class Opinion:
                 "To identify the desired opinion, either 'cap_id' or 'cite' "
                 "must be provided."
             )
-        if full_case and not api_key:
-            raise ValueError("A CAP API key must be provided when full_case is True.")
+
+        api_dict = {}
+        if full_case:
+            if not api_key:
+                raise ValueError(
+                    "A CAP API key must be provided when full_case is True."
+                )
+            else:
+                api_dict["Authorization"] = f"Token {api_key}"
+
         if not directory:
             directory = cls.directory
         params = {}
@@ -115,7 +123,7 @@ class Opinion:
             endpoint += f"{cap_id}/"
         else:
             params["cite"] = cite
-        downloaded = requests.get(endpoint, params=params, headers=api_key).json()
+        downloaded = requests.get(endpoint, params=params, headers=api_dict).json()
 
         if downloaded.get("results") is not None and not downloaded["results"]:
             if cap_id:
@@ -133,7 +141,7 @@ class Opinion:
         for number, case in enumerate(results):
             if not filename:
                 mangled_filename = f'{case["id"]}.json'
-            elif n > 0:
+            elif number > 0:
                 mangled_filename = filename.replace(".", f"_{number}.")
             else:
                 mangled_filename = filename

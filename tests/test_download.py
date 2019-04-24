@@ -1,5 +1,7 @@
 import json
 
+import pytest
+
 from authorityspoke.opinions import Opinion
 
 
@@ -27,3 +29,13 @@ class TestDownload:
     def test_download_and_make_opinion_object(self):
         lotus = Opinion.cap_download(cite="49 F.3d 807", save_to_file=False)
         assert lotus.__class__.__name__ == "Opinion"
+
+    def test_error_download_without_case_reference(self, tmp_path):
+        to_file = "lotus_h.json"
+        with pytest.raises(ValueError):
+            Opinion.cap_download(filename=to_file, directory=tmp_path)
+
+    def test_error_full_case_download_without_api_key(self, tmp_path):
+        to_file = "lotus_h.json"
+        with pytest.raises(ValueError):
+            Opinion.cap_download(filename=to_file, directory=tmp_path, full_case=True)
