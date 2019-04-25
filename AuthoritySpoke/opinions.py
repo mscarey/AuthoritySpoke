@@ -194,7 +194,9 @@ class Opinion:
         for opinion in Opinion.from_dict(opinion_dict):
             yield opinion
 
-    def exposit(self, rule_file: Optional[str]=None, rule_dict: Optional[dict]=None):
+    def exposit(
+        self, rule_file: Optional[str] = None, rule_dict: Optional[dict] = None, directory: Optional[pathlib.Path] = None
+    ):
         """
         This imports Opinion with all its holdings, under
         the assumption that the text of the Opinion is in the
@@ -205,7 +207,7 @@ class Opinion:
         if rule_dict:
             holdings = Rule.collection_from_dict(rule_dict)
         elif rule_file:
-            holdings = Rule.from_json(rule_file)
+            holdings = Rule.from_json(rule_file, directory=directory)
         else:
             raise ValueError(
                 "Must specify either rule_file (filename of a JSON rule input file) "

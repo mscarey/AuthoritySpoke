@@ -1,5 +1,6 @@
 import json
 import operator
+import pathlib
 
 from types import MappingProxyType
 
@@ -479,7 +480,9 @@ class Rule(Factor):
         return finished_rules
 
     @classmethod
-    def from_json(cls, filename: str) -> List["Rule"]:
+    def from_json(
+        cls, filename: str, directory: Optional[pathlib.Path] = None
+    ) -> List["Rule"]:
         """
         Creates a list of holdings from a JSON file in the input
         subdirectory, from a JSON file in the format that lists
@@ -488,8 +491,9 @@ class Rule(Factor):
 
         Does not cause an Opinion to posit the Rules as holdings.
         """
-
-        with open(cls.directory / filename, "r") as f:
+        if not directory:
+            directory = cls.directory
+        with open(directory / filename, "r") as f:
             case = json.load(f)
         return cls.collection_from_dict(case)
 
