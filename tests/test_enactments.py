@@ -52,7 +52,9 @@ class TestEnactments:
         )
 
     def test_passage_from_imported_statute(self, make_code):
-        oracle_majority = Opinion.make_opinion_with_holdings("oracle")
+        opinion_generator = Opinion.from_file(f'oracle_h.json')
+        opinion = next(opinion_generator)
+        oracle_majority = opinion.exposit(f'holding_oracle.json')
         despite_text = str(oracle_majority.holdings[5])
         assert 'DESPITE: "In no case does copyright protection ' in despite_text
 

@@ -939,6 +939,8 @@ def make_opinion_with_holding() -> Dict[str, Opinion]:
     test_cases = ("brad", "cardenas", "lotus", "watt")
     opinions = {}
     for case in test_cases:
-        opinion = Opinion.make_opinion_with_holdings(case)
+        opinion_generator = Opinion.from_file(f'{case}_h.json')
+        opinion = next(opinion_generator)
+        opinion = opinion.exposit(f'holding_{case}.json')
         opinions[f"{case}_majority"] = opinion
     return opinions

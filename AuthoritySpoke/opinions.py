@@ -194,20 +194,26 @@ class Opinion:
         for opinion in Opinion.from_dict(opinion_dict):
             yield opinion
 
-    @classmethod
-    def make_opinion_with_holdings(cls, party_name: str):
+    def exposit(self, rule_file: Optional[str]=None, rule_dict: Optional[dict]=None):
         """
-        This generates a majority Opinion with all its holdings, under
+        This imports Opinion with all its holdings, under
         the assumption that the text of the Opinion is in the
         example_data/opinions folder with the name [party_name]_h.json,
         and the holdings are in the example_data/holdings folder with
         the name holding_[party_name].json.
         """
-        opinion = next(cls.from_file(f"{party_name}_h.json"))
-        holdings = Rule.from_json(f"holding_{party_name}.json")
+        if rule_dict:
+            holdings = Rule.collection_from_dict(rule_dict)
+        elif rule_file:
+            holdings = Rule.from_json(rule_file)
+        else:
+            raise ValueError(
+                "Must specify either rule_file (filename of a JSON rule input file) "
+                "or rule_dict (a dict with the same fields as the JSON input file)."
+            )
         for holding in holdings:
-            opinion.posits(holding)
-        return opinion
+            self.posits(holding)
+        return self
 
     def posits(self, holding: Rule, context: Optional[Sequence[Factor]] = None) -> None:
         """
