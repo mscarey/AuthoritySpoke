@@ -20,11 +20,6 @@
         {
             "type": "entity",
             "name": "Quattro's Lotus Emulation Interface"
-        },
-        {
-            "type": "exhibit",
-            "name": "Lotus's copyright registration",
-            "form": "certificate of copyright registration"
         }
     ],
     "holdings": [{
@@ -94,7 +89,11 @@
         {
             "inputs": [{
                 "type": "evidence",
-                "exhibit": "Lotus's copyright registration",
+                "exhibit": {
+                    "type": "exhibit",
+                    "name": "Lotus's copyright registration",
+                    "form": "certificate of copyright registration"
+                },
                 "to_effect": {
                     "type": "fact",
                     "content": "Lotus Development Corporation registered a copyright covering the Lotus menu command hierarchy"
