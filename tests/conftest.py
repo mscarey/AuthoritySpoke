@@ -936,7 +936,7 @@ def make_opinion(make_entity) -> Dict[str, Opinion]:
 
 @pytest.fixture(scope="class")
 def make_opinion_with_holding() -> Dict[str, Opinion]:
-    test_cases = ("brad", "cardenas", "lotus", "watt")
+    test_cases = ("brad", "cardenas", "lotus", "watt", "oracle")
     opinions = {}
     for case in test_cases:
         opinion_generator = Opinion.from_file(f'{case}_h.json')

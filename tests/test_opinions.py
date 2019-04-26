@@ -12,7 +12,7 @@ from authorityspoke.context import log_mentioned_context
 
 class TestOpinions:
     def test_load_opinion_in_Harvard_format(self):
-        watt_dict = next(Opinion.from_file("watt_h.json"))
+        watt_dict = Opinion.lead_opinion_from_file("watt_h.json")
         assert watt_dict.name_abbreviation == "Wattenburg v. United States"
 
     def test_opinion_features(self, make_opinion):

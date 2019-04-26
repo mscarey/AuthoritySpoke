@@ -181,9 +181,11 @@ class Opinion:
 
     @classmethod
     def from_file(cls, filename: str, directory: Optional[pathlib.Path] = None):
-        """This is a generator that gets one opinion from a
+        """
+        This is a generator that gets one opinion from a
         Harvard-format case file every time it's called. Exhaust the
-        generator to get the lead opinion and all non-lead opinions."""
+        generator to get the lead opinion and all non-lead opinions.
+        """
 
         if not directory:
             directory = cls.directory
@@ -193,6 +195,18 @@ class Opinion:
 
         for opinion in Opinion.from_dict(opinion_dict):
             yield opinion
+
+    @classmethod
+    def lead_opinion_from_file(cls, filename: str, directory: Optional[pathlib.Path] = None):
+        """
+        Returns just the lead opinion from a Harvard-format JSON
+        case file. This method should be easier to understand
+        than from_file() because it doesn't require interacting
+        with a generator.
+        """
+
+        generator = cls.from_file(filename, directory)
+        return next(generator)
 
     def exposit(
         self, rule_file: Optional[str] = None, rule_dict: Optional[dict] = None, directory: Optional[pathlib.Path] = None
