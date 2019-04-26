@@ -4,7 +4,7 @@ import logging
 import operator
 import re
 
-from typing import Callable, Dict, List, Set, Tuple
+from typing import Any, Callable, Dict, List, Set, Tuple
 from typing import Iterable, Iterator, Mapping
 from typing import Optional, Sequence, Type, Union
 
@@ -501,6 +501,26 @@ class Factor:
                                 new_mapping_choices.append(updated_mapping)
         for choice in new_mapping_choices:
             yield choice
+
+    def evolve(self, changes: Dict["str", Any]) -> "Factor":
+        """
+        :param changes: a dict where the keys are names of attributes
+        of self, and the values are new values for those attributes.
+
+        :returns: a new Factor object initialized with attributes from
+        self.__dict__, except that any attributes named as keys in the
+        changes parameter are replaced by the corresponding value.
+        """
+        for key in changes:
+            if key not in self.__dict__:
+                raise ValueError(
+                    f"Invalid: '{key}' is not among the Factor's attributes "
+                    f"{list(self.__dict__.keys())}."
+                )
+        new_dict = self.__dict__
+        for key in changes:
+            new_dict[key] = changes[key]
+        return self.__class__(**new_dict)
 
     @new_context_helper
     def new_context(self, changes: Dict["Factor", "Factor"]) -> "Factor":
