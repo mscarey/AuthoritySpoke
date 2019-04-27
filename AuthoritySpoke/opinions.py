@@ -235,7 +235,7 @@ class Opinion:
     def __gt__(self, other) -> bool:
         return (self >= other) and (self != other)
 
-    def __ge__(self, other) -> bool:
+    def __ge__(self, other: Union["Opinion", Rule]) -> bool:
         """
         Returns a bool indicating whether every holding of other
         is implied by some holding of self.
@@ -249,6 +249,17 @@ class Opinion:
             return True
         raise TypeError(
             f"'Implies' test not implemented for types {self.__class__} and {other.__class__}."
+        )
+
+    def contradicts(self, other: Union["Opinion", Rule]) -> bool:
+        if isinstance(other, Rule):
+            return any(self_holding.contradicts(other) for self_holding in self.holdings)
+        elif isinstance(other, self.__class__):
+            return any(
+                any(self_holding.contradicts(other_holding) for self_holding in self.holdings)
+                for other_holding in other.holdings)
+        raise TypeError(
+            f"'Contradicts' test not implemented for types {self.__class__} and {other.__class__}."
         )
 
     def posits(self, holding: Union[Rule, Iterable[Rule]], context: Optional[Sequence[Factor]] = None) -> None:
@@ -285,8 +296,6 @@ class Opinion:
                 posits_one_holding(item, context)
         else:
             posits_one_holding(holding, context)
-
-
 
     def get_factor_by_name(self, name: str) -> Optional[Factor]:
         """
