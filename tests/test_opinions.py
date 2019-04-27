@@ -143,18 +143,32 @@ class TestOpinions:
         watt.posits(brad.holdings[0], context_items)
         assert watt.holdings[-1] == brad.holdings[0]
 
+    # Implication
+
     def test_no_implication(self, make_opinion_with_holding):
         watt = make_opinion_with_holding["watt_majority"]
         brad = make_opinion_with_holding["brad_majority"]
         assert not watt >= brad
 
-    def test_implication(self, make_opinion):
+    def test_posit_list_of_holdings_and_imply(self, make_opinion):
         watt = make_opinion["watt_majority"]
         brad = make_opinion["brad_majority"]
-        some_rules = Rule.from_json(f"holding_watt.json")
-        for rule in some_rules[:3]:
-            watt.posits(rule)
-            brad.posits(rule)
+        some_rules = Rule.from_json("holding_watt.json")
+        for case in (watt, brad):
+            case.holdings = []
+            case.posits(some_rules[:3])
         watt.posits(some_rules[3])
         assert watt > brad
         assert not brad >= watt
+
+    def test_opinion_implies_rule(self, make_opinion, make_holding):
+        watt = make_opinion["watt_majority"]
+        watt.holdings = [make_holding["h2_invalid_undecided"]]
+        assert watt >= make_holding["h2_undecided"]
+        assert watt > make_holding["h2_undecided"]
+
+    def test_opinion_does_not_imply_rule(self, make_opinion, make_holding):
+        watt = make_opinion["watt_majority"]
+        watt.holdings = [make_holding["h2_irrelevant_inputs_undecided"]]
+        assert not watt >= make_holding["h2_undecided"]
+        assert not watt > make_holding["h2_undecided"]
