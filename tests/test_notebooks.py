@@ -31,7 +31,7 @@ class TestIntroduction:
             end="works of authorship"
             )
         rule_with_shorter_enactment = oracle.holdings[0].evolve(
-            {"enactments": [works_of_authorship_clause]}
+            {"enactments": works_of_authorship_clause}
         )
         assert rule_with_shorter_enactment >= oracle.holdings[0]
         assert not oracle.holdings[0] >= rule_with_shorter_enactment

@@ -231,6 +231,21 @@ class Opinion:
             self.posits(holding)
         return self
 
+    def __gt__(self, other) -> bool:
+        return (self >= other) and (self != other)
+
+    def __ge__(self, other) -> bool:
+        """
+        Returns a bool indicating whether every holding of other
+        is implied by some holding of self.
+        """
+        if not isinstance(other, self.__class__):
+            return False
+        for other_holding in other.holdings:
+            if not any(self_holding >= other_holding for self_holding in self.holdings):
+                return False
+        return True
+
     def posits(self, holding: Rule, context: Optional[Sequence[Factor]] = None) -> None:
         """
         Adds holding to the opinion's holdings list, replacing any other

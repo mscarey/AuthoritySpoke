@@ -10,6 +10,7 @@ from authorityspoke.opinions import Opinion
 from authorityspoke.factors import ureg, Q_
 from authorityspoke.context import log_mentioned_context
 
+
 class TestOpinions:
     def test_load_opinion_in_Harvard_format(self):
         watt_dict = Opinion.lead_opinion_from_file("watt_h.json")
@@ -94,9 +95,9 @@ class TestOpinions:
         brad = make_opinion["brad_majority"]
         with pytest.raises(ValueError):
             brad.posits(
-            make_holding["h1"],
-            context=(Entity("House on Haunted Hill"), "nonexistent factor"),
-        )
+                make_holding["h1"],
+                context=(Entity("House on Haunted Hill"), "nonexistent factor"),
+            )
 
     def test_new_context_creates_equal_rule(self, make_opinion):
         watt = make_opinion["watt_majority"]
@@ -141,3 +142,19 @@ class TestOpinions:
         ]
         watt.posits(brad.holdings[0], context_items)
         assert watt.holdings[-1] == brad.holdings[0]
+
+    def test_no_implication(self, make_opinion_with_holding):
+        watt = make_opinion_with_holding["watt_majority"]
+        brad = make_opinion_with_holding["brad_majority"]
+        assert not watt >= brad
+
+    def test_implication(self, make_opinion):
+        watt = make_opinion["watt_majority"]
+        brad = make_opinion["brad_majority"]
+        some_rules = Rule.from_json(f"holding_watt.json")
+        for rule in some_rules[:3]:
+            watt.posits(rule)
+            brad.posits(rule)
+        watt.posits(some_rules[3])
+        assert watt > brad
+        assert not brad >= watt
