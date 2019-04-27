@@ -517,7 +517,7 @@ class Factor:
                     f"Invalid: '{key}' is not among the Factor's attributes "
                     f"{list(self.__dict__.keys())}."
                 )
-        new_dict = self.__dict__
+        new_dict = self.__dict__.copy()
         for key in changes:
             new_dict[key] = changes[key]
         return self.__class__(**new_dict)
