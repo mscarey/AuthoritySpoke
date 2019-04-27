@@ -11,8 +11,8 @@ class TestIntroduction:
     Tests of commands from the "Introduction to AuthoritySpoke" notebook
     """
 
-    def test_oracle_21_holdings(self, make_opinion_with_holding):
-        assert len(make_opinion_with_holding["oracle_majority"].holdings) == 21
+    def test_oracle_20_holdings(self, make_opinion_with_holding):
+        assert len(make_opinion_with_holding["oracle_majority"].holdings) == 20
 
     def test_replace_generic_factor(self, make_opinion_with_holding):
         oracle = make_opinion_with_holding["oracle_majority"]
@@ -35,3 +35,9 @@ class TestIntroduction:
         )
         assert rule_with_shorter_enactment >= oracle.holdings[0]
         assert not oracle.holdings[0] >= rule_with_shorter_enactment
+
+    def test_opinion_contradiction(self, make_opinion_with_holding):
+        oracle = make_opinion_with_holding["oracle_majority"]
+        lotus_majority = make_opinion_with_holding["lotus_majority"]
+        assert oracle.contradicts(lotus_majority)
+        assert lotus_majority.contradicts(oracle)

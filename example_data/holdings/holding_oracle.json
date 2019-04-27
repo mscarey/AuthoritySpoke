@@ -337,23 +337,6 @@
             "enactments_despite": "copyright protection provision"
         },
         {
-            "inputs": [{
-                "type": "fact",
-                "content": "the Java API was copyrightable"
-            }, {
-                "type": "fact",
-                "content": "the Java API was a scene a faire",
-                "absent": true
-            }],
-            "outputs": {
-                "type": "fact",
-                "content": "Google infringed the copyright on the Java API"
-            },
-            "mandatory": true,
-            "enactments": "copyrightability exceptions",
-            "enactments_despite": "copyright protection provision"
-        },
-        {
             "inputs": {
                 "type": "fact",
                 "content": "the Java API was essentially the only way to express the idea that it embodied"
@@ -378,6 +361,10 @@
             }, {
                 "type": "fact",
                 "content": "the Java API was essentially the only way to express the idea that it embodied",
+                "absent": true
+            }, {
+                "type": "fact",
+                "content": "the Java API was a scene a faire",
                 "absent": true
             }],
             "outputs": {
