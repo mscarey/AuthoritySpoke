@@ -15,6 +15,9 @@ class TestRules:
     def test_enactment_type_in_str(self, make_holding):
         assert "constitution" in str(make_holding["h1"]).lower()
 
+    def test_no_blank_line_in_str(self, make_holding):
+        assert "\n\n" not in str(make_holding["h2"])
+
     def test_enactment_text_in_str(self, make_holding):
         assert "secure in their persons" in str(make_holding["h1"])
 

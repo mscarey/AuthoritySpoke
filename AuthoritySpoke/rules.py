@@ -576,17 +576,18 @@ class ProceduralRule(Rule):
     def __str__(self):
         def factor_catalog(factors: List[Union[Factor, Enactment]], tag: str) -> str:
             lines = [f"{tag}: {factors[i]}\n" for i in range(len(factors))]
-            return "\n" + "".join(lines)
+            return "".join(lines)
 
+        newline = "\n"
         return (
             f"the rule that {'it is not decided whether ' if not self.decided else ''}"
             + f"{'it is not valid that ' if not self.rule_valid else ''}the court "
             + f"{'MUST' if self.mandatory else 'MAY'} {'ALWAYS' if self.universal else 'SOMETIMES'} "
-            + f"accept the result{str(factor_catalog(self.procedure.outputs, 'RESULT'))}"
-            + f"{'based on the input' + str(factor_catalog(self.procedure.inputs, 'GIVEN')) if self.procedure.inputs else ''}"
+            + f"accept the result{newline}{str(factor_catalog(self.procedure.outputs, 'RESULT'))}"
+            + f"{'based on the input' + newline + str(factor_catalog(self.procedure.inputs, 'GIVEN')) if self.procedure.inputs else ''}"
             + f"{str(factor_catalog(self.procedure.despite, 'DESPITE')) if self.procedure.despite else ''}"
-            + f"{'according to the legislation' + str(factor_catalog(self.enactments, 'GIVEN')) if self.enactments else ''}"
-            + f"{'and despite the legislation' + str(factor_catalog(self.enactments_despite, 'DESPITE')) if self.enactments_despite else ''}"
+            + f"{'according to the legislation' + newline + str(factor_catalog(self.enactments, 'GIVEN')) if self.enactments else ''}"
+            + f"{'and despite the legislation' + newline + str(factor_catalog(self.enactments_despite, 'DESPITE')) if self.enactments_despite else ''}"
         )
 
     def __len__(self):
