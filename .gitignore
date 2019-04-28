@@ -14,7 +14,9 @@ html/
 example_data/holdings/unused
 example_data/opinions/flf/
 example_data/opinions/unused
-notebooks/
+notebooks/.ipynb_checkpoints
+notebooks/unused
+notebooks/request_cases.ipynb
 Pipfile.lock
 prof/
 tests/__pycache__/
