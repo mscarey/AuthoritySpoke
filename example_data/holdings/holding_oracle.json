@@ -381,7 +381,7 @@
                 "content": "Sun Microsystems created the Java API"
             }, {
                 "type": "fact",
-                "content": "when creating the Java API, Sun Microsystems could have selected and arranged its names and phrases in unlimited different ways and it still would have worked"
+                "content": "when creating the Java API, Sun Microsystems could have selected and arranged its names and phrases in unlimited different ways"
             }],
             "outputs": {
                 "type": "fact",

@@ -243,7 +243,8 @@
             }],
             "despite": {
                 "type": "fact",
-                "content": "the Lotus menu command hierarchy was an abstraction"
+                "content": "the Lotus menu command hierarchy was an abstraction",
+                "truth": false
             },
             "outputs": [{
                 "type": "fact",
