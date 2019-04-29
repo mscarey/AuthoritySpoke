@@ -8,7 +8,7 @@ setuptools.setup(
     version="0.0.1",
     author="Matt Carey",
     author_email="matt@authorityspoke.com",
-    description="Reading the law for the last time",
+    description="a tool for constructing data about legal rules",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/mscarey/AuthoritySpoke",

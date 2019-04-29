@@ -18,10 +18,12 @@ authorityspoke = {path = ".",editable = true}
 black = "*"
 mypy = "*"
 pylint = "*"
-pytest = "<4.0.0"
+pytest = "*"
 pytest-cov = "*"
 pytest-profiling = "*"
 rope = "*"
+sphinx = "*"
+sphinx-autodoc-typehints = "*"
 
 [requires]
 python_version = "3.7"

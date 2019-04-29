@@ -1,15 +1,16 @@
-from typing import Dict, List, Tuple
+from __future__ import annotations
+
+from typing import Any, Dict, List, Tuple
 from typing import Iterable
 from typing import Optional, Sequence, Union
 
 import datetime
 import json
-import os
 import pathlib
 
-import requests
-
 from dataclasses import dataclass
+
+import requests
 
 from authorityspoke.context import get_directory_path
 from authorityspoke.factors import Factor
@@ -18,8 +19,33 @@ from authorityspoke.rules import Rule, ProceduralRule
 
 @dataclass
 class Opinion:
-    """A document that resolves legal issues in a case and posits legal holdings.
-    Usually only a majority opinion will create holdings binding on any courts.
+    """
+    A document that resolves legal issues in a case and posits legal holdings.
+    Usually an opinion must have ``position="majority"``
+    to create holdings binding on any courts.
+
+    :param name:
+        full name of the opinion, e.g. "ORACLE AMERICA, INC.,
+        Plaintiff-Appellant, v. GOOGLE INC., Defendant-Cross-Appellant"
+    :param name_abbreviation:
+        shorter name of the opinion, e.g. "Oracle America, Inc. v. Google Inc."
+    :param citations:
+        citations to the opinion, usually in the format
+        ``[Volume Number] [Reporter Name Abbreviation] [Page Number]``
+    :param first_page:
+        the page where the opinion begins in its official reporter
+    :param last_page:
+        the page where the opinion ends in its official reporter
+    :param decision_date:
+        date when the opinion was first published by the court
+        (not the publication date of the reporter volume)
+    :param court:
+        name of the court that published the opinion
+    :param position:
+        the opinion's position toward the court's disposition of the case.
+        e.g. ``majority``, ``dissenting``, ``concurring``, ``concurring in the result``
+    :param author:
+        name of the judge who authored the opinion, if identified
     """
 
     name: str
@@ -48,39 +74,52 @@ class Opinion:
         full_case: bool = False,
         api_key: Optional[str] = None,
         to_dict: bool = False,
-    ) -> Union[Dict, List[Dict]]:
+    ) -> Union[Opinion, List[Opinion], Dict[str, Any], List[Dict[str, Any]]]:
         """
-        :param cap_id: an integer identifier for an opinion in the CAP
-        database, e.g. 4066790 for Oracle America, Inc. v. Google Inc.
+        :param cap_id:
+            an identifier for an opinion in the
+            `Caselaw Access Project database <https://case.law/api/>`_,
+            e.g. 4066790 for
+            `Oracle America, Inc. v. Google Inc. <https://api.case.law/v1/cases/4066790/>`_
 
-        :param cite: a string representing a citation linked to an opinion
-        in the CAP database. Usually these will be in the traditional format
-        "[Volume Number] [Reporter Name Abbreviation] [Page Number]", e.g.
-        "750 F.3d 1339" for Oracle America, Inc. v. Google Inc. If the id
-        field is given, the cite field will be ignored. If neither field
-        is given, the download will fail.
+        :param cite:
+            a citation linked to an opinion in the
+            `Caselaw Access Project database <https://case.law/api/>`_.
+            Usually these will be in the traditional format
+            ``[Volume Number] [Reporter Name Abbreviation] [Page Number]``, e.g.
+            "750 F.3d 1339" for
+            `Oracle America, Inc. v. Google Inc. <https://case.law/search/#/cases?page=1&cite=%22750%20F.3d%201339%22>`_
+            If the ``cap_id`` field is given, the cite field will be ignored.
+            If neither field is given, the download will fail.
 
-        :param save_to_file: whether to save the opinion to disk in addition
-        to returning it as a dict. Defaults to True.
+        :param save_to_file:
+            whether to save the opinion to disk in addition
+            to returning it as a dict. Defaults to ``True``.
 
-        :param filename: the filename (not including the directory) for the
-        file where the downloaded opinion should be saved.
+        :param filename:
+            the filename (not including the directory) for the
+            file where the downloaded opinion should be saved.
 
-        :param directory: a Path object specifying the directory where the
-        downloaded opinion should be saved. If None is given, the current
-        default is example_data/opinions.
+        :param directory:
+            a :py:class:`~pathlib.Path` object specifying the directory where the
+            downloaded opinion should be saved. If ``None`` is given, the current
+            default is ``example_data/opinions``.
 
-        :param full_case: whether to request the full text of the opinion
-        from the CAP API. If this is True, the api_key parameter must be
-        provided.
+        :param full_case:
+            whether to request the full text of the opinion from the
+            `Caselaw Access Project API <https://api.case.law/v1/>`_.
+            If this is ``True``, the `api_key` parameter must be
+            provided.
 
-        :param api_key: a Case Access Project API key. Visit
-        https://case.law/user/register/ to obtain one. Not needed if you
-        only want to download metadata about the opinion without the
-        full text.
+        :param api_key:
+            a Case Access Project API key. Visit
+            https://case.law/user/register/ to obtain one. Not needed if you
+            only want to download metadata about the opinion without the
+            full text.
 
-        :param to_dict: if True, opinion records remain dict objects
-        rather than being converted to authorityspoke Opinion objects.
+        :param to_dict:
+            if ``True``, opinion records remain dict objects
+            rather than being converted to :class:`.Opinion` objects.
         """
 
         def save_opinion(
