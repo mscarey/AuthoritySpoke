@@ -1,8 +1,8 @@
 import functools
 import pathlib
 
-from typing import Callable, Dict, List, Tuple
-from typing import Optional, Sequence, Union
+from typing import Callable, Dict, Iterable, List
+from typing import Optional, Sequence, Tuple, Union
 
 
 def log_mentioned_context(func: Callable):

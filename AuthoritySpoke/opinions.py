@@ -213,6 +213,32 @@ class Opinion:
             else:
                 return opinions
 
+    def contradicts(self, other: Union[Opinion, Rule]) -> bool:
+        """
+        :param other:
+
+        :returns:
+            a bool indicating whether any holding of ``self`` is
+            inconsistent with the :class:`.Rule` ``other``, or with
+            any holding of ``other`` if ``other`` is an :class:`.Opinion`.
+        """
+
+        if isinstance(other, Rule):
+            return any(
+                self_holding.contradicts(other) for self_holding in self.holdings
+            )
+        elif isinstance(other, self.__class__):
+            return any(
+                any(
+                    self_holding.contradicts(other_holding)
+                    for self_holding in self.holdings
+                )
+                for other_holding in other.holdings
+            )
+        raise TypeError(
+            f"'Contradicts' test not implemented for types {self.__class__} and {other.__class__}."
+        )
+
     @classmethod
     def from_dict(
         cls, decision_dict: Dict[str, Any], lead_only: bool = True
@@ -349,11 +375,36 @@ class Opinion:
             self.posits(holding)
         return self
 
+    @property
+    def generic_factors(self) -> List[Factor]:
+        """
+        :returns:
+            a list of generic :class:`.Factor` objects mentioned in
+            any ``input``, ``output``, or ``despite`` :class:`.Factor`
+            of ``self``, with guaranteed order, including each
+            generic :class:`.Factor` only once.
+        """
+        return list(
+            {
+                generic: None
+                for holding in self.holdings
+                for generic in holding.generic_factors
+            }
+        )
+
     def get_factor_by_name(self, name: str) -> Optional[Factor]:
         """
-        Performs a recursive search of each holding in the
-        Opinion for a Factor with the specified name attribute.
-        Returns such a Factor if it exists, otherwise returns None.
+        Performs a recursive search of each holding in ``self``
+        for a :class:`.Factor` with the specified name attribute.
+        Returns such a :class:`.Factor` if it exists, otherwise returns None.
+
+        :param name:
+            string to match with the ``name`` attribute of the
+            :class:`.Factor` being searched for.
+
+        :returns:
+            a :class:`.Factor` with the specified ``name``, if one
+            exists in a :class:`.Rule` in ``self.holdings``.
         """
 
         for holding in self.holdings:
@@ -362,56 +413,28 @@ class Opinion:
                 return factor
         raise ValueError(f'No factor by the name "{name}" was found')
 
-    def __ge__(self, other: Union[Opinion, Rule]) -> bool:
-        """
-        Returns a bool indicating whether every holding of other
-        (or other itself, if other is a :class:`.Rule`)
-        is implied by :class:`.Rule` in ``self.holdings``.
-        """
-        if isinstance(other, Rule):
-            return any(self_holding >= other for self_holding in self.holdings)
-        elif isinstance(other, self.__class__):
-            for other_holding in other.holdings:
-                if not any(
-                    self_holding >= other_holding for self_holding in self.holdings
-                ):
-                    return False
-            return True
-        raise TypeError(
-            f"'Implies' test not implemented for types {self.__class__} and {other.__class__}."
-        )
-
-    def __gt__(self, other) -> bool:
-        """
-        Returns self >= value and self != value.
-        """
-        return (self >= other) and (self != other)
-
-    def contradicts(self, other: Union[Opinion, Rule]) -> bool:
-        if isinstance(other, Rule):
-            return any(
-                self_holding.contradicts(other) for self_holding in self.holdings
-            )
-        elif isinstance(other, self.__class__):
-            return any(
-                any(
-                    self_holding.contradicts(other_holding)
-                    for self_holding in self.holdings
-                )
-                for other_holding in other.holdings
-            )
-        raise TypeError(
-            f"'Contradicts' test not implemented for types {self.__class__} and {other.__class__}."
-        )
-
     def posits(
         self,
         holding: Union[Rule, Iterable[Rule]],
         context: Optional[Sequence[Factor]] = None,
     ) -> None:
         """
-        Adds holding to the opinion's holdings list, replacing any other
-        Holdings with the same meaning.
+        Adds ``holding`` (or every :class:`.Rule` in ``holding``, if ``holding`` is iterable) to the :py:class:`list` ``self.holdings``, replacing
+        any other :class:`.Rule` in ``self.holdings`` with the same meaning.
+
+        :param holding:
+            a :class:`.Rule` that the :class:`.Opinion` ``self`` posits
+            as valid in its own court or jurisdiction, regardless of
+            whether ``self`` accepts that the ``inputs`` of the
+            :class:`.Rule` correspond to the reality of the current
+            case, and regardless of whether the court orders that
+            the ``outputs`` of the :class:`.Rule` be put into effect.
+
+        :param context:
+            an ordered sequence (probably :py:class:`dict`) of
+            generic :class:`.Factor` objects from ``self`` which
+            will provide the context for the new holding in the
+            present case.
         """
 
         def posits_one_holding(
@@ -447,14 +470,27 @@ class Opinion:
         else:
             posits_one_holding(holding, context)
 
-
-
-    @property
-    def generic_factors(self) -> List[Factor]:
-        return list(
-            {
-                generic: None
-                for holding in self.holdings
-                for generic in holding.generic_factors
-            }
+    def __ge__(self, other: Union[Opinion, Rule]) -> bool:
+        """
+        Returns a bool indicating whether the :class:`.Rule` ``other``
+        (or every holding of ``other``, if other is an :class:`.Opinion`)
+        is implied by some :class:`.Rule` in ``self.holdings``.
+        """
+        if isinstance(other, Rule):
+            return any(self_holding >= other for self_holding in self.holdings)
+        elif isinstance(other, self.__class__):
+            for other_holding in other.holdings:
+                if not any(
+                    self_holding >= other_holding for self_holding in self.holdings
+                ):
+                    return False
+            return True
+        raise TypeError(
+            f"'Implies' test not implemented for types {self.__class__} and {other.__class__}."
         )
+
+    def __gt__(self, other) -> bool:
+        """
+        Returns self >= value and self != value.
+        """
+        return (self >= other) and (self != other)

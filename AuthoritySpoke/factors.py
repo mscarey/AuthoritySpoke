@@ -70,7 +70,6 @@ def new_context_helper(func: Callable):
 
     return wrapper
 
-
 @dataclass(frozen=True)
 class Factor:
     """A factor is something used to determine the applicability of a legal
