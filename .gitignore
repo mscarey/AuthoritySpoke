@@ -10,7 +10,6 @@ AuthoritySpoke.egg-info
 docs/_build
 example_data/codes/ca_evidence.html
 example_data/codes/ca_penal.html
-example_data/codes/usc17.xml
 html/
 example_data/holdings/unused
 example_data/opinions/flf/

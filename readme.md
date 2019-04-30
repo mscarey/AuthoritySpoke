@@ -6,6 +6,10 @@ AuthoritySpoke is a Python library for managing structured data about legal rule
 
 The best way to familiarize yourself with AuthoritySpoke is through the [Introduction to AuthoritySpoke Jupyter notebook](https://github.com/mscarey/AuthoritySpoke/blob/master/notebooks/introduction.ipynb).
 
+Use this button to interact with the notebook online through Binder.
+
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/mscarey/AuthoritySpoke/master)
+
 More documentation is coming soon.
 
 ## Installing AuthoritySpoke
@@ -19,7 +23,7 @@ $ pipenv install
 $ pipenv shell
 ```
 
-If everything worked, AuthoritySpoke should be available as a package in your Python environment.
+If everything worked, AuthoritySpoke should be available to import in your Python environment.
 
 ```
 $ python
