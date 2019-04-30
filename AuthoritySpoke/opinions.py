@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from typing import Any, Dict, List, Tuple
-from typing import Iterable
+from typing import Iterable, Iterator
 from typing import Optional, Sequence, Union
 
 import datetime
@@ -74,6 +74,7 @@ class Opinion:
         full_case: bool = False,
         api_key: Optional[str] = None,
         to_dict: bool = False,
+        as_generator: bool = False,
     ) -> Union[Opinion, List[Opinion], Dict[str, Any], List[Dict[str, Any]]]:
         """
         :param cap_id:
@@ -120,23 +121,11 @@ class Opinion:
         :param to_dict:
             if ``True``, opinion records remain dict objects
             rather than being converted to :class:`.Opinion` objects.
-        """
 
-        def save_opinion(
-            downloaded: dict,
-            directory: pathlib.Path,
-            filename: Optional[str] = None,
-            save_to_file: bool = save_to_file,
-            to_dict: bool = False,
-        ):
-            if save_to_file:
-                with open(directory / filename, "w") as fp:
-                    json.dump(downloaded, fp, ensure_ascii=False)
-            if to_dict:
-                yield downloaded
-            else:
-                for opinion in Opinion.from_dict(downloaded):
-                    yield opinion
+        :param as_generator:
+            if ``True``, returns a generator that yields all opinions
+            meeting the query
+        """
 
         if not (cap_id or cite):
             raise ValueError(
@@ -172,6 +161,9 @@ class Opinion:
                 message = f"API returned no cases with cite {cite}"
             raise ValueError(message)
 
+        # Because the API wraps the results in a list only if there's
+        # more than one result.
+
         if not downloaded.get("results"):
             results = [downloaded]
         else:
@@ -181,46 +173,71 @@ class Opinion:
         for number, case in enumerate(results):
             if not filename:
                 mangled_filename = f'{case["id"]}.json'
-            elif number > 0:
-                mangled_filename = filename.replace(".", f"_{number}.")
             else:
                 mangled_filename = filename
-            for opinion in save_opinion(
-                case, directory, mangled_filename, save_to_file, to_dict
-            ):
+            if number > 0:
+                mangled_filename = filename.replace(".", f"_{number}.")
+            if save_to_file:
+                with open(directory / filename, "w") as fp:
+                    json.dump(case, fp, ensure_ascii=False)
                 opinions.append(opinion)
-
-        if len(opinions) == 1:
-            return opinions[0]
-        else:
-            return opinions
+            if as_generator:
+                if to_dict:
+                    yield case
+                else:
+                    for opinion in cls.from_dict(case, lead_only=False):
+                        yield opinion
+            else:
+                if to_dict:
+                    opinions.append(case)
+                else:
+                    for opinion in cls.from_dict(case, lead_only=False):
+                        opinions.append(opinion)
+        if not as_generator:
+            if len(opinions) == 1:
+                return opinions[0]
+            else:
+                return opinions
 
     @classmethod
-    def from_dict(cls, opinion_dict: Dict):
-        citations = tuple(c["cite"] for c in opinion_dict["citations"])
-        opinions = opinion_dict.get("casebody", {}).get("data", {}).get("opinions")
-        if not opinions:
-            opinions = [{"type": "majority", "author": None}]
-        for opinion in opinions:
-            position = opinion["type"]
-            author = opinion["author"]
+    def from_dict(cls, decision_dict: Dict, lead_only: bool = True):
+        def make_opinion(decision_dict, opinion_dict, citations) -> Opinion:
+            position = opinion_dict["type"]
+            author = opinion_dict["author"]
             if author:
                 author = author.strip(",:")
 
-            yield Opinion(
-                opinion_dict["name"],
-                opinion_dict["name_abbreviation"],
+            return Opinion(
+                decision_dict["name"],
+                decision_dict["name_abbreviation"],
                 citations,
-                int(opinion_dict["first_page"]),
-                int(opinion_dict["last_page"]),
-                datetime.date.fromisoformat(opinion_dict["decision_date"]),
-                opinion_dict["court"]["slug"],
+                int(decision_dict["first_page"]),
+                int(decision_dict["last_page"]),
+                datetime.date.fromisoformat(decision_dict["decision_date"]),
+                decision_dict["court"]["slug"],
                 position,
                 author,
             )
 
+        citations = tuple(c["cite"] for c in decision_dict["citations"])
+        opinions = (
+            decision_dict.get("casebody", {})
+            .get("data", {})
+            .get("opinions", [{"type": "majority", "author": None}])
+        )
+
+        if lead_only:
+            return make_opinion(decision_dict, opinions[0], citations)
+        else:
+            return iter(make_opinion(decision_dict, opinion_dict, citations) for opinion_dict in opinions)
+
     @classmethod
-    def from_file(cls, filename: str, directory: Optional[pathlib.Path] = None):
+    def from_file(
+        cls,
+        filename: str,
+        directory: Optional[pathlib.Path] = None,
+        lead_only: bool = True,
+    ) -> Union[Opinion, Iterator[Opinion]]:
         """
         This is a generator that gets one opinion from a
         Harvard-format case file every time it's called. Exhaust the
@@ -231,25 +248,15 @@ class Opinion:
             directory = cls.directory
 
         with open(directory / filename, "r") as f:
-            opinion_dict = json.load(f)
+            decision_dict = json.load(f)
 
-        for opinion in Opinion.from_dict(opinion_dict):
-            yield opinion
-
-    @classmethod
-    def lead_opinion_from_file(cls, filename: str, directory: Optional[pathlib.Path] = None):
-        """
-        Returns just the lead opinion from a Harvard-format JSON
-        case file. This method should be easier to understand
-        than from_file() because it doesn't require interacting
-        with a generator.
-        """
-
-        generator = cls.from_file(filename, directory)
-        return next(generator)
+        return Opinion.from_dict(decision_dict, lead_only)
 
     def exposit(
-        self, rule_file: Optional[str] = None, rule_dict: Optional[dict] = None, directory: Optional[pathlib.Path] = None
+        self,
+        rule_file: Optional[str] = None,
+        rule_dict: Optional[dict] = None,
+        directory: Optional[pathlib.Path] = None,
     ):
         """
         This imports Opinion with all its holdings, under
@@ -283,7 +290,9 @@ class Opinion:
             return any(self_holding >= other for self_holding in self.holdings)
         elif isinstance(other, self.__class__):
             for other_holding in other.holdings:
-                if not any(self_holding >= other_holding for self_holding in self.holdings):
+                if not any(
+                    self_holding >= other_holding for self_holding in self.holdings
+                ):
                     return False
             return True
         raise TypeError(
@@ -292,21 +301,35 @@ class Opinion:
 
     def contradicts(self, other: Union["Opinion", Rule]) -> bool:
         if isinstance(other, Rule):
-            return any(self_holding.contradicts(other) for self_holding in self.holdings)
+            return any(
+                self_holding.contradicts(other) for self_holding in self.holdings
+            )
         elif isinstance(other, self.__class__):
             return any(
-                any(self_holding.contradicts(other_holding) for self_holding in self.holdings)
-                for other_holding in other.holdings)
+                any(
+                    self_holding.contradicts(other_holding)
+                    for self_holding in self.holdings
+                )
+                for other_holding in other.holdings
+            )
         raise TypeError(
             f"'Contradicts' test not implemented for types {self.__class__} and {other.__class__}."
         )
 
-    def posits(self, holding: Union[Rule, Iterable[Rule]], context: Optional[Sequence[Factor]] = None) -> None:
+    def posits(
+        self,
+        holding: Union[Rule, Iterable[Rule]],
+        context: Optional[Sequence[Factor]] = None,
+    ) -> None:
         """
         Adds holding to the opinion's holdings list, replacing any other
         Holdings with the same meaning.
         """
-        def posits_one_holding(holding: Union[Rule, Iterable[Rule]], context: Optional[Sequence[Factor]] = None) -> None:
+
+        def posits_one_holding(
+            holding: Union[Rule, Iterable[Rule]],
+            context: Optional[Sequence[Factor]] = None,
+        ) -> None:
             if not isinstance(holding, Rule):
                 raise TypeError('"holding" must be an object of type Rule.')
 
