@@ -10,7 +10,6 @@
 # `Pipfile.lock` and then regenerate `requirements*.txt`.
 ################################################################################
 
--e .
 beautifulsoup4>=4.7.1
 ipykernel
 lxml
