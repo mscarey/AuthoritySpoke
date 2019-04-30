@@ -183,35 +183,32 @@ class Opinion:
         else:
             results = downloaded["results"]
 
-        opinions = []
-        for number, case in enumerate(results):
-            if not filename:
-                mangled_filename = f'{case["id"]}.json'
-            else:
-                mangled_filename = filename
-            if number > 0:
-                mangled_filename = filename.replace(".", f"_{number}.")
-            if save_to_file:
-                with open(directory / filename, "w") as fp:
-                    json.dump(case, fp, ensure_ascii=False)
-                opinions.append(opinion)
-            if as_generator:
+        def opinions_from_response(results, to_dict):
+
+            for number, case in enumerate(results):
+                if not filename:
+                    mangled_filename = f'{case["id"]}.json'
+                else:
+                    mangled_filename = filename
+                if number > 0:
+                    mangled_filename = filename.replace(".", f"_{number}.")
+                if save_to_file:
+                    with open(directory / filename, "w") as fp:
+                        json.dump(case, fp, ensure_ascii=False)
                 if to_dict:
                     yield case
                 else:
                     for opinion in cls.from_dict(case, lead_only=False):
                         yield opinion
-            else:
-                if to_dict:
-                    opinions.append(case)
-                else:
-                    for opinion in cls.from_dict(case, lead_only=False):
-                        opinions.append(opinion)
-        if not as_generator:
-            if len(opinions) == 1:
-                return opinions[0]
-            else:
-                return opinions
+
+
+        if as_generator:
+            return iter(opinions_from_response(results, to_dict))
+        opinions = [case for case in opinions_from_response(results, to_dict)]
+        if len(opinions) == 1:
+            return opinions[0]
+        else:
+            return opinions
 
     def contradicts(self, other: Union[Opinion, Rule]) -> bool:
         """
