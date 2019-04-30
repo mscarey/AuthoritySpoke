@@ -42,7 +42,7 @@ class Opinion:
     :param court:
         name of the court that published the opinion
     :param position:
-        the opinion's position toward the court's disposition of the case.
+        the opinion's attitude toward the court's disposition of the case.
         e.g. ``majority``, ``dissenting``, ``concurring``, ``concurring in the result``
     :param author:
         name of the judge who authored the opinion, if identified
@@ -75,21 +75,35 @@ class Opinion:
         api_key: Optional[str] = None,
         to_dict: bool = False,
         as_generator: bool = False,
-    ) -> Union[Opinion, List[Opinion], Dict[str, Any], List[Dict[str, Any]]]:
+    ) -> Union[
+        Opinion,
+        List[Opinion],
+        Iterator[Opinion],
+        Dict[str, Any],
+        List[Dict[str, Any]],
+        Iterator[Dict[str, Any]],
+    ]:
         """
+        Queries the Opinion endpoint of the
+        `Caselaw Access Project API <https://api.case.law/v1/cases/>`_,
+        saves the JSON object(s) from the response to the
+        ``example_data/opinions/`` directory in the repo,
+        and returns one or more dict objects from the JSON
+        or one or more :class:`.Opinion` objects.
+
         :param cap_id:
             an identifier for an opinion in the
             `Caselaw Access Project database <https://case.law/api/>`_,
             e.g. 4066790 for
-            `Oracle America, Inc. v. Google Inc. <https://api.case.law/v1/cases/4066790/>`_
+            `Oracle America, Inc. v. Google Inc. <https://api.case.law/v1/cases/4066790/>`_.
 
         :param cite:
             a citation linked to an opinion in the
             `Caselaw Access Project database <https://case.law/api/>`_.
             Usually these will be in the traditional format
             ``[Volume Number] [Reporter Name Abbreviation] [Page Number]``, e.g.
-            "750 F.3d 1339" for
-            `Oracle America, Inc. v. Google Inc. <https://case.law/search/#/cases?page=1&cite=%22750%20F.3d%201339%22>`_
+            `750 F.3d 1339 <https://case.law/search/#/cases?page=1&cite=%22750%20F.3d%201339%22>`_
+            for Oracle America, Inc. v. Google Inc.
             If the ``cap_id`` field is given, the cite field will be ignored.
             If neither field is given, the download will fail.
 
@@ -108,7 +122,7 @@ class Opinion:
 
         :param full_case:
             whether to request the full text of the opinion from the
-            `Caselaw Access Project API <https://api.case.law/v1/>`_.
+            `Caselaw Access Project API <https://api.case.law/v1/cases/>`_.
             If this is ``True``, the `api_key` parameter must be
             provided.
 
@@ -124,7 +138,7 @@ class Opinion:
 
         :param as_generator:
             if ``True``, returns a generator that yields all opinions
-            meeting the query
+            meeting the query.
         """
 
         if not (cap_id or cite):
@@ -200,7 +214,31 @@ class Opinion:
                 return opinions
 
     @classmethod
-    def from_dict(cls, decision_dict: Dict, lead_only: bool = True):
+    def from_dict(
+        cls, decision_dict: Dict[str, Any], lead_only: bool = True
+    ) -> Union[Opinion, Iterator[Opinion]]:
+        """
+        Creates and returns one or more :class:`.Opinion` objects
+        from a :py:class:`dict` derived from an opinion record from the
+        `Caselaw Access Project API <https://api.case.law/v1/cases/>`_.
+
+        :param decision_dict:
+            A record of an opinion loaded from JSON from the
+            `Caselaw Access Project API <https://api.case.law/v1/cases/>`_.
+
+        :param lead_only:
+            If ``True``, returns a single :class:`.Opinion` object
+            from the first opinion found in the
+            ``casebody/data/opinions`` section of the dict, which should
+            usually be the lead opinion. The lead opinion is commonly, but
+            not always, the only opinion that creates binding legal authority.
+            Usually every :class:`.Rule` posited by the lead opinion is
+            binding, but some may not be, often because parts of the
+            :class:`.Opinion` fail to command a majority of the panel
+            of judges. If ``False``, returns an iterator that yields
+            :class:`.Opinion` objects from every opinion in the case.
+        """
+
         def make_opinion(decision_dict, opinion_dict, citations) -> Opinion:
             position = opinion_dict["type"]
             author = opinion_dict["author"]
@@ -229,7 +267,10 @@ class Opinion:
         if lead_only:
             return make_opinion(decision_dict, opinions[0], citations)
         else:
-            return iter(make_opinion(decision_dict, opinion_dict, citations) for opinion_dict in opinions)
+            return iter(
+                make_opinion(decision_dict, opinion_dict, citations)
+                for opinion_dict in opinions
+            )
 
     @classmethod
     def from_file(
@@ -239,9 +280,25 @@ class Opinion:
         lead_only: bool = True,
     ) -> Union[Opinion, Iterator[Opinion]]:
         """
-        This is a generator that gets one opinion from a
-        Harvard-format case file every time it's called. Exhaust the
-        generator to get the lead opinion and all non-lead opinions.
+        Creates and returns one or more :class:`.Opinion` objects
+        from a JSON file derived from an opinion record from the
+        `Caselaw Access Project API <https://api.case.law/v1/cases/>`_.
+
+        :param filename: The name of the input JSON file.
+
+        :param directory: The directory where the input JSON file is located.
+
+        :param lead_only:
+            If ``True``, returns a single :class:`.Opinion` object
+            from the first opinion found in the
+            ``casebody/data/opinions`` section of the dict, which should
+            usually be the lead opinion. The lead opinion is commonly, but
+            not always, the only opinion that creates binding legal authority.
+            Usually every :class:`.Rule` posited by the lead opinion is
+            binding, but some may not be, often because parts of the
+            :class:`.Opinion` fail to command a majority of the panel
+            of judges. If ``False``, returns an iterator that yields
+            :class:`.Opinion` objects from every opinion in the case.
         """
 
         if not directory:
@@ -259,12 +316,26 @@ class Opinion:
         directory: Optional[pathlib.Path] = None,
     ):
         """
-        This imports Opinion with all its holdings, under
-        the assumption that the text of the Opinion is in the
-        example_data/opinions folder with the name [party_name]_h.json,
-        and the holdings are in the example_data/holdings folder with
-        the name holding_[party_name].json.
+        Loads structured JSON representation of :class:`.Rule`
+        objects, and posits each :class:`.Rule`
+        (that is, adds each :class:`.Rule` to self.holdings).
+
+        :param rule_file:
+            name of the JSON file with the
+            representation of :class:`.Rule` objects. If ``None``
+            is passed in, the :class:`.Rule` class will add the
+            default value ``holding_[party_name].json``.
+
+        :param rule_dict:
+            dict with a representation of :class:`.Rule` objects.
+
+        :param directory:
+            directory containing the JSON file with the
+            representation of :class:`.Rule` objects. If ``None``
+            is passed in, the :class:`.Rule` class will add the
+            default value ``example_data/holdings``.
         """
+
         if rule_dict:
             holdings = Rule.collection_from_dict(rule_dict)
         elif rule_file:
@@ -278,13 +349,24 @@ class Opinion:
             self.posits(holding)
         return self
 
-    def __gt__(self, other) -> bool:
-        return (self >= other) and (self != other)
+    def get_factor_by_name(self, name: str) -> Optional[Factor]:
+        """
+        Performs a recursive search of each holding in the
+        Opinion for a Factor with the specified name attribute.
+        Returns such a Factor if it exists, otherwise returns None.
+        """
 
-    def __ge__(self, other: Union["Opinion", Rule]) -> bool:
+        for holding in self.holdings:
+            factor = holding.get_factor_by_name(name)
+            if factor is not None:
+                return factor
+        raise ValueError(f'No factor by the name "{name}" was found')
+
+    def __ge__(self, other: Union[Opinion, Rule]) -> bool:
         """
         Returns a bool indicating whether every holding of other
-        is implied by some holding of self.
+        (or other itself, if other is a :class:`.Rule`)
+        is implied by :class:`.Rule` in ``self.holdings``.
         """
         if isinstance(other, Rule):
             return any(self_holding >= other for self_holding in self.holdings)
@@ -299,7 +381,13 @@ class Opinion:
             f"'Implies' test not implemented for types {self.__class__} and {other.__class__}."
         )
 
-    def contradicts(self, other: Union["Opinion", Rule]) -> bool:
+    def __gt__(self, other) -> bool:
+        """
+        Returns self >= value and self != value.
+        """
+        return (self >= other) and (self != other)
+
+    def contradicts(self, other: Union[Opinion, Rule]) -> bool:
         if isinstance(other, Rule):
             return any(
                 self_holding.contradicts(other) for self_holding in self.holdings
@@ -359,18 +447,7 @@ class Opinion:
         else:
             posits_one_holding(holding, context)
 
-    def get_factor_by_name(self, name: str) -> Optional[Factor]:
-        """
-        Performs a recursive search of each holding in the
-        Opinion for a Factor with the specified name attribute.
-        Returns such a Factor if it exists, otherwise returns None.
-        """
 
-        for holding in self.holdings:
-            factor = holding.get_factor_by_name(name)
-            if factor is not None:
-                return factor
-        raise ValueError(f'No factor by the name "{name}" was found')
 
     @property
     def generic_factors(self) -> List[Factor]:
