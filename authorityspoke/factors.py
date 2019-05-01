@@ -165,18 +165,32 @@ class Factor(ABC):
 
     def consistent_with(self, other: Factor, comparison: Callable) -> bool:
         """
-        :returns: a bool indicating whether there's at least one way to
-        match the :attr:`Factor.generic_factors` of ``self`` and ``other``,
-        such that they fit the relationship ``comparison``.
+        :returns:
+            a bool indicating whether there's at least one way to
+            match the :attr:`Factor.context_factors` of ``self`` and ``other``,
+            such that they fit the relationship ``comparison``.
         """
 
         context_registers = iter(self.context_register(other, operator.ge))
         return any(register is not None for register in context_registers)
 
+    @property
+    def context_factors(self) -> Tuple:
+        """
+        :returns:
+            a tuple of attributes that are designated as the ``context_factors``
+            for whichever subclass of :class:`Factor` calls this method. These
+            can be used for comparing objects using :meth:`consistent_with`
+        """
+        return tuple(
+            self.__dict__.get(factor_name) for factor_name in self.context_factor_names
+        )
+
     def contradicts(self, other: Optional[Factor]) -> bool:
         """
-        :returns: ``True`` if self and other can't both be true at
-        the same time. Otherwise returns ``False``.
+        :returns:
+            ``True`` if self and other can't both be true at
+            the same time. Otherwise returns ``False``.
         """
 
         if other is None:
@@ -199,49 +213,6 @@ class Factor(ABC):
         """
         return self >= other.make_absent()
 
-    def _implies_if_present(self, other: Factor) -> bool:
-        """
-        :returns:
-            bool indicating whether ``self`` would imply ``other``,
-            under the assumption that neither self nor other has
-            the attribute ``absent == True``.
-        """
-
-        if isinstance(other, self.__class__):
-            if other.generic:
-                return True
-            if self.generic:
-                return False
-            return bool(self.implies_if_concrete(other))
-        return False
-
-    def implies_if_concrete(self, other: "Factor") -> bool:
-        """
-        Determines whether self would imply other, under the assumptions
-        that neither self nor other has the attribute absent, neither
-        has the attribute generic, and other is an instance of self's class.
-        """
-
-        for i, self_factor in enumerate(self.context_factors):
-            if other.context_factors[i]:
-                if not (self_factor and self_factor >= other.context_factors[i]):
-                    return False
-        return self.consistent_with(other, operator.ge)
-
-    def equal_if_concrete(self, other: "Factor") -> bool:
-        """
-        Determines whether self would imply other, under the assumptions
-        that neither self nor other has the attribute absent, neither
-        has the attribute generic, and other is an instance of self's class.
-
-        Most subclasses will inject their own tests before calling this.
-        """
-        for i, self_factor in enumerate(self.context_factors):
-            if self_factor != other.context_factors[i]:
-                return False
-
-        return self.consistent_with(other, operator.eq)
-
     def __eq__(self, other) -> bool:
         if self.__class__ != other.__class__:
             return False
@@ -255,16 +226,58 @@ class Factor(ABC):
         if self.generic != other.generic:
             return False
 
-        return self.equal_if_concrete(other)
+        return self._equal_if_concrete(other)
 
-    def __str__(self):
-        string = f"{self.__class__.__name__.lower()}" + " {}"
-        if self.generic:
-            string = f"<{string}>"
-        if self.absent:
-            string = "absence of " + string
-        return string
+    def _equal_if_concrete(self, other: Factor) -> bool:
+        """
+        Used to test equality based on :attr:`context_factors`,
+        usually after a subclasses has injected its own tests
+        based on other attributes.
 
+        :returns:
+            bool indicating whether ``self`` would imply ``other``, under the assumptions
+            that neither ``self`` nor ``other`` has ``absent=True``, neither
+            has ``generic=True``, and ``other`` is an instance of ``self``'s class.
+        """
+        for i, self_factor in enumerate(self.context_factors):
+            if self_factor != other.context_factors[i]:
+                return False
+
+        return self.consistent_with(other, operator.eq)
+
+    def _implies_if_concrete(self, other: Factor) -> bool:
+        """
+        Used to test implication based on :attr:`context_factors`,
+        usually after a subclasses has injected its own tests
+        based on other attributes.
+
+        :returns:
+            bool indicating whether ``self`` would imply ``other``, under the assumptions
+            that neither ``self`` nor ``other`` has ``absent=True``, neither
+            has ``generic=True``, and ``other`` is an instance of ``self``'s class.
+        """
+
+        for i, self_factor in enumerate(self.context_factors):
+            if other.context_factors[i]:
+                if not (self_factor and self_factor >= other.context_factors[i]):
+                    return False
+        return self.consistent_with(other, operator.ge)
+
+    def _implies_if_present(self, other: Factor) -> bool:
+        """
+        :returns:
+            bool indicating whether ``self`` would imply ``other``,
+            under the assumption that neither self nor other has
+            the attribute ``absent == True``.
+        """
+
+        if isinstance(other, self.__class__):
+            if other.generic:
+                return True
+            if self.generic:
+                return False
+            return bool(self._implies_if_concrete(other))
+        return False
 
     def __ge__(self, other: "Factor") -> bool:
         if other is None:
@@ -284,10 +297,10 @@ class Factor(ABC):
 
         return False
 
-    def __gt__(self, other: Optional["Factor"]) -> bool:
+    def __gt__(self, other: Optional[Factor]) -> bool:
         return self >= other and self != other
 
-    def make_absent(self) -> "Factor":
+    def make_absent(self) -> Factor:
         """Returns a new object the same as self except with the
         opposite value for 'absent'"""
 
@@ -297,14 +310,7 @@ class Factor(ABC):
         return self.__class__(**new_attrs)
 
     @property
-    def context_factors(self) -> Tuple:
-
-        return tuple(
-            self.__dict__.get(factor_name) for factor_name in self.context_factor_names
-        )
-
-    @property
-    def recursive_factors(self) -> Dict["Factor", None]:
+    def recursive_factors(self) -> Dict[Factor, None]:
         """
         Returns a collection of factors including self's
         context_factors, and each of those factors'
@@ -337,8 +343,8 @@ class Factor(ABC):
         """
         This function and interchangeable_factors should be the only parts
         of the context-matching process that need to be unique for each
-        subclass of Factor. It specifies what attributes of self and other
-        to look in to find Factor objects to match.
+        subclass of :class:`Factor`. It specifies what attributes of self and other
+        to look in to find :class:`Factor` objects to match.
 
         For Fact, it returns the context_factors, which can't contain None.
         Other classes will return a Tuple[Optional[Factor], ...]
@@ -400,6 +406,14 @@ class Factor(ABC):
             ):
                 already_returned.append(changed_registry)
                 yield changed_registry
+
+    def __str__(self):
+        string = f"{self.__class__.__name__.lower()}" + " {}"
+        if self.generic:
+            string = f"<{string}>"
+        if self.absent:
+            string = "absence of " + string
+        return string
 
     @staticmethod
     def wrap_with_tuple(item):
@@ -998,13 +1012,13 @@ class Fact(Factor):
             ]
         return []
 
-    def equal_if_concrete(self, other: Factor) -> bool:
+    def _equal_if_concrete(self, other: Factor) -> bool:
         if (
             self.predicate != other.predicate
             or self.standard_of_proof != other.standard_of_proof
         ):
             return False
-        return super().equal_if_concrete(other)
+        return super()._equal_if_concrete(other)
 
     def __eq__(self, other) -> bool:
         return super().__eq__(other)
@@ -1038,7 +1052,7 @@ class Fact(Factor):
     def __len__(self):
         return len(self.context_factors)
 
-    def implies_if_concrete(self, other: Factor) -> bool:
+    def _implies_if_concrete(self, other: Factor) -> bool:
         if bool(self.standard_of_proof) != bool(other.standard_of_proof):
             return False
 
@@ -1049,7 +1063,7 @@ class Fact(Factor):
 
         if not self.predicate >= other.predicate:
             return False
-        return super().implies_if_concrete(other)
+        return super()._implies_if_concrete(other)
 
     def contradicts_if_present(self, other: "Fact") -> bool:
         """
@@ -1255,19 +1269,19 @@ class Pleading(Factor):
     def context_factor_names(self) -> Tuple[Optional[Entity]]:
         return ("filer",)
 
-    def equal_if_concrete(self, other: "Pleading") -> bool:
+    def _equal_if_concrete(self, other: "Pleading") -> bool:
         if self.date != other.date:
             return False
-        return super().equal_if_concrete(other)
+        return super()._equal_if_concrete(other)
 
     def __eq__(self, other: Factor) -> bool:
         return super.__eq__(other)
 
-    def implies_if_concrete(self, other: "Pleading"):
+    def _implies_if_concrete(self, other: "Pleading"):
         # TODO: allow the same kind of comparisons as Predicate.quantity
         if self.date != other.date:
             return False
-        return super().implies_if_concrete(other)
+        return super()._implies_if_concrete(other)
 
     def __str__(self):
         string = (
@@ -1331,20 +1345,20 @@ class Exhibit(Factor):
     def context_factor_names(self) -> Tuple[str, ...]:
         return ("statement", "stated_by")
 
-    def equal_if_concrete(self, other: "Pleading") -> bool:
+    def _equal_if_concrete(self, other: "Pleading") -> bool:
         if self.form != other.form:
             return False
-        return super().equal_if_concrete(other)
+        return super()._equal_if_concrete(other)
 
     def __eq__(self, other: Factor) -> bool:
         return super().__eq__(other)
 
-    def implies_if_concrete(self, other: "Exhibit"):
+    def _implies_if_concrete(self, other: "Exhibit"):
 
         if not (self.form == other.form or other.form is None):
             return False
 
-        return super().implies_if_concrete(other)
+        return super()._implies_if_concrete(other)
 
     def __str__(self):
         string = (
