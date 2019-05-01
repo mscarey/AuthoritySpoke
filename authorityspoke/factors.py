@@ -1,19 +1,22 @@
+from __future__ import annotations
+
 import datetime
 import functools
 import logging
 import operator
 import re
 
-from typing import Any, Callable, Dict, List, Set, Tuple
+from abc import ABC
+
+from typing import Any, Callable, Dict, List, Tuple
 from typing import Iterable, Iterator, Mapping
-from typing import Optional, Sequence, Type, Union
+from typing import Optional, Sequence, Set, Type, Union
 
 from pint import UnitRegistry
 
 from authorityspoke.context import log_mentioned_context
-from authorityspoke.enactments import Enactment
 
-from dataclasses import astuple, dataclass, field
+from dataclasses import astuple, dataclass
 
 ureg = UnitRegistry()
 Q_ = ureg.Quantity
@@ -31,15 +34,24 @@ OPPOSITE_COMPARISONS = {
 
 
 def new_context_helper(func: Callable):
+
     """
-    Decorator for make_dict() methods of Factor subclasses, including Rule.
+    Decorator for :meth:`Factor.new_context`.
+
+    If a :class:`list` has been passed in rather than a :class:`dict`, uses
+    the input as a set of :class:`Factor`\s to replace the
+    :meth:`Factor.generic_factors` from the calling object.
+
+    Also, if ``context`` contains a replacement for the calling
+    object, the decorator returns the replacement and never calls
+    the decorated function.
     """
 
     @functools.wraps(func)
     def wrapper(
-        factor: "Factor",
-        context: Optional[Union[Sequence["Factor"], Dict["Factor", "Factor"]]],
-    ) -> "Factor":
+        factor: Factor,
+        context: Optional[Union[Sequence[Factor], Dict[Factor, Factor]]],
+    ) -> Factor:
 
         if context is not None:
             if not isinstance(context, Iterable):
@@ -59,7 +71,6 @@ def new_context_helper(func: Callable):
                         + "replacement Factor."
                     )
                 context = dict(zip(generic_factors, context))
-            # BUG: needs an equality test, not an "in" test?
             for context_factor in context:
                 if factor.name == context_factor or (
                     factor == context_factor and factor.name == context_factor.name
@@ -71,18 +82,17 @@ def new_context_helper(func: Callable):
     return wrapper
 
 @dataclass(frozen=True)
-class Factor:
-    """A factor is something used to determine the applicability of a legal
-    procedure. Factors can be both inputs and outputs of legal procedures.
-    In a chain of legal procedures, the outputs of one may become inputs for
-    another. Common types of factors include Facts, Evidence, Allegations,
-    Motions, and Arguments."""
+class Factor(ABC):
+    """
+    Anything relevant to a court's determination of the applicability of a legal
+    :class:`Rule` can be a :class:`Factor`. The same :class:`Factor` that is an output
+    of one legal :class:`Rule` might be an input of another.
+    """
 
     @classmethod
-    def all_subclasses(cls):
+    def all_subclasses(cls) -> Set[Type]:
         """
-        The set of subclasses available could change if the user imports
-        more classes after calling the method once.
+        :return: the set of all subclasses of :class:`Factor`
         """
         return set(cls.__subclasses__()).union(
             [s for c in cls.__subclasses__() for s in c.all_subclasses()]

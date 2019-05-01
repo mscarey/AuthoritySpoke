@@ -1,7 +1,7 @@
 ==============
-``Opinions``
+``Predicates``
 ==============
 
-.. autoclass:: authorityspoke.opinions.Opinion
+.. autoclass:: authorityspoke.factors.Predicate
    :members:
    :special-members:

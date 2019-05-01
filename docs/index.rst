@@ -10,13 +10,11 @@ Welcome to AuthoritySpoke's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-API
-===
-
-Auto-generated API documentation:
+API Reference
+=============
 
 .. toctree::
-    :maxdepth: 1
+    :maxdepth: 2
     :glob:
 
     api/*
