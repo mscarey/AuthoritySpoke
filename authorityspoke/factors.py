@@ -211,7 +211,7 @@ class Factor(ABC):
             ``True`` if self and other can't both be true at
             the same time. Otherwise returns ``False``.
         """
-        return self >= other.make_absent()
+        return self >= other.evolve("absent")
 
     def __eq__(self, other) -> bool:
         if self.__class__ != other.__class__:
@@ -299,15 +299,6 @@ class Factor(ABC):
 
     def __gt__(self, other: Optional[Factor]) -> bool:
         return self >= other and self != other
-
-    def make_absent(self) -> Factor:
-        """Returns a new object the same as self except with the
-        opposite value for 'absent'"""
-
-        new_attrs = self.__dict__.copy()
-        if new_attrs.get("absent") is not None:
-            new_attrs["absent"] = not new_attrs["absent"]
-        return self.__class__(**new_attrs)
 
     @property
     def recursive_factors(self) -> Dict[Factor, None]:
@@ -541,21 +532,27 @@ class Factor(ABC):
         for choice in new_mapping_choices:
             yield choice
 
-    def evolve(self, changes: Dict["str", Any]) -> "Factor":
+    def evolve(self, changes: Union[str, Tuple[str, ...], Dict["str", Any]]) -> "Factor":
         """
         :param changes: a dict where the keys are names of attributes
-        of self, and the values are new values for those attributes.
+        of self, and the values are new values for those attributes, or
+        a list of attributes that need to have their values replaced with
+        their boolean opposite.
 
         :returns: a new Factor object initialized with attributes from
         self.__dict__, except that any attributes named as keys in the
         changes parameter are replaced by the corresponding value.
         """
+        if isinstance(changes, str):
+            changes = (changes,)
         for key in changes:
             if key not in self.__dict__:
                 raise ValueError(
                     f"Invalid: '{key}' is not among the Factor's attributes "
                     f"{list(self.__dict__.keys())}."
                 )
+        if isinstance(changes, tuple):
+            changes = {key: not self.__dict__[key] for key in changes}
         new_dict = self.__dict__.copy()
         for key in changes:
             new_dict[key] = changes[key]
