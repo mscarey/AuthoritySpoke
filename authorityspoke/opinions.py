@@ -469,7 +469,7 @@ class Opinion:
 
     def __ge__(self, other: Union[Opinion, Rule]) -> bool:
         """
-        Returns a bool indicating whether the :class:`.Rule` ``other``
+        :returns: a bool indicating whether the :class:`.Rule` ``other``
         (or every holding of ``other``, if other is an :class:`.Opinion`)
         is implied by some :class:`.Rule` in ``self.holdings``.
         """
@@ -488,6 +488,6 @@ class Opinion:
 
     def __gt__(self, other) -> bool:
         """
-        Returns self >= value and self != value.
+        :returns: self >= value and self != value.
         """
         return (self >= other) and (self != other)

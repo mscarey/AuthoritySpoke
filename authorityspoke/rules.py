@@ -140,7 +140,7 @@ class Procedure(Factor):
                             for next_step in next_steps:
                                 yield next_step
 
-    def implies_if_present(self, other: Factor) -> bool:
+    def _implies_if_present(self, other: Factor) -> bool:
         """
         Tests whether the assertion that self applies in some cases
         implies that the procedure "other" applies in some cases.

@@ -40,7 +40,7 @@ def new_context_helper(func: Callable):
 
     If a :class:`list` has been passed in rather than a :class:`dict`, uses
     the input as a set of :class:`Factor`\s to replace the
-    :meth:`Factor.generic_factors` from the calling object.
+    :attr:`Factor.generic_factors` from the calling object.
 
     Also, if ``context`` contains a replacement for the calling
     object, the decorator returns the replacement and never calls
@@ -103,8 +103,10 @@ class Factor(ABC):
     def class_from_str(cls, name: str):
         """
         Part of the JSON deserialization process. Obtains a classname
-        of a Factor subclass from a string, checking first in the lru_cache
+        of a :class:`Factor` subclass from a string, checking first in the lru_cache
         of known subclasses.
+
+        :param: name of the desired subclass
         """
         name = name.capitalize()
         class_options = {
@@ -120,8 +122,8 @@ class Factor(ABC):
 
     @classmethod
     def _build_from_dict(
-        cls, factor_dict: Dict, mentioned: List[Union["Factor"]]
-    ) -> "Factor":
+        cls, factor_dict: Dict, mentioned: List[Union[Factor]]
+    ) -> Factor:
         example = cls()
         new_factor_dict = example.__dict__
         for attr in new_factor_dict:
@@ -136,20 +138,22 @@ class Factor(ABC):
     @classmethod
     @log_mentioned_context
     def from_dict(
-        cls, factor_record: Dict, mentioned: List["Factor"]
-    ) -> Optional["Factor"]:
+        cls, factor_record: Dict, mentioned: List[Factor]
+    ) -> Optional[Factor]:
         """
-        Turns a dict recently created from a chunk of JSON into a Factor object.
+        Turns a dict recently created from a chunk of JSON into a :class:`Factor` object.
         """
         cname = factor_record["type"]
         target_class = cls.class_from_str(cname)
         return target_class._build_from_dict(factor_record, mentioned)
 
     @property
-    def generic_factors(self) -> Dict["Factor", None]:
-        """Returns an iterable of self's generic Factors,
-        which must be matched to other generic Factors to
-        perform equality tests between Factors."""
+    def generic_factors(self) -> Dict[Factor, None]:
+        """
+        :returns: a value-less :class:`dict` of self's generic :class:`Factor`\s,
+        which can be matched to another object's ``generic_factors`` to
+        perform an equality test.
+        """
 
         if self.generic:
             return {self: None}
@@ -159,11 +163,48 @@ class Factor(ABC):
             for generic in factor.generic_factors
         }
 
-    def implies_if_present(self, other: "Factor"):
+    def consistent_with(self, other: Factor, comparison: Callable) -> bool:
         """
-        Determines whether self would imply other, under
-        the assumption that neither self nor other is an
-        "absent" Factor.
+        :returns: a bool indicating whether there's at least one way to
+        match the :attr:`Factor.generic_factors` of ``self`` and ``other``,
+        such that they fit the relationship ``comparison``.
+        """
+
+        context_registers = iter(self.context_register(other, operator.ge))
+        return any(register is not None for register in context_registers)
+
+    def contradicts(self, other: Optional[Factor]) -> bool:
+        """
+        :returns: ``True`` if self and other can't both be true at
+        the same time. Otherwise returns ``False``.
+        """
+
+        if other is None:
+            return False
+        if not isinstance(other, Factor):
+            raise TypeError(
+                f"{self.__class__} objects may only be compared for "
+                + "contradiction with other Factor objects or None."
+            )
+        return self._contradicts_if_factor(other)
+
+    def _contradicts_if_factor(self, other: Factor) -> bool:
+        """
+        A :meth:`contradicts` method under the assumption that ``other``
+        is not ``None``.
+
+        :returns:
+            ``True`` if self and other can't both be true at
+            the same time. Otherwise returns ``False``.
+        """
+        return self >= other.make_absent()
+
+    def _implies_if_present(self, other: Factor) -> bool:
+        """
+        :returns:
+            bool indicating whether ``self`` would imply ``other``,
+            under the assumption that neither self nor other has
+            the attribute ``absent == True``.
         """
 
         if isinstance(other, self.__class__):
@@ -173,16 +214,6 @@ class Factor(ABC):
                 return False
             return bool(self.implies_if_concrete(other))
         return False
-
-    def any_context_register(self, other: "Factor", comparison: Callable) -> bool:
-        """
-        Returns a bool indicating whether there's at least one way to
-        match the generic context factors of self and other, such that they
-        fit the relationship "comparison".
-        """
-
-        context_registers = iter(self.context_register(other, operator.ge))
-        return any(register is not None for register in context_registers)
 
     def implies_if_concrete(self, other: "Factor") -> bool:
         """
@@ -195,7 +226,7 @@ class Factor(ABC):
             if other.context_factors[i]:
                 if not (self_factor and self_factor >= other.context_factors[i]):
                     return False
-        return self.any_context_register(other, operator.ge)
+        return self.consistent_with(other, operator.ge)
 
     def equal_if_concrete(self, other: "Factor") -> bool:
         """
@@ -209,7 +240,7 @@ class Factor(ABC):
             if self_factor != other.context_factors[i]:
                 return False
 
-        return self.any_context_register(other, operator.eq)
+        return self.consistent_with(other, operator.eq)
 
     def __eq__(self, other) -> bool:
         if self.__class__ != other.__class__:
@@ -234,21 +265,6 @@ class Factor(ABC):
             string = "absence of " + string
         return string
 
-    def contradicts_if_factor(self, other: "Factor") -> bool:
-        return self >= other.make_absent()
-
-    def contradicts(self, other: Optional["Factor"]) -> bool:
-        """Returns True if self and other can't both be true at the same time.
-        Otherwise returns False."""
-
-        if other is None:
-            return False
-        if not isinstance(other, Factor):
-            raise TypeError(
-                f"{self.__class__} objects may only be compared for "
-                + "contradiction with other Factor objects or None."
-            )
-        return self.contradicts_if_factor(other)
 
     def __ge__(self, other: "Factor") -> bool:
         if other is None:
@@ -261,10 +277,10 @@ class Factor(ABC):
             )
 
         if self.__dict__.get("absent") and other.__dict__.get("absent"):
-            return bool(other.implies_if_present(self))
+            return bool(other._implies_if_present(self))
 
         if not self.__dict__.get("absent") and not other.__dict__.get("absent"):
-            return bool(self.implies_if_present(other))
+            return bool(self._implies_if_present(other))
 
         return False
 
@@ -1043,13 +1059,14 @@ class Fact(Factor):
         if (self.predicate.contradicts(other.predicate) and not other.absent) or (
             self.predicate >= other.predicate and other.absent
         ):
-            return self.any_context_register(other, operator.ge)
+            return self.consistent_with(other, operator.ge)
         return False
 
-    def contradicts_if_factor(self, other: Factor) -> bool:
+    def _contradicts_if_factor(self, other: Factor) -> bool:
         """
-        Returns True if self and other can't both be true at the same time.
-        Otherwise returns False.
+        :returns:
+            True if self and other can't both be true at the same time.
+            Otherwise returns False.
         """
 
         if not isinstance(other, self.__class__):
@@ -1063,8 +1080,10 @@ class Fact(Factor):
     def _build_from_dict(
         cls, fact_dict: Dict[str, Union[str, bool]], mentioned: List[Factor]
     ) -> Tuple[Optional["Fact"], List[Factor]]:
-        """Constructs and returns a Fact object from a dict imported from
-        a JSON file in the format used in the "input" folder."""
+        """
+        Constructs and returns a :class:`Fact` object from a dict imported from
+        a JSON file in the format used in the "input" folder.
+        """
 
         placeholder = "{}"  # to be replaced in the Fact's string method
 
@@ -1072,17 +1091,20 @@ class Fact(Factor):
             content: str, mentioned: List[Factor], placeholder: str
         ) -> Tuple[str, List[Factor]]:
             """
-            :param content: the content for the Fact's Predicate
+            :param content: the content for the :class:`Fact`\'s Predicate
 
-            :param mentioned: list of Factors with names that could be
-            referenced in content
+            :param mentioned:
+                list of :class:`Factor`\s with names that could be
+                referenced in content
 
-            :param placeholder: a string to replace the names of
-            referenced Factors in content
+            :param placeholder:
+                a string to replace the names of
+                referenced :class:`Factor`\s in content
 
-            :returns: the content string with any referenced Factors
-            replaced by placeholder, and a list of referenced Factors
-            in the order they appeared in content.
+            :returns:
+                the content string with any referenced :class:`Factor`\s
+                replaced by placeholder, and a list of referenced
+                :class:`Factor`\s in the order they appeared in content.
             """
             context_with_indices: List[List[Factor, int]] = []
             for factor in mentioned:
