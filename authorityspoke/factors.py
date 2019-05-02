@@ -291,6 +291,36 @@ class Factor(ABC):
         """
         return self >= other.evolve("absent")
 
+    def evolve(
+        self, changes: Union[str, Tuple[str, ...], Dict["str", Any]]
+    ) -> Factor:
+        """
+        :param changes:
+            a :class:`dict` where the keys are names of attributes
+            of self, and the values are new values for those attributes, or
+            else an attribute name or :class:`list` of names that need to
+            have their values replaced with their boolean opposite.
+
+        :returns:
+            a new object initialized with attributes from
+            ``self.__dict__``, except that any attributes named as keys in the
+            changes parameter are replaced by the corresponding value.
+        """
+        if isinstance(changes, str):
+            changes = (changes,)
+        for key in changes:
+            if key not in self.__dict__:
+                raise ValueError(
+                    f"Invalid: '{key}' is not among the Factor's attributes "
+                    f"{list(self.__dict__.keys())}."
+                )
+        if isinstance(changes, tuple):
+            changes = {key: not self.__dict__[key] for key in changes}
+        new_dict = self.__dict__.copy()
+        for key in changes:
+            new_dict[key] = changes[key]
+        return self.__class__(**new_dict)
+
     def __eq__(self, other) -> bool:
         if self.__class__ != other.__class__:
             return False
@@ -442,7 +472,7 @@ class Factor(ABC):
         return string
 
     @staticmethod
-    def wrap_with_tuple(item):
+    def _wrap_with_tuple(item):
         if isinstance(item, Iterable):
             return tuple(item)
         return (item,)
@@ -529,8 +559,8 @@ class Factor(ABC):
 
         new_mapping_choices = [self_mapping_proxy]
 
-        self_factors = self.wrap_with_tuple(self_factors)
-        other_factors = self.wrap_with_tuple(other_factors)
+        self_factors = self._wrap_with_tuple(self_factors)
+        other_factors = self._wrap_with_tuple(other_factors)
 
         # why am I allowing the __len__s to be different?
         shortest = min(len(self_factors), len(other_factors))
@@ -567,33 +597,6 @@ class Factor(ABC):
         for choice in new_mapping_choices:
             yield choice
 
-    def evolve(
-        self, changes: Union[str, Tuple[str, ...], Dict["str", Any]]
-    ) -> Factor:
-        """
-        :param changes: a dict where the keys are names of attributes
-        of self, and the values are new values for those attributes, or
-        a list of attributes that need to have their values replaced with
-        their boolean opposite.
-
-        :returns: a new Factor object initialized with attributes from
-        self.__dict__, except that any attributes named as keys in the
-        changes parameter are replaced by the corresponding value.
-        """
-        if isinstance(changes, str):
-            changes = (changes,)
-        for key in changes:
-            if key not in self.__dict__:
-                raise ValueError(
-                    f"Invalid: '{key}' is not among the Factor's attributes "
-                    f"{list(self.__dict__.keys())}."
-                )
-        if isinstance(changes, tuple):
-            changes = {key: not self.__dict__[key] for key in changes}
-        new_dict = self.__dict__.copy()
-        for key in changes:
-            new_dict[key] = changes[key]
-        return self.__class__(**new_dict)
 
     @new_context_helper
     def new_context(self, changes: Dict[Factor, Factor]) -> Factor:
@@ -960,8 +963,8 @@ class Fact(Factor):
 
         if not context_factors:
             context_factors = range(len(self.predicate))
-        case_factors = self.__class__.wrap_with_tuple(case_factors)
-        context_factors = self.__class__.wrap_with_tuple(context_factors)
+        case_factors = self.__class__._wrap_with_tuple(case_factors)
+        context_factors = self.__class__._wrap_with_tuple(context_factors)
 
         if len(context_factors) != len(self.predicate):
             raise ValueError(

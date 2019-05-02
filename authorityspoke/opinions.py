@@ -459,7 +459,7 @@ class Opinion:
 
         # These lines repeat lines in new_context_helper
         if isinstance(context, Factor) or isinstance(context, str):
-            context = context.wrap_with_tuple(context)
+            context = context._wrap_with_tuple(context)
 
         if isinstance(holding, Iterable):
             for item in holding:

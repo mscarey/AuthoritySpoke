@@ -77,9 +77,9 @@ class Procedure(Factor):
 
     def __post_init__(self):
 
-        outputs = self.__class__.wrap_with_tuple(self.outputs)
-        inputs = self.__class__.wrap_with_tuple(self.inputs)
-        despite = self.__class__.wrap_with_tuple(self.despite)
+        outputs = self.__class__._wrap_with_tuple(self.outputs)
+        inputs = self.__class__._wrap_with_tuple(self.inputs)
+        despite = self.__class__._wrap_with_tuple(self.despite)
 
         groups = {"outputs": outputs, "inputs": inputs, "despite": despite}
         for group in groups:
@@ -606,7 +606,7 @@ class ProceduralRule(Rule):
         for attr in ("enactments", "enactments_despite"):
             value = self.__dict__[attr]
             if isinstance(value, Enactment):
-                object.__setattr__(self, attr, self.wrap_with_tuple(value))
+                object.__setattr__(self, attr, self._wrap_with_tuple(value))
 
     def __str__(self):
         def factor_catalog(factors: List[Union[Factor, Enactment]], tag: str) -> str:
