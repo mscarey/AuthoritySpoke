@@ -49,8 +49,7 @@ def new_context_helper(func: Callable):
 
     @functools.wraps(func)
     def wrapper(
-        factor: Factor,
-        context: Optional[Union[Sequence[Factor], Dict[Factor, Factor]]],
+        factor: Factor, context: Optional[Union[Sequence[Factor], Dict[Factor, Factor]]]
     ) -> Factor:
 
         if context is not None:
@@ -81,12 +80,15 @@ def new_context_helper(func: Callable):
 
     return wrapper
 
+
 @dataclass(frozen=True)
 class Factor(ABC):
     """
-    Anything relevant to a court's determination of the applicability of a legal
-    :class:`Rule` can be a :class:`Factor`. The same :class:`Factor` that is an output
-    of one legal :class:`Rule` might be an input of another.
+    Anything relevant to a court's determination of the applicability
+    of a legal :class:`rules.Rule` can be a :class:`Factor`. The same
+    :class:`Factor` that is in the :attr:`.rules.Procedure.outputs`
+    for one legal :class:`.Rule` might be in the :attr:`.rules.Procedure.inputs`
+    for another.
     """
 
     @classmethod
@@ -103,8 +105,8 @@ class Factor(ABC):
     def class_from_str(cls, name: str):
         """
         Part of the JSON deserialization process. Obtains a classname
-        of a :class:`Factor` subclass from a string, checking first in the lru_cache
-        of known subclasses.
+        of a :class:`Factor` subclass from a string, checking first
+        in the lru_cache of known subclasses.
 
         :param: name of the desired subclass
         """
@@ -122,15 +124,15 @@ class Factor(ABC):
 
     @classmethod
     def _build_from_dict(
-        cls, factor_dict: Dict, mentioned: List[Union[Factor]]
+        cls, factor_record: Dict, mentioned: List[Factor]
     ) -> Factor:
         example = cls()
         new_factor_dict = example.__dict__
         for attr in new_factor_dict:
             if attr in example.context_factor_names:
-                value, mentioned = Factor.from_dict(factor_dict.get(attr), mentioned)
+                value, mentioned = Factor.from_dict(factor_record.get(attr), mentioned)
             else:
-                value = factor_dict.get(attr)
+                value = factor_record.get(attr)
             if value is not None:
                 new_factor_dict[attr] = value
         return (cls(**new_factor_dict), mentioned)
@@ -141,7 +143,18 @@ class Factor(ABC):
         cls, factor_record: Dict, mentioned: List[Factor]
     ) -> Optional[Factor]:
         """
-        Turns a dict recently created from a chunk of JSON into a :class:`Factor` object.
+        Turns a dict recently created from a chunk of JSON
+        into a :class:`Factor` object.
+
+        :param factor_record:
+            parameter values to pass to :meth:`Factor.__init__`.
+
+        :param mentioned:
+            a list of relevant :class:`Factor`\s that have already been
+            constructed and can be used in composition of the output
+            :class:`Factor`, instead of constructing new ones.
+
+        :returns: a new :class:`Factor` built from :param:`factor_record`.
         """
         cname = factor_record["type"]
         target_class = cls.class_from_str(cname)
@@ -150,9 +163,11 @@ class Factor(ABC):
     @property
     def generic_factors(self) -> Dict[Factor, None]:
         """
-        :returns: a value-less :class:`dict` of self's generic :class:`Factor`\s,
-        which can be matched to another object's ``generic_factors`` to
-        perform an equality test.
+        :returns:
+            a :class:`dict` with self's generic :class:`Factor`\s
+            as keys and ``None`` as values, so that the keys can
+            be matched to  another object's ``generic_factors``
+            to perform an equality test.
         """
 
         if self.generic:
@@ -235,9 +250,10 @@ class Factor(ABC):
         based on other attributes.
 
         :returns:
-            bool indicating whether ``self`` would imply ``other``, under the assumptions
-            that neither ``self`` nor ``other`` has ``absent=True``, neither
-            has ``generic=True``, and ``other`` is an instance of ``self``'s class.
+            bool indicating whether ``self`` would equal ``other``,
+            under the assumptions that neither ``self`` nor ``other``
+            has ``absent=True``, neither has ``generic=True``, and
+            ``other`` is an instance of ``self``'s class.
         """
         for i, self_factor in enumerate(self.context_factors):
             if self_factor != other.context_factors[i]:
@@ -252,9 +268,10 @@ class Factor(ABC):
         based on other attributes.
 
         :returns:
-            bool indicating whether ``self`` would imply ``other``, under the assumptions
-            that neither ``self`` nor ``other`` has ``absent=True``, neither
-            has ``generic=True``, and ``other`` is an instance of ``self``'s class.
+            bool indicating whether ``self`` would imply ``other``,
+            under the assumptions that neither ``self`` nor ``other``
+            has ``absent=True``, neither has ``generic=True``, and
+            ``other`` is an instance of ``self``'s class.
         """
 
         for i, self_factor in enumerate(self.context_factors):
@@ -303,11 +320,11 @@ class Factor(ABC):
     @property
     def recursive_factors(self) -> Dict[Factor, None]:
         """
-        Returns a collection of factors including self's
-        context_factors, and each of those factors'
-        context_factors, recursively.
-
-        Uses a dict instead of a set to preserve order.
+        :returns:
+            a :class:`dict` (instead of a :class:`set`,
+            to preserve order) of :class:`Factor`\s including ``self``'s
+            :attr:`context_factors`, and each of those :class:`Factor`\s'
+            :attr:`context_factors`, recursively.
         """
         answers: Dict[Factor, None] = {self: None}
         for context in filter(lambda x: x is not None, self.context_factors):
@@ -532,7 +549,9 @@ class Factor(ABC):
         for choice in new_mapping_choices:
             yield choice
 
-    def evolve(self, changes: Union[str, Tuple[str, ...], Dict["str", Any]]) -> "Factor":
+    def evolve(
+        self, changes: Union[str, Tuple[str, ...], Dict["str", Any]]
+    ) -> "Factor":
         """
         :param changes: a dict where the keys are names of attributes
         of self, and the values are new values for those attributes, or

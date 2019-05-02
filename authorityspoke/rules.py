@@ -17,6 +17,26 @@ from authorityspoke.factors import Factor, new_context_helper
 
 
 class Relation(NamedTuple):
+    """
+    Describes two groups of :class:`.Factor`\s and suggests a relation
+    between the two groups. The work of determining whether the
+    relation holds isn't currently performed by this class.
+
+    :param need_matches:
+        :class:`.Factor`\s that all need to satisfy the comparison
+        :attr:`comparison` with some factor of :attr:`available`
+        for the relation to hold.
+
+    :param available:
+        :class:`.Factor`\s available for matching with the
+        :attr:`need_matches` :class:`.Factor`\s, but that don't
+        all need to be matched themselves for the relation to hold.
+
+    :param comparison:
+        a function defining the comparison that must be ``True``
+        between each :attr:`need_matches` and some :attr:`available`
+        for the relation to hold.
+    """
     need_matches: Tuple[Factor, ...]
     available: Tuple[Factor, ...]
     comparison: Callable
@@ -31,7 +51,20 @@ class Procedure(Factor):
     Input factors are not treated as potential undercutters.
     Instead, they're assumed to be additional support in favor of the output.
     If a factor is relevant both as support for the output and as a potential
-    undercutter, include it in both 'inputs' and 'despite'."""
+    undercutter, include it in both 'inputs' and 'despite'.
+
+    :param outputs:
+
+    :param inputs:
+
+    :param despite:
+
+    :param name:
+
+    :param absent:
+
+    :param generic:
+    """
 
     outputs: Iterable[Factor] = ()
     inputs: Iterable[Factor] = ()

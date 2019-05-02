@@ -33,6 +33,7 @@ release = authorityspoke.__version__
 # ones.
 extensions = [
     'sphinx.ext.autodoc',
+    'sphinx.ext.inheritance_diagram',
     'sphinx.ext.intersphinx',
     'sphinx_autodoc_typehints',
 ]
