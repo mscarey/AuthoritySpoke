@@ -28,10 +28,10 @@ class TestEntities:
         """
         motel = make_entity["motel"]
         watt = make_entity["watt"]
-        empty_update = motel.context_register(watt, operator.ge)
+        empty_update = motel._context_register(watt, operator.ge)
         assert not any(register is not None for register in empty_update)
 
-        update = motel.context_register(watt, operator.le)
+        update = motel._context_register(watt, operator.le)
         assert any(register == {motel: watt, watt: motel} for register in update)
 
     def test_new_context(self, make_entity):

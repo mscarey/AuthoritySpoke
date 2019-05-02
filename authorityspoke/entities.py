@@ -5,6 +5,7 @@ people, places, or things. Unlike Facts, Evidence, and Allegations
 as parameters, so they won't (probably?) need to incorporate
 ordered tuples of other Factors.
 """
+from __future__ import annotations
 
 from typing import Dict, Optional
 

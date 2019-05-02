@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import json
 import operator
 import pathlib
@@ -53,7 +55,7 @@ class Procedure(Factor):
     If a factor is relevant both as support for the output and as a potential
     undercutter, include it in both 'inputs' and 'despite'.
 
-    :param outputs:
+    :param outputs: tk
 
     :param inputs:
 
@@ -90,7 +92,7 @@ class Procedure(Factor):
                     )
             object.__setattr__(self, group, groups[group])
 
-    def __eq__(self, other: "Procedure") -> bool:
+    def __eq__(self, other: Procedure) -> bool:
         """Determines if the two procedures have all the same factors
         with the same entities in the same roles, not whether they're
         actually the same Python object."""
@@ -428,11 +430,11 @@ class Procedure(Factor):
                 if self_factor.contradicts(other_factor):
                     if all(
                         all(
-                            matches.get(key) == context_register[key]
-                            or matches.get(context_register[key] == key)
+                            matches.get(key) == _context_register[key]
+                            or matches.get(_context_register[key] == key)
                             for key in self_factor.generic_factors
                         )
-                        for context_register in self_factor.context_register(
+                        for _context_register in self_factor._context_register(
                             other_factor, operator.eq
                         )
                     ):

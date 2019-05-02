@@ -85,9 +85,9 @@ def new_context_helper(func: Callable):
 class Factor(ABC):
     """
     Anything relevant to a court's determination of the applicability
-    of a legal :class:`rules.Rule` can be a :class:`Factor`. The same
-    :class:`Factor` that is in the :attr:`.rules.Procedure.outputs`
-    for one legal :class:`.Rule` might be in the :attr:`.rules.Procedure.inputs`
+    of a legal :class:`.Rule` can be a :class:`Factor`. The same
+    :class:`Factor` that is in the :attr:`.Procedure.outputs`
+    for one legal :class:`.Rule` might be in the :attr:`.Procedure.inputs`
     for another.
     """
 
@@ -153,12 +153,38 @@ class Factor(ABC):
             a list of relevant :class:`Factor`\s that have already been
             constructed and can be used in composition of the output
             :class:`Factor`, instead of constructing new ones.
-
-        :returns: a new :class:`Factor` built from :param:`factor_record`.
         """
         cname = factor_record["type"]
         target_class = cls.class_from_str(cname)
         return target_class._build_from_dict(factor_record, mentioned)
+
+    @property
+    def context_factor_names(self) -> Tuple[str, ...]:
+        """
+        This method and :meth:`interchangeable_factors` should be the only parts
+        of the context-matching process that need to be unique for each
+        subclass of :class:`Factor`.
+
+        :returns:
+            attribute names identifying which attributes of ``self`` and
+            ``other`` must match, for a :class:`.Relation` to hold between
+            this :class:`Factor` and another.
+        """
+
+        return ()
+
+    @property
+    def interchangeable_factors(self) -> List[Dict[Factor, Factor]]:
+        """
+        :returns:
+            the ways :attr:`context_factors` can be reordered without
+            changing the meaning of ``self``, or whether it would
+            be true in a particular context.
+
+            This is the default version for subclasses that don't have any
+            interchangeable :attr:`context_factors`.
+        """
+        return []
 
     @property
     def generic_factors(self) -> Dict[Factor, None]:
@@ -178,17 +204,6 @@ class Factor(ABC):
             for generic in factor.generic_factors
         }
 
-    def consistent_with(self, other: Factor, comparison: Callable) -> bool:
-        """
-        :returns:
-            a bool indicating whether there's at least one way to
-            match the :attr:`Factor.context_factors` of ``self`` and ``other``,
-            such that they fit the relationship ``comparison``.
-        """
-
-        context_registers = iter(self.context_register(other, operator.ge))
-        return any(register is not None for register in context_registers)
-
     @property
     def context_factors(self) -> Tuple:
         """
@@ -200,6 +215,54 @@ class Factor(ABC):
         return tuple(
             self.__dict__.get(factor_name) for factor_name in self.context_factor_names
         )
+
+    @property
+    def recursive_factors(self) -> Dict[Factor, None]:
+        """
+        :returns:
+            a :class:`dict` (instead of a :class:`set`,
+            to preserve order) of :class:`Factor`\s including ``self``'s
+            :attr:`context_factors`, and each of those :class:`Factor`\s'
+            :attr:`context_factors`, recursively.
+        """
+        answers: Dict[Factor, None] = {self: None}
+        for context in filter(lambda x: x is not None, self.context_factors):
+            if isinstance(context, Iterable):
+                for item in context:
+                    answers.update(item.recursive_factors)
+            else:
+                answers.update(context.recursive_factors)
+        return answers
+
+    def consistent_with(self, other: Factor, comparison: Callable) -> bool:
+        """
+        :returns:
+            a bool indicating whether there's at least one way to
+            match the :attr:`context_factors` of ``self`` and ``other``,
+            such that they fit the relationship ``comparison``.
+        """
+
+        context_registers = iter(self._context_register(other, operator.ge))
+        return any(register is not None for register in context_registers)
+
+    def _context_register(
+        self, other: Factor, comparison: Callable
+    ) -> Iterator[Dict[Factor, Factor]]:
+        """
+        Searches through the :attr:`context_factors` of ``self``
+        and ``other``, and yields all valid ways to make matches between
+        corresponding :class:`Factor`\s.
+        """
+
+        if other is None:
+            yield {}
+        elif self.generic or other.generic:
+            yield {self: other, other: self}
+        else:
+            for registry in self.update_mapping(
+                {}, self.context_factors, other.context_factors, comparison
+            ):
+                yield registry
 
     def contradicts(self, other: Optional[Factor]) -> bool:
         """
@@ -261,6 +324,51 @@ class Factor(ABC):
 
         return self.consistent_with(other, operator.eq)
 
+    def get_factor_by_name(self, name: str) -> Optional[Factor]:
+        """
+        Performs a recursive search of ``self`` and ``self``'s attributes
+        for a :class:`Factor` with the specified ``name`` attribute.
+
+        :returns:
+            a :class:`Factor` with the specified ``name`` attribute
+            if it exists, otherwise returns ``None``.
+        """
+        for factor in self.recursive_factors:
+            if factor.name == name:
+                return factor
+        return None
+
+
+    def __ge__(self, other: Factor) -> bool:
+        """
+        :returns:
+            bool indicating whether ``self`` implies ``other``.
+        """
+        if other is None:
+            return True
+
+        if not isinstance(other, Factor):
+            raise TypeError(
+                f"{self.__class__} objects may only be compared for "
+                + "implication with other Factor objects or None."
+            )
+
+        if self.__dict__.get("absent") and other.__dict__.get("absent"):
+            return bool(other._implies_if_present(self))
+
+        if not self.__dict__.get("absent") and not other.__dict__.get("absent"):
+            return bool(self._implies_if_present(other))
+
+        return False
+
+    def __gt__(self, other: Optional[Factor]) -> bool:
+        """
+        :returns:
+            bool indicating whether ``self`` implies ``other``
+            and ``self`` != ``other``.
+        """
+        return self >= other and self != other
+
     def _implies_if_concrete(self, other: Factor) -> bool:
         """
         Used to test implication based on :attr:`context_factors`,
@@ -296,116 +404,26 @@ class Factor(ABC):
             return bool(self._implies_if_concrete(other))
         return False
 
-    def __ge__(self, other: "Factor") -> bool:
-        if other is None:
-            return True
-
-        if not isinstance(other, Factor):
-            raise TypeError(
-                f"{self.__class__} objects may only be compared for "
-                + "implication with other Factor objects or None."
-            )
-
-        if self.__dict__.get("absent") and other.__dict__.get("absent"):
-            return bool(other._implies_if_present(self))
-
-        if not self.__dict__.get("absent") and not other.__dict__.get("absent"):
-            return bool(self._implies_if_present(other))
-
-        return False
-
-    def __gt__(self, other: Optional[Factor]) -> bool:
-        return self >= other and self != other
-
-    @property
-    def recursive_factors(self) -> Dict[Factor, None]:
-        """
-        :returns:
-            a :class:`dict` (instead of a :class:`set`,
-            to preserve order) of :class:`Factor`\s including ``self``'s
-            :attr:`context_factors`, and each of those :class:`Factor`\s'
-            :attr:`context_factors`, recursively.
-        """
-        answers: Dict[Factor, None] = {self: None}
-        for context in filter(lambda x: x is not None, self.context_factors):
-            if isinstance(context, Iterable):
-                for item in context:
-                    answers.update(item.recursive_factors)
-            else:
-                answers.update(context.recursive_factors)
-        return answers
-
-    def get_factor_by_name(self, name: str) -> Optional["Factor"]:
-        """
-        Performs a recursive search of self and self's attributes
-        for a Factor with the specified name attribute. Returns
-        such a Factor if it exists, otherwise returns None.
-        """
-        for factor in self.recursive_factors:
-            if factor.name == name:
-                return factor
-        return None
-
-    @property
-    def context_factor_names(self) -> Tuple[str, ...]:
-        """
-        This function and interchangeable_factors should be the only parts
-        of the context-matching process that need to be unique for each
-        subclass of :class:`Factor`. It specifies what attributes of self and other
-        to look in to find :class:`Factor` objects to match.
-
-        For Fact, it returns the context_factors, which can't contain None.
-        Other classes will return a Tuple[Optional[Factor], ...]
-        """
-
-        return ()
-
-    @property
-    def interchangeable_factors(self) -> List[Dict["Factor", "Factor"]]:
-        """
-        Yields the ways the context factors referenced by the Factor object
-        can be reordered without changing the truth value of the Factor.
-
-        This is the default version for subclasses that don't have any
-        interchangeable context factors.
-        """
-        return []
-
-    def context_register(
-        self, other: "Factor", comparison: Callable
-    ) -> Iterator[Dict["Factor", "Factor"]]:
-        """Searches through the context factors of self and other, making
-        a list of dicts, where each dict is a valid way to make matches between
-        corresponding factors. The dict is empty if there are no matches."""
-
-        if other is None:
-            yield {}
-        elif self.generic or other.generic:
-            yield {self: other, other: self}
-        else:
-            for registry in self.update_mapping(
-                {}, self.context_factors, other.context_factors, comparison
-            ):
-                yield registry
-
     def registers_for_interchangeable_context(
-        self, matches: Dict["Factor", "Factor"]
-    ) -> Iterator[Dict["Factor", "Factor"]]:
+        self, matches: Dict[Factor, Factor]
+    ) -> Iterator[Dict[Factor, Factor]]:
         """
-        Returns context registers with every possible combination of
-        self and other's interchangeable context factors.
+        :yields:
+            context registers with every possible combination of
+            ``self``'s and ``other``'s interchangeable
+            :attr:`context_factors`.
         """
 
         def replace_factors_in_dict(
-            matches: Dict["Factor", "Factor"],
-            replacement_dict: Dict["Factor", "Factor"],
+            matches: Dict[Factor, Factor],
+            replacement_dict: Dict[Factor, Factor],
         ):
             values = matches.values()
             keys = [replacement_dict.get(factor) or factor for factor in matches.keys()]
             return dict(zip(keys, values))
 
         yield matches
-        already_returned: List[Dict["Factor", "Factor"]] = [matches]
+        already_returned: List[Dict[Factor, Factor]] = [matches]
         for replacement_dict in self.interchangeable_factors:
             changed_registry = replace_factors_in_dict(matches, replacement_dict)
             if not any(
@@ -431,9 +449,9 @@ class Factor(ABC):
 
     @staticmethod
     def _import_to_mapping(
-        self_mapping: Mapping["Factor", "Factor"],
-        incoming_mapping: Dict["Factor", "Factor"],
-    ) -> Optional[Mapping["Factor", "Factor"]]:
+        self_mapping: Mapping[Factor, Factor],
+        incoming_mapping: Dict[Factor, Factor],
+    ) -> Optional[Mapping[Factor, Factor]]:
         """
         If the same factor in one mapping appears to match
         to two different factors in the other, the function
@@ -442,7 +460,7 @@ class Factor(ABC):
 
         This is a dict of implication relations.
         So the values need to be lists of Factors that the key implies.
-        Need to start by changing the simple context_register function
+        Need to start by changing the simple _context_register function
         for Entity, to take into account the 'comparison' to see which way
         the implication goes.
         """
@@ -487,8 +505,8 @@ class Factor(ABC):
     def update_mapping(
         self,
         self_mapping_proxy: Mapping,
-        self_factors: Tuple["Factor"],
-        other_factors: Tuple["Factor"],
+        self_factors: Tuple[Factor],
+        other_factors: Tuple[Factor],
         comparison: Callable,
     ):
         """
@@ -533,7 +551,7 @@ class Factor(ABC):
                     new_mapping_choices.append(mapping)
                 else:
                     register_iter = iter(
-                        self_factors[index].context_register(
+                        self_factors[index]._context_register(
                             other_factors[index], comparison
                         )
                     )
@@ -551,7 +569,7 @@ class Factor(ABC):
 
     def evolve(
         self, changes: Union[str, Tuple[str, ...], Dict["str", Any]]
-    ) -> "Factor":
+    ) -> Factor:
         """
         :param changes: a dict where the keys are names of attributes
         of self, and the values are new values for those attributes, or
@@ -578,7 +596,7 @@ class Factor(ABC):
         return self.__class__(**new_dict)
 
     @new_context_helper
-    def new_context(self, changes: Dict["Factor", "Factor"]) -> "Factor":
+    def new_context(self, changes: Dict[Factor, Factor]) -> Factor:
         """
         Creates new Factor object, replacing keys of "changes" with their values.
         """
@@ -1239,7 +1257,7 @@ class Entity(Factor):
             return f"<{self.name}>"
         return self.name
 
-    def context_register(
+    def _context_register(
         self, other: Factor, comparison
     ) -> Optional[Dict[Factor, Factor]]:
         """Returns a list of possible ways the context of self can be

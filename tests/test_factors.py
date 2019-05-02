@@ -198,14 +198,14 @@ class TestFacts:
         """
         with pytest.raises(StopIteration):
             next(
-                watt_factor["f1"].context_register(
+                watt_factor["f1"]._context_register(
                     watt_factor["f1_entity_order"], operator.ge
                 )
             )
 
     def test_context_register_valid(self, make_entity, watt_factor):
         assert next(
-            watt_factor["f1"].context_register(
+            watt_factor["f1"]._context_register(
                 watt_factor["f1_entity_order"], operator.le
             )
         ) == {
