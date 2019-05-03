@@ -158,7 +158,7 @@ class Procedure(Factor):
             for other_factor in available_for_matching:
                 if comparison(self_factor, other_factor):
                     updated_mappings = iter(
-                        self.update_mapping(
+                        self._update_mapping(
                             matches, (self_factor,), (other_factor,), comparison
                         )
                     )

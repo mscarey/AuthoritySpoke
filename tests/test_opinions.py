@@ -3,11 +3,11 @@ import pytest
 
 from authorityspoke.enactments import Code, Enactment
 from authorityspoke.entities import Human, Event
-from authorityspoke.factors import Predicate, Factor, Entity, Fact
+from authorityspoke.factors import Entity
 from authorityspoke.factors import Evidence, Exhibit
 from authorityspoke.rules import Procedure, Rule, ProceduralRule
 from authorityspoke.opinions import Opinion
-from authorityspoke.factors import ureg, Q_
+from authorityspoke.predicates import ureg, Q_
 from authorityspoke.context import log_mentioned_context
 
 

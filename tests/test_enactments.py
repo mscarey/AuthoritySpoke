@@ -7,9 +7,8 @@ import pytest
 
 from authorityspoke.entities import Human, Event
 from authorityspoke.enactments import Code, Enactment
-from authorityspoke.factors import Predicate, Factor, Entity, Fact
 from authorityspoke.opinions import Opinion
-from authorityspoke.factors import ureg, Q_
+from authorityspoke.predicates import ureg, Q_
 
 
 class TestCodes:
