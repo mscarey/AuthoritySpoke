@@ -416,6 +416,19 @@ class Factor(ABC):
             return bool(self._implies_if_concrete(other))
         return False
 
+    def make_generic(self) -> Factor:
+        """
+        .. note::
+            The new object created with this method will have all the
+            attributes of ``self`` except ``generic=False``.
+            Therefore the method isn't equivalent to creating a new
+            instance of the class with only the ``generic`` attribute
+            specified. To do that, you would use ``Fact(generic=True)``.
+
+        :returns: a new object changing ``generic`` to ``True``.
+        """
+        return self.evolve({"generic": True})
+
     @new_context_helper
     def new_context(self, changes: Dict[Factor, Factor]) -> Factor:
         """
@@ -734,21 +747,6 @@ class Fact(Factor):
     def __eq__(self, other) -> bool:
         return super().__eq__(other)
 
-    def make_generic(self) -> "Fact":
-        """
-        This returns a new object changing generic to True. But it does
-        preserve the predicate attribute.
-        For a Fact with no features specified, use: Fact(generic=True)
-        """
-
-        return Fact(
-            predicate=self.predicate,
-            context_factors=self.context_factors,
-            standard_of_proof=self.standard_of_proof,
-            absent=self.absent,
-            generic=True,
-        )
-
     def predicate_in_context(self, entities: Sequence[Factor]) -> str:
         """Prints the representation of the Predicate with Entities
         added into the slots, with added text from the Fact object
@@ -776,7 +774,7 @@ class Fact(Factor):
             return False
         return super()._implies_if_concrete(other)
 
-    def contradicts_if_present(self, other: "Fact") -> bool:
+    def _contradicts_if_present(self, other: Fact) -> bool:
         """
         Indicates whether self contradicts the Fact other under the assumption that
         self.absent == False.
@@ -798,8 +796,8 @@ class Fact(Factor):
             return False
 
         if self.absent:
-            return other.contradicts_if_present(self)
-        return self.contradicts_if_present(other)
+            return other._contradicts_if_present(self)
+        return self._contradicts_if_present(other)
 
     @classmethod
     def _build_from_dict(
@@ -952,11 +950,6 @@ class Entity(Factor):
                 + f"{self.__class__.__name__} and class {other.__class__.__name__}."
             )
         return False
-
-    def make_generic(self):
-        if not self.generic:
-            return self.__class__(name=self.name, generic=True, plural=self.plural)
-        return self
 
     @new_context_helper
     def new_context(self, context: Dict[Factor, Factor]) -> "Entity":

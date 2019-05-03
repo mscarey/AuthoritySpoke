@@ -2,6 +2,6 @@
 ``Predicates``
 ==============
 
-.. autoclass:: authorityspoke.factors.Predicate
+.. autoclass:: authorityspoke.predicates.Predicate
    :members:
    :special-members:

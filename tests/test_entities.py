@@ -16,11 +16,16 @@ class TestEntities:
         e = make_entity
         assert e["motel_specific"].make_generic() == e["motel"]
 
-    def test_same_object_after_make_generic(self, make_entity):
+    def test_repr_equal_after_make_generic(self, make_entity):
+        """
+        see the docstring for :meth:`Factor._import_to_mapping`
+        for an explanation of what led to __repr__s being
+        compared for equality instead of the underlying objects.
+        """
         e = make_entity
         motel = e["motel"]
         motel_b = motel.make_generic()
-        assert motel is motel_b
+        assert repr(motel) == repr(motel_b)
 
     def test_context_register(self, make_entity):
         """

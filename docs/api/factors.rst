@@ -3,10 +3,11 @@
 ==============
 
 .. autoclass:: authorityspoke.factors.Factor
-   :members:
-   :special-members:
+    :members:
+    :special-members:
 
 .. autoclass:: authorityspoke.factors.Fact
+    :members:
 
 .. autoclass:: authorityspoke.factors.Exhibit
 
