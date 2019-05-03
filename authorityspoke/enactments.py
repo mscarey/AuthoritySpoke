@@ -195,7 +195,7 @@ class Enactment:
     @log_mentioned_context
     def from_dict(
         cls, enactment_dict: Dict[str, str], mentioned: List[Dict[str, str]]
-    ) -> "Enactment":
+    ) -> Enactment:
         """
         No way to use an existing code object currently.
         Also, handing "mentioned" through this method is pointless.

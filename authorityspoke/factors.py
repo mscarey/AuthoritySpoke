@@ -123,9 +123,7 @@ class Factor(ABC):
         return answer
 
     @classmethod
-    def _build_from_dict(
-        cls, factor_record: Dict, mentioned: List[Factor]
-    ) -> Factor:
+    def _build_from_dict(cls, factor_record: Dict, mentioned: List[Factor]) -> Factor:
         example = cls()
         new_factor_dict = example.__dict__
         for attr in new_factor_dict:
@@ -259,7 +257,7 @@ class Factor(ABC):
         elif self.generic or other.generic:
             yield {self: other, other: self}
         else:
-            for registry in self.update_mapping(
+            for registry in self._update_mapping(
                 {}, self.context_factors, other.context_factors, comparison
             ):
                 yield registry
@@ -291,9 +289,7 @@ class Factor(ABC):
         """
         return self >= other.evolve("absent")
 
-    def evolve(
-        self, changes: Union[str, Tuple[str, ...], Dict["str", Any]]
-    ) -> Factor:
+    def evolve(self, changes: Union[str, Tuple[str, ...], Dict["str", Any]]) -> Factor:
         """
         :param changes:
             a :class:`dict` where the keys are names of attributes
@@ -368,7 +364,6 @@ class Factor(ABC):
                 return factor
         return None
 
-
     def __ge__(self, other: Factor) -> bool:
         """
         :returns:
@@ -434,7 +429,22 @@ class Factor(ABC):
             return bool(self._implies_if_concrete(other))
         return False
 
-    def registers_for_interchangeable_context(
+    @new_context_helper
+    def new_context(self, changes: Dict[Factor, Factor]) -> Factor:
+        """
+        :param changes:
+            has :class:`Factor`\s to replace as keys, and has
+            their replacements as the corresponding values.
+
+        :returns:
+            a new :class:`Factor` object with the replacements made.
+        """
+        new_dict = self.__dict__.copy()
+        for name in self.context_factor_names:
+            new_dict[name] = self.__dict__[name].new_context(changes)
+        return self.__class__(**new_dict)
+
+    def _registers_for_interchangeable_context(
         self, matches: Dict[Factor, Factor]
     ) -> Iterator[Dict[Factor, Factor]]:
         """
@@ -445,8 +455,7 @@ class Factor(ABC):
         """
 
         def replace_factors_in_dict(
-            matches: Dict[Factor, Factor],
-            replacement_dict: Dict[Factor, Factor],
+            matches: Dict[Factor, Factor], replacement_dict: Dict[Factor, Factor]
         ):
             values = matches.values()
             keys = [replacement_dict.get(factor) or factor for factor in matches.keys()]
@@ -472,44 +481,42 @@ class Factor(ABC):
         return string
 
     @staticmethod
-    def _wrap_with_tuple(item):
-        if isinstance(item, Iterable):
-            return tuple(item)
-        return (item,)
-
-    @staticmethod
     def _import_to_mapping(
-        self_mapping: Mapping[Factor, Factor],
-        incoming_mapping: Dict[Factor, Factor],
-    ) -> Optional[Mapping[Factor, Factor]]:
+        self_mapping: Dict[Factor, Factor], incoming_mapping: Dict[Factor, Factor]
+    ) -> Optional[Dict[Factor, Factor]]:
         """
-        If the same factor in one mapping appears to match
-        to two different factors in the other, the function
-        return False. Otherwise it returns a merged dict of
-        matches.
+        Compares :class:`Factor`\s based on their :meth:`__repr__` to
+        determine whether two sets of matches of :class:`Factor`\s
+        can be merged.
 
-        This is a dict of implication relations.
-        So the values need to be lists of Factors that the key implies.
-        Need to start by changing the simple _context_register function
-        for Entity, to take into account the 'comparison' to see which way
-        the implication goes.
+        :meth:`__repr__` was chosen because an ``is`` test would
+        return ``False`` when the :class:`Factor`\s are equal but
+        not identical, while :meth:`__eq__` incorrectly matches
+        generically equal :class:`Factor`\s that don't refer to the
+        same thing.
+
+        This problem is a consequence of overloading the :meth:`__eq__`
+        operator.
+
+        :param self_mapping:
+            an existing mapping of :class:`Factor`\s
+            from ``self`` to :class:`Factor`\s from ``other``
+
+        :param incoming_mapping:
+            an incoming mapping of :class:`Factor`\s
+            from ``self`` to :class:`Factor`\s from ``other``
+
+        :returns:
+            ``None`` if the same :class:`Factor` in one mapping
+            appears to match to two different :class:`Factor`\s in the other.
+            Otherwise returns an updated :class:`dict` of matches.
         """
         logger = logging.getLogger("context_match_logger")
         self_mapping = dict(self_mapping)
         # The key-value relationship isn't symmetrical when the root Factors
         # are being compared for implication.
         for in_key, in_value in incoming_mapping.items():
-            # The "if in_value" test prevents a failure when in_value is
-            # None, but an "is" test returns False when in_value is
-            # equal but not identical to self_mapping[in_key], while
-            # equality incorrectly matches generically equal Factors
-            # that don't refer to the same thing. Can this be
-            # made a nonissue by making it impossible for duplicate
-            # Factor objects to exist?
 
-            # Resorting to comparing __repr__ for now. What will be
-            # the correct behavior when testing for implication rather
-            # than equality?
             if in_key and in_value:
                 if self_mapping.get(in_key) and repr(self_mapping.get(in_key)) != repr(
                     in_value
@@ -532,40 +539,50 @@ class Factor(ABC):
                     self_mapping[in_value] = in_key
         return self_mapping
 
-    def update_mapping(
+    def _update_mapping(
         self,
-        self_mapping_proxy: Mapping,
+        self_mapping: Dict[Factor, Factor],
         self_factors: Tuple[Factor],
         other_factors: Tuple[Factor],
         comparison: Callable,
     ):
         """
-        :param self_mapping_proxy: A view on a dict with keys representing
-        factors in self and values representing factors in other. The keys
-        and values have been found in corresponding positions in self and
-        other.
+        .. note::
+            I understood how this method works, and I wrote the
+            docstring for this method, but not at the same time.
 
-        :param self_factors: factors from self that will be matched with
-        other_factors. This function is expected to be called with various
-        permutations of other_factors, but no other permutations of self_factors.
+        :param self_mapping:
+            keysing representing :class:`Factor`\s in ``self`` and
+            values representing :class:`Factor`\s in ``other``. The
+            keys and values have been found in corresponding positions
+            in ``self`` and ``other``.
 
-        :param other_factors: an ordering of factors from other.entity_orders.
+        :param self_factors:
+            :class:`Factor`\s from ``self`` that will be matched with
+            ``other_factors``. This function is expected to be called
+            with various permutations of ``other_factors``, but no other
+            permutations of ``self_factors``.
 
-        :returns: a bool indicating whether the factors in other_factors can
-        be matched to the tuple of factors in self_factors in
-        self_matching_proxy, without making the same factor from other_factors
-        match to two different factors in self_matching_proxy.
-        """  # TODO: docstring
+        :param other_factors:
+            other's :attr:`context_factors`
 
-        new_mapping_choices = [self_mapping_proxy]
+        :returns:
+            :class:`bool` indicating whether the :class:`Factor`\s in
+            ``other_factors`` can be matched to the :class:`Factor`\s in
+            ``self_factors`` in ``self_mapping``, without making the
+            same :class:`Factor` from ``other_factors``
+            match to two different factors in self_mapping.
+        """
+
+        new_mapping_choices = [self_mapping]
 
         self_factors = self._wrap_with_tuple(self_factors)
         other_factors = self._wrap_with_tuple(other_factors)
 
         # why am I allowing the __len__s to be different?
         shortest = min(len(self_factors), len(other_factors))
-        # The "is" comparison is for None values.
 
+        # The "is" comparison is for None values.
         if not all(
             self_factors[index] is other_factors[index]
             or comparison(self_factors[index], other_factors[index])
@@ -588,7 +605,7 @@ class Factor(ABC):
                     for incoming_register in register_iter:
                         for transposed_register in self_factors[
                             index
-                        ].registers_for_interchangeable_context(incoming_register):
+                        ]._registers_for_interchangeable_context(incoming_register):
                             updated_mapping = self._import_to_mapping(
                                 mapping, transposed_register
                             )
@@ -597,16 +614,11 @@ class Factor(ABC):
         for choice in new_mapping_choices:
             yield choice
 
-
-    @new_context_helper
-    def new_context(self, changes: Dict[Factor, Factor]) -> Factor:
-        """
-        Creates new Factor object, replacing keys of "changes" with their values.
-        """
-        new_dict = self.__dict__.copy()
-        for name in self.context_factor_names:
-            new_dict[name] = self.__dict__[name].new_context(changes)
-        return self.__class__(**new_dict)
+    @staticmethod
+    def _wrap_with_tuple(item):
+        if isinstance(item, Iterable):
+            return tuple(item)
+        return (item,)
 
 
 @dataclass(frozen=True)
