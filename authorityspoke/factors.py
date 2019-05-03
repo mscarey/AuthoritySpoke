@@ -166,8 +166,8 @@ class Factor(ABC):
             changing the meaning of ``self``, or whether it would
             be true in a particular context.
 
-            This is the default version for subclasses that don't have any
-            interchangeable :attr:`context_factors`.
+            The empty list is the default return value for subclasses
+            that don't have any interchangeable :attr:`context_factors`.
         """
         return []
 
@@ -624,8 +624,42 @@ class Factor(ABC):
 
 @dataclass(frozen=True)
 class Fact(Factor):
-    """An assertion accepted as factual by a court, often through factfinding by
-    a judge or jury."""
+    """
+    An assertion accepted as factual by a court, often
+    through factfinding by a judge or jury.
+
+    :param predicate:
+        a natural-language clause with zero or more slots
+        to insert ``context_factors`` that are typically the
+        subject and objects of the clause.
+
+    :param context_factors:
+        a series of :class:`Factor` objects that fill in
+        the blank spaces in the ``predicate`` statement.
+
+    :param name:
+        an identifier for this object, often used if the object needs
+        to be referred to multiple times in the process of composing
+        other :class:`Factor` objects.
+
+    :param standard_of_proof:
+        a descriptor for the degree of certainty associated
+        with the assertion in the ``predicate``.
+
+    :param absent:
+        whether the absence, rather than the presence, of the legal
+        fact described above is being asserted.
+
+    :param generic:
+        whether this object could be replaced by another generic
+        object of the same class without changing the truth of the
+        :class:`Rule` in which it is mentioned.
+
+    :param case_factors:
+        a series of :class:`Factor`\s that have already been mentioned
+        in the :class:`Opinion`. They are available for composing the
+        new :class:`Factor` object and don't need to be recreated.
+    """
 
     predicate: Optional[Predicate] = None
     context_factors: Tuple[Factor, ...] = ()
@@ -685,6 +719,26 @@ class Fact(Factor):
             )
         object.__setattr__(self, "context_factors", context_factors)
 
+    @classmethod
+    def standards_of_proof(cls) -> Tuple[str, ...]:
+        """
+        .. note:
+            If any courts anywhere in a legal regime disagree about the
+            relative strength of the various standards of proof, or if
+            any court considers the order context-specific, then this
+            approach of hard-coding their names and order will have to change.
+
+        :returns: a tuple with every allowable name for a standard of
+        proof, in order from weakest to strongest.
+        """
+        return (
+            "scintilla of evidence",
+            "substantial evidence",
+            "preponderance of evidence",
+            "clear and convincing",
+            "beyond reasonable doubt",
+        )
+
     def __str__(self):
         predicate = str(self.predicate.content_with_entities(self.context_factors))
         standard = (
@@ -695,37 +749,23 @@ class Fact(Factor):
         string = f"{standard}{predicate}"
         return super().__str__().format(string)
 
-    @classmethod
-    def standards_of_proof(cls) -> Tuple[str, ...]:
-        """
-        Returns a tuple with every allowable name for a standard of proof,
-        in order from weakest to strongest.
-
-        If any courts anywhere disagree about the relative strength of
-        these standards of proof, or if any court considers the order
-        context-specific, this representation will have to change.
-        """
-        return (
-            "scintilla of evidence",
-            "substantial evidence",
-            "preponderance of evidence",
-            "clear and convincing",
-            "beyond reasonable doubt",
-        )
-
     @property
     def interchangeable_factors(self) -> List[Dict[Factor, Factor]]:
         """
-        Yields the ways the context factors referenced by the Fact object
-        can be reordered without changing the truth value of the Fact.
-        Currently the predicate must be phrased either in a way that doesn't
-        make any context factors interchangeable, or if the "reciprocal" flag
-        is set, in a way that allows only the first two context factors to switch
-        places.
+        Each :class:`dict` returned has :class:`Factor`\s to replace as keys,
+        and :class:`Factor`\s to replace them with as values.
+        If there's more than one way to rearrange the context factors,
+        more than one :class:`dict` should be returned.
 
-        Each dict returned has factors to replace as keys, and factors to
-        replace them with as values. If there's more than one way to
-        rearrange the context factors, more than one dict should be returned.
+        :returns:
+            the ways the context factors referenced by the
+            :class:`Factor` object can be reordered without changing
+            the truth value of the :class:`Factor`. Currently the
+            predicate must be phrased either in a way that doesn't
+            make any context factors interchangeable, or if the
+            ``reciprocal`` flag is set, in a way that allows only the
+            first two context factors to switch places.
+
         """
         if self.predicate and self.predicate.reciprocal:
             return [
