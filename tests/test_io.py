@@ -7,8 +7,8 @@ import pytest
 
 from authorityspoke.context import get_directory_path
 from authorityspoke.enactments import Code, Enactment
-from authorityspoke.entities import Human, Event
-from authorityspoke.factors import Factor, Entity, Fact
+from authorityspoke.entities import Entity, Event, Human
+from authorityspoke.factors import Factor, Fact
 from authorityspoke.opinions import Opinion
 from authorityspoke.predicates import Predicate
 from authorityspoke.rules import Rule

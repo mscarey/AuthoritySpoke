@@ -3,15 +3,16 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to AuthoritySpoke's documentation!
-==========================================
+=========================================================
+AuthoritySpoke: Reading Legal Authority for the Last Time
+=========================================================
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
 API Reference
-=============
+-------------
 
 .. toctree::
     :maxdepth: 2
@@ -20,7 +21,7 @@ API Reference
     api/*
 
 Indices and tables
-==================
+------------------
 
 * :ref:`genindex`
 * :ref:`modindex`

@@ -1,6 +1,6 @@
 from .enactments import Enactment
-from .entities import Association, Human, Event
-from .factors import Factor, Entity
+from .entities import Association, Entity, Event, Human
+from .factors import Factor
 from .opinions import Opinion
 from .rules import Rule, ProceduralRule
 

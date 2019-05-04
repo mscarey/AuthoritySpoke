@@ -3,8 +3,8 @@ import operator
 
 import pytest
 
-from authorityspoke.entities import Human, Event
-from authorityspoke.factors import Factor, Entity, Fact
+from authorityspoke.entities import Entity, Event, Human
+from authorityspoke.factors import Factor, Fact
 from authorityspoke.rules import Rule, ProceduralRule
 from authorityspoke.opinions import Opinion
 from authorityspoke.predicates import ureg, Q_

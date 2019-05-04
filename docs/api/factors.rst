@@ -1,5 +1,5 @@
 ==============
-Factors
+``Factors``
 ==============
 
 .. autoclass:: authorityspoke.factors.Factor
