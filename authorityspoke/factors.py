@@ -788,10 +788,14 @@ class Fact(Factor):
         return super().__eq__(other)
 
     def predicate_in_context(self, entities: Sequence[Factor]) -> str:
-        """Prints the representation of the Predicate with Entities
-        added into the slots, with added text from the Fact object
-        indicating the class name and whether the Predicate is
-        "Absent" or not."""
+        """
+        :returns:
+            the representation of ``self``\s :class:`Predicate` with
+            :class:`str` representations of ``entities`` added into
+            the slots, with added text from the :class:`Fact` object
+            indicating the class name and whether the :class:`Predicate`
+            is ``absent``.
+        """
 
         return (
             f"{'Absent ' if self.absent else ''}{self.__class__.__name__}: "
@@ -816,8 +820,9 @@ class Fact(Factor):
 
     def _contradicts_if_present(self, other: Fact) -> bool:
         """
-        Indicates whether self contradicts the Fact other under the assumption that
-        self.absent == False.
+        :returns:
+            whether ``self`` contradicts ``other``
+            under the assumption that ``self.absent == False``.
         """
         if (self.predicate.contradicts(other.predicate) and not other.absent) or (
             self.predicate >= other.predicate and other.absent
@@ -842,7 +847,7 @@ class Fact(Factor):
     @classmethod
     def _build_from_dict(
         cls, fact_dict: Dict[str, Union[str, bool]], mentioned: List[Factor]
-    ) -> Tuple[Optional["Fact"], List[Factor]]:
+    ) -> Tuple[Optional[Fact], List[Factor]]:
         """
         Constructs and returns a :class:`Fact` object from a dict imported from
         a JSON file in the format used in the "input" folder.
