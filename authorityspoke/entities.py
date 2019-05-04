@@ -7,7 +7,7 @@ ordered tuples of other Factors.
 """
 from __future__ import annotations
 
-from typing import Dict, Optional
+from typing import Dict, Iterator, Optional
 
 from authorityspoke.factors import Factor, new_context_helper
 
@@ -42,8 +42,8 @@ class Entity(Factor):
 
     :param plural:
         Specifies whether the :class:`Entity` object refers to
-        more than one thing (whether it would be represented by
-        a plural noun).
+        more than one thing. In other words, whether it would
+        be represented by a plural noun.
     """
 
     name: Optional[str] = None
@@ -51,6 +51,12 @@ class Entity(Factor):
     plural: bool = False
 
     def __eq__(self, other):
+        """
+        ``generic`` :class:`Entity` objects are considered equal
+        as long as they're the same class. If not ``generic``, they're
+        considered equal if all their attributes are the same.
+        """
+
         if self.__class__ != other.__class__:
             return False
         if self.generic and other.generic:
@@ -58,14 +64,9 @@ class Entity(Factor):
         return astuple(self) == astuple(other)
 
     def __ge__(self, other: Optional[Factor]):
-        return self == other or self > other
-
-    def __gt__(self, other: Optional[Factor]):
         if other is None:
             return True
         if not isinstance(self, other.__class__):
-            return False
-        if self == other:
             return False
         if self.generic == False and self.name == other.name:
             return True
@@ -78,10 +79,12 @@ class Entity(Factor):
 
     def _context_register(
         self, other: Factor, comparison
-    ) -> Optional[Dict[Factor, Factor]]:
-        """Returns a list of possible ways the context of self can be
-        mapped onto the context of other. Other subclasses of Factor
-        will have more complex lists."""
+    ) -> Iterator[Dict[Factor, Factor]]:
+        """
+        :yields:
+            possible ways the context of ``self`` can be
+            mapped onto the context of ``other``.
+        """
 
         # If there was a way to compare an Entity to None, should it return {}?
         if comparison(self, other):
@@ -96,7 +99,7 @@ class Entity(Factor):
         return False
 
     @new_context_helper
-    def new_context(self, context: Dict[Factor, Factor]) -> "Entity":
+    def new_context(self, context: Dict[Factor, Factor]) -> Entity:
         return self
 
 class Association(Entity):

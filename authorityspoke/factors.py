@@ -235,8 +235,11 @@ class Factor(ABC):
     ) -> Iterator[Dict[Factor, Factor]]:
         """
         Searches through the :attr:`context_factors` of ``self``
-        and ``other``, and yields all valid ways to make matches between
-        corresponding :class:`Factor`\s.
+        and ``other``.
+
+        :yields:
+            all valid ways to make matches between
+            corresponding :class:`Factor`\s.
         """
 
         if other is None:
