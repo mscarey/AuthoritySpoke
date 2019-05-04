@@ -16,15 +16,42 @@ from dataclasses import astuple, dataclass
 
 @dataclass(frozen=True)
 class Entity(Factor):
-    """A person, place, thing, or event that needs to be mentioned in
-    multiple predicates/factors in a holding."""
+    """
+    A person, place, thing, or event that needs to be mentioned in
+    multiple :class:`Factor`\s in a :class:`Rule`, often in the
+    :class:`Predicate` of a :class:`Fact` object.
+
+    An :class:`Entity` is often, but not always, ``generic`` with
+    respect to the meaning of the :class:`Rule` in which it is
+    mentioned, which means that the :class:`Rule` is understood
+    to apply generally even if some other :class:`Entity` was
+    substituted.
+
+    :param name:
+        An identifier. An :class:`Entity` with the same ``name``
+        is considered to refer to the same specific object, but
+        if they have different names but are ``generic`` and are
+        otherwise the same, then they're considered to have the
+        same meaning and they evaluate equal to one another.
+
+    :param generic:
+        Determines whether a change in the ``name`` of the
+        :class:`Entity` would change the meaning of the
+        :class:`Factor` in which the :class:`Entity` is
+        embedded.
+
+    :param plural:
+        Specifies whether the :class:`Entity` object refers to
+        more than one thing (whether it would be represented by
+        a plural noun).
+    """
 
     name: Optional[str] = None
     generic: bool = True
     plural: bool = False
 
     def __eq__(self, other):
-        if not isinstance(other, self.__class__):
+        if self.__class__ != other.__class__:
             return False
         if self.generic and other.generic:
             return True
