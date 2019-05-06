@@ -68,16 +68,28 @@ class Procedure(Factor):
     :param despite:
         :class:`Factor`\s that do not prevent the court from
         imposing the ``output``. These could be considered
-        "failed undercutters" in defeasible logic. If a factor
+        "failed undercutters" in defeasible logic. If a :class:`Factor`
         is relevant both as support for the output and as
-        a potential undercutter, include it in both 'inputs'
-        and 'despite'.
+        a potential undercutter, include it in both ``inputs``
+        and ``despite``.
 
     :param name:
+        An identifier that can be used to reference and
+        incorporate an existing procedure in a new
+        :class:`Factor`, instead of constructing a new
+        copy of the :class:`Procedure`.
 
     :param absent:
+        Whether the absence, rather than presence, of this
+        :class:`Procedure` is being referenced. The usefulness
+        of this is unclear, but I'm not prepared to eliminate it
+        before the :class:`Argument` class has been implemented
+        and tested.
 
     :param generic:
+        Whether the this :class:`Procedure` is being referenced
+        as a generic example, which could be replaced by any
+        other :class:`Procedure`.
     """
 
     outputs: Iterable[Factor] = ()
@@ -105,9 +117,12 @@ class Procedure(Factor):
             object.__setattr__(self, group, groups[group])
 
     def __eq__(self, other: Procedure) -> bool:
-        """Determines if the two procedures have all the same factors
-        with the same entities in the same roles, not whether they're
-        actually the same Python object."""
+        """
+        :returns:
+        whether the two :class:`Procedure`\s have all the same
+        :class:`Factor`\s with the same context factors in the
+        same roles.
+        """
 
         if not isinstance(other, self.__class__):
             return False
@@ -154,7 +169,8 @@ class Procedure(Factor):
         comparison: Callable,
     ) -> Iterator[Dict[Factor, Optional[Factor]]]:
         """
-        Determines whether all factors in need_matches have the relation
+        :param matches:
+            Determines whether all factors in need_matches have the relation
         "comparison" with a factor in available_for_matching, with matching
         entity slots.
         """

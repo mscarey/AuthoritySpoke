@@ -18,13 +18,5 @@
     :members:
     :special-members:
 
-.. inheritance-diagram:: authorityspoke.rules.Procedure
-    :top-classes: authorityspoke.factors.Factor
-    :parts: 1
-
-.. autoclass:: authorityspoke.rules.Procedure
-    :members:
-    :special-members:
-
 .. autoclass:: authorityspoke.rules.Relation
     :members:
