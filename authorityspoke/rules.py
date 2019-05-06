@@ -46,20 +46,32 @@ class Relation(NamedTuple):
 
 @dataclass(frozen=True)
 class Procedure(Factor):
-    """A (potential) rule for courts to use in resolving litigation. Described in
-    terms of inputs and outputs, and also potentially "even if" factors, which could
-    be considered "failed undercutters" in defeasible logic.
+    """
+    A (potential) rule for courts to use in resolving litigation.
+    Described in terms of inputs and outputs, and also potentially
+    "despite" :class:`Factor`\s, which occur when a :class:`Rule`
+    could be said to apply "even if" some "despite" factor is true.
 
-    Input factors are not treated as potential undercutters.
-    Instead, they're assumed to be additional support in favor of the output.
-    If a factor is relevant both as support for the output and as a potential
-    undercutter, include it in both 'inputs' and 'despite'.
+    Users generally should not need to interact with this class
+    directly, under the current design. Instead, they should interact
+    with the class :class:`ProdecuralRule`.
 
-    :param outputs: tk
+    :param outputs:
+        an outcome that a court may accept based on the presence
+        of the ``inputs``
 
     :param inputs:
+        supporting :class:`Factor`\s in favor of the ``output``.
+        The ``input`` :class:`Factor`\s are not treated as
+        potential undercutters.
 
     :param despite:
+        :class:`Factor`\s that do not prevent the court from
+        imposing the ``output``. These could be considered
+        "failed undercutters" in defeasible logic. If a factor
+        is relevant both as support for the output and as
+        a potential undercutter, include it in both 'inputs'
+        and 'despite'.
 
     :param name:
 
