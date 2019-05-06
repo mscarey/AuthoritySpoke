@@ -3,7 +3,7 @@ from __future__ import annotations
 import re
 
 from typing import Any, Callable, Dict, List, Tuple
-from typing import Iterable, Iterator, Mapping
+from typing import ClassVar, Iterable, Iterator, Mapping
 from typing import Optional, Sequence, Set, Type, Union
 
 from dataclasses import dataclass
@@ -45,6 +45,15 @@ class Predicate:
     reciprocal: bool = False
     comparison: Optional[str] = None
     quantity: Optional[Union[int, float, ureg.Quantity]] = None
+    opposite_comparisons: ClassVar = {
+            ">=": "<",
+            "==": "!=",
+            "<>": "=",
+            "<=": ">",
+            "=": "!=",
+            ">": "<=",
+            "<": ">=",
+        }
 
     def __post_init__(self):
 

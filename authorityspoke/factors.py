@@ -900,7 +900,7 @@ class Fact(Factor):
             content, context_factors = add_content_references(
                 content, mentioned, placeholder
             )
-        for item in Predicate.OPPOSITE_COMPARISONS():
+        for item in Predicate.opposite_comparisons:
             if item in content:
                 comparison = item
                 content, quantity = content.split(item)
