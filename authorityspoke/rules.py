@@ -4,10 +4,8 @@ import json
 import operator
 import pathlib
 
-from types import MappingProxyType
-
 from typing import Dict, List, Sequence, Tuple
-from typing import Iterable, Iterator, Mapping
+from typing import Iterable, Iterator
 from typing import Callable, Optional, Union
 from typing import NamedTuple
 
@@ -163,7 +161,7 @@ class Procedure(Factor):
 
     def compare_factors(
         self,
-        matches: Mapping,
+        matches: Dict[Factor, Factor],
         need_matches: List[Factor],
         available_for_matching: Tuple[Factor, ...],
         comparison: Callable,
@@ -240,7 +238,7 @@ class Procedure(Factor):
             new_matchlist = []
             for matches in matchlist:
                 for answer in self.compare_factors(
-                    MappingProxyType(matches),
+                    matches,
                     list(relation.need_matches),
                     relation.available,
                     relation.comparison,
@@ -452,7 +450,6 @@ class Procedure(Factor):
         Does Factor: None in matches always mean that Factor
         can avoid being matched in a contradictory way?"""
 
-        # proxy = MappingProxyType(matches)
         for self_factor in self_factors:
             for other_factor in other_factors:
                 if self_factor.contradicts(other_factor):
