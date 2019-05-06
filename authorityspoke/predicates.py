@@ -13,6 +13,7 @@ from pint import UnitRegistry
 ureg = UnitRegistry()
 Q_ = ureg.Quantity
 
+
 @dataclass(frozen=True)
 class Predicate:
     """
@@ -20,24 +21,35 @@ class Predicate:
     Predicates may be "alleged" by a pleading, "supported" by evidence, or
     "found" to be factual by a jury verdict or a judge's finding of fact.
 
-    A predicate's self.content string shows where references to specific
-    entities from the case can be used as subjects or objects of the predicate.
+    :param content:
+        a clause containing an assertion, with blanks represented
+        by curly brackets showing where references to specific
+        entities from the case can be inserted to make the clause specific.
 
-    If self.reciprocal is True, then the order of the first two entities will
-    be considered interchangeable. There's no way to make any entities
-    interchangeable other than the first two.
+    :param truth:
+        indicates whether the clause in ``content`` is asserted to be
+        true or false. ``None`` indicates an assertion as to "whether"
+        the clause is true or false, without specifying which.
 
-    A predicate can also end with a comparison to some quantity, as described
-    by a ureg.Quantity object from the pint library. See pint.readthedocs.io.
+    :param reciprocal:
+        if True, then the order of the first two entities
+        is considered interchangeable. There's no way to make any entities
+        interchangeable other than the first two.
 
-    If a quantity is defined, a "comparison" should also be defined. That's
-    a string indicating whether the thing described by the predicate is
-    greater than, less than, or equal to the quantity. Even though "="
-    is the default, it's the least useful, because courts almost always state
-    rules that are intended to apply to quantities above or below some threshold.
+    :param comparison:
+        A string representing an equality or inequality sign like ``==``,
+        ``>``, or ``<=``. Used to indicate that the clause ends with a
+        comparison to some quantity. Should be defined if and only if a
+        ``quantity`` is defined. Even though "=" is the default, it's
+        the least useful, because courts almost always state rules that
+        are intended to apply to quantities above or below some threshold.
 
-    The quantity comparison can only be mentioned last. No entities may be
-    mentioned after the quantity comparison is mentioned.
+    :param quantity:
+        a Python number object or :class:`ureg.Quantity`
+        from the `pint <pint.readthedocs.io>`_ library. Comparisons to
+        quantities can be used to determine whether :class:`Predicate`\s
+        imply or contradict each other. A single Predicate may contain
+        no more than one ``comparison`` and one ``quantity``.
     """
 
     content: str
@@ -46,14 +58,14 @@ class Predicate:
     comparison: Optional[str] = None
     quantity: Optional[Union[int, float, ureg.Quantity]] = None
     opposite_comparisons: ClassVar = {
-            ">=": "<",
-            "==": "!=",
-            "<>": "=",
-            "<=": ">",
-            "=": "!=",
-            ">": "<=",
-            "<": ">=",
-        }
+        ">=": "<",
+        "==": "!=",
+        "<>": "=",
+        "<=": ">",
+        "=": "!=",
+        ">": "<=",
+        "<": ">=",
+    }
 
     def __post_init__(self):
 
@@ -93,24 +105,33 @@ class Predicate:
             slots -= 1
         return slots
 
-    def content_with_entities(self, entities: Union[Factor, Sequence[Factor]]) -> str:
-        """Creates a sentence by substituting the names of entities
-        from a particular case into the predicate_with_truth."""
+    def content_with_entities(self, context: Union[Factor, Sequence[Factor]]) -> str:
+        """
+        :param context:
+            generic :class:`Factor`\s to be mentioned in the context of
+            this Predicate. Does not need to be type :class:`Entity`.
 
-        if not isinstance(entities, Iterable):
-            entities = (entities,)
-        if len(entities) != len(self):
+        :returns:
+            a sentence created by substituting string representations
+            of generic factors from a particular case into the return
+            value of the :meth:`__str__` method.
+        """
+
+        if not isinstance(context, Iterable):
+            context = (context,)
+        if len(context) != len(self):
             raise ValueError(
                 f"Exactly {len(self)} entities needed to complete "
-                + f'"{self.content}", but {len(entities)} were given.'
+                + f'"{self.content}", but {len(context)} were given.'
             )
-        return str(self).format(*(str(e) for e in entities))
+        return str(self).format(*(str(e) for e in context))
 
     def contradicts(self, other: Optional[Predicate]) -> bool:
-        """This first tries to find a contradiction based on the relationship
-        between the quantities in the predicates. If there are no quantities, it
-        returns false only if the content is exactly the same and self.truth is
-        different.
+        """
+        This first tries to find a contradiction based on the relationship
+        between the quantities in the :class:`Predicate`\s. If there are
+        no quantities, it returns ``False`` only if the content is exactly
+        the same and ``self.truth`` is different.
         """
         if other is None:
             return False
@@ -118,7 +139,7 @@ class Predicate:
         if not isinstance(other, self.__class__):
             raise TypeError(
                 f"{self.__class__} objects may only be compared for "
-                + "contradiction with other {self.__class__} objects or None."
+                + f"contradiction with other {self.__class__} objects or None."
             )
 
         if (type(self.quantity) == ureg.Quantity) != (
@@ -181,13 +202,36 @@ class Predicate:
     ) -> Tuple[Predicate, Tuple["Factor", ...]]:
 
         """
-        Generates a Predicate object and Entities from a string that
-        has curly brackets around the Entities and the comparison/quantity.
-        Assumes the comparison/quantity can only come last.
-        This may never be used because it's an alternative to
-        Fact.from_dict(). This function identifies Entities
-        by finding brackets around them, while Fact.from_dict()
-        depends on knowing the names of the Entities in advance.
+        This method for constructing :class:`Predicate` objects
+        from strings may never be used because it's an alternative to
+        :meth:`Fact.from_dict`. This function identifies context
+        factors by finding brackets around them, while
+        :meth:`Fact.from_dict` depends on knowing the names of the
+        context factors in advance.
+
+        :param content:
+            a string containing a clause making an assertion.
+            Differs from the ``content`` parameter in
+            the :meth:`__init__` method because the curly brackets
+            surround the names of :class:`Entity` context factors,
+            and because the ``comparison`` and ``quantity`` are
+            represented in the ``content`` string rather than as
+            separate parameters.
+
+        :param truth:
+            indicates whether the clause in ``content`` is asserted to be
+            true or false. ``None`` indicates an assertion as to "whether"
+            the clause is true or false, without specifying which.
+
+        :param reciprocal:
+            if True, then the order of the first two entities
+            is considered interchangeable. There's no way to make
+            any entities interchangeable other than the first two.
+
+        :returns:
+            a :class:`Predicate` and :class:`Entity` objects
+            from a string that has curly brackets around the
+            context factors and the comparison/quantity.
         """
 
         comparison = None
@@ -214,9 +258,12 @@ class Predicate:
         )
 
     def __gt__(self, other: Optional[Predicate]) -> bool:
-        """Indicates whether self implies the other predicate,
-        which is True if their statements about quantity imply it.
-        Returns False if self and other are equal."""
+        """
+        :returns:
+            whether ``self`` implies ``other``, which is ``True``
+            if their statements about quantity imply it.
+            Returns ``False`` if ``self`` and ``other`` are equal.
+        """
 
         if other is None:
             return True
@@ -284,23 +331,26 @@ class Predicate:
             return True
         return self > other
 
-
     def __len__(self):
         """
+        Also called the linguistic valency, arity, or adicity.
+
         :returns:
             the number of entities that can fit in the pairs of brackets
             in the predicate. ``self.quantity`` doesn't count as one of these entities,
             even though the place where ``self.quantity`` goes in represented by brackets
             in the ``self.content`` string.
-
-        Also called the linguistic valency, arity, or adicity.
         """
 
         return self.context_slots
 
     def quantity_comparison(self) -> str:
-        """String representation of a comparison with a quantity,
-        which can include units due to the pint library."""
+        """
+        :returns:
+            string representation of a comparison with a
+            quantity, which can include units due to the
+            `pint <pint.readthedocs.io>`_  library.
+        """
 
         if not self.quantity:
             return None
@@ -317,8 +367,9 @@ class Predicate:
 
     def negated(self) -> Predicate:
         """
-        Returns a copy of the same Predicate, but with the opposite
-        truth value.
+        :returns:
+            a copy of the same :class:`Predicate`,
+            but with the opposite truth value.
         """
 
         return Predicate(
@@ -342,7 +393,6 @@ class Predicate:
         else:
             content = self.content
         return f"{truth_prefix}{content}"
-
 
     @staticmethod
     def str_to_quantity(quantity: str) -> Union[float, int, ureg.Quantity]:
