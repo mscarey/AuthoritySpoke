@@ -63,9 +63,9 @@ class Predicate:
                 self, "comparison", normalize_comparison[self.comparison]
             )
 
-        if self.comparison and self.comparison not in self.OPPOSITE_COMPARISONS().keys():
+        if self.comparison and self.comparison not in self.opposite_comparisons.keys():
             raise ValueError(
-                f'"comparison" string parameter must be one of {self.OPPOSITE_COMPARISONS().keys()}.'
+                f'"comparison" string parameter must be one of {self.opposite_comparisons.keys()}.'
             )
 
         if self.context_slots < 2 and self.reciprocal:
@@ -77,37 +77,113 @@ class Predicate:
         if self.comparison and self.truth is False:
             object.__setattr__(self, "truth", True)
             object.__setattr__(
-                self, "comparison", self.OPPOSITE_COMPARISONS()[self.comparison]
+                self, "comparison", self.opposite_comparisons[self.comparison]
             )
 
     @property
-    def context_slots(self):
+    def context_slots(self) -> int:
+        """
+        :returns:
+            the number of context :class:`Factor`\s that must be
+            specified to fill in the blanks in ``self.content``.
+        """
+
         slots = self.content.count("{}")
         if self.quantity:
             slots -= 1
         return slots
 
-    @staticmethod
-    def str_to_quantity(quantity: str) -> Union[float, int, ureg.Quantity]:
-        quantity = quantity.strip()
-        if quantity.isdigit():
-            return int(quantity)
-        float_parts = quantity.split(".")
-        if len(float_parts) == 2 and all(
-            substring.isnumeric() for substring in float_parts
+    def content_with_entities(self, entities: Union[Factor, Sequence[Factor]]) -> str:
+        """Creates a sentence by substituting the names of entities
+        from a particular case into the predicate_with_truth."""
+
+        if not isinstance(entities, Iterable):
+            entities = (entities,)
+        if len(entities) != len(self):
+            raise ValueError(
+                f"Exactly {len(self)} entities needed to complete "
+                + f'"{self.content}", but {len(entities)} were given.'
+            )
+        return str(self).format(*(str(e) for e in entities))
+
+    def contradicts(self, other: Optional[Predicate]) -> bool:
+        """This first tries to find a contradiction based on the relationship
+        between the quantities in the predicates. If there are no quantities, it
+        returns false only if the content is exactly the same and self.truth is
+        different.
+        """
+        if other is None:
+            return False
+
+        if not isinstance(other, self.__class__):
+            raise TypeError(
+                f"{self.__class__} objects may only be compared for "
+                + "contradiction with other {self.__class__} objects or None."
+            )
+
+        if (type(self.quantity) == ureg.Quantity) != (
+            type(other.quantity) == ureg.Quantity
         ):
-            return float(quantity)
-        return Q_(quantity)
+            return False
+
+        if self.truth is None or other.truth is None:
+            return False
+
+        if (
+            isinstance(self.quantity, ureg.Quantity)
+            and self.quantity.dimensionality != other.quantity.dimensionality
+        ):
+            return False
+
+        if not (
+            self.content.lower() == other.content.lower()
+            and self.reciprocal == other.reciprocal
+        ):
+            return False
+
+        if self.quantity and other.quantity:
+            if (
+                ">" in self.comparison or "=" in self.comparison
+            ) and "<" in other.comparison:
+                if self.quantity > other.quantity:
+                    return True
+            if (
+                "<" in self.comparison or "=" in self.comparison
+            ) and ">" in other.comparison:
+                if self.quantity < other.quantity:
+                    return True
+            if ">" in self.comparison and "=" in other.comparison:
+                if self.quantity > other.quantity:
+                    return True
+            if "<" in self.comparison and "=" in other.comparison:
+                if self.quantity < other.quantity:
+                    return True
+            if ("=" in self.comparison) != ("=" in other.comparison):
+                if self.quantity == other.quantity:
+                    return True
+            return False
+        return self.content == other.content and self.truth != other.truth
+
+    def __eq__(self, other: Predicate) -> bool:
+        if not isinstance(other, self.__class__):
+            return False
+
+        if (
+            self.content.lower() == other.content.lower()
+            and self.reciprocal == other.reciprocal
+            and self.quantity == other.quantity
+        ):
+            return self.truth == other.truth and self.comparison == other.comparison
 
     @classmethod
     def from_string(
         cls, content: str, truth: Optional[bool] = True, reciprocal: bool = False
     ) -> Tuple[Predicate, Tuple["Factor", ...]]:
 
-        """Generates a Predicate object and Entities from a string that
+        """
+        Generates a Predicate object and Entities from a string that
         has curly brackets around the Entities and the comparison/quantity.
         Assumes the comparison/quantity can only come last.
-
         This may never be used because it's an alternative to
         Fact.from_dict(). This function identifies Entities
         by finding brackets around them, while Fact.from_dict()
@@ -119,7 +195,7 @@ class Predicate:
         pattern = r"\{([^\{]+)\}"
 
         entities = re.findall(pattern, content)
-        for c in cls.OPPOSITE_COMPARISONS():
+        for c in cls.opposite_comparisons:
             if entities[-1].startswith(c):
                 comparison = c
                 quantity = entities.pop(-1)
@@ -136,43 +212,6 @@ class Predicate:
             ),
             tuple(entities),
         )
-
-    def __len__(self):
-        """
-        Returns the number of entities that can fit in the pairs of brackets
-        in the predicate. self.quantity doesn't count as one of these entities,
-        even though the place where self.quantity goes in represented by brackets
-        in the "content" string.
-
-        Also called the linguistic valency, arity, or adicity.
-        """
-
-        return self.context_slots
-
-    def __str__(self):
-        if self.truth is None:
-            truth_prefix = "whether "
-        elif self.truth is False:
-            truth_prefix = "it is false that "
-        else:
-            truth_prefix = ""
-        if self.quantity:
-            slots = ("{}" for slot in range(len(self)))
-            content = self.content.format(*slots, self.quantity_comparison())
-        else:
-            content = self.content
-        return f"{truth_prefix}{content}"
-
-    def __eq__(self, other: Predicate) -> bool:
-        if not isinstance(other, self.__class__):
-            return False
-
-        if (
-            self.content.lower() == other.content.lower()
-            and self.reciprocal == other.reciprocal
-            and self.quantity == other.quantity
-        ):
-            return self.truth == other.truth and self.comparison == other.comparison
 
     def __gt__(self, other: Optional[Predicate]) -> bool:
         """Indicates whether self implies the other predicate,
@@ -245,63 +284,19 @@ class Predicate:
             return True
         return self > other
 
-    def contradicts(self, other: Optional[Predicate]) -> bool:
-        """This first tries to find a contradiction based on the relationship
-        between the quantities in the predicates. If there are no quantities, it
-        returns false only if the content is exactly the same and self.truth is
-        different.
+
+    def __len__(self):
         """
-        if other is None:
-            return False
+        :returns:
+            the number of entities that can fit in the pairs of brackets
+            in the predicate. ``self.quantity`` doesn't count as one of these entities,
+            even though the place where ``self.quantity`` goes in represented by brackets
+            in the ``self.content`` string.
 
-        if not isinstance(other, self.__class__):
-            raise TypeError(
-                f"{self.__class__} objects may only be compared for "
-                + "contradiction with other {self.__class__} objects or None."
-            )
+        Also called the linguistic valency, arity, or adicity.
+        """
 
-        if (type(self.quantity) == ureg.Quantity) != (
-            type(other.quantity) == ureg.Quantity
-        ):
-            return False
-
-        if self.truth is None or other.truth is None:
-            return False
-
-        if (
-            isinstance(self.quantity, ureg.Quantity)
-            and self.quantity.dimensionality != other.quantity.dimensionality
-        ):
-            return False
-
-        if not (
-            self.content.lower() == other.content.lower()
-            and self.reciprocal == other.reciprocal
-        ):
-            return False
-
-        if self.quantity and other.quantity:
-            if (
-                ">" in self.comparison or "=" in self.comparison
-            ) and "<" in other.comparison:
-                if self.quantity > other.quantity:
-                    return True
-            if (
-                "<" in self.comparison or "=" in self.comparison
-            ) and ">" in other.comparison:
-                if self.quantity < other.quantity:
-                    return True
-            if ">" in self.comparison and "=" in other.comparison:
-                if self.quantity > other.quantity:
-                    return True
-            if "<" in self.comparison and "=" in other.comparison:
-                if self.quantity < other.quantity:
-                    return True
-            if ("=" in self.comparison) != ("=" in other.comparison):
-                if self.quantity == other.quantity:
-                    return True
-            return False
-        return self.content == other.content and self.truth != other.truth
+        return self.context_slots
 
     def quantity_comparison(self) -> str:
         """String representation of a comparison with a quantity,
@@ -320,19 +315,6 @@ class Predicate:
         }
         return f"{expand[comparison]} {self.quantity}"
 
-    def content_with_entities(self, entities: Union["Factor", Sequence["Factor"]]) -> str:
-        """Creates a sentence by substituting the names of entities
-        from a particular case into the predicate_with_truth."""
-
-        if not isinstance(entities, Iterable):
-            entities = (entities,)
-        if len(entities) != len(self):
-            raise ValueError(
-                f"Exactly {len(self)} entities needed to complete "
-                + f'"{self.content}", but {len(entities)} were given.'
-            )
-        return str(self).format(*(str(e) for e in entities))
-
     def negated(self) -> Predicate:
         """
         Returns a copy of the same Predicate, but with the opposite
@@ -347,14 +329,39 @@ class Predicate:
             quantity=self.quantity,
         )
 
-    @classmethod
-    def OPPOSITE_COMPARISONS(self):
-        return {
-            ">=": "<",
-            "==": "!=",
-            "<>": "=",
-            "<=": ">",
-            "=": "!=",
-            ">": "<=",
-            "<": ">=",
-        }
+    def __str__(self):
+        if self.truth is None:
+            truth_prefix = "whether "
+        elif self.truth is False:
+            truth_prefix = "it is false that "
+        else:
+            truth_prefix = ""
+        if self.quantity:
+            slots = ("{}" for slot in range(len(self)))
+            content = self.content.format(*slots, self.quantity_comparison())
+        else:
+            content = self.content
+        return f"{truth_prefix}{content}"
+
+
+    @staticmethod
+    def str_to_quantity(quantity: str) -> Union[float, int, ureg.Quantity]:
+        """
+        :param quantity:
+            when a string is being parsed for conversion to a
+            :class:`Predicate`, this is the part of the string
+            after the equals or inequality sign.
+        :returns:
+            a Python number object or a :class:`Quantity`
+            object created with `pint.UnitRegistry
+            <https://pint.readthedocs.io/en/0.9/tutorial.html>`_.
+        """
+        quantity = quantity.strip()
+        if quantity.isdigit():
+            return int(quantity)
+        float_parts = quantity.split(".")
+        if len(float_parts) == 2 and all(
+            substring.isnumeric() for substring in float_parts
+        ):
+            return float(quantity)
+        return Q_(quantity)

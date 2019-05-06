@@ -279,7 +279,7 @@ class Factor(ABC):
         """
         return self >= other.evolve("absent")
 
-    def evolve(self, changes: Union[str, Tuple[str, ...], Dict["str", Any]]) -> Factor:
+    def evolve(self, changes: Union[str, Tuple[str, ...], Dict[str, Any]]) -> Factor:
         """
         :param changes:
             a :class:`dict` where the keys are names of attributes
