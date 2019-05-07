@@ -15,6 +15,12 @@ class TestOpinions:
         watt_dict = Opinion.from_file("watt_h.json")
         assert watt_dict.name_abbreviation == "Wattenburg v. United States"
 
+    def test_load_generator_for_opinions(self):
+        opinion_generator = Opinion.from_file("brad_h.json", lead_only=False)
+        majority = next(opinion_generator)
+        dissent = next(opinion_generator)
+        assert dissent.position == "concurring-in-part-and-dissenting-in-part"
+
     def test_opinion_features(self, make_opinion):
         assert make_opinion["watt_majority"].court == "9th-cir"
         assert "388 F.2d 853" in make_opinion["watt_majority"].citations
