@@ -264,13 +264,11 @@ class Procedure(Factor):
     ) -> bool:
         """
         .. note::
-            A call to the deleted ``check_entity_consistency`` function
-            was deleted here. Is it possible for there to appear to be
-            a contradiction based on comparing one context factor from
-            ``self`` and one from ``other``, but requiring a complete
-            set of context factor assignments shows that no contradiction
-            is possible? If so, this issue isn't reflected in the test
-            suite.
+            Doesn't the comparison between generic_factors here
+            repeat something that should have been reused from
+            elsewhere?
+            And don't these generic factors need to be turned
+            concrete before they can be compared?
 
         :returns:
             whether any factor assignment can be found that
@@ -280,7 +278,9 @@ class Procedure(Factor):
         for other_factor in other.outputs:
             for self_factor in self.outputs:
                 if other_factor.contradicts(self_factor):
-                    generic_pairs = zip(self_factor.generic_factors, other_factor.generic_factors)
+                    generic_pairs = zip(
+                        self_factor.generic_factors, other_factor.generic_factors
+                    )
                     if all(match.get(pair[0]) == pair[1] for pair in generic_pairs):
                         return True
         return False

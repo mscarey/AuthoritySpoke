@@ -1,5 +1,7 @@
 # AuthoritySpoke
 
+[![CircleCI](https://circleci.com/gh/mscarey/AuthoritySpoke.svg?style=svg)](https://circleci.com/gh/mscarey/AuthoritySpoke)
+
 AuthoritySpoke is a Python library for managing structured data about legal rules.
 
 ## Learning about AuthoritySpoke
