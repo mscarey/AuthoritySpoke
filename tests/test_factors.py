@@ -4,7 +4,7 @@ import operator
 import pytest
 
 from authorityspoke.entities import Entity, Event, Human
-from authorityspoke.factors import Factor, Fact
+from authorityspoke.factors import Factor, Fact, means
 from authorityspoke.rules import Rule, ProceduralRule
 from authorityspoke.opinions import Opinion
 from authorityspoke.predicates import ureg, Q_
@@ -287,32 +287,32 @@ class TestFacts:
     # Equality
 
     def test_equality_factor_from_same_predicate(self, watt_factor):
-        assert watt_factor["f1"] == watt_factor["f1b"]
+        assert watt_factor["f1"].means(watt_factor["f1b"])
 
     def test_equality_factor_from_equal_predicate(self, watt_factor):
-        assert watt_factor["f1"] == watt_factor["f1c"]
+        assert watt_factor["f1"].means(watt_factor["f1c"])
 
     def test_equality_because_factors_are_generic_entities(self, watt_factor):
-        assert watt_factor["f1"] == watt_factor["f1_different_entity"]
+        assert watt_factor["f1"].means(watt_factor["f1_different_entity"])
 
     def test_unequal_because_a_factor_is_not_generic(self, watt_factor):
-        assert watt_factor["f9_swap_entities_4"] != watt_factor["f9"]
+        assert not watt_factor["f9_swap_entities_4"].means(watt_factor["f9"])
 
     def test_generic_factors_equal(self, watt_factor):
-        assert watt_factor["f2_generic"] == watt_factor["f2_false_generic"]
-        assert watt_factor["f2_generic"] == watt_factor["f3_generic"]
+        assert watt_factor["f2_generic"].means(watt_factor["f2_false_generic"])
+        assert watt_factor["f2_generic"].means(watt_factor["f3_generic"])
 
     def test_equal_referencing_diffent_generic_factors(self, make_factor):
-        assert make_factor["f_murder"] == make_factor["f_murder_craig"]
+        assert make_factor["f_murder"].means(make_factor["f_murder_craig"])
 
     def test_generic_and_specific_factors_unequal(self, watt_factor):
-        assert watt_factor["f2"] != watt_factor["f2_generic"]
+        assert not watt_factor["f2"].means(watt_factor["f2_generic"])
 
     def test_factor_reciprocal_unequal(self, watt_factor):
-        assert watt_factor["f2"] != watt_factor["f2_reciprocal"]
+        assert not watt_factor["f2"].means(watt_factor["f2_reciprocal"])
 
     def test_factor_different_predicate_truth_unequal(self, watt_factor):
-        assert watt_factor["f7"] != watt_factor["f7_opposite"]
+        assert not watt_factor["f7"].means(watt_factor["f7_opposite"])
 
     def test_copies_of_identical_factor(self, make_factor):
         """
@@ -321,27 +321,20 @@ class TestFacts:
         arbitrary.
         """
         f = make_factor
-        assert f["f_irrelevant_3"] == f["f_irrelevant_3"]
-        assert f["f_irrelevant_3"] == f["f_irrelevant_3_new_context"]
+        assert f["f_irrelevant_3"].means(f["f_irrelevant_3"])
+        assert f["f_irrelevant_3"].means(f["f_irrelevant_3_new_context"])
 
     def test_equal_with_different_generic_subfactors(self, make_complex_fact):
-        assert (
-            make_complex_fact["f_relevant_murder"]
-            == make_complex_fact["f_relevant_murder_craig"]
+        assert make_complex_fact["f_relevant_murder"].means(
+            make_complex_fact["f_relevant_murder_craig"]
         )
 
     def test_reciprocal_context_register(self, watt_factor):
         """
-        This test describes something that shouldn't happen in practice,
-        because it means two objects with the same meaning have been
+        This test describes two objects with the same meaning that have been
         made in two different ways, each with a different id and repr.
-
-        This situation risks creating a lot of bugs. Will it be possible
-        to avoid creating multiple objects representing the same
-        Fact in practice, so "(A is B) == False" guarantees they refer to
-        different things?
         """
-        assert watt_factor["f7"] == watt_factor["f7_swap_entities"]
+        assert watt_factor["f7"].means(watt_factor["f7_swap_entities"])
 
     @pytest.mark.xfail
     def test_unequal_due_to_repeating_entity(self, make_factor):
@@ -349,13 +342,13 @@ class TestFacts:
         multiple references to the same Entity just because the name of the
         Entity appears more than once in the Predicate."""
         f = make_factor
-        assert f["f_three_entities"] != f["f_repeating_entity"]
+        assert not f["f_three_entities"].means(f["f_repeating_entity"])
 
     def test_standard_of_proof_inequality(self, watt_factor):
 
         f = watt_factor
-        assert f["f2_clear_and_convincing"] != f["f2_preponderance_of_evidence"]
-        assert f["f2_clear_and_convincing"] != f["f2"]
+        assert not f["f2_clear_and_convincing"].means(f["f2_preponderance_of_evidence"])
+        assert not f["f2_clear_and_convincing"].means(f["f2"])
 
     # Implication
 
@@ -406,9 +399,9 @@ class TestFacts:
 
     def test_equal_factors_not_gt(self, watt_factor):
         f = watt_factor
-        assert f["f7"] >= f["f7_swap_entities"]
-        assert f["f7"] <= f["f7_swap_entities"]
-        assert not f["f7"] > f["f7_swap_entities"]
+        assert f["f7"] >= f["f7"]
+        assert f["f7"] <= f["f7"]
+        assert not f["f7"] > f["f7"]
 
     def test_standard_of_proof_comparison(self, watt_factor):
         f = watt_factor
@@ -481,17 +474,14 @@ class TestFacts:
     def test_copy_with_foreign_context(self, watt_mentioned, watt_factor):
         w = watt_mentioned
         assert (
-            watt_factor["f1"].new_context({w[0]: w[2]})
-            == watt_factor["f1_different_entity"]
-        )
+            watt_factor["f1"].new_context({w[0]: w[2]}).means(watt_factor["f1_different_entity"]
+        ))
 
     def test_check_entity_consistency_true(self, make_entity, make_factor):
         left = make_factor["f_irrelevant_3"]
         right = make_factor["f_irrelevant_3_new_context"]
         e = make_entity
-        easy_update = left._update_mapping(
-            {e["dan"]: e["craig"]}, left, right, operator.eq
-        )
+        easy_update = left._update_mapping({e["dan"]: e["craig"]}, left, right, means)
         harder_update = left._update_mapping(
             {
                 e["alice"]: e["bob"],
@@ -502,7 +492,7 @@ class TestFacts:
             },
             left,
             right,
-            operator.eq,
+            means,
         )
         assert any(register is not None for register in easy_update)
         assert any(register is not None for register in harder_update)

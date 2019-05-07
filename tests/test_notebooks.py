@@ -19,7 +19,7 @@ class TestIntroduction:
         nosferatu_rule = oracle.holdings[0].new_context(
             {Entity('the Java API'): Entity('Nosferatu')}
         )
-        assert oracle.holdings[0] == nosferatu_rule
+        assert oracle.holdings[0].means(nosferatu_rule)
 
     def test_evolve_rule_replacing_enactment(self, make_opinion_with_holding):
         oracle = make_opinion_with_holding["oracle_majority"]

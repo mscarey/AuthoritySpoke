@@ -13,7 +13,7 @@ from dataclasses import dataclass
 
 from authorityspoke.context import get_directory_path
 from authorityspoke.enactments import Enactment
-from authorityspoke.factors import Factor, new_context_helper
+from authorityspoke.factors import Factor, means, new_context_helper
 
 
 class Relation(NamedTuple):
@@ -285,7 +285,7 @@ class Procedure(Factor):
                         return True
         return False
 
-    def __eq__(self, other: Procedure) -> bool:
+    def means(self, other: Procedure) -> bool:
         """
         :returns:
             whether the two :class:`Procedure`\s have all the same
@@ -304,10 +304,7 @@ class Procedure(Factor):
             new_matchlist = []
             for matches in matchlist:
                 for answer in self.compare_factors(
-                    matches,
-                    list(self.__dict__[group]),
-                    other.__dict__[group],
-                    operator.eq,
+                    matches, list(self.__dict__[group]), other.__dict__[group], means
                 ):
                     new_matchlist.append(answer)
             matchlist = new_matchlist
@@ -321,10 +318,7 @@ class Procedure(Factor):
             new_matchlist = []
             for matches in matchlist:
                 for answer in self.compare_factors(
-                    matches,
-                    list(other.__dict__[group]),
-                    self.__dict__[group],
-                    operator.eq,
+                    matches, list(other.__dict__[group]), self.__dict__[group], means
                 ):
                     new_matchlist.append(answer)
             matchlist = new_matchlist
@@ -402,7 +396,7 @@ class Procedure(Factor):
         if not isinstance(other, self.__class__):
             return False
 
-        if self == other:
+        if self.means(other):
             return True
 
         relations = (
@@ -492,7 +486,7 @@ class Procedure(Factor):
                             for key in self_factor.generic_factors
                         )
                         for _context_register in self_factor._context_register(
-                            other_factor, operator.eq
+                            other_factor, means
                         )
                     ):
                         return False
@@ -856,12 +850,32 @@ class ProceduralRule(Rule):
         # negation of itself.
 
         if not self.decided and not other.decided:
-            return self == other or self == other.negated()
+            return self.means(other) or self.means(other.negated())
 
         # It doesn't seem that any holding being undecided implies
         # that any holding is decided, or vice versa.
 
         return False
+
+    def means(self, other: ProceduralRule) -> bool:
+        """
+        :returns:
+            whether ``other`` is a :class:`ProceduralRule` with the
+            same meaning as ``self``.
+        """
+
+        if not self.__class__ == other.__class__:
+            return False
+
+        if not self.procedure.means(other.procedure):
+            return False
+
+        return (
+            self.mandatory == other.mandatory
+            and self.universal == other.universal
+            and self.rule_valid == other.rule_valid
+            and self.decided == other.decided
+        )
 
     def negated(self):
         return ProceduralRule(

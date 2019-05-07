@@ -59,7 +59,7 @@ def new_context_helper(func: Callable):
                 context = dict(zip(generic_factors, context))
             for context_factor in context:
                 if factor.name == context_factor or (
-                    factor == context_factor and factor.name == context_factor.name
+                    factor.means(context_factor) and factor.name == context_factor.name
                 ):
                     return context[context_factor]
 
@@ -227,7 +227,7 @@ class Factor(ABC):
             such that they fit the relationship ``comparison``.
         """
 
-        context_registers = iter(self._context_register(other, operator.ge))
+        context_registers = iter(self._context_register(other, comparison))
         return any(register is not None for register in context_registers)
 
     def _context_register(
@@ -307,7 +307,7 @@ class Factor(ABC):
             new_dict[key] = changes[key]
         return self.__class__(**new_dict)
 
-    def __eq__(self, other) -> bool:
+    def means(self, other) -> bool:
         if self.__class__ != other.__class__:
             return False
 
@@ -335,10 +335,10 @@ class Factor(ABC):
             ``other`` is an instance of ``self``'s class.
         """
         for i, self_factor in enumerate(self.context_factors):
-            if self_factor != other.context_factors[i]:
+            if not self_factor.means(other.context_factors[i]):
                 return False
 
-        return self.consistent_with(other, operator.eq)
+        return self.consistent_with(other, means)
 
     def get_factor_by_name(self, name: str) -> Optional[Factor]:
         """
@@ -469,7 +469,7 @@ class Factor(ABC):
         for replacement_dict in self.interchangeable_factors:
             changed_registry = replace_factors_in_dict(matches, replacement_dict)
             if not any(
-                compare_dict_for_identical_entries(changed_registry, returned_dict)
+                changed_registry == returned_dict
                 for returned_dict in already_returned
             ):
                 already_returned.append(changed_registry)
@@ -521,17 +521,13 @@ class Factor(ABC):
         for in_key, in_value in incoming_mapping.items():
 
             if in_key and in_value:
-                if self_mapping.get(in_key) and repr(self_mapping.get(in_key)) != repr(
-                    in_value
-                ):
+                if self_mapping.get(in_key) and self_mapping.get(in_key) != in_value:
                     logger.debug(
                         f"{in_key} already in mapping with value "
                         + f"{self_mapping[in_key]}, not {in_value}"
                     )
                     return None
-                if self_mapping.get(in_value) and repr(
-                    self_mapping.get(in_value)
-                ) != repr(in_key):
+                if self_mapping.get(in_value) and self_mapping.get(in_value) != in_key:
                     logger.debug(
                         f"key {in_value} already in mapping with value "
                         + f"{self_mapping[in_value]}, not {in_key}"
@@ -787,9 +783,6 @@ class Fact(Factor):
             return False
         return super()._equal_if_concrete(other)
 
-    def __eq__(self, other) -> bool:
-        return super().__eq__(other)
-
     def predicate_in_context(self, entities: Sequence[Factor]) -> str:
         """
         :returns:
@@ -968,9 +961,6 @@ class Pleading(Factor):
             return False
         return super()._equal_if_concrete(other)
 
-    def __eq__(self, other: Factor) -> bool:
-        return super.__eq__(other)
-
     def _implies_if_concrete(self, other: Pleading):
         # TODO: allow the same kind of comparisons as Predicate.quantity
         if self.date != other.date:
@@ -1001,12 +991,6 @@ class Allegation(Factor):
     @property
     def context_factor_names(self) -> Tuple[str, ...]:
         return ("to_effect", "pleading")
-
-    def __eq__(self, other: Factor) -> bool:
-        """
-        dataclass behaves confusingly if this isn't included.
-        """
-        return super().__eq__(other)
 
     def __str__(self):
         string = (
@@ -1044,9 +1028,6 @@ class Exhibit(Factor):
             return False
         return super()._equal_if_concrete(other)
 
-    def __eq__(self, other: Factor) -> bool:
-        return super().__eq__(other)
-
     def _implies_if_concrete(self, other: Exhibit):
 
         if not (self.form == other.form or other.form is None):
@@ -1081,23 +1062,13 @@ class Evidence(Factor):
         )
         return super().__str__().format(string).strip()
 
-    def __eq__(self, other: Factor) -> bool:
-        return super().__eq__(other)
-
     @property
     def context_factor_names(self) -> Tuple[str, ...]:
         return ("exhibit", "to_effect")
 
 
-def compare_dict_for_identical_entries(
-    left: Dict[Factor, Factor], right: Dict[Factor, Factor]
+def means(
+    left: Factor, right: Factor
 ) -> bool:
-    """Compares two dicts to see whether the
-    keys and values of one are the same objects
-    as the keys and values of the other, not just
-    whether they evaluate equal."""
 
-    return all(
-        any((l_key is r_key and left[l_key] is right[r_key]) for r_key in right)
-        for l_key in left
-    )
+    return left.means(right)

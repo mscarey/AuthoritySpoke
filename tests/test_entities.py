@@ -47,7 +47,7 @@ class TestEntities:
         motel = make_entity["motel"]
         assert motel.new_context(changes) == changes[make_entity["motel"]]
 
-    # Equality
+    # Same Meaning
 
     def test_specific_to_generic_different_object(self, make_entity):
         e = make_entity
@@ -58,16 +58,16 @@ class TestEntities:
 
     def test_equality_generic_entities(self, make_entity):
         e = make_entity
-        assert e["motel"] == e["trees"]
-        assert e["motel"] is not e["trees"]
+        assert e["motel"].means(e["trees"])
+        assert not e["motel"] == e["trees"]
 
     def test_generic_human_and_event_not_equal(self, make_entity):
         """Neither is a subclass of the other."""
-        assert make_entity["tree_search"] != make_entity["watt"]
+        assert not make_entity["tree_search"].means(make_entity["watt"])
 
     def test_generic_human_and_entity_not_equal(self, make_entity):
         """Human is a subclass of Entity."""
-        assert make_entity["motel"] != make_entity["watt"]
+        assert not make_entity["motel"].means(make_entity["watt"])
 
     # Implication
 

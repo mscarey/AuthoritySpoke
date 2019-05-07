@@ -90,23 +90,23 @@ class TestProcedures:
         assert f["f2"] in c1_again.inputs
         assert f["f2"].context_factors == (watt_mentioned[1], watt_mentioned[0])
 
-    # Equality
+    # Same Meaning
 
     def test_procedure_equality(self, make_procedure, caplog):
         caplog.set_level(logging.DEBUG)
-        assert make_procedure["c1"] == make_procedure["c1_again"]
+        assert make_procedure["c1"].means(make_procedure["c1_again"])
 
     def test_procedure_equality_entity_order(self, make_procedure):
-        assert make_procedure["c1"] == make_procedure["c1_entity_order"]
+        assert make_procedure["c1"].means(make_procedure["c1_entity_order"])
 
     def test_still_equal_after_swapping_reciprocal_entities(
         self, make_procedure, caplog
     ):
         caplog.set_level(logging.DEBUG)
-        assert make_procedure["c2"] == make_procedure["c2_reciprocal_swap"]
+        assert make_procedure["c2"].means(make_procedure["c2_reciprocal_swap"])
 
     def test_unequal_after_swapping_nonreciprocal_entities(self, make_procedure):
-        assert make_procedure["c2"] != make_procedure["c2_nonreciprocal_swap"]
+        assert not make_procedure["c2"].means(make_procedure["c2_nonreciprocal_swap"])
 
     # Implication
 
@@ -159,7 +159,7 @@ class TestProcedures:
 
         c2 = make_procedure["c2"]
         c2_reciprocal_swap = make_procedure["c2_reciprocal_swap"]
-        assert c2 == c2_reciprocal_swap
+        assert c2.means(c2_reciprocal_swap)
         assert c2 >= c2_reciprocal_swap
 
     def test_entities_of_implied_quantity_outputs_for_implied_procedure(

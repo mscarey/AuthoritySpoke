@@ -114,7 +114,7 @@ class TestOpinions:
             "Bradley's marijuana patch": "the stockpile of trees",
         }
         watt.posits(brad.holdings[0], context_pairs)
-        assert watt.holdings[-1] == brad.holdings[0]
+        assert watt.holdings[-1].means(brad.holdings[0])
 
     def test_new_context_inferring_factors_to_change(self, make_opinion):
         """
@@ -140,7 +140,7 @@ class TestOpinions:
             "the stockpile of trees",
         ]
         watt.posits(brad.holdings[0], context_items)
-        assert watt.holdings[-1] == brad.holdings[0]
+        assert watt.holdings[-1].means(brad.holdings[0])
 
     # Implication
 

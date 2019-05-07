@@ -81,10 +81,10 @@ class TestRules:
         assert len(cardenas_holdings[1].outputs) == 1
         assert len(cardenas_holdings[1].despite) == 1
 
-    # Equality
+    # Same Meaning
 
     def test_identical_holdings_equal(self, make_holding):
-        assert make_holding["h1"] == make_holding["h1_again"]
+        assert make_holding["h1"].means(make_holding["h1_again"])
 
     def test_holdings_equivalent_entity_orders_equal(self, make_holding):
         """
@@ -93,13 +93,13 @@ class TestRules:
         equivalent order.
         e.g. {"F1": "1,2,1", "F2": "2,0,0"} and {"F2": "1,2,2", "F1": "0,1,0"}
         """
-        assert make_holding["h1"] == make_holding["h1_entity_order"]
+        assert make_holding["h1"].means(make_holding["h1_entity_order"])
 
     def test_holdings_different_entities_unequal(self, make_holding):
-        assert make_holding["h1"] != make_holding["h1_easy"]
+        assert not make_holding["h1"].means(make_holding["h1_easy"])
 
     def test_holdings_differing_in_entity_order_equal(self, make_holding):
-        assert make_holding["h1"] == make_holding["h1_entity_order"]
+        assert make_holding["h1"].means(make_holding["h1_entity_order"])
 
     # Implication
 
@@ -158,7 +158,7 @@ class TestRules:
         assert make_holding["h_near_means_curtilage_even_if"] <= make_holding["h2"]
 
     def test_negated_method(self, make_holding):
-        assert make_holding["h1"].negated() == make_holding["h1_opposite"]
+        assert make_holding["h1"].negated().means(make_holding["h1_opposite"])
 
     def test_undecided_holding_no_implication_more_inputs(self, make_holding):
 
@@ -226,7 +226,7 @@ class TestRules:
             make_holding["h2_undecided"].contradicts(make_procedure["c2"])
 
     def test_holding_contradicts_invalid_version_of_self(self, make_holding):
-        assert make_holding["h2"].negated() == make_holding["h2_invalid"]
+        assert make_holding["h2"].negated().means(make_holding["h2_invalid"])
         assert make_holding["h2"].contradicts(make_holding["h2_invalid"])
         assert make_holding["h2"] >= make_holding["h2_invalid"].negated()
 

@@ -12,26 +12,22 @@ class TestExhibits:
 
     def test_equality(self, make_exhibit):
         assert (
-            make_exhibit["no_shooting_entity_order_testimony"]
-            == make_exhibit["no_shooting_testimony"]
-        )
+            make_exhibit["no_shooting_entity_order_testimony"].means(make_exhibit["no_shooting_testimony"]
+        ))
 
     def test_not_equal_different_speaker(self, make_exhibit):
-        assert (
-            make_exhibit["no_shooting_different_witness_testimony"]
-            != make_exhibit["no_shooting_testimony"]
-        )
+        assert not (
+            make_exhibit["no_shooting_different_witness_testimony"].means(make_exhibit["no_shooting_testimony"]
+        ))
 
     def test_equal_complex_statement(self, make_exhibit):
         assert (
-            make_exhibit["relevant_murder_nested_swap_testimony"]
-            == make_exhibit["relevant_murder_testimony"]
+            make_exhibit["relevant_murder_nested_swap_testimony"].means(make_exhibit["relevant_murder_testimony"])
         )
 
     def test_not_equal_complex_statement(self, make_exhibit):
-        assert (
-            make_exhibit["relevant_murder_alice_craig_testimony"]
-            != make_exhibit["relevant_murder_testimony"]
+        assert not (
+            make_exhibit["relevant_murder_alice_craig_testimony"].means(make_exhibit["relevant_murder_testimony"])
         )
 
     # Implication
@@ -160,20 +156,19 @@ class TestEvidence:
 
     def test_equality_with_entity_order(self, make_predicate, make_evidence):
         e = make_evidence
-        assert e["no_shooting"] == e["no_shooting_entity_order"]
+        assert e["no_shooting"].means(e["no_shooting_entity_order"])
 
     def test_equality_with_no_statement(self, make_evidence):
-        assert make_evidence["crime"] == make_evidence["crime"]
+        assert make_evidence["crime"].means(make_evidence["crime"])
 
     def test_unequal_due_to_entity_order(self, make_evidence):
         e = make_evidence
-        assert e["no_shooting"] != e["no_shooting_different_witness"]
+        assert not e["no_shooting"].means(e["no_shooting_different_witness"])
 
     def test_unequal_different_attributes(self, make_evidence):
-        assert (
-            make_evidence["no_shooting_no_effect_entity_order"]
-            != make_evidence["no_shooting_different_witness"]
-        )
+        assert not (
+            make_evidence["no_shooting_no_effect_entity_order"].means(make_evidence["no_shooting_different_witness"]
+        ))
 
     def test_implication_missing_witness(self, make_evidence):
         e = make_evidence

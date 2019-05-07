@@ -50,7 +50,7 @@ class Entity(Factor):
     generic: bool = True
     plural: bool = False
 
-    def __eq__(self, other):
+    def means(self, other):
         """
         ``generic`` :class:`Entity` objects are considered equal
         as long as they're the same class. If not ``generic``, they're

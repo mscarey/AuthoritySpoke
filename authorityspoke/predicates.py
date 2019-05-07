@@ -185,7 +185,7 @@ class Predicate:
             return False
         return self.content == other.content and self.truth != other.truth
 
-    def __eq__(self, other: Predicate) -> bool:
+    def means(self, other: Predicate) -> bool:
         if not isinstance(other, self.__class__):
             return False
 
