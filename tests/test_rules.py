@@ -346,6 +346,19 @@ class TestRules:
             make_holding["h_near_means_no_curtilage_ALL_MUST"]
         )
 
+    def test_no_contradiction_quantity_outputs(self, make_holding):
+        """
+        Added to try to break Procedure.contradiction_between_outputs.
+
+        "the distance between {the stockpile of trees} and a parking area
+        used by personnel and patrons of {Hideaway Lodge} was <= 5 feet"
+        does not contradict
+        "the distance between {circus} and a parking area used by personnel
+        and patrons of {Hideaway Lodge} was > 5 feet"
+        """
+        assert not make_holding["h_output_distance_less"].contradicts(make_holding["h_output_distance_more"])
+
+
     def test_contradicts_if_valid_all_vs_all(self, make_holding):
 
         """

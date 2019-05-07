@@ -37,6 +37,7 @@ class Relation(NamedTuple):
         between each :attr:`need_matches` and some :attr:`available`
         for the relation to hold.
     """
+
     need_matches: Tuple[Factor, ...]
     available: Tuple[Factor, ...]
     comparison: Callable
@@ -114,12 +115,180 @@ class Procedure(Factor):
                     )
             object.__setattr__(self, group, groups[group])
 
+    def all_relation_matches(
+        self, relations: Tuple[Relation, ...]
+    ) -> List[Dict[Factor, Optional[Factor]]]:
+        matchlist = [{}]
+        for relation in relations:
+            new_matchlist = []
+            for matches in matchlist:
+                for answer in self.compare_factors(
+                    matches,
+                    list(relation.need_matches),
+                    relation.available,
+                    relation.comparison,
+                ):
+                    new_matchlist.append(dict(answer))
+            matchlist = new_matchlist
+        return matchlist
+
+    def compare_factors(
+        self,
+        matches: Dict[Factor, Factor],
+        need_matches: List[Factor],
+        available_for_matching: Tuple[Factor, ...],
+        comparison: Callable,
+    ) -> Iterator[Dict[Factor, Optional[Factor]]]:
+        """
+        :param matches:
+            a mapping of :class:`Factor`\s that have already been matched
+            to each other in the recursive search for a complete group of
+            matches. Starts empty when the method is first called.
+
+        :param need_matches:
+            :class:`Factor`\s that have not yet been matched to any
+            :class:`Factor` in the other :class:`Procedure`.
+
+        :param available_for_matching:
+            :class:`Factor`\s from the other :class:`Procedure` that
+            could be matched to :class:`Factor`\s from ``need_matches``
+
+        :param comparison:
+            The relationship that two :class:`Factor`\s need to have
+            for them to match. Could be equality or implication.
+
+        :returns:
+            Whether all factors in ``need_matches`` have the
+            relation ``comparison`` with a :class:`Factor` in
+            ``available_for_matching``, with matching entity slots.
+        """
+
+        if not need_matches:
+            # This seems to allow duplicate values in
+            # Procedure.output, .input, and .despite, but not in
+            # attributes of other kinds of Factors. Likely cause
+            # of bugs.
+            yield matches
+        else:
+            self_factor = need_matches.pop()
+            for other_factor in available_for_matching:
+                if comparison(self_factor, other_factor):
+                    updated_mappings = iter(
+                        self._update_mapping(
+                            matches, (self_factor,), (other_factor,), comparison
+                        )
+                    )
+                    for new_matches in updated_mappings:
+                        if new_matches:
+                            next_steps = iter(
+                                self.compare_factors(
+                                    new_matches,
+                                    need_matches,
+                                    available_for_matching,
+                                    comparison,
+                                )
+                            )
+                            for next_step in next_steps:
+                                yield next_step
+
+    def _implies_if_present(self, other: Factor) -> bool:
+        """
+        When ``self`` and ``other`` are included in
+        :class:`Rule`\s that both apply in **some** cases:
+
+        ``self`` does not imply ``other`` if any input of ``other``
+        is not equal to or implied by some input of ``self``.
+
+        ``self`` does not imply ``other`` if any output of ``other``
+        is not equal to or implied by some output of self.
+
+        ``self`` does not imply ``other`` if any despite of ``other``
+        is not equal to or implied by some despite or input of ``self``.
+
+        :param other: another :class:`Procedure`
+
+        :returns:
+            whether the assertion that ``self`` applies in some cases
+            implies that the :class:`Procedure` ``other`` applies
+            in some cases.
+        """
+
+        despite_or_input = (*self.despite, *self.inputs)
+
+        relations = (
+            Relation(other.outputs, self.outputs, operator.le),
+            Relation(other.inputs, self.inputs, operator.le),
+            Relation(other.despite, despite_or_input, operator.le),
+        )
+
+        return bool(self.all_relation_matches(relations))
+
+    def __len__(self):
+        """
+        Returns the number of context :class:`Factor`\s that need to be
+        specified for this :class:`Procedure`.
+        """
+
+        return len(self.generic_factors)
+
+    def __repr__(self):
+        return (
+            f"{self.__class__.__name__}(outputs=("
+            + f"{', '.join(repr(factor) for factor in self.outputs)}), "
+            + f"inputs=({', '.join(repr(factor) for factor in self.inputs)}), "
+            + f"despite=({', '.join(repr(factor) for factor in self.despite)}))"
+        )
+
+    def __str__(self):
+        text = "Procedure:"
+        if self.inputs:
+            text += "\nSupporting inputs:"
+            for f in self.inputs:
+                text += "\n" + str(f)
+        if self.despite:
+            text += "\nDespite:"
+            for f in self.despite:
+                text += "\n" + str(f)
+        if self.outputs:
+            text += "\nOutputs:"
+            for f in self.outputs:
+                text += "\n" + str(f)
+        return text
+
+    @property
+    def context_factor_names(self):
+        return ("outputs", "inputs", "despite")
+
+    def contradiction_between_outputs(
+        self, other: Procedure, m: Tuple[int, ...]
+    ) -> bool:
+        """
+        .. note::
+            A call to the deleted ``check_entity_consistency`` function
+            was deleted here. Is it possible for there to appear to be
+            a contradiction based on comparing one context factor from
+            ``self`` and one from ``other``, but requiring a complete
+            set of context factor assignments shows that no contradiction
+            is possible? If so, this issue isn't reflected in the test
+            suite.
+
+        :returns:
+            whether any factor assignment can be found that
+            makes a factor in the output of other contradict a factor in the
+            output of self.
+        """
+        for other_factor in other.outputs:
+            for self_factor in self.outputs:
+                if other_factor.contradicts(self_factor):
+                    return True
+        return False
+
     def __eq__(self, other: Procedure) -> bool:
         """
         :returns:
-        whether the two :class:`Procedure`\s have all the same
-        :class:`Factor`\s with the same context factors in the
-        same roles.
+            whether the two :class:`Procedure`\s have all the same
+            :class:`Factor`\s with the same context factors in the
+            same roles.
         """
 
         if not isinstance(other, self.__class__):
@@ -159,147 +328,6 @@ class Procedure(Factor):
             matchlist = new_matchlist
         return bool(matchlist)
 
-    def compare_factors(
-        self,
-        matches: Dict[Factor, Factor],
-        need_matches: List[Factor],
-        available_for_matching: Tuple[Factor, ...],
-        comparison: Callable,
-    ) -> Iterator[Dict[Factor, Optional[Factor]]]:
-        """
-        :param matches:
-            Determines whether all factors in need_matches have the relation
-        "comparison" with a factor in available_for_matching, with matching
-        entity slots.
-        """
-
-        if not need_matches:
-            # This seems to allow duplicate values in
-            # Procedure.output, .input, and .despite, but not in
-            # attributes of other kinds of Factors. Likely cause
-            # of bugs.
-            yield matches
-        else:
-            self_factor = need_matches.pop()
-            for other_factor in available_for_matching:
-                if comparison(self_factor, other_factor):
-                    updated_mappings = iter(
-                        self._update_mapping(
-                            matches, (self_factor,), (other_factor,), comparison
-                        )
-                    )
-                    for new_matches in updated_mappings:
-                        if new_matches:
-                            next_steps = iter(
-                                self.compare_factors(
-                                    new_matches,
-                                    need_matches,
-                                    available_for_matching,
-                                    comparison,
-                                )
-                            )
-                            for next_step in next_steps:
-                                yield next_step
-
-    def _implies_if_present(self, other: Factor) -> bool:
-        """
-        Tests whether the assertion that self applies in some cases
-        implies that the procedure "other" applies in some cases.
-        Despite the "if_present" in the method name, there's no "absent"
-        attribute for Procedures.
-
-        When self and other are holdings that both apply in SOME cases:
-
-        Self does not imply other if any input of other
-        is not equal to or implied by some input of self.
-
-        Self does not imply other if any output of other
-        is not equal to or implied by some output of self.
-
-        Self does not imply other if any despite of other
-        is not equal to or implied by some despite or input of self.
-        """
-
-        despite_or_input = (*self.despite, *self.inputs)
-
-        relations = (
-            Relation(other.outputs, self.outputs, operator.le),
-            Relation(other.inputs, self.inputs, operator.le),
-            Relation(other.despite, despite_or_input, operator.le),
-        )
-
-        return bool(self.all_relation_matches(relations))
-
-    def all_relation_matches(
-        self, relations: Tuple[Relation, ...]
-    ) -> List[Dict[Factor, Optional[Factor]]]:
-        matchlist = [{}]
-        for relation in relations:
-            new_matchlist = []
-            for matches in matchlist:
-                for answer in self.compare_factors(
-                    matches,
-                    list(relation.need_matches),
-                    relation.available,
-                    relation.comparison,
-                ):
-                    new_matchlist.append(dict(answer))
-            matchlist = new_matchlist
-        return matchlist
-
-    def __len__(self):
-        """
-        Returns the number of context factors that need to be specified for the procedure.
-        """
-
-        return len(self.generic_factors)
-
-    def __repr__(self):
-        return (
-            f"{self.__class__.__name__}(outputs=("
-            + f"{', '.join(repr(factor) for factor in self.outputs)}), "
-            + f"inputs=({', '.join(repr(factor) for factor in self.inputs)}), "
-            + f"despite=({', '.join(repr(factor) for factor in self.despite)}))"
-        )
-
-    def __str__(self):
-        text = "Procedure:"
-        if self.inputs:
-            text += "\nSupporting inputs:"
-            for f in self.inputs:
-                text += "\n" + str(f)
-        if self.despite:
-            text += "\nDespite:"
-            for f in self.despite:
-                text += "\n" + str(f)
-        if self.outputs:
-            text += "\nOutputs:"
-            for f in self.outputs:
-                text += "\n" + str(f)
-        return text
-
-    @property
-    def context_factor_names(self):
-        return ("outputs", "inputs", "despite")
-
-    def contradiction_between_outputs(
-        self, other: "Procedure", m: Tuple[int, ...]
-    ) -> bool:
-        """
-        Returns a boolean indicating if any factor assignment can be found that
-        makes a factor in the output of other contradict a factor in the
-        output of self.
-        """
-        return any(
-            other_factor.contradicts(self_factor)
-            and (
-                check_entity_consistency(other_factor, self_factor, m)
-                for self_factor in self.outputs
-            )
-            for other_factor in other.outputs
-            for self_factor in self.outputs
-        )
-
     def factors_all(self) -> List[Factor]:
         """Returns a set of all factors."""
 
@@ -328,7 +356,7 @@ class Procedure(Factor):
             }
         )
 
-    def contradicts_some_to_all(self, other: "Procedure") -> bool:
+    def contradicts_some_to_all(self, other: Procedure) -> bool:
         """
         Tests whether the assertion that self applies in SOME cases
         contradicts that the procedure "other" applies in ALL cases,
@@ -488,7 +516,7 @@ class Procedure(Factor):
             if get_foreign_match(match) is not None
         ]
 
-    def contradicts(self, other):
+    def contradicts(self, other) -> None:
         raise NotImplementedError(
             "Procedures do not contradict one another unless one of them ",
             "applies in 'ALL' cases. Consider using the ",
@@ -584,7 +612,7 @@ class ProceduralRule(Rule):
     procedure (Procedure): optional because a holding can contain
     an attribution instead of a holding
 
-    enactments (Union[Enactment, Iterable[Enactment]]): the set of
+    enactments (Union[Enactment, Iterable[Enactment]]): the
     enactments cited as authority for the holding
 
     enactments_despite (Union[Enactment, Iterable[Enactment]]):
