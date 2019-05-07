@@ -257,7 +257,9 @@ def watt_factor(make_predicate, make_entity, watt_mentioned) -> Dict[str, Factor
         "f8_meters": Fact(p["p8_meters"], (0, 2), case_factors=c),
         "f9_absent": Fact(p["p9"], absent=True, case_factors=c),
         "f9_absent_miles": Fact(p["p9_miles"], absent=True, case_factors=c),
-        "f9_more_swap_entities": Fact(p["p9_more"], (make_entity["circus"], make_entity["motel"]), case_factors=c),
+        "f9_more_swap_entities": Fact(
+            p["p9_more"], (make_entity["circus"], make_entity["motel"]), case_factors=c
+        ),
         "f9_swap_entities": Fact(p["p9"], (0, 2), case_factors=c),
         "f9_swap_entities_4": Fact(p["p9"], (1, 4), case_factors=c),
         "f10_absent": Fact(p["p10"], (2, 0), absent=True, case_factors=c),
@@ -482,13 +484,11 @@ def make_evidence(
 def make_code() -> Dict[str, Code]:
     return {
         "const": Code("constitution.xml"),
-
         # USC Title 17 in USLM format
         "usc17": Code("usc17.xml"),
-
         # one section of the 2012 edition of CFR Title 37 from govinfo.gov
         "cfr37": Code("cfr37.xml"),
-            }
+    }
 
 
 @pytest.fixture(scope="module")
@@ -669,13 +669,9 @@ def make_procedure(make_evidence, make_factor, watt_factor) -> Dict[str, Procedu
             inputs=(f["f3"], f["f11"], f["f12"], f["f15"]),
             despite=(f["f16"]),
         ),
-        "c_output_distance_less": Procedure(
-            outputs=(f["f9"]),
-            inputs=(f["f1"])
-        ),
+        "c_output_distance_less": Procedure(outputs=(f["f9"]), inputs=(f["f1"])),
         "c_output_distance_more": Procedure(
-            outputs=(f["f9_more_swap_entities"]),
-            inputs=(f["f1"])
+            outputs=(f["f9_more_swap_entities"]), inputs=(f["f1"])
         ),
     }
 
@@ -936,7 +932,9 @@ def make_holding(make_procedure, make_enactment) -> Dict[str, ProceduralRule]:
         "h_far_means_no_curtilage_ALL": ProceduralRule(
             c["c_far_means_no_curtilage"], enactments=e["search_clause"], universal=True
         ),
-        "h_output_distance_less": ProceduralRule(c["c_output_distance_less"], universal=True, mandatory=True),
+        "h_output_distance_less": ProceduralRule(
+            c["c_output_distance_less"], universal=True, mandatory=True
+        ),
         "h_output_distance_more": ProceduralRule(c["c_output_distance_more"]),
     }
 
@@ -952,12 +950,13 @@ def make_opinion(make_entity) -> Dict[str, Opinion]:
             opinions[f"{case}_{opinion.position}"] = opinion
     return opinions
 
+
 @pytest.fixture(scope="class")
 def make_opinion_with_holding() -> Dict[str, Opinion]:
     test_cases = ("brad", "cardenas", "lotus", "watt", "oracle")
     opinions = {}
     for case in test_cases:
-        opinion = Opinion.from_file(f'{case}_h.json')
-        opinion = opinion.exposit(f'holding_{case}.json')
+        opinion = Opinion.from_file(f"{case}_h.json")
+        opinion = opinion.exposit(f"holding_{case}.json")
         opinions[f"{case}_majority"] = opinion
     return opinions

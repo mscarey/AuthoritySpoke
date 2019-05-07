@@ -356,8 +356,12 @@ class TestRules:
         "the distance between {circus} and a parking area used by personnel
         and patrons of {Hideaway Lodge} was > 5 feet"
         """
-        assert not make_holding["h_output_distance_less"].contradicts(make_holding["h_output_distance_more"])
-
+        assert not make_holding["h_output_distance_less"].contradicts(
+            make_holding["h_output_distance_more"]
+        )
+        assert not make_holding["h_output_distance_more"].contradicts(
+            make_holding["h_output_distance_less"]
+        )
 
     def test_contradicts_if_valid_all_vs_all(self, make_holding):
 

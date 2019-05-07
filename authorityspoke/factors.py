@@ -960,10 +960,10 @@ class Pleading(Factor):
     generic: bool = False
 
     @property
-    def context_factor_names(self) -> Tuple[Optional["Entity"]]:
+    def context_factor_names(self) -> Tuple[str]:
         return ("filer",)
 
-    def _equal_if_concrete(self, other: "Pleading") -> bool:
+    def _equal_if_concrete(self, other: Pleading) -> bool:
         if self.date != other.date:
             return False
         return super()._equal_if_concrete(other)
@@ -971,7 +971,7 @@ class Pleading(Factor):
     def __eq__(self, other: Factor) -> bool:
         return super.__eq__(other)
 
-    def _implies_if_concrete(self, other: "Pleading"):
+    def _implies_if_concrete(self, other: Pleading):
         # TODO: allow the same kind of comparisons as Predicate.quantity
         if self.date != other.date:
             return False
@@ -1039,7 +1039,7 @@ class Exhibit(Factor):
     def context_factor_names(self) -> Tuple[str, ...]:
         return ("statement", "stated_by")
 
-    def _equal_if_concrete(self, other: "Pleading") -> bool:
+    def _equal_if_concrete(self, other: Exhibit) -> bool:
         if self.form != other.form:
             return False
         return super()._equal_if_concrete(other)
@@ -1047,7 +1047,7 @@ class Exhibit(Factor):
     def __eq__(self, other: Factor) -> bool:
         return super().__eq__(other)
 
-    def _implies_if_concrete(self, other: "Exhibit"):
+    def _implies_if_concrete(self, other: Exhibit):
 
         if not (self.form == other.form or other.form is None):
             return False

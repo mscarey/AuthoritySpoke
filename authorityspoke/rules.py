@@ -260,7 +260,7 @@ class Procedure(Factor):
         return ("outputs", "inputs", "despite")
 
     def contradiction_between_outputs(
-        self, other: Procedure, m: Tuple[int, ...]
+        self, other: Procedure, match: Dict[Factor, Factor]
     ) -> bool:
         """
         .. note::
@@ -280,7 +280,9 @@ class Procedure(Factor):
         for other_factor in other.outputs:
             for self_factor in self.outputs:
                 if other_factor.contradicts(self_factor):
-                    return True
+                    generic_pairs = zip(self_factor.generic_factors, other_factor.generic_factors)
+                    if all(match.get(pair[0]) == pair[1] for pair in generic_pairs):
+                        return True
         return False
 
     def __eq__(self, other: Procedure) -> bool:
@@ -464,7 +466,8 @@ class Procedure(Factor):
         other_factors: Tuple[Factor],
         matches: Dict[Factor, Factor],
     ):
-        """Determines whether unassigned context factors can
+        """
+        Determines whether unassigned context factors can
         be assigned in such a way that there's no contradiction
         between any factor in self_factors and other_factors,
         given that some factors have already been assigned as
@@ -476,7 +479,8 @@ class Procedure(Factor):
         possible to make the contexts not match?
 
         Does Factor: None in matches always mean that Factor
-        can avoid being matched in a contradictory way?"""
+        can avoid being matched in a contradictory way?
+        """
 
         for self_factor in self_factors:
             for other_factor in other_factors:
