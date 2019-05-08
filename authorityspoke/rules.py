@@ -35,12 +35,65 @@ class Relation(NamedTuple):
     :param comparison:
         a function defining the comparison that must be ``True``
         between each :attr:`need_matches` and some :attr:`available`
-        for the relation to hold.
+        for the relation to hold. Could be :meth:`Factor.means` or
+        :meth:`Factor.__ge__`.
     """
 
     need_matches: Tuple[Factor, ...]
     available: Tuple[Factor, ...]
     comparison: Callable
+
+    def compare_factors(
+        self, matches: Dict[Factor, Factor], still_need_matches: List[Factor]
+    ) -> Iterator[Dict[Factor, Optional[Factor]]]:
+        """
+        :param matches:
+            a mapping of :class:`Factor`\s that have already been matched
+            to each other in the recursive search for a complete group of
+            matches. Starts empty when the method is first called.
+
+        :param still_need_matches:
+            :class:`.Factor`\s that need to satisfy the comparison
+            :attr:`comparison` with some factor of :attr:`available`
+            for the relation to hold, and have not yet been matched.
+
+        :returns:
+            Whether all factors in ``need_matches`` have the
+            relation ``comparison`` with a :class:`Factor` in
+            ``available_for_matching``, with matching entity slots.
+        """
+
+        if not still_need_matches:
+            # This seems to allow duplicate values in
+            # Procedure.output, .input, and .despite, but not in
+            # attributes of other kinds of Factors. Likely cause
+            # of bugs.
+            yield matches
+        else:
+            self_factor = still_need_matches.pop()
+            for other_factor in self.available:
+                if self.comparison(self_factor, other_factor):
+                    updated_mappings = iter(
+                        Factor.update_mapping(
+                            matches, (self_factor,), (other_factor,), self.comparison
+                        )
+                    )
+                    for new_matches in updated_mappings:
+                        if new_matches:
+                            next_steps = iter(
+                                self.compare_factors(new_matches, still_need_matches)
+                            )
+                            for next_step in next_steps:
+                                yield next_step
+
+    def update_matchlist(
+        self, matchlist: List[Dict[Factor, Factor]]
+    ) -> List[Dict[Factor, Optional[Factor]]]:
+        new_matchlist = []
+        for matches in matchlist:
+            for answer in self.compare_factors(matches, list(self.need_matches)):
+                new_matchlist.append(dict(answer))
+        return new_matchlist
 
 
 @dataclass(frozen=True)
@@ -120,76 +173,8 @@ class Procedure(Factor):
     ) -> List[Dict[Factor, Optional[Factor]]]:
         matchlist = [{}]
         for relation in relations:
-            new_matchlist = []
-            for matches in matchlist:
-                for answer in self.compare_factors(
-                    matches,
-                    list(relation.need_matches),
-                    relation.available,
-                    relation.comparison,
-                ):
-                    new_matchlist.append(dict(answer))
-            matchlist = new_matchlist
+            matchlist = relation.update_matchlist(matchlist)
         return matchlist
-
-    def compare_factors(
-        self,
-        matches: Dict[Factor, Factor],
-        need_matches: List[Factor],
-        available_for_matching: Tuple[Factor, ...],
-        comparison: Callable,
-    ) -> Iterator[Dict[Factor, Optional[Factor]]]:
-        """
-        :param matches:
-            a mapping of :class:`Factor`\s that have already been matched
-            to each other in the recursive search for a complete group of
-            matches. Starts empty when the method is first called.
-
-        :param need_matches:
-            :class:`Factor`\s that have not yet been matched to any
-            :class:`Factor` in the other :class:`Procedure`.
-
-        :param available_for_matching:
-            :class:`Factor`\s from the other :class:`Procedure` that
-            could be matched to :class:`Factor`\s from ``need_matches``
-
-        :param comparison:
-            The relationship that two :class:`Factor`\s need to have
-            for them to match. Could be equality or implication.
-
-        :returns:
-            Whether all factors in ``need_matches`` have the
-            relation ``comparison`` with a :class:`Factor` in
-            ``available_for_matching``, with matching entity slots.
-        """
-
-        if not need_matches:
-            # This seems to allow duplicate values in
-            # Procedure.output, .input, and .despite, but not in
-            # attributes of other kinds of Factors. Likely cause
-            # of bugs.
-            yield matches
-        else:
-            self_factor = need_matches.pop()
-            for other_factor in available_for_matching:
-                if comparison(self_factor, other_factor):
-                    updated_mappings = iter(
-                        self._update_mapping(
-                            matches, (self_factor,), (other_factor,), comparison
-                        )
-                    )
-                    for new_matches in updated_mappings:
-                        if new_matches:
-                            next_steps = iter(
-                                self.compare_factors(
-                                    new_matches,
-                                    need_matches,
-                                    available_for_matching,
-                                    comparison,
-                                )
-                            )
-                            for next_step in next_steps:
-                                yield next_step
 
     def _implies_if_present(self, other: Factor) -> bool:
         """
@@ -301,27 +286,24 @@ class Procedure(Factor):
         groups = ("outputs", "inputs", "despite")
         matchlist = [{}]
         for group in groups:
-            new_matchlist = []
-            for matches in matchlist:
-                for answer in self.compare_factors(
-                    matches, list(self.__dict__[group]), other.__dict__[group], means
-                ):
-                    new_matchlist.append(answer)
-            matchlist = new_matchlist
-
+            updater = Relation(
+                need_matches=self.__dict__[group],
+                available=other.__dict__[group],
+                comparison=means,
+            )
+            matchlist = updater.update_matchlist(matchlist)
         if not bool(matchlist):
             return False
 
         # Now doing the same thing in reverse
         matchlist = [{}]
         for group in groups:
-            new_matchlist = []
-            for matches in matchlist:
-                for answer in self.compare_factors(
-                    matches, list(other.__dict__[group]), self.__dict__[group], means
-                ):
-                    new_matchlist.append(answer)
-            matchlist = new_matchlist
+            updater = Relation(
+                need_matches=other.__dict__[group],
+                available=self.__dict__[group],
+                comparison=means,
+            )
+            matchlist = updater.update_matchlist(matchlist)
         return bool(matchlist)
 
     def factors_all(self) -> List[Factor]:
@@ -686,7 +668,7 @@ class ProceduralRule(Rule):
     @classmethod
     def from_dict(
         cls, record: Dict, context_list: List[Factor]
-    ) -> Tuple["ProceduralRule", List[Factor]]:
+    ) -> Tuple[ProceduralRule, List[Factor]]:
         def list_from_records(
             record_list: Union[Dict[str, str], List[Dict[str, str]]],
             context_list: List[Factor],

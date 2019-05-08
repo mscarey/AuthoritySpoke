@@ -247,7 +247,7 @@ class Factor(ABC):
         elif self.generic or other.generic:
             yield {self: other, other: self}
         else:
-            for registry in self._update_mapping(
+            for registry in self.update_mapping(
                 {}, self.context_factors, other.context_factors, comparison
             ):
                 yield registry
@@ -538,8 +538,9 @@ class Factor(ABC):
                     self_mapping[in_value] = in_key
         return self_mapping
 
-    def _update_mapping(
-        self,
+    @classmethod
+    def update_mapping(
+        cls,
         self_mapping: Dict[Factor, Factor],
         self_factors: Tuple[Factor],
         other_factors: Tuple[Factor],
@@ -575,8 +576,8 @@ class Factor(ABC):
 
         new_mapping_choices = [self_mapping]
 
-        self_factors = self._wrap_with_tuple(self_factors)
-        other_factors = self._wrap_with_tuple(other_factors)
+        self_factors = cls._wrap_with_tuple(self_factors)
+        other_factors = cls._wrap_with_tuple(other_factors)
 
         # why am I allowing the __len__s to be different?
         shortest = min(len(self_factors), len(other_factors))
@@ -605,7 +606,7 @@ class Factor(ABC):
                         for transposed_register in self_factors[
                             index
                         ]._registers_for_interchangeable_context(incoming_register):
-                            updated_mapping = self._import_to_mapping(
+                            updated_mapping = cls._import_to_mapping(
                                 mapping, transposed_register
                             )
                             if updated_mapping not in new_mapping_choices:

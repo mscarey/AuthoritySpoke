@@ -481,8 +481,8 @@ class TestFacts:
         left = make_factor["f_irrelevant_3"]
         right = make_factor["f_irrelevant_3_new_context"]
         e = make_entity
-        easy_update = left._update_mapping({e["dan"]: e["craig"]}, left, right, means)
-        harder_update = left._update_mapping(
+        easy_update = left.update_mapping({e["dan"]: e["craig"]}, left, right, means)
+        harder_update = left.update_mapping(
             {
                 e["alice"]: e["bob"],
                 e["bob"]: e["alice"],
@@ -498,7 +498,7 @@ class TestFacts:
         assert any(register is not None for register in harder_update)
 
     def test_check_entity_consistency_false(self, make_entity, make_factor):
-        update = make_factor["f_irrelevant_3"]._update_mapping(
+        update = make_factor["f_irrelevant_3"].update_mapping(
             {make_entity["circus"]: make_entity["alice"]},
             make_factor["f_irrelevant_3"],
             make_factor["f_irrelevant_3_new_context"],
@@ -508,7 +508,7 @@ class TestFacts:
 
     def test_entity_consistency_identity_not_equality(self, make_entity, make_factor):
 
-        update = make_factor["f_irrelevant_3"]._update_mapping(
+        update = make_factor["f_irrelevant_3"].update_mapping(
             {make_entity["dan"]: make_entity["dan"]},
             make_factor["f_irrelevant_3"],
             make_factor["f_irrelevant_3_new_context"],
@@ -524,7 +524,7 @@ class TestFacts:
         instead of .gt. The comparison would just return False.
         """
         m = make_factor
-        update = make_factor["f_irrelevant_3"]._update_mapping(
+        update = make_factor["f_irrelevant_3"].update_mapping(
             {make_entity["dan"]: make_entity["dan"]},
             m["f_irrelevant_3"],
             make_predicate["p2"],
