@@ -64,19 +64,6 @@ class TestProcedures:
             make_evidence["crime_absent"],
         }
 
-    def test_sorted_factors_from_procedure(self, watt_factor, make_procedure):
-        """The factors_sorted method sorts them alphabetically by __repr__."""
-        f = watt_factor
-        assert make_procedure["c2"].factors_sorted() == [
-            f["f9"],
-            f["f7"],
-            f["f8"],
-            f["f5"],
-            f["f6"],
-            f["f4"],
-            f["f10"],
-        ]
-
     def test_entities_of_inputs_for_identical_procedure(
         self, watt_factor, make_procedure, watt_mentioned
     ):

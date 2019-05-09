@@ -69,6 +69,7 @@ class Procedure(Factor):
     name: Optional[str] = None
     absent: bool = False
     generic: bool = False
+    context_factor_names: ClassVar = ("outputs", "inputs", "despite")
 
     def __post_init__(self):
         outputs = self.__class__._wrap_with_tuple(self.outputs)
@@ -85,9 +86,22 @@ class Procedure(Factor):
                     )
             object.__setattr__(self, group, groups[group])
 
+    @staticmethod
     def all_relation_matches(
-        self, relations: Tuple[Relation, ...]
+        relations: Tuple[Relation, ...]
     ) -> List[Dict[Factor, Optional[Factor]]]:
+        """
+        :param relations:
+            a series of :class:`.Relation` comparisons in which
+            the ``need_matches`` :class:`.Factor`\s all refer to
+            one context (for instance, the same :class:`.Opinion`),
+            and the ``available`` :class:`.Factor`\s all refer to
+            another context.
+
+        :returns:
+            a list of all context registers consistent with all of the
+            :class:`.Relation`\s.
+        """
         matchlist = [{}]
         for relation in relations:
             matchlist = relation.update_matchlist(matchlist)
@@ -127,8 +141,9 @@ class Procedure(Factor):
 
     def __len__(self):
         """
-        Returns the number of context :class:`Factor`\s that need to be
-        specified for this :class:`Procedure`.
+        :returns:
+            the number of context :class:`Factor`\s that need to be
+            specified for this :class:`Procedure`.
         """
 
         return len(self.generic_factors)
@@ -157,25 +172,23 @@ class Procedure(Factor):
                 text += "\n" + str(f)
         return text
 
-    @property
-    def context_factor_names(self):
-        return ("outputs", "inputs", "despite")
-
     def contradiction_between_outputs(
-        self, other: Procedure, match: Dict[Factor, Factor]
+        self, other: Procedure, matches: Dict[Factor, Factor]
     ) -> bool:
         """
-        .. note::
-            Doesn't the comparison between generic_factors here
-            repeat something that should have been reused from
-            elsewhere?
-            And don't these generic factors need to be turned
-            concrete before they can be compared?
+        :param other:
+            another :class:`Factor`
+
+        :param matches:
+            keys representing :class:`.Factor`\s in ``self`` and
+            values representing :class:`.Factor`\s in ``other``. The
+            keys and values have been found in corresponding positions
+            in ``self`` and ``other``.
 
         :returns:
-            whether any factor assignment can be found that
-            makes a factor in the output of other contradict a factor in the
-            output of self.
+            whether any :class:`Factor` assignment can be found that
+            makes a :class:`Factor` in the output of ``other`` contradict
+            a :class:`Factor` in the output of ``self``.
         """
         for other_factor in other.outputs:
             for self_factor in self.outputs:
@@ -183,7 +196,7 @@ class Procedure(Factor):
                     generic_pairs = zip(
                         self_factor.generic_factors, other_factor.generic_factors
                     )
-                    if all(match.get(pair[0]) == pair[1] for pair in generic_pairs):
+                    if all(matches.get(pair[0]) == pair[1] for pair in generic_pairs):
                         return True
         return False
 
@@ -224,18 +237,13 @@ class Procedure(Factor):
         return bool(matchlist)
 
     def factors_all(self) -> List[Factor]:
-        """Returns a set of all factors."""
+        """
+        :returns:
+            a :class:`list` of all :class:`.Factor`\s."""
 
         inputs = self.inputs or ()
         despite = self.despite or ()
         return [*self.outputs, *inputs, *despite]
-
-    def factors_sorted(self) -> List[Factor]:
-        """Sorts the procedure's factors into an order that will always be
-        the same for the same set of factors, but that doesn't correspond to
-        whether the factors are inputs, outputs, or "even if" factors."""
-
-        return sorted(self.factors_all(), key=repr)
 
     @property
     def generic_factors(self) -> List[Optional[Factor]]:

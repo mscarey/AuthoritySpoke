@@ -17,6 +17,3 @@
 .. autoclass:: authorityspoke.rules.ProceduralRule
     :members:
     :special-members:
-
-.. autoclass:: authorityspoke.rules.Relation
-    :members:
