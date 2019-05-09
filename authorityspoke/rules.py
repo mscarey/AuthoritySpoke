@@ -86,63 +86,10 @@ class Procedure(Factor):
                     )
             object.__setattr__(self, group, groups[group])
 
-    @staticmethod
-    def all_relation_matches(
-        relations: Tuple[Relation, ...]
-    ) -> List[Dict[Factor, Optional[Factor]]]:
-        """
-        :param relations:
-            a series of :class:`.Relation` comparisons in which
-            the ``need_matches`` :class:`.Factor`\s all refer to
-            one context (for instance, the same :class:`.Opinion`),
-            and the ``available`` :class:`.Factor`\s all refer to
-            another context.
-
-        :returns:
-            a list of all context registers consistent with all of the
-            :class:`.Relation`\s.
-        """
-        matchlist = [{}]
-        for relation in relations:
-            matchlist = relation.update_matchlist(matchlist)
-        return matchlist
-
-    def _implies_if_present(self, other: Factor) -> bool:
-        """
-        When ``self`` and ``other`` are included in
-        :class:`Rule`\s that both apply in **some** cases:
-
-        ``self`` does not imply ``other`` if any input of ``other``
-        is not equal to or implied by some input of ``self``.
-
-        ``self`` does not imply ``other`` if any output of ``other``
-        is not equal to or implied by some output of self.
-
-        ``self`` does not imply ``other`` if any despite of ``other``
-        is not equal to or implied by some despite or input of ``self``.
-
-        :param other: another :class:`Procedure`
-
-        :returns:
-            whether the assertion that ``self`` applies in some cases
-            implies that the :class:`Procedure` ``other`` applies
-            in some cases.
-        """
-
-        despite_or_input = (*self.despite, *self.inputs)
-
-        relations = (
-            Relation(other.outputs, self.outputs, operator.le),
-            Relation(other.inputs, self.inputs, operator.le),
-            Relation(other.despite, despite_or_input, operator.le),
-        )
-
-        return bool(self.all_relation_matches(relations))
-
     def __len__(self):
         """
         :returns:
-            the number of context :class:`Factor`\s that need to be
+            the number of generic :class:`Factor`\s that need to be
             specified for this :class:`Procedure`.
         """
 
@@ -172,6 +119,77 @@ class Procedure(Factor):
                 text += "\n" + str(f)
         return text
 
+    @property
+    def factors_all(self) -> List[Factor]:
+        """
+        :returns:
+            a :class:`list` of all :class:`.Factor`\s."""
+
+        inputs = self.inputs or ()
+        despite = self.despite or ()
+        return [*self.outputs, *inputs, *despite]
+
+    @property
+    def generic_factors(self) -> List[Optional[Factor]]:
+        """
+        :returns:
+            ``self``'s generic :class:`Factor`s,
+            which must be matched to other generic :class:`Factor`s to
+            perform equality or implication tests between :class:`Factor`s
+            with :meth:`Factor.means` or :meth:`Factor.__ge__`.
+        """
+        if self.generic:
+            return [self]
+        return list(
+            {
+                generic: None
+                for factor in self.factors_all
+                for generic in factor.generic_factors
+            }
+        )
+
+    def consistent_factor_groups(
+        self,
+        self_factors: Tuple[Factor],
+        other_factors: Tuple[Factor],
+        matches: Dict[Factor, Factor],
+    ):
+        """
+        Works by first determining whether one :class:`Factor`
+        potentially :meth:`~.Factor.contradicts` another,
+        and then determining whether it's possible to make
+        context assignments match between the contradictory
+        :class:`Factor`\s.
+
+        .. Note::
+            Does ``Factor: None`` in matches always mean that
+            the :class:`.Factor` can avoid being matched in a
+            contradictory way?
+
+        :returns:
+            whether unassigned context factors can be assigned in such
+            a way that there's no contradiction between any factor in
+            ``self_factors`` and ``other_factors``, given that some
+            :class:`Factor`\s have already been assigned as
+            described by ``matches``.
+        """
+
+        for self_factor in self_factors:
+            for other_factor in other_factors:
+                if self_factor.contradicts(other_factor):
+                    if all(
+                        all(
+                            matches.get(key) == context_register[key]
+                            or matches.get(context_register[key] == key)
+                            for key in self_factor.generic_factors
+                        )
+                        for context_register in self_factor._context_registers(
+                            other_factor, means
+                        )
+                    ):
+                        return False
+        return True
+
     def contradiction_between_outputs(
         self, other: Procedure, matches: Dict[Factor, Factor]
     ) -> bool:
@@ -200,11 +218,147 @@ class Procedure(Factor):
                         return True
         return False
 
+    def contradicts(self, other) -> None:
+        raise NotImplementedError(
+            "Procedures do not contradict one another unless one of them ",
+            "applies in 'ALL' cases. Consider using the ",
+            "'contradicts_some_to_all' method.",
+        )
+
+    def contradicts_some_to_all(self, other: Procedure) -> bool:
+        """
+        :returns:
+            whether the assertion that ``self`` applies in
+            **some** cases contradicts that ``other`` applies in **all**
+            cases, where at least one of the :class:``Rules``\s is mandatory.
+        """
+
+        if not isinstance(other, self.__class__):
+            return False
+
+        self_despite_or_input = (*self.despite, *self.inputs)
+
+        # For self to contradict other, every input of other
+        # must be implied by some input or despite factor of self.
+        relations = (Relation(other.inputs, self_despite_or_input, operator.le),)
+        matchlist = self.all_relation_matches(relations)
+
+        # For self to contradict other, some output of other
+        # must be contradicted by some output of self.
+
+        return any(self.contradiction_between_outputs(other, m) for m in matchlist)
+
+    def implies_all_to_all(self, other: Procedure) -> bool:
+        """
+        ``self`` does not imply ``other`` if any output of ``other``
+        is not equal to or implied by some output of ``self``.
+
+        For ``self`` to imply ``other``, every input of ``self``
+        must be implied by some input of ``other``.
+
+        ``self`` does not imply ``other`` if any despite of ``other``
+        :meth:`~.Factor.contradicts` an input of ``self``.
+
+        :returns:
+            whether the assertion that ``self`` applies in **all** cases
+            implies that ``other`` applies in **all** cases.
+        """
+
+        if not isinstance(other, self.__class__):
+            return False
+
+        if self.means(other):
+            return True
+
+        relations = (
+            Relation(other.outputs, self.outputs, operator.le),
+            Relation(self.inputs, other.inputs, operator.le),
+        )
+        matchlist = self.all_relation_matches(relations)
+
+        # For every factor in other, find the permutations of entity slots
+        # that are consistent with matchlist and that don't cause the factor
+        # to contradict any factor of self.
+
+        return any(
+            self.consistent_factor_groups(self.inputs, other.despite, matches)
+            for matches in matchlist
+        )
+
+    def implies_all_to_some(self, other: Procedure) -> bool:
+        """
+        For ``self`` to imply ``other``, every output of ``other``
+        must be equal to or implied by some output of ``self``.
+
+        For ``self`` to imply ``other``, every input of ``self`` must not be
+        contradicted by any input or despite of ``other``.
+
+        ``self`` does not imply ``other`` if any "despite" :class:`.Factor`\s
+        of ``other`` are not implied by inputs of ``self``.
+
+        :returns:
+            whether the assertion that ``self`` applies in **all** cases
+            implies that ``other`` applies in **some** cases (that is, if
+            the list of ``self``'s inputs is not considered an exhaustive list
+            of the circumstances needed to invoke the procedure).
+        """
+
+        if not isinstance(other, self.__class__):
+            return False
+
+        if self.implies_all_to_all(other):
+            return True
+
+        other_despite_or_input = (*other.despite, *other.inputs)
+        self_despite_or_input = (*self.despite, *self.inputs)
+
+        relations = (
+            Relation(other.outputs, self.outputs, operator.le),
+            Relation(other.despite, self_despite_or_input, operator.le),
+        )
+
+        matchlist = self.all_relation_matches(relations)
+
+        return any(
+            self.consistent_factor_groups(self.inputs, other_despite_or_input, matches)
+            for matches in matchlist
+        )
+
+    def _implies_if_present(self, other: Factor) -> bool:
+        """
+        When ``self`` and ``other`` are included in
+        :class:`Rule`\s that both apply in **some** cases:
+
+        ``self`` does not imply ``other`` if any input of ``other``
+        is not equal to or implied by some input of ``self``.
+
+        ``self`` does not imply ``other`` if any output of ``other``
+        is not equal to or implied by some output of self.
+
+        ``self`` does not imply ``other`` if any despite of ``other``
+        is not equal to or implied by some despite or input of ``self``.
+
+        :returns:
+            whether the assertion that ``self`` applies in some cases
+            implies that the :class:`.Procedure` ``other`` applies
+            in some cases.
+        """
+
+        despite_or_input = (*self.despite, *self.inputs)
+
+        relations = (
+            Relation(other.outputs, self.outputs, operator.le),
+            Relation(other.inputs, self.inputs, operator.le),
+            Relation(other.despite, despite_or_input, operator.le),
+        )
+
+        return bool(self.all_relation_matches(relations))
+
     def means(self, other: Procedure) -> bool:
         """
         :returns:
-            whether the two :class:`Procedure`\s have all the same
-            :class:`Factor`\s with the same context factors in the
+            whether the two :class:`.Procedure`\s have all the same
+            :class:`.Factor`\s with the same context factors in the
             same roles.
         """
 
@@ -236,181 +390,59 @@ class Procedure(Factor):
             matchlist = updater.update_matchlist(matchlist)
         return bool(matchlist)
 
-    def factors_all(self) -> List[Factor]:
+    @new_context_helper
+    def new_context(self, changes: Dict[Factor, Factor]) -> Procedure:
         """
+        :param changes:
+            a :class:`dict` of :class:`.Factor`\s to replace
+            matched to the :class:`.Factor`\s that should replace them
+
         :returns:
-            a :class:`list` of all :class:`.Factor`\s."""
-
-        inputs = self.inputs or ()
-        despite = self.despite or ()
-        return [*self.outputs, *inputs, *despite]
-
-    @property
-    def generic_factors(self) -> List[Optional[Factor]]:
+            new :class:`.Procedure` object, replacing keys of
+            ``changes`` with their values.
         """
+        new_dict = self.__dict__.copy()
+        for name in self.context_factor_names:
+            new_dict[name] = tuple(
+                [factor.new_context(changes) for factor in new_dict[name]]
+            )
+        return self.__class__(**new_dict)
+
+    @staticmethod
+    def all_relation_matches(
+        relations: Tuple[Relation, ...]
+    ) -> List[Dict[Factor, Optional[Factor]]]:
+        """
+        :param relations:
+            a series of :class:`.Relation` comparisons in which
+            the ``need_matches`` :class:`.Factor`\s all refer to
+            one context (for instance, the same :class:`.Opinion`),
+            and the ``available`` :class:`.Factor`\s all refer to
+            another context.
+
         :returns:
-            ``self``'s generic :class:`Factor`s,
-            which must be matched to other generic :class:`Factor`s to
-            perform equality or implication tests between :class:`Factor`s
-            with :meth:`Factor.means` or :meth:`Factor.__ge__`.
+            a list of all context registers consistent with all of the
+            :class:`.Relation`\s.
         """
-        if self.generic:
-            return [self]
-        return list({
-                generic: None
-                for factor in self.factors_all()
-                for generic in factor.generic_factors
-            })
+        matchlist = [{}]
+        for relation in relations:
+            matchlist = relation.update_matchlist(matchlist)
+        return matchlist
 
-    def contradicts_some_to_all(self, other: Procedure) -> bool:
-        """
-        Tests whether the assertion that self applies in SOME cases
-        contradicts that the procedure "other" applies in ALL cases,
-        where at least one of the holdings is mandatory.
-
-        :param other:
-        """
-
-        if not isinstance(other, self.__class__):
-            return False
-
-        self_despite_or_input = (*self.despite, *self.inputs)
-
-        # For self to contradict other, every input of other
-        # must be implied by some input or despite factor of self.
-        relations = (Relation(other.inputs, self_despite_or_input, operator.le),)
-        matchlist = self.all_relation_matches(relations)
-
-        # For self to contradict other, some output of other
-        # must be contradicted by some output of self.
-
-        return any(self.contradiction_between_outputs(other, m) for m in matchlist)
-
-    def implies_all_to_all(self, other: "Procedure") -> bool:
-        """
-        Tests whether the assertion that self applies in ALL cases
-        implies that the procedure "other" applies in ALL cases.
-
-        Self does not imply other if any output of other
-        is not equal to or implied by some output of self.
-
-        For self to imply other, every input of self
-        must be implied by some input of other.
-
-        Self does not imply other if any despite of other
-        contradicts an input of self.
-
-        :param other:
-        """
-
-        if not isinstance(other, self.__class__):
-            return False
-
-        if self.means(other):
-            return True
-
-        relations = (
-            Relation(other.outputs, self.outputs, operator.le),
-            Relation(self.inputs, other.inputs, operator.le),
-        )
-        matchlist = self.all_relation_matches(relations)
-
-        # For every factor in other, find the permutations of entity slots
-        # that are consistent with matchlist and that don't cause the factor
-        # to contradict any factor of self.
-
-        return any(
-            self.consistent_factor_groups(self.inputs, other.despite, matches)
-            for matches in matchlist
-        )
-
-    def implies_all_to_some(self, other: "Procedure") -> bool:
-        """
-        This is a different process for checking whether one procedure implies another,
-        used when the list of self's inputs is considered an exhaustive list of the
-        circumstances needed to invoke the procedure (i.e. when the rule "always" applies
-        when the inputs are present), but the list of other's inputs is not exhaustive.
-
-        For self to imply other, every output of other
-        must be equal to or implied by some output of self.
-
-        For self to imply other, every input of self must not be
-        contradicted by any input or despite of other.
-
-        Self does not imply other if any despite factors of other
-        are not implied by inputs of self.
-
-        :param other:
-        """
-
-        if not isinstance(other, self.__class__):
-            return False
-
-        if self.implies_all_to_all(other):
-            return True
-
-        other_despite_or_input = (*other.despite, *other.inputs)
-        self_despite_or_input = (*self.despite, *self.inputs)
-
-        relations = (
-            Relation(other.outputs, self.outputs, operator.le),
-            Relation(other.despite, self_despite_or_input, operator.le),
-        )
-
-        matchlist = self.all_relation_matches(relations)
-
-        return any(
-            self.consistent_factor_groups(self.inputs, other_despite_or_input, matches)
-            for matches in matchlist
-        )
-
-    def consistent_factor_groups(
-        self,
-        self_factors: Tuple[Factor],
-        other_factors: Tuple[Factor],
-        matches: Dict[Factor, Factor],
-    ):
-        """
-        Determines whether unassigned context factors can
-        be assigned in such a way that there's no contradiction
-        between any factor in self_factors and other_factors,
-        given that some factors have already been assigned as
-        described by matches.
-
-        Try first determining whether one factor can contradict
-        another (imply the absence of the other given matching
-        context assignments), and then determine whether it's
-        possible to make the contexts not match?
-
-        Does Factor: None in matches always mean that Factor
-        can avoid being matched in a contradictory way?
-        """
-
-        for self_factor in self_factors:
-            for other_factor in other_factors:
-                if self_factor.contradicts(other_factor):
-                    if all(
-                        all(
-                            matches.get(key) == context_register[key]
-                            or matches.get(context_register[key] == key)
-                            for key in self_factor.generic_factors
-                        )
-                        for context_register in self_factor._context_registers(
-                            other_factor, means
-                        )
-                    ):
-                        return False
-        return True
-
+    @staticmethod
     def get_foreign_match_list(
-        self, foreign: List[Dict[Factor, Factor]]
+        foreign: List[Dict[Factor, Factor]]
     ) -> List[Dict[Factor, Factor]]:
-        """Gets a version of matchlist in which the indices represent
-        other's entity slots and the values represent self's entity slots.
+        """
+        Compare this to the regular ``matchlist`` objects, in
+        which the indices represent self's entity slots and the
+        values represent other's.
 
-        Compare this to the regular matchlist objects, in which the
-        indices represent self's entity slots and the values represent
-        other's."""  # TODO: docstring
+        :returns:
+            a version of ``matchlist`` in which the indices
+            represent ``foreign``'s entity slots and the values
+            represent ``self``'s entity slots.
+        """
 
         def get_foreign_match(
             match: Dict[Factor, Factor]
@@ -424,29 +456,6 @@ class Procedure(Factor):
             if get_foreign_match(match) is not None
         ]
 
-    def contradicts(self, other) -> None:
-        raise NotImplementedError(
-            "Procedures do not contradict one another unless one of them ",
-            "applies in 'ALL' cases. Consider using the ",
-            "'contradicts_some_to_all' method.",
-        )
-
-    @new_context_helper
-    def new_context(
-        self, changes: Union[List[Factor], Dict[Factor, Factor]]
-    ) -> Procedure:
-        """
-        Creates new Procedure object, converting "changes" from a List
-        to a Dict if needed, and replacing keys of "changes" with their
-        values.
-        """
-        new_dict = self.__dict__.copy()
-        for name in self.context_factor_names:
-            new_dict[name] = tuple(
-                [factor.new_context(changes) for factor in new_dict[name]]
-            )
-        return self.__class__(**new_dict)
-
 
 @dataclass(frozen=True)
 class Rule(Factor):
@@ -455,20 +464,30 @@ class Rule(Factor):
     deciding some aspect of the current litigation but also potentially
     binding future courts to follow the rule. When holdings appear in
     judicial opinions they are often hypothetical and don't necessarily
-    imply that the court accepts the factual assertions or other factors
-    that make up the inputs or outputs of the procedure mentioned in the
-    holding.
+    imply that the court accepts the :class:`.Fact` assertions or other
+    :class:`Factor`\s that make up the inputs or outputs of the
+    :class:`Procedure` mentioned in the rule.
     """
 
     directory = get_directory_path("holdings")
 
     @classmethod
-    def collection_from_dict(cls, case: Dict) -> List["Rule"]:
+    def collection_from_dict(cls, case: Dict) -> List[Rule]:
+        """
+        :param case:
+            a :class:`dict` derived from the JSON format that
+            lists ``mentioned_entities`` followed by a
+            series of :class:`Rule`\s
+        :returns:
+            a :class:`list` of :class:`Rule`\s with the items
+            from ``mentioned_entities`` as ``context_factors``
+        """
+
         context_list = case.get("mentioned_factors")
         rule_list = case.get("holdings")
 
         mentioned = cls.get_mentioned_factors(context_list)
-        finished_rules: List["Rule"] = []
+        finished_rules: List[Rule] = []
         for rule in rule_list:
             # This will need to change for Attribution holdings
             finished_rule, mentioned = ProceduralRule.from_dict(rule, mentioned)
@@ -478,14 +497,23 @@ class Rule(Factor):
     @classmethod
     def from_json(
         cls, filename: str, directory: Optional[pathlib.Path] = None
-    ) -> List["Rule"]:
+    ) -> List[Rule]:
         """
-        Creates a list of holdings from a JSON file in the input
-        subdirectory, from a JSON file in the format that lists
-        mentioned_entities followed by a list of holdings.
-        Then returns the list.
+        Does not cause an :class:`.Opinion` to posit the :class:`.Rule`\s
+        as holdings.
 
-        Does not cause an Opinion to posit the Rules as holdings.
+        :param filename:
+            the name of the JSON file to look in for :class:`Rule`
+            data in the format that lists ``mentioned_entities``
+            followed by a list of holdings
+
+        :param directory:
+            the path of the directory containing the JSON file
+
+        :returns:
+            a list of :class:`Rule`\s from a JSON file in the
+            ``example_data/holdings`` subdirectory, from a JSON
+            file.
         """
         if not directory:
             directory = cls.directory
@@ -498,9 +526,10 @@ class Rule(Factor):
         cls, mentioned_list: Optional[List[Dict[str, str]]]
     ) -> List[Factor]:
         """
-        :param mentioned_dict:
-            A dict in the JSON format used in the
-            ``example_data/holdings`` folder.
+        :param mentioned_list:
+            A list of dicts describing context :class:`Factor`\s
+            in the JSON format used in the ``example_data/holdings``
+            folder.
 
         :returns:
             A list of :class:`Factor`\s mentioned in the
@@ -645,14 +674,14 @@ class ProceduralRule(Rule):
         )
 
     @property
+    def despite(self):
+        return self.procedure.despite
+
+    @property
     def generic_factors(self) -> List[Optional[Factor]]:
         if self.generic:
             return [self]
         return self.procedure.generic_factors
-
-    @property
-    def despite(self):
-        return self.procedure.despite
 
     @property
     def inputs(self):
