@@ -79,8 +79,8 @@ class Relation(NamedTuple):
             for other_factor in self.available:
                 if self.comparison(self_factor, other_factor):
                     updated_mappings = iter(
-                        Factor.update_mapping(
-                            matches, (self_factor,), (other_factor,), self.comparison
+                        Factor.update_context_register(
+                            self_factor, other_factor, matches, self.comparison
                         )
                     )
                     for new_matches in updated_mappings:
