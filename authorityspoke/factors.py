@@ -227,10 +227,10 @@ class Factor(ABC):
             such that they fit the relationship ``comparison``.
         """
 
-        context_registers = iter(self._context_register(other, comparison))
+        context_registers = iter(self._context_registers(other, comparison))
         return any(register is not None for register in context_registers)
 
-    def _context_register(
+    def _context_registers(
         self, other: Factor, comparison: Callable
     ) -> Iterator[Dict[Factor, Factor]]:
         """
@@ -247,10 +247,10 @@ class Factor(ABC):
         elif self.generic or other.generic:
             yield {self: other, other: self}
         else:
-            for registry in self.update_mapping(
+            for register in self.update_mapping(
                 {}, self.context_factors, other.context_factors, comparison
             ):
-                yield registry
+                yield register
 
     def contradicts(self, other: Optional[Factor]) -> bool:
         """
@@ -537,6 +537,33 @@ class Factor(ABC):
                     self_mapping[in_value] = in_key
         return self_mapping
 
+    def update_context_register(
+        self, other: Factor, register: Dict[Factor, Factor], comparison: Callable
+    ):
+        """
+        :param other:
+            another :class:`Factor` being compared to ``self``
+
+        :param register:
+            keys representing :class:`Factor`\s from ``self``'s context and
+            values representing :class:`Factor`\s in ``other``'s context.
+
+        :param comparison:
+            a function defining the comparison that must be ``True``
+            between ``self`` and ``other``. Could be :meth:`Factor.means` or
+            :meth:`Factor.__ge__`.
+
+        :yields:
+            every way that ``self_mapping`` can be updated to be consistent
+            with ``self`` and ``other`` having the relationship
+            ``comparison``
+        """
+        for incoming_register in self._context_registers(other, comparison):
+            for new_register_variation in self._registers_for_interchangeable_context(
+                incoming_register
+            ):
+                yield self._import_to_mapping(register, new_register_variation)
+
     @classmethod
     def update_mapping(
         cls,
@@ -593,20 +620,11 @@ class Factor(ABC):
                 if self_factor is None:
                     new_mapping_choices.append(mapping)
                 else:
-                    register_iter = iter(
-                        self_factor._context_register(other_factors[index], comparison)
-                    )
-                    for incoming_register in register_iter:
-                        for (
-                            transposed_register
-                        ) in self_factor._registers_for_interchangeable_context(
-                            incoming_register
-                        ):
-                            updated_mapping = cls._import_to_mapping(
-                                mapping, transposed_register
-                            )
-                            if updated_mapping not in new_mapping_choices:
-                                new_mapping_choices.append(updated_mapping)
+                    for incoming_register in self_factor.update_context_register(
+                        other_factors[index], mapping, comparison
+                    ):
+                        if incoming_register not in new_mapping_choices:
+                            new_mapping_choices.append(incoming_register)
         for choice in new_mapping_choices:
             yield choice
 

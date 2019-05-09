@@ -470,11 +470,11 @@ class Procedure(Factor):
                 if self_factor.contradicts(other_factor):
                     if all(
                         all(
-                            matches.get(key) == _context_register[key]
-                            or matches.get(_context_register[key] == key)
+                            matches.get(key) == context_register[key]
+                            or matches.get(context_register[key] == key)
                             for key in self_factor.generic_factors
                         )
-                        for _context_register in self_factor._context_register(
+                        for context_register in self_factor._context_registers(
                             other_factor, means
                         )
                     ):
