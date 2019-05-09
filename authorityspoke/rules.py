@@ -43,8 +43,10 @@ class Relation(NamedTuple):
     available: Tuple[Factor, ...]
     comparison: Callable
 
-    def compare_factors(
-        self, matches: Dict[Factor, Factor], still_need_matches: List[Factor]
+    def unordered_comparison(
+        self,
+        matches: Dict[Factor, Factor],
+        still_need_matches: Optional[List[Factor]] = None,
     ) -> Iterator[Dict[Factor, Optional[Factor]]]:
         """
         :param matches:
@@ -53,15 +55,18 @@ class Relation(NamedTuple):
             matches. Starts empty when the method is first called.
 
         :param still_need_matches:
-            :class:`.Factor`\s that need to satisfy the comparison
+            :class:`Factor`\s that need to satisfy the comparison
             :attr:`comparison` with some factor of :attr:`available`
             for the relation to hold, and have not yet been matched.
 
-        :returns:
-            Whether all factors in ``need_matches`` have the
-            relation ``comparison`` with a :class:`Factor` in
-            ``available_for_matching``, with matching entity slots.
+        :yields:
+            context registers showing how each :class:`Factor` in
+            ``need_matches`` can have the relation ``comparison``
+            with some :class:`Factor` in ``available_for_matching``,
+            with matching context.
         """
+        if still_need_matches is None:
+            still_need_matches = list(self.need_matches)
 
         if not still_need_matches:
             # This seems to allow duplicate values in
@@ -81,7 +86,9 @@ class Relation(NamedTuple):
                     for new_matches in updated_mappings:
                         if new_matches:
                             next_steps = iter(
-                                self.compare_factors(new_matches, still_need_matches)
+                                self.unordered_comparison(
+                                    new_matches, still_need_matches
+                                )
                             )
                             for next_step in next_steps:
                                 yield next_step
@@ -91,7 +98,7 @@ class Relation(NamedTuple):
     ) -> List[Dict[Factor, Optional[Factor]]]:
         new_matchlist = []
         for matches in matchlist:
-            for answer in self.compare_factors(matches, list(self.need_matches)):
+            for answer in self.unordered_comparison(matches, list(self.need_matches)):
                 new_matchlist.append(dict(answer))
         return new_matchlist
 
@@ -506,7 +513,7 @@ class Procedure(Factor):
     @new_context_helper
     def new_context(
         self, changes: Union[List[Factor], Dict[Factor, Factor]]
-    ) -> "Procedure":
+    ) -> Procedure:
         """
         Creates new Procedure object, converting "changes" from a List
         to a Dict if needed, and replacing keys of "changes" with their
