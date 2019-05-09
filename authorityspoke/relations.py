@@ -27,8 +27,8 @@ class Relation:
     :param comparison:
         a function defining the comparison that must be ``True``
         between each :attr:`need_matches` and some :attr:`available`
-        for the relation to hold. Could be :meth:`Factor.means` or
-        :meth:`Factor.__ge__`.
+        for the relation to hold. Could be :meth:`.Factor.means` or
+        :meth:`.Factor.__ge__`.
     """
 
     need_matches: Tuple["Factor", ...]
@@ -40,8 +40,8 @@ class Relation:
     ) -> Iterator[Dict["Factor", Optional["Factor"]]]:
         """
         :param matches:
-            keys representing :class:`Factor`\s in ``self`` and
-            values representing :class:`Factor`\s in ``other``. The
+            keys representing :class:`.Factor`\s in ``self`` and
+            values representing :class:`.Factor`\s in ``other``. The
             keys and values have been found in corresponding positions
             in ``self`` and ``other``.
 
@@ -85,19 +85,19 @@ class Relation:
     ) -> Iterator[Dict["Factor", Optional["Factor"]]]:
         """
         :param matches:
-            a mapping of :class:`Factor`\s that have already been matched
+            a mapping of :class:`.Factor`\s that have already been matched
             to each other in the recursive search for a complete group of
             matches. Starts empty when the method is first called.
 
         :param still_need_matches:
-            :class:`Factor`\s that need to satisfy the comparison
-            :attr:`comparison` with some factor of :attr:`available`
+            :class:`.Factor`\s that need to satisfy the comparison
+            :attr:`comparison` with some :class:`.Factor` of :attr:`available`
             for the relation to hold, and have not yet been matched.
 
         :yields:
-            context registers showing how each :class:`Factor` in
+            context registers showing how each :class:`.Factor` in
             ``need_matches`` can have the relation ``comparison``
-            with some :class:`Factor` in ``available_for_matching``,
+            with some :class:`.Factor` in ``available_for_matching``,
             with matching context.
         """
         if still_need_matches is None:

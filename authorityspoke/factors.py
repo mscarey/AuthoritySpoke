@@ -168,7 +168,7 @@ class Factor(ABC):
         return []
 
     @property
-    def generic_factors(self) -> Dict[Factor, None]:
+    def generic_factors(self) -> List[Optional[Factor]]:
         """
         :returns:
             a :class:`dict` with self's generic :class:`Factor`\s
@@ -178,12 +178,12 @@ class Factor(ABC):
         """
 
         if self.generic:
-            return {self: None}
-        return {
-            generic: None
-            for factor in self.context_factors
-            for generic in factor.generic_factors
-        }
+            return [self]
+        return list({
+                generic: None
+                for factor in self.context_factors
+                for generic in factor.generic_factors
+            })
 
     @property
     def context_factors(self) -> Tuple:
@@ -303,6 +303,14 @@ class Factor(ABC):
         return self.__class__(**new_dict)
 
     def means(self, other) -> bool:
+        """
+        :returns:
+            whether ``other`` is another :class:`Factor`
+            with the same meaning as ``self``. Not the same as an
+            equality comparison with the ``==`` symbol, which simply
+            converts ``self``'s and ``other``'s fields to tuples
+            and compares them.
+        """
         if self.__class__ != other.__class__:
             return False
         if self.absent != other.absent:
@@ -562,6 +570,7 @@ class Factor(ABC):
         if isinstance(item, Iterable):
             return tuple(item)
         return (item,)
+
 
 @dataclass(frozen=True)
 class Fact(Factor):
@@ -990,6 +999,7 @@ class Evidence(Factor):
             + f'{("which supports " + str(self.to_effect)) if self.to_effect else ""}'
         )
         return super().__str__().format(string).strip()
+
 
 def means(left: Factor, right: Factor) -> bool:
 

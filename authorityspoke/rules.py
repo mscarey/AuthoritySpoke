@@ -4,9 +4,8 @@ import json
 import operator
 import pathlib
 
-from typing import Dict, List, Sequence, Tuple
-from typing import Iterable, Iterator
-from typing import Callable, Optional, Union
+from typing import ClassVar, Dict, Iterable, List, Sequence, Tuple
+from typing import Optional, Union
 
 from dataclasses import dataclass
 
@@ -69,7 +68,7 @@ class Procedure(Factor):
     despite: Iterable[Factor] = ()
     name: Optional[str] = None
     absent: bool = False
-    generic: bool = True
+    generic: bool = False
 
     def __post_init__(self):
         outputs = self.__class__._wrap_with_tuple(self.outputs)
@@ -239,18 +238,21 @@ class Procedure(Factor):
         return sorted(self.factors_all(), key=repr)
 
     @property
-    def generic_factors(self) -> List[Factor]:
-        """Returns an iterable of self's generic Factors,
-        which must be matched to other generic Factors to
-        perform equality tests between Factors."""
-
-        return list(
-            {
+    def generic_factors(self) -> List[Optional[Factor]]:
+        """
+        :returns:
+            ``self``'s generic :class:`Factor`s,
+            which must be matched to other generic :class:`Factor`s to
+            perform equality or implication tests between :class:`Factor`s
+            with :meth:`Factor.means` or :meth:`Factor.__ge__`.
+        """
+        if self.generic:
+            return [self]
+        return list({
                 generic: None
                 for factor in self.factors_all()
                 for generic in factor.generic_factors
-            }
-        )
+            })
 
     def contradicts_some_to_all(self, other: Procedure) -> bool:
         """
@@ -488,13 +490,16 @@ class Rule(Factor):
         cls, mentioned_list: Optional[List[Dict[str, str]]]
     ) -> List[Factor]:
         """
-        :param mentioned_dict: A dict in the JSON format used in the
-        "input" folder.
+        :param mentioned_dict:
+            A dict in the JSON format used in the
+            ``example_data/holdings`` folder.
 
-        :returns: A list of Factors mentioned in the Opinion's holdings.
-        Especially the context factors referenced in Predicates, since
-        there's currently no other way to import those using the JSON
-        format.
+        :returns:
+            A list of :class:`Factor`\s mentioned in the
+            :class:`Opinion`\'s holdings. Especially the
+            context factors referenced in :class:`Predicate`s,
+            since there's currently no other way to import
+            those using the JSON format.
         """
         mentioned: List[Factor] = []
         if mentioned_list:
@@ -551,6 +556,7 @@ class ProceduralRule(Rule):
     decided: bool = True
     generic: bool = False
     name: Optional[str] = None
+    context_factor_names: ClassVar = ("procedure",)
 
     def __post_init__(self):
 
@@ -631,7 +637,9 @@ class ProceduralRule(Rule):
         )
 
     @property
-    def generic_factors(self):
+    def generic_factors(self) -> List[Optional[Factor]]:
+        if self.generic:
+            return [self]
         return self.procedure.generic_factors
 
     @property
@@ -787,10 +795,6 @@ class ProceduralRule(Rule):
             rule_valid=not self.rule_valid,
             decided=self.decided,
         )
-
-    @property
-    def context_factor_names(self):
-        return ("procedure",)
 
     def contradicts(self, other) -> bool:
         """
