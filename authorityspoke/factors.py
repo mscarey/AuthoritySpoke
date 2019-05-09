@@ -469,8 +469,7 @@ class Factor(ABC):
         for replacement_dict in self.interchangeable_factors:
             changed_registry = replace_factors_in_dict(matches, replacement_dict)
             if not any(
-                changed_registry == returned_dict
-                for returned_dict in already_returned
+                changed_registry == returned_dict for returned_dict in already_returned
             ):
                 already_returned.append(changed_registry)
                 yield changed_registry
@@ -547,12 +546,8 @@ class Factor(ABC):
         comparison: Callable,
     ):
         """
-        .. note::
-            I understood how this method works, and I wrote the
-            docstring for this method, but not at the same time.
-
         :param self_mapping:
-            keysing representing :class:`Factor`\s in ``self`` and
+            keys representing :class:`Factor`\s in ``self`` and
             values representing :class:`Factor`\s in ``other``. The
             keys and values have been found in corresponding positions
             in ``self`` and ``other``.
@@ -566,12 +561,16 @@ class Factor(ABC):
         :param other_factors:
             other's :attr:`context_factors`
 
-        :returns:
-            :class:`bool` indicating whether the :class:`Factor`\s in
-            ``other_factors`` can be matched to the :class:`Factor`\s in
-            ``self_factors`` in ``self_mapping``, without making the
-            same :class:`Factor` from ``other_factors``
-            match to two different factors in self_mapping.
+        :param comparison:
+            a function defining the comparison that must be ``True``
+            between each pair of :attr:`self_factors` and
+            :attr:`other_factors`. Could be :meth:`Factor.means` or
+            :meth:`Factor.__ge__`.
+
+        :yields:
+            every way that ``self_mapping`` can be updated to be consistent
+            with ``self_factors`` and ``other_factors`` having the relationship
+            ``comparison``
         """
 
         new_mapping_choices = [self_mapping]
@@ -579,33 +578,30 @@ class Factor(ABC):
         self_factors = cls._wrap_with_tuple(self_factors)
         other_factors = cls._wrap_with_tuple(other_factors)
 
-        # why am I allowing the __len__s to be different?
-        shortest = min(len(self_factors), len(other_factors))
-
         # The "is" comparison is for None values.
         if not all(
-            self_factors[index] is other_factors[index]
-            or comparison(self_factors[index], other_factors[index])
-            for index in range(shortest)
+            self_factor is other_factors[index]
+            or comparison(self_factor, other_factors[index])
+            for index, self_factor in enumerate(self_factors)
         ):
             return None
         # TODO: change to depth-first
-        for index in range(shortest):
+        for index, self_factor in enumerate(self_factors):
             mapping_choices = new_mapping_choices
             new_mapping_choices = []
             for mapping in mapping_choices:
-                if self_factors[index] is None:
+                if self_factor is None:
                     new_mapping_choices.append(mapping)
                 else:
                     register_iter = iter(
-                        self_factors[index]._context_register(
-                            other_factors[index], comparison
-                        )
+                        self_factor._context_register(other_factors[index], comparison)
                     )
                     for incoming_register in register_iter:
-                        for transposed_register in self_factors[
-                            index
-                        ]._registers_for_interchangeable_context(incoming_register):
+                        for (
+                            transposed_register
+                        ) in self_factor._registers_for_interchangeable_context(
+                            incoming_register
+                        ):
                             updated_mapping = cls._import_to_mapping(
                                 mapping, transposed_register
                             )
@@ -619,7 +615,6 @@ class Factor(ABC):
         if isinstance(item, Iterable):
             return tuple(item)
         return (item,)
-
 
 
 @dataclass(frozen=True)
@@ -939,7 +934,6 @@ class Fact(Factor):
         )
 
 
-
 @dataclass(frozen=True)
 class Pleading(Factor):
     """
@@ -1068,8 +1062,6 @@ class Evidence(Factor):
         return ("exhibit", "to_effect")
 
 
-def means(
-    left: Factor, right: Factor
-) -> bool:
+def means(left: Factor, right: Factor) -> bool:
 
     return left.means(right)
