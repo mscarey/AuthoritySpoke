@@ -4,24 +4,20 @@ import datetime
 import functools
 import logging
 import operator
-import re
 
 from abc import ABC
 
-from typing import Any, Callable, Dict, List, Tuple
-from typing import Iterable, Iterator, Mapping
-from typing import Optional, Sequence, Set, Type, Union
+from typing import Any, Callable, ClassVar, Dict, Iterable, Iterator, List
+from typing import Optional, Sequence, Set, Tuple, Type, Union
 
-from pint import UnitRegistry
+from dataclasses import dataclass
 
 from authorityspoke.context import log_mentioned_context
 from authorityspoke.predicates import Predicate
-
-from dataclasses import astuple, dataclass
+from authorityspoke.relations import Relation
 
 
 def new_context_helper(func: Callable):
-
     """
     Decorator for :meth:`Factor.new_context`.
 
@@ -81,7 +77,7 @@ class Factor(ABC):
     @classmethod
     def all_subclasses(cls) -> Set[Type]:
         """
-        :return: the set of all subclasses of :class:`Factor`
+        :returns: the set of all subclasses of :class:`Factor`
         """
         return set(cls.__subclasses__()).union(
             [s for c in cls.__subclasses__() for s in c.all_subclasses()]
@@ -247,9 +243,8 @@ class Factor(ABC):
         elif self.generic or other.generic:
             yield {self: other, other: self}
         else:
-            for register in self.update_mapping(
-                {}, self.context_factors, other.context_factors, comparison
-            ):
+            relation = Relation(self.context_factors, other.context_factors, comparison)
+            for register in relation.ordered_comparison():
                 yield register
 
     def contradicts(self, other: Optional[Factor]) -> bool:
@@ -310,16 +305,12 @@ class Factor(ABC):
     def means(self, other) -> bool:
         if self.__class__ != other.__class__:
             return False
-
         if self.absent != other.absent:
             return False
-
         if self.generic == other.generic == True:
             return True
-
         if self.generic != other.generic:
             return False
-
         return self._equal_if_concrete(other)
 
     def _equal_if_concrete(self, other: Factor) -> bool:
@@ -558,82 +549,19 @@ class Factor(ABC):
             with ``self`` and ``other`` having the relationship
             ``comparison``
         """
+        if other and not isinstance(other, Factor):
+            raise TypeError(f"{other} is type {other.__class__.__name__}, not Factor")
         for incoming_register in self._context_registers(other, comparison):
             for new_register_variation in self._registers_for_interchangeable_context(
                 incoming_register
             ):
                 yield self._import_to_mapping(register, new_register_variation)
 
-    @classmethod
-    def update_mapping(
-        cls,
-        self_mapping: Dict[Factor, Factor],
-        self_factors: Tuple[Factor],
-        other_factors: Tuple[Factor],
-        comparison: Callable,
-    ):
-        """
-        :param self_mapping:
-            keys representing :class:`Factor`\s in ``self`` and
-            values representing :class:`Factor`\s in ``other``. The
-            keys and values have been found in corresponding positions
-            in ``self`` and ``other``.
-
-        :param self_factors:
-            :class:`Factor`\s from ``self`` that will be matched with
-            ``other_factors``. This function is expected to be called
-            with various permutations of ``other_factors``, but no other
-            permutations of ``self_factors``.
-
-        :param other_factors:
-            other's :attr:`context_factors`
-
-        :param comparison:
-            a function defining the comparison that must be ``True``
-            between each pair of :attr:`self_factors` and
-            :attr:`other_factors`. Could be :meth:`Factor.means` or
-            :meth:`Factor.__ge__`.
-
-        :yields:
-            every way that ``self_mapping`` can be updated to be consistent
-            with ``self_factors`` and ``other_factors`` having the relationship
-            ``comparison``
-        """
-
-        new_mapping_choices = [self_mapping]
-
-        self_factors = cls._wrap_with_tuple(self_factors)
-        other_factors = cls._wrap_with_tuple(other_factors)
-
-        # The "is" comparison is for None values.
-        if not all(
-            self_factor is other_factors[index]
-            or comparison(self_factor, other_factors[index])
-            for index, self_factor in enumerate(self_factors)
-        ):
-            return None
-        # TODO: change to depth-first
-        for index, self_factor in enumerate(self_factors):
-            mapping_choices = new_mapping_choices
-            new_mapping_choices = []
-            for mapping in mapping_choices:
-                if self_factor is None:
-                    new_mapping_choices.append(mapping)
-                else:
-                    for incoming_register in self_factor.update_context_register(
-                        other_factors[index], mapping, comparison
-                    ):
-                        if incoming_register not in new_mapping_choices:
-                            new_mapping_choices.append(incoming_register)
-        for choice in new_mapping_choices:
-            yield choice
-
     @staticmethod
     def _wrap_with_tuple(item):
         if isinstance(item, Iterable):
             return tuple(item)
         return (item,)
-
 
 @dataclass(frozen=True)
 class Fact(Factor):
@@ -691,14 +619,12 @@ class Fact(Factor):
             raise ValueError(
                 f"standard of proof must be one of {self.standards_of_proof()} or None."
             )
-        context_factors = self.context_factors
-        case_factors = self.case_factors
-        object.__delattr__(self, "case_factors")
-
-        if not context_factors:
+        case_factors = self.__class__._wrap_with_tuple(self.case_factors)
+        if not self.context_factors:
             context_factors = range(len(self.predicate))
-        case_factors = self.__class__._wrap_with_tuple(case_factors)
-        context_factors = self.__class__._wrap_with_tuple(context_factors)
+        else:
+            context_factors = self.__class__._wrap_with_tuple(self.context_factors)
+        object.__delattr__(self, "case_factors")
 
         if len(context_factors) != len(self.predicate):
             raise ValueError(
@@ -741,8 +667,9 @@ class Fact(Factor):
             any court considers the order context-specific, then this
             approach of hard-coding their names and order will have to change.
 
-        :returns: a tuple with every allowable name for a standard of
-        proof, in order from weakest to strongest.
+        :returns:
+            a tuple with every allowable name for a standard of
+            proof, in order from weakest to strongest.
         """
         return (
             "scintilla of evidence",
@@ -937,18 +864,15 @@ class Fact(Factor):
     @new_context_helper
     def new_context(self, changes: Dict[Factor, Factor]) -> Factor:
         """
-        Creates new Fact object, replacing keys of "changes" with their values.
+        Creates new :class:`Fact` object, replacing keys of ``changes``
+        with their values.
         """
-        new_context_factors = [
-            factor.new_context(changes) for factor in self.context_factors
-        ]
-        return Fact(
-            self.predicate,
-            tuple(new_context_factors),
-            self.name,
-            self.standard_of_proof,
-            self.absent,
-            self.generic,
+        return self.evolve(
+            {
+                "context_factors": [
+                    factor.new_context(changes) for factor in self.context_factors
+                ]
+            }
         )
 
 
@@ -964,10 +888,7 @@ class Pleading(Factor):
     name: Optional[str] = None
     absent: bool = False
     generic: bool = False
-
-    @property
-    def context_factor_names(self) -> Tuple[str]:
-        return ("filer",)
+    context_factor_names: ClassVar = ("filer",)
 
     def _equal_if_concrete(self, other: Pleading) -> bool:
         if self.date != other.date:
@@ -991,8 +912,8 @@ class Pleading(Factor):
 @dataclass(frozen=True)
 class Allegation(Factor):
     """
-    A formal assertion of a Fact, included by a party in a Pleading
-    to establish a cause of action.
+    A formal assertion of a :class:`Fact`, included by a party in a
+    :class:`Pleading` to establish a cause of action.
     """
 
     to_effect: Optional[Fact] = None
@@ -1000,10 +921,7 @@ class Allegation(Factor):
     name: Optional[str] = None
     absent: bool = False
     generic: bool = False
-
-    @property
-    def context_factor_names(self) -> Tuple[str, ...]:
-        return ("to_effect", "pleading")
+    context_factor_names: ClassVar = ("to_effect", "pleading")
 
     def __str__(self):
         string = (
@@ -1031,10 +949,7 @@ class Exhibit(Factor):
     name: Optional[str] = None
     absent: bool = False
     generic: bool = False
-
-    @property
-    def context_factor_names(self) -> Tuple[str, ...]:
-        return ("statement", "stated_by")
+    context_factor_names: ClassVar = ("statement", "stated_by")
 
     def _equal_if_concrete(self, other: Exhibit) -> bool:
         if self.form != other.form:
@@ -1067,6 +982,7 @@ class Evidence(Factor):
     name: Optional[str] = None
     absent: bool = False
     generic: bool = False
+    context_factor_names: ClassVar = ("exhibit", "to_effect")
 
     def __str__(self):
         string = (
@@ -1074,11 +990,6 @@ class Evidence(Factor):
             + f'{("which supports " + str(self.to_effect)) if self.to_effect else ""}'
         )
         return super().__str__().format(string).strip()
-
-    @property
-    def context_factor_names(self) -> Tuple[str, ...]:
-        return ("exhibit", "to_effect")
-
 
 def means(left: Factor, right: Factor) -> bool:
 

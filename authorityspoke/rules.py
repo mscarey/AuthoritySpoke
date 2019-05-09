@@ -7,100 +7,13 @@ import pathlib
 from typing import Dict, List, Sequence, Tuple
 from typing import Iterable, Iterator
 from typing import Callable, Optional, Union
-from typing import NamedTuple
 
 from dataclasses import dataclass
 
 from authorityspoke.context import get_directory_path
 from authorityspoke.enactments import Enactment
 from authorityspoke.factors import Factor, means, new_context_helper
-
-
-class Relation(NamedTuple):
-    """
-    Describes two groups of :class:`.Factor`\s and suggests a relation
-    between the two groups. The work of determining whether the
-    relation holds isn't currently performed by this class.
-
-    :param need_matches:
-        :class:`.Factor`\s that all need to satisfy the comparison
-        :attr:`comparison` with some factor of :attr:`available`
-        for the relation to hold.
-
-    :param available:
-        :class:`.Factor`\s available for matching with the
-        :attr:`need_matches` :class:`.Factor`\s, but that don't
-        all need to be matched themselves for the relation to hold.
-
-    :param comparison:
-        a function defining the comparison that must be ``True``
-        between each :attr:`need_matches` and some :attr:`available`
-        for the relation to hold. Could be :meth:`Factor.means` or
-        :meth:`Factor.__ge__`.
-    """
-
-    need_matches: Tuple[Factor, ...]
-    available: Tuple[Factor, ...]
-    comparison: Callable
-
-    def unordered_comparison(
-        self,
-        matches: Dict[Factor, Factor],
-        still_need_matches: Optional[List[Factor]] = None,
-    ) -> Iterator[Dict[Factor, Optional[Factor]]]:
-        """
-        :param matches:
-            a mapping of :class:`Factor`\s that have already been matched
-            to each other in the recursive search for a complete group of
-            matches. Starts empty when the method is first called.
-
-        :param still_need_matches:
-            :class:`Factor`\s that need to satisfy the comparison
-            :attr:`comparison` with some factor of :attr:`available`
-            for the relation to hold, and have not yet been matched.
-
-        :yields:
-            context registers showing how each :class:`Factor` in
-            ``need_matches`` can have the relation ``comparison``
-            with some :class:`Factor` in ``available_for_matching``,
-            with matching context.
-        """
-        if still_need_matches is None:
-            still_need_matches = list(self.need_matches)
-
-        if not still_need_matches:
-            # This seems to allow duplicate values in
-            # Procedure.output, .input, and .despite, but not in
-            # attributes of other kinds of Factors. Likely cause
-            # of bugs.
-            yield matches
-        else:
-            self_factor = still_need_matches.pop()
-            for other_factor in self.available:
-                if self.comparison(self_factor, other_factor):
-                    updated_mappings = iter(
-                        Factor.update_context_register(
-                            self_factor, other_factor, matches, self.comparison
-                        )
-                    )
-                    for new_matches in updated_mappings:
-                        if new_matches:
-                            next_steps = iter(
-                                self.unordered_comparison(
-                                    new_matches, still_need_matches
-                                )
-                            )
-                            for next_step in next_steps:
-                                yield next_step
-
-    def update_matchlist(
-        self, matchlist: List[Dict[Factor, Factor]]
-    ) -> List[Dict[Factor, Optional[Factor]]]:
-        new_matchlist = []
-        for matches in matchlist:
-            for answer in self.unordered_comparison(matches, list(self.need_matches)):
-                new_matchlist.append(dict(answer))
-        return new_matchlist
+from authorityspoke.relations import Relation
 
 
 @dataclass(frozen=True)
@@ -159,11 +72,9 @@ class Procedure(Factor):
     generic: bool = True
 
     def __post_init__(self):
-
         outputs = self.__class__._wrap_with_tuple(self.outputs)
         inputs = self.__class__._wrap_with_tuple(self.inputs)
         despite = self.__class__._wrap_with_tuple(self.despite)
-
         groups = {"outputs": outputs, "inputs": inputs, "despite": despite}
         for group in groups:
             for factor_obj in groups[group]:

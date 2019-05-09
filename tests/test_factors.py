@@ -474,15 +474,18 @@ class TestFacts:
     def test_copy_with_foreign_context(self, watt_mentioned, watt_factor):
         w = watt_mentioned
         assert (
-            watt_factor["f1"].new_context({w[0]: w[2]}).means(watt_factor["f1_different_entity"]
-        ))
+            watt_factor["f1"]
+            .new_context({w[0]: w[2]})
+            .means(watt_factor["f1_different_entity"])
+        )
 
     def test_check_entity_consistency_true(self, make_entity, make_factor):
         left = make_factor["f_irrelevant_3"]
         right = make_factor["f_irrelevant_3_new_context"]
         e = make_entity
-        easy_update = left.update_mapping({e["dan"]: e["craig"]}, left, right, means)
-        harder_update = left.update_mapping(
+        easy_update = left.update_context_register(right, {e["dan"]: e["craig"]}, means)
+        harder_update = left.update_context_register(
+            right,
             {
                 e["alice"]: e["bob"],
                 e["bob"]: e["alice"],
@@ -490,29 +493,25 @@ class TestFacts:
                 e["dan"]: e["craig"],
                 e["circus"]: e["circus"],
             },
-            left,
-            right,
             means,
         )
         assert any(register is not None for register in easy_update)
         assert any(register is not None for register in harder_update)
 
     def test_check_entity_consistency_false(self, make_entity, make_factor):
-        update = make_factor["f_irrelevant_3"].update_mapping(
-            {make_entity["circus"]: make_entity["alice"]},
-            make_factor["f_irrelevant_3"],
+        update = make_factor["f_irrelevant_3"].update_context_register(
             make_factor["f_irrelevant_3_new_context"],
-            operator.eq,
+            {make_entity["circus"]: make_entity["alice"]},
+            means,
         )
         assert not any(register is not None for register in update)
 
     def test_entity_consistency_identity_not_equality(self, make_entity, make_factor):
 
-        update = make_factor["f_irrelevant_3"].update_mapping(
-            {make_entity["dan"]: make_entity["dan"]},
-            make_factor["f_irrelevant_3"],
+        update = make_factor["f_irrelevant_3"].update_context_register(
             make_factor["f_irrelevant_3_new_context"],
-            operator.eq,
+            {make_entity["dan"]: make_entity["dan"]},
+            means,
         )
         assert not any(register is not None for register in update)
 
@@ -524,11 +523,8 @@ class TestFacts:
         instead of .gt. The comparison would just return False.
         """
         m = make_factor
-        update = make_factor["f_irrelevant_3"].update_mapping(
-            {make_entity["dan"]: make_entity["dan"]},
-            m["f_irrelevant_3"],
-            make_predicate["p2"],
-            operator.gt,
+        update = make_factor["f_irrelevant_3"].update_context_register(
+            make_predicate["p2"], {make_entity["dan"]: make_entity["dan"]}, operator.gt
         )
         with pytest.raises(TypeError):
             any(register is not None for register in update)
