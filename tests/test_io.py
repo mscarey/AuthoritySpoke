@@ -174,7 +174,7 @@ class TestRuleImport:
         brad = make_opinion["brad_majority"]
         brad_holdings = Rule.from_json("holding_brad.json")
         for rule in brad_holdings:
-            brad.posits(rule)
+            brad.posit(rule)
         assert "warrantless search and seizure" in str(brad.holdings[0])
 
     def test_opinion_posits_holding_tuple_context(self, make_opinion, make_entity):
@@ -187,7 +187,7 @@ class TestRuleImport:
         context_holding = brad_holdings[6].new_context(
             [make_entity["watt"], make_entity["trees"], make_entity["motel"]]
         )
-        watt.posits(context_holding)
+        watt.posit(context_holding)
         assert (
             "the number of marijuana plants in <the stockpile of trees> was at least 3"
             in str(watt.holdings[-1])
@@ -206,7 +206,7 @@ class TestRuleImport:
         )
         # resetting holdings because of class scope of fixture
         watt.holdings = []
-        watt.posits(context_holding)
+        watt.posit(context_holding)
         string = str(context_holding)
         assert "<Wattenburg> lived at <Bradley's house>" in string
         assert "<Wattenburg> lived at <Bradley's house>" in str(watt.holdings[0])

@@ -40,7 +40,7 @@ class TestOpinions:
         h = real_holding
         e = make_entity
         h3_specific = h["h3"]
-        watt.posits(h3_specific)
+        watt.posit(h3_specific)
         assert h3_specific in watt.holdings
 
     def test_opinion_entity_list(
@@ -50,9 +50,9 @@ class TestOpinions:
         h = real_holding
         e = make_entity
 
-        watt.posits(h["h1"], (e["motel"], e["watt"]))
-        watt.posits(h["h2"], (e["trees"], e["motel"]))
-        watt.posits(
+        watt.posit(h["h1"], (e["motel"], e["watt"]))
+        watt.posit(h["h2"], (e["trees"], e["motel"]))
+        watt.posit(
             h["h3"],
             (
                 make_evidence["generic"],
@@ -62,7 +62,7 @@ class TestOpinions:
                 e["tree_search"],
             ),
         )
-        watt.posits(h["h4"], (e["trees"], e["tree_search"], e["motel"], e["watt"]))
+        watt.posit(h["h4"], (e["trees"], e["tree_search"], e["motel"], e["watt"]))
         assert make_entity["watt"] in make_opinion["watt_majority"].generic_factors
 
     def test_opinion_date(self, make_opinion):
@@ -79,7 +79,7 @@ class TestOpinions:
 
     def test_positing_non_rule_error(self, make_opinion, make_procedure):
         with pytest.raises(TypeError):
-            make_opinion["watt_majority"].posits(make_procedure["c1"])
+            make_opinion["watt_majority"].posit(make_procedure["c1"])
 
     def test_new_context_non_iterable_changes(self, make_opinion, make_holding):
         """
@@ -88,7 +88,7 @@ class TestOpinions:
         expects.
         """
         brad = make_opinion["brad_majority"]
-        brad.posits(make_holding["h1"], context=Entity("House on Haunted Hill"))
+        brad.posit(make_holding["h1"], context=Entity("House on Haunted Hill"))
         assert "Haunted Hill" in str(brad.holdings[0])
 
     def test_new_context_naming_nonexistent_factor(self, make_opinion, make_holding):
@@ -99,7 +99,7 @@ class TestOpinions:
         """
         brad = make_opinion["brad_majority"]
         with pytest.raises(ValueError):
-            brad.posits(
+            brad.posit(
                 make_holding["h1"],
                 context=(Entity("House on Haunted Hill"), "nonexistent factor"),
             )
@@ -110,16 +110,16 @@ class TestOpinions:
         watt_holdings = Rule.from_json(f"holding_watt.json")
         brad_holdings = Rule.from_json(f"holding_brad.json")
         for holding in watt_holdings:
-            watt.posits(holding)
+            watt.posit(holding)
         for holding in brad_holdings:
-            brad.posits(holding)
+            brad.posit(holding)
         context_pairs = {
             "proof of Bradley's guilt": "proof of Wattenburg's guilt",
             "Bradley": "Wattenburg",
             "officers' search of the yard": "officers' search of the stockpile",
             "Bradley's marijuana patch": "the stockpile of trees",
         }
-        watt.posits(brad.holdings[0], context_pairs)
+        watt.posit(brad.holdings[0], context_pairs)
         assert watt.holdings[-1].means(brad.holdings[0])
 
     def test_new_context_inferring_factors_to_change(self, make_opinion):
@@ -134,9 +134,9 @@ class TestOpinions:
         watt_holdings = Rule.from_json(f"holding_watt.json")
         brad_holdings = Rule.from_json(f"holding_brad.json")
         for holding in watt_holdings:
-            watt.posits(holding)
+            watt.posit(holding)
         for holding in brad_holdings:
-            brad.posits(holding)
+            brad.posit(holding)
 
         context_items = [
             "proof of Wattenburg's guilt",
@@ -145,7 +145,7 @@ class TestOpinions:
             "Hideaway Lodge",
             "the stockpile of trees",
         ]
-        watt.posits(brad.holdings[0], context_items)
+        watt.posit(brad.holdings[0], context_items)
         assert watt.holdings[-1].means(brad.holdings[0])
 
     # Implication
@@ -161,8 +161,8 @@ class TestOpinions:
         some_rules = Rule.from_json("holding_watt.json")
         for case in (watt, brad):
             case.holdings = []
-            case.posits(some_rules[:3])
-        watt.posits(some_rules[3])
+            case.posit(some_rules[:3])
+        watt.posit(some_rules[3])
         assert watt > brad
         assert not brad >= watt
 

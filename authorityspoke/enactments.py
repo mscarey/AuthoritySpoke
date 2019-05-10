@@ -18,6 +18,14 @@ class Code:
     """
     A constitution, code of statutes, code of regulations,
     or collection of court rules.
+
+    Each instance of this class depends on an XML file containing
+    the code, so every new XML format will require adding a method
+    to this class to ingest it.
+
+    :param filename:
+        the name of the file in the ``example_data/codes``
+        folder where the XML version of the code can be found.
     """
 
     directory = get_directory_path("codes")

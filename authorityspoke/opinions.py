@@ -369,7 +369,7 @@ class Opinion:
                 "or rule_dict (a dict with the same fields as the JSON input file)."
             )
         for holding in holdings:
-            self.posits(holding)
+            self.posit(holding)
         return self
 
     @property
@@ -410,7 +410,7 @@ class Opinion:
                 return factor
         raise ValueError(f'No factor by the name "{name}" was found')
 
-    def posits(
+    def posit(
         self,
         holding: Union[Rule, Iterable[Rule]],
         context: Optional[Sequence[Factor]] = None,

@@ -499,8 +499,8 @@ class Rule(Factor):
         cls, filename: str, directory: Optional[pathlib.Path] = None
     ) -> List[Rule]:
         """
-        Does not cause an :class:`.Opinion` to posit the :class:`.Rule`\s
-        as holdings.
+        Does not cause an :class:`.Opinion` to :meth:`~.Opinion.posit`
+        the :class:`.Rule`\s as holdings.
 
         :param filename:
             the name of the JSON file to look in for :class:`Rule`
@@ -532,9 +532,9 @@ class Rule(Factor):
             folder.
 
         :returns:
-            A list of :class:`Factor`\s mentioned in the
-            :class:`Opinion`\'s holdings. Especially the
-            context factors referenced in :class:`Predicate`s,
+            A list of :class:`.Factor`\s mentioned in the
+            :class:`.Opinion`\'s holdings. Especially the
+            context factors referenced in :class:`.Predicate`\s,
             since there's currently no other way to import
             those using the JSON format.
         """
