@@ -255,7 +255,7 @@ class TestRules:
         assert make_holding["h2_ALL"].contradicts(
             make_holding["h2_SOME_MUST_output_false"]
         )
-        assert make_holding["h2_ALL"].contradicts_if_valid(
+        assert make_holding["h2_ALL"]._contradicts_if_valid(
             make_holding["h2_SOME_MUST_output_false"]
         )
 
@@ -268,7 +268,7 @@ class TestRules:
 
         assert make_holding["h2_invalid"].contradicts(
             make_holding["h2_irrelevant_inputs"]
-        ) != make_holding["h2_invalid"].contradicts_if_valid(
+        ) != make_holding["h2_invalid"]._contradicts_if_valid(
             make_holding["h2_irrelevant_inputs"]
         )
 
@@ -291,10 +291,10 @@ class TestRules:
         A is not in the curtilage of B
         """
 
-        assert make_holding["h_nearer_means_curtilage_MUST"].contradicts_if_valid(
+        assert make_holding["h_nearer_means_curtilage_MUST"]._contradicts_if_valid(
             make_holding["h_near_means_no_curtilage_ALL"]
         )
-        assert make_holding["h_near_means_no_curtilage_ALL"].contradicts_if_valid(
+        assert make_holding["h_near_means_no_curtilage_ALL"]._contradicts_if_valid(
             make_holding["h_nearer_means_curtilage_MUST"]
         )
 
@@ -317,10 +317,10 @@ class TestRules:
         A is in the curtilage of B
         """
 
-        assert not make_holding["h_near_means_no_curtilage"].contradicts_if_valid(
+        assert not make_holding["h_near_means_no_curtilage"]._contradicts_if_valid(
             make_holding["h_nearer_means_curtilage_ALL"]
         )
-        assert not make_holding["h_nearer_means_curtilage_ALL"].contradicts_if_valid(
+        assert not make_holding["h_nearer_means_curtilage_ALL"]._contradicts_if_valid(
             make_holding["h_near_means_no_curtilage"]
         )
 
@@ -378,10 +378,10 @@ class TestRules:
         A is not in the curtilage of B
         """
 
-        assert make_holding["h_near_means_curtilage_ALL_MUST"].contradicts_if_valid(
+        assert make_holding["h_near_means_curtilage_ALL_MUST"]._contradicts_if_valid(
             make_holding["h_far_means_no_curtilage"]
         )
-        assert make_holding["h_far_means_no_curtilage"].contradicts_if_valid(
+        assert make_holding["h_far_means_no_curtilage"]._contradicts_if_valid(
             make_holding["h_near_means_curtilage_ALL_MUST"]
         )
 

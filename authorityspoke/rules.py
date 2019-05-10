@@ -549,39 +549,57 @@ class Rule(Factor):
 class ProceduralRule(Rule):
 
     """
-    procedure (Procedure): optional because a holding can contain
-    an attribution instead of a holding
+    :param procedure:
+        a :class:`.Procedure` containing the inputs, and despite
+        :class:`.Factor`\s and resulting outputs when this rule
+        is triggered.
 
-    enactments (Union[Enactment, Iterable[Enactment]]): the
-    enactments cited as authority for the holding
+    :param enactments:
+        the :class:`.Enactment`\s cited as authority for
+        invoking the ``procedure``.
 
-    enactments_despite (Union[Enactment, Iterable[Enactment]]):
-    the set of enactments specifically cited as failing to undercut
-    the holding
+    :param enactments_despite:
+        the :class:`.Enactment`\s specifically cited as failing
+        to preclude application of the ``procedure``.
 
-    mandatory (bool): whether the procedure is mandatory for the
-    court to apply whenever the holding is properly invoked. False
-    may be used for procedures deemed "discretionary".
-    Not applicable to attributions.
+    :param mandatory:
+        whether the ``procedure`` is mandatory for the
+        court to apply whenever the :class:`.Rule` is properly invoked.
+        ``False`` means that the ``procedure`` is "discretionary".
 
-    universal (bool): True if the procedure is applicable whenever
-    its inputs are present. False means that the procedure is
-    applicable in "some" situation where the facts are present.
-    Not applicable to attributions.
+    :param universal:
+        ``True`` if the ``procedure`` is applicable whenever
+        its inputs are present. ``False`` means that the ``procedure`` is
+        applicable in "some" situation where the inputs are present.
 
-    rule_valid (bool): True means the holding asserts the procedure
-    is a valid legal rule. False means it's not a valid legal
-    rule.
+    :param rule_valid:
+        ``True`` means the :class:`Rule` is asserted to be valid (or
+        useable by a court in litigation). ``False`` means it's asserted
+        to be invalid.
 
-    decided (bool): False means that it should be deemed undecided
-    whether the rule is valid, and thus can have the effect of
-    overruling prior holdings finding the rule to be either
-    valid or invalid. Seemingly, decided=False should render the
-    "rule_valid" flag irrelevant. Note that if an opinion merely
-    says the court is not deciding whether a procedure or attribution
-    is valid, there is no holding, and no Rule object should be
-    created. Deciding not to decide a rule's validity is not the same
-    thing as deciding that a rule is undecided.
+    :param decided:
+        ``False`` means that it should be deemed undecided
+        whether the :class:`Rule` is valid, and thus can have the
+        effect of overruling prior holdings finding the :class:`.Rule`
+        to be either valid or invalid. Seemingly, ``decided=False``
+        should render the ``rule_valid`` flag irrelevant. Note that
+        if an opinion merely says the court is not deciding whether
+        a :class:`.Rule` is valid, there is no holding, and no
+        :class:`.Rule` object should be created. Deciding not to decide
+        a :class:`Rule`\'s validity is not the same thing as deciding
+        that the :class:`.Rule` is undecided.
+
+    :param generic:
+        whether the :class:`Rule` is being mentioned in a generic
+        context. e.g., if the :class:`Rule` is being mentioned in
+        an :class:`.Argument` object merely as an example of the
+        kind of :class:`Rule` that might be mentioned in such an
+        :class:`.Argument`.
+
+    :param name:
+        an identifier used to retrieve this :class:`Rule` when
+        needed for the composition of another :class:`.Factor`
+        object.
     """
 
     procedure: Procedure
@@ -602,34 +620,30 @@ class ProceduralRule(Rule):
             if isinstance(value, Enactment):
                 object.__setattr__(self, attr, self._wrap_with_tuple(value))
 
-    def __str__(self):
-        def factor_catalog(factors: List[Union[Factor, Enactment]], tag: str) -> str:
-            lines = [f"{tag}: {factors[i]}\n" for i in range(len(factors))]
-            return "".join(lines)
-
-        newline = "\n"
-        return (
-            f"the rule that {'it is not decided whether ' if not self.decided else ''}"
-            + f"{'it is not valid that ' if not self.rule_valid else ''}the court "
-            + f"{'MUST' if self.mandatory else 'MAY'} {'ALWAYS' if self.universal else 'SOMETIMES'} "
-            + f"accept the result{newline}{str(factor_catalog(self.procedure.outputs, 'RESULT'))}"
-            + f"{'based on the input' + newline + str(factor_catalog(self.procedure.inputs, 'GIVEN')) if self.procedure.inputs else ''}"
-            + f"{str(factor_catalog(self.procedure.despite, 'DESPITE')) if self.procedure.despite else ''}"
-            + f"{'according to the legislation' + newline + str(factor_catalog(self.enactments, 'GIVEN')) if self.enactments else ''}"
-            + f"{'and despite the legislation' + newline + str(factor_catalog(self.enactments_despite, 'DESPITE')) if self.enactments_despite else ''}"
-        )
-
-    def __len__(self):
-        """Returns the number of entities needed to provide context
-        for the Rule, which currently is just the entities needed
-        for the Rule's Procedure."""
-
-        return len(self.procedure)
-
     @classmethod
     def from_dict(
         cls, record: Dict, context_list: List[Factor]
     ) -> Tuple[ProceduralRule, List[Factor]]:
+
+        """
+        :param record:
+            a :class:`dict` derived from the JSON format that
+            lists ``mentioned_entities`` followed by a
+            series of :class:`Rule`\s. Only one of the :class:`Rule`\s
+            will by covered by this :class:`dict`.
+
+        :param context_list:
+            a series of context factors, including any generic
+            :class:`.Factor`\s that need to be mentioned in
+            :class:`.Predicate`\s. These will have been constructed
+            from the ``mentioned_entities`` section of the input
+            JSON.
+
+        :returns:
+            a :class:`list` of :class:`Rule`\s with the items
+            from ``mentioned_entities`` as ``context_factors``
+        """
+
         def list_from_records(
             record_list: Union[Dict[str, str], List[Dict[str, str]]],
             context_list: List[Factor],
@@ -674,6 +688,10 @@ class ProceduralRule(Rule):
         )
 
     @property
+    def context_factors(self) -> Tuple:
+        return self.procedure.context_factors
+
+    @property
     def despite(self):
         return self.procedure.despite
 
@@ -691,15 +709,49 @@ class ProceduralRule(Rule):
     def outputs(self):
         return self.procedure.outputs
 
-    @property
-    def context_factors(self) -> Tuple:
+    def contradicts(self, other) -> bool:
+        """
+        A :class:`ProceduralRule` contradicts ``other`` if it
+        :meth:`~.Factor.implies` ``other.negated()`` Checked
+        by testing whether ``self`` would imply ``other`` if
+        ``other`` had an opposite value for ``rule_valid``.
 
-        return self.procedure.context_factors
+        This method takes three main paths depending on
+        whether the holdings ``self`` and ``other`` assert that
+        rules are decided or undecided.
 
-    def contradicts_if_valid(self, other) -> bool:
-        """Determines whether self contradicts other,
-        assuming that rule_valid and decided are
-        True for both Rules."""
+        A ``decided`` :class:`ProceduralRule` can never contradict
+        a previous statement that any :class:`Rule` was undecided.
+
+        If rule A implies rule B, then a holding that B is undecided
+        contradicts a prior :class:`ProceduralRule` deciding that
+        rule A is valid or invalid.
+
+        :returns:
+            whether ``self`` contradicts ``other``.
+        """
+
+        if not isinstance(other, self.__class__):
+            raise TypeError(
+                f"'Contradicts' not supported between instances of "
+                + f"'{self.__class__.__name__}' and '{other.__class__.__name__}'."
+            )
+
+        if not other.decided:
+            return False
+        if self.decided:
+            return self >= other.negated()
+        return other._implies_if_decided(self) or other._implies_if_decided(
+            self.negated()
+        )
+
+    def _contradicts_if_valid(self, other) -> bool:
+        """
+        :returns:
+            whether ``self`` contradicts ``other``,
+            assuming that ``rule_valid`` and ``decided`` are
+            ``True`` for both :class:`Rule`\s.
+        """
 
         if not self.mandatory and not other.mandatory:
             return False
@@ -720,36 +772,79 @@ class ProceduralRule(Rule):
             self.procedure
         ) or self.procedure.contradicts_some_to_all(other.procedure)
 
-    def implies_if_decided(self, other) -> bool:
+    def __ge__(self, other) -> bool:
+        """
+        Implication method. See :meth:`.Procedure.__ge__` for
+        explanations of how ``inputs``,``outputs``,
+        and ``despite`` :class:`Factor`\s affect implication.
 
-        """Simplified version of the __ge__ implication function
-        covering only cases where decided is True for both Rules,
-        although rule_valid can be False."""
+        If ``self`` relies for support on some :class:`Enactment` text
+        that ``other`` doesn't, then ``self`` doesn't imply ``other``.
+
+        Also, if ``other`` specifies that it applies notwithstanding
+        some :class:`Enactment` not mentioned by ``self``, then
+        ``self`` doesn't imply ``other``.
+
+        :returns:
+            whether ``self`` implies ``other``, which requires ``other``
+            to be another :class:`ProceduralRule`.
+        """
+
+        if not isinstance(other, self.__class__):
+            raise TypeError(
+                f"'Implies' not supported between instances of "
+                + f"'{self.__class__.__name__}' and '{other.__class__.__name__}'."
+            )
+
+        if self.decided and other.decided:
+            return self._implies_if_decided(other)
+
+        # A holding being undecided doesn't seem to imply that
+        # any other holding is undecided, except itself and the
+        # negation of itself.
+
+        if not self.decided and not other.decided:
+            return self.means(other) or self.means(other.negated())
+
+        # It doesn't seem that any holding being undecided implies
+        # that any holding is decided, or vice versa.
+
+        return False
+
+    def _implies_if_decided(self, other) -> bool:
+
+        """
+        Simplified version of the :meth:`ProceduralRule.__ge__`
+        implication function.
+
+        :returns:
+            whether ``self`` implies ``other``, assuming that
+            ``self.decided == other.decided == True`` and that
+            ``self`` and ``other`` are both :class:`ProceduralRule`\s,
+            although ``rule_valid`` can be ``False``.
+        """
 
         if self.rule_valid and other.rule_valid:
-            return self.implies_if_valid(other)
+            return self._implies_if_valid(other)
 
         if not self.rule_valid and not other.rule_valid:
-            return other.implies_if_valid(self)
+            return other._implies_if_valid(self)
 
         # Looking for implication where self.rule_valid != other.rule_valid
         # is equivalent to looking for contradiction.
 
         # If decided rule A contradicts B, then B also contradicts A
 
-        return self.contradicts_if_valid(other)
+        return self._contradicts_if_valid(other)
 
-    def implies_if_valid(self, other) -> bool:
+    def _implies_if_valid(self, other) -> bool:
         """
-        Partial version of the __ge__ implication function covering
-        only cases where other is an instance of self's class, and
-        rule_valid and decided are True for both of them.
+        Partial version of the :meth:`ProceduralRule.__ge__`
+        implication function.
 
-        If self relies for support on some enactment text that
-        other doesn't, then self doesn't imply other.
-
-        Also, if other specifies that it applies notwithstanding some
-        enactment not mentioned by self, then self doesn't imply other.
+        :returns: whether ``self`` implies ``other``, assuming that
+        both are :class:`ProceduralRule`\s,, and
+        ``rule_valid`` and ``decided`` are ``True`` for both of them.
         """
 
         if not all(
@@ -777,30 +872,15 @@ class ProceduralRule(Rule):
 
         return self.procedure >= other.procedure
 
-    def __ge__(self, other) -> bool:
-        """Returns a boolean indicating whether self implies other,
-        where other is another Rule."""
+    def __len__(self):
+        """
+        :returns:
+            the number of generic :class:`Factor`\s needed to provide
+            context for this :class:`Rule`, which currently is just the
+            generic :class:`Factor`\s needed for the ``procedure``.
+        """
 
-        if not isinstance(other, self.__class__):
-            raise TypeError(
-                f"'Implies' not supported between instances of "
-                + f"'{self.__class__.__name__}' and '{other.__class__.__name__}'."
-            )
-
-        if self.decided and other.decided:
-            return self.implies_if_decided(other)
-
-        # A holding being undecided doesn't seem to imply that
-        # any other holding is undecided, except itself and the
-        # negation of itself.
-
-        if not self.decided and not other.decided:
-            return self.means(other) or self.means(other.negated())
-
-        # It doesn't seem that any holding being undecided implies
-        # that any holding is decided, or vice versa.
-
-        return False
+        return len(self.procedure)
 
     def means(self, other: ProceduralRule) -> bool:
         """
@@ -833,36 +913,21 @@ class ProceduralRule(Rule):
             decided=self.decided,
         )
 
-    def contradicts(self, other) -> bool:
-        """
-        A holding contradicts another holding if it implies
-        that the other holding is false. Generally checked
-        by testing whether self would imply other if
-        other had an opposite value for rule_valid.
+    def __str__(self):
+        def factor_catalog(factors: List[Union[Factor, Enactment]], tag: str) -> str:
+            lines = [f"{tag}: {factors[i]}\n" for i in range(len(factors))]
+            return "".join(lines)
 
-        This function takes three main paths depending on
-        whether the holdings "self" and "other" assert that
-        rules are decided or undecided.
-
-        A decided holding can never contradict a previous
-        statement that any rule was undecided.
-
-        If rule A implies rule B, then a holding that B is undecided
-        contradicts a prior holding deciding that rule A is valid or invalid.
-        """
-
-        if not isinstance(other, self.__class__):
-            raise TypeError(
-                f"'Contradicts' not supported between instances of "
-                + f"'{self.__class__.__name__}' and '{other.__class__.__name__}'."
-            )
-
-        if not other.decided:
-            return False
-        if self.decided:
-            return self >= other.negated()
-        return other.implies_if_decided(self) or other.implies_if_decided(
-            self.negated()
+        newline = "\n"
+        return (
+            f"the rule that {'it is not decided whether ' if not self.decided else ''}"
+            + f"{'it is not valid that ' if not self.rule_valid else ''}the court "
+            + f"{'MUST' if self.mandatory else 'MAY'} {'ALWAYS' if self.universal else 'SOMETIMES'} "
+            + f"accept the result{newline}{str(factor_catalog(self.procedure.outputs, 'RESULT'))}"
+            + f"{'based on the input' + newline + str(factor_catalog(self.procedure.inputs, 'GIVEN')) if self.procedure.inputs else ''}"
+            + f"{str(factor_catalog(self.procedure.despite, 'DESPITE')) if self.procedure.despite else ''}"
+            + f"{'according to the legislation' + newline + str(factor_catalog(self.enactments, 'GIVEN')) if self.enactments else ''}"
+            + f"{'and despite the legislation' + newline + str(factor_catalog(self.enactments_despite, 'DESPITE')) if self.enactments_despite else ''}"
         )
 
 

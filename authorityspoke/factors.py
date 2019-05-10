@@ -383,6 +383,15 @@ class Factor(ABC):
         """
         return self >= other and self != other
 
+    def implies(self, other: Factor) -> bool:
+        """
+        Alias for :meth:`__ge__`.
+
+        :returns:
+            bool indicating whether ``self`` implies ``other``
+        """
+        return self >= other
+
     def _implies_if_concrete(self, other: Factor) -> bool:
         """
         Used to test implication based on :attr:`context_factors`,
