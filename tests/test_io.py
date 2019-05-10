@@ -147,7 +147,7 @@ class TestRuleImport:
         brad = make_opinion["brad_majority"]
         brad_holdings = Rule.from_json("holding_brad.json")
         assert any(
-            watt_holdings[0].enactments[0] == brad_enactment
+            watt_holdings[0].enactments[0].means(brad_enactment)
             for brad_enactment in brad_holdings[0].enactments
         )
 

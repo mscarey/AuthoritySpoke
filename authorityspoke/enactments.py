@@ -60,19 +60,24 @@ class Code:
         return self.title
 
     def get_xml(self):
+        """
+        :returns: the XML corresponding to this Code object.
+        """
         with open(self.path) as fp:
             xml = BeautifulSoup(fp.read(), "lxml-xml")
         return xml
 
-    def provision_effective_date(self, cite):
+    def provision_effective_date(self, cite: str) -> datetime.date:
         """
-        Given the "citation" of a legislative provision
-        (only XML element names are used as citations so far),
-        retrieves the effective date of the provision from
-        the United States Legislative Markup (USLM) XML version
-        of the code where the provision is located.
+        So far this method only covers the US Constitution and it
+        assumes that the XML format is United States Legislative
+        Markup (USLM).
 
-        So far this only covers the US Constitution.
+        :param cite:
+            a string representing the XML element name for the
+            the legislative provision within this Code.
+
+        :returns: the effective date of the cited provision
         """
 
         if self.level == "constitutional" and self.sovereign == "federal":
@@ -105,6 +110,37 @@ class Code:
 @dataclass(frozen=True)
 class Enactment:
 
+    """
+    A passage of legislative text. May be used as support for a
+    :class:`.ProceduralRule`. To retrieve the text, there needs
+    to be an available method for identifying the correct XML
+    element based on the section and subsection names, and each
+    XML format used for a Code requires a different method.
+
+    :param code:
+        the :class:`Code` where this legislative text appears.
+
+    :param section:
+        identifier for the section of the :class:`Code` where
+        the text can be found.
+
+    :param subsection:
+        identifier for the subsection of the :class:`Code` where
+        the text can be found.
+
+    :param start:
+        a unique string corresponding to the first part of the
+        quoted passage of legislative text
+
+    :param end:
+        a unique string corresponding to the end of the
+        quoted passage of legislative text
+
+    :param name:
+        an identifier for this object, often used if the object needs
+        to be referred to multiple times in the process of composing
+        other :class:`Factor` objects.
+    """
     code: Code
     section: str
     subsection: Optional[str] = None
@@ -114,14 +150,17 @@ class Enactment:
 
     @property
     def effective_date(self):
+        """
+        :returns:
+            the effective date of the text in this passage.
+            Currently works only for the US Constitution.
+        """
         return self.code.provision_effective_date(self.section)
 
     @property
     def text(self):
-
         """
-        Given the attributes describing the section and the start and end points
-        of the cited text, collects the full text of the cited passage from the XML.
+        :returns: the full text of the cited passage from the XML.
         """
 
         def cal_href(href):
@@ -175,7 +214,18 @@ class Enactment:
     def __str__(self):
         return f'"{self.text}" ({self.code.title}, {self.section})'
 
-    def __eq__(self, other):
+    def means(self, other: Enactment) -> bool:
+        """
+        It's questionable whether this comparison is really meaningful.
+        You could always make the result ``False`` by comparing longer
+        passages of text until you found a difference between the two
+        sites in the text.
+
+        :returns:
+            whether ``self`` and ``other`` represent the same text
+            issued by the same sovereign in the same level of
+            :class:`Enactment`.
+        """
         if not isinstance(other, self.__class__):
             return False
 
@@ -186,6 +236,15 @@ class Enactment:
         )
 
     def __ge__(self, other):
+        """
+        Why does this method not require the same ``code.sovereign`` and
+        ``code.level``, especially considering that :meth:`means` does?
+
+        :returns:
+            Whether ``self`` "implies" ``other``, which in this context means
+            whether ``self`` contains at least all the same text as ``other``.
+        """
+
         if not isinstance(other, self.__class__):
             raise TypeError(
                 f"{self.__class__} objects may only be compared for "

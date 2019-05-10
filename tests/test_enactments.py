@@ -76,8 +76,8 @@ class TestEnactments:
         assert "secure in their persons" in str(make_enactment["search_clause"])
 
     def test_equal_enactment_text(self, make_enactment):
-        assert make_enactment["due_process_5"] == make_enactment["due_process_14"]
-        assert not make_enactment["due_process_5"] > make_enactment["due_process_14"]
+        assert make_enactment["due_process_5"].means(make_enactment["due_process_14"])
+        assert make_enactment["due_process_5"] >= make_enactment["due_process_14"]
 
     def test_unequal_enactment_text(self, make_enactment):
         assert make_enactment["search_clause"] != make_enactment["fourth_a"]
