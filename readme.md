@@ -12,7 +12,7 @@ Use this button to interact with the notebook online through Binder.
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/mscarey/AuthoritySpoke/master)
 
-More documentation is coming soon.
+[Full documentation for AuthoritySpoke](https://authorityspoke.readthedocs.io/en/latest/) is a work in progress.
 
 ## Installing AuthoritySpoke
 
