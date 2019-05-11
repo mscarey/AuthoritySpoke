@@ -7,6 +7,11 @@
 AuthoritySpoke: Reading Legal Authority for the Last Time
 =========================================================
 
+Release v\. |release|.
+
+See the `GitHub repo <https://github.com/mscarey/AuthoritySpoke>`_
+for examples and to try out AuthoritySpoke in a Jupyter Notebook.
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:

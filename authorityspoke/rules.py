@@ -219,10 +219,20 @@ class Procedure(Factor):
         return False
 
     def contradicts(self, other) -> None:
+        """
+        Raises an error because, by analogy with :meth:`Procedure.implies`\,
+        users might expect this method to return ``True`` only when
+        :class:`ProceduralRule` with ``universal=False`` and Procedure ``self``
+        would contradict another :class:`ProceduralRule` with ``universal=False``
+        and Procedure ``other``. But that would never happen.
+
+        :returns: None
+        """
+
         raise NotImplementedError(
             "Procedures do not contradict one another unless one of them ",
-            "applies in 'ALL' cases. Consider using the ",
-            "'contradicts_some_to_all' method.",
+            "applies in 'ALL' cases. Consider using ",
+            "'Procedure.contradicts_some_to_all' or 'ProceduralRule.contradicts'.",
         )
 
     def contradicts_some_to_all(self, other: Procedure) -> bool:
@@ -689,24 +699,44 @@ class ProceduralRule(Rule):
 
     @property
     def context_factors(self) -> Tuple:
+        """
+        :returns:
+            context_factors from ``self``'s :class:`Procedure`
+        """
         return self.procedure.context_factors
 
     @property
     def despite(self):
+        """
+        :returns:
+            despite :class:`.Factors` from ``self``'s :class:`Procedure`
+        """
         return self.procedure.despite
 
     @property
     def generic_factors(self) -> List[Optional[Factor]]:
+        """
+        :returns:
+            generic :class:`.Factors` from ``self``'s :class:`Procedure`
+        """
         if self.generic:
             return [self]
         return self.procedure.generic_factors
 
     @property
     def inputs(self):
+        """
+        :returns:
+            input :class:`.Factors` from ``self``'s :class:`Procedure`
+        """
         return self.procedure.inputs
 
     @property
     def outputs(self):
+        """
+        :returns:
+            output :class:`.Factors` from ``self``'s :class:`Procedure`
+        """
         return self.procedure.outputs
 
     def contradicts(self, other) -> bool:
