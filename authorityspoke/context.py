@@ -13,8 +13,9 @@ def log_mentioned_context(func: Callable):
 
     If factor_record is a :class:`str` instead of a :class:`dict`, looks up the
     corresponding factor in "mentioned" and returns that instead of
-    constructing a new Factor. Also, if a newly-constructed Factor
-    has a name attribute, logs the factor in "mentioned" for later use.
+    constructing a new :class:`Factor`. Also, if the newly-constructed
+    :class:`Factor` has a ``name`` attribute, logs the :class:`Factor`
+    in ``mentioned`` for later use.
     """
 
     @functools.wraps(func)
@@ -57,8 +58,9 @@ def log_mentioned_context(func: Callable):
 
 def get_directory_path(stem: str) -> pathlib.Path:
     """
-    This function finds a data directory for importing files, if cwd
-    is that directory, is its parent directory, or is a sibling
+    This function finds a data directory for importing files, if
+    the current working directory is that directory, is its
+    parent directory, or is a sibling
     directory. Otherwise it won't find the right directory.
 
     This function doesn't obviously belong in the context module.

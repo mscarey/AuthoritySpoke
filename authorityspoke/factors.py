@@ -69,9 +69,9 @@ class Factor(ABC):
     """
     Anything relevant to a court's determination of the applicability
     of a legal :class:`.Rule` can be a :class:`Factor`. The same
-    :class:`Factor` that is in the :attr:`.Procedure.outputs`
-    for one legal :class:`.Rule` might be in the :attr:`.Procedure.inputs`
-    for another.
+    :class:`Factor` that is in the outputs for the :class:`.Procedure`
+    of one legal :class:`.Rule` might be in the ``inputs`` of the
+    :class:`.Procedure` for another.
     """
 
     @classmethod
@@ -171,9 +171,9 @@ class Factor(ABC):
     def generic_factors(self) -> List[Optional[Factor]]:
         """
         :returns:
-            a :class:`dict` with self's generic :class:`Factor`\s
+            a :class:`dict` with self's generic :class:`.Factor`\s
             as keys and ``None`` as values, so that the keys can
-            be matched to  another object's ``generic_factors``
+            be matched to another object's ``generic_factors``
             to perform an equality test.
         """
 
@@ -446,11 +446,11 @@ class Factor(ABC):
     def new_context(self, changes: Dict[Factor, Factor]) -> Factor:
         """
         :param changes:
-            has :class:`Factor`\s to replace as keys, and has
+            has :class:`.Factor`\s to replace as keys, and has
             their replacements as the corresponding values.
 
         :returns:
-            a new :class:`Factor` object with the replacements made.
+            a new :class:`.Factor` object with the replacements made.
         """
         new_dict = self.__dict__.copy()
         for name in self.context_factor_names:
@@ -618,7 +618,7 @@ class Fact(Factor):
 
     :param case_factors:
         a series of :class:`Factor`\s that have already been mentioned
-        in the :class:`Opinion`. They are available for composing the
+        in the :class:`.Opinion`. They are available for composing the
         new :class:`Factor` object and don't need to be recreated.
     """
 
@@ -954,13 +954,14 @@ class Allegation(Factor):
 
 @dataclass(frozen=True)
 class Exhibit(Factor):
-    """A source of information for use in litigation.
+    """
+    A source of information for use in litigation.
 
     "derived_from" and and "offered_by" parameters were removed
-    because the former is probably better represented as a Fact,
-    and the latter as a Motion.
+    because the former is probably better represented as a :class:`Fact`,
+    and the latter as a :class:`Motion`.
 
-    Allowed inputs for "form" will need to be limited.
+    TODO: Allowed inputs for ``form`` will need to be limited.
     """
 
     form: Optional[str] = None
@@ -994,8 +995,10 @@ class Exhibit(Factor):
 
 @dataclass(frozen=True)
 class Evidence(Factor):
-    """An Exhibit that has been admitted by the court to aid a
-    factual determination."""
+    """
+    An :class:`Exhibit` that has been admitted by the court to aid a
+    factual determination.
+    """
 
     exhibit: Optional[Exhibit] = None
     to_effect: Optional[Fact] = None

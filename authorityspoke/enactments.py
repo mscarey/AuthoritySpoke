@@ -119,7 +119,7 @@ class Enactment:
     :class:`.ProceduralRule`. To retrieve the text, there needs
     to be an available method for identifying the correct XML
     element based on the section and subsection names, and each
-    XML format used for a :class:`Code` requires a different method.
+    XML format used for any :class:`Code` will require a different method.
 
     :param code:
         the :class:`Code` where this legislative text appears.
@@ -143,7 +143,7 @@ class Enactment:
     :param name:
         an identifier for this object, often used if the object needs
         to be referred to multiple times in the process of composing
-        other :class:`Factor` objects.
+        other :class:`.Factor` objects.
     """
 
     code: Code
@@ -220,7 +220,11 @@ class Enactment:
     @log_mentioned_context
     def from_dict(cls, enactment_dict: Dict[str, str]) -> Enactment:
         """
-        No way to use an existing :class:`Code` object currently.
+        Creates a new :class:`Enactment` object using a :class:`dict`
+        imported from JSON example data.
+
+        There's currently no way to import an existing :class:`Code` object
+        for use in composing the new :class:`Enactment`.
         """
         code = Code(enactment_dict["code"])
         start = enactment_dict.get("start")
@@ -242,10 +246,15 @@ class Enactment:
 
     def means(self, other: Enactment) -> bool:
         """
-        It's questionable whether this comparison is really meaningful.
-        You could always make the result ``False`` by comparing longer
-        passages of text until you found a difference between the two
-        sites in the text.
+        Whether the meaning of ``self`` is equivalent to (neither
+        broader nor narrower than) the meaning of the legislative
+        text passage ``other``.
+
+        .. note::
+            You could always make the result ``False`` by comparing longer
+            passages of text until you found a difference between the two
+            sites in the text. Does this undercut the usefulness of the
+            ``means`` method?
 
         :returns:
             whether ``self`` and ``other`` represent the same text
@@ -266,8 +275,10 @@ class Enactment:
 
     def __ge__(self, other):
         """
-        Why does this method not require the same ``code.sovereign`` and
-        ``code.level``, especially considering that :meth:`means` does?
+        .. note::
+            Why does this method not require the same ``code.sovereign``
+            and ``code.level``, especially considering that
+            :meth:`means` does?
 
         :returns:
             Whether ``self`` "implies" ``other``, which in this context means

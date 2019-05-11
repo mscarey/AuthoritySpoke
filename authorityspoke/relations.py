@@ -15,8 +15,8 @@ class Relation:
     the relation.
 
     :param need_matches:
-        :class:`.Factor`\s that all need to satisfy the comparison
-        :attr:`comparison` with some factor of :attr:`available`
+        :class:`.Factor`\s that all need to satisfy the ``comparison``
+        with some :class:`.Factor` of ``available``
         for the relation to hold.
 
     :param available:

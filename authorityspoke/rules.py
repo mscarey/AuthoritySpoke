@@ -20,26 +20,26 @@ class Procedure(Factor):
     """
     A (potential) rule for courts to use in resolving litigation.
     Described in terms of inputs and outputs, and also potentially
-    "despite" :class:`Factor`\s, which occur when a :class:`Rule`
+    "despite" :class:`.Factor`\s, which occur when a :class:`Rule`
     could be said to apply "even if" some "despite" factor is true.
 
     Users generally should not need to interact with this class
     directly, under the current design. Instead, they should interact
-    with the class :class:`ProdecuralRule`.
+    with the class :class:`.ProdecuralRule`.
 
     :param outputs:
         an outcome that a court may accept based on the presence
         of the ``inputs``
 
     :param inputs:
-        supporting :class:`Factor`\s in favor of the ``output``.
-        The ``input`` :class:`Factor`\s are not treated as
+        supporting :class:`.Factor`\s in favor of the ``output``.
+        The ``input`` :class:`.Factor`\s are not treated as
         potential undercutters.
 
     :param despite:
-        :class:`Factor`\s that do not prevent the court from
+        :class:`.Factor`\s that do not prevent the court from
         imposing the ``output``. These could be considered
-        "failed undercutters" in defeasible logic. If a :class:`Factor`
+        "failed undercutters" in defeasible logic. If a :class:`.Factor`
         is relevant both as support for the output and as
         a potential undercutter, include it in both ``inputs``
         and ``despite``.
@@ -47,14 +47,14 @@ class Procedure(Factor):
     :param name:
         An identifier that can be used to reference and
         incorporate an existing procedure in a new
-        :class:`Factor`, instead of constructing a new
-        copy of the :class:`Procedure`.
+        :class:`.Factor`, instead of constructing a new
+        copy of the :class:`.Procedure`.
 
     :param absent:
         Whether the absence, rather than presence, of this
-        :class:`Procedure` is being referenced. The usefulness
+        :class:`.Procedure` is being referenced. The usefulness
         of this is unclear, but I'm not prepared to eliminate it
-        before the :class:`Argument` class has been implemented
+        before the :class:`.Argument` class has been implemented
         and tested.
 
     :param generic:
@@ -89,7 +89,7 @@ class Procedure(Factor):
     def __len__(self):
         """
         :returns:
-            the number of generic :class:`Factor`\s that need to be
+            the number of generic :class:`.Factor`\s that need to be
             specified for this :class:`Procedure`.
         """
 
@@ -133,10 +133,10 @@ class Procedure(Factor):
     def generic_factors(self) -> List[Optional[Factor]]:
         """
         :returns:
-            ``self``'s generic :class:`Factor`s,
-            which must be matched to other generic :class:`Factor`s to
-            perform equality or implication tests between :class:`Factor`s
-            with :meth:`Factor.means` or :meth:`Factor.__ge__`.
+            ``self``'s generic :class:`.Factor`\s,
+            which must be matched to other generic :class:`.Factor`\s to
+            perform equality or implication tests between :class:`.Factor`\s
+            with :meth:`.Factor.means` or :meth:`.Factor.__ge__`.
         """
         if self.generic:
             return [self]
@@ -155,11 +155,11 @@ class Procedure(Factor):
         matches: Dict[Factor, Factor],
     ):
         """
-        Works by first determining whether one :class:`Factor`
+        Works by first determining whether one :class:`.Factor`
         potentially :meth:`~.Factor.contradicts` another,
         and then determining whether it's possible to make
         context assignments match between the contradictory
-        :class:`Factor`\s.
+        :class:`.Factor`\s.
 
         .. Note::
             Does ``Factor: None`` in matches always mean that
@@ -170,7 +170,7 @@ class Procedure(Factor):
             whether unassigned context factors can be assigned in such
             a way that there's no contradiction between any factor in
             ``self_factors`` and ``other_factors``, given that some
-            :class:`Factor`\s have already been assigned as
+            :class:`.Factor`\s have already been assigned as
             described by ``matches``.
         """
 
@@ -204,9 +204,9 @@ class Procedure(Factor):
             in ``self`` and ``other``.
 
         :returns:
-            whether any :class:`Factor` assignment can be found that
-            makes a :class:`Factor` in the output of ``other`` contradict
-            a :class:`Factor` in the output of ``self``.
+            whether any :class:`.Factor` assignment can be found that
+            makes a :class:`.Factor` in the output of ``other`` contradict
+            a :class:`.Factor` in the output of ``self``.
         """
         for other_factor in other.outputs:
             for self_factor in self.outputs:
@@ -230,7 +230,7 @@ class Procedure(Factor):
         :returns:
             whether the assertion that ``self`` applies in
             **some** cases contradicts that ``other`` applies in **all**
-            cases, where at least one of the :class:``Rules``\s is mandatory.
+            cases, where at least one of the :class:`.Rule`\s is ``mandatory``.
         """
 
         if not isinstance(other, self.__class__):
@@ -465,7 +465,7 @@ class Rule(Factor):
     binding future courts to follow the rule. When holdings appear in
     judicial opinions they are often hypothetical and don't necessarily
     imply that the court accepts the :class:`.Fact` assertions or other
-    :class:`Factor`\s that make up the inputs or outputs of the
+    :class:`.Factor`\s that make up the inputs or outputs of the
     :class:`Procedure` mentioned in the rule.
     """
 
@@ -527,7 +527,7 @@ class Rule(Factor):
     ) -> List[Factor]:
         """
         :param mentioned_list:
-            A list of dicts describing context :class:`Factor`\s
+            A list of dicts describing context :class:`.Factor`\s
             in the JSON format used in the ``example_data/holdings``
             folder.
 
@@ -774,15 +774,16 @@ class ProceduralRule(Rule):
 
     def __ge__(self, other) -> bool:
         """
-        Implication method. See :meth:`.Procedure.__ge__` for
-        explanations of how ``inputs``,``outputs``,
-        and ``despite`` :class:`Factor`\s affect implication.
+        Implication method. See :meth:`.Procedure.implies_all_to_all`
+        and :meth:`.Procedure.implies_all_to_some` for
+        explanations of how ``inputs``, ``outputs``,
+        and ``despite`` :class:`.Factor`\s affect implication.
 
-        If ``self`` relies for support on some :class:`Enactment` text
+        If ``self`` relies for support on some :class:`.Enactment` text
         that ``other`` doesn't, then ``self`` doesn't imply ``other``.
 
         Also, if ``other`` specifies that it applies notwithstanding
-        some :class:`Enactment` not mentioned by ``self``, then
+        some :class:`.Enactment` not mentioned by ``self``, then
         ``self`` doesn't imply ``other``.
 
         :returns:
@@ -875,9 +876,9 @@ class ProceduralRule(Rule):
     def __len__(self):
         """
         :returns:
-            the number of generic :class:`Factor`\s needed to provide
+            the number of generic :class:`.Factor`\s needed to provide
             context for this :class:`Rule`, which currently is just the
-            generic :class:`Factor`\s needed for the ``procedure``.
+            generic :class:`.Factor`\s needed for the ``procedure``.
         """
 
         return len(self.procedure)

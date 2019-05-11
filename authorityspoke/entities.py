@@ -1,10 +1,3 @@
-"""
-Entity and its subclasses are subclasses of Factor that represent
-people, places, or things. Unlike Facts, Evidence, and Allegations
-(which are also subclasses of Factor), Entities don't take Predicates
-as parameters, so they won't (probably?) need to incorporate
-ordered tuples of other Factors.
-"""
 from __future__ import annotations
 
 from typing import Dict, Iterator, Optional
@@ -18,12 +11,12 @@ from dataclasses import astuple, dataclass
 class Entity(Factor):
     """
     A person, place, thing, or event that needs to be mentioned in
-    multiple :class:`Factor`\s in a :class:`Rule`, often in the
-    :class:`Predicate` of a :class:`Fact` object.
+    multiple :class:`.Factor`\s in a :class:`.Rule`, often in the
+    :class:`.Predicate` of a :class:`.Fact` object.
 
     An :class:`Entity` is often, but not always, ``generic`` with
-    respect to the meaning of the :class:`Rule` in which it is
-    mentioned, which means that the :class:`Rule` is understood
+    respect to the meaning of the :class:`.Rule` in which it is
+    mentioned, which means that the :class:`.Rule` is understood
     to apply generally even if some other :class:`Entity` was
     substituted.
 
@@ -37,7 +30,7 @@ class Entity(Factor):
     :param generic:
         Determines whether a change in the ``name`` of the
         :class:`Entity` would change the meaning of the
-        :class:`Factor` in which the :class:`Entity` is
+        :class:`.Factor` in which the :class:`Entity` is
         embedded.
 
     :param plural:
@@ -52,9 +45,9 @@ class Entity(Factor):
 
     def means(self, other):
         """
-        ``generic`` :class:`Entity` objects are considered equal
-        as long as they're the same class. If not ``generic``, they're
-        considered equal if all their attributes are the same.
+        ``generic`` :class:`Entity` objects are considered equivalent
+        in meaning as long as they're the same class. If not ``generic``,
+        they're considered equivalent if all their attributes are the same.
         """
 
         if self.__class__ != other.__class__:
@@ -104,22 +97,24 @@ class Entity(Factor):
 
 class Association(Entity):
     """
-    An entity representing a set of people such as members or shareholders,
+    An :class:`Entity` representing a set of people such as members or shareholders,
     or a business such as a corporation or LLC, but not an unincorporated
     business such as a sole proprietorship.
     """
 
 class Human(Entity):
     """
-    A "natural person" mentioned as an entity in a factor. On the distinction
-    between "human" and "person", see Slaughter-House Cases, 83 U.S. 36, 99.
-    https://www.courtlistener.com/opinion/88661/slaughter-house-cases/
+    A "natural person" mentioned as an :class:`Entity` in a factor. On the distinction
+    between "human" and "person", see `Slaughter-House Cases
+    <https://www.courtlistener.com/opinion/88661/slaughter-house-cases/>`_
+    , 83 U.S. 36, 99.
     """
 
 
 class Event(Entity):
     """
-    Events may be referenced as entities in a predicate's content.
-    See Lepore, Ernest. Meaning and Argument: An Introduction to Logic
-    Through Language. Section 17.2: The Event Approach
+    An Event may be referenced as an :class:`Entity` in a
+    :class:`Predicate`\'s ``content``.
+    *See* Lepore, Ernest. Meaning and Argument: An Introduction to Logic
+    Through Language. Section 17.2: The Event Approach.
     """

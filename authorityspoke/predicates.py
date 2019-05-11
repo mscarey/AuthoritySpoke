@@ -45,11 +45,11 @@ class Predicate:
         are intended to apply to quantities above or below some threshold.
 
     :param quantity:
-        a Python number object or :class:`ureg.Quantity`
-        from the `pint <pint.readthedocs.io>`_ library. Comparisons to
+        a Python number object or :class:`ureg.Quantity` from the
+        `pint <https://pint.readthedocs.io/en/0.9/>`_ library. Comparisons to
         quantities can be used to determine whether :class:`Predicate`\s
-        imply or contradict each other. A single Predicate may contain
-        no more than one ``comparison`` and one ``quantity``.
+        imply or contradict each other. A single :class:`Predicate`
+        may contain no more than one ``comparison`` and one ``quantity``.
     """
 
     content: str
@@ -96,7 +96,7 @@ class Predicate:
     def context_slots(self) -> int:
         """
         :returns:
-            the number of context :class:`Factor`\s that must be
+            the number of context :class:`.Factor`\s that must be
             specified to fill in the blanks in ``self.content``.
         """
 
@@ -108,8 +108,8 @@ class Predicate:
     def content_with_entities(self, context: Union[Factor, Sequence[Factor]]) -> str:
         """
         :param context:
-            generic :class:`Factor`\s to be mentioned in the context of
-            this Predicate. Does not need to be type :class:`Entity`.
+            generic :class:`.Factor`\s to be mentioned in the context of
+            this Predicate. Does not need to be type :class:`.Entity`.
 
         :returns:
             a sentence created by substituting string representations
@@ -204,16 +204,16 @@ class Predicate:
         """
         This method for constructing :class:`Predicate` objects
         from strings may never be used because it's an alternative to
-        :meth:`Fact.from_dict`. This function identifies context
+        :meth:`.Factor.from_dict`. This function identifies context
         factors by finding brackets around them, while
-        :meth:`Fact.from_dict` depends on knowing the names of the
+        :meth:`~.Factor.from_dict` depends on knowing the names of the
         context factors in advance.
 
         :param content:
             a string containing a clause making an assertion.
             Differs from the ``content`` parameter in
             the :meth:`__init__` method because the curly brackets
-            surround the names of :class:`Entity` context factors,
+            surround the names of :class:`.Entity` context factors,
             and because the ``comparison`` and ``quantity`` are
             represented in the ``content`` string rather than as
             separate parameters.
@@ -229,7 +229,7 @@ class Predicate:
             any entities interchangeable other than the first two.
 
         :returns:
-            a :class:`Predicate` and :class:`Entity` objects
+            a :class:`Predicate` and :class:`.Entity` objects
             from a string that has curly brackets around the
             context factors and the comparison/quantity.
         """
@@ -262,7 +262,7 @@ class Predicate:
         :returns:
             whether ``self`` implies ``other``, which is ``True``
             if their statements about quantity imply it.
-            Returns ``False`` if ``self`` and ``other`` are equal.
+            Returns ``False`` if ``self == other``.
         """
 
         if other is None:
