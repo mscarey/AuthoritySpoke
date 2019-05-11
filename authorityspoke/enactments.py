@@ -31,6 +31,7 @@ class Code:
     directory = get_directory_path("codes")
 
     def __init__(self, filename: str):
+        self.filename = filename
         self.path = self.__class__.directory / filename
         self.xml = self.get_xml()
         if filename.startswith("ca_"):
@@ -55,9 +56,6 @@ class Code:
             self.level = "regulation"
         else:
             self.level = "statutory"
-
-    def __str__(self):
-        return self.title
 
     def get_xml(self):
         """
@@ -106,6 +104,12 @@ class Code:
 
         return NotImplementedError
 
+    def __repr__(self):
+        return f'{self.__class__.__name__}("{self.filename}")'
+
+    def __str__(self):
+        return self.title
+
 
 @dataclass(frozen=True)
 class Enactment:
@@ -115,7 +119,7 @@ class Enactment:
     :class:`.ProceduralRule`. To retrieve the text, there needs
     to be an available method for identifying the correct XML
     element based on the section and subsection names, and each
-    XML format used for a Code requires a different method.
+    XML format used for a :class:`Code` requires a different method.
 
     :param code:
         the :class:`Code` where this legislative text appears.
@@ -141,8 +145,9 @@ class Enactment:
         to be referred to multiple times in the process of composing
         other :class:`Factor` objects.
     """
+
     code: Code
-    section: str
+    section: Optional[str] = None
     subsection: Optional[str] = None
     start: Optional[str] = None
     end: Optional[str] = None
@@ -211,8 +216,29 @@ class Enactment:
             r = len(text)
         return text[l:r]
 
-    def __str__(self):
-        return f'"{self.text}" ({self.code.title}, {self.section})'
+    @classmethod
+    @log_mentioned_context
+    def from_dict(cls, enactment_dict: Dict[str, str]) -> Enactment:
+        """
+        No way to use an existing :class:`Code` object currently.
+        """
+        code = Code(enactment_dict["code"])
+        start = enactment_dict.get("start")
+        end = enactment_dict.get("end")
+        name = enactment_dict.get("name")
+        text = enactment_dict.get("text")
+        if text and not (start or end):
+            start = text
+            end = text
+
+        return Enactment(
+                code=code,
+                section=enactment_dict.get("section"),
+                subsection=enactment_dict.get("subsection"),
+                start=start,
+                end=end,
+                name=name,
+            )
 
     def means(self, other: Enactment) -> bool:
         """
@@ -234,6 +260,9 @@ class Enactment:
             and self.code.sovereign == other.code.sovereign
             and self.code.level == other.code.level
         )
+
+    def __str__(self):
+        return f'"{self.text}" ({self.code.title}, {self.section})'
 
     def __ge__(self, other):
         """
@@ -257,33 +286,3 @@ class Enactment:
         if self == other:
             return False
         return self >= other
-
-    @classmethod
-    @log_mentioned_context
-    def from_dict(
-        cls, enactment_dict: Dict[str, str], mentioned: List[Dict[str, str]]
-    ) -> Enactment:
-        """
-        No way to use an existing code object currently.
-        Also, handing "mentioned" through this method is pointless.
-        """
-        code = Code(enactment_dict.get("code"))
-        start = enactment_dict.get("start")
-        end = enactment_dict.get("end")
-        name = enactment_dict.get("name")
-        text = enactment_dict.get("text")
-        if text and not (start or end):
-            start = text
-            end = text
-
-        return (
-            Enactment(
-                code=code,
-                section=enactment_dict.get("section"),
-                subsection=enactment_dict.get("subsection"),
-                start=start,
-                end=end,
-                name=name,
-            ),
-            mentioned,
-        )

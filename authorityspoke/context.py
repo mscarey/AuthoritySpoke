@@ -9,9 +9,9 @@ from typing import Optional, Sequence, Tuple, Union
 
 def log_mentioned_context(func: Callable):
     """
-    Decorator for make_dict() methods of Factor subclasses.
+    Decorator for :meth:`.Factor.from_dict()` and :meth:`.Enactment.from_dict()`.
 
-    If factor_record is a string instead of a dict, looks up the
+    If factor_record is a :class:`str` instead of a :class:`dict`, looks up the
     corresponding factor in "mentioned" and returns that instead of
     constructing a new Factor. Also, if a newly-constructed Factor
     has a name attribute, logs the factor in "mentioned" for later use.
@@ -38,7 +38,10 @@ def log_mentioned_context(func: Callable):
                 + "representing a Factor or a string "
                 + "representing the name of a Factor included in context_list."
             )
-        factor, mentioned = func(cls, factor_record, mentioned)
+        if factor_record.get("code") is not None:
+            factor = func(cls, factor_record)
+        else:
+            factor, mentioned = func(cls, factor_record, mentioned)
         if not factor.name and (not hasattr(factor, "generic") or not factor.generic):
             for context_factor in mentioned:
                 if context_factor == factor:
@@ -51,13 +54,21 @@ def log_mentioned_context(func: Callable):
 
     return wrapper
 
-def get_directory_path(stem):
+
+def get_directory_path(stem: str) -> pathlib.Path:
     """
     This function finds a data directory for importing files, if cwd
     is that directory, is its parent directory, or is a sibling
     directory. Otherwise it won't find the right directory.
 
     This function doesn't obviously belong in the context module.
+
+    :param stem:
+        name of the folder where the desired example data files
+        can be found, e.g. "holdings" or "opinions".
+
+    :returns:
+        path to the directory with the desired example data files.
     """
     directory = pathlib.Path.cwd()
     if directory.stem == stem:

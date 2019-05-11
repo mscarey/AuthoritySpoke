@@ -22,8 +22,8 @@ def new_context_helper(func: Callable):
     Decorator for :meth:`Factor.new_context`.
 
     If a :class:`list` has been passed in rather than a :class:`dict`, uses
-    the input as a set of :class:`Factor`\s to replace the
-    :attr:`Factor.generic_factors` from the calling object.
+    the input as a series of :class:`Factor`\s to replace the
+    :attr:`~Factor.generic_factors` from the calling object.
 
     Also, if ``context`` contains a replacement for the calling
     object, the decorator returns the replacement and never calls
@@ -179,11 +179,13 @@ class Factor(ABC):
 
         if self.generic:
             return [self]
-        return list({
+        return list(
+            {
                 generic: None
                 for factor in self.context_factors
                 for generic in factor.generic_factors
-            })
+            }
+        )
 
     @property
     def context_factors(self) -> Tuple:
@@ -788,8 +790,8 @@ class Fact(Factor):
     def _contradicts_if_factor(self, other: Factor) -> bool:
         """
         :returns:
-            True if self and other can't both be true at the same time.
-            Otherwise returns False.
+            ``True`` if ``self`` and ``other`` can't both be true at
+            the same time. Otherwise returns ``False``.
         """
 
         if not isinstance(other, self.__class__):
@@ -897,8 +899,8 @@ class Fact(Factor):
 @dataclass(frozen=True)
 class Pleading(Factor):
     """
-    A formal assertion of a Fact, included by a party in a Pleading
-    to establish a cause of action.
+    A formal assertion of a :class:`Fact`, included by a party in
+    a :class:`Pleading` to establish a cause of action.
     """
 
     filer: Optional["Entity"] = None

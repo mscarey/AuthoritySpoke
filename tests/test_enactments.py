@@ -20,6 +20,11 @@ class TestCodes:
         cfr = make_code["cfr37"]
         assert str(cfr) == "Code of Federal Regulations Title 37"
 
+    def test_cfr_repr(self, make_code):
+        cfr = make_code["cfr37"]
+        assert repr(cfr) == 'Code("cfr37.xml")'
+
+
     def test_get_bill_of_rights_effective_date(self, make_code):
         const = make_code["const"]
         bill_of_rights_date = datetime.date(1791, 12, 15)
