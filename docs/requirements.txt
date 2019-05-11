@@ -1,2 +1,3 @@
-sphinx
+-e .
+sphinx>=2.0
 sphinx-autodoc-typehints
