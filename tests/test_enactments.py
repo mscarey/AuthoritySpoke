@@ -24,9 +24,18 @@ class TestCodes:
         cfr = make_code["cfr37"]
         assert repr(cfr) == 'Code("cfr37.xml")'
 
-    def test_uslm_url(self, make_code):
-        usc17 = make_code["usc17"]
-        assert usc17.url == "/us/usc/t17"
+    @pytest.mark.parametrize(
+        'code, url',
+        [
+            ("usc17", "/us/usc/t17"),
+            ("const", "/us/const"),
+            ("cfr37", "/us/cfr/t37"),
+            ("ca_evid", "/us-ca/evid"),
+            ("ca_pen", "/us-ca/pen"),
+        ]
+    )
+    def test_code_urls(self, make_code, code, url):
+        assert make_code[code].url == url
 
     def test_const_url(self, make_code):
         assert make_code["const"].url == "/us/const"

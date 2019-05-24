@@ -488,6 +488,8 @@ def make_code() -> Dict[str, Code]:
         "usc17": Code("usc17.xml"),
         # one section of the 2012 edition of CFR Title 37 from govinfo.gov
         "cfr37": Code("cfr37.xml"),
+        "ca_evid": Code("ca_evidence.html"),
+        "ca_pen": Code("ca_penal.html"),
     }
 
 

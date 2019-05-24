@@ -33,6 +33,7 @@ class Code:
     ns = {
         "uslm": "http://xml.house.gov/schemas/uslm/1.0",
         "dc": "http://purl.org/dc/elements/1.1/",
+        "xhtml" : "http://www.w3.org/1999/xhtml",
     }
 
     def __init__(self, filename: str):
@@ -58,7 +59,7 @@ class Code:
 
         if filename.startswith("ca_"):
             self.url = "/us-ca"
-            self.title = self.xml.find("h3").find("b").text.split(" - ")[0]
+            self.title = root.find(".//xhtml:h3/xhtml:b", ns).text.split(" - ")[0]
             if "Evidence" in self.title:
                 self.url += "/evid"
             elif "Penal" in self.title:
