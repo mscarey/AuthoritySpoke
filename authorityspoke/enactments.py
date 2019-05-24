@@ -4,8 +4,7 @@ import datetime
 import pathlib
 import re
 from typing import Dict, List, Optional
-
-from bs4 import BeautifulSoup
+from lxml import etree
 
 from dataclasses import dataclass
 
@@ -30,40 +29,53 @@ class Code:
 
     directory = get_directory_path("codes")
 
+    # namespaces for legislative XML schemas
+    ns = {
+        "uslm": "http://xml.house.gov/schemas/uslm/1.0",
+        "dc": "http://purl.org/dc/elements/1.1/",
+    }
+
     def __init__(self, filename: str):
+        ns = self.__class__.ns
         self.filename = filename
         self.path = self.__class__.directory / filename
-        self.xml = self.get_xml()
-        if filename.startswith("ca_"):
-            self.title = self.xml.find("h3").find("b").text.split(" - ")[0]
-            self.sovereign = "California"
-        elif filename.startswith("usc"):
-            self.title_number = int(self.xml.find("meta").find("docNumber").text)
-            self.title = f"USC Title {self.title_number}"
-            self.sovereign = "federal"
-        elif filename.startswith("cfr"):
-            self.title_number = int(self.xml.CFRGRANULE.FDSYS.CFRTITLE.text)
-            self.title = f"Code of Federal Regulations Title {self.title_number}"
-            self.sovereign = "federal"
-        else:
-            self.title = self.xml.find("dc:title").text
-            if "United States" in self.title:
-                self.sovereign = "federal"
+        with open(self.path) as fp:
+            self.xml = etree.parse(fp)
+        root = self.xml.getroot()
+        if root.nsmap.get(None) == ns["uslm"]:
+            title = self.xml.getroot().find("./uslm:main/uslm:title", ns)
+            if title is not None:
+                # The code is a USC title
+                self.url = title.attrib["identifier"]
+                self.title_number = int(
+                    root.find("./uslm:meta/uslm:docNumber", ns).text
+                )
+                self.title = f"USC Title {self.title_number}"
+            else:
+                # The code is the US constitution
+                self.url = "/us/const"
+                self.title = root.find("./uslm:meta/dc:title", ns).text
 
+        if filename.startswith("ca_"):
+            self.url = "/us-ca"
+            self.title = self.xml.find("h3").find("b").text.split(" - ")[0]
+            if "Evidence" in self.title:
+                self.url += "/evid"
+            elif "Penal" in self.title:
+                self.url += "/pen"
+
+        elif filename.startswith("cfr"):
+            self.title_number = int(root.xpath("/CFRGRANULE/FDSYS/CFRTITLE")[0].text)
+            self.title = f"Code of Federal Regulations Title {self.title_number}"
+            self.url = f"/us/cfr/t{self.title_number}"
+
+        self.sovereign = self.url.split("/")[1]
         if "Constitution" in self.title:
             self.level = "constitutional"
         elif "Regulations" in self.title:
             self.level = "regulation"
         else:
             self.level = "statutory"
-
-    def get_xml(self):
-        """
-        :returns: the XML corresponding to this Code object.
-        """
-        with open(self.path) as fp:
-            xml = BeautifulSoup(fp.read(), "lxml-xml")
-        return xml
 
     def provision_effective_date(self, cite: str) -> datetime.date:
         """
@@ -78,7 +90,7 @@ class Code:
         :returns: the effective date of the cited provision
         """
 
-        if self.level == "constitutional" and self.sovereign == "federal":
+        if self.level == "constitutional" and self.sovereign == "us":
             if "amendment" not in cite.lower():
                 return datetime.date(1788, 9, 13)
             roman_numeral = cite.split("-")[1]
@@ -190,16 +202,16 @@ class Enactment:
                 )
             return section.find_all(["chapeau", "paragraph", "content"])
 
-        if self.code.sovereign == "federal":
+        if self.code.sovereign == "us":
             if self.code.level == "regulation":
                 passages = self.code.xml.find(
                     name="SECTNO", text=f"§ {202.1}"
                 ).parent.find_all(name="P")
-            elif hasattr(self.code, "title_number"):
+            elif self.code.url.split("/")[-1].startswith("t"):
                 passages = usc_statute_text()
             else:
                 passages = self.code.xml.find(id=self.section).find_all(name="text")
-        elif self.code.sovereign == "California":
+        elif self.code.sovereign == "us-ca":
             passages = self.code.xml.find(href=cal_href).parent.find_next_siblings(
                 style="margin:0;display:inline;"
             )

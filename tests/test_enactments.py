@@ -24,6 +24,12 @@ class TestCodes:
         cfr = make_code["cfr37"]
         assert repr(cfr) == 'Code("cfr37.xml")'
 
+    def test_uslm_url(self, make_code):
+        usc17 = make_code["usc17"]
+        assert usc17.url == "/us/usc/t17"
+
+    def test_const_url(self, make_code):
+        assert make_code["const"].url == "/us/const"
 
     def test_get_bill_of_rights_effective_date(self, make_code):
         const = make_code["const"]
