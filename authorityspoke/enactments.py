@@ -4,13 +4,14 @@ import datetime
 import pathlib
 import re
 from typing import Dict, List, Optional
-from lxml import etree
-
 from dataclasses import dataclass
+
+from lxml import etree
 
 from utils import roman
 
 from authorityspoke.context import log_mentioned_context, get_directory_path
+from authorityspoke.selectors import TextQuoteSelector
 
 
 class Code:
@@ -137,21 +138,9 @@ class Enactment:
     :param code:
         the :class:`Code` where this legislative text appears.
 
-    :param section:
-        identifier for the section of the :class:`Code` where
+    :param selector:
+        identifier for the place in the :class:`Code` where
         the text can be found.
-
-    :param subsection:
-        identifier for the subsection of the :class:`Code` where
-        the text can be found.
-
-    :param start:
-        a unique string corresponding to the first part of the
-        quoted passage of legislative text
-
-    :param end:
-        a unique string corresponding to the end of the
-        quoted passage of legislative text
 
     :param name:
         an identifier for this object, often used if the object needs
@@ -160,10 +149,7 @@ class Enactment:
     """
 
     code: Code
-    section: Optional[str] = None
-    subsection: Optional[str] = None
-    start: Optional[str] = None
-    end: Optional[str] = None
+    selector: TextQuoteSelector
     name: Optional[str] = None
 
     @property
@@ -173,7 +159,7 @@ class Enactment:
             the effective date of the text in this passage.
             Currently works only for the US Constitution.
         """
-        return self.code.provision_effective_date(self.section)
+        return self.code.provision_effective_date(self.selector)
 
     @property
     def text(self):

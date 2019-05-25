@@ -42,8 +42,7 @@
                 "content": "Hideaway Lodge was Wattenburg’s abode"
             }],
             "enactments": [{
-                "code": "constitution.xml",
-                "section": "amendment-IV",
+                "path": "/us/const/amendment-IV",
                 "end": "violated",
                 "name": "search clause"
             }],

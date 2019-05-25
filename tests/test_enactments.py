@@ -9,6 +9,7 @@ from authorityspoke.entities import Human, Event
 from authorityspoke.enactments import Code, Enactment
 from authorityspoke.opinions import Opinion
 from authorityspoke.predicates import ureg, Q_
+from authorityspoke.selectors import TextQuoteSelector
 
 
 class TestCodes:
@@ -89,7 +90,8 @@ class TestEnactments:
 
     def test_passage_from_cfr_code(self, make_code):
         cfr = make_code["cfr37"]
-        slogans = Enactment(cfr, section=202.1, end="names, titles, and slogans")
+        selector = TextQuoteSelector(path="/us/cfr/t37/s202.1")
+        slogans = Enactment(cfr, selector=selector)
         assert "Words and short phrases such as names" in slogans.text
 
     def test_code_title_in_str(self, make_enactment):

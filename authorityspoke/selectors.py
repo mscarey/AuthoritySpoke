@@ -11,6 +11,10 @@ class TextQuoteSelector:
     Compare with the `Web Annotation Data Model
     <https://www.w3.org/TR/annotation-model/#text-quote-selector>`_
 
+    :param path:
+        a path from the root of the document to the XML element where
+        the selected text can be found.
+
     :param exact:
         a copy of the text which is being selected, after normalization.
         If None, then the entire text of the element identified by the
@@ -24,10 +28,6 @@ class TextQuoteSelector:
     :param suffix:
         the snippet of text that occurs immediately after the text which
         is being selected.
-
-    :param path:
-        a path from the root of the document to the XML element where
-        the selected text can be found.
     """
 
     exact: Optional[str] = None

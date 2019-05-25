@@ -78,14 +78,12 @@
                 "absent": true
             },
             "enactments": [{
-                    "code": "constitution.xml",
-                    "section": "amendment-IV",
+                    "path": "/us/const/amendment-IV",
                     "end": "violated",
                     "name": "search clause"
                 },
                 {
-                    "code": "constitution.xml",
-                    "section": "amendment-XIV-1",
+                    "path": "/us/const/amendment-XIV-1",
                     "start": "nor shall any State",
                     "end": "due process of law",
                     "name": "due process clause"

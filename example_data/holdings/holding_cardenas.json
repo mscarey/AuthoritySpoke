@@ -50,27 +50,21 @@
             }],
             "mandatory": true,
             "enactments": [{
-                    "code": "ca_evidence.html",
-                    "section": "351"
+                    "path": "/us-ca/evid/s351"
                 },
                 {
-                    "code": "ca_evidence.html",
-                    "section": "352",
+                    "path": "/us-ca/evid/s352",
                     "end": "its admission will"
                 },
                 {
-                    "code": "ca_evidence.html",
-                    "section": "352",
-                    "start": "create substantial danger",
-                    "end": "undue prejudice"
+                    "path": "/us-ca/evid/s352",
+                    "exact": "create substantial danger of undue prejudice"
                 },
                 {
-                    "code": "ca_penal.html",
-                    "section": "211"
+                    "path": "/us-ca/pen/s211"
                 },
                 {
-                    "code": "ca_penal.html",
-                    "section": "664",
+                    "path": "/us-ca/pen/s664",
                     "end": "shall be punished"
                 }
             ]

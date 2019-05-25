@@ -37,9 +37,7 @@
                 "content": "Borland International infringed the copyright in the Lotus menu command hierarchy"
             }],
             "enactments": [{
-                "code": "usc17.xml",
-                "section": "102",
-                "subsection": "a",
+                "path": "/us/usc/t17/s102/a",
                 "end": "machine or device.",
                 "name": "copyright protection"
             }]
@@ -110,9 +108,7 @@
                 "content": "the Lotus menu command hierarchy was copyrightable"
             }],
             "enactments": [{
-                "code": "usc17.xml",
-                "section": "410",
-                "subsection": "c"
+                "path": "/us/usc/t17/s410/c"
             }]
         },
         {
@@ -193,18 +189,14 @@
             "mandatory": true,
             "universal": true,
             "enactments": [{
-                    "code": "usc17.xml",
-                    "section": "102",
-                    "subsection": "b",
+                    "path": "/us/usc/t17/s102/b",
                     "end": "extend to any",
                     "name": "copyright exceptions"
                 },
                 {
-                    "code": "usc17.xml",
-                    "section": "102",
-                    "subsection": "b",
-                    "name": "method of operation provision",
-                    "text": "method of operation"
+                    "path": "/us/usc/t17/s102/b",
+                    "exact": "method of operation",
+                    "name": "method of operation provision"
                 }
             ]
         },

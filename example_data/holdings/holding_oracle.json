@@ -35,10 +35,8 @@
             },
             "mandatory": true,
             "enactments": {
-                "code": "usc17.xml",
-                "section": "102",
-                "subsection": "a",
-                "end": "machine or device.",
+                "path": "/us/usc/t17/s102/a",
+                "exact": "Copyright protection subsists, in accordance with this title, in original works of authorship fixed in any tangible medium of expression, now known or later developed, from which they can be perceived, reproduced, or otherwise communicated, either directly or with the aid of a machine or device.",
                 "name": "copyright protection provision"
             }
         },
@@ -90,9 +88,7 @@
             "mandatory": true,
             "enactments": "copyright protection provision",
             "enactments_despite": {
-                "code": "usc17.xml",
-                "section": "102",
-                "subsection": "b",
+                "path": "/us/usc/t17/s102/b",
                 "name": "copyrightability exceptions"
             }
         },
@@ -296,22 +292,17 @@
             "mandatory": true,
             "enactments": "copyright protection provision",
             "enactments_despite": [{
-                    "code": "usc17.xml",
-                    "section": "102",
-                    "subsection": "b",
-                    "end": "extend to any",
+                    "path": "/us/usc/t17/s102/b",
+                    "exact": "In no case does copyright protection for an original work of authorship extend to any",
                     "name": "in no case clause"
                 },
                 {
-                    "code": "usc17.xml",
-                    "section": "102",
-                    "subsection": "b",
-                    "name": "method of operation clause",
-                    "text": "method of operation"
+                    "path": "/us/usc/t17/s102/b",
+                    "exact": "method of operation",
+                    "name": "method of operation clause"
                 },
                 {
-                    "code": "cfr37.xml",
-                    "section": "202.1",
+                    "path": "/us/cfr/t37/s202.1",
                     "name": "short phrases copyright exception",
                     "end": "names, titles, and slogans"
                 }
