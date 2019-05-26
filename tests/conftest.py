@@ -8,6 +8,7 @@ from authorityspoke.enactments import Code, Enactment
 from authorityspoke.entities import Entity, Event, Human
 from authorityspoke.factors import Evidence, Exhibit
 from authorityspoke.factors import Fact
+from authorityspoke.jurisdictions import Jurisdiction, Regime
 from authorityspoke.opinions import Opinion
 from authorityspoke.predicates import Predicate, Q_
 from authorityspoke.rules import Procedure, ProceduralRule, Rule
@@ -482,15 +483,18 @@ def make_evidence(
 
 @pytest.fixture(scope="module")
 def make_code() -> Dict[str, Code]:
-    return {
-        "const": Code("constitution.xml"),
+    usa = Regime()
+    for code in (
+        Code("constitution.xml"),
         # USC Title 17 in USLM format
-        "usc17": Code("usc17.xml"),
+        Code("usc17.xml"),
         # one section of the 2012 edition of CFR Title 37 from govinfo.gov
-        "cfr37": Code("cfr37.xml"),
-        "ca_evid": Code("ca_evidence.html"),
-        "ca_pen": Code("ca_penal.html"),
-    }
+        Code("cfr37.xml"),
+        Code("ca_evidence.html"),
+        Code("ca_penal.html"),
+    ):
+        usa.has_code(code)
+    return usa
 
 
 @pytest.fixture(scope="module")

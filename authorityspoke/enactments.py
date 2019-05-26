@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime
 import pathlib
 import re
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Union
 from dataclasses import dataclass
 
 from lxml import etree
@@ -34,7 +34,7 @@ class Code:
     ns = {
         "uslm": "http://xml.house.gov/schemas/uslm/1.0",
         "dc": "http://purl.org/dc/elements/1.1/",
-        "xhtml" : "http://www.w3.org/1999/xhtml",
+        "xhtml": "http://www.w3.org/1999/xhtml",
     }
 
     def __init__(self, filename: str):
@@ -78,6 +78,10 @@ class Code:
             self.level = "regulation"
         else:
             self.level = "statutory"
+
+    @property
+    def jurisdiction_id(self):
+        return self.url.split("/")[1]
 
     def provision_effective_date(self, cite: str) -> datetime.date:
         """
@@ -217,13 +221,20 @@ class Enactment:
 
     @classmethod
     @log_mentioned_context
-    def from_dict(cls, enactment_dict: Dict[str, str]) -> Enactment:
+    def from_dict(
+        cls, enactment_dict: Dict[str, str], mentioned: List[Union["Factor", Enactment]]
+    ) -> Enactment:
         """
         Creates a new :class:`Enactment` object using a :class:`dict`
         imported from JSON example data.
 
         There's currently no way to import an existing :class:`Code` object
         for use in composing the new :class:`Enactment`.
+
+        :param enactment_dict:
+        :param mentioned:
+            not currently used, passed to the function to to maintain
+            symmetry with :meth:`.Function.from_dict`
         """
         code = Code(enactment_dict["code"])
         start = enactment_dict.get("start")
@@ -235,13 +246,13 @@ class Enactment:
             end = text
 
         return Enactment(
-                code=code,
-                section=enactment_dict.get("section"),
-                subsection=enactment_dict.get("subsection"),
-                start=start,
-                end=end,
-                name=name,
-            )
+            code=code,
+            section=enactment_dict.get("section"),
+            subsection=enactment_dict.get("subsection"),
+            start=start,
+            end=end,
+            name=name,
+        ), mentioned
 
     def means(self, other: Enactment) -> bool:
         """
