@@ -201,7 +201,6 @@ class Opinion:
                     for opinion in cls.from_dict(case, lead_only=False):
                         yield opinion
 
-
         if as_generator:
             return iter(opinions_from_response(results, to_dict))
         opinions = [case for case in opinions_from_response(results, to_dict)]
@@ -337,6 +336,7 @@ class Opinion:
         rule_file: Optional[str] = None,
         rule_dict: Optional[dict] = None,
         directory: Optional[pathlib.Path] = None,
+        regime: Optional["Regime"] = None,
     ):
         """
         Loads structured JSON representation of :class:`.Rule`
@@ -360,9 +360,9 @@ class Opinion:
         """
 
         if rule_dict:
-            holdings = Rule.collection_from_dict(rule_dict)
+            holdings = Rule.collection_from_dict(rule_dict, regime=regime)
         elif rule_file:
-            holdings = Rule.from_json(rule_file, directory=directory)
+            holdings = Rule.from_json(rule_file, directory=directory, regime=regime)
         else:
             raise ValueError(
                 "Must specify either rule_file (filename of a JSON rule input file) "

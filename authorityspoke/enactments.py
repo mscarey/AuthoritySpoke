@@ -174,9 +174,9 @@ class Enactment:
         def cal_href(href):
             """
             Tests whether an XML element has an attribute labeling it as the text
-            of the statutory section "self.section".
+            of the statutory section `self.section`.
 
-            Uses the California statute XML format from http://leginfo.legislature.ca.gov/.
+            Uses `California statute XML format <http://leginfo.legislature.ca.gov/>`_.
             """
 
             return href and re.compile(
