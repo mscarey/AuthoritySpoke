@@ -9,7 +9,8 @@ from authorityspoke.opinions import Opinion
 @dataclass
 class Court:
     """
-    Issues Opinions, has Judges, may be inferior to other Courts.
+    Issues :class:`.Opinion`\s, has :class:`.Judge`\s,
+    may be inferior to other `Courts`.
     """
     id: str
     opinions: Optional[List[Opinion]] = None

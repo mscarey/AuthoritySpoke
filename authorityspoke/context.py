@@ -23,6 +23,7 @@ def log_mentioned_context(func: Callable):
         cls,
         factor_record: Union[str, Optional[Dict[str, Union[str, bool]]]],
         mentioned: List[Union["Factor", "Enactment"]],
+        regime: Optional["Regime"] = None,
     ) -> Tuple[Optional["Factor"], List["Factor"]]:
 
         if factor_record is None:
@@ -42,7 +43,7 @@ def log_mentioned_context(func: Callable):
         if factor_record.get("code") is not None:
             factor = func(cls, factor_record)
         else:
-            factor, mentioned = func(cls, factor_record, mentioned)
+            factor, mentioned = func(cls, factor_record, mentioned, regime)
         if not factor.name and (not hasattr(factor, "generic") or not factor.generic):
             for context_factor in mentioned:
                 if context_factor == factor:

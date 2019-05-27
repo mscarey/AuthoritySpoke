@@ -121,7 +121,7 @@ class Factor(ABC):
     @classmethod
     @log_mentioned_context
     def from_dict(
-        cls, factor_record: Dict, mentioned: List[Factor]
+        cls, factor_record: Dict, mentioned: List[Factor], regime: Optional["Regime"] = None
     ) -> Optional[Factor]:
         """
         Turns a dict recently created from a chunk of JSON

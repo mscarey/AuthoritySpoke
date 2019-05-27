@@ -222,7 +222,10 @@ class Enactment:
     @classmethod
     @log_mentioned_context
     def from_dict(
-        cls, enactment_dict: Dict[str, str], mentioned: List[Union["Factor", Enactment]]
+        cls,
+        enactment_dict: Dict[str, str],
+        mentioned: Optional[List[Union["Factor", Enactment]]] = None,
+        regime: Optional["Regime"] = None,
     ) -> Enactment:
         """
         Creates a new :class:`Enactment` object using a :class:`dict`
@@ -232,11 +235,22 @@ class Enactment:
         for use in composing the new :class:`Enactment`.
 
         :param enactment_dict:
+
         :param mentioned:
-            not currently used, passed to the function to to maintain
+            not currently used, passed to the function to maintain
             symmetry with :meth:`.Function.from_dict`
+
+        :param regime:
+            the :class:`.Regime` where the :class:`.Code` that is the
+            source for this `Enactment` can be found.
         """
-        code = Code(enactment_dict["code"])
+        if regime is not None and regime.get_code(enactment_dict["path"]):
+            code = regime.get_code(enactment_dict["path"])
+        else:
+            code = Code(enactment_dict["path"])
+            if regime:
+                regime.set_code(code)
+
         start = enactment_dict.get("start")
         end = enactment_dict.get("end")
         name = enactment_dict.get("name")
@@ -245,14 +259,17 @@ class Enactment:
             start = text
             end = text
 
-        return Enactment(
-            code=code,
-            section=enactment_dict.get("section"),
-            subsection=enactment_dict.get("subsection"),
-            start=start,
-            end=end,
-            name=name,
-        ), mentioned
+        return (
+            Enactment(
+                code=code,
+                section=enactment_dict.get("section"),
+                subsection=enactment_dict.get("subsection"),
+                start=start,
+                end=end,
+                name=name,
+            ),
+            mentioned,
+        )
 
     def means(self, other: Enactment) -> bool:
         """

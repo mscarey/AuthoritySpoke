@@ -493,7 +493,7 @@ def make_code() -> Dict[str, Code]:
         Code("ca_evidence.html"),
         Code("ca_penal.html"),
     ):
-        usa.has_code(code)
+        usa.set_code(code)
     return usa
 
 

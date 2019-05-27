@@ -482,12 +482,17 @@ class Rule(Factor):
     directory = get_directory_path("holdings")
 
     @classmethod
-    def collection_from_dict(cls, case: Dict) -> List[Rule]:
+    def collection_from_dict(
+        cls, case: Dict, regime: Optional["Regime"] = None
+    ) -> List[Rule]:
         """
         :param case:
             a :class:`dict` derived from the JSON format that
             lists ``mentioned_entities`` followed by a
             series of :class:`Rule`\s
+
+        :param regime:
+
         :returns:
             a :class:`list` of :class:`Rule`\s with the items
             from ``mentioned_entities`` as ``context_factors``
@@ -500,13 +505,18 @@ class Rule(Factor):
         finished_rules: List[Rule] = []
         for rule in rule_list:
             # This will need to change for Attribution holdings
-            finished_rule, mentioned = ProceduralRule.from_dict(rule, mentioned)
+            finished_rule, mentioned = ProceduralRule.from_dict(
+                rule, mentioned, regime=regime
+            )
             finished_rules.append(finished_rule)
         return finished_rules
 
     @classmethod
     def from_json(
-        cls, filename: str, directory: Optional[pathlib.Path] = None
+        cls,
+        filename: str,
+        directory: Optional[pathlib.Path] = None,
+        regime: Optional["Regime"] = None,
     ) -> List[Rule]:
         """
         Does not cause an :class:`.Opinion` to :meth:`~.Opinion.posit`
@@ -520,6 +530,8 @@ class Rule(Factor):
         :param directory:
             the path of the directory containing the JSON file
 
+        :parame regime:
+
         :returns:
             a list of :class:`Rule`\s from a JSON file in the
             ``example_data/holdings`` subdirectory, from a JSON
@@ -529,11 +541,13 @@ class Rule(Factor):
             directory = cls.directory
         with open(directory / filename, "r") as f:
             case = json.load(f)
-        return cls.collection_from_dict(case)
+        return cls.collection_from_dict(case, regime=regime)
 
     @classmethod
     def get_mentioned_factors(
-        cls, mentioned_list: Optional[List[Dict[str, str]]]
+        cls,
+        mentioned_list: Optional[List[Dict[str, str]]],
+        regime: Optional["Regime"] = None,
     ) -> List[Factor]:
         """
         :param mentioned_list:
@@ -551,7 +565,7 @@ class Rule(Factor):
         mentioned: List[Factor] = []
         if mentioned_list:
             for factor_dict in mentioned_list:
-                _, mentioned = Factor.from_dict(factor_dict, mentioned)
+                _, mentioned = Factor.from_dict(factor_dict, mentioned, regime=regime)
         return mentioned
 
 
@@ -632,7 +646,7 @@ class ProceduralRule(Rule):
 
     @classmethod
     def from_dict(
-        cls, record: Dict, context_list: List[Factor]
+        cls, record: Dict, context_list: List[Factor], regime: Optional["Regime"] = None
     ) -> Tuple[ProceduralRule, List[Factor]]:
 
         """
@@ -658,12 +672,15 @@ class ProceduralRule(Rule):
             record_list: Union[Dict[str, str], List[Dict[str, str]]],
             context_list: List[Factor],
             class_to_create,
+            regime: Optional["Regime"] = None
         ) -> Tuple[Union[Factor, Enactment]]:
             factors_or_enactments: List[Union[Factor, Enactment]] = []
             if not isinstance(record_list, list):
                 record_list = [record_list]
             for record in record_list:
-                created, context_list = class_to_create.from_dict(record, context_list)
+                created, context_list = class_to_create.from_dict(
+                    record, context_list, regime=regime
+                )
                 factors_or_enactments.append(created)
             return tuple(factors_or_enactments), context_list
 
@@ -675,7 +692,7 @@ class ProceduralRule(Rule):
         enactment_groups: Dict[str, List] = {"enactments": [], "enactments_despite": []}
         for enactment_type in enactment_groups:
             enactment_groups[enactment_type], context_list = list_from_records(
-                record.get(enactment_type, []), context_list, Enactment
+                record.get(enactment_type, []), context_list, Enactment, regime=regime
             )
 
         procedure = Procedure(

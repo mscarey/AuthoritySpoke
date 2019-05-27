@@ -265,7 +265,7 @@ class TestRuleImport:
 
 
 class TestNestedFactorImport:
-    def test_import_holding(self, make_opinion):
+    def test_import_holding(self, make_code, make_opinion):
         """
         Based on this text:
         This testimony tended “only remotely” to prove that appellant
@@ -276,5 +276,5 @@ class TestNestedFactorImport:
         concerning appellant’s use of narcotics was improper.
         """
         cardenas = make_opinion["cardenas_majority"]
-        cardenas_holdings = Rule.from_json("holding_cardenas.json")
+        cardenas_holdings = Rule.from_json("holding_cardenas.json", regime=make_code)
         assert len(cardenas_holdings) == 2
