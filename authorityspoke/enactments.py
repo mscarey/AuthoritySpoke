@@ -226,7 +226,7 @@ class Enactment:
         enactment_dict: Dict[str, str],
         mentioned: Optional[List[Union["Factor", Enactment]]] = None,
         regime: Optional["Regime"] = None,
-    ) -> Enactment:
+    ) -> Tuple[Enactment, Optional[List[Union[Enactment, Factor]]]]:
         """
         Creates a new :class:`Enactment` object using a :class:`dict`
         imported from JSON example data.
@@ -251,23 +251,15 @@ class Enactment:
             if regime:
                 regime.set_code(code)
 
-        start = enactment_dict.get("start")
-        end = enactment_dict.get("end")
-        name = enactment_dict.get("name")
-        text = enactment_dict.get("text")
-        if text and not (start or end):
-            start = text
-            end = text
+        selector = TextQuoteSelector(
+            path=enactment_dict.get("path"),
+            exact=enactment_dict.get("exact"),
+            prefix=enactment_dict.get("prefix"),
+            suffix=enactment_dict.get("suffix"),
+        )
 
         return (
-            Enactment(
-                code=code,
-                section=enactment_dict.get("section"),
-                subsection=enactment_dict.get("subsection"),
-                start=start,
-                end=end,
-                name=name,
-            ),
+            Enactment(code=code, selector=selector, name=enactment_dict.get("name")),
             mentioned,
         )
 

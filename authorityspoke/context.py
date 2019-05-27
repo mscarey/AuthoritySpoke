@@ -22,10 +22,12 @@ def log_mentioned_context(func: Callable):
     def wrapper(
         cls,
         factor_record: Union[str, Optional[Dict[str, Union[str, bool]]]],
-        mentioned: List[Union["Factor", "Enactment"]],
+        mentioned: Optional[List[Union["Factor", "Enactment"]]]=None,
         regime: Optional["Regime"] = None,
     ) -> Tuple[Optional["Factor"], List["Factor"]]:
 
+        if not mentioned:
+            mentioned = []
         if factor_record is None:
             return None, mentioned
         if isinstance(factor_record, str):

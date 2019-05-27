@@ -12,6 +12,7 @@ from authorityspoke.jurisdictions import Jurisdiction, Regime
 from authorityspoke.opinions import Opinion
 from authorityspoke.predicates import Predicate, Q_
 from authorityspoke.rules import Procedure, ProceduralRule, Rule
+from authorityspoke.selectors import TextQuoteSelector
 
 
 @pytest.fixture(scope="class")
@@ -499,22 +500,34 @@ def make_code() -> Dict[str, Code]:
 
 @pytest.fixture(scope="module")
 def make_enactment(make_code) -> Dict[str, Enactment]:
-    const = make_code["const"]
-
     return {
-        "search_clause": Enactment(const, "amendment-IV", end="violated"),
-        "fourth_a": Enactment(const, "amendment-IV"),
-        "due_process_5": Enactment(
-            const,
-            "amendment-V",
-            start="life, liberty, or property",
-            end="due process of law",
+        "search_clause": Enactment.from_dict(
+            {
+                "path": "/us/const/amendment-IV",
+                "exact": (
+                    "The right of the people to be secure in their persons, "
+                    + "houses, papers, and effects, against unreasonable searches "
+                    + "and seizures, shall not be violated"
+                ),
+            },
+            regime=make_code,
         ),
-        "due_process_14": Enactment(
-            const,
-            "amendment-XIV-1",
-            start="life, liberty, or property",
-            end="due process of law",
+        "fourth_a": Enactment.from_dict(
+            {"path": "/us/const/amendment-IV"}, regime=make_code
+        ),
+        "due_process_5": Enactment.from_dict(
+            {
+                "path": "/us/const/amendment-V",
+                "exact": "life, liberty, or property, without due process of law",
+            },
+            regime=make_code,
+        ),
+        "due_process_14": Enactment.from_dict(
+            {
+                "path": "/us/const/amendment-XIV-1",
+                "exact": "life, liberty, or property, without due process of law",
+            },
+            regime=make_code,
         ),
     }
 
