@@ -45,7 +45,7 @@ class Code:
             self.xml = etree.parse(fp)
         root = self.xml.getroot()
         if root.nsmap.get(None) == ns["uslm"]:
-            title = self.xml.getroot().find("./uslm:main/uslm:title", ns)
+            title = root.find("./uslm:main/uslm:title", ns)
             if title is not None:
                 # The code is a USC title
                 self.uri = title.attrib["identifier"]
@@ -100,17 +100,30 @@ class Code:
         if isinstance(cite, TextQuoteSelector):
             cite = cite.path
         if self.level == "constitution" and self.sovereign == "us":
+            # The constitution's id fields don't contain the whole path.
+            cite = cite.strip(self.uri).strip("/")
+
             if "amendment" not in cite.lower():
                 return datetime.date(1788, 9, 13)
             roman_numeral = cite.split("-")[1]
             amendment_number = roman.from_roman(roman_numeral)
             if amendment_number < 11:
                 return datetime.date(1791, 12, 15)
-            section = self.xml.find(id=cite)
-            if section.name == "level":
-                enactment_text = section.find("note").p.text
+            root = self.xml.getroot()
+            # an explicit prefix is needed when a predicate is used
+            # so root.nsmap won't work.
+            ns = self.__class__.ns
+            def query_for_tag(tag: str):
+                query = f'//uslm:{tag}[@id="{cite}"]'
+                return self.xml.find(query, ns)
+
+            tag = query_for_tag("section")
+            if tag is not None:
+                enactment_text = tag.find("uslm:note/uslm:p", ns).text
             else:
-                enactment_text = section.parent.find("note").p.text
+                tag = query_for_tag("level")
+                enactment_text = tag.find("uslm:note/uslm:p", ns).text
+
             month_first = re.compile(
                 r"""(?:Secretary of State|Administrator of General Services|certificate of the Archivist)(?: accordingly issued a proclamation)?,? dated (\w+ \d\d?, \d{4}),"""
             )
