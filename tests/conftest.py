@@ -481,6 +481,12 @@ def make_evidence(
         "generic_absent": Evidence(x["generic_exhibit"], absent=True, generic=True),
     }
 
+@pytest.fixture(scope="module")
+def make_selector() -> Dict[str, TextQuoteSelector]:
+    return {"/us/usc/t17/s103": TextQuoteSelector(
+            path = "/us/usc/t17/s103",
+            exact = "protection for a work employing preexisting material in which copyright subsists does not extend to any part of the work in which such material has been used unlawfully."
+    )}
 
 @pytest.fixture(scope="module")
 def make_code() -> Dict[str, Code]:

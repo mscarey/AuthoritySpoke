@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 from pathlib import PurePosixPath
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Union
 
 from dataclasses import dataclass, field
 
 from authorityspoke.enactments import Code
 from authorityspoke.courts import Court
+from authorityspoke.selectors import TextQuoteSelector
 
 @dataclass
 class Jurisdiction:
@@ -51,19 +52,28 @@ class Regime:
     """
     jurisdictions: Dict[str, Jurisdiction] = field(default_factory=dict)
 
-    def get_code(self, url: str):
-        jurisdiction_id = url.split("/")[1]
+    def get_code(self, selector: Union[TextQuoteSelector, str]):
+        if isinstance(selector, TextQuoteSelector):
+            if selector.path is not None:
+                return self.get_code(selector.path)
+            else:
+                raise ValueError(
+                    '"selector" must have a "path" attribute containing ',
+                    'a path to the code, or must be a string containing the path'
+                )
+
+        jurisdiction_id = selector.split("/")[1]
 
         if jurisdiction_id not in self.jurisdictions:
             raise ValueError(
                 f"Regime has no jurisdiction {jurisdiction_id}."
             )
-        return self.jurisdictions[jurisdiction_id].get_code(url)
+        return self.jurisdictions[jurisdiction_id].get_code(selector)
 
     def set_code(self, code: Code):
-        jurisdiction_id = code.url.split("/")[1]
+        jurisdiction_id = code.uri.split("/")[1]
         if jurisdiction_id not in self.jurisdictions:
             self.jurisdictions[jurisdiction_id] = Jurisdiction()
 
-        self.jurisdictions[jurisdiction_id].codes[code.url] = code
+        self.jurisdictions[jurisdiction_id].codes[code.uri] = code
         return code

@@ -48,40 +48,40 @@ class Code:
             title = self.xml.getroot().find("./uslm:main/uslm:title", ns)
             if title is not None:
                 # The code is a USC title
-                self.url = title.attrib["identifier"]
+                self.uri = title.attrib["identifier"]
                 self.title_number = int(
                     root.find("./uslm:meta/uslm:docNumber", ns).text
                 )
                 self.title = f"USC Title {self.title_number}"
             else:
                 # The code is the US constitution
-                self.url = "/us/const"
+                self.uri = "/us/const"
                 self.title = root.find("./uslm:meta/dc:title", ns).text
 
         if filename.startswith("ca_"):
-            self.url = "/us-ca"
+            self.uri = "/us-ca"
             self.title = root.find(".//xhtml:h3/xhtml:b", ns).text.split(" - ")[0]
             if "Evidence" in self.title:
-                self.url += "/evid"
+                self.uri += "/evid"
             elif "Penal" in self.title:
-                self.url += "/pen"
+                self.uri += "/pen"
 
         elif filename.startswith("cfr"):
             self.title_number = int(root.xpath("/CFRGRANULE/FDSYS/CFRTITLE")[0].text)
             self.title = f"Code of Federal Regulations Title {self.title_number}"
-            self.url = f"/us/cfr/t{self.title_number}"
+            self.uri = f"/us/cfr/t{self.title_number}"
 
-        self.sovereign = self.url.split("/")[1]
+        self.sovereign = self.uri.split("/")[1]
         if "Constitution" in self.title:
-            self.level = "constitutional"
+            self.level = "constitution"
         elif "Regulations" in self.title:
             self.level = "regulation"
         else:
-            self.level = "statutory"
+            self.level = "statute"
 
     @property
     def jurisdiction_id(self):
-        return self.url.split("/")[1]
+        return self.uri.split("/")[1]
 
     def provision_effective_date(self, cite: str) -> datetime.date:
         """
@@ -96,7 +96,7 @@ class Code:
         :returns: the effective date of the cited provision
         """
 
-        if self.level == "constitutional" and self.sovereign == "us":
+        if self.level == "constitution" and self.sovereign == "us":
             if "amendment" not in cite.lower():
                 return datetime.date(1788, 9, 13)
             roman_numeral = cite.split("-")[1]
@@ -121,6 +121,48 @@ class Code:
             return datetime.datetime.strptime(result.group(1), "%dth of %B, %Y").date()
 
         return NotImplementedError
+
+    def select_text(self, selector: TextQuoteSelector) -> str:
+
+        def cal_href(href):
+            """
+            Tests whether an XML element has an attribute labeling it as the text
+            of the statutory section `self.section`.
+
+            Uses `California statute XML format <http://leginfo.legislature.ca.gov/>`_.
+            """
+
+            return href and re.compile(
+                r"^javascript:submitCodesValues\('" + self.section
+            ).search(href)
+
+        def usc_statute_text():
+            section_identifier = f"/us/usc/t{self.code.title_number}/s{self.section}"
+            section = self.code.xml.find(name="section", identifier=section_identifier)
+            if self.subsection:
+                subsection_identifier = f"{section_identifier}/{self.subsection}"
+                section = section.find(
+                    name="subsection", identifier=subsection_identifier
+                )
+            return section.find_all(["chapeau", "paragraph", "content"])
+
+        if self.code.sovereign == "us":
+            if self.code.level == "regulation":
+                passages = self.code.xml.find(
+                    name="SECTNO", text=f"§ {202.1}"
+                ).parent.find_all(name="P")
+            elif self.code.uri.split("/")[-1].startswith("t"):
+                passages = usc_statute_text()
+            else:
+                passages = self.code.xml.find(id=self.section).find_all(name="text")
+        elif self.code.sovereign == "us-ca":
+            passages = self.code.xml.find(href=cal_href).parent.find_next_siblings(
+                style="margin:0;display:inline;"
+            )
+
+        text = "".join(passage.text for passage in passages)
+        text = re.sub(r"\s+", " ", text).strip()
+        return text
 
     def __repr__(self):
         return f'{self.__class__.__name__}("{self.filename}")'
@@ -171,53 +213,7 @@ class Enactment:
         :returns: the full text of the cited passage from the XML.
         """
 
-        def cal_href(href):
-            """
-            Tests whether an XML element has an attribute labeling it as the text
-            of the statutory section `self.section`.
-
-            Uses `California statute XML format <http://leginfo.legislature.ca.gov/>`_.
-            """
-
-            return href and re.compile(
-                r"^javascript:submitCodesValues\('" + self.section
-            ).search(href)
-
-        def usc_statute_text():
-            section_identifier = f"/us/usc/t{self.code.title_number}/s{self.section}"
-            section = self.code.xml.find(name="section", identifier=section_identifier)
-            if self.subsection:
-                subsection_identifier = f"{section_identifier}/{self.subsection}"
-                section = section.find(
-                    name="subsection", identifier=subsection_identifier
-                )
-            return section.find_all(["chapeau", "paragraph", "content"])
-
-        if self.code.sovereign == "us":
-            if self.code.level == "regulation":
-                passages = self.code.xml.find(
-                    name="SECTNO", text=f"§ {202.1}"
-                ).parent.find_all(name="P")
-            elif self.code.url.split("/")[-1].startswith("t"):
-                passages = usc_statute_text()
-            else:
-                passages = self.code.xml.find(id=self.section).find_all(name="text")
-        elif self.code.sovereign == "us-ca":
-            passages = self.code.xml.find(href=cal_href).parent.find_next_siblings(
-                style="margin:0;display:inline;"
-            )
-
-        text = "".join(passage.text for passage in passages)
-        text = re.sub(r"\s+", " ", text).strip()
-        if self.start:
-            l = text.find(self.start)
-        else:
-            l = 0
-        if self.end:
-            r = text.find(self.end) + len(self.end)
-        else:
-            r = len(text)
-        return text[l:r]
+        return self.code.select_text(self.selector)
 
     @classmethod
     @log_mentioned_context
@@ -251,12 +247,7 @@ class Enactment:
             if regime:
                 regime.set_code(code)
 
-        selector = TextQuoteSelector(
-            path=enactment_dict.get("path"),
-            exact=enactment_dict.get("exact"),
-            prefix=enactment_dict.get("prefix"),
-            suffix=enactment_dict.get("suffix"),
-        )
+        selector = TextQuoteSelector(**enactment_dict, code=code)
 
         return (
             Enactment(code=code, selector=selector, name=enactment_dict.get("name")),
