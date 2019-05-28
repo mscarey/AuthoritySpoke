@@ -83,19 +83,22 @@ class Code:
     def jurisdiction_id(self):
         return self.uri.split("/")[1]
 
-    def provision_effective_date(self, cite: str) -> datetime.date:
+    def provision_effective_date(self, cite: Union[TextQuoteSelector, str]) -> datetime.date:
         """
         So far this method only covers the US Constitution and it
         assumes that the XML format is United States Legislative
         Markup (USLM).
 
         :param cite:
-            a string representing the XML element name for the
+            a string or selector representing the XML element name for the
             the legislative provision within this Code.
 
-        :returns: the effective date of the cited provision
+        :returns:
+            the effective date of the cited provision
         """
 
+        if isinstance(cite, TextQuoteSelector):
+            cite = cite.path
         if self.level == "constitution" and self.sovereign == "us":
             if "amendment" not in cite.lower():
                 return datetime.date(1788, 9, 13)
@@ -120,10 +123,9 @@ class Code:
             result = day_first.search(enactment_text)
             return datetime.datetime.strptime(result.group(1), "%dth of %B, %Y").date()
 
-        return NotImplementedError
+        raise(NotImplementedError)
 
     def select_text(self, selector: TextQuoteSelector) -> str:
-
         def cal_href(href):
             """
             Tests whether an XML element has an attribute labeling it as the text
@@ -146,17 +148,17 @@ class Code:
                 )
             return section.find_all(["chapeau", "paragraph", "content"])
 
-        if self.code.sovereign == "us":
-            if self.code.level == "regulation":
-                passages = self.code.xml.find(
+        if self.sovereign == "us":
+            if self.level == "regulation":
+                passages = self.xml.find(
                     name="SECTNO", text=f"§ {202.1}"
                 ).parent.find_all(name="P")
-            elif self.code.uri.split("/")[-1].startswith("t"):
+            elif self.uri.split("/")[-1].startswith("t"):
                 passages = usc_statute_text()
             else:
-                passages = self.code.xml.find(id=self.section).find_all(name="text")
-        elif self.code.sovereign == "us-ca":
-            passages = self.code.xml.find(href=cal_href).parent.find_next_siblings(
+                passages = self.xml.find(id=self.section).find_all(name="text")
+        elif self.sovereign == "us-ca":
+            passages = self.xml.find(href=cal_href).parent.find_next_siblings(
                 style="margin:0;display:inline;"
             )
 
@@ -218,10 +220,7 @@ class Enactment:
     @classmethod
     @log_mentioned_context
     def from_dict(
-        cls,
-        enactment_dict: Dict[str, str],
-        mentioned: Optional[List[Union["Factor", Enactment]]] = None,
-        regime: Optional["Regime"] = None,
+        cls, enactment_dict: Dict[str, str], regime: Optional["Regime"] = None
     ) -> Tuple[Enactment, Optional[List[Union[Enactment, Factor]]]]:
         """
         Creates a new :class:`Enactment` object using a :class:`dict`
@@ -231,10 +230,6 @@ class Enactment:
         for use in composing the new :class:`Enactment`.
 
         :param enactment_dict:
-
-        :param mentioned:
-            not currently used, passed to the function to maintain
-            symmetry with :meth:`.Function.from_dict`
 
         :param regime:
             the :class:`.Regime` where the :class:`.Code` that is the
@@ -249,10 +244,7 @@ class Enactment:
 
         selector = TextQuoteSelector(**enactment_dict, code=code)
 
-        return (
-            Enactment(code=code, selector=selector, name=enactment_dict.get("name")),
-            mentioned,
-        )
+        return Enactment(code=code, selector=selector, name=enactment_dict.get("name"))
 
     def means(self, other: Enactment) -> bool:
         """

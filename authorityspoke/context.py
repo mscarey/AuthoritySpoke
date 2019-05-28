@@ -27,7 +27,7 @@ def log_mentioned_context(func: Callable):
     ) -> Tuple[Optional["Factor"], List["Factor"]]:
 
         if not mentioned:
-            mentioned = []
+            return func(cls, factor_record, regime)
         if factor_record is None:
             return None, mentioned
         if isinstance(factor_record, str):
@@ -42,8 +42,8 @@ def log_mentioned_context(func: Callable):
                 + "representing a Factor or a string "
                 + "representing the name of a Factor included in context_list."
             )
-        if factor_record.get("code") is not None:
-            factor = func(cls, factor_record)
+        if factor_record.get("path") or factor_record.get("filename"):
+            factor = func(cls, factor_record, regime)
         else:
             factor, mentioned = func(cls, factor_record, mentioned, regime)
         if not factor.name and (not hasattr(factor, "generic") or not factor.generic):
