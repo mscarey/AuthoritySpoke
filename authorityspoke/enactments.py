@@ -102,10 +102,16 @@ class Code:
     @lazyprop
     def uri(self) -> str:
         """
+        .. note::
+            This handles California state statutes only with a
+            mockup, which can only refer to the Penal and Evidence
+            Codes.
+
         :returns:
-            The USLM identifier that describes the document as a
-            whole, if available in the XML. Otherwise returns a
-            pseudo-USLM identifier.
+            The `United States Legislative Markup (USLM)
+            <https://github.com/usgpo/uslm>`_ identifier that
+            describes the document as a whole, if available in
+            the XML. Otherwise returns a pseudo-USLM identifier.
         """
         title = self.title
         if title == "Constitution of the United States":
@@ -139,12 +145,12 @@ class Code:
     ) -> datetime.date:
         """
         So far this method only covers the US Constitution and it
-        assumes that the XML format is United States Legislative
-        Markup (USLM).
+        assumes that the XML format is `United States Legislative
+        Markup (USLM) <https://github.com/usgpo/uslm>`_.
 
         :param cite:
             a string or selector representing the XML element name for the
-            the legislative provision within this Code.
+            the legislative provision within this ``Code``.
 
         :returns:
             the effective date of the cited provision
@@ -180,7 +186,22 @@ class Code:
         raise NotImplementedError
 
     def select_text(self, selector: TextQuoteSelector) -> str:
-        def cal_href(href):
+        """
+        :param selector:
+            a selector referencing a text passage in the ``Code``.
+
+        .. note::
+            When handling Code of Federal Regulation (CFR) :class:`.Enactment`\s,
+            this can only select from the whole document or from Sections,
+            not Subsections or any other level. Still hoping to be able
+            to switch to a `United States Legislative Markup (USLM)
+            <https://github.com/usgpo/uslm>`_-like XML format for CFR.
+
+        :returns:
+            the text referenced by the selector.
+        """
+
+        def cal_href(href, docpath):
             """
             Tests whether an XML element has an attribute labeling it as the text
             of the statutory section `self.section`.
@@ -202,19 +223,25 @@ class Code:
                 )
             return section.find_all(["chapeau", "paragraph", "content"])
 
+        if selector.path is not None:
+            docpath = selector.path.lstrip(self.uri)
+        else:
+            passages = self.xml.find_all(name="text")
+
         if self.jurisdiction == "us":
             if self.level == "regulation":
+                section = docpath.split("/")[1]
                 passages = self.xml.find(
-                    name="SECTNO", text=f"§ {202.1}"
+                    name="SECTNO", text=f"§ {section}"
                 ).parent.find_all(name="P")
-            elif self.uri.split("/")[-1].startswith("t"):
-                passages = usc_statute_text()
-            else:
-                passages = self.xml.find(id=self.section).find_all(name="text")
+        elif docpath.split("/")[1].startswith("t"):
+            passages = usc_statute_text()
         elif self.jurisdiction == "us-ca":
             passages = self.xml.find(href=cal_href).parent.find_next_siblings(
                 style="margin:0;display:inline;"
             )
+        else:
+            passages = self.xml.find(id=docpath.split("/")[1]).find_all(name="text")
 
         text = "".join(passage.text for passage in passages)
         text = re.sub(r"\s+", " ", text).strip()

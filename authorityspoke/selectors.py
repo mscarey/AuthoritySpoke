@@ -55,7 +55,6 @@ class TextQuoteSelector:
     code: Optional["Code"] = None
 
     def __post_init__(self):
-
         def exact_from_ends(text: str) -> str:
             """
             Locates and returns an exact quotation from a text passage given the
@@ -85,7 +84,6 @@ class TextQuoteSelector:
         object.__delattr__(self, "code")
         object.__delattr__(self, "start")
         object.__delattr__(self, "end")
-
 
     @property
     def json(self):

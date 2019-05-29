@@ -469,9 +469,10 @@ class Opinion:
 
     def __ge__(self, other: Union[Opinion, Rule]) -> bool:
         """
-        :returns: a bool indicating whether the :class:`.Rule` ``other``
-        (or every holding of ``other``, if other is an :class:`.Opinion`)
-        is implied by some :class:`.Rule` in ``self.holdings``.
+        :returns:
+            a bool indicating whether the :class:`.Rule` ``other``
+            (or every holding of ``other``, if other is an :class:`.Opinion`)
+            is implied by some :class:`.Rule` in ``self.holdings``.
         """
         if isinstance(other, Rule):
             return any(self_holding >= other for self_holding in self.holdings)
