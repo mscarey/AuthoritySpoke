@@ -489,7 +489,7 @@ def make_selector() -> Dict[str, TextQuoteSelector]:
     )}
 
 @pytest.fixture(scope="module")
-def make_code() -> Dict[str, Code]:
+def make_regime() -> Dict[str, Code]:
     usa = Regime()
     for code in (
         Code("constitution.xml"),
@@ -505,7 +505,18 @@ def make_code() -> Dict[str, Code]:
 
 
 @pytest.fixture(scope="module")
-def make_enactment(make_code) -> Dict[str, Enactment]:
+def make_code(make_regime) -> Dict[str, Code]:
+    return {
+        "const": make_regime.get_code("/us/const"),
+        "usc17": make_regime.get_code("/us/usc/t17"),
+        "cfr37": make_regime.get_code("/us/cfr/t37"),
+        "ca_evid": make_regime.get_code("/us-ca/evid"),
+        "ca_evid": make_regime.get_code("/us-ca/pen"),
+    }
+
+
+@pytest.fixture(scope="module")
+def make_enactment(make_regime) -> Dict[str, Enactment]:
     return {
         "search_clause": Enactment.from_dict(
             {
@@ -516,24 +527,24 @@ def make_enactment(make_code) -> Dict[str, Enactment]:
                     + "and seizures, shall not be violated"
                 ),
             },
-            regime=make_code,
+            regime=make_regime,
         ),
         "fourth_a": Enactment.from_dict(
-            {"path": "/us/const/amendment-IV"}, regime=make_code
+            {"path": "/us/const/amendment-IV"}, regime=make_regime
         ),
         "due_process_5": Enactment.from_dict(
             {
                 "path": "/us/const/amendment-V",
                 "exact": "life, liberty, or property, without due process of law",
             },
-            regime=make_code,
+            regime=make_regime,
         ),
         "due_process_14": Enactment.from_dict(
             {
                 "path": "/us/const/amendment-XIV-1",
                 "exact": "life, liberty, or property, without due process of law",
             },
-            regime=make_code,
+            regime=make_regime,
         ),
     }
 
@@ -977,11 +988,11 @@ def make_opinion(make_entity) -> Dict[str, Opinion]:
 
 
 @pytest.fixture(scope="class")
-def make_opinion_with_holding(make_code) -> Dict[str, Opinion]:
+def make_opinion_with_holding(make_regime) -> Dict[str, Opinion]:
     test_cases = ("brad", "cardenas", "lotus", "watt", "oracle")
     opinions = {}
     for case in test_cases:
         opinion = Opinion.from_file(f"{case}_h.json")
-        opinion = opinion.exposit(f"holding_{case}.json", regime=make_code)
+        opinion = opinion.exposit(f"holding_{case}.json", regime=make_regime)
         opinions[f"{case}_majority"] = opinion
     return opinions
