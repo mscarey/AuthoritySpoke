@@ -1,17 +1,19 @@
 from __future__ import annotations
 
 import datetime
+import functools
 import pathlib
 import re
 from typing import Dict, List, Optional, Union
 from dataclasses import dataclass
 
-from lxml import etree
+from bs4 import BeautifulSoup
 
 from utils import roman
 
 from authorityspoke.context import log_mentioned_context, get_directory_path
 from authorityspoke.selectors import TextQuoteSelector
+from utils.cache import lazyprop
 
 
 class Code:
@@ -38,52 +40,103 @@ class Code:
     }
 
     def __init__(self, filename: str):
-        ns = self.__class__.ns
         self.filename = filename
-        self.path = self.__class__.directory / filename
-        with open(self.path) as fp:
-            self.xml = etree.parse(fp)
-        root = self.xml.getroot()
-        if root.nsmap.get(None) == ns["uslm"]:
-            title = root.find("./uslm:main/uslm:title", ns)
-            if title is not None:
-                # The code is a USC title
-                self.uri = title.attrib["identifier"]
-                self.title_number = int(
-                    root.find("./uslm:meta/uslm:docNumber", ns).text
-                )
-                self.title = f"USC Title {self.title_number}"
-            else:
-                # The code is the US constitution
-                self.uri = "/us/const"
-                self.title = root.find("./uslm:meta/dc:title", ns).text
-
-        if filename.startswith("ca_"):
-            self.uri = "/us-ca"
-            self.title = root.find(".//xhtml:h3/xhtml:b", ns).text.split(" - ")[0]
-            if "Evidence" in self.title:
-                self.uri += "/evid"
-            elif "Penal" in self.title:
-                self.uri += "/pen"
-
-        elif filename.startswith("cfr"):
-            self.title_number = int(root.xpath("/CFRGRANULE/FDSYS/CFRTITLE")[0].text)
-            self.title = f"Code of Federal Regulations Title {self.title_number}"
-            self.uri = f"/us/cfr/t{self.title_number}"
-
-        self.sovereign = self.uri.split("/")[1]
-        if "Constitution" in self.title:
-            self.level = "constitution"
-        elif "Regulations" in self.title:
-            self.level = "regulation"
-        else:
-            self.level = "statute"
 
     @property
-    def jurisdiction_id(self):
+    def path(self):
+        """
+        :returns:
+            The path to the file where the XML file for
+            the code can be found.
+        """
+        return self.__class__.directory / self.filename
+
+    @lazyprop
+    def jurisdiction(self) -> str:
+        """
+        :returns:
+            The abbreviation for the jurisdiction that
+            enacted the ``Code``, in USLM-like format.
+
+            e.g. ``us`` for U.S. federal laws,
+            ``us-ca`` for California state laws.
+        """
         return self.uri.split("/")[1]
 
-    def provision_effective_date(self, cite: Union[TextQuoteSelector, str]) -> datetime.date:
+    @property
+    def level(self) -> str:
+        """
+        :returns:
+            "constitution", "statute", or "regulation"
+        """
+
+        if "Constitution" in self.title:
+            return "constitution"
+        elif "Regulations" in self.title:
+            return "regulation"
+        else:
+            return "statute"
+
+    @lazyprop
+    def title(self) -> str:
+        """
+        :returns:
+            the contents of an XML ``title`` element that
+            describes the ``Code``, if any. Otherwise
+            returns a descriptive name that may not exactly
+            appear in the XML.
+        """
+
+        uslm_title = self.xml.find("dc:title")
+        if uslm_title:
+            return uslm_title.text
+        cal_title = self.xml.h3
+        if cal_title:
+            code_name = cal_title.b.text.split(" - ")[0]
+            return f"California {code_name}"
+        cfr_title = self.xml.CFRGRANULE.FDSYS.CFRTITLE
+        if cfr_title:
+            return f"Code of Federal Regulations Title {cfr_title.text}"
+        raise NotImplementedError
+
+    @lazyprop
+    def uri(self) -> str:
+        """
+        :returns:
+            The USLM identifier that describes the document as a
+            whole, if available in the XML. Otherwise returns a
+            pseudo-USLM identifier.
+        """
+        title = self.title
+        if title == "Constitution of the United States":
+            return "/us/const"
+        if title.startswith("Title"):
+            return self.xml.find("main").find("title")["identifier"]
+        if title.startswith("California"):
+            uri = "/us-ca/"
+            if "Penal" in title:
+                return uri + "pen"
+            else:
+                return uri + "evid"
+        if title.startswith("Code of Federal Regulations"):
+            title_num = title.split()[-1]
+            return f"/us/cfr/t{title_num}"
+        raise NotImplementedError
+
+    @lazyprop
+    def xml(self):
+        """
+        :returns:
+            A BeautifulSoup object created by parsing the
+            ``Code``\'s XML file
+        """
+        with open(self.path) as fp:
+            xml = BeautifulSoup(fp, "lxml-xml")
+        return xml
+
+    def provision_effective_date(
+        self, cite: Union[TextQuoteSelector, str]
+    ) -> datetime.date:
         """
         So far this method only covers the US Constitution and it
         assumes that the XML format is United States Legislative
@@ -99,7 +152,7 @@ class Code:
 
         if isinstance(cite, TextQuoteSelector):
             cite = cite.path
-        if self.level == "constitution" and self.sovereign == "us":
+        if self.level == "constitution" and self.jurisdiction == "us":
             # The constitution's id fields don't contain the whole path.
             cite = cite.strip(self.uri).strip("/")
 
@@ -113,6 +166,7 @@ class Code:
             # an explicit prefix is needed when a predicate is used
             # so root.nsmap won't work.
             ns = self.__class__.ns
+
             def query_for_tag(tag: str):
                 query = f'//uslm:{tag}[@id="{cite}"]'
                 return self.xml.find(query, ns)
@@ -136,7 +190,7 @@ class Code:
             result = day_first.search(enactment_text)
             return datetime.datetime.strptime(result.group(1), "%dth of %B, %Y").date()
 
-        raise(NotImplementedError)
+        raise (NotImplementedError)
 
     def select_text(self, selector: TextQuoteSelector) -> str:
         def cal_href(href):
@@ -161,7 +215,7 @@ class Code:
                 )
             return section.find_all(["chapeau", "paragraph", "content"])
 
-        if self.sovereign == "us":
+        if self.jurisdiction == "us":
             if self.level == "regulation":
                 passages = self.xml.find(
                     name="SECTNO", text=f"§ {202.1}"
@@ -170,7 +224,7 @@ class Code:
                 passages = usc_statute_text()
             else:
                 passages = self.xml.find(id=self.section).find_all(name="text")
-        elif self.sovereign == "us-ca":
+        elif self.jurisdiction == "us-ca":
             passages = self.xml.find(href=cal_href).parent.find_next_siblings(
                 style="margin:0;display:inline;"
             )

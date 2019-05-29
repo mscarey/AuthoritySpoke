@@ -38,8 +38,18 @@ class TestCodes:
     def test_code_urls(self, make_code, code, url):
         assert make_code[code].url == url
 
-    def test_const_url(self, make_code):
-        assert make_code["const"].url == "/us/const"
+    @pytest.mark.parametrize(
+        'code, expected',
+        [
+            ("usc17", "USC Title 17"),
+            ("const", "Constitution of the United States"),
+            ("cfr37", "Code of Federal Regulations Title 37"),
+            ("ca_evid", "California Evidence Code"),
+            ("ca_pen", "California Penal Code"),
+        ]
+    )
+    def test_code_title(self, make_code, code, expected):
+        assert make_code[code].title == expected
 
     def test_get_bill_of_rights_effective_date(self, make_code):
         const = make_code["const"]
@@ -50,10 +60,6 @@ class TestCodes:
         const = make_code["const"]
         equal_protection_date = datetime.date(1868, 7, 28)
         assert const.provision_effective_date("amendment-XIV") == equal_protection_date
-
-    def test_uslm_code(self, make_code):
-        usc17 = make_code["usc17"]
-        assert usc17.title == "USC Title 17"
 
 
 class TestEnactments:
