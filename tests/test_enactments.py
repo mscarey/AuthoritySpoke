@@ -26,27 +26,27 @@ class TestCodes:
         assert repr(cfr) == 'Code("cfr37.xml")'
 
     @pytest.mark.parametrize(
-        'code, url',
+        "code, url",
         [
             ("usc17", "/us/usc/t17"),
             ("const", "/us/const"),
             ("cfr37", "/us/cfr/t37"),
             ("ca_evid", "/us-ca/evid"),
             ("ca_pen", "/us-ca/pen"),
-        ]
+        ],
     )
     def test_code_urls(self, make_code, code, url):
         assert make_code[code].url == url
 
     @pytest.mark.parametrize(
-        'code, expected',
+        "code, expected",
         [
             ("usc17", "USC Title 17"),
             ("const", "Constitution of the United States"),
             ("cfr37", "Code of Federal Regulations Title 37"),
             ("ca_evid", "California Evidence Code"),
             ("ca_pen", "California Penal Code"),
-        ]
+        ],
     )
     def test_code_title(self, make_code, code, expected):
         assert make_code[code].title == expected
@@ -60,6 +60,16 @@ class TestCodes:
         const = make_code["const"]
         equal_protection_date = datetime.date(1868, 7, 28)
         assert const.provision_effective_date("amendment-XIV") == equal_protection_date
+
+    def test_format_uri_for_const(self, make_code):
+        """
+        This should test the example in the docstring
+        for the Code.format_uri_for_const method.
+        """
+
+        const = make_code["const"]
+        out = const.format_uri_for_const("/us/const/amendment/XIV/1")
+        assert out == "amendment-XIV-1"
 
 
 class TestEnactments:
@@ -78,8 +88,8 @@ class TestEnactments:
         )
 
     def test_passage_from_imported_statute(self, make_code):
-        opinion = Opinion.from_file(f'oracle_h.json')
-        oracle_majority = opinion.exposit(f'holding_oracle.json')
+        opinion = Opinion.from_file(f"oracle_h.json")
+        oracle_majority = opinion.exposit(f"holding_oracle.json")
         despite_text = str(oracle_majority.holdings[5])
         assert 'DESPITE: "In no case does copyright protection ' in despite_text
 

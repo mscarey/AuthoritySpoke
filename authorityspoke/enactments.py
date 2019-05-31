@@ -140,6 +140,30 @@ class Code:
             xml = BeautifulSoup(fp, "lxml-xml")
         return xml
 
+    def format_uri_for_const(self, uri: str) -> str:
+        """
+        Although the US Constitution is published in a format
+        described as USML, its section identifier strings differ from
+        those in USC USML documents in that they skip the jurisdiction
+        and code fields, skip the initial slash character,
+        start with the section field, and convert all remaining
+        slashes to hyphens.
+
+        This will only remove the path to the current code if
+        the current code is the same one referenced in the URI.
+        So the example below assumes the current ``Code`` object
+        has ``self.uri == "/us/const"``
+
+        :param uri:
+            an identifier in a format consistent with USC USML
+            documents, e.g. ``/us/const/amendment/XIV/1``
+
+        returns
+            an identifier in a format found in the USLM version of
+            the federal constitution, e.g. ``amendment-XIV-1``
+        """
+        return uri.replace(self.uri, "").lstrip("/").replace("/", "-")
+
     def provision_effective_date(
         self, cite: Union[TextQuoteSelector, str]
     ) -> datetime.date:
@@ -158,8 +182,8 @@ class Code:
 
         if isinstance(cite, TextQuoteSelector):
             cite = cite.path
-        cite = cite.lstrip(self.uri)
         if self.level == "constitution" and self.jurisdiction == "us":
+            cite = self.format_uri_for_const(cite)
             if "amendment" not in cite.lower():
                 return datetime.date(1788, 9, 13)
             roman_numeral = cite.split("-")[1]
@@ -224,7 +248,7 @@ class Code:
             return section.find_all(["chapeau", "paragraph", "content"])
 
         if selector.path is not None:
-            docpath = selector.path.lstrip(self.uri)
+            docpath = selector.path.replace(self.uri, "")
         else:
             passages = self.xml.find_all(name="text")
 
@@ -234,14 +258,15 @@ class Code:
                 passages = self.xml.find(
                     name="SECTNO", text=f"§ {section}"
                 ).parent.find_all(name="P")
-        elif docpath.split("/")[1].startswith("t"):
-            passages = usc_statute_text()
+            elif docpath.split("/")[1].startswith("t"):
+                passages = usc_statute_text()
+            else:  # federal constitution
+                passages = self.xml.find(id=docpath.split("/")[1]).find_all(name="text")
+
         elif self.jurisdiction == "us-ca":
             passages = self.xml.find(href=cal_href).parent.find_next_siblings(
                 style="margin:0;display:inline;"
             )
-        else:
-            passages = self.xml.find(id=docpath.split("/")[1]).find_all(name="text")
 
         text = "".join(passage.text for passage in passages)
         text = re.sub(r"\s+", " ", text).strip()
