@@ -158,7 +158,7 @@ class Code:
             an identifier in a format consistent with USC USML
             documents, e.g. ``/us/const/amendment/XIV/1``
 
-        returns
+        :returns:
             an identifier in a format found in the USLM version of
             the federal constitution, e.g. ``amendment-XIV-1``
         """
@@ -209,7 +209,7 @@ class Code:
 
         raise NotImplementedError
 
-    def select_text(self, selector: TextQuoteSelector) -> str:
+    def select_text(self, selector: TextQuoteSelector) -> Optional[str]:
         """
         :param selector:
             a selector referencing a text passage in the ``Code``.
@@ -222,7 +222,8 @@ class Code:
             <https://github.com/usgpo/uslm>`_-like XML format for CFR.
 
         :returns:
-            the text referenced by the selector.
+            the text referenced by the selector, or ``None`` if the text
+            can't be found.
         """
 
         def cal_href(href, docpath):
@@ -269,8 +270,20 @@ class Code:
             )
 
         text = "".join(passage.text for passage in passages)
-        text = re.sub(r"\s+", " ", text).strip()
-        return text
+        if not selector.exact:
+            return text
+        prefix = selector.prefix or ""
+        suffix = selector.suffix or ""
+        passage_regex = (
+            re.escape(prefix)
+            + r"\s*"
+            + re.escape(selector.exact)
+            + r"\s*"
+            + re.escape(suffix)
+        )
+        if re.search(passage_regex, text, re.IGNORECASE):
+            return selector.exact
+        return None
 
     def __repr__(self):
         return f'{self.__class__.__name__}("{self.filename}")'

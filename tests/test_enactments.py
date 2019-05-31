@@ -115,16 +115,17 @@ class TestEnactments:
 
     def test_equal_enactment_text(self, make_enactment):
         assert make_enactment["due_process_5"].means(make_enactment["due_process_14"])
-        assert make_enactment["due_process_5"] >= make_enactment["due_process_14"]
+
+    def test_enactment_subset_or_equal(self, make_enactment):
+        dp5 = make_enactment["due_process_5"]
+        dp14 = make_enactment["due_process_14"]
+        assert dp5 >= dp14
 
     def test_unequal_enactment_text(self, make_enactment):
         assert make_enactment["search_clause"] != make_enactment["fourth_a"]
 
     def test_enactment_subset(self, make_enactment):
         assert make_enactment["search_clause"] < make_enactment["fourth_a"]
-
-    def test_enactment_subset_or_equal(self, make_enactment):
-        assert make_enactment["due_process_5"] >= make_enactment["due_process_14"]
 
     def test_comparison_to_factor_false(self, make_enactment, watt_factor):
         dp5 = make_enactment["due_process_5"]
