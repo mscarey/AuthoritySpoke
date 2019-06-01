@@ -22,14 +22,24 @@ def log_mentioned_context(func: Callable):
     def wrapper(
         cls,
         factor_record: Union[str, Optional[Dict[str, Union[str, bool]]]],
-        mentioned: Optional[List[Union["Factor", "Enactment"]]]=None,
+        mentioned: Optional[List[Union["Factor", "Enactment"]]] = None,
         regime: Optional["Regime"] = None,
     ) -> Tuple[Optional["Factor"], List["Factor"]]:
 
         if not mentioned:
-            return func(cls, factor_record, regime)
+            if isinstance(mentioned, str):
+                raise TypeError(
+                    "No 'mentioned' list exists to search for a Factor "
+                    + f"or Enactment by the name '{mentioned}'."
+                )
+            if factor_record.get("path") or factor_record.get("filename"):
+                return func(cls, factor_record, regime), []
+            else:
+                return func(cls, factor_record, mentioned=[], regime=regime)
+
         if factor_record is None:
             return None, mentioned
+
         if isinstance(factor_record, str):
             for context_factor in mentioned:
                 if (

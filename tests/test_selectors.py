@@ -8,16 +8,16 @@ from authorityspoke.selectors import TextQuoteSelector
 
 
 class TestSelectors:
-    def test_code_from_selector(self, make_code, make_selector):
-        code = make_code.get_code(make_selector["/us/usc/t17/s103"])
+    def test_code_from_selector(self, make_regime, make_selector):
+        code = make_regime.get_code(make_selector["/us/usc/t17/s103"])
         assert code.uri == "/us/usc/t17"
 
-    def test_usc_selection(self, make_code, make_selector):
+    def test_usc_selection(self, make_regime, make_selector):
         selector = make_selector["/us/usc/t17/s103"]
-        code = make_code.get_code(selector.path)
-        enactment = Enactment(code, selector)
+        code = make_regime.get_code(selector.path)
+        enactment = Enactment(code=code, selector=selector)
         assert enactment.code.level == "statute"
-        assert enactment.code.jurisdiction_id == "us"
+        assert enactment.code.jurisdiction == "us"
 
     def test_omit_terminal_slash(self, make_code):
         usc17 = make_code["usc17"]

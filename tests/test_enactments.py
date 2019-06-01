@@ -26,7 +26,7 @@ class TestCodes:
         assert repr(cfr) == 'Code("cfr37.xml")'
 
     @pytest.mark.parametrize(
-        "code, url",
+        "code, path",
         [
             ("usc17", "/us/usc/t17"),
             ("const", "/us/const"),
@@ -35,8 +35,8 @@ class TestCodes:
             ("ca_pen", "/us-ca/pen"),
         ],
     )
-    def test_code_urls(self, make_code, code, url):
-        assert make_code[code].url == url
+    def test_code_urls(self, make_code, code, path):
+        assert make_code[code].uri == path
 
     @pytest.mark.parametrize(
         "code, expected",
@@ -77,21 +77,11 @@ class TestEnactments:
         search_clause = make_enactment["search_clause"]
         assert search_clause.text.endswith("shall not be violated")
 
-    def test_passage_from_imported_statute(self, make_code):
+    def test_passage_from_imported_statute(self, make_regime):
         opinion = Opinion.from_file(f"oracle_h.json")
-        oracle_majority = opinion.exposit(f"holding_oracle.json")
+        oracle_majority = opinion.exposit(f"holding_oracle.json", regime=make_regime)
         despite_text = str(oracle_majority.holdings[5])
         assert 'DESPITE: "In no case does copyright protection ' in despite_text
-
-    def test_add_omitted_initial_slash(self, make_code):
-        usc17 = make_code["usc17"]
-        selector = TextQuoteSelector(
-            path="us/usc/t17/s102/b",
-            prefix="process, system,",
-            suffix=", concept, principle",
-            source=usc17,
-        )
-        assert selector.path.startswith("/")
 
     def test_short_passage_from_uslm_code(self, make_code):
         usc17 = make_code["usc17"]

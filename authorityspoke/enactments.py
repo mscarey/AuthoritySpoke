@@ -296,12 +296,12 @@ class Enactment:
     element based on the section and subsection names, and each
     XML format used for any :class:`Code` will require a different method.
 
-    :param code:
-        the :class:`Code` where this legislative text appears.
-
     :param selector:
         identifier for the place in the :class:`Code` where
         the text can be found.
+
+    :param code:
+        the :class:`Code` where this legislative text appears.
 
     :param name:
         an identifier for this object, often used if the object needs
@@ -363,7 +363,7 @@ class Enactment:
             if regime:
                 regime.set_code(code)
 
-        selector = TextQuoteSelector(**enactment_dict, code=code)
+        selector = TextQuoteSelector(**enactment_dict, source=code)
 
         return Enactment(code=code, selector=selector, name=enactment_dict.get("name"))
 

@@ -501,7 +501,7 @@ class Rule(Factor):
         context_list = case.get("mentioned_factors")
         rule_list = case.get("holdings")
 
-        mentioned = cls.get_mentioned_factors(context_list)
+        mentioned = cls.get_mentioned_factors(context_list, regime=regime)
         finished_rules: List[Rule] = []
         for rule in rule_list:
             # This will need to change for Attribution holdings
@@ -546,14 +546,16 @@ class Rule(Factor):
     @classmethod
     def get_mentioned_factors(
         cls,
-        mentioned_list: Optional[List[Dict[str, str]]],
+        mentioned: Optional[List[Dict[str, str]]],
         regime: Optional["Regime"] = None,
     ) -> List[Factor]:
         """
-        :param mentioned_list:
+        :param mentioned:
             A list of dicts describing context :class:`.Factor`\s
             in the JSON format used in the ``example_data/holdings``
             folder.
+
+        :param regime:
 
         :returns:
             A list of :class:`.Factor`\s mentioned in the
@@ -563,8 +565,8 @@ class Rule(Factor):
             those using the JSON format.
         """
         mentioned: List[Factor] = []
-        if mentioned_list:
-            for factor_dict in mentioned_list:
+        if mentioned:
+            for factor_dict in mentioned:
                 _, mentioned = Factor.from_dict(factor_dict, mentioned, regime=regime)
         return mentioned
 
@@ -646,7 +648,7 @@ class ProceduralRule(Rule):
 
     @classmethod
     def from_dict(
-        cls, record: Dict, context_list: List[Factor], regime: Optional["Regime"] = None
+        cls, record: Dict, mentioned: List[Factor], regime: Optional["Regime"] = None
     ) -> Tuple[ProceduralRule, List[Factor]]:
 
         """
@@ -656,7 +658,7 @@ class ProceduralRule(Rule):
             series of :class:`Rule`\s. Only one of the :class:`Rule`\s
             will by covered by this :class:`dict`.
 
-        :param context_list:
+        :param mentioned:
             a series of context factors, including any generic
             :class:`.Factor`\s that need to be mentioned in
             :class:`.Predicate`\s. These will have been constructed
@@ -670,7 +672,7 @@ class ProceduralRule(Rule):
 
         def list_from_records(
             record_list: Union[Dict[str, str], List[Dict[str, str]]],
-            context_list: List[Factor],
+            mentioned: List[Factor],
             class_to_create,
             regime: Optional["Regime"] = None
         ) -> Tuple[Union[Factor, Enactment]]:
@@ -678,21 +680,21 @@ class ProceduralRule(Rule):
             if not isinstance(record_list, list):
                 record_list = [record_list]
             for record in record_list:
-                created, context_list = class_to_create.from_dict(
-                    record, context_list, regime=regime
+                created, mentioned = class_to_create.from_dict(
+                    record, mentioned, regime=regime
                 )
                 factors_or_enactments.append(created)
-            return tuple(factors_or_enactments), context_list
+            return tuple(factors_or_enactments), mentioned
 
         factor_groups: Dict[str, List] = {"inputs": [], "outputs": [], "despite": []}
         for factor_type in factor_groups:
-            factor_groups[factor_type], context_list = list_from_records(
-                record.get(factor_type, []), context_list, Factor
+            factor_groups[factor_type], mentioned = list_from_records(
+                record.get(factor_type, []), mentioned, Factor
             )
         enactment_groups: Dict[str, List] = {"enactments": [], "enactments_despite": []}
         for enactment_type in enactment_groups:
-            enactment_groups[enactment_type], context_list = list_from_records(
-                record.get(enactment_type, []), context_list, Enactment, regime=regime
+            enactment_groups[enactment_type], mentioned = list_from_records(
+                record.get(enactment_type, []), mentioned, Enactment, regime=regime
             )
 
         procedure = Procedure(
@@ -711,7 +713,7 @@ class ProceduralRule(Rule):
                 rule_valid=record.get("rule_valid", True),
                 decided=record.get("decided", True),
             ),
-            context_list,
+            mentioned,
         )
 
     @property
