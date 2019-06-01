@@ -38,7 +38,7 @@
             }],
             "enactments": [{
                 "path": "/us/usc/t17/s102/a",
-                "end": "machine or device.",
+                "suffix": "Works of authorship include",
                 "name": "copyright protection"
             }]
         },
@@ -190,7 +190,7 @@
             "universal": true,
             "enactments": [{
                     "path": "/us/usc/t17/s102/b",
-                    "end": "extend to any",
+                    "suffix": "idea, procedure, process",
                     "name": "copyright exceptions"
                 },
                 {

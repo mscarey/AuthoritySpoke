@@ -255,7 +255,7 @@ class Code:
 
         if self.jurisdiction == "us":
             if self.level == "regulation":
-                section = docpath.split("/")[1]
+                section = docpath.split("/")[1].strip("s")
                 passages = self.xml.find(
                     name="SECTNO", text=f"§ {section}"
                 ).parent.find_all(name="P")
@@ -315,9 +315,16 @@ class Enactment:
         other :class:`.Factor` objects.
     """
 
-    code: Code
     selector: TextQuoteSelector
+    code: Optional[Code] = None
+    regime: Optional["Regime"] = None
     name: Optional[str] = None
+
+    def __post_init__(self):
+        if not self.code and not self.regime:
+            raise ValueError("'code' and 'regime' cannot both be None")
+        if self.regime and not self.code:
+            object.__setattr__(self, "code", self.regime.get_code(self.selector.path))
 
     @property
     def effective_date(self):
@@ -345,8 +352,9 @@ class Enactment:
         Creates a new :class:`Enactment` object using a :class:`dict`
         imported from JSON example data.
 
-        There's currently no way to import an existing :class:`Code` object
-        for use in composing the new :class:`Enactment`.
+        The new :class:`Enactment` can be composed using the
+         There's currently no way to import an existing :class:`Code` object
+        for use in composing .
 
         :param enactment_dict:
 
@@ -387,12 +395,12 @@ class Enactment:
 
         return (
             self.text.strip(",:;. ") == other.text.strip(",:;. ")
-            and self.code.sovereign == other.code.sovereign
+            and self.code.jurisdiction == other.code.jurisdiction
             and self.code.level == other.code.level
         )
 
     def __str__(self):
-        return f'"{self.text}" ({self.code.title}, {self.section})'
+        return f'"{self.text}" ({self.code.title}, {self.selector.path})'
 
     def __ge__(self, other):
         """

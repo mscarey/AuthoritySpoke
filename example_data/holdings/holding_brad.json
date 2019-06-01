@@ -79,13 +79,13 @@
             },
             "enactments": [{
                     "path": "/us/const/amendment-IV",
-                    "end": "violated",
+                    "suffix": ", and no Warrants shall issue",
                     "name": "search clause"
                 },
                 {
                     "path": "/us/const/amendment-XIV-1",
-                    "start": "nor shall any State",
-                    "end": "due process of law",
+                    "prefix": "immunities of citizens of the United States; ",
+                    "suffix": " nor deny to any person",
                     "name": "due process clause"
                 }
             ],
