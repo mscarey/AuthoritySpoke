@@ -26,11 +26,11 @@ def log_mentioned_context(func: Callable):
         regime: Optional["Regime"] = None,
     ) -> Tuple[Optional["Factor"], List["Factor"]]:
 
-        if not mentioned:
-            if isinstance(mentioned, str):
+        if mentioned is None:
+            if isinstance(factor_record, str):
                 raise TypeError(
                     "No 'mentioned' list exists to search for a Factor "
-                    + f"or Enactment by the name '{mentioned}'."
+                    + f"or Enactment by the name '{factor_record}'."
                 )
             if factor_record.get("path") or factor_record.get("filename"):
                 return func(cls, factor_record, regime)

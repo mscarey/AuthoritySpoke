@@ -138,8 +138,12 @@ class TestRuleImport:
         exactly match the holdings created for testing in conftest.
         """
         lotus = make_opinion_with_holding["lotus_majority"]
-        assert lotus.holdings[0].enactments[0].code == lotus.holdings[1].enactments[0].code
-        assert lotus.holdings[0].enactments[0].code is lotus.holdings[1].enactments[0].code
+        assert (
+            lotus.holdings[0].enactments[0].code == lotus.holdings[1].enactments[0].code
+        )
+        assert (
+            lotus.holdings[0].enactments[0].code is lotus.holdings[1].enactments[0].code
+        )
 
     def test_same_enactment_in_two_opinions(self, make_opinion):
         watt = make_opinion["watt_majority"]
@@ -265,7 +269,7 @@ class TestRuleImport:
 
 
 class TestNestedFactorImport:
-    def test_import_holding(self, make_code, make_opinion):
+    def test_import_holding(self, make_regime):
         """
         Based on this text:
         This testimony tended “only remotely” to prove that appellant
@@ -275,6 +279,5 @@ class TestNestedFactorImport:
         testimony on the jury. Hence, admission of the testimony
         concerning appellant’s use of narcotics was improper.
         """
-        cardenas = make_opinion["cardenas_majority"]
-        cardenas_holdings = Rule.from_json("holding_cardenas.json", regime=make_code)
+        cardenas_holdings = Rule.from_json("holding_cardenas.json", regime=make_regime)
         assert len(cardenas_holdings) == 2

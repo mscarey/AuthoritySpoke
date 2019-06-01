@@ -483,7 +483,10 @@ class Rule(Factor):
 
     @classmethod
     def collection_from_dict(
-        cls, case: Dict, regime: Optional["Regime"] = None
+        cls,
+        case: Dict,
+        mentioned: Optional[List[Factor]] = None,
+        regime: Optional["Regime"] = None
     ) -> List[Rule]:
         """
         :param case:
@@ -498,12 +501,13 @@ class Rule(Factor):
             from ``mentioned_entities`` as ``context_factors``
         """
 
-        context_list = case.get("mentioned_factors")
-        rule_list = case.get("holdings")
-
-        mentioned = cls.get_mentioned_factors(context_list, regime=regime)
+        mentioned = cls.get_mentioned_factors(
+            factor_dicts=case.get("mentioned_factors"),
+            mentioned=mentioned,
+            regime=regime
+            )
         finished_rules: List[Rule] = []
-        for rule in rule_list:
+        for rule in case.get("holdings"):
             # This will need to change for Attribution holdings
             finished_rule, mentioned = ProceduralRule.from_dict(
                 rule, mentioned, regime=regime
@@ -546,14 +550,19 @@ class Rule(Factor):
     @classmethod
     def get_mentioned_factors(
         cls,
-        mentioned: Optional[List[Dict[str, str]]],
+        factor_dicts: Optional[List[Dict[str, str]]],
+        mentioned: Optional[List[Factor]],
         regime: Optional["Regime"] = None,
     ) -> List[Factor]:
         """
-        :param mentioned:
+        :param factor_dicts:
             A list of dicts describing context :class:`.Factor`\s
             in the JSON format used in the ``example_data/holdings``
             folder.
+
+        :param mentioned:
+            :class:`.Factors`\s already known, which can be referenced
+            by their name parameter.
 
         :param regime:
 
@@ -564,10 +573,11 @@ class Rule(Factor):
             since there's currently no other way to import
             those using the JSON format.
         """
-        mentioned: List[Factor] = []
-        if mentioned:
-            for factor_dict in mentioned:
-                _, mentioned = Factor.from_dict(factor_dict, mentioned, regime=regime)
+        if not mentioned:
+            mentioned: List[Factor] = []
+        if factor_dicts:
+            for factor_dict in factor_dicts:
+                _, mentioned = Factor.from_dict(factor_dict, mentioned=mentioned, regime=regime)
         return mentioned
 
 
