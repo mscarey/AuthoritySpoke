@@ -33,7 +33,7 @@ def log_mentioned_context(func: Callable):
                     + f"or Enactment by the name '{mentioned}'."
                 )
             if factor_record.get("path") or factor_record.get("filename"):
-                return func(cls, factor_record, regime), []
+                return func(cls, factor_record, regime)
             else:
                 return func(cls, factor_record, mentioned=[], regime=regime)
 

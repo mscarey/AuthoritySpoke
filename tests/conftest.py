@@ -511,7 +511,7 @@ def make_code(make_regime) -> Dict[str, Code]:
         "usc17": make_regime.get_code("/us/usc/t17"),
         "cfr37": make_regime.get_code("/us/cfr/t37"),
         "ca_evid": make_regime.get_code("/us-ca/evid"),
-        "ca_evid": make_regime.get_code("/us-ca/pen"),
+        "ca_pen": make_regime.get_code("/us-ca/pen"),
     }
 
 

@@ -346,9 +346,8 @@ class Enactment:
         Creates a new :class:`Enactment` object using a :class:`dict`
         imported from JSON example data.
 
-        The new :class:`Enactment` can be composed using the
-         There's currently no way to import an existing :class:`Code` object
-        for use in composing .
+        The new :class:`Enactment` can be composed from a :class:`.Code`
+        referenced in the ``regime`` parameter.
 
         :param enactment_dict:
 
@@ -363,7 +362,12 @@ class Enactment:
             if regime:
                 regime.set_code(code)
 
-        selector = TextQuoteSelector(**enactment_dict, source=code)
+        selector = TextQuoteSelector(
+            exact=enactment_dict.get("exact"),
+            prefix=enactment_dict.get("prefix"),
+            suffix=enactment_dict.get("suffix"),
+            source=code,
+        )
 
         return Enactment(code=code, selector=selector, name=enactment_dict.get("name"))
 
