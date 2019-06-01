@@ -77,37 +77,37 @@ class TestEnactments:
         search_clause = make_enactment["search_clause"]
         assert search_clause.text.endswith("shall not be violated")
 
-    def test_passage_from_uslm_code(self, make_code):
-        usc17 = make_code["usc17"]
-        copyright_exceptions = Enactment(
-            usc17, section="102", subsection="b", end="extend to any"
-        )
-        assert copyright_exceptions.text == (
-            "In no case does copyright protection "
-            + "for an original work of authorship extend to any"
-        )
-
     def test_passage_from_imported_statute(self, make_code):
         opinion = Opinion.from_file(f"oracle_h.json")
         oracle_majority = opinion.exposit(f"holding_oracle.json")
         despite_text = str(oracle_majority.holdings[5])
         assert 'DESPITE: "In no case does copyright protection ' in despite_text
 
+    def test_add_omitted_initial_slash(self, make_code):
+        usc17 = make_code["usc17"]
+        selector = TextQuoteSelector(
+            path="us/usc/t17/s102/b",
+            prefix="process, system,",
+            suffix=", concept, principle",
+            source=usc17,
+        )
+        assert selector.path.startswith("/")
+
     def test_short_passage_from_uslm_code(self, make_code):
         usc17 = make_code["usc17"]
-        method = Enactment(
-            usc17,
-            section="102",
-            subsection="b",
-            start="method of operation",
-            end="method of operation",
+        selector = TextQuoteSelector(
+            path="us/usc/t17/s102/b",
+            prefix="process, system,",
+            suffix=", concept, principle",
+            source=usc17,
         )
-        assert method.text == "method of operation"
+        method = Enactment(selector=selector, code=usc17)
+        assert method.text.strip() == "method of operation"
 
     def test_passage_from_cfr_code(self, make_code):
         cfr = make_code["cfr37"]
-        selector = TextQuoteSelector(path="/us/cfr/t37/s202.1")
-        slogans = Enactment(cfr, selector=selector)
+        selector = TextQuoteSelector(path="/us/cfr/t37/s202.1", source=cfr)
+        slogans = Enactment(selector=selector, code=cfr)
         assert "Words and short phrases such as names" in slogans.text
 
     def test_code_title_in_str(self, make_enactment):

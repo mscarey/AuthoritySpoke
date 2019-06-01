@@ -80,6 +80,11 @@ class TextQuoteSelector:
                 raise ValueError(f"'suffix' value {self.suffix} not found in {text}")
             return text[l:r]
 
+        if self.path and not self.path.startswith("/"):
+            object.__setattr__(self, "path", "/" + self.path)
+        if self.path and self.path.endswith("/"):
+            object.__setattr__(self, "path", self.path.rstrip("/"))
+
         if not self.exact:
             if self.source.__class__.__name__ == "Regime":
                 code = self.source.get_code(self.path)

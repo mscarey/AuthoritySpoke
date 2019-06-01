@@ -239,13 +239,7 @@ class Code:
             ).search(href)
 
         def usc_statute_text():
-            section_identifier = f"/us/usc/t{self.code.title_number}/s{self.section}"
-            section = self.code.xml.find(name="section", identifier=section_identifier)
-            if self.subsection:
-                subsection_identifier = f"{section_identifier}/{self.subsection}"
-                section = section.find(
-                    name="subsection", identifier=subsection_identifier
-                )
+            section = self.xml.find(identifier=selector.path)
             return section.find_all(["chapeau", "paragraph", "content"])
 
         if selector.path is not None:
@@ -259,7 +253,7 @@ class Code:
                 passages = self.xml.find(
                     name="SECTNO", text=f"§ {section}"
                 ).parent.find_all(name="P")
-            elif docpath.split("/")[1].startswith("t"):
+            elif self.level == "statute":
                 passages = usc_statute_text()
             else:  # federal constitution
                 passages = self.xml.find(id=docpath.split("/")[1]).find_all(name="text")

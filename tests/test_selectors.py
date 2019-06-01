@@ -6,8 +6,8 @@ from authorityspoke.rules import Procedure, Rule, ProceduralRule
 from authorityspoke.opinions import Opinion
 from authorityspoke.selectors import TextQuoteSelector
 
-class TestSelectors:
 
+class TestSelectors:
     def test_code_from_selector(self, make_code, make_selector):
         code = make_code.get_code(make_selector["/us/usc/t17/s103"])
         assert code.uri == "/us/usc/t17"
@@ -18,3 +18,33 @@ class TestSelectors:
         enactment = Enactment(code, selector)
         assert enactment.code.level == "statute"
         assert enactment.code.jurisdiction_id == "us"
+
+    def test_omit_terminal_slash(self, make_code):
+        usc17 = make_code["usc17"]
+        selector = TextQuoteSelector(
+            path="us/usc/t17/s102/b/",
+            prefix="process, system,",
+            suffix=", concept, principle",
+            source=usc17,
+        )
+        assert not selector.path.endswith("/")
+
+    def test_add_omitted_initial_slash(self, make_code):
+        usc17 = make_code["usc17"]
+        selector = TextQuoteSelector(
+            path="us/usc/t17/s102/b",
+            prefix="process, system,",
+            suffix=", concept, principle",
+            source=usc17,
+        )
+        assert selector.path.startswith("/")
+
+    def test_passage_from_uslm_code(self, make_code):
+        usc17 = make_code["usc17"]
+        copyright_exceptions = TextQuoteSelector(
+            path="/us/usc/t17/s102/b", suffix="idea, procedure,", source=usc17
+        )
+        assert copyright_exceptions.exact.strip() == (
+            "In no case does copyright protection "
+            + "for an original work of authorship extend to any"
+        )
