@@ -226,16 +226,16 @@ class Code:
             can't be found.
         """
 
-        def cal_href(href, docpath):
+        def cal_href(docpath, href):
             """
             Tests whether an XML element has an attribute labeling it as the text
             of the statutory section `self.section`.
 
             Uses `California statute XML format <http://leginfo.legislature.ca.gov/>`_.
             """
-
+            section = docpath.split("/")[1].strip("s")
             return href and re.compile(
-                r"^javascript:submitCodesValues\('" + self.section
+                r"^javascript:submitCodesValues\('" + section
             ).search(href)
 
         def usc_statute_text():
@@ -244,10 +244,10 @@ class Code:
 
         if selector.path is not None:
             docpath = selector.path.replace(self.uri, "")
-        else:
-            passages = self.xml.find_all(name="text")
 
-        if self.jurisdiction == "us":
+        if selector.path is None:
+            passages = self.xml.find_all(name="text")
+        elif self.jurisdiction == "us":
             if self.level == "regulation":
                 section = docpath.split("/")[1].strip("s")
                 passages = self.xml.find(
@@ -259,7 +259,8 @@ class Code:
                 passages = self.xml.find(id=docpath.split("/")[1]).find_all(name="text")
 
         elif self.jurisdiction == "us-ca":
-            passages = self.xml.find(href=cal_href).parent.find_next_siblings(
+            this_cal_section = functools.partial(cal_href, docpath)
+            passages = self.xml.find(href=this_cal_section).parent.find_next_siblings(
                 style="margin:0;display:inline;"
             )
 
@@ -363,6 +364,7 @@ class Enactment:
                 regime.set_code(code)
 
         selector = TextQuoteSelector(
+            path=enactment_dict.get("path"),
             exact=enactment_dict.get("exact"),
             prefix=enactment_dict.get("prefix"),
             suffix=enactment_dict.get("suffix"),

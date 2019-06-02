@@ -33,14 +33,6 @@ class TextQuoteSelector:
         the snippet of text that occurs immediately after the text which
         is being selected.
 
-    :param start:
-        the beginning of the quoted text. Only needed
-        if ``exact`` is not specified.
-
-    :param end:
-        the end of the quoted text. Only needed
-        if ``exact`` is not specified.
-
     :param source:
         the :class:`.Code` where the quoted text can be found,
         or the :class:`.Regime` that has enacted it.
@@ -75,9 +67,13 @@ class TextQuoteSelector:
             else:
                 r = len(text)
             if l == -1:
-                raise ValueError(f"'prefix' value {self.prefix} not found in {text}")
+                raise ValueError(
+                    f"'prefix' value '{self.prefix}' not found in '{text}'"
+                )
             if r == -1:
-                raise ValueError(f"'suffix' value {self.suffix} not found in {text}")
+                raise ValueError(
+                    f"'suffix' value '{self.suffix}' not found in '{text}'"
+                )
             return text[l:r]
 
         if self.path and not self.path.startswith("/"):
