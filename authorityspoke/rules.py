@@ -551,7 +551,7 @@ class Rule(Factor):
     def get_mentioned_factors(
         cls,
         factor_dicts: Optional[List[Dict[str, str]]],
-        mentioned: Optional[List[Factor]],
+        mentioned: Optional[List[Factor]] = None,
         regime: Optional["Regime"] = None,
     ) -> List[Factor]:
         """

@@ -41,7 +41,7 @@ class TestCodes:
     @pytest.mark.parametrize(
         "code, expected",
         [
-            ("usc17", "USC Title 17"),
+            ("usc17", "Title 17"),
             ("const", "Constitution of the United States"),
             ("cfr37", "Code of Federal Regulations Title 37"),
             ("ca_evid", "California Evidence Code"),

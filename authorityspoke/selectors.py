@@ -63,9 +63,9 @@ class TextQuoteSelector:
             else:
                 l = 0
             if self.suffix:
-                r = text.find(self.suffix)
+                r: Union[int, None] = text.find(self.suffix)
             else:
-                r = len(text)
+                r = None
             if l == -1:
                 raise ValueError(
                     f"'prefix' value '{self.prefix}' not found in '{text}'"
