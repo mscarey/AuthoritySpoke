@@ -354,14 +354,22 @@ class Enactment:
 
         :param regime:
             the :class:`.Regime` where the :class:`.Code` that is the
-            source for this `Enactment` can be found.
+            source for this ``Enactment`` can be found.
         """
-        if regime is not None and regime.get_code(enactment_dict["path"]):
-            code = regime.get_code(enactment_dict["path"])
-        else:
-            code = Code(enactment_dict["path"])
+        # TODO: allow 'code' as a parameter
+        code = None
+        if regime is not None:
+            code = regime.get_code(enactment_dict.get("path"))
+        if code is None and enactment_dict.get("code"):
+            code = Code(enactment_dict.get("code"))
             if regime:
                 regime.set_code(code)
+        if code is None:
+            raise ValueError(
+                "Must either specify a Regime and a path to find the "
+                + "Code within the Regime, or specify a filename for an XML "
+                + "file that can be used to build the Code"
+            )
 
         selector = TextQuoteSelector(
             path=enactment_dict.get("path"),
