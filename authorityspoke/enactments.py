@@ -264,7 +264,7 @@ class Code:
                 style="margin:0;display:inline;"
             )
 
-        text = "".join(passage.text for passage in passages)
+        text = " ".join(" ".join(passage.text.split()) for passage in passages)
         if not selector.exact:
             return text
         prefix = selector.prefix or ""

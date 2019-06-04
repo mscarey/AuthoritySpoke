@@ -104,11 +104,11 @@ class TestOpinions:
                 context=(Entity("House on Haunted Hill"), "nonexistent factor"),
             )
 
-    def test_new_context_creates_equal_rule(self, make_opinion):
+    def test_new_context_creates_equal_rule(self, make_opinion, make_regime):
         watt = make_opinion["watt_majority"]
         brad = make_opinion["brad_majority"]
-        watt_holdings = Rule.from_json(f"holding_watt.json")
-        brad_holdings = Rule.from_json(f"holding_brad.json")
+        watt_holdings = Rule.from_json(f"holding_watt.json", regime=make_regime)
+        brad_holdings = Rule.from_json(f"holding_brad.json", regime=make_regime)
         for holding in watt_holdings:
             watt.posit(holding)
         for holding in brad_holdings:
@@ -122,7 +122,7 @@ class TestOpinions:
         watt.posit(brad.holdings[0], context_pairs)
         assert watt.holdings[-1].means(brad.holdings[0])
 
-    def test_new_context_inferring_factors_to_change(self, make_opinion):
+    def test_new_context_inferring_factors_to_change(self, make_opinion, make_regime):
         """
         This changes watt's holdings; may break tests below.
         """
@@ -131,8 +131,8 @@ class TestOpinions:
         brad = make_opinion["brad_majority"]
         watt.holdings = []
         brad.holdings = []
-        watt_holdings = Rule.from_json(f"holding_watt.json")
-        brad_holdings = Rule.from_json(f"holding_brad.json")
+        watt_holdings = Rule.from_json(f"holding_watt.json", regime=make_regime)
+        brad_holdings = Rule.from_json(f"holding_brad.json", regime=make_regime)
         for holding in watt_holdings:
             watt.posit(holding)
         for holding in brad_holdings:
@@ -155,10 +155,10 @@ class TestOpinions:
         brad = make_opinion_with_holding["brad_majority"]
         assert not watt >= brad
 
-    def test_posit_list_of_holdings_and_imply(self, make_opinion):
+    def test_posit_list_of_holdings_and_imply(self, make_opinion, make_regime):
         watt = make_opinion["watt_majority"]
         brad = make_opinion["brad_majority"]
-        some_rules = Rule.from_json("holding_watt.json")
+        some_rules = Rule.from_json("holding_watt.json", regime=make_regime)
         for case in (watt, brad):
             case.holdings = []
             case.posit(some_rules[:3])

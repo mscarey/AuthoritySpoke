@@ -96,13 +96,16 @@
                     "suffix": "(a) necessitate undue consumption"
                 },
                 {
+                    "code": "ca_evidence.html",
                     "path": "/us-ca/evid/s352",
                     "exact": "create substantial danger of undue prejudice"
                 },
                 {
-                    "path": "/us-ca/evid/s211"
+                    "code": "ca_penal.html",
+                    "path": "/us-ca/pen/s211"
                 },
                 {
+                    "code": "ca_penal.html",
                     "path": "/us-ca/pen/s664",
                     "suffix": "where no provision is"
                 }

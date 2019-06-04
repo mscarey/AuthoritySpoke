@@ -3,7 +3,9 @@ Tests of commands that appear in notebooks in
 the notebooks/ directory
 """
 
-from authorityspoke import Enactment, Entity
+from authorityspoke import Association, Enactment, Entity
+from authorityspoke.selectors import TextQuoteSelector
+
 
 class TestIntroduction:
 
@@ -15,21 +17,31 @@ class TestIntroduction:
         assert len(make_opinion_with_holding["oracle_majority"].holdings) == 20
 
     def test_replace_generic_factor(self, make_opinion_with_holding):
-        oracle = make_opinion_with_holding["oracle_majority"]
-        nosferatu_rule = oracle.holdings[0].new_context(
-            {Entity('the Java API'): Entity('Nosferatu')}
+        lotus_majority = make_opinion_with_holding["lotus_majority"]
+        nosferatu_rule = lotus_majority.holdings[0].new_context(
+            {
+                Association("Borland International"): Association("Prana Film"),
+                Entity("the Lotus menu command hierarchy"): Entity("Dracula"),
+            }
         )
-        assert oracle.holdings[0].means(nosferatu_rule)
+        assert lotus_majority.holdings[0] != nosferatu_rule
+        assert lotus_majority.holdings[0].means(nosferatu_rule)
 
-    def test_evolve_rule_replacing_enactment(self, make_opinion_with_holding):
+    def test_evolve_rule_replacing_enactment(
+        self, make_regime, make_opinion_with_holding
+    ):
         oracle = make_opinion_with_holding["oracle_majority"]
         usc = oracle.holdings[0].enactments[0].code
+        works_of_authorship_selector = TextQuoteSelector(
+            path="/us/usc/t17/s102/a",
+            exact=(
+                "Copyright protection subsists, in accordance with this title,"
+                + " in original works of authorship"
+            ),
+        )
         works_of_authorship_clause = Enactment(
-            code=usc,
-            section=102,
-            subsection="a",
-            end="works of authorship"
-            )
+            selector=works_of_authorship_selector, regime=make_regime
+        )
         rule_with_shorter_enactment = oracle.holdings[0].evolve(
             {"enactments": works_of_authorship_clause}
         )

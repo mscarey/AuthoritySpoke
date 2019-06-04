@@ -6,6 +6,7 @@ from authorityspoke.opinions import Opinion
 
 pytestmark = pytest.mark.skip("don't feel like calling API")
 
+
 class TestDownload:
     def test_download_opinion_by_id(self, tmp_path):
         to_file = "oracle_h.json"

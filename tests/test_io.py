@@ -66,25 +66,25 @@ class TestEntityImport:
 
 
 class TestEnactmentImport:
-    def test_enactment_import(self):
-        holdings = Rule.from_json("holding_cardenas.json")
+    def test_enactment_import(self, make_regime):
+        holdings = Rule.from_json("holding_cardenas.json", regime=make_regime)
         enactment_list = holdings[0].enactments
         assert "all relevant evidence is admissible" in enactment_list[0].text
 
 
 class TestFactorImport:
-    def test_fact_import(self):
-        holdings = Rule.from_json("holding_watt.json")
+    def test_fact_import(self, make_regime):
+        holdings = Rule.from_json("holding_watt.json", regime=make_regime)
         new_fact = holdings[0].inputs[1]
         assert "lived at <Hideaway Lodge>" in str(new_fact)
         assert isinstance(new_fact.context_factors[0], Entity)
 
-    def test_fact_with_quantity(self):
-        holdings = Rule.from_json("holding_watt.json")
+    def test_fact_with_quantity(self, make_regime):
+        holdings = Rule.from_json("holding_watt.json", regime=make_regime)
         new_fact = holdings[1].inputs[3]
         assert "was no more than 35 foot" in str(new_fact)
 
-    def test_find_directory_for_json(self):
+    def test_find_directory_for_json(self, make_regime):
         directory = pathlib.Path.cwd() / "tests"
         if directory.exists():
             os.chdir(directory)
@@ -109,7 +109,7 @@ class TestRuleImport:
 
     def test_enactment_has_subsection(self, make_opinion_with_holding):
         lotus = make_opinion_with_holding["lotus_majority"]
-        assert lotus.holdings[8].enactments[0].subsection == "b"
+        assert lotus.holdings[8].enactments[0].selector.path.split("/")[-1] == "b"
 
     def test_enactment_text_limited_to_subsection(self, make_opinion_with_holding):
         lotus = make_opinion_with_holding["lotus_majority"]
@@ -147,17 +147,17 @@ class TestRuleImport:
             lotus.holdings[0].enactments[0].code is lotus.holdings[1].enactments[0].code
         )
 
-    def test_same_enactment_in_two_opinions(self, make_opinion):
+    def test_same_enactment_in_two_opinions(self, make_regime, make_opinion):
         watt = make_opinion["watt_majority"]
-        watt_holdings = Rule.from_json("holding_watt.json")
+        watt_holdings = Rule.from_json("holding_watt.json", regime=make_regime)
         brad = make_opinion["brad_majority"]
-        brad_holdings = Rule.from_json("holding_brad.json")
+        brad_holdings = Rule.from_json("holding_brad.json", regime=make_regime)
         assert any(
             watt_holdings[0].enactments[0].means(brad_enactment)
             for brad_enactment in brad_holdings[0].enactments
         )
 
-    def test_same_object_for_enactment_in_import(self, make_opinion):
+    def test_same_object_for_enactment_in_import(self, make_opinion, make_regime):
         """
         The JSON for Bradley repeats identical fields to create the same Factor
         for multiple Rules, instead of using the "name" field as a shortcut.
@@ -165,31 +165,33 @@ class TestRuleImport:
         as if the JSON file had referred to the object by its name field.
         """
         brad = make_opinion["brad_majority"]
-        brad_holdings = Rule.from_json("holding_brad.json")
+        brad_holdings = Rule.from_json("holding_brad.json", regime=make_regime)
         assert any(brad_holdings[6].inputs[0] == x for x in brad_holdings[5].inputs)
         assert any(brad_holdings[6].inputs[0] is x for x in brad_holdings[5].inputs)
 
-    def test_use_int_not_pint_without_dimension(self, make_opinion):
+    def test_use_int_not_pint_without_dimension(self, make_regime, make_opinion):
 
         brad = make_opinion["brad_majority"]
-        brad_holdings = Rule.from_json("holding_brad.json")
+        brad_holdings = Rule.from_json("holding_brad.json", regime=make_regime)
         assert "dimensionless" not in str(brad_holdings[6])
         assert isinstance(brad_holdings[6].inputs[0].predicate.quantity, int)
 
-    def test_opinion_posits_holding(self, make_opinion):
+    def test_opinion_posits_holding(self, make_opinion, make_regime):
         brad = make_opinion["brad_majority"]
-        brad_holdings = Rule.from_json("holding_brad.json")
+        brad_holdings = Rule.from_json("holding_brad.json", regime=make_regime)
         for rule in brad_holdings:
             brad.posit(rule)
         assert "warrantless search and seizure" in str(brad.holdings[0])
 
-    def test_opinion_posits_holding_tuple_context(self, make_opinion, make_entity):
+    def test_opinion_posits_holding_tuple_context(
+        self, make_opinion, make_regime, make_entity
+    ):
         """
         Having the Watt case posit a holding from the Brad
         case, but with generic factors from Watt.
         """
         watt = make_opinion["watt_majority"]
-        brad_holdings = Rule.from_json("holding_brad.json")
+        brad_holdings = Rule.from_json("holding_brad.json", regime=make_regime)
         context_holding = brad_holdings[6].new_context(
             [make_entity["watt"], make_entity["trees"], make_entity["motel"]]
         )
@@ -199,14 +201,16 @@ class TestRuleImport:
             in str(watt.holdings[-1])
         )
 
-    def test_opinion_posits_holding_dict_context(self, make_opinion, make_entity):
+    def test_opinion_posits_holding_dict_context(
+        self, make_opinion, make_regime, make_entity
+    ):
         """
         Having the Watt case posit a holding from the Brad
         case, but replacing one generic factor with a factor
         from Watt.
         """
         watt = make_opinion["watt_majority"]
-        brad_holdings = Rule.from_json("holding_brad.json")
+        brad_holdings = Rule.from_json("holding_brad.json", regime=make_regime)
         context_holding = brad_holdings[6].new_context(
             {brad_holdings[6].generic_factors[0]: make_entity["watt"]}
         )
@@ -217,12 +221,14 @@ class TestRuleImport:
         assert "<Wattenburg> lived at <Bradley's house>" in string
         assert "<Wattenburg> lived at <Bradley's house>" in str(watt.holdings[0])
 
-    def test_holding_with_non_generic_value(self, make_opinion, make_entity):
+    def test_holding_with_non_generic_value(
+        self, make_opinion, make_regime, make_entity
+    ):
         """
         This test originally required a ValueError, but why should it?
         """
         watt = make_opinion["watt_majority"]
-        brad_holdings = Rule.from_json("holding_brad.json")
+        brad_holdings = Rule.from_json("holding_brad.json", regime=make_regime)
         context_change = brad_holdings[6].new_context(
             {brad_holdings[6].generic_factors[1]: make_entity["trees_specific"]}
         )
