@@ -51,11 +51,25 @@ class TestSelectors:
             + "for an original work of authorship extend to any"
         )
 
+    def test_convert_selector_to_json(self, make_code):
+        usc17 = make_code["usc17"]
+        copyright_exceptions = TextQuoteSelector(
+            path="/us/usc/t17/s102/b", suffix="idea, procedure,", source=usc17
+        )
+        assert '"exact": "In no case does copyright' in copyright_exceptions.json
+
     def test_failed_prefix(self, make_code):
         usc17 = make_code["usc17"]
         with pytest.raises(ValueError):
             copyright_exceptions = TextQuoteSelector(
                 path="/us/usc/t17/s102/b", prefix="sound recordings", source=usc17
+            )
+
+    def test_fail_no_exact_or_source(self, make_code):
+        usc17 = make_code["usc17"]
+        with pytest.raises(ValueError):
+            copyright_exceptions = TextQuoteSelector(
+                path="/us/usc/t17/s102/b", prefix="sound recordings"
             )
 
     def test_failed_suffix(self, make_code):
@@ -64,3 +78,12 @@ class TestSelectors:
             copyright_exceptions = TextQuoteSelector(
                 path="/us/usc/t17/s102/b", suffix="sound recordings", source=usc17
             )
+
+    def test_section_text_from_path_and_regime(self, make_regime):
+        copyright_exceptions = TextQuoteSelector(
+            path="/us/usc/t17/s102/b", source=make_regime
+        )
+        assert copyright_exceptions.exact.startswith(
+            "In no case does copyright protection "
+            + "for an original work of authorship extend to any"
+        )

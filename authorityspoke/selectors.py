@@ -88,7 +88,7 @@ class TextQuoteSelector:
             elif self.source.__class__.__name__ == "Code":
                 code = self.source
             else:
-                raise TypeError(
+                raise ValueError(
                     "If 'exact' parameter is not specified, you must specify "
                     + "a 'Code' or 'Regime' object as the 'source' parameter to "
                     + "obtain the exact text selection."
