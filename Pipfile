@@ -25,6 +25,7 @@ rope = "*"
 sphinx = "*"
 sphinx-autodoc-typehints = "*"
 pipenv-to-requirements = "*"
+wily = "*"
 
 [requires]
 python_version = "3.7.3"
