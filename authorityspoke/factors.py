@@ -816,7 +816,8 @@ class Fact(Factor):
             content: str, mentioned: List[Factor], placeholder: str
         ) -> Tuple[str, List[Factor]]:
             """
-            :param content: the content for the :class:`Fact`\'s Predicate
+            :param content:
+                the content for the :class:`Fact`\'s :class:`Predicate`
 
             :param mentioned:
                 list of :class:`Factor`\s with names that could be
@@ -904,28 +905,13 @@ class Pleading(Factor):
     """
 
     filer: Optional["Entity"] = None
-    date: Optional[datetime.date] = None
     name: Optional[str] = None
     absent: bool = False
     generic: bool = False
     context_factor_names: ClassVar = ("filer",)
 
-    def _equal_if_concrete(self, other: Pleading) -> bool:
-        if self.date != other.date:
-            return False
-        return super()._equal_if_concrete(other)
-
-    def _implies_if_concrete(self, other: Pleading):
-        # TODO: allow the same kind of comparisons as Predicate.quantity
-        if self.date != other.date:
-            return False
-        return super()._implies_if_concrete(other)
-
     def __str__(self):
-        string = (
-            f'{("filed by " + str(self.filer) if self.filer else "")}'
-            + f'{("received on " + str(self.date)) if self.date else ""}'
-        )
+        string = f'{("filed by " + str(self.filer) if self.filer else "")}'
         return super().__str__().format(string)
 
 

@@ -134,11 +134,27 @@ class TestEnactments:
         with pytest.raises(TypeError):
             assert not dp5 < f1
 
+    def test_constitution_effective_date(self, make_regime):
+        ex_post_facto_provision = Enactment.from_dict(
+            {"path": "/us/const/article-I/9/3"}, regime=make_regime
+        )
+        assert ex_post_facto_provision.effective_date == datetime.date(1788, 9, 13)
+
     def test_bill_of_rights_effective_date(self, make_enactment):
         # December 15, 1791
         assert make_enactment["search_clause"].effective_date == datetime.date(
             1791, 12, 15
         )
+
+    def test_12th_A_effective_date(self, make_regime):
+        """
+        This tests different parsing code because the date is
+        in the format "dated the 25th of September, 1804"
+        """
+        amendment_12 = Enactment.from_dict(
+            {"path": "/us/const/amendment-XII"}, regime=make_regime
+        )
+        assert amendment_12.effective_date == datetime.date(1804, 9, 25)
 
     def test_14th_A_effective_date(self, make_enactment):
         # July 28, 1868
