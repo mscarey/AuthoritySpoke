@@ -12,7 +12,7 @@ class TextQuoteSelector:
     A selector that describes a textual segment by means of quoting it,
     plus passages before or after it.
 
-    Compare with the `Web Annotation Data Model
+    Based on the `Web Annotation Data Model
     <https://www.w3.org/TR/annotation-model/#text-quote-selector>`_
 
     :param path:
@@ -59,22 +59,23 @@ class TextQuoteSelector:
             """
 
             if self.prefix:
-                l = text.find(self.prefix) + len(self.prefix)
+                left_end: int = text.find(self.prefix)
+                if left_end == -1:
+                    raise ValueError(
+                        f"'prefix' value '{self.prefix}' not found in '{text}'"
+                    )
+                left_end += len(self.prefix)
             else:
-                l = 0
+                left_end = 0
             if self.suffix:
-                r: Union[int, None] = text.find(self.suffix)
+                right_end: Optional[int] = text.find(self.suffix)
             else:
-                r = None
-            if l == -1:
-                raise ValueError(
-                    f"'prefix' value '{self.prefix}' not found in '{text}'"
-                )
-            if r == -1:
+                right_end = None
+            if right_end == -1:
                 raise ValueError(
                     f"'suffix' value '{self.suffix}' not found in '{text}'"
                 )
-            return text[l:r]
+            return text[left_end:right_end]
 
         if self.path and not self.path.startswith("/"):
             object.__setattr__(self, "path", "/" + self.path)

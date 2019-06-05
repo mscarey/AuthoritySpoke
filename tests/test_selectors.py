@@ -1,3 +1,5 @@
+import pytest
+
 from authorityspoke.enactments import Code, Enactment
 from authorityspoke.entities import Entity, Event, Human
 from authorityspoke.factors import Predicate, Factor, Fact
@@ -48,3 +50,17 @@ class TestSelectors:
             "In no case does copyright protection "
             + "for an original work of authorship extend to any"
         )
+
+    def test_failed_prefix(self, make_code):
+        usc17 = make_code["usc17"]
+        with pytest.raises(ValueError):
+            copyright_exceptions = TextQuoteSelector(
+                path="/us/usc/t17/s102/b", prefix="sound recordings", source=usc17
+            )
+
+    def test_failed_suffix(self, make_code):
+        usc17 = make_code["usc17"]
+        with pytest.raises(ValueError):
+            copyright_exceptions = TextQuoteSelector(
+                path="/us/usc/t17/s102/b", suffix="sound recordings", source=usc17
+            )
