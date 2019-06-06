@@ -518,32 +518,34 @@ def make_code(make_regime) -> Dict[str, Code]:
 @pytest.fixture(scope="module")
 def make_enactment(make_regime) -> Dict[str, Enactment]:
     return {
-        "search_clause": Enactment.from_dict(
-            {
-                "path": "/us/const/amendment-IV",
-                "exact": (
+        "search_clause": Enactment(
+            selector=TextQuoteSelector(
+                path="/us/const/amendment-IV",
+                exact=(
                     "The right of the people to be secure in their persons, "
                     + "houses, papers, and effects, against unreasonable searches "
                     + "and seizures, shall not be violated"
                 ),
-            },
+                source=make_regime
+            ),
+            ),
+        "fourth_a": Enactment(
+            selector=TextQuoteSelector(
+            path="/us/const/amendment-IV"),
+            regime=make_regime
+        ),
+        "due_process_5": Enactment(
+            selector=TextQuoteSelector(
+            path="/us/const/amendment-V",
+            exact="life, liberty, or property, without due process of law",
+            ),
             regime=make_regime,
         ),
-        "fourth_a": Enactment.from_dict(
-            {"path": "/us/const/amendment-IV"}, regime=make_regime
-        ),
-        "due_process_5": Enactment.from_dict(
-            {
-                "path": "/us/const/amendment-V",
-                "exact": "life, liberty, or property, without due process of law",
-            },
-            regime=make_regime,
-        ),
-        "due_process_14": Enactment.from_dict(
-            {
-                "path": "/us/const/amendment-XIV-1",
-                "exact": "life, liberty, or property, without due process of law",
-            },
+        "due_process_14": Enactment(
+            selector=TextQuoteSelector(
+            path="/us/const/amendment-XIV-1",
+            exact="life, liberty, or property, without due process of law",
+            ),
             regime=make_regime,
         ),
     }

@@ -83,20 +83,21 @@ class TextQuoteSelector:
             object.__setattr__(self, "path", self.path.rstrip("/"))
 
         if not self.exact:
-            if self.source.__class__.__name__ == "Regime":
-                code = self.source.get_code(self.path)
-            elif self.source.__class__.__name__ == "Code":
-                code = self.source
-            else:
-                raise ValueError(
-                    "If 'exact' parameter is not specified, you must specify "
-                    + "a 'Code' or 'Regime' object as the 'source' parameter to "
-                    + "obtain the exact text selection."
-                )
-
-            selection = code.select_text(self)
+            selection = self.code.select_text(self)
             object.__setattr__(self, "exact", exact_from_ends(selection))
-        object.__delattr__(self, "source")
+
+    @property
+    def code(self) -> "Code":
+        """
+        :returns:
+            A :class:`.Code` object associated with this selector
+        """
+        if self.source.__class__.__name__ == "Regime":
+            return self.source.get_code(self.path)
+        elif self.source.__class__.__name__ == "Code":
+            return self.source
+        else:
+            return None
 
     @property
     def json(self):

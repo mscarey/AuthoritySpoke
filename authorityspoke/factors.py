@@ -116,7 +116,7 @@ class Factor(ABC):
                 value = factor_record.get(attr)
             if value is not None:
                 new_factor_dict[attr] = value
-        return (cls(**new_factor_dict), mentioned)
+        return cls(**new_factor_dict)
 
     @classmethod
     @log_mentioned_context
@@ -804,7 +804,7 @@ class Fact(Factor):
     @classmethod
     def _build_from_dict(
         cls, fact_dict: Dict[str, Union[str, bool]], mentioned: List[Factor]
-    ) -> Tuple[Optional[Fact], List[Factor]]:
+    ) -> Optional[Fact]:
         """
         Constructs and returns a :class:`Fact` object from a dict imported from
         a JSON file in the format used in the "input" folder.
@@ -880,7 +880,7 @@ class Fact(Factor):
             absent=fact_dict.get("absent", False),
             generic=fact_dict.get("generic", False),
         )
-        return factor, mentioned
+        return factor
 
     @new_context_helper
     def new_context(self, changes: Dict[Factor, Factor]) -> Factor:

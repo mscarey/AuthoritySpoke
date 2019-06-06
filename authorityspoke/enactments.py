@@ -316,10 +316,15 @@ class Enactment:
     name: Optional[str] = None
 
     def __post_init__(self):
-        if not self.code and not self.regime:
-            raise ValueError("'code' and 'regime' cannot both be None")
-        if self.regime and not self.code:
-            object.__setattr__(self, "code", self.regime.get_code(self.selector.path))
+        if not self.code:
+            if self.regime:
+                object.__setattr__(
+                    self, "code", self.regime.get_code(self.selector.path)
+                )
+            elif self.selector.code:
+                object.__setattr__(self, "code", self.selector.code)
+            else:
+                raise ValueError("'code' and 'regime' cannot both be None")
 
     @property
     def effective_date(self):
@@ -341,8 +346,12 @@ class Enactment:
     @classmethod
     @log_mentioned_context
     def from_dict(
-        cls, enactment_dict: Dict[str, str], regime: Optional["Regime"] = None
-    ) -> Tuple[Enactment, Optional[List[Union[Enactment, Factor]]]]:
+        cls,
+        enactment_dict: Dict[str, str],
+        regime: Optional["Regime"] = None,
+        *args,
+        **kwargs,
+    ) -> Enactment:
         """
         Creates a new :class:`Enactment` object using a :class:`dict`
         imported from JSON example data.

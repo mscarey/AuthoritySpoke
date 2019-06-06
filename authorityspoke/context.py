@@ -26,21 +26,12 @@ def log_mentioned_context(func: Callable):
         regime: Optional["Regime"] = None,
     ) -> Tuple[Optional["Factor"], List["Factor"]]:
 
-        if mentioned is None:
-            if isinstance(factor_record, str):
+        if isinstance(factor_record, str):
+            if mentioned is None:
                 raise TypeError(
                     "No 'mentioned' list exists to search for a Factor "
                     + f"or Enactment by the name '{factor_record}'."
                 )
-            if factor_record.get("path") or factor_record.get("filename"):
-                return func(cls, factor_record, regime)
-            else:
-                return func(cls, factor_record, mentioned=[], regime=regime)
-
-        if factor_record is None:
-            return None, mentioned
-
-        if isinstance(factor_record, str):
             for context_factor in mentioned:
                 if (
                     hasattr(context_factor, "name")
@@ -48,23 +39,35 @@ def log_mentioned_context(func: Callable):
                 ):
                     return context_factor, mentioned
             raise ValueError(
-                f'The object "{factor_record}" should be a dict '
+                "The 'factor_record' parameter should be a dict "
                 + "representing a Factor or a string "
-                + "representing the name of a Factor included in context_list."
+                + "representing the name of a Factor included in 'mentioned'."
             )
-        if factor_record.get("path") or factor_record.get("filename"):
-            factor = func(cls, factor_record, regime)
-        else:
-            factor, mentioned = func(cls, factor_record, mentioned, regime)
-        if not factor.name and (not hasattr(factor, "generic") or not factor.generic):
+
+        if factor_record is None:
+            return None, mentioned
+
+        new_factor = func(cls, factor_record, mentioned=[], regime=regime)
+
+        mentioned = mentioned or []
+
+        if not new_factor.name and (
+            not hasattr(new_factor, "generic") or not new_factor.generic
+        ):
             for context_factor in mentioned:
-                if context_factor == factor:
+                if context_factor == new_factor:
                     return context_factor, mentioned
-        mentioned.append(factor)
+        if hasattr(new_factor, "recursive_factors"):
+            factors_to_add = new_factor.recursive_factors
+        else:
+            factors_to_add = [new_factor]
+        for recursive_factor in factors_to_add:
+            if recursive_factor not in mentioned:
+                mentioned.append(recursive_factor)
         mentioned = sorted(
             mentioned, key=lambda f: len(f.name) if f.name else 0, reverse=True
         )
-        return factor, mentioned
+        return new_factor, mentioned
 
     return wrapper
 
