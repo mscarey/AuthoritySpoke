@@ -494,6 +494,8 @@ class Rule(Factor):
             lists ``mentioned_entities`` followed by a
             series of :class:`Rule`\s
 
+        :param mentioned:
+
         :param regime:
 
         :returns:

@@ -46,36 +46,6 @@ class TextQuoteSelector:
     source: Optional[Union["Regime", "Code"]] = None
 
     def __post_init__(self):
-        def exact_from_ends(text: str) -> str:
-            """
-            Locates and returns an exact quotation from a text passage given the
-            beginning and end of the passage.
-
-            :param text:
-                the passage where an exact quotation needs to be located.
-
-            :returns:
-                the exact quotation from the text passage
-            """
-
-            if self.prefix:
-                left_end: int = text.find(self.prefix)
-                if left_end == -1:
-                    raise ValueError(
-                        f"'prefix' value '{self.prefix}' not found in '{text}'"
-                    )
-                left_end += len(self.prefix)
-            else:
-                left_end = 0
-            if self.suffix:
-                right_end: Optional[int] = text.find(self.suffix)
-            else:
-                right_end = None
-            if right_end == -1:
-                raise ValueError(
-                    f"'suffix' value '{self.suffix}' not found in '{text}'"
-                )
-            return text[left_end:right_end]
 
         if self.path and not self.path.startswith("/"):
             object.__setattr__(self, "path", "/" + self.path)
@@ -83,21 +53,50 @@ class TextQuoteSelector:
             object.__setattr__(self, "path", self.path.rstrip("/"))
 
         if not self.exact:
-            selection = self.code.select_text(self)
-            object.__setattr__(self, "exact", exact_from_ends(selection))
+            if self.source:
+                self.set_exact_from_source(self.source)
 
-    @property
-    def code(self) -> "Code":
-        """
-        :returns:
-            A :class:`.Code` object associated with this selector
-        """
-        if self.source.__class__.__name__ == "Regime":
-            return self.source.get_code(self.path)
+        object.__delattr__(self, "source")
+
+    def set_exact_from_source(self, source: Union["Regime", "Code"]) -> None:
+        if source.__class__.__name__ == "Regime":
+            code = source.get_code(self.path)
         elif self.source.__class__.__name__ == "Code":
-            return self.source
+            code = source
         else:
             return None
+
+        selection = code.select_text(self)
+        object.__setattr__(self, "exact", self.exact_from_ends(selection))
+
+    def exact_from_ends(self, text: str) -> str:
+        """
+        Locates and returns an exact quotation from a text passage given the
+        beginning and end of the passage.
+
+        :param text:
+            the passage where an exact quotation needs to be located.
+
+        :returns:
+            the exact quotation from the text passage
+        """
+
+        if self.prefix:
+            left_end: int = text.find(self.prefix)
+            if left_end == -1:
+                raise ValueError(
+                    f"'prefix' value '{self.prefix}' not found in '{text}'"
+                )
+            left_end += len(self.prefix)
+        else:
+            left_end = 0
+        if self.suffix:
+            right_end: Optional[int] = text.find(self.suffix)
+        else:
+            right_end = None
+        if right_end == -1:
+            raise ValueError(f"'suffix' value '{self.suffix}' not found in '{text}'")
+        return text[left_end:right_end]
 
     @property
     def json(self):

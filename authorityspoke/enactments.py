@@ -321,10 +321,11 @@ class Enactment:
                 object.__setattr__(
                     self, "code", self.regime.get_code(self.selector.path)
                 )
-            elif self.selector.code:
-                object.__setattr__(self, "code", self.selector.code)
             else:
                 raise ValueError("'code' and 'regime' cannot both be None")
+        if not self.selector.exact:
+            self.selector.set_exact_from_source(self.code)
+        object.__delattr__(self, "regime")
 
     @property
     def effective_date(self):

@@ -71,6 +71,7 @@ class TestSelectors:
             copyright_exceptions = TextQuoteSelector(
                 path="/us/usc/t17/s102/b", prefix="sound recordings"
             )
+            copyright_enactment = Enactment(selector=copyright_exceptions)
 
     def test_failed_suffix(self, make_code):
         usc17 = make_code["usc17"]

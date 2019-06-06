@@ -135,8 +135,9 @@ class TestEnactments:
             assert not dp5 < f1
 
     def test_constitution_effective_date(self, make_regime):
-        ex_post_facto_provision = Enactment.from_dict(
-            {"path": "/us/const/article-I/9/3"}, regime=make_regime
+        ex_post_facto_provision = Enactment(
+            selector=TextQuoteSelector(path="/us/const/article-I/9/3"),
+            regime=make_regime,
         )
         assert ex_post_facto_provision.effective_date == datetime.date(1788, 9, 13)
 
@@ -151,8 +152,9 @@ class TestEnactments:
         This tests different parsing code because the date is
         in the format "dated the 25th of September, 1804"
         """
-        amendment_12 = Enactment.from_dict(
-            {"path": "/us/const/amendment-XII"}, regime=make_regime
+        amendment_12 = Enactment(
+            selector=TextQuoteSelector(path="/us/const/amendment-XII"),
+            regime=make_regime,
         )
         assert amendment_12.effective_date == datetime.date(1804, 9, 25)
 

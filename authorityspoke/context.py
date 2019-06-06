@@ -47,9 +47,9 @@ def log_mentioned_context(func: Callable):
         if factor_record is None:
             return None, mentioned
 
-        new_factor = func(cls, factor_record, mentioned=[], regime=regime)
-
         mentioned = mentioned or []
+
+        new_factor = func(cls, factor_record, mentioned=mentioned, regime=regime)
 
         if not new_factor.name and (
             not hasattr(new_factor, "generic") or not new_factor.generic

@@ -732,8 +732,7 @@
         },
         "pyrsistent": {
             "hashes": [
-                "sha256:16692ee739d42cf5e39cef8d27649a8c1fdb7aa99887098f1460057c5eb75c3a",
-                "sha256:88fc74af35ad81a05862ebdbc0e59a077ccac2ad7578a622142dc5d0897bb1ee"
+                "sha256:16692ee739d42cf5e39cef8d27649a8c1fdb7aa99887098f1460057c5eb75c3a"
             ],
             "version": "==0.15.2"
         },

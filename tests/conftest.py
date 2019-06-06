@@ -528,10 +528,12 @@ def make_enactment(make_regime) -> Dict[str, Enactment]:
                 ),
                 source=make_regime
             ),
+            regime=make_regime
             ),
         "fourth_a": Enactment(
             selector=TextQuoteSelector(
-            path="/us/const/amendment-IV"),
+            path="/us/const/amendment-IV",
+            ),
             regime=make_regime
         ),
         "due_process_5": Enactment(
