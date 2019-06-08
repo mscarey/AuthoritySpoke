@@ -12,7 +12,7 @@ class Relation:
     Describes two groups of :class:`.Factor`\s and specifies a function
     that must hold between the two groups. Can be used to find ways to
     assign the :class:`.Factor`\s' context assignments consistently with
-    the relation.
+    the ``Relation``.
 
     :param need_matches:
         :class:`.Factor`\s that all need to satisfy the ``comparison``
@@ -39,6 +39,8 @@ class Relation:
         self, matches: Optional[Dict["Factor", "Factor"]] = None
     ) -> Iterator[Dict["Factor", Optional["Factor"]]]:
         """
+        Find ways for a series of pairs of :class:`.Factor`\s to satisfy a comparison.
+
         :param matches:
             keys representing :class:`.Factor`\s in ``self`` and
             values representing :class:`.Factor`\s in ``other``. The
@@ -46,10 +48,10 @@ class Relation:
             in ``self`` and ``other``.
 
         :yields:
-            every way that ``self_mapping`` can be updated to be consistent
-            with each element of ``self_factors`` having the relationship
-            ``comparison`` with the item at the corresponding index of
-            ``other_factors``.
+            every way that ``matches`` can be updated to be consistent
+            with each element of ``self.need_matches`` having the relationship
+            ``self.comparison`` with the item at the corresponding index of
+            ``self.available``.
         """
         if matches is None:
             matches = {}
@@ -84,6 +86,8 @@ class Relation:
         still_need_matches: Optional[List["Factor"]] = None,
     ) -> Iterator[Dict["Factor", Optional["Factor"]]]:
         """
+        Find ways for two unordered sets of :class:`.Factor`\s to satisfy a comparison.
+
         :param matches:
             a mapping of :class:`.Factor`\s that have already been matched
             to each other in the recursive search for a complete group of

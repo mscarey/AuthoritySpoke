@@ -1,3 +1,12 @@
+"""
+Phrases that contain the meaning of :class:`.Factor`\s,
+particularly :class:`.Fact`\s.
+
+Can contain references to other :class:`.Factor`\s,
+to numeric values, or to quantities (with the use of
+the `pint <https://pint.readthedocs.io/en/0.9/>`_ library.)
+"""
+
 from __future__ import annotations
 
 import re
@@ -128,6 +137,8 @@ class Predicate:
 
     def contradicts(self, other: Optional[Predicate]) -> bool:
         """
+        Test whether ``other`` and ``self`` have contradictory meanings.
+
         This first tries to find a contradiction based on the relationship
         between the quantities in the :class:`Predicate`\s. If there are
         no quantities, it returns ``False`` only if the content is exactly
@@ -185,7 +196,13 @@ class Predicate:
             return False
         return self.content == other.content and self.truth != other.truth
 
-    def means(self, other: Predicate) -> bool:
+    def means(self, other) -> bool:
+        """
+        Test whether ``self`` and ``other`` have identical meanings.
+
+        To return ``True``, ``other`` can be neither broader nor narrower.
+        """
+
         if not isinstance(other, self.__class__):
             return False
 

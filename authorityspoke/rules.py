@@ -1,3 +1,9 @@
+"""
+Statements of legal doctrines that :class:`.Court`\s may posit as
+holdings and that may describe procedural moves available in
+litigation.
+"""
+
 from __future__ import annotations
 
 import json
@@ -132,6 +138,8 @@ class Procedure(Factor):
     @property
     def generic_factors(self) -> List[Optional[Factor]]:
         """
+        :class:`.Factor`\s that can be replaced without changing ``self``\s meaning.
+
         :returns:
             ``self``'s generic :class:`.Factor`\s,
             which must be matched to other generic :class:`.Factor`\s to
@@ -155,6 +163,8 @@ class Procedure(Factor):
         matches: Dict[Factor, Factor],
     ):
         """
+        Find whether two sets of :class:`.Factor`\s can be consistent.
+
         Works by first determining whether one :class:`.Factor`
         potentially :meth:`~.Factor.contradicts` another,
         and then determining whether it's possible to make
@@ -173,7 +183,6 @@ class Procedure(Factor):
             :class:`.Factor`\s have already been assigned as
             described by ``matches``.
         """
-
         for self_factor in self_factors:
             for other_factor in other_factors:
                 if self_factor.contradicts(other_factor):
@@ -218,17 +227,16 @@ class Procedure(Factor):
                         return True
         return False
 
-    def contradicts(self, other) -> None:
+    def contradicts(self, other) -> bool:
         """
+        Find if ``self`` applying in some cases implies ``other`` cannot apply in some.
+
         Raises an error because, by analogy with :meth:`Procedure.implies`\,
         users might expect this method to return ``True`` only when
         :class:`ProceduralRule` with ``universal=False`` and Procedure ``self``
         would contradict another :class:`ProceduralRule` with ``universal=False``
         and Procedure ``other``. But that would never happen.
-
-        :returns: None
         """
-
         raise NotImplementedError(
             "Procedures do not contradict one another unless one of them ",
             "applies in 'ALL' cases. Consider using ",
@@ -237,12 +245,13 @@ class Procedure(Factor):
 
     def contradicts_some_to_all(self, other: Procedure) -> bool:
         """
+        Find if ``self`` applying in some cases implies ``other`` cannot apply in all.
+
         :returns:
             whether the assertion that ``self`` applies in
             **some** cases contradicts that ``other`` applies in **all**
             cases, where at least one of the :class:`.Rule`\s is ``mandatory``.
         """
-
         if not isinstance(other, self.__class__):
             return False
 
@@ -260,6 +269,8 @@ class Procedure(Factor):
 
     def implies_all_to_all(self, other: Procedure) -> bool:
         """
+        Find if ``self`` applying in all cases implies ``other`` applies in all.
+
         ``self`` does not imply ``other`` if any output of ``other``
         is not equal to or implied by some output of ``self``.
 
@@ -273,7 +284,6 @@ class Procedure(Factor):
             whether the assertion that ``self`` applies in **all** cases
             implies that ``other`` applies in **all** cases.
         """
-
         if not isinstance(other, self.__class__):
             return False
 
@@ -297,6 +307,8 @@ class Procedure(Factor):
 
     def implies_all_to_some(self, other: Procedure) -> bool:
         """
+        Find if ``self`` applying in all cases implies ``other`` applies in some.
+
         For ``self`` to imply ``other``, every output of ``other``
         must be equal to or implied by some output of ``self``.
 
@@ -364,8 +376,10 @@ class Procedure(Factor):
 
         return bool(self.all_relation_matches(relations))
 
-    def means(self, other: Procedure) -> bool:
+    def means(self, other) -> bool:
         """
+        Determine whether ``other`` has the same meaning as ``self``.
+
         :returns:
             whether the two :class:`.Procedure`\s have all the same
             :class:`.Factor`\s with the same context factors in the
@@ -470,13 +484,14 @@ class Procedure(Factor):
 @dataclass(frozen=True)
 class Rule(Factor):
     """
-    A statement of a legal rule which a court may posit as authoritative,
-    deciding some aspect of the current litigation but also potentially
-    binding future courts to follow the rule. When holdings appear in
-    judicial opinions they are often hypothetical and don't necessarily
+    A statement of a legal doctrine which a court may posit as authoritative.
+
+    May decide some aspect of current litigation, and also potentially
+    may be cided and reused by future courts. When ``Rule``\s appear as
+    judicial holdings they are often hypothetical and don't necessarily
     imply that the court accepts the :class:`.Fact` assertions or other
     :class:`.Factor`\s that make up the inputs or outputs of the
-    :class:`Procedure` mentioned in the rule.
+    :class:`Procedure` mentioned in the ``Rule``.
     """
 
     directory = get_directory_path("holdings")
@@ -525,8 +540,10 @@ class Rule(Factor):
         regime: Optional["Regime"] = None,
     ) -> List[Rule]:
         """
+        Load a list of ``Rule``\s from JSON.
+
         Does not cause an :class:`.Opinion` to :meth:`~.Opinion.posit`
-        the :class:`.Rule`\s as holdings.
+        the ``Rule``\s as holdings.
 
         :param filename:
             the name of the JSON file to look in for :class:`Rule`
@@ -747,6 +764,8 @@ class ProceduralRule(Rule):
     @property
     def generic_factors(self) -> List[Optional[Factor]]:
         """
+        :class:`.Factor`\s that can be replaced without changing ``self``\s meaning.
+
         :returns:
             generic :class:`.Factors` from ``self``'s :class:`Procedure`
         """

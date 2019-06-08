@@ -1,3 +1,9 @@
+"""
+Selectors for getting text from legislation and court decisions.
+
+Based on the `Web Annotation Data Model <https://www.w3.org/TR/annotation-model/>`_
+"""
+
 from __future__ import annotations
 
 import json
@@ -9,8 +15,7 @@ from typing import Optional, Union
 @dataclass(frozen=True)
 class TextQuoteSelector:
     """
-    A selector that describes a textual segment by means of quoting it,
-    plus passages before or after it.
+    Describes a textual segment by quoting it, or passages before or after it.
 
     Based on the `Web Annotation Data Model
     <https://www.w3.org/TR/annotation-model/#text-quote-selector>`_
@@ -59,6 +64,7 @@ class TextQuoteSelector:
         object.__delattr__(self, "source")
 
     def set_exact_from_source(self, source: Union["Regime", "Code"]) -> None:
+        """Use text found in ``source`` as ``exact`` parameter for ``self``."""
         if source.__class__.__name__ == "Regime":
             code = source.get_code(self.path)
         elif self.source.__class__.__name__ == "Code":
@@ -71,14 +77,13 @@ class TextQuoteSelector:
 
     def exact_from_ends(self, text: str) -> str:
         """
-        Locates and returns an exact quotation from a text passage given the
-        beginning and end of the passage.
+        Locate an exact passage from some text.
 
         :param text:
             the passage where an exact quotation needs to be located.
 
         :returns:
-            the exact quotation from the text passage
+            the passage between ``self.prefix`` and ``self.suffix`` in ``text``.
         """
 
         if self.prefix:
@@ -100,6 +105,12 @@ class TextQuoteSelector:
 
     @property
     def json(self):
+        """
+        Serialize the selector.
+
+        Based on the JSON serialization format in the `Web Annotation Data Model
+        <https://www.w3.org/TR/annotation-model/#text-quote-selector>`_
+        """
         return json.dumps(
             {
                 "source": self.path,

@@ -74,10 +74,12 @@ def log_mentioned_context(func: Callable):
 
 def get_directory_path(stem: str) -> pathlib.Path:
     """
-    This function finds a data directory for importing files, if
-    the current working directory is that directory, is its
-    parent directory, or is a sibling
-    directory. Otherwise it won't find the right directory.
+    Find a data directory for importing files.
+
+    Will only find the correct directory if it is the current working
+    directory is that directory, is its child directory, or is a sibling
+    directory. Requires the directory to be found within an ``example_data``
+    directory.
 
     This function doesn't obviously belong in the context module.
 

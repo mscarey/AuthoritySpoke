@@ -1,3 +1,5 @@
+"""Classes representing legislation."""
+
 from __future__ import annotations
 
 import datetime
@@ -18,7 +20,9 @@ from utils.cache import lazyprop
 
 class Code:
     """
-    A constitution, code of statutes, code of regulations,
+    A code of legislation.
+
+    Could be a constitution, code of statutes, code of regulations,
     or collection of court rules.
 
     Each instance of this class depends on an XML file containing
@@ -45,15 +49,19 @@ class Code:
     @property
     def path(self):
         """
+        Construct the path to this file in the ``example_data`` folder.
+
         :returns:
             The path to the file where the XML file for
             the code can be found.
         """
         return self.__class__.directory / self.filename
 
-    @lazyprop
+    @property
     def jurisdiction(self) -> str:
         """
+        Get string representing the jurisdiction from within ``uri``.
+
         :returns:
             The abbreviation for the jurisdiction that
             enacted the ``Code``, in USLM-like format.
@@ -66,10 +74,11 @@ class Code:
     @property
     def level(self) -> str:
         """
+        Get identifier for the :class:`.Enactment` type found in this ``Code``.
+
         :returns:
             "constitution", "statute", or "regulation"
         """
-
         if "Constitution" in self.title:
             return "constitution"
         elif "Regulations" in self.title:
@@ -80,13 +89,14 @@ class Code:
     @lazyprop
     def title(self) -> str:
         """
+        Provide "title" identifier for the ``Code``'s XML.
+
         :returns:
             the contents of an XML ``title`` element that
             describes the ``Code``, if any. Otherwise
             returns a descriptive name that may not exactly
             appear in the XML.
         """
-
         uslm_title = self.xml.find("dc:title")
         if uslm_title:
             return uslm_title.text
@@ -102,6 +112,8 @@ class Code:
     @lazyprop
     def uri(self) -> str:
         """
+        Build a URI for the ``Code`` based on its XML metadata.
+
         .. note::
             This handles California state statutes only with a
             mockup, which can only refer to the Penal and Evidence
@@ -132,6 +144,8 @@ class Code:
     @lazyprop
     def xml(self):
         """
+        Get XML tree of legislative provisions.
+
         :returns:
             A BeautifulSoup object created by parsing the
             ``Code``\'s XML file
@@ -142,6 +156,8 @@ class Code:
 
     def format_uri_for_const(self, uri: str) -> str:
         """
+        Convert ``uri`` to identifier for constitution sections.
+
         Although the US Constitution is published in a format
         described as USML, its section identifier strings differ from
         those in USC USML documents in that they skip the jurisdiction
@@ -168,6 +184,8 @@ class Code:
         self, cite: Union[TextQuoteSelector, str]
     ) -> datetime.date:
         """
+        Give effective date for a provision within the ``Code``.
+
         So far this method only covers the US Constitution and it
         assumes that the XML format is `United States Legislative
         Markup (USLM) <https://github.com/usgpo/uslm>`_.
@@ -179,7 +197,6 @@ class Code:
         :returns:
             the effective date of the cited provision
         """
-
         if isinstance(cite, TextQuoteSelector):
             cite = cite.path
         if self.level == "constitution" and self.jurisdiction == "us":
@@ -211,6 +228,8 @@ class Code:
 
     def select_text(self, selector: TextQuoteSelector) -> Optional[str]:
         """
+        Get text from the ``Code`` using a :class:`.TextQuoteSelector`.
+
         :param selector:
             a selector referencing a text passage in the ``Code``.
 
@@ -228,8 +247,7 @@ class Code:
 
         def cal_href(docpath, href):
             """
-            Tests whether an XML element has an attribute labeling it as the text
-            of the statutory section `self.section`.
+            Test if XML element is labeled as the text of the section in ``docpath``.
 
             Uses `California statute XML format <http://leginfo.legislature.ca.gov/>`_.
             """
@@ -289,9 +307,10 @@ class Code:
 
 @dataclass(frozen=True)
 class Enactment:
-
     """
-    A passage of legislative text. May be used as support for a
+    A passage of legislative text.
+
+    May be used as support for a
     :class:`.ProceduralRule`. To retrieve the text, there needs
     to be an available method for identifying the correct XML
     element based on the section and subsection names, and each
@@ -330,6 +349,8 @@ class Enactment:
     @property
     def effective_date(self):
         """
+        Give effective date for the :class:`Enactment`\.
+
         :returns:
             the effective date of the text in this passage.
             Currently works only for the US Constitution.
@@ -354,8 +375,7 @@ class Enactment:
         **kwargs,
     ) -> Enactment:
         """
-        Creates a new :class:`Enactment` object using a :class:`dict`
-        imported from JSON example data.
+        Create a new :class:`Enactment` object using imported JSON data.
 
         The new :class:`Enactment` can be composed from a :class:`.Code`
         referenced in the ``regime`` parameter.
@@ -364,7 +384,7 @@ class Enactment:
 
         :param regime:
             the :class:`.Regime` where the :class:`.Code` that is the
-            source for this ``Enactment`` can be found.
+            source for this :class:`Enactment` can be found.
         """
         # TODO: allow 'code' as a parameter
         code = None
@@ -393,9 +413,11 @@ class Enactment:
 
     def means(self, other: Enactment) -> bool:
         """
-        Whether the meaning of ``self`` is equivalent to (neither
-        broader nor narrower than) the meaning of the legislative
-        text passage ``other``.
+        Find whether meaning of ``self`` is equivalent to that of ``other``.
+
+        ``Self`` must be neither broader nor narrower than ``other``, which
+        means it must contain the same legislative text in the same :class:`.Code`
+        from the same :class:`.Jurisdiction`
 
         .. note::
             You could always make the result ``False`` by comparing longer
@@ -406,7 +428,7 @@ class Enactment:
         :returns:
             whether ``self`` and ``other`` represent the same text
             issued by the same sovereign in the same level of
-            :class:`Enactment`.
+            :class:`Enactment`\.
         """
         if not isinstance(other, self.__class__):
             return False
@@ -422,6 +444,8 @@ class Enactment:
 
     def __ge__(self, other):
         """
+        Tells whether ``self`` implies ``other``.
+
         .. note::
             Why does this method not require the same ``code.sovereign``
             and ``code.level``, especially considering that
@@ -431,7 +455,6 @@ class Enactment:
             Whether ``self`` "implies" ``other``, which in this context means
             whether ``self`` contains at least all the same text as ``other``.
         """
-
         if not isinstance(other, self.__class__):
             raise TypeError(
                 f"{self.__class__} objects may only be compared for "
@@ -440,7 +463,8 @@ class Enactment:
 
         return other.text.strip(",:;. ") in self.text
 
-    def __gt__(self, other):
+    def __gt__(self, other) -> bool:
+        """Test whether ``self`` implies ``other`` without having same meaning."""
         if self == other:
             return False
         return self >= other

@@ -1,0 +1,3 @@
+[pydocstyle]
+
+add-ignore=D105,D202,D301

@@ -17,6 +17,7 @@ authorityspoke = {path = ".",editable = true}
 [dev-packages]
 black = "*"
 mypy = "*"
+pydocstyle = "*"
 pylint = "*"
 pytest = "*"
 pytest-cov = "*"

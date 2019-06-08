@@ -21,6 +21,7 @@ from authorityspoke.rules import Rule, ProceduralRule
 class Opinion:
     """
     A document that resolves legal issues in a case and posits legal holdings.
+
     Usually an opinion must have ``position="majority"``
     to create holdings binding on any courts.
 
@@ -84,6 +85,8 @@ class Opinion:
         Iterator[Dict[str, Any]],
     ]:
         """
+        Download opinions from Caselaw Access Project API.
+
         Queries the Opinion endpoint of the
         `Caselaw Access Project API <https://api.case.law/v1/cases/>`_,
         saves the JSON object(s) from the response to the
@@ -302,9 +305,10 @@ class Opinion:
         lead_only: bool = True,
     ) -> Union[Opinion, Iterator[Opinion]]:
         """
-        Creates and returns one or more :class:`.Opinion` objects
-        from a JSON file derived from an opinion record from the
-        `Caselaw Access Project API <https://api.case.law/v1/cases/>`_.
+        Create and return one or more :class:`.Opinion` objects from JSON.
+
+        Relies on the JSON format from the `Caselaw Access Project
+        API <https://api.case.law/v1/cases/>`_.
 
         :param filename: The name of the input JSON file.
 
@@ -339,9 +343,10 @@ class Opinion:
         regime: Optional["Regime"] = None,
     ):
         """
-        Loads structured JSON representation of :class:`.Rule`
-        objects, and posits each :class:`.Rule`
-        (that is, adds each :class:`.Rule` to self.holdings).
+        Load and :meth:`~Opinion.posit` :class:`.Rule` objects from JSON.
+
+        Here, to :meth:`~Opinion.posit` means to add each :class:`.Rule`
+        to ``self.holdings``.
 
         :param rule_file:
             name of the JSON file with the
@@ -375,6 +380,8 @@ class Opinion:
     @property
     def generic_factors(self) -> List[Factor]:
         """
+        Get all generic :class:`.Factor`\s mentioned in ``self``.
+
         :returns:
             a list of generic :class:`.Factor` objects mentioned in
             any ``input``, ``output``, or ``despite`` :class:`.Factor`
@@ -391,9 +398,7 @@ class Opinion:
 
     def get_factor_by_name(self, name: str) -> Optional[Factor]:
         """
-        Performs a recursive search of each holding in ``self``
-        for a :class:`.Factor` with the specified name attribute.
-        Returns such a :class:`.Factor` if it exists, otherwise returns None.
+        Search recursively in holdings of ``self`` for :class:`.Factor` with ``name``.
 
         :param name:
             string to match with the ``name`` attribute of the
@@ -402,6 +407,7 @@ class Opinion:
         :returns:
             a :class:`.Factor` with the specified ``name``, if one
             exists in a :class:`.Rule` in ``self.holdings``.
+            Otherwise ``None``.
         """
 
         for holding in self.holdings:
@@ -416,7 +422,10 @@ class Opinion:
         context: Optional[Sequence[Factor]] = None,
     ) -> None:
         """
-        Adds ``holding`` (or every :class:`.Rule` in ``holding``, if ``holding`` is iterable) to the :py:class:`list` ``self.holdings``, replacing
+        Add a :class:`.Rule` as a holding of this ``Opinion``.
+
+        Adds ``holding`` (or every :class:`.Rule` in ``holding``, if ``holding``
+        is iterable) to the :py:class:`list` ``self.holdings``, replacing
         any other :class:`.Rule` in ``self.holdings`` with the same meaning.
 
         :param holding:
@@ -469,6 +478,8 @@ class Opinion:
 
     def __ge__(self, other: Union[Opinion, Rule]) -> bool:
         """
+        Find whether ``self``'s holdings imply all the holdings of ``other``.
+
         :returns:
             a bool indicating whether the :class:`.Rule` ``other``
             (or every holding of ``other``, if other is an :class:`.Opinion`)
@@ -489,6 +500,12 @@ class Opinion:
 
     def __gt__(self, other) -> bool:
         """
-        :returns: self >= value and self != value.
+        Find whether ``self``\'s holdings imply ``other``\'s but self != other.
+
+        This actually tests for inequality because ``Opinion`` does not
+        have a ``means`` method.
+
+        :returns:
+            self >= other and self != other.
         """
         return (self >= other) and (self != other)

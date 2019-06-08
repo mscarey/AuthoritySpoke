@@ -1,3 +1,15 @@
+"""
+Classes representing things that exist in the outside world,
+that can be mentioned in legal rules. Not concepts that
+derive their meaning from litigation, such as a legal
+Fact, an Allegation, a Pleading, etc.
+
+Because of the challenge of describing the significance
+of classifying an object as one kind of Entity rather than
+another, all of Entity's subclasses might be collapsed into
+a single Entity class.
+"""
+
 from __future__ import annotations
 
 from typing import Dict, Iterator, Optional
@@ -74,11 +86,12 @@ class Entity(Factor):
         self, other: Factor, comparison
     ) -> Iterator[Dict[Factor, Factor]]:
         """
-        :yields:
-            possible ways the context of ``self`` can be
-            mapped onto the context of ``other``.
-        """
+        Find how ``self``\'s context of can be mapped onto ``other``\'s.
 
+        :yields:
+            the only possible way the context of one ``Entity`` can be
+            mapped onto the context of another.
+        """
         # If there was a way to compare an Entity to None, should it return {}?
         if comparison(self, other):
             yield {self: other, other: self}
@@ -92,8 +105,15 @@ class Entity(Factor):
         return False
 
     @new_context_helper
-    def new_context(self, context: Dict[Factor, Factor]) -> Entity:
+    def new_context(self, changes: Dict[Factor, Factor]) -> Entity:
+        """
+        Create new :class:`Factor`, replacing keys of ``changes`` with values.
+
+        Assumes no changes are possible because the :func:`new_context_helper`
+        decorator would have replaced ``self`` if any replacement was available.
+        """
         return self
+
 
 class Association(Entity):
     """
@@ -101,6 +121,7 @@ class Association(Entity):
     or a business such as a corporation or LLC, but not an unincorporated
     business such as a sole proprietorship.
     """
+
 
 class Human(Entity):
     """

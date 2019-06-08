@@ -142,6 +142,8 @@ class Factor(ABC):
     @property
     def context_factor_names(self) -> Tuple[str, ...]:
         """
+        Get names of attributes to compare in :meth:`~Factor.means` or :meth:`~Factor.__ge__`.
+
         This method and :meth:`interchangeable_factors` should be the only parts
         of the context-matching process that need to be unique for each
         subclass of :class:`Factor`.
@@ -157,19 +159,23 @@ class Factor(ABC):
     @property
     def interchangeable_factors(self) -> List[Dict[Factor, Factor]]:
         """
+        List ways to reorder :attr:`context_factors` but preserve ``self``\'s meaning.
+
+        The empty list is the default return value for subclasses that don't
+        have any interchangeable :attr:`context_factors`.
+
         :returns:
             the ways :attr:`context_factors` can be reordered without
             changing the meaning of ``self``, or whether it would
             be true in a particular context.
-
-            The empty list is the default return value for subclasses
-            that don't have any interchangeable :attr:`context_factors`.
         """
         return []
 
     @property
     def generic_factors(self) -> List[Optional[Factor]]:
         """
+        :class:`.Factor`\s that can be replaced without changing ``self``\s meaning.
+
         :returns:
             a :class:`dict` with self's generic :class:`.Factor`\s
             as keys and ``None`` as values, so that the keys can
@@ -219,6 +225,8 @@ class Factor(ABC):
 
     def consistent_with(self, other: Factor, comparison: Callable) -> bool:
         """
+        Find whether ``self`` and ``other`` can fit the relationship ``comparison``.
+
         :returns:
             a bool indicating whether there's at least one way to
             match the :attr:`context_factors` of ``self`` and ``other``,
@@ -267,7 +275,9 @@ class Factor(ABC):
 
     def _contradicts_if_factor(self, other: Factor) -> bool:
         """
-        A :meth:`contradicts` method under the assumption that ``other``
+        Tests whether ``self`` :meth:`implies` the absence of ``other``.
+
+        This should only be called after confirming that ``other``
         is not ``None``.
 
         :returns:
@@ -306,6 +316,8 @@ class Factor(ABC):
 
     def means(self, other) -> bool:
         """
+        Test whether ``self`` and ``other`` have identical meanings.
+
         :returns:
             whether ``other`` is another :class:`Factor`
             with the same meaning as ``self``. Not the same as an
@@ -387,7 +399,7 @@ class Factor(ABC):
 
     def implies(self, other: Factor) -> bool:
         """
-        Alias for :meth:`__ge__`.
+        Call :meth:`__ge__` as an alias.
 
         :returns:
             bool indicating whether ``self`` implies ``other``
@@ -396,6 +408,8 @@ class Factor(ABC):
 
     def _implies_if_concrete(self, other: Factor) -> bool:
         """
+        Find if ``self`` would imply ``other`` if they aren't absent or generic.
+
         Used to test implication based on :attr:`context_factors`,
         usually after a subclasses has injected its own tests
         based on other attributes.
@@ -406,7 +420,6 @@ class Factor(ABC):
             has ``absent=True``, neither has ``generic=True``, and
             ``other`` is an instance of ``self``'s class.
         """
-
         for i, self_factor in enumerate(self.context_factors):
             if other.context_factors[i]:
                 if not (self_factor and self_factor >= other.context_factors[i]):
@@ -415,12 +428,13 @@ class Factor(ABC):
 
     def _implies_if_present(self, other: Factor) -> bool:
         """
+        Find if ``self`` would imply ``other`` if they aren't absent.
+
         :returns:
             bool indicating whether ``self`` would imply ``other``,
             under the assumption that neither self nor other has
             the attribute ``absent == True``.
         """
-
         if isinstance(other, self.__class__):
             if other.generic:
                 return True
@@ -466,7 +480,6 @@ class Factor(ABC):
             ``self``'s and ``other``'s interchangeable
             :attr:`context_factors`.
         """
-
         def replace_factors_in_dict(
             matches: Dict[Factor, Factor], replacement_dict: Dict[Factor, Factor]
         ):
@@ -885,8 +898,7 @@ class Fact(Factor):
     @new_context_helper
     def new_context(self, changes: Dict[Factor, Factor]) -> Factor:
         """
-        Creates new :class:`Fact` object, replacing keys of ``changes``
-        with their values.
+        Create new :class:`Factor`, replacing keys of ``changes`` with values.
         """
         return self.evolve(
             {
