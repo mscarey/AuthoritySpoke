@@ -360,6 +360,8 @@ class Enactment:
     @property
     def text(self):
         """
+        Get a passage from ``self``\s :class:`.Code` with ``self``\s :class:`.TextQuoteSelector`.
+
         :returns: the full text of the cited passage from the XML.
         """
 

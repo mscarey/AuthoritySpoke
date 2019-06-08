@@ -7,7 +7,7 @@ import pytest
 
 from authorityspoke.context import get_directory_path
 from authorityspoke.enactments import Code, Enactment
-from authorityspoke.entities import Entity, Event, Human
+from authorityspoke.factors import Entity
 from authorityspoke.factors import Factor, Fact
 from authorityspoke.opinions import Opinion
 from authorityspoke.predicates import Predicate
@@ -23,13 +23,11 @@ class TestPredicateImport:
     """
 
     def test_import_predicate_with_quantity(self):
-        story, entities = Predicate.from_string(
-            "Once there was a {king} who had {> 3} castles"
-        )
-        assert len(entities) == 1
-        assert story.content.startswith("Once")
-        assert story.comparison == ">"
-        assert story.quantity == 3
+        story = Fact.from_string("Once there was a {king} who had {> 3} castles")
+        assert len(story.predicate) == 1
+        assert story.predicate.content.startswith("Once")
+        assert story.predicate.comparison == ">"
+        assert story.predicate.quantity == 3
 
 
 class TestEntityImport:
@@ -46,8 +44,8 @@ class TestEntityImport:
     def test_specific_entity(self):
         smith_dict = {
             "mentioned_factors": [
-                {"type": "Human", "name": "Smith", "generic": False},
-                {"type": "Human", "name": "Smythe"},
+                {"type": "Entity", "name": "Smith", "generic": False},
+                {"type": "Entity", "name": "Smythe"},
             ],
             "holdings": [
                 {

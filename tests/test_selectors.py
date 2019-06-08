@@ -1,8 +1,7 @@
 import pytest
 
 from authorityspoke.enactments import Code, Enactment
-from authorityspoke.entities import Entity, Event, Human
-from authorityspoke.factors import Predicate, Factor, Fact
+from authorityspoke.factors import Predicate, Entity, Factor, Fact
 from authorityspoke.factors import Evidence, Exhibit
 from authorityspoke.rules import Procedure, Rule, ProceduralRule
 from authorityspoke.opinions import Opinion

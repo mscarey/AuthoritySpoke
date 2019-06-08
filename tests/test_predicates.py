@@ -3,8 +3,7 @@ import operator
 
 import pytest
 
-from authorityspoke.entities import Entity, Event, Human
-from authorityspoke.factors import Factor, Fact
+from authorityspoke.factors import Entity, Factor, Fact
 from authorityspoke.rules import Rule, ProceduralRule
 from authorityspoke.opinions import Opinion
 from authorityspoke.predicates import Predicate, ureg, Q_
@@ -94,10 +93,6 @@ class TestPredicates:
     def test_greater_float_and_int(self, make_predicate):
         assert make_predicate["p8_higher_int"] > make_predicate["p8_float"]
         assert make_predicate["p8_int"] < make_predicate["p8_higher_int"]
-        p8_float_more = Predicate.from_string(
-            "the distance between {Ann} and {Lee} was {>= 20.1}", reciprocal=True
-        )[0]
-        assert p8_float_more > make_predicate["p8_int"]
 
     def test_any_truth_value_implies_none(self, make_predicate):
         assert make_predicate["p_murder"] > make_predicate["p_murder_whether"]

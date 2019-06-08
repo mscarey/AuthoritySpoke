@@ -1,6 +1,5 @@
 """
-Phrases that contain the meaning of :class:`.Factor`\s,
-particularly :class:`.Fact`\s.
+Phrases that contain meanings of :class:`.Factor`\s, particularly :class:`.Fact`\s.
 
 Can contain references to other :class:`.Factor`\s,
 to numeric values, or to quantities (with the use of
@@ -27,6 +26,7 @@ Q_ = ureg.Quantity
 class Predicate:
     """
     A statement about real events or about a legal conclusion.
+
     Predicates may be "alleged" by a pleading, "supported" by evidence, or
     "found" to be factual by a jury verdict or a judge's finding of fact.
 
@@ -104,6 +104,8 @@ class Predicate:
     @property
     def context_slots(self) -> int:
         """
+        Count bracket pairs in ``self.content``, minus 1 if ``self.quantity==True``.
+
         :returns:
             the number of context :class:`.Factor`\s that must be
             specified to fill in the blanks in ``self.content``.
@@ -114,11 +116,15 @@ class Predicate:
             slots -= 1
         return slots
 
-    def content_with_entities(self, context: Union[Factor, Sequence[Factor]]) -> str:
+    def content_with_entities(
+        self, context: Union["Factor", Sequence["Factor"]]
+    ) -> str:
         """
+        Make a sentence by filling in ``self.content`` with generic :class:`.Factor`\s.
+
         :param context:
             generic :class:`.Factor`\s to be mentioned in the context of
-            this Predicate. Does not need to be type :class:`.Entity`.
+            this Predicate. They do not need to be type :class:`.Entity`.
 
         :returns:
             a sentence created by substituting string representations
@@ -212,67 +218,6 @@ class Predicate:
             and self.quantity == other.quantity
         ):
             return self.truth == other.truth and self.comparison == other.comparison
-
-    @classmethod
-    def from_string(
-        cls, content: str, truth: Optional[bool] = True, reciprocal: bool = False
-    ) -> Tuple[Predicate, Tuple["Factor", ...]]:
-
-        """
-        This method for constructing :class:`Predicate` objects
-        from strings may never be used because it's an alternative to
-        :meth:`.Factor.from_dict`. This function identifies context
-        factors by finding brackets around them, while
-        :meth:`~.Factor.from_dict` depends on knowing the names of the
-        context factors in advance.
-
-        :param content:
-            a string containing a clause making an assertion.
-            Differs from the ``content`` parameter in
-            the :meth:`__init__` method because the curly brackets
-            surround the names of :class:`.Entity` context factors,
-            and because the ``comparison`` and ``quantity`` are
-            represented in the ``content`` string rather than as
-            separate parameters.
-
-        :param truth:
-            indicates whether the clause in ``content`` is asserted to be
-            true or false. ``None`` indicates an assertion as to "whether"
-            the clause is true or false, without specifying which.
-
-        :param reciprocal:
-            if True, then the order of the first two entities
-            is considered interchangeable. There's no way to make
-            any entities interchangeable other than the first two.
-
-        :returns:
-            a :class:`Predicate` and :class:`.Entity` objects
-            from a string that has curly brackets around the
-            context factors and the comparison/quantity.
-        """
-
-        comparison = None
-        quantity = None
-        pattern = r"\{([^\{]+)\}"
-
-        entities = re.findall(pattern, content)
-        for c in cls.opposite_comparisons:
-            if entities[-1].startswith(c):
-                comparison = c
-                quantity = entities.pop(-1)
-                quantity = quantity[2:].strip()
-                quantity = cls.str_to_quantity(quantity)
-
-        return (
-            Predicate(
-                content=re.sub(pattern, "{}", content),
-                truth=truth,
-                reciprocal=reciprocal,
-                comparison=comparison,
-                quantity=quantity,
-            ),
-            tuple(entities),
-        )
 
     def __gt__(self, other: Optional[Predicate]) -> bool:
         """

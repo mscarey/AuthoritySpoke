@@ -2,8 +2,7 @@ import json
 import pytest
 
 from authorityspoke.enactments import Code, Enactment
-from authorityspoke.entities import Entity, Event, Human
-from authorityspoke.factors import Evidence, Exhibit
+from authorityspoke.factors import Entity, Evidence, Exhibit
 from authorityspoke.rules import Procedure, Rule, ProceduralRule
 from authorityspoke.opinions import Opinion
 from authorityspoke.predicates import ureg, Q_

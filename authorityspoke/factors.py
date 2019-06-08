@@ -4,6 +4,7 @@ import datetime
 import functools
 import logging
 import operator
+import re
 
 from abc import ABC
 
@@ -722,6 +723,70 @@ class Fact(Factor):
         string = f"{standard}{predicate}"
         return super().__str__().format(string)
 
+
+    @classmethod
+    def from_string(
+        cls, content: str, truth: Optional[bool] = True, reciprocal: bool = False
+    ) -> Fact:
+        """
+        Make :class:`Fact` with context :class:`.Entity` objects from a :py:class:`str`.
+
+        This method for constructing :class:`Predicate` objects
+        from strings may rarely be used because it's an alternative to
+        :meth:`.Factor.from_dict`. This function identifies context
+        factors by finding brackets around them, while
+        :meth:`~.Factor.from_dict` depends on knowing the names of the
+        context factors in advance.
+
+        :param content:
+            a string containing a clause making an assertion.
+            Differs from the ``content`` parameter in
+            the :meth:`__init__` method because the curly brackets
+            surround the names of :class:`.Entity` context factors,
+            and because the ``comparison`` and ``quantity`` are
+            represented in the ``content`` string rather than as
+            separate parameters.
+
+        :param truth:
+            indicates whether the clause in ``content`` is asserted to be
+            true or false. ``None`` indicates an assertion as to "whether"
+            the clause is true or false, without specifying which.
+
+        :param reciprocal:
+            if True, then the order of the first two entities
+            is considered interchangeable. There's no way to make
+            any entities interchangeable other than the first two.
+
+        :returns:
+            a :class:`Predicate` and :class:`.Entity` objects
+            from a string that has curly brackets around the
+            context factors and the comparison/quantity.
+        """
+
+        comparison = None
+        quantity = None
+        pattern = r"\{([^\{]+)\}"
+
+        entities_as_text = re.findall(pattern, content)
+        for c in Predicate.opposite_comparisons:
+            if entities_as_text[-1].startswith(c):
+                comparison = c
+                quantity = entities_as_text.pop(-1)
+                quantity = quantity[2:].strip()
+                quantity = Predicate.str_to_quantity(quantity)
+
+        entities = [Entity(name=entity) for entity in entities_as_text]
+
+        return Fact(predicate=Predicate(
+                content=re.sub(pattern, "{}", content),
+                truth=truth,
+                reciprocal=reciprocal,
+                comparison=comparison,
+                quantity=quantity,
+            ),
+            context_factors=entities,
+        )
+
     @property
     def interchangeable_factors(self) -> List[Dict[Factor, Factor]]:
         """
@@ -911,10 +976,7 @@ class Fact(Factor):
 
 @dataclass(frozen=True)
 class Pleading(Factor):
-    """
-    A formal assertion of a :class:`Fact`, included by a party in
-    a :class:`Pleading` to establish a cause of action.
-    """
+    """A document filed by a party to make :class:`Allegation`\s."""
 
     filer: Optional["Entity"] = None
     name: Optional[str] = None
@@ -1016,3 +1078,100 @@ class Evidence(Factor):
 def means(left: Factor, right: Factor) -> bool:
 
     return left.means(right)
+
+
+
+@dataclass(frozen=True)
+class Entity(Factor):
+    """
+    A person, place, thing, or event that needs to be mentioned in
+    multiple :class:`.Factor`\s in a :class:`.Rule`, often in the
+    :class:`.Predicate` of a :class:`.Fact` object.
+
+    An :class:`Entity` is often, but not always, ``generic`` with
+    respect to the meaning of the :class:`.Rule` in which it is
+    mentioned, which means that the :class:`.Rule` is understood
+    to apply generally even if some other :class:`Entity` was
+    substituted.
+
+    :param name:
+        An identifier. An :class:`Entity` with the same ``name``
+        is considered to refer to the same specific object, but
+        if they have different names but are ``generic`` and are
+        otherwise the same, then they're considered to have the
+        same meaning and they evaluate equal to one another.
+
+    :param generic:
+        Determines whether a change in the ``name`` of the
+        :class:`Entity` would change the meaning of the
+        :class:`.Factor` in which the :class:`Entity` is
+        embedded.
+
+    :param plural:
+        Specifies whether the :class:`Entity` object refers to
+        more than one thing. In other words, whether it would
+        be represented by a plural noun.
+    """
+
+    name: Optional[str] = None
+    generic: bool = True
+    plural: bool = False
+
+    def means(self, other):
+        """
+        ``generic`` :class:`Entity` objects are considered equivalent
+        in meaning as long as they're the same class. If not ``generic``,
+        they're considered equivalent if all their attributes are the same.
+        """
+
+        if self.__class__ != other.__class__:
+            return False
+        if self.generic and other.generic:
+            return True
+        return astuple(self) == astuple(other)
+
+    def __ge__(self, other: Optional[Factor]):
+        if other is None:
+            return True
+        if not isinstance(self, other.__class__):
+            return False
+        if self.generic == False and self.name == other.name:
+            return True
+        return other.generic
+
+    def __str__(self):
+        if self.generic:
+            return f"<{self.name}>"
+        return self.name
+
+    def _context_register(
+        self, other: Factor, comparison
+    ) -> Iterator[Dict[Factor, Factor]]:
+        """
+        Find how ``self``\'s context of can be mapped onto ``other``\'s.
+
+        :yields:
+            the only possible way the context of one ``Entity`` can be
+            mapped onto the context of another.
+        """
+        # If there was a way to compare an Entity to None, should it return {}?
+        if comparison(self, other):
+            yield {self: other, other: self}
+
+    def contradicts(self, other: Factor) -> bool:
+        if not isinstance(other, Factor):
+            raise TypeError(
+                f"'Contradicts' not supported between class "
+                + f"{self.__class__.__name__} and class {other.__class__.__name__}."
+            )
+        return False
+
+    @new_context_helper
+    def new_context(self, changes: Dict[Factor, Factor]) -> Entity:
+        """
+        Create new :class:`Factor`, replacing keys of ``changes`` with values.
+
+        Assumes no changes are possible because the :func:`new_context_helper`
+        decorator would have replaced ``self`` if any replacement was available.
+        """
+        return self

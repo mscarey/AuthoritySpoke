@@ -3,8 +3,8 @@ import operator
 
 import pytest
 
-from authorityspoke.entities import Entity, Event, Human
-from authorityspoke.factors import Factor, Fact, means
+from authorityspoke.factors import Entity, Factor, Fact, means
+from authorityspoke.entities import Human
 from authorityspoke.rules import Rule, ProceduralRule
 from authorityspoke.opinions import Opinion
 from authorityspoke.predicates import ureg, Q_
@@ -46,6 +46,13 @@ class TestFacts:
             case_factors=watt_mentioned,
         )
         assert f2.context_factors == (e["watt"], e["trees"])
+
+    def test_make_fact_from_string(self, watt_factor):
+        fact_float_more = Fact.from_string(
+            "the distance between {Ann} and {Lee} was {>= 20.1}", reciprocal=True
+        )
+        fact_float_less = watt_factor["f8_int"]
+        assert fact_float_more > fact_float_less
 
     def test_wrong_type_in_context_factors_in_init(
         self, make_entity, make_predicate, watt_mentioned
@@ -114,7 +121,7 @@ class TestFacts:
     def test_new_concrete_context(self, make_entity, watt_factor):
         different = watt_factor["f2"].new_context(
             {
-                make_entity["watt"]: Human("Darth Vader"),
+                make_entity["watt"]: Entity("Darth Vader"),
                 make_entity["motel"]: Entity("Death Star"),
             }
         )

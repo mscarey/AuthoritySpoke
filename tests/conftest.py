@@ -3,9 +3,9 @@ from typing import Dict, Tuple
 import pytest
 
 
-from authorityspoke.factors import Factor
+from authorityspoke.factors import Factor, Entity
 from authorityspoke.enactments import Code, Enactment
-from authorityspoke.entities import Entity, Event, Human
+from authorityspoke.entities import Event, Human
 from authorityspoke.factors import Evidence, Exhibit
 from authorityspoke.factors import Fact
 from authorityspoke.jurisdictions import Jurisdiction, Regime

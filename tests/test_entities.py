@@ -5,8 +5,9 @@ import operator
 from pint import UnitRegistry
 import pytest
 
-from authorityspoke.entities import Entity, Human, Event
+from authorityspoke.factors import Entity
 from authorityspoke.factors import Predicate, Factor, Fact
+from authorityspoke.entities import Human
 from authorityspoke.opinions import Opinion
 from authorityspoke.predicates import ureg, Q_
 

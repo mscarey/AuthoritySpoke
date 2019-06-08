@@ -776,6 +776,8 @@ class ProceduralRule(Rule):
     @property
     def inputs(self):
         """
+        Call :class:`Procedure`\'s :meth:`~Procedure.inputs` method.
+
         :returns:
             input :class:`.Factors` from ``self``'s :class:`Procedure`
         """
@@ -784,6 +786,8 @@ class ProceduralRule(Rule):
     @property
     def outputs(self):
         """
+        Call :class:`Procedure`\'s :meth:`~Procedure.outputs` method.
+
         :returns:
             output :class:`.Factors` from ``self``'s :class:`Procedure`
         """
@@ -791,9 +795,9 @@ class ProceduralRule(Rule):
 
     def contradicts(self, other) -> bool:
         """
-        A :class:`ProceduralRule` contradicts ``other`` if it
-        :meth:`~.Factor.implies` ``other.negated()`` Checked
-        by testing whether ``self`` would imply ``other`` if
+        Test if ``self`` :meth:`~.Factor.implies` ``other`` :meth:`~.Factor.negated`\.
+
+        Works by testing whether ``self`` would imply ``other`` if
         ``other`` had an opposite value for ``rule_valid``.
 
         This method takes three main paths depending on
