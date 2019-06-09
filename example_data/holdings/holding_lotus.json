@@ -2,11 +2,11 @@
     "mentioned_factors": [
 
         {
-            "type": "association",
+            "type": "entity",
             "name": "Lotus Development Corporation"
         },
         {
-            "type": "association",
+            "type": "entity",
             "name": "Borland International"
         },
         {

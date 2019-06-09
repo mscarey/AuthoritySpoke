@@ -5,7 +5,6 @@ import operator
 from pint import UnitRegistry
 import pytest
 
-from authorityspoke.entities import Human, Event
 from authorityspoke.enactments import Code, Enactment
 from authorityspoke.opinions import Opinion
 from authorityspoke.predicates import ureg, Q_

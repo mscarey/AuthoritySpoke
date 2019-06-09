@@ -4,7 +4,6 @@ import operator
 import pytest
 
 from authorityspoke.factors import Entity, Factor, Fact, means
-from authorityspoke.entities import Human
 from authorityspoke.rules import Rule, ProceduralRule
 from authorityspoke.opinions import Opinion
 from authorityspoke.predicates import ureg, Q_
@@ -95,7 +94,7 @@ class TestFacts:
 
     def test_new_context_replace_fact(self, make_entity, watt_factor):
         changes = {
-            make_entity["watt"]: Human("Darth Vader"),
+            make_entity["watt"]: Entity("Darth Vader"),
             watt_factor["f2"]: watt_factor["f10"],
         }
         assert "was within the curtilage of <Hideaway Lodge>" in str(
@@ -108,7 +107,7 @@ class TestFacts:
         )
         factor = factor_list[1]
         assert any(
-            factor == Human("parole officer") and factor.name == "parole officer"
+            factor == Entity("parole officer") and factor.name == "parole officer"
             for factor in factor_list
         )
 
@@ -198,16 +197,14 @@ class TestFacts:
         factor = watt_factor["f2_preponderance_of_evidence"]
         assert factor.standard_of_proof in str(factor)
 
-    def test_context_register_empty(self, watt_factor):
+    def test_context_register_empty(self, make_complex_fact, watt_factor):
         """
         Yields no context_register because the Entity in f1 doesn't imply
-        the Human in f1_entity_order.
+        the Fact in f_relevant_murder.
         """
         with pytest.raises(StopIteration):
             next(
-                watt_factor["f1"]._context_registers(
-                    watt_factor["f1_entity_order"], operator.ge
-                )
+                watt_factor["f1"]._context_registers(make_complex_fact["f_relevant_murder"], operator.ge)
             )
 
     def test_context_register_valid(self, make_entity, watt_factor):

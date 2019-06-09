@@ -7,7 +7,6 @@ import pytest
 
 from authorityspoke.factors import Entity
 from authorityspoke.factors import Predicate, Factor, Fact
-from authorityspoke.entities import Human
 from authorityspoke.opinions import Opinion
 from authorityspoke.predicates import ureg, Q_
 
@@ -30,12 +29,12 @@ class TestEntities:
 
     def test_context_register(self, make_entity):
         """
-        Class "Human" implies "Entity" but not vice versa.
+        There will be a match because both object are :class:`.Entity`.
         """
         motel = make_entity["motel"]
         watt = make_entity["watt"]
-        empty_update = motel._context_register(watt, operator.ge)
-        assert not any(register is not None for register in empty_update)
+        update = motel._context_register(watt, operator.ge)
+        assert any(register is not None for register in update)
 
         update = motel._context_register(watt, operator.le)
         assert any(register == {motel: watt, watt: motel} for register in update)
@@ -43,7 +42,7 @@ class TestEntities:
     def test_new_context(self, make_entity):
         changes = {
             make_entity["motel"]: Entity("Death Star"),
-            make_entity["watt"]: Human("Darth Vader"),
+            make_entity["watt"]: Entity("Darth Vader"),
         }
         motel = make_entity["motel"]
         assert motel.new_context(changes) == changes[make_entity["motel"]]
@@ -62,14 +61,6 @@ class TestEntities:
         assert e["motel"].means(e["trees"])
         assert not e["motel"] == e["trees"]
 
-    def test_generic_human_and_event_not_equal(self, make_entity):
-        """Neither is a subclass of the other."""
-        assert not make_entity["tree_search"].means(make_entity["watt"])
-
-    def test_generic_human_and_entity_not_equal(self, make_entity):
-        """Human is a subclass of Entity."""
-        assert not make_entity["motel"].means(make_entity["watt"])
-
     # Implication
 
     def test_implication_generic_entities(self, make_entity):
@@ -86,9 +77,6 @@ class TestEntities:
     def test_implication_subclass(self, make_entity):
         assert make_entity["tree_search_specific"] >= make_entity["motel"]
         assert make_entity["tree_search"] > make_entity["motel"]
-
-    def test_implication_superclass(self, make_entity):
-        assert not make_entity["trees"] >= make_entity["tree_search"]
 
     # Contradiction
 

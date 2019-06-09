@@ -6,7 +6,7 @@
             "name": "Hideaway Lodge"
         },
         {
-            "type": "human",
+            "type": "entity",
             "name": "Wattenburg"
         },
         {
@@ -14,7 +14,7 @@
             "name": "the stockpile of trees"
         },
         {
-            "type": "event",
+            "type": "entity",
             "name": "officers' search of the stockpile"
         },
         {

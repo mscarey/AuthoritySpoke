@@ -2,15 +2,15 @@
     "mentioned_factors": [
 
         {
-            "type": "association",
+            "type": "entity",
             "name": "Oracle America"
         },
         {
-            "type": "association",
+            "type": "entity",
             "name": "Google"
         },
         {
-            "type": "association",
+            "type": "entity",
             "name": "Sun Microsystems"
         },
         {

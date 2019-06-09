@@ -5,7 +5,6 @@ import pytest
 
 from authorityspoke.factors import Factor, Entity
 from authorityspoke.enactments import Code, Enactment
-from authorityspoke.entities import Event, Human
 from authorityspoke.factors import Evidence, Exhibit
 from authorityspoke.factors import Fact
 from authorityspoke.jurisdictions import Jurisdiction, Regime
@@ -20,17 +19,17 @@ def make_entity() -> Dict[str, Entity]:
     return {
         "motel": Entity("Hideaway Lodge"),
         "motel_specific": Entity("Hideaway Lodge", generic=False),
-        "watt": Human("Wattenburg"),
+        "watt": Entity("Wattenburg"),
         "trees": Entity("the stockpile of trees"),
         "trees_specific": Entity("the stockpile of trees", generic=False),
-        "tree_search": Event("officers' search of the stockpile of trees"),
-        "tree_search_specific": Event(
+        "tree_search": Entity("officers' search of the stockpile of trees"),
+        "tree_search_specific": Entity(
             "officers' search of the stockpile of trees", generic=False
         ),
-        "alice": Human("Alice"),
-        "bob": Human("Bob"),
-        "craig": Human("Craig"),
-        "dan": Human("Dan"),
+        "alice": Entity("Alice"),
+        "bob": Entity("Bob"),
+        "craig": Entity("Craig"),
+        "dan": Entity("Dan"),
         "circus": Entity("circus"),
     }
 

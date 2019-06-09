@@ -11,7 +11,7 @@ from abc import ABC
 from typing import Any, Callable, ClassVar, Dict, Iterable, Iterator, List
 from typing import Optional, Sequence, Set, Tuple, Type, Union
 
-from dataclasses import dataclass
+from dataclasses import astuple, dataclass
 
 from authorityspoke.context import log_mentioned_context
 from authorityspoke.predicates import Predicate
@@ -1084,7 +1084,12 @@ def means(left: Factor, right: Factor) -> bool:
 @dataclass(frozen=True)
 class Entity(Factor):
     """
-    A person, place, thing, or event that needs to be mentioned in
+    Things that exist in the outside world, like people, places, or events.
+
+    Not concepts that derive their meaning from litigation,
+    such as a legal Fact, an Allegation, a Pleading, etc.
+
+    Best used to specify things to be mentioned in
     multiple :class:`.Factor`\s in a :class:`.Rule`, often in the
     :class:`.Predicate` of a :class:`.Fact` object.
 

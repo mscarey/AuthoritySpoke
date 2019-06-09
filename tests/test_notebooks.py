@@ -4,7 +4,6 @@ the notebooks/ directory
 """
 
 from authorityspoke import Enactment, Entity
-from authorityspoke.entities import Association
 from authorityspoke.selectors import TextQuoteSelector
 
 
@@ -21,7 +20,7 @@ class TestIntroduction:
         lotus_majority = make_opinion_with_holding["lotus_majority"]
         nosferatu_rule = lotus_majority.holdings[0].new_context(
             {
-                Association("Borland International"): Association("Prana Film"),
+                Entity("Borland International"): Entity("Prana Film"),
                 Entity("the Lotus menu command hierarchy"): Entity("Dracula"),
             }
         )

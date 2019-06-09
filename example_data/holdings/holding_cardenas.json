@@ -1,10 +1,10 @@
 {
     "mentioned_factors": [{
-            "type": "Human",
+            "type": "entity",
             "name": "defendant"
         },
         {
-            "type": "Human",
+            "type": "entity",
             "name": "parole officer"
         },
         {

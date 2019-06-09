@@ -2,7 +2,6 @@ import logging
 import pytest
 
 from authorityspoke.enactments import Code, Enactment
-from authorityspoke.entities import Human
 from authorityspoke.factors import Predicate, Entity, Factor, Fact
 from authorityspoke.factors import Evidence, Exhibit
 from authorityspoke.rules import Procedure, Rule, ProceduralRule
@@ -26,7 +25,7 @@ class TestRules:
 
     def test_new_concrete_context(self, make_holding):
         different = make_holding["h1"].new_context(
-            [Entity("Castle Grayskull"), Human("He-Man")]
+            [Entity("Castle Grayskull"), Entity("He-Man")]
         )
         assert "<He-Man> operated" in str(different)
 

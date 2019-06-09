@@ -6,7 +6,7 @@
             "name": "Bradley's house"
         },
         {
-            "type": "human",
+            "type": "entity",
             "name": "Bradley"
         },
         {
@@ -14,7 +14,7 @@
             "name": "Bradley's marijuana patch"
         },
         {
-            "type": "event",
+            "type": "entity",
             "name": "officers' search of the yard"
         },
         {
