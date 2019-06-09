@@ -213,11 +213,13 @@ class Predicate:
             return False
 
         if (
-            self.content.lower() == other.content.lower()
-            and self.reciprocal == other.reciprocal
-            and self.quantity == other.quantity
+            self.content.lower() != other.content.lower()
+            or self.reciprocal != other.reciprocal
+            or self.quantity != other.quantity
         ):
-            return self.truth == other.truth and self.comparison == other.comparison
+            return False
+
+        return self.truth == other.truth and self.comparison == other.comparison
 
     def __gt__(self, other: Optional[Predicate]) -> bool:
         """

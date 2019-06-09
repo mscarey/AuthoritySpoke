@@ -115,7 +115,7 @@ def make_predicate() -> Dict[str, Predicate]:
             quantity=20,
         ),
         "p8_float": Predicate(
-            "the distance between {} and {} was {}",
+            "The distance between {} and {} was {}",
             reciprocal=True,
             comparison=">=",
             quantity=20.0,

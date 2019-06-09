@@ -776,7 +776,7 @@ class Fact(Factor):
 
     def _equal_if_concrete(self, other: Factor) -> bool:
         if (
-            self.predicate != other.predicate
+            not self.predicate.means(other.predicate)
             or self.standard_of_proof != other.standard_of_proof
         ):
             return False

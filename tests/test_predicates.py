@@ -74,7 +74,13 @@ class TestPredicates:
         assert make_predicate["p7"] == make_predicate["p7_obverse"]
 
     def test_equal_float_and_int(self, make_predicate):
-        assert make_predicate["p8_int"] == make_predicate["p8_float"]
+        """
+        These don't evaluate equal because they don't have the same
+        string, but the :meth:`.Predicate.means` method considers them
+        to have the same meaning.
+        """
+        assert not make_predicate["p8_int"] == make_predicate["p8_float"]
+        assert make_predicate["p8_int"].means(make_predicate["p8_float"])
 
     def test_no_equality_with_inconsistent_dimensionality(self, make_predicate):
         assert make_predicate["p9"] != make_predicate["p9_acres"]
@@ -83,6 +89,9 @@ class TestPredicates:
         assert make_predicate["p_murder"] != make_predicate["p_murder_whether"]
         assert make_predicate["p_murder_false"] != make_predicate["p_murder_whether"]
         assert make_predicate["p_murder_false"] != make_predicate["p_murder"]
+
+    def test_predicate_does_not_mean_fact(self, make_predicate, watt_factor):
+        assert not make_predicate["p8"].means(watt_factor["f8"])
 
     # Implication
 
