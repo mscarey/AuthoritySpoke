@@ -38,12 +38,6 @@ class TestProcedures:
             make_procedure["c2_irrelevant_inputs"]
         )
 
-    def test_foreign_match_list(self, make_procedure, watt_mentioned):
-        w = watt_mentioned
-        assert make_procedure["c2_irrelevant_inputs"].get_foreign_match_list(
-            [{w[2]: w[1], w[3]: w[0]}, {w[1]: w[1], w[2]: w[3]}]
-        ) == [{w[1]: w[2], w[0]: w[3]}, {w[1]: w[1], w[3]: w[2]}]
-
     def test_generic_factors(
         self, watt_factor, make_entity, make_evidence, make_procedure
     ):

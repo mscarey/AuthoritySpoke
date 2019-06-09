@@ -453,33 +453,6 @@ class Procedure(Factor):
             matchlist = relation.update_matchlist(matchlist)
         return matchlist
 
-    @staticmethod
-    def get_foreign_match_list(
-        foreign: List[Dict[Factor, Factor]]
-    ) -> List[Dict[Factor, Factor]]:
-        """
-        Compare this to the regular ``matchlist`` objects, in
-        which the indices represent self's entity slots and the
-        values represent other's.
-
-        :returns:
-            a version of ``matchlist`` in which the indices
-            represent ``foreign``'s entity slots and the values
-            represent ``self``'s entity slots.
-        """
-
-        def get_foreign_match(
-            match: Dict[Factor, Factor]
-        ) -> Optional[Dict[Factor, Factor]]:
-            # TODO: write test for multiple keys of match with same value (other than None)
-            return {v: k for k, v in match.items() if v is not None}
-
-        return [
-            get_foreign_match(match)
-            for match in foreign
-            if get_foreign_match(match) is not None
-        ]
-
 
 @dataclass(frozen=True)
 class Rule(Factor):
