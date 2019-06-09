@@ -260,7 +260,7 @@ class Procedure(Factor):
         # For self to contradict other, every input of other
         # must be implied by some input or despite factor of self.
         relations = (Relation(other.inputs, self_despite_or_input, operator.le),)
-        matchlist = self.all_relation_matches(relations)
+        matchlist = self._all_relation_matches(relations)
 
         # For self to contradict other, some output of other
         # must be contradicted by some output of self.
@@ -294,7 +294,7 @@ class Procedure(Factor):
             Relation(other.outputs, self.outputs, operator.le),
             Relation(self.inputs, other.inputs, operator.le),
         )
-        matchlist = self.all_relation_matches(relations)
+        matchlist = self._all_relation_matches(relations)
 
         # For every factor in other, find the permutations of entity slots
         # that are consistent with matchlist and that don't cause the factor
@@ -339,7 +339,7 @@ class Procedure(Factor):
             Relation(other.despite, self_despite_or_input, operator.le),
         )
 
-        matchlist = self.all_relation_matches(relations)
+        matchlist = self._all_relation_matches(relations)
 
         return any(
             self.consistent_factor_groups(self.inputs, other_despite_or_input, matches)
@@ -374,7 +374,7 @@ class Procedure(Factor):
             Relation(other.despite, despite_or_input, operator.le),
         )
 
-        return bool(self.all_relation_matches(relations))
+        return bool(self._all_relation_matches(relations))
 
     def means(self, other) -> bool:
         """
@@ -433,10 +433,12 @@ class Procedure(Factor):
         return self.__class__(**new_dict)
 
     @staticmethod
-    def all_relation_matches(
+    def _all_relation_matches(
         relations: Tuple[Relation, ...]
     ) -> List[Dict[Factor, Optional[Factor]]]:
         """
+        Find all context registers consistent with multiple :class:`.Relation`\s.
+
         :param relations:
             a series of :class:`.Relation` comparisons in which
             the ``need_matches`` :class:`.Factor`\s all refer to
