@@ -11,8 +11,10 @@
 ################################################################################
 
 black
+coveralls
 mypy
 pipenv-to-requirements
+pydocstyle
 pylint
 pytest
 pytest-cov
@@ -20,3 +22,4 @@ pytest-profiling
 rope
 sphinx
 sphinx-autodoc-typehints
+wily
