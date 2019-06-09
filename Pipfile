@@ -27,6 +27,7 @@ sphinx = "*"
 sphinx-autodoc-typehints = "*"
 pipenv-to-requirements = "*"
 wily = "*"
+coveralls = "*"
 
 [requires]
 python_version = "3.7.3"
