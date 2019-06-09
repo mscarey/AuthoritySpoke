@@ -31,15 +31,6 @@ class TestPredicateImport:
 
 
 class TestEntityImport:
-    def test_mentioned_factors(self, make_regime):
-        with open(Rule.directory / "holding_watt.json", "r") as f:
-            case = json.load(f)
-        context_list = case["mentioned_factors"]
-        mentioned = Rule.get_mentioned_factors(
-            factor_dicts=context_list, regime=make_regime
-        )
-        assert isinstance(mentioned[0], Entity)
-        assert any("Watt" in str(factor) for factor in mentioned)
 
     def test_specific_entity(self):
         smith_dict = {

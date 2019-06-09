@@ -504,25 +504,35 @@ class Rule(Factor):
         regime: Optional["Regime"] = None
     ) -> List[Rule]:
         """
+        Create a :py:class:`list` of :class:`Rule`\s from JSON.
+
         :param case:
             a :class:`dict` derived from the JSON format that
             lists ``mentioned_entities`` followed by a
-            series of :class:`Rule`\s
+            series of strings representing :class:`Rule`\s.
 
         :param mentioned:
+            A list of :class:`.Factor`\s mentioned in the
+            :class:`.Opinion`\'s holdings. Especially used for
+            context factors referenced in :class:`.Predicate`\s,
+            since there's currently no other way to import
+            those using the JSON format.
 
         :param regime:
+            A :class:`.Regime` to search in for :class:`.Enactment`\s
+            referenced in ``case``.
 
         :returns:
             a :class:`list` of :class:`Rule`\s with the items
-            from ``mentioned_entities`` as ``context_factors``
+            from ``mentioned_entities`` as ``context_factors``.
         """
+        if not mentioned:
+            mentioned: List[Factor] = []
+        factor_dicts=case.get("mentioned_factors")
+        if factor_dicts:
+            for factor_dict in factor_dicts:
+                _, mentioned = Factor.from_dict(factor_dict, mentioned=mentioned, regime=regime)
 
-        mentioned = cls.get_mentioned_factors(
-            factor_dicts=case.get("mentioned_factors"),
-            mentioned=mentioned,
-            regime=regime
-            )
         finished_rules: List[Rule] = []
         for rule in case.get("holdings"):
             # This will need to change for Attribution holdings
@@ -565,40 +575,6 @@ class Rule(Factor):
         with open(directory / filename, "r") as f:
             case = json.load(f)
         return cls.collection_from_dict(case, regime=regime)
-
-    @classmethod
-    def get_mentioned_factors(
-        cls,
-        factor_dicts: Optional[List[Dict[str, str]]],
-        mentioned: Optional[List[Factor]] = None,
-        regime: Optional["Regime"] = None,
-    ) -> List[Factor]:
-        """
-        :param factor_dicts:
-            A list of dicts describing context :class:`.Factor`\s
-            in the JSON format used in the ``example_data/holdings``
-            folder.
-
-        :param mentioned:
-            :class:`.Factors`\s already known, which can be referenced
-            by their name parameter.
-
-        :param regime:
-
-        :returns:
-            A list of :class:`.Factor`\s mentioned in the
-            :class:`.Opinion`\'s holdings. Especially the
-            context factors referenced in :class:`.Predicate`\s,
-            since there's currently no other way to import
-            those using the JSON format.
-        """
-        if not mentioned:
-            mentioned: List[Factor] = []
-        if factor_dicts:
-            for factor_dict in factor_dicts:
-                _, mentioned = Factor.from_dict(factor_dict, mentioned=mentioned, regime=regime)
-        return mentioned
-
 
 @dataclass(frozen=True)
 class ProceduralRule(Rule):
