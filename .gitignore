@@ -9,6 +9,7 @@ AuthoritySpoke.egg-info
 .mypy_cache/
 docs/_build/
 html/
+htmlcov/
 example_data/holdings/unused
 example_data/opinions/flf/
 example_data/opinions/unused
