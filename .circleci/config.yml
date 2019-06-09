@@ -49,8 +49,9 @@ jobs:
           name: run tests
           command: |
             . venv/bin/activate
-            pytest
+            coverage run -m pytest
+            coverage report
+            coverage html
 
       - store_artifacts:
-          path: test-reports
-          destination: test-reports
+          path: htmlcov

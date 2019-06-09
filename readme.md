@@ -1,6 +1,6 @@
 # AuthoritySpoke
 
-[![CircleCI](https://circleci.com/gh/mscarey/AuthoritySpoke.svg?style=svg)](https://circleci.com/gh/mscarey/AuthoritySpoke)[![Coverage Status](https://coveralls.io/repos/github/mscarey/AuthoritySpoke/badge.svg?branch=master)](https://coveralls.io/github/mscarey/AuthoritySpoke?branch=master)
+[![CircleCI](https://circleci.com/gh/mscarey/AuthoritySpoke.svg?style=svg)](https://circleci.com/gh/mscarey/AuthoritySpoke) [![Coverage Status](https://coveralls.io/repos/github/mscarey/AuthoritySpoke/badge.svg?branch=master)](https://coveralls.io/github/mscarey/AuthoritySpoke?branch=master)
 
 AuthoritySpoke is a Python library for managing structured data about legal rules.
 
