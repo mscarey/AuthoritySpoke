@@ -13,57 +13,9 @@ from typing import Optional, Sequence, Set, Tuple, Type, Union
 
 from dataclasses import astuple, dataclass
 
-from authorityspoke.context import log_mentioned_context
+from authorityspoke.context import log_mentioned_context, new_context_helper
 from authorityspoke.predicates import Predicate
 from authorityspoke.relations import Relation
-
-
-def new_context_helper(func: Callable):
-    """
-    Decorator for :meth:`Factor.new_context`.
-
-    If a :class:`list` has been passed in rather than a :class:`dict`, uses
-    the input as a series of :class:`Factor`\s to replace the
-    :attr:`~Factor.generic_factors` from the calling object.
-
-    Also, if ``context`` contains a replacement for the calling
-    object, the decorator returns the replacement and never calls
-    the decorated function.
-    """
-
-    @functools.wraps(func)
-    def wrapper(
-        factor: Factor, context: Optional[Union[Sequence[Factor], Dict[Factor, Factor]]]
-    ) -> Factor:
-
-        if context is not None:
-            if not isinstance(context, Iterable):
-                context = (context,)
-            if any(not isinstance(item, (Factor, str)) for item in context):
-                raise TypeError(
-                    'Each item in "context" must be a Factor or the name of a Factor'
-                )
-            if not isinstance(context, dict):
-                generic_factors = factor.generic_factors
-                if len(generic_factors) != len(context):
-                    raise ValueError(
-                        'If the parameter "changes" is not a list of '
-                        + "replacements for every element of factor.generic_factors, "
-                        + 'then "changes" must be a dict where each key is a Factor '
-                        + "to be replaced and each value is the corresponding "
-                        + "replacement Factor."
-                    )
-                context = dict(zip(generic_factors, context))
-            for context_factor in context:
-                if factor.name == context_factor or (
-                    factor.means(context_factor) and factor.name == context_factor.name
-                ):
-                    return context[context_factor]
-
-        return func(factor, context)
-
-    return wrapper
-
 
 @dataclass(frozen=True)
 class Factor(ABC):
@@ -467,6 +419,10 @@ class Factor(ABC):
         :returns:
             a new :class:`.Factor` object with the replacements made.
         """
+        if any(not isinstance(item, (str, Factor)) for item in changes):
+            raise TypeError(
+                'Each item in "changes" must be a Factor or the name of a Factor'
+            )
         new_dict = self.__dict__.copy()
         for name in self.context_factor_names:
             new_dict[name] = self.__dict__[name].new_context(changes)
@@ -1076,7 +1032,16 @@ class Evidence(Factor):
 
 
 def means(left: Factor, right: Factor) -> bool:
+    """
+    Call :meth:`.Factor.means` as function alias
 
+    This only exists because :class:`.Relation` objects expect
+    a function rather than a method for :attr:`~.Relation.comparison`.
+
+    :returns:
+        whether ``other`` is another :class:`Factor` with the same
+        meaning as ``self``.
+    """
     return left.means(right)
 
 
@@ -1124,6 +1089,8 @@ class Entity(Factor):
 
     def means(self, other):
         """
+        Test whether ``other`` has the same meaning as ``self``.
+
         ``generic`` :class:`Entity` objects are considered equivalent
         in meaning as long as they're the same class. If not ``generic``,
         they're considered equivalent if all their attributes are the same.

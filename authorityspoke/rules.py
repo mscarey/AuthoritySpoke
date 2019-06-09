@@ -537,7 +537,7 @@ class Rule(Factor):
         cls,
         filename: str,
         directory: Optional[pathlib.Path] = None,
-        regime: Optional["Regime"] = None,
+        regime: Optional[Regime] = None,
     ) -> List[Rule]:
         """
         Load a list of ``Rule``\s from JSON.
@@ -602,8 +602,9 @@ class Rule(Factor):
 
 @dataclass(frozen=True)
 class ProceduralRule(Rule):
-
     """
+    A statement of a legal doctrine about a :class:`.Procedure` for litigation.
+
     :param procedure:
         a :class:`.Procedure` containing the inputs, and despite
         :class:`.Factor`\s and resulting outputs when this rule
@@ -679,8 +680,9 @@ class ProceduralRule(Rule):
     def from_dict(
         cls, record: Dict, mentioned: List[Factor], regime: Optional["Regime"] = None
     ) -> Tuple[ProceduralRule, List[Factor]]:
-
         """
+        Make :class:`Rule` from a :py:class:`dict` of strings and a list of mentioned :class:`.Factor`\s.
+
         :param record:
             a :class:`dict` derived from the JSON format that
             lists ``mentioned_entities`` followed by a
@@ -748,6 +750,8 @@ class ProceduralRule(Rule):
     @property
     def context_factors(self) -> Tuple:
         """
+        Call :class:`Procedure`\'s :meth:`~Procedure.context_factors` method.
+
         :returns:
             context_factors from ``self``'s :class:`Procedure`
         """
@@ -756,6 +760,8 @@ class ProceduralRule(Rule):
     @property
     def despite(self):
         """
+        Call :class:`Procedure`\'s :meth:`~Procedure.despite` method.
+
         :returns:
             despite :class:`.Factors` from ``self``'s :class:`Procedure`
         """
@@ -764,7 +770,7 @@ class ProceduralRule(Rule):
     @property
     def generic_factors(self) -> List[Optional[Factor]]:
         """
-        :class:`.Factor`\s that can be replaced without changing ``self``\s meaning.
+        Get :class:`.Factor`\s that can be replaced without changing ``self``\s meaning.
 
         :returns:
             generic :class:`.Factors` from ``self``'s :class:`Procedure`
@@ -831,6 +837,8 @@ class ProceduralRule(Rule):
 
     def _contradicts_if_valid(self, other) -> bool:
         """
+        Test if ``self`` contradicts ``other``, assuming ``rule_valid`` and ``decided``.
+
         :returns:
             whether ``self`` contradicts ``other``,
             assuming that ``rule_valid`` and ``decided`` are
@@ -858,7 +866,9 @@ class ProceduralRule(Rule):
 
     def __ge__(self, other) -> bool:
         """
-        Implication method. See :meth:`.Procedure.implies_all_to_all`
+        Test for implication.
+
+        See :meth:`.Procedure.implies_all_to_all`
         and :meth:`.Procedure.implies_all_to_some` for
         explanations of how ``inputs``, ``outputs``,
         and ``despite`` :class:`.Factor`\s affect implication.
@@ -897,10 +907,11 @@ class ProceduralRule(Rule):
         return False
 
     def _implies_if_decided(self, other) -> bool:
-
         """
-        Simplified version of the :meth:`ProceduralRule.__ge__`
-        implication function.
+        Test if ``self`` implies ``other`` if they're both decided.
+
+        This is a partial version of the
+        :meth:`ProceduralRule.__ge__` implication function.
 
         :returns:
             whether ``self`` implies ``other``, assuming that
@@ -924,12 +935,15 @@ class ProceduralRule(Rule):
 
     def _implies_if_valid(self, other) -> bool:
         """
-        Partial version of the :meth:`ProceduralRule.__ge__`
-        implication function.
+        Test if ``self`` implies ``other`` if they're valid and decided.
 
-        :returns: whether ``self`` implies ``other``, assuming that
-        both are :class:`ProceduralRule`\s,, and
-        ``rule_valid`` and ``decided`` are ``True`` for both of them.
+        This is a partial version of the
+        :meth:`ProceduralRule.__ge__` implication function.
+
+        :returns:
+            whether ``self`` implies ``other``, assuming that
+            both are :class:`ProceduralRule`\s, and
+            ``rule_valid`` and ``decided`` are ``True`` for both of them.
         """
 
         if not all(
@@ -959,16 +973,19 @@ class ProceduralRule(Rule):
 
     def __len__(self):
         """
+        Count generic :class:`.Factor`\s needed as context for this :class:`Rule`.
+
         :returns:
-            the number of generic :class:`.Factor`\s needed to provide
-            context for this :class:`Rule`, which currently is just the
-            generic :class:`.Factor`\s needed for the ``procedure``.
+            the number of generic :class:`.Factor`\s needed for
+            self's :class:`.Procedure`.
         """
 
         return len(self.procedure)
 
     def means(self, other: ProceduralRule) -> bool:
         """
+        Test whether ``other`` has the same meaning as ``self``.
+
         :returns:
             whether ``other`` is a :class:`ProceduralRule` with the
             same meaning as ``self``.
@@ -988,15 +1005,8 @@ class ProceduralRule(Rule):
         )
 
     def negated(self):
-        return ProceduralRule(
-            procedure=self.procedure,
-            enactments=self.enactments,
-            enactments_despite=self.enactments_despite,
-            mandatory=self.mandatory,
-            universal=self.universal,
-            rule_valid=not self.rule_valid,
-            decided=self.decided,
-        )
+        """Get new copy of ``self`` with an opposite value for ``rule_valid``."""
+        return self.evolve("rule_valid")
 
     def __str__(self):
         def factor_catalog(factors: List[Union[Factor, Enactment]], tag: str) -> str:
@@ -1018,9 +1028,11 @@ class ProceduralRule(Rule):
 
 class Attribution:
     """
-    An assertion about the meaning of a prior Opinion. Either a user or an Opinion
-    may make an Attribution to an Opinion. An Attribution may attribute either
-    a Rule or a further Attribution.
+    An assertion about the meaning of a prior :class:`.Opinion`.
+
+    Either a user or an :class:`.Opinion` may make an Attribution
+    to an :class:`.Opinion`. An Attribution may attribute either a
+    :class:`.Rule` or a further Attribution.
     """
 
     pass

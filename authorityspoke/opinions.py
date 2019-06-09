@@ -1,3 +1,9 @@
+"""
+:class:`Court` documents that decide litigation and posit :class:`.Rule`\s.
+
+Unlike most other ``authorityspoke`` classes, :class:`Opinion`\s are not frozen.
+"""
+
 from __future__ import annotations
 
 from typing import Any, Dict, List, Tuple
@@ -214,7 +220,10 @@ class Opinion:
 
     def contradicts(self, other: Union[Opinion, Rule]) -> bool:
         """
+        Test whether ``other`` is or contains a :class:`.Rule` contradicted by ``self``.
+
         :param other:
+            another :class:`.Opinion` or :class:`.Rule`
 
         :returns:
             a bool indicating whether any holding of ``self`` is
@@ -243,9 +252,7 @@ class Opinion:
         cls, decision_dict: Dict[str, Any], lead_only: bool = True
     ) -> Union[Opinion, Iterator[Opinion]]:
         """
-        Creates and returns one or more :class:`.Opinion` objects
-        from a :py:class:`dict` derived from an opinion record from the
-        `Caselaw Access Project API <https://api.case.law/v1/cases/>`_.
+        Create and return one or more :class:`.Opinion` objects.
 
         :param decision_dict:
             A record of an opinion loaded from JSON from the
