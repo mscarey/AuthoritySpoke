@@ -1,3 +1,5 @@
+"""Objects that test whether a function holds between two groups of :class:`.Factor`\s."""
+
 from __future__ import annotations
 
 from typing import Callable, Dict, Iterator
@@ -9,10 +11,10 @@ from dataclasses import dataclass
 @dataclass(frozen=True)
 class Relation:
     """
-    Describes two groups of :class:`.Factor`\s and specifies a function
-    that must hold between the two groups. Can be used to find ways to
-    assign the :class:`.Factor`\s' context assignments consistently with
-    the ``Relation``.
+    Two groups of :class:`.Factor`\s and a function that must hold between them.
+
+    Can be used to find ways to assign the :class:`.Factor`\s'
+    context assignments consistently with the ``Relation``.
 
     :param need_matches:
         :class:`.Factor`\s that all need to satisfy the ``comparison``
@@ -31,13 +33,13 @@ class Relation:
         :meth:`.Factor.__ge__`.
     """
 
-    need_matches: Tuple["Factor", ...]
-    available: Tuple["Factor", ...]
+    need_matches: Tuple[Factor, ...]
+    available: Tuple[Factor, ...]
     comparison: Callable
 
     def ordered_comparison(
-        self, matches: Optional[Dict["Factor", "Factor"]] = None
-    ) -> Iterator[Dict["Factor", Optional["Factor"]]]:
+        self, matches: Optional[Dict[Factor, Factor]] = None
+    ) -> Iterator[Dict[Factor, Optional[Factor]]]:
         """
         Find ways for a series of pairs of :class:`.Factor`\s to satisfy a comparison.
 
@@ -82,9 +84,9 @@ class Relation:
 
     def unordered_comparison(
         self,
-        matches: Dict["Factor", "Factor"],
-        still_need_matches: Optional[List["Factor"]] = None,
-    ) -> Iterator[Dict["Factor", Optional["Factor"]]]:
+        matches: Dict[Factor, Factor],
+        still_need_matches: Optional[List[Factor]] = None,
+    ) -> Iterator[Dict[Factor, Optional[Factor]]]:
         """
         Find ways for two unordered sets of :class:`.Factor`\s to satisfy a comparison.
 
@@ -133,8 +135,17 @@ class Relation:
                                 yield next_step
 
     def update_matchlist(
-        self, matchlist: List[Dict["Factor", "Factor"]]
-    ) -> List[Dict["Factor", Optional["Factor"]]]:
+        self, matchlist: List[Dict[Factor, Factor]]
+    ) -> List[Dict[Factor, Optional[Factor]]]:
+        """
+        Filter a :py:class:`list` of possible :class:`.Factor` assignments with an :meth:`~Relation.unordered_comparison`.
+
+        :param matchlist:
+            possible ways to match generic :class:`.Factor`\s of ``need_matches`` with ``available``.
+
+        :returns:
+            a new version of ``matchlist`` filtered to be consistent with ``self``\'s :meth:`~Relation.unordered_comparison`.
+        """
         new_matchlist = []
         for matches in matchlist:
             for answer in self.unordered_comparison(matches, list(self.need_matches)):

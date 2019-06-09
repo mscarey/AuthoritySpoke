@@ -1,3 +1,5 @@
+""":class:`Factor`\s, or inputs and outputs of legal :class:`.Rule`\s."""
+
 from __future__ import annotations
 
 import datetime
@@ -590,6 +592,16 @@ class Fact(Factor):
         a series of :class:`Factor`\s that have already been mentioned
         in the :class:`.Opinion`. They are available for composing the
         new :class:`Factor` object and don't need to be recreated.
+
+    :attr standards_of_proof:
+        a tuple with every allowable name for a standard of
+        proof, in order from weakest to strongest.
+
+        .. note:
+            If any courts anywhere in a legal regime disagree about the
+            relative strength of the various standards of proof, or if
+            any court considers the order context-specific, then this
+            approach of hard-coding their names and order will have to change.
     """
 
     predicate: Optional[Predicate] = None
@@ -599,15 +611,23 @@ class Fact(Factor):
     absent: bool = False
     generic: bool = False
     case_factors: Tuple[Factor, ...] = ()
+    standards_of_proof: ClassVar = (
+            "scintilla of evidence",
+            "substantial evidence",
+            "preponderance of evidence",
+            "clear and convincing",
+            "beyond reasonable doubt",
+        )
+
 
     def __post_init__(self):
 
         if (
             self.standard_of_proof
-            and self.standard_of_proof not in self.standards_of_proof()
+            and self.standard_of_proof not in self.standards_of_proof
         ):
             raise ValueError(
-                f"standard of proof must be one of {self.standards_of_proof()} or None."
+                f"standard of proof must be one of {self.standards_of_proof} or None."
             )
         case_factors = self.__class__._wrap_with_tuple(self.case_factors)
         if not self.context_factors:
@@ -647,27 +667,6 @@ class Fact(Factor):
                 get_factor_by_index(i, case_factors) for i in context_factors
             )
         object.__setattr__(self, "context_factors", context_factors)
-
-    @classmethod
-    def standards_of_proof(cls) -> Tuple[str, ...]:
-        """
-        .. note:
-            If any courts anywhere in a legal regime disagree about the
-            relative strength of the various standards of proof, or if
-            any court considers the order context-specific, then this
-            approach of hard-coding their names and order will have to change.
-
-        :returns:
-            a tuple with every allowable name for a standard of
-            proof, in order from weakest to strongest.
-        """
-        return (
-            "scintilla of evidence",
-            "substantial evidence",
-            "preponderance of evidence",
-            "clear and convincing",
-            "beyond reasonable doubt",
-        )
 
     def __str__(self):
         predicate = str(self.predicate.content_with_entities(self.context_factors))
@@ -746,19 +745,22 @@ class Fact(Factor):
     @property
     def interchangeable_factors(self) -> List[Dict[Factor, Factor]]:
         """
+        Get ways to reorder context :class:`Factor`\s without changing truth value of ``self``.
+
         Each :class:`dict` returned has :class:`Factor`\s to replace as keys,
         and :class:`Factor`\s to replace them with as values.
         If there's more than one way to rearrange the context factors,
         more than one :class:`dict` should be returned.
 
+        Currently the predicate must be phrased either in a way that
+        doesn't make any context factors interchangeable, or if the
+        ``reciprocal`` flag is set, in a way that allows only the
+        first two context factors to switch places.
+
         :returns:
             the ways the context factors referenced by the
             :class:`Factor` object can be reordered without changing
-            the truth value of the :class:`Factor`. Currently the
-            predicate must be phrased either in a way that doesn't
-            make any context factors interchangeable, or if the
-            ``reciprocal`` flag is set, in a way that allows only the
-            first two context factors to switch places.
+            the truth value of the :class:`Factor`.
 
         """
         if self.predicate and self.predicate.reciprocal:
@@ -780,6 +782,8 @@ class Fact(Factor):
 
     def predicate_in_context(self, entities: Sequence[Factor]) -> str:
         """
+        Insert :class:`str` representations of ``entities`` into ``self``\s :class:`Predicate`.
+
         :returns:
             the representation of ``self``\s :class:`Predicate` with
             :class:`str` representations of ``entities`` added into
@@ -797,12 +801,18 @@ class Fact(Factor):
         return len(self.context_factors)
 
     def _implies_if_concrete(self, other: Factor) -> bool:
+        """
+        Test if ``self`` impliess ``other``, assuming they are not ``generic``.
+
+        :returns:
+            whether ``self`` implies ``other`` under the given assumption.
+        """
         if bool(self.standard_of_proof) != bool(other.standard_of_proof):
             return False
 
-        if self.standard_of_proof and self.standards_of_proof().index(
+        if self.standard_of_proof and self.standards_of_proof.index(
             self.standard_of_proof
-        ) < self.standards_of_proof().index(other.standard_of_proof):
+        ) < self.standards_of_proof.index(other.standard_of_proof):
             return False
 
         if not self.predicate >= other.predicate:
@@ -811,9 +821,11 @@ class Fact(Factor):
 
     def _contradicts_if_present(self, other: Fact) -> bool:
         """
+        Test if ``self`` contradicts ``other``, assuming they are not ``absent``.
+
         :returns:
-            whether ``self`` contradicts ``other``
-            under the assumption that ``self.absent == False``.
+            whether ``self`` and ``other`` can't both be true at
+            the same time under the given assumption.
         """
         if (self.predicate.contradicts(other.predicate) and not other.absent) or (
             self.predicate >= other.predicate and other.absent
@@ -823,9 +835,11 @@ class Fact(Factor):
 
     def _contradicts_if_factor(self, other: Factor) -> bool:
         """
+        Test if ``self`` contradicts ``other``, assuming they are both :class:`Factor`\s.
+
         :returns:
-            ``True`` if ``self`` and ``other`` can't both be true at
-            the same time. Otherwise returns ``False``.
+            whether ``self`` and ``other`` can't both be true at
+            the same time under the given assumption.
         """
 
         if not isinstance(other, self.__class__):
@@ -840,8 +854,16 @@ class Fact(Factor):
         cls, fact_dict: Dict[str, Union[str, bool]], mentioned: List[Factor]
     ) -> Optional[Fact]:
         """
-        Constructs and returns a :class:`Fact` object from a dict imported from
-        a JSON file in the format used in the "input" folder.
+        Construct and return a :class:`Fact` object from a :py:class:`dict`.
+
+        :param fact_dict:
+            imported from a JSON file in the format used in the "input" folder.
+
+        :param mentioned:
+            a list of :class:`.Factor`\s that may be included by reference to their ``name``\s.
+
+        :returns:
+            a :class:`Fact`.
         """
 
         placeholder = "{}"  # to be replaced in the Fact's string method
@@ -850,8 +872,10 @@ class Fact(Factor):
             content: str, mentioned: List[Factor], placeholder: str
         ) -> Tuple[str, List[Factor]]:
             """
+            Get context :class:`Factor`\s for new :class:`Fact`.
+
             :param content:
-                the content for the :class:`Fact`\'s :class:`Predicate`
+                the content for the :class:`Fact`\'s :class:`Predicate`.
 
             :param mentioned:
                 list of :class:`Factor`\s with names that could be
@@ -885,7 +909,6 @@ class Fact(Factor):
         quantity = None
         content = fact_dict.get("content")
         if fact_dict.get("content"):
-            content = fact_dict.get("content")
             content, context_factors = add_content_references(
                 content, mentioned, placeholder
             )
@@ -906,7 +929,7 @@ class Fact(Factor):
             quantity=quantity,
         )
 
-        factor = cls(
+        return cls(
             predicate,
             context_factors,
             name=fact_dict.get("name", None),
@@ -914,12 +937,14 @@ class Fact(Factor):
             absent=fact_dict.get("absent", False),
             generic=fact_dict.get("generic", False),
         )
-        return factor
 
     @new_context_helper
     def new_context(self, changes: Dict[Factor, Factor]) -> Factor:
         """
         Create new :class:`Factor`, replacing keys of ``changes`` with values.
+
+        :returns:
+            a version of ``self`` with the new context.
         """
         return self.evolve(
             {
@@ -948,8 +973,10 @@ class Pleading(Factor):
 @dataclass(frozen=True)
 class Allegation(Factor):
     """
-    A formal assertion of a :class:`Fact`, included by a party in a
-    :class:`Pleading` to establish a cause of action.
+    A formal assertion of a :class:`Fact`.
+
+    May be included by a party in a :class:`Pleading`
+    to establish a cause of action.
     """
 
     to_effect: Optional[Fact] = None
@@ -1011,10 +1038,7 @@ class Exhibit(Factor):
 
 @dataclass(frozen=True)
 class Evidence(Factor):
-    """
-    An :class:`Exhibit` that has been admitted by the court to aid a
-    factual determination.
-    """
+    """An :class:`Exhibit` admitted by a court to aid a factual determination."""
 
     exhibit: Optional[Exhibit] = None
     to_effect: Optional[Fact] = None
@@ -1033,7 +1057,7 @@ class Evidence(Factor):
 
 def means(left: Factor, right: Factor) -> bool:
     """
-    Call :meth:`.Factor.means` as function alias
+    Call :meth:`.Factor.means` as function alias.
 
     This only exists because :class:`.Relation` objects expect
     a function rather than a method for :attr:`~.Relation.comparison`.
@@ -1131,6 +1155,12 @@ class Entity(Factor):
             yield {self: other, other: self}
 
     def contradicts(self, other: Factor) -> bool:
+        """
+        Test whether ``self`` contradicts the ``other`` :class:`Factor`.
+
+        :returns:
+            ``False``, because an :class:`Entity` contradicts no other :class:`Factor`.
+        """
         if not isinstance(other, Factor):
             raise TypeError(
                 f"'Contradicts' not supported between class "

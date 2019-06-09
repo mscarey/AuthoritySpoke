@@ -1,7 +1,8 @@
 """
-Statements of legal doctrines that :class:`.Court`\s may posit as
-holdings and that may describe procedural moves available in
-litigation.
+Statements of legal doctrines.
+
+:class:`.Court`\s may posit them as holdings, and they
+may describe procedural moves available in litigation.
 """
 
 from __future__ import annotations
@@ -25,6 +26,7 @@ from authorityspoke.relations import Relation
 class Procedure(Factor):
     """
     A (potential) rule for courts to use in resolving litigation.
+
     Described in terms of inputs and outputs, and also potentially
     "despite" :class:`.Factor`\s, which occur when a :class:`Rule`
     could be said to apply "even if" some "despite" factor is true.
@@ -94,6 +96,8 @@ class Procedure(Factor):
 
     def __len__(self):
         """
+        Get number of generic :class:`.Factor`\s specified for ``self``.
+
         :returns:
             the number of generic :class:`.Factor`\s that need to be
             specified for this :class:`Procedure`.
@@ -128,8 +132,11 @@ class Procedure(Factor):
     @property
     def factors_all(self) -> List[Factor]:
         """
+        Get :class:`.Factor`\s in ``inputs``, ``outputs``, and ``despite``.
+
         :returns:
-            a :class:`list` of all :class:`.Factor`\s."""
+            a :class:`list` of all :class:`.Factor`\s.
+        """
 
         inputs = self.inputs or ()
         despite = self.despite or ()
@@ -203,6 +210,8 @@ class Procedure(Factor):
         self, other: Procedure, matches: Dict[Factor, Factor]
     ) -> bool:
         """
+        Test whether outputs of two :class:`Procedure`\s can contradict.
+
         :param other:
             another :class:`Factor`
 
@@ -348,6 +357,8 @@ class Procedure(Factor):
 
     def _implies_if_present(self, other: Factor) -> bool:
         """
+        Find if ``self`` would imply ``other`` if they aren't absent.
+
         When ``self`` and ``other`` are included in
         :class:`Rule`\s that both apply in **some** cases:
 
@@ -417,6 +428,8 @@ class Procedure(Factor):
     @new_context_helper
     def new_context(self, changes: Dict[Factor, Factor]) -> Procedure:
         """
+        Create new :class:`Procedure`, replacing keys of ``changes`` with values.
+
         :param changes:
             a :class:`dict` of :class:`.Factor`\s to replace
             matched to the :class:`.Factor`\s that should replace them
