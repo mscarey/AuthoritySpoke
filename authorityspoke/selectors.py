@@ -48,7 +48,7 @@ class TextQuoteSelector:
     exact: Optional[str] = None
     prefix: Optional[str] = None
     suffix: Optional[str] = None
-    source: Optional[Union["Regime", "Code"]] = None
+    source: Optional[Union[Regime, Code]] = None
 
     def __post_init__(self):
 

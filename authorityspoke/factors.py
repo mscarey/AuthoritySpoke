@@ -22,17 +22,20 @@ from authorityspoke.relations import Relation
 @dataclass(frozen=True)
 class Factor(ABC):
     """
-    Anything relevant to a court's determination of the applicability
-    of a legal :class:`.Rule` can be a :class:`Factor`. The same
-    :class:`Factor` that is in the outputs for the :class:`.Procedure`
-    of one legal :class:`.Rule` might be in the ``inputs`` of the
-    :class:`.Procedure` for another.
+    Things relevant to a :class:`.Court`\'s application of a :class:`.Rule`.
+
+    The same :class:`Factor` that is in the ``outputs`` for the
+    :class:`.Procedure` of one legal :class:`.Rule` might be in the
+    ``inputs`` of the :class:`.Procedure` for another.
     """
 
     @classmethod
     def all_subclasses(cls) -> Set[Type]:
         """
-        :returns: the set of all subclasses of :class:`Factor`
+        Get all subclasses of :class:`Factor`.
+
+        :returns:
+            the set of all subclasses of :class:`Factor`
         """
         return set(cls.__subclasses__()).union(
             [s for c in cls.__subclasses__() for s in c.all_subclasses()]
@@ -42,11 +45,15 @@ class Factor(ABC):
     @functools.lru_cache()
     def class_from_str(cls, name: str):
         """
-        Part of the JSON deserialization process. Obtains a classname
-        of a :class:`Factor` subclass from a string, checking first
-        in the lru_cache of known subclasses.
+        Find class for use in JSON deserialization process.
 
-        :param: name of the desired subclass
+        Obtains a classname of a :class:`Factor`
+        subclass from a string, checking first
+        in the ``lru_cache`` of known subclasses.
+
+        :param name: name of the desired subclass.
+
+        :returns: the Class named ``name``.
         """
         name = name.capitalize()
         class_options = {
@@ -79,8 +86,7 @@ class Factor(ABC):
         cls, factor_record: Dict, mentioned: List[Factor], regime: Optional["Regime"] = None
     ) -> Optional[Factor]:
         """
-        Turns a dict recently created from a chunk of JSON
-        into a :class:`Factor` object.
+        Turn fields from a chunk of JSON into a :class:`Factor` object.
 
         :param factor_record:
             parameter values to pass to :meth:`Factor.__init__`.
@@ -151,6 +157,8 @@ class Factor(ABC):
     @property
     def context_factors(self) -> Tuple:
         """
+        Get :class:`Factor`\s used in comparisons with other :class:`Factor`\s.
+
         :returns:
             a tuple of attributes that are designated as the ``context_factors``
             for whichever subclass of :class:`Factor` calls this method. These
@@ -163,11 +171,11 @@ class Factor(ABC):
     @property
     def recursive_factors(self) -> Dict[Factor, None]:
         """
+        Collect ``self``'s :attr:`context_factors`, and each of their :attr:`context_factors`, recursively.
+
         :returns:
             a :class:`dict` (instead of a :class:`set`,
-            to preserve order) of :class:`Factor`\s including ``self``'s
-            :attr:`context_factors`, and each of those :class:`Factor`\s'
-            :attr:`context_factors`, recursively.
+            to preserve order) of :class:`Factor`\s.
         """
         answers: Dict[Factor, None] = {self: None}
         for context in filter(lambda x: x is not None, self.context_factors):
@@ -195,8 +203,7 @@ class Factor(ABC):
         self, other: Factor, comparison: Callable
     ) -> Iterator[Dict[Factor, Factor]]:
         """
-        Searches through the :attr:`context_factors` of ``self``
-        and ``other``.
+        Search for ways to match :attr:`context_factors` of ``self`` and ``other``.
 
         :yields:
             all valid ways to make matches between
@@ -214,6 +221,8 @@ class Factor(ABC):
 
     def contradicts(self, other: Optional[Factor]) -> bool:
         """
+        Test whether ``self`` implies the absence of ``other``.
+
         :returns:
             ``True`` if self and other can't both be true at
             the same time. Otherwise returns ``False``.
@@ -230,7 +239,7 @@ class Factor(ABC):
 
     def _contradicts_if_factor(self, other: Factor) -> bool:
         """
-        Tests whether ``self`` :meth:`implies` the absence of ``other``.
+        Test whether ``self`` :meth:`implies` the absence of ``other``.
 
         This should only be called after confirming that ``other``
         is not ``None``.
@@ -243,6 +252,8 @@ class Factor(ABC):
 
     def evolve(self, changes: Union[str, Tuple[str, ...], Dict[str, Any]]) -> Factor:
         """
+        Make new object with attributes from ``self.__dict__``, replacing attributes as specified.
+
         :param changes:
             a :class:`dict` where the keys are names of attributes
             of self, and the values are new values for those attributes, or
@@ -292,8 +303,9 @@ class Factor(ABC):
 
     def _equal_if_concrete(self, other: Factor) -> bool:
         """
-        Used to test equality based on :attr:`context_factors`,
-        usually after a subclasses has injected its own tests
+        Test equality based on :attr:`context_factors`.
+
+        Usually called after a subclasses has injected its own tests
         based on other attributes.
 
         :returns:
@@ -310,12 +322,11 @@ class Factor(ABC):
 
     def get_factor_by_name(self, name: str) -> Optional[Factor]:
         """
-        Performs a recursive search of ``self`` and ``self``'s attributes
-        for a :class:`Factor` with the specified ``name`` attribute.
+        Search of ``self`` and ``self``'s attributes for :class:`Factor` with specified ``name``.
 
         :returns:
             a :class:`Factor` with the specified ``name`` attribute
-            if it exists, otherwise returns ``None``.
+            if it exists, otherwise ``None``.
         """
         for factor in self.recursive_factors:
             if factor.name == name:
@@ -323,10 +334,7 @@ class Factor(ABC):
         return None
 
     def __ge__(self, other: Factor) -> bool:
-        """
-        :returns:
-            bool indicating whether ``self`` implies ``other``.
-        """
+        """Test whether ``self`` implies ``other``."""
         if other is None:
             return True
 
@@ -345,11 +353,7 @@ class Factor(ABC):
         return False
 
     def __gt__(self, other: Optional[Factor]) -> bool:
-        """
-        :returns:
-            bool indicating whether ``self`` implies ``other``
-            and ``self`` != ``other``.
-        """
+        """Test whether ``self`` implies ``other`` and ``self`` != ``other``."""
         return self >= other and self != other
 
     def implies(self, other: Factor) -> bool:
@@ -400,6 +404,8 @@ class Factor(ABC):
 
     def make_generic(self) -> Factor:
         """
+        Get a copy of ``self`` except ensure ``generic`` is ``True``.
+
         .. note::
             The new object created with this method will have all the
             attributes of ``self`` except ``generic=False``.
@@ -414,6 +420,8 @@ class Factor(ABC):
     @new_context_helper
     def new_context(self, changes: Dict[Factor, Factor]) -> Factor:
         """
+        Create new :class:`Factor`, replacing keys of ``changes`` with values.
+
         :param changes:
             has :class:`.Factor`\s to replace as keys, and has
             their replacements as the corresponding values.
@@ -434,6 +442,8 @@ class Factor(ABC):
         self, matches: Dict[Factor, Factor]
     ) -> Iterator[Dict[Factor, Factor]]:
         """
+        Find possible combination of interchangeable :attr:`context_factors`.
+
         :yields:
             context registers with every possible combination of
             ``self``'s and ``other``'s interchangeable
@@ -469,18 +479,7 @@ class Factor(ABC):
         self_mapping: Dict[Factor, Factor], incoming_mapping: Dict[Factor, Factor]
     ) -> Optional[Dict[Factor, Factor]]:
         """
-        Compares :class:`Factor`\s based on their :meth:`__repr__` to
-        determine whether two sets of matches of :class:`Factor`\s
-        can be merged.
-
-        :meth:`__repr__` was chosen because an ``is`` test would
-        return ``False`` when the :class:`Factor`\s are equal but
-        not identical, while :meth:`__eq__` incorrectly matches
-        generically equal :class:`Factor`\s that don't refer to the
-        same thing.
-
-        This problem is a consequence of overloading the :meth:`__eq__`
-        operator.
+        Compare :class:`Factor`\s to test if two sets of matches can be merged.
 
         :param self_mapping:
             an existing mapping of :class:`Factor`\s
@@ -523,6 +522,8 @@ class Factor(ABC):
         self, other: Factor, register: Dict[Factor, Factor], comparison: Callable
     ):
         """
+        Find ways to update ``self_mapping`` to allow relationship ``comparison``.
+
         :param other:
             another :class:`Factor` being compared to ``self``
 
@@ -538,7 +539,7 @@ class Factor(ABC):
         :yields:
             every way that ``self_mapping`` can be updated to be consistent
             with ``self`` and ``other`` having the relationship
-            ``comparison``
+            ``comparison``.
         """
         if other and not isinstance(other, Factor):
             raise TypeError(f"{other} is type {other.__class__.__name__}, not Factor")
@@ -558,8 +559,9 @@ class Factor(ABC):
 @dataclass(frozen=True)
 class Fact(Factor):
     """
-    An assertion accepted as factual by a court, often
-    through factfinding by a judge or jury.
+    An assertion accepted as factual by a court.
+
+    Often based on factfinding by a judge or jury.
 
     :param predicate:
         a natural-language clause with zero or more slots
@@ -1000,16 +1002,17 @@ class Exhibit(Factor):
     """
     A source of information for use in litigation.
 
-    "derived_from" and and "offered_by" parameters were removed
-    because the former is probably better represented as a :class:`Fact`,
-    and the latter as a :class:`Motion`.
+    .. note
+        "Derived_from" and "offered_by" parameters were removed
+        because the former is probably better represented as a :class:`Fact`,
+        and the latter as a :class:`Motion`.
 
     TODO: Allowed inputs for ``form`` will need to be limited.
     """
 
     form: Optional[str] = None
     statement: Optional[Fact] = None
-    stated_by: Optional["Entity"] = None
+    stated_by: Optional[Entity] = None
     name: Optional[str] = None
     absent: bool = False
     generic: bool = False
@@ -1115,7 +1118,7 @@ class Entity(Factor):
         """
         Test whether ``other`` has the same meaning as ``self``.
 
-        ``generic`` :class:`Entity` objects are considered equivalent
+        ``Generic`` :class:`Entity` objects are considered equivalent
         in meaning as long as they're the same class. If not ``generic``,
         they're considered equivalent if all their attributes are the same.
         """

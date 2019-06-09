@@ -80,8 +80,8 @@ def log_mentioned_context(func: Callable):
 
     If factor_record is a :class:`str` instead of a :class:`dict`, looks up the
     corresponding factor in "mentioned" and returns that instead of
-    constructing a new :class:`Factor`. Also, if the newly-constructed
-    :class:`Factor` has a ``name`` attribute, logs the :class:`Factor`
+    constructing a new :class:`.Factor`. Also, if the newly-constructed
+    :class:`.Factor` has a ``name`` attribute, logs the :class:`.Factor`
     in ``mentioned`` for later use.
     """
 

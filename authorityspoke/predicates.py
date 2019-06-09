@@ -221,6 +221,8 @@ class Predicate:
 
     def __gt__(self, other: Optional[Predicate]) -> bool:
         """
+        Test whether ``self`` implies ``other`` and has different meaning.
+
         :returns:
             whether ``self`` implies ``other``, which is ``True``
             if their statements about quantity imply it.
@@ -308,6 +310,8 @@ class Predicate:
 
     def quantity_comparison(self) -> str:
         """
+        Convert text to a comparison with a quantity.
+
         :returns:
             string representation of a comparison with a
             quantity, which can include units due to the
@@ -328,12 +332,7 @@ class Predicate:
         return f"{expand[comparison]} {self.quantity}"
 
     def negated(self) -> Predicate:
-        """
-        :returns:
-            a copy of the same :class:`Predicate`,
-            but with the opposite truth value.
-        """
-
+        """Copy ``self``, with the opposite truth value."""
         return Predicate(
             content=self.content,
             truth=not self.truth,
@@ -359,6 +358,8 @@ class Predicate:
     @staticmethod
     def str_to_quantity(quantity: str) -> Union[float, int, ureg.Quantity]:
         """
+        Create `pint <https://pint.readthedocs.io/en/0.9/tutorial.html>`_ quantity object from text.
+
         :param quantity:
             when a string is being parsed for conversion to a
             :class:`Predicate`, this is the part of the string

@@ -44,6 +44,7 @@ class Code:
     }
 
     def __init__(self, filename: str):
+        """Set ``filename`` parameter as attribute."""
         self.filename = filename
 
     @property
@@ -360,7 +361,7 @@ class Enactment:
     @property
     def text(self):
         """
-        Get a passage from ``self``\s :class:`.Code` with ``self``\s :class:`.TextQuoteSelector`.
+        Get a passage from ``self``\'s :class:`.Code` with ``self``\'s :class:`.TextQuoteSelector`.
 
         :returns: the full text of the cited passage from the XML.
         """

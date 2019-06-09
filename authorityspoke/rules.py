@@ -33,7 +33,7 @@ class Procedure(Factor):
 
     Users generally should not need to interact with this class
     directly, under the current design. Instead, they should interact
-    with the class :class:`.ProdecuralRule`.
+    with the class :class:`.ProceduralRule`.
 
     :param outputs:
         an outcome that a court may accept based on the presence
@@ -240,7 +240,7 @@ class Procedure(Factor):
         """
         Find if ``self`` applying in some cases implies ``other`` cannot apply in some.
 
-        Raises an error because, by analogy with :meth:`Procedure.implies`\,
+        Raises an error because, by analogy with :meth:`.Procedure.implies`\,
         users might expect this method to return ``True`` only when
         :class:`ProceduralRule` with ``universal=False`` and Procedure ``self``
         would contradict another :class:`ProceduralRule` with ``universal=False``
@@ -313,6 +313,15 @@ class Procedure(Factor):
             self.consistent_factor_groups(self.inputs, other.despite, matches)
             for matches in matchlist
         )
+
+    def implies(self, other: Procedure) -> bool:
+        """
+        Call :meth:`__ge__` as an alias.
+
+        :returns:
+            bool indicating whether ``self`` implies ``other``
+        """
+        return self >= other
 
     def implies_all_to_some(self, other: Procedure) -> bool:
         """
@@ -727,7 +736,7 @@ class ProceduralRule(Rule):
         Call :class:`Procedure`\'s :meth:`~Procedure.despite` method.
 
         :returns:
-            despite :class:`.Factors` from ``self``'s :class:`Procedure`
+            despite :class:`.Factor`\s from ``self``'s :class:`Procedure`
         """
         return self.procedure.despite
 
@@ -737,7 +746,7 @@ class ProceduralRule(Rule):
         Get :class:`.Factor`\s that can be replaced without changing ``self``\s meaning.
 
         :returns:
-            generic :class:`.Factors` from ``self``'s :class:`Procedure`
+            generic :class:`.Factor`\s from ``self``'s :class:`Procedure`
         """
         if self.generic:
             return [self]
@@ -749,7 +758,7 @@ class ProceduralRule(Rule):
         Call :class:`Procedure`\'s :meth:`~Procedure.inputs` method.
 
         :returns:
-            input :class:`.Factors` from ``self``'s :class:`Procedure`
+            input :class:`.Factor`\s from ``self``'s :class:`Procedure`
         """
         return self.procedure.inputs
 
@@ -759,7 +768,7 @@ class ProceduralRule(Rule):
         Call :class:`Procedure`\'s :meth:`~Procedure.outputs` method.
 
         :returns:
-            output :class:`.Factors` from ``self``'s :class:`Procedure`
+            output :class:`.Factor`\s from ``self``'s :class:`Procedure`
         """
         return self.procedure.outputs
 

@@ -69,14 +69,14 @@ class Regime:
 
     Currently used for retrieving :class:`.Enactment` text.
     May be modified for retrieving :class:`.Court`\s and
-    :class:`.Opinion`\s
+    :class:`.Opinion`\s.
     """
 
     jurisdictions: Dict[str, Jurisdiction] = field(default_factory=dict)
 
     def get_code(self, selector: Union[TextQuoteSelector, str]):
         """
-        Find a :class:`.Code` in the Regime from a selector.
+        Find a :class:`.Code` in the :class:`Regime` from a selector.
 
         :returns:
             the :class:`.Code` described in the selector path.
@@ -98,13 +98,13 @@ class Regime:
 
     def set_code(self, code: Code) -> None:
         """
-        Add to the collection of :class:`.Code`\s enacted in this Regime.
+        Add to the collection of :class:`.Code`\s enacted in this :class:`Regime`.
 
         Create the appropriate :class:`.Jurisdiction` object for the
-        :class:`.Code`, if it's not already linked to the Regime.
+        :class:`.Code`, if it's not already linked to the :class:`Regime`.
 
         :param code:
-            a :class:`.Code` valid in this Regime
+            a :class:`.Code` valid in this :class:`Regime`
         """
         if code.jurisdiction not in self.jurisdictions:
             self.jurisdictions[code.jurisdiction] = Jurisdiction()
