@@ -45,7 +45,7 @@ jobs:
           name: run tests
           command: |
             . venv/bin/activate
-            pytest --cov-report= --cov=authorityspoke tests/
+            pytest --cov-report term --cov=authorityspoke tests/
             coveralls
 
       - store_artifacts:
