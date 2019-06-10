@@ -9,12 +9,12 @@ from dataclasses import dataclass
 
 
 @dataclass(frozen=True)
-class Relation:
+class Analogy:
     """
     Two groups of :class:`.Factor`\s and a function that must hold between them.
 
     Can be used to find ways to assign the :class:`.Factor`\s'
-    context assignments consistently with the ``Relation``.
+    context assignments consistently with the ``Analogy``.
 
     :param need_matches:
         :class:`.Factor`\s that all need to satisfy the ``comparison``
@@ -138,7 +138,7 @@ class Relation:
         self, matchlist: List[Dict[Factor, Factor]]
     ) -> List[Dict[Factor, Optional[Factor]]]:
         """
-        Filter :class:`list` of :class:`.Factor` assignments with :meth:`~Relation.unordered_comparison`.
+        Filter :class:`list` of :class:`.Factor` assignments with :meth:`~Analogy.unordered_comparison`.
 
         :param matchlist:
             possible ways to match generic :class:`.Factor`\s of
@@ -146,7 +146,7 @@ class Relation:
 
         :returns:
             a new version of ``matchlist`` filtered to be consistent with
-            ``self``\'s :meth:`~Relation.unordered_comparison`.
+            ``self``\'s :meth:`~Analogy.unordered_comparison`.
         """
         new_matchlist = []
         for matches in matchlist:

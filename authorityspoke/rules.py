@@ -19,7 +19,7 @@ from dataclasses import dataclass
 from authorityspoke.context import get_directory_path
 from authorityspoke.enactments import Enactment
 from authorityspoke.factors import Factor, means, new_context_helper
-from authorityspoke.relations import Relation
+from authorityspoke.relations import Analogy
 
 
 @dataclass(frozen=True)
@@ -268,7 +268,7 @@ class Procedure(Factor):
 
         # For self to contradict other, every input of other
         # must be implied by some input or despite factor of self.
-        relations = (Relation(other.inputs, self_despite_or_input, operator.le),)
+        relations = (Analogy(other.inputs, self_despite_or_input, operator.le),)
         matchlist = self._all_relation_matches(relations)
 
         # For self to contradict other, some output of other
@@ -300,8 +300,8 @@ class Procedure(Factor):
             return True
 
         relations = (
-            Relation(other.outputs, self.outputs, operator.le),
-            Relation(self.inputs, other.inputs, operator.le),
+            Analogy(other.outputs, self.outputs, operator.le),
+            Analogy(self.inputs, other.inputs, operator.le),
         )
         matchlist = self._all_relation_matches(relations)
 
@@ -353,8 +353,8 @@ class Procedure(Factor):
         self_despite_or_input = (*self.despite, *self.inputs)
 
         relations = (
-            Relation(other.outputs, self.outputs, operator.le),
-            Relation(other.despite, self_despite_or_input, operator.le),
+            Analogy(other.outputs, self.outputs, operator.le),
+            Analogy(other.despite, self_despite_or_input, operator.le),
         )
 
         matchlist = self._all_relation_matches(relations)
@@ -389,9 +389,9 @@ class Procedure(Factor):
         despite_or_input = (*self.despite, *self.inputs)
 
         relations = (
-            Relation(other.outputs, self.outputs, operator.le),
-            Relation(other.inputs, self.inputs, operator.le),
-            Relation(other.despite, despite_or_input, operator.le),
+            Analogy(other.outputs, self.outputs, operator.le),
+            Analogy(other.inputs, self.inputs, operator.le),
+            Analogy(other.despite, despite_or_input, operator.le),
         )
 
         return bool(self._all_relation_matches(relations))
@@ -414,7 +414,7 @@ class Procedure(Factor):
         groups = ("outputs", "inputs", "despite")
         matchlist = [{}]
         for group in groups:
-            updater = Relation(
+            updater = Analogy(
                 need_matches=self.__dict__[group],
                 available=other.__dict__[group],
                 comparison=means,
@@ -426,7 +426,7 @@ class Procedure(Factor):
         # Now doing the same thing in reverse
         matchlist = [{}]
         for group in groups:
-            updater = Relation(
+            updater = Analogy(
                 need_matches=other.__dict__[group],
                 available=self.__dict__[group],
                 comparison=means,
@@ -456,13 +456,13 @@ class Procedure(Factor):
 
     @staticmethod
     def _all_relation_matches(
-        relations: Tuple[Relation, ...]
+        relations: Tuple[Analogy, ...]
     ) -> List[Dict[Factor, Optional[Factor]]]:
         """
-        Find all context registers consistent with multiple :class:`.Relation`\s.
+        Find all context registers consistent with multiple :class:`.Analogy`\s.
 
         :param relations:
-            a series of :class:`.Relation` comparisons in which
+            a series of :class:`.Analogy` comparisons in which
             the ``need_matches`` :class:`.Factor`\s all refer to
             one context (for instance, the same :class:`.Opinion`),
             and the ``available`` :class:`.Factor`\s all refer to
@@ -470,7 +470,7 @@ class Procedure(Factor):
 
         :returns:
             a list of all context registers consistent with all of the
-            :class:`.Relation`\s.
+            :class:`.Analogy`\s.
         """
         matchlist = [{}]
         for relation in relations:
@@ -498,7 +498,7 @@ class Rule(Factor):
         cls,
         case: Dict,
         mentioned: Optional[List[Factor]] = None,
-        regime: Optional["Regime"] = None
+        regime: Optional[Regime] = None
     ) -> List[Rule]:
         """
         Create a :py:class:`list` of :class:`Rule`\s from JSON.

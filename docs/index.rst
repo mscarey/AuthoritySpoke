@@ -20,10 +20,16 @@ API Reference
 -------------
 
 .. toctree::
-    :maxdepth: 2
-    :glob:
+    :maxdepth: 3
 
-    api/*
+    api/factors
+    api/predicates
+    api/legislation
+    api/courts
+    api/opinions
+    api/regimes
+    api/context
+    api/selectors
 
 Indices and tables
 ------------------

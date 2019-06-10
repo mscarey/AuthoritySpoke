@@ -17,7 +17,7 @@ from dataclasses import astuple, dataclass
 
 from authorityspoke.context import log_mentioned_context, new_context_helper
 from authorityspoke.predicates import Predicate
-from authorityspoke.relations import Relation
+from authorityspoke.relations import Analogy
 
 @dataclass(frozen=True)
 class Factor(ABC):
@@ -111,7 +111,7 @@ class Factor(ABC):
 
         :returns:
             attribute names identifying which attributes of ``self`` and
-            ``other`` must match, for a :class:`.Relation` to hold between
+            ``other`` must match, for a :class:`.Analogy` to hold between
             this :class:`Factor` and another.
         """
 
@@ -215,7 +215,7 @@ class Factor(ABC):
         elif self.generic or other.generic:
             yield {self: other, other: self}
         else:
-            relation = Relation(self.context_factors, other.context_factors, comparison)
+            relation = Analogy(self.context_factors, other.context_factors, comparison)
             for register in relation.ordered_comparison():
                 yield register
 
@@ -1062,8 +1062,8 @@ def means(left: Factor, right: Factor) -> bool:
     """
     Call :meth:`.Factor.means` as function alias.
 
-    This only exists because :class:`.Relation` objects expect
-    a function rather than a method for :attr:`~.Relation.comparison`.
+    This only exists because :class:`.Analogy` objects expect
+    a function rather than a method for :attr:`~.Analogy.comparison`.
 
     :returns:
         whether ``other`` is another :class:`Factor` with the same
