@@ -264,7 +264,7 @@ class Code:
         if selector.path is not None:
             docpath = selector.path.replace(self.uri, "")
 
-        if selector.path is None:
+        if selector.path is None:  # selecting the whole Code
             passages = self.xml.find_all(name="text")
         elif self.jurisdiction == "us":
             if self.level == "regulation":
@@ -297,7 +297,10 @@ class Code:
         )
         if re.search(passage_regex, text, re.IGNORECASE):
             return selector.exact
-        return None
+        raise ValueError(
+            f"Passage {selector.exact} from TextQuoteSelector "
+            + f"not found in Code at path {selector.path}."
+        )
 
     def __repr__(self):
         return f'{self.__class__.__name__}("{self.filename}")'
@@ -322,6 +325,10 @@ class Enactment:
         the text can be found.
 
     :param code:
+        the :class:`Code` where this legislative text appears.
+
+    :param regime:
+        a :class:`.Regime` with a :class:`.Jurisdiction` that has enacted
         the :class:`Code` where this legislative text appears.
 
     :param name:

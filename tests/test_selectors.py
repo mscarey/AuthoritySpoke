@@ -87,3 +87,11 @@ class TestSelectors:
             "In no case does copyright protection "
             + "for an original work of authorship extend to any"
         )
+
+    def test_exact_text_not_in_selection(self, make_regime):
+        due_process_wrong_section = TextQuoteSelector(
+            path="/us/const/amendment-XV/1", exact="due process"
+        )
+        enactment = Enactment(selector=due_process_wrong_section, regime=make_regime)
+        with pytest.raises(ValueError):
+            print(enactment.text)

@@ -138,16 +138,18 @@ class Relation:
         self, matchlist: List[Dict[Factor, Factor]]
     ) -> List[Dict[Factor, Optional[Factor]]]:
         """
-        Filter a :py:class:`list` of possible :class:`.Factor` assignments with an :meth:`~Relation.unordered_comparison`.
+        Filter :class:`list` of :class:`.Factor` assignments with :meth:`~Relation.unordered_comparison`.
 
         :param matchlist:
-            possible ways to match generic :class:`.Factor`\s of ``need_matches`` with ``available``.
+            possible ways to match generic :class:`.Factor`\s of
+            ``need_matches`` with ``available``.
 
         :returns:
-            a new version of ``matchlist`` filtered to be consistent with ``self``\'s :meth:`~Relation.unordered_comparison`.
+            a new version of ``matchlist`` filtered to be consistent with
+            ``self``\'s :meth:`~Relation.unordered_comparison`.
         """
         new_matchlist = []
         for matches in matchlist:
-            for answer in self.unordered_comparison(matches, list(self.need_matches)):
+            for answer in self.unordered_comparison(matches=matches):
                 new_matchlist.append(answer)
         return new_matchlist
