@@ -380,7 +380,8 @@ class Enactment:
     def from_dict(
         cls,
         enactment_dict: Dict[str, str],
-        regime: Optional["Regime"] = None,
+        code: Optional[Code] = None,
+        regime: Optional[Regime] = None,
         *args,
         **kwargs,
     ) -> Enactment:
@@ -392,24 +393,30 @@ class Enactment:
 
         :param enactment_dict:
 
+        :param code:
+            the :class:`.Code` that is the source for this
+            :class:`Enactment`
+
         :param regime:
             the :class:`.Regime` where the :class:`.Code` that is the
-            source for this :class:`Enactment` can be found.
+            source for this :class:`Enactment` can be found, or where
+            it should be added
+
+        :returns:
+            a new :class:`Enactment` object.
         """
-        # TODO: allow 'code' as a parameter
-        code = None
-        if regime is not None:
+        if regime and not code:
             code = regime.get_code(enactment_dict.get("path"))
         if code is None and enactment_dict.get("code"):
             code = Code(enactment_dict.get("code"))
-            if regime:
-                regime.set_code(code)
         if code is None:
             raise ValueError(
                 "Must either specify a Regime and a path to find the "
                 + "Code within the Regime, or specify a filename for an XML "
                 + "file that can be used to build the Code"
             )
+        if regime:
+            regime.set_code(code)
 
         selector = TextQuoteSelector(
             path=enactment_dict.get("path"),

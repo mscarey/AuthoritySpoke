@@ -89,9 +89,12 @@ def log_mentioned_context(func: Callable):
     def wrapper(
         cls,
         factor_record: Union[str, Optional[Dict[str, Union[str, bool]]]],
-        mentioned: Optional[List[Union["Factor", "Enactment"]]] = None,
-        regime: Optional["Regime"] = None,
-    ) -> Tuple[Optional["Factor"], List["Factor"]]:
+        mentioned: Optional[List[Union[Factor, Enactment]]] = None,
+        code: Optional[Code] = None,
+        regime: Optional[Regime] = None,
+        *args,
+        **kwargs,
+    ) -> Tuple[Optional[Factor], List[Factor]]:
 
         if isinstance(factor_record, str):
             if mentioned is None:
@@ -116,7 +119,9 @@ def log_mentioned_context(func: Callable):
 
         mentioned = mentioned or []
 
-        new_factor = func(cls, factor_record, mentioned=mentioned, regime=regime)
+        new_factor = func(
+            cls, factor_record, mentioned=mentioned, code=code, regime=regime
+        )
 
         if not new_factor.name and (
             not hasattr(new_factor, "generic") or not new_factor.generic

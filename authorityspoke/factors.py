@@ -83,7 +83,7 @@ class Factor(ABC):
     @classmethod
     @log_mentioned_context
     def from_dict(
-        cls, factor_record: Dict, mentioned: List[Factor], regime: Optional["Regime"] = None
+        cls, factor_record: Dict, mentioned: List[Factor], regime: Optional["Regime"] = None, *args, **kwargs
     ) -> Optional[Factor]:
         """
         Turn fields from a chunk of JSON into a :class:`Factor` object.

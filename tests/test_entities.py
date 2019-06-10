@@ -12,6 +12,14 @@ from authorityspoke.predicates import ureg, Q_
 
 
 class TestEntities:
+    def test_make_entity_from_str_without_mentioned(self, make_regime):
+        """
+        This fails because it needs to look up the string factor_records
+        in a "mentioned" list, but no "mentioned" parameter is given.
+        """
+        with pytest.raises(TypeError):
+            print(Entity.from_dict(factor_record="Bradley", regime=make_regime))
+
     def test_conversion_to_generic(self, make_entity):
         e = make_entity
         assert e["motel_specific"].make_generic() == e["motel"]

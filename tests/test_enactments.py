@@ -76,6 +76,22 @@ class TestEnactments:
         search_clause = make_enactment["search_clause"]
         assert search_clause.text.endswith("shall not be violated")
 
+    def test_make_enactment_from_dict_with_code(self, make_code):
+        fourth_a = Enactment.from_dict(
+            factor_record={"path": "/us/const/amendment-IV"}, code=make_code["const"]
+        )[0]
+        assert fourth_a.text.endswith("and the persons or things to be seized.")
+
+    def test_make_enactment_from_dict_with_code_and_regime(
+        self, make_regime, make_code
+    ):
+        fourth_a = Enactment.from_dict(
+            factor_record={"path": "/us/const/amendment-IV"},
+            code=make_code["const"],
+            regime=make_regime,
+        )[0]
+        assert fourth_a.text.endswith("and the persons or things to be seized.")
+
     def test_passage_from_imported_statute(self, make_regime):
         opinion = Opinion.from_file(f"oracle_h.json")
         oracle_majority = opinion.exposit(f"holding_oracle.json", regime=make_regime)

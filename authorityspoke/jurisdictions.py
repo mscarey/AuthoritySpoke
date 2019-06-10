@@ -109,5 +109,6 @@ class Regime:
         if code.jurisdiction not in self.jurisdictions:
             self.jurisdictions[code.jurisdiction] = Jurisdiction()
 
-        self.jurisdictions[code.jurisdiction].codes[code.uri] = code
+        if not self.jurisdictions[code.jurisdiction].codes.get(code.uri):
+            self.jurisdictions[code.jurisdiction].codes[code.uri] = code
         return None

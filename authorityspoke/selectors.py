@@ -63,7 +63,7 @@ class TextQuoteSelector:
 
         object.__delattr__(self, "source")
 
-    def set_exact_from_source(self, source: Union["Regime", "Code"]) -> None:
+    def set_exact_from_source(self, source: Union[Regime, Code]) -> None:
         """Use text found in ``source`` as ``exact`` parameter for ``self``."""
         if source.__class__.__name__ == "Regime":
             code = source.get_code(self.path)
