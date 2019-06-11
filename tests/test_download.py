@@ -4,7 +4,7 @@ import pytest
 
 from authorityspoke.opinions import Opinion
 
-pytestmark = pytest.mark.skip("don't feel like calling API")
+# pytestmark = pytest.mark.skip("don't want to call API")
 
 
 class TestDownload:

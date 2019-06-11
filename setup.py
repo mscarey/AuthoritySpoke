@@ -5,16 +5,20 @@ with open("readme.md", "r") as fh:
 
 setuptools.setup(
     name="AuthoritySpoke",
-    version="0.0.1",
+    version="0.1.0",
     author="Matt Carey",
     author_email="matt@authorityspoke.com",
-    description="a tool for constructing data about legal rules",
+    description="tool for managing structured data about legal authority",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/mscarey/AuthoritySpoke",
-    packages=setuptools.find_packages(),
+    packages=setuptools.find_packages(
+        exclude=["tests", "*.tests", "*.tests.*", "tests.*"]
+    ),
+    install_requires=["beautifulsoup4", "lxml", "pint", "requests", "ipykernel"],
+    extras_require={"jupyter notebooks": "jupyter"},
     classifiers=[
-        "Development Status :: 2 - Pre-Alpha",
+        "Development Status :: 3 - Alpha",
         "Intended Audience :: Legal Industry",
         "License :: OSI Approved :: GNU Affero General Public License v3",
         "Programming Language :: Python :: 3.7",
@@ -22,4 +26,5 @@ setuptools.setup(
         "Natural Language :: English",
         "Topic :: Sociology :: History",
     ],
+    include_package_data=True,
 )
