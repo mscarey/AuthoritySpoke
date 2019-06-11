@@ -31,6 +31,14 @@ API Reference
     api/context
     api/selectors
 
+Development Updates
+-------------------
+
+.. toctree::
+    :maxdepth: 2
+
+    history/releases
+
 Indices and tables
 ------------------
 

@@ -7,6 +7,8 @@ AuthoritySpoke.egg-info
 .pytest_cache
 .vscode
 .mypy_cache/
+build/
+dist/
 docs/_build/
 html/
 htmlcov/
