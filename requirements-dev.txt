@@ -20,6 +20,9 @@ pytest
 pytest-cov
 pytest-profiling
 rope
+setuptools
 sphinx
 sphinx-autodoc-typehints
+twine
+wheel
 wily
