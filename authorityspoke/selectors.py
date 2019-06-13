@@ -7,6 +7,7 @@ Based on the `Web Annotation Data Model <https://www.w3.org/TR/annotation-model/
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import dataclass
 
 from typing import Optional, Union
@@ -59,11 +60,13 @@ class TextQuoteSelector:
 
         if not self.exact:
             if self.source:
-                self.set_exact_from_source(self.source)
+                object.__setattr__(
+                    self, "exact", self.set_exact_from_source(self.source)
+                )
 
         object.__delattr__(self, "source")
 
-    def set_exact_from_source(self, source: Union[Regime, Code]) -> None:
+    def set_exact_from_source(self, source: Union[Regime, Code]) -> Optional[str]:
         """Use text found in ``source`` as ``exact`` parameter for ``self``."""
         if source.__class__.__name__ == "Regime":
             code = source.get_code(self.path)
@@ -72,8 +75,8 @@ class TextQuoteSelector:
         else:
             return None
 
-        selection = code.select_text(self)
-        object.__setattr__(self, "exact", self.exact_from_ends(selection))
+        section_text = code.section_text(self.path)
+        return self.exact_from_ends(section_text)
 
     def exact_from_ends(self, text: str) -> str:
         """
@@ -101,7 +104,7 @@ class TextQuoteSelector:
             right_end = None
         if right_end == -1:
             raise ValueError(f"'suffix' value '{self.suffix}' not found in '{text}'")
-        return text[left_end:right_end]
+        return text[left_end:right_end].strip()
 
     @property
     def json(self):
@@ -122,3 +125,9 @@ class TextQuoteSelector:
                 },
             }
         )
+
+    @property
+    def passage_regex(self):
+        prefix = (re.escape(self.prefix) + r"\s*") if self.prefix else ""
+        suffix = (r"\s*" + re.escape(self.suffix)) if self.suffix else ""
+        return (prefix + r"(" + re.escape(self.exact) + r")" + suffix).strip()

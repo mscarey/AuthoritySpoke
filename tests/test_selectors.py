@@ -40,11 +40,8 @@ class TestSelectors:
         )
         assert selector.path.startswith("/")
 
-    def test_passage_from_uslm_code(self, make_code):
-        usc17 = make_code["usc17"]
-        copyright_exceptions = TextQuoteSelector(
-            path="/us/usc/t17/s102/b", suffix="idea, procedure,", source=usc17
-        )
+    def test_passage_from_uslm_code(self, make_selector):
+        copyright_exceptions = make_selector["copyright"]
         assert copyright_exceptions.exact.strip() == (
             "In no case does copyright protection "
             + "for an original work of authorship extend to any"

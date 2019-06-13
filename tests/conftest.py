@@ -481,11 +481,14 @@ def make_evidence(
     }
 
 @pytest.fixture(scope="module")
-def make_selector() -> Dict[str, TextQuoteSelector]:
+def make_selector(make_code) -> Dict[str, TextQuoteSelector]:
     return {"/us/usc/t17/s103": TextQuoteSelector(
             path = "/us/usc/t17/s103",
             exact = "protection for a work employing preexisting material in which copyright subsists does not extend to any part of the work in which such material has been used unlawfully."
-    )}
+    ),
+    "copyright": TextQuoteSelector(
+            path="/us/usc/t17/s102/b", suffix="idea, procedure,", source=make_code["usc17"]
+        )}
 
 @pytest.fixture(scope="module")
 def make_regime() -> Dict[str, Code]:
@@ -515,8 +518,11 @@ def make_code(make_regime) -> Dict[str, Code]:
 
 
 @pytest.fixture(scope="module")
-def make_enactment(make_regime) -> Dict[str, Enactment]:
+def make_enactment(make_selector, make_regime) -> Dict[str, Enactment]:
     return {
+        "copyright": Enactment(
+            selector=make_selector["copyright"], regime=make_regime
+        ),
         "search_clause": Enactment(
             selector=TextQuoteSelector(
                 path="/us/const/amendment-IV",
@@ -529,6 +535,13 @@ def make_enactment(make_regime) -> Dict[str, Enactment]:
             ),
             regime=make_regime
             ),
+        "warrants_clause": Enactment(
+            selector=TextQuoteSelector(
+                path="/us/const/amendment-IV",
+                exact="shall not be violated, and no Warrants shall issue,",
+            ),
+            regime=make_regime
+        ),
         "fourth_a": Enactment(
             selector=TextQuoteSelector(
             path="/us/const/amendment-IV",

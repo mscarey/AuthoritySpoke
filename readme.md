@@ -16,7 +16,7 @@ You can find AuthoritySpoke's [API documentation and more at ReadTheDocs](https:
 
 ## Installing AuthoritySpoke
 
-AuthoritySpoke is now [available on PyPI](https://pypi.org/project/AuthoritySpoke/) so you can install it with pip
+AuthoritySpoke is now [available on PyPI](https://pypi.org/project/AuthoritySpoke/), so you can install it with pip:
 
 ```
 $ pip install authorityspoke

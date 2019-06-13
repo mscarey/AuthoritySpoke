@@ -183,3 +183,57 @@ class TestEnactments:
         dp5 = make_enactment["due_process_5"]
         dp14 = make_enactment["due_process_14"]
         assert dp14.effective_date > dp5.effective_date
+
+    @pytest.mark.parametrize(
+        "enactment_name, text",
+        [
+            ("due_process_5", "life, liberty, or property, without due process of law"),
+            (
+                "copyright",
+                "In no case does copyright protection for an original work of authorship extend to any",
+            ),
+        ],
+    )
+    def test_text_interval(self, make_enactment, enactment_name, text):
+        """
+        The interval represents the start and end of the phrase
+        "life, liberty, or property, without due process of law"
+        in the Fifth Amendment.
+        """
+        provision = make_enactment[enactment_name]
+        interval = provision.text_interval()
+        this_section = provision.code.section_text(path=provision.selector.path)
+        assert this_section[interval[0] : interval[1]] == text
+
+    # Addition
+
+    def test_add_overlapping_enactments(self, make_enactment):
+        search_clause = make_enactment["search_clause"]
+        warrant_clause = make_enactment["warrants_clause"]
+
+        combined = search_clause + warrant_clause
+
+        passage = (
+            "against unreasonable searches and seizures, "
+            + "shall not be violated, "
+            + "and no Warrants shall issue,"
+        )
+        assert passage in combined.text
+
+    def test_add_shorter_plus_longer(self, make_enactment):
+        search_clause = make_enactment["search_clause"]
+        fourth_a = make_enactment["fourth_a"]
+
+        combined = search_clause + fourth_a
+
+        assert combined.text == fourth_a.text
+        assert combined == fourth_a
+
+    def test_add_longer_plus_shorter(self, make_enactment):
+        search_clause = make_enactment["search_clause"]
+        fourth_a = make_enactment["fourth_a"]
+
+        combined = fourth_a + search_clause
+
+        assert combined.text == fourth_a.text
+        assert combined == fourth_a
