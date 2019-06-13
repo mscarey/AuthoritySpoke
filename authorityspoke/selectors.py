@@ -58,6 +58,9 @@ class TextQuoteSelector:
         if self.path and self.path.endswith("/"):
             object.__setattr__(self, "path", self.path.rstrip("/"))
 
+        if self.source and not self.path:
+            object.__setattr__(self, "exact", self.source.uri)
+
         if not self.exact:
             if self.source:
                 object.__setattr__(

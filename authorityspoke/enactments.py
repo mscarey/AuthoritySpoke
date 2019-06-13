@@ -279,6 +279,18 @@ class Code:
 
         return " ".join(" ".join(passage.text.split()) for passage in passages)
 
+    def select_text_from_interval(
+        self, interval: Tuple[int, int], path: Optional[str] = None
+    ) -> Optional[str]:
+        if not path:
+            path = self.uri
+        section_text = self.section_text(path)
+        if len(section_text) < max(interval):
+            raise ValueError(
+                f"Interval {interval} extends beyond the end of Enactment {path}."
+            )
+        return section_text[min(interval) : max(interval)]
+
     def select_text(self, selector: TextQuoteSelector) -> Optional[str]:
         """
         Get text from the ``Code`` using a :class:`.TextQuoteSelector`.
@@ -377,14 +389,35 @@ class Enactment:
         if combined:
             return combined
 
-        # If the Enactments can't be combined, just return self.
-        return self
+        # If the Enactments can't be combined, return None
+        return None
 
-    def combine_text(self, other: Enactment) -> Enactment:
+    def combine_text(self, other: Enactment) -> Optional[Enactment]:
         if not other.selector.path.startswith(self.selector.path):
-            return self
+            return None
+        self_interval = self.text_interval()
+        other_interval = other.text_interval(path=self.selector.path)
+        if not self_interval or not other_interval:
+            return None
+        both_intervals = sorted([self_interval, other_interval])
+        if both_intervals[1][0] >= both_intervals[0][1] + 2:
+            return None
+        new_interval = (
+            both_intervals[0][0],
+            max(both_intervals[0][1], both_intervals[1][1]),
+        )
+        # BUG: can't create prefix and suffix to distinguish identical passages.
+        return Enactment(
+            selector=TextQuoteSelector(
+                path=self.selector.path,
+                exact=self.code.select_text_from_interval(
+                    interval=new_interval, path=self.selector.path
+                ),
+            ),
+            code=self.code,
+        )
 
-    def text_interval(self, selector=None) -> Optional[Tuple[int, int]]:
+    def text_interval(self, path=None) -> Optional[Tuple[int, int]]:
         """
         Find integer indices for the quoted text.
 
@@ -393,10 +426,10 @@ class Enactment:
             text passage quoted in ``self.selector.exact`` within the
             XML section referenced in ``self.selector.path``.
         """
-        if not selector:
-            selector = self.selector
-        regex = selector.passage_regex
-        match = re.search(regex, self.code.section_text(selector.path), re.IGNORECASE)
+        if not path:
+            path = self.selector.path
+        regex = self.selector.passage_regex
+        match = re.search(regex, self.code.section_text(path), re.IGNORECASE)
         if match:
             # Getting indices from match group 1 (in the parentheses),
             # not match 0 which includes prefix and suffix
