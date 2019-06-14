@@ -4,7 +4,8 @@ import pytest
 from authorityspoke.enactments import Code, Enactment
 from authorityspoke.factors import Predicate, Entity, Factor, Fact
 from authorityspoke.factors import Evidence, Exhibit
-from authorityspoke.rules import Procedure, Rule, ProceduralRule
+from authorityspoke.procedures import Procedure
+from authorityspoke.rules import Rule
 from authorityspoke.opinions import Opinion
 from authorityspoke.predicates import ureg, Q_
 from authorityspoke.context import log_mentioned_context

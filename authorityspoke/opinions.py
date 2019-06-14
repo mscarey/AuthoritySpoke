@@ -20,7 +20,7 @@ import requests
 
 from authorityspoke.context import get_directory_path
 from authorityspoke.factors import Factor
-from authorityspoke.rules import Rule, ProceduralRule
+from authorityspoke.rules import Rule
 
 
 @dataclass
@@ -457,7 +457,7 @@ class Opinion:
             if not isinstance(holding, Rule):
                 raise TypeError('"holding" must be an object of type Rule.')
 
-            if context is not None and isinstance(holding, ProceduralRule):
+            if context is not None and isinstance(holding, Rule):
                 if isinstance(context, dict):
                     for factor in context:
                         if isinstance(context[factor], str):

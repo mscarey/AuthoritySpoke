@@ -4,7 +4,7 @@ import operator
 import pytest
 
 from authorityspoke.factors import Entity, Factor, Fact, means
-from authorityspoke.rules import Rule, ProceduralRule
+from authorityspoke.rules import Rule
 from authorityspoke.opinions import Opinion
 from authorityspoke.predicates import ureg, Q_
 
