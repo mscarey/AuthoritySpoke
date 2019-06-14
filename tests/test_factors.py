@@ -532,3 +532,12 @@ class TestFacts:
         )
         with pytest.raises(TypeError):
             any(register is not None for register in update)
+
+    # Addition
+
+    @pytest.mark.parametrize("left, right, expected",
+    [
+        ("f_shooting_craig_poe", "f_shooting_craig_brd", "f_shooting_craig_brd")
+    ])
+    def test_addition(self, make_factor, left, right, expected):
+        assert make_factor[left] + make_factor[right] == make_factor[expected]

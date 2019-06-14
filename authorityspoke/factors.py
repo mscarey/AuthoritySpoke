@@ -186,6 +186,15 @@ class Factor(ABC):
                 answers.update(context.recursive_factors)
         return answers
 
+    def __add__(self, other) -> Optional[Factor]:
+        if not isinstance(other, Factor):
+            raise TypeError
+        if self >= other:
+            return self
+        if other >= self:
+            return other.new_context(self.generic_factors)
+        return None
+
     def consistent_with(self, other: Factor, comparison: Callable) -> bool:
         """
         Find whether ``self`` and ``other`` can fit the relationship ``comparison``.
