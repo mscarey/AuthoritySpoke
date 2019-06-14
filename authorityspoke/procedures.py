@@ -1,3 +1,9 @@
+"""
+Descriptions of changes in litigation, without specifying
+whether they are mandatory or universal, or specifying the
+:class:`.Enactment`\s that might require them.
+"""
+
 from __future__ import annotations
 
 import operator
@@ -22,7 +28,7 @@ class Procedure(Factor):
 
     Users generally should not need to interact with this class
     directly, under the current design. Instead, they should interact
-    with the class :class:`.ProceduralRule`.
+    with the class :class:`.Rule`.
 
     :param outputs:
         an outcome that a court may accept based on the presence
@@ -231,14 +237,14 @@ class Procedure(Factor):
 
         Raises an error because, by analogy with :meth:`.Procedure.implies`\,
         users might expect this method to return ``True`` only when
-        :class:`ProceduralRule` with ``universal=False`` and Procedure ``self``
-        would contradict another :class:`ProceduralRule` with ``universal=False``
+        :class:`Rule` with ``universal=False`` and Procedure ``self``
+        would contradict another :class:`Rule` with ``universal=False``
         and Procedure ``other``. But that would never happen.
         """
         raise NotImplementedError(
             "Procedures do not contradict one another unless one of them ",
             "applies in 'ALL' cases. Consider using ",
-            "'Procedure.contradicts_some_to_all' or 'ProceduralRule.contradicts'.",
+            "'Procedure.contradicts_some_to_all' or 'Rule.contradicts'.",
         )
 
     def contradicts_some_to_all(self, other: Procedure) -> bool:

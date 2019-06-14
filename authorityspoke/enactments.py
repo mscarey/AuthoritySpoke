@@ -345,7 +345,7 @@ class Enactment:
     A passage of legislative text.
 
     May be used as support for a
-    :class:`.ProceduralRule`. To retrieve the text, there needs
+    :class:`.Rule`. To retrieve the text, there needs
     to be an available method for identifying the correct XML
     element based on the section and subsection names, and each
     XML format used for any :class:`Code` will require a different method.
