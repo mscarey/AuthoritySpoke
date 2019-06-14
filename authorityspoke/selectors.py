@@ -131,6 +131,7 @@ class TextQuoteSelector:
 
     @property
     def passage_regex(self):
+        """Get a regex to identify the selected text."""
         prefix = (re.escape(self.prefix) + r"\s*") if self.prefix else ""
         suffix = (r"\s*" + re.escape(self.suffix)) if self.suffix else ""
         return (prefix + r"(" + re.escape(self.exact) + r")" + suffix).strip()

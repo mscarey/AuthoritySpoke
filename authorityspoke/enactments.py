@@ -282,6 +282,19 @@ class Code:
     def select_text_from_interval(
         self, interval: Tuple[int, int], path: Optional[str] = None
     ) -> Optional[str]:
+        """
+        Select text as interval of section identified by path.
+
+        :param interval:
+            the indices of the slice of the section text to be selected.
+
+        :para path:
+            a path to the section that text should be selected from
+
+        :returns:
+            a slice of text from the section identified by ``path``
+        """
+
         if not path:
             path = self.uri
         section_text = self.section_text(path)
@@ -393,6 +406,16 @@ class Enactment:
         return None
 
     def combine_text(self, other: Enactment) -> Optional[Enactment]:
+        """
+        Create new :class:`Enactment` with combined text of the source :class:`Enactment`\s.
+
+        :param other:
+            another :class:`Enactment` with text to combine with the text from ``self``.
+
+        :returns:
+            new :class:`Enactment` with combined text of the source :class:`Enactment`\s, or
+            ``None`` if the :class:`Enactment`\s can't be combined.
+        """
         if not other.selector.path.startswith(self.selector.path):
             return None
         self_interval = self.text_interval()

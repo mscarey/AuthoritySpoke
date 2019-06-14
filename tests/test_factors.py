@@ -537,7 +537,9 @@ class TestFacts:
 
     @pytest.mark.parametrize("left, right, expected",
     [
-        ("f_shooting_craig_poe", "f_shooting_craig_brd", "f_shooting_craig_brd")
+        ("f_shooting_craig_poe", "f_shooting_craig_brd", "f_shooting_craig_brd"),
+        ("f_irrelevant_3", "f_irrelevant_3_new_context", "f_irrelevant_3"),
+        ("f_irrelevant_3_new_context", "f_irrelevant_3", "f_irrelevant_3_new_context"),
     ])
     def test_addition(self, make_factor, left, right, expected):
         assert make_factor[left] + make_factor[right] == make_factor[expected]
