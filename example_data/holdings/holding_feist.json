@@ -1,0 +1,247 @@
+{
+    "mentioned_factors": [
+
+        {
+            "type": "entity",
+            "name": "Rural Telephone Service Company"
+        },
+        {
+            "type": "entity",
+            "name": "Rural's telephone directory"
+        },
+        {
+            "type": "entity",
+            "name": "Rural's telephone listings",
+            "plural": true
+        },
+        {
+            "type": "entity",
+            "name": "Rural's arragement of its telephone listings"
+        },
+        {
+            "type": "entity",
+            "name": "Feist Publications"
+        },
+        {
+            "type": "entity",
+            "name": "Feist's telephone directory"
+        }
+    ],
+    "holdings": [{
+            "inputs": {
+                "type": "fact",
+                "content": "Rural's telephone directory was a fact"
+            },
+            "outputs": {
+                "type": "fact",
+                "content": "Rural's telephone directory was copyrightable",
+                "truth": false
+            },
+            "enactments": [{
+                    "path": "/us/const/article-I/8/8",
+                    "exact": "To promote the Progress of Science and useful Arts, by securing for limited Times to Authors",
+                    "name": "securing for authors"
+                }, {
+                    "path": "/us/const/article-I/8/8",
+                    "exact": "the exclusive Right to their respective Writings",
+                    "name": "right to writings"
+                }, {
+                    "path": "/us/usc/t17/s103/b",
+                    "exact": "The copyright in a compilation",
+                    "name": "copyright in a compilation"
+                },
+                {
+                    "path": "/us/usc/t17/s103/b",
+                    "exact": "extends only to the material contributed by the author of such work, as distinguished from the preexisting material employed in the work, and does not imply any exclusive right in the preexisting material.",
+                    "name": "preexisting material provision"
+                }
+            ],
+            "mandatory": true,
+            "universal": true
+        },
+        {
+            "inputs": {
+                "type": "fact",
+                "content": "Rural's telephone directory was a compilation of facts"
+            },
+            "outputs": {
+                "type": "fact",
+                "content": "Rural's telephone directory was copyrightable"
+            },
+            "enactments": ["securing for authors", "right to writings"],
+            "mandatory": true
+        },
+        {
+            "inputs": {
+                "type": "fact",
+                "content": "Rural's telephone directory was an idea"
+            },
+            "outputs": {
+                "type": "fact",
+                "content": "Rural's telephone directory was copyrightable",
+                "truth": false
+            },
+            "enactments": ["securing for authors", "right to writings"],
+            "mandatory": true,
+            "universal": true
+        },
+        {
+            "inputs": {
+                "type": "fact",
+                "content": "Rural's telephone directory was original"
+            },
+            "outputs": {
+                "type": "fact",
+                "content": "Rural's telephone directory was copyrightable"
+            },
+            "exclusive": true,
+            "enactments": ["securing for authors", "right to writings"]
+        },
+        {
+            "inputs": [{
+                    "type": "fact",
+                    "content": "Rural's telephone directory was independently created by Rural Telephone Service Company, as opposed to copied from other works"
+                },
+                {
+                    "type": "fact",
+                    "content": "Rural's telephone directory possessed at least some minimal degree of creativity"
+                }
+            ],
+            "despite": {
+                "type": "fact",
+                "content": "Rural's telephone directory closely resembled other works"
+            },
+            "outputs": {
+                "type": "fact",
+                "content": "Rural's telephone directory was original"
+            },
+            "universal": true
+        },
+        {
+            "inputs": {
+                "type": "fact",
+                "content": "Rural's telephone directory was a fact"
+            },
+            "outputs": {
+                "type": "fact",
+                "content": "Rural's telephone directory was original",
+                "truth": false
+            },
+            "mandatory": true,
+            "universal": true
+        },
+        {
+            "inputs": [{
+                    "type": "fact",
+                    "content": "Rural's telephone directory was a compilation of facts"
+                },
+                {
+                    "type": "fact",
+                    "content": "Rural Telephone Service Company was the creator of Rural's telephone directory"
+                },
+                {
+                    "type": "fact",
+                    "content": "Rural Telephone Service Company independently used a degree of creativity to choose which facts to include in Rural's telephone directory"
+                },
+                {
+                    "type": "fact",
+                    "content": "Rural Telephone Service Company independently used a degree of creativity to choose in what order to place the facts in Rural's telephone directory, and how to arrange the collected data so that they could be used effectively by readers"
+                }
+            ],
+            "outputs": {
+                "type": "fact",
+                "content": "Rural's telephone directory was original"
+            },
+            "enactments": ["securing for authors", "right to writings"]
+        },
+        {
+            "inputs": [{
+                    "type": "fact",
+                    "content": "Rural's telephone directory was a compilation of facts"
+                },
+                {
+                    "type": "fact",
+                    "content": "Rural's telephone directory contained written expression protectable by copyright",
+                    "truth": false
+                }
+            ],
+            "despite": [{
+                    "type": "fact",
+                    "content": "Rural Telephone Service Company independently used a degree of creativity to choose which facts to include in Rural's telephone directory"
+                },
+                {
+                    "type": "fact",
+                    "content": "Rural Telephone Service Company independently used a degree of creativity to choose in what order to place the facts in Rural's telephone directory, and how to arrange the collected data so that they could be used effectively by readers"
+                }
+            ],
+            "outputs": {
+                "type": "fact",
+                "content": "Rural's telephone directory was copyrightable",
+                "truth": false
+            },
+            "enactments": ["securing for authors", "right to writings"],
+            "rule_valid": false
+        },
+        {
+            "inputs": [{
+                "type": "fact",
+                "content": "Rural's telephone directory was a compilation of facts"
+            }, {
+                "type": "fact",
+                "content": "Feist's telephone directory did not feature the same selection and arrangement as Rural's telephone directory"
+            }],
+            "despite": [{
+                "type": "fact",
+                "content": "Rural's telephone directory was copyrightable"
+            }, {
+                "type": "fact",
+                "content": "Feist Publications freely copied the facts contained in Rural's telephone directory, in preparing Feist's telephone directory"
+            }],
+            "outputs": {
+                "type": "fact",
+                "content": "Feist Publications infringed the copyright on Rural's telephone directory",
+                "truth": false
+            },
+            "enactments": ["securing for authors", "right to writings"]
+        },
+        {
+            "inputs": {
+                "type": "fact",
+                "content": "Rural's telephone directory was a compilation of facts"
+            },
+            "outputs": {
+                "type": "fact",
+                "content": "Rural's telephone directory was copyrightable"
+            },
+            "universal": true,
+            "rule_valid": false
+        },
+        {
+            "inputs": {
+                "type": "fact",
+                "content": "Rural's telephone listings were names, towns, and telephone numbers of telephone subscribers"
+            },
+            "outputs": {
+                "type": "fact",
+                "content": "Rural's telephone listings were original",
+                "truth": false
+            },
+            "enactments": ["securing for authors", "right to writings", "copyright in a compilation", "preexisting material provision"]
+        },
+        {
+            "inputs": [{
+                "type": "fact",
+                "content": "Rural's telephone directory was a telephone directory."
+            }, {
+                "type": "fact",
+                "content": "Rural's arragement of its telephone listings was the method of listing subscribers alphabetically by surname in Rural's telephone directory"
+            }],
+            "outputs": {
+                "type": "fact",
+                "content": "Rural's arragement of its telephone listings was original",
+                "truth": false
+            },
+            "enactments": ["securing for authors", "right to writings", "copyright in a compilation", "preexisting material provision"]
+        }
+    ]
+}
