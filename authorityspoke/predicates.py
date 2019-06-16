@@ -202,6 +202,40 @@ class Predicate:
             return False
         return self.content == other.content and self.truth != other.truth
 
+    def same_content_meaning(
+        self, other: Predicate, ignore_plural: bool = True
+    ) -> bool:
+        """
+        Test if :param:`~Predicate.content` strings of ``self`` and ``other`` have same meaning.
+
+        This currently has a very brittle solution that should be
+        replaced, especially if spaCy can be used here. It assumes
+        that singular/plural differences will always result in
+        differences between the choice of "was" and "were", and
+        that such differences can always just be ignored. (Unless
+        ``ignore_plural`` is set to ``False``, which it never is.)
+
+        :other:
+            another :class:`Predicate` being compared to ``self``
+
+        :ignore_plural:
+            whether the text of ``self`` and ``other`` should be reformatted
+            before comparing them, to try to eliminate any differences caused
+            by one using a plural :class:`.Entity` whether the other uses a
+            singular one.
+
+        :returns:
+            whether ``self`` and ``other`` have ``content`` strings
+            similar enough to be considered to have the same meaning.
+        """
+        if self.content.lower() == other.content.lower():
+            return True
+        if ignore_plural and self.content.lower().replace(
+            "were", "was"
+        ) == other.content.lower().replace("were", "was"):
+            return True
+        return False
+
     def means(self, other) -> bool:
         """
         Test whether ``self`` and ``other`` have identical meanings.
@@ -212,11 +246,10 @@ class Predicate:
         if not isinstance(other, self.__class__):
             return False
 
-        if (
-            self.content.lower() != other.content.lower()
-            or self.reciprocal != other.reciprocal
-            or self.quantity != other.quantity
-        ):
+        if not self.same_content_meaning(other):
+            return False
+
+        if self.reciprocal != other.reciprocal or self.quantity != other.quantity:
             return False
 
         return self.truth == other.truth and self.comparison == other.comparison

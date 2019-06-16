@@ -86,6 +86,14 @@ class TestEntities:
         assert make_entity["tree_search_specific"] >= make_entity["motel"]
         assert make_entity["tree_search"] > make_entity["motel"]
 
+    def test_plural_true(self, make_opinion_with_holding):
+        """
+        holding_feist.json has an entity with the name "Rural's telephone listings"
+        and "plural": true
+        """
+        feist = make_opinion_with_holding["feist_majority"]
+        assert any(entity.plural is True for entity in feist.generic_factors)
+
     # Contradiction
 
     def test_error_contradiction_with_non_factor(self, make_entity, make_predicate):

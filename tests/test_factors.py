@@ -6,7 +6,7 @@ import pytest
 from authorityspoke.factors import Entity, Factor, Fact, means
 from authorityspoke.rules import Rule
 from authorityspoke.opinions import Opinion
-from authorityspoke.predicates import ureg, Q_
+from authorityspoke.predicates import ureg, Q_, Predicate
 
 
 class TestFacts:
@@ -353,6 +353,13 @@ class TestFacts:
         f = watt_factor
         assert not f["f2_clear_and_convincing"].means(f["f2_preponderance_of_evidence"])
         assert not f["f2_clear_and_convincing"].means(f["f2"])
+
+    def test_means_despite_plural(self):
+        directory = Entity("Rural's telephone directory", plural=False)
+        listings = Entity("Rural's telephone listings", plural=True)
+        directory_original = Fact(Predicate("{} was original"), context_factors=directory)
+        listings_original = Fact(Predicate("{} were original"), context_factors=listings)
+        assert directory_original.means(listings_original)
 
     # Implication
 
