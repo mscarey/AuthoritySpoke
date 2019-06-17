@@ -198,18 +198,18 @@ class Rule(Factor):
         return cls.collection_from_dict(case, regime=regime)
 
     @classmethod
-    def from_dict(
+    def contrapositive_from_dict(
         cls, record: Dict, mentioned: List[Factor], regime: Optional[Regime] = None
     ) -> Iterator[Tuple[Rule, List[Factor]]]:
         """
-        Make :class:`Rule` from a :class:`dict` of strings and a list of mentioned :class:`.Factor`\s.
+        Make contrapositive forms of a :class:`Rule` described by JSON input.
 
         If ``record`` contains the entry ``"exclusive": True``, that means
-        the specified ``inputs`` are the only way to reach the specified output.
-        (Multiple ``outputs`` are not allowed when the ``exclusive`` flag is ``True``.)
-        When that happens, it can be inferred that in the absence of any of the inputs,
-        the output must also be absent. So, this function will call more instances of
-        itself (one for each input) to create more :class:`Rule`\s containing that
+        the specified :class:`~Rule.inputs`` are the only way to reach the specified
+        output. (Multiple :class:`~Rule.outputs` are not allowed when the ``exclusive``
+        flag is ``True``.) When that happens, it can be inferred that in the absence
+        of any of the inputs, the output must also be absent. So, this method will be
+        called once for each input to create more :class:`Rule`\s containing that
         information. None of the completed :class:`Rule` objects will contain an
         ``exclusive`` flag.
 
@@ -226,8 +226,75 @@ class Rule(Factor):
             from the ``mentioned_entities`` section of the input
             JSON.
 
+        :param regime:
+
         :returns:
-            a :class:`list` of :class:`Rule`\s with the items
+            iterator yielding :class:`Rule`\s with the items
+            from ``mentioned_entities`` as ``context_factors``
+        """
+
+        if len(record["outputs"]) != 1:
+            raise ValueError(
+                "The 'exclusive' attribute is not allowed for Rules "
+                + "with more than one 'output' Factor. If the set of Factors "
+                + "in 'inputs' is really the only way to reach any of the "
+                + "'outputs', consider making a separate 'exclusive' entry "
+                + "for each output."
+            )
+        if record["outputs"][0].get("absent") is True:
+            raise ValueError(
+                "The 'exclusive' attribute is not allowed for Rules "
+                + "with an 'absent' 'output' Factor. This would indicate "
+                + "that the output can or must be present in every litigation "
+                + "unless specified inputs are present, which is unlikely."
+            )
+        if record.get("rule_valid") is False:
+            raise NotImplementedError(
+                "The ability to state that it is not 'valid' to assert "
+                + "that a Rule is the 'exclusive' way to reach an output is "
+                + "not implemented, so 'rule_valid' cannot be False while "
+                + "'exclusive' is True. Try expressing this in another way "
+                + "without the 'exclusive' keyword."
+            )
+        record["mandatory"] = not record.get("mandatory")
+        record["universal"] = not record.get("universal")
+        del record["exclusive"]
+        record["outputs"][0]["absent"] = True
+
+        for input_factor in record["inputs"]:
+            new_record = record.copy()
+            new_input = input_factor.copy()
+            new_input["absent"] = not new_input.get("absent")
+            new_record["inputs"] = [new_input]
+            for new_tuple in Rule.from_dict(
+                record=new_record, mentioned=mentioned, regime=regime
+            ):
+                yield new_tuple
+
+    @classmethod
+    def from_dict(
+        cls, record: Dict, mentioned: List[Factor], regime: Optional[Regime] = None
+    ) -> Iterator[Tuple[Rule, List[Factor]]]:
+        """
+        Make :class:`Rule` from a :class:`dict` of strings and a list of mentioned :class:`.Factor`\s.
+
+        :param record:
+            a :class:`dict` derived from the JSON format that
+            lists ``mentioned_entities`` followed by a
+            series of :class:`Rule`\s. Only one of the :class:`Rule`\s
+            will by covered by this :class:`dict`.
+
+        :param mentioned:
+            a series of context factors, including any generic
+            :class:`.Factor`\s that need to be mentioned in
+            :class:`.Predicate`\s. These will have been constructed
+            from the ``mentioned_entities`` section of the input
+            JSON.
+
+        :param regime:
+
+        :returns:
+            iterator yielding :class:`Rule`\s with the items
             from ``mentioned_entities`` as ``context_factors``
         """
 
@@ -246,48 +313,6 @@ class Rule(Factor):
                 )
                 factors_or_enactments.append(created)
             return tuple(factors_or_enactments), mentioned
-
-        if record.get("exclusive") is True:
-            if len(record["outputs"]) > 1:
-                raise ValueError(
-                    "The 'exclusive' attribute is not allowed for Rules "
-                    + "with more than one 'output' Factor. If the set of Factors "
-                    + "in 'inputs' is really the only way to reach any of the "
-                    + "'outputs', consider making a separate 'exclusive' entry "
-                    + "for each output."
-                )
-            if record["outputs"][0].get("absent") is True:
-                raise ValueError(
-                    "The 'exclusive' attribute is not allowed for Rules "
-                    + "with an 'absent' 'output' Factor. This would indicate "
-                    + "that the output can or must be present in every litigation "
-                    + "unless specified inputs are present, which is unlikely."
-                )
-            if record.get("rule_valid") is False:
-                raise NotImplementedError(
-                    "The ability to state that it is not 'valid' to assert "
-                    + "that a Rule is the 'exclusive' way to reach an output is "
-                    + "not implemented, so 'rule_valid' cannot be False while "
-                    + "'exclusive' is True. Try expressing this in another way "
-                    + "without the 'exclusive' keyword."
-                )
-            partial_new_record = record.copy()
-            partial_new_record["mandatory"] = not partial_new_record.get("mandatory")
-            partial_new_record["universal"] = not partial_new_record.get("universal")
-            partial_new_record["exclusive"] = False
-            new_output = partial_new_record.get("outputs")[0].copy()
-            new_output["absent"] = True
-            partial_new_record["outputs"] = [new_output]
-
-            for input_factor in record["inputs"]:
-                new_record = partial_new_record.copy()
-                new_input = input_factor.copy()
-                new_input["absent"] = not new_input.get("absent")
-                new_record["inputs"] = [new_input]
-                for new_tuple in Rule.from_dict(
-                    record=new_record, mentioned=mentioned, regime=regime
-                ):
-                    yield new_tuple
 
         factor_groups: Dict[str, List] = {"inputs": [], "outputs": [], "despite": []}
         for factor_type in factor_groups:
@@ -318,6 +343,10 @@ class Rule(Factor):
             ),
             mentioned,
         )
+
+        if record.get("exclusive") is True:
+            for response in Rule.contrapositive_from_dict(record, mentioned, regime):
+                yield response
 
     @property
     def context_factors(self) -> Tuple:

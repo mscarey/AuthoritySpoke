@@ -27,6 +27,17 @@ class TestIntroduction:
         assert lotus_majority.holdings[0] != nosferatu_rule
         assert lotus_majority.holdings[0].means(nosferatu_rule)
 
+    def test_inferred_holdings_after_exclusive_holding(self, make_opinion_with_holding):
+        """
+        Test that when a holding is marked "exclusive" in the JSON input,
+        that holding is added first to the Opinion's set of holdings, and
+        any other inferred holdings, about the absence of the output from
+        the original holding, are added later.
+        """
+        lotus_majority = make_opinion_with_holding["lotus_majority"]
+        assert lotus_majority.holdings[0].outputs[0].absent is False
+        assert lotus_majority.holdings[1].outputs[0].absent is True
+
     def test_evolve_rule_replacing_enactment(
         self, make_regime, make_opinion_with_holding
     ):
