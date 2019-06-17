@@ -13,6 +13,7 @@ pint = ">=0.9"
 requests = "*"
 authorityspoke = {path = ".",editable = true}
 ipykernel = "*"
+pylint = "*"
 
 [dev-packages]
 black = "*"

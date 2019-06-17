@@ -12,7 +12,7 @@ import operator
 import pathlib
 
 from typing import ClassVar, Dict, Iterable, List, Sequence, Tuple
-from typing import Optional, Union
+from typing import Iterator, Optional, Union
 
 from dataclasses import dataclass
 
@@ -148,9 +148,19 @@ class Rule(Factor):
 
         finished_rules: List[Rule] = []
         for rule in case.get("holdings"):
-            # This will need to change for Attribution holdings
-            finished_rule, mentioned = Rule.from_dict(rule, mentioned, regime=regime)
-            finished_rules.append(finished_rule)
+
+            # This basic formatting could be moved elsewhere, but
+            # it's needed before generating multiple rules based
+            # on the "exclusive" flag in the JSON.
+            for category in ("inputs", "despite", "outputs"):
+                if isinstance(rule.get(category), dict):
+                    rule[category] = [rule[category]]
+
+            for finished_rule, new_mentioned in Rule.from_dict(
+                rule, mentioned, regime=regime
+            ):
+                finished_rules.append(finished_rule)
+                mentioned = new_mentioned
         return finished_rules
 
     @classmethod
@@ -189,8 +199,8 @@ class Rule(Factor):
 
     @classmethod
     def from_dict(
-        cls, record: Dict, mentioned: List[Factor], regime: Optional["Regime"] = None
-    ) -> Tuple[Rule, List[Factor]]:
+        cls, record: Dict, mentioned: List[Factor], regime: Optional[Regime] = None
+    ) -> Iterator[Tuple[Rule, List[Factor]]]:
         """
         Make :class:`Rule` from a :py:class:`dict` of strings and a list of mentioned :class:`.Factor`\s.
 
@@ -216,7 +226,7 @@ class Rule(Factor):
             record_list: Union[Dict[str, str], List[Dict[str, str]]],
             mentioned: List[Factor],
             class_to_create,
-            regime: Optional["Regime"] = None,
+            regime: Optional[Regime] = None,
         ) -> Tuple[Union[Factor, Enactment]]:
             factors_or_enactments: List[Union[Factor, Enactment]] = []
             if not isinstance(record_list, list):
@@ -227,6 +237,48 @@ class Rule(Factor):
                 )
                 factors_or_enactments.append(created)
             return tuple(factors_or_enactments), mentioned
+
+        if record.get("exclusive") is True:
+            if len(record["outputs"]) > 1:
+                raise ValueError(
+                    "The 'exclusive' attribute is not allowed for Rules "
+                    + "with more than one 'output' Factor. If the set of Factors "
+                    + "in 'inputs' is really the only way to reach any of the "
+                    + "'outputs', consider making a separate 'exclusive' entry "
+                    + "for each output."
+                )
+            if record["outputs"][0].get("absent") is True:
+                raise ValueError(
+                    "The 'exclusive' attribute is not allowed for Rules "
+                    + "with an 'absent' 'output' Factor. This would indicate "
+                    + "that the output can or must be present in every litigation "
+                    + "unless specified inputs are present, which is unlikely."
+                )
+            if record.get("rule_valid") is False:
+                raise NotImplementedError(
+                    "The ability to state that it is not 'valid' to assert "
+                    + "that a Rule is the 'exclusive' way to reach an output is "
+                    + "not implemented, so 'rule_valid' cannot be False while "
+                    + "'exclusive' is True. Try expressing this in another way "
+                    + "without the 'exclusive' keyword."
+                )
+            partial_new_record = record.copy()
+            partial_new_record["mandatory"] = not partial_new_record.get("mandatory")
+            partial_new_record["universal"] = not partial_new_record.get("universal")
+            partial_new_record["exclusive"] = False
+            new_output = partial_new_record.get("outputs")[0]
+            new_output["absent"] = True
+            partial_new_record["outputs"] = [new_output]
+
+            for input_factor in record["inputs"]:
+                new_record = partial_new_record.copy()
+                new_input = input_factor.copy()
+                new_input["absent"] = not new_input.get("absent")
+                new_record["inputs"] = [new_input]
+                for new_tuple in Rule.from_dict(
+                    record=new_record, mentioned=mentioned, regime=regime
+                ):
+                    yield new_tuple
 
         factor_groups: Dict[str, List] = {"inputs": [], "outputs": [], "despite": []}
         for factor_type in factor_groups:
@@ -245,7 +297,7 @@ class Rule(Factor):
             despite=factor_groups["despite"],
         )
 
-        return (
+        yield (
             Rule(
                 procedure=procedure,
                 enactments=enactment_groups["enactments"],
