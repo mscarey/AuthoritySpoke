@@ -206,7 +206,7 @@ class Predicate:
         self, other: Predicate, ignore_plural: bool = True
     ) -> bool:
         """
-        Test if :param:`~Predicate.content` strings of ``self`` and ``other`` have same meaning.
+        Test if :attr:`~Predicate.content` strings of ``self`` and ``other`` have same meaning.
 
         This currently has a very brittle solution that should be
         replaced, especially if spaCy can be used here. It assumes
@@ -215,17 +215,17 @@ class Predicate:
         that such differences can always just be ignored. (Unless
         ``ignore_plural`` is set to ``False``, which it never is.)
 
-        :other:
+        :param other:
             another :class:`Predicate` being compared to ``self``
 
-        :ignore_plural:
+        :param ignore_plural:
             whether the text of ``self`` and ``other`` should be reformatted
             before comparing them, to try to eliminate any differences caused
             by one using a plural :class:`.Entity` whether the other uses a
             singular one.
 
         :returns:
-            whether ``self`` and ``other`` have ``content`` strings
+            whether ``self`` and ``other`` have :attr:`~Predicate.content` strings
             similar enough to be considered to have the same meaning.
         """
         if self.content.lower() == other.content.lower():
