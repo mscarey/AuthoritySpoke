@@ -264,12 +264,33 @@ class TestRuleImport:
         with pytest.raises(ValueError):
             Rule.collection_from_dict(rule_dict)
 
-    def test_holding_from_exclusive(self, make_opinion_with_holding):
+    def test_holding_flagged_exclusive(self, make_opinion_with_holding):
+        """
+        Test that "exclusive" flag doesn't mess up the holding where it's placed.
+
+        Test whether the Feist opinion object includes a holding
+        with the output "Rural's telephone directory
+        was copyrightable" and the input "Rural's telephone
+        directory was original", when that holding was marked
+        "exclusive" in the JSON.
+        """
+
+        directory = Entity("Rural's telephone directory")
+        original = Fact(Predicate("{} was original"), directory)
+        copyrightable = Fact(Predicate("{} was copyrightable"), directory)
+        originality_procedure = Procedure(outputs=copyrightable, inputs=original)
+        originality_rule = Rule(originality_procedure, mandatory=False, universal=False)
+        assert any(
+            feist_rule.means(originality_rule)
+            for feist_rule in make_opinion_with_holding["feist_majority"].holdings
+        )
+
+    def test_holding_inferred_from_exclusive(self, make_opinion_with_holding):
         """
         Test whether the Feist opinion object includes a holding
         that was inferred from an entry in the JSON saying that the
         "exclusive" way to reach the output "Rural's telephone directory
-        was  copyrightable" is to have the input "Rural's telephone
+        was copyrightable" is to have the input "Rural's telephone
         directory was original".
 
         The inferred holding says that in the absence of the input
@@ -282,12 +303,14 @@ class TestRuleImport:
         not_copyrightable = Fact(
             Predicate("{} was copyrightable"), directory, absent=True
         )
-        originality_procedure = Procedure(
+        no_originality_procedure = Procedure(
             outputs=not_copyrightable, inputs=not_original
         )
-        originality_rule = Rule(originality_procedure, mandatory=True, universal=True)
+        no_originality_rule = Rule(
+            no_originality_procedure, mandatory=True, universal=True
+        )
         assert any(
-            feist_rule.means(originality_rule)
+            feist_rule.means(no_originality_rule)
             for feist_rule in make_opinion_with_holding["feist_majority"].holdings
         )
 

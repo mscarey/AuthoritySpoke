@@ -40,35 +40,8 @@
                 "path": "/us/usc/t17/s102/a",
                 "suffix": "Works of authorship include",
                 "name": "copyright protection"
-            }]
-        },
-        {
-            "inputs": [{
-                "type": "fact",
-                "content": "the Lotus menu command hierarchy was copyrightable",
-                "absent": true
             }],
-            "outputs": [{
-                "type": "fact",
-                "content": "Borland International infringed the copyright in the Lotus menu command hierarchy",
-                "absent": true
-            }],
-            "universal": true,
-            "enactments": ["copyright protection"]
-        },
-        {
-            "inputs": [{
-                "type": "fact",
-                "content": "Borland International copied constituent elements of the Lotus menu command hierarchy that were original",
-                "absent": true
-            }],
-            "outputs": [{
-                "type": "fact",
-                "content": "Borland International infringed the copyright in the Lotus menu command hierarchy",
-                "absent": true
-            }],
-            "universal": true,
-            "enactments": ["copyright protection"]
+            "exclusive": true
         },
         {
             "inputs": [{

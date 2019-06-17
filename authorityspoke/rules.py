@@ -275,7 +275,7 @@ class Rule(Factor):
             partial_new_record["mandatory"] = not partial_new_record.get("mandatory")
             partial_new_record["universal"] = not partial_new_record.get("universal")
             partial_new_record["exclusive"] = False
-            new_output = partial_new_record.get("outputs")[0]
+            new_output = partial_new_record.get("outputs")[0].copy()
             new_output["absent"] = True
             partial_new_record["outputs"] = [new_output]
 
