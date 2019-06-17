@@ -12,6 +12,7 @@
 
 black
 coveralls
+ipykernel
 mypy
 pipenv-to-requirements
 pydocstyle
@@ -25,4 +26,3 @@ sphinx
 sphinx-autodoc-typehints
 twine
 wheel
-wily

@@ -171,14 +171,14 @@ class Rule(Factor):
         regime: Optional[Regime] = None,
     ) -> List[Rule]:
         """
-        Load a list of ``Rule``\s from JSON.
+        Load a list of :class:`Rule`\s from JSON.
 
         Does not cause an :class:`.Opinion` to :meth:`~.Opinion.posit`
-        the ``Rule``\s as holdings.
+        the :class:`Rule`\s as holdings.
 
         :param filename:
             the name of the JSON file to look in for :class:`Rule`
-            data in the format that lists ``mentioned_entities``
+            data in the format that lists ``mentioned_factors``
             followed by a list of holdings
 
         :param directory:
@@ -202,7 +202,16 @@ class Rule(Factor):
         cls, record: Dict, mentioned: List[Factor], regime: Optional[Regime] = None
     ) -> Iterator[Tuple[Rule, List[Factor]]]:
         """
-        Make :class:`Rule` from a :py:class:`dict` of strings and a list of mentioned :class:`.Factor`\s.
+        Make :class:`Rule` from a :class:`dict` of strings and a list of mentioned :class:`.Factor`\s.
+
+        If ``record`` contains the entry ``"exclusive": True``, that means
+        the specified ``inputs`` are the only way to reach the specified output.
+        (Multiple ``outputs`` are not allowed when the ``exclusive`` flag is ``True``.)
+        When that happens, it can be inferred that in the absence of any of the inputs,
+        the output must also be absent. So, this function will call more instances of
+        itself (one for each input) to create more :class:`Rule`\s containing that
+        information. None of the completed :class:`Rule` objects will contain an
+        ``exclusive`` flag.
 
         :param record:
             a :class:`dict` derived from the JSON format that

@@ -11,11 +11,11 @@ from dataclasses import dataclass
 
 from bs4 import BeautifulSoup
 
-from utils import roman
+from utils.cache import lazyprop
+from utils.roman import from_roman
 
 from authorityspoke.context import log_mentioned_context, get_directory_path
 from authorityspoke.selectors import TextQuoteSelector
-from utils.cache import lazyprop
 
 
 class Code:
@@ -205,7 +205,7 @@ class Code:
             if "amendment" not in cite.lower():
                 return datetime.date(1788, 9, 13)
             roman_numeral = cite.split("-")[1]
-            amendment_number = roman.from_roman(roman_numeral)
+            amendment_number = from_roman(roman_numeral)
             if amendment_number < 11:
                 return datetime.date(1791, 12, 15)
             section = self.xml.find(id=cite)

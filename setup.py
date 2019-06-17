@@ -15,8 +15,8 @@ setuptools.setup(
     packages=setuptools.find_packages(
         exclude=["tests", "*.tests", "*.tests.*", "tests.*"]
     ),
-    install_requires=["beautifulsoup4", "lxml", "pint", "requests", "ipykernel"],
-    extras_require={"jupyter notebooks": "jupyter"},
+    install_requires=["beautifulsoup4", "lxml", "pint", "requests"],
+    extras_require={"jupyter notebooks": ["jupyter", "ipykernel"]},
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Intended Audience :: Legal Industry",
