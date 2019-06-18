@@ -83,8 +83,15 @@ class TestRules:
         assert len(cardenas_holdings[1].outputs) == 1
         assert len(cardenas_holdings[1].despite) == 1
 
-    # Same Meaning
+    def test_single_enactment_converted_to_tuple(self, make_holding):
+        assert isinstance(make_holding["h2"].enactments, tuple)
 
+    def test_holding_len(self, make_holding):
+        assert len(make_holding["h1"]) == 2
+        assert len(make_holding["h3"]) == 5
+
+
+class TestSameMeaning:
     def test_identical_holdings_equal(self, make_holding):
         assert make_holding["h1"].means(make_holding["h1_again"])
 
@@ -103,8 +110,11 @@ class TestRules:
     def test_holdings_differing_in_entity_order_equal(self, make_holding):
         assert make_holding["h1"].means(make_holding["h1_entity_order"])
 
-    # Implication
+    def test_holdings_citing_different_enactment_text_unequal(self, make_holding):
+        assert make_holding["h2"] != make_holding["h2_fourth_a_cite"]
 
+
+class TestImplication:
     def test_holdings_more_inputs_implies_fewer(self, make_holding):
         assert make_holding["h1"] > make_holding["h1_easy"]
         assert make_holding["h2_irrelevant_inputs"] > make_holding["h2"]
@@ -221,8 +231,39 @@ class TestRules:
         with pytest.raises(TypeError):
             make_holding["h2_undecided"] >= make_procedure["c2"]
 
-    # Contradiction
+    def test_implication_with_evidence(self, make_holding):
+        assert make_holding["h3"] > make_holding["h3_fewer_inputs"]
 
+    def test_holding_based_on_less_text_implies_more(self, make_holding):
+        """The implied holding is based on enactment text that is a superset
+        of the implying holding's enactment text."""
+        assert make_holding["h2"] > make_holding["h2_fourth_a_cite"]
+
+    def test_holding_with_enactment_cite_does_not_imply_without(self, make_holding):
+        """Just because an outcome is required by enactment text doesn't mean
+        the court would require it pursuant to its common law power to make laws."""
+        assert not make_holding["h2"] >= make_holding["h2_without_cite"]
+
+    def test_implication_common_law_and_constitutional(self, make_holding):
+        """When a court asserts a holding as valid without legislative support,
+        the court is actually making a broader statement than it would be making
+        if it cited legislative support. The holding without legislative support
+        doesn't depend for its validity on the enactment remaining in effect without
+        being repealed.
+
+        The relative priority of the holdings is a different
+        matter. Statutory holdings trump common law holdings, and constitutional
+        trumps statutory."""
+        assert make_holding["h2"] <= make_holding["h2_without_cite"]
+
+    def test_no_implication_of_holding_with_added_despite_enactment(self, make_holding):
+        assert not make_holding["h2"] >= make_holding["h2_despite_due_process"]
+
+    def test_implication_of_holding_with_removed_despite_enactment(self, make_holding):
+        assert make_holding["h2_despite_due_process"] >= make_holding["h2"]
+
+
+class TestContradiction:
     def test_error_contradiction_with_procedure(self, make_holding, make_procedure):
         with pytest.raises(TypeError):
             make_holding["h2_undecided"].contradicts(make_procedure["c2"])
@@ -567,41 +608,20 @@ class TestRules:
             make_holding["h2_irrelevant_inputs_undecided"]
         )
 
-    # Enactments cited in Rules
+    def test_contradiction_with_evidence(self, make_holding):
+        assert make_holding["h3_ALL_undecided"].contradicts(
+            make_holding["h3_fewer_inputs_ALL"]
+        )
 
-    def test_single_enactment_converted_to_frozenset(self, make_holding):
-        assert isinstance(make_holding["h2"].enactments, tuple)
+    def test_no_contradiction_same_undecided_holding(self, make_holding):
+        assert not make_holding["h3_ALL_undecided"].contradicts(
+            make_holding["h3_ALL_undecided"]
+        )
 
-    def test_holdings_citing_different_enactment_text_unequal(self, make_holding):
-        assert make_holding["h2"] != make_holding["h2_fourth_a_cite"]
-
-    def test_holding_based_on_less_text_implies_more(self, make_holding):
-        """The implied holding is based on enactment text that is a superset
-        of the implying holding's enactment text."""
-        assert make_holding["h2"] > make_holding["h2_fourth_a_cite"]
-
-    def test_holding_with_enactment_cite_does_not_imply_without(self, make_holding):
-        """Just because an outcome is required by enactment text doesn't mean
-        the court would require it pursuant to its common law power to make laws."""
-        assert not make_holding["h2"] >= make_holding["h2_without_cite"]
-
-    def test_implication_common_law_and_constitutional(self, make_holding):
-        """When a court asserts a holding as valid without legislative support,
-        the court is actually making a broader statement than it would be making
-        if it cited legislative support. The holding without legislative support
-        doesn't depend for its validity on the enactment remaining in effect without
-        being repealed.
-
-        The relative priority of the holdings is a different
-        matter. Statutory holdings trump common law holdings, and constitutional
-        trumps statutory."""
-        assert make_holding["h2"] <= make_holding["h2_without_cite"]
-
-    def test_no_implication_of_holding_with_added_despite_enactment(self, make_holding):
-        assert not make_holding["h2"] >= make_holding["h2_despite_due_process"]
-
-    def test_implication_of_holding_with_removed_despite_enactment(self, make_holding):
-        assert make_holding["h2_despite_due_process"] >= make_holding["h2"]
+    def test_no_contradiction_holding_with_evidence(self, make_holding):
+        assert not make_holding["h3_fewer_inputs_ALL_undecided"].contradicts(
+            make_holding["h3_ALL"]
+        )
 
     def test_no_contradiction_when_added_enactment_makes_rule_valid(self, make_holding):
         assert not make_holding["h2_ALL_due_process"].contradicts(
@@ -618,24 +638,68 @@ class TestRules:
             make_holding["h2_ALL"]
         )
 
-    def test_implication_with_evidence(self, make_holding):
-        assert make_holding["h3"] > make_holding["h3_fewer_inputs"]
 
-    def test_contradiction_with_evidence(self, make_holding):
-        assert make_holding["h3_ALL_undecided"].contradicts(
-            make_holding["h3_fewer_inputs_ALL"]
+class TestAddition:
+    def test_add_simple_rules(self):
+        """
+        A simple form of two Rules from Feist, with no Enactments.
+
+        Even though the rules have different generic Factors (i.e. Entities),
+        the __add__ function will make one Rule using the generic Factors from
+        the operand on the left, but will give it the output from the operand
+        on the right.
+        """
+        context = Entity("the Pythagorean theorem")
+        three = Entity("the number three")
+
+        fact_not_original = Rule(
+            Procedure(
+                inputs=Fact(Predicate("{} is a fact"), context_factors=context),
+                outputs=Fact(
+                    Predicate("{} is original", truth=False), context_factors=context
+                )
+            ),
+            universal=True,
+        )
+        unoriginal_not_copyrightable = Rule(
+            Procedure(
+                inputs=Fact(
+                    Predicate("{} is original", truth=False), context_factors=three
+                ),
+                outputs=Fact(
+                    Predicate("{} is copyrightable", truth=False),
+                    context_factors=three,
+                ),
+            ),
+            universal=True,
         )
 
-    def test_no_contradiction_same_undecided_holding(self, make_holding):
-        assert not make_holding["h3_ALL_undecided"].contradicts(
-            make_holding["h3_ALL_undecided"]
-        )
+        facts_not_copyrightable = fact_not_original + unoriginal_not_copyrightable
+        assert len(facts_not_copyrightable.inputs) == 1
+        assert str(facts_not_copyrightable.inputs[0]) == (
+            "fact <the Pythagorean theorem> is a fact")
+        assert len(facts_not_copyrightable.outputs) == 2
+        assert str(facts_not_copyrightable.outputs[1]) == (
+            "fact it is false that <the Pythagorean theorem> is copyrightable")
 
-    def test_no_contradiction_holding_with_evidence(self, make_holding):
-        assert not make_holding["h3_fewer_inputs_ALL_undecided"].contradicts(
-            make_holding["h3_ALL"]
-        )
+    def test_add_inferred_rule(self, make_opinion_with_holding):
+        """
+        test implication between
+        telephone listings -> not original (feist.holdings[11])
+        +
+        not original -> not copyrightable (feist.holdings[3])
+        =
+        telephone listings -> not copyrightable
 
-    def test_holding_len(self, make_holding):
-        assert len(make_holding["h1"]) == 2
-        assert len(make_holding["h3"]) == 5
+        BUG: "not original -> not copyrightable" should be labeled
+        as "universal, but it's not
+        """
+        feist = make_opinion_with_holding["feist_majority"]
+        listings_not_original = feist.holdings[11]
+        unoriginal_not_copyrightable = feist.holdings[3]
+        listings_not_copyrightable = (
+            listings_not_original + unoriginal_not_copyrightable
+        )
+        assert len(listings_not_copyrightable.inputs) == 1
+        assert str(listings_not_copyrightable.inputs[0]) == "TKTK"
+        assert any(str(out) == "TKTK" for out in listings_not_copyrightable.outputs)

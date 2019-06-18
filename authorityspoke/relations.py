@@ -153,3 +153,26 @@ class Analogy:
             for answer in self.unordered_comparison(matches=matches):
                 new_matchlist.append(answer)
         return new_matchlist
+
+
+def all_analogy_matches(
+    relations: Tuple[Analogy, ...]
+) -> List[Dict[Factor, Optional[Factor]]]:
+    """
+    Find all context registers consistent with multiple :class:`.Analogy` comparisons.
+
+    :param relations:
+        a series of :class:`.Analogy` comparisons in which
+        the ``need_matches`` :class:`.Factor`\s all refer to
+        one context (for instance, the same :class:`.Opinion`),
+        and the ``available`` :class:`.Factor`\s all refer to
+        another context.
+
+    :returns:
+        a list of all context registers consistent with all of the
+        :class:`.Analogy`\s.
+    """
+    matchlist = [{}]
+    for relation in relations:
+        matchlist = relation.update_matchlist(matchlist)
+    return matchlist

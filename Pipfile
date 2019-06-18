@@ -30,6 +30,7 @@ setuptools = "*"
 wheel = "*"
 twine = "*"
 ipykernel = "*"
+doc8 = "*"
 
 [requires]
 python_version = "3.7.3"

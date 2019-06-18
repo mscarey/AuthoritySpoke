@@ -107,6 +107,54 @@ class Rule(Factor):
             if isinstance(value, Enactment):
                 object.__setattr__(self, attr, self._wrap_with_tuple(value))
 
+    def __add__(self, other) -> Optional[Rule]:
+        """
+        Create new :class:`Rule` if ``self`` can satisfy the :attr:`inputs` of ``other``
+
+        If both ``self`` and ``other`` have False for :attr:`universal`,
+        or if either has ``False`` for :attr:`rule_valid'\,
+        then returns ``None``. Otherwise:
+
+        If the union of the :attr:`inputs` and :attr:`outputs` of ``self``
+        would trigger ``other``, then return a new version of ``self``
+        with the output :class:`.Factor`\s of ``other`` as well as the
+        outputs of ``self``.
+
+        The new ``universal`` and ``mandatory`` values are the
+        lesser of the old values for each.
+
+        Don't test whether ``self`` could be triggered by the outputs
+        of other. Let user do ``other + self`` for that.
+
+        :param other:
+            another :class:`Rule` to try to add to ``self``
+
+        :returns:
+            a combined :class:`Rule` that extends the procedural
+            move made in ``self``, if possible. Otherwise ``None``.
+        """
+        if not isinstance(other, Rule):
+            raise TypeError
+        if self.rule_valid is False or other.rule_valid is False:
+            return None
+        if self.universal is False and other.universal is False:
+            return None
+
+        if not other.needs_subset_of_enactments(self):
+            return None
+
+        matchlist = self.procedure.triggers_next_procedure(other.procedure)
+        if matchlist:
+            # Arbitrarily choosing the first match to decide what
+            # generic Factors appear in the new outputs.
+            # Wouldn't it have been better to get just one match with a generator?
+            triggered_rule = other.new_context(matchlist[0])
+            new_procedure = self.procedure.evolve(
+                {"outputs": (*self.outputs, *triggered_rule.outputs)}
+            )
+            return self.evolve({"procedure": new_procedure})
+        return None
+
     @classmethod
     def collection_from_dict(
         cls,
@@ -534,6 +582,28 @@ class Rule(Factor):
 
         return self._contradicts_if_valid(other)
 
+    def needs_subset_of_enactments(self, other) -> bool:
+        """
+        Test whether ``self``\'s :class:`.Enactment` support is a subset of ``other``\'s.
+
+        A :class:`Rule` makes a more powerful statement if it relies on
+        fewer :class:`.Enactment`\s (or applies despite more :class:`.Enactment`\s).
+
+        So this method must return ``True`` for ``self`` to imply ``other``.
+        """
+
+        if not all(
+            any(other_e >= e for other_e in other.enactments) for e in self.enactments
+        ):
+            return False
+
+        if not all(
+            any(e >= other_d for e in (self.enactments + self.enactments_despite))
+            for other_d in other.enactments_despite
+        ):
+            return False
+        return True
+
     def _implies_if_valid(self, other) -> bool:
         """
         Test if ``self`` implies ``other`` if they're valid and decided.
@@ -547,15 +617,7 @@ class Rule(Factor):
             ``rule_valid`` and ``decided`` are ``True`` for both of them.
         """
 
-        if not all(
-            any(other_e >= e for other_e in other.enactments) for e in self.enactments
-        ):
-            return False
-
-        if not all(
-            any(e >= other_d for e in (self.enactments + self.enactments_despite))
-            for other_d in other.enactments_despite
-        ):
+        if not self.needs_subset_of_enactments(other):
             return False
 
         if other.mandatory > self.mandatory:

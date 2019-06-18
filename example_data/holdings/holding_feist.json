@@ -211,10 +211,9 @@
             },
             "outputs": {
                 "type": "fact",
-                "content": "Rural's telephone directory was copyrightable"
-            },
-            "universal": true,
-            "rule_valid": false
+                "content": "Rural's telephone directory was copyrightable",
+                "truth": false
+            }
         },
         {
             "inputs": {

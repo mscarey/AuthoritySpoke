@@ -14,7 +14,7 @@ from typing import Optional, Union
 from dataclasses import dataclass
 
 from authorityspoke.factors import Factor, means, new_context_helper
-from authorityspoke.relations import Analogy
+from authorityspoke.relations import Analogy, all_analogy_matches
 
 
 @dataclass(frozen=True)
@@ -264,7 +264,7 @@ class Procedure(Factor):
         # For self to contradict other, every input of other
         # must be implied by some input or despite factor of self.
         relations = (Analogy(other.inputs, self_despite_or_input, operator.le),)
-        matchlist = self._all_relation_matches(relations)
+        matchlist = all_analogy_matches(relations)
 
         # For self to contradict other, some output of other
         # must be contradicted by some output of self.
@@ -298,7 +298,7 @@ class Procedure(Factor):
             Analogy(other.outputs, self.outputs, operator.le),
             Analogy(self.inputs, other.inputs, operator.le),
         )
-        matchlist = self._all_relation_matches(relations)
+        matchlist = all_analogy_matches(relations)
 
         # For every factor in other, find the permutations of entity slots
         # that are consistent with matchlist and that don't cause the factor
@@ -352,7 +352,7 @@ class Procedure(Factor):
             Analogy(other.despite, self_despite_or_input, operator.le),
         )
 
-        matchlist = self._all_relation_matches(relations)
+        matchlist = all_analogy_matches(relations)
 
         return any(
             self.consistent_factor_groups(self.inputs, other_despite_or_input, matches)
@@ -389,7 +389,7 @@ class Procedure(Factor):
             Analogy(other.despite, despite_or_input, operator.le),
         )
 
-        return bool(self._all_relation_matches(relations))
+        return bool(all_analogy_matches(relations))
 
     def means(self, other) -> bool:
         """
@@ -449,25 +449,29 @@ class Procedure(Factor):
             )
         return self.__class__(**new_dict)
 
-    @staticmethod
-    def _all_relation_matches(
-        relations: Tuple[Analogy, ...]
-    ) -> List[Dict[Factor, Optional[Factor]]]:
+    def triggers_next_procedure(self, other: Procedure) -> List[Dict[Factor, Factor]]:
         """
-        Find all context registers consistent with multiple :class:`.Analogy`\s.
+        Test if :class:`.Factor`\s from firing ``self`` would trigger ``other``.
 
-        :param relations:
-            a series of :class:`.Analogy` comparisons in which
-            the ``need_matches`` :class:`.Factor`\s all refer to
-            one context (for instance, the same :class:`.Opinion`),
-            and the ``available`` :class:`.Factor`\s all refer to
-            another context.
+        .. Note::
+            To be confident that ``self`` actually can trigger ``other``,
+            we would have to assume that ``other`` has ``universal: True``
+            since otherwise we don't know exactly what is required to
+            trigger ``other``.
+
+        :param other:
+            another :class:`Procedure` to test to see whether it can
+            be triggered by triggering ``self``
 
         :returns:
-            a list of all context registers consistent with all of the
-            :class:`.Analogy`\s.
+            whether the set of :class:`Factor`\s that exist after ``self``
+            is fired could trigger ``other``
         """
-        matchlist = [{}]
-        for relation in relations:
-            matchlist = relation.update_matchlist(matchlist)
-        return matchlist
+        self_despite_or_input = (*self.despite, *self.inputs)
+        self_output_or_input = (*self.outputs, *self.inputs)
+
+        relations = (
+            Analogy(other.inputs, self_output_or_input, operator.le),
+            Analogy(other.despite, self_despite_or_input, operator.le),
+        )
+        return all_analogy_matches(relations)
