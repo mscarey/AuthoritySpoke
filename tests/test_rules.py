@@ -657,7 +657,7 @@ class TestAddition:
                 inputs=Fact(Predicate("{} is a fact"), context_factors=context),
                 outputs=Fact(
                     Predicate("{} is original", truth=False), context_factors=context
-                )
+                ),
             ),
             universal=True,
         )
@@ -667,8 +667,7 @@ class TestAddition:
                     Predicate("{} is original", truth=False), context_factors=three
                 ),
                 outputs=Fact(
-                    Predicate("{} is copyrightable", truth=False),
-                    context_factors=three,
+                    Predicate("{} is copyrightable", truth=False), context_factors=three
                 ),
             ),
             universal=True,
@@ -677,10 +676,12 @@ class TestAddition:
         facts_not_copyrightable = fact_not_original + unoriginal_not_copyrightable
         assert len(facts_not_copyrightable.inputs) == 1
         assert str(facts_not_copyrightable.inputs[0]) == (
-            "fact <the Pythagorean theorem> is a fact")
+            "fact <the Pythagorean theorem> is a fact"
+        )
         assert len(facts_not_copyrightable.outputs) == 2
         assert str(facts_not_copyrightable.outputs[1]) == (
-            "fact it is false that <the Pythagorean theorem> is copyrightable")
+            "fact it is false that <the Pythagorean theorem> is copyrightable"
+        )
 
     def test_add_inferred_rule(self, make_opinion_with_holding):
         """
@@ -691,15 +692,21 @@ class TestAddition:
         =
         telephone listings -> not copyrightable
 
-        BUG: "not original -> not copyrightable" should be labeled
-        as "universal, but it's not
         """
         feist = make_opinion_with_holding["feist_majority"]
         listings_not_original = feist.holdings[11]
-        unoriginal_not_copyrightable = feist.holdings[3]
+        unoriginal_not_copyrightable = feist.holdings[4]
         listings_not_copyrightable = (
             listings_not_original + unoriginal_not_copyrightable
         )
         assert len(listings_not_copyrightable.inputs) == 1
-        assert str(listings_not_copyrightable.inputs[0]) == "TKTK"
-        assert any(str(out) == "TKTK" for out in listings_not_copyrightable.outputs)
+        assert str(listings_not_copyrightable.inputs[0]) == (
+            "fact <Rural's telephone listings> were names, towns, "
+            + "and telephone numbers of telephone subscribers"
+        )
+        assert any(
+            str(out) == "absence of fact <Rural's telephone listings> were copyrightable"
+            for out in listings_not_copyrightable.outputs
+        )
+
+    # Add tests that consider differences in Enactments

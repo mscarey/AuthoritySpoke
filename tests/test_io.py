@@ -309,10 +309,8 @@ class TestRuleImport:
         no_originality_rule = Rule(
             no_originality_procedure, mandatory=True, universal=True
         )
-        assert any(
-            feist_rule.means(no_originality_rule)
-            for feist_rule in make_opinion_with_holding["feist_majority"].holdings
-        )
+        feist = make_opinion_with_holding["feist_majority"]
+        assert feist.holdings[4].means(no_originality_rule)
 
     def test_exclusive_results_in_more_holdings(self, make_opinion_with_holding):
         """

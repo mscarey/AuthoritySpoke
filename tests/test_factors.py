@@ -480,6 +480,16 @@ class TestFacts:
     def test_no_contradiction_of_None(self, watt_factor):
         assert not watt_factor["f1"].contradicts(None)
 
+    def test_contradicts_if_present_both_present(self, watt_factor):
+        """
+        Test a helper function that checks whether there would
+        be a contradiction if neither Factor was "absent".
+        """
+        assert watt_factor["f2"]._contradicts_if_present(watt_factor["f2_false"])
+
+    def test_contradicts_if_present_one_absent(self, watt_factor):
+        assert watt_factor["f2"]._contradicts_if_present(watt_factor["f2_false_absent"])
+
     # Consistency with Entity/Factor assignments
 
     def test_copy_with_foreign_context(self, watt_mentioned, watt_factor):

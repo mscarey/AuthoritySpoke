@@ -231,6 +231,7 @@ def watt_factor(make_predicate, make_entity, watt_mentioned) -> Dict[str, Factor
         "f2_entity_order": Fact(p["p2"], case_factors=c),
         "f2_no_truth": Fact(p["p2_no_truth"], (1, 0), case_factors=c),
         "f2_false": Fact(p["p2_false"], case_factors=c),
+        "f2_false_absent": Fact(p["p2_false"], absent=True, case_factors=c),
         "f2_reciprocal": Fact(p["p2_reciprocal"], case_factors=c),
         "f2_generic": Fact(p["p2"], generic=True, case_factors=c),
         "f2_false_generic": Fact(p["p2_false"], generic=True, case_factors=c),

@@ -208,6 +208,14 @@ class Factor(ABC):
         context_registers = iter(self._context_registers(other, comparison))
         return any(register is not None for register in context_registers)
 
+    def _contradicts_if_present(self, other: Factor) -> bool:
+        """
+        Test if ``self`` would contradict ``other`` if neither was ``absent``.
+
+        The default is ``False`` where no class-specific method is available.
+        """
+        return False
+
     def _context_registers(
         self, other: Factor, comparison: Callable
     ) -> Iterator[Dict[Factor, Factor]]:
@@ -352,14 +360,15 @@ class Factor(ABC):
                 f"{self.__class__} objects may only be compared for "
                 + "implication with other Factor objects or None."
             )
+        if not self.__dict__.get("absent"):
+            if not other.__dict__.get("absent"):
+                return bool(self._implies_if_present(other))
+            return bool(self._contradicts_if_present(other))
 
-        if self.__dict__.get("absent") and other.__dict__.get("absent"):
+        # if self.__dict__.get("absent")
+        if other.__dict__.get("absent"):
             return bool(other._implies_if_present(self))
-
-        if not self.__dict__.get("absent") and not other.__dict__.get("absent"):
-            return bool(self._implies_if_present(other))
-
-        return False
+        return bool(other._contradicts_if_present(self))
 
     def __gt__(self, other: Optional[Factor]) -> bool:
         """Test whether ``self`` implies ``other`` and ``self`` != ``other``."""
@@ -832,15 +841,13 @@ class Fact(Factor):
 
     def _contradicts_if_present(self, other: Fact) -> bool:
         """
-        Test if ``self`` contradicts ``other``, assuming they are not ``absent``.
+        Test if ``self`` contradicts :class:`Fact` ``other`` if neither is ``absent``.
 
         :returns:
             whether ``self`` and ``other`` can't both be true at
             the same time under the given assumption.
         """
-        if (self.predicate.contradicts(other.predicate) and not other.absent) or (
-            self.predicate >= other.predicate and other.absent
-        ):
+        if self.predicate.contradicts(other.predicate):
             return self.consistent_with(other, operator.ge)
         return False
 
@@ -857,8 +864,12 @@ class Fact(Factor):
             return False
 
         if self.absent:
-            return other._contradicts_if_present(self)
-        return self._contradicts_if_present(other)
+            if other.absent:
+                return other._contradicts_if_present(self)
+            return other._implies_if_present(self)
+        if not other.absent:
+            return self._contradicts_if_present(other)
+        return self._implies_if_present(other)
 
     @classmethod
     def _build_from_dict(

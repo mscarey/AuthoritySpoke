@@ -174,8 +174,7 @@ class Predicate:
             return False
 
         if not (
-            self.content.lower() == other.content.lower()
-            and self.reciprocal == other.reciprocal
+            self.same_content_meaning(other) and self.reciprocal == other.reciprocal
         ):
             return False
 
@@ -200,7 +199,7 @@ class Predicate:
                 if self.quantity == other.quantity:
                     return True
             return False
-        return self.content == other.content and self.truth != other.truth
+        return self.truth != other.truth
 
     def same_content_meaning(
         self, other: Predicate, ignore_plural: bool = True
@@ -274,8 +273,7 @@ class Predicate:
 
         # Assumes no predicate implies another based on meaning of their content text
         if not (
-            self.content.lower() == other.content.lower()
-            and self.reciprocal == other.reciprocal
+            self.same_content_meaning(other) and self.reciprocal == other.reciprocal
         ):
             return False
 
