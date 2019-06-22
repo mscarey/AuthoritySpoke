@@ -139,7 +139,14 @@ class Predicate:
                 f"Exactly {len(self)} entities needed to complete "
                 + f'"{self.content}", but {len(context)} were given.'
             )
-        return str(self).format(*(str(e) for e in context))
+        add_plurals = str(self)
+        for index, context_factor in enumerate(context):
+            if context_factor.__dict__.get("plural"):
+                add_plurals = Predicate.make_context_plural(
+                    sentence=add_plurals, index=index
+                )
+
+        return add_plurals.format(*(str(e) for e in context))
 
     def contradicts(self, other: Optional[Predicate]) -> bool:
         """
@@ -387,6 +394,26 @@ class Predicate:
         else:
             content = self.content
         return f"{truth_prefix}{content}"
+
+    @staticmethod
+    def make_context_plural(sentence: str, index: int = 0) -> str:
+        """
+        Replace "was" with "were" after a context slot in a sentence.
+
+        :param sentence:
+            a sentence with pairs of curly braces representing slots for
+            context factors
+
+        :param index:
+            the index of the context factor that is plural, counting
+            from the start of the sentence
+
+        :returns:
+            a form of the sentence with one instance of "was" replaced
+            with "were"
+        """
+        pattern = r"^([^{]*?(\{\}[^{]*?){%d})\{\} was" % index
+        return re.sub(pattern, r"\1{} were", sentence)
 
     @staticmethod
     def str_to_quantity(quantity: str) -> Union[float, int, ureg.Quantity]:

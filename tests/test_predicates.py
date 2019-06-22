@@ -57,6 +57,30 @@ class TestPredicates:
             make_predicate["p8"]
         )
 
+    @pytest.mark.parametrize(
+        "sentence, index, expected",
+        [
+            (
+                "{} was names, towns, and telephone numbers of telephone subscribers",
+                0,
+                "{} were names, towns,",
+            ),
+            (
+                "all of {} and {} was at the meeting",
+                0,
+                "all of {} and {} was at the meeting",
+            ),
+            (
+                "all of {} and {} was at the meeting",
+                1,
+                "all of {} and {} were at the meeting",
+            ),
+        ],
+    )
+    def test_make_str_plural(self, sentence, index, expected):
+        plural_version = Predicate.make_context_plural(sentence=sentence, index=index)
+        assert plural_version.startswith(expected)
+
     def test_negated_method(self, make_predicate):
         assert make_predicate["p7"].negated() == make_predicate["p7_opposite"]
         assert make_predicate["p3"].negated() == make_predicate["p3_false"]
