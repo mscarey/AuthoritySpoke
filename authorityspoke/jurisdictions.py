@@ -9,7 +9,7 @@ thus to :class:`.Opinion`\s.
 from __future__ import annotations
 
 from pathlib import PurePosixPath
-from typing import Dict, List, Optional, Union
+from typing import ClassVar, Dict, List, Optional, Union
 
 from dataclasses import dataclass, field
 
@@ -73,6 +73,7 @@ class Regime:
     """
 
     jurisdictions: Dict[str, Jurisdiction] = field(default_factory=dict)
+    uri: ClassVar = "/"
 
     def get_code(self, selector: Union[TextQuoteSelector, str]):
         """

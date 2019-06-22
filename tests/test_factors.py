@@ -4,9 +4,9 @@ import operator
 import pytest
 
 from authorityspoke.factors import Entity, Factor, Fact, means
-from authorityspoke.rules import Rule, ProceduralRule
+from authorityspoke.rules import Rule
 from authorityspoke.opinions import Opinion
-from authorityspoke.predicates import ureg, Q_
+from authorityspoke.predicates import ureg, Q_, Predicate
 
 
 class TestFacts:
@@ -354,6 +354,13 @@ class TestFacts:
         assert not f["f2_clear_and_convincing"].means(f["f2_preponderance_of_evidence"])
         assert not f["f2_clear_and_convincing"].means(f["f2"])
 
+    def test_means_despite_plural(self):
+        directory = Entity("Rural's telephone directory", plural=False)
+        listings = Entity("Rural's telephone listings", plural=True)
+        directory_original = Fact(Predicate("{} was original"), context_factors=directory)
+        listings_original = Fact(Predicate("{} were original"), context_factors=listings)
+        assert directory_original.means(listings_original)
+
     # Implication
 
     def test_specific_factor_implies_generic(self, watt_factor):
@@ -473,6 +480,16 @@ class TestFacts:
     def test_no_contradiction_of_None(self, watt_factor):
         assert not watt_factor["f1"].contradicts(None)
 
+    def test_contradicts_if_present_both_present(self, watt_factor):
+        """
+        Test a helper function that checks whether there would
+        be a contradiction if neither Factor was "absent".
+        """
+        assert watt_factor["f2"]._contradicts_if_present(watt_factor["f2_false"])
+
+    def test_contradicts_if_present_one_absent(self, watt_factor):
+        assert watt_factor["f2"]._contradicts_if_present(watt_factor["f2_false_absent"])
+
     # Consistency with Entity/Factor assignments
 
     def test_copy_with_foreign_context(self, watt_mentioned, watt_factor):
@@ -532,3 +549,14 @@ class TestFacts:
         )
         with pytest.raises(TypeError):
             any(register is not None for register in update)
+
+    # Addition
+
+    @pytest.mark.parametrize("left, right, expected",
+    [
+        ("f_shooting_craig_poe", "f_shooting_craig_brd", "f_shooting_craig_brd"),
+        ("f_irrelevant_3", "f_irrelevant_3_new_context", "f_irrelevant_3"),
+        ("f_irrelevant_3_new_context", "f_irrelevant_3", "f_irrelevant_3_new_context"),
+    ])
+    def test_addition(self, make_factor, left, right, expected):
+        assert make_factor[left] + make_factor[right] == make_factor[expected]

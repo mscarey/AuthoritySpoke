@@ -12,17 +12,14 @@ Use this button to interact with the notebook online through Binder.
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/mscarey/AuthoritySpoke/master)
 
-[Full documentation for AuthoritySpoke](https://authorityspoke.readthedocs.io/en/latest/) is a work in progress.
+You can find AuthoritySpoke's [API documentation and more at ReadTheDocs](https://authorityspoke.readthedocs.io/en/latest/).
 
 ## Installing AuthoritySpoke
 
-I suggest running AuthoritySpoke in a Pipenv environment. See the [installation instructions for Pipenv](https://docs.pipenv.org/en/latest/install/#installing-pipenv).
-
-Then run
+AuthoritySpoke is now [available on PyPI](https://pypi.org/project/AuthoritySpoke/), so you can install it with pip:
 
 ```
-$ pipenv install
-$ pipenv shell
+$ pip install authorityspoke
 ```
 
 If everything worked, AuthoritySpoke should be available to import in your Python environment.

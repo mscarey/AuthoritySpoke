@@ -77,12 +77,22 @@ class Predicate:
     }
 
     def __post_init__(self):
+        """
+        Clean up and test validity of attributes.
 
+        If the :attr:`content` sentence is phrased to have a plural
+        context factor, normalizes it by changing "were" to "was".
+
+        Conjugating verbs using regex feels like a very brittle solution.
+        An NLP library may be used here in future versions.
+        """
         normalize_comparison = {"==": "=", "!=": "<>"}
         if self.comparison in normalize_comparison:
             object.__setattr__(
                 self, "comparison", normalize_comparison[self.comparison]
             )
+
+        object.__setattr__(self, "content", self.content.replace("{} were", "{} was"))
 
         if self.comparison and self.comparison not in self.opposite_comparisons.keys():
             raise ValueError(
@@ -139,7 +149,14 @@ class Predicate:
                 f"Exactly {len(self)} entities needed to complete "
                 + f'"{self.content}", but {len(context)} were given.'
             )
-        return str(self).format(*(str(e) for e in context))
+        add_plurals = str(self)
+        for index, context_factor in enumerate(context):
+            if context_factor.__dict__.get("plural"):
+                add_plurals = Predicate.make_context_plural(
+                    sentence=add_plurals, index=index
+                )
+
+        return add_plurals.format(*(str(e) for e in context))
 
     def contradicts(self, other: Optional[Predicate]) -> bool:
         """
@@ -174,8 +191,7 @@ class Predicate:
             return False
 
         if not (
-            self.content.lower() == other.content.lower()
-            and self.reciprocal == other.reciprocal
+            self.same_content_meaning(other) and self.reciprocal == other.reciprocal
         ):
             return False
 
@@ -200,7 +216,23 @@ class Predicate:
                 if self.quantity == other.quantity:
                     return True
             return False
-        return self.content == other.content and self.truth != other.truth
+        return self.truth != other.truth
+
+    def same_content_meaning(self, other: Predicate) -> bool:
+        """
+        Test if :attr:`~Predicate.content` strings of ``self`` and ``other`` have same meaning.
+
+        This once was used to disregard differences between "was" and "were",
+        but that now happens in :meth:`Predicate.__post_init__`.
+
+        :param other:
+            another :class:`Predicate` being compared to ``self``
+
+        :returns:
+            whether ``self`` and ``other`` have :attr:`~Predicate.content` strings
+            similar enough to be considered to have the same meaning.
+        """
+        return self.content.lower() == other.content.lower()
 
     def means(self, other) -> bool:
         """
@@ -212,11 +244,10 @@ class Predicate:
         if not isinstance(other, self.__class__):
             return False
 
-        if (
-            self.content.lower() != other.content.lower()
-            or self.reciprocal != other.reciprocal
-            or self.quantity != other.quantity
-        ):
+        if not self.same_content_meaning(other):
+            return False
+
+        if self.reciprocal != other.reciprocal or self.quantity != other.quantity:
             return False
 
         return self.truth == other.truth and self.comparison == other.comparison
@@ -241,8 +272,7 @@ class Predicate:
 
         # Assumes no predicate implies another based on meaning of their content text
         if not (
-            self.content.lower() == other.content.lower()
-            and self.reciprocal == other.reciprocal
+            self.same_content_meaning(other) and self.reciprocal == other.reciprocal
         ):
             return False
 
@@ -356,6 +386,41 @@ class Predicate:
         else:
             content = self.content
         return f"{truth_prefix}{content}"
+
+    @staticmethod
+    def make_context_plural(sentence: str, index: int = 0) -> str:
+        """
+        Replace "was" with "were" after a context slot in a sentence.
+
+        :param sentence:
+            a sentence with pairs of curly braces representing slots for
+            context factors
+
+        :param index:
+            the index of the context factor that is plural, counting
+            from the start of the sentence
+
+        :returns:
+            a form of the sentence with one instance of "was" replaced
+            with "were"
+        """
+        pattern = re.compile(
+            r"""
+            ^       # from beginning of string
+            (       # start capture group \1
+            [^{]*?  # everything before the first {
+            (?:     # start noncapturing group \2
+            \{\}    # literal curly brackets next to each other
+            [^{]*?  # everything before the next literal curly bracket
+            ){%d}   # group \2 occurs "index" times (could be 0)
+            )       # end of \1, which will be in the re.sub replacement string
+            \{\}    # literal curly brackets
+            \ was   # literal " was"
+            """
+            % index,
+            re.VERBOSE,
+        )
+        return re.sub(pattern, r"\1{} were", sentence)
 
     @staticmethod
     def str_to_quantity(quantity: str) -> Union[float, int, ureg.Quantity]:

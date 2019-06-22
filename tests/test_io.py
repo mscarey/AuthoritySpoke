@@ -11,6 +11,7 @@ from authorityspoke.factors import Entity
 from authorityspoke.factors import Factor, Fact
 from authorityspoke.opinions import Opinion
 from authorityspoke.predicates import Predicate
+from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
 
 ureg = pint.UnitRegistry()
@@ -31,7 +32,6 @@ class TestPredicateImport:
 
 
 class TestEntityImport:
-
     def test_specific_entity(self):
         smith_dict = {
             "mentioned_factors": [
@@ -263,6 +263,69 @@ class TestRuleImport:
         }
         with pytest.raises(ValueError):
             Rule.collection_from_dict(rule_dict)
+
+    def test_holding_flagged_exclusive(self, make_opinion_with_holding):
+        """
+        Test that "exclusive" flag doesn't mess up the holding where it's placed.
+
+        Test whether the Feist opinion object includes a holding
+        with the output "Rural's telephone directory
+        was copyrightable" and the input "Rural's telephone
+        directory was original", when that holding was marked
+        "exclusive" in the JSON.
+        """
+
+        directory = Entity("Rural's telephone directory")
+        original = Fact(Predicate("{} was original"), directory)
+        copyrightable = Fact(Predicate("{} was copyrightable"), directory)
+        originality_procedure = Procedure(outputs=copyrightable, inputs=original)
+        originality_rule = Rule(originality_procedure, mandatory=False, universal=False)
+        assert any(
+            feist_rule.means(originality_rule)
+            for feist_rule in make_opinion_with_holding["feist_majority"].holdings
+        )
+
+    def test_holding_inferred_from_exclusive(self, make_opinion_with_holding):
+        """
+        Test whether the Feist opinion object includes a holding
+        that was inferred from an entry in the JSON saying that the
+        "exclusive" way to reach the output "Rural's telephone directory
+        was copyrightable" is to have the input "Rural's telephone
+        directory was original".
+
+        The inferred holding says that in the absence of the input
+        "Rural's telephone directory was original", the court MUST
+        ALWAYS find the output to be absent as well.
+        """
+
+        directory = Entity("Rural's telephone directory")
+        not_original = Fact(Predicate("{} was original"), directory, absent=True)
+        not_copyrightable = Fact(
+            Predicate("{} was copyrightable"), directory, absent=True
+        )
+        no_originality_procedure = Procedure(
+            outputs=not_copyrightable, inputs=not_original
+        )
+        no_originality_rule = Rule(
+            no_originality_procedure, mandatory=True, universal=True
+        )
+        feist = make_opinion_with_holding["feist_majority"]
+        assert feist.holdings[4].means(no_originality_rule)
+
+    def test_exclusive_results_in_more_holdings(self, make_opinion_with_holding):
+        """
+        Test that a holding inferred due to the "exclusive" flag
+        is created in addition to all the other holdings, so there
+        is one more holding than there are entries in the "holdings"
+        section of the JSON.
+        """
+
+        with open(Rule.directory / "holding_feist.json", "r") as f:
+            feist_json = json.load(f)
+        assert (
+            len(make_opinion_with_holding["feist_majority"].holdings)
+            == len(feist_json["holdings"]) + 1
+        )
 
 
 class TestNestedFactorImport:

@@ -6,16 +6,16 @@ import datetime
 import functools
 import pathlib
 import re
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional, Tuple, Union
 from dataclasses import dataclass
 
 from bs4 import BeautifulSoup
 
-from utils import roman
+from utils.cache import lazyprop
+from utils.roman import from_roman
 
 from authorityspoke.context import log_mentioned_context, get_directory_path
 from authorityspoke.selectors import TextQuoteSelector
-from utils.cache import lazyprop
 
 
 class Code:
@@ -205,7 +205,7 @@ class Code:
             if "amendment" not in cite.lower():
                 return datetime.date(1788, 9, 13)
             roman_numeral = cite.split("-")[1]
-            amendment_number = roman.from_roman(roman_numeral)
+            amendment_number = from_roman(roman_numeral)
             if amendment_number < 11:
                 return datetime.date(1791, 12, 15)
             section = self.xml.find(id=cite)
@@ -227,23 +227,17 @@ class Code:
 
         raise NotImplementedError
 
-    def select_text(self, selector: TextQuoteSelector) -> Optional[str]:
+    @functools.lru_cache()
+    def section_text(self, path: str) -> str:
         """
-        Get text from the ``Code`` using a :class:`.TextQuoteSelector`.
+        Get the text of the section identified by a path.
 
-        :param selector:
-            a selector referencing a text passage in the ``Code``.
-
-        .. note::
-            When handling Code of Federal Regulation (CFR) :class:`.Enactment`\s,
-            this can only select from the whole document or from Sections,
-            not Subsections or any other level. Still hoping to be able
-            to switch to a `United States Legislative Markup (USLM)
-            <https://github.com/usgpo/uslm>`_-like XML format for CFR.
+        :param path:
+            a path string, in the format used for :class:`.TextQuoteSelector`
+            objects, to the section with the text to be returned.
 
         :returns:
-            the text referenced by the selector, or ``None`` if the text
-            can't be found.
+            the text of a section of the :class:`Code`.
         """
 
         def cal_href(docpath, href):
@@ -258,13 +252,13 @@ class Code:
             ).search(href)
 
         def usc_statute_text():
-            section = self.xml.find(identifier=selector.path)
+            section = self.xml.find(identifier=path)
             return section.find_all(["chapeau", "paragraph", "content"])
 
-        if selector.path is not None:
-            docpath = selector.path.replace(self.uri, "")
+        if path is not None:
+            docpath = path.replace(self.uri, "")
 
-        if selector.path is None:  # selecting the whole Code
+        if path is None:  # selecting the whole Code
             passages = self.xml.find_all(name="text")
         elif self.jurisdiction == "us":
             if self.level == "regulation":
@@ -283,19 +277,55 @@ class Code:
                 style="margin:0;display:inline;"
             )
 
-        text = " ".join(" ".join(passage.text.split()) for passage in passages)
+        return " ".join(" ".join(passage.text.split()) for passage in passages)
+
+    def select_text_from_interval(
+        self, interval: Tuple[int, int], path: Optional[str] = None
+    ) -> Optional[str]:
+        """
+        Select text as interval of section identified by path.
+
+        :param interval:
+            the indices of the slice of the section text to be selected.
+
+        :para path:
+            a path to the section that text should be selected from
+
+        :returns:
+            a slice of text from the section identified by ``path``
+        """
+
+        if not path:
+            path = self.uri
+        section_text = self.section_text(path)
+        if len(section_text) < max(interval):
+            raise ValueError(
+                f"Interval {interval} extends beyond the end of Enactment {path}."
+            )
+        return section_text[min(interval) : max(interval)]
+
+    def select_text(self, selector: TextQuoteSelector) -> Optional[str]:
+        """
+        Get text from the ``Code`` using a :class:`.TextQuoteSelector`.
+
+        :param selector:
+            a selector referencing a text passage in the ``Code``.
+
+        .. note::
+            When handling Code of Federal Regulation (CFR) :class:`.Enactment`\s,
+            this can only select from the whole document or from Sections,
+            not Subsections or any other level. Still hoping to be able
+            to switch to a `United States Legislative Markup (USLM)
+            <https://github.com/usgpo/uslm>`_-like XML format for CFR.
+
+        :returns:
+            the text referenced by the selector, or ``None`` if the text
+            can't be found.
+        """
+        text = self.section_text(path=selector.path)
         if not selector.exact:
             return text
-        prefix = selector.prefix or ""
-        suffix = selector.suffix or ""
-        passage_regex = (
-            re.escape(prefix)
-            + r"\s*"
-            + re.escape(selector.exact)
-            + r"\s*"
-            + re.escape(suffix)
-        )
-        if re.search(passage_regex, text, re.IGNORECASE):
+        if re.search(selector.passage_regex, text, re.IGNORECASE):
             return selector.exact
         raise ValueError(
             f"Passage {selector.exact} from TextQuoteSelector "
@@ -315,7 +345,7 @@ class Enactment:
     A passage of legislative text.
 
     May be used as support for a
-    :class:`.ProceduralRule`. To retrieve the text, there needs
+    :class:`.Rule`. To retrieve the text, there needs
     to be an available method for identifying the correct XML
     element based on the section and subsection names, and each
     XML format used for any :class:`Code` will require a different method.
@@ -339,7 +369,7 @@ class Enactment:
 
     selector: TextQuoteSelector
     code: Optional[Code] = None
-    regime: Optional["Regime"] = None
+    regime: Optional[Regime] = None
     name: Optional[str] = None
 
     def __post_init__(self):
@@ -353,6 +383,81 @@ class Enactment:
         if not self.selector.exact:
             self.selector.set_exact_from_source(self.code)
         object.__delattr__(self, "regime")
+
+    def __add__(self, other):
+        if not isinstance(other, self.__class__):
+            raise TypeError(
+                f"Objects of type {self.__class__} may only be added "
+                + "to other objects of the same class."
+            )
+        if self >= other:
+            return self
+        if other >= self:
+            return other
+
+        combined = self.combine_text(other)
+        if combined:
+            return combined
+        combined = other.combine_text(self)
+        if combined:
+            return combined
+
+        # If the Enactments can't be combined, return None
+        return None
+
+    def combine_text(self, other: Enactment) -> Optional[Enactment]:
+        """
+        Create new :class:`Enactment` with combined text of the source :class:`Enactment`\s.
+
+        :param other:
+            another :class:`Enactment` with text to combine with the text from ``self``.
+
+        :returns:
+            new :class:`Enactment` with combined text of the source :class:`Enactment`\s, or
+            ``None`` if the :class:`Enactment`\s can't be combined.
+        """
+        if not other.selector.path.startswith(self.selector.path):
+            return None
+        self_interval = self.text_interval()
+        other_interval = other.text_interval(path=self.selector.path)
+        if not self_interval or not other_interval:
+            return None
+        both_intervals = sorted([self_interval, other_interval])
+        if both_intervals[1][0] >= both_intervals[0][1] + 2:
+            return None
+        new_interval = (
+            both_intervals[0][0],
+            max(both_intervals[0][1], both_intervals[1][1]),
+        )
+        # BUG: can't create prefix and suffix to distinguish identical passages.
+        return Enactment(
+            selector=TextQuoteSelector(
+                path=self.selector.path,
+                exact=self.code.select_text_from_interval(
+                    interval=new_interval, path=self.selector.path
+                ),
+            ),
+            code=self.code,
+        )
+
+    def text_interval(self, path=None) -> Optional[Tuple[int, int]]:
+        """
+        Find integer indices for the quoted text.
+
+        :returns:
+            A :class:`tuple` containing the lower and upper bounds of the
+            text passage quoted in ``self.selector.exact`` within the
+            XML section referenced in ``self.selector.path``.
+        """
+        if not path:
+            path = self.selector.path
+        regex = self.selector.passage_regex
+        match = re.search(regex, self.code.section_text(path), re.IGNORECASE)
+        if match:
+            # Getting indices from match group 1 (in the parentheses),
+            # not match 0 which includes prefix and suffix
+            return (match.start(1), match.end(1))
+        return None
 
     @property
     def effective_date(self):

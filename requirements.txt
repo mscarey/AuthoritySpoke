@@ -12,7 +12,6 @@
 
 -e .
 beautifulsoup4>=4.7.1
-ipykernel
 lxml
 pint>=0.9
 requests

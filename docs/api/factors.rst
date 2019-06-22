@@ -65,11 +65,11 @@
 ``Procedures``
 ==============
 
-.. inheritance-diagram:: authorityspoke.rules.Procedure
+.. inheritance-diagram:: authorityspoke.procedures.Procedure
     :top-classes: authorityspoke.factors.Factor
     :parts: 1
 
-.. autoclass:: authorityspoke.rules.Procedure
+.. autoclass:: authorityspoke.procedures.Procedure
     :members:
     :special-members:
     :private-members:
@@ -82,16 +82,5 @@
     :parts: 1
 
 .. autoclass:: authorityspoke.rules.Rule
-    :members:
-    :special-members:
-
-``ProceduralRules``
----------------------
-
-.. inheritance-diagram:: authorityspoke.rules.ProceduralRule
-    :top-classes: authorityspoke.factors.Factor
-    :parts: 1
-
-.. autoclass:: authorityspoke.rules.ProceduralRule
     :members:
     :special-members:

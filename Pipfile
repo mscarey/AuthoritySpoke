@@ -8,11 +8,10 @@ allow_prereleases = true
 
 [packages]
 beautifulsoup4 = ">=4.7.1"
-lxml = "*"
 pint = ">=0.9"
 requests = "*"
 authorityspoke = {path = ".",editable = true}
-ipykernel = "*"
+lxml = "*"
 
 [dev-packages]
 black = "*"
@@ -26,11 +25,12 @@ rope = "*"
 sphinx = "*"
 sphinx-autodoc-typehints = "*"
 pipenv-to-requirements = "*"
-wily = "*"
 coveralls = "*"
 setuptools = "*"
 wheel = "*"
 twine = "*"
+ipykernel = "*"
+doc8 = "*"
 
 [requires]
 python_version = "3.7.3"

@@ -4,7 +4,7 @@ import operator
 import pytest
 
 from authorityspoke.factors import Entity, Factor, Fact
-from authorityspoke.rules import Rule, ProceduralRule
+from authorityspoke.rules import Rule
 from authorityspoke.opinions import Opinion
 from authorityspoke.predicates import Predicate, ureg, Q_
 
@@ -56,6 +56,30 @@ class TestPredicates:
         assert "distance between {} and {} was at least 20 foot" in str(
             make_predicate["p8"]
         )
+
+    @pytest.mark.parametrize(
+        "sentence, index, expected",
+        [
+            (
+                "{} was names, towns, and telephone numbers of telephone subscribers",
+                0,
+                "{} were names, towns,",
+            ),
+            (
+                "all of {} and {} was at the meeting",
+                0,
+                "all of {} and {} was at the meeting",
+            ),
+            (
+                "all of {} and {} was at the meeting",
+                1,
+                "all of {} and {} were at the meeting",
+            ),
+        ],
+    )
+    def test_make_str_plural(self, sentence, index, expected):
+        plural_version = Predicate.make_context_plural(sentence=sentence, index=index)
+        assert plural_version.startswith(expected)
 
     def test_negated_method(self, make_predicate):
         assert make_predicate["p7"].negated() == make_predicate["p7_opposite"]
