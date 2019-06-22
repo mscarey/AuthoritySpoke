@@ -412,7 +412,22 @@ class Predicate:
             a form of the sentence with one instance of "was" replaced
             with "were"
         """
-        pattern = r"^([^{]*?(\{\}[^{]*?){%d})\{\} was" % index
+        pattern = re.compile(
+            r"""
+            ^       # from beginning of string
+            (       # start capture group \1
+            [^{]*?  # everything before the first {
+            (?:     # start noncapturing group \2
+            \{\}    # literal curly brackets next to each other
+            [^{]*?  # everything before the next literal curly bracket
+            ){%d}   # group \2 occurs "index" times (could be 0)
+            )       # end of \1, which will be in the re.sub replacement string
+            \{\}    # literal curly brackets
+            \ was   # literal " was"
+            """
+            % index,
+            re.VERBOSE,
+        )
         return re.sub(pattern, r"\1{} were", sentence)
 
     @staticmethod
