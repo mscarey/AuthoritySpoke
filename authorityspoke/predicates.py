@@ -77,12 +77,22 @@ class Predicate:
     }
 
     def __post_init__(self):
+        """
+        Clean up and test validity of attributes.
 
+        If the :attr:`content` sentence is phrased to have a plural
+        context factor, normalizes it by changing "were" to "was".
+
+        Conjugating verbs using regex feels like a very brittle solution.
+        An NLP library may be used here in future versions.
+        """
         normalize_comparison = {"==": "=", "!=": "<>"}
         if self.comparison in normalize_comparison:
             object.__setattr__(
                 self, "comparison", normalize_comparison[self.comparison]
             )
+
+        object.__setattr__(self, "content", self.content.replace("{} were", "{} was"))
 
         if self.comparison and self.comparison not in self.opposite_comparisons.keys():
             raise ValueError(
@@ -208,39 +218,21 @@ class Predicate:
             return False
         return self.truth != other.truth
 
-    def same_content_meaning(
-        self, other: Predicate, ignore_plural: bool = True
-    ) -> bool:
+    def same_content_meaning(self, other: Predicate) -> bool:
         """
         Test if :attr:`~Predicate.content` strings of ``self`` and ``other`` have same meaning.
 
-        This currently has a very brittle solution that should be
-        replaced, especially if spaCy can be used here. It assumes
-        that singular/plural differences will always result in
-        differences between the choice of "was" and "were", and
-        that such differences can always just be ignored. (Unless
-        ``ignore_plural`` is set to ``False``, which it never is.)
+        This once was used to disregard differences between "was" and "were",
+        but that now happens in :meth:`Predicate.__post_init__`.
 
         :param other:
             another :class:`Predicate` being compared to ``self``
-
-        :param ignore_plural:
-            whether the text of ``self`` and ``other`` should be reformatted
-            before comparing them, to try to eliminate any differences caused
-            by one using a plural :class:`.Entity` whether the other uses a
-            singular one.
 
         :returns:
             whether ``self`` and ``other`` have :attr:`~Predicate.content` strings
             similar enough to be considered to have the same meaning.
         """
-        if self.content.lower() == other.content.lower():
-            return True
-        if ignore_plural and self.content.lower().replace(
-            "were", "was"
-        ) == other.content.lower().replace("were", "was"):
-            return True
-        return False
+        return self.content.lower() == other.content.lower()
 
     def means(self, other) -> bool:
         """
