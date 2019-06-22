@@ -115,6 +115,7 @@
                 "type": "fact",
                 "content": "Rural's telephone directory was original"
             },
+            "enactments": ["securing for authors", "right to writings"],
             "universal": true
         },
         {
@@ -127,6 +128,7 @@
                 "content": "Rural's telephone directory was original",
                 "truth": false
             },
+            "enactments": ["securing for authors", "right to writings"],
             "mandatory": true,
             "universal": true
         },
@@ -213,7 +215,8 @@
                 "type": "fact",
                 "content": "Rural's telephone directory was copyrightable",
                 "truth": false
-            }
+            },
+            "enactments": ["securing for authors", "right to writings", "copyright in a compilation", "preexisting material provision"]
         },
         {
             "inputs": {

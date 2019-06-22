@@ -435,6 +435,21 @@ def make_exhibit(
         "testimony_no_statement": Exhibit(form="testimony"),
     }
 
+@pytest.fixture(scope="class")
+def make_complex_rule(make_factor, make_exhibit, make_complex_fact) -> Dict[str, Rule]:
+    return {"accept_relevance_testimony": Rule(
+        inputs=make_exhibit["relevant_murder_testimony"],
+        outputs=make_complex_fact["f_relevant_murder"]
+    ),
+    "accept_relevance_testimony_ALL": Rule(
+        inputs=make_exhibit["relevant_murder_testimony"],
+        outputs=make_complex_fact["f_relevant_murder"],
+        universal=True
+    ),
+    "accept_murder_fact_from_relevance": Rule(
+        inputs=make_complex_fact["f_relevant_murder"],
+        outputs=make_factor["f_murder"]
+    )}
 
 @pytest.fixture(scope="class")
 def make_evidence(

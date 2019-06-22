@@ -709,4 +709,15 @@ class TestAddition:
             for out in listings_not_copyrightable.outputs
         )
 
+    def test_add_some_plus_some_makes_none(self, make_complex_rule):
+        new_rule = make_complex_rule["accept_relevance_testimony"] + make_complex_rule["accept_murder_fact_from_relevance"]
+        assert new_rule is None
+
+    def test_add_complex_rule(self, make_factor, make_complex_rule):
+        new_rule = make_complex_rule["accept_relevance_testimony_ALL"] + make_complex_rule["accept_murder_fact_from_relevance"]
+        assert new_rule.universal is False
+        assert new_rule.inputs == make_complex_rule["accept_relevance_testimony_ALL"].inputs
+        assert new_rule.outputs == make_complex_rule["accept_murder_fact_from_relevance"].outputs
+
+
     # Add tests that consider differences in Enactments

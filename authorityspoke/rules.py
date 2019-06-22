@@ -152,7 +152,13 @@ class Rule(Factor):
             new_procedure = self.procedure.evolve(
                 {"outputs": (*self.outputs, *triggered_rule.outputs)}
             )
-            return self.evolve({"procedure": new_procedure})
+            return self.evolve(
+                {
+                    "procedure": new_procedure,
+                    "universal": min(self.universal, other.universal),
+                    "mandatory": min(self.mandatory, other.mandatory),
+                }
+            )
         return None
 
     @classmethod
