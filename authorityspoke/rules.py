@@ -88,7 +88,7 @@ class Rule(Factor):
         object.
     """
 
-    procedure: Procedure
+    procedure: Optional[Procedure] = None
     enactments: Union[Enactment, Iterable[Enactment]] = ()
     enactments_despite: Union[Enactment, Iterable[Enactment]] = ()
     mandatory: bool = False
@@ -97,15 +97,36 @@ class Rule(Factor):
     decided: bool = True
     generic: bool = False
     name: Optional[str] = None
+    outputs: Optional[Union[Factor, Iterable[Factor]]] = None
+    inputs: Optional[Union[Factor, Iterable[Factor]]] = None
+    despite: Optional[Union[Factor, Iterable[Factor]]] = None
+
     context_factor_names: ClassVar = ("procedure",)
-    directory = get_directory_path("holdings")
+    directory: ClassVar = get_directory_path("holdings")
 
     def __post_init__(self):
-
         for attr in ("enactments", "enactments_despite"):
             value = self.__dict__[attr]
             if isinstance(value, Enactment):
                 object.__setattr__(self, attr, self._wrap_with_tuple(value))
+
+        if self.procedure is None:
+            if self.outputs is None:
+                raise ValueError(
+                    "To construct a Rule you must specify either a Procedure "
+                    + "or output/input/despite Factors for use in constructing "
+                    + "a Procedure (including at least one output)."
+                )
+            object.__setattr__(
+                self,
+                "procedure",
+                Procedure(
+                    outputs=self.outputs, inputs=self.inputs, despite=self.despite
+                ),
+            )
+        object.__setattr__(self, "outputs", self.procedure.outputs)
+        object.__setattr__(self, "inputs", self.procedure.inputs)
+        object.__setattr__(self, "despite", self.procedure.despite)
 
     def __add__(self, other) -> Optional[Rule]:
         """
@@ -413,16 +434,6 @@ class Rule(Factor):
         return self.procedure.context_factors
 
     @property
-    def despite(self):
-        """
-        Call :class:`Procedure`\'s :meth:`~Procedure.despite` method.
-
-        :returns:
-            despite :class:`.Factor`\s from ``self``'s :class:`Procedure`
-        """
-        return self.procedure.despite
-
-    @property
     def generic_factors(self) -> List[Optional[Factor]]:
         """
         Get :class:`.Factor`\s that can be replaced without changing ``self``\s meaning.
@@ -433,26 +444,6 @@ class Rule(Factor):
         if self.generic:
             return [self]
         return self.procedure.generic_factors
-
-    @property
-    def inputs(self):
-        """
-        Call :class:`Procedure`\'s :meth:`~Procedure.inputs` method.
-
-        :returns:
-            input :class:`.Factor`\s from ``self``'s :class:`Procedure`
-        """
-        return self.procedure.inputs
-
-    @property
-    def outputs(self):
-        """
-        Call :class:`Procedure`\'s :meth:`~Procedure.outputs` method.
-
-        :returns:
-            output :class:`.Factor`\s from ``self``'s :class:`Procedure`
-        """
-        return self.procedure.outputs
 
     def contradicts(self, other) -> bool:
         """

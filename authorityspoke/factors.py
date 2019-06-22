@@ -569,10 +569,11 @@ class Factor(ABC):
 
     @staticmethod
     def _wrap_with_tuple(item):
+        if item is None:
+            return ()
         if isinstance(item, Iterable):
             return tuple(item)
         return (item,)
-
 
 @dataclass(frozen=True)
 class Fact(Factor):
