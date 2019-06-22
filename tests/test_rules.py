@@ -710,14 +710,19 @@ class TestAddition:
         )
 
     def test_add_some_plus_some_makes_none(self, make_complex_rule):
+        """The rules can't be added because they both have universal==False"""
         new_rule = make_complex_rule["accept_relevance_testimony"] + make_complex_rule["accept_murder_fact_from_relevance"]
         assert new_rule is None
 
     def test_add_complex_rule(self, make_factor, make_complex_rule):
+        """
+        The resulting rule will have universal==False because one of the
+        two input rules has universal==False.
+        """
         new_rule = make_complex_rule["accept_relevance_testimony_ALL"] + make_complex_rule["accept_murder_fact_from_relevance"]
         assert new_rule.universal is False
         assert new_rule.inputs == make_complex_rule["accept_relevance_testimony_ALL"].inputs
-        assert new_rule.outputs == make_complex_rule["accept_murder_fact_from_relevance"].outputs
+        assert make_complex_rule["accept_murder_fact_from_relevance"].outputs[0] in new_rule.outputs
 
 
     # Add tests that consider differences in Enactments
