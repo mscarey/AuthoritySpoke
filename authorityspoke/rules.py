@@ -653,6 +653,18 @@ class Rule(Factor):
 
         return len(self.procedure)
 
+    def has_all_same_enactments(self, other: Rule) -> bool:
+        """
+        Test if ``self`` has :class:`.Enactment`\s with same meanings as ``other``\'s
+        """
+        for enactment_group in self.enactment_attr_names:
+            if not all(
+                any(other_e.means(self_e) for self_e in self.__dict__[enactment_group])
+                for other_e in other.__dict__[enactment_group]
+            ):
+                return False
+        return True
+
     def means(self, other: Rule) -> bool:
         """
         Test whether ``other`` has the same meaning as ``self``.
@@ -661,11 +673,15 @@ class Rule(Factor):
             whether ``other`` is a :class:`Rule` with the
             same meaning as ``self``.
         """
-
         if not self.__class__ == other.__class__:
             return False
 
         if not self.procedure.means(other.procedure):
+            return False
+
+        if not self.has_all_same_enactments(other):
+            return False
+        if not other.has_all_same_enactments(self):
             return False
 
         return (
