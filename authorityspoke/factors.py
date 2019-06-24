@@ -187,6 +187,8 @@ class Factor(ABC):
         return answers
 
     def __add__(self, other) -> Optional[Factor]:
+        if other.__class__.__name__ in ("Procedure", "Rule"):
+            return other + self
         if not isinstance(other, Factor):
             raise TypeError
         if self >= other:

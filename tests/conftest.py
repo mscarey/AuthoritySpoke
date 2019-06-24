@@ -449,7 +449,12 @@ def make_complex_rule(make_factor, make_exhibit, make_complex_fact) -> Dict[str,
     "accept_murder_fact_from_relevance": Rule(
         inputs=make_complex_fact["f_relevant_murder"],
         outputs=make_factor["f_murder"]
-    )}
+    ),
+    "accept_murder_fact_from_relevance_and_shooting": Rule(
+        inputs=[make_complex_fact["f_relevant_murder"], make_factor["f_shooting"]],
+        outputs=make_factor["f_murder"]
+    ),
+    }
 
 @pytest.fixture(scope="class")
 def make_evidence(

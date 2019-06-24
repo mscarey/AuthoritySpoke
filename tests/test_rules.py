@@ -640,6 +640,22 @@ class TestContradiction:
 
 
 class TestAddition:
+    def test_add_factor_to_rule(self, make_complex_rule, make_factor):
+        """
+        Test that you can make a new version of a :class:`.Rule`,
+        with one more input :class:`.Factor`, by using the addition operator with
+        the :class:`.Rule` and input :class:`.Factor`.
+        """
+        c = make_complex_rule
+        assert not c["accept_murder_fact_from_relevance"].means(c["accept_murder_fact_from_relevance_and_shooting"])
+        two_input_rule = c["accept_murder_fact_from_relevance"] + make_factor["f_shooting"]
+        assert two_input_rule.means(c["accept_murder_fact_from_relevance_and_shooting"])
+
+    def test_add_factor_to_rule_reverse(self, make_complex_rule, make_factor):
+        c = make_complex_rule
+        two_input_rule = make_factor["f_shooting"] + c["accept_murder_fact_from_relevance"]
+        assert two_input_rule.means(c["accept_murder_fact_from_relevance_and_shooting"])
+
     def test_add_simple_rules(self):
         """
         A simple form of two Rules from Feist, with no Enactments.

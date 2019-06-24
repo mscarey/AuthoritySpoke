@@ -19,6 +19,7 @@ notebooks/.ipynb_checkpoints
 notebooks/unused
 notebooks/request_cases.ipynb
 prof/
+schemas/
 tests/__pycache__/
 tests/.pytest_cache/
 tests/prof/

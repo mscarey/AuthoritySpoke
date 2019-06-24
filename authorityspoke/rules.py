@@ -102,10 +102,11 @@ class Rule(Factor):
     despite: Optional[Union[Factor, Iterable[Factor]]] = None
 
     context_factor_names: ClassVar = ("procedure",)
+    enactment_attr_names: ClassVar = ("enactments", "enactments_despite")
     directory: ClassVar = get_directory_path("holdings")
 
     def __post_init__(self):
-        for attr in ("enactments", "enactments_despite"):
+        for attr in self.enactment_attr_names:
             value = self.__dict__[attr]
             if isinstance(value, Enactment):
                 object.__setattr__(self, attr, self._wrap_with_tuple(value))
@@ -155,6 +156,8 @@ class Rule(Factor):
             move made in ``self``, if possible. Otherwise ``None``.
         """
         if not isinstance(other, Rule):
+            if isinstance(other, Factor):
+                return self.add_factor(other)
             raise TypeError
         if self.rule_valid is False or other.rule_valid is False:
             return None
@@ -164,15 +167,8 @@ class Rule(Factor):
         if not other.needs_subset_of_enactments(self):
             return None
 
-        matchlist = self.procedure.triggers_next_procedure(other.procedure)
-        if matchlist:
-            # Arbitrarily choosing the first match to decide what
-            # generic Factors appear in the new outputs.
-            # Wouldn't it have been better to get just one match with a generator?
-            triggered_rule = other.new_context(matchlist[0])
-            new_procedure = self.procedure.evolve(
-                {"outputs": (*self.outputs, *triggered_rule.outputs)}
-            )
+        new_procedure = self.procedure + other.procedure
+        if new_procedure is not None:
             return self.evolve(
                 {
                     "procedure": new_procedure,
@@ -444,6 +440,21 @@ class Rule(Factor):
         if self.generic:
             return [self]
         return self.procedure.generic_factors
+
+    def add_factor(self, incoming: Factor, role: str = "inputs") -> Rule:
+        """
+        Make new version of ``self`` with an added input, output, or despite :class:`.Factor`.
+
+        :param incoming:
+            the new :class:`.Factor` to be added to input, output, or despite
+
+        :param role:
+            specifies whether the new :class:`.Factor` should be added to input, output, or despite
+
+        :returns:
+            a new version of ``self`` with the specified change
+        """
+        return self.evolve({"procedure": self.procedure.add_factor(incoming, role)})
 
     def contradicts(self, other) -> bool:
         """

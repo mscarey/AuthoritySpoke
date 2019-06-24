@@ -89,6 +89,16 @@ class Procedure(Factor):
                     )
             object.__setattr__(self, group, groups[group])
 
+    def __add__(self, other: Procedure) -> Optional[Procedure]:
+        matchlist = self.triggers_next_procedure(other)
+        if matchlist:
+            # Arbitrarily choosing the first match to decide what
+            # generic Factors appear in the new outputs.
+            # Wouldn't it have been better to get just one match with a generator?
+            triggered_rule = other.new_context(matchlist[0])
+            return self.evolve({"outputs": (*self.outputs, *triggered_rule.outputs)})
+        return None
+
     def __len__(self):
         """
         Get number of generic :class:`.Factor`\s specified for ``self``.
@@ -200,6 +210,13 @@ class Procedure(Factor):
                     ):
                         return False
         return True
+
+    def add_factor(self, incoming: Factor, role: str = "inputs") -> Procedure:
+        if role not in self.context_factor_names:
+            raise ValueError(f"'role' must be one of {self.context_factor_names}")
+        old_factors = self.__dict__.get(role) or []
+        new_factors = list(old_factors) + [incoming]
+        return self.evolve({role: new_factors})
 
     def contradiction_between_outputs(
         self, other: Procedure, matches: Dict[Factor, Factor]
