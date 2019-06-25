@@ -18,6 +18,7 @@ example_data/opinions/unused
 notebooks/.ipynb_checkpoints
 notebooks/unused
 notebooks/request_cases.ipynb
+Pipfile.lock
 prof/
 schemas/
 tests/__pycache__/
