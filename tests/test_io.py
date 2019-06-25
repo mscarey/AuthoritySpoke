@@ -13,6 +13,7 @@ from authorityspoke.opinions import Opinion
 from authorityspoke.predicates import Predicate
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
+from authorityspoke.selectors import TextQuoteSelector
 
 ureg = pint.UnitRegistry()
 
@@ -264,7 +265,7 @@ class TestRuleImport:
         with pytest.raises(ValueError):
             Rule.collection_from_dict(rule_dict)
 
-    def test_holding_flagged_exclusive(self, make_opinion_with_holding):
+    def test_holding_flagged_exclusive(self, make_opinion_with_holding, make_enactment):
         """
         Test that "exclusive" flag doesn't mess up the holding where it's placed.
 
@@ -278,14 +279,25 @@ class TestRuleImport:
         directory = Entity("Rural's telephone directory")
         original = Fact(Predicate("{} was original"), directory)
         copyrightable = Fact(Predicate("{} was copyrightable"), directory)
-        originality_procedure = Procedure(outputs=copyrightable, inputs=original)
-        originality_rule = Rule(originality_procedure, mandatory=False, universal=False)
+        originality_enactments = [
+            make_enactment["securing_for_authors"],
+            make_enactment["right_to_writings"],
+        ]
+        originality_rule = Rule(
+            outputs=copyrightable,
+            inputs=original,
+            mandatory=False,
+            universal=False,
+            enactments=originality_enactments,
+        )
         assert any(
             feist_rule.means(originality_rule)
             for feist_rule in make_opinion_with_holding["feist_majority"].holdings
         )
 
-    def test_holding_inferred_from_exclusive(self, make_opinion_with_holding):
+    def test_holding_inferred_from_exclusive(
+        self, make_enactment, make_opinion_with_holding
+    ):
         """
         Test whether the Feist opinion object includes a holding
         that was inferred from an entry in the JSON saying that the
@@ -307,7 +319,13 @@ class TestRuleImport:
             outputs=not_copyrightable, inputs=not_original
         )
         no_originality_rule = Rule(
-            no_originality_procedure, mandatory=True, universal=True
+            no_originality_procedure,
+            mandatory=True,
+            universal=True,
+            enactments=[
+                make_enactment["securing_for_authors"],
+                make_enactment["right_to_writings"],
+            ],
         )
         feist = make_opinion_with_holding["feist_majority"]
         assert feist.holdings[4].means(no_originality_rule)

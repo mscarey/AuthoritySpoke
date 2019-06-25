@@ -539,10 +539,24 @@ def make_code(make_regime) -> Dict[str, Code]:
 
 
 @pytest.fixture(scope="module")
-def make_enactment(make_selector, make_regime) -> Dict[str, Enactment]:
+def make_enactment(make_code, make_selector, make_regime) -> Dict[str, Enactment]:
     return {
         "copyright": Enactment(
             selector=make_selector["copyright"], regime=make_regime
+        ),
+        "securing_for_authors": Enactment(
+            selector=TextQuoteSelector(
+                path="/us/const/article-I/8/8",
+                exact="To promote the Progress of Science and useful Arts, by securing for limited Times to Authors",
+            ),
+            code=make_code["const"],
+        ),
+        "right_to_writings": Enactment(
+            selector=TextQuoteSelector(
+                path="/us/const/article-I/8/8",
+                exact="the exclusive Right to their respective Writings",
+            ),
+            code=make_code["const"],
         ),
         "search_clause": Enactment(
             selector=TextQuoteSelector(
