@@ -656,6 +656,28 @@ class TestAddition:
         two_input_rule = make_factor["f_shooting"] + c["accept_murder_fact_from_relevance"]
         assert two_input_rule.means(c["accept_murder_fact_from_relevance_and_shooting"])
 
+    def test_add_enactment_to_rule_reverse(self, make_complex_rule, make_enactment):
+        """
+        Test that you can make a new version of a :class:`.Rule`,
+        with one more input :class:`.Factor`, by using the addition operator with
+        the :class:`.Rule` and input :class:`.Factor`.
+        """
+        murder_rule = make_complex_rule["accept_murder_fact_from_relevance"]
+        assert make_enactment["due_process_5"] not in murder_rule.enactments
+        due_process_murder_rule = make_enactment["due_process_5"] + murder_rule
+        assert make_enactment["due_process_5"] in due_process_murder_rule.enactments
+
+    def test_add_enactment_to_rule(self, make_complex_rule, make_enactment):
+        """
+        Test that you can make a new version of a :class:`.Rule`,
+        with one more input :class:`.Factor`, by using the addition operator with
+        the :class:`.Rule` and input :class:`.Factor`.
+        """
+        murder_rule = make_complex_rule["accept_murder_fact_from_relevance"]
+        assert make_enactment["due_process_5"] not in murder_rule.enactments
+        due_process_murder_rule = murder_rule + make_enactment["due_process_5"]
+        assert make_enactment["due_process_5"] in due_process_murder_rule.enactments
+
     def test_add_simple_rules(self):
         """
         A simple form of two Rules from Feist, with no Enactments.

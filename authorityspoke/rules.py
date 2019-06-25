@@ -158,6 +158,8 @@ class Rule(Factor):
         if not isinstance(other, Rule):
             if isinstance(other, Factor):
                 return self.add_factor(other)
+            if isinstance(other, Enactment):
+                return self.add_enactment(other)
             raise TypeError
         if self.rule_valid is False or other.rule_valid is False:
             return None
@@ -440,6 +442,29 @@ class Rule(Factor):
         if self.generic:
             return [self]
         return self.procedure.generic_factors
+
+    def add_enactment(self, incoming: Enactment, role: str = "enactments") -> Rule:
+        """
+        Make new version of ``self`` with an :class:`.Enactment` added.
+
+        :param incoming:
+            the new :class:`.Enactment` to be added to enactments or
+            enactments_despite
+
+        :param role:
+            specifies whether the new :class:`.Enactment` should be added
+            to enactments or enactments_despite
+
+        :returns:
+            a new version of ``self`` with the specified change
+        """
+        if role not in self.enactment_attr_names:
+            raise ValueError(f"'role' must be one of {self.enactment_attr_names}")
+
+        if not isinstance(incoming, Enactment):
+            raise TypeError
+
+        return self.evolve({role: list(self.__dict__[role]) + [incoming]})
 
     def add_factor(self, incoming: Factor, role: str = "inputs") -> Rule:
         """

@@ -385,11 +385,10 @@ class Enactment:
         object.__delattr__(self, "regime")
 
     def __add__(self, other):
+        if other.__class__.__name__ == "Rule":
+            return other + self
         if not isinstance(other, self.__class__):
-            raise TypeError(
-                f"Objects of type {self.__class__} may only be added "
-                + "to other objects of the same class."
-            )
+            raise TypeError
         if self >= other:
             return self
         if other >= self:
