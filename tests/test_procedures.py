@@ -89,8 +89,8 @@ class TestProcedures:
     def test_unequal_after_swapping_nonreciprocal_entities(self, make_procedure):
         assert not make_procedure["c2"].means(make_procedure["c2_nonreciprocal_swap"])
 
-    # Implication
 
+class TestProcedureImplication:
     def test_entities_of_implied_inputs_for_implied_procedure(
         self, watt_factor, make_procedure
     ):
@@ -231,8 +231,8 @@ class TestProcedures:
         assert not make_procedure["c1"].implies_all_to_all(watt_factor["f1"])
         assert not make_procedure["c1"].implies_all_to_some(watt_factor["f1"])
 
-    # Contradiction
 
+class TestProcedureContradiction:
     def test_no_contradict_between_procedures(self, make_procedure):
         """
         I don't think some-to-some contradiction is possible for Procedures
@@ -243,3 +243,14 @@ class TestProcedures:
 
     def test_no_contradiction_of_other_factor(self, make_procedure, watt_factor):
         assert not make_procedure["c1"].contradicts_some_to_all(watt_factor["f1"])
+
+
+class TestProcedureUnion:
+    def test_simple_union(self, make_opinion_with_holding):
+        feist = make_opinion_with_holding["feist_majority"]
+        procedure_from_union = feist.holdings[0].procedure | feist.holdings[2].procedure
+        procedure_from_adding = (
+            feist.holdings[0].procedure + feist.holdings[2].procedure.inputs[0]
+        )
+        assert procedure_from_union.means(procedure_from_adding)
+        assert procedure_from_union == procedure_from_adding

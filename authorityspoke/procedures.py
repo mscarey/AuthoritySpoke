@@ -90,6 +90,8 @@ class Procedure(Factor):
             object.__setattr__(self, group, groups[group])
 
     def __add__(self, other: Procedure) -> Optional[Procedure]:
+        if not isinstance(other, self.__class__):
+            return self.add_factor(other)
         matchlist = self.triggers_next_procedure(other)
         if matchlist:
             # Arbitrarily choosing the first match to decide what
@@ -98,6 +100,42 @@ class Procedure(Factor):
             triggered_rule = other.new_context(matchlist[0])
             return self.evolve({"outputs": (*self.outputs, *triggered_rule.outputs)})
         return None
+
+    def __or__(self, other: Procedure) -> Optional[Procedure]:
+        """
+        Combines two :class:`Procedure`\s into one.
+
+        The new :class:`Procedure` will have all of the ``inputs``, ``outputs``,
+        and ``despite`` :class:`.Factor`\s of both ``self`` and ``other``.
+
+        All of the context :class:`.Factor`\s of ``self`` will
+        remain the same.
+        """
+
+        def combine_factor_list(
+            self_list, other_list, allow_contradictions: bool = False
+        ):
+            new_factors = []
+            for self_factor in self_list:
+                broadest = self_factor
+                for other_factor in other_list:
+                    if allow_contradictions is False and other_factor.contradicts(
+                        self_factor
+                    ):
+                        return None
+                    if other_factor >= self_factor:
+                        broadest = other_factor
+                new_factors.append(broadest)
+            return new_factors + [
+                factor for factor in other_list if factor not in new_factors
+            ]
+
+        new_inputs = combine_factor_list(self.inputs, other.inputs)
+        new_outputs = combine_factor_list(self.outputs, other.outputs)
+        new_despite = combine_factor_list(
+            self.despite, other.despite, allow_contradictions=True
+        )
+        return Procedure(outputs=new_outputs, inputs=new_inputs, despite=new_despite)
 
     def __len__(self):
         """
