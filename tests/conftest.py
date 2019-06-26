@@ -551,6 +551,13 @@ def make_enactment(make_code, make_selector, make_regime) -> Dict[str, Enactment
             ),
             code=make_code["const"],
         ),
+        "and_inventors": Enactment(
+            selector=TextQuoteSelector(
+                path="/us/const/article-I/8/8",
+                exact="and Inventors",
+            ),
+            code=make_code["const"],
+        ),
         "right_to_writings": Enactment(
             selector=TextQuoteSelector(
                 path="/us/const/article-I/8/8",

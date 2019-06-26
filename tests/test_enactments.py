@@ -253,8 +253,10 @@ class TestEnactments:
                 make_enactment["securing_for_authors"],
                 make_enactment["right_to_writings"],
                 make_enactment["copyright"],
+                make_enactment["and_inventors"],
             ]
         )
+        assert len(combined) == 2
         assert any(
             law.text.startswith("To promote the Progress")
             and law.text.endswith("their respective Writings")
