@@ -17,7 +17,7 @@ from typing import Iterator, Optional, Union
 from dataclasses import dataclass
 
 from authorityspoke.context import get_directory_path
-from authorityspoke.enactments import Enactment
+from authorityspoke.enactments import Enactment, consolidate_enactments
 from authorityspoke.factors import Factor, means, new_context_helper
 from authorityspoke.procedures import Procedure
 
@@ -726,6 +726,8 @@ class Rule(Factor):
         if self.universal == other.universal == False:
             return None
         new_procedure = self.procedure | other.procedure
+        if new_procedure is None:
+            return None
         return Rule(
             procedure=new_procedure,
             enactments=consolidate_enactments(
