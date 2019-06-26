@@ -389,20 +389,13 @@ class Enactment:
             return other + self
         if not isinstance(other, self.__class__):
             raise TypeError
-        if self >= other:
+
+        if self >= other and self.selector.path.startswith(other.selector.path):
             return self
-        if other >= self:
+        if other >= self and other.selector.path.startswith(self.selector.path):
             return other
-
-        combined = self.combine_text(other)
-        if combined:
-            return combined
-        combined = other.combine_text(self)
-        if combined:
-            return combined
-
-        # If the Enactments can't be combined, return None
-        return None
+        combined = self.combine_text(other) or other.combine_text(self)
+        return combined
 
     def combine_text(self, other: Enactment) -> Optional[Enactment]:
         """
