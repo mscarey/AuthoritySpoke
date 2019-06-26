@@ -589,3 +589,19 @@ class Enactment:
         if self == other:
             return False
         return self >= other
+
+
+def consolidate_enactments(enactments: List[Enactment]) -> List[Enactment]:
+    consolidated: List[Enactment] = []
+    while enactments:
+        match_made = False
+        left = enactments.pop()
+        for right in enactments:
+            if left + right is not None:
+                enactments.remove(right)
+                enactments.append(left + right)
+                match_made = True
+                break
+        if match_made is False:
+            consolidated.append(left)
+    return consolidated

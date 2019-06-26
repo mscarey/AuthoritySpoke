@@ -135,6 +135,8 @@ class Procedure(Factor):
         new_despite = combine_factor_list(
             self.despite, other.despite, allow_contradictions=True
         )
+        if any(group is None for group in (new_outputs, new_inputs, new_despite)):
+            return None
         return Procedure(outputs=new_outputs, inputs=new_inputs, despite=new_despite)
 
     def __len__(self):

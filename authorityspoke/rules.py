@@ -720,6 +720,24 @@ class Rule(Factor):
         """Get new copy of ``self`` with an opposite value for ``rule_valid``."""
         return self.evolve("rule_valid")
 
+    def __or__(self, other: Rule) -> Rule:
+        if not isinstance(other, Rule):
+            raise TypeError
+        if self.universal == other.universal == False:
+            return None
+        new_procedure = self.procedure | other.procedure
+        return Rule(
+            procedure=new_procedure,
+            enactments=consolidate_enactments(
+                list(self.enactments) + list(other.enactments)
+            ),
+            enactments_despite=consolidate_enactments(
+                list(self.enactments_despite) + list(other.enactments_despite)
+            ),
+            mandatory=min(self.mandatory, other.mandatory),
+            universal=min(self.universal, other.universal),
+        )
+
     def __str__(self):
         def factor_catalog(factors: List[Union[Factor, Enactment]], tag: str) -> str:
             lines = [f"{tag}: {factors[i]}\n" for i in range(len(factors))]

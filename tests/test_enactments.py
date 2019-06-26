@@ -5,7 +5,7 @@ import operator
 from pint import UnitRegistry
 import pytest
 
-from authorityspoke.enactments import Code, Enactment
+from authorityspoke.enactments import Code, Enactment, consolidate_enactments
 from authorityspoke.opinions import Opinion
 from authorityspoke.predicates import ureg, Q_
 from authorityspoke.selectors import TextQuoteSelector
@@ -237,3 +237,32 @@ class TestEnactments:
 
         assert combined.text == fourth_a.text
         assert combined == fourth_a
+
+    def test_consolidate_enactments(self, make_enactment):
+        assert consolidate_enactments(
+            [
+                make_enactment["search_clause"],
+                make_enactment["warrants_clause"],
+                make_enactment["fourth_a"],
+            ]
+        ) == [make_enactment["fourth_a"]]
+
+    def test_consolidate_adjacent_passages(self, make_enactment):
+        combined = consolidate_enactments(
+            [
+                make_enactment["securing_for_authors"],
+                make_enactment["right_to_writings"],
+                make_enactment["copyright"],
+            ]
+        )
+        assert any(
+            law.text.startswith("To promote the Progress")
+            and law.text.endswith("their respective Writings")
+            for law in combined
+        )
+
+    def test_do_not_consolidate_from_different_sections(self, make_enactment):
+        combined = consolidate_enactments(
+            [make_enactment["due_process_5"], make_enactment["due_process_14"]]
+        )
+        assert len(combined) == 2
