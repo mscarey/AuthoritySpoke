@@ -762,6 +762,8 @@ class TestAddition:
         assert new_rule.inputs == make_complex_rule["accept_relevance_testimony_ALL"].inputs
         assert make_complex_rule["accept_murder_fact_from_relevance"].outputs[0] in new_rule.outputs
 
+class TestUnion:
+
     def test_union_contradictory_outputs(self, make_opinion_with_holding):
         """
         Test that even when two Rules don't contradict each other,
@@ -771,5 +773,25 @@ class TestAddition:
         assert not feist.holdings[1].contradicts(feist.holdings[2])
         assert feist.holdings[1].outputs[0].contradicts(feist.holdings[2].outputs[0])
         assert feist.holdings[1] | feist.holdings[2] == None
+
+    def test_union_basic(self, make_opinion_with_holding):
+        feist = make_opinion_with_holding["feist_majority"]
+        new_rule = feist.holdings[0] | feist.holdings[2]
+        assert len(new_rule.inputs) == 2
+        assert len(new_rule.outputs) == 1
+        assert len(new_rule.enactments) == 4
+
+    def test_union_longer(self, make_opinion_with_holding):
+        feist = make_opinion_with_holding["feist_majority"]
+        new_rule = feist.holdings[5] | feist.holdings[7]
+        assert len(new_rule.inputs) == 6
+        assert len(new_rule.outputs) == 1
+        assert len(new_rule.despite) == 1
+        assert new_rule.universal == False
+        assert new_rule.mandatory == False
+
+    def test_union_neither_universal(self, make_opinion_with_holding):
+        feist = make_opinion_with_holding["feist_majority"]
+        assert(feist.holdings[9] | feist.holdings[7]) is None
 
     # Add tests that consider differences in Enactments
