@@ -1,7 +1,8 @@
 """
-Descriptions of changes in litigation, without specifying
-whether they are mandatory or universal, or specifying the
-:class:`.Enactment`\s that might require them.
+Descriptions of procedural changes in litigation.
+
+Does not specify whether they are mandatory or universal,
+or specify the :class:`.Enactment`\s that might require them.
 """
 
 from __future__ import annotations
@@ -103,7 +104,7 @@ class Procedure(Factor):
 
     def __or__(self, other: Procedure) -> Optional[Procedure]:
         """
-        Combines two :class:`Procedure`\s into one.
+        Combine two :class:`Procedure`\s into one.
 
         The new :class:`Procedure` will have all of the ``inputs``, ``outputs``,
         and ``despite`` :class:`.Factor`\s of both ``self`` and ``other``.
@@ -208,6 +209,27 @@ class Procedure(Factor):
             }
         )
 
+    def add_factor(self, incoming: Factor, role: str = "inputs") -> Procedure:
+        """
+        Add an output, input, or despite :class:`.Factor`.
+
+        :param incoming:
+            the new :class:`.Factor` to be added to input, output, or despite
+
+        :param role:
+            specifies whether the new :class:`.Factor` should be added to
+            input, output, or despite
+
+        :returns:
+            a new version of ``self`` with the specified change
+        """
+
+        if role not in self.context_factor_names:
+            raise ValueError(f"'role' must be one of {self.context_factor_names}")
+        old_factors = self.__dict__.get(role) or []
+        new_factors = list(old_factors) + [incoming]
+        return self.evolve({role: new_factors})
+
     def consistent_factor_groups(
         self,
         self_factors: Tuple[Factor],
@@ -250,13 +272,6 @@ class Procedure(Factor):
                     ):
                         return False
         return True
-
-    def add_factor(self, incoming: Factor, role: str = "inputs") -> Procedure:
-        if role not in self.context_factor_names:
-            raise ValueError(f"'role' must be one of {self.context_factor_names}")
-        old_factors = self.__dict__.get(role) or []
-        new_factors = list(old_factors) + [incoming]
-        return self.evolve({role: new_factors})
 
     def contradiction_between_outputs(
         self, other: Procedure, matches: Dict[Factor, Factor]

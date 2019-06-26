@@ -585,6 +585,16 @@ class Enactment:
 
 
 def consolidate_enactments(enactments: List[Enactment]) -> List[Enactment]:
+    """
+    Consolidate any overlapping :class:`Enactment`\s in a :class:`list`.
+
+    :param enactments:
+        a list of :class:`Enactment`\s that may include overlapping
+        legislative text within the same section
+
+    :returns:
+        a list of :class:`Enactment`\s without overlapping text
+    """
     consolidated: List[Enactment] = []
     while enactments:
         match_made = False

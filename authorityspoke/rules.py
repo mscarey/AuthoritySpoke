@@ -24,7 +24,6 @@ from authorityspoke.procedures import Procedure
 
 @dataclass(frozen=True)
 class Rule(Factor):
-
     """
     A statement of a legal doctrine about a :class:`.Procedure` for litigation.
 
@@ -131,7 +130,7 @@ class Rule(Factor):
 
     def __add__(self, other) -> Optional[Rule]:
         """
-        Create new :class:`Rule` if ``self`` can satisfy the :attr:`inputs` of ``other``
+        Create new :class:`Rule` if ``self`` can satisfy the :attr:`inputs` of ``other``.
 
         If both ``self`` and ``other`` have False for :attr:`universal`,
         or if either has ``False`` for :attr:`rule_valid'\,
@@ -680,7 +679,13 @@ class Rule(Factor):
 
     def has_all_same_enactments(self, other: Rule) -> bool:
         """
-        Test if ``self`` has :class:`.Enactment`\s with same meanings as ``other``\'s
+        Test if ``self`` has :class:`.Enactment`\s with same meanings as ``other``\'s.
+
+        :param other:
+            another :class:`Rule` to compare to ``self``.
+
+        :returns:
+            whether the :meth:`~.Enactment.means` test passes for all :class:`.Enactment`\s
         """
         for enactment_group in self.enactment_attr_names:
             if not all(

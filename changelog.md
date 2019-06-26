@@ -1,9 +1,8 @@
-=========
 Changelog
 =========
 
 dev
-===
+---
 
 - Merge ProceduralRule class with Rule
 - Ignore was/were differences in Predicate content text
@@ -15,7 +14,7 @@ dev
 - Create function to consolidate list of Enactments
 
 0.1.0 (2019-06-10)
-==================
+------------------
 
 - Add Regime and Jurisdiction classes to organize Enactments
 - Add TextQuoteSelector class to select text from Enactments
