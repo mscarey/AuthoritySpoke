@@ -258,7 +258,7 @@ class Code:
         if path is not None:
             docpath = path.replace(self.uri, "")
 
-        if path is None:  # selecting the whole Code
+        if not docpath:  # selecting the whole Code
             passages = self.xml.find_all(name="text")
         elif self.jurisdiction == "us":
             if self.level == "regulation":
@@ -380,7 +380,7 @@ class Enactment:
                 )
             else:
                 raise ValueError("'code' and 'regime' cannot both be None")
-        if not self.selector.exact:
+        if (self.selector.prefix or self.selector.suffix) and not self.selector.exact:
             self.selector.set_exact_from_source(self.code)
         object.__delattr__(self, "regime")
 

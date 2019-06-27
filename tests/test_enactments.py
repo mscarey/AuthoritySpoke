@@ -115,6 +115,13 @@ class TestEnactments:
         slogans = Enactment(selector=selector, code=cfr)
         assert "Words and short phrases such as names" in slogans.text
 
+    def test_cite_entire_constitution(self, make_regime):
+        entire_const = Enactment(
+            selector=TextQuoteSelector(path="/us/const", source=make_regime),
+            regime=make_regime,
+        )
+        assert "and been seven Years a Citizen" in entire_const.text
+
     def test_code_title_in_str(self, make_enactment):
         assert "secure in their persons" in str(make_enactment["search_clause"])
 

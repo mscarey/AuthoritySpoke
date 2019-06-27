@@ -62,7 +62,7 @@ class TextQuoteSelector:
             object.__setattr__(self, "exact", self.source.uri)
 
         if not self.exact:
-            if self.source:
+            if (self.prefix or self.suffix) and not self.source:
                 object.__setattr__(
                     self, "exact", self.set_exact_from_source(self.source)
                 )
@@ -73,7 +73,7 @@ class TextQuoteSelector:
         """Use text found in ``source`` as ``exact`` parameter for ``self``."""
         if source.__class__.__name__ == "Regime":
             code = source.get_code(self.path)
-        elif self.source.__class__.__name__ == "Code":
+        elif source.__class__.__name__ == "Code":
             code = source
         else:
             return None
