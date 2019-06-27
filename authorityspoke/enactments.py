@@ -381,7 +381,9 @@ class Enactment:
             else:
                 raise ValueError("'code' and 'regime' cannot both be None")
         if (self.selector.prefix or self.selector.suffix) and not self.selector.exact:
-            self.selector.set_exact_from_source(self.code)
+            object.__setattr__(
+                self.selector, "exact", self.selector.set_exact_from_source(self.code)
+            )
         object.__delattr__(self, "regime")
 
     def __add__(self, other):

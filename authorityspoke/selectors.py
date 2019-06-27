@@ -59,7 +59,7 @@ class TextQuoteSelector:
             object.__setattr__(self, "path", self.path.rstrip("/"))
 
         if self.source and not self.path:
-            object.__setattr__(self, "exact", self.source.uri)
+            object.__setattr__(self, "path", self.source.uri)
 
         if not self.exact:
             if (self.prefix or self.suffix) and not self.source:

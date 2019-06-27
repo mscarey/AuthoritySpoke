@@ -99,6 +99,7 @@ class TestEnactments:
         assert 'DESPITE: "In no case does copyright protection ' in despite_text
 
     def test_short_passage_from_uslm_code(self, make_code):
+        """Also tests adding the missing initial "/" in ``path``."""
         usc17 = make_code["usc17"]
         selector = TextQuoteSelector(
             path="us/usc/t17/s102/b",
