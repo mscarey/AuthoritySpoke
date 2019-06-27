@@ -70,6 +70,10 @@ class TestCodes:
         out = const.format_uri_for_const("/us/const/amendment/XIV/1")
         assert out == "amendment-XIV-1"
 
+    def test_text_interval_from_entire_code(self, make_code):
+        interval = make_code["const"].select_text_from_interval(interval=(16, 50))
+        assert interval.startswith("Powers herein granted")
+
 
 class TestEnactments:
     def test_make_enactment(self, make_enactment):

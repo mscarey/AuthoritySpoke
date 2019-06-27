@@ -285,6 +285,9 @@ class Code:
         """
         Select text as interval of section identified by path.
 
+        If ``path`` parameter is not given, selects an interval from the
+        whole :class:`Code`.
+
         :param interval:
             the indices of the slice of the section text to be selected.
 
