@@ -42,7 +42,10 @@ class TextQuoteSelector:
     :param source:
         the :class:`.Code` where the quoted text can be found,
         or the :class:`.Regime` that has enacted it.
-        Only needed if ``exact`` is not specified.
+        Only needed if ``exact`` is not specified. If this
+        parameter is given, then the ``exact`` text will be
+        stored even if it's the entire text of a section or
+        :class:`.Code`.
     """
 
     path: Optional[str] = None
@@ -61,11 +64,8 @@ class TextQuoteSelector:
         if self.source and not self.path:
             object.__setattr__(self, "path", self.source.uri)
 
-        if not self.exact:
-            if (self.prefix or self.suffix) and not self.source:
-                object.__setattr__(
-                    self, "exact", self.set_exact_from_source(self.source)
-                )
+        if self.source and not self.exact:
+            object.__setattr__(self, "exact", self.set_exact_from_source(self.source))
 
         object.__delattr__(self, "source")
 

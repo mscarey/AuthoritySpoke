@@ -118,8 +118,7 @@ class TestEnactments:
 
     def test_cite_entire_constitution(self, make_regime):
         entire_const = Enactment(
-            selector=TextQuoteSelector(path="/us/const", source=make_regime),
-            regime=make_regime,
+            selector=TextQuoteSelector(path="/us/const"), regime=make_regime
         )
         assert "and been seven Years a Citizen" in entire_const.text
 
@@ -170,16 +169,23 @@ class TestEnactments:
             1791, 12, 15
         )
 
-    def test_12th_A_effective_date(self, make_regime):
+    def test_date_and_text_from_path_and_regime(self, make_regime):
         """
         This tests different parsing code because the date is
         in the format "dated the 25th of September, 1804"
+
+        This also verifies that providing the ``regime`` to the
+        Enactment constructor is sufficient to assign the full text of
+        the section as the text of the Enactment, even though no
+        ``exact``, ``prefix``, ``suffix``, or ``source`` parameter was
+        passed to the TextQuoteSelector constructor.
         """
         amendment_12 = Enactment(
             selector=TextQuoteSelector(path="/us/const/amendment-XII"),
             regime=make_regime,
         )
         assert amendment_12.effective_date == datetime.date(1804, 9, 25)
+        assert "Electors shall meet" in amendment_12.text
 
     def test_14th_A_effective_date(self, make_enactment):
         # July 28, 1868
