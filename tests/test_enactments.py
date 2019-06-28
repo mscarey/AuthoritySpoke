@@ -70,9 +70,34 @@ class TestCodes:
         out = const.format_uri_for_const("/us/const/amendment/XIV/1")
         assert out == "amendment-XIV-1"
 
+    @pytest.mark.parametrize(
+        "path, expected",
+        (
+            ["/us/const/amendment-XIV/3", "No person shall be a Senator"],
+            ["/article-I/5/1", "Each House shall be the Judge"],
+        ),
+    )
+    def test_get_section_from_fed_const(self, make_code, path, expected):
+        const = make_code["const"]
+        section = const.get_fed_const_section(path)
+        assert section.find("text").text.startswith(expected)
+
     def test_text_interval_from_entire_code(self, make_code):
         interval = make_code["const"].select_text_from_interval(interval=(16, 50))
         assert interval.startswith("Powers herein granted")
+
+    def test_text_interval_constitution_section(self, make_code):
+        passage = make_code["const"].select_text_from_interval(
+            path="/us/const/article-I/3/7", interval=(66, 85)
+        )
+        assert passage == "removal from Office"
+
+    def test_text_interval_beyond_end_of_section(self, make_code):
+        with pytest.raises(ValueError):
+            answer = make_code["const"].select_text_from_interval(
+                path="/us/const/article-I/3/7", interval=(66, 400)
+            )
+            print(answer)
 
 
 class TestEnactments:

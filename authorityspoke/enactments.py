@@ -227,6 +227,29 @@ class Code:
 
         raise NotImplementedError
 
+    def get_fed_const_section(self, path: str) -> BeautifulSoup:
+        """
+        Get a section from a USLM identifier if ``self`` is the US Constitution.
+
+        :param path:
+            a USLM path to a section of the US Constitution, with or
+            without the part that identifies the :class:`Code`, but without
+            a namespace declaration.
+
+        :returns:
+            the XML section of ``self`` matching the path.
+        """
+        path = path.replace(self.uri, "")
+        path_parts: List[str] = []
+        path = path.lstrip("/")
+        for slash_count in range(path.count("/") + 1):
+            path_parts.append(path[: (path.index("/") if "/" in path else None)])
+            path = path.replace("/", "-", 1)
+        section = self.xml
+        for part in path_parts:
+            section = section.find(id=part)
+        return section
+
     @functools.lru_cache()
     def section_text(self, path: str) -> str:
         """
@@ -269,7 +292,8 @@ class Code:
             elif self.level == "statute":
                 passages = usc_statute_text()
             else:  # federal constitution
-                passages = self.xml.find(id=docpath.split("/")[1]).find_all(name="text")
+                cited_section = self.get_fed_const_section(docpath)
+                passages = cited_section.find_all(name="text")
 
         elif self.jurisdiction == "us-ca":
             this_cal_section = functools.partial(cal_href, docpath)
@@ -303,7 +327,7 @@ class Code:
         section_text = self.section_text(path)
         if len(section_text) < max(interval):
             raise ValueError(
-                f"Interval {interval} extends beyond the end of Enactment {path}."
+                f"Interval {interval} extends beyond the end of text section {path}."
             )
         return section_text[min(interval) : max(interval)]
 
