@@ -318,6 +318,9 @@ class TestFacts:
     def test_factor_different_predicate_truth_unequal(self, watt_factor):
         assert not watt_factor["f7"].means(watt_factor["f7_opposite"])
 
+    def test_unequal_because_one_factor_is_absent(self, watt_factor):
+        assert not watt_factor["f8"].means(watt_factor["f8_absent"])
+
     def test_copies_of_identical_factor(self, make_factor):
         """
         Even if the two factors have different entity markers in self.context_factors,
@@ -420,7 +423,7 @@ class TestFacts:
 
     def test_standard_of_proof_comparison(self, watt_factor):
         f = watt_factor
-        assert f["f2_clear_and_convincing"] >= f["f2_preponderance_of_evidence"]
+        assert f["f2_clear_and_convincing"].implies(f["f2_preponderance_of_evidence"])
         assert f["f2_beyond_reasonable_doubt"] >= f["f2_clear_and_convincing"]
 
     def test_no_implication_between_factors_with_and_without_standards(
@@ -458,6 +461,9 @@ class TestFacts:
     def test_factor_contradiction_absent_predicate(self, watt_factor):
         assert watt_factor["f3"].contradicts(watt_factor["f3_absent"])
         assert watt_factor["f3_absent"].contradicts(watt_factor["f3"])
+
+    def test_two_absences_dont_contradict(self, watt_factor):
+        assert not watt_factor["f8_absent"].contradicts(watt_factor["f8_less_absent"])
 
     def test_factor_no_contradiction_no_truth_value(self, watt_factor):
         assert not watt_factor["f2"].contradicts(watt_factor["f2_no_truth"])
@@ -564,3 +570,11 @@ class TestFacts:
     ])
     def test_addition(self, make_factor, left, right, expected):
         assert make_factor[left] + make_factor[right] == make_factor[expected]
+
+    def test_add_unrelated_factors(self, make_factor):
+        assert make_factor["f_murder"] + make_factor["f_crime"] is None
+
+    def test_cant_add_enactment_to_fact(self, watt_factor, make_enactment):
+        with pytest.raises(TypeError):
+            print(watt_factor["f3"] + make_enactment["search_clause"])
+

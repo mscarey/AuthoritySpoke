@@ -256,6 +256,7 @@ def watt_factor(make_predicate, make_entity, watt_mentioned) -> Dict[str, Factor
         "f8_higher_int": Fact(p["p8_higher_int"], (0, 2), case_factors=c),
         "f8_int": Fact(p["p8_int"], (0, 2), case_factors=c),
         "f8_less": Fact(p["p8_less"], (0, 2), case_factors=c),
+        "f8_less_absent": Fact(p["p8_less"], (0, 2), absent=True, case_factors=c),
         "f8_meters": Fact(p["p8_meters"], (0, 2), case_factors=c),
         "f9_absent": Fact(p["p9"], absent=True, case_factors=c),
         "f9_absent_miles": Fact(p["p9_miles"], absent=True, case_factors=c),

@@ -868,7 +868,7 @@ class Fact(Factor):
 
         if self.absent:
             if other.absent:
-                return other._contradicts_if_present(self)
+                return False
             return other._implies_if_present(self)
         if not other.absent:
             return self._contradicts_if_present(other)
