@@ -76,7 +76,7 @@ class TextQuoteSelector:
         elif source.__class__.__name__ == "Code":
             code = source
         else:
-            return None
+            raise TypeError(f'"source" parameter must be class "Regime" or "Code"')
 
         section_text = code.section_text(self.path)
         return self.exact_from_ends(section_text)

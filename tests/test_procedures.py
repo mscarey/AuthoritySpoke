@@ -71,8 +71,14 @@ class TestProcedures:
         assert f["f2"] in c1_again.inputs
         assert f["f2"].context_factors == (watt_mentioned[1], watt_mentioned[0])
 
-    # Same Meaning
+    def test_wrong_role_for_added_factor(self, watt_factor, make_procedure):
+        with pytest.raises(ValueError):
+            new = make_procedure["c1"].add_factor(
+                incoming=watt_factor["f8"], role="generic"
+            )
 
+
+class TestProcedureSameMeaning:
     def test_procedure_equality(self, make_procedure, caplog):
         caplog.set_level(logging.DEBUG)
         assert make_procedure["c1"].means(make_procedure["c1_again"])
@@ -119,7 +125,7 @@ class TestProcedureImplication:
 
         c2 = make_procedure["c2"]
         c2_exact_quantity = make_procedure["c2_exact_quantity"]
-        assert c2_exact_quantity >= c2
+        assert c2_exact_quantity.implies(c2)
 
     def test_procedure_general_quantity_does_not_imply_exact(
         self, watt_factor, make_procedure

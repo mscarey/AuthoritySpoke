@@ -90,6 +90,12 @@ class TestRules:
         assert len(make_holding["h1"]) == 2
         assert len(make_holding["h3"]) == 5
 
+    def test_wrong_role_for_added_enactment(self, make_enactment, make_holding):
+        with pytest.raises(ValueError):
+            new = make_holding["h1"].add_enactment(
+                incoming=make_enactment["due_process_14"], role="inputs"
+            )
+
 
 class TestSameMeaning:
     def test_identical_holdings_equal(self, make_holding):
@@ -103,6 +109,17 @@ class TestSameMeaning:
         e.g. {"F1": "1,2,1", "F2": "2,0,0"} and {"F2": "1,2,2", "F1": "0,1,0"}
         """
         assert make_holding["h1"].means(make_holding["h1_entity_order"])
+
+    def test_added_enactment_changes_meaning(self, make_complex_rule, make_enactment):
+        due_process_rule = (
+        make_complex_rule["accept_murder_fact_from_relevance"]
+        + make_enactment["due_process_5"]
+        )
+
+        assert not due_process_rule.means(
+            make_complex_rule["accept_murder_fact_from_relevance"])
+        assert not make_complex_rule["accept_murder_fact_from_relevance"].means(
+            due_process_rule)
 
     def test_holdings_different_entities_unequal(self, make_holding):
         assert not make_holding["h1"].means(make_holding["h1_easy"])
@@ -761,6 +778,21 @@ class TestAddition:
         assert new_rule.universal is False
         assert new_rule.inputs == make_complex_rule["accept_relevance_testimony_ALL"].inputs
         assert make_complex_rule["accept_murder_fact_from_relevance"].outputs[0] in new_rule.outputs
+
+    def test_add_disconnected_rules_returns_none(self, make_holding):
+        assert make_holding["h1"] + make_holding["h2_ALL"] is None
+
+    def test_rule_requiring_more_enactments_wont_add(self, make_enactment, make_complex_rule):
+        """
+        This requirement might be changed, so that if the second
+        Rule requires more Enactments the method will just assume they're
+        available.
+        """
+        due_process_rule = (
+            make_complex_rule["accept_murder_fact_from_relevance"]
+            + make_enactment["due_process_5"]
+            )
+        assert make_complex_rule["accept_relevance_testimony_ALL"] + due_process_rule is None
 
 class TestUnion:
 

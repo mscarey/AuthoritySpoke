@@ -372,6 +372,9 @@ def make_exhibit(
     c = make_complex_fact
 
     return {
+        "shooting_affidavit": Exhibit(
+            form="affidavit", statement=f["f_shooting"], stated_by=e["alice"]
+        ),
         "shooting_testimony": Exhibit(
             form="testimony", statement=f["f_shooting"], stated_by=e["alice"]
         ),

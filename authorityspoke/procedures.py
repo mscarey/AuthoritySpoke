@@ -193,6 +193,10 @@ class Procedure(Factor):
         """
         :class:`.Factor`\s that can be replaced without changing ``self``\s meaning.
 
+        If ``self.generic is True`` then the only generic :class:`.Factor` is ``self``.
+        This could happen if the :class:`.Procedure` was mentioned generically in an
+        :class:`.Argument` about preserving objections for appeal, for instance.
+
         :returns:
             ``self``'s generic :class:`.Factor`\s,
             which must be matched to other generic :class:`.Factor`\s to
