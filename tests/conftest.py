@@ -565,6 +565,13 @@ def make_enactment(make_code, make_selector, make_regime) -> Dict[str, Enactment
             ),
             code=make_code["const"],
         ),
+        "commerce_vague_path": Enactment(
+            selector=TextQuoteSelector(
+                path="/us/const/article-I",
+                exact="No Preference shall be given by any Regulation of Commerce"
+            ),
+            code=make_code["const"],
+        ),
         "search_clause": Enactment(
             selector=TextQuoteSelector(
                 path="/us/const/amendment-IV",

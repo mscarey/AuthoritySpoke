@@ -355,8 +355,8 @@ class Code:
         if re.search(selector.passage_regex, text, re.IGNORECASE):
             return selector.exact
         raise ValueError(
-            f"Passage {selector.exact} from TextQuoteSelector "
-            + f"not found in Code at path {selector.path}."
+            f'Passage "{selector.exact}" from TextQuoteSelector '
+            + f'not found in Code "{self.title}" at path "{selector.path}".'
         )
 
     def __repr__(self):
@@ -441,8 +441,6 @@ class Enactment:
             return None
         self_interval = self.text_interval()
         other_interval = other.text_interval(path=self.selector.path)
-        if not self_interval or not other_interval:
-            return None
         both_intervals = sorted([self_interval, other_interval])
         if both_intervals[1][0] >= both_intervals[0][1] + 2:
             return None

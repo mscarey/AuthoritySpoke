@@ -319,3 +319,25 @@ class TestEnactments:
             [make_enactment["due_process_5"], make_enactment["due_process_14"]]
         )
         assert len(combined) == 2
+
+    def test_cant_add_fact_to_enactment(self, watt_factor, make_enactment):
+        with pytest.raises(TypeError):
+            print(make_enactment["search_clause"] + watt_factor["f3"])
+
+    def test_add_with_invalid_selector_text(self, make_enactment, make_code):
+        bad_selector = TextQuoteSelector(
+            path="/us/const/amendment-IV", exact="text that doesn't exist in the code"
+        )
+        bad_enactment = Enactment(selector=bad_selector, code=make_code["const"])
+        with pytest.raises(ValueError):
+            print(make_enactment["search_clause"] + bad_enactment)
+
+    def test_add_unconnected_provisions(self, make_enactment):
+        assert make_enactment["search_clause"] + make_enactment["copyright"] is None
+
+    def test_add_more_specific_path_no_overlap(self, make_enactment):
+        assert (
+            make_enactment["securing_for_authors"]
+            + make_enactment["commerce_vague_path"]
+            is None
+        )
