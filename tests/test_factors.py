@@ -348,6 +348,10 @@ class TestFacts:
         f = make_factor
         assert not f["f_three_entities"].means(f["f_repeating_entity"])
 
+    def test_unequal_to_enactment(self, watt_factor, make_enactment):
+        assert not watt_factor["f1"].means(make_enactment["copyright"])
+        assert not make_enactment["copyright"].means(watt_factor["f1"])
+
     def test_standard_of_proof_inequality(self, watt_factor):
 
         f = watt_factor

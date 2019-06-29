@@ -541,6 +541,10 @@ def make_code(make_regime) -> Dict[str, Code]:
 @pytest.fixture(scope="module")
 def make_enactment(make_code, make_selector, make_regime) -> Dict[str, Enactment]:
     return {
+        "bad_selector": Enactment(
+            selector=TextQuoteSelector(
+            path="/us/const/amendment-IV", exact="text that doesn't exist in the code"
+        ), code=make_code["const"]),
         "copyright": Enactment(
             selector=make_selector["copyright"], regime=make_regime
         ),

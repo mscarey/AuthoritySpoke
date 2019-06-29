@@ -165,6 +165,11 @@ class TestEnactments:
     def test_equal_enactment_text(self, make_enactment):
         assert make_enactment["due_process_5"].means(make_enactment["due_process_14"])
 
+    def test_not_gt_if_equal(self, make_enactment):
+        assert make_enactment["search_clause"] == make_enactment["search_clause"]
+        assert make_enactment["search_clause"].means(make_enactment["search_clause"])
+        assert not make_enactment["search_clause"] > make_enactment["search_clause"]
+
     def test_enactment_subset_or_equal(self, make_enactment):
         dp5 = make_enactment["due_process_5"]
         dp14 = make_enactment["due_process_14"]
@@ -256,6 +261,9 @@ class TestEnactments:
         this_section = provision.code.section_text(path=provision.selector.path)
         assert this_section[interval[0] : interval[1]] == text
 
+    def test_text_interval_bad_selector(self, make_enactment):
+        assert make_enactment["bad_selector"].text_interval() is None
+
     # Addition
 
     def test_add_overlapping_enactments(self, make_enactment):
@@ -325,12 +333,8 @@ class TestEnactments:
             print(make_enactment["search_clause"] + watt_factor["f3"])
 
     def test_add_with_invalid_selector_text(self, make_enactment, make_code):
-        bad_selector = TextQuoteSelector(
-            path="/us/const/amendment-IV", exact="text that doesn't exist in the code"
-        )
-        bad_enactment = Enactment(selector=bad_selector, code=make_code["const"])
         with pytest.raises(ValueError):
-            print(make_enactment["search_clause"] + bad_enactment)
+            print(make_enactment["search_clause"] + make_enactment["bad_selector"])
 
     def test_add_unconnected_provisions(self, make_enactment):
         assert make_enactment["search_clause"] + make_enactment["copyright"] is None
