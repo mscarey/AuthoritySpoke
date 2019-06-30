@@ -6,7 +6,7 @@ Unlike most other ``authorityspoke`` classes, :class:`Opinion`\s are not frozen.
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Tuple
+from typing import Any, ClassVar, Dict, List, Tuple
 from typing import Iterable, Iterator
 from typing import Optional, Sequence, Union
 
@@ -21,6 +21,7 @@ import requests
 from authorityspoke.context import get_directory_path
 from authorityspoke.factors import Factor
 from authorityspoke.rules import Rule
+from authorityspoke.selectors import TextQuoteSelector
 
 
 @dataclass
@@ -65,10 +66,13 @@ class Opinion:
     position: str
     author: Optional[str]
 
-    directory = get_directory_path("opinions")
+    directory: ClassVar = get_directory_path("opinions")
 
     def __post_init__(self):
-        self.holdings = []
+        self.holdings: List[Holding] = []
+        self.factors: Dict[
+            Factor, Union[TextQuoteSelector, Tuple[TextQuoteSelector, ...]]
+        ] = {}
 
     @classmethod
     def cap_download(
@@ -303,6 +307,83 @@ class Opinion:
                 make_opinion(decision_dict, opinion_dict, citations)
                 for opinion_dict in opinions
             )
+
+    def holdings_from_json(
+        self,
+        filename: str,
+        directory: Optional[pathlib.Path] = None,
+        regime: Optional[Regime] = None,
+        mentioned: List[Factor] = None,
+        posit_holdings: bool = True,
+    ) -> List[Rule]:
+        """
+        Load a list of :class:`Holdings`\s from JSON and :meth:`~.Opinion.posit` them.
+
+        :param filename:
+            the name of the JSON file to look in for :class:`Rule`
+            data in the format that lists ``mentioned_factors``
+            followed by a list of holdings
+
+        :param directory:
+            the path of the directory containing the JSON file
+
+        :parame regime:
+
+        :param mentioned:
+            A list of :class:`.Factor`\s that the method needs to
+            expect to find in the :class:`.Opinion`\'s holdings,
+            but that won't be provided within the JSON, if any.
+
+        :param posit_holdings:
+            Whether the :class:`.Holding`\s discovered in the JSON
+            should be posited by ``self``. If ``False``, a list of
+            the :class:`.Holding`\s will still be returned.
+
+        :returns:
+            a list of :class:`Rule`\s from a JSON file in the
+            ``example_data/holdings`` subdirectory, from a JSON
+            file.
+        """
+        if not directory:
+            directory = self.__class__.directory
+        with open(directory / filename, "r") as f:
+            case = json.load(f)
+
+        if not mentioned:
+            mentioned = []
+
+        factor_dicts = case.get("mentioned_factors")
+
+        # populates mentioned with context factors that don't
+        # need links to Opinion text
+        if factor_dicts:
+            for factor_dict in factor_dicts:
+                _, mentioned = Factor.from_dict(
+                    factor_dict, mentioned=mentioned, regime=regime
+                )
+
+        finished_rules: List[Rule] = []
+        for rule in case.get("holdings"):
+
+            # This basic formatting could be moved elsewhere, but
+            # it's needed before generating multiple rules based
+            # on the "exclusive" flag in the JSON.
+            for category in ("inputs", "despite", "outputs"):
+                if isinstance(rule.get(category), dict):
+                    rule[category] = [rule[category]]
+
+            for finished_rule, new_mentioned, factor_text_links in Holding.from_dict(
+                rule, mentioned, regime=regime
+            ):
+                mentioned = new_mentioned
+                finished_rules.append(finished_rule)
+                if posit_holdings:
+                    for factor in factor_text_links:
+                        if self.factors.get(factor) is None:
+                            self.factors[factor] = factor_text_links[factor]
+            if posit_holdings:
+                self.holdings.extend(finished_rules)
+        return finished_rules
 
     @classmethod
     def from_file(

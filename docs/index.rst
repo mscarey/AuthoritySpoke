@@ -22,12 +22,13 @@ API Reference
 .. toctree::
     :maxdepth: 3
 
+    api/regimes
+    api/courts
+    api/opinions
+    api/holdings
     api/factors
     api/predicates
     api/legislation
-    api/courts
-    api/opinions
-    api/regimes
     api/context
     api/selectors
 
