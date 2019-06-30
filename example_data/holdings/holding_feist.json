@@ -236,27 +236,32 @@
         {
             "inputs": {
                 "type": "fact",
-                "content": "Rural's telephone listings were names, towns, and telephone numbers of telephone subscribers"
+                "content": "Rural's telephone listings were names, towns, and telephone numbers of telephone subscribers",
+                "text": "There is no doubt that Feist took from the white pages of Rural’s directory a substantial amount of factual information. At a minimum, Feist copied the names, towns, and telephone numbers of 1,309 of Rural’s subscribers."
             },
             "outputs": {
                 "type": "fact",
                 "content": "Rural's telephone listings were original",
-                "truth": false
+                "truth": false,
+                "text": "In other words, did Feist, by taking 1,309 names, towns, and telephone numbers from Rural’s white pages, copy anything that was “original” to Rural? Certainly, the raw data does not satisfy the originality requirement."
             },
             "enactments": ["securing for authors", "right to writings", "copyright in a compilation", "preexisting material provision"]
         },
         {
             "inputs": [{
                 "type": "fact",
-                "content": "Rural's telephone directory was a telephone directory."
+                "content": "Rural's telephone directory was a telephone directory.",
+                "text": "Rural publishes a typical telephone directory, consisting of white pages and yellow pages."
             }, {
                 "type": "fact",
-                "content": "Rural's arragement of its telephone listings was the method of listing subscribers alphabetically by surname in Rural's telephone directory"
+                "content": "Rural's arragement of its telephone listings was the method of listing subscribers alphabetically by surname in Rural's telephone directory",
+                "text": "In preparing its white pages, Rural simply takes the data provided by its subscribers and lists it alphabetically by surname."
             }],
             "outputs": {
                 "type": "fact",
                 "content": "Rural's arragement of its telephone listings was original",
-                "truth": false
+                "truth": false,
+                "text": "The end product is a garden-variety white pages directory, devoid of even the slightest trace of creativity.\nRural’s selection of listings could not be more obvious: It publishes the most basic information — name, town, and telephone number — about each person who applies to it for telephone service. This is “selection” of a sort, but it lacks the modicum of creativity necessary to transform mere selection into copyrightable expression."
             },
             "enactments": ["securing for authors", "right to writings", "copyright in a compilation", "preexisting material provision"]
         }

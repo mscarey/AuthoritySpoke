@@ -462,7 +462,7 @@ class TestFacts:
         assert watt_factor["f3"].contradicts(watt_factor["f3_absent"])
         assert watt_factor["f3_absent"].contradicts(watt_factor["f3"])
 
-    def test_two_absences_dont_contradict(self, watt_factor):
+    def test_absences_of_contradictory_facts_consistent(self, watt_factor):
         assert not watt_factor["f8_absent"].contradicts(watt_factor["f8_less_absent"])
 
     def test_factor_no_contradiction_no_truth_value(self, watt_factor):
