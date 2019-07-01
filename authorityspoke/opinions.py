@@ -368,9 +368,9 @@ class Opinion:
                     for factor in factor_text_links:
                         if self.factors.get(factor) is None:
                             self.factors[factor] = factor_text_links[factor]
-            if posit_holdings:
-                self.holdings.extend(finished_rules)
-        return finished_rules
+        if posit_holdings:
+            self.holdings.extend(finished_holdings)
+        return finished_holdings
 
     def holdings_from_json(
         self,

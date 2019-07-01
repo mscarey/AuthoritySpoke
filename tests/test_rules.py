@@ -70,20 +70,22 @@ class TestRules:
 
     def test_string_with_line_breaks(self, make_opinion, make_regime):
         cardenas = make_opinion["cardenas_majority"]
-        cardenas.holdings_from_json("holding_cardenas.json", regime=make_regime)
+        cardenas.exposit("holding_cardenas.json", regime=make_regime)
         assert "was addicted to heroin\n" in str(cardenas.holdings[0])
 
-    def test_string_mentions_absence(self, make_regime):
-        cardenas_holdings = Holding.from_json("holding_cardenas.json", regime=make_regime)
+    def test_string_mentions_absence(self, make_opinion, make_regime):
+        cardenas = make_opinion["cardenas_majority"]
+        cardenas.exposit("holding_cardenas.json", regime=make_regime)
         assert "absence of evidence of testimony by <parole officer>" in str(
-            cardenas_holdings[1]
+            cardenas.holdings[1]
         )
 
-    def test_factor_properties_for_rule(self, make_regime):
-        cardenas_holdings = Holding.from_json("holding_cardenas.json", regime=make_regime)
-        assert len(cardenas_holdings[1].inputs) == 1
-        assert len(cardenas_holdings[1].outputs) == 1
-        assert len(cardenas_holdings[1].despite) == 1
+    def test_factor_properties_for_rule(self, make_opinion, make_regime):
+        cardenas = make_opinion["cardenas_majority"]
+        cardenas.exposit("holding_cardenas.json", regime=make_regime)
+        assert len(cardenas.holdings[1].inputs) == 1
+        assert len(cardenas.holdings[1].outputs) == 1
+        assert len(cardenas.holdings[1].despite) == 1
 
     def test_single_enactment_converted_to_tuple(self, make_holding):
         assert isinstance(make_holding["h2"].enactments, tuple)

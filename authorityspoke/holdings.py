@@ -56,6 +56,11 @@ class Holding:
 
     directory: ClassVar = get_directory_path("holdings")
 
+    def __post_init__(self):
+        object.__setattr__(self, "outputs", self.rule.procedure.outputs)
+        object.__setattr__(self, "inputs", self.rule.procedure.inputs)
+        object.__setattr__(self, "despite", self.rule.procedure.despite)
+
     @classmethod
     def from_dict(
         cls, record: Dict, mentioned: List[Factor], regime: Optional[Regime] = None
@@ -75,6 +80,7 @@ class Holding:
 
         factor_text_links: Dict[Factor, List[TextQuoteSelector]] = {}
         factor_groups: Dict[str, List] = {"inputs": [], "outputs": [], "despite": []}
+
         for factor_type in factor_groups:
             for factor_dict in record[factor_type]:
                 created, mentioned = Factor.from_dict(
@@ -83,6 +89,8 @@ class Holding:
                 if isinstance(factor_dict, dict):
                     selector_group = factor_dict.pop("text", None)
                     if selector_group:
+                        if not isinstance(selector_group, list):
+                            selector_group = list(selector_group)
                         selector_group = [
                             TextQuoteSelector.from_json(selector)
                             for selector in selector_group
@@ -93,9 +101,9 @@ class Holding:
         exclusive = record.pop("exclusive", None)
         rule_valid = record.pop("rule_valid", True)
         decided = record.pop("decided", True)
-        selector = TextQuoteSelector.from_json(record.pop("text", None))
+        selector = TextQuoteSelector.from_dict(record.pop("text", None))
 
-        basic_rule = Rule.from_dict(
+        basic_rule, mentioned = Rule.from_dict(
             record=record,
             mentioned=mentioned,
             regime=regime,
@@ -133,3 +141,9 @@ class Holding:
 
         # Continue by handing off to Rule.from_dict, which will have to be changed
         # to handle the Factors already having been created.
+
+    def __str__(self):
+        return (
+            f"the holding {'' if self.decided else 'that it is undecided whether '}"
+            + f"to {'accept' if self.rule_valid else 'reject'} {str(self.rule)}"
+        )

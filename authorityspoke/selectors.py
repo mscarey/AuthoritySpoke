@@ -131,6 +131,24 @@ class TextQuoteSelector:
             }
         )
 
+    @classmethod
+    def from_dict(cls, record: Optional[Union[dict, str]]):
+        if record is None:
+            return None
+        if isinstance(record, dict):
+            return TextQuoteSelector(**record)
+        if record.count("|") == 0:
+            return TextQuoteSelector(exact=record)
+        elif record.count("|") == 2:
+            prefix, exact, suffix = record.split("|")
+            return TextQuoteSelector(exact=exact, prefix=prefix, suffix=suffix)
+        else:
+            raise ValueError(
+                "If 'text' is a string, it must either contain no | pipe "
+                + "separator, or it must contain two pipe separators dividing "
+                + "the string into 'prefix', 'exact', and 'suffix'."
+            )
+
     @property
     def passage_regex(self):
         """Get a regex to identify the selected text."""
