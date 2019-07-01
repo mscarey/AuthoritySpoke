@@ -57,23 +57,6 @@ class Rule(Factor):
         its inputs are present. ``False`` means that the ``procedure`` is
         applicable in "some" situation where the inputs are present.
 
-    :param rule_valid:
-        ``True`` means the :class:`Rule` is asserted to be valid (or
-        useable by a court in litigation). ``False`` means it's asserted
-        to be invalid.
-
-    :param decided:
-        ``False`` means that it should be deemed undecided
-        whether the :class:`Rule` is valid, and thus can have the
-        effect of overruling prior holdings finding the :class:`.Rule`
-        to be either valid or invalid. Seemingly, ``decided=False``
-        should render the ``rule_valid`` flag irrelevant. Note that
-        if an opinion merely says the court is not deciding whether
-        a :class:`.Rule` is valid, there is no holding, and no
-        :class:`.Rule` object should be created. Deciding not to decide
-        a :class:`Rule`\'s validity is not the same thing as deciding
-        that the :class:`.Rule` is undecided.
-
     :param generic:
         whether the :class:`Rule` is being mentioned in a generic
         context. e.g., if the :class:`Rule` is being mentioned in
@@ -179,133 +162,23 @@ class Rule(Factor):
             )
         return None
 
-    @classmethod
-    def collection_from_dict(
-        cls,
-        case: Dict,
-        mentioned: Optional[List[Factor]] = None,
-        regime: Optional[Regime] = None,
-    ) -> List[Rule]:
+    def get_contrapositives(self) -> Iterator[Rule]:
         """
-        Create a :py:class:`list` of :class:`Rule`\s from JSON.
+        Make contrapositive forms of this :class:`Rule`.
 
-        :param case:
-            a :class:`dict` derived from the JSON format that
-            lists ``mentioned_entities`` followed by a
-            series of strings representing :class:`Rule`\s.
-
-        :param mentioned:
-            A list of :class:`.Factor`\s mentioned in the
-            :class:`.Opinion`\'s holdings. Especially used for
-            context factors referenced in :class:`.Predicate`\s,
-            since there's currently no other way to import
-            those using the JSON format.
-
-        :param regime:
-            A :class:`.Regime` to search in for :class:`.Enactment`\s
-            referenced in ``case``.
+        Used when converting from JSON input containing the entry
+        ``"exclusive": True``, which means the specified :class:`~Rule.inputs``
+        are the only way to reach the specified output. When that happens,
+        it can be inferred that in the absence of any of the inputs, the output
+        must also be absent. (Multiple :class:`~Rule.outputs` are not allowed
+        when the ``exclusive`` flag is ``True``.) So, this generator will
+        yield one new :class:`Rule` for each input.
 
         :returns:
-            a :class:`list` of :class:`Rule`\s with the items
-            from ``mentioned_entities`` as ``context_factors``.
-        """
-        if not mentioned:
-            mentioned: List[Factor] = []
-        factor_dicts = case.get("mentioned_factors")
-        if factor_dicts:
-            for factor_dict in factor_dicts:
-                _, mentioned = Factor.from_dict(
-                    factor_dict, mentioned=mentioned, regime=regime
-                )
-
-        finished_rules: List[Rule] = []
-        for rule in case.get("holdings"):
-
-            # This basic formatting could be moved elsewhere, but
-            # it's needed before generating multiple rules based
-            # on the "exclusive" flag in the JSON.
-            for category in ("inputs", "despite", "outputs"):
-                if isinstance(rule.get(category), dict):
-                    rule[category] = [rule[category]]
-
-            for finished_rule, new_mentioned in Rule.from_dict(
-                rule, mentioned, regime=regime
-            ):
-                finished_rules.append(finished_rule)
-                mentioned = new_mentioned
-        return finished_rules
-
-    @classmethod
-    def from_json(
-        cls,
-        filename: str,
-        directory: Optional[pathlib.Path] = None,
-        regime: Optional[Regime] = None,
-    ) -> List[Rule]:
-        """
-        Load a list of :class:`Rule`\s from JSON.
-
-        Does not cause an :class:`.Opinion` to :meth:`~.Opinion.posit`
-        the :class:`Rule`\s as holdings.
-
-        :param filename:
-            the name of the JSON file to look in for :class:`Rule`
-            data in the format that lists ``mentioned_factors``
-            followed by a list of holdings
-
-        :param directory:
-            the path of the directory containing the JSON file
-
-        :parame regime:
-
-        :returns:
-            a list of :class:`Rule`\s from a JSON file in the
-            ``example_data/holdings`` subdirectory, from a JSON
-            file.
-        """
-        if not directory:
-            directory = cls.directory
-        with open(directory / filename, "r") as f:
-            case = json.load(f)
-        return cls.collection_from_dict(case, regime=regime)
-
-    @classmethod
-    def contrapositive_from_dict(
-        cls, record: Dict, mentioned: List[Factor], regime: Optional[Regime] = None
-    ) -> Iterator[Tuple[Rule, List[Factor]]]:
-        """
-        Make contrapositive forms of a :class:`Rule` described by JSON input.
-
-        If ``record`` contains the entry ``"exclusive": True``, that means
-        the specified :class:`~Rule.inputs`` are the only way to reach the specified
-        output. (Multiple :class:`~Rule.outputs` are not allowed when the ``exclusive``
-        flag is ``True``.) When that happens, it can be inferred that in the absence
-        of any of the inputs, the output must also be absent. So, this method will be
-        called once for each input to create more :class:`Rule`\s containing that
-        information. None of the completed :class:`Rule` objects will contain an
-        ``exclusive`` flag.
-
-        :param record:
-            a :class:`dict` derived from the JSON format that
-            lists ``mentioned_entities`` followed by a
-            series of :class:`Rule`\s. Only one of the :class:`Rule`\s
-            will by covered by this :class:`dict`.
-
-        :param mentioned:
-            a series of context factors, including any generic
-            :class:`.Factor`\s that need to be mentioned in
-            :class:`.Predicate`\s. These will have been constructed
-            from the ``mentioned_entities`` section of the input
-            JSON.
-
-        :param regime:
-
-        :returns:
-            iterator yielding :class:`Rule`\s with the items
-            from ``mentioned_entities`` as ``context_factors``
+            iterator yielding :class:`Rule`\s.
         """
 
-        if len(record["outputs"]) != 1:
+        if len(self.outputs) != 1:
             raise ValueError(
                 "The 'exclusive' attribute is not allowed for Rules "
                 + "with more than one 'output' Factor. If the set of Factors "
@@ -313,27 +186,23 @@ class Rule(Factor):
                 + "'outputs', consider making a separate 'exclusive' entry "
                 + "for each output."
             )
-        if record["outputs"][0].get("absent") is True:
+        if self.outputs[0].absent:
             raise ValueError(
                 "The 'exclusive' attribute is not allowed for Rules "
                 + "with an 'absent' 'output' Factor. This would indicate "
                 + "that the output can or must be present in every litigation "
                 + "unless specified inputs are present, which is unlikely."
             )
-        if record.get("rule_valid") is False:
-            raise NotImplementedError(
-                "The ability to state that it is not 'valid' to assert "
-                + "that a Rule is the 'exclusive' way to reach an output is "
-                + "not implemented, so 'rule_valid' cannot be False while "
-                + "'exclusive' is True. Try expressing this in another way "
-                + "without the 'exclusive' keyword."
-            )
-        record["mandatory"] = not record.get("mandatory")
-        record["universal"] = not record.get("universal")
-        del record["exclusive"]
-        record["outputs"][0]["absent"] = True
 
-        for input_factor in record["inputs"]:
+        for input_factor in self.inputs:
+            yield self.evolve(
+                {
+                    "mandatory": not self.mandatory,
+                    "universal": not self.universal,
+                    "inputs": [input_factor],
+                    "outputs": [self.outputs[0].evolve({"absent": True})],
+                }
+            )
             new_record = record.copy()
             new_input = input_factor.copy()
             new_input["absent"] = not new_input.get("absent")
@@ -345,7 +214,11 @@ class Rule(Factor):
 
     @classmethod
     def from_dict(
-        cls, record: Dict, mentioned: List[Factor], regime: Optional[Regime] = None
+        cls,
+        record: Dict,
+        mentioned: List[Factor],
+        regime: Optional[Regime],
+        factor_groups: Optional[Dict[str, List[Factor]]] = None,
     ) -> Iterator[Tuple[Rule, List[Factor]]]:
         """
         Make :class:`Rule` from a :class:`dict` of strings and a list of mentioned :class:`.Factor`\s.
@@ -386,11 +259,17 @@ class Rule(Factor):
                 factors_or_enactments.append(created)
             return tuple(factors_or_enactments), mentioned
 
-        factor_groups: Dict[str, List] = {"inputs": [], "outputs": [], "despite": []}
-        for factor_type in factor_groups:
-            factor_groups[factor_type], mentioned = list_from_records(
-                record.get(factor_type, []), mentioned, Factor
-            )
+        if factor_groups is None:
+            # TODO: make this a separate method also called by Holdings.from_dict
+            factor_groups: Dict[str, List] = {
+                "inputs": [],
+                "outputs": [],
+                "despite": [],
+            }
+            for factor_type in factor_groups:
+                factor_groups[factor_type], mentioned = list_from_records(
+                    record.get(factor_type, []), mentioned, Factor
+                )
         enactment_groups: Dict[str, List] = {"enactments": [], "enactments_despite": []}
         for enactment_type in enactment_groups:
             enactment_groups[enactment_type], mentioned = list_from_records(
@@ -403,7 +282,7 @@ class Rule(Factor):
             despite=factor_groups["despite"],
         )
 
-        yield (
+        return (
             Rule(
                 procedure=procedure,
                 enactments=enactment_groups["enactments"],
@@ -415,10 +294,6 @@ class Rule(Factor):
             ),
             mentioned,
         )
-
-        if record.get("exclusive") is True:
-            for response in Rule.contrapositive_from_dict(record, mentioned, regime):
-                yield response
 
     @property
     def context_factors(self) -> Tuple:

@@ -56,7 +56,9 @@ class TextQuoteSelector:
 
     def __post_init__(self):
 
-        if self.path and not self.path.startswith("/"):
+        if self.path and not (
+            self.path.startswith("/") or self.path.startswith("http")
+        ):
             object.__setattr__(self, "path", "/" + self.path)
         if self.path and self.path.endswith("/"):
             object.__setattr__(self, "path", self.path.rstrip("/"))

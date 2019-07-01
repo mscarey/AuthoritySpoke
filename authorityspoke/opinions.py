@@ -20,6 +20,7 @@ import requests
 
 from authorityspoke.context import get_directory_path
 from authorityspoke.factors import Factor
+from authorityspoke.holdings import Holding
 from authorityspoke.rules import Rule
 from authorityspoke.selectors import TextQuoteSelector
 
@@ -308,13 +309,76 @@ class Opinion:
                 for opinion_dict in opinions
             )
 
+    def holdings_from_dict(
+        self,
+        case: Dict,
+        regime: Optional[Regime] = None,
+        mentioned: List[Factor] = None,
+        posit_holdings: bool = False,
+    ) -> List[Rule]:
+        """
+        Load a list of :class:`Holdings`\s from JSON and :meth:`~.Opinion.posit` them.
+
+        :param filename:
+            the name of the JSON file to look in for :class:`Rule`
+            data in the format that lists ``mentioned_factors``
+            followed by a list of holdings
+
+        :param directory:
+            the path of the directory containing the JSON file
+
+        :parame regime:
+
+        :param mentioned:
+            A list of :class:`.Factor`\s that the method needs to
+            expect to find in the :class:`.Opinion`\'s holdings,
+            but that won't be provided within the JSON, if any.
+
+        :param posit_holdings:
+            Whether the :class:`.Holding`\s discovered in the JSON
+            should be posited by ``self``. If ``False``, a list of
+            the :class:`.Holding`\s will still be returned.
+
+        :returns:
+            a list of :class:`Rule`\s from a JSON file in the
+            ``example_data/holdings`` subdirectory, from a JSON
+            file.
+        """
+        if not mentioned:
+            mentioned = []
+
+        factor_dicts = case.get("mentioned_factors")
+
+        # populates mentioned with context factors that don't
+        # need links to Opinion text
+        if factor_dicts:
+            for factor_dict in factor_dicts:
+                _, mentioned = Factor.from_dict(
+                    factor_dict, mentioned=mentioned, regime=regime
+                )
+
+        finished_holdings: List[Holding] = []
+        for holding_record in case.get("holdings"):
+            for finished_holding, new_mentioned, factor_text_links in Holding.from_dict(
+                holding_record, mentioned, regime=regime
+            ):
+                mentioned = new_mentioned
+                finished_holdings.append(finished_holding)
+                if posit_holdings:
+                    for factor in factor_text_links:
+                        if self.factors.get(factor) is None:
+                            self.factors[factor] = factor_text_links[factor]
+            if posit_holdings:
+                self.holdings.extend(finished_rules)
+        return finished_rules
+
     def holdings_from_json(
         self,
         filename: str,
         directory: Optional[pathlib.Path] = None,
         regime: Optional[Regime] = None,
         mentioned: List[Factor] = None,
-        posit_holdings: bool = True,
+        posit_holdings: bool = False,
     ) -> List[Rule]:
         """
         Load a list of :class:`Holdings`\s from JSON and :meth:`~.Opinion.posit` them.
@@ -345,45 +409,12 @@ class Opinion:
             file.
         """
         if not directory:
-            directory = self.__class__.directory
+            directory = Holding.directory
         with open(directory / filename, "r") as f:
             case = json.load(f)
-
-        if not mentioned:
-            mentioned = []
-
-        factor_dicts = case.get("mentioned_factors")
-
-        # populates mentioned with context factors that don't
-        # need links to Opinion text
-        if factor_dicts:
-            for factor_dict in factor_dicts:
-                _, mentioned = Factor.from_dict(
-                    factor_dict, mentioned=mentioned, regime=regime
-                )
-
-        finished_rules: List[Rule] = []
-        for rule in case.get("holdings"):
-
-            # This basic formatting could be moved elsewhere, but
-            # it's needed before generating multiple rules based
-            # on the "exclusive" flag in the JSON.
-            for category in ("inputs", "despite", "outputs"):
-                if isinstance(rule.get(category), dict):
-                    rule[category] = [rule[category]]
-
-            for finished_rule, new_mentioned, factor_text_links in Holding.from_dict(
-                rule, mentioned, regime=regime
-            ):
-                mentioned = new_mentioned
-                finished_rules.append(finished_rule)
-                if posit_holdings:
-                    for factor in factor_text_links:
-                        if self.factors.get(factor) is None:
-                            self.factors[factor] = factor_text_links[factor]
-            if posit_holdings:
-                self.holdings.extend(finished_rules)
-        return finished_rules
+        return self.holdings_from_dict(
+            case=case, regime=regime, mentioned=mentioned, posit_holdings=posit_holdings
+        )
 
     @classmethod
     def from_file(
@@ -450,20 +481,27 @@ class Opinion:
             representation of :class:`.Rule` objects. If ``None``
             is passed in, the :class:`.Rule` class will add the
             default value ``example_data/holdings``.
+
+        :param regime:
         """
 
         if rule_dict:
-            holdings = Rule.collection_from_dict(rule_dict, regime=regime)
+            holdings = self.holdings_from_dict(
+                case=rule_dict, regime=regime, posit_holdings=True
+            )
         elif rule_file:
-            holdings = Rule.from_json(rule_file, directory=directory, regime=regime)
+            holdings = self.holdings_from_json(
+                filename=rule_file,
+                directory=directory,
+                regime=regime,
+                posit_holdings=True,
+            )
         else:
             raise ValueError(
                 "Must specify either rule_file (filename of a JSON rule input file) "
                 "or rule_dict (a dict with the same fields as the JSON input file)."
             )
-        for holding in holdings:
-            self.posit(holding)
-        return self
+        return None
 
     @property
     def generic_factors(self) -> List[Factor]:

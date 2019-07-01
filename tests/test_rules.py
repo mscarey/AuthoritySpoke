@@ -4,6 +4,7 @@ import pytest
 from authorityspoke.enactments import Code, Enactment
 from authorityspoke.factors import Predicate, Entity, Factor, Fact
 from authorityspoke.factors import Evidence, Exhibit
+from authorityspoke.holdings import Holding
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
 from authorityspoke.opinions import Opinion
@@ -67,18 +68,19 @@ class TestRules:
         generics = make_holding["h1"].generic_factors
         assert list(generics) == [make_entity["motel"], make_entity["watt"]]
 
-    def test_string_with_line_breaks(self, make_regime):
-        cardenas_holdings = Rule.from_json("holding_cardenas.json", regime=make_regime)
-        assert "was addicted to heroin\n" in str(cardenas_holdings[0])
+    def test_string_with_line_breaks(self, make_opinion, make_regime):
+        cardenas = make_opinion["cardenas_majority"]
+        cardenas.holdings_from_json("holding_cardenas.json", regime=make_regime)
+        assert "was addicted to heroin\n" in str(cardenas.holdings[0])
 
     def test_string_mentions_absence(self, make_regime):
-        cardenas_holdings = Rule.from_json("holding_cardenas.json", regime=make_regime)
+        cardenas_holdings = Holding.from_json("holding_cardenas.json", regime=make_regime)
         assert "absence of evidence of testimony by <parole officer>" in str(
             cardenas_holdings[1]
         )
 
     def test_factor_properties_for_rule(self, make_regime):
-        cardenas_holdings = Rule.from_json("holding_cardenas.json", regime=make_regime)
+        cardenas_holdings = Holding.from_json("holding_cardenas.json", regime=make_regime)
         assert len(cardenas_holdings[1].inputs) == 1
         assert len(cardenas_holdings[1].outputs) == 1
         assert len(cardenas_holdings[1].despite) == 1
