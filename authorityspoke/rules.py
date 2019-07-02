@@ -70,13 +70,11 @@ class Rule(Factor):
         object.
     """
 
-    procedure: Optional[Procedure] = None
+    procedure: Procedure
     enactments: Union[Enactment, Iterable[Enactment]] = ()
     enactments_despite: Union[Enactment, Iterable[Enactment]] = ()
     mandatory: bool = False
     universal: bool = False
-    rule_valid: bool = True
-    decided: bool = True
     generic: bool = False
     name: Optional[str] = None
     outputs: Optional[Union[Factor, Iterable[Factor]]] = None
@@ -116,7 +114,6 @@ class Rule(Factor):
         Create new :class:`Rule` if ``self`` can satisfy the :attr:`inputs` of ``other``.
 
         If both ``self`` and ``other`` have False for :attr:`universal`,
-        or if either has ``False`` for :attr:`rule_valid'\,
         then returns ``None``. Otherwise:
 
         If the union of the :attr:`inputs` and :attr:`outputs` of ``self``
@@ -143,8 +140,6 @@ class Rule(Factor):
             if isinstance(other, Enactment):
                 return self.add_enactment(other)
             raise TypeError
-        if self.rule_valid is False or other.rule_valid is False:
-            return None
         if self.universal is False and other.universal is False:
             return None
 
@@ -289,8 +284,6 @@ class Rule(Factor):
                 enactments_despite=enactment_groups["enactments_despite"],
                 mandatory=record.get("mandatory", False),
                 universal=record.get("universal", False),
-                rule_valid=record.get("rule_valid", True),
-                decided=record.get("decided", True),
             ),
             mentioned,
         )
@@ -357,49 +350,15 @@ class Rule(Factor):
 
     def contradicts(self, other) -> bool:
         """
-        Test if ``self`` :meth:`~.Factor.implies` ``other`` :meth:`~.Factor.negated`\.
-
-        Works by testing whether ``self`` would imply ``other`` if
-        ``other`` had an opposite value for ``rule_valid``.
-
-        This method takes three main paths depending on
-        whether the holdings ``self`` and ``other`` assert that
-        rules are decided or undecided.
-
-        A ``decided`` :class:`Rule` can never contradict
-        a previous statement that any :class:`Rule` was undecided.
-
-        If rule A implies rule B, then a holding that B is undecided
-        contradicts a prior :class:`Rule` deciding that
-        rule A is valid or invalid.
+        Test if ``self`` contradicts ``other``.
 
         :returns:
-            whether ``self`` contradicts ``other``.
+            whether ``self`` contradicts ``other``, if each is posited by a
+            :class:`.Holding` with :attr:`~Holding.rule_valid``
+            and :attr:`~Holding.decided`
         """
-
         if not isinstance(other, self.__class__):
-            raise TypeError(
-                f"'Contradicts' not supported between instances of "
-                + f"'{self.__class__.__name__}' and '{other.__class__.__name__}'."
-            )
-
-        if not other.decided:
-            return False
-        if self.decided:
-            return self >= other.negated()
-        return other._implies_if_decided(self) or other._implies_if_decided(
-            self.negated()
-        )
-
-    def _contradicts_if_valid(self, other) -> bool:
-        """
-        Test if ``self`` contradicts ``other``, assuming ``rule_valid`` and ``decided``.
-
-        :returns:
-            whether ``self`` contradicts ``other``,
-            assuming that ``rule_valid`` and ``decided`` are
-            ``True`` for both :class:`Rule`\s.
-        """
+            raise TypeError()
 
         if not self.mandatory and not other.mandatory:
             return False
@@ -419,75 +378,6 @@ class Rule(Factor):
         return other.procedure.contradicts_some_to_all(
             self.procedure
         ) or self.procedure.contradicts_some_to_all(other.procedure)
-
-    def __ge__(self, other) -> bool:
-        """
-        Test for implication.
-
-        See :meth:`.Procedure.implies_all_to_all`
-        and :meth:`.Procedure.implies_all_to_some` for
-        explanations of how ``inputs``, ``outputs``,
-        and ``despite`` :class:`.Factor`\s affect implication.
-
-        If ``self`` relies for support on some :class:`.Enactment` text
-        that ``other`` doesn't, then ``self`` doesn't imply ``other``.
-
-        Also, if ``other`` specifies that it applies notwithstanding
-        some :class:`.Enactment` not mentioned by ``self``, then
-        ``self`` doesn't imply ``other``.
-
-        :returns:
-            whether ``self`` implies ``other``, which requires ``other``
-            to be another :class:`Rule`.
-        """
-
-        if not isinstance(other, self.__class__):
-            raise TypeError(
-                f"'Implies' not supported between instances of "
-                + f"'{self.__class__.__name__}' and '{other.__class__.__name__}'."
-            )
-
-        if self.decided and other.decided:
-            return self._implies_if_decided(other)
-
-        # A holding being undecided doesn't seem to imply that
-        # any other holding is undecided, except itself and the
-        # negation of itself.
-
-        if not self.decided and not other.decided:
-            return self.means(other) or self.means(other.negated())
-
-        # It doesn't seem that any holding being undecided implies
-        # that any holding is decided, or vice versa.
-
-        return False
-
-    def _implies_if_decided(self, other) -> bool:
-        """
-        Test if ``self`` implies ``other`` if they're both decided.
-
-        This is a partial version of the
-        :meth:`Rule.__ge__` implication function.
-
-        :returns:
-            whether ``self`` implies ``other``, assuming that
-            ``self.decided == other.decided == True`` and that
-            ``self`` and ``other`` are both :class:`Rule`\s,
-            although ``rule_valid`` can be ``False``.
-        """
-
-        if self.rule_valid and other.rule_valid:
-            return self._implies_if_valid(other)
-
-        if not self.rule_valid and not other.rule_valid:
-            return other._implies_if_valid(self)
-
-        # Looking for implication where self.rule_valid != other.rule_valid
-        # is equivalent to looking for contradiction.
-
-        # If decided rule A contradicts B, then B also contradicts A
-
-        return self._contradicts_if_valid(other)
 
     def needs_subset_of_enactments(self, other) -> bool:
         """
@@ -511,12 +401,19 @@ class Rule(Factor):
             return False
         return True
 
-    def _implies_if_valid(self, other) -> bool:
+    def __ge__(self, other) -> bool:
         """
-        Test if ``self`` implies ``other`` if they're valid and decided.
+        Test if ``self`` implies ``other`` if posited in valid and decided :class:`.Holding`\s.
 
-        This is a partial version of the
-        :meth:`Rule.__ge__` implication function.
+        If ``self`` relies for support on some :class:`.Enactment` text
+        that ``other`` doesn't, then ``self`` doesn't imply ``other``.
+
+        Also, if ``other`` specifies that it applies notwithstanding
+        some :class:`.Enactment` not mentioned by ``self``, then
+        ``self`` doesn't imply ``other``.
+
+        This will be called as part of the
+        :meth:`Holding.__ge__` implication function.
 
         :returns:
             whether ``self`` implies ``other``, assuming that
@@ -589,16 +486,7 @@ class Rule(Factor):
         if not other.has_all_same_enactments(self):
             return False
 
-        return (
-            self.mandatory == other.mandatory
-            and self.universal == other.universal
-            and self.rule_valid == other.rule_valid
-            and self.decided == other.decided
-        )
-
-    def negated(self):
-        """Get new copy of ``self`` with an opposite value for ``rule_valid``."""
-        return self.evolve("rule_valid")
+        return self.mandatory == other.mandatory and self.universal == other.universal
 
     def __or__(self, other: Rule) -> Rule:
         if not isinstance(other, Rule):
@@ -627,8 +515,7 @@ class Rule(Factor):
 
         newline = "\n"
         return (
-            f"the rule that {'it is not decided whether ' if not self.decided else ''}"
-            + f"{'it is not valid that ' if not self.rule_valid else ''}the court "
+            f"the rule that the court "
             + f"{'MUST' if self.mandatory else 'MAY'} {'ALWAYS' if self.universal else 'SOMETIMES'} "
             + f"accept the result{newline}{str(factor_catalog(self.procedure.outputs, 'RESULT'))}"
             + f"{'based on the input' + newline + str(factor_catalog(self.procedure.inputs, 'GIVEN')) if self.procedure.inputs else ''}"

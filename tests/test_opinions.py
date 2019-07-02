@@ -107,12 +107,11 @@ class TestOpinions:
     def test_new_context_creates_equal_rule(self, make_opinion, make_regime):
         watt = make_opinion["watt_majority"]
         brad = make_opinion["brad_majority"]
-        watt_holdings = Rule.from_json(f"holding_watt.json", regime=make_regime)
-        brad_holdings = Rule.from_json(f"holding_brad.json", regime=make_regime)
-        for holding in watt_holdings:
-            watt.posit(holding)
-        for holding in brad_holdings:
-            brad.posit(holding)
+        # Clearing in case prior tests added holdings
+        watt.holdings = []
+        brad.holdings = []
+        watt.exposit(rule_file="holding_watt.json", regime=make_regime)
+        brad.exposit(rule_file="holding_brad.json", regime=make_regime)
         context_pairs = {
             "proof of Bradley's guilt": "proof of Wattenburg's guilt",
             "Bradley": "Wattenburg",

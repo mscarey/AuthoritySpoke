@@ -16,7 +16,7 @@ from authorityspoke.selectors import TextQuoteSelector
 
 
 @dataclass(frozen=True)
-class Holding:
+class Holding(Factor):
     """
     An :class:`.Opinion`\'s announcement that it posits or rejects a legal :class:`.Rule`.
 
@@ -53,6 +53,7 @@ class Holding:
     rule_valid: bool = True
     decided: bool = True
     selector: Optional[Union[Iterable[TextQuoteSelector], TextQuoteSelector]] = None
+    name: Optional[str] = None
 
     directory: ClassVar = get_directory_path("holdings")
 
@@ -143,6 +144,140 @@ class Holding:
 
         # Continue by handing off to Rule.from_dict, which will have to be changed
         # to handle the Factors already having been created.
+
+    @property
+    def context_factors(self) -> Tuple:
+        """
+        Call :class:`Procedure`\'s :meth:`~Procedure.context_factors` method.
+
+        :returns:
+            context_factors from ``self``'s :class:`Procedure`
+        """
+        return self.rule.procedure.context_factors
+
+    def contradicts(self, other) -> bool:
+        """
+        Test if ``self`` :meth:`~.Factor.implies` ``other`` :meth:`~.Factor.negated`\.
+
+        Works by testing whether ``self`` would imply ``other`` if
+        ``other`` had an opposite value for ``rule_valid``.
+
+        This method takes three main paths depending on
+        whether the holdings ``self`` and ``other`` assert that
+        rules are decided or undecided.
+
+        A ``decided`` :class:`Rule` can never contradict
+        a previous statement that any :class:`Rule` was undecided.
+
+        If rule A implies rule B, then a holding that B is undecided
+        contradicts a prior :class:`Rule` deciding that
+        rule A is valid or invalid.
+
+        :returns:
+            whether ``self`` contradicts ``other``.
+        """
+
+        if not isinstance(other, self.__class__):
+            raise TypeError(
+                f"'Contradicts' not supported between instances of "
+                + f"'{self.__class__.__name__}' and '{other.__class__.__name__}'."
+            )
+
+        if not other.decided:
+            return False
+        if self.decided:
+            return self >= other.negated()
+        return other._implies_if_decided(self) or other._implies_if_decided(
+            self.negated()
+        )
+
+    def __ge__(self, other: Union[Holding, Rule]) -> bool:
+        """
+        Test for implication.
+
+        See :meth:`.Procedure.implies_all_to_all`
+        and :meth:`.Procedure.implies_all_to_some` for
+        explanations of how ``inputs``, ``outputs``,
+        and ``despite`` :class:`.Factor`\s affect implication.
+
+        :param other:
+            A :class:`Holding` to compare to self, or a :class:`.Rule` to
+            convert into such a :class:`Holding` and then compare
+
+        :returns:
+            whether ``self`` implies ``other``
+        """
+
+        if isinstance(other, Rule):
+            return self >= Holding(rule=other)
+
+        if not isinstance(other, self.__class__):
+            raise TypeError(
+                f"'Implies' not supported between instances of "
+                + f"'{self.__class__.__name__}' and '{other.__class__.__name__}'."
+            )
+
+        if self.decided and other.decided:
+            return self._implies_if_decided(other)
+
+        # A holding being undecided doesn't seem to imply that
+        # any other holding is undecided, except itself and the
+        # negation of itself.
+
+        if not self.decided and not other.decided:
+            return self.means(other) or self.means(other.negated())
+
+        # It doesn't seem that any holding being undecided implies
+        # that any holding is decided, or vice versa.
+
+        return False
+
+    def _implies_if_decided(self, other) -> bool:
+        """
+        Test if ``self`` implies ``other`` if they're both decided.
+
+        This is a partial version of the
+        :meth:`Holding.__ge__` implication function.
+
+        :returns:
+            whether ``self`` implies ``other``, assuming that
+            ``self.decided == other.decided == True`` and that
+            ``self`` and ``other`` are both :class:`Holding`\s,
+            although ``rule_valid`` can be ``False``.
+        """
+
+        if self.rule_valid and other.rule_valid:
+            return self.rule >= other.rule
+
+        if not self.rule_valid and not other.rule_valid:
+            return other.rule >= self.rule
+
+        # Looking for implication where self.rule_valid != other.rule_valid
+        # is equivalent to looking for contradiction.
+
+        # If decided rule A contradicts B, then B also contradicts A
+
+        return self.rule.contradicts(other.rule)
+
+    def means(self, other):
+        """
+        Test whether ``other`` has the same meaning as ``self``.
+
+        :returns:
+            whether ``other`` is a :class:`Holding` with the
+            same meaning as ``self``.
+        """
+        if not isinstance(other, self.__class__):
+            return False
+
+        if not self.rule.means(other.rule):
+            return False
+
+        return self.rule_valid == other.rule_valid and self.decided == other.decided
+
+    def negated(self):
+        """Get new copy of ``self`` with an opposite value for ``rule_valid``."""
+        return self.evolve("rule_valid")
 
     def __str__(self):
         return (
