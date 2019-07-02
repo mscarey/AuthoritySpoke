@@ -130,8 +130,12 @@ class TestOpinions:
         brad = make_opinion["brad_majority"]
         watt.holdings = []
         brad.holdings = []
-        watt_holdings = Rule.from_json(f"holding_watt.json", regime=make_regime)
-        brad_holdings = Rule.from_json(f"holding_brad.json", regime=make_regime)
+        watt_holdings = watt.holdings_from_json(
+            filename="holding_watt.json", regime=make_regime
+        )
+        brad_holdings = brad.holdings_from_json(
+            filename="holding_brad.json", regime=make_regime
+        )
         for holding in watt_holdings:
             watt.posit(holding)
         for holding in brad_holdings:

@@ -95,7 +95,7 @@ class Holding(Factor):
                         if not isinstance(selector_group, list):
                             selector_group = list(selector_group)
                         selector_group = [
-                            TextQuoteSelector.from_json(selector)
+                            TextQuoteSelector.from_record(selector)
                             for selector in selector_group
                         ]
                         factor_text_links[created] = selector_group
@@ -104,7 +104,7 @@ class Holding(Factor):
         exclusive = record.pop("exclusive", None)
         rule_valid = record.pop("rule_valid", True)
         decided = record.pop("decided", True)
-        selector = TextQuoteSelector.from_dict(record.pop("text", None))
+        selector = TextQuoteSelector.from_record(record.pop("text", None))
 
         basic_rule, mentioned = Rule.from_dict(
             record=record,
@@ -154,6 +154,16 @@ class Holding(Factor):
             context_factors from ``self``'s :class:`Procedure`
         """
         return self.rule.procedure.context_factors
+
+    @property
+    def generic_factors(self) -> List[Optional[Factor]]:
+        """
+        Get :class:`.Factor`\s that can be replaced without changing ``self``\s meaning.
+
+        :returns:
+            generic :class:`.Factor`\s from ``self``'s :class:`Procedure`
+        """
+        return self.rule.generic_factors
 
     def contradicts(self, other) -> bool:
         """
@@ -278,6 +288,14 @@ class Holding(Factor):
     def negated(self):
         """Get new copy of ``self`` with an opposite value for ``rule_valid``."""
         return self.evolve("rule_valid")
+
+    def new_context(self, changes: Dict[Factor, Factor]) -> Factor:
+        return Holding(
+            rule=self.rule.new_context(changes),
+            rule_valid=self.rule_valid,
+            decided=self.decided,
+            selector=self.selector,
+        )
 
     def __str__(self):
         return (

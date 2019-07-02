@@ -569,7 +569,7 @@ class Opinion:
             present case.
         """
 
-        def posits_one_holding(
+        def posit_one_holding(
             holding: Union[Holding, Iterable[Holding]],
             context: Optional[Sequence[Factor]] = None,
         ) -> None:
@@ -598,9 +598,9 @@ class Opinion:
 
         if isinstance(holding, Iterable):
             for item in holding:
-                posits_one_holding(item, context)
+                posit_one_holding(item, context)
         else:
-            posits_one_holding(holding, context)
+            posit_one_holding(holding, context)
 
     def __ge__(self, other: Union[Opinion, Rule]) -> bool:
         """

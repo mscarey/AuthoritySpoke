@@ -132,7 +132,7 @@ class TextQuoteSelector:
         )
 
     @classmethod
-    def from_dict(cls, record: Optional[Union[dict, str]]):
+    def from_record(cls, record: Optional[Union[dict, str]]):
         if record is None:
             return None
         if isinstance(record, dict):
