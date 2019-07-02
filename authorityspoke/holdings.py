@@ -52,7 +52,7 @@ class Holding:
     rule: Rule
     rule_valid: bool = True
     decided: bool = True
-    selector: Optional[TextQuoteSelector] = None
+    selector: Optional[Union[Iterable[TextQuoteSelector], TextQuoteSelector]] = None
 
     directory: ClassVar = get_directory_path("holdings")
 
@@ -60,6 +60,10 @@ class Holding:
         object.__setattr__(self, "outputs", self.rule.procedure.outputs)
         object.__setattr__(self, "inputs", self.rule.procedure.inputs)
         object.__setattr__(self, "despite", self.rule.procedure.despite)
+        if isinstance(self.selector, list):
+            object.__setattr__(self, "selector", tuple(self.selector))
+        elif isinstance(self.selector, TextQuoteSelector):
+            object.__setattr__(self, "selector", tuple([self.selector]))
 
     @classmethod
     def from_dict(
@@ -67,8 +71,6 @@ class Holding:
     ) -> Iterator[Tuple[Holding, List[Factor], Dict[Factor, List[TextQuoteSelector]]]]:
         """
         Will yield multiple items if ``exclusive: True`` is present in ``record``.
-
-
         """
 
         # If lists were omitted around single elements in the JSON,
@@ -82,7 +84,7 @@ class Holding:
         factor_groups: Dict[str, List] = {"inputs": [], "outputs": [], "despite": []}
 
         for factor_type in factor_groups:
-            for factor_dict in record[factor_type]:
+            for factor_dict in record.get(factor_type) or []:
                 created, mentioned = Factor.from_dict(
                     factor_dict, mentioned, regime=regime
                 )

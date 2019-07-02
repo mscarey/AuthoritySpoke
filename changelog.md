@@ -5,6 +5,8 @@ dev
 ---
 
 - Merge ProceduralRule class with Rule
+- Split aspects of Rule into a separate Holding class
+- Use Selectors to anchor Holdings to Opinion text
 - Ignore was/were differences in Predicate content text
 - Let input JSON label a Rule as the "exclusive" way to get output
 - Create addition operator for Factors and Rules

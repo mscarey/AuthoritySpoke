@@ -570,13 +570,13 @@ class Opinion:
         """
 
         def posits_one_holding(
-            holding: Union[Rule, Iterable[Rule]],
+            holding: Union[Holding, Iterable[Holding]],
             context: Optional[Sequence[Factor]] = None,
         ) -> None:
-            if not isinstance(holding, Rule):
-                raise TypeError('"holding" must be an object of type Rule.')
+            if not isinstance(holding, Holding):
+                raise TypeError('"holding" must be an object of type Holding.')
 
-            if context is not None and isinstance(holding, Rule):
+            if context is not None:
                 if isinstance(context, dict):
                     for factor in context:
                         if isinstance(context[factor], str):

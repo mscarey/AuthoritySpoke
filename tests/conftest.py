@@ -7,6 +7,7 @@ from authorityspoke.factors import Factor, Entity
 from authorityspoke.enactments import Code, Enactment
 from authorityspoke.factors import Evidence, Exhibit
 from authorityspoke.factors import Fact
+from authorityspoke.holdings import Holding
 from authorityspoke.jurisdictions import Jurisdiction, Regime
 from authorityspoke.opinions import Opinion
 from authorityspoke.predicates import Predicate, Q_
@@ -804,7 +805,7 @@ def real_holding(make_procedure, make_enactment) -> Dict[str, Rule]:
 
 
 @pytest.fixture(scope="class")
-def make_holding(make_procedure, make_enactment) -> Dict[str, Rule]:
+def make_rule(make_procedure, make_enactment) -> Dict[str, Rule]:
     c = make_procedure
     e = make_enactment
 
@@ -817,9 +818,7 @@ def make_holding(make_procedure, make_enactment) -> Dict[str, Rule]:
             c["c1_entity_order"], enactments=e["search_clause"]
         ),
         "h1_easy": Rule(c["c1_easy"], enactments=e["search_clause"]),
-        "h1_opposite": Rule(
-            c["c1"], enactments=e["search_clause"], rule_valid=False
-        ),
+
         "h2_without_cite": Rule(c["c2"]),
         "h2_fourth_a_cite": Rule(c["c2"], enactments=e["fourth_a"]),
         "h2_despite_due_process": Rule(
@@ -832,14 +831,6 @@ def make_holding(make_procedure, make_enactment) -> Dict[str, Rule]:
             enactments=(e["search_clause"], e["due_process_5"]),
             mandatory=False,
             universal=True,
-            rule_valid=True,
-        ),
-        "h2_ALL_due_process_invalid": Rule(
-            c["c2"],
-            enactments=(e["search_clause"], e["due_process_5"]),
-            mandatory=False,
-            universal=True,
-            rule_valid=False,
         ),
         "h2_ALL": Rule(
             c["c2"], enactments=e["search_clause"], mandatory=False, universal=True
@@ -930,14 +921,8 @@ def make_holding(make_procedure, make_enactment) -> Dict[str, Rule]:
             mandatory=False,
             universal=True,
         ),
-        "h2_invalid_undecided": Rule(
-            c["c2"], enactments=e["search_clause"], rule_valid=False, decided=False
-        ),
         "h2_MUST": Rule(
             c["c2"], enactments=e["search_clause"], mandatory=True, universal=False
-        ),
-        "h2_MUST_invalid": Rule(
-            c["c2"], enactments=e["search_clause"], mandatory=True, rule_valid=False
         ),
         "h2_output_absent": Rule(
             c["c2_output_absent"], enactments=e["search_clause"]
@@ -963,38 +948,14 @@ def make_holding(make_procedure, make_enactment) -> Dict[str, Rule]:
             mandatory=True,
             universal=False,
         ),
-        "h2_undecided": Rule(
-            c["c2"], enactments=e["search_clause"], decided=False
-        ),
-        "h2_irrelevant_inputs_undecided": Rule(
-            c["c2_irrelevant_inputs"], enactments=e["search_clause"], decided=False
-        ),
-        "h2_MUST_undecided": Rule(
-            c["c2"], enactments=e["search_clause"], mandatory=True, decided=False
-        ),
         "h3_ALL": Rule(
             c["c3"], enactments=e["search_clause"], universal=True
         ),
         "h3_fewer_inputs": Rule(
             c["c3_fewer_inputs"], enactments=e["search_clause"]
         ),
-        "h3_undecided": Rule(
-            c["c3"], enactments=e["search_clause"], decided=False
-        ),
-        "h3_ALL_undecided": Rule(
-            c["c3"], enactments=e["search_clause"], decided=False, universal=True
-        ),
         "h3_fewer_inputs_ALL": Rule(
             c["c3_fewer_inputs"], enactments=e["search_clause"], universal=True
-        ),
-        "h3_fewer_inputs_undecided": Rule(
-            c["c3_fewer_inputs"], enactments=e["search_clause"], decided=False
-        ),
-        "h3_fewer_inputs_ALL_undecided": Rule(
-            c["c3_fewer_inputs"],
-            enactments=e["search_clause"],
-            universal=True,
-            decided=False,
         ),
         "h_near_means_curtilage": Rule(
             c["c_near_means_curtilage"], enactments=e["search_clause"]
@@ -1007,12 +968,6 @@ def make_holding(make_procedure, make_enactment) -> Dict[str, Rule]:
             enactments=e["search_clause"],
             mandatory=True,
             universal=True,
-        ),
-        "h_near_means_curtilage_ALL_undecided": Rule(
-            c["c_near_means_curtilage"],
-            enactments=e["search_clause"],
-            universal=True,
-            decided=False,
         ),
         "h_near_means_no_curtilage": Rule(
             c["c_near_means_no_curtilage"], enactments=e["search_clause"]
@@ -1047,6 +1002,29 @@ def make_holding(make_procedure, make_enactment) -> Dict[str, Rule]:
         "h_output_distance_more": Rule(c["c_output_distance_more"]),
     }
 
+@pytest.fixture(scope="class")
+def make_holding(make_rule) -> Dict[str, Holding]:
+    holdings: Dict[str, Holding] = {}
+    for name, rule in make_rule:
+        holdings[name] = Holding(rule=rule)
+
+    new_holdings = {
+    "h1_opposite": Holding(rule=make_rule["h1"], rule_valid=False),
+    "h2_undecided": Holding(rule=make_rule["h2"], decided=False),
+    "h2_invalid_undecided": Holding(rule=make_rule["h2"], rule_valid=False, decided=False),
+    "h2_irrelevant_inputs_undecided": Holding(rule=make_rule["h2_irrelevant_inputs"], decided=False),
+    "h2_MUST_undecided": Holding(rule=make_rule["h2_MUST"], decided=False),
+    "h2_MUST_invalid": Holding(rule=make_rule["h2_MUST"], rule_valid=False),
+    "h2_ALL_due_process_invalid": Holding(rule=make_rule["h2_ALL_due_process"], rule_valid=False),
+    "h3_undecided": Holding(rule=make_rule["h3"], decided=False),
+    "h3_ALL_undecided": Holding(rule=make_rule["h3_ALL"], decided=False),
+    "h3_fewer_inputs_undecided": Holding(rule=make_rule["h3_fewer_inputs"], decided=False),
+    "h3_fewer_inputs_ALL_undecided": Holding(rule=make_rule["h3_fewer_inputs_ALL"], decided=False),
+    "h_near_means_curtilage_ALL_undecided": Holding(rule=make_rule["h_near_means_curtilage_ALL"], decided=False),
+    }
+
+    holdings.update(new_holdings)
+    return holdings
 
 @pytest.fixture(scope="class")
 def make_opinion(make_entity) -> Dict[str, Opinion]:

@@ -158,7 +158,7 @@ class TestOpinions:
     def test_posit_list_of_holdings_and_imply(self, make_opinion, make_regime):
         watt = make_opinion["watt_majority"]
         brad = make_opinion["brad_majority"]
-        some_rules = Rule.from_json("holding_watt.json", regime=make_regime)
+        some_rules = watt.holdings_from_json("holding_watt.json", regime=make_regime)
         for case in (watt, brad):
             case.holdings = []
             case.posit(some_rules[:3])
