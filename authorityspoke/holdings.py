@@ -69,6 +69,112 @@ class Holding(Factor):
             object.__setattr__(self, "selector", tuple([self.selector]))
 
     @classmethod
+    def collect_from_json(
+        cls,
+        filename: str,
+        directory: Optional[pathlib.Path] = None,
+        regime: Optional[Regime] = None,
+        mentioned: List[Factor] = None,
+        include_text_links: bool = False,
+    ) -> List[Holding]:
+        """
+        Load a list of :class:`Holdings`\s from JSON and :meth:`~.Opinion.posit` them.
+
+        :param filename:
+            the name of the JSON file to look in for :class:`Rule`
+            data in the format that lists ``mentioned_factors``
+            followed by a list of holdings
+
+        :param directory:
+            the path of the directory containing the JSON file
+
+        :parame regime:
+
+        :param mentioned:
+            A list of :class:`.Factor`\s that the method needs to
+            expect to find in the :class:`.Opinion`\'s holdings,
+            but that won't be provided within the JSON, if any.
+
+        :param include_text_links:
+
+        :returns:
+            a list of :class:`Rule`\s from a JSON file in the
+            ``example_data/holdings`` subdirectory, from a JSON
+            file.
+        """
+        if not directory:
+            directory = cls.directory
+        with open(directory / filename, "r") as f:
+            case = json.load(f)
+        return cls.collect_from_dict(
+            case=case,
+            regime=regime,
+            mentioned=mentioned,
+            include_text_links=include_text_links,
+        )
+
+    @classmethod
+    def collect_from_dict(
+        cls,
+        case: Dict,
+        regime: Optional[Regime] = None,
+        mentioned: List[Factor] = None,
+        include_text_links: bool = False,
+    ) -> Union[
+        List[Holding], Tuple[List[Holding], Dict[Factor, List[TextQuoteSelector]]]
+    ]:
+        """
+        Load a list of :class:`Holdings`\s from JSON and :meth:`~.Opinion.posit` them.
+
+        :param filename:
+            the name of the JSON file to look in for :class:`Rule`
+            data in the format that lists ``mentioned_factors``
+            followed by a list of holdings
+
+        :param directory:
+            the path of the directory containing the JSON file
+
+        :parame regime:
+
+        :param mentioned:
+            A list of :class:`.Factor`\s that the method needs to
+            expect to find in the :class:`.Opinion`\'s holdings,
+            but that won't be provided within the JSON, if any.
+
+        :param include_text_links:
+
+        :returns:
+            a list of :class:`Rule`\s from a JSON file in the
+            ``example_data/holdings`` subdirectory, from a JSON
+            file.
+        """
+        if not mentioned:
+            mentioned = []
+
+        factor_dicts = case.get("mentioned_factors")
+
+        # populates mentioned with context factors that don't
+        # need links to Opinion text
+        if factor_dicts:
+            for factor_dict in factor_dicts:
+                _, mentioned = Factor.from_dict(
+                    factor_dict, mentioned=mentioned, regime=regime
+                )
+
+        finished_holdings: List[Holding] = []
+        text_links = {}
+        for holding_record in case.get("holdings"):
+            for finished_holding, new_mentioned, factor_text_links in Holding.from_dict(
+                holding_record, mentioned, regime=regime
+            ):
+                mentioned = new_mentioned
+                finished_holdings.append(finished_holding)
+                text_links.update(factor_text_links)
+        if include_text_links:
+            return finished_holdings, text_links
+        return finished_holdings
+
+    @classmethod
     def from_dict(
         cls, record: Dict, mentioned: List[Factor], regime: Optional[Regime] = None
     ) -> Iterator[Tuple[Holding, List[Factor], Dict[Factor, List[TextQuoteSelector]]]]:
@@ -270,6 +376,17 @@ class Holding(Factor):
         # If decided rule A contradicts B, then B also contradicts A
 
         return self.rule.contradicts(other.rule)
+
+    def __len__(self):
+        """
+        Count generic :class:`.Factor`\s needed as context for this :class:`Holding`.
+
+        :returns:
+            the number of generic :class:`.Factor`\s needed for
+            self's :class:`.Procedure`.
+        """
+
+        return len(self.rule.procedure)
 
     def means(self, other):
         """

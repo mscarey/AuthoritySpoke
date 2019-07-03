@@ -9,6 +9,7 @@ from authorityspoke.context import get_directory_path
 from authorityspoke.enactments import Code, Enactment
 from authorityspoke.factors import Entity
 from authorityspoke.factors import Factor, Fact
+from authorityspoke.holdings import Holding
 from authorityspoke.opinions import Opinion
 from authorityspoke.predicates import Predicate
 from authorityspoke.procedures import Procedure
@@ -33,7 +34,7 @@ class TestPredicateImport:
 
 
 class TestEntityImport:
-    def test_specific_entity(self):
+    def test_specific_entity(self, make_opinion):
         smith_dict = {
             "mentioned_factors": [
                 {"type": "Entity", "name": "Smith", "generic": False},
@@ -50,27 +51,30 @@ class TestEntityImport:
                 },
             ],
         }
-        holdings = Rule.collection_from_dict(smith_dict)
+        watt = make_opinion["watt_majority"]
+        holdings = watt.holdings_from_dict(smith_dict)
         assert not holdings[1] >= holdings[0]
         assert holdings[1].generic_factors != holdings[0].generic_factors
 
 
 class TestEnactmentImport:
     def test_enactment_import(self, make_regime):
-        holdings = Rule.from_json("holding_cardenas.json", regime=make_regime)
+        holdings = Holding.collect_from_json(
+            "holding_cardenas.json", regime=make_regime
+        )
         enactment_list = holdings[0].enactments
         assert "all relevant evidence is admissible" in enactment_list[0].text
 
 
 class TestFactorImport:
     def test_fact_import(self, make_regime):
-        holdings = Rule.from_json("holding_watt.json", regime=make_regime)
+        holdings = Holding.collect_from_json("holding_watt.json", regime=make_regime)
         new_fact = holdings[0].inputs[1]
         assert "lived at <Hideaway Lodge>" in str(new_fact)
         assert isinstance(new_fact.context_factors[0], Entity)
 
     def test_fact_with_quantity(self, make_regime):
-        holdings = Rule.from_json("holding_watt.json", regime=make_regime)
+        holdings = Holding.collect_from_json("holding_watt.json", regime=make_regime)
         new_fact = holdings[1].inputs[3]
         assert "was no more than 35 foot" in str(new_fact)
 
@@ -78,7 +82,7 @@ class TestFactorImport:
         directory = pathlib.Path.cwd() / "tests"
         if directory.exists():
             os.chdir(directory)
-        input_directory = Rule.directory / "holding_watt.json"
+        input_directory = Holding.directory / "holding_watt.json"
         assert input_directory.exists()
 
 
@@ -328,7 +332,7 @@ class TestRuleImport:
             ],
         )
         feist = make_opinion_with_holding["feist_majority"]
-        assert feist.holdings[4].means(no_originality_rule)
+        assert feist.holdings[4].rule.means(no_originality_rule)
 
     def test_exclusive_results_in_more_holdings(self, make_opinion_with_holding):
         """
@@ -338,7 +342,7 @@ class TestRuleImport:
         section of the JSON.
         """
 
-        with open(Rule.directory / "holding_feist.json", "r") as f:
+        with open(Holding.directory / "holding_feist.json", "r") as f:
             feist_json = json.load(f)
         assert (
             len(make_opinion_with_holding["feist_majority"].holdings)
@@ -357,5 +361,7 @@ class TestNestedFactorImport:
         testimony on the jury. Hence, admission of the testimony
         concerning appellant’s use of narcotics was improper.
         """
-        cardenas_holdings = Rule.from_json("holding_cardenas.json", regime=make_regime)
+        cardenas_holdings = Holding.collect_from_json(
+            "holding_cardenas.json", regime=make_regime
+        )
         assert len(cardenas_holdings) == 2

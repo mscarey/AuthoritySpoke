@@ -96,7 +96,7 @@ class TestRules:
 
     def test_wrong_role_for_added_enactment(self, make_enactment, make_holding):
         with pytest.raises(ValueError):
-            new = make_holding["h1"].add_enactment(
+            new = make_holding["h1"].rule.add_enactment(
                 incoming=make_enactment["due_process_14"], role="inputs"
             )
 
