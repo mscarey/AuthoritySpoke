@@ -812,14 +812,14 @@ class TestUnion:
 
     def test_union_basic(self, make_opinion_with_holding):
         feist = make_opinion_with_holding["feist_majority"]
-        new_rule = feist.holdings[0] | feist.holdings[2]
+        new_rule = feist.holdings[0].rule | feist.holdings[2].rule
         assert len(new_rule.inputs) == 2
         assert len(new_rule.outputs) == 1
         assert len(new_rule.enactments) == 4
 
     def test_union_longer(self, make_opinion_with_holding):
         feist = make_opinion_with_holding["feist_majority"]
-        new_rule = feist.holdings[5] | feist.holdings[7]
+        new_rule = feist.holdings[5].rule | feist.holdings[7].rule
         assert len(new_rule.inputs) == 6
         assert len(new_rule.outputs) == 1
         assert len(new_rule.despite) == 1

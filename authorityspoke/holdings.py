@@ -297,6 +297,41 @@ class Holding(Factor):
             selector=self.selector,
         )
 
+    def __or__(self, other: Union[Rule, Holding]) -> Optional[Holding]:
+        if isinstance(other, Rule):
+            return self | Holding(rule=other)
+        if not isinstance(other, Holding):
+            raise TypeError
+
+        if self.decided == other.decided == False:
+            if self.rule >= other.rule:
+                return self
+            if other.rule >= self.rule:
+                return other
+            return None
+
+        if not self.decided or not other.decided:
+            return None
+        if self.rule_valid != other.rule_valid:
+            return None
+
+        if self.rule_valid is False:
+            # If a Rule with input A present is not valid
+            # and a Rule with input A absent is also not valid
+            # then a version of the Rule with input A
+            # omitted is also not valid.
+            raise NotImplementedError
+
+        new_rule = self.rule | other.rule
+        if not new_rule:
+            return None
+        raise NotImplementedError(
+            "Need a method to merge two lists of Opinion text selectors."
+        )
+        return Holding(
+            rule=new_rule, decided=True, rule_valid=True, selector=new_selector_group
+        )
+
     def __str__(self):
         return (
             f"the holding {'' if self.decided else 'that it is undecided whether '}"

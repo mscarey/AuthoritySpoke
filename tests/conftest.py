@@ -835,13 +835,6 @@ def make_rule(make_procedure, make_enactment) -> Dict[str, Rule]:
         "h2_ALL": Rule(
             c["c2"], enactments=e["search_clause"], mandatory=False, universal=True
         ),
-        "h2_ALL_invalid": Rule(
-            c["c2"],
-            enactments=e["search_clause"],
-            mandatory=False,
-            universal=True,
-            rule_valid=False,
-        ),
         "h2_ALL_MAY_output_false": Rule(
             c["c2_output_false"],
             enactments=e["search_clause"],
@@ -860,42 +853,22 @@ def make_rule(make_procedure, make_enactment) -> Dict[str, Rule]:
         "h2_exact_quantity": Rule(
             c["c2_exact_quantity"], enactments=e["search_clause"]
         ),
-        "h2_invalid": Rule(
-            c["c2"], enactments=e["search_clause"], rule_valid=False
-        ),
         "h2_irrelevant_inputs": Rule(
             c["c2_irrelevant_inputs"], enactments=e["search_clause"]
         ),
-        "h2_irrelevant_inputs_invalid": Rule(
-            c["c2_irrelevant_inputs"], enactments=e["search_clause"], rule_valid=False
+        "h2_irrelevant_inputs_ALL": Rule(
+            c["c2_irrelevant_inputs"],
+            enactments=e["search_clause"],
+            universal=True,
+        ),
+        "h2_irrelevant_inputs_MUST": Rule(
+            c["c2_irrelevant_inputs"], enactments=e["search_clause"], mandatory=True
         ),
         "h2_irrelevant_inputs_ALL_MUST": Rule(
             c["c2_irrelevant_inputs"],
             enactments=e["search_clause"],
             mandatory=True,
             universal=True,
-        ),
-        "h2_irrelevant_inputs_ALL_MUST_invalid": Rule(
-            c["c2_irrelevant_inputs"],
-            enactments=e["search_clause"],
-            mandatory=True,
-            universal=True,
-            rule_valid=False,
-        ),
-        "h2_irrelevant_inputs_ALL_invalid": Rule(
-            c["c2_irrelevant_inputs"],
-            enactments=e["search_clause"],
-            universal=True,
-            rule_valid=False,
-        ),
-        "h2_irrelevant_inputs_MUST": Rule(
-            c["c2_irrelevant_inputs"], enactments=e["search_clause"], mandatory=True
-        ),
-        "h2_irrelevant_inputs_MUST_invalid": Rule(
-            c["c2_irrelevant_inputs"],
-            enactments=e["search_clause"],
-            mandatory=True,
-            rule_valid=False,
         ),
         "h2_reciprocal_swap": Rule(
             c["c2_reciprocal_swap"], enactments=e["search_clause"]
@@ -963,6 +936,11 @@ def make_rule(make_procedure, make_enactment) -> Dict[str, Rule]:
         "h_near_means_curtilage_even_if": Rule(
             c["c_near_means_curtilage_even_if"], enactments=e["search_clause"]
         ),
+        "h_near_means_curtilage_ALL": Rule(
+            c["c_near_means_curtilage"],
+            enactments=e["search_clause"],
+            universal=True,
+        ),
         "h_near_means_curtilage_ALL_MUST": Rule(
             c["c_near_means_curtilage"],
             enactments=e["search_clause"],
@@ -1005,16 +983,34 @@ def make_rule(make_procedure, make_enactment) -> Dict[str, Rule]:
 @pytest.fixture(scope="class")
 def make_holding(make_rule) -> Dict[str, Holding]:
     holdings: Dict[str, Holding] = {}
-    for name, rule in make_rule:
+    for name, rule in make_rule.items():
         holdings[name] = Holding(rule=rule)
 
     new_holdings = {
     "h1_opposite": Holding(rule=make_rule["h1"], rule_valid=False),
     "h2_undecided": Holding(rule=make_rule["h2"], decided=False),
     "h2_invalid_undecided": Holding(rule=make_rule["h2"], rule_valid=False, decided=False),
-    "h2_irrelevant_inputs_undecided": Holding(rule=make_rule["h2_irrelevant_inputs"], decided=False),
     "h2_MUST_undecided": Holding(rule=make_rule["h2_MUST"], decided=False),
     "h2_MUST_invalid": Holding(rule=make_rule["h2_MUST"], rule_valid=False),
+    "h2_invalid": Holding(rule=make_rule["h2"], rule_valid=False),
+    "h2_ALL_invalid": Holding(rule=make_rule["h2_ALL"], rule_valid=False,
+    ),
+    "h2_irrelevant_inputs_undecided": Holding(rule=make_rule["h2_irrelevant_inputs"], decided=False),
+    "h2_irrelevant_inputs_invalid": Holding(
+        rule=make_rule["h2_irrelevant_inputs"],
+        rule_valid=False,
+        ),
+    "h2_irrelevant_inputs_ALL_invalid": Holding(
+        rule=make_rule["h2_irrelevant_inputs_ALL"],
+        rule_valid=False,
+        ),
+    "h2_irrelevant_inputs_ALL_MUST_invalid": Holding(
+        rule=make_rule["h2_irrelevant_inputs_ALL_MUST"],
+        rule_valid=False,
+        ),
+    "h2_irrelevant_inputs_MUST_invalid": Holding(rule=make_rule["h2_irrelevant_inputs_MUST"],
+        rule_valid=False,
+        ),
     "h2_ALL_due_process_invalid": Holding(rule=make_rule["h2_ALL_due_process"], rule_valid=False),
     "h3_undecided": Holding(rule=make_rule["h3"], decided=False),
     "h3_ALL_undecided": Holding(rule=make_rule["h3_ALL"], decided=False),
