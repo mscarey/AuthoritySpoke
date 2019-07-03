@@ -188,24 +188,21 @@ class Rule(Factor):
                 + "that the output can or must be present in every litigation "
                 + "unless specified inputs are present, which is unlikely."
             )
+        if not self.inputs:
+            raise ValueError(
+                "The 'exclusive' attribute is not allowed for Rules "
+                + "with no 'input' Factors."
+            )
 
         for input_factor in self.inputs:
             yield self.evolve(
                 {
                     "mandatory": not self.mandatory,
                     "universal": not self.universal,
-                    "inputs": [input_factor],
+                    "inputs": [input_factor.evolve("absent")],
                     "outputs": [self.outputs[0].evolve({"absent": True})],
                 }
             )
-            new_record = record.copy()
-            new_input = input_factor.copy()
-            new_input["absent"] = not new_input.get("absent")
-            new_record["inputs"] = [new_input]
-            for new_tuple in Rule.from_dict(
-                record=new_record, mentioned=mentioned, regime=regime
-            ):
-                yield new_tuple
 
     @classmethod
     def from_dict(

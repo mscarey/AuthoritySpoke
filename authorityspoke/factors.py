@@ -917,7 +917,7 @@ class Fact(Factor):
             """
             context_with_indices: List[List[Factor, int]] = []
             for factor in mentioned:
-                if factor.name and factor.name in content:
+                if factor.name and factor.name in content and factor.name != content:
                     factor_index = content.find(factor.name)
                     for pair in context_with_indices:
                         if pair[1] > factor_index:
@@ -953,11 +953,16 @@ class Fact(Factor):
             comparison=comparison,
             quantity=quantity,
         )
+        name = fact_dict.get("name")
+        if not name:
+            name = f'{"false " if not predicate.truth else ""}{fact_dict.get("content")}'
+        if name:
+            name = name.replace("{", "").replace("}", "")
 
         return cls(
             predicate,
             context_factors,
-            name=fact_dict.get("name", None),
+            name=name,
             standard_of_proof=fact_dict.get("standard_of_proof", None),
             absent=fact_dict.get("absent", False),
             generic=fact_dict.get("generic", False),

@@ -78,7 +78,7 @@ class Holding(Factor):
         # add them back
 
         for category in ("inputs", "despite", "outputs"):
-            if isinstance(record.get(category), dict):
+            if isinstance(record.get(category), (str, dict)):
                 record[category] = [record[category]]
 
         factor_text_links: Dict[Factor, List[TextQuoteSelector]] = {}

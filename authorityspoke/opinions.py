@@ -501,7 +501,7 @@ class Opinion:
                 "Must specify either rule_file (filename of a JSON rule input file) "
                 "or rule_dict (a dict with the same fields as the JSON input file)."
             )
-        return None
+        return self
 
     @property
     def generic_factors(self) -> List[Factor]:

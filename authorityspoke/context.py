@@ -97,6 +97,7 @@ def log_mentioned_context(func: Callable):
     ) -> Tuple[Optional[Factor], List[Factor]]:
 
         if isinstance(factor_record, str):
+            factor_record = factor_record.lower()
             if mentioned is None:
                 raise TypeError(
                     "No 'mentioned' list exists to search for a Factor "
@@ -105,7 +106,7 @@ def log_mentioned_context(func: Callable):
             for context_factor in mentioned:
                 if (
                     hasattr(context_factor, "name")
-                    and context_factor.name == factor_record
+                    and context_factor.name.lower() == factor_record
                 ):
                     return context_factor, mentioned
             raise ValueError(
