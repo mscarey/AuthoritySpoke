@@ -61,6 +61,8 @@ class Holding(Factor):
         object.__setattr__(self, "outputs", self.rule.procedure.outputs)
         object.__setattr__(self, "inputs", self.rule.procedure.inputs)
         object.__setattr__(self, "despite", self.rule.procedure.despite)
+        object.__setattr__(self, "enactments", self.rule.enactments)
+        object.__setattr__(self, "enactments_despite", self.rule.enactments_despite)
         if isinstance(self.selector, list):
             object.__setattr__(self, "selector", tuple(self.selector))
         elif isinstance(self.selector, TextQuoteSelector):
