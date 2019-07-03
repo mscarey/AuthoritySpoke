@@ -627,7 +627,7 @@ class Fact(Factor):
             approach of hard-coding their names and order will have to change.
     """
 
-    predicate: Optional[Predicate] = None
+    predicate: Predicate
     context_factors: Tuple[Factor, ...] = ()
     name: Optional[str] = None
     standard_of_proof: Optional[str] = None
@@ -794,6 +794,10 @@ class Fact(Factor):
                 }
             ]
         return []
+
+    @property
+    def truth(self) -> Optional[bool]:
+        return self.predicate.truth
 
     def _equal_if_concrete(self, other: Factor) -> bool:
         if (
