@@ -52,9 +52,9 @@ class TestEntityImport:
             ],
         }
         watt = make_opinion["watt_majority"]
-        holdings = watt.holdings_from_dict(smith_dict)
-        assert not holdings[1] >= holdings[0]
-        assert holdings[1].generic_factors != holdings[0].generic_factors
+        watt.exposit(rule_dict=smith_dict)
+        assert not watt.holdings[1] >= watt.holdings[0]
+        assert watt.holdings[1].generic_factors != watt.holdings[0].generic_factors
 
 
 class TestEnactmentImport:
@@ -117,8 +117,8 @@ class TestRuleImport:
         """
 
         watt = make_opinion["watt_majority"]
-        watt_holdings = Rule.from_json("holding_watt.json")
-        assert watt_holdings[0] == real_holding["h1"]
+        watt.exposit(rule_file="holding_watt.json")
+        assert watt.holdings[0] == real_holding["h1"]
 
     def test_same_enactment_objects_equal(self, make_opinion_with_holding):
         """
@@ -143,12 +143,12 @@ class TestRuleImport:
 
     def test_same_enactment_in_two_opinions(self, make_regime, make_opinion):
         watt = make_opinion["watt_majority"]
-        watt_holdings = Rule.from_json("holding_watt.json", regime=make_regime)
+        watt.exposit(rule_file="holding_watt.json", regime=make_regime)
         brad = make_opinion["brad_majority"]
-        brad_holdings = Rule.from_json("holding_brad.json", regime=make_regime)
+        brad.exposit(rule_file="holding_brad.json", regime=make_regime)
         assert any(
-            watt_holdings[0].enactments[0].means(brad_enactment)
-            for brad_enactment in brad_holdings[0].enactments
+            watt.holdings[0].enactments[0].means(brad_enactment)
+            for brad_enactment in brad.holdings[0].enactments
         )
 
     def test_same_object_for_enactment_in_import(self, make_opinion, make_regime):
@@ -159,9 +159,10 @@ class TestRuleImport:
         as if the JSON file had referred to the object by its name field.
         """
         brad = make_opinion["brad_majority"]
-        brad_holdings = Rule.from_json("holding_brad.json", regime=make_regime)
-        assert any(brad_holdings[6].inputs[0] == x for x in brad_holdings[5].inputs)
-        assert any(brad_holdings[6].inputs[0] is x for x in brad_holdings[5].inputs)
+        brad.holdings = []
+        brad.exposit(rule_file="holding_brad.json", regime=make_regime)
+        assert any(brad.holdings[6].inputs[0] == x for x in brad.holdings[5].inputs)
+        assert any(brad.holdings[6].inputs[0] is x for x in brad.holdings[5].inputs)
 
     def test_use_int_not_pint_without_dimension(self, make_regime, make_opinion):
 

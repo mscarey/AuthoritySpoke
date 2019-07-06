@@ -124,7 +124,7 @@ def log_mentioned_context(func: Callable):
             cls, factor_record, mentioned=mentioned, code=code, regime=regime
         )
 
-        if not new_factor.name and (
+        if not factor_record.get("name") and (
             not hasattr(new_factor, "generic") or not new_factor.generic
         ):
             for context_factor in mentioned:
