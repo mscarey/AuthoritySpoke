@@ -167,15 +167,13 @@ class TestRuleImport:
     def test_use_int_not_pint_without_dimension(self, make_regime, make_opinion):
 
         brad = make_opinion["brad_majority"]
-        brad_holdings = Rule.from_json("holding_brad.json", regime=make_regime)
-        assert "dimensionless" not in str(brad_holdings[6])
-        assert isinstance(brad_holdings[6].inputs[0].predicate.quantity, int)
+        brad.exposit(rule_file="holding_brad.json", regime=make_regime)
+        assert "dimensionless" not in str(brad.holdings[6])
+        assert isinstance(brad.holdings[6].inputs[0].predicate.quantity, int)
 
     def test_opinion_posits_holding(self, make_opinion, make_regime):
         brad = make_opinion["brad_majority"]
-        brad_holdings = Rule.from_json("holding_brad.json", regime=make_regime)
-        for rule in brad_holdings:
-            brad.posit(rule)
+        brad.exposit(rule_file="holding_brad.json", regime=make_regime)
         assert "warrantless search and seizure" in str(brad.holdings[0])
 
     def test_opinion_posits_holding_tuple_context(
@@ -186,8 +184,8 @@ class TestRuleImport:
         case, but with generic factors from Watt.
         """
         watt = make_opinion["watt_majority"]
-        brad_holdings = Rule.from_json("holding_brad.json", regime=make_regime)
-        context_holding = brad_holdings[6].new_context(
+        brad.exposit(rule_file="holding_brad.json", regime=make_regime)
+        context_holding = brad.holdings[6].new_context(
             [make_entity["watt"], make_entity["trees"], make_entity["motel"]]
         )
         watt.posit(context_holding)
@@ -205,9 +203,9 @@ class TestRuleImport:
         from Watt.
         """
         watt = make_opinion["watt_majority"]
-        brad_holdings = Rule.from_json("holding_brad.json", regime=make_regime)
-        context_holding = brad_holdings[6].new_context(
-            {brad_holdings[6].generic_factors[0]: make_entity["watt"]}
+        brad.exposit(rule_file="holding_brad.json", regime=make_regime)
+        context_holding = brad.holdings[6].new_context(
+            {brad.holdings[6].generic_factors[0]: make_entity["watt"]}
         )
         # resetting holdings because of class scope of fixture
         watt.holdings = []
@@ -223,9 +221,9 @@ class TestRuleImport:
         This test originally required a ValueError, but why should it?
         """
         watt = make_opinion["watt_majority"]
-        brad_holdings = Rule.from_json("holding_brad.json", regime=make_regime)
-        context_change = brad_holdings[6].new_context(
-            {brad_holdings[6].generic_factors[1]: make_entity["trees_specific"]}
+        brad.exposit(rule_file="holding_brad.json", regime=make_regime)
+        context_change = brad.holdings[6].new_context(
+            {brad.holdings[6].generic_factors[1]: make_entity["trees_specific"]}
         )
         string = str(context_change)
         assert "plants in the stockpile of trees was at least 3" in string

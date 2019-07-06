@@ -10,6 +10,7 @@ from typing import Iterator, Optional, Union
 from dataclasses import dataclass
 
 from authorityspoke.context import get_directory_path
+from authorityspoke.enactments import Enactment
 from authorityspoke.factors import Factor
 from authorityspoke.rules import Rule
 from authorityspoke.selectors import TextQuoteSelector
@@ -49,20 +50,40 @@ class Holding(Factor):
         the outputs.
     """
 
-    rule: Rule
+    rule: Optional[Rule] = None
     rule_valid: bool = True
     decided: bool = True
     selector: Optional[Union[Iterable[TextQuoteSelector], TextQuoteSelector]] = None
     name: Optional[str] = None
+    outputs: Optional[Union[Factor, Iterable[Factor]]] = None
+    inputs: Optional[Union[Factor, Iterable[Factor]]] = None
+    despite: Optional[Union[Factor, Iterable[Factor]]] = None
+    enactments: Optional[Union[Enactment, Iterable[Enactment]]] = None
+    enactments_despite: Optional[Union[Enactment, Iterable[Enactment]]] = None
+    mandatory: bool = False
+    universal: bool = False
 
     directory: ClassVar = get_directory_path("holdings")
 
     def __post_init__(self):
+        if not self.rule:
+            new_rule = Rule(
+                outputs=self.outputs,
+                inputs=self.inputs,
+                despite=self.despite,
+                enactment=self.enactments,
+                enactments_despite=self.enactments_despite,
+                mandatory=self.mandatory,
+                universal=self.universal,
+            )
+            object.__setattr__(self, "rule", new_rule)
         object.__setattr__(self, "outputs", self.rule.procedure.outputs)
         object.__setattr__(self, "inputs", self.rule.procedure.inputs)
         object.__setattr__(self, "despite", self.rule.procedure.despite)
         object.__setattr__(self, "enactments", self.rule.enactments)
         object.__setattr__(self, "enactments_despite", self.rule.enactments_despite)
+        object.__setattr__(self, "mandatory", self.rule.mandatory)
+        object.__setattr__(self, "universal", self.rule.universal)
         if isinstance(self.selector, list):
             object.__setattr__(self, "selector", tuple(self.selector))
         elif isinstance(self.selector, TextQuoteSelector):

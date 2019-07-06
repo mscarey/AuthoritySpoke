@@ -146,13 +146,13 @@ class Factor(ABC):
 
         if self.generic:
             return [self]
-        return list(
-            {
-                generic: None
-                for factor in self.context_factors
-                for generic in factor.generic_factors
-            }
-        )
+        generics = {}
+        for factor in self.context_factors:
+            if factor is not None:
+                for generic in factor.generic_factors:
+                    generics[generic] = None
+        return list(generics)
+
 
     @property
     def context_factors(self) -> Tuple:
