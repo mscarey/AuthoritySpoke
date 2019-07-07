@@ -803,10 +803,10 @@ def real_holding(make_procedure, make_enactment) -> Dict[str, Rule]:
     e = make_enactment
 
     return {
-        "h1": Rule(c["c1"], enactments=e["search_clause"], mandatory=True),
-        "h2": Rule(c["c2"], enactments=e["search_clause"], mandatory=True),
-        "h3": Rule(c["c3"], enactments=e["search_clause"], mandatory=True),
-        "h4": Rule(c["c4"], enactments=e["search_clause"], mandatory=True),
+        "h1": Holding(rule=Rule(c["c1"], enactments=e["search_clause"], mandatory=True)),
+        "h2": Holding(rule=Rule(c["c2"], enactments=e["search_clause"], mandatory=True)),
+        "h3": Holding(rule=Rule(c["c3"], enactments=e["search_clause"], mandatory=True)),
+        "h4": Holding(rule=Rule(c["c4"], enactments=e["search_clause"], mandatory=True)),
     }
 
 

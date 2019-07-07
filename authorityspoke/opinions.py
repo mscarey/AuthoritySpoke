@@ -509,7 +509,7 @@ class Opinion:
             (or every holding of ``other``, if other is an :class:`.Opinion`)
             is implied by some :class:`.Rule` in ``self.holdings``.
         """
-        if isinstance(other, Rule):
+        if isinstance(other, (Rule, Holding)):
             return any(self_holding >= other for self_holding in self.holdings)
         elif isinstance(other, self.__class__):
             for other_holding in other.holdings:
