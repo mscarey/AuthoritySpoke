@@ -514,7 +514,10 @@ def make_selector(make_code) -> Dict[str, TextQuoteSelector]:
     ),
     "copyright": TextQuoteSelector(
             path="/us/usc/t17/s102/b", suffix="idea, procedure,", source=make_code["usc17"]
-        )}
+        ),
+    "copyright_requires_originality": TextQuoteSelector(
+        path="/us/usc/t17/s102/a",
+    )}
 
 @pytest.fixture(scope="module")
 def make_regime() -> Dict[str, Code]:
@@ -552,6 +555,9 @@ def make_enactment(make_code, make_selector, make_regime) -> Dict[str, Enactment
         ), code=make_code["const"]),
         "copyright": Enactment(
             selector=make_selector["copyright"], regime=make_regime
+        ),
+        "copyright_requires_originality": Enactment(
+            selector=make_selector["copyright_requires_originality"], regime=make_regime
         ),
         "securing_for_authors": Enactment(
             selector=TextQuoteSelector(

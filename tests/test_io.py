@@ -288,6 +288,7 @@ class TestRuleImport:
         originality_enactments = [
             make_enactment["securing_for_authors"],
             make_enactment["right_to_writings"],
+            make_enactment["copyright_requires_originality"],
         ]
         originality_rule = Rule(
             outputs=copyrightable,
@@ -297,8 +298,8 @@ class TestRuleImport:
             enactments=originality_enactments,
         )
         assert any(
-            feist_rule.means(originality_rule)
-            for feist_rule in make_opinion_with_holding["feist_majority"].holdings
+            feist_holding.rule.means(originality_rule)
+            for feist_holding in make_opinion_with_holding["feist_majority"].holdings
         )
 
     def test_holding_inferred_from_exclusive(
@@ -334,7 +335,7 @@ class TestRuleImport:
             ],
         )
         feist = make_opinion_with_holding["feist_majority"]
-        assert feist.holdings[4].rule.means(no_originality_rule)
+        assert feist.holdings[3].rule.means(no_originality_rule)
 
     def test_exclusive_results_in_more_holdings(self, make_opinion_with_holding):
         """
