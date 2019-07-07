@@ -184,6 +184,7 @@ class TestRuleImport:
         case, but with generic factors from Watt.
         """
         watt = make_opinion["watt_majority"]
+        brad = make_opinion["brad_majority"]
         brad.exposit(rule_file="holding_brad.json", regime=make_regime)
         context_holding = brad.holdings[6].new_context(
             [make_entity["watt"], make_entity["trees"], make_entity["motel"]]
@@ -203,6 +204,7 @@ class TestRuleImport:
         from Watt.
         """
         watt = make_opinion["watt_majority"]
+        brad = make_opinion["brad_majority"]
         brad.exposit(rule_file="holding_brad.json", regime=make_regime)
         context_holding = brad.holdings[6].new_context(
             {brad.holdings[6].generic_factors[0]: make_entity["watt"]}
@@ -221,6 +223,7 @@ class TestRuleImport:
         This test originally required a ValueError, but why should it?
         """
         watt = make_opinion["watt_majority"]
+        brad = make_opinion["brad_majority"]
         brad.exposit(rule_file="holding_brad.json", regime=make_regime)
         context_change = brad.holdings[6].new_context(
             {brad.holdings[6].generic_factors[1]: make_entity["trees_specific"]}
@@ -246,7 +249,7 @@ class TestRuleImport:
             ],
         }
         with pytest.raises(ValueError):
-            Rule.collection_from_dict(rule_dict)
+            Holding.collect_from_dict(rule_dict)
 
     def test_error_classname_does_not_exist(self):
         rule_dict = {
@@ -266,7 +269,7 @@ class TestRuleImport:
             ]
         }
         with pytest.raises(ValueError):
-            Rule.collection_from_dict(rule_dict)
+            Holding.collect_from_dict(rule_dict)
 
     def test_holding_flagged_exclusive(self, make_opinion_with_holding, make_enactment):
         """
