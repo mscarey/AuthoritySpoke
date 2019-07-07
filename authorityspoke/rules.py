@@ -70,7 +70,7 @@ class Rule(Factor):
         object.
     """
 
-    procedure: Procedure
+    procedure: Optional[Procedure] = None
     enactments: Union[Enactment, Iterable[Enactment]] = ()
     enactments_despite: Union[Enactment, Iterable[Enactment]] = ()
     mandatory: bool = False

@@ -12,6 +12,7 @@ from dataclasses import dataclass
 from authorityspoke.context import get_directory_path
 from authorityspoke.enactments import Enactment
 from authorityspoke.factors import Factor
+from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
 from authorityspoke.selectors import TextQuoteSelector
 
@@ -55,6 +56,7 @@ class Holding(Factor):
     decided: bool = True
     selector: Optional[Union[Iterable[TextQuoteSelector], TextQuoteSelector]] = None
     name: Optional[str] = None
+    procedure: Optional[Procedure] = None
     outputs: Optional[Union[Factor, Iterable[Factor]]] = None
     inputs: Optional[Union[Factor, Iterable[Factor]]] = None
     despite: Optional[Union[Factor, Iterable[Factor]]] = None
@@ -66,17 +68,20 @@ class Holding(Factor):
     directory: ClassVar = get_directory_path("holdings")
 
     def __post_init__(self):
-        if not self.rule:
-            new_rule = Rule(
+        rule = self.rule
+        if self.rule is None:
+            rule = Rule(
+                procedure=self.procedure,
                 outputs=self.outputs,
                 inputs=self.inputs,
                 despite=self.despite,
-                enactment=self.enactments,
+                enactments=self.enactments,
                 enactments_despite=self.enactments_despite,
                 mandatory=self.mandatory,
                 universal=self.universal,
             )
-            object.__setattr__(self, "rule", new_rule)
+            object.__setattr__(self, "rule", rule)
+        object.__setattr__(self, "procedure", self.rule.procedure)
         object.__setattr__(self, "outputs", self.rule.procedure.outputs)
         object.__setattr__(self, "inputs", self.rule.procedure.inputs)
         object.__setattr__(self, "despite", self.rule.procedure.despite)
