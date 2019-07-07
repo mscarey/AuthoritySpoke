@@ -105,6 +105,14 @@ class Rule(Factor):
                     outputs=self.outputs, inputs=self.inputs, despite=self.despite
                 ),
             )
+        else:
+            if not (self.outputs == self.inputs == self.despite == None):
+                new_procedure = Procedure(
+                    outputs=self.outputs or self.procedure.outputs,
+                    inputs=self.inputs or self.procedure.inputs,
+                    despite=self.despite or self.procedure.despite,
+                )
+                object.__setattr__(self, "procedure", new_procedure)
         object.__setattr__(self, "outputs", self.procedure.outputs)
         object.__setattr__(self, "inputs", self.procedure.inputs)
         object.__setattr__(self, "despite", self.procedure.despite)
