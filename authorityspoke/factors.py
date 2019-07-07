@@ -453,10 +453,19 @@ class Factor(ABC):
             raise TypeError(
                 'Each item in "changes" must be a Factor or the name of a Factor'
             )
-        new_dict = self.__dict__.copy()
+        new_dict = self.own_attributes()
         for name in self.context_factor_names:
             new_dict[name] = self.__dict__[name].new_context(changes)
         return self.__class__(**new_dict)
+
+    def own_attributes(self) -> Dict[str, Any]:
+        """
+        Return attributes of ``self`` that aren't inherited
+        from another class or used for identification.
+        """
+        attrs = self.__dict__.copy()
+        attrs.pop("name", None)
+        return attrs
 
     def _registers_for_interchangeable_context(
         self, matches: Dict[Factor, Factor]

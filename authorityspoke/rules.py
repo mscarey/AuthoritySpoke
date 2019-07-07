@@ -11,8 +11,8 @@ import json
 import operator
 import pathlib
 
-from typing import ClassVar, Dict, Iterable, List, Sequence, Tuple
-from typing import Iterator, Optional, Union
+from typing import Any, ClassVar, Dict, Iterable, Iterator
+from typing import List, Optional, Sequence, Tuple, Union
 
 from dataclasses import dataclass
 
@@ -512,6 +512,17 @@ class Rule(Factor):
             mandatory=min(self.mandatory, other.mandatory),
             universal=min(self.universal, other.universal),
         )
+
+    def own_attributes(self) -> Dict[str, Any]:
+        """
+        Return attributes of ``self`` that aren't inherited
+        from another class or used for identification.
+        """
+        attrs = self.__dict__.copy()
+        attrs.pop("name", None)
+        for group in Procedure.context_factor_names:
+            attrs.pop(group, None)
+        return attrs
 
     def __str__(self):
         def factor_catalog(factors: List[Union[Factor, Enactment]], tag: str) -> str:

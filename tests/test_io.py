@@ -190,9 +190,11 @@ class TestRuleImport:
             [make_entity["watt"], make_entity["trees"], make_entity["motel"]]
         )
         watt.posit(context_holding)
+        holding_string = str(watt.holdings[-1])
+        print("breakpoint")
         assert (
             "the number of marijuana plants in <the stockpile of trees> was at least 3"
-            in str(watt.holdings[-1])
+            in holding_string
         )
 
     def test_opinion_posits_holding_dict_context(
