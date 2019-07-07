@@ -516,10 +516,9 @@ class Rule(Factor):
     def own_attributes(self) -> Dict[str, Any]:
         """
         Return attributes of ``self`` that aren't inherited
-        from another class or used for identification.
+        from another class.
         """
         attrs = self.__dict__.copy()
-        attrs.pop("name", None)
         for group in Procedure.context_factor_names:
             attrs.pop(group, None)
         return attrs

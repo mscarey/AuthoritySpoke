@@ -294,7 +294,7 @@ class Factor(ABC):
                 )
         if isinstance(changes, tuple):
             changes = {key: not self.__dict__[key] for key in changes}
-        new_dict = self.__dict__.copy()
+        new_dict = self.own_attributes()
         for key in changes:
             new_dict[key] = changes[key]
         return self.__class__(**new_dict)
@@ -461,11 +461,9 @@ class Factor(ABC):
     def own_attributes(self) -> Dict[str, Any]:
         """
         Return attributes of ``self`` that aren't inherited
-        from another class or used for identification.
+        from another class.
         """
-        attrs = self.__dict__.copy()
-        attrs.pop("name", None)
-        return attrs
+        return self.__dict__.copy()
 
     def _registers_for_interchangeable_context(
         self, matches: Dict[Factor, Factor]

@@ -334,10 +334,11 @@ class TestRuleImport:
             enactments=[
                 make_enactment["securing_for_authors"],
                 make_enactment["right_to_writings"],
+                make_enactment["copyright_requires_originality"],
             ],
         )
         feist = make_opinion_with_holding["feist_majority"]
-        assert feist.holdings[3].rule.means(no_originality_rule)
+        assert feist.holdings[4].rule.means(no_originality_rule)
 
     def test_exclusive_results_in_more_holdings(self, make_opinion_with_holding):
         """
