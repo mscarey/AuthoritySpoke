@@ -81,6 +81,23 @@ class Holding(Factor):
                 universal=self.universal,
             )
             object.__setattr__(self, "rule", rule)
+        elif not (
+            self.procedure
+            == self.enactments
+            == self.enactments_despite
+            == self.universal
+            == self.mandatory
+            == None
+        ):
+            new_rule = Rule(
+                procedure=self.procedure or self.rule.procedure,
+                enactments=self.enactments or self.rule.enactments,
+                enactments_despite=self.enactments_despite
+                or self.rule.enactments_despite,
+                mandatory=self.mandatory or self.rule.mandatory,
+                universal=self.universal or self.rule.universal,
+            )
+            object.__setattr__(self, "rule", new_rule)
         object.__setattr__(self, "procedure", self.rule.procedure)
         object.__setattr__(self, "outputs", self.rule.procedure.outputs)
         object.__setattr__(self, "inputs", self.rule.procedure.inputs)
@@ -476,6 +493,19 @@ class Holding(Factor):
         return Holding(
             rule=new_rule, decided=True, rule_valid=True, selector=new_selector_group
         )
+
+    def own_attributes(self) -> Dict[str, Any]:
+        """
+        Return attributes of ``self`` that aren't inherited
+        from another class.
+        """
+        attrs = self.__dict__.copy()
+        for group in Procedure.context_factor_names:
+            attrs.pop(group, None)
+        for group in Rule.enactment_attr_names:
+            attrs.pop(group, None)
+        attrs.pop("procedure", None)
+        return attrs
 
     def __str__(self):
         return (
