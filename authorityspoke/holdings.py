@@ -69,7 +69,6 @@ class Holding(Factor):
     generic: ClassVar = False
 
     def __post_init__(self):
-        rule = self.rule
         if self.rule is None:
             rule = Rule(
                 procedure=self.procedure,
@@ -315,6 +314,11 @@ class Holding(Factor):
             generic :class:`.Factor`\s from ``self``'s :class:`Procedure`
         """
         return self.rule.generic_factors
+
+    def __add__(self, other: Factor) -> Holding:
+        if isinstance(other, Enactment):
+            return self.evolve({"rule": self.rule + other})
+        raise NotImplementedError
 
     def contradicts(self, other) -> bool:
         """

@@ -8,8 +8,7 @@ thus to :class:`.Opinion`\s.
 
 from __future__ import annotations
 
-from pathlib import PurePosixPath
-from typing import ClassVar, Dict, List, Optional, Union
+from typing import ClassVar, Dict, Union
 
 from dataclasses import dataclass, field
 

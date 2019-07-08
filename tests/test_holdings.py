@@ -176,6 +176,11 @@ class TestContradiction:
         assert make_holding["h2_ALL_MUST"].contradicts(make_holding["h2_ALL_invalid"])
         assert make_holding["h2_ALL_invalid"].contradicts(make_holding["h2_ALL_MUST"])
 
+    def test_contradiction_with_distance(self, make_opinion_with_holding, make_holding):
+        watt = make_opinion_with_holding["watt_majority"]
+        must_not_rule = make_holding["h2_output_false_ALL_MUST"]
+        assert watt.holdings[1].contradicts(must_not_rule)
+
     def test_error_contradiction_with_procedure(self, make_holding, make_procedure):
         with pytest.raises(TypeError):
             make_holding["h2_undecided"].contradicts(make_procedure["c2"])

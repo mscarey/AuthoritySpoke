@@ -912,6 +912,9 @@ def make_rule(make_procedure, make_enactment) -> Dict[str, Rule]:
         "h2_output_false_ALL": Rule(
             c["c2_output_false"], enactments=e["search_clause"], universal=True
         ),
+        "h2_output_false_ALL_MUST": Rule(
+            c["c2_output_false"], enactments=e["search_clause"], mandatory=True, universal=True
+        ),
         "h2_output_absent_false": Rule(
             c["c2_output_absent_false"], enactments=e["search_clause"]
         ),

@@ -154,8 +154,13 @@ class Opinion:
             if ``True``, returns a generator that yields all opinions
             meeting the query.
         """
-
-        if not (cap_id or cite):
+        endpoint = "https://api.case.law/v1/cases/"
+        params = {}
+        if cap_id:
+            endpoint += f"{cap_id}/"
+        elif cite is not None:
+            params["cite"] = cite
+        else:
             raise ValueError(
                 "To identify the desired opinion, either 'cap_id' or 'cite' "
                 "must be provided."
@@ -172,14 +177,8 @@ class Opinion:
 
         if not directory:
             directory = cls.directory
-        params = {}
         if full_case:
             params["full_case"] = "true"
-        endpoint = "https://api.case.law/v1/cases/"
-        if cap_id:
-            endpoint += f"{cap_id}/"
-        else:
-            params["cite"] = cite
         downloaded = requests.get(endpoint, params=params, headers=api_dict).json()
 
         if downloaded.get("results") is not None and not downloaded["results"]:
@@ -223,12 +222,12 @@ class Opinion:
         else:
             return opinions
 
-    def contradicts(self, other: Union[Opinion, Rule]) -> bool:
+    def contradicts(self, other: Union[Opinion, Holding]) -> bool:
         """
-        Test whether ``other`` is or contains a :class:`.Rule` contradicted by ``self``.
+        Test whether ``other`` is or contains a :class:`.Holding` contradicted by ``self``.
 
         :param other:
-            another :class:`.Opinion` or :class:`.Rule`
+            another :class:`.Opinion` or :class:`.Holding`
 
         :returns:
             a bool indicating whether any holding of ``self`` is
@@ -236,7 +235,7 @@ class Opinion:
             any holding of ``other`` if ``other`` is an :class:`.Opinion`.
         """
 
-        if isinstance(other, Rule):
+        if isinstance(other, Holding):
             return any(
                 self_holding.contradicts(other) for self_holding in self.holdings
             )

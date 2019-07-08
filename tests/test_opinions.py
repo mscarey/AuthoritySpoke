@@ -82,6 +82,10 @@ class TestOpinions:
         with pytest.raises(TypeError):
             make_opinion["watt_majority"].posit(make_procedure["c1"])
 
+    def test_error_exposit_with_no_rule_source(self, make_opinion):
+        with pytest.raises(ValueError):
+            make_opinion["watt_majority"].exposit()
+
     def test_new_context_non_iterable_changes(self, make_opinion, make_holding):
         """
         The context here (a Factor outside an iterable) only changes the first
@@ -144,8 +148,8 @@ class TestOpinions:
         watt.posit(brad.holdings[0], context_items)
         assert watt.holdings[-1].means(brad.holdings[0])
 
-    # Implication
 
+class TestImplication:
     def test_no_implication(self, make_opinion_with_holding):
         watt = make_opinion_with_holding["watt_majority"]
         brad = make_opinion_with_holding["brad_majority"]
@@ -175,3 +179,24 @@ class TestOpinions:
         watt.holdings = [make_holding["h2_irrelevant_inputs_undecided"]]
         assert not watt >= make_holding["h2_undecided"]
         assert not watt > make_holding["h2_undecided"]
+
+
+class TestContradiction:
+    def test_contradiction(self, make_opinion_with_holding, make_holding):
+        """
+        This is to diagnose why the test below isn't working.
+        """
+        watt = make_opinion_with_holding["watt_majority"]
+        must_not_rule = make_holding["h2_output_false_ALL_MUST"]
+        assert watt.holdings[1].contradicts(must_not_rule)
+
+    def test_contradiction_of_holding(
+        self, make_opinion_with_holding, make_enactment, make_holding
+    ):
+        assert make_opinion_with_holding["watt_majority"].contradicts(
+            make_holding["h2_output_false_ALL_MUST"] + make_enactment["search_clause"]
+        )
+
+    def test_error_contradiction_with_procedure(self, make_opinion, make_procedure):
+        with pytest.raises(TypeError):
+            make_opinion["watt_majority"].contradicts(make_procedure["c1"])

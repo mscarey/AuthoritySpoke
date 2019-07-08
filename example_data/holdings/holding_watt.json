@@ -70,7 +70,7 @@
                 },
                 {
                     "type": "fact",
-                    "content": "the distance between the stockpile of trees and a parking area used by personnel and patrons of Hideaway Lodge was < 5 feet"
+                    "content": "the distance between the stockpile of trees and a parking area used by personnel and patrons of Hideaway Lodge was <= 5 feet"
                 }
             ],
             "despite": [{
@@ -150,7 +150,7 @@
                 },
                 {
                     "type": "fact",
-                    "content": "the distance between the stockpile of trees and a parking area used by personnel and patrons of Hideaway Lodge was < 5 feet"
+                    "content": "the distance between the stockpile of trees and a parking area used by personnel and patrons of Hideaway Lodge was <= 5 feet"
                 }
             ],
             "outputs": {
