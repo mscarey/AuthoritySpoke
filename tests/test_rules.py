@@ -573,7 +573,7 @@ class TestAddition:
             "fact it is false that <the Pythagorean theorem> is copyrightable"
         )
 
-    def test_add_inferred_rule(self, make_opinion_with_holding):
+    def test_add_inferred_rule(self, make_enactment, make_opinion_with_holding):
         """
         test implication between
         telephone listings -> not original (feist.holdings[11])
@@ -582,12 +582,16 @@ class TestAddition:
         =
         telephone listings -> not copyrightable
 
+        listings_not_original doesn't have all the Enactments it needs
+        on its own. So the addition expression first puts the added
+        Enactment onto listings_not_original to make a new Rule, and then adds
+        unoriginal_not_copyrightable to the new Rule.
         """
         feist = make_opinion_with_holding["feist_majority"]
-        listings_not_original = feist.holdings[11]
-        unoriginal_not_copyrightable = feist.holdings[4]
+        listings_not_original = feist.holdings[11].rule
+        unoriginal_not_copyrightable = feist.holdings[4].rule
         listings_not_copyrightable = (
-            listings_not_original + unoriginal_not_copyrightable
+            listings_not_original + make_enactment["copyright_requires_originality"] + unoriginal_not_copyrightable
         )
         assert len(listings_not_copyrightable.inputs) == 1
         assert str(listings_not_copyrightable.inputs[0]) == (
