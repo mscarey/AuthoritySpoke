@@ -618,8 +618,8 @@ class TestAddition:
         assert new_rule.inputs == make_complex_rule["accept_relevance_testimony_ALL"].inputs
         assert make_complex_rule["accept_murder_fact_from_relevance"].outputs[0] in new_rule.outputs
 
-    def test_add_disconnected_rules_returns_none(self, make_holding):
-        assert make_holding["h1"] + make_holding["h2_ALL"] is None
+    def test_add_disconnected_rules_returns_none(self, make_rule):
+        assert make_rule["h1"] + make_rule["h2_ALL"] is None
 
     def test_rule_requiring_more_enactments_wont_add(self, make_enactment, make_complex_rule):
         """
