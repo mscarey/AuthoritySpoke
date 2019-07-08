@@ -207,7 +207,7 @@ class Opinion:
                 if number > 0:
                     mangled_filename = filename.replace(".", f"_{number}.")
                 if save_to_file:
-                    with open(directory / filename, "w") as fp:
+                    with open(directory / mangled_filename, "w") as fp:
                         json.dump(case, fp, ensure_ascii=False)
                 if to_dict:
                     yield case
@@ -442,23 +442,23 @@ class Opinion:
 
     def posit(
         self,
-        holding: Union[Rule, Iterable[Rule]],
+        holding: Union[Holding, Iterable[Holding]],
         context: Optional[Sequence[Factor]] = None,
     ) -> None:
         """
-        Add a :class:`.Rule` as a holding of this ``Opinion``.
+        Add a :class:`.Holding` as a holding of this ``Opinion``.
 
-        Adds ``holding`` (or every :class:`.Rule` in ``holding``, if ``holding``
+        Adds ``holding`` (or every :class:`.Holding` in ``holding``, if ``holding``
         is iterable) to the :py:class:`list` ``self.holdings``, replacing
-        any other :class:`.Rule` in ``self.holdings`` with the same meaning.
+        any other :class:`.Holding` in ``self.holdings`` with the same meaning.
 
         :param holding:
-            a :class:`.Rule` that the :class:`.Opinion` ``self`` posits
+            a :class:`.Holding` that the :class:`.Opinion` ``self`` posits
             as valid in its own court or jurisdiction, regardless of
             whether ``self`` accepts that the ``inputs`` of the
-            :class:`.Rule` correspond to the reality of the current
+            :class:`.Holding` correspond to the reality of the current
             case, and regardless of whether the court orders that
-            the ``outputs`` of the :class:`.Rule` be put into effect.
+            the ``outputs`` of the :class:`.Holding` be put into effect.
 
         :param context:
             an ordered sequence (probably :py:class:`dict`) of

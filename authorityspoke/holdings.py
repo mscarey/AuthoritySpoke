@@ -66,6 +66,7 @@ class Holding(Factor):
     universal: bool = False
 
     directory: ClassVar = get_directory_path("holdings")
+    generic: ClassVar = False
 
     def __post_init__(self):
         rule = self.rule
@@ -119,7 +120,9 @@ class Holding(Factor):
         regime: Optional[Regime] = None,
         mentioned: List[Factor] = None,
         include_text_links: bool = False,
-    ) -> List[Holding]:
+    ) -> Union[
+        List[Holding], Tuple[List[Holding], Dict[Factor, List[TextQuoteSelector]]]
+    ]:
         """
         Load a list of :class:`Holdings`\s from JSON and :meth:`~.Opinion.posit` them.
 
@@ -292,9 +295,6 @@ class Holding(Factor):
                 )
             for modified_rule in basic_rule.get_contrapositives():
                 yield (Holding(rule=modified_rule, selector=selector), mentioned, {})
-
-        # Continue by handing off to Rule.from_dict, which will have to be changed
-        # to handle the Factors already having been created.
 
     @property
     def context_factors(self) -> Tuple:

@@ -146,7 +146,7 @@ class Factor(ABC):
 
         if self.generic:
             return [self]
-        generics = {}
+        generics: Dict[Factor, None] = {}
         for factor in self.context_factors:
             if factor is not None:
                 for generic in factor.generic_factors:
