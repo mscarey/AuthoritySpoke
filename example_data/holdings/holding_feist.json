@@ -117,7 +117,7 @@
         {
             "inputs": {
                 "type": "fact",
-                "content": "Rural's telephone directory was original",
+                "content": "Rural's telephone directory was an original work",
                 "text": [
                     "The sine qua non of copyright is|originality|",
                     "Original, as the term is used in copyright"
@@ -148,7 +148,7 @@
                 "content": "Rural's telephone directory closely resembled other works",
                 "text": "it closely resembles other works"
             },
-            "outputs": "Rural's telephone directory was original",
+            "outputs": "Rural's telephone directory was an original work",
             "enactments": ["securing for authors", "right to writings"],
             "universal": true,
             "text": "means only that"
@@ -157,7 +157,7 @@
             "inputs": "Rural's telephone directory was a fact",
             "outputs": {
                 "type": "fact",
-                "content": "Rural's telephone directory was original",
+                "content": "Rural's telephone directory was an original work",
                 "truth": false,
                 "text": "No one may claim originality"
             },
@@ -186,7 +186,7 @@
                     "text": ["The compilation author typically chooses", "in what order to place them, and how to arrange the collected data so that they may be used effectively by readers", "so long as they are made independently", "and entail a minimal degree of creativity"]
                 }
             ],
-            "outputs": "Rural's telephone directory was original",
+            "outputs": "Rural's telephone directory was an original work",
             "enactments": ["securing for authors", "right to writings"],
             "text": "|may|possess the requisite originality"
         },
@@ -241,7 +241,7 @@
             },
             "outputs": {
                 "type": "fact",
-                "content": "Rural's telephone listings were original",
+                "content": "Rural's telephone listings were an original work",
                 "truth": false,
                 "text": "In other words, did Feist, by taking 1,309 names, towns, and telephone numbers from Rural’s white pages, copy anything that was “original” to Rural? Certainly, the raw data does not satisfy the originality requirement."
             },
@@ -259,7 +259,7 @@
             }],
             "outputs": {
                 "type": "fact",
-                "content": "Rural's arragement of its telephone listings was original",
+                "content": "Rural's arragement of its telephone listings was an original work",
                 "truth": false,
                 "text": "The end product is a garden-variety white pages directory, devoid of even the slightest trace of creativity.\nRural’s selection of listings could not be more obvious: It publishes the most basic information — name, town, and telephone number — about each person who applies to it for telephone service. This is “selection” of a sort, but it lacks the modicum of creativity necessary to transform mere selection into copyrightable expression."
             },

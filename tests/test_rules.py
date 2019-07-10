@@ -544,9 +544,9 @@ class TestAddition:
 
         fact_not_original = Rule(
             Procedure(
-                inputs=Fact(Predicate("{} is a fact"), context_factors=context),
+                inputs=Fact(Predicate("{} was a fact"), context_factors=context),
                 outputs=Fact(
-                    Predicate("{} is original", truth=False), context_factors=context
+                    Predicate("{} was an original work", truth=False), context_factors=context
                 ),
             ),
             universal=True,
@@ -554,10 +554,10 @@ class TestAddition:
         unoriginal_not_copyrightable = Rule(
             Procedure(
                 inputs=Fact(
-                    Predicate("{} is original", truth=False), context_factors=three
+                    Predicate("{} was an original work", truth=False), context_factors=three
                 ),
                 outputs=Fact(
-                    Predicate("{} is copyrightable", truth=False), context_factors=three
+                    Predicate("{} was copyrightable", truth=False), context_factors=three
                 ),
             ),
             universal=True,
@@ -566,11 +566,11 @@ class TestAddition:
         facts_not_copyrightable = fact_not_original + unoriginal_not_copyrightable
         assert len(facts_not_copyrightable.inputs) == 1
         assert str(facts_not_copyrightable.inputs[0]) == (
-            "fact <the Pythagorean theorem> is a fact"
+            "fact <the Pythagorean theorem> was a fact"
         )
         assert len(facts_not_copyrightable.outputs) == 2
         assert str(facts_not_copyrightable.outputs[1]) == (
-            "fact it is false that <the Pythagorean theorem> is copyrightable"
+            "fact it is false that <the Pythagorean theorem> was copyrightable"
         )
 
     def test_add_inferred_rule(self, make_enactment, make_opinion_with_holding):
@@ -665,4 +665,18 @@ class TestUnion:
         feist = make_opinion_with_holding["feist_majority"]
         assert(feist.holdings[9] | feist.holdings[7]) is None
 
-    # Add tests that consider differences in Enactments
+    def test_union_same_except_enactments(self, make_opinion_with_holding):
+        """
+        The union operator should return a rule with all the inputs of both Rules
+        (including input Enactments) and all the outputs of both Rules.
+
+        The Feist Rule differs only in having more input Enactments, so that's
+        what should be returned.
+        """
+        feist = make_opinion_with_holding["feist_majority"]
+        feist_copyrightable = feist.holdings[3].rule
+        oracle = make_opinion_with_holding["oracle_majority"]
+        oracle_copyrightable = oracle.holdings[0].rule
+        new_rule = feist_copyrightable | oracle_copyrightable
+        assert new_rule.means(feist_copyrightable)
+        assert new_rule == feist_copyrightable

@@ -285,7 +285,7 @@ class TestRuleImport:
         """
 
         directory = Entity("Rural's telephone directory")
-        original = Fact(Predicate("{} was original"), directory)
+        original = Fact(Predicate("{} was an original work"), directory)
         copyrightable = Fact(Predicate("{} was copyrightable"), directory)
         originality_enactments = [
             make_enactment["securing_for_authors"],
@@ -320,7 +320,9 @@ class TestRuleImport:
         """
 
         directory = Entity("Rural's telephone directory")
-        not_original = Fact(Predicate("{} was original"), directory, absent=True)
+        not_original = Fact(
+            Predicate("{} was an original work"), directory, absent=True
+        )
         not_copyrightable = Fact(
             Predicate("{} was copyrightable"), directory, absent=True
         )
