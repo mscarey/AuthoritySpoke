@@ -658,25 +658,32 @@ class TestUnion:
         assert len(new_rule.inputs) == 6
         assert len(new_rule.outputs) == 1
         assert len(new_rule.despite) == 1
-        assert new_rule.universal == False
-        assert new_rule.mandatory == False
+        assert new_rule.universal is False
+        assert new_rule.mandatory is False
+
+    def test_union_same_output(self, make_opinion_with_holding):
+        lotus = make_opinion_with_holding["lotus_majority"]
+        lotus_not_copyrightable = lotus.holdings[6].rule
+        feist = make_opinion_with_holding["feist_majority"]
+        lotus_not_copyrightable = feist.holdings[0].rule
+        new_rule = lotus_not_copyrightable | lotus_not_copyrightable
+        assert len(new_rule.outputs) == 1
+
 
     def test_union_neither_universal(self, make_opinion_with_holding):
         feist = make_opinion_with_holding["feist_majority"]
         assert(feist.holdings[9] | feist.holdings[7]) is None
 
-    def test_union_same_except_enactments(self, make_opinion_with_holding):
+    def test_union_inconsistent_outputs(self, make_opinion_with_holding):
         """
         The union operator should return a rule with all the inputs of both Rules
         (including input Enactments) and all the outputs of both Rules.
 
-        The Feist Rule differs only in having more input Enactments, so that's
-        what should be returned.
+        This returns None because the outputs are inconsistent
+        (True and False versions of the same Rule)
         """
         feist = make_opinion_with_holding["feist_majority"]
         feist_copyrightable = feist.holdings[3].rule
         oracle = make_opinion_with_holding["oracle_majority"]
         oracle_copyrightable = oracle.holdings[0].rule
-        new_rule = feist_copyrightable | oracle_copyrightable
-        assert new_rule.means(feist_copyrightable)
-        assert new_rule == feist_copyrightable
+        assert feist_copyrightable | oracle_copyrightable == None
