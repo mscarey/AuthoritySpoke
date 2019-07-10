@@ -133,6 +133,18 @@ class TextQuoteSelector:
 
     @classmethod
     def from_record(cls, record: Optional[Union[dict, str]]):
+        """
+        Create new instance from JSON user input.
+
+        If the input is a :class:`str`, tries to break up the string
+        into :attr:`~TextQuoteSelector.prefix`, :attr:`~TextQuoteSelector.exact`,
+        and :attr:`~TextQuoteSelector.suffix`, by splitting on the pipe characters.
+
+        :param record:
+            a string or dict representing a text passage
+
+        :returns: a new :class:`TextQuoteSelector`
+        """
         if record is None:
             return None
         if isinstance(record, dict):

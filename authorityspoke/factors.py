@@ -806,9 +806,7 @@ class Fact(Factor):
 
     @property
     def truth(self) -> Optional[bool]:
-        """
-        Access :attr:`~Predicate.truth` attribute.
-        """
+        """Access :attr:`~Predicate.truth` attribute."""
         return self.predicate.truth
 
     def _equal_if_concrete(self, other: Factor) -> bool:

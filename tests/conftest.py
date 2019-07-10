@@ -180,10 +180,11 @@ def make_predicate() -> Dict[str, Predicate]:
         "p_relevant": Predicate("{} is relevant to show {}"),
         "p_relevant_whether": Predicate("{} is relevant to show {}", truth=None),
         "p_shooting": Predicate("{} shot {}"),
+        "p_shooting_self": Predicate("{0} shot {0}"),
         "p_no_shooting": Predicate("{} shot {}", truth=False),
         "p_shooting_whether": Predicate("{} shot {}", truth=None),
         "p_no_crime": Predicate("{} committed a crime", truth=False),
-        "p_three_entities": Predicate("{} threw {} to {}"),
+        "p_three_entities": Predicate("{} told {} to hire {}"),
     }
 
 
@@ -306,6 +307,7 @@ def make_factor(make_predicate, make_entity) -> Dict[str, Factor]:
         "f_murder_craig": Fact(p["p_murder"], (2, 3), case_factors=c),
         "f_murder_whether": Fact(p["p_murder_whether"], case_factors=c),
         "f_shooting": Fact(p["p_shooting"], case_factors=c),
+        "f_shooting_self": Fact(p["p_shooting_self"], case_factors=c),
         "f_shooting_craig": Fact(p["p_shooting"], (2, 3), case_factors=c),
         "f_shooting_craig_poe": Fact(
             p["p_shooting"],

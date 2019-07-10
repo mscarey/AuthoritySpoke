@@ -83,6 +83,14 @@ class TestFacts:
     def test_string_no_truth_value(self, watt_factor):
         assert "whether" in str(watt_factor["f2_no_truth"])
 
+    def test_repeating_entity_string(self, make_factor):
+        """I'm not convinced that a model of a Fact ever needs to include
+        multiple references to the same Entity just because the name of the
+        Entity appears more than once in the Predicate."""
+        f = make_factor
+        assert str(f["f_three_entities"]) == "fact <Alice> told <Bob> to hire <Craig>"
+        assert str(f["f_repeating_entity"]) == "fact <Alice> told <Bob> to hire <Alice>"
+
     def test_string_representation_with_concrete_entities(self, watt_factor):
         """
         "Hideaway Lodge" is still a string representation of an Entity
@@ -343,7 +351,6 @@ class TestFacts:
         """
         assert watt_factor["f7"].means(watt_factor["f7_swap_entities"])
 
-    @pytest.mark.xfail
     def test_unequal_due_to_repeating_entity(self, make_factor):
         """I'm not convinced that a model of a Fact ever needs to include
         multiple references to the same Entity just because the name of the

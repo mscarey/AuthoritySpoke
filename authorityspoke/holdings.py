@@ -1,3 +1,13 @@
+"""
+:class:`Holding`\s describe :class:`.Opinion`\s` attitudes toward :class:`.Rule`\s.
+
+:class:`Holding`\s are text passages within :class:`.Opinion`\s
+in which :class:`.Court` posits, or rejects, the validity of a
+:class:`.Rule` within the :class:`.Court`\'s :class:`.Jurisdiction`,
+or the :class:`.Court` asserts that the validity of the :class:`.Rule`
+should be considered undecided.
+"""
+
 from __future__ import annotations
 
 import json
@@ -9,7 +19,7 @@ from typing import Iterator, Optional, Union
 
 from dataclasses import dataclass
 
-from authorityspoke.context import get_directory_path
+from authorityspoke.context import get_directory_path, new_context_helper
 from authorityspoke.enactments import Enactment
 from authorityspoke.factors import Factor
 from authorityspoke.procedures import Procedure
@@ -224,7 +234,25 @@ class Holding(Factor):
         cls, record: Dict, mentioned: List[Factor], regime: Optional[Regime] = None
     ) -> Iterator[Tuple[Holding, List[Factor], Dict[Factor, List[TextQuoteSelector]]]]:
         """
+        Create new :class:`Holding` object from user input.
+
         Will yield multiple items if ``exclusive: True`` is present in ``record``.
+
+        :param record:
+            A representation of a :class:`Holding` in the format
+            used for input JSON
+
+        :param mentioned:
+            known :class:`.Factor`\s that may be reused in constructing
+            the new :class:`Holding`
+
+        :param regime:
+            a collection of :class:`.Jurisdiction`\s and corresponding
+            :class:`.Code`\s for discovering :class:`.Enactment`\s to
+            reference in the new :class:`Holding`.
+
+        :returns:
+            new :class:`Holding`.
         """
 
         # If lists were omitted around single elements in the JSON,
@@ -455,7 +483,14 @@ class Holding(Factor):
         """Get new copy of ``self`` with an opposite value for ``rule_valid``."""
         return self.evolve("rule_valid")
 
+    @new_context_helper
     def new_context(self, changes: Dict[Factor, Factor]) -> Factor:
+        """
+        Create new :class:`Holding`, replacing keys of ``changes`` with values.
+
+        :returns:
+            a version of ``self`` with the new context.
+        """
         return Holding(
             rule=self.rule.new_context(changes),
             rule_valid=self.rule_valid,
@@ -500,8 +535,10 @@ class Holding(Factor):
 
     def own_attributes(self) -> Dict[str, Any]:
         """
-        Return attributes of ``self`` that aren't inherited
-        from another class.
+        Return attributes of ``self`` that aren't inherited from another class.
+
+        Used for getting parameters to pass to :meth:`~Holding.__init__`
+        when generating a new object.
         """
         attrs = self.__dict__.copy()
         for group in Procedure.context_factor_names:
