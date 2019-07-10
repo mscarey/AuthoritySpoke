@@ -260,7 +260,7 @@ class Rule(Factor):
             return tuple(factors_or_enactments), mentioned
 
         if factor_groups is None:
-            # TODO: make this a separate method also called by Holdings.from_dict
+            # TODO: make this a separate method also called by Holding.from_dict
             factor_groups: Dict[str, List] = {
                 "inputs": [],
                 "outputs": [],
@@ -515,8 +515,10 @@ class Rule(Factor):
 
     def own_attributes(self) -> Dict[str, Any]:
         """
-        Return attributes of ``self`` that aren't inherited
-        from another class.
+        Return attributes of ``self`` that aren't inherited from another class.
+
+        Used for getting parameters to pass to :meth:`~Rule.__init__`
+        when generating a new object.
         """
         attrs = self.__dict__.copy()
         for group in Procedure.context_factor_names:

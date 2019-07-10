@@ -460,8 +460,10 @@ class Factor(ABC):
 
     def own_attributes(self) -> Dict[str, Any]:
         """
-        Return attributes of ``self`` that aren't inherited
-        from another class.
+        Return attributes of ``self`` that aren't inherited from another class.
+
+        Used for getting parameters to pass to :meth:`~Factor.__init__`
+        when generating a new object.
         """
         return self.__dict__.copy()
 
@@ -804,6 +806,9 @@ class Fact(Factor):
 
     @property
     def truth(self) -> Optional[bool]:
+        """
+        Access :attr:`~Predicate.truth` attribute.
+        """
         return self.predicate.truth
 
     def _equal_if_concrete(self, other: Factor) -> bool:

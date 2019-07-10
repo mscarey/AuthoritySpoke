@@ -182,13 +182,6 @@ class TestImplication:
 
 
 class TestContradiction:
-    def test_contradiction(self, make_opinion_with_holding, make_holding):
-        """
-        This is to diagnose why the test below isn't working.
-        """
-        watt = make_opinion_with_holding["watt_majority"]
-        must_not_rule = make_holding["h2_output_false_ALL_MUST"]
-        assert watt.holdings[1].contradicts(must_not_rule)
 
     def test_contradiction_of_holding(
         self, make_opinion_with_holding, make_enactment, make_holding

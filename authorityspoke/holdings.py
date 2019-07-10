@@ -4,7 +4,7 @@ import json
 import operator
 import pathlib
 
-from typing import ClassVar, Dict, Iterable, List, Sequence, Tuple
+from typing import Any, ClassVar, Dict, Iterable, List, Tuple
 from typing import Iterator, Optional, Union
 
 from dataclasses import dataclass
