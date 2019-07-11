@@ -669,6 +669,26 @@ class TestUnion:
         new_rule = lotus_not_copyrightable | lotus_not_copyrightable
         assert len(new_rule.outputs) == 1
 
+    def test_union_implied_but_not_universal(self, make_rule):
+        assert (make_rule["h1"] | make_rule["h1_easy"]).means(make_rule["h1"])
+        assert (make_rule["h2_irrelevant_inputs"] | make_rule["h2"]).means(make_rule["h2_irrelevant_inputs"])
+
+    def test_union_implied_change_entities(self, make_rule):
+        original_on_left = make_rule["h1_easy"] | make_rule["h1_entity_order"]
+        assert "RESULT: fact <Hideaway Lodge> was <Wattenburg>’s abode" in str(original_on_left)
+        original_on_right = make_rule["h1_entity_order"] | make_rule["h1_easy"]
+        assert "RESULT: fact <Wattenburg> was <Hideaway Lodge>’s abode" in str(original_on_right)
+
+    def test_union_returns_universal(self, make_rule):
+        """
+        an ALL rule should be
+        returned even though ``implied`` is SOME, because
+        ``implied`` contributes no information that wasn't
+        already in ``greater``.
+        """
+        new_rule = make_rule["h2_ALL_due_process"] | make_rule["h2"]
+        assert len(new_rule.enactments) == 2
+        assert new_rule.universal
 
     def test_union_neither_universal(self, make_opinion_with_holding):
         feist = make_opinion_with_holding["feist_majority"]

@@ -500,6 +500,14 @@ class Rule(Factor):
         This operation is destructive in the sense that the new :class:`Rule` may not
         contain all the information that was available in ``self`` and ``other``.
 
+        This seems to work differently when one Rule
+        implies the other. That could mean there is a
+        union to return even when both Rules are SOME
+        rules. Or it could mean an ALL rule should be
+        returned even though ``implied`` is SOME, because
+        implied contributes no information that wasn't
+        already in ``greater``.
+
         :param other: a :class:`Rule` to be combined with ``self``.
 
         :returns:
@@ -507,59 +515,41 @@ class Rule(Factor):
             :class:`.Factor`\s of ``self`` and ``other``
         """
 
-        def union_if_implied(greater, implied):
-            """
-            This seems to work differently when one Rule
-            implies the other. That could mean there is a
-            union to return even when both Rules are SOME
-            rules. Or it could mean an ALL rule should be
-            returned even though ``implied`` is SOME, because
-            implied contributes no information that wasn't
-            already in ``greater``.
-
-            Still need tests for both these cases.
-            """
-            if greater.procedure.implies_all_to_all(implied.procedure):
-                mandatory = max(self.mandatory, other.mandatory)
-                universal = max(self.universal, other.universal)
-            else:
-                mandatory = min(self.mandatory, other.mandatory)
-                universal = min(self.universal, other.universal)
-
-            new_procedure = greater.procedure | implied.procedure
-            return Rule(
-                procedure=new_procedure,
-                enactments=consolidate_enactments(
-                    list(self.enactments) + list(other.enactments)
-                ),
-                enactments_despite=consolidate_enactments(
-                    list(self.enactments_despite) + list(other.enactments_despite),
-                    mandatory=mandatory,
-                    universal=universal,
-                ),
-            )
-
         if not isinstance(other, Rule):
             raise TypeError
-        if self >= other:
-            return union_if_implied(self, other)
-        if other >= self:
-            return union_if_implied(other, self).new_context(self.generic_factors)
+
+        recontexualized_procedure = other.procedure.new_context(self.generic_factors)
+        new_procedure = self.procedure | recontexualized_procedure
+        if new_procedure is None:
+            return None
+
+        enactments = (
+            consolidate_enactments(list(self.enactments) + list(other.enactments)),
+        )
+        enactments_despite = (
+            consolidate_enactments(
+                list(self.enactments_despite) + list(other.enactments_despite)
+            ),
+        )
+
+        if self.procedure.implies_all_to_all(
+            other.procedure
+        ) or other.procedure.implies_all_to_all(self.procedure):
+            return Rule(
+                procedure=new_procedure,
+                enactments=enactments,
+                enactments_despite=enactments_despite,
+                mandatory=min(self.mandatory, other.mandatory),
+                universal=min(self.universal, other.universal),
+            )
 
         if self.universal == other.universal == False:
-            return None
-        new_procedure = self.procedure | other.procedure
-        if new_procedure is None:
             return None
 
         return Rule(
             procedure=new_procedure,
-            enactments=consolidate_enactments(
-                list(self.enactments) + list(other.enactments)
-            ),
-            enactments_despite=consolidate_enactments(
-                list(self.enactments_despite) + list(other.enactments_despite)
-            ),
+            enactments=enactments,
+            enactments_despite=enactments_despite,
             mandatory=min(self.mandatory, other.mandatory),
             universal=min(self.universal, other.universal),
         )
