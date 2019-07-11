@@ -1,7 +1,7 @@
 """
 Statements of legal doctrines.
 
-:class:`.Court`\s may posit them as holdings, and they
+:class:`.Court`/s may posit them as holdings, and they
 may describe procedural moves available in litigation.
 """
 
@@ -24,7 +24,7 @@ from authorityspoke.procedures import Procedure
 
 @dataclass(frozen=True)
 class Rule(Factor):
-    """
+    r"""
     A statement of a legal doctrine about a :class:`.Procedure` for litigation.
 
     May decide some aspect of current litigation, and also potentially
@@ -118,7 +118,7 @@ class Rule(Factor):
         object.__setattr__(self, "despite", self.procedure.despite)
 
     def __add__(self, other) -> Optional[Rule]:
-        """
+        r"""
         Create new :class:`Rule` if ``self`` can satisfy the :attr:`inputs` of ``other``.
 
         If both ``self`` and ``other`` have False for :attr:`universal`,
@@ -166,7 +166,7 @@ class Rule(Factor):
         return None
 
     def get_contrapositives(self) -> Iterator[Rule]:
-        """
+        r"""
         Make contrapositive forms of this :class:`Rule`.
 
         Used when converting from JSON input containing the entry
@@ -220,7 +220,7 @@ class Rule(Factor):
         regime: Optional[Regime],
         factor_groups: Optional[Dict[str, List[Factor]]] = None,
     ) -> Iterator[Tuple[Rule, List[Factor]]]:
-        """
+        r"""
         Make :class:`Rule` from a :class:`dict` of strings and a list of mentioned :class:`.Factor`\s.
 
         :param record:
@@ -305,7 +305,7 @@ class Rule(Factor):
 
     @property
     def generic_factors(self) -> List[Optional[Factor]]:
-        """
+        r"""
         Get :class:`.Factor`\s that can be replaced without changing ``self``\s meaning.
 
         :returns:
@@ -385,7 +385,7 @@ class Rule(Factor):
         ) or self.procedure.contradicts_some_to_all(other.procedure)
 
     def needs_subset_of_enactments(self, other) -> bool:
-        """
+        r"""
         Test whether ``self``\'s :class:`.Enactment` support is a subset of ``other``\'s.
 
         A :class:`Rule` makes a more powerful statement if it relies on
@@ -407,7 +407,7 @@ class Rule(Factor):
         return True
 
     def __ge__(self, other) -> bool:
-        """
+        r"""
         Test if ``self`` implies ``other`` if posited in valid and decided :class:`.Holding`\s.
 
         If ``self`` relies for support on some :class:`.Enactment` text
@@ -422,7 +422,7 @@ class Rule(Factor):
 
         :returns:
             whether ``self`` implies ``other``, assuming that
-            both are :class:`Rule`\s, and
+            both are :class:`Rule`/s, and
             ``rule_valid`` and ``decided`` are ``True`` for both of them.
         """
 
@@ -444,7 +444,7 @@ class Rule(Factor):
         return self.procedure >= other.procedure
 
     def __len__(self):
-        """
+        r"""
         Count generic :class:`.Factor`\s needed as context for this :class:`Rule`.
 
         :returns:
@@ -455,7 +455,7 @@ class Rule(Factor):
         return len(self.procedure)
 
     def has_all_same_enactments(self, other: Rule) -> bool:
-        """
+        r"""
         Test if ``self`` has :class:`.Enactment`\s with same meanings as ``other``\'s.
 
         :param other:
@@ -494,6 +494,19 @@ class Rule(Factor):
         return self.mandatory == other.mandatory and self.universal == other.universal
 
     def __or__(self, other: Rule) -> Optional[Rule]:
+        r"""
+        Create new :class:`Rule` showing combined effect of all inputs of ``self`` and ``other``.
+
+        This operation is destructive in the sense that the new :class:`Rule` may not
+        contain all the information that was available in ``self`` and ``other``.
+
+        :param other: a :class:`Rule` to be combined with ``self``.
+
+        :returns:
+            a :class:`Rule` indicating the combined effect of the ``input`` and ``despite``
+            :class:`.Factor`\s of ``self`` and ``other``
+        """
+
         def union_if_implied(greater, implied):
             """
             This seems to work differently when one Rule
@@ -520,11 +533,11 @@ class Rule(Factor):
                     list(self.enactments) + list(other.enactments)
                 ),
                 enactments_despite=consolidate_enactments(
-                    list(self.enactments_despite) + list(other.enactments_despite),)
+                    list(self.enactments_despite) + list(other.enactments_despite),
                     mandatory=mandatory,
                     universal=universal,
-                )
-
+                ),
+            )
 
         if not isinstance(other, Rule):
             raise TypeError
@@ -571,8 +584,10 @@ class Rule(Factor):
         newline = "\n"
         return (
             f"the rule that the court "
-            + f"{'MUST' if self.mandatory else 'MAY'} {'ALWAYS' if self.universal else 'SOMETIMES'} "
-            + f"accept the result{newline}{str(factor_catalog(self.procedure.outputs, 'RESULT'))}"
+            + f"{'MUST' if self.mandatory else 'MAY'} "
+            + f"{'ALWAYS' if self.universal else 'SOMETIMES'} "
+            + f"accept the result{newline}"
+            + f"{str(factor_catalog(self.procedure.outputs, 'RESULT'))}"
             + f"{'based on the input' + newline + str(factor_catalog(self.procedure.inputs, 'GIVEN')) if self.procedure.inputs else ''}"
             + f"{str(factor_catalog(self.procedure.despite, 'DESPITE')) if self.procedure.despite else ''}"
             + f"{'according to the legislation' + newline + str(factor_catalog(self.enactments, 'GIVEN')) if self.enactments else ''}"

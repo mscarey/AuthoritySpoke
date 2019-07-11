@@ -31,6 +31,7 @@ wheel = "*"
 twine = "*"
 ipykernel = "*"
 doc8 = "*"
+flake8-comprehensions = "*"
 
 [requires]
 python_version = "3.7.3"

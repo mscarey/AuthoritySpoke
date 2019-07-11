@@ -103,7 +103,7 @@ class Procedure(Factor):
         return None
 
     def __or__(self, other: Procedure) -> Optional[Procedure]:
-        """
+        r"""
         Combine two :class:`Procedure`\s into one.
 
         The new :class:`Procedure` will have all of the ``inputs``, ``outputs``,
@@ -141,7 +141,7 @@ class Procedure(Factor):
         return Procedure(outputs=new_outputs, inputs=new_inputs, despite=new_despite)
 
     def __len__(self):
-        """
+        r"""
         Get number of generic :class:`.Factor`\s specified for ``self``.
 
         :returns:
@@ -177,7 +177,7 @@ class Procedure(Factor):
 
     @property
     def factors_all(self) -> List[Factor]:
-        """
+        r"""
         Get :class:`.Factor`\s in ``inputs``, ``outputs``, and ``despite``.
 
         :returns:
@@ -190,7 +190,7 @@ class Procedure(Factor):
 
     @property
     def generic_factors(self) -> List[Optional[Factor]]:
-        """
+        r"""
         :class:`.Factor`\s that can be replaced without changing ``self``\s meaning.
 
         If ``self.generic is True`` then the only generic :class:`.Factor` is ``self``.
@@ -240,7 +240,7 @@ class Procedure(Factor):
         other_factors: Tuple[Factor],
         matches: Dict[Factor, Factor],
     ):
-        """
+        r"""
         Find whether two sets of :class:`.Factor`\s can be consistent.
 
         Works by first determining whether one :class:`.Factor`
@@ -280,7 +280,7 @@ class Procedure(Factor):
     def contradiction_between_outputs(
         self, other: Procedure, matches: Dict[Factor, Factor]
     ) -> bool:
-        """
+        r"""
         Test whether outputs of two :class:`Procedure`\s can contradict.
 
         :param other:
@@ -308,7 +308,7 @@ class Procedure(Factor):
         return False
 
     def contradicts(self, other) -> bool:
-        """
+        r"""
         Find if ``self`` applying in some cases implies ``other`` cannot apply in some.
 
         Raises an error because, by analogy with :meth:`.Procedure.implies`\,
@@ -324,7 +324,7 @@ class Procedure(Factor):
         )
 
     def contradicts_some_to_all(self, other: Procedure) -> bool:
-        """
+        r"""
         Find if ``self`` applying in some cases implies ``other`` cannot apply in all.
 
         :returns:
@@ -436,7 +436,7 @@ class Procedure(Factor):
         )
 
     def _implies_if_present(self, other: Factor) -> bool:
-        """
+        r"""
         Find if ``self`` would imply ``other`` if they aren't absent.
 
         When ``self`` and ``other`` are included in
@@ -468,7 +468,7 @@ class Procedure(Factor):
         return bool(all_analogy_matches(relations))
 
     def means(self, other) -> bool:
-        """
+        r"""
         Determine whether ``other`` has the same meaning as ``self``.
 
         :returns:
@@ -507,7 +507,7 @@ class Procedure(Factor):
 
     @new_context_helper
     def new_context(self, changes: Dict[Factor, Factor]) -> Procedure:
-        """
+        r"""
         Create new :class:`Procedure`, replacing keys of ``changes`` with values.
 
         :param changes:
@@ -521,12 +521,12 @@ class Procedure(Factor):
         new_dict = self.__dict__.copy()
         for name in self.context_factor_names:
             new_dict[name] = tuple(
-                [factor.new_context(changes) for factor in new_dict[name]]
+                factor.new_context(changes) for factor in new_dict[name]
             )
         return self.__class__(**new_dict)
 
     def triggers_next_procedure(self, other: Procedure) -> List[Dict[Factor, Factor]]:
-        """
+        r"""
         Test if :class:`.Factor`\s from firing ``self`` would trigger ``other``.
 
         .. Note::
