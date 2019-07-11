@@ -47,7 +47,7 @@ class TestPredicates:
     def test_quantity_comparison(self, make_predicate):
         assert make_predicate["p7"].quantity_comparison() == "no more than 35 foot"
         assert make_predicate["p9"].quantity_comparison() == "no more than 5 foot"
-        assert make_predicate["p1"].quantity_comparison() is None
+        assert make_predicate["p1"].quantity_comparison() == ""
 
     def test_context_slots(self, make_predicate):
         assert make_predicate["p7"].context_slots == 2

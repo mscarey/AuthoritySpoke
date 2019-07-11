@@ -1173,7 +1173,7 @@ class Entity(Factor):
             return True
         if not isinstance(self, other.__class__):
             return False
-        if self.generic == False and self.name == other.name:
+        if self.generic is False and self.name == other.name:
             return True
         return other.generic
 

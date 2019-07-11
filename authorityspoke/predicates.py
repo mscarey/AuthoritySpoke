@@ -10,9 +10,8 @@ from __future__ import annotations
 
 import re
 
-from typing import Any, Callable, Dict, List, Tuple
-from typing import ClassVar, Iterable, Iterator, Mapping
-from typing import Optional, Sequence, Set, Type, Union
+from typing import ClassVar, Iterable
+from typing import Optional, Sequence, Union
 
 from dataclasses import dataclass
 
@@ -24,7 +23,7 @@ Q_ = ureg.Quantity
 
 @dataclass(frozen=True)
 class Predicate:
-    """
+    r"""
     A statement about real events or about a legal conclusion.
 
     Predicates may be "alleged" by a pleading, "supported" by evidence, or
@@ -177,7 +176,7 @@ class Predicate:
         return True
 
     def contradicts(self, other: Optional[Predicate]) -> bool:
-        """
+        r"""
         Test whether ``other`` and ``self`` have contradictory meanings.
 
         This first tries to find a contradiction based on the relationship
@@ -353,7 +352,7 @@ class Predicate:
         """
 
         if not self.quantity:
-            return None
+            return ""
         comparison = self.comparison or "="
         expand = {
             "=": "exactly equal to",
