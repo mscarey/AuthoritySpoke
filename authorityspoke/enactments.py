@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import datetime
 import functools
-import pathlib
 import re
 from typing import Dict, List, Optional, Tuple, Union
 from dataclasses import dataclass
@@ -553,7 +552,7 @@ class Enactment:
         return Enactment(code=code, selector=selector, name=enactment_dict.get("name"))
 
     def means(self, other: Enactment) -> bool:
-        """
+        r"""
         Find whether meaning of ``self`` is equivalent to that of ``other``.
 
         ``Self`` must be neither broader nor narrower than ``other``, which

@@ -1,4 +1,4 @@
-"""Objects that test whether a function holds between two groups of :class:`.Factor`\s."""
+r"""Objects that test whether a function holds between two groups of :class:`.Factor`\s."""
 
 from __future__ import annotations
 
@@ -10,7 +10,7 @@ from dataclasses import dataclass
 
 @dataclass(frozen=True)
 class Analogy:
-    """
+    r"""
     Two groups of :class:`.Factor`\s and a function that must hold between them.
 
     Can be used to find ways to assign the :class:`.Factor`\s'
@@ -40,7 +40,7 @@ class Analogy:
     def ordered_comparison(
         self, matches: Optional[Dict[Factor, Factor]] = None
     ) -> Iterator[Dict[Factor, Optional[Factor]]]:
-        """
+        r"""
         Find ways for a series of pairs of :class:`.Factor`\s to satisfy a comparison.
 
         :param matches:
@@ -87,7 +87,7 @@ class Analogy:
         matches: Dict[Factor, Factor],
         still_need_matches: Optional[List[Factor]] = None,
     ) -> Iterator[Dict[Factor, Optional[Factor]]]:
-        """
+        r"""
         Find ways for two unordered sets of :class:`.Factor`\s to satisfy a comparison.
 
         :param matches:
@@ -138,7 +138,7 @@ class Analogy:
         self, matchlist: List[Dict[Factor, Factor]]
     ) -> List[Dict[Factor, Optional[Factor]]]:
         """
-        Filter :class:`list` of :class:`.Factor` assignments with :meth:`~Analogy.unordered_comparison`.
+        Filter context assignments with :meth:`~Analogy.unordered_comparison`.
 
         :param matchlist:
             possible ways to match generic :class:`.Factor`\s of
@@ -158,7 +158,7 @@ class Analogy:
 def all_analogy_matches(
     relations: Tuple[Analogy, ...]
 ) -> List[Dict[Factor, Optional[Factor]]]:
-    """
+    r"""
     Find all context registers consistent with multiple :class:`.Analogy` comparisons.
 
     :param relations:
@@ -172,7 +172,7 @@ def all_analogy_matches(
         a list of all context registers consistent with all of the
         :class:`.Analogy`\s.
     """
-    matchlist = [{}]
+    matchlist: List[Dict[Factor, Factor]] = [{}]
     for relation in relations:
         matchlist = relation.update_matchlist(matchlist)
     return matchlist

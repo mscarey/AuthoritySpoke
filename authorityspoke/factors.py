@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import datetime
 import functools
 import logging
 import operator
@@ -18,6 +17,7 @@ from dataclasses import astuple, dataclass
 from authorityspoke.context import log_mentioned_context, new_context_helper
 from authorityspoke.predicates import Predicate
 from authorityspoke.relations import Analogy
+
 
 @dataclass(frozen=True)
 class Factor(ABC):
@@ -83,9 +83,9 @@ class Factor(ABC):
     @classmethod
     @log_mentioned_context
     def from_dict(
-        cls, factor_record: Dict, mentioned: List[Factor], regime: Optional["Regime"] = None, *args, **kwargs
+        cls, factor_record: Dict, mentioned: List[Factor], regime: Optional[Regime] = None, *args, **kwargs
     ) -> Optional[Factor]:
-        """
+        f"""
         Turn fields from a chunk of JSON into a :class:`Factor` object.
 
         :param factor_record:
@@ -153,10 +153,9 @@ class Factor(ABC):
                     generics[generic] = None
         return list(generics)
 
-
     @property
     def context_factors(self) -> Tuple:
-        """
+        r"""
         Get :class:`Factor`\s used in comparisons with other :class:`Factor`\s.
 
         :returns:
@@ -314,7 +313,7 @@ class Factor(ABC):
             return False
         if self.absent != other.absent:
             return False
-        if self.generic == other.generic == True:
+        if self.generic and other.generic:
             return True
         if self.generic != other.generic:
             return False
@@ -549,7 +548,7 @@ class Factor(ABC):
 
     def update_context_register(
         self, other: Factor, register: Dict[Factor, Factor], comparison: Callable
-    ):
+    ) -> Iterator[Optional[Dict[Factor, Factor]]]:
         """
         Find ways to update ``self_mapping`` to allow relationship ``comparison``.
 
@@ -651,7 +650,6 @@ class Fact(Factor):
             "beyond reasonable doubt",
         )
 
-
     def __post_init__(self):
 
         if (
@@ -709,7 +707,6 @@ class Fact(Factor):
         )
         string = f"{standard}{predicate}"
         return super().__str__().format(string)
-
 
     @classmethod
     def from_string(
@@ -910,7 +907,7 @@ class Fact(Factor):
         def add_content_references(
             content: str, mentioned: List[Factor], placeholder: str
         ) -> Tuple[str, List[Factor]]:
-            """
+            r"""
             Get context :class:`Factor`\s for new :class:`Fact`.
 
             :param content:
@@ -944,7 +941,7 @@ class Fact(Factor):
             return content, context_factors
 
         # TODO: inherit the later part of this function from Factor
-        comparison = None
+        comparison = ""
         quantity = None
         content = fact_dict.get("content")
         if fact_dict.get("content"):

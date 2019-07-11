@@ -12,6 +12,7 @@ pint = ">=0.9"
 requests = "*"
 authorityspoke = {path = ".",editable = true}
 lxml = "*"
+mypy = "*"
 
 [dev-packages]
 black = "*"

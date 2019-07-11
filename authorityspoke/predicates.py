@@ -64,7 +64,7 @@ class Predicate:
     content: str
     truth: Optional[bool] = True
     reciprocal: bool = False
-    comparison: Optional[str] = None
+    comparison: str = ""
     quantity: Optional[Union[int, float, ureg.Quantity]] = None
     opposite_comparisons: ClassVar = {
         ">=": "<",
@@ -86,6 +86,12 @@ class Predicate:
         Conjugating verbs using regex feels like a very brittle solution.
         An NLP library may be used here in future versions.
         """
+        if not self.comparison and self.quantity is not None:
+            object.__setattr__(self, "comparison", "=")
+
+        if self.comparison is None:
+            object.__setattr__(self, "comparison", "")
+
         normalize_comparison = {"==": "=", "!=": "<>"}
         if self.comparison in normalize_comparison:
             object.__setattr__(
