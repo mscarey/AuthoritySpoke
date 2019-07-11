@@ -331,7 +331,7 @@ class Code:
         return section_text[min(interval) : max(interval)]
 
     def select_text(self, selector: TextQuoteSelector) -> Optional[str]:
-        """
+        r"""
         Get text from the ``Code`` using a :class:`.TextQuoteSelector`.
 
         :param selector:
@@ -426,7 +426,7 @@ class Enactment:
         return combined
 
     def combine_text(self, other: Enactment) -> Optional[Enactment]:
-        """
+        r"""
         Create new :class:`Enactment` with combined text of the source :class:`Enactment`\s.
 
         :param other:

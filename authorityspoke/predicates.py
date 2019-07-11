@@ -1,4 +1,4 @@
-"""
+r"""
 Phrases that contain meanings of :class:`.Factor`\s, particularly :class:`.Fact`\s.
 
 Can contain references to other :class:`.Factor`\s,
@@ -164,6 +164,18 @@ class Predicate:
 
         return add_plurals.format(*(str(e) for e in context))
 
+    def consistent_dimensionality(self, other: Predicate) -> bool:
+        """Test if ``other`` has a quantity parameter consistent with ``self``."""
+
+        if isinstance(self.quantity, ureg.Quantity):
+            if not isinstance(other.quantity, ureg.Quantity):
+                return False
+            if self.quantity.dimensionality != other.quantity.dimensionality:
+                return False
+        elif isinstance(other.quantity, ureg.Quantity):
+            return False
+        return True
+
     def contradicts(self, other: Optional[Predicate]) -> bool:
         """
         Test whether ``other`` and ``self`` have contradictory meanings.
@@ -182,18 +194,10 @@ class Predicate:
                 + f"contradiction with other {self.__class__} objects or None."
             )
 
-        if (type(self.quantity) == ureg.Quantity) != (
-            type(other.quantity) == ureg.Quantity
-        ):
-            return False
-
         if self.truth is None or other.truth is None:
             return False
 
-        if (
-            isinstance(self.quantity, ureg.Quantity)
-            and self.quantity.dimensionality != other.quantity.dimensionality
-        ):
+        if not self.consistent_dimensionality(other):
             return False
 
         if not (
@@ -293,15 +297,7 @@ class Predicate:
         ):
             return False
 
-        if isinstance(self.quantity, ureg.Quantity) != (
-            isinstance(other.quantity, ureg.Quantity)
-        ):
-            return False
-
-        if (
-            isinstance(self.quantity, ureg.Quantity)
-            and self.quantity.dimensionality != other.quantity.dimensionality
-        ):
+        if not self.consistent_dimensionality(other):
             return False
 
         if "<" in self.comparison and (

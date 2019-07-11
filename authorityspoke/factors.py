@@ -1,4 +1,4 @@
-""":class:`Factor`\s, or inputs and outputs of legal :class:`.Rule`\s."""
+r""":class:`Factor`\s, or inputs and outputs of legal :class:`.Rule`\s."""
 
 from __future__ import annotations
 
@@ -85,7 +85,7 @@ class Factor(ABC):
     def from_dict(
         cls, factor_record: Dict, mentioned: List[Factor], regime: Optional[Regime] = None, *args, **kwargs
     ) -> Optional[Factor]:
-        f"""
+        r"""
         Turn fields from a chunk of JSON into a :class:`Factor` object.
 
         :param factor_record:
@@ -169,7 +169,7 @@ class Factor(ABC):
 
     @property
     def recursive_factors(self) -> Dict[Factor, None]:
-        """
+        r"""
         Collect ``self``'s :attr:`context_factors`, and each of their :attr:`context_factors`, recursively.
 
         :returns:
@@ -220,7 +220,7 @@ class Factor(ABC):
     def _context_registers(
         self, other: Factor, comparison: Callable
     ) -> Iterator[Dict[Factor, Factor]]:
-        """
+        r"""
         Search for ways to match :attr:`context_factors` of ``self`` and ``other``.
 
         :yields:
@@ -506,7 +506,7 @@ class Factor(ABC):
     def _import_to_mapping(
         self_mapping: Dict[Factor, Factor], incoming_mapping: Dict[Factor, Factor]
     ) -> Optional[Dict[Factor, Factor]]:
-        """
+        r"""
         Compare :class:`Factor`\s to test if two sets of matches can be merged.
 
         :param self_mapping:
@@ -587,7 +587,7 @@ class Factor(ABC):
 
 @dataclass(frozen=True)
 class Fact(Factor):
-    """
+    r"""
     An assertion accepted as factual by a court.
 
     Often based on factfinding by a judge or jury.
@@ -773,7 +773,7 @@ class Fact(Factor):
 
     @property
     def interchangeable_factors(self) -> List[Dict[Factor, Factor]]:
-        """
+        r"""
         Get ways to reorder context :class:`Factor`\s without changing truth value of ``self``.
 
         Each :class:`dict` returned has :class:`Factor`\s to replace as keys,
@@ -866,7 +866,7 @@ class Fact(Factor):
         return False
 
     def _contradicts_if_factor(self, other: Factor) -> bool:
-        """
+        r"""
         Test if ``self`` contradicts ``other``, assuming they are both :class:`Factor`\s.
 
         :returns:
@@ -889,7 +889,7 @@ class Fact(Factor):
     def _build_from_dict(
         cls, fact_dict: Dict[str, Union[str, bool]], mentioned: List[Factor]
     ) -> Optional[Fact]:
-        """
+        r"""
         Construct and return a :class:`Fact` object from a :py:class:`dict`.
 
         :param fact_dict:
