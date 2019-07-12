@@ -10,7 +10,7 @@ import re
 from abc import ABC
 
 from typing import Any, Callable, ClassVar, Dict, Iterable, Iterator, List
-from typing import Optional, Sequence, Set, Tuple, Type, Union
+from typing import Optional, Sequence, Tuple, Union
 
 from dataclasses import astuple, dataclass
 
@@ -735,7 +735,7 @@ class Fact(Factor):
             context factors and the comparison/quantity.
         """
 
-        comparison = None
+        comparison = ""
         quantity = None
         pattern = r"\{([^\{]+)\}"
 
@@ -932,7 +932,7 @@ class Fact(Factor):
         comparison = ""
         quantity = None
         content = fact_dict.get("content")
-        if fact_dict.get("content"):
+        if content:
             content, context_factors = add_content_references(
                 content, mentioned, placeholder
             )
@@ -1097,7 +1097,6 @@ def means(left: Factor, right: Factor) -> bool:
         meaning as ``self``.
     """
     return left.means(right)
-
 
 
 @dataclass(frozen=True)
