@@ -124,15 +124,15 @@ class Factor(ABC):
         return []
 
     @property
-    def generic_factors(self) -> List[Optional[Factor]]:
+    def generic_factors(self) -> List[Factor]:
         r"""
         :class:`.Factor`\s that can be replaced without changing ``self``\s meaning.
 
         :returns:
-            a :class:`dict` with self's generic :class:`.Factor`\s
-            as keys and ``None`` as values, so that the keys can
-            be matched to another object's ``generic_factors``
-            to perform an equality test.
+            a :class:`list` made from a :class:`dict` with ``self``\'s
+            generic :class:`.Factor`\s as keys and ``None`` as values,
+            so that the keys can be matched to another object's
+            ``generic_factors`` to perform an equality test.
         """
 
         if self.generic:
@@ -145,7 +145,7 @@ class Factor(ABC):
         return list(generics)
 
     @property
-    def context_factors(self) -> Tuple:
+    def context_factors(self) -> Tuple[Factor, ...]:
         r"""
         Get :class:`Factor`\s used in comparisons with other :class:`Factor`\s.
 
@@ -210,7 +210,7 @@ class Factor(ABC):
 
     def _context_registers(
         self, other: Factor, comparison: Callable
-    ) -> Iterator[Dict[Factor, Factor]]:
+    ) -> Iterator[Dict[Factor, Optional[Factor]]]:
         r"""
         Search for ways to match :attr:`context_factors` of ``self`` and ``other``.
 
@@ -458,25 +458,25 @@ class Factor(ABC):
         return self.__dict__.copy()
 
     def _registers_for_interchangeable_context(
-        self, matches: Dict[Factor, Factor]
-    ) -> Iterator[Dict[Factor, Factor]]:
-        """
+        self, matches: Dict[Factor, Optional[Factor]]
+    ) -> Iterator[Dict[Factor, Optional[Factor]]]:
+        r"""
         Find possible combination of interchangeable :attr:`context_factors`.
 
         :yields:
             context registers with every possible combination of
-            ``self``'s and ``other``'s interchangeable
+            ``self``\'s and ``other``\'s interchangeable
             :attr:`context_factors`.
         """
         def replace_factors_in_dict(
-            matches: Dict[Factor, Factor], replacement_dict: Dict[Factor, Factor]
+            matches: Dict[Factor, Optional[Factor]], replacement_dict: Dict[Factor, Factor]
         ):
             values = matches.values()
             keys = [replacement_dict.get(factor) or factor for factor in matches.keys()]
             return dict(zip(keys, values))
 
         yield matches
-        already_returned: List[Dict[Factor, Factor]] = [matches]
+        already_returned: List[Dict[Factor, Optional[Factor]]] = [matches]
         for replacement_dict in self.interchangeable_factors:
             changed_registry = replace_factors_in_dict(matches, replacement_dict)
             if not any(
@@ -495,7 +495,7 @@ class Factor(ABC):
 
     @staticmethod
     def _import_to_mapping(
-        self_mapping: Dict[Factor, Factor], incoming_mapping: Dict[Factor, Factor]
+        self_mapping: Dict[Factor, Factor], incoming_mapping: Dict[Factor, Optional[Factor]]
     ) -> Optional[Dict[Factor, Factor]]:
         r"""
         Compare :class:`Factor`\s to test if two sets of matches can be merged.
@@ -918,7 +918,7 @@ class Fact(Factor):
                 replaced by placeholder, and a list of referenced
                 :class:`Factor`\s in the order they appeared in content.
             """
-            context_with_indices: List[List[Factor, int]] = []
+            context_with_indices: List[List[Union[Factor, int]]] = []
             for factor in mentioned:
                 if factor.name and factor.name in content and factor.name != content:
                     factor_index = content.find(factor.name)

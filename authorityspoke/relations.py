@@ -155,9 +155,7 @@ class Analogy:
         return new_matchlist
 
 
-def all_analogy_matches(
-    relations: Tuple[Analogy, ...]
-) -> List[Dict[Factor, Optional[Factor]]]:
+def all_analogy_matches(relations: Tuple[Analogy, ...]) -> List[Dict[Factor, Factor]]:
     r"""
     Find all context registers consistent with multiple :class:`.Analogy` comparisons.
 
