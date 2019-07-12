@@ -172,6 +172,7 @@ class TestEvidence:
             .startswith("evidence of testimony by")
         )
 
+    # Same Meaning
     def test_equality_with_entity_order(self, make_predicate, make_evidence):
         e = make_evidence
         assert e["no_shooting"].means(e["no_shooting_entity_order"])
@@ -189,6 +190,10 @@ class TestEvidence:
                 make_evidence["no_shooting_different_witness"]
             )
         )
+
+    def test_not_equal_no_effect(self, make_evidence):
+        assert not make_evidence["shooting"].means(make_evidence["shooting_no_effect"])
+        assert not make_evidence["shooting_no_effect"].means(make_evidence["shooting"])
 
     def test_implication_missing_witness(self, make_evidence):
         e = make_evidence

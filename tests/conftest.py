@@ -473,6 +473,7 @@ def make_evidence(
     x = make_exhibit
     return {
         "shooting": Evidence(x["shooting_testimony"], to_effect=f["f_crime"]),
+        "shooting_no_effect": Evidence(x["shooting_testimony"]),
         "no_shooting": Evidence(x["no_shooting_testimony"], to_effect=f["f_no_crime"]),
         "no_shooting_absent": Evidence(
             x["no_shooting_testimony"], to_effect=f["f_no_crime"], absent=True

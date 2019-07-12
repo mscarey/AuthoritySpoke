@@ -326,7 +326,11 @@ class Factor(ABC):
             ``other`` is an instance of ``self``'s class.
         """
         for i, self_factor in enumerate(self.context_factors):
-            if not self_factor.means(other.context_factors[i]):
+            other_factor = other.context_factors[i]
+            if self_factor is None:
+                if other_factor is not None:
+                    return False
+            elif not self_factor.means(other_factor):
                 return False
 
         return self.consistent_with(other, means)
