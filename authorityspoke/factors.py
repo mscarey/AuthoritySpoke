@@ -19,7 +19,7 @@ from authorityspoke.predicates import Predicate
 from authorityspoke.relations import Analogy
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, init=False)
 class Factor(ABC):
     """
     Things relevant to a :class:`.Court`\'s application of a :class:`.Rule`.
@@ -28,6 +28,10 @@ class Factor(ABC):
     :class:`.Procedure` of one legal :class:`.Rule` might be in the
     ``inputs`` of the :class:`.Procedure` for another.
     """
+    def __init__(self, *, name: Optional[str] = None, generic: bool = False, absent: bool = False):
+        self.name = name
+        self.generic = generic
+        self.absent = absent
 
     @classmethod
     @functools.lru_cache()
@@ -121,7 +125,7 @@ class Factor(ABC):
 
     @property
     def generic_factors(self) -> List[Optional[Factor]]:
-        """
+        r"""
         :class:`.Factor`\s that can be replaced without changing ``self``\s meaning.
 
         :returns:
@@ -425,7 +429,7 @@ class Factor(ABC):
 
     @new_context_helper
     def new_context(self, changes: Dict[Factor, Factor]) -> Factor:
-        """
+        r"""
         Create new :class:`Factor`, replacing keys of ``changes`` with values.
 
         :param changes:
@@ -536,7 +540,7 @@ class Factor(ABC):
     def update_context_register(
         self, other: Factor, register: Dict[Factor, Factor], comparison: Callable
     ) -> Iterator[Optional[Dict[Factor, Factor]]]:
-        """
+        r"""
         Find ways to update ``self_mapping`` to allow relationship ``comparison``.
 
         :param other:
