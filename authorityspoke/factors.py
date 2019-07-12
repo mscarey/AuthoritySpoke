@@ -30,18 +30,6 @@ class Factor(ABC):
     """
 
     @classmethod
-    def all_subclasses(cls) -> Set[Type]:
-        """
-        Get all subclasses of :class:`Factor`.
-
-        :returns:
-            the set of all subclasses of :class:`Factor`
-        """
-        return set(cls.__subclasses__()).union(
-            [s for c in cls.__subclasses__() for s in c.all_subclasses()]
-        )
-
-    @classmethod
     @functools.lru_cache()
     def class_from_str(cls, name: str):
         """
@@ -55,11 +43,10 @@ class Factor(ABC):
 
         :returns: the Class named ``name``.
         """
-        name = name.capitalize()
         class_options = {
-            class_obj.__name__: class_obj for class_obj in cls.all_subclasses()
+            class_obj.__name__: class_obj for class_obj in cls.__subclasses__()
         }
-        answer = class_options.get(name)
+        answer = class_options.get(name.capitalize())
         if answer is None:
             raise ValueError(
                 f'"type" value in input must be one of '
