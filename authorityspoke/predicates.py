@@ -118,7 +118,7 @@ class Predicate:
 
     @property
     def context_slots(self) -> int:
-        """
+        r"""
         Count bracket pairs in ``self.content``, minus 1 if ``self.quantity==True``.
 
         :returns:
@@ -134,7 +134,7 @@ class Predicate:
     def content_with_entities(
         self, context: Union["Factor", Sequence["Factor"]]
     ) -> str:
-        """
+        r"""
         Make a sentence by filling in ``self.content`` with generic :class:`.Factor`\s.
 
         :param context:

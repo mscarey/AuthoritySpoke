@@ -317,9 +317,9 @@ class Factor(ABC):
             return True
         if self.generic != other.generic:
             return False
-        return self._equal_if_concrete(other)
+        return self._means_if_concrete(other)
 
-    def _equal_if_concrete(self, other: Factor) -> bool:
+    def _means_if_concrete(self, other: Factor) -> bool:
         """
         Test equality based on :attr:`context_factors`.
 
@@ -351,7 +351,7 @@ class Factor(ABC):
                 return factor
         return None
 
-    def __ge__(self, other: Factor) -> bool:
+    def __ge__(self, other: Optional[Factor]) -> bool:
         """Test whether ``self`` implies ``other``."""
         if other is None:
             return True
@@ -585,6 +585,7 @@ class Factor(ABC):
             return tuple(item)
         return (item,)
 
+
 @dataclass(frozen=True)
 class Fact(Factor):
     r"""
@@ -806,13 +807,13 @@ class Fact(Factor):
         """Access :attr:`~Predicate.truth` attribute."""
         return self.predicate.truth
 
-    def _equal_if_concrete(self, other: Factor) -> bool:
+    def _means_if_concrete(self, other: Factor) -> bool:
         if (
             not self.predicate.means(other.predicate)
             or self.standard_of_proof != other.standard_of_proof
         ):
             return False
-        return super()._equal_if_concrete(other)
+        return super()._means_if_concrete(other)
 
     def predicate_in_context(self, entities: Sequence[Factor]) -> str:
         """
@@ -1057,10 +1058,10 @@ class Exhibit(Factor):
     generic: bool = False
     context_factor_names: ClassVar = ("statement", "stated_by")
 
-    def _equal_if_concrete(self, other: Exhibit) -> bool:
+    def _means_if_concrete(self, other: Exhibit) -> bool:
         if self.form != other.form:
             return False
-        return super()._equal_if_concrete(other)
+        return super()._means_if_concrete(other)
 
     def _implies_if_concrete(self, other: Exhibit):
 
@@ -1171,7 +1172,7 @@ class Entity(Factor):
     def __ge__(self, other: Optional[Factor]):
         if other is None:
             return True
-        if not isinstance(self, other.__class__):
+        if not isinstance(other, Entity):
             return False
         if self.generic is False and self.name == other.name:
             return True
