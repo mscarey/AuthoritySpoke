@@ -137,7 +137,7 @@ class Analogy:
     def update_matchlist(
         self, matchlist: List[Dict[Factor, Factor]]
     ) -> List[Dict[Factor, Optional[Factor]]]:
-        """
+        r"""
         Filter context assignments with :meth:`~Analogy.unordered_comparison`.
 
         :param matchlist:

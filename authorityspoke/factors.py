@@ -145,7 +145,7 @@ class Factor(ABC):
         return list(generics)
 
     @property
-    def context_factors(self) -> Tuple[Factor, ...]:
+    def context_factors(self) -> Tuple[Optional[Factor], ...]:
         r"""
         Get :class:`Factor`\s used in comparisons with other :class:`Factor`\s.
 
@@ -154,9 +154,11 @@ class Factor(ABC):
             for whichever subclass of :class:`Factor` calls this method. These
             can be used for comparing objects using :meth:`consistent_with`
         """
-        return tuple(
-            self.__dict__.get(factor_name) for factor_name in self.context_factor_names
-        )
+        context: List[Optional[Factor]] = []
+        for factor_name in self.context_factor_names:
+            next_factor: Optional[Factor] = self.__dict__.get(factor_name)
+            context.append(next_factor)
+        return tuple(context)
 
     @property
     def recursive_factors(self) -> Dict[Factor, None]:
@@ -168,11 +170,11 @@ class Factor(ABC):
             to preserve order) of :class:`Factor`\s.
         """
         answers: Dict[Factor, None] = {self: None}
-        for context in filter(lambda x: x is not None, self.context_factors):
+        for context in self.context_factors:
             if isinstance(context, Iterable):
                 for item in context:
                     answers.update(item.recursive_factors)
-            else:
+            elif context is not None:
                 answers.update(context.recursive_factors)
         return answers
 
@@ -626,7 +628,10 @@ class Fact(Factor):
             any court considers the order context-specific, then this
             approach of hard-coding their names and order will have to change.
     """
-
+    # TODO: use dicts for named context_factors
+    # and tuples for ordered context_factors like Fact has.
+    # Then Procedure would have a dict with tuples as values?
+    # Actually, why bother?
     predicate: Predicate
     context_factors: Tuple[Factor, ...] = ()
     name: Optional[str] = None
