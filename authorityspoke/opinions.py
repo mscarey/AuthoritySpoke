@@ -13,6 +13,7 @@ from typing import Optional, Sequence, Union
 import datetime
 import json
 import pathlib
+import re
 
 from dataclasses import dataclass
 
@@ -66,6 +67,7 @@ class Opinion:
     court: str
     position: str
     author: Optional[str]
+    text: Optional[str]
 
     directory: ClassVar = get_directory_path("opinions")
 
@@ -291,6 +293,7 @@ class Opinion:
                 decision_dict["court"]["slug"],
                 position,
                 author,
+                opinion_dict.get("text"),
             )
 
         citations = tuple(c["cite"] for c in decision_dict["citations"])
@@ -499,6 +502,25 @@ class Opinion:
         else:
             posit_one_holding(holding, context)
 
+    def get_anchors(self, holding: Holding) -> List[str]:
+        r"""
+        Get text passages where a :class:`.Holding` is linked to ``self``.
+
+        :param holding:
+            a holding to find anchors for, which must be in :attr:`~Opinion.holdings`\.
+
+        :returns:
+            a :class:`list` with the text of each passage that anchors the :class:`.Holding`
+        """
+        anchors = holding.selector
+        if anchors is None:
+            raise ValueError(
+                '"Holding" must be a Holding object already listed in self.holdings'
+            )
+        if isinstance(anchors, Iterable):
+            return [self.select_text(anchor) for anchor in anchors]
+        return [self.select_text(anchor)]
+
     def __ge__(self, other: Union[Opinion, Rule]) -> bool:
         """
         Find whether ``self``'s holdings imply all the holdings of ``other``.
@@ -532,3 +554,21 @@ class Opinion:
             self >= other and self != other.
         """
         return (self >= other) and (self != other)
+
+    def select_text(self, selector: TextQuoteSelector) -> Optional[str]:
+        r"""
+        Get text using a :class:`.TextQuoteSelector`.
+
+        :param selector:
+            a selector referencing a text passage in this :class:`Opinion`.
+
+        :returns:
+            the text referenced by the selector, or ``None`` if the text
+            can't be found.
+        """
+        if re.search(selector.passage_regex, self.text, re.IGNORECASE):
+            return selector.exact
+        raise ValueError(
+            f'Passage "{selector.exact}" from TextQuoteSelector '
+            + f'not found in Opinion "{self}".'
+        )

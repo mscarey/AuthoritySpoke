@@ -64,7 +64,7 @@ class Holding(Factor):
     rule: Optional[Rule] = None
     rule_valid: bool = True
     decided: bool = True
-    selector: Optional[Union[Iterable[TextQuoteSelector], TextQuoteSelector]] = None
+    selectors: Union[Iterable[TextQuoteSelector], TextQuoteSelector] = ()
     name: Optional[str] = None
     procedure: Optional[Procedure] = None
     outputs: Optional[Union[Factor, Iterable[Factor]]] = None
@@ -116,10 +116,10 @@ class Holding(Factor):
         object.__setattr__(self, "enactments_despite", self.rule.enactments_despite)
         object.__setattr__(self, "mandatory", self.rule.mandatory)
         object.__setattr__(self, "universal", self.rule.universal)
-        if isinstance(self.selector, list):
-            object.__setattr__(self, "selector", tuple(self.selector))
-        elif isinstance(self.selector, TextQuoteSelector):
-            object.__setattr__(self, "selector", tuple([self.selector]))
+        if isinstance(self.selectors, Iterable):
+            object.__setattr__(self, "selectors", tuple(self.selectors))
+        elif isinstance(self.selectors, TextQuoteSelector):
+            object.__setattr__(self, "selectors", (self.selectors,))
 
     @classmethod
     def collect_from_json(
@@ -298,7 +298,7 @@ class Holding(Factor):
                 rule=basic_rule,
                 rule_valid=rule_valid,
                 decided=decided,
-                selector=selector,
+                selectors=selector,
             ),
             mentioned,
             factor_text_links,
@@ -321,7 +321,7 @@ class Holding(Factor):
                     + "without the 'exclusive' keyword."
                 )
             for modified_rule in basic_rule.get_contrapositives():
-                yield (Holding(rule=modified_rule, selector=selector), mentioned, {})
+                yield (Holding(rule=modified_rule, selectors=selector), mentioned, {})
 
     @property
     def context_factors(self) -> Tuple:
@@ -426,7 +426,7 @@ class Holding(Factor):
         return False
 
     def _implies_if_decided(self, other) -> bool:
-        """
+        r"""
         Test if ``self`` implies ``other`` if they're both decided.
 
         This is a partial version of the
@@ -495,7 +495,7 @@ class Holding(Factor):
             rule=self.rule.new_context(changes),
             rule_valid=self.rule_valid,
             decided=self.decided,
-            selector=self.selector,
+            selectors=self.selectors,
         )
 
     def __or__(self, other: Union[Rule, Holding]) -> Optional[Holding]:
@@ -530,7 +530,7 @@ class Holding(Factor):
             "Need a method to merge two lists of Opinion text selectors."
         )
         return Holding(
-            rule=new_rule, decided=True, rule_valid=True, selector=new_selector_group
+            rule=new_rule, decided=True, rule_valid=True, selectors=new_selector_group
         )
 
     def own_attributes(self) -> Dict[str, Any]:
