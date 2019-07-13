@@ -505,6 +505,7 @@ class Opinion:
     def get_anchors(self, holding: Holding) -> List[str]:
         r"""
         Get text passages where a :class:`.Holding` is linked to ``self``.
+        TODO: add a flag to get anchors for factors_all too.
 
         :param holding:
             a holding to find anchors for, which must be in :attr:`~Opinion.holdings`\.
@@ -512,14 +513,13 @@ class Opinion:
         :returns:
             a :class:`list` with the text of each passage that anchors the :class:`.Holding`
         """
-        anchors = holding.selector
-        if anchors is None:
-            raise ValueError(
-                '"Holding" must be a Holding object already listed in self.holdings'
-            )
-        if isinstance(anchors, Iterable):
-            return [self.select_text(anchor) for anchor in anchors]
-        return [self.select_text(anchor)]
+        anchors = []
+        for selector in holding.selectors:
+            new_text = self.select_text(selector)
+            if not new_text:
+                raise ValueError(f"Failed to find Opinion text with {selector}.")
+            anchors.append(new_text)
+        return anchors
 
     def __ge__(self, other: Union[Opinion, Rule]) -> bool:
         """

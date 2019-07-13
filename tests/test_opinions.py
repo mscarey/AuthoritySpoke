@@ -50,6 +50,10 @@ class TestOpinions:
         watt.posit(h3_specific)
         assert h3_specific in watt.holdings
 
+    def test_opinion_text_anchor(self, make_opinion_with_holdings):
+        feist = make_opinion_with_holdings["feist_majority"]
+        assert "generally" in feist.get_anchors(feist.holdings[1])
+
     def test_opinion_entity_list(
         self, make_opinion, real_holding, make_entity, make_evidence
     ):

@@ -1034,6 +1034,7 @@ def make_holding(make_rule) -> Dict[str, Holding]:
     holdings.update(new_holdings)
     return holdings
 
+
 @pytest.fixture(scope="class")
 def make_opinion(make_entity) -> Dict[str, Opinion]:
     test_cases = ("brad", "cardenas", "feist", "lotus", "oracle", "watt")
