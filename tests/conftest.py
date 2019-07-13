@@ -1036,9 +1036,7 @@ def make_holding(make_rule) -> Dict[str, Holding]:
 
 @pytest.fixture(scope="class")
 def make_opinion(make_entity) -> Dict[str, Opinion]:
-    e = make_entity
-
-    test_cases = ("brad", "cardenas", "lotus", "watt")
+    test_cases = ("brad", "cardenas", "feist", "lotus", "oracle", "watt")
     opinions = {}
     for case in test_cases:
         for opinion in Opinion.from_file(f"{case}_h.json", lead_only=False):
@@ -1047,11 +1045,9 @@ def make_opinion(make_entity) -> Dict[str, Opinion]:
 
 
 @pytest.fixture(scope="class")
-def make_opinion_with_holding(make_regime) -> Dict[str, Opinion]:
-    test_cases = ("feist", "brad", "cardenas", "lotus", "watt", "oracle")
-    opinions = {}
+def make_opinion_with_holding(make_opinion, make_regime) -> Dict[str, Opinion]:
+    test_cases = ("brad", "cardenas", "feist", "lotus", "oracle", "watt")
+    opinions = make_opinion.copy()
     for case in test_cases:
-        opinion = Opinion.from_file(f"{case}_h.json")
-        opinion = opinion.exposit(f"holding_{case}.json", regime=make_regime)
-        opinions[f"{case}_majority"] = opinion
+        opinions[f"{case}_majority"].exposit(f"holding_{case}.json", regime=make_regime)
     return opinions

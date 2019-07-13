@@ -145,7 +145,7 @@ class Factor(ABC):
         return list(generics)
 
     @property
-    def context_factors(self) -> Tuple[Optional[Factor], ...]:
+    def context_factors(self) -> Sequence[Optional[Factor]]:
         r"""
         Get :class:`Factor`\s used in comparisons with other :class:`Factor`\s.
 
@@ -637,12 +637,12 @@ class Fact(Factor):
     # Then Procedure would have a dict with tuples as values?
     # Actually, why bother?
     predicate: Predicate
-    context_factors: Tuple[Factor, ...] = ()
+    context_factors: Sequence[Factor] = ()
     name: Optional[str] = None
     standard_of_proof: Optional[str] = None
     absent: bool = False
     generic: bool = False
-    case_factors: Tuple[Factor, ...] = ()
+    case_factors: Sequence[Factor] = ()
     standards_of_proof: ClassVar = (
             "scintilla of evidence",
             "substantial evidence",

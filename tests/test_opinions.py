@@ -34,6 +34,12 @@ class TestOpinions:
             == "TOBRINER, J."
         )
 
+    def test_opinion_text(self, make_opinion):
+        assert (
+            "Feist responded that such efforts were economically "
+            + "impractical and, in any event, unnecessary"
+        ) in make_opinion["feist_majority"].text
+
     def test_opinion_holding_list(
         self, make_opinion, real_holding, make_evidence, make_entity
     ):
@@ -182,7 +188,6 @@ class TestImplication:
 
 
 class TestContradiction:
-
     def test_contradiction_of_holding(
         self, make_opinion_with_holding, make_enactment, make_holding
     ):

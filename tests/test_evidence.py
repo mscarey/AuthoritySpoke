@@ -3,6 +3,7 @@ import logging
 from authorityspoke.factors import Fact
 from authorityspoke.factors import Evidence, Exhibit
 
+
 class TestEvidence:
     def test_make_evidence_object(self, watt_factor):
         e = Evidence(Exhibit(form="testimony"), to_effect=watt_factor["f2"])
@@ -47,7 +48,8 @@ class TestEvidence:
             .startswith("evidence of testimony by")
         )
 
-  class TestEvidenceSameMeaning:
+
+class TestEvidenceSameMeaning:
     def test_equality_with_entity_order(self, make_predicate, make_evidence):
         e = make_evidence
         assert e["no_shooting"].means(e["no_shooting_entity_order"])
@@ -70,7 +72,8 @@ class TestEvidence:
         assert not make_evidence["shooting_no_effect"].means(make_evidence["shooting"])
         assert not make_evidence["shooting"].means(make_evidence["shooting_no_effect"])
 
- class TestEvidenceImplication:
+
+class TestEvidenceImplication:
     def test_implication_missing_witness(self, make_evidence):
         e = make_evidence
         assert e["no_shooting"] >= e["no_shooting_witness_unknown"]
@@ -86,7 +89,8 @@ class TestEvidence:
         assert not make_evidence["no_shooting"] > cool_fact
         assert not cool_fact > make_evidence["no_shooting"]
 
- class TestEvidenceContradiction:
+
+class TestEvidenceContradiction:
     def test_no_contradiction_of_fact(
         self, make_predicate, make_evidence, watt_mentioned
     ):
