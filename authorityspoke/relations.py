@@ -3,7 +3,7 @@ r"""Objects that test whether a function holds between two groups of :class:`.Fa
 from __future__ import annotations
 
 from typing import Callable, Dict, Iterator
-from typing import List, Optional, Tuple
+from typing import List, Optional, Sequence, Tuple
 
 from dataclasses import dataclass
 
@@ -33,8 +33,8 @@ class Analogy:
         :meth:`.Factor.__ge__`.
     """
 
-    need_matches: Tuple[Factor, ...]
-    available: Tuple[Factor, ...]
+    need_matches: Sequence[Optional[Factor]]
+    available: Sequence[Optional[Factor]]
     comparison: Callable
 
     def ordered_comparison(

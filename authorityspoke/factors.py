@@ -302,14 +302,14 @@ class Factor(ABC):
             converts ``self``\'s and ``other``\'s fields to tuples
             and compares them.
         """
-        if self.__class__ != other.__class__:
-            return False
-        if self.absent != other.absent:
+        if (
+            self.__class__ != other.__class__
+            or self.absent != other.absent
+            or self.generic != other.generic
+        ):
             return False
         if self.generic and other.generic:
             return True
-        if self.generic != other.generic:
-            return False
         return self._means_if_concrete(other)
 
     def _means_if_concrete(self, other: Factor) -> bool:
@@ -808,6 +808,8 @@ class Fact(Factor):
         return self.predicate.truth
 
     def _means_if_concrete(self, other: Factor) -> bool:
+        if not isinstance(other, self.__class__):
+            return False
         if (
             not self.predicate.means(other.predicate)
             or self.standard_of_proof != other.standard_of_proof
@@ -1058,7 +1060,9 @@ class Exhibit(Factor):
     generic: bool = False
     context_factor_names: ClassVar = ("statement", "stated_by")
 
-    def _means_if_concrete(self, other: Exhibit) -> bool:
+    def _means_if_concrete(self, other: Factor) -> bool:
+        if not isinstance(other, self.__class__):
+            return False
         if self.form != other.form:
             return False
         return super()._means_if_concrete(other)

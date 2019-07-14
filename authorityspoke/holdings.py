@@ -1,4 +1,4 @@
-"""
+r"""
 :class:`Holding`\s describe :class:`.Opinion`\s` attitudes toward :class:`.Rule`\s.
 
 :class:`Holding`\s are text passages within :class:`.Opinion`\s
@@ -349,7 +349,7 @@ class Holding(Factor):
         raise NotImplementedError
 
     def contradicts(self, other) -> bool:
-        """
+        r"""
         Test if ``self`` :meth:`~.Factor.implies` ``other`` :meth:`~.Factor.negated`\.
 
         Works by testing whether ``self`` would imply ``other`` if
@@ -385,7 +385,7 @@ class Holding(Factor):
         )
 
     def __ge__(self, other: Union[Holding, Rule]) -> bool:
-        """
+        r"""
         Test for implication.
 
         See :meth:`.Procedure.implies_all_to_all`
@@ -453,7 +453,7 @@ class Holding(Factor):
         return self.rule.contradicts(other.rule)
 
     def __len__(self):
-        """
+        r"""
         Count generic :class:`.Factor`\s needed as context for this :class:`Holding`.
 
         :returns:
