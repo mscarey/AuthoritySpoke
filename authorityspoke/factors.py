@@ -292,14 +292,14 @@ class Factor(ABC):
         return self.__class__(**new_dict)
 
     def means(self, other) -> bool:
-        """
+        r"""
         Test whether ``self`` and ``other`` have identical meanings.
 
         :returns:
             whether ``other`` is another :class:`Factor`
             with the same meaning as ``self``. Not the same as an
             equality comparison with the ``==`` symbol, which simply
-            converts ``self``'s and ``other``'s fields to tuples
+            converts ``self``\'s and ``other``\'s fields to tuples
             and compares them.
         """
         if self.__class__ != other.__class__:

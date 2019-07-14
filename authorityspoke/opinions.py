@@ -12,6 +12,7 @@ from typing import Optional, Sequence, Union
 
 import datetime
 import json
+import logging
 import pathlib
 import re
 
@@ -502,7 +503,7 @@ class Opinion:
         else:
             posit_one_holding(holding, context)
 
-    def get_anchors(self, holding: Holding) -> List[str]:
+    def get_anchors(self, holding: Holding, include_factors: bool = True) -> List[str]:
         r"""
         Get text passages where a :class:`.Holding` is linked to ``self``.
         TODO: add a flag to get anchors for factors_all too.
@@ -513,12 +514,30 @@ class Opinion:
         :returns:
             a :class:`list` with the text of each passage that anchors the :class:`.Holding`
         """
-        anchors = []
-        for selector in holding.selectors:
-            new_text = self.select_text(selector)
-            if not new_text:
-                raise ValueError(f"Failed to find Opinion text with {selector}.")
-            anchors.append(new_text)
+
+        def add_selectors(
+            anchor_list: List, selectors: Optional[Iterable[TextQuoteSelector]]
+        ) -> List[str]:
+            if selectors is None:
+                return anchor_list
+            for selector in selectors:
+                new_text = self.select_text(selector)
+                if new_text:
+                    anchor_list.append(new_text)
+                else:
+                    logger.error(
+                        f"Failed to find Opinion text with {selector} in "
+                        + (f"Opinion {self.name}.")
+                    )
+            return anchor_list
+
+        logger = logging.getLogger("opinion_text_anchor_logger")
+        anchors: List[str] = []
+        if include_factors:
+            for factor in holding.rule.procedure.factors_all:
+                anchors = add_selectors(anchors, self.factors.get(factor))
+        anchors = add_selectors(anchors, holding.selectors)
+
         return anchors
 
     def __ge__(self, other: Union[Opinion, Rule]) -> bool:

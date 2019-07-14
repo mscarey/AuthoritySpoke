@@ -50,9 +50,21 @@ class TestOpinions:
         watt.posit(h3_specific)
         assert h3_specific in watt.holdings
 
-    def test_opinion_text_anchor(self, make_opinion_with_holdings):
-        feist = make_opinion_with_holdings["feist_majority"]
-        assert "generally" in feist.get_anchors(feist.holdings[1])
+    def test_opinion_text_anchor(self, make_opinion_with_holding):
+        feist = make_opinion_with_holding["feist_majority"]
+        assert any(
+            "generally" in anchor for anchor in feist.get_anchors(feist.holdings[1])
+        )
+
+    def test_opinion_factor_text_anchor(self, make_opinion_with_holding):
+        feist = make_opinion_with_holding["feist_majority"]
+        assert all(
+            "No one may claim originality" not in anchor
+            for anchor in feist.get_anchors(feist.holdings[0])
+        )
+        assert any(
+            "as to facts" in anchor for anchor in feist.get_anchors(feist.holdings[0])
+        )
 
     def test_opinion_entity_list(
         self, make_opinion, real_holding, make_entity, make_evidence
