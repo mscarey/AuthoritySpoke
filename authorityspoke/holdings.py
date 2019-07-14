@@ -132,7 +132,7 @@ class Holding(Factor):
     ) -> Union[
         List[Holding], Tuple[List[Holding], Dict[Factor, List[TextQuoteSelector]]]
     ]:
-        """
+        r"""
         Load a list of :class:`Holdings`\s from JSON and :meth:`~.Opinion.posit` them.
 
         :param filename:
@@ -325,7 +325,7 @@ class Holding(Factor):
 
     @property
     def context_factors(self) -> Tuple:
-        """
+        r"""
         Call :class:`Procedure`\'s :meth:`~Procedure.context_factors` method.
 
         :returns:
@@ -335,7 +335,7 @@ class Holding(Factor):
 
     @property
     def generic_factors(self) -> List[Optional[Factor]]:
-        """
+        r"""
         Get :class:`.Factor`\s that can be replaced without changing ``self``\s meaning.
 
         :returns:

@@ -74,7 +74,7 @@ class Factor(ABC):
     @classmethod
     @log_mentioned_context
     def from_dict(
-        cls, factor_record: Dict, mentioned: List[Factor], regime: Optional[Regime] = None, *args, **kwargs
+        cls, factor_record: Dict, mentioned: List[Factor]
     ) -> Optional[Factor]:
         r"""
         Turn fields from a chunk of JSON into a :class:`Factor` object.
@@ -818,7 +818,7 @@ class Fact(Factor):
         return super()._means_if_concrete(other)
 
     def predicate_in_context(self, entities: Sequence[Factor]) -> str:
-        """
+        r"""
         Insert :class:`str` representations of ``entities`` into ``self``\s :class:`Predicate`.
 
         :returns:
@@ -844,6 +844,8 @@ class Fact(Factor):
         :returns:
             whether ``self`` implies ``other`` under the given assumption.
         """
+        if not isinstance(other, self.__class__):
+            return False
         if bool(self.standard_of_proof) != bool(other.standard_of_proof):
             return False
 
@@ -856,7 +858,7 @@ class Fact(Factor):
             return False
         return super()._implies_if_concrete(other)
 
-    def _contradicts_if_present(self, other: Fact) -> bool:
+    def _contradicts_if_present(self, other: Factor) -> bool:
         """
         Test if ``self`` contradicts :class:`Fact` ``other`` if neither is ``absent``.
 
@@ -864,6 +866,8 @@ class Fact(Factor):
             whether ``self`` and ``other`` can't both be true at
             the same time under the given assumption.
         """
+        if not isinstance(other, Fact):
+            return False
         if self.predicate.contradicts(other.predicate):
             return self.consistent_with(other, operator.ge)
         return False
@@ -890,12 +894,12 @@ class Fact(Factor):
 
     @classmethod
     def _build_from_dict(
-        cls, fact_dict: Dict[str, Union[str, bool]], mentioned: List[Factor]
-    ) -> Optional[Fact]:
+        cls, factor_record: Dict[str, Union[str, bool]], mentioned: List[Factor]
+    ) -> Fact:
         r"""
         Construct and return a :class:`Fact` object from a :py:class:`dict`.
 
-        :param fact_dict:
+        :param factor_record:
             imported from a JSON file in the format used in the "input" folder.
 
         :param mentioned:
@@ -946,7 +950,7 @@ class Fact(Factor):
         # TODO: inherit the later part of this function from Factor
         comparison = ""
         quantity = None
-        content = fact_dict.get("content")
+        content = factor_record.get("content")
         if content:
             content, context_factors = add_content_references(
                 content, mentioned, placeholder
@@ -962,14 +966,14 @@ class Fact(Factor):
         # rewriting them here.
         predicate = Predicate(
             content=content,
-            truth=fact_dict.get("truth", True),
-            reciprocal=fact_dict.get("reciprocal", False),
+            truth=factor_record.get("truth", True),
+            reciprocal=factor_record.get("reciprocal", False),
             comparison=comparison,
             quantity=quantity,
         )
-        name = fact_dict.get("name")
+        name = factor_record.get("name")
         if not name:
-            name = f'{"false " if not predicate.truth else ""}{fact_dict.get("content")}'
+            name = f'{"false " if not predicate.truth else ""}{factor_record.get("content")}'
         if name:
             name = name.replace("{", "").replace("}", "")
 
@@ -977,9 +981,9 @@ class Fact(Factor):
             predicate,
             context_factors,
             name=name,
-            standard_of_proof=fact_dict.get("standard_of_proof", None),
-            absent=fact_dict.get("absent", False),
-            generic=fact_dict.get("generic", False),
+            standard_of_proof=factor_record.get("standard_of_proof", None),
+            absent=factor_record.get("absent", False),
+            generic=factor_record.get("generic", False),
         )
 
     @new_context_helper
@@ -1001,7 +1005,7 @@ class Fact(Factor):
 
 @dataclass(frozen=True)
 class Pleading(Factor):
-    """A document filed by a party to make :class:`Allegation`\s."""
+    r"""A document filed by a party to make :class:`Allegation`\s."""
 
     filer: Optional["Entity"] = None
     name: Optional[str] = None
@@ -1068,7 +1072,8 @@ class Exhibit(Factor):
         return super()._means_if_concrete(other)
 
     def _implies_if_concrete(self, other: Exhibit):
-
+        if not isinstance(other, self.__class__):
+            return False
         if not (self.form == other.form or other.form is None):
             return False
 
@@ -1118,7 +1123,7 @@ def means(left: Factor, right: Factor) -> bool:
 
 @dataclass(frozen=True)
 class Entity(Factor):
-    """
+    r"""
     Things that exist in the outside world, like people, places, or events.
 
     Not concepts that derive their meaning from litigation,
