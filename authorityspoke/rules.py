@@ -515,6 +515,9 @@ class Rule(Factor):
             :class:`.Factor`\s of ``self`` and ``other``
         """
 
+        if other is None:
+            return self
+
         if not isinstance(other, Rule):
             raise TypeError
 
