@@ -5,9 +5,11 @@ import operator
 from pint import UnitRegistry
 import pytest
 
+
 from authorityspoke.enactments import Code, Enactment, consolidate_enactments
 from authorityspoke.opinions import Opinion
 from authorityspoke.predicates import ureg, Q_
+from authorityspoke.io.readers import read_json
 from authorityspoke.selectors import TextQuoteSelector
 
 
@@ -131,7 +133,9 @@ class TestEnactments:
 
     def test_passage_from_imported_statute(self, make_regime):
         opinion = Opinion.from_file(f"oracle_h.json")
-        oracle_majority = opinion.exposit(f"holding_oracle.json", regime=make_regime)
+        oracle_majority = opinion.exposit(
+            read_json(f"holding_oracle.json", regime=make_regime)
+        )
         despite_text = str(oracle_majority.holdings[5])
         assert 'DESPITE: "In no case does copyright protection ' in despite_text
 

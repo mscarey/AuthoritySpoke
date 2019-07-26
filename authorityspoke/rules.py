@@ -16,7 +16,6 @@ from typing import List, Optional, Sequence, Tuple, Union
 
 from dataclasses import dataclass
 
-from authorityspoke.context import get_directory_path
 from authorityspoke.enactments import Enactment, consolidate_enactments
 from authorityspoke.factors import Factor, means, new_context_helper
 from authorityspoke.procedures import Procedure
@@ -83,7 +82,6 @@ class Rule(Factor):
 
     context_factor_names: ClassVar = ("procedure",)
     enactment_attr_names: ClassVar = ("enactments", "enactments_despite")
-    directory: ClassVar = get_directory_path("holdings")
 
     def __post_init__(self):
         for attr in self.enactment_attr_names:

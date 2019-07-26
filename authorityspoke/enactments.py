@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import datetime
 import functools
+import pathlib
 import re
 from typing import Dict, List, Optional, Tuple, Union
 from dataclasses import dataclass
@@ -13,7 +14,8 @@ from bs4 import BeautifulSoup
 from utils.cache import lazyprop
 from utils.roman import from_roman
 
-from authorityspoke.context import log_mentioned_context, get_directory_path
+from authorityspoke.context import log_mentioned_context
+from authorityspoke.io.downloads import get_directory_path
 from authorityspoke.selectors import TextQuoteSelector
 
 

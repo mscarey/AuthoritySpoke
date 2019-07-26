@@ -20,7 +20,9 @@ from dataclasses import dataclass
 
 import requests
 
-from authorityspoke.context import get_directory_path
+# eliminate import soon
+from authorityspoke.io.downloads import get_directory_path
+
 from authorityspoke.factors import Factor
 from authorityspoke.holdings import Holding
 from authorityspoke.rules import Rule
@@ -352,56 +354,29 @@ class Opinion:
 
     def exposit(
         self,
-        rule_file: Optional[str] = None,
-        rule_dict: Optional[dict] = None,
-        directory: Optional[pathlib.Path] = None,
-        regime: Optional["Regime"] = None,
+        holdings: Sequence[Holding],
+        text_links: Optional[Dict[Factor, List[TextQuoteSelector]]] = None,
     ):
-        """
-        Load and :meth:`~Opinion.posit` :class:`.Rule` objects from JSON.
+        r"""
+        :meth:`~Opinion.posit` :class:`.Rule` objects and link :class:`Factor`\s to text.
 
         Here, to :meth:`~Opinion.posit` means to add each :class:`.Rule`
         to ``self.holdings``.
 
-        :param rule_file:
-            name of the JSON file with the
-            representation of :class:`.Rule` objects. If ``None``
-            is passed in, the :class:`.Rule` class will add the
-            default value ``holding_[party_name].json``.
+        :param holdings:
+            :class:`Holding`\s to :meth:`~Opinion.posit`
 
-        :param rule_dict:
-            dict with a representation of :class:`.Rule` objects.
-
-        :param directory:
-            directory containing the JSON file with the
-            representation of :class:`.Rule` objects. If ``None``
-            is passed in, the :class:`.Rule` class will add the
-            default value ``example_data/holdings``.
-
-        :param regime:
+        :param text_links:
+            mapping of :class:`Factor`\s to the :class:`Opinion` passages where
+            they can be found
         """
 
-        if rule_dict:
-            holdings, text_links = Holding.collect_from_dict(
-                case=rule_dict, regime=regime, include_text_links=True
-            )
-        elif rule_file:
-            holdings, text_links = Holding.collect_from_json(
-                filename=rule_file,
-                directory=directory,
-                regime=regime,
-                include_text_links=True,
-            )
-        else:
-            raise ValueError(
-                "Must specify either rule_file (filename of a JSON rule input file) "
-                "or rule_dict (a dict with the same fields as the JSON input file)."
-            )
         for holding in holdings:
             self.posit(holding)
-        for factor in text_links:
-            if self.factors.get(factor) is None:
-                self.factors[factor] = text_links[factor]
+        if text_links:
+            for factor in text_links:
+                if self.factors.get(factor) is None:
+                    self.factors[factor] = text_links[factor]
         return self
 
     @property
@@ -506,7 +481,6 @@ class Opinion:
     def get_anchors(self, holding: Holding, include_factors: bool = True) -> List[str]:
         r"""
         Get text passages where a :class:`.Holding` is linked to ``self``.
-        TODO: add a flag to get anchors for factors_all too.
 
         :param holding:
             a holding to find anchors for, which must be in :attr:`~Opinion.holdings`\.

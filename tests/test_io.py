@@ -5,7 +5,6 @@ import pathlib
 import pint
 import pytest
 
-from authorityspoke.context import get_directory_path
 from authorityspoke.enactments import Code, Enactment
 from authorityspoke.factors import Entity
 from authorityspoke.factors import Factor, Fact
@@ -13,6 +12,7 @@ from authorityspoke.holdings import Holding
 from authorityspoke.opinions import Opinion
 from authorityspoke.predicates import Predicate
 from authorityspoke.procedures import Procedure
+from authorityspoke.io.readers import get_directory_path, read_dict, read_json
 from authorityspoke.rules import Rule
 from authorityspoke.selectors import TextQuoteSelector
 
@@ -52,29 +52,27 @@ class TestEntityImport:
             ],
         }
         watt = make_opinion["watt_majority"]
-        watt.exposit(rule_dict=smith_dict)
+        watt.exposit(read_dict(smith_dict))
         assert not watt.holdings[1] >= watt.holdings[0]
         assert watt.holdings[1].generic_factors != watt.holdings[0].generic_factors
 
 
 class TestEnactmentImport:
     def test_enactment_import(self, make_regime):
-        holdings = Holding.collect_from_json(
-            "holding_cardenas.json", regime=make_regime
-        )
+        holdings = read_json("holding_cardenas.json", regime=make_regime)
         enactment_list = holdings[0].enactments
         assert "all relevant evidence is admissible" in enactment_list[0].text
 
 
 class TestFactorImport:
     def test_fact_import(self, make_regime):
-        holdings = Holding.collect_from_json("holding_watt.json", regime=make_regime)
+        holdings = read_json("holding_watt.json", regime=make_regime)
         new_fact = holdings[0].inputs[1]
         assert "lived at <Hideaway Lodge>" in str(new_fact)
         assert isinstance(new_fact.context_factors[0], Entity)
 
     def test_fact_with_quantity(self, make_regime):
-        holdings = Holding.collect_from_json("holding_watt.json", regime=make_regime)
+        holdings = read_json("holding_watt.json", regime=make_regime)
         new_fact = holdings[1].inputs[3]
         assert "was no more than 35 foot" in str(new_fact)
 
@@ -82,7 +80,7 @@ class TestFactorImport:
         directory = pathlib.Path.cwd() / "tests"
         if directory.exists():
             os.chdir(directory)
-        input_directory = Holding.directory / "holding_watt.json"
+        input_directory = get_directory_path("holdings") / "holding_watt.json"
         assert input_directory.exists()
 
 
@@ -117,7 +115,7 @@ class TestRuleImport:
         """
 
         watt = make_opinion["watt_majority"]
-        watt.exposit(rule_file="holding_watt.json")
+        watt.exposit(read_json("holding_watt.json"))
         assert watt.holdings[0] == real_holding["h1"]
 
     def test_same_enactment_objects_equal(self, make_opinion_with_holding):
@@ -143,9 +141,9 @@ class TestRuleImport:
 
     def test_same_enactment_in_two_opinions(self, make_regime, make_opinion):
         watt = make_opinion["watt_majority"]
-        watt.exposit(rule_file="holding_watt.json", regime=make_regime)
+        watt.exposit(read_json("holding_watt.json", regime=make_regime))
         brad = make_opinion["brad_majority"]
-        brad.exposit(rule_file="holding_brad.json", regime=make_regime)
+        brad.exposit(read_json("holding_brad.json", regime=make_regime))
         assert any(
             watt.holdings[0].enactments[0].means(brad_enactment)
             for brad_enactment in brad.holdings[0].enactments
@@ -160,20 +158,20 @@ class TestRuleImport:
         """
         brad = make_opinion["brad_majority"]
         brad.holdings = []
-        brad.exposit(rule_file="holding_brad.json", regime=make_regime)
+        brad.exposit(read_json("holding_brad.json", regime=make_regime))
         assert any(brad.holdings[6].inputs[0] == x for x in brad.holdings[5].inputs)
         assert any(brad.holdings[6].inputs[0] is x for x in brad.holdings[5].inputs)
 
     def test_use_int_not_pint_without_dimension(self, make_regime, make_opinion):
 
         brad = make_opinion["brad_majority"]
-        brad.exposit(rule_file="holding_brad.json", regime=make_regime)
+        brad.exposit(read_json("holding_brad.json", regime=make_regime))
         assert "dimensionless" not in str(brad.holdings[6])
         assert isinstance(brad.holdings[6].inputs[0].predicate.quantity, int)
 
     def test_opinion_posits_holding(self, make_opinion, make_regime):
         brad = make_opinion["brad_majority"]
-        brad.exposit(rule_file="holding_brad.json", regime=make_regime)
+        brad.exposit(read_json("holding_brad.json", regime=make_regime))
         assert "warrantless search and seizure" in str(brad.holdings[0])
 
     def test_opinion_posits_holding_tuple_context(
@@ -185,7 +183,7 @@ class TestRuleImport:
         """
         watt = make_opinion["watt_majority"]
         brad = make_opinion["brad_majority"]
-        brad.exposit(rule_file="holding_brad.json", regime=make_regime)
+        brad.exposit(read_json("holding_brad.json", regime=make_regime))
         context_holding = brad.holdings[6].new_context(
             [make_entity["watt"], make_entity["trees"], make_entity["motel"]]
         )
@@ -207,7 +205,7 @@ class TestRuleImport:
         """
         watt = make_opinion["watt_majority"]
         brad = make_opinion["brad_majority"]
-        brad.exposit(rule_file="holding_brad.json", regime=make_regime)
+        brad.exposit(read_json("holding_brad.json", regime=make_regime))
         context_holding = brad.holdings[6].new_context(
             {brad.holdings[6].generic_factors[0]: make_entity["watt"]}
         )
@@ -226,7 +224,7 @@ class TestRuleImport:
         """
         watt = make_opinion["watt_majority"]
         brad = make_opinion["brad_majority"]
-        brad.exposit(rule_file="holding_brad.json", regime=make_regime)
+        brad.exposit(read_json("holding_brad.json", regime=make_regime))
         context_change = brad.holdings[6].new_context(
             {brad.holdings[6].generic_factors[1]: make_entity["trees_specific"]}
         )
@@ -251,7 +249,7 @@ class TestRuleImport:
             ],
         }
         with pytest.raises(ValueError):
-            Holding.collect_from_dict(rule_dict)
+            read_dict(rule_dict)
 
     def test_error_classname_does_not_exist(self):
         rule_dict = {
@@ -271,7 +269,7 @@ class TestRuleImport:
             ]
         }
         with pytest.raises(ValueError):
-            Holding.collect_from_dict(rule_dict)
+            read_dict(rule_dict)
 
     def test_holding_flagged_exclusive(self, make_opinion_with_holding, make_enactment):
         """
@@ -350,7 +348,7 @@ class TestRuleImport:
         section of the JSON.
         """
 
-        with open(Holding.directory / "holding_feist.json", "r") as f:
+        with open(get_directory_path("holdings") / "holding_feist.json", "r") as f:
             feist_json = json.load(f)
         assert (
             len(make_opinion_with_holding["feist_majority"].holdings)
@@ -369,7 +367,5 @@ class TestNestedFactorImport:
         testimony on the jury. Hence, admission of the testimony
         concerning appellant’s use of narcotics was improper.
         """
-        cardenas_holdings = Holding.collect_from_json(
-            "holding_cardenas.json", regime=make_regime
-        )
+        cardenas_holdings = read_json("holding_cardenas.json", regime=make_regime)
         assert len(cardenas_holdings) == 2

@@ -4,6 +4,7 @@ import pytest
 from authorityspoke.enactments import Code, Enactment
 from authorityspoke.factors import Entity, Evidence, Exhibit
 from authorityspoke.holdings import Holding
+from authorityspoke.io.readers import read_json
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
 from authorityspoke.opinions import Opinion
@@ -105,7 +106,7 @@ class TestOpinions:
             make_opinion["watt_majority"].posit(make_procedure["c1"])
 
     def test_error_exposit_with_no_rule_source(self, make_opinion):
-        with pytest.raises(ValueError):
+        with pytest.raises(TypeError):
             make_opinion["watt_majority"].exposit()
 
     def test_new_context_non_iterable_changes(self, make_opinion, make_holding):
@@ -137,8 +138,8 @@ class TestOpinions:
         # Clearing in case prior tests added holdings
         watt.holdings = []
         brad.holdings = []
-        watt.exposit(rule_file="holding_watt.json", regime=make_regime)
-        brad.exposit(rule_file="holding_brad.json", regime=make_regime)
+        watt.exposit(read_json("holding_watt.json", regime=make_regime))
+        brad.exposit(read_json("holding_brad.json", regime=make_regime))
         context_pairs = {
             "proof of Bradley's guilt": "proof of Wattenburg's guilt",
             "Bradley": "Wattenburg",
@@ -157,8 +158,8 @@ class TestOpinions:
         brad = make_opinion["brad_majority"]
         watt.holdings = []
         brad.holdings = []
-        watt.exposit(rule_file="holding_watt.json", regime=make_regime)
-        brad.exposit(rule_file="holding_brad.json", regime=make_regime)
+        watt.exposit(read_json("holding_watt.json", regime=make_regime))
+        brad.exposit(read_json("holding_brad.json", regime=make_regime))
 
         context_items = [
             "proof of Wattenburg's guilt",
@@ -180,9 +181,7 @@ class TestImplication:
     def test_posit_list_of_holdings_and_imply(self, make_opinion, make_regime):
         watt = make_opinion["watt_majority"]
         brad = make_opinion["brad_majority"]
-        some_rules = Holding.collect_from_json(
-            filename="holding_watt.json", regime=make_regime
-        )
+        some_rules = read_json(filename="holding_watt.json", regime=make_regime)
         for case in (watt, brad):
             case.holdings = []
             case.posit(some_rules[:3])

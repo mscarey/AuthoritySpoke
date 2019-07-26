@@ -143,32 +143,3 @@ def log_mentioned_context(func: Callable):
         return new_factor, mentioned
 
     return wrapper
-
-
-def get_directory_path(stem: str) -> pathlib.Path:
-    """
-    Find a data directory for importing files.
-
-    Will only find the correct directory if it is the current working
-    directory is that directory, is its child directory, or is a sibling
-    directory. Requires the directory to be found within an ``example_data``
-    directory.
-
-    This function doesn't obviously belong in the context module.
-
-    :param stem:
-        name of the folder where the desired example data files
-        can be found, e.g. "holdings" or "opinions".
-
-    :returns:
-        path to the directory with the desired example data files.
-    """
-    directory = pathlib.Path.cwd()
-    if directory.stem == stem:
-        return directory
-    if directory.stem != "example_data":
-        directory = directory / "example_data"
-    directory = directory / stem
-    if not directory.exists():
-        directory = pathlib.Path.cwd().parent / "example_data" / stem
-    return directory
