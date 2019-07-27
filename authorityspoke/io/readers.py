@@ -1,8 +1,9 @@
 import datetime
+from functools import partial
 import json
 import pathlib
 
-from typing import Any, Dict, List, Iterator, Optional, Tuple, Union
+from typing import Any, Dict, List, Iterable, Iterator, Optional, Tuple, Union
 
 from authorityspoke.enactments import Code
 from authorityspoke.factors import Factor
@@ -217,11 +218,31 @@ def read_code(
     return Code(filepath=validated_filepath)
 
 
-def dict_opinion(
-    decision_dict: Dict[str, Any], lead_only: bool = True
+def opinion_from_case(
+    citations: List[Dict[str, str]],
+    casebody: Dict,
+    decision_date: str,
+    court: Dict[str, Union[str, int]],
+    name: str = "",
+    name_abbreviation: str = "",
+    first_page: str = "",
+    last_page: str = "",
+    lead_only: bool = True,
+    **kwargs
 ) -> Union[Opinion, Iterator[Opinion]]:
     """
     Create and return one or more :class:`.Opinion` objects.
+
+    This function uses the model of a judicial decision from
+    the `Caselaw Access Project API <https://api.case.law/v1/cases/>`_.
+    One of these records may contain multiple :class:`.Opinion`\s.
+
+    Typically one record will contain all the :class:`.Opinion`\s
+    from one appeal, but not necessarily from the whole lawsuit. One
+    lawsuit may contain multiple appeals or other petitions, and
+    if more then one of those generates published :class:`.Opinion`\s,
+    the CAP API will divide those :class:`.Opinion`\s into a separate
+    record for each appeal.
 
     The lead opinion is commonly, but not always, the only
     :class:`.Opinion` that creates binding legal authority.
@@ -230,9 +251,41 @@ def dict_opinion(
     :class:`.Opinion` fail to command a majority of the panel
     of judges.
 
-    :param decision_dict:
-        A record of an opinion loaded from JSON from the
-        `Caselaw Access Project API <https://api.case.law/v1/cases/>`_.
+    :param citations:
+        Page references that would be used to locate the decision in
+        printed volumes. May be the closest things to accepted
+        identifiers for a decision.
+
+    :param casebody:
+        A large section of the CAP API response containing all the
+        text that was printed in the reporter volume.
+
+    :param decision_date:
+        The day the :class:`.Opinion`\s were issued, in ISO format.
+
+    :param court:
+        A dict containing the :class:`.Court` slug, hopefully a unique
+        identifier of the court. Also contains the "id", which can be
+        resorted to when the slug turns out not to be unique.
+
+    :param name:
+        Full name of the lawsuit. Sometimes the same lawsuit may change
+        its name as time passes between multiple appeals.
+
+    :param name_abbreviation:
+        A shorter name for the lawsuit. Courts may or may not have
+        deterministic rules for creating the abbreviation given
+        the full name. This may be only one of many possible abbreviations.
+
+    :param first_page:
+        The first printed page where any of the :class:`.Opinion`\s for this
+        decision can be found. Does not come with an identifier of the reporter,
+        but in most cases there is only one official reporter, which is the most
+        likely choice.
+
+    :param last_page:
+        The last printed page where any of the :class:`.Opinion`\s for this
+        decision can be found.
 
     :param lead_only:
         If ``True``, returns a single :class:`.Opinion` object
@@ -242,37 +295,53 @@ def dict_opinion(
         :class:`.Opinion` objects from every opinion in the case.
     """
 
-    def make_opinion(decision_dict, opinion_dict, citations) -> Opinion:
-        position = opinion_dict["type"]
-        author = opinion_dict["author"]
+    def make_opinion(
+        name: str,
+        name_abbreviation: str,
+        citations: Iterable[str],
+        first_page: Optional[int],
+        last_page: Optional[int],
+        decision_date: datetime.date,
+        court: str,
+        opinion_dict: Dict[str, str],
+    ) -> Opinion:
+
+        author = opinion_dict.get("author")
         if author:
             author = author.strip(",:")
 
         return Opinion(
-            decision_dict["name"],
-            decision_dict["name_abbreviation"],
-            citations,
-            int(decision_dict["first_page"]),
-            int(decision_dict["last_page"]),
-            datetime.date.fromisoformat(decision_dict["decision_date"]),
-            decision_dict["court"]["slug"],
-            position,
-            author,
-            opinion_dict.get("text"),
+            name=name,
+            name_abbreviation=name_abbreviation,
+            citations=citations,
+            first_page=first_page,
+            last_page=last_page,
+            decision_date=decision_date,
+            court=court,
+            position=opinion_dict.get("type"),
+            author=author,
+            text=opinion_dict.get("text"),
         )
 
-    citations = tuple(c["cite"] for c in decision_dict["citations"])
-    opinions = (
-        decision_dict.get("casebody", {})
-        .get("data", {})
-        .get("opinions", [{"type": "majority", "author": None}])
+    opinions = casebody.get("data", {}).get(
+        "opinions", [{"type": "majority", "author": None}]
     )
 
+    make_opinion_given_case = partial(
+        make_opinion,
+        name=name,
+        name_abbreviation=name_abbreviation,
+        first_page=int(first_page) if first_page else None,
+        last_page=int(last_page) if last_page else None,
+        decision_date=datetime.date.fromisoformat(decision_date),
+        court=court["slug"],
+        citations=tuple(c["cite"] for c in citations),
+    )
     if lead_only:
-        return make_opinion(decision_dict, opinions[0], citations)
+        return make_opinion_given_case(opinion_dict=opinions[0])
     else:
         return iter(
-            make_opinion(decision_dict, opinion_dict, citations)
+            make_opinion_given_case(opinion_dict=opinion_dict)
             for opinion_dict in opinions
         )
 
@@ -310,4 +379,4 @@ def json_opinion(
     with open(validated_filepath, "r") as f:
         decision_dict = json.load(f)
 
-    return dict_opinion(decision_dict, lead_only)
+    return opinion_from_case(**decision_dict, lead_only=lead_only)

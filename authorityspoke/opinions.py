@@ -63,12 +63,12 @@ class Opinion:
 
     name: str
     name_abbreviation: str
-    citations: Tuple[str]
-    first_page: int
-    last_page: int
+    citations: Iterable[str]
+    first_page: Optional[int]
+    last_page: Optional[int]
     decision_date: datetime.date
     court: str
-    position: str
+    position: Optional[str]
     author: Optional[str]
     text: Optional[str]
 
