@@ -11,7 +11,7 @@ from authorityspoke.holdings import Holding
 from authorityspoke.jurisdictions import Jurisdiction, Regime
 from authorityspoke.opinions import Opinion
 from authorityspoke.predicates import Predicate, Q_
-from authorityspoke.io.readers import read_json
+from authorityspoke.io import readers
 from authorityspoke.rules import Procedure, Rule
 from authorityspoke.selectors import TextQuoteSelector
 
@@ -526,16 +526,10 @@ def make_selector(make_code) -> Dict[str, TextQuoteSelector]:
 @pytest.fixture(scope="module")
 def make_regime() -> Dict[str, Code]:
     usa = Regime()
-    for code in (
-        Code("constitution.xml"),
-        # USC Title 17 in USLM format
-        Code("usc17.xml"),
-        # one section of the 2012 edition of CFR Title 37 from govinfo.gov
-        Code("cfr37.xml"),
-        Code("ca_evidence.html"),
-        Code("ca_penal.html"),
+    for filename in (
+        "constitution.xml", "usc17.xml", "cfr37.xml", "ca_evidence.html", "ca_penal.html"
     ):
-        usa.set_code(code)
+        usa.set_code(readers.read_code(filename=filename))
     return usa
 
 
@@ -1054,9 +1048,9 @@ def make_opinion_with_holding(make_opinion, make_regime) -> Dict[str, Opinion]:
     for case in test_cases:
         for opinion in Opinion.from_file(f"{case}_h.json", lead_only=False):
             opinions[f"{case}_{opinion.position}"] = opinion
-        opinions[f"{case}_majority"].exposit(read_json(f"holding_{case}.json", regime=make_regime))
+        opinions[f"{case}_majority"].exposit(readers.read_json(f"holding_{case}.json", regime=make_regime))
     for case in test_cases_with_anchors:
         for opinion in Opinion.from_file(f"{case}_h.json", lead_only=False):
             opinions[f"{case}_{opinion.position}"] = opinion
-        opinions[f"{case}_majority"].exposit(*read_json(f"holding_{case}.json", regime=make_regime, include_text_links=True))
+        opinions[f"{case}_majority"].exposit(*readers.read_json(f"holding_{case}.json", regime=make_regime, include_text_links=True))
     return opinions

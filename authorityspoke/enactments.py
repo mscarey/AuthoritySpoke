@@ -15,7 +15,6 @@ from utils.cache import lazyprop
 from utils.roman import from_roman
 
 from authorityspoke.context import log_mentioned_context
-from authorityspoke.io.downloads import get_directory_path
 from authorityspoke.selectors import TextQuoteSelector
 
 
@@ -30,12 +29,10 @@ class Code:
     the code, so every new XML format will require adding a method
     to this class to ingest it.
 
-    :param filename:
+    :param filepath:
         the name of the file in the ``example_data/codes``
         folder where the XML version of the code can be found.
     """
-
-    directory = get_directory_path("codes")
 
     # namespaces for legislative XML schemas
     ns = {
@@ -44,20 +41,9 @@ class Code:
         "xhtml": "http://www.w3.org/1999/xhtml",
     }
 
-    def __init__(self, filename: str):
-        """Set ``filename`` parameter as attribute."""
-        self.filename = filename
-
-    @property
-    def path(self):
-        """
-        Construct the path to this file in the ``example_data`` folder.
-
-        :returns:
-            The path to the file where the XML file for
-            the code can be found.
-        """
-        return self.__class__.directory / self.filename
+    def __init__(self, filepath: pathlib.Path):
+        """Set ``filepath`` parameter as attribute."""
+        self.filepath = filepath
 
     @property
     def jurisdiction(self) -> str:
@@ -152,7 +138,7 @@ class Code:
             A BeautifulSoup object created by parsing the
             ``Code``\'s XML file
         """
-        with open(self.path) as fp:
+        with open(self.filepath) as fp:
             xml = BeautifulSoup(fp, "lxml-xml")
         return xml
 
@@ -361,7 +347,7 @@ class Code:
         )
 
     def __repr__(self):
-        return f'{self.__class__.__name__}("{self.filename}")'
+        return f"{self.__class__.__name__}({self.filepath})"
 
     def __str__(self):
         return self.title
