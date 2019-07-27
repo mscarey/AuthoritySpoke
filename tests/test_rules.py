@@ -5,7 +5,7 @@ from authorityspoke.enactments import Code, Enactment
 from authorityspoke.factors import Predicate, Entity, Factor, Fact
 from authorityspoke.factors import Evidence, Exhibit
 from authorityspoke.holdings import Holding
-from authorityspoke.io.readers import read_json
+from authorityspoke.io.readers import json_holdings
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
 from authorityspoke.opinions import Opinion
@@ -71,19 +71,19 @@ class TestRules:
 
     def test_string_with_line_breaks(self, make_opinion, make_regime):
         cardenas = make_opinion["cardenas_majority"]
-        cardenas.exposit(read_json("holding_cardenas.json", regime=make_regime))
+        cardenas.exposit(json_holdings("holding_cardenas.json", regime=make_regime))
         assert "was addicted to heroin\n" in str(cardenas.holdings[0])
 
     def test_string_mentions_absence(self, make_opinion, make_regime):
         cardenas = make_opinion["cardenas_majority"]
-        cardenas.exposit(read_json("holding_cardenas.json", regime=make_regime))
+        cardenas.exposit(json_holdings("holding_cardenas.json", regime=make_regime))
         assert "absence of evidence of testimony by <parole officer>" in str(
             cardenas.holdings[1]
         )
 
     def test_factor_properties_for_rule(self, make_opinion, make_regime):
         cardenas = make_opinion["cardenas_majority"]
-        cardenas.exposit(read_json("holding_cardenas.json", regime=make_regime))
+        cardenas.exposit(json_holdings("holding_cardenas.json", regime=make_regime))
         assert len(cardenas.holdings[1].inputs) == 1
         assert len(cardenas.holdings[1].outputs) == 1
         assert len(cardenas.holdings[1].despite) == 1

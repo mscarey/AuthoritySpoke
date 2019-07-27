@@ -1,25 +1,18 @@
-import json
 import pytest
 
-from authorityspoke.enactments import Code, Enactment
-from authorityspoke.factors import Entity, Evidence, Exhibit
-from authorityspoke.holdings import Holding
-from authorityspoke.io.readers import read_json
-from authorityspoke.procedures import Procedure
-from authorityspoke.rules import Rule
+from authorityspoke.factors import Entity
+from authorityspoke.io import readers
 from authorityspoke.opinions import Opinion
-from authorityspoke.predicates import ureg, Q_
-from authorityspoke.context import log_mentioned_context
 
 
 class TestOpinions:
     def test_load_opinion_in_Harvard_format(self):
-        watt_dict = Opinion.from_file("watt_h.json")
+        watt_dict = readers.json_opinion("watt_h.json")
         assert watt_dict.name_abbreviation == "Wattenburg v. United States"
 
     def test_load_generator_for_opinions(self):
-        opinion_generator = Opinion.from_file("brad_h.json", lead_only=False)
-        majority = next(opinion_generator)
+        opinion_generator = readers.json_opinion("brad_h.json", lead_only=False)
+        _ = next(opinion_generator)  # majority
         dissent = next(opinion_generator)
         assert dissent.position == "concurring-in-part-and-dissenting-in-part"
 
@@ -138,8 +131,8 @@ class TestOpinions:
         # Clearing in case prior tests added holdings
         watt.holdings = []
         brad.holdings = []
-        watt.exposit(read_json("holding_watt.json", regime=make_regime))
-        brad.exposit(read_json("holding_brad.json", regime=make_regime))
+        watt.exposit(readers.json_holdings("holding_watt.json", regime=make_regime))
+        brad.exposit(readers.json_holdings("holding_brad.json", regime=make_regime))
         context_pairs = {
             "proof of Bradley's guilt": "proof of Wattenburg's guilt",
             "Bradley": "Wattenburg",
@@ -158,8 +151,8 @@ class TestOpinions:
         brad = make_opinion["brad_majority"]
         watt.holdings = []
         brad.holdings = []
-        watt.exposit(read_json("holding_watt.json", regime=make_regime))
-        brad.exposit(read_json("holding_brad.json", regime=make_regime))
+        watt.exposit(readers.json_holdings("holding_watt.json", regime=make_regime))
+        brad.exposit(readers.json_holdings("holding_brad.json", regime=make_regime))
 
         context_items = [
             "proof of Wattenburg's guilt",
@@ -181,7 +174,9 @@ class TestImplication:
     def test_posit_list_of_holdings_and_imply(self, make_opinion, make_regime):
         watt = make_opinion["watt_majority"]
         brad = make_opinion["brad_majority"]
-        some_rules = read_json(filename="holding_watt.json", regime=make_regime)
+        some_rules = readers.json_holdings(
+            filename="holding_watt.json", regime=make_regime
+        )
         for case in (watt, brad):
             case.holdings = []
             case.posit(some_rules[:3])

@@ -1,12 +1,14 @@
+import datetime
 import json
 import pathlib
 
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Iterator, Optional, Tuple, Union
 
 from authorityspoke.enactments import Code
 from authorityspoke.factors import Factor
 from authorityspoke.holdings import Holding
 from authorityspoke.jurisdictions import Regime
+from authorityspoke.opinions import Opinion
 from authorityspoke.selectors import TextQuoteSelector
 
 
@@ -132,7 +134,7 @@ def make_filepath(
     return directory / filename
 
 
-def read_json(
+def json_holdings(
     filename: Optional[str] = None,
     directory: Optional[pathlib.Path] = None,
     filepath: Optional[pathlib.Path] = None,
@@ -213,3 +215,99 @@ def read_code(
         filename, directory, filepath, default_folder="codes"
     )
     return Code(filepath=validated_filepath)
+
+
+def dict_opinion(
+    decision_dict: Dict[str, Any], lead_only: bool = True
+) -> Union[Opinion, Iterator[Opinion]]:
+    """
+    Create and return one or more :class:`.Opinion` objects.
+
+    The lead opinion is commonly, but not always, the only
+    :class:`.Opinion` that creates binding legal authority.
+    Usually every :class:`.Rule` posited by the lead :class:`.Opinion` is
+    binding, but some may not be, often because parts of the
+    :class:`.Opinion` fail to command a majority of the panel
+    of judges.
+
+    :param decision_dict:
+        A record of an opinion loaded from JSON from the
+        `Caselaw Access Project API <https://api.case.law/v1/cases/>`_.
+
+    :param lead_only:
+        If ``True``, returns a single :class:`.Opinion` object
+        from the first opinion found in the
+        ``casebody/data/opinions`` section of the dict, which should
+        usually be the lead opinion. If ``False``, returns an iterator that yields
+        :class:`.Opinion` objects from every opinion in the case.
+    """
+
+    def make_opinion(decision_dict, opinion_dict, citations) -> Opinion:
+        position = opinion_dict["type"]
+        author = opinion_dict["author"]
+        if author:
+            author = author.strip(",:")
+
+        return Opinion(
+            decision_dict["name"],
+            decision_dict["name_abbreviation"],
+            citations,
+            int(decision_dict["first_page"]),
+            int(decision_dict["last_page"]),
+            datetime.date.fromisoformat(decision_dict["decision_date"]),
+            decision_dict["court"]["slug"],
+            position,
+            author,
+            opinion_dict.get("text"),
+        )
+
+    citations = tuple(c["cite"] for c in decision_dict["citations"])
+    opinions = (
+        decision_dict.get("casebody", {})
+        .get("data", {})
+        .get("opinions", [{"type": "majority", "author": None}])
+    )
+
+    if lead_only:
+        return make_opinion(decision_dict, opinions[0], citations)
+    else:
+        return iter(
+            make_opinion(decision_dict, opinion_dict, citations)
+            for opinion_dict in opinions
+        )
+
+
+def json_opinion(
+    filename: Optional[str] = None,
+    directory: Optional[pathlib.Path] = None,
+    filepath: Optional[pathlib.Path] = None,
+    lead_only: bool = True,
+) -> Union[Opinion, Iterator[Opinion]]:
+    """
+    Create and return one or more :class:`.Opinion` objects from JSON.
+
+    Relies on the JSON format from the `Caselaw Access Project
+    API <https://api.case.law/v1/cases/>`_.
+
+    :param filename: The name of the input JSON file.
+
+    :param directory: The directory where the input JSON file is located.
+
+    :param filepath:
+        Complete path to the JSON file representing the :class:`.Opinion`,
+        including filename.
+
+    :param lead_only:
+        If ``True``, returns a single :class:`.Opinion` object,
+        otherwise returns an iterator that yields every
+        :class:`.Opinion` in the case.
+    """
+
+    validated_filepath = make_filepath(
+        filename, directory, filepath, default_folder="opinions"
+    )
+
+    with open(validated_filepath, "r") as f:
+        decision_dict = json.load(f)
+
+    return dict_opinion(decision_dict, lead_only)

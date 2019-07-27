@@ -1031,11 +1031,11 @@ def make_holding(make_rule) -> Dict[str, Holding]:
 
 
 @pytest.fixture(scope="class")
-def make_opinion(make_entity) -> Dict[str, Opinion]:
+def make_opinion() -> Dict[str, Opinion]:
     test_cases = ("brad", "cardenas", "feist", "lotus", "oracle", "watt")
     opinions = {}
     for case in test_cases:
-        for opinion in Opinion.from_file(f"{case}_h.json", lead_only=False):
+        for opinion in readers.json_opinion(f"{case}_h.json", lead_only=False):
             opinions[f"{case}_{opinion.position}"] = opinion
     return opinions
 
@@ -1046,11 +1046,11 @@ def make_opinion_with_holding(make_opinion, make_regime) -> Dict[str, Opinion]:
     test_cases_with_anchors = ("feist",)
     opinions = {}
     for case in test_cases:
-        for opinion in Opinion.from_file(f"{case}_h.json", lead_only=False):
+        for opinion in readers.json_opinion(f"{case}_h.json", lead_only=False):
             opinions[f"{case}_{opinion.position}"] = opinion
-        opinions[f"{case}_majority"].exposit(readers.read_json(f"holding_{case}.json", regime=make_regime))
+        opinions[f"{case}_majority"].exposit(readers.json_holdings(f"holding_{case}.json", regime=make_regime))
     for case in test_cases_with_anchors:
-        for opinion in Opinion.from_file(f"{case}_h.json", lead_only=False):
+        for opinion in readers.json_opinion(f"{case}_h.json", lead_only=False):
             opinions[f"{case}_{opinion.position}"] = opinion
-        opinions[f"{case}_majority"].exposit(*readers.read_json(f"holding_{case}.json", regime=make_regime, include_text_links=True))
+        opinions[f"{case}_majority"].exposit(*readers.json_holdings(f"holding_{case}.json", regime=make_regime, include_text_links=True))
     return opinions

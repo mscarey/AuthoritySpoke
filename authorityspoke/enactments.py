@@ -347,7 +347,7 @@ class Code:
         )
 
     def __repr__(self):
-        return f"{self.__class__.__name__}({self.filepath})"
+        return f"{self.__class__.__name__}({repr(self.filepath)})"
 
     def __str__(self):
         return self.title
