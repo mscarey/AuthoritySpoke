@@ -72,7 +72,7 @@ def cases_to_file(
             mangled_filename = filename
             if number > 0:
                 mangled_filename = mangled_filename.replace(".", f"_{number}.")
-        opinion_to_file(
+        case_to_file(
             case=case, filename=mangled_filename, directory=directory, filepath=filepath
         )
     return None

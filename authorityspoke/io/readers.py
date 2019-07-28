@@ -154,7 +154,7 @@ def read_code(
     directory: Optional[pathlib.Path] = None,
     filepath: Optional[pathlib.Path] = None,
 ) -> Code:
-    """
+    r"""
     Create a new :class:`.Code` from an XML filepath.
 
     Defers parsing of the XML until later, which makes "read" in the
@@ -195,7 +195,7 @@ def opinion_from_case(
     as_generator: bool = False,
     **kwargs
 ) -> Union[Opinion, Iterator[Opinion], List[Opinion]]:
-    """
+    r"""
     Create and return one or more :class:`.Opinion` objects.
 
     This function uses the model of a judicial decision from
@@ -328,7 +328,7 @@ def json_opinion(
     lead_only: bool = True,
     as_generator: bool = False,
 ) -> Union[Opinion, Iterator[Opinion], List[Opinion]]:
-    """
+    r"""
     Create and return one or more :class:`.Opinion` objects from JSON.
 
     Relies on the JSON format from the `Caselaw Access Project

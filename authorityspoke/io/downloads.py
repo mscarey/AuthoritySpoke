@@ -104,12 +104,10 @@ def download_case(
         params["full_case"] = "true"
     downloaded = requests.get(endpoint, params=params, headers=api_dict).json()
 
-    if downloaded.get("results") is not None and not downloaded["results"]:
-        if cap_id:
-            message = f"API returned no cases with id {cap_id}"
-        else:
-            message = f"API returned no cases with cite {cite}"
-        raise ValueError(message)
+    if cap_id and downloaded.get("detail") == "Not found.":
+        raise ValueError(f"API returned no cases with id {cap_id}")
+    if cite and not downloaded.get("results") and downloaded.get("results") is not None:
+        raise ValueError(f"API returned no cases with cite {cite}")
 
     # Because the API wraps the results in a list only if there's
     # more than one result.
