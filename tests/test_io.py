@@ -12,7 +12,8 @@ from authorityspoke.holdings import Holding
 from authorityspoke.opinions import Opinion
 from authorityspoke.predicates import Predicate
 from authorityspoke.procedures import Procedure
-from authorityspoke.io.readers import get_directory_path, read_dict, json_holdings
+from authorityspoke.io.readers import read_dict, json_holdings
+from authorityspoke.io import filepaths
 from authorityspoke.rules import Rule
 from authorityspoke.selectors import TextQuoteSelector
 
@@ -80,7 +81,7 @@ class TestFactorImport:
         directory = pathlib.Path.cwd() / "tests"
         if directory.exists():
             os.chdir(directory)
-        input_directory = get_directory_path("holdings") / "holding_watt.json"
+        input_directory = filepaths.get_directory_path("holdings") / "holding_watt.json"
         assert input_directory.exists()
 
 
@@ -348,7 +349,9 @@ class TestRuleImport:
         section of the JSON.
         """
 
-        with open(get_directory_path("holdings") / "holding_feist.json", "r") as f:
+        with open(
+            filepaths.get_directory_path("holdings") / "holding_feist.json", "r"
+        ) as f:
             feist_json = json.load(f)
         assert (
             len(make_opinion_with_holding["feist_majority"].holdings)

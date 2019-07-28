@@ -14,35 +14,8 @@ from authorityspoke.opinions import Opinion
 from authorityspoke.selectors import TextQuoteSelector
 
 
-def get_directory_path(stem: str) -> pathlib.Path:
-    """
-    Find a data directory for importing files.
-
-    Will only find the correct directory if it is the current working
-    directory is that directory, is its child directory, or is a sibling
-    directory. Requires the directory to be found within an ``example_data``
-    directory.
-
-    :param stem:
-        name of the folder where the desired example data files
-        can be found, e.g. "holdings" or "opinions".
-
-    :returns:
-        path to the directory with the desired example data files.
-    """
-    directory = pathlib.Path.cwd()
-    if directory.stem == stem:
-        return directory
-    if directory.stem != "example_data":
-        directory = directory / "example_data"
-    directory = directory / stem
-    if not directory.exists():
-        directory = pathlib.Path.cwd().parent / "example_data" / stem
-    return directory
-
-
 def read_dict(
-    case: Dict,
+    case: Dict[str, Iterable],  # TODO: change format to list
     regime: Optional[Regime] = None,
     mentioned: List[Factor] = None,
     include_text_links: bool = False,

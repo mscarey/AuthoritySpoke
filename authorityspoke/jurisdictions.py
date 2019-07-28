@@ -1,4 +1,4 @@
-"""
+r"""
 Representations of legal systems.
 
 These clasess are currently used to organize legislation,
@@ -8,7 +8,7 @@ thus to :class:`.Opinion`\s.
 
 from __future__ import annotations
 
-from typing import ClassVar, Dict, Union
+from typing import ClassVar, Dict, Optional, Union
 
 from dataclasses import dataclass, field
 
@@ -19,7 +19,7 @@ from authorityspoke.selectors import TextQuoteSelector
 
 @dataclass
 class Jurisdiction:
-    """
+    r"""
     A geopolitical entity with the power to enact legislation.
 
     Has :class:`.Court`\s to interpret and apply legislation.
@@ -38,7 +38,7 @@ class Jurisdiction:
     codes: Dict[str, Code] = field(default_factory=dict)
     courts: Dict[str, Court] = field(default_factory=dict)
 
-    def get_code(self, uri: str) -> Code:
+    def get_code(self, uri: str) -> Optional[Code]:
         """
         Find a :class:`.Code` under a key corresponding to ``uri``.
 
@@ -63,7 +63,7 @@ class Jurisdiction:
 
 @dataclass
 class Regime:
-    """
+    r"""
     A legal system consisting of multiple jurisdictions.
 
     Currently used for retrieving :class:`.Enactment` text.
@@ -97,7 +97,7 @@ class Regime:
         return self.jurisdictions[jurisdiction_id].get_code(selector)
 
     def set_code(self, code: Code) -> None:
-        """
+        r"""
         Add to the collection of :class:`.Code`\s enacted in this :class:`Regime`.
 
         Create the appropriate :class:`.Jurisdiction` object for the

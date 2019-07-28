@@ -1,4 +1,4 @@
-"""
+r"""
 Decorators for memoizing generic :class:`.Factor`\s.
 
 Used when changing an abstract :class:`.Rule` from
@@ -8,14 +8,13 @@ one concrete context to another.
 from __future__ import annotations
 
 import functools
-import pathlib
 
 from typing import Callable, Dict, Iterable, List
 from typing import Optional, Sequence, Tuple, Union
 
 
 def new_context_helper(func: Callable):
-    """
+    r"""
     Search :class:`.Factor` for generic :class:`.Factor`\s to use in new context.
 
     Decorator for :meth:`Factor.new_context`.
