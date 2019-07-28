@@ -5,7 +5,7 @@ import pytest
 from authorityspoke.io.downloads import download_case
 from authorityspoke.io.readers import opinion_from_case
 
-pytestmark = pytest.mark.skip("don't want to call API")
+# pytestmark = pytest.mark.skip("don't want to call API")
 
 
 class TestDownload:

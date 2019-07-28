@@ -1,12 +1,10 @@
-import json
 import pathlib
 
-from typing import Any, Dict, Iterator, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 import requests
 
-from authorityspoke.opinions import Opinion
-from authorityspoke.io import filepaths
+from authorityspoke.io.writers import cases_to_file
 
 
 def download_case(
@@ -59,7 +57,7 @@ def download_case(
         default is ``example_data/cases``.
 
     :param filepath:
-        Complete path to the XML file representing the :class:`.Code`,
+        Complete path to the location where the JSON file should be saved,
         including filename.
 
     :param full_case:
@@ -121,22 +119,10 @@ def download_case(
     else:
         results = downloaded["results"]
 
-    case_list: List[Dict] = []
-
-    for number, case in enumerate(results):
-        if save_to_file:
-            if not filename:
-                mangled_filename = f'{case["id"]}.json'
-            else:
-                mangled_filename = filename
-            if number > 0:
-                mangled_filename = mangled_filename.replace(".", f"_{number}.")
-            validated_filepath = filepaths.make_filepath(
-                mangled_filename, directory, filepath, default_folder="cases"
-            )
-            with open(validated_filepath, "w") as fp:
-                json.dump(case, fp, ensure_ascii=False)
-        case_list.append(case)
-    if len(case_list) == 1 and not always_list:
-        return case_list[0]
-    return case_list
+    if save_to_file:
+        cases_to_file(
+            results=results, filename=filename, directory=directory, filepath=filepath
+        )
+    if len(results) == 1 and not always_list:
+        return results[0]
+    return results
