@@ -3,11 +3,12 @@ from functools import partial
 import json
 import pathlib
 
-from typing import Any, Dict, List, Iterable, Iterator, Optional, Tuple, Union
+from typing import Dict, List, Iterable, Iterator, Optional, Tuple, Union
 
 from authorityspoke.enactments import Code
 from authorityspoke.factors import Factor
 from authorityspoke.holdings import Holding
+from authorityspoke.io import filepaths
 from authorityspoke.jurisdictions import Regime
 from authorityspoke.opinions import Opinion
 from authorityspoke.selectors import TextQuoteSelector
@@ -98,43 +99,6 @@ def read_dict(
     return finished_holdings
 
 
-def make_filepath(
-    filename: Optional[str] = None,
-    directory: Optional[pathlib.Path] = None,
-    filepath: Optional[pathlib.Path] = None,
-    default_folder: str = "holdings",
-):
-    """
-    Create :class:`.pathlib.Path` for a file containing XML or JSON to load as objects.
-
-    :param filename:
-        just the name of the file, without the directory.
-
-    :param directory:
-        just the directory, without the path
-
-    :param filepath:
-        a full path that just needs to be checked for validity and returned
-
-    :param default_folder:
-        a folder name to use in constructing a missing directory path
-
-    :returns:
-        the path to the desired file
-    """
-    if filepath:
-        if not isinstance(filepath, pathlib.Path):
-            raise TypeError('"filepath" must by type pathlib.Path')
-        return filepath
-    if not filename:
-        raise ValueError(
-            '"filepath" or "filename" must be given to find a file to open.'
-        )
-    if not directory:
-        directory = get_directory_path(default_folder)
-    return directory / filename
-
-
 def json_holdings(
     filename: Optional[str] = None,
     directory: Optional[pathlib.Path] = None,
@@ -172,7 +136,7 @@ def json_holdings(
         ``example_data/holdings`` subdirectory, from a JSON
         file.
     """
-    validated_filepath = make_filepath(
+    validated_filepath = filepaths.make_filepath(
         filename, directory, filepath, default_folder="holdings"
     )
     with open(validated_filepath, "r") as f:
@@ -212,7 +176,7 @@ def read_code(
         new :class:`.Code` object that can be used to parse the XML to
         find text of :class:`.Enactment`\s.
     """
-    validated_filepath = make_filepath(
+    validated_filepath = filepaths.make_filepath(
         filename, directory, filepath, default_folder="codes"
     )
     return Code(filepath=validated_filepath)
@@ -220,16 +184,17 @@ def read_code(
 
 def opinion_from_case(
     citations: List[Dict[str, str]],
-    casebody: Dict,
     decision_date: str,
     court: Dict[str, Union[str, int]],
+    casebody: Optional[Dict] = None,
     name: str = "",
     name_abbreviation: str = "",
     first_page: str = "",
     last_page: str = "",
     lead_only: bool = True,
+    as_generator: bool = False,
     **kwargs
-) -> Union[Opinion, Iterator[Opinion]]:
+) -> Union[Opinion, Iterator[Opinion], List[Opinion]]:
     """
     Create and return one or more :class:`.Opinion` objects.
 
@@ -258,7 +223,8 @@ def opinion_from_case(
 
     :param casebody:
         A large section of the CAP API response containing all the
-        text that was printed in the reporter volume.
+        text that was printed in the reporter volume. Only available
+        if the ``full_case`` flag was used in the API request.
 
     :param decision_date:
         The day the :class:`.Opinion`\s were issued, in ISO format.
@@ -323,6 +289,9 @@ def opinion_from_case(
             text=opinion_dict.get("text"),
         )
 
+    if not casebody:
+        casebody = {}
+
     opinions = casebody.get("data", {}).get(
         "opinions", [{"type": "majority", "author": None}]
     )
@@ -338,12 +307,18 @@ def opinion_from_case(
         citations=tuple(c["cite"] for c in citations),
     )
     if lead_only:
-        return make_opinion_given_case(opinion_dict=opinions[0])
-    else:
+        if as_generator:
+            return iter([make_opinion_given_case(opinion_dict=opinions[0])])
+        else:
+            return make_opinion_given_case(opinion_dict=opinions[0])
+    elif as_generator:
         return iter(
             make_opinion_given_case(opinion_dict=opinion_dict)
             for opinion_dict in opinions
         )
+    return [
+        make_opinion_given_case(opinion_dict=opinion_dict) for opinion_dict in opinions
+    ]
 
 
 def json_opinion(
@@ -351,7 +326,8 @@ def json_opinion(
     directory: Optional[pathlib.Path] = None,
     filepath: Optional[pathlib.Path] = None,
     lead_only: bool = True,
-) -> Union[Opinion, Iterator[Opinion]]:
+    as_generator: bool = False,
+) -> Union[Opinion, Iterator[Opinion], List[Opinion]]:
     """
     Create and return one or more :class:`.Opinion` objects from JSON.
 
@@ -367,16 +343,22 @@ def json_opinion(
         including filename.
 
     :param lead_only:
-        If ``True``, returns a single :class:`.Opinion` object,
+        If True, returns a single :class:`.Opinion` object,
         otherwise returns an iterator that yields every
         :class:`.Opinion` in the case.
+
+    :param as_generator:
+        if True, returns a generator that
+        yields all opinions meeting the query.
     """
 
-    validated_filepath = make_filepath(
-        filename, directory, filepath, default_folder="opinions"
+    validated_filepath = filepaths.make_filepath(
+        filename, directory, filepath, default_folder="cases"
     )
 
     with open(validated_filepath, "r") as f:
         decision_dict = json.load(f)
 
-    return opinion_from_case(**decision_dict, lead_only=lead_only)
+    return opinion_from_case(
+        lead_only=lead_only, as_generator=as_generator, **decision_dict
+    )

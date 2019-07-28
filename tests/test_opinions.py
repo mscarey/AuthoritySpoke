@@ -11,7 +11,7 @@ class TestOpinions:
         assert watt_dict.name_abbreviation == "Wattenburg v. United States"
 
     def test_load_generator_for_opinions(self):
-        opinion_generator = readers.json_opinion("brad_h.json", lead_only=False)
+        opinion_generator = iter(readers.json_opinion("brad_h.json", lead_only=False))
         _ = next(opinion_generator)  # majority
         dissent = next(opinion_generator)
         assert dissent.position == "concurring-in-part-and-dissenting-in-part"

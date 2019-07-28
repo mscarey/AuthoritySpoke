@@ -13,8 +13,8 @@ docs/_build/
 html/
 htmlcov/
 example_data/holdings/unused
-example_data/opinions/flf/
-example_data/opinions/unused
+example_data/cases/flf/
+example_data/cases/unused
 notebooks/.ipynb_checkpoints
 notebooks/unused
 notebooks/request_cases.ipynb

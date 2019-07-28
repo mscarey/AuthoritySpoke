@@ -1,25 +1,142 @@
+import json
 import pathlib
 
+from typing import Any, Dict, Iterator, List, Optional, Union
 
-def get_directory_path(stem: str) -> pathlib.Path:
+import requests
+
+from authorityspoke.opinions import Opinion
+from authorityspoke.io import filepaths
+
+
+def download_case(
+    cap_id: Optional[int] = None,
+    cite: Optional[str] = None,
+    save_to_file: bool = True,
+    filename: Optional[str] = None,
+    directory: Optional[pathlib.Path] = None,
+    filepath: Optional[pathlib.Path] = None,
+    full_case: bool = False,
+    api_key: Optional[str] = None,
+    always_list: bool = False,
+) -> Union[Dict[str, Any], List[Dict[str, Any]]]:
     """
-    Find a data directory for importing files.
+    Download cases from Caselaw Access Project API.
 
-    Only in this module temporarily to prevent a circular import.
+    Queries the Opinion endpoint of the
+    `Caselaw Access Project API <https://api.case.law/v1/cases/>`_,
+    saves the JSON object(s) from the response to the
+    ``example_data/cases/`` directory in the repo,
+    and returns one or more dict objects from the JSON.
 
-    :param stem:
-        name of the folder where the desired example data files
-        can be found, e.g. "holdings" or "opinions".
+    :param cap_id:
+        an identifier for an opinion in the
+        `Caselaw Access Project database <https://case.law/api/>`_,
+        e.g. 4066790 for
+        `Oracle America, Inc. v. Google Inc. <https://api.case.law/v1/cases/4066790/>`_.
+
+    :param cite:
+        a citation linked to an opinion in the
+        `Caselaw Access Project database <https://case.law/api/>`_.
+        Usually these will be in the traditional format
+        ``[Volume Number] [Reporter Name Abbreviation] [Page Number]``, e.g.
+        `750 F.3d 1339 <https://case.law/search/#/cases?page=1&cite=%22750%20F.3d%201339%22>`_
+        for Oracle America, Inc. v. Google Inc.
+        If the ``cap_id`` field is given, the cite field will be ignored.
+        If neither field is given, the download will fail.
+
+    :param save_to_file:
+        whether to save the opinion to disk in addition
+        to returning it as a dict. Defaults to ``True``.
+
+    :param filename:
+        the filename (not including the directory) for the
+        file where the downloaded opinion should be saved.
+
+    :param directory:
+        a :py:class:`~pathlib.Path` object specifying the directory where the
+        downloaded opinion should be saved. If ``None`` is given, the current
+        default is ``example_data/cases``.
+
+    :param filepath:
+        Complete path to the XML file representing the :class:`.Code`,
+        including filename.
+
+    :param full_case:
+        whether to request the full text of the opinion from the
+        `Caselaw Access Project API <https://api.case.law/v1/cases/>`_.
+        If this is ``True``, the `api_key` parameter must be
+        provided.
+
+    :param api_key:
+        a Case Access Project API key. Visit
+        https://case.law/user/register/ to obtain one. Not needed if you
+        only want to download metadata about the opinion without the
+        full text.
+
+    :param always_list:
+        If True and as_generator is False, a single case from the API will
+        be returned as a one-item list. If False and as_generator is False,
+        a single case will be a list.
 
     :returns:
-        path to the directory with the desired example data files.
+        a case record or list of case records from the API.
+
     """
-    directory = pathlib.Path.cwd()
-    if directory.stem == stem:
-        return directory
-    if directory.stem != "example_data":
-        directory = directory / "example_data"
-    directory = directory / stem
-    if not directory.exists():
-        directory = pathlib.Path.cwd().parent / "example_data" / stem
-    return directory
+    endpoint = "https://api.case.law/v1/cases/"
+    params = {}
+    if cap_id:
+        endpoint += f"{cap_id}/"
+    elif cite is not None:
+        params["cite"] = cite
+    else:
+        raise ValueError(
+            "To identify the desired opinion, either 'cap_id' or 'cite' "
+            "must be provided."
+        )
+
+    api_dict = {}
+    if full_case:
+        if not api_key:
+            raise ValueError("A CAP API key must be provided when full_case is True.")
+        else:
+            api_dict["Authorization"] = f"Token {api_key}"
+
+    if full_case:
+        params["full_case"] = "true"
+    downloaded = requests.get(endpoint, params=params, headers=api_dict).json()
+
+    if downloaded.get("results") is not None and not downloaded["results"]:
+        if cap_id:
+            message = f"API returned no cases with id {cap_id}"
+        else:
+            message = f"API returned no cases with cite {cite}"
+        raise ValueError(message)
+
+    # Because the API wraps the results in a list only if there's
+    # more than one result.
+
+    if not downloaded.get("results"):
+        results = [downloaded]
+    else:
+        results = downloaded["results"]
+
+    case_list: List[Dict] = []
+
+    for number, case in enumerate(results):
+        if save_to_file:
+            if not filename:
+                mangled_filename = f'{case["id"]}.json'
+            else:
+                mangled_filename = filename
+            if number > 0:
+                mangled_filename = mangled_filename.replace(".", f"_{number}.")
+            validated_filepath = filepaths.make_filepath(
+                mangled_filename, directory, filepath, default_folder="cases"
+            )
+            with open(validated_filepath, "w") as fp:
+                json.dump(case, fp, ensure_ascii=False)
+        case_list.append(case)
+    if len(case_list) == 1 and not always_list:
+        return case_list[0]
+    return case_list

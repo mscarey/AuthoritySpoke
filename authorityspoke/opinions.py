@@ -20,9 +20,6 @@ from dataclasses import dataclass
 
 import requests
 
-# eliminate import soon
-from authorityspoke.io.downloads import get_directory_path
-
 from authorityspoke.factors import Factor
 from authorityspoke.holdings import Holding
 from authorityspoke.rules import Rule
@@ -72,160 +69,11 @@ class Opinion:
     author: Optional[str]
     text: Optional[str]
 
-    directory: ClassVar = get_directory_path("opinions")
-
     def __post_init__(self):
         self.holdings: List[Holding] = []
         self.factors: Dict[
             Factor, Union[TextQuoteSelector, Tuple[TextQuoteSelector, ...]]
         ] = {}
-
-    @classmethod
-    def cap_download(
-        cls,
-        cap_id: Optional[int] = None,
-        cite: Optional[str] = None,
-        save_to_file: bool = True,
-        filename: Optional[str] = None,
-        directory: Optional[pathlib.Path] = None,
-        full_case: bool = False,
-        api_key: Optional[str] = None,
-        to_dict: bool = False,
-        as_generator: bool = False,
-    ) -> Union[
-        Opinion,
-        List[Opinion],
-        Iterator[Opinion],
-        Dict[str, Any],
-        List[Dict[str, Any]],
-        Iterator[Dict[str, Any]],
-    ]:
-        """
-        Download opinions from Caselaw Access Project API.
-
-        Queries the Opinion endpoint of the
-        `Caselaw Access Project API <https://api.case.law/v1/cases/>`_,
-        saves the JSON object(s) from the response to the
-        ``example_data/opinions/`` directory in the repo,
-        and returns one or more dict objects from the JSON
-        or one or more :class:`.Opinion` objects.
-
-        :param cap_id:
-            an identifier for an opinion in the
-            `Caselaw Access Project database <https://case.law/api/>`_,
-            e.g. 4066790 for
-            `Oracle America, Inc. v. Google Inc. <https://api.case.law/v1/cases/4066790/>`_.
-
-        :param cite:
-            a citation linked to an opinion in the
-            `Caselaw Access Project database <https://case.law/api/>`_.
-            Usually these will be in the traditional format
-            ``[Volume Number] [Reporter Name Abbreviation] [Page Number]``, e.g.
-            `750 F.3d 1339 <https://case.law/search/#/cases?page=1&cite=%22750%20F.3d%201339%22>`_
-            for Oracle America, Inc. v. Google Inc.
-            If the ``cap_id`` field is given, the cite field will be ignored.
-            If neither field is given, the download will fail.
-
-        :param save_to_file:
-            whether to save the opinion to disk in addition
-            to returning it as a dict. Defaults to ``True``.
-
-        :param filename:
-            the filename (not including the directory) for the
-            file where the downloaded opinion should be saved.
-
-        :param directory:
-            a :py:class:`~pathlib.Path` object specifying the directory where the
-            downloaded opinion should be saved. If ``None`` is given, the current
-            default is ``example_data/opinions``.
-
-        :param full_case:
-            whether to request the full text of the opinion from the
-            `Caselaw Access Project API <https://api.case.law/v1/cases/>`_.
-            If this is ``True``, the `api_key` parameter must be
-            provided.
-
-        :param api_key:
-            a Case Access Project API key. Visit
-            https://case.law/user/register/ to obtain one. Not needed if you
-            only want to download metadata about the opinion without the
-            full text.
-
-        :param to_dict:
-            if ``True``, opinion records remain dict objects
-            rather than being converted to :class:`.Opinion` objects.
-
-        :param as_generator:
-            if ``True``, returns a generator that yields all opinions
-            meeting the query.
-        """
-        endpoint = "https://api.case.law/v1/cases/"
-        params = {}
-        if cap_id:
-            endpoint += f"{cap_id}/"
-        elif cite is not None:
-            params["cite"] = cite
-        else:
-            raise ValueError(
-                "To identify the desired opinion, either 'cap_id' or 'cite' "
-                "must be provided."
-            )
-
-        api_dict = {}
-        if full_case:
-            if not api_key:
-                raise ValueError(
-                    "A CAP API key must be provided when full_case is True."
-                )
-            else:
-                api_dict["Authorization"] = f"Token {api_key}"
-
-        if not directory:
-            directory = cls.directory
-        if full_case:
-            params["full_case"] = "true"
-        downloaded = requests.get(endpoint, params=params, headers=api_dict).json()
-
-        if downloaded.get("results") is not None and not downloaded["results"]:
-            if cap_id:
-                message = f"API returned no cases with id {cap_id}"
-            else:
-                message = f"API returned no cases with cite {cite}"
-            raise ValueError(message)
-
-        # Because the API wraps the results in a list only if there's
-        # more than one result.
-
-        if not downloaded.get("results"):
-            results = [downloaded]
-        else:
-            results = downloaded["results"]
-
-        def opinions_from_response(results, to_dict):
-
-            for number, case in enumerate(results):
-                if not filename:
-                    mangled_filename = f'{case["id"]}.json'
-                else:
-                    mangled_filename = filename
-                if number > 0:
-                    mangled_filename = filename.replace(".", f"_{number}.")
-                if save_to_file:
-                    with open(directory / mangled_filename, "w") as fp:
-                        json.dump(case, fp, ensure_ascii=False)
-                if to_dict:
-                    yield case
-                else:
-                    for opinion in cls.from_dict(case, lead_only=False):
-                        yield opinion
-
-        if as_generator:
-            return iter(opinions_from_response(results, to_dict))
-        opinions = [case for case in opinions_from_response(results, to_dict)]
-        if len(opinions) == 1:
-            return opinions[0]
-        else:
-            return opinions
 
     def contradicts(self, other: Union[Opinion, Holding]) -> bool:
         """
