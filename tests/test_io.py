@@ -7,12 +7,13 @@ import pytest
 
 from authorityspoke.enactments import Code, Enactment
 from authorityspoke.factors import Entity
-from authorityspoke.factors import Factor, Fact
+from authorityspoke.factors import Fact
 from authorityspoke.holdings import Holding
 from authorityspoke.opinions import Opinion
 from authorityspoke.predicates import Predicate
 from authorityspoke.procedures import Procedure
-from authorityspoke.io.readers import read_holdings, json_holdings
+from authorityspoke.io.readers import read_holdings
+from authorityspoke.io.loaders import load_holdings
 from authorityspoke.io import filepaths
 from authorityspoke.rules import Rule
 from authorityspoke.selectors import TextQuoteSelector
@@ -60,20 +61,20 @@ class TestEntityImport:
 
 class TestEnactmentImport:
     def test_enactment_import(self, make_regime):
-        holdings = json_holdings("holding_cardenas.json", regime=make_regime)
+        holdings = load_holdings("holding_cardenas.json", regime=make_regime)
         enactment_list = holdings[0].enactments
         assert "all relevant evidence is admissible" in enactment_list[0].text
 
 
 class TestFactorImport:
     def test_fact_import(self, make_regime):
-        holdings = json_holdings("holding_watt.json", regime=make_regime)
+        holdings = load_holdings("holding_watt.json", regime=make_regime)
         new_fact = holdings[0].inputs[1]
         assert "lived at <Hideaway Lodge>" in str(new_fact)
         assert isinstance(new_fact.context_factors[0], Entity)
 
     def test_fact_with_quantity(self, make_regime):
-        holdings = json_holdings("holding_watt.json", regime=make_regime)
+        holdings = load_holdings("holding_watt.json", regime=make_regime)
         new_fact = holdings[1].inputs[3]
         assert "was no more than 35 foot" in str(new_fact)
 
@@ -116,7 +117,7 @@ class TestRuleImport:
         """
 
         watt = make_opinion["watt_majority"]
-        watt.exposit(json_holdings("holding_watt.json"))
+        watt.exposit(load_holdings("holding_watt.json"))
         assert watt.holdings[0] == real_holding["h1"]
 
     def test_same_enactment_objects_equal(self, make_opinion_with_holding):
@@ -142,9 +143,9 @@ class TestRuleImport:
 
     def test_same_enactment_in_two_opinions(self, make_regime, make_opinion):
         watt = make_opinion["watt_majority"]
-        watt.exposit(json_holdings("holding_watt.json", regime=make_regime))
+        watt.exposit(load_holdings("holding_watt.json", regime=make_regime))
         brad = make_opinion["brad_majority"]
-        brad.exposit(json_holdings("holding_brad.json", regime=make_regime))
+        brad.exposit(load_holdings("holding_brad.json", regime=make_regime))
         assert any(
             watt.holdings[0].enactments[0].means(brad_enactment)
             for brad_enactment in brad.holdings[0].enactments
@@ -159,20 +160,20 @@ class TestRuleImport:
         """
         brad = make_opinion["brad_majority"]
         brad.holdings = []
-        brad.exposit(json_holdings("holding_brad.json", regime=make_regime))
+        brad.exposit(load_holdings("holding_brad.json", regime=make_regime))
         assert any(brad.holdings[6].inputs[0] == x for x in brad.holdings[5].inputs)
         assert any(brad.holdings[6].inputs[0] is x for x in brad.holdings[5].inputs)
 
     def test_use_int_not_pint_without_dimension(self, make_regime, make_opinion):
 
         brad = make_opinion["brad_majority"]
-        brad.exposit(json_holdings("holding_brad.json", regime=make_regime))
+        brad.exposit(load_holdings("holding_brad.json", regime=make_regime))
         assert "dimensionless" not in str(brad.holdings[6])
         assert isinstance(brad.holdings[6].inputs[0].predicate.quantity, int)
 
     def test_opinion_posits_holding(self, make_opinion, make_regime):
         brad = make_opinion["brad_majority"]
-        brad.exposit(json_holdings("holding_brad.json", regime=make_regime))
+        brad.exposit(load_holdings("holding_brad.json", regime=make_regime))
         assert "warrantless search and seizure" in str(brad.holdings[0])
 
     def test_opinion_posits_holding_tuple_context(
@@ -184,7 +185,7 @@ class TestRuleImport:
         """
         watt = make_opinion["watt_majority"]
         brad = make_opinion["brad_majority"]
-        brad.exposit(json_holdings("holding_brad.json", regime=make_regime))
+        brad.exposit(load_holdings("holding_brad.json", regime=make_regime))
         context_holding = brad.holdings[6].new_context(
             [make_entity["watt"], make_entity["trees"], make_entity["motel"]]
         )
@@ -206,7 +207,7 @@ class TestRuleImport:
         """
         watt = make_opinion["watt_majority"]
         brad = make_opinion["brad_majority"]
-        brad.exposit(json_holdings("holding_brad.json", regime=make_regime))
+        brad.exposit(load_holdings("holding_brad.json", regime=make_regime))
         context_holding = brad.holdings[6].new_context(
             {brad.holdings[6].generic_factors[0]: make_entity["watt"]}
         )
@@ -225,7 +226,7 @@ class TestRuleImport:
         """
         watt = make_opinion["watt_majority"]
         brad = make_opinion["brad_majority"]
-        brad.exposit(json_holdings("holding_brad.json", regime=make_regime))
+        brad.exposit(load_holdings("holding_brad.json", regime=make_regime))
         context_change = brad.holdings[6].new_context(
             {brad.holdings[6].generic_factors[1]: make_entity["trees_specific"]}
         )
@@ -370,5 +371,5 @@ class TestNestedFactorImport:
         testimony on the jury. Hence, admission of the testimony
         concerning appellant’s use of narcotics was improper.
         """
-        cardenas_holdings = json_holdings("holding_cardenas.json", regime=make_regime)
+        cardenas_holdings = load_holdings("holding_cardenas.json", regime=make_regime)
         assert len(cardenas_holdings) == 2

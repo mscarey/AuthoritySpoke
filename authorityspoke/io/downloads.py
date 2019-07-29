@@ -1,3 +1,9 @@
+"""
+Downloading data that can be converted to authorityspoke objects.
+
+So far this only covers the Case Access Project API.
+"""
+
 import pathlib
 
 from typing import Any, Dict, List, Optional, Union

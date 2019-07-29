@@ -11,7 +11,7 @@ from authorityspoke.holdings import Holding
 from authorityspoke.jurisdictions import Jurisdiction, Regime
 from authorityspoke.opinions import Opinion
 from authorityspoke.predicates import Predicate, Q_
-from authorityspoke.io import readers
+from authorityspoke.io import loaders, readers
 from authorityspoke.rules import Procedure, Rule
 from authorityspoke.selectors import TextQuoteSelector
 
@@ -529,7 +529,7 @@ def make_regime() -> Dict[str, Code]:
     for filename in (
         "constitution.xml", "usc17.xml", "cfr37.xml", "ca_evidence.html", "ca_penal.html"
     ):
-        usa.set_code(readers.read_code(filename=filename))
+        usa.set_code(loaders.load_code(filename=filename))
     return usa
 
 
@@ -1035,7 +1035,7 @@ def make_opinion() -> Dict[str, Opinion]:
     test_cases = ("brad", "cardenas", "feist", "lotus", "oracle", "watt")
     opinions = {}
     for case in test_cases:
-        for opinion in readers.json_opinion(f"{case}_h.json", lead_only=False):
+        for opinion in loaders.load_opinion(f"{case}_h.json", lead_only=False):
             opinions[f"{case}_{opinion.position}"] = opinion
     return opinions
 
@@ -1046,11 +1046,11 @@ def make_opinion_with_holding(make_opinion, make_regime) -> Dict[str, Opinion]:
     test_cases_with_anchors = ("feist",)
     opinions = {}
     for case in test_cases:
-        for opinion in readers.json_opinion(f"{case}_h.json", lead_only=False):
+        for opinion in loaders.load_opinion(f"{case}_h.json", lead_only=False):
             opinions[f"{case}_{opinion.position}"] = opinion
-        opinions[f"{case}_majority"].exposit(readers.json_holdings(f"holding_{case}.json", regime=make_regime))
+        opinions[f"{case}_majority"].exposit(loaders.load_holdings(f"holding_{case}.json", regime=make_regime))
     for case in test_cases_with_anchors:
-        for opinion in readers.json_opinion(f"{case}_h.json", lead_only=False):
+        for opinion in loaders.load_opinion(f"{case}_h.json", lead_only=False):
             opinions[f"{case}_{opinion.position}"] = opinion
-        opinions[f"{case}_majority"].exposit(*readers.json_holdings(f"holding_{case}.json", regime=make_regime, include_text_links=True))
+        opinions[f"{case}_majority"].exposit(*loaders.load_holdings(f"holding_{case}.json", regime=make_regime, include_text_links=True))
     return opinions

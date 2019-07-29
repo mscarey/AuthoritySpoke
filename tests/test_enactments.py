@@ -9,7 +9,7 @@ import pytest
 from authorityspoke.enactments import Code, Enactment, consolidate_enactments
 from authorityspoke.opinions import Opinion
 from authorityspoke.predicates import ureg, Q_
-from authorityspoke.io import readers
+from authorityspoke.io import loaders, readers
 from authorityspoke.selectors import TextQuoteSelector
 
 
@@ -132,9 +132,9 @@ class TestEnactments:
         assert fourth_a.text.endswith("and the persons or things to be seized.")
 
     def test_passage_from_imported_statute(self, make_regime):
-        opinion = readers.json_opinion(f"oracle_h.json")
+        opinion = loaders.load_opinion(f"oracle_h.json")
         oracle_majority = opinion.exposit(
-            readers.json_holdings(f"holding_oracle.json", regime=make_regime)
+            loaders.load_holdings(f"holding_oracle.json", regime=make_regime)
         )
         despite_text = str(oracle_majority.holdings[5])
         assert 'DESPITE: "In no case does copyright protection ' in despite_text

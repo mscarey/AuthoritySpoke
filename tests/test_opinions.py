@@ -1,17 +1,17 @@
 import pytest
 
 from authorityspoke.factors import Entity
-from authorityspoke.io import readers
+from authorityspoke.io import loaders, readers
 from authorityspoke.opinions import Opinion
 
 
 class TestOpinions:
     def test_load_opinion_in_Harvard_format(self):
-        watt_dict = readers.json_opinion("watt_h.json")
+        watt_dict = loaders.load_opinion("watt_h.json")
         assert watt_dict.name_abbreviation == "Wattenburg v. United States"
 
     def test_load_generator_for_opinions(self):
-        opinion_generator = iter(readers.json_opinion("brad_h.json", lead_only=False))
+        opinion_generator = iter(loaders.load_opinion("brad_h.json", lead_only=False))
         _ = next(opinion_generator)  # majority
         dissent = next(opinion_generator)
         assert dissent.position == "concurring-in-part-and-dissenting-in-part"
@@ -131,8 +131,8 @@ class TestOpinions:
         # Clearing in case prior tests added holdings
         watt.holdings = []
         brad.holdings = []
-        watt.exposit(readers.json_holdings("holding_watt.json", regime=make_regime))
-        brad.exposit(readers.json_holdings("holding_brad.json", regime=make_regime))
+        watt.exposit(loaders.load_holdings("holding_watt.json", regime=make_regime))
+        brad.exposit(loaders.load_holdings("holding_brad.json", regime=make_regime))
         context_pairs = {
             "proof of Bradley's guilt": "proof of Wattenburg's guilt",
             "Bradley": "Wattenburg",
@@ -151,8 +151,8 @@ class TestOpinions:
         brad = make_opinion["brad_majority"]
         watt.holdings = []
         brad.holdings = []
-        watt.exposit(readers.json_holdings("holding_watt.json", regime=make_regime))
-        brad.exposit(readers.json_holdings("holding_brad.json", regime=make_regime))
+        watt.exposit(loaders.load_holdings("holding_watt.json", regime=make_regime))
+        brad.exposit(loaders.load_holdings("holding_brad.json", regime=make_regime))
 
         context_items = [
             "proof of Wattenburg's guilt",
@@ -174,7 +174,7 @@ class TestImplication:
     def test_posit_list_of_holdings_and_imply(self, make_opinion, make_regime):
         watt = make_opinion["watt_majority"]
         brad = make_opinion["brad_majority"]
-        some_rules = readers.json_holdings(
+        some_rules = loaders.load_holdings(
             filename="holding_watt.json", regime=make_regime
         )
         for case in (watt, brad):

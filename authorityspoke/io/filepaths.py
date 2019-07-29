@@ -1,3 +1,5 @@
+"""Functions to help locate data to import on disk."""
+
 import pathlib
 
 from typing import Optional
