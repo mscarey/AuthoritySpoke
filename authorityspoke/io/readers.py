@@ -11,11 +11,98 @@ from authorityspoke.holdings import Holding
 from authorityspoke.io import filepaths
 from authorityspoke.jurisdictions import Regime
 from authorityspoke.opinions import Opinion
+from authorityspoke.rules import Rule
 from authorityspoke.selectors import TextQuoteSelector
 
 
+def read_holding(
+    record: Dict, mentioned: List[Factor], regime: Optional[Regime] = None
+) -> Iterator[Tuple[Holding, List[Factor], Dict[Factor, List[TextQuoteSelector]]]]:
+    """
+    Create new :class:`Holding` object from user input.
+
+    Will yield multiple items if ``exclusive: True`` is present in ``record``.
+
+    :param record:
+        A representation of a :class:`Holding` in the format
+        used for input JSON
+
+    :param mentioned:
+        known :class:`.Factor`\s that may be reused in constructing
+        the new :class:`Holding`
+
+    :param regime:
+        a collection of :class:`.Jurisdiction`\s and corresponding
+        :class:`.Code`\s for discovering :class:`.Enactment`\s to
+        reference in the new :class:`Holding`.
+
+    :returns:
+        new :class:`Holding`.
+    """
+
+    # If lists were omitted around single elements in the JSON,
+    # add them back
+
+    for category in ("inputs", "despite", "outputs"):
+        if isinstance(record.get(category), (str, dict)):
+            record[category] = [record[category]]
+
+    factor_text_links: Dict[Factor, List[TextQuoteSelector]] = {}
+    factor_groups: Dict[str, List] = {"inputs": [], "outputs": [], "despite": []}
+
+    for factor_type in factor_groups:
+        for factor_dict in record.get(factor_type) or []:
+            created, mentioned = Factor.from_dict(factor_dict, mentioned, regime=regime)
+            if isinstance(factor_dict, dict):
+                selector_group = factor_dict.pop("text", None)
+                if selector_group:
+                    if not isinstance(selector_group, list):
+                        selector_group = list(selector_group)
+                    selector_group = [
+                        TextQuoteSelector.from_record(selector)
+                        for selector in selector_group
+                    ]
+                    factor_text_links[created] = selector_group
+            factor_groups[factor_type].append(created)
+
+    exclusive = record.pop("exclusive", None)
+    rule_valid = record.pop("rule_valid", True)
+    decided = record.pop("decided", True)
+    selector = TextQuoteSelector.from_record(record.pop("text", None))
+
+    basic_rule, mentioned = Rule.from_dict(
+        record=record, mentioned=mentioned, regime=regime, factor_groups=factor_groups
+    )
+    yield (
+        Holding(
+            rule=basic_rule, rule_valid=rule_valid, decided=decided, selectors=selector
+        ),
+        mentioned,
+        factor_text_links,
+    )
+
+    if exclusive:
+        if not rule_valid:
+            raise NotImplementedError(
+                "The ability to state that it is not 'valid' to assert "
+                + "that a Rule is the 'exclusive' way to reach an output is "
+                + "not implemented, so 'rule_valid' cannot be False while "
+                + "'exclusive' is True. Try expressing this in another way "
+                + "without the 'exclusive' keyword."
+            )
+        if not decided:
+            raise NotImplementedError(
+                "The ability to state that it is not 'decided' whether "
+                + "a Rule is the 'exclusive' way to reach an output is "
+                + "not implemented. Try expressing this in another way "
+                + "without the 'exclusive' keyword."
+            )
+        for modified_rule in basic_rule.get_contrapositives():
+            yield (Holding(rule=modified_rule, selectors=selector), mentioned, {})
+
+
 def read_holdings(
-    holdings: Dict[str, Iterable],  # TODO: change format to list
+    holdings: Dict[str, Iterable],  # TODO: remove "mentioned", leaving a list
     regime: Optional[Regime] = None,
     mentioned: List[Factor] = None,
     include_text_links: bool = False,
@@ -56,9 +143,9 @@ def read_holdings(
 
     finished_holdings: List[Holding] = []
     text_links = {}
-    for holding_record in holdings.get("holdings"):
-        for finished_holding, new_mentioned, factor_text_links in Holding.from_dict(
-            holding_record, mentioned, regime=regime
+    for holding_record in holdings["holdings"]:
+        for finished_holding, new_mentioned, factor_text_links in read_holding(
+            holding_record, mentioned=mentioned, regime=regime
         ):
             mentioned = new_mentioned
             finished_holdings.append(finished_holding)
