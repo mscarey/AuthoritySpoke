@@ -14,8 +14,8 @@ from authorityspoke.opinions import Opinion
 from authorityspoke.selectors import TextQuoteSelector
 
 
-def read_dict(
-    case: Dict[str, Iterable],  # TODO: change format to list
+def read_holdings(
+    holdings: Dict[str, Iterable],  # TODO: change format to list
     regime: Optional[Regime] = None,
     mentioned: List[Factor] = None,
     include_text_links: bool = False,
@@ -23,13 +23,9 @@ def read_dict(
     r"""
     Load a list of :class:`Holdings`\s from JSON, with optional text links.
 
-    :param filename:
-        the name of the JSON file to look in for :class:`Rule`
-        data in the format that lists ``mentioned_factors``
+    :param holdings:
+        the record from JSON in the format that lists ``mentioned_factors``
         followed by a list of holdings
-
-    :param directory:
-        the path of the directory containing the JSON file
 
     :parame regime:
 
@@ -48,7 +44,7 @@ def read_dict(
     if not mentioned:
         mentioned = []
 
-    factor_dicts = case.get("mentioned_factors")
+    factor_dicts = holdings.get("mentioned_factors")
 
     # populates mentioned with context factors that don't
     # need links to Opinion text
@@ -60,7 +56,7 @@ def read_dict(
 
     finished_holdings: List[Holding] = []
     text_links = {}
-    for holding_record in case.get("holdings"):
+    for holding_record in holdings.get("holdings"):
         for finished_holding, new_mentioned, factor_text_links in Holding.from_dict(
             holding_record, mentioned, regime=regime
         ):
@@ -113,9 +109,9 @@ def json_holdings(
         filename, directory, filepath, default_folder="holdings"
     )
     with open(validated_filepath, "r") as f:
-        case = json.load(f)
-    return read_dict(
-        case=case,
+        holdings = json.load(f)
+    return read_holdings(
+        holdings=holdings,
         regime=regime,
         mentioned=mentioned,
         include_text_links=include_text_links,

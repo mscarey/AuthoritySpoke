@@ -10,10 +10,6 @@ should be considered undecided.
 
 from __future__ import annotations
 
-import json
-import operator
-import pathlib
-
 from typing import Any, ClassVar, Dict, Iterable, List, Tuple
 from typing import Iterator, Optional, Union
 

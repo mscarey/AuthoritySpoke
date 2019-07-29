@@ -12,7 +12,7 @@ from authorityspoke.holdings import Holding
 from authorityspoke.opinions import Opinion
 from authorityspoke.predicates import Predicate
 from authorityspoke.procedures import Procedure
-from authorityspoke.io.readers import read_dict, json_holdings
+from authorityspoke.io.readers import read_holdings, json_holdings
 from authorityspoke.io import filepaths
 from authorityspoke.rules import Rule
 from authorityspoke.selectors import TextQuoteSelector
@@ -53,7 +53,7 @@ class TestEntityImport:
             ],
         }
         watt = make_opinion["watt_majority"]
-        watt.exposit(read_dict(smith_dict))
+        watt.exposit(read_holdings(smith_dict))
         assert not watt.holdings[1] >= watt.holdings[0]
         assert watt.holdings[1].generic_factors != watt.holdings[0].generic_factors
 
@@ -250,7 +250,7 @@ class TestRuleImport:
             ],
         }
         with pytest.raises(ValueError):
-            read_dict(rule_dict)
+            read_holdings(rule_dict)
 
     def test_error_classname_does_not_exist(self):
         rule_dict = {
@@ -270,7 +270,7 @@ class TestRuleImport:
             ]
         }
         with pytest.raises(ValueError):
-            read_dict(rule_dict)
+            read_holdings(rule_dict)
 
     def test_holding_flagged_exclusive(self, make_opinion_with_holding, make_enactment):
         """

@@ -29,7 +29,7 @@ def make_filepath(
     """
     if filepath:
         if not isinstance(filepath, pathlib.Path):
-            raise TypeError('"filepath" must by type pathlib.Path')
+            raise TypeError('"filepath" must be type pathlib.Path')
         return filepath
     if not filename:
         raise ValueError(
