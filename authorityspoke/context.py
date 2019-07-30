@@ -12,6 +12,8 @@ import functools
 from typing import Callable, Dict, Iterable, List
 from typing import Optional, Sequence, Tuple, Union
 
+from authorityspoke.selectors import TextQuoteSelector
+
 
 def new_context_helper(func: Callable):
     r"""
@@ -148,7 +150,7 @@ def log_mentioned_context(func: Callable):
             selector_group = [
                 TextQuoteSelector.from_record(selector) for selector in selector_group
             ]
-            factor_text_links[created] = selector_group
+            factor_text_links[new_factor] = selector_group
 
         return new_factor, mentioned, factor_text_links
 
