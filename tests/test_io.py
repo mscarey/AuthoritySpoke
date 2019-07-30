@@ -55,8 +55,8 @@ class TestEntityImport:
         }
         watt = make_opinion["watt_majority"]
         watt.exposit(read_holdings(smith_dict))
-        assert not watt.holdings[1] >= watt.holdings[0]
         assert watt.holdings[1].generic_factors != watt.holdings[0].generic_factors
+        assert not watt.holdings[1] >= watt.holdings[0]
 
 
 class TestEnactmentImport:

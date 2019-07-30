@@ -493,6 +493,8 @@ class Enactment:
         enactment_dict: Dict[str, str],
         code: Optional[Code] = None,
         regime: Optional[Regime] = None,
+        mentioned=None,
+        factor_text_links=None,
         *args,
         **kwargs,
     ) -> Enactment:
@@ -537,7 +539,7 @@ class Enactment:
             source=code,
         )
 
-        return Enactment(code=code, selector=selector, name=enactment_dict.get("name"))
+        return Enactment(code=code, selector=selector, name=enactment_dict.get("name")), mentioned
 
     def means(self, other: Enactment) -> bool:
         r"""

@@ -17,6 +17,7 @@ from dataclasses import astuple, dataclass
 from authorityspoke.context import log_mentioned_context, new_context_helper
 from authorityspoke.predicates import Predicate
 from authorityspoke.relations import Analogy
+from authorityspoke.selectors import TextQuoteSelector
 
 
 @dataclass(frozen=True, init=False)
@@ -64,12 +65,12 @@ class Factor(ABC):
         new_factor_dict = example.__dict__
         for attr in new_factor_dict:
             if attr in example.context_factor_names:
-                value, mentioned = Factor.from_dict(factor_record.get(attr), mentioned)
+                value, mentioned, _ = Factor.from_dict(factor_record=factor_record.get(attr), mentioned=mentioned)
             else:
                 value = factor_record.get(attr)
             if value is not None:
                 new_factor_dict[attr] = value
-        return cls(**new_factor_dict)
+        return cls(**new_factor_dict), mentioned
 
     @classmethod
     @log_mentioned_context
@@ -89,7 +90,9 @@ class Factor(ABC):
         """
         cname = factor_record["type"]
         target_class = cls.class_from_str(cname)
-        return target_class._build_from_dict(factor_record, mentioned)
+        created_factor, mentioned = target_class._build_from_dict(factor_record, mentioned)
+        return created_factor, mentioned
+
 
     @property
     def context_factor_names(self) -> Tuple[str, ...]:
@@ -984,7 +987,7 @@ class Fact(Factor):
             standard_of_proof=factor_record.get("standard_of_proof", None),
             absent=factor_record.get("absent", False),
             generic=factor_record.get("generic", False),
-        )
+        ), mentioned
 
     @new_context_helper
     def new_context(self, changes: Dict[Factor, Factor]) -> Factor:

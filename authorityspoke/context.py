@@ -91,6 +91,7 @@ def log_mentioned_context(func: Callable):
         mentioned: Optional[List[Union[Factor, Enactment]]] = None,
         code: Optional[Code] = None,
         regime: Optional[Regime] = None,
+        factor_text_links=None,
         *args,
         **kwargs,
     ) -> Tuple[Optional[Factor], List[Factor]]:
@@ -107,7 +108,7 @@ def log_mentioned_context(func: Callable):
                     hasattr(context_factor, "name")
                     and context_factor.name.lower() == factor_record
                 ):
-                    return context_factor, mentioned
+                    return context_factor, mentioned, factor_text_links
             raise ValueError(
                 "The 'factor_record' parameter should be a dict "
                 + "representing a Factor or a string "
@@ -115,11 +116,11 @@ def log_mentioned_context(func: Callable):
             )
 
         if factor_record is None:
-            return None, mentioned
+            return None, mentioned, factor_text_links
 
         mentioned = mentioned or []
 
-        new_factor = func(
+        new_factor, mentioned = func(
             cls, factor_record, mentioned=mentioned, code=code, regime=regime
         )
 
@@ -128,7 +129,7 @@ def log_mentioned_context(func: Callable):
         ):
             for context_factor in mentioned:
                 if context_factor == new_factor:
-                    return context_factor, mentioned
+                    return context_factor, mentioned, factor_text_links
         if hasattr(new_factor, "recursive_factors"):
             factors_to_add = new_factor.recursive_factors
         else:
@@ -136,9 +137,19 @@ def log_mentioned_context(func: Callable):
         for recursive_factor in factors_to_add:
             if recursive_factor not in mentioned:
                 mentioned.append(recursive_factor)
+
         mentioned = sorted(
             mentioned, key=lambda f: len(f.name) if f.name else 0, reverse=True
         )
-        return new_factor, mentioned
+        selector_group = factor_record.pop("text", None)
+        if selector_group:
+            if not isinstance(selector_group, list):
+                selector_group = list(selector_group)
+            selector_group = [
+                TextQuoteSelector.from_record(selector) for selector in selector_group
+            ]
+            factor_text_links[created] = selector_group
+
+        return new_factor, mentioned, factor_text_links
 
     return wrapper
