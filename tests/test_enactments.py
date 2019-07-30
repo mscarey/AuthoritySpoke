@@ -349,3 +349,16 @@ class TestEnactments:
             + make_enactment["commerce_vague_path"]
             is None
         )
+
+    def test_multiple_non_Factor_selectors_for_Holding(self, make_regime):
+        """
+        The Holding-level TextQuoteSelectors should be built from this:
+
+        "text": [
+            "Census data therefore do not|trigger|copyright",
+            "|may|possess the requisite originality"
+            ]
+        """
+
+        holdings = loaders.load_holdings("holding_feist.json", regime=make_regime)
+        assert len(holdings[7].selectors) == 2

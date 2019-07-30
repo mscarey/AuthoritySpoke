@@ -7,15 +7,12 @@ after they import some data from a file.
 
 import datetime
 from functools import partial
-import json
-import pathlib
 
 from typing import Dict, List, Iterable, Iterator, Optional, Tuple, Union
 
 from authorityspoke.enactments import Code, Enactment
 from authorityspoke.factors import Factor
 from authorityspoke.holdings import Holding
-from authorityspoke.io import filepaths
 from authorityspoke.jurisdictions import Regime
 from authorityspoke.opinions import Opinion
 from authorityspoke.procedures import Procedure
@@ -121,8 +118,7 @@ def read_holding(
     factor_text_links: Dict[Factor, List[TextQuoteSelector]] = {}
     list_mentioned: List[Factor] = mentioned or []
 
-    # TODO: test multiple non-Factor selectors for a Holding
-    selectors = TextQuoteSelector.from_record(text)
+    selectors = read_selectors(text)
 
     basic_rule, list_mentioned, factor_text_links = read_rule(
         outputs=outputs,
@@ -483,3 +479,53 @@ def read_rule(
         mentioned,
         factor_text_links,
     )
+
+
+def read_selector(text: Union[dict, str]) -> TextQuoteSelector:
+    """
+    Create new instance from JSON user input.
+
+    If the input is a :class:`str`, tries to break up the string
+    into :attr:`~TextQuoteSelector.prefix`, :attr:`~TextQuoteSelector.exact`,
+    and :attr:`~TextQuoteSelector.suffix`, by splitting on the pipe characters.
+
+    :param text:
+        a string or dict representing a text passage
+
+    :returns: a new :class:`TextQuoteSelector`
+    """
+    if isinstance(text, dict):
+        return TextQuoteSelector(**text)
+    if text.count("|") == 0:
+        return TextQuoteSelector(exact=text)
+    elif text.count("|") == 2:
+        prefix, exact, suffix = text.split("|")
+        return TextQuoteSelector(exact=exact, prefix=prefix, suffix=suffix)
+    raise ValueError(
+        "'text' must be either a dict, a string containing no | pipe "
+        + "separator, or a string containing two pipe separators to divide "
+        + "the string into 'prefix', 'exact', and 'suffix'."
+    )
+
+
+def read_selectors(
+    records: Optional[Union[str, Dict, Iterable[Union[str, Dict]]]]
+) -> List[TextQuoteSelector]:
+    r"""
+    Create list of :class:`.TextQuoteSelector`\s from JSON user input.
+
+    If the input is a :class:`str`, tries to break up the string
+    into :attr:`~TextQuoteSelector.prefix`, :attr:`~TextQuoteSelector.exact`,
+    and :attr:`~TextQuoteSelector.suffix`, by splitting on the pipe characters.
+
+    :param record:
+        a string or dict representing a text passage, or list of
+        strings and dicts.
+
+    :returns: a list of :class:`TextQuoteSelector`\s
+    """
+    if records is None:
+        return []
+    if isinstance(records, (list, tuple)):
+        return [read_selector(record) for record in records]
+    return [read_selector(records)]

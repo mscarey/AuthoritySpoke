@@ -17,7 +17,6 @@ from dataclasses import astuple, dataclass
 from authorityspoke.context import log_mentioned_context, new_context_helper
 from authorityspoke.predicates import Predicate
 from authorityspoke.relations import Analogy
-from authorityspoke.selectors import TextQuoteSelector
 
 
 @dataclass(frozen=True, init=False)

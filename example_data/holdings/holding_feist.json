@@ -188,7 +188,7 @@
             ],
             "outputs": "Rural's telephone directory was an original work",
             "enactments": ["securing for authors", "right to writings"],
-            "text": "|may|possess the requisite originality"
+            "text": ["Census data therefore do not|trigger|copyright", "|may|possess the requisite originality"]
         },
         {
             "inputs": ["Rural's telephone directory was a compilation of facts",

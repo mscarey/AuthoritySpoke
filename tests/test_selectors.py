@@ -3,6 +3,7 @@ import pytest
 from authorityspoke.enactments import Code, Enactment
 from authorityspoke.factors import Predicate, Entity, Factor, Fact
 from authorityspoke.factors import Evidence, Exhibit
+from authorityspoke.io import loaders
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
 from authorityspoke.opinions import Opinion
@@ -93,3 +94,16 @@ class TestSelectors:
         enactment = Enactment(selector=due_process_wrong_section, regime=make_regime)
         with pytest.raises(ValueError):
             print(enactment.text)
+
+    def test_multiple_non_Factor_selectors_for_Holding(self, make_regime):
+        """
+        The Holding-level TextQuoteSelectors should be built from this:
+
+        "text": [
+            "Census data therefore do not|trigger|copyright",
+            "|may|possess the requisite originality"
+            ]
+        """
+
+        holdings = loaders.load_holdings("holding_feist.json", regime=make_regime)
+        assert len(holdings[7].selectors) == 2
