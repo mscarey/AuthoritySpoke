@@ -1,4 +1,4 @@
-"""
+r"""
 Descriptions of procedural changes in litigation.
 
 Does not specify whether they are mandatory or universal,
@@ -20,7 +20,7 @@ from authorityspoke.relations import Analogy, all_analogy_matches
 
 @dataclass(frozen=True)
 class Procedure(Factor):
-    """
+    r"""
     A (potential) rule for courts to use in resolving litigation.
 
     Described in terms of inputs and outputs, and also potentially
@@ -395,7 +395,7 @@ class Procedure(Factor):
         return self >= other
 
     def implies_all_to_some(self, other: Procedure) -> bool:
-        """
+        r"""
         Find if ``self`` applying in all cases implies ``other`` applies in some.
 
         For ``self`` to imply ``other``, every output of ``other``

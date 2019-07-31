@@ -9,8 +9,8 @@ from __future__ import annotations
 
 import functools
 
-from typing import Callable, Dict, Iterable, List
-from typing import Optional, Sequence, Tuple, Union
+from typing import Callable, Dict, Iterable
+from typing import Optional, Sequence, Union
 
 
 def new_context_helper(func: Callable):
@@ -46,25 +46,26 @@ def new_context_helper(func: Callable):
         factor: Factor, changes: Optional[Union[Sequence[Factor], Dict[Factor, Factor]]]
     ) -> Factor:
 
-        if changes is not None:
-            if not isinstance(changes, Iterable):
-                changes = (changes,)
-            if not isinstance(changes, dict):
-                generic_factors = factor.generic_factors
-                if len(generic_factors) != len(changes):
-                    raise ValueError(
-                        'If the parameter "changes" is not a list of '
-                        + "replacements for every element of factor.generic_factors, "
-                        + 'then "changes" must be a dict where each key is a Factor '
-                        + "to be replaced and each value is the corresponding "
-                        + "replacement Factor."
-                    )
-                changes = dict(zip(generic_factors, changes))
-            for context_factor in changes:
-                if factor.name == context_factor or (
-                    factor.means(context_factor) and factor.name == context_factor.name
-                ):
-                    return changes[context_factor]
+        if changes is None:
+            return func(factor, changes)
+        if not isinstance(changes, Iterable):
+            changes = (changes,)
+        if not isinstance(changes, dict):
+            generic_factors = factor.generic_factors
+            if len(generic_factors) != len(changes):
+                raise ValueError(
+                    'If the parameter "changes" is not a list of '
+                    + "replacements for every element of factor.generic_factors, "
+                    + 'then "changes" must be a dict where each key is a Factor '
+                    + "to be replaced and each value is the corresponding "
+                    + "replacement Factor."
+                )
+            changes = dict(zip(generic_factors, changes))
+        for context_factor in changes:
+            if factor.name == context_factor or (
+                factor.means(context_factor) and factor.name == context_factor.name
+            ):
+                return changes[context_factor]
 
         return func(factor, changes)
 

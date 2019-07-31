@@ -6,7 +6,7 @@ import datetime
 import functools
 import pathlib
 import re
-from typing import Dict, List, Optional, Tuple, Union
+from typing import List, Optional, Tuple, Union
 from dataclasses import dataclass
 
 from bs4 import BeautifulSoup
@@ -18,7 +18,7 @@ from authorityspoke.selectors import TextQuoteSelector
 
 
 class Code:
-    """
+    r"""
     A code of legislation.
 
     Could be a constitution, code of statutes, code of regulations,
@@ -228,7 +228,7 @@ class Code:
         path = path.replace(self.uri, "")
         path_parts: List[str] = []
         path = path.lstrip("/")
-        for slash_count in range(path.count("/") + 1):
+        for _ in range(path.count("/") + 1):
             path_parts.append(path[: (path.index("/") if "/" in path else None)])
             path = path.replace("/", "-", 1)
         section = self.xml
@@ -466,7 +466,7 @@ class Enactment:
 
     @property
     def effective_date(self):
-        """
+        r"""
         Give effective date for the :class:`Enactment`\.
 
         :returns:
@@ -477,7 +477,7 @@ class Enactment:
 
     @property
     def text(self):
-        """
+        r"""
         Get a passage from ``self``\'s :class:`.Code` with ``self``\'s :class:`.TextQuoteSelector`.
 
         :returns: the full text of the cited passage from the XML.
@@ -545,7 +545,7 @@ class Enactment:
 
 
 def consolidate_enactments(enactments: List[Enactment]) -> List[Enactment]:
-    """
+    r"""
     Consolidate any overlapping :class:`Enactment`\s in a :class:`list`.
 
     :param enactments:

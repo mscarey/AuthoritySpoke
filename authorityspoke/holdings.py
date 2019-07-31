@@ -116,7 +116,6 @@ class Holding(Factor):
         elif isinstance(self.selectors, TextQuoteSelector):
             object.__setattr__(self, "selectors", (self.selectors,))
 
-
     @property
     def context_factors(self) -> Tuple:
         r"""

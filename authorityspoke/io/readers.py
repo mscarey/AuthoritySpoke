@@ -441,7 +441,7 @@ def read_holdings(
             )
 
     finished_holdings: List[Holding] = []
-    text_links = {}
+    text_links: Dict[Factor, List[TextQuoteSelector]] = {}
     for holding_record in holdings["holdings"]:
         for finished_holding, new_mentioned, factor_text_links in read_holding(
             mentioned=list_mentioned, regime=regime, **holding_record
@@ -690,6 +690,7 @@ def read_rule(
             enactments_despite=enactment_groups[1],
             mandatory=mandatory,
             universal=universal,
+            generic=generic,
         ),
         mentioned,
         factor_text_links,

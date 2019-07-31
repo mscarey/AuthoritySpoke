@@ -130,7 +130,7 @@ class Factor(ABC):
     @property
     def recursive_factors(self) -> Dict[Factor, None]:
         r"""
-        Collect ``self``'s :attr:`context_factors`, and each of their :attr:`context_factors`, recursively.
+        Collect `self`'s :attr:`context_factors`, and their :attr:`context_factors`, recursively.
 
         :returns:
             a :class:`dict` (instead of a :class:`set`,

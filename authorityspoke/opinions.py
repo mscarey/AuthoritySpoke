@@ -1,4 +1,4 @@
-"""
+r"""
 :class:`Court` documents that decide litigation and posit :class:`.Rule`\s.
 
 Unlike most other ``authorityspoke`` classes, :class:`Opinion`\s are not frozen.
@@ -6,19 +6,14 @@ Unlike most other ``authorityspoke`` classes, :class:`Opinion`\s are not frozen.
 
 from __future__ import annotations
 
-from typing import Any, ClassVar, Dict, List, Tuple
-from typing import Iterable, Iterator
+from typing import Any, Dict, Iterable, List, Tuple
 from typing import Optional, Sequence, Union
 
 import datetime
-import json
 import logging
-import pathlib
 import re
 
 from dataclasses import dataclass
-
-import requests
 
 from authorityspoke.factors import Factor
 from authorityspoke.holdings import Holding

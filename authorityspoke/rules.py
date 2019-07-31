@@ -17,7 +17,7 @@ from typing import List, Optional, Sequence, Tuple, Union
 from dataclasses import dataclass
 
 from authorityspoke.enactments import Enactment, consolidate_enactments
-from authorityspoke.factors import Factor, means, new_context_helper
+from authorityspoke.factors import Factor
 from authorityspoke.procedures import Procedure
 
 
