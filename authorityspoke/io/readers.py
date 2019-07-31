@@ -526,6 +526,6 @@ def read_selectors(
     """
     if records is None:
         return []
-    if isinstance(records, (list, tuple)):
-        return [read_selector(record) for record in records]
-    return [read_selector(records)]
+    if isinstance(records, (str, dict)):
+        return [read_selector(records)]
+    return [read_selector(record) for record in records]
