@@ -116,7 +116,7 @@ class TestEnactments:
         assert art_3.text.endswith("the United States")
 
     def test_make_enactment_from_dict_with_code(self, make_code):
-        fourth_a = Enactment.from_dict(
+        fourth_a = readers.read_enactment(
             factor_record={"path": "/us/const/amendment-IV"}, code=make_code["const"]
         )[0]
         assert fourth_a.text.endswith("and the persons or things to be seized.")
@@ -124,7 +124,7 @@ class TestEnactments:
     def test_make_enactment_from_dict_with_code_and_regime(
         self, make_regime, make_code
     ):
-        fourth_a = Enactment.from_dict(
+        fourth_a = readers.read_enactment(
             factor_record={"path": "/us/const/amendment-IV"},
             code=make_code["const"],
             regime=make_regime,

@@ -7,6 +7,7 @@ import pytest
 
 from authorityspoke.factors import Entity
 from authorityspoke.factors import Predicate, Factor, Fact
+from authorityspoke.io import readers
 from authorityspoke.opinions import Opinion
 from authorityspoke.predicates import ureg, Q_
 
@@ -18,7 +19,7 @@ class TestEntities:
         in a "mentioned" list, but no "mentioned" parameter is given.
         """
         with pytest.raises(TypeError):
-            print(Entity.from_dict(factor_record="Bradley", regime=make_regime))
+            print(readers.read_factor(factor_record="Bradley", regime=make_regime))
 
     def test_conversion_to_generic(self, make_entity):
         e = make_entity
