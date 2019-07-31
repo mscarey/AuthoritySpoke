@@ -10,14 +10,250 @@ from functools import partial
 
 from typing import Dict, List, Iterable, Iterator, Optional, Tuple, Union
 
+from authorityspoke.io import references
 from authorityspoke.enactments import Code, Enactment
-from authorityspoke.factors import Factor
+from authorityspoke.factors import Factor, Fact
 from authorityspoke.holdings import Holding
 from authorityspoke.jurisdictions import Regime
 from authorityspoke.opinions import Opinion
+from authorityspoke.predicates import Predicate
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
 from authorityspoke.selectors import TextQuoteSelector
+
+
+@references.log_mentioned_context
+def read_enactment(
+    enactment_dict: Dict[str, str],
+    code: Optional[Code] = None,
+    regime: Optional[Regime] = None,
+    mentioned=None,
+    *args,
+    **kwargs,
+) -> Enactment:
+    """
+    Create a new :class:`Enactment` object using imported JSON data.
+
+    The new :class:`Enactment` can be composed from a :class:`.Code`
+    referenced in the ``regime`` parameter.
+
+    :param enactment_dict:
+
+    :param code:
+        the :class:`.Code` that is the source for this
+        :class:`Enactment`
+
+    :param regime:
+        the :class:`.Regime` where the :class:`.Code` that is the
+        source for this :class:`Enactment` can be found, or where
+        it should be added
+
+    :returns:
+        a new :class:`Enactment` object.
+    """
+    if regime and not code:
+        code = regime.get_code(enactment_dict.get("path"))
+    if code is None and enactment_dict.get("code"):
+        code = Code(enactment_dict.get("code"))
+    if code is None:
+        raise ValueError(
+            "Must either specify a Regime and a path to find the "
+            + "Code within the Regime, or specify a filename for an XML "
+            + "file that can be used to build the Code"
+        )
+    if regime:
+        regime.set_code(code)
+
+    selector = TextQuoteSelector(
+        path=enactment_dict.get("path"),
+        exact=enactment_dict.get("exact"),
+        prefix=enactment_dict.get("prefix"),
+        suffix=enactment_dict.get("suffix"),
+        source=code,
+    )
+
+    return (
+        Enactment(code=code, selector=selector, name=enactment_dict.get("name")),
+        mentioned,
+    )
+
+
+def read_enactments(
+    record_list: Union[Dict[str, str], List[Dict[str, str]]],
+    mentioned: List[Union[Factor, Enactment]],
+    regime: Optional[Regime] = None,
+    factor_text_links: Dict = None,
+) -> Tuple[List[Enactment], List[Union[Factor, Enactment]], Dict]:
+    created_list: List[Enactment] = []
+    if record_list is None:
+        record_list = []
+    if not isinstance(record_list, list):
+        record_list = [record_list]
+    for record in record_list:
+        created, mentioned, factor_text_links = read_enactment(
+            record, mentioned, regime=regime, factor_text_links=factor_text_links
+        )
+        created_list.append(created)
+    return tuple(created_list), mentioned, factor_text_links
+
+
+def read_fact(
+    factor_record: Dict[str, Union[str, bool]], mentioned: List[Factor]
+) -> Fact:
+    r"""
+    Construct and return a :class:`Fact` object from a :py:class:`dict`.
+
+    :param factor_record:
+        imported from a JSON file in the format used in the "input" folder.
+
+    :param mentioned:
+        a list of :class:`.Factor`\s that may be included by reference to their ``name``\s.
+
+    :returns:
+        a :class:`Fact`.
+    """
+
+    placeholder = "{}"  # to be replaced in the Fact's string method
+
+    def add_content_references(
+        content: str, mentioned: List[Factor], placeholder: str
+    ) -> Tuple[str, List[Factor]]:
+        r"""
+        Get context :class:`Factor`\s for new :class:`Fact`.
+
+        :param content:
+            the content for the :class:`Fact`\'s :class:`Predicate`.
+
+        :param mentioned:
+            list of :class:`Factor`\s with names that could be
+            referenced in content
+
+        :param placeholder:
+            a string to replace the names of
+            referenced :class:`Factor`\s in content
+
+        :returns:
+            the content string with any referenced :class:`Factor`\s
+            replaced by placeholder, and a list of referenced
+            :class:`Factor`\s in the order they appeared in content.
+        """
+        context_with_indices: List[List[Union[Factor, int]]] = []
+        for factor in mentioned:
+            if factor.name and factor.name in content and factor.name != content:
+                factor_index = content.find(factor.name)
+                for pair in context_with_indices:
+                    if pair[1] > factor_index:
+                        pair[1] -= len(factor.name) - len(placeholder)
+                context_with_indices.append([factor, factor_index])
+                content = content.replace(factor.name, placeholder)
+        context_factors = [
+            k[0] for k in sorted(context_with_indices, key=lambda k: k[1])
+        ]
+        return content, context_factors
+
+    # TODO: inherit the later part of this function from Factor
+    comparison = ""
+    quantity = None
+    content = factor_record.get("content")
+    if content:
+        content, context_factors = add_content_references(
+            content, mentioned, placeholder
+        )
+    for item in Predicate.opposite_comparisons:
+        if item in content:
+            comparison = item
+            content, quantity = content.split(item)
+            quantity = Predicate.str_to_quantity(quantity)
+            content += placeholder
+
+    # TODO: get default attributes from the classes instead of
+    # rewriting them here.
+    predicate = Predicate(
+        content=content,
+        truth=factor_record.get("truth", True),
+        reciprocal=factor_record.get("reciprocal", False),
+        comparison=comparison,
+        quantity=quantity,
+    )
+    name = factor_record.get("name")
+    if not name:
+        name = (
+            f'{"false " if not predicate.truth else ""}{factor_record.get("content")}'
+        )
+    if name:
+        name = name.replace("{", "").replace("}", "")
+
+    return (
+        Fact(
+            predicate,
+            context_factors,
+            name=name,
+            standard_of_proof=factor_record.get("standard_of_proof", None),
+            absent=factor_record.get("absent", False),
+            generic=factor_record.get("generic", False),
+        ),
+        mentioned,
+    )
+
+
+@references.log_mentioned_context
+def read_factor(
+    factor_record: Dict, mentioned: List[Factor], *args, **kwargs
+) -> Optional[Factor]:
+    r"""
+    Turn fields from a chunk of JSON into a :class:`Factor` object.
+
+    :param factor_record:
+        parameter values to pass to :meth:`Factor.__init__`.
+
+    :param mentioned:
+        a list of relevant :class:`Factor`\s that have already been
+        constructed and can be used in composition of the output
+        :class:`Factor`, instead of constructing new ones.
+    """
+    cname = factor_record["type"]
+    target_class = Factor.subclass_from_str(cname)
+    if target_class == Fact:
+        created_factor, mentioned = read_fact(factor_record, mentioned)
+    else:
+        created_factor, mentioned = read_factor_subclass(
+            target_class, factor_record, mentioned
+        )
+    return created_factor, mentioned
+
+
+def read_factor_subclass(cls, factor_record: Dict, mentioned: List[Factor]) -> Factor:
+    prototype = cls()
+    new_factor_dict = prototype.__dict__
+    for attr in new_factor_dict:
+        if attr in prototype.context_factor_names:
+            value, mentioned, _ = read_factor(
+                factor_record=factor_record.get(attr), mentioned=mentioned
+            )
+        else:
+            value = factor_record.get(attr)
+        if value is not None:
+            new_factor_dict[attr] = value
+    return cls(**new_factor_dict), mentioned
+
+
+def read_factors(
+    record_list: Union[Dict[str, str], List[Dict[str, str]]],
+    mentioned: List[Factor],
+    regime: Optional[Regime] = None,
+    factor_text_links: Dict = None,
+) -> Tuple[List[Factor], List[Union[Factor, Enactment]], Dict]:
+    created_list: List[Factor] = []
+    if record_list is None:
+        record_list = []
+    if not isinstance(record_list, list):
+        record_list = [record_list]
+    for record in record_list:
+        created, mentioned, factor_text_links = read_factor(
+            record, mentioned, regime=regime, factor_text_links=factor_text_links
+        )
+        created_list.append(created)
+    return tuple(created_list), mentioned, factor_text_links
 
 
 def read_holding(
@@ -118,7 +354,7 @@ def read_holding(
     factor_text_links: Dict[Factor, List[TextQuoteSelector]] = {}
     list_mentioned: List[Factor] = mentioned or []
 
-    selectors = read_selectors(text)
+    selectors = references.read_selectors(text)
 
     basic_rule, list_mentioned, factor_text_links = read_rule(
         outputs=outputs,
@@ -194,10 +430,10 @@ def read_holdings(
     factor_dicts = holdings.get("mentioned_factors")
 
     # populates mentioned with context factors that don't
-    # need links to Opinion text
+    # appear in inputs, outputs, or despite
     if factor_dicts:
         for factor_dict in factor_dicts:
-            _, list_mentioned, factor_text_links = Factor.from_dict(
+            _, list_mentioned, factor_text_links = read_factor(
                 factor_record=factor_dict,
                 mentioned=list_mentioned,
                 regime=regime,
@@ -229,7 +465,7 @@ def read_opinion(
     last_page: str = "",
     lead_only: bool = True,
     as_generator: bool = False,
-    **kwargs
+    **kwargs,
 ) -> Union[Opinion, Iterator[Opinion], List[Opinion]]:
     r"""
     Create and return one or more :class:`.Opinion` objects.
@@ -421,32 +657,12 @@ def read_rule(
         from ``mentioned_entities`` as ``context_factors``
     """
 
-    def list_from_records(
-        record_list: Union[Dict[str, str], List[Dict[str, str]]],
-        mentioned: List[Factor],
-        class_to_create,
-        regime: Optional[Regime] = None,
-        factor_text_links: Dict = None,
-    ) -> Union[List[Factor], List[Enactment]]:
-        factors_or_enactments: Union[List[Factor], List[Enactment]] = []
-        if record_list is None:
-            record_list = []
-        if not isinstance(record_list, list):
-            record_list = [record_list]
-        for record in record_list:
-            created, mentioned, factor_text_links = class_to_create.from_dict(
-                record, mentioned, regime=regime, factor_text_links=factor_text_links
-            )
-            factors_or_enactments.append(created)
-        return tuple(factors_or_enactments), mentioned, factor_text_links
-
     factor_dicts = [outputs, inputs, despite]
     factor_groups = []
-    for i, category in enumerate(factor_dicts):
-        category, mentioned, factor_text_links = list_from_records(
+    for category in factor_dicts:
+        category, mentioned, factor_text_links = read_factors(
             record_list=category,
             mentioned=mentioned,
-            class_to_create=Factor,
             regime=regime,
             factor_text_links=factor_text_links,
         )
@@ -454,11 +670,10 @@ def read_rule(
 
     enactment_dicts = [enactments, enactments_despite]
     enactment_groups = []
-    for i, category in enumerate(enactment_dicts):
-        category, mentioned, factor_text_links = list_from_records(
+    for category in enactment_dicts:
+        category, mentioned, factor_text_links = read_enactments(
             record_list=category,
             mentioned=mentioned,
-            class_to_create=Enactment,
             regime=regime,
             factor_text_links=factor_text_links,
         )
@@ -479,53 +694,3 @@ def read_rule(
         mentioned,
         factor_text_links,
     )
-
-
-def read_selector(text: Union[dict, str]) -> TextQuoteSelector:
-    """
-    Create new instance from JSON user input.
-
-    If the input is a :class:`str`, tries to break up the string
-    into :attr:`~TextQuoteSelector.prefix`, :attr:`~TextQuoteSelector.exact`,
-    and :attr:`~TextQuoteSelector.suffix`, by splitting on the pipe characters.
-
-    :param text:
-        a string or dict representing a text passage
-
-    :returns: a new :class:`TextQuoteSelector`
-    """
-    if isinstance(text, dict):
-        return TextQuoteSelector(**text)
-    if text.count("|") == 0:
-        return TextQuoteSelector(exact=text)
-    elif text.count("|") == 2:
-        prefix, exact, suffix = text.split("|")
-        return TextQuoteSelector(exact=exact, prefix=prefix, suffix=suffix)
-    raise ValueError(
-        "'text' must be either a dict, a string containing no | pipe "
-        + "separator, or a string containing two pipe separators to divide "
-        + "the string into 'prefix', 'exact', and 'suffix'."
-    )
-
-
-def read_selectors(
-    records: Optional[Union[str, Dict, Iterable[Union[str, Dict]]]]
-) -> List[TextQuoteSelector]:
-    r"""
-    Create list of :class:`.TextQuoteSelector`\s from JSON user input.
-
-    If the input is a :class:`str`, tries to break up the string
-    into :attr:`~TextQuoteSelector.prefix`, :attr:`~TextQuoteSelector.exact`,
-    and :attr:`~TextQuoteSelector.suffix`, by splitting on the pipe characters.
-
-    :param record:
-        a string or dict representing a text passage, or list of
-        strings and dicts.
-
-    :returns: a list of :class:`TextQuoteSelector`\s
-    """
-    if records is None:
-        return []
-    if isinstance(records, (str, dict)):
-        return [read_selector(records)]
-    return [read_selector(record) for record in records]

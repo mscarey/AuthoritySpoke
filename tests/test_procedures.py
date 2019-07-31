@@ -8,7 +8,6 @@ from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
 from authorityspoke.opinions import Opinion
 from authorityspoke.predicates import ureg, Q_
-from authorityspoke.context import log_mentioned_context
 
 
 class TestProcedures:

@@ -14,7 +14,6 @@ from bs4 import BeautifulSoup
 from utils.cache import lazyprop
 from utils.roman import from_roman
 
-from authorityspoke.context import log_mentioned_context
 from authorityspoke.selectors import TextQuoteSelector
 
 
@@ -485,61 +484,6 @@ class Enactment:
         """
 
         return self.code.select_text(self.selector)
-
-    @classmethod
-    @log_mentioned_context
-    def from_dict(
-        cls,
-        enactment_dict: Dict[str, str],
-        code: Optional[Code] = None,
-        regime: Optional[Regime] = None,
-        mentioned=None,
-        factor_text_links=None,
-        *args,
-        **kwargs,
-    ) -> Enactment:
-        """
-        Create a new :class:`Enactment` object using imported JSON data.
-
-        The new :class:`Enactment` can be composed from a :class:`.Code`
-        referenced in the ``regime`` parameter.
-
-        :param enactment_dict:
-
-        :param code:
-            the :class:`.Code` that is the source for this
-            :class:`Enactment`
-
-        :param regime:
-            the :class:`.Regime` where the :class:`.Code` that is the
-            source for this :class:`Enactment` can be found, or where
-            it should be added
-
-        :returns:
-            a new :class:`Enactment` object.
-        """
-        if regime and not code:
-            code = regime.get_code(enactment_dict.get("path"))
-        if code is None and enactment_dict.get("code"):
-            code = Code(enactment_dict.get("code"))
-        if code is None:
-            raise ValueError(
-                "Must either specify a Regime and a path to find the "
-                + "Code within the Regime, or specify a filename for an XML "
-                + "file that can be used to build the Code"
-            )
-        if regime:
-            regime.set_code(code)
-
-        selector = TextQuoteSelector(
-            path=enactment_dict.get("path"),
-            exact=enactment_dict.get("exact"),
-            prefix=enactment_dict.get("prefix"),
-            suffix=enactment_dict.get("suffix"),
-            source=code,
-        )
-
-        return Enactment(code=code, selector=selector, name=enactment_dict.get("name")), mentioned
 
     def means(self, other: Enactment) -> bool:
         r"""

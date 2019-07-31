@@ -14,7 +14,7 @@ from typing import Optional, Sequence, Tuple, Union
 
 from dataclasses import astuple, dataclass
 
-from authorityspoke.context import log_mentioned_context, new_context_helper
+from authorityspoke.context import new_context_helper
 from authorityspoke.predicates import Predicate
 from authorityspoke.relations import Analogy
 
@@ -35,7 +35,7 @@ class Factor(ABC):
 
     @classmethod
     @functools.lru_cache()
-    def class_from_str(cls, name: str):
+    def subclass_from_str(cls, name: str):
         """
         Find class for use in JSON deserialization process.
 
@@ -57,41 +57,6 @@ class Factor(ABC):
                 + f"{list(class_options.keys())}, not {name}"
             )
         return answer
-
-    @classmethod
-    def _build_from_dict(cls, factor_record: Dict, mentioned: List[Factor]) -> Factor:
-        example = cls()
-        new_factor_dict = example.__dict__
-        for attr in new_factor_dict:
-            if attr in example.context_factor_names:
-                value, mentioned, _ = Factor.from_dict(factor_record=factor_record.get(attr), mentioned=mentioned)
-            else:
-                value = factor_record.get(attr)
-            if value is not None:
-                new_factor_dict[attr] = value
-        return cls(**new_factor_dict), mentioned
-
-    @classmethod
-    @log_mentioned_context
-    def from_dict(
-        cls, factor_record: Dict, mentioned: List[Factor], *args, **kwargs
-    ) -> Optional[Factor]:
-        r"""
-        Turn fields from a chunk of JSON into a :class:`Factor` object.
-
-        :param factor_record:
-            parameter values to pass to :meth:`Factor.__init__`.
-
-        :param mentioned:
-            a list of relevant :class:`Factor`\s that have already been
-            constructed and can be used in composition of the output
-            :class:`Factor`, instead of constructing new ones.
-        """
-        cname = factor_record["type"]
-        target_class = cls.class_from_str(cname)
-        created_factor, mentioned = target_class._build_from_dict(factor_record, mentioned)
-        return created_factor, mentioned
-
 
     @property
     def context_factor_names(self) -> Tuple[str, ...]:
@@ -893,100 +858,6 @@ class Fact(Factor):
         if not other.absent:
             return self._contradicts_if_present(other)
         return self._implies_if_present(other)
-
-    @classmethod
-    def _build_from_dict(
-        cls, factor_record: Dict[str, Union[str, bool]], mentioned: List[Factor]
-    ) -> Fact:
-        r"""
-        Construct and return a :class:`Fact` object from a :py:class:`dict`.
-
-        :param factor_record:
-            imported from a JSON file in the format used in the "input" folder.
-
-        :param mentioned:
-            a list of :class:`.Factor`\s that may be included by reference to their ``name``\s.
-
-        :returns:
-            a :class:`Fact`.
-        """
-
-        placeholder = "{}"  # to be replaced in the Fact's string method
-
-        def add_content_references(
-            content: str, mentioned: List[Factor], placeholder: str
-        ) -> Tuple[str, List[Factor]]:
-            r"""
-            Get context :class:`Factor`\s for new :class:`Fact`.
-
-            :param content:
-                the content for the :class:`Fact`\'s :class:`Predicate`.
-
-            :param mentioned:
-                list of :class:`Factor`\s with names that could be
-                referenced in content
-
-            :param placeholder:
-                a string to replace the names of
-                referenced :class:`Factor`\s in content
-
-            :returns:
-                the content string with any referenced :class:`Factor`\s
-                replaced by placeholder, and a list of referenced
-                :class:`Factor`\s in the order they appeared in content.
-            """
-            context_with_indices: List[List[Union[Factor, int]]] = []
-            for factor in mentioned:
-                if factor.name and factor.name in content and factor.name != content:
-                    factor_index = content.find(factor.name)
-                    for pair in context_with_indices:
-                        if pair[1] > factor_index:
-                            pair[1] -= len(factor.name) - len(placeholder)
-                    context_with_indices.append([factor, factor_index])
-                    content = content.replace(factor.name, placeholder)
-            context_factors = [
-                k[0] for k in sorted(context_with_indices, key=lambda k: k[1])
-            ]
-            return content, context_factors
-
-        # TODO: inherit the later part of this function from Factor
-        comparison = ""
-        quantity = None
-        content = factor_record.get("content")
-        if content:
-            content, context_factors = add_content_references(
-                content, mentioned, placeholder
-            )
-        for item in Predicate.opposite_comparisons:
-            if item in content:
-                comparison = item
-                content, quantity = content.split(item)
-                quantity = Predicate.str_to_quantity(quantity)
-                content += placeholder
-
-        # TODO: get default attributes from the classes instead of
-        # rewriting them here.
-        predicate = Predicate(
-            content=content,
-            truth=factor_record.get("truth", True),
-            reciprocal=factor_record.get("reciprocal", False),
-            comparison=comparison,
-            quantity=quantity,
-        )
-        name = factor_record.get("name")
-        if not name:
-            name = f'{"false " if not predicate.truth else ""}{factor_record.get("content")}'
-        if name:
-            name = name.replace("{", "").replace("}", "")
-
-        return cls(
-            predicate,
-            context_factors,
-            name=name,
-            standard_of_proof=factor_record.get("standard_of_proof", None),
-            absent=factor_record.get("absent", False),
-            generic=factor_record.get("generic", False),
-        ), mentioned
 
     @new_context_helper
     def new_context(self, changes: Dict[Factor, Factor]) -> Factor:
