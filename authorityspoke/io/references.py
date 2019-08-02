@@ -24,13 +24,12 @@ def log_mentioned_context(func: Callable):
     @functools.wraps(func)
     def wrapper(
         factor_record: Union[str, Optional[Dict[str, Union[str, bool]]]],
-        mentioned: Optional[List[Union[Factor, Enactment]]] = None,
+        mentioned: Optional[Dict[Factor, List[TextQuoteSelector]]] = None,
         code: Optional[Code] = None,
         regime: Optional[Regime] = None,
-        factor_text_links=None,
         *args,
         **kwargs,
-    ) -> Tuple[Optional[Factor], List[Factor]]:
+    ) -> Tuple[Optional[Factor], Dict[Factor, List[TextQuoteSelector]]]:
 
         if isinstance(factor_record, str):
             factor_record = factor_record.lower()
@@ -42,19 +41,21 @@ def log_mentioned_context(func: Callable):
             for context_factor in mentioned:
                 if (
                     hasattr(context_factor, "name")
+                    and context_factor.name is not None
                     and context_factor.name.lower() == factor_record
                 ):
-                    return context_factor, mentioned, factor_text_links
+                    return context_factor, mentioned
             raise ValueError(
                 "The 'factor_record' parameter should be a dict "
                 + "representing a Factor or a string "
                 + "representing the name of a Factor included in 'mentioned'."
             )
 
-        if factor_record is None:
-            return None, mentioned, factor_text_links
+        if mentioned is None:
+            mentioned = {}
 
-        mentioned = mentioned or []
+        if factor_record is None:
+            return None, mentioned
 
         new_factor, mentioned = func(
             factor_record, mentioned=mentioned, code=code, regime=regime
@@ -65,23 +66,22 @@ def log_mentioned_context(func: Callable):
         ):
             for context_factor in mentioned:
                 if context_factor == new_factor:
-                    return context_factor, mentioned, factor_text_links
+                    return context_factor, mentioned
+
+        # TODO: check whether recursive_factors phase can be deleted.
         if hasattr(new_factor, "recursive_factors"):
             factors_to_add = new_factor.recursive_factors
         else:
             factors_to_add = [new_factor]
         for recursive_factor in factors_to_add:
             if recursive_factor not in mentioned:
-                mentioned.append(recursive_factor)
+                mentioned[recursive_factor] = []
 
-        mentioned = sorted(
-            mentioned, key=lambda f: len(f.name) if f.name else 0, reverse=True
-        )
         text = factor_record.pop("text", None)
         if text:
-            factor_text_links[new_factor] = read_selectors(text)
+            mentioned[new_factor] = read_selectors(text)
 
-        return new_factor, mentioned, factor_text_links
+        return new_factor, mentioned
 
     return wrapper
 

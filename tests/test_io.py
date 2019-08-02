@@ -36,7 +36,7 @@ class TestPredicateImport:
 
 
 class TestEntityImport:
-    def test_specific_entity(self, make_opinion):
+    def test_specific_entity(self):
         smith_dict = {
             "mentioned_factors": [
                 {"type": "Entity", "name": "Smith", "generic": False},
@@ -53,10 +53,12 @@ class TestEntityImport:
                 },
             ],
         }
-        watt = make_opinion["watt_majority"]
-        watt.exposit(read_holdings(smith_dict))
-        assert watt.holdings[1].generic_factors != watt.holdings[0].generic_factors
-        assert not watt.holdings[1] >= watt.holdings[0]
+        different_entity_holdings = read_holdings(smith_dict)
+        assert (
+            different_entity_holdings[1].generic_factors
+            != different_entity_holdings[0].generic_factors
+        )
+        assert not different_entity_holdings[1] >= different_entity_holdings[0]
 
 
 class TestEnactmentImport:

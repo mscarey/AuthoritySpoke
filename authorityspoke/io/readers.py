@@ -82,19 +82,16 @@ def read_enactments(
     record_list: Union[Dict[str, str], List[Dict[str, str]]],
     mentioned: List[Union[Factor, Enactment]],
     regime: Optional[Regime] = None,
-    factor_text_links: Dict = None,
-) -> Tuple[List[Enactment], List[Union[Factor, Enactment]], Dict]:
+) -> Tuple[List[Enactment], List[Union[Factor, Enactment]]]:
     created_list: List[Enactment] = []
     if record_list is None:
         record_list = []
     if not isinstance(record_list, list):
         record_list = [record_list]
     for record in record_list:
-        created, mentioned, factor_text_links = read_enactment(
-            record, mentioned, regime=regime, factor_text_links=factor_text_links
-        )
+        created, mentioned = read_enactment(record, mentioned=mentioned, regime=regime)
         created_list.append(created)
-    return tuple(created_list), mentioned, factor_text_links
+    return tuple(created_list), mentioned
 
 
 def read_fact(
@@ -227,7 +224,7 @@ def read_factor_subclass(cls, factor_record: Dict, mentioned: List[Factor]) -> F
     new_factor_dict = prototype.__dict__
     for attr in new_factor_dict:
         if attr in prototype.context_factor_names:
-            value, mentioned, _ = read_factor(
+            value, mentioned = read_factor(
                 factor_record=factor_record.get(attr), mentioned=mentioned
             )
         else:
@@ -241,7 +238,6 @@ def read_factors(
     record_list: Union[Dict[str, str], List[Dict[str, str]]],
     mentioned: List[Factor],
     regime: Optional[Regime] = None,
-    factor_text_links: Dict = None,
 ) -> Tuple[List[Factor], List[Union[Factor, Enactment]], Dict]:
     created_list: List[Factor] = []
     if record_list is None:
@@ -249,11 +245,9 @@ def read_factors(
     if not isinstance(record_list, list):
         record_list = [record_list]
     for record in record_list:
-        created, mentioned, factor_text_links = read_factor(
-            record, mentioned, regime=regime, factor_text_links=factor_text_links
-        )
+        created, mentioned = read_factor(record, mentioned, regime=regime)
         created_list.append(created)
-    return tuple(created_list), mentioned, factor_text_links
+    return tuple(created_list), mentioned
 
 
 def read_holding(
@@ -269,7 +263,7 @@ def read_holding(
     enactments: Optional[Union[Dict, Iterable[Dict]]] = None,
     enactments_despite: Optional[Union[Dict, Iterable[Dict]]] = None,
     text: Optional[Union[str, Dict, Iterable[Union[str, Dict]]]] = None,
-    mentioned: Optional[List[Factor]] = None,
+    mentioned: Optional[Dict[Factor, List[TextQuoteSelector]]] = None,
     regime: Optional[Regime] = None,
 ) -> Iterator[Tuple[Holding, List[Factor], Dict[Factor, List[TextQuoteSelector]]]]:
     r"""
@@ -351,12 +345,11 @@ def read_holding(
     # If lists were omitted around single elements in the JSON,
     # add them back
 
-    factor_text_links: Dict[Factor, List[TextQuoteSelector]] = {}
-    list_mentioned: List[Factor] = mentioned or []
+    mentioned = mentioned or {}
 
     selectors = references.read_selectors(text)
 
-    basic_rule, list_mentioned, factor_text_links = read_rule(
+    basic_rule, mentioned = read_rule(
         outputs=outputs,
         inputs=inputs,
         despite=despite,
@@ -365,17 +358,12 @@ def read_holding(
         generic=generic,
         enactments=enactments,
         enactments_despite=enactments_despite,
-        mentioned=list_mentioned,
+        mentioned=mentioned,
         regime=regime,
-        factor_text_links=factor_text_links,
     )
-    yield (
-        Holding(
-            rule=basic_rule, rule_valid=rule_valid, decided=decided, selectors=selectors
-        ),
-        list_mentioned,
-        factor_text_links,
-    )
+    yield Holding(
+        rule=basic_rule, rule_valid=rule_valid, decided=decided, selectors=selectors
+    ), mentioned
 
     if exclusive:
         if not rule_valid:
@@ -394,14 +382,13 @@ def read_holding(
                 + "without the 'exclusive' keyword."
             )
         for modified_rule in basic_rule.get_contrapositives():
-            yield (Holding(rule=modified_rule, selectors=selectors), list_mentioned, {})
+            yield Holding(rule=modified_rule, selectors=selectors), mentioned
 
 
 def read_holdings(
-    holdings: Dict[str, Iterable],  # TODO: remove "mentioned", leaving a list
+    holdings: Dict[str, Iterable],  # TODO: remove "mentioned_factors" from JSON format
     regime: Optional[Regime] = None,
-    mentioned: Optional[List[Factor]] = None,
-    factor_text_links=None,
+    mentioned: Optional[Dict[Factor, List[TextQuoteSelector]]] = None,
     include_text_links: bool = False,
 ) -> Union[List[Holding], Tuple[List[Holding], Dict[Factor, List[TextQuoteSelector]]]]:
     r"""
@@ -412,45 +399,43 @@ def read_holdings(
         followed by a list of holdings
 
     :parame regime:
+        A collection of :class:`.Jurisdiction`\s and the :class:`.Code`\s
+        that have been enacted in each. Used for constructing
+        :class:`.Enactment`\s referenced by :class:`.Holding`\s.
 
     :param mentioned:
-        A list of :class:`.Factor`\s that the method needs to
-        expect to find in the :class:`.Opinion`\'s holdings,
-        but that won't be provided within the JSON, if any.
+        A dict of :class:`.Factor`\s that the method needs to
+        expect to find in the :class:`.Holding`\s,
+        linked to lists of :class:`.TextQuoteSelector`\s indicating
+        where each :class:`.Factor` can be found in the :class:`.Opinion`\.
 
     :param include_text_links:
+        Whether to return the ``mentioned`` :class:`.Factor`\s and
+        corresponding text selectors in the return value for
+        this function.
 
     :returns:
-        a list of :class:`Rule`\s from a JSON file in the
-        ``example_data/holdings`` subdirectory, from a JSON
-        file.
+        a list of :class:`.Holding` objects, optionally with
+        an index matching :class:`.Factor`\s to selectors.
     """
-    list_mentioned: List[Factor] = mentioned or []
-
-    factor_dicts = holdings.get("mentioned_factors")
-
     # populates mentioned with context factors that don't
     # appear in inputs, outputs, or despite
-    if factor_dicts:
-        for factor_dict in factor_dicts:
-            _, list_mentioned, factor_text_links = read_factor(
-                factor_record=factor_dict,
-                mentioned=list_mentioned,
-                regime=regime,
-                factor_text_links=factor_text_links,
+    if holdings.get("mentioned_factors"):
+        for factor_dict in holdings["mentioned_factors"]:
+            _, mentioned = read_factor(
+                factor_record=factor_dict, mentioned=mentioned, regime=regime
             )
 
     finished_holdings: List[Holding] = []
-    text_links: Dict[Factor, List[TextQuoteSelector]] = {}
     for holding_record in holdings["holdings"]:
-        for finished_holding, new_mentioned, factor_text_links in read_holding(
-            mentioned=list_mentioned, regime=regime, **holding_record
+
+        for generated_holding in read_holding(
+            mentioned=mentioned, regime=regime, **holding_record
         ):
-            list_mentioned = new_mentioned
+            finished_holding, mentioned = generated_holding
             finished_holdings.append(finished_holding)
-            text_links.update(factor_text_links)
     if include_text_links:
-        return finished_holdings, text_links
+        return finished_holdings, mentioned
     return finished_holdings
 
 
@@ -604,7 +589,6 @@ def read_rule(
     enactments_despite: Optional[Union[Dict, Iterable[Dict]]] = None,
     mentioned: List[Factor] = None,
     regime: Optional[Regime] = None,
-    factor_text_links: Optional[Dict[Factor, List[TextQuoteSelector]]] = None,
 ) -> Iterator[Tuple[Rule, List[Factor]]]:
     r"""
     Make :class:`Rule` from a :class:`dict` of strings and a list of mentioned :class:`.Factor`\s.
@@ -660,22 +644,16 @@ def read_rule(
     factor_dicts = [outputs, inputs, despite]
     factor_groups = []
     for category in factor_dicts:
-        category, mentioned, factor_text_links = read_factors(
-            record_list=category,
-            mentioned=mentioned,
-            regime=regime,
-            factor_text_links=factor_text_links,
+        category, mentioned = read_factors(
+            record_list=category, mentioned=mentioned, regime=regime
         )
         factor_groups.append(category)
 
     enactment_dicts = [enactments, enactments_despite]
     enactment_groups = []
     for category in enactment_dicts:
-        category, mentioned, factor_text_links = read_enactments(
-            record_list=category,
-            mentioned=mentioned,
-            regime=regime,
-            factor_text_links=factor_text_links,
+        category, mentioned = read_enactments(
+            record_list=category, mentioned=mentioned, regime=regime
         )
         enactment_groups.append(category)
 
@@ -693,5 +671,4 @@ def read_rule(
             generic=generic,
         ),
         mentioned,
-        factor_text_links,
     )
