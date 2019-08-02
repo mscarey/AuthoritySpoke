@@ -134,8 +134,11 @@ def read_fact(
             replaced by placeholder, and a list of referenced
             :class:`Factor`\s in the order they appeared in content.
         """
+        sorted_mentioned = sorted(
+            mentioned.keys(), key=lambda x: len(x.name) if x.name else 0, reverse=True
+        )
         context_with_indices: List[List[Union[Factor, int]]] = []
-        for factor in mentioned:
+        for factor in sorted_mentioned:
             if factor.name and factor.name in content and factor.name != content:
                 factor_index = content.find(factor.name)
                 for pair in context_with_indices:

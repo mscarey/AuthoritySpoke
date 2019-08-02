@@ -12,7 +12,7 @@ from authorityspoke.holdings import Holding
 from authorityspoke.opinions import Opinion
 from authorityspoke.predicates import Predicate
 from authorityspoke.procedures import Procedure
-from authorityspoke.io.readers import read_holdings
+from authorityspoke.io import readers
 from authorityspoke.io.loaders import load_holdings
 from authorityspoke.io import filepaths
 from authorityspoke.rules import Rule
@@ -53,7 +53,7 @@ class TestEntityImport:
                 },
             ],
         }
-        different_entity_holdings = read_holdings(smith_dict)
+        different_entity_holdings = readers.read_holdings(smith_dict)
         assert (
             different_entity_holdings[1].generic_factors
             != different_entity_holdings[0].generic_factors
@@ -86,6 +86,19 @@ class TestFactorImport:
             os.chdir(directory)
         input_directory = filepaths.get_directory_path("holdings") / "holding_watt.json"
         assert input_directory.exists()
+
+
+class TestFactImport:
+    def test_import_fact_with_entity_name_containing_another(self):
+        house_fact = readers.read_fact(
+            factor_record={
+                "content": "Alice sold Alice's house for a price in dollars of > 300000"
+            },
+            mentioned={Entity(name="Alice"): [], Entity(name="Alice's house"): []},
+        )
+        assert any(
+            context.name == "Alice's house" for context in house_fact.generic_factors
+        )
 
 
 class TestRuleImport:
@@ -253,7 +266,7 @@ class TestRuleImport:
             ],
         }
         with pytest.raises(ValueError):
-            read_holdings(rule_dict)
+            readers.read_holdings(rule_dict)
 
     def test_error_classname_does_not_exist(self):
         rule_dict = {
@@ -273,7 +286,7 @@ class TestRuleImport:
             ]
         }
         with pytest.raises(ValueError):
-            read_holdings(rule_dict)
+            readers.read_holdings(rule_dict)
 
     def test_holding_flagged_exclusive(self, make_opinion_with_holding, make_enactment):
         """
