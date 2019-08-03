@@ -88,9 +88,12 @@ def read_enactments(
     if not isinstance(record_list, list):
         record_list = [record_list]
     for record in record_list:
-        created, mentioned = read_enactment(record, mentioned=mentioned, regime=regime)
+        created, mentioned = read_enactment(
+            record, mentioned=mentioned, regime=regime, report_mentioned=True
+        )
         created_list.append(created)
-    return (created_list, mentioned) if report_mentioned else created_list
+    answer = tuple(created_list)
+    return (answer, mentioned) if report_mentioned else answer
 
 
 def read_fact(
@@ -264,7 +267,8 @@ def read_factors(
             record, mentioned, regime=regime, report_mentioned=True
         )
         created_list.append(created)
-    return tuple(created_list), mentioned
+    answer = tuple(created_list)
+    return (answer, mentioned) if report_mentioned else answer
 
 
 def read_holding(

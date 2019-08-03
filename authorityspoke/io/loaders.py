@@ -92,8 +92,8 @@ def load_holdings(
     )
     with open(validated_filepath, "r") as f:
         holdings = json.load(f)
-    answer = readers.read_holdings(
-        holdings=holdings, regime=regime, mentioned=mentioned, include_text_links=True
+    answer, mentioned = readers.read_holdings(
+        holdings=holdings, regime=regime, mentioned=mentioned, report_mentioned=True
     )
     return (answer, mentioned) if report_mentioned else answer
 
