@@ -11,7 +11,7 @@ from typing import Dict, List, Iterator, Optional, Tuple, Union
 from authorityspoke.enactments import Code
 from authorityspoke.factors import Factor
 from authorityspoke.holdings import Holding
-from authorityspoke.io import filepaths, readers, references
+from authorityspoke.io import filepaths, readers
 from authorityspoke.jurisdictions import Regime
 from authorityspoke.opinions import Opinion
 from authorityspoke.selectors import TextQuoteSelector

@@ -26,12 +26,14 @@ from authorityspoke.selectors import TextQuoteSelector
 def read_enactment(
     enactment_dict: Dict[str, str],
     code: Optional[Code] = None,
-    mentioned=None,
+    mentioned: Optional[Dict[Union[Factor, Enactment], List[TextQuoteSelector]]] = None,
     regime: Optional[Regime] = None,
     report_mentioned: bool = False,
     *args,
     **kwargs,
-) -> Enactment:
+) -> Union[
+    Enactment, Tuple[Enactment, Dict[Union[Factor, Enactment], List[TextQuoteSelector]]]
+]:
     """
     Create a new :class:`Enactment` object using imported JSON data.
 
@@ -78,10 +80,13 @@ def read_enactment(
 
 def read_enactments(
     record_list: Union[Dict[str, str], List[Dict[str, str]]],
-    mentioned: List[Union[Factor, Enactment]],
+    mentioned: Optional[Dict[Union[Factor, Enactment], List[TextQuoteSelector]]] = None,
     regime: Optional[Regime] = None,
     report_mentioned: bool = False,
-) -> Tuple[List[Enactment], List[Union[Factor, Enactment]]]:
+) -> Union[
+    List[Enactment],
+    Tuple[List[Enactment], Dict[Union[Factor, Enactment], List[TextQuoteSelector]]],
+]:
     created_list: List[Enactment] = []
     if record_list is None:
         record_list = []
@@ -98,9 +103,9 @@ def read_enactments(
 
 def read_fact(
     factor_record: Dict[str, Union[str, bool]],
-    mentioned: List[Factor],
+    mentioned: Optional[Dict[Union[Factor, Enactment], List[TextQuoteSelector]]] = None,
     report_mentioned: bool = False,
-) -> Fact:
+) -> Union[Fact, Tuple[Fact, Dict[Union[Factor, Enactment], List[TextQuoteSelector]]]]:
     r"""
     Construct and return a :class:`Fact` object from a :py:class:`dict`.
 
@@ -117,7 +122,11 @@ def read_fact(
     placeholder = "{}"  # to be replaced in the Fact's string method
 
     def add_content_references(
-        content: str, mentioned: List[Factor], placeholder: str
+        content: str,
+        mentioned: Optional[
+            Dict[Union[Factor, Enactment], List[TextQuoteSelector]]
+        ] = None,
+        placeholder: str = "{}",
     ) -> Tuple[str, List[Factor]]:
         r"""
         Get context :class:`Factor`\s for new :class:`Fact`.
@@ -201,11 +210,14 @@ def read_fact(
 @references.log_mentioned_context
 def read_factor(
     factor_record: Dict,
-    mentioned: List[Factor],
+    mentioned: Optional[Dict[Union[Factor, Enactment], List[TextQuoteSelector]]] = None,
     report_mentioned: bool = False,
     *args,
     **kwargs,
-) -> Optional[Factor]:
+) -> Union[
+    Optional[Factor],
+    Tuple[Optional[Factor], Dict[Union[Factor, Enactment], List[TextQuoteSelector]]],
+]:
     r"""
     Turn fields from a chunk of JSON into a :class:`Factor` object.
 
@@ -231,8 +243,13 @@ def read_factor(
 
 
 def read_factor_subclass(
-    cls, factor_record: Dict, mentioned: List[Factor], report_mentioned: bool = False
-) -> Factor:
+    cls,
+    factor_record: Dict,
+    mentioned: Optional[Dict[Union[Factor, Enactment], List[TextQuoteSelector]]] = None,
+    report_mentioned: bool = False,
+) -> Union[
+    Factor, Tuple[Factor, Dict[Union[Factor, Enactment], List[TextQuoteSelector]]]
+]:
     prototype = cls()
     new_factor_dict = prototype.__dict__
     for attr in new_factor_dict:
@@ -253,10 +270,13 @@ def read_factor_subclass(
 
 def read_factors(
     record_list: Union[Dict[str, str], List[Dict[str, str]]],
-    mentioned: List[Factor],
+    mentioned: Optional[Dict[Union[Factor, Enactment], List[TextQuoteSelector]]] = None,
     regime: Optional[Regime] = None,
     report_mentioned: bool = False,
-) -> Tuple[List[Factor], List[Union[Factor, Enactment]], Dict]:
+) -> Union[
+    List[Factor],
+    Tuple[List[Factor], Dict[Union[Factor, Enactment], List[TextQuoteSelector]]],
+]:
     created_list: List[Factor] = []
     if record_list is None:
         record_list = []
@@ -287,7 +307,11 @@ def read_holding(
     mentioned: Optional[Dict[Factor, List[TextQuoteSelector]]] = None,
     regime: Optional[Regime] = None,
     report_mentioned: bool = False,
-) -> Iterator[Tuple[Holding, List[Factor], Dict[Factor, List[TextQuoteSelector]]]]:
+) -> Iterator[
+    Union[
+        Holding, Tuple[Holding, Dict[Union[Factor, Enactment], List[TextQuoteSelector]]]
+    ]
+]:
     r"""
     Create new :class:`Holding` object from simple datatypes from JSON input.
 
@@ -415,7 +439,10 @@ def read_holdings(
     regime: Optional[Regime] = None,
     mentioned: Optional[Dict[Factor, List[TextQuoteSelector]]] = None,
     report_mentioned: bool = False,
-) -> Union[List[Holding], Tuple[List[Holding], Dict[Factor, List[TextQuoteSelector]]]]:
+) -> Union[
+    List[Holding],
+    Tuple[List[Holding], Dict[Union[Factor, Enactment], List[TextQuoteSelector]]],
+]:
     r"""
     Load a list of :class:`Holdings`\s from JSON, with optional text links.
 
@@ -608,10 +635,10 @@ def read_rule(
     generic: bool = False,
     enactments: Optional[Union[Dict, Iterable[Dict]]] = None,
     enactments_despite: Optional[Union[Dict, Iterable[Dict]]] = None,
-    mentioned: List[Factor] = None,
+    mentioned: Optional[Dict[Union[Factor, Enactment], List[TextQuoteSelector]]] = None,
     regime: Optional[Regime] = None,
     report_mentioned: bool = False,
-) -> Iterator[Tuple[Rule, List[Factor]]]:
+) -> Union[Rule, Tuple[Rule, Dict[Union[Factor, Enactment], List[TextQuoteSelector]]]]:
     r"""
     Make :class:`Rule` from a :class:`dict` of strings and a list of mentioned :class:`.Factor`\s.
 
