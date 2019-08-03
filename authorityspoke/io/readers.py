@@ -26,8 +26,9 @@ from authorityspoke.selectors import TextQuoteSelector
 def read_enactment(
     enactment_dict: Dict[str, str],
     code: Optional[Code] = None,
-    regime: Optional[Regime] = None,
     mentioned=None,
+    regime: Optional[Regime] = None,
+    report_mentioned: bool = False,
     *args,
     **kwargs,
 ) -> Enactment:
@@ -71,17 +72,15 @@ def read_enactment(
         suffix=enactment_dict.get("suffix"),
         source=code,
     )
-
-    return (
-        Enactment(code=code, selector=selector, name=enactment_dict.get("name")),
-        mentioned,
-    )
+    answer = Enactment(code=code, selector=selector, name=enactment_dict.get("name"))
+    return (answer, mentioned) if report_mentioned else answer
 
 
 def read_enactments(
     record_list: Union[Dict[str, str], List[Dict[str, str]]],
     mentioned: List[Union[Factor, Enactment]],
     regime: Optional[Regime] = None,
+    report_mentioned: bool = False,
 ) -> Tuple[List[Enactment], List[Union[Factor, Enactment]]]:
     created_list: List[Enactment] = []
     if record_list is None:
@@ -91,11 +90,13 @@ def read_enactments(
     for record in record_list:
         created, mentioned = read_enactment(record, mentioned=mentioned, regime=regime)
         created_list.append(created)
-    return tuple(created_list), mentioned
+    return (created_list, mentioned) if report_mentioned else created_list
 
 
 def read_fact(
-    factor_record: Dict[str, Union[str, bool]], mentioned: List[Factor]
+    factor_record: Dict[str, Union[str, bool]],
+    mentioned: List[Factor],
+    report_mentioned: bool = False,
 ) -> Fact:
     r"""
     Construct and return a :class:`Fact` object from a :py:class:`dict`.
@@ -183,22 +184,24 @@ def read_fact(
     if name:
         name = name.replace("{", "").replace("}", "")
 
-    return (
-        Fact(
-            predicate,
-            context_factors,
-            name=name,
-            standard_of_proof=factor_record.get("standard_of_proof", None),
-            absent=factor_record.get("absent", False),
-            generic=factor_record.get("generic", False),
-        ),
-        mentioned,
+    answer = Fact(
+        predicate,
+        context_factors,
+        name=name,
+        standard_of_proof=factor_record.get("standard_of_proof", None),
+        absent=factor_record.get("absent", False),
+        generic=factor_record.get("generic", False),
     )
+    return (answer, mentioned) if report_mentioned else answer
 
 
 @references.log_mentioned_context
 def read_factor(
-    factor_record: Dict, mentioned: List[Factor], *args, **kwargs
+    factor_record: Dict,
+    mentioned: List[Factor],
+    report_mentioned: bool = False,
+    *args,
+    **kwargs,
 ) -> Optional[Factor]:
     r"""
     Turn fields from a chunk of JSON into a :class:`Factor` object.
@@ -214,33 +217,42 @@ def read_factor(
     cname = factor_record["type"]
     target_class = Factor.subclass_from_str(cname)
     if target_class == Fact:
-        created_factor, mentioned = read_fact(factor_record, mentioned)
+        created_factor, mentioned = read_fact(
+            factor_record, mentioned, report_mentioned=True
+        )
     else:
         created_factor, mentioned = read_factor_subclass(
-            target_class, factor_record, mentioned
+            target_class, factor_record, mentioned, report_mentioned=True
         )
-    return created_factor, mentioned
+    return (created_factor, mentioned) if report_mentioned else created_factor
 
 
-def read_factor_subclass(cls, factor_record: Dict, mentioned: List[Factor]) -> Factor:
+def read_factor_subclass(
+    cls, factor_record: Dict, mentioned: List[Factor], report_mentioned: bool = False
+) -> Factor:
     prototype = cls()
     new_factor_dict = prototype.__dict__
     for attr in new_factor_dict:
         if attr in prototype.context_factor_names:
             value, mentioned = read_factor(
-                factor_record=factor_record.get(attr), mentioned=mentioned
+                factor_record=factor_record.get(attr),
+                mentioned=mentioned,
+                report_mentioned=True,
             )
         else:
             value = factor_record.get(attr)
         if value is not None:
             new_factor_dict[attr] = value
-    return cls(**new_factor_dict), mentioned
+    if report_mentioned:
+        return cls(**new_factor_dict), mentioned
+    return cls(**new_factor_dict)
 
 
 def read_factors(
     record_list: Union[Dict[str, str], List[Dict[str, str]]],
     mentioned: List[Factor],
     regime: Optional[Regime] = None,
+    report_mentioned: bool = False,
 ) -> Tuple[List[Factor], List[Union[Factor, Enactment]], Dict]:
     created_list: List[Factor] = []
     if record_list is None:
@@ -248,7 +260,9 @@ def read_factors(
     if not isinstance(record_list, list):
         record_list = [record_list]
     for record in record_list:
-        created, mentioned = read_factor(record, mentioned, regime=regime)
+        created, mentioned = read_factor(
+            record, mentioned, regime=regime, report_mentioned=True
+        )
         created_list.append(created)
     return tuple(created_list), mentioned
 
@@ -268,6 +282,7 @@ def read_holding(
     text: Optional[Union[str, Dict, Iterable[Union[str, Dict]]]] = None,
     mentioned: Optional[Dict[Factor, List[TextQuoteSelector]]] = None,
     regime: Optional[Regime] = None,
+    report_mentioned: bool = False,
 ) -> Iterator[Tuple[Holding, List[Factor], Dict[Factor, List[TextQuoteSelector]]]]:
     r"""
     Create new :class:`Holding` object from simple datatypes from JSON input.
@@ -363,10 +378,12 @@ def read_holding(
         enactments_despite=enactments_despite,
         mentioned=mentioned,
         regime=regime,
+        report_mentioned=True,
     )
-    yield Holding(
+    answer = Holding(
         rule=basic_rule, rule_valid=rule_valid, decided=decided, selectors=selectors
-    ), mentioned
+    )
+    yield (answer, mentioned) if report_mentioned else answer
 
     if exclusive:
         if not rule_valid:
@@ -385,14 +402,15 @@ def read_holding(
                 + "without the 'exclusive' keyword."
             )
         for modified_rule in basic_rule.get_contrapositives():
-            yield Holding(rule=modified_rule, selectors=selectors), mentioned
+            answer = Holding(rule=modified_rule, selectors=selectors)
+            yield (answer, mentioned) if report_mentioned else answer
 
 
 def read_holdings(
     holdings: Dict[str, Iterable],  # TODO: remove "mentioned_factors" from JSON format
     regime: Optional[Regime] = None,
     mentioned: Optional[Dict[Factor, List[TextQuoteSelector]]] = None,
-    include_text_links: bool = False,
+    report_mentioned: bool = False,
 ) -> Union[List[Holding], Tuple[List[Holding], Dict[Factor, List[TextQuoteSelector]]]]:
     r"""
     Load a list of :class:`Holdings`\s from JSON, with optional text links.
@@ -412,11 +430,6 @@ def read_holdings(
         linked to lists of :class:`.TextQuoteSelector`\s indicating
         where each :class:`.Factor` can be found in the :class:`.Opinion`\.
 
-    :param include_text_links:
-        Whether to return the ``mentioned`` :class:`.Factor`\s and
-        corresponding text selectors in the return value for
-        this function.
-
     :returns:
         a list of :class:`.Holding` objects, optionally with
         an index matching :class:`.Factor`\s to selectors.
@@ -426,20 +439,21 @@ def read_holdings(
     if holdings.get("mentioned_factors"):
         for factor_dict in holdings["mentioned_factors"]:
             _, mentioned = read_factor(
-                factor_record=factor_dict, mentioned=mentioned, regime=regime
+                factor_record=factor_dict,
+                mentioned=mentioned,
+                regime=regime,
+                report_mentioned=True,
             )
 
     finished_holdings: List[Holding] = []
     for holding_record in holdings["holdings"]:
 
         for generated_holding in read_holding(
-            mentioned=mentioned, regime=regime, **holding_record
+            mentioned=mentioned, regime=regime, report_mentioned=True, **holding_record
         ):
             finished_holding, mentioned = generated_holding
             finished_holdings.append(finished_holding)
-    if include_text_links:
-        return finished_holdings, mentioned
-    return finished_holdings
+    return (finished_holdings, mentioned) if report_mentioned else finished_holdings
 
 
 def read_opinion(
@@ -592,6 +606,7 @@ def read_rule(
     enactments_despite: Optional[Union[Dict, Iterable[Dict]]] = None,
     mentioned: List[Factor] = None,
     regime: Optional[Regime] = None,
+    report_mentioned: bool = False,
 ) -> Iterator[Tuple[Rule, List[Factor]]]:
     r"""
     Make :class:`Rule` from a :class:`dict` of strings and a list of mentioned :class:`.Factor`\s.
@@ -648,7 +663,10 @@ def read_rule(
     factor_groups = []
     for category in factor_dicts:
         category, mentioned = read_factors(
-            record_list=category, mentioned=mentioned, regime=regime
+            record_list=category,
+            mentioned=mentioned,
+            regime=regime,
+            report_mentioned=True,
         )
         factor_groups.append(category)
 
@@ -656,7 +674,10 @@ def read_rule(
     enactment_groups = []
     for category in enactment_dicts:
         category, mentioned = read_enactments(
-            record_list=category, mentioned=mentioned, regime=regime
+            record_list=category,
+            mentioned=mentioned,
+            regime=regime,
+            report_mentioned=True,
         )
         enactment_groups.append(category)
 
@@ -664,14 +685,12 @@ def read_rule(
         outputs=factor_groups[0], inputs=factor_groups[1], despite=factor_groups[2]
     )
 
-    return (
-        Rule(
-            procedure=procedure,
-            enactments=enactment_groups[0],
-            enactments_despite=enactment_groups[1],
-            mandatory=mandatory,
-            universal=universal,
-            generic=generic,
-        ),
-        mentioned,
+    answer = Rule(
+        procedure=procedure,
+        enactments=enactment_groups[0],
+        enactments_despite=enactment_groups[1],
+        mandatory=mandatory,
+        universal=universal,
+        generic=generic,
     )
+    return (answer, mentioned) if report_mentioned else answer

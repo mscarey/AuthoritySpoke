@@ -108,12 +108,12 @@ class TestRuleImport:
     the format in holding_cardenas.json
     """
 
-    def test_import_some_holdings(self, make_opinion_with_holding):
+    def test_import_some_holdings(self, make_regime):
         """
         Don't expect the holdings imported from the JSON to
         exactly match the holdings created for testing in conftest.
         """
-        lotus = make_opinion_with_holding["lotus_majority"]
+        lotus = load_holdings("holding_lotus.json", regime=make_regime)
         assert len(lotus.holdings) == 12
 
     def test_enactment_has_subsection(self, make_opinion_with_holding):

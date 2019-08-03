@@ -27,6 +27,7 @@ def log_mentioned_context(func: Callable):
         mentioned: Optional[Dict[Factor, List[TextQuoteSelector]]] = None,
         code: Optional[Code] = None,
         regime: Optional[Regime] = None,
+        report_mentioned: bool = False,
         *args,
         **kwargs,
     ) -> Tuple[Optional[Factor], Dict[Factor, List[TextQuoteSelector]]]:
@@ -38,13 +39,13 @@ def log_mentioned_context(func: Callable):
                     "No 'mentioned' list exists to search for a Factor "
                     + f"or Enactment by the name '{factor_record}'."
                 )
-            for context_factor in mentioned:
+            for context in mentioned:
                 if (
-                    hasattr(context_factor, "name")
-                    and context_factor.name is not None
-                    and context_factor.name.lower() == factor_record
+                    hasattr(context, "name")
+                    and context.name is not None
+                    and context.name.lower() == factor_record
                 ):
-                    return context_factor, mentioned
+                    return (context, mentioned) if report_mentioned else context
             raise ValueError(
                 "The 'factor_record' parameter should be a dict "
                 + "representing a Factor or a string "
@@ -55,18 +56,22 @@ def log_mentioned_context(func: Callable):
             mentioned = {}
 
         if factor_record is None:
-            return None, mentioned
+            return (None, mentioned) if report_mentioned else None
 
         new_factor, mentioned = func(
-            factor_record, mentioned=mentioned, code=code, regime=regime
+            factor_record,
+            mentioned=mentioned,
+            code=code,
+            regime=regime,
+            report_mentioned=True,
         )
 
         if not factor_record.get("name") and (
             not hasattr(new_factor, "generic") or not new_factor.generic
         ):
-            for context_factor in mentioned:
-                if context_factor == new_factor:
-                    return context_factor, mentioned
+            for context in mentioned:
+                if context == new_factor:
+                    return (context, mentioned) if report_mentioned else context
 
         # TODO: check whether recursive_factors phase can be deleted.
         if hasattr(new_factor, "recursive_factors"):
@@ -81,7 +86,7 @@ def log_mentioned_context(func: Callable):
         if text:
             mentioned[new_factor] = read_selectors(text)
 
-        return new_factor, mentioned
+        return (new_factor, mentioned) if report_mentioned else new_factor
 
     return wrapper
 

@@ -11,8 +11,7 @@ from typing import Dict, List, Iterator, Optional, Tuple, Union
 from authorityspoke.enactments import Code
 from authorityspoke.factors import Factor
 from authorityspoke.holdings import Holding
-from authorityspoke.io import filepaths
-from authorityspoke.io import readers
+from authorityspoke.io import filepaths, readers, references
 from authorityspoke.jurisdictions import Regime
 from authorityspoke.opinions import Opinion
 from authorityspoke.selectors import TextQuoteSelector
@@ -57,7 +56,7 @@ def load_holdings(
     filepath: Optional[pathlib.Path] = None,
     regime: Optional[Regime] = None,
     mentioned: List[Factor] = None,
-    include_text_links: bool = False,
+    report_mentioned: bool = False,
 ) -> Union[List[Holding], Tuple[List[Holding], Dict[Factor, List[TextQuoteSelector]]]]:
     r"""
     Load a list of :class:`.Holding`\s from JSON.
@@ -81,7 +80,7 @@ def load_holdings(
         expect to find in the :class:`.Opinion`\'s holdings,
         but that won't be provided within the JSON, if any.
 
-    :param include_text_links:
+    :param report_mentioned:
 
     :returns:
         a list of :class:`Rule`\s from a JSON file in the
@@ -93,12 +92,10 @@ def load_holdings(
     )
     with open(validated_filepath, "r") as f:
         holdings = json.load(f)
-    return readers.read_holdings(
-        holdings=holdings,
-        regime=regime,
-        mentioned=mentioned,
-        include_text_links=include_text_links,
+    answer = readers.read_holdings(
+        holdings=holdings, regime=regime, mentioned=mentioned, include_text_links=True
     )
+    return (answer, mentioned) if report_mentioned else answer
 
 
 def load_opinion(
