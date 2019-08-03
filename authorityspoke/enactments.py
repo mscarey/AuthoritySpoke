@@ -561,8 +561,8 @@ def consolidate_enactments(enactments: List[Enactment]) -> List[Enactment]:
         left = enactments.pop()
         for right in enactments:
             if left + right is not None:
-                enactments.remove(right)
-                enactments.append(left + right)
+                enactments.remove(right)  # TODO: not efficient
+                enactments.append(left + right)  # TODO: calculation repeated
                 match_made = True
                 break
         if match_made is False:

@@ -443,13 +443,11 @@ class Rule(Factor):
         if new_procedure is None:
             return None
 
-        enactments = (
-            consolidate_enactments(list(self.enactments) + list(other.enactments)),
+        enactments = consolidate_enactments(
+            list(self.enactments) + list(other.enactments)
         )
-        enactments_despite = (
-            consolidate_enactments(
-                list(self.enactments_despite) + list(other.enactments_despite)
-            ),
+        enactments_despite = consolidate_enactments(
+            list(self.enactments_despite) + list(other.enactments_despite)
         )
 
         if self.procedure.implies_all_to_all(
