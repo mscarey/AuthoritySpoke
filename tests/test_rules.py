@@ -670,9 +670,23 @@ class TestUnion:
         new_rule = lotus_not_copyrightable | lotus_not_copyrightable
         assert len(new_rule.outputs) == 1
 
-    def test_union_implied_but_not_universal(self, make_rule):
+    def test_union_implied_but_not_universal_easy(self, make_rule):
+        """
+        Tests that when you take the union of Rule A with another Rule
+        that only differs in that its input Factors are a subset of Rule A's,
+        the answer is Rule A.
+        """
         assert (make_rule["h1"] | make_rule["h1_easy"]).means(make_rule["h1"])
-        assert (make_rule["h2_irrelevant_inputs"] | make_rule["h2"]).means(make_rule["h2_irrelevant_inputs"])
+
+    def test_union_implied_but_not_universal(self, make_rule):
+        """
+        This is similar to the test above, except that the first Rule
+        also has some generic context Factors that the second
+        Rule doesn't.
+        """
+        a = make_rule["h2_irrelevant_inputs"]
+        b = make_rule["h2"]
+        assert (a | b).means(a)
 
     def test_union_implied_change_entities(self, make_rule):
         original_on_left = make_rule["h1_easy"] | make_rule["h1_entity_order"]

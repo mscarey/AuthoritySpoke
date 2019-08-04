@@ -438,8 +438,7 @@ class Rule(Factor):
         if not isinstance(other, Rule):
             raise TypeError
 
-        recontexualized_procedure = other.procedure.new_context(self.generic_factors)
-        new_procedure = self.procedure | recontexualized_procedure
+        new_procedure = self.procedure | other.procedure
         if new_procedure is None:
             return None
 
@@ -457,8 +456,8 @@ class Rule(Factor):
                 procedure=new_procedure,
                 enactments=enactments,
                 enactments_despite=enactments_despite,
-                mandatory=min(self.mandatory, other.mandatory),
-                universal=min(self.universal, other.universal),
+                mandatory=max(self.mandatory, other.mandatory),
+                universal=max(self.universal, other.universal),
             )
 
         if self.universal == other.universal == False:
