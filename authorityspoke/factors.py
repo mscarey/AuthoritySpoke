@@ -944,7 +944,7 @@ class Exhibit(Factor):
             return False
         return super()._means_if_concrete(other)
 
-    def _implies_if_concrete(self, other: Exhibit):
+    def _implies_if_concrete(self, other: Factor):
         if not isinstance(other, self.__class__):
             return False
         if not (self.form == other.form or other.form is None):

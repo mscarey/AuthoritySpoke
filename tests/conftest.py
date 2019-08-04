@@ -198,7 +198,6 @@ def watt_mentioned(make_entity) -> Tuple[Entity, ...]:
 @pytest.fixture(scope="class")
 def watt_factor(make_predicate, make_entity, watt_mentioned) -> Dict[str, Factor]:
     p = make_predicate
-    e = make_entity
 
     c = watt_mentioned
 
@@ -513,8 +512,11 @@ def make_evidence(
 @pytest.fixture(scope="module")
 def make_selector(make_code) -> Dict[str, TextQuoteSelector]:
     return {"/us/usc/t17/s103": TextQuoteSelector(
-            path = "/us/usc/t17/s103",
-            exact = "protection for a work employing preexisting material in which copyright subsists does not extend to any part of the work in which such material has been used unlawfully."
+            path="/us/usc/t17/s103",
+            exact=(
+                "protection for a work employing preexisting material in which "
+                + "copyright subsists does not extend to any part of the work in "
+                + "which such material has been used unlawfully.")
     ),
     "copyright": TextQuoteSelector(
             path="/us/usc/t17/s102/b", suffix="idea, procedure,", source=make_code["usc17"]
@@ -1000,7 +1002,8 @@ def make_holding(make_rule) -> Dict[str, Holding]:
     "h2_MUST_undecided": Holding(rule=make_rule["h2_MUST"], decided=False),
     "h2_MUST_invalid": Holding(rule=make_rule["h2_MUST"], rule_valid=False),
     "h2_invalid": Holding(rule=make_rule["h2"], rule_valid=False),
-    "h2_ALL_invalid": Holding(rule=make_rule["h2_ALL"], rule_valid=False,
+    "h2_ALL_invalid": Holding(
+        rule=make_rule["h2_ALL"], rule_valid=False,
     ),
     "h2_irrelevant_inputs_undecided": Holding(rule=make_rule["h2_irrelevant_inputs"], decided=False),
     "h2_irrelevant_inputs_invalid": Holding(

@@ -116,7 +116,7 @@ def read_fact(
         a list of :class:`.Factor`\s that may be included by reference to their ``name``\s.
 
     :returns:
-        a :class:`Fact`.
+        a :class:`Fact`, with optional mentioned factors
     """
 
     placeholder = "{}"  # to be replaced in the Fact's string method

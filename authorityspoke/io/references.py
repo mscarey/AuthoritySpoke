@@ -8,6 +8,52 @@ from authorityspoke.jurisdictions import Regime
 from authorityspoke.selectors import TextQuoteSelector
 
 
+def _find_or_build_factor(
+    factor_record: Dict[str, Union[str, bool]],
+    mentioned: Dict[Factor, List[TextQuoteSelector]],
+    func: Callable,
+    code: Optional[Code] = None,
+    regime: Optional[Regime] = None,
+) -> Tuple[Optional[Factor], Dict[Factor, List[TextQuoteSelector]]]:
+    """
+    Retrieve cached :class:`.Factor` if possible, or else build one.
+
+    Should be called by log_mentioned_context, which should
+    have already normalized the parameter types,
+    so this function can have simpler type annotations.
+    """
+
+    new_factor, mentioned = func(
+        factor_record,
+        mentioned=mentioned,
+        code=code,
+        regime=regime,
+        report_mentioned=True,
+    )
+
+    mentioned = mentioned or {}
+
+    if not factor_record.get("name") and (
+        not hasattr(new_factor, "generic") or not new_factor.generic
+    ):
+        for context in mentioned:
+            if context == new_factor:
+                return context, mentioned
+
+    if hasattr(new_factor, "recursive_factors"):
+        factors_to_add = new_factor.recursive_factors
+    else:
+        factors_to_add = [new_factor]
+    for recursive_factor in factors_to_add:
+        if recursive_factor not in mentioned:
+            mentioned[recursive_factor] = []
+
+    text = factor_record.pop("text", None)
+    if text:
+        mentioned[new_factor] = read_selectors(text)
+    return new_factor, mentioned
+
+
 def log_mentioned_context(func: Callable):
     """
     Retrieve cached :class:`.Factor` instead of building one with the decorated method.
@@ -28,9 +74,9 @@ def log_mentioned_context(func: Callable):
         code: Optional[Code] = None,
         regime: Optional[Regime] = None,
         report_mentioned: bool = False,
-        *args,
-        **kwargs,
-    ) -> Tuple[Optional[Factor], Dict[Factor, List[TextQuoteSelector]]]:
+    ) -> Union[
+        Factor, None, Tuple[Optional[Factor], Dict[Factor, List[TextQuoteSelector]]]
+    ]:
 
         if isinstance(factor_record, str):
             factor_record = factor_record.lower()
@@ -56,35 +102,15 @@ def log_mentioned_context(func: Callable):
             mentioned = {}
 
         if factor_record is None:
-            return (None, mentioned) if report_mentioned else None
+            return None, mentioned
 
-        new_factor, mentioned = func(
-            factor_record,
+        new_factor, mentioned = _find_or_build_factor(
+            factor_record=factor_record,
             mentioned=mentioned,
+            func=func,
             code=code,
             regime=regime,
-            report_mentioned=True,
         )
-
-        if not factor_record.get("name") and (
-            not hasattr(new_factor, "generic") or not new_factor.generic
-        ):
-            for context in mentioned:
-                if context == new_factor:
-                    return (context, mentioned) if report_mentioned else context
-
-        # TODO: check whether recursive_factors phase can be deleted.
-        if hasattr(new_factor, "recursive_factors"):
-            factors_to_add = new_factor.recursive_factors
-        else:
-            factors_to_add = [new_factor]
-        for recursive_factor in factors_to_add:
-            if recursive_factor not in mentioned:
-                mentioned[recursive_factor] = []
-
-        text = factor_record.pop("text", None)
-        if text:
-            mentioned[new_factor] = read_selectors(text)
 
         return (new_factor, mentioned) if report_mentioned else new_factor
 
@@ -119,7 +145,7 @@ def read_selector(text: Union[dict, str]) -> TextQuoteSelector:
 
 
 def read_selectors(
-    records: Optional[Union[str, Dict, Iterable[Union[str, Dict]]]]
+    records: Optional[Union[str, Dict[str, str], Iterable[Union[str, Dict[str, str]]]]]
 ) -> List[TextQuoteSelector]:
     r"""
     Create list of :class:`.TextQuoteSelector`\s from JSON user input.

@@ -10,8 +10,8 @@ should be considered undecided.
 
 from __future__ import annotations
 
-from typing import Any, ClassVar, Dict, Iterable, List, Tuple
-from typing import Iterator, Optional, Union
+from typing import Any, Dict, Iterable, List, Tuple
+from typing import Optional, Union
 
 from dataclasses import dataclass
 
@@ -70,8 +70,7 @@ class Holding(Factor):
     enactments_despite: Optional[Union[Enactment, Iterable[Enactment]]] = None
     mandatory: bool = False
     universal: bool = False
-
-    generic: ClassVar = False
+    generic: bool = False
 
     def __post_init__(self):
         if self.rule is None:
