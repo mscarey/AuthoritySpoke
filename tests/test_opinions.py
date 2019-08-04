@@ -20,6 +20,16 @@ class TestOpinions:
         assert make_opinion["watt_majority"].court == "9th-cir"
         assert "388 F.2d 853" in make_opinion["watt_majority"].citations
 
+    def test_repr(self, make_opinion):
+        assert "HAMLEY, Circuit Judge" in repr(make_opinion["watt_majority"])
+
+    def test_repr_excludes_text(self, make_opinion):
+        """
+        reprs would be way too long if they could contain the
+        full opinion text.
+        """
+        assert "text" not in repr(make_opinion["watt_majority"])
+
     def test_opinion_author(self, make_opinion):
         assert make_opinion["watt_majority"].author == "HAMLEY, Circuit Judge"
         assert make_opinion["brad_majority"].author == "BURKE, J."

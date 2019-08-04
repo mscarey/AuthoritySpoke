@@ -13,7 +13,7 @@ import datetime
 import logging
 import re
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from authorityspoke.factors import Factor
 from authorityspoke.holdings import Holding
@@ -62,7 +62,7 @@ class Opinion:
     court: str
     position: Optional[str]
     author: Optional[str]
-    text: Optional[str]
+    text: Optional[str] = field(repr=False)
 
     def __post_init__(self):
         self.holdings: List[Holding] = []
@@ -312,3 +312,15 @@ class Opinion:
             f'Passage "{selector.exact}" from TextQuoteSelector '
             + f'not found in Opinion "{self}".'
         )
+
+    def __str__(self):
+        if isinstance(self.citations, str):
+            citation = self.citations
+        else:
+            citation = self.citations[0]
+        name = self.name_abbreviation or self.name
+        if self.position == "majority":
+            position = ""
+        else:
+            position = self.position + " "
+        return f"<{position}Opinion> {name}, {citation} ({self.decision_date})"
