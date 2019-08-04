@@ -4,10 +4,10 @@ import os
 import pytest
 
 from authorityspoke.io.downloads import download_case
-from authorityspoke.io.readers import read_opinion
+from authorityspoke.io.readers import read_case, read_opinions
 from authorityspoke.io.loaders import load_opinion
 
-pytestmark = pytest.mark.skip("don't want to call API")
+# pytestmark = pytest.mark.skip("don't want to call API")
 
 
 class TestDownload:
@@ -32,7 +32,7 @@ class TestDownload:
             cite="49 F.3d 807", always_list=True, save_to_file=False
         )
         lotus = opinion_list[0]
-        lotus_opinion = opinion_from_case(**lotus)
+        lotus_opinion = read_case(lotus)
         assert lotus_opinion.__class__.__name__ == "Opinion"
 
     def test_download_save_and_make_opinion(self, tmp_path):
@@ -41,7 +41,7 @@ class TestDownload:
             cite="49 F.3d 807", filename=to_file, directory=tmp_path, save_to_file=True
         )
         filepath = tmp_path / to_file
-        lotus_opinion = json_opinion(filepath=filepath)
+        lotus_opinion = load_opinion(filepath=filepath)
         assert lotus_opinion.__class__.__name__ == "Opinion"
         assert "Lotus" in lotus_opinion.name_abbreviation
 

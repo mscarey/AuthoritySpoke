@@ -136,6 +136,6 @@ def load_opinion(
     with open(validated_filepath, "r") as f:
         decision_dict = json.load(f)
 
-    return readers.read_opinion(
+    return readers.read_opinions(
         lead_only=lead_only, as_generator=as_generator, **decision_dict
     )

@@ -8,7 +8,7 @@ after they import some data from a file.
 import datetime
 from functools import partial
 
-from typing import Dict, List, Iterable, Iterator, Optional, Tuple, Union
+from typing import Any, Dict, List, Iterable, Iterator, Optional, Tuple, Union
 
 from authorityspoke.io import references
 from authorityspoke.enactments import Code, Enactment
@@ -29,7 +29,6 @@ def read_enactment(
     mentioned: Optional[Dict[Union[Factor, Enactment], List[TextQuoteSelector]]] = None,
     regime: Optional[Regime] = None,
     report_mentioned: bool = False,
-    *args,
     **kwargs,
 ) -> Union[
     Enactment, Tuple[Enactment, Dict[Union[Factor, Enactment], List[TextQuoteSelector]]]
@@ -486,7 +485,39 @@ def read_holdings(
     return (finished_holdings, mentioned) if report_mentioned else finished_holdings
 
 
-def read_opinion(
+def read_case(
+    decision_dict: Dict[str, Any],
+    lead_only: bool = True,
+    as_generator: bool = False
+) -> Union[Opinion, Iterator[Opinion], List[Opinion]]:
+    r"""
+    Create and return one or more :class:`.Opinion` objects from a dict API response.
+
+    Relies on the JSON format from the `Caselaw Access Project
+    API <https://api.case.law/v1/cases/>`_.
+
+    This function is a more convenient way to call read_opinions with an entire
+    case from the CAP API as a single parameter.
+
+    :param decision_dict:
+        A dict created from a Caselaw Access Project API response.
+
+    :param lead_only:
+        If True, returns a single :class:`.Opinion` object,
+        otherwise returns an iterator that yields every
+        :class:`.Opinion` in the case.
+
+    :param as_generator:
+        if True, returns a generator that
+        yields all opinions meeting the query.
+    """
+
+    return read_opinions(
+        lead_only=lead_only, as_generator=as_generator, **decision_dict
+    )
+
+
+def read_opinions(
     citations: List[Dict[str, str]],
     decision_date: str,
     court: Dict[str, Union[str, int]],
