@@ -212,7 +212,6 @@ def read_factor(
     factor_record: Dict,
     mentioned: Optional[Dict[Union[Factor, Enactment], List[TextQuoteSelector]]] = None,
     report_mentioned: bool = False,
-    *args,
     **kwargs,
 ) -> Union[
     Optional[Factor],

@@ -370,7 +370,6 @@ def make_exhibit(
 ) -> Dict[str, Exhibit]:
     e = make_entity
     f = make_factor
-    p = make_predicate
     w = watt_factor
     c = make_complex_fact
 

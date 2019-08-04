@@ -86,10 +86,10 @@ def log_mentioned_context(func: Callable):
             regime=regime,
             report_mentioned=True,
         )
-
+        mentioned = mentioned or {}
         if not factor_record.get("name"):
             new_factor = _replace_new_factor_from_mentioned(
-                new_factor=new_factor, mentioned=mentioned or {}
+                new_factor=new_factor, mentioned=mentioned
             )
         if new_factor not in mentioned:
             mentioned[new_factor] = []

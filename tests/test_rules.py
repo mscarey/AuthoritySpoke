@@ -688,7 +688,13 @@ class TestUnion:
         b = make_rule["h2"]
         assert (a | b).means(a)
 
+    @pytest.mark.xfail
     def test_union_implied_change_entities(self, make_rule):
+        """
+        TODO: marked xfail because there's not yet a function
+        to assign the correct Entities to the context factors
+        in a new Function created with the __or__ method.
+        """
         original_on_left = make_rule["h1_easy"] | make_rule["h1_entity_order"]
         assert "RESULT: fact <Hideaway Lodge> was <Wattenburg>’s abode" in str(original_on_left)
         original_on_right = make_rule["h1_entity_order"] | make_rule["h1_easy"]

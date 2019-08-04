@@ -9,8 +9,7 @@ from __future__ import annotations
 
 import operator
 
-from typing import ClassVar, Dict, Iterable, List, Sequence, Tuple
-from typing import Optional, Union
+from typing import ClassVar, Dict, Iterable, List, Optional, Tuple
 
 from dataclasses import dataclass
 
@@ -189,7 +188,7 @@ class Procedure(Factor):
         return [*self.outputs, *inputs, *despite]
 
     @property
-    def generic_factors(self) -> List[Optional[Factor]]:
+    def generic_factors(self) -> List[Factor]:
         r"""
         :class:`.Factor`\s that can be replaced without changing ``self``\s meaning.
 
@@ -456,7 +455,8 @@ class Procedure(Factor):
             implies that the :class:`.Procedure` ``other`` applies
             in some cases.
         """
-
+        if not isinstance(other, self.__class__):
+            return False
         despite_or_input = (*self.despite, *self.inputs)
 
         relations = (
