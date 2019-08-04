@@ -2,56 +2,64 @@ import functools
 
 from typing import Callable, Dict, Iterable, List, Optional, Tuple, Union
 
-from authorityspoke.enactments import Code, Enactment
+from authorityspoke.enactments import Code
 from authorityspoke.factors import Factor
 from authorityspoke.jurisdictions import Regime
 from authorityspoke.selectors import TextQuoteSelector
 
 
-def _find_or_build_factor(
-    factor_record: Dict[str, Union[str, bool]],
-    mentioned: Dict[Factor, List[TextQuoteSelector]],
-    func: Callable,
-    code: Optional[Code] = None,
-    regime: Optional[Regime] = None,
-) -> Tuple[Optional[Factor], Dict[Factor, List[TextQuoteSelector]]]:
+def _replace_new_factor_from_mentioned(
+    new_factor: Factor, mentioned: Dict[Factor, List[TextQuoteSelector]]
+) -> Factor:
     """
-    Retrieve cached :class:`.Factor` if possible, or else build one.
+    Check if ``new_factor`` can be replaced by an element of ``mentioned``.
 
-    Should be called by log_mentioned_context, which should
-    have already normalized the parameter types,
-    so this function can have simpler type annotations.
+    :param new_factor:
+        May be identical to an element of ``mentioned``.
+
+    :param mentioned:
+        Contains :class:`.Factors` that have already been created.
+
+    :returns:
+        An element of mentioned identical to ``new_factor``, or else
+        ``new_factor`` itself.
     """
 
-    new_factor, mentioned = func(
-        factor_record,
-        mentioned=mentioned,
-        code=code,
-        regime=regime,
-        report_mentioned=True,
-    )
-
-    mentioned = mentioned or {}
-
-    if not factor_record.get("name") and (
-        not hasattr(new_factor, "generic") or not new_factor.generic
-    ):
+    if not hasattr(new_factor, "generic") or not new_factor.generic:
         for context in mentioned:
             if context == new_factor:
-                return context, mentioned
+                return context
+    return new_factor
 
+
+def _update_mentioned_from_new_factor(
+    new_factor: Factor, mentioned: Dict[Factor, List[TextQuoteSelector]]
+) -> Dict[Factor, List[TextQuoteSelector]]:
+    """
+    Add a new :class:`.Factor`\s ``recursive_factors`` to ``mentioned``.
+
+    Can this be made obsolete by having the recursive_factors each
+    added to ``mentioned`` as they`re created, so the search through
+    a new_factor's recursive_factors would never uncover anything that
+    hasn't been logged?
+
+    :param new_factor:
+        May be identical to an element of ``mentioned``.
+
+    :param mentioned:
+        Contains :class:`.Factors` that have already been created.
+
+    :returns:
+        A version of ``mentioned`` that may have new elements added.
+    """
     if hasattr(new_factor, "recursive_factors"):
-        factors_to_add = new_factor.recursive_factors
+        factors_to_add = list(new_factor.recursive_factors)
     else:
         factors_to_add = [new_factor]
     for recursive_factor in factors_to_add:
         if recursive_factor not in mentioned:
             mentioned[recursive_factor] = []
-
-    text = factor_record.pop("text", None)
-    if text:
-        mentioned[new_factor] = read_selectors(text)
-    return new_factor, mentioned
+    return mentioned
 
 
 def log_mentioned_context(func: Callable):
@@ -98,20 +106,25 @@ def log_mentioned_context(func: Callable):
                 + "representing the name of a Factor included in 'mentioned'."
             )
 
-        if mentioned is None:
-            mentioned = {}
-
         if factor_record is None:
-            return None, mentioned
+            return None, mentioned or {}
 
-        new_factor, mentioned = _find_or_build_factor(
-            factor_record=factor_record,
-            mentioned=mentioned,
-            func=func,
+        new_factor, mentioned = func(
+            factor_record,
+            mentioned=mentioned or {},
             code=code,
             regime=regime,
+            report_mentioned=True,
         )
 
+        if not factor_record.get("name"):
+            new_factor = _replace_new_factor_from_mentioned(
+                new_factor=new_factor, mentioned=mentioned or {}
+            )
+        mentioned = _update_mentioned_from_new_factor(new_factor, mentioned or {})
+        text = factor_record.get("text")
+        if text:
+            mentioned[new_factor] = read_selectors(text)
         return (new_factor, mentioned) if report_mentioned else new_factor
 
     return wrapper
