@@ -32,36 +32,6 @@ def _replace_new_factor_from_mentioned(
     return new_factor
 
 
-def _update_mentioned_from_new_factor(
-    new_factor: Factor, mentioned: Dict[Factor, List[TextQuoteSelector]]
-) -> Dict[Factor, List[TextQuoteSelector]]:
-    """
-    Add a new :class:`.Factor`\s ``recursive_factors`` to ``mentioned``.
-
-    Can this be made obsolete by having the recursive_factors each
-    added to ``mentioned`` as they`re created, so the search through
-    a new_factor's recursive_factors would never uncover anything that
-    hasn't been logged?
-
-    :param new_factor:
-        May be identical to an element of ``mentioned``.
-
-    :param mentioned:
-        Contains :class:`.Factors` that have already been created.
-
-    :returns:
-        A version of ``mentioned`` that may have new elements added.
-    """
-    if hasattr(new_factor, "recursive_factors"):
-        factors_to_add = list(new_factor.recursive_factors)
-    else:
-        factors_to_add = [new_factor]
-    for recursive_factor in factors_to_add:
-        if recursive_factor not in mentioned:
-            mentioned[recursive_factor] = []
-    return mentioned
-
-
 def log_mentioned_context(func: Callable):
     """
     Retrieve cached :class:`.Factor` instead of building one with the decorated method.
@@ -121,10 +91,10 @@ def log_mentioned_context(func: Callable):
             new_factor = _replace_new_factor_from_mentioned(
                 new_factor=new_factor, mentioned=mentioned or {}
             )
-        mentioned = _update_mentioned_from_new_factor(new_factor, mentioned or {})
-        text = factor_record.get("text")
-        if text:
-            mentioned[new_factor] = read_selectors(text)
+        if new_factor not in mentioned:
+            mentioned[new_factor] = []
+        if factor_record.get("text"):
+            mentioned[new_factor] = read_selectors(factor_record.get("text"))
         return (new_factor, mentioned) if report_mentioned else new_factor
 
     return wrapper
