@@ -88,7 +88,11 @@
                     "text": "concepts of merger and |scenes a faire|"
                 }
             ],
-            "outputs": "the Java API was copyrightable",
+            "outputs": {
+                "type": "fact",
+                "content": "the Java API was copyrightable",
+                "text": "questions regarding originality are considered questions of |copyrightability|"
+            },
             "mandatory": true,
             "enactments": "copyright protection provision",
             "enactments_despite": {
