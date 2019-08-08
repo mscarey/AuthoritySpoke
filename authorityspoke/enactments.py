@@ -7,7 +7,7 @@ import functools
 import pathlib
 import re
 from typing import List, Optional, Tuple, Union
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from bs4 import BeautifulSoup
 
@@ -381,7 +381,7 @@ class Enactment:
     """
 
     selector: TextQuoteSelector
-    code: Optional[Code] = None
+    code: Optional[Code] = field(repr=False, default=None)
     regime: Optional[Regime] = None
     name: Optional[str] = None
 
