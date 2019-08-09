@@ -9,8 +9,6 @@
     :members:
     :special-members:
 
-.. autofunction:: authorityspoke.context.get_directory_path
-
 ``Enactments``
 ==============
 

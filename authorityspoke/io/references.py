@@ -1,3 +1,5 @@
+r"""Resolving references in imported data to :class:`.Factor`\s and text passages."""
+
 import functools
 
 from typing import Callable, Dict, Iterable, List, Optional, Tuple, Union

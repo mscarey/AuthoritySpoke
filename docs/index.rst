@@ -30,7 +30,23 @@ API Reference
     api/predicates
     api/legislation
     api/context
+    api/analogies
     api/selectors
+
+I/O
+-------------
+
+.. toctree::
+    :maxdepth: 2
+
+    io/downloads
+    io/loaders
+    io/readers
+    io/writers
+    io/filepaths
+    io/references
+
+
 
 Development Updates
 -------------------
