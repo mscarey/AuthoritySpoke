@@ -19,6 +19,9 @@ for examples and to try out AuthoritySpoke in a Jupyter Notebook.
 API Reference
 -------------
 
+Core
+====
+
 .. toctree::
     :maxdepth: 3
 
@@ -34,7 +37,7 @@ API Reference
     api/selectors
 
 I/O
--------------
+===
 
 .. toctree::
     :maxdepth: 2

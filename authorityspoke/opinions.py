@@ -117,7 +117,7 @@ class Opinion:
         :param text_links:
             mapping of :class:`Factor`\s to the :class:`Opinion` passages where
             they can be found. Can be obtained as the "mentioned" return value
-            of one of the functions in :module:`authorityspoke.io.readers`\.
+            of one of the functions in :mod:`authorityspoke.io.readers`\.
 
         :param context:
             an ordered sequence (probably :py:class:`dict`) of
@@ -193,7 +193,7 @@ class Opinion:
         :param text_links:
             mapping of :class:`Factor`\s to the :class:`Opinion` passages where
             they can be found. Can be obtained as the "mentioned" return value
-            of one of the functions in :module:`authorityspoke.io.readers`\.
+            of one of the functions in :mod:`authorityspoke.io.readers`\.
 
         :param context:
             an ordered sequence (probably :py:class:`dict`) of
