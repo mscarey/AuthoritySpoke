@@ -103,6 +103,7 @@ class Opinion:
         self,
         holdings: Sequence[Holding],
         text_links: Optional[Dict[Factor, List[TextQuoteSelector]]] = None,
+        context: Optional[Sequence[Factor]] = None,
     ):
         r"""
         :meth:`~Opinion.posit` :class:`.Rule` objects and link :class:`Factor`\s to text.
@@ -111,19 +112,22 @@ class Opinion:
         to ``self.holdings``.
 
         :param holdings:
-            :class:`Holding`\s to :meth:`~Opinion.posit`
+            :class:`Holding`\s to :meth:`~Opinion.posit`.
 
         :param text_links:
             mapping of :class:`Factor`\s to the :class:`Opinion` passages where
-            they can be found
+            they can be found. Can be obtained as the "mentioned" return value
+            of one of the functions in :module:`authorityspoke.io.readers`\.
+
+        :param context:
+            an ordered sequence (probably :py:class:`dict`) of
+            generic :class:`.Factor` objects from ``self`` which
+            will provide the context for the new holding in the
+            present case.
         """
 
         for holding in holdings:
-            self.posit(holding)
-        if text_links:
-            for factor in text_links:
-                if self.factors.get(factor) is None:
-                    self.factors[factor] = text_links[factor]
+            self.posit(holding=holding, text_links=text_links, context=context)
         return self
 
     @property
@@ -168,9 +172,10 @@ class Opinion:
     def posit(
         self,
         holding: Union[Holding, Iterable[Holding]],
+        text_links: Optional[Dict[Factor, List[TextQuoteSelector]]] = None,
         context: Optional[Sequence[Factor]] = None,
     ) -> None:
-        """
+        r"""
         Add a :class:`.Holding` as a holding of this ``Opinion``.
 
         Adds ``holding`` (or every :class:`.Holding` in ``holding``, if ``holding``
@@ -185,6 +190,11 @@ class Opinion:
             case, and regardless of whether the court orders that
             the ``outputs`` of the :class:`.Holding` be put into effect.
 
+        :param text_links:
+            mapping of :class:`Factor`\s to the :class:`Opinion` passages where
+            they can be found. Can be obtained as the "mentioned" return value
+            of one of the functions in :module:`authorityspoke.io.readers`\.
+
         :param context:
             an ordered sequence (probably :py:class:`dict`) of
             generic :class:`.Factor` objects from ``self`` which
@@ -195,6 +205,7 @@ class Opinion:
         def posit_one_holding(
             holding: Union[Holding, Iterable[Holding]],
             context: Optional[Sequence[Factor]] = None,
+            text_links=None,
         ) -> None:
             if not isinstance(holding, Holding):
                 raise TypeError('"holding" must be an object of type Holding.')
@@ -215,15 +226,26 @@ class Opinion:
                 holding = holding.new_context(context)
             self.holdings.append(holding)
 
+            if text_links:
+                for factor in holding.recursive_factors:
+                    for selector in text_links.get(factor, []):
+                        if factor not in self.factors:
+                            self.factors[factor] = []  # repeated elsewhere?
+                        if not any(
+                            selector == known_selector
+                            for known_selector in self.factors[factor]
+                        ):
+                            self.factors[factor].append(selector)
+
         # These lines repeat lines in new_context_helper
         if isinstance(context, Factor) or isinstance(context, str):
             context = context._wrap_with_tuple(context)
 
         if isinstance(holding, Iterable):
             for item in holding:
-                posit_one_holding(item, context)
+                posit_one_holding(item, context, text_links)
         else:
-            posit_one_holding(holding, context)
+            posit_one_holding(holding, context, text_links)
 
     def get_anchors(self, holding: Holding, include_factors: bool = True) -> List[str]:
         r"""

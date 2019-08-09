@@ -465,8 +465,11 @@ def read_holdings(
     """
     # populates mentioned with context factors that don't
     # appear in inputs, outputs, or despite
-    if holdings.get("mentioned_factors"):
-        for factor_dict in holdings["mentioned_factors"]:
+    mentioned_factors = holdings.get("mentioned_factors")
+    if mentioned_factors:
+        if isinstance(mentioned_factors, dict):
+            mentioned_factors = [mentioned_factors]
+        for factor_dict in mentioned_factors:
             _, mentioned = read_factor(
                 factor_record=factor_dict,
                 mentioned=mentioned,

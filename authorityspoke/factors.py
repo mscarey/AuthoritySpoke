@@ -599,10 +599,6 @@ class Fact(Factor):
             any court considers the order context-specific, then this
             approach of hard-coding their names and order will have to change.
     """
-    # TODO: use dicts for named context_factors
-    # and tuples for ordered context_factors like Fact has.
-    # Then Procedure would have a dict with tuples as values?
-    # Actually, why bother?
     predicate: Predicate
     context_factors: Sequence[Factor] = ()
     name: Optional[str] = None

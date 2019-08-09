@@ -1,5 +1,7 @@
 import pytest
 
+from authorityspoke.io import readers
+
 
 class TestSameMeaning:
     def test_identical_holdings_equal(self, make_holding):
@@ -184,3 +186,21 @@ class TestContradiction:
     def test_error_contradiction_with_procedure(self, make_holding, make_procedure):
         with pytest.raises(TypeError):
             make_holding["h2_undecided"].contradicts(make_procedure["c2"])
+
+
+class TestHoldingImports:
+    def test_make_selector_for_opinion_text(self, make_analysis):
+        holdings, mentioned = readers.read_holdings(
+            make_analysis["minimal"], report_mentioned=True
+        )
+        fact = holdings[0].outputs[0]
+        assert mentioned[fact][0].exact == "open fields or grounds"
+
+    def test_posit_holding_with_selector(self, make_analysis, make_opinion):
+        holdings, mentioned = readers.read_holdings(
+            make_analysis["minimal"], report_mentioned=True
+        )
+        brad = make_opinion["brad_majority"]
+        brad.posit(holdings[0], text_links=mentioned)
+        fact = holdings[0].outputs[0]
+        assert brad.factors[fact][0].exact == "open fields or grounds"

@@ -1,4 +1,4 @@
-from typing import Dict, Tuple
+from typing import Any, Dict, Tuple
 
 import pytest
 
@@ -1056,3 +1056,21 @@ def make_opinion_with_holding(make_opinion, make_regime) -> Dict[str, Opinion]:
             opinions[f"{case}_{opinion.position}"] = opinion
         opinions[f"{case}_majority"].exposit(*loaders.load_holdings(f"holding_{case}.json", regime=make_regime, report_mentioned=True))
     return opinions
+
+@pytest.fixture(scope="class")
+def make_analysis() -> Dict[str, Dict["str", Any]]:
+    """Example user analysis data."""
+    analysis = {}
+    analysis["minimal"] = {
+        "mentioned_factors": {"type": "entity", "name": "Bradley"},
+        "holdings": [
+            {
+                "outputs": {
+                    "type": "fact",
+                    "content": "Bradley made a minimal holding object.",
+                    "text": "upholding searches in |open fields or grounds|around a house",
+                }
+            }
+        ],
+    }
+    return analysis

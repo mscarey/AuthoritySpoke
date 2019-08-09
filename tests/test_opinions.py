@@ -77,11 +77,11 @@ class TestOpinions:
         h = real_holding
         e = make_entity
 
-        watt.posit(h["h1"], (e["motel"], e["watt"]))
-        watt.posit(h["h2"], (e["trees"], e["motel"]))
+        watt.posit(h["h1"], context=(e["motel"], e["watt"]))
+        watt.posit(h["h2"], context=(e["trees"], e["motel"]))
         watt.posit(
             h["h3"],
-            (
+            context=(
                 make_evidence["generic"],
                 e["motel"],
                 e["watt"],
@@ -89,7 +89,9 @@ class TestOpinions:
                 e["tree_search"],
             ),
         )
-        watt.posit(h["h4"], (e["trees"], e["tree_search"], e["motel"], e["watt"]))
+        watt.posit(
+            h["h4"], context=(e["trees"], e["tree_search"], e["motel"], e["watt"])
+        )
         assert make_entity["watt"] in make_opinion["watt_majority"].generic_factors
 
     def test_opinion_date(self, make_opinion):
@@ -171,7 +173,7 @@ class TestOpinions:
             "Hideaway Lodge",
             "the stockpile of trees",
         ]
-        watt.posit(brad.holdings[0], context_items)
+        watt.posit(brad.holdings[0], context=context_items)
         assert watt.holdings[-1].means(brad.holdings[0])
 
 
