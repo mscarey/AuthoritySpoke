@@ -5,6 +5,7 @@ These functions will usually be called by functions from the io.loaders module
 after they import some data from a file.
 """
 
+from collections import defaultdict
 import datetime
 from functools import partial
 
@@ -33,25 +34,35 @@ def read_enactment(
     report_mentioned: bool = False,
     **kwargs,
 ) -> Union[Enactment, Tuple[Enactment, TextLinkDict]]:
-    """
+    r"""
     Create a new :class:`Enactment` object using imported JSON data.
 
     The new :class:`Enactment` can be composed from a :class:`.Code`
     referenced in the ``regime`` parameter.
 
     :param enactment_dict:
+        :class:`dict` with string fields from JSON for constructing
+        new :class:`.Enactment`
 
     :param code:
         the :class:`.Code` that is the source for this
         :class:`Enactment`
+
+    :param mentioned:
+        :class:`.TextLinkDict` for known :class:`.Factor`\s
+        and :class:`.Enactment`\s
 
     :param regime:
         the :class:`.Regime` where the :class:`.Code` that is the
         source for this :class:`Enactment` can be found, or where
         it should be added
 
+    :param report_mentioned:
+        if True, return a new :class:`.TextLinkDict` in addition to
+        the :class:`.Enactment`\.
+
     :returns:
-        a new :class:`Enactment` object.
+        a new :class:`Enactment` object, optionally with text links.
     """
     if regime and not code:
         code = regime.get_code(enactment_dict["path"])
@@ -74,6 +85,7 @@ def read_enactment(
         source=code,
     )
     answer = Enactment(code=code, selector=selector, name=enactment_dict.get("name"))
+    mentioned = mentioned or defaultdict(list)
     return (answer, mentioned) if report_mentioned else answer
 
 
@@ -83,6 +95,36 @@ def read_enactments(
     regime: Optional[Regime] = None,
     report_mentioned: bool = False,
 ) -> Union[List[Enactment], Tuple[List[Enactment], TextLinkDict]]:
+    r"""
+    Create a new :class:`Enactment` object using imported JSON data.
+
+    The new :class:`Enactment` can be composed from a :class:`.Code`
+    referenced in the ``regime`` parameter.
+
+    :param record_list:
+        sequence of :class:`dict`\s with string fields from JSON for
+        constructing new :class:`.Enactment`\s
+
+    :param code:
+        the :class:`.Code` that is the source for this
+        :class:`Enactment`
+
+    :param mentioned:
+        :class:`.TextLinkDict` for known :class:`.Factor`\s
+        and :class:`.Enactment`\s
+
+    :param regime:
+        the :class:`.Regime` where the :class:`.Code` that is the
+        source for this :class:`Enactment` can be found, or where
+        it should be added
+
+    :param report_mentioned:
+        if True, return a new :class:`.TextLinkDict` in addition to
+        the :class:`.Enactment`\.
+
+    :returns:
+        a list of new :class:`Enactment` objects, optionally with text links.
+    """
     created_list: List[Enactment] = []
     if record_list is None:
         record_list = []
@@ -93,8 +135,8 @@ def read_enactments(
             record, mentioned=mentioned, regime=regime, report_mentioned=True
         )
         created_list.append(created)
-    answer = tuple(created_list)
-    return (answer, mentioned) if report_mentioned else answer
+    mentioned = mentioned or defaultdict(list)
+    return (created_list, mentioned) if report_mentioned else created_list
 
 
 def read_fact(
@@ -111,14 +153,19 @@ def read_fact(
     :param mentioned:
         a list of :class:`.Factor`\s that may be included by reference to their ``name``\s.
 
+    :param report_mentioned:
+        if True, return a new :class:`.TextLinkDict` in addition to
+        the :class:`.Fact`\.
+
     :returns:
         a :class:`Fact`, with optional mentioned factors
     """
-
+    if mentioned is None:
+        mentioned = defaultdict(list)
     placeholder = "{}"  # to be replaced in the Fact's string method
 
     def add_content_references(
-        content: str, mentioned: Optional[TextLinkDict] = None, placeholder: str = "{}"
+        content: str, mentioned: TextLinkDict, placeholder: str = "{}"
     ) -> Tuple[str, List[Factor]]:
         r"""
         Get context :class:`Factor`\s for new :class:`Fact`.
