@@ -138,7 +138,7 @@ class Opinion:
             factor = holding.get_factor_by_name(name)
             if factor is not None:
                 return factor
-        raise ValueError(f'No factor by the name "{name}" was found')
+        return None
 
     def posit_holding(
         self,
@@ -157,26 +157,8 @@ class Opinion:
         if not isinstance(holding, Holding):
             raise TypeError('"holding" must be an object of type Holding.')
 
-        # These lines repeat lines in new_context_helper
-        if isinstance(context, Factor) or isinstance(context, str):
-            context = context._wrap_with_tuple(context)
-
-        # TODO: this should be a separate function.
-        # It probably already is one somewhere.
-        if context is not None:
-            if isinstance(context, dict):
-                for factor in context:
-                    if isinstance(context[factor], str):
-                        context[factor] = self.get_factor_by_name(context[factor])
-            else:
-                new_context: List[Factor] = []
-                for factor in context:
-                    if isinstance(factor, str):
-                        new_context.append(self.get_factor_by_name(factor))
-                    else:
-                        new_context.append(factor)
-                context = dict(zip(holding.generic_factors, new_context))
-            holding = holding.new_context(context)
+        if context:
+            holding = holding.new_context(context, context_opinion=self)
         self.holdings.append(holding)
 
         if text_links:

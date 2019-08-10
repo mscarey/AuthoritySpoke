@@ -37,34 +37,50 @@ def new_context_helper(func: Callable):
         indicates the which generic :class:`.Factor`\s within ``factor`` should
         be replaced and what they should be replaced with.
 
+    :param context_opinion:
+        a second object that with generic factors that need to be searched
+        when trying to resolve what a string in the `changes` parameter
+        refers to.
+
     :returns:
         a new :class:`.Factor` object in the new context.
     """
 
     @functools.wraps(func)
     def wrapper(
-        factor: Factor, changes: Optional[Union[Sequence[Factor], Dict[Factor, Factor]]]
+        factor: Factor,
+        changes: Optional[Union[Sequence[Factor], Dict[Factor, Factor]]],
+        context_opinion: Optional[Opinion] = None,
     ) -> Factor:
 
         if changes is None:
-            return func(factor, changes)
+            return factor
         if not isinstance(changes, Iterable):
             changes = (changes,)
         if not isinstance(changes, dict):
             generic_factors = factor.generic_factors
-            if len(generic_factors) != len(changes):
+            if len(generic_factors) < len(changes):
                 raise ValueError(
-                    'If the parameter "changes" is not a list of '
-                    + "replacements for every element of factor.generic_factors, "
-                    + 'then "changes" must be a dict where each key is a Factor '
-                    + "to be replaced and each value is the corresponding "
-                    + "replacement Factor."
+                    f"The iterable {changes} is too long to be interpreted "
+                    + f"as a list of replacements for the "
+                    + f"{len(generic_factors)} items of generic_factors."
                 )
             changes = dict(zip(generic_factors, changes))
+
         for context_factor in changes:
-            if factor.name == context_factor or (
-                factor.means(context_factor) and factor.name == context_factor.name
-            ):
+            name_to_seek = changes[context_factor]
+            if isinstance(name_to_seek, str):
+                changes[context_factor] = factor.get_factor_by_name(name_to_seek)
+            if context_opinion and not changes[context_factor]:
+                changes[context_factor] = context_opinion.get_factor_by_name(
+                    name_to_seek
+                )
+            if not changes[context_factor]:
+                raise ValueError(
+                    f"Unable to find a Factor with the name '{name_to_seek}'"
+                )
+
+            if factor.means(context_factor) and factor.name == context_factor.name:
                 return changes[context_factor]
 
         return func(factor, changes)
