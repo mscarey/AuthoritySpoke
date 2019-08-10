@@ -94,7 +94,7 @@ def read_enactments(
     mentioned: Optional[TextLinkDict] = None,
     regime: Optional[Regime] = None,
     report_mentioned: bool = False,
-) -> Union[List[Enactment], Tuple[List[Enactment], TextLinkDict]]:
+) -> Union[Tuple[Enactment, ...], Tuple[Tuple[Enactment, ...], TextLinkDict]]:
     r"""
     Create a new :class:`Enactment` object using imported JSON data.
 
@@ -136,7 +136,7 @@ def read_enactments(
         )
         created_list.append(created)
     mentioned = mentioned or defaultdict(list)
-    return (created_list, mentioned) if report_mentioned else created_list
+    return (tuple(created_list), mentioned) if report_mentioned else tuple(created_list)
 
 
 def read_fact(
@@ -189,18 +189,16 @@ def read_fact(
         sorted_mentioned = sorted(
             mentioned.keys(), key=lambda x: len(x.name) if x.name else 0, reverse=True
         )
-        context_with_indices: List[List[Union[Factor, int]]] = []
+        context_with_indices: Dict[Factor, int] = {}
         for factor in sorted_mentioned:
             if factor.name and factor.name in content and factor.name != content:
                 factor_index = content.find(factor.name)
-                for pair in context_with_indices:
-                    if pair[1] > factor_index:
-                        pair[1] -= len(factor.name) - len(placeholder)
-                context_with_indices.append([factor, factor_index])
+                for named_factor in context_with_indices:
+                    if context_with_indices[named_factor] > factor_index:
+                        context_with_indices[named_factor] -= len(factor.name) - len(placeholder)
+                context_with_indices[factor] = factor_index
                 content = content.replace(factor.name, placeholder)
-        context_factors = [
-            k[0] for k in sorted(context_with_indices, key=lambda k: k[1])
-        ]
+        context_factors = sorted(context_with_indices, key=context_with_indices.get)
         return content, context_factors
 
     # TODO: inherit the later part of this function from Factor
