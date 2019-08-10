@@ -40,8 +40,10 @@ class Code:
         "xhtml": "http://www.w3.org/1999/xhtml",
     }
 
-    def __init__(self, filepath: pathlib.Path):
+    def __init__(self, filepath: Union[str, pathlib.Path]):
         """Set ``filepath`` parameter as attribute."""
+        if isinstance(filepath, str):
+            filepath = pathlib.Path(filepath)
         self.filepath = filepath
 
     @property

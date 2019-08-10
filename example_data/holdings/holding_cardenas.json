@@ -87,25 +87,25 @@
             }],
             "mandatory": true,
             "enactments": [{
-                    "code": "ca_evidence.html",
+                    "file": "ca_evidence.html",
                     "path": "/us-ca/evid/s351"
                 },
                 {
-                    "code": "ca_evidence.html",
+                    "file": "ca_evidence.html",
                     "path": "/us-ca/evid/s352",
                     "suffix": "(a) necessitate undue consumption"
                 },
                 {
-                    "code": "ca_evidence.html",
+                    "file": "ca_evidence.html",
                     "path": "/us-ca/evid/s352",
                     "exact": "create substantial danger of undue prejudice"
                 },
                 {
-                    "code": "ca_penal.html",
+                    "file": "ca_penal.html",
                     "path": "/us-ca/pen/s211"
                 },
                 {
-                    "code": "ca_penal.html",
+                    "file": "ca_penal.html",
                     "path": "/us-ca/pen/s664",
                     "suffix": "where no provision is"
                 }
