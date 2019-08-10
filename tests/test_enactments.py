@@ -132,8 +132,8 @@ class TestEnactments:
         assert fourth_a.text.endswith("and the persons or things to be seized.")
 
     def test_passage_from_imported_statute(self, make_regime):
-        opinion = loaders.load_opinion(f"oracle_h.json")
-        oracle_majority = opinion.exposit(
+        oracle_majority = loaders.load_opinion(f"oracle_h.json")
+        oracle_majority.posit(
             loaders.load_holdings(f"holding_oracle.json", regime=make_regime)
         )
         despite_text = str(oracle_majority.holdings[5])

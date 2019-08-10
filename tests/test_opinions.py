@@ -110,9 +110,9 @@ class TestOpinions:
         with pytest.raises(TypeError):
             make_opinion["watt_majority"].posit(make_procedure["c1"])
 
-    def test_error_exposit_with_no_rule_source(self, make_opinion):
+    def test_error_posit_with_no_rule_source(self, make_opinion):
         with pytest.raises(TypeError):
-            make_opinion["watt_majority"].exposit()
+            make_opinion["watt_majority"].posit()
 
     def test_new_context_non_iterable_changes(self, make_opinion, make_holding):
         """
@@ -143,8 +143,8 @@ class TestOpinions:
         # Clearing in case prior tests added holdings
         watt.holdings = []
         brad.holdings = []
-        watt.exposit(loaders.load_holdings("holding_watt.json", regime=make_regime))
-        brad.exposit(loaders.load_holdings("holding_brad.json", regime=make_regime))
+        watt.posit(loaders.load_holdings("holding_watt.json", regime=make_regime))
+        brad.posit(loaders.load_holdings("holding_brad.json", regime=make_regime))
         context_pairs = {
             "proof of Bradley's guilt": "proof of Wattenburg's guilt",
             "Bradley": "Wattenburg",
@@ -163,8 +163,8 @@ class TestOpinions:
         brad = make_opinion["brad_majority"]
         watt.holdings = []
         brad.holdings = []
-        watt.exposit(loaders.load_holdings("holding_watt.json", regime=make_regime))
-        brad.exposit(loaders.load_holdings("holding_brad.json", regime=make_regime))
+        watt.posit(loaders.load_holdings("holding_watt.json", regime=make_regime))
+        brad.posit(loaders.load_holdings("holding_brad.json", regime=make_regime))
 
         context_items = [
             "proof of Wattenburg's guilt",

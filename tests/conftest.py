@@ -1050,11 +1050,11 @@ def make_opinion_with_holding(make_opinion, make_regime) -> Dict[str, Opinion]:
     for case in test_cases:
         for opinion in loaders.load_opinion(f"{case}_h.json", lead_only=False):
             opinions[f"{case}_{opinion.position}"] = opinion
-        opinions[f"{case}_majority"].exposit(loaders.load_holdings(f"holding_{case}.json", regime=make_regime))
+        opinions[f"{case}_majority"].posit(loaders.load_holdings(f"holding_{case}.json", regime=make_regime))
     for case in test_cases_with_anchors:
         for opinion in loaders.load_opinion(f"{case}_h.json", lead_only=False):
             opinions[f"{case}_{opinion.position}"] = opinion
-        opinions[f"{case}_majority"].exposit(*loaders.load_holdings(f"holding_{case}.json", regime=make_regime, report_mentioned=True))
+        opinions[f"{case}_majority"].posit(*loaders.load_holdings(f"holding_{case}.json", regime=make_regime, report_mentioned=True))
     return opinions
 
 @pytest.fixture(scope="class")

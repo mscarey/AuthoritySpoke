@@ -20,6 +20,8 @@ from authorityspoke.holdings import Holding
 from authorityspoke.rules import Rule
 from authorityspoke.selectors import TextQuoteSelector
 
+logger = logging.getLogger(__name__)
+
 
 @dataclass
 class Opinion:
@@ -99,37 +101,6 @@ class Opinion:
             f"'Contradicts' test not implemented for types {self.__class__} and {other.__class__}."
         )
 
-    def exposit(
-        self,
-        holdings: Sequence[Holding],
-        text_links: Optional[Dict[Factor, List[TextQuoteSelector]]] = None,
-        context: Optional[Sequence[Factor]] = None,
-    ):
-        r"""
-        :meth:`~Opinion.posit` :class:`.Rule` objects and link :class:`Factor`\s to text.
-
-        Here, to :meth:`~Opinion.posit` means to add each :class:`.Rule`
-        to ``self.holdings``.
-
-        :param holdings:
-            :class:`Holding`\s to :meth:`~Opinion.posit`.
-
-        :param text_links:
-            mapping of :class:`Factor`\s to the :class:`Opinion` passages where
-            they can be found. Can be obtained as the "mentioned" return value
-            of one of the functions in :mod:`authorityspoke.io.readers`\.
-
-        :param context:
-            an ordered sequence (probably :py:class:`dict`) of
-            generic :class:`.Factor` objects from ``self`` which
-            will provide the context for the new holding in the
-            present case.
-        """
-
-        for holding in holdings:
-            self.posit(holding=holding, text_links=text_links, context=context)
-        return self
-
     @property
     def generic_factors(self) -> List[Factor]:
         """
@@ -169,18 +140,98 @@ class Opinion:
                 return factor
         raise ValueError(f'No factor by the name "{name}" was found')
 
+    def posit_holding(
+        self,
+        holding: Union[Holding, Rule],
+        text_links: Optional[Dict[Factor, List[TextQuoteSelector]]] = None,
+        context: Optional[Sequence[Factor]] = None,
+    ) -> None:
+
+        if isinstance(holding, Rule):
+            logger.warning(
+                "posit_holding was called with a Rule "
+                "that was automatically converted to a Holding"
+            )
+            holding = Holding(rule=holding)
+
+        if not isinstance(holding, Holding):
+            raise TypeError('"holding" must be an object of type Holding.')
+
+        # These lines repeat lines in new_context_helper
+        if isinstance(context, Factor) or isinstance(context, str):
+            context = context._wrap_with_tuple(context)
+
+        # TODO: this should be a separate function.
+        # It probably already is one somewhere.
+        if context is not None:
+            if isinstance(context, dict):
+                for factor in context:
+                    if isinstance(context[factor], str):
+                        context[factor] = self.get_factor_by_name(context[factor])
+            else:
+                new_context: List[Factor] = []
+                for factor in context:
+                    if isinstance(factor, str):
+                        new_context.append(self.get_factor_by_name(factor))
+                    else:
+                        new_context.append(factor)
+                context = dict(zip(holding.generic_factors, new_context))
+            holding = holding.new_context(context)
+        self.holdings.append(holding)
+
+        if text_links:
+            for factor in holding.recursive_factors:
+                for selector in text_links.get(factor, []):
+                    if factor not in self.factors:
+                        self.factors[factor] = []  # repeated elsewhere?
+                    if not any(
+                        selector == known_selector
+                        for known_selector in self.factors[factor]
+                    ):
+                        self.factors[factor].append(selector)
+
+    def posit_holdings(
+        self,
+        holdings: Iterable[Union[Holding, Rule]],
+        text_links: Optional[Dict[Factor, List[TextQuoteSelector]]] = None,
+        context: Optional[Sequence[Factor]] = None,
+    ):
+        r"""
+        Add :class:`.Holding`\s to this ``Opinion`` from a sequence.
+
+        :param holdings:
+            a sequence of :class:`.Holding`\s that this :class:`.Opinion`
+            posits as valid in its own court or jurisdiction, regardless of
+            whether ``self`` accepts that the ``inputs`` correspond to the
+            reality of the current case, and regardless of whether the
+            court orders that the ``outputs`` be put into effect.
+
+        :param text_links:
+            mapping of :class:`Factor`\s to the :class:`Opinion` passages where
+            they can be found. Can be obtained as the `mentioned` return value
+            of one of the functions in :mod:`authorityspoke.io.readers`\.
+
+        :param context:
+            an ordered sequence (probably :py:class:`dict`) of
+            generic :class:`.Factor` objects from ``self`` which
+            will provide the context for the new holding in the
+            present case.
+        """
+        for holding in holdings:
+            self.posit_holding(holding, text_links=text_links, context=context)
+
     def posit(
         self,
-        holding: Union[Holding, Iterable[Holding]],
+        holdings: Union[Holding, Iterable[Union[Holding, Rule]]],
         text_links: Optional[Dict[Factor, List[TextQuoteSelector]]] = None,
         context: Optional[Sequence[Factor]] = None,
     ) -> None:
         r"""
-        Add a :class:`.Holding` as a holding of this ``Opinion``.
+        Add one or more :class:`.Holding`\s to this ``Opinion``.
 
-        Adds ``holding`` (or every :class:`.Holding` in ``holding``, if ``holding``
-        is iterable) to the :py:class:`list` ``self.holdings``, replacing
-        any other :class:`.Holding` in ``self.holdings`` with the same meaning.
+        This method passes its values to :meth:`~posit_holding` or
+        :meth:`~posit_holdings` depending on whether the `holding` parameter
+        is one :class:`.Holding` or a :class:`list`\.
 
         :param holding:
             a :class:`.Holding` that the :class:`.Opinion` ``self`` posits
@@ -201,51 +252,10 @@ class Opinion:
             will provide the context for the new holding in the
             present case.
         """
-
-        def posit_one_holding(
-            holding: Union[Holding, Iterable[Holding]],
-            context: Optional[Sequence[Factor]] = None,
-            text_links=None,
-        ) -> None:
-            if not isinstance(holding, Holding):
-                raise TypeError('"holding" must be an object of type Holding.')
-
-            if context is not None:
-                if isinstance(context, dict):
-                    for factor in context:
-                        if isinstance(context[factor], str):
-                            context[factor] = self.get_factor_by_name(context[factor])
-                else:
-                    new_context: List[Factor] = []
-                    for factor in context:
-                        if isinstance(factor, str):
-                            new_context.append(self.get_factor_by_name(factor))
-                        else:
-                            new_context.append(factor)
-                    context = dict(zip(holding.generic_factors, new_context))
-                holding = holding.new_context(context)
-            self.holdings.append(holding)
-
-            if text_links:
-                for factor in holding.recursive_factors:
-                    for selector in text_links.get(factor, []):
-                        if factor not in self.factors:
-                            self.factors[factor] = []  # repeated elsewhere?
-                        if not any(
-                            selector == known_selector
-                            for known_selector in self.factors[factor]
-                        ):
-                            self.factors[factor].append(selector)
-
-        # These lines repeat lines in new_context_helper
-        if isinstance(context, Factor) or isinstance(context, str):
-            context = context._wrap_with_tuple(context)
-
-        if isinstance(holding, Iterable):
-            for item in holding:
-                posit_one_holding(item, context, text_links)
+        if isinstance(holdings, Iterable):
+            self.posit_holdings(holdings, text_links=text_links, context=context)
         else:
-            posit_one_holding(holding, context, text_links)
+            self.posit_holding(holdings, text_links=text_links, context=context)
 
     def get_anchors(self, holding: Holding, include_factors: bool = True) -> List[str]:
         r"""
@@ -274,11 +284,11 @@ class Opinion:
                     )
             return anchor_list
 
-        logger = logging.getLogger("opinion_text_anchor_logger")
         anchors: List[str] = []
         if include_factors:
             for factor in holding.rule.procedure.factors_all:
                 anchors = add_selectors(anchors, self.factors.get(factor))
+        # What about the Rule? Can that have its own selectors?
         anchors = add_selectors(anchors, holding.selectors)
 
         return anchors

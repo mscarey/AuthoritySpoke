@@ -132,7 +132,7 @@ class TestRuleImport:
         """
 
         watt = make_opinion["watt_majority"]
-        watt.exposit(load_holdings("holding_watt.json"))
+        watt.posit(load_holdings("holding_watt.json"))
         assert watt.holdings[0] == real_holding["h1"]
 
     def test_same_enactment_objects_equal(self, make_opinion_with_holding):
@@ -158,9 +158,9 @@ class TestRuleImport:
 
     def test_same_enactment_in_two_opinions(self, make_regime, make_opinion):
         watt = make_opinion["watt_majority"]
-        watt.exposit(load_holdings("holding_watt.json", regime=make_regime))
+        watt.posit(load_holdings("holding_watt.json", regime=make_regime))
         brad = make_opinion["brad_majority"]
-        brad.exposit(load_holdings("holding_brad.json", regime=make_regime))
+        brad.posit(load_holdings("holding_brad.json", regime=make_regime))
         assert any(
             watt.holdings[0].enactments[0].means(brad_enactment)
             for brad_enactment in brad.holdings[0].enactments
@@ -175,20 +175,20 @@ class TestRuleImport:
         """
         brad = make_opinion["brad_majority"]
         brad.holdings = []
-        brad.exposit(load_holdings("holding_brad.json", regime=make_regime))
+        brad.posit(load_holdings("holding_brad.json", regime=make_regime))
         assert any(brad.holdings[6].inputs[0] == x for x in brad.holdings[5].inputs)
         assert any(brad.holdings[6].inputs[0] is x for x in brad.holdings[5].inputs)
 
     def test_use_int_not_pint_without_dimension(self, make_regime, make_opinion):
 
         brad = make_opinion["brad_majority"]
-        brad.exposit(load_holdings("holding_brad.json", regime=make_regime))
+        brad.posit(load_holdings("holding_brad.json", regime=make_regime))
         assert "dimensionless" not in str(brad.holdings[6])
         assert isinstance(brad.holdings[6].inputs[0].predicate.quantity, int)
 
     def test_opinion_posits_holding(self, make_opinion, make_regime):
         brad = make_opinion["brad_majority"]
-        brad.exposit(load_holdings("holding_brad.json", regime=make_regime))
+        brad.posit(load_holdings("holding_brad.json", regime=make_regime))
         assert "warrantless search and seizure" in str(brad.holdings[0])
 
     def test_opinion_posits_holding_tuple_context(
@@ -200,7 +200,7 @@ class TestRuleImport:
         """
         watt = make_opinion["watt_majority"]
         brad = make_opinion["brad_majority"]
-        brad.exposit(load_holdings("holding_brad.json", regime=make_regime))
+        brad.posit(load_holdings("holding_brad.json", regime=make_regime))
         context_holding = brad.holdings[6].new_context(
             [make_entity["watt"], make_entity["trees"], make_entity["motel"]]
         )
@@ -222,7 +222,7 @@ class TestRuleImport:
         """
         watt = make_opinion["watt_majority"]
         brad = make_opinion["brad_majority"]
-        brad.exposit(load_holdings("holding_brad.json", regime=make_regime))
+        brad.posit(load_holdings("holding_brad.json", regime=make_regime))
         context_holding = brad.holdings[6].new_context(
             {brad.holdings[6].generic_factors[0]: make_entity["watt"]}
         )
@@ -241,7 +241,7 @@ class TestRuleImport:
         """
         watt = make_opinion["watt_majority"]
         brad = make_opinion["brad_majority"]
-        brad.exposit(load_holdings("holding_brad.json", regime=make_regime))
+        brad.posit(load_holdings("holding_brad.json", regime=make_regime))
         context_change = brad.holdings[6].new_context(
             {brad.holdings[6].generic_factors[1]: make_entity["trees_specific"]}
         )

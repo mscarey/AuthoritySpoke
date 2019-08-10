@@ -18,6 +18,7 @@ from authorityspoke.context import new_context_helper
 from authorityspoke.predicates import Predicate
 from authorityspoke.relations import Analogy
 
+logger = logging.getLogger(__name__)
 
 @dataclass(frozen=True, init=False)
 class Factor(ABC):
@@ -486,7 +487,6 @@ class Factor(ABC):
             appears to match to two different :class:`Factor`\s in the other.
             Otherwise returns an updated :class:`dict` of matches.
         """
-        logger = logging.getLogger("context_match_logger")
         self_mapping = dict(self_mapping)
         # The key-value relationship isn't symmetrical when the root Factors
         # are being compared for implication.
