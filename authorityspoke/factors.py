@@ -20,6 +20,7 @@ from authorityspoke.relations import Analogy
 
 logger = logging.getLogger(__name__)
 
+
 @dataclass(frozen=True, init=False)
 class Factor(ABC):
     """
@@ -876,7 +877,7 @@ class Fact(Factor):
 class Pleading(Factor):
     r"""A document filed by a party to make :class:`Allegation`\s."""
 
-    filer: Optional["Entity"] = None
+    filer: Optional[Entity] = None
     name: Optional[str] = None
     absent: bool = False
     generic: bool = False

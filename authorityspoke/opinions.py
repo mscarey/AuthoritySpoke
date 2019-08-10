@@ -103,7 +103,7 @@ class Opinion:
 
     @property
     def generic_factors(self) -> List[Factor]:
-        """
+        r"""
         Get all generic :class:`.Factor`\s mentioned in ``self``.
 
         :returns:

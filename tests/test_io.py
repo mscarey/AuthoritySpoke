@@ -239,7 +239,6 @@ class TestRuleImport:
         """
         This test originally required a ValueError, but why should it?
         """
-        watt = make_opinion["watt_majority"]
         brad = make_opinion["brad_majority"]
         brad.posit(load_holdings("holding_brad.json", regime=make_regime))
         context_change = brad.holdings[6].new_context(

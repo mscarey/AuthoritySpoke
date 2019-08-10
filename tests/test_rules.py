@@ -40,7 +40,7 @@ class TestRules:
 
     def test_new_context_non_generic_from_list_error(self, make_holding, watt_factor):
         with pytest.raises(ValueError):
-            different = make_holding["h1"].new_context(
+            make_holding["h1"].new_context(
                 [watt_factor["f1"], watt_factor["f7"], watt_factor["f2"]]
             )
 
@@ -48,13 +48,13 @@ class TestRules:
         self, make_holding, make_predicate
     ):
         with pytest.raises(TypeError):
-            different = make_holding["h1"].new_context(
+            make_holding["h1"].new_context(
                 {make_predicate["p1"]: make_predicate["p7"]}
             )
 
     def test_new_context_dict_must_be_dict(self, make_holding, make_predicate):
         with pytest.raises(TypeError):
-            different = make_holding["h1"].new_context(
+            make_holding["h1"].new_context(
                 [make_predicate["p1"], make_predicate["p2"]]
             )
 
@@ -97,7 +97,7 @@ class TestRules:
 
     def test_wrong_role_for_added_enactment(self, make_enactment, make_holding):
         with pytest.raises(ValueError):
-            new = make_holding["h1"].rule.add_enactment(
+            make_holding["h1"].rule.add_enactment(
                 incoming=make_enactment["due_process_14"], role="inputs"
             )
 

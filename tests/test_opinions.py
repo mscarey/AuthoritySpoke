@@ -49,7 +49,6 @@ class TestOpinions:
     ):
         watt = make_opinion["watt_majority"]
         h = real_holding
-        e = make_entity
         h3_specific = h["h3"]
         watt.posit(h3_specific)
         assert h3_specific in watt.holdings

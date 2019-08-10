@@ -1,5 +1,3 @@
-import logging
-
 from authorityspoke.factors import Fact
 from authorityspoke.factors import Evidence, Exhibit
 
