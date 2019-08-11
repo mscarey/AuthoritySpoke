@@ -91,9 +91,7 @@ class TestFactorImport:
 class TestFactImport:
     def test_import_fact_with_entity_name_containing_another(self):
         house_fact = readers.read_fact(
-            factor_record={
-                "content": "Alice sold Alice's house for a price in dollars of > 300000"
-            },
+            content="Alice sold Alice's house for a price in dollars of > 300000",
             mentioned={Entity(name="Alice"): [], Entity(name="Alice's house"): []},
         )
         assert any(

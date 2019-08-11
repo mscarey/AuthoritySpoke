@@ -180,22 +180,54 @@ def add_content_references(
 
 
 def read_fact(
-    factor_record: Dict[str, Union[str, bool]],
+    content: str = "",
+    truth: bool = True,
+    reciprocal: bool = False,
+    standard_of_proof: Optional[str] = None,
+    name: Optional[str] = None,
     mentioned: Optional[TextLinkDict] = None,
     report_mentioned: bool = False,
+    absent: bool = False,
+    generic: bool = False,
+    **kwargs,
 ) -> Union[Fact, Tuple[Fact, TextLinkDict]]:
     r"""
-    Construct and return a :class:`Fact` object from a :py:class:`dict`.
+    Construct a :class:`Fact` from strings and bools.
 
-    :param factor_record:
-        imported from a JSON file in the format used in the "input" folder.
+    :param content:
+        a string containing a clause making an assertion.
+
+    :param truth:
+        whether the assertion in `content` is claimed to be true
+
+    :param reciprocal:
+        whether the order of the first two entities in `content`
+        can be changed without changing the meaning
 
     :param mentioned:
         a list of :class:`.Factor`\s that may be included by reference to their ``name``\s.
 
+    :param standard_of_proof:
+        the finding as to the strength of the evidence supporting
+        the assertion, if any
+
+    :param name:
+        a string identifier
+
+    :param mentioned:
+        known :class:`.Factors`. Can be reused.
+
     :param report_mentioned:
         if True, return a new :class:`.TextLinkDict` in addition to
         the :class:`.Fact`\.
+
+    :param absent:
+        whether the :class:`.Fact` can be considered absent from the case
+
+    :param generic:
+        whether the :class:`.Fact` is interchangeable with other generic
+        facts without changing the meaning of a :class:`.Rule` where it is
+        mentioned
 
     :returns:
         a :class:`Fact`, with optional mentioned factors
@@ -203,11 +235,14 @@ def read_fact(
     if mentioned is None:
         mentioned = defaultdict(list)
     placeholder = "{}"  # to be replaced in the Fact's string method
+    if not name:
+        name = (
+            f'{"false " if not truth else ""}{content}'
+        )
+    name = name.replace("{", "").replace("}", "")
 
-    # TODO: inherit the later part of this function from Factor
     comparison = ""
     quantity = None
-    content = factor_record.get("content")
     if content:
         content, context_factors = add_content_references(
             content, mentioned, placeholder
@@ -223,26 +258,19 @@ def read_fact(
     # rewriting them here.
     predicate = Predicate(
         content=content,
-        truth=factor_record.get("truth", True),
-        reciprocal=factor_record.get("reciprocal", False),
+        truth=truth,
+        reciprocal=reciprocal,
         comparison=comparison,
         quantity=quantity,
     )
-    name = factor_record.get("name")
-    if not name:
-        name = (
-            f'{"false " if not predicate.truth else ""}{factor_record.get("content")}'
-        )
-    if name:
-        name = name.replace("{", "").replace("}", "")
 
     answer = Fact(
         predicate,
         context_factors,
         name=name,
-        standard_of_proof=factor_record.get("standard_of_proof", None),
-        absent=factor_record.get("absent", False),
-        generic=factor_record.get("generic", False),
+        standard_of_proof=standard_of_proof,
+        absent=absent,
+        generic=generic,
     )
     return (answer, mentioned) if report_mentioned else answer
 
@@ -269,7 +297,7 @@ def read_factor(
     target_class = Factor.subclass_from_str(cname)
     if target_class == Fact:
         created_factor, mentioned = read_fact(
-            factor_record, mentioned, report_mentioned=True
+            mentioned=mentioned, report_mentioned=True, **factor_record
         )
     else:
         created_factor, mentioned = read_factor_subclass(
