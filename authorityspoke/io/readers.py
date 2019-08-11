@@ -139,6 +139,46 @@ def read_enactments(
     return (tuple(created_list), mentioned) if report_mentioned else tuple(created_list)
 
 
+def add_content_references(
+    content: str, mentioned: TextLinkDict, placeholder: str = "{}"
+) -> Tuple[str, List[Union[Enactment, Factor]]]:
+    r"""
+    Get context :class:`Factor`\s for new :class:`Fact`.
+
+    :param content:
+        the content for the :class:`Fact`\'s :class:`Predicate`.
+
+    :param mentioned:
+        list of :class:`Factor`\s with names that could be
+        referenced in content
+
+    :param placeholder:
+        a string to replace the names of
+        referenced :class:`Factor`\s in content
+
+    :returns:
+        the content string with any referenced :class:`Factor`\s
+        replaced by placeholder, and a list of referenced
+        :class:`Factor`\s in the order they appeared in content.
+    """
+    sorted_mentioned = sorted(
+        mentioned.keys(), key=lambda x: len(x.name) if x.name else 0, reverse=True
+    )
+    context_with_indices: Dict[Union[Enactment, Factor], int] = {}
+    for factor in sorted_mentioned:
+        if factor.name and factor.name in content and factor.name != content:
+            factor_index = content.find(factor.name)
+            for named_factor in context_with_indices:
+                if context_with_indices[named_factor] > factor_index:
+                    context_with_indices[named_factor] -= len(factor.name) - len(
+                        placeholder
+                    )
+            context_with_indices[factor] = factor_index
+            content = content.replace(factor.name, placeholder)
+    context_factors = sorted(context_with_indices, key=context_with_indices.get)
+    return content, context_factors
+
+
 def read_fact(
     factor_record: Dict[str, Union[str, bool]],
     mentioned: Optional[TextLinkDict] = None,
@@ -163,43 +203,6 @@ def read_fact(
     if mentioned is None:
         mentioned = defaultdict(list)
     placeholder = "{}"  # to be replaced in the Fact's string method
-
-    def add_content_references(
-        content: str, mentioned: TextLinkDict, placeholder: str = "{}"
-    ) -> Tuple[str, List[Factor]]:
-        r"""
-        Get context :class:`Factor`\s for new :class:`Fact`.
-
-        :param content:
-            the content for the :class:`Fact`\'s :class:`Predicate`.
-
-        :param mentioned:
-            list of :class:`Factor`\s with names that could be
-            referenced in content
-
-        :param placeholder:
-            a string to replace the names of
-            referenced :class:`Factor`\s in content
-
-        :returns:
-            the content string with any referenced :class:`Factor`\s
-            replaced by placeholder, and a list of referenced
-            :class:`Factor`\s in the order they appeared in content.
-        """
-        sorted_mentioned = sorted(
-            mentioned.keys(), key=lambda x: len(x.name) if x.name else 0, reverse=True
-        )
-        context_with_indices: Dict[Factor, int] = {}
-        for factor in sorted_mentioned:
-            if factor.name and factor.name in content and factor.name != content:
-                factor_index = content.find(factor.name)
-                for named_factor in context_with_indices:
-                    if context_with_indices[named_factor] > factor_index:
-                        context_with_indices[named_factor] -= len(factor.name) - len(placeholder)
-                context_with_indices[factor] = factor_index
-                content = content.replace(factor.name, placeholder)
-        context_factors = sorted(context_with_indices, key=context_with_indices.get)
-        return content, context_factors
 
     # TODO: inherit the later part of this function from Factor
     comparison = ""
