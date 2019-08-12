@@ -11,6 +11,8 @@ from functools import partial
 
 from typing import Any, Dict, List, Iterable, Iterator, Optional, Tuple, Union
 
+from pint import UnitRegistry
+
 from authorityspoke.io import references
 from authorityspoke.enactments import Code, Enactment
 from authorityspoke.factors import Factor, Fact
@@ -24,6 +26,8 @@ from authorityspoke.selectors import TextQuoteSelector
 
 TextLinkDict = Dict[Union[Factor, Enactment], List[TextQuoteSelector]]
 
+ureg = UnitRegistry()
+Q_ = ureg.Quantity
 
 @references.log_mentioned_context
 def read_enactment(
@@ -178,6 +182,28 @@ def add_content_references(
     context_factors = sorted(context_with_indices, key=context_with_indices.get)
     return content, context_factors
 
+def read_quantity(quantity: str) -> Union[float, int, ureg.Quantity]:
+    """
+    Create `pint <https://pint.readthedocs.io/en/0.9/tutorial.html>`_ quantity object from text.
+
+    :param quantity:
+        when a string is being parsed for conversion to a
+        :class:`Predicate`, this is the part of the string
+        after the equals or inequality sign.
+    :returns:
+        a Python number object or a :class:`Quantity`
+        object created with `pint.UnitRegistry
+        <https://pint.readthedocs.io/en/0.9/tutorial.html>`_.
+    """
+    quantity = quantity.strip()
+    if quantity.isdigit():
+        return int(quantity)
+    float_parts = quantity.split(".")
+    if len(float_parts) == 2 and all(
+        substring.isnumeric() for substring in float_parts
+    ):
+        return float(quantity)
+    return Q_(quantity)
 
 def read_fact(
     content: str = "",
@@ -250,8 +276,8 @@ def read_fact(
     for item in Predicate.opposite_comparisons:
         if item in content:
             comparison = item
-            content, quantity = content.split(item)
-            quantity = Predicate.str_to_quantity(quantity)
+            content, quantity_text = content.split(item)
+            quantity = read_quantity(quantity_text)
             content += placeholder
 
     # TODO: get default attributes from the classes instead of

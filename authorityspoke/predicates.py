@@ -422,27 +422,3 @@ class Predicate:
             re.VERBOSE,
         )
         return re.sub(pattern, r"\1{} were", sentence)
-
-    @staticmethod
-    def str_to_quantity(quantity: str) -> Union[float, int, ureg.Quantity]:
-        """
-        Create `pint <https://pint.readthedocs.io/en/0.9/tutorial.html>`_ quantity object from text.
-
-        :param quantity:
-            when a string is being parsed for conversion to a
-            :class:`Predicate`, this is the part of the string
-            after the equals or inequality sign.
-        :returns:
-            a Python number object or a :class:`Quantity`
-            object created with `pint.UnitRegistry
-            <https://pint.readthedocs.io/en/0.9/tutorial.html>`_.
-        """
-        quantity = quantity.strip()
-        if quantity.isdigit():
-            return int(quantity)
-        float_parts = quantity.split(".")
-        if len(float_parts) == 2 and all(
-            substring.isnumeric() for substring in float_parts
-        ):
-            return float(quantity)
-        return Q_(quantity)
