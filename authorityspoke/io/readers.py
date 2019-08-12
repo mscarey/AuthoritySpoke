@@ -8,6 +8,7 @@ after they import some data from a file.
 from collections import defaultdict
 import datetime
 from functools import partial
+import re
 
 from typing import Any, Dict, List, Iterable, Iterator, Optional, Tuple, Union
 
@@ -15,7 +16,7 @@ from pint import UnitRegistry
 
 from authorityspoke.io import references
 from authorityspoke.enactments import Code, Enactment
-from authorityspoke.factors import Factor, Fact
+from authorityspoke.factors import Entity, Factor, Fact
 from authorityspoke.holdings import Holding
 from authorityspoke.jurisdictions import Regime
 from authorityspoke.opinions import Opinion
@@ -143,11 +144,11 @@ def read_enactments(
     return (tuple(created_list), mentioned) if report_mentioned else tuple(created_list)
 
 
-def add_content_references(
+def get_references_from_mentioned(
     content: str, mentioned: TextLinkDict, placeholder: str = "{}"
 ) -> Tuple[str, List[Union[Enactment, Factor]]]:
     r"""
-    Get context :class:`Factor`\s for new :class:`Fact`.
+    Retrieve known context :class:`Factor`\s for new :class:`Fact`.
 
     :param content:
         the content for the :class:`Fact`\'s :class:`Predicate`.
@@ -204,6 +205,52 @@ def read_quantity(quantity: str) -> Union[float, int, ureg.Quantity]:
     ):
         return float(quantity)
     return Q_(quantity)
+
+
+def get_references_from_string(
+    content: str, mentioned: TextLinkDict,
+) -> Tuple[str, List[Entity], TextLinkDict]:
+    r"""
+    Make :class:`.Entity` context :class:`.Factor`\s from string.
+
+    This function identifies context :class:`.Factor`\s by finding
+    brackets around them, while :func:`get_references_from_mentioned`
+    depends on knowing the names of the context factors in advance.
+    Also, this function works only when all the context_factors
+    are type :class:`.Entity`.
+
+    Despite "placeholder" being defined as a variable elsewhere,
+    this function isn't compatible with any placeholder string other
+    than "{}".
+
+    :param content:
+        a string containing a clause making an assertion.
+        Curly brackets surround the names of :class:`.Entity`
+        context factors to be created.
+
+    :param content:
+        a :class:`.TextLinkDict` of known :class:`.Factor`\s.
+        It will not be searched for :class:`.Factor`\s to add
+        to `context_factors`, but newly created :class:`.Entity`
+        object will be added to it.
+
+    :returns:
+        a :class:`Predicate` and :class:`.Entity` objects
+        from a string that has curly brackets around the
+        context factors and the comparison/quantity.
+    """
+    pattern = r"\{([^\{]+)\}"
+    entities_as_text = re.findall(pattern, content)
+
+    context_factors = []
+    for entity_name in entities_as_text:
+        entity = Entity(name=entity_name)
+        content = content.replace(entity_name, "")
+        context_factors.append(entity)
+        mentioned[entity] = []
+
+    return content, context_factors, mentioned
+
 
 def read_fact(
     content: str = "",
@@ -270,9 +317,14 @@ def read_fact(
     comparison = ""
     quantity = None
     if content:
-        content, context_factors = add_content_references(
-            content, mentioned, placeholder
-        )
+        if placeholder[0] in content:
+            content, context_factors, mentioned = get_references_from_string(
+                content, mentioned
+            )
+        else:
+            content, context_factors = get_references_from_mentioned(
+                content, mentioned, placeholder
+            )
     for item in Predicate.opposite_comparisons:
         if item in content:
             comparison = item
@@ -280,8 +332,6 @@ def read_fact(
             quantity = read_quantity(quantity_text)
             content += placeholder
 
-    # TODO: get default attributes from the classes instead of
-    # rewriting them here.
     predicate = Predicate(
         content=content,
         truth=truth,

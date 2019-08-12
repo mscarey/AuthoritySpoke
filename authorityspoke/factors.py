@@ -601,7 +601,7 @@ class Fact(Factor):
             approach of hard-coding their names and order will have to change.
     """
     predicate: Predicate
-    context_factors: Sequence[Factor] = ()
+    context_factors: Sequence[Union[Enactment, Factor]] = ()
     name: Optional[str] = None
     standard_of_proof: Optional[str] = None
     absent: bool = False
@@ -673,68 +673,6 @@ class Fact(Factor):
         string = f"{standard}{predicate}"
         return super().__str__().format(string)
 
-    @classmethod
-    def from_string(
-        cls, content: str, truth: Optional[bool] = True, reciprocal: bool = False
-    ) -> Fact:
-        """
-        Make :class:`Fact` with context :class:`.Entity` objects from a :py:class:`str`.
-
-        This method for constructing :class:`Predicate` objects
-        from strings may rarely be used because it's an alternative to
-        :meth:`.Factor.from_dict`. This function identifies context
-        factors by finding brackets around them, while
-        :meth:`~.Factor.from_dict` depends on knowing the names of the
-        context factors in advance.
-
-        :param content:
-            a string containing a clause making an assertion.
-            Differs from the ``content`` parameter in
-            the :meth:`__init__` method because the curly brackets
-            surround the names of :class:`.Entity` context factors,
-            and because the ``comparison`` and ``quantity`` are
-            represented in the ``content`` string rather than as
-            separate parameters.
-
-        :param truth:
-            indicates whether the clause in ``content`` is asserted to be
-            true or false. ``None`` indicates an assertion as to "whether"
-            the clause is true or false, without specifying which.
-
-        :param reciprocal:
-            if True, then the order of the first two entities
-            is considered interchangeable. There's no way to make
-            any entities interchangeable other than the first two.
-
-        :returns:
-            a :class:`Predicate` and :class:`.Entity` objects
-            from a string that has curly brackets around the
-            context factors and the comparison/quantity.
-        """
-
-        comparison = ""
-        quantity = None
-        pattern = r"\{([^\{]+)\}"
-
-        entities_as_text = re.findall(pattern, content)
-        for c in Predicate.opposite_comparisons:
-            if entities_as_text[-1].startswith(c):
-                comparison = c
-                quantity = entities_as_text.pop(-1)
-                quantity = quantity[2:].strip()
-                quantity = Predicate.str_to_quantity(quantity)
-
-        entities = [Entity(name=entity) for entity in entities_as_text]
-
-        return Fact(predicate=Predicate(
-                content=re.sub(pattern, "{}", content),
-                truth=truth,
-                reciprocal=reciprocal,
-                comparison=comparison,
-                quantity=quantity,
-            ),
-            context_factors=entities,
-        )
 
     @property
     def interchangeable_factors(self) -> List[Dict[Factor, Factor]]:

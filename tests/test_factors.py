@@ -46,13 +46,6 @@ class TestFacts:
         )
         assert f2.context_factors == (e["watt"], e["trees"])
 
-    def test_make_fact_from_string(self, watt_factor):
-        fact_float_more = Fact.from_string(
-            "the distance between {Ann} and {Lee} was {>= 20.1}", reciprocal=True
-        )
-        fact_float_less = watt_factor["f8_int"]
-        assert fact_float_more > fact_float_less
-
     def test_wrong_type_in_context_factors_in_init(
         self, make_entity, make_predicate, watt_mentioned
     ):

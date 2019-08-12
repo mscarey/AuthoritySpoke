@@ -28,11 +28,18 @@ class TestPredicateImport:
     """
 
     def test_import_predicate_with_quantity(self):
-        story = Fact.from_string("Once there was a {king} who had {> 3} castles")
+        story = readers.read_fact("The number of castles {the king} had was > 3")
         assert len(story.predicate) == 1
-        assert story.predicate.content.startswith("Once")
+        assert story.predicate.content.startswith("The number of castles")
         assert story.predicate.comparison == ">"
         assert story.predicate.quantity == 3
+
+    def test_make_fact_from_string(self, watt_factor):
+        fact_float_more = readers.read_fact(
+            "the distance between {Ann} and {Lee} was >= 20.1", reciprocal=True
+        )
+        fact_float_less = watt_factor["f8_int"]
+        assert fact_float_more > fact_float_less
 
 
 class TestEntityImport:
