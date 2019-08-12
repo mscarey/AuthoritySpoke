@@ -28,7 +28,7 @@ from authorityspoke.selectors import TextQuoteSelector
 TextLinkDict = Dict[Union[Factor, Enactment], List[TextQuoteSelector]]
 
 ureg = UnitRegistry()
-Q_ = ureg.Quantity
+
 
 @references.log_mentioned_context
 def read_enactment(
@@ -140,8 +140,9 @@ def read_enactments(
             record, mentioned=mentioned, regime=regime, report_mentioned=True
         )
         created_list.append(created)
-    mentioned = mentioned or defaultdict(list)
-    return (tuple(created_list), mentioned) if report_mentioned else tuple(created_list)
+    mentioned = mentioned or {}
+    answer = tuple(created_list)
+    return (answer, mentioned) if report_mentioned else answer
 
 
 def get_references_from_mentioned(
@@ -183,6 +184,7 @@ def get_references_from_mentioned(
     context_factors = sorted(context_with_indices, key=context_with_indices.get)
     return content, context_factors
 
+
 def read_quantity(quantity: str) -> Union[float, int, ureg.Quantity]:
     """
     Create `pint <https://pint.readthedocs.io/en/0.9/tutorial.html>`_ quantity object from text.
@@ -204,11 +206,11 @@ def read_quantity(quantity: str) -> Union[float, int, ureg.Quantity]:
         substring.isnumeric() for substring in float_parts
     ):
         return float(quantity)
-    return Q_(quantity)
+    return ureg.Quantity(quantity)
 
 
 def get_references_from_string(
-    content: str, mentioned: TextLinkDict,
+    content: str, mentioned: TextLinkDict
 ) -> Tuple[str, List[Entity], TextLinkDict]:
     r"""
     Make :class:`.Entity` context :class:`.Factor`\s from string.
@@ -305,13 +307,10 @@ def read_fact(
     :returns:
         a :class:`Fact`, with optional mentioned factors
     """
-    if mentioned is None:
-        mentioned = defaultdict(list)
+    mentioned = mentioned or {}
     placeholder = "{}"  # to be replaced in the Fact's string method
     if not name:
-        name = (
-            f'{"false " if not truth else ""}{content}'
-        )
+        name = f'{"false " if not truth else ""}{content}'
     name = name.replace("{", "").replace("}", "")
 
     comparison = ""
@@ -370,6 +369,7 @@ def read_factor(
         :class:`Factor`, instead of constructing new ones.
     """
     cname = factor_record["type"]
+    mentioned = mentioned or {}
     target_class = Factor.subclass_from_str(cname)
     if target_class == Fact:
         created_factor, mentioned = read_fact(
@@ -401,9 +401,9 @@ def read_factor_subclass(
             value = factor_record.get(attr)
         if value is not None:
             new_factor_dict[attr] = value
-    if report_mentioned:
-        return cls(**new_factor_dict), mentioned
-    return cls(**new_factor_dict)
+    answer: Factor = cls(**new_factor_dict)
+    mentioned = mentioned or {}
+    return (answer, mentioned) if report_mentioned else answer
 
 
 def read_factors(
@@ -411,7 +411,7 @@ def read_factors(
     mentioned: Optional[TextLinkDict] = None,
     regime: Optional[Regime] = None,
     report_mentioned: bool = False,
-) -> Union[List[Factor], Tuple[List[Factor], TextLinkDict]]:
+) -> Union[Tuple[Factor, ...], Tuple[Tuple[Factor, ...], TextLinkDict]]:
     created_list: List[Factor] = []
     if record_list is None:
         record_list = []
@@ -422,6 +422,7 @@ def read_factors(
             record, mentioned, regime=regime, report_mentioned=True
         )
         created_list.append(created)
+    mentioned = mentioned or {}
     answer = tuple(created_list)
     return (answer, mentioned) if report_mentioned else answer
 
@@ -439,7 +440,7 @@ def read_holding(
     enactments: Optional[Union[Dict, Iterable[Dict]]] = None,
     enactments_despite: Optional[Union[Dict, Iterable[Dict]]] = None,
     text: Optional[Union[str, Dict, Iterable[Union[str, Dict]]]] = None,
-    mentioned: Optional[Dict[Factor, List[TextQuoteSelector]]] = None,
+    mentioned: Optional[TextLinkDict] = None,
     regime: Optional[Regime] = None,
     report_mentioned: bool = False,
 ) -> Iterator[Union[Holding, Tuple[Holding, TextLinkDict]]]:
@@ -568,7 +569,7 @@ def read_holding(
 def read_holdings(
     holdings: Dict[str, Iterable],  # TODO: remove "mentioned_factors" from JSON format
     regime: Optional[Regime] = None,
-    mentioned: Optional[Dict[Factor, List[TextQuoteSelector]]] = None,
+    mentioned: Optional[TextLinkDict] = None,
     report_mentioned: bool = False,
 ) -> Union[List[Holding], Tuple[List[Holding], TextLinkDict]]:
     r"""
@@ -615,6 +616,7 @@ def read_holdings(
         ):
             finished_holding, mentioned = generated_holding
             finished_holdings.append(finished_holding)
+    mentioned = mentioned or {}
     return (finished_holdings, mentioned) if report_mentioned else finished_holdings
 
 
@@ -885,4 +887,5 @@ def read_rule(
         universal=universal,
         generic=generic,
     )
+    mentioned = mentioned or {}
     return (answer, mentioned) if report_mentioned else answer

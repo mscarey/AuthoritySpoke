@@ -5,7 +5,6 @@ from __future__ import annotations
 import functools
 import logging
 import operator
-import re
 
 from abc import ABC
 
