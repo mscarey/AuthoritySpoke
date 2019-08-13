@@ -4,8 +4,6 @@ Converting simple structured data from XML or JSON into authorityspoke objects.
 These functions will usually be called by functions from the io.loaders module
 after they import some data from a file.
 """
-
-from collections import defaultdict
 import datetime
 from functools import partial
 import re
@@ -90,7 +88,7 @@ def read_enactment(
         source=code,
     )
     answer = Enactment(code=code, selector=selector, name=enactment_dict.get("name"))
-    mentioned = mentioned or defaultdict(list)
+    mentioned = mentioned or {}
     return (answer, mentioned) if report_mentioned else answer
 
 
@@ -853,36 +851,43 @@ def read_rule(
         from ``mentioned_entities`` as ``context_factors``
     """
 
-    factor_dicts = [outputs, inputs, despite]
-    factor_groups = []
-    for category in factor_dicts:
-        category, mentioned = read_factors(
-            record_list=category,
-            mentioned=mentioned,
-            regime=regime,
-            report_mentioned=True,
-        )
-        factor_groups.append(category)
+    factor_groups = {
+        "outputs": outputs,
+        "inputs": inputs,
+        "despite": despite,
+    }
+    enactment_groups = {
+        "enactments": enactments,
+        "enactments_despite": enactments_despite,
+    }
+    built_factors: Dict[str, [Tuple[Factor]]] = {}
+    built_enactments: Dict[str, [Tuple[Enactment]]] = {}
 
-    enactment_dicts = [enactments, enactments_despite]
-    enactment_groups = []
-    for category in enactment_dicts:
-        category, mentioned = read_enactments(
-            record_list=category,
+    for category_name, factor_group in factor_groups.items():
+        built_factors[category_name], mentioned = read_factors(
+            record_list=factor_group,
             mentioned=mentioned,
             regime=regime,
             report_mentioned=True,
         )
-        enactment_groups.append(category)
+    for category_name, enactment_group in enactment_groups.items():
+        built_enactments[category_name], mentioned = read_enactments(
+            record_list=enactment_group,
+            mentioned=mentioned,
+            regime=regime,
+            report_mentioned=True,
+        )
 
     procedure = Procedure(
-        outputs=factor_groups[0], inputs=factor_groups[1], despite=factor_groups[2]
+        outputs=built_factors["outputs"],
+        inputs=built_factors["inputs"],
+        despite=built_factors["despite"]
     )
 
     answer = Rule(
         procedure=procedure,
-        enactments=enactment_groups[0],
-        enactments_despite=enactment_groups[1],
+        enactments=built_enactments["enactments"],
+        enactments_despite=built_enactments["enactments_despite"],
         mandatory=mandatory,
         universal=universal,
         generic=generic,
