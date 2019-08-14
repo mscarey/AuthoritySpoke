@@ -14,7 +14,7 @@ from typing import ClassVar, Dict, Iterable, List, Optional, Tuple
 from dataclasses import dataclass
 
 from authorityspoke.factors import Factor, means, new_context_helper
-from authorityspoke.relations import Analogy, all_analogy_matches
+from authorityspoke.analogies import Analogy, all_analogy_matches
 
 
 @dataclass(frozen=True)
@@ -203,7 +203,7 @@ class Procedure(Factor):
             with :meth:`.Factor.means` or :meth:`.Factor.__ge__`.
         """
         if self.generic:
-            return (self)
+            return self
         return tuple(
             {
                 generic: None

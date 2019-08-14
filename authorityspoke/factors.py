@@ -15,7 +15,7 @@ from dataclasses import astuple, dataclass
 
 from authorityspoke.context import new_context_helper
 from authorityspoke.predicates import Predicate
-from authorityspoke.relations import Analogy
+from authorityspoke.analogies import Analogy
 
 logger = logging.getLogger(__name__)
 
@@ -534,7 +534,7 @@ class Factor(ABC):
             ``comparison``.
         """
         if other and not isinstance(other, Factor):
-            raise TypeError(f"{other} is type {other.__class__.__name__}, not Factor")
+            raise TypeError
         for incoming_register in self._context_registers(other, comparison):
             for new_register_variation in self._registers_for_interchangeable_context(
                 incoming_register
@@ -600,7 +600,7 @@ class Fact(Factor):
             approach of hard-coding their names and order will have to change.
     """
     predicate: Predicate
-    context_factors: Sequence[Union[Enactment, Factor]] = ()
+    context_factors: Sequence[Factor] = ()
     name: Optional[str] = None
     standard_of_proof: Optional[str] = None
     absent: bool = False
