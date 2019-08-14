@@ -3,7 +3,7 @@ import operator
 
 import pytest
 
-from authorityspoke.factors import Entity, Factor, means
+from authorityspoke.factors import Entity, Factor, ContextRegister, means
 from authorityspoke.facts import Fact
 from authorityspoke.rules import Rule
 from authorityspoke.opinions import Opinion
@@ -219,47 +219,32 @@ class TestFacts:
             make_entity["motel"]: make_entity["watt"],
         }
 
-    def test_import_to_mapping(self, make_entity, watt_factor):
+    def test_import_to_context_register(self, make_entity, watt_factor):
         f = watt_factor["f7"]
-        assert (
-            len(
-                f._import_to_mapping(
-                    {
+        left = ContextRegister({
                         watt_factor["f7"]: watt_factor["f7_swap_entities"],
                         make_entity["motel"]: make_entity["trees"],
-                    },
-                    {make_entity["trees"]: make_entity["motel"]},
-                )
-            )
-            == 3
-        )
+                    })
+        right = ContextRegister({make_entity["trees"]: make_entity["motel"]})
+        assert len(left.merged_with(right)) == 3
 
-    def test_import_to_mapping_no_change(self, make_entity, watt_factor):
-        f = watt_factor["f7"]
-        old_mapping = {make_entity["motel"]: make_entity["trees"]}
-        assert dict(
-            f._import_to_mapping(
-                old_mapping, {make_entity["motel"]: make_entity["trees"]}
+    def test_import_to_mapping_no_change(self, make_entity):
+        old_mapping = ContextRegister({make_entity["motel"]: make_entity["trees"]})
+        assert dict(old_mapping.merged_with({make_entity["motel"]: make_entity["trees"]}
             )
         ) == {
             make_entity["motel"]: make_entity["trees"],
             make_entity["trees"]: make_entity["motel"],
         }
 
-    def test_import_to_mapping_conflict(self, make_entity, watt_factor):
-        assert (
-            watt_factor["f7"]._import_to_mapping(
-                {make_entity["motel"]: make_entity["trees"]},
-                {make_entity["motel"]: make_entity["motel"]},
-            )
-            is None
-        )
+    def test_import_to_mapping_conflict(self, make_entity):
+        merged = ContextRegister({make_entity["motel"]: make_entity["trees"]}).merged_with(
+            ContextRegister({make_entity["motel"]: make_entity["motel"]}))
+        assert merged is None
 
-    def test_import_to_mapping_reciprocal(self, watt_factor, caplog):
-        caplog.set_level(logging.DEBUG)
-        mapping = Factor._import_to_mapping(
-            {watt_factor["f7"]: watt_factor["f7"]},
-            {watt_factor["f7_swap_entities"]: watt_factor["f7_swap_entities"]},
+    def test_import_to_mapping_reciprocal(self, watt_factor):
+        mapping = ContextRegister({watt_factor["f7"]: watt_factor["f7"]}).merged_with(
+            {watt_factor["f7_swap_entities"]: watt_factor["f7_swap_entities"]}
         )
         assert mapping[watt_factor["f7"]] == watt_factor["f7"]
 
@@ -272,23 +257,22 @@ class TestFacts:
 
         Try putting Entity's custom hash method back? Will that help?
         """
-
-        matches = {
+        matches = ContextRegister({
             make_entity["motel"]: make_entity["trees"],
             make_entity["trees"]: make_entity["motel"],
             make_entity["watt"]: make_entity["watt"],
-        }
+        })
         new_matches = [
             match
             for match in watt_factor["f7"]._registers_for_interchangeable_context(
                 matches
             )
         ]
-        assert {
+        assert ContextRegister({
             make_entity["trees"]: make_entity["trees"],
             make_entity["motel"]: make_entity["motel"],
             make_entity["watt"]: make_entity["watt"],
-        } in new_matches
+        }) in new_matches
 
     # Equality
 
@@ -578,4 +562,3 @@ class TestFacts:
     def test_cant_add_enactment_to_fact(self, watt_factor, make_enactment):
         with pytest.raises(TypeError):
             print(watt_factor["f3"] + make_enactment["search_clause"])
-

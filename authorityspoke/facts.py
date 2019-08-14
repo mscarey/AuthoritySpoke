@@ -4,7 +4,7 @@ import operator
 from typing import ClassVar, Dict, List, Optional, Sequence, Union
 
 from authorityspoke.context import new_context_helper
-from authorityspoke.factors import Factor
+from authorityspoke.factors import Factor, ContextRegister
 from authorityspoke.predicates import Predicate
 
 
@@ -131,7 +131,7 @@ class Fact(Factor):
         return super().__str__().format(string)
 
     @property
-    def interchangeable_factors(self) -> List[Dict[Factor, Factor]]:
+    def interchangeable_factors(self) -> List[ContextRegister]:
         r"""
         Get ways to reorder context :class:`Factor`\s without changing truth value of ``self``.
 

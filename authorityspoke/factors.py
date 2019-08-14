@@ -2,19 +2,14 @@ r""":class:`Factor`\s, or inputs and outputs of legal :class:`.Rule`\s."""
 
 from __future__ import annotations
 
-import functools
+from abc import ABC
+from dataclasses import astuple, dataclass
 import logging
 import operator
-
-from abc import ABC
-
 from typing import Any, Callable, ClassVar, Dict, Iterable, Iterator, List
-from typing import Optional, Sequence, Tuple, Union
-
-from dataclasses import astuple, dataclass
+from typing import Mapping, Optional, Sequence, Tuple, Union
 
 from authorityspoke.context import new_context_helper
-from authorityspoke.analogies import Analogy
 
 logger = logging.getLogger(__name__)
 
@@ -54,7 +49,7 @@ class Factor(ABC):
         return ()
 
     @property
-    def interchangeable_factors(self) -> List[Dict[Factor, Factor]]:
+    def interchangeable_factors(self) -> List[ContextRegister]:
         """
         List ways to reorder :attr:`context_factors` but preserve ``self``\'s meaning.
 
@@ -157,7 +152,7 @@ class Factor(ABC):
 
     def _context_registers(
         self, other: Factor, comparison: Callable
-    ) -> Iterator[Dict[Factor, Optional[Factor]]]:
+    ) -> Iterator[ContextRegister]:
         r"""
         Search for ways to match :attr:`context_factors` of ``self`` and ``other``.
 
@@ -167,9 +162,9 @@ class Factor(ABC):
         """
 
         if other is None:
-            yield {}
+            yield ContextRegister()
         elif self.generic or other.generic:
-            yield {self: other, other: self}
+            yield ContextRegister({self: other, other: self})
         else:
             relation = Analogy(self.context_factors, other.context_factors, comparison)
             for register in relation.ordered_comparison():
@@ -409,8 +404,8 @@ class Factor(ABC):
         return self.__dict__.copy()
 
     def _registers_for_interchangeable_context(
-        self, matches: Dict[Factor, Optional[Factor]]
-    ) -> Iterator[Dict[Factor, Optional[Factor]]]:
+        self, matches: ContextRegister
+    ) -> Iterator[ContextRegister]:
         r"""
         Find possible combination of interchangeable :attr:`context_factors`.
 
@@ -419,19 +414,10 @@ class Factor(ABC):
             ``self``\'s and ``other``\'s interchangeable
             :attr:`context_factors`.
         """
-
-        def replace_factors_in_dict(
-            matches: Dict[Factor, Optional[Factor]],
-            replacement_dict: Dict[Factor, Factor],
-        ):
-            values = matches.values()
-            keys = [replacement_dict.get(factor) or factor for factor in matches.keys()]
-            return dict(zip(keys, values))
-
         yield matches
         already_returned: List[Dict[Factor, Optional[Factor]]] = [matches]
         for replacement_dict in self.interchangeable_factors:
-            changed_registry = replace_factors_in_dict(matches, replacement_dict)
+            changed_registry = matches.replace_keys(replacement_dict)
             if not any(
                 changed_registry == returned_dict for returned_dict in already_returned
             ):
@@ -446,53 +432,9 @@ class Factor(ABC):
             string = "absence of " + string
         return string
 
-    @staticmethod
-    def _import_to_mapping(
-        self_mapping: Dict[Factor, Factor],
-        incoming_mapping: Dict[Factor, Optional[Factor]],
-    ) -> Optional[Dict[Factor, Factor]]:
-        r"""
-        Compare :class:`Factor`\s to test if two sets of matches can be merged.
-
-        :param self_mapping:
-            an existing mapping of :class:`Factor`\s
-            from ``self`` to :class:`Factor`\s from ``other``
-
-        :param incoming_mapping:
-            an incoming mapping of :class:`Factor`\s
-            from ``self`` to :class:`Factor`\s from ``other``
-
-        :returns:
-            ``None`` if the same :class:`Factor` in one mapping
-            appears to match to two different :class:`Factor`\s in the other.
-            Otherwise returns an updated :class:`dict` of matches.
-        """
-        self_mapping = dict(self_mapping)
-        # The key-value relationship isn't symmetrical when the root Factors
-        # are being compared for implication.
-        for in_key, in_value in incoming_mapping.items():
-
-            if in_key and in_value:
-                if self_mapping.get(in_key) and self_mapping.get(in_key) != in_value:
-                    logger.debug(
-                        f"{in_key} already in mapping with value "
-                        + f"{self_mapping[in_key]}, not {in_value}"
-                    )
-                    return None
-                if self_mapping.get(in_value) and self_mapping.get(in_value) != in_key:
-                    logger.debug(
-                        f"key {in_value} already in mapping with value "
-                        + f"{self_mapping[in_value]}, not {in_key}"
-                    )
-                    return None
-                if in_key.generic or in_value.generic:
-                    self_mapping[in_key] = in_value
-                    self_mapping[in_value] = in_key
-        return self_mapping
-
     def update_context_register(
-        self, other: Factor, register: Dict[Factor, Factor], comparison: Callable
-    ) -> Iterator[Optional[Dict[Factor, Factor]]]:
+        self, other: Factor, register: ContextRegister, comparison: Callable
+    ) -> Iterator[Optional[ContextRegister]]:
         r"""
         Find ways to update ``self_mapping`` to allow relationship ``comparison``.
 
@@ -515,11 +457,13 @@ class Factor(ABC):
         """
         if other and not isinstance(other, Factor):
             raise TypeError
+        if not isinstance(register, ContextRegister):
+            register = ContextRegister(register)
         for incoming_register in self._context_registers(other, comparison):
             for new_register_variation in self._registers_for_interchangeable_context(
                 incoming_register
             ):
-                yield self._import_to_mapping(register, new_register_variation)
+                yield register.merged_with(new_register_variation)
 
     @staticmethod
     def _wrap_with_tuple(item):
@@ -654,3 +598,233 @@ class Entity(Factor):
         decorator would have replaced ``self`` if any replacement was available.
         """
         return self
+
+
+class ContextRegister(Dict[Factor, Optional[Factor]]):
+    r"""
+    A mapping of corresponding :class:`Factor`\s from two different contexts.
+
+    When :class:`Factor`\s are matched in a ContextRegister, it indicates
+    that their relationship can be described by a comparison function
+    like :func:`means`, :meth:`Factor.implies`, or :meth:`Factor.consistent_with`\.
+    """
+
+    def __str__(self) -> str:
+        return "ContextRegister({})".format(super().__str__())
+
+    def is_full(self) -> bool:
+        """Check whether all keys are matched to a :class:`.Factor` value."""
+        return all(key for key in self.keys())
+
+    def replace_keys(
+        self,
+        replacements: ContextRegister,
+    ) -> ContextRegister:
+        """Construct new :class:`ContextRegister` by replacing keys."""
+        values = self.values()
+        keys = [replacements.get(factor) or factor for factor in self.keys()]
+        return ContextRegister(zip(keys, values))
+
+    def merged_with(
+        self,
+        incoming_mapping: ContextRegister,
+    ) -> Optional[ContextRegister]:
+        r"""
+        Create a new merged :class:`ContextRegister`\.
+
+        :param incoming_mapping:
+            an incoming mapping of :class:`Factor`\s
+            from ``self`` to :class:`Factor`\s.
+
+        :returns:
+            ``None`` if the same :class:`Factor` in one mapping
+            appears to match to two different :class:`Factor`\s in the other.
+            Otherwise returns an updated :class:`ContextRegister` of matches.
+        """
+        self_mapping = ContextRegister(self.items())
+        for in_key, in_value in incoming_mapping.items():
+
+            if in_key and in_value:
+                if self_mapping.get(in_key) and self_mapping.get(in_key) != in_value:
+                    logger.debug(
+                        f"{in_key} already in mapping with value "
+                        + f"{self_mapping[in_key]}, not {in_value}"
+                    )
+                    return None
+                if self_mapping.get(in_value) and self_mapping.get(in_value) != in_key:
+                    logger.debug(
+                        f"key {in_value} already in mapping with value "
+                        + f"{self_mapping[in_value]}, not {in_key}"
+                    )
+                    return None
+                if in_key.generic or in_value.generic:
+                    self_mapping[in_key] = in_value
+                    self_mapping[in_value] = in_key
+        return self_mapping
+
+@dataclass(frozen=True)
+class Analogy:
+    r"""
+    Two groups of :class:`.Factor`\s and a function that must hold between them.
+
+    Can be used to find ways to assign the :class:`.Factor`\s'
+    context assignments consistently with the :class:`Analogy`\.
+
+    :param need_matches:
+        :class:`.Factor`\s that all need to satisfy the ``comparison``
+        with some :class:`.Factor` of ``available``
+        for the relation to hold.
+
+    :param available:
+        :class:`.Factor`\s available for matching with the
+        :attr:`need_matches` :class:`.Factor`\s, but that don't
+        all need to be matched themselves for the relation to hold.
+
+    :param comparison:
+        a function defining the comparison that must be ``True``
+        between each :attr:`need_matches` and some :attr:`available`
+        for the relation to hold. Could be :meth:`.Factor.means` or
+        :meth:`.Factor.__ge__`.
+    """
+
+    need_matches: Sequence[Optional[Factor]]
+    available: Sequence[Optional[Factor]]
+    comparison: Callable
+
+    def ordered_comparison(
+        self, matches: Optional[ContextRegister] = None
+    ) -> Iterator[ContextRegister]:
+        r"""
+        Find ways for a series of pairs of :class:`.Factor`\s to satisfy a comparison.
+
+        :param matches:
+            keys representing :class:`.Factor`\s in ``self`` and
+            values representing :class:`.Factor`\s in ``other``. The
+            keys and values have been found in corresponding positions
+            in ``self`` and ``other``.
+
+        :yields:
+            every way that ``matches`` can be updated to be consistent
+            with each element of ``self.need_matches`` having the relationship
+            ``self.comparison`` with the item at the corresponding index of
+            ``self.available``.
+        """
+        if matches is None:
+            matches = ContextRegister()
+        new_mapping_choices = [matches]
+
+        # The "is" comparison is for None values.
+        if not all(
+            self_factor is self.available[index]
+            or self.comparison(self_factor, self.available[index])
+            for index, self_factor in enumerate(self.need_matches)
+        ):
+            return None
+        # TODO: change to depth-first
+        for index, self_factor in enumerate(self.need_matches):
+            mapping_choices = new_mapping_choices
+            new_mapping_choices = []
+            for mapping in mapping_choices:
+                if self_factor is None:
+                    new_mapping_choices.append(mapping)
+                else:
+                    for incoming_register in self_factor.update_context_register(
+                        self.available[index], mapping, self.comparison
+                    ):
+                        if incoming_register not in new_mapping_choices:
+                            new_mapping_choices.append(incoming_register)
+        for choice in new_mapping_choices:
+            yield choice
+
+    def unordered_comparison(
+        self,
+        matches: Dict[Factor, Factor],
+        still_need_matches: Optional[List[Factor]] = None,
+    ) -> Iterator[Dict[Factor, Optional[Factor]]]:
+        r"""
+        Find ways for two unordered sets of :class:`.Factor`\s to satisfy a comparison.
+
+        :param matches:
+            a mapping of :class:`.Factor`\s that have already been matched
+            to each other in the recursive search for a complete group of
+            matches. Starts empty when the method is first called.
+
+        :param still_need_matches:
+            :class:`.Factor`\s that need to satisfy the comparison
+            :attr:`comparison` with some :class:`.Factor` of :attr:`available`
+            for the relation to hold, and have not yet been matched.
+
+        :yields:
+            context registers showing how each :class:`.Factor` in
+            ``need_matches`` can have the relation ``comparison``
+            with some :class:`.Factor` in ``available_for_matching``,
+            with matching context.
+        """
+        if still_need_matches is None:
+            still_need_matches = list(self.need_matches)
+
+        if not still_need_matches:
+            # This seems to allow duplicate values in
+            # Procedure.output, .input, and .despite, but not in
+            # attributes of other kinds of Factors. Likely cause
+            # of bugs.
+            yield matches
+        else:
+            self_factor = still_need_matches.pop()
+            for other_factor in self.available:
+                if self.comparison(self_factor, other_factor):
+                    updated_mappings = iter(
+                        self_factor.update_context_register(
+                            other_factor, matches, self.comparison
+                        )
+                    )
+                    for new_matches in updated_mappings:
+                        if new_matches:
+                            next_steps = iter(
+                                self.unordered_comparison(
+                                    new_matches, still_need_matches
+                                )
+                            )
+                            for next_step in next_steps:
+                                yield next_step
+
+    def update_matchlist(
+        self, matchlist: List[Dict[Factor, Factor]]
+    ) -> List[Dict[Factor, Optional[Factor]]]:
+        r"""
+        Filter context assignments with :meth:`~Analogy.unordered_comparison`.
+
+        :param matchlist:
+            possible ways to match generic :class:`.Factor`\s of
+            ``need_matches`` with ``available``.
+
+        :returns:
+            a new version of ``matchlist`` filtered to be consistent with
+            ``self``\'s :meth:`~Analogy.unordered_comparison`.
+        """
+        new_matchlist = []
+        for matches in matchlist:
+            for answer in self.unordered_comparison(matches=matches):
+                new_matchlist.append(answer)
+        return new_matchlist
+
+
+def all_analogy_matches(relations: Tuple[Analogy, ...]) -> List[Dict[Factor, Factor]]:
+    r"""
+    Find all context registers consistent with multiple :class:`.Analogy` comparisons.
+
+    :param relations:
+        a series of :class:`.Analogy` comparisons in which
+        the ``need_matches`` :class:`.Factor`\s all refer to
+        one context (for instance, the same :class:`.Opinion`),
+        and the ``available`` :class:`.Factor`\s all refer to
+        another context.
+
+    :returns:
+        a list of all context registers consistent with all of the
+        :class:`.Analogy`\s.
+    """
+    matchlist: List[Dict[Factor, Factor]] = [{}]
+    for relation in relations:
+        matchlist = relation.update_matchlist(matchlist)
+    return matchlist

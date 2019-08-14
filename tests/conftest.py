@@ -2,7 +2,6 @@ from typing import Any, Dict, Tuple
 
 import pytest
 
-
 from authorityspoke.factors import Factor, Entity
 from authorityspoke.enactments import Code, Enactment
 from authorityspoke.evidence import Evidence, Exhibit

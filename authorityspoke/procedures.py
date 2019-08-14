@@ -14,7 +14,7 @@ from typing import ClassVar, Dict, Iterable, List, Optional, Tuple
 from dataclasses import dataclass
 
 from authorityspoke.factors import Factor, means, new_context_helper
-from authorityspoke.analogies import Analogy, all_analogy_matches
+from authorityspoke.factors import Analogy, all_analogy_matches
 
 
 @dataclass(frozen=True)
