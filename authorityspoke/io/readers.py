@@ -886,8 +886,8 @@ def read_rule(
         "enactments": enactments,
         "enactments_despite": enactments_despite,
     }
-    built_factors: Dict[str, [Tuple[Factor]]] = {}
-    built_enactments: Dict[str, [Tuple[Enactment]]] = {}
+    built_factors: Dict[str, Tuple[Factor]] = {}
+    built_enactments: Dict[str, Tuple[Enactment]] = {}
 
     for category_name, factor_group in factor_groups.items():
         built_factors[category_name], mentioned = read_factors(

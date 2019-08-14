@@ -20,47 +20,47 @@
 ``Facts``
 ==============
 
-.. inheritance-diagram:: authorityspoke.factors.Fact
+.. inheritance-diagram:: authorityspoke.facts.Fact
     :top-classes: authorityspoke.factors.Factor
     :parts: 1
 
-.. autoclass:: authorityspoke.factors.Fact
+.. autoclass:: authorityspoke.facts.Fact
 
 ``Exhibits``
 ==============
 
-.. inheritance-diagram:: authorityspoke.factors.Exhibit
+.. inheritance-diagram:: authorityspoke.evidence.Exhibit
     :top-classes: authorityspoke.factors.Factor
     :parts: 1
 
-.. autoclass:: authorityspoke.factors.Exhibit
+.. autoclass:: authorityspoke.evidence.Exhibit
 
 ``Evidence``
 ==============
 
-.. inheritance-diagram:: authorityspoke.factors.Evidence
+.. inheritance-diagram:: authorityspoke.evidence.Evidence
     :top-classes: authorityspoke.factors.Factor
     :parts: 1
 
-.. autoclass:: authorityspoke.factors.Evidence
+.. autoclass:: authorityspoke.evidence.Evidence
 
 ``Pleadings``
 ==============
 
-.. inheritance-diagram:: authorityspoke.factors.Pleading
+.. inheritance-diagram:: authorityspoke.pleadings.Pleading
     :top-classes: authorityspoke.factors.Factor
     :parts: 1
 
-.. autoclass:: authorityspoke.factors.Pleading
+.. autoclass:: authorityspoke.pleadings.Pleading
 
 ``Allegations``
 ================
 
-.. inheritance-diagram:: authorityspoke.factors.Allegation
+.. inheritance-diagram:: authorityspoke.pleadings.Allegation
     :top-classes: authorityspoke.factors.Factor
     :parts: 1
 
-.. autoclass:: authorityspoke.factors.Allegation
+.. autoclass:: authorityspoke.pleadings.Allegation
 
 ``Procedures``
 ==============
