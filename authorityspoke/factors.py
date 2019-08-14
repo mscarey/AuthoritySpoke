@@ -616,18 +616,14 @@ class ContextRegister(Dict[Factor, Optional[Factor]]):
         """Check whether all keys are matched to a :class:`.Factor` value."""
         return all(key for key in self.keys())
 
-    def replace_keys(
-        self,
-        replacements: ContextRegister,
-    ) -> ContextRegister:
+    def replace_keys(self, replacements: ContextRegister) -> ContextRegister:
         """Construct new :class:`ContextRegister` by replacing keys."""
         values = self.values()
         keys = [replacements.get(factor) or factor for factor in self.keys()]
         return ContextRegister(zip(keys, values))
 
     def merged_with(
-        self,
-        incoming_mapping: ContextRegister,
+        self, incoming_mapping: ContextRegister
     ) -> Optional[ContextRegister]:
         r"""
         Create a new merged :class:`ContextRegister`\.
@@ -661,6 +657,7 @@ class ContextRegister(Dict[Factor, Optional[Factor]]):
                     self_mapping[in_key] = in_value
                     self_mapping[in_value] = in_key
         return self_mapping
+
 
 @dataclass(frozen=True)
 class Analogy:
@@ -738,9 +735,9 @@ class Analogy:
 
     def unordered_comparison(
         self,
-        matches: Dict[Factor, Factor],
+        matches: ContextRegister,
         still_need_matches: Optional[List[Factor]] = None,
-    ) -> Iterator[Dict[Factor, Optional[Factor]]]:
+    ) -> Iterator[ContextRegister]:
         r"""
         Find ways for two unordered sets of :class:`.Factor`\s to satisfy a comparison.
 
@@ -789,8 +786,8 @@ class Analogy:
                                 yield next_step
 
     def update_matchlist(
-        self, matchlist: List[Dict[Factor, Factor]]
-    ) -> List[Dict[Factor, Optional[Factor]]]:
+        self, matchlist: List[ContextRegister]
+    ) -> List[ContextRegister]:
         r"""
         Filter context assignments with :meth:`~Analogy.unordered_comparison`.
 
@@ -809,7 +806,7 @@ class Analogy:
         return new_matchlist
 
 
-def all_analogy_matches(relations: Tuple[Analogy, ...]) -> List[Dict[Factor, Factor]]:
+def all_analogy_matches(relations: Tuple[Analogy, ...]) -> List[ContextRegister]:
     r"""
     Find all context registers consistent with multiple :class:`.Analogy` comparisons.
 
@@ -824,7 +821,7 @@ def all_analogy_matches(relations: Tuple[Analogy, ...]) -> List[Dict[Factor, Fac
         a list of all context registers consistent with all of the
         :class:`.Analogy`\s.
     """
-    matchlist: List[Dict[Factor, Factor]] = [{}]
+    matchlist: List[ContextRegister] = [ContextRegister()]
     for relation in relations:
         matchlist = relation.update_matchlist(matchlist)
     return matchlist
