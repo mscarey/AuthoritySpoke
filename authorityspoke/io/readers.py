@@ -8,16 +8,19 @@ import datetime
 from functools import partial
 import re
 
-from typing import Any, Dict, List, Iterable, Iterator, Optional, Tuple, Union
+from typing import Any, Dict, List, Iterable, Iterator, Optional, Tuple, Type, Union
 
 from pint import UnitRegistry
 
 from authorityspoke.io import references
 from authorityspoke.enactments import Code, Enactment
-from authorityspoke.factors import Entity, Factor, Fact
+from authorityspoke.evidence import Exhibit, Evidence
+from authorityspoke.factors import Entity, Factor
+from authorityspoke.facts import Fact
 from authorityspoke.holdings import Holding
 from authorityspoke.jurisdictions import Regime
 from authorityspoke.opinions import Opinion
+from authorityspoke.pleadings import Allegation, Pleading
 from authorityspoke.predicates import Predicate
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
@@ -27,6 +30,10 @@ TextLinkDict = Dict[Union[Factor, Enactment], List[TextQuoteSelector]]
 
 ureg = UnitRegistry()
 
+FACTOR_SUBCLASSES = {
+    class_obj.__name__: class_obj
+    for class_obj in (Allegation, Entity, Exhibit, Evidence, Fact, Pleading)
+}
 
 @references.log_mentioned_context
 def read_enactment(
@@ -347,6 +354,25 @@ def read_fact(
     )
     return (answer, mentioned) if report_mentioned else answer
 
+def subclass_from_str(name: str) -> Type:
+    """
+    Find class for use in JSON deserialization process.
+
+    Obtains a classname of a :class:`Factor`
+    subclass from a string. The list of subclasses used
+    here must be updated wheneven a new one is created.
+
+    :param name: name of the desired subclass.
+
+    :returns: the Class named ``name``.
+    """
+    answer = FACTOR_SUBCLASSES.get(name.capitalize())
+    if answer is None:
+        raise ValueError(
+            f'"type" value in input must be one of '
+            + f"{list(FACTOR_SUBCLASSES.keys())}, not {name}"
+        )
+    return answer
 
 @references.log_mentioned_context
 def read_factor(
@@ -368,7 +394,7 @@ def read_factor(
     """
     cname = factor_record["type"]
     mentioned = mentioned or {}
-    target_class = Factor.subclass_from_str(cname)
+    target_class = subclass_from_str(cname)
     if target_class == Fact:
         created_factor, mentioned = read_fact(
             mentioned=mentioned, report_mentioned=True, **factor_record

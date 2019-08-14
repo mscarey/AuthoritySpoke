@@ -3,7 +3,6 @@ import operator
 
 import pytest
 
-from authorityspoke.factors import Entity, Factor, Fact
 from authorityspoke.rules import Rule
 from authorityspoke.opinions import Opinion
 from authorityspoke.predicates import Predicate, ureg, Q_

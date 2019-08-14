@@ -1,6 +1,6 @@
 import logging
 
-from authorityspoke.factors import Exhibit
+from authorityspoke.evidence import Exhibit
 
 
 class TestExhibits:

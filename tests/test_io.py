@@ -7,7 +7,7 @@ import pytest
 
 from authorityspoke.enactments import Code, Enactment
 from authorityspoke.factors import Entity
-from authorityspoke.factors import Fact
+from authorityspoke.facts import Fact
 from authorityspoke.holdings import Holding
 from authorityspoke.opinions import Opinion
 from authorityspoke.predicates import Predicate

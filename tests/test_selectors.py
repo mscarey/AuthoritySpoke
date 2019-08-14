@@ -1,8 +1,6 @@
 import pytest
 
 from authorityspoke.enactments import Code, Enactment
-from authorityspoke.factors import Predicate, Entity, Factor, Fact
-from authorityspoke.factors import Evidence, Exhibit
 from authorityspoke.io import loaders
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
@@ -64,7 +62,6 @@ class TestSelectors:
             )
 
     def test_fail_no_exact_or_source(self, make_code):
-        usc17 = make_code["usc17"]
         with pytest.raises(ValueError):
             copyright_exceptions = TextQuoteSelector(
                 path="/us/usc/t17/s102/b", prefix="sound recordings"

@@ -5,8 +5,8 @@ import pytest
 
 from authorityspoke.factors import Factor, Entity
 from authorityspoke.enactments import Code, Enactment
-from authorityspoke.factors import Evidence, Exhibit
-from authorityspoke.factors import Fact
+from authorityspoke.evidence import Evidence, Exhibit
+from authorityspoke.facts import Fact
 from authorityspoke.holdings import Holding
 from authorityspoke.jurisdictions import Jurisdiction, Regime
 from authorityspoke.opinions import Opinion

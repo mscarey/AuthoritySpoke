@@ -1,5 +1,5 @@
-from authorityspoke.factors import Fact
-from authorityspoke.factors import Evidence, Exhibit
+from authorityspoke.evidence import Evidence, Exhibit
+from authorityspoke.facts import Fact
 
 
 class TestEvidence:
