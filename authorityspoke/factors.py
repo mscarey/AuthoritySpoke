@@ -14,7 +14,6 @@ from typing import Optional, Sequence, Tuple, Union
 logger = logging.getLogger(__name__)
 
 
-
 def new_context_helper(func: Callable):
     r"""
     Search :class:`.Factor` for generic :class:`.Factor`\s to use in new context.
@@ -90,6 +89,7 @@ def new_context_helper(func: Callable):
         return func(factor, changes)
 
     return wrapper
+
 
 @dataclass(frozen=True, init=False)
 class Factor(ABC):
@@ -783,28 +783,40 @@ class Analogy:
             ``self.comparison`` with the item at the corresponding index of
             ``self.available``.
         """
+
+        def update_register(register: ContextRegister, i: int = 0):
+            """
+            Recursively search through :class:`Factor` pairs trying out context assignments.
+
+            This has the potential to take a long time to fail if the problem is
+            unsatisfiable. It will reduce risk to check that every :class:`Factor` pair
+            is satisfiable before checking that they're all satisfiable together.
+            """
+            if i == len(ordered_pairs):
+                yield register
+            else:
+                left, right = ordered_pairs[i]
+                if left is not None or right is None:
+                    if left is None:
+                        for new_register in update_register(register, i + 1):
+                            yield new_register
+                    else:
+                        new_mapping_choices: List[ContextRegister] = []
+                        for incoming_register in left.update_context_register(
+                            right, register, self.comparison
+                        ):
+                            if incoming_register not in new_mapping_choices:
+                                new_mapping_choices.append(incoming_register)
+                                for new_register in update_register(
+                                    incoming_register, i + 1
+                                ):
+                                    yield new_register
+
         if matches is None:
             matches = ContextRegister()
-        new_mapping_choices = [matches]
-
-        ordered_pairs = zip_longest(self.need_matches, self.available)
-        # TODO: change to depth-first
-        for left, right in ordered_pairs:
-            if left is None and right is not None:
-                return None
-            mapping_choices = new_mapping_choices
-            new_mapping_choices = []
-            for mapping in mapping_choices:
-                if left is None:
-                    new_mapping_choices.append(mapping)
-                else:
-                    for incoming_register in left.update_context_register(
-                        right, mapping, self.comparison
-                    ):
-                        if incoming_register not in new_mapping_choices:
-                            new_mapping_choices.append(incoming_register)
-        for choice in new_mapping_choices:
-            yield choice
+        ordered_pairs = list(zip_longest(self.need_matches, self.available))
+        for updated in update_register(register=matches):
+            yield updated
 
     def unordered_comparison(
         self,
