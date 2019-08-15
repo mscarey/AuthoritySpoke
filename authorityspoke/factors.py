@@ -4,15 +4,92 @@ from __future__ import annotations
 
 from abc import ABC
 from dataclasses import astuple, dataclass
+import functools
+from itertools import zip_longest
 import logging
 import operator
-from typing import Any, Callable, ClassVar, Dict, Iterable, Iterator, List
-from typing import Mapping, Optional, Sequence, Tuple, Union
-
-from authorityspoke.context import new_context_helper
+from typing import Any, Callable, Dict, Iterable, Iterator, List
+from typing import Optional, Sequence, Tuple, Union
 
 logger = logging.getLogger(__name__)
 
+
+
+def new_context_helper(func: Callable):
+    r"""
+    Search :class:`.Factor` for generic :class:`.Factor`\s to use in new context.
+
+    Decorators for memoizing generic :class:`.Factor`\s.
+    Used when changing an abstract :class:`.Rule` from
+    one concrete context to another.
+
+    If a :class:`list` has been passed in rather than a :class:`dict`, uses
+    the input as a series of :class:`Factor`\s to replace the
+    :attr:`~Factor.generic_factors` from the calling object.
+
+    Also, if ``changes`` contains a replacement for the calling
+    object, the decorator returns the replacement and never calls
+    the decorated function.
+
+    :param factor:
+        a :class:`.Factor` that is having its generic :class:`.Factor`\s
+        replaced to change context (for instance, to change to the context
+        of a different case involving parties represented by different
+        :class:`.Entity` objects).
+
+    :param changes:
+        indicates the which generic :class:`.Factor`\s within ``factor`` should
+        be replaced and what they should be replaced with.
+
+    :param context_opinion:
+        a second object that with generic factors that need to be searched
+        when trying to resolve what a string in the `changes` parameter
+        refers to.
+
+    :returns:
+        a new :class:`.Factor` object in the new context.
+    """
+
+    @functools.wraps(func)
+    def wrapper(
+        factor: Factor,
+        changes: Optional[Union[Sequence[Factor], Dict[Factor, Factor]]],
+        context_opinion: Optional[Opinion] = None,
+    ) -> Factor:
+
+        if changes is None:
+            return factor
+        if not isinstance(changes, Iterable):
+            changes = (changes,)
+        if not isinstance(changes, dict):
+            generic_factors = factor.generic_factors
+            if len(generic_factors) < len(changes):
+                raise ValueError(
+                    f"The iterable {changes} is too long to be interpreted "
+                    + f"as a list of replacements for the "
+                    + f"{len(generic_factors)} items of generic_factors."
+                )
+            changes = dict(zip(generic_factors, changes))
+
+        for context_factor in changes:
+            name_to_seek = changes[context_factor]
+            if isinstance(name_to_seek, str):
+                changes[context_factor] = factor.get_factor_by_name(name_to_seek)
+            if context_opinion and not changes[context_factor]:
+                changes[context_factor] = context_opinion.get_factor_by_name(
+                    name_to_seek
+                )
+            if not changes[context_factor]:
+                raise ValueError(
+                    f"Unable to find a Factor with the name '{name_to_seek}'"
+                )
+
+            if factor.means(context_factor) and factor.name == context_factor.name:
+                return changes[context_factor]
+
+        return func(factor, changes)
+
+    return wrapper
 
 @dataclass(frozen=True, init=False)
 class Factor(ABC):
@@ -710,23 +787,23 @@ class Analogy:
             matches = ContextRegister()
         new_mapping_choices = [matches]
 
-        # The "is" comparison is for None values.
-        if not all(
-            self_factor is self.available[index]
-            or self.comparison(self_factor, self.available[index])
-            for index, self_factor in enumerate(self.need_matches)
-        ):
-            return None
+        ordered_pairs = zip_longest(self.need_matches, self.available)
         # TODO: change to depth-first
-        for index, self_factor in enumerate(self.need_matches):
+        for left, right in ordered_pairs:
+            if left is None:
+                if right is not None:
+                    return None
+            else:
+                if not self.comparison(left, right):
+                    return None
             mapping_choices = new_mapping_choices
             new_mapping_choices = []
             for mapping in mapping_choices:
-                if self_factor is None:
+                if left is None:
                     new_mapping_choices.append(mapping)
                 else:
-                    for incoming_register in self_factor.update_context_register(
-                        self.available[index], mapping, self.comparison
+                    for incoming_register in left.update_context_register(
+                        right, mapping, self.comparison
                     ):
                         if incoming_register not in new_mapping_choices:
                             new_mapping_choices.append(incoming_register)

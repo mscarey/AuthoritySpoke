@@ -15,9 +15,8 @@ from typing import Optional, Union
 
 from dataclasses import dataclass
 
-from authorityspoke.context import new_context_helper
 from authorityspoke.enactments import Enactment
-from authorityspoke.factors import Factor
+from authorityspoke.factors import Factor, new_context_helper
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
 from authorityspoke.selectors import TextQuoteSelector

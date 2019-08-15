@@ -3,7 +3,7 @@ import operator
 
 from typing import ClassVar, Dict, List, Optional, Sequence, Union
 
-from authorityspoke.context import new_context_helper
+from authorityspoke.factors import new_context_helper
 from authorityspoke.factors import Factor, ContextRegister
 from authorityspoke.predicates import Predicate
 
