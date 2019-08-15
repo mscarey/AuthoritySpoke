@@ -790,12 +790,8 @@ class Analogy:
         ordered_pairs = zip_longest(self.need_matches, self.available)
         # TODO: change to depth-first
         for left, right in ordered_pairs:
-            if left is None:
-                if right is not None:
-                    return None
-            else:
-                if not self.comparison(left, right):
-                    return None
+            if left is None and right is not None:
+                return None
             mapping_choices = new_mapping_choices
             new_mapping_choices = []
             for mapping in mapping_choices:
