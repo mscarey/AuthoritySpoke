@@ -228,7 +228,7 @@ class Factor(ABC):
         return False
 
     def _context_registers(
-        self, other: Factor, comparison: Callable
+        self, other: Optional[Factor], comparison: Callable
     ) -> Iterator[ContextRegister]:
         r"""
         Search for ways to match :attr:`context_factors` of ``self`` and ``other``.
@@ -510,7 +510,7 @@ class Factor(ABC):
         return string
 
     def update_context_register(
-        self, other: Factor, register: ContextRegister, comparison: Callable
+        self, other: Optional[Factor], register: ContextRegister, comparison: Callable
     ) -> Iterator[Optional[ContextRegister]]:
         r"""
         Find ways to update ``self_mapping`` to allow relationship ``comparison``.

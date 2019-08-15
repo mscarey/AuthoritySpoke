@@ -13,8 +13,8 @@ from typing import ClassVar, Dict, Iterable, List, Optional, Tuple
 
 from dataclasses import dataclass
 
-from authorityspoke.factors import Factor, means, new_context_helper
-from authorityspoke.factors import Analogy, all_analogy_matches
+from authorityspoke.factors import Factor, ContextRegister, new_context_helper
+from authorityspoke.factors import Analogy, all_analogy_matches, means
 
 
 @dataclass(frozen=True)
@@ -483,7 +483,7 @@ class Procedure(Factor):
             # Verifying that every factor in self is in other.
             # Also verifying that every factor in other is in self.
         groups = ("outputs", "inputs", "despite")
-        matchlist = [{}]
+        matchlist = [ContextRegister()]
         for group in groups:
             updater = Analogy(
                 need_matches=self.__dict__[group],
@@ -495,7 +495,7 @@ class Procedure(Factor):
             return False
 
         # Now doing the same thing in reverse
-        matchlist = [{}]
+        matchlist = [ContextRegister()]
         for group in groups:
             updater = Analogy(
                 need_matches=other.__dict__[group],
