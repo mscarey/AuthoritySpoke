@@ -16,11 +16,14 @@ import re
 from dataclasses import dataclass, field
 
 from authorityspoke.factors import Factor
+from authorityspoke.enactments import Enactment
 from authorityspoke.holdings import Holding
 from authorityspoke.rules import Rule
 from authorityspoke.selectors import TextQuoteSelector
 
 logger = logging.getLogger(__name__)
+
+TextLinkDict = Dict[Union[Factor, Enactment], List[TextQuoteSelector]]
 
 
 @dataclass
@@ -143,7 +146,7 @@ class Opinion:
     def posit_holding(
         self,
         holding: Union[Holding, Rule],
-        text_links: Optional[Dict[Factor, List[TextQuoteSelector]]] = None,
+        text_links: Optional[TextLinkDict] = None,
         context: Optional[Sequence[Factor]] = None,
     ) -> None:
 
@@ -175,7 +178,7 @@ class Opinion:
     def posit_holdings(
         self,
         holdings: Iterable[Union[Holding, Rule]],
-        text_links: Optional[Dict[Factor, List[TextQuoteSelector]]] = None,
+        text_links: Optional[TextLinkDict] = None,
         context: Optional[Sequence[Factor]] = None,
     ):
         r"""
@@ -205,7 +208,7 @@ class Opinion:
     def posit(
         self,
         holdings: Union[Holding, Iterable[Union[Holding, Rule]]],
-        text_links: Optional[Dict[Factor, List[TextQuoteSelector]]] = None,
+        text_links: Optional[TextLinkDict] = None,
         context: Optional[Sequence[Factor]] = None,
     ) -> None:
         r"""

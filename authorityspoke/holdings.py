@@ -16,7 +16,7 @@ from typing import Optional, Union
 from dataclasses import dataclass
 
 from authorityspoke.enactments import Enactment
-from authorityspoke.factors import Factor, new_context_helper
+from authorityspoke.factors import Factor, ContextRegister, new_context_helper
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
 from authorityspoke.selectors import TextQuoteSelector
@@ -275,7 +275,7 @@ class Holding(Factor):
         return self.evolve("rule_valid")
 
     @new_context_helper
-    def new_context(self, changes: Dict[Factor, Factor]) -> Factor:
+    def new_context(self, changes: ContextRegister) -> Factor:
         """
         Create new :class:`Holding`, replacing keys of ``changes`` with values.
 

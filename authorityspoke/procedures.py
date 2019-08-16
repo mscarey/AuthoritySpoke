@@ -277,7 +277,7 @@ class Procedure(Factor):
         return True
 
     def contradiction_between_outputs(
-        self, other: Procedure, matches: Dict[Factor, Factor]
+        self, other: Procedure, matches: ContextRegister
     ) -> bool:
         r"""
         Test whether outputs of two :class:`Procedure`\s can contradict.
@@ -506,7 +506,7 @@ class Procedure(Factor):
         return bool(matchlist)
 
     @new_context_helper
-    def new_context(self, changes: Dict[Factor, Factor]) -> Procedure:
+    def new_context(self, changes: ContextRegister) -> Procedure:
         r"""
         Create new :class:`Procedure`, replacing keys of ``changes`` with values.
 

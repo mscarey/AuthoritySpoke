@@ -52,7 +52,7 @@ def new_context_helper(func: Callable):
     @functools.wraps(func)
     def wrapper(
         factor: Factor,
-        changes: Optional[Union[Sequence[Factor], Dict[Factor, Factor]]],
+        changes: Optional[Union[Sequence[Factor], ContextRegister]],
         context_opinion: Optional[Opinion] = None,
     ) -> Factor:
 
@@ -451,7 +451,7 @@ class Factor(ABC):
         return self.evolve({"generic": True})
 
     @new_context_helper
-    def new_context(self, changes: Dict[Factor, Factor]) -> Factor:
+    def new_context(self, changes: ContextRegister) -> Factor:
         r"""
         Create new :class:`Factor`, replacing keys of ``changes`` with values.
 
@@ -492,7 +492,7 @@ class Factor(ABC):
             :attr:`context_factors`.
         """
         yield matches
-        already_returned: List[Dict[Factor, Optional[Factor]]] = [matches]
+        already_returned: List[ContextRegister] = [matches]
         for replacement_dict in self.interchangeable_factors:
             changed_registry = matches.replace_keys(replacement_dict)
             if not any(
@@ -637,7 +637,7 @@ class Entity(Factor):
 
     def _context_register(
         self, other: Factor, comparison
-    ) -> Iterator[Dict[Factor, Factor]]:
+    ) -> Iterator[ContextRegister]:
         """
         Find how ``self``\'s context of can be mapped onto ``other``\'s.
 
@@ -667,7 +667,7 @@ class Entity(Factor):
         return False
 
     @new_context_helper
-    def new_context(self, changes: Dict[Factor, Factor]) -> Entity:
+    def new_context(self, changes: ContextRegister) -> Entity:
         """
         Create new :class:`Factor`, replacing keys of ``changes`` with values.
 
