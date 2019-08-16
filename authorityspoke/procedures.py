@@ -237,7 +237,7 @@ class Procedure(Factor):
         self,
         self_factors: Tuple[Factor],
         other_factors: Tuple[Factor],
-        matches: Dict[Factor, Factor],
+        matches: ContextRegister,
     ):
         r"""
         Find whether two sets of :class:`.Factor`\s can be consistent.
@@ -525,7 +525,7 @@ class Procedure(Factor):
             )
         return self.__class__(**new_dict)
 
-    def triggers_next_procedure(self, other: Procedure) -> List[Dict[Factor, Factor]]:
+    def triggers_next_procedure(self, other: Procedure) -> List[ContextRegister]:
         r"""
         Test if :class:`.Factor`\s from firing ``self`` would trigger ``other``.
 

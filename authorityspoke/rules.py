@@ -66,15 +66,15 @@ class Rule(Factor):
     """
 
     procedure: Procedure = Procedure()
-    enactments: Union[Enactment, Iterable[Enactment]] = ()
-    enactments_despite: Union[Enactment, Iterable[Enactment]] = ()
+    enactments: Iterable[Enactment] = ()
+    enactments_despite: Iterable[Enactment] = ()
     mandatory: bool = False
     universal: bool = False
     generic: bool = False
     name: Optional[str] = None
-    outputs: Optional[Union[Factor, Iterable[Factor]]] = None
-    inputs: Optional[Union[Factor, Iterable[Factor]]] = None
-    despite: Optional[Union[Factor, Iterable[Factor]]] = None
+    outputs: Iterable[Factor] = ()
+    inputs: Iterable[Factor] = ()
+    despite: Iterable[Factor] = ()
 
     context_factor_names: ClassVar = ("procedure",)
     enactment_attr_names: ClassVar = ("enactments", "enactments_despite")
@@ -100,7 +100,7 @@ class Rule(Factor):
                 ),
             )
         else:
-            if not (self.outputs == self.inputs == self.despite == None):
+            if not self.outputs == self.inputs == self.despite == None:
                 new_procedure = Procedure(
                     outputs=self.outputs or self.procedure.outputs,
                     inputs=self.inputs or self.procedure.inputs,
@@ -313,7 +313,7 @@ class Rule(Factor):
             return False
 
         if not all(
-            any(e >= other_d for e in (self.enactments + self.enactments_despite))
+            any(e >= other_d for e in self.enactments + self.enactments_despite)
             for other_d in other.enactments_despite
         ):
             return False
@@ -486,15 +486,18 @@ class Rule(Factor):
 
         newline = "\n"
         return (
-            f"the rule that the court "
+            "the rule that the court "
             + f"{'MUST' if self.mandatory else 'MAY'} "
             + f"{'ALWAYS' if self.universal else 'SOMETIMES'} "
             + f"accept the result{newline}"
             + f"{str(factor_catalog(self.procedure.outputs, 'RESULT'))}"
-            + f"{'based on the input' + newline + str(factor_catalog(self.procedure.inputs, 'GIVEN')) if self.procedure.inputs else ''}"
+            + f"{'based on the input' + newline}"
+            + f"{str(factor_catalog(self.procedure.inputs, 'GIVEN')) if self.procedure.inputs else ''}"
             + f"{str(factor_catalog(self.procedure.despite, 'DESPITE')) if self.procedure.despite else ''}"
-            + f"{'according to the legislation' + newline + str(factor_catalog(self.enactments, 'GIVEN')) if self.enactments else ''}"
-            + f"{'and despite the legislation' + newline + str(factor_catalog(self.enactments_despite, 'DESPITE')) if self.enactments_despite else ''}"
+            + f"{'according to the legislation' + newline}"
+            + f"{str(factor_catalog(self.enactments, 'GIVEN')) if self.enactments else ''}"
+            + f"{'and despite the legislation' + newline}"
+            + f"{str(factor_catalog(self.enactments_despite, 'DESPITE')) if self.enactments_despite else ''}"
         )
 
 
@@ -506,5 +509,3 @@ class Attribution:
     to an :class:`.Opinion`. An Attribution may attribute either a
     :class:`.Rule` or a further Attribution.
     """
-
-    pass
