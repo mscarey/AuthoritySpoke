@@ -511,7 +511,7 @@ class Factor(ABC):
 
     def update_context_register(
         self, other: Optional[Factor], register: ContextRegister, comparison: Callable
-    ) -> Iterator[Optional[ContextRegister]]:
+    ) -> Iterator[ContextRegister]:
         r"""
         Find ways to update ``self_mapping`` to allow relationship ``comparison``.
 
@@ -540,7 +540,9 @@ class Factor(ABC):
             for new_register_variation in self._registers_for_interchangeable_context(
                 incoming_register
             ):
-                yield register.merged_with(new_register_variation)
+                register_or_none = register.merged_with(new_register_variation)
+                if register_or_none is not None:
+                    yield register_or_none
 
     @staticmethod
     def _wrap_with_tuple(item):
