@@ -175,7 +175,7 @@ class Holding(Factor):
             self.negated()
         )
 
-    def __ge__(self, other: Union[Holding, Rule]) -> bool:
+    def implies(self, other: Union[Holding, Rule]) -> bool:
         r"""
         Test for implication.
 
@@ -215,6 +215,9 @@ class Holding(Factor):
         # that any holding is decided, or vice versa.
 
         return False
+
+    def __ge__(self, other: Union[Holding, Rule]) -> bool:
+        return self.implies(other)
 
     def _implies_if_decided(self, other) -> bool:
         r"""

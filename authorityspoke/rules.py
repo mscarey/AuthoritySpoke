@@ -319,7 +319,7 @@ class Rule(Factor):
             return False
         return True
 
-    def __ge__(self, other) -> bool:
+    def implies(self, other) -> bool:
         r"""
         Test if ``self`` implies ``other`` if posited in valid and decided :class:`.Holding`\s.
 
@@ -355,6 +355,9 @@ class Rule(Factor):
             return self.procedure.implies_all_to_all(other.procedure)
 
         return self.procedure >= other.procedure
+
+    def __ge__(self, other: Factor) -> bool:
+        return self.implies(other)
 
     def __len__(self):
         r"""

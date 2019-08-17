@@ -365,7 +365,7 @@ class Factor(ABC):
                 return factor
         return None
 
-    def __ge__(self, other: Optional[Factor]) -> bool:
+    def implies(self, other: Optional[Factor]) -> bool:
         """Test whether ``self`` implies ``other``."""
         if other is None:
             return True
@@ -387,16 +387,16 @@ class Factor(ABC):
 
     def __gt__(self, other: Optional[Factor]) -> bool:
         """Test whether ``self`` implies ``other`` and ``self`` != ``other``."""
-        return self >= other and self != other
+        return self.implies(other) and self != other
 
-    def implies(self, other: Factor) -> bool:
+    def __ge__(self, other: Factor) -> bool:
         """
-        Call :meth:`__ge__` as an alias.
+        Call :meth:`implies` as an alias.
 
         :returns:
             bool indicating whether ``self`` implies ``other``
         """
-        return self >= other
+        return self.implies(other)
 
     def _implies_if_concrete(self, other: Factor) -> bool:
         """
