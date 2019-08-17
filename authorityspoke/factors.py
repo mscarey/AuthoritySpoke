@@ -244,8 +244,7 @@ class Factor(ABC):
             yield ContextRegister({self: other, other: self})
         else:
             relation = Analogy(self.context_factors, other.context_factors, comparison)
-            for register in relation.ordered_comparison():
-                yield register
+            yield from relation.ordered_comparison()
 
     def contradicts(self, other: Optional[Factor]) -> bool:
         """
@@ -389,7 +388,7 @@ class Factor(ABC):
         """Test whether ``self`` implies ``other`` and ``self`` != ``other``."""
         return self.implies(other) and self != other
 
-    def __ge__(self, other: Factor) -> bool:
+    def __ge__(self, other: Optional[Factor]) -> bool:
         """
         Call :meth:`implies` as an alias.
 
@@ -403,7 +402,7 @@ class Factor(ABC):
         Find if ``self`` would imply ``other`` if they aren't absent or generic.
 
         Used to test implication based on :attr:`context_factors`,
-        usually after a subclasses has injected its own tests
+        usually after a subclass has injected its own tests
         based on other attributes.
 
         :returns:
@@ -417,6 +416,7 @@ class Factor(ABC):
                 if not (self_factor and self_factor >= other.context_factors[i]):
                     return False
         return self.consistent_with(other, operator.ge)
+
 
     def _implies_if_present(self, other: Factor) -> bool:
         """
@@ -635,9 +635,7 @@ class Entity(Factor):
             return f"<{self.name}>"
         return self.name
 
-    def _context_register(
-        self, other: Factor, comparison
-    ) -> Iterator[ContextRegister]:
+    def _context_register(self, other: Factor, comparison) -> Iterator[ContextRegister]:
         """
         Find how ``self``\'s context of can be mapped onto ``other``\'s.
 
@@ -798,8 +796,7 @@ class Analogy:
                 left, right = ordered_pairs[i]
                 if left is not None or right is None:
                     if left is None:
-                        for new_register in update_register(register, i + 1):
-                            yield new_register
+                        yield from update_register(register, i + 1)
                     else:
                         new_mapping_choices: List[ContextRegister] = []
                         for incoming_register in left.update_context_register(
@@ -807,16 +804,14 @@ class Analogy:
                         ):
                             if incoming_register not in new_mapping_choices:
                                 new_mapping_choices.append(incoming_register)
-                                for new_register in update_register(
+                                yield from update_register(
                                     incoming_register, i + 1
-                                ):
-                                    yield new_register
+                                )
 
         if matches is None:
             matches = ContextRegister()
         ordered_pairs = list(zip_longest(self.need_matches, self.available))
-        for updated in update_register(register=matches):
-            yield updated
+        yield from update_register(register=matches)
 
     def unordered_comparison(
         self,
@@ -862,13 +857,11 @@ class Analogy:
                     )
                     for new_matches in updated_mappings:
                         if new_matches:
-                            next_steps = iter(
+                            yield from iter(
                                 self.unordered_comparison(
                                     new_matches, still_need_matches
                                 )
                             )
-                            for next_step in next_steps:
-                                yield next_step
 
     def update_matchlist(
         self, matchlist: List[ContextRegister]
