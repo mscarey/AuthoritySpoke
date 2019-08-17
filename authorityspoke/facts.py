@@ -236,7 +236,7 @@ class Fact(Factor):
             the same time under the given assumption.
         """
 
-        if not isinstance(other, self.__class__) and not (self.absent and other.absent):
+        if isinstance(other, self.__class__) and not (self.absent and other.absent):
             if self.absent:
                 yield from other._implies_if_present(self)
             elif not other.absent:

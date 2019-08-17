@@ -248,7 +248,7 @@ class Factor(ABC):
             relation = Analogy(self.context_factors, other.context_factors, comparison)
             yield from relation.ordered_comparison()
 
-    def contradicts(self, other: Optional[Factor]) -> bool:
+    def contradicts(self, other: Optional[Factor], explain: bool = False) -> Union[bool, ContextRegister]:
         """
         Test whether ``self`` implies the absence of ``other``.
 
@@ -264,7 +264,13 @@ class Factor(ABC):
                 f"{self.__class__} objects may only be compared for "
                 + "contradiction with other Factor objects or None."
             )
-        return self._contradicts_if_factor(other)
+        answer = self._contradicts_if_factor(other)
+
+        try:
+            register = next(answer)
+            return register if explain else bool(answer)
+        except StopIteration:
+            return False
 
     def _contradicts_if_factor(self, other: Factor) -> bool:
         """
