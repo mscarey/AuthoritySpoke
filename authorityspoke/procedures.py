@@ -384,15 +384,6 @@ class Procedure(Factor):
             for matches in matchlist
         )
 
-    def implies(self, other: Procedure) -> bool:
-        """
-        Call :meth:`__ge__` as an alias.
-
-        :returns:
-            bool indicating whether ``self`` implies ``other``
-        """
-        return self >= other
-
     def implies_all_to_some(self, other: Procedure) -> bool:
         r"""
         Find if ``self`` applying in all cases implies ``other`` applies in some.

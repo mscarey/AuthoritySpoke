@@ -19,14 +19,14 @@ from authorityspoke.factors import Entity, Factor
 from authorityspoke.facts import Fact
 from authorityspoke.holdings import Holding
 from authorityspoke.jurisdictions import Regime
-from authorityspoke.opinions import Opinion
+from authorityspoke.opinions import Opinion, TextLinkDict
 from authorityspoke.pleadings import Allegation, Pleading
 from authorityspoke.predicates import Predicate
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
 from authorityspoke.selectors import TextQuoteSelector
 
-TextLinkDict = Dict[Union[Factor, Enactment], List[TextQuoteSelector]]
+
 
 ureg = UnitRegistry()
 

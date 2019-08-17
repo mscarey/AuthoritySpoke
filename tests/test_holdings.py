@@ -63,8 +63,10 @@ class TestImplication:
         assert make_holding["h2_invalid_undecided"] >= make_holding["h2_undecided"]
         assert make_holding["h2_undecided"] >= make_holding["h2_invalid_undecided"]
 
-    def test_no_implication_between_decided_and_undecided(self, make_holding):
+    def test_no_implication_undecided_to_decided(self, make_holding):
         assert not make_holding["h2_undecided"] >= make_holding["h2"]
+
+    def test_no_implication_decided_to_undecided(self, make_holding):
         assert not make_holding["h2"] > make_holding["h2_invalid_undecided"]
 
     def test_error_implication_with_procedure(self, make_holding, make_procedure):
