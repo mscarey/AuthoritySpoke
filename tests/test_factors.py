@@ -359,6 +359,10 @@ class TestFacts:
         assert watt_factor["f2"] > watt_factor["f2_generic"]
         assert not watt_factor["f2_generic"] > watt_factor["f2"]
 
+    def test_specific_factor_implies_generic_explain(self, watt_factor):
+        answer = watt_factor["f2"].implies(watt_factor["f2_generic"], explain=True)
+        assert (watt_factor["f2"], watt_factor["f2_generic"]) in answer.items()
+
     def test_specific_implies_generic_form_of_another_fact(self, watt_factor):
         assert watt_factor["f2"] > watt_factor["f3_generic"]
 

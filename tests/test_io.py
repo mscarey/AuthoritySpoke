@@ -39,7 +39,7 @@ class TestPredicateImport:
             "the distance between {Ann} and {Lee} was >= 20.1", reciprocal=True
         )
         fact_float_less = watt_factor["f8_int"]
-        assert fact_float_more > fact_float_less
+        assert fact_float_more >= fact_float_less
 
 
 class TestEntityImport:

@@ -206,7 +206,9 @@ class Factor(ABC):
             return other.new_context(self.generic_factors)
         return None
 
-    def consistent_with(self, other: Factor, comparison: Callable) -> bool:
+    def consistent_with(
+        self, other: Factor, comparison: Callable
+    ) -> List[ContextRegister]:
         """
         Find whether ``self`` and ``other`` can fit the relationship ``comparison``.
 
@@ -216,8 +218,7 @@ class Factor(ABC):
             such that they fit the relationship ``comparison``.
         """
 
-        context_registers = iter(self._context_registers(other, comparison))
-        return any(register is not None for register in context_registers)
+        return list(self._context_registers(other, comparison))
 
     def _contradicts_if_present(self, other: Factor) -> bool:
         """
@@ -225,7 +226,8 @@ class Factor(ABC):
 
         The default is ``False`` where no class-specific method is available.
         """
-        return False
+        if False:
+            yield False
 
     def _context_registers(
         self, other: Optional[Factor], comparison: Callable
@@ -364,7 +366,9 @@ class Factor(ABC):
                 return factor
         return None
 
-    def implies(self, other: Optional[Factor]) -> bool:
+    def implies(
+        self, other: Optional[Factor], explain: bool = False
+    ) -> Union[bool, List[ContextRegister]]:
         """Test whether ``self`` implies ``other``."""
         if other is None:
             return True
@@ -376,13 +380,21 @@ class Factor(ABC):
             )
         if not self.__dict__.get("absent"):
             if not other.__dict__.get("absent"):
-                return bool(self._implies_if_present(other))
-            return bool(self._contradicts_if_present(other))
+                answer = self._implies_if_present(other)
+            else:
+                answer = self._contradicts_if_present(other)
 
-        # if self.__dict__.get("absent")
-        if other.__dict__.get("absent"):
-            return bool(other._implies_if_present(self))
-        return bool(other._contradicts_if_present(self))
+        else:
+            if other.__dict__.get("absent"):
+                answer = other._implies_if_present(self)
+            else:
+                answer = other._contradicts_if_present(self)
+
+        try:
+            register = next(answer)
+            return register if explain else bool(answer)
+        except StopIteration:
+            return False
 
     def __gt__(self, other: Optional[Factor]) -> bool:
         """Test whether ``self`` implies ``other`` and ``self`` != ``other``."""
@@ -397,7 +409,7 @@ class Factor(ABC):
         """
         return self.implies(other)
 
-    def _implies_if_concrete(self, other: Factor) -> bool:
+    def _implies_if_concrete(self, other: Factor) -> Union[bool, List[ContextRegister]]:
         """
         Find if ``self`` would imply ``other`` if they aren't absent or generic.
 
@@ -411,12 +423,13 @@ class Factor(ABC):
             has ``absent=True``, neither has ``generic=True``, and
             ``other`` is an instance of ``self``'s class.
         """
+        valid = True  # TODO
         for i, self_factor in enumerate(self.context_factors):
             if other.context_factors[i]:
                 if not (self_factor and self_factor >= other.context_factors[i]):
-                    return False
-        return self.consistent_with(other, operator.ge)
-
+                    valid = False
+        if valid:
+            yield from self.consistent_with(other, operator.ge)
 
     def _implies_if_present(self, other: Factor) -> bool:
         """
@@ -429,11 +442,9 @@ class Factor(ABC):
         """
         if isinstance(other, self.__class__):
             if other.generic:
-                return True
-            if self.generic:
-                return False
-            return bool(self._implies_if_concrete(other))
-        return False
+                yield ContextRegister({self: other})
+            if not self.generic:
+                yield from self._implies_if_concrete(other)
 
     def make_generic(self) -> Factor:
         """
@@ -806,9 +817,7 @@ class Analogy:
                         ):
                             if incoming_register not in new_mapping_choices:
                                 new_mapping_choices.append(incoming_register)
-                                yield from update_register(
-                                    incoming_register, i + 1
-                                )
+                                yield from update_register(incoming_register, i + 1)
 
         if matches is None:
             matches = ContextRegister()

@@ -89,11 +89,9 @@ class TestEvidenceImplication:
 
 
 class TestEvidenceContradiction:
-    def test_no_contradiction_of_fact(
-        self, make_predicate, make_evidence, watt_mentioned
-    ):
+    def test_no_contradiction_of_fact(self, make_evidence, make_factor):
         assert not make_evidence["no_shooting"].contradicts(
-            Fact(make_predicate["p_no_shooting"], case_factors=watt_mentioned)
+            make_factor["f_no_shooting"]
         )
 
     def test_no_contradiction_from_supporting_contradictory_facts(self, make_evidence):

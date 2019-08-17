@@ -202,19 +202,19 @@ class Fact(Factor):
         :returns:
             whether ``self`` implies ``other`` under the given assumption.
         """
-        if not isinstance(other, self.__class__):
-            return False
-        if bool(self.standard_of_proof) != bool(other.standard_of_proof):
-            return False
-
-        if self.standard_of_proof and self.standards_of_proof.index(
-            self.standard_of_proof
-        ) < self.standards_of_proof.index(other.standard_of_proof):
-            return False
-
-        if not self.predicate >= other.predicate:
-            return False
-        return super()._implies_if_concrete(other)
+        if (
+            isinstance(other, self.__class__)
+            and bool(self.standard_of_proof) == bool(other.standard_of_proof)
+            and not (
+                self.standard_of_proof
+                and (
+                    self.standards_of_proof.index(self.standard_of_proof)
+                    < self.standards_of_proof.index(other.standard_of_proof)
+                )
+            )
+            and self.predicate >= other.predicate
+        ):
+            yield from super()._implies_if_concrete(other)
 
     def _contradicts_if_present(self, other: Factor) -> bool:
         """
@@ -224,11 +224,8 @@ class Fact(Factor):
             whether ``self`` and ``other`` can't both be true at
             the same time under the given assumption.
         """
-        if not isinstance(other, Fact):
-            return False
-        if self.predicate.contradicts(other.predicate):
-            return self.consistent_with(other, operator.ge)
-        return False
+        if isinstance(other, Fact) and self.predicate.contradicts(other.predicate):
+            yield from self.consistent_with(other, operator.ge)
 
     def _contradicts_if_factor(self, other: Factor) -> bool:
         r"""
@@ -239,16 +236,13 @@ class Fact(Factor):
             the same time under the given assumption.
         """
 
-        if not isinstance(other, self.__class__):
-            return False
-
-        if self.absent:
-            if other.absent:
-                return False
-            return other._implies_if_present(self)
-        if not other.absent:
-            return self._contradicts_if_present(other)
-        return self._implies_if_present(other)
+        if not isinstance(other, self.__class__) and not (self.absent and other.absent):
+            if self.absent:
+                yield from other._implies_if_present(self)
+            elif not other.absent:
+                yield from self._contradicts_if_present(other)
+            else:
+                yield from self._implies_if_present(other)
 
     @new_context_helper
     def new_context(self, changes: Dict[Factor, Factor]) -> Factor:
