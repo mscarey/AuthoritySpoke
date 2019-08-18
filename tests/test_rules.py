@@ -63,6 +63,9 @@ class TestRules:
         assert make_entity["motel"] in generics
         assert make_entity["tree_search"] in generics
 
+    def test_despite_only_in_str_when_relevant(self, make_holding):
+        assert "despite the legislation" not in str(make_holding["h1"].rule)
+
     def test_generic_factors_order(self, make_entity, make_holding):
         """The motel is mentioned in the first input in the JSON,
         so it should be first."""

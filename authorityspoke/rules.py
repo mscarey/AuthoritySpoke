@@ -488,6 +488,11 @@ class Rule(Factor):
             return "".join(lines)
 
         newline = "\n"
+        despite_enactment_text = ''
+        if self.enactments_despite:
+            despite_enactment_text += 'and despite the legislation\n'
+            despite_enactment_text += str(factor_catalog(self.enactments_despite, 'DESPITE'))
+
         return (
             "the rule that the court "
             + f"{'MUST' if self.mandatory else 'MAY'} "
@@ -499,8 +504,7 @@ class Rule(Factor):
             + f"{str(factor_catalog(self.procedure.despite, 'DESPITE')) if self.procedure.despite else ''}"
             + f"{'according to the legislation' + newline}"
             + f"{str(factor_catalog(self.enactments, 'GIVEN')) if self.enactments else ''}"
-            + f"{'and despite the legislation' + newline}"
-            + f"{str(factor_catalog(self.enactments_despite, 'DESPITE')) if self.enactments_despite else ''}"
+            + despite_enactment_text
         )
 
 

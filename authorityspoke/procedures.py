@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import operator
 
-from typing import ClassVar, Dict, Iterable, List, Optional, Tuple
+from typing import ClassVar, Dict, Iterable, Iterator, List, Optional, Tuple
 
 from dataclasses import dataclass
 
@@ -425,7 +425,7 @@ class Procedure(Factor):
             for matches in matchlist
         )
 
-    def _implies_if_present(self, other: Factor) -> bool:
+    def _implies_if_present(self, other: Factor) -> Iterator[ContextRegister]:
         r"""
         Find if ``self`` would imply ``other`` if they aren't absent.
 
