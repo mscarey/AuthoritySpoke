@@ -266,7 +266,7 @@ class Procedure(Factor):
                     if all(
                         all(
                             matches.get(key) == context_register[key]
-                            or matches.get(context_register[key] == key)
+                            or matches.get(context_register[key]) == key
                             for key in self_factor.generic_factors
                         )
                         for context_register in self_factor._context_registers(

@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 
-from typing import ClassVar, Optional
+from typing import ClassVar, Iterator, Optional
 
-from authorityspoke.factors import Entity, Factor
+from authorityspoke.factors import ContextRegister, Entity, Factor
 from authorityspoke.facts import Fact
 
 
@@ -34,7 +34,7 @@ class Exhibit(Factor):
             return False
         return super()._means_if_concrete(other)
 
-    def _implies_if_concrete(self, other: Factor):
+    def _implies_if_concrete(self, other: Factor) -> Iterator[ContextRegister]:
         if isinstance(other, self.__class__) and (
             self.form == other.form or other.form is None
         ):

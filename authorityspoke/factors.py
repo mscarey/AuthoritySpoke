@@ -68,7 +68,7 @@ def new_context_helper(func: Callable):
                     + f"as a list of replacements for the "
                     + f"{len(generic_factors)} items of generic_factors."
                 )
-            changes = dict(zip(generic_factors, changes))
+            changes = ContextRegister(dict(zip(generic_factors, changes)))
 
         for context_factor in changes:
             name_to_seek = changes[context_factor]
@@ -220,14 +220,13 @@ class Factor(ABC):
 
         return list(self._context_registers(other, comparison))
 
-    def _contradicts_if_present(self, other: Factor) -> bool:
+    def _contradicts_if_present(self, other: Factor) -> Iterator[ContextRegister]:
         """
         Test if ``self`` would contradict ``other`` if neither was ``absent``.
 
-        The default is ``False`` where no class-specific method is available.
+        The default is to yield nothing where no class-specific method is available.
         """
-        if False:
-            yield False
+        yield from iter([])
 
     def _context_registers(
         self, other: Optional[Factor], comparison: Callable
@@ -276,7 +275,7 @@ class Factor(ABC):
         except StopIteration:
             return False
 
-    def _contradicts_if_same_class(self, other: Factor) -> bool:
+    def _contradicts_if_same_class(self, other: Factor) -> Iterator[ContextRegister]:
         """
         Test whether ``self`` :meth:`implies` the absence of ``other``.
 
@@ -397,7 +396,7 @@ class Factor(ABC):
 
     def implies(
         self, other: Optional[Factor], explain: bool = False
-    ) -> Union[bool, List[ContextRegister]]:
+    ) -> Union[bool, ContextRegister]:
         """Test whether ``self`` implies ``other``."""
         if other is None:
             return True
@@ -419,7 +418,7 @@ class Factor(ABC):
 
     def __gt__(self, other: Optional[Factor]) -> bool:
         """Test whether ``self`` implies ``other`` and ``self`` != ``other``."""
-        return self.implies(other) and self != other
+        return bool(self.implies(other) and self != other)
 
     def __ge__(self, other: Optional[Factor]) -> bool:
         """
@@ -428,7 +427,7 @@ class Factor(ABC):
         :returns:
             bool indicating whether ``self`` implies ``other``
         """
-        return self.implies(other)
+        return bool(self.implies(other))
 
     def _implies_if_concrete(self, other: Factor) -> Iterator[ContextRegister]:
         """
@@ -452,7 +451,7 @@ class Factor(ABC):
         if valid:
             yield from self.consistent_with(other, operator.ge)
 
-    def _implies_if_present(self, other: Factor) -> bool:
+    def _implies_if_present(self, other: Factor) -> Iterator[ContextRegister]:
         """
         Find if ``self`` would imply ``other`` if they aren't absent.
 
@@ -677,13 +676,16 @@ class Entity(Factor):
             the only possible way the context of one ``Entity`` can be
             mapped onto the context of another.
         """
-        # If there was a way to compare an Entity to None, should it return {}?
         if comparison(self, other):
-            yield {self: other, other: self}
+            yield ContextRegister({self: other, other: self})
 
-    def contradicts(self, other: Optional[Factor]) -> bool:
+    def contradicts(self, other: Optional[Factor], explain: bool = False) -> bool:
         """
         Test whether ``self`` contradicts the ``other`` :class:`Factor`.
+
+        :param explain:
+            a flag that will be silently ignored because there can never be
+            any contradiction to explain.
 
         :returns:
             ``False``, because an :class:`Entity` contradicts no other :class:`Factor`.
