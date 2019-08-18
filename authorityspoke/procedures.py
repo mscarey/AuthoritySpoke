@@ -446,17 +446,16 @@ class Procedure(Factor):
             implies that the :class:`.Procedure` ``other`` applies
             in some cases.
         """
-        if not isinstance(other, self.__class__):
-            return False
-        despite_or_input = (*self.despite, *self.inputs)
+        if isinstance(other, self.__class__):
+            despite_or_input = (*self.despite, *self.inputs)
 
-        relations = (
-            Analogy(other.outputs, self.outputs, operator.le),
-            Analogy(other.inputs, self.inputs, operator.le),
-            Analogy(other.despite, despite_or_input, operator.le),
-        )
+            relations = (
+                Analogy(other.outputs, self.outputs, operator.le),
+                Analogy(other.inputs, self.inputs, operator.le),
+                Analogy(other.despite, despite_or_input, operator.le),
+            )
 
-        return bool(all_analogy_matches(relations))
+            yield from iter(all_analogy_matches(relations))
 
     def means(self, other) -> bool:
         r"""
