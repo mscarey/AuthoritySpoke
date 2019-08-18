@@ -248,7 +248,9 @@ class Factor(ABC):
             relation = Analogy(self.context_factors, other.context_factors, comparison)
             yield from relation.ordered_comparison()
 
-    def contradicts(self, other: Optional[Factor], explain: bool = False) -> Union[bool, ContextRegister]:
+    def contradicts(
+        self, other: Optional[Factor], explain: bool = False
+    ) -> Union[bool, ContextRegister]:
         """
         Test whether ``self`` implies the absence of ``other``.
 
@@ -264,7 +266,9 @@ class Factor(ABC):
                 f"{self.__class__} objects may only be compared for "
                 + "contradiction with other Factor objects or None."
             )
-        answer = self._contradicts_if_factor(other)
+        if not isinstance(other, self.__class__):
+            return False
+        answer = self._contradicts_if_same_class(other)
 
         try:
             register = next(answer)
@@ -272,7 +276,7 @@ class Factor(ABC):
         except StopIteration:
             return False
 
-    def _contradicts_if_factor(self, other: Factor) -> bool:
+    def _contradicts_if_same_class(self, other: Factor) -> bool:
         """
         Test whether ``self`` :meth:`implies` the absence of ``other``.
 
@@ -283,7 +287,12 @@ class Factor(ABC):
             ``True`` if self and other can't both be true at
             the same time. Otherwise returns ``False``.
         """
-        return self >= other.evolve("absent")
+        if not self.__dict__.get("absent") and not other.__dict__.get("absent"):
+            yield from self._contradicts_if_present(other)
+        if self.__dict__.get("absent") and other.__dict__.get("absent"):
+            yield from other._contradicts_if_present(self)
+        else:
+            yield from self._implies_if_same_class(other.evolve("absent"))
 
     def evolve(self, changes: Union[str, Tuple[str, ...], Dict[str, Any]]) -> Factor:
         """
@@ -372,6 +381,20 @@ class Factor(ABC):
                 return factor
         return None
 
+    def _implies_if_same_class(self, other: Factor) -> Iterator[ContextRegister]:
+        if not self.__dict__.get("absent"):
+            if not other.__dict__.get("absent"):
+                yield from self._implies_if_present(other)
+            else:
+                yield from self._contradicts_if_present(other)
+
+        else:
+            if other.__dict__.get("absent"):
+                yield from other._implies_if_present(self)
+            else:
+                yield from other._contradicts_if_present(self)
+
+
     def implies(
         self, other: Optional[Factor], explain: bool = False
     ) -> Union[bool, List[ContextRegister]]:
@@ -384,17 +407,9 @@ class Factor(ABC):
                 f"{self.__class__} objects may only be compared for "
                 + "implication with other Factor objects or None."
             )
-        if not self.__dict__.get("absent"):
-            if not other.__dict__.get("absent"):
-                answer = self._implies_if_present(other)
-            else:
-                answer = self._contradicts_if_present(other)
-
-        else:
-            if other.__dict__.get("absent"):
-                answer = other._implies_if_present(self)
-            else:
-                answer = other._contradicts_if_present(self)
+        if not isinstance(other, self.__class__):
+            return False
+        answer = self._implies_if_same_class(other)
 
         try:
             register = next(answer)
@@ -415,7 +430,7 @@ class Factor(ABC):
         """
         return self.implies(other)
 
-    def _implies_if_concrete(self, other: Factor) -> Union[bool, List[ContextRegister]]:
+    def _implies_if_concrete(self, other: Factor) -> Iterator[ContextRegister]:
         """
         Find if ``self`` would imply ``other`` if they aren't absent or generic.
 

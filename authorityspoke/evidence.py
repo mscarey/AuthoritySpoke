@@ -35,12 +35,10 @@ class Exhibit(Factor):
         return super()._means_if_concrete(other)
 
     def _implies_if_concrete(self, other: Factor):
-        if not isinstance(other, self.__class__):
-            return False
-        if not (self.form == other.form or other.form is None):
-            return False
-
-        return super()._implies_if_concrete(other)
+        if isinstance(other, self.__class__) and (
+            self.form == other.form or other.form is None
+        ):
+            yield from super()._implies_if_concrete(other)
 
     def __str__(self):
         string = (
