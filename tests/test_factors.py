@@ -234,7 +234,6 @@ class TestFacts:
             )
         ) == {
             make_entity["motel"]: make_entity["trees"],
-            make_entity["trees"]: make_entity["motel"],
         }
 
     def test_import_to_mapping_conflict(self, make_entity):
@@ -427,6 +426,28 @@ class TestFacts:
             make_complex_fact["f_relevant_murder"]
             > make_complex_fact["f_relevant_murder_whether"]
         )
+
+    def test_implication_complex_explain(self, make_complex_fact):
+        complex_true = make_complex_fact["f_relevant_murder"]
+        complex_whether = make_complex_fact["f_relevant_murder_whether"].new_context(
+            {Entity('Alice'): Entity('Craig'),
+            Entity('Bob'): Entity("Dan")}
+        )
+        explanation = complex_true.implies(complex_whether, explain=True)
+        assert (Entity("Alice"), Entity("Craig")) in explanation.items()
+
+    def test_implication_explain_keys_only_from_left(self, make_complex_fact):
+        """
+        Check that when implies provides a ContextRegister as an "explanation",
+        it uses elements only from the left as keys and from the right as values.
+        """
+        complex_true = make_complex_fact["f_relevant_murder"]
+        complex_whether = make_complex_fact["f_relevant_murder_whether"].new_context(
+            {Entity('Alice'): Entity('Craig'),
+            Entity('Bob'): Entity("Dan")}
+        )
+        explanation = complex_true.implies(complex_whether, explain=True)
+        assert (Entity("Craig"), Entity("Alice")) not in explanation.items()
 
     def test_no_implication_complex(self, make_complex_fact):
         assert (

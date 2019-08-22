@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import operator
 
-from typing import ClassVar, Dict, Iterable, Iterator, List, Optional, Tuple
+from typing import ClassVar, Iterable, Iterator, List, Optional, Tuple
 
 from dataclasses import dataclass
 

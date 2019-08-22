@@ -323,7 +323,7 @@ class Factor(ABC):
             new_dict[key] = changes[key]
         return self.__class__(**new_dict)
 
-    def means(self, other) -> bool:
+    def means(self, other: Factor) -> bool:
         r"""
         Test whether ``self`` and ``other`` have identical meanings.
 
@@ -758,15 +758,8 @@ class ContextRegister(Dict[Factor, Optional[Factor]]):
                         + f"{self_mapping[in_key]}, not {in_value}"
                     )
                     return None
-                if self_mapping.get(in_value) and self_mapping.get(in_value) != in_key:
-                    logger.debug(
-                        f"key {in_value} already in mapping with value "
-                        + f"{self_mapping[in_value]}, not {in_key}"
-                    )
-                    return None
                 if in_key.generic or in_value.generic:
                     self_mapping[in_key] = in_value
-                    self_mapping[in_value] = in_key
         return self_mapping
 
 
