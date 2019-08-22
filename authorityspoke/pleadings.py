@@ -2,7 +2,8 @@ from dataclasses import dataclass
 
 from typing import ClassVar, Optional
 
-from authorityspoke.factors import Entity, Factor
+from authorityspoke.entities import Entity
+from authorityspoke.factors import Factor
 from authorityspoke.facts import Fact
 
 

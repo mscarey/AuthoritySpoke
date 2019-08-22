@@ -3,7 +3,8 @@ import operator
 
 import pytest
 
-from authorityspoke.factors import Entity, Factor, ContextRegister, means
+from authorityspoke.entities import Entity
+from authorityspoke.factors import Factor, ContextRegister, means
 from authorityspoke.facts import Fact
 from authorityspoke.rules import Rule
 from authorityspoke.opinions import Opinion
@@ -443,11 +444,13 @@ class TestFacts:
         """
         complex_true = make_complex_fact["f_relevant_murder"]
         complex_whether = make_complex_fact["f_relevant_murder_whether"].new_context(
-            {Entity('Alice'): Entity('Craig'),
-            Entity('Bob'): Entity("Dan")}
+            {
+                Entity('Alice'): Entity('Craig'),
+                Entity('Bob'): Entity("Dan")}
         )
-        explanation = complex_true.implies(complex_whether, explain=True)
-        assert (Entity("Craig"), Entity("Alice")) not in explanation.items()
+        explanations = complex_true.context_for_implication(complex_whether)
+        for explanation in explanations:
+            assert (Entity("Craig"), Entity("Alice")) not in explanation.items()
 
     def test_no_implication_complex(self, make_complex_fact):
         assert (

@@ -3,7 +3,8 @@ Tests of commands that appear in notebooks in
 the notebooks/ directory
 """
 
-from authorityspoke import Enactment, Entity
+from authorityspoke import Enactment
+from authorityspoke.entities import Entity
 from authorityspoke.selectors import TextQuoteSelector
 
 

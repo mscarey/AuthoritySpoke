@@ -5,7 +5,7 @@ import operator
 from pint import UnitRegistry
 import pytest
 
-from authorityspoke.factors import Entity
+from authorityspoke.entities import Entity
 from authorityspoke.io import readers
 from authorityspoke.opinions import Opinion
 from authorityspoke.predicates import ureg, Q_

@@ -14,8 +14,9 @@ from pint import UnitRegistry
 
 from authorityspoke.io import references
 from authorityspoke.enactments import Code, Enactment
+from authorityspoke.entities import Entity
 from authorityspoke.evidence import Exhibit, Evidence
-from authorityspoke.factors import Entity, Factor
+from authorityspoke.factors import Factor
 from authorityspoke.facts import Fact
 from authorityspoke.holdings import Holding
 from authorityspoke.jurisdictions import Regime

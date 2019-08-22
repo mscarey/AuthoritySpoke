@@ -2,7 +2,8 @@ from dataclasses import dataclass
 
 from typing import ClassVar, Iterator, Optional
 
-from authorityspoke.factors import ContextRegister, Entity, Factor
+from authorityspoke.entities import Entity
+from authorityspoke.factors import ContextRegister, Factor
 from authorityspoke.facts import Fact
 
 

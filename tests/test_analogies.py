@@ -2,7 +2,8 @@ import operator
 
 import pytest
 
-from authorityspoke.factors import Analogy, Entity, Factor
+from authorityspoke.entities import Entity
+from authorityspoke.factors import Analogy, Factor
 from authorityspoke.factors import ContextRegister, means
 from authorityspoke.facts import Fact
 from authorityspoke.io.readers import read_fact

@@ -6,7 +6,7 @@ import pint
 import pytest
 
 from authorityspoke.enactments import Code, Enactment
-from authorityspoke.factors import Entity
+from authorityspoke.entities import Entity
 from authorityspoke.facts import Fact
 from authorityspoke.holdings import Holding
 from authorityspoke.opinions import Opinion

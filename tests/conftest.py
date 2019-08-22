@@ -2,9 +2,11 @@ from typing import Any, Dict, Tuple
 
 import pytest
 
-from authorityspoke.factors import Factor, Entity
+
 from authorityspoke.enactments import Code, Enactment
+from authorityspoke.entities import Entity
 from authorityspoke.evidence import Evidence, Exhibit
+from authorityspoke.factors import Factor
 from authorityspoke.facts import Fact
 from authorityspoke.holdings import Holding
 from authorityspoke.jurisdictions import Jurisdiction, Regime

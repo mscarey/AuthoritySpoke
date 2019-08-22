@@ -1,6 +1,6 @@
 import pytest
 
-from authorityspoke.factors import Entity
+from authorityspoke.entities import Entity
 from authorityspoke.io import loaders, readers
 from authorityspoke.opinions import Opinion
 
