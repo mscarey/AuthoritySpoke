@@ -485,9 +485,13 @@ class TestFacts:
         assert watt_factor["f8_absent"].contradicts(watt_factor["f8_meters"])
         assert watt_factor["f8_meters"].contradicts(watt_factor["f8_absent"])
 
-    def test_absent_does_not_contradict_narrower_quantity_statement(self, watt_factor):
-        assert not watt_factor["f9_absent_miles"].contradicts(watt_factor["f9"])
-        assert not watt_factor["f9"].contradicts(watt_factor["f9_absent_miles"])
+    def test_less_specific_absent_contradicts_more_specific(self, watt_factor):
+        assert watt_factor["f9_absent_miles"].contradicts(watt_factor["f9"])
+        assert watt_factor["f9"].contradicts(watt_factor["f9_absent_miles"])
+
+    def test_no_contradiction_with_more_specific_absent(self, watt_factor):
+        assert not watt_factor["f9_absent"].contradicts(watt_factor["f9_miles"])
+        assert not watt_factor["f9_miles"].contradicts(watt_factor["f9_absent"])
 
     def test_contradiction_complex(self, make_complex_fact):
         assert make_complex_fact["f_irrelevant_murder"].contradicts(
