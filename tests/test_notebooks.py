@@ -65,3 +65,12 @@ class TestIntroduction:
         lotus_majority = make_opinion_with_holding["lotus_majority"]
         assert oracle.contradicts(lotus_majority)
         assert lotus_majority.contradicts(oracle)
+
+    def test_specific_holding_contradiction(self, make_opinion_with_holding):
+        """
+        Check the specific Holdings that should be causing a
+        contradiction to be found between the Opinions.
+        """
+        oracle = make_opinion_with_holding["oracle_majority"]
+        lotus = make_opinion_with_holding["lotus_majority"]
+        assert oracle.holdings[10].contradicts(lotus.holdings[8])

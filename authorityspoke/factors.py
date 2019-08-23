@@ -787,7 +787,7 @@ class Analogy:
                             )
 
     def update_matchlist(
-        self, matchlist: List[ContextRegister]
+        self, matchlist: List[ContextRegister], inverse: bool = False
     ) -> List[ContextRegister]:
         r"""
         Filter context assignments with :meth:`~Analogy.unordered_comparison`.
@@ -803,11 +803,13 @@ class Analogy:
         new_matchlist = []
         for matches in matchlist:
             for answer in self.unordered_comparison(matches=matches):
+                if inverse:
+                    answer = ContextRegister({v: k for k, v in answer.items()})
                 new_matchlist.append(answer)
         return new_matchlist
 
 
-def all_analogy_matches(relations: Tuple[Analogy, ...]) -> List[ContextRegister]:
+def all_analogy_matches(relations: Tuple[Analogy, ...], inverse: bool = False) -> List[ContextRegister]:
     r"""
     Find all context registers consistent with multiple :class:`.Analogy` comparisons.
 
@@ -824,5 +826,5 @@ def all_analogy_matches(relations: Tuple[Analogy, ...]) -> List[ContextRegister]
     """
     matchlist: List[ContextRegister] = [ContextRegister()]
     for relation in relations:
-        matchlist = relation.update_matchlist(matchlist)
+        matchlist = relation.update_matchlist(matchlist, inverse)
     return matchlist

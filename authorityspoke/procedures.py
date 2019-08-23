@@ -339,7 +339,7 @@ class Procedure(Factor):
         # For self to contradict other, every input of other
         # must be implied by some input or despite factor of self.
         relations = (Analogy(other.inputs, self_despite_or_input, operator.le),)
-        matchlist = all_analogy_matches(relations)
+        matchlist = all_analogy_matches(relations, inverse=True)
 
         # For self to contradict other, some output of other
         # must be contradicted by some output of self.
