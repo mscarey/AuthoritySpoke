@@ -488,10 +488,12 @@ class Rule(Factor):
             return "".join(lines)
 
         newline = "\n"
-        despite_enactment_text = ''
+        despite_enactment_text = ""
         if self.enactments_despite:
-            despite_enactment_text += 'and despite the legislation\n'
-            despite_enactment_text += str(factor_catalog(self.enactments_despite, 'DESPITE'))
+            despite_enactment_text += "and despite the legislation\n"
+            despite_enactment_text += str(
+                factor_catalog(self.enactments_despite, "DESPITE")
+            )
 
         return (
             "the rule that the court "
