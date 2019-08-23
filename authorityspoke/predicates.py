@@ -81,9 +81,6 @@ class Predicate:
 
         If the :attr:`content` sentence is phrased to have a plural
         context factor, normalizes it by changing "were" to "was".
-
-        Conjugating verbs using regex feels like a very brittle solution.
-        An NLP library may be used here in future versions.
         """
         if not self.comparison and self.quantity is not None:
             object.__setattr__(self, "comparison", "=")
@@ -97,6 +94,8 @@ class Predicate:
                 self, "comparison", normalize_comparison[self.comparison]
             )
 
+        # Conjugating a verb using regex feels like a very brittle solution.
+        # An NLP library may be used here in future versions.
         object.__setattr__(self, "content", self.content.replace("{} were", "{} was"))
 
         if self.comparison and self.comparison not in self.opposite_comparisons.keys():

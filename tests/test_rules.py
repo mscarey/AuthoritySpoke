@@ -224,6 +224,25 @@ class TestImplication:
     def test_implication_of_holding_with_removed_despite_enactment(self, make_rule):
         assert make_rule["h2_despite_due_process"] >= make_rule["h2"]
 
+    def test_implication_more_specific_input(self, make_complex_rule):
+        """
+        A Rule is contravariant with its inputs.
+        When an input becomes more specific, the Rule becomes less specific.
+        """
+        small_reliable = make_complex_rule["accept_small_weight_reliable"]
+        small_more_reliable = make_complex_rule["accept_small_weight_reliable_more_evidence"]
+        assert small_reliable >= small_more_reliable
+        assert not small_more_reliable >= small_reliable
+
+    def test_implication_more_specific_output(self, make_complex_rule):
+        """
+        A Rule is covariant with its outputs.
+        When an output becomes more specific, the Rule becomes more specific.
+        """
+        small_reliable = make_complex_rule["accept_small_weight_reliable"]
+        large_reliable = make_complex_rule["accept_large_weight_reliable"]
+        assert not small_reliable >= large_reliable
+        assert large_reliable >= small_reliable
 
 class TestContradiction:
     def test_some_holding_consistent_with_absent_output(self, make_rule):

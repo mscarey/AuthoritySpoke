@@ -187,6 +187,10 @@ def make_predicate() -> Dict[str, Predicate]:
         "p_shooting_whether": Predicate("{} shot {}", truth=None),
         "p_no_crime": Predicate("{} committed a crime", truth=False),
         "p_three_entities": Predicate("{} told {} to hire {}"),
+        "p_small_weight": Predicate("the amount of gold {} possessed was {}", comparison=">=", quantity=Q_("1 gram")),
+        "p_large_weight": Predicate("the amount of gold {} possessed was {}", comparison=">=", quantity=Q_("100 kilograms")),
+        "p_friends": Predicate("{} and {} were friends", reciprocal=True),
+        "p_reliable": Predicate("{} was reliable")
     }
 
 
@@ -328,40 +332,9 @@ def make_factor(make_predicate, make_entity) -> Dict[str, Factor]:
         "f_no_shooting_entity_order": Fact(p["p_no_shooting"], (1, 0), case_factors=c),
         "f_three_entities": Fact(p["p_three_entities"], (0, 1, 2), case_factors=c),
         "f_repeating_entity": Fact(p["p_three_entities"], (0, 1, 0), case_factors=c),
-    }
-
-
-@pytest.fixture(scope="class")
-def make_complex_fact(make_predicate, make_factor) -> Dict[str, Evidence]:
-    p = make_predicate
-    f = make_factor
-
-    return {
-        "f_irrelevant_murder": Fact(
-            p["p_irrelevant"], (f["f_shooting"], f["f_murder"])
-        ),
-        "f_relevant_murder": Fact(p["p_relevant"], (f["f_shooting"], f["f_murder"])),
-        "f_relevant_murder_swap_entities": Fact(
-            p["p_relevant"], (f["f_shooting"], f["f_murder"])
-        ),
-        "f_relevant_murder_nested_swap": Fact(
-            p["p_relevant"], (f["f_shooting_entity_order"], f["f_murder_entity_swap"])
-        ),
-        "f_relevant_murder_whether": Fact(
-            p["p_relevant"], (f["f_shooting"], f["f_murder_whether"])
-        ),
-        "f_whether_relevant_murder_whether": Fact(
-            p["p_relevant"], (f["f_shooting_whether"], f["f_murder_whether"])
-        ),
-        "f_relevant_murder_swap": Fact(
-            p["p_relevant"], (f["f_shooting"], f["f_murder_entity_swap"])
-        ),
-        "f_relevant_murder_craig": Fact(
-            p["p_relevant"], (f["f_shooting_craig"], f["f_murder_craig"])
-        ),
-        "f_relevant_murder_alice_craig": Fact(
-            p["p_relevant"], (f["f_shooting"], f["f_murder_craig"])
-        ),
+        "f_large_weight": Fact(p["p_large_weight"], (0,), case_factors=c),
+        "f_small_weight": Fact(p["p_small_weight"], (0,), case_factors=c),
+        "f_friends": Fact(p["p_friends"], (0, 1), case_factors=c),
     }
 
 
@@ -437,13 +410,65 @@ def make_exhibit(
             statement=c["f_relevant_murder_alice_craig"],
             stated_by=e["alice"],
         ),
+        "large_weight_testimony": Exhibit(
+            form="testimony", statement=f["f_large_weight"], stated_by=e["bob"]
+        ),
+        "small_weight_testimony": Exhibit(
+            form="testimony", statement=f["f_small_weight"], stated_by=e["bob"]
+        ),
         "generic_exhibit": Exhibit(generic=True),
         "specific_but_featureless": Exhibit(),
         "testimony_no_statement": Exhibit(form="testimony"),
     }
 
 @pytest.fixture(scope="class")
-def make_complex_rule(make_factor, make_exhibit, make_complex_fact) -> Dict[str, Rule]:
+def make_complex_fact(make_predicate, make_factor) -> Dict[str, Evidence]:
+    p = make_predicate
+    f = make_factor
+
+    return {
+        "f_irrelevant_murder": Fact(
+            p["p_irrelevant"], (f["f_shooting"], f["f_murder"])
+        ),
+        "f_relevant_murder": Fact(p["p_relevant"], (f["f_shooting"], f["f_murder"])),
+        "f_relevant_murder_swap_entities": Fact(
+            p["p_relevant"], (f["f_shooting"], f["f_murder"])
+        ),
+        "f_relevant_murder_nested_swap": Fact(
+            p["p_relevant"], (f["f_shooting_entity_order"], f["f_murder_entity_swap"])
+        ),
+        "f_relevant_murder_whether": Fact(
+            p["p_relevant"], (f["f_shooting"], f["f_murder_whether"])
+        ),
+        "f_whether_relevant_murder_whether": Fact(
+            p["p_relevant"], (f["f_shooting_whether"], f["f_murder_whether"])
+        ),
+        "f_relevant_murder_swap": Fact(
+            p["p_relevant"], (f["f_shooting"], f["f_murder_entity_swap"])
+        ),
+        "f_relevant_murder_craig": Fact(
+            p["p_relevant"], (f["f_shooting_craig"], f["f_murder_craig"])
+        ),
+        "f_relevant_murder_alice_craig": Fact(
+            p["p_relevant"], (f["f_shooting"], f["f_murder_craig"])
+        ),
+    }
+
+@pytest.fixture(scope="class")
+def make_fact_about_exhibit(make_predicate, make_exhibit) -> Dict[str, Evidence]:
+    p = make_predicate
+    e = make_exhibit
+    return {
+        "f_reliable_large_weight": Fact(
+            p["p_reliable"], (e["large_weight_testimony"],)
+        ),
+        "f_reliable_small_weight": Fact(
+            p["p_reliable"], (e["small_weight_testimony"],)
+        ),
+        }
+
+@pytest.fixture(scope="class")
+def make_complex_rule(make_factor, make_exhibit, make_complex_fact, make_fact_about_exhibit) -> Dict[str, Rule]:
     return {"accept_relevance_testimony": Rule(
         inputs=make_exhibit["relevant_murder_testimony"],
         outputs=make_complex_fact["f_relevant_murder"]
@@ -460,6 +485,18 @@ def make_complex_rule(make_factor, make_exhibit, make_complex_fact) -> Dict[str,
     "accept_murder_fact_from_relevance_and_shooting": Rule(
         inputs=[make_complex_fact["f_relevant_murder"], make_factor["f_shooting"]],
         outputs=make_factor["f_murder"]
+    ),
+    "accept_small_weight_reliable": Rule(
+        inputs=[make_factor["f_small_weight"], make_factor["f_friends"]],
+        outputs=make_fact_about_exhibit["f_reliable_small_weight"]
+    ),
+    "accept_small_weight_reliable_more_evidence": Rule(
+        inputs=[make_factor["f_large_weight"], make_factor["f_friends"]],
+        outputs=make_fact_about_exhibit["f_reliable_small_weight"]
+    ),
+    "accept_large_weight_reliable": Rule(
+        inputs=[make_factor["f_small_weight"], make_factor["f_friends"]],
+        outputs=make_fact_about_exhibit["f_reliable_large_weight"]
     ),
     }
 

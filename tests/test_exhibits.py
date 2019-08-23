@@ -97,6 +97,16 @@ class TestExhibitsImplication:
             > make_exhibit["reciprocal_testimony_absent"]
         )
 
+    def test_implication_fact_with_quantity(self, make_exhibit):
+        specific_testimony = make_exhibit["large_weight_testimony"]
+        vague_testimony = make_exhibit["small_weight_testimony"]
+        assert specific_testimony >= vague_testimony
+
+    def test_implication_fact_with_quantity(self, make_fact_about_exhibit):
+        specific_testimony_reliable = make_fact_about_exhibit["f_reliable_large_weight"]
+        vague_testimony_reliable = make_fact_about_exhibit["f_reliable_small_weight"]
+        assert specific_testimony_reliable >= vague_testimony_reliable
+
 
 class TestExhibitsContradiction:
     def test_conflicting_exhibits_not_contradictory(self, make_exhibit):
