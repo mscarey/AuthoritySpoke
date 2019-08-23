@@ -407,15 +407,13 @@ class Factor(ABC):
                 for register in generator:
                     yield ContextRegister({v: k for k, v in register.items()})
 
-
     def implies(self, other: Optional[Factor]) -> bool:
         """Test whether ``self`` implies ``other``."""
         if other is None:
             return True
         return any(
-            register is not None
-            for register in self.context_for_implication(other))
-
+            register is not None for register in self.context_for_implication(other)
+        )
 
     def __gt__(self, other: Optional[Factor]) -> bool:
         """Test whether ``self`` implies ``other`` and ``self`` != ``other``."""
@@ -450,7 +448,7 @@ class Factor(ABC):
                 if not (self_factor and self_factor >= other.context_factors[i]):
                     valid = False
         if valid:
-            yield from self.consistent_with(other, operator.ge)
+            yield from self._context_registers(other, operator.ge)
 
     def _implies_if_present(self, other: Factor) -> Iterator[ContextRegister]:
         """

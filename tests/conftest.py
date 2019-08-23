@@ -471,7 +471,7 @@ def make_fact_about_exhibit(make_predicate, make_exhibit) -> Dict[str, Evidence]
 def make_complex_rule(make_factor, make_exhibit, make_complex_fact, make_fact_about_exhibit) -> Dict[str, Rule]:
     return {"accept_relevance_testimony": Rule(
         inputs=make_exhibit["relevant_murder_testimony"],
-        outputs=make_complex_fact["f_relevant_murder"]
+        outputs=make_complex_fact["f_relevant_murder"],
     ),
     "accept_relevance_testimony_ALL": Rule(
         inputs=make_exhibit["relevant_murder_testimony"],
@@ -488,15 +488,18 @@ def make_complex_rule(make_factor, make_exhibit, make_complex_fact, make_fact_ab
     ),
     "accept_small_weight_reliable": Rule(
         inputs=[make_factor["f_small_weight"], make_factor["f_friends"]],
-        outputs=make_fact_about_exhibit["f_reliable_small_weight"]
+        outputs=make_fact_about_exhibit["f_reliable_small_weight"],
+        universal=True,
     ),
     "accept_small_weight_reliable_more_evidence": Rule(
         inputs=[make_factor["f_large_weight"], make_factor["f_friends"]],
-        outputs=make_fact_about_exhibit["f_reliable_small_weight"]
+        outputs=make_fact_about_exhibit["f_reliable_small_weight"],
+        universal=True,
     ),
     "accept_large_weight_reliable": Rule(
         inputs=[make_factor["f_small_weight"], make_factor["f_friends"]],
-        outputs=make_fact_about_exhibit["f_reliable_large_weight"]
+        outputs=make_fact_about_exhibit["f_reliable_large_weight"],
+        universal=True,
     ),
     }
 

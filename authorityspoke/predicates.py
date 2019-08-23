@@ -94,7 +94,7 @@ class Predicate:
                 self, "comparison", normalize_comparison[self.comparison]
             )
 
-        # Conjugating a verb using regex feels like a very brittle solution.
+        # Conjugating a verb using .replace feels like a very brittle solution.
         # An NLP library may be used here in future versions.
         object.__setattr__(self, "content", self.content.replace("{} were", "{} was"))
 

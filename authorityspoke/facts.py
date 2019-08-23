@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 import operator
 
-from typing import ClassVar, Dict, List, Optional, Sequence, Union
+from typing import ClassVar, Dict, Iterator, List, Optional, Sequence, Union
 
 from authorityspoke.factors import new_context_helper
 from authorityspoke.factors import Factor, ContextRegister
@@ -195,7 +195,7 @@ class Fact(Factor):
     def __len__(self):
         return len(self.context_factors)
 
-    def _implies_if_concrete(self, other: Factor) -> bool:
+    def _implies_if_concrete(self, other: Factor) -> Iterator[ContextRegister]:
         """
         Test if ``self`` impliess ``other``, assuming they are not ``generic``.
 
@@ -216,7 +216,7 @@ class Fact(Factor):
         ):
             yield from super()._implies_if_concrete(other)
 
-    def _contradicts_if_present(self, other: Factor) -> bool:
+    def _contradicts_if_present(self, other: Factor) -> Iterator[ContextRegister]:
         """
         Test if ``self`` contradicts :class:`Fact` ``other`` if neither is ``absent``.
 
@@ -227,7 +227,7 @@ class Fact(Factor):
         if isinstance(other, Fact) and self.predicate.contradicts(other.predicate):
             yield from self.consistent_with(other, operator.ge)
 
-    def _contradicts_if_factor(self, other: Factor) -> bool:
+    def _contradicts_if_factor(self, other: Factor) -> Iterator[ContextRegister]:
         r"""
         Test if ``self`` contradicts ``other``, assuming they are both :class:`Factor`\s.
 

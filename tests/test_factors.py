@@ -216,7 +216,6 @@ class TestFacts:
                 watt_factor["f1_entity_order"], operator.le
             )
         ) == {
-            make_entity["watt"]: make_entity["motel"],
             make_entity["motel"]: make_entity["watt"],
         }
 

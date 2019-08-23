@@ -226,7 +226,7 @@ class TestImplication:
 
     def test_implication_more_specific_input(self, make_complex_rule):
         """
-        A Rule is contravariant with its inputs.
+        A universal Rule is contravariant with its inputs.
         When an input becomes more specific, the Rule becomes less specific.
         """
         small_reliable = make_complex_rule["accept_small_weight_reliable"]
