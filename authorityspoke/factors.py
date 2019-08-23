@@ -320,7 +320,7 @@ class Factor(ABC):
             new_dict[key] = changes[key]
         return self.__class__(**new_dict)
 
-    def means(self, other: Factor) -> bool:
+    def means(self, other: Optional[Factor]) -> bool:
         r"""
         Test whether ``self`` and ``other`` have identical meanings.
 
@@ -331,17 +331,21 @@ class Factor(ABC):
             converts ``self``\'s and ``other``\'s fields to tuples
             and compares them.
         """
-        if (
-            self.__class__ != other.__class__
-            or self.absent != other.absent
-            or self.generic != other.generic
-        ):
+        if other is None:
             return False
-        if self.generic and other.generic:
-            return True
-        return self._means_if_concrete(other)
+        return any(self.context_for_same_meaning(other))
 
-    def _means_if_concrete(self, other: Factor) -> bool:
+    def context_for_same_meaning(self, other: Factor) -> Iterator[ContextRegister]:
+        if (
+            self.__class__ == other.__class__
+            and self.absent == other.absent
+            and self.generic == other.generic
+        ):
+            if self.generic:
+                yield ContextRegister({self: other})
+            yield from self._means_if_concrete(other)
+
+    def _means_if_concrete(self, other: Factor) -> Iterator[ContextRegister]:
         """
         Test equality based on :attr:`context_factors`.
 
@@ -354,15 +358,8 @@ class Factor(ABC):
             has ``absent=True``, neither has ``generic=True``, and
             ``other`` is an instance of ``self``'s class.
         """
-        for i, self_factor in enumerate(self.context_factors):
-            other_factor = other.context_factors[i]
-            if self_factor is None:
-                if other_factor is not None:
-                    return False
-            elif not self_factor.means(other_factor):
-                return False
-
-        return self.consistent_with(other, means)
+        if self.compare_context_factors(other, means):
+            yield from self.consistent_with(other, means)
 
     def get_factor_by_name(self, name: str) -> Optional[Factor]:
         """
@@ -425,6 +422,23 @@ class Factor(ABC):
         """
         return bool(self.implies(other))
 
+    def compare_context_factors(self, other: Factor, relation: Callable) -> bool:
+        r"""
+        Test if relation holds for corresponding context factors of self and other.
+
+        This doesn't track a persistent :class:`ContextRegister` as it goes
+        down the sequence of :class:`Factor` pairs. Perhaps(?) this simpler
+        process can weed out :class:`Factor`\s that clearly don't satisfy
+        a comparison before moving on to the more costly :class:`Analogy`
+        process. Or maybe it's useful for testing.
+        """
+        valid = True
+        for i, self_factor in enumerate(self.context_factors):
+            if not (self_factor is other.context_factors[i] is None):
+                if not (self_factor and relation(self_factor, other.context_factors[i])):
+                    valid = False
+        return valid
+
     def _implies_if_concrete(self, other: Factor) -> Iterator[ContextRegister]:
         """
         Find if ``self`` would imply ``other`` if they aren't absent or generic.
@@ -434,17 +448,12 @@ class Factor(ABC):
         based on other attributes.
 
         :returns:
-            bool indicating whether ``self`` would imply ``other``,
+            context assignments where ``self`` would imply ``other``,
             under the assumptions that neither ``self`` nor ``other``
             has ``absent=True``, neither has ``generic=True``, and
             ``other`` is an instance of ``self``'s class.
         """
-        valid = True  # TODO
-        for i, self_factor in enumerate(self.context_factors):
-            if other.context_factors[i]:
-                if not (self_factor and self_factor >= other.context_factors[i]):
-                    valid = False
-        if valid:
+        if self.compare_context_factors(other, operator.ge):
             yield from self._context_registers(other, operator.ge)
 
     def _implies_if_present(self, other: Factor) -> Iterator[ContextRegister]:
@@ -594,7 +603,7 @@ def means(left: Factor, right: Factor) -> bool:
     return left.means(right)
 
 
-class ContextRegister(Dict[Factor, Optional[Factor]]):
+class ContextRegister(Dict[Factor, Factor]):
     r"""
     A mapping of corresponding :class:`Factor`\s from two different contexts.
 
@@ -634,15 +643,19 @@ class ContextRegister(Dict[Factor, Optional[Factor]]):
         self_mapping = ContextRegister(self.items())
         for in_key, in_value in incoming_mapping.items():
 
-            if in_key and in_value:
+            if in_value:
                 if self_mapping.get(in_key) and self_mapping.get(in_key) != in_value:
                     logger.debug(
                         f"{in_key} already in mapping with value "
                         + f"{self_mapping[in_key]}, not {in_value}"
                     )
                     return None
-                if in_key.generic or in_value.generic:
-                    self_mapping[in_key] = in_value
+                self_mapping[in_key] = in_value
+                if list(self_mapping.values()).count(in_value) > 1:
+                    logger.debug(
+                        f"{in_value} assigned to two different keys"
+                    )
+                    return None
         return self_mapping
 
 

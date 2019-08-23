@@ -28,9 +28,6 @@ class TestExhibitsSameMeaning:
         )
 
     def test_not_equal_complex_statement(self, make_exhibit):
-        alice_craig = str(make_exhibit["relevant_murder_alice_craig_testimony"])
-        other = str(make_exhibit["relevant_murder_testimony"])
-
         assert not (
             make_exhibit["relevant_murder_alice_craig_testimony"].means(
                 make_exhibit["relevant_murder_testimony"]

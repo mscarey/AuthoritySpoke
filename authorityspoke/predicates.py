@@ -17,6 +17,8 @@ from dataclasses import dataclass
 
 from pint import UnitRegistry
 
+from authorityspoke.factors import Factor
+
 ureg = UnitRegistry()
 Q_ = ureg.Quantity
 
@@ -130,9 +132,7 @@ class Predicate:
             slots -= 1
         return slots
 
-    def content_with_entities(
-        self, context: Union["Factor", Sequence["Factor"]]
-    ) -> str:
+    def content_with_entities(self, context: Union[Factor, Sequence[Factor]]) -> str:
         r"""
         Make a sentence by filling in ``self.content`` with generic :class:`.Factor`\s.
 
