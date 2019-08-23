@@ -16,6 +16,7 @@ dev
 - Create function to consolidate list of Enactments
 - Add Union operator for Rules
 - Move functions for loading objects from JSON and XML to new I/O modules
+- Add "explain" functions to show how generic Factors match up when a contradiction or implication exists
 
 0.1.0 (2019-06-10)
 ------------------
