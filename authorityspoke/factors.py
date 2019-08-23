@@ -258,9 +258,9 @@ class Factor(ABC):
 
         if other is None:
             return False
-        return any(self.context_for_contradiction(other))
+        return any(self.explain_contradiction(other))
 
-    def context_for_contradiction(self, other: Factor) -> Iterator[ContextRegister]:
+    def explain_contradiction(self, other: Factor) -> Iterator[ContextRegister]:
         """
         Test whether ``self`` :meth:`implies` the absence of ``other``.
 
@@ -333,9 +333,9 @@ class Factor(ABC):
         """
         if other is None:
             return False
-        return any(self.context_for_same_meaning(other))
+        return any(self.explain_same_meaning(other))
 
-    def context_for_same_meaning(self, other: Factor) -> Iterator[ContextRegister]:
+    def explain_same_meaning(self, other: Factor) -> Iterator[ContextRegister]:
         if (
             self.__class__ == other.__class__
             and self.absent == other.absent
@@ -359,7 +359,7 @@ class Factor(ABC):
             ``other`` is an instance of ``self``'s class.
         """
         if self.compare_context_factors(other, means):
-            yield from self.consistent_with(other, means)
+            yield from self._context_registers(other, means)
 
     def get_factor_by_name(self, name: str) -> Optional[Factor]:
         """
@@ -374,8 +374,8 @@ class Factor(ABC):
                 return factor
         return None
 
-    def context_for_implication(self, other: Factor) -> Iterator[ContextRegister]:
-        """
+    def explain_implication(self, other: Factor) -> Iterator[ContextRegister]:
+        r"""
         Generate :class:`.ContextRegister`\s that cause `self` to imply `other`.
 
         If self is `absent`, then generate a ContextRegister from other's point
@@ -406,7 +406,7 @@ class Factor(ABC):
         if other is None:
             return True
         return any(
-            register is not None for register in self.context_for_implication(other)
+            register is not None for register in self.explain_implication(other)
         )
 
     def __gt__(self, other: Optional[Factor]) -> bool:

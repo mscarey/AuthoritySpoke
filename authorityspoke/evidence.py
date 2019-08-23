@@ -28,12 +28,9 @@ class Exhibit(Factor):
     generic: bool = False
     context_factor_names: ClassVar = ("statement", "stated_by")
 
-    def _means_if_concrete(self, other: Factor) -> bool:
-        if not isinstance(other, self.__class__):
-            return False
-        if self.form != other.form:
-            return False
-        return super()._means_if_concrete(other)
+    def _means_if_concrete(self, other: Factor) -> Iterator[ContextRegister]:
+        if isinstance(other, self.__class__) and self.form == other.form:
+            yield from super()._means_if_concrete(other)
 
     def _implies_if_concrete(self, other: Factor) -> Iterator[ContextRegister]:
         if isinstance(other, self.__class__) and (

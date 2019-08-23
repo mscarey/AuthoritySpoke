@@ -589,11 +589,11 @@ class TestAddition:
         facts_not_copyrightable = fact_not_original + unoriginal_not_copyrightable
         assert len(facts_not_copyrightable.inputs) == 1
         assert str(facts_not_copyrightable.inputs[0]) == (
-            "fact <the Pythagorean theorem> was a fact"
+            "fact that <the Pythagorean theorem> was a fact"
         )
         assert len(facts_not_copyrightable.outputs) == 2
         assert str(facts_not_copyrightable.outputs[1]) == (
-            "fact it is false that <the Pythagorean theorem> was copyrightable"
+            "fact that it is false that <the Pythagorean theorem> was copyrightable"
         )
 
     def test_add_inferred_rule(self, make_enactment, make_opinion_with_holding):
@@ -618,11 +618,11 @@ class TestAddition:
         )
         assert len(listings_not_copyrightable.inputs) == 1
         assert str(listings_not_copyrightable.inputs[0]) == (
-            "fact <Rural's telephone listings> were names, towns, "
+            "fact that <Rural's telephone listings> were names, towns, "
             + "and telephone numbers of telephone subscribers"
         )
         assert any(
-            str(out) == "absence of fact <Rural's telephone listings> were copyrightable"
+            str(out) == "absence of fact that <Rural's telephone listings> were copyrightable"
             for out in listings_not_copyrightable.outputs
         )
 
@@ -718,9 +718,9 @@ class TestUnion:
         in a new Function created with the __or__ method.
         """
         original_on_left = make_rule["h1_easy"] | make_rule["h1_entity_order"]
-        assert "RESULT: fact <Hideaway Lodge> was <Wattenburg>’s abode" in str(original_on_left)
+        assert "RESULT: fact that <Hideaway Lodge> was <Wattenburg>’s abode" in str(original_on_left)
         original_on_right = make_rule["h1_entity_order"] | make_rule["h1_easy"]
-        assert "RESULT: fact <Wattenburg> was <Hideaway Lodge>’s abode" in str(original_on_right)
+        assert "RESULT: fact that <Wattenburg> was <Hideaway Lodge>’s abode" in str(original_on_right)
 
     def test_union_returns_universal(self, make_rule):
         """

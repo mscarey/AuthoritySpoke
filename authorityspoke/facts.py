@@ -127,7 +127,7 @@ class Fact(Factor):
             if self.standard_of_proof
             else ""
         )
-        string = f"{standard}{predicate}"
+        string = f"{standard}that {predicate}"
         return super().__str__().format(string)
 
     @property
