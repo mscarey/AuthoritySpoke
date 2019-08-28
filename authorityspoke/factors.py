@@ -37,11 +37,11 @@ def new_context_helper(func: Callable):
         :class:`.Entity` objects).
 
     :param changes:
-        indicates the which generic :class:`.Factor`\s within ``factor`` should
+        indicates which generic :class:`.Factor`\s within ``factor`` should
         be replaced and what they should be replaced with.
 
     :param context_opinion:
-        a second object that with generic factors that need to be searched
+        a second object with generic factors that need to be searched
         when trying to resolve what a string in the `changes` parameter
         refers to.
 
@@ -614,10 +614,6 @@ class ContextRegister(Dict[Factor, Factor]):
 
     def __str__(self) -> str:
         return "ContextRegister({})".format(super().__str__())
-
-    def is_full(self) -> bool:
-        """Check whether all keys are matched to a :class:`.Factor` value."""
-        return all(key for key in self.keys())
 
     def replace_keys(self, replacements: ContextRegister) -> ContextRegister:
         """Construct new :class:`ContextRegister` by replacing keys."""

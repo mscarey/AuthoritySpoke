@@ -4,15 +4,17 @@ import functools
 
 from typing import Callable, Dict, Iterable, List, Optional, Tuple, Union
 
-from authorityspoke.enactments import Code
+from authorityspoke.enactments import Code, Enactment
 from authorityspoke.factors import Factor
 from authorityspoke.jurisdictions import Regime
 from authorityspoke.selectors import TextQuoteSelector
 
+TextLinkDict = Dict[Union[Factor, Enactment], List[TextQuoteSelector]]
+
 
 def _replace_new_factor_from_mentioned(
-    new_factor: Factor, mentioned: Dict[Factor, List[TextQuoteSelector]]
-) -> Factor:
+    new_factor: Union[Enactment, Factor], mentioned: TextLinkDict
+) -> Union[Enactment, Factor]:
     """
     Check if ``new_factor`` can be replaced by an element of ``mentioned``.
 
@@ -50,13 +52,11 @@ def log_mentioned_context(func: Callable):
     @functools.wraps(func)
     def wrapper(
         factor_record: Union[str, Optional[Dict[str, Union[str, bool]]]],
-        mentioned: Optional[Dict[Factor, List[TextQuoteSelector]]] = None,
+        mentioned: Optional[TextLinkDict] = None,
         code: Optional[Code] = None,
         regime: Optional[Regime] = None,
         report_mentioned: bool = False,
-    ) -> Union[
-        Factor, None, Tuple[Optional[Factor], Dict[Factor, List[TextQuoteSelector]]]
-    ]:
+    ) -> Union[Factor, None, Tuple[Optional[Factor], TextLinkDict]]:
 
         if isinstance(factor_record, str):
             factor_record = factor_record.lower()

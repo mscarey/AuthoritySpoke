@@ -710,7 +710,6 @@ class TestUnion:
         b = make_rule["h2"]
         assert (a | b).means(a)
 
-    @pytest.mark.xfail
     def test_union_implied_change_entities(self, make_rule):
         """
         TODO: marked xfail because there's not yet a function
