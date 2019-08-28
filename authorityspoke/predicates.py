@@ -294,30 +294,26 @@ class Predicate:
         ):
             return False
 
-        if (
-            ">" in self.comparison or "=" in self.comparison
-        ) and "<" in other.comparison:
-            if self.quantity > other.quantity:
+        if self.quantity > other.quantity:
+            if (">" in self.comparison and "=" in other.comparison) or (
+                (">" in self.comparison or "=" in self.comparison)
+                and "<" in other.comparison
+            ):
                 return True
-        if (
-            "<" in self.comparison or "=" in self.comparison
-        ) and ">" in other.comparison:
-            if self.quantity < other.quantity:
+        if self.quantity < other.quantity:
+            if (
+                ("<" in self.comparison and "=" in other.comparison)
+                or ("<" in self.comparison or "=" in self.comparison)
+                and ">" in other.comparison
+            ):
                 return True
-        if ">" in self.comparison and "=" in other.comparison:
-            if self.quantity > other.quantity:
-                return True
-        if "<" in self.comparison and "=" in other.comparison:
-            if self.quantity < other.quantity:
-                return True
-        if ("=" in self.comparison) != ("=" in other.comparison):
-            if self.quantity == other.quantity:
-                return True
-        return False
+        return self.quantity == other.quantity and (
+            ("=" in self.comparison) != ("=" in other.comparison)
+        )
 
     def includes_other_quantity(self, other: Predicate) -> bool:
         """
-        Test if the quantity mentioned in self must be greater than other's.
+        Test if the range of quantities mentioned in self is a subset of other's.
         """
         if not self.quantity or not other.quantity:
             return bool(self.quantity)
@@ -325,26 +321,26 @@ class Predicate:
         if not self.consistent_dimensionality(other):
             return False
 
-        if "<" in self.comparison and (
-            "<" in other.comparison or "=" in other.comparison
+        if (
+            (self.quantity < other.quantity)
+            and ("<" in self.comparison)
+            and ("<" in other.comparison or "=" in other.comparison)
         ):
-            if self.quantity < other.quantity:
-                return True
-        if ">" in self.comparison and (
-            ">" in other.comparison or "=" in other.comparison
+            return True
+        if (
+            (self.quantity > other.quantity)
+            and (">" in self.comparison)
+            and (">" in other.comparison or "=" in other.comparison)
         ):
-            if self.quantity > other.quantity:
+            return True
+        if "=" in self.comparison:
+            if ("<" in other.comparison and self.quantity < other.quantity) or (
+                ">" in other.comparison and self.quantity > other.quantity
+            ):
                 return True
-        if "=" in self.comparison and "<" in other.comparison:
-            if self.quantity < other.quantity:
-                return True
-        if "=" in self.comparison and ">" in other.comparison:
-            if self.quantity > other.quantity:
-                return True
-        if ("=" in self.comparison) == ("=" in other.comparison):
-            if self.quantity == other.quantity:
-                return True
-        return False
+        return self.quantity == other.quantity and (
+            ("=" in self.comparison) == ("=" in other.comparison)
+        )
 
     def __len__(self):
         """

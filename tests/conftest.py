@@ -190,7 +190,11 @@ def make_predicate() -> Dict[str, Predicate]:
         "p_small_weight": Predicate("the amount of gold {} possessed was {}", comparison=">=", quantity=Q_("1 gram")),
         "p_large_weight": Predicate("the amount of gold {} possessed was {}", comparison=">=", quantity=Q_("100 kilograms")),
         "p_friends": Predicate("{} and {} were friends", reciprocal=True),
-        "p_reliable": Predicate("{} was reliable")
+        "p_reliable": Predicate("{} was reliable"),
+        "p_quantity=3": Predicate("The number of mice was {}", comparison="==", quantity=3),
+        "p_quantity>=4": Predicate("The number of mice was {}", comparison=">=", quantity=4),
+        "p_quantity>5": Predicate("The number of mice was {}", comparison=">", quantity=5),
+
     }
 
 

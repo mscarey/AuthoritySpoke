@@ -142,6 +142,18 @@ class TestPredicates:
         assert make_predicate["p_murder"] > make_predicate["p_murder_whether"]
         assert make_predicate["p_murder_false"] > make_predicate["p_murder_whether"]
 
+    def test_no_implication_by_equal_quantity(self, make_predicate):
+        assert not make_predicate["p_quantity=3"] > make_predicate["p_quantity>5"]
+
+    def test_no_implication_of_equal_quantity(self, make_predicate):
+        assert not make_predicate["p_quantity>5"] > make_predicate["p_quantity=3"]
+
+    def test_no_implication_by_greater_or_equal_quantity(self, make_predicate):
+        assert not make_predicate["p_quantity>=4"] > make_predicate["p_quantity>5"]
+
+    def test_no_implication_of_greater_or_equal_quantity(self, make_predicate):
+        assert not make_predicate["p_quantity>5"] > make_predicate["p_quantity>=4"]
+
     def test_equal_implies_greater_or_equal(self, make_predicate):
         assert make_predicate["p9_exact"] > make_predicate["p9"]
 
@@ -175,6 +187,26 @@ class TestPredicates:
     def test_contradiction_with_exact(self, make_predicate):
         assert make_predicate["p8_exact"].contradicts(make_predicate["p8_less"])
         assert make_predicate["p8_less"].contradicts(make_predicate["p8_exact"])
+
+    def test_contradiction_by_equal_quantity(self, make_predicate):
+        assert make_predicate["p_quantity=3"].contradicts(
+            make_predicate["p_quantity>5"]
+        )
+
+    def test_contradiction_of_equal_quantity(self, make_predicate):
+        assert make_predicate["p_quantity>5"].contradicts(
+            make_predicate["p_quantity=3"]
+        )
+
+    def test_no_contradiction_by_greater_or_equal_quantity(self, make_predicate):
+        assert not make_predicate["p_quantity>=4"].contradicts(
+            make_predicate["p_quantity>5"]
+        )
+
+    def test_no_contradiction_of_greater_or_equal_quantity(self, make_predicate):
+        assert not make_predicate["p_quantity>5"].contradicts(
+            make_predicate["p_quantity>=4"]
+        )
 
     def test_error_predicate_contradict_factor(self, make_predicate, watt_factor):
         with pytest.raises(TypeError):
