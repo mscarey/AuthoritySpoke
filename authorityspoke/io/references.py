@@ -8,8 +8,7 @@ from authorityspoke.enactments import Code, Enactment
 from authorityspoke.factors import Factor
 from authorityspoke.jurisdictions import Regime
 from authorityspoke.selectors import TextQuoteSelector
-
-TextLinkDict = Dict[Union[Factor, Enactment], List[TextQuoteSelector]]
+from authorityspoke.factors import TextLinkDict
 
 
 def _replace_new_factor_from_mentioned(

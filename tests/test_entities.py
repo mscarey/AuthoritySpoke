@@ -1,14 +1,9 @@
-import datetime
-import json
 import operator
 
-from pint import UnitRegistry
 import pytest
 
 from authorityspoke.entities import Entity
 from authorityspoke.io import readers
-from authorityspoke.opinions import Opinion
-from authorityspoke.predicates import ureg, Q_
 
 
 class TestEntities:

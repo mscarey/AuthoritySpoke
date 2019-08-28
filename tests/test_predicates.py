@@ -86,6 +86,12 @@ class TestPredicates:
         plural_version = Predicate.make_context_plural(sentence=sentence, index=index)
         assert plural_version.startswith(expected)
 
+    def test_str_not_equal(self, make_predicate):
+        assert (
+            str(make_predicate["p7_not_equal"])
+            == "the distance between {} and {} was not equal to 35 foot"
+        )
+
     def test_negated_method(self, make_predicate):
         assert make_predicate["p7"].negated() == make_predicate["p7_opposite"]
         assert make_predicate["p3"].negated() == make_predicate["p3_false"]

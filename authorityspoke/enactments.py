@@ -202,7 +202,8 @@ class Code:
             else:
                 enactment_text = section.parent.find("note").p.text
             month_first = re.compile(
-                r"""(?:Secretary of State|Administrator of General Services|certificate of the Archivist)(?: accordingly issued a proclamation)?,? dated (\w+ \d\d?, \d{4}),"""
+                r"(?:Secretary of State|Administrator of General Services|certificate of the Archivist)"
+                r"(?: accordingly issued a proclamation)?,? dated (\w+ \d\d?, \d{4}),"
             )
             day_first = re.compile(
                 r"(?:Congress|Secretary of State),? dated the (\d\d?th of \w+, \d{4}),"

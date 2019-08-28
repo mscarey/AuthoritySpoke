@@ -11,7 +11,11 @@ import operator
 from typing import Any, Callable, Dict, Iterable, Iterator, List
 from typing import Optional, Sequence, Tuple, Union
 
+from authorityspoke.enactments import Enactment
+from authorityspoke.selectors import TextQuoteSelector
+
 logger = logging.getLogger(__name__)
+
 
 
 def new_context_helper(func: Callable):
@@ -588,6 +592,7 @@ class Factor(ABC):
             return tuple(item)
         return (item,)
 
+TextLinkDict = Dict[Union[Factor, Enactment], List[TextQuoteSelector]]
 
 def means(left: Factor, right: Factor) -> bool:
     """

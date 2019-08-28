@@ -88,13 +88,9 @@ class Entity(Factor):
         if comparison(self, other):
             yield ContextRegister({self: other, other: self})
 
-    def contradicts(self, other: Optional[Factor], explain: bool = False) -> bool:
+    def contradicts(self, other: Optional[Factor]) -> bool:
         """
         Test whether ``self`` contradicts the ``other`` :class:`Factor`.
-
-        :param explain:
-            a flag that will be silently ignored because there can never be
-            any contradiction to explain.
 
         :returns:
             ``False``, because an :class:`Entity` contradicts no other :class:`Factor`.

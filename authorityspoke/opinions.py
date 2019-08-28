@@ -6,7 +6,7 @@ Unlike most other ``authorityspoke`` classes, :class:`Opinion`\s are not frozen.
 
 from __future__ import annotations
 
-from typing import Any, Dict, Iterable, List, Tuple
+from typing import Dict, Iterable, List, Tuple
 from typing import Optional, Sequence, Union
 
 import datetime
@@ -15,15 +15,13 @@ import re
 
 from dataclasses import dataclass, field
 
-from authorityspoke.factors import Factor
+from authorityspoke.factors import Factor, TextLinkDict
 from authorityspoke.enactments import Enactment
 from authorityspoke.holdings import Holding
 from authorityspoke.rules import Rule
 from authorityspoke.selectors import TextQuoteSelector
 
 logger = logging.getLogger(__name__)
-
-TextLinkDict = Dict[Union[Factor, Enactment], List[TextQuoteSelector]]
 
 
 @dataclass

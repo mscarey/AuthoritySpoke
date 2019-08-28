@@ -204,26 +204,7 @@ class Predicate:
             return False
 
         if self.quantity and other.quantity:
-            if (
-                ">" in self.comparison or "=" in self.comparison
-            ) and "<" in other.comparison:
-                if self.quantity > other.quantity:
-                    return True
-            if (
-                "<" in self.comparison or "=" in self.comparison
-            ) and ">" in other.comparison:
-                if self.quantity < other.quantity:
-                    return True
-            if ">" in self.comparison and "=" in other.comparison:
-                if self.quantity > other.quantity:
-                    return True
-            if "<" in self.comparison and "=" in other.comparison:
-                if self.quantity < other.quantity:
-                    return True
-            if ("=" in self.comparison) != ("=" in other.comparison):
-                if self.quantity == other.quantity:
-                    return True
-            return False
+            return self.excludes_other_quantity(other)
         return self.truth != other.truth
 
     def same_content_meaning(self, other: Predicate) -> bool:
@@ -295,6 +276,52 @@ class Predicate:
         ):
             return False
 
+        return self.includes_other_quantity(other)
+
+    def __ge__(self, other: Predicate) -> bool:
+        if self == other:
+            return True
+        return self > other
+
+    def excludes_other_quantity(self, other: Predicate) -> bool:
+        """
+        Test if quantity ranges in self and other are non-overlapping.
+        """
+        if (
+            not self.quantity
+            or not other.quantity
+            or not self.consistent_dimensionality(other)
+        ):
+            return False
+
+        if (
+            ">" in self.comparison or "=" in self.comparison
+        ) and "<" in other.comparison:
+            if self.quantity > other.quantity:
+                return True
+        if (
+            "<" in self.comparison or "=" in self.comparison
+        ) and ">" in other.comparison:
+            if self.quantity < other.quantity:
+                return True
+        if ">" in self.comparison and "=" in other.comparison:
+            if self.quantity > other.quantity:
+                return True
+        if "<" in self.comparison and "=" in other.comparison:
+            if self.quantity < other.quantity:
+                return True
+        if ("=" in self.comparison) != ("=" in other.comparison):
+            if self.quantity == other.quantity:
+                return True
+        return False
+
+    def includes_other_quantity(self, other: Predicate) -> bool:
+        """
+        Test if the quantity mentioned in self must be greater than other's.
+        """
+        if not self.quantity or not other.quantity:
+            return bool(self.quantity)
+
         if not self.consistent_dimensionality(other):
             return False
 
@@ -314,18 +341,10 @@ class Predicate:
         if "=" in self.comparison and ">" in other.comparison:
             if self.quantity > other.quantity:
                 return True
-        if "=" in self.comparison and "=" in other.comparison:
-            if self.quantity == other.quantity:
-                return True
-        if "=" not in self.comparison and "=" not in other.comparison:
+        if ("=" in self.comparison) == ("=" in other.comparison):
             if self.quantity == other.quantity:
                 return True
         return False
-
-    def __ge__(self, other: Predicate) -> bool:
-        if self == other:
-            return True
-        return self > other
 
     def __len__(self):
         """
@@ -356,6 +375,7 @@ class Predicate:
         expand = {
             "=": "exactly equal to",
             "!=": "not equal to",
+            "<>": "not equal to",
             ">": "greater than",
             "<": "less than",
             ">=": "at least",
