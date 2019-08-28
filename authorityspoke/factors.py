@@ -405,9 +405,7 @@ class Factor(ABC):
         """Test whether ``self`` implies ``other``."""
         if other is None:
             return True
-        return any(
-            register is not None for register in self.explain_implication(other)
-        )
+        return any(register is not None for register in self.explain_implication(other))
 
     def __gt__(self, other: Optional[Factor]) -> bool:
         """Test whether ``self`` implies ``other`` and ``self`` != ``other``."""
@@ -435,7 +433,9 @@ class Factor(ABC):
         valid = True
         for i, self_factor in enumerate(self.context_factors):
             if not (self_factor is other.context_factors[i] is None):
-                if not (self_factor and relation(self_factor, other.context_factors[i])):
+                if not (
+                    self_factor and relation(self_factor, other.context_factors[i])
+                ):
                     valid = False
         return valid
 
@@ -652,9 +652,7 @@ class ContextRegister(Dict[Factor, Factor]):
                     return None
                 self_mapping[in_key] = in_value
                 if list(self_mapping.values()).count(in_value) > 1:
-                    logger.debug(
-                        f"{in_value} assigned to two different keys"
-                    )
+                    logger.debug("%s assigned to two different keys", in_value)
                     return None
         return self_mapping
 
@@ -809,7 +807,9 @@ class Analogy:
         return new_matchlist
 
 
-def all_analogy_matches(relations: Tuple[Analogy, ...], inverse: bool = False) -> List[ContextRegister]:
+def all_analogy_matches(
+    relations: Tuple[Analogy, ...], inverse: bool = False
+) -> List[ContextRegister]:
     r"""
     Find all context registers consistent with multiple :class:`.Analogy` comparisons.
 

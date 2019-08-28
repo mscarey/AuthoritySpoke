@@ -153,10 +153,12 @@ class Fact(Factor):
         """
         if self.predicate and self.predicate.reciprocal:
             return [
-                {
-                    self.context_factors[1]: self.context_factors[0],
-                    self.context_factors[0]: self.context_factors[1],
-                }
+                ContextRegister(
+                    {
+                        self.context_factors[1]: self.context_factors[0],
+                        self.context_factors[0]: self.context_factors[1],
+                    }
+                )
             ]
         return []
 
@@ -224,23 +226,6 @@ class Fact(Factor):
         """
         if isinstance(other, Fact) and self.predicate.contradicts(other.predicate):
             yield from self.consistent_with(other, operator.ge)
-
-    def _contradicts_if_factor(self, other: Factor) -> Iterator[ContextRegister]:
-        r"""
-        Test if ``self`` contradicts ``other``, assuming they are both :class:`Factor`\s.
-
-        :returns:
-            whether ``self`` and ``other`` can't both be true at
-            the same time under the given assumption.
-        """
-
-        if isinstance(other, self.__class__) and not (self.absent and other.absent):
-            if self.absent:
-                yield from other._implies_if_present(self)
-            elif not other.absent:
-                yield from self._contradicts_if_present(other)
-            else:
-                yield from self._implies_if_present(other)
 
     @new_context_helper
     def new_context(self, changes: Dict[Factor, Factor]) -> Factor:

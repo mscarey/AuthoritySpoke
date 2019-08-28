@@ -465,6 +465,7 @@ class TestFacts:
 
     def test_same_predicate_true_vs_false(self, watt_factor):
         assert watt_factor["f10"].contradicts(watt_factor["f10_false"])
+        assert watt_factor["f10"].truth != watt_factor["f10_false"].truth
 
     def test_factor_does_not_contradict_predicate(self, make_predicate, watt_factor):
         with pytest.raises(TypeError):
