@@ -243,14 +243,22 @@ class Predicate:
 
     def __gt__(self, other: Optional[Predicate]) -> bool:
         """
-        Test whether ``self`` implies ``other`` and has different meaning.
+        Test whether ``self`` implies ``other``.
 
         :returns:
             whether ``self`` implies ``other``, which is ``True``
             if their statements about quantity imply it.
-            Returns ``False`` if ``self == other``.
         """
+        return self.implies(other)
 
+    def implies(self, other: Optional[Predicate]) -> bool:
+        """
+        Test whether ``self`` implies ``other``.
+
+        :returns:
+            whether ``self`` implies ``other``, which is ``True``
+            if their statements about quantity imply it.
+        """
         if other is None:
             return True
         if not isinstance(other, self.__class__):
@@ -281,7 +289,7 @@ class Predicate:
     def __ge__(self, other: Predicate) -> bool:
         if self == other:
             return True
-        return self > other
+        return self.implies(other)
 
     def excludes_other_quantity(self, other: Predicate) -> bool:
         """
@@ -323,14 +331,14 @@ class Predicate:
 
         if (
             (self.quantity < other.quantity)
-            and ("<" in self.comparison)
-            and ("<" in other.comparison or "=" in other.comparison)
+            and ("<" in self.comparison or "=" in self.comparison)
+            and ("<" in other.comparison)
         ):
             return True
         if (
             (self.quantity > other.quantity)
-            and (">" in self.comparison)
-            and (">" in other.comparison or "=" in other.comparison)
+            and (">" in self.comparison or "=" in self.comparison)
+            and (">" in other.comparison)
         ):
             return True
         if "=" in self.comparison:

@@ -151,8 +151,14 @@ class TestPredicates:
     def test_no_implication_by_greater_or_equal_quantity(self, make_predicate):
         assert not make_predicate["p_quantity>=4"] > make_predicate["p_quantity>5"]
 
-    def test_no_implication_of_greater_or_equal_quantity(self, make_predicate):
-        assert not make_predicate["p_quantity>5"] > make_predicate["p_quantity>=4"]
+    def test_no_implication_of_greater_or_equal_quantity(self):
+        less = Predicate(
+            content="The number of mice was {}", comparison=">", quantity=4
+        )
+        more = Predicate(
+            content="The number of mice was {}", comparison=">=", quantity=5
+        )
+        assert not less.implies(more)
 
     def test_equal_implies_greater_or_equal(self, make_predicate):
         assert make_predicate["p9_exact"] > make_predicate["p9"]
