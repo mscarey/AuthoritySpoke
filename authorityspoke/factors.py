@@ -592,6 +592,7 @@ class Factor(ABC):
             return tuple(item)
         return (item,)
 
+
 TextLinkDict = Dict[Union[Factor, Enactment], List[TextQuoteSelector]]
 
 def means(left: Factor, right: Factor) -> bool:

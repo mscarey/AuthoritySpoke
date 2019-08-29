@@ -2,10 +2,15 @@ import logging
 import pytest
 
 from authorityspoke.enactments import Code, Enactment
+from authorityspoke.entities import Entity
+from authorityspoke.factors import ContextRegister
 from authorityspoke.procedures import Procedure
+from authorityspoke.procedures import consistent_factor_groups
+from authorityspoke.procedures import contradictory_factor_groups
 from authorityspoke.rules import Rule
 from authorityspoke.opinions import Opinion
-from authorityspoke.predicates import ureg, Q_
+from authorityspoke.predicates import Predicate, ureg, Q_
+from authorityspoke.facts import Fact
 
 
 class TestProcedures:
@@ -257,3 +262,67 @@ class TestProcedureUnion:
         )
         assert procedure_from_union.means(procedure_from_adding)
         assert procedure_from_union == procedure_from_adding
+
+
+p_small_weight = Predicate(
+    "the amount of gold {} possessed was {}", comparison="<", quantity=Q_("1 gram")
+)
+p_large_weight = Predicate(
+    "the amount of gold {} possessed was {}",
+    comparison=">=",
+    quantity=Q_("100 kilograms"),
+)
+alice = Entity("Alice")
+bob = Entity("Bob")
+craig = Entity("Craig")
+dan = Entity("Dan")
+alice_rich = Fact(p_large_weight, context_factors=alice)
+bob_poor = Fact(p_small_weight, context_factors=bob)
+craig_rich = Fact(p_small_weight, context_factors=craig)
+dan_poor = Fact(p_small_weight, context_factors=dan)
+
+
+class TestFactorGroups:
+    def test_consistent_factor_groups(self):
+        """
+        Verifies that the factor groups are considered "consistent"
+        even though it would be possible to make an analogy that would
+        make the statements contradict.
+
+        If Alice is considered analagous to Dan the two sets of
+        statements would be inconsistent, but not if
+        Alice is considered analagous to Craig.
+        """
+        assert consistent_factor_groups(
+            self_factors=(alice_rich, bob_poor), other_factors=(dan_poor, craig_rich)
+        )
+        assert not consistent_factor_groups(
+            self_factors=(alice_rich, bob_poor),
+            other_factors=(dan_poor, craig_rich),
+            matches=ContextRegister({alice: dan}),
+        )
+
+    def test_contradictory_factor_groups(self):
+        """
+        Verifies that the factor groups are considered "consistent"
+        even though it would be possible to make an analogy that would
+        make the statements contradict.
+
+        If Alice is considered analagous to Dan the two sets of
+        statements would be contradictory, but not if
+        Alice is considered analagous to Craig.
+        """
+        assert contradictory_factor_groups(
+            self_factors=(alice_rich, bob_poor), other_factors=(craig_rich, dan_poor)
+        )
+
+    def test_not_contradictory_factor_groups(self):
+        """
+        Because the ContextRegister matches up the two contexts
+        consistently, it's impossible to reach a contradiction.
+        """
+        assert not contradictory_factor_groups(
+            self_factors=(alice_rich, bob_poor),
+            other_factors=(dan_poor, craig_rich),
+            matches=ContextRegister({alice: craig}),
+        )

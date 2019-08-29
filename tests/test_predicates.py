@@ -1,10 +1,5 @@
-import logging
-import operator
-
 import pytest
 
-from authorityspoke.rules import Rule
-from authorityspoke.opinions import Opinion
 from authorityspoke.predicates import Predicate, ureg, Q_
 
 
