@@ -303,17 +303,10 @@ class Predicate:
             return False
 
         if self.quantity > other.quantity:
-            if (">" in self.comparison and "=" in other.comparison) or (
-                (">" in self.comparison or "=" in self.comparison)
-                and "<" in other.comparison
-            ):
+            if "<" not in self.comparison and ">" not in other.comparison:
                 return True
         if self.quantity < other.quantity:
-            if (
-                ("<" in self.comparison and "=" in other.comparison)
-                or ("<" in self.comparison or "=" in self.comparison)
-                and ">" in other.comparison
-            ):
+            if ">" not in self.comparison and "<" not in other.comparison:
                 return True
         return self.quantity == other.quantity and (
             ("=" in self.comparison) != ("=" in other.comparison)

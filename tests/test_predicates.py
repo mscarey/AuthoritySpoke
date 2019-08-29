@@ -190,8 +190,10 @@ class TestPredicates:
         assert not make_predicate["p1"].contradicts(make_predicate["p1_again"])
         assert not make_predicate["p3"].contradicts(make_predicate["p7"])
 
-    def test_contradiction_with_exact(self, make_predicate):
+    def test_contradiction_by_exact(self, make_predicate):
         assert make_predicate["p8_exact"].contradicts(make_predicate["p8_less"])
+
+    def test_contradiction_of_exact(self, make_predicate):
         assert make_predicate["p8_less"].contradicts(make_predicate["p8_exact"])
 
     def test_contradiction_by_equal_quantity(self, make_predicate):
