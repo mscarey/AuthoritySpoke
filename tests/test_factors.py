@@ -457,7 +457,7 @@ class TestFacts:
             >= make_complex_fact["f_relevant_murder_alice_craig"]
         )
 
-    # Contradiction
+class TestContradiction:
 
     def test_factor_different_predicate_truth_contradicts(self, watt_factor):
         assert watt_factor["f7"].contradicts(watt_factor["f7_opposite"])
@@ -519,6 +519,45 @@ class TestFacts:
 
     # Consistency with Entity/Factor assignments
 
+    def test_inconsistent_statements_about_different_entities(self):
+        """
+        Alice and Bob are both generics. So it's possible to reach a
+        contradiction if you assume they correspond to one another.
+        """
+        p_small_weight = Predicate(
+            "the amount of gold {} possessed was {}", comparison="<", quantity=Q_("1 gram")
+        )
+        p_large_weight = Predicate(
+            "the amount of gold {} possessed was {}",
+            comparison=">=",
+            quantity=Q_("100 kilograms"),
+        )
+        alice = Entity("Alice")
+        bob = Entity("Bob")
+        alice_rich = Fact(p_large_weight, context_factors=alice)
+        bob_poor = Fact(p_small_weight, context_factors=bob)
+        assert alice_rich.contradicts(bob_poor)
+
+    def test_inconsistent_statements_about_corresponding_entities(self):
+        """
+        Even though Alice and Bob are both generics, it's known that
+        Alice in the first context corresponds with Alice in the second.
+        So there's no contradiction.
+        """
+        p_small_weight = Predicate(
+            "the amount of gold {} possessed was {}", comparison="<", quantity=Q_("1 gram")
+        )
+        p_large_weight = Predicate(
+            "the amount of gold {} possessed was {}",
+            comparison=">=",
+            quantity=Q_("100 kilograms"),
+        )
+        alice = Entity("Alice")
+        bob = Entity("Bob")
+        alice_rich = Fact(p_large_weight, context_factors=alice)
+        bob_poor = Fact(p_small_weight, context_factors=bob)
+        assert alice_rich.contradicts(bob_poor, context=ContextRegister({alice: alice}))
+
     def test_copy_with_foreign_context(self, watt_mentioned, watt_factor):
         w = watt_mentioned
         assert (
@@ -577,7 +616,7 @@ class TestFacts:
         with pytest.raises(TypeError):
             any(register is not None for register in update)
 
-    # Addition
+class TestAddition:
 
     @pytest.mark.parametrize("left, right, expected",
     [

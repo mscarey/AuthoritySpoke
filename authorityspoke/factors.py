@@ -211,10 +211,10 @@ class Factor(ABC):
         return None
 
     def consistent_with(
-        self, other: Factor, comparison: Callable
-    ) -> List[ContextRegister]:
+        self, other: Factor, context: Optional[ContextRegister]
+    ) -> Iterator[ContextRegister]:
         """
-        Find whether ``self`` and ``other`` can fit the relationship ``comparison``.
+        Check if self and other can be non-contradictory.
 
         :returns:
             a bool indicating whether there's at least one way to
@@ -222,9 +222,9 @@ class Factor(ABC):
             such that they fit the relationship ``comparison``.
         """
 
-        return list(self._context_registers(other, comparison))
+        raise NotImplementedError
 
-    def _contradicts_if_present(self, other: Factor) -> Iterator[ContextRegister]:
+    def _contradicts_if_present(self, other: Factor, context: Optional[ContextRegister] = None) -> Iterator[ContextRegister]:
         """
         Test if ``self`` would contradict ``other`` if neither was ``absent``.
 
@@ -233,7 +233,7 @@ class Factor(ABC):
         yield from iter([])
 
     def _context_registers(
-        self, other: Optional[Factor], comparison: Callable
+        self, other: Optional[Factor], comparison: Callable, context: Optional[ContextRegister] = None
     ) -> Iterator[ContextRegister]:
         r"""
         Search for ways to match :attr:`context_factors` of ``self`` and ``other``.
@@ -242,16 +242,18 @@ class Factor(ABC):
             all valid ways to make matches between
             corresponding :class:`Factor`\s.
         """
-
+        if context is None:
+            context = ContextRegister()
         if other is None:
-            yield ContextRegister()
+            yield context
         elif self.generic or other.generic:
-            yield ContextRegister({self: other})
+            if context.get(self) is None or (context.get(self) == other):
+                yield ContextRegister({self: other})
         else:
             relation = Analogy(self.context_factors, other.context_factors, comparison)
-            yield from relation.ordered_comparison()
+            yield from relation.ordered_comparison(matches=context)
 
-    def contradicts(self, other: Optional[Factor]) -> bool:
+    def contradicts(self, other: Optional[Factor], context: Optional[ContextRegister] = None) -> bool:
         """
         Test whether ``self`` implies the absence of ``other``.
 
@@ -262,9 +264,9 @@ class Factor(ABC):
 
         if other is None:
             return False
-        return any(self.explain_contradiction(other))
+        return any(self.explain_contradiction(other, context))
 
-    def explain_contradiction(self, other: Factor) -> Iterator[ContextRegister]:
+    def explain_contradiction(self, other: Factor, context: Optional[ContextRegister]) -> Iterator[ContextRegister]:
         """
         Test whether ``self`` :meth:`implies` the absence of ``other``.
 
@@ -275,6 +277,8 @@ class Factor(ABC):
             ``True`` if self and other can't both be true at
             the same time. Otherwise returns ``False``.
         """
+        if context is None:
+            context = ContextRegister()
         if not isinstance(other, Factor):
             raise TypeError(
                 f"{self.__class__} objects may only be compared for "
@@ -283,16 +287,14 @@ class Factor(ABC):
         if isinstance(other, self.__class__):
             if not self.__dict__.get("absent"):
                 if not other.__dict__.get("absent"):
-                    yield from self._contradicts_if_present(other)
+                    yield from self._contradicts_if_present(other, context)
                 else:
-                    yield from self._implies_if_present(other)
+                    yield from self._implies_if_present(other, context)
             elif self.__dict__.get("absent"):
                 if not other.__dict__.get("absent"):
-                    generator = other._implies_if_present(self)
+                    yield from other._implies_if_present(self, context.reversed)
                 else:
-                    generator = other._contradicts_if_present(self)
-                for register in generator:
-                    yield ContextRegister({v: k for k, v in register.items()})
+                    yield from other._contradicts_if_present(self, context.reversed)
 
     def evolve(self, changes: Union[str, Tuple[str, ...], Dict[str, Any]]) -> Factor:
         """
@@ -378,7 +380,7 @@ class Factor(ABC):
                 return factor
         return None
 
-    def explain_implication(self, other: Factor) -> Iterator[ContextRegister]:
+    def explain_implication(self, other: Factor, ) -> Iterator[ContextRegister]:
         r"""
         Generate :class:`.ContextRegister`\s that cause `self` to imply `other`.
 
@@ -403,7 +405,7 @@ class Factor(ABC):
                 else:
                     generator = other._contradicts_if_present(self)
                 for register in generator:
-                    yield ContextRegister({v: k for k, v in register.items()})
+                    yield
 
     def implies(self, other: Optional[Factor]) -> bool:
         """Test whether ``self`` implies ``other``."""
@@ -443,7 +445,7 @@ class Factor(ABC):
                     valid = False
         return valid
 
-    def _implies_if_concrete(self, other: Factor) -> Iterator[ContextRegister]:
+    def _implies_if_concrete(self, other: Factor, context: Optional[ContextRegister] = None) -> Iterator[ContextRegister]:
         """
         Find if ``self`` would imply ``other`` if they aren't absent or generic.
 
@@ -458,9 +460,9 @@ class Factor(ABC):
             ``other`` is an instance of ``self``'s class.
         """
         if self.compare_context_factors(other, operator.ge):
-            yield from self._context_registers(other, operator.ge)
+            yield from self._context_registers(other, operator.ge, context)
 
-    def _implies_if_present(self, other: Factor) -> Iterator[ContextRegister]:
+    def _implies_if_present(self, other: Factor, context: Optional[ContextRegister] = None) -> Iterator[ContextRegister]:
         """
         Find if ``self`` would imply ``other`` if they aren't absent.
 
@@ -469,11 +471,14 @@ class Factor(ABC):
             under the assumption that neither self nor other has
             the attribute ``absent == True``.
         """
+        if not context:
+            context = ContextRegister()
         if isinstance(other, self.__class__):
             if other.generic:
-                yield ContextRegister({self: other})
+                if context.get(self) is None or (context.get(self) == other):
+                    yield ContextRegister({self: other})
             if not self.generic:
-                yield from self._implies_if_concrete(other)
+                yield from self._implies_if_concrete(other, context)
 
     def make_generic(self) -> Factor:
         """
@@ -626,6 +631,10 @@ class ContextRegister(Dict[Factor, Factor]):
         values = self.values()
         keys = [replacements.get(factor) or factor for factor in self.keys()]
         return ContextRegister(zip(keys, values))
+
+    @property
+    def reversed(self):
+        return ContextRegister({v: k for k, v in self.items()})
 
     def merged_with(
         self, incoming_mapping: ContextRegister

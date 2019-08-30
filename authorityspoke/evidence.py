@@ -32,11 +32,13 @@ class Exhibit(Factor):
         if isinstance(other, self.__class__) and self.form == other.form:
             yield from super()._means_if_concrete(other)
 
-    def _implies_if_concrete(self, other: Factor) -> Iterator[ContextRegister]:
+    def _implies_if_concrete(
+        self, other: Factor, context: Optional[ContextRegister] = None
+    ) -> Iterator[ContextRegister]:
         if isinstance(other, self.__class__) and (
             self.form == other.form or other.form is None
         ):
-            yield from super()._implies_if_concrete(other)
+            yield from super()._implies_if_concrete(other, context)
 
     def __str__(self):
         string = (

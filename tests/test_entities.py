@@ -66,14 +66,16 @@ class TestEntities:
 
     # Implication
 
-    def test_implication_generic_entities(self, make_entity):
+    def test_implication_of_generic_entity(self, make_entity):
         assert make_entity["motel_specific"] > make_entity["trees"]
+
+    def test_generic_entity_does_not_imply_specific_and_different(self, make_entity):
         assert not make_entity["motel_specific"] < make_entity["trees"]
 
     def test_implication_same_except_generic(self, make_entity):
         assert make_entity["motel_specific"] > make_entity["motel"]
 
-    def test_no_implication_generic_to_specific(self, make_entity):
+    def test_generic_entity_does_not_imply_specific_and_same(self, make_entity):
         assert not make_entity["motel_specific"] < make_entity["motel"]
 
     def test_same_entity_not_ge(self, make_entity):

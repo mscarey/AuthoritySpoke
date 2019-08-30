@@ -66,9 +66,9 @@ class Procedure(Factor):
         other :class:`Procedure`.
     """
 
-    outputs: Iterable[Factor] = ()
-    inputs: Iterable[Factor] = ()
-    despite: Iterable[Factor] = ()
+    outputs: Tuple[Factor, ...] = ()
+    inputs: Tuple[Factor, ...] = ()
+    despite: Tuple[Factor, ...] = ()
     name: Optional[str] = None
     absent: bool = False
     generic: bool = False
@@ -271,7 +271,10 @@ class Procedure(Factor):
         # For self to contradict other, some output of other
         # must be contradicted by some output of self.
 
-        return any(self.contradiction_between_outputs(other, m) for m in matchlist)
+        return any(
+            contradictory_factor_groups(self.outputs, other.outputs, m)
+            for m in matchlist
+        )
 
     def implies_all_to_all(self, other: Procedure) -> bool:
         """

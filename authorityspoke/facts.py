@@ -195,7 +195,9 @@ class Fact(Factor):
     def __len__(self):
         return len(self.context_factors)
 
-    def _implies_if_concrete(self, other: Factor) -> Iterator[ContextRegister]:
+    def _implies_if_concrete(
+        self, other: Factor, context: Optional[ContextRegister] = None
+    ) -> Iterator[ContextRegister]:
         """
         Test if ``self`` impliess ``other``, assuming they are not ``generic``.
 
@@ -214,9 +216,11 @@ class Fact(Factor):
             )
             and self.predicate >= other.predicate
         ):
-            yield from super()._implies_if_concrete(other)
+            yield from super()._implies_if_concrete(other, context)
 
-    def _contradicts_if_present(self, other: Factor) -> Iterator[ContextRegister]:
+    def _contradicts_if_present(
+        self, other: Factor, context: Optional[ContextRegister] = None
+    ) -> Iterator[ContextRegister]:
         """
         Test if ``self`` contradicts :class:`Fact` ``other`` if neither is ``absent``.
 
@@ -224,8 +228,10 @@ class Fact(Factor):
             whether ``self`` and ``other`` can't both be true at
             the same time under the given assumption.
         """
+        if context is None:
+            context = ContextRegister()
         if isinstance(other, Fact) and self.predicate.contradicts(other.predicate):
-            yield from self.consistent_with(other, operator.ge)
+            yield from self._context_registers(other, operator.ge, context)
 
     @new_context_helper
     def new_context(self, changes: Dict[Factor, Factor]) -> Factor:
