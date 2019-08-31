@@ -523,7 +523,7 @@ def consistent_factor_groups(
 def contradictory_factor_groups(
     self_factors: Tuple[Factor],
     other_factors: Tuple[Factor],
-    matches: Optional[ContextRegister] = None,
+    context: Optional[ContextRegister] = None,
 ) -> bool:
     r"""
     Find whether two sets of :class:`.Factor`\s can be contradictory.
@@ -547,14 +547,10 @@ def contradictory_factor_groups(
         makes a :class:`.Factor` in the output of ``other`` contradict
         a :class:`.Factor` in the output of ``self``.
     """
-    if matches is None:
-        matches = ContextRegister()
+    if context is None:
+        context = ContextRegister()
     for other_factor in other_factors:
         for self_factor in self_factors:
-            if other_factor.contradicts(self_factor):
-                generic_pairs = zip(
-                    self_factor.generic_factors, other_factor.generic_factors
-                )
-                if all(matches.get(pair[0]) == pair[1] for pair in generic_pairs):
-                    return True
+            if other_factor.contradicts(self_factor, context):
+                return True
     return False

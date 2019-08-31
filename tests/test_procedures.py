@@ -324,5 +324,5 @@ class TestFactorGroups:
         assert not contradictory_factor_groups(
             self_factors=(alice_rich, bob_poor),
             other_factors=(dan_poor, craig_rich),
-            matches=ContextRegister({alice: craig}),
+            context=ContextRegister({alice: craig}),
         )
