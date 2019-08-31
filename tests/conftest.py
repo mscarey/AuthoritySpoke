@@ -309,6 +309,7 @@ def make_factor(make_predicate, make_entity) -> Dict[str, Factor]:
         "f_irrelevant_3_new_context": Fact(p["p_irrelevant_3"], (3, 4), case_factors=c),
         "f_irrelevant_3_context_0": Fact(p["p_irrelevant_3"], (3, 0), case_factors=c),
         "f_crime": Fact(p["p_crime"], case_factors=c),
+        "f_watt_crime": Fact(p["p_crime"], case_factors=make_entity["watt"]),
         "f_no_crime": Fact(p["p_no_crime"], case_factors=c),
         "f_no_crime_entity_order": Fact(p["p_no_crime"], (1,), case_factors=c),
         "f_murder": Fact(p["p_murder"], case_factors=c),
@@ -546,9 +547,9 @@ def make_evidence(
             x["no_shooting_different_witness_testimony"], to_effect=f["f_no_crime"]
         ),
         "reciprocal": Evidence(x["reciprocal_testimony"], to_effect=f["f_no_crime"]),
-        "crime": Evidence(x["generic_exhibit"], to_effect=f["f_crime"], generic=True),
+        "crime": Evidence(x["generic_exhibit"], to_effect=f["f_watt_crime"], generic=True),
         "crime_absent": Evidence(
-            x["generic_exhibit"], to_effect=f["f_crime"], absent=True, generic=True
+            x["generic_exhibit"], to_effect=f["f_watt_crime"], absent=True, generic=True
         ),
         "generic": Evidence(x["generic_exhibit"], generic=True),
         "generic_absent": Evidence(x["generic_exhibit"], absent=True, generic=True),

@@ -473,7 +473,7 @@ class Factor(ABC):
             under the assumption that neither self nor other has
             the attribute ``absent == True``.
         """
-        if not context:
+        if context is None:
             context = ContextRegister()
         if isinstance(other, self.__class__):
             if other.generic:
