@@ -275,10 +275,9 @@ class Procedure(Factor):
         # For self to contradict other, some output of other
         # must be contradicted by some output of self.
 
-        yield from (
-            contradictory_factor_groups(self.outputs, other.outputs, m)
-            for m in matchlist
-        )
+        for m in matchlist:
+            if contradictory_factor_groups(self.outputs, other.outputs, m):
+                yield m
 
     def implies_all_to_all(self, other: Procedure) -> bool:
         """
@@ -525,10 +524,10 @@ def consistent_factor_groups(
 
 
 def contradictory_factor_groups(
-    self_factors: Tuple[Factor],
-    other_factors: Tuple[Factor],
+    self_factors: Tuple[Factor, ...],
+    other_factors: Tuple[Factor, ...],
     context: Optional[ContextRegister] = None,
-) -> bool:
+) -> Iterator[ContextRegister]:
     r"""
     Find whether two sets of :class:`.Factor`\s can be contradictory.
 
