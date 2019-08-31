@@ -7,13 +7,14 @@ may describe procedural moves available in litigation.
 
 from __future__ import annotations
 
+from itertools import chain
 from typing import Any, ClassVar, Dict, Iterable, Iterator
 from typing import List, Optional, Sequence, Tuple, Union
 
 from dataclasses import dataclass
 
 from authorityspoke.enactments import Enactment, consolidate_enactments
-from authorityspoke.factors import Factor
+from authorityspoke.factors import Factor, ContextRegister
 from authorityspoke.procedures import Procedure
 
 
@@ -266,7 +267,7 @@ class Rule(Factor):
         """
         return self.evolve({"procedure": self.procedure.add_factor(incoming, role)})
 
-    def contradicts(self, other) -> bool:
+    def contradicts(self, other, context: Optional[ContextRegister] = None) -> bool:
         """
         Test if ``self`` contradicts ``other``.
 
@@ -284,18 +285,36 @@ class Rule(Factor):
         if not self.universal and not other.universal:
             return False
 
+        return any(
+            register is not None
+            for register in self.explain_contradiction(other, context)
+        )
+
+    def explain_contradiction(
+        self, other, context: Optional[ContextRegister] = None
+    ) -> Iterator[ContextRegister]:
+        if context is None:
+            context = ContextRegister()
+
+        self_to_other = self.procedure.contradicts_some_to_all(other.procedure, context)
+        other_to_self = (
+            register.reversed
+            for register in other.procedure.contradicts_some_to_all(
+                self.procedure, context.reversed
+            )
+        )
+
         if other.universal and not self.universal:
-            return self.procedure.contradicts_some_to_all(other.procedure)
+            yield from self_to_other
 
         if self.universal and not other.universal:
-            return other.procedure.contradicts_some_to_all(self.procedure)
+            yield from other_to_self
 
-        # This last option is for the ALL contradicts ALL case (regardless of MAY or MUST)
+        # This last option is for the ALL contradicts ALL case
+        # (regardless of MAY or MUST).
         # It could use more tests.
 
-        return other.procedure.contradicts_some_to_all(
-            self.procedure
-        ) or self.procedure.contradicts_some_to_all(other.procedure)
+        yield from chain(self_to_other, other_to_self)
 
     def needs_subset_of_enactments(self, other) -> bool:
         r"""

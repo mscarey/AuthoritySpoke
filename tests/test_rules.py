@@ -3,6 +3,7 @@ import pytest
 
 from authorityspoke.enactments import Code, Enactment
 from authorityspoke.entities import Entity
+from authorityspoke.factors import ContextRegister
 from authorityspoke.facts import Fact
 from authorityspoke.holdings import Holding
 from authorityspoke.io.loaders import load_holdings
@@ -148,6 +149,15 @@ class TestImplication:
     def test_holding_narrower_despite_implies_broader(self, make_rule):
         assert make_rule["h2_exact_in_despite"] > make_rule["h2"]
         assert not make_rule["h2"] > make_rule["h2_exact_in_despite"]
+
+    def test_explain_implication_same_entities(self, make_rule):
+        """
+        Checks that because the generic entities on both sides of the implication
+        relation are the same, the "Hideaway Lodge" Entity corresponds to an equal object.
+        """
+        explanations = make_rule["h2_exact_in_despite"].explain_implication(make_rule["h2"])
+        hideaway = Entity("Hideaway Lodge")
+        assert any(explanation[hideaway] == hideaway for explanation in explanations)
 
     def test_holdings_more_specific_quantity_implies_less_specific(self, make_rule):
         assert make_rule["h2_exact_quantity"] > make_rule["h2"]
@@ -348,12 +358,17 @@ class TestContradiction:
         does not contradict
         "the distance between {circus} and a parking area used by personnel
         and patrons of {Hideaway Lodge} was > 5 feet"
+
+        Given that the context parameter indicates the "circus" is not the
+        same place as "the stockpile of trees", there's no contradiction.
         """
+        stockpile_means_stockpile = ContextRegister(
+            {Entity("the stockpile of trees"): Entity("the stockpile of trees")})
         assert not make_rule["h_output_distance_less"].contradicts(
-            make_rule["h_output_distance_more"]
+            make_rule["h_output_distance_more"], context=stockpile_means_stockpile
         )
         assert not make_rule["h_output_distance_more"].contradicts(
-            make_rule["h_output_distance_less"]
+            make_rule["h_output_distance_less"], context=stockpile_means_stockpile
         )
 
     def test_contradicts_if_valid_all_vs_all(self, make_rule):

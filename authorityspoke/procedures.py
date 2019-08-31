@@ -249,7 +249,9 @@ class Procedure(Factor):
             "'Procedure.contradicts_some_to_all' or 'Rule.contradicts'.",
         )
 
-    def contradicts_some_to_all(self, other: Procedure) -> bool:
+    def contradicts_some_to_all(
+        self, other: Procedure, context: Optional[ContextRegister] = None
+    ) -> Iterator[ContextRegister]:
         r"""
         Find if ``self`` applying in some cases implies ``other`` cannot apply in all.
 
@@ -260,18 +262,20 @@ class Procedure(Factor):
         """
         if not isinstance(other, self.__class__):
             return False
+        if context is None:
+            context = ContextRegister()
 
         self_despite_or_input = (*self.despite, *self.inputs)
 
         # For self to contradict other, every input of other
         # must be implied by some input or despite factor of self.
         relations = (Analogy(other.inputs, self_despite_or_input, operator.le),)
-        matchlist = all_analogy_matches(relations, inverse=True)
+        matchlist = all_analogy_matches(relations, inverse=True, context=context)
 
         # For self to contradict other, some output of other
         # must be contradicted by some output of self.
 
-        return any(
+        yield from (
             contradictory_factor_groups(self.outputs, other.outputs, m)
             for m in matchlist
         )

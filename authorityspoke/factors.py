@@ -251,7 +251,7 @@ class Factor(ABC):
                 yield ContextRegister({self: other})
         else:
             relation = Analogy(self.context_factors, other.context_factors, comparison)
-            yield from relation.ordered_comparison(matches=context)
+            yield from relation.ordered_comparison(context=context)
 
     def contradicts(self, other: Optional[Factor], context: Optional[ContextRegister] = None) -> bool:
         """
@@ -700,12 +700,12 @@ class Analogy:
     comparison: Callable
 
     def ordered_comparison(
-        self, matches: Optional[ContextRegister] = None
+        self, context: Optional[ContextRegister] = None
     ) -> Iterator[ContextRegister]:
         r"""
         Find ways for a series of pairs of :class:`.Factor`\s to satisfy a comparison.
 
-        :param matches:
+        :param context:
             keys representing :class:`.Factor`\s in ``self`` and
             values representing :class:`.Factor`\s in ``other``. The
             keys and values have been found in corresponding positions
@@ -742,10 +742,10 @@ class Analogy:
                                 new_mapping_choices.append(incoming_register)
                                 yield from update_register(incoming_register, i + 1)
 
-        if matches is None:
-            matches = ContextRegister()
+        if context is None:
+            context = ContextRegister()
         ordered_pairs = list(zip_longest(self.need_matches, self.available))
-        yield from update_register(register=matches)
+        yield from update_register(register=context)
 
     def unordered_comparison(
         self,
