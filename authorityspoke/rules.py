@@ -484,7 +484,7 @@ class Rule(Factor):
 
     def __str__(self):
         def factor_catalog(factors: List[Union[Factor, Enactment]], tag: str) -> str:
-            lines = [f"{tag}: {factors[i]}\n" for i in range(len(factors))]
+            lines = [f"{tag}: {factor}\n" for factor in factors]
             return "".join(lines)
 
         newline = "\n"
@@ -504,7 +504,7 @@ class Rule(Factor):
             + f"{'based on the input' + newline}"
             + f"{str(factor_catalog(self.procedure.inputs, 'GIVEN')) if self.procedure.inputs else ''}"
             + f"{str(factor_catalog(self.procedure.despite, 'DESPITE')) if self.procedure.despite else ''}"
-            + f"{'according to the legislation' + newline}"
+            + f"{'according to the legislation' + newline if self.enactments else ''}"
             + f"{str(factor_catalog(self.enactments, 'GIVEN')) if self.enactments else ''}"
             + despite_enactment_text
         )

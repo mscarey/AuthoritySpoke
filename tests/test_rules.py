@@ -26,6 +26,9 @@ class TestRules:
     def test_None_not_in_str(self, make_holding):
         assert "None" not in str(make_holding["h2"])
 
+    def test_str_without_legislation(self, make_holding):
+        assert "legislation" not in str(make_holding["h_output_distance_less"])
+
     def test_new_concrete_context(self, make_holding):
         different = make_holding["h1"].new_context(
             [Entity("Castle Grayskull"), Entity("He-Man")]
