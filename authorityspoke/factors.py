@@ -821,7 +821,7 @@ class Analogy:
 
 
 def all_analogy_matches(
-    relations: Tuple[Analogy, ...], inverse: bool = False
+    relations: Tuple[Analogy, ...], inverse: bool = False, context: Optional[ContextRegister] = None
 ) -> List[ContextRegister]:
     r"""
     Find all context registers consistent with multiple :class:`.Analogy` comparisons.
@@ -837,7 +837,9 @@ def all_analogy_matches(
         a list of all context registers consistent with all of the
         :class:`.Analogy`\s.
     """
-    matchlist: List[ContextRegister] = [ContextRegister()]
+    if context is None:
+        context = ContextRegister()
+    matchlist: List[ContextRegister] = [context]
     for relation in relations:
         matchlist = relation.update_matchlist(matchlist, inverse)
     return matchlist

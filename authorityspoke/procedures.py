@@ -355,7 +355,9 @@ class Procedure(Factor):
             for matches in matchlist
         )
 
-    def _implies_if_present(self, other: Factor) -> Iterator[ContextRegister]:
+    def _implies_if_present(
+        self, other: Factor, context: Optional[ContextRegister] = None
+    ) -> Iterator[ContextRegister]:
         r"""
         Find if ``self`` would imply ``other`` if they aren't absent.
 
@@ -385,7 +387,7 @@ class Procedure(Factor):
                 Analogy(other.despite, despite_or_input, operator.le),
             )
 
-            yield from iter(all_analogy_matches(relations))
+            yield from iter(all_analogy_matches(relations, context))
 
     def means(self, other) -> bool:
         r"""
