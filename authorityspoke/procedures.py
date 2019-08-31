@@ -551,6 +551,6 @@ def contradictory_factor_groups(
         context = ContextRegister()
     for other_factor in other_factors:
         for self_factor in self_factors:
-            if other_factor.contradicts(self_factor, context):
+            if self_factor.contradicts(other_factor, context):
                 return True
     return False

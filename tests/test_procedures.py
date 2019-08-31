@@ -278,7 +278,7 @@ craig = Entity("Craig")
 dan = Entity("Dan")
 alice_rich = Fact(p_large_weight, context_factors=alice)
 bob_poor = Fact(p_small_weight, context_factors=bob)
-craig_rich = Fact(p_small_weight, context_factors=craig)
+craig_rich = Fact(p_large_weight, context_factors=craig)
 dan_poor = Fact(p_small_weight, context_factors=dan)
 
 
