@@ -292,9 +292,10 @@ class Factor(ABC):
                     yield from self._implies_if_present(other, context)
             elif self.__dict__.get("absent"):
                 if not other.__dict__.get("absent"):
-                    yield from other._implies_if_present(self, context.reversed)
+                    test = other._implies_if_present(self, context.reversed)
                 else:
-                    yield from other._contradicts_if_present(self, context.reversed)
+                    test = other._contradicts_if_present(self, context.reversed)
+                yield from (register.reversed for register in test)
 
     def evolve(self, changes: Union[str, Tuple[str, ...], Dict[str, Any]]) -> Factor:
         """
@@ -380,13 +381,15 @@ class Factor(ABC):
                 return factor
         return None
 
-    def explain_implication(self, other: Factor, ) -> Iterator[ContextRegister]:
+    def explain_implication(self, other: Factor, context: Optional[ContextRegister] = None) -> Iterator[ContextRegister]:
         r"""
         Generate :class:`.ContextRegister`\s that cause `self` to imply `other`.
 
         If self is `absent`, then generate a ContextRegister from other's point
         of view and then swap the keys and values.
         """
+        if context is None:
+            context = ContextRegister()
         if not isinstance(other, Factor):
             raise TypeError(
                 f"{self.__class__} objects may only be compared for "
@@ -395,17 +398,16 @@ class Factor(ABC):
         if isinstance(other, self.__class__):
             if not self.__dict__.get("absent"):
                 if not other.__dict__.get("absent"):
-                    yield from self._implies_if_present(other)
+                    yield from self._implies_if_present(other, context)
                 else:
-                    yield from self._contradicts_if_present(other)
+                    yield from self._contradicts_if_present(other, context)
 
             else:
                 if other.__dict__.get("absent"):
-                    generator = other._implies_if_present(self)
+                    test = other._implies_if_present(self, context.reversed)
                 else:
-                    generator = other._contradicts_if_present(self)
-                for register in generator:
-                    yield
+                    test = other._contradicts_if_present(self, context.reversed)
+                yield from (register.reversed for register in test)
 
     def implies(self, other: Optional[Factor]) -> bool:
         """Test whether ``self`` implies ``other``."""

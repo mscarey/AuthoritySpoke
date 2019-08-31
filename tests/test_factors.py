@@ -556,7 +556,7 @@ class TestContradiction:
         bob = Entity("Bob")
         alice_rich = Fact(p_large_weight, context_factors=alice)
         bob_poor = Fact(p_small_weight, context_factors=bob)
-        assert alice_rich.contradicts(bob_poor, context=ContextRegister({alice: alice}))
+        assert not alice_rich.contradicts(bob_poor, context=ContextRegister({alice: alice}))
 
     def test_copy_with_foreign_context(self, watt_mentioned, watt_factor):
         w = watt_mentioned
