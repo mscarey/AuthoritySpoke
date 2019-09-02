@@ -249,7 +249,7 @@ class TestProcedureContradiction:
         with pytest.raises(NotImplementedError):
             assert p["c2_higher_quantity"].contradicts(p["c2_exact_in_despite"])
 
-    def test_no_contradiction_of_other_factor(self, make_procedure, watt_factor):
+    def test_no_contradiction_of_other_type(self, make_procedure, watt_factor):
         assert not make_procedure["c1"].contradicts_some_to_all(watt_factor["f1"])
 
 

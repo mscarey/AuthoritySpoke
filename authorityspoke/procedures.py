@@ -151,12 +151,13 @@ class Procedure(Factor):
         return len(self.generic_factors)
 
     def __repr__(self):
-        return (
+        text = (
             f"{self.__class__.__name__}(outputs=("
             + f"{', '.join(repr(factor) for factor in self.outputs)}), "
             + f"inputs=({', '.join(repr(factor) for factor in self.inputs)}), "
             + f"despite=({', '.join(repr(factor) for factor in self.despite)}))"
         )
+        return text
 
     def __str__(self):
         text = "Procedure:"
@@ -251,7 +252,7 @@ class Procedure(Factor):
 
     def contradicts_some_to_all(
         self, other: Procedure, context: Optional[ContextRegister] = None
-    ) -> Iterator[ContextRegister]:
+    ) -> bool:
         r"""
         Find if ``self`` applying in some cases implies ``other`` cannot apply in all.
 
@@ -260,11 +261,19 @@ class Procedure(Factor):
             **some** cases contradicts that ``other`` applies in **all**
             cases, where at least one of the :class:`.Rule`\s is ``mandatory``.
         """
+
         if not isinstance(other, self.__class__):
             return False
+        return any(self.explain_contradicts_some_to_all(self, other, context))
+
+    def explain_contradicts_some_to_all(
+        self, other: Procedure, context: Optional[ContextRegister] = None
+    ) -> Iterator[ContextRegister]:
+        """
+        Generate any explanations of why ``self`` applying in some cases implies ``other`` cannot apply in all.
+        """
         if context is None:
             context = ContextRegister()
-
         self_despite_or_input = (*self.despite, *self.inputs)
 
         # For self to contradict other, every input of other
