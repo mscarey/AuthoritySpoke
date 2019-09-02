@@ -167,13 +167,15 @@ class Fact(Factor):
         """Access :attr:`~Predicate.truth` attribute."""
         return self.predicate.truth
 
-    def _means_if_concrete(self, other: Factor) -> Iterator[ContextRegister]:
+    def _means_if_concrete(
+        self, other: Factor, context: Optional[ContextRegister] = None
+    ) -> Iterator[ContextRegister]:
         if (
             isinstance(other, self.__class__)
             and self.predicate.means(other.predicate)
             and self.standard_of_proof == other.standard_of_proof
         ):
-            yield from super()._means_if_concrete(other)
+            yield from super()._means_if_concrete(other, context)
 
     def predicate_in_context(self, entities: Sequence[Factor]) -> str:
         r"""

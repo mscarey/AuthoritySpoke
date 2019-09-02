@@ -264,9 +264,9 @@ class Procedure(Factor):
 
         if not isinstance(other, self.__class__):
             return False
-        return any(self.explain_contradicts_some_to_all(self, other, context))
+        return any(self.explain_contradiction_some_to_all(other, context))
 
-    def explain_contradicts_some_to_all(
+    def explain_contradiction_some_to_all(
         self, other: Procedure, context: Optional[ContextRegister] = None
     ) -> Iterator[ContextRegister]:
         """
@@ -288,7 +288,30 @@ class Procedure(Factor):
             if contradictory_factor_groups(self.outputs, other.outputs, m):
                 yield m
 
-    def implies_all_to_all(self, other: Procedure) -> bool:
+    def explain_implication_all_to_all(
+        self, other: Procedure, context: Optional[ContextRegister] = None
+    ) -> Iterator[ContextRegister]:
+
+        if isinstance(other, self.__class__):
+
+            yield from self.explain_same_meaning(other, context)
+
+            relations = (
+                Analogy(other.outputs, self.outputs, operator.le),
+                Analogy(self.inputs, other.inputs, operator.le),
+            )
+            matchlist = all_analogy_matches(relations)
+
+            # For every factor in other, find the permutations of entity slots
+            # that are consistent with matchlist and that don't cause the factor
+            # to contradict any factor of self.
+
+            for matches in matchlist:
+                yield from consistent_factor_groups(self.inputs, other.despite, matches)
+
+    def implies_all_to_all(
+        self, other: Procedure, context: Optional[ContextRegister] = None
+    ) -> bool:
         """
         Find if ``self`` applying in all cases implies ``other`` applies in all.
 
@@ -305,28 +328,34 @@ class Procedure(Factor):
             whether the assertion that ``self`` applies in **all** cases
             implies that ``other`` applies in **all** cases.
         """
-        if not isinstance(other, self.__class__):
-            return False
+        return any(self.explain_implication_all_to_all(other, context))
 
-        if self.means(other):
-            return True
+    def explain_implication_all_to_some(
+        self, other: Procedure, context: Optional[ContextRegister] = None
+    ) -> Iterator[ContextRegister]:
 
-        relations = (
-            Analogy(other.outputs, self.outputs, operator.le),
-            Analogy(self.inputs, other.inputs, operator.le),
-        )
-        matchlist = all_analogy_matches(relations)
+        if isinstance(other, self.__class__):
 
-        # For every factor in other, find the permutations of entity slots
-        # that are consistent with matchlist and that don't cause the factor
-        # to contradict any factor of self.
+            yield from self.explain_implication_all_to_all(other)
 
-        return any(
-            consistent_factor_groups(self.inputs, other.despite, matches)
-            for matches in matchlist
-        )
+            other_despite_or_input = (*other.despite, *other.inputs)
+            self_despite_or_input = (*self.despite, *self.inputs)
 
-    def implies_all_to_some(self, other: Procedure) -> bool:
+            relations = (
+                Analogy(other.outputs, self.outputs, operator.le),
+                Analogy(other.despite, self_despite_or_input, operator.le),
+            )
+
+            matchlist = all_analogy_matches(relations)
+
+            for context in matchlist:
+                yield from consistent_factor_groups(
+                    self.inputs, other_despite_or_input, context
+                )
+
+    def implies_all_to_some(
+        self, other: Procedure, context: Optional[ContextRegister] = None
+    ) -> bool:
         r"""
         Find if ``self`` applying in all cases implies ``other`` applies in some.
 
@@ -345,27 +374,7 @@ class Procedure(Factor):
             the list of ``self``'s inputs is not considered an exhaustive list
             of the circumstances needed to invoke the procedure).
         """
-
-        if not isinstance(other, self.__class__):
-            return False
-
-        if self.implies_all_to_all(other):
-            return True
-
-        other_despite_or_input = (*other.despite, *other.inputs)
-        self_despite_or_input = (*self.despite, *self.inputs)
-
-        relations = (
-            Analogy(other.outputs, self.outputs, operator.le),
-            Analogy(other.despite, self_despite_or_input, operator.le),
-        )
-
-        matchlist = all_analogy_matches(relations)
-
-        return any(
-            consistent_factor_groups(self.inputs, other_despite_or_input, matches)
-            for matches in matchlist
-        )
+        return any(self.explain_implication_all_to_some(other, context))
 
     def _implies_if_present(
         self, other: Factor, context: Optional[ContextRegister] = None
@@ -488,8 +497,8 @@ class Procedure(Factor):
 
 
 def consistent_factor_groups(
-    self_factors: Tuple[Factor],
-    other_factors: Tuple[Factor],
+    self_factors: Tuple[Factor, ...],
+    other_factors: Tuple[Factor, ...],
     matches: Optional[ContextRegister] = None,
 ):
     r"""

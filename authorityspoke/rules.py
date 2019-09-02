@@ -296,10 +296,12 @@ class Rule(Factor):
         if context is None:
             context = ContextRegister()
 
-        self_to_other = self.procedure.contradicts_some_to_all(other.procedure, context)
+        self_to_other = self.procedure.explain_contradiction_some_to_all(
+            other.procedure, context
+        )
         other_to_self = (
             register.reversed
-            for register in other.procedure.contradicts_some_to_all(
+            for register in other.procedure.explain_contradiction_some_to_all(
                 self.procedure, context.reversed
             )
         )
@@ -338,7 +340,29 @@ class Rule(Factor):
             return False
         return True
 
-    def implies(self, other) -> bool:
+    def explain_implication(
+        self, other, context: Optional[ContextRegister] = None
+    ) -> Iterator[ContextRegister]:
+        if (
+            self.needs_subset_of_enactments(other)
+            and self.mandatory >= other.mandatory
+            and self.universal >= other.universal
+        ):
+
+            if self.universal > other.universal:
+                yield from self.procedure.explain_implication_all_to_some(
+                    other.procedure, context
+                )
+
+            elif other.universal:
+                yield from self.procedure.explain_implication_all_to_all(
+                    other.procedure, context
+                )
+
+            else:
+                yield from self.procedure.explain_implication(other.procedure, context)
+
+    def implies(self, other, context: Optional[ContextRegister] = None) -> bool:
         r"""
         Test if ``self`` implies ``other`` if posited in valid and decided :class:`.Holding`\s.
 
@@ -358,22 +382,7 @@ class Rule(Factor):
             ``rule_valid`` and ``decided`` are ``True`` for both of them.
         """
 
-        if not self.needs_subset_of_enactments(other):
-            return False
-
-        if other.mandatory > self.mandatory:
-            return False
-
-        if other.universal > self.universal:
-            return False
-
-        if self.universal > other.universal:
-            return self.procedure.implies_all_to_some(other.procedure)
-
-        if other.universal:
-            return self.procedure.implies_all_to_all(other.procedure)
-
-        return self.procedure >= other.procedure
+        return any(self.explain_implication(other, context))
 
     def __ge__(self, other: Factor) -> bool:
         return self.implies(other)
