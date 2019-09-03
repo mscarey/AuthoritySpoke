@@ -427,11 +427,14 @@ class Factor(ABC):
                     test = other._contradicts_if_present(self, context.reversed)
                 yield from (register.reversed for register in test)
 
-    def implies(self, other: Optional[Factor]) -> bool:
+    def implies(self, other: Optional[Factor], context: Optional[ContextRegister] = None) -> bool:
         """Test whether ``self`` implies ``other``."""
         if other is None:
             return True
-        return any(register is not None for register in self.explain_implication(other))
+        return any(
+            register is not None
+            for register in self.explain_implication(other, context=context)
+            )
 
     def __gt__(self, other: Optional[Factor]) -> bool:
         """Test whether ``self`` implies ``other`` and ``self`` != ``other``."""

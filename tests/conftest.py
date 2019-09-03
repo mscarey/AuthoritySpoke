@@ -709,8 +709,8 @@ def make_procedure(make_evidence, make_factor, watt_factor) -> Dict[str, Procedu
         ),
         "c1_again": Procedure(outputs=(f["f3"],), inputs=(f["f1"], f["f2"])),
         "c1_entity_order": Procedure(
-            outputs=(f["f3_different_entity"],),
-            inputs=(f["f2_different_entity"], f["f1_different_entity"]),
+            outputs=(f["f3_entity_order"],),
+            inputs=(f["f2_entity_order"], f["f1_entity_order"]),
         ),
         "c1_easy": Procedure(outputs=(f["f3"],), inputs=(f["f2"])),
         "c2_absent_despite": Procedure(

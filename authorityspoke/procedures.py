@@ -47,7 +47,7 @@ def find_less_specific_context(
         for right_factor in right.factors_all:
             if left_factor.means(right_factor, context=context):
                 incoming = ContextRegister(
-                    dict(zip(left_factor.generic_factors, right_factor.generic_factors))
+                    dict(zip(right_factor.generic_factors, left_factor.generic_factors))
                 )
                 updated_context = new_context.merged_with(incoming)
                 if updated_context is not None:
@@ -88,7 +88,7 @@ def find_more_specific_context(
                 right_factor, context=context
             ) or right_factor.implies(left_factor, context=context):
                 incoming = ContextRegister(
-                    dict(zip(left_factor.generic_factors, right_factor.generic_factors))
+                    dict(zip(right_factor.generic_factors, left_factor.generic_factors))
                 )
                 updated_context = new_context.merged_with(incoming)
                 if updated_context is not None:
@@ -129,16 +129,9 @@ def use_likely_context(func: Callable):
     def wrapper(
         left: Procedure, right: Procedure, context: Optional[ContextRegister] = None
     ) -> Iterator[ContextRegister]:
-        less_specific_context = find_less_specific_context(left, right, context)
-        most_specific_context = find_most_specific_context(
-            left, right, less_specific_context
-        )
-        if any(func(left, right, most_specific_context)):
-            yield from func(left, right, most_specific_context)
-        elif any(func(left, right, less_specific_context)):
-            yield from func(left, right, less_specific_context)
-        else:
-            yield from func(left, right, context)
+        less_specific = find_less_specific_context(left, right, context)
+        more_specific = find_more_specific_context(left, right, less_specific)
+        return func(left, right, more_specific or less_specific or context)
 
     return wrapper
 
@@ -227,8 +220,10 @@ class Procedure(Factor):
             return self.evolve({"outputs": (*self.outputs, *triggered_rule.outputs)})
         return None
 
-
-    def __or__(self, other: Procedure) -> Optional[Procedure]:
+    @use_likely_context
+    def union(
+        self, other: Procedure, context: Optional[ContextRegister] = None
+    ) -> Optional[Procedure]:
         r"""
         Combine two :class:`Procedure`\s into one.
 
@@ -257,6 +252,7 @@ class Procedure(Factor):
                 factor for factor in other_list if factor not in new_factors
             ]
 
+        other = other.new_context(context)
         new_inputs = combine_factor_list(self.inputs, other.inputs)
         new_outputs = combine_factor_list(self.outputs, other.outputs)
         new_despite = combine_factor_list(
@@ -265,6 +261,9 @@ class Procedure(Factor):
         if any(group is None for group in (new_outputs, new_inputs, new_despite)):
             return None
         return Procedure(outputs=new_outputs, inputs=new_inputs, despite=new_despite)
+
+    def __or__(self, other):
+        return self.union(other)
 
     def __len__(self):
         r"""

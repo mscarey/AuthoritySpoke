@@ -740,14 +740,15 @@ class TestUnion:
 
     def test_union_implied_change_entities(self, make_rule):
         """
-        TODO: marked xfail because there's not yet a function
-        to assign the correct Entities to the context factors
-        in a new Function created with the __or__ method.
+        The correct Entities need to be assigned to the context factors
+        in a new Procedure created with the __or__ method.
         """
         original_on_left = make_rule["h1_easy"] | make_rule["h1_entity_order"]
-        assert "RESULT: fact that <Hideaway Lodge> was <Wattenburg>’s abode" in str(original_on_left)
+        assert "fact that <Hideaway Lodge> was <Wattenburg>’s abode" in str(original_on_left)
+
+    def test_union_implied_change_entities_reverse(self, make_rule):
         original_on_right = make_rule["h1_entity_order"] | make_rule["h1_easy"]
-        assert "RESULT: fact that <Wattenburg> was <Hideaway Lodge>’s abode" in str(original_on_right)
+        assert "fact that <Wattenburg> was <Hideaway Lodge>’s abode" in str(original_on_right)
 
     def test_union_returns_universal(self, make_rule):
         """
