@@ -131,7 +131,16 @@ def use_likely_context(func: Callable):
     ) -> Iterator[ContextRegister]:
         less_specific = find_less_specific_context(left, right, context)
         more_specific = find_more_specific_context(left, right, less_specific)
-        return func(left, right, more_specific or less_specific or context)
+        context_to_use = more_specific or less_specific or context or ContextRegister()
+        for unused_left, unused_right in zip(
+            [
+                item for item in left.generic_factors
+                if item not in context_to_use.keys()],
+            [
+                item for item in right.generic_factors
+                if item not in context_to_use.values()]):
+            context_to_use[unused_right] = unused_left
+        return func(left, right, context_to_use)
 
     return wrapper
 
