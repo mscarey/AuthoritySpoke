@@ -738,7 +738,7 @@ class TestUnion:
         b = make_rule["h2"]
         assert (a | b).means(a)
 
-    def test_union_implied_change_entities(self, make_rule):
+    def test_union_implied_change_context(self, make_rule):
         """
         The correct Entities need to be assigned to the context factors
         in a new Procedure created with the __or__ method.
@@ -746,9 +746,25 @@ class TestUnion:
         original_on_left = make_rule["h1_easy"] | make_rule["h1_entity_order"]
         assert "fact that <Hideaway Lodge> was <Wattenburg>’s abode" in str(original_on_left)
 
-    def test_union_implied_change_entities_reverse(self, make_rule):
+    def test_union_implied_change_context_reverse(self, make_rule):
         original_on_right = make_rule["h1_entity_order"] | make_rule["h1_easy"]
         assert "fact that <Wattenburg> was <Hideaway Lodge>’s abode" in str(original_on_right)
+
+    def test_union_change_context(self, make_opinion_with_holding):
+        """
+        When the union operation is applied to the Rules, a fact that
+        related to <the Java API> in the original is mentioned relating
+        to <the Lotus menu command hierarchy> instead.
+        """
+
+        lotus = make_opinion_with_holding["lotus_majority"]
+        oracle = make_opinion_with_holding["oracle_majority"]
+        # changing one of the Rules to universal because otherwise
+        # nothing can be inferred by their union.
+        lotus_4 = lotus.holdings[4].rule.evolve("universal")
+        new = lotus_4 | oracle.holdings[2].rule
+        assert "<the Lotus menu command hierarchy> was the expression of an idea" in str(new)
+        assert new.mandatory is False
 
     def test_union_returns_universal(self, make_rule):
         """
@@ -760,10 +776,6 @@ class TestUnion:
         new_rule = make_rule["h2_ALL_due_process"] | make_rule["h2"]
         assert len(new_rule.enactments) == 2
         assert new_rule.universal
-
-    def test_union_neither_universal(self, make_opinion_with_holding):
-        feist = make_opinion_with_holding["feist_majority"]
-        assert(feist.holdings[9] | feist.holdings[7]) is None
 
     def test_union_inconsistent_outputs(self, make_opinion_with_holding):
         """

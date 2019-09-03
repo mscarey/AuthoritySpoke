@@ -190,6 +190,12 @@ class TestContradiction:
             make_holding["h2_undecided"].contradicts(make_procedure["c2"])
 
 
+class TestUnion:
+    def test_union_neither_universal(self, make_opinion_with_holding):
+        feist = make_opinion_with_holding["feist_majority"]
+        assert (feist.holdings[9] | feist.holdings[7]) is None
+
+
 class TestHoldingImports:
     def test_make_selector_for_opinion_text(self, make_analysis):
         holdings, mentioned = readers.read_holdings(
