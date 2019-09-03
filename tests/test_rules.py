@@ -766,6 +766,23 @@ class TestUnion:
         assert "<the Lotus menu command hierarchy> was the expression of an idea" in str(new)
         assert new.mandatory is False
 
+    def test_union_one_generic_not_matched(self, make_opinion_with_holding):
+        """
+        Here, both Rules have the input "fact that <> was a computer program".
+        But they each have another generic that can't be matched:
+        fact that <the Java API> was a literal element of <the Java language>
+        and
+        fact that <the Lotus menu command hierarchy> provided the means by
+        which users controlled and operated <Lotus 1-2-3>
+        """
+        lotus = make_opinion_with_holding["lotus_majority"]
+        oracle = make_opinion_with_holding["oracle_majority"]
+        new = lotus.holdings[9].rule | oracle.holdings[3].rule
+        text = (
+            "fact that <the Lotus menu command hierarchy> was a "
+            "literal element of <Lotus 1-2-3>")
+        assert text in str(new)
+
     def test_union_returns_universal(self, make_rule):
         """
         an ALL rule should be
