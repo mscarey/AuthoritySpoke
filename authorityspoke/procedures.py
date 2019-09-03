@@ -7,14 +7,140 @@ or specify the :class:`.Enactment`\s that might require them.
 
 from __future__ import annotations
 
+import functools
 import operator
 
-from typing import ClassVar, Iterator, List, Optional, Tuple
+from typing import Callable, ClassVar, Iterator, List, Optional, Tuple
 
 from dataclasses import dataclass
 
 from authorityspoke.factors import Factor, ContextRegister, new_context_helper
 from authorityspoke.factors import Analogy, all_analogy_matches, means
+
+
+def find_less_specific_context(
+    left: Procedure, right: Procedure, context: Optional[ContextRegister] = None
+) -> Optional[ContextRegister]:
+    r"""
+    Find context assuming :class:`.Factor`\s with same meaning have corresponding generics.
+
+    :param left:
+        a :class:`.Procedure` that is being compared to another
+        :class:`.Procedure`\, to create a new :class:`.Procedure`
+        using the context of the left :class:`.Procedure`\.
+
+    :param right:
+        a :class:`.Procedure` that is being compared to another :class:`.Procedure`\,
+        but that will have its context overwritten in the newly-created object.
+
+    :param context:
+        a :class:`.ContextRegister` identifying any known pairs of corresponding
+        context :class:`.Factor`\s between the two :class:`.Procedure`\s being
+        compared.
+
+    :returns:
+        a :class:`.ContextRegister`\s assuming that :class:`.Factor`\s with the
+        same meaning have corresponding generics.
+    """
+    new_context = context or ContextRegister()
+    for left_factor in left.factors_all:
+        for right_factor in right.factors_all:
+            if left_factor.means(right_factor, context=context):
+                incoming = ContextRegister(
+                    dict(zip(left_factor.generic_factors, right_factor.generic_factors))
+                )
+                updated_context = new_context.merged_with(incoming)
+                if updated_context is not None:
+                    new_context = updated_context
+    if new_context and new_context != context:
+        return new_context
+    return None
+
+
+def find_more_specific_context(
+    left: Procedure, right: Procedure, context: Optional[ContextRegister] = None
+) -> Optional[ContextRegister]:
+    r"""
+    Find context assuming :class:`.Factor`\s that imply each other have corresponding generics.
+
+    :param left:
+        a :class:`.Procedure` that is being compared to another
+        :class:`.Procedure`\, to create a new :class:`.Procedure`
+        using the context of the left :class:`.Procedure`\.
+
+    :param right:
+        a :class:`.Procedure` that is being compared to another :class:`.Procedure`\,
+        but that will have its context overwritten in the newly-created object.
+
+    :param context:
+        a :class:`.ContextRegister` identifying any known pairs of corresponding
+        context :class:`.Factor`\s between the two :class:`.Procedure`\s being
+        compared.
+
+    :returns:
+        a :class:`.ContextRegister`\s assuming that :class:`.Factor`\s with the
+        same meaning have corresponding generics.
+    """
+    new_context = context or ContextRegister()
+    for left_factor in left.factors_all:
+        for right_factor in right.factors_all:
+            if left_factor.implies(
+                right_factor, context=context
+            ) or right_factor.implies(left_factor, context=context):
+                incoming = ContextRegister(
+                    dict(zip(left_factor.generic_factors, right_factor.generic_factors))
+                )
+                updated_context = new_context.merged_with(incoming)
+                if updated_context is not None:
+                    new_context = updated_context
+    if new_context and new_context != context:
+        return new_context
+    return None
+
+
+def use_likely_context(func: Callable):
+    r"""
+    Find contexts most likely to have been intended for comparing :class:`Procedure`\s.
+
+    When such contexts are found, first tries calling the decorated comparison method
+    using those contexts. Only if no answer is found using the likely contexts
+    will the decorated method be called with no comparison method specified.
+
+    :param left:
+        a :class:`.Procedure` that is being compared to another
+        :class:`.Procedure`\, to create a new :class:`.Procedure`
+        using the context of the left :class:`.Procedure`\.
+
+    :param right:
+        a :class:`.Procedure` that is being compared to another :class:`.Procedure`\,
+        but that will have its context overwritten in the newly-created object.
+
+    :param context:
+        a :class:`.ContextRegister` identifying any known pairs of corresponding
+        context :class:`.Factor`\s between the two :class:`.Procedure`\s being
+        compared.
+
+    :returns:
+        a generator yielding :class:`.ContextRegister`\s based on the most "likely"
+        context that yields any :class:`.ContextRegister`\s at all.
+    """
+
+    @functools.wraps(func)
+    def wrapper(
+        left: Procedure, right: Procedure, context: Optional[ContextRegister] = None
+    ) -> Iterator[ContextRegister]:
+        less_specific_context = find_less_specific_context(left, right, context)
+        most_specific_context = find_most_specific_context(
+            left, right, less_specific_context
+        )
+        if any(func(left, right, most_specific_context)):
+            yield from func(left, right, most_specific_context)
+        elif any(func(left, right, less_specific_context)):
+            yield from func(left, right, less_specific_context)
+        else:
+            yield from func(left, right, context)
+
+    return wrapper
 
 
 @dataclass(frozen=True)
@@ -100,6 +226,7 @@ class Procedure(Factor):
             triggered_rule = other.new_context(matchlist[0])
             return self.evolve({"outputs": (*self.outputs, *triggered_rule.outputs)})
         return None
+
 
     def __or__(self, other: Procedure) -> Optional[Procedure]:
         r"""

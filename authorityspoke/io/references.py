@@ -39,7 +39,7 @@ def log_mentioned_context(func: Callable):
     """
     Retrieve cached :class:`.Factor` instead of building one with the decorated method.
 
-    Decorator for :meth:`.Factor.from_dict()` and :meth:`.Enactment.from_dict()`.
+    Decorator for :func:`.read_factor` and :func:`.read_enactment`.
 
     If factor_record is a :class:`str` instead of a :class:`dict`, looks up the
     corresponding factor in "mentioned" and returns that instead of
