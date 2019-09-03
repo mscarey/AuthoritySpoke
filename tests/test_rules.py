@@ -160,9 +160,14 @@ class TestImplication:
         assert any(explanation[hideaway] == hideaway for explanation in explanations)
 
     def test_explain_all_to_all_implies_reciprocal(self, make_rule):
+        """
+        There's only one explanation for how the factors can match between these two Rules.
+        The explanation simply matches each context factor to the same factor.
+        """
         fewer_inputs = make_rule["h3_fewer_inputs_ALL"]
-        explanations = list(fewer_inputs.explain_implication(make_rule["h3_ALL"]))
-        assert {Entity("Hideaway Lodge"): Entity("Hideaway Lodge")} in explanations
+        explanations = fewer_inputs.explain_implication(make_rule["h3_ALL"])
+        explanation = next(explanations)
+        assert explanation[Entity("Hideaway Lodge")] == Entity("Hideaway Lodge")
 
     def test_holdings_more_specific_quantity_implies_less_specific(self, make_rule):
         assert make_rule["h2_exact_quantity"] > make_rule["h2"]

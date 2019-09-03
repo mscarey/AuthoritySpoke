@@ -307,7 +307,8 @@ class Procedure(Factor):
             # to contradict any factor of self.
 
             for matches in matchlist:
-                yield from consistent_factor_groups(self.inputs, other.despite, matches)
+                if consistent_factor_groups(self.inputs, other.despite, matches):
+                    yield matches
 
     def implies_all_to_all(
         self, other: Procedure, context: Optional[ContextRegister] = None
@@ -349,9 +350,10 @@ class Procedure(Factor):
             matchlist = all_analogy_matches(relations)
 
             for context in matchlist:
-                yield from consistent_factor_groups(
+                if consistent_factor_groups(
                     self.inputs, other_despite_or_input, context
-                )
+                ):
+                    yield context
 
     def implies_all_to_some(
         self, other: Procedure, context: Optional[ContextRegister] = None
@@ -408,9 +410,40 @@ class Procedure(Factor):
                 Analogy(other.despite, despite_or_input, operator.le),
             )
 
-            yield from iter(all_analogy_matches(relations, context))
+            yield from iter(all_analogy_matches(relations, context=context))
 
-    def means(self, other) -> bool:
+    def explain_same_meaning(
+        self, other, context: Optional[ContextRegister] = None
+    ) -> Iterator[ContextRegister]:
+        if isinstance(other, self.__class__):
+            # Verifying that every factor in self is in other.
+            # Also verifying that every factor in other is in self.
+
+            groups = ("outputs", "inputs", "despite")
+            matchlist = [ContextRegister()]
+            for group in groups:
+                updater = Analogy(
+                    need_matches=self.__dict__[group],
+                    available=other.__dict__[group],
+                    comparison=means,
+                )
+                matchlist = updater.update_matchlist(matchlist)
+            if not bool(matchlist):
+                return False
+
+            # Now doing the same thing in reverse
+            matchlist = [ContextRegister()]
+            for group in groups:
+                updater = Analogy(
+                    need_matches=other.__dict__[group],
+                    available=self.__dict__[group],
+                    comparison=means,
+                )
+                matchlist = updater.update_matchlist(matchlist)
+            for context in matchlist:
+                yield context
+
+    def means(self, other, context: Optional[ContextRegister] = None) -> bool:
         r"""
         Determine whether ``other`` has the same meaning as ``self``.
 
@@ -419,34 +452,7 @@ class Procedure(Factor):
             :class:`.Factor`\s with the same context factors in the
             same roles.
         """
-
-        if not isinstance(other, self.__class__):
-            return False
-
-            # Verifying that every factor in self is in other.
-            # Also verifying that every factor in other is in self.
-        groups = ("outputs", "inputs", "despite")
-        matchlist = [ContextRegister()]
-        for group in groups:
-            updater = Analogy(
-                need_matches=self.__dict__[group],
-                available=other.__dict__[group],
-                comparison=means,
-            )
-            matchlist = updater.update_matchlist(matchlist)
-        if not bool(matchlist):
-            return False
-
-        # Now doing the same thing in reverse
-        matchlist = [ContextRegister()]
-        for group in groups:
-            updater = Analogy(
-                need_matches=other.__dict__[group],
-                available=self.__dict__[group],
-                comparison=means,
-            )
-            matchlist = updater.update_matchlist(matchlist)
-        return bool(matchlist)
+        return any(self.explain_same_meaning(other, context))
 
     @new_context_helper
     def new_context(self, changes: ContextRegister) -> Procedure:
