@@ -384,7 +384,7 @@ class Rule(Factor):
 
         return any(self.explain_implication(other, context))
 
-    def __ge__(self, other: Factor) -> bool:
+    def __ge__(self, other: Optional[Factor]) -> bool:
         return self.implies(other)
 
     def __len__(self):
@@ -416,7 +416,21 @@ class Rule(Factor):
                 return False
         return True
 
-    def means(self, other: Rule) -> bool:
+    def explain_same_meaning(
+        self, other: Optional[Factor], context: Optional[ContextRegister] = None
+    ) -> Iterator[ContextRegister]:
+        if (
+            isinstance(other, Rule)
+            and self.has_all_same_enactments(other)
+            and other.has_all_same_enactments(self)
+            and self.mandatory == other.mandatory
+            and self.universal == other.universal
+        ):
+            yield from self.procedure.explain_same_meaning(other.procedure, context)
+
+    def means(
+        self, other: Optional[Factor], context: Optional[ContextRegister] = None
+    ) -> bool:
         """
         Test whether ``other`` has the same meaning as ``self``.
 
@@ -424,18 +438,7 @@ class Rule(Factor):
             whether ``other`` is a :class:`Rule` with the
             same meaning as ``self``.
         """
-        if not self.__class__ == other.__class__:
-            return False
-
-        if not self.procedure.means(other.procedure):
-            return False
-
-        if not self.has_all_same_enactments(other):
-            return False
-        if not other.has_all_same_enactments(self):
-            return False
-
-        return self.mandatory == other.mandatory and self.universal == other.universal
+        return any(self.explain_same_meaning(other, context))
 
     def __or__(self, other: Rule) -> Optional[Rule]:
         r"""
