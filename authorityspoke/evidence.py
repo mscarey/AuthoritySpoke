@@ -71,10 +71,10 @@ class Evidence(Factor):
         text = ""
         if self.exhibit:
             text += f"\n  OF:"
-            factor_text = textwrap.indent(str(self.exhibit), prefix="  ")
-            text += f"\n  {str(factor_text)}"
+            factor_text = textwrap.indent(str(self.exhibit), prefix="    ")
+            text += f"\n{str(factor_text)}"
         if self.to_effect:
             text += f"\n  INDICATING:"
-            factor_text = textwrap.indent(str(self.to_effect), prefix="  ")
-            text += f"\n  {str(factor_text)}"
+            factor_text = textwrap.indent(str(self.to_effect), prefix="    ")
+            text += f"\n{str(factor_text)}"
         return super().__str__().format(text).strip()

@@ -84,9 +84,7 @@ class TestRules:
     def test_string_mentions_absence(self, make_opinion, make_regime):
         cardenas = make_opinion["cardenas_majority"]
         cardenas.posit(load_holdings("holding_cardenas.json", regime=make_regime))
-        assert "absence of the Evidence of testimony by <parole officer>" in str(
-            cardenas.holdings[1]
-        )
+        assert "absence of the Evidence" in str(cardenas.holdings[1])
 
     def test_factor_properties_for_rule(self, make_opinion, make_regime):
         cardenas = make_opinion["cardenas_majority"]
@@ -618,9 +616,8 @@ class TestAddition:
         assert len(facts_not_copyrightable.inputs) == 1
         assert "act that <the Pythagorean theorem> was a fact" in str(facts_not_copyrightable.inputs[0])
         assert len(facts_not_copyrightable.outputs) == 2
-        assert str(facts_not_copyrightable.outputs[1]) == (
-            "act that it is false that <the Pythagorean theorem> was copyrightable"
-        )
+        assert "act it is false that <the Pythagorean theorem> was copyrightable" in str(facts_not_copyrightable.outputs[1])
+
 
     def test_add_inferred_rule(self, make_enactment, make_opinion_with_holding):
         """
