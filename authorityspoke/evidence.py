@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 
+import textwrap
 from typing import ClassVar, Iterator, Optional
 
 from authorityspoke.entities import Entity
@@ -45,14 +46,14 @@ class Exhibit(Factor):
     def __str__(self):
         text = ""
         if self.form:
-            text += f"\n  in the FORM of {self.form}"
+            text += f"in the FORM of {self.form}"
         if self.stated_by:
             text += f"\n  STATED BY {str(self.stated_by)}"
         if self.statement:
             text += f"\n  ASSERTING:"
-            factor_text = textwrap.indent(str(self.statement), prefix="  ")
-            text += f"\n  {str(factor_text)}"
-        return super().__str__().format(string)
+            factor_text = textwrap.indent(str(self.statement), prefix="    ")
+            text += f"\n{str(factor_text)}"
+        return super().__str__().format(text)
 
 
 @dataclass(frozen=True)
@@ -67,8 +68,13 @@ class Evidence(Factor):
     context_factor_names: ClassVar = ("exhibit", "to_effect")
 
     def __str__(self):
-        string = (
-            f'{("of " + str(self.exhibit)) + ", " if self.exhibit else ""}'
-            + f'{("which supports " + str(self.to_effect)) if self.to_effect else ""}'
-        )
-        return super().__str__().format(string).strip()
+        text = ""
+        if self.exhibit:
+            text += f"\n  OF:"
+            factor_text = textwrap.indent(str(self.exhibit), prefix="  ")
+            text += f"\n  {str(factor_text)}"
+        if self.to_effect:
+            text += f"\n  INDICATING:"
+            factor_text = textwrap.indent(str(self.to_effect), prefix="  ")
+            text += f"\n  {str(factor_text)}"
+        return super().__str__().format(text).strip()

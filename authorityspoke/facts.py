@@ -1,9 +1,9 @@
 from dataclasses import dataclass
 import operator
+import textwrap
 
 from typing import ClassVar, Dict, Iterator, List, Optional, Sequence, Union
 
-from authorityspoke.entities import Entity
 from authorityspoke.factors import new_context_helper
 from authorityspoke.factors import Factor, ContextRegister
 from authorityspoke.predicates import Predicate
@@ -128,11 +128,11 @@ class Fact(Factor):
         concrete_context = [
             factor for factor in self.context_factors if not factor.generic
         ]
-        if any(concrete_context):
+        if any(concrete_context) and not self.generic:
             text += f"\n  SPECIFIC CONTEXT:"
             for factor in concrete_context:
-                factor_text = textwrap.indent(str(factor), prefix="  ")
-                text += f"\n  {str(factor_text)}"
+                factor_text = textwrap.indent(str(factor), prefix="    ")
+                text += f"\n{str(factor_text)}"
         return super().__str__().format(text)
 
     @property

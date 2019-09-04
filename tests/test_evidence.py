@@ -40,11 +40,7 @@ class TestEvidence:
         assert len(e.to_effect.context_factors) == 1
 
     def test_evidence_str(self, make_evidence):
-        assert (
-            str(make_evidence["reciprocal"])
-            .lower()
-            .startswith("evidence of testimony by")
-        )
+        assert "in the form of testimony" in str(make_evidence["reciprocal"]).lower()
 
 
 class TestEvidenceSameMeaning:

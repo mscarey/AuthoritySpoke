@@ -19,7 +19,7 @@ class TestPredicates:
     def test_make_comparison_when_absent(self):
         statement = Predicate(content="{}'s favorite number is {}", quantity=42)
         assert statement.comparison == "="
-        assert str(statement) == "{}'s favorite number is exactly equal to 42"
+        assert "{}'s favorite number is exactly equal to 42" in str(statement)
         assert len(statement) == 1
 
     def test_convert_false_statement_about_quantity_to_obverse(self, make_predicate):
@@ -82,9 +82,8 @@ class TestPredicates:
         assert plural_version.startswith(expected)
 
     def test_str_not_equal(self, make_predicate):
-        assert (
-            str(make_predicate["p7_not_equal"])
-            == "the distance between {} and {} was not equal to 35 foot"
+        assert "the distance between {} and {} was not equal to 35 foot" in str(
+            make_predicate["p7_not_equal"]
         )
 
     def test_negated_method(self, make_predicate):

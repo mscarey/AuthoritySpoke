@@ -8,7 +8,7 @@ class TestHolding:
     def test_complex_string(self, make_complex_rule):
         holding = Holding(make_complex_rule["accept_murder_fact_from_relevance"])
         string = str(holding)
-        assert "was relevant to the Fact that" in string
+        assert "is relevant to show the Fact that <Alice>" in string
 
 
 class TestSameMeaning:

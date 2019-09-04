@@ -84,7 +84,7 @@ class TestRules:
     def test_string_mentions_absence(self, make_opinion, make_regime):
         cardenas = make_opinion["cardenas_majority"]
         cardenas.posit(load_holdings("holding_cardenas.json", regime=make_regime))
-        assert "absence of evidence of testimony by <parole officer>" in str(
+        assert "absence of the Evidence of testimony by <parole officer>" in str(
             cardenas.holdings[1]
         )
 
@@ -616,12 +616,10 @@ class TestAddition:
 
         facts_not_copyrightable = fact_not_original + unoriginal_not_copyrightable
         assert len(facts_not_copyrightable.inputs) == 1
-        assert str(facts_not_copyrightable.inputs[0]) == (
-            "fact that <the Pythagorean theorem> was a fact"
-        )
+        assert "act that <the Pythagorean theorem> was a fact" in str(facts_not_copyrightable.inputs[0])
         assert len(facts_not_copyrightable.outputs) == 2
         assert str(facts_not_copyrightable.outputs[1]) == (
-            "fact that it is false that <the Pythagorean theorem> was copyrightable"
+            "act that it is false that <the Pythagorean theorem> was copyrightable"
         )
 
     def test_add_inferred_rule(self, make_enactment, make_opinion_with_holding):
@@ -645,12 +643,12 @@ class TestAddition:
             listings_not_original + make_enactment["copyright_requires_originality"] + unoriginal_not_copyrightable
         )
         assert len(listings_not_copyrightable.inputs) == 1
-        assert str(listings_not_copyrightable.inputs[0]) == (
-            "fact that <Rural's telephone listings> were names, towns, "
+        assert (
+            "act that <Rural's telephone listings> were names, towns, "
             + "and telephone numbers of telephone subscribers"
-        )
+        ) in str(listings_not_copyrightable.inputs[0])
         assert any(
-            str(out) == "absence of fact that <Rural's telephone listings> were copyrightable"
+            str(out) == "absence of the Fact that <Rural's telephone listings> were copyrightable"
             for out in listings_not_copyrightable.outputs
         )
 
@@ -744,11 +742,11 @@ class TestUnion:
         in a new Procedure created with the __or__ method.
         """
         original_on_left = make_rule["h1_easy"] | make_rule["h1_entity_order"]
-        assert "fact that <Hideaway Lodge> was <Wattenburg>’s abode" in str(original_on_left)
+        assert "act that <Hideaway Lodge> was <Wattenburg>’s abode" in str(original_on_left)
 
     def test_union_implied_change_context_reverse(self, make_rule):
         original_on_right = make_rule["h1_entity_order"] | make_rule["h1_easy"]
-        assert "fact that <Wattenburg> was <Hideaway Lodge>’s abode" in str(original_on_right)
+        assert "that <Wattenburg> was <Hideaway Lodge>’s abode" in str(original_on_right)
 
     def test_union_change_context(self, make_opinion_with_holding):
         """
@@ -779,7 +777,7 @@ class TestUnion:
         oracle = make_opinion_with_holding["oracle_majority"]
         new = lotus.holdings[9].rule | oracle.holdings[3].rule
         text = (
-            "fact that <the Lotus menu command hierarchy> was a "
+            "that <the Lotus menu command hierarchy> was a "
             "literal element of <Lotus 1-2-3>")
         assert text in str(new)
 
