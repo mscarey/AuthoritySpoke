@@ -344,12 +344,12 @@ class Holding(Factor):
         return attrs
 
     def __str__(self):
+        indent = "  "
         action = (
             "consider UNDECIDED"
             if not self.decided
             else ("ACCEPT" if self.rule_valid else "REJECT")
         )
-        text = f"Holding to {action} the\n{str(self.rule)}"
-        return textwrap.indent(
-            text, prefix="  ", predicate=lambda line: not line.startswith("Holding to")
-        )
+        rule_text = textwrap.indent(str(self.rule), prefix=indent)
+        text = f"the Holding to {action}\n{rule_text}"
+        return text

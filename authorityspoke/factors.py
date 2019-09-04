@@ -8,6 +8,7 @@ import functools
 from itertools import zip_longest
 import logging
 import operator
+import textwrap
 from typing import Any, Callable, Dict, Iterable, Iterator, List
 from typing import Optional, Sequence, Tuple, Union
 
@@ -574,12 +575,13 @@ class Factor(ABC):
                 yield changed_registry
 
     def __str__(self):
-        string = f"{self.__class__.__name__.lower()}" + " {}"
+        text = f"the {self.__class__.__name__}" + " {}"
         if self.generic:
-            string = f"<{string}>"
+            text = f"<{text}>"
         if self.absent:
-            string = "absence of " + string
-        return string
+            text = "absence of " + text
+
+        return textwrap.fill(text, initial_indent="", subsequent_indent="  ")
 
     def update_context_register(
         self, other: Optional[Factor], register: ContextRegister, comparison: Callable

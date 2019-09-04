@@ -396,7 +396,7 @@ class Predicate:
         elif self.truth is False:
             truth_prefix = "it is false that "
         else:
-            truth_prefix = ""
+            truth_prefix = "that "
         if self.quantity:
             slots = ("{}" for slot in range(len(self)))
             content = self.content.format(*slots, self.quantity_comparison())

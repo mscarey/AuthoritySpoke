@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import functools
 import operator
+import textwrap
 
 from typing import Callable, ClassVar, Iterator, List, Optional, Tuple
 
@@ -134,11 +135,16 @@ def use_likely_context(func: Callable):
         context_to_use = more_specific or less_specific or context or ContextRegister()
         for unused_left, unused_right in zip(
             [
-                item for item in left.generic_factors
-                if item not in context_to_use.keys()],
+                item
+                for item in left.generic_factors
+                if item not in context_to_use.keys()
+            ],
             [
-                item for item in right.generic_factors
-                if item not in context_to_use.values()]):
+                item
+                for item in right.generic_factors
+                if item not in context_to_use.values()
+            ],
+        ):
             context_to_use[unused_right] = unused_left
         return func(left, right, context_to_use)
 
@@ -295,19 +301,19 @@ class Procedure(Factor):
         return text
 
     def __str__(self):
-        text = "Procedure:"
+        indent = "  "
+        text = "RESULT:"
+        for f in self.outputs:
+            text += "\n" + textwrap.indent(str(f), prefix=indent)
         if self.inputs:
-            text += "\nSupporting inputs:"
+            text += "\nGIVEN:"
             for f in self.inputs:
-                text += "\n" + str(f)
+                text += "\n" + textwrap.indent(str(f), prefix=indent)
         if self.despite:
-            text += "\nDespite:"
+            text += "\nDESPITE:"
             for f in self.despite:
-                text += "\n" + str(f)
-        if self.outputs:
-            text += "\nOutputs:"
-            for f in self.outputs:
-                text += "\n" + str(f)
+                text += "\n" + textwrap.indent(str(f), prefix=indent)
+
         return text
 
     @property

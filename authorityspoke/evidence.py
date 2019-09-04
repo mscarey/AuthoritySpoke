@@ -43,12 +43,16 @@ class Exhibit(Factor):
             yield from super()._implies_if_concrete(other, context)
 
     def __str__(self):
-        string = (
-            f'{("by " + str(self.stated_by) + ", ") if self.stated_by else ""}'
-            + f'{("asserting " + str(self.statement)) if self.statement else ""}'
-        )
-        string = super().__str__().format(string)
-        return string.replace("exhibit", self.form or "exhibit").strip()
+        text = ""
+        if self.form:
+            text += f"\n  in the FORM of {self.form}"
+        if self.stated_by:
+            text += f"\n  STATED BY {str(self.stated_by)}"
+        if self.statement:
+            text += f"\n  ASSERTING:"
+            factor_text = textwrap.indent(str(self.statement), prefix="  ")
+            text += f"\n  {str(factor_text)}"
+        return super().__str__().format(string)
 
 
 @dataclass(frozen=True)

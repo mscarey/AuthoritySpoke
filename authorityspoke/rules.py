@@ -518,20 +518,25 @@ class Rule(Factor):
         indent = "  "
         mandatory = "MUST" if self.mandatory else "MAY"
         universal = "ALWAYS" if self.universal else "SOMETIMES"
-        text = f"Rule that the court {mandatory} {universal} accept the\n" + str(
-            self.procedure
+        text = (
+            f"the Rule that the court {mandatory} {universal} impose the\n"
+            + textwrap.indent(str(self.procedure), prefix=indent)
         )
         if self.enactments:
-            text += f"GIVEN the ENACTMENTS:\n"
+            text += f"\n  GIVEN the ENACTMENT"
+            if len(self.enactments) > 1:
+                text += "S"
+            text += ":"
             for enactment in self.enactments:
-                text += indent + str(enactment) + "\n"
+                text += "\n  " + textwrap.indent(str(enactment), prefix=indent)
         if self.enactments_despite:
-            text += f"DESPITE the ENACTMENTS:\n"
+            text += f"DESPITE the ENACTMENT"
+            if len(self.enactments_despite) > 1:
+                text += "S"
+            text += ":"
             for despite in self.enactments_despite:
-                text += indent + str(despite) + "\n"
-        return textwrap.indent(
-            text, prefix=indent, predicate=lambda line: not line.startswith("Rule that")
-        )
+                text += "\n  " + textwrap.indent(str(despite), prefix=indent)
+        return text
 
 
 class Attribution:
