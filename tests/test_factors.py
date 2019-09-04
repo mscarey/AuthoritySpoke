@@ -168,28 +168,11 @@ class TestFacts:
                 (make_entity["motel"], make_entity["watt"])
             )
 
-    def test_false_predicate_with_entities(self, make_entity, watt_factor):
-        assert watt_factor["f7"].predicate_in_context(
-            (make_entity["trees"], make_entity["motel"])
-        ) == str(
-            "Fact: the distance between <the stockpile of trees> "
-            + "and <Hideaway Lodge> was no more than 35 foot"
-        )
-
     def test_entity_and_human_in_predicate(self, make_entity, watt_factor):
         assert (
             "<Wattenburg> operated and lived at <Hideaway Lodge>" in
             watt_factor["f2"].predicate.content_with_entities(
                 (make_entity["watt"], make_entity["motel"])))
-
-
-    def test_fact_label_with_entities(self, make_entity, watt_factor):
-        assert (
-            watt_factor["f2"].predicate_in_context(
-                (make_entity["watt"], make_entity["motel"])
-            )
-            == "Fact: <Wattenburg> operated and lived at <Hideaway Lodge>"
-        )
 
     def test_standard_of_proof_must_be_listed(self, make_predicate):
         with pytest.raises(ValueError):

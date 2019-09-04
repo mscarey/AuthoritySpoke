@@ -182,23 +182,6 @@ class Fact(Factor):
         ):
             yield from super()._means_if_concrete(other, context)
 
-    def predicate_in_context(self, entities: Sequence[Factor]) -> str:
-        r"""
-        Insert :class:`str` representations of ``entities`` into ``self``\s :class:`Predicate`.
-
-        :returns:
-            the representation of ``self``\s :class:`Predicate` with
-            :class:`str` representations of ``entities`` added into
-            the slots, with added text from the :class:`Fact` object
-            indicating the class name and whether the :class:`Predicate`
-            is ``absent``.
-        """
-
-        return (
-            f"{'Absent ' if self.absent else ''}{self.__class__.__name__}: "
-            + f"{self.predicate.content_with_entities(entities)}"
-        )
-
     def __len__(self):
         return len(self.context_factors)
 
