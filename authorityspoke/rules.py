@@ -530,7 +530,7 @@ class Rule(Factor):
             for enactment in self.enactments:
                 text += "\n  " + textwrap.indent(str(enactment), prefix=indent)
         if self.enactments_despite:
-            text += f"DESPITE the ENACTMENT"
+            text += f"\n  DESPITE the ENACTMENT"
             if len(self.enactments_despite) > 1:
                 text += "S"
             text += ":"
