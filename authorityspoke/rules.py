@@ -8,8 +8,9 @@ may describe procedural moves available in litigation.
 from __future__ import annotations
 
 from itertools import chain
+import textwrap
 from typing import Any, ClassVar, Dict, Iterable, Iterator
-from typing import List, Optional, Sequence, Tuple, Union
+from typing import List, Optional, Tuple
 
 from dataclasses import dataclass
 
@@ -514,30 +515,22 @@ class Rule(Factor):
         return attrs
 
     def __str__(self):
-        def factor_catalog(factors: List[Union[Factor, Enactment]], tag: str) -> str:
-            lines = [f"{tag}: {factor}\n" for factor in factors]
-            return "".join(lines)
-
-        newline = "\n"
-        despite_enactment_text = ""
+        indent = "  "
+        mandatory = "MUST" if self.mandatory else "MAY"
+        universal = "ALWAYS" if self.universal else "SOMETIMES"
+        text = f"Rule that the court {mandatory} {universal} accept the\n" + str(
+            self.procedure
+        )
+        if self.enactments:
+            text += f"GIVEN the ENACTMENTS:\n"
+            for enactment in self.enactments:
+                text += indent + str(enactment) + "\n"
         if self.enactments_despite:
-            despite_enactment_text += "and despite the legislation\n"
-            despite_enactment_text += str(
-                factor_catalog(self.enactments_despite, "DESPITE")
-            )
-
-        return (
-            "the rule that the court "
-            + f"{'MUST' if self.mandatory else 'MAY'} "
-            + f"{'ALWAYS' if self.universal else 'SOMETIMES'} "
-            + f"accept the result{newline}"
-            + f"{str(factor_catalog(self.procedure.outputs, 'RESULT'))}"
-            + f"{'based on the input' + newline}"
-            + f"{str(factor_catalog(self.procedure.inputs, 'GIVEN')) if self.procedure.inputs else ''}"
-            + f"{str(factor_catalog(self.procedure.despite, 'DESPITE')) if self.procedure.despite else ''}"
-            + f"{'according to the legislation' + newline if self.enactments else ''}"
-            + f"{str(factor_catalog(self.enactments, 'GIVEN')) if self.enactments else ''}"
-            + despite_enactment_text
+            text += f"DESPITE the ENACTMENTS:\n"
+            for despite in self.enactments_despite:
+                text += indent + str(despite) + "\n"
+        return textwrap.indent(
+            text, prefix=indent, predicate=lambda line: not line.startswith("Rule that")
         )
 
 

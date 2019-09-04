@@ -137,7 +137,7 @@ class TestEnactments:
             loaders.load_holdings(f"holding_oracle.json", regime=make_regime)
         )
         despite_text = str(oracle_majority.holdings[5])
-        assert 'DESPITE: "In no case does copyright protection ' in despite_text
+        assert "In no case does copyright protection " in despite_text
 
     def test_short_passage_from_uslm_code(self, make_code):
         """Also tests adding the missing initial "/" in ``path``."""

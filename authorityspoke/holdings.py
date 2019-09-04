@@ -12,6 +12,7 @@ from __future__ import annotations
 
 from typing import Any, Dict, Iterable, List, Tuple
 from typing import Optional, Union
+import textwrap
 
 from dataclasses import dataclass
 
@@ -343,7 +344,12 @@ class Holding(Factor):
         return attrs
 
     def __str__(self):
-        return (
-            f"the holding {'' if self.decided else 'that it is undecided whether '}"
-            + f"to {'accept' if self.rule_valid else 'reject'} {str(self.rule)}"
+        action = (
+            "consider UNDECIDED"
+            if not self.decided
+            else ("ACCEPT" if self.rule_valid else "REJECT")
+        )
+        text = f"Holding to {action} the\n{str(self.rule)}"
+        return textwrap.indent(
+            text, prefix="  ", predicate=lambda line: not line.startswith("Holding to")
         )
