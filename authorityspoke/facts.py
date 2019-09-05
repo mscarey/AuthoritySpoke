@@ -136,6 +136,17 @@ class Fact(Factor):
         return super().__str__().format(text)
 
     @property
+    def short_string(self):
+        predicate = str(self.predicate.content_with_entities(self.context_factors))
+        standard = (
+            f"by the standard {self.standard_of_proof}, "
+            if self.standard_of_proof
+            else ""
+        )
+        string = f"{standard}{predicate}"
+        return super().__str__().format(string).replace("Fact", "fact")
+
+    @property
     def interchangeable_factors(self) -> List[ContextRegister]:
         r"""
         Get ways to reorder context :class:`Factor`\s without changing truth value of ``self``.

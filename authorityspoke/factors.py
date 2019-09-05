@@ -583,6 +583,14 @@ class Factor(ABC):
 
         return textwrap.fill(text, initial_indent="", subsequent_indent="  ")
 
+    @property
+    def short_string(self):
+        """
+        If a class has no short_string method, default to the regular
+        string method.
+        """
+        return str(self)
+
     def update_context_register(
         self, other: Optional[Factor], register: ContextRegister, comparison: Callable
     ) -> Iterator[ContextRegister]:

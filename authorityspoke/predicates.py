@@ -160,7 +160,7 @@ class Predicate:
                     sentence=add_plurals, index=index
                 )
 
-        return add_plurals.format(*(str(e) for e in context))
+        return add_plurals.format(*(e.short_string for e in context))
 
     def consistent_dimensionality(self, other: Predicate) -> bool:
         """Test if ``other`` has a quantity parameter consistent with ``self``."""

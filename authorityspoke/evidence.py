@@ -43,6 +43,18 @@ class Exhibit(Factor):
         ):
             yield from super()._implies_if_concrete(other, context)
 
+    @property
+    def short_string(self):
+        """
+        Return string representation of the object without line breaks.
+        """
+        string = (
+            f'{("by " + str(self.stated_by) + ", ") if self.stated_by else ""}'
+            + f'{("asserting " + str(self.statement)) if self.statement else ""}'
+        )
+        string = super().__str__().format(string)
+        return string.replace("Exhibit", self.form or "exhibit").strip()
+
     def __str__(self):
         text = ""
         if self.form:
@@ -78,3 +90,11 @@ class Evidence(Factor):
             factor_text = textwrap.indent(str(self.to_effect), prefix="    ")
             text += f"\n{str(factor_text)}"
         return super().__str__().format(text).strip()
+
+    @property
+    def short_string(self):
+        string = (
+            f'{("of " + str(self.exhibit)) + ", " if self.exhibit else ""}'
+            + f'{("which supports " + str(self.to_effect)) if self.to_effect else ""}'
+        )
+        return super().__str__().format(string).strip().replace("Evidence", "evidence")

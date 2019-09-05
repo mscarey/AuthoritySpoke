@@ -95,6 +95,21 @@ class TestFacts:
         """
         assert "Hideaway Lodge was a motel" in str(watt_factor["f1_specific"])
 
+    def test_complex_fact_no_line_break_in_predicate(self, make_opinion_with_holding):
+        """
+        Tests that the string representation of this Holding's only input
+        Fact is all on one line except for the "SPECIFIC CONTEXT" part,
+        if present.
+
+        The representation of the Exhibit mentioned in the Fact should
+        not introduce any line breaks inside the Fact's string.
+        """
+        holding = make_opinion_with_holding["cardenas_majority"].holdings[1]
+        fact_text = str(holding.inputs[0])
+        if "SPECIFIC CONTEXT" in fact_text:
+            fact_text = fact_text.split("SPECIFIC CONTEXT")[0].strip()
+        assert len(fact_text.splitlines()) == 1
+
     def test_new_context_replace_fact(self, make_entity, watt_factor):
         changes = {
             make_entity["watt"]: Entity("Darth Vader"),
