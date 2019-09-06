@@ -40,6 +40,15 @@ class TestSelectors:
         )
         assert selector.path.startswith("/")
 
+    def test_selector_text_split(self, make_code):
+        usc17 = make_code["usc17"]
+        selector = TextQuoteSelector(
+            path="us/usc/t17/s102/b",
+            text="process, system,|method of operation|, concept, principle",
+            source=usc17,
+        )
+        assert selector.path.startswith("/")
+
     def test_passage_from_uslm_code(self, make_selector):
         copyright_exceptions = make_selector["copyright"]
         assert copyright_exceptions.exact.strip() == (

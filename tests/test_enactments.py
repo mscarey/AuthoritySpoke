@@ -131,6 +131,17 @@ class TestEnactments:
         )
         assert fourth_a.text.endswith("and the persons or things to be seized.")
 
+    def test_make_enactment_from_dict_with_text_split(self, make_regime, make_code):
+        fourth_a = readers.read_enactment(
+            factor_record={
+                "path": "/us/const/amendment-IV",
+                "text": "and|the persons or things|to be seized.",
+            },
+            code=make_code["const"],
+            regime=make_regime,
+        )
+        assert fourth_a.text.endswith("or things")
+
     def test_passage_from_imported_statute(self, make_regime):
         oracle_majority = loaders.load_opinion(f"oracle_h.json")
         oracle_majority.posit(

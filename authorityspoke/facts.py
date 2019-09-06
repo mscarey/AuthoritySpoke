@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import operator
 import textwrap
 
@@ -64,7 +64,7 @@ class Fact(Factor):
     standard_of_proof: Optional[str] = None
     absent: bool = False
     generic: bool = False
-    case_factors: Sequence[Factor] = ()
+    case_factors: Sequence[Factor] = field(default=(), repr=False)
     standards_of_proof: ClassVar = (
         "scintilla of evidence",
         "substantial evidence",

@@ -216,6 +216,10 @@ class TestFacts:
             make_entity["motel"]: make_entity["watt"],
         }
 
+    def test_case_factors_deleted_from_fact(self, watt_factor):
+        """This attribute should have been deleted during Fact.__post_init__"""
+        assert not hasattr(watt_factor["f1"], "case_factors")
+
     def test_import_to_context_register(self, make_entity, watt_factor):
         f = watt_factor["f7"]
         left = ContextRegister({
