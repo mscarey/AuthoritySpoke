@@ -37,8 +37,7 @@ class TestSelectors:
             "path": "/us/usc/t17/s102/b",
             "text": "process, system,|method of operation|, concept, principle",
         }
-        selector_data = references.selector_schema.load(data)
-        selector = TextQuoteSelector(**selector_data)
+        selector = references.read_selector(data)
         assert selector.exact.startswith("method")
 
     def test_passage_from_uslm_code(self, make_selector):

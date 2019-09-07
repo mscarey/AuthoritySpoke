@@ -141,7 +141,18 @@ class SelectorSchema(Schema):
         return data
 
 
-selector_schema = SelectorSchema()
+def read_selector(record: Union[dict, str]) -> TextQuoteSelector:
+    """
+    Create new selector from JSON user input.
+
+    :param record:
+        a string or dict representing a text passage
+
+    :returns: a new :class:`TextQuoteSelector`
+    """
+
+    selector_schema = SelectorSchema()
+    return TextQuoteSelector(**selector_schema.load(record))
 
 
 def read_selectors(
@@ -163,5 +174,6 @@ def read_selectors(
     if records is None:
         return []
     if isinstance(records, (str, dict)):
-        return [selector_schema.load(records)]
-    return [selector_schema.load(record) for record in records]
+        return [read_selector(records)]
+    schema = SelectorSchema(many=True)
+    return [TextQuoteSelector(**record) for record in schema.load(records)]
