@@ -46,9 +46,9 @@ def read_enactment(
     **kwargs,
 ) -> Union[Enactment, Tuple[Enactment, TextLinkDict]]:
     r"""
-    Create a new :class:`Enactment` object using imported JSON data.
+    Create a new :class:`.Enactment` object using imported JSON data.
 
-    The new :class:`Enactment` can be composed from a :class:`.Code`
+    The new :class:`.Enactment` can be composed from a :class:`.Code`
     referenced in the ``regime`` parameter.
 
     :param enactment_dict:
@@ -77,8 +77,10 @@ def read_enactment(
     """
     if regime and not code:
         code = regime.get_code(enactment_dict["path"])
-    if code is None and enactment_dict.get("file"):
-        code = Code(enactment_dict["file"])
+    if enactment_dict.get("file"):
+        if code is None:
+            code = Code(enactment_dict["file"])
+        del enactment_dict["file"]
     if code is None:
         raise ValueError(
             "Must either specify a Regime and a path to find the "
