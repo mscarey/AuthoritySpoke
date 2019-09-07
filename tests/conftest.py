@@ -1115,7 +1115,7 @@ def make_analysis() -> Dict[str, Dict["str", Any]]:
                 "outputs": {
                     "type": "fact",
                     "content": "Bradley made a minimal holding object.",
-                    "text": "upholding searches in |open fields or grounds|around a house",
+                    "anchors": "upholding searches in |open fields or grounds|around a house",
                 }
             }
         ],

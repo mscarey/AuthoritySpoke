@@ -88,14 +88,11 @@ def read_enactment(
     if regime:
         regime.set_code(code)
 
-    selector = TextQuoteSelector(
-        path=enactment_dict.get("path"),
-        exact=enactment_dict.get("exact"),
-        prefix=enactment_dict.get("prefix"),
-        suffix=enactment_dict.get("suffix"),
-        source=code,
-    )
-    answer = Enactment(code=code, selector=selector, name=enactment_dict.get("name"))
+    name = enactment_dict.get("name")
+    if name:
+        del enactment_dict["name"]
+    selector = references.read_selector(record=enactment_dict, source=code)
+    answer = Enactment(code=code, selector=selector, name=name)
     mentioned = mentioned or {}
     return (answer, mentioned) if report_mentioned else answer
 
@@ -464,7 +461,7 @@ def read_holding(
     generic: bool = False,
     enactments: Optional[Union[Dict, Iterable[Dict]]] = None,
     enactments_despite: Optional[Union[Dict, Iterable[Dict]]] = None,
-    text: Optional[Union[str, Dict, Iterable[Union[str, Dict]]]] = None,
+    anchors: Optional[Union[str, Dict, Iterable[Union[str, Dict]]]] = None,
     mentioned: Optional[TextLinkDict] = None,
     regime: Optional[Regime] = None,
     report_mentioned: bool = False,
@@ -523,7 +520,7 @@ def read_holding(
         of overruling prior :class:`.Holding`\s finding the :class:`.Rule`
         to be either valid or invalid.
 
-    :param text:
+    :param anchors:
         Text selectors for the whole :class:`Holding`, not for any
         individual :class:`.Factor`. Often selects text used to
         indicate whether the :class:`.Rule` is ``mandatory``, ``universal``,
@@ -550,7 +547,7 @@ def read_holding(
 
     mentioned = mentioned or {}
 
-    selectors = references.read_selectors(text)
+    selectors = references.read_selectors(anchors)
 
     basic_rule, mentioned = read_rule(
         outputs=outputs,

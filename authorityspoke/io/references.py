@@ -96,8 +96,8 @@ def log_mentioned_context(func: Callable):
             )
         if new_factor not in mentioned:
             mentioned[new_factor] = []
-        if factor_record.get("text"):
-            mentioned[new_factor] = read_selectors(factor_record.get("text"))
+        if factor_record.get("anchor"):
+            mentioned[new_factor] = read_selectors(factor_record.get("anchor"))
         return (new_factor, mentioned) if report_mentioned else new_factor
 
     return wrapper
@@ -125,7 +125,9 @@ class SelectorSchema(Schema):
         elif text.count("|") == 2:
             return tuple([*text.split("|")])
         raise ValidationError(
-            "'text' must be either a dict, a string containing no | pipe "
+            "If the 'text' field is included, it must be either a dict"
+            + "with one or more of 'prefix', 'exact', and 'suffix' "
+            + "a string containing no | pipe "
             + "separator, or a string containing two pipe separators to divide "
             + "the string into 'prefix', 'exact', and 'suffix'."
         )
@@ -141,7 +143,9 @@ class SelectorSchema(Schema):
         return data
 
 
-def read_selector(record: Union[dict, str]) -> TextQuoteSelector:
+def read_selector(
+    record: Union[dict, str], source: Optional[Code] = None
+) -> TextQuoteSelector:
     """
     Create new selector from JSON user input.
 
@@ -152,7 +156,7 @@ def read_selector(record: Union[dict, str]) -> TextQuoteSelector:
     """
 
     selector_schema = SelectorSchema()
-    return TextQuoteSelector(**selector_schema.load(record))
+    return TextQuoteSelector(source=source, **selector_schema.load(record))
 
 
 def read_selectors(

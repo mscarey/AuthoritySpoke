@@ -140,7 +140,7 @@ class TestEnactments:
             code=make_code["const"],
             regime=make_regime,
         )
-        assert fourth_a.text.endswith("or things")
+        assert fourth_a.selector.exact.endswith("or things")
 
     def test_passage_from_imported_statute(self, make_regime):
         oracle_majority = loaders.load_opinion(f"oracle_h.json")
