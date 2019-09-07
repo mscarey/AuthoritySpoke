@@ -4,11 +4,13 @@ import functools
 
 from typing import Callable, Dict, Iterable, List, Optional, Tuple, Union
 
+from marshmallow import Schema, fields, pre_load, ValidationError
+
 from authorityspoke.enactments import Code, Enactment
 from authorityspoke.factors import Factor
 from authorityspoke.jurisdictions import Regime
-from authorityspoke.selectors import TextQuoteSelector
 from authorityspoke.factors import TextLinkDict
+from authorityspoke.selectors import TextQuoteSelector
 
 
 def _replace_new_factor_from_mentioned(
@@ -101,31 +103,45 @@ def log_mentioned_context(func: Callable):
     return wrapper
 
 
-def read_selector(text: Union[dict, str]) -> TextQuoteSelector:
-    """
-    Create new instance from JSON user input.
+class SelectorSchema(Schema):
+    prefix = fields.Str()
+    exact = fields.Str()
+    suffix = fields.Str()
+    path = fields.Url(relative=True)
 
-    If the input is a :class:`str`, tries to break up the string
-    into :attr:`~TextQuoteSelector.prefix`, :attr:`~TextQuoteSelector.exact`,
-    and :attr:`~TextQuoteSelector.suffix`, by splitting on the pipe characters.
+    def split_text(self, text: str) -> Tuple[str, ...]:
+        """
+        Tries to break up the string into :attr:`~TextQuoteSelector.prefix`,
+        :attr:`~TextQuoteSelector.exact`,
+        and :attr:`~TextQuoteSelector.suffix`, by splitting on the pipe characters.
 
-    :param text:
-        a string or dict representing a text passage
+        :param text: a string or dict representing a text passage
 
-    :returns: a new :class:`TextQuoteSelector`
-    """
-    if isinstance(text, dict):
-        return TextQuoteSelector(**text)
-    if text.count("|") == 0:
-        return TextQuoteSelector(exact=text)
-    elif text.count("|") == 2:
-        prefix, exact, suffix = text.split("|")
-        return TextQuoteSelector(exact=exact, prefix=prefix, suffix=suffix)
-    raise ValueError(
-        "'text' must be either a dict, a string containing no | pipe "
-        + "separator, or a string containing two pipe separators to divide "
-        + "the string into 'prefix', 'exact', and 'suffix'."
-    )
+        :returns: a tuple of the three values
+        """
+
+        if text.count("|") == 0:
+            return ("", text, "")
+        elif text.count("|") == 2:
+            return tuple([*text.split("|")])
+        raise ValidationError(
+            "'text' must be either a dict, a string containing no | pipe "
+            + "separator, or a string containing two pipe separators to divide "
+            + "the string into 'prefix', 'exact', and 'suffix'."
+        )
+
+    @pre_load
+    def preprocess(self, data: Union[str, Dict[str, str]], **kwargs) -> Dict[str, str]:
+        if isinstance(data, str):
+            data = {"text": data}
+        text = data.get("text")
+        if text:
+            data["prefix"], data["exact"], data["suffix"] = self.split_text(text)
+            del data["text"]
+        return data
+
+
+selector_schema = SelectorSchema()
 
 
 def read_selectors(
@@ -147,5 +163,5 @@ def read_selectors(
     if records is None:
         return []
     if isinstance(records, (str, dict)):
-        return [read_selector(records)]
-    return [read_selector(record) for record in records]
+        return [selector_schema.load(records)]
+    return [selector_schema.load(record) for record in records]

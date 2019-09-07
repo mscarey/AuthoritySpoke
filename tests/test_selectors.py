@@ -1,7 +1,7 @@
 import pytest
 
 from authorityspoke.enactments import Code, Enactment
-from authorityspoke.io import loaders
+from authorityspoke.io import loaders, references
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
 from authorityspoke.opinions import Opinion
@@ -23,31 +23,23 @@ class TestSelectors:
     def test_omit_terminal_slash(self, make_code):
         usc17 = make_code["usc17"]
         selector = TextQuoteSelector(
-            path="us/usc/t17/s102/b/",
-            prefix="process, system,",
-            suffix=", concept, principle",
-            source=usc17,
+            path="us/usc/t17/s102/b/", exact="process, system,"
         )
         assert not selector.path.endswith("/")
 
     def test_add_omitted_initial_slash(self, make_code):
         usc17 = make_code["usc17"]
-        selector = TextQuoteSelector(
-            path="us/usc/t17/s102/b",
-            prefix="process, system,",
-            suffix=", concept, principle",
-            source=usc17,
-        )
+        selector = TextQuoteSelector(path="us/usc/t17/s102/b", exact="process, system,")
         assert selector.path.startswith("/")
 
-    def test_selector_text_split(self, make_code):
-        usc17 = make_code["usc17"]
-        selector = TextQuoteSelector(
-            path="us/usc/t17/s102/b",
-            text="process, system,|method of operation|, concept, principle",
-            source=usc17,
-        )
-        assert selector.path.startswith("/")
+    def test_selector_text_split(self):
+        data = {
+            "path": "/us/usc/t17/s102/b",
+            "text": "process, system,|method of operation|, concept, principle",
+        }
+        selector_data = references.selector_schema.load(data)
+        selector = TextQuoteSelector(**selector_data)
+        assert selector.exact.startswith("method")
 
     def test_passage_from_uslm_code(self, make_selector):
         copyright_exceptions = make_selector["copyright"]
