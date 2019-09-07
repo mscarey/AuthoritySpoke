@@ -16,8 +16,20 @@ class TestFacts:
         self, make_entity, make_predicate, watt_mentioned
     ):
         e = make_entity
-        f2 = build_fact(make_predicate["p1"], case_factors=watt_mentioned)
-        assert f2.context_factors == (e["motel"],)
+        f1 = build_fact(make_predicate["p1"], case_factors=watt_mentioned)
+        assert f1.context_factors == (e["motel"],)
+
+    def test_build_fact(self, make_predicate, watt_mentioned):
+        """
+        Check that context_factors is created as a (hashable) tuple, not list
+        """
+        shooting = build_fact(
+            make_predicate["p_shooting"],
+            (2, 3),
+            case_factors=watt_mentioned,
+            standard_of_proof="preponderance of evidence",
+        )
+        assert isinstance(shooting.context_factors, tuple)
 
     def test_context_factors_from_case_factor_indices(
         self, make_entity, make_predicate, watt_mentioned

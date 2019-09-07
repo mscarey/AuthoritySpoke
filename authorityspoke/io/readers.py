@@ -187,7 +187,7 @@ def get_references_from_mentioned(
             context_with_indices[factor] = factor_index
             content = content.replace(factor.name, placeholder)
     context_factors = sorted(context_with_indices, key=context_with_indices.get)
-    return content, context_factors
+    return content, tuple(context_factors)
 
 
 def read_quantity(quantity: str) -> Union[float, int, ureg.Quantity]:
@@ -256,7 +256,7 @@ def get_references_from_string(
         context_factors.append(entity)
         mentioned[entity] = []
 
-    return content, context_factors, mentioned
+    return content, tuple(context_factors), mentioned
 
 
 def read_fact(

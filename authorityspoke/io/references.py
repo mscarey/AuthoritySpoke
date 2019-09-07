@@ -82,6 +82,12 @@ def log_mentioned_context(func: Callable):
         if factor_record is None:
             return None, mentioned or {}
 
+        if factor_record.get("anchors"):
+            anchors = read_selectors(factor_record.get("anchors"))
+            del factor_record["anchors"]
+        else:
+            anchors = []
+
         new_factor, mentioned = func(
             factor_record,
             mentioned=mentioned or {},
@@ -94,10 +100,7 @@ def log_mentioned_context(func: Callable):
             new_factor = _replace_new_factor_from_mentioned(
                 new_factor=new_factor, mentioned=mentioned
             )
-        if new_factor not in mentioned:
-            mentioned[new_factor] = []
-        if factor_record.get("anchors"):
-            mentioned[new_factor] = read_selectors(factor_record.get("anchors"))
+        mentioned[new_factor] = anchors
         return (new_factor, mentioned) if report_mentioned else new_factor
 
     return wrapper

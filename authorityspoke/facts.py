@@ -213,9 +213,9 @@ class Fact(Factor):
         """
         return self.evolve(
             {
-                "context_factors": [
+                "context_factors": tuple(
                     factor.new_context(changes) for factor in self.context_factors
-                ]
+                )
             }
         )
 
