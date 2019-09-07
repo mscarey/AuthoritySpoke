@@ -96,8 +96,8 @@ def log_mentioned_context(func: Callable):
             )
         if new_factor not in mentioned:
             mentioned[new_factor] = []
-        if factor_record.get("anchor"):
-            mentioned[new_factor] = read_selectors(factor_record.get("anchor"))
+        if factor_record.get("anchors"):
+            mentioned[new_factor] = read_selectors(factor_record.get("anchors"))
         return (new_factor, mentioned) if report_mentioned else new_factor
 
     return wrapper
