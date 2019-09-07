@@ -43,11 +43,6 @@ class Fact(Factor):
         object of the same class without changing the truth of the
         :class:`Rule` in which it is mentioned.
 
-    :param case_factors:
-        a series of :class:`Factor`\s that have already been mentioned
-        in the :class:`.Opinion`. They are available for composing the
-        new :class:`Factor` object and don't need to be recreated.
-
     :attr standards_of_proof:
         a tuple with every allowable name for a standard of
         proof, in order from weakest to strongest.
@@ -64,7 +59,6 @@ class Fact(Factor):
     standard_of_proof: Optional[str] = None
     absent: bool = False
     generic: bool = False
-    case_factors: Sequence[Factor] = field(default=(), repr=False)
     standards_of_proof: ClassVar = (
         "scintilla of evidence",
         "substantial evidence",
@@ -82,44 +76,19 @@ class Fact(Factor):
             raise ValueError(
                 f"standard of proof must be one of {self.standards_of_proof} or None."
             )
-        case_factors = self.__class__._wrap_with_tuple(self.case_factors)
-        if not self.context_factors:
-            context_factors = range(len(self.predicate))
-        else:
-            context_factors = self.__class__._wrap_with_tuple(self.context_factors)
-        object.__delattr__(self, "case_factors")
 
+        context_factors = self.__class__._wrap_with_tuple(self.context_factors)
         if len(context_factors) != len(self.predicate):
             raise ValueError(
                 "The number of items in 'context_factors' must be "
                 + f"{len(self.predicate)}, to match predicate.context_slots"
             )
-        if any(not isinstance(s, (Factor, int)) for s in context_factors):
+        if any(not isinstance(s, Factor) for s in context_factors):
             raise TypeError(
                 "Items in the context_factors parameter should "
                 + "be Factor or a subclass of Factor, or should be integer "
                 + "indices of Factor objects in the case_factors parameter."
             )
-
-        def get_factor_by_index(
-            factor_or_index: Union[Factor, int], case_factors: List[Factor]
-        ) -> Factor:
-            if isinstance(factor_or_index, int):
-                if 0 <= factor_or_index < len(case_factors):
-                    factor_or_index = case_factors[factor_or_index]
-                else:
-                    raise ValueError(
-                        f"The integer {factor_or_index} could not be interpreted as "
-                        + f"the index of an item from case_factors, which has length "
-                        + f"{len(case_factors)}."
-                    )
-            return factor_or_index
-
-        if any(isinstance(s, int) for s in context_factors):
-            context_factors = tuple(
-                get_factor_by_index(i, case_factors) for i in context_factors
-            )
-        object.__setattr__(self, "context_factors", context_factors)
 
     def __str__(self):
         text = str(self.predicate.content_with_entities(self.context_factors))
@@ -249,3 +218,68 @@ class Fact(Factor):
                 ]
             }
         )
+
+
+def build_fact(
+    predicate: Predicate,
+    indices: Optional[Sequence[int]] = None,
+    case_factors: Optional[Union[Factor, Sequence[Factor]]] = None,
+    name: Optional[str] = None,
+    standard_of_proof: Optional[str] = None,
+    absent: bool = False,
+    generic: bool = False,
+):
+    """
+    Build a :class:`.Fact` with generics selected from a list.
+
+    :param predicate:
+        a natural-language clause with zero or more slots
+        to insert ``context_factors`` that are typically the
+        subject and objects of the clause.
+
+    :param context_factors:
+        a series of integer indices of generic factors to
+        fill in the blanks in the :class:`.Predicate`
+
+    :param name:
+        an identifier for this object, often used if the object needs
+        to be referred to multiple times in the process of composing
+        other :class:`.Factor` objects
+
+    :param standard_of_proof:
+        a descriptor for the degree of certainty associated
+        with the assertion in the :class:`.Predicate`
+
+    :param absent:
+        whether the absence, rather than the presence, of the legal
+        fact described above is being asserted.
+
+    :param generic:
+        whether this object could be replaced by another generic
+        object of the same class without changing the truth of the
+        :class:`Rule` in which it is mentioned.
+
+    :param case_factors:
+        a series of :class:`.Factor`\s that have already been mentioned
+        in the :class:`.Opinion`. They are available for composing the
+        new :class:`.Factor` object and don't need to be recreated.
+    """
+    if not indices:
+        indices = range(len(predicate))
+    if isinstance(indices, int):
+        indices = (indices,)
+
+    if case_factors is None:
+        case_factors = []
+    if isinstance(case_factors, Factor):
+        case_factors = [case_factors]
+
+    context_factors = tuple(case_factors[i] for i in indices)
+    return Fact(
+        predicate=predicate,
+        context_factors=context_factors,
+        name=name,
+        standard_of_proof=standard_of_proof,
+        absent=absent,
+        generic=generic,
+    )

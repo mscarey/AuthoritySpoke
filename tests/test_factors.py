@@ -5,7 +5,7 @@ import pytest
 
 from authorityspoke.entities import Entity
 from authorityspoke.factors import Factor, ContextRegister, means
-from authorityspoke.facts import Fact
+from authorityspoke.facts import Fact, build_fact
 from authorityspoke.rules import Rule
 from authorityspoke.opinions import Opinion
 from authorityspoke.predicates import ureg, Q_, Predicate
@@ -16,7 +16,7 @@ class TestFacts:
         self, make_entity, make_predicate, watt_mentioned
     ):
         e = make_entity
-        f2 = Fact(make_predicate["p1"], case_factors=watt_mentioned)
+        f2 = build_fact(make_predicate["p1"], case_factors=watt_mentioned)
         assert f2.context_factors == (e["motel"],)
 
     def test_context_factors_from_case_factor_indices(
@@ -32,18 +32,18 @@ class TestFacts:
 
         e = make_entity
 
-        f2 = Fact(
-            make_predicate["p2"], context_factors=(1, 0), case_factors=watt_mentioned
+        f2 = build_fact(
+            make_predicate["p2"], indices=(1, 0), case_factors=watt_mentioned
         )
         assert f2.context_factors == (e["watt"], e["motel"])
 
-    def test_mix_of_factors_and_indices_in_init(
+    def test_correct_factors_from_indices_in_build_fact(
         self, make_entity, make_predicate, watt_mentioned
     ):
         e = make_entity
-        f2 = Fact(
+        f2 = build_fact(
             make_predicate["p2"],
-            context_factors=(1, e["trees"]),
+            indices=(1, 2),
             case_factors=watt_mentioned,
         )
         assert f2.context_factors == (e["watt"], e["trees"])
@@ -53,22 +53,22 @@ class TestFacts:
     ):
         e = make_entity
         with pytest.raises(TypeError):
-            f2 = Fact(
-                make_predicate["p2"],
-                context_factors=(1, "nonsense"),
+            f2 = build_fact(
+                make_predicate["p1"],
+                indices=("nonsense"),
                 case_factors=watt_mentioned,
             )
 
     def test_invalid_index_for_case_factors_in_init(self, make_predicate, make_entity):
-        with pytest.raises(ValueError):
-            _ = Fact(
+        with pytest.raises(IndexError):
+            _ = build_fact(
                 make_predicate["p1"],
-                context_factors=2,
+                indices=2,
                 case_factors=make_entity["watt"],
             )
 
     def test_convert_int_context_factors_to_tuple(self, make_predicate, watt_mentioned):
-        f = Fact(make_predicate["p_irrelevant_1"], 3, case_factors=watt_mentioned)
+        f = build_fact(make_predicate["p_irrelevant_1"], 3, case_factors=watt_mentioned)
         assert f.context_factors == (watt_mentioned[3],)
 
     def test_string_representation_of_factor(self, watt_factor):
@@ -175,7 +175,7 @@ class TestFacts:
 
     def test_factor_context_factors_does_not_match_predicate(self, make_predicate):
         with pytest.raises(ValueError):
-            _ = Fact(make_predicate["p1"], (0, 1, 2))
+            _ = build_fact(make_predicate["p1"], (0, 1, 2))
 
     def test_reciprocal_with_wrong_number_of_entities(self, make_entity, watt_factor):
         with pytest.raises(ValueError):
@@ -191,7 +191,7 @@ class TestFacts:
 
     def test_standard_of_proof_must_be_listed(self, make_predicate):
         with pytest.raises(ValueError):
-            _ = Fact(make_predicate["p2"], standard_of_proof="probably so")
+            _ = build_fact(make_predicate["p2"], standard_of_proof="probably so")
 
     def test_standard_of_proof_in_str(self, watt_factor):
         factor = watt_factor["f2_preponderance_of_evidence"]
@@ -219,7 +219,7 @@ class TestFacts:
     def test_case_factors_deleted_from_fact(self, watt_factor):
         """This attribute should have been deleted during Fact.__post_init__"""
         predicate = Predicate("some things happened")
-        factor = Fact(predicate)
+        factor = build_fact(predicate)
         assert not hasattr(factor, "case_factors")
 
     def test_import_to_context_register(self, make_entity, watt_factor):
