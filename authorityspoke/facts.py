@@ -77,13 +77,16 @@ class Fact(Factor):
                 f"standard of proof must be one of {self.standards_of_proof} or None."
             )
 
-        context_factors = self.__class__._wrap_with_tuple(self.context_factors)
-        if len(context_factors) != len(self.predicate):
+        if not isinstance(self.context_factors, tuple):
+            context_factors = self.__class__._wrap_with_tuple(self.context_factors)
+            object.__setattr__(self, "context_factors", context_factors)
+
+        if len(self.context_factors) != len(self.predicate):
             raise ValueError(
                 "The number of items in 'context_factors' must be "
                 + f"{len(self.predicate)}, to match predicate.context_slots"
             )
-        if any(not isinstance(s, Factor) for s in context_factors):
+        if any(not isinstance(s, Factor) for s in self.context_factors):
             raise TypeError(
                 "Items in the context_factors parameter should "
                 + "be Factor or a subclass of Factor, or should be integer "

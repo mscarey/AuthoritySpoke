@@ -1,5 +1,5 @@
 from authorityspoke.evidence import Evidence, Exhibit
-from authorityspoke.facts import Fact
+from authorityspoke.facts import Fact, build_fact
 
 
 class TestEvidence:
@@ -79,7 +79,9 @@ class TestEvidenceImplication:
     def test_no_implication_of_fact(
         self, make_predicate, make_evidence, watt_mentioned
     ):
-        cool_fact = Fact(make_predicate["p_no_shooting"], case_factors=watt_mentioned)
+        cool_fact = build_fact(
+            make_predicate["p_no_shooting"], case_factors=watt_mentioned
+        )
         assert not make_evidence["no_shooting"] > cool_fact
         assert not cool_fact > make_evidence["no_shooting"]
 

@@ -185,9 +185,13 @@ class TestFacts:
             watt_factor["f1"].predicate.content_with_entities((make_entity["motel"]))
         )
 
-    def test_factor_context_factors_does_not_match_predicate(self, make_predicate):
+    def test_factor_context_factors_do_not_match_predicate(self, make_predicate, watt_mentioned):
+        """
+        make_predicate["p1"] has only one slot for context factors, but
+        this tells it to look for three.
+        """
         with pytest.raises(ValueError):
-            _ = build_fact(make_predicate["p1"], (0, 1, 2))
+            _ = build_fact(make_predicate["p1"], (0, 1, 2), case_factors=watt_mentioned)
 
     def test_reciprocal_with_wrong_number_of_entities(self, make_entity, watt_factor):
         with pytest.raises(ValueError):
@@ -201,9 +205,9 @@ class TestFacts:
             watt_factor["f2"].predicate.content_with_entities(
                 (make_entity["watt"], make_entity["motel"])))
 
-    def test_standard_of_proof_must_be_listed(self, make_predicate):
+    def test_standard_of_proof_must_be_listed(self, make_predicate, watt_mentioned):
         with pytest.raises(ValueError):
-            _ = build_fact(make_predicate["p2"], standard_of_proof="probably so")
+            _ = build_fact(make_predicate["p2"], case_factors=watt_mentioned, standard_of_proof="probably so")
 
     def test_standard_of_proof_in_str(self, watt_factor):
         factor = watt_factor["f2_preponderance_of_evidence"]
