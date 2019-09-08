@@ -13,5 +13,6 @@
 -e .
 beautifulsoup4>=4.7.1
 lxml
+marshmallow
 pint>=0.9
 requests

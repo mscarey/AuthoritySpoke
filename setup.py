@@ -15,7 +15,7 @@ setuptools.setup(
     packages=setuptools.find_packages(
         exclude=["tests", "*.tests", "*.tests.*", "tests.*"]
     ),
-    install_requires=["beautifulsoup4", "lxml", "pint", "requests"],
+    install_requires=["beautifulsoup4", "lxml", "marshmallow", "pint", "requests"],
     extras_require={"jupyter notebooks": ["jupyter", "ipykernel"]},
     classifiers=[
         "Development Status :: 3 - Alpha",
