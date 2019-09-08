@@ -205,14 +205,17 @@ class TestUnion:
 
 
 class TestHoldingImports:
-    def test_make_selector_for_opinion_text(self, make_analysis):
+    def test_repeating_read_holdings_has_same_result(self, make_analysis):
         holdings, mentioned = readers.read_holdings(
             make_analysis["minimal"], report_mentioned=True
         )
-        fact = holdings[0].outputs[0]
-        assert mentioned[fact][0].exact == "open fields or grounds"
+        holdings2, mentioned2 = readers.read_holdings(
+            make_analysis["minimal"], report_mentioned=True
+        )
+        assert mentioned == mentioned2
 
     def test_posit_holding_with_selector(self, make_analysis, make_opinion):
+
         holdings, mentioned = readers.read_holdings(
             make_analysis["minimal"], report_mentioned=True
         )

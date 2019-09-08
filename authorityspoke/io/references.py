@@ -84,7 +84,6 @@ def log_mentioned_context(func: Callable):
 
         if factor_record.get("anchors"):
             anchors = read_selectors(factor_record.get("anchors"))
-            del factor_record["anchors"]
         else:
             anchors = []
 
