@@ -24,7 +24,7 @@ class TestCodes:
 
     def test_cfr_repr(self, make_code):
         cfr = make_code["cfr37"]
-        assert "cfr37" in repr(cfr)
+        assert "Title 37" in repr(cfr)
 
     @pytest.mark.parametrize(
         "code, path",

@@ -4,6 +4,7 @@ the notebooks/ directory
 """
 
 from authorityspoke import Enactment
+from authorityspoke.factors import ContextRegister
 from authorityspoke.entities import Entity
 from authorityspoke.selectors import TextQuoteSelector
 
@@ -65,6 +66,14 @@ class TestIntroduction:
         lotus_majority = make_opinion_with_holding["lotus_majority"]
         assert oracle.contradicts(lotus_majority)
         assert lotus_majority.contradicts(oracle)
+
+    def test_opinion_explain_contradiction(self, make_opinion_with_holding):
+        oracle = make_opinion_with_holding["oracle_majority"]
+        lotus = make_opinion_with_holding["lotus_majority"]
+        register = next(lotus.holdings[8].explain_contradiction(oracle.holdings[10]))
+        assert register == ContextRegister(
+            {Entity("the Java API"): Entity("the Lotus menu command hierarchy")}
+        )
 
     def test_specific_holding_contradiction(self, make_opinion_with_holding):
         """

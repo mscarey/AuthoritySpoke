@@ -73,7 +73,9 @@ class Opinion:
             Factor, Union[TextQuoteSelector, Tuple[TextQuoteSelector, ...]]
         ] = {}
 
-    def contradicts(self, other: Union[Opinion, Holding]) -> bool:
+    def contradicts(
+        self, other: Union[Opinion, Holding], context: Optional[ContextRegister] = None
+    ) -> bool:
         """
         Test whether ``other`` is or contains a :class:`.Holding` contradicted by ``self``.
 
@@ -88,12 +90,13 @@ class Opinion:
 
         if isinstance(other, Holding):
             return any(
-                self_holding.contradicts(other) for self_holding in self.holdings
+                self_holding.contradicts(other, context)
+                for self_holding in self.holdings
             )
         elif isinstance(other, self.__class__):
             return any(
                 any(
-                    self_holding.contradicts(other_holding)
+                    self_holding.contradicts(other_holding, context)
                     for self_holding in self.holdings
                 )
                 for other_holding in other.holdings

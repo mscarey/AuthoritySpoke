@@ -274,7 +274,7 @@ class Factor(ABC):
         return any(self.explain_contradiction(other, context))
 
     def explain_contradiction(
-        self, other: Factor, context: Optional[ContextRegister]
+        self, other: Factor, context: Optional[ContextRegister] = None
     ) -> Iterator[ContextRegister]:
         """
         Test whether ``self`` :meth:`implies` the absence of ``other``.

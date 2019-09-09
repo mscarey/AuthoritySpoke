@@ -10,7 +10,8 @@ should be considered undecided.
 
 from __future__ import annotations
 
-from typing import Any, Dict, Iterable, List, Tuple
+from itertools import chain
+from typing import Any, Dict, Iterable, Iterator, List, Tuple
 from typing import Optional, Union
 import textwrap
 
@@ -57,7 +58,7 @@ class Holding(Factor):
         the outputs.
     """
 
-    rule: Optional[Rule] = None
+    rule: Rule
     rule_valid: bool = True
     decided: bool = True
     selectors: Union[Iterable[TextQuoteSelector], TextQuoteSelector] = ()
@@ -140,7 +141,40 @@ class Holding(Factor):
             return self.evolve({"rule": self.rule + other})
         raise NotImplementedError
 
-    def contradicts(self, other) -> bool:
+    def explain_contradiction(
+        self, other: Factor, context: ContextRegister = None
+    ) -> Iterator[ContextRegister]:
+        r"""
+        Find context matches that would result in a contradiction with other.
+
+        :param other:
+            The :class:`.Factor` to be compared to self. Unlike with
+            :meth:`~Holding.contradicts`\, this method cannot be called
+            with an :class:`.Opinion` for `other`.
+
+        :returns:
+            a generator yielding :class:`.ContextRegister`\s that cause a
+            contradiction.
+        """
+
+        if context is None:
+            context = ContextRegister()
+        if isinstance(other, Rule):
+            other = Holding(rule=other)
+        if not isinstance(other, self.__class__):
+            raise TypeError
+        if isinstance(other, Holding) and other.decided:
+            if self.decided:
+                yield from self.rule.explain_contradiction(other.rule)
+            else:
+                yield from chain(
+                    other._implies_if_decided(self),
+                    other._implies_if_decided(self.negated()),
+                )
+
+    def contradicts(
+        self, other: Union[Factor, "Opinion"], context: ContextRegister = None
+    ) -> bool:
         r"""
         Test if ``self`` :meth:`~.Factor.implies` ``other`` :meth:`~.Factor.negated`\.
 
@@ -161,20 +195,11 @@ class Holding(Factor):
         :returns:
             whether ``self`` contradicts ``other``.
         """
-
-        if not isinstance(other, self.__class__):
-            raise TypeError(
-                f"'Contradicts' not supported between instances of "
-                + f"'{self.__class__.__name__}' and '{other.__class__.__name__}'."
-            )
-
-        if not other.decided:
-            return False
-        if self.decided:
-            return self >= other.negated()
-        return other._implies_if_decided(self) or other._implies_if_decided(
-            self.negated()
-        )
+        if context is None:
+            context = ContextRegister()
+        if other.__class__.__name__ == "Opinion":
+            return other.contradicts(self, context.reversed)
+        return any(self.explain_contradiction(other, context))
 
     def implies(self, other: Union[Holding, Rule]) -> bool:
         r"""
@@ -220,7 +245,9 @@ class Holding(Factor):
     def __ge__(self, other: Union[Holding, Rule]) -> bool:
         return self.implies(other)
 
-    def _implies_if_decided(self, other) -> bool:
+    def _implies_if_decided(
+        self, other: Holding, context: Optional[ContextRegister] = None
+    ) -> Iterator[ContextRegister]:
         r"""
         Test if ``self`` implies ``other`` if they're both decided.
 
@@ -235,17 +262,18 @@ class Holding(Factor):
         """
 
         if self.rule_valid and other.rule_valid:
-            return self.rule >= other.rule
+            yield from self.rule.explain_implication(other.rule, context)
 
-        if not self.rule_valid and not other.rule_valid:
-            return other.rule >= self.rule
+        elif not self.rule_valid and not other.rule_valid:
+            yield from other.rule.explain_implication(self.rule, context)
 
         # Looking for implication where self.rule_valid != other.rule_valid
         # is equivalent to looking for contradiction.
 
         # If decided rule A contradicts B, then B also contradicts A
 
-        return self.rule.contradicts(other.rule)
+        else:
+            yield from self.rule.explain_contradiction(other.rule, context)
 
     def __len__(self):
         r"""
