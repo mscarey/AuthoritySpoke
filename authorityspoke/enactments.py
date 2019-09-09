@@ -7,7 +7,7 @@ import functools
 import pathlib
 import re
 from typing import List, Optional, Tuple, Union
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 from bs4 import BeautifulSoup
 
@@ -349,7 +349,7 @@ class Code:
         )
 
     def __repr__(self):
-        return f"{self.__class__.__name__}({repr(self.filepath)})"
+        return f"{self.__class__.__name__}({self.title})"
 
     def __str__(self):
         return self.title
@@ -384,7 +384,7 @@ class Enactment:
     """
 
     selector: TextQuoteSelector
-    code: Optional[Code] = field(repr=False, default=None)
+    code: Optional[Code] = None
     regime: Optional[Regime] = None
     name: Optional[str] = None
 
