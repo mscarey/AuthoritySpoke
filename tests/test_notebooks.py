@@ -72,7 +72,7 @@ class TestIntroduction:
         lotus = make_opinion_with_holding["lotus_majority"]
         register = next(lotus.holdings[8].explain_contradiction(oracle.holdings[10]))
         assert register == ContextRegister(
-            {Entity("the Java API"): Entity("the Lotus menu command hierarchy")}
+            {Entity("the Lotus menu command hierarchy"): Entity("the Java API")}
         )
 
     def test_specific_holding_contradiction(self, make_opinion_with_holding):

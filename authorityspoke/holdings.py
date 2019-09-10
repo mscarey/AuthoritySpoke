@@ -165,7 +165,7 @@ class Holding(Factor):
             raise TypeError
         if isinstance(other, Holding) and other.decided:
             if self.decided:
-                yield from self.rule.explain_contradiction(other.rule)
+                yield from self.explain_implication(other.negated())
             else:
                 yield from chain(
                     other._implies_if_decided(self),
