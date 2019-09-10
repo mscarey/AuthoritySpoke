@@ -201,7 +201,31 @@ class Holding(Factor):
             return other.contradicts(self, context.reversed)
         return any(self.explain_contradiction(other, context))
 
-    def implies(self, other: Union[Holding, Rule]) -> bool:
+    def explain_implication(
+        self, other: Factor, context: ContextRegister = None
+    ) -> Iterator[ContextRegister]:
+        if not isinstance(other, self.__class__):
+            raise TypeError
+
+        if self.decided and other.decided:
+            yield from self._implies_if_decided(other, context)
+
+        # A holding being undecided doesn't seem to imply that
+        # any other holding is undecided, except itself and the
+        # negation of itself.
+
+        # It doesn't seem that any holding being undecided implies
+        # that any holding is decided, or vice versa.
+
+        elif not self.decided and not other.decided:
+            yield from chain(
+                self.explain_same_meaning(other, context),
+                self.explain_same_meaning(other.negated(), context),
+            )
+
+    def implies(
+        self, other: Union[Holding, Rule], context: ContextRegister = None
+    ) -> bool:
         r"""
         Test for implication.
 
@@ -217,30 +241,12 @@ class Holding(Factor):
         :returns:
             whether ``self`` implies ``other``
         """
-
+        if other is None:
+            return True
         if isinstance(other, Rule):
-            return self >= Holding(rule=other)
+            return self.implies(Holding(rule=other), context=context)
 
-        if not isinstance(other, self.__class__):
-            raise TypeError(
-                f"'Implies' not supported between instances of "
-                + f"'{self.__class__.__name__}' and '{other.__class__.__name__}'."
-            )
-
-        if self.decided and other.decided:
-            return self._implies_if_decided(other)
-
-        # A holding being undecided doesn't seem to imply that
-        # any other holding is undecided, except itself and the
-        # negation of itself.
-
-        if not self.decided and not other.decided:
-            return self.means(other) or self.means(other.negated())
-
-        # It doesn't seem that any holding being undecided implies
-        # that any holding is decided, or vice versa.
-
-        return False
+        return any(self.explain_implication(other, context))
 
     def __ge__(self, other: Union[Holding, Rule]) -> bool:
         return self.implies(other)
@@ -286,7 +292,19 @@ class Holding(Factor):
 
         return len(self.rule.procedure)
 
-    def means(self, other):
+    def explain_same_meaning(
+        self, other: Factor, context: Optional[ContextRegister] = None
+    ) -> Iterator[ContextRegister]:
+        if (
+            isinstance(other, self.__class__)
+            and self.rule_valid == other.rule_valid
+            and self.decided == other.decided
+        ):
+            yield from self.rule.explain_same_meaning(other.rule, context)
+
+    def means(
+        self, other: Optional[Factor], context: Optional[ContextRegister] = None
+    ) -> bool:
         """
         Test whether ``other`` has the same meaning as ``self``.
 
@@ -294,13 +312,9 @@ class Holding(Factor):
             whether ``other`` is a :class:`Holding` with the
             same meaning as ``self``.
         """
-        if not isinstance(other, self.__class__):
+        if other is None:
             return False
-
-        if not self.rule.means(other.rule):
-            return False
-
-        return self.rule_valid == other.rule_valid and self.decided == other.decided
+        return any(self.explain_same_meaning(other, context))
 
     def negated(self):
         """Get new copy of ``self`` with an opposite value for ``rule_valid``."""
