@@ -661,8 +661,13 @@ class ContextRegister(Dict[Factor, Factor]):
     like :func:`means`, :meth:`Factor.implies`, or :meth:`Factor.consistent_with`\.
     """
 
+    def __repr__(self) -> str:
+        return "ContextRegister({})".format(super().__repr__())
+
     def __str__(self) -> str:
-        return "ContextRegister({})".format(super().__str__())
+        item_names = [f"{str(k)} -> {str(v)}" for k, v in self.items()]
+        items = ", ".join(item_names)
+        return f"ContextRegister({items})"
 
     def replace_keys(self, replacements: ContextRegister) -> ContextRegister:
         """Construct new :class:`ContextRegister` by replacing keys."""
