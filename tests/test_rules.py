@@ -619,7 +619,7 @@ class TestAddition:
         assert "act it is false that <the Pythagorean theorem> was copyrightable" in str(facts_not_copyrightable.outputs[1])
 
 
-    def test_add_inferred_rule(self, make_enactment, make_opinion_with_holding):
+    def test_add_rules_with_duplicate_enactment_text(self, make_enactment, make_opinion_with_holding):
         """
         test implication between
         telephone listings -> not original (feist.holdings[11])
@@ -628,10 +628,9 @@ class TestAddition:
         =
         telephone listings -> not copyrightable
 
-        listings_not_original doesn't have all the Enactments it needs
-        on its own. So the addition expression first puts the added
-        Enactment onto listings_not_original to make a new Rule, and then adds
-        unoriginal_not_copyrightable to the new Rule.
+        listings_not_original now has all the Enactments it needs
+        on its own. The addition expression should not result in
+        duplicated text.
         """
         feist = make_opinion_with_holding["feist_majority"]
         listings_not_original = feist.holdings[11].rule
@@ -640,14 +639,11 @@ class TestAddition:
             listings_not_original + make_enactment["copyright_requires_originality"] + unoriginal_not_copyrightable
         )
         assert len(listings_not_copyrightable.inputs) == 1
-        assert (
-            "act that <Rural's telephone listings> were names, towns, "
-            + "and telephone numbers of telephone subscribers"
-        ) in str(listings_not_copyrightable.inputs[0])
         assert any(
             str(out) == "absence of the Fact that <Rural's telephone listings> were copyrightable"
             for out in listings_not_copyrightable.outputs
         )
+        assert str(listings_not_copyrightable).count("in accordance with this title") == 1
 
     def test_add_some_plus_some_makes_none(self, make_complex_rule):
         """The rules can't be added because they both have universal==False"""

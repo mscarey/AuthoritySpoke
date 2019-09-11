@@ -127,7 +127,8 @@
             "exclusive": true,
             "enactments": ["securing for authors", "right to writings", {
                 "path": "/us/usc/t17/s102/a",
-                "name": "copyright requires originality"
+                "name": "copyright requires originality",
+                "suffix": "fixed in any tangible"
             }],
             "anchors": "|The sine qua non of|copyright"
         },
@@ -245,7 +246,7 @@
                 "truth": false,
                 "anchors": "In other words, did Feist, by taking 1,309 names, towns, and telephone numbers from Rural’s white pages, copy anything that was “original” to Rural? Certainly, the raw data does not satisfy the originality requirement."
             },
-            "enactments": ["securing for authors", "right to writings", "copyright in a compilation", "preexisting material provision"]
+            "enactments": ["securing for authors", "right to writings", "copyright requires originality", "copyright in a compilation", "preexisting material provision"]
         },
         {
             "inputs": [{

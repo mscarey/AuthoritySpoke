@@ -136,10 +136,38 @@ class Holding(Factor):
         """
         return self.rule.generic_factors
 
-    def __add__(self, other: Factor) -> Holding:
-        if isinstance(other, Enactment):
-            return self.evolve({"rule": self.rule + other})
-        raise NotImplementedError
+    def add_rule(self, other: Rule) -> Optional[Rule]:
+        if not self.rule_valid:
+            raise NotImplementedError(
+        "Adding is not implemented for Holdings that assert a Rule is not valid."
+        )
+        if not self.decided:
+            raise NotImplementedError(
+        "Adding is not implemented for Holdings that assert a Rule is not valid."
+        )
+        return self.rule + other
+
+    def add_holding(self, other: Holding) -> Optional[Holding]:
+        if not (self.decided and other.decided):
+            raise NotImplementedError(
+        "Adding is not implemented for Holdings that assert a Rule is not decided."
+        )
+        if not (self.rule_valid and other.rule_valid):
+            raise NotImplementedError(
+        "Adding is not implemented for Holdings that assert a Rule is not valid."
+        )
+        new_rule = self.rule + other.rule
+        if new_rule is None:
+            return None
+        return self.evolve({"rule": self.rule + other.rule})
+
+    def __add__(self, other: Factor) -> Optional[Union[Rule, Holding]]:
+        if isinstance(other, Rule):
+            return self.add_rule(other)
+        elif isinstance(other, Holding):
+            return self.add_holding(other)
+        return self.evolve({"rule": self.rule + other})
+
 
     def explain_contradiction(
         self, other: Factor, context: ContextRegister = None

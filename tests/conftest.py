@@ -569,6 +569,7 @@ def make_selector(make_code) -> Dict[str, TextQuoteSelector]:
         ),
     "copyright_requires_originality": TextQuoteSelector(
         path="/us/usc/t17/s102/a",
+        suffix="fixed in any tangible"
     )}
 
 @pytest.fixture(scope="module")
