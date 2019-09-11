@@ -251,7 +251,9 @@ class Rule(Factor):
         if not isinstance(incoming, Enactment):
             raise TypeError
 
-        return self.evolve({role: list(self.__dict__[role]) + [incoming]})
+        new_enactments = list(self.__dict__[role]) + [incoming]
+        new_enactments = consolidate_enactments(new_enactments)
+        return self.evolve({role: new_enactments})
 
     def add_factor(self, incoming: Factor, role: str = "inputs") -> Rule:
         """
