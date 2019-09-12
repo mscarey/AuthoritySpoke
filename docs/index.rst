@@ -4,7 +4,7 @@
    contain the root `toctree` directive.
 
 =========================================================
-AuthoritySpoke: Making the Law as Simple as Possible
+AuthoritySpoke: Reading Legal Authority for the Last Time
 =========================================================
 
 Release v\. |release|.
@@ -15,6 +15,17 @@ for examples and to try out AuthoritySpoke in a Jupyter Notebook.
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
+
+Guides
+------------
+
+.. toctree::
+    :maxdepth: 2
+
+    guides/introduction.rst
+    guides/create_holding_data.rst
+    guides/example_holdings.rst
+
 
 API Reference
 -------------
@@ -31,6 +42,8 @@ Core
     api/holdings
     api/factors
     api/predicates
+    api/procedures
+    api/rules
     api/legislation
     api/context
     api/analogies

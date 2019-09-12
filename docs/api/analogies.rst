@@ -1,7 +1,7 @@
 ``Analogies``
 ================
 
-.. autoclass:: authorityspoke.analogies.Analogy
+.. autoclass:: authorityspoke.factors.Analogy
     :members:
 
-.. autofunction:: authorityspoke.analogies.all_analogy_matches
+.. autofunction:: authorityspoke.factors.all_analogy_matches

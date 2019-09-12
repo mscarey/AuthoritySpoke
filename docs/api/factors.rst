@@ -9,11 +9,11 @@
 ``Entities``
 ==============
 
-.. inheritance-diagram:: authorityspoke.factors.Entity
+.. inheritance-diagram:: authorityspoke.entities.Entity
     :top-classes: authorityspoke.factors.Factor
     :parts: 1
 
-.. autoclass:: authorityspoke.factors.Entity
+.. autoclass:: authorityspoke.entities.Entity
     :members:
     :special-members:
 
@@ -61,26 +61,3 @@
     :parts: 1
 
 .. autoclass:: authorityspoke.pleadings.Allegation
-
-``Procedures``
-==============
-
-.. inheritance-diagram:: authorityspoke.procedures.Procedure
-    :top-classes: authorityspoke.factors.Factor
-    :parts: 1
-
-.. autoclass:: authorityspoke.procedures.Procedure
-    :members:
-    :special-members:
-    :private-members:
-
-``Rules``
-==============
-
-.. inheritance-diagram:: authorityspoke.rules.Rule
-    :top-classes: authorityspoke.factors.Factor
-    :parts: 1
-
-.. autoclass:: authorityspoke.rules.Rule
-    :members:
-    :special-members:
