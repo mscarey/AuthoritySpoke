@@ -203,6 +203,12 @@ class TestUnion:
         feist = make_opinion_with_holding["feist_majority"]
         assert (feist.holdings[9] | feist.holdings[7]) is None
 
+    def test_union_and_addition_different(self, make_opinion_with_holding):
+        feist = make_opinion_with_holding["feist_majority"]
+        result_of_adding = feist.holdings[11] + feist.holdings[4]
+        result_of_union = feist.holdings[11] | feist.holdings[4]
+        assert not result_of_adding.means(result_of_union)
+
 
 class TestHoldingImports:
     def test_repeating_read_holdings_has_same_result(self, make_analysis):

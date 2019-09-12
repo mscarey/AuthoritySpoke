@@ -139,23 +139,23 @@ class Holding(Factor):
     def add_rule(self, other: Rule) -> Optional[Rule]:
         if not self.rule_valid:
             raise NotImplementedError(
-        "Adding is not implemented for Holdings that assert a Rule is not valid."
-        )
+                "Adding is not implemented for Holdings that assert a Rule is not valid."
+            )
         if not self.decided:
             raise NotImplementedError(
-        "Adding is not implemented for Holdings that assert a Rule is not valid."
-        )
+                "Adding is not implemented for Holdings that assert a Rule is not valid."
+            )
         return self.rule + other
 
     def add_holding(self, other: Holding) -> Optional[Holding]:
         if not (self.decided and other.decided):
             raise NotImplementedError(
-        "Adding is not implemented for Holdings that assert a Rule is not decided."
-        )
+                "Adding is not implemented for Holdings that assert a Rule is not decided."
+            )
         if not (self.rule_valid and other.rule_valid):
             raise NotImplementedError(
-        "Adding is not implemented for Holdings that assert a Rule is not valid."
-        )
+                "Adding is not implemented for Holdings that assert a Rule is not valid."
+            )
         new_rule = self.rule + other.rule
         if new_rule is None:
             return None
@@ -167,7 +167,6 @@ class Holding(Factor):
         elif isinstance(other, Holding):
             return self.add_holding(other)
         return self.evolve({"rule": self.rule + other})
-
 
     def explain_contradiction(
         self, other: Factor, context: ContextRegister = None
@@ -386,17 +385,15 @@ class Holding(Factor):
             # and a Rule with input A absent is also not valid
             # then a version of the Rule with input A
             # omitted is also not valid.
-            raise NotImplementedError
+            raise NotImplementedError(
+                "The union operation is not yet implemented for Holdings "
+                "that assert a Rule is not valid."
+            )
 
         new_rule = self.rule | other.rule
         if not new_rule:
             return None
-        raise NotImplementedError(
-            "Need a method to merge two lists of Opinion text selectors."
-        )
-        return Holding(
-            rule=new_rule, decided=True, rule_valid=True, selectors=new_selector_group
-        )
+        return self.evolve({"rule": new_rule})
 
     def own_attributes(self) -> Dict[str, Any]:
         """
