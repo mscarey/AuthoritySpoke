@@ -296,6 +296,7 @@ class Rule(Factor):
     def explain_contradiction(
         self, other, context: Optional[ContextRegister] = None
     ) -> Iterator[ContextRegister]:
+        """Find context matches that would result in a contradiction with other."""
         if context is None:
             context = ContextRegister()
 
@@ -422,6 +423,7 @@ class Rule(Factor):
     def explain_same_meaning(
         self, other: Optional[Factor], context: Optional[ContextRegister] = None
     ) -> Iterator[ContextRegister]:
+        """Find context matches that would result in self and other meaning the same."""
         if (
             isinstance(other, Rule)
             and self.has_all_same_enactments(other)

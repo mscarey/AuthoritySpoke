@@ -119,3 +119,19 @@ class TestIntroduction:
             "act that <Rural's telephone listings> were names, towns, "
             + "and telephone numbers of telephone subscribers"
         ) in str(listings_not_copyrightable.inputs[0])
+
+    def test_union_holdings_from_different_cases(self, make_opinion_with_holding):
+        oracle = make_opinion_with_holding["oracle_majority"]
+        feist = make_opinion_with_holding["feist_majority"]
+        new = oracle.holdings[1] | feist.holdings[2]
+        assert "it is false that <the Java API> was copyrightable" in str(new)
+        assert "<the Java API> was an original work" in str(new)
+
+
+class TestCreateHoldingData:
+    def test_holding_has_name_param(self, make_opinion_with_holding):
+        """
+        If this needs to change, be sure to update the notebook too.
+        """
+        oracle = make_opinion_with_holding["oracle_majority"]
+        assert oracle.holdings[0].enactments[0].name == "copyright protection provision"

@@ -150,7 +150,7 @@ class Opinion:
         text_links: Optional[TextLinkDict] = None,
         context: Optional[Sequence[Factor]] = None,
     ) -> None:
-
+        r"""Record that this Opinion endorses specified :class:`Holding`\s."""
         if isinstance(holding, Rule):
             logger.warning(
                 "posit_holding was called with a Rule "

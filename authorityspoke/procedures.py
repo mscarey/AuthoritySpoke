@@ -410,9 +410,7 @@ class Procedure(Factor):
     def explain_contradiction_some_to_all(
         self, other: Procedure, context: Optional[ContextRegister] = None
     ) -> Iterator[ContextRegister]:
-        """
-        Generate any explanations of why ``self`` applying in some cases implies ``other`` cannot apply in all.
-        """
+        """Explain why ``other`` can't apply in all cases if ``self`` applies in some."""
         if context is None:
             context = ContextRegister()
         self_despite_or_input = (*self.despite, *self.inputs)

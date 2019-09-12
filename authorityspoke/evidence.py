@@ -1,3 +1,4 @@
+r""":class:`.Factor`\s used to support :class:`.Fact` findings."""
 from dataclasses import dataclass
 
 import textwrap

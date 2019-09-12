@@ -292,9 +292,7 @@ class Predicate:
         return self.implies(other)
 
     def excludes_other_quantity(self, other: Predicate) -> bool:
-        """
-        Test if quantity ranges in self and other are non-overlapping.
-        """
+        """Test if quantity ranges in self and other are non-overlapping."""
         if (
             not self.quantity
             or not other.quantity
@@ -313,9 +311,7 @@ class Predicate:
         )
 
     def includes_other_quantity(self, other: Predicate) -> bool:
-        """
-        Test if the range of quantities mentioned in self is a subset of other's.
-        """
+        """Test if the range of quantities mentioned in self is a subset of other's."""
         if not self.quantity or not other.quantity:
             return bool(self.quantity)
 

@@ -356,6 +356,7 @@ class Factor(ABC):
     def explain_same_meaning(
         self, other: Factor, context: Optional[ContextRegister] = None
     ) -> Iterator[ContextRegister]:
+        """Generate ways to match contexts of self and other so they mean the same."""
         if (
             self.__class__ == other.__class__
             and self.absent == other.absent
@@ -585,10 +586,7 @@ class Factor(ABC):
 
     @property
     def short_string(self):
-        """
-        If a class has no short_string method, default to the regular
-        string method.
-        """
+        """Use the regular string method unless otherwise specified."""
         return str(self)
 
     def update_context_register(
@@ -677,6 +675,7 @@ class ContextRegister(Dict[Factor, Factor]):
 
     @property
     def reversed(self):
+        """Swap keys for values and vice versa."""
         return ContextRegister({v: k for k, v in self.items()})
 
     def merged_with(

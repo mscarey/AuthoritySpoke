@@ -1,4 +1,6 @@
-from dataclasses import dataclass, field
+"""Create models of assertions accepted as factual by courts."""
+
+from dataclasses import dataclass
 import operator
 import textwrap
 
@@ -109,6 +111,7 @@ class Fact(Factor):
 
     @property
     def short_string(self):
+        """Create one-line string representation for inclusion in other Facts."""
         predicate = str(self.predicate.content_with_entities(self.context_factors))
         standard = (
             f"by the standard {self.standard_of_proof}, "

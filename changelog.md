@@ -14,7 +14,7 @@ dev
 - Use addition operator to add Factors as Rule inputs
 - Use addition operator to add Enactments to Rules
 - Create function to consolidate list of Enactments
-- Add Union operator for Rules
+- Add Union operator for Rules and Holdings
 - Move functions for loading objects from JSON and XML to new I/O modules
 - Add "explain" functions to show how generic Factors match up when a contradiction or implication exists
 - Add whitespace to `__str__` methods for greater clarity

@@ -44,12 +44,14 @@ class TestImplication:
             >= make_holding["h2_undecided"]
         )
 
-    def test_no_undecided_holding_implication_with_MUST(self, make_holding):
+    def test_no_undecided_holding_implication_by_MUST(self, make_holding):
 
         """If it's undecided whether courts MUST follow the procedure in h2,
         it still could be decided that they MAY do so"""
 
         assert not make_holding["h2_MUST_undecided"] >= make_holding["h2_undecided"]
+
+    def test_no_undecided_holding_implication_of_MUST(self, make_holding):
 
         """If it's undecided whether courts MAY follow the procedure in h2,
         the rule that they MUST do so still could have been decided to be not valid."""

@@ -1,3 +1,4 @@
+"""Functions for saving objects to file after they have been JSON serialized."""
 import json
 import pathlib
 
@@ -12,7 +13,7 @@ def case_to_file(
     directory: Optional[pathlib.Path] = None,
     filepath: Optional[pathlib.Path] = None,
 ) -> None:
-    """
+    r"""
     Save one case from an API response as a JSON file.
 
     :param results:
@@ -26,7 +27,7 @@ def case_to_file(
     :param directory:
         A :py:class:`~pathlib.Path` object specifying the directory where the
         downloaded opinion should be saved. If ``None`` is given, the current
-        default is ``example_data/cases``.
+        default is ``example_data/cases``\.
 
     :param filepath:
         Complete path to the location where the JSON file should be saved,

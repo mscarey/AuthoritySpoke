@@ -5,12 +5,10 @@ from authorityspoke.enactments import Code, Enactment
 from authorityspoke.entities import Entity
 from authorityspoke.factors import ContextRegister
 from authorityspoke.facts import Fact
-from authorityspoke.holdings import Holding
 from authorityspoke.io.loaders import load_holdings
-from authorityspoke.predicates import Predicate, ureg, Q_
+from authorityspoke.predicates import Predicate
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
-from authorityspoke.opinions import Opinion
 
 
 
