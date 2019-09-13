@@ -1,15 +1,15 @@
 Changelog
 =========
 
-dev
----
+0.2.0 (2019-09-24)
+------------------
 
 - Merge ProceduralRule class with Rule
 - Split aspects of Rule into a separate Holding class
 - Use Selectors to anchor Holdings to Opinion text
 - Ignore was/were differences in Predicate content text
 - Let input JSON label a Rule as the "exclusive" way to get output
-- Create addition operator for Factors and Rules
+- Create addition operator for Factors, Rules, and Holdings
 - Let Rule init method handle the necessary Procedure init method
 - Use addition operator to add Factors as Rule inputs
 - Use addition operator to add Enactments to Rules
