@@ -7,4 +7,4 @@ from .jurisdictions import Jurisdiction, Regime
 from .opinions import Opinion
 from .rules import Rule
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
