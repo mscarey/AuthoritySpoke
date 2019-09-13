@@ -8,11 +8,11 @@ AuthoritySpoke is a Python library for managing structured data about legal rule
 
 The best way to familiarize yourself with AuthoritySpoke is through the [Introduction to AuthoritySpoke Jupyter notebook](notebooks/introduction.ipynb).
 
-Use this button to interact with the notebook online through Binder.
+Use this button to interact with the notebook online through Binder. If you use Binder, you'll be shown the directory structure of this repo. Navigate to the `notebooks` folder to find the tutorials.
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/mscarey/AuthoritySpoke/master)
 
-You can find AuthoritySpoke's [API documentation and more at ReadTheDocs](https://authorityspoke.readthedocs.io/en/latest/).
+You can find [static versions of the tutorial notebooks, the API documentation, and more](https://authorityspoke.readthedocs.io/en/latest/) at ReadTheDocs.
 
 ## Installing AuthoritySpoke
 
