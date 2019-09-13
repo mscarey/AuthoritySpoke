@@ -895,7 +895,7 @@ value that can come at the end of the string, which isn't demonstrated
 in this tutorial.)
 
 Adding Holdings
--------------------------
+------------------
 
 To try out the addition feature, let's load another case from the
 ``example_data`` folder.
@@ -909,10 +909,11 @@ To try out the addition feature, let's load another case from the
 `*Feist Publications, Inc. v. Rural Telephone Service
 Co.* <https://en.wikipedia.org/wiki/Feist_Publications,_Inc.,_v._Rural_Telephone_Service_Co.>`__
 was a case that held that the listings in a telephone directory did not
-qualify as "an original work" and thus were not eligible for protection
-under the Copyright Act. This is a two-step analysis.
+qualify as "an original work" and that only original works are eligible
+for protection under the Copyright Act. This is a two-step analysis.
 
-The first step results in "the Fact it is false that Rural's telephone listings were an original work".
+The first step results in the Fact it is false that a generic Entity was
+"an original work":
 
 .. code-block:: python
 
@@ -936,7 +937,8 @@ The first step results in "the Fact it is false that Rural's telephone listings 
 
 
 And the second step relies on the result of the first step to reach the
-further result of "absence of the Fact that was copyrightable".
+further result of "absence of the Fact that" a generic Entity was
+"copyrightable".
 
 .. code-block:: python
 
@@ -988,7 +990,10 @@ Holding that captures the whole process.
 The difference between ``feist.holdings[11]`` and the newly-created
 Holding ``listings_not_copyrightable`` is that
 ``listings_not_copyrightable`` has two Factors under its "RESULT", not
-just one.
+just one. Notice that it doesn't matter that the two original Holdings
+reference different generic Entities ("Rural's telephone directory"
+versus "Rural's telephone listings"). Because they're generic, they're
+interchangeable for this purpose.
 
 You might recall that oracle.holdings[0] also was also about the
 relationship between originality and copyrightability. Let's see what
