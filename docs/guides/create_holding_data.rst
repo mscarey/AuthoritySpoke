@@ -7,7 +7,7 @@ legal Holdings in AuthoritySpoke.
 To get ready, we need to repeat some setup steps we already saw in the
 ``introduction`` notebook. First, import the package.
 
-.. code:: ipython3
+.. code-block:: python
 
     import authorityspoke
     from authorityspoke.io.loaders import load_opinion
@@ -17,14 +17,14 @@ of a legal Code.
 
 So we need to load some Opinions.
 
-.. code:: ipython3
+.. code-block:: python
 
     oracle = load_opinion("oracle_h.json")
     lotus = load_opinion("lotus_h.json")
 
 And also load some legal Codes.
 
-.. code:: ipython3
+.. code-block:: python
 
     from authorityspoke import Regime
 
@@ -45,7 +45,7 @@ loading that information into AuthoritySpoke. In version 0.2,
 AuthoritySpoke's way of creating Holding objects is to load them from
 JSON files that need to be created using other tools.
 
-.. code:: ipython3
+.. code-block:: python
 
     from authorityspoke.io.loaders import load_holdings
 
@@ -151,7 +151,7 @@ the Holdings to the Opinions using the ``.posit`` method. As we look at
 the parts of the JSON file, the code cells will show how fields from the
 JSON affect the structure of the Holding object.
 
-.. code:: ipython3
+.. code-block:: python
 
     oracle.posit(oracle_holdings)
     lotus.posit(lotus_holdings)
@@ -185,7 +185,7 @@ they're present. There can be more than one Factor in the "inputs",
 "outputs" or "despite" categories, and if so they would be listed
 together in square brackets in the JSON.
 
-.. code:: ipython3
+.. code-block:: python
 
     print(oracle.holdings[0].inputs[0])
 
@@ -201,7 +201,7 @@ as False. "universal" means that the Rule applies whenever its inputs
 are present. "mandatory" means that when Rule applies, the court has no
 discretion and must accept the outputs.
 
-.. code:: ipython3
+.. code-block:: python
 
     print(oracle.holdings[0].mandatory)
 
@@ -234,7 +234,7 @@ could have used the field:
 
     "text": "in accordance with this title, in|original works of authorship|fixed"
 
-.. code:: ipython3
+.. code-block:: python
 
     print(oracle.holdings[0].enactments[0])
 
@@ -247,7 +247,7 @@ could have used the field:
 The text selector in the example had just an ``exact`` field, with no
 ``prefix`` or ``suffix``.
 
-.. code:: ipython3
+.. code-block:: python
 
     print(oracle.holdings[0].enactments[0].selector.prefix)
 
@@ -260,7 +260,7 @@ The text selector in the example had just an ``exact`` field, with no
 The "name" field is simply a nickname that can be used to refer to the
 passage again later in the same file.
 
-.. code:: ipython3
+.. code-block:: python
 
     print(oracle.holdings[0].enactments[0].name)
 

@@ -24,7 +24,7 @@ Let's start by importing the package and its Opinion class.
 (When I capitalize a seemingly random word, it's usually the name of an
 AuthoritySpoke class.)
 
-.. code:: ipython3
+.. code-block:: python
 
     import authorityspoke
 
@@ -60,7 +60,7 @@ could either replace ``os.environ['CAP_API_KEY']`` with a string
 containing your own API key, or skip the use of the API key as described
 below.
 
-.. code:: ipython3
+.. code-block:: python
 
     import os
 
@@ -81,7 +81,7 @@ was a "method of operation" under the Copyright Act. As we'll see, the
 Citations: \* *Oracle America v. Google*: 750 F.3d 1339 \* *Lotus
 Development Corporation v. Borland International*: 49 F.3d 807
 
-.. code:: ipython3
+.. code-block:: python
 
     from authorityspoke.io.downloads import download_case
 
@@ -93,7 +93,7 @@ saved to the "example\_data/opinions" folder under the filename
 this file came from the Harvard CAP API.) Let's look at the API
 response.
 
-.. code:: ipython3
+.. code-block:: python
 
     oracle_download
 
@@ -136,7 +136,7 @@ whether there are any non-majority opinions in the case, and the names
 of the opinion authors. So let's request the *Oracle* case with
 ``full_case=True``.
 
-.. code:: ipython3
+.. code-block:: python
 
     oracle_download = download_case(
         cite="750 F.3d 1339",
@@ -146,7 +146,7 @@ of the opinion authors. So let's request the *Oracle* case with
 
 And then do the same for the *Lotus* case.
 
-.. code:: ipython3
+.. code-block:: python
 
     lotus_download = download_case(
         cite="49 F.3d 807",
@@ -156,7 +156,7 @@ And then do the same for the *Lotus* case.
 
 Now let's convert the *Oracle* API response to an AuthoritySpoke object.
 
-.. code:: ipython3
+.. code-block:: python
 
     from authorityspoke.io.readers import read_case
 
@@ -164,7 +164,7 @@ Now let's convert the *Oracle* API response to an AuthoritySpoke object.
 
 And take a look at the object we made.
 
-.. code:: ipython3
+.. code-block:: python
 
     oracle
 
@@ -181,7 +181,7 @@ The *Lotus* case has a concurring opinion as well as a majority opinion.
 By default, the ``read_case`` command will just create just one Opinion
 object, from the majority opinion.
 
-.. code:: ipython3
+.. code-block:: python
 
     lotus = read_case(lotus_download)
     lotus
@@ -203,7 +203,7 @@ following commands to create the Opinion objects from the files in the
 If you already did the steps above, you can skip the next cell and go to
 section 3.
 
-.. code:: ipython3
+.. code-block:: python
 
     # If you already downloaded Opinions from the API,
     # running this cell will overwrite them with example data.
@@ -232,7 +232,7 @@ way to organize the Code objects is to create a Regime object
 representing the country and link each of the Codes to the Regime
 object.
 
-.. code:: ipython3
+.. code-block:: python
 
     from authorityspoke import Regime
 
@@ -277,7 +277,7 @@ already been created. AuthoritySpoke should find them when we call the
 AuthoritySpoke can use it to find and link the statutes or other
 Enactments cited in the Holding.
 
-.. code:: ipython3
+.. code-block:: python
 
     from authorityspoke.io.loaders import load_holdings
 
@@ -286,7 +286,7 @@ Enactments cited in the Holding.
 
 The following commands will assign the Holdings to each Opinion.
 
-.. code:: ipython3
+.. code-block:: python
 
     oracle.posit(oracle_holdings)
     lotus.posit(lotus_holdings)
@@ -307,7 +307,7 @@ holdings. (You can verify this by checking how many times the string
 Let's make sure that the .posit() method linked all of those holdings to
 our ``oracle`` Opinion object.
 
-.. code:: ipython3
+.. code-block:: python
 
     len(oracle.holdings)
 
@@ -323,7 +323,7 @@ our ``oracle`` Opinion object.
 Now let's see the string representation of the AuthoritySpoke Holding
 object we created from the structured JSON we saw above.
 
-.. code:: ipython3
+.. code-block:: python
 
     print(oracle.holdings[0])
 
@@ -362,7 +362,7 @@ also not going to accept the "RESULT" that
 We can also access just the inputs of a Holding, just the Enactments,
 etc.
 
-.. code:: ipython3
+.. code-block:: python
 
     oracle.holdings[0].inputs
 
@@ -375,7 +375,7 @@ etc.
 
 
 
-.. code:: ipython3
+.. code-block:: python
 
     oracle.holdings[0].enactments
 
@@ -397,7 +397,7 @@ the JSON. More specifically, the angle brackets are there because Entity
 objects are considered ``generic`` by default, and we didn't specify
 otherwise.
 
-.. code:: ipython3
+.. code-block:: python
 
     oracle.holdings[0].generic_factors
 
@@ -418,7 +418,7 @@ different specific contexts.
 
 Let's illustrate this idea with the first holding from the Lotus case.
 
-.. code:: ipython3
+.. code-block:: python
 
     print(lotus.holdings[0])
 
@@ -442,7 +442,7 @@ computer programs? First we could look at the ``"generic"`` Factors of
 the Rule, which were marked off in angle brackets in the string
 representation of the Rule.
 
-.. code:: ipython3
+.. code-block:: python
 
     lotus.holdings[0].generic_factors
 
@@ -470,7 +470,7 @@ applied in the context of the *Castle Rock Entertainment* case, under 17
 USC 102 had applied to that dispute. We can check that by replacing the
 generic factors from the *Lotus* Rule.
 
-.. code:: ipython3
+.. code-block:: python
 
     from authorityspoke import Entity
 
@@ -486,7 +486,7 @@ Holding object, which we've assigned to the name ``seinfeld_holding``,
 but the Holding that we used as a basis for the new object also still
 exists, and it's unchanged.
 
-.. code:: ipython3
+.. code-block:: python
 
     print(seinfeld_holding)
 
@@ -510,7 +510,7 @@ the same meaning. In other words, they both endorse exactly the same
 legal Rule. If Holding A ``means`` Holding B, then Holding A also
 necessarily ``implies`` Holding B.
 
-.. code:: ipython3
+.. code-block:: python
 
     lotus.holdings[0] == seinfeld_holding
 
@@ -523,7 +523,7 @@ necessarily ``implies`` Holding B.
 
 
 
-.. code:: ipython3
+.. code-block:: python
 
     lotus.holdings[0].means(seinfeld_holding)
 
@@ -545,7 +545,7 @@ meaning entirely includes the meaning of the second Holding. To
 illustrate this idea, let's look at the Enactment that needs to be
 present to trigger the Holding at ``oracle.holdings[0]``.
 
-.. code:: ipython3
+.. code-block:: python
 
     copyright_provision = oracle.holdings[0].enactments[0]
     copyright_provision
@@ -564,7 +564,7 @@ AuthoritySpoke class representing a code of laws. Specifically, it
 refers to `Title 17 of the United States
 Code <https://www.copyright.gov/title17/>`__.
 
-.. code:: ipython3
+.. code-block:: python
 
     usc = copyright_provision.code
     print(usc)
@@ -578,7 +578,7 @@ Code <https://www.copyright.gov/title17/>`__.
 Next, let's create a new Enactment object representing a shorter passage
 of text from the same Code.
 
-.. code:: ipython3
+.. code-block:: python
 
     from authorityspoke import Enactment
     from authorityspoke.selectors import TextQuoteSelector
@@ -605,13 +605,13 @@ replace, and then specify what we want to replace those attributes' old
 values with. This returns a new Holding object and doesn't change the
 existing Holding.
 
-.. code:: ipython3
+.. code-block:: python
 
     rule_with_shorter_enactment = oracle.holdings[0].evolve(
                 {"enactments": works_of_authorship_clause}
             )
 
-.. code:: ipython3
+.. code-block:: python
 
     print(rule_with_shorter_enactment)
 
@@ -633,7 +633,7 @@ Now let's try comparing this new Rule with the real Rule from the
 comparing AuthoritySpoke objects, the greater than sign ``>`` means
 "implies, but is not equal to".
 
-.. code:: ipython3
+.. code-block:: python
 
     rule_with_shorter_enactment > oracle.holdings[0]
 
@@ -652,7 +652,7 @@ also imply one another, so that would mean ``>=`` is the symbol that
 really means "implies". ``<=`` can also be used, and it means "is
 implied by or is equal to".
 
-.. code:: ipython3
+.. code-block:: python
 
     rule_with_shorter_enactment <= oracle.holdings[0]
 
@@ -700,7 +700,7 @@ operation", the fact that a Lotus menu command hierarchy was a "method
 of operation" meant that it was also uncopyrightable, despite a couple
 of Facts that might tempt some courts to rule the other way.
 
-.. code:: ipython3
+.. code-block:: python
 
     print(lotus.holdings[8])
 
@@ -725,7 +725,7 @@ of Facts that might tempt some courts to rule the other way.
 but Oracle was the winner in that decision. So we might wonder whether
 the *Oracle* Opinion contradicts the *Lotus* Opinion. Let's check.
 
-.. code:: ipython3
+.. code-block:: python
 
     oracle.contradicts(lotus)
 
@@ -742,7 +742,7 @@ Good to know! But maybe we want more detail than that. Let's check each
 Holding posited by the *Oracle* case to see whether it contradicts
 lotus.holdings[8].
 
-.. code:: ipython3
+.. code-block:: python
 
     for index, oracle_holding in enumerate(oracle.holdings):
         print(f'{index:02} {oracle_holding.contradicts(lotus.holdings[8])}')
@@ -776,7 +776,7 @@ It looks like the Holding at index 10 of oracle.holdings contradicts the
 *Lotus* court's Holding. Let's read it and see if we can spot the
 contradiction.
 
-.. code:: ipython3
+.. code-block:: python
 
     print(oracle.holdings[10])
 
@@ -817,7 +817,7 @@ right. The ``explain_contradiction`` returns a generator object, so you
 can use the ``next()`` command on it to get explanations one at a time.
 For this example, I'll just convert it to a list.
 
-.. code:: ipython3
+.. code-block:: python
 
     explanations = lotus.holdings[8].explain_contradiction(oracle.holdings[10])
     explanations = list(explanations)
@@ -836,7 +836,7 @@ AuthoritySpoke could have given would have been that 'the Lotus menu
 command hierarchy' is analagous to 'the Java language'. Let's see if the
 other possible ``ContextRegister`` also appears in ``explanations``.
 
-.. code:: ipython3
+.. code-block:: python
 
     len(explanations)
 
@@ -900,7 +900,7 @@ Adding Holdings
 To try out the addition feature, let's load another case from the
 ``example_data`` folder.
 
-.. code:: ipython3
+.. code-block:: python
 
     feist = load_opinion("feist_h.json")
     feist_holdings = load_holdings("holding_feist.json", regime=usa)
@@ -915,7 +915,7 @@ under the Copyright Act. This is a two-step analysis.
 The first step results in "the Fact it is false that were an original
 work":
 
-.. code:: ipython3
+.. code-block:: python
 
     print(feist.holdings[11])
 
@@ -939,7 +939,7 @@ work":
 And the second step relies on the result of the first step to reach the
 further result of "absence of the Fact that was copyrightable".
 
-.. code:: ipython3
+.. code-block:: python
 
     print(feist.holdings[4])
 
@@ -963,7 +963,7 @@ applied, the second Holding (feist.holdings[4]) can be applied as well.
 That means the two Holdings can be added together to make a single
 Holding that captures the whole process.
 
-.. code:: ipython3
+.. code-block:: python
 
     listings_not_copyrightable = feist.holdings[11] + feist.holdings[4]
     print(listings_not_copyrightable)
@@ -995,7 +995,7 @@ You might recall that oracle.holdings[0] also was also about the
 relationship between originality and copyrightability. Let's see what
 happens when we add oracle.holdings[0] to feist.holdings[11].
 
-.. code:: ipython3
+.. code-block:: python
 
     print(feist.holdings[11] + oracle.holdings[0])
 
@@ -1008,7 +1008,7 @@ happens when we add oracle.holdings[0] to feist.holdings[11].
 Can you guess why it's not possible to add these two Holdings together?
 Here's a hint:
 
-.. code:: ipython3
+.. code-block:: python
 
     feist.holdings[11].universal
 
@@ -1021,7 +1021,7 @@ Here's a hint:
 
 
 
-.. code:: ipython3
+.. code-block:: python
 
     oracle.holdings[0].universal
 
@@ -1034,7 +1034,7 @@ Here's a hint:
 
 
 
-.. code:: ipython3
+.. code-block:: python
 
     feist.holdings[4].universal
 
@@ -1067,7 +1067,7 @@ Set Operations with Holdings
 In AuthoritySpoke, the union operation is different from the addition
 operation, and it usually gives different results.
 
-.. code:: ipython3
+.. code-block:: python
 
     result_of_adding = feist.holdings[11] + feist.holdings[4]
     result_of_union = feist.holdings[11] | feist.holdings[4]
@@ -1091,7 +1091,7 @@ For context, let's review how these operators apply to ordinary Python
 sets. The union operator combines two sets by returning a new set with
 all of the elements of either of the original sets.
 
-.. code:: ipython3
+.. code-block:: python
 
     {3, 4} | {1, 4, 5}
 
@@ -1107,7 +1107,7 @@ all of the elements of either of the original sets.
 The intersection operator returns a new set with only the elements that
 were in both original sets.
 
-.. code:: ipython3
+.. code-block:: python
 
     {3, 4} & {1, 4, 5}
 
@@ -1133,7 +1133,7 @@ applies don't overlap with the "SOME" cases where the other applies.
 In this example, we'll look at a holding from *Oracle*, then a holding
 from *Feist*, and then the union of both of them.
 
-.. code:: ipython3
+.. code-block:: python
 
     print(oracle.holdings[1])
 
@@ -1151,7 +1151,7 @@ from *Feist*, and then the union of both of them.
           "Copyright protection subsists, in accordance with this title, in original works of authorship fixed in any tangible medium of expression, now known or later developed, from which they can be perceived, reproduced, or otherwise communicated, either directly or with the aid of a machine or device." (Title 17, /us/usc/t17/s102/a)
 
 
-.. code:: ipython3
+.. code-block:: python
 
     print(feist.holdings[2])
 
@@ -1169,7 +1169,7 @@ from *Feist*, and then the union of both of them.
           "the exclusive Right to their respective Writings" (Constitution of the United States, /us/const/article-I/8/8)
 
 
-.. code:: ipython3
+.. code-block:: python
 
     print(oracle.holdings[1] | feist.holdings[2])
 

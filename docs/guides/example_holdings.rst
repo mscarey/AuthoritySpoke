@@ -22,7 +22,7 @@ so it will contain some Optical Character Recognition errors.
     ownership of a valid copyright, and (2) copying of constituent
     elements of the work that are original."
 
-.. code:: ipython3
+.. code-block:: python
 
     for h in lotus.holdings[:3]:
         print(str(h) + "\n\n")
@@ -68,7 +68,7 @@ so it will contain some Optical Character Recognition errors.
     burden to the defendant to demonstrate why the copyright is not
     valid.
 
-.. code:: ipython3
+.. code-block:: python
 
     print(lotus.holdings[4])
 
@@ -96,7 +96,7 @@ so it will contain some Optical Character Recognition errors.
     he or she may either present direct evidence of factual copying
     or...
 
-.. code:: ipython3
+.. code-block:: python
 
     print(lotus.holdings[5])
 
@@ -124,7 +124,7 @@ so it will contain some Optical Character Recognition errors.
     copyrighted works are so similar that the court may infer that there
     was factual copying (i.e., probative similarity).
 
-.. code:: ipython3
+.. code-block:: python
 
     print(lotus.holdings[6])
 
@@ -154,7 +154,7 @@ so it will contain some Optical Character Recognition errors.
     was so extensive that it rendered the offending and copyrighted
     works substantially similar.
 
-.. code:: ipython3
+.. code-block:: python
 
     print(lotus.holdings[7])
 
@@ -185,7 +185,7 @@ so it will contain some Optical Character Recognition errors.
     categories foreclosed from copyright protection by § 102(b), such as
     being a “method of operation.”
 
-.. code:: ipython3
+.. code-block:: python
 
     print(lotus.holdings[8])
 
@@ -215,7 +215,7 @@ so it will contain some Optical Character Recognition errors.
     command hierarchy, users would not be able to access and control, or
     indeed make use of, Lotus 1-2-3’s functional capabilities.
 
-.. code:: ipython3
+.. code-block:: python
 
     print(lotus.holdings[9])
 
@@ -242,7 +242,7 @@ so it will contain some Optical Character Recognition errors.
     abstractions; rather, they are the means by which a user operates
     something.
 
-.. code:: ipython3
+.. code-block:: python
 
     print(lotus.holdings[10])
 
@@ -269,7 +269,7 @@ so it will contain some Optical Character Recognition errors.
     hierarchy. Thus the Lotus 1-2-3 code is not a uncopyrightable
     “method of operation.”
 
-.. code:: ipython3
+.. code-block:: python
 
     print(lotus.holdings[11])
 
@@ -296,7 +296,7 @@ so it will contain some Optical Character Recognition errors.
     By statute, a work must be “original” to qualify for copyright
     protection. 17 U.S.C. § 102(a).
 
-.. code:: ipython3
+.. code-block:: python
 
     print(oracle.holdings[0])
 
@@ -318,7 +318,7 @@ so it will contain some Optical Character Recognition errors.
     other works), and that it possesses at least some minimal degree of
     creativity.
 
-.. code:: ipython3
+.. code-block:: python
 
     print(oracle.holdings[1])
 
@@ -342,7 +342,7 @@ so it will contain some Optical Character Recognition errors.
     copyrightability, concepts of merger and scenes a faire are
     affirmative defenses to claims of infringement.
 
-.. code:: ipython3
+.. code-block:: python
 
     print(oracle.holdings[2])
 
@@ -369,7 +369,7 @@ so it will contain some Optical Character Recognition errors.
     The literal elements of a computer program are the source code and
     object code.
 
-.. code:: ipython3
+.. code-block:: python
 
     print(oracle.holdings[3])
     print("\n")
@@ -406,7 +406,7 @@ so it will contain some Optical Character Recognition errors.
     literal and non-literal elements of a computer program. See Altai
     982 F.2d at 702.
 
-.. code:: ipython3
+.. code-block:: python
 
     print(oracle.holdings[5])
 
@@ -430,7 +430,7 @@ so it will contain some Optical Character Recognition errors.
     other things, the program’s sequence, structure, and organization,
     as well as the program’s user interface.
 
-.. code:: ipython3
+.. code-block:: python
 
     print(oracle.holdings[6])
     print("\n")
@@ -470,7 +470,7 @@ so it will contain some Optical Character Recognition errors.
     the component in question qualifies as an expression of an idea, or
     an idea itself.”
 
-.. code:: ipython3
+.. code-block:: python
 
     print(oracle.holdings[8])
     print("\n")
@@ -527,7 +527,7 @@ so it will contain some Optical Character Recognition errors.
     operation” reasoning in Lotus, and we conclude that it is
     inconsistent with binding precedent.
 
-.. code:: ipython3
+.. code-block:: python
 
     print(oracle.holdings[10])
 
@@ -564,7 +564,7 @@ so it will contain some Optical Character Recognition errors.
     considered questions of copyrightability, concepts of merger and
     scenes a faire are affirmative defenses to claims of infringement.
 
-.. code:: ipython3
+.. code-block:: python
 
     print(oracle.holdings[11])
 
@@ -592,7 +592,7 @@ so it will contain some Optical Character Recognition errors.
     copyrighted work from infringement if the idea contained therein can
     be expressed in only one way.
 
-.. code:: ipython3
+.. code-block:: python
 
     print(oracle.holdings[12])
     print("\n")
@@ -653,7 +653,7 @@ because AuthoritySpoke doesn't yet include "Argument" objects.
     Oracle was selecting among preordained names and phrases to create
     its packages.
 
-.. code:: ipython3
+.. code-block:: python
 
     print(oracle.holdings[14])
 
@@ -677,7 +677,7 @@ because AuthoritySpoke doesn't yet include "Argument" objects.
     the work at issue contains short phrases — as literary works often
     do — but, rather, whether those phrases are creative.
 
-.. code:: ipython3
+.. code-block:: python
 
     print(oracle.holdings[15])
 
@@ -708,7 +708,7 @@ because AuthoritySpoke doesn't yet include "Argument" objects.
     focus of the scenes a faire doctrine is on the circumstances
     presented to the creator, not the copier.
 
-.. code:: ipython3
+.. code-block:: python
 
     print(oracle.holdings[16])
 
@@ -734,7 +734,7 @@ because AuthoritySpoke doesn't yet include "Argument" objects.
     of a computer program is eligible for copyright protection where it
     qualifies as an expression of an idea, rather than the idea itself.
 
-.. code:: ipython3
+.. code-block:: python
 
     print(oracle.holdings[17])
 
@@ -762,7 +762,7 @@ because AuthoritySpoke doesn't yet include "Argument" objects.
     seems to suggest, automatically deny copyright protection to
     elements of a computer program that are functional.
 
-.. code:: ipython3
+.. code-block:: python
 
     print(oracle.holdings[18])
 
@@ -791,7 +791,7 @@ because AuthoritySpoke doesn't yet include "Argument" objects.
     invitation to declare that protection of software programs should be
     the domain of patent law, and only patent law.
 
-.. code:: ipython3
+.. code-block:: python
 
     print(oracle.holdings[19])
 
