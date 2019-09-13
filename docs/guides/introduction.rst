@@ -912,8 +912,7 @@ was a case that held that the listings in a telephone directory did not
 qualify as "an original work" and thus were not eligible for protection
 under the Copyright Act. This is a two-step analysis.
 
-The first step results in "the Fact it is false that were an original
-work":
+The first step results in "the Fact it is false that Rural's telephone listings were an original work".
 
 .. code-block:: python
 
