@@ -4,13 +4,13 @@ import functools
 
 from typing import Callable, Dict, Iterable, List, Optional, Tuple, Union
 
-from marshmallow import Schema, fields, pre_load, ValidationError
-
 from authorityspoke.enactments import Code, Enactment
 from authorityspoke.factors import Factor
 from authorityspoke.jurisdictions import Regime
 from authorityspoke.factors import TextLinkDict
 from authorityspoke.selectors import TextQuoteSelector
+
+from authorityspoke.io.schemas import SelectorSchema
 
 
 def _replace_new_factor_from_mentioned(
@@ -103,51 +103,6 @@ def log_mentioned_context(func: Callable):
         return (new_factor, mentioned) if report_mentioned else new_factor
 
     return wrapper
-
-
-class SelectorSchema(Schema):
-    prefix = fields.Str()
-    exact = fields.Str()
-    suffix = fields.Str()
-    path = fields.Url(relative=True)
-
-    def split_text(self, text: str) -> Tuple[str, ...]:
-        """
-        Break up shorthand text selector format into three fields.
-
-        Tries to break up the string into :attr:`~TextQuoteSelector.prefix`,
-        :attr:`~TextQuoteSelector.exact`,
-        and :attr:`~TextQuoteSelector.suffix`, by splitting on the pipe characters.
-
-        :param text: a string or dict representing a text passage
-
-        :returns: a tuple of the three values
-        """
-
-        if text.count("|") == 0:
-            return ("", text, "")
-        elif text.count("|") == 2:
-            return tuple([*text.split("|")])
-        raise ValidationError(
-            "If the 'text' field is included, it must be either a dict"
-            + "with one or more of 'prefix', 'exact', and 'suffix' "
-            + "a string containing no | pipe "
-            + "separator, or a string containing two pipe separators to divide "
-            + "the string into 'prefix', 'exact', and 'suffix'."
-        )
-
-    @pre_load
-    def expand_shorthand(
-        self, data: Union[str, Dict[str, str]], **kwargs
-    ) -> Dict[str, str]:
-        """Convert input from shorthand format to normal selector format."""
-        if isinstance(data, str):
-            data = {"text": data}
-        text = data.get("text")
-        if text:
-            data["prefix"], data["exact"], data["suffix"] = self.split_text(text)
-            del data["text"]
-        return data
 
 
 def read_selector(

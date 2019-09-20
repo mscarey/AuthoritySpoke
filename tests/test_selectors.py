@@ -2,10 +2,12 @@ import pytest
 
 from authorityspoke.enactments import Code, Enactment
 from authorityspoke.io import loaders, references
+from authorityspoke.io.schemas import SelectorSchema, get_schema_for_item
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
 from authorityspoke.opinions import Opinion
 from authorityspoke.selectors import TextQuoteSelector
+from authorityspoke import to_dict, to_json
 
 
 class TestSelectors:
@@ -52,7 +54,8 @@ class TestSelectors:
         copyright_exceptions = TextQuoteSelector(
             path="/us/usc/t17/s102/b", suffix="idea, procedure,", source=usc17
         )
-        assert '"exact": "In no case does copyright' in copyright_exceptions.json
+        str_version = to_json(copyright_exceptions)
+        assert '"exact": "In no case does copyright' in str_version
 
     def test_failed_prefix(self, make_code):
         usc17 = make_code["usc17"]
@@ -104,3 +107,34 @@ class TestSelectors:
 
         holdings = loaders.load_holdings("holding_feist.json", regime=make_regime)
         assert len(holdings[7].selectors) == 2
+
+
+class TestDump:
+    def test_get_schema_for_selector(self):
+        data = {
+            "path": "/us/usc/t17/s102/b",
+            "text": "process, system,|method of operation|, concept, principle",
+        }
+        selector = references.read_selector(data)
+        schema = get_schema_for_item(selector)
+        assert isinstance(schema, SelectorSchema)
+
+    def test_dump_selector(self):
+        data = {
+            "path": "/us/usc/t17/s102/b",
+            "text": "process, system,|method of operation|, concept, principle",
+        }
+        selector = references.read_selector(data)
+        selector_dict = to_dict(selector)
+        assert isinstance(selector_dict, dict)
+        assert selector_dict["prefix"].startswith("process, system")
+
+    def test_string_dump_selector(self):
+        data = {
+            "path": "/us/usc/t17/s102/b",
+            "text": "process, system,|method of operation|, concept, principle",
+        }
+        selector = references.read_selector(data)
+        selector_str = to_json(selector)
+        assert isinstance(selector_str, str)
+        assert '"prefix": "process, system' in selector_str
