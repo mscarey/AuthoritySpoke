@@ -12,27 +12,28 @@ from authorityspoke import to_dict, to_json
 
 class TestSelectors:
     def test_code_from_selector(self, make_regime, make_selector):
-        code = make_regime.get_code(make_selector["/us/usc/t17/s103"])
+        code = make_regime.get_code("/us/usc/t17/s103")
         assert code.uri == "/us/usc/t17"
 
     def test_usc_selection(self, make_regime, make_selector):
-        selector = make_selector["/us/usc/t17/s103"]
-        code = make_regime.get_code(selector.path)
-        enactment = Enactment(code=code, selector=selector)
+        selector = make_selector["preexisting material"]
+        source = "/us/usc/t17/s103"
+        code = make_regime.get_code(source)
+        enactment = Enactment(code=code, source=source, selector=selector)
         assert enactment.code.level == "statute"
         assert enactment.code.jurisdiction == "us"
 
     def test_omit_terminal_slash(self, make_code):
         usc17 = make_code["usc17"]
-        selector = TextQuoteSelector(
-            path="us/usc/t17/s102/b/", exact="process, system,"
-        )
-        assert not selector.path.endswith("/")
+        selector = TextQuoteSelector(exact="process, system,")
+        statute = Enactment(selector=selector, source="us/usc/t17/s102/b/", code=usc17)
+        assert not statute.source.endswith("/")
 
     def test_add_omitted_initial_slash(self, make_code):
         usc17 = make_code["usc17"]
-        selector = TextQuoteSelector(path="us/usc/t17/s102/b", exact="process, system,")
-        assert selector.path.startswith("/")
+        selector = TextQuoteSelector(exact="process, system,")
+        statute = Enactment(selector=selector, source="us/usc/t17/s102/b/", code=usc17)
+        assert statute.source.startswith("/")
 
     def test_selector_text_split(self):
         data = {
@@ -42,9 +43,9 @@ class TestSelectors:
         selector = references.read_selector(data)
         assert selector.exact.startswith("method")
 
-    def test_passage_from_uslm_code(self, make_selector):
-        copyright_exceptions = make_selector["copyright"]
-        assert copyright_exceptions.exact.strip() == (
+    def test_passage_from_uslm_code(self, make_enactment):
+        copyright_exceptions = make_enactment["copyright"]
+        assert copyright_exceptions.selector.exact.strip() == (
             "In no case does copyright protection "
             + "for an original work of authorship extend to any"
         )
@@ -88,10 +89,12 @@ class TestSelectors:
         )
 
     def test_exact_text_not_in_selection(self, make_regime):
-        due_process_wrong_section = TextQuoteSelector(
-            path="/us/const/amendment-XV/1", exact="due process"
+        due_process_wrong_section = TextQuoteSelector(exact="due process")
+        enactment = Enactment(
+            selector=due_process_wrong_section,
+            source="/us/const/amendment-XV/1",
+            regime=make_regime,
         )
-        enactment = Enactment(selector=due_process_wrong_section, regime=make_regime)
         with pytest.raises(ValueError):
             print(enactment.text)
 

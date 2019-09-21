@@ -383,8 +383,8 @@ class Enactment:
         other :class:`.Factor` objects.
     """
 
-    selector: Union[TextQuoteSelector, Tuple[TextQuoteSelector]]
     source: Optional[str]
+    selector: Optional[Union[TextQuoteSelector, Tuple[TextQuoteSelector]]] = None
     code: Optional[Code] = None
     regime: Optional[Regime] = None
     name: Optional[str] = None
@@ -394,7 +394,7 @@ class Enactment:
         if self.source and not (
             self.source.startswith("/") or self.source.startswith("http")
         ):
-            object.__setattr__(self, "source", "/" + self.path)
+            object.__setattr__(self, "source", "/" + self.source)
         if self.source and self.source.endswith("/"):
             object.__setattr__(self, "source", self.source.rstrip("/"))
 
@@ -427,9 +427,9 @@ class Enactment:
         if not isinstance(other, self.__class__):
             raise TypeError
 
-        if self >= other and self.selector.path.startswith(other.selector.path):
+        if self >= other and self.source.startswith(other.source):
             return self
-        if other >= self and other.selector.path.startswith(self.selector.path):
+        if other >= self and other.source.startswith(self.source):
             return other
         combined = self.combine_text(other) or other.combine_text(self)
         return combined
@@ -445,10 +445,10 @@ class Enactment:
             new :class:`Enactment` with combined text of the source :class:`Enactment`\s, or
             ``None`` if the :class:`Enactment`\s can't be combined.
         """
-        if not other.selector.path.startswith(self.selector.path):
+        if not other.source.startswith(self.source):
             return None
         self_interval = self.text_interval()
-        other_interval = other.text_interval(path=self.selector.path)
+        other_interval = other.text_interval(path=self.source)
         both_intervals = sorted([self_interval, other_interval])
         if both_intervals[1][0] >= both_intervals[0][1] + 2:
             return None
@@ -458,11 +458,11 @@ class Enactment:
         )
         # BUG: can't create prefix and suffix to distinguish identical passages.
         return Enactment(
+            source=self.source,
             selector=TextQuoteSelector(
-                path=self.selector.path,
                 exact=self.code.select_text_from_interval(
-                    interval=new_interval, path=self.selector.path
-                ),
+                    interval=new_interval, path=self.source
+                )
             ),
             code=self.code,
         )

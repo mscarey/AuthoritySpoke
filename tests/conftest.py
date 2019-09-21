@@ -187,14 +187,27 @@ def make_predicate() -> Dict[str, Predicate]:
         "p_shooting_whether": Predicate("{} shot {}", truth=None),
         "p_no_crime": Predicate("{} committed a crime", truth=False),
         "p_three_entities": Predicate("{} told {} to hire {}"),
-        "p_small_weight": Predicate("the amount of gold {} possessed was {}", comparison=">=", quantity=Q_("1 gram")),
-        "p_large_weight": Predicate("the amount of gold {} possessed was {}", comparison=">=", quantity=Q_("100 kilograms")),
+        "p_small_weight": Predicate(
+            "the amount of gold {} possessed was {}",
+            comparison=">=",
+            quantity=Q_("1 gram"),
+        ),
+        "p_large_weight": Predicate(
+            "the amount of gold {} possessed was {}",
+            comparison=">=",
+            quantity=Q_("100 kilograms"),
+        ),
         "p_friends": Predicate("{} and {} were friends", reciprocal=True),
         "p_reliable": Predicate("{} was reliable"),
-        "p_quantity=3": Predicate("The number of mice was {}", comparison="==", quantity=3),
-        "p_quantity>=4": Predicate("The number of mice was {}", comparison=">=", quantity=4),
-        "p_quantity>5": Predicate("The number of mice was {}", comparison=">", quantity=5),
-
+        "p_quantity=3": Predicate(
+            "The number of mice was {}", comparison="==", quantity=3
+        ),
+        "p_quantity>=4": Predicate(
+            "The number of mice was {}", comparison=">=", quantity=4
+        ),
+        "p_quantity>5": Predicate(
+            "The number of mice was {}", comparison=">", quantity=5
+        ),
     }
 
 
@@ -271,7 +284,9 @@ def watt_factor(make_predicate, make_entity, watt_mentioned) -> Dict[str, Factor
         "f8_meters": build_fact(p["p8_meters"], (0, 2), case_factors=c),
         "f9_absent": build_fact(p["p9"], (2, 0), absent=True, case_factors=c),
         "f9_miles": build_fact(p["p9_miles"], (2, 0), case_factors=c),
-        "f9_absent_miles": build_fact(p["p9_miles"], (2, 0), absent=True, case_factors=c),
+        "f9_absent_miles": build_fact(
+            p["p9_miles"], (2, 0), absent=True, case_factors=c
+        ),
         "f9_more_swap_entities": Fact(
             p["p9_more"], (make_entity["circus"], make_entity["motel"])
         ),
@@ -306,8 +321,12 @@ def make_factor(make_predicate, make_entity) -> Dict[str, Factor]:
         "f_irrelevant_1": build_fact(p["p_irrelevant_1"], (3,), case_factors=c),
         "f_irrelevant_2": build_fact(p["p_irrelevant_2"], (4,), case_factors=c),
         "f_irrelevant_3": build_fact(p["p_irrelevant_3"], (2, 4), case_factors=c),
-        "f_irrelevant_3_new_context": build_fact(p["p_irrelevant_3"], (3, 4), case_factors=c),
-        "f_irrelevant_3_context_0": build_fact(p["p_irrelevant_3"], (3, 0), case_factors=c),
+        "f_irrelevant_3_new_context": build_fact(
+            p["p_irrelevant_3"], (3, 4), case_factors=c
+        ),
+        "f_irrelevant_3_context_0": build_fact(
+            p["p_irrelevant_3"], (3, 0), case_factors=c
+        ),
         "f_crime": build_fact(p["p_crime"], case_factors=c),
         "f_watt_crime": build_fact(p["p_crime"], case_factors=make_entity["watt"]),
         "f_no_crime": build_fact(p["p_no_crime"], case_factors=c),
@@ -335,9 +354,15 @@ def make_factor(make_predicate, make_entity) -> Dict[str, Factor]:
         "f_shooting_entity_order": build_fact(p["p_shooting"], (1, 0), case_factors=c),
         "f_no_shooting": build_fact(p["p_no_shooting"], case_factors=c),
         "f_shooting_whether": build_fact(p["p_shooting_whether"], case_factors=c),
-        "f_no_shooting_entity_order": build_fact(p["p_no_shooting"], (1, 0), case_factors=c),
-        "f_three_entities": build_fact(p["p_three_entities"], (0, 1, 2), case_factors=c),
-        "f_repeating_entity": build_fact(p["p_three_entities"], (0, 1, 0), case_factors=c),
+        "f_no_shooting_entity_order": build_fact(
+            p["p_no_shooting"], (1, 0), case_factors=c
+        ),
+        "f_three_entities": build_fact(
+            p["p_three_entities"], (0, 1, 2), case_factors=c
+        ),
+        "f_repeating_entity": build_fact(
+            p["p_three_entities"], (0, 1, 0), case_factors=c
+        ),
         "f_large_weight": build_fact(p["p_large_weight"], (0,), case_factors=c),
         "f_small_weight": build_fact(p["p_small_weight"], (0,), case_factors=c),
         "f_friends": build_fact(p["p_friends"], (0, 1), case_factors=c),
@@ -427,6 +452,7 @@ def make_exhibit(
         "testimony_no_statement": Exhibit(form="testimony"),
     }
 
+
 @pytest.fixture(scope="class")
 def make_complex_fact(make_predicate, make_factor) -> Dict[str, Evidence]:
     p = make_predicate
@@ -460,6 +486,7 @@ def make_complex_fact(make_predicate, make_factor) -> Dict[str, Evidence]:
         ),
     }
 
+
 @pytest.fixture(scope="class")
 def make_fact_about_exhibit(make_predicate, make_exhibit) -> Dict[str, Evidence]:
     p = make_predicate
@@ -471,43 +498,48 @@ def make_fact_about_exhibit(make_predicate, make_exhibit) -> Dict[str, Evidence]
         "f_reliable_small_weight": Fact(
             p["p_reliable"], (e["small_weight_testimony"],)
         ),
-        }
+    }
+
 
 @pytest.fixture(scope="class")
-def make_complex_rule(make_factor, make_exhibit, make_complex_fact, make_fact_about_exhibit) -> Dict[str, Rule]:
-    return {"accept_relevance_testimony": Rule(
-        inputs=make_exhibit["relevant_murder_testimony"],
-        outputs=make_complex_fact["f_relevant_murder"],
-    ),
-    "accept_relevance_testimony_ALL": Rule(
-        inputs=make_exhibit["relevant_murder_testimony"],
-        outputs=make_complex_fact["f_relevant_murder"],
-        universal=True
-    ),
-    "accept_murder_fact_from_relevance": Rule(
-        inputs=make_complex_fact["f_relevant_murder"],
-        outputs=make_factor["f_murder"]
-    ),
-    "accept_murder_fact_from_relevance_and_shooting": Rule(
-        inputs=[make_complex_fact["f_relevant_murder"], make_factor["f_shooting"]],
-        outputs=make_factor["f_murder"]
-    ),
-    "accept_small_weight_reliable": Rule(
-        inputs=[make_factor["f_small_weight"], make_factor["f_friends"]],
-        outputs=make_fact_about_exhibit["f_reliable_small_weight"],
-        universal=True,
-    ),
-    "accept_small_weight_reliable_more_evidence": Rule(
-        inputs=[make_factor["f_large_weight"], make_factor["f_friends"]],
-        outputs=make_fact_about_exhibit["f_reliable_small_weight"],
-        universal=True,
-    ),
-    "accept_large_weight_reliable": Rule(
-        inputs=[make_factor["f_small_weight"], make_factor["f_friends"]],
-        outputs=make_fact_about_exhibit["f_reliable_large_weight"],
-        universal=True,
-    ),
+def make_complex_rule(
+    make_factor, make_exhibit, make_complex_fact, make_fact_about_exhibit
+) -> Dict[str, Rule]:
+    return {
+        "accept_relevance_testimony": Rule(
+            inputs=make_exhibit["relevant_murder_testimony"],
+            outputs=make_complex_fact["f_relevant_murder"],
+        ),
+        "accept_relevance_testimony_ALL": Rule(
+            inputs=make_exhibit["relevant_murder_testimony"],
+            outputs=make_complex_fact["f_relevant_murder"],
+            universal=True,
+        ),
+        "accept_murder_fact_from_relevance": Rule(
+            inputs=make_complex_fact["f_relevant_murder"],
+            outputs=make_factor["f_murder"],
+        ),
+        "accept_murder_fact_from_relevance_and_shooting": Rule(
+            inputs=[make_complex_fact["f_relevant_murder"], make_factor["f_shooting"]],
+            outputs=make_factor["f_murder"],
+        ),
+        "accept_small_weight_reliable": Rule(
+            inputs=[make_factor["f_small_weight"], make_factor["f_friends"]],
+            outputs=make_fact_about_exhibit["f_reliable_small_weight"],
+            universal=True,
+        ),
+        "accept_small_weight_reliable_more_evidence": Rule(
+            inputs=[make_factor["f_large_weight"], make_factor["f_friends"]],
+            outputs=make_fact_about_exhibit["f_reliable_small_weight"],
+            universal=True,
+        ),
+        "accept_large_weight_reliable": Rule(
+            inputs=[make_factor["f_small_weight"], make_factor["f_friends"]],
+            outputs=make_fact_about_exhibit["f_reliable_large_weight"],
+            universal=True,
+        ),
     }
+
 
 @pytest.fixture(scope="class")
 def make_evidence(
@@ -547,7 +579,9 @@ def make_evidence(
             x["no_shooting_different_witness_testimony"], to_effect=f["f_no_crime"]
         ),
         "reciprocal": Evidence(x["reciprocal_testimony"], to_effect=f["f_no_crime"]),
-        "crime": Evidence(x["generic_exhibit"], to_effect=f["f_watt_crime"], generic=True),
+        "crime": Evidence(
+            x["generic_exhibit"], to_effect=f["f_watt_crime"], generic=True
+        ),
         "crime_absent": Evidence(
             x["generic_exhibit"], to_effect=f["f_watt_crime"], absent=True, generic=True
         ),
@@ -555,28 +589,33 @@ def make_evidence(
         "generic_absent": Evidence(x["generic_exhibit"], absent=True, generic=True),
     }
 
+
 @pytest.fixture(scope="module")
-def make_selector(make_code) -> Dict[str, TextQuoteSelector]:
-    return {"/us/usc/t17/s103": TextQuoteSelector(
-            path="/us/usc/t17/s103",
+def make_selector() -> Dict[str, TextQuoteSelector]:
+    return {
+        "preexisting material": TextQuoteSelector(
             exact=(
                 "protection for a work employing preexisting material in which "
                 + "copyright subsists does not extend to any part of the work in "
-                + "which such material has been used unlawfully.")
-    ),
-    "copyright": TextQuoteSelector(
-            path="/us/usc/t17/s102/b", suffix="idea, procedure,", source=make_code["usc17"]
+                + "which such material has been used unlawfully."
+            )
         ),
-    "copyright_requires_originality": TextQuoteSelector(
-        path="/us/usc/t17/s102/a",
-        suffix="fixed in any tangible"
-    )}
+        "copyright": TextQuoteSelector(suffix="idea, procedure,"),
+        "copyright_requires_originality": TextQuoteSelector(
+            suffix="fixed in any tangible"
+        ),
+    }
+
 
 @pytest.fixture(scope="module")
 def make_regime() -> Dict[str, Code]:
     usa = Regime()
     for filename in (
-        "constitution.xml", "usc17.xml", "cfr37.xml", "ca_evidence.html", "ca_penal.html"
+        "constitution.xml",
+        "usc17.xml",
+        "cfr37.xml",
+        "ca_evidence.html",
+        "ca_penal.html",
     ):
         usa.set_code(loaders.load_code(filename=filename))
     return usa
@@ -597,80 +636,85 @@ def make_code(make_regime) -> Dict[str, Code]:
 def make_enactment(make_code, make_selector, make_regime) -> Dict[str, Enactment]:
     return {
         "bad_selector": Enactment(
+            source="/us/const/amendment-IV",
             selector=TextQuoteSelector(
-            path="/us/const/amendment-IV", exact="text that doesn't exist in the code"
-        ), code=make_code["const"]),
+                exact="text that doesn't exist in the code",
+            ),
+            code=make_code["const"],
+        ),
         "copyright": Enactment(
-            selector=make_selector["copyright"], regime=make_regime
+            selector=make_selector["copyright"],
+            source="/us/usc/t17/s102/b",
+            code=make_code["usc17"],
+            regime=make_regime,
         ),
         "copyright_requires_originality": Enactment(
-            selector=make_selector["copyright_requires_originality"], regime=make_regime
+            selector=make_selector["copyright_requires_originality"],
+            source="/us/usc/t17/s102/a",
+            regime=make_regime,
         ),
         "securing_for_authors": Enactment(
             selector=TextQuoteSelector(
-                path="/us/const/article-I/8/8",
                 exact="To promote the Progress of Science and useful Arts, by securing for limited Times to Authors",
             ),
+            source="/us/const/article-I/8/8",
             code=make_code["const"],
         ),
         "and_inventors": Enactment(
             selector=TextQuoteSelector(
-                path="/us/const/article-I/8/8",
-                exact="and Inventors",
+                exact="and Inventors"
             ),
+            source="/us/const/article-I/8/8",
             code=make_code["const"],
         ),
         "right_to_writings": Enactment(
             selector=TextQuoteSelector(
-                path="/us/const/article-I/8/8",
                 exact="the exclusive Right to their respective Writings",
             ),
+            source="/us/const/article-I/8/8",
             code=make_code["const"],
         ),
         "commerce_vague_path": Enactment(
             selector=TextQuoteSelector(
-                path="/us/const/article-I",
-                exact="No Preference shall be given by any Regulation of Commerce"
+                exact="No Preference shall be given by any Regulation of Commerce",
             ),
             code=make_code["const"],
+            source="/us/const/article-I",
         ),
         "search_clause": Enactment(
             selector=TextQuoteSelector(
-                path="/us/const/amendment-IV",
                 exact=(
                     "The right of the people to be secure in their persons, "
                     + "houses, papers, and effects, against unreasonable searches "
                     + "and seizures, shall not be violated"
                 ),
-                source=make_regime
             ),
-            regime=make_regime
-            ),
+            source="/us/const/amendment-IV",
+            regime=make_regime,
+        ),
         "warrants_clause": Enactment(
             selector=TextQuoteSelector(
-                path="/us/const/amendment-IV",
                 exact="shall not be violated, and no Warrants shall issue,",
             ),
-            regime=make_regime
+            source="/us/const/amendment-IV",
+            regime=make_regime,
         ),
-        "fourth_a": Enactment(
-            selector=TextQuoteSelector(
-            path="/us/const/amendment-IV",
-            ),
-            regime=make_regime
+        "fourth_a": Enactment(  # whole section, no selector
+            source="/us/const/amendment-IV",
+            regime=make_regime,
         ),
         "due_process_5": Enactment(
             selector=TextQuoteSelector(
-            path="/us/const/amendment-V",
-            exact="life, liberty, or property, without due process of law",
+                exact="life, liberty, or property, without due process of law",
             ),
+            source="/us/const/amendment-V",
             regime=make_regime,
         ),
         "due_process_14": Enactment(
             selector=TextQuoteSelector(
-            path="/us/const/amendment-XIV-1",
-            exact="life, liberty, or property, without due process of law",
+                exact="life, liberty, or property, without due process of law",
             ),
+            source="/us/const/amendment-XIV-1",
             regime=make_regime,
         ),
     }
@@ -850,10 +894,18 @@ def real_holding(make_procedure, make_enactment) -> Dict[str, Rule]:
     e = make_enactment
 
     return {
-        "h1": Holding(rule=Rule(c["c1"], enactments=e["search_clause"], mandatory=True)),
-        "h2": Holding(rule=Rule(c["c2"], enactments=e["search_clause"], mandatory=True)),
-        "h3": Holding(rule=Rule(c["c3"], enactments=e["search_clause"], mandatory=True)),
-        "h4": Holding(rule=Rule(c["c4"], enactments=e["search_clause"], mandatory=True)),
+        "h1": Holding(
+            rule=Rule(c["c1"], enactments=e["search_clause"], mandatory=True)
+        ),
+        "h2": Holding(
+            rule=Rule(c["c2"], enactments=e["search_clause"], mandatory=True)
+        ),
+        "h3": Holding(
+            rule=Rule(c["c3"], enactments=e["search_clause"], mandatory=True)
+        ),
+        "h4": Holding(
+            rule=Rule(c["c4"], enactments=e["search_clause"], mandatory=True)
+        ),
     }
 
 
@@ -867,11 +919,8 @@ def make_rule(make_procedure, make_enactment) -> Dict[str, Rule]:
         "h2": Rule(c["c2"], enactments=e["search_clause"]),
         "h3": Rule(c["c3"], enactments=e["search_clause"]),
         "h1_again": Rule(c["c1"], enactments=e["search_clause"]),
-        "h1_entity_order": Rule(
-            c["c1_entity_order"], enactments=e["search_clause"]
-        ),
+        "h1_entity_order": Rule(c["c1_entity_order"], enactments=e["search_clause"]),
         "h1_easy": Rule(c["c1_easy"], enactments=e["search_clause"]),
-
         "h2_without_cite": Rule(c["c2"]),
         "h2_fourth_a_cite": Rule(c["c2"], enactments=e["fourth_a"]),
         "h2_despite_due_process": Rule(
@@ -910,9 +959,7 @@ def make_rule(make_procedure, make_enactment) -> Dict[str, Rule]:
             c["c2_irrelevant_inputs"], enactments=e["search_clause"]
         ),
         "h2_irrelevant_inputs_ALL": Rule(
-            c["c2_irrelevant_inputs"],
-            enactments=e["search_clause"],
-            universal=True,
+            c["c2_irrelevant_inputs"], enactments=e["search_clause"], universal=True
         ),
         "h2_irrelevant_inputs_MUST": Rule(
             c["c2_irrelevant_inputs"], enactments=e["search_clause"], mandatory=True
@@ -950,17 +997,16 @@ def make_rule(make_procedure, make_enactment) -> Dict[str, Rule]:
         "h2_MUST": Rule(
             c["c2"], enactments=e["search_clause"], mandatory=True, universal=False
         ),
-        "h2_output_absent": Rule(
-            c["c2_output_absent"], enactments=e["search_clause"]
-        ),
-        "h2_output_false": Rule(
-            c["c2_output_false"], enactments=e["search_clause"]
-        ),
+        "h2_output_absent": Rule(c["c2_output_absent"], enactments=e["search_clause"]),
+        "h2_output_false": Rule(c["c2_output_false"], enactments=e["search_clause"]),
         "h2_output_false_ALL": Rule(
             c["c2_output_false"], enactments=e["search_clause"], universal=True
         ),
         "h2_output_false_ALL_MUST": Rule(
-            c["c2_output_false"], enactments=e["search_clause"], mandatory=True, universal=True
+            c["c2_output_false"],
+            enactments=e["search_clause"],
+            mandatory=True,
+            universal=True,
         ),
         "h2_output_absent_false": Rule(
             c["c2_output_absent_false"], enactments=e["search_clause"]
@@ -977,12 +1023,8 @@ def make_rule(make_procedure, make_enactment) -> Dict[str, Rule]:
             mandatory=True,
             universal=False,
         ),
-        "h3_ALL": Rule(
-            c["c3"], enactments=e["search_clause"], universal=True
-        ),
-        "h3_fewer_inputs": Rule(
-            c["c3_fewer_inputs"], enactments=e["search_clause"]
-        ),
+        "h3_ALL": Rule(c["c3"], enactments=e["search_clause"], universal=True),
+        "h3_fewer_inputs": Rule(c["c3_fewer_inputs"], enactments=e["search_clause"]),
         "h3_fewer_inputs_ALL": Rule(
             c["c3_fewer_inputs"], enactments=e["search_clause"], universal=True
         ),
@@ -993,9 +1035,7 @@ def make_rule(make_procedure, make_enactment) -> Dict[str, Rule]:
             c["c_near_means_curtilage_even_if"], enactments=e["search_clause"]
         ),
         "h_near_means_curtilage_ALL": Rule(
-            c["c_near_means_curtilage"],
-            enactments=e["search_clause"],
-            universal=True,
+            c["c_near_means_curtilage"], enactments=e["search_clause"], universal=True
         ),
         "h_near_means_curtilage_ALL_MUST": Rule(
             c["c_near_means_curtilage"],
@@ -1036,6 +1076,7 @@ def make_rule(make_procedure, make_enactment) -> Dict[str, Rule]:
         "h_output_distance_more": Rule(c["c_output_distance_more"]),
     }
 
+
 @pytest.fixture(scope="class")
 def make_holding(make_rule) -> Dict[str, Holding]:
     holdings: Dict[str, Holding] = {}
@@ -1043,37 +1084,44 @@ def make_holding(make_rule) -> Dict[str, Holding]:
         holdings[name] = Holding(rule=rule)
 
     new_holdings = {
-    "h1_opposite": Holding(rule=make_rule["h1"], rule_valid=False),
-    "h2_undecided": Holding(rule=make_rule["h2"], decided=False),
-    "h2_invalid_undecided": Holding(rule=make_rule["h2"], rule_valid=False, decided=False),
-    "h2_MUST_undecided": Holding(rule=make_rule["h2_MUST"], decided=False),
-    "h2_MUST_invalid": Holding(rule=make_rule["h2_MUST"], rule_valid=False),
-    "h2_invalid": Holding(rule=make_rule["h2"], rule_valid=False),
-    "h2_ALL_invalid": Holding(
-        rule=make_rule["h2_ALL"], rule_valid=False,
-    ),
-    "h2_irrelevant_inputs_undecided": Holding(rule=make_rule["h2_irrelevant_inputs"], decided=False),
-    "h2_irrelevant_inputs_invalid": Holding(
-        rule=make_rule["h2_irrelevant_inputs"],
-        rule_valid=False,
+        "h1_opposite": Holding(rule=make_rule["h1"], rule_valid=False),
+        "h2_undecided": Holding(rule=make_rule["h2"], decided=False),
+        "h2_invalid_undecided": Holding(
+            rule=make_rule["h2"], rule_valid=False, decided=False
         ),
-    "h2_irrelevant_inputs_ALL_invalid": Holding(
-        rule=make_rule["h2_irrelevant_inputs_ALL"],
-        rule_valid=False,
+        "h2_MUST_undecided": Holding(rule=make_rule["h2_MUST"], decided=False),
+        "h2_MUST_invalid": Holding(rule=make_rule["h2_MUST"], rule_valid=False),
+        "h2_invalid": Holding(rule=make_rule["h2"], rule_valid=False),
+        "h2_ALL_invalid": Holding(rule=make_rule["h2_ALL"], rule_valid=False),
+        "h2_irrelevant_inputs_undecided": Holding(
+            rule=make_rule["h2_irrelevant_inputs"], decided=False
         ),
-    "h2_irrelevant_inputs_ALL_MUST_invalid": Holding(
-        rule=make_rule["h2_irrelevant_inputs_ALL_MUST"],
-        rule_valid=False,
+        "h2_irrelevant_inputs_invalid": Holding(
+            rule=make_rule["h2_irrelevant_inputs"], rule_valid=False
         ),
-    "h2_irrelevant_inputs_MUST_invalid": Holding(rule=make_rule["h2_irrelevant_inputs_MUST"],
-        rule_valid=False,
+        "h2_irrelevant_inputs_ALL_invalid": Holding(
+            rule=make_rule["h2_irrelevant_inputs_ALL"], rule_valid=False
         ),
-    "h2_ALL_due_process_invalid": Holding(rule=make_rule["h2_ALL_due_process"], rule_valid=False),
-    "h3_undecided": Holding(rule=make_rule["h3"], decided=False),
-    "h3_ALL_undecided": Holding(rule=make_rule["h3_ALL"], decided=False),
-    "h3_fewer_inputs_undecided": Holding(rule=make_rule["h3_fewer_inputs"], decided=False),
-    "h3_fewer_inputs_ALL_undecided": Holding(rule=make_rule["h3_fewer_inputs_ALL"], decided=False),
-    "h_near_means_curtilage_ALL_undecided": Holding(rule=make_rule["h_near_means_curtilage_ALL"], decided=False),
+        "h2_irrelevant_inputs_ALL_MUST_invalid": Holding(
+            rule=make_rule["h2_irrelevant_inputs_ALL_MUST"], rule_valid=False
+        ),
+        "h2_irrelevant_inputs_MUST_invalid": Holding(
+            rule=make_rule["h2_irrelevant_inputs_MUST"], rule_valid=False
+        ),
+        "h2_ALL_due_process_invalid": Holding(
+            rule=make_rule["h2_ALL_due_process"], rule_valid=False
+        ),
+        "h3_undecided": Holding(rule=make_rule["h3"], decided=False),
+        "h3_ALL_undecided": Holding(rule=make_rule["h3_ALL"], decided=False),
+        "h3_fewer_inputs_undecided": Holding(
+            rule=make_rule["h3_fewer_inputs"], decided=False
+        ),
+        "h3_fewer_inputs_ALL_undecided": Holding(
+            rule=make_rule["h3_fewer_inputs_ALL"], decided=False
+        ),
+        "h_near_means_curtilage_ALL_undecided": Holding(
+            rule=make_rule["h_near_means_curtilage_ALL"], decided=False
+        ),
     }
 
     holdings.update(new_holdings)
@@ -1098,12 +1146,19 @@ def make_opinion_with_holding(make_opinion, make_regime) -> Dict[str, Opinion]:
     for case in test_cases:
         for opinion in loaders.load_opinion(f"{case}_h.json", lead_only=False):
             opinions[f"{case}_{opinion.position}"] = opinion
-        opinions[f"{case}_majority"].posit(loaders.load_holdings(f"holding_{case}.json", regime=make_regime))
+        opinions[f"{case}_majority"].posit(
+            loaders.load_holdings(f"holding_{case}.json", regime=make_regime)
+        )
     for case in test_cases_with_anchors:
         for opinion in loaders.load_opinion(f"{case}_h.json", lead_only=False):
             opinions[f"{case}_{opinion.position}"] = opinion
-        opinions[f"{case}_majority"].posit(*loaders.load_holdings(f"holding_{case}.json", regime=make_regime, report_mentioned=True))
+        opinions[f"{case}_majority"].posit(
+            *loaders.load_holdings(
+                f"holding_{case}.json", regime=make_regime, report_mentioned=True
+            )
+        )
     return opinions
+
 
 @pytest.fixture(scope="class")
 def make_analysis() -> Dict[str, Dict["str", Any]]:

@@ -74,27 +74,18 @@ class Regime:
     jurisdictions: Dict[str, Jurisdiction] = field(default_factory=dict)
     uri: ClassVar = "/"
 
-    def get_code(self, selector: Union[TextQuoteSelector, str]):
+    def get_code(self, path: str):
         """
         Find a :class:`.Code` in the :class:`Regime` from a selector.
 
         :returns:
             the :class:`.Code` described in the selector path.
         """
-        if isinstance(selector, TextQuoteSelector):
-            if selector.path is not None:
-                return self.get_code(selector.path)
-            else:
-                raise ValueError(
-                    '"selector" must have a "path" attribute containing ',
-                    "a path to the code, or must be a string containing the path",
-                )
-
-        jurisdiction_id = selector.split("/")[1]
+        jurisdiction_id = path.split("/")[1]
 
         if jurisdiction_id not in self.jurisdictions:
             raise ValueError(f"Regime has no jurisdiction {jurisdiction_id}.")
-        return self.jurisdictions[jurisdiction_id].get_code(selector)
+        return self.jurisdictions[jurisdiction_id].get_code(path)
 
     def set_code(self, code: Code) -> None:
         r"""
