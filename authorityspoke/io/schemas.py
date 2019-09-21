@@ -1,6 +1,7 @@
 from typing import Any, Dict, Tuple, Union
 
-from marshmallow import Schema, fields, pre_load, ValidationError
+from marshmallow import Schema, fields, pre_load, post_load
+from marshmallow import ValidationError
 
 from authorityspoke.selectors import TextQuoteSelector
 
@@ -49,6 +50,10 @@ class SelectorSchema(Schema):
             data["prefix"], data["exact"], data["suffix"] = self.split_text(text)
             del data["text"]
         return data
+
+    @post_load
+    def make_selector(self, data, **kwargs):
+        return TextQuoteSelector(**data)
 
 
 SCHEMAS = [schema() for schema in Schema.__subclasses__()]

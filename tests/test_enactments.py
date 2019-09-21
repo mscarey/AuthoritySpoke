@@ -108,10 +108,10 @@ class TestEnactments:
         assert search_clause.text.endswith("shall not be violated")
 
     def test_make_enactment_from_selector_without_code(self, make_code):
-        select = TextQuoteSelector(
-            path="/us/const/article-III/1", suffix=", shall be vested"
+        select = TextQuoteSelector(suffix=", shall be vested")
+        art_3 = Enactment(
+            selector=select, source="/us/const/article-III/1", code=make_code["const"]
         )
-        art_3 = Enactment(selector=select, code=make_code["const"])
         assert art_3.text.startswith("The judicial Power")
         assert art_3.text.endswith("the United States")
 
