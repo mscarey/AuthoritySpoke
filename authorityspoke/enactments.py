@@ -169,9 +169,7 @@ class Code:
         """
         return uri.replace(self.uri, "").lstrip("/").replace("/", "-")
 
-    def provision_effective_date(
-        self, cite: Union[TextQuoteSelector, str]
-    ) -> datetime.date:
+    def provision_effective_date(self, cite: str) -> datetime.date:
         """
         Give effective date for a provision within the ``Code``.
 
@@ -186,8 +184,6 @@ class Code:
         :returns:
             the effective date of the cited provision
         """
-        if isinstance(cite, TextQuoteSelector):
-            cite = cite.path
         if self.level == "constitution" and self.jurisdiction == "us":
             cite = self.format_uri_for_const(cite)
             if "amendment" not in cite.lower():
@@ -507,7 +503,7 @@ class Enactment:
             the effective date of the text in this passage.
             Currently works only for the US Constitution.
         """
-        return self.code.provision_effective_date(self.selector)
+        return self.code.provision_effective_date(self.source)
 
     @property
     def text(self):
@@ -548,7 +544,7 @@ class Enactment:
         )
 
     def __str__(self):
-        return f'"{self.text}" ({self.code.title}, {self.selector.path})'
+        return f'"{self.text}" ({self.code.title}, {self.source})'
 
     def __ge__(self, other):
         """

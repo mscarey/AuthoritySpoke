@@ -141,4 +141,4 @@ def read_selectors(
     if isinstance(records, (str, dict)):
         return [read_selector(records)]
     schema = SelectorSchema(many=True)
-    return [TextQuoteSelector(**record) for record in schema.load(records)]
+    return schema.load(records)

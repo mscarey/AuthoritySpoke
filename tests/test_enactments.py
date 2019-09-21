@@ -153,25 +153,23 @@ class TestEnactments:
     def test_short_passage_from_uslm_code(self, make_code):
         """Also tests adding the missing initial "/" in ``path``."""
         usc17 = make_code["usc17"]
-        selector = TextQuoteSelector(
-            path="us/usc/t17/s102/b",
-            prefix="process, system,",
-            suffix=", concept, principle",
-            source=usc17,
+        method = readers.read_enactment(
+            {
+                "path": "us/usc/t17/s102/b",
+                "prefix": "process, system,",
+                "suffix": ", concept, principle",
+            },
+            code=usc17,
         )
-        method = Enactment(selector=selector, code=usc17)
         assert method.text.strip() == "method of operation"
 
     def test_passage_from_cfr_code(self, make_code):
         cfr = make_code["cfr37"]
-        selector = TextQuoteSelector(path="/us/cfr/t37/s202.1", source=cfr)
-        slogans = Enactment(selector=selector, code=cfr)
+        slogans = readers.read_enactment({"path": "/us/cfr/t37/s202.1"}, code=cfr)
         assert "Words and short phrases such as names" in slogans.text
 
     def test_cite_entire_constitution(self, make_regime):
-        entire_const = Enactment(
-            selector=TextQuoteSelector(path="/us/const"), regime=make_regime
-        )
+        entire_const = readers.read_enactment({"path": "/us/const"}, regime=make_regime)
         assert "and been seven Years a Citizen" in entire_const.text
 
     def test_code_title_in_str(self, make_enactment):
@@ -214,9 +212,8 @@ class TestEnactments:
             assert not dp5 < f1
 
     def test_constitution_effective_date(self, make_regime):
-        ex_post_facto_provision = Enactment(
-            selector=TextQuoteSelector(path="/us/const/article-I/9/3"),
-            regime=make_regime,
+        ex_post_facto_provision = readers.read_enactment(
+            {"path": "/us/const/article-I/9/3"}, regime=make_regime
         )
         assert ex_post_facto_provision.effective_date == datetime.date(1788, 9, 13)
 
