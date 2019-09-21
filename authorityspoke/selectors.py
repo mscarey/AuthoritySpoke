@@ -52,35 +52,11 @@ class TextQuoteSelector:
     exact: Optional[str] = None
     prefix: Optional[str] = None
     suffix: Optional[str] = None
-    source: Optional[Union[Regime, Code]] = None
 
-    def __post_init__(self):
-
-        if self.path and not (
-            self.path.startswith("/") or self.path.startswith("http")
-        ):
-            object.__setattr__(self, "path", "/" + self.path)
-        if self.path and self.path.endswith("/"):
-            object.__setattr__(self, "path", self.path.rstrip("/"))
-
-        if self.source and not self.path:
-            object.__setattr__(self, "path", self.source.uri)
-
-        if self.source and not self.exact:
-            object.__setattr__(self, "exact", self.set_exact_from_source(self.source))
-
-        object.__delattr__(self, "source")
-
-    def set_exact_from_source(self, source: Union[Regime, Code]) -> Optional[str]:
+    def set_exact_from_source(self, source: str, code: "Code") -> Optional[str]:
         """Use text found in ``source`` as ``exact`` parameter for ``self``."""
-        if source.__class__.__name__ == "Regime":
-            code = source.get_code(self.path)
-        elif source.__class__.__name__ == "Code":
-            code = source
-        else:
-            raise TypeError(f'"source" parameter must be class "Regime" or "Code"')
 
-        section_text = code.section_text(self.path)
+        section_text = code.section_text(source)
         return self.exact_from_ends(section_text)
 
     def exact_from_ends(self, text: str) -> str:
@@ -121,13 +97,12 @@ class TextQuoteSelector:
         """
         return json.dumps(
             {
-                "source": self.path,
                 "selector": {
                     "type": "TextQuoteSelector",
                     "exact": self.exact,
                     "prefix": self.prefix,
                     "suffix": self.suffix,
-                },
+                }
             }
         )
 

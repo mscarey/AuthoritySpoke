@@ -383,23 +383,42 @@ class Enactment:
         other :class:`.Factor` objects.
     """
 
-    selector: TextQuoteSelector
+    selector: Union[TextQuoteSelector, Tuple[TextQuoteSelector]]
+    source: Optional[str]
     code: Optional[Code] = None
     regime: Optional[Regime] = None
     name: Optional[str] = None
 
     def __post_init__(self):
-        if not self.code:
-            if self.regime:
-                object.__setattr__(
-                    self, "code", self.regime.get_code(self.selector.path)
-                )
+
+        if self.source and not (
+            self.source.startswith("/") or self.source.startswith("http")
+        ):
+            object.__setattr__(self, "source", "/" + self.path)
+        if self.source and self.source.endswith("/"):
+            object.__setattr__(self, "source", self.source.rstrip("/"))
+
+        if not self.source:
+
+            if self.code:
+                object.__setattr__(self, "source", self.code.uri)
+
+            elif self.regime:
+                object.__setattr__(self, "source", self.regime.uri)
+
             else:
                 raise ValueError("'code' and 'regime' cannot both be None")
+
+        if self.regime and not self.code:
+            object.__setattr__(self, "code", self.regime.get_code(self.source))
+
         if (self.selector.prefix or self.selector.suffix) and not self.selector.exact:
             object.__setattr__(
-                self.selector, "exact", self.selector.set_exact_from_source(self.code)
+                self.selector,
+                "exact",
+                self.selector.set_exact_from_source(source=self.source, code=self.code),
             )
+
         object.__delattr__(self, "regime")
 
     def __add__(self, other):

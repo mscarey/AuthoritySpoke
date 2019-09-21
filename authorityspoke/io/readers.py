@@ -93,8 +93,13 @@ def read_enactment(
     name = enactment_dict.get("name")
     if name:
         del enactment_dict["name"]
-    selector = references.read_selector(record=enactment_dict, source=code)
-    answer = Enactment(code=code, selector=selector, name=name)
+
+    source = enactment_dict.get("path")
+    if source:
+        del enactment_dict["path"]
+
+    selector = references.read_selector(record=enactment_dict)
+    answer = Enactment(code=code, source=source, selector=selector, name=name)
     mentioned = mentioned or {}
     return (answer, mentioned) if report_mentioned else answer
 
