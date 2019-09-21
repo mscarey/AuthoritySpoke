@@ -267,7 +267,9 @@ class Code:
             section = self.xml.find(identifier=path)
             return section.find_all(["chapeau", "paragraph", "content"])
 
-        if path is not None:
+        if path is None:
+            docpath = "/"
+        else:
             docpath = path.replace(self.uri, "")
 
         if not docpath:  # selecting the whole Code
@@ -320,7 +322,9 @@ class Code:
             )
         return section_text[min(interval) : max(interval)]
 
-    def select_text(self, selector: TextQuoteSelector) -> Optional[str]:
+    def select_text(
+        self, path: Optional[str], selector: Optional[TextQuoteSelector]
+    ) -> Optional[str]:
         r"""
         Get text from the ``Code`` using a :class:`.TextQuoteSelector`.
 
@@ -338,8 +342,8 @@ class Code:
             the text referenced by the selector, or ``None`` if the text
             can't be found.
         """
-        text = self.section_text(path=selector.path)
-        if not selector.exact:
+        text = self.section_text(path=path)
+        if not selector:
             return text
         if re.search(selector.passage_regex, text, re.IGNORECASE):
             return selector.exact
@@ -412,7 +416,15 @@ class Enactment:
         if self.regime and not self.code:
             object.__setattr__(self, "code", self.regime.get_code(self.source))
 
-        if (self.selector.prefix or self.selector.suffix) and not self.selector.exact:
+        if (
+            self.selector
+            and (self.selector.prefix or self.selector.suffix)
+            and not self.selector.exact
+        ):
+            if not self.code:
+                raise AttributeError(
+                    "A Code or Regime is required to select text without an 'exact' field."
+                )
             object.__setattr__(
                 self.selector,
                 "exact",
@@ -505,7 +517,7 @@ class Enactment:
         :returns: the full text of the cited passage from the XML.
         """
 
-        return self.code.select_text(self.selector)
+        return self.code.select_text(path=self.source, selector=self.selector)
 
     def means(self, other: Enactment) -> bool:
         r"""

@@ -50,40 +50,42 @@ class TestSelectors:
             + "for an original work of authorship extend to any"
         )
 
-    def test_convert_selector_to_json(self, make_code):
-        usc17 = make_code["usc17"]
-        copyright_exceptions = TextQuoteSelector(
-            path="/us/usc/t17/s102/b", suffix="idea, procedure,", source=usc17
-        )
-        str_version = to_json(copyright_exceptions)
+    def test_convert_selector_to_json(self, make_enactment):
+        copyright_exceptions = make_enactment["copyright"]
+        str_version = to_json(copyright_exceptions.selector)
         assert '"exact": "In no case does copyright' in str_version
 
     def test_failed_prefix(self, make_code):
+        """
+        The phrase "sound recordings" is in the cited Code, but not in
+        the cited subsection, so creating the Enactment should fail.
+        """
         usc17 = make_code["usc17"]
+        up_to_sound = TextQuoteSelector(prefix="sound recordings")
         with pytest.raises(ValueError):
-            copyright_exceptions = TextQuoteSelector(
-                path="/us/usc/t17/s102/b", prefix="sound recordings", source=usc17
-            )
-
-    def test_fail_no_exact_or_source(self, make_code):
-        with pytest.raises(ValueError):
-            copyright_exceptions = TextQuoteSelector(
-                path="/us/usc/t17/s102/b", prefix="sound recordings"
-            )
-            copyright_enactment = Enactment(selector=copyright_exceptions)
+            _ = Enactment(source="/us/usc/t17/s102/b", selector=up_to_sound, code=usc17)
 
     def test_failed_suffix(self, make_code):
         usc17 = make_code["usc17"]
+        up_to_sound = TextQuoteSelector(suffix="sound recordings")
         with pytest.raises(ValueError):
-            copyright_exceptions = TextQuoteSelector(
-                path="/us/usc/t17/s102/b", suffix="sound recordings", source=usc17
-            )
+            _ = Enactment(source="/us/usc/t17/s102/b", selector=up_to_sound, code=usc17)
+
+    def test_fail_no_exact_or_source(self, make_code):
+        """
+        "method of operation," is in the cited section, but there's no
+        Code provided for the __init__ method to look up the text of
+        the passage the user is trying to select.
+        """
+        selector = TextQuoteSelector(prefix="method of operation,")
+        with pytest.raises(AttributeError):
+            _ = Enactment(source="/us/usc/t17/s102/b", selector=selector)
 
     def test_section_text_from_path_and_regime(self, make_regime):
-        copyright_exceptions = TextQuoteSelector(
-            path="/us/usc/t17/s102/b", source=make_regime
+        copyright_exceptions = Enactment(
+            source="/us/usc/t17/s102/b", regime=make_regime
         )
-        assert copyright_exceptions.exact.startswith(
+        assert copyright_exceptions.text.startswith(
             "In no case does copyright protection "
             + "for an original work of authorship extend to any"
         )
