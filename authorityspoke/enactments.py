@@ -212,6 +212,14 @@ class Code:
 
         raise NotImplementedError
 
+    def get_exact_from_source(
+        self, source: str, selector: TextQuoteSelector
+    ) -> Optional[str]:
+        """Use ``source`` to find text for ``exact`` parameter."""
+
+        section_text = self.section_text(source)
+        return selector.exact_from_ends(section_text)
+
     def get_fed_const_section(self, path: str) -> BeautifulSoup:
         """
         Get a section from a USLM identifier if ``self`` is the US Constitution.
@@ -424,7 +432,9 @@ class Enactment:
             object.__setattr__(
                 self.selector,
                 "exact",
-                self.selector.set_exact_from_source(source=self.source, code=self.code),
+                self.code.get_exact_from_source(
+                    source=self.source, selector=self.selector
+                ),
             )
 
         object.__delattr__(self, "regime")

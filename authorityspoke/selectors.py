@@ -53,12 +53,6 @@ class TextQuoteSelector:
     prefix: Optional[str] = None
     suffix: Optional[str] = None
 
-    def set_exact_from_source(self, source: str, code: "Code") -> Optional[str]:
-        """Use text found in ``source`` as ``exact`` parameter for ``self``."""
-
-        section_text = code.section_text(source)
-        return self.exact_from_ends(section_text)
-
     def exact_from_ends(self, text: str) -> str:
         """
         Locate an exact passage from some text.
