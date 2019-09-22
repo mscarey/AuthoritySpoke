@@ -485,7 +485,7 @@ class Enactment:
             XML section referenced in ``self.selector.path``.
         """
         if not path:
-            path = self.selector.path
+            path = self.source
         regex = self.selector.passage_regex
         match = re.search(regex, self.code.section_text(path), re.IGNORECASE)
         if match:

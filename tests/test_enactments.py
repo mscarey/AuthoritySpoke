@@ -234,9 +234,8 @@ class TestEnactments:
         ``exact``, ``prefix``, ``suffix``, or ``source`` parameter was
         passed to the TextQuoteSelector constructor.
         """
-        amendment_12 = Enactment(
-            selector=TextQuoteSelector(path="/us/const/amendment-XII"),
-            regime=make_regime,
+        amendment_12 = readers.read_enactment(
+            {"path": "/us/const/amendment-XII"}, regime=make_regime
         )
         assert amendment_12.effective_date == datetime.date(1804, 9, 25)
         assert "Electors shall meet" in amendment_12.text
@@ -270,7 +269,7 @@ class TestEnactments:
         """
         provision = make_enactment[enactment_name]
         interval = provision.text_interval()
-        this_section = provision.code.section_text(path=provision.selector.path)
+        this_section = provision.code.section_text(path=provision.source)
         assert this_section[interval[0] : interval[1]] == text
 
     def test_text_interval_bad_selector(self, make_enactment):

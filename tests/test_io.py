@@ -123,7 +123,7 @@ class TestRuleImport:
 
     def test_enactment_has_subsection(self, make_opinion_with_holding):
         lotus = make_opinion_with_holding["lotus_majority"]
-        assert lotus.holdings[8].enactments[0].selector.path.split("/")[-1] == "b"
+        assert lotus.holdings[8].enactments[0].source.split("/")[-1] == "b"
 
     def test_enactment_text_limited_to_subsection(self, make_opinion_with_holding):
         lotus = make_opinion_with_holding["lotus_majority"]

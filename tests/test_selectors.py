@@ -36,10 +36,7 @@ class TestSelectors:
         assert statute.source.startswith("/")
 
     def test_selector_text_split(self):
-        data = {
-            "path": "/us/usc/t17/s102/b",
-            "text": "process, system,|method of operation|, concept, principle",
-        }
+        data = {"text": "process, system,|method of operation|, concept, principle"}
         selector = references.read_selector(data)
         assert selector.exact.startswith("method")
 
@@ -116,29 +113,25 @@ class TestSelectors:
 
 class TestDump:
     def test_get_schema_for_selector(self):
-        data = {
-            "path": "/us/usc/t17/s102/b",
-            "text": "process, system,|method of operation|, concept, principle",
-        }
+        data = {"text": "process, system,|method of operation|, concept, principle"}
         selector = references.read_selector(data)
         schema = get_schema_for_item(selector)
         assert isinstance(schema, SelectorSchema)
 
     def test_dump_selector(self):
-        data = {
-            "path": "/us/usc/t17/s102/b",
-            "text": "process, system,|method of operation|, concept, principle",
-        }
+        """
+        Uses text from "path": "/us/usc/t17/s102/b", but
+        no longer includes a reference to the path.
+        """
+
+        data = {"text": "process, system,|method of operation|, concept, principle"}
         selector = references.read_selector(data)
         selector_dict = to_dict(selector)
         assert isinstance(selector_dict, dict)
         assert selector_dict["prefix"].startswith("process, system")
 
     def test_string_dump_selector(self):
-        data = {
-            "path": "/us/usc/t17/s102/b",
-            "text": "process, system,|method of operation|, concept, principle",
-        }
+        data = {"text": "process, system,|method of operation|, concept, principle"}
         selector = references.read_selector(data)
         selector_str = to_json(selector)
         assert isinstance(selector_str, str)

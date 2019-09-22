@@ -3,6 +3,7 @@ from typing import Any, Dict, Tuple, Union
 from marshmallow import Schema, fields, pre_load, post_load
 from marshmallow import ValidationError
 
+from authorityspoke.enactments import Enactment
 from authorityspoke.selectors import TextQuoteSelector
 
 
@@ -11,7 +12,6 @@ class SelectorSchema(Schema):
     prefix = fields.Str()
     exact = fields.Str()
     suffix = fields.Str()
-    path = fields.Url(relative=True)
 
     def split_text(self, text: str) -> Tuple[str, ...]:
         """
@@ -54,6 +54,12 @@ class SelectorSchema(Schema):
     @post_load
     def make_selector(self, data, **kwargs):
         return TextQuoteSelector(**data)
+
+
+class EnactmentSchema(Schema):
+    __model__ = Enactment
+    source = fields.Url(relative=True)
+    selector = fields.Nested(SelectorSchema)
 
 
 SCHEMAS = [schema() for schema in Schema.__subclasses__()]
