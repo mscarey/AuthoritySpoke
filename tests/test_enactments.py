@@ -252,28 +252,39 @@ class TestEnactments:
         assert dp14.effective_date > dp5.effective_date
 
     @pytest.mark.parametrize(
-        "enactment_name, text",
+        "enactment_name, code_name, text",
         [
-            ("due_process_5", "life, liberty, or property, without due process of law"),
+            (
+                "due_process_5",
+                "const",
+                "life, liberty, or property, without due process of law",
+            ),
             (
                 "copyright",
+                "usc17",
                 "In no case does copyright protection for an original work of authorship extend to any",
             ),
         ],
     )
-    def test_text_interval(self, make_enactment, enactment_name, text):
+    def test_text_interval(
+        self, make_code, make_enactment, code_name, enactment_name, text
+    ):
         """
         The interval represents the start and end of the phrase
         "life, liberty, or property, without due process of law"
         in the Fifth Amendment.
         """
         provision = make_enactment[enactment_name]
-        interval = provision.text_interval()
-        this_section = provision.code.section_text(path=provision.source)
+        code = make_code[code_name]
+        interval = code.text_interval(provision)
+        this_section = code.section_text(path=provision.source)
         assert this_section[interval[0] : interval[1]] == text
 
-    def test_text_interval_bad_selector(self, make_enactment):
-        assert make_enactment["bad_selector"].text_interval() is None
+    def test_text_interval_bad_source(self, make_code, make_enactment):
+        assert make_code["usc17"].text_interval(make_enactment["bad_selector"]) is None
+
+    def test_text_interval_bad_selector(self, make_code, make_enactment):
+        assert make_code["const"].text_interval(make_enactment["bad_selector"]) is None
 
     # Addition
 

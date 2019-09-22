@@ -6,7 +6,7 @@ import datetime
 import functools
 import pathlib
 import re
-from typing import List, Optional, Tuple, Union
+from typing import List, Optional, Sequence, Tuple, Union
 from dataclasses import dataclass
 
 from bs4 import BeautifulSoup
@@ -74,6 +74,34 @@ class Code:
             return "regulation"
         else:
             return "statute"
+
+    def text_interval(
+        self, enactment: Enactment, path: str = ""
+    ) -> Optional[Tuple[int, int]]:
+        """
+        Find integer indices for the quoted text.
+
+        :returns:
+            A :class:`tuple` containing the lower and upper bounds of the
+            text passage quoted in ``self.selector.exact`` within the
+            XML section referenced in ``self.selector.path``.
+        """
+        if not path:
+            path = enactment.source
+
+        sections = self.get_sections(path)
+        if not sections:
+            raise ValueError(f"Section {path} does not exist in code {self.title}")
+
+        text = self.section_text(sections)
+
+        regex = enactment.selector.passage_regex
+        match = re.search(regex, text, re.IGNORECASE)
+        if match:
+            # Getting indices from match group 1 (in the parentheses),
+            # not match 0 which includes prefix and suffix
+            return (match.start(1), match.end(1))
+        return None
 
     @lazyprop
     def title(self) -> str:
@@ -217,7 +245,8 @@ class Code:
     ) -> Optional[str]:
         """Use ``source`` to find text for ``exact`` parameter."""
 
-        section_text = self.section_text(source)
+        sections = self.get_sections(source)
+        section_text = self.section_text(sections)
         return selector.exact_from_ends(section_text)
 
     def get_fed_const_section(self, path: str) -> BeautifulSoup:
@@ -244,9 +273,9 @@ class Code:
         return section
 
     @functools.lru_cache()
-    def section_text(self, path: str) -> str:
-        """
-        Get the text of the section identified by a path.
+    def get_sections(self, path: str = "") -> Optional[BeautifulSoup]:
+        r"""
+        Get sections identified by a path, if present in the :class:`Code`\.
 
         :param path:
             a path string, in the format used for :class:`.TextQuoteSelector`
@@ -271,19 +300,23 @@ class Code:
             section = self.xml.find(identifier=path)
             return section.find_all(["chapeau", "paragraph", "content"])
 
-        if path is None:
-            docpath = "/"
+        docpath = path or self.uri
+        if not docpath.startswith(self.uri):
+            return None  # path does not lead to this Code
         else:
-            docpath = path.replace(self.uri, "")
+            docpath = docpath.replace(self.uri, "")
 
         if not docpath:  # selecting the whole Code
             passages = self.xml.find_all(name="text")
         elif self.jurisdiction == "us":
             if self.level == "regulation":
                 section = docpath.split("/")[1].strip("s")
-                passages = self.xml.find(
+                citation = self.xml.find(
                     name="SECTNO", text=f"§ {section}"
-                ).parent.find_all(name="P")
+                )
+                if not citation:
+                    return None
+                passages = citation.parent.find_all(name="P")
             elif self.level == "statute":
                 passages = usc_statute_text()
             else:  # federal constitution
@@ -295,6 +328,19 @@ class Code:
             passages = self.xml.find(href=this_cal_section).parent.find_next_siblings(
                 style="margin:0;display:inline;"
             )
+        return passages
+
+    @staticmethod
+    def section_text(passages: Sequence[BeautifulSoup]) -> str:
+        """
+        Get the text of the section identified by a path.
+
+        :param path:
+            a sequence of XML elements with text to join
+
+        :returns:
+            the text of the XML elements.
+        """
 
         return " ".join(" ".join(passage.text.split()) for passage in passages)
 
@@ -319,7 +365,8 @@ class Code:
 
         if not path:
             path = self.uri
-        section_text = self.section_text(path)
+        sections = self.get_sections(path)
+        section_text = self.section_text(sections)
         if len(section_text) < max(interval):
             raise ValueError(
                 f"Interval {interval} extends beyond the end of text section {path}."
@@ -346,7 +393,8 @@ class Code:
             the text referenced by the selector, or ``None`` if the text
             can't be found.
         """
-        text = self.section_text(path=path)
+        sections = self.get_sections(path)
+        text = self.section_text(sections)
         if not selector:
             return text
         if re.search(selector.passage_regex, text, re.IGNORECASE):
@@ -392,7 +440,7 @@ class Enactment:
     """
 
     source: Optional[str]
-    selector: Optional[Union[TextQuoteSelector, Tuple[TextQuoteSelector]]] = None
+    selector: Optional[TextQuoteSelector] = None
     code: Optional[Code] = None
     regime: Optional[Regime] = None
     name: Optional[str] = None
@@ -484,25 +532,6 @@ class Enactment:
             ),
             code=self.code,
         )
-
-    def text_interval(self, path=None) -> Optional[Tuple[int, int]]:
-        """
-        Find integer indices for the quoted text.
-
-        :returns:
-            A :class:`tuple` containing the lower and upper bounds of the
-            text passage quoted in ``self.selector.exact`` within the
-            XML section referenced in ``self.selector.path``.
-        """
-        if not path:
-            path = self.source
-        regex = self.selector.passage_regex
-        match = re.search(regex, self.code.section_text(path), re.IGNORECASE)
-        if match:
-            # Getting indices from match group 1 (in the parentheses),
-            # not match 0 which includes prefix and suffix
-            return (match.start(1), match.end(1))
-        return None
 
     @property
     def effective_date(self):
