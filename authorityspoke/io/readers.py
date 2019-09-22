@@ -12,7 +12,6 @@ from typing import Any, Dict, List, Iterable, Iterator, Optional, Tuple, Type, U
 
 from pint import UnitRegistry
 
-from authorityspoke.io import references
 from authorityspoke.enactments import Code, Enactment
 from authorityspoke.entities import Entity
 from authorityspoke.evidence import Exhibit, Evidence
@@ -26,6 +25,9 @@ from authorityspoke.predicates import Predicate
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
 from authorityspoke.selectors import TextQuoteSelector
+
+from authorityspoke.io import references
+from authorityspoke.io import schemas
 
 
 
@@ -76,27 +78,21 @@ def read_enactment(
         a new :class:`Enactment` object, optionally with text links.
     """
     if regime and not code:
-        code = regime.get_code(enactment_dict["path"])
+        code = regime.get_code(enactment_dict["source"])
     if code is None:
         raise ValueError(
             "Must either specify a Code, or else specify a Regime "
             + "and a path to find the Code within the Regime."
         )
-    if regime:
-        regime.set_code(code)
 
-    name = enactment_dict.get("name")
-    if name:
-        del enactment_dict["name"]
+    schema = schemas.EnactmentSchema()
+    normalized = schema.load(enactment_dict)
 
-    source = enactment_dict.get("path")
-    if source:
-        del enactment_dict["path"]
+    if not normalized.get("source"):
+        normalized["source"] = code.uri
 
-    selector = references.read_selector(record=enactment_dict)
-    answer = Enactment(code=code, source=source, selector=selector, name=name)
-    mentioned = mentioned or {}
-    return (answer, mentioned) if report_mentioned else answer
+    answer = Enactment(**normalized, code=code)
+    return (answer, mentioned or {}) if report_mentioned else answer
 
 
 def read_enactments(

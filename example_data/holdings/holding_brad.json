@@ -78,12 +78,12 @@
                 "absent": true
             },
             "enactments": [{
-                    "path": "/us/const/amendment-IV",
+                    "source": "/us/const/amendment-IV",
                     "suffix": ", and no Warrants shall issue",
                     "name": "search clause"
                 },
                 {
-                    "path": "/us/const/amendment-XIV-1",
+                    "source": "/us/const/amendment-XIV-1",
                     "prefix": "immunities of citizens of the United States; ",
                     "suffix": " nor deny to any person",
                     "name": "due process clause"

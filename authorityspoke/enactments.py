@@ -459,24 +459,6 @@ class Enactment:
 
     def __post_init__(self):
 
-        if self.source and not (
-            self.source.startswith("/") or self.source.startswith("http")
-        ):
-            object.__setattr__(self, "source", "/" + self.source)
-        if self.source and self.source.endswith("/"):
-            object.__setattr__(self, "source", self.source.rstrip("/"))
-
-        if not self.source:
-
-            if self.code:
-                object.__setattr__(self, "source", self.code.uri)
-
-            elif self.regime:
-                object.__setattr__(self, "source", self.regime.uri)
-
-            else:
-                raise ValueError("'code' and 'regime' cannot both be None")
-
         if self.regime and not self.code:
             object.__setattr__(self, "code", self.regime.get_code(self.source))
 

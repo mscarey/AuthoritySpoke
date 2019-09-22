@@ -117,7 +117,7 @@ class TestEnactments:
 
     def test_make_enactment_from_dict_with_code(self, make_code):
         fourth_a = readers.read_enactment(
-            factor_record={"path": "/us/const/amendment-IV"}, code=make_code["const"]
+            factor_record={"source": "/us/const/amendment-IV"}, code=make_code["const"]
         )
         assert fourth_a.text.endswith("and the persons or things to be seized.")
 
@@ -125,7 +125,7 @@ class TestEnactments:
         self, make_regime, make_code
     ):
         fourth_a = readers.read_enactment(
-            factor_record={"path": "/us/const/amendment-IV"},
+            factor_record={"source": "/us/const/amendment-IV"},
             code=make_code["const"],
             regime=make_regime,
         )
@@ -134,7 +134,7 @@ class TestEnactments:
     def test_make_enactment_from_dict_with_text_split(self, make_regime, make_code):
         fourth_a = readers.read_enactment(
             factor_record={
-                "path": "/us/const/amendment-IV",
+                "source": "/us/const/amendment-IV",
                 "text": "and|the persons or things|to be seized.",
             },
             code=make_code["const"],
@@ -155,7 +155,7 @@ class TestEnactments:
         usc17 = make_code["usc17"]
         method = readers.read_enactment(
             {
-                "path": "us/usc/t17/s102/b",
+                "source": "us/usc/t17/s102/b",
                 "prefix": "process, system,",
                 "suffix": ", concept, principle",
             },
@@ -165,11 +165,13 @@ class TestEnactments:
 
     def test_passage_from_cfr_code(self, make_code):
         cfr = make_code["cfr37"]
-        slogans = readers.read_enactment({"path": "/us/cfr/t37/s202.1"}, code=cfr)
+        slogans = readers.read_enactment({"source": "/us/cfr/t37/s202.1"}, code=cfr)
         assert "Words and short phrases such as names" in slogans.text
 
     def test_cite_entire_constitution(self, make_regime):
-        entire_const = readers.read_enactment({"path": "/us/const"}, regime=make_regime)
+        entire_const = readers.read_enactment(
+            {"source": "/us/const"}, regime=make_regime
+        )
         assert "and been seven Years a Citizen" in entire_const.text
 
     def test_code_title_in_str(self, make_enactment):
@@ -213,7 +215,7 @@ class TestEnactments:
 
     def test_constitution_effective_date(self, make_regime):
         ex_post_facto_provision = readers.read_enactment(
-            {"path": "/us/const/article-I/9/3"}, regime=make_regime
+            {"source": "/us/const/article-I/9/3"}, regime=make_regime
         )
         assert ex_post_facto_provision.effective_date == datetime.date(1788, 9, 13)
 
@@ -235,7 +237,7 @@ class TestEnactments:
         passed to the TextQuoteSelector constructor.
         """
         amendment_12 = readers.read_enactment(
-            {"path": "/us/const/amendment-XII"}, regime=make_regime
+            {"source": "/us/const/amendment-XII"}, regime=make_regime
         )
         assert amendment_12.effective_date == datetime.date(1804, 9, 25)
         assert "Electors shall meet" in amendment_12.text

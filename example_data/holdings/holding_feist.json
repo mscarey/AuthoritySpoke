@@ -58,20 +58,20 @@
                 }]
             },
             "enactments": [{
-                    "path": "/us/const/article-I/8/8",
+                    "source": "/us/const/article-I/8/8",
                     "exact": "To promote the Progress of Science and useful Arts, by securing for limited Times to Authors",
                     "name": "securing for authors"
                 }, {
-                    "path": "/us/const/article-I/8/8",
+                    "source": "/us/const/article-I/8/8",
                     "exact": "the exclusive Right to their respective Writings",
                     "name": "right to writings"
                 }, {
-                    "path": "/us/usc/t17/s103/b",
+                    "source": "/us/usc/t17/s103/b",
                     "exact": "The copyright in a compilation",
                     "name": "copyright in a compilation"
                 },
                 {
-                    "path": "/us/usc/t17/s103/b",
+                    "source": "/us/usc/t17/s103/b",
                     "exact": "extends only to the material contributed by the author of such work, as distinguished from the preexisting material employed in the work, and does not imply any exclusive right in the preexisting material.",
                     "name": "preexisting material provision"
                 }
@@ -126,7 +126,7 @@
             "outputs": "Rural's telephone directory was copyrightable",
             "exclusive": true,
             "enactments": ["securing for authors", "right to writings", {
-                "path": "/us/usc/t17/s102/a",
+                "source": "/us/usc/t17/s102/a",
                 "name": "copyright requires originality",
                 "suffix": "fixed in any tangible"
             }],
@@ -163,7 +163,7 @@
                 "anchors": "No one may claim originality"
             },
             "enactments": ["securing for authors", "right to writings", {
-                "path": "/us/usc/t17/s102/b",
+                "source": "/us/usc/t17/s102/b",
                 "name": "facts are never original"
             }],
             "mandatory": true,

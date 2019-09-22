@@ -58,8 +58,40 @@ class SelectorSchema(Schema):
 
 class EnactmentSchema(Schema):
     __model__ = Enactment
+    name = fields.String()
     source = fields.Url(relative=True)
     selector = fields.Nested(SelectorSchema)
+
+    @pre_load
+    def move_selector_fields(self, data, **kwargs):
+        """
+        Nest fields used for :class:`SelectorSchema` model.
+
+        If the fields are already nested, they need not to be moved.
+
+        The fields can only be moved into a "selector" field with a dict
+        value, not a "selectors" field with a list value.
+        """
+        selector_field_names = ["text", "exact", "prefix", "suffix"]
+        for name in selector_field_names:
+            if data.get(name):
+                if not data.get("selector"):
+                    data["selector"] = {}
+                data["selector"][name] = data[name]
+                del data[name]
+        return data
+
+    @pre_load
+    def fix_source_path_errors(self, data, **kwargs):
+
+        if data.get("source"):
+            if not (
+                data["source"].startswith("/") or data["source"].startswith("http")
+            ):
+                data["source"] = "/" + data["source"]
+            if data["source"].endswith("/"):
+                data["source"] = data["source"].rstrip("/")
+        return data
 
 
 SCHEMAS = [schema() for schema in Schema.__subclasses__()]

@@ -1,7 +1,7 @@
 import pytest
 
 from authorityspoke.enactments import Code, Enactment
-from authorityspoke.io import loaders, references
+from authorityspoke.io import loaders, readers, references
 from authorityspoke.io.schemas import SelectorSchema, get_schema_for_item
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
@@ -25,14 +25,16 @@ class TestSelectors:
 
     def test_omit_terminal_slash(self, make_code):
         usc17 = make_code["usc17"]
-        selector = TextQuoteSelector(exact="process, system,")
-        statute = Enactment(selector=selector, source="us/usc/t17/s102/b/", code=usc17)
+        statute = readers.read_enactment(
+            {"exact": "process, system,", "source": "us/usc/t17/s102/b/"}, code=usc17
+        )
         assert not statute.source.endswith("/")
 
     def test_add_omitted_initial_slash(self, make_code):
         usc17 = make_code["usc17"]
-        selector = TextQuoteSelector(exact="process, system,")
-        statute = Enactment(selector=selector, source="us/usc/t17/s102/b/", code=usc17)
+        statute = readers.read_enactment(
+            {"exact": "process, system,", "source": "us/usc/t17/s102/b/"}, code=usc17
+        )
         assert statute.source.startswith("/")
 
     def test_selector_text_split(self):

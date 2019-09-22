@@ -37,7 +37,7 @@
             },
             "mandatory": true,
             "enactments": {
-                "path": "/us/usc/t17/s102/a",
+                "source": "/us/usc/t17/s102/a",
                 "exact": "Copyright protection subsists, in accordance with this title, in original works of authorship fixed in any tangible medium of expression, now known or later developed, from which they can be perceived, reproduced, or otherwise communicated, either directly or with the aid of a machine or device.",
                 "name": "copyright protection provision"
             },
@@ -96,7 +96,7 @@
             "mandatory": true,
             "enactments": "copyright protection provision",
             "enactments_despite": {
-                "path": "/us/usc/t17/s102/b",
+                "source": "/us/usc/t17/s102/b",
                 "name": "copyrightability exceptions"
             }
         },
@@ -278,17 +278,17 @@
             "mandatory": true,
             "enactments": "copyright protection provision",
             "enactments_despite": [{
-                    "path": "/us/usc/t17/s102/b",
+                    "source": "/us/usc/t17/s102/b",
                     "exact": "In no case does copyright protection for an original work of authorship extend to any",
                     "name": "in no case clause"
                 },
                 {
-                    "path": "/us/usc/t17/s102/b",
+                    "source": "/us/usc/t17/s102/b",
                     "exact": "method of operation",
                     "name": "method of operation clause"
                 },
                 {
-                    "path": "/us/cfr/t37/s202.1",
+                    "source": "/us/cfr/t37/s202.1",
                     "name": "short phrases copyright exception",
                     "suffix": "familiar symbols or designs"
                 }

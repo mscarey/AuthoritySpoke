@@ -50,21 +50,21 @@
             }],
             "mandatory": true,
             "enactments": [{
-                    "path": "/us-ca/evid/s351"
+                    "source": "/us-ca/evid/s351"
                 },
                 {
-                    "path": "/us-ca/evid/s352",
+                    "source": "/us-ca/evid/s352",
                     "suffix": "(a) necessitate undue"
                 },
                 {
-                    "path": "/us-ca/evid/s352",
+                    "source": "/us-ca/evid/s352",
                     "exact": "create substantial danger of undue prejudice"
                 },
                 {
-                    "path": "/us-ca/pen/s211"
+                    "source": "/us-ca/pen/s211"
                 },
                 {
-                    "path": "/us-ca/pen/s664",
+                    "source": "/us-ca/pen/s664",
                     "suffix": "where no provision is"
                 }
             ]
@@ -87,21 +87,21 @@
             }],
             "mandatory": true,
             "enactments": [{
-                    "path": "/us-ca/evid/s351"
+                    "source": "/us-ca/evid/s351"
                 },
                 {
-                    "path": "/us-ca/evid/s352",
+                    "source": "/us-ca/evid/s352",
                     "suffix": "(a) necessitate undue consumption"
                 },
                 {
-                    "path": "/us-ca/evid/s352",
+                    "source": "/us-ca/evid/s352",
                     "exact": "create substantial danger of undue prejudice"
                 },
                 {
-                    "path": "/us-ca/pen/s211"
+                    "source": "/us-ca/pen/s211"
                 },
                 {
-                    "path": "/us-ca/pen/s664",
+                    "source": "/us-ca/pen/s664",
                     "suffix": "where no provision is"
                 }
             ]
