@@ -277,11 +277,12 @@ class TestEnactments:
         provision = make_enactment[enactment_name]
         code = make_code[code_name]
         interval = code.text_interval(provision)
-        this_section = code.section_text(path=provision.source)
+        this_section = code.section_text_from_path(path=provision.source)
         assert this_section[interval[0] : interval[1]] == text
 
     def test_text_interval_bad_source(self, make_code, make_enactment):
-        assert make_code["usc17"].text_interval(make_enactment["bad_selector"]) is None
+        with pytest.raises(ValueError):
+            _ = make_code["usc17"].text_interval(make_enactment["bad_selector"])
 
     def test_text_interval_bad_selector(self, make_code, make_enactment):
         assert make_code["const"].text_interval(make_enactment["bad_selector"]) is None

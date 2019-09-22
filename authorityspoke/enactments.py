@@ -311,9 +311,7 @@ class Code:
         elif self.jurisdiction == "us":
             if self.level == "regulation":
                 section = docpath.split("/")[1].strip("s")
-                citation = self.xml.find(
-                    name="SECTNO", text=f"§ {section}"
-                )
+                citation = self.xml.find(name="SECTNO", text=f"§ {section}")
                 if not citation:
                     return None
                 passages = citation.parent.find_all(name="P")
@@ -333,9 +331,9 @@ class Code:
     @staticmethod
     def section_text(passages: Sequence[BeautifulSoup]) -> str:
         """
-        Get the text of the section identified by a path.
+        Get the text of legislative sections from XML elements.
 
-        :param path:
+        :param passages:
             a sequence of XML elements with text to join
 
         :returns:
@@ -343,6 +341,20 @@ class Code:
         """
 
         return " ".join(" ".join(passage.text.split()) for passage in passages)
+
+    def section_text_from_path(self, path: str = "") -> str:
+        """
+        Get the text of legislative sections from a path identifier.
+
+        :param path:
+            a path string, in the format used for :class:`.TextQuoteSelector`
+            objects, to the section with the text to be returned.
+
+        :returns:
+            the text of the XML elements.
+        """
+        sections = self.get_sections(path)
+        return self.section_text(sections)
 
     def select_text_from_interval(
         self, interval: Tuple[int, int], path: Optional[str] = None
@@ -513,8 +525,8 @@ class Enactment:
         """
         if not other.source.startswith(self.source):
             return None
-        self_interval = self.text_interval()
-        other_interval = other.text_interval(path=self.source)
+        self_interval = self.code.text_interval(self)
+        other_interval = self.code.text_interval(other, path=self.source)
         both_intervals = sorted([self_interval, other_interval])
         if both_intervals[1][0] >= both_intervals[0][1] + 2:
             return None
