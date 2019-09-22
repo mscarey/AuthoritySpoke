@@ -77,15 +77,10 @@ def read_enactment(
     """
     if regime and not code:
         code = regime.get_code(enactment_dict["path"])
-    if enactment_dict.get("file"):
-        if code is None:
-            code = Code(enactment_dict["file"])
-        del enactment_dict["file"]
     if code is None:
         raise ValueError(
-            "Must either specify a Regime and a path to find the "
-            + "Code within the Regime, or specify a filename for an XML "
-            + "file that can be used to build the Code"
+            "Must either specify a Code, or else specify a Regime "
+            + "and a path to find the Code within the Regime."
         )
     if regime:
         regime.set_code(code)
