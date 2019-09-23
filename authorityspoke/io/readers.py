@@ -85,11 +85,8 @@ def read_enactment(
             + "and a path to find the Code within the Regime."
         )
 
-    schema = schemas.EnactmentSchema()
+    schema = schemas.EnactmentSchema(context={"code": code})
     normalized = schema.load(enactment_dict)
-
-    if not normalized.get("source"):
-        normalized["source"] = code.uri
 
     answer = Enactment(**normalized, code=code)
     return (answer, mentioned or {}) if report_mentioned else answer
@@ -111,16 +108,12 @@ def read_enactments(
         sequence of :class:`dict`\s with string fields from JSON for
         constructing new :class:`.Enactment`\s
 
-    :param code:
-        the :class:`.Code` that is the source for this
-        :class:`Enactment`
-
     :param mentioned:
         :class:`.TextLinkDict` for known :class:`.Factor`\s
         and :class:`.Enactment`\s
 
     :param regime:
-        the :class:`.Regime` where the :class:`.Code` that is the
+        the :class:`.Regime` where the :class:`.Code`\s that are the
         source for this :class:`Enactment` can be found, or where
         it should be added
 

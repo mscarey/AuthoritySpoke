@@ -138,3 +138,11 @@ class TestDump:
         selector_str = to_json(selector)
         assert isinstance(selector_str, str)
         assert '"prefix": "process, system' in selector_str
+
+    def test_round_trip_dict(self):
+        data = {"exact": "method of operation"}
+        selector = references.read_selector(data)
+        selector_dict = to_dict(selector)
+        new = references.read_selector(selector_dict)
+        assert new.prefix is None
+        assert new.exact == "method of operation"

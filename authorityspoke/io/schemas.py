@@ -9,9 +9,9 @@ from authorityspoke.selectors import TextQuoteSelector
 
 class SelectorSchema(Schema):
     __model__ = TextQuoteSelector
-    prefix = fields.Str()
-    exact = fields.Str()
-    suffix = fields.Str()
+    prefix = fields.Str(missing=None)
+    exact = fields.Str(missing=None)
+    suffix = fields.Str(missing=None)
 
     def split_text(self, text: str) -> Tuple[str, ...]:
         """
@@ -58,9 +58,9 @@ class SelectorSchema(Schema):
 
 class EnactmentSchema(Schema):
     __model__ = Enactment
-    name = fields.String()
+    name = fields.String(missing=None)
     source = fields.Url(relative=True)
-    selector = fields.Nested(SelectorSchema)
+    selector = fields.Nested(SelectorSchema, missing=None)
 
     @pre_load
     def move_selector_fields(self, data, **kwargs):
@@ -83,6 +83,9 @@ class EnactmentSchema(Schema):
 
     @pre_load
     def fix_source_path_errors(self, data, **kwargs):
+
+        if not data.get("source"):
+            data["source"] = self.context["code"].uri
 
         if data.get("source"):
             if not (

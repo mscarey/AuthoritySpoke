@@ -9,7 +9,7 @@ import pytest
 from authorityspoke.enactments import Code, Enactment, consolidate_enactments
 from authorityspoke.opinions import Opinion
 from authorityspoke.predicates import ureg, Q_
-from authorityspoke.io import loaders, readers
+from authorityspoke.io import loaders, readers, dump
 from authorityspoke.selectors import TextQuoteSelector
 
 
@@ -370,3 +370,38 @@ class TestEnactments:
             + make_enactment["commerce_vague_path"]
             is None
         )
+
+
+class TestDump:
+    def test_dump_dict(self, make_enactment):
+        d = dump.to_dict(make_enactment["securing_for_authors"])
+        assert "Science and useful Arts" in d["selector"]["exact"]
+
+    def test_dump_json(self, make_code):
+        cfr = make_code["cfr37"]
+        slogans = readers.read_enactment({"source": "/us/cfr/t37/s202.1"}, code=cfr)
+        s = dump.to_json(slogans)
+        assert '"source": "/us/cfr/t37/s202.1"' in s
+
+    def test_round_trip_dict(self, make_code):
+        cfr = make_code["cfr37"]
+        slogans = readers.read_enactment({"source": "/us/cfr/t37/s202.1"}, code=cfr)
+        dumped_slogans = dump.to_dict(slogans)
+        new = readers.read_enactment(dumped_slogans, code=cfr)
+        assert new.source == "/us/cfr/t37/s202.1"
+
+    def test_supply_missing_source_from_code(self, make_code):
+        """
+        Test that when a "source" path is omitted, the load method
+        at least uses the uri of the code as the source.
+
+        It might make sense for the method to find a more accurate
+        source path for the specific section, but it doesn't.
+        """
+        const = make_code["const"]
+        due_process = readers.read_enactment(
+            {"prefix": "property, without ", "suffix": "nor shall private property"},
+            code=const,
+        )
+        assert "due process" in due_process.text
+        assert due_process.source.startswith("/us/const")
