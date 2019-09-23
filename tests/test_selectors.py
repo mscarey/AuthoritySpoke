@@ -81,8 +81,8 @@ class TestSelectors:
             _ = Enactment(source="/us/usc/t17/s102/b", selector=selector)
 
     def test_section_text_from_path_and_regime(self, make_regime):
-        copyright_exceptions = Enactment(
-            source="/us/usc/t17/s102/b", regime=make_regime
+        copyright_exceptions = readers.read_enactment(
+            {"source": "/us/usc/t17/s102/b"}, regime=make_regime
         )
         assert copyright_exceptions.text.startswith(
             "In no case does copyright protection "
@@ -91,9 +91,11 @@ class TestSelectors:
 
     def test_exact_text_not_in_selection(self, make_regime):
         due_process_wrong_section = TextQuoteSelector(exact="due process")
-        enactment = Enactment(
-            selector=due_process_wrong_section,
-            source="/us/const/amendment-XV/1",
+        enactment = readers.read_enactment(
+            {
+                "selector": due_process_wrong_section,
+                "source": "/us/const/amendment-XV/1",
+            },
             regime=make_regime,
         )
         with pytest.raises(ValueError):

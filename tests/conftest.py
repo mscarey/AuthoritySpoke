@@ -642,21 +642,21 @@ def make_enactment(make_code, make_selector, make_regime) -> Dict[str, Enactment
             ),
             code=make_code["const"],
         ),
-        "copyright": Enactment(
-            selector=make_selector["copyright"],
-            source="/us/usc/t17/s102/b",
+        "copyright": readers.read_enactment(
+            {"selector": make_selector["copyright"],
+            "source": "/us/usc/t17/s102/b"},
             code=make_code["usc17"],
             regime=make_regime,
         ),
-        "copyright_requires_originality": Enactment(
-            selector=make_selector["copyright_requires_originality"],
-            source="/us/usc/t17/s102/a",
+        "copyright_requires_originality": readers.read_enactment(
+            {"selector": make_selector["copyright_requires_originality"],
+            "source": "/us/usc/t17/s102/a"},
             regime=make_regime,
         ),
         "securing_for_authors": Enactment(
             selector=TextQuoteSelector(
-                exact="To promote the Progress of Science and useful Arts, by securing for limited Times to Authors",
-            ),
+                exact=("To promote the Progress of Science and "
+                + "useful Arts, by securing for limited Times to Authors")),
             source="/us/const/article-I/8/8",
             code=make_code["const"],
         ),
@@ -681,40 +681,32 @@ def make_enactment(make_code, make_selector, make_regime) -> Dict[str, Enactment
             code=make_code["const"],
             source="/us/const/article-I",
         ),
-        "search_clause": Enactment(
-            selector=TextQuoteSelector(
-                exact=(
+        "search_clause": readers.read_enactment(
+            {"exact": (
                     "The right of the people to be secure in their persons, "
                     + "houses, papers, and effects, against unreasonable searches "
                     + "and seizures, shall not be violated"
                 ),
-            ),
-            source="/us/const/amendment-IV",
+            "source": "/us/const/amendment-IV"},
             regime=make_regime,
         ),
-        "warrants_clause": Enactment(
-            selector=TextQuoteSelector(
-                exact="shall not be violated, and no Warrants shall issue,",
-            ),
-            source="/us/const/amendment-IV",
+        "warrants_clause": readers.read_enactment(
+            {"exact": "shall not be violated, and no Warrants shall issue,",
+            "source": "/us/const/amendment-IV"},
             regime=make_regime,
         ),
-        "fourth_a": Enactment(  # whole section, no selector
-            source="/us/const/amendment-IV",
+        "fourth_a": readers.read_enactment(  # whole section, no selector
+            {"source": "/us/const/amendment-IV"},
             regime=make_regime,
         ),
-        "due_process_5": Enactment(
-            selector=TextQuoteSelector(
-                exact="life, liberty, or property, without due process of law",
-            ),
-            source="/us/const/amendment-V",
+        "due_process_5": readers.read_enactment(
+            {"exact": "life, liberty, or property, without due process of law",
+            "source": "/us/const/amendment-V"},
             regime=make_regime,
         ),
-        "due_process_14": Enactment(
-            selector=TextQuoteSelector(
-                exact="life, liberty, or property, without due process of law",
-            ),
-            source="/us/const/amendment-XIV-1",
+        "due_process_14": readers.read_enactment(
+            {"exact": "life, liberty, or property, without due process of law",
+            "source": "/us/const/amendment-XIV-1"},
             regime=make_regime,
         ),
     }

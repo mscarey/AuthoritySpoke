@@ -454,13 +454,9 @@ class Enactment:
     source: Optional[str]
     selector: Optional[TextQuoteSelector] = None
     code: Optional[Code] = None
-    regime: Optional[Regime] = None
     name: Optional[str] = None
 
     def __post_init__(self):
-
-        if self.regime and not self.code:
-            object.__setattr__(self, "code", self.regime.get_code(self.source))
 
         if (
             self.selector
@@ -478,8 +474,6 @@ class Enactment:
                     source=self.source, selector=self.selector
                 ),
             )
-
-        object.__delattr__(self, "regime")
 
     def __add__(self, other):
         if other.__class__.__name__ == "Rule":

@@ -1,6 +1,11 @@
 Changelog
 =========
 
+Dev
+------------------
+- Enactments may choose text by section without a TextQuoteSelector
+- Remove "regime" parameter from Enactment
+
 0.2.0 (2019-09-24)
 ------------------
 

@@ -40,9 +40,7 @@ class TestIntroduction:
         assert lotus_majority.holdings[0].outputs[0].absent is False
         assert lotus_majority.holdings[1].outputs[0].absent is True
 
-    def test_evolve_rule_replacing_enactment(
-        self, make_regime, make_opinion_with_holding
-    ):
+    def test_evolve_rule_replacing_enactment(self, make_opinion_with_holding):
         oracle = make_opinion_with_holding["oracle_majority"]
         usc = oracle.holdings[0].enactments[0].code
         works_of_authorship_selector = TextQuoteSelector(
@@ -52,9 +50,7 @@ class TestIntroduction:
             )
         )
         works_of_authorship_clause = Enactment(
-            selector=works_of_authorship_selector,
-            source="/us/usc/t17/s102/a",
-            regime=make_regime,
+            selector=works_of_authorship_selector, source="/us/usc/t17/s102/a", code=usc
         )
         rule_with_shorter_enactment = oracle.holdings[0].evolve(
             {"enactments": works_of_authorship_clause}

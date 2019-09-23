@@ -72,6 +72,10 @@ class EnactmentSchema(Schema):
         The fields can only be moved into a "selector" field with a dict
         value, not a "selectors" field with a list value.
         """
+        # Dumping the data because it seems to need to be loaded all at once.
+        if isinstance(data.get("selector"), TextQuoteSelector):
+            data["selector"] = SelectorSchema().dump(data["selector"])
+
         selector_field_names = ["text", "exact", "prefix", "suffix"]
         for name in selector_field_names:
             if data.get(name):
