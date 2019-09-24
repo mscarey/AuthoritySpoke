@@ -88,23 +88,6 @@ class Entity(Factor):
         if comparison(self, other):
             yield ContextRegister({self: other, other: self})
 
-    def contradicts(self, other: Optional[Factor]) -> bool:
-        """
-        Test whether ``self`` contradicts the ``other`` :class:`Factor`.
-
-        :returns:
-            ``False``, because an :class:`Entity` contradicts no other :class:`Factor`.
-        """
-        if other is None:
-            return False
-
-        if not isinstance(other, Factor):
-            raise TypeError(
-                f"'Contradicts' not supported between class "
-                + f"{self.__class__.__name__} and class {other.__class__.__name__}."
-            )
-        return False
-
     @new_context_helper
     def new_context(self, changes: ContextRegister) -> Entity:
         """
