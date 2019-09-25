@@ -86,9 +86,8 @@ def read_enactment(
         )
 
     schema = schemas.EnactmentSchema(context={"code": code})
-    normalized = schema.load(enactment_dict)
+    answer = schema.load(enactment_dict)
 
-    answer = Enactment(**normalized, code=code)
     return (answer, mentioned or {}) if report_mentioned else answer
 
 
@@ -263,40 +262,16 @@ def read_fact(
     r"""
     Construct a :class:`Fact` from strings and bools.
 
-    :param content:
-        a string containing a clause making an assertion.
-
-    :param truth:
-        whether the assertion in `content` is claimed to be true
-
-    :param reciprocal:
-        whether the order of the first two entities in `content`
-        can be changed without changing the meaning
+    :param factor_record:
+        parameter values to pass to :class:`.FactSchema`\.
 
     :param mentioned:
         a list of :class:`.Factor`\s that may be included by reference to their ``name``\s.
-
-    :param standard_of_proof:
-        the finding as to the strength of the evidence supporting
-        the assertion, if any
-
-    :param name:
-        a string identifier
-
-    :param mentioned:
-        known :class:`.Factors`. Can be reused.
 
     :param report_mentioned:
         if True, return a new :class:`.TextLinkDict` in addition to
         the :class:`.Fact`\.
 
-    :param absent:
-        whether the :class:`.Fact` can be considered absent from the case
-
-    :param generic:
-        whether the :class:`.Fact` is interchangeable with other generic
-        facts without changing the meaning of a :class:`.Rule` where it is
-        mentioned
 
     :returns:
         a :class:`Fact`, with optional mentioned factors
@@ -324,7 +299,6 @@ def read_fact(
             content, quantity_text = content.split(item)
             quantity = read_quantity(quantity_text)
             content += placeholder
-
     predicate = Predicate(
         content=content,
         truth=truth,
@@ -386,7 +360,7 @@ def read_factor(
     target_class = subclass_from_str(cname)
     if target_class == Fact:
         created_factor, mentioned = read_fact(
-            mentioned=mentioned, report_mentioned=True, **factor_record
+            **factor_record, mentioned=mentioned, report_mentioned=True
         )
     else:
         created_factor, mentioned = read_factor_subclass(

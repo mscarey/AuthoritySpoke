@@ -77,7 +77,7 @@ def make_predicate() -> Dict[str, Predicate]:
             "the distance between {} and {} was {}",
             truth=True,
             reciprocal=True,
-            comparison="!=",
+            comparison="<>",
             quantity=Q_("35 feet"),
         ),
         "p7_true": Predicate(

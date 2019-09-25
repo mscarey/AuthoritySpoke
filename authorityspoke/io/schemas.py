@@ -1,10 +1,17 @@
 from typing import Any, Dict, Tuple, Union
 
-from marshmallow import Schema, fields, pre_load, post_load
+from marshmallow import Schema, fields
+from marshmallow import pre_dump, pre_load, post_dump, post_load
 from marshmallow import ValidationError
 
+from pint import UnitRegistry
+
 from authorityspoke.enactments import Enactment
+from authorityspoke.facts import Fact
+from authorityspoke.predicates import Predicate
 from authorityspoke.selectors import TextQuoteSelector
+
+ureg = UnitRegistry()
 
 
 class SelectorSchema(Schema):
@@ -52,8 +59,8 @@ class SelectorSchema(Schema):
         return data
 
     @post_load
-    def make_selector(self, data, **kwargs):
-        return TextQuoteSelector(**data)
+    def make_object(self, data, **kwargs):
+        return self.__model__(**data)
 
 
 class EnactmentSchema(Schema):
@@ -99,6 +106,55 @@ class EnactmentSchema(Schema):
             if data["source"].endswith("/"):
                 data["source"] = data["source"].rstrip("/")
         return data
+
+    @post_load
+    def make_object(self, data, **kwargs):
+        return self.__model__(**data, code=self.context["code"])
+
+
+class PredicateSchema(Schema):
+    __model__ = Predicate
+    content = fields.Str()
+    truth = fields.Bool(missing=True)
+    reciprocal = fields.Bool(missing=False)
+    comparison = fields.Str(missing="")
+    quantity = fields.Method("quantity_or_number")
+    units = fields.Method(missing="")
+
+    def quantity_or_number(self, obj):
+        if isinstance(obj, ureg.Quantity):
+            return (obj.magnitude, str(obj.units))
+        return (obj, None)
+
+    @post_dump
+    def split_quantity_field(self, data, **kwargs):
+        if data["quantity"][1]:
+            data["units"] = data["quantity"][1]
+        data["quantity"] = data["quantity"][0]
+
+    @pre_load
+    def normalize_comparison(self, data, **kwargs):
+        if data["quantity"] and not data["comparison"]:
+            data["comparison"] = "="
+
+        if data["comparison"] is None:
+            data["comparison"] = ""
+
+        normalized = {"==": "=", "!=": "<>"}
+        if data.get("comparison") in normalized:
+            data["comparison"] = normalized[data["comparison"]]
+
+        if (
+            data["comparison"]
+            and data["comparison"] not in __model__.opposite_comparisons
+        ):
+            raise ValidationError(
+                f'"comparison" string parameter must be one of {self.opposite_comparisons.keys()}.'
+            )
+
+    @post_load
+    def make_object(self, data, **kwargs):
+        return self.__model__(**data)
 
 
 SCHEMAS = [schema() for schema in Schema.__subclasses__()]
