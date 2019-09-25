@@ -16,12 +16,6 @@ class TestPredicates:
                 quantity=Q_("160 centimeters"),
             )
 
-    def test_make_comparison_when_absent(self):
-        statement = Predicate(content="{}'s favorite number is {}", quantity=42)
-        assert statement.comparison == "="
-        assert "{}'s favorite number is exactly equal to 42" in str(statement)
-        assert len(statement) == 1
-
     def test_convert_false_statement_about_quantity_to_obverse(self, make_predicate):
         assert make_predicate["p7_obverse"].truth is True
         assert make_predicate["p7_obverse"].quantity == ureg.Quantity(35, "foot")

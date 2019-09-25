@@ -105,7 +105,7 @@ def log_mentioned_context(func: Callable):
     return wrapper
 
 
-def read_selector(record: Union[dict, str]) -> Optional[TextQuoteSelector]:
+def read_selector(record: Optional[Union[Dict, str]]) -> Optional[TextQuoteSelector]:
     """
     Create new selector from JSON user input.
 

@@ -30,13 +30,13 @@ from authorityspoke.io import references
 from authorityspoke.io import schemas
 
 
-
 ureg = UnitRegistry()
 
 FACTOR_SUBCLASSES = {
     class_obj.__name__: class_obj
     for class_obj in (Allegation, Entity, Exhibit, Evidence, Fact, Pleading)
 }
+
 
 @references.log_mentioned_context
 def read_enactment(
@@ -178,30 +178,6 @@ def get_references_from_mentioned(
     return content, tuple(context_factors)
 
 
-def read_quantity(quantity: str) -> Union[float, int, ureg.Quantity]:
-    """
-    Create `pint <https://pint.readthedocs.io/en/0.9/tutorial.html>`_ quantity object from text.
-
-    :param quantity:
-        when a string is being parsed for conversion to a
-        :class:`Predicate`, this is the part of the string
-        after the equals or inequality sign.
-    :returns:
-        a Python number object or a :class:`Quantity`
-        object created with `pint.UnitRegistry
-        <https://pint.readthedocs.io/en/0.9/tutorial.html>`_.
-    """
-    quantity = quantity.strip()
-    if quantity.isdigit():
-        return int(quantity)
-    float_parts = quantity.split(".")
-    if len(float_parts) == 2 and all(
-        substring.isnumeric() for substring in float_parts
-    ):
-        return float(quantity)
-    return ureg.Quantity(quantity)
-
-
 def get_references_from_string(
     content: str, mentioned: TextLinkDict
 ) -> Tuple[str, List[Entity], TextLinkDict]:
@@ -245,6 +221,11 @@ def get_references_from_string(
         mentioned[entity] = []
 
     return content, tuple(context_factors), mentioned
+
+
+def read_predicate(value: Dict) -> Predicate:
+    schema = schemas.PredicateSchema(partial=True)
+    return schema.load(value)
 
 
 def read_fact(
@@ -297,7 +278,7 @@ def read_fact(
         if item in content:
             comparison = item
             content, quantity_text = content.split(item)
-            quantity = read_quantity(quantity_text)
+            quantity = schemas.read_quantity(quantity_text)
             content += placeholder
     predicate = Predicate(
         content=content,
@@ -316,6 +297,7 @@ def read_fact(
         generic=generic,
     )
     return (answer, mentioned) if report_mentioned else answer
+
 
 def subclass_from_str(name: str) -> Type:
     """
@@ -336,6 +318,7 @@ def subclass_from_str(name: str) -> Type:
             + f"{list(FACTOR_SUBCLASSES.keys())}, not {name}"
         )
     return answer
+
 
 @references.log_mentioned_context
 def read_factor(
@@ -840,11 +823,7 @@ def read_rule(
         from ``mentioned_entities`` as ``context_factors``
     """
 
-    factor_groups = {
-        "outputs": outputs,
-        "inputs": inputs,
-        "despite": despite,
-    }
+    factor_groups = {"outputs": outputs, "inputs": inputs, "despite": despite}
     enactment_groups = {
         "enactments": enactments,
         "enactments_despite": enactments_despite,
@@ -870,7 +849,7 @@ def read_rule(
     procedure = Procedure(
         outputs=built_factors["outputs"],
         inputs=built_factors["inputs"],
-        despite=built_factors["despite"]
+        despite=built_factors["despite"],
     )
 
     answer = Rule(

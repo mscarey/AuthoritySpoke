@@ -1,6 +1,6 @@
 from typing import Any, Dict, Tuple, Union
 
-from marshmallow import Schema, fields
+from marshmallow import Schema, fields, validate
 from marshmallow import pre_dump, pre_load, post_dump, post_load
 from marshmallow import ValidationError
 
@@ -112,45 +112,67 @@ class EnactmentSchema(Schema):
         return self.__model__(**data, code=self.context["code"])
 
 
+def read_quantity(value: Union[float, int, str]) -> Union[float, int, ureg.Quantity]:
+    """
+    Create pint quantity object from text.
+
+    See `pint tutorial <https://pint.readthedocs.io/en/0.9/tutorial.html>`_
+
+    :param quantity:
+        when a string is being parsed for conversion to a
+        :class:`Predicate`, this is the part of the string
+        after the equals or inequality sign.
+    :returns:
+        a Python number object or a :class:`Quantity`
+        object created with `pint.UnitRegistry
+        <https://pint.readthedocs.io/en/0.9/tutorial.html>`_.
+    """
+    if isinstance(value, (int, float)):
+        return value
+    quantity = value.strip()
+    if quantity.isdigit():
+        return int(quantity)
+    float_parts = quantity.split(".")
+    if len(float_parts) == 2 and all(
+        substring.isnumeric() for substring in float_parts
+    ):
+        return float(quantity)
+    return ureg.Quantity(quantity)
+
+
+def dump_quantity(obj: Union[float, int, ureg.Quantity]) -> Union[float, int, str]:
+    """
+    Convert quantity to string if it's a pint `ureg.Quantity` object.
+    """
+    quantity = obj.quantity
+    if isinstance(quantity, (int, float)):
+        return quantity
+    return f"{quantity.magnitude} {quantity.units}"
+
+
 class PredicateSchema(Schema):
     __model__ = Predicate
     content = fields.Str()
     truth = fields.Bool(missing=True)
     reciprocal = fields.Bool(missing=False)
-    comparison = fields.Str(missing="")
-    quantity = fields.Method("quantity_or_number")
-    units = fields.Method(missing="")
-
-    def quantity_or_number(self, obj):
-        if isinstance(obj, ureg.Quantity):
-            return (obj.magnitude, str(obj.units))
-        return (obj, None)
-
-    @post_dump
-    def split_quantity_field(self, data, **kwargs):
-        if data["quantity"][1]:
-            data["units"] = data["quantity"][1]
-        data["quantity"] = data["quantity"][0]
+    comparison = fields.Str(
+        missing="",
+        validate=validate.OneOf([""] + list(Predicate.opposite_comparisons.keys())),
+    )
+    quantity = fields.Function(dump_quantity, deserialize=read_quantity)
 
     @pre_load
     def normalize_comparison(self, data, **kwargs):
-        if data["quantity"] and not data["comparison"]:
+        if data.get("quantity") and not data.get("comparison"):
             data["comparison"] = "="
 
-        if data["comparison"] is None:
+        if data.get("comparison") is None:
             data["comparison"] = ""
 
         normalized = {"==": "=", "!=": "<>"}
         if data.get("comparison") in normalized:
             data["comparison"] = normalized[data["comparison"]]
-
-        if (
-            data["comparison"]
-            and data["comparison"] not in __model__.opposite_comparisons
-        ):
-            raise ValidationError(
-                f'"comparison" string parameter must be one of {self.opposite_comparisons.keys()}.'
-            )
+        return data
 
     @post_load
     def make_object(self, data, **kwargs):
