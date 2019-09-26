@@ -138,106 +138,15 @@ def read_enactments(
     return (answer, mentioned) if report_mentioned else answer
 
 
-def get_references_from_mentioned(
-    content: str, mentioned: TextLinkDict, placeholder: str = "{}"
-) -> Tuple[str, List[Union[Enactment, Factor]]]:
-    r"""
-    Retrieve known context :class:`Factor`\s for new :class:`Fact`.
-
-    :param content:
-        the content for the :class:`Fact`\'s :class:`Predicate`.
-
-    :param mentioned:
-        list of :class:`Factor`\s with names that could be
-        referenced in content
-
-    :param placeholder:
-        a string to replace the names of
-        referenced :class:`Factor`\s in content
-
-    :returns:
-        the content string with any referenced :class:`Factor`\s
-        replaced by placeholder, and a list of referenced
-        :class:`Factor`\s in the order they appeared in content.
-    """
-    sorted_mentioned = sorted(
-        mentioned.keys(), key=lambda x: len(x.name) if x.name else 0, reverse=True
-    )
-    context_with_indices: Dict[Union[Enactment, Factor], int] = {}
-    for factor in sorted_mentioned:
-        if factor.name and factor.name in content and factor.name != content:
-            factor_index = content.find(factor.name)
-            for named_factor in context_with_indices:
-                if context_with_indices[named_factor] > factor_index:
-                    context_with_indices[named_factor] -= len(factor.name) - len(
-                        placeholder
-                    )
-            context_with_indices[factor] = factor_index
-            content = content.replace(factor.name, placeholder)
-    context_factors = sorted(context_with_indices, key=context_with_indices.get)
-    return content, tuple(context_factors)
-
-
-def get_references_from_string(
-    content: str, mentioned: TextLinkDict
-) -> Tuple[str, List[Entity], TextLinkDict]:
-    r"""
-    Make :class:`.Entity` context :class:`.Factor`\s from string.
-
-    This function identifies context :class:`.Factor`\s by finding
-    brackets around them, while :func:`get_references_from_mentioned`
-    depends on knowing the names of the context factors in advance.
-    Also, this function works only when all the context_factors
-    are type :class:`.Entity`.
-
-    Despite "placeholder" being defined as a variable elsewhere,
-    this function isn't compatible with any placeholder string other
-    than "{}".
-
-    :param content:
-        a string containing a clause making an assertion.
-        Curly brackets surround the names of :class:`.Entity`
-        context factors to be created.
-
-    :param mentioned:
-        a :class:`.TextLinkDict` of known :class:`.Factor`\s.
-        It will not be searched for :class:`.Factor`\s to add
-        to `context_factors`, but newly created :class:`.Entity`
-        object will be added to it.
-
-    :returns:
-        a :class:`Predicate` and :class:`.Entity` objects
-        from a string that has curly brackets around the
-        context factors and the comparison/quantity.
-    """
-    pattern = r"\{([^\{]+)\}"
-    entities_as_text = re.findall(pattern, content)
-
-    context_factors = []
-    for entity_name in entities_as_text:
-        entity = Entity(name=entity_name)
-        content = content.replace(entity_name, "")
-        context_factors.append(entity)
-        mentioned[entity] = []
-
-    return content, tuple(context_factors), mentioned
-
-
-def read_predicate(value: Dict) -> Predicate:
+def read_predicate(record: Dict) -> Predicate:
     schema = schemas.PredicateSchema(partial=True)
-    return schema.load(value)
+    return schema.load(record)
 
 
 def read_fact(
-    content: str = "",
-    truth: bool = True,
-    reciprocal: bool = False,
-    standard_of_proof: Optional[str] = None,
-    name: Optional[str] = None,
+    record: Dict,
     mentioned: Optional[TextLinkDict] = None,
     report_mentioned: bool = False,
-    absent: bool = False,
-    generic: bool = False,
     **kwargs,
 ) -> Union[Fact, Tuple[Fact, TextLinkDict]]:
     r"""
@@ -253,27 +162,16 @@ def read_fact(
         if True, return a new :class:`.TextLinkDict` in addition to
         the :class:`.Fact`\.
 
-
     :returns:
         a :class:`Fact`, with optional mentioned factors
     """
-    mentioned = mentioned or {}
-    placeholder = "{}"  # to be replaced in the Fact's string method
-    if not name:
-        name = f'{"false " if not truth else ""}{content}'
-    name = name.replace("{", "").replace("}", "")
+    mentioned = mentioned or TextLinkDict({})
+    schema = schemas.FactSchema(partial=True, context={"mentioned": mentioned})
+    return schema.load(record)
 
     comparison = ""
     quantity = None
-    if content:
-        if placeholder[0] in content:
-            content, context_factors, mentioned = get_references_from_string(
-                content, mentioned
-            )
-        else:
-            content, context_factors = get_references_from_mentioned(
-                content, mentioned, placeholder
-            )
+
     for item in Predicate.opposite_comparisons:
         if item in content:
             comparison = item
@@ -343,7 +241,7 @@ def read_factor(
     target_class = subclass_from_str(cname)
     if target_class == Fact:
         created_factor, mentioned = read_fact(
-            **factor_record, mentioned=mentioned, report_mentioned=True
+            record=factor_record, mentioned=mentioned, report_mentioned=True
         )
     else:
         created_factor, mentioned = read_factor_subclass(

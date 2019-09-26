@@ -58,7 +58,7 @@ class TestEntityLoad:
 class TestFactLoad:
     def test_import_fact_with_entity_name_containing_another(self):
         house_fact = readers.read_fact(
-            content="Alice sold Alice's house for a price in dollars of > 300000",
+            {"content": "Alice sold Alice's house for a price in dollars of > 300000"},
             mentioned={Entity(name="Alice"): [], Entity(name="Alice's house"): []},
         )
         assert any(
@@ -66,7 +66,9 @@ class TestFactLoad:
         )
 
     def test_import_predicate_with_quantity(self):
-        story = readers.read_fact("The number of castles {the king} had was > 3")
+        story = readers.read_fact(
+            {"content": "The number of castles {the king} had was > 3"}
+        )
         assert len(story.predicate) == 1
         assert story.predicate.content.startswith("The number of castles")
         assert story.predicate.comparison == ">"
@@ -74,7 +76,10 @@ class TestFactLoad:
 
     def test_make_fact_from_string(self, watt_factor):
         fact_float_more = readers.read_fact(
-            "the distance between {Ann} and {Lee} was >= 20.1", reciprocal=True
+            {
+                "content": "the distance between {Ann} and {Lee} was >= 20.1",
+                "reciprocal": True,
+            }
         )
         fact_float_less = watt_factor["f8_int"]
         assert fact_float_more >= fact_float_less

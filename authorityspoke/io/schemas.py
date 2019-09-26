@@ -1,4 +1,4 @@
-from typing import Any, Dict, Tuple, Type, Union
+from typing import Any, Dict, List, Tuple, Type, Union
 
 from marshmallow import Schema, fields, validate
 from marshmallow import pre_dump, pre_load, post_dump, post_load
@@ -8,7 +8,7 @@ from pint import UnitRegistry
 
 from authorityspoke.enactments import Enactment
 from authorityspoke.entities import Entity
-from authorityspoke.factors import Factor
+from authorityspoke.factors import Factor, TextLinkDict
 from authorityspoke.facts import Fact
 from authorityspoke.predicates import Predicate
 from authorityspoke.selectors import TextQuoteSelector
@@ -205,6 +205,141 @@ class FactorSchema(Schema):
             schema = get_schema_for_factor_record(original)
             return schema.load(original)
         return self.__model__(**data)
+
+
+def get_references_from_mentioned(
+    content: str, mentioned: TextLinkDict, placeholder: str = "{}"
+) -> Tuple[str, List[Union[Enactment, Factor]]]:
+    r"""
+    Retrieve known context :class:`Factor`\s for new :class:`Fact`.
+
+    :param content:
+        the content for the :class:`Fact`\'s :class:`Predicate`.
+
+    :param mentioned:
+        list of :class:`Factor`\s with names that could be
+        referenced in content
+
+    :param placeholder:
+        a string to replace the names of
+        referenced :class:`Factor`\s in content
+
+    :returns:
+        the content string with any referenced :class:`Factor`\s
+        replaced by placeholder, and a list of referenced
+        :class:`Factor`\s in the order they appeared in content.
+    """
+    sorted_mentioned = sorted(
+        mentioned.keys(), key=lambda x: len(x.name) if x.name else 0, reverse=True
+    )
+    context_with_indices: Dict[Union[Enactment, Factor], int] = {}
+    for factor in sorted_mentioned:
+        if factor.name and factor.name in content and factor.name != content:
+            factor_index = content.find(factor.name)
+            for named_factor in context_with_indices:
+                if context_with_indices[named_factor] > factor_index:
+                    context_with_indices[named_factor] -= len(factor.name) - len(
+                        placeholder
+                    )
+            context_with_indices[factor] = factor_index
+            content = content.replace(factor.name, placeholder)
+    context_factors = sorted(context_with_indices, key=context_with_indices.get)
+    return content, tuple(context_factors)
+
+
+def get_references_from_string(
+    content: str, mentioned: TextLinkDict
+) -> Tuple[str, List[Entity], TextLinkDict]:
+    r"""
+    Make :class:`.Entity` context :class:`.Factor`\s from string.
+
+    This function identifies context :class:`.Factor`\s by finding
+    brackets around them, while :func:`get_references_from_mentioned`
+    depends on knowing the names of the context factors in advance.
+    Also, this function works only when all the context_factors
+    are type :class:`.Entity`.
+
+    Despite "placeholder" being defined as a variable elsewhere,
+    this function isn't compatible with any placeholder string other
+    than "{}".
+
+    :param content:
+        a string containing a clause making an assertion.
+        Curly brackets surround the names of :class:`.Entity`
+        context factors to be created.
+
+    :param mentioned:
+        a :class:`.TextLinkDict` of known :class:`.Factor`\s.
+        It will not be searched for :class:`.Factor`\s to add
+        to `context_factors`, but newly created :class:`.Entity`
+        object will be added to it.
+
+    :returns:
+        a :class:`Predicate` and :class:`.Entity` objects
+        from a string that has curly brackets around the
+        context factors and the comparison/quantity.
+    """
+    pattern = r"\{([^\{]+)\}"
+    entities_as_text = re.findall(pattern, content)
+
+    context_factors = []
+    for entity_name in entities_as_text:
+        entity = Entity(name=entity_name)
+        content = content.replace(entity_name, "")
+        context_factors.append(entity)
+        mentioned[entity] = []
+
+    return content, tuple(context_factors), mentioned
+
+
+class FactSchema(FactorSchema):
+    __model__: Type = Fact
+    predicate = fields.Nested(PredicateSchema)
+    context_factors = fields.Nested(FactorSchema, many=True)
+    standard_of_proof = fields.Str(missing=None)
+    name = fields.Str(missing=None)
+    absent = fields.Bool(missing=False)
+    generic = fields.Bool(missing=False)
+
+    def nest_predicate_fields(self, data, **kwargs):
+        """
+        Make sure predicate-related fields are in a dict under "predicate" key.
+        """
+        if data.get("content") and not data.get("predicate"):
+            data["predicate"] = {}
+            for predicate_field in [
+                "content",
+                "truth",
+                "reciprocal",
+                "comparison",
+                "quantity",
+            ]:
+                if data.get("predicate_field"):
+                    data["predicate"][predicate_field] = data["predicate_field"]
+                    del data["predicate_field"]
+        return data
+
+    @pre_load
+    def make_context_factors(self, data, **kwargs):
+        data = self.nest_predicate_fields(data)
+
+        placeholder = "{}"  # to be replaced in the Fact's string method
+        if not data["name"]:
+            truth = data["predicate"].get("truth")
+            content = data["predicate"].get("content")
+            data["name"] = f'{"false " if not truth else ""}{content}'
+        data["name"] = data["name"].replace("{", "").replace("}", "")
+
+        if not data["context_factors"]:
+            if placeholder[0] in data["predicate"]["content"]:
+                data["predicate"]["content"], data["context_factors"], self.context[
+                    "mentioned"
+                ] = get_references_from_string(content, mentioned)
+            else:
+                data["predicate"]["content"], data[
+                    "context_factors"
+                ] = get_references_from_mentioned(content, mentioned, placeholder)
+            return data
 
 
 class EntitySchema(FactorSchema):
