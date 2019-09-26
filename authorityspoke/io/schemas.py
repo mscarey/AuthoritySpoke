@@ -7,6 +7,8 @@ from marshmallow import ValidationError
 from pint import UnitRegistry
 
 from authorityspoke.enactments import Enactment
+from authorityspoke.entities import Entity
+from authorityspoke.factors import Factor
 from authorityspoke.facts import Fact
 from authorityspoke.predicates import Predicate
 from authorityspoke.selectors import TextQuoteSelector
@@ -140,7 +142,7 @@ def read_quantity(value: Union[float, int, str]) -> Union[float, int, ureg.Quant
     return ureg.Quantity(quantity)
 
 
-def dump_quantity(obj: Union[float, int, ureg.Quantity]) -> Union[float, int, str]:
+def dump_quantity(obj: Predicate) -> Union[float, int, str]:
     """
     Convert quantity to string if it's a pint `ureg.Quantity` object.
     """
@@ -179,7 +181,44 @@ class PredicateSchema(Schema):
         return self.__model__(**data)
 
 
-SCHEMAS = [schema() for schema in Schema.__subclasses__()]
+class EntitySchema(Schema):
+    __model__ = Entity
+    name = fields.Str(missing=None)
+    generic = fields.Bool()
+    plural = fields.Bool()
+
+    @post_load
+    def make_object(self, data, **kwargs):
+        return self.__model__(**data)
+
+
+class FactorSchema(Schema):
+    __model__ = Factor
+    name = fields.Str(missing=None)
+    generic = fields.Bool()
+
+    @post_load(pass_original=True)
+    def make_subclass_factor(self, data, original, **kwargs):
+        """
+        Return the result of loading with the subclass schema.
+
+        Discards the result of loading with FactorSchema.
+        """
+        schema = get_schema_for_factor_record(original)
+        return schema.load(original)
+
+
+SCHEMAS = [schema for schema in Schema.__subclasses__()]
+
+
+def get_schema_for_factor_record(record: Dict) -> Schema:
+    """
+    Find the Marshmallow schema for an AuthoritySpoke object.
+    """
+    for option in SCHEMAS:
+        if record.get("type").lower() == option.__model__.__name__.lower():
+            return option(unknown="EXCLUDE")
+    return None
 
 
 def get_schema_for_item(item: Any) -> Schema:
@@ -188,5 +227,5 @@ def get_schema_for_item(item: Any) -> Schema:
     """
     for option in SCHEMAS:
         if item.__class__ == option.__model__:
-            return option
+            return option()
     return None

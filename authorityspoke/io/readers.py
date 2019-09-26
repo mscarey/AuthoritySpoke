@@ -199,7 +199,7 @@ def get_references_from_string(
         Curly brackets surround the names of :class:`.Entity`
         context factors to be created.
 
-    :param content:
+    :param mentioned:
         a :class:`.TextLinkDict` of known :class:`.Factor`\s.
         It will not be searched for :class:`.Factor`\s to add
         to `context_factors`, but newly created :class:`.Entity`
@@ -243,7 +243,7 @@ def read_fact(
     r"""
     Construct a :class:`Fact` from strings and bools.
 
-    :param factor_record:
+    :param record:
         parameter values to pass to :class:`.FactSchema`\.
 
     :param mentioned:

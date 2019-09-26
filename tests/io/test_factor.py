@@ -7,14 +7,14 @@ import pytest
 
 from authorityspoke.enactments import Code, Enactment
 from authorityspoke.entities import Entity
-from authorityspoke.io import readers
+from authorityspoke.io import readers, schemas
 from authorityspoke.io.loaders import load_holdings
 from authorityspoke.io import filepaths
 
 ureg = pint.UnitRegistry()
 
 
-class TestFactorImport:
+class TestFactorLoad:
     def test_fact_import(self, make_regime):
         holdings = load_holdings("holding_watt.json", regime=make_regime)
         new_fact = holdings[0].inputs[1]
@@ -34,7 +34,15 @@ class TestFactorImport:
         assert input_directory.exists()
 
 
-class TestFactImport:
+class TestEntityLoad:
+    def test_load_entity_from_factor_schema(self):
+        record = {"type": "Entity", "name": "George Washington"}
+        schema = schemas.FactorSchema(partial=True, unknown="INCLUDE")
+        george = schema.load(record)
+        assert george.generic == True
+
+
+class TestFactLoad:
     def test_import_fact_with_entity_name_containing_another(self):
         house_fact = readers.read_fact(
             content="Alice sold Alice's house for a price in dollars of > 300000",
