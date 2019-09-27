@@ -1,4 +1,5 @@
 from typing import Any, Dict, List, Tuple, Type, Union
+import re
 
 from marshmallow import Schema, fields, validate
 from marshmallow import pre_dump, pre_load, post_dump, post_load
@@ -186,9 +187,13 @@ class FactorSchema(Schema):
     name = fields.Str(missing=None)
     generic = fields.Bool(missing=False)
 
+    class Meta:
+        additional = ("type",)
+
     @post_dump
-    def add_type_field(self, data, **kwargs):
-        data["type"] = self.__model__.__name__
+    def add_factor_type(self, data, **kwargs):
+        if self.__model__.__name__ != "Factor":
+            data["type"] = self.__model__.__name__
         return data
 
     @post_load(pass_original=True)
@@ -202,9 +207,16 @@ class FactorSchema(Schema):
         it deserializes using the subclass model.
         """
         if self.__model__ == Factor:
-            schema = get_schema_for_factor_record(original)
+            schema = get_schema_for_factor_record(original["type"])
             return schema.load(original)
-        return self.__model__(**data)
+        if data.get("type"):
+            del data["type"]
+        answer = self.__model__(**data)
+        return (
+            (answer, self.context["mentioned"])
+            if self.context.get("report_mentioned")
+            else answer
+        )
 
 
 def get_references_from_mentioned(
@@ -292,6 +304,13 @@ def get_references_from_string(
     return content, tuple(context_factors), mentioned
 
 
+def serialize_if_factor(item: Any) -> Dict:
+    if isinstance(item, Factor):
+        schema = FactorSchema(unknown="EXCLUDE")
+        return schema.dump(item)
+    return item
+
+
 class FactSchema(FactorSchema):
     __model__: Type = Fact
     predicate = fields.Nested(PredicateSchema)
@@ -314,9 +333,9 @@ class FactSchema(FactorSchema):
                 "comparison",
                 "quantity",
             ]:
-                if data.get("predicate_field"):
-                    data["predicate"][predicate_field] = data["predicate_field"]
-                    del data["predicate_field"]
+                if data.get(predicate_field):
+                    data["predicate"][predicate_field] = data[predicate_field]
+                    del data[predicate_field]
         return data
 
     @pre_load
@@ -324,22 +343,27 @@ class FactSchema(FactorSchema):
         data = self.nest_predicate_fields(data)
 
         placeholder = "{}"  # to be replaced in the Fact's string method
-        if not data["name"]:
+        if not data.get("name"):
             truth = data["predicate"].get("truth")
             content = data["predicate"].get("content")
             data["name"] = f'{"false " if not truth else ""}{content}'
         data["name"] = data["name"].replace("{", "").replace("}", "")
 
-        if not data["context_factors"]:
+        if not data.get("context_factors"):
             if placeholder[0] in data["predicate"]["content"]:
                 data["predicate"]["content"], data["context_factors"], self.context[
                     "mentioned"
-                ] = get_references_from_string(content, mentioned)
+                ] = get_references_from_string(data["predicate"]["content"], self.context["mentioned"])
             else:
                 data["predicate"]["content"], data[
                     "context_factors"
-                ] = get_references_from_mentioned(content, mentioned, placeholder)
-            return data
+                ] = get_references_from_mentioned(
+                    data["predicate"]["content"], self.context["mentioned"], placeholder
+                )
+        data["context_factors"] = [
+            serialize_if_factor(item) for item in data["context_factors"]
+        ]
+        return data
 
 
 class EntitySchema(FactorSchema):
@@ -354,12 +378,12 @@ SCHEMAS = [schema for schema in Schema.__subclasses__()] + [
 ]
 
 
-def get_schema_for_factor_record(record: Dict) -> Schema:
+def get_schema_for_factor_record(typename: str) -> Schema:
     """
     Find the Marshmallow schema for an AuthoritySpoke object.
     """
     for option in SCHEMAS:
-        if record.get("type", "").lower() == option.__model__.__name__.lower():
+        if typename.lower() == option.__model__.__name__.lower():
             return option(unknown="EXCLUDE")
     return None
 

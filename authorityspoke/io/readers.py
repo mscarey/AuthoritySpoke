@@ -165,36 +165,11 @@ def read_fact(
     :returns:
         a :class:`Fact`, with optional mentioned factors
     """
-    mentioned = mentioned or TextLinkDict({})
-    schema = schemas.FactSchema(partial=True, context={"mentioned": mentioned})
+    mentioned = mentioned or {}
+    schema = schemas.FactSchema(
+        context={"mentioned": mentioned, "report_mentioned": report_mentioned}
+    )
     return schema.load(record)
-
-    comparison = ""
-    quantity = None
-
-    for item in Predicate.opposite_comparisons:
-        if item in content:
-            comparison = item
-            content, quantity_text = content.split(item)
-            quantity = schemas.read_quantity(quantity_text)
-            content += placeholder
-    predicate = Predicate(
-        content=content,
-        truth=truth,
-        reciprocal=reciprocal,
-        comparison=comparison,
-        quantity=quantity,
-    )
-
-    answer = Fact(
-        predicate,
-        context_factors,
-        name=name,
-        standard_of_proof=standard_of_proof,
-        absent=absent,
-        generic=generic,
-    )
-    return (answer, mentioned) if report_mentioned else answer
 
 
 def subclass_from_str(name: str) -> Type:
