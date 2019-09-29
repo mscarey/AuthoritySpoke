@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Tuple, Type, Union
+from typing import Any, Dict, List, Optional, Tuple, Type, Union
 import re
 
 from marshmallow import Schema, fields, validate
@@ -73,7 +73,6 @@ class EnactmentSchema(Schema):
     source = fields.Url(relative=True)
     selector = fields.Nested(SelectorSchema, missing=None)
 
-    @pre_load
     def move_selector_fields(self, data, **kwargs):
         """
         Nest fields used for :class:`SelectorSchema` model.
@@ -96,20 +95,24 @@ class EnactmentSchema(Schema):
                 del data[name]
         return data
 
+    def fix_source_path_errors(self, source: str) -> str:
+        """
+        Fix errors in source path formatting, substituting code URI if needed.
+        """
+        if not source:
+            source = self.context["code"].uri
+
+        if source:
+            if not source.startswith("/") or source.startswith("http"):
+                source = "/" + source
+            if source.endswith("/"):
+                source = source.rstrip("/")
+        return source
+
     @pre_load
-    def fix_source_path_errors(self, data, **kwargs):
-
-        if not data.get("source"):
-            data["source"] = self.context["code"].uri
-
-        if data.get("source"):
-            if not (
-                data["source"].startswith("/") or data["source"].startswith("http")
-            ):
-                data["source"] = "/" + data["source"]
-            if data["source"].endswith("/"):
-                data["source"] = data["source"].rstrip("/")
-        return data
+    def format_data_to_load(self, data, **kwargs):
+        data["source"] = self.fix_source_path_errors(data.get(source))
+        return self.move_selector_fields(data)
 
     @post_load
     def make_object(self, data, **kwargs):
@@ -223,9 +226,7 @@ def get_references_from_mentioned(
     return content, tuple(context_factors)
 
 
-def get_references_from_string(
-    content: str, mentioned: TextLinkDict
-) -> Tuple[str, List[Entity], TextLinkDict]:
+def get_references_from_string(content: str) -> Tuple[str, List[Entity]]:
     r"""
     Make :class:`.Entity` context :class:`.Factor`\s from string.
 
@@ -239,16 +240,14 @@ def get_references_from_string(
     this function isn't compatible with any placeholder string other
     than "{}".
 
+    This function no longer updates the "mentioned" :class:`.TextLinkDict`\.
+    That update should instead happen after loading of each item in
+    context_factors.
+
     :param content:
         a string containing a clause making an assertion.
         Curly brackets surround the names of :class:`.Entity`
         context factors to be created.
-
-    :param mentioned:
-        a :class:`.TextLinkDict` of known :class:`.Factor`\s.
-        It will not be searched for :class:`.Factor`\s to add
-        to `context_factors`, but newly created :class:`.Entity`
-        object will be added to it.
 
     :returns:
         a :class:`Predicate` and :class:`.Entity` objects
@@ -264,7 +263,7 @@ def get_references_from_string(
         content = content.replace(entity_name, "")
         context_factors.append(entity)
 
-    return content, context_factors, mentioned
+    return content, context_factors
 
 
 def serialize_if_factor(item: Any) -> Dict:
@@ -301,34 +300,44 @@ class FactSchema(Schema):
                     del data[predicate_field]
         return data
 
+    def supply_name(self, truth: Optional[bool], content: str) -> str:
+        """
+        Provide a name for the :class:`.Fact` if none is provided.
+        """
+        name = f'{"false " if not truth else ""}{content}'
+        return name.replace("{", "").replace("}", "")
+
+    def extract_context_factors(self, data: Dict, placeholder: str) -> Dict:
+        content = data["predicate"]["content"]
+        if placeholder[0] in content:
+            data["predicate"]["content"], data[
+                "context_factors"
+            ] = get_references_from_string(content)
+        else:
+            data["predicate"]["content"], data[
+                "context_factors"
+            ] = get_references_from_mentioned(content, self.context["mentioned"], placeholder)
+        return data
+
     @pre_load
-    def make_context_factors(self, data, **kwargs):
+    def format_data_to_load(self, data, **kwargs):
         data = self.nest_predicate_fields(data)
+        if not data.get("name"):
+            data["name"] = self.supply_name(
+                truth=data["predicate"].get("truth"),
+                content=data["predicate"]["content"],
+            )
 
         placeholder = "{}"  # to be replaced in the Fact's string method
-        if not data.get("name"):
-            truth = data["predicate"].get("truth")
-            content = data["predicate"].get("content")
-            data["name"] = f'{"false " if not truth else ""}{content}'
-        data["name"] = data["name"].replace("{", "").replace("}", "")
-
         if not data.get("context_factors"):
-            if placeholder[0] in data["predicate"]["content"]:
-                data["predicate"]["content"], data["context_factors"], self.context[
-                    "mentioned"
-                ] = get_references_from_string(
-                    data["predicate"]["content"], self.context["mentioned"]
-                )
-            else:
-                data["predicate"]["content"], data[
-                    "context_factors"
-                ] = get_references_from_mentioned(
-                    data["predicate"]["content"], self.context["mentioned"], placeholder
-                )
+            data = self.extract_context_factors(data, placeholder)
+
         for item in Predicate.opposite_comparisons:
             if item in data["predicate"]["content"]:
                 data["predicate"]["comparison"] = item
-                data["predicate"]["content"], quantity_text = data["predicate"]["content"].split(item)
+                data["predicate"]["content"], quantity_text = data["predicate"][
+                    "content"
+                ].split(item)
                 data["predicate"]["quantity"] = read_quantity(quantity_text)
                 data["predicate"]["content"] += placeholder
         data["context_factors"] = [
