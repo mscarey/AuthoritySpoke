@@ -139,7 +139,7 @@ def read_enactments(
 
 
 def read_predicate(record: Dict) -> Predicate:
-    schema = schemas.PredicateSchema(partial=True)
+    schema = schemas.PredicateSchema()
     return schema.load(record)
 
 

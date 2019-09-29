@@ -168,17 +168,36 @@ class PredicateSchema(Schema):
     )
     quantity = fields.Function(dump_quantity, deserialize=read_quantity)
 
-    @pre_load
-    def normalize_comparison(self, data, **kwargs):
+    def get_quantity_from_content(self, data, normalized_operators):
+        """
+        Extract equality operator and use it to split the content phrase.
+        """
+        placeholder = "{}"
+        # dict insert order matters, must try normalized_operators first
+        for item in {**normalized_operators, **Predicate.opposite_comparisons}:
+            if item in data["content"]:
+                data["comparison"] = item
+                data["content"], data["quantity"] = data["content"].split(item)
+                data["content"] += placeholder
+        return data
+
+    def normalize_comparison(self, data, normalized_operators):
         if data.get("quantity") and not data.get("comparison"):
             data["comparison"] = "="
 
         if data.get("comparison") is None:
             data["comparison"] = ""
 
-        normalized = {"==": "=", "!=": "<>"}
-        if data.get("comparison") in normalized:
-            data["comparison"] = normalized[data["comparison"]]
+        if data.get("comparison") in normalized_operators:
+            data["comparison"] = normalized_operators[data["comparison"]]
+
+        return data
+
+    @pre_load
+    def format_data_to_load(self, data, **kwargs):
+        normalized_operators = {"==": "=", "!=": "<>"}
+        data = self.get_quantity_from_content(data, normalized_operators)
+        data = self.normalize_comparison(data, normalized_operators)
         return data
 
     @post_load
@@ -316,7 +335,9 @@ class FactSchema(Schema):
         else:
             data["predicate"]["content"], data[
                 "context_factors"
-            ] = get_references_from_mentioned(content, self.context["mentioned"], placeholder)
+            ] = get_references_from_mentioned(
+                content, self.context["mentioned"], placeholder
+            )
         return data
 
     @pre_load
@@ -332,17 +353,6 @@ class FactSchema(Schema):
         if not data.get("context_factors"):
             data = self.extract_context_factors(data, placeholder)
 
-        for item in Predicate.opposite_comparisons:
-            if item in data["predicate"]["content"]:
-                data["predicate"]["comparison"] = item
-                data["predicate"]["content"], quantity_text = data["predicate"][
-                    "content"
-                ].split(item)
-                data["predicate"]["quantity"] = read_quantity(quantity_text)
-                data["predicate"]["content"] += placeholder
-        data["context_factors"] = [
-            serialize_if_factor(item) for item in data["context_factors"]
-        ]
         return data
 
     @post_load
@@ -398,6 +408,6 @@ def get_schema_for_item(item: Any) -> Schema:
     Find the Marshmallow schema for an AuthoritySpoke object.
     """
     for option in SCHEMAS:
-        if item.__class__ == option.__model__:
+        if hasattr(option, "__model__") and item.__class__ == option.__model__:
             return option()
     return None

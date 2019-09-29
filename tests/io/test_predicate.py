@@ -35,12 +35,32 @@ class TestPredicateLoad:
 
     def test_load_and_normalize_comparison(self):
         p7 = readers.read_predicate(
-            value={
+            record={
                 "content": "the distance between {} and {} was {}",
                 "truth": True,
                 "reciprocal": True,
                 "comparison": "!=",
                 "quantity": "35 feet",
+            }
+        )
+        assert p7.comparison == "<>"
+
+    def test_load_and_find_quantity(self):
+        p7 = readers.read_predicate(
+            record={
+                "content": "the distance between {} and {} was > 35 feet",
+                "truth": True,
+                "reciprocal": True,
+            }
+        )
+        assert p7.comparison == ">"
+
+    def test_load_and_normalize_quantity(self):
+        p7 = readers.read_predicate(
+            record={
+                "content": "the distance between {} and {} was != 35 feet",
+                "truth": True,
+                "reciprocal": True,
             }
         )
         assert p7.comparison == "<>"
