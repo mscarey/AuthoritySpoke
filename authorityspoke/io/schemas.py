@@ -325,6 +325,12 @@ class FactSchema(Schema):
                 ] = get_references_from_mentioned(
                     data["predicate"]["content"], self.context["mentioned"], placeholder
                 )
+        for item in Predicate.opposite_comparisons:
+            if item in data["predicate"]["content"]:
+                data["predicate"]["comparison"] = item
+                data["predicate"]["content"], quantity_text = data["predicate"]["content"].split(item)
+                data["predicate"]["quantity"] = read_quantity(quantity_text)
+                data["predicate"]["content"] += placeholder
         data["context_factors"] = [
             serialize_if_factor(item) for item in data["context_factors"]
         ]
