@@ -14,6 +14,7 @@ authorityspoke = {path = ".",editable = true}
 lxml = "*"
 mypy = "*"
 marshmallow = ">=3.2.0"
+marshmallow-oneofschema = "*"
 
 [dev-packages]
 black = "*"

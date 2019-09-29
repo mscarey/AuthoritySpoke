@@ -4,6 +4,7 @@ import re
 from marshmallow import Schema, fields, validate
 from marshmallow import pre_dump, pre_load, post_dump, post_load
 from marshmallow import ValidationError
+from marshmallow_oneofschema import OneOfSchema
 
 from pint import UnitRegistry
 
@@ -182,43 +183,6 @@ class PredicateSchema(Schema):
         return self.__model__(**data)
 
 
-class FactorSchema(Schema):
-    __model__: Type = Factor
-    name = fields.Str(missing=None)
-    generic = fields.Bool(missing=False)
-
-    class Meta:
-        additional = ("type",)
-
-    @post_dump
-    def add_factor_type(self, data, **kwargs):
-        if self.__model__.__name__ != "Factor":
-            data["type"] = self.__model__.__name__
-        return data
-
-    @post_load(pass_original=True)
-    def make_subclass_factor(self, data, original, **kwargs):
-        """
-        Return the result of loading with the subclass schema.
-
-        Discards the result of loading with FactorSchema.
-
-        If this function is called from within a subclass,
-        it deserializes using the subclass model.
-        """
-        if self.__model__ == Factor:
-            schema = get_schema_for_factor_record(original["type"])
-            return schema.load(original)
-        if data.get("type"):
-            del data["type"]
-        answer = self.__model__(**data)
-        return (
-            (answer, self.context["mentioned"])
-            if self.context.get("report_mentioned")
-            else answer
-        )
-
-
 def get_references_from_mentioned(
     content: str, mentioned: TextLinkDict, placeholder: str = "{}"
 ) -> Tuple[str, List[Union[Enactment, Factor]]]:
@@ -296,12 +260,11 @@ def get_references_from_string(
 
     context_factors = []
     for entity_name in entities_as_text:
-        entity = Entity(name=entity_name)
+        entity = {"type": "Entity", "name": entity_name}
         content = content.replace(entity_name, "")
         context_factors.append(entity)
-        mentioned[entity] = []
 
-    return content, tuple(context_factors), mentioned
+    return content, context_factors, mentioned
 
 
 def serialize_if_factor(item: Any) -> Dict:
@@ -311,10 +274,10 @@ def serialize_if_factor(item: Any) -> Dict:
     return item
 
 
-class FactSchema(FactorSchema):
+class FactSchema(Schema):
     __model__: Type = Fact
     predicate = fields.Nested(PredicateSchema)
-    context_factors = fields.Nested(FactorSchema, many=True)
+    context_factors = fields.Nested("FactorSchema", many=True)
     standard_of_proof = fields.Str(missing=None)
     name = fields.Str(missing=None)
     absent = fields.Bool(missing=False)
@@ -353,7 +316,9 @@ class FactSchema(FactorSchema):
             if placeholder[0] in data["predicate"]["content"]:
                 data["predicate"]["content"], data["context_factors"], self.context[
                     "mentioned"
-                ] = get_references_from_string(data["predicate"]["content"], self.context["mentioned"])
+                ] = get_references_from_string(
+                    data["predicate"]["content"], self.context["mentioned"]
+                )
             else:
                 data["predicate"]["content"], data[
                     "context_factors"
@@ -365,12 +330,37 @@ class FactSchema(FactorSchema):
         ]
         return data
 
+    @post_load
+    def make_fact(self, data, **kwargs):
+        answer = Fact(**data)
+        return (
+            (answer, self.context["mentioned"])
+            if self.context.get("report_mentioned")
+            else answer
+        )
 
-class EntitySchema(FactorSchema):
+
+class EntitySchema(Schema):
     __model__: Type = Entity
     name = fields.Str(missing=None)
     generic = fields.Bool(missing=True)
     plural = fields.Bool()
+
+    @post_load
+    def make_entity(self, data, **kwargs):
+        answer = Entity(**data)
+        return (
+            (answer, self.context["mentioned"])
+            if self.context.get("report_mentioned")
+            else answer
+        )
+
+
+class FactorSchema(OneOfSchema):
+    type_schemas = {"Entity": EntitySchema, "Fact": FactSchema}
+
+    def get_obj_type(self, obj):
+        return obj.__class__.__name__.capitalize()
 
 
 SCHEMAS = [schema for schema in Schema.__subclasses__()] + [
