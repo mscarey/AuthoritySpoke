@@ -7,9 +7,9 @@ import pytest
 
 from authorityspoke.enactments import Code, Enactment
 from authorityspoke.entities import Entity
-from authorityspoke.io import readers, schemas
+from authorityspoke.io import filepaths, readers, schemas
 from authorityspoke.io.loaders import load_holdings
-from authorityspoke.io import filepaths
+from authorityspoke.io.dump import to_dict, to_json
 
 ureg = pint.UnitRegistry()
 
@@ -28,7 +28,14 @@ class TestEntityLoad:
         record = {"type": "Entity", "name": "George Washington"}
         schema = schemas.FactorSchema()
         george = schema.load(record)
-        assert george.generic == True
+        assert george.generic is True
+
+    def test_load_entity_from_mentioned(self, make_entity):
+        mentioned = {make_entity["motel"]: []}
+        schema = schemas.EntitySchema()
+        schema.context["mentioned"] = mentioned
+        motel = schema.load("Hideaway Lodge")
+        assert "Lodge" in motel.name
 
     def test_dump_entity_from_factor_schema(self):
         george = Entity("George Washington")
@@ -74,3 +81,41 @@ class TestFactLoad:
         )
         fact_float_less = watt_factor["f8_int"]
         assert fact_float_more >= fact_float_less
+
+    def test_retrieve_mentioned_during_load(self):
+        """
+        Test that the schema can recreate the Entity objects "Alice" and
+        "Bob" from just their name strings, by having added them to
+        "mentioned" when they first appeared.
+        """
+        relevant_json = """{"predicate": {
+            "content": "{} is relevant to show {}"},
+            "context_factors": [
+                {
+                    "predicate": {"content": "{} shot {}"},
+                    "context_factors": [
+                        {"name": "Alice", "type": "Entity"},
+                        {"name": "Bob", "type": "Entity"}
+                        ],
+                    "type": "Fact"
+                },
+                {
+                    "predicate": {"content": "{} murdered {}"},
+                    "context_factors": ["Alice", "Bob"],
+                    "type": "Fact"
+                }]}"""
+        schema = schemas.FactSchema()
+        relevant_fact = schema.loads(relevant_json)
+        assert relevant_fact.context_factors[1].context_factors[0] == "Bob"
+
+
+class TestFactDump:
+    def test_dump_with_quantity(self, watt_factor):
+        f8_dict = to_dict(watt_factor["f8"])
+        assert f8_dict["predicate"]["quantity"] == "20 foot"
+
+    def test_dump_complex_fact(self, make_complex_fact):
+        relevant_fact = make_complex_fact["f_relevant_murder"]
+        relevant_dict = to_dict(relevant_fact)
+        shooting_dict = relevant_dict["context_factors"][0]
+        assert shooting_dict["context_factors"][0]["name"] == "Alice"

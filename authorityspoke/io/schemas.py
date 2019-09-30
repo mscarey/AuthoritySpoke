@@ -152,6 +152,8 @@ def dump_quantity(obj: Predicate) -> Union[float, int, str]:
     Convert quantity to string if it's a pint `ureg.Quantity` object.
     """
     quantity = obj.quantity
+    if quantity is None:
+        return None
     if isinstance(quantity, (int, float)):
         return quantity
     return f"{quantity.magnitude} {quantity.units}"
@@ -287,12 +289,36 @@ def get_references_from_string(content: str) -> Tuple[str, List[Entity]]:
 
 def serialize_if_factor(item: Any) -> Dict:
     if isinstance(item, Factor):
-        schema = FactorSchema(unknown="EXCLUDE")
+        schema = FactorSchema()
         return schema.dump(item)
     return item
 
 
-class FactSchema(Schema):
+class BaseSchema(Schema):
+    def get_from_mentioned(self, data, **kwargs):
+        """
+        Replaces data to load with any object with same name in "mentioned".
+        """
+
+        self.context["mentioned"] = self.context.get("mentioned") or {}
+        name = ""
+        if isinstance(data, str):
+            name = data
+        elif data.get("name"):
+            name = data["name"]
+        if name:
+            for item in self.context["mentioned"]:
+                if name == item.name:
+                    return self.dump(item)
+        return data
+
+    def save_to_mentioned(self, obj, **kwargs):
+        if obj not in self.context["mentioned"]:
+            self.context["mentioned"][obj] = []
+        return obj
+
+
+class FactSchema(BaseSchema):
     __model__: Type = Fact
     predicate = fields.Nested(PredicateSchema)
     context_factors = fields.Nested("FactorSchema", many=True)
@@ -366,15 +392,21 @@ class FactSchema(Schema):
         )
 
 
-class EntitySchema(Schema):
+class EntitySchema(BaseSchema):
     __model__: Type = Entity
     name = fields.Str(missing=None)
     generic = fields.Bool(missing=True)
-    plural = fields.Bool()
+    plural = fields.Bool(missing=False)
+
+    @pre_load
+    def format_data_to_load(self, data, **kwargs):
+        data = self.get_from_mentioned(data)
+        return data
 
     @post_load
     def make_entity(self, data, **kwargs):
         answer = Entity(**data)
+        self.save_to_mentioned(answer)
         return (
             (answer, self.context["mentioned"])
             if self.context.get("report_mentioned")
@@ -389,9 +421,7 @@ class FactorSchema(OneOfSchema):
         return obj.__class__.__name__.capitalize()
 
 
-SCHEMAS = [schema for schema in Schema.__subclasses__()] + [
-    schema for schema in FactorSchema.__subclasses__()
-]
+SCHEMAS = [schema for schema in BaseSchema.__subclasses__()]
 
 
 def get_schema_for_factor_record(typename: str) -> Schema:
