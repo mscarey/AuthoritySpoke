@@ -326,19 +326,18 @@ class FactSchema(Schema):
         name = f'{"false " if not truth else ""}{content}'
         return name.replace("{", "").replace("}", "")
 
-    def extract_context_factors(self, data: Dict, placeholder: str) -> Dict:
-        content = data["predicate"]["content"]
+    def extract_context_factors(
+        self, content: str, placeholder: str
+    ) -> Tuple[str, List[Dict]]:
         if placeholder[0] in content:
-            data["predicate"]["content"], data[
-                "context_factors"
-            ] = get_references_from_string(content)
+            content, context_factors = get_references_from_string(content)
         else:
-            data["predicate"]["content"], data[
-                "context_factors"
-            ] = get_references_from_mentioned(
+            content, context_factors = get_references_from_mentioned(
                 content, self.context["mentioned"], placeholder
             )
-        return data
+        context_factors = [serialize_if_factor(item) for item in context_factors]
+
+        return content, context_factors
 
     @pre_load
     def format_data_to_load(self, data, **kwargs):
@@ -351,7 +350,9 @@ class FactSchema(Schema):
 
         placeholder = "{}"  # to be replaced in the Fact's string method
         if not data.get("context_factors"):
-            data = self.extract_context_factors(data, placeholder)
+            data["predicate"]["content"], data[
+                "context_factors"
+            ] = self.extract_context_factors(data["predicate"]["content"], placeholder)
 
         return data
 
