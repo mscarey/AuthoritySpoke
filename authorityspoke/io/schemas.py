@@ -207,46 +207,6 @@ class PredicateSchema(Schema):
         return self.__model__(**data)
 
 
-def get_references_from_mentioned(
-    content: str, mentioned: TextLinkDict, placeholder: str = "{}"
-) -> Tuple[str, List[Union[Enactment, Factor]]]:
-    r"""
-    Retrieve known context :class:`Factor`\s for new :class:`Fact`.
-
-    :param content:
-        the content for the :class:`Fact`\'s :class:`Predicate`.
-
-    :param mentioned:
-        list of :class:`Factor`\s with names that could be
-        referenced in content
-
-    :param placeholder:
-        a string to replace the names of
-        referenced :class:`Factor`\s in content
-
-    :returns:
-        the content string with any referenced :class:`Factor`\s
-        replaced by placeholder, and a list of referenced
-        :class:`Factor`\s in the order they appeared in content.
-    """
-    sorted_mentioned = sorted(
-        mentioned.keys(), key=lambda x: len(x.name) if x.name else 0, reverse=True
-    )
-    context_with_indices: Dict[Union[Enactment, Factor], int] = {}
-    for factor in sorted_mentioned:
-        if factor.name and factor.name in content and factor.name != content:
-            factor_index = content.find(factor.name)
-            for named_factor in context_with_indices:
-                if context_with_indices[named_factor] > factor_index:
-                    context_with_indices[named_factor] -= len(factor.name) - len(
-                        placeholder
-                    )
-            context_with_indices[factor] = factor_index
-            content = content.replace(factor.name, placeholder)
-    context_factors = sorted(context_with_indices, key=context_with_indices.get)
-    return content, tuple(context_factors)
-
-
 def get_references_from_string(content: str) -> Tuple[str, List[Entity]]:
     r"""
     Make :class:`.Entity` context :class:`.Factor`\s from string.
@@ -285,13 +245,6 @@ def get_references_from_string(content: str) -> Tuple[str, List[Entity]]:
         context_factors.append(entity)
 
     return content, context_factors
-
-
-def serialize_if_factor(item: Any) -> Dict:
-    if isinstance(item, Factor):
-        schema = FactorSchema()
-        return schema.dump(item)
-    return item
 
 
 class BaseSchema(Schema):
@@ -352,17 +305,55 @@ class FactSchema(BaseSchema):
         name = f'{"false " if not truth else ""}{content}'
         return name.replace("{", "").replace("}", "")
 
+    def get_references_from_mentioned(
+        self, content: str, placeholder: str = "{}"
+    ) -> Tuple[str, List[Dict]]:
+        r"""
+        Retrieve known context :class:`Factor`\s for new :class:`Fact`.
+
+        :param content:
+            the content for the :class:`Fact`\'s :class:`Predicate`.
+
+        :param mentioned:
+            list of :class:`Factor`\s with names that could be
+            referenced in content
+
+        :param placeholder:
+            a string to replace the names of
+            referenced :class:`Factor`\s in content
+
+        :returns:
+            the content string with any referenced :class:`Factor`\s
+            replaced by placeholder, and a list of referenced
+            :class:`Factor`\s in the order they appeared in content.
+        """
+        mentioned = self.context.get("mentioned") or {}
+        sorted_mentioned = sorted(
+            mentioned.keys(), key=lambda x: len(x.name) if x.name else 0, reverse=True
+        )
+        context_with_indices: Dict[Union[Enactment, Factor], int] = {}
+        for factor in sorted_mentioned:
+            if factor.name and factor.name in content and factor.name != content:
+                factor_index = content.find(factor.name)
+                for named_factor in context_with_indices:
+                    if context_with_indices[named_factor] > factor_index:
+                        context_with_indices[named_factor] -= len(factor.name) - len(
+                            placeholder
+                        )
+                context_with_indices[factor] = factor_index
+                new_content = content.replace(factor.name, placeholder)
+        sorted_factors = sorted(context_with_indices, key=context_with_indices.get)
+        return new_content, [factor.__dict__ for factor in sorted_factors]
+
     def extract_context_factors(
         self, content: str, placeholder: str
     ) -> Tuple[str, List[Dict]]:
         if placeholder[0] in content:
             content, context_factors = get_references_from_string(content)
         else:
-            content, context_factors = get_references_from_mentioned(
-                content, self.context["mentioned"], placeholder
+            content, context_factors = self.get_references_from_mentioned(
+                content, placeholder
             )
-        context_factors = [serialize_if_factor(item) for item in context_factors]
-
         return content, context_factors
 
     @pre_load

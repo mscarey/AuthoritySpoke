@@ -90,6 +90,7 @@ class TestFactLoad:
         """
         relevant_json = """{"predicate": {
             "content": "{} is relevant to show {}"},
+            "type": "Fact",
             "context_factors": [
                 {
                     "predicate": {"content": "{} shot {}"},
@@ -104,7 +105,7 @@ class TestFactLoad:
                     "context_factors": ["Alice", "Bob"],
                     "type": "Fact"
                 }]}"""
-        schema = schemas.FactSchema()
+        schema = schemas.FactorSchema()
         relevant_fact = schema.loads(relevant_json)
         assert relevant_fact.context_factors[1].context_factors[0] == "Bob"
 
