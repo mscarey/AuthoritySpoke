@@ -24,20 +24,15 @@ class TestFactorLoad:
 
 
 class TestEntityLoad:
-    def test_get_entity_schema(self):
-        record = {"type": "Entity", "name": "George Washington"}
-        schema = schemas.get_schema_for_factor_record(record)
-        assert schema.__model__ == Entity
-
     def test_load_entity_from_factor_schema(self):
         record = {"type": "Entity", "name": "George Washington"}
-        schema = schemas.FactorSchema(partial=True, unknown="INCLUDE")
+        schema = schemas.FactorSchema()
         george = schema.load(record)
         assert george.generic == True
 
-    def test_load_and_dump_entity_from_entity_schema(self):
-        record = {"name": "John Adams"}
-        schema = schemas.EntitySchema()
+    def test_load_and_dump_entity_from_factor_schema(self):
+        record = {"name": "John Adams", "type": "entity"}
+        schema = schemas.FactorSchema()
         john = schema.load(record)
         assert john.generic is True
         john_dict = schema.dump(john)

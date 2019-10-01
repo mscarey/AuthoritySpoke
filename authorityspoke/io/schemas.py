@@ -317,10 +317,15 @@ class EntitySchema(Schema):
 
 
 class FactorSchema(OneOfSchema):
-    type_schemas = {"Entity": EntitySchema, "Fact": FactSchema}
+    type_schemas = {
+        "entity": EntitySchema,
+        "Entity": EntitySchema,
+        "fact": FactSchema,
+        "Fact": FactSchema,
+    }
 
     def get_obj_type(self, obj):
-        return obj.__class__.__name__.capitalize()
+        return obj.__class__.__name__
 
 
 SCHEMAS = [schema for schema in Schema.__subclasses__()]
