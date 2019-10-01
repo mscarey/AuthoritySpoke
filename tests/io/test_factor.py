@@ -73,8 +73,12 @@ class TestFactLoad:
         assert story.predicate.quantity == 3
 
     def test_make_fact_from_string(self, watt_factor):
-        fact_float_more = readers.read_fact(
-            "the distance between {Ann} and {Lee} was >= 20.1", reciprocal=True
+        schema = schemas.FactSchema()
+        fact_float_more = schema.load(
+            {
+                "content": "the distance between {Ann} and {Lee} was >= 20.1",
+                "reciprocal": True,
+            }
         )
         fact_float_less = watt_factor["f8_int"]
         assert fact_float_more >= fact_float_less

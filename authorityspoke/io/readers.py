@@ -225,9 +225,8 @@ def get_references_from_string(
 
 
 def read_fact(
-    content: str = "",
-    truth: bool = True,
-    reciprocal: bool = False,
+    predicate: Predicate,
+    context_factors: Optional[List[Factor]],
     standard_of_proof: Optional[str] = None,
     name: Optional[str] = None,
     mentioned: Optional[TextLinkDict] = None,
@@ -254,36 +253,7 @@ def read_fact(
         a :class:`Fact`, with optional mentioned factors
     """
     mentioned = mentioned or {}
-    placeholder = "{}"  # to be replaced in the Fact's string method
-    if not name:
-        name = f'{"false " if not truth else ""}{content}'
-    name = name.replace("{", "").replace("}", "")
-
-    comparison = ""
-    quantity = None
-    if content:
-        if placeholder[0] in content:
-            content, context_factors, mentioned = get_references_from_string(
-                content, mentioned
-            )
-        else:
-            content, context_factors = get_references_from_mentioned(
-                content, mentioned, placeholder
-            )
-    for item in Predicate.opposite_comparisons:
-        if item in content:
-            comparison = item
-            content, quantity_text = content.split(item)
-            quantity = read_quantity(quantity_text)
-            content += placeholder
-    predicate = Predicate(
-        content=content,
-        truth=truth,
-        reciprocal=reciprocal,
-        comparison=comparison,
-        quantity=quantity,
-    )
-
+    context_factors = context_factors or []
     answer = Fact(
         predicate,
         context_factors,

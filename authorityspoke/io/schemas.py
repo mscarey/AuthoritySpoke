@@ -13,7 +13,7 @@ from authorityspoke.facts import Fact
 from authorityspoke.predicates import Predicate
 from authorityspoke.selectors import TextQuoteSelector
 
-from authorityspoke.io import readers
+from authorityspoke.io import readers, references
 
 ureg = UnitRegistry()
 
@@ -257,7 +257,7 @@ class FactSchema(Schema):
         self, content: str, placeholder: str
     ) -> Tuple[str, List[Dict]]:
         if placeholder[0] in content:
-            content, context_factors = get_references_from_string(content)
+            content, context_factors = references.get_references_from_string(content)
         else:
             content, context_factors = self.get_references_from_mentioned(
                 content, placeholder

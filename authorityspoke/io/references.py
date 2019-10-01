@@ -1,10 +1,12 @@
 r"""Resolving references in imported data to :class:`.Factor`\s and text passages."""
 
 import functools
+import re
 
 from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple, Union
 
 from authorityspoke.enactments import Code, Enactment
+from authorityspoke.entities import Entity
 from authorityspoke.factors import Factor
 from authorityspoke.jurisdictions import Regime
 from authorityspoke.factors import TextLinkDict
@@ -100,3 +102,38 @@ def log_mentioned_context(func: Callable):
         return (new_factor, mentioned) if report_mentioned else new_factor
 
     return wrapper
+
+
+def get_references_from_string(content: str) -> Tuple[str, List[Entity]]:
+    r"""
+    Make :class:`.Entity` context :class:`.Factor`\s from string.
+    This function identifies context :class:`.Factor`\s by finding
+    brackets around them, while :func:`get_references_from_mentioned`
+    depends on knowing the names of the context factors in advance.
+    Also, this function works only when all the context_factors
+    are type :class:`.Entity`.
+    Despite "placeholder" being defined as a variable elsewhere,
+    this function isn't compatible with any placeholder string other
+    than "{}".
+    This function no longer updates the "mentioned" :class:`.TextLinkDict`\.
+    That update should instead happen after loading of each item in
+    context_factors.
+    :param content:
+        a string containing a clause making an assertion.
+        Curly brackets surround the names of :class:`.Entity`
+        context factors to be created.
+    :returns:
+        a :class:`Predicate` and :class:`.Entity` objects
+        from a string that has curly brackets around the
+        context factors and the comparison/quantity.
+    """
+    pattern = r"\{([^\{]+)\}"
+    entities_as_text = re.findall(pattern, content)
+
+    context_factors = []
+    for entity_name in entities_as_text:
+        entity = {"type": "Entity", "name": entity_name}
+        content = content.replace(entity_name, "")
+        context_factors.append(entity)
+
+    return content, context_factors
