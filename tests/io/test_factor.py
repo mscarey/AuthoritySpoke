@@ -15,17 +15,6 @@ ureg = pint.UnitRegistry()
 
 
 class TestFactorLoad:
-    def test_fact_import(self, make_regime):
-        holdings = load_holdings("holding_watt.json", regime=make_regime)
-        new_fact = holdings[0].inputs[1]
-        assert "lived at <Hideaway Lodge>" in str(new_fact)
-        assert isinstance(new_fact.context_factors[0], Entity)
-
-    def test_fact_with_quantity(self, make_regime):
-        holdings = load_holdings("holding_watt.json", regime=make_regime)
-        new_fact = holdings[1].inputs[3]
-        assert "was no more than 35 foot" in str(new_fact)
-
     def test_find_directory_for_json(self, make_regime):
         directory = pathlib.Path.cwd() / "tests"
         if directory.exists():

@@ -3,6 +3,7 @@ from typing import Any, Dict, List, Optional, Tuple, Type, Union
 from marshmallow import Schema, fields, validate
 from marshmallow import pre_dump, pre_load, post_dump, post_load
 from marshmallow import ValidationError
+from marshmallow_oneofschema import OneOfSchema
 
 from pint import UnitRegistry
 
@@ -163,9 +164,22 @@ class PredicateSchema(Schema):
         missing="",
         validate=validate.OneOf([""] + list(Predicate.opposite_comparisons.keys())),
     )
-    quantity = fields.Function(dump_quantity, deserialize=read_quantity)
+    quantity = fields.Function(dump_quantity, deserialize=read_quantity, missing=None)
 
-    @pre_load
+    def split_quantity_from_content(
+        self, content: str
+    ) -> Tuple[str, Optional[str], Optional[Union[ureg.Quantity, int, float]]]:
+        placeholder = "{}"
+        for comparison in {
+            **Predicate.normalized_comparisons,
+            **Predicate.opposite_comparisons,
+        }:
+            if comparison in content:
+                content, quantity_text = content.split(comparison)
+                content += placeholder
+                return content, comparison, quantity_text
+        return content, "", None
+
     def normalize_comparison(self, data, **kwargs):
         if data.get("quantity") and not data.get("comparison"):
             data["comparison"] = "="
@@ -176,6 +190,15 @@ class PredicateSchema(Schema):
         normalized = {"==": "=", "!=": "<>"}
         if data.get("comparison") in normalized:
             data["comparison"] = normalized[data["comparison"]]
+        return data
+
+    @pre_load
+    def format_data_to_load(self, data, **kwargs):
+        if not data.get("quantity"):
+            data["content"], data["comparison"], data[
+                "quantity"
+            ] = self.split_quantity_from_content(data["content"])
+        data = self.normalize_comparison(data)
         return data
 
     @post_load
@@ -282,47 +305,30 @@ class FactSchema(Schema):
         return data
 
 
-class FactorSchema(Schema):
-    __model__: Type = Factor
-    name = fields.Str(missing=None)
-    generic = fields.Bool(missing=False)
-
-    @post_dump
-    def add_type_field(self, data, **kwargs):
-        data["type"] = self.__model__.__name__
-        return data
-
-    @post_load(pass_original=True)
-    def make_subclass_factor(self, data, original, **kwargs):
-        """
-        Return the result of loading with the subclass schema.
-
-        Discards the result of loading with FactorSchema.
-
-        If this function is called from within a subclass,
-        it deserializes using the subclass model.
-        """
-        if self.__model__ == Factor:
-            schema = get_schema_for_factor_record(original)
-            return schema.load(original)
-        return self.__model__(**data)
-
-
-class EntitySchema(FactorSchema):
+class EntitySchema(Schema):
     __model__: Type = Entity
     name = fields.Str(missing=None)
     generic = fields.Bool(missing=True)
-    plural = fields.Bool()
+    plural = fields.Bool(missing=False)
+
+    @post_load
+    def make_object(self, data, **kwargs):
+        return Entity(**data)
 
 
-SCHEMAS = [schema for schema in Schema.__subclasses__()] + [
-    schema for schema in FactorSchema.__subclasses__()
-]
+class FactorSchema(OneOfSchema):
+    type_schemas = {"Entity": EntitySchema, "Fact": FactSchema}
+
+    def get_obj_type(self, obj):
+        return obj.__class__.__name__.capitalize()
+
+
+SCHEMAS = [schema for schema in Schema.__subclasses__()]
 
 
 def get_schema_for_factor_record(record: Dict) -> Schema:
     """
-    Find the Marshmallow schema for an AuthoritySpoke object.
+    Find the Marshmallow schema to make an AuthoritySpoke object.
     """
     for option in SCHEMAS:
         if record.get("type", "").lower() == option.__model__.__name__.lower():
@@ -332,7 +338,7 @@ def get_schema_for_factor_record(record: Dict) -> Schema:
 
 def get_schema_for_item(item: Any) -> Schema:
     """
-    Find the Marshmallow schema for an AuthoritySpoke object.
+    Find the Marshmallow schema to serialize an AuthoritySpoke object.
     """
     for option in SCHEMAS:
         if item.__class__ == option.__model__:

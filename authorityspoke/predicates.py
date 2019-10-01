@@ -76,6 +76,7 @@ class Predicate:
         ">": "<=",
         "<": ">=",
     }
+    normalized_comparisons: ClassVar = {"==": "=", "!=": "<>"}
 
     def __post_init__(self):
         """

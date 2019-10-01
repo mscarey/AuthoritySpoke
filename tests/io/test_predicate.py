@@ -33,6 +33,28 @@ class TestPredicateLoad:
         )
         assert p7.comparison == "<>"
 
+    def test_load_and_find_quantity(self):
+        schema = schemas.PredicateSchema()
+        p7 = schema.load(
+            data={
+                "content": "the distance between {} and {} was > 35 feet",
+                "truth": True,
+                "reciprocal": True,
+            }
+        )
+        assert p7.comparison == ">"
+
+    def test_load_and_normalize_quantity(self):
+        schema = schemas.PredicateSchema()
+        p7 = schema.load(
+            data={
+                "content": "the distance between {} and {} was != 35 feet",
+                "truth": True,
+                "reciprocal": True,
+            }
+        )
+        assert p7.comparison == "<>"
+
     def test_load_and_normalize_comparison(self):
         p7 = readers.read_predicate(
             value={

@@ -27,7 +27,6 @@ from authorityspoke.rules import Rule
 from authorityspoke.selectors import TextQuoteSelector
 
 from authorityspoke.io import references
-from authorityspoke.io import schemas
 
 
 ureg = UnitRegistry()
@@ -177,51 +176,6 @@ def get_references_from_mentioned(
             content = content.replace(factor.name, placeholder)
     context_factors = sorted(context_with_indices, key=context_with_indices.get)
     return content, tuple(context_factors)
-
-
-def get_references_from_string(
-    content: str, mentioned: TextLinkDict
-) -> Tuple[str, List[Entity], TextLinkDict]:
-    r"""
-    Make :class:`.Entity` context :class:`.Factor`\s from string.
-
-    This function identifies context :class:`.Factor`\s by finding
-    brackets around them, while :func:`get_references_from_mentioned`
-    depends on knowing the names of the context factors in advance.
-    Also, this function works only when all the context_factors
-    are type :class:`.Entity`.
-
-    Despite "placeholder" being defined as a variable elsewhere,
-    this function isn't compatible with any placeholder string other
-    than "{}".
-
-    :param content:
-        a string containing a clause making an assertion.
-        Curly brackets surround the names of :class:`.Entity`
-        context factors to be created.
-
-    :param mentioned:
-        a :class:`.TextLinkDict` of known :class:`.Factor`\s.
-        It will not be searched for :class:`.Factor`\s to add
-        to `context_factors`, but newly created :class:`.Entity`
-        object will be added to it.
-
-    :returns:
-        a :class:`Predicate` and :class:`.Entity` objects
-        from a string that has curly brackets around the
-        context factors and the comparison/quantity.
-    """
-    pattern = r"\{([^\{]+)\}"
-    entities_as_text = re.findall(pattern, content)
-
-    context_factors = []
-    for entity_name in entities_as_text:
-        entity = Entity(name=entity_name)
-        content = content.replace(entity_name, "")
-        context_factors.append(entity)
-        mentioned[entity] = []
-
-    return content, tuple(context_factors), mentioned
 
 
 def read_fact(
