@@ -341,6 +341,6 @@ def get_schema_for_item(item: Any) -> Schema:
     Find the Marshmallow schema to serialize an AuthoritySpoke object.
     """
     for option in SCHEMAS:
-        if item.__class__ == option.__model__:
+        if hasattr(option, "__model__") and item.__class__ == option.__model__:
             return option()
     return None
