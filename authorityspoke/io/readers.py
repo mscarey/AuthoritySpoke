@@ -40,7 +40,9 @@ FACTOR_SUBCLASSES = {
 
 @references.log_mentioned_context
 def read_enactment(
-    enactment_dict: Dict[str, str],
+    selector: TextQuoteSelector,
+    source: str,
+    name: Optional[str] = None,
     code: Optional[Code] = None,
     mentioned: Optional[TextLinkDict] = None,
     regime: Optional[Regime] = None,
@@ -78,15 +80,14 @@ def read_enactment(
         a new :class:`Enactment` object, optionally with text links.
     """
     if regime and not code:
-        code = regime.get_code(enactment_dict["source"])
+        code = regime.get_code(source)
     if code is None:
         raise ValueError(
             "Must either specify a Code, or else specify a Regime "
             + "and a path to find the Code within the Regime."
         )
 
-    schema = schemas.EnactmentSchema(context={"code": code})
-    answer = schema.load(enactment_dict)
+    answer = Enactment(selector=selector, source=source, code=code, name=name)
 
     return (answer, mentioned or {}) if report_mentioned else answer
 
@@ -223,11 +224,6 @@ def get_references_from_string(
     return content, tuple(context_factors), mentioned
 
 
-def read_predicate(value: Dict) -> Predicate:
-    schema = schemas.PredicateSchema(partial=True)
-    return schema.load(value)
-
-
 def read_fact(
     content: str = "",
     truth: bool = True,
@@ -278,7 +274,7 @@ def read_fact(
         if item in content:
             comparison = item
             content, quantity_text = content.split(item)
-            quantity = schemas.read_quantity(quantity_text)
+            quantity = read_quantity(quantity_text)
             content += placeholder
     predicate = Predicate(
         content=content,

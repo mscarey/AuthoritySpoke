@@ -1,4 +1,4 @@
-from typing import Any, Dict, Tuple, Type, Union
+from typing import Any, Dict, List, Optional, Tuple, Type, Union
 
 from marshmallow import Schema, fields, validate
 from marshmallow import pre_dump, pre_load, post_dump, post_load
@@ -12,6 +12,8 @@ from authorityspoke.factors import Factor
 from authorityspoke.facts import Fact
 from authorityspoke.predicates import Predicate
 from authorityspoke.selectors import TextQuoteSelector
+
+from authorityspoke.io import readers
 
 ureg = UnitRegistry()
 
@@ -62,7 +64,7 @@ class SelectorSchema(Schema):
 
     @post_load
     def make_object(self, data, **kwargs):
-        return self.__model__(**data)
+        return SelectorSchema(**data)
 
 
 class EnactmentSchema(Schema):
@@ -111,7 +113,7 @@ class EnactmentSchema(Schema):
 
     @post_load
     def make_object(self, data, **kwargs):
-        return self.__model__(**data, code=self.context["code"])
+        return readers.read_enactment(factor_record=data, **self.context)
 
 
 def read_quantity(value: Union[float, int, str]) -> Union[float, int, ureg.Quantity]:
@@ -179,6 +181,105 @@ class PredicateSchema(Schema):
     @post_load
     def make_object(self, data, **kwargs):
         return self.__model__(**data)
+
+
+class FactSchema(Schema):
+    __model__: Type = Fact
+    predicate = fields.Nested(PredicateSchema)
+    context_factors = fields.Nested("FactorSchema", many=True)
+    standard_of_proof = fields.Str(missing=None)
+    name = fields.Str(missing=None)
+    absent = fields.Bool(missing=False)
+    generic = fields.Bool(missing=False)
+
+    def nest_predicate_fields(self, data, **kwargs):
+        """
+        Make sure predicate-related fields are in a dict under "predicate" key.
+        """
+        if data.get("content") and not data.get("predicate"):
+            data["predicate"] = {}
+            for predicate_field in [
+                "content",
+                "truth",
+                "reciprocal",
+                "comparison",
+                "quantity",
+            ]:
+                if data.get(predicate_field):
+                    data["predicate"][predicate_field] = data[predicate_field]
+                    del data[predicate_field]
+        return data
+
+    def supply_name(self, truth: Optional[bool], content: str) -> str:
+        """
+        Provide a name for the :class:`.Fact` if none is provided.
+        """
+        name = f'{"false " if not truth else ""}{content}'
+        return name.replace("{", "").replace("}", "")
+
+    def get_references_from_mentioned(
+        self, content: str, placeholder: str = "{}"
+    ) -> Tuple[str, List[Dict]]:
+        r"""
+        Retrieve known context :class:`Factor`\s for new :class:`Fact`.
+        :param content:
+            the content for the :class:`Fact`\'s :class:`Predicate`.
+        :param mentioned:
+            list of :class:`Factor`\s with names that could be
+            referenced in content
+        :param placeholder:
+            a string to replace the names of
+            referenced :class:`Factor`\s in content
+        :returns:
+            the content string with any referenced :class:`Factor`\s
+            replaced by placeholder, and a list of referenced
+            :class:`Factor`\s in the order they appeared in content.
+        """
+        mentioned = self.context.get("mentioned") or {}
+        sorted_mentioned = sorted(
+            mentioned.keys(), key=lambda x: len(x.name) if x.name else 0, reverse=True
+        )
+        context_with_indices: Dict[Union[Enactment, Factor], int] = {}
+        for factor in sorted_mentioned:
+            if factor.name and factor.name in content and factor.name != content:
+                factor_index = content.find(factor.name)
+                for named_factor in context_with_indices:
+                    if context_with_indices[named_factor] > factor_index:
+                        context_with_indices[named_factor] -= len(factor.name) - len(
+                            placeholder
+                        )
+                context_with_indices[factor] = factor_index
+                new_content = content.replace(factor.name, placeholder)
+        sorted_factors = sorted(context_with_indices, key=context_with_indices.get)
+        return new_content, [factor.__dict__ for factor in sorted_factors]
+
+    def extract_context_factors(
+        self, content: str, placeholder: str
+    ) -> Tuple[str, List[Dict]]:
+        if placeholder[0] in content:
+            content, context_factors = get_references_from_string(content)
+        else:
+            content, context_factors = self.get_references_from_mentioned(
+                content, placeholder
+            )
+        return content, context_factors
+
+    @pre_load
+    def format_data_to_load(self, data, **kwargs):
+        data = self.nest_predicate_fields(data)
+        if not data.get("name"):
+            data["name"] = self.supply_name(
+                truth=data["predicate"].get("truth"),
+                content=data["predicate"]["content"],
+            )
+
+        placeholder = "{}"  # to be replaced in the Fact's string method
+        if not data.get("context_factors"):
+            data["predicate"]["content"], data[
+                "context_factors"
+            ] = self.extract_context_factors(data["predicate"]["content"], placeholder)
+
+        return data
 
 
 class FactorSchema(Schema):

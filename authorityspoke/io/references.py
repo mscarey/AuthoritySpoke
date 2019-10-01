@@ -2,15 +2,12 @@ r"""Resolving references in imported data to :class:`.Factor`\s and text passage
 
 import functools
 
-from typing import Callable, Dict, Iterable, List, Optional, Tuple, Union
+from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple, Union
 
 from authorityspoke.enactments import Code, Enactment
 from authorityspoke.factors import Factor
 from authorityspoke.jurisdictions import Regime
 from authorityspoke.factors import TextLinkDict
-from authorityspoke.selectors import TextQuoteSelector
-
-from authorityspoke.io.schemas import SelectorSchema
 
 
 def _replace_new_factor_from_mentioned(
@@ -52,7 +49,7 @@ def log_mentioned_context(func: Callable):
 
     @functools.wraps(func)
     def wrapper(
-        factor_record: Union[str, Optional[Dict[str, Union[str, bool]]]],
+        factor_record: Dict[str, Any],
         mentioned: Optional[TextLinkDict] = None,
         code: Optional[Code] = None,
         regime: Optional[Regime] = None,
@@ -88,7 +85,7 @@ def log_mentioned_context(func: Callable):
             anchors = []
 
         new_factor, mentioned = func(
-            factor_record,
+            **factor_record,
             mentioned=mentioned or {},
             code=code,
             regime=regime,
@@ -103,42 +100,3 @@ def log_mentioned_context(func: Callable):
         return (new_factor, mentioned) if report_mentioned else new_factor
 
     return wrapper
-
-
-def read_selector(record: Optional[Union[Dict, str]]) -> Optional[TextQuoteSelector]:
-    """
-    Create new selector from JSON user input.
-
-    :param record:
-        a string or dict representing a text passage
-
-    :returns: a new :class:`TextQuoteSelector`
-    """
-    if not record:
-        return None
-    selector_schema = SelectorSchema()
-    return selector_schema.load(record)
-
-
-def read_selectors(
-    records: Optional[Union[str, Dict[str, str], Iterable[Union[str, Dict[str, str]]]]]
-) -> List[TextQuoteSelector]:
-    r"""
-    Create list of :class:`.TextQuoteSelector`\s from JSON user input.
-
-    If the input is a :class:`str`, tries to break up the string
-    into :attr:`~TextQuoteSelector.prefix`, :attr:`~TextQuoteSelector.exact`,
-    and :attr:`~TextQuoteSelector.suffix`, by splitting on the pipe characters.
-
-    :param record:
-        a string or dict representing a text passage, or list of
-        strings and dicts.
-
-    :returns: a list of :class:`TextQuoteSelector`\s
-    """
-    if records is None:
-        return []
-    if isinstance(records, (str, dict)):
-        return [read_selector(records)]
-    schema = SelectorSchema(many=True)
-    return schema.load(records)
