@@ -272,9 +272,11 @@ class FactSchema(Schema):
                             placeholder
                         )
                 context_with_indices[factor] = factor_index
-                new_content = content.replace(factor.name, placeholder)
+                content = content.replace(factor.name, placeholder)
         sorted_factors = sorted(context_with_indices, key=context_with_indices.get)
-        return new_content, [factor.__dict__ for factor in sorted_factors]
+        factor_schema = FactorSchema()
+        factor_schema.context["mentioned"] = self.context["mentioned"]
+        return content, [factor_schema.dump(factor) for factor in sorted_factors]
 
     def extract_context_factors(
         self, content: str, placeholder: str
@@ -304,6 +306,14 @@ class FactSchema(Schema):
 
         return data
 
+    @post_load
+    def make_object(self, data, **kwargs):
+        return readers.read_fact(
+            **data,
+            mentioned=self.context.get("mentioned"),
+            report_mentioned=self.context.get("report_mentioned"),
+        )
+
 
 class EntitySchema(Schema):
     __model__: Type = Entity
@@ -313,7 +323,7 @@ class EntitySchema(Schema):
 
     @post_load
     def make_object(self, data, **kwargs):
-        return Entity(**data)
+        return self.__model__(**data)
 
 
 class FactorSchema(OneOfSchema):

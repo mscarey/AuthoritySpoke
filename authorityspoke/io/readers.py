@@ -177,7 +177,6 @@ def get_references_from_mentioned(
     context_factors = sorted(context_with_indices, key=context_with_indices.get)
     return content, tuple(context_factors)
 
-
 def read_fact(
     predicate: Predicate,
     context_factors: Optional[List[Factor]],

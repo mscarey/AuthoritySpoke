@@ -41,16 +41,26 @@ class TestEntityLoad:
 
 class TestFactLoad:
     def test_import_fact_with_entity_name_containing_another(self):
-        house_fact = readers.read_fact(
-            content="Alice sold Alice's house for a price in dollars of > 300000",
-            mentioned={Entity(name="Alice"): [], Entity(name="Alice's house"): []},
+        schema = schemas.FactSchema()
+        schema.context["mentioned"] = {
+            Entity(name="Alice"): [],
+            Entity(name="Alice's house"): [],
+        }
+        house_fact = schema.load(
+            data={
+                "content": "Alice sold Alice's house for a price in dollars of > 300000"
+            }
         )
+
         assert any(
             context.name == "Alice's house" for context in house_fact.generic_factors
         )
 
     def test_import_predicate_with_quantity(self):
-        story = readers.read_fact("The number of castles {the king} had was > 3")
+        schema = schemas.FactSchema()
+        story = schema.load(
+            data={"content": "The number of castles {the king} had was > 3"}
+        )
         assert len(story.predicate) == 1
         assert story.predicate.content.startswith("The number of castles")
         assert story.predicate.comparison == ">"
