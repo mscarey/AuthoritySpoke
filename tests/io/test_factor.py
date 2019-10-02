@@ -7,7 +7,7 @@ import pytest
 
 from authorityspoke.enactments import Code, Enactment
 from authorityspoke.entities import Entity
-from authorityspoke.io import readers, schemas
+from authorityspoke.io import readers, schemas, name_index
 from authorityspoke.io.loaders import load_holdings
 from authorityspoke.io import filepaths
 
@@ -78,3 +78,10 @@ class TestFactLoad:
         )
         fact_float_less = watt_factor["f8_int"]
         assert fact_float_more >= fact_float_less
+
+
+class TestCollectMentioned:
+    def test_mentioned_from_entity(self):
+        obj = {"type": "Entity", "name": "Ann"}
+        mentioned = name_index.get_mentioned(obj)
+        assert mentioned["Ann"]["type"] == "Entity"
