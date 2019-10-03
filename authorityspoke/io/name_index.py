@@ -69,10 +69,10 @@ def expand_shorthand_mentioned(obj: Dict) -> Dict:
         )
     for _, value in obj.items():
         if isinstance(value, Dict):
-            value = expand_shorthand_mentioned(value, mentioned)
+            value = expand_shorthand_mentioned(value)
         elif isinstance(value, List):
             for item in value:
-                item = expand_shorthand_mentioned(item, mentioned)
+                item = expand_shorthand_mentioned(item)
     return obj
 
 
