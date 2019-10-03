@@ -13,6 +13,8 @@ from authorityspoke.facts import Fact
 from authorityspoke.predicates import Predicate
 from authorityspoke.selectors import TextQuoteSelector
 
+from utils.marshmallow_oneofschema.one_of_schema import OneOfSchema
+
 ureg = UnitRegistry()
 
 
@@ -181,37 +183,15 @@ class PredicateSchema(Schema):
         return self.__model__(**data)
 
 
-class FactorSchema(Schema):
-    __model__: Type = Factor
-    name = fields.Str(missing=None)
-    generic = fields.Bool(missing=False)
-
-    @post_dump
-    def add_type_field(self, data, **kwargs):
-        data["type"] = self.__model__.__name__
-        return data
-
-    @post_load(pass_original=True)
-    def make_subclass_factor(self, data, original, **kwargs):
-        """
-        Return the result of loading with the subclass schema.
-
-        Discards the result of loading with FactorSchema.
-
-        If this function is called from within a subclass,
-        it deserializes using the subclass model.
-        """
-        if self.__model__ == Factor:
-            schema = get_schema_for_factor_record(original)
-            return schema.load(original)
-        return self.__model__(**data)
-
-
-class EntitySchema(FactorSchema):
+class EntitySchema(Schema):
     __model__: Type = Entity
     name = fields.Str(missing=None)
     generic = fields.Bool(missing=True)
     plural = fields.Bool()
+
+    @post_load
+    def make_object(self, data, **kwargs):
+        return Entity(**data)
 
 
 class FactSchema(Schema):
@@ -279,7 +259,7 @@ class FactSchema(Schema):
     def consume_type_field(self, data, **kwargs):
         if data.get("type"):
             ty = data.pop("type").lower()
-            if typefield != self.__model__.__name__.lower():
+            if ty != self.__model__.__name__.lower():
                 raise ValidationError(
                     f'type field "{ty} does not match model type {self.__model__}'
                 )
@@ -291,7 +271,7 @@ class FactSchema(Schema):
         if not data.get("context_factors"):
             data["predicate"]["content"], data[
                 "context_factors"
-            ] = self.get_references_from_mentioned(content, placeholder)
+            ] = self.get_references_from_mentioned(data["predicate"]["content"])
         data = self.consume_type_field(data)
         return data
 
@@ -300,9 +280,19 @@ class FactSchema(Schema):
         return Fact(**data)
 
 
-SCHEMAS = [schema for schema in Schema.__subclasses__()] + [
-    schema for schema in FactorSchema.__subclasses__()
-]
+class FactorSchema(OneOfSchema):
+    type_schemas = {
+        "entity": EntitySchema,
+        "Entity": EntitySchema,
+        "fact": FactSchema,
+        "Fact": FactSchema,
+    }
+
+    def get_obj_type(self, obj):
+        return obj.__class__.__name__
+
+
+SCHEMAS = [schema for schema in Schema.__subclasses__()]
 
 
 def get_schema_for_factor_record(record: Dict) -> Schema:

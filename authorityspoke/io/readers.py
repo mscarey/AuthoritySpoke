@@ -243,11 +243,9 @@ def read_factor(
     mentioned = mentioned or {}
     target_class = subclass_from_str(cname)
     if target_class == Fact:
-        created_factor, mentioned = read_fact(
-            **factor_record, mentioned=mentioned, report_mentioned=True
-        )
+        created_factor = read_fact(factor_record)
     else:
-        created_factor, mentioned = read_factor_subclass(
+        created_factor = read_factor_subclass(
             target_class, factor_record, mentioned, report_mentioned=True
         )
     return (created_factor, mentioned) if report_mentioned else created_factor

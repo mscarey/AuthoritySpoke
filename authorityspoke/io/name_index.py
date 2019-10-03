@@ -42,12 +42,13 @@ def get_references_from_string(content: str) -> Tuple[str, List[Dict]]:
     """
     pattern = r"\{([^\{]+)\}"
     entities_as_text = findall(pattern, content)
-
     context_factors = []
     for entity_name in entities_as_text:
         entity = {"type": "Entity", "name": entity_name}
-        content = content.replace(entity_name, "")
         context_factors.append(entity)
+    sorted_entities = sorted(entities_as_text, key=len, reverse=True)
+    for entity_name in sorted_entities:
+        content = content.replace(entity_name, "")
 
     return content, context_factors
 
