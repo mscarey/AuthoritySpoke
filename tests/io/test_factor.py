@@ -83,5 +83,12 @@ class TestFactLoad:
 class TestCollectMentioned:
     def test_mentioned_from_entity(self):
         obj = {"type": "Entity", "name": "Ann"}
-        mentioned = name_index.get_mentioned(obj)
+        obj, mentioned = name_index.get_mentioned(obj)
         assert mentioned["Ann"]["type"] == "Entity"
+
+    def test_insert_in_mentioned_does_not_change_obj(self):
+        mentioned = name_index.Mentioned()
+        obj = {"type": "Entity", "name": "Remainer"}
+        mentioned.insert_by_name(obj)
+        assert obj["name"] == "Remainer"
+        assert "name" not in mentioned["Remainer"].keys()
