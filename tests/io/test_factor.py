@@ -74,7 +74,10 @@ class TestFactLoad:
 
     def test_make_fact_from_string(self, watt_factor):
         fact_float_more = readers.read_fact(
-            "the distance between {Ann} and {Lee} was >= 20.1", reciprocal=True
+            {
+                "content": "the distance between {Ann} and {Lee} was >= 20.1",
+                "reciprocal": True,
+            }
         )
         fact_float_less = watt_factor["f8_int"]
         assert fact_float_more >= fact_float_less
@@ -98,10 +101,10 @@ class TestCollectMentioned:
         "type": "Fact",
         "name": "relevant fact",
         "context_factors": [
-            {"content": "{Alice} shot {Bob}", "type": "Fact"},
+            {"content": "{Short Name} shot {Longer Name}", "type": "Fact"},
             {
                 "content": "{} murdered {}",
-                "context_factors": ["Alice", "Bob"],
+                "context_factors": ["Short Name", "Longer Name"],
                 "type": "Fact",
             },
         ],
@@ -117,3 +120,8 @@ class TestCollectMentioned:
         assert mentioned["relevant fact"]["type"] == "Fact"
         alice_shot_bob = mentioned["relevant fact"]["context_factors"][0]
         assert alice_shot_bob["context_factors"][0]["name"] == "Alice"
+
+    def test_mentioned_ordered_by_length(self):
+        obj, mentioned = name_index.index_names(self.relevant_dict)
+        shortest = mentioned.popitem()
+        assert shortest[0] == "Short Name"

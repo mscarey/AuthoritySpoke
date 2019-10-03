@@ -1,4 +1,5 @@
 """Functions for indexing named objects in JSON to be imported."""
+from collections import OrderedDict
 from re import findall
 
 from typing import Dict, List, Optional, Tuple, Union
@@ -96,3 +97,22 @@ def collect_mentioned(
             for item in value:
                 item, mentioned = collect_mentioned(item, mentioned)
     return obj, mentioned
+
+
+def index_names(obj: Dict) -> Tuple[Dict, Mentioned]:
+    """
+    Call all functions to prepare "mentioned" index.
+
+    The names are sorted by length so that if one mentioned Factor's name
+    is a substring of another, the longest available name is expanded.
+
+    :returns:
+        a modified version of the dict to load, plus a dict of names
+        and the objects to expand them with.
+    """
+    obj = expand_shorthand_mentioned(obj)
+    obj, mentioned = collect_mentioned(obj)
+    sorted_mentioned = OrderedDict(
+        sorted(mentioned.items(), key=lambda t: len(t[0]), reverse=True)
+    )
+    return obj, sorted_mentioned

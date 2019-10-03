@@ -1,4 +1,4 @@
-from typing import Any, Dict, Tuple, Type, Union
+from typing import Any, Dict, List, Optional, Tuple, Type, Union
 
 from marshmallow import Schema, fields, validate
 from marshmallow import pre_dump, pre_load, post_dump, post_load
@@ -212,6 +212,82 @@ class EntitySchema(FactorSchema):
     name = fields.Str(missing=None)
     generic = fields.Bool(missing=True)
     plural = fields.Bool()
+
+
+class FactSchema(Schema):
+    __model__: Type = Fact
+    predicate = fields.Nested(PredicateSchema)
+    context_factors = fields.Nested("FactorSchema", many=True)
+    standard_of_proof = fields.Str(missing=None)
+    name = fields.Str(missing=None)
+    absent = fields.Bool(missing=False)
+    generic = fields.Bool(missing=False)
+
+    def nest_predicate_fields(self, data, **kwargs):
+        """
+        Make sure predicate-related fields are in a dict under "predicate" key.
+        """
+        if data.get("content") and not data.get("predicate"):
+            data["predicate"] = {}
+            for predicate_field in [
+                "content",
+                "truth",
+                "reciprocal",
+                "comparison",
+                "quantity",
+            ]:
+                if data.get(predicate_field):
+                    data["predicate"][predicate_field] = data[predicate_field]
+                    del data[predicate_field]
+        return data
+
+    def get_references_from_mentioned(
+        self, content: str, placeholder: str = "{}"
+    ) -> Tuple[str, List[Dict]]:
+        r"""
+        Retrieve known context :class:`Factor`\s for new :class:`Fact`.
+        :param content:
+            the content for the :class:`Fact`\'s :class:`Predicate`.
+        :param mentioned:
+            list of :class:`Factor`\s with names that could be
+            referenced in content
+        :param placeholder:
+            a string to replace the names of
+            referenced :class:`Factor`\s in content
+        :returns:
+            the content string with any referenced :class:`Factor`\s
+            replaced by placeholder, and a list of referenced
+            :class:`Factor`\s in the order they appeared in content.
+        """
+        mentioned = self.context.get("mentioned") or {}
+        context_with_indices: Dict[Union[Enactment, Factor], int] = {}
+        for factor in mentioned:
+            if factor.name and factor.name in content and factor.name != content:
+                factor_index = content.find(factor.name)
+                for named_factor in context_with_indices:
+                    if context_with_indices[named_factor] > factor_index:
+                        context_with_indices[named_factor] -= len(factor.name) - len(
+                            placeholder
+                        )
+                context_with_indices[factor] = factor_index
+                content = content.replace(factor.name, placeholder)
+        sorted_factors = sorted(context_with_indices, key=context_with_indices.get)
+        factor_schema = FactorSchema()
+        factor_schema.context["mentioned"] = self.context["mentioned"]
+        return content, [factor_schema.dump(factor) for factor in sorted_factors]
+
+    @pre_load
+    def format_data_to_load(self, data, **kwargs):
+        data = self.nest_predicate_fields(data)
+        if not data.get("context_factors"):
+            data["predicate"]["content"], data[
+                "context_factors"
+            ] = self.get_references_from_mentioned(content, placeholder)
+        return data
+
+    @post_load
+    def make_object(self, data, **kwargs):
+        return Fact(**data)
 
 
 SCHEMAS = [schema for schema in Schema.__subclasses__()] + [

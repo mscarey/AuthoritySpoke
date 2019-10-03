@@ -28,6 +28,7 @@ from authorityspoke.selectors import TextQuoteSelector
 
 from authorityspoke.io import references
 from authorityspoke.io import schemas
+from authorityspoke.io import name_index
 
 
 ureg = UnitRegistry()
@@ -183,75 +184,20 @@ def read_predicate(value: Dict) -> Predicate:
     return schema.load(value)
 
 
-def read_fact(
-    content: str = "",
-    truth: bool = True,
-    reciprocal: bool = False,
-    standard_of_proof: Optional[str] = None,
-    name: Optional[str] = None,
-    mentioned: Optional[TextLinkDict] = None,
-    report_mentioned: bool = False,
-    absent: bool = False,
-    generic: bool = False,
-    **kwargs,
-) -> Union[Fact, Tuple[Fact, TextLinkDict]]:
+def read_fact(record: Dict) -> Fact:
     r"""
-    Construct a :class:`Fact` from strings and bools.
+    Construct a :class:`Fact` after loading a dict from JSON.
 
     :param record:
         parameter values to pass to :class:`.FactSchema`\.
 
-    :param mentioned:
-        a list of :class:`.Factor`\s that may be included by reference to their ``name``\s.
-
-    :param report_mentioned:
-        if True, return a new :class:`.TextLinkDict` in addition to
-        the :class:`.Fact`\.
-
-
     :returns:
         a :class:`Fact`, with optional mentioned factors
     """
-    mentioned = mentioned or {}
-    placeholder = "{}"  # to be replaced in the Fact's string method
-    if not name:
-        name = f'{"false " if not truth else ""}{content}'
-    name = name.replace("{", "").replace("}", "")
-
-    comparison = ""
-    quantity = None
-    if content:
-        if placeholder[0] in content:
-            content, context_factors, mentioned = get_references_from_string(
-                content, mentioned
-            )
-        else:
-            content, context_factors = get_references_from_mentioned(
-                content, mentioned, placeholder
-            )
-    for item in Predicate.opposite_comparisons:
-        if item in content:
-            comparison = item
-            content, quantity_text = content.split(item)
-            quantity = schemas.read_quantity(quantity_text)
-            content += placeholder
-    predicate = Predicate(
-        content=content,
-        truth=truth,
-        reciprocal=reciprocal,
-        comparison=comparison,
-        quantity=quantity,
-    )
-
-    answer = Fact(
-        predicate,
-        context_factors,
-        name=name,
-        standard_of_proof=standard_of_proof,
-        absent=absent,
-        generic=generic,
-    )
-    return (answer, mentioned) if report_mentioned else answer
+    record, mentioned = name_index.index_names(record)
+    schema = schemas.FactSchema()
+    schema.context["mentioned"] = mentioned
+    return schema.load(record)
 
 
 def subclass_from_str(name: str) -> Type:
