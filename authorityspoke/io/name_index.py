@@ -51,22 +51,48 @@ def get_references_from_string(content: str) -> Tuple[str, List[Dict]]:
     return content, context_factors
 
 
-def get_mentioned(
-    obj: Union[Dict, List], mentioned: Optional[Mentioned] = None
-) -> Mentioned:
-    mentioned = mentioned or Mentioned()
+def expand_shorthand_mentioned(obj: Dict) -> Dict:
+    """
+    Expand any Entity references that use the curly bracket shorthand.
+
+    :param obj:
+        object loaded from JSON to make a :class:`.Factor` or :class:`.Holding`
+
+    :returns:
+        the input object, but with shorthand references expanded.
+    """
     if not isinstance(obj, Dict):
-        return mentioned
-    if obj.get("name"):
-        mentioned.insert_by_name(obj)
+        return obj
     if obj.get("content") and not obj.get("context_factors"):
         obj["content"], obj["context_factors"] = get_references_from_string(
             obj["content"]
         )
     for _, value in obj.items():
         if isinstance(value, Dict):
-            mentioned = get_mentioned(value, mentioned)
+            value = expand_shorthand_mentioned(value, mentioned)
         elif isinstance(value, List):
             for item in value:
-                mentioned = get_mentioned(item, mentioned)
+                item = expand_shorthand_mentioned(item, mentioned)
+    return obj
+
+
+def collect_mentioned(
+    obj: Dict, mentioned: Optional[Mentioned] = None
+) -> Tuple[Dict, Mentioned]:
+    """
+    Make a dict of all nested objects labeled by name.
+
+    To be used during loading to expand name references to full objects.
+    """
+    mentioned = mentioned or Mentioned()
+    if not isinstance(obj, Dict):
+        return obj, mentioned
+    if obj.get("name"):
+        mentioned.insert_by_name(obj)
+    for _, value in obj.items():
+        if isinstance(value, Dict):
+            value, mentioned = collect_mentioned(value, mentioned)
+        elif isinstance(value, List):
+            for item in value:
+                item, mentioned = collect_mentioned(item, mentioned)
     return obj, mentioned

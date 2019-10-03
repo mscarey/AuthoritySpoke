@@ -83,7 +83,7 @@ class TestFactLoad:
 class TestCollectMentioned:
     def test_mentioned_from_entity(self):
         obj = {"type": "Entity", "name": "Ann"}
-        obj, mentioned = name_index.get_mentioned(obj)
+        obj, mentioned = name_index.extract_mentioned(obj)
         assert mentioned["Ann"]["type"] == "Entity"
 
     def test_insert_in_mentioned_does_not_change_obj(self):
@@ -92,3 +92,25 @@ class TestCollectMentioned:
         mentioned.insert_by_name(obj)
         assert obj["name"] == "Remainer"
         assert "name" not in mentioned["Remainer"].keys()
+
+    relevant_dict = {
+        "content": "{} is relevant to show {}",
+        "type": "Fact",
+        "name": "relevant fact",
+        "context_factors": [
+            {"content": "{Alice} shot {Bob}", "type": "Fact"},
+            {
+                "content": "{} murdered {}",
+                "context_factors": ["Alice", "Bob"],
+                "type": "Fact",
+            },
+        ],
+    }
+
+    def test_expand_shorthand(self):
+        obj = name_index.expand_shorthand_mentioned(self.relevant_dict)
+        assert obj["context_factors"][0]["context_factors"][0]["name"] == "Alice"
+
+    def test_mentioned_from_fact_and_entities(self):
+        obj, mentioned = name_index.collect_mentioned(self.relevant_dict)
+        assert mentioned["Alice"]["type"] == "Entity"
