@@ -276,6 +276,15 @@ class FactSchema(Schema):
         factor_schema.context["mentioned"] = self.context["mentioned"]
         return content, [factor_schema.dump(factor) for factor in sorted_factors]
 
+    def consume_type_field(self, data, **kwargs):
+        if data.get("type"):
+            ty = data.pop("type").lower()
+            if typefield != self.__model__.__name__.lower():
+                raise ValidationError(
+                    f'type field "{ty} does not match model type {self.__model__}'
+                )
+        return data
+
     @pre_load
     def format_data_to_load(self, data, **kwargs):
         data = self.nest_predicate_fields(data)
@@ -283,6 +292,7 @@ class FactSchema(Schema):
             data["predicate"]["content"], data[
                 "context_factors"
             ] = self.get_references_from_mentioned(content, placeholder)
+        data = self.consume_type_field(data)
         return data
 
     @post_load

@@ -112,14 +112,14 @@ class TestCollectMentioned:
 
     def test_expand_shorthand(self):
         obj = name_index.expand_shorthand_mentioned(self.relevant_dict)
-        assert obj["context_factors"][0]["context_factors"][0]["name"] == "Alice"
+        assert obj["context_factors"][0]["context_factors"][0]["name"] == "Short Name"
 
     def test_mentioned_from_fact_and_entities(self):
         obj = name_index.expand_shorthand_mentioned(self.relevant_dict)
         obj, mentioned = name_index.collect_mentioned(self.relevant_dict)
         assert mentioned["relevant fact"]["type"] == "Fact"
-        alice_shot_bob = mentioned["relevant fact"]["context_factors"][0]
-        assert alice_shot_bob["context_factors"][0]["name"] == "Alice"
+        shooting = mentioned["relevant fact"]["context_factors"][0]
+        assert shooting["context_factors"][0]["name"] == "Short Name"
 
     def test_mentioned_ordered_by_length(self):
         obj, mentioned = name_index.index_names(self.relevant_dict)
