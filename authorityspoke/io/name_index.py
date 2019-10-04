@@ -5,7 +5,7 @@ from re import findall
 from typing import Dict, List, Optional, Tuple, Union
 
 
-class Mentioned(Dict[str, Dict]):
+class Mentioned(OrderedDict):
     def insert_by_name(self, obj: Dict):
         self[obj["name"]] = obj.copy()
         self[obj["name"]].pop("name")
@@ -69,8 +69,13 @@ def expand_shorthand_mentioned(obj: Dict) -> Dict:
         obj["content"], obj["context_factors"] = get_references_from_string(
             obj["content"]
         )
-    for _, value in obj.items():
-        if isinstance(value, Dict):
+    elif obj.get("predicate", {}).get("content") and not obj.get("context_factors"):
+        obj["predicate"]["content"], obj[
+            "context_factors"
+        ] = get_references_from_string(obj["predicate"]["content"])
+
+    for key, value in obj.items():
+        if isinstance(value, Dict) and key != "predicate":
             value = expand_shorthand_mentioned(value)
         elif isinstance(value, List):
             for item in value:
@@ -113,7 +118,7 @@ def index_names(obj: Dict) -> Tuple[Dict, Mentioned]:
     """
     obj = expand_shorthand_mentioned(obj)
     obj, mentioned = collect_mentioned(obj)
-    sorted_mentioned = OrderedDict(
+    sorted_mentioned = Mentioned(
         sorted(mentioned.items(), key=lambda t: len(t[0]), reverse=True)
     )
     return obj, sorted_mentioned

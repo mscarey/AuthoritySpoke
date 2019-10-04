@@ -10,6 +10,7 @@ from authorityspoke.entities import Entity
 from authorityspoke.io import readers, schemas, name_index
 from authorityspoke.io.loaders import load_holdings
 from authorityspoke.io import filepaths
+from authorityspoke.io.dump import to_dict, to_json
 
 ureg = pint.UnitRegistry()
 
@@ -128,3 +129,43 @@ class TestCollectMentioned:
         obj, mentioned = name_index.index_names(self.relevant_dict)
         shortest = mentioned.popitem()
         assert shortest[0] == "Short Name"
+
+    def test_retrieve_mentioned_during_load(self):
+        """
+        Test that the schema can recreate the Entity objects "Alice" and
+        "Bob" from just their name strings, by having added them to
+        "mentioned" when they first appeared.
+        """
+        relevant_dict = {
+            "predicate": {"content": "{} is relevant to show {}"},
+            "type": "Fact",
+            "context_factors": [
+                {
+                    "predicate": {"content": "{} shot {}"},
+                    "context_factors": [
+                        {"name": "Alice", "type": "Entity"},
+                        {"name": "Bob", "type": "Entity"},
+                    ],
+                    "type": "Fact",
+                },
+                {
+                    "predicate": {"content": "{} murdered {}"},
+                    "context_factors": ["Alice", "Bob"],
+                    "type": "Fact",
+                },
+            ],
+        }
+        relevant_fact = readers.read_fact(relevant_dict)
+        assert relevant_fact.context_factors[1].context_factors[1].name == "Bob"
+
+
+class TestFactDump:
+    def test_dump_with_quantity(self, watt_factor):
+        f8_dict = to_dict(watt_factor["f8"])
+        assert f8_dict["predicate"]["quantity"] == "20 foot"
+
+    def test_dump_complex_fact(self, make_complex_fact):
+        relevant_fact = make_complex_fact["f_relevant_murder"]
+        relevant_dict = to_dict(relevant_fact)
+        shooting_dict = relevant_dict["context_factors"][0]
+        assert shooting_dict["context_factors"][0]["name"] == "Alice"

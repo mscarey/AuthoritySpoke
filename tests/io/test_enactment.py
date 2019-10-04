@@ -22,7 +22,12 @@ ureg = pint.UnitRegistry()
 
 
 class TestEnactmentImport:
-    def test_enactment_import(self, make_regime):
+    def test_enactment_from_dict(self, make_regime):
+        record = {"source": "/us-ca/evid/s351"}
+        enactment = readers.read_enactment(record, regime=make_regime)
+        assert "all relevant evidence is admissible" in enactment.text
+
+    def test_enactment_import_from_holding(self, make_regime):
         holdings = load_holdings("holding_cardenas.json", regime=make_regime)
         enactment_list = holdings[0].enactments
         assert "all relevant evidence is admissible" in enactment_list[0].text

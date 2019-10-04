@@ -26,7 +26,7 @@ class ExpandableSchema(Schema):
 
         self.context["mentioned"] = self.context.get("mentioned") or {}
         if isinstance(data, str):
-            return self.context["mentioned"]["data"]
+            return self.context["mentioned"].get_by_name(data)
         return data
 
 
@@ -203,9 +203,8 @@ class PredicateSchema(ExpandableSchema):
         if data.get("comparison") is None:
             data["comparison"] = ""
 
-        normalized = {"==": "=", "!=": "<>"}
-        if data.get("comparison") in normalized:
-            data["comparison"] = normalized[data["comparison"]]
+        if data.get("comparison") in Predicate.normalized_comparisons:
+            data["comparison"] = Predicate.normalized_comparisons[data["comparison"]]
         return data
 
     @pre_load
