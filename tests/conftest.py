@@ -573,7 +573,7 @@ def make_evidence(
             x["no_shooting_witness_unknown_absent_testimony"], to_effect=f["f_no_crime"]
         ),
         "no_shooting_no_effect_entity_order": Evidence(
-            x["no_shooting_no_effect_entity_order_testimony"]
+            x["no_shooting_entity_order_testimony"]
         ),
         "no_shooting_different_witness": Evidence(
             x["no_shooting_different_witness_testimony"], to_effect=f["f_no_crime"]

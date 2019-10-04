@@ -336,7 +336,26 @@ class ExhibitSchema(ExpandableSchema):
     stated_by = fields.Nested(EntitySchema, missing=None)
     name = fields.Str(missing=None)
     absent = fields.Bool(missing=False)
-    generic = fields.Bool(missing=True)
+    generic = fields.Bool(missing=False)
+
+    @pre_load
+    def format_data_to_load(self, data, **kwargs):
+        data = self.get_from_mentioned(data)
+        data = self.consume_type_field(data)
+        return data
+
+    @post_load
+    def make_object(self, data, **kwargs):
+        return self.__model__(**data)
+
+
+class EvidenceSchema(ExpandableSchema):
+    __model__: Type = Evidence
+    exhibit = fields.Nested(ExhibitSchema, missing=None)
+    to_effect = fields.Nested(FactSchema, missing=None)
+    name = fields.Str(missing=None)
+    absent = fields.Bool(missing=False)
+    generic = fields.Bool(missing=False)
 
     @pre_load
     def format_data_to_load(self, data, **kwargs):
@@ -354,6 +373,8 @@ class FactorSchema(OneOfSchema, ExpandableSchema):
     type_schemas = {
         "entity": EntitySchema,
         "Entity": EntitySchema,
+        "evidence": EvidenceSchema,
+        "Evidence": EvidenceSchema,
         "exhibit": ExhibitSchema,
         "Exhibit": ExhibitSchema,
         "fact": FactSchema,

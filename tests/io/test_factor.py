@@ -199,3 +199,11 @@ class TestExhibitDump:
         loaded = schema.load(dumped)
         assert loaded.form == "testimony"
         assert loaded.stated_by.name == "Bob"
+
+
+class TestEvidenceDump:
+    def test_dump_evidence(self, make_evidence):
+        evidence = make_evidence["shooting"]
+        schema = schemas.EvidenceSchema()
+        dumped = schema.dump(evidence)
+        assert dumped["exhibit"]["stated_by"]["name"] == "Alice"
