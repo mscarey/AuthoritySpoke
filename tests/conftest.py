@@ -11,6 +11,7 @@ from authorityspoke.facts import Fact, build_fact
 from authorityspoke.holdings import Holding
 from authorityspoke.jurisdictions import Jurisdiction, Regime
 from authorityspoke.opinions import Opinion
+from authorityspoke.pleadings import Pleading, Allegation
 from authorityspoke.predicates import Predicate, Q_
 from authorityspoke.io import loaders, readers
 from authorityspoke.rules import Procedure, Rule
@@ -589,6 +590,18 @@ def make_evidence(
         "generic_absent": Evidence(x["generic_exhibit"], absent=True, generic=True),
     }
 
+@pytest.fixture(scope="class")
+def make_pleading(make_entity) -> Dict[str, Dict[str, Pleading]]:
+    return {
+        "craig": Pleading(filer=make_entity["craig"])
+    }
+
+@pytest.fixture(scope="class")
+def make_allegation(make_pleading, make_factor) -> Dict[str, Dict[str, Allegation]]:
+    return {
+        "shooting": Allegation(statement=make_factor["f_shooting"], pleading=make_pleading["craig"])
+    }
+
 
 @pytest.fixture(scope="module")
 def make_selector() -> Dict[str, TextQuoteSelector]:
@@ -1153,7 +1166,7 @@ def make_opinion_with_holding(make_opinion, make_regime) -> Dict[str, Opinion]:
 
 
 @pytest.fixture(scope="class")
-def make_analysis() -> Dict[str, Dict["str", Any]]:
+def make_analysis() -> Dict[str, Dict[str, Any]]:
     """Example user analysis data."""
     analysis = {}
     analysis["minimal"] = {

@@ -11,6 +11,7 @@ from authorityspoke.entities import Entity
 from authorityspoke.evidence import Exhibit, Evidence
 from authorityspoke.factors import Factor
 from authorityspoke.facts import Fact
+from authorityspoke.pleadings import Pleading, Allegation
 from authorityspoke.predicates import Predicate
 from authorityspoke.selectors import TextQuoteSelector
 
@@ -349,6 +350,43 @@ class ExhibitSchema(ExpandableSchema):
         return self.__model__(**data)
 
 
+class PleadingSchema(ExpandableSchema):
+    __model__: Type = Pleading
+    filer = fields.Nested(EntitySchema, missing=None)
+    name = fields.Str(missing=None)
+    absent = fields.Bool(missing=False)
+    generic = fields.Bool(missing=False)
+
+    @pre_load
+    def format_data_to_load(self, data, **kwargs):
+        data = self.get_from_mentioned(data)
+        data = self.consume_type_field(data)
+        return data
+
+    @post_load
+    def make_object(self, data, **kwargs):
+        return self.__model__(**data)
+
+
+class AllegationSchema(ExpandableSchema):
+    __model__: Type = Allegation
+    pleading = fields.Nested(PleadingSchema, missing=None)
+    statement = fields.Nested(FactSchema, missing=None)
+    name = fields.Str(missing=None)
+    absent = fields.Bool(missing=False)
+    generic = fields.Bool(missing=False)
+
+    @pre_load
+    def format_data_to_load(self, data, **kwargs):
+        data = self.get_from_mentioned(data)
+        data = self.consume_type_field(data)
+        return data
+
+    @post_load
+    def make_object(self, data, **kwargs):
+        return self.__model__(**data)
+
+
 class EvidenceSchema(ExpandableSchema):
     __model__: Type = Evidence
     exhibit = fields.Nested(ExhibitSchema, missing=None)
@@ -371,6 +409,8 @@ class EvidenceSchema(ExpandableSchema):
 class FactorSchema(OneOfSchema, ExpandableSchema):
     __model__: Type = Factor
     type_schemas = {
+        "allegation": AllegationSchema,
+        "Allegation": AllegationSchema,
         "entity": EntitySchema,
         "Entity": EntitySchema,
         "evidence": EvidenceSchema,
@@ -379,6 +419,8 @@ class FactorSchema(OneOfSchema, ExpandableSchema):
         "Exhibit": ExhibitSchema,
         "fact": FactSchema,
         "Fact": FactSchema,
+        "pleading": PleadingSchema,
+        "Pleading": PleadingSchema,
     }
 
     def pre_load(self, data, **kwargs):

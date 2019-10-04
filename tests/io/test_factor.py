@@ -207,3 +207,19 @@ class TestEvidenceDump:
         schema = schemas.EvidenceSchema()
         dumped = schema.dump(evidence)
         assert dumped["exhibit"]["stated_by"]["name"] == "Alice"
+
+
+class TestPleadingDump:
+    def test_dump_pleading(self, make_pleading):
+        pleading = make_pleading["craig"]
+        schema = schemas.PleadingSchema()
+        dumped = schema.dump(pleading)
+        assert dumped["filer"]["name"] == "Craig"
+
+
+class TestAllegationDump:
+    def test_dump_allegation(self, make_allegation):
+        allegation = make_allegation["shooting"]
+        schema = schemas.AllegationSchema()
+        dumped = schema.dump(allegation)
+        assert dumped["statement"]["context_factors"][0]["name"] == "Alice"

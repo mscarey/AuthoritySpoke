@@ -32,18 +32,18 @@ class Allegation(Factor):
     to establish a cause of action.
     """
 
-    to_effect: Optional[Fact] = None
+    statement: Optional[Fact] = None
     pleading: Optional[Pleading] = None
     name: Optional[str] = None
     absent: bool = False
     generic: bool = False
-    context_factor_names: ClassVar = ("to_effect", "pleading")
+    context_factor_names: ClassVar = ("statement", "pleading")
 
     def __str__(self):
         text = ""
-        if self.to_effect:
+        if self.statement:
             text += f"\n  OF:"
-            factor_text = textwrap.indent(str(self.to_effect), prefix="    ")
+            factor_text = textwrap.indent(str(self.statement), prefix="    ")
             text += f"\n{str(factor_text)}"
         if self.pleading:
             text += f"\n  FOUND IN:"
@@ -55,7 +55,7 @@ class Allegation(Factor):
     def short_string(self):
         string = (
             f'{("in " + str(self.pleading) + ",") if self.pleading else ""}'
-            + f'{("claiming " + str(self.to_effect) + ",") if self.to_effect else ""}'
+            + f'{("claiming " + str(self.statement) + ",") if self.statement else ""}'
         )
         string = string.strip(",")
         return super().__str__().format(string).replace("Allegation", "allegation")
