@@ -166,6 +166,8 @@ def dump_quantity(obj: Predicate) -> Union[float, int, str]:
     Convert quantity to string if it's a pint `ureg.Quantity` object.
     """
     quantity = obj.quantity
+    if quantity is None:
+        return None
     if isinstance(quantity, (int, float)):
         return quantity
     return f"{quantity.magnitude} {quantity.units}"
