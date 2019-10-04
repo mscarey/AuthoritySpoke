@@ -18,7 +18,19 @@ from utils.marshmallow_oneofschema.one_of_schema import OneOfSchema
 ureg = UnitRegistry()
 
 
-class SelectorSchema(Schema):
+class ExpandableSchema(Schema):
+    def get_from_mentioned(self, data, **kwargs):
+        """
+        Replaces data to load with any object with same name in "mentioned".
+        """
+
+        self.context["mentioned"] = self.context.get("mentioned") or {}
+        if isinstance(data, str):
+            return self.context["mentioned"]["data"]
+        return data
+
+
+class SelectorSchema(ExpandableSchema):
     __model__ = TextQuoteSelector
     prefix = fields.Str(missing=None)
     exact = fields.Str(missing=None)
@@ -67,13 +79,12 @@ class SelectorSchema(Schema):
         return self.__model__(**data)
 
 
-class EnactmentSchema(Schema):
+class EnactmentSchema(ExpandableSchema):
     __model__ = Enactment
     name = fields.String(missing=None)
     source = fields.Url(relative=True)
     selector = fields.Nested(SelectorSchema, missing=None)
 
-    @pre_load
     def move_selector_fields(self, data, **kwargs):
         """
         Nest fields used for :class:`SelectorSchema` model.
@@ -96,7 +107,6 @@ class EnactmentSchema(Schema):
                 del data[name]
         return data
 
-    @pre_load
     def fix_source_path_errors(self, data, **kwargs):
 
         if not data.get("source"):
@@ -109,6 +119,13 @@ class EnactmentSchema(Schema):
                 data["source"] = "/" + data["source"]
             if data["source"].endswith("/"):
                 data["source"] = data["source"].rstrip("/")
+        return data
+
+    @pre_load
+    def format_data_to_load(self, data, **kwargs):
+        data = self.get_from_mentioned(data)
+        data = self.fix_source_path_errors(data)
+        data = self.move_selector_fields(data)
         return data
 
     @post_load
@@ -154,7 +171,7 @@ def dump_quantity(obj: Predicate) -> Union[float, int, str]:
     return f"{quantity.magnitude} {quantity.units}"
 
 
-class PredicateSchema(Schema):
+class PredicateSchema(ExpandableSchema):
     __model__ = Predicate
     content = fields.Str()
     truth = fields.Bool(missing=True)
@@ -163,9 +180,22 @@ class PredicateSchema(Schema):
         missing="",
         validate=validate.OneOf([""] + list(Predicate.opposite_comparisons.keys())),
     )
-    quantity = fields.Function(dump_quantity, deserialize=read_quantity)
+    quantity = fields.Function(dump_quantity, deserialize=read_quantity, missing=None)
 
-    @pre_load
+    def split_quantity_from_content(
+        self, content: str
+    ) -> Tuple[str, Optional[str], Optional[Union[ureg.Quantity, int, float]]]:
+        placeholder = "{}"
+        for comparison in {
+            **Predicate.normalized_comparisons,
+            **Predicate.opposite_comparisons,
+        }:
+            if comparison in content:
+                content, quantity_text = content.split(comparison)
+                content += placeholder
+                return content, comparison, quantity_text
+        return content, "", None
+
     def normalize_comparison(self, data, **kwargs):
         if data.get("quantity") and not data.get("comparison"):
             data["comparison"] = "="
@@ -178,23 +208,37 @@ class PredicateSchema(Schema):
             data["comparison"] = normalized[data["comparison"]]
         return data
 
+    @pre_load
+    def format_data_to_load(self, data, **kwargs):
+        if not data.get("quantity"):
+            data["content"], data["comparison"], data[
+                "quantity"
+            ] = self.split_quantity_from_content(data["content"])
+        data = self.normalize_comparison(data)
+        return data
+
     @post_load
     def make_object(self, data, **kwargs):
         return self.__model__(**data)
 
 
-class EntitySchema(Schema):
+class EntitySchema(ExpandableSchema):
     __model__: Type = Entity
     name = fields.Str(missing=None)
     generic = fields.Bool(missing=True)
     plural = fields.Bool()
+
+    @pre_load
+    def format_data_to_load(self, data, **kwargs):
+        data = self.get_from_mentioned(data)
+        return data
 
     @post_load
     def make_object(self, data, **kwargs):
         return Entity(**data)
 
 
-class FactSchema(Schema):
+class FactSchema(ExpandableSchema):
     __model__: Type = Fact
     predicate = fields.Nested(PredicateSchema)
     context_factors = fields.Nested("FactorSchema", many=True)
@@ -267,6 +311,7 @@ class FactSchema(Schema):
 
     @pre_load
     def format_data_to_load(self, data, **kwargs):
+        data = self.get_from_mentioned(data)
         data = self.nest_predicate_fields(data)
         if not data.get("context_factors"):
             data["predicate"]["content"], data[
@@ -280,7 +325,7 @@ class FactSchema(Schema):
         return Fact(**data)
 
 
-class FactorSchema(OneOfSchema):
+class FactorSchema(OneOfSchema, ExpandableSchema):
     __model__: Type = Factor
     type_schemas = {
         "entity": EntitySchema,
@@ -289,11 +334,15 @@ class FactorSchema(OneOfSchema):
         "Fact": FactSchema,
     }
 
+    def pre_load(self, data, **kwargs):
+        data = self.get_from_mentioned(data)
+        return data
+
     def get_obj_type(self, obj):
         return obj.__class__.__name__
 
 
-SCHEMAS = [schema for schema in Schema.__subclasses__()]
+SCHEMAS = [schema for schema in ExpandableSchema.__subclasses__()]
 
 
 def get_schema_for_factor_record(record: Dict) -> Schema:

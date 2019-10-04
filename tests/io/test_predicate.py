@@ -33,9 +33,32 @@ class TestPredicateLoad:
         )
         assert p7.comparison == "<>"
 
+    def test_load_and_find_quantity(self):
+        schema = schemas.PredicateSchema()
+        p7 = schema.load(
+            data={
+                "content": "the distance between {} and {} was > 35 feet",
+                "truth": True,
+                "reciprocal": True,
+            }
+        )
+        assert p7.comparison == ">"
+
+    def test_load_and_normalize_quantity(self):
+        schema = schemas.PredicateSchema()
+        p7 = schema.load(
+            data={
+                "content": "the distance between {} and {} was != 35 feet",
+                "truth": True,
+                "reciprocal": True,
+            }
+        )
+        assert p7.comparison == "<>"
+
     def test_load_and_normalize_comparison(self):
-        p7 = readers.read_predicate(
-            value={
+        schema = schemas.PredicateSchema()
+        p7 = schema.load(
+            data={
                 "content": "the distance between {} and {} was {}",
                 "truth": True,
                 "reciprocal": True,
@@ -50,7 +73,8 @@ class TestPredicateLoad:
         assert str(quantity.units) == "foot"
 
     def test_make_comparison_when_absent(self):
-        statement = readers.read_predicate(
+        schema = schemas.PredicateSchema()
+        statement = schema.load(
             {"content": "{}'s favorite number is {}", "quantity": 42}
         )
         assert statement.comparison == "="
@@ -71,7 +95,8 @@ class TestPredicateDump:
         assert dumped["quantity"] == "35 foot"
 
     def test_round_trip(self):
-        statement = readers.read_predicate(
+        schema = schemas.PredicateSchema()
+        statement = schema.load(
             {"content": "{}'s favorite number is {}", "quantity": 42}
         )
         dumped = to_dict(statement)
