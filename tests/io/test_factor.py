@@ -15,17 +15,6 @@ ureg = pint.UnitRegistry()
 
 
 class TestFactorLoad:
-    def test_fact_import(self, make_regime):
-        holdings = load_holdings("holding_watt.json", regime=make_regime)
-        new_fact = holdings[0].inputs[1]
-        assert "lived at <Hideaway Lodge>" in str(new_fact)
-        assert isinstance(new_fact.context_factors[0], Entity)
-
-    def test_fact_with_quantity(self, make_regime):
-        holdings = load_holdings("holding_watt.json", regime=make_regime)
-        new_fact = holdings[1].inputs[3]
-        assert "was no more than 35 foot" in str(new_fact)
-
     def test_find_directory_for_json(self, make_regime):
         directory = pathlib.Path.cwd() / "tests"
         if directory.exists():
@@ -37,21 +26,32 @@ class TestFactorLoad:
 class TestEntityLoad:
     def test_get_entity_schema(self):
         record = {"type": "Entity", "name": "George Washington"}
-        schema = schemas.get_schema_for_factor_record(record)
-        assert schema.__model__ == Entity
+        schema = schemas.FactorSchema()
+        obj = schema.load(record)
+        assert obj.name == "George Washington"
+        assert isinstance(obj, Entity)
 
     def test_load_entity_from_factor_schema(self):
         record = {"type": "Entity", "name": "George Washington"}
-        schema = schemas.FactorSchema(partial=True, unknown="INCLUDE")
+        schema = schemas.FactorSchema()
         george = schema.load(record)
         assert george.generic == True
 
     def test_load_and_dump_entity_from_entity_schema(self):
+        """
+        When this object is loaded with the EntitySchema, it becomes
+        an Entity with default values.
+
+        When it's dumped with FactorSchema instead of EntitySchema,
+        it receives a "type" field to specify which type of Factor
+        it is.
+        """
         record = {"name": "John Adams"}
         schema = schemas.EntitySchema()
         john = schema.load(record)
         assert john.generic is True
-        john_dict = schema.dump(john)
+        factor_schema = schemas.FactorSchema()
+        john_dict = factor_schema.dump(john)
         assert john_dict["type"] == "Entity"
 
 

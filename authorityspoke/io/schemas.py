@@ -281,6 +281,7 @@ class FactSchema(Schema):
 
 
 class FactorSchema(OneOfSchema):
+    __model__: Type = Factor
     type_schemas = {
         "entity": EntitySchema,
         "Entity": EntitySchema,
@@ -301,7 +302,7 @@ def get_schema_for_factor_record(record: Dict) -> Schema:
     """
     for option in SCHEMAS:
         if record.get("type", "").lower() == option.__model__.__name__.lower():
-            return option(unknown="EXCLUDE")
+            return option()
     return None
 
 

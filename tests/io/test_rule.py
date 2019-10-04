@@ -123,6 +123,17 @@ class TestRuleImport:
         assert any(brad.holdings[6].inputs[0] == x for x in brad.holdings[5].inputs)
         assert any(brad.holdings[6].inputs[0] is x for x in brad.holdings[5].inputs)
 
+    def test_fact_from_loaded_holding(self, make_regime):
+        holdings = load_holdings("holding_watt.json", regime=make_regime)
+        new_fact = holdings[0].inputs[1]
+        assert "lived at <Hideaway Lodge>" in str(new_fact)
+        assert isinstance(new_fact.context_factors[0], Entity)
+
+    def test_fact_with_quantity(self, make_regime):
+        holdings = load_holdings("holding_watt.json", regime=make_regime)
+        new_fact = holdings[1].inputs[3]
+        assert "was no more than 35 foot" in str(new_fact)
+
     def test_use_int_not_pint_without_dimension(self, make_regime, make_opinion):
 
         brad = make_opinion["brad_majority"]
