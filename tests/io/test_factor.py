@@ -36,7 +36,21 @@ class TestEntityLoad:
         record = {"type": "Entity", "name": "George Washington"}
         schema = schemas.FactorSchema()
         george = schema.load(record)
-        assert george.generic == True
+        assert george.generic is True
+
+    def test_load_entity_from_mentioned(self):
+        mentioned = name_index.Mentioned({"Lee": {"type": "entity"}})
+        schema = schemas.EntitySchema()
+        schema.context["mentioned"] = mentioned
+        lee = schema.load("Lee")
+        assert lee.name == "Lee"
+
+    def test_dump_entity_from_factor_schema(self):
+        george = Entity("George Washington")
+        schema = schemas.FactorSchema()
+        record = schema.dump(george)
+        assert record["generic"] is True
+        assert record["type"] == "Entity"
 
     def test_load_and_dump_entity_from_entity_schema(self):
         """
@@ -169,3 +183,19 @@ class TestFactDump:
         relevant_dict = to_dict(relevant_fact)
         shooting_dict = relevant_dict["context_factors"][0]
         assert shooting_dict["context_factors"][0]["name"] == "Alice"
+
+
+class TestExhibitDump:
+    def test_dump_exhibit(self, make_exhibit):
+        exhibit = make_exhibit["shooting_affidavit"]
+        schema = schemas.ExhibitSchema()
+        dumped = schema.dump(exhibit)
+        assert dumped["statement"]["context_factors"][0]["name"] == "Alice"
+
+    def test_dump_and_load_exhibit(self, make_exhibit):
+        exhibit = make_exhibit["no_shooting_entity_order_testimony"]
+        schema = schemas.ExhibitSchema()
+        dumped = schema.dump(exhibit)
+        loaded = schema.load(dumped)
+        assert loaded.form == "testimony"
+        assert loaded.stated_by.name == "Bob"

@@ -399,7 +399,7 @@ def make_exhibit(
         "no_shooting_witness_unknown_absent_testimony": Exhibit(
             form="testimony", statement=f["f_no_shooting"], absent=True
         ),
-        "no_shooting_no_effect_entity_order_testimony": Exhibit(
+        "no_shooting_entity_order_testimony": Exhibit(
             form="testimony",
             statement=f["f_no_shooting_entity_order"],
             stated_by=e["bob"],

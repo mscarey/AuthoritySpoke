@@ -8,6 +8,7 @@ from pint import UnitRegistry
 
 from authorityspoke.enactments import Enactment
 from authorityspoke.entities import Entity
+from authorityspoke.evidence import Exhibit, Evidence
 from authorityspoke.factors import Factor
 from authorityspoke.facts import Fact
 from authorityspoke.predicates import Predicate
@@ -27,6 +28,15 @@ class ExpandableSchema(Schema):
         self.context["mentioned"] = self.context.get("mentioned") or {}
         if isinstance(data, str):
             return self.context["mentioned"].get_by_name(data)
+        return data
+
+    def consume_type_field(self, data, **kwargs):
+        if data.get("type"):
+            ty = data.pop("type").lower()
+            if ty != self.__model__.__name__.lower():
+                raise ValidationError(
+                    f'type field "{ty} does not match model type {self.__model__}'
+                )
         return data
 
 
@@ -126,6 +136,7 @@ class EnactmentSchema(ExpandableSchema):
         data = self.get_from_mentioned(data)
         data = self.fix_source_path_errors(data)
         data = self.move_selector_fields(data)
+        data = self.consume_type_field(data)
         return data
 
     @post_load
@@ -232,11 +243,12 @@ class EntitySchema(ExpandableSchema):
     @pre_load
     def format_data_to_load(self, data, **kwargs):
         data = self.get_from_mentioned(data)
+        data = self.consume_type_field(data)
         return data
 
     @post_load
     def make_object(self, data, **kwargs):
-        return Entity(**data)
+        return self.__model__(**data)
 
 
 class FactSchema(ExpandableSchema):
@@ -301,15 +313,6 @@ class FactSchema(ExpandableSchema):
         factor_schema.context["mentioned"] = self.context["mentioned"]
         return content, [factor_schema.dump(factor) for factor in sorted_factors]
 
-    def consume_type_field(self, data, **kwargs):
-        if data.get("type"):
-            ty = data.pop("type").lower()
-            if ty != self.__model__.__name__.lower():
-                raise ValidationError(
-                    f'type field "{ty} does not match model type {self.__model__}'
-                )
-        return data
-
     @pre_load
     def format_data_to_load(self, data, **kwargs):
         data = self.get_from_mentioned(data)
@@ -323,7 +326,27 @@ class FactSchema(ExpandableSchema):
 
     @post_load
     def make_object(self, data, **kwargs):
-        return Fact(**data)
+        return self.__model__(**data)
+
+
+class ExhibitSchema(ExpandableSchema):
+    __model__: Type = Exhibit
+    form = fields.Str(missing=None)
+    statement = fields.Nested(FactSchema, missing=None)
+    stated_by = fields.Nested(EntitySchema, missing=None)
+    name = fields.Str(missing=None)
+    absent = fields.Bool(missing=False)
+    generic = fields.Bool(missing=True)
+
+    @pre_load
+    def format_data_to_load(self, data, **kwargs):
+        data = self.get_from_mentioned(data)
+        data = self.consume_type_field(data)
+        return data
+
+    @post_load
+    def make_object(self, data, **kwargs):
+        return self.__model__(**data)
 
 
 class FactorSchema(OneOfSchema, ExpandableSchema):
@@ -331,6 +354,8 @@ class FactorSchema(OneOfSchema, ExpandableSchema):
     type_schemas = {
         "entity": EntitySchema,
         "Entity": EntitySchema,
+        "exhibit": ExhibitSchema,
+        "Exhibit": ExhibitSchema,
         "fact": FactSchema,
         "Fact": FactSchema,
     }
