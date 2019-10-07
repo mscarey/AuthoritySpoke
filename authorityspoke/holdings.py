@@ -143,7 +143,7 @@ class Holding(Factor):
             )
         if not self.decided:
             raise NotImplementedError(
-                "Adding is not implemented for Holdings that assert a Rule is not valid."
+                "Adding is not implemented for Holdings that assert a Rule is not decided."
             )
         return self.rule + other
 

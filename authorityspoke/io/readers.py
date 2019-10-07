@@ -39,15 +39,12 @@ FACTOR_SUBCLASSES = {
 }
 
 
-@references.log_mentioned_context
 def read_enactment(
     enactment_dict: Dict[str, str],
     code: Optional[Code] = None,
-    mentioned: Optional[TextLinkDict] = None,
     regime: Optional[Regime] = None,
-    report_mentioned: bool = False,
     **kwargs,
-) -> Union[Enactment, Tuple[Enactment, TextLinkDict]]:
+) -> Enactment:
     r"""
     Create a new :class:`.Enactment` object using imported JSON data.
 
@@ -62,34 +59,18 @@ def read_enactment(
         the :class:`.Code` that is the source for this
         :class:`Enactment`
 
-    :param mentioned:
-        :class:`.TextLinkDict` for known :class:`.Factor`\s
-        and :class:`.Enactment`\s
-
     :param regime:
         the :class:`.Regime` where the :class:`.Code` that is the
         source for this :class:`Enactment` can be found, or where
         it should be added
 
-    :param report_mentioned:
-        if True, return a new :class:`.TextLinkDict` in addition to
-        the :class:`.Enactment`\.
-
     :returns:
         a new :class:`Enactment` object, optionally with text links.
     """
-    if regime and not code:
-        code = regime.get_code(enactment_dict["source"])
-    if code is None:
-        raise ValueError(
-            "Must either specify a Code, or else specify a Regime "
-            + "and a path to find the Code within the Regime."
-        )
-
-    schema = schemas.EnactmentSchema(context={"code": code})
+    schema = schemas.EnactmentSchema(context={"code": code, "regime": regime})
     answer = schema.load(enactment_dict)
 
-    return (answer, mentioned or {}) if report_mentioned else answer
+    return answer
 
 
 def read_enactments(
@@ -658,62 +639,11 @@ def read_opinions(
     ]
 
 
-def read_rule(
-    outputs: Optional[Union[str, Dict, List[Union[str, Dict]]]],
-    inputs: Optional[Union[str, Dict, List[Union[str, Dict]]]] = None,
-    despite: Optional[Union[str, Dict, List[Union[str, Dict]]]] = None,
-    mandatory: bool = False,
-    universal: bool = False,
-    generic: bool = False,
-    enactments: Optional[Union[Dict, Iterable[Dict]]] = None,
-    enactments_despite: Optional[Union[Dict, Iterable[Dict]]] = None,
-    mentioned: Optional[TextLinkDict] = None,
-    regime: Optional[Regime] = None,
-    report_mentioned: bool = False,
-) -> Union[Rule, Tuple[Rule, TextLinkDict]]:
+def read_rule(record: Dict, regime: Optional[Regime] = None) -> Rule:
     r"""
-    Make :class:`Rule` from a :class:`dict` of strings and a list of mentioned :class:`.Factor`\s.
+    Make :class:`Rule` from a :class:`dict` of fields and a :class:`.Regime`\.
 
-    :param inputs:
-        data for constructing :class:`.Factor` inputs for a :class:`.Rule`
-
-    :param despite:
-        data for constructing despite :class:`.Factor`\s for a :class:`.Rule`
-
-    :param outputs:
-        data for constructing :class:`.Factor` outputs for a :class:`.Rule`
-
-    :param enactments:
-        the :class:`.Enactment`\s cited as authority for
-        invoking the ``procedure``.
-
-    :param enactments_despite:
-        the :class:`.Enactment`\s specifically cited as failing
-        to preclude application of the ``procedure``.
-
-    :param mandatory:
-        whether the ``procedure`` is mandatory for the
-        court to apply whenever the :class:`.Rule` is properly invoked.
-        ``False`` means that the ``procedure`` is "discretionary".
-
-    :param universal:
-        ``True`` if the ``procedure`` is applicable whenever
-        its inputs are present. ``False`` means that the ``procedure`` is
-        applicable in "some" situation where the inputs are present.
-
-    :param generic:
-        whether the :class:`Rule` is being mentioned in a generic
-        context. e.g., if the :class:`Rule` is being mentioned in
-        an :class:`.Argument` object merely as an example of the
-        kind of :class:`Rule` that might be mentioned in such an
-        :class:`.Argument`.
-
-    :param mentioned:
-        a series of context factors, including any generic
-        :class:`.Factor`\s that need to be mentioned in
-        :class:`.Predicate`\s. These will have been constructed
-        from the ``mentioned_entities`` section of the input
-        JSON.
+    :param record:
 
     :param regime:
 
@@ -721,43 +651,8 @@ def read_rule(
         iterator yielding :class:`Rule`\s with the items
         from ``mentioned_entities`` as ``context_factors``
     """
-
-    factor_groups = {"outputs": outputs, "inputs": inputs, "despite": despite}
-    enactment_groups = {
-        "enactments": enactments,
-        "enactments_despite": enactments_despite,
-    }
-    built_factors: Dict[str, Tuple[Factor]] = {}
-    built_enactments: Dict[str, Tuple[Enactment]] = {}
-
-    for category_name, factor_group in factor_groups.items():
-        built_factors[category_name], mentioned = read_factors(
-            record_list=factor_group,
-            mentioned=mentioned,
-            regime=regime,
-            report_mentioned=True,
-        )
-    for category_name, enactment_group in enactment_groups.items():
-        built_enactments[category_name], mentioned = read_enactments(
-            record_list=enactment_group,
-            mentioned=mentioned,
-            regime=regime,
-            report_mentioned=True,
-        )
-
-    procedure = Procedure(
-        outputs=built_factors["outputs"],
-        inputs=built_factors["inputs"],
-        despite=built_factors["despite"],
-    )
-
-    answer = Rule(
-        procedure=procedure,
-        enactments=built_enactments["enactments"],
-        enactments_despite=built_enactments["enactments_despite"],
-        mandatory=mandatory,
-        universal=universal,
-        generic=generic,
-    )
-    mentioned = mentioned or {}
-    return (answer, mentioned) if report_mentioned else answer
+    record, mentioned = name_index.index_names(record)
+    schema = schemas.RuleSchema()
+    schema.context["mentioned"] = mentioned
+    schema.context["regime"] = regime
+    return schema.load(record)

@@ -134,12 +134,23 @@ class EnactmentSchema(ExpandableSchema):
                 data["source"] = data["source"].rstrip("/")
         return data
 
+    def get_code_from_regime(self, data, **kwargs):
+        if self.context.get("regime") and not self.context.get("code"):
+            self.context["code"] = self.context["regime"].get_code(data["source"])
+        if self.context["code"] is None:
+            raise ValueError(
+                f"Must either specify a Code for Enactment '{data['source']}', "
+                + "or else specify a Regime "
+                + "and a path to find the Code within the Regime."
+            )
+
     @pre_load
     def format_data_to_load(self, data, **kwargs):
         data = self.get_from_mentioned(data)
         data = self.fix_source_path_errors(data)
         data = self.move_selector_fields(data)
         data = self.consume_type_field(data)
+        deta = self.get_code_from_regime(data)
         return data
 
     @post_load
@@ -459,7 +470,7 @@ class RuleSchema(ExpandableSchema):
         procedure_fields = ("inputs", "despite", "outputs")
         for field in procedure_fields:
             if field in data:
-                data["procedure"][value] = data[field].pop()
+                data["procedure"][field] = data.pop(field)
         return data
 
     @post_load
