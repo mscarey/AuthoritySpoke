@@ -315,11 +315,8 @@ def read_holding(record: Dict, regime: Optional[Regime] = None) -> Holding:
 
 
 def read_holdings(
-    holdings: Dict[str, Iterable],  # TODO: remove "mentioned_factors" from JSON format
-    regime: Optional[Regime] = None,
-    mentioned: Optional[TextLinkDict] = None,
-    report_mentioned: bool = False,
-) -> Union[List[Holding], Tuple[List[Holding], TextLinkDict]]:
+    holdings: List[Dict], regime: Optional[Regime] = None
+) -> List[Holding]:
     r"""
     Load a list of :class:`Holdings`\s from JSON, with optional text links.
 
@@ -332,41 +329,15 @@ def read_holdings(
         that have been enacted in each. Used for constructing
         :class:`.Enactment`\s referenced by :class:`.Holding`\s.
 
-    :param mentioned:
-        A dict of :class:`.Factor`\s that the method needs to
-        expect to find in the :class:`.Holding`\s,
-        linked to lists of :class:`.TextQuoteSelector`\s indicating
-        where each :class:`.Factor` can be found in the :class:`.Opinion`\.
-
     :returns:
         a list of :class:`.Holding` objects, optionally with
         an index matching :class:`.Factor`\s to selectors.
     """
-    # populates mentioned with context factors that don't
-    # appear in inputs, outputs, or despite
-    mentioned_factors = holdings.get("mentioned_factors")
-    if mentioned_factors:
-        if isinstance(mentioned_factors, dict):
-            mentioned_factors = [mentioned_factors]
-        for factor_dict in mentioned_factors:
-            _, mentioned = read_factor(
-                factor_record=factor_dict,
-                mentioned=mentioned,
-                regime=regime,
-                report_mentioned=True,
-            )
-
-    finished_holdings: List[Holding] = []
-    for holding_record in holdings["holdings"]:
-
-        for generated_holding in read_holding(
-            mentioned=mentioned, regime=regime, report_mentioned=True, **holding_record
-        ):
-            finished_holding, mentioned = generated_holding
-            finished_holdings.append(finished_holding)
-    mentioned = mentioned or {}
-    return (finished_holdings, mentioned) if report_mentioned else finished_holdings
-
+    record, mentioned = name_index.index_names(holdings)
+    schema = schemas.HoldingSchema(many=True)
+    schema.context["mentioned"] = mentioned
+    schema.context["regime"] = regime
+    return schema.load(record)
 
 def read_case(
     decision_dict: Dict[str, Any], lead_only: bool = True, as_generator: bool = False

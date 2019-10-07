@@ -36,23 +36,28 @@ class TestHoldingDump:
 
 class TestEntityImport:
     def test_specific_entity(self):
-        smith_dict = {
-            "mentioned_factors": [
-                {"type": "Entity", "name": "Smith", "generic": False},
-                {"type": "Entity", "name": "Smythe"},
-            ],
-            "holdings": [
-                {
-                    "inputs": [{"type": "fact", "content": "Smith stole a car"}],
-                    "outputs": [{"type": "fact", "content": "Smith committed theft"}],
-                },
-                {
-                    "inputs": [{"type": "fact", "content": "Smythe stole a car"}],
-                    "outputs": [{"type": "fact", "content": "Smythe committed theft"}],
-                },
-            ],
-        }
-        different_entity_holdings = readers.read_holdings(smith_dict)
+        smith_holdings = [
+            {
+                "inputs": [
+                    {
+                        "type": "fact",
+                        "content": "{} stole a car",
+                        "context_factors": {
+                            "type": "Entity",
+                            "name": "Smith",
+                            "generic": False,
+                        },
+                    }
+                ],
+                "outputs": [{"type": "fact", "content": "Smith committed theft"}],
+            },
+            {
+                "inputs": [{"type": "fact", "content": "{Smythe} stole a car"}],
+                "outputs": [{"type": "fact", "content": "Smythe committed theft"}],
+            },
+        ]
+        different_entity_holdings = readers.read_holdings(smith_holdings)
+        print(different_entity_holdings)
         assert (
             different_entity_holdings[1].generic_factors
             != different_entity_holdings[0].generic_factors

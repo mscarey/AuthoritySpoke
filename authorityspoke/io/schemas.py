@@ -328,10 +328,16 @@ class FactSchema(ExpandableSchema):
         factor_schema.context["mentioned"] = self.context["mentioned"]
         return content, [factor_schema.dump(factor) for factor in sorted_factors]
 
+    def wrap_single_element_in_list(self, data):
+        if data.get("context_factors") and isinstance(data["context_factors"], dict):
+            data["context_factors"] = [data["context_factors"]]
+        return data
+
     @pre_load
     def format_data_to_load(self, data, **kwargs):
         data = self.get_from_mentioned(data)
         data = self.nest_predicate_fields(data)
+        data = self.wrap_single_element_in_list(data)
         if not data.get("context_factors"):
             data["predicate"]["content"], data[
                 "context_factors"
@@ -478,6 +484,7 @@ class RuleSchema(ExpandableSchema):
     def make_object(self, data, **kwargs):
         return self.__model__(**data)
 
+
 class HoldingSchema(ExpandableSchema):
     __model__: Type = Holding
     rule = fields.Nested(RuleSchema)
@@ -487,15 +494,29 @@ class HoldingSchema(ExpandableSchema):
     generic = fields.Bool(missing=False)
 
     def nest_fields(self, data):
+        """
+        Nest fields inside "rule" and "procedure", if not already nested.
+        """
+        rule_fields = (
+            "procedure",
+            "enactments",
+            "enactments_despite",
+            "mandatory",
+            "universal",
+        )
+        data["rule"] = data.get("rule") or {}
+        for field in rule_fields:
+            if field in data:
+                data["rule"][field] = data.pop(field)
+
+        data["rule"]["procedure"] = data["rule"].get("procedure") or {}
         procedure_fields = ("inputs", "despite", "outputs")
         for field in procedure_fields:
             if field in data:
                 data["rule"]["procedure"][field] = data.pop(field)
-                procedure_fields = ("inputs", "despite", "outputs")
-        rule_fields = ("procedure", "enactments", "enactments_despite", "mandatory", "universal")
-        for field in rule_fields:
-            if field in data:
-                data["rule"][field] = data.pop(field)
+            if field in data["rule"]:
+                data["rule"]["procedure"][field] = data["rule"].pop(field)
+
         return data
 
     @pre_load
