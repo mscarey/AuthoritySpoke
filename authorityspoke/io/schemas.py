@@ -14,6 +14,7 @@ from authorityspoke.facts import Fact
 from authorityspoke.pleadings import Pleading, Allegation
 from authorityspoke.predicates import Predicate
 from authorityspoke.procedures import Procedure
+from authorityspoke.rules import Rule
 from authorityspoke.selectors import TextQuoteSelector
 
 from utils.marshmallow_oneofschema.one_of_schema import OneOfSchema
@@ -438,12 +439,27 @@ class ProcedureSchema(ExpandableSchema):
     despite = fields.Nested(FactorSchema, many=True)
     outputs = fields.Nested(FactorSchema, many=True)
 
+    @post_load
+    def make_object(self, data, **kwargs):
+        return self.__model__(**data)
+
+
+class RuleSchema(ExpandableSchema):
+    __model__: Type = Rule
+    procedure = fields.Nested(ProcedureSchema)
+    enactments = fields.Nested(EnactmentSchema, many=True)
+    enactments_despite = fields.Nested(EnactmentSchema, many=True)
+    mandatory = fields.Bool(missing=False)
+    universal = fields.Bool(missing=False)
+    name = fields.Str(missing=None)
+    generic = fields.Bool(missing=False)
+
     @pre_load
     def format_data_to_load(self, data, **kwargs):
-        standard_keys = {"given": "inputs", "then": "outputs"}
-        for key, value in standard_keys.items():
-            if key in data:
-                data[value] = data[key].pop()
+        procedure_fields = ("inputs", "despite", "outputs")
+        for field in procedure_fields:
+            if field in data:
+                data["procedure"][value] = data[field].pop()
         return data
 
     @post_load
