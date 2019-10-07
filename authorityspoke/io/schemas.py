@@ -13,6 +13,7 @@ from authorityspoke.factors import Factor
 from authorityspoke.facts import Fact
 from authorityspoke.pleadings import Pleading, Allegation
 from authorityspoke.predicates import Predicate
+from authorityspoke.procedures import Procedure
 from authorityspoke.selectors import TextQuoteSelector
 
 from utils.marshmallow_oneofschema.one_of_schema import OneOfSchema
@@ -429,6 +430,25 @@ class FactorSchema(OneOfSchema, ExpandableSchema):
 
     def get_obj_type(self, obj):
         return obj.__class__.__name__
+
+
+class ProcedureSchema(ExpandableSchema):
+    __model__: Type = Procedure
+    inputs = fields.Nested(FactorSchema, many=True)
+    despite = fields.Nested(FactorSchema, many=True)
+    outputs = fields.Nested(FactorSchema, many=True)
+
+    @pre_load
+    def format_data_to_load(self, data, **kwargs):
+        standard_keys = {"given": "inputs", "then": "outputs"}
+        for key, value in standard_keys.items():
+            if key in data:
+                data[value] = data[key].pop()
+        return data
+
+    @post_load
+    def make_object(self, data, **kwargs):
+        return self.__model__(**data)
 
 
 SCHEMAS = [schema for schema in ExpandableSchema.__subclasses__()]
