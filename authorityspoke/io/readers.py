@@ -277,76 +277,14 @@ def read_factors(
     return (answer, mentioned) if report_mentioned else answer
 
 
-def read_holding(
-    outputs: Optional[Union[str, Dict, List[Union[str, Dict]]]],
-    inputs: Optional[Union[str, Dict, List[Union[str, Dict]]]] = None,
-    despite: Optional[Union[str, Dict, List[Union[str, Dict]]]] = None,
-    exclusive: bool = False,
-    rule_valid: bool = True,
-    decided: bool = True,
-    mandatory: bool = False,
-    universal: bool = False,
-    generic: bool = False,
-    enactments: Optional[Union[Dict, Iterable[Dict]]] = None,
-    enactments_despite: Optional[Union[Dict, Iterable[Dict]]] = None,
-    anchors: Optional[Union[str, Dict, Iterable[Union[str, Dict]]]] = None,
-    mentioned: Optional[TextLinkDict] = None,
-    regime: Optional[Regime] = None,
-    report_mentioned: bool = False,
-) -> Iterator[Union[Holding, Tuple[Holding, TextLinkDict]]]:
+def read_holding(record: Dict, regime: Optional[Regime] = None) -> Holding:
     r"""
     Create new :class:`Holding` object from simple datatypes from JSON input.
 
     Will yield multiple items if ``exclusive: True`` is present in ``record``.
 
-    :param inputs:
-        data for constructing :class:`.Factor` inputs for a :class:`.Rule`
-
-    :param despite:
-        data for constructing despite :class:`.Factor`\s for a :class:`.Rule`
-
-    :param outputs:
-        data for constructing :class:`.Factor` outputs for a :class:`.Rule`
-
-    :param enactments:
-        the :class:`.Enactment`\s cited as authority for
-        invoking the ``procedure``.
-
-    :param enactments_despite:
-        the :class:`.Enactment`\s specifically cited as failing
-        to preclude application of the ``procedure``.
-
-    :param mandatory:
-        whether the ``procedure`` is mandatory for the
-        court to apply whenever the :class:`.Rule` is properly invoked.
-        ``False`` means that the ``procedure`` is "discretionary".
-
-    :param universal:
-        ``True`` if the ``procedure`` is applicable whenever
-        its inputs are present. ``False`` means that the ``procedure`` is
-        applicable in "some" situation where the inputs are present.
-
-    :param generic:
-        whether the :class:`Rule` is being mentioned in a generic
-        context. e.g., if the :class:`Rule` is being mentioned in
-        an :class:`.Argument` object merely as an example of the
-        kind of :class:`Rule` that might be mentioned in such an
-        :class:`.Argument`.
-
-    :param name:
-        an identifier used to retrieve the :class:`Rule` when
-        needed for the composition of another :class:`.Factor`
-        object.
-
-    :param rule_valid:
-        Whether the :class:`.Rule` is asserted to be valid (or
-        useable by a court in litigation).
-
-    :param decided:
-        Whether it should be deemed decided whether the :class:`.Rule`
-        is valid. If not, the :class:`.Holding` have the effect
-        of overruling prior :class:`.Holding`\s finding the :class:`.Rule`
-        to be either valid or invalid.
+    :param record:
+        dict of values for constructing :class:`.Holding`
 
     :param anchors:
         Text selectors for the whole :class:`Holding`, not for any
@@ -369,51 +307,11 @@ def read_holding(
         :class:`.Factor`\s as keys and their :class:`.TextQuoteSelector`\s
         as values.
     """
-
-    # If lists were omitted around single elements in the JSON,
-    # add them back
-
-    mentioned = mentioned or {}
-
-    selectors = references.read_selectors(anchors)
-
-    basic_rule, mentioned = read_rule(
-        outputs=outputs,
-        inputs=inputs,
-        despite=despite,
-        mandatory=mandatory,
-        universal=universal,
-        generic=generic,
-        enactments=enactments,
-        enactments_despite=enactments_despite,
-        mentioned=mentioned,
-        regime=regime,
-        report_mentioned=True,
-    )
-    answer = Holding(
-        rule=basic_rule, rule_valid=rule_valid, decided=decided, selectors=selectors
-    )
-    yield (answer, mentioned) if report_mentioned else answer
-
-    if exclusive:
-        if not rule_valid:
-            raise NotImplementedError(
-                "The ability to state that it is not 'valid' to assert "
-                + "that a Rule is the 'exclusive' way to reach an output is "
-                + "not implemented, so 'rule_valid' cannot be False while "
-                + "'exclusive' is True. Try expressing this in another way "
-                + "without the 'exclusive' keyword."
-            )
-        if not decided:
-            raise NotImplementedError(
-                "The ability to state that it is not 'decided' whether "
-                + "a Rule is the 'exclusive' way to reach an output is "
-                + "not implemented. Try expressing this in another way "
-                + "without the 'exclusive' keyword."
-            )
-        for modified_rule in basic_rule.get_contrapositives():
-            answer = Holding(rule=modified_rule, selectors=selectors)
-            yield (answer, mentioned) if report_mentioned else answer
+    record, mentioned = name_index.index_names(record)
+    schema = schemas.HoldingSchema()
+    schema.context["mentioned"] = mentioned
+    schema.context["regime"] = regime
+    return schema.load(record)
 
 
 def read_holdings(

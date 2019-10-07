@@ -11,6 +11,7 @@ from authorityspoke.entities import Entity
 from authorityspoke.evidence import Exhibit, Evidence
 from authorityspoke.factors import Factor
 from authorityspoke.facts import Fact
+from authorityspoke.holdings import Holding
 from authorityspoke.pleadings import Pleading, Allegation
 from authorityspoke.predicates import Predicate
 from authorityspoke.procedures import Procedure
@@ -471,6 +472,36 @@ class RuleSchema(ExpandableSchema):
         for field in procedure_fields:
             if field in data:
                 data["procedure"][field] = data.pop(field)
+        return data
+
+    @post_load
+    def make_object(self, data, **kwargs):
+        return self.__model__(**data)
+
+class HoldingSchema(ExpandableSchema):
+    __model__: Type = Holding
+    rule = fields.Nested(RuleSchema)
+    rule_valid = fields.Bool(missing=True)
+    decided = fields.Bool(missing=True)
+    name = fields.Str(missing=None)
+    generic = fields.Bool(missing=False)
+
+    def nest_fields(self, data):
+        procedure_fields = ("inputs", "despite", "outputs")
+        for field in procedure_fields:
+            if field in data:
+                data["rule"]["procedure"][field] = data.pop(field)
+                procedure_fields = ("inputs", "despite", "outputs")
+        rule_fields = ("procedure", "enactments", "enactments_despite", "mandatory", "universal")
+        for field in rule_fields:
+            if field in data:
+                data["rule"][field] = data.pop(field)
+        return data
+
+    @pre_load
+    def format_data_to_load(self, data, **kwargs):
+        data = self.nest_fields(data)
+
         return data
 
     @post_load

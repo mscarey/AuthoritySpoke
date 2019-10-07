@@ -10,13 +10,28 @@ from authorityspoke.holdings import Holding
 from authorityspoke.opinions import Opinion
 from authorityspoke.predicates import Predicate
 from authorityspoke.procedures import Procedure
-from authorityspoke.io import readers
+from authorityspoke.io import readers, dump
 from authorityspoke.io.loaders import load_holdings
 from authorityspoke.io import filepaths
 from authorityspoke.rules import Rule
 from authorityspoke.selectors import TextQuoteSelector
 
 ureg = pint.UnitRegistry()
+
+
+class TestHoldingDump:
+    def test_dump_holding(self, make_holding):
+        holding = make_holding["h2"]
+        dumped = dump.to_dict(holding)
+        content = dumped["rule"]["procedure"]["inputs"][0]["predicate"]["content"]
+        assert content == "{} was on the premises of {}"
+
+    def test_dump_and_read_rule(self, make_holding, make_regime):
+        holding = make_holding["h2"]
+        dumped = dump.to_dict(holding)
+        loaded = readers.read_holding(dumped, regime=make_regime)
+        content = loaded.despite[0].predicate.content
+        assert "the distance between {} and {} was" in content
 
 
 class TestEntityImport:
@@ -45,13 +60,7 @@ class TestEntityImport:
         assert not different_entity_holdings[1] >= different_entity_holdings[0]
 
 
-class TestRuleImport:
-    """
-    Maybe hold off on trying to make these tests pass until deciding
-    whether to update the JSON format they rely on to match
-    the format in holding_cardenas.json
-    """
-
+class TestHoldingImport:
     def test_import_some_holdings(self, make_regime):
         """
         Don't expect the holdings imported from the JSON to
