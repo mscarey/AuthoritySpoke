@@ -10,7 +10,7 @@ from authorityspoke.holdings import Holding
 from authorityspoke.opinions import Opinion
 from authorityspoke.predicates import Predicate
 from authorityspoke.procedures import Procedure
-from authorityspoke.io import readers, dump
+from authorityspoke.io import readers, dump, name_index
 from authorityspoke.io.loaders import load_holdings
 from authorityspoke.io import filepaths
 from authorityspoke.rules import Rule
@@ -35,29 +35,35 @@ class TestHoldingDump:
 
 
 class TestEntityImport:
+    smith_holdings = [
+        {
+            "inputs": [
+                {
+                    "type": "fact",
+                    "content": "{} stole a car",
+                    "context_factors": {
+                        "type": "Entity",
+                        "name": "Smith",
+                        "generic": False,
+                    },
+                }
+            ],
+            "outputs": [{"type": "fact", "content": "Smith committed theft"}],
+        },
+        {
+            "inputs": [{"type": "fact", "content": "{Smythe} stole a car"}],
+            "outputs": [{"type": "fact", "content": "Smythe committed theft"}],
+        },
+    ]
+
+    def test_expand_shorthand(self):
+        expanded = name_index.expand_shorthand_mentioned(self.smith_holdings)
+        fact = expanded[1]["inputs"][0]
+        assert fact["context_factors"][0]["name"] == "Smythe"
+
     def test_specific_entity(self):
-        smith_holdings = [
-            {
-                "inputs": [
-                    {
-                        "type": "fact",
-                        "content": "{} stole a car",
-                        "context_factors": {
-                            "type": "Entity",
-                            "name": "Smith",
-                            "generic": False,
-                        },
-                    }
-                ],
-                "outputs": [{"type": "fact", "content": "Smith committed theft"}],
-            },
-            {
-                "inputs": [{"type": "fact", "content": "{Smythe} stole a car"}],
-                "outputs": [{"type": "fact", "content": "Smythe committed theft"}],
-            },
-        ]
-        different_entity_holdings = readers.read_holdings(smith_holdings)
-        print(different_entity_holdings)
+
+        different_entity_holdings = readers.read_holdings(self.smith_holdings)
         assert (
             different_entity_holdings[1].generic_factors
             != different_entity_holdings[0].generic_factors

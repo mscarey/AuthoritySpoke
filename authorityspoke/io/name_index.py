@@ -63,6 +63,8 @@ def expand_shorthand_mentioned(obj: Dict) -> Dict:
     :returns:
         the input object, but with shorthand references expanded.
     """
+    if isinstance(obj, List):
+        obj = [expand_shorthand_mentioned(item) for item in obj]
     if not isinstance(obj, Dict):
         return obj
     if obj.get("content") and not obj.get("context_factors"):
@@ -75,11 +77,8 @@ def expand_shorthand_mentioned(obj: Dict) -> Dict:
         ] = get_references_from_string(obj["predicate"]["content"])
 
     for key, value in obj.items():
-        if isinstance(value, Dict) and key != "predicate":
+        if isinstance(value, (Dict, List)) and key != "predicate":
             value = expand_shorthand_mentioned(value)
-        elif isinstance(value, List):
-            for item in value:
-                item = expand_shorthand_mentioned(item)
     return obj
 
 
