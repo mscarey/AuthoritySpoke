@@ -1,4 +1,6 @@
 """Functions for indexing named objects in JSON to be imported."""
+from __future__ import annotations
+
 from collections import OrderedDict
 from re import findall
 
@@ -14,6 +16,15 @@ class Mentioned(OrderedDict):
         value = self[name]
         value["name"] = name
         return value
+
+    def sorted_by_length(self) -> Mentioned:
+        return Mentioned(sorted(self.items(), key=lambda t: len(t[0]), reverse=True))
+
+    def __str__(self):
+        return f"Mentioned({str(dict(self))})"
+
+    def __repr__(self):
+        return f"Mentioned({repr(dict(self))})"
 
 
 def get_references_from_string(content: str) -> Tuple[str, List[Dict]]:
@@ -64,7 +75,7 @@ def expand_shorthand_mentioned(obj: Dict) -> Dict:
         the input object, but with shorthand references expanded.
     """
     if isinstance(obj, List):
-        obj = [expand_shorthand_mentioned(item) for item in obj]
+        return [expand_shorthand_mentioned(item) for item in obj]
     if not isinstance(obj, Dict):
         return obj
     if obj.get("content") and not obj.get("context_factors"):
@@ -78,30 +89,27 @@ def expand_shorthand_mentioned(obj: Dict) -> Dict:
 
     for key, value in obj.items():
         if isinstance(value, (Dict, List)) and key != "predicate":
-            value = expand_shorthand_mentioned(value)
+            obj[key] = expand_shorthand_mentioned(value)
     return obj
 
 
-def collect_mentioned(
-    obj: Dict, mentioned: Optional[Mentioned] = None
-) -> Tuple[Dict, Mentioned]:
+def collect_mentioned(obj: Dict, mentioned: Optional[Mentioned] = None) -> Mentioned:
     """
     Make a dict of all nested objects labeled by name.
 
     To be used during loading to expand name references to full objects.
     """
     mentioned = mentioned or Mentioned()
-    if not isinstance(obj, Dict):
-        return obj, mentioned
-    if obj.get("name"):
-        mentioned.insert_by_name(obj)
-    for _, value in obj.items():
-        if isinstance(value, Dict):
-            value, mentioned = collect_mentioned(value, mentioned)
-        elif isinstance(value, List):
-            for item in value:
-                item, mentioned = collect_mentioned(item, mentioned)
-    return obj, mentioned
+    if isinstance(obj, List):
+        for item in obj:
+            mentioned.update(collect_mentioned(item))
+    if isinstance(obj, Dict):
+        if obj.get("name"):
+            mentioned.insert_by_name(obj)
+        for _, value in obj.items():
+            if isinstance(value, (Dict, List)):
+                mentioned.update(collect_mentioned(value))
+    return mentioned
 
 
 def index_names(obj: Dict) -> Tuple[Dict, Mentioned]:
@@ -116,8 +124,5 @@ def index_names(obj: Dict) -> Tuple[Dict, Mentioned]:
         and the objects to expand them with.
     """
     obj = expand_shorthand_mentioned(obj)
-    obj, mentioned = collect_mentioned(obj)
-    sorted_mentioned = Mentioned(
-        sorted(mentioned.items(), key=lambda t: len(t[0]), reverse=True)
-    )
+    mentioned = collect_mentioned(obj)
     return obj, sorted_mentioned

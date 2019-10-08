@@ -12,6 +12,7 @@ from authorityspoke.evidence import Exhibit, Evidence
 from authorityspoke.factors import Factor
 from authorityspoke.facts import Fact
 from authorityspoke.holdings import Holding
+from authorityspoke.io.name_index import Mentioned
 from authorityspoke.pleadings import Pleading, Allegation
 from authorityspoke.predicates import Predicate
 from authorityspoke.procedures import Procedure
@@ -29,7 +30,7 @@ class ExpandableSchema(Schema):
         Replaces data to load with any object with same name in "mentioned".
         """
 
-        self.context["mentioned"] = self.context.get("mentioned") or {}
+        self.context["mentioned"] = self.context.get("mentioned") or Mentioned()
         if isinstance(data, str):
             return self.context["mentioned"].get_by_name(data)
         return data
@@ -311,22 +312,22 @@ class FactSchema(ExpandableSchema):
             replaced by placeholder, and a list of referenced
             :class:`Factor`\s in the order they appeared in content.
         """
-        mentioned = self.context.get("mentioned") or {}
-        context_with_indices: Dict[Union[Enactment, Factor], int] = {}
-        for factor in mentioned:
-            if factor.name and factor.name in content and factor.name != content:
-                factor_index = content.find(factor.name)
+        self.context["mentioned"] = self.context.get("mentioned") or Mentioned({})
+        self.context["mentioned"] = self.context["mentioned"].sorted_by_length()
+        mentioned = self.context["mentioned"]
+        context_with_indices: Dict[str, int] = {}
+        for factor_name in mentioned:
+            if factor_name in content and factor_name != content:
+                factor_index = content.find(factor_name)
                 for named_factor in context_with_indices:
                     if context_with_indices[named_factor] > factor_index:
-                        context_with_indices[named_factor] -= len(factor.name) - len(
+                        context_with_indices[named_factor] -= len(factor_name) - len(
                             placeholder
                         )
-                context_with_indices[factor] = factor_index
-                content = content.replace(factor.name, placeholder)
+                context_with_indices[factor_name] = factor_index
+                content = content.replace(factor_name, placeholder)
         sorted_factors = sorted(context_with_indices, key=context_with_indices.get)
-        factor_schema = FactorSchema()
-        factor_schema.context["mentioned"] = self.context["mentioned"]
-        return content, [factor_schema.dump(factor) for factor in sorted_factors]
+        return content, [mentioned.get_by_name(name) for name in sorted_factors]
 
     def wrap_single_element_in_list(self, data):
         if data.get("context_factors") and isinstance(data["context_factors"], dict):

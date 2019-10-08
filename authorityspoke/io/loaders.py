@@ -55,9 +55,7 @@ def load_holdings(
     directory: Optional[pathlib.Path] = None,
     filepath: Optional[pathlib.Path] = None,
     regime: Optional[Regime] = None,
-    mentioned: List[Factor] = None,
-    report_mentioned: bool = False,
-) -> Union[List[Holding], Tuple[List[Holding], Dict[Factor, List[TextQuoteSelector]]]]:
+) -> List[Holding]:
     r"""
     Load a list of :class:`.Holding`\s from JSON.
 
@@ -75,13 +73,6 @@ def load_holdings(
 
     :parame regime:
 
-    :param mentioned:
-        A list of :class:`.Factor`\s that the method needs to
-        expect to find in the :class:`.Opinion`\'s holdings,
-        but that won't be provided within the JSON, if any.
-
-    :param report_mentioned:
-
     :returns:
         a list of :class:`Rule`\s from a JSON file in the
         ``example_data/holdings`` subdirectory, from a JSON
@@ -92,10 +83,8 @@ def load_holdings(
     )
     with open(validated_filepath, "r") as f:
         holdings = json.load(f)
-    answer, mentioned = readers.read_holdings(
-        holdings=holdings, regime=regime, mentioned=mentioned, report_mentioned=True
-    )
-    return (answer, mentioned) if report_mentioned else answer
+    answer = readers.read_holdings(holdings=holdings, regime=regime)
+    return answer
 
 
 def load_opinion(

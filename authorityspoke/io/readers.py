@@ -115,7 +115,7 @@ def read_enactments(
             record, mentioned=mentioned, regime=regime, report_mentioned=True
         )
         created_list.append(created)
-    mentioned = mentioned or {}
+    mentioned = mentioned or Mentioned({})
     answer = tuple(created_list)
     return (answer, mentioned) if report_mentioned else answer
 
@@ -221,7 +221,7 @@ def read_factor(
         :class:`Factor`, instead of constructing new ones.
     """
     cname = factor_record["type"]
-    mentioned = mentioned or {}
+    mentioned = mentioned or Mentioned({})
     target_class = subclass_from_str(cname)
     if target_class == Fact:
         created_factor = read_fact(factor_record)
@@ -252,7 +252,7 @@ def read_factor_subclass(
         if value is not None:
             new_factor_dict[attr] = value
     answer: Factor = cls(**new_factor_dict)
-    mentioned = mentioned or {}
+    mentioned = mentioned or Mentioned({})
     return (answer, mentioned) if report_mentioned else answer
 
 
@@ -272,7 +272,7 @@ def read_factors(
             record, mentioned, regime=regime, report_mentioned=True
         )
         created_list.append(created)
-    mentioned = mentioned or {}
+    mentioned = mentioned or Mentioned({})
     answer = tuple(created_list)
     return (answer, mentioned) if report_mentioned else answer
 
@@ -338,6 +338,7 @@ def read_holdings(
     schema.context["mentioned"] = mentioned
     schema.context["regime"] = regime
     return schema.load(record)
+
 
 def read_case(
     decision_dict: Dict[str, Any], lead_only: bool = True, as_generator: bool = False
