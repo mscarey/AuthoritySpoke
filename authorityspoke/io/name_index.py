@@ -125,4 +125,4 @@ def index_names(obj: Dict) -> Tuple[Dict, Mentioned]:
     """
     obj = expand_shorthand_mentioned(obj)
     mentioned = collect_mentioned(obj)
-    return obj, sorted_mentioned
+    return obj, mentioned
