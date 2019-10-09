@@ -16,6 +16,8 @@ from authorityspoke.io import filepaths
 from authorityspoke.rules import Rule
 from authorityspoke.selectors import TextQuoteSelector
 
+from marshmallow import ValidationError
+
 ureg = pint.UnitRegistry()
 
 
@@ -222,45 +224,29 @@ class TestHoldingImport:
         string = str(context_change)
         assert "plants in the stockpile of trees was at least 3" in string
 
-    def test_error_because_string_does_not_match_factor_name(self):
-        rule_dict = {
-            "mentioned_factors": [
-                {"type": "Entity", "name": "the dog"},
-                {"type": "Human", "name": "the man"},
-            ],
-            "holdings": [
-                {
-                    "inputs": ["this factor hasn't been mentioned"],
-                    "outputs": [{"type": "fact", "content": "the dog bit the man"}],
-                    "enactments": [
-                        {"code": "constitution.xml", "section": "amendment-IV"}
-                    ],
-                    "mandatory": True,
-                }
-            ],
+    def test_error_because_string_does_not_match_factor_name(self, make_regime):
+        rule_holding = {
+            "inputs": ["this factor hasn't been mentioned"],
+            "outputs": [{"type": "fact", "content": "{the dog} bit {the man}"}],
+            "enactments": [{"source": "/us/const/amendment-IV"}],
+            "mandatory": True,
         }
-        with pytest.raises(ValueError):
-            readers.read_holdings(rule_dict)
+        with pytest.raises(ValidationError):
+            readers.read_holding(rule_holding, regime=make_regime)
 
     def test_error_classname_does_not_exist(self):
         rule_dict = {
-            "holdings": [
+            "inputs": [
                 {
-                    "inputs": [
-                        {
-                            "type": "RidiculousFakeClassName",
-                            "content": "officers' search of the yard was a warrantless search and seizure",
-                        }
-                    ],
-                    "outputs": [{"type": "fact", "content": "the dog bit the man"}],
-                    "enactments": [
-                        {"code": "constitution.xml", "section": "amendment-IV"}
-                    ],
+                    "type": "RidiculousFakeClassName",
+                    "content": "officers' search of the yard was a warrantless search and seizure",
                 }
-            ]
+            ],
+            "outputs": [{"type": "fact", "content": "the dog bit the man"}],
+            "enactments": [{"source": "/us/const/amendment-IV"}],
         }
         with pytest.raises(ValueError):
-            readers.read_holdings(rule_dict)
+            readers.read_holding(rule_dict)
 
     def test_holding_flagged_exclusive(self, make_opinion_with_holding, make_enactment):
         """

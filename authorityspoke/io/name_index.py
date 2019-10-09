@@ -6,6 +6,8 @@ from re import findall
 
 from typing import Dict, List, Optional, Tuple, Union
 
+from marshmallow import ValidationError
+
 
 class Mentioned(OrderedDict):
     def insert_by_name(self, obj: Dict):
@@ -13,6 +15,10 @@ class Mentioned(OrderedDict):
         self[obj["name"]].pop("name")
 
     def get_by_name(self, name: str) -> Dict:
+        if not self.get(name):
+            raise ValidationError(
+                f'Name "{name}" not found in the index of mentioned Factors'
+            )
         value = self[name].copy()
         value["name"] = name
         return value

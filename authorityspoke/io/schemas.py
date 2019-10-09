@@ -527,6 +527,7 @@ class HoldingSchema(ExpandableSchema):
 
     @pre_load
     def format_data_to_load(self, data, **kwargs):
+        data = self.get_from_mentioned(data)
         data = self.nest_fields(data)
 
         return data
