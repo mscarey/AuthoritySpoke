@@ -45,6 +45,17 @@ class ExpandableSchema(Schema):
         return data
 
 
+    def wrap_single_element_in_list(self, data: Dict, many_element: str):
+        """
+        Make a specified field a list if it isn't already a list.
+        """
+        if (
+            data.get(many_element) is not None
+            and not isinstance(data[many_element], list)
+            ):
+            data[many_element] = [data[many_element]]
+        return data
+
 class SelectorSchema(ExpandableSchema):
     __model__ = TextQuoteSelector
     prefix = fields.Str(missing=None)
@@ -294,7 +305,7 @@ class FactSchema(ExpandableSchema):
             "comparison",
             "quantity",
         ]:
-            if data.get(predicate_field):
+            if predicate_field in data:
                 data["predicate"][predicate_field] = data.pop(predicate_field)
         return data
 
@@ -333,16 +344,12 @@ class FactSchema(ExpandableSchema):
         sorted_factors = sorted(context_with_indices, key=context_with_indices.get)
         return content, [mentioned.get_by_name(name) for name in sorted_factors]
 
-    def wrap_single_element_in_list(self, data):
-        if data.get("context_factors") and isinstance(data["context_factors"], dict):
-            data["context_factors"] = [data["context_factors"]]
-        return data
 
     @pre_load
     def format_data_to_load(self, data, **kwargs):
         data = self.get_from_mentioned(data)
         data = self.nest_predicate_fields(data)
-        data = self.wrap_single_element_in_list(data)
+        data = self.wrap_single_element_in_list(data, "context_factors")
         if not data.get("context_factors"):
             data["predicate"]["content"], data[
                 "context_factors"
@@ -462,6 +469,12 @@ class ProcedureSchema(ExpandableSchema):
     despite = fields.Nested(FactorSchema, many=True)
     outputs = fields.Nested(FactorSchema, many=True)
 
+    @pre_load
+    def format_data_to_load(self, data, **kwargs):
+        for field_name in ("inputs", "despite", "outputs"):
+            data = self.wrap_single_element_in_list(data, field_name)
+        return data
+
     @post_load
     def make_object(self, data, **kwargs):
         return self.__model__(**data)
@@ -480,6 +493,7 @@ class RuleSchema(ExpandableSchema):
     @pre_load
     def format_data_to_load(self, data, **kwargs):
         procedure_fields = ("inputs", "despite", "outputs")
+        data["procedure"] = data.get("procedure") or {}
         for field in procedure_fields:
             if field in data:
                 data["procedure"][field] = data.pop(field)

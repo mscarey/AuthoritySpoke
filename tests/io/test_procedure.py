@@ -1,5 +1,5 @@
 from authorityspoke.io import dump
-from authorityspoke.io import schemas
+from authorityspoke.io import readers, schemas
 
 
 class TestProcedureDump:
@@ -16,3 +16,23 @@ class TestProcedureDump:
         loaded = schema.load(dumped)
         content = loaded.despite[0].predicate.content
         assert "the distance between {} and {} was" in content
+
+
+class TestProcedureLoad:
+    example = {
+        "inputs": {
+            "type": "fact",
+            "content": "{the Java API} was an original work",
+            "truth": False,
+        },
+        "outputs": {
+            "type": "fact",
+            "content": "the Java API was copyrightable",
+            "truth": False,
+        },
+    }
+
+    def test_load_example(self):
+        procedure = readers.read_procedure(self.example)
+        factor = procedure.outputs[0].context_factors[0]
+        assert factor.name == "the Java API"

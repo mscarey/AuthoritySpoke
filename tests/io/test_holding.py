@@ -217,7 +217,8 @@ class TestHoldingImport:
         This test originally required a ValueError, but why should it?
         """
         brad = make_opinion["brad_majority"]
-        brad.posit(load_holdings("holding_brad.json", regime=make_regime))
+        some_holdings = load_holdings("holding_brad.json", regime=make_regime)
+        brad.posit(some_holdings)
         context_change = brad.holdings[6].new_context(
             {brad.holdings[6].generic_factors[1]: make_entity["trees_specific"]}
         )

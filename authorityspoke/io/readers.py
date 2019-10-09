@@ -28,7 +28,7 @@ from authorityspoke.selectors import TextQuoteSelector
 
 from authorityspoke.io import references
 from authorityspoke.io import schemas
-from authorityspoke.io import name_index
+from authorityspoke.io.name_index import index_names
 
 
 ureg = UnitRegistry()
@@ -175,7 +175,7 @@ def read_fact(record: Dict) -> Fact:
     :returns:
         a :class:`Fact`, with optional mentioned factors
     """
-    record, mentioned = name_index.index_names(record)
+    record, mentioned = index_names(record)
     schema = schemas.FactSchema()
     schema.context["mentioned"] = mentioned
     return schema.load(record)
@@ -277,6 +277,15 @@ def read_factors(
     return (answer, mentioned) if report_mentioned else answer
 
 
+def read_procedure(
+    record: Dict, regime: Optional[Regime] = None, many=False
+) -> Procedure:
+    schema = schemas.ProcedureSchema(many=many)
+    record, schema.context["mentioned"] = index_names(record)
+    schema.context["regime"] = regime
+    return schema.load(record)
+
+
 def read_holding(record: Dict, regime: Optional[Regime] = None) -> Holding:
     r"""
     Create new :class:`Holding` object from simple datatypes from JSON input.
@@ -307,7 +316,7 @@ def read_holding(record: Dict, regime: Optional[Regime] = None) -> Holding:
         :class:`.Factor`\s as keys and their :class:`.TextQuoteSelector`\s
         as values.
     """
-    record, mentioned = name_index.index_names(record)
+    record, mentioned = index_names(record)
     schema = schemas.HoldingSchema()
     schema.context["mentioned"] = mentioned
     schema.context["regime"] = regime
@@ -333,7 +342,7 @@ def read_holdings(
         a list of :class:`.Holding` objects, optionally with
         an index matching :class:`.Factor`\s to selectors.
     """
-    record, mentioned = name_index.index_names(holdings)
+    record, mentioned = index_names(holdings)
     schema = schemas.HoldingSchema(many=True)
     schema.context["mentioned"] = mentioned
     schema.context["regime"] = regime
@@ -521,7 +530,7 @@ def read_rule(record: Dict, regime: Optional[Regime] = None) -> Rule:
         iterator yielding :class:`Rule`\s with the items
         from ``mentioned_entities`` as ``context_factors``
     """
-    record, mentioned = name_index.index_names(record)
+    record, mentioned = index_names(record)
     schema = schemas.RuleSchema()
     schema.context["mentioned"] = mentioned
     schema.context["regime"] = regime
