@@ -272,7 +272,6 @@ class Code:
             section = section.find(id=part)
         return section
 
-    @functools.lru_cache()
     def get_sections(self, path: str = "") -> Optional[BeautifulSoup]:
         r"""
         Get sections identified by a path, if present in the :class:`Code`\.

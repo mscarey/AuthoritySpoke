@@ -125,7 +125,8 @@ class EnactmentSchema(ExpandableSchema):
     def fix_source_path_errors(self, data, **kwargs):
 
         if not data.get("source"):
-            data["source"] = self.context["code"].uri
+            code = self.get_code_from_regime(data)
+            data["source"] = code.uri
 
         if data.get("source"):
             if not (
@@ -137,14 +138,18 @@ class EnactmentSchema(ExpandableSchema):
         return data
 
     def get_code_from_regime(self, data, **kwargs):
-        if self.context.get("regime") and not self.context.get("code"):
-            self.context["code"] = self.context["regime"].get_code(data["source"])
-        if self.context["code"] is None:
+        if self.context["regime"]:
+            code = self.context["regime"].get_code(data["source"])
+        elif self.context.get("code"):
+            code = self.context("code")
+        else:
             raise ValueError(
                 f"Must either specify a Code for Enactment '{data['source']}', "
                 + "or else specify a Regime "
                 + "and a path to find the Code within the Regime."
             )
+        return code
+
 
     @pre_load
     def format_data_to_load(self, data, **kwargs):
@@ -152,12 +157,12 @@ class EnactmentSchema(ExpandableSchema):
         data = self.fix_source_path_errors(data)
         data = self.move_selector_fields(data)
         data = self.consume_type_field(data)
-        deta = self.get_code_from_regime(data)
         return data
 
     @post_load
     def make_object(self, data, **kwargs):
-        return self.__model__(**data, code=self.context["code"])
+        code = self.get_code_from_regime(data)
+        return self.__model__(**data, code=code)
 
 
 def read_quantity(value: Union[float, int, str]) -> Union[float, int, ureg.Quantity]:
@@ -280,18 +285,17 @@ class FactSchema(ExpandableSchema):
         """
         Make sure predicate-related fields are in a dict under "predicate" key.
         """
-        if data.get("content") and not data.get("predicate"):
+        if not data.get("predicate"):
             data["predicate"] = {}
-            for predicate_field in [
-                "content",
-                "truth",
-                "reciprocal",
-                "comparison",
-                "quantity",
-            ]:
-                if data.get(predicate_field):
-                    data["predicate"][predicate_field] = data[predicate_field]
-                    del data[predicate_field]
+        for predicate_field in [
+            "content",
+            "truth",
+            "reciprocal",
+            "comparison",
+            "quantity",
+        ]:
+            if data.get(predicate_field):
+                data["predicate"][predicate_field] = data.pop(predicate_field)
         return data
 
     def get_references_from_mentioned(
@@ -491,6 +495,7 @@ class HoldingSchema(ExpandableSchema):
     rule = fields.Nested(RuleSchema)
     rule_valid = fields.Bool(missing=True)
     decided = fields.Bool(missing=True)
+    exclusive = fields.Bool(missing=False)
     name = fields.Str(missing=None)
     generic = fields.Bool(missing=False)
 

@@ -1,110 +1,101 @@
-{
-    "mentioned_factors": [{
-            "type": "entity",
-            "name": "defendant"
-        },
-        {
-            "type": "entity",
-            "name": "parole officer"
-        },
-        {
-            "type": "Entity",
-            "name": "The People of California"
-        },
-        {
-            "type": "Fact",
-            "name": "fact that defendant was addicted to heroin",
-            "content": "the defendant was addicted to heroin"
-        },
-        {
-            "type": "Exhibit",
-            "name": "officer's testimony that defendant was addicted to heroin",
-            "form": "testimony",
-            "statement": "fact that defendant was addicted to heroin",
-            "stated_by": "parole officer"
-        },
-        {
-            "type": "Fact",
-            "name": "fact that defendant committed an attempted robbery",
-            "content": "defendant committed an attempted robbery"
-        },
-        {
-            "type": "Allegation",
-            "name": "the attempted robbery charge",
-            "alleged_by": "The People of California",
-            "to_effect": "fact that defendant committed an attempted robbery"
-        }
-    ],
-    "holdings": [{
-            "inputs": [
-                "officer's testimony that defendant was addicted to heroin",
-                "the attempted robbery charge"
-            ],
-            "despite": [{
-                "type": "Fact",
-                "content": "officer's testimony that defendant was addicted to heroin, was relevant to show the defendant had a motive to commit an attempted robbery"
-            }],
-            "outputs": [{
-                "type": "Fact",
-                "content": "the probative value of officer's testimony that defendant was addicted to heroin, in showing fact that defendant committed an attempted robbery, was outweighed by unfair prejudice to defendant"
-            }],
-            "mandatory": true,
-            "enactments": [{
-                    "source": "/us-ca/evid/s351"
+[{
+        "inputs": [
+
+            {
+                "type": "Exhibit",
+                "name": "officer's testimony that defendant was addicted to heroin",
+                "form": "testimony",
+                "statement": {
+                    "type": "Fact",
+                    "name": "fact that defendant was addicted to heroin",
+                    "content": "the {defendant} was addicted to heroin"
                 },
-                {
-                    "source": "/us-ca/evid/s352",
-                    "suffix": "(a) necessitate undue"
-                },
-                {
-                    "source": "/us-ca/evid/s352",
-                    "exact": "create substantial danger of undue prejudice"
-                },
-                {
-                    "source": "/us-ca/pen/s211"
-                },
-                {
-                    "source": "/us-ca/pen/s664",
-                    "suffix": "where no provision is"
+                "stated_by": {
+                    "type": "entity",
+                    "name": "parole officer"
                 }
-            ]
-        },
-        {
-            "inputs": [{
-                "type": "Fact",
-                "content": "the probative value of officer's testimony that defendant was addicted to heroin, in indicating fact that defendant committed an attempted robbery, was outweighed by unfair prejudice to defendant"
-            }],
-            "despite": [{
-                "type": "Fact",
-                "content": "officer's testimony that defendant was addicted to heroin was relevant to show defendant had a motive to commit an attempted robbery"
-            }],
-            "outputs": [{
-                "type": "Evidence",
-                "name": "evidence of officer's testimony that defendant was addicted to heroin",
-                "exhibit": "officer's testimony that defendant was addicted to heroin",
-                "to_effect": "fact that defendant committed an attempted robbery",
-                "absent": true
-            }],
-            "mandatory": true,
-            "enactments": [{
-                    "source": "/us-ca/evid/s351"
+            },
+            {
+                "type": "Allegation",
+                "name": "the attempted robbery charge",
+                "pleading": {
+                    "type": "Pleading",
+                    "filer": {
+                        "type": "Entity",
+                        "name": "The People of California"
+                    }
                 },
-                {
-                    "source": "/us-ca/evid/s352",
-                    "suffix": "(a) necessitate undue consumption"
-                },
-                {
-                    "source": "/us-ca/evid/s352",
-                    "exact": "create substantial danger of undue prejudice"
-                },
-                {
-                    "source": "/us-ca/pen/s211"
-                },
-                {
-                    "source": "/us-ca/pen/s664",
-                    "suffix": "where no provision is"
+                "statement": {
+                    "type": "Fact",
+                    "name": "fact that defendant committed an attempted robbery",
+                    "content": "defendant committed an attempted robbery"
                 }
-            ]
-        }
-    ]
-}
+            }
+        ],
+        "despite": [{
+            "type": "Fact",
+            "content": "officer's testimony that defendant was addicted to heroin, was relevant to show the defendant had a motive to commit an attempted robbery"
+        }],
+        "outputs": [{
+            "type": "Fact",
+            "content": "the probative value of officer's testimony that defendant was addicted to heroin, in showing fact that defendant committed an attempted robbery, was outweighed by unfair prejudice to defendant"
+        }],
+        "mandatory": true,
+        "enactments": [{
+                "source": "/us-ca/evid/s351"
+            },
+            {
+                "source": "/us-ca/evid/s352",
+                "suffix": "(a) necessitate undue"
+            },
+            {
+                "source": "/us-ca/evid/s352",
+                "exact": "create substantial danger of undue prejudice"
+            },
+            {
+                "source": "/us-ca/pen/s211"
+            },
+            {
+                "source": "/us-ca/pen/s664",
+                "suffix": "where no provision is"
+            }
+        ]
+    },
+    {
+        "inputs": [{
+            "type": "Fact",
+            "content": "the probative value of officer's testimony that defendant was addicted to heroin, in indicating fact that defendant committed an attempted robbery, was outweighed by unfair prejudice to defendant"
+        }],
+        "despite": [{
+            "type": "Fact",
+            "content": "officer's testimony that defendant was addicted to heroin was relevant to show defendant had a motive to commit an attempted robbery"
+        }],
+        "outputs": [{
+            "type": "Evidence",
+            "name": "evidence of officer's testimony that defendant was addicted to heroin",
+            "exhibit": "officer's testimony that defendant was addicted to heroin",
+            "to_effect": "fact that defendant committed an attempted robbery",
+            "absent": true
+        }],
+        "mandatory": true,
+        "enactments": [{
+                "source": "/us-ca/evid/s351"
+            },
+            {
+                "source": "/us-ca/evid/s352",
+                "suffix": "(a) necessitate undue consumption"
+            },
+            {
+                "source": "/us-ca/evid/s352",
+                "exact": "create substantial danger of undue prejudice"
+            },
+            {
+                "source": "/us-ca/pen/s211"
+            },
+            {
+                "source": "/us-ca/pen/s664",
+                "suffix": "where no provision is"
+            }
+        ]
+    }
+]

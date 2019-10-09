@@ -71,6 +71,7 @@ class Holding(Factor):
     enactments_despite: Optional[Union[Enactment, Iterable[Enactment]]] = None
     mandatory: bool = False
     universal: bool = False
+    exclusive: bool = False
     generic: bool = False
 
     def __post_init__(self):

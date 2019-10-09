@@ -13,7 +13,7 @@ class Mentioned(OrderedDict):
         self[obj["name"]].pop("name")
 
     def get_by_name(self, name: str) -> Dict:
-        value = self[name]
+        value = self[name].copy()
         value["name"] = name
         return value
 
