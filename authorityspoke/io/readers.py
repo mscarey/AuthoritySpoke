@@ -4,11 +4,12 @@ Converting simple structured data from XML or JSON into authorityspoke objects.
 These functions will usually be called by functions from the io.loaders module
 after they import some data from a file.
 """
+from collections import defaultdict
 import datetime
 from functools import partial
-import re
 
-from typing import Any, Dict, List, Iterable, Iterator, Optional, Tuple, Type, Union
+from typing import Any, Dict, List, Iterable, Iterator
+from typing import Optional, Set, Tuple, Type, Union
 
 from pint import UnitRegistry
 
@@ -37,6 +38,87 @@ FACTOR_SUBCLASSES = {
     class_obj.__name__: class_obj
     for class_obj in (Allegation, Entity, Exhibit, Evidence, Fact, Pleading)
 }
+
+
+def read_selector(
+    record: Optional[Union[Dict, str]], many: bool = False
+) -> Optional[TextQuoteSelector]:
+    """
+    Create new selector from JSON user input.
+
+    :param record:
+        a string or dict representing a text passage
+
+    :returns: a new :class:`TextQuoteSelector`
+    """
+    if not record:
+        return None
+    selector_schema = SelectorSchema(many=many)
+    return selector_schema.load(record)
+
+
+def read_selectors(
+    record: Iterable[Union[str, Dict[str, str]]]
+) -> List[TextQuoteSelector]:
+    r"""
+    Create list of :class:`.TextQuoteSelector`\s from JSON user input.
+
+    If the input is a :class:`str`, tries to break up the string
+    into :attr:`~TextQuoteSelector.prefix`, :attr:`~TextQuoteSelector.exact`,
+    and :attr:`~TextQuoteSelector.suffix`, by splitting on the pipe characters.
+
+    :param record:
+        a string or dict representing a text passage, or list of
+        strings and dicts.
+
+    :returns: a list of :class:`TextQuoteSelector`\s
+    """
+    return read_selector(record, many=True)
+
+
+AnchorDict = Dict[Union[Factor, Holding, Enactment], Set[TextQuoteSelector]]
+
+
+def read_anchorable(obj: Dict, regime: Optional[Regime] = None):
+    """
+    Make an object of any type that can have an anchor field.
+    """
+    if "rule" in obj:
+        return read_holding(obj, regime=regime)
+    elif "source" in obj:
+        return read_enactment(obj, regime=regime)
+    return read_factor(obj)
+
+
+def collect_anchors(
+    obj: Dict, anchors: Optional[AnchorDict] = None, index_anchors: bool = True
+) -> Tuple[Dict, AnchorDict]:
+    r"""
+    Move anchors fields to a dict linking object names to lists of anchors.
+
+    To be used during loading of :class:`.Holding`\s.
+    Keys are :class:`.Factor`\s, :class:`.Enactment`\s, or :class:`.Holding`\s,
+    and values are lists of the :class:`.Opinion` passages that reference them.
+
+    """
+    anchors = anchors or defaultdict(set)
+    if isinstance(obj, List):
+        for item in obj:
+            obj, anchors = collect_anchors(item, anchors)
+    if isinstance(obj, Dict):
+        for _, value in obj.items():
+            if isinstance(value, (Dict, List)):
+                obj, anchors = collect_anchors(value, anchors)
+        if obj.get("anchors"):
+            incoming = obj.pop("anchors")
+            if index_anchors:
+                key = read_anchorable(obj, regime=regime)
+                if not isinstance(incoming, list):
+                    incoming = [incoming]
+                for selector in incoming:
+                    anchors[key].add(selector)
+
+    return obj, anchors
 
 
 def read_enactment(
@@ -287,7 +369,10 @@ def read_procedure(
 
 
 def read_holding(
-    record: Dict, regime: Optional[Regime] = None, many: bool = False
+    record: Dict,
+    regime: Optional[Regime] = None,
+    many: bool = False,
+    index_anchors: bool = False,
 ) -> Holding:
     r"""
     Create new :class:`Holding` object from simple datatypes from JSON input.
@@ -312,14 +397,16 @@ def read_holding(
         as values.
     """
     record, mentioned = index_names(record)
+    record, anchors = collect_anchors(record, index_anchors=index_anchors)
     schema = schemas.HoldingSchema(many=many)
     schema.context["mentioned"] = mentioned
     schema.context["regime"] = regime
-    return schema.load(record)
+    answer = schema.load(record)
+    return (answer, anchors) if index_anchors else answer
 
 
 def read_holdings(
-    record: List[Dict], regime: Optional[Regime] = None
+    record: List[Dict], regime: Optional[Regime] = None, index_anchors: bool = False
 ) -> List[Holding]:
     r"""
     Load a list of :class:`Holdings`\s from JSON, with optional text links.
@@ -336,7 +423,9 @@ def read_holdings(
         a list of :class:`.Holding` objects, optionally with
         an index matching :class:`.Factor`\s to selectors.
     """
-    return read_holding(record=record, regime=regime, many=True)
+    return read_holding(
+        record=record, regime=regime, many=True, index_anchors=index_anchors
+    )
 
 
 def read_case(

@@ -83,7 +83,9 @@ def load_holdings(
     )
     with open(validated_filepath, "r") as f:
         holdings = json.load(f)
-    answer = readers.read_holding(record=holdings, regime=regime, many=True)
+    answer = readers.read_holding(
+        record=holdings, regime=regime, many=True, index_anchors=True
+    )
     return answer
 
 

@@ -2,7 +2,7 @@ from typing import Any, Dict, List, Optional, Tuple, Type, Union
 
 from marshmallow import Schema, fields, validate
 from marshmallow import pre_dump, pre_load, post_dump, post_load
-from marshmallow import ValidationError
+from marshmallow import ValidationError, EXCLUDE
 
 from pint import UnitRegistry
 
@@ -110,6 +110,9 @@ class EnactmentSchema(ExpandableSchema):
     name = fields.String(missing=None)
     source = fields.Url(relative=True)
     selector = fields.Nested(SelectorSchema, missing=None)
+
+    class Meta:
+        unknown = EXCLUDE
 
     def move_selector_fields(self, data, **kwargs):
         """
