@@ -286,7 +286,9 @@ def read_procedure(
     return schema.load(record)
 
 
-def read_holding(record: Dict, regime: Optional[Regime] = None) -> Holding:
+def read_holding(
+    record: Dict, regime: Optional[Regime] = None, many: bool = False
+) -> Holding:
     r"""
     Create new :class:`Holding` object from simple datatypes from JSON input.
 
@@ -295,21 +297,14 @@ def read_holding(record: Dict, regime: Optional[Regime] = None) -> Holding:
     :param record:
         dict of values for constructing :class:`.Holding`
 
-    :param anchors:
-        Text selectors for the whole :class:`Holding`, not for any
-        individual :class:`.Factor`. Often selects text used to
-        indicate whether the :class:`.Rule` is ``mandatory``, ``universal``,
-        ``valid``, or ``decided``, or shows the ``exclusive`` way to reach
-        the outputs.
-
-    :param mentioned:
-        Known :class:`.Factor`\s that may be reused in constructing
-        the new :class:`Holding`.
-
     :param regime:
         Collection of :class:`.Jurisdiction`\s and corresponding
         :class:`.Code`\s for discovering :class:`.Enactment`\s to
         reference in the new :class:`Holding`.
+
+    :param many:
+        if True, record represents a list of :class:`Holding`\s rather than
+        just one.
 
     :returns:
         New :class:`.Holding`, and an updated dictionary with mentioned
@@ -317,21 +312,20 @@ def read_holding(record: Dict, regime: Optional[Regime] = None) -> Holding:
         as values.
     """
     record, mentioned = index_names(record)
-    schema = schemas.HoldingSchema()
+    schema = schemas.HoldingSchema(many=many)
     schema.context["mentioned"] = mentioned
     schema.context["regime"] = regime
     return schema.load(record)
 
 
 def read_holdings(
-    holdings: List[Dict], regime: Optional[Regime] = None
+    record: List[Dict], regime: Optional[Regime] = None
 ) -> List[Holding]:
     r"""
     Load a list of :class:`Holdings`\s from JSON, with optional text links.
 
-    :param holdings:
-        the record from JSON in the format that lists ``mentioned_factors``
-        followed by a list of holdings
+    :param record:
+        a list of dicts representing holdings, in the JSON input format
 
     :parame regime:
         A collection of :class:`.Jurisdiction`\s and the :class:`.Code`\s
@@ -342,11 +336,7 @@ def read_holdings(
         a list of :class:`.Holding` objects, optionally with
         an index matching :class:`.Factor`\s to selectors.
     """
-    record, mentioned = index_names(holdings)
-    schema = schemas.HoldingSchema(many=True)
-    schema.context["mentioned"] = mentioned
-    schema.context["regime"] = regime
-    return schema.load(record)
+    return read_holding(record=record, regime=regime, many=True)
 
 
 def read_case(
