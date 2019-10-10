@@ -91,8 +91,8 @@ def read_anchorable(obj: Dict, regime: Optional[Regime] = None):
 
 
 def collect_anchors(
-    obj: Dict, anchors: Optional[AnchorDict] = None, index_anchors: bool = True
-) -> Tuple[Dict, AnchorDict]:
+    obj: Dict, anchors: Optional[AnchorDict] = None, regime: Optional[Regime] = None
+) -> AnchorDict:
     r"""
     Move anchors fields to a dict linking object names to lists of anchors.
 
@@ -104,21 +104,20 @@ def collect_anchors(
     anchors = anchors or defaultdict(set)
     if isinstance(obj, List):
         for item in obj:
-            obj, anchors = collect_anchors(item, anchors)
+            anchors = collect_anchors(item, regime=regime)
     if isinstance(obj, Dict):
         for _, value in obj.items():
             if isinstance(value, (Dict, List)):
-                obj, anchors = collect_anchors(value, anchors)
+                anchors = collect_anchors(value, regime=regime)
         if obj.get("anchors"):
-            incoming = obj.pop("anchors")
-            if index_anchors:
-                key = read_anchorable(obj, regime=regime)
-                if not isinstance(incoming, list):
-                    incoming = [incoming]
-                for selector in incoming:
-                    anchors[key].add(selector)
+            incoming = obj["anchors"]
+            key = read_anchorable(obj, regime=regime)
+            if not isinstance(incoming, list):
+                incoming = [incoming]
+            for selector in incoming:
+                anchors[key].add(selector)
 
-    return obj, anchors
+    return anchors
 
 
 def read_enactment(
@@ -284,34 +283,20 @@ def subclass_from_str(name: str) -> Type:
     return answer
 
 
-@references.log_mentioned_context
 def read_factor(
-    factor_record: Dict,
-    mentioned: Optional[TextLinkDict] = None,
-    report_mentioned: bool = False,
-    **kwargs,
-) -> Union[Optional[Factor], Tuple[Optional[Factor], TextLinkDict]]:
+    record: Dict, regime: Optional[Regime] = None, many: bool = False, **kwargs
+) -> Factor:
     r"""
     Turn fields from a chunk of JSON into a :class:`Factor` object.
 
-    :param factor_record:
+    :param record:
         parameter values to pass to :meth:`Factor.__init__`.
 
-    :param mentioned:
-        a list of relevant :class:`Factor`\s that have already been
-        constructed and can be used in composition of the output
-        :class:`Factor`, instead of constructing new ones.
     """
-    cname = factor_record["type"]
-    mentioned = mentioned or Mentioned({})
-    target_class = subclass_from_str(cname)
-    if target_class == Fact:
-        created_factor = read_fact(factor_record)
-    else:
-        created_factor = read_factor_subclass(
-            target_class, factor_record, mentioned, report_mentioned=True
-        )
-    return (created_factor, mentioned) if report_mentioned else created_factor
+    schema = schemas.FactorSchema(many=many)
+    record, schema.context["mentioned"] = index_names(record)
+    schema.context["regime"] = regime
+    return schema.load(record)
 
 
 def read_factor_subclass(
@@ -397,7 +382,8 @@ def read_holding(
         as values.
     """
     record, mentioned = index_names(record)
-    record, anchors = collect_anchors(record, index_anchors=index_anchors)
+    if index_anchors:
+        anchors = collect_anchors(record, index_anchors=index_anchors, regime=regime)
     schema = schemas.HoldingSchema(many=many)
     schema.context["mentioned"] = mentioned
     schema.context["regime"] = regime
