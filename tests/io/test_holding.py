@@ -76,11 +76,12 @@ class TestEntityImport:
 class TestHoldingImport:
     def test_import_some_holdings(self, make_regime):
         """
-        Don't expect the holdings imported from the JSON to
-        exactly match the holdings created for testing in conftest.
+        Now generates 10, instead of 12, because the "exclusive" Holding
+        is stored with that flag instead of generating Holdings that it
+        implies.
         """
         lotus_holdings = load_holdings("holding_lotus.json", regime=make_regime)
-        assert len(lotus_holdings) == 12
+        assert len(lotus_holdings) == 10
 
     def test_enactment_has_subsection(self, make_opinion_with_holding):
         lotus = make_opinion_with_holding["lotus_majority"]
@@ -136,14 +137,12 @@ class TestHoldingImport:
         """
         The JSON for Bradley repeats identical fields to create the same Factor
         for multiple Rules, instead of using the "name" field as a shortcut.
-        This tests whether the from_json method uses the same Factor object anyway,
-        as if the JSON file had referred to the object by its name field.
+        This tests whether the loaded objects turn out equal.
         """
         brad = make_opinion["brad_majority"]
         brad.holdings = []
         brad.posit(load_holdings("holding_brad.json", regime=make_regime))
         assert any(brad.holdings[6].inputs[0] == x for x in brad.holdings[5].inputs)
-        assert any(brad.holdings[6].inputs[0] is x for x in brad.holdings[5].inputs)
 
     def test_fact_from_loaded_holding(self, make_regime):
         holdings = load_holdings("holding_watt.json", regime=make_regime)

@@ -345,8 +345,7 @@ class FactSchema(ExpandableSchema):
         data = self.get_from_mentioned(data)
         data = self.nest_predicate_fields(data)
         data = self.wrap_single_element_in_list(data, "context_factors")
-        if not data.get("context_factors"):
-            data["predicate"]["content"], data[
+        data["predicate"]["content"], data[
                 "context_factors"
             ] = self.get_references_from_mentioned(data["predicate"]["content"], data["context_factors"])
         data = self.consume_type_field(data)
