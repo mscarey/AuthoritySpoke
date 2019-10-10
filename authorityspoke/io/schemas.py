@@ -12,7 +12,7 @@ from authorityspoke.evidence import Exhibit, Evidence
 from authorityspoke.factors import Factor
 from authorityspoke.facts import Fact
 from authorityspoke.holdings import Holding
-from authorityspoke.io.name_index import Mentioned
+from authorityspoke.io.name_index import Mentioned, add_found_context
 from authorityspoke.pleadings import Pleading, Allegation
 from authorityspoke.predicates import Predicate
 from authorityspoke.procedures import Procedure
@@ -310,7 +310,7 @@ class FactSchema(ExpandableSchema):
         return data
 
     def get_references_from_mentioned(
-        self, content: str, placeholder: str = "{}"
+        self, content: str, context_factors: Optional[List[Dict]] = None, placeholder: str = "{}"
     ) -> Tuple[str, List[Dict]]:
         r"""
         Retrieve known context :class:`Factor`\s for new :class:`Fact`.
@@ -329,20 +329,15 @@ class FactSchema(ExpandableSchema):
         """
         self.context["mentioned"] = self.context.get("mentioned") or Mentioned({})
         self.context["mentioned"] = self.context["mentioned"].sorted_by_length()
+        context_factors = context_factors or []
         mentioned = self.context["mentioned"]
-        context_with_indices: Dict[str, int] = {}
         for factor_name in mentioned:
             if factor_name in content and factor_name != content:
-                factor_index = content.find(factor_name)
-                for named_factor in context_with_indices:
-                    if context_with_indices[named_factor] > factor_index:
-                        context_with_indices[named_factor] -= len(factor_name) - len(
-                            placeholder
-                        )
-                context_with_indices[factor_name] = factor_index
-                content = content.replace(factor_name, placeholder)
-        sorted_factors = sorted(context_with_indices, key=context_with_indices.get)
-        return content, [mentioned.get_by_name(name) for name in sorted_factors]
+                obj = mentioned.get_by_name(factor_name)
+                content, context_factors = add_found_context(
+                    content, context_factors, factor=obj, placeholder=placeholder
+                )
+        return content, context_factors
 
 
     @pre_load
@@ -353,7 +348,7 @@ class FactSchema(ExpandableSchema):
         if not data.get("context_factors"):
             data["predicate"]["content"], data[
                 "context_factors"
-            ] = self.get_references_from_mentioned(data["predicate"]["content"])
+            ] = self.get_references_from_mentioned(data["predicate"]["content"], data["context_factors"])
         data = self.consume_type_field(data)
         return data
 

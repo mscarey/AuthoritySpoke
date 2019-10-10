@@ -47,6 +47,24 @@ class TestCollectMentioned:
 
 
 class TestRetrieveMentioned:
+    def test_add_found_context_to_content(self):
+        fact = {
+            "type": "fact",
+            "predicate": {"content": "{} threw a pie at Larry but it hit {}"},
+            "context_factors": [
+                {"type": "Entity", "name": "Moe"},
+                {"type": "Entity", "name": "Curly"},
+            ],
+        }
+        obj = {"type": "Entity", "name": "Larry"}
+        fact["predicate"]["content"], fact[
+            "context_factors"
+        ] = name_index.add_found_context(
+            fact["predicate"]["content"], fact["context_factors"], obj
+        )
+        assert fact["predicate"]["content"] == "{} threw a pie at {} but it hit {}"
+        assert fact["context_factors"][1]["name"] == "Larry"
+
     def test_retrieve_mentioned_during_load(self):
         """
         Test that the schema can recreate the Entity objects "Alice" and
@@ -97,3 +115,16 @@ class TestRetrieveMentioned:
         new_content, context = schema.get_references_from_mentioned(content)
         assert new_content == "{} threw {} at {}"
         assert context[2] == {"name": "Godzilla", "type": "Entity"}
+
+    def test_unmarked_factor_when_one_was_marked(self):
+        fact = {
+            "type": "fact",
+            "content": "{} lived at Elsinore",
+            "context_factors": [{"type": "Entity", "name": "Hamlet"}],
+        }
+        schema = schemas.FactSchema()
+        schema.context["mentioned"] = name_index.Mentioned(
+            {"Elsinore": {"type": "Entity"}}
+        )
+        loaded = schema.load(fact)
+        assert loaded.predicate.content == "{} lived at {}"

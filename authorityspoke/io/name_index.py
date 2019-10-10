@@ -70,6 +70,25 @@ def get_references_from_string(content: str) -> Tuple[str, List[Dict]]:
     return content, context_factors
 
 
+def add_found_context(
+    content: str, context_factors: List[Dict], factor: Dict, placeholder="{}"
+):
+    """
+    Replace mentions of factor with placeholder and list replacements.
+
+    :returns:
+        Content with mentions of factor replaced by placeholder, and
+        a context_factors list with the factor inserted in a position
+        corresponding to its position in the context phrase.
+    """
+    while factor["name"] in content:
+        index_in_content = content.index(factor["name"])
+        index_in_factor_list = content[:index_in_content].count(placeholder)
+        context_factors.insert(index_in_factor_list, factor)
+        content = content.replace(factor["name"], placeholder, 1)
+    return content, context_factors
+
+
 def expand_shorthand_mentioned(obj: Dict) -> Dict:
     """
     Expand any Entity references that use the curly bracket shorthand.
