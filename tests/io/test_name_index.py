@@ -1,4 +1,4 @@
-from authorityspoke.io import name_index, readers, schemas
+from authorityspoke.io import loaders, name_index, readers, schemas
 
 
 class TestCollectMentioned:
@@ -44,6 +44,18 @@ class TestCollectMentioned:
         mentioned = mentioned.sorted_by_length()
         shortest = mentioned.popitem()
         assert shortest[0] == "Short Name"
+
+    def test_name_inferred_from_content(self, make_regime):
+        """
+        Test that a name field is generated for Factors without them.
+
+        The Factors must be inserted in "mentioned" with the generated name.
+        """
+
+        oracle_records = loaders.load_holdings("holding_oracle.json")
+        oracle_holdings = readers.read_holdings(oracle_records, regime=make_regime)
+        factor = oracle_holdings[2]["rule"]["procedure"]["inputs"][0]
+        assert factor.content == "{} was an original work"
 
 
 class TestRetrieveMentioned:

@@ -44,6 +44,17 @@ class ExpandableSchema(Schema):
                 )
         return data
 
+    def nest_fields(self, data: Dict, nest: str, eggs: List[str]):
+        """
+        Make sure specified fields are nested under "nest" key.
+        """
+        if not data.get(nest):
+            data[nest] = {}
+        for egg_field in eggs:
+            if egg_field in data:
+                data[nest][egg_field] = data.pop(egg_field)
+        return data
+
     def remove_anchors_field(self, data, **kwargs):
         """
         Remove field that may have been used to link objects to :class:`.Opinion` text.
@@ -299,23 +310,6 @@ class FactSchema(ExpandableSchema):
     absent = fields.Bool(missing=False)
     generic = fields.Bool(missing=False)
 
-    def nest_predicate_fields(self, data, **kwargs):
-        """
-        Make sure predicate-related fields are in a dict under "predicate" key.
-        """
-        if not data.get("predicate"):
-            data["predicate"] = {}
-        for predicate_field in [
-            "content",
-            "truth",
-            "reciprocal",
-            "comparison",
-            "quantity",
-        ]:
-            if predicate_field in data:
-                data["predicate"][predicate_field] = data.pop(predicate_field)
-        return data
-
     def get_references_from_mentioned(
         self,
         content: str,
@@ -352,7 +346,14 @@ class FactSchema(ExpandableSchema):
     @pre_load
     def format_data_to_load(self, data, **kwargs):
         data = self.get_from_mentioned(data)
-        data = self.nest_predicate_fields(data)
+        to_nest = [
+            "content",
+            "truth",
+            "reciprocal",
+            "comparison",
+            "quantity",
+        ]
+        data = self.nest_fields(data, nest="predicate", eggs=to_nest)
         data = self.wrap_single_element_in_list(data, "context_factors")
         data["predicate"]["content"], data[
             "context_factors"
@@ -498,6 +499,8 @@ class RuleSchema(ExpandableSchema):
 
     @pre_load
     def format_data_to_load(self, data, **kwargs):
+        data = self.wrap_single_element_in_list(data, "enactments")
+        data = self.wrap_single_element_in_list(data, "enactments_despite")
         procedure_fields = ("inputs", "despite", "outputs")
         data["procedure"] = data.get("procedure") or {}
         for field in procedure_fields:
@@ -519,22 +522,10 @@ class HoldingSchema(ExpandableSchema):
     name = fields.Str(missing=None)
     generic = fields.Bool(missing=False)
 
-    def nest_fields(self, data):
+    def nest_fields_inside_rule(self, data):
         """
         Nest fields inside "rule" and "procedure", if not already nested.
         """
-        rule_fields = (
-            "procedure",
-            "enactments",
-            "enactments_despite",
-            "mandatory",
-            "universal",
-        )
-        data["rule"] = data.get("rule") or {}
-        for field in rule_fields:
-            if field in data:
-                data["rule"][field] = data.pop(field)
-
         data["rule"]["procedure"] = data["rule"].get("procedure") or {}
         procedure_fields = ("inputs", "despite", "outputs")
         for field in procedure_fields:
@@ -548,7 +539,17 @@ class HoldingSchema(ExpandableSchema):
     @pre_load
     def format_data_to_load(self, data, **kwargs):
         data = self.get_from_mentioned(data)
-        data = self.nest_fields(data)
+
+        to_nest = [
+            "procedure",
+            "enactments",
+            "enactments_despite",
+            "mandatory",
+            "universal",
+        ]
+        data = self.nest_fields(data, nest="rule", eggs=to_nest)
+        data = self.nest_fields_inside_rule(data)
+
         data = self.remove_anchors_field(data)
         return data
 

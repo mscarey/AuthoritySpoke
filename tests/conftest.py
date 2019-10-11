@@ -1145,23 +1145,14 @@ def make_opinion() -> Dict[str, Opinion]:
 
 @pytest.fixture(scope="class")
 def make_opinion_with_holding(make_opinion, make_regime) -> Dict[str, Opinion]:
-    test_cases = ("brad", "cardenas", "lotus", "oracle", "watt")
-    test_cases_with_anchors = ("feist",)
+    test_cases = ("brad", "cardenas", "lotus", "oracle", "watt", "feist",)
     opinions = {}
     for case in test_cases:
         for opinion in loaders.load_opinion(f"{case}_h.json", lead_only=False):
             opinions[f"{case}_{opinion.position}"] = opinion
-        opinions[f"{case}_majority"].posit(
-            loaders.load_holdings(f"holding_{case}.json", regime=make_regime)
-        )
-    for case in test_cases_with_anchors:
-        for opinion in loaders.load_opinion(f"{case}_h.json", lead_only=False):
-            opinions[f"{case}_{opinion.position}"] = opinion
-        opinions[f"{case}_majority"].posit(
-            *loaders.load_holdings(
-                f"holding_{case}.json", regime=make_regime, report_mentioned=True
-            )
-        )
+        raw_holdings = loaders.load_holdings(f"holding_{case}.json", regime=make_regime)
+        holdings, anchors = readers.read_holdings(raw_holdings, regime=make_regime, index_anchors=True)
+        opinions[f"{case}_majority"].posit(holdings, text_links=anchors)
     return opinions
 
 

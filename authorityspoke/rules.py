@@ -84,7 +84,7 @@ class Rule(Factor):
     def __post_init__(self):
         for attr in self.enactment_attr_names:
             value = self.__dict__[attr]
-            if isinstance(value, Enactment):
+            if not isinstance(value, Tuple):
                 object.__setattr__(self, attr, self._wrap_with_tuple(value))
 
         if self.procedure is None:

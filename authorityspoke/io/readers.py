@@ -76,15 +76,12 @@ def read_selectors(
     return read_selector(record, many=True)
 
 
-AnchorDict = Dict[Union[Factor, Holding, Enactment], Set[TextQuoteSelector]]
-
-
 def read_anchorable(obj: Dict, regime: Optional[Regime] = None):
     """
     Make an object of any type that can have an anchor field.
     """
     record, mentioned = index_names(obj)
-    if "rule" in record:
+    if "rule" in record or "outputs" in record:
         schema = schemas.HoldingSchema()
     elif "source" in record:
         schema = schemas.EnactmentSchema()
@@ -96,8 +93,8 @@ def read_anchorable(obj: Dict, regime: Optional[Regime] = None):
 
 
 def collect_anchors(
-    obj: Dict, anchors: Optional[AnchorDict] = None, regime: Optional[Regime] = None
-) -> AnchorDict:
+    obj: Dict, anchors: Optional[TextLinkDict] = None, regime: Optional[Regime] = None
+) -> TextLinkDict:
     r"""
     Move anchors fields to a dict linking object names to lists of anchors.
 
@@ -109,11 +106,11 @@ def collect_anchors(
     anchors = anchors or defaultdict(set)
     if isinstance(obj, List):
         for item in obj:
-            anchors = collect_anchors(item, regime=regime)
+            anchors = collect_anchors(item, anchors=anchors, regime=regime)
     if isinstance(obj, Dict):
         for _, value in obj.items():
             if isinstance(value, (Dict, List)):
-                anchors = collect_anchors(value, regime=regime)
+                anchors = collect_anchors(value, anchors=anchors, regime=regime)
         if obj.get("anchors"):
             incoming = obj["anchors"]
             key = read_anchorable(obj, regime=regime)
