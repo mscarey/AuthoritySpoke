@@ -44,17 +44,24 @@ class ExpandableSchema(Schema):
                 )
         return data
 
+    def remove_anchors_field(self, data, **kwargs):
+        """
+        Remove field that may have been used to link objects to :class:`.Opinion` text.
+        """
+        if data.get("anchors"):
+            del data["anchors"]
+        return data
 
     def wrap_single_element_in_list(self, data: Dict, many_element: str):
         """
         Make a specified field a list if it isn't already a list.
         """
-        if (
-            data.get(many_element) is not None
-            and not isinstance(data[many_element], list)
-            ):
+        if data.get(many_element) is not None and not isinstance(
+            data[many_element], list
+        ):
             data[many_element] = [data[many_element]]
         return data
+
 
 class SelectorSchema(ExpandableSchema):
     __model__ = TextQuoteSelector
@@ -111,9 +118,6 @@ class EnactmentSchema(ExpandableSchema):
     source = fields.Url(relative=True)
     selector = fields.Nested(SelectorSchema, missing=None)
 
-    class Meta:
-        unknown = EXCLUDE
-
     def move_selector_fields(self, data, **kwargs):
         """
         Nest fields used for :class:`SelectorSchema` model.
@@ -164,13 +168,13 @@ class EnactmentSchema(ExpandableSchema):
             )
         return code
 
-
     @pre_load
     def format_data_to_load(self, data, **kwargs):
         data = self.get_from_mentioned(data)
         data = self.fix_source_path_errors(data)
         data = self.move_selector_fields(data)
         data = self.consume_type_field(data)
+        data = self.remove_anchors_field(data)
         return data
 
     @post_load
@@ -313,7 +317,10 @@ class FactSchema(ExpandableSchema):
         return data
 
     def get_references_from_mentioned(
-        self, content: str, context_factors: Optional[List[Dict]] = None, placeholder: str = "{}"
+        self,
+        content: str,
+        context_factors: Optional[List[Dict]] = None,
+        placeholder: str = "{}",
     ) -> Tuple[str, List[Dict]]:
         r"""
         Retrieve known context :class:`Factor`\s for new :class:`Fact`.
@@ -342,15 +349,16 @@ class FactSchema(ExpandableSchema):
                 )
         return content, context_factors
 
-
     @pre_load
     def format_data_to_load(self, data, **kwargs):
         data = self.get_from_mentioned(data)
         data = self.nest_predicate_fields(data)
         data = self.wrap_single_element_in_list(data, "context_factors")
         data["predicate"]["content"], data[
-                "context_factors"
-            ] = self.get_references_from_mentioned(data["predicate"]["content"], data["context_factors"])
+            "context_factors"
+        ] = self.get_references_from_mentioned(
+            data["predicate"]["content"], data["context_factors"]
+        )
         data = self.consume_type_field(data)
         return data
 
@@ -454,6 +462,7 @@ class FactorSchema(OneOfSchema, ExpandableSchema):
 
     def pre_load(self, data, **kwargs):
         data = self.get_from_mentioned(data)
+        data = self.remove_anchors_field(data)
         return data
 
     def get_obj_type(self, obj):
@@ -540,7 +549,7 @@ class HoldingSchema(ExpandableSchema):
     def format_data_to_load(self, data, **kwargs):
         data = self.get_from_mentioned(data)
         data = self.nest_fields(data)
-
+        data = self.remove_anchors_field(data)
         return data
 
     @post_load

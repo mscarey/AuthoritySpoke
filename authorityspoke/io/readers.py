@@ -53,7 +53,7 @@ def read_selector(
     """
     if not record:
         return None
-    selector_schema = SelectorSchema(many=many)
+    selector_schema = schemas.SelectorSchema(many=many)
     return selector_schema.load(record)
 
 
@@ -83,11 +83,16 @@ def read_anchorable(obj: Dict, regime: Optional[Regime] = None):
     """
     Make an object of any type that can have an anchor field.
     """
-    if "rule" in obj:
-        return read_holding(obj, regime=regime)
-    elif "source" in obj:
-        return read_enactment(obj, regime=regime)
-    return read_factor(obj)
+    record, mentioned = index_names(obj)
+    if "rule" in record:
+        schema = schemas.HoldingSchema()
+    elif "source" in record:
+        schema = schemas.EnactmentSchema()
+    else:
+        schema = schemas.FactorSchema()
+    schema.context["mentioned"] = mentioned
+    schema.context["regime"] = regime
+    return schema.load(record)
 
 
 def collect_anchors(
@@ -115,7 +120,8 @@ def collect_anchors(
             if not isinstance(incoming, list):
                 incoming = [incoming]
             for selector in incoming:
-                anchors[key].add(selector)
+                built_selector = read_selector(selector)
+                anchors[key].add(built_selector)
 
     return anchors
 
@@ -383,7 +389,7 @@ def read_holding(
     """
     record, mentioned = index_names(record)
     if index_anchors:
-        anchors = collect_anchors(record, index_anchors=index_anchors, regime=regime)
+        anchors = collect_anchors(record, regime=regime)
     schema = schemas.HoldingSchema(many=many)
     schema.context["mentioned"] = mentioned
     schema.context["regime"] = regime

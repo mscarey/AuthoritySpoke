@@ -14,5 +14,7 @@ class TestCollectAnchors:
 
     def test_anchors_from_fact(self):
         anchors = collect_anchors(self.fact)
-        fact = next(anchors.keys())
-        assert anchors[fact][0]["exact"] == "are not copyrightable"
+        fact = list(anchors.keys())[0]
+        assert any(
+            selector.exact == "are not copyrightable" for selector in anchors[fact]
+        )
