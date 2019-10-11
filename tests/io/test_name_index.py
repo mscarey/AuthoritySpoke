@@ -66,6 +66,30 @@ class TestCollectMentioned:
         record, mentioned = name_index.index_names(feist_records)
         assert "securing for authors" in mentioned
 
+    def test_context_factor_not_collapsed(self, make_regime):
+        """
+        There is a context factor listed for this Fact, but it hasn't been collapsed
+        in the content phrase.
+        """
+        holding = {
+            "inputs": {
+                "type": "fact",
+                "content": "Rural's telephone listings were names, towns, and telephone numbers of telephone subscribers",
+                "context_factors": {
+                    "type": "entity",
+                    "name": "Rural's telephone listings",
+                    "plural": True,
+                },
+            },
+            "outputs": {
+                "type": "fact",
+                "content": "Rural's telephone listings were an original work",
+                "truth": False,
+            },
+        }
+        built = readers.read_holding(record=holding, regime=make_regime)
+        assert built.inputs[0].content.startswith("{} were names")
+
     def test_enactment_name_in_holding(self, make_regime):
         """
         Test error message:

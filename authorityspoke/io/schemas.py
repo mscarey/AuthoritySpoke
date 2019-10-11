@@ -13,6 +13,7 @@ from authorityspoke.factors import Factor
 from authorityspoke.facts import Fact
 from authorityspoke.holdings import Holding
 from authorityspoke.io.name_index import Mentioned, add_found_context
+from authorityspoke.io.nesting import nest_fields
 from authorityspoke.pleadings import Pleading, Allegation
 from authorityspoke.predicates import Predicate
 from authorityspoke.procedures import Procedure
@@ -44,16 +45,7 @@ class ExpandableSchema(Schema):
                 )
         return data
 
-    def nest_fields(self, data: Dict, nest: str, eggs: List[str]):
-        """
-        Make sure specified fields are nested under "nest" key.
-        """
-        if not data.get(nest):
-            data[nest] = {}
-        for egg_field in eggs:
-            if egg_field in data:
-                data[nest][egg_field] = data.pop(egg_field)
-        return data
+
 
     def remove_anchors_field(self, data, **kwargs):
         """
@@ -353,7 +345,7 @@ class FactSchema(ExpandableSchema):
             "comparison",
             "quantity",
         ]
-        data = self.nest_fields(data, nest="predicate", eggs=to_nest)
+        data = nest_fields(data, nest="predicate", eggs=to_nest)
         data = self.wrap_single_element_in_list(data, "context_factors")
         data["predicate"]["content"], data[
             "context_factors"
@@ -547,7 +539,7 @@ class HoldingSchema(ExpandableSchema):
             "mandatory",
             "universal",
         ]
-        data = self.nest_fields(data, nest="rule", eggs=to_nest)
+        data = nest_fields(data, nest="rule", eggs=to_nest)
         data = self.nest_fields_inside_rule(data)
 
         data = self.remove_anchors_field(data)
