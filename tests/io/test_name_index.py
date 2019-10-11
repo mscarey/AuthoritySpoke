@@ -29,11 +29,11 @@ class TestCollectMentioned:
     }
 
     def test_expand_shorthand(self):
-        obj = name_index.expand_shorthand_mentioned(self.relevant_dict)
+        obj = name_index.recursively_expand_shorthand(self.relevant_dict)
         assert obj["context_factors"][0]["context_factors"][0]["name"] == "Short Name"
 
     def test_mentioned_from_fact_and_entities(self):
-        obj = name_index.expand_shorthand_mentioned(self.relevant_dict)
+        obj = name_index.recursively_expand_shorthand(self.relevant_dict)
         mentioned = name_index.collect_mentioned(self.relevant_dict)
         assert mentioned["relevant fact"]["type"] == "Fact"
         shooting = mentioned["relevant fact"]["context_factors"][0]
@@ -54,8 +54,26 @@ class TestCollectMentioned:
 
         oracle_records = loaders.load_holdings("holding_oracle.json")
         oracle_holdings = readers.read_holdings(oracle_records, regime=make_regime)
-        factor = oracle_holdings[2]["rule"]["procedure"]["inputs"][0]
+        factor = oracle_holdings[2].inputs[0]
         assert factor.content == "{} was an original work"
+
+    def test_enactment_name_index(self, make_regime):
+        """
+        Test error message:
+        'Name "securing for authors" not found in the index of mentioned Factors'
+        """
+        feist_records = loaders.load_holdings("holding_feist.json")
+        record, mentioned = name_index.index_names(feist_records)
+        assert "securing for authors" in mentioned
+
+    def test_enactment_name_in_holding(self, make_regime):
+        """
+        Test error message:
+        'Name "securing for authors" not found in the index of mentioned Factors'
+        """
+        feist_records = loaders.load_holdings("holding_feist.json")
+        feist_holdings = readers.read_holdings(feist_records, regime=make_regime)
+        assert "securing for authors" in str(feist_holdings)
 
 
 class TestRetrieveMentioned:

@@ -154,6 +154,11 @@ class Fact(Factor):
         return []
 
     @property
+    def content(self) -> Optional[str]:
+        """Access :attr:`~Predicate.content` attribute."""
+        return self.predicate.content
+
+    @property
     def truth(self) -> Optional[bool]:
         """Access :attr:`~Predicate.truth` attribute."""
         return self.predicate.truth

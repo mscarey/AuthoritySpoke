@@ -99,10 +99,6 @@ def expand_shorthand_mentioned(obj: Dict) -> Dict:
     :returns:
         the input object, but with shorthand references expanded.
     """
-    if isinstance(obj, List):
-        return [expand_shorthand_mentioned(item) for item in obj]
-    if not isinstance(obj, Dict):
-        return obj
     if obj.get("content") and not obj.get("context_factors"):
         obj["content"], obj["context_factors"] = get_references_from_string(
             obj["content"]
@@ -112,9 +108,6 @@ def expand_shorthand_mentioned(obj: Dict) -> Dict:
             "context_factors"
         ] = get_references_from_string(obj["predicate"]["content"])
 
-    for key, value in obj.items():
-        if isinstance(value, (Dict, List)) and key != "predicate":
-            obj[key] = expand_shorthand_mentioned(value)
     return obj
 
 
@@ -137,6 +130,69 @@ def collect_mentioned(obj: Dict, mentioned: Optional[Mentioned] = None) -> Menti
     return mentioned
 
 
+def name_from_content(content: str, truth: Optional[bool] = None):
+    false_modifier = "False " if truth is False else ""
+    return f"{false_modifier}{content}"
+
+
+def assign_names_from_content(obj: Dict) -> Dict:
+    """
+    Use the content to assign a name to any :class:`.Fact` that lacks one.
+
+    :param obj:
+        object loaded from JSON to make a :class:`.Factor` or :class:`.Holding`
+
+    :returns:
+        the input object, but with names assigned.
+    """
+
+    if obj.get("content") and not obj.get("name"):
+        obj["name"] = name_from_content(obj["content"], obj.get("truth"))
+
+    elif obj.get("predicate", {}).get("content") and not obj.get("name"):
+        obj["name"] = name_from_content(
+            obj["predicate"]["content"], obj["predicate"].get("truth")
+        )
+    return obj
+
+
+def wrap_single_element_in_list(data: Dict, many_element: str):
+    """
+    Make a specified field a list if it isn't already a list.
+    """
+    if data.get(many_element) is not None and not isinstance(data[many_element], list):
+        data[many_element] = [data[many_element]]
+    return data
+
+
+def expand_node_shorthand(obj: Dict):
+    if obj.get("context_factors") is not None and not isinstance(
+        obj["context_factors"], list
+    ):
+        obj["context_factors"] = [obj["context_factors"]]
+
+    obj = expand_shorthand_mentioned(obj)
+    obj = assign_names_from_content(obj)
+    return obj
+
+
+def recursively_expand_shorthand(obj: Dict):
+    """
+    Traverse dict and expand every kind of pre-loading shorthand.
+    """
+    if isinstance(obj, List):
+        return [recursively_expand_shorthand(item) for item in obj]
+    if not isinstance(obj, Dict):
+        return obj
+
+    obj = expand_node_shorthand(obj)
+
+    for key, value in obj.items():
+        if isinstance(value, (Dict, List)) and key != "predicate":
+            obj[key] = recursively_expand_shorthand(value)
+    return obj
+
+
 def index_names(obj: Dict) -> Tuple[Dict, Mentioned]:
     """
     Call all functions to prepare "mentioned" index.
@@ -148,6 +204,6 @@ def index_names(obj: Dict) -> Tuple[Dict, Mentioned]:
         a modified version of the dict to load, plus a dict of names
         and the objects to expand them with.
     """
-    obj = expand_shorthand_mentioned(obj)
+    obj = recursively_expand_shorthand(obj)
     mentioned = collect_mentioned(obj)
     return obj, mentioned
