@@ -532,6 +532,7 @@ class HoldingSchema(ExpandableSchema):
     def format_data_to_load(self, data, **kwargs):
         data = self.get_from_mentioned(data)
 
+        data["rule"] = data.get("rule") or {}
         to_nest = [
             "procedure",
             "enactments",

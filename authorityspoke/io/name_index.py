@@ -80,7 +80,7 @@ def collapse_name_in_content(
     content = content.replace(name, placeholder, 1)
     double_placeholder = placeholder[0] + placeholder + placeholder[1]
     if double_placeholder in content:
-        content.replace(double_placeholder, placeholder, 1)
+        content = content.replace(double_placeholder, placeholder, 1)
     return content
 
 
