@@ -59,7 +59,7 @@ class TestEntityImport:
     ]
 
     def test_expand_shorthand(self):
-        expanded = name_index.expand_shorthand_mentioned(self.smith_holdings)
+        expanded = name_index.recursively_expand_shorthand(self.smith_holdings)
         fact = expanded[1]["inputs"][0]
         assert fact["context_factors"][0]["name"] == "Smythe"
 
@@ -82,6 +82,58 @@ class TestHoldingImport:
         """
         lotus_holdings = load_holdings("holding_lotus.json", regime=make_regime)
         assert len(lotus_holdings) == 10
+
+    def test_holding_without_enactments_or_regime(self):
+        holding = {
+            "inputs": {"type": "fact", "content": "{Bradley} lived at Bradley's house"},
+            "outputs": {
+                "type": "evidence",
+                "to_effect": {
+                    "type": "fact",
+                    "name": "fact that Bradley committed a crime",
+                    "content": "Bradley committed a crime",
+                },
+                "name": "evidence of Bradley's guilt",
+                "absent": True,
+            },
+        }
+        built = readers.read_holding(holding)
+        new_factor = built.outputs[0].to_effect.context_factors[0]
+        assert new_factor.name == "Bradley"
+
+    def test_mentioned_context_changing(self):
+        """
+        The "mentioned" context should not change while data
+        is being loaded with the schema. This is to test
+        that the "content" field of a value in the "mentioned"
+        dict isn't changed to replace the name of a Factor
+        with bracketed text.
+        """
+        holdings = [
+            {
+                "inputs": {
+                    "type": "fact",
+                    "content": "{Bradley} lived at Bradley's house",
+                },
+                "outputs": {
+                    "type": "evidence",
+                    "to_effect": {
+                        "type": "fact",
+                        "name": "fact that Bradley committed a crime",
+                        "content": "Bradley committed a crime",
+                    },
+                    "name": "evidence of Bradley's guilt",
+                    "absent": True,
+                },
+            },
+            {
+                "inputs": "fact that Bradley committed a crime",
+                "outputs": {"type": "fact", "content": "Bradley committed a tort"},
+            },
+        ]
+        built = readers.read_holdings(holdings)
+        new_factor = built[1].outputs[0].to_effect.context_factors[0]
+        assert new_factor.name == "Bradley"
 
     def test_enactment_has_subsection(self, make_opinion_with_holding):
         lotus = make_opinion_with_holding["lotus_majority"]
@@ -123,35 +175,33 @@ class TestHoldingImport:
             lotus.holdings[0].enactments[0].code is lotus.holdings[1].enactments[0].code
         )
 
-    def test_same_enactment_in_two_opinions(self, make_regime, make_opinion):
-        watt = make_opinion["watt_majority"]
-        watt.posit(load_holdings("holding_watt.json", regime=make_regime))
-        brad = make_opinion["brad_majority"]
-        brad.posit(load_holdings("holding_brad.json", regime=make_regime))
+    def test_same_enactment_in_two_opinions(self, make_opinion_with_holding):
+        watt = make_opinion_with_holding["watt_majority"]
+        brad = make_opinion_with_holding["brad_majority"]
         assert any(
             watt.holdings[0].enactments[0].means(brad_enactment)
             for brad_enactment in brad.holdings[0].enactments
         )
 
-    def test_same_object_for_enactment_in_import(self, make_opinion, make_regime):
+    def test_same_object_for_enactment_in_import(self, make_opinion_with_holding):
         """
         The JSON for Bradley repeats identical fields to create the same Factor
         for multiple Rules, instead of using the "name" field as a shortcut.
         This tests whether the loaded objects turn out equal.
         """
-        brad = make_opinion["brad_majority"]
-        brad.holdings = []
-        brad.posit(load_holdings("holding_brad.json", regime=make_regime))
+        brad = make_opinion_with_holding["brad_majority"]
         assert any(brad.holdings[6].inputs[0] == x for x in brad.holdings[5].inputs)
 
     def test_fact_from_loaded_holding(self, make_regime):
-        holdings = load_holdings("holding_watt.json", regime=make_regime)
+        to_read = load_holdings("holding_watt.json", regime=make_regime)
+        holdings = readers.read_holdings(to_read, regime=make_regime)
         new_fact = holdings[0].inputs[1]
         assert "lived at <Hideaway Lodge>" in str(new_fact)
         assert isinstance(new_fact.context_factors[0], Entity)
 
     def test_fact_with_quantity(self, make_regime):
-        holdings = load_holdings("holding_watt.json", regime=make_regime)
+        to_read = load_holdings("holding_watt.json")
+        holdings = readers.read_holdings(to_read, regime=make_regime)
         new_fact = holdings[1].inputs[3]
         assert "was no more than 35 foot" in str(new_fact)
 

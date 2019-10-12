@@ -30,10 +30,9 @@ class ExpandableSchema(Schema):
         """
         Replaces data to load with any object with same name in "mentioned".
         """
-
-        self.context["mentioned"] = self.context.get("mentioned") or Mentioned()
         if isinstance(data, str):
-            return self.context["mentioned"].get_by_name(data)
+            mentioned = self.context.get("mentioned") or Mentioned()
+            return mentioned.get_by_name(data)
         return data
 
     def consume_type_field(self, data, **kwargs):
@@ -323,10 +322,8 @@ class FactSchema(ExpandableSchema):
             replaced by placeholder, and a list of referenced
             :class:`Factor`\s in the order they appeared in content.
         """
-        self.context["mentioned"] = self.context.get("mentioned") or Mentioned({})
-        self.context["mentioned"] = self.context["mentioned"].sorted_by_length()
+        mentioned = self.context.get("mentioned") or Mentioned({})
         context_factors = context_factors or []
-        mentioned = self.context["mentioned"]
         for factor_name in mentioned:
             if factor_name in content and factor_name != content:
                 obj = mentioned.get_by_name(factor_name)
@@ -337,7 +334,7 @@ class FactSchema(ExpandableSchema):
 
     @pre_load
     def format_data_to_load(self, data, **kwargs):
-        data = self.get_from_mentioned(data)
+        data = self.get_from_mentioned(data).copy()
         to_nest = [
             "content",
             "truth",

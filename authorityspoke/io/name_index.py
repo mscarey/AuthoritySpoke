@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from collections import OrderedDict
+from copy import deepcopy
 from re import findall
 
 from typing import Dict, List, Optional, Tuple, Union
@@ -21,8 +22,8 @@ class Mentioned(OrderedDict):
             raise ValidationError(
                 f'Name "{name}" not found in the index of mentioned Factors'
             )
-        value = self[name].copy()
-        value["name"] = name
+        value = {"name": name}
+        value.update(self[name])
         return value
 
     def sorted_by_length(self) -> Mentioned:
@@ -241,4 +242,5 @@ def index_names(obj: Dict) -> Tuple[Dict, Mentioned]:
     """
     obj = recursively_expand_shorthand(obj)
     mentioned = collect_mentioned(obj)
-    return obj, mentioned
+    sorted_mentioned = mentioned.sorted_by_length()
+    return obj, sorted_mentioned

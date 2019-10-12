@@ -84,11 +84,14 @@ class Fact(Factor):
             object.__setattr__(self, "context_factors", context_factors)
 
         if len(self.context_factors) != len(self.predicate):
-            raise ValueError(
+            message = (
                 "The number of items in 'context_factors' must be "
                 + f"{len(self.predicate)}, to match predicate.context_slots "
                 + f"for '{self.predicate.content}'"
             )
+            if hasattr(self, "name"):
+                message += f" for '{self.name}'"
+            raise ValueError(message)
         if any(not isinstance(s, Factor) for s in self.context_factors):
             raise TypeError(
                 "Items in the context_factors parameter should "

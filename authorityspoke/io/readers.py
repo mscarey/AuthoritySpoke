@@ -388,7 +388,8 @@ def read_holding(
     if index_anchors:
         anchors = collect_anchors(record, regime=regime)
     schema = schemas.HoldingSchema(many=many)
-    schema.context["mentioned"] = mentioned
+    sorted_mentioned = mentioned.sorted_by_length()
+    schema.context["mentioned"] = sorted_mentioned
     schema.context["regime"] = regime
     answer = schema.load(record)
     return (answer, anchors) if index_anchors else answer
