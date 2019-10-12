@@ -63,6 +63,7 @@ def get_references_from_string(
     """
     pattern = r"\{([^\{]+)\}"
     entities_as_text = findall(pattern, content)
+    entities_as_text.sort(key=len, reverse=True)
     context_factors = context_factors or []
     for entity_name in entities_as_text:
         entity = {"type": "Entity", "name": entity_name}
@@ -145,7 +146,7 @@ def collect_mentioned(obj: Dict, mentioned: Optional[Mentioned] = None) -> Menti
 
 def name_from_content(content: str, truth: Optional[bool] = None):
     false_modifier = "False " if truth is False else ""
-    return f"{false_modifier}{content}"
+    return f"{false_modifier}{content}".replace("{", "").replace("}", "")
 
 
 def assign_names_from_content(obj: Dict) -> Dict:
@@ -159,7 +160,11 @@ def assign_names_from_content(obj: Dict) -> Dict:
         the input object, but with names assigned.
     """
 
-    if obj.get("predicate", {}).get("content") and not obj.get("name"):
+    if (
+        obj.get("predicate", {}).get("content")
+        and not obj.get("name")
+        and not obj.get("context_factors")
+    ):
         obj["name"] = name_from_content(
             obj["predicate"]["content"], obj["predicate"].get("truth")
         )

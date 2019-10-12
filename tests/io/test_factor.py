@@ -77,9 +77,7 @@ class TestFactLoad:
                 "content": "{Alice} sold {Alice's house} for a price in dollars of > 300000"
             }
         )
-        assert any(
-            context.name == "Alice's house" for context in house_fact.generic_factors
-        )
+        assert house_fact.context_factors[1].name == "Alice's house"
 
     def test_import_predicate_with_quantity(self):
         story = readers.read_fact(

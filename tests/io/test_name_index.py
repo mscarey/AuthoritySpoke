@@ -88,7 +88,9 @@ class TestCollectMentioned:
             },
         }
         built = readers.read_holding(record=holding, regime=make_regime)
-        assert built.inputs[0].content.startswith("{} were names")
+        assert built.inputs[0].short_string.startswith(
+            "the fact that <Rural's telephone listings> were names"
+        )
 
     def test_enactment_name_in_holding(self, make_regime):
         """

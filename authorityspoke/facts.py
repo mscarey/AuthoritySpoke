@@ -86,7 +86,8 @@ class Fact(Factor):
         if len(self.context_factors) != len(self.predicate):
             raise ValueError(
                 "The number of items in 'context_factors' must be "
-                + f"{len(self.predicate)}, to match predicate.context_slots"
+                + f"{len(self.predicate)}, to match predicate.context_slots "
+                + f"for '{self.predicate.content}'"
             )
         if any(not isinstance(s, Factor) for s in self.context_factors):
             raise TypeError(
