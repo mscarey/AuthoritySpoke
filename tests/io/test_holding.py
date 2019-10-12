@@ -135,6 +135,7 @@ class TestHoldingImport:
         new_factor = built[1].outputs[0].to_effect.context_factors[0]
         assert new_factor.name == "Bradley"
 
+
     def test_enactment_has_subsection(self, make_opinion_with_holding):
         lotus = make_opinion_with_holding["lotus_majority"]
         assert lotus.holdings[8].enactments[0].source.split("/")[-1] == "b"

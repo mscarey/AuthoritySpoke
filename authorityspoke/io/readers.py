@@ -8,6 +8,7 @@ from collections import defaultdict
 import datetime
 from functools import partial
 
+from types import MappingProxyType
 from typing import Any, Dict, List, Iterable, Iterator
 from typing import Optional, Set, Tuple, Type, Union
 
@@ -388,8 +389,8 @@ def read_holding(
     if index_anchors:
         anchors = collect_anchors(record, regime=regime)
     schema = schemas.HoldingSchema(many=many)
-    sorted_mentioned = mentioned.sorted_by_length()
-    schema.context["mentioned"] = sorted_mentioned
+    proxy = MappingProxyType(mentioned)
+    schema.context["mentioned"] = proxy
     schema.context["regime"] = regime
     answer = schema.load(record)
     return (answer, anchors) if index_anchors else answer

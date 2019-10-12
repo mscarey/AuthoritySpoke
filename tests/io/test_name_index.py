@@ -149,6 +149,38 @@ class TestRetrieveMentioned:
         relevant_fact = readers.read_fact(relevant_dict)
         assert relevant_fact.context_factors[1].context_factors[1].name == "Bob"
 
+    def test_get_references_without_changing_mentioned(self):
+        """
+        This isn't catching the bug where the mentioned dict is mutated.
+        """
+        schema = schemas.HoldingSchema()
+        schema.context["mentioned"] = {
+            "Bradley": {"type": "entity"},
+            "fact that Bradley committed a crime": {
+                "type": "fact",
+                "content": "Bradley committed a crime",
+            },
+        }
+        assert (
+            schema.context["mentioned"]["fact that Bradley committed a crime"][
+                "content"
+            ]
+            == "Bradley committed a crime"
+        )
+        new = {
+            "inputs": "fact that Bradley committed a crime",
+            "outputs": {"type": "fact", "content": "Bradley committed a tort"},
+        }
+        holding = schema.load(new)
+        assert holding.inputs[0].context_factors[0].name == "Bradley"
+        # Making the same assertion again to show it's still true
+        assert (
+            schema.context["mentioned"]["fact that Bradley committed a crime"][
+                "content"
+            ]
+            == "Bradley committed a crime"
+        )
+
     def test_retrieve_references_with_substring(self):
         """
         The Mentioned object must be sorted longest to shortest.

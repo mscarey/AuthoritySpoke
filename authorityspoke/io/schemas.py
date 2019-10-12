@@ -12,7 +12,7 @@ from authorityspoke.evidence import Exhibit, Evidence
 from authorityspoke.factors import Factor
 from authorityspoke.facts import Fact
 from authorityspoke.holdings import Holding
-from authorityspoke.io.name_index import Mentioned, add_found_context
+from authorityspoke.io.name_index import Mentioned, add_found_context, get_by_name
 from authorityspoke.io.nesting import nest_fields
 from authorityspoke.pleadings import Pleading, Allegation
 from authorityspoke.predicates import Predicate
@@ -32,7 +32,7 @@ class ExpandableSchema(Schema):
         """
         if isinstance(data, str):
             mentioned = self.context.get("mentioned") or Mentioned()
-            return mentioned.get_by_name(data)
+            return get_by_name(mentioned, data)
         return data
 
     def consume_type_field(self, data, **kwargs):
@@ -326,7 +326,7 @@ class FactSchema(ExpandableSchema):
         context_factors = context_factors or []
         for factor_name in mentioned:
             if factor_name in content and factor_name != content:
-                obj = mentioned.get_by_name(factor_name)
+                obj = get_by_name(mentioned, factor_name)
                 content, context_factors = add_found_context(
                     content, context_factors, factor=obj, placeholder=placeholder
                 )
@@ -347,7 +347,7 @@ class FactSchema(ExpandableSchema):
         data["predicate"]["content"], data[
             "context_factors"
         ] = self.get_references_from_mentioned(
-            data["predicate"]["content"], data["context_factors"]
+            data["predicate"]["content"], data.get("context_factors")
         )
         data = self.consume_type_field(data)
         return data

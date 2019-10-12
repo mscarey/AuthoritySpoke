@@ -5,11 +5,21 @@ from collections import OrderedDict
 from copy import deepcopy
 from re import findall
 
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Mapping, Optional, Tuple, Union
 
 from marshmallow import ValidationError
 
 from authorityspoke.io.nesting import nest_fields
+
+
+def get_by_name(mapping: Mapping, name: str) -> Dict:
+    if not mapping.get(name):
+        raise ValidationError(
+            f'Name "{name}" not found in the index of mentioned Factors'
+        )
+    value = {"name": name}
+    value.update(mapping[name])
+    return value
 
 
 class Mentioned(OrderedDict):
