@@ -27,7 +27,8 @@ class TestEnactmentImport:
         enactment = readers.read_enactment(record, regime=make_regime)
         assert "all relevant evidence is admissible" in enactment.text
 
-    def test_enactment_import_from_holding(self, make_opinion_with_holding):
-        holdings = make_opinion_with_holding["cardenas_majority"].holdings
+    def test_enactment_import_from_holding(self, make_regime):
+        holding_cardenas = load_holdings("holding_cardenas.json")
+        holdings = readers.read_holdings(holding_cardenas, regime=make_regime)
         enactment_list = holdings[0].enactments
         assert "all relevant evidence is admissible" in enactment_list[0].text

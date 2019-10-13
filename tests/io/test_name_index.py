@@ -154,13 +154,15 @@ class TestRetrieveMentioned:
         This isn't catching the bug where the mentioned dict is mutated.
         """
         schema = schemas.HoldingSchema()
-        schema.context["mentioned"] = {
-            "Bradley": {"type": "entity"},
-            "fact that Bradley committed a crime": {
-                "type": "fact",
-                "content": "Bradley committed a crime",
-            },
-        }
+        schema.context["mentioned"] = name_index.Mentioned(
+            {
+                "Bradley": {"type": "entity"},
+                "fact that Bradley committed a crime": {
+                    "type": "fact",
+                    "content": "Bradley committed a crime",
+                },
+            }
+        )
         assert (
             schema.context["mentioned"]["fact that Bradley committed a crime"][
                 "content"

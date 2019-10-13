@@ -10,7 +10,7 @@ from authorityspoke.holdings import Holding
 from authorityspoke.opinions import Opinion
 from authorityspoke.predicates import Predicate
 from authorityspoke.procedures import Procedure
-from authorityspoke.io import readers, dump, name_index
+from authorityspoke.io import loaders, readers, dump, name_index
 from authorityspoke.io.loaders import load_holdings
 from authorityspoke.io import filepaths
 from authorityspoke.rules import Rule
@@ -82,6 +82,117 @@ class TestHoldingImport:
         """
         lotus_holdings = load_holdings("holding_lotus.json", regime=make_regime)
         assert len(lotus_holdings) == 10
+
+    def test_import_enactments_and_anchors(self, make_regime):
+        """
+        Testing issue that enactment expansion fails only when
+        text anchors are loaded.
+        """
+        raw_holdings = [{
+        "inputs": {
+            "type": "fact",
+            "content": "{Rural's telephone directory} was a fact",
+            "anchors": [{
+                    "exact": "facts",
+                    "prefix": "The first is that"
+                },
+                {
+                    "exact": "as to facts",
+                    "prefix": "No one may claim originality"
+                },
+                {
+                    "exact": "facts",
+                    "prefix": "no one may copyright"
+                }
+            ]
+        },
+        "outputs": {
+            "type": "fact",
+            "content": "Rural's telephone directory was copyrightable",
+            "truth": False,
+            "anchors": [{
+                "exact": "are not copyrightable",
+                "prefix": "The first is that facts"
+            }, {
+                "exact": "no one may copyright",
+                "suffix": "facts"
+            }]
+        },
+        "enactments": [{
+                "source": "/us/const/article-I/8/8",
+                "exact": "To promote the Progress of Science and useful Arts, by securing for limited Times to Authors",
+                "name": "securing for authors"
+            }, {
+                "source": "/us/const/article-I/8/8",
+                "exact": "the exclusive Right to their respective Writings",
+                "name": "right to writings"
+            }
+        ],
+        "mandatory": True,
+        "universal": True
+        },
+        {
+        "outputs": {
+            "type": "fact",
+            "content": "Rural's telephone directory was copyrightable",
+            "anchors": [{
+                "exact": "copyrightable",
+                "prefix": "first is that facts are not"
+            }, "The sine qua non of|copyright|"]
+        },
+        "enactments": ["securing for authors", "right to writings"],
+        "mandatory": True,
+        "anchors": "compilations of facts|generally are|"
+        }]
+        feist_holdings, anchors = readers.read_holdings(
+            raw_holdings, regime=make_regime, index_anchors=True
+        )
+        assert feist_holdings[0].enactments[0].name == "securing for authors"
+        assert feist_holdings[1].enactments[0].name == "securing for authors"
+
+
+    def test_import_feist_holdings_with_enactments(self, make_regime):
+        """
+        Testing error message:
+        'Name "securing for authors" not found in the index of mentioned Factors'
+
+        Delete if this and the test above both pass
+        """
+        raw_holdings = load_holdings(f"holding_feist.json", regime=make_regime)
+        feist_holdings, anchors = readers.read_holdings(
+            raw_holdings, regime=make_regime, index_anchors=True
+        )
+        assert feist_holdings[0].enactments[0].name == "securing for authors"
+
+    def test_import_holdings_from_multiple_cases(self, make_regime):
+        """
+        Test whether loading two cases in a row causes a problem.
+        """
+        test_cases = ("feist", "lotus", "oracle", "brad", "watt", "cardenas")
+        opinions = {}
+        for case in test_cases:
+            for opinion in loaders.load_opinion(f"{case}_h.json", lead_only=False):
+                opinions[f"{case}_{opinion.position}"] = opinion
+            raw_holdings = loaders.load_holdings(
+                f"holding_{case}.json", regime=make_regime
+            )
+            holdings, anchors = readers.read_holdings(
+                raw_holdings, regime=make_regime, index_anchors=True)
+            opinions[f"{case}_majority"].posit(holdings)
+        factor = opinions["lotus_majority"].holdings[0].inputs[0]
+        assert factor.predicate.content == "the {} was copyrightable"
+
+    def test_import_holdings_with_anchors(self, make_regime):
+        """
+        Test whether index_anchors flag causes holding loading to break.
+        """
+        raw_holdings = load_holdings(f"holding_oracle.json", regime=make_regime)
+        oracle_holdings, anchors = readers.read_holdings(
+            raw_holdings, regime=make_regime, index_anchors=True
+        )
+
+        assert isinstance(oracle_holdings[0], Holding)
+        assert isinstance(anchors.popitem()[1].pop(), TextQuoteSelector)
 
     def test_holding_without_enactments_or_regime(self):
         holding = {

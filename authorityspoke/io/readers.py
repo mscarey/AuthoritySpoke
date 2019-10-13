@@ -387,7 +387,7 @@ def read_holding(
     """
     record, mentioned = index_names(record)
     if index_anchors:
-        anchors = collect_anchors(record, regime=regime)
+        anchors = collect_anchors(deepcopy(record), regime=regime)
     schema = schemas.HoldingSchema(many=many)
 
     proxy = deepcopy(mentioned)
