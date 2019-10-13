@@ -155,7 +155,7 @@ def collect_mentioned(obj: Dict, mentioned: Optional[Mentioned] = None) -> Menti
 
 
 def name_from_content(content: str, truth: Optional[bool] = None):
-    false_modifier = "False " if truth is False else ""
+    false_modifier = "false " if truth is False else ""
     return f"{false_modifier}{content}".replace("{", "").replace("}", "")
 
 
