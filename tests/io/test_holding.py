@@ -132,9 +132,8 @@ class TestHoldingImport:
             },
         ]
         built = readers.read_holdings(holdings)
-        new_factor = built[1].outputs[0].to_effect.context_factors[0]
+        new_factor = built[0].outputs[0].to_effect.context_factors[0]
         assert new_factor.name == "Bradley"
-
 
     def test_enactment_has_subsection(self, make_opinion_with_holding):
         lotus = make_opinion_with_holding["lotus_majority"]
@@ -209,13 +208,17 @@ class TestHoldingImport:
     def test_use_int_not_pint_without_dimension(self, make_regime, make_opinion):
 
         brad = make_opinion["brad_majority"]
-        brad.posit(load_holdings("holding_brad.json", regime=make_regime))
+        to_read = load_holdings("holding_brad.json")
+        holdings = readers.read_holdings(to_read, regime=make_regime)
+        brad.posit(holdings)
         assert "dimensionless" not in str(brad.holdings[6])
         assert isinstance(brad.holdings[6].inputs[0].predicate.quantity, int)
 
     def test_opinion_posits_holding(self, make_opinion, make_regime):
         brad = make_opinion["brad_majority"]
-        brad.posit(load_holdings("holding_brad.json", regime=make_regime))
+        to_read = load_holdings("holding_brad.json")
+        holdings = readers.read_holdings(to_read, regime=make_regime)
+        brad.posit(holdings)
         assert "warrantless search and seizure" in str(brad.holdings[0])
 
     def test_opinion_posits_holding_tuple_context(
@@ -225,15 +228,14 @@ class TestHoldingImport:
         Having the Watt case posit a holding from the Brad
         case, but with generic factors from Watt.
         """
-        watt = make_opinion["watt_majority"]
-        brad = make_opinion["brad_majority"]
-        brad.posit(load_holdings("holding_brad.json", regime=make_regime))
-        context_holding = brad.holdings[6].new_context(
+        to_read = load_holdings("holding_brad.json")
+        brad_holdings = readers.read_holdings(to_read, regime=make_regime)
+        context_holding = brad_holdings[6].new_context(
             [make_entity["watt"], make_entity["trees"], make_entity["motel"]]
         )
+        watt = make_opinion["watt_majority"]
         watt.posit(context_holding)
         holding_string = str(watt.holdings[-1])
-        print("breakpoint")
         assert (
             "the number of marijuana plants in <the stockpile of trees> was at least 3"
             in holding_string
@@ -249,7 +251,9 @@ class TestHoldingImport:
         """
         watt = make_opinion["watt_majority"]
         brad = make_opinion["brad_majority"]
-        brad.posit(load_holdings("holding_brad.json", regime=make_regime))
+        to_read = load_holdings("holding_brad.json", regime=make_regime)
+        holdings = readers.read_holdings(to_read, regime=make_regime)
+        brad.posit(holdings)
         context_holding = brad.holdings[6].new_context(
             {brad.holdings[6].generic_factors[0]: make_entity["watt"]}
         )
@@ -267,8 +271,9 @@ class TestHoldingImport:
         This test originally required a ValueError, but why should it?
         """
         brad = make_opinion["brad_majority"]
-        some_holdings = load_holdings("holding_brad.json", regime=make_regime)
-        brad.posit(some_holdings)
+        to_read = load_holdings("holding_brad.json", regime=make_regime)
+        holdings = readers.read_holdings(to_read, regime=make_regime)
+        brad.posit(holdings)
         context_change = brad.holdings[6].new_context(
             {brad.holdings[6].generic_factors[1]: make_entity["trees_specific"]}
         )

@@ -199,6 +199,7 @@ class TestRetrieveMentioned:
         )
         content = "Mecha Godzilla threw Mothra at Godzilla"
         schema = schemas.FactSchema()
+        mentioned = mentioned.sorted_by_length()
         schema.context["mentioned"] = mentioned
         new_content, context = schema.get_references_from_mentioned(content)
         assert new_content == "{} threw {} at {}"
