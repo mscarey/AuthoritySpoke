@@ -12,20 +12,11 @@ from marshmallow import ValidationError
 from authorityspoke.io.nesting import nest_fields
 
 
-def get_by_name(mapping: Mapping, name: str) -> Dict:
-    if not mapping.get(name):
-        raise ValidationError(
-            f'Name "{name}" not found in the index of mentioned Factors'
-        )
-    value = {"name": name}
-    value.update(mapping[name])
-    return value
-
-
 class Mentioned(OrderedDict):
-    def insert_by_name(self, obj: Dict):
+    def insert_by_name(self, obj: Dict) -> None:
         self[obj["name"]] = obj.copy()
         self[obj["name"]].pop("name")
+        return None
 
     def get_by_name(self, name: str) -> Dict:
         if not self.get(name):
@@ -34,7 +25,7 @@ class Mentioned(OrderedDict):
             )
         value = {"name": name}
         value.update(self[name])
-        return value
+        return deepcopy(value)
 
     def sorted_by_length(self) -> Mentioned:
         return Mentioned(sorted(self.items(), key=lambda t: len(t[0]), reverse=True))

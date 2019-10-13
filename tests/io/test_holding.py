@@ -224,13 +224,15 @@ class TestHoldingImport:
         allegation = built[0].inputs[1]
         assert allegation.statement.context_factors[0].name == "defendant"
 
-    def test_enactment_has_subsection(self, make_opinion_with_holding):
-        lotus = make_opinion_with_holding["lotus_majority"]
-        assert lotus.holdings[8].enactments[0].source.split("/")[-1] == "b"
+    def test_enactment_has_subsection(self, make_regime):
+        to_read = load_holdings("holding_lotus.json")
+        holdings = readers.read_holdings(to_read, regime=make_regime)
+        assert holdings[8].enactments[0].source.split("/")[-1] == "b"
 
-    def test_enactment_text_limited_to_subsection(self, make_opinion_with_holding):
-        lotus = make_opinion_with_holding["lotus_majority"]
-        assert "architectural works" not in str(lotus.holdings[8].enactments[0])
+    def test_enactment_text_limited_to_subsection(self, make_regime):
+        to_read = load_holdings("holding_lotus.json")
+        holdings = readers.read_holdings(to_read, regime=make_regime)
+        assert "architectural works" not in str(holdings[8].enactments[0])
 
     @pytest.mark.xfail
     def test_imported_holding_same_as_test_object(self, real_holding, make_opinion):
@@ -243,43 +245,46 @@ class TestHoldingImport:
         watt.posit(load_holdings("holding_watt.json"))
         assert watt.holdings[0] == real_holding["h1"]
 
-    def test_same_enactment_objects_equal(self, make_opinion_with_holding):
+    def test_same_enactment_objects_equal(self, make_regime):
         """
         Don't expect the holdings imported from the JSON to
         exactly match the holdings created for testing in conftest.
         """
-        watt = make_opinion_with_holding["watt_majority"]
-        assert watt.holdings[0].enactments[0] == watt.holdings[1].enactments[0]
+        to_read = load_holdings("holding_watt.json")
+        holdings = readers.read_holdings(to_read, regime=make_regime)
+        assert holdings[0].enactments[0] == holdings[1].enactments[0]
 
-    def test_different_enactments_same_code(self, make_opinion_with_holding):
+    def test_different_enactments_same_code(self, make_regime):
         """
         Don't expect the holdings imported from the JSON to
         exactly match the holdings created for testing in conftest.
         """
-        lotus = make_opinion_with_holding["lotus_majority"]
-        assert (
-            lotus.holdings[0].enactments[0].code == lotus.holdings[1].enactments[0].code
-        )
-        assert (
-            lotus.holdings[0].enactments[0].code is lotus.holdings[1].enactments[0].code
-        )
+        to_read = load_holdings("holding_lotus.json")
+        holdings = readers.read_holdings(to_read, regime=make_regime)
+        assert holdings[0].enactments[0].code == holdings[1].enactments[0].code
+        assert holdings[0].enactments[0].code is holdings[1].enactments[0].code
 
-    def test_same_enactment_in_two_opinions(self, make_opinion_with_holding):
-        watt = make_opinion_with_holding["watt_majority"]
-        brad = make_opinion_with_holding["brad_majority"]
+    def test_same_enactment_in_two_opinions(self, make_regime):
+        to_read = load_holdings("holding_watt.json")
+        watt_holdings = readers.read_holdings(to_read, regime=make_regime)
+
+        to_read = load_holdings("holding_brad.json")
+        brad_holdings = readers.read_holdings(to_read, regime=make_regime)
+
         assert any(
-            watt.holdings[0].enactments[0].means(brad_enactment)
-            for brad_enactment in brad.holdings[0].enactments
+            watt_holdings[0].enactments[0].means(brad_enactment)
+            for brad_enactment in brad_holdings[0].enactments
         )
 
-    def test_same_object_for_enactment_in_import(self, make_opinion_with_holding):
+    def test_same_object_for_enactment_in_import(self, make_regime):
         """
         The JSON for Bradley repeats identical fields to create the same Factor
         for multiple Rules, instead of using the "name" field as a shortcut.
         This tests whether the loaded objects turn out equal.
         """
-        brad = make_opinion_with_holding["brad_majority"]
-        assert any(brad.holdings[6].inputs[0] == x for x in brad.holdings[5].inputs)
+        to_read = load_holdings("holding_brad.json")
+        holdings = readers.read_holdings(to_read, regime=make_regime)
+        assert any(holdings[6].inputs[0] == x for x in holdings[5].inputs)
 
     def test_fact_from_loaded_holding(self, make_regime):
         to_read = load_holdings("holding_watt.json", regime=make_regime)
@@ -393,7 +398,9 @@ class TestHoldingImport:
         with pytest.raises(ValueError):
             readers.read_holding(rule_dict)
 
-    def test_holding_flagged_exclusive(self, make_opinion_with_holding, make_enactment):
+
+class TestExclusiveFlag:
+    def test_holding_flagged_exclusive(self, make_regime, make_enactment):
         """
         Test that "exclusive" flag doesn't mess up the holding where it's placed.
 
@@ -403,6 +410,8 @@ class TestHoldingImport:
         directory was original", when that holding was marked
         "exclusive" in the JSON.
         """
+        to_read = load_holdings("holding_feist.json")
+        feist_holdings = readers.read_holdings(to_read, regime=make_regime)
 
         directory = Entity("Rural's telephone directory")
         original = Fact(Predicate("{} was an original work"), directory)
@@ -421,12 +430,11 @@ class TestHoldingImport:
         )
         assert any(
             feist_holding.rule.means(originality_rule)
-            for feist_holding in make_opinion_with_holding["feist_majority"].holdings
+            for feist_holding in feist_holdings
         )
 
-    def test_holding_inferred_from_exclusive(
-        self, make_enactment, make_opinion_with_holding
-    ):
+    @pytest.mark.xfail
+    def test_holding_inferred_from_exclusive(self, make_enactment, make_regime):
         """
         Test whether the Feist opinion object includes a holding
         that was inferred from an entry in the JSON saying that the
@@ -437,7 +445,13 @@ class TestHoldingImport:
         The inferred holding says that in the absence of the input
         "Rural's telephone directory was original", the court MUST
         ALWAYS find the output to be absent as well.
+
+        Marked xfail because the "exclusive" flag no longer causes
+        inferred Holdings to be expanded. Instead, it now should generate
+        inferred Rules that aren't expanded during data loading.
         """
+        to_read = load_holdings("holding_feist.json")
+        feist_holdings = readers.read_holdings(to_read, regime=make_regime)
 
         directory = Entity("Rural's telephone directory")
         not_original = Fact(
@@ -459,25 +473,22 @@ class TestHoldingImport:
                 make_enactment["copyright_requires_originality"],
             ],
         )
-        feist = make_opinion_with_holding["feist_majority"]
-        assert feist.holdings[4].rule.means(no_originality_rule)
+        assert feist_holdings[4].rule.means(no_originality_rule)
 
-    def test_exclusive_results_in_more_holdings(self, make_opinion_with_holding):
+    def test_exclusive_does_not_result_in_more_holdings(self, make_regime):
         """
-        Test that a holding inferred due to the "exclusive" flag
-        is created in addition to all the other holdings, so there
-        is one more holding than there are entries in the "holdings"
-        section of the JSON.
-        """
+        The intended behavior is now for the Holding to assert that
+        its Rule is the "exclusive" way to reach the outputs, and
+        to have an additional function that can generate additional
+        Rules that can be inferred from the exclusive flag.
 
-        with open(
-            filepaths.get_directory_path("holdings") / "holding_feist.json", "r"
-        ) as f:
-            feist_json = json.load(f)
-        assert (
-            len(make_opinion_with_holding["feist_majority"].holdings)
-            == len(feist_json["holdings"]) + 1
-        )
+        "Implies" and "contradict" methods will be able to look at the Holding's
+        generated Rules as well as its original Rule.
+        """
+        feist_json = load_holdings("holding_feist.json")
+        feist_holdings = readers.read_holdings(feist_json, regime=make_regime)
+
+        assert len(feist_holdings) == len(feist_json)
 
 
 class TestNestedFactorImport:
@@ -491,5 +502,6 @@ class TestNestedFactorImport:
         testimony on the jury. Hence, admission of the testimony
         concerning appellant’s use of narcotics was improper.
         """
-        cardenas_holdings = load_holdings("holding_cardenas.json", regime=make_regime)
+        cardenas_json = load_holdings("holding_cardenas.json")
+        cardenas_holdings = readers.read_holdings(cardenas_json, regime=make_regime)
         assert len(cardenas_holdings) == 2
