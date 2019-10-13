@@ -2,10 +2,9 @@
 from __future__ import annotations
 
 from collections import OrderedDict
-from copy import deepcopy
 from re import findall
 
-from typing import Dict, List, Mapping, Optional, Tuple, Union
+from typing import Dict, List, Optional, Tuple, Union
 
 from marshmallow import ValidationError
 

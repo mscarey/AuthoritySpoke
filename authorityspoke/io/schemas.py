@@ -1,3 +1,4 @@
+from copy import deepcopy
 from typing import Any, Dict, List, Optional, Tuple, Type, Union
 
 from marshmallow import Schema, fields, validate
@@ -32,7 +33,7 @@ class ExpandableSchema(Schema):
         """
         if isinstance(data, str):
             mentioned = self.context.get("mentioned") or Mentioned()
-            return get_by_name(mentioned, data)
+            return deepcopy(get_by_name(mentioned, data))
         return data
 
     def consume_type_field(self, data, **kwargs):
@@ -334,7 +335,7 @@ class FactSchema(ExpandableSchema):
 
     @pre_load
     def format_data_to_load(self, data, **kwargs):
-        data = self.get_from_mentioned(data).copy()
+        data = self.get_from_mentioned(data)
         to_nest = [
             "content",
             "truth",

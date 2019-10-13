@@ -5,10 +5,10 @@ These functions will usually be called by functions from the io.loaders module
 after they import some data from a file.
 """
 from collections import defaultdict
+from copy import deepcopy
 import datetime
 from functools import partial
 
-from types import MappingProxyType
 from typing import Any, Dict, List, Iterable, Iterator
 from typing import Optional, Set, Tuple, Type, Union
 
@@ -389,7 +389,9 @@ def read_holding(
     if index_anchors:
         anchors = collect_anchors(record, regime=regime)
     schema = schemas.HoldingSchema(many=many)
-    proxy = MappingProxyType(mentioned)
+
+    proxy = deepcopy(mentioned)
+
     schema.context["mentioned"] = proxy
     schema.context["regime"] = regime
     answer = schema.load(record)
