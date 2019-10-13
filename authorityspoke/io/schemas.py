@@ -329,7 +329,7 @@ class FactSchema(ExpandableSchema):
             if factor_name in content and factor_name != content:
                 obj = get_by_name(mentioned, factor_name)
                 content, context_factors = add_found_context(
-                    content, context_factors, factor=obj, placeholder=placeholder
+                    content, context_factors, factor=deepcopy(obj), placeholder=placeholder
                 )
         return content, context_factors
 

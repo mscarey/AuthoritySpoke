@@ -135,6 +135,95 @@ class TestHoldingImport:
         new_factor = built[0].outputs[0].to_effect.context_factors[0]
         assert new_factor.name == "Bradley"
 
+    def test_holdings_with_allegation_and_exhibit(self):
+        """
+        Testing the error message:
+        The number of items in 'context_factors' must be 1,
+        to match predicate.context_slots for '{} committed
+        an attempted robbery' for 'fact that defendant
+        committed an attempted robbery'
+
+        This was another bug involving mutation of the "mentioned" context object
+        during deserialization.
+
+        Fixed by having FactSchema.get_references_from_mentioned call
+        add_found_context with deepcopy(obj) instead of obj for the
+        "factor" parameter
+        """
+        holdings = [
+            {
+                "inputs": [
+                    {
+                        "type": "Exhibit",
+                        "name": "officer's testimony that defendant was addicted to heroin",
+                        "form": "testimony",
+                        "statement": {
+                            "type": "Fact",
+                            "name": "fact that defendant was addicted to heroin",
+                            "content": "the {defendant} was addicted to heroin",
+                        },
+                        "stated_by": {"type": "entity", "name": "parole officer"},
+                    },
+                    {
+                        "type": "Allegation",
+                        "name": "the attempted robbery charge",
+                        "pleading": {
+                            "type": "Pleading",
+                            "filer": {
+                                "type": "Entity",
+                                "name": "The People of California",
+                            },
+                        },
+                        "statement": {
+                            "type": "Fact",
+                            "name": "fact that defendant committed an attempted robbery",
+                            "content": "defendant committed an attempted robbery",
+                        },
+                    },
+                ],
+                "despite": [
+                    {
+                        "type": "Fact",
+                        "content": "officer's testimony that defendant was addicted to heroin, was relevant to show the defendant had a motive to commit an attempted robbery",
+                    }
+                ],
+                "outputs": [
+                    {
+                        "type": "Fact",
+                        "content": "the probative value of officer's testimony that defendant was addicted to heroin, in showing fact that defendant committed an attempted robbery, was outweighed by unfair prejudice to defendant",
+                    }
+                ],
+                "mandatory": True,
+            },
+            {
+                "inputs": [
+                    {
+                        "type": "Fact",
+                        "content": "the probative value of officer's testimony that defendant was addicted to heroin, in indicating fact that defendant committed an attempted robbery, was outweighed by unfair prejudice to defendant",
+                    }
+                ],
+                "despite": [
+                    {
+                        "type": "Fact",
+                        "content": "officer's testimony that defendant was addicted to heroin was relevant to show defendant had a motive to commit an attempted robbery",
+                    }
+                ],
+                "outputs": [
+                    {
+                        "type": "Evidence",
+                        "name": "evidence of officer's testimony that defendant was addicted to heroin",
+                        "exhibit": "officer's testimony that defendant was addicted to heroin",
+                        "to_effect": "fact that defendant committed an attempted robbery",
+                        "absent": True,
+                    }
+                ],
+                "mandatory": True,
+            },
+        ]
+        built = readers.read_holdings(holdings)
+        allegation = built[0].inputs[1]
+        assert allegation.statement.context_factors[0].name == "defendant"
+
     def test_enactment_has_subsection(self, make_opinion_with_holding):
         lotus = make_opinion_with_holding["lotus_majority"]
         assert lotus.holdings[8].enactments[0].source.split("/")[-1] == "b"

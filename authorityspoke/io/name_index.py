@@ -1,6 +1,7 @@
 """Functions for indexing named objects in JSON to be imported."""
 from __future__ import annotations
 
+from copy import deepcopy
 from collections import OrderedDict
 from re import findall
 
@@ -125,6 +126,7 @@ def expand_shorthand_mentioned(obj: Dict) -> Dict:
     :returns:
         the input object, but with shorthand references expanded.
     """
+
     if obj.get("predicate", {}).get("content"):
         obj["predicate"]["content"], obj[
             "context_factors"
@@ -159,7 +161,7 @@ def name_from_content(content: str, truth: Optional[bool] = None):
     return f"{false_modifier}{content}".replace("{", "").replace("}", "")
 
 
-def assign_names_from_content(obj: Dict) -> Dict:
+def assign_name_from_content(obj: Dict) -> Dict:
     """
     Use the content to assign a name to any :class:`.Fact` that lacks one.
 
@@ -213,7 +215,7 @@ def expand_node_shorthand(obj: Dict):
     to_nest = ["content", "truth", "reciprocal", "comparison", "quantity"]
     obj = nest_fields(obj, nest="predicate", eggs=to_nest)
 
-    obj = assign_names_from_content(obj)
+    obj = assign_name_from_content(obj)
     obj = collapse_known_factors(obj)
 
     obj = expand_shorthand_mentioned(obj)
