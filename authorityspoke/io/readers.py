@@ -77,7 +77,7 @@ def read_selectors(
 
 
 def read_enactment(
-    enactment_dict: Dict[str, str],
+    record: Dict[str, str],
     code: Optional[Code] = None,
     regime: Optional[Regime] = None,
     **kwargs,
@@ -105,7 +105,7 @@ def read_enactment(
         a new :class:`Enactment` object, optionally with text links.
     """
     schema = schemas.EnactmentSchema(context={"code": code, "regime": regime})
-    answer = schema.load(enactment_dict)
+    answer = schema.load(record)
 
     return answer
 

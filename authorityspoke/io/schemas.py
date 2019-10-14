@@ -162,7 +162,7 @@ class EnactmentSchema(ExpandableSchema):
         if self.context["regime"]:
             code = self.context["regime"].get_code(data["source"])
         elif self.context.get("code"):
-            code = self.context("code")
+            code = self.context["code"]
         else:
             raise ValueError(
                 f"Must either specify a Code for Enactment '{data['source']}', "

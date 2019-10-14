@@ -25,15 +25,15 @@ class TestAnalogies:
 
 class TestContext:
     def test_impossible_register(self):
-        fact_al = read_fact("{Al} sold {the bull} to {Betty}.")
-        fact_alice = read_fact("{Alice} sold {the cow} to {Bob}.")
+        fact_al = read_fact({"content": "{Al} sold {the bull} to {Betty}."})
+        fact_alice = read_fact({"content": "{Alice} sold {the cow} to {Bob}."})
         context = ContextRegister({Entity("Al"): Entity("Bob")})
         answers = fact_al.update_context_register(fact_alice, context, means)
         assert not any(answers)
 
     def test_possible_register(self):
-        fact_al = read_fact("{Al} sold {the bull} to {Betty}.")
-        fact_alice = read_fact("{Alice} sold {the cow} to {Bob}.")
+        fact_al = read_fact({"content": "{Al} sold {the bull} to {Betty}."})
+        fact_alice = read_fact({"content": "{Alice} sold {the cow} to {Bob}."})
         context = ContextRegister({Entity("Al"): Entity("Alice")})
         answers = fact_al.update_context_register(fact_alice, context, means)
         assert Entity("the bull") in next(answers).keys()

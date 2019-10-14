@@ -117,7 +117,7 @@ class TestEnactments:
 
     def test_make_enactment_from_dict_with_code(self, make_code):
         fourth_a = readers.read_enactment(
-            factor_record={"source": "/us/const/amendment-IV"}, code=make_code["const"]
+            record={"source": "/us/const/amendment-IV"}, code=make_code["const"]
         )
         assert fourth_a.text.endswith("and the persons or things to be seized.")
 
@@ -125,7 +125,7 @@ class TestEnactments:
         self, make_regime, make_code
     ):
         fourth_a = readers.read_enactment(
-            factor_record={"source": "/us/const/amendment-IV"},
+            record={"source": "/us/const/amendment-IV"},
             code=make_code["const"],
             regime=make_regime,
         )
@@ -133,7 +133,7 @@ class TestEnactments:
 
     def test_make_enactment_from_dict_with_text_split(self, make_regime, make_code):
         fourth_a = readers.read_enactment(
-            factor_record={
+            record={
                 "source": "/us/const/amendment-IV",
                 "text": "and|the persons or things|to be seized.",
             },
@@ -144,9 +144,9 @@ class TestEnactments:
 
     def test_passage_from_imported_statute(self, make_regime):
         oracle_majority = loaders.load_opinion(f"oracle_h.json")
-        oracle_majority.posit(
-            loaders.load_holdings(f"holding_oracle.json", regime=make_regime)
-        )
+        raw_holdings = loaders.load_holdings("holding_oracle.json")
+        holdings = readers.read_holdings(raw_holdings, regime=make_regime)
+        oracle_majority.posit(holdings)
         despite_text = str(oracle_majority.holdings[5])
         assert "In no case does copyright protection " in despite_text
 
