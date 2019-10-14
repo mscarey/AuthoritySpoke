@@ -5,7 +5,9 @@ from authorityspoke.opinions import TextLinkDict
 
 
 def collect_anchors(obj: Dict) -> List[Dict]:
-    return obj.get("anchors") or []
+    if obj.get("name"):
+        return obj.get("anchors") or []
+    return []
 
 
 def collect_anchors_recursively(
@@ -22,18 +24,13 @@ def collect_anchors_recursively(
     anchors: TextLinkDict = anchors or defaultdict(list)
     if isinstance(obj, List):
         for item in obj:
-            incoming = collect_anchors_recursively(item)
-            for k, v in incoming.items():
-                for selector in v:
-                    anchors[k].append(selector)
+            for k, v in collect_anchors_recursively(item).items():
+                anchors[k] += v
     if isinstance(obj, Dict):
-        if obj.get("name"):
-            for selector in collect_anchors(obj):
-                anchors[obj["name"]].append(selector)
+        for selector in collect_anchors(obj):
+            anchors[obj["name"]].append(selector)
         for key, value in obj.items():
             if key != "anchors" and isinstance(value, (Dict, List)):
-                incoming = collect_anchors_recursively(value)
-                for k, v in incoming.items():
-                    for selector in v:
-                        anchors[k].append(selector)
+                for k, v in collect_anchors_recursively(value).items():
+                    anchors[k] += v
     return anchors
