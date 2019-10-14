@@ -28,8 +28,7 @@ from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
 from authorityspoke.selectors import TextQuoteSelector
 
-from authorityspoke.io import references
-from authorityspoke.io import schemas
+from authorityspoke.io import anchors, schemas
 from authorityspoke.io.name_index import index_names
 
 
@@ -340,8 +339,15 @@ def read_holding(
     """
     record, mentioned = index_names(record)
     if index_anchors:
-        holding_anchors = [collect_anchors(holding) for holding in record]
-        anchors = collect_anchors(deepcopy(record), regime=regime)
+        factor_anchors = anchors.collect_anchors_recursively(deepcopy(record))
+        factor_anchors = {
+            key: read_selectors(value) for key, value in factor_anchors.items()
+        }
+        if many:
+            holding_anchors = [anchors.collect_anchors(holding) for holding in record]
+        else:
+            holding_anchors = [anchors.collect_anchors(record)]
+        holding_anchors = [read_selectors(group) for group in holding_anchors]
     schema = schemas.HoldingSchema(many=many)
 
     proxy = deepcopy(mentioned)
@@ -349,7 +355,7 @@ def read_holding(
     schema.context["mentioned"] = proxy
     schema.context["regime"] = regime
     answer = schema.load(record)
-    return (answer, anchors) if index_anchors else answer
+    return (answer, factor_anchors, holding_anchors) if index_anchors else answer
 
 
 def read_holdings(

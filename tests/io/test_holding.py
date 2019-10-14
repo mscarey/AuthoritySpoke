@@ -144,7 +144,7 @@ class TestHoldingImport:
         "mandatory": True,
         "anchors": "compilations of facts|generally are|"
         }]
-        feist_holdings, anchors = readers.read_holdings(
+        feist_holdings, anchors, holding_anchors = readers.read_holdings(
             raw_holdings, regime=make_regime, index_anchors=True
         )
         assert feist_holdings[0].enactments[0].name == "securing for authors"
@@ -159,7 +159,7 @@ class TestHoldingImport:
         Delete if this and the test above both pass
         """
         raw_holdings = load_holdings(f"holding_feist.json", regime=make_regime)
-        feist_holdings, anchors = readers.read_holdings(
+        feist_holdings, anchors, holding_anchors = readers.read_holdings(
             raw_holdings, regime=make_regime, index_anchors=True
         )
         assert feist_holdings[0].enactments[0].name == "securing for authors"
@@ -176,7 +176,7 @@ class TestHoldingImport:
             raw_holdings = loaders.load_holdings(
                 f"holding_{case}.json", regime=make_regime
             )
-            holdings, anchors = readers.read_holdings(
+            holdings, anchors, holding_anchors = readers.read_holdings(
                 raw_holdings, regime=make_regime, index_anchors=True)
             opinions[f"{case}_majority"].posit(holdings)
         factor = opinions["lotus_majority"].holdings[0].inputs[0]
@@ -187,7 +187,7 @@ class TestHoldingImport:
         Test whether index_anchors flag causes holding loading to break.
         """
         raw_holdings = load_holdings(f"holding_oracle.json", regime=make_regime)
-        oracle_holdings, anchors = readers.read_holdings(
+        oracle_holdings, anchors, holding_anchors = readers.read_holdings(
             raw_holdings, regime=make_regime, index_anchors=True
         )
 
