@@ -206,6 +206,12 @@ class TestUnion:
         assert (feist.holdings[9] | feist.holdings[7]) is None
 
     def test_union_and_addition_different(self, make_opinion_with_holding):
+        """
+        This is failing because the only suitable holding for adding was
+        created using the "exclusive" flag. But creating holdings that way
+        is disabled for now.
+        """
+
         feist = make_opinion_with_holding["feist_majority"]
         result_of_adding = feist.holdings[11] + feist.holdings[4]
         result_of_union = feist.holdings[11] | feist.holdings[4]
@@ -224,10 +230,11 @@ class TestHoldingImports:
 
     def test_posit_holding_with_selector(self, make_analysis, make_opinion):
 
-        holdings, mentioned = readers.read_holdings(
-            make_analysis["minimal"], report_mentioned=True
+        holdings, anchors, holding_anchors = readers.read_holdings(
+            make_analysis["minimal"], index_anchors=True
         )
         brad = make_opinion["brad_majority"]
-        brad.posit(holdings[0], text_links=mentioned)
-        fact = holdings[0].outputs[0]
+        brad.posit(holdings, text_links=holding_anchors)
+        brad.add_factor_anchors(anchors)
+        fact_name = holdings[0].outputs[0]
         assert brad.factors[fact][0].exact == "open fields or grounds"

@@ -1,4 +1,4 @@
-import json
+from collections import OrderedDict
 
 import pint
 import pytest
@@ -88,68 +88,69 @@ class TestHoldingImport:
         Testing issue that enactment expansion fails only when
         text anchors are loaded.
         """
-        raw_holdings = [{
-        "inputs": {
-            "type": "fact",
-            "content": "{Rural's telephone directory} was a fact",
-            "anchors": [{
-                    "exact": "facts",
-                    "prefix": "The first is that"
+        raw_holdings = [
+            {
+                "inputs": {
+                    "type": "fact",
+                    "content": "{Rural's telephone directory} was a fact",
+                    "anchors": [
+                        {"exact": "facts", "prefix": "The first is that"},
+                        {
+                            "exact": "as to facts",
+                            "prefix": "No one may claim originality",
+                        },
+                        {"exact": "facts", "prefix": "no one may copyright"},
+                    ],
                 },
-                {
-                    "exact": "as to facts",
-                    "prefix": "No one may claim originality"
+                "outputs": {
+                    "type": "fact",
+                    "content": "Rural's telephone directory was copyrightable",
+                    "truth": False,
+                    "anchors": [
+                        {
+                            "exact": "are not copyrightable",
+                            "prefix": "The first is that facts",
+                        },
+                        {"exact": "no one may copyright", "suffix": "facts"},
+                    ],
                 },
-                {
-                    "exact": "facts",
-                    "prefix": "no one may copyright"
-                }
-            ]
-        },
-        "outputs": {
-            "type": "fact",
-            "content": "Rural's telephone directory was copyrightable",
-            "truth": False,
-            "anchors": [{
-                "exact": "are not copyrightable",
-                "prefix": "The first is that facts"
-            }, {
-                "exact": "no one may copyright",
-                "suffix": "facts"
-            }]
-        },
-        "enactments": [{
-                "source": "/us/const/article-I/8/8",
-                "exact": "To promote the Progress of Science and useful Arts, by securing for limited Times to Authors",
-                "name": "securing for authors"
-            }, {
-                "source": "/us/const/article-I/8/8",
-                "exact": "the exclusive Right to their respective Writings",
-                "name": "right to writings"
-            }
-        ],
-        "mandatory": True,
-        "universal": True
-        },
-        {
-        "outputs": {
-            "type": "fact",
-            "content": "Rural's telephone directory was copyrightable",
-            "anchors": [{
-                "exact": "copyrightable",
-                "prefix": "first is that facts are not"
-            }, "The sine qua non of|copyright|"]
-        },
-        "enactments": ["securing for authors", "right to writings"],
-        "mandatory": True,
-        "anchors": "compilations of facts|generally are|"
-        }]
+                "enactments": [
+                    {
+                        "source": "/us/const/article-I/8/8",
+                        "exact": "To promote the Progress of Science and useful Arts, by securing for limited Times to Authors",
+                        "name": "securing for authors",
+                    },
+                    {
+                        "source": "/us/const/article-I/8/8",
+                        "exact": "the exclusive Right to their respective Writings",
+                        "name": "right to writings",
+                    },
+                ],
+                "mandatory": True,
+                "universal": True,
+            },
+            {
+                "outputs": {
+                    "type": "fact",
+                    "content": "Rural's telephone directory was copyrightable",
+                    "anchors": [
+                        {
+                            "exact": "copyrightable",
+                            "prefix": "first is that facts are not",
+                        },
+                        "The sine qua non of|copyright|",
+                    ],
+                },
+                "enactments": ["securing for authors", "right to writings"],
+                "mandatory": True,
+                "anchors": "compilations of facts|generally are|",
+            },
+        ]
         feist_holdings, anchors, holding_anchors = readers.read_holdings(
             raw_holdings, regime=make_regime, index_anchors=True
         )
         assert feist_holdings[0].enactments[0].name == "securing for authors"
         assert feist_holdings[1].enactments[0].name == "securing for authors"
-
 
     def test_import_feist_holdings_with_enactments(self, make_regime):
         """
@@ -177,9 +178,11 @@ class TestHoldingImport:
                 f"holding_{case}.json", regime=make_regime
             )
             holdings, anchors, holding_anchors = readers.read_holdings(
-                raw_holdings, regime=make_regime, index_anchors=True)
+                raw_holdings, regime=make_regime, index_anchors=True
+            )
             opinions[f"{case}_majority"].posit(holdings)
-        factor = opinions["lotus_majority"].holdings[0].inputs[0]
+        holding = list(opinions["lotus_majority"].holdings)[0]
+        factor = holding.inputs[0]
         assert factor.predicate.content == "the {} was copyrightable"
 
     def test_import_holdings_with_anchors(self, make_regime):
@@ -416,15 +419,16 @@ class TestHoldingImport:
         to_read = load_holdings("holding_brad.json")
         holdings = readers.read_holdings(to_read, regime=make_regime)
         brad.posit(holdings)
-        assert "dimensionless" not in str(brad.holdings[6])
-        assert isinstance(brad.holdings[6].inputs[0].predicate.quantity, int)
+        expectation_not_reasonable = list(brad.holdings)[6]
+        assert "dimensionless" not in str(expectation_not_reasonable)
+        assert isinstance(expectation_not_reasonable.inputs[0].predicate.quantity, int)
 
     def test_opinion_posits_holding(self, make_opinion, make_regime):
         brad = make_opinion["brad_majority"]
         to_read = load_holdings("holding_brad.json")
         holdings = readers.read_holdings(to_read, regime=make_regime)
         brad.posit(holdings)
-        assert "warrantless search and seizure" in str(brad.holdings[0])
+        assert "warrantless search and seizure" in str(list(brad.holdings)[0])
 
     def test_opinion_posits_holding_tuple_context(
         self, make_opinion, make_regime, make_entity
@@ -440,7 +444,7 @@ class TestHoldingImport:
         )
         watt = make_opinion["watt_majority"]
         watt.posit(context_holding)
-        holding_string = str(watt.holdings[-1])
+        holding_string = str(list(watt.holdings)[-1])
         assert (
             "the number of marijuana plants in <the stockpile of trees> was at least 3"
             in holding_string
@@ -459,15 +463,16 @@ class TestHoldingImport:
         to_read = load_holdings("holding_brad.json", regime=make_regime)
         holdings = readers.read_holdings(to_read, regime=make_regime)
         brad.posit(holdings)
-        context_holding = brad.holdings[6].new_context(
-            {brad.holdings[6].generic_factors[0]: make_entity["watt"]}
+        expectation_not_reasonable = list(brad.holdings.keys())[6]
+        context_holding = expectation_not_reasonable.new_context(
+            {expectation_not_reasonable.generic_factors[0]: make_entity["watt"]}
         )
         # resetting holdings because of class scope of fixture
-        watt.holdings = []
+        watt.holdings = OrderedDict()
         watt.posit(context_holding)
         string = str(context_holding)
         assert "<Wattenburg> lived at <Bradley's house>" in string
-        assert "<Wattenburg> lived at <Bradley's house>" in str(watt.holdings[0])
+        assert "<Wattenburg> lived at <Bradley's house>" in str(list(watt.holdings)[0])
 
     def test_holding_with_non_generic_value(
         self, make_opinion, make_regime, make_entity
@@ -479,8 +484,10 @@ class TestHoldingImport:
         to_read = load_holdings("holding_brad.json", regime=make_regime)
         holdings = readers.read_holdings(to_read, regime=make_regime)
         brad.posit(holdings)
-        context_change = brad.holdings[6].new_context(
-            {brad.holdings[6].generic_factors[1]: make_entity["trees_specific"]}
+        expectation_not_reasonable = list(brad.holdings.keys())[6]
+        generic_patch = expectation_not_reasonable.generic_factors[1]
+        context_change = expectation_not_reasonable.new_context(
+            {generic_patch: make_entity["trees_specific"]}
         )
         string = str(context_change)
         assert "plants in the stockpile of trees was at least 3" in string

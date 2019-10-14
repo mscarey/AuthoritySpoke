@@ -1160,16 +1160,13 @@ def make_opinion_with_holding(make_opinion, make_regime) -> Dict[str, Opinion]:
 def make_analysis() -> Dict[str, Dict[str, Any]]:
     """Example user analysis data."""
     analysis = {}
-    analysis["minimal"] = {
-        "mentioned_factors": {"type": "entity", "name": "Bradley"},
-        "holdings": [
+    analysis["minimal"] = [
             {
                 "outputs": {
                     "type": "fact",
-                    "content": "Bradley made a minimal holding object.",
+                    "content": "{Bradley} made a minimal holding object.",
                     "anchors": "upholding searches in |open fields or grounds|around a house",
                 }
             }
-        ],
-    }
+        ]
     return analysis

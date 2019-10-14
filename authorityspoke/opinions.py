@@ -6,6 +6,8 @@ Unlike most other ``authorityspoke`` classes, :class:`Opinion`\s are not frozen.
 
 from __future__ import annotations
 
+from collections import OrderedDict
+from itertools import zip_longest
 from typing import Dict, Iterable, List
 from typing import Optional, Sequence, Set, Tuple, Union
 
@@ -71,10 +73,8 @@ class Opinion:
     text: Optional[str] = field(repr=False)
 
     def __post_init__(self):
-        self.holdings: List[Holding] = []
-        self.factors: Dict[
-            Factor, Union[TextQuoteSelector, Tuple[TextQuoteSelector, ...]]
-        ] = {}
+        self.holdings: OrderedDict[Holding, List[TextQuoteSelector]] = OrderedDict({})
+        self.factors: Dict[Factor, List[TextQuoteSelector]] = {}
 
     def contradicts(
         self, other: Union[Opinion, Holding], context: Optional[ContextRegister] = None
@@ -150,7 +150,7 @@ class Opinion:
     def posit_holding(
         self,
         holding: Union[Holding, Rule],
-        text_links: Optional[TextLinkDict] = None,
+        text_links: Optional[List[TextQuoteSelector]] = None,
         context: Optional[Sequence[Factor]] = None,
     ) -> None:
         r"""Record that this Opinion endorses specified :class:`Holding`\s."""
@@ -164,25 +164,16 @@ class Opinion:
         if not isinstance(holding, Holding):
             raise TypeError('"holding" must be an object of type Holding.')
 
+        text_links = text_links or []
         if context:
             holding = holding.new_context(context, context_opinion=self)
-        self.holdings.append(holding)
-
-        if text_links:
-            for factor in holding.recursive_factors:
-                for selector in text_links.get(factor, []):
-                    if factor not in self.factors:
-                        self.factors[factor] = []  # repeated elsewhere?
-                    if not any(
-                        selector == known_selector
-                        for known_selector in self.factors[factor]
-                    ):
-                        self.factors[factor].append(selector)
+        if holding not in self.holdings:
+            self.holdings[holding] = text_links
 
     def posit_holdings(
         self,
         holdings: Iterable[Union[Holding, Rule]],
-        text_links: Optional[TextLinkDict] = None,
+        text_links: Optional[List[List[TextQuoteSelector]]] = None,
         context: Optional[Sequence[Factor]] = None,
     ):
         r"""
@@ -206,8 +197,9 @@ class Opinion:
             will provide the context for the new holding in the
             present case.
         """
-        for holding in holdings:
-            self.posit_holding(holding, text_links=text_links, context=context)
+        text_links = text_links or []
+        for (holding, selector_list) in zip_longest(holdings, text_links):
+            self.posit_holding(holding, text_links=selector_list, context=context)
 
     def posit(
         self,
