@@ -24,7 +24,7 @@ class TestCollectAnchors:
 
     def test_anchors_from_fact_with_inferred_name(self):
         record, mentioned = name_index.index_names(self.fact)
-        factor_anchors = anchors.collect_anchors(record)
+        factor_anchors = anchors.collect_anchors_recursively(record)
         fact_anchors = factor_anchors[
             "false Rural's telephone directory was copyrightable"
         ]

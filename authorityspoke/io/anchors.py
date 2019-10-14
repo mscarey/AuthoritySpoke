@@ -4,13 +4,8 @@ from typing import Dict, List, Optional
 from authorityspoke.opinions import TextLinkDict
 
 
-def collect_anchors(obj: Dict, anchors: Optional[TextLinkDict] = None) -> TextLinkDict:
-    anchors: TextLinkDict = anchors or defaultdict(list)
-    if obj.get("anchors") and obj.get("name"):
-        for selector in obj["anchors"]:
-            anchors[obj["name"]].append(selector)
-
-    return anchors
+def collect_anchors(obj: Dict) -> List[Dict]:
+    return obj.get("anchors") or []
 
 
 def collect_anchors_recursively(
@@ -24,13 +19,21 @@ def collect_anchors_recursively(
     and values are lists of the :class:`.Opinion` passages that reference them.
 
     """
-
+    anchors: TextLinkDict = anchors or defaultdict(list)
     if isinstance(obj, List):
         for item in obj:
-            anchors = collect_anchors_recursively(item, anchors=anchors)
+            incoming = collect_anchors_recursively(item)
+            for k, v in incoming.items():
+                for selector in v:
+                    anchors[k].append(selector)
     if isinstance(obj, Dict):
-        anchors = collect_anchors(obj, anchors)
-        for value in obj.values():
-            if isinstance(value, (Dict, List)):
-                anchors = collect_anchors_recursively(value, anchors=anchors)
+        if obj.get("name"):
+            for selector in collect_anchors(obj):
+                anchors[obj["name"]].append(selector)
+        for key, value in obj.items():
+            if key != "anchors" and isinstance(value, (Dict, List)):
+                incoming = collect_anchors_recursively(value)
+                for k, v in incoming.items():
+                    for selector in v:
+                        anchors[k].append(selector)
     return anchors
