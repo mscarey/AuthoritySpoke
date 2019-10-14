@@ -24,7 +24,7 @@ from authorityspoke.selectors import TextQuoteSelector
 logger = logging.getLogger(__name__)
 
 
-TextLinkDict = Dict[Union[Factor, Holding, Enactment], Set[TextQuoteSelector]]
+TextLinkDict = Dict[str, List[TextQuoteSelector]]
 
 
 @dataclass

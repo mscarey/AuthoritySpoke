@@ -77,53 +77,6 @@ def read_selectors(
     return read_selector(record, many=True)
 
 
-def read_anchorable(obj: Dict, regime: Optional[Regime] = None):
-    """
-    Make an object of any type that can have an anchor field.
-    """
-    record, mentioned = index_names(obj)
-    if "rule" in record or "outputs" in record:
-        schema = schemas.HoldingSchema()
-    elif "source" in record:
-        schema = schemas.EnactmentSchema()
-    else:
-        schema = schemas.FactorSchema()
-    schema.context["mentioned"] = mentioned
-    schema.context["regime"] = regime
-    return schema.load(record)
-
-
-def collect_anchors(
-    obj: Dict, anchors: Optional[TextLinkDict] = None, regime: Optional[Regime] = None
-) -> TextLinkDict:
-    r"""
-    Move anchors fields to a dict linking object names to lists of anchors.
-
-    To be used during loading of :class:`.Holding`\s.
-    Keys are :class:`.Factor`\s, :class:`.Enactment`\s, or :class:`.Holding`\s,
-    and values are lists of the :class:`.Opinion` passages that reference them.
-
-    """
-    anchors = anchors or defaultdict(set)
-    if isinstance(obj, List):
-        for item in obj:
-            anchors = collect_anchors(item, anchors=anchors, regime=regime)
-    if isinstance(obj, Dict):
-        for _, value in obj.items():
-            if isinstance(value, (Dict, List)):
-                anchors = collect_anchors(value, anchors=anchors, regime=regime)
-        if obj.get("anchors"):
-            incoming = obj["anchors"]
-            key = read_anchorable(obj, regime=regime)
-            if not isinstance(incoming, list):
-                incoming = [incoming]
-            for selector in incoming:
-                built_selector = read_selector(selector)
-                anchors[key].add(built_selector)
-
-    return anchors
-
-
 def read_enactment(
     enactment_dict: Dict[str, str],
     code: Optional[Code] = None,
@@ -387,6 +340,7 @@ def read_holding(
     """
     record, mentioned = index_names(record)
     if index_anchors:
+        holding_anchors = [collect_anchors(holding) for holding in record]
         anchors = collect_anchors(deepcopy(record), regime=regime)
     schema = schemas.HoldingSchema(many=many)
 

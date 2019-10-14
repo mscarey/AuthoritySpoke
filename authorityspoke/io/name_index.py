@@ -178,7 +178,7 @@ def wrap_single_element_in_list(data: Dict, many_element: str):
     """
     Make a specified field a list if it isn't already a list.
     """
-    if data.get(many_element) is not None and not isinstance(data[many_element], list):
+    if not isinstance(data[many_element], list):
         data[many_element] = [data[many_element]]
     return data
 
@@ -198,10 +198,9 @@ def collapse_known_factors(obj: Dict):
 
 
 def expand_node_shorthand(obj: Dict):
-    if obj.get("context_factors") is not None and not isinstance(
-        obj["context_factors"], list
-    ):
-        obj["context_factors"] = [obj["context_factors"]]
+    for list_field in ("context_factors", "anchors"):
+        if obj.get(list_field) is not None:
+            obj = wrap_single_element_in_list(obj, list_field)
 
     to_nest = ["content", "truth", "reciprocal", "comparison", "quantity"]
     obj = nest_fields(obj, nest="predicate", eggs=to_nest)
