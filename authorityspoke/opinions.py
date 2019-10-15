@@ -78,6 +78,12 @@ class Opinion:
         ] = OrderedDict({})
         self.factor_anchors: Dict[Factor, List[TextQuoteSelector]] = {}
 
+    def clear_holdings(self):
+        r"""
+        Remove all :class:`.Holding`\s from the opinion.
+        """
+        self.holding_anchors = OrderedDict({})
+
     def contradicts(
         self, other: Union[Opinion, Holding], context: Optional[ContextRegister] = None
     ) -> bool:

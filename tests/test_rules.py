@@ -74,19 +74,16 @@ class TestRules:
         generics = make_holding["h1"].generic_factors
         assert list(generics) == [make_entity["motel"], make_entity["watt"]]
 
-    def test_string_with_line_breaks(self, make_opinion, make_regime):
-        cardenas = make_opinion["cardenas_majority"]
-        cardenas.posit(load_holdings("holding_cardenas.json", regime=make_regime))
+    def test_string_with_line_breaks(self, make_opinion_with_holding):
+        cardenas = make_opinion_with_holding["cardenas_majority"]
         assert "was addicted to heroin\n" in str(cardenas.holdings[0])
 
-    def test_string_mentions_absence(self, make_opinion, make_regime):
-        cardenas = make_opinion["cardenas_majority"]
-        cardenas.posit(load_holdings("holding_cardenas.json", regime=make_regime))
+    def test_string_mentions_absence(self, make_opinion_with_holding):
+        cardenas = make_opinion_with_holding["cardenas_majority"]
         assert "absence of the Evidence" in str(cardenas.holdings[1])
 
-    def test_factor_properties_for_rule(self, make_opinion, make_regime):
-        cardenas = make_opinion["cardenas_majority"]
-        cardenas.posit(load_holdings("holding_cardenas.json", regime=make_regime))
+    def test_factor_properties_for_rule(self, make_opinion_with_holding):
+        cardenas = make_opinion_with_holding["cardenas_majority"]
         assert len(cardenas.holdings[1].inputs) == 1
         assert len(cardenas.holdings[1].outputs) == 1
         assert len(cardenas.holdings[1].despite) == 1
@@ -694,7 +691,7 @@ class TestUnion:
 
     def test_union_longer(self, make_opinion_with_holding):
         feist = make_opinion_with_holding["feist_majority"]
-        new_rule = feist.holdings[5].rule | feist.holdings[7].rule
+        new_rule = feist.holdings[4].rule | feist.holdings[6].rule
         assert len(new_rule.inputs) == 6
         assert len(new_rule.outputs) == 1
         assert len(new_rule.despite) == 1

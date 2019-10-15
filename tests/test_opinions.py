@@ -185,11 +185,10 @@ class TestImplication:
     def test_posit_list_of_holdings_and_imply(self, make_opinion, make_regime):
         watt = make_opinion["watt_majority"]
         brad = make_opinion["brad_majority"]
-        some_rules = loaders.load_holdings(
-            filename="holding_watt.json", regime=make_regime
-        )
+        some_rules_raw = loaders.load_holdings(filename="holding_watt.json")
+        some_rules = readers.read_holdings(some_rules_raw, regime=make_regime)
         for case in (watt, brad):
-            case.holdings = []
+            case.clear_holdings()
             case.posit(some_rules[:3])
         watt.posit(some_rules[3])
         assert watt > brad
@@ -197,13 +196,13 @@ class TestImplication:
 
     def test_opinion_implies_rule(self, make_opinion, make_holding):
         watt = make_opinion["watt_majority"]
-        watt.holdings = [make_holding["h2_invalid_undecided"]]
+        watt.posit(make_holding["h2_invalid_undecided"])
         assert watt >= make_holding["h2_undecided"]
         assert watt > make_holding["h2_undecided"]
 
     def test_opinion_does_not_imply_rule(self, make_opinion, make_holding):
         watt = make_opinion["watt_majority"]
-        watt.holdings = [make_holding["h2_irrelevant_inputs_undecided"]]
+        watt.posit(make_holding["h2_irrelevant_inputs_undecided"])
         assert not watt >= make_holding["h2_undecided"]
         assert not watt > make_holding["h2_undecided"]
 

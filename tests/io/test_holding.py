@@ -170,7 +170,7 @@ class TestHoldingImport:
             opinions[f"{case}_majority"].posit(holdings)
         holding = opinions["lotus_majority"].holdings[0]
         factor = holding.inputs[0]
-        assert factor.predicate.content == "the {} was copyrightable"
+        assert factor.predicate.content == "{} was copyrightable"
 
     def test_import_holdings_with_anchors(self, make_regime):
         """
