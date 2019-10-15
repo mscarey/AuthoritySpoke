@@ -147,7 +147,7 @@ class TestEnactments:
         raw_holdings = loaders.load_holdings("holding_oracle.json")
         holdings = readers.read_holdings(raw_holdings, regime=make_regime)
         oracle_majority.posit(holdings)
-        despite_text = str(oracle_majority.holdings[5])
+        despite_text = str(list(oracle_majority.holdings)[5])
         assert "In no case does copyright protection " in despite_text
 
     def test_short_passage_from_uslm_code(self, make_code):

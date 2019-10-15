@@ -50,8 +50,8 @@ class Exhibit(Factor):
         Return string representation of the object without line breaks.
         """
         string = (
-            f'{("by " + str(self.stated_by) + ", ") if self.stated_by else ""}'
-            + f'{("asserting " + str(self.statement)) if self.statement else ""}'
+            f'{("by " + self.stated_by.short_string + ", ") if self.stated_by else ""}'
+            + f'{("asserting " + self.statement.short_string) if self.statement else ""}'
         )
         string = super().__str__().format(string)
         return string.replace("Exhibit", self.form or "exhibit").strip()
@@ -95,7 +95,7 @@ class Evidence(Factor):
     @property
     def short_string(self):
         string = (
-            f'{("of " + str(self.exhibit)) + ", " if self.exhibit else ""}'
-            + f'{("which supports " + str(self.to_effect)) if self.to_effect else ""}'
+            f'{("of " + self.exhibit.short_string + ", ") if self.exhibit else ""}'
+            + f'{("which supports " + self.to_effect.short_string) if self.to_effect else ""}'
         )
         return super().__str__().format(string).strip().replace("Evidence", "evidence")

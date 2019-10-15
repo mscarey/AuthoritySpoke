@@ -116,7 +116,7 @@ class TestFacts:
         The representation of the Exhibit mentioned in the Fact should
         not introduce any line breaks inside the Fact's string.
         """
-        holding = make_opinion_with_holding["cardenas_majority"].holdings[1]
+        holding = list(make_opinion_with_holding["cardenas_majority"].holdings)[1]
         fact_text = str(holding.inputs[0])
         if "SPECIFIC CONTEXT" in fact_text:
             fact_text = fact_text.split("SPECIFIC CONTEXT")[0].strip()
@@ -132,10 +132,10 @@ class TestFacts:
         )
 
     def test_get_factor_from_recursive_search(self, make_opinion_with_holding):
-        factor_list = list(
-            make_opinion_with_holding["cardenas_majority"].holdings[0].recursive_factors
+        holding_list = list(
+            make_opinion_with_holding["cardenas_majority"].holdings
         )
-        factor = factor_list[1]
+        factor_list = list(holding_list[0].recursive_factors)
         assert any(
             factor == Entity("parole officer") and factor.name == "parole officer"
             for factor in factor_list

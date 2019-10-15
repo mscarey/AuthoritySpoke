@@ -27,7 +27,17 @@ class TestEvidence:
         """
 
         lotus = make_opinion_with_holding["lotus_majority"]
-        assert " , " not in str(lotus.holdings[4].inputs[0])
+        holding = list(lotus.holdings)[4]
+        assert " , " not in str(holding.inputs[0])
+
+    def test_no_caps_in_short_string(self, make_opinion_with_holding):
+        """
+        Class names should not be capitalized in this format.
+        """
+        lotus = make_opinion_with_holding["lotus_majority"]
+        evidence = list(lotus.holdings)[4].inputs[0]
+        assert "Fact" not in evidence.short_string
+        assert "fact" in evidence.short_string
 
     def test_get_entity_orders(self, make_evidence):
         # TODO: check this after making Evidence.__str__ method

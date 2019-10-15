@@ -193,7 +193,7 @@ class TestContradiction:
     def test_contradiction_with_distance(self, make_opinion_with_holding, make_holding):
         watt = make_opinion_with_holding["watt_majority"]
         must_not_rule = make_holding["h2_output_false_ALL_MUST"]
-        assert watt.holdings[1].contradicts(must_not_rule)
+        assert list(watt.holdings)[1].contradicts(must_not_rule)
 
     def test_error_contradiction_with_procedure(self, make_holding, make_procedure):
         with pytest.raises(TypeError):
@@ -203,7 +203,8 @@ class TestContradiction:
 class TestUnion:
     def test_union_neither_universal(self, make_opinion_with_holding):
         feist = make_opinion_with_holding["feist_majority"]
-        assert (feist.holdings[9] | feist.holdings[7]) is None
+        holdings = list(feist.holdings)
+        assert (holdings[9] | holdings[7]) is None
 
     def test_union_and_addition_different(self, make_opinion_with_holding):
         """

@@ -22,6 +22,10 @@ class Pleading(Factor):
         string = f'{("filed by " + str(self.filer) if self.filer else "")}'
         return super().__str__().format(string).replace("Pleading", "pleading")
 
+    @property
+    def short_string(self):
+        return str(self)
+
 
 @dataclass(frozen=True)
 class Allegation(Factor):
@@ -54,8 +58,8 @@ class Allegation(Factor):
     @property
     def short_string(self):
         string = (
-            f'{("in " + str(self.pleading) + ",") if self.pleading else ""}'
-            + f'{("claiming " + str(self.statement) + ",") if self.statement else ""}'
+            f'{("in " + self.pleading.short_string + ",") if self.pleading else ""}'
+            + f'{("claiming " + self.statement.short_string + ",") if self.statement else ""}'
         )
         string = string.strip(",")
         return super().__str__().format(string).replace("Allegation", "allegation")
