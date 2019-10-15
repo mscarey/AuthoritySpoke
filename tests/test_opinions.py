@@ -139,11 +139,15 @@ class TestOpinions:
     def test_new_context_creates_equal_rule(self, make_opinion, make_regime):
         watt = make_opinion["watt_majority"]
         brad = make_opinion["brad_majority"]
-        # Clearing in case prior tests added holdings
-        watt.holdings = []
-        brad.holdings = []
-        watt.posit(loaders.load_holdings("holding_watt.json", regime=make_regime))
-        brad.posit(loaders.load_holdings("holding_brad.json", regime=make_regime))
+
+        watt.clear_holdings()
+        watt_raw = loaders.load_holdings("holding_watt.json")
+        watt.posit(readers.read_holdings(watt_raw, regime=make_regime))
+
+        brad.clear_holdings()
+        brad_raw = loaders.load_holdings("holding_brad.json")
+        brad.posit(readers.read_holdings(brad_raw, regime=make_regime))
+
         context_pairs = {
             "proof of Bradley's guilt": "proof of Wattenburg's guilt",
             "Bradley": "Wattenburg",
@@ -160,10 +164,14 @@ class TestOpinions:
 
         watt = make_opinion["watt_majority"]
         brad = make_opinion["brad_majority"]
-        watt.holdings = []
-        brad.holdings = []
-        watt.posit(loaders.load_holdings("holding_watt.json", regime=make_regime))
-        brad.posit(loaders.load_holdings("holding_brad.json", regime=make_regime))
+
+        watt.clear_holdings()
+        watt_raw = loaders.load_holdings("holding_watt.json")
+        watt.posit(readers.read_holdings(watt_raw, regime=make_regime))
+
+        brad.clear_holdings()
+        brad_raw = loaders.load_holdings("holding_brad.json")
+        brad.posit(readers.read_holdings(brad_raw, regime=make_regime))
 
         context_items = [
             "proof of Wattenburg's guilt",
@@ -194,14 +202,15 @@ class TestImplication:
         assert watt > brad
         assert not brad >= watt
 
-    def test_opinion_implies_rule(self, make_opinion, make_holding):
+    def test_opinion_implies_holding(self, make_opinion, make_holding):
         watt = make_opinion["watt_majority"]
         watt.posit(make_holding["h2_invalid_undecided"])
         assert watt >= make_holding["h2_undecided"]
         assert watt > make_holding["h2_undecided"]
 
-    def test_opinion_does_not_imply_rule(self, make_opinion, make_holding):
+    def test_opinion_does_not_imply_holding(self, make_opinion, make_holding):
         watt = make_opinion["watt_majority"]
+        watt.clear_holdings()
         watt.posit(make_holding["h2_irrelevant_inputs_undecided"])
         assert not watt >= make_holding["h2_undecided"]
         assert not watt > make_holding["h2_undecided"]
