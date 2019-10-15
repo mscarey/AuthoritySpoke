@@ -3,12 +3,12 @@
 
             {
                 "type": "Exhibit",
-                "name": "officer's testimony that defendant was addicted to heroin",
+                "name": "officer's testimony that the defendant was addicted to heroin",
                 "form": "testimony",
                 "statement": {
                     "type": "Fact",
-                    "name": "fact that defendant was addicted to heroin",
-                    "content": "the {defendant} was addicted to heroin"
+                    "name": "fact that the defendant was addicted to heroin",
+                    "content": "{the defendant} was addicted to heroin"
                 },
                 "stated_by": {
                     "type": "entity",
@@ -27,18 +27,18 @@
                 },
                 "statement": {
                     "type": "Fact",
-                    "name": "fact that defendant committed an attempted robbery",
-                    "content": "defendant committed an attempted robbery"
+                    "name": "fact that the defendant committed an attempted robbery",
+                    "content": "the defendant committed an attempted robbery"
                 }
             }
         ],
         "despite": [{
             "type": "Fact",
-            "content": "officer's testimony that defendant was addicted to heroin was relevant to show the defendant had a motive to commit an attempted robbery"
+            "content": "officer's testimony that the defendant was addicted to heroin was relevant to show the defendant had a motive to commit an attempted robbery"
         }],
         "outputs": [{
             "type": "Fact",
-            "content": "the probative value of officer's testimony that defendant was addicted to heroin, in showing fact that defendant committed an attempted robbery, was outweighed by unfair prejudice to defendant"
+            "content": "the probative value of officer's testimony that the defendant was addicted to heroin, in showing fact that the defendant committed an attempted robbery, was outweighed by unfair prejudice to the defendant"
         }],
         "mandatory": true,
         "enactments": [{
@@ -64,17 +64,17 @@
     {
         "inputs": [{
             "type": "Fact",
-            "content": "the probative value of officer's testimony that defendant was addicted to heroin, in showing fact that defendant committed an attempted robbery, was outweighed by unfair prejudice to defendant"
+            "content": "the probative value of officer's testimony that the defendant was addicted to heroin, in showing fact that the defendant committed an attempted robbery, was outweighed by unfair prejudice to defendant"
         }],
         "despite": [{
             "type": "Fact",
-            "content": "officer's testimony that defendant was addicted to heroin was relevant to show defendant had a motive to commit an attempted robbery"
+            "content": "officer's testimony that the defendant was addicted to heroin was relevant to show the defendant had a motive to commit an attempted robbery"
         }],
         "outputs": [{
             "type": "Evidence",
-            "name": "evidence of officer's testimony that defendant was addicted to heroin",
-            "exhibit": "officer's testimony that defendant was addicted to heroin",
-            "to_effect": "fact that defendant committed an attempted robbery",
+            "name": "evidence of officer's testimony that the defendant was addicted to heroin",
+            "exhibit": "officer's testimony that the defendant was addicted to heroin",
+            "to_effect": "fact that the defendant committed an attempted robbery",
             "absent": true
         }],
         "mandatory": true,

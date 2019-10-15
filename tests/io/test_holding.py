@@ -458,7 +458,7 @@ class TestHoldingImport:
         watt.posit(context_holding)
         string = str(context_holding)
         assert "<Wattenburg> lived at <Bradley's house>" in string
-        assert "<Wattenburg> lived at <Bradley's house>" in str(watt.holdings[0])
+        assert "<Wattenburg> lived at <Bradley's house>" in str(watt.holdings[-1])
 
     def test_holding_with_non_generic_value(
         self, make_opinion, make_regime, make_entity

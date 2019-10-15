@@ -702,11 +702,18 @@ class TestUnion:
         assert new_rule.mandatory is False
 
     def test_union_same_output(self, make_opinion_with_holding):
+        """
+        The two Rules being combined both same the same output
+        Factor (and they both have only one output Factor).
+        The combined Rule should also have just that one
+        output Factor.
+        """
+
         lotus = make_opinion_with_holding["lotus_majority"]
         lotus_not_copyrightable = lotus.holdings[6].rule
         feist = make_opinion_with_holding["feist_majority"]
-        lotus_not_copyrightable = feist.holdings[0].rule
-        new_rule = lotus_not_copyrightable | lotus_not_copyrightable
+        feist_not_copyrightable = feist.holdings[0].rule
+        new_rule = lotus_not_copyrightable | feist_not_copyrightable
         assert len(new_rule.outputs) == 1
 
     def test_union_implied_but_not_universal_easy(self, make_rule):
@@ -750,7 +757,7 @@ class TestUnion:
         oracle = make_opinion_with_holding["oracle_majority"]
         # changing one of the Rules to universal because otherwise
         # nothing can be inferred by their union.
-        lotus_4 = lotus.holdings[4].rule.evolve("universal")
+        lotus_4 = lotus.holdings[2].rule.evolve("universal")
         new = lotus_4 | oracle.holdings[2].rule
         assert "<the Lotus menu command hierarchy> was the expression of an idea" in str(new)
         assert new.mandatory is False
@@ -766,7 +773,7 @@ class TestUnion:
         """
         lotus = make_opinion_with_holding["lotus_majority"]
         oracle = make_opinion_with_holding["oracle_majority"]
-        new = lotus.holdings[9].rule | oracle.holdings[3].rule
+        new = lotus.holdings[7].rule | oracle.holdings[3].rule
         text = (
             "that <the Lotus menu command hierarchy> was a "
             "literal element of <Lotus 1-2-3>")

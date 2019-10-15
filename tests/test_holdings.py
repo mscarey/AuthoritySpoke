@@ -238,6 +238,4 @@ class TestHoldingImports:
         )
         brad = make_opinion["brad_majority"]
         brad.posit(holdings, text_links=holding_anchors)
-        brad.add_factor_anchors(anchors)
-        fact_name = holdings[0].outputs[0]
-        assert brad.factors[fact][0].exact == "open fields or grounds"
+        assert brad.holding_anchors[holdings[0]][0].exact == "we hold"
