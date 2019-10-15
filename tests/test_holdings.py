@@ -214,20 +214,22 @@ class TestUnion:
         """
 
         feist = make_opinion_with_holding["feist_majority"]
-        result_of_adding = feist.holdings[11] + feist.holdings[4]
-        result_of_union = feist.holdings[11] | feist.holdings[4]
+        result_of_adding = feist.holding(11) + feist.holding(4)
+        result_of_union = feist.holding(11) | feist.holding(4)
         assert not result_of_adding.means(result_of_union)
 
 
 class TestHoldingImports:
     def test_repeating_read_holdings_has_same_result(self, make_analysis):
-        holdings, mentioned = readers.read_holdings(
-            make_analysis["minimal"], report_mentioned=True
+        holdings, anchors, holding_anchors = readers.read_holdings(
+            make_analysis["minimal"], index_anchors=True
         )
-        holdings2, mentioned2 = readers.read_holdings(
-            make_analysis["minimal"], report_mentioned=True
+        holdings2, anchors2, holding_anchors2 = readers.read_holdings(
+            make_analysis["minimal"], index_anchors=True
         )
-        assert mentioned == mentioned2
+        assert holdings == holdings2
+        assert anchors == anchors2
+        assert holding_anchors == holding_anchors2
 
     def test_posit_holding_with_selector(self, make_analysis, make_opinion):
 

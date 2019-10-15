@@ -152,19 +152,6 @@ class TestHoldingImport:
         assert feist_holdings[0].enactments[0].name == "securing for authors"
         assert feist_holdings[1].enactments[0].name == "securing for authors"
 
-    def test_import_feist_holdings_with_enactments(self, make_regime):
-        """
-        Testing error message:
-        'Name "securing for authors" not found in the index of mentioned Factors'
-
-        Delete if this and the test above both pass
-        """
-        raw_holdings = load_holdings(f"holding_feist.json", regime=make_regime)
-        feist_holdings, anchors, holding_anchors = readers.read_holdings(
-            raw_holdings, regime=make_regime, index_anchors=True
-        )
-        assert feist_holdings[0].enactments[0].name == "securing for authors"
-
     def test_import_holdings_from_multiple_cases(self, make_regime):
         """
         Test whether loading two cases in a row causes a problem.
@@ -357,7 +344,7 @@ class TestHoldingImport:
 
         watt = make_opinion["watt_majority"]
         watt.posit(load_holdings("holding_watt.json"))
-        assert watt.holdings[0] == real_holding["h1"]
+        assert watt.holding(0) == real_holding["h1"]
 
     def test_same_enactment_objects_equal(self, make_regime):
         """

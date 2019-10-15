@@ -337,7 +337,7 @@ def read_holding(
         :class:`.Factor`\s as keys and their :class:`.TextQuoteSelector`\s
         as values.
     """
-    record, mentioned = index_names(record)
+    record, mentioned = index_names(deepcopy(record))
     if index_anchors:
         factor_anchors = anchors.collect_anchors_recursively(deepcopy(record))
         factor_anchors = {

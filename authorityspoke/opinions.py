@@ -147,6 +147,15 @@ class Opinion:
                 return factor
         return None
 
+    def holding(self, index: int) -> Holding:
+        """
+        Access a :class:`.Holding` by its position in self.holdings.
+
+        :returns:
+            the :class:`.Holding` in that index in the :class:`.OrderedDict`
+        """
+        return list(self.holdings)[index]
+
     def posit_holding(
         self,
         holding: Union[Holding, Rule],
