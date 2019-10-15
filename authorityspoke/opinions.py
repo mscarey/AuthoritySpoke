@@ -73,8 +73,10 @@ class Opinion:
     text: Optional[str] = field(repr=False)
 
     def __post_init__(self):
-        self.holdings: OrderedDict[Holding, List[TextQuoteSelector]] = OrderedDict({})
-        self.factors: Dict[Factor, List[TextQuoteSelector]] = {}
+        self.holding_anchors: OrderedDict[
+            Holding, List[TextQuoteSelector]
+        ] = OrderedDict({})
+        self.factor_anchors: Dict[Factor, List[TextQuoteSelector]] = {}
 
     def contradicts(
         self, other: Union[Opinion, Holding], context: Optional[ContextRegister] = None
@@ -147,14 +149,15 @@ class Opinion:
                 return factor
         return None
 
-    def holding(self, index: int) -> Holding:
-        """
-        Access a :class:`.Holding` by its position in self.holdings.
+    @property
+    def holdings(self) -> List[Holding]:
+        r"""
+        Get ordered list of :class:`.Holding`\s posited by this :class:`Opinion`
 
         :returns:
-            the :class:`.Holding` in that index in the :class:`.OrderedDict`
+            keys of the holding_anchors :class:`.OrderedDict`, as a list
         """
-        return list(self.holdings)[index]
+        return list(self.holding_anchors)
 
     def posit_holding(
         self,
@@ -177,7 +180,7 @@ class Opinion:
         if context:
             holding = holding.new_context(context, context_opinion=self)
         if holding not in self.holdings:
-            self.holdings[holding] = text_links
+            self.holding_anchors[holding] = text_links
 
     def posit_holdings(
         self,

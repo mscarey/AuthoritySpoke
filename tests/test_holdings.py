@@ -214,8 +214,8 @@ class TestUnion:
         """
 
         feist = make_opinion_with_holding["feist_majority"]
-        result_of_adding = feist.holding(11) + feist.holding(4)
-        result_of_union = feist.holding(11) | feist.holding(4)
+        result_of_adding = feist.holdings[11] + feist.holdings[4]
+        result_of_union = feist.holdings[11] | feist.holdings[4]
         assert not result_of_adding.means(result_of_union)
 
 

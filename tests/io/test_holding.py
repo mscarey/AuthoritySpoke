@@ -168,7 +168,7 @@ class TestHoldingImport:
                 raw_holdings, regime=make_regime, index_anchors=True
             )
             opinions[f"{case}_majority"].posit(holdings)
-        holding = list(opinions["lotus_majority"].holdings)[0]
+        holding = opinions["lotus_majority"].holdings[0]
         factor = holding.inputs[0]
         assert factor.predicate.content == "the {} was copyrightable"
 
@@ -344,7 +344,7 @@ class TestHoldingImport:
 
         watt = make_opinion["watt_majority"]
         watt.posit(load_holdings("holding_watt.json"))
-        assert watt.holding(0) == real_holding["h1"]
+        assert watt.holdings[0] == real_holding["h1"]
 
     def test_same_enactment_objects_equal(self, make_regime):
         """
@@ -450,16 +450,15 @@ class TestHoldingImport:
         to_read = load_holdings("holding_brad.json", regime=make_regime)
         holdings = readers.read_holdings(to_read, regime=make_regime)
         brad.posit(holdings)
-        expectation_not_reasonable = list(brad.holdings.keys())[6]
+        expectation_not_reasonable = brad.holdings[6]
         context_holding = expectation_not_reasonable.new_context(
             {expectation_not_reasonable.generic_factors[0]: make_entity["watt"]}
         )
-        # resetting holdings because of class scope of fixture
-        watt.holdings = OrderedDict()
+
         watt.posit(context_holding)
         string = str(context_holding)
         assert "<Wattenburg> lived at <Bradley's house>" in string
-        assert "<Wattenburg> lived at <Bradley's house>" in str(list(watt.holdings)[0])
+        assert "<Wattenburg> lived at <Bradley's house>" in str(watt.holdings[0])
 
     def test_holding_with_non_generic_value(
         self, make_opinion, make_regime, make_entity
@@ -471,7 +470,7 @@ class TestHoldingImport:
         to_read = load_holdings("holding_brad.json", regime=make_regime)
         holdings = readers.read_holdings(to_read, regime=make_regime)
         brad.posit(holdings)
-        expectation_not_reasonable = list(brad.holdings.keys())[6]
+        expectation_not_reasonable = brad.holdings[6]
         generic_patch = expectation_not_reasonable.generic_factors[1]
         context_change = expectation_not_reasonable.new_context(
             {generic_patch: make_entity["trees_specific"]}
