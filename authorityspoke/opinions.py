@@ -6,7 +6,7 @@ Unlike most other ``authorityspoke`` classes, :class:`Opinion`\s are not frozen.
 
 from __future__ import annotations
 
-from collections import OrderedDict
+from collections import defaultdict
 from itertools import zip_longest
 from typing import Dict, Iterable, List
 from typing import Optional, Sequence, Set, Tuple, Union
@@ -73,16 +73,14 @@ class Opinion:
     text: Optional[str] = field(repr=False)
 
     def __post_init__(self):
-        self.holding_anchors: OrderedDict[
-            Holding, List[TextQuoteSelector]
-        ] = OrderedDict({})
-        self.factor_anchors: Dict[Factor, List[TextQuoteSelector]] = {}
+        self.holding_anchors: Dict[Holding, List[TextQuoteSelector]] = defaultdict(list)
+        self.factors: Dict[Factor, List[TextQuoteSelector]] = defaultdict(list)
 
     def clear_holdings(self):
         r"""
         Remove all :class:`.Holding`\s from the opinion.
         """
-        self.holding_anchors = OrderedDict({})
+        self.holding_anchors.clear()
 
     def contradicts(
         self, other: Union[Opinion, Holding], context: Optional[ContextRegister] = None
@@ -169,6 +167,7 @@ class Opinion:
         self,
         holding: Union[Holding, Rule],
         text_links: Optional[List[TextQuoteSelector]] = None,
+        factor_text_links: Optional[TextLinkDict] = None,
         context: Optional[Sequence[Factor]] = None,
     ) -> None:
         r"""Record that this Opinion endorses specified :class:`Holding`\s."""
@@ -182,16 +181,19 @@ class Opinion:
         if not isinstance(holding, Holding):
             raise TypeError('"holding" must be an object of type Holding.')
 
-        text_links = text_links or []
         if context:
             holding = holding.new_context(context, context_opinion=self)
-        if holding not in self.holdings:
-            self.holding_anchors[holding] = text_links
+        self.holding_anchors[holding].append(text_links or [])
+        if factor_text_links:
+            for factor in holding.recursive_factors:
+                if factor.get("name") in factor_text_links:
+                    self.factors[factor].append(factor_text_links[factor["name"]])
 
     def posit_holdings(
         self,
         holdings: Iterable[Union[Holding, Rule]],
         text_links: Optional[List[List[TextQuoteSelector]]] = None,
+        factor_text_links: Optional[TextLinkDict] = None,
         context: Optional[Sequence[Factor]] = None,
     ):
         r"""
@@ -217,12 +219,20 @@ class Opinion:
         """
         text_links = text_links or []
         for (holding, selector_list) in zip_longest(holdings, text_links):
-            self.posit_holding(holding, text_links=selector_list, context=context)
+            self.posit_holding(
+                holding,
+                text_links=selector_list,
+                factor_text_links=factor_text_links,
+                context=context,
+            )
 
     def posit(
         self,
         holdings: Union[Holding, Iterable[Union[Holding, Rule]]],
-        text_links: Optional[TextLinkDict] = None,
+        text_links: Optional[
+            List[Union[TextQuoteSelector, List[TextQuoteSelector]]]
+        ] = None,
+        factor_text_links: Optional[TextLinkDict] = None,
         context: Optional[Sequence[Factor]] = None,
     ) -> None:
         r"""
@@ -241,9 +251,8 @@ class Opinion:
             the ``outputs`` of the :class:`.Holding` be put into effect.
 
         :param text_links:
-            mapping of :class:`Factor`\s to the :class:`Opinion` passages where
-            they can be found. Can be obtained as the "mentioned" return value
-            of one of the functions in :mod:`authorityspoke.io.readers`\.
+            list of lists of :class:`.Opinion` passages where references to each
+            :class:`.Holding` can be found.
 
         :param context:
             an ordered sequence (probably :py:class:`dict`) of
@@ -252,9 +261,19 @@ class Opinion:
             present case.
         """
         if isinstance(holdings, Iterable):
-            self.posit_holdings(holdings, text_links=text_links, context=context)
+            self.posit_holdings(
+                holdings,
+                text_links=text_links,
+                factor_text_links=factor_text_links,
+                context=context,
+            )
         else:
-            self.posit_holding(holdings, text_links=text_links, context=context)
+            self.posit_holding(
+                holdings,
+                text_links=text_links,
+                factor_text_links=factor_text_links,
+                context=context,
+            )
 
     def get_anchors(self, holding: Holding, include_factors: bool = True) -> List[str]:
         r"""

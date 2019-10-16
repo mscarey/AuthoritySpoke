@@ -44,12 +44,9 @@ class TestOpinions:
             + "impractical and, in any event, unnecessary"
         ) in make_opinion["feist_majority"].text
 
-    def test_opinion_holding_list(
-        self, make_opinion, real_holding, make_evidence, make_entity
-    ):
+    def test_opinion_holding_list(self, make_opinion, real_holding):
         watt = make_opinion["watt_majority"]
-        h = real_holding
-        h3_specific = h["h3"]
+        h3_specific = real_holding["h3"]
         watt.posit(h3_specific)
         assert h3_specific in watt.holdings
 
@@ -61,13 +58,9 @@ class TestOpinions:
 
     def test_opinion_factor_text_anchor(self, make_opinion_with_holding):
         feist = make_opinion_with_holding["feist_majority"]
-        assert all(
-            "No one may claim originality" not in anchor
-            for anchor in feist.get_anchors(feist.holdings[0])
-        )
-        assert any(
-            "as to facts" in anchor for anchor in feist.get_anchors(feist.holdings[0])
-        )
+        anchors = feist.get_anchors(feist.holdings[0])
+        assert all("No one may claim originality" not in anchor for anchor in anchors)
+        assert any("as to facts" in anchor for anchor in anchors)
 
     def test_opinion_entity_list(
         self, make_opinion, real_holding, make_entity, make_evidence
