@@ -53,14 +53,17 @@ class TestOpinions:
     def test_opinion_text_anchor(self, make_opinion_with_holding):
         feist = make_opinion_with_holding["feist_majority"]
         assert any(
-            "generally" in anchor for anchor in feist.get_anchors(feist.holdings[1])
+            "generally" in anchor.exact
+            for anchor in feist.get_anchors(feist.holdings[1])
         )
 
     def test_opinion_factor_text_anchor(self, make_opinion_with_holding):
         feist = make_opinion_with_holding["feist_majority"]
         anchors = feist.get_anchors(feist.holdings[0])
-        assert all("No one may claim originality" not in anchor for anchor in anchors)
-        assert any("as to facts" in anchor for anchor in anchors)
+        assert all(
+            "No one may claim originality" not in anchor.exact for anchor in anchors
+        )
+        assert any("as to facts" in anchor.exact for anchor in anchors)
 
     def test_opinion_entity_list(
         self, make_opinion, real_holding, make_entity, make_evidence
@@ -220,4 +223,3 @@ class TestContradiction:
     def test_error_contradiction_with_procedure(self, make_opinion, make_procedure):
         with pytest.raises(TypeError):
             make_opinion["watt_majority"].contradicts(make_procedure["c1"])
-

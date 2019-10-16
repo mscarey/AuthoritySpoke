@@ -186,8 +186,8 @@ class Opinion:
         self.holding_anchors[holding].extend(text_links or [])
         if factor_text_links:
             for factor in holding.recursive_factors:
-                if factor.get("name") in factor_text_links:
-                    self.factors[factor].extend(factor_text_links[factor["name"]])
+                if factor.name in factor_text_links:
+                    self.factors[factor].extend(factor_text_links[factor.name])
 
     def posit_holdings(
         self,
@@ -286,28 +286,12 @@ class Opinion:
             a :class:`list` with the text of each passage that anchors the :class:`.Holding`
         """
 
-        def add_selectors(
-            anchor_list: List, selectors: Optional[Iterable[TextQuoteSelector]]
-        ) -> List[str]:
-            if selectors is None:
-                return anchor_list
-            for selector in selectors:
-                new_text = self.select_text(selector)
-                if new_text:
-                    anchor_list.append(new_text)
-                else:
-                    logger.error(
-                        f"Failed to find Opinion text with {selector} in "
-                        + (f"Opinion {self.name}.")
-                    )
-            return anchor_list
-
         anchors: List[str] = []
         if include_factors:
             for factor in holding.rule.procedure.factors_all:
-                anchors = add_selectors(anchors, self.factors.get(factor))
-        # What about the Rule? Can that have its own selectors?
-        anchors = add_selectors(anchors, holding.selectors)
+                if self.factors.get(factor):
+                    anchors.extend(self.factors[factor])
+        anchors.extend(self.holding_anchors[holding])
 
         return anchors
 
