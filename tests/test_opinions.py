@@ -220,3 +220,4 @@ class TestContradiction:
     def test_error_contradiction_with_procedure(self, make_opinion, make_procedure):
         with pytest.raises(TypeError):
             make_opinion["watt_majority"].contradicts(make_procedure["c1"])
+

@@ -51,8 +51,6 @@ def read_selector(
 
     :returns: a new :class:`TextQuoteSelector`
     """
-    if not record:
-        return None
     selector_schema = schemas.SelectorSchema(many=many)
     return selector_schema.load(record)
 

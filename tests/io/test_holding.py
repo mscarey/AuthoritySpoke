@@ -172,7 +172,7 @@ class TestHoldingImport:
         factor = holding.inputs[0]
         assert factor.predicate.content == "{} was copyrightable"
 
-    def test_import_holdings_with_anchors(self, make_regime):
+    def test_read_holdings_with_anchors(self, make_regime):
         """
         Test whether index_anchors flag causes holding loading to break.
         """
@@ -183,6 +183,18 @@ class TestHoldingImport:
 
         assert isinstance(oracle_holdings[0], Holding)
         assert isinstance(anchors.popitem()[1].pop(), TextQuoteSelector)
+
+class TestTextAnchors:
+    def test_read_holding_with_no_anchor(self, make_opinion, make_analysis):
+        oracle = make_opinion["oracle_majority"]
+        raw_analysis = make_analysis["no anchors"]
+        oracle_holdings, anchors, holding_anchors = readers.read_holdings(
+            raw_analysis, index_anchors=True
+        )
+        oracle.posit(oracle_holdings, text_links=holding_anchors, factor_text_links=anchors)
+        has_no_anchors = oracle.holdings[0]
+        assert oracle.holding_anchors[has_no_anchors] == []
+
 
     def test_holding_without_enactments_or_regime(self):
         holding = {

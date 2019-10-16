@@ -183,11 +183,11 @@ class Opinion:
 
         if context:
             holding = holding.new_context(context, context_opinion=self)
-        self.holding_anchors[holding].append(text_links or [])
+        self.holding_anchors[holding].extend(text_links or [])
         if factor_text_links:
             for factor in holding.recursive_factors:
                 if factor.get("name") in factor_text_links:
-                    self.factors[factor].append(factor_text_links[factor["name"]])
+                    self.factors[factor].extend(factor_text_links[factor["name"]])
 
     def posit_holdings(
         self,

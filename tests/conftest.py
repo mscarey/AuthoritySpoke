@@ -1164,11 +1164,19 @@ def make_analysis() -> Dict[str, Dict[str, Any]]:
             {
                 "outputs": {
                     "type": "fact",
-                    "content": "{Bradley} made a minimal holding object.",
+                    "content": "{Bradley} made a minimal holding object",
                     "anchors": "upholding searches in |open fields or grounds|around a house",
                 },
                 "anchors": "Thus,|we hold|that this rule is correct."
             }
 
+        ]
+    analysis["no anchors"] = [
+            {
+                "outputs": {
+                    "type": "fact",
+                    "content": "this holding has no text anchors",
+                }
+            }
         ]
     return analysis
