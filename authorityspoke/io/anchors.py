@@ -1,7 +1,44 @@
 from collections import defaultdict
-from typing import Dict, List, Optional
+from typing import Dict, Iterable, List, Optional, Tuple, Union
 
 from authorityspoke.opinions import TextLinkDict
+from authorityspoke.selectors import TextQuoteSelector
+
+from authorityspoke.io import schemas
+
+
+def read_selector(
+    record: Optional[Union[Dict, str]], many: bool = False
+) -> Optional[TextQuoteSelector]:
+    """
+    Create new selector from JSON user input.
+
+    :param record:
+        a string or dict representing a text passage
+
+    :returns: a new :class:`TextQuoteSelector`
+    """
+    selector_schema = schemas.SelectorSchema(many=many)
+    return selector_schema.load(record)
+
+
+def read_selectors(
+    record: Iterable[Union[str, Dict[str, str]]]
+) -> List[TextQuoteSelector]:
+    r"""
+    Create list of :class:`.TextQuoteSelector`\s from JSON user input.
+
+    If the input is a :class:`str`, tries to break up the string
+    into :attr:`~TextQuoteSelector.prefix`, :attr:`~TextQuoteSelector.exact`,
+    and :attr:`~TextQuoteSelector.suffix`, by splitting on the pipe characters.
+
+    :param record:
+        a string or dict representing a text passage, or list of
+        strings and dicts.
+
+    :returns: a list of :class:`TextQuoteSelector`\s
+    """
+    return read_selector(record, many=True)
 
 
 def collect_anchors(obj: Dict) -> List[Dict]:
@@ -33,3 +70,22 @@ def collect_anchors_recursively(
                 for k, v in collect_anchors_recursively(value).items():
                     anchors[k] += v
     return anchors
+
+
+def index_anchors(
+    record: Dict, many: bool = False
+) -> Tuple[TextLinkDict, List[List[TextQuoteSelector]]]:
+    """
+    Make indexes of Holding and Factor text anchors for a list of Holdings.
+    """
+
+    factor_anchors = collect_anchors_recursively(record)
+    factor_anchors = {
+        key: read_selectors(value) for key, value in factor_anchors.items()
+    }
+    if many:
+        holding_anchors = [collect_anchors(holding) for holding in record]
+    else:
+        holding_anchors = [collect_anchors(record)]
+    holding_anchors = [read_selectors(record) for record in holding_anchors]
+    return factor_anchors, holding_anchors

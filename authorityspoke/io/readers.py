@@ -337,15 +337,9 @@ def read_holding(
     """
     record, mentioned = index_names(deepcopy(record))
     if index_anchors:
-        factor_anchors = anchors.collect_anchors_recursively(deepcopy(record))
-        factor_anchors = {
-            key: read_selectors(value) for key, value in factor_anchors.items()
-        }
-        if many:
-            holding_anchors = [anchors.collect_anchors(holding) for holding in record]
-        else:
-            holding_anchors = [anchors.collect_anchors(record)]
-        holding_anchors = [read_selectors(group) for group in holding_anchors]
+        factor_anchors, holding_anchors = anchors.index_anchors(
+            deepcopy(record), many=many
+        )
     schema = schemas.HoldingSchema(many=many)
 
     proxy = deepcopy(mentioned)
