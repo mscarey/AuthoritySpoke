@@ -182,7 +182,7 @@ class Rule(Factor):
                 "The 'exclusive' attribute is not allowed for Rules "
                 + "with more than one 'output' Factor. If the set of Factors "
                 + "in 'inputs' is really the only way to reach any of the "
-                + "'outputs', consider making a separate 'exclusive' entry "
+                + "'outputs', consider making a separate 'exclusive' Rule "
                 + "for each output."
             )
         if self.outputs[0].absent:

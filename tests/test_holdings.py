@@ -10,6 +10,16 @@ class TestHolding:
         string = str(holding)
         assert "is relevant to show the fact that <Alice>" in string
 
+    def test_infer_from_exclusive(self, make_opinion_with_holding):
+        """
+        Test that the correct inference is made from a Holding being marked
+        the "exclusive" way to reach the output "{} infringed the copyright in {}"
+        """
+        exclusive_holding = make_opinion_with_holding["lotus_majority"].holdings[0]
+        inferred = next(exclusive_holding.inferred_from_exclusive())
+        assert inferred.outputs[0].content == "{} infringed the copyright in {}"
+        assert inferred.outputs[0].absent
+
 
 class TestSameMeaning:
     def test_identical_holdings_equal(self, make_holding):
@@ -217,25 +227,3 @@ class TestUnion:
         result_of_adding = feist.holdings[11] + feist.holdings[4]
         result_of_union = feist.holdings[11] | feist.holdings[4]
         assert not result_of_adding.means(result_of_union)
-
-
-class TestHoldingImports:
-    def test_repeating_read_holdings_has_same_result(self, make_analysis):
-        holdings, anchors, holding_anchors = readers.read_holdings(
-            make_analysis["minimal"], index_anchors=True
-        )
-        holdings2, anchors2, holding_anchors2 = readers.read_holdings(
-            make_analysis["minimal"], index_anchors=True
-        )
-        assert holdings == holdings2
-        assert anchors == anchors2
-        assert holding_anchors == holding_anchors2
-
-    def test_posit_holding_with_selector(self, make_analysis, make_opinion):
-
-        holdings, anchors, holding_anchors = readers.read_holdings(
-            make_analysis["minimal"], index_anchors=True
-        )
-        brad = make_opinion["brad_majority"]
-        brad.posit(holdings, text_links=holding_anchors)
-        assert brad.holding_anchors[holdings[0]][0].exact == "we hold"

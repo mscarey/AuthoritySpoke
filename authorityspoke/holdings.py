@@ -208,9 +208,18 @@ class Holding(Factor):
             other = Holding(rule=other)
         if not isinstance(other, self.__class__):
             raise TypeError
+        for self_holding in self.nonexclusive_holdings():
+            for other_holding in other.nonexclusive_holdings():
+                yield from self_holding.contradicts_if_not_exclusive(other_holding)
+
+    def contradicts_if_not_exclusive(
+        self, other: Holding, context: ContextRegister = None
+    ):
+        if context is None:
+            context = ContextRegister()
         if isinstance(other, Holding) and other.decided:
             if self.decided:
-                yield from self.explain_implication(other.negated())
+                yield from self.explain_implication(other.negated(), context=context)
             else:
                 yield from chain(
                     other._implies_if_decided(self),
@@ -337,6 +346,16 @@ class Holding(Factor):
 
         return len(self.rule.procedure)
 
+    def inferred_from_exclusive(self) -> Iterator[Holding]:
+        r"""
+        Yield :class:`Holding`\s that can be inferred from the "exclusive" flag.
+
+        The generator will be empty if `self.exclusive` is False.
+        """
+        if self.exclusive:
+            for modified_rule in self.rule.get_contrapositives():
+                yield Holding(rule=modified_rule)
+
     def explain_same_meaning(
         self, other: Factor, context: Optional[ContextRegister] = None
     ) -> Iterator[ContextRegister]:
@@ -379,6 +398,17 @@ class Holding(Factor):
             decided=self.decided,
             selectors=self.selectors,
         )
+
+    def nonexclusive_holdings(self) -> Iterator[Holding]:
+        r"""
+        Yield all :class:`.Holding`\s with `exclusive is False` implied by self.
+        """
+        if not self.exclusive:
+            yield self
+        else:
+            yield self.evolve("exclusive")
+            for inferred in self.inferred_from_exclusive():
+                yield inferred
 
     def __or__(self, other: Union[Rule, Holding]) -> Optional[Holding]:
         if isinstance(other, Rule):

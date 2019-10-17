@@ -514,6 +514,25 @@ class TestTextAnchors:
         with pytest.raises(ValueError):
             readers.read_holding(rule_dict)
 
+    def test_repeating_read_holdings_has_same_result(self, make_analysis):
+        holdings, anchors, holding_anchors = readers.read_holdings(
+            make_analysis["minimal"], index_anchors=True
+        )
+        holdings2, anchors2, holding_anchors2 = readers.read_holdings(
+            make_analysis["minimal"], index_anchors=True
+        )
+        assert holdings == holdings2
+        assert anchors == anchors2
+        assert holding_anchors == holding_anchors2
+
+    def test_posit_holding_with_selector(self, make_analysis, make_opinion):
+
+        holdings, anchors, holding_anchors = readers.read_holdings(
+            make_analysis["minimal"], index_anchors=True
+        )
+        brad = make_opinion["brad_majority"]
+        brad.posit(holdings, text_links=holding_anchors)
+        assert brad.holding_anchors[holdings[0]][0].exact == "we hold"
 
 class TestExclusiveFlag:
     def test_holding_flagged_exclusive(self, make_regime, make_enactment):
