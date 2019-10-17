@@ -472,6 +472,14 @@ class Holding(Factor):
             if not self.decided
             else ("ACCEPT" if self.rule_valid else "REJECT")
         )
+        exclusive = (
+            (
+                f" that the EXCLUSIVE way to reach "
+                f"{self.rule.outputs[0].short_string} is"
+            )
+            if self.exclusive
+            else ""
+        )
         rule_text = textwrap.indent(str(self.rule), prefix=indent)
-        text = f"the Holding to {action}\n{rule_text}"
+        text = f"the Holding to {action}{exclusive}\n{rule_text}"
         return text

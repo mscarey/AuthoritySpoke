@@ -67,7 +67,7 @@ class TestIntroduction:
     def test_opinion_explain_contradiction(self, make_opinion_with_holding):
         oracle = make_opinion_with_holding["oracle_majority"]
         lotus = make_opinion_with_holding["lotus_majority"]
-        register = next(lotus.holdings[8].explain_contradiction(oracle.holdings[10]))
+        register = next(lotus.holdings[6].explain_contradiction(oracle.holdings[10]))
         assert register == ContextRegister(
             {Entity("the Lotus menu command hierarchy"): Entity("the Java API")}
         )
@@ -75,7 +75,7 @@ class TestIntroduction:
     def test_register_string(self, make_opinion_with_holding):
         oracle = make_opinion_with_holding["oracle_majority"]
         lotus = make_opinion_with_holding["lotus_majority"]
-        register = next(lotus.holdings[8].explain_contradiction(oracle.holdings[10]))
+        register = next(lotus.holdings[6].explain_contradiction(oracle.holdings[10]))
         string = "ContextRegister(<the Lotus menu command hierarchy> -> <the Java API>)"
         assert str(register) == string
 
@@ -86,7 +86,7 @@ class TestIntroduction:
         """
         oracle = make_opinion_with_holding["oracle_majority"]
         lotus = make_opinion_with_holding["lotus_majority"]
-        assert oracle.holdings[10].contradicts(lotus.holdings[8])
+        assert oracle.holdings[10].contradicts(lotus.holdings[6])
 
     def test_addition_some_to_some(self, make_opinion_with_holding):
         """
@@ -96,21 +96,21 @@ class TestIntroduction:
 
         oracle = make_opinion_with_holding["oracle_majority"]
         feist = make_opinion_with_holding["feist_majority"]
-        listings_not_original = feist.holdings[11]
+        listings_not_original = feist.holdings[10]
         original_not_copyrightable = oracle.holdings[0]
         assert listings_not_original + original_not_copyrightable is None
 
     def test_adding_holdings(self, make_opinion_with_holding):
         feist = make_opinion_with_holding["feist_majority"]
-        listings_not_original = feist.holdings[11]
-        unoriginal_not_copyrightable = feist.holdings[4]
+        listings_not_original = feist.holdings[10]
+        unoriginal_not_copyrightable = feist.holdings[3]
         listings_not_copyrightable = (
             listings_not_original + unoriginal_not_copyrightable
         )
         not_copyrightable = unoriginal_not_copyrightable.outputs[0]
-        assert any(
-            not_copyrightable.means(factor)
-            for factor in listings_not_copyrightable.outputs
+        assert str(listings_not_copyrightable.outputs[1]) == (
+            "absence of the Fact that <Rural's telephone"
+            " listings> were copyrightable"
         )
         assert (
             "act that <Rural's telephone listings> were names, towns, "
