@@ -50,12 +50,23 @@ def load_code(
     return Code(filepath=validated_filepath)
 
 
-def load_holdings(
+def load_and_read_holdings(
     filename: Optional[str] = None,
     directory: Optional[pathlib.Path] = None,
     filepath: Optional[pathlib.Path] = None,
     regime: Optional[Regime] = None,
 ) -> List[Holding]:
+    raw_holdings = load_holdings(
+        filename=filename, directory=directory, filepath=filepath
+    )
+    return readers.read_holdings(raw_holdings, regime=regime)
+
+
+def load_holdings(
+    filename: Optional[str] = None,
+    directory: Optional[pathlib.Path] = None,
+    filepath: Optional[pathlib.Path] = None,
+) -> List[Dict]:
     r"""
     Load a list of :class:`.Holding`\s from JSON.
 
