@@ -80,7 +80,7 @@ class TestHoldingImport:
         is stored with that flag instead of generating Holdings that it
         implies.
         """
-        lotus_holdings = load_holdings("holding_lotus.json", regime=make_regime)
+        lotus_holdings = load_holdings("holding_lotus.json")
         assert len(lotus_holdings) == 10
 
     def test_import_enactments_and_anchors(self, make_regime):
@@ -161,9 +161,7 @@ class TestHoldingImport:
         for case in test_cases:
             for opinion in loaders.load_opinion(f"{case}_h.json", lead_only=False):
                 opinions[f"{case}_{opinion.position}"] = opinion
-            raw_holdings = loaders.load_holdings(
-                f"holding_{case}.json", regime=make_regime
-            )
+            raw_holdings = loaders.load_holdings(f"holding_{case}.json")
             holdings, anchors, holding_anchors = readers.read_holdings(
                 raw_holdings, regime=make_regime, index_anchors=True
             )
@@ -176,7 +174,7 @@ class TestHoldingImport:
         """
         Test whether index_anchors flag causes holding loading to break.
         """
-        raw_holdings = load_holdings(f"holding_oracle.json", regime=make_regime)
+        raw_holdings = load_holdings(f"holding_oracle.json")
         oracle_holdings, anchors, holding_anchors = readers.read_holdings(
             raw_holdings, regime=make_regime, index_anchors=True
         )
@@ -400,7 +398,7 @@ class TestTextAnchors:
         assert any(holdings[6].inputs[0] == x for x in holdings[5].inputs)
 
     def test_fact_from_loaded_holding(self, make_regime):
-        to_read = load_holdings("holding_watt.json", regime=make_regime)
+        to_read = load_holdings("holding_watt.json")
         holdings = readers.read_holdings(to_read, regime=make_regime)
         new_fact = holdings[0].inputs[1]
         assert "lived at <Hideaway Lodge>" in str(new_fact)
@@ -459,7 +457,7 @@ class TestTextAnchors:
         """
         watt = make_opinion["watt_majority"]
         brad = make_opinion["brad_majority"]
-        to_read = load_holdings("holding_brad.json", regime=make_regime)
+        to_read = load_holdings("holding_brad.json")
         holdings = readers.read_holdings(to_read, regime=make_regime)
         brad.posit(holdings)
         expectation_not_reasonable = brad.holdings[6]
@@ -479,7 +477,7 @@ class TestTextAnchors:
         This test originally required a ValueError, but why should it?
         """
         brad = make_opinion["brad_majority"]
-        to_read = load_holdings("holding_brad.json", regime=make_regime)
+        to_read = load_holdings("holding_brad.json")
         holdings = readers.read_holdings(to_read, regime=make_regime)
         brad.posit(holdings)
         expectation_not_reasonable = brad.holdings[6]
