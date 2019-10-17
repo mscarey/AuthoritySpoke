@@ -117,6 +117,23 @@ class Holding(Factor):
         elif isinstance(self.selectors, TextQuoteSelector):
             object.__setattr__(self, "selectors", (self.selectors,))
 
+        if self.exclusive:
+            if not self.rule_valid:
+                raise NotImplementedError(
+                    "The ability to state that it is not 'valid' to assert "
+                    + "that a Rule is the 'exclusive' way to reach an output is "
+                    + "not implemented, so 'rule_valid' cannot be False while "
+                    + "'exclusive' is True. Try expressing this in another way "
+                    + "without the 'exclusive' keyword."
+                )
+            if not self.decided:
+                raise NotImplementedError(
+                    "The ability to state that it is not 'decided' whether "
+                    + "a Rule is the 'exclusive' way to reach an output is "
+                    + "not implemented. Try expressing this in another way "
+                    + "without the 'exclusive' keyword."
+                )
+
     @property
     def context_factors(self) -> Tuple:
         r"""
@@ -346,7 +363,7 @@ class Holding(Factor):
 
     def negated(self):
         """Get new copy of ``self`` with an opposite value for ``rule_valid``."""
-        return self.evolve("rule_valid")
+        return self.evolve({"rule_valid": not self.rule_valid, "exclusive": False})
 
     @new_context_helper
     def new_context(self, changes: ContextRegister) -> Factor:

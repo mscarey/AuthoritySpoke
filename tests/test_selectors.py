@@ -1,7 +1,7 @@
 import pytest
 
 from authorityspoke.enactments import Code, Enactment
-from authorityspoke.io import loaders, readers, references, schemas
+from authorityspoke.io import anchors, loaders, readers
 from authorityspoke.io.schemas import SelectorSchema, get_schema_for_item
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
@@ -39,7 +39,7 @@ class TestSelectors:
 
     def test_selector_text_split(self):
         data = {"text": "process, system,|method of operation|, concept, principle"}
-        selector = readers.read_selector(data)
+        selector = anchors.read_selector(data)
         assert selector.exact.startswith("method")
 
     def test_passage_from_uslm_code(self, make_enactment):

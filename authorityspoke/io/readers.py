@@ -40,40 +40,6 @@ FACTOR_SUBCLASSES = {
 }
 
 
-def read_selector(
-    record: Optional[Union[Dict, str]], many: bool = False
-) -> Optional[TextQuoteSelector]:
-    """
-    Create new selector from JSON user input.
-
-    :param record:
-        a string or dict representing a text passage
-
-    :returns: a new :class:`TextQuoteSelector`
-    """
-    selector_schema = schemas.SelectorSchema(many=many)
-    return selector_schema.load(record)
-
-
-def read_selectors(
-    record: Iterable[Union[str, Dict[str, str]]]
-) -> List[TextQuoteSelector]:
-    r"""
-    Create list of :class:`.TextQuoteSelector`\s from JSON user input.
-
-    If the input is a :class:`str`, tries to break up the string
-    into :attr:`~TextQuoteSelector.prefix`, :attr:`~TextQuoteSelector.exact`,
-    and :attr:`~TextQuoteSelector.suffix`, by splitting on the pipe characters.
-
-    :param record:
-        a string or dict representing a text passage, or list of
-        strings and dicts.
-
-    :returns: a list of :class:`TextQuoteSelector`\s
-    """
-    return read_selector(record, many=True)
-
-
 def read_enactment(
     record: Dict[str, str],
     code: Optional[Code] = None,
