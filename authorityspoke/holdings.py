@@ -417,12 +417,7 @@ class Holding(Factor):
             for inferred in self.inferred_from_exclusive():
                 yield inferred
 
-    def __or__(self, other: Union[Rule, Holding]) -> Optional[Holding]:
-        if isinstance(other, Rule):
-            return self | Holding(rule=other)
-        if not isinstance(other, Holding):
-            raise TypeError
-
+    def union_if_not_exclusive(self, other: Holding) -> Optional[Holding]:
         if self.decided == other.decided == False:
             if self.rule >= other.rule:
                 return self
@@ -448,7 +443,18 @@ class Holding(Factor):
         new_rule = self.rule | other.rule
         if not new_rule:
             return None
-        return self.evolve({"rule": new_rule})
+        return self.evolve({"rule": new_rule, "exclusive": False})
+
+    def __or__(self, other: Union[Rule, Holding]) -> Optional[Holding]:
+        if isinstance(other, Rule):
+            return self | Holding(rule=other)
+        if not isinstance(other, Holding):
+            raise TypeError
+        for self_holding in self.nonexclusive_holdings():
+            for other_holding in other.nonexclusive_holdings():
+                united = self_holding.union_if_not_exclusive(other_holding)
+                if united is not None:
+                    return united
 
     def own_attributes(self) -> Dict[str, Any]:
         """

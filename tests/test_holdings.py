@@ -224,6 +224,11 @@ class TestUnion:
         """
 
         feist = make_opinion_with_holding["feist_majority"]
-        result_of_adding = feist.holdings[11] + feist.holdings[4]
-        result_of_union = feist.holdings[11] | feist.holdings[4]
+        result_of_adding = feist.holdings[10] + feist.holdings[3]
+        result_of_union = feist.holdings[10] | feist.holdings[3]
         assert not result_of_adding.means(result_of_union)
+
+    def test_union_with_exclusive_flag(self, make_opinion_with_holding):
+        feist = make_opinion_with_holding["feist_majority"]
+        result_of_union = feist.holdings[10] | feist.holdings[3]
+        assert isinstance(result_of_union, Holding)
