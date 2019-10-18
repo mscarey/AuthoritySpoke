@@ -12,5 +12,4 @@
     io/writers
     io/anchors
     io/filepaths
-    io/references
     io/name_index

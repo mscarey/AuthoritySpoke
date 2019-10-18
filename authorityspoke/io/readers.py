@@ -40,7 +40,7 @@ FACTOR_SUBCLASSES = {
 
 
 def read_enactment(
-    record: Dict[str, str],
+    record: Dict[str, Union[str, Dict]],
     code: Optional[Code] = None,
     regime: Optional[Regime] = None,
     index_anchors: bool = False,
@@ -72,7 +72,7 @@ def read_enactment(
         a new :class:`Enactment` object, optionally with text links.
     """
     if index_anchors:
-        factor_anchors = anchors.collect_anchors_recursively(deepcopy(record))
+        factor_anchors = anchors.collect_anchors_recursively(record)
     schema = schemas.EnactmentSchema(
         context={"code": code, "regime": regime}, many=many
     )
