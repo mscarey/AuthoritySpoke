@@ -1,15 +1,15 @@
 ===============
-``Legislation``
+Legislation
 ===============
 
-``Codes``
+Codes
 ==============
 
 .. autoclass:: authorityspoke.enactments.Code
     :members:
     :special-members:
 
-``Enactments``
+Enactments
 ==============
 
 .. autoclass:: authorityspoke.enactments.Enactment

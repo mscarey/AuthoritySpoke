@@ -1,5 +1,5 @@
 ==============
-``Predicates``
+Predicates
 ==============
 
 .. autoclass:: authorityspoke.predicates.Predicate

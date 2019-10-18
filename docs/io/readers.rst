@@ -1,5 +1,5 @@
 ==============
-``Readers``
+Readers
 ==============
 
 .. automodule:: authorityspoke.io.readers

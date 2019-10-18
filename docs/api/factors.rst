@@ -1,12 +1,12 @@
 ==============
-``Factors``
+Factors
 ==============
 
 .. autoclass:: authorityspoke.factors.Factor
     :members:
     :special-members:
 
-``Entities``
+Entities
 ==============
 
 .. inheritance-diagram:: authorityspoke.entities.Entity
@@ -17,7 +17,7 @@
     :members:
     :special-members:
 
-``Facts``
+Facts
 ==============
 
 .. inheritance-diagram:: authorityspoke.facts.Fact
@@ -26,7 +26,7 @@
 
 .. autoclass:: authorityspoke.facts.Fact
 
-``Exhibits``
+Exhibits
 ==============
 
 .. inheritance-diagram:: authorityspoke.evidence.Exhibit
@@ -35,7 +35,7 @@
 
 .. autoclass:: authorityspoke.evidence.Exhibit
 
-``Evidence``
+Evidence
 ==============
 
 .. inheritance-diagram:: authorityspoke.evidence.Evidence
@@ -44,7 +44,7 @@
 
 .. autoclass:: authorityspoke.evidence.Evidence
 
-``Pleadings``
+Pleadings
 ==============
 
 .. inheritance-diagram:: authorityspoke.pleadings.Pleading
@@ -53,7 +53,7 @@
 
 .. autoclass:: authorityspoke.pleadings.Pleading
 
-``Allegations``
+Allegations
 ================
 
 .. inheritance-diagram:: authorityspoke.pleadings.Allegation

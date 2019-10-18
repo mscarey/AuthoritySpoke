@@ -1,5 +1,5 @@
 ==============
-``Loaders``
+Loaders
 ==============
 
 .. automodule:: authorityspoke.io.loaders

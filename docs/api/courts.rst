@@ -1,5 +1,5 @@
 ==============
-``Courts``
+Courts
 ==============
 
 .. autoclass:: authorityspoke.courts.Court

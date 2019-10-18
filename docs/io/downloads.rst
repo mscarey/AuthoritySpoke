@@ -1,5 +1,5 @@
 ==============
-``Downloads``
+Downloads
 ==============
 
 .. automodule:: authorityspoke.io.downloads

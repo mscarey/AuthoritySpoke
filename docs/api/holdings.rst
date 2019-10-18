@@ -1,5 +1,5 @@
 ==============
-``Holdings``
+Holdings
 ==============
 
 .. autoclass:: authorityspoke.holdings.Holding

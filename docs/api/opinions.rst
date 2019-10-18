@@ -1,5 +1,5 @@
 ==============
-``Opinions``
+Opinions
 ==============
 
 .. autoclass:: authorityspoke.opinions.Opinion

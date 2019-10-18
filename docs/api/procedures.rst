@@ -1,5 +1,6 @@
 
-``Procedures``
+==============
+Procedures
 ==============
 
 .. inheritance-diagram:: authorityspoke.procedures.Procedure

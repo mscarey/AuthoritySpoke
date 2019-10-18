@@ -1,4 +1,5 @@
-``Rules``
+==============
+Rules
 ==============
 
 .. inheritance-diagram:: authorityspoke.rules.Rule

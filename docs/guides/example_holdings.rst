@@ -509,6 +509,7 @@ so it will contain some Optical Character Recognition errors.
           "Copyright protection subsists, in accordance with this title, in original works of authorship fixed in any tangible medium of expression, now known or later developed, from which they can be perceived, reproduced, or otherwise communicated, either directly or with the aid of a machine or device." (Title 17, /us/usc/t17/s102/a)
 
 
+
     On appeal, Oracle argues that the district court’s reliance on Lotus
     is misplaced because it is distinguishable on its facts and is
     inconsistent with Ninth Circuit law. We agree. First, while the

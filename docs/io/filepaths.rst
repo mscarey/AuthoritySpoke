@@ -1,5 +1,5 @@
 ==============
-``Filepaths``
+Filepaths
 ==============
 
 .. automodule:: authorityspoke.io.filepaths

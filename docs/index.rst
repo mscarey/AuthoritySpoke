@@ -29,39 +29,11 @@ Guides
 
 API Reference
 -------------
-
-Core
-====
-
 .. toctree::
-    :maxdepth: 3
+    :maxdepth: 1
 
-    api/regimes
-    api/courts
-    api/opinions
-    api/holdings
-    api/factors
-    api/predicates
-    api/procedures
-    api/rules
-    api/legislation
-    api/context
-    api/analogies
-    api/selectors
-
-I/O
-===
-
-.. toctree::
-    :maxdepth: 2
-
-    io/downloads
-    io/loaders
-    io/readers
-    io/writers
-    io/filepaths
-    io/references
-
+    api_core
+    api_io
 
 
 Development Updates

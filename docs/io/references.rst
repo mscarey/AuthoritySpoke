@@ -1,5 +1,5 @@
 ==============
-``References``
+References
 ==============
 
 .. automodule:: authorityspoke.io.references

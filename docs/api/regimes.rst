@@ -1,11 +1,11 @@
 =================
-``Regimes``
+Regimes
 =================
 
 .. autoclass:: authorityspoke.jurisdictions.Regime
     :members:
 
-``Jurisdictions``
+Jurisdictions
 =================
 
 .. autoclass:: authorityspoke.jurisdictions.Jurisdiction

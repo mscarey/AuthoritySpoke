@@ -1,4 +1,5 @@
-``Analogies``
+================
+Analogies
 ================
 
 .. autoclass:: authorityspoke.factors.Analogy
