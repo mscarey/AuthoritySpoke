@@ -73,6 +73,16 @@ class Opinion:
     text: Optional[str] = field(repr=False)
 
     def __post_init__(self):
+        r"""
+        Add attributes to store Holdings and Factors keyed to their text selectors.
+
+        The ``holding_anchors`` are text selectors for the whole :class:`Holding`, not for any
+        individual :class:`.Factor`. Often select text used to
+        indicate whether the :class:`.Rule` is ``mandatory``, ``universal``,
+        ``valid``, or ``decided``, or show the ``exclusive`` way to reach
+        the outputs.
+        """
+
         self.holding_anchors: Dict[Holding, List[TextQuoteSelector]] = defaultdict(list)
         self.factors: Dict[Factor, List[TextQuoteSelector]] = defaultdict(list)
 

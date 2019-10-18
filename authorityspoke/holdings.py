@@ -50,18 +50,11 @@ class Holding(Factor):
         to be either valid or invalid. Seemingly, ``decided=False``
         should render the ``rule_valid`` flag irrelevant.
 
-    :param selector:
-        A text selector for the whole :class:`Holding`, not for any
-        individual :class:`.Factor`. Often selects text used to
-        indicate whether the :class:`.Rule` is ``mandatory``, ``universal``,
-        ``valid``, or ``decided``, or shows the ``exclusive`` way to reach
-        the outputs.
     """
 
     rule: Rule
     rule_valid: bool = True
     decided: bool = True
-    selectors: Union[Iterable[TextQuoteSelector], TextQuoteSelector] = ()
     name: Optional[str] = None
     procedure: Optional[Procedure] = None
     outputs: Optional[Union[Factor, Iterable[Factor]]] = None
@@ -112,10 +105,6 @@ class Holding(Factor):
         object.__setattr__(self, "enactments_despite", self.rule.enactments_despite)
         object.__setattr__(self, "mandatory", self.rule.mandatory)
         object.__setattr__(self, "universal", self.rule.universal)
-        if isinstance(self.selectors, Iterable):
-            object.__setattr__(self, "selectors", tuple(self.selectors))
-        elif isinstance(self.selectors, TextQuoteSelector):
-            object.__setattr__(self, "selectors", (self.selectors,))
 
         if self.exclusive:
             if not self.rule_valid:
