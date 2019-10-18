@@ -7,9 +7,7 @@ from authorityspoke.selectors import TextQuoteSelector
 from authorityspoke.io import schemas
 
 
-def read_selector(
-    record: Optional[Union[Dict, str]], many: bool = False
-) -> Optional[TextQuoteSelector]:
+def read_selector(record: Union[str, Dict[str, str]]) -> TextQuoteSelector:
     """
     Create new selector from JSON user input.
 
@@ -18,7 +16,7 @@ def read_selector(
 
     :returns: a new :class:`TextQuoteSelector`
     """
-    selector_schema = schemas.SelectorSchema(many=many)
+    selector_schema = schemas.SelectorSchema(many=False)
     return selector_schema.load(record)
 
 
@@ -38,17 +36,16 @@ def read_selectors(
 
     :returns: a list of :class:`TextQuoteSelector`\s
     """
-    return read_selector(record, many=True)
+    selector_schema = schemas.SelectorSchema(many=True)
+    return selector_schema.load(record)
 
 
-def collect_anchors(obj: Dict) -> List[Dict]:
+def collect_anchors(obj: Dict) -> List[TextQuoteSelector]:
     anchors = obj.get("anchors") or []
     return read_selectors(anchors)
 
 
-def collect_anchors_recursively(
-    obj: Dict, anchors: Optional[TextLinkDict] = None
-) -> TextLinkDict:
+def collect_anchors_recursively(obj: Union[Dict, List]) -> TextLinkDict:
     r"""
     Move anchors fields to a dict linking object names to lists of anchors.
 
@@ -57,7 +54,7 @@ def collect_anchors_recursively(
     and values are lists of the :class:`.Opinion` passages that reference them.
 
     """
-    anchors: TextLinkDict = anchors or defaultdict(list)
+    anchors: TextLinkDict = defaultdict(list)
     if isinstance(obj, List):
         for item in obj:
             for k, v in collect_anchors_recursively(item).items():
