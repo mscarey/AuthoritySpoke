@@ -210,30 +210,6 @@ def read_factor(
     return schema.load(record)
 
 
-def read_factor_subclass(
-    cls,
-    factor_record: Dict,
-    mentioned: Optional[TextLinkDict] = None,
-    report_mentioned: bool = False,
-) -> Union[Factor, Tuple[Factor, TextLinkDict]]:
-    prototype = cls()
-    new_factor_dict = prototype.__dict__
-    for attr in new_factor_dict:
-        if attr in prototype.context_factor_names:
-            value, mentioned = read_factor(
-                factor_record=factor_record.get(attr),
-                mentioned=mentioned,
-                report_mentioned=True,
-            )
-        else:
-            value = factor_record.get(attr)
-        if value is not None:
-            new_factor_dict[attr] = value
-    answer: Factor = cls(**new_factor_dict)
-    mentioned = mentioned or Mentioned({})
-    return (answer, mentioned) if report_mentioned else answer
-
-
 def read_factors(
     record_list: Union[Dict[str, str], List[Dict[str, str]]],
     mentioned: Optional[TextLinkDict] = None,
