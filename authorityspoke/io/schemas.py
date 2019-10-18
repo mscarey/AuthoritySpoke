@@ -13,8 +13,9 @@ from authorityspoke.evidence import Exhibit, Evidence
 from authorityspoke.factors import Factor
 from authorityspoke.facts import Fact
 from authorityspoke.holdings import Holding
-from authorityspoke.io.name_index import Mentioned, add_found_context
+from authorityspoke.io.name_index import Mentioned
 from authorityspoke.io.nesting import nest_fields
+from authorityspoke.io.text_expansion import add_found_context
 from authorityspoke.pleadings import Pleading, Allegation
 from authorityspoke.predicates import Predicate
 from authorityspoke.procedures import Procedure
@@ -90,7 +91,7 @@ class SelectorSchema(ExpandableSchema):
         elif text.count("|") == 2:
             return tuple([*text.split("|")])
         raise ValidationError(
-            "If the 'text' field is included, it must be either a dict"
+            "If the 'text' field is included, it must be either a dict "
             + "with one or more of 'prefix', 'exact', and 'suffix' "
             + "a string containing no | pipe "
             + "separator, or a string containing two pipe separators to divide "

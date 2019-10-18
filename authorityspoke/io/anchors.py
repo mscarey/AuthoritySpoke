@@ -42,10 +42,12 @@ def read_selectors(
 
 def collect_anchors(obj: Dict) -> List[TextQuoteSelector]:
     anchors = obj.get("anchors") or []
+    if not isinstance(anchors, List):
+        anchors = [anchors]
     return read_selectors(anchors)
 
 
-def collect_anchors_recursively(obj: Union[Dict, List]) -> TextLinkDict:
+def get_named_anchors(obj: Union[Dict, List]) -> TextLinkDict:
     r"""
     Move anchors fields to a dict linking object names to lists of anchors.
 
@@ -57,7 +59,7 @@ def collect_anchors_recursively(obj: Union[Dict, List]) -> TextLinkDict:
     anchors: TextLinkDict = defaultdict(list)
     if isinstance(obj, List):
         for item in obj:
-            for k, v in collect_anchors_recursively(item).items():
+            for k, v in get_named_anchors(item).items():
                 anchors[k] += v
     if isinstance(obj, Dict):
         if obj.get("name"):
@@ -65,21 +67,18 @@ def collect_anchors_recursively(obj: Union[Dict, List]) -> TextLinkDict:
                 anchors[obj["name"]].append(selector)
         for key, value in obj.items():
             if key != "anchors" and isinstance(value, (Dict, List)):
-                for k, v in collect_anchors_recursively(value).items():
+                for k, v in get_named_anchors(value).items():
                     anchors[k] += v
     return anchors
 
 
-def index_anchors(
-    record: Dict, many: bool = False
-) -> Tuple[TextLinkDict, List[List[TextQuoteSelector]]]:
+def get_holding_anchors(
+    record: Dict, many: bool = True
+) -> List[List[TextQuoteSelector]]:
     """
-    Make indexes of Holding and Factor text anchors for a list of Holdings.
+    Make indexes of text anchors for a list of Holdings.
     """
 
-    factor_anchors = collect_anchors_recursively(record)
     if many:
-        holding_anchors = [collect_anchors(holding) for holding in record]
-    else:
-        holding_anchors = [collect_anchors(record)]
-    return factor_anchors, holding_anchors
+        return [collect_anchors(holding) for holding in record]
+    return [collect_anchors(record)]

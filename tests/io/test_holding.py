@@ -10,7 +10,7 @@ from authorityspoke.holdings import Holding
 from authorityspoke.opinions import Opinion
 from authorityspoke.predicates import Predicate
 from authorityspoke.procedures import Procedure
-from authorityspoke.io import loaders, readers, dump, name_index
+from authorityspoke.io import anchors, loaders, readers, dump, name_index
 from authorityspoke.io.loaders import load_holdings
 from authorityspoke.io import filepaths
 from authorityspoke.rules import Rule
@@ -175,12 +175,13 @@ class TestHoldingImport:
         Test whether index_anchors flag causes holding loading to break.
         """
         raw_holdings = load_holdings(f"holding_oracle.json")
-        oracle_holdings, anchors, holding_anchors = readers.read_holdings(
-            raw_holdings, regime=make_regime, index_anchors=True
+        oracle_holdings = readers.read_holdings(
+            raw_holdings, regime=make_regime
         )
+        named_anchors = anchors.get_named_anchors(raw_holdings)
 
         assert isinstance(oracle_holdings[0], Holding)
-        assert isinstance(anchors.popitem()[1].pop(), TextQuoteSelector)
+        assert isinstance(named_anchors.popitem()[1].pop(), TextQuoteSelector)
 
 class TestTextAnchors:
     def test_read_holding_with_no_anchor(self, make_opinion, make_analysis):
@@ -513,21 +514,25 @@ class TestTextAnchors:
             readers.read_holding(rule_dict)
 
     def test_repeating_read_holdings_has_same_result(self, make_analysis):
-        holdings, anchors, holding_anchors = readers.read_holdings(
-            make_analysis["minimal"], index_anchors=True
-        )
-        holdings2, anchors2, holding_anchors2 = readers.read_holdings(
-            make_analysis["minimal"], index_anchors=True
-        )
-        assert holdings == holdings2
-        assert anchors == anchors2
-        assert holding_anchors == holding_anchors2
+        raw = make_analysis["minimal"]
+        holdings_and_anchors = [
+            readers.read_holdings(raw),
+            anchors.get_holding_anchors(raw),
+            anchors.get_named_anchors(raw)]
+        holdings_and_anchors_again = [
+            readers.read_holdings(raw),
+            anchors.get_holding_anchors(raw),
+            anchors.get_named_anchors(raw)]
+        assert all(
+            left == right
+            for left, right
+            in zip(holdings_and_anchors, holdings_and_anchors_again))
+
 
     def test_posit_holding_with_selector(self, make_analysis, make_opinion):
 
-        holdings, anchors, holding_anchors = readers.read_holdings(
-            make_analysis["minimal"], index_anchors=True
-        )
+        holdings = readers.read_holdings(make_analysis["minimal"])
+        holding_anchors = anchors.get_holding_anchors(make_analysis["minimal"])
         brad = make_opinion["brad_majority"]
         brad.posit(holdings, text_links=holding_anchors)
         assert brad.holding_anchors[holdings[0]][0].exact == "we hold"

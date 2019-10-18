@@ -1,4 +1,5 @@
 from authorityspoke.io import anchors, name_index
+from authorityspoke.io.text_expansion import expand_shorthand
 
 
 class TestCollectAnchors:
@@ -27,12 +28,12 @@ class TestCollectAnchors:
     }
 
     def test_anchor_not_wrapped_in_list(self):
-        obj, _ = name_index.index_names(self.fact_string_anchor)
+        obj = expand_shorthand(self.fact_string_anchor)
         assert obj["anchors"][0].startswith("In preparing")
 
     def test_anchors_from_fact_with_inferred_name(self):
-        record, _ = name_index.index_names(self.fact)
-        factor_anchors = anchors.collect_anchors_recursively(record)
+        record = expand_shorthand(self.fact)
+        factor_anchors = anchors.get_named_anchors(record)
         fact_anchors = factor_anchors[
             "false Rural's telephone directory was copyrightable"
         ]

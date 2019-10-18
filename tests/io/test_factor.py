@@ -11,6 +11,7 @@ from authorityspoke.io import readers, schemas, name_index
 from authorityspoke.io.loaders import load_holdings
 from authorityspoke.io import filepaths
 from authorityspoke.io.dump import to_dict, to_json
+from authorityspoke.io.text_expansion import expand_shorthand
 
 ureg = pint.UnitRegistry()
 
@@ -71,12 +72,13 @@ class TestEntityLoad:
 
 
 class TestFactLoad:
+    house_data = {
+        "content": "{Alice} sold {Alice's house} for a price in dollars of > 300000"
+    }
+
     def test_import_fact_with_entity_name_containing_another(self):
-        house_fact = readers.read_fact(
-            {
-                "content": "{Alice} sold {Alice's house} for a price in dollars of > 300000"
-            }
-        )
+        expanded = expand_shorthand(self.house_data)
+        house_fact = readers.read_fact(expanded)
         assert house_fact.context_factors[1].name == "Alice's house"
 
     def test_import_predicate_with_quantity(self):

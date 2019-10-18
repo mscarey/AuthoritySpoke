@@ -392,7 +392,6 @@ class Holding(Factor):
             rule=self.rule.new_context(changes),
             rule_valid=self.rule_valid,
             decided=self.decided,
-            selectors=self.selectors,
         )
 
     def nonexclusive_holdings(self) -> Iterator[Holding]:

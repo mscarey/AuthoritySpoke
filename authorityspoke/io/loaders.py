@@ -11,7 +11,8 @@ from typing import Dict, List, Iterator, Optional, Tuple, Union
 from authorityspoke.enactments import Code
 from authorityspoke.factors import Factor
 from authorityspoke.holdings import Holding
-from authorityspoke.io import filepaths, readers
+from authorityspoke.io import anchors, filepaths, readers
+from authorityspoke.io.text_expansion import expand_shorthand
 from authorityspoke.jurisdictions import Regime
 from authorityspoke.opinions import Opinion
 from authorityspoke.selectors import TextQuoteSelector
@@ -56,10 +57,16 @@ def load_and_read_holdings(
     filepath: Optional[pathlib.Path] = None,
     regime: Optional[Regime] = None,
 ) -> List[Holding]:
+    """
+    Read holdings with text anchors from a file.
+    """
     raw_holdings = load_holdings(
         filename=filename, directory=directory, filepath=filepath
     )
-    return readers.read_holdings(raw_holdings, regime=regime)
+    holding_anchors = anchors.get_holding_anchors(raw_holdings)
+    named_anchors = anchors.get_named_anchors(raw_holdings)
+    holdings = readers.read_holdings(raw_holdings, regime=regime)
+    return holdings, holding_anchors, named_anchors
 
 
 def load_holdings(
@@ -94,6 +101,7 @@ def load_holdings(
     )
     with open(validated_filepath, "r") as f:
         holdings = json.load(f)
+    holdings = expand_shorthand(holdings)
     return holdings
 
 

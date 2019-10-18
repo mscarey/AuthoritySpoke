@@ -72,7 +72,7 @@ def read_enactment(
         a new :class:`Enactment` object, optionally with text links.
     """
     if index_anchors:
-        factor_anchors = anchors.collect_anchors_recursively(record)
+        factor_anchors = anchors.get_named_anchors(record)
     schema = schemas.EnactmentSchema(
         context={"code": code, "regime": regime}, many=many
     )
@@ -167,7 +167,7 @@ def read_fact(record: Dict) -> Fact:
     :returns:
         a :class:`Fact`, with optional mentioned factors
     """
-    record, mentioned = index_names(record)
+    mentioned = index_names(record)
     schema = schemas.FactSchema()
     schema.context["mentioned"] = mentioned
     return schema.load(record)
@@ -205,7 +205,7 @@ def read_factor(
 
     """
     schema = schemas.FactorSchema(many=many)
-    record, schema.context["mentioned"] = index_names(record)
+    schema.context["mentioned"] = index_names(record)
     schema.context["regime"] = regime
     return schema.load(record)
 
@@ -235,16 +235,13 @@ def read_procedure(
     record: Dict, regime: Optional[Regime] = None, many=False
 ) -> Procedure:
     schema = schemas.ProcedureSchema(many=many)
-    record, schema.context["mentioned"] = index_names(record)
+    schema.context["mentioned"] = index_names(record)
     schema.context["regime"] = regime
     return schema.load(record)
 
 
 def read_holding(
-    record: Dict,
-    regime: Optional[Regime] = None,
-    many: bool = False,
-    index_anchors: bool = False,
+    record: Dict, regime: Optional[Regime] = None, many: bool = False
 ) -> Holding:
     r"""
     Create new :class:`Holding` object from simple datatypes from JSON input.
@@ -263,19 +260,12 @@ def read_holding(
         if True, record represents a list of :class:`Holding`\s rather than
         just one.
 
-    :param index_anchors:
-        whether to also return an index of text links to the created object(s)
-
     :returns:
         New :class:`.Holding`, and an updated dictionary with mentioned
         :class:`.Factor`\s as keys and their :class:`.TextQuoteSelector`\s
         as values.
     """
-    record, mentioned = index_names(deepcopy(record))
-    if index_anchors:
-        factor_anchors, holding_anchors = anchors.index_anchors(
-            deepcopy(record), many=many
-        )
+    mentioned = index_names(record)
     schema = schemas.HoldingSchema(many=many)
 
     proxy = deepcopy(mentioned)
@@ -283,12 +273,10 @@ def read_holding(
     schema.context["mentioned"] = proxy
     schema.context["regime"] = regime
     answer = schema.load(record)
-    return (answer, factor_anchors, holding_anchors) if index_anchors else answer
+    return answer
 
 
-def read_holdings(
-    record: List[Dict], regime: Optional[Regime] = None, index_anchors: bool = False
-) -> List[Holding]:
+def read_holdings(record: List[Dict], regime: Optional[Regime] = None) -> List[Holding]:
     r"""
     Load a list of :class:`Holdings`\s from JSON, with optional text links.
 
@@ -307,9 +295,7 @@ def read_holdings(
         a list of :class:`.Holding` objects, optionally with
         an index matching :class:`.Factor`\s to selectors.
     """
-    return read_holding(
-        record=record, regime=regime, many=True, index_anchors=index_anchors
-    )
+    return read_holding(record=record, regime=regime, many=True)
 
 
 def read_case(
