@@ -36,4 +36,4 @@ class TestCollectAnchors:
         fact_anchors = factor_anchors[
             "false Rural's telephone directory was copyrightable"
         ]
-        assert fact_anchors[1]["exact"] == "no one may copyright"
+        assert fact_anchors[1].exact == "no one may copyright"

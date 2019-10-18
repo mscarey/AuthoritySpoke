@@ -25,6 +25,7 @@ from authorityspoke.pleadings import Allegation, Pleading
 from authorityspoke.predicates import Predicate
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
+from authorityspoke.selectors import TextQuoteSelector
 
 from authorityspoke.io import anchors, schemas
 from authorityspoke.io.name_index import index_names
@@ -64,6 +65,9 @@ def read_enactment(
         source for this :class:`Enactment` can be found, or where
         it should be added
 
+    :param index_anchors:
+        whether to also return an index of text links to the created object(s)
+
     :returns:
         a new :class:`Enactment` object, optionally with text links.
     """
@@ -81,14 +85,14 @@ def read_enactments(
     record: Union[Dict[str, str], List[Dict[str, str]]],
     regime: Optional[Regime] = None,
     index_anchors: bool = False,
-) -> Union[Tuple[Enactment, ...], Tuple[Tuple[Enactment, ...], TextLinkDict]]:
+) -> Union[List[Enactment], Tuple[List[Enactment], TextLinkDict]]:
     r"""
     Create a new :class:`Enactment` object using imported JSON data.
 
     The new :class:`Enactment` can be composed from a :class:`.Code`
     referenced in the ``regime`` parameter.
 
-    :param record_list:
+    :param record:
         sequence of :class:`dict`\s with string fields from JSON for
         constructing new :class:`.Enactment`\s
 
@@ -97,9 +101,8 @@ def read_enactments(
         source for this :class:`Enactment` can be found, or where
         it should be added
 
-    :param report_mentioned:
-        if True, return a new :class:`.TextLinkDict` in addition to
-        the :class:`.Enactment`\.
+    :param index_anchors:
+        whether to also return an index of text links to the created object(s)
 
     :returns:
         a list of new :class:`Enactment` objects, optionally with text links.
@@ -284,6 +287,9 @@ def read_holding(
         if True, record represents a list of :class:`Holding`\s rather than
         just one.
 
+    :param index_anchors:
+        whether to also return an index of text links to the created object(s)
+
     :returns:
         New :class:`.Holding`, and an updated dictionary with mentioned
         :class:`.Factor`\s as keys and their :class:`.TextQuoteSelector`\s
@@ -317,6 +323,9 @@ def read_holdings(
         A collection of :class:`.Jurisdiction`\s and the :class:`.Code`\s
         that have been enacted in each. Used for constructing
         :class:`.Enactment`\s referenced by :class:`.Holding`\s.
+
+    :param index_anchors:
+        whether to also return an index of text links to the created object(s)
 
     :returns:
         a list of :class:`.Holding` objects, optionally with

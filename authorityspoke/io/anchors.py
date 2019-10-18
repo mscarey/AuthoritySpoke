@@ -42,7 +42,8 @@ def read_selectors(
 
 
 def collect_anchors(obj: Dict) -> List[Dict]:
-    return obj.get("anchors") or []
+    anchors = obj.get("anchors") or []
+    return read_selectors(anchors)
 
 
 def collect_anchors_recursively(
@@ -80,12 +81,8 @@ def index_anchors(
     """
 
     factor_anchors = collect_anchors_recursively(record)
-    factor_anchors = {
-        key: read_selectors(value) for key, value in factor_anchors.items()
-    }
     if many:
         holding_anchors = [collect_anchors(holding) for holding in record]
     else:
         holding_anchors = [collect_anchors(record)]
-    holding_anchors = [read_selectors(record) for record in holding_anchors]
     return factor_anchors, holding_anchors
