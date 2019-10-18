@@ -5,7 +5,7 @@ from copy import deepcopy
 from collections import OrderedDict
 from re import findall
 
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Optional, Tuple
 
 from marshmallow import ValidationError
 

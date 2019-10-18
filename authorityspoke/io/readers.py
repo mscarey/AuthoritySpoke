@@ -4,13 +4,12 @@ Converting simple structured data from XML or JSON into authorityspoke objects.
 These functions will usually be called by functions from the io.loaders module
 after they import some data from a file.
 """
-from collections import defaultdict
 from copy import deepcopy
 import datetime
 from functools import partial
 
 from typing import Any, Dict, List, Iterable, Iterator
-from typing import Optional, Set, Tuple, Type, Union
+from typing import Optional, Tuple, Type, Union
 
 from pint import UnitRegistry
 
@@ -26,7 +25,6 @@ from authorityspoke.pleadings import Allegation, Pleading
 from authorityspoke.predicates import Predicate
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
-from authorityspoke.selectors import TextQuoteSelector
 
 from authorityspoke.io import anchors, schemas
 from authorityspoke.io.name_index import index_names
@@ -44,7 +42,8 @@ def read_enactment(
     record: Dict[str, str],
     code: Optional[Code] = None,
     regime: Optional[Regime] = None,
-    **kwargs,
+    index_anchors: bool = False,
+    many: bool = False,
 ) -> Enactment:
     r"""
     Create a new :class:`.Enactment` object using imported JSON data.
@@ -52,7 +51,7 @@ def read_enactment(
     The new :class:`.Enactment` can be composed from a :class:`.Code`
     referenced in the ``regime`` parameter.
 
-    :param enactment_dict:
+    :param record:
         :class:`dict` with string fields from JSON for constructing
         new :class:`.Enactment`
 
@@ -68,17 +67,20 @@ def read_enactment(
     :returns:
         a new :class:`Enactment` object, optionally with text links.
     """
-    schema = schemas.EnactmentSchema(context={"code": code, "regime": regime})
+    if index_anchors:
+        factor_anchors = anchors.collect_anchors_recursively(deepcopy(record))
+    schema = schemas.EnactmentSchema(
+        context={"code": code, "regime": regime}, many=many
+    )
     answer = schema.load(record)
 
-    return answer
+    return (answer, factor_anchors) if index_anchors else answer
 
 
 def read_enactments(
-    record_list: Union[Dict[str, str], List[Dict[str, str]]],
-    mentioned: Optional[TextLinkDict] = None,
+    record: Union[Dict[str, str], List[Dict[str, str]]],
     regime: Optional[Regime] = None,
-    report_mentioned: bool = False,
+    index_anchors: bool = False,
 ) -> Union[Tuple[Enactment, ...], Tuple[Tuple[Enactment, ...], TextLinkDict]]:
     r"""
     Create a new :class:`Enactment` object using imported JSON data.
@@ -89,10 +91,6 @@ def read_enactments(
     :param record_list:
         sequence of :class:`dict`\s with string fields from JSON for
         constructing new :class:`.Enactment`\s
-
-    :param mentioned:
-        :class:`.TextLinkDict` for known :class:`.Factor`\s
-        and :class:`.Enactment`\s
 
     :param regime:
         the :class:`.Regime` where the :class:`.Code`\s that are the
@@ -106,19 +104,9 @@ def read_enactments(
     :returns:
         a list of new :class:`Enactment` objects, optionally with text links.
     """
-    created_list: List[Enactment] = []
-    if record_list is None:
-        record_list = []
-    if not isinstance(record_list, list):
-        record_list = [record_list]
-    for record in record_list:
-        created, mentioned = read_enactment(
-            record, mentioned=mentioned, regime=regime, report_mentioned=True
-        )
-        created_list.append(created)
-    mentioned = mentioned or Mentioned({})
-    answer = tuple(created_list)
-    return (answer, mentioned) if report_mentioned else answer
+    return read_enactment(
+        record=record, regime=regime, many=True, index_anchors=index_anchors
+    )
 
 
 def get_references_from_mentioned(
