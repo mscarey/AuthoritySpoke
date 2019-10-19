@@ -272,7 +272,7 @@ def read_holding(
 
     schema.context["mentioned"] = proxy
     schema.context["regime"] = regime
-    answer = schema.load(record)
+    answer = schema.load(deepcopy(record))
     return answer
 
 

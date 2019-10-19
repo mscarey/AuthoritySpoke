@@ -171,9 +171,10 @@ class TestHoldingImport:
         factor = holding.inputs[0]
         assert factor.predicate.content == "{} was copyrightable"
 
-    def test_read_holdings_with_anchors(self, make_regime):
+    def test_read_holdings_and_then_get_anchors(self, make_regime):
         """
-        Test whether index_anchors flag causes holding loading to break.
+        Test whether read_holdings mutates raw_holding and makes it
+        impossible to get text anchors.
         """
         raw_holdings = load_holdings(f"holding_oracle.json")
         oracle_holdings = readers.read_holdings(
@@ -188,10 +189,10 @@ class TestTextAnchors:
     def test_read_holding_with_no_anchor(self, make_opinion, make_analysis):
         oracle = make_opinion["oracle_majority"]
         raw_analysis = make_analysis["no anchors"]
-        oracle_holdings, anchors, holding_anchors = readers.read_holdings(
-            raw_analysis, index_anchors=True
-        )
-        oracle.posit(oracle_holdings, text_links=holding_anchors, factor_text_links=anchors)
+        oracle_holdings = readers.read_holdings(raw_analysis)
+        holding_anchors = anchors.get_holding_anchors(raw_analysis)
+        named_anchors = anchors.get_named_anchors(raw_analysis)
+        oracle.posit(oracle_holdings, holding_anchors=holding_anchors, named_anchors=named_anchors)
         has_no_anchors = oracle.holdings[0]
         assert oracle.holding_anchors[has_no_anchors] == []
 
@@ -210,7 +211,8 @@ class TestTextAnchors:
                 "absent": True,
             },
         }
-        built = readers.read_holding(holding)
+        expanded = text_expansion.expand_shorthand(holding)
+        built = readers.read_holding(expanded)
         new_factor = built.outputs[0].to_effect.context_factors[0]
         assert new_factor.name == "Bradley"
 
@@ -244,7 +246,8 @@ class TestTextAnchors:
                 "outputs": {"type": "fact", "content": "Bradley committed a tort"},
             },
         ]
-        built = readers.read_holdings(holdings)
+        expanded = text_expansion.expand_shorthand(holdings)
+        built = readers.read_holdings(expanded)
         new_factor = built[0].outputs[0].to_effect.context_factors[0]
         assert new_factor.name == "Bradley"
 
@@ -333,7 +336,8 @@ class TestTextAnchors:
                 "mandatory": True,
             },
         ]
-        built = readers.read_holdings(holdings)
+        expanded = text_expansion.expand_shorthand(holdings)
+        built = readers.read_holdings(expanded)
         allegation = built[0].inputs[1]
         assert allegation.statement.context_factors[0].name == "defendant"
 
@@ -535,7 +539,7 @@ class TestTextAnchors:
         holdings = readers.read_holdings(make_analysis["minimal"])
         holding_anchors = anchors.get_holding_anchors(make_analysis["minimal"])
         brad = make_opinion["brad_majority"]
-        brad.posit(holdings, text_links=holding_anchors)
+        brad.posit(holdings, holding_anchors=holding_anchors)
         assert brad.holding_anchors[holdings[0]][0].exact == "we hold"
 
 class TestExclusiveFlag:
