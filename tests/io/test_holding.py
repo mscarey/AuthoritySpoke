@@ -12,7 +12,7 @@ from authorityspoke.predicates import Predicate
 from authorityspoke.procedures import Procedure
 from authorityspoke.io import anchors, loaders, readers, dump, name_index
 from authorityspoke.io.loaders import load_holdings
-from authorityspoke.io import filepaths
+from authorityspoke.io import filepaths, text_expansion
 from authorityspoke.rules import Rule
 from authorityspoke.selectors import TextQuoteSelector
 
@@ -59,7 +59,7 @@ class TestEntityImport:
     ]
 
     def test_expand_shorthand(self):
-        expanded = name_index.recursively_expand_shorthand(self.smith_holdings)
+        expanded = text_expansion.expand_shorthand(self.smith_holdings)
         fact = expanded[1]["inputs"][0]
         assert fact["context_factors"][0]["name"] == "Smythe"
 
@@ -83,10 +83,10 @@ class TestHoldingImport:
         lotus_holdings = load_holdings("holding_lotus.json")
         assert len(lotus_holdings) == 10
 
-    def test_import_enactments_and_anchors(self, make_regime):
+    def test_import_enactments_and_anchors(self, make_regime, make_opinion):
         """
-        Testing issue that enactment expansion fails only when
-        text anchors are loaded.
+        Testing issue that caused enactment expansion to fail only when
+        text anchors were loaded.
         """
         raw_holdings = [
             {
@@ -146,11 +146,15 @@ class TestHoldingImport:
                 "anchors": "compilations of facts|generally are|",
             },
         ]
-        feist_holdings, anchors, holding_anchors = readers.read_holdings(
-            raw_holdings, regime=make_regime, index_anchors=True
+        holding_anchors = anchors.get_holding_anchors(raw_holdings)
+        named_anchors = anchors.get_named_anchors(raw_holdings)
+        feist_holdings = readers.read_holdings(
+            raw_holdings, regime=make_regime
         )
-        assert feist_holdings[0].enactments[0].name == "securing for authors"
-        assert feist_holdings[1].enactments[0].name == "securing for authors"
+        feist = make_opinion["feist_majority"]
+        feist.posit(feist_holdings, holding_anchors=holding_anchors, named_anchors=named_anchors)
+        assert feist.holdings[0].enactments[0].name == "securing for authors"
+        assert feist.holdings[1].enactments[0].name == "securing for authors"
 
     def test_import_holdings_from_multiple_cases(self, make_regime):
         """
@@ -161,11 +165,8 @@ class TestHoldingImport:
         for case in test_cases:
             for opinion in loaders.load_opinion(f"{case}_h.json", lead_only=False):
                 opinions[f"{case}_{opinion.position}"] = opinion
-            raw_holdings = loaders.load_holdings(f"holding_{case}.json")
-            holdings, anchors, holding_anchors = readers.read_holdings(
-                raw_holdings, regime=make_regime, index_anchors=True
-            )
-            opinions[f"{case}_majority"].posit(holdings)
+            holdings, holding_anchors, named_anchors = loaders.load_and_read_holdings(f"holding_{case}.json", regime=make_regime)
+            opinions[f"{case}_majority"].posit(holdings, holding_anchors=holding_anchors, named_anchors=named_anchors)
         holding = opinions["lotus_majority"].holdings[0]
         factor = holding.inputs[0]
         assert factor.predicate.content == "{} was copyrightable"

@@ -75,6 +75,7 @@ class TestFactLoad:
     house_data = {
         "content": "{Alice} sold {Alice's house} for a price in dollars of > 300000"
     }
+    story_data = {"content": "The number of castles {the king} had was > 3"}
 
     def test_import_fact_with_entity_name_containing_another(self):
         expanded = expand_shorthand(self.house_data)
@@ -82,21 +83,20 @@ class TestFactLoad:
         assert house_fact.context_factors[1].name == "Alice's house"
 
     def test_import_predicate_with_quantity(self):
-        story = readers.read_fact(
-            {"content": "The number of castles {the king} had was > 3"}
-        )
+        story = expand_shorthand(self.story_data)
+        story = readers.read_fact(story)
         assert len(story.predicate) == 1
         assert story.predicate.content.startswith("The number of castles")
         assert story.predicate.comparison == ">"
         assert story.predicate.quantity == 3
 
     def test_make_fact_from_string(self, watt_factor):
-        fact_float_more = readers.read_fact(
-            {
-                "content": "the distance between {Ann} and {Lee} was >= 20.1",
-                "reciprocal": True,
-            }
-        )
+        fact_float_data = {
+            "content": "the distance between {Ann} and {Lee} was >= 20.1",
+            "reciprocal": True,
+        }
+        fact_float_more = expand_shorthand(fact_float_data)
+        fact_float_more = readers.read_fact(fact_float_more)
         fact_float_less = watt_factor["f8_int"]
         assert fact_float_more >= fact_float_less
 

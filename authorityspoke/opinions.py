@@ -176,8 +176,8 @@ class Opinion:
     def posit_holding(
         self,
         holding: Union[Holding, Rule],
-        text_links: Optional[List[TextQuoteSelector]] = None,
-        factor_text_links: Optional[TextLinkDict] = None,
+        holding_anchors: Optional[List[TextQuoteSelector]] = None,
+        named_anchors: Optional[TextLinkDict] = None,
         context: Optional[Sequence[Factor]] = None,
     ) -> None:
         r"""Record that this Opinion endorses specified :class:`Holding`\s."""
@@ -193,17 +193,17 @@ class Opinion:
 
         if context:
             holding = holding.new_context(context, context_opinion=self)
-        self.holding_anchors[holding].extend(text_links or [])
-        if factor_text_links:
+        self.holding_anchors[holding].extend(holding_anchors or [])
+        if named_anchors:
             for factor in holding.recursive_factors:
-                if factor.name in factor_text_links:
-                    self.factors[factor].extend(factor_text_links[factor.name])
+                if factor.name in named_anchors:
+                    self.factors[factor].extend(named_anchors[factor.name])
 
     def posit_holdings(
         self,
         holdings: Iterable[Union[Holding, Rule]],
-        text_links: Optional[List[List[TextQuoteSelector]]] = None,
-        factor_text_links: Optional[TextLinkDict] = None,
+        holding_anchors: Optional[List[List[TextQuoteSelector]]] = None,
+        named_anchors: Optional[TextLinkDict] = None,
         context: Optional[Sequence[Factor]] = None,
     ):
         r"""
@@ -227,22 +227,22 @@ class Opinion:
             will provide the context for the new holding in the
             present case.
         """
-        text_links = text_links or []
-        for (holding, selector_list) in zip_longest(holdings, text_links):
+        holding_anchors = holding_anchors or []
+        for (holding, selector_list) in zip_longest(holdings, holding_anchors):
             self.posit_holding(
                 holding,
-                text_links=selector_list,
-                factor_text_links=factor_text_links,
+                holding_anchors=selector_list,
+                named_anchors=named_anchors,
                 context=context,
             )
 
     def posit(
         self,
         holdings: Union[Holding, Iterable[Union[Holding, Rule]]],
-        text_links: Optional[
+        holding_anchors: Optional[
             List[Union[TextQuoteSelector, List[TextQuoteSelector]]]
         ] = None,
-        factor_text_links: Optional[TextLinkDict] = None,
+        named_anchors: Optional[TextLinkDict] = None,
         context: Optional[Sequence[Factor]] = None,
     ) -> None:
         r"""
@@ -273,15 +273,15 @@ class Opinion:
         if isinstance(holdings, Iterable):
             self.posit_holdings(
                 holdings,
-                text_links=text_links,
-                factor_text_links=factor_text_links,
+                holding_anchors=holding_anchors,
+                named_anchors=named_anchors,
                 context=context,
             )
         else:
             self.posit_holding(
                 holdings,
-                text_links=text_links,
-                factor_text_links=factor_text_links,
+                holding_anchors=holding_anchors,
+                named_anchors=named_anchors,
                 context=context,
             )
 
