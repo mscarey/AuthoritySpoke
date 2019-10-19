@@ -1,5 +1,5 @@
 from copy import deepcopy
-from typing import Any, Dict, List, Optional, Tuple, Type, Union
+from typing import Any, Dict, List, Optional, Sequence, Tuple, Type, Union
 
 from marshmallow import Schema, fields, validate
 from marshmallow import pre_load, post_load
@@ -26,7 +26,13 @@ from utils.marshmallow_oneofschema.one_of_schema import OneOfSchema
 
 ureg = UnitRegistry()
 
-RawHolding = Dict[str, Any]
+RawSelector = Union[str, Dict[str, str]]
+RawPredicate = Dict[str, Union[str, bool]]
+RawFactor = Dict[str, Union[RawPredicate, Sequence[Any], str, bool]]
+RawEnactment = Dict[str, Union[str, List[RawSelector]]]
+RawProcedure = Dict[str, Sequence[RawFactor]]
+RawRule = Dict[str, Union[RawProcedure, Sequence[RawEnactment], str, bool]]
+RawHolding = Dict[str, Union[RawRule, str, bool]]
 
 class ExpandableSchema(Schema):
     def get_from_mentioned(self, data, **kwargs):
@@ -253,7 +259,7 @@ class PredicateSchema(ExpandableSchema):
                 return content, comparison, quantity_text
         return content, "", None
 
-    def normalize_comparison(self, data, **kwargs):
+    def normalize_comparison(self, data: RawPredicate, **kwargs) -> RawPredicate:
         if data.get("quantity") and not data.get("comparison"):
             data["comparison"] = "="
 
@@ -265,7 +271,7 @@ class PredicateSchema(ExpandableSchema):
         return data
 
     @pre_load
-    def format_data_to_load(self, data, **kwargs):
+    def format_data_to_load(self, data: RawPredicate, **kwargs) -> RawPredicate:
         if not data.get("quantity"):
             data["content"], data["comparison"], data[
                 "quantity"
@@ -274,7 +280,7 @@ class PredicateSchema(ExpandableSchema):
         return data
 
     @post_load
-    def make_object(self, data, **kwargs):
+    def make_object(self, data: RawPredicate, **kwargs) -> Predicate:
         return self.__model__(**data)
 
 
@@ -285,13 +291,13 @@ class EntitySchema(ExpandableSchema):
     plural = fields.Bool()
 
     @pre_load
-    def format_data_to_load(self, data, **kwargs):
+    def format_data_to_load(self, data: RawFactor, **kwargs) -> RawFactor:
         data = self.get_from_mentioned(data)
         data = self.consume_type_field(data)
         return data
 
     @post_load
-    def make_object(self, data, **kwargs):
+    def make_object(self, data: RawFactor, **kwargs) -> Entity:
         return self.__model__(**data)
 
 
@@ -336,7 +342,7 @@ class FactSchema(ExpandableSchema):
         return content, context_factors
 
     @pre_load
-    def format_data_to_load(self, data, **kwargs):
+    def format_data_to_load(self, data: RawFactor, **kwargs) -> RawFactor:
         data = self.get_from_mentioned(data)
         to_nest = [
             "content",
@@ -356,7 +362,7 @@ class FactSchema(ExpandableSchema):
         return data
 
     @post_load
-    def make_object(self, data, **kwargs):
+    def make_object(self, data: RawFactor, **kwargs) -> Fact:
         return self.__model__(**data)
 
 
@@ -370,13 +376,13 @@ class ExhibitSchema(ExpandableSchema):
     generic = fields.Bool(missing=False)
 
     @pre_load
-    def format_data_to_load(self, data, **kwargs):
+    def format_data_to_load(self, data: RawFactor, **kwargs) -> RawFactor:
         data = self.get_from_mentioned(data)
         data = self.consume_type_field(data)
         return data
 
     @post_load
-    def make_object(self, data, **kwargs):
+    def make_object(self, data: RawFactor, **kwargs) -> Exhibit:
         return self.__model__(**data)
 
 
@@ -388,13 +394,13 @@ class PleadingSchema(ExpandableSchema):
     generic = fields.Bool(missing=False)
 
     @pre_load
-    def format_data_to_load(self, data, **kwargs):
+    def format_data_to_load(self, data: RawFactor, **kwargs) -> RawFactor:
         data = self.get_from_mentioned(data)
         data = self.consume_type_field(data)
         return data
 
     @post_load
-    def make_object(self, data, **kwargs):
+    def make_object(self, data: RawFactor, **kwargs) -> Pleading:
         return self.__model__(**data)
 
 
@@ -407,13 +413,13 @@ class AllegationSchema(ExpandableSchema):
     generic = fields.Bool(missing=False)
 
     @pre_load
-    def format_data_to_load(self, data, **kwargs):
+    def format_data_to_load(self, data: RawFactor, **kwargs) -> RawFactor:
         data = self.get_from_mentioned(data)
         data = self.consume_type_field(data)
         return data
 
     @post_load
-    def make_object(self, data, **kwargs):
+    def make_object(self, data: RawFactor, **kwargs) -> Allegation:
         return self.__model__(**data)
 
 
@@ -426,13 +432,13 @@ class EvidenceSchema(ExpandableSchema):
     generic = fields.Bool(missing=False)
 
     @pre_load
-    def format_data_to_load(self, data, **kwargs):
+    def format_data_to_load(self, data: RawFactor, **kwargs) -> RawFactor:
         data = self.get_from_mentioned(data)
         data = self.consume_type_field(data)
         return data
 
     @post_load
-    def make_object(self, data, **kwargs):
+    def make_object(self, data: RawFactor, **kwargs) -> Evidence:
         return self.__model__(**data)
 
 
@@ -453,12 +459,12 @@ class FactorSchema(OneOfSchema, ExpandableSchema):
         "Pleading": PleadingSchema,
     }
 
-    def pre_load(self, data, **kwargs):
+    def pre_load(self, data: RawFactor, **kwargs) -> RawFactor:
         data = self.get_from_mentioned(data)
         data = self.remove_anchors_field(data)
         return data
 
-    def get_obj_type(self, obj):
+    def get_obj_type(self, obj) -> str:
         return obj.__class__.__name__
 
 
@@ -490,7 +496,7 @@ class RuleSchema(ExpandableSchema):
     generic = fields.Bool(missing=False)
 
     @pre_load
-    def format_data_to_load(self, data, **kwargs):
+    def format_data_to_load(self, data: Dict, **kwargs) -> RawRule:
         data = self.wrap_single_element_in_list(data, "enactments")
         data = self.wrap_single_element_in_list(data, "enactments_despite")
         procedure_fields = ("inputs", "despite", "outputs")
@@ -501,7 +507,7 @@ class RuleSchema(ExpandableSchema):
         return data
 
     @post_load
-    def make_object(self, data, **kwargs):
+    def make_object(self, data: RawRule, **kwargs) -> Rule:
         return self.__model__(**data)
 
 
@@ -514,7 +520,7 @@ class HoldingSchema(ExpandableSchema):
     name = fields.Str(missing=None)
     generic = fields.Bool(missing=False)
 
-    def nest_fields_inside_rule(self, data):
+    def nest_fields_inside_rule(self, data: Dict) -> RawHolding:
         """
         Nest fields inside "rule" and "procedure", if not already nested.
         """
@@ -547,7 +553,7 @@ class HoldingSchema(ExpandableSchema):
         return data
 
     @post_load
-    def make_object(self, data: RawHolding, **kwargs):
+    def make_object(self, data: RawHolding, **kwargs) -> Holding:
         return self.__model__(**data)
 
 

@@ -5,9 +5,10 @@ from authorityspoke.opinions import TextLinkDict
 from authorityspoke.selectors import TextQuoteSelector
 
 from authorityspoke.io import schemas
+from authorityspoke.io.schemas import RawSelector, RawHolding
 
 
-def read_selector(record: Union[str, Dict[str, str]]) -> TextQuoteSelector:
+def read_selector(record: RawSelector) -> TextQuoteSelector:
     """
     Create new selector from JSON user input.
 
@@ -20,9 +21,7 @@ def read_selector(record: Union[str, Dict[str, str]]) -> TextQuoteSelector:
     return selector_schema.load(record)
 
 
-def read_selectors(
-    record: Iterable[Union[str, Dict[str, str]]]
-) -> List[TextQuoteSelector]:
+def read_selectors(record: Iterable[RawSelector]) -> List[TextQuoteSelector]:
     r"""
     Create list of :class:`.TextQuoteSelector`\s from JSON user input.
 
@@ -76,12 +75,12 @@ def get_named_anchors(obj: Union[Dict, List]) -> TextLinkDict:
 
 
 def get_holding_anchors(
-    record: Union[Dict[str, Any], List[Dict[str, Any]]], many: bool = True
+    record: Union[RawHolding, List[RawHolding]]
 ) -> List[List[TextQuoteSelector]]:
     """
     Make indexes of text anchors for a list of Holdings.
     """
 
-    if many:
+    if isinstance(record, list):
         return [collect_anchors(holding) for holding in record]
     return [collect_anchors(record)]

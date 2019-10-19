@@ -27,7 +27,7 @@ from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
 
 from authorityspoke.io import anchors, schemas
-from authorityspoke.io.schemas import RawHolding
+from authorityspoke.io.schemas import RawSelector, RawEnactment, RawHolding
 from authorityspoke.io.name_index import index_names
 
 
@@ -40,9 +40,7 @@ FACTOR_SUBCLASSES = {
 
 
 def read_enactment(
-    record: Dict[str, Union[str, Dict]],
-    code: Optional[Code] = None,
-    regime: Optional[Regime] = None,
+    record: RawEnactment, code: Optional[Code] = None, regime: Optional[Regime] = None
 ) -> Enactment:
     r"""
     Create a new :class:`.Enactment` object using imported JSON data.
@@ -74,7 +72,7 @@ def read_enactment(
 
 
 def read_enactments(
-    record: List[Dict[str, Any]],
+    record: List[RawEnactment],
     code: Optional[Code] = None,
     regime: Optional[Regime] = None,
 ) -> List[Enactment]:
@@ -100,7 +98,7 @@ def read_enactments(
     :returns:
         a list of new :class:`Enactment` objects, optionally with text links.
     """
-    schema = schemas.EnactmentSchema(many=False)
+    schema = schemas.EnactmentSchema(many=True)
     schema.context["mentioned"] = index_names(record)
     schema.context["regime"] = regime
     schema.context["code"] = code
