@@ -1151,7 +1151,7 @@ def make_opinion_with_holding(make_opinion, make_regime) -> Dict[str, Opinion]:
         for opinion in loaders.load_opinion(f"{case}_h.json", lead_only=False):
             opinions[f"{case}_{opinion.position}"] = opinion
         holdings, holding_anchors, named_anchors = loaders.load_and_read_holdings(f"holding_{case}.json", regime=make_regime)
-        opinions[f"{case}_majority"].posit(holdings, holding_anchors=holding_anchors, name_anchors=named_anchors)
+        opinions[f"{case}_majority"].posit(holdings, holding_anchors=holding_anchors, named_anchors=named_anchors)
     return opinions
 
 

@@ -1,4 +1,5 @@
-from authorityspoke.io import loaders, name_index, readers, schemas
+from authorityspoke.io import loaders, readers, schemas
+from authorityspoke.io import name_index, text_expansion
 
 
 class TestCollectMentioned:
@@ -29,19 +30,18 @@ class TestCollectMentioned:
     }
 
     def test_expand_shorthand(self):
-        obj = name_index.recursively_expand_shorthand(self.relevant_dict)
+        obj = text_expansion.expand_shorthand(self.relevant_dict)
         assert obj["context_factors"][0]["context_factors"][0]["name"] == "Short Name"
 
     def test_mentioned_from_fact_and_entities(self):
-        obj = name_index.recursively_expand_shorthand(self.relevant_dict)
+        obj = text_expansion.expand_shorthand(self.relevant_dict)
         mentioned = name_index.collect_mentioned(self.relevant_dict)
         assert mentioned["relevant fact"]["type"] == "Fact"
         shooting = mentioned["relevant fact"]["context_factors"][0]
         assert shooting["context_factors"][0]["name"] == "Short Name"
 
     def test_mentioned_ordered_by_length(self):
-        obj, mentioned = name_index.index_names(self.relevant_dict)
-        mentioned = mentioned.sorted_by_length()
+        mentioned = name_index.index_names(self.relevant_dict)
         shortest = mentioned.popitem()
         assert shortest[0] == "Short Name"
 
@@ -63,7 +63,7 @@ class TestCollectMentioned:
         'Name "securing for authors" not found in the index of mentioned Factors'
         """
         feist_records = loaders.load_holdings("holding_feist.json")
-        record, mentioned = name_index.index_names(feist_records)
+        mentioned = name_index.index_names(feist_records)
         assert "securing for authors" in mentioned
 
     def test_context_factor_not_collapsed(self, make_regime):
@@ -87,6 +87,7 @@ class TestCollectMentioned:
                 "truth": False,
             },
         }
+        holding = text_expansion.expand_shorthand(holding)
         built = readers.read_holding(record=holding, regime=make_regime)
         assert built.inputs[0].short_string.startswith(
             "the fact that <Rural's telephone listings> were names"
@@ -115,7 +116,7 @@ class TestRetrieveMentioned:
         obj = {"type": "Entity", "name": "Larry"}
         fact["predicate"]["content"], fact[
             "context_factors"
-        ] = name_index.add_found_context(
+        ] = text_expansion.add_found_context(
             fact["predicate"]["content"], fact["context_factors"], obj
         )
         assert fact["predicate"]["content"] == "{} threw a pie at {} but it hit {}"

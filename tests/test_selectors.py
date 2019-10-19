@@ -112,7 +112,5 @@ class TestSelectors:
         """
 
         raw_holdings = loaders.load_holdings("holding_feist.json")
-        holdings, links, holding_links = readers.read_holdings(
-            raw_holdings, regime=make_regime, index_anchors=True
-        )
+        holding_links = anchors.get_holding_anchors(raw_holdings)
         assert len(holding_links[6]) == 2

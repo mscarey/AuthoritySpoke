@@ -479,7 +479,7 @@ def read_rule(record: Dict, regime: Optional[Regime] = None) -> Rule:
         iterator yielding :class:`Rule`\s with the items
         from ``mentioned_entities`` as ``context_factors``
     """
-    record, mentioned = index_names(record)
+    mentioned = index_names(record)
     schema = schemas.RuleSchema()
     schema.context["mentioned"] = mentioned
     schema.context["regime"] = regime

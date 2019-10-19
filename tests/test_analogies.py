@@ -7,6 +7,7 @@ from authorityspoke.factors import Analogy, Factor
 from authorityspoke.factors import ContextRegister, means
 from authorityspoke.facts import Fact
 from authorityspoke.io.readers import read_fact
+from authorityspoke.io.text_expansion import expand_shorthand
 
 
 class TestAnalogies:
@@ -24,16 +25,19 @@ class TestAnalogies:
 
 
 class TestContext:
+    al = expand_shorthand({"content": "{Al} sold {the bull} to {Betty}."})
+    alice = expand_shorthand({"content": "{Alice} sold {the cow} to {Bob}."})
+
     def test_impossible_register(self):
-        fact_al = read_fact({"content": "{Al} sold {the bull} to {Betty}."})
-        fact_alice = read_fact({"content": "{Alice} sold {the cow} to {Bob}."})
+        fact_al = read_fact(self.al)
+        fact_alice = read_fact(self.alice)
         context = ContextRegister({Entity("Al"): Entity("Bob")})
         answers = fact_al.update_context_register(fact_alice, context, means)
         assert not any(answers)
 
     def test_possible_register(self):
-        fact_al = read_fact({"content": "{Al} sold {the bull} to {Betty}."})
-        fact_alice = read_fact({"content": "{Alice} sold {the cow} to {Bob}."})
+        fact_al = read_fact(self.al)
+        fact_alice = read_fact(self.alice)
         context = ContextRegister({Entity("Al"): Entity("Alice")})
         answers = fact_al.update_context_register(fact_alice, context, means)
         assert Entity("the bull") in next(answers).keys()

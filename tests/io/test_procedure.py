@@ -1,4 +1,4 @@
-from authorityspoke.io import dump
+from authorityspoke.io import dump, text_expansion
 from authorityspoke.io import readers, schemas
 
 
@@ -33,6 +33,7 @@ class TestProcedureLoad:
     }
 
     def test_load_example(self):
-        procedure = readers.read_procedure(self.example)
+        procedure = text_expansion.expand_shorthand(self.example)
+        procedure = readers.read_procedure(procedure)
         factor = procedure.outputs[0].context_factors[0]
         assert factor.name == "the Java API"
