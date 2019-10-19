@@ -26,6 +26,7 @@ from utils.marshmallow_oneofschema.one_of_schema import OneOfSchema
 
 ureg = UnitRegistry()
 
+RawHolding = Dict[str, Any]
 
 class ExpandableSchema(Schema):
     def get_from_mentioned(self, data, **kwargs):
@@ -528,7 +529,7 @@ class HoldingSchema(ExpandableSchema):
         return data
 
     @pre_load
-    def format_data_to_load(self, data, **kwargs):
+    def format_data_to_load(self, data: RawHolding, **kwargs) -> RawHolding:
         data = self.get_from_mentioned(data)
 
         data["rule"] = data.get("rule") or {}
@@ -546,7 +547,7 @@ class HoldingSchema(ExpandableSchema):
         return data
 
     @post_load
-    def make_object(self, data, **kwargs):
+    def make_object(self, data: RawHolding, **kwargs):
         return self.__model__(**data)
 
 

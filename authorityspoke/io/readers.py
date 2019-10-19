@@ -27,6 +27,7 @@ from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
 
 from authorityspoke.io import anchors, schemas
+from authorityspoke.io.schemas import RawHolding
 from authorityspoke.io.name_index import index_names
 
 
@@ -240,7 +241,7 @@ def read_procedure(
 
 
 def read_holding(
-    record: Dict, regime: Optional[Regime] = None, many: bool = False
+    record: RawHolding, regime: Optional[Regime] = None, many: bool = False
 ) -> Holding:
     r"""
     Create new :class:`Holding` object from simple datatypes from JSON input.
@@ -271,7 +272,9 @@ def read_holding(
     return answer
 
 
-def read_holdings(record: List[Dict], regime: Optional[Regime] = None) -> List[Holding]:
+def read_holdings(
+    record: List[RawHolding], regime: Optional[Regime] = None
+) -> List[Holding]:
     r"""
     Load a list of :class:`Holdings`\s from JSON, with optional text links.
 

@@ -400,11 +400,6 @@ def make_exhibit(
         "no_shooting_witness_unknown_absent_testimony": Exhibit(
             form="testimony", statement=f["f_no_shooting"], absent=True
         ),
-        "no_shooting_entity_order_testimony": Exhibit(
-            form="testimony",
-            statement=f["f_no_shooting_entity_order"],
-            stated_by=e["bob"],
-        ),
         "no_shooting_different_witness_testimony": Exhibit(
             form="testimony", statement=f["f_no_shooting"], stated_by=e["bob"]
         ),
@@ -455,7 +450,7 @@ def make_exhibit(
 
 
 @pytest.fixture(scope="class")
-def make_complex_fact(make_predicate, make_factor) -> Dict[str, Evidence]:
+def make_complex_fact(make_predicate, make_factor) -> Dict[str, Fact]:
     p = make_predicate
     f = make_factor
 

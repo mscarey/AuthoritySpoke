@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import Dict, Iterable, List, Optional, Tuple, Union
+from typing import Any, Dict, Iterable, List, Union
 
 from authorityspoke.opinions import TextLinkDict
 from authorityspoke.selectors import TextQuoteSelector
@@ -76,7 +76,7 @@ def get_named_anchors(obj: Union[Dict, List]) -> TextLinkDict:
 
 
 def get_holding_anchors(
-    record: Dict, many: bool = True
+    record: Union[Dict[str, Any], List[Dict[str, Any]]], many: bool = True
 ) -> List[List[TextQuoteSelector]]:
     """
     Make indexes of text anchors for a list of Holdings.

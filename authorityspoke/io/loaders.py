@@ -6,10 +6,9 @@ Will usually hand off data to the io.readers module to create authorityspoke obj
 import json
 import pathlib
 
-from typing import Dict, List, Iterator, Optional, Tuple, Union
+from typing import Any, Dict, List, Iterator, Optional, Tuple, Union
 
 from authorityspoke.enactments import Code
-from authorityspoke.factors import Factor
 from authorityspoke.holdings import Holding
 from authorityspoke.io import anchors, filepaths, readers
 from authorityspoke.io.text_expansion import expand_shorthand
@@ -56,7 +55,9 @@ def load_and_read_holdings(
     directory: Optional[pathlib.Path] = None,
     filepath: Optional[pathlib.Path] = None,
     regime: Optional[Regime] = None,
-) -> List[Holding]:
+) -> Tuple[
+    List[Holding], List[List[TextQuoteSelector]], Dict[str, List[TextQuoteSelector]]
+]:
     """
     Read holdings with text anchors from a file.
     """
@@ -73,7 +74,7 @@ def load_holdings(
     filename: Optional[str] = None,
     directory: Optional[pathlib.Path] = None,
     filepath: Optional[pathlib.Path] = None,
-) -> List[Dict]:
+) -> List[RawHolding]:
     r"""
     Load a list of :class:`.Holding`\s from JSON.
 
