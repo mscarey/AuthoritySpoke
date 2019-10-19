@@ -41,6 +41,9 @@ def read_selectors(
 
 
 def collect_anchors(obj: Dict) -> List[TextQuoteSelector]:
+    r"""
+    Get list containing any available text anchors.
+    """
     anchors = obj.get("anchors") or []
     if not isinstance(anchors, List):
         anchors = [anchors]

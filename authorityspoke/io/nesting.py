@@ -1,6 +1,6 @@
 """Nesting fields to prepare to load a dict with a Marshmallow schema."""
 
-from typing import Dict, List
+from typing import Callable, Dict, List, Sequence, Union
 
 
 def nest_fields(data: Dict, nest: str, eggs: List[str]):
@@ -13,3 +13,30 @@ def nest_fields(data: Dict, nest: str, eggs: List[str]):
                 data[nest] = {}
             data[nest][egg_field] = data.pop(egg_field)
     return data
+
+
+def walk_tree_and_modify(
+    obj: Union[Dict, List], func: Callable, ignore: Sequence[str] = ()
+):
+    """
+    Traverse tree of dicts and lists, and modify each node.
+
+    :param obj: the object to traverse
+
+    :param func: the function to call on each node
+
+    :param ignore: the names of keys that should not be explored
+
+    :returns: a version of the tree with every node modified by `func`
+    """
+    if isinstance(obj, List):
+        return [walk_tree_and_modify(item, func, ignore) for item in obj]
+    if not isinstance(obj, Dict):
+        return obj
+
+    obj = func(obj)
+
+    for key, value in obj.items():
+        if isinstance(value, (Dict, List)) and key not in ignore:
+            obj[key] = walk_tree_and_modify(value, func, ignore)
+    return obj

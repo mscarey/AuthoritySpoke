@@ -1,24 +1,16 @@
 from re import findall
 from typing import Dict, List, Optional, Tuple
 
-from authorityspoke.io.nesting import nest_fields
+from authorityspoke.io import nesting
 
 
-def expand_shorthand(obj: Dict):
+def expand_shorthand(obj: Dict) -> Dict:
     """
     Traverse dict and expand every kind of pre-loading shorthand.
     """
-    if isinstance(obj, List):
-        return [expand_shorthand(item) for item in obj]
-    if not isinstance(obj, Dict):
-        return obj
-
-    obj = expand_node_shorthand(obj)
-
-    for key, value in obj.items():
-        if isinstance(value, (Dict, List)) and key != "predicate":
-            obj[key] = expand_shorthand(value)
-    return obj
+    return nesting.walk_tree_and_modify(
+        obj=obj, func=expand_node_shorthand, ignore=("predicate")
+    )
 
 
 def expand_node_shorthand(obj: Dict):
@@ -27,7 +19,7 @@ def expand_node_shorthand(obj: Dict):
             obj = wrap_single_element_in_list(obj, list_field)
 
     to_nest = ["content", "truth", "reciprocal", "comparison", "quantity"]
-    obj = nest_fields(obj, nest="predicate", eggs=to_nest)
+    obj = nesting.nest_fields(obj, nest="predicate", eggs=to_nest)
 
     obj = assign_name_from_content(obj)
     obj = collapse_known_factors(obj)
