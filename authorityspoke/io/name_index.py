@@ -1,14 +1,11 @@
 """Functions for indexing named objects in JSON to be imported."""
 from __future__ import annotations
 
-from copy import deepcopy
 from collections import OrderedDict
 
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional
 
 from marshmallow import ValidationError
-
-from authorityspoke.io.nesting import nest_fields
 
 
 class Mentioned(OrderedDict):
@@ -24,7 +21,7 @@ class Mentioned(OrderedDict):
             )
         value = {"name": name}
         value.update(self[name])
-        return deepcopy(value)
+        return value
 
     def sorted_by_length(self) -> Mentioned:
         return Mentioned(sorted(self.items(), key=lambda t: len(t[0]), reverse=True))

@@ -25,7 +25,6 @@ from authorityspoke.pleadings import Allegation, Pleading
 from authorityspoke.predicates import Predicate
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
-from authorityspoke.selectors import TextQuoteSelector
 
 from authorityspoke.io import anchors, schemas
 from authorityspoke.io.name_index import index_names
@@ -265,12 +264,8 @@ def read_holding(
         :class:`.Factor`\s as keys and their :class:`.TextQuoteSelector`\s
         as values.
     """
-    mentioned = index_names(record)
     schema = schemas.HoldingSchema(many=many)
-
-    proxy = deepcopy(mentioned)
-
-    schema.context["mentioned"] = proxy
+    schema.context["mentioned"] = index_names(record)
     schema.context["regime"] = regime
     answer = schema.load(deepcopy(record))
     return answer

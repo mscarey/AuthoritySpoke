@@ -1,10 +1,10 @@
 from re import findall
-from typing import Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 from authorityspoke.io import nesting
 
 
-def expand_shorthand(obj: Dict) -> Dict:
+def expand_shorthand(obj: Dict) -> Dict[str, Any]:
     """
     Traverse dict and expand every kind of pre-loading shorthand.
     """
@@ -13,7 +13,7 @@ def expand_shorthand(obj: Dict) -> Dict:
     )
 
 
-def expand_node_shorthand(obj: Dict):
+def expand_node_shorthand(obj: Dict[str, Any]) -> Dict[str, Any]:
     for list_field in ("context_factors", "anchors"):
         if obj.get(list_field) is not None:
             obj = wrap_single_element_in_list(obj, list_field)
@@ -101,7 +101,7 @@ def assign_name_from_content(obj: Dict) -> Dict:
 
 def add_found_context(
     content: str, context_factors: List[Dict], factor: Dict, placeholder="{}"
-):
+) -> Tuple[str, List[Dict[str, Any]]]:
     """
     Replace mentions of factor with placeholder and list replacements.
 
