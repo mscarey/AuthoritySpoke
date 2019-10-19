@@ -17,13 +17,14 @@ def nest_fields(data: Dict, nest: str, eggs: List[str]):
 
 def walk_tree_and_modify(
     obj: Union[Dict, List], func: Callable, ignore: Sequence[str] = ()
-):
+) -> Union[Dict, List]:
     """
     Traverse tree of dicts and lists, and modify each node.
 
     :param obj: the object to traverse
 
-    :param func: the function to call on each node
+    :param func:
+        the function to call on each dict node, returning a dict
 
     :param ignore: the names of keys that should not be explored
 
@@ -31,12 +32,13 @@ def walk_tree_and_modify(
     """
     if isinstance(obj, List):
         return [walk_tree_and_modify(item, func, ignore) for item in obj]
-    if not isinstance(obj, Dict):
-        return obj
+    if isinstance(obj, Dict):
 
-    obj = func(obj)
+        obj_dict: Dict = func(obj)
 
-    for key, value in obj.items():
-        if isinstance(value, (Dict, List)) and key not in ignore:
-            obj[key] = walk_tree_and_modify(value, func, ignore)
+        for key, value in obj_dict.items():
+            if isinstance(value, (Dict, List)) and key not in ignore:
+                obj_dict[key] = walk_tree_and_modify(value, func, ignore)
+        return obj_dict
+
     return obj

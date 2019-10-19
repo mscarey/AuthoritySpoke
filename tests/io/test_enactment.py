@@ -1,24 +1,5 @@
-import json
-import os
-import pathlib
-
-import pint
-import pytest
-
-from authorityspoke.enactments import Code, Enactment
-from authorityspoke.entities import Entity
-from authorityspoke.facts import Fact
-from authorityspoke.holdings import Holding
-from authorityspoke.opinions import Opinion
-from authorityspoke.predicates import Predicate
-from authorityspoke.procedures import Procedure
-from authorityspoke.io import readers
+from authorityspoke.io import anchors, readers
 from authorityspoke.io.loaders import load_holdings
-from authorityspoke.io import filepaths
-from authorityspoke.rules import Rule
-from authorityspoke.selectors import TextQuoteSelector
-
-ureg = pint.UnitRegistry()
 
 
 class TestEnactmentImport:
@@ -38,9 +19,8 @@ class TestEnactmentImport:
         assert "all relevant evidence is admissible" in enactment.text
 
     def test_enactment_with_anchor(self, make_regime):
-        enactment, factor_anchors = readers.read_enactment(
-            self.test_enactments[1], regime=make_regime, index_anchors=True
-        )
+        enactment = readers.read_enactment(self.test_enactments[1], regime=make_regime)
+        factor_anchors = anchors.get_named_anchors(self.test_enactments[1])
         assert enactment.text.startswith(
             "nor shall any State deprive any person of life, liberty, or property"
         )

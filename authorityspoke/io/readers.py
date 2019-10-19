@@ -43,8 +43,6 @@ def read_enactment(
     record: Dict[str, Union[str, Dict]],
     code: Optional[Code] = None,
     regime: Optional[Regime] = None,
-    index_anchors: bool = False,
-    many: bool = False,
 ) -> Enactment:
     r"""
     Create a new :class:`.Enactment` object using imported JSON data.
@@ -65,27 +63,21 @@ def read_enactment(
         source for this :class:`Enactment` can be found, or where
         it should be added
 
-    :param index_anchors:
-        whether to also return an index of text links to the created object(s)
-
     :returns:
         a new :class:`Enactment` object, optionally with text links.
     """
-    if index_anchors:
-        factor_anchors = anchors.get_named_anchors(record)
-    schema = schemas.EnactmentSchema(
-        context={"code": code, "regime": regime}, many=many
-    )
-    answer = schema.load(record)
-
-    return (answer, factor_anchors) if index_anchors else answer
+    schema = schemas.EnactmentSchema(many=False)
+    schema.context["mentioned"] = index_names(record)
+    schema.context["regime"] = regime
+    schema.context["code"] = code
+    return schema.load(deepcopy(record))
 
 
 def read_enactments(
-    record: Union[Dict[str, str], List[Dict[str, str]]],
+    record: List[Dict[str, Any]],
+    code: Optional[Code] = None,
     regime: Optional[Regime] = None,
-    index_anchors: bool = False,
-) -> Union[List[Enactment], Tuple[List[Enactment], TextLinkDict]]:
+) -> List[Enactment]:
     r"""
     Create a new :class:`Enactment` object using imported JSON data.
 
@@ -96,20 +88,23 @@ def read_enactments(
         sequence of :class:`dict`\s with string fields from JSON for
         constructing new :class:`.Enactment`\s
 
+    :param code:
+        a :class:`.Code` that is the source for every :class:`Enactment`
+        to be loaded, if they all come from the same :class:`.Code`
+
     :param regime:
         the :class:`.Regime` where the :class:`.Code`\s that are the
         source for this :class:`Enactment` can be found, or where
         it should be added
 
-    :param index_anchors:
-        whether to also return an index of text links to the created object(s)
-
     :returns:
         a list of new :class:`Enactment` objects, optionally with text links.
     """
-    return read_enactment(
-        record=record, regime=regime, many=True, index_anchors=index_anchors
-    )
+    schema = schemas.EnactmentSchema(many=False)
+    schema.context["mentioned"] = index_names(record)
+    schema.context["regime"] = regime
+    schema.context["code"] = code
+    return schema.load(deepcopy(record))
 
 
 def get_references_from_mentioned(
@@ -240,9 +235,7 @@ def read_procedure(
     return schema.load(record)
 
 
-def read_holding(
-    record: RawHolding, regime: Optional[Regime] = None, many: bool = False
-) -> Holding:
+def read_holding(record: RawHolding, regime: Optional[Regime] = None) -> Holding:
     r"""
     Create new :class:`Holding` object from simple datatypes from JSON input.
 
@@ -265,11 +258,10 @@ def read_holding(
         :class:`.Factor`\s as keys and their :class:`.TextQuoteSelector`\s
         as values.
     """
-    schema = schemas.HoldingSchema(many=many)
+    schema = schemas.HoldingSchema(many=False)
     schema.context["mentioned"] = index_names(record)
     schema.context["regime"] = regime
-    answer = schema.load(deepcopy(record))
-    return answer
+    return schema.load(deepcopy(record))
 
 
 def read_holdings(
@@ -293,7 +285,10 @@ def read_holdings(
         a list of :class:`.Holding` objects, optionally with
         an index matching :class:`.Factor`\s to selectors.
     """
-    return read_holding(record=record, regime=regime, many=True)
+    schema = schemas.HoldingSchema(many=True)
+    schema.context["mentioned"] = index_names(record)
+    schema.context["regime"] = regime
+    return schema.load(deepcopy(record))
 
 
 def read_case(

@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from collections import OrderedDict
 
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Union
 
 from marshmallow import ValidationError
 
@@ -52,7 +52,7 @@ def collect_mentioned(obj: Dict, mentioned: Optional[Mentioned] = None) -> Menti
     return mentioned
 
 
-def index_names(obj: Dict) -> Mentioned:
+def index_names(obj: Union[List, Dict]) -> Mentioned:
     """
     Call all functions to prepare "mentioned" index.
 
