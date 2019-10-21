@@ -28,6 +28,7 @@ from authorityspoke.rules import Rule
 
 from authorityspoke.io import anchors, schemas
 from authorityspoke.io.schemas import RawSelector, RawEnactment, RawHolding
+from authorityspoke.io.schemas import RawPredicate, RawFactor
 from authorityspoke.io.name_index import index_names
 
 
@@ -105,12 +106,12 @@ def read_enactments(
     return schema.load(deepcopy(record))
 
 
-def read_predicate(value: Dict) -> Predicate:
+def read_predicate(value: RawPredicate) -> Predicate:
     schema = schemas.PredicateSchema(partial=True)
     return schema.load(value)
 
 
-def read_fact(record: Dict) -> Fact:
+def read_fact(record: RawFactor) -> Fact:
     r"""
     Construct a :class:`Fact` after loading a dict from JSON.
 
@@ -126,62 +127,40 @@ def read_fact(record: Dict) -> Fact:
     return schema.load(record)
 
 
-def subclass_from_str(name: str) -> Type:
-    """
-    Find class for use in JSON deserialization process.
-
-    Obtains a classname of a :class:`Factor`
-    subclass from a string. The list of subclasses used
-    here must be updated wheneven a new one is created.
-
-    :param name: name of the desired subclass.
-
-    :returns: the Class named ``name``.
-    """
-    answer = FACTOR_SUBCLASSES.get(name.capitalize())
-    if answer is None:
-        raise ValueError(
-            f'"type" value in input must be one of '
-            + f"{list(FACTOR_SUBCLASSES.keys())}, not {name}"
-        )
-    return answer
-
-
-def read_factor(
-    record: Dict, regime: Optional[Regime] = None, many: bool = False, **kwargs
-) -> Factor:
+def read_factor(record: RawFactor, regime: Optional[Regime] = None, **kwargs) -> Factor:
     r"""
-    Turn fields from a chunk of JSON into a :class:`Factor` object.
+    Turn fields from JSON into a :class:`Factor` object.
 
     :param record:
-        parameter values to pass to :meth:`Factor.__init__`.
+        parameter values to pass to schema
+
+    :parame regime:
+        to look up any :class:`.Enactment` references
 
     """
-    schema = schemas.FactorSchema(many=many)
+    schema = schemas.FactorSchema(many=False)
     schema.context["mentioned"] = index_names(record)
     schema.context["regime"] = regime
     return schema.load(record)
 
 
 def read_factors(
-    record_list: Union[Dict[str, str], List[Dict[str, str]]],
-    mentioned: Optional[TextLinkDict] = None,
-    regime: Optional[Regime] = None,
-    report_mentioned: bool = False,
-) -> Union[Tuple[Factor, ...], Tuple[Tuple[Factor, ...], TextLinkDict]]:
-    created_list: List[Factor] = []
-    if record_list is None:
-        record_list = []
-    if not isinstance(record_list, list):
-        record_list = [record_list]
-    for record in record_list:
-        created, mentioned = read_factor(
-            record, mentioned, regime=regime, report_mentioned=True
-        )
-        created_list.append(created)
-    mentioned = mentioned or Mentioned({})
-    answer = tuple(created_list)
-    return (answer, mentioned) if report_mentioned else answer
+    record: List[RawFactor], regime: Optional[Regime] = None, **kwargs
+) -> Factor:
+    r"""
+    Turn fields from JSON into a :class:`Factor` object.
+
+    :param record:
+        parameter values to pass to schema
+
+    :parame regime:
+        to look up any :class:`.Enactment` references
+
+    """
+    schema = schemas.FactorSchema(many=False)
+    schema.context["mentioned"] = index_names(record)
+    schema.context["regime"] = regime
+    return schema.load(record)
 
 
 def read_procedure(

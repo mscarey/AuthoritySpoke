@@ -101,6 +101,19 @@ class TestFactLoad:
         assert fact_float_more >= fact_float_less
 
 
+class TestFactorLoad:
+    def test_import_fact_with_factor_schema(self):
+        loaded = load_holdings("holding_cardenas.json")
+        entity = readers.read_factor(loaded[0]["inputs"][0])
+        inner_context = entity.context_factors[0].context_factors[0]
+        assert inner_context.name == "the defendant"
+
+    def test_import_facts_with_factor_schema(self):
+        loaded = load_holdings("holding_cardenas.json")
+        factors = readers.read_factors(loaded[0]["inputs"])
+        assert factors[1].context_factors[0].name == "TK"
+
+
 class TestFactDump:
     def test_dump_with_quantity(self, watt_factor):
         f8_dict = to_dict(watt_factor["f8"])
