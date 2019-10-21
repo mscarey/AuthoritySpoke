@@ -110,8 +110,8 @@ class TestFactorLoad:
 
     def test_import_facts_with_factor_schema(self):
         loaded = load_holdings("holding_cardenas.json")
-        factors = readers.read_factors(loaded[0]["inputs"])
-        assert factors[1].context_factors[0].name == "TK"
+        factor = readers.read_factors(loaded[0]["inputs"])[1].context_factors[0]
+        assert factor.content == "{} committed an attempted robbery"
 
 
 class TestFactDump:

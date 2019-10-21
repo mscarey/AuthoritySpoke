@@ -157,7 +157,7 @@ def read_factors(
         to look up any :class:`.Enactment` references
 
     """
-    schema = schemas.FactorSchema(many=False)
+    schema = schemas.FactorSchema(many=True)
     schema.context["mentioned"] = index_names(record)
     schema.context["regime"] = regime
     return schema.load(record)
