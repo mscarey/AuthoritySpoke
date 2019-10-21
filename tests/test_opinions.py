@@ -6,16 +6,6 @@ from authorityspoke.opinions import Opinion
 
 
 class TestOpinions:
-    def test_load_opinion_in_Harvard_format(self):
-        watt_dict = loaders.load_opinion("watt_h.json")
-        assert watt_dict.name_abbreviation == "Wattenburg v. United States"
-
-    def test_load_generator_for_opinions(self):
-        opinion_generator = iter(loaders.load_opinion("brad_h.json", lead_only=False))
-        _ = next(opinion_generator)  # majority
-        dissent = next(opinion_generator)
-        assert dissent.position == "concurring-in-part-and-dissenting-in-part"
-
     def test_opinion_features(self, make_opinion):
         assert make_opinion["watt_majority"].court == "9th-cir"
         assert "388 F.2d 853" in make_opinion["watt_majority"].citations

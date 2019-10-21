@@ -20,7 +20,7 @@ from authorityspoke.factors import Factor
 from authorityspoke.facts import Fact
 from authorityspoke.holdings import Holding
 from authorityspoke.jurisdictions import Regime
-from authorityspoke.opinions import Opinion, TextLinkDict
+from authorityspoke.opinions import Opinion, Decision, TextLinkDict
 from authorityspoke.pleadings import Allegation, Pleading
 from authorityspoke.predicates import Predicate
 from authorityspoke.procedures import Procedure
@@ -228,9 +228,7 @@ def read_holdings(
     return schema.load(deepcopy(record))
 
 
-def read_case(
-    decision_dict: Dict[str, Any], lead_only: bool = True, as_generator: bool = False
-) -> Union[Opinion, Iterator[Opinion], List[Opinion]]:
+def read_decision(decision_dict: Dict[str, Any]) -> Decision:
     r"""
     Create and return one or more :class:`.Opinion` objects from a dict API response.
 
@@ -242,20 +240,25 @@ def read_case(
 
     :param decision_dict:
         A dict created from a Caselaw Access Project API response.
-
-    :param lead_only:
-        If True, returns a single :class:`.Opinion` object,
-        otherwise returns an iterator that yields every
-        :class:`.Opinion` in the case.
-
-    :param as_generator:
-        if True, returns a generator that
-        yields all opinions meeting the query.
     """
+    schema = schemas.DecisionSchema()
+    return schema.load(decision_dict)
 
-    return read_opinions(
-        lead_only=lead_only, as_generator=as_generator, **decision_dict
-    )
+def read_opinion(data: Dict[str, Any]) -> Opinion:
+    r"""
+    Create and return one or more :class:`.Opinion` objects from a dict API response.
+
+    Relies on the JSON format from the `Caselaw Access Project
+    API <https://api.case.law/v1/cases/>`_, under ["casebody"]["data"]["opinions"].
+
+    This function is a more convenient way to call read_opinions with an entire
+    case from the CAP API as a single parameter.
+
+    :param data:
+        A dict created from a Caselaw Access Project API response.
+    """
+    schema = schemas.DecisionSchema()
+    return schema.load(decision_dict)
 
 
 def read_opinions(

@@ -74,13 +74,23 @@ class ExpandableSchema(Schema):
 
 class OpinionSchema(Schema):
     __model__ = Opinion
-    position = fields.Str()
+    position = fields.Str(data_key="type")
     author = fields.Str()
     text = fields.Str()
 
+    @post_load
+    def make_object(self, data, **kwargs):
+        return self.__model__(**data)
+
 class CaseCitationSchema(Schema):
+
     __model__ = CaseCitation
     cite = fields.Str()
+    reporter = fields.Str(data_key="type")
+
+    @post_load
+    def make_object(self, data, **kwargs):
+        return self.__model__(**data)
 
 class DecisionSchema(Schema):
     __model__ = Decision
@@ -92,6 +102,10 @@ class DecisionSchema(Schema):
     last_page = fields.Int()
     decision_date = fields.Date()
     court = fields.Str()
+
+    @post_load
+    def make_object(self, data, **kwargs):
+        return self.__model__(**data)
 
 class SelectorSchema(ExpandableSchema):
     __model__ = TextQuoteSelector

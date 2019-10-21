@@ -4,7 +4,7 @@ import os
 import pytest
 
 from authorityspoke.io.downloads import download_case
-from authorityspoke.io.readers import read_case
+from authorityspoke.io.readers import read_decision
 from authorityspoke.io.loaders import load_opinion
 
 pytestmark = pytest.mark.skip("don't want to call API")
