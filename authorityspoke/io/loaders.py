@@ -16,7 +16,7 @@ from authorityspoke.selectors import TextQuoteSelector
 
 from authorityspoke.io import anchors, filepaths, readers
 from authorityspoke.io.text_expansion import expand_shorthand
-from authorityspoke.io.schemas import RawHolding
+from authorityspoke.io.schemas import RawHolding, RawDecision
 
 
 def load_code(
@@ -108,13 +108,11 @@ def load_holdings(
     return holdings
 
 
-def load_opinion(
+def load_decision(
     filename: Optional[str] = None,
     directory: Optional[pathlib.Path] = None,
     filepath: Optional[pathlib.Path] = None,
-    lead_only: bool = True,
-    as_generator: bool = False,
-) -> Union[Opinion, Iterator[Opinion], List[Opinion]]:
+) -> RawDecision:
     r"""
     Create and return one or more :class:`.Opinion` objects from JSON.
 

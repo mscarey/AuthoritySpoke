@@ -28,9 +28,12 @@ logger = logging.getLogger(__name__)
 
 TextLinkDict = Dict[str, List[TextQuoteSelector]]
 
+
 @dataclass
 class CaseCitation:
     cite: str
+    reporter: str
+
 
 @dataclass
 class Opinion:
@@ -40,40 +43,17 @@ class Opinion:
     Usually an opinion must have ``position="majority"``
     to create holdings binding on any courts.
 
-    :param name:
-        full name of the opinion, e.g. "ORACLE AMERICA, INC.,
-        Plaintiff-Appellant, v. GOOGLE INC., Defendant-Cross-Appellant"
-    :param name_abbreviation:
-        shorter name of the opinion, e.g. "Oracle America, Inc. v. Google Inc."
-    :param citations:
-        citations to the opinion, usually in the format
-        ``[Volume Number] [Reporter Name Abbreviation] [Page Number]``
-    :param first_page:
-        the page where the opinion begins in its official reporter
-    :param last_page:
-        the page where the opinion ends in its official reporter
-    :param decision_date:
-        date when the opinion was first published by the court
-        (not the publication date of the reporter volume)
-    :param court:
-        name of the court that published the opinion
     :param position:
         the opinion's attitude toward the court's disposition of the case.
         e.g. ``majority``, ``dissenting``, ``concurring``, ``concurring in the result``
     :param author:
         name of the judge who authored the opinion, if identified
+    :param text:
     """
 
-    name: str
-    name_abbreviation: str
-    citations: Iterable[str]
-    first_page: Optional[int]
-    last_page: Optional[int]
-    decision_date: datetime.date
-    court: str
-    position: Optional[str]
-    author: Optional[str]
-    text: Optional[str] = field(repr=False)
+    position: Optional[str] = None
+    author: Optional[str] = None
+    text: Optional[str] = field(default=None, repr=False)
 
     def __post_init__(self):
         r"""
@@ -375,11 +355,40 @@ class Opinion:
 
 @dataclass
 class Decision:
+    """
+    A court decision to resolve a step in litigation.
+
+    May be determined by one majority :class:`Opinion` or by the combined
+    effect of multiple Opinions.
+
+    :param name:
+        full name of the opinion, e.g. "ORACLE AMERICA, INC.,
+        Plaintiff-Appellant, v. GOOGLE INC., Defendant-Cross-Appellant"
+    :param name_abbreviation:
+        shorter name of the opinion, e.g. "Oracle America, Inc. v. Google Inc."
+    :param citations:
+        citations to the opinion, usually in the format
+        ``[Volume Number] [Reporter Name Abbreviation] [Page Number]``
+    :param first_page:
+        the page where the opinion begins in its official reporter
+    :param last_page:
+        the page where the opinion ends in its official reporter
+    :param decision_date:
+        date when the opinion was first published by the court
+        (not the publication date of the reporter volume)
+    :param court:
+        name of the court that published the opinion
+    :param _id:
+        unique ID from CAP API
+    """
+
     name: str
-    name_abbreviation: str
-    citations: Sequence[str]
-    first_page: Optional[int]
-    last_page: Optional[int]
     decision_date: datetime.date
-    court: str
-    opinions: Sequence[Opinion]
+    name_abbreviation: Optional[str] = None
+    citations: Optional[Sequence[CaseCitation]] = None
+    first_page: Optional[int] = None
+    last_page: Optional[int] = None
+    court: Optional[str] = None
+    opinions: Optional[Sequence[Opinion]] = None
+    jurisdiction: Optional[str] = None
+    _id: Optional[int] = None

@@ -163,8 +163,9 @@ class TestHoldingImport:
         test_cases = ("feist", "lotus", "oracle", "brad", "watt", "cardenas")
         opinions = {}
         for case in test_cases:
-            for opinion in loaders.load_opinion(f"{case}_h.json", lead_only=False):
-                opinions[f"{case}_{opinion.position}"] = opinion
+            decision = loaders.load_decision(f"{case}_h.json")
+            built = readers.read_decision(decision)
+            opinions[f"{case}_majority"] = built.opinions[0]
             holdings, holding_anchors, named_anchors = loaders.load_and_read_holdings(f"holding_{case}.json", regime=make_regime)
             opinions[f"{case}_majority"].posit(holdings, holding_anchors=holding_anchors, named_anchors=named_anchors)
         holding = opinions["lotus_majority"].holdings[0]

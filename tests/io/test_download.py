@@ -5,7 +5,7 @@ import pytest
 
 from authorityspoke.io.downloads import download_case
 from authorityspoke.io.readers import read_decision
-from authorityspoke.io.loaders import load_opinion
+from authorityspoke.io.loaders import load_decision
 
 pytestmark = pytest.mark.skip("don't want to call API")
 
@@ -41,7 +41,7 @@ class TestDownload:
             cite="49 F.3d 807", filename=to_file, directory=tmp_path, save_to_file=True
         )
         filepath = tmp_path / to_file
-        lotus_opinion = load_opinion(filepath=filepath)
+        lotus_opinion = load_decision(filepath=filepath)
         assert lotus_opinion.__class__.__name__ == "Opinion"
         assert "Lotus" in lotus_opinion.name_abbreviation
 

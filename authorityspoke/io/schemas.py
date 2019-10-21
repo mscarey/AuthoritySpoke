@@ -72,6 +72,11 @@ class ExpandableSchema(Schema):
             data[many_element] = [data[many_element]]
         return data
 
+
+RawOpinion = Dict[str, str]
+RawCaseCitation = Dict[str, str]
+RawDecision = Dict[str, Union[str, int, Sequence[RawOpinion], Sequence[RawCaseCitation]]]
+
 class OpinionSchema(Schema):
     __model__ = Opinion
     position = fields.Str(data_key="type")
@@ -79,7 +84,7 @@ class OpinionSchema(Schema):
     text = fields.Str()
 
     @post_load
-    def make_object(self, data, **kwargs):
+    def make_object(self, data: RawOpinion, **kwargs) -> Opinion:
         return self.__model__(**data)
 
 class CaseCitationSchema(Schema):
@@ -89,7 +94,7 @@ class CaseCitationSchema(Schema):
     reporter = fields.Str(data_key="type")
 
     @post_load
-    def make_object(self, data, **kwargs):
+    def make_object(self, data: RawCaseCitation, **kwargs) -> CaseCitation:
         return self.__model__(**data)
 
 class DecisionSchema(Schema):
@@ -102,9 +107,24 @@ class DecisionSchema(Schema):
     last_page = fields.Int()
     decision_date = fields.Date()
     court = fields.Str()
+    jurisdiction = fields.Str(missing=None)
+    _id = fields.Int(data_key="id")
+
+    @pre_load
+    def format_data_to_load(self, data: RawDecision, **kwargs) -> RawDecision:
+        data["court"] = data.get("court", {}).get("slug", "")
+        data["jurisdiction"] = data.get("jurisdiction", {}).get("slug", "")
+        data["opinions"] = data.get("casebody", {}).get("data", {}).get("opinions", {})
+        del data["casebody"]
+        del data["docket_number"]
+        del data["reporter"]
+        del data["url"]
+        data.pop("frontend_url", None)
+        del data["volume"]
+        return data
 
     @post_load
-    def make_object(self, data, **kwargs):
+    def make_object(self, data: RawDecision, **kwargs) -> Decision:
         return self.__model__(**data)
 
 class SelectorSchema(ExpandableSchema):
