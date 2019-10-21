@@ -6,9 +6,9 @@ from authorityspoke.opinions import Opinion
 
 
 class TestOpinions:
-    def test_opinion_features(self, make_opinion):
-        assert make_opinion["watt_majority"].court == "9th-cir"
-        assert "388 F.2d 853" in make_opinion["watt_majority"].citations
+    def test_opinion_features(self, make_decision):
+        assert make_decision["watt"].court == "9th-cir"
+        assert make_decision["watt"].citations[0].cite == "388 F.2d 853"
 
     def test_repr(self, make_opinion):
         assert "HAMLEY, Circuit Judge" in repr(make_opinion["watt_majority"])

@@ -389,6 +389,13 @@ class Decision:
     first_page: Optional[int] = None
     last_page: Optional[int] = None
     court: Optional[str] = None
-    opinions: Optional[Sequence[Opinion]] = None
+    opinions: Sequence[Opinion] = field(default_factory=list)
     jurisdiction: Optional[str] = None
     _id: Optional[int] = None
+
+    @property
+    def majority(self) -> Optional[Opinion]:
+        for opinion in self.opinions:
+            if opinion.position == "majority":
+                return opinion
+        return None

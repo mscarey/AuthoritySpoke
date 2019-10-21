@@ -1,3 +1,4 @@
+from copy import deepcopy
 from typing import Any, Dict, Tuple
 
 import pytest
@@ -1130,28 +1131,37 @@ def make_holding(make_rule) -> Dict[str, Holding]:
     holdings.update(new_holdings)
     return holdings
 
+TEST_CASES = ("brad", "cardenas", "feist", "lotus", "oracle", "watt")
 
 @pytest.fixture(scope="class")
-def make_opinion() -> Dict[str, Opinion]:
-    test_cases = ("brad", "cardenas", "feist", "lotus", "oracle", "watt")
-    opinions = {}
-    for case in test_cases:
+def make_decision():
+    decisions = {}
+    for case in TEST_CASES:
         decision = loaders.load_decision(f"{case}_h.json")
         built = readers.read_decision(decision)
-        opinions[f"{case}_majority"] = built.opinions[0]
+        decisions[case] = built
+    return decisions
+
+@pytest.fixture(scope="class")
+def make_decision_with_holding(make_decision):
+    decisions = deepcopy(make_decision)
+    for case in TEST_CASES:
+        holdings, holding_anchors, named_anchors = loaders.load_and_read_holdings(f"holding_{case}.json", regime=make_regime)
+        decisions[case].majority.posit(holdings, holding_anchors=holding_anchors, named_anchors=named_anchors)
+    return decisions
+
+@pytest.fixture(scope="class")
+def make_opinion(make_decision) -> Dict[str, Opinion]:
+    opinions = {}
+    for case in TEST_CASES:
+        opinions[f"{case}_majority"] = make_decision[case].majority
     return opinions
 
-
 @pytest.fixture(scope="class")
-def make_opinion_with_holding(make_opinion, make_regime) -> Dict[str, Opinion]:
-    test_cases = ("brad", "cardenas", "lotus", "oracle", "watt", "feist",)
+def make_opinion_with_holding(make_decision_with_holding) -> Dict[str, Opinion]:
     opinions = {}
-    for case in test_cases:
-        decision = loaders.load_decision(f"{case}_h.json")
-        built = readers.read_decision(decision)
-        opinions[f"{case}_majority"] = built.opinions[0]
-        holdings, holding_anchors, named_anchors = loaders.load_and_read_holdings(f"holding_{case}.json", regime=make_regime)
-        opinions[f"{case}_majority"].posit(holdings, holding_anchors=holding_anchors, named_anchors=named_anchors)
+    for case in TEST_CASES:
+        opinions[f"{case}_majority"] = make_decision_with_holding[case].majority
     return opinions
 
 

@@ -11,7 +11,7 @@ from typing import Any, Dict, List, Iterator, Optional, Tuple, Union
 from authorityspoke.enactments import Code
 from authorityspoke.holdings import Holding
 from authorityspoke.jurisdictions import Regime
-from authorityspoke.opinions import Opinion
+from authorityspoke.opinions import Opinion, Decision
 from authorityspoke.selectors import TextQuoteSelector
 
 from authorityspoke.io import anchors, filepaths, readers
@@ -145,3 +145,14 @@ def load_decision(
         decision_dict = json.load(f)
 
     return decision_dict
+
+
+def load_and_read_decision(
+    filename: Optional[str] = None,
+    directory: Optional[pathlib.Path] = None,
+    filepath: Optional[pathlib.Path] = None,
+) -> Decision:
+    raw_decision = load_decision(
+        filename=filename, directory=directory, filepath=filepath
+    )
+    return readers.read_decision(raw_decision)

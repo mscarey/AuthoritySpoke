@@ -143,7 +143,7 @@ class TestEnactments:
         assert fourth_a.selector.exact.endswith("or things")
 
     def test_passage_from_imported_statute(self, make_regime):
-        oracle_majority = loaders.load_opinion(f"oracle_h.json")
+        oracle_majority = loaders.load_and_read_decision(f"oracle_h.json").majority
         raw_holdings = loaders.load_holdings("holding_oracle.json")
         holdings = readers.read_holdings(raw_holdings, regime=make_regime)
         oracle_majority.posit(holdings)
