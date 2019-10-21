@@ -79,17 +79,13 @@ class TestOpinions:
         )
         assert make_entity["watt"] in make_opinion["watt_majority"].generic_factors
 
-    def test_opinion_date(self, make_opinion):
-        assert (
-            make_opinion["watt_majority"].decision_date
-            < make_opinion["brad_majority"].decision_date
-        )
-        assert (
-            make_opinion["brad_majority"].decision_date
-            == make_opinion[
-                "brad_concurring-in-part-and-dissenting-in-part"
-            ].decision_date
-        )
+    def test_opinion_date(self, make_decision):
+        """
+        This no longer tests whether two Opinions from the same Decision
+        have the same date, because the date field has been moved to the
+        Decision class.
+        """
+        assert make_decision["watt"].date < make_decision["brad"].date
 
     def test_positing_non_rule_error(self, make_opinion, make_procedure):
         with pytest.raises(TypeError):

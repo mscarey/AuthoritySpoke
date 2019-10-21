@@ -87,6 +87,11 @@ class OpinionSchema(Schema):
     def make_object(self, data: RawOpinion, **kwargs) -> Opinion:
         return self.__model__(**data)
 
+    @pre_load
+    def format_data_to_load(self, data: RawOpinion, **kwargs) -> RawOpinion:
+        data["author"] = data["author"].strip(",:")
+        return data
+
 class CaseCitationSchema(Schema):
 
     __model__ = CaseCitation
@@ -105,7 +110,7 @@ class DecisionSchema(Schema):
     opinions = fields.Nested(OpinionSchema, many=True)
     first_page = fields.Int()
     last_page = fields.Int()
-    decision_date = fields.Date()
+    date = fields.Date(data_key="decision_date")
     court = fields.Str()
     jurisdiction = fields.Str(missing=None)
     _id = fields.Int(data_key="id")

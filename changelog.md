@@ -5,6 +5,9 @@ Dev
 ------------------
 - Enactments may choose text by section without a TextQuoteSelector
 - Remove "regime" parameter from Enactment
+- Add data serialization using Marshmallow
+- Migrate JSON data loading functions to Marshmallow
+- Add Decision class containing Opinions
 
 0.2.0 (2019-09-24)
 ------------------

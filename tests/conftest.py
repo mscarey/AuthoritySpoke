@@ -1,4 +1,3 @@
-from copy import deepcopy
 from typing import Any, Dict, Tuple
 
 import pytest
@@ -1131,10 +1130,10 @@ def make_holding(make_rule) -> Dict[str, Holding]:
     holdings.update(new_holdings)
     return holdings
 
+
 TEST_CASES = ("brad", "cardenas", "feist", "lotus", "oracle", "watt")
 
-@pytest.fixture(scope="class")
-def make_decision():
+def load_decisions_for_fixtures():
     decisions = {}
     for case in TEST_CASES:
         decision = loaders.load_decision(f"{case}_h.json")
@@ -1143,8 +1142,12 @@ def make_decision():
     return decisions
 
 @pytest.fixture(scope="class")
-def make_decision_with_holding(make_decision):
-    decisions = deepcopy(make_decision)
+def make_decision():
+    return load_decisions_for_fixtures()
+
+@pytest.fixture(scope="class")
+def make_decision_with_holding(make_decision, make_regime):
+    decisions = load_decisions_for_fixtures()
     for case in TEST_CASES:
         holdings, holding_anchors, named_anchors = loaders.load_and_read_holdings(f"holding_{case}.json", regime=make_regime)
         decisions[case].majority.posit(holdings, holding_anchors=holding_anchors, named_anchors=named_anchors)
@@ -1154,16 +1157,17 @@ def make_decision_with_holding(make_decision):
 def make_opinion(make_decision) -> Dict[str, Opinion]:
     opinions = {}
     for case in TEST_CASES:
-        opinions[f"{case}_majority"] = make_decision[case].majority
+        for opinion in make_decision[case].opinions:
+            opinions[f"{case}_{opinion.position}"] = opinion
     return opinions
 
 @pytest.fixture(scope="class")
 def make_opinion_with_holding(make_decision_with_holding) -> Dict[str, Opinion]:
     opinions = {}
     for case in TEST_CASES:
-        opinions[f"{case}_majority"] = make_decision_with_holding[case].majority
+        for opinion in make_decision_with_holding[case].opinions:
+            opinions[f"{case}_{opinion.position}"] = opinion
     return opinions
-
 
 @pytest.fixture(scope="class")
 def make_analysis() -> Dict[str, Dict[str, Any]]:

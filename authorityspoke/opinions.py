@@ -383,7 +383,7 @@ class Decision:
     """
 
     name: str
-    decision_date: datetime.date
+    date: datetime.date
     name_abbreviation: Optional[str] = None
     citations: Optional[Sequence[CaseCitation]] = None
     first_page: Optional[int] = None
