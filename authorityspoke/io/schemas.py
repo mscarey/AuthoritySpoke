@@ -16,6 +16,7 @@ from authorityspoke.holdings import Holding
 from authorityspoke.io.name_index import Mentioned
 from authorityspoke.io.nesting import nest_fields
 from authorityspoke.io.text_expansion import add_found_context
+from authorityspoke.opinions import CaseCitation, Opinion, Decision
 from authorityspoke.pleadings import Pleading, Allegation
 from authorityspoke.predicates import Predicate
 from authorityspoke.procedures import Procedure
@@ -53,8 +54,6 @@ class ExpandableSchema(Schema):
                 )
         return data
 
-
-
     def remove_anchors_field(self, data, **kwargs):
         """
         Remove field that may have been used to link objects to :class:`.Opinion` text.
@@ -73,6 +72,26 @@ class ExpandableSchema(Schema):
             data[many_element] = [data[many_element]]
         return data
 
+class OpinionSchema(Schema):
+    __model__ = Opinion
+    position = fields.Str()
+    author = fields.Str()
+    text = fields.Str()
+
+class CaseCitationSchema(Schema):
+    __model__ = CaseCitation
+    cite = fields.Str()
+
+class DecisionSchema(Schema):
+    __model__ = Decision
+    name = fields.Str()
+    name_abbreviation = fields.Str(missing=None)
+    citations = fields.Nested(CaseCitationSchema, many=True)
+    opinions = fields.Nested(OpinionSchema, many=True)
+    first_page = fields.Int()
+    last_page = fields.Int()
+    decision_date = fields.Date()
+    court = fields.Str()
 
 class SelectorSchema(ExpandableSchema):
     __model__ = TextQuoteSelector

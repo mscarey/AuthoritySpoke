@@ -28,6 +28,9 @@ logger = logging.getLogger(__name__)
 
 TextLinkDict = Dict[str, List[TextQuoteSelector]]
 
+@dataclass
+class CaseCitation:
+    cite: str
 
 @dataclass
 class Opinion:
@@ -368,3 +371,15 @@ class Opinion:
         else:
             position = self.position + " "
         return f"<{position}Opinion> {name}, {citation} ({self.decision_date})"
+
+
+@dataclass
+class Decision:
+    name: str
+    name_abbreviation: str
+    citations: Sequence[str]
+    first_page: Optional[int]
+    last_page: Optional[int]
+    decision_date: datetime.date
+    court: str
+    opinions: Sequence[Opinion]
