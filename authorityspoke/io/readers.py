@@ -105,46 +105,6 @@ def read_enactments(
     return schema.load(deepcopy(record))
 
 
-def get_references_from_mentioned(
-    content: str, mentioned: TextLinkDict, placeholder: str = "{}"
-) -> Tuple[str, List[Union[Enactment, Factor]]]:
-    r"""
-    Retrieve known context :class:`Factor`\s for new :class:`Fact`.
-
-    :param content:
-        the content for the :class:`Fact`\'s :class:`Predicate`.
-
-    :param mentioned:
-        list of :class:`Factor`\s with names that could be
-        referenced in content
-
-    :param placeholder:
-        a string to replace the names of
-        referenced :class:`Factor`\s in content
-
-    :returns:
-        the content string with any referenced :class:`Factor`\s
-        replaced by placeholder, and a list of referenced
-        :class:`Factor`\s in the order they appeared in content.
-    """
-    sorted_mentioned = sorted(
-        mentioned.keys(), key=lambda x: len(x.name) if x.name else 0, reverse=True
-    )
-    context_with_indices: Dict[Union[Enactment, Factor], int] = {}
-    for factor in sorted_mentioned:
-        if factor.name and factor.name in content and factor.name != content:
-            factor_index = content.find(factor.name)
-            for named_factor in context_with_indices:
-                if context_with_indices[named_factor] > factor_index:
-                    context_with_indices[named_factor] -= len(factor.name) - len(
-                        placeholder
-                    )
-            context_with_indices[factor] = factor_index
-            content = content.replace(factor.name, placeholder)
-    context_factors = sorted(context_with_indices, key=context_with_indices.get)
-    return content, tuple(context_factors)
-
-
 def read_predicate(value: Dict) -> Predicate:
     schema = schemas.PredicateSchema(partial=True)
     return schema.load(value)

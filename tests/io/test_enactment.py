@@ -29,6 +29,13 @@ class TestEnactmentImport:
             == "reference to the Due Process Clause"
         )
 
+    def test_enactment_import_from_dict(self, make_regime):
+        holding_brad = load_holdings("holding_brad.json")
+        enactments = readers.read_enactments(
+            holding_brad[0]["enactments"], regime=make_regime
+        )
+        assert enactments[0].text.endswith("shall not be violated")
+
     def test_enactment_import_from_holding(self, make_regime):
         holding_cardenas = load_holdings("holding_cardenas.json")
         holdings = readers.read_holdings(holding_cardenas, regime=make_regime)

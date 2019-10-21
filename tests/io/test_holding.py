@@ -186,19 +186,7 @@ class TestHoldingImport:
         assert isinstance(named_anchors.popitem()[1].pop(), TextQuoteSelector)
 
 class TestTextAnchors:
-    def test_read_holding_with_no_anchor(self, make_opinion, make_analysis):
-        oracle = make_opinion["oracle_majority"]
-        raw_analysis = make_analysis["no anchors"]
-        oracle_holdings = readers.read_holdings(raw_analysis)
-        holding_anchors = anchors.get_holding_anchors(raw_analysis)
-        named_anchors = anchors.get_named_anchors(raw_analysis)
-        oracle.posit(oracle_holdings, holding_anchors=holding_anchors, named_anchors=named_anchors)
-        has_no_anchors = oracle.holdings[0]
-        assert oracle.holding_anchors[has_no_anchors] == []
-
-
-    def test_holding_without_enactments_or_regime(self):
-        holding = {
+    one_holding = {
             "inputs": {"type": "fact", "content": "{Bradley} lived at Bradley's house"},
             "outputs": {
                 "type": "evidence",
@@ -211,10 +199,31 @@ class TestTextAnchors:
                 "absent": True,
             },
         }
-        expanded = text_expansion.expand_shorthand(holding)
+
+    def test_read_holding_with_no_anchor(self, make_opinion, make_analysis):
+        oracle = make_opinion["oracle_majority"]
+        raw_analysis = make_analysis["no anchors"]
+        oracle_holdings = readers.read_holdings(raw_analysis)
+        holding_anchors = anchors.get_holding_anchors(raw_analysis)
+        named_anchors = anchors.get_named_anchors(raw_analysis)
+        oracle.posit(oracle_holdings, holding_anchors=holding_anchors, named_anchors=named_anchors)
+        has_no_anchors = oracle.holdings[0]
+        assert oracle.holding_anchors[has_no_anchors] == []
+
+
+    def test_holding_without_enactments_or_regime(self):
+
+        expanded = text_expansion.expand_shorthand(self.one_holding)
         built = readers.read_holding(expanded)
         new_factor = built.outputs[0].to_effect.context_factors[0]
         assert new_factor.name == "Bradley"
+
+    def test_posit_one_holding_with_anchor(self, make_opinion):
+        expanded = text_expansion.expand_shorthand(self.one_holding)
+        cardenas = make_opinion["cardenas_majority"]
+        anchor_list = anchors.get_holding_anchors(expanded)
+        holding = readers.read_holding(expanded)
+        cardenas.posit(holding, holding_anchors=anchor_list)
 
     def test_mentioned_context_changing(self):
         """
