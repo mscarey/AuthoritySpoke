@@ -17,7 +17,7 @@ import re
 
 from dataclasses import dataclass, field
 
-from authorityspoke.factors import Factor
+from authorityspoke.factors import Factor, ContextRegister
 from authorityspoke.enactments import Enactment
 from authorityspoke.holdings import Holding
 from authorityspoke.rules import Rule
@@ -288,6 +288,26 @@ class Opinion:
 
         return anchors
 
+    def implies(
+        self, other: Union[Opinion, Holding, Rule], context: ContextRegister = None
+    ) -> bool:
+        if isinstance(other, (Rule, Holding)):
+            return any(
+                self_holding.implies(other, context=context)
+                for self_holding in self.holdings
+            )
+        elif isinstance(other, self.__class__):
+            for other_holding in other.holdings:
+                if not any(
+                    self_holding.implies(other_holding, context=context)
+                    for self_holding in self.holdings
+                ):
+                    return False
+            return True
+        raise TypeError(
+            f"'Implies' test not implemented for types {self.__class__} and {other.__class__}."
+        )
+
     def __ge__(self, other: Union[Opinion, Rule]) -> bool:
         """
         Find whether ``self``'s holdings imply all the holdings of ``other``.
@@ -297,18 +317,7 @@ class Opinion:
             (or every holding of ``other``, if other is an :class:`.Opinion`)
             is implied by some :class:`.Rule` in ``self.holdings``.
         """
-        if isinstance(other, (Rule, Holding)):
-            return any(self_holding >= other for self_holding in self.holdings)
-        elif isinstance(other, self.__class__):
-            for other_holding in other.holdings:
-                if not any(
-                    self_holding >= other_holding for self_holding in self.holdings
-                ):
-                    return False
-            return True
-        raise TypeError(
-            f"'Implies' test not implemented for types {self.__class__} and {other.__class__}."
-        )
+        return self.implies(other)
 
     def __gt__(self, other) -> bool:
         """

@@ -95,6 +95,16 @@ class TestOpinions:
         with pytest.raises(TypeError):
             make_opinion["watt_majority"].posit()
 
+    def test_posit_rule(self, make_opinion, make_rule, make_holding):
+        """
+        "Positing" a Rule causes the Rule to be converted to a Holding first.
+        So the Opinion implies the corresponding Holding.
+        """
+
+        watt = make_opinion["watt_majority"]
+        watt.posit(make_rule["h1"])
+        assert watt.implies(make_holding["h1"])
+
     def test_new_context_non_iterable_changes(self, make_opinion, make_holding):
         """
         The context here (a Factor outside an iterable) only changes the first

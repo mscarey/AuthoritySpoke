@@ -77,7 +77,7 @@ RawOpinion = Dict[str, str]
 RawCaseCitation = Dict[str, str]
 RawDecision = Dict[str, Union[str, int, Sequence[RawOpinion], Sequence[RawCaseCitation]]]
 
-class OpinionSchema(Schema):
+class OpinionSchema(ExpandableSchema):
     __model__ = Opinion
     position = fields.Str(data_key="type")
     author = fields.Str()
@@ -102,7 +102,7 @@ class CaseCitationSchema(Schema):
     def make_object(self, data: RawCaseCitation, **kwargs) -> CaseCitation:
         return self.__model__(**data)
 
-class DecisionSchema(Schema):
+class DecisionSchema(ExpandableSchema):
     __model__ = Decision
     name = fields.Str()
     name_abbreviation = fields.Str(missing=None)
@@ -320,9 +320,6 @@ class PredicateSchema(ExpandableSchema):
     def normalize_comparison(self, data: RawPredicate, **kwargs) -> RawPredicate:
         if data.get("quantity") and not data.get("comparison"):
             data["comparison"] = "="
-
-        if data.get("comparison") is None:
-            data["comparison"] = ""
 
         if data.get("comparison") in Predicate.normalized_comparisons:
             data["comparison"] = Predicate.normalized_comparisons[data["comparison"]]
@@ -618,16 +615,6 @@ class HoldingSchema(ExpandableSchema):
 SCHEMAS = [schema for schema in ExpandableSchema.__subclasses__()]
 
 
-def get_schema_for_factor_record(record: Dict) -> Schema:
-    """
-    Find the Marshmallow schema for an AuthoritySpoke object.
-    """
-    for option in SCHEMAS:
-        if record.get("type", "").lower() == option.__model__.__name__.lower():
-            return option()
-    return None
-
-
 def get_schema_for_item(item: Any) -> Schema:
     """
     Find the Marshmallow schema for an AuthoritySpoke object.
@@ -635,4 +622,4 @@ def get_schema_for_item(item: Any) -> Schema:
     for option in SCHEMAS:
         if item.__class__ == option.__model__:
             return option()
-    return None
+    raise ValueError(f"No schema found for class '{item.__class__}'")

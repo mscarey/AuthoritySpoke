@@ -1,3 +1,6 @@
+import pytest
+from marshmallow import ValidationError
+
 from authorityspoke.io import anchors, dump, schemas
 
 
@@ -7,6 +10,16 @@ class TestLoadSelector:
         selector = anchors.read_selector(data)
         schema = schemas.get_schema_for_item(selector)
         assert isinstance(schema, schemas.SelectorSchema)
+
+    def test_wrong_selector_shorthand(self):
+        """
+        This should fail because there's only one pipe symbol so there's
+        no way to tell which text is supposed to be in the middle.
+        """
+
+        data = {"text": "process, system,|method of operation, concept, principle"}
+        with pytest.raises(ValidationError):
+            _ = anchors.read_selector(data)
 
 
 class TestDumpSelector:

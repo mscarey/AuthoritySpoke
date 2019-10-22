@@ -184,6 +184,12 @@ class TestRetrieveMentioned:
             == "Bradley committed a crime"
         )
 
+    overlapping_names_mentioned = {
+        "Godzilla": {"type": "Entity"},
+        "Mothra": {"type": "Entity"},
+        "Mecha Godzilla": {"type": "Entity"},
+    }
+
     def test_retrieve_references_with_substring(self):
         """
         The Mentioned object must be sorted longest to shortest.
@@ -193,13 +199,7 @@ class TestRetrieveMentioned:
         list created by `get_references_from_mentioned`.
         """
 
-        mentioned = name_index.Mentioned(
-            {
-                "Godzilla": {"type": "Entity"},
-                "Mothra": {"type": "Entity"},
-                "Mecha Godzilla": {"type": "Entity"},
-            }
-        )
+        mentioned = name_index.Mentioned(self.overlapping_names_mentioned)
         content = "Mecha Godzilla threw Mothra at Godzilla"
         schema = schemas.FactSchema()
         mentioned = mentioned.sorted_by_length()
@@ -207,6 +207,11 @@ class TestRetrieveMentioned:
         new_content, context = schema.get_references_from_mentioned(content)
         assert new_content == "{} threw {} at {}"
         assert context[2] == {"name": "Godzilla", "type": "Entity"}
+
+    def test_mentioned_object_string(self):
+        mentioned = name_index.Mentioned(self.overlapping_names_mentioned)
+        assert "Mentioned({'Godzilla'" in str(mentioned)
+        assert "Mentioned({'Godzilla'" in repr(mentioned)
 
     def test_unmarked_factor_when_one_was_marked(self):
         fact = {
