@@ -217,12 +217,6 @@ class TestUnion:
         assert (holdings[9] | holdings[7]) is None
 
     def test_union_and_addition_different(self, make_opinion_with_holding):
-        """
-        This is failing because the only suitable holding for adding was
-        created using the "exclusive" flag. But creating holdings that way
-        is disabled for now.
-        """
-
         feist = make_opinion_with_holding["feist_majority"]
         result_of_adding = feist.holdings[10] + feist.holdings[3]
         result_of_union = feist.holdings[10] | feist.holdings[3]

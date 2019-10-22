@@ -87,6 +87,10 @@ class TestOpinions:
         """
         assert make_decision["watt"].date < make_decision["brad"].date
 
+    def test_opinion_string(self, make_opinion):
+        opinion = make_opinion["cardenas_majority"]
+        assert str(opinion).lower() == "majority opinion by bird, c.j."
+
     def test_positing_non_rule_error(self, make_opinion, make_procedure):
         with pytest.raises(TypeError):
             make_opinion["watt_majority"].posit(make_procedure["c1"])

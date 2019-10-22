@@ -572,7 +572,6 @@ class HoldingSchema(ExpandableSchema):
     rule_valid = fields.Bool(missing=True)
     decided = fields.Bool(missing=True)
     exclusive = fields.Bool(missing=False)
-    name = fields.Str(missing=None)
     generic = fields.Bool(missing=False)
 
     def nest_fields_inside_rule(self, data: Dict) -> RawHolding:

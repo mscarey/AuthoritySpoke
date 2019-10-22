@@ -55,6 +55,8 @@ class Holding(Factor):
     rule: Rule
     rule_valid: bool = True
     decided: bool = True
+    exclusive: bool = False
+    generic: bool = False
 
     def __post_init__(self):
         if self.exclusive:
@@ -73,6 +75,26 @@ class Holding(Factor):
                     + "not implemented. Try expressing this in another way "
                     + "without the 'exclusive' keyword."
                 )
+
+    @property
+    def despite(self):
+        return self.rule.procedure.despite
+
+    @property
+    def inputs(self):
+        return self.rule.procedure.inputs
+
+    @property
+    def outputs(self):
+        return self.rule.procedure.outputs
+
+    @property
+    def enactments(self):
+        return self.rule.enactments
+
+    @property
+    def enactments_despite(self):
+        return self.rule.enactments_despite
 
     @property
     def context_factors(self) -> Tuple:

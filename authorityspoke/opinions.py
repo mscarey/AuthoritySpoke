@@ -179,7 +179,7 @@ class Opinion:
         self.holding_anchors[holding].extend(holding_anchors or [])
         if named_anchors:
             for factor in holding.recursive_factors:
-                if factor.name in named_anchors:
+                if hasattr(factor, "name") and factor.name in named_anchors:
                     self.factors[factor].extend(named_anchors[factor.name])
 
     def posit_holdings(
@@ -350,16 +350,7 @@ class Opinion:
         )
 
     def __str__(self):
-        if isinstance(self.citations, str):
-            citation = self.citations
-        else:
-            citation = self.citations[0]
-        name = self.name_abbreviation or self.name
-        if self.position == "majority":
-            position = ""
-        else:
-            position = self.position + " "
-        return f"<{position}Opinion> {name}, {citation} ({self.decision_date})"
+        return f"{self.position} Opinion by {self.author}"
 
 
 @dataclass
@@ -419,6 +410,11 @@ class Decision:
     opinions: Sequence[Opinion] = field(default_factory=list)
     jurisdiction: Optional[str] = None
     _id: Optional[int] = None
+
+    def __str__(self):
+        citation = self.citations[0].cite if self.citations else ""
+        name = self.name_abbreviation or self.name
+        return f"{name}, {citation} ({self.date})"
 
     @property
     def majority(self) -> Optional[Opinion]:
