@@ -71,6 +71,8 @@ class TestIntroduction:
         assert register == ContextRegister(
             {Entity("the Lotus menu command hierarchy"): Entity("the Java API")}
         )
+        assert "<the Lotus menu command hierarchy> -> <the Java API>" in str(register)
+        assert "Entity(name='the Java API'" in repr(register)
 
     def test_register_string(self, make_opinion_with_holding):
         oracle = make_opinion_with_holding["oracle_majority"]

@@ -30,16 +30,11 @@ def make_filepath(
         the path to the desired file
     """
     if filepath:
-        if not isinstance(filepath, pathlib.Path):
-            raise TypeError('"filepath" must be type pathlib.Path')
-        return filepath
-    if not filename:
-        raise ValueError(
-            '"filepath" or "filename" must be given to find a file to open.'
-        )
+        return pathlib.Path(filepath)
     if not directory:
         directory = get_directory_path(default_folder)
-    return directory / filename
+    to_append = filename or ""
+    return directory / to_append
 
 
 def get_directory_path(stem: str) -> pathlib.Path:

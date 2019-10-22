@@ -126,15 +126,6 @@ def load_decision(
     :param filepath:
         Complete path to the JSON file representing the :class:`.Opinion`,
         including filename.
-
-    :param lead_only:
-        If True, returns a single :class:`.Opinion` object,
-        otherwise returns an iterator that yields every
-        :class:`.Opinion` in the case.
-
-    :param as_generator:
-        if True, returns a generator that
-        yields all opinions meeting the query.
     """
 
     validated_filepath = filepaths.make_filepath(

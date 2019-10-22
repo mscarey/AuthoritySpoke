@@ -2,6 +2,7 @@ import json
 import os
 import pathlib
 
+from marshmallow import ValidationError
 import pint
 import pytest
 
@@ -140,6 +141,14 @@ class TestExhibitDump:
         loaded = schema.load(dumped)
         assert loaded.form == "testimony"
         assert loaded.stated_by.name == "Bob"
+
+
+class TestEvidenceLoad:
+    def test_wrong_schema(self, make_evidence):
+        fact_dict = load_holdings("holding_cardenas.json")[1]["inputs"][0]
+        wrong_schema = schemas.EvidenceSchema()
+        with pytest.raises(ValidationError):
+            wrong_schema.load(fact_dict)
 
 
 class TestEvidenceDump:
