@@ -27,8 +27,13 @@ from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
 
 from authorityspoke.io import anchors, schemas
-from authorityspoke.io.schemas import RawSelector, RawEnactment, RawHolding
-from authorityspoke.io.schemas import RawPredicate, RawFactor
+from authorityspoke.io.schemas import (
+    RawEnactment,
+    RawHolding,
+    RawPredicate,
+    RawFactor,
+    RawDecision,
+)
 from authorityspoke.io.name_index import index_names
 
 
@@ -228,7 +233,7 @@ def read_holdings(
     return schema.load(deepcopy(record))
 
 
-def read_decision(decision_dict: Dict[str, Any]) -> Decision:
+def read_decision(decision_dict: RawDecision) -> Decision:
     r"""
     Create and return one or more :class:`.Opinion` objects from a dict API response.
 
@@ -243,161 +248,6 @@ def read_decision(decision_dict: Dict[str, Any]) -> Decision:
     """
     schema = schemas.DecisionSchema()
     return schema.load(decision_dict)
-
-def read_opinion(data: Dict[str, Any]) -> Opinion:
-    r"""
-    Create and return one or more :class:`.Opinion` objects from a dict API response.
-
-    Relies on the JSON format from the `Caselaw Access Project
-    API <https://api.case.law/v1/cases/>`_, under ["casebody"]["data"]["opinions"].
-
-    This function is a more convenient way to call read_opinions with an entire
-    case from the CAP API as a single parameter.
-
-    :param data:
-        A dict created from a Caselaw Access Project API response.
-    """
-    schema = schemas.DecisionSchema()
-    return schema.load(decision_dict)
-
-
-def read_opinions(
-    citations: List[Dict[str, str]],
-    decision_date: str,
-    court: Dict[str, Union[str, int]],
-    casebody: Optional[Dict] = None,
-    name: str = "",
-    name_abbreviation: str = "",
-    first_page: str = "",
-    last_page: str = "",
-    lead_only: bool = True,
-    as_generator: bool = False,
-    **kwargs,
-) -> Union[Opinion, Iterator[Opinion], List[Opinion]]:
-    r"""
-    Create and return one or more :class:`.Opinion` objects.
-
-    This function uses the model of a judicial decision from
-    the `Caselaw Access Project API <https://api.case.law/v1/cases/>`_.
-    One of these records may contain multiple :class:`.Opinion`\s.
-
-    Typically one record will contain all the :class:`.Opinion`\s
-    from one appeal, but not necessarily from the whole lawsuit. One
-    lawsuit may contain multiple appeals or other petitions, and
-    if more then one of those generates published :class:`.Opinion`\s,
-    the CAP API will divide those :class:`.Opinion`\s into a separate
-    record for each appeal.
-
-    The lead opinion is commonly, but not always, the only
-    :class:`.Opinion` that creates binding legal authority.
-    Usually every :class:`.Rule` posited by the lead :class:`.Opinion` is
-    binding, but some may not be, often because parts of the
-    :class:`.Opinion` fail to command a majority of the panel
-    of judges.
-
-    :param citations:
-        Page references that would be used to locate the decision in
-        printed volumes. May be the closest things to accepted
-        identifiers for a decision.
-
-    :param casebody:
-        A large section of the CAP API response containing all the
-        text that was printed in the reporter volume. Only available
-        if the ``full_case`` flag was used in the API request.
-
-    :param decision_date:
-        The day the :class:`.Opinion`\s were issued, in ISO format.
-
-    :param court:
-        A dict containing the :class:`.Court` slug, hopefully a unique
-        identifier of the court. Also contains the "id", which can be
-        resorted to when the slug turns out not to be unique.
-
-    :param name:
-        Full name of the lawsuit. Sometimes the same lawsuit may change
-        its name as time passes between multiple appeals.
-
-    :param name_abbreviation:
-        A shorter name for the lawsuit. Courts may or may not have
-        deterministic rules for creating the abbreviation given
-        the full name. This may be only one of many possible abbreviations.
-
-    :param first_page:
-        The first printed page where any of the :class:`.Opinion`\s for this
-        decision can be found. Does not come with an identifier of the reporter,
-        but in most cases there is only one official reporter, which is the most
-        likely choice.
-
-    :param last_page:
-        The last printed page where any of the :class:`.Opinion`\s for this
-        decision can be found.
-
-    :param lead_only:
-        If ``True``, returns a single :class:`.Opinion` object
-        from the first opinion found in the
-        ``casebody/data/opinions`` section of the dict, which should
-        usually be the lead opinion. If ``False``, returns an iterator that yields
-        :class:`.Opinion` objects from every opinion in the case.
-    """
-
-    def make_opinion(
-        name: str,
-        name_abbreviation: str,
-        citations: Iterable[str],
-        first_page: Optional[int],
-        last_page: Optional[int],
-        decision_date: datetime.date,
-        court: str,
-        opinion_dict: Dict[str, str],
-    ) -> Opinion:
-
-        author = opinion_dict.get("author")
-        if author:
-            author = author.strip(",:")
-
-        return Opinion(
-            name=name,
-            name_abbreviation=name_abbreviation,
-            citations=citations,
-            first_page=first_page,
-            last_page=last_page,
-            decision_date=decision_date,
-            court=court,
-            position=opinion_dict.get("type"),
-            author=author,
-            text=opinion_dict.get("text"),
-        )
-
-    if not casebody:
-        casebody = {}
-
-    opinions = casebody.get("data", {}).get(
-        "opinions", [{"type": "majority", "author": None}]
-    )
-
-    make_opinion_given_case = partial(
-        make_opinion,
-        name=name,
-        name_abbreviation=name_abbreviation,
-        first_page=int(first_page) if first_page else None,
-        last_page=int(last_page) if last_page else None,
-        decision_date=datetime.date.fromisoformat(decision_date),
-        court=court["slug"],
-        citations=tuple(c["cite"] for c in citations),
-    )
-    if lead_only:
-        if as_generator:
-            return iter([make_opinion_given_case(opinion_dict=opinions[0])])
-        else:
-            return make_opinion_given_case(opinion_dict=opinions[0])
-    elif as_generator:
-        return iter(
-            make_opinion_given_case(opinion_dict=opinion_dict)
-            for opinion_dict in opinions
-        )
-    return [
-        make_opinion_given_case(opinion_dict=opinion_dict) for opinion_dict in opinions
-    ]
 
 
 def read_rule(record: Dict, regime: Optional[Regime] = None) -> Rule:
