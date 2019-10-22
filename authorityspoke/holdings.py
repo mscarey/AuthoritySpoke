@@ -55,57 +55,8 @@ class Holding(Factor):
     rule: Rule
     rule_valid: bool = True
     decided: bool = True
-    name: Optional[str] = None
-    procedure: Optional[Procedure] = None
-    outputs: Optional[Union[Factor, Iterable[Factor]]] = None
-    inputs: Optional[Union[Factor, Iterable[Factor]]] = None
-    despite: Optional[Union[Factor, Iterable[Factor]]] = None
-    enactments: Optional[Union[Enactment, Iterable[Enactment]]] = None
-    enactments_despite: Optional[Union[Enactment, Iterable[Enactment]]] = None
-    mandatory: bool = False
-    universal: bool = False
-    exclusive: bool = False
-    generic: bool = False
 
     def __post_init__(self):
-        if self.rule is None:
-            rule = Rule(
-                procedure=self.procedure,
-                outputs=self.outputs,
-                inputs=self.inputs,
-                despite=self.despite,
-                enactments=self.enactments,
-                enactments_despite=self.enactments_despite,
-                mandatory=self.mandatory,
-                universal=self.universal,
-            )
-            object.__setattr__(self, "rule", rule)
-        elif not (
-            self.procedure
-            == self.enactments
-            == self.enactments_despite
-            == self.universal
-            == self.mandatory
-            == None
-        ):
-            new_rule = Rule(
-                procedure=self.procedure or self.rule.procedure,
-                enactments=self.enactments or self.rule.enactments,
-                enactments_despite=self.enactments_despite
-                or self.rule.enactments_despite,
-                mandatory=self.mandatory or self.rule.mandatory,
-                universal=self.universal or self.rule.universal,
-            )
-            object.__setattr__(self, "rule", new_rule)
-        object.__setattr__(self, "procedure", self.rule.procedure)
-        object.__setattr__(self, "outputs", self.rule.procedure.outputs)
-        object.__setattr__(self, "inputs", self.rule.procedure.inputs)
-        object.__setattr__(self, "despite", self.rule.procedure.despite)
-        object.__setattr__(self, "enactments", self.rule.enactments)
-        object.__setattr__(self, "enactments_despite", self.rule.enactments_despite)
-        object.__setattr__(self, "mandatory", self.rule.mandatory)
-        object.__setattr__(self, "universal", self.rule.universal)
-
         if self.exclusive:
             if not self.rule_valid:
                 raise NotImplementedError(
@@ -443,6 +394,7 @@ class Holding(Factor):
                 united = self_holding.union_if_not_exclusive(other_holding)
                 if united is not None:
                     return united
+        return None
 
     def own_attributes(self) -> Dict[str, Any]:
         """

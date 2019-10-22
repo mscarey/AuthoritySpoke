@@ -67,16 +67,13 @@ class Rule(Factor):
         object.
     """
 
-    procedure: Procedure = Procedure()
+    procedure: Procedure
     enactments: Iterable[Enactment] = ()
     enactments_despite: Iterable[Enactment] = ()
     mandatory: bool = False
     universal: bool = False
     generic: bool = False
     name: Optional[str] = None
-    outputs: Iterable[Factor] = ()
-    inputs: Iterable[Factor] = ()
-    despite: Iterable[Factor] = ()
 
     context_factor_names: ClassVar = ("procedure",)
     enactment_attr_names: ClassVar = ("enactments", "enactments_despite")
@@ -87,31 +84,17 @@ class Rule(Factor):
             if not isinstance(value, Tuple):
                 object.__setattr__(self, attr, self._wrap_with_tuple(value))
 
-        if self.procedure is None:
-            if self.outputs is None:
-                raise ValueError(
-                    "To construct a Rule you must specify either a Procedure "
-                    + "or output/input/despite Factors for use in constructing "
-                    + "a Procedure (including at least one output)."
-                )
-            object.__setattr__(
-                self,
-                "procedure",
-                Procedure(
-                    outputs=self.outputs, inputs=self.inputs, despite=self.despite
-                ),
-            )
-        else:
-            if not self.outputs == self.inputs == self.despite == None:
-                new_procedure = Procedure(
-                    outputs=self.outputs or self.procedure.outputs,
-                    inputs=self.inputs or self.procedure.inputs,
-                    despite=self.despite or self.procedure.despite,
-                )
-                object.__setattr__(self, "procedure", new_procedure)
-        object.__setattr__(self, "outputs", self.procedure.outputs)
-        object.__setattr__(self, "inputs", self.procedure.inputs)
-        object.__setattr__(self, "despite", self.procedure.despite)
+    @property
+    def despite(self):
+        return self.procedure.despite
+
+    @property
+    def inputs(self):
+        return self.procedure.inputs
+
+    @property
+    def outputs(self):
+        return self.procedure.outputs
 
     def __add__(self, other) -> Optional[Rule]:
         r"""
