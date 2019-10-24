@@ -172,7 +172,11 @@ class Opinion:
             holding = holding.new_context(context, context_opinion=self)
         self.holding_anchors[holding].extend(holding_anchors or [])
         if named_anchors:
-            for factor in holding.recursive_factors:
+            for factor in (
+                list(holding.recursive_factors)
+                + list(holding.enactments)
+                + list(holding.enactments_despite)
+            ):
                 if hasattr(factor, "name") and factor.name in named_anchors:
                     self.factors[factor].extend(named_anchors[factor.name])
 
@@ -372,4 +376,3 @@ class Opinion:
 
     def __str__(self):
         return f"{self.position} Opinion by {self.author}"
-

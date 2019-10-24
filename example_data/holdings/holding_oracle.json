@@ -1,4 +1,5 @@
-[{
+[
+    {
         "inputs": {
             "type": "fact",
             "content": "{the Java API} was an original work",
@@ -15,12 +16,14 @@
         "enactments": {
             "source": "/us/usc/t17/s102/a",
             "exact": "Copyright protection subsists, in accordance with this title, in original works of authorship fixed in any tangible medium of expression, now known or later developed, from which they can be perceived, reproduced, or otherwise communicated, either directly or with the aid of a machine or device.",
-            "name": "copyright protection provision"
+            "name": "copyright protection provision",
+            "anchors": "qualify for copyright protection. |17 U.S.C. § 102(a)|."
         },
         "anchors": "By statute, a work |must be “original” to qualify| for"
     },
     {
-        "inputs": [{
+        "inputs": [
+            {
                 "type": "fact",
                 "content": "the Java API was independently created by the author, as opposed to copied from other works",
                 "anchors": "the work was independently created by the author (as opposed to copied from other works)"
@@ -41,7 +44,9 @@
         "enactments": "copyright protection provision"
     },
     {
-        "inputs": ["the Java API was an original work", {
+        "inputs": [
+            "the Java API was an original work",
+            {
                 "type": "fact",
                 "content": "the Java API was the expression of an idea",
                 "anchors": "Copyright protection extends only to |the expression of an idea|"
@@ -53,7 +58,8 @@
                 "anchors": "not to the underlying idea itself"
             }
         ],
-        "despite": [{
+        "despite": [
+            {
                 "type": "fact",
                 "content": "the Java API was essentially the only way to express the idea that it embodied",
                 "anchors": "concepts of|merger|and scenes a faire"
@@ -77,7 +83,8 @@
         }
     },
     {
-        "inputs": [{
+        "inputs": [
+            {
                 "type": "fact",
                 "content": "{the Java language} was a computer program",
                 "anchors": "The literal elements of |a computer program|are"
@@ -95,10 +102,14 @@
         },
         "mandatory": true,
         "universal": true,
-        "enactments": ["copyright protection provision", "copyrightability exceptions"]
+        "enactments": [
+            "copyright protection provision",
+            "copyrightability exceptions"
+        ]
     },
     {
-        "inputs": ["the Java language was a computer program",
+        "inputs": [
+            "the Java language was a computer program",
             {
                 "type": "fact",
                 "content": "the Java API was the object code of the Java language",
@@ -108,17 +119,24 @@
         "outputs": "the Java API was a literal element of the Java language",
         "mandatory": true,
         "universal": true,
-        "enactments": ["copyright protection provision", "copyrightability exceptions"]
+        "enactments": [
+            "copyright protection provision",
+            "copyrightability exceptions"
+        ]
     },
     {
-        "inputs": ["the Java language was a computer program", "the Java API was a literal element of the Java language"],
+        "inputs": [
+            "the Java language was a computer program",
+            "the Java API was a literal element of the Java language"
+        ],
         "outputs": "the Java API was copyrightable",
         "mandatory": true,
         "enactments": "copyright protection provision",
         "enactments_despite": "copyrightability exceptions"
     },
     {
-        "inputs": ["the Java language was a computer program",
+        "inputs": [
+            "the Java language was a computer program",
             {
                 "type": "fact",
                 "content": "the Java API was the sequence, structure, and organization of the Java language",
@@ -132,10 +150,14 @@
         },
         "mandatory": true,
         "universal": true,
-        "enactments": ["copyright protection provision", "copyrightability exceptions"]
+        "enactments": [
+            "copyright protection provision",
+            "copyrightability exceptions"
+        ]
     },
     {
-        "inputs": [{
+        "inputs": [
+            {
                 "type": "fact",
                 "content": "the Java language was a computer program"
             },
@@ -150,10 +172,14 @@
         },
         "mandatory": true,
         "universal": true,
-        "enactments": ["copyright protection provision", "copyrightability exceptions"]
+        "enactments": [
+            "copyright protection provision",
+            "copyrightability exceptions"
+        ]
     },
     {
-        "inputs": [{
+        "inputs": [
+            {
                 "type": "fact",
                 "content": "the Java language was a computer program"
             },
@@ -170,7 +196,10 @@
                 "type": "fact",
                 "content": "the Java API was an idea",
                 "truth": false,
-                "anchors": ["|the component in question qualifies as| an expression of an idea,", "or |an idea itself.|"]
+                "anchors": [
+                    "|the component in question qualifies as| an expression of an idea,",
+                    "or |an idea itself.|"
+                ]
             }
         ],
         "outputs": "the Java API was copyrightable",
@@ -179,17 +208,24 @@
         "enactments_despite": "copyrightability exceptions"
     },
     {
-        "inputs": ["the Java language was a computer program", "the Java API was a non-literal element of the Java language",
+        "inputs": [
+            "the Java language was a computer program",
+            "the Java API was a non-literal element of the Java language",
             {
                 "type": "fact",
                 "content": "the Java API was the expression of an idea",
                 "truth": false,
-                "anchors": ["whether, on the particular facts of each case, the component in question qualifies as", "an expression of an idea, or |an idea itself.|"]
+                "anchors": [
+                    "whether, on the particular facts of each case, the component in question qualifies as",
+                    "an expression of an idea, or |an idea itself.|"
+                ]
             },
             {
                 "type": "fact",
                 "content": "the Java API was an idea",
-                "anchors": ["whether, on the particular facts of each case, the component in question qualifies as an expression of an idea"]
+                "anchors": [
+                    "whether, on the particular facts of each case, the component in question qualifies as an expression of an idea"
+                ]
             }
         ],
         "outputs": {
@@ -203,34 +239,43 @@
         "enactments_despite": "copyright protection provision"
     },
     {
-        "inputs": ["the Java language was a computer program",
+        "inputs": [
+            "the Java language was a computer program",
             {
                 "type": "fact",
                 "content": "the Java API was a set of application programming interface declarations",
                 "anchors": "literal elements of its API packages — the 7,000 lines of declaring source code"
             },
             "the Java API was an original work",
-            "the Java API was a non-literal element of the Java language", "the Java API was the expression of an idea", {
+            "the Java API was a non-literal element of the Java language",
+            "the Java API was the expression of an idea",
+            {
                 "type": "fact",
                 "content": "the Java API was essentially the only way to express the idea that it embodied",
                 "truth": false,
-                "anchors": ["we agree that merger cannot bar copyright protection for any lines of declaring source code unless Sun/Oracle had only one way, or a limited number of ways, to write them", "Oracle had “unlimited options as to the selection and arrangement of the 7000 lines Google copied."]
+                "anchors": [
+                    "we agree that merger cannot bar copyright protection for any lines of declaring source code unless Sun/Oracle had only one way, or a limited number of ways, to write them",
+                    "Oracle had “unlimited options as to the selection and arrangement of the 7000 lines Google copied."
+                ]
             },
             {
                 "type": "fact",
                 "content": "the Java API was creative",
                 "anchors": "it is undisputed here that the declaring code and the structure and organization of the API packages are both creative"
-            }, {
+            },
+            {
                 "type": "fact",
                 "content": "it was possible to use the Java language without copying the Java API",
                 "anchors": "Google did not need to copy the structure, sequence, and organization of the Java API packages to write programs in the Java language"
             }
         ],
-        "despite": [{
+        "despite": [
+            {
                 "type": "fact",
                 "content": "the Java API was a method of operation",
                 "anchors": "although an element of a work may be characterized as a method of operation"
-            }, {
+            },
+            {
                 "type": "fact",
                 "content": "the Java API contained short phrases",
                 "anchors": "purposes is not whether |the work at issue contains short phrases|"
@@ -253,7 +298,8 @@
         },
         "mandatory": true,
         "enactments": "copyright protection provision",
-        "enactments_despite": [{
+        "enactments_despite": [
+            {
                 "source": "/us/usc/t17/s102/b",
                 "exact": "In no case does copyright protection for an original work of authorship extend to any",
                 "name": "in no case clause"
@@ -270,7 +316,6 @@
             }
         ]
     },
-
     {
         "inputs": {
             "type": "fact",
@@ -312,20 +357,24 @@
         "enactments_despite": "copyright protection provision"
     },
     {
-        "inputs": [{
-            "type": "fact",
-            "content": "the Java API was copyrightable"
-        }, {
-            "type": "fact",
-            "content": "the Java API was essentially the only way to express the idea that it embodied",
-            "absent": true,
-            "anchors": "|concepts of merger| and scenes a faire are affirmative defenses"
-        }, {
-            "type": "fact",
-            "content": "the Java API was a scene a faire",
-            "absent": true,
-            "anchors": "concepts of merger and |scenes a faire| are affirmative defenses "
-        }],
+        "inputs": [
+            {
+                "type": "fact",
+                "content": "the Java API was copyrightable"
+            },
+            {
+                "type": "fact",
+                "content": "the Java API was essentially the only way to express the idea that it embodied",
+                "absent": true,
+                "anchors": "|concepts of merger| and scenes a faire are affirmative defenses"
+            },
+            {
+                "type": "fact",
+                "content": "the Java API was a scene a faire",
+                "absent": true,
+                "anchors": "concepts of merger and |scenes a faire| are affirmative defenses "
+            }
+        ],
         "outputs": {
             "type": "fact",
             "content": "Google infringed the copyright on the Java API",
@@ -336,15 +385,18 @@
         "enactments_despite": "copyright protection provision"
     },
     {
-        "inputs": [{
-            "type": "fact",
-            "content": "{Sun Microsystems} created the Java API",
-            "anchors": "Sun Microsystems, Inc. (“Sun”) developed the Java “platform” for computer programming"
-        }, {
-            "type": "fact",
-            "content": "when creating the Java API, Sun Microsystems could have selected and arranged its names and phrases in unlimited different ways",
-            "anchors": "Oracle had “unlimited options as to the selection and arrangement of the 7000 lines Google copied."
-        }],
+        "inputs": [
+            {
+                "type": "fact",
+                "content": "{Sun Microsystems} created the Java API",
+                "anchors": "Sun Microsystems, Inc. (“Sun”) developed the Java “platform” for computer programming"
+            },
+            {
+                "type": "fact",
+                "content": "when creating the Java API, Sun Microsystems could have selected and arranged its names and phrases in unlimited different ways",
+                "anchors": "Oracle had “unlimited options as to the selection and arrangement of the 7000 lines Google copied."
+            }
+        ],
         "outputs": {
             "type": "fact",
             "content": "the Java API was essentially the only way to express the idea that it embodied",
@@ -356,15 +408,18 @@
         "enactments_despite": "copyrightability exceptions"
     },
     {
-        "inputs": [{
-            "type": "fact",
-            "content": "the Java API was a literary work",
-            "anchors": "as literary works often do"
-        }, {
-            "type": "fact",
-            "content": "the short phrases in the Java API were creative",
-            "anchors": "whether those phrases are creative."
-        }],
+        "inputs": [
+            {
+                "type": "fact",
+                "content": "the Java API was a literary work",
+                "anchors": "as literary works often do"
+            },
+            {
+                "type": "fact",
+                "content": "the short phrases in the Java API were creative",
+                "anchors": "whether those phrases are creative."
+            }
+        ],
         "despite": {
             "type": "fact",
             "content": "the Java API contained short phrases",
@@ -377,11 +432,13 @@
         "mandatory": true,
         "enactments": "copyright protection provision",
         "enactments_despite": [
-            "copyrightability exceptions", "short phrases copyright exception"
+            "copyrightability exceptions",
+            "short phrases copyright exception"
         ]
     },
     {
-        "inputs": [{
+        "inputs": [
+            {
                 "type": "fact",
                 "content": "the Java language was a computer program",
                 "anchors": "the scene a faire doctrine denies protection to |program| elements"
@@ -406,7 +463,8 @@
         "enactments_despite": "copyright protection provision"
     },
     {
-        "inputs": [{
+        "inputs": [
+            {
                 "type": "fact",
                 "content": "the Java language was a computer program"
             },
@@ -434,10 +492,10 @@
         },
         "enactments": "copyright protection provision",
         "enactments_despite": "copyrightability exceptions"
-
     },
     {
-        "inputs": ["the Java API was an original work",
+        "inputs": [
+            "the Java API was an original work",
             {
                 "type": "fact",
                 "content": "Sun Microsystems was the author of the Java API"
@@ -461,7 +519,6 @@
         "universal": true,
         "enactments": "copyright protection provision",
         "enactments_despite": "copyrightability exceptions"
-
     },
     {
         "inputs": {

@@ -28,32 +28,11 @@ class TestOpinions:
             == "TOBRINER, J."
         )
 
-    def test_opinion_text(self, make_opinion):
-        assert (
-            "Feist responded that such efforts were economically "
-            + "impractical and, in any event, unnecessary"
-        ) in make_opinion["feist_majority"].text
-
     def test_opinion_holding_list(self, make_opinion, real_holding):
         watt = make_opinion["watt_majority"]
         h3_specific = real_holding["h3"]
         watt.posit(h3_specific)
         assert h3_specific in watt.holdings
-
-    def test_opinion_text_anchor(self, make_opinion_with_holding):
-        feist = make_opinion_with_holding["feist_majority"]
-        assert any(
-            "generally" in anchor.exact
-            for anchor in feist.get_anchors(feist.holdings[1])
-        )
-
-    def test_opinion_factor_text_anchor(self, make_opinion_with_holding):
-        feist = make_opinion_with_holding["feist_majority"]
-        anchors = feist.get_anchors(feist.holdings[0])
-        assert all(
-            "No one may claim originality" not in anchor.exact for anchor in anchors
-        )
-        assert any("as to facts" in anchor.exact for anchor in anchors)
 
     def test_opinion_entity_list(
         self, make_opinion, real_holding, make_entity, make_evidence
@@ -91,6 +70,52 @@ class TestOpinions:
         opinion = make_opinion["cardenas_majority"]
         assert str(opinion).lower() == "majority opinion by bird, c. j."
 
+
+class TestOpinionText:
+    def test_opinion_text(self, make_opinion):
+        assert (
+            "Feist responded that such efforts were economically "
+            + "impractical and, in any event, unnecessary"
+        ) in make_opinion["feist_majority"].text
+
+    def test_opinion_text_anchor(self, make_opinion_with_holding):
+        feist = make_opinion_with_holding["feist_majority"]
+        assert any(
+            "generally" in anchor.exact
+            for anchor in feist.get_anchors(feist.holdings[1])
+        )
+
+    def test_opinion_factor_text_anchor(self, make_opinion_with_holding):
+        feist = make_opinion_with_holding["feist_majority"]
+        anchors = feist.get_anchors(feist.holdings[0])
+        assert all(
+            "No one may claim originality" not in anchor.exact for anchor in anchors
+        )
+        assert any("as to facts" in anchor.exact for anchor in anchors)
+
+    def test_select_opinion_text_for_factor(self, make_opinion_with_holding):
+        oracle = make_opinion_with_holding["oracle_majority"]
+        factor = oracle.holdings[0].outputs[0]
+        anchor = oracle.factors[factor][0]
+        selected = oracle.select_text(selector=anchor)
+        assert selected == "copyright protection."
+
+    def test_select_opinion_text_for_enactment(self, make_opinion_with_holding):
+        oracle = make_opinion_with_holding["oracle_majority"]
+        enactment = oracle.holdings[0].enactments[0]
+        anchor = oracle.factors[enactment][0]
+        selected = oracle.select_text(selector=anchor)
+        assert selected == "17 U.S.C. § 102(a)"
+
+    def test_select_opinion_text_for_holding(self, make_opinion_with_holding):
+        oracle = make_opinion_with_holding["oracle_majority"]
+        holding = oracle.holdings[0]
+        anchor = oracle.holding_anchors[holding][0]
+        selected = oracle.select_text(selector=anchor)
+        assert selected == "must be “original” to qualify"
+
+
+class TestOpinionHoldings:
     def test_positing_non_rule_error(self, make_opinion, make_procedure):
         with pytest.raises(TypeError):
             make_opinion["watt_majority"].posit(make_procedure["c1"])
