@@ -574,9 +574,9 @@ class TestExclusiveFlag:
             make_enactment["right_to_writings"],
             make_enactment["copyright_requires_originality"],
         ]
-        originality_rule = Rule(
+        originality_rule = Rule(Procedure(
             outputs=copyrightable,
-            inputs=original,
+            inputs=original),
             mandatory=False,
             universal=False,
             enactments=originality_enactments,

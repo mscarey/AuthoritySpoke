@@ -10,7 +10,7 @@ from __future__ import annotations
 from itertools import chain
 import textwrap
 from typing import Any, ClassVar, Dict, Iterable, Iterator
-from typing import List, Optional, Tuple
+from typing import List, Optional, Tuple, Union
 
 from dataclasses import dataclass
 
@@ -182,12 +182,17 @@ class Rule(Factor):
             )
 
         for input_factor in self.inputs:
+            new_procedure = self.procedure.evolve(
+                {
+                    "inputs": [input_factor.evolve("absent")],
+                    "outputs": [self.outputs[0].evolve({"absent": True})],
+                }
+            )
             yield self.evolve(
                 {
                     "mandatory": not self.mandatory,
                     "universal": not self.universal,
-                    "inputs": [input_factor.evolve("absent")],
-                    "outputs": [self.outputs[0].evolve({"absent": True})],
+                    "procedure": new_procedure,
                 }
             )
 
@@ -275,6 +280,26 @@ class Rule(Factor):
             register is not None
             for register in self.explain_contradiction(other, context)
         )
+
+    def evolve(self, changes: Union[str, Tuple[str, ...], Dict[str, Any]]) -> Rule:
+        """
+        Make new object with attributes from ``self.__dict__``, replacing attributes as specified.
+
+        :param changes:
+            a :class:`dict` where the keys are names of attributes
+            of self, and the values are new values for those attributes, or
+            else an attribute name or :class:`list` of names that need to
+            have their values replaced with their boolean opposite.
+
+        :returns:
+            a new object initialized with attributes from
+            ``self.__dict__``, except that any attributes named as keys in the
+            changes parameter are replaced by the corresponding value.
+        """
+        changes = self._make_dict_to_evolve(changes)
+        changes = self._evolve_attribute(changes, "procedure")
+        new_values = self._evolve_from_dict(changes)
+        return self.__class__(**new_values)
 
     def explain_contradiction(
         self, other, context: Optional[ContextRegister] = None

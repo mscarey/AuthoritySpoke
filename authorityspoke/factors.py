@@ -306,6 +306,37 @@ class Factor(ABC):
                     test = other._contradicts_if_present(self, context.reversed)
                 yield from (register.reversed for register in test)
 
+    def _evolve_attribute(self, changes: Dict[str, Any], attr_name: str) -> Dict[str, Any]:
+        attr_dict = {}
+        new_changes = {}
+        for key in changes:
+            if key in self.__dict__[attr_name].own_attributes():
+                attr_dict[key] = changes[key]
+            else:
+                new_changes[key] = changes[key]
+        if attr_dict:
+            new_changes[attr_name] = self.__dict__[attr_name].evolve(attr_dict)
+        return new_changes
+
+    def _evolve_from_dict(self, changes: Dict[str, Any]) -> Dict[str, Any]:
+        for key in changes:
+            if key not in self.__dict__:
+                raise ValueError(
+                    f"Invalid: '{key}' is not among the {self.__class__}'s attributes "
+                    f"{list(self.__dict__.keys())}."
+                )
+        new_dict = self.own_attributes()
+        for key in changes:
+            new_dict[key] = changes[key]
+        return new_dict
+
+    def _make_dict_to_evolve(self, changes: Union[str, Tuple[str, ...], Dict[str, Any]]) -> Dict[str, Any]:
+        if isinstance(changes, str):
+            changes = (changes,)
+        if isinstance(changes, tuple):
+            changes = {key: not self.__dict__[key] for key in changes}
+        return changes
+
     def evolve(self, changes: Union[str, Tuple[str, ...], Dict[str, Any]]) -> Factor:
         """
         Make new object with attributes from ``self.__dict__``, replacing attributes as specified.
@@ -321,20 +352,10 @@ class Factor(ABC):
             ``self.__dict__``, except that any attributes named as keys in the
             changes parameter are replaced by the corresponding value.
         """
-        if isinstance(changes, str):
-            changes = (changes,)
-        for key in changes:
-            if key not in self.__dict__:
-                raise ValueError(
-                    f"Invalid: '{key}' is not among the Factor's attributes "
-                    f"{list(self.__dict__.keys())}."
-                )
-        if isinstance(changes, tuple):
-            changes = {key: not self.__dict__[key] for key in changes}
-        new_dict = self.own_attributes()
-        for key in changes:
-            new_dict[key] = changes[key]
-        return self.__class__(**new_dict)
+        changes = self._make_dict_to_evolve(changes)
+        new_values = self._evolve_from_dict(changes)
+        return self.__class__(**new_values)
+
 
     def means(
         self, other: Optional[Factor], context: Optional[ContextRegister] = None
@@ -395,7 +416,7 @@ class Factor(ABC):
             if it exists, otherwise ``None``.
         """
         for factor in self.recursive_factors:
-            if factor.name == name:
+            if hasattr(factor, "name") and factor.name == name:
                 return factor
         return None
 
