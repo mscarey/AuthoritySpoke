@@ -417,6 +417,35 @@ class Decision:
         return f"{name}, {citation} ({self.date})"
 
     @property
+    def holdings(self):
+        if self.majority is None:
+            raise NotImplementedError(
+                "Cannot determine Holdings of Decision with no known majority Opinion."
+            )
+        return self.majority.holdings
+
+    def posit(
+        self,
+        holdings: Union[Holding, Iterable[Union[Holding, Rule]]],
+        holding_anchors: Optional[
+            List[Union[TextQuoteSelector, List[TextQuoteSelector]]]
+        ] = None,
+        named_anchors: Optional[TextLinkDict] = None,
+        context: Optional[Sequence[Factor]] = None,
+    ) -> None:
+        if self.majority is None:
+            raise AttributeError(
+                "Cannot posit Holding because this Decision has no known majority Opinion."
+                " Try having an Opinion posit the Holding directly."
+            )
+        self.majority.posit(
+            holdings=holdings,
+            holding_anchors=holding_anchors,
+            named_anchors=named_anchors,
+            context=context,
+        )
+
+    @property
     def majority(self) -> Optional[Opinion]:
         for opinion in self.opinions:
             if opinion.position == "majority":

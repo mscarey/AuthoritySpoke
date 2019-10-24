@@ -156,21 +156,6 @@ class TestHoldingImport:
         assert feist.holdings[0].enactments[0].name == "securing for authors"
         assert feist.holdings[1].enactments[0].name == "securing for authors"
 
-    def test_import_holdings_from_multiple_cases(self, make_regime):
-        """
-        Test whether loading two cases in a row causes a problem.
-        """
-        test_cases = ("feist", "lotus", "oracle", "brad", "watt", "cardenas")
-        opinions = {}
-        for case in test_cases:
-            decision = loaders.load_decision(f"{case}_h.json")
-            built = readers.read_decision(decision)
-            opinions[f"{case}_majority"] = built.opinions[0]
-            holdings, holding_anchors, named_anchors = loaders.load_and_read_holdings(f"holding_{case}.json", regime=make_regime)
-            opinions[f"{case}_majority"].posit(holdings, holding_anchors=holding_anchors, named_anchors=named_anchors)
-        holding = opinions["lotus_majority"].holdings[0]
-        factor = holding.inputs[0]
-        assert factor.predicate.content == "{} was copyrightable"
 
     def test_read_holdings_and_then_get_anchors(self, make_regime):
         """
