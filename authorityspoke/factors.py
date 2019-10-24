@@ -301,9 +301,9 @@ class Factor(ABC):
                     yield from self._implies_if_present(other, context)
             elif self.__dict__.get("absent"):
                 if not other.__dict__.get("absent"):
-                    test = other._implies_if_present(self, context.reversed)
+                    test = other._implies_if_present(self, context.reversed())
                 else:
-                    test = other._contradicts_if_present(self, context.reversed)
+                    test = other._contradicts_if_present(self, context.reversed())
                 yield from (register.reversed for register in test)
 
     def _evolve_attribute(self, changes: Dict[str, Any], attr_name: str) -> Dict[str, Any]:
@@ -445,10 +445,10 @@ class Factor(ABC):
 
             else:
                 if other.__dict__.get("absent"):
-                    test = other._implies_if_present(self, context.reversed)
+                    test = other._implies_if_present(self, context.reversed())
                 else:
-                    test = other._contradicts_if_present(self, context.reversed)
-                yield from (register.reversed for register in test)
+                    test = other._contradicts_if_present(self, context.reversed())
+                yield from (register.reversed() for register in test)
 
     def implies(self, other: Optional[Factor], context: Optional[ContextRegister] = None) -> bool:
         """Test whether ``self`` implies ``other``."""
@@ -694,7 +694,6 @@ class ContextRegister(Dict[Factor, Factor]):
         keys = [replacements.get(factor) or factor for factor in self.keys()]
         return ContextRegister(zip(keys, values))
 
-    @property
     def reversed(self):
         """Swap keys for values and vice versa."""
         return ContextRegister({v: k for k, v in self.items()})

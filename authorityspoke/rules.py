@@ -267,8 +267,12 @@ class Rule(Factor):
             :class:`.Holding` with :attr:`~Holding.rule_valid``
             and :attr:`~Holding.decided`
         """
+        if context is None:
+            context = ContextRegister()
+
         if not isinstance(other, self.__class__):
-            raise TypeError()
+            if hasattr(other, "contradicts"):
+                return other.contradicts(self, context=context.reversed())
 
         if not self.mandatory and not other.mandatory:
             return False
@@ -312,9 +316,9 @@ class Rule(Factor):
             other.procedure, context
         )
         other_to_self = (
-            register.reversed
+            register.reversed()
             for register in other.procedure.explain_contradiction_some_to_all(
-                self.procedure, context.reversed
+                self.procedure, context.reversed()
             )
         )
 
@@ -393,7 +397,12 @@ class Rule(Factor):
             both are :class:`Rule`/s, and
             ``rule_valid`` and ``decided`` are ``True`` for both of them.
         """
-
+        if not isinstance(other, self.__class__):
+            if hasattr(other, "implied_by"):
+                if context:
+                    context = context.reversed()
+                return other.implied_by(self, context=context)
+            return False
         return any(self.explain_implication(other, context))
 
     def __ge__(self, other: Optional[Factor]) -> bool:

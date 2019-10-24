@@ -5,6 +5,7 @@ from authorityspoke.enactments import Code, Enactment
 from authorityspoke.entities import Entity
 from authorityspoke.factors import ContextRegister
 from authorityspoke.facts import Fact
+from authorityspoke.holdings import Holding
 from authorityspoke.io.loaders import load_holdings
 from authorityspoke.predicates import Predicate
 from authorityspoke.procedures import Procedure
@@ -259,6 +260,15 @@ class TestImplication:
         large_reliable = make_complex_rule["accept_large_weight_reliable"]
         assert not small_reliable >= large_reliable
         assert large_reliable >= small_reliable
+
+    def test_implies_holding(self, make_complex_rule):
+        """
+        The Rule class doesn't know anything about the Holding class, but it
+        should check whether Holding has an is_implied_by method and call it.
+        """
+        small_reliable = make_complex_rule["accept_small_weight_reliable"]
+        small_more_reliable_holding = Holding(make_complex_rule["accept_small_weight_reliable_more_evidence"])
+        assert small_reliable >= small_more_reliable_holding
 
 class TestContradiction:
     def test_some_holding_consistent_with_absent_output(self, make_rule):

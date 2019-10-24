@@ -89,9 +89,8 @@ class TestImplication:
     def test_no_implication_decided_to_undecided(self, make_holding):
         assert not make_holding["h2"] > make_holding["h2_invalid_undecided"]
 
-    def test_error_implication_with_procedure(self, make_holding, make_procedure):
-        with pytest.raises(TypeError):
-            assert make_holding["h2_undecided"] >= make_procedure["c2"]
+    def test_no_implication_of_procedure(self, make_holding, make_procedure):
+        assert not make_holding["h2_undecided"] >= make_procedure["c2"]
 
 
 class TestContradiction:

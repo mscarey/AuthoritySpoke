@@ -225,7 +225,7 @@ class Holding(Factor):
         if context is None:
             context = ContextRegister()
         if other.__class__.__name__ == "Opinion":
-            return other.contradicts(self, context.reversed)
+            return other.contradicts(self, context.reversed())
         return any(self.explain_contradiction(other, context))
 
     def explain_implication(
@@ -250,9 +250,7 @@ class Holding(Factor):
                 self.explain_same_meaning(other.negated(), context),
             )
 
-    def implies(
-        self, other: Union[Holding, Rule], context: ContextRegister = None
-    ) -> bool:
+    def implies(self, other: Factor, context: ContextRegister = None) -> bool:
         r"""
         Test for implication.
 
@@ -272,8 +270,22 @@ class Holding(Factor):
             return True
         if isinstance(other, Rule):
             return self.implies(Holding(rule=other), context=context)
-
+        if not isinstance(other, self.__class__):
+            if hasattr(other, "implied_by"):
+                if context:
+                    context = context.reversed()
+                return other.implied_by(self, context=context)
+            return False
         return any(self.explain_implication(other, context))
+
+    def implied_by(
+        self, other: Factor, context: Optional[ContextRegister] = None
+    ) -> bool:
+        if context:
+            context = context.reversed()
+        if isinstance(other, Rule):
+            return Holding(rule=other).implies(self, context=context)
+        return other.implies(self, context=context)
 
     def __ge__(self, other: Union[Holding, Rule]) -> bool:
         return self.implies(other)

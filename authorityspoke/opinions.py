@@ -288,6 +288,26 @@ class Opinion:
 
         return anchors
 
+    def implied_by_holding(
+        self, other: Holding, context: ContextRegister = None
+    ) -> bool:
+        return all(
+            other.implies(self_holding, context=context.reversed())
+            for self_holding in self.holdings
+        )
+
+    def implied_by_rule(self, other: Rule, context: ContextRegister = None) -> bool:
+        return self.implied_by_holding(other=Holding(other), context=context)
+
+    def implied_by(
+        self, other: Union[Opinion, Holding, Rule], context: ContextRegister = None
+    ) -> bool:
+        if isinstance(other, Holding):
+            return self.implied_by_holding(other, context=context)
+        elif isinstance(other, Rule):
+            return self.implied_by_rule(other, context=context)
+        return other.implies(self, context=context.reversed())
+
     def implies(
         self, other: Union[Opinion, Holding, Rule], context: ContextRegister = None
     ) -> bool:
@@ -304,9 +324,11 @@ class Opinion:
                 ):
                     return False
             return True
-        raise TypeError(
-            f"'Implies' test not implemented for types {self.__class__} and {other.__class__}."
-        )
+        if hasattr(other, "implied_by"):
+            if context:
+                context = context.reversed()
+            return other.implied_by(self, context=context)
+        return False
 
     def __ge__(self, other: Union[Opinion, Rule]) -> bool:
         """
