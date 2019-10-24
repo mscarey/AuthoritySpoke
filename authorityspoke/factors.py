@@ -145,7 +145,7 @@ class Factor(ABC):
         return []
 
     @property
-    def generic_factors(self) -> Tuple[Factor, ...]:
+    def generic_factors(self) -> List[Factor]:
         r"""
         :class:`.Factor`\s that can be replaced without changing ``self``\s meaning.
 
@@ -157,13 +157,13 @@ class Factor(ABC):
         """
 
         if self.generic:
-            return (self,)
+            return [self]
         generics: Dict[Factor, None] = {}
         for factor in self.context_factors:
             if factor is not None:
                 for generic in factor.generic_factors:
                     generics[generic] = None
-        return tuple(generics)
+        return list(generics)
 
     @property
     def context_factors(self) -> Sequence[Optional[Factor]]:

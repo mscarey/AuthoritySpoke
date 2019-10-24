@@ -207,7 +207,7 @@ class Rule(Factor):
         return self.procedure.context_factors
 
     @property
-    def generic_factors(self) -> List[Optional[Factor]]:
+    def generic_factors(self) -> List[Factor]:
         r"""
         Get :class:`.Factor`\s that can be replaced without changing ``self``\s meaning.
 
@@ -503,7 +503,7 @@ class Rule(Factor):
                 universal=max(self.universal, other.universal),
             )
 
-        if self.universal == other.universal == False:
+        if self.universal is other.universal is False:
             return None
 
         return Rule(

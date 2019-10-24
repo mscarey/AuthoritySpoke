@@ -111,7 +111,7 @@ class Holding(Factor):
         return self.rule.procedure.context_factors
 
     @property
-    def generic_factors(self) -> List[Optional[Factor]]:
+    def generic_factors(self) -> List[Factor]:
         r"""
         Get :class:`.Factor`\s that can be replaced without changing ``self``\s meaning.
 

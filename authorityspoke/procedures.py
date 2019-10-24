@@ -330,7 +330,7 @@ class Procedure(Factor):
         return [*self.outputs, *inputs, *despite]
 
     @property
-    def generic_factors(self) -> Tuple[Factor, ...]:
+    def generic_factors(self) -> List[Factor]:
         r"""
         :class:`.Factor`\s that can be replaced without changing ``self``\s meaning.
 
@@ -346,7 +346,7 @@ class Procedure(Factor):
         """
         if self.generic:
             return (self,)
-        return tuple(
+        return list(
             {
                 generic: None
                 for factor in self.factors_all

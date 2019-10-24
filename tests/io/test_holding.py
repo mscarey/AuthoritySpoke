@@ -1,5 +1,6 @@
 from collections import OrderedDict
 
+from marshmallow import ValidationError
 import pint
 import pytest
 
@@ -15,8 +16,6 @@ from authorityspoke.io.loaders import load_holdings
 from authorityspoke.io import filepaths, text_expansion
 from authorityspoke.rules import Rule
 from authorityspoke.selectors import TextQuoteSelector
-
-from marshmallow import ValidationError
 
 ureg = pint.UnitRegistry()
 
@@ -117,7 +116,8 @@ class TestHoldingImport:
                 "enactments": [
                     {
                         "source": "/us/const/article-I/8/8",
-                        "exact": "To promote the Progress of Science and useful Arts, by securing for limited Times to Authors",
+                        "exact": ("To promote the Progress of Science and useful Arts, "
+                        "by securing for limited Times to Authors"),
                         "name": "securing for authors",
                     },
                     {
