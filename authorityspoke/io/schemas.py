@@ -7,6 +7,7 @@ from marshmallow import ValidationError
 
 from pint import UnitRegistry
 
+from authorityspoke.decisions import CaseCitation, Decision
 from authorityspoke.enactments import Enactment
 from authorityspoke.entities import Entity
 from authorityspoke.evidence import Exhibit, Evidence
@@ -16,7 +17,7 @@ from authorityspoke.holdings import Holding
 from authorityspoke.io.name_index import Mentioned
 from authorityspoke.io.nesting import nest_fields
 from authorityspoke.io.text_expansion import add_found_context
-from authorityspoke.opinions import CaseCitation, Opinion, Decision
+from authorityspoke.opinions import Opinion
 from authorityspoke.pleadings import Pleading, Allegation
 from authorityspoke.predicates import Predicate
 from authorityspoke.procedures import Procedure

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from dataclasses import dataclass, field
 import datetime
 from typing import Iterable, List, Optional, Sequence, Union

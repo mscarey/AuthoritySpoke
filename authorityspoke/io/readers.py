@@ -13,6 +13,7 @@ from typing import Optional, Tuple, Type, Union
 
 from pint import UnitRegistry
 
+from authorityspoke.decisions import Decision
 from authorityspoke.enactments import Code, Enactment
 from authorityspoke.entities import Entity
 from authorityspoke.evidence import Exhibit, Evidence
@@ -20,7 +21,7 @@ from authorityspoke.factors import Factor
 from authorityspoke.facts import Fact
 from authorityspoke.holdings import Holding
 from authorityspoke.jurisdictions import Regime
-from authorityspoke.opinions import Opinion, Decision, TextLinkDict
+from authorityspoke.opinions import Opinion, TextLinkDict
 from authorityspoke.pleadings import Allegation, Pleading
 from authorityspoke.predicates import Predicate
 from authorityspoke.procedures import Procedure

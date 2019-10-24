@@ -8,10 +8,11 @@ import pathlib
 
 from typing import Any, Dict, List, Iterator, Optional, Tuple, Union
 
+from authorityspoke.decisions import Decision
 from authorityspoke.enactments import Code
 from authorityspoke.holdings import Holding
 from authorityspoke.jurisdictions import Regime
-from authorityspoke.opinions import Opinion, Decision
+from authorityspoke.opinions import Opinion
 from authorityspoke.selectors import TextQuoteSelector
 
 from authorityspoke.io import anchors, filepaths, readers
