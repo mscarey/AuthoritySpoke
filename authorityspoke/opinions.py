@@ -308,6 +308,17 @@ class Opinion:
             return self.implied_by_rule(other, context=context)
         return other.implies(self, context=context.reversed())
 
+    def implies_other_holdings(
+        self, other_holdings: List[Holding], context: ContextRegister = None
+    ):
+        for other_holding in other_holdings:
+            if not any(
+                self_holding.implies(other_holding, context=context)
+                for self_holding in self.holdings
+            ):
+                return False
+        return True
+
     def implies(
         self, other: Union[Opinion, Holding, Rule], context: ContextRegister = None
     ) -> bool:
@@ -317,13 +328,7 @@ class Opinion:
                 for self_holding in self.holdings
             )
         elif isinstance(other, self.__class__):
-            for other_holding in other.holdings:
-                if not any(
-                    self_holding.implies(other_holding, context=context)
-                    for self_holding in self.holdings
-                ):
-                    return False
-            return True
+            return self.implies_other_holdings(other.holdings)
         if hasattr(other, "implied_by"):
             if context:
                 context = context.reversed()
@@ -446,6 +451,13 @@ class Decision:
             )
         return self.majority.holdings
 
+    def contradicts(self, other):
+        if isinstance(other, Decision):
+            if self.majority and other.majority:
+                return self.majority.contradicts(other.majority)
+            return False
+        return self.majority.contradicts(other)
+
     def posit(
         self,
         holdings: Union[Holding, Iterable[Union[Holding, Rule]]],
@@ -466,6 +478,71 @@ class Decision:
             named_anchors=named_anchors,
             context=context,
         )
+
+    def __ge__(self, other) -> bool:
+        return self.implies(other)
+
+    def __gt__(self, other) -> bool:
+        return self.implies(other) and not self == other
+
+    def implied_by_holding(
+        self, other: Holding, context: ContextRegister = None
+    ) -> bool:
+        return all(
+            other.implies(self_holding, context=context.reversed())
+            for self_holding in self.holdings
+        )
+
+    def implied_by_rule(self, other: Rule, context: ContextRegister = None) -> bool:
+        return self.implied_by_holding(other=Holding(other), context=context)
+
+    def implied_by(
+        self, other: Union[Opinion, Holding, Rule], context: ContextRegister = None
+    ) -> bool:
+        if isinstance(other, Opinion):
+            if context:
+                context = context.reversed()
+            return other.implies_other_holdings(self.holdings, context=context)
+        if isinstance(other, Holding):
+            return self.implied_by_holding(other, context=context)
+        elif isinstance(other, Rule):
+            return self.implied_by_rule(other, context=context)
+        if context is not None:
+            context = context.reversed()
+        return other.implies(self, context=context)
+
+    def implies_decision_or_opinion(
+        self, other: Union[Decision, Opinion], context: Optional[ContextRegister] = None
+    ) -> bool:
+        for other_holding in other.holdings:
+            if not any(
+                self_holding.implies(other_holding, context=context)
+                for self_holding in self.holdings
+            ):
+                return False
+        return True
+
+    def implies_holding(
+        self, other: Holding, context: Optional[ContextRegister] = None
+    ) -> bool:
+        return any(
+            self_holding.implies(other, context=context)
+            for self_holding in self.holdings
+        )
+
+    def implies_rule(
+        self, other: Rule, context: Optional[ContextRegister] = None
+    ) -> bool:
+        return self.implies_holding(Holding(other), context=context)
+
+    def implies(self, other, context: Optional[ContextRegister] = None) -> bool:
+        if isinstance(other, (Decision, Opinion)):
+            return self.implies_decision_or_opinion(other, context=context)
+        elif isinstance(other, Holding):
+            return self.implies_holding(other, context=context)
+        elif isinstance(other, Rule):
+            return self.implies_rule(other, context=context)
+        return False
 
     @property
     def majority(self) -> Optional[Opinion]:

@@ -12,3 +12,25 @@ class TestDecision:
         watt = make_decision["watt"]
         watt.posit([make_holding["h1"], make_holding["h2"]])
         assert watt.majority.holdings[-1] == make_holding["h2"]
+
+
+class TestImplication:
+    def test_implication_of_decision_with_one_of_same_holdings(
+        self, make_decision, make_decision_with_holding
+    ):
+        oracle = make_decision["oracle"]
+        oracle_with_holdings = make_decision_with_holding["oracle"]
+        oracle.posit(oracle_with_holdings.holdings[0])
+        assert len(oracle.holdings) == 1
+        assert len(oracle_with_holdings.holdings) > 10
+        assert oracle_with_holdings >= oracle
+
+
+class TestContradiction:
+    def test_oracle_contradicts_lotus(self, make_decision_with_holding):
+        """
+        This is the same example from the "Introduction" notebook.
+        """
+        oracle = make_decision_with_holding["oracle"]
+        lotus = make_decision_with_holding["lotus"]
+        assert oracle.contradicts(lotus)
