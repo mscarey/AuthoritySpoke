@@ -2,8 +2,10 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 import datetime
-from typing import Iterable, List, Optional, Sequence, Union
+from typing import Iterable, Iterator, List
+from typing import Optional, Sequence, Union
 
+from authorityspoke.explanations import Explanation
 from authorityspoke.factors import Factor, ContextRegister
 from authorityspoke.holdings import Holding
 from authorityspoke.opinions import Opinion, TextLinkDict
@@ -94,6 +96,25 @@ class Decision:
                 return self.majority.contradicts(other.majority)
             return False
         return self.majority.contradicts(other)
+
+    def explain_contradiction(
+        self,
+        other: Union[Decision, Opinion, Holding, Rule],
+        context: Optional[ContextRegister] = None,
+    ) -> Iterator[Explanation]:
+        if isinstance(other, Decision):
+            if self.majority and other.majority:
+                yield from self.majority.explain_contradiction(
+                    other.majority, context=context
+                )
+        elif isinstance(other, (Rule, Holding, Opinion)):
+            if self.majority:
+                yield from self.majority.explain_contradiction(other, context=context)
+        else:
+            raise TypeError(
+                f"'Contradicts' test not implemented for types "
+                f"{self.__class__} and {other.__class__}."
+            )
 
     def posit(
         self,
