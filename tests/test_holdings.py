@@ -233,9 +233,13 @@ class TestContradiction:
         must_not_rule = make_holding["h2_output_false_ALL_MUST"]
         assert list(watt.holdings)[1].contradicts(must_not_rule)
 
-    def test_error_contradiction_with_procedure(self, make_holding, make_procedure):
-        with pytest.raises(TypeError):
-            make_holding["h2_undecided"].contradicts(make_procedure["c2"])
+    def test_contradiction_with_procedure(self, make_holding, make_procedure):
+        """
+        This test previously required a TypeError, but on second
+        thought the command expresses a pretty clear intention to
+        convert the Procedure to a Holding.
+        """
+        assert make_holding["h2_undecided"].contradicts(make_procedure["c2"])
 
     def test_holding_contradicts_opinion(self, make_opinion_with_holding):
         oracle = make_opinion_with_holding["oracle_majority"]

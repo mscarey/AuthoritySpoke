@@ -178,18 +178,29 @@ class Holding(Factor):
 
         if context is None:
             context = ContextRegister()
+        if isinstance(other, Procedure):
+            other = Rule(procedure=other)
         if isinstance(other, Rule):
             other = Holding(rule=other)
-        if not isinstance(other, self.__class__):
-            raise TypeError
-        for self_holding in self.nonexclusive_holdings():
-            for other_holding in other.nonexclusive_holdings():
-                for register in self_holding.contradicts_if_not_exclusive(
-                    other_holding
-                ):
-                    yield Explanation(
-                        needs_match=self, available=other, context=register
-                    )
+        if isinstance(other, self.__class__):
+            for self_holding in self.nonexclusive_holdings():
+                for other_holding in other.nonexclusive_holdings():
+                    for register in self_holding.contradicts_if_not_exclusive(
+                        other_holding
+                    ):
+                        yield Explanation(
+                            needs_match=self_holding,
+                            available=other_holding,
+                            context=register,
+                        )
+        elif not isinstance(other, Factor) and hasattr(other, "explain_contradiction"):
+            if context:
+                context = context.reversed()
+            yield from other.explain_contradiction(self, context=context)
+        else:
+            raise TypeError(
+                f"'Contradicts' test not implemented for types {self.__class__} and {other.__class__}."
+            )
 
     def contradicts_if_not_exclusive(
         self, other: Holding, context: ContextRegister = None

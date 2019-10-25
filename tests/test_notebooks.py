@@ -67,11 +67,11 @@ class TestIntroduction:
     def test_opinion_explain_contradiction(self, make_opinion_with_holding):
         oracle = make_opinion_with_holding["oracle_majority"]
         lotus = make_opinion_with_holding["lotus_majority"]
-        register = next(lotus.holdings[6].explain_contradiction(oracle.holdings[10]))
-        assert register == ContextRegister(
+        explanation = next(lotus.holdings[6].explain_contradiction(oracle.holdings[10]))
+        assert explanation.context == ContextRegister(
             {Entity("the Lotus menu command hierarchy"): Entity("the Java API")}
         )
-        assert "<the Lotus menu command hierarchy> -> <the Java API>" in str(register)
+        assert "<the Lotus menu command hierarchy> is like <the Java API>" in str(register)
         assert "Entity(name='the Java API'" in repr(register)
 
     def test_register_string(self, make_opinion_with_holding):
