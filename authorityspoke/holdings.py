@@ -12,17 +12,15 @@ from __future__ import annotations
 
 from functools import lru_cache
 from itertools import chain
-from typing import Any, Dict, Iterable, Iterator, List, Tuple
+from typing import Any, Dict, Iterator, List, Tuple
 from typing import Optional, Union
 import textwrap
 
 from dataclasses import dataclass
 
-from authorityspoke.enactments import Enactment
 from authorityspoke.factors import Factor, ContextRegister, new_context_helper
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
-from authorityspoke.selectors import TextQuoteSelector
 
 
 @dataclass(frozen=True)
@@ -152,6 +150,7 @@ class Holding(Factor):
                 added = self_holding.add_if_not_exclusive(other_holding)
                 if added is not None:
                     return added
+        return None
 
     def __add__(self, other: Factor) -> Optional[Union[Rule, Holding]]:
         if isinstance(other, Rule):
@@ -418,7 +417,7 @@ class Holding(Factor):
         return [self.evolve("exclusive")] + self.inferred_from_exclusive
 
     def union_if_not_exclusive(self, other: Holding) -> Optional[Holding]:
-        if self.decided == other.decided == False:
+        if self.decided is other.decided is False:
             if self.rule >= other.rule:
                 return self
             if other.rule >= self.rule:

@@ -330,7 +330,10 @@ class Factor(ABC):
             new_dict[key] = changes[key]
         return new_dict
 
-    def _make_dict_to_evolve(self, changes: Union[str, Tuple[str, ...], Dict[str, Any]]) -> Dict[str, Any]:
+    def _make_dict_to_evolve(
+        self,
+        changes: Union[str, Tuple[str, ...], Dict[str, Any]]
+        ) -> Dict[str, Any]:
         if isinstance(changes, str):
             changes = (changes,)
         if isinstance(changes, tuple):

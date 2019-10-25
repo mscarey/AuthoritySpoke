@@ -1,12 +1,10 @@
 import logging
 import pytest
 
-from authorityspoke.enactments import Code, Enactment
 from authorityspoke.entities import Entity
 from authorityspoke.factors import ContextRegister
 from authorityspoke.facts import Fact
 from authorityspoke.holdings import Holding
-from authorityspoke.io.loaders import load_holdings
 from authorityspoke.predicates import Predicate
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
@@ -267,7 +265,8 @@ class TestImplication:
         should check whether Holding has an is_implied_by method and call it.
         """
         small_reliable = make_complex_rule["accept_small_weight_reliable"]
-        small_more_reliable_holding = Holding(make_complex_rule["accept_small_weight_reliable_more_evidence"])
+        small_more_reliable_holding = Holding(
+            make_complex_rule["accept_small_weight_reliable_more_evidence"])
         assert small_reliable >= small_more_reliable_holding
 
 class TestContradiction:
@@ -553,7 +552,8 @@ class TestAddition:
         the :class:`.Rule` and input :class:`.Factor`.
         """
         c = make_complex_rule
-        assert not c["accept_murder_fact_from_relevance"].means(c["accept_murder_fact_from_relevance_and_shooting"])
+        assert not c["accept_murder_fact_from_relevance"].means(
+            c["accept_murder_fact_from_relevance_and_shooting"])
         two_input_rule = c["accept_murder_fact_from_relevance"] + make_factor["f_shooting"]
         assert two_input_rule.means(c["accept_murder_fact_from_relevance_and_shooting"])
 
@@ -619,12 +619,15 @@ class TestAddition:
 
         facts_not_copyrightable = fact_not_original + unoriginal_not_copyrightable
         assert len(facts_not_copyrightable.inputs) == 1
-        assert "act that <the Pythagorean theorem> was a fact" in str(facts_not_copyrightable.inputs[0])
+        assert str(facts_not_copyrightable.inputs[0]).endswith(
+            "act that <the Pythagorean theorem> was a fact")
         assert len(facts_not_copyrightable.outputs) == 2
-        assert "act it is false that <the Pythagorean theorem> was copyrightable" in str(facts_not_copyrightable.outputs[1])
+        assert str(facts_not_copyrightable.outputs[1]).endswith(
+            "false that <the Pythagorean theorem> was copyrightable")
 
 
-    def test_add_rules_with_duplicate_enactment_text(self, make_enactment, make_opinion_with_holding):
+    def test_add_rules_with_duplicate_enactment_text(
+        self, make_enactment, make_opinion_with_holding):
         """
         test implication between
         telephone listings -> not original (feist.holdings[11])
@@ -653,15 +656,19 @@ class TestAddition:
 
     def test_add_some_plus_some_makes_none(self, make_complex_rule):
         """The rules can't be added because they both have universal==False"""
-        new_rule = make_complex_rule["accept_relevance_testimony"] + make_complex_rule["accept_murder_fact_from_relevance"]
+        new_rule = (
+            make_complex_rule["accept_relevance_testimony"]
+            + make_complex_rule["accept_murder_fact_from_relevance"])
         assert new_rule is None
 
-    def test_add_complex_rule(self, make_factor, make_complex_rule):
+    def test_add_complex_rule(self, make_complex_rule):
         """
         The resulting rule will have universal==False because one of the
         two input rules has universal==False.
         """
-        new_rule = make_complex_rule["accept_relevance_testimony_ALL"] + make_complex_rule["accept_murder_fact_from_relevance"]
+        new_rule = (
+            make_complex_rule["accept_relevance_testimony_ALL"]
+            + make_complex_rule["accept_murder_fact_from_relevance"])
         assert new_rule.universal is False
         assert new_rule.inputs == make_complex_rule["accept_relevance_testimony_ALL"].inputs
         assert make_complex_rule["accept_murder_fact_from_relevance"].outputs[0] in new_rule.outputs
@@ -677,8 +684,7 @@ class TestAddition:
         """
         due_process_rule = (
             make_complex_rule["accept_murder_fact_from_relevance"]
-            + make_enactment["due_process_5"]
-            )
+            + make_enactment["due_process_5"])
         assert make_complex_rule["accept_relevance_testimony_ALL"] + due_process_rule is None
 
 class TestUnion:
@@ -691,7 +697,7 @@ class TestUnion:
         feist = make_opinion_with_holding["feist_majority"]
         assert not feist.holdings[1].contradicts(feist.holdings[2])
         assert feist.holdings[1].outputs[0].contradicts(feist.holdings[2].outputs[0])
-        assert feist.holdings[1] | feist.holdings[2] == None
+        assert feist.holdings[1] | feist.holdings[2] is None
 
     def test_union_basic(self, make_opinion_with_holding):
         feist = make_opinion_with_holding["feist_majority"]
@@ -810,4 +816,4 @@ class TestUnion:
         feist_copyrightable = feist.holdings[3].rule
         oracle = make_opinion_with_holding["oracle_majority"]
         oracle_copyrightable = oracle.holdings[0].rule
-        assert feist_copyrightable | oracle_copyrightable == None
+        assert feist_copyrightable | oracle_copyrightable is None

@@ -1,6 +1,5 @@
 import pytest
 
-from authorityspoke.io import readers
 from authorityspoke.holdings import Holding
 
 
@@ -225,3 +224,20 @@ class TestUnion:
         feist = make_opinion_with_holding["feist_majority"]
         result_of_union = feist.holdings[10] | feist.holdings[3]
         assert isinstance(result_of_union, Holding)
+
+    def test_no_union_with_opinion(self, make_holding, make_opinion_with_holding):
+        holding = make_holding["h1"]
+        feist = make_opinion_with_holding["feist_majority"]
+        with pytest.raises(TypeError):
+            _ = holding | feist
+
+    def test_union_with_rule(self, make_opinion_with_holding):
+        feist = make_opinion_with_holding["feist_majority"]
+        rule = feist.holdings[3].inferred_from_exclusive[0].rule
+        new_holding = feist.holdings[10] | rule
+        assert isinstance(new_holding, Holding)
+
+    def test_no_union_with_an_undecided_holding(self, make_holding):
+        left = make_holding["h1"].evolve("decided")
+        right = make_holding["h1"]
+        assert left | right is None
