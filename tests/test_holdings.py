@@ -1,5 +1,7 @@
 import pytest
 
+from authorityspoke.entities import Entity
+from authorityspoke.factors import ContextRegister
 from authorityspoke.holdings import Holding
 
 
@@ -19,10 +21,20 @@ class TestHolding:
         assert inferred.outputs[0].content == "{} infringed the copyright in {}"
         assert inferred.outputs[0].absent
 
+    def test_infer_from_not_exclusive(self, make_holding):
+        """
+        For a Holding with `exclusive=False`, inferred_from_exclusive
+        should return an empty list.
+        """
+        assert not make_holding["h1"].inferred_from_exclusive
+
 
 class TestSameMeaning:
     def test_identical_holdings_equal(self, make_holding):
         assert make_holding["h1"].means(make_holding["h1_again"])
+
+    def test_holding_does_not_mean_None(self, make_holding):
+        assert not make_holding["h1"].means(None)
 
     def test_negated_method(self, make_holding):
         assert make_holding["h1"].negated().means(make_holding["h1_opposite"])
@@ -90,6 +102,24 @@ class TestImplication:
 
     def test_no_implication_of_procedure(self, make_holding, make_procedure):
         assert not make_holding["h2_undecided"] >= make_procedure["c2"]
+
+    def test_holding_implies_opinion_with_no_holdings(
+        self, make_opinion_with_holding, make_opinion
+    ):
+        lotus = make_opinion["lotus_majority"]
+        holding = make_opinion_with_holding["oracle_majority"].holdings[0]
+        assert holding.implies(
+            lotus,
+            context=ContextRegister(
+                {Entity("the Java API"): Entity("the Lotus menu command hierarchy")}
+            ),
+        )
+
+    def test_holding_implies_none(self, make_holding):
+        assert make_holding["h3"] >= None
+
+    def test_holding_implies_rule(self, make_holding, make_rule):
+        assert make_holding["h3"] >= make_rule["h3"]
 
 
 class TestContradiction:
@@ -207,6 +237,11 @@ class TestContradiction:
         with pytest.raises(TypeError):
             make_holding["h2_undecided"].contradicts(make_procedure["c2"])
 
+    def test_holding_contradicts_opinion(self, make_opinion_with_holding):
+        oracle = make_opinion_with_holding["oracle_majority"]
+        lotus = make_opinion_with_holding["lotus_majority"]
+        assert lotus.holdings[6].contradicts(oracle)
+
 
 class TestUnion:
     def test_union_neither_universal(self, make_opinion_with_holding):
@@ -248,3 +283,8 @@ class TestUnion:
         new = narrow_undecided | broad_undecided
         assert new == broad_undecided
         assert broad_undecided | narrow_undecided == broad_undecided
+
+    def test_union_unrelated_undecided(self, make_holding):
+        left = make_holding["h1"].evolve("decided")
+        right = make_holding["h2"].evolve("decided")
+        assert left | right is None

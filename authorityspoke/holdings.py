@@ -281,6 +281,13 @@ class Holding(Factor):
     def implied_by(
         self, other: Factor, context: Optional[ContextRegister] = None
     ) -> bool:
+        """
+        Test if other implies self.
+
+        This function is for handling implication checks for classes
+        that don't know the structure of the :class:`Holding` class,
+        such as :class:`.Fact` and :class:`.Rule`\.
+        """
         if context:
             context = context.reversed()
         if isinstance(other, Rule):

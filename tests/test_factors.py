@@ -292,7 +292,7 @@ class TestFacts:
             make_entity["watt"]: make_entity["watt"],
         }) in new_matches
 
-    # Equality
+class TestSameMeaning:
 
     def test_equality_factor_from_same_predicate(self, watt_factor):
         assert watt_factor["f1"].means(watt_factor["f1b"])
@@ -371,7 +371,13 @@ class TestFacts:
         listings_original = Fact(Predicate("{} were original"), context_factors=listings)
         assert directory_original.means(listings_original)
 
-    # Implication
+class TestImplication:
+
+    def test_fact_does_not_imply_rule(self, watt_factor, make_rule):
+        assert not watt_factor["f1"].implies(make_rule["h1"])
+
+    def test_fact_does_not_imply_holding(self, watt_factor, make_holding):
+        assert not watt_factor["f1"].implies(make_holding["h1"])
 
     def test_specific_factor_implies_generic(self, watt_factor):
         assert watt_factor["f2"] > watt_factor["f2_generic"]
