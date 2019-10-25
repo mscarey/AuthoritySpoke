@@ -16,7 +16,7 @@ class TestHolding:
         the "exclusive" way to reach the output "{} infringed the copyright in {}"
         """
         exclusive_holding = make_opinion_with_holding["lotus_majority"].holdings[0]
-        inferred = next(exclusive_holding.inferred_from_exclusive())
+        inferred = exclusive_holding.inferred_from_exclusive[0]
         assert inferred.outputs[0].content == "{} infringed the copyright in {}"
         assert inferred.outputs[0].absent
 

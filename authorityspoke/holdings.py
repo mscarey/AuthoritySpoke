@@ -10,6 +10,7 @@ should be considered undecided.
 
 from __future__ import annotations
 
+from functools import lru_cache
 from itertools import chain
 from typing import Any, Dict, Iterable, Iterator, List, Tuple
 from typing import Optional, Union
@@ -331,15 +332,19 @@ class Holding(Factor):
 
         return len(self.rule.procedure)
 
-    def inferred_from_exclusive(self) -> Iterator[Holding]:
+    @property
+    def inferred_from_exclusive(self) -> List[Holding]:
         r"""
         Yield :class:`Holding`\s that can be inferred from the "exclusive" flag.
 
         The generator will be empty if `self.exclusive` is False.
         """
         if self.exclusive:
-            for modified_rule in self.rule.get_contrapositives():
-                yield Holding(rule=modified_rule)
+            return [
+                Holding(rule=modified_rule)
+                for modified_rule in self.rule.get_contrapositives()
+            ]
+        return []
 
     def evolve(self, changes: Union[str, Tuple[str, ...], Dict[str, Any]]) -> Holding:
         """
@@ -403,16 +408,14 @@ class Holding(Factor):
             decided=self.decided,
         )
 
-    def nonexclusive_holdings(self) -> Iterator[Holding]:
+    @lru_cache(maxsize=16)
+    def nonexclusive_holdings(self) -> List[Holding]:
         r"""
         Yield all :class:`.Holding`\s with `exclusive is False` implied by self.
         """
         if not self.exclusive:
-            yield self
-        else:
-            yield self.evolve("exclusive")
-            for inferred in self.inferred_from_exclusive():
-                yield inferred
+            return [self]
+        return [self.evolve("exclusive")] + self.inferred_from_exclusive
 
     def union_if_not_exclusive(self, other: Holding) -> Optional[Holding]:
         if self.decided == other.decided == False:
