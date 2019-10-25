@@ -18,6 +18,7 @@ import textwrap
 
 from dataclasses import dataclass
 
+from authorityspoke.explanations import Explanation
 from authorityspoke.factors import Factor, ContextRegister, new_context_helper
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
@@ -161,7 +162,7 @@ class Holding(Factor):
 
     def explain_contradiction(
         self, other: Factor, context: ContextRegister = None
-    ) -> Iterator[ContextRegister]:
+    ) -> Iterator[Explanation]:
         r"""
         Find context matches that would result in a contradiction with other.
 
@@ -183,11 +184,16 @@ class Holding(Factor):
             raise TypeError
         for self_holding in self.nonexclusive_holdings():
             for other_holding in other.nonexclusive_holdings():
-                yield from self_holding.contradicts_if_not_exclusive(other_holding)
+                for register in self_holding.contradicts_if_not_exclusive(
+                    other_holding
+                ):
+                    yield Explanation(
+                        needs_match=self, available=other, context=register
+                    )
 
     def contradicts_if_not_exclusive(
         self, other: Holding, context: ContextRegister = None
-    ):
+    ) -> Iterator[ContextRegister]:
         if context is None:
             context = ContextRegister()
         if isinstance(other, Holding) and other.decided:

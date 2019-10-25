@@ -242,6 +242,13 @@ class TestContradiction:
         lotus = make_opinion_with_holding["lotus_majority"]
         assert lotus.holdings[6].contradicts(oracle)
 
+    def test_explain_holding_contradicting_opinion(self, make_opinion_with_holding):
+        oracle = make_opinion_with_holding["oracle_majority"]
+        lotus = make_opinion_with_holding["lotus_majority"]
+        explanations = lotus.holdings[6].explain_contradiction(oracle)
+        explanation = next(explanations)
+        assert "the explanation" in str(explanation).lower()
+
 
 class TestUnion:
     def test_union_neither_universal(self, make_opinion_with_holding):

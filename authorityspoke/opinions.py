@@ -8,17 +8,16 @@ from __future__ import annotations
 
 from collections import defaultdict
 from itertools import zip_longest
-from typing import Dict, Iterable, List
+from typing import Dict, Iterable, Iterator, List
 from typing import Optional, Sequence, Set, Tuple, Union
 
-import datetime
 import logging
 import re
 
 from dataclasses import dataclass, field
 
 from authorityspoke.factors import Factor, ContextRegister
-from authorityspoke.enactments import Enactment
+from authorityspoke.explanations import Explanation
 from authorityspoke.holdings import Holding
 from authorityspoke.rules import Rule
 from authorityspoke.selectors import TextQuoteSelector
@@ -69,8 +68,37 @@ class Opinion:
         """
         self.holding_anchors.clear()
 
+    def explain_contradiction(
+        self,
+        other: Union[Opinion, Holding, Rule],
+        context: Optional[ContextRegister] = None,
+    ) -> Iterator[Explanation]:
+        if isinstance(other, Rule):
+            other = Holding(rule=other)
+        if isinstance(other, Holding):
+            for self_holding in self.holdings:
+                for explanation in self_holding.explain_contradiction(other, context):
+                    yield explanation
+        elif isinstance(other, self.__class__):
+            for self_holding in self.holdings:
+                for other_holding in other.holdings:
+                    for explanation in self_holding.explain_contradiction(
+                        other_holding, context
+                    ):
+                        yield explanation
+        elif hasattr(other, "explain_contradiction"):
+            if context:
+                context = context.reversed()
+            yield from other.explain_contradiction(self, context=context)
+        else:
+            raise TypeError(
+                f"'Contradicts' test not implemented for types {self.__class__} and {other.__class__}."
+            )
+
     def contradicts(
-        self, other: Union[Opinion, Holding], context: Optional[ContextRegister] = None
+        self,
+        other: Union[Opinion, Holding, Rule],
+        context: Optional[ContextRegister] = None,
     ) -> bool:
         """
         Test whether ``other`` is or contains a :class:`.Holding` contradicted by ``self``.
@@ -84,22 +112,7 @@ class Opinion:
             any holding of ``other`` if ``other`` is an :class:`.Opinion`.
         """
 
-        if isinstance(other, Holding):
-            return any(
-                self_holding.contradicts(other, context)
-                for self_holding in self.holdings
-            )
-        elif isinstance(other, self.__class__):
-            return any(
-                any(
-                    self_holding.contradicts(other_holding, context)
-                    for self_holding in self.holdings
-                )
-                for other_holding in other.holdings
-            )
-        raise TypeError(
-            f"'Contradicts' test not implemented for types {self.__class__} and {other.__class__}."
-        )
+        return any(self.explain_contradiction(other, context=context))
 
     @property
     def generic_factors(self) -> List[Factor]:
