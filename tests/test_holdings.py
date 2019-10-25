@@ -241,3 +241,10 @@ class TestUnion:
         left = make_holding["h1"].evolve("decided")
         right = make_holding["h1"]
         assert left | right is None
+
+    def test_union_with_two_undecided_holdings(self, make_holding):
+        narrow_undecided = make_holding["h2_ALL_MUST"].evolve("decided")
+        broad_undecided = make_holding["h2"].evolve("decided")
+        new = narrow_undecided | broad_undecided
+        assert new == broad_undecided
+        assert broad_undecided | narrow_undecided == broad_undecided

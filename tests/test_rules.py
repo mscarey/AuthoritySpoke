@@ -642,8 +642,8 @@ class TestAddition:
         """
         feist = make_opinion_with_holding["feist_majority"]
         listings_not_original = feist.holdings[10].rule
-        inferred_generator = feist.holdings[3].inferred_from_exclusive
-        unoriginal_not_copyrightable = next(inferred_generator).rule
+        inferred_holding = feist.holdings[3].inferred_from_exclusive[0]
+        unoriginal_not_copyrightable = inferred_holding.rule
         listings_not_copyrightable = (
             listings_not_original + make_enactment["copyright_requires_originality"] + unoriginal_not_copyrightable
         )

@@ -419,9 +419,9 @@ class Holding(Factor):
     def union_if_not_exclusive(self, other: Holding) -> Optional[Holding]:
         if self.decided is other.decided is False:
             if self.rule >= other.rule:
-                return self
-            if other.rule >= self.rule:
                 return other
+            if other.rule >= self.rule:
+                return self
             return None
 
         if not self.decided or not other.decided:
