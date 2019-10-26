@@ -250,7 +250,7 @@ class TestContradiction:
         lotus = make_opinion_with_holding["lotus_majority"]
         explanations = oracle.explain_contradiction(lotus.holdings[6])
         explanation = next(explanations)
-        assert "the explanation" in str(explanation).lower()
+        assert "an explanation" in str(explanation).lower()
 
     def test_contradiction_of_decision(
         self, make_opinion_with_holding, make_decision_with_holding
@@ -266,7 +266,7 @@ class TestContradiction:
         lotus = make_decision_with_holding["lotus"]
         explanations = oracle_majority.explain_contradiction(lotus)
         explanation = next(explanations)
-        assert "the explanation" in str(explanation).lower()
+        assert "an explanation" in str(explanation).lower()
 
     def test_error_contradiction_with_procedure(self, make_opinion, make_procedure):
         with pytest.raises(TypeError):

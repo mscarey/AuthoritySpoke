@@ -251,7 +251,7 @@ class TestContradiction:
         lotus = make_opinion_with_holding["lotus_majority"]
         explanations = lotus.holdings[6].explain_contradiction(oracle)
         explanation = next(explanations)
-        assert "the explanation" in str(explanation).lower()
+        assert "an explanation" in str(explanation).lower()
 
 
 class TestUnion:
