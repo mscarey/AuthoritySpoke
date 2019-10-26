@@ -692,7 +692,7 @@ def contradictory_factor_groups(
     self_factors: Tuple[Factor, ...],
     other_factors: Tuple[Factor, ...],
     context: Optional[ContextRegister] = None,
-) -> Iterator[ContextRegister]:
+) -> bool:
     r"""
     Find whether two sets of :class:`.Factor`\s can be contradictory.
 

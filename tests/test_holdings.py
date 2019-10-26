@@ -254,8 +254,7 @@ class TestContradiction:
     def test_explain_holding_contradicting_opinion(self, make_opinion_with_holding):
         oracle = make_opinion_with_holding["oracle_majority"]
         lotus = make_opinion_with_holding["lotus_majority"]
-        explanations = lotus.holdings[6].explain_contradiction(oracle)
-        explanation = next(explanations)
+        explanation = lotus.holdings[6].explain_contradiction(oracle)
         assert "an explanation" in str(explanation).lower()
 
     def test_holding_does_not_contradict_fact(self, make_holding, watt_factor):
@@ -283,7 +282,8 @@ class TestAddition:
         new_holding = oracle.holdings[0] + rule_from_lotus
         output_strings = (
             "the Fact it is false that <the Java API> was copyrightable",
-            "absence of the Fact that <Borland International> infringed the copyright in <the Java API>",
+            "absence of the Fact that <Borland International> "
+            + "infringed the copyright in <the Java API>",
         )
         for output in new_holding.outputs:
             assert str(output) in output_strings

@@ -149,13 +149,13 @@ class Holding(Factor):
             return self.add_holding(other)
         return self.evolve({"rule": self.rule + other})
 
-    def _explain_contradiction_of_holding(
+    def _explanations_contradiction_of_holding(
         self, other: Holding, context: ContextRegister
     ) -> Iterator[Explanation]:
         for self_holding in self.nonexclusive_holdings():
             for other_holding in other.nonexclusive_holdings():
                 for register in self_holding.contradicts_if_not_exclusive(
-                    other_holding
+                    other_holding, context=context
                 ):
                     yield Explanation(
                         needs_match=self_holding,
@@ -163,7 +163,7 @@ class Holding(Factor):
                         context=register,
                     )
 
-    def explain_contradiction(
+    def explanations_contradiction(
         self, other: Factor, context: ContextRegister = None
     ) -> Iterator[Explanation]:
         r"""
@@ -186,16 +186,17 @@ class Holding(Factor):
         if isinstance(other, Rule):
             other = Holding(rule=other)
         if isinstance(other, self.__class__):
-            yield from self._explain_contradiction_of_holding(other, context)
+            yield from self._explanations_contradiction_of_holding(other, context)
         elif isinstance(other, Factor):
             yield from []  # no possible contradiction
-        elif hasattr(other, "explain_contradiction"):
+        elif hasattr(other, "explanations_contradiction"):
             if context:
                 context = context.reversed()
-            yield from other.explain_contradiction(self, context=context)
+            yield from other.explanations_contradiction(self, context=context)
         else:
             raise TypeError(
-                f"'Contradicts' test not implemented for types {self.__class__} and {other.__class__}."
+                f"'Contradicts' test not implemented for types "
+                f"{self.__class__} and {other.__class__}."
             )
 
     def contradicts_if_not_exclusive(
@@ -237,7 +238,7 @@ class Holding(Factor):
         """
         if context is None:
             context = ContextRegister()
-        return any(self.explain_contradiction(other, context))
+        return any(self.explanations_contradiction(other, context))
 
     def explain_implication(
         self, other: Factor, context: ContextRegister = None
@@ -292,7 +293,7 @@ class Holding(Factor):
     def implied_by(
         self, other: Factor, context: Optional[ContextRegister] = None
     ) -> bool:
-        """
+        r"""
         Test if other implies self.
 
         This function is for handling implication checks for classes
@@ -336,7 +337,7 @@ class Holding(Factor):
         # If decided rule A contradicts B, then B also contradicts A
 
         else:
-            yield from self.rule.explain_contradiction(other.rule, context)
+            yield from self.rule.explanations_contradiction(other.rule, context)
 
     def __len__(self):
         r"""

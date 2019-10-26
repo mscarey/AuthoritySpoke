@@ -72,24 +72,38 @@ class Opinion:
         self,
         other: Union[Opinion, Holding, Rule],
         context: Optional[ContextRegister] = None,
+    ) -> Optional[Explanation]:
+        explanations = self.explanations_contradiction(other, context=context)
+        try:
+            explanation = next(explanations)
+        except StopIteration:
+            return None
+        return explanation
+
+    def explanations_contradiction(
+        self,
+        other: Union[Opinion, Holding, Rule],
+        context: Optional[ContextRegister] = None,
     ) -> Iterator[Explanation]:
         if isinstance(other, Rule):
             other = Holding(rule=other)
         if isinstance(other, Holding):
             for self_holding in self.holdings:
-                for explanation in self_holding.explain_contradiction(other, context):
+                for explanation in self_holding.explanations_contradiction(
+                    other, context
+                ):
                     yield explanation
         elif isinstance(other, self.__class__):
             for self_holding in self.holdings:
                 for other_holding in other.holdings:
-                    for explanation in self_holding.explain_contradiction(
+                    for explanation in self_holding.explanations_contradiction(
                         other_holding, context
                     ):
                         yield explanation
-        elif hasattr(other, "explain_contradiction"):
+        elif hasattr(other, "explanations_contradiction"):
             if context:
                 context = context.reversed()
-            yield from other.explain_contradiction(self, context=context)
+            yield from other.explanations_contradiction(self, context=context)
         else:
             raise TypeError(
                 f"'Contradicts' test not implemented for types {self.__class__} and {other.__class__}."
@@ -112,7 +126,7 @@ class Opinion:
             any holding of ``other`` if ``other`` is an :class:`.Opinion`.
         """
 
-        return any(self.explain_contradiction(other, context=context))
+        return any(self.explanations_contradiction(other, context=context))
 
     @property
     def generic_factors(self) -> List[Factor]:

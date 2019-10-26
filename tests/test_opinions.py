@@ -248,8 +248,7 @@ class TestContradiction:
     def test_explain_opinion_contradicting_holding(self, make_opinion_with_holding):
         oracle = make_opinion_with_holding["oracle_majority"]
         lotus = make_opinion_with_holding["lotus_majority"]
-        explanations = oracle.explain_contradiction(lotus.holdings[6])
-        explanation = next(explanations)
+        explanation = oracle.explain_contradiction(lotus.holdings[6])
         assert "an explanation" in str(explanation).lower()
 
     def test_contradiction_of_decision(
@@ -264,8 +263,7 @@ class TestContradiction:
     ):
         oracle_majority = make_opinion_with_holding["oracle_majority"]
         lotus = make_decision_with_holding["lotus"]
-        explanations = oracle_majority.explain_contradiction(lotus)
-        explanation = next(explanations)
+        explanation = oracle_majority.explain_contradiction(lotus)
         assert "an explanation" in str(explanation).lower()
 
     def test_error_contradiction_with_procedure(self, make_opinion, make_procedure):

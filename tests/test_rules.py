@@ -645,7 +645,9 @@ class TestAddition:
         inferred_holding = feist.holdings[3].inferred_from_exclusive[0]
         unoriginal_not_copyrightable = inferred_holding.rule
         listings_not_copyrightable = (
-            listings_not_original + make_enactment["copyright_requires_originality"] + unoriginal_not_copyrightable
+            listings_not_original
+            + make_enactment["copyright_requires_originality"]
+            + unoriginal_not_copyrightable
         )
         assert len(listings_not_copyrightable.inputs) == 1
         assert any(

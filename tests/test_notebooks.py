@@ -67,7 +67,7 @@ class TestIntroduction:
     def test_opinion_explain_contradiction(self, make_opinion_with_holding):
         oracle = make_opinion_with_holding["oracle_majority"]
         lotus = make_opinion_with_holding["lotus_majority"]
-        explanation = next(lotus.holdings[6].explain_contradiction(oracle.holdings[10]))
+        explanation = lotus.holdings[6].explain_contradiction(oracle.holdings[10])
         assert explanation.context == ContextRegister(
             {Entity("the Lotus menu command hierarchy"): Entity("the Java API")}
         )
@@ -79,7 +79,7 @@ class TestIntroduction:
     def test_register_string(self, make_opinion_with_holding):
         oracle = make_opinion_with_holding["oracle_majority"]
         lotus = make_opinion_with_holding["lotus_majority"]
-        explanation = next(lotus.holdings[6].explain_contradiction(oracle.holdings[10]))
+        explanation = lotus.holdings[6].explain_contradiction(oracle.holdings[10])
         string = "ContextRegister(<the Lotus menu command hierarchy> -> <the Java API>)"
         assert str(explanation.context) == string
 

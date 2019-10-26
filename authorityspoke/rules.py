@@ -10,7 +10,7 @@ from __future__ import annotations
 from itertools import chain
 import textwrap
 from typing import Any, ClassVar, Dict, Iterable, Iterator
-from typing import List, Optional, Tuple, Union
+from typing import List, Optional, Sequence, Tuple, Union
 
 from dataclasses import dataclass
 
@@ -68,8 +68,8 @@ class Rule(Factor):
     """
 
     procedure: Procedure
-    enactments: Iterable[Enactment] = ()
-    enactments_despite: Iterable[Enactment] = ()
+    enactments: Sequence[Enactment] = ()
+    enactments_despite: Sequence[Enactment] = ()
     mandatory: bool = False
     universal: bool = False
     generic: bool = False
@@ -197,7 +197,7 @@ class Rule(Factor):
             )
 
     @property
-    def context_factors(self) -> Tuple:
+    def context_factors(self) -> Sequence[Sequence[Factor]]:
         """
         Call :class:`Procedure`\'s :meth:`~Procedure.context_factors` method.
 
@@ -282,7 +282,7 @@ class Rule(Factor):
 
         return any(
             register is not None
-            for register in self.explain_contradiction(other, context)
+            for register in self.explanations_contradiction(other, context)
         )
 
     def evolve(self, changes: Union[str, Tuple[str, ...], Dict[str, Any]]) -> Rule:
@@ -305,7 +305,7 @@ class Rule(Factor):
         new_values = self._evolve_from_dict(changes)
         return self.__class__(**new_values)
 
-    def explain_contradiction(
+    def explanations_contradiction(
         self, other, context: Optional[ContextRegister] = None
     ) -> Iterator[ContextRegister]:
         """Find context matches that would result in a contradiction with other."""

@@ -99,17 +99,31 @@ class Decision:
 
     def explain_contradiction(
         self,
+        other: Union[Opinion, Holding, Rule],
+        context: Optional[ContextRegister] = None,
+    ) -> Optional[Explanation]:
+        explanations = self.explanations_contradiction(other, context=context)
+        try:
+            explanation = next(explanations)
+        except StopIteration:
+            return None
+        return explanation
+
+    def explanations_contradiction(
+        self,
         other: Union[Decision, Opinion, Holding, Rule],
         context: Optional[ContextRegister] = None,
     ) -> Iterator[Explanation]:
         if isinstance(other, Decision):
             if self.majority and other.majority:
-                yield from self.majority.explain_contradiction(
+                yield from self.majority.explanations_contradiction(
                     other.majority, context=context
                 )
         elif isinstance(other, (Rule, Holding, Opinion)):
             if self.majority:
-                yield from self.majority.explain_contradiction(other, context=context)
+                yield from self.majority.explanations_contradiction(
+                    other, context=context
+                )
         else:
             raise TypeError(
                 f"'Contradicts' test not implemented for types "

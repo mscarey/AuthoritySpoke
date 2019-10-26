@@ -166,7 +166,7 @@ class Factor(ABC):
         return list(generics)
 
     @property
-    def context_factors(self) -> Sequence[Optional[Factor]]:
+    def context_factors(self) -> Union[Sequence[Optional[Factor]], Sequence[Sequence[Factor]]]:
         r"""
         Get :class:`Factor`\s used in comparisons with other :class:`Factor`\s.
 
@@ -271,9 +271,9 @@ class Factor(ABC):
 
         if other is None:
             return False
-        return any(self.explain_contradiction(other, context))
+        return any(self.explanations_contradiction(other, context))
 
-    def explain_contradiction(
+    def explanations_contradiction(
         self, other: Factor, context: Optional[ContextRegister] = None
     ) -> Iterator[ContextRegister]:
         """
@@ -305,6 +305,15 @@ class Factor(ABC):
                 else:
                     test = other._contradicts_if_present(self, context.reversed())
                 yield from (register.reversed for register in test)
+
+    def explain_contradiction(self, other: Factor, context: Optional[ContextRegister] = None) -> Optional[ContextRegister]:
+        explanations = self.explanations_contradiction(other, context=context)
+        try:
+            explanation = next(explanations)
+        except StopIteration:
+            return None
+        return explanation
+
 
     def _evolve_attribute(self, changes: Dict[str, Any], attr_name: str) -> Dict[str, Any]:
         attr_dict = {}
@@ -487,7 +496,7 @@ class Factor(ABC):
         """
         valid = True
         for i, self_factor in enumerate(self.context_factors):
-            if not (self_factor is other.context_factors[i] is None):
+            if not self_factor is other.context_factors[i] is None:
                 if not (
                     self_factor and relation(self_factor, other.context_factors[i])
                 ):
