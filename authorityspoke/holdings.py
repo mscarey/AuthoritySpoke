@@ -149,6 +149,20 @@ class Holding(Factor):
             return self.add_holding(other)
         return self.evolve({"rule": self.rule + other})
 
+    def _explain_contradiction_of_holding(
+        self, other: Holding, context: ContextRegister
+    ) -> Iterator[Explanation]:
+        for self_holding in self.nonexclusive_holdings():
+            for other_holding in other.nonexclusive_holdings():
+                for register in self_holding.contradicts_if_not_exclusive(
+                    other_holding
+                ):
+                    yield Explanation(
+                        needs_match=self_holding,
+                        available=other_holding,
+                        context=register,
+                    )
+
     def explain_contradiction(
         self, other: Factor, context: ContextRegister = None
     ) -> Iterator[Explanation]:
@@ -172,17 +186,10 @@ class Holding(Factor):
         if isinstance(other, Rule):
             other = Holding(rule=other)
         if isinstance(other, self.__class__):
-            for self_holding in self.nonexclusive_holdings():
-                for other_holding in other.nonexclusive_holdings():
-                    for register in self_holding.contradicts_if_not_exclusive(
-                        other_holding
-                    ):
-                        yield Explanation(
-                            needs_match=self_holding,
-                            available=other_holding,
-                            context=register,
-                        )
-        elif not isinstance(other, Factor) and hasattr(other, "explain_contradiction"):
+            yield from self._explain_contradiction_of_holding(other, context)
+        elif isinstance(other, Factor):
+            yield from []  # no possible contradiction
+        elif hasattr(other, "explain_contradiction"):
             if context:
                 context = context.reversed()
             yield from other.explain_contradiction(self, context=context)
@@ -230,8 +237,6 @@ class Holding(Factor):
         """
         if context is None:
             context = ContextRegister()
-        if other.__class__.__name__ == "Opinion":
-            return other.contradicts(self, context.reversed())
         return any(self.explain_contradiction(other, context))
 
     def explain_implication(

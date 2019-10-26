@@ -244,7 +244,12 @@ class TestContradiction:
     def test_holding_contradicts_opinion(self, make_opinion_with_holding):
         oracle = make_opinion_with_holding["oracle_majority"]
         lotus = make_opinion_with_holding["lotus_majority"]
-        assert lotus.holdings[6].contradicts(oracle)
+        assert lotus.holdings[6].contradicts(
+            oracle,
+            context=ContextRegister(
+                {Entity("the Lotus menu command hierarchy"): Entity("the Java API")}
+            ),
+        )
 
     def test_explain_holding_contradicting_opinion(self, make_opinion_with_holding):
         oracle = make_opinion_with_holding["oracle_majority"]
@@ -252,6 +257,14 @@ class TestContradiction:
         explanations = lotus.holdings[6].explain_contradiction(oracle)
         explanation = next(explanations)
         assert "an explanation" in str(explanation).lower()
+
+    def test_holding_does_not_contradict_fact(self, make_holding, watt_factor):
+        assert not make_holding["h1"].contradicts(watt_factor["f1"])
+        assert not watt_factor["f1"].contradicts(make_holding["h1"])
+
+    def test_error_no_contradiction_test(self, make_holding):
+        with pytest.raises(TypeError):
+            _ = make_holding["h1"].contradicts(ContextRegister({}))
 
 
 class TestAddition:
