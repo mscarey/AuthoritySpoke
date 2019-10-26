@@ -706,6 +706,14 @@ class TestUnion:
         assert len(new_rule.outputs) == 1
         assert len(new_rule.enactments) == 4
 
+    def test_union_of_rule_and_holding(self, make_opinion_with_holding):
+        feist = make_opinion_with_holding["feist_majority"]
+        new_holding = feist.holdings[0].rule | feist.holdings[2]
+        assert isinstance(new_holding, Holding)
+        assert len(new_holding.inputs) == 2
+        assert len(new_holding.outputs) == 1
+        assert len(new_holding.enactments) == 4
+
     def test_union_longer(self, make_opinion_with_holding):
         feist = make_opinion_with_holding["feist_majority"]
         new_rule = feist.holdings[4].rule | feist.holdings[6].rule

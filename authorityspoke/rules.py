@@ -462,6 +462,52 @@ class Rule(Factor):
         """
         return any(self.explain_same_meaning(other, context))
 
+    def _union_with_rule(self, other: Rule, context: ContextRegister) -> Optional[Rule]:
+        new_procedure = self.procedure.union(other.procedure, context=context)
+        if new_procedure is None:
+            return None
+
+        enactments = consolidate_enactments(
+            list(self.enactments) + list(other.enactments)
+        )
+        enactments_despite = consolidate_enactments(
+            list(self.enactments_despite) + list(other.enactments_despite)
+        )
+
+        if self.procedure.implies_all_to_all(
+            other.procedure, context=context
+        ) or other.procedure.implies_all_to_all(self.procedure, context=context):
+            return Rule(
+                procedure=new_procedure,
+                enactments=enactments,
+                enactments_despite=enactments_despite,
+                mandatory=max(self.mandatory, other.mandatory),
+                universal=max(self.universal, other.universal),
+            )
+
+        if self.universal is other.universal is False:
+            return None
+
+        return Rule(
+            procedure=new_procedure,
+            enactments=enactments,
+            enactments_despite=enactments_despite,
+            mandatory=min(self.mandatory, other.mandatory),
+            universal=min(self.universal, other.universal),
+        )
+
+    def union(
+        self, other: Optional[Rule], context: Optional[ContextRegister] = None
+    ) -> Optional[Rule]:
+        if other is None:
+            return self
+        context = context or ContextRegister()
+        if isinstance(other, Rule):
+            return self._union_with_rule(other, context=context)
+        elif hasattr(other, "union") and hasattr(other, "rule"):
+            return other.union(self, context=context.reversed())
+        raise TypeError
+
     def __or__(self, other: Rule) -> Optional[Rule]:
         r"""
         Create new :class:`Rule` showing combined effect of all inputs of ``self`` and ``other``.
@@ -483,45 +529,7 @@ class Rule(Factor):
             a :class:`Rule` indicating the combined effect of the ``input`` and ``despite``
             :class:`.Factor`\s of ``self`` and ``other``
         """
-
-        if other is None:
-            return self
-
-        if not isinstance(other, Rule):
-            raise TypeError
-
-        new_procedure = self.procedure | other.procedure
-        if new_procedure is None:
-            return None
-
-        enactments = consolidate_enactments(
-            list(self.enactments) + list(other.enactments)
-        )
-        enactments_despite = consolidate_enactments(
-            list(self.enactments_despite) + list(other.enactments_despite)
-        )
-
-        if self.procedure.implies_all_to_all(
-            other.procedure
-        ) or other.procedure.implies_all_to_all(self.procedure):
-            return Rule(
-                procedure=new_procedure,
-                enactments=enactments,
-                enactments_despite=enactments_despite,
-                mandatory=max(self.mandatory, other.mandatory),
-                universal=max(self.universal, other.universal),
-            )
-
-        if self.universal is other.universal is False:
-            return None
-
-        return Rule(
-            procedure=new_procedure,
-            enactments=enactments,
-            enactments_despite=enactments_despite,
-            mandatory=min(self.mandatory, other.mandatory),
-            universal=min(self.universal, other.universal),
-        )
+        return self.union(other)
 
     def own_attributes(self) -> Dict[str, Any]:
         """

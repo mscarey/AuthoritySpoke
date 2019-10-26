@@ -434,11 +434,13 @@ class Holding(Factor):
             return [self]
         return [self.evolve("exclusive")] + self.inferred_from_exclusive
 
-    def union_if_not_exclusive(self, other: Holding) -> Optional[Holding]:
+    def _union_if_not_exclusive(
+        self, other: Holding, context: ContextRegister
+    ) -> Optional[Holding]:
         if self.decided is other.decided is False:
-            if self.rule >= other.rule:
+            if self.rule.implies(other.rule, context=context):
                 return other
-            if other.rule >= self.rule:
+            if other.rule.implies(self.rule, context=context.reversed()):
                 return self
             return None
 
@@ -457,22 +459,35 @@ class Holding(Factor):
                 "that assert a Rule is not valid."
             )
 
-        new_rule = self.rule | other.rule
+        new_rule = self.rule.union(other.rule, context=context)
         if not new_rule:
             return None
         return self.evolve({"rule": new_rule, "exclusive": False})
 
-    def __or__(self, other: Union[Rule, Holding]) -> Optional[Holding]:
-        if isinstance(other, Rule):
-            return self | Holding(rule=other)
-        if not isinstance(other, Holding):
-            raise TypeError
+    def _union_with_holding(
+        self, other: Holding, context: ContextRegister
+    ) -> Optional[Holding]:
         for self_holding in self.nonexclusive_holdings():
             for other_holding in other.nonexclusive_holdings():
-                united = self_holding.union_if_not_exclusive(other_holding)
+                united = self_holding._union_if_not_exclusive(
+                    other_holding, context=context
+                )
                 if united is not None:
                     return united
         return None
+
+    def union(
+        self, other: Union[Rule, Holding], context: Optional[ContextRegister] = None
+    ) -> Optional[Holding]:
+        context = context or ContextRegister()
+        if isinstance(other, Rule):
+            other = Holding(rule=other)
+        if not isinstance(other, Holding):
+            raise TypeError
+        return self._union_with_holding(other, context=context)
+
+    def __or__(self, other: Union[Rule, Holding]) -> Optional[Holding]:
+        return self.union(other)
 
     def own_attributes(self) -> Dict[str, Any]:
         """
