@@ -232,7 +232,9 @@ class Procedure(Factor):
             # generic Factors appear in the new outputs.
             # Wouldn't it have been better to get just one match with a generator?
             triggered_rule = other.new_context(matchlist[0])
-            return self.evolve({"outputs": (*self.outputs, *triggered_rule.outputs)})
+            new_outputs = [*self.outputs, *triggered_rule.outputs]
+            unique_new_outputs = tuple({key: None for key in new_outputs})
+            return self.evolve({"outputs": unique_new_outputs})
         return None
 
     @use_likely_context

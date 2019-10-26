@@ -254,6 +254,29 @@ class TestContradiction:
         assert "an explanation" in str(explanation).lower()
 
 
+class TestAddition:
+    def test_adding_same_ALL_holdings_results_in_same(self, make_opinion_with_holding):
+        brad = make_opinion_with_holding["brad_majority"]
+        assert brad.holdings[0] + brad.holdings[0] == brad.holdings[0]
+
+    def test_adding_same_SOME_holdings_results_in_None(self, make_opinion_with_holding):
+        watt = make_opinion_with_holding["watt_majority"]
+        assert watt.holdings[0] + watt.holdings[0] is None
+
+    def test_add_rule_to_holding(self, make_opinion_with_holding):
+        watt = make_opinion_with_holding["brad_majority"]
+        added = []
+        for left in watt.holdings:
+            for right in watt.holdings:
+                try:
+                    new = left + right
+                    if new:
+                        added.append((left, right, new))
+                except NotImplementedError:
+                    pass
+        assert added
+
+
 class TestUnion:
     def test_union_neither_universal(self, make_opinion_with_holding):
         feist = make_opinion_with_holding["feist_majority"]

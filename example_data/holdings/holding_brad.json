@@ -1,5 +1,7 @@
-[{
-        "inputs": [{
+[
+    {
+        "inputs": [
+            {
                 "type": "fact",
                 "content": "{officers' search of the yard} was a warrantless search and seizure"
             },
@@ -38,14 +40,17 @@
             {
                 "type": "fact",
                 "content": "{} was derived from {}",
-                "context_factors": [{
-                    "type": "exhibit",
-                    "name": "proof of Bradley's guilt",
-                    "generic": true
-                }, {
-                    "type": "entity",
-                    "name": "officers' search of the yard"
-                }]
+                "context_factors": [
+                    {
+                        "type": "exhibit",
+                        "name": "proof of Bradley's guilt",
+                        "generic": true
+                    },
+                    {
+                        "type": "entity",
+                        "name": "officers' search of the yard"
+                    }
+                ]
             }
         ],
         "outputs": {
@@ -56,10 +61,11 @@
                 "name": "fact that Bradley committed a crime",
                 "content": "Bradley committed a crime"
             },
-            "name": "evidence of Bradley's guilt",
+            "name": "absence of evidence of Bradley's guilt",
             "absent": true
         },
-        "enactments": [{
+        "enactments": [
+            {
                 "source": "/us/const/amendment-IV",
                 "suffix": ", and no Warrants shall issue",
                 "name": "search clause"
@@ -75,7 +81,8 @@
         "universal": true
     },
     {
-        "inputs": [{
+        "inputs": [
+            {
                 "type": "fact",
                 "content": "officers' search of the yard was a warrantless search and seizure"
             },
@@ -117,20 +124,18 @@
             "content": "Bradley exhibited an expectation of privacy in Bradley's marijuana patch",
             "truth": false
         },
-        "outputs": {
-            "type": "evidence",
-            "exhibit": "proof of Bradley's guilt",
-            "to_effect": "fact that Bradley committed a crime",
-            "name": "evidence of Bradley's guilt",
-            "absent": true
-        },
-        "enactments": ["search clause", "due process clause"],
+        "outputs": "absence of evidence of Bradley's guilt",
+        "enactments": [
+            "search clause",
+            "due process clause"
+        ],
         "mandatory": true,
         "universal": true,
         "rule_valid": false
     },
     {
-        "inputs": [{
+        "inputs": [
+            {
                 "type": "fact",
                 "content": "officers' search of the yard was a warrantless search and seizure"
             },
@@ -150,7 +155,6 @@
                 "type": "fact",
                 "content": "officers' search of the yard was performed in the grounds around Bradley's house"
             },
-
             {
                 "type": "fact",
                 "content": "Bradley exhibited an expectation of privacy in Bradley's marijuana patch"
@@ -173,20 +177,18 @@
             "content": "it was reasonable for Bradley to hold an expectation of privacy in Bradley's marijuana patch",
             "truth": false
         },
-        "outputs": {
-            "type": "evidence",
-            "exhibit": "proof of Bradley's guilt",
-            "to_effect": "fact that Bradley committed a crime",
-            "name": "evidence of Bradley's guilt",
-            "absent": true
-        },
-        "enactments": ["search clause", "due process clause"],
+        "outputs": "absence of evidence of Bradley's guilt",
+        "enactments": [
+            "search clause",
+            "due process clause"
+        ],
         "mandatory": true,
         "universal": true,
         "rule_valid": false
     },
     {
-        "inputs": [{
+        "inputs": [
+            {
                 "type": "fact",
                 "content": "officers' search of the yard was a warrantless search and seizure"
             },
@@ -198,7 +200,6 @@
                 "type": "fact",
                 "content": "Bradley lived at Bradley's house"
             },
-
             {
                 "type": "fact",
                 "content": "officers' search of the yard was performed by law enforcement officers"
@@ -229,20 +230,18 @@
             "content": "officers' search of the yard violated Bradley's expectation of privacy in Bradley's marijuana patch",
             "truth": false
         },
-        "outputs": {
-            "type": "evidence",
-            "exhibit": "proof of Bradley's guilt",
-            "to_effect": "fact that Bradley committed a crime",
-            "name": "evidence of Bradley's guilt",
-            "absent": true
-        },
-        "enactments": ["search clause", "due process clause"],
+        "outputs": "absence of evidence of Bradley's guilt",
+        "enactments": [
+            "search clause",
+            "due process clause"
+        ],
         "mandatory": true,
         "universal": true,
         "rule_valid": false
     },
     {
-        "inputs": [{
+        "inputs": [
+            {
                 "type": "fact",
                 "content": "officers' search of the yard was a warrantless search and seizure"
             },
@@ -254,7 +253,6 @@
                 "type": "fact",
                 "content": "Bradley lived at Bradley's house"
             },
-
             {
                 "type": "fact",
                 "content": "officers' search of the yard was performed by law enforcement officers"
@@ -285,20 +283,18 @@
             "content": "officers' search of the yard was an unreasonable governmental intrusion upon Bradley's marijuana patch",
             "truth": false
         },
-        "outputs": {
-            "type": "evidence",
-            "exhibit": "proof of Bradley's guilt",
-            "to_effect": "fact that Bradley committed a crime",
-            "name": "evidence of Bradley's guilt",
-            "absent": true
-        },
-        "enactments": ["search clause", "due process clause"],
+        "outputs": "absence of evidence of Bradley's guilt",
+        "enactments": [
+            "search clause",
+            "due process clause"
+        ],
         "mandatory": true,
         "universal": true,
         "rule_valid": false
     },
     {
-        "inputs": [{
+        "inputs": [
+            {
                 "type": "fact",
                 "content": "the number of marijuana plants in Bradley's marijuana patch was >= 3"
             },
@@ -306,7 +302,6 @@
                 "type": "fact",
                 "content": "Bradley's marijuana patch was in a yard accessible from a house that did not belong to Bradley"
             },
-
             {
                 "type": "fact",
                 "content": "Bradley's marijuana patch was entirely hidden by foliage",
@@ -332,7 +327,6 @@
             }
         ],
         "despite": [
-
             {
                 "type": "fact",
                 "content": "Bradley's house was a house"
@@ -344,22 +338,26 @@
             {
                 "type": "fact",
                 "content": "Bradley's marijuana patch was partially hidden by foliage"
-            }, {
+            },
+            {
                 "type": "fact",
                 "content": "Bradley's marijuana patch was in the fenced rear yard of Bradley's house"
             }
-
         ],
         "outputs": {
             "type": "fact",
             "content": "Bradley exhibited an expectation of privacy in Bradley's marijuana patch",
             "truth": false
         },
-        "enactments": ["search clause", "due process clause"],
+        "enactments": [
+            "search clause",
+            "due process clause"
+        ],
         "mandatory": true
     },
     {
-        "inputs": [{
+        "inputs": [
+            {
                 "type": "fact",
                 "content": "the number of marijuana plants in Bradley's marijuana patch was >= 3"
             },
@@ -367,7 +365,6 @@
                 "type": "fact",
                 "content": "Bradley's marijuana patch was in a yard accessible from a house that did not belong to Bradley"
             },
-
             {
                 "type": "fact",
                 "content": "Bradley's marijuana patch was entirely hidden by foliage",
@@ -393,7 +390,6 @@
             }
         ],
         "despite": [
-
             {
                 "type": "fact",
                 "content": "Bradley's house was a house"
@@ -405,7 +401,8 @@
             {
                 "type": "fact",
                 "content": "Bradley's marijuana patch was partially hidden by foliage"
-            }, {
+            },
+            {
                 "type": "fact",
                 "content": "Bradley's marijuana patch was in the fenced rear yard of Bradley's house"
             }
@@ -415,7 +412,10 @@
             "content": "it was reasonable for Bradley to exhibit an expectation of privacy in Bradley's marijuana patch",
             "truth": false
         },
-        "enactments": ["search clause", "due process clause"],
+        "enactments": [
+            "search clause",
+            "due process clause"
+        ],
         "mandatory": true
     }
 ]

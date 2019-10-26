@@ -120,17 +120,6 @@ class Holding(Factor):
         """
         return self.rule.generic_factors
 
-    def add_rule(self, other: Rule) -> Optional[Rule]:
-        if not self.rule_valid:
-            raise NotImplementedError(
-                "Adding is not implemented for Holdings that assert a Rule is not valid."
-            )
-        if not self.decided:
-            raise NotImplementedError(
-                "Adding is not implemented for Holdings that assert a Rule is not decided."
-            )
-        return self.rule + other
-
     def add_if_not_exclusive(self, other: Holding) -> Optional[Holding]:
         new_rule = self.rule + other.rule
         if new_rule is None:
@@ -155,8 +144,8 @@ class Holding(Factor):
 
     def __add__(self, other: Factor) -> Optional[Union[Rule, Holding]]:
         if isinstance(other, Rule):
-            return self.add_rule(other)
-        elif isinstance(other, Holding):
+            other = Holding(rule=other)
+        if isinstance(other, Holding):
             return self.add_holding(other)
         return self.evolve({"rule": self.rule + other})
 
