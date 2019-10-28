@@ -100,18 +100,19 @@ class Fact(Factor):
             )
 
     def __str__(self):
-        text = str(self.predicate.content_with_entities(self.context_factors))
+        unwrapped = str(self.predicate.content_with_entities(self.context_factors))
+        text = wrapped(super().__str__().format(unwrapped))
         if self.standard_of_proof:
-            text += f"\n  by the STANDARD {self.standard_of_proof}"
+            text += f"\n" + indented("by the STANDARD {self.standard_of_proof}")
         concrete_context = [
             factor for factor in self.context_factors if not factor.generic
         ]
         if any(concrete_context) and not self.generic:
-            text += f"\n  SPECIFIC CONTEXT:"
+            text += f"\n" + indented("SPECIFIC CONTEXT:")
             for factor in concrete_context:
                 factor_text = indented(str(factor), tabs=2)
                 text += f"\n{str(factor_text)}"
-        return super().__str__().format(text)
+        return text
 
     @property
     def short_string(self):
