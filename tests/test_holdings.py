@@ -8,8 +8,16 @@ from authorityspoke.holdings import Holding
 class TestHolding:
     def test_complex_string(self, make_complex_rule):
         holding = Holding(make_complex_rule["accept_murder_fact_from_relevance"])
-        string = str(holding)
-        assert "is relevant to show the fact that <Alice>" in string
+        string = " ".join([x.strip() for x in str(holding).splitlines()])
+        assert "is relevant to show the fact that <Alice>" in string.replace("/n", " ")
+
+    def test_string_indentation(self, make_opinion_with_holding):
+        """
+        Test that the text of an Evidence string is indented even
+        when it appears in a Holding.
+        """
+        lotus = make_opinion_with_holding["lotus_majority"]
+        assert "    OF:\n" in str(lotus.holdings[2])
 
     def test_infer_from_exclusive(self, make_opinion_with_holding):
         """

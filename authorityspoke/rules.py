@@ -557,14 +557,14 @@ class Rule(Factor):
                 text += "S"
             text += ":"
             for enactment in self.enactments:
-                text += "\n  " + textwrap.indent(str(enactment), prefix=indent)
+                text += "\n" + self.indented_block(str(enactment), 4)
         if self.enactments_despite:
             text += f"\n  DESPITE the ENACTMENT"
             if len(self.enactments_despite) > 1:
                 text += "S"
             text += ":"
             for despite in self.enactments_despite:
-                text += "\n  " + textwrap.indent(str(despite), prefix=indent)
+                text += "\n" + self.indented_block(str(despite), 4)
         return text
 
 

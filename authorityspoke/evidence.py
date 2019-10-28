@@ -84,11 +84,11 @@ class Evidence(Factor):
         text = ""
         if self.exhibit:
             text += f"\n  OF:"
-            factor_text = textwrap.indent(str(self.exhibit), prefix="    ")
+            factor_text = self.indented_block(str(self.exhibit), 4)
             text += f"\n{str(factor_text)}"
         if self.to_effect:
             text += f"\n  INDICATING:"
-            factor_text = textwrap.indent(str(self.to_effect), prefix="    ")
+            factor_text = self.indented_block(str(self.to_effect), 4)
             text += f"\n{str(factor_text)}"
         return super().__str__().format(text).strip()
 

@@ -303,18 +303,18 @@ class Procedure(Factor):
         return text
 
     def __str__(self):
-        indent = "  "
+
         text = "RESULT:"
         for f in self.outputs:
-            text += "\n" + textwrap.indent(str(f), prefix=indent)
+            text += "\n" + self.indented_block(str(f))
         if self.inputs:
             text += "\nGIVEN:"
             for f in self.inputs:
-                text += "\n" + textwrap.indent(str(f), prefix=indent)
+                text += "\n" + self.indented_block(str(f))
         if self.despite:
             text += "\nDESPITE:"
             for f in self.despite:
-                text += "\n" + textwrap.indent(str(f), prefix=indent)
+                text += "\n" + self.indented_block(str(f))
 
         return text
 

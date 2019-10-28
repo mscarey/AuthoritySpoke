@@ -617,6 +617,11 @@ class Factor(ABC):
 
         return textwrap.fill(text, initial_indent="", subsequent_indent="  ")
 
+    @staticmethod
+    def indented_block(text: str, spaces: int = 2) -> str:
+        indent = " " * spaces
+        return textwrap.indent(textwrap.fill(text, width=80), prefix=indent)
+
     @property
     def short_string(self):
         """Use the regular string method unless otherwise specified."""

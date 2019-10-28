@@ -521,5 +521,8 @@ class Holding(Factor):
             else ""
         )
         rule_text = textwrap.indent(str(self.rule), prefix=indent)
-        text = f"the Holding to {action}{exclusive}\n{rule_text}"
+        text = (
+            textwrap.fill(f"the Holding to {action}{exclusive}", width=80)
+            + f"\n{rule_text}"
+        )
         return text
