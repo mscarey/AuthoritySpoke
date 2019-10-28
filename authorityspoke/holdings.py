@@ -20,6 +20,7 @@ from dataclasses import dataclass
 
 from authorityspoke.explanations import Explanation
 from authorityspoke.factors import Factor, ContextRegister, new_context_helper
+from authorityspoke.formatting import indented, wrapped
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
 
@@ -506,7 +507,6 @@ class Holding(Factor):
         return attrs
 
     def __str__(self):
-        indent = "  "
         action = (
             "consider UNDECIDED"
             if not self.decided
@@ -520,9 +520,6 @@ class Holding(Factor):
             if self.exclusive
             else ""
         )
-        rule_text = textwrap.indent(str(self.rule), prefix=indent)
-        text = (
-            textwrap.fill(f"the Holding to {action}{exclusive}", width=80)
-            + f"\n{rule_text}"
-        )
+        rule_text = indented(str(self.rule))
+        text = wrapped(f"the Holding to {action}{exclusive}") + f"\n{rule_text}"
         return text

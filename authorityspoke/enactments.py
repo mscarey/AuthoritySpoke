@@ -14,6 +14,7 @@ from bs4 import BeautifulSoup
 from utils.cache import lazyprop
 from utils.roman import from_roman
 
+from authorityspoke.formatting import indented, wrapped
 from authorityspoke.selectors import TextQuoteSelector
 
 
@@ -570,7 +571,7 @@ class Enactment:
         )
 
     def __str__(self):
-        return f'"{self.text}" ({self.code.title}, {self.source})'
+        return wrapped(f'"{self.text}" ({self.code.title}, {self.source})')
 
     def __ge__(self, other):
         """

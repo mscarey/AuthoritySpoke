@@ -9,7 +9,6 @@ from __future__ import annotations
 
 import functools
 import operator
-import textwrap
 
 from typing import Callable, ClassVar, Iterator, List, Optional, Tuple
 
@@ -17,6 +16,7 @@ from dataclasses import dataclass
 
 from authorityspoke.factors import Factor, ContextRegister, new_context_helper
 from authorityspoke.factors import Analogy, all_analogy_matches, means
+from authorityspoke.formatting import indented, wrapped
 
 
 def find_less_specific_context(
@@ -306,15 +306,15 @@ class Procedure(Factor):
 
         text = "RESULT:"
         for f in self.outputs:
-            text += "\n" + self.indented_block(str(f))
+            text += "\n" + indented(str(f))
         if self.inputs:
             text += "\nGIVEN:"
             for f in self.inputs:
-                text += "\n" + self.indented_block(str(f))
+                text += "\n" + indented(str(f))
         if self.despite:
             text += "\nDESPITE:"
             for f in self.despite:
-                text += "\n" + self.indented_block(str(f))
+                text += "\n" + indented(str(f))
 
         return text
 

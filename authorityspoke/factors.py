@@ -8,7 +8,6 @@ import functools
 from itertools import zip_longest
 import logging
 import operator
-import textwrap
 from typing import Any, Callable, Dict, Iterable, Iterator, List
 from typing import Optional, Sequence, Tuple, Union
 
@@ -615,12 +614,8 @@ class Factor(ABC):
         if self.absent:
             text = "absence of " + text
 
-        return textwrap.fill(text, initial_indent="", subsequent_indent="  ")
+        return text
 
-    @staticmethod
-    def indented_block(text: str, spaces: int = 2) -> str:
-        indent = " " * spaces
-        return textwrap.indent(textwrap.fill(text, width=80), prefix=indent)
 
     @property
     def short_string(self):

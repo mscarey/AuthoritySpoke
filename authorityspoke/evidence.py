@@ -1,12 +1,12 @@
 r""":class:`.Factor`\s used to support :class:`.Fact` findings."""
 from dataclasses import dataclass
 
-import textwrap
 from typing import ClassVar, Iterator, Optional
 
 from authorityspoke.entities import Entity
 from authorityspoke.factors import ContextRegister, Factor
 from authorityspoke.facts import Fact
+from authorityspoke.formatting import indented, wrapped
 
 
 @dataclass(frozen=True)
@@ -61,10 +61,10 @@ class Exhibit(Factor):
         if self.form:
             text += f"in the FORM of {self.form}"
         if self.stated_by:
-            text += f"\n  STATED BY {str(self.stated_by)}"
+            text += f"\n" + indented(f"STATED BY {str(self.stated_by)}")
         if self.statement:
-            text += f"\n  ASSERTING:"
-            factor_text = textwrap.indent(str(self.statement), prefix="    ")
+            text += f"\n" + indented(f"ASSERTING:")
+            factor_text = indented(str(self.statement), tabs=2)
             text += f"\n{str(factor_text)}"
         return super().__str__().format(text)
 
@@ -83,12 +83,12 @@ class Evidence(Factor):
     def __str__(self):
         text = ""
         if self.exhibit:
-            text += f"\n  OF:"
-            factor_text = self.indented_block(str(self.exhibit), 4)
+            text += f"\n" + indented("OF:")
+            factor_text = indented(str(self.exhibit), tabs=2)
             text += f"\n{str(factor_text)}"
         if self.to_effect:
-            text += f"\n  INDICATING:"
-            factor_text = self.indented_block(str(self.to_effect), 4)
+            text += f"\n" + indented("INDICATING:")
+            factor_text = indented(str(self.to_effect), tabs=2)
             text += f"\n{str(factor_text)}"
         return super().__str__().format(text).strip()
 

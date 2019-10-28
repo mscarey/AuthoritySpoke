@@ -6,6 +6,7 @@ from typing import ClassVar, Optional
 from authorityspoke.entities import Entity
 from authorityspoke.factors import Factor
 from authorityspoke.facts import Fact
+from authorityspoke.formatting import indented, wrapped
 
 
 @dataclass(frozen=True)
@@ -46,12 +47,12 @@ class Allegation(Factor):
     def __str__(self):
         text = ""
         if self.statement:
-            text += f"\n  OF:"
-            factor_text = textwrap.indent(str(self.statement), prefix="    ")
+            text += f"\n" + indented("OF:")
+            factor_text = indented(str(self.statement), tabs=2)
             text += f"\n{str(factor_text)}"
         if self.pleading:
-            text += f"\n  FOUND IN:"
-            factor_text = textwrap.indent(str(self.pleading), prefix="    ")
+            text += f"\n" + indented("FOUND IN:")
+            factor_text = indented(str(self.pleading), tabs=2)
             text += f"\n{str(factor_text)}"
         return super().__str__().format(text).strip()
 

@@ -8,7 +8,6 @@ may describe procedural moves available in litigation.
 from __future__ import annotations
 
 from itertools import chain
-import textwrap
 from typing import Any, ClassVar, Dict, Iterable, Iterator
 from typing import List, Optional, Sequence, Tuple, Union
 
@@ -16,6 +15,7 @@ from dataclasses import dataclass
 
 from authorityspoke.enactments import Enactment, consolidate_enactments
 from authorityspoke.factors import Factor, ContextRegister
+from authorityspoke.formatting import indented, wrapped
 from authorityspoke.procedures import Procedure
 
 
@@ -544,12 +544,11 @@ class Rule(Factor):
         return attrs
 
     def __str__(self):
-        indent = "  "
         mandatory = "MUST" if self.mandatory else "MAY"
         universal = "ALWAYS" if self.universal else "SOMETIMES"
         text = (
             f"the Rule that the court {mandatory} {universal} impose the\n"
-            + textwrap.indent(str(self.procedure), prefix=indent)
+            + indented(str(self.procedure))
         )
         if self.enactments:
             text += f"\n  GIVEN the ENACTMENT"
@@ -557,14 +556,14 @@ class Rule(Factor):
                 text += "S"
             text += ":"
             for enactment in self.enactments:
-                text += "\n" + self.indented_block(str(enactment), 4)
+                text += "\n" + indented(str(enactment), tabs=2)
         if self.enactments_despite:
             text += f"\n  DESPITE the ENACTMENT"
             if len(self.enactments_despite) > 1:
                 text += "S"
             text += ":"
             for despite in self.enactments_despite:
-                text += "\n" + self.indented_block(str(despite), 4)
+                text += "\n" + indented(str(despite), tabs=2)
         return text
 
 
