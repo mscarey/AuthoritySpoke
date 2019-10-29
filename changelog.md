@@ -8,6 +8,8 @@ Dev
 - Add data serialization using Marshmallow
 - Migrate JSON data loading functions to Marshmallow
 - Add Decision class containing Opinions
+- Add Explanation class to clarify relationships between Holdings
+- Improve readability of object strings
 
 0.2.0 (2019-09-24)
 ------------------

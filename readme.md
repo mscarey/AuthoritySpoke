@@ -126,7 +126,7 @@ is that <the Lotus menu command hierarchy> is like <the Java API>
 
 ## Learning about AuthoritySpoke
 
-You can find the example above and much more information about using the AuthoritySpoke Python package in the [Introduction to AuthoritySpoke Jupyter notebook](notebooks/introduction.ipynb).
+You can find the example above and much more information about using AuthoritySpoke in the [Introduction to AuthoritySpoke](notebooks/introduction.ipynb) Jupyter notebook.
 
 Use the button below to interact with the notebook online through Binder. If you use Binder, you'll be shown the directory structure of this repo. Navigate to the `notebooks` folder to find the tutorials.
 

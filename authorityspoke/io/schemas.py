@@ -373,19 +373,20 @@ class FactSchema(ExpandableSchema):
         placeholder: str = "{}",
     ) -> Tuple[str, List[Dict]]:
         r"""
-        Retrieve known context :class:`Factor`\s for new :class:`Fact`.
+        Retrieve known context :class:`.Factor`\s for new :class:`.Fact`\.
+
         :param content:
-            the content for the :class:`Fact`\'s :class:`Predicate`.
+            the content for the :class:`.Fact`\'s :class:`.Predicate`
         :param mentioned:
-            list of :class:`Factor`\s with names that could be
+            list of :class:`.Factor`\s with names that could be
             referenced in content
         :param placeholder:
             a string to replace the names of
-            referenced :class:`Factor`\s in content
+            referenced :class:`.Factor`\s in content
         :returns:
-            the content string with any referenced :class:`Factor`\s
+            the content string with any referenced :class:`.Factor`\s
             replaced by placeholder, and a list of referenced
-            :class:`Factor`\s in the order they appeared in content.
+            :class:`.Factor`\s in the order they appeared in content.
         """
         mentioned = self.context.get("mentioned") or Mentioned({})
         context_factors = context_factors or []
