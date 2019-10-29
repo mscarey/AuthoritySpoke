@@ -8,6 +8,7 @@ import functools
 from itertools import zip_longest
 import logging
 import operator
+import textwrap
 from typing import Any, Callable, Dict, Iterable, Iterator, List
 from typing import Optional, Sequence, Tuple, Union
 
@@ -617,10 +618,14 @@ class Factor(ABC):
         return text
 
 
+
     @property
-    def short_string(self):
-        """Use the regular string method unless otherwise specified."""
-        return str(self)
+    def short_string(self) -> str:
+        """
+        Return string representation without line breaks.
+        """
+        return textwrap.shorten(str(self), width=5000, placeholder="...")
+
 
     def update_context_register(
         self, other: Optional[Factor], register: ContextRegister, comparison: Callable

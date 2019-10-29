@@ -426,7 +426,7 @@ class TestTextAnchors:
         to_read = load_holdings("holding_brad.json")
         holdings = readers.read_holdings(to_read, regime=make_regime)
         brad.posit(holdings)
-        assert "warrantless search and seizure" in str(list(brad.holdings)[0])
+        assert "warrantless search and seizure" in brad.holdings[0].short_string
 
     def test_opinion_posits_holding_tuple_context(
         self, make_opinion, make_regime, make_entity
@@ -442,7 +442,7 @@ class TestTextAnchors:
         )
         watt = make_opinion["watt_majority"]
         watt.posit(context_holding)
-        holding_string = str(list(watt.holdings)[-1])
+        holding_string = watt.holdings[-1].short_string
         assert (
             "the number of marijuana plants in <the stockpile of trees> was at least 3"
             in holding_string
@@ -486,7 +486,7 @@ class TestTextAnchors:
         context_change = expectation_not_reasonable.new_context(
             {generic_patch: make_entity["trees_specific"]}
         )
-        string = str(context_change)
+        string = context_change.short_string
         assert "plants in the stockpile of trees was at least 3" in string
 
     def test_error_because_string_does_not_match_factor_name(self, make_regime):

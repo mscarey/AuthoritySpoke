@@ -651,10 +651,12 @@ class TestAddition:
         )
         assert len(listings_not_copyrightable.inputs) == 1
         assert any(
-            str(out) == "absence of the Fact that <Rural's telephone listings> were copyrightable"
+            out.short_string == (
+            "absence of the fact that <Rural's telephone listings> were copyrightable"
+            )
             for out in listings_not_copyrightable.outputs
         )
-        assert str(listings_not_copyrightable).count("in accordance with this title") == 1
+        assert listings_not_copyrightable.short_string.count("in accordance with this title") == 1
 
     def test_add_some_plus_some_makes_none(self, make_complex_rule):
         """The rules can't be added because they both have universal==False"""
@@ -783,7 +785,7 @@ class TestUnion:
         # nothing can be inferred by their union.
         lotus_4 = lotus.holdings[2].rule.evolve("universal")
         new = lotus_4 | oracle.holdings[2].rule
-        assert "<the Lotus menu command hierarchy> was the expression of an idea" in str(new)
+        assert "<the Lotus menu command hierarchy> was the expression of an idea" in new.short_string
         assert new.mandatory is False
 
     def test_union_one_generic_not_matched(self, make_opinion_with_holding):
@@ -801,7 +803,7 @@ class TestUnion:
         text = (
             "that <the Lotus menu command hierarchy> was a "
             "literal element of <Lotus 1-2-3>")
-        assert text in str(new)
+        assert text in new.short_string
 
     def test_union_returns_universal(self, make_rule):
         """

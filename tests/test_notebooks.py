@@ -112,14 +112,14 @@ class TestIntroduction:
             listings_not_original + unoriginal_not_copyrightable
         )
         not_copyrightable = unoriginal_not_copyrightable.outputs[0]
-        assert str(listings_not_copyrightable.outputs[1]) == (
-            "absence of the Fact that <Rural's telephone"
+        assert listings_not_copyrightable.outputs[1].short_string == (
+            "absence of the fact that <Rural's telephone"
             " listings> were copyrightable"
         )
         assert (
             "act that <Rural's telephone listings> were names, towns, "
             + "and telephone numbers of telephone subscribers"
-        ) in str(listings_not_copyrightable.inputs[0])
+        ) in listings_not_copyrightable.inputs[0].short_string
 
     def test_union_holdings_from_different_cases(self, make_opinion_with_holding):
         oracle = make_opinion_with_holding["oracle_majority"]

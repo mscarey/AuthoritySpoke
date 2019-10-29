@@ -289,12 +289,12 @@ class TestAddition:
         rule_from_lotus = lotus.holdings[0].inferred_from_exclusive[0].rule
         new_holding = oracle.holdings[0] + rule_from_lotus
         output_strings = (
-            "the Fact it is false that <the Java API> was copyrightable",
-            "absence of the Fact that <Borland International> "
+            "the fact it is false that <the Java API> was copyrightable",
+            "absence of the fact that <Borland International> "
             + "infringed the copyright in <the Java API>",
         )
         for output in new_holding.outputs:
-            assert str(output) in output_strings
+            assert output.short_string in output_strings
 
     def test_add_exclusive_holding(self, make_opinion_with_holding):
         """
@@ -305,11 +305,11 @@ class TestAddition:
         feist = make_opinion_with_holding["feist_majority"]
         new_holding = feist.holdings[10] + feist.holdings[3]
         output_strings = (
-            "the Fact it is false that <Rural's telephone listings> were an original work",
-            "absence of the Fact that <Rural's telephone listings> were copyrightable",
+            "the fact it is false that <Rural's telephone listings> were an original work",
+            "absence of the fact that <Rural's telephone listings> were copyrightable",
         )
         for output in new_holding.outputs:
-            assert str(output) in output_strings
+            assert output.short_string in output_strings
 
 
 class TestUnion:
