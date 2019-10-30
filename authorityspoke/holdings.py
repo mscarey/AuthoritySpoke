@@ -162,6 +162,7 @@ class Holding(Factor):
                         needs_match=self_holding,
                         available=other_holding,
                         context=register,
+                        relation="CONTRADICTION",
                     )
 
     def explanations_contradiction(
@@ -314,7 +315,7 @@ class Holding(Factor):
         self, other: Holding, context: Optional[ContextRegister] = None
     ) -> Iterator[Explanation]:
         for register in self._context_registers_for_implication(other, context=context):
-            yield Explanation(self, other, register)
+            yield Explanation(self, other, register, relation="IMPLICATION")
 
     def implied_by(
         self, other: Factor, context: Optional[ContextRegister] = None

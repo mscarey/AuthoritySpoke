@@ -717,6 +717,15 @@ class ContextRegister(Dict[Factor, Factor]):
         items = ", ".join(item_names)
         return f"ContextRegister({items})"
 
+    @property
+    def prose(self) -> str:
+        similies = [
+            f'{key} {"are" if key.__dict__.get("plural") is True else "is"} like {value}'
+            for key, value in self.items()]
+        if len(similies) > 1:
+            similies[-2:] = [", and ".join(similies[-2:])]
+        return ", ".join(similies)
+
     def replace_keys(self, replacements: ContextRegister) -> ContextRegister:
         """Construct new :class:`ContextRegister` by replacing keys."""
         values = self.values()

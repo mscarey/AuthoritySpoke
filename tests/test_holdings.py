@@ -147,7 +147,7 @@ class TestImplication:
     def test_explain_implication(self, make_decision_with_holding):
         oracle = make_decision_with_holding["oracle"]
         explanation = oracle.holdings[18].explain_implication(oracle.holdings[19])
-        assert isinstance(explanation, Explanation)
+        assert "implication" in str(explanation).lower()
 
     def test_explanation_same_generic_factor(self, make_decision_with_holding):
         """

@@ -268,12 +268,8 @@ class TestFacts:
 
     def test_registers_for_interchangeable_context(self, make_entity, watt_factor):
         """
-        The entity equality test is causing Python to think the
-        correct object is in the output when it isn't.
-        It's probably also the issue preventing the correct object
-        from being in the output.
-
-        Try putting Entity's custom hash method back? Will that help?
+        Test that _registers_for_interchangeable_context swaps the first two
+        items in the ContextRegister
         """
         matches = ContextRegister({
             make_entity["motel"]: make_entity["trees"],
@@ -452,11 +448,17 @@ class TestImplication:
             > make_complex_fact["f_relevant_murder_whether"]
         )
 
+    context_names = ContextRegister({Entity('Alice'): Entity('Craig'),
+            Entity('Bob'): Entity("Dan")})
+
+    def test_context_register_text(self):
+        assert self.context_names.prose == (
+            "<Alice> is like <Craig>, and <Bob> is like <Dan>")
+
     def test_implication_complex_explain(self, make_complex_fact):
         complex_true = make_complex_fact["f_relevant_murder"]
         complex_whether = make_complex_fact["f_relevant_murder_whether"].new_context(
-            {Entity('Alice'): Entity('Craig'),
-            Entity('Bob'): Entity("Dan")}
+            self.context_names
         )
         explanation = complex_true.explain_implication(complex_whether)
         assert (Entity("Alice"), Entity("Craig")) in explanation.items()
@@ -467,12 +469,9 @@ class TestImplication:
         it uses elements only from the left as keys and from the right as values.
         """
         complex_true = make_complex_fact["f_relevant_murder"]
-        complex_whether = make_complex_fact["f_relevant_murder_whether"].new_context(
-            {
-                Entity('Alice'): Entity('Craig'),
-                Entity('Bob'): Entity("Dan")}
-        )
-        explanations = list(complex_true.explanations_implication(complex_whether))
+        complex_whether = make_complex_fact["f_relevant_murder_whether"]
+        new = complex_whether.new_context(self.context_names)
+        explanations = list(complex_true.explanations_implication(new))
         for explanation in explanations:
             assert (Entity("Craig"), Entity("Alice")) not in explanation.items()
 
