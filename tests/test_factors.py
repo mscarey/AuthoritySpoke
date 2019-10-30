@@ -385,7 +385,7 @@ class TestImplication:
 
     def test_specific_factor_implies_generic_explain(self, watt_factor):
         answer = watt_factor["f2"].explain_implication(watt_factor["f2_generic"])
-        assert (watt_factor["f2"], watt_factor["f2_generic"]) in next(answer).items()
+        assert (watt_factor["f2"], watt_factor["f2_generic"]) in answer.items()
 
     def test_specific_implies_generic_form_of_another_fact(self, watt_factor):
         assert watt_factor["f2"] > watt_factor["f3_generic"]
@@ -458,8 +458,8 @@ class TestImplication:
             {Entity('Alice'): Entity('Craig'),
             Entity('Bob'): Entity("Dan")}
         )
-        explanations = complex_true.explain_implication(complex_whether)
-        assert (Entity("Alice"), Entity("Craig")) in next(explanations).items()
+        explanation = complex_true.explain_implication(complex_whether)
+        assert (Entity("Alice"), Entity("Craig")) in explanation.items()
 
     def test_implication_explain_keys_only_from_left(self, make_complex_fact):
         """
@@ -472,7 +472,7 @@ class TestImplication:
                 Entity('Alice'): Entity('Craig'),
                 Entity('Bob'): Entity("Dan")}
         )
-        explanations = complex_true.explain_implication(complex_whether)
+        explanations = list(complex_true.explanations_implication(complex_whether))
         for explanation in explanations:
             assert (Entity("Craig"), Entity("Alice")) not in explanation.items()
 

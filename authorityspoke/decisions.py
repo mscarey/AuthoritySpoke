@@ -130,6 +130,39 @@ class Decision:
                 f"{self.__class__} and {other.__class__}."
             )
 
+    def explain_implication(
+        self,
+        other: Union[Opinion, Holding, Rule],
+        context: Optional[ContextRegister] = None,
+    ) -> Optional[Explanation]:
+        explanations = self.explanations_implication(other, context=context)
+        try:
+            explanation = next(explanations)
+        except StopIteration:
+            return None
+        return explanation
+
+    def explanations_implication(
+        self,
+        other: Union[Decision, Opinion, Holding, Rule],
+        context: Optional[ContextRegister] = None,
+    ) -> Iterator[Explanation]:
+        if isinstance(other, Decision):
+            if self.majority and other.majority:
+                yield from self.majority.explanations_implication(
+                    other.majority, context=context
+                )
+        elif isinstance(other, (Rule, Holding, Opinion)):
+            if self.majority:
+                yield from self.majority.explanations_implication(
+                    other, context=context
+                )
+        else:
+            raise TypeError(
+                f"'Implication' test not implemented for types "
+                f"{self.__class__} and {other.__class__}."
+            )
+
     def posit(
         self,
         holdings: Union[Holding, Iterable[Union[Holding, Rule]]],

@@ -1,6 +1,7 @@
 import pytest
 
 from authorityspoke.entities import Entity
+from authorityspoke.explanations import Explanation
 from authorityspoke.factors import ContextRegister
 from authorityspoke.holdings import Holding
 
@@ -140,9 +141,26 @@ class TestImplication:
         This goes back to the issue that new Holdings can't be
         generated just because they'd be implied if they existed.
         """
-
         oracle = make_decision_with_holding["oracle"]
         assert oracle.holdings[18].implies(oracle.holdings[19])
+
+    def test_explain_implication(self, make_decision_with_holding):
+        oracle = make_decision_with_holding["oracle"]
+        explanation = oracle.holdings[18].explain_implication(oracle.holdings[19])
+        assert isinstance(explanation, Explanation)
+
+    def test_explanation_same_generic_factor(self, make_decision_with_holding):
+        """
+        Test that the ContextRegister makes sense when the same generic
+        Factors occur in Holdings on both sides of the "implies" relationship.
+        """
+        oracle = make_decision_with_holding["oracle"]
+        language = Entity("the Java language")
+        new_context = oracle.holdings[18].new_context(
+            {Entity("the Java API"): language}
+        )
+        explanation = new_context.explain_implication(oracle.holdings[19])
+        assert explanation.context[language] == language
 
 
 class TestContradiction:

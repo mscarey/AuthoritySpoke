@@ -376,7 +376,9 @@ class Rule(Factor):
                 )
 
             else:
-                yield from self.procedure.explain_implication(other.procedure, context)
+                yield from self.procedure.explanations_implication(
+                    other.procedure, context
+                )
 
     def implies(self, other, context: Optional[ContextRegister] = None) -> bool:
         r"""

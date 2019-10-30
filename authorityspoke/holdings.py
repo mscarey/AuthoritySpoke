@@ -10,15 +10,16 @@ should be considered undecided.
 
 from __future__ import annotations
 
-from functools import lru_cache
 from itertools import chain
+import operator
 from typing import Any, Dict, Iterator, List, Tuple
 from typing import Optional, Union
 
 from dataclasses import dataclass
 
 from authorityspoke.explanations import Explanation
-from authorityspoke.factors import Factor, ContextRegister, new_context_helper
+from authorityspoke.factors import Factor, new_context_helper
+from authorityspoke.factors import Analogy, ContextRegister
 from authorityspoke.formatting import indented, wrapped
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
@@ -135,8 +136,8 @@ class Holding(Factor):
             raise NotImplementedError(
                 "Adding is not implemented for Holdings that assert a Rule is not valid."
             )
-        for self_holding in self.nonexclusive_holdings():
-            for other_holding in other.nonexclusive_holdings():
+        for self_holding in self.nonexclusive_holdings:
+            for other_holding in other.nonexclusive_holdings:
                 added = self_holding.add_if_not_exclusive(other_holding)
                 if added is not None:
                     return added
@@ -152,9 +153,9 @@ class Holding(Factor):
     def _explanations_contradiction_of_holding(
         self, other: Holding, context: ContextRegister
     ) -> Iterator[Explanation]:
-        for self_holding in self.nonexclusive_holdings():
-            for other_holding in other.nonexclusive_holdings():
-                for register in self_holding.contradicts_if_not_exclusive(
+        for self_holding in self.nonexclusive_holdings:
+            for other_holding in other.nonexclusive_holdings:
+                for register in self_holding._contradicts_if_not_exclusive(
                     other_holding, context=context
                 ):
                     yield Explanation(
@@ -199,14 +200,16 @@ class Holding(Factor):
                 f"{self.__class__} and {other.__class__}."
             )
 
-    def contradicts_if_not_exclusive(
+    def _contradicts_if_not_exclusive(
         self, other: Holding, context: ContextRegister = None
     ) -> Iterator[ContextRegister]:
         if context is None:
             context = ContextRegister()
         if isinstance(other, Holding) and other.decided:
             if self.decided:
-                yield from self.explain_implication(other.negated(), context=context)
+                yield from self._explanations_implies_if_not_exclusive(
+                    other.negated(), context=context
+                )
             else:
                 yield from chain(
                     other._implies_if_decided(self),
@@ -240,7 +243,7 @@ class Holding(Factor):
             context = ContextRegister()
         return any(self.explanations_contradiction(other, context))
 
-    def explain_implication(
+    def _explanations_implies_if_not_exclusive(
         self, other: Factor, context: ContextRegister = None
     ) -> Iterator[ContextRegister]:
         if not isinstance(other, self.__class__):
@@ -281,14 +284,37 @@ class Holding(Factor):
         if other is None:
             return True
         if isinstance(other, Rule):
-            return self.implies(Holding(rule=other), context=context)
+            other = Holding(rule=other)
         if not isinstance(other, self.__class__):
             if hasattr(other, "implied_by"):
                 if context:
                     context = context.reversed()
                 return other.implied_by(self, context=context)
             return False
-        return any(self.explain_implication(other, context))
+        return any(self.explanations_implication(other, context))
+
+    def _context_registers_for_implication(
+        self, other: Holding, context: Optional[ContextRegister] = None
+    ) -> Iterator[ContextRegister]:
+        if self.exclusive is other.exclusive is False:
+            yield from self._explanations_implies_if_not_exclusive(
+                other, context=context
+            )
+        else:
+            analogy = Analogy(
+                need_matches=other.nonexclusive_holdings,
+                available=self.nonexclusive_holdings,
+                comparison=operator.le,
+            )
+            # in the "exclusive" case, should this return all relevant
+            # matches from the nonexclusive Holdings?
+            yield from analogy.unordered_comparison(matches=context)
+
+    def explanations_implication(
+        self, other: Holding, context: Optional[ContextRegister] = None
+    ) -> Iterator[Explanation]:
+        for register in self._context_registers_for_implication(other, context=context):
+            yield Explanation(self, other, register)
 
     def implied_by(
         self, other: Factor, context: Optional[ContextRegister] = None
@@ -426,7 +452,7 @@ class Holding(Factor):
             decided=self.decided,
         )
 
-    @lru_cache(maxsize=16)
+    @property
     def nonexclusive_holdings(self) -> List[Holding]:
         r"""
         Yield all :class:`.Holding`\s with `exclusive is False` implied by self.
@@ -468,8 +494,8 @@ class Holding(Factor):
     def _union_with_holding(
         self, other: Holding, context: ContextRegister
     ) -> Optional[Holding]:
-        for self_holding in self.nonexclusive_holdings():
-            for other_holding in other.nonexclusive_holdings():
+        for self_holding in self.nonexclusive_holdings:
+            for other_holding in other.nonexclusive_holdings:
                 united = self_holding._union_if_not_exclusive(
                     other_holding, context=context
                 )

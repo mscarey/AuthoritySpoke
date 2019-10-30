@@ -275,7 +275,7 @@ class Factor(ABC):
 
     def explanations_contradiction(
         self, other: Factor, context: Optional[ContextRegister] = None
-    ) -> Iterator[ContextRegister]:
+    ) -> Iterator[Explanation]:
         """
         Test whether ``self`` :meth:`implies` the absence of ``other``.
 
@@ -304,9 +304,11 @@ class Factor(ABC):
                     test = other._implies_if_present(self, context.reversed())
                 else:
                     test = other._contradicts_if_present(self, context.reversed())
-                yield from (register.reversed for register in test)
+                yield from (register.reversed() for register in test)
 
-    def explain_contradiction(self, other: Factor, context: Optional[ContextRegister] = None) -> Optional[ContextRegister]:
+    def explain_contradiction(
+        self, other: Factor, context: Optional[ContextRegister] = None
+        ) -> Optional[ContextRegister]:
         explanations = self.explanations_contradiction(other, context=context)
         try:
             explanation = next(explanations)
@@ -314,6 +316,16 @@ class Factor(ABC):
             return None
         return explanation
 
+
+    def explain_implication(
+        self, other: Factor, context: Optional[ContextRegister] = None
+            ) -> Optional[ContextRegister]:
+        explanations = self.explanations_implication(other, context=context)
+        try:
+            explanation = next(explanations)
+        except StopIteration:
+            return None
+        return explanation
 
     def _evolve_attribute(self, changes: Dict[str, Any], attr_name: str) -> Dict[str, Any]:
         attr_dict = {}
@@ -432,7 +444,7 @@ class Factor(ABC):
                 return factor
         return None
 
-    def explain_implication(
+    def explanations_implication(
         self, other: Factor, context: Optional[ContextRegister] = None
     ) -> Iterator[ContextRegister]:
         r"""
@@ -468,7 +480,7 @@ class Factor(ABC):
             return True
         return any(
             register is not None
-            for register in self.explain_implication(other, context=context)
+            for register in self.explanations_implication(other, context=context)
             )
 
     def __gt__(self, other: Optional[Factor]) -> bool:
@@ -826,7 +838,7 @@ class Analogy:
 
     def unordered_comparison(
         self,
-        matches: ContextRegister,
+        matches: ContextRegister = None,
         still_need_matches: Optional[List[Factor]] = None,
     ) -> Iterator[ContextRegister]:
         r"""
@@ -850,6 +862,9 @@ class Analogy:
         """
         if still_need_matches is None:
             still_need_matches = list(self.need_matches)
+
+        if matches is None:
+            matches = ContextRegister()
 
         if not still_need_matches:
             # This seems to allow duplicate values in

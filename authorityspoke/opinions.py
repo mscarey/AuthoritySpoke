@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from collections import defaultdict
 from itertools import zip_longest
+import operator
 from typing import Dict, Iterable, Iterator, List
 from typing import Optional, Sequence, Set, Tuple, Union
 
@@ -16,7 +17,7 @@ import re
 
 from dataclasses import dataclass, field
 
-from authorityspoke.factors import Factor, ContextRegister
+from authorityspoke.factors import Factor, ContextRegister, Analogy
 from authorityspoke.explanations import Explanation
 from authorityspoke.holdings import Holding
 from authorityspoke.rules import Rule
@@ -107,6 +108,47 @@ class Opinion:
         else:
             raise TypeError(
                 f"'Contradicts' test not implemented for types {self.__class__} and {other.__class__}."
+            )
+
+    def explain_implication(
+        self,
+        other: Union[Opinion, Holding, Rule],
+        context: Optional[ContextRegister] = None,
+    ) -> Optional[Explanation]:
+        explanations = self.explanations_implication(other, context=context)
+        try:
+            explanation = next(explanations)
+        except StopIteration:
+            return None
+        return explanation
+
+    def explanations_implication(
+        self,
+        other: Union[Opinion, Holding, Rule],
+        context: Optional[ContextRegister] = None,
+    ) -> Iterator[Explanation]:
+        if isinstance(other, Rule):
+            other = Holding(rule=other)
+        if isinstance(other, Holding):
+            for self_holding in self.holdings:
+                for explanation in self_holding.explanations_implication(
+                    other, context
+                ):
+                    yield explanation
+        elif isinstance(other, self.__class__):
+            analogy = Analogy(
+                need_matches=other.holdings,
+                available=self.holdings,
+                comparison=operator.le,
+            )
+            yield from analogy.unordered_comparison(matches=context)
+        elif hasattr(other, "explanations_implication"):
+            if context:
+                context = context.reversed()
+            yield from other.explanations_implication(self, context=context)
+        else:
+            raise TypeError(
+                f"'Implies' test not implemented for types {self.__class__} and {other.__class__}."
             )
 
     def contradicts(
