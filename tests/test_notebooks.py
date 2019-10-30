@@ -65,6 +65,9 @@ class TestIntroduction:
         assert lotus_majority.contradicts(oracle)
 
     def test_opinion_explain_contradiction(self, make_opinion_with_holding):
+        """
+        The notebook now uses Decisions instead of this.
+        """
         oracle = make_opinion_with_holding["oracle_majority"]
         lotus = make_opinion_with_holding["lotus_majority"]
         explanation = lotus.holdings[6].explain_contradiction(oracle.holdings[10])
@@ -75,6 +78,15 @@ class TestIntroduction:
             explanation
         )
         assert "Entity(name='the Java API'" in repr(explanation)
+
+    def test_decision_explain_contradiction(self, make_decision_with_holding):
+        oracle = make_decision_with_holding["oracle"]
+        lotus = make_decision_with_holding["lotus"]
+        explanation = lotus.explain_contradiction(oracle)
+        assert "<the Lotus menu command hierarchy> is like <the Java API>" in str(
+            explanation
+        )
+        assert "the Fact it is false that <the Lotus" in str(explanation)
 
     def test_register_string(self, make_opinion_with_holding):
         oracle = make_opinion_with_holding["oracle_majority"]

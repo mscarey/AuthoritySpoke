@@ -129,6 +129,21 @@ class TestImplication:
     def test_holding_implies_rule(self, make_holding, make_rule):
         assert make_holding["h3"] >= make_rule["h3"]
 
+    def test_implication_due_to_always(self, make_decision_with_holding):
+        """
+        A "MUST ALWAYS" Holding about copyrightability implies that
+        things "MAY SOMETIMES" be copyrightable if they're computer
+        programs. Makes sense in this context, but it would also
+        have found implication of "Socrates is human, thus Socrates
+        may sometimes be copyrightable."
+
+        This goes back to the issue that new Holdings can't be
+        generated just because they'd be implied if they existed.
+        """
+
+        oracle = make_decision_with_holding["oracle"]
+        assert oracle.holdings[18].implies(oracle.holdings[19])
+
 
 class TestContradiction:
     def test_holding_contradicts_invalid_version_of_self(self, make_holding):
@@ -264,6 +279,12 @@ class TestContradiction:
         lotus = make_opinion_with_holding["lotus_majority"]
         explanation = lotus.holdings[6].explain_contradiction(oracle)
         assert "an explanation" in str(explanation).lower()
+
+    def test_no_holding_contradiction_explanations(self, make_opinion_with_holding):
+        oracle = make_opinion_with_holding["oracle_majority"]
+        lotus = make_opinion_with_holding["lotus_majority"]
+        explanation = lotus.holdings[1].explain_contradiction(lotus.holdings[2])
+        assert explanation is None
 
     def test_holding_does_not_contradict_fact(self, make_holding, watt_factor):
         assert not make_holding["h1"].contradicts(watt_factor["f1"])

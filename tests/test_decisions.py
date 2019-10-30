@@ -34,3 +34,9 @@ class TestContradiction:
         oracle = make_decision_with_holding["oracle"]
         lotus = make_decision_with_holding["lotus"]
         assert oracle.contradicts(lotus)
+
+    def test_no_contradiction_explanations(self, make_decision_with_holding):
+        oracle = make_decision_with_holding["oracle"]
+        feist = make_decision_with_holding["feist"]
+        explanation = oracle.explain_contradiction(feist)
+        assert explanation is None
