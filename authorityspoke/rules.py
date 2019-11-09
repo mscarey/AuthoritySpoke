@@ -273,6 +273,7 @@ class Rule(Factor):
         if not isinstance(other, self.__class__):
             if hasattr(other, "contradicts"):
                 return other.contradicts(self, context=context.reversed())
+            return False
 
         if not self.mandatory and not other.mandatory:
             return False

@@ -274,14 +274,6 @@ class TestContradiction:
         must_not_rule = make_holding["h2_output_false_ALL_MUST"]
         assert list(watt.holdings)[1].contradicts(must_not_rule)
 
-    def test_contradiction_with_procedure(self, make_holding, make_procedure):
-        """
-        This test previously required a TypeError, but on second
-        thought the command expresses a pretty clear intention to
-        convert the Procedure to a Holding.
-        """
-        assert make_holding["h2_undecided"].contradicts(make_procedure["c2"])
-
     def test_holding_contradicts_opinion(self, make_opinion_with_holding):
         oracle = make_opinion_with_holding["oracle_majority"]
         lotus = make_opinion_with_holding["lotus_majority"]
@@ -299,7 +291,6 @@ class TestContradiction:
         assert "an explanation" in str(explanation).lower()
 
     def test_no_holding_contradiction_explanations(self, make_opinion_with_holding):
-        oracle = make_opinion_with_holding["oracle_majority"]
         lotus = make_opinion_with_holding["lotus_majority"]
         explanation = lotus.holdings[1].explain_contradiction(lotus.holdings[2])
         assert explanation is None
@@ -311,6 +302,120 @@ class TestContradiction:
     def test_error_no_contradiction_test(self, make_holding):
         with pytest.raises(TypeError):
             _ = make_holding["h1"].contradicts(ContextRegister({}))
+
+    def test_contradiction_with_ALL_MUST_and_false_output_ALL_MAY(self, make_holding):
+
+        # You ALWAYS MUST follow X
+        # will contradict
+        # You MAY NOT ALWAYS follow Y
+        # if Y implies X
+
+        assert make_holding["h2_ALL_MUST"].contradicts(
+            make_holding["h2_output_false_ALL"]
+        )
+        assert make_holding["h2_output_false_ALL"].contradicts(
+            make_holding["h2_ALL_MUST"]
+        )
+
+    def test_no_contradiction_when_added_enactment_makes_rule_valid(self, make_holding):
+        assert not make_holding["h2_ALL_due_process"].contradicts(
+            make_holding["h2_ALL_invalid"]
+        )
+        assert not make_holding["h2_ALL_invalid"].contradicts(
+            make_holding["h2_ALL_due_process"]
+        )
+
+    def test_contradiction_with_fewer_enactments(self, make_holding):
+        """This and the previous enactment contradiction test passed on their own.
+        Does there need to be something about enactments in the contradicts method?"""
+        assert make_holding["h2_ALL_due_process_invalid"].contradicts(
+            make_holding["h2_ALL"]
+        )
+
+    # Contradiction of undecided Holdings
+
+    def test_no_contradiction_same_undecided_holding(self, make_holding):
+        assert not make_holding["h3_ALL_undecided"].contradicts(
+            make_holding["h3_ALL_undecided"]
+        )
+
+    def test_undecided_contradicts_holding(self, make_holding):
+        """When a lower court issues a holding deciding a legal issue
+        and a higher court posits that the issue should be considered
+        undecided, the lower court's prior holding is "contradicted"
+        in the sense of being rendered ineffective."""
+
+        assert make_holding["h2_undecided"].contradicts(make_holding["h2"])
+
+    def test_undecided_contradicts_holding_reverse(self, make_holding):
+        """
+        Remember that the "contradicts" relation is not symmetric between
+        decided and undecided Rules.
+        """
+        assert not make_holding["h2"].contradicts(make_holding["h2_undecided"])
+
+    def test_undecided_contradicts_decided_invalid_holding(self, make_holding):
+        assert make_holding["h2_undecided"].contradicts(make_holding["h2_invalid"])
+
+    def test_no_contradiction_of_undecided_holding(self, make_holding):
+        """A court's act of deciding a legal issue doesn't "contradict" another
+        court's prior act of positing that the issue was undecided."""
+
+        assert not make_holding["h2"].contradicts(make_holding["h2_undecided"])
+        assert not make_holding["h2_invalid"].contradicts(make_holding["h2_undecided"])
+
+    def test_undecided_holding_implied_contradiction(self, make_holding):
+        assert make_holding["h2_irrelevant_inputs_undecided"].contradicts(
+            make_holding["h2_ALL"]
+        )
+        assert not make_holding["h2_ALL"].contradicts(
+            make_holding["h2_irrelevant_inputs_undecided"]
+        )
+
+    def test_undecided_holding_no_implied_contradiction_with_SOME(self, make_holding):
+        """Because a SOME holding doesn't imply a version of the same holding
+        with added supporting inputs,
+
+        make_holding["h2_irrelevant_inputs_undecided"]
+        does not contradict
+        make_holding["h2"]
+
+        which seems questionable."""
+
+        assert not make_holding["h2_irrelevant_inputs_undecided"].contradicts(
+            make_holding["h2"]
+        )
+        assert not make_holding["h2"].contradicts(
+            make_holding["h2_irrelevant_inputs_undecided"]
+        )
+
+    def test_undecided_holding_no_implied_contradiction(self, make_holding):
+        assert not make_holding["h2_irrelevant_inputs_undecided"].contradicts(
+            make_holding["h2_ALL_invalid"]
+        )
+        assert not make_holding["h2_ALL_invalid"].contradicts(
+            make_holding["h2_irrelevant_inputs_undecided"]
+        )
+
+    def test_contradiction_with_evidence(self, make_holding):
+        assert make_holding["h3_ALL_undecided"].contradicts(
+            make_holding["h3_fewer_inputs_ALL"]
+        )
+
+    def test_no_contradiction_holding_with_evidence(self, make_holding):
+        assert not make_holding["h3_fewer_inputs_ALL_undecided"].contradicts(
+            make_holding["h3_ALL"]
+        )
+
+    # Contradiction of other types
+
+    def test_contradiction_with_procedure(self, make_holding, make_procedure):
+        """
+        This test previously required a TypeError, but on second
+        thought the command expresses a pretty clear intention to
+        convert the Procedure to a Holding.
+        """
+        assert make_holding["h2_undecided"].contradicts(make_procedure["c2"])
 
 
 class TestAddition:

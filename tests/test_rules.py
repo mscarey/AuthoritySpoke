@@ -286,7 +286,6 @@ class TestContradiction:
             make_rule["h2"]
         )
 
-
     def test_contradicts_if_valid_some_vs_all(self, make_rule):
 
         """
@@ -441,108 +440,20 @@ class TestContradiction:
         assert not make_rule["h2_MUST"].contradicts(make_rule["h2"])
         assert not make_rule["h2"].contradicts(make_rule["h2_MUST"])
 
-    def test_contradiction_with_ALL_MUST_and_false_output_ALL_MAY(self, make_holding):
+    # Contradiction of other types
 
-        # You ALWAYS MUST follow X
-        # will contradict
-        # You MAY NOT ALWAYS follow Y
-        # if Y implies X
-
-        assert make_holding["h2_ALL_MUST"].contradicts(
-            make_holding["h2_output_false_ALL"]
-        )
-        assert make_holding["h2_output_false_ALL"].contradicts(
-            make_holding["h2_ALL_MUST"]
+    def test_sometimes_must_contradicts_holding_always_must_not(self, make_rule, make_holding):
+        assert make_rule["h2_MUST"].contradicts(
+            make_holding["h2_ALL_MUST_output_false"]
         )
 
-    def test_undecided_contradicts_holding(self, make_holding):
-        """When a lower court issues a holding deciding a legal issue
-        and a higher court posits that the issue should be considered
-        undecided, the lower court's prior holding is "contradicted"
-        in the sense of being rendered ineffective."""
+    def test_no_contradiction_of_fact(self, make_rule, watt_factor):
+        assert not make_rule["h2_MUST"].contradicts(
+            watt_factor["f2"])
 
-        assert make_holding["h2_undecided"].contradicts(make_holding["h2"])
-
-    def test_undecided_contradicts_holding_reverse(self, make_holding):
-        """
-        Remember that the "contradicts" relation is not symmetric between
-        decided and undecided Rules.
-        """
-        assert not make_holding["h2"].contradicts(make_holding["h2_undecided"])
-
-    def test_undecided_contradicts_decided_invalid_holding(self, make_holding):
-        assert make_holding["h2_undecided"].contradicts(make_holding["h2_invalid"])
-
-    def test_no_contradiction_of_undecided_holding(self, make_holding):
-        """A court's act of deciding a legal issue doesn't "contradict" another
-        court's prior act of positing that the issue was undecided."""
-
-        assert not make_holding["h2"].contradicts(make_holding["h2_undecided"])
-        assert not make_holding["h2_invalid"].contradicts(make_holding["h2_undecided"])
-
-    def test_undecided_holding_implied_contradiction(self, make_holding):
-        assert make_holding["h2_irrelevant_inputs_undecided"].contradicts(
-            make_holding["h2_ALL"]
-        )
-        assert not make_holding["h2_ALL"].contradicts(
-            make_holding["h2_irrelevant_inputs_undecided"]
-        )
-
-    def test_undecided_holding_no_implied_contradiction_with_SOME(self, make_holding):
-        """Because a SOME holding doesn't imply a version of the same holding
-        with added supporting inputs,
-
-        make_holding["h2_irrelevant_inputs_undecided"]
-        does not contradict
-        make_holding["h2"]
-
-        which seems questionable."""
-
-        assert not make_holding["h2_irrelevant_inputs_undecided"].contradicts(
-            make_holding["h2"]
-        )
-        assert not make_holding["h2"].contradicts(
-            make_holding["h2_irrelevant_inputs_undecided"]
-        )
-
-    def test_undecided_holding_no_implied_contradiction(self, make_holding):
-        assert not make_holding["h2_irrelevant_inputs_undecided"].contradicts(
-            make_holding["h2_ALL_invalid"]
-        )
-        assert not make_holding["h2_ALL_invalid"].contradicts(
-            make_holding["h2_irrelevant_inputs_undecided"]
-        )
-
-    def test_contradiction_with_evidence(self, make_holding):
-        assert make_holding["h3_ALL_undecided"].contradicts(
-            make_holding["h3_fewer_inputs_ALL"]
-        )
-
-    def test_no_contradiction_same_undecided_holding(self, make_holding):
-        assert not make_holding["h3_ALL_undecided"].contradicts(
-            make_holding["h3_ALL_undecided"]
-        )
-
-    def test_no_contradiction_holding_with_evidence(self, make_holding):
-        assert not make_holding["h3_fewer_inputs_ALL_undecided"].contradicts(
-            make_holding["h3_ALL"]
-        )
-
-    def test_no_contradiction_when_added_enactment_makes_rule_valid(self, make_holding):
-        assert not make_holding["h2_ALL_due_process"].contradicts(
-            make_holding["h2_ALL_invalid"]
-        )
-        assert not make_holding["h2_ALL_invalid"].contradicts(
-            make_holding["h2_ALL_due_process"]
-        )
-
-    def test_contradiction_with_fewer_enactments(self, make_holding):
-        """This and the previous enactment contradiction test passed on their own.
-        Does there need to be something about enactments in the contradicts method?"""
-        assert make_holding["h2_ALL_due_process_invalid"].contradicts(
-            make_holding["h2_ALL"]
-        )
-
+    def test_error_for_contradiction_of_predicate(self, make_rule, watt_factor):
+        with pytest.raises(TypeError):
+            make_rule["h2_MUST"].contradicts(watt_factor["f2"].predicate)
 
 class TestAddition:
     def test_add_factor_to_rule(self, make_complex_rule, make_factor):
