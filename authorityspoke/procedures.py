@@ -435,7 +435,7 @@ class Procedure(Factor):
 
         if isinstance(other, self.__class__):
 
-            yield from self.explain_same_meaning(other, context)
+            yield from self.explanations_same_meaning(other, context)
 
             relations = (
                 Analogy(other.outputs, self.outputs, operator.le),
@@ -553,7 +553,7 @@ class Procedure(Factor):
 
             yield from iter(all_analogy_matches(relations, context=context))
 
-    def explain_same_meaning(
+    def explanations_same_meaning(
         self, other, context: Optional[ContextRegister] = None
     ) -> Iterator[ContextRegister]:
         if isinstance(other, self.__class__):
@@ -593,7 +593,7 @@ class Procedure(Factor):
             :class:`.Factor`\s with the same context factors in the
             same roles.
         """
-        return any(self.explain_same_meaning(other, context))
+        return any(self.explanations_same_meaning(other, context))
 
     @new_context_helper
     def new_context(self, changes: ContextRegister) -> Procedure:

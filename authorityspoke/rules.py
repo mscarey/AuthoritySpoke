@@ -8,14 +8,14 @@ may describe procedural moves available in litigation.
 from __future__ import annotations
 
 from itertools import chain
-from typing import Any, ClassVar, Dict, Iterable, Iterator
+from typing import Any, ClassVar, Dict, Iterator
 from typing import List, Optional, Sequence, Tuple, Union
 
 from dataclasses import dataclass
 
 from authorityspoke.enactments import Enactment, consolidate_enactments
 from authorityspoke.factors import Factor, ContextRegister
-from authorityspoke.formatting import indented, wrapped
+from authorityspoke.formatting import indented
 from authorityspoke.procedures import Procedure
 
 
@@ -357,7 +357,7 @@ class Rule(Factor):
             return False
         return True
 
-    def explain_implication(
+    def explanations_implication(
         self, other, context: Optional[ContextRegister] = None
     ) -> Iterator[ContextRegister]:
         if (
@@ -406,7 +406,7 @@ class Rule(Factor):
                     context = context.reversed()
                 return other.implied_by(self, context=context)
             return False
-        return any(self.explain_implication(other, context))
+        return any(self.explanations_implication(other, context))
 
     def __ge__(self, other: Optional[Factor]) -> bool:
         return self.implies(other)
@@ -440,7 +440,7 @@ class Rule(Factor):
                 return False
         return True
 
-    def explain_same_meaning(
+    def explanations_same_meaning(
         self, other: Optional[Factor], context: Optional[ContextRegister] = None
     ) -> Iterator[ContextRegister]:
         """Find context matches that would result in self and other meaning the same."""
@@ -451,7 +451,9 @@ class Rule(Factor):
             and self.mandatory == other.mandatory
             and self.universal == other.universal
         ):
-            yield from self.procedure.explain_same_meaning(other.procedure, context)
+            yield from self.procedure.explanations_same_meaning(
+                other.procedure, context
+            )
 
     def means(
         self, other: Optional[Factor], context: Optional[ContextRegister] = None
@@ -463,7 +465,7 @@ class Rule(Factor):
             whether ``other`` is a :class:`Rule` with the
             same meaning as ``self``.
         """
-        return any(self.explain_same_meaning(other, context))
+        return any(self.explanations_same_meaning(other, context))
 
     def _union_with_rule(self, other: Rule, context: ContextRegister) -> Optional[Rule]:
         new_procedure = self.procedure.union(other.procedure, context=context)

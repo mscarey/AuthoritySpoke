@@ -306,9 +306,19 @@ class Factor(ABC):
                     test = other._contradicts_if_present(self, context.reversed())
                 yield from (register.reversed() for register in test)
 
+    def explain_same_meaning(
+        self, other: Factor, context: Optional[ContextRegister] = None
+    ) -> Optional[ContextRegister]:
+        explanations = self.explanations_same_meaning(other, context=context)
+        try:
+            explanation = next(explanations)
+        except StopIteration:
+            return None
+        return explanation
+
     def explain_contradiction(
         self, other: Factor, context: Optional[ContextRegister] = None
-        ) -> Optional[ContextRegister]:
+    ) -> Optional[ContextRegister]:
         explanations = self.explanations_contradiction(other, context=context)
         try:
             explanation = next(explanations)
@@ -316,10 +326,9 @@ class Factor(ABC):
             return None
         return explanation
 
-
     def explain_implication(
         self, other: Factor, context: Optional[ContextRegister] = None
-            ) -> Optional[ContextRegister]:
+    ) -> Optional[ContextRegister]:
         explanations = self.explanations_implication(other, context=context)
         try:
             explanation = next(explanations)
@@ -396,9 +405,9 @@ class Factor(ABC):
         """
         if other is None:
             return False
-        return any(self.explain_same_meaning(other, context=context))
+        return any(self.explanations_same_meaning(other, context=context))
 
-    def explain_same_meaning(
+    def explanations_same_meaning(
         self, other: Factor, context: Optional[ContextRegister] = None
     ) -> Iterator[ContextRegister]:
         """Generate ways to match contexts of self and other so they mean the same."""

@@ -522,6 +522,10 @@ def make_complex_rule(
             inputs=[make_complex_fact["f_relevant_murder"], make_factor["f_shooting"]],
             outputs=make_factor["f_murder"],)
         ),
+        "accept_murder_fact_from_relevance_and_shooting_craig": Rule(Procedure(
+            inputs=[make_complex_fact["f_relevant_murder_craig"], make_factor["f_shooting_craig"]],
+            outputs=make_factor["f_murder_craig"],)
+        ),
         "accept_small_weight_reliable": Rule(Procedure(
             inputs=[make_factor["f_small_weight"], make_factor["f_friends"]],
             outputs=make_fact_about_exhibit["f_reliable_small_weight"]),

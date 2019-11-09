@@ -130,7 +130,14 @@ class TestSameMeaning:
         assert make_rule["h1"].means(make_rule["h1_entity_order"])
 
     def test_holdings_citing_different_enactment_text_unequal(self, make_rule):
-        assert make_rule["h2"] != make_rule["h2_fourth_a_cite"]
+        assert not make_rule["h2"].means(make_rule["h2_fourth_a_cite"])
+
+    def test_explain_rule_differing_in_entity_order(self, make_complex_rule):
+        left = make_complex_rule["accept_murder_fact_from_relevance_and_shooting"]
+        right = make_complex_rule["accept_murder_fact_from_relevance_and_shooting_craig"]
+
+        explanation = left.explain_same_meaning(right)
+        assert explanation.prose == '<Craig> is like <Alice>, and <Dan> is like <Bob>'
 
 
 class TestImplication:
@@ -147,9 +154,9 @@ class TestImplication:
         Checks that because the generic entities on both sides of the implication
         relation are the same, the "Hideaway Lodge" Entity corresponds to an equal object.
         """
-        explanations = make_rule["h2_exact_in_despite"].explain_implication(make_rule["h2"])
+        explanation = make_rule["h2_exact_in_despite"].explain_implication(make_rule["h2"])
         hideaway = Entity("Hideaway Lodge")
-        assert any(explanation[hideaway] == hideaway for explanation in explanations)
+        assert explanation[hideaway] == hideaway
 
     def test_explain_all_to_all_implies_reciprocal(self, make_rule):
         """
@@ -157,8 +164,7 @@ class TestImplication:
         The explanation simply matches each context factor to the same factor.
         """
         fewer_inputs = make_rule["h3_fewer_inputs_ALL"]
-        explanations = fewer_inputs.explain_implication(make_rule["h3_ALL"])
-        explanation = next(explanations)
+        explanation = fewer_inputs.explain_implication(make_rule["h3_ALL"])
         assert explanation[Entity("Hideaway Lodge")] == Entity("Hideaway Lodge")
 
     def test_holdings_more_specific_quantity_implies_less_specific(self, make_rule):

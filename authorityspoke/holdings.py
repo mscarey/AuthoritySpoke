@@ -262,8 +262,8 @@ class Holding(Factor):
 
         elif not self.decided and not other.decided:
             yield from chain(
-                self.explain_same_meaning(other, context),
-                self.explain_same_meaning(other.negated(), context),
+                self.explanations_same_meaning(other, context),
+                self.explanations_same_meaning(other.negated(), context),
             )
 
     def implies(self, other: Factor, context: ContextRegister = None) -> bool:
@@ -353,10 +353,10 @@ class Holding(Factor):
         """
 
         if self.rule_valid and other.rule_valid:
-            yield from self.rule.explain_implication(other.rule, context)
+            yield from self.rule.explanations_implication(other.rule, context)
 
         elif not self.rule_valid and not other.rule_valid:
-            yield from other.rule.explain_implication(self.rule, context)
+            yield from other.rule.explanations_implication(self.rule, context)
 
         # Looking for implication where self.rule_valid != other.rule_valid
         # is equivalent to looking for contradiction.
@@ -411,7 +411,7 @@ class Holding(Factor):
         new_values = self._evolve_from_dict(changes)
         return self.__class__(**new_values)
 
-    def explain_same_meaning(
+    def explanations_same_meaning(
         self, other: Factor, context: Optional[ContextRegister] = None
     ) -> Iterator[ContextRegister]:
         if (
@@ -419,7 +419,7 @@ class Holding(Factor):
             and self.rule_valid == other.rule_valid
             and self.decided == other.decided
         ):
-            yield from self.rule.explain_same_meaning(other.rule, context)
+            yield from self.rule.explanations_same_meaning(other.rule, context)
 
     def means(
         self, other: Optional[Factor], context: Optional[ContextRegister] = None
@@ -433,7 +433,7 @@ class Holding(Factor):
         """
         if other is None:
             return False
-        return any(self.explain_same_meaning(other, context))
+        return any(self.explanations_same_meaning(other, context))
 
     def negated(self):
         """Get new copy of ``self`` with an opposite value for ``rule_valid``."""

@@ -39,6 +39,12 @@ class TestExhibitsSameMeaning:
             make_exhibit["shooting_testimony"]
         )
 
+    def test_explain_same_meaning(self, make_exhibit):
+        explanation = make_exhibit["no_shooting_testimony"].explain_same_meaning(
+            make_exhibit["no_shooting_entity_order_testimony"]
+        )
+        assert explanation.prose == "<Alice> is like <Bob>, and <Bob> is like <Alice>"
+
 
 class TestExhibitsImplication:
     def test_implication(self, make_exhibit, caplog):
