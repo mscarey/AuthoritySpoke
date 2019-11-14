@@ -8,13 +8,22 @@ from copy import deepcopy
 import datetime
 from functools import partial
 
+from bs4 import BeautifulSoup
+
 from typing import Any, Dict, List, Iterable, Iterator
 from typing import Optional, Tuple, Type, Union
 
 from pint import UnitRegistry
 
 from authorityspoke.decisions import Decision
-from authorityspoke.enactments import Code, Enactment
+from authorityspoke.enactments import (
+    Code,
+    Enactment,
+    USCCode,
+    USConstCode,
+    CalCode,
+    CFRCode,
+)
 from authorityspoke.entities import Entity
 from authorityspoke.evidence import Exhibit, Evidence
 from authorityspoke.factors import Factor
@@ -44,6 +53,76 @@ FACTOR_SUBCLASSES = {
     class_obj.__name__: class_obj
     for class_obj in (Allegation, Entity, Exhibit, Evidence, Fact, Pleading)
 }
+
+
+def get_code_uri(xml, title: str) -> str:
+    """
+    Build a URI for the ``Code`` based on its XML metadata.
+
+    .. note::
+        This handles California state statutes only with a
+        mockup, which can only refer to the Penal and Evidence
+        Codes.
+
+    :returns:
+        The `United States Legislative Markup (USLM)
+        <https://github.com/usgpo/uslm>`_ identifier that
+        describes the document as a whole, if available in
+        the XML. Otherwise returns a pseudo-USLM identifier.
+    """
+    if title == "Constitution of the United States":
+        return "/us/const"
+    if title.startswith("Title"):
+        return xml.find("main").find("title")["identifier"]
+    if title.startswith("California"):
+        uri = "/us-ca"
+        if "Penal" in title:
+            return uri + "/pen"
+        else:
+            return uri + "/evid"
+    if title.startswith("Code of Federal Regulations"):
+        title_num = title.split()[-1]
+        return f"/us/cfr/t{title_num}"
+    raise NotImplementedError
+
+
+def get_code_title(xml) -> str:
+    r"""
+    Provide "title" identifier for the :class:`Code` XML.
+
+    :returns:
+        the contents of an XML ``title`` element that
+        describes the ``Code``, if any. Otherwise
+        returns a descriptive name that may not exactly
+        appear in the XML.
+    """
+    uslm_title = xml.find("dc:title")
+    if uslm_title:
+        return uslm_title.text
+    cal_title = xml.h3
+    if cal_title:
+        code_name = cal_title.b.text.split(" - ")[0]
+        return f"California {code_name}"
+    cfr_title = xml.CFRGRANULE.FDSYS.CFRTITLE
+    if cfr_title:
+        return f"Code of Federal Regulations Title {cfr_title.text}"
+    raise NotImplementedError
+
+
+def read_code(xml):
+    title = get_code_title(xml)
+    uri = get_code_uri(xml, title)
+    if uri.startswith("/us/const"):
+        code_class = USConstCode
+    elif uri.startswith("/us/cfr"):
+        code_class = CFRCode
+    elif uri.startswith("/us/"):
+        code_class = USCCode
+    elif uri.startswith("/us-ca"):
+        code_class = CalCode
+    else:
+        return Code(xml, title, uri)
+    return code_class(xml, title, uri)
 
 
 def read_enactment(

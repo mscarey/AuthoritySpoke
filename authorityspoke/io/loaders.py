@@ -8,6 +8,8 @@ import pathlib
 
 from typing import Any, Dict, List, Iterator, Optional, Tuple, Union
 
+from bs4 import BeautifulSoup
+
 from authorityspoke.decisions import Decision
 from authorityspoke.enactments import Code
 from authorityspoke.holdings import Holding
@@ -24,7 +26,7 @@ def load_code(
     filename: Optional[str] = None,
     directory: Optional[pathlib.Path] = None,
     filepath: Optional[pathlib.Path] = None,
-) -> Code:
+) -> BeautifulSoup:
     r"""
     Create a new :class:`.Code` from an XML filepath.
 
@@ -50,27 +52,18 @@ def load_code(
     validated_filepath = filepaths.make_filepath(
         filename, directory, filepath, default_folder="codes"
     )
-    return Code(filepath=validated_filepath)
+    with open(validated_filepath) as fp:
+        xml = BeautifulSoup(fp, "lxml-xml")
+    return xml
 
 
-def load_and_read_holdings(
+def load_and_read_code(
     filename: Optional[str] = None,
     directory: Optional[pathlib.Path] = None,
     filepath: Optional[pathlib.Path] = None,
-    regime: Optional[Regime] = None,
-) -> Tuple[
-    List[Holding], List[List[TextQuoteSelector]], Dict[str, List[TextQuoteSelector]]
-]:
-    """
-    Read holdings with text anchors from a file.
-    """
-    raw_holdings = load_holdings(
-        filename=filename, directory=directory, filepath=filepath
-    )
-    holding_anchors = anchors.get_holding_anchors(raw_holdings)
-    named_anchors = anchors.get_named_anchors(raw_holdings)
-    holdings = readers.read_holdings(raw_holdings, regime=regime)
-    return holdings, holding_anchors, named_anchors
+) -> Code:
+    soup = load_code(filename=filename, directory=directory, filepath=filepath)
+    return readers.read_code(soup)
 
 
 def load_holdings(
@@ -107,6 +100,26 @@ def load_holdings(
         holdings = json.load(f)
     holdings = expand_shorthand(holdings)
     return holdings
+
+
+def load_and_read_holdings(
+    filename: Optional[str] = None,
+    directory: Optional[pathlib.Path] = None,
+    filepath: Optional[pathlib.Path] = None,
+    regime: Optional[Regime] = None,
+) -> Tuple[
+    List[Holding], List[List[TextQuoteSelector]], Dict[str, List[TextQuoteSelector]]
+]:
+    """
+    Read holdings with text anchors from a file.
+    """
+    raw_holdings = load_holdings(
+        filename=filename, directory=directory, filepath=filepath
+    )
+    holding_anchors = anchors.get_holding_anchors(raw_holdings)
+    named_anchors = anchors.get_named_anchors(raw_holdings)
+    holdings = readers.read_holdings(raw_holdings, regime=regime)
+    return holdings, holding_anchors, named_anchors
 
 
 def load_decision(

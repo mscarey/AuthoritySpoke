@@ -29,9 +29,9 @@ class Code:
     the code, so every new XML format will require adding a method
     to this class to ingest it.
 
-    :param filepath:
-        the name of the file in the ``example_data/codes``
-        folder where the XML version of the code can be found.
+    :param xml:
+        A BeautifulSoup object created by parsing the
+        ``Code``\'s XML file
     """
 
     # namespaces for legislative XML schemas
@@ -41,11 +41,11 @@ class Code:
         "xhtml": "http://www.w3.org/1999/xhtml",
     }
 
-    def __init__(self, filepath: Union[str, pathlib.Path]):
-        """Set ``filepath`` parameter as attribute."""
-        if isinstance(filepath, str):
-            filepath = pathlib.Path(filepath)
-        self.filepath = filepath
+    def __init__(self, xml, title: str, uri: str):
+        self.xml = xml
+        self.title = title
+        self.uri = uri
+
 
     @property
     def jurisdiction(self) -> str:
@@ -104,73 +104,6 @@ class Code:
             return (match.start(1), match.end(1))
         return None
 
-    @lazyprop
-    def title(self) -> str:
-        """
-        Provide "title" identifier for the ``Code``'s XML.
-
-        :returns:
-            the contents of an XML ``title`` element that
-            describes the ``Code``, if any. Otherwise
-            returns a descriptive name that may not exactly
-            appear in the XML.
-        """
-        uslm_title = self.xml.find("dc:title")
-        if uslm_title:
-            return uslm_title.text
-        cal_title = self.xml.h3
-        if cal_title:
-            code_name = cal_title.b.text.split(" - ")[0]
-            return f"California {code_name}"
-        cfr_title = self.xml.CFRGRANULE.FDSYS.CFRTITLE
-        if cfr_title:
-            return f"Code of Federal Regulations Title {cfr_title.text}"
-        raise NotImplementedError
-
-    @lazyprop
-    def uri(self) -> str:
-        """
-        Build a URI for the ``Code`` based on its XML metadata.
-
-        .. note::
-            This handles California state statutes only with a
-            mockup, which can only refer to the Penal and Evidence
-            Codes.
-
-        :returns:
-            The `United States Legislative Markup (USLM)
-            <https://github.com/usgpo/uslm>`_ identifier that
-            describes the document as a whole, if available in
-            the XML. Otherwise returns a pseudo-USLM identifier.
-        """
-        title = self.title
-        if title == "Constitution of the United States":
-            return "/us/const"
-        if title.startswith("Title"):
-            return self.xml.find("main").find("title")["identifier"]
-        if title.startswith("California"):
-            uri = "/us-ca/"
-            if "Penal" in title:
-                return uri + "pen"
-            else:
-                return uri + "evid"
-        if title.startswith("Code of Federal Regulations"):
-            title_num = title.split()[-1]
-            return f"/us/cfr/t{title_num}"
-        raise NotImplementedError
-
-    @lazyprop
-    def xml(self):
-        """
-        Get XML tree of legislative provisions.
-
-        :returns:
-            A BeautifulSoup object created by parsing the
-            ``Code``\'s XML file
-        """
-        with open(self.filepath) as fp:
-            xml = BeautifulSoup(fp, "lxml-xml")
-        return xml
 
     def format_uri_for_const(self, uri: str) -> str:
         """
@@ -421,6 +354,22 @@ class Code:
 
     def __str__(self):
         return self.title
+
+
+class USConstCode(Code):
+    pass
+
+
+class USCCode(Code):
+    pass
+
+
+class CFRCode(Code):
+    pass
+
+
+class CalCode(Code):
+    pass
 
 
 @dataclass(frozen=True)

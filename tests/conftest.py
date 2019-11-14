@@ -632,7 +632,8 @@ def make_regime() -> Dict[str, Code]:
         "ca_evidence.html",
         "ca_penal.html",
     ):
-        usa.set_code(loaders.load_code(filename=filename))
+        xml = loaders.load_code(filename=filename)
+        usa.set_code(readers.read_code(xml))
     return usa
 
 
