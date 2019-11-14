@@ -16,14 +16,8 @@ from typing import Optional, Tuple, Type, Union
 from pint import UnitRegistry
 
 from authorityspoke.decisions import Decision
-from authorityspoke.enactments import (
-    Code,
-    Enactment,
-    USCCode,
-    USConstCode,
-    CalCode,
-    CFRCode,
-)
+from authorityspoke.codes import Code, USCCode, USConstCode, CalCode, CFRCode
+from authorityspoke.enactments import Enactment
 from authorityspoke.entities import Entity
 from authorityspoke.evidence import Exhibit, Evidence
 from authorityspoke.factors import Factor

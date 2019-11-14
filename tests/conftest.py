@@ -3,7 +3,8 @@ from typing import Any, Dict, Tuple
 import pytest
 
 
-from authorityspoke.enactments import Code, Enactment
+from authorityspoke.codes import Code
+from authorityspoke.enactments import Enactment
 from authorityspoke.entities import Entity
 from authorityspoke.evidence import Evidence, Exhibit
 from authorityspoke.factors import Factor
