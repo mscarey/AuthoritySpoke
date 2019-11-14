@@ -21,15 +21,8 @@ class TextQuoteSelector:
     Based on the `Web Annotation Data Model
     <https://www.w3.org/TR/annotation-model/#text-quote-selector>`_
 
-    :param path:
-        a path from the root of the document to the XML element where
-        the selected text can be found.
-
     :param exact:
-        a copy of the text which is being selected, after normalization.
-        If None, then the entire text of the element identified by the
-        `path` parameter is selected. If `path` is also None, then the
-        whole :class:`.Code` is selected.
+        a copy of the text which is being selected
 
     :param prefix:
         a snippet of text that occurs immediately before the text which
@@ -39,16 +32,8 @@ class TextQuoteSelector:
         the snippet of text that occurs immediately after the text which
         is being selected.
 
-    :param source:
-        the :class:`.Code` where the quoted text can be found,
-        or the :class:`.Regime` that has enacted it.
-        Only needed if ``exact`` is not specified. If this
-        parameter is given, then the ``exact`` text will be
-        stored even if it's the entire text of a section or
-        :class:`.Code`.
     """
 
-    path: Optional[str] = None
     exact: Optional[str] = None
     prefix: Optional[str] = None
     suffix: Optional[str] = None

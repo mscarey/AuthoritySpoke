@@ -71,7 +71,7 @@ class Code:
     @property
     def level(self) -> str:
         """
-        Get identifier for the :class:`.Enactment` type found in this ``Code``.
+        Get level of legislation for this Code, e.g. "statute".
 
         :returns:
             "constitution", "statute", or "regulation"
@@ -247,7 +247,7 @@ class Code:
             return selector.exact
         raise ValueError(
             f'Passage "{selector.exact}" from TextQuoteSelector '
-            + f'not found in Code "{self.title}" at path "{selector.path}".'
+            + f'not found in Code "{self.title}" at path "{path}".'
         )
 
     def __repr__(self):
