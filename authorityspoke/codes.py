@@ -138,8 +138,10 @@ class Code:
         """
         Get sections using relative path, assuming Code follows USLM standard.
         """
-        section = self.xml.find(identifier=docpath)
-        passages = section.find_all(["chapeau", "paragraph", "content"])
+        sections = self.xml.find(identifier=docpath)
+        if not sections:
+            return None
+        passages = sections.find_all(["chapeau", "paragraph", "content"])
 
         return passages
 
