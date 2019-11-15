@@ -28,10 +28,6 @@ class Enactment:
     :param code:
         the :class:`Code` where this legislative text appears.
 
-    :param regime:
-        a :class:`.Regime` with a :class:`.Jurisdiction` that has enacted
-        the :class:`Code` where this legislative text appears.
-
     :param name:
         an identifier for this object, often used if the object needs
         to be referred to multiple times in the process of composing
@@ -88,8 +84,8 @@ class Enactment:
         """
         if not other.source.startswith(self.source):
             return None
-        self_interval = self.code.text_interval(self)
-        other_interval = self.code.text_interval(other, path=self.source)
+        self_interval = self.code.text_interval(self.selector, path=self.source)
+        other_interval = self.code.text_interval(other.selector, path=self.source)
         both_intervals = sorted([self_interval, other_interval])
         if both_intervals[1][0] >= both_intervals[0][1] + 2:
             return None

@@ -83,7 +83,7 @@ class Code:
         return "statute"
 
     def text_interval(
-        self, enactment: Enactment, path: str = ""
+        self, selector: Optional[TextQuoteSelector] = None, path: str = ""
     ) -> Optional[Tuple[int, int]]:
         """
         Find integer indices for the quoted text.
@@ -93,16 +93,14 @@ class Code:
             text passage quoted in ``self.selector.exact`` within the
             XML section referenced in ``self.selector.path``.
         """
-        if not path:
-            path = enactment.source
-
         sections = self.get_sections(path)
         if not sections:
             raise ValueError(f"Section {path} does not exist in code {self.title}")
 
         text = self.section_text(sections)
-
-        regex = enactment.selector.passage_regex
+        if not selector:
+            return (0, len(text))
+        regex = selector.passage_regex
         match = re.search(regex, text, re.IGNORECASE)
         if match:
             # Getting indices from match group 1 (in the parentheses),
