@@ -9,13 +9,20 @@ from authorityspoke.selectors import TextQuoteSelector
 
 
 class TestCodes:
-    def test_making_code(self, make_code):
-        const = make_code["const"]
-        assert str(const) == "Constitution of the United States"
-
-    def test_make_cfr(self, make_code):
-        cfr = make_code["cfr37"]
-        assert str(cfr) == "Code of Federal Regulations Title 37"
+    @pytest.mark.parametrize(
+        "codename, name, level",
+        [
+            ("usc17", "USC Title 17", "statute"),
+            ("const", "Constitution of the United States", "constitution"),
+            ("cfr37", "Code of Federal Regulations Title 37", "regulation"),
+            ("ca_evid", "California Evidence Code", "statute"),
+            ("ca_pen", "California Penal Code", "statute"),
+        ],
+    )
+    def test_making_code(self, make_code, codename, name, level):
+        code = make_code[codename]
+        assert str(code) == name
+        assert code.level == level
 
     def test_cfr_repr(self, make_code):
         cfr = make_code["cfr37"]
@@ -89,9 +96,24 @@ class TestCodes:
         )
         assert passage == "removal from Office"
 
+    def test_text_interval_entire_section(self, make_code):
+        """
+        Returns an interval covering the entire 317-character section.
+        """
+        interval = make_code["const"].text_interval(path="/us/const/article-I/3/7")
+        assert interval == (0, 317)
+
     def test_text_interval_beyond_end_of_section(self, make_code):
         with pytest.raises(ValueError):
-            answer = make_code["const"].select_text_from_interval(
+            _ = make_code["const"].select_text_from_interval(
                 path="/us/const/article-I/3/7", interval=(66, 400)
             )
-            print(answer)
+
+    def test_text_interval_absent_section(self, make_code):
+        """
+        The path is a section that doesn't exist in CFR.
+        """
+        with pytest.raises(ValueError):
+            _ = make_code["cfr37"].select_text_from_interval(
+                path="/us/const/article-I/3/7", interval=(0, 66)
+            )

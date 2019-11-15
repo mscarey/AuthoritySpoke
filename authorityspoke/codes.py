@@ -210,6 +210,8 @@ class Code:
         if not path:
             path = self.uri
         sections = self.get_sections(path)
+        if not sections:
+            raise ValueError(f"Section {path} does not exist in {self}.")
         section_text = self.section_text(sections)
         if len(section_text) < max(interval):
             raise ValueError(
