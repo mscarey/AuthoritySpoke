@@ -100,13 +100,7 @@ class Code:
         text = self.section_text(sections)
         if not selector:
             return (0, len(text))
-        regex = selector.passage_regex
-        match = re.search(regex, text, re.IGNORECASE)
-        if match:
-            # Getting indices from match group 1 (in the parentheses),
-            # not match 0 which includes prefix and suffix
-            return (match.start(1), match.end(1))
-        return None
+        return selector.get_interval(text)
 
     def provision_effective_date(self, cite: str) -> datetime.date:
         """

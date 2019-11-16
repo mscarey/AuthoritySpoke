@@ -133,7 +133,7 @@ class DecisionSchema(ExpandableSchema):
     def make_object(self, data: RawDecision, **kwargs) -> Decision:
         return self.__model__(**data)
 
-class SelectorSchema(ExpandableSchema):
+class SelectorSchema(Schema):
     __model__ = TextQuoteSelector
     prefix = fields.Str(missing=None)
     exact = fields.Str(missing=None)
@@ -613,7 +613,7 @@ class HoldingSchema(ExpandableSchema):
         return self.__model__(**data)
 
 
-SCHEMAS = [schema for schema in ExpandableSchema.__subclasses__()]
+SCHEMAS = [schema for schema in ExpandableSchema.__subclasses__()] + [SelectorSchema]
 
 
 def get_schema_for_item(item: Any) -> Schema:
