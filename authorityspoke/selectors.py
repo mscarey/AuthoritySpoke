@@ -63,7 +63,7 @@ class TextQuoteSelector:
             right_end = None
         if right_end == -1:
             raise ValueError(f"'suffix' value '{self.suffix}' not found in '{text}'")
-        return text[left_end:right_end]
+        return text[left_end:right_end].strip()
 
     def dump(self):
         """
