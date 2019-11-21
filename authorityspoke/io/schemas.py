@@ -135,9 +135,9 @@ class DecisionSchema(ExpandableSchema):
 
 class SelectorSchema(Schema):
     __model__ = TextQuoteSelector
-    prefix = fields.Str(missing=None)
-    exact = fields.Str(missing=None)
-    suffix = fields.Str(missing=None)
+    prefix = fields.Str(missing="")
+    exact = fields.Str(missing="")
+    suffix = fields.Str(missing="")
 
     def split_text(self, text: str) -> Tuple[str, ...]:
         """

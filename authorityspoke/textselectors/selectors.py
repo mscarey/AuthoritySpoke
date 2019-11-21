@@ -37,7 +37,7 @@ class TextQuoteSelector:
     prefix: str = ""
     suffix: str = ""
 
-    def exact_from_ends(self, text: str) -> str:
+    def exact_from_ends(self, text: str) -> Optional[str]:
         """
         Get quotation between the prefix and suffix in a text.
 
@@ -48,22 +48,10 @@ class TextQuoteSelector:
             the passage between :attr:`prefix` and :attr:`suffix` in ``text``.
         """
 
-        if self.prefix:
-            left_end: int = text.find(self.prefix)
-            if left_end == -1:
-                raise ValueError(
-                    f"'prefix' value '{self.prefix}' not found in '{text}'"
-                )
-            left_end += len(self.prefix)
-        else:
-            left_end = 0
-        if self.suffix:
-            right_end: Optional[int] = text.find(self.suffix)
-        else:
-            right_end = None
-        if right_end == -1:
-            raise ValueError(f"'suffix' value '{self.suffix}' not found in '{text}'")
-        return text[left_end:right_end].strip()
+        match = re.match(pattern=self.passage_regex_without_exact(), string=text)
+        if match:
+            return text[match.start(1):match.end(1)]
+        return None
 
     def dump(self):
         """
@@ -83,7 +71,7 @@ class TextQuoteSelector:
         """
         Get the interval where the selected quote appears in "text".
         """
-        regex = self.passage_regex
+        regex = self.passage_regex()
         match = re.search(regex, text, re.IGNORECASE)
         if match:
             # Getting indices from match group 1 (in the parentheses),
@@ -91,28 +79,36 @@ class TextQuoteSelector:
             return (match.start(1), match.end(1))
         return None
 
-    def as_position_selector(self, text: str) -> TextPositionSelector:
+    def as_position_selector(self, text: str) -> Optional[TextPositionSelector]:
         interval = self.get_interval(text)
         if not interval:
             return None
         return TextPositionSelector(start=interval[0], end=interval[1])
 
-    @property
-    def passage_regex(self):
-        """Get a regex to identify the selected text."""
-        if not (self.prefix or self.exact or self.suffix):
+    def passage_regex_without_exact(self):
+        if not (self.prefix or self.suffix):
             return r"^.*$"
-        
+
         prefix = (re.escape(self.prefix) + r"\s*") if self.prefix else ""
         suffix = (r"\s*" + re.escape(self.suffix)) if self.suffix else ""
 
+        if not self.prefix:
+            return r"^(.*?)" + suffix
+
+        if not self.suffix:
+            return prefix + r"(.*?)$"
+
+        return prefix + r"(.*?)" + suffix.strip()
+
+
+    def passage_regex(self):
+
+        """Get a regex to identify the selected text."""
         if not self.exact:
-            if not self.prefix:
-                return r"^(.*?)" + suffix
-            if not self.suffix:
-                return prefix + r"(.*?)$"
-        
-        # continue if self.exact is present
+            return self.passage_regex_without_exact()
+
+        prefix = (re.escape(self.prefix) + r"\s*") if self.prefix else ""
+        suffix = (r"\s*" + re.escape(self.suffix)) if self.suffix else ""
         return (prefix + r"(" + re.escape(self.exact) + r")" + suffix).strip()
 
 

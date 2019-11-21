@@ -10,7 +10,7 @@ from authorityspoke.codes import Code
 from authorityspoke.enactments import Enactment, consolidate_enactments
 from authorityspoke.opinions import Opinion
 from authorityspoke.predicates import ureg, Q_
-from authorityspoke.io import loaders, readers, dump
+from authorityspoke.io import anchors, loaders, readers, dump
 from authorityspoke.textselectors.selectors import TextQuoteSelector
 
 

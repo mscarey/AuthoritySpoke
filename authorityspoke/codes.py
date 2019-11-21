@@ -237,7 +237,7 @@ class Code:
         text = self.section_text(sections)
         if not selector:
             return text
-        if re.search(selector.passage_regex, text, re.IGNORECASE):
+        if re.search(selector.passage_regex(), text, re.IGNORECASE):
             return selector.exact
         raise ValueError(
             f'Passage "{selector.exact}" from TextQuoteSelector '
