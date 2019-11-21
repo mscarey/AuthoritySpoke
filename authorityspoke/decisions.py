@@ -10,7 +10,7 @@ from authorityspoke.factors import Factor, ContextRegister
 from authorityspoke.holdings import Holding
 from authorityspoke.opinions import Opinion, TextLinkDict
 from authorityspoke.rules import Rule
-from authorityspoke.selectors import TextQuoteSelector
+from authorityspoke.textselectors.selectors import TextQuoteSelector
 
 
 @dataclass

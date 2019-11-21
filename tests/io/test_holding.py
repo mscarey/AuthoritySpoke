@@ -15,7 +15,7 @@ from authorityspoke.io import anchors, loaders, readers, dump, name_index
 from authorityspoke.io.loaders import load_holdings
 from authorityspoke.io import filepaths, text_expansion
 from authorityspoke.rules import Rule
-from authorityspoke.selectors import TextQuoteSelector
+from authorityspoke.textselectors.selectors import TextQuoteSelector
 
 ureg = pint.UnitRegistry()
 

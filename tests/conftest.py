@@ -15,7 +15,7 @@ from authorityspoke.opinions import Opinion
 from authorityspoke.pleadings import Pleading, Allegation
 from authorityspoke.predicates import Predicate, Q_
 from authorityspoke.rules import Procedure, Rule
-from authorityspoke.selectors import TextQuoteSelector
+from authorityspoke.textselectors.selectors import TextQuoteSelector
 
 from authorityspoke.io import loaders, readers
 from authorityspoke.io.schemas import RawHolding

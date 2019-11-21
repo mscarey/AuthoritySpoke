@@ -2,7 +2,7 @@ from collections import defaultdict
 from typing import Any, Dict, Iterable, List, Union
 
 from authorityspoke.opinions import TextLinkDict
-from authorityspoke.selectors import TextQuoteSelector
+from authorityspoke.textselectors.selectors import TextQuoteSelector
 
 from authorityspoke.io import schemas
 from authorityspoke.io.schemas import RawSelector, RawHolding

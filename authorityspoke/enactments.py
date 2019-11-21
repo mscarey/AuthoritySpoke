@@ -7,7 +7,7 @@ from dataclasses import dataclass
 
 from authorityspoke.codes import Code
 from authorityspoke.formatting import wrapped
-from authorityspoke.selectors import TextQuoteSelector
+from authorityspoke.textselectors.selectors import TextQuoteSelector
 
 
 @dataclass(frozen=True)

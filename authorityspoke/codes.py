@@ -11,7 +11,7 @@ from bs4 import BeautifulSoup
 
 from utils.roman import from_roman
 
-from authorityspoke.selectors import TextQuoteSelector
+from authorityspoke.textselectors.selectors import TextQuoteSelector
 
 
 class Code:

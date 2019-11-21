@@ -14,7 +14,7 @@ from dataclasses import dataclass, field
 
 from authorityspoke.enactments import Code
 from authorityspoke.courts import Court
-from authorityspoke.selectors import TextQuoteSelector
+from authorityspoke.textselectors.selectors import TextQuoteSelector
 
 
 @dataclass

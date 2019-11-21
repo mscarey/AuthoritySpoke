@@ -15,7 +15,7 @@ from authorityspoke.codes import Code
 from authorityspoke.holdings import Holding
 from authorityspoke.jurisdictions import Regime
 from authorityspoke.opinions import Opinion
-from authorityspoke.selectors import TextQuoteSelector
+from authorityspoke.textselectors.selectors import TextQuoteSelector
 
 from authorityspoke.io import anchors, filepaths, readers
 from authorityspoke.io.text_expansion import expand_shorthand

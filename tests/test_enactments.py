@@ -11,7 +11,7 @@ from authorityspoke.enactments import Enactment, consolidate_enactments
 from authorityspoke.opinions import Opinion
 from authorityspoke.predicates import ureg, Q_
 from authorityspoke.io import loaders, readers, dump
-from authorityspoke.selectors import TextQuoteSelector
+from authorityspoke.textselectors.selectors import TextQuoteSelector
 
 
 class TestEnactments:
@@ -326,3 +326,76 @@ class TestDump:
         )
         assert "due process" in due_process.text
         assert due_process.source.startswith("/us/const")
+
+class TestTextSelection:
+    def test_code_from_selector(self, make_regime, make_selector):
+        code = make_regime.get_code("/us/usc/t17/s103")
+        assert code.uri == "/us/usc/t17"
+
+    def test_usc_selection(self, make_regime, make_selector):
+        selector = make_selector["preexisting material"]
+        source = "/us/usc/t17/s103"
+        code = make_regime.get_code(source)
+        enactment = Enactment(code=code, source=source, selector=selector)
+        assert enactment.code.level == "statute"
+        assert enactment.code.jurisdiction == "us"
+
+    def test_omit_terminal_slash(self, make_code):
+        usc17 = make_code["usc17"]
+        statute = readers.read_enactment(
+            {"exact": "process, system,", "source": "us/usc/t17/s102/b/"}, code=usc17
+        )
+        assert not statute.source.endswith("/")
+
+    def test_add_omitted_initial_slash(self, make_code):
+        usc17 = make_code["usc17"]
+        statute = readers.read_enactment(
+            {"exact": "process, system,", "source": "us/usc/t17/s102/b/"}, code=usc17
+        )
+        assert statute.source.startswith("/")
+
+    def test_selector_text_split(self):
+        data = {"text": "process, system,|method of operation|, concept, principle"}
+        selector = anchors.read_selector(data)
+        assert selector.exact.startswith("method")
+
+    def test_passage_from_uslm_code(self, make_enactment):
+        copyright_exceptions = make_enactment["copyright"]
+        assert copyright_exceptions.selector.exact.strip() == (
+            "In no case does copyright protection "
+            + "for an original work of authorship extend to any"
+        )
+    def test_section_text_from_path_and_regime(self, make_regime):
+        copyright_exceptions = readers.read_enactment(
+            {"source": "/us/usc/t17/s102/b"}, regime=make_regime
+        )
+        assert copyright_exceptions.text.startswith(
+            "In no case does copyright protection "
+            + "for an original work of authorship extend to any"
+        )
+
+    def test_exact_text_not_in_selection(self, make_regime):
+        due_process_wrong_section = TextQuoteSelector(exact="due process")
+        enactment = readers.read_enactment(
+            {
+                "selector": due_process_wrong_section,
+                "source": "/us/const/amendment-XV/1",
+            },
+            regime=make_regime,
+        )
+        with pytest.raises(ValueError):
+            print(enactment.text)
+
+    def test_multiple_non_Factor_selectors_for_Holding(self, make_regime):
+        """
+        The Holding-level TextQuoteSelectors should be built from this:
+
+        "text": [
+            "Census data therefore do not|trigger|copyright",
+            "|may|possess the requisite originality"
+            ]
+        """
+
+        raw_holdings = loaders.load_holdings("holding_feist.json")
+        holding_links = anchors.get_holding_anchors(raw_holdings)
+        assert len(holding_links[6]) == 2

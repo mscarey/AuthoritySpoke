@@ -33,9 +33,9 @@ class TextQuoteSelector:
 
     """
 
-    exact: Optional[str] = None
-    prefix: Optional[str] = None
-    suffix: Optional[str] = None
+    exact: str = ""
+    prefix: str = ""
+    suffix: str = ""
 
     def exact_from_ends(self, text: str) -> str:
         """
@@ -100,8 +100,19 @@ class TextQuoteSelector:
     @property
     def passage_regex(self):
         """Get a regex to identify the selected text."""
+        if not (self.prefix or self.exact or self.suffix):
+            return r"^.*$"
+        
         prefix = (re.escape(self.prefix) + r"\s*") if self.prefix else ""
         suffix = (r"\s*" + re.escape(self.suffix)) if self.suffix else ""
+
+        if not self.exact:
+            if not self.prefix:
+                return r"^(.*?)" + suffix
+            if not self.suffix:
+                return prefix + r"(.*?)$"
+        
+        # continue if self.exact is present
         return (prefix + r"(" + re.escape(self.exact) + r")" + suffix).strip()
 
 

@@ -5,7 +5,7 @@ import pytest
 from authorityspoke.codes import Code
 from authorityspoke.enactments import Enactment, consolidate_enactments
 from authorityspoke.io import loaders, readers, dump
-from authorityspoke.selectors import TextQuoteSelector
+from authorityspoke.textselectors.selectors import TextQuoteSelector
 
 
 class TestCodes:
