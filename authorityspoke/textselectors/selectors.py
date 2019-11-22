@@ -72,7 +72,7 @@ class TextQuoteSelector:
         Get the interval where the selected quote appears in "text".
         """
         regex = self.passage_regex()
-        match = re.match(regex, text, re.IGNORECASE)
+        match = re.search(regex, text, re.IGNORECASE)
         if match:
             # Getting indices from match group 1 (in the parentheses),
             # not match 0 which includes prefix and suffix

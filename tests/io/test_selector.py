@@ -47,5 +47,5 @@ class TestDumpSelector:
         selector = anchors.read_selector(data)
         selector_dict = dump.to_dict(selector)
         new = anchors.read_selector(selector_dict)
-        assert new.prefix is None
+        assert not new.prefix
         assert new.exact == "method of operation"

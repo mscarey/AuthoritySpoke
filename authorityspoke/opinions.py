@@ -436,7 +436,7 @@ class Opinion:
             the text referenced by the selector, or ``None`` if the text
             can't be found.
         """
-        if re.search(selector.passage_regex, self.text, re.IGNORECASE):
+        if re.search(selector.passage_regex(), self.text, re.IGNORECASE):
             return selector.exact
         raise ValueError(
             f'Passage "{selector.exact}" from TextQuoteSelector '
