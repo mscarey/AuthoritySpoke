@@ -1,7 +1,8 @@
 """
 Selectors for citing exact passages in strings.
 
-Based on the `Web Annotation Data Model <https://www.w3.org/TR/annotation-model/>`_
+Based on parts of the `Web Annotation Data
+Model <https://www.w3.org/TR/annotation-model/>`_
 """
 
 from __future__ import annotations
@@ -52,6 +53,21 @@ class TextQuoteSelector:
         if match:
             return match.group(1).strip()
         return None
+
+    def rebuild_from_text(self, text: str) -> Optional[TextQuoteSelector]:
+        """
+        Make new selector with the "exact" value found in a given text.
+
+        :param text:
+            the passage where an exact quotation needs to be located
+
+        :returns:
+            a new selector with the "exact" value found in the provided text
+        """
+        exact = self.exact_from_ends(text)
+        if not exact:
+            return None
+        return TextQuoteSelector(exact=exact, prefix=self.prefix, suffix=self.suffix)
 
     def dump(self):
         """
@@ -141,14 +157,22 @@ class TextPositionSelector:
     start: int = 0
     end: Optional[int] = None
 
+    def __post_init__(self):
+        if self.start < 0:
+            object.__setattr__(self, "start", 0)
+        if self.end:
+            if self.end <= self.start:
+                raise ValueError(
+                    "End position must be a positive number "
+                    "greater than the start position"
+                )
+
     def __add__(self, other: TextPositionSelector) -> TextPositionSelector:
         """
         Make a new selector covering the combined ranges of self and other.
         """
-        if not isinstance(other, TextPositionSelector):
-            raise TypeError
-        if (not other.end or self.start <= other.end) and (
-            not self.end or other.start <= self.end
+        if (not other.end or self.start <= other.end + 3) and (
+            not self.end or other.start <= self.end + 3
         ):
             return TextPositionSelector(
                 start=min(self.start, other.start), end=max(self.end, other.end)
