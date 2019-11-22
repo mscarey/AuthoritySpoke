@@ -1,30 +1,32 @@
 import json
+import re
 
 import pytest
 
 from authorityspoke.textselectors.selectors import TextQuoteSelector
 from authorityspoke.textselectors.selectors import TextPositionSelector
 
+
 class TestQuoteSelectors:
     preexisting_material = TextQuoteSelector(
-            exact=(
-                "protection for a work employing preexisting material in which "
-                + "copyright subsists does not extend to any part of the work in "
-                + "which such material has been used unlawfully."
-            ))
+        exact=(
+            "protection for a work employing preexisting material in which "
+            + "copyright subsists does not extend to any part of the work in "
+            + "which such material has been used unlawfully."
+        )
+    )
 
     in_no_case = TextQuoteSelector(suffix="idea, procedure,")
 
-    copyright_requires_originality = TextQuoteSelector(
-            suffix="fixed in any tangible"
-        )
+    copyright_requires_originality = TextQuoteSelector(suffix="fixed in any tangible")
 
     s102b = (
-        "In no case does copyright protection for an original " +
-        "work of authorship extend to any idea, procedure, process, system, " +
-        "method of operation, concept, principle, or discovery, regardless of " +
-        "the form in which it is described, explained, illustrated, or " +
-        "embodied in such work.")
+        "In no case does copyright protection for an original "
+        + "work of authorship extend to any idea, procedure, process, system, "
+        + "method of operation, concept, principle, or discovery, regardless of "
+        + "the form in which it is described, explained, illustrated, or "
+        + "embodied in such work."
+    )
 
     amendment = (
         "All persons born or naturalized in the United States "
@@ -38,9 +40,10 @@ class TestQuoteSelectors:
     )
 
     amendment_selector = TextQuoteSelector(
-        exact='',
-        prefix='immunities of citizens of the United States; ',
-        suffix=' nor deny to any person')
+        exact="",
+        prefix="immunities of citizens of the United States; ",
+        suffix=" nor deny to any person",
+    )
 
     def test_convert_selector_to_json(self):
         copyright_dict = self.preexisting_material.dump()
@@ -72,9 +75,27 @@ class TestQuoteSelectors:
     def test_exact_from_just_suffix(self):
         exact = self.in_no_case.exact_from_ends(self.s102b)
         assert exact == (
-            "In no case does copyright protection for an original " +
-            "work of authorship extend to any")
+            "In no case does copyright protection for an original "
+            + "work of authorship extend to any"
+        )
 
     def test_exact_from_prefix_and_suffix(self):
         exact = self.amendment_selector.exact_from_ends(self.amendment)
         assert exact.startswith("nor shall any State deprive")
+
+    def test_selector_escapes_special_characters(self):
+        selector = TextQuoteSelector(suffix="opened the C:\documents folder")
+        pattern = selector.passage_regex()
+        match = re.match(pattern, "Lee \n opened the C:\documents folder yesterday")
+        assert match
+
+    def test_regex_match(self):
+        pattern = (
+            r"immunities\ of\ citizens\ of\ the\ United\ States;"
+            + r"\s*(.*?)\s*nor\ deny\ to\ any\ person"
+        )
+        match = re.search(pattern, self.amendment)
+        assert (
+            match.group(1)
+            == "nor shall any State deprive any person of life, liberty, or property, without due process of law;"
+        )

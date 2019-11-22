@@ -47,10 +47,10 @@ class TextQuoteSelector:
         :returns:
             the passage between :attr:`prefix` and :attr:`suffix` in ``text``.
         """
-
-        match = re.match(pattern=self.passage_regex_without_exact(), string=text)
+        pattern = self.passage_regex_without_exact()
+        match = re.search(pattern=pattern, string=text)
         if match:
-            return text[match.start(1):match.end(1)]
+            return match.group(1).strip()
         return None
 
     def dump(self):
@@ -72,7 +72,7 @@ class TextQuoteSelector:
         Get the interval where the selected quote appears in "text".
         """
         regex = self.passage_regex()
-        match = re.search(regex, text, re.IGNORECASE)
+        match = re.match(regex, text, re.IGNORECASE)
         if match:
             # Getting indices from match group 1 (in the parentheses),
             # not match 0 which includes prefix and suffix
@@ -86,30 +86,37 @@ class TextQuoteSelector:
         return TextPositionSelector(start=interval[0], end=interval[1])
 
     def passage_regex_without_exact(self):
+
         if not (self.prefix or self.suffix):
             return r"^.*$"
 
-        prefix = (re.escape(self.prefix) + r"\s*") if self.prefix else ""
-        suffix = (r"\s*" + re.escape(self.suffix)) if self.suffix else ""
-
         if not self.prefix:
-            return r"^(.*?)" + suffix
+            return r"^(.*)" + self.suffix_regex()
 
         if not self.suffix:
-            return prefix + r"(.*?)$"
+            return self.prefix_regex() + r"(.*)$"
 
-        return prefix + r"(.*?)" + suffix.strip()
-
+        return (self.prefix_regex() + r"(.*)" + self.suffix_regex()).strip()
 
     def passage_regex(self):
-
         """Get a regex to identify the selected text."""
+
         if not self.exact:
             return self.passage_regex_without_exact()
 
-        prefix = (re.escape(self.prefix) + r"\s*") if self.prefix else ""
-        suffix = (r"\s*" + re.escape(self.suffix)) if self.suffix else ""
-        return (prefix + r"(" + re.escape(self.exact) + r")" + suffix).strip()
+        return (
+            self.prefix_regex()
+            + r"("
+            + re.escape(self.exact)
+            + r")"
+            + self.suffix_regex()
+        ).strip()
+
+    def prefix_regex(self):
+        return (re.escape(self.prefix.strip()) + r"\s*") if self.prefix else ""
+
+    def suffix_regex(self):
+        return (r"\s*" + re.escape(self.suffix.strip())) if self.suffix else ""
 
 
 @dataclass(frozen=True)
