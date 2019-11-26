@@ -73,15 +73,23 @@ class TestQuoteSelectors:
         assert selector.get_interval(self.s102b) == (141, len(self.s102b))
 
     def test_exact_from_just_suffix(self):
-        exact = self.in_no_case.exact_from_ends(self.s102b)
+        exact = self.in_no_case.select_text(self.s102b)
         assert exact == (
             "In no case does copyright protection for an original "
             + "work of authorship extend to any"
         )
 
     def test_exact_from_prefix_and_suffix(self):
-        exact = self.amendment_selector.exact_from_ends(self.amendment)
+        exact = self.amendment_selector.select_text(self.amendment)
         assert exact.startswith("nor shall any State deprive")
+
+    def test_select_text(self):
+        selector = TextQuoteSelector(prefix="in no case", exact="does copyright", suffix="protection")
+        assert selector.select_text(self.s102b) == "does copyright"
+
+    def test_select_text_without_exact(self):
+        selector = TextQuoteSelector(prefix="in no case", suffix="protection")
+        assert selector.select_text(self.s102b) == "does copyright"
 
     def test_rebuilding_from_text(self):
         new_selector = self.amendment_selector.rebuild_from_text(self.amendment)

@@ -38,7 +38,7 @@ class TextQuoteSelector:
     prefix: str = ""
     suffix: str = ""
 
-    def exact_from_ends(self, text: str) -> Optional[str]:
+    def select_text(self, text: str) -> Optional[str]:
         """
         Get quotation between the prefix and suffix in a text.
 
@@ -48,8 +48,8 @@ class TextQuoteSelector:
         :returns:
             the passage between :attr:`prefix` and :attr:`suffix` in ``text``.
         """
-        pattern = self.passage_regex_without_exact()
-        match = re.search(pattern=pattern, string=text)
+        pattern = self.passage_regex()
+        match = re.search(pattern, text, re.IGNORECASE)
         if match:
             return match.group(1).strip()
         return None
@@ -64,7 +64,7 @@ class TextQuoteSelector:
         :returns:
             a new selector with the "exact" value found in the provided text
         """
-        exact = self.exact_from_ends(text)
+        exact = self.select_text(text)
         if not exact:
             return None
         return TextQuoteSelector(exact=exact, prefix=self.prefix, suffix=self.suffix)

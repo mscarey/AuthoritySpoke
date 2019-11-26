@@ -609,6 +609,7 @@ def make_allegation(make_pleading, make_factor) -> Dict[str, Dict[str, Allegatio
 @pytest.fixture(scope="module")
 def make_selector() -> Dict[str, TextQuoteSelector]:
     return {
+        "bad_selector": TextQuoteSelector(exact="text that doesn't exist in the code"),
         "preexisting material": TextQuoteSelector(
             exact=(
                 "protection for a work employing preexisting material in which "
@@ -652,13 +653,6 @@ def make_code(make_regime) -> Dict[str, Code]:
 @pytest.fixture(scope="module")
 def make_enactment(make_code, make_selector, make_regime) -> Dict[str, Enactment]:
     return {
-        "bad_selector": Enactment(
-            source="/us/const/amendment-IV",
-            selector=TextQuoteSelector(
-                exact="text that doesn't exist in the code",
-            ),
-            code=make_code["const"],
-        ),
         "copyright": readers.read_enactment(
             {"selector": make_selector["copyright"],
             "source": "/us/usc/t17/s102/b"},

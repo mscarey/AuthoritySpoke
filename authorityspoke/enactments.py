@@ -51,12 +51,16 @@ class Enactment:
                     "A Code or Regime is required to select text without an 'exact' field."
                 )
             object.__setattr__(
-                self.selector,
-                "exact",
-                self.code.get_exact_from_source(
-                    source=self.source, selector=self.selector
+                self,
+                "selector",
+                self.selector.rebuild_from_text(
+                    text=self.code.section_text_from_path(self.source)
                 ),
             )
+        elif self.selector and self.source and self.code:
+            if not self.selector.select_text(self.code.section_text_from_path(self.source)):
+                raise ValueError(f"Selected text not found in {self.source}")
+
 
     def __add__(self, other):
         if other.__class__.__name__ == "Rule":

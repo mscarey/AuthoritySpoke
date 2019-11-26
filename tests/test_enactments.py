@@ -194,21 +194,13 @@ class TestEnactments:
         this_section = code.section_text_from_path(path=provision.source)
         assert this_section[interval[0] : interval[1]] == text
 
-    def test_text_interval_bad_source(self, make_code, make_enactment):
+    def test_invalid_selector_text(self, make_code, make_selector):
         with pytest.raises(ValueError):
-            _ = make_code["usc17"].text_interval(
-                selector=make_enactment["bad_selector"].selector,
-                path=make_enactment["bad_selector"].source,
+            _ = Enactment(
+                source="/us/const/amendment-IV",
+                selector=make_selector["bad_selector"],
+                code=make_code["const"],
             )
-
-    def test_text_interval_bad_selector(self, make_code, make_enactment):
-        assert (
-            make_code["const"].text_interval(
-                selector=make_enactment["bad_selector"].selector,
-                path=make_enactment["bad_selector"].source,
-            )
-            is None
-        )
 
     # Addition
 
@@ -278,10 +270,6 @@ class TestEnactments:
         with pytest.raises(TypeError):
             print(make_enactment["search_clause"] + watt_factor["f3"])
 
-    def test_add_with_invalid_selector_text(self, make_enactment, make_code):
-        with pytest.raises(ValueError):
-            print(make_enactment["search_clause"] + make_enactment["bad_selector"])
-
     def test_add_unconnected_provisions(self, make_enactment):
         assert make_enactment["search_clause"] + make_enactment["copyright"] is None
 
@@ -327,6 +315,7 @@ class TestDump:
         assert "due process" in due_process.text
         assert due_process.source.startswith("/us/const")
 
+
 class TestTextSelection:
     def test_code_from_selector(self, make_regime, make_selector):
         code = make_regime.get_code("/us/usc/t17/s103")
@@ -365,6 +354,7 @@ class TestTextSelection:
             "In no case does copyright protection "
             + "for an original work of authorship extend to any"
         )
+
     def test_section_text_from_path_and_regime(self, make_regime):
         copyright_exceptions = readers.read_enactment(
             {"source": "/us/usc/t17/s102/b"}, regime=make_regime
@@ -376,15 +366,14 @@ class TestTextSelection:
 
     def test_exact_text_not_in_selection(self, make_regime):
         due_process_wrong_section = TextQuoteSelector(exact="due process")
-        enactment = readers.read_enactment(
-            {
-                "selector": due_process_wrong_section,
-                "source": "/us/const/amendment-XV/1",
-            },
-            regime=make_regime,
-        )
         with pytest.raises(ValueError):
-            print(enactment.text)
+            enactment = readers.read_enactment(
+                {
+                    "selector": due_process_wrong_section,
+                    "source": "/us/const/amendment-XV/1",
+                },
+                regime=make_regime,
+            )
 
     def test_multiple_non_Factor_selectors_for_Holding(self, make_regime):
         """

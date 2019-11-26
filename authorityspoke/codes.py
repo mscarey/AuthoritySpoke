@@ -115,7 +115,7 @@ class Code:
 
         sections = self.get_sections(source)
         section_text = self.section_text(sections)
-        return selector.exact_from_ends(section_text)
+        return selector.select_text(section_text)
 
     def make_docpath(self, path: str = "") -> str:
         """
@@ -142,7 +142,7 @@ class Code:
         Get sections identified by a path, if present in the :class:`Code`\.
 
         :param path:
-            a path string, in the format used for :class:`.TextQuoteSelector`
+            a path string, in the format used for :class:`.Enactment`
             objects, to the section with the text to be returned.
 
         :returns:
@@ -173,7 +173,7 @@ class Code:
         Get the text of legislative sections from a path identifier.
 
         :param path:
-            a path string, in the format used for :class:`.TextQuoteSelector`
+            a path string, in the format used for :class:`.Enactment`
             objects, to the section with the text to be returned.
 
         :returns:
@@ -237,12 +237,7 @@ class Code:
         text = self.section_text(sections)
         if not selector:
             return text
-        if re.search(selector.passage_regex(), text, re.IGNORECASE):
-            return selector.exact
-        raise ValueError(
-            f'Passage "{selector.exact}" from TextQuoteSelector '
-            + f'not found in Code "{self.title}" at path "{path}".'
-        )
+        return selector.select_text(text)
 
     def __repr__(self):
         return f"{self.__class__.__name__}({self.title})"

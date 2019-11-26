@@ -117,3 +117,17 @@ class TestCodes:
             _ = make_code["cfr37"].select_text_from_interval(
                 path="/us/const/article-I/3/7", interval=(0, 66)
             )
+
+    def test_text_interval_bad_source(self, make_code, make_selector):
+        with pytest.raises(ValueError):
+            _ = make_code["usc17"].text_interval(
+                selector=make_selector["bad_selector"], path="/us/const/amendment-IV",
+            )
+
+    def test_text_interval_bad_selector(self, make_code, make_selector):
+        assert (
+            make_code["const"].text_interval(
+                selector=make_selector["bad_selector"], path="/us/const/amendment-IV",
+            )
+            is None
+        )
