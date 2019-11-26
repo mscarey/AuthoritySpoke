@@ -40,27 +40,22 @@ class Enactment:
     name: Optional[str] = None
 
     def __post_init__(self):
-
-        if (
-            self.selector
-            and (self.selector.prefix or self.selector.suffix)
-            and not self.selector.exact
-        ):
+        if not self.source:
             if not self.code:
-                raise AttributeError(
-                    "A Code or Regime is required to select text without an 'exact' field."
+                raise AttributeError("A Source or Code parameter is required.")
+            object.__setattr__(self, "source", self.code.uri)
+        if self.selector and self.code:
+            text = self.code.section_text_from_path(self.source)
+            if not self.selector.exact:
+                object.__setattr__(
+                    self, "selector", self.selector.rebuild_from_text(text=text)
                 )
-            object.__setattr__(
-                self,
-                "selector",
-                self.selector.rebuild_from_text(
-                    text=self.code.section_text_from_path(self.source)
-                ),
-            )
-        elif self.selector and self.source and self.code:
-            if not self.selector.select_text(self.code.section_text_from_path(self.source)):
-                raise ValueError(f"Selected text not found in {self.source}")
-
+            interval = self.selector.as_position_selector(text)
+            if interval is None:
+                raise ValueError(f"Selected text not found in source {self.source}")
+            object.__setattr__(self, "interval", interval)
+        else:
+            object.__setattr__(self, "interval", None)
 
     def __add__(self, other):
         if other.__class__.__name__ == "Rule":

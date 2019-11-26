@@ -12,6 +12,7 @@ from bs4 import BeautifulSoup
 from utils.roman import from_roman
 
 from authorityspoke.textselectors.selectors import TextQuoteSelector
+from authorityspoke.textselectors.selectors import TextPositionSelector
 
 
 class Code:
@@ -148,7 +149,6 @@ class Code:
         :returns:
             the text of a section of the :class:`Code`.
         """
-
         docpath = self.make_docpath(path)
         if not docpath:  # selecting the whole Code
             return self.xml.find_all(name="text")
@@ -183,7 +183,7 @@ class Code:
         return self.section_text(sections)
 
     def select_text_from_interval(
-        self, interval: Tuple[int, int], path: Optional[str] = None
+        self, interval: TextPositionSelector, path: Optional[str] = None,
     ) -> Optional[str]:
         """
         Select text as interval of section identified by path.
@@ -200,18 +200,11 @@ class Code:
         :returns:
             a slice of text from the section identified by ``path``
         """
-
-        if not path:
-            path = self.uri
         sections = self.get_sections(path)
         if not sections:
             raise ValueError(f"Section {path} does not exist in {self}.")
         section_text = self.section_text(sections)
-        if len(section_text) < max(interval):
-            raise ValueError(
-                f"Interval {interval} extends beyond the end of text section {path}."
-            )
-        return section_text[min(interval) : max(interval)]
+        return interval.passage(section_text)
 
     def select_text(
         self, path: Optional[str], selector: Optional[TextQuoteSelector]

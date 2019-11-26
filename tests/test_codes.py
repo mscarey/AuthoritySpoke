@@ -6,6 +6,7 @@ from authorityspoke.codes import Code
 from authorityspoke.enactments import Enactment, consolidate_enactments
 from authorityspoke.io import loaders, readers, dump
 from authorityspoke.textselectors.selectors import TextQuoteSelector
+from authorityspoke.textselectors.selectors import TextPositionSelector
 
 
 class TestCodes:
@@ -87,7 +88,9 @@ class TestCodes:
         assert section.find("text").text.startswith(expected)
 
     def test_text_interval_from_entire_code(self, make_code):
-        interval = make_code["const"].select_text_from_interval(interval=(16, 50))
+        interval = make_code["const"].select_text_from_interval(
+            interval=TextPositionSelector(16, 50)
+        )
         assert interval.startswith("Powers herein granted")
 
     def test_text_interval_constitution_section(self, make_code):
@@ -106,7 +109,7 @@ class TestCodes:
     def test_text_interval_beyond_end_of_section(self, make_code):
         with pytest.raises(ValueError):
             _ = make_code["const"].select_text_from_interval(
-                path="/us/const/article-I/3/7", interval=(66, 400)
+                path="/us/const/article-I/3/7", interval=TextPositionSelector(66, 400)
             )
 
     def test_text_interval_absent_section(self, make_code):
@@ -115,7 +118,7 @@ class TestCodes:
         """
         with pytest.raises(ValueError):
             _ = make_code["cfr37"].select_text_from_interval(
-                path="/us/const/article-I/3/7", interval=(0, 66)
+                path="/us/const/article-I/3/7", interval=TextPositionSelector(0, 66)
             )
 
     def test_text_interval_bad_source(self, make_code, make_selector):
