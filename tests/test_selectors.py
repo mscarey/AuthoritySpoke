@@ -55,11 +55,11 @@ class TestQuoteSelectors:
         the cited subsection, so searching for the interval will fail.
         """
         after_sound = TextQuoteSelector(prefix="sound recordings")
-        assert after_sound.get_interval(self.s102b) is None
+        assert after_sound.as_position(self.s102b) is None
 
     def test_failed_suffix(self):
         up_to_sound = TextQuoteSelector(suffix="sound recordings")
-        assert up_to_sound.get_interval(self.s102b) is None
+        assert up_to_sound.as_position(self.s102b) is None
 
     def test_interval_from_just_prefix(self):
         """
@@ -70,7 +70,9 @@ class TestQuoteSelectors:
         If it started with 140, there would be a leading space.
         """
         selector = TextQuoteSelector(prefix="method of operation,")
-        assert selector.get_interval(self.s102b) == (141, len(self.s102b))
+        assert selector.as_position(self.s102b) == TextPositionSelector(
+            141, len(self.s102b)
+        )
 
     def test_exact_from_just_suffix(self):
         exact = self.in_no_case.select_text(self.s102b)
@@ -84,7 +86,9 @@ class TestQuoteSelectors:
         assert exact.startswith("nor shall any State deprive")
 
     def test_select_text(self):
-        selector = TextQuoteSelector(prefix="in no case", exact="does copyright", suffix="protection")
+        selector = TextQuoteSelector(
+            prefix="in no case", exact="does copyright", suffix="protection"
+        )
         assert selector.select_text(self.s102b) == "does copyright"
 
     def test_select_text_without_exact(self):
@@ -102,11 +106,11 @@ class TestQuoteSelectors:
         assert not new_selector
 
     def test_make_position_selector(self):
-        new_selector = self.amendment_selector.as_position_selector(self.amendment)
+        new_selector = self.amendment_selector.as_position(self.amendment)
         assert new_selector.start == self.amendment.find("nor shall any State")
 
     def test_failing_to_make_position_selector(self):
-        new_selector = self.amendment_selector.as_position_selector(
+        new_selector = self.amendment_selector.as_position(
             "does not contain selected passages"
         )
         assert not new_selector

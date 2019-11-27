@@ -95,7 +95,7 @@ class TestCodes:
 
     def test_text_interval_constitution_section(self, make_code):
         passage = make_code["const"].select_text_from_interval(
-            path="/us/const/article-I/3/7", interval=(66, 85)
+            path="/us/const/article-I/3/7", interval=TextPositionSelector(66, 85)
         )
         assert passage == "removal from Office"
 

@@ -38,6 +38,13 @@ class TextQuoteSelector:
     prefix: str = ""
     suffix: str = ""
 
+    def find_match(self, text: str) -> Optional[re.match]:
+        """
+        Get the first match for the selector within a string.
+        """
+        pattern = self.passage_regex()
+        return re.search(pattern, text, re.IGNORECASE)
+
     def select_text(self, text: str) -> Optional[str]:
         """
         Get quotation between the prefix and suffix in a text.
@@ -48,8 +55,7 @@ class TextQuoteSelector:
         :returns:
             the passage between :attr:`prefix` and :attr:`suffix` in ``text``.
         """
-        pattern = self.passage_regex()
-        match = re.search(pattern, text, re.IGNORECASE)
+        match = self.find_match(text)
         if match:
             return match.group(1).strip()
         return None
@@ -83,23 +89,26 @@ class TextQuoteSelector:
             "suffix": self.suffix,
         }
 
-    def get_interval(self, text: str) -> Optional[Tuple[int, int]]:
+    def as_position(self, text: str) -> Optional[TextPositionSelector]:
         """
         Get the interval where the selected quote appears in "text".
         """
-        regex = self.passage_regex()
-        match = re.search(regex, text, re.IGNORECASE)
+        match = self.find_match(text)
         if match:
             # Getting indices from match group 1 (in the parentheses),
             # not match 0 which includes prefix and suffix
-            return (match.start(1), match.end(1))
+            return TextPositionSelector(match.start(1), match.end(1))
         return None
 
-    def as_position_selector(self, text: str) -> Optional[TextPositionSelector]:
-        interval = self.get_interval(text)
-        if not interval:
-            return None
-        return TextPositionSelector(start=interval[0], end=interval[1])
+    def is_unique_in(self, text: str) -> bool:
+        """
+        Test if selector refers to exactly one passage in text.
+        """
+        match = self.find_match(text)
+        if match:
+            second_match = self.find_match(text[match.end(1) :])
+            return bool(second_match)
+        return False
 
     def passage_regex_without_exact(self):
 
@@ -167,7 +176,7 @@ class TextPositionSelector:
                     "greater than the start position"
                 )
 
-    def __add__(self, other: TextPositionSelector) -> TextPositionSelector:
+    def __add__(self, other: TextPositionSelector) -> Optional[TextPositionSelector]:
         """
         Make a new selector covering the combined ranges of self and other.
         """
@@ -177,7 +186,25 @@ class TextPositionSelector:
             return TextPositionSelector(
                 start=min(self.start, other.start), end=max(self.end, other.end)
             )
-        return self
+        return None
+
+    def as_quote_selector(self, text: str) -> TextQuoteSelector:
+        """
+        Make a quote selector, adding prefix and suffix if possible.
+        """
+        exact = text[self.start : self.end]
+        margin = 0
+        end = self.end or len(text)
+        while margin < (len(text) - len(exact)):
+            margin += 5
+            prefix = text[max(0, self.start - margin) : self.start]
+            suffix = text[end : min(len(text), end + margin)]
+            new_selector = TextQuoteSelector(exact=exact, prefix=prefix, suffix=suffix)
+            if new_selector.is_unique_in(text):
+                return new_selector
+        return TextQuoteSelector(
+            exact=exact, prefix=text[: self.start], suffix=text[self.end :]
+        )
 
     def combine(self, other: TextPositionSelector, text: str):
         """

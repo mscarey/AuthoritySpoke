@@ -85,12 +85,12 @@ class Code:
 
     def text_interval(
         self, selector: Optional[TextQuoteSelector] = None, path: str = ""
-    ) -> Optional[Tuple[int, int]]:
+    ) -> Optional[TextPositionSelector]:
         """
         Find integer indices for the quoted text.
 
         :returns:
-            A :class:`tuple` containing the lower and upper bounds of the
+            A :class:`TextPositionSelector` containing the lower and upper bounds of the
             text passage quoted in ``self.selector.exact`` within the
             XML section referenced in ``self.selector.path``.
         """
@@ -101,7 +101,7 @@ class Code:
         text = self.section_text(sections)
         if not selector:
             return (0, len(text))
-        return selector.get_interval(text)
+        return selector.as_position(text)
 
     def provision_effective_date(self, cite: str) -> datetime.date:
         """

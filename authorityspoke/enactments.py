@@ -2,12 +2,13 @@
 
 from __future__ import annotations
 
-from typing import List, Optional
+from typing import List, Optional, Union
 from dataclasses import dataclass
 
 from authorityspoke.codes import Code
 from authorityspoke.formatting import wrapped
 from authorityspoke.textselectors.selectors import TextQuoteSelector
+from authorityspoke.textselectors.selectors import TextPositionSelector
 
 
 @dataclass(frozen=True)
@@ -35,7 +36,7 @@ class Enactment:
     """
 
     source: Optional[str]
-    selector: Optional[TextQuoteSelector] = None
+    selector: Optional[Union[TextQuoteSelector, TextPositionSelector]] = None
     code: Optional[Code] = None
     name: Optional[str] = None
 
@@ -44,18 +45,35 @@ class Enactment:
             if not self.code:
                 raise AttributeError("A Source or Code parameter is required.")
             object.__setattr__(self, "source", self.code.uri)
+
+        if isinstance(self.selector, TextPositionSelector):
+            if not self.code:
+                raise AttributeError(
+                    "Because text alignment may vary between Code versions, "
+                    + "a Code parameter is required when the selector is a "
+                    + "TextPositionSelector."
+                )
+            object.__setattr__(self, "_interval", self.selector)
+            object.__setattr__(
+                self,
+                "selector",
+                self._interval.as_quote_selector(
+                    self.code.section_text_from_path(self.source)
+                ),
+            )
+
         if self.selector and self.code:
             text = self.code.section_text_from_path(self.source)
             if not self.selector.exact:
                 object.__setattr__(
                     self, "selector", self.selector.rebuild_from_text(text=text)
                 )
-            interval = self.selector.as_position_selector(text)
+            interval = self.selector.as_position(text)
             if interval is None:
                 raise ValueError(f"Selected text not found in source {self.source}")
-            object.__setattr__(self, "interval", interval)
+            object.__setattr__(self, "_interval", interval)
         else:
-            object.__setattr__(self, "interval", None)
+            object.__setattr__(self, "_interval", None)
 
     def __add__(self, other):
         if other.__class__.__name__ == "Rule":
@@ -70,6 +88,28 @@ class Enactment:
         combined = self.combine_text(other) or other.combine_text(self)
         return combined
 
+    def _combine_text(self, other: Enactment) -> Optional[Enactment]:
+        r"""
+        Create new :class:`Enactment` with combined text of the source :class:`Enactment`\s.
+
+        Private method because it only works if other's path includes
+        self's path.
+        """
+        code = self.code or other.code
+        if not code:
+            raise AttributeError(
+                "Code attribute is needed to combine text of Enactments "
+                + "with different source URIs."
+            )
+        section_text = code.section_text_from_path(self.source)
+        self_interval = self.selector.as_position(section_text)
+        other_interval = other.selector.as_position(section_text)
+        new_interval = self_interval + other_interval
+        if not new_interval:
+            return None
+        new_selector = new_interval.as_quote_selector(section_text)
+        return Enactment(source=self.source, selector=new_selector, code=self.code,)
+
     def combine_text(self, other: Enactment) -> Optional[Enactment]:
         r"""
         Create new :class:`Enactment` with combined text of the source :class:`Enactment`\s.
@@ -81,27 +121,17 @@ class Enactment:
             new :class:`Enactment` with combined text of the source :class:`Enactment`\s, or
             ``None`` if the :class:`Enactment`\s can't be combined.
         """
-        if not other.source.startswith(self.source):
-            return None
-        self_interval = self.code.text_interval(self.selector, path=self.source)
-        other_interval = self.code.text_interval(other.selector, path=self.source)
-        both_intervals = sorted([self_interval, other_interval])
-        if both_intervals[1][0] >= both_intervals[0][1] + 2:
-            return None
-        new_interval = (
-            both_intervals[0][0],
-            max(both_intervals[0][1], both_intervals[1][1]),
-        )
-        # BUG: can't create prefix and suffix to distinguish identical passages.
-        return Enactment(
-            source=self.source,
-            selector=TextQuoteSelector(
-                exact=self.code.select_text_from_interval(
-                    interval=new_interval, path=self.source
-                )
-            ),
-            code=self.code,
-        )
+        if other.source == self.source:
+            return Enactment(
+                source=self.source,
+                selector=self.interval + other.interval,
+                code=self.code,
+            )
+        if other.source.startswith(self.source):
+            return self._combine_text(other)
+        elif self.source.startswith(other.source):
+            return other._combine_text(self)
+        return None
 
     @property
     def effective_date(self):
@@ -113,6 +143,10 @@ class Enactment:
             Currently works only for the US Constitution.
         """
         return self.code.provision_effective_date(self.source)
+
+    @property
+    def interval(self):
+        return self._interval or TextPositionSelector(0, len(self.text))
 
     @property
     def text(self):
