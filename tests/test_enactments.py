@@ -192,7 +192,7 @@ class TestEnactments:
         code = make_code[code_name]
         interval = code.text_interval(provision.selector, path=provision.source)
         this_section = code.section_text_from_path(path=provision.source)
-        assert this_section[interval[0] : interval[1]] == text
+        assert this_section[interval.start : interval.end] == text
 
     def test_invalid_selector_text(self, make_code, make_selector):
         with pytest.raises(ValueError):

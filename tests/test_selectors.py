@@ -167,7 +167,7 @@ class TestQuoteSelectors:
         left = TextPositionSelector(start=5, end=12)
         right = TextPositionSelector(start=24, end=27)
         new = left + right
-        assert new == left
+        assert new is None
 
     def test_fail_combining_with_short_text(self):
         left = TextPositionSelector(start=5, end=12)

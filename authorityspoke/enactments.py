@@ -122,11 +122,10 @@ class Enactment:
             ``None`` if the :class:`Enactment`\s can't be combined.
         """
         if other.source == self.source:
-            return Enactment(
-                source=self.source,
-                selector=self.interval + other.interval,
-                code=self.code,
-            )
+            new_interval = self.interval + other.interval
+            if new_interval is None:
+                return None
+            return Enactment(source=self.source, selector=new_interval, code=self.code,)
         if other.source.startswith(self.source):
             return self._combine_text(other)
         elif self.source.startswith(other.source):
