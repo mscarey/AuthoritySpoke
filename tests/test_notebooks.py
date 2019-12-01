@@ -3,10 +3,11 @@ Tests of commands that appear in notebooks in
 the notebooks/ directory
 """
 
+from anchorpoint.textselectors import TextQuoteSelector
+
 from authorityspoke import Enactment
 from authorityspoke.factors import ContextRegister
 from authorityspoke.entities import Entity
-from authorityspoke.textselectors.selectors import TextQuoteSelector
 
 
 class TestIntroduction:

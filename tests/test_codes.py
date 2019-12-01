@@ -2,11 +2,11 @@ import datetime
 
 import pytest
 
+from anchorpoint.textselectors import TextQuoteSelector, TextPositionSelector
+
 from authorityspoke.codes import Code
 from authorityspoke.enactments import Enactment, consolidate_enactments
 from authorityspoke.io import loaders, readers, dump
-from authorityspoke.textselectors.selectors import TextQuoteSelector
-from authorityspoke.textselectors.selectors import TextPositionSelector
 
 
 class TestCodes:
@@ -107,7 +107,7 @@ class TestCodes:
         assert interval == (0, 317)
 
     def test_text_interval_beyond_end_of_section(self, make_code):
-        with pytest.raises(ValueError):
+        with pytest.raises(IndexError):
             _ = make_code["const"].select_text_from_interval(
                 path="/us/const/article-I/3/7", interval=TextPositionSelector(66, 400)
             )

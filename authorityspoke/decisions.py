@@ -5,12 +5,13 @@ import datetime
 from typing import Iterable, Iterator, List
 from typing import Optional, Sequence, Union
 
+from anchorpoint.textselectors import TextQuoteSelector
+
 from authorityspoke.explanations import Explanation
 from authorityspoke.factors import Factor, ContextRegister
 from authorityspoke.holdings import Holding
 from authorityspoke.opinions import Opinion, TextLinkDict
 from authorityspoke.rules import Rule
-from authorityspoke.textselectors.selectors import TextQuoteSelector
 
 
 @dataclass

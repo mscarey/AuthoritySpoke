@@ -6,10 +6,11 @@ Dev
 - Enactments may choose text by section without a TextQuoteSelector
 - Remove "regime" parameter from Enactment
 - Add data serialization using Marshmallow
-- Migrate JSON data loading functions to Marshmallow
+- Migrate JSON data loading functions to [Marshmallow](https://marshmallow.readthedocs.io/)
 - Add Decision class containing Opinions
 - Add Explanation class to clarify relationships between Holdings
 - Improve readability of object strings
+- Move text selectors to separate [anchorpoint](https://anchorpoint.readthedocs.io/) library
 
 0.2.0 (2019-09-24)
 ------------------

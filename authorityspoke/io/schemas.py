@@ -5,6 +5,7 @@ from marshmallow import Schema, fields, validate
 from marshmallow import pre_load, post_load
 from marshmallow import ValidationError
 
+from anchorpoint.textselectors import TextQuoteSelector
 from pint import UnitRegistry
 
 from authorityspoke.decisions import CaseCitation, Decision
@@ -22,7 +23,6 @@ from authorityspoke.pleadings import Pleading, Allegation
 from authorityspoke.predicates import Predicate
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
-from authorityspoke.textselectors.selectors import TextQuoteSelector
 
 from utils.marshmallow_oneofschema.one_of_schema import OneOfSchema
 

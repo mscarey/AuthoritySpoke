@@ -1,8 +1,9 @@
 from collections import defaultdict
 from typing import Any, Dict, Iterable, List, Union
 
+from anchorpoint.textselectors import TextQuoteSelector
+
 from authorityspoke.opinions import TextLinkDict
-from authorityspoke.textselectors.selectors import TextQuoteSelector
 
 from authorityspoke.io import schemas
 from authorityspoke.io.schemas import RawSelector, RawHolding

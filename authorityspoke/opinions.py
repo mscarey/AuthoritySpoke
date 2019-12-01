@@ -17,11 +17,13 @@ import re
 
 from dataclasses import dataclass, field
 
+from anchorpoint.textselectors import TextQuoteSelector
+
 from authorityspoke.factors import Factor, ContextRegister, Analogy
 from authorityspoke.explanations import Explanation
 from authorityspoke.holdings import Holding
 from authorityspoke.rules import Rule
-from authorityspoke.textselectors.selectors import TextQuoteSelector
+
 
 logger = logging.getLogger(__name__)
 

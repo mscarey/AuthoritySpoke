@@ -13,7 +13,7 @@ from typing import Any, Callable, Dict, Iterable, Iterator, List
 from typing import Optional, Sequence, Tuple, Union
 
 from authorityspoke.enactments import Enactment
-from authorityspoke.textselectors.selectors import TextQuoteSelector
+from anchorpoint.textselectors import TextQuoteSelector
 
 logger = logging.getLogger(__name__)
 

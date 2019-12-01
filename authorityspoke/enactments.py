@@ -5,10 +5,10 @@ from __future__ import annotations
 from typing import List, Optional, Union
 from dataclasses import dataclass
 
+from anchorpoint.textselectors import TextQuoteSelector, TextPositionSelector
+
 from authorityspoke.codes import Code
 from authorityspoke.formatting import wrapped
-from authorityspoke.textselectors.selectors import TextQuoteSelector
-from authorityspoke.textselectors.selectors import TextPositionSelector
 
 
 @dataclass(frozen=True)

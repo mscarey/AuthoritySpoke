@@ -2,16 +2,15 @@ import datetime
 import json
 import operator
 
+from anchorpoint.textselectors import TextQuoteSelector
 from pint import UnitRegistry
 import pytest
-
 
 from authorityspoke.codes import Code
 from authorityspoke.enactments import Enactment, consolidate_enactments
 from authorityspoke.opinions import Opinion
 from authorityspoke.predicates import ureg, Q_
 from authorityspoke.io import anchors, loaders, readers, dump
-from authorityspoke.textselectors.selectors import TextQuoteSelector
 
 
 class TestEnactments:

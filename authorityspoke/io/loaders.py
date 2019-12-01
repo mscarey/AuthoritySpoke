@@ -8,6 +8,7 @@ import pathlib
 
 from typing import Any, Dict, List, Iterator, Optional, Tuple, Union
 
+from anchorpoint.textselectors import TextQuoteSelector
 from bs4 import BeautifulSoup
 
 from authorityspoke.decisions import Decision
@@ -15,7 +16,6 @@ from authorityspoke.codes import Code
 from authorityspoke.holdings import Holding
 from authorityspoke.jurisdictions import Regime
 from authorityspoke.opinions import Opinion
-from authorityspoke.textselectors.selectors import TextQuoteSelector
 
 from authorityspoke.io import anchors, filepaths, readers
 from authorityspoke.io.text_expansion import expand_shorthand

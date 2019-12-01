@@ -4,6 +4,8 @@ from marshmallow import ValidationError
 import pint
 import pytest
 
+from anchorpoint.textselectors import TextQuoteSelector
+
 from authorityspoke.enactments import Code, Enactment
 from authorityspoke.entities import Entity
 from authorityspoke.facts import Fact
@@ -15,7 +17,6 @@ from authorityspoke.io import anchors, loaders, readers, dump, name_index
 from authorityspoke.io.loaders import load_holdings
 from authorityspoke.io import filepaths, text_expansion
 from authorityspoke.rules import Rule
-from authorityspoke.textselectors.selectors import TextQuoteSelector
 
 ureg = pint.UnitRegistry()
 

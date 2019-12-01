@@ -1,5 +1,6 @@
 from typing import Any, Dict, Tuple
 
+from anchorpoint.textselectors import TextQuoteSelector
 import pytest
 
 
@@ -15,7 +16,6 @@ from authorityspoke.opinions import Opinion
 from authorityspoke.pleadings import Pleading, Allegation
 from authorityspoke.predicates import Predicate, Q_
 from authorityspoke.rules import Procedure, Rule
-from authorityspoke.textselectors.selectors import TextQuoteSelector
 
 from authorityspoke.io import loaders, readers
 from authorityspoke.io.schemas import RawHolding
@@ -605,7 +605,6 @@ def make_allegation(make_pleading, make_factor) -> Dict[str, Dict[str, Allegatio
         "shooting": Allegation(statement=make_factor["f_shooting"], pleading=make_pleading["craig"])
     }
 
-
 @pytest.fixture(scope="module")
 def make_selector() -> Dict[str, TextQuoteSelector]:
     return {
@@ -623,7 +622,6 @@ def make_selector() -> Dict[str, TextQuoteSelector]:
         ),
     }
 
-
 @pytest.fixture(scope="module")
 def make_regime() -> Dict[str, Code]:
     usa = Regime()
@@ -637,7 +635,6 @@ def make_regime() -> Dict[str, Code]:
         xml = loaders.load_code(filename=filename)
         usa.set_code(readers.read_code(xml))
     return usa
-
 
 @pytest.fixture(scope="module")
 def make_code(make_regime) -> Dict[str, Code]:

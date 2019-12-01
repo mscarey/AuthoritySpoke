@@ -7,12 +7,10 @@ import functools
 import re
 from typing import List, Optional, Sequence, Tuple, Union
 
+from anchorpoint.textselectors import TextQuoteSelector, TextPositionSelector
 from bs4 import BeautifulSoup
 
 from utils.roman import from_roman
-
-from authorityspoke.textselectors.selectors import TextQuoteSelector
-from authorityspoke.textselectors.selectors import TextPositionSelector
 
 
 class Code:
