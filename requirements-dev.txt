@@ -12,6 +12,8 @@
 
 black
 coveralls
+doc8
+flake8-comprehensions
 ipykernel
 mypy
 pipenv-to-requirements
@@ -22,7 +24,7 @@ pytest-cov
 pytest-profiling
 rope
 setuptools
-sphinx
 sphinx-autodoc-typehints
+sphinx>=2.1.2
 twine
 wheel

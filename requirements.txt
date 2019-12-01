@@ -11,8 +11,9 @@
 ################################################################################
 
 -e .
-beautifulsoup4>=4.7.1
+anchorpoint>=0.1.1
+beautifulsoup4>=4.8.1
 lxml
-marshmallow
+marshmallow>=3.2.2
 pint>=0.9
 requests
