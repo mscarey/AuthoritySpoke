@@ -276,9 +276,8 @@ class USConstCode(Code):
         :returns:
             the XML section of ``self`` matching the path.
         """
-        path = path.replace(self.uri, "")
+        path = self.format_uri_for_const(path)
         path_parts: List[str] = []
-        path = path.lstrip("/")
         for _ in range(path.count("/") + 1):
             path_parts.append(path[: (path.index("/") if "/" in path else None)])
             path = path.replace("/", "-", 1)
