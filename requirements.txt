@@ -12,6 +12,7 @@
 
 -e .
 anchorpoint>=0.1.1
+apispec[validation]
 beautifulsoup4>=4.8.1
 lxml
 marshmallow>=3.2.2

@@ -2,7 +2,7 @@
 
 [![CircleCI](https://circleci.com/gh/mscarey/AuthoritySpoke.svg?style=svg)](https://circleci.com/gh/mscarey/AuthoritySpoke) [![Coverage Status](https://coveralls.io/repos/github/mscarey/AuthoritySpoke/badge.svg?branch=master)](https://coveralls.io/github/mscarey/AuthoritySpoke?branch=master)
 
-AuthoritySpoke is the world's first open source legal authority automation tool.
+AuthoritySpoke is the first open source legal authority automation tool.
 
 ## Installing AuthoritySpoke
 
@@ -11,6 +11,8 @@ AuthoritySpoke is a Python package [available on PyPI](https://pypi.org/project/
 ```
 $ pip install authorityspoke
 ```
+
+AuthoritySpoke is tested on Python 3.7 and is not yet working on Python 3.8.
 
 ## Trying it Out
 
@@ -30,13 +32,13 @@ The `example_data` folder also contains legislation in XML files that can be org
 ```python
 from authorityspoke import Regime
 
-from authorityspoke.io.loaders import load_code
+from authorityspoke.io.loaders import load_and_read_code
 
 usa = Regime()
 
-usa.set_code(load_code("constitution.xml"))
-usa.set_code(load_code("usc17.xml"))
-usa.set_code(load_code("cfr37.xml"))
+usa.set_code(load_and_read_code("constitution.xml"))
+usa.set_code(load_and_read_code("usc17.xml"))
+usa.set_code(load_and_read_code("cfr37.xml"))
 ```
 
 Structured annotations about the holdings in _Oracle_ and _Lotus_ can also be loaded from the `example_data` folder, and can be linked to the `Opinion` objects.
