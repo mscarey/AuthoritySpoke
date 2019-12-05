@@ -128,7 +128,7 @@ def load_decision(
     filepath: Optional[pathlib.Path] = None,
 ) -> RawDecision:
     r"""
-    Create and return one or more :class:`.Opinion` objects from JSON.
+    Load file containing a judicial decision with one or more opinions.
 
     Relies on the JSON format from the `Caselaw Access Project
     API <https://api.case.law/v1/cases/>`_.

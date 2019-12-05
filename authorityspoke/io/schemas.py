@@ -281,16 +281,15 @@ def read_quantity(value: Union[float, int, str]) -> Union[float, int, ureg.Quant
     return ureg.Quantity(quantity)
 
 
-def dump_quantity(obj: Predicate) -> Union[float, int, str]:
+def dump_quantity(obj: Predicate) -> Optional[Union[float, int, str]]:
     """
     Convert quantity to string if it's a pint `ureg.Quantity` object.
     """
-    quantity = obj.quantity
-    if quantity is None:
+    if obj is None or obj.quantity is None:
         return None
-    if isinstance(quantity, (int, float)):
-        return quantity
-    return f"{quantity.magnitude} {quantity.units}"
+    if isinstance(obj.quantity, (int, float)):
+        return obj.quantity
+    return f"{obj.quantity.magnitude} {obj.quantity.units}"
 
 
 class PredicateSchema(ExpandableSchema):
