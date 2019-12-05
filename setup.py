@@ -1,5 +1,7 @@
 import setuptools
 
+import authorityspoke
+
 with open("readme.md", "r") as fh:
     long_description = fh.read()
 
@@ -15,16 +17,16 @@ setuptools.setup(
     packages=setuptools.find_packages(
         exclude=["tests", "*.tests", "*.tests.*", "tests.*"]
     ),
-    install_requires=["beautifulsoup4", "lxml", "marshmallow", "pint", "requests"],
-    extras_require={"jupyter notebooks": ["jupyter", "ipykernel"]},
+    install_requires=["anchorpoint", "apispec", "beautifulsoup4", "lxml", "marshmallow", "pint", "requests"],
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Intended Audience :: Legal Industry",
-        "License :: OSI Approved :: GNU Affero General Public License v3",
+        "License :: Free To Use But Restricted",
         "Programming Language :: Python :: 3.7",
         "Operating System :: OS Independent",
         "Natural Language :: English",
         "Topic :: Sociology :: History",
     ],
+    python_requires="==3.7"
     include_package_data=True,
 )

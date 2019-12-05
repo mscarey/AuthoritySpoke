@@ -38,4 +38,4 @@ flake8-comprehensions = "*"
 jupyterlab = "*"
 
 [requires]
-python_version = "3.7.3"
+python_version = "3.7"
