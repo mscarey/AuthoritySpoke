@@ -581,3 +581,67 @@ into the Holding object, as shown in the examples above.
     paths: {}
 
 
+
+Finally, if you want to convert an AuthoritySpoke object back to JSON or
+to a Python dictionary, you can do so with :func:`.io.dump.to_json` or
+:func:`.io.dump.to_dict`\. If you need to make some changes to an
+AuthoritySpoke object, one way to do
+so would be to convert it to JSON, edit the JSON, and then load it back
+into AuthoritySpoke. The JSON format is also easier to store and share
+over the web.
+
+.. code:: python
+
+    from authorityspoke.io import dump
+
+    dump.to_dict(oracle.holdings[0])
+
+
+.. parsed-literal::
+
+    {'exclusive': False,
+     'rule': {'procedure': {'inputs': [{'absent': False,
+         'name': 'false the Java API was an original work',
+         'context_factors': [{'name': 'the Java API',
+           'generic': True,
+           'plural': False,
+           'type': 'Entity'}],
+         'predicate': {'truth': False,
+          'reciprocal': False,
+          'content': '{} was an original work',
+          'quantity': None,
+          'comparison': ''},
+         'generic': False,
+         'standard_of_proof': None,
+         'type': 'Fact'}],
+       'despite': [],
+       'outputs': [{'absent': False,
+         'name': 'false the Java API was copyrightable',
+         'context_factors': [{'name': 'the Java API',
+           'generic': True,
+           'plural': False,
+           'type': 'Entity'}],
+         'predicate': {'truth': False,
+          'reciprocal': False,
+          'content': '{} was copyrightable',
+          'quantity': None,
+          'comparison': ''},
+         'generic': False,
+         'standard_of_proof': None,
+         'type': 'Fact'}]},
+      'name': None,
+      'enactments': [{'name': 'copyright protection provision',
+        'selector': {'prefix': '',
+         'suffix': '',
+         'exact': 'Copyright protection subsists, in accordance with this title, in original works of authorship fixed in any tangible medium of expression, now known or later developed, from which they can be perceived, reproduced, or otherwise communicated, either directly or with the aid of a machine or device.'},
+        'source': '/us/usc/t17/s102/a'}],
+      'mandatory': True,
+      'universal': False,
+      'generic': False,
+      'enactments_despite': []},
+     'decided': True,
+     'generic': False,
+     'rule_valid': True}
+
+
+

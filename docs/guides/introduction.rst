@@ -283,7 +283,7 @@ files.
 An explanation of the interface for creating new ``Holding`` objects can
 be found in the ``create_holding_data`` notebook in this folder. That
 interface should continue to undergo major changes as AuthoritySpoke
-moves beyond version 0.2.
+moves beyond version 0.3.
 
 For now, this introduction will rely on example JSON files that have
 already been created. AuthoritySpoke should find them when we call the
