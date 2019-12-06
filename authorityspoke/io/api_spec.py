@@ -16,3 +16,21 @@ spec.components.schema("Holding", schema=HoldingSchema)
 spec.components.schema("Fact", schema=FactSchema)
 spec.components.schema("Evidence", schema=EvidenceSchema)
 spec.components.schema("Allegation", schema=AllegationSchema)
+
+factor_names = ["Fact", "Exhibit", "Evidence", "Pleading", "Allegation"]
+factor_options = []
+
+for factor_name in factor_names:
+    factor_options.append({"$ref": f"#/components/schemas/{factor_name}"})
+
+del spec.components._schemas["Factor"]
+
+spec.components.schema(
+    "Factor",
+    {
+        "properties": {
+            "oneOf": factor_options,
+            "discriminator": {"propertyName": "type"},
+        },
+    },
+)
