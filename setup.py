@@ -35,6 +35,6 @@ setuptools.setup(
         "Natural Language :: English",
         "Topic :: Sociology :: History",
     ],
-    python_requires="==3.7",
+    python_requires=">=3.7, <3.8",
     include_package_data=True,
 )

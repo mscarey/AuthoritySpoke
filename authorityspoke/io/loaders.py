@@ -72,7 +72,7 @@ def load_holdings(
     filepath: Optional[pathlib.Path] = None,
 ) -> List[RawHolding]:
     r"""
-    Load a list of :class:`.Holding`\s from JSON.
+    Load a list of records from JSON to create :class:`.Holding`\s.
 
     :param filename:
         the name of the JSON file to look in for :class:`Rule`
@@ -103,6 +103,33 @@ def load_holdings(
 
 
 def load_and_read_holdings(
+    filename: Optional[str] = None,
+    directory: Optional[pathlib.Path] = None,
+    filepath: Optional[pathlib.Path] = None,
+    regime: Optional[Regime] = None,
+) -> List[Holding]:
+    """
+    Read holdings with text anchors from a file.
+
+    :param filename: The name of the input JSON file.
+
+    :param directory: The directory where the input JSON file is located.
+
+    :param filepath:
+        Complete path to the JSON file representing the :class:`.Opinion`,
+        including filename.
+
+    :param regime:
+        The regime to reference for the :class:`Enactment`\s
+        mentioned in the holding.
+    """
+    raw_holdings = load_holdings(
+        filename=filename, directory=directory, filepath=filepath
+    )
+    return readers.read_holdings(raw_holdings, regime=regime)
+
+
+def load_holdings_with_anchors(
     filename: Optional[str] = None,
     directory: Optional[pathlib.Path] = None,
     filepath: Optional[pathlib.Path] = None,

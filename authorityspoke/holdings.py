@@ -121,6 +121,14 @@ class Holding(Factor):
         """
         return self.rule.generic_factors
 
+    @property
+    def mandatory(self) -> bool:
+        return self.rule.mandatory
+
+    @property
+    def universal(self) -> bool:
+        return self.rule.universal
+
     def add_if_not_exclusive(self, other: Holding) -> Optional[Holding]:
         new_rule = self.rule + other.rule
         if new_rule is None:
