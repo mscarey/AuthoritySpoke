@@ -6,6 +6,7 @@
 
     io/dump
     io/schemas
+    io/schema_specs
     io/downloads
     io/loaders
     io/readers

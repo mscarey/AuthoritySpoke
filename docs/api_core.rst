@@ -15,4 +15,3 @@
     api/legislation
     api/context
     api/analogies
-    api/selectors
