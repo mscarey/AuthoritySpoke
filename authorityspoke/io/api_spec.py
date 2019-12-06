@@ -26,11 +26,5 @@ for factor_name in factor_names:
 del spec.components._schemas["Factor"]
 
 spec.components.schema(
-    "Factor",
-    {
-        "properties": {
-            "oneOf": factor_options,
-            "discriminator": {"propertyName": "type"},
-        },
-    },
+    "Factor", {"oneOf": factor_options, "discriminator": {"propertyName": "type"},},
 )

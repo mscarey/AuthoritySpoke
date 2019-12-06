@@ -17,7 +17,15 @@ setuptools.setup(
     packages=setuptools.find_packages(
         exclude=["tests", "*.tests", "*.tests.*", "tests.*"]
     ),
-    install_requires=["anchorpoint", "apispec", "beautifulsoup4", "lxml", "marshmallow", "pint", "requests"],
+    install_requires=[
+        "anchorpoint",
+        "apispec",
+        "beautifulsoup4",
+        "lxml",
+        "marshmallow",
+        "pint",
+        "requests",
+    ],
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Intended Audience :: Legal Industry",
@@ -27,6 +35,6 @@ setuptools.setup(
         "Natural Language :: English",
         "Topic :: Sociology :: History",
     ],
-    python_requires="==3.7"
+    python_requires="==3.7",
     include_package_data=True,
 )
