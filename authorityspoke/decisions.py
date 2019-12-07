@@ -173,6 +173,9 @@ class Decision:
         named_anchors: Optional[TextLinkDict] = None,
         context: Optional[Sequence[Factor]] = None,
     ) -> None:
+        """
+        Add one or more Holdings to the majority Opinion of this Decision.
+        """
         if self.majority is None:
             raise AttributeError(
                 "Cannot posit Holding because this Decision has no known majority Opinion."

@@ -1,3 +1,4 @@
+..  _example_holdings:
 
 ``Example Holdings``
 ======================================
