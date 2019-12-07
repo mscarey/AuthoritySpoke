@@ -42,6 +42,9 @@ And also load some legal Codes.
     usa.set_code(usc_title_17)
     usa.set_code(code_of_federal_regulations_title_37)
 
+Loading Holdings from Existing JSON
+-----------------------------------
+
 Now we’re ready to look at the process of describing legal Holdings and
 loading that information into AuthoritySpoke. In version 0.3, although
 there’s not yet a web interface for loading this data, there is an
@@ -83,6 +86,9 @@ following sentence from the majority opinion:
 The ``anchors`` field doesn’t do much yet in AuthoritySpoke version 0.3,
 but in future versions it’ll help link each Holding to the relevant
 parts of the Opinion.
+
+The Parts of a Holding in JSON
+-----------------------------------
 
 Now let’s look at the part of ``holding_oracle.json`` representing that
 first holding.
@@ -304,6 +310,9 @@ repeated in its entirety.
 There can also be an “enactments_despite” field, which identifies
 legislative text that doesn’t need to be present for the Rule to apply,
 but that also doesn’t negate the validity of the Rule.
+
+JSON API Specification
+-----------------------------------
 
 If you want to view the schema specification, you can view it by
 calling :func:`.io.api_spec.make_spec`\. When you read it,
@@ -582,7 +591,8 @@ into the Holding object, as shown in the examples above.
     openapi: 3.0.2
     paths: {}
 
-
+Exporting AuthoritySpoke Holdings back to JSON
+----------------------------------------------
 
 Finally, if you want to convert an AuthoritySpoke object back to JSON or
 to a Python dictionary, you can do so with :func:`.io.dump.to_json` or
