@@ -1,16 +1,17 @@
 Changelog
 =========
 
-Dev
+0.3.0 (2019-12-07)
 ------------------
 - Enactments may choose text by section without a TextQuoteSelector
 - Remove "regime" parameter from Enactment
-- Add data serialization using Marshmallow
-- Migrate JSON data loading functions to [Marshmallow](https://marshmallow.readthedocs.io/)
+- Add data serialization using [Marshmallow](https://marshmallow.readthedocs.io/)
+- Migrate JSON data loading functions to Marshmallow
 - Add Decision class containing Opinions
 - Add Explanation class to clarify relationships between Holdings
-- Improve readability of object strings
+- Improve readability of string representations of objects
 - Move text selectors to separate [anchorpoint](https://anchorpoint.readthedocs.io/) library
+- Add [apispec](https://github.com/marshmallow-code/apispec) schema specification for Holding input JSON files
 
 0.2.0 (2019-09-24)
 ------------------
