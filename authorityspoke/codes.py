@@ -49,6 +49,7 @@ class Code:
     }
 
     def __init__(self, xml, title: str, uri: str):
+        """Link an entire XML tree to the Code."""
         self.xml = xml
         self.title = title
         self.uri = uri
@@ -102,24 +103,28 @@ class Code:
         return selector.as_position(text)
 
     def provision_effective_date(self, cite: str) -> datetime.date:
-        """
-        Give effective date for a provision within the Code.
-        """
+        """Give effective date for a provision within the Code."""
         raise NotImplementedError
 
     def get_exact_from_source(
         self, source: str, selector: TextQuoteSelector
     ) -> Optional[str]:
-        """Use ``source`` to find text for ``exact`` parameter."""
+        """
+        Use ``source`` to find text for ``exact`` parameter.
+
+        :param source:
+            path to a cited section or node, which may contain subsections
+
+        :param selector:
+            selector for the cited text passage within the cited node
+        """
 
         sections = self.get_sections(source)
         section_text = self.section_text(sections)
         return selector.select_text(section_text)
 
     def make_docpath(self, path: str = "") -> str:
-        """
-        Remove Code identifier from path to get a path relative to the document.
-        """
+        """Remove Code identifier from path to get a path relative to the document."""
         docpath = path or self.uri
         if not docpath.startswith(self.uri):
             return docpath  # path could be relative to the Code already

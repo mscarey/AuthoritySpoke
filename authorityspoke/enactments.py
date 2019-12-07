@@ -23,8 +23,11 @@ class Enactment:
     XML format used for any :class:`Code` will require a different method.
 
     :param selector:
-        identifier for the place in the :class:`Code` where
+        identifier for the section of a :class:`Code` where
         the text can be found.
+
+    :param selector:
+        identifier for the part of the section being cited
 
     :param code:
         the :class:`Code` where this legislative text appears.
@@ -145,12 +148,13 @@ class Enactment:
 
     @property
     def interval(self):
+        """Return :class:`TextPositionSelector` for cited part of the Enactment section."""
         return self._interval or TextPositionSelector(0, len(self.text))
 
     @property
     def text(self):
         r"""
-        Get a passage from ``self``\'s :class:`.Code` with ``self``\'s :class:`.TextQuoteSelector`.
+        Get passage from self's Code with self's TextQuoteSelector.
 
         :returns: the full text of the cited passage from the XML.
         """

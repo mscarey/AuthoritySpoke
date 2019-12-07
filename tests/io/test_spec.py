@@ -1,6 +1,6 @@
 import apispec
 
-from authorityspoke.io.api_spec import make_spec
+from authorityspoke.io.api_spec import spec
 
 
 class TestSpec:
@@ -10,17 +10,17 @@ class TestSpec:
         which is a OneOfSchema. It's difficult to document
         OneOf subschemas with apispec.
         """
-        d = make_spec().to_dict()
+        d = spec.to_dict()
         schemas = d["components"]["schemas"]
         assert "Fact" in schemas
 
     def test_factor_one_of(self):
-        d = make_spec().to_dict()
+        d = spec.to_dict()
         factor_schema = d["components"]["schemas"]["Factor"]
         assert "oneOf" in factor_schema
 
     def test_factor_schema_list(self):
-        d = make_spec().to_dict()
+        d = spec.to_dict()
         factor_schema_list = d["components"]["schemas"]["Factor"]["oneOf"]
         assert factor_schema_list[0]["$ref"].startswith("#/components/schemas/")
 
@@ -29,7 +29,7 @@ class TestSpec:
         Check for the field that determines which schema the
         Factor uses.
         """
-        d = make_spec().to_dict()
+        d = spec.to_dict()
         properties = d["components"]["schemas"]["Factor"]
         assert properties["discriminator"]["propertyName"] == "type"
 
@@ -38,4 +38,4 @@ class TestSpec:
         This function returns True if the spec validates against
         the OpenAPI standard.
         """
-        assert apispec.utils.validate_spec(make_spec())
+        assert apispec.utils.validate_spec(spec)

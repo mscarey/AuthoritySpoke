@@ -1,3 +1,5 @@
+"""Objects describing relationships between pairs of Factors or Opinions."""
+
 from dataclasses import dataclass
 import textwrap
 

@@ -108,6 +108,7 @@ class Factor(ABC):
     def __init__(
         self, *, name: Optional[str] = None, generic: bool = False, absent: bool = False
     ):
+        """Designate attributes inherited from Factor as keyword-only."""
         self.name = name
         self.generic = generic
         self.absent = absent
@@ -166,7 +167,9 @@ class Factor(ABC):
         return list(generics)
 
     @property
-    def context_factors(self) -> Union[Sequence[Optional[Factor]], Sequence[Sequence[Factor]]]:
+    def context_factors(
+        self,
+    ) -> Union[Sequence[Optional[Factor]], Sequence[Sequence[Factor]]]:
         r"""
         Get :class:`Factor`\s used in comparisons with other :class:`Factor`\s.
 
@@ -309,6 +312,7 @@ class Factor(ABC):
     def explain_same_meaning(
         self, other: Factor, context: Optional[ContextRegister] = None
     ) -> Optional[ContextRegister]:
+        """Get one explanation of why self and other have the same meaning."""
         explanations = self.explanations_same_meaning(other, context=context)
         try:
             explanation = next(explanations)
@@ -319,6 +323,7 @@ class Factor(ABC):
     def explain_contradiction(
         self, other: Factor, context: Optional[ContextRegister] = None
     ) -> Optional[ContextRegister]:
+        """Get one explanation of why self and other contradict."""
         explanations = self.explanations_contradiction(other, context=context)
         try:
             explanation = next(explanations)
@@ -329,6 +334,7 @@ class Factor(ABC):
     def explain_implication(
         self, other: Factor, context: Optional[ContextRegister] = None
     ) -> Optional[ContextRegister]:
+        """Get one explanation of why self implies other."""
         explanations = self.explanations_implication(other, context=context)
         try:
             explanation = next(explanations)
@@ -336,7 +342,9 @@ class Factor(ABC):
             return None
         return explanation
 
-    def _evolve_attribute(self, changes: Dict[str, Any], attr_name: str) -> Dict[str, Any]:
+    def _evolve_attribute(
+        self, changes: Dict[str, Any], attr_name: str
+    ) -> Dict[str, Any]:
         attr_dict = {}
         new_changes = {}
         for key in changes:
@@ -361,9 +369,8 @@ class Factor(ABC):
         return new_dict
 
     def _make_dict_to_evolve(
-        self,
-        changes: Union[str, Tuple[str, ...], Dict[str, Any]]
-        ) -> Dict[str, Any]:
+        self, changes: Union[str, Tuple[str, ...], Dict[str, Any]]
+    ) -> Dict[str, Any]:
         if isinstance(changes, str):
             changes = (changes,)
         if isinstance(changes, tuple):
@@ -388,7 +395,6 @@ class Factor(ABC):
         changes = self._make_dict_to_evolve(changes)
         new_values = self._evolve_from_dict(changes)
         return self.__class__(**new_values)
-
 
     def means(
         self, other: Optional[Factor], context: Optional[ContextRegister] = None
@@ -436,9 +442,7 @@ class Factor(ABC):
             ``other`` is an instance of ``self``'s class.
         """
         if self.compare_context_factors(other, means):
-            yield from self._context_registers(
-                other, comparison=means, context=context
-            )
+            yield from self._context_registers(other, comparison=means, context=context)
 
     def get_factor_by_name(self, name: str) -> Optional[Factor]:
         """
@@ -483,14 +487,16 @@ class Factor(ABC):
                     test = other._contradicts_if_present(self, context.reversed())
                 yield from (register.reversed() for register in test)
 
-    def implies(self, other: Optional[Factor], context: Optional[ContextRegister] = None) -> bool:
+    def implies(
+        self, other: Optional[Factor], context: Optional[ContextRegister] = None
+    ) -> bool:
         """Test whether ``self`` implies ``other``."""
         if other is None:
             return True
         return any(
             register is not None
             for register in self.explanations_implication(other, context=context)
-            )
+        )
 
     def __gt__(self, other: Optional[Factor]) -> bool:
         """Test whether ``self`` implies ``other`` and ``self`` != ``other``."""
@@ -638,15 +644,10 @@ class Factor(ABC):
 
         return text
 
-
-
     @property
     def short_string(self) -> str:
-        """
-        Return string representation without line breaks.
-        """
+        """Return string representation without line breaks."""
         return textwrap.shorten(str(self), width=5000, placeholder="...")
-
 
     def update_context_register(
         self, other: Optional[Factor], register: ContextRegister, comparison: Callable
@@ -728,9 +729,11 @@ class ContextRegister(Dict[Factor, Factor]):
 
     @property
     def prose(self) -> str:
+        """Make statement matching analagous context factors of self and other."""
         similies = [
             f'{key} {"are" if key.__dict__.get("plural") is True else "is"} like {value}'
-            for key, value in self.items()]
+            for key, value in self.items()
+        ]
         if len(similies) > 1:
             similies[-2:] = [", and ".join(similies[-2:])]
         return ", ".join(similies)

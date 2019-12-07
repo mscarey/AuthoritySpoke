@@ -6,9 +6,7 @@ from authorityspoke.io.schemas import EvidenceSchema, HoldingSchema
 
 
 def make_spec() -> APISpec:
-    """
-    Generate specification for data used to create AuthoritySpoke objects.
-    """
+    """Generate specification for data used to create AuthoritySpoke objects."""
     spec = APISpec(
         title="AuthoritySpoke Holding API",
         version="0.1.0",
@@ -34,3 +32,6 @@ def make_spec() -> APISpec:
         "Factor", {"oneOf": factor_options, "discriminator": {"propertyName": "type"},},
     )
     return spec
+
+
+spec = make_spec()

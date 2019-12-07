@@ -55,6 +55,7 @@ class Fact(Factor):
             any court considers the order context-specific, then this
             approach of hard-coding their names and order will have to change.
     """
+
     predicate: Predicate
     context_factors: Sequence[Factor] = ()
     name: Optional[str] = None

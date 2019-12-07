@@ -4,11 +4,9 @@
    “Details, unnumbered, shifting, sharp, disordered, unchartable,
    jagged.”
 
-   Llewellyn, Karl N. *The Bramble Bush: On Our Law and Its Study* 106
-   (Quid Pro 2012) (1930).
+   Karl N. Llewellyn, The Bramble Bush: On Our Law and Its Study (1930).
 
-AuthoritySpoke is a Python package that will help you make legal
-authority readable by computers.
+AuthoritySpoke is the first open source legal authority automation tool.
 
 This notebook will provide an overview of AuthoritySpoke’s most
 important features. AuthoritySpoke is still in an early alpha state, so

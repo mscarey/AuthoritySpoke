@@ -41,9 +41,10 @@ def expand_shorthand_mentioned(obj: Dict) -> Dict:
     """
 
     if obj.get("predicate", {}).get("content"):
-        obj["predicate"]["content"], obj[
-            "context_factors"
-        ] = get_references_from_string(
+        (
+            obj["predicate"]["content"],
+            obj["context_factors"],
+        ) = get_references_from_string(
             obj["predicate"]["content"], obj.get("context_factors")
         )
 
@@ -162,9 +163,7 @@ def name_from_content(content: str, truth: Optional[bool] = None):
 
 
 def wrap_single_element_in_list(data: Dict, many_element: str):
-    """
-    Make a specified field a list if it isn't already a list.
-    """
+    """Make a specified field a list if it isn't already a list."""
     if not isinstance(data[many_element], list):
         data[many_element] = [data[many_element]]
     return data
