@@ -5,9 +5,7 @@ from authorityspoke.io import nesting
 
 
 def expand_shorthand(obj: Dict) -> Dict[str, Any]:
-    """
-    Traverse dict and expand every kind of pre-loading shorthand.
-    """
+    """Traverse dict and expand every kind of pre-loading shorthand."""
     return nesting.walk_tree_and_modify(
         obj=obj, func=expand_node_shorthand, ignore=("predicate")
     )
@@ -52,6 +50,7 @@ def expand_shorthand_mentioned(obj: Dict) -> Dict:
 
 
 def collapse_known_factors(obj: Dict):
+    """Replace all names of known context factors with placeholder strings."""
     if obj.get("context_factors"):
         for factor in obj["context_factors"]:
             if isinstance(factor, str):
@@ -68,9 +67,7 @@ def collapse_known_factors(obj: Dict):
 def collapse_name_in_content(
     content: str, name: Optional[str], placeholder: str = "{}"
 ):
-    """
-    Replace name with placeholder to show it is referenced in context_factors.
-    """
+    """Replace name with placeholder to show it is referenced in context_factors."""
     content = content.replace(name, placeholder, 1)
     double_placeholder = placeholder[0] + placeholder + placeholder[1]
     if double_placeholder in content:

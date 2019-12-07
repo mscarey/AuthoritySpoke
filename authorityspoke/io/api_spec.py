@@ -7,7 +7,7 @@ from authorityspoke.io.schemas import EvidenceSchema, HoldingSchema
 
 def make_spec() -> APISpec:
     """Generate specification for data used to create AuthoritySpoke objects."""
-    spec = APISpec(
+    holding_spec = APISpec(
         title="AuthoritySpoke Holding API",
         version="0.1.0",
         openapi_version="3.0.2",
@@ -15,10 +15,10 @@ def make_spec() -> APISpec:
         plugins=[MarshmallowPlugin()],
     )
 
-    spec.components.schema("Holding", schema=HoldingSchema)
-    spec.components.schema("Fact", schema=FactSchema)
-    spec.components.schema("Evidence", schema=EvidenceSchema)
-    spec.components.schema("Allegation", schema=AllegationSchema)
+    holding_spec.components.schema("Holding", schema=HoldingSchema)
+    holding_spec.components.schema("Fact", schema=FactSchema)
+    holding_spec.components.schema("Evidence", schema=EvidenceSchema)
+    holding_spec.components.schema("Allegation", schema=AllegationSchema)
 
     factor_names = ["Fact", "Exhibit", "Evidence", "Pleading", "Allegation"]
     factor_options = []
@@ -26,12 +26,12 @@ def make_spec() -> APISpec:
     for factor_name in factor_names:
         factor_options.append({"$ref": f"#/components/schemas/{factor_name}"})
 
-    del spec.components._schemas["Factor"]
+    del holding_spec.components._schemas["Factor"]
 
-    spec.components.schema(
+    holding_spec.components.schema(
         "Factor", {"oneOf": factor_options, "discriminator": {"propertyName": "type"},},
     )
-    return spec
+    return holding_spec
 
 
 spec = make_spec()

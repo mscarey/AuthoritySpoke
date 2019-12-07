@@ -12,8 +12,10 @@ import textwrap
 from typing import Any, Callable, Dict, Iterable, Iterator, List
 from typing import Optional, Sequence, Tuple, Union
 
-from authorityspoke.enactments import Enactment
 from anchorpoint.textselectors import TextQuoteSelector
+
+from authorityspoke.enactments import Enactment
+
 
 logger = logging.getLogger(__name__)
 

@@ -365,6 +365,7 @@ class CalCode(Code):
         def cal_href(docpath, href):
             """
             Test if XML element is labeled as the text of the section in ``docpath``.
+
             Uses `California statute XML format <http://leginfo.legislature.ca.gov/>`_.
             """
             section = docpath.split("/")[1].strip("s")

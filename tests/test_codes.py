@@ -2,11 +2,7 @@ import datetime
 
 import pytest
 
-from anchorpoint.textselectors import TextQuoteSelector, TextPositionSelector
-
-from authorityspoke.codes import Code
-from authorityspoke.enactments import Enactment, consolidate_enactments
-from authorityspoke.io import loaders, readers, dump
+from anchorpoint.textselectors import TextPositionSelector
 
 
 class TestCodes:

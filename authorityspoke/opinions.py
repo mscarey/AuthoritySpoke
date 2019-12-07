@@ -109,7 +109,8 @@ class Opinion:
             yield from other.explanations_contradiction(self, context=context)
         else:
             raise TypeError(
-                f"'Contradicts' test not implemented for types {self.__class__} and {other.__class__}."
+                f"'Contradicts' test not implemented for types "
+                + f"{self.__class__} and {other.__class__}."
             )
 
     def explain_implication(
