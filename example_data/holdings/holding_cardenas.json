@@ -1,6 +1,6 @@
-[{
+[
+    {
         "inputs": [
-
             {
                 "type": "Exhibit",
                 "name": "officer's testimony that the defendant was addicted to heroin",
@@ -10,7 +10,7 @@
                     "name": "fact that the defendant was addicted to heroin",
                     "content": "{the defendant} was addicted to heroin"
                 },
-                "stated_by": {
+                "statement_attribution": {
                     "type": "entity",
                     "name": "parole officer"
                 }
@@ -32,16 +32,21 @@
                 }
             }
         ],
-        "despite": [{
-            "type": "Fact",
-            "content": "officer's testimony that the defendant was addicted to heroin was relevant to show the defendant had a motive to commit an attempted robbery"
-        }],
-        "outputs": [{
-            "type": "Fact",
-            "content": "the probative value of officer's testimony that the defendant was addicted to heroin, in showing fact that the defendant committed an attempted robbery, was outweighed by unfair prejudice to the defendant"
-        }],
+        "despite": [
+            {
+                "type": "Fact",
+                "content": "officer's testimony that the defendant was addicted to heroin was relevant to show the defendant had a motive to commit an attempted robbery"
+            }
+        ],
+        "outputs": [
+            {
+                "type": "Fact",
+                "content": "the probative value of officer's testimony that the defendant was addicted to heroin, in showing fact that the defendant committed an attempted robbery, was outweighed by unfair prejudice to the defendant"
+            }
+        ],
         "mandatory": true,
-        "enactments": [{
+        "enactments": [
+            {
                 "source": "/us-ca/evid/s351"
             },
             {
@@ -62,23 +67,30 @@
         ]
     },
     {
-        "inputs": [{
-            "type": "Fact",
-            "content": "the probative value of officer's testimony that the defendant was addicted to heroin, in showing fact that the defendant committed an attempted robbery, was outweighed by unfair prejudice to defendant"
-        }],
-        "despite": [{
-            "type": "Fact",
-            "content": "officer's testimony that the defendant was addicted to heroin was relevant to show the defendant had a motive to commit an attempted robbery"
-        }],
-        "outputs": [{
-            "type": "Evidence",
-            "name": "evidence of officer's testimony that the defendant was addicted to heroin",
-            "exhibit": "officer's testimony that the defendant was addicted to heroin",
-            "to_effect": "fact that the defendant committed an attempted robbery",
-            "absent": true
-        }],
+        "inputs": [
+            {
+                "type": "Fact",
+                "content": "the probative value of officer's testimony that the defendant was addicted to heroin, in showing fact that the defendant committed an attempted robbery, was outweighed by unfair prejudice to defendant"
+            }
+        ],
+        "despite": [
+            {
+                "type": "Fact",
+                "content": "officer's testimony that the defendant was addicted to heroin was relevant to show the defendant had a motive to commit an attempted robbery"
+            }
+        ],
+        "outputs": [
+            {
+                "type": "Evidence",
+                "name": "evidence of officer's testimony that the defendant was addicted to heroin",
+                "exhibit": "officer's testimony that the defendant was addicted to heroin",
+                "to_effect": "fact that the defendant committed an attempted robbery",
+                "absent": true
+            }
+        ],
         "mandatory": true,
-        "enactments": [{
+        "enactments": [
+            {
                 "source": "/us-ca/evid/s351"
             },
             {

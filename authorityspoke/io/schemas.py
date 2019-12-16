@@ -36,6 +36,7 @@ RawProcedure = Dict[str, Sequence[RawFactor]]
 RawRule = Dict[str, Union[RawProcedure, Sequence[RawEnactment], str, bool]]
 RawHolding = Dict[str, Union[RawRule, str, bool]]
 
+
 class ExpandableSchema(Schema):
     def get_from_mentioned(self, data, **kwargs):
         """
@@ -76,7 +77,10 @@ class ExpandableSchema(Schema):
 
 RawOpinion = Dict[str, str]
 RawCaseCitation = Dict[str, str]
-RawDecision = Dict[str, Union[str, int, Sequence[RawOpinion], Sequence[RawCaseCitation]]]
+RawDecision = Dict[
+    str, Union[str, int, Sequence[RawOpinion], Sequence[RawCaseCitation]]
+]
+
 
 class OpinionSchema(ExpandableSchema):
     __model__ = Opinion
@@ -93,6 +97,7 @@ class OpinionSchema(ExpandableSchema):
         data["author"] = data["author"].strip(",:")
         return data
 
+
 class CaseCitationSchema(Schema):
 
     __model__ = CaseCitation
@@ -102,6 +107,7 @@ class CaseCitationSchema(Schema):
     @post_load
     def make_object(self, data: RawCaseCitation, **kwargs) -> CaseCitation:
         return self.__model__(**data)
+
 
 class DecisionSchema(ExpandableSchema):
     __model__ = Decision
@@ -132,6 +138,7 @@ class DecisionSchema(ExpandableSchema):
     @post_load
     def make_object(self, data: RawDecision, **kwargs) -> Decision:
         return self.__model__(**data)
+
 
 class SelectorSchema(Schema):
     __model__ = TextQuoteSelector
@@ -328,9 +335,11 @@ class PredicateSchema(ExpandableSchema):
     @pre_load
     def format_data_to_load(self, data: RawPredicate, **kwargs) -> RawPredicate:
         if not data.get("quantity"):
-            data["content"], data["comparison"], data[
-                "quantity"
-            ] = self.split_quantity_from_content(data["content"])
+            (
+                data["content"],
+                data["comparison"],
+                data["quantity"],
+            ) = self.split_quantity_from_content(data["content"])
         data = self.normalize_comparison(data)
         return data
 
@@ -393,7 +402,10 @@ class FactSchema(ExpandableSchema):
             if factor_name in content and factor_name != content:
                 obj = mentioned.get_by_name(factor_name)
                 content, context_factors = add_found_context(
-                    content, context_factors, factor=deepcopy(obj), placeholder=placeholder
+                    content,
+                    context_factors,
+                    factor=deepcopy(obj),
+                    placeholder=placeholder,
                 )
         return content, context_factors
 
@@ -409,9 +421,10 @@ class FactSchema(ExpandableSchema):
         ]
         data = nest_fields(data, nest="predicate", eggs=to_nest)
         data = self.wrap_single_element_in_list(data, "context_factors")
-        data["predicate"]["content"], data[
-            "context_factors"
-        ] = self.get_references_from_mentioned(
+        (
+            data["predicate"]["content"],
+            data["context_factors"],
+        ) = self.get_references_from_mentioned(
             data["predicate"]["content"], data.get("context_factors")
         )
         data = self.consume_type_field(data)
@@ -426,7 +439,7 @@ class ExhibitSchema(ExpandableSchema):
     __model__: Type = Exhibit
     form = fields.Str(missing=None)
     statement = fields.Nested(FactSchema, missing=None)
-    stated_by = fields.Nested(EntitySchema, missing=None)
+    statement_attribution = fields.Nested(EntitySchema, missing=None)
     name = fields.Str(missing=None)
     absent = fields.Bool(missing=False)
     generic = fields.Bool(missing=False)

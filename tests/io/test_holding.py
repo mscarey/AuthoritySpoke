@@ -117,8 +117,10 @@ class TestHoldingImport:
                 "enactments": [
                     {
                         "source": "/us/const/article-I/8/8",
-                        "exact": ("To promote the Progress of Science and useful Arts, "
-                        "by securing for limited Times to Authors"),
+                        "exact": (
+                            "To promote the Progress of Science and useful Arts, "
+                            "by securing for limited Times to Authors"
+                        ),
                         "name": "securing for authors",
                     },
                     {
@@ -149,14 +151,13 @@ class TestHoldingImport:
         ]
         holding_anchors = anchors.get_holding_anchors(raw_holdings)
         named_anchors = anchors.get_named_anchors(raw_holdings)
-        feist_holdings = readers.read_holdings(
-            raw_holdings, regime=make_regime
-        )
+        feist_holdings = readers.read_holdings(raw_holdings, regime=make_regime)
         feist = make_opinion["feist_majority"]
-        feist.posit(feist_holdings, holding_anchors=holding_anchors, named_anchors=named_anchors)
+        feist.posit(
+            feist_holdings, holding_anchors=holding_anchors, named_anchors=named_anchors
+        )
         assert feist.holdings[0].enactments[0].name == "securing for authors"
         assert feist.holdings[1].enactments[0].name == "securing for authors"
-
 
     def test_read_holdings_and_then_get_anchors(self, make_regime):
         """
@@ -164,28 +165,27 @@ class TestHoldingImport:
         impossible to get text anchors.
         """
         raw_holdings = load_holdings(f"holding_oracle.json")
-        oracle_holdings = readers.read_holdings(
-            raw_holdings, regime=make_regime
-        )
+        oracle_holdings = readers.read_holdings(raw_holdings, regime=make_regime)
         named_anchors = anchors.get_named_anchors(raw_holdings)
 
         assert isinstance(oracle_holdings[0], Holding)
         assert isinstance(named_anchors.popitem()[1].pop(), TextQuoteSelector)
 
+
 class TestTextAnchors:
     one_holding = {
-            "inputs": {"type": "fact", "content": "{Bradley} lived at Bradley's house"},
-            "outputs": {
-                "type": "evidence",
-                "to_effect": {
-                    "type": "fact",
-                    "name": "fact that Bradley committed a crime",
-                    "content": "Bradley committed a crime",
-                },
-                "name": "evidence of Bradley's guilt",
-                "absent": True,
+        "inputs": {"type": "fact", "content": "{Bradley} lived at Bradley's house"},
+        "outputs": {
+            "type": "evidence",
+            "to_effect": {
+                "type": "fact",
+                "name": "fact that Bradley committed a crime",
+                "content": "Bradley committed a crime",
             },
-        }
+            "name": "evidence of Bradley's guilt",
+            "absent": True,
+        },
+    }
 
     def test_read_holding_with_no_anchor(self, make_opinion, make_analysis):
         oracle = make_opinion["oracle_majority"]
@@ -193,10 +193,13 @@ class TestTextAnchors:
         oracle_holdings = readers.read_holdings(raw_analysis)
         holding_anchors = anchors.get_holding_anchors(raw_analysis)
         named_anchors = anchors.get_named_anchors(raw_analysis)
-        oracle.posit(oracle_holdings, holding_anchors=holding_anchors, named_anchors=named_anchors)
+        oracle.posit(
+            oracle_holdings,
+            holding_anchors=holding_anchors,
+            named_anchors=named_anchors,
+        )
         has_no_anchors = oracle.holdings[0]
         assert oracle.holding_anchors[has_no_anchors] == []
-
 
     def test_holding_without_enactments_or_regime(self):
 
@@ -274,7 +277,10 @@ class TestTextAnchors:
                             "name": "fact that defendant was addicted to heroin",
                             "content": "the {defendant} was addicted to heroin",
                         },
-                        "stated_by": {"type": "entity", "name": "parole officer"},
+                        "statement_attribution": {
+                            "type": "entity",
+                            "name": "parole officer",
+                        },
                     },
                     {
                         "type": "Allegation",
@@ -519,16 +525,17 @@ class TestTextAnchors:
         holdings_and_anchors = [
             readers.read_holdings(raw),
             anchors.get_holding_anchors(raw),
-            anchors.get_named_anchors(raw)]
+            anchors.get_named_anchors(raw),
+        ]
         holdings_and_anchors_again = [
             readers.read_holdings(raw),
             anchors.get_holding_anchors(raw),
-            anchors.get_named_anchors(raw)]
+            anchors.get_named_anchors(raw),
+        ]
         assert all(
             left == right
-            for left, right
-            in zip(holdings_and_anchors, holdings_and_anchors_again))
-
+            for left, right in zip(holdings_and_anchors, holdings_and_anchors_again)
+        )
 
     def test_posit_holding_with_selector(self, make_analysis, make_opinion):
 
@@ -537,6 +544,7 @@ class TestTextAnchors:
         brad = make_opinion["brad_majority"]
         brad.posit(holdings, holding_anchors=holding_anchors)
         assert brad.holding_anchors[holdings[0]][0].exact == "we hold"
+
 
 class TestExclusiveFlag:
     def test_holding_flagged_exclusive(self, make_regime, make_enactment):
@@ -560,9 +568,8 @@ class TestExclusiveFlag:
             make_enactment["right_to_writings"],
             make_enactment["copyright_requires_originality"],
         ]
-        originality_rule = Rule(Procedure(
-            outputs=copyrightable,
-            inputs=original),
+        originality_rule = Rule(
+            Procedure(outputs=copyrightable, inputs=original),
             mandatory=False,
             universal=False,
             enactments=originality_enactments,

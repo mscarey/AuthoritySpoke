@@ -385,18 +385,18 @@ def make_exhibit(
 
     return {
         "shooting_affidavit": Exhibit(
-            form="affidavit", statement=f["f_shooting"], stated_by=e["alice"]
+            form="affidavit", statement=f["f_shooting"], statement_attribution=e["alice"]
         ),
         "shooting_testimony": Exhibit(
-            form="testimony", statement=f["f_shooting"], stated_by=e["alice"]
+            form="testimony", statement=f["f_shooting"], statement_attribution=e["alice"]
         ),
         "no_shooting_testimony": Exhibit(
-            form="testimony", statement=f["f_no_shooting"], stated_by=e["alice"]
+            form="testimony", statement=f["f_no_shooting"], statement_attribution=e["alice"]
         ),
         "no_shooting_entity_order_testimony": Exhibit(
             form="testimony",
             statement=f["f_no_shooting_entity_order"],
-            stated_by=e["bob"],
+            statement_attribution=e["bob"],
         ),
         "no_shooting_witness_unknown_testimony": Exhibit(
             form="testimony", statement=f["f_no_shooting"]
@@ -405,47 +405,47 @@ def make_exhibit(
             form="testimony", statement=f["f_no_shooting"], absent=True
         ),
         "no_shooting_different_witness_testimony": Exhibit(
-            form="testimony", statement=f["f_no_shooting"], stated_by=e["bob"]
+            form="testimony", statement=f["f_no_shooting"], statement_attribution=e["bob"]
         ),
         "reciprocal_testimony": Exhibit(
-            form="testimony", statement=w["f8"], stated_by=e["craig"]
+            form="testimony", statement=w["f8"], statement_attribution=e["craig"]
         ),
         "reciprocal_declaration": Exhibit(
-            form="declaration", statement=w["f8"], stated_by=e["craig"]
+            form="declaration", statement=w["f8"], statement_attribution=e["craig"]
         ),
         "reciprocal_testimony_absent": Exhibit(
-            form="testimony", statement=w["f8"], stated_by=e["craig"], absent=True
+            form="testimony", statement=w["f8"], statement_attribution=e["craig"], absent=True
         ),
         "reciprocal_testimony_less": Exhibit(
-            form="testimony", statement=w["f8_less"], stated_by=e["craig"]
+            form="testimony", statement=w["f8_less"], statement_attribution=e["craig"]
         ),
         "reciprocal_testimony_specific": Exhibit(
-            form="testimony", statement=w["f8_meters"], stated_by=e["craig"]
+            form="testimony", statement=w["f8_meters"], statement_attribution=e["craig"]
         ),
         "reciprocal_testimony_specific_absent": Exhibit(
             form="testimony",
             statement=w["f8_meters"],
-            stated_by=e["craig"],
+            statement_attribution=e["craig"],
             absent=True,
         ),
         "relevant_murder_testimony": Exhibit(
-            form="testimony", statement=c["f_relevant_murder"], stated_by=e["alice"]
+            form="testimony", statement=c["f_relevant_murder"], statement_attribution=e["alice"]
         ),
         "relevant_murder_nested_swap_testimony": Exhibit(
             form="testimony",
             statement=c["f_relevant_murder_nested_swap"],
-            stated_by=e["bob"],
+            statement_attribution=e["bob"],
         ),
         "relevant_murder_alice_craig_testimony": Exhibit(
             form="testimony",
             statement=c["f_relevant_murder_alice_craig"],
-            stated_by=e["alice"],
+            statement_attribution=e["alice"],
         ),
         "large_weight_testimony": Exhibit(
-            form="testimony", statement=f["f_large_weight"], stated_by=e["bob"]
+            form="testimony", statement=f["f_large_weight"], statement_attribution=e["bob"]
         ),
         "small_weight_testimony": Exhibit(
-            form="testimony", statement=f["f_small_weight"], stated_by=e["bob"]
+            form="testimony", statement=f["f_small_weight"], statement_attribution=e["bob"]
         ),
         "generic_exhibit": Exhibit(generic=True),
         "specific_but_featureless": Exhibit(),

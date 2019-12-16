@@ -70,6 +70,8 @@ class Regime:
     Currently used for retrieving :class:`.Enactment` text.
     May be modified for retrieving :class:`.Court`\s and
     :class:`.Opinion`\s.
+
+    :param jurisdictions:
     """
 
     jurisdictions: Dict[str, Jurisdiction] = field(default_factory=dict)

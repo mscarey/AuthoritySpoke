@@ -51,6 +51,14 @@ class Holding(Factor):
         to be either valid or invalid. Seemingly, ``decided=False``
         should render the ``rule_valid`` flag irrelevant.
 
+    :param exclusive:
+        if True, the stated rule is asserted to be the only way to establish
+        the output that is the output of the rule.
+
+    :param generic:
+        if True, indicates that the specific attributes of this holding
+        are irrelevant in the context of a different holding that is
+        referencing this holding.
     """
 
     rule: Rule

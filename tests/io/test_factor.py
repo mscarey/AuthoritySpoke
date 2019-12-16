@@ -140,7 +140,7 @@ class TestExhibitDump:
         dumped = schema.dump(exhibit)
         loaded = schema.load(dumped)
         assert loaded.form == "testimony"
-        assert loaded.stated_by.name == "Bob"
+        assert loaded.statement_attribution.name == "Bob"
 
 
 class TestEvidenceLoad:
@@ -156,7 +156,7 @@ class TestEvidenceDump:
         evidence = make_evidence["shooting"]
         schema = schemas.EvidenceSchema()
         dumped = schema.dump(evidence)
-        assert dumped["exhibit"]["stated_by"]["name"] == "Alice"
+        assert dumped["exhibit"]["statement_attribution"]["name"] == "Alice"
 
 
 class TestPleadingDump:

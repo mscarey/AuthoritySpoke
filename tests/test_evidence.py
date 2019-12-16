@@ -14,7 +14,7 @@ class TestEvidence:
             Exhibit(
                 form="testimony",
                 statement=make_factor["f_no_shooting"],
-                stated_by=make_entity["alice"],
+                statement_attribution=make_entity["alice"],
             ),
             to_effect=make_factor["f_no_crime"],
         )

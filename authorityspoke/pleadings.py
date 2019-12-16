@@ -1,6 +1,5 @@
 from dataclasses import dataclass
 
-import textwrap
 from typing import ClassVar, Optional
 
 from authorityspoke.entities import Entity
@@ -11,7 +10,19 @@ from authorityspoke.formatting import indented, wrapped
 
 @dataclass(frozen=True)
 class Pleading(Factor):
-    r"""A document filed by a party to make :class:`Allegation`\s."""
+    r"""
+    A document filed by a party to make :class:`Allegation`\s.
+
+    :param filer:
+        the :class:`.Entity` that the pleading references as having filed it,
+        regardless of any questions about the identification of the filer.
+
+    :param name:
+
+    :param absent:
+
+    :param generic:
+    """
 
     filer: Optional[Entity] = None
     name: Optional[str] = None
@@ -35,6 +46,18 @@ class Allegation(Factor):
 
     May be included by a party in a :class:`Pleading`
     to establish a cause of action.
+
+    :param statement:
+        a :class:`Fact` being alleged
+
+    :param pleading:
+        the :class:`Pleading` in where the allegation appears
+
+    :param name:
+
+    :param absent:
+
+    :param generic:
     """
 
     statement: Optional[Fact] = None

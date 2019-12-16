@@ -14,21 +14,49 @@ class Exhibit(Factor):
     """
     A source of information for use in litigation.
 
-    .. note
-        "Derived_from" and "offered_by" parameters were removed
-        because the former is probably better represented as a :class:`Fact`,
-        and the latter as a :class:`Motion`.
+    :param form:
+        a term describing the category of exhibit. For example: testimony,
+        declaration, document, or recording.
 
-    TODO: Allowed inputs for ``form`` will need to be limited.
+    :param statement:
+        a fact assertion made via the exhibit. For instance, if the exhibit
+        is a document, this parameter could refer to a statement printed
+        on the document.
+
+    :param statement_attribution:
+        the :class:`.Entity` that the exhibit imputes the statement to. For
+        instance, for a signed declaration, this would refer to the person
+        whose signature appears on the declaration, regardless of any
+        authentication concerns. The statement_attribution parameter may
+        appear without the statement parameter, especially if the content
+        of the statement is irrelevant.
+
+    :param name:
+        a string identifier for the exhibit
+
+    :param absent:
+        if True, indicates that no exhibit meeting the description exists
+        in the litigation. If the exhibit has merely been rejected as
+        evidence, use the absent attribute on an :class:`Evidence` object
+        instead.
+
+    :param generic:
+        if True, indicates that the specific attributes of the exhibit
+        are irrelevant in the context of the :class:`.Holding` where
+        the exhibit is being referenced.
+
+    .. note
+        The form parameter may be replaced by a limited
+        ontology of terms when sufficient example data is available.
     """
 
     form: Optional[str] = None
     statement: Optional[Fact] = None
-    stated_by: Optional[Entity] = None
+    statement_attribution: Optional[Entity] = None
     name: Optional[str] = None
     absent: bool = False
     generic: bool = False
-    context_factor_names: ClassVar = ("statement", "stated_by")
+    context_factor_names: ClassVar = ("statement", "statement_attribution")
 
     def _means_if_concrete(
         self, other: Factor, context: Optional[ContextRegister] = None
@@ -50,7 +78,7 @@ class Exhibit(Factor):
         Return string representation of the object without line breaks.
         """
         string = (
-            f'{("by " + self.stated_by.short_string + ", ") if self.stated_by else ""}'
+            f'{("by " + self.statement_attribution.short_string + ", ") if self.statement_attribution else ""}'
             + f'{("asserting " + self.statement.short_string) if self.statement else ""}'
         )
         string = super().__str__().format(string)
@@ -60,8 +88,8 @@ class Exhibit(Factor):
         text = ""
         if self.form:
             text += f"in the FORM of {self.form}"
-        if self.stated_by:
-            text += f"\n" + indented(f"STATED BY {str(self.stated_by)}")
+        if self.statement_attribution:
+            text += f"\n" + indented(f"STATED BY {str(self.statement_attribution)}")
         if self.statement:
             text += f"\n" + indented(f"ASSERTING:")
             factor_text = indented(str(self.statement), tabs=2)
@@ -71,7 +99,31 @@ class Exhibit(Factor):
 
 @dataclass(frozen=True)
 class Evidence(Factor):
-    """An :class:`Exhibit` admitted by a court to aid a factual determination."""
+    """
+    An :class:`Exhibit` admitted by a court to aid a factual determination.
+
+    :param exhibit:
+        the thing that is being used to aid a factual determination
+
+    :param to_effect:
+        the :class:`.Fact` finding that would be supported by the evidence.
+        If the Fact object includes a non-null standard_of_proof attribute, it
+        indicates that that the evidence would support a factual finding by
+        that standard of proof.
+
+    :param name:
+        a string identifier
+
+    :param absent:
+        if True, indicates that no evidence meeting the description has been
+        admitted, regardless of whether a corresponding :class:`Exhibit` has
+        been presented
+
+    :param generic:
+        if True, indicates that the specific attributes of the evidence
+        are irrelevant in the context of the :class:`.Holding` where
+        the evidence is being referenced.
+    """
 
     exhibit: Optional[Exhibit] = None
     to_effect: Optional[Fact] = None
