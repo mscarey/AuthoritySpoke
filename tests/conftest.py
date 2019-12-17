@@ -631,6 +631,7 @@ def make_regime() -> Dict[str, Code]:
         "cfr37.xml",
         "ca_evidence.html",
         "ca_penal.html",
+        "beard_tax_act.xml",
     ):
         xml = loaders.load_code(filename=filename)
         usa.set_code(readers.read_code(xml))

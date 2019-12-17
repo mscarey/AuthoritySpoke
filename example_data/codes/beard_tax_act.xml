@@ -8,156 +8,158 @@
         <dc:title>Australian​ ​Beard​ ​Tax​ ​(Promotion​ ​of​ ​Enlightenment​ ​Values) Act​ ​1934</dc:title>
     </meta>
     <main>
-        <part identifier="/au/act/1934/47/1">
-            <heading>Part 1—Preliminary</heading>
-            <section identifier="/au/act/1934/47/1/1">
-                <num value="1">1</num>
-                <heading> Short title</heading>
-                <content>This Act may be cited as the Australian Beard Tax (Promotion of Enlightenment Values) Act 1934.</content>
-            </section>
-            <section identifier="/au/act/1934/47/1/2">
-                <num value="2">2</num>
-                <heading> Commencement</heading>
-                <content>This Act shall commence on 1 April 1935.</content>
-            </section>
-            <section identifier="/au/act/1934/47/1/3">
-                <num value="3">3</num>
-                <heading> Purpose</heading>
-                <content>This Act is enacted for the purpose of the promotion of enlightenment values and to discourage and dissuade the wearing of beards within the Commonwealth of Australia.</content>
-            </section>
-            <section identifier="/au/act/1934/47/1/4">
-                <num value="4">4</num>
-                <heading> Beard, defined</heading>
-                <chapeau>In this Act, beard means any facial hair no shorter than 5 millimetres in length that:</chapeau>
-                <subsection identifier="/au/act/1934/47/1/4/a">occurs on or below the chin, or</subsection>
-                <subsection identifier="/au/act/1934/47/1/4/b">exists in an uninterrupted line from the front of one ear to the front of the other ear below the nose.</subsection>
-            </section>
-        </part>
-        <part identifier="/au/act/1934/47/2">
-            <heading>Part 2—Prohibition of beards</heading>
-            <section identifier="/au/act/1934/47/2/5">
-                <num value="5">5</num>
-                <heading> Prohibition of beards</heading>
-                <content>The wearing of any beard whatsoever, except as provided in section 6, is prohibited within the Commonwealth of Australia.</content>
-            </section>
-            <section identifier="/au/act/1934/47/2/6">
-                <num value="6">6</num>
-                <heading> Exemption</heading>
-                <subsection identifier="/au/act/1934/47/2/6/1">
-                    <num value="1">(1)</num>
-                    <content>The office of the Department of Beards may, from time to time or as they see fit, grant exemptions to persons from the prohibition contained in section 5.</content>
-                </subsection>
-                <subsection identifier="/au/act/1934/47/2/6/2">
-                    <num value="2">(2)</num>
-                    <content>Any such exemption granted under subsection 1 is to be for no longer than a period of 12 months.</content>
-                </subsection>
-            </section>
-        </part>
-        <part identifier="/au/act/1934/47/2A">
-            <heading>Part 2A—Beard tax</heading>
-            <section identifier="/au/act/1934/47/2A/6A">
-                <num value="6A">6A</num>
-                <heading> Levy of beard tax</heading>
-                <content>Where the Department provides an exemption from the prohibition in section 5, except as defined in section 6D, the person to whom such exemption is granted shall be liable to pay to the Department of Beards such fee as may be levied under section 6B.</content>
-            </section>
-            <section identifier="/au/act/1934/47/2A/6B">
-                <num value="6B">6B</num>
-                <heading> Regulatory power of the Minister for Beards</heading>
-                <content>The Minister for Beards may, by Order in Council, issue such regulations, including but not limited to levies to be paid by persons exempted under section 6 from the prohibition in section 5, as is necessary for the good governance and financial stability of the Department of Beards.</content>
-            </section>
-            <section identifier="/au/act/1934/47/2A/6C">
-                <num value="6C">6C</num>
-                <heading> Issuance of beardcoin</heading>
-                <content>Where an exemption is granted under section 6, the Department of Beards shall issue to the person so exempted a token, hereinafter referred to as a beardcoin, that shall for all purposes be regarded as substantive proof of such exemption.</content>
-            </section>
-            <section identifier="/au/act/1934/47/2A/6D">
-                <num value="6D">6D</num>
-                <heading> Waiver of beard tax in special circumstances</heading>
-                <subsection identifier="/au/act/1934/47/2A/6D/1">
-                    <num value="1">(1)</num>
-                    <content>The Department of Beards shall waive the collection of beard tax upon issuance of beardcoin under Section 6C where the reason the maintainer wears a beard is due to bona fide religious or cultural reasons.</content>
-                </subsection>
-                <subsection identifier="/au/act/1934/47/2A/6D/2">
-                    <num value="2">(2)</num>
-                    <content>The determination of the Department of Beards as to what constitutes bona fide religious or cultural reasons shall be final and no right of appeal shall exist.</content>
-                </subsection>
-            </section>
-        </part>
-        <part identifier="/au/act/1934/47/3">
-            <heading>Part 3—Offences</heading>
-            <section identifier="/au/act/1934/47/3/7">
-                <heading> Wearing of a beard without exemption</heading>
-                <content>Any person found to be wearing a beard within the Commonwealth of Australia without proper exemption as granted under section 6 commits an offence.</content>
-            </section>
-            <section identifier="/au/act/1934/47/3/7A">
-                <heading> Improper transfer of beardcoin</heading>
-                <content>It shall be an offence to buy, sell, lend, lease, gift, transfer or receive in any way a beardcoin from any person or body other than the Department of Beards, except as provided in Part 4.</content>
-            </section>
-            <section identifier="/au/act/1934/47/3/7B">
-                <heading> Counterfeit beardcoin</heading>
-                <subsection identifier="/au/act/1934/47/3/7B/1">
-                    <num value="1">(1)</num>
-                    <content>It shall be an offense to produce, alter, or manufacture tokens with the appearance of and purporting to be genuine beardcoin.</content>
-                </subsection>
-                <subsection identifier="/au/act/1934/47/3/7B/2">
-                    <num value="2">(2)</num>
-                    <content>It shall be no defense to a charge under section 7A that the purchase, sale, lease, gift, transfer or receipt was of counterfeit beardcoin rather than genuine beardcoin.</content>
-                </subsection>
-            </section>
-            <section identifier="/au/act/1934/47/3/8">
-                <heading> Notice to remedy</heading>
-                <subsection identifier="/au/act/1934/47/3/8/1">
-                    <num value="1">(1)</num>
-                    <content>Where an officer of the Department of Beards, Australian Federal Police, state or territorial police, or military police of the Australian Defence Force finds a person to be wearing a beard within the territory of the Commonwealth of Australia, and that person fails or is unable to produce a beardcoin as proof of holding an exemption under section 6, that officer shall in the first instance issue such person a notice to remedy</content>
-                </subsection>
-                <subsection identifier="/au/act/1934/47/3/8/2">
-                    <num value="2">(2)</num>
-                    <chapeau>Any such person issued a notice to remedy under subsection 1 must either:</chapeau>
-                    <clause identifier="/au/act/1934/47/3/8/2/a">shave in such a way that they are no longer in breach of section 5, or</clause>
-                    <clause identifier="/au/act/1934/47/3/8/2/b">obtain a beardcoin from the Department of Beards</clause>
-                    <continuation>within 14 days of such notice being issued to them.</continuation>
-                </subsection>
-            </section>
-            <section identifier="/au/act/1934/47/3/9">
-                <heading> Penalties</heading>
-                <subsection identifier="/au/act/1934/47/3/9/1">
-                    <num value="1">(1)</num>
-                    <content> Any person summarily convicted of a first offence under section 7 of unlawfully wearing a beard within the Commonwealth of Australia shall be liable to a fine not exceeding $200.</content>
-                </subsection>
-                <subsection identifier="/au/act/1934/47/3/9/2">
-                    <num value="2">(2)</num>
-                    <content>  Any person summarily convicted of a second or subsequent offence under section 7 shall be liable to a fine not exceeding $1000, or a period of imprisonment until such time as they no longer are in breach of section 5.</content>
-                </subsection>
-                <subsection identifier="/au/act/1934/47/3/9/3">
-                    <num value="3">(3)</num>
-                    <content>  No penalty shall be applied to any person who, within 14 days of receiving a notice to remedy under section 8(1), takes the action required of them under section 8(2).</content>
-                </subsection>
-                <subsection identifier="/au/act/1934/47/3/9/4">
-                    <num value="4">(4)</num>
-                    <content> Any person convicted of an offence under section 7A or section 7B(1) shall be liable to a fine not exceeding $5000 and/or a period of imprisonment not exceeding 12 months.</content>
-                </subsection>
-            </section>
-        </part>
-        <part identifier="/au/act/1934/47/4">
-            <section identifier="/au/act/1934/47/4/10">
-                <heading> Purpose of Part 4</heading>
-                <content>Part 4 of the Australian Beard Tax (Promotion of Enlightement Values) Act 1934 exists for the purpose of incentivising Australians, and those visiting Australia, to relieve themselves from the burdensome habit of wearing a beard.</content>
-            </section>
-            <section identifier="/au/act/1934/47/4/11">
-                <heading>  Licensed repurchasers of beardcoin</heading>
-                <content>The Department of Beards may issue licenses to such barbers, hairdressers or other male grooming professionals as they see fit to purchase a beardcoin from a customer whose beard they have removed, and to resell those beardcoins to the Department of Beards</content>
-            </section>
-            <section identifier="/au/act/1934/47/4/12">
-                <heading>  Rate to be paid to repurchasers of beardcoin</heading>
-                <content>The value to be transfered to licensed repurchasers of beardcoin under section 11 shall be defined by Order in Council by the Minister for Beards under section 6B on a per coin basis.</content>
-            </section>
-        </part>
-        <part identifier="/au/act/1934/47/5">
-            <heading>Part 5—Consequential amendments</heading>
-            <section identifier="/au/act/1934/47/5/13">
-                <heading>  Removal of GST from razors and shavers</heading>
-                <content>The items set out in Annexe 1 of this Act shall be exempt from the goods and sales tax provisions of the Taxation Administration Act 1953.</content>
-            </section>
-        </part>
+        <act identifier="/au/act/1934/47">
+            <part identifier="/au/act/1934/47/1">
+                <heading>Part 1—Preliminary</heading>
+                <section identifier="/au/act/1934/47/1/1">
+                    <num value="1">1</num>
+                    <heading> Short title</heading>
+                    <content>This Act may be cited as the Australian Beard Tax (Promotion of Enlightenment Values) Act 1934.</content>
+                </section>
+                <section identifier="/au/act/1934/47/1/2">
+                    <num value="2">2</num>
+                    <heading> Commencement</heading>
+                    <content>This Act shall commence on 1 April 1935.</content>
+                </section>
+                <section identifier="/au/act/1934/47/1/3">
+                    <num value="3">3</num>
+                    <heading> Purpose</heading>
+                    <content>This Act is enacted for the purpose of the promotion of enlightenment values and to discourage and dissuade the wearing of beards within the Commonwealth of Australia.</content>
+                </section>
+                <section identifier="/au/act/1934/47/1/4">
+                    <num value="4">4</num>
+                    <heading> Beard, defined</heading>
+                    <chapeau>In this Act, beard means any facial hair no shorter than 5 millimetres in length that:</chapeau>
+                    <subsection identifier="/au/act/1934/47/1/4/a">occurs on or below the chin, or</subsection>
+                    <subsection identifier="/au/act/1934/47/1/4/b">exists in an uninterrupted line from the front of one ear to the front of the other ear below the nose.</subsection>
+                </section>
+            </part>
+            <part identifier="/au/act/1934/47/2">
+                <heading>Part 2—Prohibition of beards</heading>
+                <section identifier="/au/act/1934/47/2/5">
+                    <num value="5">5</num>
+                    <heading> Prohibition of beards</heading>
+                    <content>The wearing of any beard whatsoever, except as provided in section 6, is prohibited within the Commonwealth of Australia.</content>
+                </section>
+                <section identifier="/au/act/1934/47/2/6">
+                    <num value="6">6</num>
+                    <heading> Exemption</heading>
+                    <subsection identifier="/au/act/1934/47/2/6/1">
+                        <num value="1">(1)</num>
+                        <content>The office of the Department of Beards may, from time to time or as they see fit, grant exemptions to persons from the prohibition contained in section 5.</content>
+                    </subsection>
+                    <subsection identifier="/au/act/1934/47/2/6/2">
+                        <num value="2">(2)</num>
+                        <content>Any such exemption granted under subsection 1 is to be for no longer than a period of 12 months.</content>
+                    </subsection>
+                </section>
+            </part>
+            <part identifier="/au/act/1934/47/2A">
+                <heading>Part 2A—Beard tax</heading>
+                <section identifier="/au/act/1934/47/2A/6A">
+                    <num value="6A">6A</num>
+                    <heading> Levy of beard tax</heading>
+                    <content>Where the Department provides an exemption from the prohibition in section 5, except as defined in section 6D, the person to whom such exemption is granted shall be liable to pay to the Department of Beards such fee as may be levied under section 6B.</content>
+                </section>
+                <section identifier="/au/act/1934/47/2A/6B">
+                    <num value="6B">6B</num>
+                    <heading> Regulatory power of the Minister for Beards</heading>
+                    <content>The Minister for Beards may, by Order in Council, issue such regulations, including but not limited to levies to be paid by persons exempted under section 6 from the prohibition in section 5, as is necessary for the good governance and financial stability of the Department of Beards.</content>
+                </section>
+                <section identifier="/au/act/1934/47/2A/6C">
+                    <num value="6C">6C</num>
+                    <heading> Issuance of beardcoin</heading>
+                    <content>Where an exemption is granted under section 6, the Department of Beards shall issue to the person so exempted a token, hereinafter referred to as a beardcoin, that shall for all purposes be regarded as substantive proof of such exemption.</content>
+                </section>
+                <section identifier="/au/act/1934/47/2A/6D">
+                    <num value="6D">6D</num>
+                    <heading> Waiver of beard tax in special circumstances</heading>
+                    <subsection identifier="/au/act/1934/47/2A/6D/1">
+                        <num value="1">(1)</num>
+                        <content>The Department of Beards shall waive the collection of beard tax upon issuance of beardcoin under Section 6C where the reason the maintainer wears a beard is due to bona fide religious or cultural reasons.</content>
+                    </subsection>
+                    <subsection identifier="/au/act/1934/47/2A/6D/2">
+                        <num value="2">(2)</num>
+                        <content>The determination of the Department of Beards as to what constitutes bona fide religious or cultural reasons shall be final and no right of appeal shall exist.</content>
+                    </subsection>
+                </section>
+            </part>
+            <part identifier="/au/act/1934/47/3">
+                <heading>Part 3—Offences</heading>
+                <section identifier="/au/act/1934/47/3/7">
+                    <heading> Wearing of a beard without exemption</heading>
+                    <content>Any person found to be wearing a beard within the Commonwealth of Australia without proper exemption as granted under section 6 commits an offence.</content>
+                </section>
+                <section identifier="/au/act/1934/47/3/7A">
+                    <heading> Improper transfer of beardcoin</heading>
+                    <content>It shall be an offence to buy, sell, lend, lease, gift, transfer or receive in any way a beardcoin from any person or body other than the Department of Beards, except as provided in Part 4.</content>
+                </section>
+                <section identifier="/au/act/1934/47/3/7B">
+                    <heading> Counterfeit beardcoin</heading>
+                    <subsection identifier="/au/act/1934/47/3/7B/1">
+                        <num value="1">(1)</num>
+                        <content>It shall be an offense to produce, alter, or manufacture tokens with the appearance of and purporting to be genuine beardcoin.</content>
+                    </subsection>
+                    <subsection identifier="/au/act/1934/47/3/7B/2">
+                        <num value="2">(2)</num>
+                        <content>It shall be no defense to a charge under section 7A that the purchase, sale, lease, gift, transfer or receipt was of counterfeit beardcoin rather than genuine beardcoin.</content>
+                    </subsection>
+                </section>
+                <section identifier="/au/act/1934/47/3/8">
+                    <heading> Notice to remedy</heading>
+                    <subsection identifier="/au/act/1934/47/3/8/1">
+                        <num value="1">(1)</num>
+                        <content>Where an officer of the Department of Beards, Australian Federal Police, state or territorial police, or military police of the Australian Defence Force finds a person to be wearing a beard within the territory of the Commonwealth of Australia, and that person fails or is unable to produce a beardcoin as proof of holding an exemption under section 6, that officer shall in the first instance issue such person a notice to remedy</content>
+                    </subsection>
+                    <subsection identifier="/au/act/1934/47/3/8/2">
+                        <num value="2">(2)</num>
+                        <chapeau>Any such person issued a notice to remedy under subsection 1 must either:</chapeau>
+                        <clause identifier="/au/act/1934/47/3/8/2/a">shave in such a way that they are no longer in breach of section 5, or</clause>
+                        <clause identifier="/au/act/1934/47/3/8/2/b">obtain a beardcoin from the Department of Beards</clause>
+                        <continuation>within 14 days of such notice being issued to them.</continuation>
+                    </subsection>
+                </section>
+                <section identifier="/au/act/1934/47/3/9">
+                    <heading> Penalties</heading>
+                    <subsection identifier="/au/act/1934/47/3/9/1">
+                        <num value="1">(1)</num>
+                        <content> Any person summarily convicted of a first offence under section 7 of unlawfully wearing a beard within the Commonwealth of Australia shall be liable to a fine not exceeding $200.</content>
+                    </subsection>
+                    <subsection identifier="/au/act/1934/47/3/9/2">
+                        <num value="2">(2)</num>
+                        <content>  Any person summarily convicted of a second or subsequent offence under section 7 shall be liable to a fine not exceeding $1000, or a period of imprisonment until such time as they no longer are in breach of section 5.</content>
+                    </subsection>
+                    <subsection identifier="/au/act/1934/47/3/9/3">
+                        <num value="3">(3)</num>
+                        <content>  No penalty shall be applied to any person who, within 14 days of receiving a notice to remedy under section 8(1), takes the action required of them under section 8(2).</content>
+                    </subsection>
+                    <subsection identifier="/au/act/1934/47/3/9/4">
+                        <num value="4">(4)</num>
+                        <content> Any person convicted of an offence under section 7A or section 7B(1) shall be liable to a fine not exceeding $5000 and/or a period of imprisonment not exceeding 12 months.</content>
+                    </subsection>
+                </section>
+            </part>
+            <part identifier="/au/act/1934/47/4">
+                <section identifier="/au/act/1934/47/4/10">
+                    <heading> Purpose of Part 4</heading>
+                    <content>Part 4 of the Australian Beard Tax (Promotion of Enlightement Values) Act 1934 exists for the purpose of incentivising Australians, and those visiting Australia, to relieve themselves from the burdensome habit of wearing a beard.</content>
+                </section>
+                <section identifier="/au/act/1934/47/4/11">
+                    <heading>  Licensed repurchasers of beardcoin</heading>
+                    <content>The Department of Beards may issue licenses to such barbers, hairdressers or other male grooming professionals as they see fit to purchase a beardcoin from a customer whose beard they have removed, and to resell those beardcoins to the Department of Beards</content>
+                </section>
+                <section identifier="/au/act/1934/47/4/12">
+                    <heading>  Rate to be paid to repurchasers of beardcoin</heading>
+                    <content>The value to be transfered to licensed repurchasers of beardcoin under section 11 shall be defined by Order in Council by the Minister for Beards under section 6B on a per coin basis.</content>
+                </section>
+            </part>
+            <part identifier="/au/act/1934/47/5">
+                <heading>Part 5—Consequential amendments</heading>
+                <section identifier="/au/act/1934/47/5/13">
+                    <heading>  Removal of GST from razors and shavers</heading>
+                    <content>The items set out in Annexe 1 of this Act shall be exempt from the goods and sales tax provisions of the Taxation Administration Act 1953.</content>
+                </section>
+            </part>
+        </act>
     </main>
 </uscDoc>

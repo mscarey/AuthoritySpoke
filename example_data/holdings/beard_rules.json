@@ -43,7 +43,7 @@
             {
                 "type": "fact",
                 "content": "the office of {the Department of Beards} granted an exemption authorizing the defendant's act of wearing the suspected beard",
-                "truth": false,
+                "truth": false
             }
         ],
         "outputs": {

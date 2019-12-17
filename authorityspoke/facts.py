@@ -87,7 +87,8 @@ class Fact(Factor):
         if len(self.context_factors) != len(self.predicate):
             message = (
                 "The number of items in 'context_factors' must be "
-                + f"{len(self.predicate)}, to match predicate.context_slots "
+                + f"{len(self.predicate)}, not {len(self.context_factors)}, "
+                + f"to match predicate.context_slots "
                 + f"for '{self.predicate.content}'"
             )
             if hasattr(self, "name"):

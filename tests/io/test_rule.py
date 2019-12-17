@@ -23,10 +23,22 @@ class TestLoadRules:
     reference to any Opinion or Holding.
     """
 
-    beard_code = loaders.load_and_read_code("beard_tax_act.xml")
-    au = Regime()
-    au.set_code(beard_code)
-    # beard_rules = load_and_read_rules("beard_rules.json")
+    def test_loading_code(self):
+        beard_code = loaders.load_and_read_code("beard_tax_act.xml")
+        assert beard_code.jurisdiction == "au"
 
-    def test_code_jurisdiction_is_australia(self):
-        assert self.beard_code.jurisdiction == "au"
+    def test_loading_rules(self, make_regime):
+        beard_rules = loaders.load_and_read_rules(
+            "beard_rules.json", regime=make_regime
+        )
+        assert beard_rules[0].outputs.content == "{the suspected beard} was a beard"
+
+    def test_index_names(self):
+        rules = loaders.load_holdings("beard_rules.json")
+        mentioned = readers.index_names(rules)
+        assert (
+            mentioned[
+                "the Department of Beards granted the defendant's beard exemption"
+            ]
+            == "the Department of Beards"
+        )
