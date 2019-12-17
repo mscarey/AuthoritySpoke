@@ -1,4 +1,5 @@
-from authorityspoke.io import dump, readers, schemas
+from authorityspoke.io import dump, loaders, readers
+from authorityspoke.jurisdictions import Regime
 
 
 class TestRuleDump:
@@ -14,3 +15,18 @@ class TestRuleDump:
         loaded = readers.read_rule(dumped, regime=make_regime)
         content = loaded.despite[0].predicate.content
         assert "the distance between {} and {} was" in content
+
+
+class TestLoadRules:
+    """
+    Tests loading Rules, possibly for linking to legislation without
+    reference to any Opinion or Holding.
+    """
+
+    beard_code = loaders.load_and_read_code("beard_tax_act.xml")
+    au = Regime()
+    au.set_code(beard_code)
+    # beard_rules = load_and_read_rules("beard_rules.json")
+
+    def test_code_jurisdiction_is_australia(self):
+        assert self.beard_code.jurisdiction == "au"

@@ -15,7 +15,7 @@ from authorityspoke.decisions import Decision
 from authorityspoke.codes import Code
 from authorityspoke.holdings import Holding
 from authorityspoke.jurisdictions import Regime
-from authorityspoke.opinions import Opinion
+from authorityspoke.rules import Rule
 
 from authorityspoke.io import anchors, filepaths, readers
 from authorityspoke.io.text_expansion import expand_shorthand
@@ -75,7 +75,7 @@ def load_holdings(
     Load a list of records from JSON to create :class:`.Holding`\s.
 
     :param filename:
-        the name of the JSON file to look in for :class:`Rule`
+        the name of the JSON file to look in for :class:`Holding`
         data in the format that lists ``mentioned_factors``
         followed by a list of holdings.
 
@@ -89,7 +89,7 @@ def load_holdings(
     :parame regime:
 
     :returns:
-        a list of :class:`Rule`\s from a JSON file in the
+        a list of :class:`Holding`\s from a JSON file in the
         ``example_data/holdings`` subdirectory, from a JSON
         file.
     """
@@ -100,6 +100,36 @@ def load_holdings(
         holdings = json.load(f)
     holdings = expand_shorthand(holdings)
     return holdings
+
+
+def load_and_read_rules(
+    filename: Optional[str] = None,
+    directory: Optional[pathlib.Path] = None,
+    filepath: Optional[pathlib.Path] = None,
+    regime: Optional[Regime] = None,
+) -> List[Rule]:
+    """
+    Read :class:`.Rule`\s from a file.
+
+    Even though this function will generate :class:`.Rule`\s instead
+    of :class:`.Holding`\s, it uses the :func:`load_holding` function.
+    Some fields that can exist in a :class:`.Holding` object (rule_valid,
+    decided, exclusive) are not applicable to :class:`.Rule`\s.
+
+    :param filename: The name of the input JSON file.
+
+    :param directory: The directory where the input JSON file is located.
+
+    :param filepath:
+        Complete path to the JSON file representing the :class:`.Opinion`,
+        including filename.
+
+    :param regime:
+        The regime to reference for the :class:`Enactment`\s
+        mentioned in the holding.
+    """
+    raw_rules = load_holdings(filename=filename, directory=directory, filepath=filepath)
+    return readers.read_rules(raw_rules, regime=regime)
 
 
 def load_and_read_holdings(

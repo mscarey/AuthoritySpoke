@@ -1,0 +1,90 @@
+[
+    {
+        "inputs": [
+            {
+                "type": "fact",
+                "content": "{the suspected beard} was facial hair"
+            },
+            {
+                "type": "fact",
+                "content": "the length of the suspected beard was < 5 millimetres"
+            },
+            {
+                "type": "fact",
+                "content": "the suspected beard occurred on or below the chin"
+            },
+            {
+                "type": "fact",
+                "content": "the suspected beard existed in an uninterrupted line from the front of one ear to the front of the other ear below the nose"
+            }
+        ],
+        "outputs": [
+            {
+                "type": "fact",
+                "content": "the suspected beard was a beard",
+                "name": "the fact that the facial hair was a beard"
+            }
+        ],
+        "enactments": [
+            {
+                "source": "/au/act/1934/47/1/4"
+            }
+        ],
+        "universal": true
+    },
+    {
+        "inputs": [
+            "the fact that the facial hair was a beard",
+            {
+                "type": "fact",
+                "content": "{the defendant} wore the suspected beard",
+                "name": "the defendant's act of wearing the suspected beard"
+            },
+            {
+                "type": "fact",
+                "content": "the office of {the Department of Beards} granted an exemption authorizing the defendant's act of wearing the suspected beard",
+                "truth": false,
+            }
+        ],
+        "outputs": {
+            "type": "fact",
+            "content": "{the defendant} committed the offense of a beard without exemption",
+            "name": "the defendant's act of wearing the suspected beard"
+        },
+        "enactments": [
+            {
+                "source": "/au/act/1934/47/2/5"
+            },
+            {
+                "source": "/au/act/1934/47/2/6"
+            },
+            {
+                "source": "/au/act/1934/47/3/7"
+            }
+        ]
+    },
+    {
+        "inputs": {
+            "type": "exhibit",
+            "form": "token",
+            "statement": {
+                "type": "fact",
+                "content": "the office of the Department of Beards granted an exemption authorizing the defendant's act of wearing the suspected beard",
+                "name": "the Department of Beards granted the defendant's beard exemption"
+            },
+            "stated_by": "the Department of Beards",
+            "name": "the beardcoin"
+        },
+        "outputs": {
+            "type": "evidence",
+            "exhibit": "the beardcoin",
+            "to_effect": "the Department of Beards granted the defendant's beard exemption"
+        },
+        "universal": true,
+        "enactments": [
+            {
+                "source": "/au/act/1934/47/2A/6C"
+            }
+        ]
+    }
+]

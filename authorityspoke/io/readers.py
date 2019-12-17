@@ -64,6 +64,10 @@ def get_code_uri(xml, title: str) -> str:
         describes the document as a whole, if available in
         the XML. Otherwise returns a pseudo-USLM identifier.
     """
+    main_element = xml.find("main")
+    if main_element:
+        identifier = main_element.findChild()["identifier"]
+        return identifier
     if title == "Constitution of the United States":
         return "/us/const"
     if title.startswith("Title"):
@@ -90,7 +94,7 @@ def get_code_title(xml) -> str:
         returns a descriptive name that may not exactly
         appear in the XML.
     """
-    uslm_title = xml.find("dc:title")
+    uslm_title = xml.find("title")
     if uslm_title:
         return uslm_title.text
     cal_title = xml.h3
@@ -338,6 +342,25 @@ def read_rule(record: Dict, regime: Optional[Regime] = None) -> Rule:
     """
     mentioned = index_names(record)
     schema = schemas.RuleSchema()
+    schema.context["mentioned"] = mentioned
+    schema.context["regime"] = regime
+    return schema.load(record)
+
+
+def read_rules(record: List[Dict], regime: Optional[Regime] = None) -> Rule:
+    r"""
+    Make :class:`Rule`\s from a list of fields and a :class:`.Regime`\.
+
+    :param record:
+
+    :param regime:
+
+    :returns:
+        iterator yielding :class:`Rule`\s with the items
+        from ``mentioned_entities`` as ``context_factors``
+    """
+    mentioned = index_names(record)
+    schema = schemas.RuleSchema(many=True)
     schema.context["mentioned"] = mentioned
     schema.context["regime"] = regime
     return schema.load(record)
