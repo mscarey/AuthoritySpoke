@@ -5,7 +5,7 @@ from authorityspoke.io import name_index, text_expansion
 class TestCollectMentioned:
     def test_mentioned_from_entity(self):
         obj = {"type": "Entity", "name": "Ann"}
-        mentioned = name_index.collect_mentioned(obj)
+        obj, mentioned = name_index.collect_mentioned(obj)
         assert mentioned["Ann"]["type"] == "Entity"
 
     def test_insert_in_mentioned_does_not_change_obj(self):
@@ -35,13 +35,13 @@ class TestCollectMentioned:
 
     def test_mentioned_from_fact_and_entities(self):
         obj = text_expansion.expand_shorthand(self.relevant_dict)
-        mentioned = name_index.collect_mentioned(self.relevant_dict)
+        obj, mentioned = name_index.collect_mentioned(obj)
         assert mentioned["relevant fact"]["type"] == "Fact"
         shooting = mentioned["relevant fact"]["context_factors"][0]
         assert shooting["context_factors"][0]["name"] == "Short Name"
 
     def test_mentioned_ordered_by_length(self):
-        mentioned = name_index.index_names(self.relevant_dict)
+        record, mentioned = name_index.index_names(self.relevant_dict)
         shortest = mentioned.popitem()
         assert shortest[0] == "Short Name"
 
@@ -63,7 +63,7 @@ class TestCollectMentioned:
         'Name "securing for authors" not found in the index of mentioned Factors'
         """
         feist_records = loaders.load_holdings("holding_feist.json")
-        mentioned = name_index.index_names(feist_records)
+        record, mentioned = name_index.index_names(feist_records)
         assert "securing for authors" in mentioned
 
     def test_context_factor_not_collapsed(self, make_regime):

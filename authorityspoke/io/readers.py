@@ -149,7 +149,7 @@ def read_enactment(
         a new :class:`Enactment` object, optionally with text links.
     """
     schema = schemas.EnactmentSchema(many=False)
-    schema.context["mentioned"] = index_names(record)
+    record, schema.context["mentioned"] = index_names(record)
     schema.context["regime"] = regime
     schema.context["code"] = code
     return schema.load(deepcopy(record))
@@ -183,7 +183,7 @@ def read_enactments(
         a list of new :class:`Enactment` objects, optionally with text links.
     """
     schema = schemas.EnactmentSchema(many=True)
-    schema.context["mentioned"] = index_names(record)
+    record, schema.context["mentioned"] = index_names(record)
     schema.context["regime"] = regime
     schema.context["code"] = code
     return schema.load(deepcopy(record))
@@ -204,7 +204,7 @@ def read_fact(record: RawFactor) -> Fact:
     :returns:
         a :class:`Fact`, with optional mentioned factors
     """
-    mentioned = index_names(record)
+    record, mentioned = index_names(record)
     schema = schemas.FactSchema()
     schema.context["mentioned"] = mentioned
     return schema.load(record)
@@ -222,7 +222,7 @@ def read_factor(record: RawFactor, regime: Optional[Regime] = None, **kwargs) ->
 
     """
     schema = schemas.FactorSchema(many=False)
-    schema.context["mentioned"] = index_names(record)
+    record, schema.context["mentioned"] = index_names(record)
     schema.context["regime"] = regime
     return schema.load(record)
 
@@ -241,7 +241,7 @@ def read_factors(
 
     """
     schema = schemas.FactorSchema(many=True)
-    schema.context["mentioned"] = index_names(record)
+    record, schema.context["mentioned"] = index_names(record)
     schema.context["regime"] = regime
     return schema.load(record)
 
@@ -250,7 +250,7 @@ def read_procedure(
     record: Dict, regime: Optional[Regime] = None, many=False
 ) -> Procedure:
     schema = schemas.ProcedureSchema(many=many)
-    schema.context["mentioned"] = index_names(record)
+    record, schema.context["mentioned"] = index_names(record)
     schema.context["regime"] = regime
     return schema.load(record)
 
@@ -306,7 +306,7 @@ def read_holdings(
         an index matching :class:`.Factor`\s to selectors.
     """
     schema = schemas.HoldingSchema(many=True)
-    schema.context["mentioned"] = index_names(record)
+    record, schema.context["mentioned"] = index_names(record)
     schema.context["regime"] = regime
     return schema.load(deepcopy(record))
 
@@ -340,7 +340,7 @@ def read_rule(record: Dict, regime: Optional[Regime] = None) -> Rule:
         iterator yielding :class:`Rule`\s with the items
         from ``mentioned_entities`` as ``context_factors``
     """
-    mentioned = index_names(record)
+    record, mentioned = index_names(record)
     schema = schemas.RuleSchema()
     schema.context["mentioned"] = mentioned
     schema.context["regime"] = regime
@@ -359,7 +359,7 @@ def read_rules(record: List[Dict], regime: Optional[Regime] = None) -> Rule:
         iterator yielding :class:`Rule`\s with the items
         from ``mentioned_entities`` as ``context_factors``
     """
-    mentioned = index_names(record)
+    record, mentioned = index_names(record)
     schema = schemas.RuleSchema(many=True)
     schema.context["mentioned"] = mentioned
     schema.context["regime"] = regime

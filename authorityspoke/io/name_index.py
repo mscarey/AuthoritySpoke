@@ -42,14 +42,17 @@ def collect_mentioned(obj: Dict, mentioned: Optional[Mentioned] = None) -> Menti
     mentioned = mentioned or Mentioned()
     if isinstance(obj, List):
         for item in obj:
-            mentioned.update(collect_mentioned(item))
+            obj, new_mentioned = collect_mentioned(item)
+            mentioned.update(new_mentioned)
     if isinstance(obj, Dict):
-        if obj.get("name"):
-            mentioned.insert_by_name(obj)
         for _, value in obj.items():
             if isinstance(value, (Dict, List)):
-                mentioned.update(collect_mentioned(value))
-    return mentioned
+                obj, new_mentioned = collect_mentioned(value)
+                mentioned.update(new_mentioned)
+        if isinstance(obj, Dict) and obj.get("name"):
+            mentioned.insert_by_name(obj)
+            obj = obj["name"]
+    return obj, mentioned
 
 
 def index_names(obj: Union[List, Dict]) -> Mentioned:
@@ -63,6 +66,6 @@ def index_names(obj: Union[List, Dict]) -> Mentioned:
         a modified version of the dict to load, plus a dict of names
         and the objects to expand them with.
     """
-    mentioned = collect_mentioned(obj)
+    obj, mentioned = collect_mentioned(obj)
     sorted_mentioned = mentioned.sorted_by_length()
-    return sorted_mentioned
+    return obj, sorted_mentioned
