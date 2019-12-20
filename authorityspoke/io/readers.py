@@ -279,7 +279,7 @@ def read_holding(record: RawHolding, regime: Optional[Regime] = None) -> Holding
         as values.
     """
     schema = schemas.HoldingSchema(many=False)
-    schema.context["mentioned"] = index_names(record)
+    record, schema.context["mentioned"] = index_names(record)
     schema.context["regime"] = regime
     return schema.load(deepcopy(record))
 

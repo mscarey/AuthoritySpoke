@@ -50,7 +50,7 @@ def assign_name_from_content(obj: Dict) -> str:
             content_for_name = content_for_name.replace("{}", context_factor, 1)
     else:
         content_for_name = obj["predicate"]["content"]
-    false_modifier = "false " if obj.get("truth") is False else ""
+    false_modifier = "false " if obj["predicate"].get("truth") is False else ""
     return f"{false_modifier}{content_for_name}".replace("{", "").replace("}", "")
 
 

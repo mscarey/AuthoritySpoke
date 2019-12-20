@@ -104,8 +104,8 @@ class TestCollectMentioned:
         'Name "securing for authors" not found in the index of mentioned Factors'
         """
         feist_records = loaders.load_holdings("holding_feist.json")
-        feist_holdings = readers.read_holdings(feist_records, regime=make_regime)
-        assert "securing for authors" in str(feist_holdings)
+        feist_holding = readers.read_holding(feist_records[0], regime=make_regime)
+        assert "securing for authors" in str(feist_holding)
 
 
 class TestRetrieveMentioned:
