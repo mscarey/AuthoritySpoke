@@ -39,6 +39,7 @@ def walk_tree_and_modify(
         for key, value in obj_dict.items():
             if isinstance(value, (Dict, List)) and key not in ignore:
                 obj_dict[key] = walk_tree_and_modify(value, func, ignore)
+
         return obj_dict
 
     return obj

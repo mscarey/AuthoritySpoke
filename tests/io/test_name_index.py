@@ -33,15 +33,22 @@ class TestCollectMentioned:
         obj = text_expansion.expand_shorthand(self.relevant_dict)
         assert obj["context_factors"][0]["context_factors"][0]["name"] == "Short Name"
 
+    def test_expand_shorthand_turns_context_factor_str_into_list(self):
+        short_shot_long = text_expansion.expand_shorthand(
+            self.relevant_dict["context_factors"][0]
+        )
+        assert isinstance(short_shot_long["context_factors"], list)
+
     def test_assign_name(self):
         """
-        This Fact should have a name assigned because it doesn't already
-        have one.
+        The collect_mentioned function should assign name to this Fact
+        because it doesn't already have one.
         """
-        short_murdered_long = self.relevant_dict["context_factors"][1]
-        with_name = text_expansion.expand_shorthand(short_murdered_long)
-        assert with_name["name"] == "Short Name murdered Longer Name"
-
+        short_shot_long = text_expansion.expand_shorthand(
+            self.relevant_dict["context_factors"][0]
+        )
+        with_name, mentioned = name_index.collect_mentioned(short_shot_long)
+        assert with_name["name"] == "Short Name shot Longer Name"
 
     def test_mentioned_from_fact_and_entities(self):
         obj = text_expansion.expand_shorthand(self.relevant_dict)
@@ -124,9 +131,10 @@ class TestRetrieveMentioned:
             ],
         }
         obj = {"type": "Entity", "name": "Larry"}
-        fact["predicate"]["content"], fact[
-            "context_factors"
-        ] = text_expansion.add_found_context(
+        (
+            fact["predicate"]["content"],
+            fact["context_factors"],
+        ) = text_expansion.add_found_context(
             fact["predicate"]["content"], fact["context_factors"], obj
         )
         assert fact["predicate"]["content"] == "{} threw a pie at {} but it hit {}"

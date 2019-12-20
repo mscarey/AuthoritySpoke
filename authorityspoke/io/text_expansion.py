@@ -7,7 +7,7 @@ from authorityspoke.io import nesting
 def expand_shorthand(obj: Dict) -> Dict[str, Any]:
     """Traverse dict and expand every kind of pre-loading shorthand."""
     return nesting.walk_tree_and_modify(
-        obj=obj, func=expand_node_shorthand, ignore=("predicate")
+        obj=obj, func=expand_node_shorthand, ignore=("predicate",)
     )
 
 
@@ -22,7 +22,6 @@ def expand_node_shorthand(obj: Dict[str, Any]) -> Dict[str, Any]:
 
     obj = collapse_known_factors(obj)
     obj = expand_shorthand_mentioned(obj)
-    obj = assign_name_from_content(obj)
 
     return obj
 
@@ -73,31 +72,6 @@ def collapse_name_in_content(
     if double_placeholder in content:
         content = content.replace(double_placeholder, placeholder, 1)
     return content
-
-
-def assign_name_from_content(obj: Dict) -> Dict:
-    """
-    Use the content to assign a name to any :class:`.Fact` that lacks one.
-
-    :param obj:
-        object loaded from JSON to make a :class:`.Factor` or :class:`.Holding`
-
-    :returns:
-        the input object, but with names assigned.
-    """
-
-    if (
-        obj.get("predicate", {}).get("content")
-        and not obj.get("name")
-    ):
-        if obj.get("context_factors"):
-            content_for_name = obj["predicate"]["content"]
-            for context_factor in obj["context_factors"]:
-                content_for_name = content_for_name.replace("{}", context_factor, 1)
-        else:
-            content_for_name = obj["predicate"]["content"]
-        obj["name"] = name_from_content(content_for_name)
-    return obj
 
 
 def add_found_context(
@@ -156,10 +130,6 @@ def get_references_from_string(
 
     return content, context_factors
 
-
-def name_from_content(content: str, truth: Optional[bool] = None):
-    false_modifier = "false " if truth is False else ""
-    return f"{false_modifier}{content}".replace("{", "").replace("}", "")
 
 
 def wrap_single_element_in_list(data: Dict, many_element: str):
