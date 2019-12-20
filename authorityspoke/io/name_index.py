@@ -45,10 +45,11 @@ def collect_mentioned(obj: Dict, mentioned: Optional[Mentioned] = None) -> Menti
             obj, new_mentioned = collect_mentioned(item)
             mentioned.update(new_mentioned)
     if isinstance(obj, Dict):
-        for _, value in obj.items():
+        for key, value in obj.items():
             if isinstance(value, (Dict, List)):
-                obj, new_mentioned = collect_mentioned(value)
+                new_value, new_mentioned = collect_mentioned(value)
                 mentioned.update(new_mentioned)
+                obj[key] = new_value
         if isinstance(obj, Dict) and obj.get("name"):
             mentioned.insert_by_name(obj)
             obj = obj["name"]

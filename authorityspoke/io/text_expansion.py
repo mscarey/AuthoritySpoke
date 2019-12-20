@@ -19,10 +19,10 @@ def expand_node_shorthand(obj: Dict[str, Any]) -> Dict[str, Any]:
     to_nest = ["content", "truth", "reciprocal", "comparison", "quantity"]
     obj = nesting.nest_fields(obj, nest="predicate", eggs=to_nest)
 
-    obj = assign_name_from_content(obj)
-    obj = collapse_known_factors(obj)
 
+    obj = collapse_known_factors(obj)
     obj = expand_shorthand_mentioned(obj)
+    obj = assign_name_from_content(obj)
 
     return obj
 
@@ -89,11 +89,14 @@ def assign_name_from_content(obj: Dict) -> Dict:
     if (
         obj.get("predicate", {}).get("content")
         and not obj.get("name")
-        and not obj.get("context_factors")
     ):
-        obj["name"] = name_from_content(
-            obj["predicate"]["content"], obj["predicate"].get("truth")
-        )
+        if obj.get("context_factors"):
+            content_for_name = obj["predicate"]["content"]
+            for context_factor in obj["context_factors"]:
+                content_for_name = content_for_name.replace("{}", context_factor, 1)
+        else:
+            content_for_name = obj["predicate"]["content"]
+        obj["name"] = name_from_content(content_for_name)
     return obj
 
 
