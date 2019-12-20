@@ -63,7 +63,7 @@ def create_name_for_factor(obj: Dict) -> str:
     :returns: a name for the Factor
     """
 
-    if obj.get("content"): # Predicates don't need names
+    if obj.get("content"):  # Predicates don't need names
         return ""
     if obj.get("predicate", {}).get("content"):
         return assign_name_from_content(obj)
@@ -85,8 +85,11 @@ def ensure_factor_has_name(obj: Dict) -> Dict:
     return obj
 
 
-
-def collect_mentioned(obj: Dict, mentioned: Optional[Mentioned] = None, keys_to_ignore: Sequence[str] = ("predicate",)) -> Mentioned:
+def collect_mentioned(
+    obj: Dict,
+    mentioned: Optional[Mentioned] = None,
+    keys_to_ignore: Sequence[str] = ("predicate",),
+) -> Mentioned:
     """
     Make a dict of all nested objects labeled by name, creating names if needed.
 
@@ -94,9 +97,12 @@ def collect_mentioned(obj: Dict, mentioned: Optional[Mentioned] = None, keys_to_
     """
     mentioned = mentioned or Mentioned()
     if isinstance(obj, List):
+        new_list = []
         for item in obj:
-            obj, new_mentioned = collect_mentioned(item)
+            new_item, new_mentioned = collect_mentioned(item)
             mentioned.update(new_mentioned)
+            new_list.append(new_item)
+        obj = new_list
     if isinstance(obj, Dict):
         for key, value in obj.items():
             if key not in keys_to_ignore:
@@ -109,6 +115,7 @@ def collect_mentioned(obj: Dict, mentioned: Optional[Mentioned] = None, keys_to_
             mentioned.insert_by_name(obj)
             obj = obj["name"]
     return obj, mentioned
+
 
 def index_names(obj: Union[List, Dict]) -> Mentioned:
     """

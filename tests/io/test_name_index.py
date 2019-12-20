@@ -41,14 +41,15 @@ class TestCollectMentioned:
 
     def test_assign_name(self):
         """
-        The collect_mentioned function should assign name to this Fact
+        The collect_mentioned function should assign a name to this Fact
         because it doesn't already have one.
         """
         short_shot_long = text_expansion.expand_shorthand(
             self.relevant_dict["context_factors"][0]
         )
-        with_name, mentioned = name_index.collect_mentioned(short_shot_long)
-        assert with_name["name"] == "Short Name shot Longer Name"
+        collapsed, mentioned = name_index.collect_mentioned(short_shot_long)
+        assert collapsed == "Short Name shot Longer Name"
+        assert mentioned[collapsed]["context_factors"][0] == "Short Name"
 
     def test_mentioned_from_fact_and_entities(self):
         obj = text_expansion.expand_shorthand(self.relevant_dict)
