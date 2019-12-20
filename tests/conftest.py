@@ -18,7 +18,7 @@ from authorityspoke.predicates import Predicate, Q_
 from authorityspoke.rules import Procedure, Rule
 
 from authorityspoke.io import loaders, readers
-from authorityspoke.io.schemas import RawHolding
+from authorityspoke.io.schemas import RawFactor, RawHolding
 
 
 
@@ -1191,3 +1191,24 @@ def make_analysis() -> Dict[str, Dict[str, Any]]:
             }
         ]
     return analysis
+
+@pytest.fixture(scope="function")
+def raw_factor() -> RawFactor:
+    """
+    Example user data that needs to be processed and loaded as a Factor.
+    """
+    return {
+        "relevant": {
+        "content": "{} is relevant to show {}",
+        "type": "Fact",
+        "name": "relevant fact",
+        "context_factors": [
+            {"content": "{Short Name} shot {Longer Name}", "type": "Fact"},
+            {
+                "content": "{} murdered {}",
+                "context_factors": ["Short Name", "Longer Name"],
+                "type": "Fact",
+            },
+        ],
+    }
+    }

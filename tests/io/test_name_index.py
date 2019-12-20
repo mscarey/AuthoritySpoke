@@ -15,51 +15,38 @@ class TestCollectMentioned:
         assert obj["name"] == "Remainer"
         assert "name" not in mentioned["Remainer"].keys()
 
-    relevant_dict = {
-        "content": "{} is relevant to show {}",
-        "type": "Fact",
-        "name": "relevant fact",
-        "context_factors": [
-            {"content": "{Short Name} shot {Longer Name}", "type": "Fact"},
-            {
-                "content": "{} murdered {}",
-                "context_factors": ["Short Name", "Longer Name"],
-                "type": "Fact",
-            },
-        ],
-    }
-
-    def test_expand_shorthand(self):
-        obj = text_expansion.expand_shorthand(self.relevant_dict)
+    def test_expand_shorthand(self, raw_factor):
+        obj = text_expansion.expand_shorthand(raw_factor["relevant"])
         assert obj["context_factors"][0]["context_factors"][0]["name"] == "Short Name"
 
-    def test_expand_shorthand_turns_context_factor_str_into_list(self):
+    def test_expand_shorthand_turns_context_factor_str_into_list(self, raw_factor):
         short_shot_long = text_expansion.expand_shorthand(
-            self.relevant_dict["context_factors"][0]
+            raw_factor["relevant"]["context_factors"][0]
         )
         assert isinstance(short_shot_long["context_factors"], list)
 
-    def test_assign_name(self):
+    def test_assign_name(self, raw_factor):
         """
         The collect_mentioned function should assign a name to this Fact
         because it doesn't already have one.
         """
         short_shot_long = text_expansion.expand_shorthand(
-            self.relevant_dict["context_factors"][0]
+            raw_factor["relevant"]["context_factors"][0]
         )
         collapsed, mentioned = name_index.collect_mentioned(short_shot_long)
         assert collapsed == "Short Name shot Longer Name"
         assert mentioned[collapsed]["context_factors"][0] == "Short Name"
 
-    def test_mentioned_from_fact_and_entities(self):
-        obj = text_expansion.expand_shorthand(self.relevant_dict)
+    def test_mentioned_from_fact_and_entities(self, raw_factor):
+        obj = text_expansion.expand_shorthand(raw_factor["relevant"])
         obj, mentioned = name_index.collect_mentioned(obj)
         assert mentioned["relevant fact"]["type"] == "Fact"
         shooting = mentioned["relevant fact"]["context_factors"][0]
-        assert shooting["context_factors"][0]["name"] == "Short Name"
+        assert mentioned[shooting]["context_factors"][0] == "Short Name"
 
-    def test_mentioned_ordered_by_length(self):
-        record, mentioned = name_index.index_names(self.relevant_dict)
+    def test_mentioned_ordered_by_length(self, raw_factor):
+        obj = text_expansion.expand_shorthand(raw_factor["relevant"])
+        obj, mentioned = name_index.index_names(obj)
         shortest = mentioned.popitem()
         assert shortest[0] == "Short Name"
 

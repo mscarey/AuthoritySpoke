@@ -65,6 +65,8 @@ def create_name_for_factor(obj: Dict) -> str:
 
     if obj.get("content"):  # Predicates don't need names
         return ""
+    if obj.get("outputs"):  # Procedures, Rules, and Holdings don't need names
+        return ""
     if obj.get("predicate", {}).get("content"):
         return assign_name_from_content(obj)
     raise NotImplementedError
@@ -88,7 +90,7 @@ def ensure_factor_has_name(obj: Dict) -> Dict:
 def collect_mentioned(
     obj: Dict,
     mentioned: Optional[Mentioned] = None,
-    keys_to_ignore: Sequence[str] = ("predicate",),
+    keys_to_ignore: Sequence[str] = ("predicate", "anchors"),
 ) -> Mentioned:
     """
     Make a dict of all nested objects labeled by name, creating names if needed.
