@@ -13,7 +13,7 @@ from authorityspoke.holdings import Holding
 from authorityspoke.opinions import Opinion
 from authorityspoke.predicates import Predicate
 from authorityspoke.procedures import Procedure
-from authorityspoke.io import anchors, loaders, readers, dump, name_index
+from authorityspoke.io import anchors, loaders, readers, schemas, dump, name_index
 from authorityspoke.io.loaders import load_holdings
 from authorityspoke.io import filepaths, text_expansion
 from authorityspoke.rules import Rule
@@ -149,9 +149,13 @@ class TestHoldingImport:
                 "anchors": "compilations of facts|generally are|",
             },
         ]
-        holding_anchors = anchors.get_holding_anchors(raw_holdings)
-        named_anchors = anchors.get_named_anchors(raw_holdings)
-        feist_holdings = readers.read_holdings(raw_holdings, regime=make_regime)
+        record, mentioned = name_index.index_names(raw_holdings)
+        holding_anchors = anchors.get_holding_anchors(record)
+        named_anchors = anchors.get_named_anchors(mentioned)
+        schema = schemas.HoldingSchema(many=True)
+        schema.context["mentioned"] = mentioned
+        schema.context["regime"] = make_regime
+        feist_holdings = schema.load(record)
         feist = make_opinion["feist_majority"]
         feist.posit(
             feist_holdings, holding_anchors=holding_anchors, named_anchors=named_anchors
@@ -165,8 +169,10 @@ class TestHoldingImport:
         impossible to get text anchors.
         """
         raw_holdings = load_holdings(f"holding_oracle.json")
-        oracle_holdings = readers.read_holdings(raw_holdings, regime=make_regime)
-        named_anchors = anchors.get_named_anchors(raw_holdings)
+        oracle_holdings, mentioned = readers.read_holdings_with_index(
+            raw_holdings, regime=make_regime
+        )
+        named_anchors = anchors.get_named_anchors(mentioned)
 
         assert isinstance(oracle_holdings[0], Holding)
         assert isinstance(named_anchors.popitem()[1].pop(), TextQuoteSelector)
@@ -190,9 +196,9 @@ class TestTextAnchors:
     def test_read_holding_with_no_anchor(self, make_opinion, make_analysis):
         oracle = make_opinion["oracle_majority"]
         raw_analysis = make_analysis["no anchors"]
-        oracle_holdings = readers.read_holdings(raw_analysis)
+        oracle_holdings, mentioned = readers.read_holdings_with_index(raw_analysis)
         holding_anchors = anchors.get_holding_anchors(raw_analysis)
-        named_anchors = anchors.get_named_anchors(raw_analysis)
+        named_anchors = anchors.get_named_anchors(mentioned)
         oracle.posit(
             oracle_holdings,
             holding_anchors=holding_anchors,

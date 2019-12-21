@@ -74,6 +74,7 @@ def get_named_anchors(mentioned: Mentioned) -> TextLinkDict:
         if "anchors" in value:
             for anchor in value["anchors"]:
                 anchors[key].append(anchor)
+            anchors[key] = read_selectors(anchors[key])
     return anchors
 
 

@@ -1147,7 +1147,9 @@ def make_decision():
 def make_decision_with_holding(make_decision, make_regime):
     decisions = load_decisions_for_fixtures()
     for case in TEST_CASES:
-        holdings, holding_anchors, named_anchors = loaders.load_holdings_with_anchors(f"holding_{case}.json", regime=make_regime)
+        holdings, mentioned = loaders.load_holdings_with_index(f"holding_{case}.json", regime=make_regime)
+        holding_anchors = anchors.get_holding_anchors(mentioned)
+        named_anchors = anchors.get_named_anchors(mentioned)
         decisions[case].majority.posit(holdings, holding_anchors=holding_anchors, named_anchors=named_anchors)
     return decisions
 

@@ -117,15 +117,22 @@ def create_name_for_factor(obj: Dict) -> str:
         or obj.get("exact")  # Text Selectors don't need names
     ):
         return ""
-    if obj.get("predicate", {}).get("content"):
-        return assign_name_from_content(obj)
-    if obj.get("source"):
-        return assign_name_for_enactment(obj)
-    if obj.get("exhibit") or obj.get("name") and obj.get("name").lower() == "evidence":
-        return assign_name_for_exhibit(obj)
-    if obj.get("type").lower() == "pleading":
-        return assign_name_for_pleading(obj)
-    raise NotImplementedError
+    elif obj.get("predicate", {}).get("content"):
+        name = assign_name_from_content(obj)
+    elif obj.get("source"):
+        name = assign_name_for_enactment(obj)
+    elif (
+        obj.get("exhibit")
+        or (obj.get("name") and obj.get("name").lower()) == "evidence"
+    ):
+        name = assign_name_for_exhibit(obj)
+    elif obj.get("type").lower() == "pleading":
+        name = assign_name_for_pleading(obj)
+    else:
+        raise NotImplementedError
+    if obj.get("absent") is True:
+        name = f"absent {name}"
+    return name
 
 
 def ensure_factor_has_name(obj: Dict) -> Dict:

@@ -30,7 +30,7 @@ class TestEnactmentImport:
             "nor shall any State deprive any person of life, liberty, or property"
         )
         assert (
-            factor_anchors[enactment.name][0]["exact"]
+            factor_anchors[enactment.name][0].exact
             == "reference to the Due Process Clause"
         )
 

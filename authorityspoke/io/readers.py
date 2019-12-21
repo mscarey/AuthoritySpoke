@@ -38,7 +38,7 @@ from authorityspoke.io.schemas import (
     RawFactor,
     RawDecision,
 )
-from authorityspoke.io.name_index import index_names
+from authorityspoke.io.name_index import index_names, Mentioned
 
 
 ureg = UnitRegistry()
@@ -282,6 +282,17 @@ def read_holding(record: RawHolding, regime: Optional[Regime] = None) -> Holding
     record, schema.context["mentioned"] = index_names(record)
     schema.context["regime"] = regime
     return schema.load(deepcopy(record))
+
+
+def read_holdings_with_index(
+    record: List[RawHolding], regime: Optional[Regime] = None
+) -> Tuple[List[Holding], Mentioned]:
+    record, mentioned = index_names(record)
+    schema = schemas.HoldingSchema(many=True)
+    schema.context["regime"] = regime
+    schema.context["mentioned"] = mentioned
+    holdings = schema.load(deepcopy(record))
+    return holdings, mentioned
 
 
 def read_holdings(

@@ -18,7 +18,7 @@ from authorityspoke.jurisdictions import Regime
 from authorityspoke.rules import Rule
 
 from authorityspoke.io import anchors, filepaths, readers
-from authorityspoke.io.name_index import index_names
+from authorityspoke.io.name_index import index_names, Mentioned
 from authorityspoke.io.text_expansion import expand_shorthand
 from authorityspoke.io.schemas import RawHolding, RawDecision
 
@@ -160,25 +160,19 @@ def load_and_read_holdings(
     return readers.read_holdings(raw_holdings, regime=regime)
 
 
-def load_holdings_with_anchors(
+def load_holdings_with_index(
     filename: Optional[str] = None,
     directory: Optional[pathlib.Path] = None,
     filepath: Optional[pathlib.Path] = None,
     regime: Optional[Regime] = None,
-) -> Tuple[
-    List[Holding], List[List[TextQuoteSelector]], Dict[str, List[TextQuoteSelector]]
-]:
+) -> Tuple[List[Holding], Mentioned]:
     """
-    Read holdings with text anchors from a file.
+    Read holdings with factor index from a file.
     """
     raw_holdings = load_holdings(
         filename=filename, directory=directory, filepath=filepath
     )
-    record, mentioned = index_names(raw_holdings)
-    holding_anchors = anchors.get_holding_anchors(record)
-    named_anchors = anchors.get_named_anchors(mentioned)
-    holdings = readers.read_holdings(record, regime=regime)
-    return holdings, holding_anchors, named_anchors
+    return readers.read_holdings_with_index(raw_holdings, regime=regime)
 
 
 def load_decision(

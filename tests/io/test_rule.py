@@ -33,8 +33,9 @@ class TestLoadRules:
         )
         assert beard_rules[0].outputs.content == "{the suspected beard} was a beard"
 
-    def test_index_names(self):
-        rules = loaders.load_holdings("beard_rules.json")
-        record, mentioned = readers.index_names(rules)
+    def test_index_names(self, make_regime):
+        rules, mentioned = loaders.load_holdings_with_index(
+            "beard_rules.json", regime=make_regime
+        )
         key = "the Department of Beards granted the defendant's beard exemption"
         assert mentioned[key]["context_factors"][0] == "the Department of Beards"
