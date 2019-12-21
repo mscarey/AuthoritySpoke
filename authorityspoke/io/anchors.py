@@ -7,6 +7,7 @@ from authorityspoke.opinions import TextLinkDict
 
 from authorityspoke.io import schemas
 from authorityspoke.io.schemas import RawSelector, RawHolding
+from authorityspoke.io.name_index import Mentioned
 
 
 def read_selector(record: RawSelector) -> TextQuoteSelector:
@@ -50,7 +51,7 @@ def collect_anchors(obj: Dict) -> List[TextQuoteSelector]:
     return read_selectors(anchors)
 
 
-def get_named_anchors(obj: Union[Dict, List]) -> TextLinkDict:
+def get_named_anchors(mentioned: Mentioned) -> TextLinkDict:
     r"""
     Move anchors fields to a dict linking object names to lists of anchors.
 
@@ -58,20 +59,21 @@ def get_named_anchors(obj: Union[Dict, List]) -> TextLinkDict:
     Keys are :class:`.Factor`\s, :class:`.Enactment`\s, or :class:`.Holding`\s,
     and values are lists of the :class:`.Opinion` passages that reference them.
 
+    Assumes that the value of the anchors field is a list (not a dict representing a
+    single text anchor, and not a string in the "shorthand" anchor format).
+
+    :param mentioned:
+        a dict representing named :class:`.Factor`\s and :class:`.Enactment`\s
+
+    :returns:
+        a dict with keys from the mentioned dict, where each key has as its value
+        just the "anchors" field from the corresponding dict in "mentioned"
     """
     anchors: TextLinkDict = defaultdict(list)
-    if isinstance(obj, List):
-        for item in obj:
-            for k, v in get_named_anchors(item).items():
-                anchors[k] += v
-    if isinstance(obj, Dict):
-        if obj.get("name"):
-            for selector in collect_anchors(obj):
-                anchors[obj["name"]].append(selector)
-        for key, value in obj.items():
-            if key != "anchors" and isinstance(value, (Dict, List)):
-                for k, v in get_named_anchors(value).items():
-                    anchors[k] += v
+    for key, value in mentioned.items():
+        if "anchors" in value:
+            for anchor in value["anchors"]:
+                anchors[key].append(anchor)
     return anchors
 
 

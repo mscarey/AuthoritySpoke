@@ -1,4 +1,5 @@
 from authorityspoke.io import anchors, name_index
+from authorityspoke.io.name_index import index_names
 from authorityspoke.io.text_expansion import expand_shorthand
 
 
@@ -55,7 +56,7 @@ class TestCollectAnchors:
         assert fact_anchors[1].exact == "no one may copyright"
 
     def test_make_enactment_anchor(self):
-        record = expand_shorthand(self.enactment_anchor)
-        factor_anchors = anchors.get_named_anchors(record)
-        enactment_anchors = factor_anchors["copyright protection provision"]
+        record, mentioned = index_names(self.enactment_anchor)
+        named_anchors = anchors.get_named_anchors(mentioned)
+        enactment_anchors = named_anchors["copyright protection provision"]
         assert enactment_anchors[0].exact == "17 U.S.C. § 102(a)"

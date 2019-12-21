@@ -7,6 +7,8 @@ from typing import Dict, List, Optional, Sequence, Union
 
 from marshmallow import ValidationError
 
+from authorityspoke.io import text_expansion
+
 
 class Mentioned(OrderedDict):
     def insert_by_name(self, obj: Dict) -> None:
@@ -130,6 +132,7 @@ def index_names(obj: Union[List, Dict]) -> Mentioned:
         a modified version of the dict to load, plus a dict of names
         and the objects to expand them with.
     """
+    obj = text_expansion.expand_shorthand(obj)
     obj, mentioned = collect_mentioned(obj)
     sorted_mentioned = mentioned.sorted_by_length()
     return obj, sorted_mentioned

@@ -17,7 +17,7 @@ from authorityspoke.facts import Fact
 from authorityspoke.holdings import Holding
 from authorityspoke.io.name_index import Mentioned
 from authorityspoke.io.nesting import nest_fields
-from authorityspoke.io.text_expansion import add_found_context
+from authorityspoke.io import text_expansion
 from authorityspoke.opinions import Opinion
 from authorityspoke.pleadings import Pleading, Allegation
 from authorityspoke.predicates import Predicate
@@ -175,14 +175,12 @@ class SelectorSchema(Schema):
     def expand_shorthand(
         self, data: Union[str, Dict[str, str]], **kwargs
     ) -> Dict[str, str]:
-        """Convert input from shorthand format to normal selector format."""
-        if isinstance(data, str):
-            data = {"text": data}
-        text = data.get("text")
-        if text:
-            data["prefix"], data["exact"], data["suffix"] = self.split_text(text)
-            del data["text"]
-        return data
+        """
+        This will repeat an operation that already happened
+        if :func:`~.text_expansion.expand_anchor_shorthand` was
+        already called in :func:`~.loaders.load_holdings`\.
+        """
+        return text_expansion.expand_anchor_shorthand(data)
 
     @post_load
     def make_object(self, data, **kwargs):
@@ -401,7 +399,7 @@ class FactSchema(ExpandableSchema):
         for factor_name in mentioned.keys():
             if factor_name in content and factor_name != content:
                 obj = mentioned.get_by_name(factor_name)
-                content, context_factors = add_found_context(
+                content, context_factors = text_expansion.add_found_context(
                     content,
                     context_factors,
                     factor=deepcopy(obj),

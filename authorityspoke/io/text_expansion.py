@@ -1,5 +1,7 @@
 from re import findall
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple, Union
+
+from marshmallow import ValidationError
 
 from authorityspoke.io import nesting
 
@@ -11,6 +13,45 @@ def expand_shorthand(obj: Dict) -> Dict[str, Any]:
     )
 
 
+def split_anchor_text(text: str) -> Tuple[str, ...]:
+    """
+    Break up shorthand text selector format into three fields.
+
+    Tries to break up the string into :attr:`~TextQuoteSelector.prefix`,
+    :attr:`~TextQuoteSelector.exact`,
+    and :attr:`~TextQuoteSelector.suffix`, by splitting on the pipe characters.
+
+    :param text: a string or dict representing a text passage
+
+    :returns: a tuple of the three values
+    """
+
+    if text.count("|") == 0:
+        return ("", text, "")
+    elif text.count("|") == 2:
+        return tuple([*text.split("|")])
+    raise ValidationError(
+        "If the 'text' field is included, it must be either a dict "
+        + "with one or more of 'prefix', 'exact', and 'suffix' "
+        + "a string containing no | pipe "
+        + "separator, or a string containing two pipe separators to divide "
+        + "the string into 'prefix', 'exact', and 'suffix'."
+    )
+
+
+def expand_anchor_shorthand(
+    data: Union[str, Dict[str, str]], **kwargs
+) -> Dict[str, str]:
+    """Convert input from shorthand format to normal selector format."""
+    if isinstance(data, str):
+        data = {"text": data}
+    text = data.get("text")
+    if text:
+        data["prefix"], data["exact"], data["suffix"] = split_anchor_text(text)
+        del data["text"]
+    return data
+
+
 def expand_node_shorthand(obj: Dict[str, Any]) -> Dict[str, Any]:
     for list_field in ("context_factors", "anchors"):
         if obj.get(list_field) is not None:
@@ -19,9 +60,11 @@ def expand_node_shorthand(obj: Dict[str, Any]) -> Dict[str, Any]:
     to_nest = ["content", "truth", "reciprocal", "comparison", "quantity"]
     obj = nesting.nest_fields(obj, nest="predicate", eggs=to_nest)
 
-
     obj = collapse_known_factors(obj)
     obj = expand_shorthand_mentioned(obj)
+
+    if obj.get("anchors"):
+        obj["anchors"] = [expand_anchor_shorthand(anchor) for anchor in obj["anchors"]]
 
     return obj
 
@@ -129,7 +172,6 @@ def get_references_from_string(
         content, context_factors = add_found_context(content, context_factors, entity)
 
     return content, context_factors
-
 
 
 def wrap_single_element_in_list(data: Dict, many_element: str):

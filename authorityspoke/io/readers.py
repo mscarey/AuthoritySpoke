@@ -298,9 +298,6 @@ def read_holdings(
         that have been enacted in each. Used for constructing
         :class:`.Enactment`\s referenced by :class:`.Holding`\s.
 
-    :param index_anchors:
-        whether to also return an index of text links to the created object(s)
-
     :returns:
         a list of :class:`.Holding` objects, optionally with
         an index matching :class:`.Factor`\s to selectors.

@@ -105,7 +105,7 @@ class TestCollectMentioned:
         """
         feist_records = loaders.load_holdings("holding_feist.json")
         feist_holding = readers.read_holding(feist_records[0], regime=make_regime)
-        assert "securing for authors" in str(feist_holding)
+        assert "securing for limited Times" in feist_holding.short_string
 
 
 class TestRetrieveMentioned:
