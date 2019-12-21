@@ -8,5 +8,4 @@ class TestFileLoad:
             filename="holding_feist.json", directory=directory
         )
         raw_holdings = loaders.load_holdings(filepath=path)
-        content = raw_holdings[0]["outputs"]["predicate"]["content"]
-        assert content.endswith("was copyrightable")
+        assert raw_holdings[0]["outputs"]["type"] == "fact"

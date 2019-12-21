@@ -56,6 +56,50 @@ def assign_name_from_content(obj: Dict) -> str:
     return f"{false_modifier}{content_for_name}".replace("{", "").replace("}", "")
 
 
+def assign_name_for_enactment(obj: Dict) -> str:
+    """
+    Return an appropriate name for an :class:`.Enactment`
+
+    :param obj: an unloaded :class:`.Enactment`
+
+    :returns: a name for the Enactment
+    """
+    name = obj["source"]
+    if obj.get("exact"):
+        name += obj["exact"]
+    elif obj.get("prefix") or obj.get("suffix"):
+        name += f' {obj.get("prefix")} {obj.get("suffix")}'.strip()
+    return name
+
+
+def assign_name_for_exhibit(obj: Dict) -> str:
+    """
+    Return an appropriate name for an :class:`.Enactment`
+
+    :param obj: an unloaded :class:`.Enactment`
+
+    :returns: a name for the Enactment
+    """
+    name = f'evidence of {obj["exhibit"]}'
+    if obj.get("to_effect"):
+        name += f' to the effect that {obj["to_effect"]}'
+    return name
+
+
+def assign_name_for_pleading(obj: Dict) -> str:
+    """
+    Return an appropriate name for an :class:`.Enactment`
+
+    :param obj: an unloaded :class:`.Enactment`
+
+    :returns: a name for the Enactment
+    """
+    name = f"pleading"
+    if obj.get("filer"):
+        name += f' filed by {obj["filer"]}'
+    return name
+
+
 def create_name_for_factor(obj: Dict) -> str:
     """
     Determine what kind of RawFactor the input is and return an appropriate name.
@@ -65,12 +109,22 @@ def create_name_for_factor(obj: Dict) -> str:
     :returns: a name for the Factor
     """
 
-    if obj.get("content"):  # Predicates don't need names
-        return ""
-    if obj.get("outputs"):  # Procedures, Rules, and Holdings don't need names
+    if (
+        obj.get("content")  # Predicates don't need name
+        or obj.get("rule")
+        or obj.get("procedure")
+        or obj.get("outputs")  # Procedures, Rules, and Holdings don't need names
+        or obj.get("exact")  # Text Selectors don't need names
+    ):
         return ""
     if obj.get("predicate", {}).get("content"):
         return assign_name_from_content(obj)
+    if obj.get("source"):
+        return assign_name_for_enactment(obj)
+    if obj.get("exhibit") or obj.get("name") and obj.get("name").lower() == "evidence":
+        return assign_name_for_exhibit(obj)
+    if obj.get("type").lower() == "pleading":
+        return assign_name_for_pleading(obj)
     raise NotImplementedError
 
 

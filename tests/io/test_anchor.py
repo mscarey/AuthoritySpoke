@@ -44,19 +44,24 @@ class TestCollectAnchors:
     }
 
     def test_anchor_not_wrapped_in_list(self):
+        """
+        Test that when the anchor field is loaded in,
+        even if it isn't wrapped in a list, it'll be normalized
+        into a list containing a dict with an "exact" field.
+        """
         obj = expand_shorthand(self.fact_string_anchor)
-        assert obj["anchors"][0].startswith("In preparing")
+        assert obj["anchors"][0]["exact"].startswith("In preparing")
 
     def test_anchors_from_fact_with_inferred_name(self):
-        record = expand_shorthand(self.fact)
-        factor_anchors = anchors.get_named_anchors(record)
+        record, mentioned = index_names(self.fact)
+        factor_anchors = anchors.get_named_anchors(mentioned)
         fact_anchors = factor_anchors[
             "false Rural's telephone directory was copyrightable"
         ]
-        assert fact_anchors[1].exact == "no one may copyright"
+        assert fact_anchors[1]["exact"] == "no one may copyright"
 
     def test_make_enactment_anchor(self):
         record, mentioned = index_names(self.enactment_anchor)
         named_anchors = anchors.get_named_anchors(mentioned)
         enactment_anchors = named_anchors["copyright protection provision"]
-        assert enactment_anchors[0].exact == "17 U.S.C. § 102(a)"
+        assert enactment_anchors[0]["exact"] == "17 U.S.C. § 102(a)"

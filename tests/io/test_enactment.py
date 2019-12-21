@@ -1,4 +1,4 @@
-from authorityspoke.io import anchors, readers
+from authorityspoke.io import anchors, name_index, readers, schemas
 from authorityspoke.io.loaders import load_holdings
 
 
@@ -19,13 +19,18 @@ class TestEnactmentImport:
         assert "all relevant evidence is admissible" in enactment.text
 
     def test_enactment_with_anchor(self, make_regime):
-        enactment = readers.read_enactment(self.test_enactments[1], regime=make_regime)
-        factor_anchors = anchors.get_named_anchors(self.test_enactments[1])
+        record, mentioned = name_index.index_names(self.test_enactments[1])
+        schema = schemas.EnactmentSchema(many=False)
+        schema.context["mentioned"] = mentioned
+        schema.context["regime"] = make_regime
+        enactment = schema.load(record)
+
+        factor_anchors = anchors.get_named_anchors(mentioned)
         assert enactment.text.startswith(
             "nor shall any State deprive any person of life, liberty, or property"
         )
         assert (
-            factor_anchors[enactment.name][0].exact
+            factor_anchors[enactment.name][0]["exact"]
             == "reference to the Due Process Clause"
         )
 

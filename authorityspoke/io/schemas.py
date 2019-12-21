@@ -146,31 +146,6 @@ class SelectorSchema(Schema):
     exact = fields.Str(missing="")
     suffix = fields.Str(missing="")
 
-    def split_text(self, text: str) -> Tuple[str, ...]:
-        """
-        Break up shorthand text selector format into three fields.
-
-        Tries to break up the string into :attr:`~TextQuoteSelector.prefix`,
-        :attr:`~TextQuoteSelector.exact`,
-        and :attr:`~TextQuoteSelector.suffix`, by splitting on the pipe characters.
-
-        :param text: a string or dict representing a text passage
-
-        :returns: a tuple of the three values
-        """
-
-        if text.count("|") == 0:
-            return ("", text, "")
-        elif text.count("|") == 2:
-            return tuple([*text.split("|")])
-        raise ValidationError(
-            "If the 'text' field is included, it must be either a dict "
-            + "with one or more of 'prefix', 'exact', and 'suffix' "
-            + "a string containing no | pipe "
-            + "separator, or a string containing two pipe separators to divide "
-            + "the string into 'prefix', 'exact', and 'suffix'."
-        )
-
     @pre_load
     def expand_shorthand(
         self, data: Union[str, Dict[str, str]], **kwargs
