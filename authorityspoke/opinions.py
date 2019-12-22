@@ -225,11 +225,15 @@ class Opinion:
     def posit_holding(
         self,
         holding: Union[Holding, Rule],
-        holding_anchors: Optional[List[TextQuoteSelector]] = None,
+        holding_anchors: Optional[
+            Union[TextQuoteSelector, List[TextQuoteSelector]]
+        ] = None,
         named_anchors: Optional[TextLinkDict] = None,
         context: Optional[Sequence[Factor]] = None,
     ) -> None:
         r"""Record that this Opinion endorses specified :class:`Holding`\s."""
+        if holding_anchors and not isinstance(holding_anchors, List):
+            holding_anchors = [holding_anchors]
         if isinstance(holding, Rule):
             logger.warning(
                 "posit_holding was called with a Rule "

@@ -28,13 +28,13 @@ class TestLoadRules:
         assert beard_code.jurisdiction == "au"
 
     def test_loading_rules(self, make_regime):
-        beard_rules = loaders.load_and_read_rules(
+        beard_rules, mentioned = loaders.load_rules_with_index(
             "beard_rules.json", regime=make_regime
         )
         assert beard_rules[0].outputs.content == "{the suspected beard} was a beard"
 
     def test_index_names(self, make_regime):
-        rules, mentioned = loaders.load_holdings_with_index(
+        rules, mentioned = loaders.load_rules_with_index(
             "beard_rules.json", regime=make_regime
         )
         key = "the Department of Beards granted the defendant's beard exemption"

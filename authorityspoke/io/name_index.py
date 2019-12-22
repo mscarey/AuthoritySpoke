@@ -123,7 +123,7 @@ def create_name_for_factor(obj: Dict) -> str:
         name = assign_name_for_enactment(obj)
     elif (
         obj.get("exhibit")
-        or (obj.get("name") and obj.get("name").lower()) == "evidence"
+        or (obj.get("type") and obj.get("type").lower()) == "evidence"
     ):
         name = assign_name_for_exhibit(obj)
     elif obj.get("type").lower() == "pleading":

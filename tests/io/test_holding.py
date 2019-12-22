@@ -169,7 +169,7 @@ class TestHoldingImport:
         impossible to get text anchors.
         """
         raw_holdings = load_holdings(f"holding_oracle.json")
-        oracle_holdings, mentioned = readers.read_holdings_with_index(
+        oracle_holdings, mentioned, holding_anchors = readers.read_holdings_with_index(
             raw_holdings, regime=make_regime
         )
         named_anchors = anchors.get_named_anchors(mentioned)
@@ -179,25 +179,12 @@ class TestHoldingImport:
 
 
 class TestTextAnchors:
-    one_holding = {
-        "inputs": {"type": "fact", "content": "{Bradley} lived at Bradley's house"},
-        "outputs": {
-            "type": "evidence",
-            "to_effect": {
-                "type": "fact",
-                "name": "fact that Bradley committed a crime",
-                "content": "Bradley committed a crime",
-            },
-            "name": "evidence of Bradley's guilt",
-            "absent": True,
-        },
-    }
-
     def test_read_holding_with_no_anchor(self, make_opinion, make_analysis):
         oracle = make_opinion["oracle_majority"]
         raw_analysis = make_analysis["no anchors"]
-        oracle_holdings, mentioned = readers.read_holdings_with_index(raw_analysis)
-        holding_anchors = anchors.get_holding_anchors(raw_analysis)
+        oracle_holdings, mentioned, holding_anchors = readers.read_holdings_with_index(
+            raw_analysis
+        )
         named_anchors = anchors.get_named_anchors(mentioned)
         oracle.posit(
             oracle_holdings,
@@ -207,19 +194,30 @@ class TestTextAnchors:
         has_no_anchors = oracle.holdings[0]
         assert oracle.holding_anchors[has_no_anchors] == []
 
-    def test_holding_without_enactments_or_regime(self):
+    def test_holding_without_enactments_or_regime(self, raw_holding):
 
-        expanded = text_expansion.expand_shorthand(self.one_holding)
+        expanded = text_expansion.expand_shorthand(raw_holding["bradley_house"])
         built = readers.read_holding(expanded)
         new_factor = built.outputs[0].to_effect.context_factors[0]
         assert new_factor.name == "Bradley"
 
-    def test_posit_one_holding_with_anchor(self, make_opinion):
-        expanded = text_expansion.expand_shorthand(self.one_holding)
+    def test_posit_one_holding_with_anchor(
+        self, make_opinion, raw_holding, make_regime
+    ):
+        holding, mentioned, anchor_list = readers.read_holdings_with_index(
+            raw_holding["bradley_house"], regime=make_regime, many=False
+        )
         cardenas = make_opinion["cardenas_majority"]
-        anchor_list = anchors.get_holding_anchors(expanded)
-        holding = readers.read_holding(expanded)
-        cardenas.posit(holding, holding_anchors=anchor_list)
+        cardenas.posit_holding(
+            holding,
+            holding_anchors=TextQuoteSelector(
+                exact="some text supporting this holding"
+            ),
+        )
+        assert (
+            cardenas.holding_anchors[holding][0].exact
+            == "some text supporting this holding"
+        )
 
     def test_mentioned_context_changing(self):
         """

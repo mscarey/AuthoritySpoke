@@ -1147,8 +1147,7 @@ def make_decision():
 def make_decision_with_holding(make_decision, make_regime):
     decisions = load_decisions_for_fixtures()
     for case in TEST_CASES:
-        holdings, mentioned = loaders.load_holdings_with_index(f"holding_{case}.json", regime=make_regime)
-        holding_anchors = anchors.get_holding_anchors(mentioned)
+        holdings, mentioned, holding_anchors = loaders.load_holdings_with_index(f"holding_{case}.json", regime=make_regime)
         named_anchors = anchors.get_named_anchors(mentioned)
         decisions[case].majority.posit(holdings, holding_anchors=holding_anchors, named_anchors=named_anchors)
     return decisions
@@ -1172,8 +1171,7 @@ def make_opinion_with_holding(make_decision_with_holding) -> Dict[str, Opinion]:
 @pytest.fixture(scope="class")
 def make_analysis() -> Dict[str, Dict[str, Any]]:
     """Example user analysis data."""
-    analysis = {}
-    analysis["minimal"] = [
+    return {"minimal": [
             {
                 "outputs": {
                     "type": "fact",
@@ -1183,16 +1181,15 @@ def make_analysis() -> Dict[str, Dict[str, Any]]:
                 "anchors": "Thus,|we hold|that this rule is correct."
             }
 
-        ]
-    analysis["no anchors"] = [
+        ],
+        "no anchors": [
             {
                 "outputs": {
                     "type": "fact",
                     "content": "this holding has no text anchors",
                 }
             }
-        ]
-    return analysis
+        ]}
 
 @pytest.fixture(scope="function")
 def raw_factor() -> RawFactor:
@@ -1214,3 +1211,19 @@ def raw_factor() -> RawFactor:
         ],
     }
     }
+
+@pytest.fixture(scope="function")
+def raw_holding() -> RawHolding:
+    return {"bradley_house": {
+        "inputs": {"type": "fact", "content": "{Bradley} lived at Bradley's house"},
+        "outputs": {
+            "type": "evidence",
+            "to_effect": {
+                "type": "fact",
+                "name": "fact that Bradley committed a crime",
+                "content": "Bradley committed a crime",
+            },
+            "name": "evidence of Bradley's guilt",
+            "absent": True,
+        },
+    }}

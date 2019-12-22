@@ -7,12 +7,14 @@ after they import some data from a file.
 from copy import deepcopy
 import datetime
 from functools import partial
+from typing import NamedTuple
 
 from bs4 import BeautifulSoup
 
 from typing import Any, Dict, List, Iterable, Iterator
 from typing import Optional, Tuple, Type, Union
 
+from anchorpoint.textselectors import TextQuoteSelector
 from pint import UnitRegistry
 
 from authorityspoke.decisions import Decision
@@ -34,6 +36,7 @@ from authorityspoke.io import anchors, schemas
 from authorityspoke.io.schemas import (
     RawEnactment,
     RawHolding,
+    RawRule,
     RawPredicate,
     RawFactor,
     RawDecision,
@@ -284,15 +287,22 @@ def read_holding(record: RawHolding, regime: Optional[Regime] = None) -> Holding
     return schema.load(deepcopy(record))
 
 
+class HoldingIndexed(NamedTuple):
+    holdings: List[Holding]
+    mentioned: Mentioned
+    holding_anchors: List[List[TextQuoteSelector]]
+
+
 def read_holdings_with_index(
-    record: List[RawHolding], regime: Optional[Regime] = None
-) -> Tuple[List[Holding], Mentioned]:
+    record: List[RawHolding], regime: Optional[Regime] = None, many: bool = True
+) -> HoldingIndexed:
     record, mentioned = index_names(record)
-    schema = schemas.HoldingSchema(many=True)
+    schema = schemas.HoldingSchema(many=many)
     schema.context["regime"] = regime
     schema.context["mentioned"] = mentioned
+    anchor_list = anchors.get_holding_anchors(record)
     holdings = schema.load(deepcopy(record))
-    return holdings, mentioned
+    return HoldingIndexed(holdings, mentioned, anchor_list)
 
 
 def read_holdings(
@@ -334,6 +344,17 @@ def read_decision(decision_dict: RawDecision) -> Decision:
     """
     schema = schemas.DecisionSchema()
     return schema.load(decision_dict)
+
+
+def read_rules_with_index(
+    record: List[RawRule], regime: Optional[Regime] = None, many: bool = True
+) -> Tuple[List[Rule], Mentioned]:
+    record, mentioned = index_names(record)
+    schema = schemas.RuleSchema(many=many)
+    schema.context["regime"] = regime
+    schema.context["mentioned"] = mentioned
+    rules = schema.load(deepcopy(record))
+    return rules, mentioned
 
 
 def read_rule(record: Dict, regime: Optional[Regime] = None) -> Rule:

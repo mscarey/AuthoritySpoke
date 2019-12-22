@@ -49,7 +49,7 @@
         "outputs": {
             "type": "fact",
             "content": "{the defendant} committed the offense of a beard without exemption",
-            "name": "the defendant's act of wearing the suspected beard"
+            "name": "the defendant's act of committing the offense"
         },
         "enactments": [
             {
@@ -72,7 +72,7 @@
                 "content": "the office of the Department of Beards granted an exemption authorizing the defendant's act of wearing the suspected beard",
                 "name": "the Department of Beards granted the defendant's beard exemption"
             },
-            "stated_by": "the Department of Beards",
+            "statement_attribution": "the Department of Beards",
             "name": "the beardcoin"
         },
         "outputs": {

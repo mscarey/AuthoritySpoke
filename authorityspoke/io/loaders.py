@@ -103,12 +103,13 @@ def load_holdings(
     return holdings
 
 
-def load_and_read_rules(
+def load_rules_with_index(
     filename: Optional[str] = None,
     directory: Optional[pathlib.Path] = None,
     filepath: Optional[pathlib.Path] = None,
     regime: Optional[Regime] = None,
-) -> List[Rule]:
+    many: bool = True,
+) -> Tuple[List[Rule], Mentioned]:
     """
     Read :class:`.Rule`\s from a file.
 
@@ -130,7 +131,7 @@ def load_and_read_rules(
         mentioned in the holding.
     """
     raw_rules = load_holdings(filename=filename, directory=directory, filepath=filepath)
-    return readers.read_rules(raw_rules, regime=regime)
+    return readers.read_rules_with_index(raw_rules, regime=regime, many=many)
 
 
 def load_and_read_holdings(
@@ -165,7 +166,7 @@ def load_holdings_with_index(
     directory: Optional[pathlib.Path] = None,
     filepath: Optional[pathlib.Path] = None,
     regime: Optional[Regime] = None,
-) -> Tuple[List[Holding], Mentioned]:
+) -> readers.HoldingIndexed:
     """
     Read holdings with factor index from a file.
     """
