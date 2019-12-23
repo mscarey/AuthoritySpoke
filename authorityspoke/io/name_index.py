@@ -173,8 +173,12 @@ def collect_mentioned(
         obj = new_list
     if isinstance(obj, Dict):
         if obj.get("predicate", {}).get("content"):
+            mentioned = mentioned.sorted_by_length()
             for name in mentioned.keys():
-                if name in obj["predicate"]["content"]:
+                if (
+                    name in obj["predicate"]["content"]
+                    and name != obj["predicate"]["content"]
+                ):
                     (
                         obj["predicate"]["content"],
                         obj["context_factors"],
