@@ -526,16 +526,8 @@ class TestTextAnchors:
 
     def test_repeating_read_holdings_has_same_result(self, make_analysis):
         raw = make_analysis["minimal"]
-        holdings_and_anchors = [
-            readers.read_holdings(raw),
-            anchors.get_holding_anchors(raw),
-            anchors.get_named_anchors(raw),
-        ]
-        holdings_and_anchors_again = [
-            readers.read_holdings(raw),
-            anchors.get_holding_anchors(raw),
-            anchors.get_named_anchors(raw),
-        ]
+        holdings_and_anchors = readers.read_holdings(raw)
+        holdings_and_anchors_again = readers.read_holdings(raw)
         assert all(
             left == right
             for left, right in zip(holdings_and_anchors, holdings_and_anchors_again)

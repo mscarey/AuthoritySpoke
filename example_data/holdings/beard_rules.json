@@ -7,7 +7,7 @@
             },
             {
                 "type": "fact",
-                "content": "the length of the suspected beard was < 5 millimetres"
+                "content": "the length of the suspected beard was >= 5 millimetres"
             },
             {
                 "type": "fact",

@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from collections import OrderedDict
+from copy import deepcopy
 
 from typing import Dict, List, Optional, Sequence, Union
 
@@ -72,7 +73,7 @@ def assign_name_for_enactment(obj: Dict) -> str:
     return name
 
 
-def assign_name_for_exhibit(obj: Dict) -> str:
+def assign_name_for_evidence(obj: Dict) -> str:
     """
     Return an appropriate name for an :class:`.Enactment`
 
@@ -80,7 +81,9 @@ def assign_name_for_exhibit(obj: Dict) -> str:
 
     :returns: a name for the Enactment
     """
-    name = f'evidence of {obj["exhibit"]}'
+    name = f"evidence"
+    if obj.get("exhibit"):
+        name += f' of {obj["exhibit"]}'
     if obj.get("to_effect"):
         name += f' to the effect that {obj["to_effect"]}'
     return name
@@ -125,7 +128,7 @@ def create_name_for_factor(obj: Dict) -> str:
         obj.get("exhibit")
         or (obj.get("type") and obj.get("type").lower()) == "evidence"
     ):
-        name = assign_name_for_exhibit(obj)
+        name = assign_name_for_evidence(obj)
     elif obj.get("type").lower() == "pleading":
         name = assign_name_for_pleading(obj)
     else:
@@ -164,15 +167,26 @@ def collect_mentioned(
     if isinstance(obj, List):
         new_list = []
         for item in obj:
-            new_item, new_mentioned = collect_mentioned(item)
+            new_item, new_mentioned = collect_mentioned(item, mentioned)
             mentioned.update(new_mentioned)
             new_list.append(new_item)
         obj = new_list
     if isinstance(obj, Dict):
+        if obj.get("predicate", {}).get("content"):
+            for name in mentioned.keys():
+                if name in obj["predicate"]["content"]:
+                    (
+                        obj["predicate"]["content"],
+                        obj["context_factors"],
+                    ) = text_expansion.add_found_context(
+                        content=obj["predicate"]["content"],
+                        context_factors=obj["context_factors"],
+                        factor=mentioned.get_by_name(name),
+                    )
         for key, value in obj.items():
             if key not in keys_to_ignore:
                 if isinstance(value, (Dict, List)):
-                    new_value, new_mentioned = collect_mentioned(value)
+                    new_value, new_mentioned = collect_mentioned(value, mentioned)
                     mentioned.update(new_mentioned)
                     obj[key] = new_value
         obj = ensure_factor_has_name(obj)
@@ -182,7 +196,7 @@ def collect_mentioned(
     return obj, mentioned
 
 
-def index_names(obj: Union[List, Dict]) -> Mentioned:
+def index_names(record: Union[List, Dict]) -> Mentioned:
     """
     Call all functions to prepare "mentioned" index.
 
@@ -193,6 +207,7 @@ def index_names(obj: Union[List, Dict]) -> Mentioned:
         a modified version of the dict to load, plus a dict of names
         and the objects to expand them with.
     """
+    obj = deepcopy(record)
     obj = text_expansion.expand_shorthand(obj)
     obj, mentioned = collect_mentioned(obj)
     sorted_mentioned = mentioned.sorted_by_length()
