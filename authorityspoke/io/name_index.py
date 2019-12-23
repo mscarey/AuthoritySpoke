@@ -117,7 +117,9 @@ def create_name_for_factor(obj: Dict) -> str:
         or obj.get("rule")
         or obj.get("procedure")
         or obj.get("outputs")  # Procedures, Rules, and Holdings don't need names
-        or obj.get("exact")  # Text Selectors don't need names
+        or obj.get("exact")
+        or obj.get("prefix")
+        or obj.get("suffix")  # Text Selectors don't need names
     ):
         return ""
     elif obj.get("predicate", {}).get("content"):
@@ -129,7 +131,7 @@ def create_name_for_factor(obj: Dict) -> str:
         or (obj.get("type") and obj.get("type").lower()) == "evidence"
     ):
         name = assign_name_for_evidence(obj)
-    elif obj.get("type").lower() == "pleading":
+    elif obj.get("type") and obj.get("type").lower() == "pleading":
         name = assign_name_for_pleading(obj)
     else:
         raise NotImplementedError

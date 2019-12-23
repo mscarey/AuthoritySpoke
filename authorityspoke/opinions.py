@@ -254,7 +254,9 @@ class Opinion:
                 + list(holding.enactments_despite)
             ):
                 if hasattr(factor, "name") and factor.name in named_anchors:
-                    self.factors[factor].extend(named_anchors[factor.name])
+                    for anchor in named_anchors[factor.name]:
+                        if anchor not in self.factors[factor]:
+                            self.factors[factor].append(anchor)
 
     def posit_holdings(
         self,

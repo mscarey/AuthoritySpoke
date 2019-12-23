@@ -17,7 +17,7 @@ from authorityspoke.pleadings import Pleading, Allegation
 from authorityspoke.predicates import Predicate, Q_
 from authorityspoke.rules import Procedure, Rule
 
-from authorityspoke.io import loaders, readers
+from authorityspoke.io import anchors, loaders, readers
 from authorityspoke.io.schemas import RawFactor, RawHolding
 
 

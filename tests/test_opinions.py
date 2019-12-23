@@ -1,7 +1,7 @@
 import pytest
 
 from authorityspoke.entities import Entity
-from authorityspoke.io import loaders, readers
+from authorityspoke.io import anchors, loaders, readers
 from authorityspoke.opinions import Opinion
 
 
@@ -92,6 +92,49 @@ class TestOpinionText:
             "No one may claim originality" not in anchor.exact for anchor in anchors
         )
         assert any("as to facts" in anchor.exact for anchor in anchors)
+
+    def test_selectors_not_duplicated(self, make_opinion):
+        """
+        Test that the factors attribute for this Opinion contains
+        one instance of the Fact "Mark stole a watch", but that both
+        of the different text anchors for that Fact are attached to it.
+        """
+
+        raw_holding = {
+            "outputs": [
+                {
+                    "type": "Fact",
+                    "content": "{Mark} stole a watch",
+                    "anchors": [{"exact": "Mark stole a watch"}],
+                },
+            ],
+            "inputs": [
+                {
+                    "type": "Evidence",
+                    "to_effect": {
+                        "type": "Fact",
+                        "content": "{Mark} stole a watch",
+                        "anchors": [{"exact": "a watch was stolen by Mark"}],
+                    },
+                }
+            ],
+        }
+        holding, mentioned, holding_anchors = readers.read_holdings_with_index(
+            [raw_holding]
+        )
+        named_anchors = anchors.get_named_anchors(mentioned)
+        cardenas = make_opinion["cardenas_majority"]
+        cardenas.posit_holding(holding, named_anchors=named_anchors)
+        output = holding.outputs[0]
+        assert any(
+            selector.exact == "Mark stole a watch"
+            for selector in cardenas.factors[output]
+        )
+        assert any(
+            selector.exact == "a watch was stolen by Mark"
+            for selector in cardenas.factors[output]
+        )
+        assert len(cardenas.factors[output]) == 2
 
     def test_select_opinion_text_for_factor(self, make_opinion_with_holding):
         oracle = make_opinion_with_holding["oracle_majority"]
