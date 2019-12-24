@@ -1226,4 +1226,24 @@ def raw_holding() -> RawHolding:
             "name": "evidence of Bradley's guilt",
             "absent": True,
         },
-    }}
+    },
+    "stolen watch": {
+            "outputs": [
+                {
+                    "type": "Fact",
+                    "content": "{Mark} stole a watch",
+                    "anchors": [{"exact": "Mark stole a watch"}],
+                },
+            ],
+            "inputs": [
+                {
+                    "type": "Evidence",
+                    "to_effect": {
+                        "type": "Fact",
+                        "content": "{Mark} stole a watch",
+                        "anchors": [{"exact": "a watch was stolen by Mark"}],
+                    },
+                }
+            ],
+        }
+    }

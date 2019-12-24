@@ -195,11 +195,15 @@ class TestTextAnchors:
         assert oracle.holding_anchors[has_no_anchors] == []
 
     def test_holding_without_enactments_or_regime(self, raw_holding):
-
         expanded = text_expansion.expand_shorthand(raw_holding["bradley_house"])
         built = readers.read_holding(expanded)
         new_factor = built.outputs[0].to_effect.context_factors[0]
         assert new_factor.name == "Bradley"
+
+    def test_anchor_not_overwritten_when_indexing(self, raw_holding):
+        watch = raw_holding["stolen watch"]
+        record, mentioned = name_index.index_names(watch)
+        assert len(mentioned["Mark stole a watch"]["anchors"]) == 2
 
     def test_posit_one_holding_with_anchor(
         self, make_opinion, raw_holding, make_regime

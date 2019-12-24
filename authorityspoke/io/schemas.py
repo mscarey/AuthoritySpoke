@@ -401,6 +401,7 @@ class FactSchema(ExpandableSchema):
             data["predicate"]["content"], data.get("context_factors")
         )
         data = self.consume_type_field(data)
+        data = self.remove_anchors_field(data)
         return data
 
     @post_load

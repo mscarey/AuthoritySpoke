@@ -17,7 +17,7 @@ def split_anchor_text(text: str) -> Tuple[str, ...]:
     """
     Break up shorthand text selector format into three fields.
 
-    Tries to break up the string into :attr:`~TextQuoteSelector.prefix`,
+    Tries to break up the  string into :attr:`~TextQuoteSelector.prefix`,
     :attr:`~TextQuoteSelector.exact`,
     and :attr:`~TextQuoteSelector.suffix`, by splitting on the pipe characters.
 

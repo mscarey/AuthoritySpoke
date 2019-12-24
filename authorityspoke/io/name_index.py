@@ -197,7 +197,12 @@ def collect_mentioned(
                     obj[key] = new_value
         obj = ensure_factor_has_name(obj)
         if obj.get("name"):
-            mentioned.insert_by_name(obj)
+            if obj["name"] in mentioned:
+                if obj.get("anchors"):
+                    for anchor in obj["anchors"]:
+                        mentioned[obj["name"]]["anchors"].append(anchor)
+            else:
+                mentioned.insert_by_name(obj)
             obj = obj["name"]
     return obj, mentioned
 
