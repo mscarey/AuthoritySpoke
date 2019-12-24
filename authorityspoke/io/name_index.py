@@ -181,14 +181,16 @@ def collect_mentioned(
                     name in obj["predicate"]["content"]
                     and name != obj["predicate"]["content"]
                 ):
+                    context_factors = obj.get("context_factors", [])
                     (
                         obj["predicate"]["content"],
                         obj["context_factors"],
                     ) = text_expansion.add_found_context(
                         content=obj["predicate"]["content"],
-                        context_factors=obj["context_factors"],
+                        context_factors=context_factors,
                         factor=mentioned.get_by_name(name),
                     )
+            obj = text_expansion.expand_shorthand_mentioned(obj)
         for key, value in obj.items():
             if key not in keys_to_ignore:
                 if isinstance(value, (Dict, List)):

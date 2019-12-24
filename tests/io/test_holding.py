@@ -37,6 +37,21 @@ class TestHoldingDump:
 
 
 class TestEntityImport:
+    def test_link_longest_context_factors_first(self):
+        """
+        If read_holdings interprets the second "Bradley" string as
+        a reference to Bradley rather than "Bradley's house", it's wrong.
+        """
+        to_read = {
+            "outputs": [
+                {"type": "fact", "content": "{Bradley's house} was a house"},
+                {"type": "fact", "content": "{Bradley} lived at Bradley's house"},
+            ]
+        }
+        record, mentioned = name_index.index_names(to_read)
+        lived_at = record["outputs"][1]
+        assert mentioned[lived_at]["context_factors"][1] == "Bradley's house"
+
     smith_holdings = [
         {
             "inputs": [
@@ -58,10 +73,10 @@ class TestEntityImport:
         },
     ]
 
-    def test_expand_shorthand(self):
-        expanded = text_expansion.expand_shorthand(self.smith_holdings)
-        fact = expanded[1]["inputs"][0]
-        assert fact["context_factors"][0]["name"] == "Smythe"
+    def test_index_names_from_otherwise_identical_factors(self):
+        expanded, mentioned = name_index.index_names(self.smith_holdings)
+        fact = mentioned[expanded[1]["inputs"][0]]
+        assert fact["context_factors"][0] == "Smythe"
 
     def test_specific_entity(self):
 
@@ -71,21 +86,6 @@ class TestEntityImport:
             != different_entity_holdings[0].generic_factors
         )
         assert not different_entity_holdings[1] >= different_entity_holdings[0]
-
-    def test_link_longest_context_factors_first(self):
-        """
-        If read_holdings interprets the second "Bradley" string as
-        a reference to Bradley rather than "Bradley's house", it's wrong.
-        """
-        to_read = {
-            "outputs": [
-                {"type": "fact", "content": "{Bradley's house} was a house"},
-                {"type": "fact", "content": "{Bradley} lived at Bradley's house"},
-            ]
-        }
-        record, mentioned = name_index.index_names(to_read)
-        lived_at = record["outputs"][1]
-        assert mentioned[lived_at]["context_factors"][1] == "Bradley's house"
 
 
 class TestHoldingImport:
@@ -407,11 +407,11 @@ class TestTextAnchors:
         assert holdings[0].enactments[0].code is holdings[1].enactments[0].code
 
     def test_same_enactment_in_two_opinions(self, make_regime):
-        to_read = load_holdings("holding_watt.json")
-        watt_holdings = readers.read_holdings(to_read, regime=make_regime)
-
         to_read = load_holdings("holding_brad.json")
         brad_holdings = readers.read_holdings(to_read, regime=make_regime)
+
+        to_read = load_holdings("holding_watt.json")
+        watt_holdings = readers.read_holdings(to_read, regime=make_regime)
 
         assert any(
             watt_holdings[0].enactments[0].means(brad_enactment)

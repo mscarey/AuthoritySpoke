@@ -61,7 +61,6 @@ def expand_node_shorthand(obj: Dict[str, Any]) -> Dict[str, Any]:
     obj = nesting.nest_fields(obj, nest="predicate", eggs=to_nest)
 
     obj = collapse_known_factors(obj)
-    obj = expand_shorthand_mentioned(obj)
 
     if obj.get("anchors"):
         obj["anchors"] = [expand_anchor_shorthand(anchor) for anchor in obj["anchors"]]
@@ -106,9 +105,7 @@ def collapse_known_factors(obj: Dict):
     return obj
 
 
-def collapse_name_in_content(
-    content: str, name: Optional[str], placeholder: str = "{}"
-):
+def collapse_name_in_content(content: str, name: str, placeholder: str = "{}"):
     """Replace name with placeholder to show it is referenced in context_factors."""
     content = content.replace(name, placeholder, 1)
     double_placeholder = placeholder[0] + placeholder + placeholder[1]
@@ -133,7 +130,6 @@ def add_found_context(
         index_in_factor_list = content[:index_in_content].count(placeholder)
         context_factors.insert(index_in_factor_list, factor)
         content = collapse_name_in_content(content, factor["name"], placeholder)
-
     return content, context_factors
 
 

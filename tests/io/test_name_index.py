@@ -15,15 +15,48 @@ class TestCollectMentioned:
         assert obj["name"] == "Remainer"
         assert "name" not in mentioned["Remainer"].keys()
 
-    def test_expand_shorthand(self, raw_factor):
-        obj = text_expansion.expand_shorthand(raw_factor["relevant"])
-        assert obj["context_factors"][0]["context_factors"][0]["name"] == "Short Name"
+    def test_index_names(self, raw_factor):
+        obj, mentioned = name_index.index_names(raw_factor["relevant"])
+        factor = mentioned[obj]["context_factors"][0]
+        assert mentioned[factor]["context_factors"][0] == "Short Name"
 
-    def test_expand_shorthand_turns_context_factor_str_into_list(self, raw_factor):
-        short_shot_long = text_expansion.expand_shorthand(
+    def test_index_names_turns_context_factor_str_into_list(self, raw_factor):
+        short_shot_long, mentioned = name_index.index_names(
             raw_factor["relevant"]["context_factors"][0]
         )
-        assert isinstance(short_shot_long["context_factors"], list)
+        assert isinstance(mentioned[short_shot_long]["context_factors"], list)
+
+    def test_index_before_apostrophe(self):
+        """
+        Not catching the error where 'Bradley exhibited an expectation of privacy in
+        Bradley's marijuana patch' becomes '{} exhibited an expectation of privacy in {{}'
+        """
+        raw_holding = {
+            "outputs": [
+                {
+                    "type": "Fact",
+                    "content": "the {possessive noun}'s factor was linked correctly",
+                },
+                {
+                    "type": "Fact",
+                    "content": "the possessive noun's factor was still linked correctly",
+                },
+            ],
+        }
+        holding, mentioned = name_index.index_names(raw_holding)
+        factor_name_1 = holding["outputs"][0]
+        assert mentioned[factor_name_1]["context_factors"][0] == "possessive noun"
+        factor_name_2 = holding["outputs"][1]
+        assert mentioned[factor_name_2]["context_factors"][0] == "possessive noun"
+
+    def test_do_not_link_bracketed_factor_name(self):
+        new_content, context_factors = text_expansion.add_found_context(
+            content="{} sent a message to {Bob's friend}",
+            context_factors=[{"type": "Entity", "name": "Bob"}],
+            factor={"type": "Entity", "name": "Bob"},
+        )
+        assert new_content == "{} sent a message to {Bob's friend}"
+        assert len(context_factors) == 1
 
     def test_assign_name(self, raw_factor):
         """
