@@ -217,31 +217,20 @@ def update_name_index_from_fact(
     content: str = predicate.get("content", "")
     if content:
         context_factors: RawContextFactors = obj.get("context_factors", [])
-        (
-            obj["predicate"]["content"],
-            obj["context_factors"],
-        ) = text_expansion.get_references_from_string(
+        content, context_factors = text_expansion.get_references_from_string(
             content=content, context_factors=context_factors
         )
-        mentioned = update_name_index_from_context_factors(
-            obj["context_factors"], mentioned
-        )
+        mentioned = update_name_index_from_context_factors(context_factors, mentioned)
 
         for name in mentioned.keys():
-            if (
-                name in obj["predicate"]["content"]
-                and name != obj["predicate"]["content"]
-            ):
-                context_factors = obj.get("context_factors", [])
-                (
-                    obj["predicate"]["content"],
-                    obj["context_factors"],
-                ) = text_expansion.add_found_context(
-                    content=obj["predicate"]["content"],
+            if name in content and name != content:
+                (content, context_factors,) = text_expansion.add_found_context(
+                    content=content,
                     context_factors=context_factors,
                     factor=mentioned.get_by_name(name),
                 )
-        obj = text_expansion.expand_shorthand_mentioned(obj)
+        obj["context_factors"] = context_factors
+        obj["predicate"]["content"] = content
     return obj, mentioned
 
 

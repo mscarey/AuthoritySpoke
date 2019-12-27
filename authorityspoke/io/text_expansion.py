@@ -1,5 +1,5 @@
 from re import findall
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
 from marshmallow import ValidationError
 
@@ -155,7 +155,7 @@ def add_found_context(
 
 def get_references_from_string(
     content: str, context_factors: Optional[List[Dict]]
-) -> Tuple[str, List[Dict]]:
+) -> Tuple[str, Sequence[Dict]]:
     r"""
     Make :class:`.Entity` context :class:`.Factor`\s from string.
 
