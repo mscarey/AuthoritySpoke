@@ -151,7 +151,7 @@ def ensure_factor_has_name(obj: Dict) -> Dict:
 
     :param obj: an unloaded :class:`.Factor`
 
-    :returns: the same :class:`.Factor` with at name field added
+    :returns: the same :class:`.Factor` with a name field added
     """
     if not obj.get("name"):
         new_name = create_name_for_factor(obj)
