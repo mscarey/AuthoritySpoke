@@ -68,28 +68,6 @@ def expand_node_shorthand(obj: Dict[str, Any]) -> Dict[str, Any]:
     return obj
 
 
-def expand_shorthand_mentioned(obj: Dict) -> Dict:
-    """
-    Expand any Entity references that use the curly bracket shorthand.
-
-    :param obj:
-        object loaded from JSON to make a :class:`.Factor` or :class:`.Holding`
-
-    :returns:
-        the input object, but with shorthand references expanded.
-    """
-
-    if obj.get("predicate", {}).get("content"):
-        (
-            obj["predicate"]["content"],
-            obj["context_factors"],
-        ) = get_references_from_string(
-            obj["predicate"]["content"], obj.get("context_factors")
-        )
-
-    return obj
-
-
 def collapse_known_factors(obj: Dict):
     """Replace all names of known context factors with placeholder strings."""
     if obj.get("context_factors"):

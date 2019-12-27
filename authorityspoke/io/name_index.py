@@ -196,11 +196,11 @@ def update_name_index_from_context_factors(
 RawContextFactors = List[Union[RawFactor, str]]
 
 
-def update_name_index_from_fact(
+def update_name_index_from_fact_content(
     obj: RawFactor, mentioned: Mentioned
 ) -> Tuple[RawFactor, Mentioned]:
     """
-    Update the index of mentioned factors from the Fact's context Factors, and vice versa.
+    Update index of mentioned Factors from Factors mentioned in Fact's content, and vice versa.
 
     :param obj:
         data from JSON to be loaded as a :class:`.Factor`
@@ -234,6 +234,39 @@ def update_name_index_from_fact(
     return obj, mentioned
 
 
+def update_name_index_with_factor(
+    obj: RawFactor, mentioned: Mentioned
+) -> Tuple[Union[str, RawFactor], Mentioned]:
+    """
+    Update index of mentioned Factors with 'obj', if obj is named.
+
+    If there is already an entry in the mentioned index with the same name
+    as obj, the old entry won't be replaced. But if any additional text
+    anchors are present in the new obj, the anchors will be added.
+
+    If obj has a name, it will be collapsed to a name reference.
+
+    :param obj:
+        data from JSON to be loaded as a :class:`.Factor`
+
+    :param mentioned:
+        :class:`.RawFactor`\s indexed by name for retrieval when loading objects
+        using a Marshmallow schema.
+
+    :returns:
+        both 'obj' and 'mentioned', as updated
+    """
+    if obj.get("name"):
+        if obj["name"] in mentioned:
+            if obj.get("anchors"):
+                for anchor in obj["anchors"]:
+                    mentioned[obj["name"]]["anchors"].append(anchor)
+        else:
+            mentioned.insert_by_name(obj)
+        obj = obj["name"]
+    return obj, mentioned
+
+
 def collect_mentioned(
     obj: Union[RawFactor, List[Union[RawFactor, str]]],
     mentioned: Optional[Mentioned] = None,
@@ -254,7 +287,7 @@ def collect_mentioned(
         obj = new_list
     if isinstance(obj, Dict):
 
-        obj, mentioned = update_name_index_from_fact(obj, mentioned)
+        obj, mentioned = update_name_index_from_fact_content(obj, mentioned)
 
         for key, value in obj.items():
             if key not in keys_to_ignore:
@@ -263,14 +296,8 @@ def collect_mentioned(
                     mentioned.update(new_mentioned)
                     obj[key] = new_value
         obj = ensure_factor_has_name(obj)
-        if obj.get("name"):
-            if obj["name"] in mentioned:
-                if obj.get("anchors"):
-                    for anchor in obj["anchors"]:
-                        mentioned[obj["name"]]["anchors"].append(anchor)
-            else:
-                mentioned.insert_by_name(obj)
-            obj = obj["name"]
+
+        obj, mentioned = update_name_index_with_factor(obj, mentioned)
     return obj, mentioned
 
 
