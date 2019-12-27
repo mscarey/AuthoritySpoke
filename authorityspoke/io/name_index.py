@@ -175,7 +175,23 @@ def collect_mentioned(
         obj = new_list
     if isinstance(obj, Dict):
         if obj.get("predicate", {}).get("content"):
+            (
+                obj["predicate"]["content"],
+                obj["context_factors"],
+            ) = text_expansion.get_references_from_string(
+                content=obj["predicate"]["content"],
+                context_factors=obj.get("context_factors", []),
+            )
+
+            for factor in obj["context_factors"]:
+                if isinstance(factor, str):
+                    factor_name = factor
+                else:
+                    factor_name = factor.get("name")
+                if factor_name and factor_name not in mentioned:
+                    mentioned.insert_by_name(factor)
             mentioned = mentioned.sorted_by_length()
+
             for name in mentioned.keys():
                 if (
                     name in obj["predicate"]["content"]

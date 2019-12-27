@@ -114,6 +114,26 @@ def collapse_name_in_content(content: str, name: str, placeholder: str = "{}"):
     return content
 
 
+def add_found_context_with_brackets(
+    content: str, context_factors: List[Dict], factor: Dict, placeholder="{}"
+) -> Tuple[str, List[Dict[str, Any]]]:
+    """
+    Replace mentions of factor with placeholder and list replacements.
+
+    :returns:
+        Content with mentions of factor replaced by placeholder, and
+        a context_factors list with the factor inserted in a position
+        corresponding to its position in the context phrase.
+    """
+    bracketed_name = "{" + factor["name"] + "}"
+    while bracketed_name in content:
+        index_in_content = content.index(bracketed_name)
+        index_in_factor_list = content[:index_in_content].count(placeholder)
+        context_factors.insert(index_in_factor_list, factor)
+        content = collapse_name_in_content(content, bracketed_name, placeholder)
+    return content, context_factors
+
+
 def add_found_context(
     content: str, context_factors: List[Dict], factor: Dict, placeholder="{}"
 ) -> Tuple[str, List[Dict[str, Any]]]:
@@ -165,7 +185,9 @@ def get_references_from_string(
     context_factors = context_factors or []
     for entity_name in entities_as_text:
         entity = {"type": "Entity", "name": entity_name}
-        content, context_factors = add_found_context(content, context_factors, entity)
+        content, context_factors = add_found_context_with_brackets(
+            content, context_factors, entity
+        )
 
     return content, context_factors
 

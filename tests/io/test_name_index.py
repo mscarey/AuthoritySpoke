@@ -49,14 +49,14 @@ class TestCollectMentioned:
         factor_name_2 = holding["outputs"][1]
         assert mentioned[factor_name_2]["context_factors"][0] == "possessive noun"
 
-    def test_do_not_link_bracketed_factor_name(self):
-        new_content, context_factors = text_expansion.add_found_context(
-            content="{} sent a message to {Bob's friend}",
-            context_factors=[{"type": "Entity", "name": "Bob"}],
-            factor={"type": "Entity", "name": "Bob"},
+    def test_update_context_from_bracketed_name(self):
+        content = "{} sent a message to {Bob's friend}"
+        context_factors = [{"type": "Entity", "name": "Bob"}]
+        new_content, context_factors = text_expansion.get_references_from_string(
+            content, context_factors
         )
-        assert new_content == "{} sent a message to {Bob's friend}"
-        assert len(context_factors) == 1
+        assert new_content == "{} sent a message to {}"
+        assert len(context_factors) == 2
 
     def test_assign_name(self, raw_factor):
         """
