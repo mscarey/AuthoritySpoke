@@ -25,5 +25,6 @@ prof/
 schemas/
 tests/__pycache__/
 tests/.pytest_cache/
+tests/io/cassettes/
 tests/prof/
 xml/

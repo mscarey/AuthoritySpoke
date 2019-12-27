@@ -83,9 +83,9 @@ RawDecision = Dict[
 
 class OpinionSchema(ExpandableSchema):
     __model__ = Opinion
-    position = fields.Str(data_key="type")
-    author = fields.Str()
-    text = fields.Str()
+    position = fields.Str(data_key="type", missing="majority")
+    author = fields.Str(missing="")
+    text = fields.Str(missing="")
 
     @post_load
     def make_object(self, data: RawOpinion, **kwargs) -> Opinion:
@@ -93,7 +93,7 @@ class OpinionSchema(ExpandableSchema):
 
     @pre_load
     def format_data_to_load(self, data: RawOpinion, **kwargs) -> RawOpinion:
-        data["author"] = data["author"].strip(",:")
+        data["author"] = data.get("author", "").strip(",:")
         return data
 
 
@@ -125,8 +125,10 @@ class DecisionSchema(ExpandableSchema):
     def format_data_to_load(self, data: RawDecision, **kwargs) -> RawDecision:
         data["court"] = data.get("court", {}).get("slug", "")
         data["jurisdiction"] = data.get("jurisdiction", {}).get("slug", "")
-        data["opinions"] = data.get("casebody", {}).get("data", {}).get("opinions", {})
-        del data["casebody"]
+        data["opinions"] = (
+            data.get("casebody", {}).get("data", {}).get("opinions", [{}])
+        )
+        data.pop("casebody", None)
         del data["docket_number"]
         del data["reporter"]
         del data["url"]
