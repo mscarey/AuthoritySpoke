@@ -118,7 +118,7 @@ def add_found_context_with_brackets(
     content: str, context_factors: List[Dict], factor: Dict, placeholder="{}"
 ) -> Tuple[str, List[Dict[str, Any]]]:
     """
-    Replace mentions of factor with placeholder and list replacements.
+    Remove bracketed mentions of factor with placeholder and list replacements.
 
     :returns:
         Content with mentions of factor replaced by placeholder, and

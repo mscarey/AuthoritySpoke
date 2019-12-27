@@ -16,6 +16,7 @@ from authorityspoke.factors import Factor
 from authorityspoke.facts import Fact
 from authorityspoke.holdings import Holding
 from authorityspoke.io.name_index import Mentioned
+from authorityspoke.io.name_index import RawFactor, RawPredicate
 from authorityspoke.io.nesting import nest_fields
 from authorityspoke.io import text_expansion
 from authorityspoke.opinions import Opinion
@@ -29,8 +30,6 @@ from utils.marshmallow_oneofschema.one_of_schema import OneOfSchema
 ureg = UnitRegistry()
 
 RawSelector = Union[str, Dict[str, str]]
-RawPredicate = Dict[str, Union[str, bool]]
-RawFactor = Dict[str, Union[RawPredicate, Sequence[Any], str, bool]]
 RawEnactment = Dict[str, Union[str, List[RawSelector]]]
 RawProcedure = Dict[str, Sequence[RawFactor]]
 RawRule = Dict[str, Union[RawProcedure, Sequence[RawEnactment], str, bool]]

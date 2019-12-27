@@ -1,14 +1,19 @@
 """Functions for indexing named objects in JSON to be imported."""
+
 from __future__ import annotations
 
 from collections import OrderedDict
 from copy import deepcopy
 
-from typing import Dict, List, Optional, Sequence, Union
+from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
 from marshmallow import ValidationError
 
 from authorityspoke.io import text_expansion
+
+
+RawPredicate = Dict[str, Union[str, bool]]
+RawFactor = Dict[str, Union[RawPredicate, Sequence[Any], str, bool]]
 
 
 class Mentioned(OrderedDict):
@@ -188,11 +193,63 @@ def update_name_index_from_context_factors(
     return mentioned.sorted_by_length()
 
 
+RawContextFactors = List[Union[RawFactor, str]]
+
+
+def update_name_index_from_fact(
+    obj: RawFactor, mentioned: Mentioned
+) -> Tuple[RawFactor, Mentioned]:
+    """
+    Update the index of mentioned factors from the Fact's context Factors, and vice versa.
+
+    :param obj:
+        data from JSON to be loaded as a :class:`.Factor`
+
+    :param mentioned:
+        :class:`.RawFactor`\s indexed by name for retrieval when loading objects
+        using a Marshmallow schema.
+
+    :returns:
+        both 'obj' and 'mentioned', updated with values from each other
+    """
+
+    predicate: RawPredicate = obj.get("predicate", {})
+    content: str = predicate.get("content", "")
+    if content:
+        context_factors: RawContextFactors = obj.get("context_factors", [])
+        (
+            obj["predicate"]["content"],
+            obj["context_factors"],
+        ) = text_expansion.get_references_from_string(
+            content=content, context_factors=context_factors
+        )
+        mentioned = update_name_index_from_context_factors(
+            obj["context_factors"], mentioned
+        )
+
+        for name in mentioned.keys():
+            if (
+                name in obj["predicate"]["content"]
+                and name != obj["predicate"]["content"]
+            ):
+                context_factors = obj.get("context_factors", [])
+                (
+                    obj["predicate"]["content"],
+                    obj["context_factors"],
+                ) = text_expansion.add_found_context(
+                    content=obj["predicate"]["content"],
+                    context_factors=context_factors,
+                    factor=mentioned.get_by_name(name),
+                )
+        obj = text_expansion.expand_shorthand_mentioned(obj)
+    return obj, mentioned
+
+
 def collect_mentioned(
-    obj: Dict,
+    obj: Union[RawFactor, List[Union[RawFactor, str]]],
     mentioned: Optional[Mentioned] = None,
     keys_to_ignore: Sequence[str] = ("predicate", "anchors"),
-) -> Mentioned:
+) -> Tuple[RawFactor, Mentioned]:
     """
     Make a dict of all nested objects labeled by name, creating names if needed.
 
@@ -207,33 +264,9 @@ def collect_mentioned(
             new_list.append(new_item)
         obj = new_list
     if isinstance(obj, Dict):
-        if obj.get("predicate", {}).get("content"):
-            (
-                obj["predicate"]["content"],
-                obj["context_factors"],
-            ) = text_expansion.get_references_from_string(
-                content=obj["predicate"]["content"],
-                context_factors=obj.get("context_factors", []),
-            )
-            mentioned = update_name_index_from_context_factors(
-                obj["context_factors"], mentioned
-            )
 
-            for name in mentioned.keys():
-                if (
-                    name in obj["predicate"]["content"]
-                    and name != obj["predicate"]["content"]
-                ):
-                    context_factors = obj.get("context_factors", [])
-                    (
-                        obj["predicate"]["content"],
-                        obj["context_factors"],
-                    ) = text_expansion.add_found_context(
-                        content=obj["predicate"]["content"],
-                        context_factors=context_factors,
-                        factor=mentioned.get_by_name(name),
-                    )
-            obj = text_expansion.expand_shorthand_mentioned(obj)
+        obj, mentioned = update_name_index_from_fact(obj, mentioned)
+
         for key, value in obj.items():
             if key not in keys_to_ignore:
                 if isinstance(value, (Dict, List)):
