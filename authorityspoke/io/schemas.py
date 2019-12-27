@@ -384,6 +384,21 @@ class FactSchema(ExpandableSchema):
 
     @pre_load
     def format_data_to_load(self, data: RawFactor, **kwargs) -> RawFactor:
+        r"""
+        Prepare :class:`.RawFact` to load, replacing name references with full objects.
+
+        Unlike the :func:`.name_index.collect_mentioned` function, this function can't add
+        any entries to the "mentioned" name index (due to limitations in the Marshmallow
+        serialization library). That means all shorthand references to factors
+        need to have been expanded before using the schema to load new objects.
+
+        :param data:
+            a dict representing a :class:`.Fact`
+
+        :returns:
+            a normalized dict representing a :class:`.Fact`\s with name references
+            expanded
+        """
         data = self.get_from_mentioned(data)
         to_nest = [
             "content",

@@ -155,6 +155,39 @@ def ensure_factor_has_name(obj: Dict) -> Dict:
     return obj
 
 
+def update_name_index_from_context_factors(
+    context_factors: List[RawFactor], mentioned: Mentioned
+):
+    r"""
+    Update name index from a list of :class:`.RawFactor`\s or strings referencing them.
+
+    :param context_factors:
+        a list of :class:`.RawFactor`\s or strings referencing them. Both
+        :class:`.RawFactor`\s and strings may exist in the list.
+
+    :param mentioned:
+        :class:`.RawFactor`\s indexed by name for retrieval when loading objects
+        using a Marshmallow schema.
+
+    :returns:
+        an updated "mentioned" name index
+    """
+
+    for factor in context_factors:
+        if isinstance(factor, str):
+            factor_name = factor
+            if factor_name not in mentioned:
+                raise ValueError(
+                    f"Unable to expand referenced Factor '{factor_name}'. "
+                    "It doesn't exist in the index of mentioned Factors."
+                )
+        else:
+            factor_name = factor.get("name")
+            if factor_name and factor_name not in mentioned:
+                mentioned.insert_by_name(factor)
+    return mentioned.sorted_by_length()
+
+
 def collect_mentioned(
     obj: Dict,
     mentioned: Optional[Mentioned] = None,
@@ -182,15 +215,9 @@ def collect_mentioned(
                 content=obj["predicate"]["content"],
                 context_factors=obj.get("context_factors", []),
             )
-
-            for factor in obj["context_factors"]:
-                if isinstance(factor, str):
-                    factor_name = factor
-                else:
-                    factor_name = factor.get("name")
-                if factor_name and factor_name not in mentioned:
-                    mentioned.insert_by_name(factor)
-            mentioned = mentioned.sorted_by_length()
+            mentioned = update_name_index_from_context_factors(
+                obj["context_factors"], mentioned
+            )
 
             for name in mentioned.keys():
                 if (
