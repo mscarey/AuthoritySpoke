@@ -192,6 +192,20 @@ class TestHoldingImport:
         assert isinstance(oracle_holdings[0], Holding)
         assert isinstance(named_anchors.popitem()[1].pop(), TextQuoteSelector)
 
+        from authorityspoke.io.loaders import load_holdings_with_index
+
+    def test_load_and_posit_holdings_with_anchors(self, make_regime, make_opinion):
+        """
+        Test that Opinion.posit can take a HoldingsIndexed as the only argument.
+        Trying to combine several tasks that normally happen together, into a single command.
+        """
+        oracle = make_opinion["oracle_majority"]
+        oracle_holdings_with_anchors = loaders.load_holdings_with_anchors(
+            "holding_oracle.json", regime=make_regime
+        )
+        oracle.posit(oracle_holdings_with_anchors)
+        assert len(oracle.holdings) == 20
+
 
 class TestTextAnchors:
     def test_read_holding_with_no_anchor(self, make_opinion, make_analysis):
@@ -526,7 +540,7 @@ class TestTextAnchors:
             "enactments": [{"source": "/us/const/amendment-IV"}],
             "mandatory": True,
         }
-        with pytest.raises(ValidationError):
+        with pytest.raises(ValueError):
             readers.read_holding(rule_holding, regime=make_regime)
 
     def test_error_classname_does_not_exist(self):

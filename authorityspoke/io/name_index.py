@@ -17,6 +17,12 @@ RawFactor = Dict[str, Union[RawPredicate, Sequence[Any], str, bool]]
 
 
 class Mentioned(OrderedDict):
+    """
+    An index of cross-referenced objects to be used in
+    loading AuthoritySpoke objects, keyed to the phrases
+    used to reference them.
+    """
+
     def insert_by_name(self, obj: Dict) -> None:
         self[obj["name"]] = obj.copy()
         self[obj["name"]].pop("name")
@@ -24,7 +30,7 @@ class Mentioned(OrderedDict):
 
     def get_by_name(self, name: str) -> Dict:
         if not self.get(name):
-            raise ValidationError(
+            raise ValueError(
                 f'Name "{name}" not found in the index of mentioned Factors'
             )
         value = {"name": name}

@@ -6,10 +6,10 @@ Unlike most other ``authorityspoke`` classes, :class:`Opinion`\s are not frozen.
 
 from __future__ import annotations
 
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 from itertools import zip_longest
 import operator
-from typing import Dict, Iterable, Iterator, List
+from typing import Dict, Iterable, Iterator, List, NamedTuple
 from typing import Optional, Sequence, Set, Tuple, Union
 
 import logging
@@ -29,6 +29,12 @@ logger = logging.getLogger(__name__)
 
 
 TextLinkDict = Dict[str, List[TextQuoteSelector]]
+
+
+class AnchoredHoldings(NamedTuple):
+    holdings: List[Holding]
+    holding_anchors: List[List[TextQuoteSelector]]
+    named_anchors: TextLinkDict
 
 
 @dataclass
@@ -260,7 +266,7 @@ class Opinion:
 
     def posit_holdings(
         self,
-        holdings: Iterable[Union[Holding, Rule]],
+        holdings: Union[AnchoredHoldings, Iterable[Union[Holding, Rule]]],
         holding_anchors: Optional[List[List[TextQuoteSelector]]] = None,
         named_anchors: Optional[TextLinkDict] = None,
         context: Optional[Sequence[Factor]] = None,
@@ -286,6 +292,9 @@ class Opinion:
             will provide the context for the new holding in the
             present case.
         """
+        if isinstance(holdings, AnchoredHoldings):
+            (holdings, holding_anchors, named_anchors) = holdings
+
         holding_anchors = holding_anchors or []
         for (holding, selector_list) in zip_longest(holdings, holding_anchors):
             self.posit_holding(
@@ -297,7 +306,7 @@ class Opinion:
 
     def posit(
         self,
-        holdings: Union[Holding, Iterable[Union[Holding, Rule]]],
+        holdings: Union[AnchoredHoldings, Holding, Iterable[Union[Holding, Rule]]],
         holding_anchors: Optional[
             List[Union[TextQuoteSelector, List[TextQuoteSelector]]]
         ] = None,
@@ -311,7 +320,7 @@ class Opinion:
         :meth:`~posit_holdings` depending on whether the `holding` parameter
         is one :class:`.Holding` or a :class:`list`\.
 
-        :param holding:
+        :param holdings:
             a :class:`.Holding` that the :class:`.Opinion` ``self`` posits
             as valid in its own court or jurisdiction, regardless of
             whether ``self`` accepts that the ``inputs`` of the

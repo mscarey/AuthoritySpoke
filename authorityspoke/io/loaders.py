@@ -14,6 +14,7 @@ from authorityspoke.decisions import Decision
 from authorityspoke.codes import Code
 from authorityspoke.holdings import Holding
 from authorityspoke.jurisdictions import Regime
+from authorityspoke.opinions import AnchoredHoldings
 from authorityspoke.rules import Rule
 
 from authorityspoke.io import filepaths, readers
@@ -164,7 +165,7 @@ def load_holdings_with_index(
     directory: Optional[pathlib.Path] = None,
     filepath: Optional[pathlib.Path] = None,
     regime: Optional[Regime] = None,
-) -> readers.HoldingIndexed:
+) -> readers.HoldingsIndexed:
     """
     Read holdings with factor index from a file.
     """
@@ -172,6 +173,21 @@ def load_holdings_with_index(
         filename=filename, directory=directory, filepath=filepath
     )
     return readers.read_holdings_with_index(raw_holdings, regime=regime)
+
+
+def load_holdings_with_anchors(
+    filename: Optional[str] = None,
+    directory: Optional[pathlib.Path] = None,
+    filepath: Optional[pathlib.Path] = None,
+    regime: Optional[Regime] = None,
+) -> AnchoredHoldings:
+    """
+    Read holdings from file, with Opinion text anchors for holdings and factors.
+    """
+    raw_holdings = load_holdings(
+        filename=filename, directory=directory, filepath=filepath
+    )
+    return readers.read_holdings_with_anchors(raw_holdings, regime=regime)
 
 
 def load_decision(

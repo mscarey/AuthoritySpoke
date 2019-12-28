@@ -12,7 +12,7 @@ from typing import NamedTuple
 from bs4 import BeautifulSoup
 
 from typing import Any, Dict, List, Iterable, Iterator
-from typing import Optional, Tuple, Type, Union
+from typing import Optional, Sequence, Tuple, Type, Union
 
 from anchorpoint.textselectors import TextQuoteSelector
 from pint import UnitRegistry
@@ -26,7 +26,7 @@ from authorityspoke.factors import Factor
 from authorityspoke.facts import Fact
 from authorityspoke.holdings import Holding
 from authorityspoke.jurisdictions import Regime
-from authorityspoke.opinions import Opinion, TextLinkDict
+from authorityspoke.opinions import AnchoredHoldings
 from authorityspoke.pleadings import Allegation, Pleading
 from authorityspoke.predicates import Predicate
 from authorityspoke.procedures import Procedure
@@ -296,7 +296,7 @@ def read_holding(record: RawHolding, regime: Optional[Regime] = None) -> Holding
     return schema.load(deepcopy(record))
 
 
-class HoldingIndexed(NamedTuple):
+class HoldingsIndexed(NamedTuple):
     holdings: List[Holding]
     mentioned: Mentioned
     holding_anchors: List[List[TextQuoteSelector]]
@@ -304,14 +304,24 @@ class HoldingIndexed(NamedTuple):
 
 def read_holdings_with_index(
     record: List[RawHolding], regime: Optional[Regime] = None, many: bool = True
-) -> HoldingIndexed:
+) -> HoldingsIndexed:
     record, mentioned = index_names(record)
     schema = schemas.HoldingSchema(many=many)
     schema.context["regime"] = regime
     schema.context["mentioned"] = mentioned
     anchor_list = anchors.get_holding_anchors(record)
     holdings = schema.load(deepcopy(record))
-    return HoldingIndexed(holdings, mentioned, anchor_list)
+    return HoldingsIndexed(holdings, mentioned, anchor_list)
+
+
+def read_holdings_with_anchors(
+    record: List[RawHolding], regime: Optional[Regime] = None, many: bool = True
+) -> AnchoredHoldings:
+    holdings, mentioned, holding_anchors = read_holdings_with_index(
+        record=record, regime=regime, many=many
+    )
+    text_anchors = anchors.get_named_anchors(mentioned)
+    return AnchoredHoldings(holdings, holding_anchors, text_anchors)
 
 
 def read_holdings(
