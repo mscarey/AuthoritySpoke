@@ -42,7 +42,7 @@ class TestCodes:
             ("cfr37", "/us/cfr/t37"),
             ("ca_evid", "/us-ca/evid"),
             ("ca_pen", "/us-ca/pen"),
-            ("beard_act", "/au/act"),
+            ("beard_act", "/au/act/1934/47"),
         ],
     )
     def test_code_urls(self, make_code, code, path):
@@ -60,6 +60,11 @@ class TestCodes:
     )
     def test_code_title(self, make_code, code, expected):
         assert make_code[code].title == expected
+
+    def test_code_select_text(self, make_code):
+        code = make_code["beard_act"]
+        text = code.select_text("/au/act/1934/47/1")
+        assert text.startswith("This Act may be cited")
 
     def test_get_bill_of_rights_effective_date(self, make_code):
         const = make_code["const"]

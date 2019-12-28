@@ -8,7 +8,6 @@ import pathlib
 
 from typing import Any, Dict, List, Iterator, Optional, Tuple, Union
 
-from anchorpoint.textselectors import TextQuoteSelector
 from bs4 import BeautifulSoup
 
 from authorityspoke.decisions import Decision
@@ -17,9 +16,8 @@ from authorityspoke.holdings import Holding
 from authorityspoke.jurisdictions import Regime
 from authorityspoke.rules import Rule
 
-from authorityspoke.io import anchors, filepaths, readers
-from authorityspoke.io.name_index import index_names, Mentioned
-from authorityspoke.io.text_expansion import expand_shorthand
+from authorityspoke.io import filepaths, readers
+from authorityspoke.io.name_index import Mentioned
 from authorityspoke.io.schemas import RawHolding, RawDecision
 
 
@@ -110,7 +108,7 @@ def load_rules_with_index(
     regime: Optional[Regime] = None,
     many: bool = True,
 ) -> Tuple[List[Rule], Mentioned]:
-    """
+    r"""
     Read :class:`.Rule`\s from a file.
 
     Even though this function will generate :class:`.Rule`\s instead

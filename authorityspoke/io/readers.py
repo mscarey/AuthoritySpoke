@@ -18,7 +18,7 @@ from anchorpoint.textselectors import TextQuoteSelector
 from pint import UnitRegistry
 
 from authorityspoke.decisions import Decision
-from authorityspoke.codes import Code, USCCode, USConstCode, CalCode, CFRCode
+from authorityspoke.codes import Code, USCCode, USLMCode, USConstCode, CalCode, CFRCode
 from authorityspoke.enactments import Enactment
 from authorityspoke.entities import Entity
 from authorityspoke.evidence import Exhibit, Evidence
@@ -110,6 +110,13 @@ def get_code_title(xml) -> str:
     raise NotImplementedError
 
 
+def has_uslm_schema(soup: BeautifulSoup) -> bool:
+    """
+    Determine if the Code XML has the USLM schema.
+    """
+    return soup.find(xmlns="http://xml.house.gov/schema/uslm/1.0")
+
+
 def read_code(xml):
     title = get_code_title(xml)
     uri = get_code_uri(xml, title)
@@ -121,6 +128,8 @@ def read_code(xml):
         code_class = USCCode
     elif uri.startswith("/us-ca"):
         code_class = CalCode
+    elif has_uslm_schema(xml):
+        code_class = USLMCode
     else:
         return Code(xml, title, uri)
     return code_class(xml, title, uri)

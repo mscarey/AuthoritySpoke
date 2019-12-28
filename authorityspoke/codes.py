@@ -210,7 +210,7 @@ class Code:
         return interval.passage(section_text)
 
     def select_text(
-        self, path: Optional[str], selector: Optional[TextQuoteSelector]
+        self, path: Optional[str], selector: Optional[TextQuoteSelector] = None
     ) -> Optional[str]:
         r"""
         Get text from the ``Code`` using a :class:`.TextQuoteSelector`.
@@ -339,15 +339,17 @@ class USConstCode(Code):
         return datetime.datetime.strptime(result.group(1), "%dth of %B, %Y").date()
 
 
-class USCCode(Code):
-    def __str__(self):
-        return f"USC {self.title}"
-
+class USLMCode(Code):
     def make_docpath(self, path: str = "") -> str:
         """
         Don't remove Code uri from path because USC uses full paths as identifiers.
         """
         return path or self.uri
+
+
+class USCCode(USLMCode):
+    def __str__(self):
+        return f"USC {self.title}"
 
 
 class CFRCode(Code):
