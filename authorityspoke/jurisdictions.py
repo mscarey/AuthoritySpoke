@@ -55,10 +55,19 @@ class Jurisdiction:
             the :class:`.Code` for the ``uri``
         """
         query = uri[:]
-        while query:
-            if self.codes.get(str(query)):
-                return self.codes.get(query)
-            query = query[: query.rfind("/")]
+        if self.codes.get(str(query)):
+            return self.codes.get(query)
+        # try shorter forms of uri
+        shortened_query = query[:]
+        while shortened_query:
+            if self.codes.get(str(shortened_query)):
+                return self.codes.get(shortened_query)
+            shortened_query = shortened_query[: shortened_query.rfind("/")]
+
+        # try longer form of uri
+        for name, code in self.codes.items():
+            if name.startswith(uri):
+                return code
         return None
 
 

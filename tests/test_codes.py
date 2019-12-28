@@ -25,6 +25,15 @@ class TestCodes:
         cfr = make_code["cfr37"]
         assert "Title 37" in repr(cfr)
 
+    def test_get_code_from_regime_with_partial_uri(self, make_regime):
+        """
+        The regime should return the appropriate "code" even though its
+        uri is more specific than the query, because it's the only one
+        available that starts with that.
+        """
+        beard_act = make_regime.get_code("/au/act")
+        assert "Enlightenment" in str(beard_act)
+
     @pytest.mark.parametrize(
         "code, path",
         [
@@ -33,6 +42,7 @@ class TestCodes:
             ("cfr37", "/us/cfr/t37"),
             ("ca_evid", "/us-ca/evid"),
             ("ca_pen", "/us-ca/pen"),
+            ("beard_act", "/au/act"),
         ],
     )
     def test_code_urls(self, make_code, code, path):

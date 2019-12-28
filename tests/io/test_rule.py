@@ -1,5 +1,6 @@
 from authorityspoke.io import dump, loaders, name_index, readers
 from authorityspoke.jurisdictions import Regime
+from authorityspoke.rules import Rule
 
 
 class TestRuleDump:
@@ -32,6 +33,18 @@ class TestLoadRules:
             "beard_rules.json", regime=make_regime
         )
         assert beard_rules[0].outputs[0].content == "{} was a beard"
+
+    def test_imported_rule_is_type_rule(self, make_regime):
+        beard_rules, mentioned = loaders.load_rules_with_index(
+            "beard_rules.json", regime=make_regime
+        )
+        assert isinstance(beard_rules[0], Rule)
+
+    def test_rule_short_string(self, make_regime):
+        beard_rules, mentioned = loaders.load_rules_with_index(
+            "beard_rules.json", regime=make_regime
+        )
+        assert beard_rules[0].short_string.lower().startswith("the rule")
 
     def test_index_names_from_sibling_inputs(self, make_regime):
         raw_rules = loaders.load_holdings("beard_rules.json")
