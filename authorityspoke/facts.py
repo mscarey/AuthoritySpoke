@@ -106,6 +106,17 @@ class Fact(Factor):
         text = wrapped(super().__str__().format(unwrapped))
         if self.standard_of_proof:
             text += f"\n" + indented("by the STANDARD {self.standard_of_proof}")
+        return text
+
+    @property
+    def str_with_concrete_context(self):
+        """
+        Identify this Fact more verbosely, specifying which text is a concrete context factor.
+
+        :returns:
+            the same as the __str__ method, but with an added "SPECIFIC CONTEXT" section
+        """
+        text = str(self)
         concrete_context = [
             factor for factor in self.context_factors if not factor.generic
         ]

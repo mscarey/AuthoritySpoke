@@ -54,9 +54,7 @@ class TestFacts:
     ):
         e = make_entity
         f2 = build_fact(
-            make_predicate["p2"],
-            indices=(1, 2),
-            case_factors=watt_mentioned,
+            make_predicate["p2"], indices=(1, 2), case_factors=watt_mentioned,
         )
         assert f2.context_factors == (e["watt"], e["trees"])
 
@@ -66,17 +64,13 @@ class TestFacts:
         e = make_entity
         with pytest.raises(TypeError):
             f2 = build_fact(
-                make_predicate["p1"],
-                indices=("nonsense"),
-                case_factors=watt_mentioned,
+                make_predicate["p1"], indices=("nonsense"), case_factors=watt_mentioned,
             )
 
     def test_invalid_index_for_case_factors_in_init(self, make_predicate, make_entity):
         with pytest.raises(IndexError):
             _ = build_fact(
-                make_predicate["p1"],
-                indices=2,
-                case_factors=make_entity["watt"],
+                make_predicate["p1"], indices=2, case_factors=make_entity["watt"],
             )
 
     def test_convert_int_context_factors_to_tuple(self, make_predicate, watt_mentioned):
@@ -95,8 +89,14 @@ class TestFacts:
         multiple references to the same Entity just because the name of the
         Entity appears more than once in the Predicate."""
         f = make_factor
-        assert "Fact that <Alice> told <Bob> to hire <Craig>".lower() in str(f["f_three_entities"]).lower()
-        assert "Fact that <Alice> told <Bob> to hire <Alice>".lower() in str(f["f_repeating_entity"]).lower()
+        assert (
+            "Fact that <Alice> told <Bob> to hire <Craig>".lower()
+            in str(f["f_three_entities"]).lower()
+        )
+        assert (
+            "Fact that <Alice> told <Bob> to hire <Alice>".lower()
+            in str(f["f_repeating_entity"]).lower()
+        )
 
     def test_string_representation_with_concrete_entities(self, watt_factor):
         """
@@ -106,6 +106,12 @@ class TestFacts:
         of the Fact.
         """
         assert "Hideaway Lodge was a motel" in str(watt_factor["f1_specific"])
+
+    def test_str_with_concrete_context(self, make_opinion_with_holding):
+        holding = list(make_opinion_with_holding["cardenas_majority"].holdings)[1]
+        longer_str = holding.inputs[0].str_with_concrete_context
+        assert "the Exhibit in the FORM testimony" in longer_str
+        assert "the Exhibit in the FORM testimony" not in str(holding.inputs[0])
 
     def test_complex_fact_no_line_break_in_predicate(self, make_opinion_with_holding):
         """
@@ -132,9 +138,7 @@ class TestFacts:
         )
 
     def test_get_factor_from_recursive_search(self, make_opinion_with_holding):
-        holding_list = list(
-            make_opinion_with_holding["cardenas_majority"].holdings
-        )
+        holding_list = list(make_opinion_with_holding["cardenas_majority"].holdings)
         factor_list = list(holding_list[0].recursive_factors)
         assert any(
             factor == Entity("parole officer") and factor.name == "parole officer"
@@ -180,12 +184,13 @@ class TestFacts:
         )
 
     def test_predicate_with_entities(self, make_entity, watt_factor):
-        assert (
-            "<Hideaway Lodge> was a motel" in
-            watt_factor["f1"].predicate.content_with_entities((make_entity["motel"]))
-        )
+        assert "<Hideaway Lodge> was a motel" in watt_factor[
+            "f1"
+        ].predicate.content_with_entities((make_entity["motel"]))
 
-    def test_factor_context_factors_do_not_match_predicate(self, make_predicate, watt_mentioned):
+    def test_factor_context_factors_do_not_match_predicate(
+        self, make_predicate, watt_mentioned
+    ):
         """
         make_predicate["p1"] has only one slot for context factors, but
         this tells it to look for three.
@@ -200,14 +205,17 @@ class TestFacts:
             )
 
     def test_entity_and_human_in_predicate(self, make_entity, watt_factor):
-        assert (
-            "<Wattenburg> operated and lived at <Hideaway Lodge>" in
-            watt_factor["f2"].predicate.content_with_entities(
-                (make_entity["watt"], make_entity["motel"])))
+        assert "<Wattenburg> operated and lived at <Hideaway Lodge>" in watt_factor[
+            "f2"
+        ].predicate.content_with_entities((make_entity["watt"], make_entity["motel"]))
 
     def test_standard_of_proof_must_be_listed(self, make_predicate, watt_mentioned):
         with pytest.raises(ValueError):
-            _ = build_fact(make_predicate["p2"], case_factors=watt_mentioned, standard_of_proof="probably so")
+            _ = build_fact(
+                make_predicate["p2"],
+                case_factors=watt_mentioned,
+                standard_of_proof="probably so",
+            )
 
     def test_standard_of_proof_in_str(self, watt_factor):
         factor = watt_factor["f2_preponderance_of_evidence"]
@@ -220,7 +228,9 @@ class TestFacts:
         """
         with pytest.raises(StopIteration):
             next(
-                watt_factor["f1"]._context_registers(make_complex_fact["f_relevant_murder"], operator.ge)
+                watt_factor["f1"]._context_registers(
+                    make_complex_fact["f_relevant_murder"], operator.ge
+                )
             )
 
     def test_context_register_valid(self, make_entity, watt_factor):
@@ -228,9 +238,7 @@ class TestFacts:
             watt_factor["f1"]._context_registers(
                 watt_factor["f1_entity_order"], operator.le
             )
-        ) == {
-            make_entity["motel"]: make_entity["watt"],
-        }
+        ) == {make_entity["motel"]: make_entity["watt"],}
 
     def test_case_factors_deleted_from_fact(self, watt_factor):
         """This attribute should have been deleted during Fact.__post_init__"""
@@ -240,24 +248,25 @@ class TestFacts:
 
     def test_import_to_context_register(self, make_entity, watt_factor):
         f = watt_factor["f7"]
-        left = ContextRegister({
-                        watt_factor["f7"]: watt_factor["f7_swap_entities"],
-                        make_entity["motel"]: make_entity["trees"],
-                    })
+        left = ContextRegister(
+            {
+                watt_factor["f7"]: watt_factor["f7_swap_entities"],
+                make_entity["motel"]: make_entity["trees"],
+            }
+        )
         right = ContextRegister({make_entity["trees"]: make_entity["motel"]})
         assert len(left.merged_with(right)) == 3
 
     def test_import_to_mapping_no_change(self, make_entity):
         old_mapping = ContextRegister({make_entity["motel"]: make_entity["trees"]})
-        assert dict(old_mapping.merged_with({make_entity["motel"]: make_entity["trees"]}
-            )
-        ) == {
-            make_entity["motel"]: make_entity["trees"],
-        }
+        assert dict(
+            old_mapping.merged_with({make_entity["motel"]: make_entity["trees"]})
+        ) == {make_entity["motel"]: make_entity["trees"],}
 
     def test_import_to_mapping_conflict(self, make_entity):
-        merged = ContextRegister({make_entity["motel"]: make_entity["trees"]}).merged_with(
-            ContextRegister({make_entity["motel"]: make_entity["motel"]}))
+        merged = ContextRegister(
+            {make_entity["motel"]: make_entity["trees"]}
+        ).merged_with(ContextRegister({make_entity["motel"]: make_entity["motel"]}))
         assert merged is None
 
     def test_import_to_mapping_reciprocal(self, watt_factor):
@@ -271,25 +280,32 @@ class TestFacts:
         Test that _registers_for_interchangeable_context swaps the first two
         items in the ContextRegister
         """
-        matches = ContextRegister({
-            make_entity["motel"]: make_entity["trees"],
-            make_entity["trees"]: make_entity["motel"],
-            make_entity["watt"]: make_entity["watt"],
-        })
+        matches = ContextRegister(
+            {
+                make_entity["motel"]: make_entity["trees"],
+                make_entity["trees"]: make_entity["motel"],
+                make_entity["watt"]: make_entity["watt"],
+            }
+        )
         new_matches = [
             match
             for match in watt_factor["f7"]._registers_for_interchangeable_context(
                 matches
             )
         ]
-        assert ContextRegister({
-            make_entity["trees"]: make_entity["trees"],
-            make_entity["motel"]: make_entity["motel"],
-            make_entity["watt"]: make_entity["watt"],
-        }) in new_matches
+        assert (
+            ContextRegister(
+                {
+                    make_entity["trees"]: make_entity["trees"],
+                    make_entity["motel"]: make_entity["motel"],
+                    make_entity["watt"]: make_entity["watt"],
+                }
+            )
+            in new_matches
+        )
+
 
 class TestSameMeaning:
-
     def test_equality_factor_from_same_predicate(self, watt_factor):
         assert watt_factor["f1"].means(watt_factor["f1b"])
 
@@ -363,12 +379,16 @@ class TestSameMeaning:
     def test_means_despite_plural(self):
         directory = Entity("Rural's telephone directory", plural=False)
         listings = Entity("Rural's telephone listings", plural=True)
-        directory_original = Fact(Predicate("{} was original"), context_factors=directory)
-        listings_original = Fact(Predicate("{} were original"), context_factors=listings)
+        directory_original = Fact(
+            Predicate("{} was original"), context_factors=directory
+        )
+        listings_original = Fact(
+            Predicate("{} were original"), context_factors=listings
+        )
         assert directory_original.means(listings_original)
 
-class TestImplication:
 
+class TestImplication:
     def test_fact_does_not_imply_rule(self, watt_factor, make_rule):
         assert not watt_factor["f1"].implies(make_rule["h1"])
 
@@ -448,12 +468,14 @@ class TestImplication:
             > make_complex_fact["f_relevant_murder_whether"]
         )
 
-    context_names = ContextRegister({Entity('Alice'): Entity('Craig'),
-            Entity('Bob'): Entity("Dan")})
+    context_names = ContextRegister(
+        {Entity("Alice"): Entity("Craig"), Entity("Bob"): Entity("Dan")}
+    )
 
     def test_context_register_text(self):
         assert self.context_names.prose == (
-            "<Alice> is like <Craig>, and <Bob> is like <Dan>")
+            "<Alice> is like <Craig>, and <Bob> is like <Dan>"
+        )
 
     def test_implication_complex_explain(self, make_complex_fact):
         complex_true = make_complex_fact["f_relevant_murder"]
@@ -481,8 +503,8 @@ class TestImplication:
             >= make_complex_fact["f_relevant_murder_alice_craig"]
         )
 
-class TestContradiction:
 
+class TestContradiction:
     def test_factor_different_predicate_truth_contradicts(self, watt_factor):
         assert watt_factor["f7"].contradicts(watt_factor["f7_opposite"])
         assert watt_factor["f7_opposite"].contradicts(watt_factor["f7"])
@@ -549,7 +571,9 @@ class TestContradiction:
         contradiction if you assume they correspond to one another.
         """
         p_small_weight = Predicate(
-            "the amount of gold {} possessed was {}", comparison="<", quantity=Q_("1 gram")
+            "the amount of gold {} possessed was {}",
+            comparison="<",
+            quantity=Q_("1 gram"),
         )
         p_large_weight = Predicate(
             "the amount of gold {} possessed was {}",
@@ -569,7 +593,9 @@ class TestContradiction:
         So there's no contradiction.
         """
         p_small_weight = Predicate(
-            "the amount of gold {} possessed was {}", comparison="<", quantity=Q_("1 gram")
+            "the amount of gold {} possessed was {}",
+            comparison="<",
+            quantity=Q_("1 gram"),
         )
         p_large_weight = Predicate(
             "the amount of gold {} possessed was {}",
@@ -580,7 +606,9 @@ class TestContradiction:
         bob = Entity("Bob")
         alice_rich = Fact(p_large_weight, context_factors=alice)
         bob_poor = Fact(p_small_weight, context_factors=bob)
-        assert not alice_rich.contradicts(bob_poor, context=ContextRegister({alice: alice}))
+        assert not alice_rich.contradicts(
+            bob_poor, context=ContextRegister({alice: alice})
+        )
 
     def test_copy_with_foreign_context(self, watt_mentioned, watt_factor):
         w = watt_mentioned
@@ -640,14 +668,20 @@ class TestContradiction:
         with pytest.raises(TypeError):
             any(register is not None for register in update)
 
-class TestAddition:
 
-    @pytest.mark.parametrize("left, right, expected",
-    [
-        ("f_shooting_craig_poe", "f_shooting_craig_brd", "f_shooting_craig_brd"),
-        ("f_irrelevant_3", "f_irrelevant_3_new_context", "f_irrelevant_3"),
-        ("f_irrelevant_3_new_context", "f_irrelevant_3", "f_irrelevant_3_new_context"),
-    ])
+class TestAddition:
+    @pytest.mark.parametrize(
+        "left, right, expected",
+        [
+            ("f_shooting_craig_poe", "f_shooting_craig_brd", "f_shooting_craig_brd"),
+            ("f_irrelevant_3", "f_irrelevant_3_new_context", "f_irrelevant_3"),
+            (
+                "f_irrelevant_3_new_context",
+                "f_irrelevant_3",
+                "f_irrelevant_3_new_context",
+            ),
+        ],
+    )
     def test_addition(self, make_factor, left, right, expected):
         assert make_factor[left] + make_factor[right] == make_factor[expected]
 

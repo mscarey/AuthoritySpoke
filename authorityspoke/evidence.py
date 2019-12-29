@@ -87,7 +87,7 @@ class Exhibit(Factor):
     def __str__(self):
         text = ""
         if self.form:
-            text += f"in the FORM of {self.form}"
+            text += f"in the FORM {self.form}"
         if self.statement:
             text += f"\n" + indented(f"WITH THE ASSERTION:")
             factor_text = indented(str(self.statement), tabs=2)

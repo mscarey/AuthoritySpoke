@@ -49,8 +49,8 @@ class TestEvidence:
         e = Evidence(Exhibit(form="testimony"), to_effect=make_factor["f_no_crime"])
         assert len(e.to_effect.context_factors) == 1
 
-    def test_evidence_str(self, make_evidence):
-        assert "in the form of testimony" in str(make_evidence["reciprocal"]).lower()
+    def test_evidence_str_with_context(self, make_evidence):
+        assert "in the form testimony" in str(make_evidence["reciprocal"]).lower()
 
 
 class TestEvidenceSameMeaning:
