@@ -30,8 +30,14 @@
                     <num value="4">4</num>
                     <heading> Beard, defined</heading>
                     <chapeau>In this Act, beard means any facial hair no shorter than 5 millimetres in length that:</chapeau>
-                    <subsection identifier="/au/act/1934/47/1/4/a">occurs on or below the chin, or</subsection>
-                    <subsection identifier="/au/act/1934/47/1/4/b">exists in an uninterrupted line from the front of one ear to the front of the other ear below the nose.</subsection>
+                    <subsection identifier="/au/act/1934/47/1/4/a">
+                        <num value="a">(a)</num>
+                        <content> occurs on or below the chin, or</content>
+                    </subsection>
+                    <subsection identifier="/au/act/1934/47/1/4/b">
+                        <num value="b">(b)</num>
+                        <content> exists in an uninterrupted line from the front of one ear to the front of the other ear below the nose.</content>
+                    </subsection>
                 </section>
             </part>
             <part identifier="/au/act/1934/47/2">
@@ -114,8 +120,14 @@
                     <subsection identifier="/au/act/1934/47/3/8/2">
                         <num value="2">(2)</num>
                         <chapeau>Any such person issued a notice to remedy under subsection 1 must either:</chapeau>
-                        <clause identifier="/au/act/1934/47/3/8/2/a">shave in such a way that they are no longer in breach of section 5, or</clause>
-                        <clause identifier="/au/act/1934/47/3/8/2/b">obtain a beardcoin from the Department of Beards</clause>
+                        <clause identifier="/au/act/1934/47/3/8/2/a">
+                            <num value="a">(a)</num>
+                            <content> shave in such a way that they are no longer in breach of section 5, or</content>
+                        </clause>
+                        <clause identifier="/au/act/1934/47/3/8/2/b">
+                            <num value="b">(b)</num>
+                            <content> obtain a beardcoin from the Department of Beards</content>
+                        </clause>
                         <continuation>within 14 days of such notice being issued to them.</continuation>
                     </subsection>
                 </section>

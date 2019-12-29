@@ -74,6 +74,13 @@ class TestEnactments:
         )
         assert method.text.strip() == "method of operation"
 
+    def test_chapeau_and_subsections_from_uslm_code(self, make_code):
+        beard = make_code["beard_act"]
+        definition = readers.read_enactment(
+            {"source": "/au/act/1934/47/1/4"}, code=beard,
+        )
+        assert definition.text.strip().endswith("below the nose.")
+
     def test_passage_from_cfr_code(self, make_code):
         cfr = make_code["cfr37"]
         slogans = readers.read_enactment({"source": "/us/cfr/t37/s202.1"}, code=cfr)

@@ -137,7 +137,9 @@ class Code:
         sections = self.xml.find(identifier=docpath)
         if not sections:
             return None
-        passages = sections.find_all(["chapeau", "paragraph", "content"])
+        passages = sections.find_all(
+            ["chapeau", "paragraph", "content", "continuation"]
+        )
 
         return passages
 

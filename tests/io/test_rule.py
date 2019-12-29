@@ -66,3 +66,11 @@ class TestLoadRules:
         )
         key = "the Department of Beards granted the defendant's beard exemption"
         assert mentioned[key]["context_factors"][0] == "the Department of Beards"
+
+    def test_read_rules_without_regime(self, make_code):
+        beard_dictionary = loaders.load_holdings("beard_rules.json")
+        beard_code = make_code["beard_act"]
+        beard_rules = readers.read_rules(beard_dictionary, beard_code)
+        assert beard_rules[0].inputs[0].short_string == (
+            "the fact that <the suspected beard> was facial hair"
+        )

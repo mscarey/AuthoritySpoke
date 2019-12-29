@@ -325,7 +325,9 @@ def read_holdings_with_anchors(
 
 
 def read_holdings(
-    record: List[RawHolding], regime: Optional[Regime] = None
+    record: List[RawHolding],
+    regime: Optional[Regime] = None,
+    code: Optional[Code] = None,
 ) -> List[Holding]:
     r"""
     Load a list of :class:`Holdings`\s from JSON, with optional text links.
@@ -345,6 +347,7 @@ def read_holdings(
     schema = schemas.HoldingSchema(many=True)
     record, schema.context["mentioned"] = index_names(record)
     schema.context["regime"] = regime
+    schema.context["code"] = code
     return schema.load(deepcopy(record))
 
 

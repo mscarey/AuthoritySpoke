@@ -8,6 +8,7 @@ from marshmallow import ValidationError
 from anchorpoint.textselectors import TextQuoteSelector
 from pint import UnitRegistry
 
+from authorityspoke.codes import Code
 from authorityspoke.decisions import CaseCitation, Decision
 from authorityspoke.enactments import Enactment
 from authorityspoke.entities import Entity
@@ -206,18 +207,19 @@ class EnactmentSchema(ExpandableSchema):
                 data["source"] = data["source"].rstrip("/")
         return data
 
-    def get_code_from_regime(self, data, **kwargs):
+    def get_code_from_regime(self, data, **kwargs) -> Code:
+        if self.context.get("code"):
+            return self.context["code"]
         if self.context["regime"]:
-            code = self.context["regime"].get_code(data["source"])
-        elif self.context.get("code"):
-            code = self.context["code"]
-        else:
-            raise ValueError(
-                f"Must either specify a Code for Enactment '{data['source']}', "
-                + "or else specify a Regime "
-                + "and a path to find the Code within the Regime."
-            )
-        return code
+            if isinstance(self.context["regime"], Code):
+                return self.context["regime"]
+            return self.context["regime"].get_code(data["source"])
+
+        raise ValueError(
+            f"Must either specify a Code for Enactment '{data['source']}', "
+            + "or else specify a Regime "
+            + "and a path to find the Code within the Regime."
+        )
 
     @pre_load
     def format_data_to_load(self, data, **kwargs):
