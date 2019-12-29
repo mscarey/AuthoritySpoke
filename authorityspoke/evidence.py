@@ -78,8 +78,8 @@ class Exhibit(Factor):
         Return string representation of the object without line breaks.
         """
         string = (
-            f'{("by " + self.statement_attribution.short_string + ", ") if self.statement_attribution else ""}'
-            + f'{("asserting " + self.statement.short_string) if self.statement else ""}'
+            f'{("attributed to " + self.statement_attribution.short_string + ", ") if self.statement_attribution else ""}'
+            + f'{("asserting " + self.statement.short_string + ", ") if self.statement else ""}'
         )
         string = super().__str__().format(string)
         return string.replace("Exhibit", self.form or "exhibit").strip()

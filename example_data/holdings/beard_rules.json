@@ -56,12 +56,12 @@
                 "source": "/au/act/1934/47/2/5"
             },
             {
-                "source": "/au/act/1934/47/2/6"
-            },
-            {
                 "source": "/au/act/1934/47/3/7"
             }
-        ]
+        ],
+        "enactments_despite": {
+            "source": "/au/act/1934/47/2/6"
+        }
     },
     {
         "inputs": {
@@ -82,7 +82,7 @@
     {
         "inputs": {
             "type": "exhibit",
-            "form": "a token",
+            "form": "token",
             "statement": "the Department of Beards granted the defendant's beard exemption",
             "statement_attribution": "the Department of Beards",
             "name": "the defendant's beardcoin"
@@ -107,7 +107,7 @@
                 "context_factors": [
                     {
                         "type": "exhibit",
-                        "form": "a token",
+                        "form": "token",
                         "statement": {
                             "type": "fact",
                             "content": "the Department of Beards granted an exemption from the prohibition of wearing beards",
@@ -120,7 +120,7 @@
             },
             {
                 "type": "fact",
-                "content": "the transaction was a licensed beardcoin repurchase",
+                "content": "the beardcoin transaction was a licensed beardcoin repurchase",
                 "absent": true
             },
             {
@@ -131,7 +131,7 @@
         ],
         "despite": {
             "type": "fact",
-            "content": "the beardcoin was counterfeit"
+            "content": "any beardcoin was counterfeit"
         },
         "outputs": {
             "type": "fact",
@@ -153,12 +153,12 @@
         "inputs": [
             {
                 "type": "fact",
-                "content": "the transaction was the counterparty's purchase of any beardcoin from the defendant"
+                "content": "the beardcoin transaction was the counterparty's purchase of any beardcoin from the defendant"
             },
-            "absent the transaction was a licensed beardcoin repurchase",
+            "absent the beardcoin transaction was a licensed beardcoin repurchase",
             "false the counterparty was the Department of Beards"
         ],
-        "despite": "the beardcoin was counterfeit",
+        "despite": "any beardcoin was counterfeit",
         "outputs": "the defendant committed the offense of improper transfer of beardcoin",
         "enactments": [
             {
@@ -176,12 +176,12 @@
         "inputs": [
             {
                 "type": "fact",
-                "content": "the transaction was the defendant's loan of any beardcoin to the counterparty"
+                "content": "the beardcoin transaction was the defendant's loan of any beardcoin to the counterparty"
             },
-            "absent the transaction was a licensed beardcoin repurchase",
+            "absent the beardcoin transaction was a licensed beardcoin repurchase",
             "false the counterparty was the Department of Beards"
         ],
-        "despite": "the beardcoin was counterfeit",
+        "despite": "any beardcoin was counterfeit",
         "outputs": "the defendant committed the offense of improper transfer of beardcoin",
         "enactments": [
             {
@@ -196,12 +196,12 @@
         "inputs": [
             {
                 "type": "fact",
-                "content": "the transaction was the defendant's lease of any beardcoin to the counterparty"
+                "content": "the beardcoin transaction was the defendant's lease of any beardcoin to the counterparty"
             },
-            "absent the transaction was a licensed beardcoin repurchase",
+            "absent the beardcoin transaction was a licensed beardcoin repurchase",
             "false the counterparty was the Department of Beards"
         ],
-        "despite": "the beardcoin was counterfeit",
+        "despite": "any beardcoin was counterfeit",
         "outputs": "the defendant committed the offense of improper transfer of beardcoin",
         "enactments": [
             {
@@ -216,12 +216,12 @@
         "inputs": [
             {
                 "type": "fact",
-                "content": "the transaction was the defendant's gift of any beardcoin to the counterparty"
+                "content": "the beardcoin transaction was the defendant's gift of any beardcoin to the counterparty"
             },
-            "absent the transaction was a licensed beardcoin repurchase",
+            "absent the beardcoin transaction was a licensed beardcoin repurchase",
             "false the counterparty was the Department of Beards"
         ],
-        "despite": "the beardcoin was counterfeit",
+        "despite": "any beardcoin was counterfeit",
         "outputs": "the defendant committed the offense of improper transfer of beardcoin",
         "enactments": [
             {
@@ -236,12 +236,12 @@
         "inputs": [
             {
                 "type": "fact",
-                "content": "the transaction was the defendant's transfer of any beardcoin to the counterparty"
+                "content": "the beardcoin transaction was the defendant's transfer of any beardcoin to the counterparty"
             },
-            "absent the transaction was a licensed beardcoin repurchase",
+            "absent the beardcoin transaction was a licensed beardcoin repurchase",
             "false the counterparty was the Department of Beards"
         ],
-        "despite": "the beardcoin was counterfeit",
+        "despite": "any beardcoin was counterfeit",
         "outputs": "the defendant committed the offense of improper transfer of beardcoin",
         "enactments": [
             {
@@ -256,12 +256,12 @@
         "inputs": [
             {
                 "type": "fact",
-                "content": "the transaction was the defendant's receipt of any beardcoin from the counterparty"
+                "content": "the beardcoin transaction was the defendant's receipt of any beardcoin from the counterparty"
             },
-            "absent the transaction was a licensed beardcoin repurchase",
+            "absent the beardcoin transaction was a licensed beardcoin repurchase",
             "false the counterparty was the Department of Beards"
         ],
-        "despite": "the beardcoin was counterfeit",
+        "despite": "any beardcoin was counterfeit",
         "outputs": "the defendant committed the offense of improper transfer of beardcoin",
         "enactments": [
             {
@@ -289,7 +289,7 @@
     },
     {
         "inputs": [
-            "the transaction was the counterparty's purchase of any beardcoin from the defendant",
+            "the beardcoin transaction was the counterparty's purchase of any beardcoin from the defendant",
             {
                 "type": "fact",
                 "content": "the counterparty removed the defendant's beard with barbering, hairdressing, or other male grooming services"
@@ -301,7 +301,7 @@
         ],
         "outputs": {
             "type": "fact",
-            "content": "the transaction was a licensed beardcoin repurchase"
+            "content": "the beardcoin transaction was a licensed beardcoin repurchase"
         },
         "enactments": {
             "source": "/au/act/1934/47/4/11"
