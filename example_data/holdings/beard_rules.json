@@ -103,7 +103,7 @@
         "inputs": [
             {
                 "type": "fact",
-                "content": "{the defendant} bought any beardcoin from {the counterparty}",
+                "content": "{the beardcoin transaction} was {the defendant}'s purchase of any beardcoin from {the counterparty}",
                 "context_factors": [
                     {
                         "type": "exhibit",
@@ -116,17 +116,17 @@
                         "statement_attribution": "the Department of Beards",
                         "name": "any beardcoin"
                     }
-                ],
-                "name": "the defendant's purchase of beardcoin from the counterparty"
+                ]
             },
             {
                 "type": "fact",
-                "content": "the defendant's purchase of beardcoin from the counterparty was a licensed beardcoin repurchase",
+                "content": "the transaction was a licensed beardcoin repurchase",
                 "absent": true
             },
             {
                 "type": "fact",
-                "content": "the counterparty was not the Department of Beards"
+                "content": "the counterparty was the Department of Beards",
+                "truth": false
             }
         ],
         "despite": {
@@ -153,40 +153,13 @@
         "inputs": [
             {
                 "type": "fact",
-                "content": "the counterparty bought any beardcoin from the defendant",
-                "context_factors": [
-                    {
-                        "type": "exhibit",
-                        "form": "a token",
-                        "statement": {
-                            "type": "fact",
-                            "content": "the Department of Beards granted an exemption from the prohibition of wearing beards",
-                            "name": "the Department of Beards granted a beard exemption"
-                        },
-                        "statement_attribution": "the Department of Beards",
-                        "name": "any beardcoin"
-                    }
-                ],
-                "name": "the counterparty's purchase of beardcoin from the defendant"
+                "content": "the transaction was the counterparty's purchase of any beardcoin from the defendant"
             },
-            {
-                "type": "fact",
-                "content": "the counterparty's purchase of beardcoin from the defendant was a licensed beardcoin repurchase",
-                "absent": true
-            },
-            {
-                "type": "fact",
-                "content": "the counterparty was not the Department of Beards"
-            }
+            "absent the transaction was a licensed beardcoin repurchase",
+            "false the counterparty was the Department of Beards"
         ],
-        "despite": {
-            "type": "fact",
-            "content": "the beardcoin was counterfeit"
-        },
-        "outputs": {
-            "type": "fact",
-            "content": "the defendant committed the offense of improper transfer of beardcoin"
-        },
+        "despite": "the beardcoin was counterfeit",
+        "outputs": "the defendant committed the offense of improper transfer of beardcoin",
         "enactments": [
             {
                 "source": "/au/act/1934/47/3/7A"
@@ -201,7 +174,122 @@
     },
     {
         "inputs": [
-            "the counterparty's purchase of beardcoin from the defendant",
+            {
+                "type": "fact",
+                "content": "the transaction was the defendant's loan of any beardcoin to the counterparty"
+            },
+            "absent the transaction was a licensed beardcoin repurchase",
+            "false the counterparty was the Department of Beards"
+        ],
+        "despite": "the beardcoin was counterfeit",
+        "outputs": "the defendant committed the offense of improper transfer of beardcoin",
+        "enactments": [
+            {
+                "source": "/au/act/1934/47/3/7A"
+            },
+            {
+                "source": "/au/act/1934/47/3/7B/2"
+            }
+        ]
+    },
+    {
+        "inputs": [
+            {
+                "type": "fact",
+                "content": "the transaction was the defendant's lease of any beardcoin to the counterparty"
+            },
+            "absent the transaction was a licensed beardcoin repurchase",
+            "false the counterparty was the Department of Beards"
+        ],
+        "despite": "the beardcoin was counterfeit",
+        "outputs": "the defendant committed the offense of improper transfer of beardcoin",
+        "enactments": [
+            {
+                "source": "/au/act/1934/47/3/7A"
+            },
+            {
+                "source": "/au/act/1934/47/3/7B/2"
+            }
+        ]
+    },
+    {
+        "inputs": [
+            {
+                "type": "fact",
+                "content": "the transaction was the defendant's gift of any beardcoin to the counterparty"
+            },
+            "absent the transaction was a licensed beardcoin repurchase",
+            "false the counterparty was the Department of Beards"
+        ],
+        "despite": "the beardcoin was counterfeit",
+        "outputs": "the defendant committed the offense of improper transfer of beardcoin",
+        "enactments": [
+            {
+                "source": "/au/act/1934/47/3/7A"
+            },
+            {
+                "source": "/au/act/1934/47/3/7B/2"
+            }
+        ]
+    },
+    {
+        "inputs": [
+            {
+                "type": "fact",
+                "content": "the transaction was the defendant's transfer of any beardcoin to the counterparty"
+            },
+            "absent the transaction was a licensed beardcoin repurchase",
+            "false the counterparty was the Department of Beards"
+        ],
+        "despite": "the beardcoin was counterfeit",
+        "outputs": "the defendant committed the offense of improper transfer of beardcoin",
+        "enactments": [
+            {
+                "source": "/au/act/1934/47/3/7A"
+            },
+            {
+                "source": "/au/act/1934/47/3/7B/2"
+            }
+        ]
+    },
+    {
+        "inputs": [
+            {
+                "type": "fact",
+                "content": "the transaction was the defendant's receipt of any beardcoin from the counterparty"
+            },
+            "absent the transaction was a licensed beardcoin repurchase",
+            "false the counterparty was the Department of Beards"
+        ],
+        "despite": "the beardcoin was counterfeit",
+        "outputs": "the defendant committed the offense of improper transfer of beardcoin",
+        "enactments": [
+            {
+                "source": "/au/act/1934/47/3/7A"
+            },
+            {
+                "source": "/au/act/1934/47/3/7B/2"
+            }
+        ]
+    },
+    {
+        "inputs": {
+            "type": "fact",
+            "content": "the defendant produced, altered, or manufactured tokens with the appearance of and purporting to be genuine beardcoin"
+        },
+        "outputs": {
+            "type": "fact",
+            "content": "the defendant committed the offense of counterfeiting beardcoin"
+        },
+        "enactments": [
+            {
+                "source": "/au/act/1934/47/3/7B/1"
+            }
+        ]
+    },
+    {
+        "inputs": [
+            "the transaction was the counterparty's purchase of any beardcoin from the defendant",
             {
                 "type": "fact",
                 "content": "the counterparty removed the defendant's beard with barbering, hairdressing, or other male grooming services"
@@ -213,7 +301,7 @@
         ],
         "outputs": {
             "type": "fact",
-            "content": "the counterparty's purchase of beardcoin from the defendant was a licensed beardcoin repurchase"
+            "content": "the transaction was a licensed beardcoin repurchase"
         },
         "enactments": {
             "source": "/au/act/1934/47/4/11"

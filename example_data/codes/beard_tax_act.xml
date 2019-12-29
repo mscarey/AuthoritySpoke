@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<act xsi:schemaLocation="http://xml.house.gov/schemas/uslm/1.0 USLM-1.0.15.xsd" xml:lang="en" identifier="/au/act/1934/47" 
+<legalDoc xsi:schemaLocation="http://xml.house.gov/schemas/uslm/1.0 USLM-1.0.15.xsd" xml:lang="en" identifier="/au/act/1934/47" 
     xmlns="http://xml.house.gov/schema/uslm/1.0" 
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
     xmlns:dc="http://purl.org/dc/elements/1.1/" 
@@ -162,4 +162,4 @@
             </part>
         </act>
     </main>
-</act>
+</legalDoc>

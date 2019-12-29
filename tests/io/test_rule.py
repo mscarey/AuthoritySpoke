@@ -57,7 +57,7 @@ class TestLoadRules:
         rules, mentioned = loaders.load_rules_with_index(
             "beard_rules.json", regime=make_regime
         )
-        exhibit = rules[4].inputs[0].context_factors[1]
+        exhibit = rules[4].inputs[0].context_factors[2]
         assert isinstance(exhibit, Exhibit)
 
     def test_load_rules_and_index_names(self, make_regime):

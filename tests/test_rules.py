@@ -10,7 +10,6 @@ from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
 
 
-
 class TestRules:
     def test_enactment_type_in_str(self, make_holding):
         assert "constitution" in str(make_holding["h1"]).lower()
@@ -49,15 +48,11 @@ class TestRules:
         self, make_holding, make_predicate
     ):
         with pytest.raises(TypeError):
-            make_holding["h1"].new_context(
-                {make_predicate["p1"]: make_predicate["p7"]}
-            )
+            make_holding["h1"].new_context({make_predicate["p1"]: make_predicate["p7"]})
 
     def test_new_context_dict_must_be_dict(self, make_holding, make_predicate):
         with pytest.raises(TypeError):
-            make_holding["h1"].new_context(
-                [make_predicate["p1"], make_predicate["p2"]]
-            )
+            make_holding["h1"].new_context([make_predicate["p1"], make_predicate["p2"]])
 
     def test_generic_factors(self, make_entity, make_holding):
         generics = make_holding["h3"].generic_factors
@@ -75,7 +70,7 @@ class TestRules:
 
     def test_string_with_line_breaks(self, make_opinion_with_holding):
         cardenas = make_opinion_with_holding["cardenas_majority"]
-        assert "was addicted to heroin\n" in str(cardenas.holdings[0])
+        assert "was addicted to heroin,\n" in str(cardenas.holdings[0])
 
     def test_string_mentions_absence(self, make_opinion_with_holding):
         cardenas = make_opinion_with_holding["cardenas_majority"]
@@ -102,7 +97,6 @@ class TestRules:
 
 
 class TestSameMeaning:
-
     def test_holdings_equivalent_entity_orders_equal(self, make_rule):
         """
         Test that holdings are considered equal if they have the same factors
@@ -114,14 +108,16 @@ class TestSameMeaning:
 
     def test_added_enactment_changes_meaning(self, make_complex_rule, make_enactment):
         due_process_rule = (
-        make_complex_rule["accept_murder_fact_from_relevance"]
-        + make_enactment["due_process_5"]
+            make_complex_rule["accept_murder_fact_from_relevance"]
+            + make_enactment["due_process_5"]
         )
 
         assert not due_process_rule.means(
-            make_complex_rule["accept_murder_fact_from_relevance"])
+            make_complex_rule["accept_murder_fact_from_relevance"]
+        )
         assert not make_complex_rule["accept_murder_fact_from_relevance"].means(
-            due_process_rule)
+            due_process_rule
+        )
 
     def test_holdings_different_entities_unequal(self, make_rule):
         assert not make_rule["h1"].means(make_rule["h1_easy"])
@@ -134,10 +130,12 @@ class TestSameMeaning:
 
     def test_explain_rule_differing_in_entity_order(self, make_complex_rule):
         left = make_complex_rule["accept_murder_fact_from_relevance_and_shooting"]
-        right = make_complex_rule["accept_murder_fact_from_relevance_and_shooting_craig"]
+        right = make_complex_rule[
+            "accept_murder_fact_from_relevance_and_shooting_craig"
+        ]
 
         explanation = left.explain_same_meaning(right)
-        assert explanation.prose == '<Craig> is like <Alice>, and <Dan> is like <Bob>'
+        assert explanation.prose == "<Craig> is like <Alice>, and <Dan> is like <Bob>"
 
 
 class TestImplication:
@@ -154,7 +152,9 @@ class TestImplication:
         Checks that because the generic entities on both sides of the implication
         relation are the same, the "Hideaway Lodge" Entity corresponds to an equal object.
         """
-        explanation = make_rule["h2_exact_in_despite"].explain_implication(make_rule["h2"])
+        explanation = make_rule["h2_exact_in_despite"].explain_implication(
+            make_rule["h2"]
+        )
         hideaway = Entity("Hideaway Lodge")
         assert explanation[hideaway] == hideaway
 
@@ -174,9 +174,7 @@ class TestImplication:
         assert make_rule["h2_ALL"] > make_rule["h2_exact_quantity_ALL"]
         assert not make_rule["h2_exact_quantity_ALL"] > make_rule["h2_ALL"]
 
-    def test_specific_holding_with_all_implies_more_general_with_some(
-        self, make_rule
-    ):
+    def test_specific_holding_with_all_implies_more_general_with_some(self, make_rule):
         assert make_rule["h2_exact_quantity_ALL"] > make_rule["h2"]
 
     def test_mandatory_implies_permissive(self, make_rule):
@@ -193,10 +191,7 @@ class TestImplication:
         because it's the mirror image of the normal entity order.
         """
         caplog.set_level(logging.DEBUG)
-        assert (
-            make_rule["h2_exact_in_despite_ALL_entity_order"]
-            > make_rule["h2_ALL"]
-        )
+        assert make_rule["h2_exact_in_despite_ALL_entity_order"] > make_rule["h2_ALL"]
 
     def test_some_holding_does_not_imply_version_with_more_supporting_factors(
         self, make_rule
@@ -212,7 +207,6 @@ class TestImplication:
 
         assert not make_rule["h_near_means_curtilage_even_if"] >= make_rule["h2"]
         assert make_rule["h_near_means_curtilage_even_if"] <= make_rule["h2"]
-
 
     def test_implication_with_evidence(self, make_rule):
         assert make_rule["h3"] > make_rule["h3_fewer_inputs"]
@@ -251,7 +245,9 @@ class TestImplication:
         When an input becomes more specific, the Rule becomes less specific.
         """
         small_reliable = make_complex_rule["accept_small_weight_reliable"]
-        small_more_reliable = make_complex_rule["accept_small_weight_reliable_more_evidence"]
+        small_more_reliable = make_complex_rule[
+            "accept_small_weight_reliable_more_evidence"
+        ]
         assert small_reliable >= small_more_reliable
         assert not small_more_reliable >= small_reliable
 
@@ -272,8 +268,10 @@ class TestImplication:
         """
         small_reliable = make_complex_rule["accept_small_weight_reliable"]
         small_more_reliable_holding = Holding(
-            make_complex_rule["accept_small_weight_reliable_more_evidence"])
+            make_complex_rule["accept_small_weight_reliable_more_evidence"]
+        )
         assert small_reliable >= small_more_reliable_holding
+
 
 class TestContradiction:
     def test_some_holding_consistent_with_absent_output(self, make_rule):
@@ -285,12 +283,8 @@ class TestContradiction:
         assert not make_rule["h2_output_false"].contradicts(make_rule["h2"])
 
     def test_some_holding_consistent_with_absent_false_output(self, make_rule):
-        assert not make_rule["h2"].contradicts(
-            make_rule["h2_output_absent_false"]
-        )
-        assert not make_rule["h2_output_absent_false"].contradicts(
-            make_rule["h2"]
-        )
+        assert not make_rule["h2"].contradicts(make_rule["h2_output_absent_false"])
+        assert not make_rule["h2_output_absent_false"].contradicts(make_rule["h2"])
 
     def test_contradicts_if_valid_some_vs_all(self, make_rule):
 
@@ -380,7 +374,8 @@ class TestContradiction:
         same place as "the stockpile of trees", there's no contradiction.
         """
         stockpile_means_stockpile = ContextRegister(
-            {Entity("the stockpile of trees"): Entity("the stockpile of trees")})
+            {Entity("the stockpile of trees"): Entity("the stockpile of trees")}
+        )
         assert not make_rule["h_output_distance_less"].contradicts(
             make_rule["h_output_distance_more"], context=stockpile_means_stockpile
         )
@@ -411,36 +406,20 @@ class TestContradiction:
         )
 
     def test_always_may_contradicts_sometimes_must_not(self, make_rule):
-        assert make_rule["h2_ALL"].contradicts(
-            make_rule["h2_SOME_MUST_output_false"]
-        )
-        assert make_rule["h2_SOME_MUST_output_false"].contradicts(
-            make_rule["h2_ALL"]
-        )
+        assert make_rule["h2_ALL"].contradicts(make_rule["h2_SOME_MUST_output_false"])
+        assert make_rule["h2_SOME_MUST_output_false"].contradicts(make_rule["h2_ALL"])
 
     def test_always_may_contradicts_sometimes_must_omit_output(self, make_rule):
-        assert make_rule["h2_ALL"].contradicts(
-            make_rule["h2_SOME_MUST_output_absent"]
-        )
-        assert make_rule["h2_SOME_MUST_output_absent"].contradicts(
-            make_rule["h2_ALL"]
-        )
+        assert make_rule["h2_ALL"].contradicts(make_rule["h2_SOME_MUST_output_absent"])
+        assert make_rule["h2_SOME_MUST_output_absent"].contradicts(make_rule["h2_ALL"])
 
     def test_sometimes_must_contradicts_always_may_not(self, make_rule):
-        assert make_rule["h2_MUST"].contradicts(
-            make_rule["h2_ALL_MAY_output_false"]
-        )
-        assert make_rule["h2_ALL_MAY_output_false"].contradicts(
-            make_rule["h2_MUST"]
-        )
+        assert make_rule["h2_MUST"].contradicts(make_rule["h2_ALL_MAY_output_false"])
+        assert make_rule["h2_ALL_MAY_output_false"].contradicts(make_rule["h2_MUST"])
 
     def test_sometimes_must_contradicts_always_must_not(self, make_rule):
-        assert make_rule["h2_MUST"].contradicts(
-            make_rule["h2_ALL_MUST_output_false"]
-        )
-        assert make_rule["h2_ALL_MUST_output_false"].contradicts(
-            make_rule["h2_MUST"]
-        )
+        assert make_rule["h2_MUST"].contradicts(make_rule["h2_ALL_MUST_output_false"])
+        assert make_rule["h2_ALL_MUST_output_false"].contradicts(make_rule["h2_MUST"])
 
     def test_some_must_no_contradict_some_may(self, make_rule):
         assert not make_rule["h2_MUST"].contradicts(make_rule["h2"])
@@ -448,18 +427,20 @@ class TestContradiction:
 
     # Contradiction of other types
 
-    def test_sometimes_must_contradicts_holding_always_must_not(self, make_rule, make_holding):
+    def test_sometimes_must_contradicts_holding_always_must_not(
+        self, make_rule, make_holding
+    ):
         assert make_rule["h2_MUST"].contradicts(
             make_holding["h2_ALL_MUST_output_false"]
         )
 
     def test_no_contradiction_of_fact(self, make_rule, watt_factor):
-        assert not make_rule["h2_MUST"].contradicts(
-            watt_factor["f2"])
+        assert not make_rule["h2_MUST"].contradicts(watt_factor["f2"])
 
     def test_error_for_contradiction_of_predicate(self, make_rule, watt_factor):
         with pytest.raises(TypeError):
             make_rule["h2_MUST"].contradicts(watt_factor["f2"].predicate)
+
 
 class TestAddition:
     def test_add_factor_to_rule(self, make_complex_rule, make_factor):
@@ -470,13 +451,18 @@ class TestAddition:
         """
         c = make_complex_rule
         assert not c["accept_murder_fact_from_relevance"].means(
-            c["accept_murder_fact_from_relevance_and_shooting"])
-        two_input_rule = c["accept_murder_fact_from_relevance"] + make_factor["f_shooting"]
+            c["accept_murder_fact_from_relevance_and_shooting"]
+        )
+        two_input_rule = (
+            c["accept_murder_fact_from_relevance"] + make_factor["f_shooting"]
+        )
         assert two_input_rule.means(c["accept_murder_fact_from_relevance_and_shooting"])
 
     def test_add_factor_to_rule_reverse(self, make_complex_rule, make_factor):
         c = make_complex_rule
-        two_input_rule = make_factor["f_shooting"] + c["accept_murder_fact_from_relevance"]
+        two_input_rule = (
+            make_factor["f_shooting"] + c["accept_murder_fact_from_relevance"]
+        )
         assert two_input_rule.means(c["accept_murder_fact_from_relevance_and_shooting"])
 
     def test_add_enactment_to_rule_reverse(self, make_complex_rule, make_enactment):
@@ -517,7 +503,8 @@ class TestAddition:
             Procedure(
                 inputs=Fact(Predicate("{} was a fact"), context_factors=context),
                 outputs=Fact(
-                    Predicate("{} was an original work", truth=False), context_factors=context
+                    Predicate("{} was an original work", truth=False),
+                    context_factors=context,
                 ),
             ),
             universal=True,
@@ -525,10 +512,12 @@ class TestAddition:
         unoriginal_not_copyrightable = Rule(
             Procedure(
                 inputs=Fact(
-                    Predicate("{} was an original work", truth=False), context_factors=three
+                    Predicate("{} was an original work", truth=False),
+                    context_factors=three,
                 ),
                 outputs=Fact(
-                    Predicate("{} was copyrightable", truth=False), context_factors=three
+                    Predicate("{} was copyrightable", truth=False),
+                    context_factors=three,
                 ),
             ),
             universal=True,
@@ -537,14 +526,16 @@ class TestAddition:
         facts_not_copyrightable = fact_not_original + unoriginal_not_copyrightable
         assert len(facts_not_copyrightable.inputs) == 1
         assert str(facts_not_copyrightable.inputs[0]).endswith(
-            "act that <the Pythagorean theorem> was a fact")
+            "act that <the Pythagorean theorem> was a fact"
+        )
         assert len(facts_not_copyrightable.outputs) == 2
         assert str(facts_not_copyrightable.outputs[1]).endswith(
-            "false that <the Pythagorean theorem> was copyrightable")
-
+            "false that <the Pythagorean theorem> was copyrightable"
+        )
 
     def test_add_rules_with_duplicate_enactment_text(
-        self, make_enactment, make_opinion_with_holding):
+        self, make_enactment, make_opinion_with_holding
+    ):
         """
         test implication between
         telephone listings -> not original (feist.holdings[11])
@@ -568,18 +559,25 @@ class TestAddition:
         )
         assert len(listings_not_copyrightable.inputs) == 1
         assert any(
-            out.short_string == (
-            "absence of the fact that <Rural's telephone listings> were copyrightable"
+            out.short_string
+            == (
+                "absence of the fact that <Rural's telephone listings> were copyrightable"
             )
             for out in listings_not_copyrightable.outputs
         )
-        assert listings_not_copyrightable.short_string.count("in accordance with this title") == 1
+        assert (
+            listings_not_copyrightable.short_string.count(
+                "in accordance with this title"
+            )
+            == 1
+        )
 
     def test_add_some_plus_some_makes_none(self, make_complex_rule):
         """The rules can't be added because they both have universal==False"""
         new_rule = (
             make_complex_rule["accept_relevance_testimony"]
-            + make_complex_rule["accept_murder_fact_from_relevance"])
+            + make_complex_rule["accept_murder_fact_from_relevance"]
+        )
         assert new_rule is None
 
     def test_add_complex_rule(self, make_complex_rule):
@@ -589,15 +587,24 @@ class TestAddition:
         """
         new_rule = (
             make_complex_rule["accept_relevance_testimony_ALL"]
-            + make_complex_rule["accept_murder_fact_from_relevance"])
+            + make_complex_rule["accept_murder_fact_from_relevance"]
+        )
         assert new_rule.universal is False
-        assert new_rule.inputs == make_complex_rule["accept_relevance_testimony_ALL"].inputs
-        assert make_complex_rule["accept_murder_fact_from_relevance"].outputs[0] in new_rule.outputs
+        assert (
+            new_rule.inputs
+            == make_complex_rule["accept_relevance_testimony_ALL"].inputs
+        )
+        assert (
+            make_complex_rule["accept_murder_fact_from_relevance"].outputs[0]
+            in new_rule.outputs
+        )
 
     def test_add_disconnected_rules_returns_none(self, make_rule):
         assert make_rule["h1"] + make_rule["h2_ALL"] is None
 
-    def test_rule_requiring_more_enactments_wont_add(self, make_enactment, make_complex_rule):
+    def test_rule_requiring_more_enactments_wont_add(
+        self, make_enactment, make_complex_rule
+    ):
         """
         This requirement might be changed, so that if the second
         Rule requires more Enactments the method will just assume they're
@@ -605,11 +612,15 @@ class TestAddition:
         """
         due_process_rule = (
             make_complex_rule["accept_murder_fact_from_relevance"]
-            + make_enactment["due_process_5"])
-        assert make_complex_rule["accept_relevance_testimony_ALL"] + due_process_rule is None
+            + make_enactment["due_process_5"]
+        )
+        assert (
+            make_complex_rule["accept_relevance_testimony_ALL"] + due_process_rule
+            is None
+        )
+
 
 class TestUnion:
-
     def test_union_contradictory_outputs(self, make_opinion_with_holding):
         """
         Test that even when two Rules don't contradict each other,
@@ -683,11 +694,15 @@ class TestUnion:
         in a new Procedure created with the __or__ method.
         """
         original_on_left = make_rule["h1_easy"] | make_rule["h1_entity_order"]
-        assert "act that <Hideaway Lodge> was <Wattenburg>’s abode" in str(original_on_left)
+        assert "act that <Hideaway Lodge> was <Wattenburg>’s abode" in str(
+            original_on_left
+        )
 
     def test_union_implied_change_context_reverse(self, make_rule):
         original_on_right = make_rule["h1_entity_order"] | make_rule["h1_easy"]
-        assert "that <Wattenburg> was <Hideaway Lodge>’s abode" in str(original_on_right)
+        assert "that <Wattenburg> was <Hideaway Lodge>’s abode" in str(
+            original_on_right
+        )
 
     def test_union_change_context(self, make_opinion_with_holding):
         """
@@ -702,7 +717,10 @@ class TestUnion:
         # nothing can be inferred by their union.
         lotus_4 = lotus.holdings[2].rule.evolve("universal")
         new = lotus_4 | oracle.holdings[2].rule
-        assert "<the Lotus menu command hierarchy> was the expression of an idea" in new.short_string
+        assert (
+            "<the Lotus menu command hierarchy> was the expression of an idea"
+            in new.short_string
+        )
         assert new.mandatory is False
 
     def test_union_one_generic_not_matched(self, make_opinion_with_holding):
@@ -719,7 +737,8 @@ class TestUnion:
         new = lotus.holdings[7].rule | oracle.holdings[3].rule
         text = (
             "that <the Lotus menu command hierarchy> was a "
-            "literal element of <Lotus 1-2-3>")
+            "literal element of <Lotus 1-2-3>"
+        )
         assert text in new.short_string
 
     def test_union_returns_universal(self, make_rule):
