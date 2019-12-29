@@ -88,12 +88,13 @@ class Exhibit(Factor):
         text = ""
         if self.form:
             text += f"in the FORM of {self.form}"
-        if self.statement_attribution:
-            text += f"\n" + indented(f"STATED BY {str(self.statement_attribution)}")
         if self.statement:
-            text += f"\n" + indented(f"ASSERTING:")
+            text += f"\n" + indented(f"WITH THE ASSERTION:")
             factor_text = indented(str(self.statement), tabs=2)
-            text += f"\n{str(factor_text)}"
+            text += f"\n{str(factor_text)},"
+        if self.statement_attribution:
+            text += f"\n" + indented(f"ATTRIBUTED TO {str(self.statement_attribution)}")
+
         return super().__str__().format(text)
 
 

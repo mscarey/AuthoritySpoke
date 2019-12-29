@@ -1,5 +1,6 @@
 from authorityspoke.io import dump, loaders, name_index, readers
 from authorityspoke.jurisdictions import Regime
+from authorityspoke.evidence import Exhibit
 from authorityspoke.rules import Rule
 
 
@@ -51,6 +52,13 @@ class TestLoadRules:
         indexed_rules, mentioned = name_index.index_names(raw_rules[0]["inputs"])
         key = "the suspected beard occurred on or below the chin"
         assert mentioned[key]["context_factors"][0] == "the suspected beard"
+
+    def test_rule_with_exhibit_as_context_factor(self, make_regime):
+        rules, mentioned = loaders.load_rules_with_index(
+            "beard_rules.json", regime=make_regime
+        )
+        exhibit = rules[4].inputs[0].context_factors[1]
+        assert isinstance(exhibit, Exhibit)
 
     def test_load_rules_and_index_names(self, make_regime):
         rules, mentioned = loaders.load_rules_with_index(
