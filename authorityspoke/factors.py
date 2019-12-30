@@ -20,6 +20,36 @@ from authorityspoke.enactments import Enactment
 logger = logging.getLogger(__name__)
 
 
+def seek_factor_by_name(
+    name: str, source_factor: Factor, source_opinion: Opinion
+) -> Factor:
+    r"""
+    Find a Factor matching a name in a Factor or Opinion.
+
+    :param name:
+        the name of a Factor to seek and return. Usually the name will correspond to an
+        :class:`.Entity` because Entities have shorter names.
+
+    :param source_factor:
+        A Factor that might have a context factor matching the "name". Usually the source_factor
+        is the Factor that will be assigned a new context, which would include replacing the
+        context factor that matches "name"
+
+    :param source_opinion:
+        An :class:`.Opinion` to search for a context factor matching "name" if the search of the
+        source_factor fails.
+
+    :returns:
+        a found Factor matching "name"
+    """
+    result = source_factor.get_factor_by_name(name)
+    if source_opinion and not result:
+        result = source_opinion.get_factor_by_name(name)
+    if not result:
+        raise ValueError(f"Unable to find a Factor with the name '{name}'")
+    return result
+
+
 def new_context_helper(func: Callable):
     r"""
     Search :class:`.Factor` for generic :class:`.Factor`\s to use in new context.
@@ -79,16 +109,9 @@ def new_context_helper(func: Callable):
         for context_factor in changes:
             name_to_seek = changes[context_factor]
             if isinstance(name_to_seek, str):
-                changes[context_factor] = factor.get_factor_by_name(name_to_seek)
-            if context_opinion and not changes[context_factor]:
-                changes[context_factor] = context_opinion.get_factor_by_name(
-                    name_to_seek
+                changes[context_factor] = seek_factor_by_name(
+                    name_to_seek, factor, context_opinion
                 )
-            if not changes[context_factor]:
-                raise ValueError(
-                    f"Unable to find a Factor with the name '{name_to_seek}'"
-                )
-
             if factor.means(context_factor) and factor.name == context_factor.name:
                 return changes[context_factor]
 

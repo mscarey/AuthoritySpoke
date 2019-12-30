@@ -1,4 +1,5 @@
 import logging
+
 import pytest
 
 from authorityspoke.entities import Entity
@@ -53,6 +54,16 @@ class TestRules:
     def test_new_context_dict_must_be_dict(self, make_holding, make_predicate):
         with pytest.raises(TypeError):
             make_holding["h1"].new_context([make_predicate["p1"], make_predicate["p2"]])
+
+    def test_new_context_choose_factor_to_replace_by_name(self, make_beard_rule):
+        transfer_rule = make_beard_rule[10]
+        barber_rule = make_beard_rule[-1]
+        defendant = transfer_rule.generic_factors[0]
+        counterparty = transfer_rule.generic_factors[2]
+        defendant_rule = barber_rule.new_context(
+            {"the barber": defendant, "the customer": counterparty}
+        )
+        assert defendant_rule.generic_factors[1].name == "the defendant"
 
     def test_generic_factors(self, make_entity, make_holding):
         generics = make_holding["h3"].generic_factors

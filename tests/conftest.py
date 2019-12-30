@@ -1,4 +1,4 @@
-from typing import Any, Dict, Tuple
+from typing import Any, Dict, List, Tuple
 
 from anchorpoint.textselectors import TextQuoteSelector
 import pytest
@@ -1078,6 +1078,12 @@ def make_rule(make_procedure, make_enactment) -> Dict[str, Rule]:
         "h_output_distance_more": Rule(c["c_output_distance_more"]),
     }
 
+@pytest.fixture(scope="class")
+def make_beard_rule() -> List[Rule]:
+    """Rules from the "Beard Tax Act" example statutes."""
+    beard_act = loaders.load_and_read_code("beard_tax_act.xml")
+    beard_dictionary = loaders.load_holdings("beard_rules.json")
+    return readers.read_rules(beard_dictionary, beard_act)
 
 @pytest.fixture(scope="class")
 def make_holding(make_rule) -> Dict[str, Holding]:
