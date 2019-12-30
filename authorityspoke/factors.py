@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 
 
 def seek_factor_by_name(
-    name: str, source_factor: Factor, source_opinion: Opinion
+    name: Union[Factor, str], source_factor: Factor, source_opinion: Opinion
 ) -> Factor:
     r"""
     Find a Factor matching a name in a Factor or Opinion.
@@ -42,6 +42,8 @@ def seek_factor_by_name(
     :returns:
         a found Factor matching "name"
     """
+    if not isinstance(name, str):
+        return name
     result = source_factor.get_factor_by_name(name)
     if source_opinion and not result:
         result = source_opinion.get_factor_by_name(name)
@@ -106,16 +108,17 @@ def new_context_helper(func: Callable):
                 )
             changes = ContextRegister(dict(zip(generic_factors, changes)))
 
-        for context_factor in changes:
-            name_to_seek = changes[context_factor]
-            if isinstance(name_to_seek, str):
-                changes[context_factor] = seek_factor_by_name(
-                    name_to_seek, factor, context_opinion
-                )
-            if factor.means(context_factor) and factor.name == context_factor.name:
-                return changes[context_factor]
+        expanded_changes = {
+            seek_factor_by_name(old, factor, context_opinion): seek_factor_by_name(
+                new, factor, context_opinion
+            )
+            for old, new in changes.items()
+        }
+        for old, new in expanded_changes.items():
+            if factor.means(old) and factor.name == old.name:
+                return new
 
-        return func(factor, changes)
+        return func(factor, expanded_changes)
 
     return wrapper
 
