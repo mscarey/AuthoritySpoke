@@ -108,12 +108,14 @@ def new_context_helper(func: Callable):
                 )
             changes = ContextRegister(dict(zip(generic_factors, changes)))
 
-        expanded_changes = {
-            seek_factor_by_name(old, factor, context_opinion): seek_factor_by_name(
-                new, factor, context_opinion
-            )
-            for old, new in changes.items()
-        }
+        expanded_changes = ContextRegister(
+            {
+                seek_factor_by_name(old, factor, context_opinion): seek_factor_by_name(
+                    new, factor, context_opinion
+                )
+                for old, new in changes.items()
+            }
+        )
         for old, new in expanded_changes.items():
             if factor.means(old) and factor.name == old.name:
                 return new

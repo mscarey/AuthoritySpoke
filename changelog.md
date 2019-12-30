@@ -1,10 +1,12 @@
 Changelog
 =========
 
-0.3.1 (2019-12-28)
+0.3.1 (dev)
 -----------
 - Fix bug where some types of cross-references caused loading of Holdings from JSON to fail
 - Update case download function because Case Access Project API no longer includes "casebody" field in all responses from cases endpoint
+- `new_context` function can use string to find Factor to be replaced
+- Enactment URIs can target a chapeau or continuation
 
 0.3.0 (2019-12-07)
 ------------------

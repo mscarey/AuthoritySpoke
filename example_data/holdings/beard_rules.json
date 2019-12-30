@@ -12,6 +12,34 @@
             {
                 "type": "fact",
                 "content": "the suspected beard occurred on or below the chin"
+            }
+        ],
+        "outputs": [
+            {
+                "type": "fact",
+                "content": "the suspected beard was a beard",
+                "name": "the fact that the facial hair was a beard"
+            }
+        ],
+        "enactments": [
+            {
+                "source": "/au/act/1934/47/1/4/chapeau"
+            },
+            {
+                "source": "/au/act/1934/47/1/4/a"
+            }
+        ],
+        "universal": true
+    },
+    {
+        "inputs": [
+            {
+                "type": "fact",
+                "content": "{the suspected beard} was facial hair"
+            },
+            {
+                "type": "fact",
+                "content": "the length of the suspected beard was >= 5 millimetres"
             },
             {
                 "type": "fact",
@@ -27,7 +55,10 @@
         ],
         "enactments": [
             {
-                "source": "/au/act/1934/47/1/4"
+                "source": "/au/act/1934/47/1/4/chapeau"
+            },
+            {
+                "source": "/au/act/1934/47/1/4/b"
             }
         ],
         "universal": true

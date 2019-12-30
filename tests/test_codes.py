@@ -66,6 +66,11 @@ class TestCodes:
         text = code.select_text("/au/act/1934/47/1")
         assert text.startswith("This Act may be cited")
 
+    def test_code_select_text_chapeau(self, make_code):
+        code = make_code["beard_act"]
+        text = code.select_text("/au/act/1934/47/1/4/chapeau")
+        assert text.startswith("In this Act, beard means")
+
     def test_get_bill_of_rights_effective_date(self, make_code):
         const = make_code["const"]
         bill_of_rights_date = datetime.date(1791, 12, 15)

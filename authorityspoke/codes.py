@@ -134,12 +134,14 @@ class Code:
         """
         Get sections using relative path, assuming Code follows USLM standard.
         """
+        passage_nodes = ["chapeau", "paragraph", "content", "continuation"]
+        if docpath.endswith(("chapeau", "continuation")):
+            docpath, suffix = docpath.rsplit("/", maxsplit=1)
+            passage_nodes = [suffix]
         sections = self.xml.find(identifier=docpath)
         if not sections:
             return None
-        passages = sections.find_all(
-            ["chapeau", "paragraph", "content", "continuation"]
-        )
+        passages = sections.find_all(passage_nodes)
 
         return passages
 

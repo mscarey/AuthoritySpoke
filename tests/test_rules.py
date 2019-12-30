@@ -56,7 +56,7 @@ class TestRules:
             make_holding["h1"].new_context([make_predicate["p1"], make_predicate["p2"]])
 
     def test_new_context_choose_factor_to_replace_by_name(self, make_beard_rule):
-        transfer_rule = make_beard_rule[10]
+        transfer_rule = make_beard_rule[11]
         barber_rule = make_beard_rule[-1]
         defendant = transfer_rule.generic_factors[0]
         counterparty = transfer_rule.generic_factors[2]
