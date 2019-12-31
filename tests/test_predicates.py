@@ -1,6 +1,6 @@
 import pytest
 
-from authorityspoke.predicates import Predicate, ureg, Q_
+from authorityspoke.predicates import Predicate, Q_
 
 
 class TestPredicates:
@@ -18,13 +18,13 @@ class TestPredicates:
 
     def test_convert_false_statement_about_quantity_to_obverse(self, make_predicate):
         assert make_predicate["p7_obverse"].truth is True
-        assert make_predicate["p7_obverse"].quantity == ureg.Quantity(35, "foot")
+        assert make_predicate["p7_obverse"].quantity == Q_(35, "foot")
         assert make_predicate["p7"].truth is True
         assert make_predicate["p7"].comparison == "<="
         assert make_predicate["p7_obverse"].comparison == "<="
 
     def test_quantity_type(self, make_predicate):
-        assert isinstance(make_predicate["p7"].quantity, ureg.Quantity)
+        assert isinstance(make_predicate["p7"].quantity, Q_)
 
     def test_quantity_string(self, make_predicate):
         assert str(make_predicate["p7"].quantity) == "35 foot"

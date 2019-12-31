@@ -843,6 +843,7 @@ class TestBuildRules:
                 source="/au/act/1934/47/1/4/", code=make_code["beard_act"]
             ),
         )
+        # assert make_beard_rule[0].inputs[1].contradicts(hypothetical.inputs[1])
         meets_chin_test = make_beard_rule[0].implies(hypothetical)
         meets_ear_test = make_beard_rule[1].implies(hypothetical)
         assert outcome == meets_chin_test or meets_ear_test

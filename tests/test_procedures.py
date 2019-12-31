@@ -9,7 +9,7 @@ from authorityspoke.procedures import consistent_factor_groups
 from authorityspoke.procedures import contradictory_factor_groups
 from authorityspoke.rules import Rule
 from authorityspoke.opinions import Opinion
-from authorityspoke.predicates import Predicate, ureg, Q_
+from authorityspoke.predicates import Predicate, Q_
 from authorityspoke.facts import Fact
 
 

@@ -43,9 +43,6 @@ from authorityspoke.io.schemas import (
 )
 from authorityspoke.io.name_index import index_names, Mentioned
 
-
-ureg = UnitRegistry()
-
 FACTOR_SUBCLASSES = {
     class_obj.__name__: class_obj
     for class_obj in (Allegation, Entity, Exhibit, Evidence, Fact, Pleading)

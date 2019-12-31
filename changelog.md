@@ -7,6 +7,7 @@ Changelog
 - Update case download function because Case Access Project API no longer includes "casebody" field in all responses from cases endpoint
 - `new_context` function can use string to find Factor to be replaced
 - Enactment URIs can target a chapeau or continuation
+- Fix bug that created [multiple pint Unit Registries](https://github.com/hgrecco/pint/issues/581)
 
 0.3.0 (2019-12-07)
 ------------------

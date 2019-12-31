@@ -22,13 +22,11 @@ from authorityspoke.io.nesting import nest_fields
 from authorityspoke.io import text_expansion
 from authorityspoke.opinions import Opinion
 from authorityspoke.pleadings import Pleading, Allegation
-from authorityspoke.predicates import Predicate
+from authorityspoke.predicates import Predicate, ureg, Q_
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
 
 from utils.marshmallow_oneofschema.one_of_schema import OneOfSchema
-
-ureg = UnitRegistry()
 
 RawSelector = Union[str, Dict[str, str]]
 RawEnactment = Dict[str, Union[str, List[RawSelector]]]
@@ -264,7 +262,7 @@ def read_quantity(value: Union[float, int, str]) -> Union[float, int, ureg.Quant
         substring.isnumeric() for substring in float_parts
     ):
         return float(quantity)
-    return ureg.Quantity(quantity)
+    return Q_(quantity)
 
 
 def dump_quantity(obj: Predicate) -> Optional[Union[float, int, str]]:

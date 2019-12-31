@@ -3,7 +3,6 @@ import os
 import pathlib
 
 from marshmallow import ValidationError
-import pint
 import pytest
 
 from authorityspoke.enactments import Code, Enactment
@@ -13,8 +12,6 @@ from authorityspoke.io.loaders import load_holdings
 from authorityspoke.io import filepaths
 from authorityspoke.io.dump import to_dict, to_json
 from authorityspoke.io.text_expansion import expand_shorthand
-
-ureg = pint.UnitRegistry()
 
 
 class TestFactorLoad:

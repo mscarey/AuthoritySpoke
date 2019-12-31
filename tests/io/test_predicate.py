@@ -1,11 +1,8 @@
-import pint
 import pytest
 
-from authorityspoke.predicates import Predicate
+from authorityspoke.predicates import Predicate, Q_
 from authorityspoke.io import readers, schemas
 from authorityspoke.io.dump import to_dict, to_json
-
-ureg = pint.UnitRegistry()
 
 
 class TestPredicateLoad:
@@ -89,7 +86,7 @@ class TestPredicateDump:
             truth=True,
             reciprocal=True,
             comparison="<>",
-            quantity=ureg.Quantity("35 feet"),
+            quantity=Q_("35 feet"),
         )
         dumped = to_dict(predicate)
         assert dumped["quantity"] == "35 foot"

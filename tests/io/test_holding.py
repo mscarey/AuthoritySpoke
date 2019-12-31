@@ -1,7 +1,6 @@
 from collections import OrderedDict
 
 from marshmallow import ValidationError
-import pint
 import pytest
 
 from anchorpoint.textselectors import TextQuoteSelector
@@ -17,8 +16,6 @@ from authorityspoke.io import anchors, loaders, readers, schemas, dump, name_ind
 from authorityspoke.io.loaders import load_holdings
 from authorityspoke.io import filepaths, text_expansion
 from authorityspoke.rules import Rule
-
-ureg = pint.UnitRegistry()
 
 
 class TestHoldingDump:

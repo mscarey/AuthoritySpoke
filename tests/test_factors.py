@@ -8,7 +8,7 @@ from authorityspoke.factors import Factor, ContextRegister, means
 from authorityspoke.facts import Fact, build_fact
 from authorityspoke.rules import Rule
 from authorityspoke.opinions import Opinion
-from authorityspoke.predicates import ureg, Q_, Predicate
+from authorityspoke.predicates import Q_, Predicate
 
 
 class TestFacts:
