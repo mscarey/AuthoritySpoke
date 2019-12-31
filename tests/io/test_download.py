@@ -1,6 +1,7 @@
 import json
 import os
 
+from dotenv import load_dotenv
 import pytest
 
 from authorityspoke.io.downloads import download_case
@@ -9,7 +10,8 @@ from authorityspoke.io.loaders import load_decision
 from authorityspoke.io.loaders import load_and_read_decision
 from authorityspoke.io import writers
 
-# pytestmark = pytest.mark.skip("don't want to call API")
+
+load_dotenv()
 
 
 class TestDownload:
@@ -68,6 +70,9 @@ class TestDownload:
         The author field is only available because of the full_case flag.
         """
         lotus = download_case(
-            cite="49 F.3d 807", full_case=True, api_key=os.environ["CAP_API_KEY"],
+            cite="49 F.3d 807",
+            full_case=True,
+            api_key=os.getenv("CAP_API_KEY"),
+            many=False,
         )
         assert lotus["casebody"]["data"]["opinions"][0]["author"].startswith("STAHL")
