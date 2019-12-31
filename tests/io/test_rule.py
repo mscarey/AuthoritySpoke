@@ -1,14 +1,6 @@
 from authorityspoke.io import dump, loaders, name_index, readers
-from authorityspoke.jurisdictions import Regime
-from authorityspoke.enactments import Enactment
-from authorityspoke.entities import Entity
 from authorityspoke.evidence import Exhibit
-from authorityspoke.facts import Fact
-from authorityspoke.predicates import Predicate, Q_
-from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
-
-import pytest
 
 
 class TestRuleDump:

@@ -120,6 +120,9 @@ class DecisionSchema(ExpandableSchema):
     date = fields.Date(data_key="decision_date")
     court = fields.Str()
     jurisdiction = fields.Str(missing=None)
+    # docket_number = fields.Str(missing=None)
+    # reporter = fields.Str(missing=None)
+    # volume = fields.Str(missing=None)
     _id = fields.Int(data_key="id")
 
     @pre_load
@@ -129,12 +132,12 @@ class DecisionSchema(ExpandableSchema):
         data["opinions"] = (
             data.get("casebody", {}).get("data", {}).get("opinions", [{}])
         )
+        data.pop("docket_number", None)
         data.pop("casebody", None)
-        del data["docket_number"]
-        del data["reporter"]
+        data.pop("reporter", None)
+        data.pop("volume", None)
         del data["url"]
         data.pop("frontend_url", None)
-        del data["volume"]
         return data
 
     @post_load
