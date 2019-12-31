@@ -2,11 +2,12 @@ import logging
 
 import pytest
 
+from authorityspoke.enactments import Enactment
 from authorityspoke.entities import Entity
 from authorityspoke.factors import ContextRegister
 from authorityspoke.facts import Fact
 from authorityspoke.holdings import Holding
-from authorityspoke.predicates import Predicate
+from authorityspoke.predicates import Predicate, Q_
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
 
@@ -776,3 +777,72 @@ class TestUnion:
         oracle = make_opinion_with_holding["oracle_majority"]
         oracle_copyrightable = oracle.holdings[0].rule
         assert feist_copyrightable | oracle_copyrightable is None
+
+
+class TestBuildRules:
+    @pytest.mark.parametrize(
+        (
+            "facial_hair_over_5mm, facial_hair_on_or_below_chin, "
+            "facial_hair_uninterrupted, outcome"
+        ),
+        (
+            [False, False, True, False],
+            [False, False, False, False],
+            [False, True, False, False],
+            [False, True, True, False],
+            [True, False, True, True],
+            [True, False, False, False],
+            [True, True, True, True],
+            [True, True, None, True],
+            [True, None, True, True],
+        ),
+    )
+    def test_is_beard_implied(
+        self,
+        facial_hair_over_5mm,
+        facial_hair_on_or_below_chin,
+        facial_hair_uninterrupted,
+        outcome,
+        make_beard_rule,
+        make_code,
+    ):
+        beard = Entity("a facial feature")
+
+        hypothetical = Rule(
+            procedure=Procedure(
+                inputs=[
+                    Fact(Predicate("{} was facial hair"), context_factors=beard),
+                    Fact(
+                        Predicate(
+                            "the length of {} was {}",
+                            comparison=">=",
+                            quantity=Q_("5 millimeters"),
+                            truth=facial_hair_over_5mm,
+                        ),
+                        context_factors=beard,
+                    ),
+                    Fact(
+                        Predicate(
+                            "{} occurred on or below the chin",
+                            truth=facial_hair_on_or_below_chin,
+                        ),
+                        context_factors=beard,
+                    ),
+                    Fact(
+                        Predicate(
+                            "{} existed in an uninterrupted line from the front "
+                            "of one ear to the front of the other ear below the nose",
+                            truth=facial_hair_uninterrupted,
+                        ),
+                        context_factors=beard,
+                    ),
+                ],
+                outputs=Fact(Predicate("{} was a beard"), context_factors=beard),
+            ),
+            enactments=Enactment(
+                source="/au/act/1934/47/1/4/", code=make_code["beard_act"]
+            ),
+        )
+        meets_chin_test = make_beard_rule[0].implies(hypothetical)
+        meets_ear_test = make_beard_rule[1].implies(hypothetical)
+        assert outcome == meets_chin_test or meets_ear_test

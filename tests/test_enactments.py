@@ -18,6 +18,16 @@ class TestEnactments:
         search_clause = make_enactment["search_clause"]
         assert search_clause.text.endswith("shall not be violated")
 
+    def test_create_enactment_with_init(self, make_code):
+        """
+        Using the __init__ method of the Enactment class, insteaid of
+        readers.read_enactment or the Enactment marshmallow schema.
+        """
+        beard_definition = Enactment(
+            source="/au/act/1934/47/1/4/", code=make_code["beard_act"]
+        )
+        assert beard_definition.text.startswith("In this Act, beard")
+
     def test_make_enactment_from_selector_without_code(self, make_code):
         select = TextQuoteSelector(suffix=", shall be vested")
         art_3 = Enactment(

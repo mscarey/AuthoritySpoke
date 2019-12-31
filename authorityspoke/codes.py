@@ -348,7 +348,7 @@ class USLMCode(Code):
         """
         Don't remove Code uri from path because USC uses full paths as identifiers.
         """
-        return path or self.uri
+        return path.rstrip("/") or self.uri
 
 
 class USCCode(USLMCode):
