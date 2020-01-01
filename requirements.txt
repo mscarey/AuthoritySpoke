@@ -17,4 +17,5 @@ beautifulsoup4>=4.8.1
 lxml
 marshmallow>=3.2.2
 pint>=0.9
+python-dotenv
 requests

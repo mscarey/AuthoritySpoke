@@ -26,7 +26,8 @@
                 "source": "/au/act/1934/47/1/4/chapeau"
             },
             {
-                "source": "/au/act/1934/47/1/4/a"
+                "source": "/au/act/1934/47/1/4/a",
+                "suffix": ", or"
             }
         ],
         "universal": true
@@ -248,7 +249,9 @@
             },
             {
                 "source": "/au/act/1934/47/3/7B/2"
-            },
+            }
+        ],
+        "enactments_despite": [
             {
                 "source": "/au/act/1934/47/4/11"
             }

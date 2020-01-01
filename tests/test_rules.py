@@ -11,6 +11,8 @@ from authorityspoke.predicates import Predicate, Q_
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
 
+from authorityspoke.io import loaders, readers
+
 
 class TestRules:
     def test_enactment_type_in_str(self, make_holding):
@@ -779,7 +781,31 @@ class TestUnion:
         assert feist_copyrightable | oracle_copyrightable is None
 
 
-class TestBuildRules:
+class TestStatuteRules:
+    """
+    Tests from the statute_rules Jupyter Notebook.
+    """
+
+    def test_greater_than_implies_equal(self, make_code, make_beard_rule):
+        beard_act = make_code["beard_act"]
+        beard_dictionary = loaders.load_holdings("beard_rules.json")
+        beard_dictionary[0]["inputs"][1][
+            "content"
+        ] = "the length of the suspected beard was = 8 millimetres"
+        longer_hair_rule = readers.read_rule(beard_dictionary[0], beard_act)
+        assert make_beard_rule[0].implies(longer_hair_rule)
+
+    def test_greater_than_contradicts_not_greater(self, make_code, make_beard_rule):
+        beard_act = make_code["beard_act"]
+        beard_dictionary = loaders.load_holdings("beard_rules.json")
+        beard_dictionary[1]["inputs"][1][
+            "content"
+        ] = "the length of the suspected beard was >= 12 inches"
+        beard_dictionary[1]["outputs"][0]["truth"] = False
+        beard_dictionary[1]["mandatory"] = True
+        long_hair_is_not_a_beard = readers.read_rule(beard_dictionary[1], beard_act)
+        assert make_beard_rule[1].contradicts(long_hair_is_not_a_beard)
+
     @pytest.mark.parametrize(
         (
             "facial_hair_over_5mm, facial_hair_on_or_below_chin, "
@@ -843,7 +869,6 @@ class TestBuildRules:
                 source="/au/act/1934/47/1/4/", code=make_code["beard_act"]
             ),
         )
-        # assert make_beard_rule[0].inputs[1].contradicts(hypothetical.inputs[1])
         meets_chin_test = make_beard_rule[0].implies(hypothetical)
         meets_ear_test = make_beard_rule[1].implies(hypothetical)
         assert outcome == meets_chin_test or meets_ear_test
