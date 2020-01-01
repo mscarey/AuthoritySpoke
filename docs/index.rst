@@ -25,6 +25,7 @@ Guides
     guides/introduction.rst
     guides/create_holding_data.rst
     guides/example_holdings.rst
+    guides/statute_rules.rst
 
 
 API Reference
