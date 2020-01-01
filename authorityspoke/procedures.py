@@ -237,6 +237,17 @@ class Procedure(Factor):
             return self.evolve({"outputs": unique_new_outputs})
         return None
 
+    def add_if_universal(self, other: Procedure) -> Optional[Procedure]:
+        if not isinstance(other, self.__class__):
+            return self.add_factor(other)
+        matchlist = self.triggers_next_procedure_if_universal(other)
+        if matchlist:
+            triggered_rule = other.new_context(matchlist[0])
+            new_outputs = [*self.outputs, *triggered_rule.outputs]
+            unique_new_outputs = tuple({key: None for key in new_outputs})
+            return self.evolve({"outputs": unique_new_outputs})
+        return None
+
     @use_likely_context
     def union(
         self, other: Procedure, context: Optional[ContextRegister] = None
@@ -621,9 +632,9 @@ class Procedure(Factor):
 
         .. Note::
             To be confident that ``self`` actually can trigger ``other``,
-            we would have to assume that ``other`` has ``universal: True``
-            since otherwise we don't know exactly what is required to
-            trigger ``other``.
+            we would have to assume that self or other has ``universal: True``
+            since otherwise there could be a mismatch between what is provided
+            and what is needed to trigger ``other``.
 
         :param other:
             another :class:`Procedure` to test to see whether it can
@@ -640,6 +651,31 @@ class Procedure(Factor):
             Analogy(other.inputs, self_output_or_input, operator.le),
             Analogy(other.despite, self_despite_or_input, operator.le),
         )
+        return all_analogy_matches(relations)
+
+    def triggers_next_procedure_if_universal(
+        self, other: Procedure
+    ) -> List[ContextRegister]:
+        r"""
+        Test if Factors from firing `self` trigger `other` if both are universal.
+
+        The difference from :func:`triggers_next_procedure` is that this
+        function doesn't require the "despite" :class:`.Factor`\s to
+        be addressed. If both calling :class:`.Rules`\s apply in "ALL"
+        cases where their inputs are present, then it doesn't matter
+        what Factors they apply "despite".
+
+        :param other:
+            another :class:`Procedure` to test to see whether it can
+            be triggered by triggering ``self``
+
+        :returns:
+            whether the set of :class:`Factor`\s that exist after ``self``
+            is fired could trigger ``other``
+        """
+        self_output_or_input = (*self.outputs, *self.inputs)
+
+        relations = (Analogy(other.inputs, self_output_or_input, operator.le),)
         return all_analogy_matches(relations)
 
 

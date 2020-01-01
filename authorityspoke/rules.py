@@ -130,10 +130,14 @@ class Rule(Factor):
         if self.universal is False and other.universal is False:
             return None
 
+        if self.universal and other.universal:
+            new_procedure = self.procedure.add_if_universal(other.procedure)
+        else:
+            new_procedure = self.procedure + other.procedure
+
         if not other.needs_subset_of_enactments(self):
             return None
 
-        new_procedure = self.procedure + other.procedure
         if new_procedure is not None:
             return self.evolve(
                 {
