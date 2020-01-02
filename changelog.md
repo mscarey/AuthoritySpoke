@@ -1,6 +1,14 @@
 Changelog
 =========
 
+0.3.3 (2020-01-01)
+-----------
+- Add `__init__.py` to utils folder
+
+0.3.2 (2020-01-01)
+-----------
+- Publish repo's utils folder as part of AuthoritySpoke package
+
 0.3.1 (2020-01-01)
 -----------
 - Fix bug where some types of cross-references caused loading of Holdings from JSON to fail
