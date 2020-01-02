@@ -6,7 +6,7 @@ from marshmallow import ValidationError
 from authorityspoke.io import nesting
 
 
-def expand_shorthand(obj: Dict) -> Dict[str, Any]:
+def expand_shorthand(obj: Union[List, Dict]) -> Union[List, Dict[str, Any]]:
     """Traverse dict and expand every kind of pre-loading shorthand."""
     return nesting.walk_tree_and_modify(
         obj=obj, func=expand_node_shorthand, ignore=("predicate",)

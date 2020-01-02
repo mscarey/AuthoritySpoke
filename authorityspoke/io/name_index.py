@@ -7,8 +7,6 @@ from copy import deepcopy
 
 from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
-from marshmallow import ValidationError
-
 from authorityspoke.io import text_expansion
 
 
@@ -205,7 +203,7 @@ RawContextFactors = List[Union[RawFactor, str]]
 def update_name_index_from_fact_content(
     obj: RawFactor, mentioned: Mentioned
 ) -> Tuple[RawFactor, Mentioned]:
-    """
+    r"""
     Update index of mentioned Factors from Factors mentioned in Fact's content, and vice versa.
 
     :param obj:
@@ -243,7 +241,7 @@ def update_name_index_from_fact_content(
 def update_name_index_with_factor(
     obj: RawFactor, mentioned: Mentioned
 ) -> Tuple[Union[str, RawFactor], Mentioned]:
-    """
+    r"""
     Update index of mentioned Factors with 'obj', if obj is named.
 
     If there is already an entry in the mentioned index with the same name

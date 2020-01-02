@@ -617,7 +617,7 @@ class HoldingSchema(ExpandableSchema):
         return self.__model__(**data)
 
 
-SCHEMAS = [schema for schema in ExpandableSchema.__subclasses__()] + [SelectorSchema]
+SCHEMAS = list(ExpandableSchema.__subclasses__()) + [SelectorSchema]
 
 
 def get_schema_for_item(item: Any) -> Schema:

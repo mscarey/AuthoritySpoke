@@ -5,8 +5,6 @@ These functions will usually be called by functions from the io.loaders module
 after they import some data from a file.
 """
 from copy import deepcopy
-import datetime
-from functools import partial
 from typing import NamedTuple
 
 from bs4 import BeautifulSoup
@@ -15,7 +13,6 @@ from typing import Any, Dict, List, Iterable, Iterator
 from typing import Optional, Sequence, Tuple, Type, Union
 
 from anchorpoint.textselectors import TextQuoteSelector
-from pint import UnitRegistry
 
 from authorityspoke.decisions import Decision
 from authorityspoke.codes import Code, USCCode, USLMCode, USConstCode, CalCode, CFRCode
@@ -395,7 +392,7 @@ def read_rule(record: Dict, regime: Optional[Regime] = None) -> Rule:
     return schema.load(record)
 
 
-def read_rules(record: List[Dict], regime: Optional[Regime] = None) -> Rule:
+def read_rules(record: List[Dict], regime: Optional[Regime] = None) -> List[Rule]:
     r"""
     Make :class:`Rule`\s from a list of fields and a :class:`.Regime`\.
 

@@ -251,7 +251,7 @@ class Fact(Factor):
 
 def build_fact(
     predicate: Predicate,
-    indices: Optional[Sequence[int]] = None,
+    indices: Optional[Union[int, Sequence[int]]] = None,
     case_factors: Optional[Union[Factor, Sequence[Factor]]] = None,
     name: Optional[str] = None,
     standard_of_proof: Optional[str] = None,

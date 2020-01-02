@@ -326,3 +326,10 @@ class TestFactorGroups:
             other_factors=(dan_poor, craig_rich),
             context=ContextRegister({alice: craig}),
         )
+
+
+class TestEvolve:
+    def test_evolve_context_to_absent(self, make_procedure):
+        procedure = make_procedure["c1"]
+        evolved = procedure.evolve("outputs")
+        assert procedure.outputs[0].contradicts(evolved.outputs[0])
