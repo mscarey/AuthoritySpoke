@@ -11,7 +11,7 @@ anchorpoint = ">=0.1.1"
 apispec = {extras = ["validation"],version = "*"}
 authorityspoke = {path = ".",editable = true}
 beautifulsoup4 = ">=4.8.1"
-lxml = "*"
+lxml = ">=4.4.2"
 marshmallow = ">=3.2.2"
 pint = ">=0.9"
 python-dotenv = "*"

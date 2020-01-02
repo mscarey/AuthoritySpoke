@@ -41,16 +41,16 @@ usa.set_code(load_and_read_code("usc17.xml"))
 usa.set_code(load_and_read_code("cfr37.xml"))
 ```
 
-Structured annotations about the holdings in _Oracle_ and _Lotus_ can also be loaded from the `example_data` folder, and can be linked to the `Opinion` objects.
+Structured annotations about the holdings in _Oracle_ and _Lotus_ can also be loaded from the `example_data` folder, and can be linked to the `Decision` objects.
 
 ```python
 from authorityspoke.io.loaders import load_and_read_holdings
 
-oracle.posit(*load_and_read_holdings("holding_oracle.json", regime=usa))
-lotus.posit(*load_and_read_holdings("holding_lotus.json", regime=usa))
+oracle.posit(load_and_read_holdings("holding_oracle.json", regime=usa))
+lotus.posit(load_and_read_holdings("holding_lotus.json", regime=usa))
 ```
 
-Now, each `Opinion` has a `.contradicts` method that can return a boolean indicating whether its holdings conflict with the holdings of another `Opinion`.
+Now, each `Decision` has a `.contradicts` method that can return a boolean indicating whether its holdings conflict with the holdings of another `Decision`.
 
 ```python
 print(lotus.contradicts(oracle))
@@ -68,7 +68,7 @@ print(explanation)
 ```
 
 ```
-an Explanation of why there is a contradiction between
+an Explanation of why there is a CONTRADICTION between
   the Holding to ACCEPT
     the Rule that the court MUST ALWAYS impose the
       RESULT:
@@ -136,10 +136,7 @@ Use the button below to interact with the notebook online through Binder. If you
 
 You can also find static versions of the tutorial notebooks, the API documentation, and more [in the project documentation](https://authorityspoke.readthedocs.io/en/latest/).
 
-
 ## Contributing to AuthoritySpoke
-
-Contributor documentation is coming soon!
 
 All participants are expected to follow the [code of conduct](code_of_conduct.md). AuthoritySpoke uses the [Contributor Covenant, version 1.4](https://www.contributor-covenant.org/version/1/4/code-of-conduct.html).
 

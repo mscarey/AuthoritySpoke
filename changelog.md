@@ -1,7 +1,7 @@
 Changelog
 =========
 
-0.3.1 (dev)
+0.3.1 (2020-01-01)
 -----------
 - Fix bug where some types of cross-references caused loading of Holdings from JSON to fail
 - Update case download function because Case Access Project API no longer includes "casebody" field in all responses from cases endpoint

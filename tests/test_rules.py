@@ -874,13 +874,13 @@ class TestStatuteRules:
         assert outcome == meets_chin_test or meets_ear_test
 
     def test_adding_definition_of_transfer(self, make_beard_rule):
-        loan_was_transfer = make_beard_rule[7]
+        loan_is_transfer = make_beard_rule[7]
         elements_of_offense = make_beard_rule[11]
         loan_without_exceptions = (
-            loan_was_transfer
-            + make_beard_rule[11].inputs[1]
-            + make_beard_rule[11].inputs[2]
-            + make_beard_rule[11].enactments[1]
+            loan_is_transfer
+            + elements_of_offense.inputs[1]
+            + elements_of_offense.inputs[2]
+            + elements_of_offense.enactments[1]
         )
         combined = loan_without_exceptions + elements_of_offense
         assert combined
