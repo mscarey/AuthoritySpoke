@@ -1,6 +1,10 @@
 Changelog
 =========
 
+0.3.4 (2020-01-02)
+-----------
+- Create broader conditions for Procedure.contradicts()
+
 0.3.3 (2020-01-01)
 -----------
 - Add `__init__.py` to utils folder

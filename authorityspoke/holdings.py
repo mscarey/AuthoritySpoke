@@ -12,8 +12,8 @@ from __future__ import annotations
 
 from itertools import chain
 import operator
-from typing import Any, Dict, Iterator, List, Tuple
-from typing import Optional, Union
+from typing import Any, Dict, Iterator, List
+from typing import Optional, Sequence, Tuple, Union
 
 from dataclasses import dataclass
 
@@ -282,7 +282,10 @@ class Holding(Factor):
                 self.explanations_same_meaning(other.negated(), context),
             )
 
-    def implies(self, other: Factor, context: ContextRegister = None) -> bool:
+    def __ge__(self, other: Optional[Factor]) -> bool:
+        return self.implies(other)
+
+    def implies(self, other: Optional[Factor], context: ContextRegister = None) -> bool:
         r"""
         Test for implication.
 
@@ -349,9 +352,6 @@ class Holding(Factor):
             return Holding(rule=other).implies(self, context=context)
         return other.implies(self, context=context)
 
-    def __ge__(self, other: Union[Holding, Rule]) -> bool:
-        return self.implies(other)
-
     def _implies_if_decided(
         self, other: Holding, context: Optional[ContextRegister] = None
     ) -> Iterator[ContextRegister]:
@@ -407,7 +407,7 @@ class Holding(Factor):
             ]
         return []
 
-    def evolve(self, changes: Union[str, Tuple[str, ...], Dict[str, Any]]) -> Holding:
+    def evolve(self, changes: Union[str, Sequence[str], Dict[str, Any]]) -> Holding:
         """
         Make new object with attributes from ``self.__dict__``, replacing attributes as specified.
 
@@ -523,6 +523,9 @@ class Holding(Factor):
     def union(
         self, other: Union[Rule, Holding], context: Optional[ContextRegister] = None
     ) -> Optional[Holding]:
+        """
+        Infer a Holding from all inputs and outputs of self and other, in context.
+        """
         context = context or ContextRegister()
         if isinstance(other, Rule):
             other = Holding(rule=other)
@@ -531,6 +534,9 @@ class Holding(Factor):
         return self._union_with_holding(other, context=context)
 
     def __or__(self, other: Union[Rule, Holding]) -> Optional[Holding]:
+        """
+        Infer a Holding from all inputs and outputs of self and other.
+        """
         return self.union(other)
 
     def own_attributes(self) -> Dict[str, Any]:

@@ -41,17 +41,13 @@ class TestProcedures:
             make_procedure["c2_irrelevant_inputs"]
         )
 
-    def test_generic_factors(
-        self, watt_factor, make_entity, make_evidence, make_procedure
-    ):
+    def test_generic_factors(self, make_entity, make_procedure, make_evidence):
         """
         Finds that for factor f["f7"], it would be consistent with the
         other group of factors for f["f7"]'s two slots to be assigned
         (0, 1) or (1, 0).
         """
         e = make_entity
-        f = watt_factor
-        c = make_procedure
         assert set(make_procedure["c3"].generic_factors) == {
             e["motel"],
             e["tree_search"],
@@ -75,7 +71,7 @@ class TestProcedures:
 
     def test_wrong_role_for_added_factor(self, watt_factor, make_procedure):
         with pytest.raises(ValueError):
-            new = make_procedure["c1"].add_factor(
+            _ = make_procedure["c1"].add_factor(
                 incoming=watt_factor["f8"], role="generic"
             )
 

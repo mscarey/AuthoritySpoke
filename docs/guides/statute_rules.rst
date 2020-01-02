@@ -202,11 +202,15 @@ contradicts a Rule that came from the Beard Tax Act.
 
 .. code:: python
 
-    beard_dictionary[1]['inputs'][1]['content'] = 'the length of the suspected beard was >= 12 inches'
-    beard_dictionary[1]['outputs'][0]['truth'] = False
-    beard_dictionary[1]['mandatory'] = True
-    long_hair_is_not_a_beard = readers.read_rule(beard_dictionary[1], beard_act)
-    print(long_hair_is_not_a_beard)
+    beard_dictionary[1]["despite"] = beard_dictionary[1]["inputs"][0]
+    beard_dictionary[1]["inputs"] = {
+        "type": "fact",
+        "content": "the length of the suspected beard was >= 12 inches",
+    }
+    beard_dictionary[1]["outputs"][0]["truth"] = False
+    beard_dictionary[1]["mandatory"] = True
+    long_thing_is_not_a_beard = readers.read_rule(beard_dictionary[1], beard_act)
+    print(long_thing_is_not_a_beard)
 
 
 .. parsed-literal::
@@ -215,10 +219,9 @@ contradicts a Rule that came from the Beard Tax Act.
       RESULT:
         the Fact it is false that <the suspected beard> was a beard
       GIVEN:
-        the Fact that <the suspected beard> was facial hair
         the Fact that the length of <the suspected beard> was at least 12 inch
-        the Fact that <the suspected beard> existed in an uninterrupted line
-        from the front of one ear to the front of the other ear below the nose
+      DESPITE:
+        the Fact that <the suspected beard> was facial hair
       GIVEN the ENACTMENTS:
         "In this Act, beard means any facial hair no shorter than 5
         millimetres in length that:" (Australian Beard Tax (Promotion of
@@ -230,7 +233,7 @@ contradicts a Rule that came from the Beard Tax Act.
 
 .. code:: python
 
-    long_hair_is_not_a_beard.contradicts(ear_rule)
+    long_thing_is_not_a_beard.contradicts(ear_rule)
 
 
 
