@@ -7,7 +7,6 @@ may describe procedural moves available in litigation.
 
 from __future__ import annotations
 
-from itertools import chain
 from typing import Any, ClassVar, Dict, Iterator
 from typing import List, Optional, Sequence, Tuple, Union
 
@@ -327,17 +326,11 @@ class Rule(Factor):
             )
         )
 
-        if other.universal and not self.universal:
+        if other.universal:
             yield from self_to_other
 
-        if self.universal and not other.universal:
+        if self.universal:
             yield from other_to_self
-
-        # This last option is for the ALL contradicts ALL case
-        # (regardless of MAY or MUST).
-        # It could use more tests.
-
-        yield from chain(self_to_other, other_to_self)
 
     def needs_subset_of_enactments(self, other) -> bool:
         r"""

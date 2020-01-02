@@ -8,6 +8,7 @@ or specify the :class:`.Enactment`\s that might require them.
 from __future__ import annotations
 
 import functools
+from itertools import chain
 import operator
 
 from typing import Callable, ClassVar, Iterator, List, Optional, Tuple
@@ -420,23 +421,43 @@ class Procedure(Factor):
             return False
         return any(self.explain_contradiction_some_to_all(other, context))
 
+    def has_input_or_despite_factors_implied_by_all_inputs_of(
+        self, other: Procedure, context: Optional[ContextRegister] = None
+    ) -> Iterator[ContextRegister]:
+        self_despite_or_input = (*self.despite, *self.inputs)
+        relations = (Analogy(other.inputs, self_despite_or_input, operator.ge),)
+        yield from all_analogy_matches(relations, inverse=True, context=context)
+
+    def has_input_or_despite_factors_implying_all_inputs_of(
+        self, other: Procedure, context: Optional[ContextRegister] = None
+    ) -> Iterator[ContextRegister]:
+        self_despite_or_input = (*self.despite, *self.inputs)
+        relations = (Analogy(other.inputs, self_despite_or_input, operator.le),)
+        yield from all_analogy_matches(relations, inverse=True, context=context)
+
     def explain_contradiction_some_to_all(
         self, other: Procedure, context: Optional[ContextRegister] = None
     ) -> Iterator[ContextRegister]:
         """Explain why ``other`` can't apply in all cases if ``self`` applies in some."""
         if context is None:
             context = ContextRegister()
-        self_despite_or_input = (*self.despite, *self.inputs)
 
-        # For self to contradict other, every input of other
-        # must be implied by some input or despite factor of self.
-        relations = (Analogy(other.inputs, self_despite_or_input, operator.le),)
-        matchlist = all_analogy_matches(relations, inverse=True, context=context)
+        # For self to contradict other, either every input of other
+        # must imply some input or despite factor of self...
+        implied_contexts = self.has_input_or_despite_factors_implied_by_all_inputs_of(
+            other, context
+        )
+
+        # or every input of other must be implied by
+        # some input or despite factor of self.
+        implying_contexts = self.has_input_or_despite_factors_implying_all_inputs_of(
+            other, context
+        )
 
         # For self to contradict other, some output of other
         # must be contradicted by some output of self.
 
-        for m in matchlist:
+        for m in chain(implying_contexts, implied_contexts):
             if contradictory_factor_groups(self.outputs, other.outputs, m):
                 yield m
 
