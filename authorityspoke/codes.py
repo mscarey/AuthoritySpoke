@@ -10,7 +10,7 @@ from typing import List, Optional, Sequence, Tuple, Union
 from anchorpoint.textselectors import TextQuoteSelector, TextPositionSelector
 from bs4 import BeautifulSoup
 
-from utils.roman import from_roman
+from authorityspoke.utils.roman import from_roman
 
 
 class Code:

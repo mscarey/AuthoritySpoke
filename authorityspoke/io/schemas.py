@@ -26,7 +26,7 @@ from authorityspoke.predicates import Predicate, ureg, Q_
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
 
-from utils.marshmallow_oneofschema.one_of_schema import OneOfSchema
+from authorityspoke.utils.marshmallow_oneofschema.one_of_schema import OneOfSchema
 
 RawSelector = Union[str, Dict[str, str]]
 RawEnactment = Dict[str, Union[str, List[RawSelector]]]
