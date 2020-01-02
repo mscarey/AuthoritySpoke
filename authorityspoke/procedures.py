@@ -11,13 +11,14 @@ import functools
 from itertools import chain
 import operator
 
-from typing import Callable, ClassVar, Iterator, List, Optional, Tuple
+from typing import Any, Callable, ClassVar, Dict, Iterator, List
+from typing import Optional, Sequence, Tuple, Union
 
 from dataclasses import dataclass
 
 from authorityspoke.factors import Factor, ContextRegister, new_context_helper
 from authorityspoke.factors import Analogy, all_analogy_matches, means
-from authorityspoke.formatting import indented, wrapped
+from authorityspoke.formatting import indented
 
 
 def find_less_specific_context(
@@ -224,6 +225,23 @@ class Procedure(Factor):
                     )
             object.__setattr__(self, group, groups[group])
 
+    def evolve(self, changes: Union[str, Sequence[str], Dict[str, Any]]) -> Procedure:
+        """
+        Make new object with attributes from ``self.__dict__``, replacing attributes as specified.
+
+        :param changes:
+            a :class:`dict` where the keys are names of attributes
+            of self, and the values are new values for those attributes
+
+        :returns:
+            a new object initialized with attributes from
+            ``self.__dict__``, except that any attributes named as keys in the
+            changes parameter are replaced by the corresponding value.
+        """
+        changes = self._make_dict_to_evolve(changes)
+        new_values = self._evolve_from_dict(changes)
+        return self.__class__(**new_values)
+
     def __add__(self, other: Procedure) -> Optional[Procedure]:
         if not isinstance(other, self.__class__):
             return self.add_factor(other)
@@ -389,7 +407,7 @@ class Procedure(Factor):
         new_factors = list(old_factors) + [incoming]
         return self.evolve({role: new_factors})
 
-    def contradicts(self, other) -> bool:
+    def contradicts(self, other, context: Optional[ContextRegister] = None) -> bool:
         r"""
         Find if ``self`` applying in some cases implies ``other`` cannot apply in some.
 
@@ -456,7 +474,6 @@ class Procedure(Factor):
 
         # For self to contradict other, some output of other
         # must be contradicted by some output of self.
-
         for m in chain(implying_contexts, implied_contexts):
             if contradictory_factor_groups(self.outputs, other.outputs, m):
                 yield m

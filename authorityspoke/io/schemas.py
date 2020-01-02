@@ -6,7 +6,6 @@ from marshmallow import pre_load, post_load
 from marshmallow import ValidationError
 
 from anchorpoint.textselectors import TextQuoteSelector
-from pint import UnitRegistry
 
 from authorityspoke.codes import Code
 from authorityspoke.decisions import CaseCitation, Decision
@@ -345,7 +344,7 @@ class EntitySchema(ExpandableSchema):
 class FactSchema(ExpandableSchema):
     __model__: Type = Fact
     predicate = fields.Nested(PredicateSchema)
-    context_factors = fields.Nested("FactorSchema", many=True)
+    context_factors = fields.Nested(lambda: FactorSchema(many=True))
     standard_of_proof = fields.Str(missing=None)
     name = fields.Str(missing=None)
     absent = fields.Bool(missing=False)

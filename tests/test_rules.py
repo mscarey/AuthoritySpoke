@@ -809,23 +809,30 @@ class TestStatuteRules:
     def test_contradictory_fact_about_beard_length(self, make_code, make_beard_rule):
         beard_act = make_code["beard_act"]
         beard_dictionary = loaders.load_holdings("beard_rules.json")
-        beard_dictionary[1]['despite'] = beard_dictionary[1]['inputs'][0]
-        beard_dictionary[1]['inputs'] = {"type": "fact", "content": 'the length of the suspected beard was >= 12 inches'}
-        beard_dictionary[1]['outputs'][0]['truth'] = False
-        beard_dictionary[1]['mandatory'] = True
+        beard_dictionary[1]["despite"] = beard_dictionary[1]["inputs"][0]
+        beard_dictionary[1]["inputs"] = {
+            "type": "fact",
+            "content": "the length of the suspected beard was >= 12 inches",
+        }
+        beard_dictionary[1]["outputs"][0]["truth"] = False
+        beard_dictionary[1]["mandatory"] = True
         long_thing_is_not_a_beard = readers.read_rule(beard_dictionary[1], beard_act)
         assert make_beard_rule[1].contradicts(long_thing_is_not_a_beard)
 
-    def test_contradictory_fact_about_beard_length_reverse(self, make_code, make_beard_rule):
+    def test_contradictory_fact_about_beard_length_reverse(
+        self, make_code, make_beard_rule
+    ):
         beard_act = make_code["beard_act"]
         beard_dictionary = loaders.load_holdings("beard_rules.json")
-        beard_dictionary[1]['despite'] = beard_dictionary[1]['inputs'][0]
-        beard_dictionary[1]['inputs'] = {"type": "fact", "content": 'the length of the suspected beard was >= 12 inches'}
-        beard_dictionary[1]['outputs'][0]['truth'] = False
-        beard_dictionary[1]['mandatory'] = True
+        beard_dictionary[1]["despite"] = beard_dictionary[1]["inputs"][0]
+        beard_dictionary[1]["inputs"] = {
+            "type": "fact",
+            "content": "the length of the suspected beard was >= 12 inches",
+        }
+        beard_dictionary[1]["outputs"][0]["truth"] = False
+        beard_dictionary[1]["mandatory"] = True
         long_thing_is_not_a_beard = readers.read_rule(beard_dictionary[1], beard_act)
         assert long_thing_is_not_a_beard.contradicts(make_beard_rule[1])
-
 
     @pytest.mark.parametrize(
         (

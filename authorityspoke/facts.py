@@ -258,7 +258,7 @@ def build_fact(
     absent: bool = False,
     generic: bool = False,
 ):
-    """
+    r"""
     Build a :class:`.Fact` with generics selected from a list.
 
     :param predicate:

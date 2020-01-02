@@ -399,15 +399,15 @@ class Factor(ABC):
         return new_dict
 
     def _make_dict_to_evolve(
-        self, changes: Union[str, Tuple[str, ...], Dict[str, Any]]
+        self, changes: Union[str, Sequence[str], Dict[str, Any]]
     ) -> Dict[str, Any]:
         if isinstance(changes, str):
             changes = (changes,)
-        if isinstance(changes, tuple):
+        if not isinstance(changes, dict):
             changes = {key: not self.__dict__[key] for key in changes}
         return changes
 
-    def evolve(self, changes: Union[str, Tuple[str, ...], Dict[str, Any]]) -> Factor:
+    def evolve(self, changes: Union[str, Sequence[str], Dict[str, Any]]) -> Factor:
         """
         Make new object with attributes from ``self.__dict__``, replacing attributes as specified.
 
