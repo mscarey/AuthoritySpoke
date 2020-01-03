@@ -39,13 +39,50 @@ class Jurisdiction:
     codes: Dict[str, Code] = field(default_factory=dict)
     courts: Dict[str, Court] = field(default_factory=dict)
 
-    def get_code(self, uri: str) -> Optional[Code]:
+    def get_code_with_uri_included_in_query(self, query: str) -> Optional[Code]:
         """
+        Find a :class:`.Code` under a key corresponding to ``query``.
+
+        If the initial form of ``query`` isn't found, truncates
+        parts from the right side of the ``query`` until a match
+        is found or nothing is left.
+
+        :param query:
+            identifier for legislative text in the USLM format
+            (or possibly pseudo-USLM for non-USC sources)
+
+        :returns:
+            the :class:`.Code` for the ``query``
+        """
+        while query:
+            if self.codes.get(str(query)):
+                return self.codes.get(query)
+            query = query[: query.rfind("/")]
+        return None
+
+    def get_code_with_uri_that_includes_query(self, query: str) -> Optional[Code]:
+        r"""
+        Find a :class:`.Code` under a key beginning with ``query``.
+
+        :param query:
+            identifier for legislative text in the USLM format
+            (or possibly pseudo-USLM for non-USC sources)
+
+        :returns:
+            the :class:`.Code` under a key starting with ``query``, or None
+        """
+        for name, code in self.codes.items():
+            if name.startswith(query):
+                return code
+        return None
+
+    def get_code(self, uri: str) -> Optional[Code]:
+        r"""
         Find a :class:`.Code` under a key corresponding to ``uri``.
 
-        If the initial form of ``uri`` isn't found, truncates
-        parts from the right side of the ``uri`` until a match
-        is found or nothing is left.
+        If the initial form of ``uri`` isn't found, try shorter
+        versions of the uri and then search for uris that contain
+        ``uri``.
 
         :param uri:
             identifier for legislative text in the USLM format
@@ -54,21 +91,12 @@ class Jurisdiction:
         :returns:
             the :class:`.Code` for the ``uri``
         """
-        query = uri[:]
-        if self.codes.get(str(query)):
-            return self.codes.get(query)
-        # try shorter forms of uri
-        shortened_query = query[:]
-        while shortened_query:
-            if self.codes.get(str(shortened_query)):
-                return self.codes.get(shortened_query)
-            shortened_query = shortened_query[: shortened_query.rfind("/")]
+        result = self.get_code_with_uri_included_in_query(uri)
+        if result:
+            return result
 
-        # try longer form of uri
-        for name, code in self.codes.items():
-            if name.startswith(uri):
-                return code
-        return None
+        result = self.get_code_with_uri_that_includes_query(uri)
+        return result
 
 
 @dataclass
