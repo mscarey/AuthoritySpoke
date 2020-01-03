@@ -7,12 +7,10 @@ after they import some data from a file.
 from copy import deepcopy
 from typing import NamedTuple
 
-from bs4 import BeautifulSoup
-
-from typing import Any, Dict, List, Iterable, Iterator
-from typing import Optional, Sequence, Tuple, Type, Union
+from typing import Dict, List, Optional, Tuple
 
 from anchorpoint.textselectors import TextQuoteSelector
+from bs4 import BeautifulSoup
 
 from authorityspoke.decisions import Decision
 from authorityspoke.codes import Code, USCCode, USLMCode, USConstCode, CalCode, CFRCode

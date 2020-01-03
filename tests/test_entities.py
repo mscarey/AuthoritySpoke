@@ -6,14 +6,14 @@ from authorityspoke.entities import Entity
 from authorityspoke.io import readers
 
 
-class TestEntities:
+class TestMakeEntities:
     def test_make_entity_from_str_without_mentioned(self, make_regime):
         """
         This fails because it needs to look up the string factor_records
         in a "mentioned" list, but no "mentioned" parameter is given.
         """
-        with pytest.raises(TypeError):
-            print(readers.read_factor(factor_record="Bradley", regime=make_regime))
+        with pytest.raises(ValueError):
+            print(readers.read_factor(record="Bradley", regime=make_regime))
 
     def test_conversion_to_generic(self, make_entity):
         e = make_entity
@@ -50,13 +50,13 @@ class TestEntities:
         motel = make_entity["motel"]
         assert motel.new_context(changes) == changes[make_entity["motel"]]
 
-    # Same Meaning
 
+class TestSameMeaning:
     def test_specific_to_generic_different_object(self, make_entity):
         e = make_entity
         motel = e["motel_specific"]
         motel_b = motel.make_generic()
-        assert not motel is motel_b
+        assert motel is not motel_b
         assert not motel == motel_b
 
     def test_equality_generic_entities(self, make_entity):
@@ -64,8 +64,8 @@ class TestEntities:
         assert e["motel"].means(e["trees"])
         assert not e["motel"] == e["trees"]
 
-    # Implication
 
+class TestImplication:
     def test_implication_of_generic_entity(self, make_entity):
         assert make_entity["motel_specific"] > make_entity["trees"]
 
@@ -93,8 +93,8 @@ class TestEntities:
         feist = make_opinion_with_holding["feist_majority"]
         assert any(entity.plural is True for entity in feist.generic_factors)
 
-    # Contradiction
 
+class TestContradiction:
     def test_error_contradiction_with_non_factor(self, make_entity, make_predicate):
         with pytest.raises(TypeError):
             assert make_entity["trees"].contradicts(make_predicate["p3"])

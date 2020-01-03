@@ -553,7 +553,7 @@ class Factor(ABC):
         """
         valid = True
         for i, self_factor in enumerate(self.context_factors):
-            if not self_factor is other.context_factors[i] is None:
+            if not (self_factor is other.context_factors[i] is None):
                 if not (
                     self_factor and relation(self_factor, other.context_factors[i])
                 ):

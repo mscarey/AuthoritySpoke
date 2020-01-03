@@ -1,14 +1,9 @@
 import datetime
-import json
-import operator
 
 from anchorpoint.textselectors import TextQuoteSelector
-from pint import UnitRegistry
 import pytest
 
-from authorityspoke.codes import Code
 from authorityspoke.enactments import Enactment, consolidate_enactments
-from authorityspoke.opinions import Opinion
 from authorityspoke.io import anchors, loaders, readers, dump
 
 
@@ -191,7 +186,10 @@ class TestEnactments:
             (
                 "copyright",
                 "usc17",
-                "In no case does copyright protection for an original work of authorship extend to any",
+                (
+                    "In no case does copyright protection for an original "
+                    "work of authorship extend to any"
+                ),
             ),
         ],
     )
@@ -332,7 +330,7 @@ class TestDump:
 
 
 class TestTextSelection:
-    def test_code_from_selector(self, make_regime, make_selector):
+    def test_code_from_selector(self, make_regime):
         code = make_regime.get_code("/us/usc/t17/s103")
         assert code.uri == "/us/usc/t17"
 
@@ -382,7 +380,7 @@ class TestTextSelection:
     def test_exact_text_not_in_selection(self, make_regime):
         due_process_wrong_section = TextQuoteSelector(exact="due process")
         with pytest.raises(ValueError):
-            enactment = readers.read_enactment(
+            _ = readers.read_enactment(
                 {
                     "selector": due_process_wrong_section,
                     "source": "/us/const/amendment-XV/1",
@@ -390,7 +388,7 @@ class TestTextSelection:
                 regime=make_regime,
             )
 
-    def test_multiple_non_Factor_selectors_for_Holding(self, make_regime):
+    def test_multiple_non_Factor_selectors_for_Holding(self):
         """
         The Holding-level TextQuoteSelectors should be built from this:
 

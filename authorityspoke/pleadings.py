@@ -5,7 +5,7 @@ from typing import ClassVar, Optional
 from authorityspoke.entities import Entity
 from authorityspoke.factors import Factor
 from authorityspoke.facts import Fact
-from authorityspoke.formatting import indented, wrapped
+from authorityspoke.formatting import indented
 
 
 @dataclass(frozen=True)

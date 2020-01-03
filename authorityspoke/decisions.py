@@ -22,7 +22,7 @@ class CaseCitation:
 
 @dataclass
 class Decision:
-    """
+    r"""
     A court decision to resolve a step in litigation.
 
     Uses the model of a judicial decision from
@@ -194,9 +194,7 @@ class Decision:
     def __gt__(self, other) -> bool:
         return self.implies(other) and not self == other
 
-    def implied_by_holding(
-        self, other: Holding, context: ContextRegister = None
-    ) -> bool:
+    def implied_by_holding(self, other: Holding, context: ContextRegister) -> bool:
         if context:
             context = context.reversed()
         return all(
@@ -204,7 +202,7 @@ class Decision:
             for self_holding in self.holdings
         )
 
-    def implied_by_rule(self, other: Rule, context: ContextRegister = None) -> bool:
+    def implied_by_rule(self, other: Rule, context: ContextRegister) -> bool:
         return self.implied_by_holding(other=Holding(other), context=context)
 
     def implied_by(

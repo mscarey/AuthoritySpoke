@@ -1,5 +1,5 @@
 from authorityspoke.evidence import Evidence, Exhibit
-from authorityspoke.facts import Fact, build_fact
+from authorityspoke.facts import build_fact
 
 
 class TestEvidence:
@@ -40,7 +40,6 @@ class TestEvidence:
         assert "fact" in evidence.short_string
 
     def test_get_entity_orders(self, make_evidence):
-        # TODO: check this after making Evidence.__str__ method
         context = make_evidence["no_shooting"].exhibit.statement.context_factors
         assert "Alice" in str(context[0])
         assert "Bob" in str(context[1])
@@ -54,7 +53,7 @@ class TestEvidence:
 
 
 class TestEvidenceSameMeaning:
-    def test_equality_with_entity_order(self, make_predicate, make_evidence):
+    def test_equality_with_entity_order(self, make_evidence):
         e = make_evidence
         assert e["no_shooting"].means(e["no_shooting_entity_order"])
 
