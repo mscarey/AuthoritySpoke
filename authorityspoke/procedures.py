@@ -740,82 +740,89 @@ class Procedure(Factor):
         return all_analogy_matches(relations)
 
 
-def consistent_factor_groups(
-    self_factors: Tuple[Factor, ...],
-    other_factors: Tuple[Factor, ...],
-    matches: Optional[ContextRegister] = None,
-):
-    r"""
-    Find whether two sets of :class:`.Factor`\s can be consistent.
-
-    Works by first determining whether one :class:`.Factor`
-    potentially :meth:`~.Factor.contradicts` another,
-    and then determining whether it's possible to make
-    context assignments match between the contradictory
-    :class:`.Factor`\s.
-
-    .. Note::
-        Does ``Factor: None`` in matches always mean that
-        the :class:`.Factor` can avoid being matched in a
-        contradictory way?
-
-    :returns:
-        whether unassigned context factors can be assigned in such
-        a way that there's no contradiction between any factor in
-        ``self_factors`` and ``other_factors``, given that some
-        :class:`.Factor`\s have already been assigned as
-        described by ``matches``.
+class FactorGroup(Tuple[Factor, ...]):
     """
-    if matches is None:
-        matches = ContextRegister()
-    for self_factor in self_factors:
-        for other_factor in other_factors:
-            if self_factor.contradicts(other_factor):
-                if all(
-                    all(
-                        matches.get(key) == context_register[key]
-                        or matches.get(context_register[key]) == key
-                        for key in self_factor.generic_factors
-                    )
-                    for context_register in self_factor._context_registers(
-                        other_factor, means
-                    )
-                ):
-                    return False
-    return True
+    Factors to be used together in a comparison.
 
-
-def contradictory_factor_groups(
-    self_factors: Tuple[Factor, ...],
-    other_factors: Tuple[Factor, ...],
-    context: Optional[ContextRegister] = None,
-) -> bool:
-    r"""
-    Find whether two sets of :class:`.Factor`\s can be contradictory.
-
-    :param self_factors:
-        one set of :class:`Factor`\s with consistent context factors.
-        Normally collected from the ``outputs`` attribute of a :class:`Procedure`\.
-
-    :param other_factors:
-        a second set of :class:`Factor`\s with context factors that
-        are internally consistent, but may not be consistent with ``self_factors``.
-
-    :param matches:
-        keys representing context :class:`.Factor`\s in ``self_factors`` and
-        values representing :class:`.Factor`\s in ``other_factors``. The
-        keys and values have been found in corresponding positions
-        in ``self`` and ``other``.
-
-    :returns:
-        whether any :class:`.Factor` assignment can be found that
-        makes a :class:`.Factor` in the output of ``other`` contradict
-        a :class:`.Factor` in the output of ``self``.
+    The inputs, outputs, and despite :class:`.Factor`\s of
+    a :class:`.Procedure` should be FactorGroups.
     """
-    if context is None:
-        context = ContextRegister()
-    for other_factor in other_factors:
-        for self_factor in self_factors:
-            if self_factor.contradicts(other_factor, context):
-                return True
-    return False
+
+    def __new__(cls, value):
+        if isinstance(value, Factor):
+            value = (value,)
+        return tuple.__new__(FactorGroup, value)
+
+    def consistent_with(
+        self, other: FactorGroup, matches: Optional[ContextRegister] = None,
+    ) -> bool:
+        r"""
+        Find whether two sets of :class:`.Factor`\s can be consistent.
+
+        Works by first determining whether one :class:`.Factor`
+        potentially :meth:`~.Factor.contradicts` another,
+        and then determining whether it's possible to make
+        context assignments match between the contradictory
+        :class:`.Factor`\s.
+
+        .. Note::
+            Does ``Factor: None`` in matches always mean that
+            the :class:`.Factor` can avoid being matched in a
+            contradictory way?
+
+        :param context:
+            correspondences between :class:`Factor`s in self and other
+            that can't be changed in seeking a way to interpret the groups
+            as consistent
+
+        :returns:
+            whether unassigned context factors can be assigned in such
+            a way that there's no contradiction between any factor in
+            ``self_factors`` and ``other_factors``, given that some
+            :class:`.Factor`\s have already been assigned as
+            described by ``matches``.
+        """
+        if matches is None:
+            matches = ContextRegister()
+        for self_factor in self:
+            for other_factor in other:
+                if self_factor.contradicts(other_factor):
+                    if all(
+                        all(
+                            matches.get(key) == context_register[key]
+                            or matches.get(context_register[key]) == key
+                            for key in self_factor.generic_factors
+                        )
+                        for context_register in self_factor._context_registers(
+                            other_factor, means
+                        )
+                    ):
+                        return False
+        return True
+
+    def contradicts(
+        self, other: FactorGroup, context: Optional[ContextRegister] = None,
+    ) -> bool:
+        r"""
+        Find whether two sets of :class:`.Factor`\s can be contradictory.
+
+        :param other:
+            a second set of :class:`Factor`\s with context factors that
+            are internally consistent, but may not be consistent with ``self_factors``.
+
+        :param context:
+            correspondences between :class:`Factor`s in self and other
+            that can't be changed in seeking a contradiction
+
+        :returns:
+            whether any :class:`.Factor` assignment can be found that
+            makes a :class:`.Factor` in the output of ``other`` contradict
+            a :class:`.Factor` in the output of ``self``.
+        """
+        if context is None:
+            context = ContextRegister()
+        for other_factor in other:
+            for self_factor in self:
+                if self_factor.contradicts(other_factor, context):
+                    return True
+        return False

@@ -5,8 +5,7 @@ from authorityspoke.enactments import Code, Enactment
 from authorityspoke.entities import Entity
 from authorityspoke.factors import ContextRegister
 from authorityspoke.procedures import Procedure
-from authorityspoke.procedures import consistent_factor_groups
-from authorityspoke.procedures import contradictory_factor_groups
+from authorityspoke.procedures import FactorGroup
 from authorityspoke.rules import Rule
 from authorityspoke.opinions import Opinion
 from authorityspoke.predicates import Predicate, Q_
@@ -289,13 +288,11 @@ class TestFactorGroups:
         statements would be inconsistent, but not if
         Alice is considered analagous to Craig.
         """
-        assert consistent_factor_groups(
-            self_factors=(alice_rich, bob_poor), other_factors=(dan_poor, craig_rich)
+        assert FactorGroup([alice_rich, bob_poor]).consistent_with(
+            FactorGroup([dan_poor, craig_rich])
         )
-        assert not consistent_factor_groups(
-            self_factors=(alice_rich, bob_poor),
-            other_factors=(dan_poor, craig_rich),
-            matches=ContextRegister({alice: dan}),
+        assert not FactorGroup([alice_rich, bob_poor]).consistent_with(
+            FactorGroup([dan_poor, craig_rich]), matches=ContextRegister({alice: dan})
         )
 
     def test_contradictory_factor_groups(self):
@@ -308,8 +305,8 @@ class TestFactorGroups:
         statements would be contradictory, but not if
         Alice is considered analagous to Craig.
         """
-        assert contradictory_factor_groups(
-            self_factors=(alice_rich, bob_poor), other_factors=(craig_rich, dan_poor)
+        assert FactorGroup([alice_rich, bob_poor]).contradicts(
+            FactorGroup([craig_rich, dan_poor])
         )
 
     def test_not_contradictory_factor_groups(self):
@@ -317,10 +314,8 @@ class TestFactorGroups:
         Because the ContextRegister matches up the two contexts
         consistently, it's impossible to reach a contradiction.
         """
-        assert not contradictory_factor_groups(
-            self_factors=(alice_rich, bob_poor),
-            other_factors=(dan_poor, craig_rich),
-            context=ContextRegister({alice: craig}),
+        assert not FactorGroup((alice_rich, bob_poor)).contradicts(
+            FactorGroup((dan_poor, craig_rich)), context=ContextRegister({alice: craig})
         )
 
 
