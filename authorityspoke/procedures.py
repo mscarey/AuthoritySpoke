@@ -465,9 +465,10 @@ class Procedure(Factor):
     def has_input_or_despite_factors_implied_by_all_inputs_of(
         self, other: Procedure, context: Optional[ContextRegister] = None
     ) -> Iterator[ContextRegister]:
-        self_despite_or_input = (*self.despite, *self.inputs)
-        relations = (Analogy(other.inputs, self_despite_or_input, operator.ge),)
-        yield from all_analogy_matches(relations, inverse=True, context=context)
+        self_despite_or_input = FactorGroup((*self.despite, *self.inputs))
+        yield from self_despite_or_input.unordered_comparison(
+            operation=operator.le, still_need_matches=other.inputs, matches=context
+        )
 
     def has_input_or_despite_factors_implying_all_inputs_of(
         self, other: Procedure, context: Optional[ContextRegister] = None

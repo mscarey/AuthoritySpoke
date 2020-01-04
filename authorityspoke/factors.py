@@ -1077,8 +1077,8 @@ class FactorGroup(Tuple[Factor, ...]):
     def unordered_comparison(
         self,
         operation: Callable,
+        still_need_matches: Sequence[Factor],
         matches: ContextRegister = None,
-        still_need_matches: Sequence[Factor] = (),
     ) -> Iterator[ContextRegister]:
         r"""
         Find ways for two unordered sets of :class:`.Factor`\s to satisfy a comparison.
@@ -1115,16 +1115,16 @@ class FactorGroup(Tuple[Factor, ...]):
                 if operation(self_factor, other_factor):
                     updated_mappings = iter(
                         self_factor.update_context_register(
-                            other_factor, matches, operation
+                            other=other_factor, register=matches, comparison=operation
                         )
                     )
                     for new_matches in updated_mappings:
                         if new_matches:
                             yield from iter(
                                 self.unordered_comparison(
+                                    still_need_matches=still_need_matches,
                                     operation=operation,
                                     matches=new_matches,
-                                    still_need_matches=still_need_matches,
                                 )
                             )
 
@@ -1132,7 +1132,7 @@ class FactorGroup(Tuple[Factor, ...]):
         self, other: FactorGroup, context: Optional[ContextRegister] = None
     ) -> Iterator[ContextRegister]:
         yield from self.unordered_comparison(
-            operation=operator.ge, matches=context, still_need_matches=list(other)
+            operation=operator.ge, still_need_matches=list(other), matches=context
         )
 
     def implies(

@@ -391,9 +391,9 @@ class TestContradiction:
             {Entity("the stockpile of trees"): Entity("the stockpile of trees")}
         )
         assert not make_rule["h_output_distance_less"].contradicts(
-            make_rule["h_output_distance_more"], context=stockpile_means_stockpile
+            make_rule["h_output_farther_different_entity"], context=stockpile_means_stockpile
         )
-        assert not make_rule["h_output_distance_more"].contradicts(
+        assert not make_rule["h_output_farther_different_entity"].contradicts(
             make_rule["h_output_distance_less"], context=stockpile_means_stockpile
         )
 

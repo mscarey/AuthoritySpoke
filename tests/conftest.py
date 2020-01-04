@@ -292,7 +292,7 @@ def watt_factor(make_predicate, make_entity, watt_mentioned) -> Dict[str, Factor
         "f9_absent_miles": build_fact(
             p["p9_miles"], (2, 0), absent=True, case_factors=c
         ),
-        "f9_more_swap_entities": Fact(
+        "f9_more_different_entity": Fact(
             p["p9_more"], (make_entity["circus"], make_entity["motel"])
         ),
         "f9_swap_entities": build_fact(p["p9"], (0, 2), case_factors=c),
@@ -879,8 +879,8 @@ def make_procedure(make_evidence, make_factor, watt_factor) -> Dict[str, Procedu
             despite=(f["f16"]),
         ),
         "c_output_distance_less": Procedure(outputs=(f["f9"]), inputs=(f["f1"])),
-        "c_output_distance_more": Procedure(
-            outputs=(f["f9_more_swap_entities"]), inputs=(f["f1"])
+        "c_output_farther_different_entity": Procedure(
+            outputs=(f["f9_more_different_entity"]), inputs=(f["f1"])
         ),
     }
 
@@ -1075,7 +1075,7 @@ def make_rule(make_procedure, make_enactment) -> Dict[str, Rule]:
         "h_output_distance_less": Rule(
             c["c_output_distance_less"], universal=True, mandatory=True
         ),
-        "h_output_distance_more": Rule(c["c_output_distance_more"]),
+        "h_output_farther_different_entity": Rule(c["c_output_farther_different_entity"]),
     }
 
 @pytest.fixture(scope="class")
