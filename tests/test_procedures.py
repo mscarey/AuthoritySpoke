@@ -3,9 +3,8 @@ import pytest
 
 from authorityspoke.enactments import Code, Enactment
 from authorityspoke.entities import Entity
-from authorityspoke.factors import ContextRegister
+from authorityspoke.factors import ContextRegister, FactorGroup
 from authorityspoke.procedures import Procedure
-from authorityspoke.procedures import FactorGroup
 from authorityspoke.rules import Rule
 from authorityspoke.opinions import Opinion
 from authorityspoke.predicates import Predicate, Q_

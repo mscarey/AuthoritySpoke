@@ -139,9 +139,6 @@ class Factor(ABC):
         self, *, name: Optional[str] = None, generic: bool = False, absent: bool = False
     ):
         """Designate attributes inherited from Factor as keyword-only."""
-        self.name = name
-        self.generic = generic
-        self.absent = absent
 
     @property
     def context_factor_names(self) -> Tuple[str, ...]:
@@ -991,7 +988,7 @@ def all_analogy_matches(
 
 
 class FactorGroup(Tuple[Factor, ...]):
-    """
+    r"""
     Factors to be used together in a comparison.
 
     The inputs, outputs, and despite :class:`.Factor`\s of
@@ -1076,3 +1073,73 @@ class FactorGroup(Tuple[Factor, ...]):
                 if self_factor.contradicts(other_factor, context):
                     return True
         return False
+
+    def unordered_comparison(
+        self,
+        operation: Callable,
+        matches: ContextRegister = None,
+        still_need_matches: Sequence[Factor] = (),
+    ) -> Iterator[ContextRegister]:
+        r"""
+        Find ways for two unordered sets of :class:`.Factor`\s to satisfy a comparison.
+
+        All of the elements of `other` need to fit the comparison. The elements of
+        `self` don't all need to be used.
+
+        :param context:
+            a mapping of :class:`.Factor`\s that have already been matched
+            to each other in the recursive search for a complete group of
+            matches. Usually starts empty when the method is first called.
+
+        :param still_need_matches:
+            :class:`.Factor`\s that need to satisfy the comparison
+            :attr:`comparison` with some :class:`.Factor` of :attr:`available`
+            for the relation to hold, and have not yet been matched.
+
+        :yields:
+            context registers showing how each :class:`.Factor` in
+            ``need_matches`` can have the relation ``comparison``
+            with some :class:`.Factor` in ``available_for_matching``,
+            with matching context.
+        """
+        still_need_matches = list(still_need_matches)
+
+        if matches is None:
+            matches = ContextRegister()
+
+        if not still_need_matches:
+            yield matches
+        else:
+            other_factor = still_need_matches.pop()
+            for self_factor in self:
+                if operation(self_factor, other_factor):
+                    updated_mappings = iter(
+                        self_factor.update_context_register(
+                            other_factor, matches, operation
+                        )
+                    )
+                    for new_matches in updated_mappings:
+                        if new_matches:
+                            yield from iter(
+                                self.unordered_comparison(
+                                    operation=operation,
+                                    matches=new_matches,
+                                    still_need_matches=still_need_matches,
+                                )
+                            )
+
+    def explanations_implication(
+        self, other: FactorGroup, context: Optional[ContextRegister] = None
+    ) -> Iterator[ContextRegister]:
+        yield from self.unordered_comparison(
+            operation=operator.ge, matches=context, still_need_matches=list(other)
+        )
+
+    def implies(
+        self, other: FactorGroup, context: Optional[ContextRegister] = None
+    ) -> bool:
+        return any(
+            register is not None
+            for register in self.explanations_implication(other, context=context)
+        )
+

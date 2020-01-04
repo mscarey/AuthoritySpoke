@@ -1,4 +1,6 @@
-from authorityspoke.procedures import FactorGroup
+import operator
+
+from authorityspoke.factors import FactorGroup, Analogy
 
 
 class TestMakeGroup:
@@ -25,3 +27,19 @@ class TestMakeGroup:
         identical_group = FactorGroup(group)
         assert isinstance(identical_group, FactorGroup)
         assert identical_group[0] == watt_factor["f1"]
+
+
+class TestImplication:
+    def test_implication_of_empty_group(self, watt_factor):
+        factor_list = [watt_factor["f1"], watt_factor["f2"]]
+        group = FactorGroup(factor_list)
+        empty_group = FactorGroup()
+        comparison = Analogy(empty_group, group, operator.le)
+        answers = list(comparison.unordered_comparison())
+        assert answers
+
+    def test_factorgroup_implication_method(self, watt_factor):
+        factor_list = [watt_factor["f1"], watt_factor["f2"]]
+        group = FactorGroup(factor_list)
+        empty_group = FactorGroup()
+        assert group.implies(empty_group)
