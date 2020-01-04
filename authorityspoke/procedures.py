@@ -211,9 +211,9 @@ class Procedure(Factor):
     context_factor_names: ClassVar = ("outputs", "inputs", "despite")
 
     def __post_init__(self):
-        outputs = self.__class__._wrap_with_tuple(self.outputs)
-        inputs = self.__class__._wrap_with_tuple(self.inputs)
-        despite = self.__class__._wrap_with_tuple(self.despite)
+        outputs = FactorGroup(self.outputs)
+        inputs = FactorGroup(self.inputs)
+        despite = FactorGroup(self.despite)
         groups = {"outputs": outputs, "inputs": inputs, "despite": despite}
         for group in groups:
             for factor_obj in groups[group]:
@@ -520,7 +520,7 @@ class Procedure(Factor):
             # to contradict any factor of self.
 
             for matches in matchlist:
-                if consistent_factor_groups(self.inputs, other.despite, matches):
+                if self.inputs.consistent_with(other.despite, matches):
                     yield matches
 
     def implies_all_to_all(
@@ -552,8 +552,8 @@ class Procedure(Factor):
 
             yield from self.explain_implication_all_to_all(other)
 
-            other_despite_or_input = (*other.despite, *other.inputs)
-            self_despite_or_input = (*self.despite, *self.inputs)
+            other_despite_or_input = FactorGroup((*other.despite, *other.inputs))
+            self_despite_or_input = FactorGroup((*self.despite, *self.inputs))
 
             relations = (
                 Analogy(other.outputs, self.outputs, operator.le),
@@ -563,9 +563,7 @@ class Procedure(Factor):
             matchlist = all_analogy_matches(relations)
 
             for context in matchlist:
-                if consistent_factor_groups(
-                    self.inputs, other_despite_or_input, context
-                ):
+                if self.inputs.consistent_with(other_despite_or_input, context):
                     yield context
 
     def implies_all_to_some(
