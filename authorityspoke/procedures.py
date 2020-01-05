@@ -268,15 +268,13 @@ class Procedure(Factor):
     def __add__(self, other: Procedure) -> Optional[Procedure]:
         if not isinstance(other, self.__class__):
             return self.add_factor(other)
-        matchlist = self.triggers_next_procedure(other)
-        if matchlist:
-            # Arbitrarily choosing the first match to decide what
-            # generic Factors appear in the new outputs.
-            # Wouldn't it have been better to get just one match with a generator?
-            triggered_rule = other.new_context(matchlist[0])
+        for explanation in self.triggers_next_procedure(other):
+            triggered_rule = other.new_context(explanation.reversed())
             new_outputs = [*self.outputs, *triggered_rule.outputs]
             unique_new_outputs = tuple({key: None for key in new_outputs})
-            return self.evolve({"outputs": unique_new_outputs})
+            added = self.evolve({"outputs": unique_new_outputs})
+            if added:
+                return added
         return None
 
     def add_if_universal(self, other: Procedure) -> Optional[Procedure]:
@@ -730,7 +728,9 @@ class Procedure(Factor):
             )
         return self.__class__(**new_dict)
 
-    def triggers_next_procedure(self, other: Procedure) -> List[ContextRegister]:
+    def triggers_next_procedure(
+        self, other: Procedure, context: Optional[ContextRegister] = None
+    ) -> Iterator[ContextRegister]:
         r"""
         Test if :class:`.Factor`\s from firing ``self`` would trigger ``other``.
 
@@ -748,14 +748,19 @@ class Procedure(Factor):
             whether the set of :class:`Factor`\s that exist after ``self``
             is fired could trigger ``other``
         """
-        self_despite_or_input = (*self.despite, *self.inputs)
-        self_output_or_input = (*self.outputs, *self.inputs)
+        self_despite_or_input = FactorGroup((*self.despite, *self.inputs))
+        self_output_or_input = FactorGroup((*self.outputs, *self.inputs))
+        context = context or ContextRegister()
 
-        relations = (
-            Analogy(other.inputs, self_output_or_input, operator.le),
-            Analogy(other.despite, self_despite_or_input, operator.le),
-        )
-        return all_analogy_matches(relations)
+        def other_inputs_implied(context: ContextRegister):
+            yield from self_output_or_input.explanations_implication(
+                other=other.inputs, context=context
+            )
+
+        for explanation in other_inputs_implied(context):
+            yield from self_despite_or_input.explanations_implication(
+                other=other.despite, context=explanation
+            )
 
     def triggers_next_procedure_if_universal(
         self, other: Procedure
