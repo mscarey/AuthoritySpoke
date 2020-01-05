@@ -213,6 +213,7 @@ def make_predicate() -> Dict[str, Predicate]:
         "p_quantity>5": Predicate(
             "The number of mice was {}", comparison=">", quantity=5
         ),
+        "p_no_context": Predicate("context was included", truth=False)
     }
 
 
@@ -371,6 +372,7 @@ def make_factor(make_predicate, make_entity) -> Dict[str, Factor]:
         "f_large_weight": build_fact(p["p_large_weight"], (0,), case_factors=c),
         "f_small_weight": build_fact(p["p_small_weight"], (0,), case_factors=c),
         "f_friends": build_fact(p["p_friends"], (0, 1), case_factors=c),
+        "f_no_context": build_fact(p["p_no_context"], case_factors=c),
     }
 
 
@@ -882,6 +884,7 @@ def make_procedure(make_evidence, make_factor, watt_factor) -> Dict[str, Procedu
         "c_output_farther_different_entity": Procedure(
             outputs=(f["f9_more_different_entity"]), inputs=(f["f1"])
         ),
+        "c_no_context": Procedure(outputs=m["f_no_context"])
     }
 
 

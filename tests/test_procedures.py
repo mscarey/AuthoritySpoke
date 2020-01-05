@@ -91,6 +91,9 @@ class TestProcedureSameMeaning:
     def test_unequal_after_swapping_nonreciprocal_entities(self, make_procedure):
         assert not make_procedure["c2"].means(make_procedure["c2_nonreciprocal_swap"])
 
+    def test_same_meaning_no_context(self, make_procedure):
+        assert make_procedure["c_no_context"].means(make_procedure["c_no_context"])
+
 
 class TestProcedureImplication:
     def test_entities_of_implied_inputs_for_implied_procedure(

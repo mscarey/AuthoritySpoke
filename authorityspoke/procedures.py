@@ -460,7 +460,10 @@ class Procedure(Factor):
 
         if not isinstance(other, self.__class__):
             return False
-        return any(self.explain_contradiction_some_to_all(other, context))
+        return any(
+            context is not None
+            for context in self.explain_contradiction_some_to_all(other, context)
+        )
 
     def has_input_or_despite_factors_implied_by_all_inputs_of(
         self, other: Procedure, context: Optional[ContextRegister] = None
@@ -544,7 +547,10 @@ class Procedure(Factor):
             whether the assertion that ``self`` applies in **all** cases
             implies that ``other`` applies in **all** cases.
         """
-        return any(self.explain_implication_all_to_all(other, context))
+        return any(
+            context is not None
+            for context in self.explain_implication_all_to_all(other, context)
+        )
 
     def explain_implication_all_to_some(
         self, other: Procedure, context: Optional[ContextRegister] = None
@@ -589,7 +595,10 @@ class Procedure(Factor):
             the list of ``self``'s inputs is not considered an exhaustive list
             of the circumstances needed to invoke the procedure).
         """
-        return any(self.explain_implication_all_to_some(other, context))
+        return any(
+            context is not None
+            for context in self.explain_implication_all_to_some(other, context)
+        )
 
     def _implies_procedure_if_present(
         self, other: Procedure, context: Optional[ContextRegister] = None
@@ -643,36 +652,34 @@ class Procedure(Factor):
         if isinstance(other, self.__class__):
             yield from self._implies_procedure_if_present(other=other, context=context)
 
+    def _explanations_same_meaning_as_procedure(
+        self, other: Procedure, context: ContextRegister
+    ):
+        def same_outputs(context: Optional[ContextRegister]):
+            yield from self.outputs.explanations_same_meaning(
+                other=other.outputs, context=context
+            )
+
+        def same_inputs(contexts: Iterable[ContextRegister]):
+            for context in contexts:
+                yield from self.inputs.explanations_same_meaning(
+                    other=other.inputs, context=context
+                )
+
+        def same_despite(contexts: Iterable[ContextRegister]):
+            for context in contexts:
+                yield from self.despite.explanations_same_meaning(
+                    other=other.despite, context=context
+                )
+
+        yield from same_despite(same_inputs(same_outputs(context)))
+
     def explanations_same_meaning(
         self, other, context: Optional[ContextRegister] = None
     ) -> Iterator[ContextRegister]:
+        context = context or ContextRegister()
         if isinstance(other, self.__class__):
-            # Verifying that every factor in self is in other.
-            # Also verifying that every factor in other is in self.
-
-            groups = ("outputs", "inputs", "despite")
-            matchlist = [ContextRegister()]
-            for group in groups:
-                updater = Analogy(
-                    need_matches=self.__dict__[group],
-                    available=other.__dict__[group],
-                    comparison=means,
-                )
-                matchlist = updater.update_matchlist(matchlist)
-            if not bool(matchlist):
-                return False
-
-            # Now doing the same thing in reverse
-            matchlist = [ContextRegister()]
-            for group in groups:
-                updater = Analogy(
-                    need_matches=other.__dict__[group],
-                    available=self.__dict__[group],
-                    comparison=means,
-                )
-                matchlist = updater.update_matchlist(matchlist)
-            for context in matchlist:
-                yield context
+            yield from self._explanations_same_meaning_as_procedure(other, context)
 
     def means(self, other, context: Optional[ContextRegister] = None) -> bool:
         r"""
@@ -683,7 +690,10 @@ class Procedure(Factor):
             :class:`.Factor`\s with the same context factors in the
             same roles.
         """
-        return any(self.explanations_same_meaning(other, context))
+        return any(
+            context is not None
+            for context in self.explanations_same_meaning(other, context)
+        )
 
     @new_context_helper
     def new_context(self, changes: ContextRegister) -> Procedure:

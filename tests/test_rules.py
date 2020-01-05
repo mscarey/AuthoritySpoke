@@ -147,9 +147,9 @@ class TestSameMeaning:
         right = make_complex_rule[
             "accept_murder_fact_from_relevance_and_shooting_craig"
         ]
-
         explanation = left.explain_same_meaning(right)
-        assert explanation.prose == "<Craig> is like <Alice>, and <Dan> is like <Bob>"
+        assert "<Craig> is like <Alice>" in explanation.prose or "<Alice> is like <Craig>" in explanation.prose
+        assert "<Dan> is like <Bob>" in explanation.prose or "<Bob> is like <Dan>" in explanation.prose
 
 
 class TestImplication:
