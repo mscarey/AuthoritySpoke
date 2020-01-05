@@ -557,27 +557,37 @@ class Procedure(Factor):
             for context in self.explain_implication_all_to_all(other, context)
         )
 
-    def explain_implication_all_to_some(
-        self, other: Procedure, context: Optional[ContextRegister] = None
+    def _explain_implication_of_procedure_all_to_some(
+        self, other: Procedure, context: ContextRegister
     ) -> Iterator[ContextRegister]:
+        yield from self.explain_implication_all_to_all(other, context)
 
-        if isinstance(other, self.__class__):
+        other_despite_or_input = FactorGroup((*other.despite, *other.inputs))
+        self_despite_or_input = FactorGroup((*self.despite, *self.inputs))
 
-            yield from self.explain_implication_all_to_all(other)
-
-            other_despite_or_input = FactorGroup((*other.despite, *other.inputs))
-            self_despite_or_input = FactorGroup((*self.despite, *self.inputs))
-
-            relations = (
-                Analogy(other.outputs, self.outputs, operator.le),
-                Analogy(other.despite, self_despite_or_input, operator.le),
+        def other_outputs_implied(context: ContextRegister):
+            yield from self.outputs.explanations_implication(
+                other=other.outputs, context=context
             )
 
-            matchlist = all_analogy_matches(relations)
+        def other_despite_implied(contexts: Iterator[ContextRegister]):
+            for context in contexts:
+                yield from self_despite_or_input.explanations_implication(
+                    other=other.despite, context=context
+                )
 
-            for context in matchlist:
-                if self.inputs.consistent_with(other_despite_or_input, context):
-                    yield context
+        for explanation in other_despite_implied(other_outputs_implied(context)):
+            if self.inputs.consistent_with(other_despite_or_input, explanation):
+                yield explanation
+
+    def explain_implication_all_to_some(
+        self, other: Factor, context: Optional[ContextRegister] = None
+    ) -> Iterator[ContextRegister]:
+        context = context or ContextRegister()
+        if isinstance(other, self.__class__):
+            yield from self._explain_implication_of_procedure_all_to_some(
+                other=other, context=context
+            )
 
     def implies_all_to_some(
         self, other: Procedure, context: Optional[ContextRegister] = None
