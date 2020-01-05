@@ -265,14 +265,18 @@ class Procedure(Factor):
         new_values = self._evolve_from_dict(changes)
         return self.__class__(**new_values)
 
+    def _trigger_addition(self, other: Procedure, context: ContextRegister):
+        """Add two Procedures, given that they have already been found to be addable."""
+        triggered_procedure = other.new_context(context.reversed())
+        new_outputs = [*self.outputs, *triggered_procedure.outputs]
+        unique_new_outputs = tuple({key: None for key in new_outputs})
+        return self.evolve({"outputs": unique_new_outputs})
+
     def __add__(self, other: Procedure) -> Optional[Procedure]:
         if not isinstance(other, self.__class__):
             return self.add_factor(other)
         for explanation in self.triggers_next_procedure(other):
-            triggered_rule = other.new_context(explanation.reversed())
-            new_outputs = [*self.outputs, *triggered_rule.outputs]
-            unique_new_outputs = tuple({key: None for key in new_outputs})
-            added = self.evolve({"outputs": unique_new_outputs})
+            added = self._trigger_addition(other, explanation)
             if added:
                 return added
         return None
@@ -280,12 +284,10 @@ class Procedure(Factor):
     def add_if_universal(self, other: Procedure) -> Optional[Procedure]:
         if not isinstance(other, self.__class__):
             return self.add_factor(other)
-        matchlist = self.triggers_next_procedure_if_universal(other)
-        if matchlist:
-            triggered_rule = other.new_context(matchlist[0])
-            new_outputs = [*self.outputs, *triggered_rule.outputs]
-            unique_new_outputs = tuple({key: None for key in new_outputs})
-            return self.evolve({"outputs": unique_new_outputs})
+        for explanation in self.triggers_next_procedure_if_universal(other):
+            added = self._trigger_addition(other, explanation)
+            if added:
+                return added
         return None
 
     @use_likely_context
@@ -763,8 +765,8 @@ class Procedure(Factor):
             )
 
     def triggers_next_procedure_if_universal(
-        self, other: Procedure
-    ) -> List[ContextRegister]:
+        self, other: Procedure, context: Optional[ContextRegister] = None
+    ) -> Iterator[ContextRegister]:
         r"""
         Test if Factors from firing `self` trigger `other` if both are universal.
 
@@ -782,8 +784,6 @@ class Procedure(Factor):
             whether the set of :class:`Factor`\s that exist after ``self``
             is fired could trigger ``other``
         """
-        self_output_or_input = (*self.outputs, *self.inputs)
-
-        relations = (Analogy(other.inputs, self_output_or_input, operator.le),)
-        return all_analogy_matches(relations)
-
+        context = context or ContextRegister()
+        self_output_or_input = FactorGroup((*self.outputs, *self.inputs))
+        yield from self_output_or_input.explanations_implication(other.inputs, context)
