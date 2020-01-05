@@ -11,8 +11,8 @@ import functools
 from itertools import chain
 import operator
 
-from typing import Any, Callable, ClassVar, Dict, Iterator, List
-from typing import Optional, Sequence, Tuple, Union
+from typing import Any, Callable, ClassVar, Dict, Iterable, Iterator
+from typing import List, Optional, Sequence, Tuple, Union
 
 from dataclasses import dataclass
 
@@ -591,6 +591,31 @@ class Procedure(Factor):
         """
         return any(self.explain_implication_all_to_some(other, context))
 
+    def _implies_procedure_if_present(
+        self, other: Procedure, context: Optional[ContextRegister] = None
+    ) -> Iterator[ContextRegister]:
+        def other_outputs_implied(context: Optional[ContextRegister]):
+            yield from self.outputs.explanations_implication(
+                other=other.outputs, context=context
+            )
+
+        def other_inputs_implied(contexts: Iterable[ContextRegister]):
+            for context in contexts:
+                yield from self.inputs.explanations_implication(
+                    other=other.inputs, context=context
+                )
+
+        def other_despite_implied(contexts: Iterable[ContextRegister]):
+            despite_or_input = FactorGroup((*self.despite, *self.inputs))
+            for context in contexts:
+                yield from despite_or_input.explanations_implication(
+                    other=other.despite, context=context
+                )
+
+        yield from other_despite_implied(
+            other_inputs_implied(other_outputs_implied(context))
+        )
+
     def _implies_if_present(
         self, other: Factor, context: Optional[ContextRegister] = None
     ) -> Iterator[ContextRegister]:
@@ -600,11 +625,11 @@ class Procedure(Factor):
         When ``self`` and ``other`` are included in
         :class:`Rule`\s that both apply in **some** cases:
 
-        ``self`` does not imply ``other`` if any input of ``other``
-        is not equal to or implied by some input of ``self``.
-
         ``self`` does not imply ``other`` if any output of ``other``
         is not equal to or implied by some output of self.
+
+        ``self`` does not imply ``other`` if any input of ``other``
+        is not equal to or implied by some input of ``self``.
 
         ``self`` does not imply ``other`` if any despite of ``other``
         is not equal to or implied by some despite or input of ``self``.
@@ -614,16 +639,9 @@ class Procedure(Factor):
             implies that the :class:`.Procedure` ``other`` applies
             in some cases.
         """
+
         if isinstance(other, self.__class__):
-            despite_or_input = (*self.despite, *self.inputs)
-
-            relations = (
-                Analogy(other.outputs, self.outputs, operator.le),
-                Analogy(other.inputs, self.inputs, operator.le),
-                Analogy(other.despite, despite_or_input, operator.le),
-            )
-
-            yield from iter(all_analogy_matches(relations, context=context))
+            yield from self._implies_procedure_if_present(other=other, context=context)
 
     def explanations_same_meaning(
         self, other, context: Optional[ContextRegister] = None
