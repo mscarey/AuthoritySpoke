@@ -675,7 +675,7 @@ class Procedure(Factor):
         yield from same_despite(same_inputs(same_outputs(context)))
 
     def explanations_same_meaning(
-        self, other, context: Optional[ContextRegister] = None
+        self, other: Factor, context: Optional[ContextRegister] = None
     ) -> Iterator[ContextRegister]:
         context = context or ContextRegister()
         if isinstance(other, self.__class__):

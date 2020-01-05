@@ -387,6 +387,9 @@ class TestSameMeaning:
         )
         assert directory_original.means(listings_original)
 
+    def test_same_meaning_no_context_factors(self, make_factor):
+        assert make_factor["f_no_context"].means(make_factor["f_no_context"])
+
 
 class TestImplication:
     def test_fact_does_not_imply_rule(self, watt_factor, make_rule):

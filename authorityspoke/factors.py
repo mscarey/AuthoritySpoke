@@ -438,7 +438,10 @@ class Factor(ABC):
         """
         if other is None:
             return False
-        return any(self.explanations_same_meaning(other, context=context))
+        return any(
+            explanation is not None
+            for explanation in self.explanations_same_meaning(other, context=context)
+            )
 
     def explanations_same_meaning(
         self, other: Factor, context: Optional[ContextRegister] = None
