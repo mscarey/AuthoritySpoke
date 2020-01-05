@@ -403,7 +403,10 @@ class Rule(Factor):
                     context = context.reversed()
                 return other.implied_by(self, context=context)
             return False
-        return any(self.explanations_implication(other, context))
+        return any(
+            explanation is not None
+            for explanation in self.explanations_implication(other, context)
+        )
 
     def __ge__(self, other: Optional[Factor]) -> bool:
         return self.implies(other)
@@ -462,7 +465,10 @@ class Rule(Factor):
             whether ``other`` is a :class:`Rule` with the
             same meaning as ``self``.
         """
-        return any(self.explanations_same_meaning(other, context))
+        return any(
+            explanation is not None
+            for explanation in self.explanations_same_meaning(other, context)
+        )
 
     def _union_with_rule(self, other: Rule, context: ContextRegister) -> Optional[Rule]:
         new_procedure = self.procedure.union(other.procedure, context=context)

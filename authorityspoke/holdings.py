@@ -258,7 +258,10 @@ class Holding(Factor):
         """
         if context is None:
             context = ContextRegister()
-        return any(self.explanations_contradiction(other, context))
+        return any(
+            explanation is not None
+            for explanation in self.explanations_contradiction(other, context)
+        )
 
     def _explanations_implies_if_not_exclusive(
         self, other: Factor, context: ContextRegister = None
@@ -311,7 +314,10 @@ class Holding(Factor):
                     context = context.reversed()
                 return other.implied_by(self, context=context)
             return False
-        return any(self.explanations_implication(other, context))
+        return any(
+            explanation is not None
+            for explanation in self.explanations_implication(other, context)
+        )
 
     def _context_registers_for_implication(
         self, other: Holding, context: Optional[ContextRegister] = None
@@ -449,7 +455,10 @@ class Holding(Factor):
         """
         if other is None:
             return False
-        return any(self.explanations_same_meaning(other, context))
+        return any(
+            explanation is not None
+            for explanation in self.explanations_same_meaning(other, context)
+        )
 
     def negated(self):
         """Get new copy of ``self`` with an opposite value for ``rule_valid``."""

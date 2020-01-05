@@ -17,7 +17,7 @@ from typing import List, Optional, Sequence, Tuple, Union
 from dataclasses import dataclass
 
 from authorityspoke.factors import Factor, ContextRegister, new_context_helper
-from authorityspoke.factors import Analogy, all_analogy_matches, means, FactorGroup
+from authorityspoke.factors import Analogy, all_analogy_matches, FactorGroup
 from authorityspoke.formatting import indented
 
 

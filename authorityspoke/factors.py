@@ -301,7 +301,8 @@ class Factor(ABC):
 
         if other is None:
             return False
-        return any(self.explanations_contradiction(other, context))
+        return any(explanation is not None
+            for explanation in self.explanations_contradiction(other, context))
 
     def explanations_contradiction(
         self, other: Factor, context: Optional[ContextRegister] = None
@@ -1122,7 +1123,7 @@ class FactorGroup(Tuple[Factor, ...]):
                         )
                     )
                     for new_matches in updated_mappings:
-                        if new_matches:
+                        if new_matches is not None:
                             yield from iter(
                                 self.unordered_comparison(
                                     still_need_matches=still_need_matches,

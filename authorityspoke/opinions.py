@@ -177,7 +177,10 @@ class Opinion:
             any holding of ``other`` if ``other`` is an :class:`.Opinion`.
         """
 
-        return any(self.explanations_contradiction(other, context=context))
+        return any(
+            explanation is not None
+            for explanation in self.explanations_contradiction(other, context=context)
+        )
 
     @property
     def generic_factors(self) -> List[Factor]:
