@@ -29,6 +29,54 @@ class TestMakeGroup:
         assert identical_group[0] == watt_factor["f1"]
 
 
+class TestSameFactors:
+    def test_group_has_same_factors_as_identical_group(self, watt_factor):
+        first_group = FactorGroup([watt_factor["f1"], watt_factor["f3"]])
+        second_group = FactorGroup([watt_factor["f1"], watt_factor["f3"]])
+        assert first_group.has_all_factors_of(second_group)
+
+    def test_group_has_same_factors_as_included_group(self, watt_factor):
+        first_group = FactorGroup(
+            [watt_factor["f1"], watt_factor["f2"], watt_factor["f3"]]
+        )
+        second_group = FactorGroup([watt_factor["f1"], watt_factor["f3"]])
+        assert first_group.has_all_factors_of(second_group)
+
+    def test_group_does_not_have_same_factors_as_bigger_group(self, watt_factor):
+        first_group = FactorGroup(
+            [watt_factor["f1"], watt_factor["f2"], watt_factor["f3"]]
+        )
+        second_group = FactorGroup([watt_factor["f1"], watt_factor["f3"]])
+        assert not second_group.has_all_factors_of(first_group)
+
+    def test_group_shares_all_factors_with_bigger_group(self, watt_factor):
+        first_group = FactorGroup(
+            [watt_factor["f1"], watt_factor["f2"], watt_factor["f3"]]
+        )
+        second_group = FactorGroup([watt_factor["f1"], watt_factor["f3"]])
+        assert second_group.shares_all_factors_with(first_group)
+
+    def test_group_does_not_share_all_factors_with_smaller_group(self, watt_factor):
+        first_group = FactorGroup(
+            [watt_factor["f1"], watt_factor["f2"], watt_factor["f3"]]
+        )
+        second_group = FactorGroup([watt_factor["f1"], watt_factor["f3"]])
+        assert not first_group.shares_all_factors_with(second_group)
+
+    def test_group_means_identical_group(self, watt_factor):
+        first_group = FactorGroup([watt_factor["f1"], watt_factor["f3"]])
+        second_group = FactorGroup([watt_factor["f1"], watt_factor["f3"]])
+        assert first_group.means(second_group)
+
+    def test_group_does_not_mean_different_group(self, watt_factor):
+        first_group = FactorGroup(
+            [watt_factor["f1"], watt_factor["f2"], watt_factor["f3"]]
+        )
+        second_group = FactorGroup([watt_factor["f1"], watt_factor["f3"]])
+        assert not first_group.means(second_group)
+        assert not second_group.means(first_group)
+
+
 class TestImplication:
     def test_factorgroup_implication_of_empty_group(self, watt_factor):
         factor_list = [watt_factor["f1"], watt_factor["f2"]]

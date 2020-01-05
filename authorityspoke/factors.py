@@ -1143,3 +1143,53 @@ class FactorGroup(Tuple[Factor, ...]):
             for register in self.explanations_implication(other, context=context)
         )
 
+    def explanations_has_all_factors_of(
+        self, other: FactorGroup, context: Optional[ContextRegister] = None
+    ) -> Iterator[ContextRegister]:
+        yield from self.unordered_comparison(
+            operation=means, still_need_matches=list(other), matches=context
+        )
+
+    def has_all_factors_of(
+        self, other: FactorGroup, context: Optional[ContextRegister] = None
+    ) -> bool:
+        return any(
+            register is not None
+            for register in self.explanations_has_all_factors_of(other, context=context)
+        )
+
+    def explanations_shares_all_factors_with(
+        self, other: FactorGroup, context: Optional[ContextRegister] = None
+    ) -> Iterator[ContextRegister]:
+        context = context or ContextRegister()
+        context_for_other = context.reversed()
+        yield from (
+            context.reversed()
+            for context in other.unordered_comparison(
+                operation=means,
+                still_need_matches=list(self),
+                matches=context_for_other,
+            )
+        )
+
+    def shares_all_factors_with(
+        self, other: FactorGroup, context: Optional[ContextRegister] = None
+    ) -> bool:
+        return any(
+            register is not None
+            for register in self.explanations_shares_all_factors_with(other, context=context)
+        )
+
+    def explanations_same_meaning(
+        self, other: FactorGroup, context: Optional[ContextRegister] = None
+    ) -> Iterator[ContextRegister]:
+        for explanation in self.explanations_shares_all_factors_with(other, context):
+            yield from self.explanations_has_all_factors_of(other, explanation)
+
+    def means(
+        self, other: FactorGroup, context: Optional[ContextRegister] = None
+    ) -> bool:
+        return any(
+            register is not None
+            for register in self.explanations_same_meaning(other, context=context)
+        )
