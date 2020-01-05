@@ -19,7 +19,7 @@ from dataclasses import dataclass
 
 from authorityspoke.explanations import Explanation
 from authorityspoke.factors import Factor, new_context_helper
-from authorityspoke.factors import Analogy, ContextRegister
+from authorityspoke.factors import Analogy, ContextRegister, FactorGroup
 from authorityspoke.formatting import indented, wrapped
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
@@ -327,14 +327,9 @@ class Holding(Factor):
                 other, context=context
             )
         else:
-            analogy = Analogy(
-                need_matches=other.nonexclusive_holdings,
-                available=self.nonexclusive_holdings,
-                comparison=operator.le,
+            yield from self.nonexclusive_holdings.explanations_implication(
+                other.nonexclusive_holdings, context=context
             )
-            # in the "exclusive" case, should this return all relevant
-            # matches from the nonexclusive Holdings?
-            yield from analogy.unordered_comparison(matches=context)
 
     def explanations_implication(
         self, other: Holding, context: Optional[ContextRegister] = None
@@ -479,13 +474,14 @@ class Holding(Factor):
         )
 
     @property
-    def nonexclusive_holdings(self) -> List[Holding]:
+    def nonexclusive_holdings(self) -> FactorGroup:
         r"""
         Yield all :class:`.Holding`\s with `exclusive is False` implied by self.
         """
         if not self.exclusive:
-            return [self]
-        return [self.evolve("exclusive")] + self.inferred_from_exclusive
+            return FactorGroup([self])
+        holdings = [self.evolve("exclusive")] + self.inferred_from_exclusive
+        return FactorGroup(holdings)
 
     def _union_if_not_exclusive(
         self, other: Holding, context: ContextRegister
