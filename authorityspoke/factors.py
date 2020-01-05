@@ -1005,7 +1005,7 @@ class FactorGroup(Tuple[Factor, ...]):
         return tuple.__new__(FactorGroup, value)
 
     def consistent_with(
-        self, other: FactorGroup, matches: Optional[ContextRegister] = None,
+        self, other: FactorGroup, context: Optional[ContextRegister] = None,
     ) -> bool:
         r"""
         Find whether two sets of :class:`.Factor`\s can be consistent.
@@ -1033,15 +1033,15 @@ class FactorGroup(Tuple[Factor, ...]):
             :class:`.Factor`\s have already been assigned as
             described by ``matches``.
         """
-        if matches is None:
-            matches = ContextRegister()
+        if context is None:
+            context = ContextRegister()
         for self_factor in self:
             for other_factor in other:
                 if self_factor.contradicts(other_factor):
                     if all(
                         all(
-                            matches.get(key) == context_register[key]
-                            or matches.get(context_register[key]) == key
+                            context.get(key) == context_register[key]
+                            or context.get(context_register[key]) == key
                             for key in self_factor.generic_factors
                         )
                         for context_register in self_factor._context_registers(

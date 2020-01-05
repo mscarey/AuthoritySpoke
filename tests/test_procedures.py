@@ -294,7 +294,7 @@ class TestFactorGroups:
             FactorGroup([dan_poor, craig_rich])
         )
         assert not FactorGroup([alice_rich, bob_poor]).consistent_with(
-            FactorGroup([dan_poor, craig_rich]), matches=ContextRegister({alice: dan})
+            FactorGroup([dan_poor, craig_rich]), context=ContextRegister({alice: dan})
         )
 
     def test_contradictory_factor_groups(self):

@@ -506,27 +506,32 @@ class Procedure(Factor):
             if self.outputs.contradicts(other.outputs, m):
                 yield m
 
-    def explain_implication_all_to_all(
-        self, other: Procedure, context: Optional[ContextRegister] = None
+    def _explain_implication_all_to_all_of_procedure(
+        self, other: Procedure, context: ContextRegister
     ) -> Iterator[ContextRegister]:
+        yield from self.explanations_same_meaning(other, context)
 
-        if isinstance(other, self.__class__):
-
-            yield from self.explanations_same_meaning(other, context)
-
-            relations = (
-                Analogy(other.outputs, self.outputs, operator.le),
-                Analogy(self.inputs, other.inputs, operator.le),
+        def other_outputs_implied(context: Optional[ContextRegister]):
+            yield from self.outputs.explanations_implication(
+                other=other.outputs, context=context
             )
-            matchlist = all_analogy_matches(relations)
 
-            # For every factor in other, find the permutations of entity slots
-            # that are consistent with matchlist and that don't cause the factor
-            # to contradict any factor of self.
+        def self_inputs_implied(contexts: Iterable[ContextRegister]):
+            for context in contexts:
+                yield from other.inputs.explanations_implication(
+                    other=self.inputs, context=context
+                )
 
-            for matches in matchlist:
-                if self.inputs.consistent_with(other.despite, matches):
-                    yield matches
+        for explanation in self_inputs_implied(other_outputs_implied(context)):
+            if self.inputs.consistent_with(other=other.despite, context=explanation):
+                yield explanation
+
+    def explain_implication_all_to_all(
+        self, other: Factor, context: Optional[ContextRegister] = None
+    ) -> Iterator[ContextRegister]:
+        context = context or ContextRegister()
+        if isinstance(other, self.__class__):
+            yield from self._explain_implication_all_to_all_of_procedure(other, context)
 
     def implies_all_to_all(
         self, other: Procedure, context: Optional[ContextRegister] = None
