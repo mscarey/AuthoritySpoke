@@ -18,8 +18,8 @@ from typing import Optional, Sequence, Tuple, Union
 from dataclasses import dataclass
 
 from authorityspoke.explanations import Explanation
-from authorityspoke.factors import Factor, new_context_helper
-from authorityspoke.factors import ContextRegister, ComparableGroup
+from authorityspoke.factors import Factor, ContextRegister, new_context_helper
+from authorityspoke.factorgroups import ComparableGroup
 from authorityspoke.formatting import indented, wrapped
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule

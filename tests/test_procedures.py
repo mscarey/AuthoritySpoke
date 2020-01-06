@@ -2,7 +2,8 @@ import logging
 import pytest
 
 from authorityspoke.entities import Entity
-from authorityspoke.factors import ContextRegister, FactorGroup
+from authorityspoke.factors import ContextRegister
+from authorityspoke.factorgroups import FactorGroup
 from authorityspoke.procedures import Procedure
 from authorityspoke.predicates import Predicate, Q_
 from authorityspoke.facts import Fact
