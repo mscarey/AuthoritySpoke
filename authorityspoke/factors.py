@@ -301,8 +301,10 @@ class Factor(ABC):
 
         if other is None:
             return False
-        return any(explanation is not None
-            for explanation in self.explanations_contradiction(other, context))
+        return any(
+            explanation is not None
+            for explanation in self.explanations_contradiction(other, context)
+        )
 
     def explanations_contradiction(
         self, other: Factor, context: Optional[ContextRegister] = None
@@ -442,7 +444,7 @@ class Factor(ABC):
         return any(
             explanation is not None
             for explanation in self.explanations_same_meaning(other, context=context)
-            )
+        )
 
     def explanations_same_meaning(
         self, other: Factor, context: Optional[ContextRegister] = None
@@ -888,110 +890,9 @@ class Analogy:
         ordered_pairs = list(zip_longest(self.need_matches, self.available))
         yield from update_register(register=context)
 
-    def unordered_comparison(
-        self,
-        matches: ContextRegister = None,
-        still_need_matches: Optional[List[Factor]] = None,
-    ) -> Iterator[ContextRegister]:
-        r"""
-        Find ways for two unordered sets of :class:`.Factor`\s to satisfy a comparison.
 
-        :param matches:
-            a mapping of :class:`.Factor`\s that have already been matched
-            to each other in the recursive search for a complete group of
-            matches. Starts empty when the method is first called.
+F = TypeVar("F")
 
-        :param still_need_matches:
-            :class:`.Factor`\s that need to satisfy the comparison
-            :attr:`comparison` with some :class:`.Factor` of :attr:`available`
-            for the relation to hold, and have not yet been matched.
-
-        :yields:
-            context registers showing how each :class:`.Factor` in
-            ``need_matches`` can have the relation ``comparison``
-            with some :class:`.Factor` in ``available_for_matching``,
-            with matching context.
-        """
-        if still_need_matches is None:
-            still_need_matches = list(self.need_matches)
-
-        if matches is None:
-            matches = ContextRegister()
-
-        if not still_need_matches:
-            # This seems to allow duplicate values in
-            # Procedure.output, .input, and .despite, but not in
-            # attributes of other kinds of Factors. Likely cause
-            # of bugs.
-            yield matches
-        else:
-            self_factor = still_need_matches.pop()
-            for other_factor in self.available:
-                if self.comparison(self_factor, other_factor):
-                    updated_mappings = iter(
-                        self_factor.update_context_register(
-                            other_factor, matches, self.comparison
-                        )
-                    )
-                    for new_matches in updated_mappings:
-                        if new_matches:
-                            yield from iter(
-                                self.unordered_comparison(
-                                    new_matches, still_need_matches
-                                )
-                            )
-
-    def update_matchlist(
-        self, matchlist: List[ContextRegister], inverse: bool = False
-    ) -> List[ContextRegister]:
-        r"""
-        Filter context assignments with :meth:`~Analogy.unordered_comparison`.
-
-        :param matchlist:
-            possible ways to match generic :class:`.Factor`\s of
-            ``need_matches`` with ``available``.
-
-        :returns:
-            a new version of ``matchlist`` filtered to be consistent with
-            ``self``\'s :meth:`~Analogy.unordered_comparison`.
-        """
-        new_matchlist = []
-        for matches in matchlist:
-            for answer in self.unordered_comparison(matches=matches):
-                if inverse:
-                    answer = ContextRegister({v: k for k, v in answer.items()})
-                new_matchlist.append(answer)
-        return new_matchlist
-
-
-def all_analogy_matches(
-    relations: Tuple[Analogy, ...],
-    inverse: bool = False,
-    context: Optional[ContextRegister] = None,
-) -> List[ContextRegister]:
-    r"""
-    Find all context registers consistent with multiple :class:`.Analogy` comparisons.
-
-    :param relations:
-        a series of :class:`.Analogy` comparisons in which
-        the ``need_matches`` :class:`.Factor`\s all refer to
-        one context (for instance, the same :class:`.Opinion`),
-        and the ``available`` :class:`.Factor`\s all refer to
-        another context.
-
-    :returns:
-        a list of all context registers consistent with all of the
-        :class:`.Analogy`\s.
-    """
-    if context is None:
-        context = ContextRegister()
-    matchlist: List[ContextRegister] = [context]
-    for relation in relations:
-        matchlist = relation.update_matchlist(matchlist, inverse)
-    return matchlist
-
-
-F = TypeVar('F')
 
 class ComparableGroup(Tuple[F, ...]):
     r"""
@@ -1183,7 +1084,9 @@ class ComparableGroup(Tuple[F, ...]):
     ) -> bool:
         return any(
             register is not None
-            for register in self.explanations_shares_all_factors_with(other, context=context)
+            for register in self.explanations_shares_all_factors_with(
+                other, context=context
+            )
         )
 
     def explanations_same_meaning(
@@ -1199,5 +1102,6 @@ class ComparableGroup(Tuple[F, ...]):
             register is not None
             for register in self.explanations_same_meaning(other, context=context)
         )
+
 
 FactorGroup = ComparableGroup[Factor]
