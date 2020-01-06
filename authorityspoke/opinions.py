@@ -6,11 +6,10 @@ Unlike most other ``authorityspoke`` classes, :class:`Opinion`\s are not frozen.
 
 from __future__ import annotations
 
-from collections import defaultdict, OrderedDict
+from collections import defaultdict
 from itertools import zip_longest
-import operator
 from typing import Dict, Iterable, Iterator, List, NamedTuple
-from typing import Optional, Sequence, Set, Tuple, Union
+from typing import Optional, Sequence, Union
 
 import logging
 import re
@@ -19,9 +18,9 @@ from dataclasses import dataclass, field
 
 from anchorpoint.textselectors import TextQuoteSelector
 
-from authorityspoke.factors import Factor, ContextRegister, Analogy
+from authorityspoke.factors import Factor, ContextRegister
 from authorityspoke.explanations import Explanation
-from authorityspoke.holdings import Holding
+from authorityspoke.holdings import Holding, HoldingGroup
 from authorityspoke.rules import Rule
 
 
@@ -219,14 +218,14 @@ class Opinion:
         return None
 
     @property
-    def holdings(self) -> List[Holding]:
+    def holdings(self) -> HoldingGroup:
         r"""
         Get ordered list of :class:`.Holding`\s posited by this :class:`Opinion`
 
         :returns:
             keys of the holding_anchors :class:`.OrderedDict`, as a list
         """
-        return list(self.holding_anchors)
+        return HoldingGroup(list(self.holding_anchors))
 
     def posit_holding(
         self,

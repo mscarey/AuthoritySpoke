@@ -19,7 +19,7 @@ from dataclasses import dataclass
 
 from authorityspoke.explanations import Explanation
 from authorityspoke.factors import Factor, new_context_helper
-from authorityspoke.factors import ContextRegister, FactorGroup
+from authorityspoke.factors import ContextRegister, ComparableGroup
 from authorityspoke.formatting import indented, wrapped
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
@@ -474,14 +474,14 @@ class Holding(Factor):
         )
 
     @property
-    def nonexclusive_holdings(self) -> FactorGroup:
+    def nonexclusive_holdings(self) -> HoldingGroup:
         r"""
         Yield all :class:`.Holding`\s with `exclusive is False` implied by self.
         """
         if not self.exclusive:
-            return FactorGroup([self])
+            return HoldingGroup([self])
         holdings = [self.evolve("exclusive")] + self.inferred_from_exclusive
-        return FactorGroup(holdings)
+        return HoldingGroup(holdings)
 
     def _union_if_not_exclusive(
         self, other: Holding, context: ContextRegister
@@ -576,3 +576,6 @@ class Holding(Factor):
         rule_text = indented(str(self.rule))
         text = wrapped(f"the Holding to {action}{exclusive}") + f"\n{rule_text}"
         return text
+
+
+HoldingGroup = ComparableGroup[Holding]

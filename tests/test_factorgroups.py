@@ -1,6 +1,4 @@
-import operator
-
-from authorityspoke.factors import ComparableGroup, FactorGroup, Analogy
+from authorityspoke.factors import ComparableGroup, FactorGroup
 
 
 class TestMakeGroup:
