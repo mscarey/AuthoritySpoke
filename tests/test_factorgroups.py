@@ -76,6 +76,10 @@ class TestSameFactors:
 
 
 class TestImplication:
+    def test_factorgroup_implies_none(self, watt_factor):
+        group = FactorGroup([watt_factor["f1"], watt_factor["f2"]])
+        assert group.implies(None)
+
     def test_factorgroup_implication_of_empty_group(self, watt_factor):
         factor_list = [watt_factor["f1"], watt_factor["f2"]]
         group = FactorGroup(factor_list)
