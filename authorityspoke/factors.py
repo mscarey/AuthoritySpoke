@@ -139,6 +139,9 @@ class Factor(ABC):
         self, *, name: Optional[str] = None, generic: bool = False, absent: bool = False
     ):
         """Designate attributes inherited from Factor as keyword-only."""
+        self.name = name
+        self.generic = generic
+        self.absent = absent
 
     @property
     def context_factor_names(self) -> Tuple[str, ...]:
@@ -194,9 +197,7 @@ class Factor(ABC):
         return list(generics)
 
     @property
-    def context_factors(
-        self,
-    ) -> Union[Sequence[Optional[Factor]], Sequence[Sequence[Factor]]]:
+    def context_factors(self) -> FactorSequence:
         r"""
         Get :class:`Factor`\s used in comparisons with other :class:`Factor`\s.
 
@@ -209,7 +210,7 @@ class Factor(ABC):
         for factor_name in self.context_factor_names:
             next_factor: Optional[Factor] = self.__dict__.get(factor_name)
             context.append(next_factor)
-        return tuple(context)
+        return FactorSequence(context)
 
     @property
     def recursive_factors(self) -> Dict[Factor, None]:
@@ -285,8 +286,8 @@ class Factor(ABC):
             if context.get(self) is None or (context.get(self) == other):
                 yield ContextRegister({self: other})
         else:
-            relation = Analogy(self.context_factors, other.context_factors, comparison)
-            yield from relation.ordered_comparison(context=context)
+            yield from self.context_factors.ordered_comparison(
+                other=other.context_factors, operation=comparison, context=context)
 
     def contradicts(
         self, other: Optional[Factor], context: Optional[ContextRegister] = None
@@ -891,7 +892,7 @@ class Analogy:
         yield from update_register(register=context)
 
 
-F = TypeVar("F")
+F = TypeVar("F", bound="Factor")
 
 
 class ComparableGroup(Tuple[F, ...]):
@@ -1105,3 +1106,61 @@ class ComparableGroup(Tuple[F, ...]):
 
 
 FactorGroup = ComparableGroup[Factor]
+
+
+class FactorSequence(Tuple[Optional[Union[Factor, FactorGroup]], ...]):
+
+    def __new__(cls, value: Sequence = ()):
+        if isinstance(value, (Factor, ComparableGroup)):
+            value = (value,)
+        if value is None:
+            value = (None,)
+        return tuple.__new__(FactorSequence, value)
+
+    def ordered_comparison(
+        self, other: FactorSequence, operation: Callable, context: Optional[ContextRegister] = None
+    ) -> Iterator[ContextRegister]:
+        r"""
+        Find ways for a series of pairs of :class:`.Factor`\s to satisfy a comparison.
+
+        :param context:
+            keys representing :class:`.Factor`\s in ``self`` and
+            values representing :class:`.Factor`\s in ``other``. The
+            keys and values have been found in corresponding positions
+            in ``self`` and ``other``.
+
+        :yields:
+            every way that ``matches`` can be updated to be consistent
+            with each element of ``self.need_matches`` having the relationship
+            ``self.comparison`` with the item at the corresponding index of
+            ``self.available``.
+        """
+
+        def update_register(register: ContextRegister, i: int = 0):
+            """
+            Recursively search through :class:`Factor` pairs trying out context assignments.
+
+            This has the potential to take a long time to fail if the problem is
+            unsatisfiable. It will reduce risk to check that every :class:`Factor` pair
+            is satisfiable before checking that they're all satisfiable together.
+            """
+            if i == len(ordered_pairs):
+                yield register
+            else:
+                left, right = ordered_pairs[i]
+                if left is not None or right is None:
+                    if left is None:
+                        yield from update_register(register, i + 1)
+                    else:
+                        new_mapping_choices: List[ContextRegister] = []
+                        for incoming_register in left.update_context_register(
+                            right, register, operation
+                        ):
+                            if incoming_register not in new_mapping_choices:
+                                new_mapping_choices.append(incoming_register)
+                                yield from update_register(incoming_register, i + 1)
+
+        if context is None:
+            context = ContextRegister()
+        ordered_pairs = list(zip_longest(self, other))
+        yield from update_register(register=context)

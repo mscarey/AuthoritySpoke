@@ -6,7 +6,7 @@ import operator
 from typing import ClassVar, Dict, Iterator, List, Optional, Sequence, Union
 
 from authorityspoke.factors import new_context_helper
-from authorityspoke.factors import Factor, ContextRegister
+from authorityspoke.factors import Factor, ContextRegister, FactorSequence
 from authorityspoke.formatting import indented, wrapped
 from authorityspoke.predicates import Predicate
 
@@ -57,7 +57,7 @@ class Fact(Factor):
     """
 
     predicate: Predicate
-    context_factors: Sequence[Factor] = ()
+    context_factors: FactorSequence = FactorSequence()
     name: Optional[str] = None
     standard_of_proof: Optional[str] = None
     absent: bool = False
@@ -80,8 +80,8 @@ class Fact(Factor):
                 f"standard of proof must be one of {self.standards_of_proof} or None."
             )
 
-        if not isinstance(self.context_factors, tuple):
-            context_factors = self.__class__._wrap_with_tuple(self.context_factors)
+        if not isinstance(self.context_factors, FactorSequence):
+            context_factors = FactorSequence(self.context_factors)
             object.__setattr__(self, "context_factors", context_factors)
 
         if len(self.context_factors) != len(self.predicate):

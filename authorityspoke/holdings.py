@@ -11,7 +11,6 @@ should be considered undecided.
 from __future__ import annotations
 
 from itertools import chain
-import operator
 from typing import Any, Dict, Iterator, List
 from typing import Optional, Sequence, Tuple, Union
 
