@@ -145,12 +145,9 @@ class Opinion:
                 ):
                     yield explanation
         elif isinstance(other, self.__class__):
-            analogy = Analogy(
-                need_matches=other.holdings,
-                available=self.holdings,
-                comparison=operator.le,
+            yield from self.holdings.explanations_implication(
+                other.holdings, context=context
             )
-            yield from analogy.unordered_comparison(matches=context)
         elif hasattr(other, "explanations_implication"):
             if context:
                 context = context.reversed()

@@ -10,7 +10,7 @@ import logging
 import operator
 import textwrap
 from typing import Any, Callable, Dict, Iterable, Iterator, List
-from typing import Optional, Sequence, Tuple, Union
+from typing import Optional, Sequence, Tuple, TypeVar, Union
 
 from anchorpoint.textselectors import TextQuoteSelector
 
@@ -991,7 +991,9 @@ def all_analogy_matches(
     return matchlist
 
 
-class FactorGroup(Tuple[Factor, ...]):
+F = TypeVar('F')
+
+class ComparableGroup(Tuple[F, ...]):
     r"""
     Factors to be used together in a comparison.
 
@@ -1002,10 +1004,10 @@ class FactorGroup(Tuple[Factor, ...]):
     def __new__(cls, value: Sequence = ()):
         if isinstance(value, Factor):
             value = (value,)
-        return tuple.__new__(FactorGroup, value)
+        return tuple.__new__(ComparableGroup, value)
 
     def consistent_with(
-        self, other: FactorGroup, context: Optional[ContextRegister] = None,
+        self, other: ComparableGroup, context: Optional[ContextRegister] = None,
     ) -> bool:
         r"""
         Find whether two sets of :class:`.Factor`\s can be consistent.
@@ -1052,7 +1054,7 @@ class FactorGroup(Tuple[Factor, ...]):
         return True
 
     def contradicts(
-        self, other: FactorGroup, context: Optional[ContextRegister] = None,
+        self, other: ComparableGroup, context: Optional[ContextRegister] = None,
     ) -> bool:
         r"""
         Find whether two sets of :class:`.Factor`\s can be contradictory.
@@ -1133,14 +1135,14 @@ class FactorGroup(Tuple[Factor, ...]):
                             )
 
     def explanations_implication(
-        self, other: FactorGroup, context: Optional[ContextRegister] = None
+        self, other: ComparableGroup, context: Optional[ContextRegister] = None
     ) -> Iterator[ContextRegister]:
         yield from self.unordered_comparison(
             operation=operator.ge, still_need_matches=list(other), matches=context
         )
 
     def implies(
-        self, other: FactorGroup, context: Optional[ContextRegister] = None
+        self, other: ComparableGroup, context: Optional[ContextRegister] = None
     ) -> bool:
         return any(
             register is not None
@@ -1148,14 +1150,14 @@ class FactorGroup(Tuple[Factor, ...]):
         )
 
     def explanations_has_all_factors_of(
-        self, other: FactorGroup, context: Optional[ContextRegister] = None
+        self, other: ComparableGroup, context: Optional[ContextRegister] = None
     ) -> Iterator[ContextRegister]:
         yield from self.unordered_comparison(
             operation=means, still_need_matches=list(other), matches=context
         )
 
     def has_all_factors_of(
-        self, other: FactorGroup, context: Optional[ContextRegister] = None
+        self, other: ComparableGroup, context: Optional[ContextRegister] = None
     ) -> bool:
         return any(
             register is not None
@@ -1163,7 +1165,7 @@ class FactorGroup(Tuple[Factor, ...]):
         )
 
     def explanations_shares_all_factors_with(
-        self, other: FactorGroup, context: Optional[ContextRegister] = None
+        self, other: ComparableGroup, context: Optional[ContextRegister] = None
     ) -> Iterator[ContextRegister]:
         context = context or ContextRegister()
         context_for_other = context.reversed()
@@ -1177,7 +1179,7 @@ class FactorGroup(Tuple[Factor, ...]):
         )
 
     def shares_all_factors_with(
-        self, other: FactorGroup, context: Optional[ContextRegister] = None
+        self, other: ComparableGroup, context: Optional[ContextRegister] = None
     ) -> bool:
         return any(
             register is not None
@@ -1185,15 +1187,17 @@ class FactorGroup(Tuple[Factor, ...]):
         )
 
     def explanations_same_meaning(
-        self, other: FactorGroup, context: Optional[ContextRegister] = None
+        self, other: ComparableGroup, context: Optional[ContextRegister] = None
     ) -> Iterator[ContextRegister]:
         for explanation in self.explanations_shares_all_factors_with(other, context):
             yield from self.explanations_has_all_factors_of(other, explanation)
 
     def means(
-        self, other: FactorGroup, context: Optional[ContextRegister] = None
+        self, other: ComparableGroup, context: Optional[ContextRegister] = None
     ) -> bool:
         return any(
             register is not None
             for register in self.explanations_same_meaning(other, context=context)
         )
+
+FactorGroup = ComparableGroup[Factor]
