@@ -304,30 +304,11 @@ class Procedure(Factor):
         remain the same.
         """
 
-        def combine_factor_list(
-            self_list, other_list, allow_contradictions: bool = False
-        ):
-            new_factors = []
-            for self_factor in self_list:
-                broadest = self_factor
-                for other_factor in other_list:
-                    if allow_contradictions is False and other_factor.contradicts(
-                        self_factor
-                    ):
-                        return None
-                    if other_factor >= self_factor:
-                        broadest = other_factor
-                new_factors.append(broadest)
-            return new_factors + [
-                factor for factor in other_list if factor not in new_factors
-            ]
-
         other = other.new_context(context)
-        new_inputs = combine_factor_list(self.inputs, other.inputs)
-        new_outputs = combine_factor_list(self.outputs, other.outputs)
-        new_despite = combine_factor_list(
-            self.despite, other.despite, allow_contradictions=True
-        )
+        new_inputs = self.inputs.union(other.inputs)
+        new_outputs = self.outputs.union(other.outputs)
+        new_despite = self.despite.union_allowing_contradictions(other.despite)
+
         if any(group is None for group in (new_outputs, new_inputs, new_despite)):
             return None
         return Procedure(outputs=new_outputs, inputs=new_inputs, despite=new_despite)
@@ -469,7 +450,7 @@ class Procedure(Factor):
         self, other: Procedure, context: Optional[ContextRegister] = None
     ) -> Iterator[ContextRegister]:
         self_despite_or_input = FactorGroup((*self.despite, *self.inputs))
-        yield from self_despite_or_input.unordered_comparison(
+        yield from self_despite_or_input.comparison(
             operation=operator.le, still_need_matches=other.inputs, matches=context
         )
 
@@ -477,7 +458,7 @@ class Procedure(Factor):
         self, other: Procedure, context: Optional[ContextRegister] = None
     ) -> Iterator[ContextRegister]:
         self_despite_or_input = FactorGroup((*self.despite, *self.inputs))
-        yield from self_despite_or_input.unordered_comparison(
+        yield from self_despite_or_input.comparison(
             operation=operator.ge, still_need_matches=other.inputs, matches=context
         )
 

@@ -16,6 +16,7 @@ from typing import Optional, Sequence, Tuple, Union
 
 from dataclasses import dataclass
 
+from authorityspoke.comparisons import Comparable
 from authorityspoke.explanations import Explanation
 from authorityspoke.factors import Factor, new_context_helper
 from authorityspoke.factors import ContextRegister, ComparableGroup
@@ -287,7 +288,9 @@ class Holding(Factor):
     def __ge__(self, other: Optional[Factor]) -> bool:
         return self.implies(other)
 
-    def implies(self, other: Optional[Factor], context: ContextRegister = None) -> bool:
+    def implies(
+        self, other: Optional[Comparable], context: ContextRegister = None
+    ) -> bool:
         r"""
         Test for implication.
 
@@ -305,7 +308,7 @@ class Holding(Factor):
         """
         if other is None:
             return True
-        if isinstance(other, Rule):
+        if isinstance(other, (Rule, Procedure)):
             other = Holding(rule=other)
         if not isinstance(other, self.__class__):
             if hasattr(other, "implied_by"):

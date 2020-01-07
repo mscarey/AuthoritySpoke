@@ -287,7 +287,7 @@ class Factor(Comparable):
             )
 
     def explanations_contradiction(
-        self, other: Factor, context: Optional[ContextRegister] = None
+        self, other: Comparable, context: Optional[ContextRegister] = None
     ) -> Iterator[ContextRegister]:
         """
         Test whether ``self`` :meth:`implies` the absence of ``other``.
@@ -374,11 +374,12 @@ class Factor(Comparable):
         return self.__class__(**new_values)
 
     def explanations_same_meaning(
-        self, other: Factor, context: Optional[ContextRegister] = None
+        self, other: Comparable, context: Optional[ContextRegister] = None
     ) -> Iterator[ContextRegister]:
         """Generate ways to match contexts of self and other so they mean the same."""
         if (
-            self.__class__ == other.__class__
+            isinstance(other, Factor)
+            and self.__class__ == other.__class__
             and self.absent == other.absent
             and self.generic == other.generic
         ):
@@ -749,7 +750,7 @@ class ComparableGroup(Tuple[F, ...], Comparable):
                     return True
         return False
 
-    def unordered_comparison(
+    def comparison(
         self,
         operation: Callable,
         still_need_matches: Sequence[Factor],
@@ -796,7 +797,7 @@ class ComparableGroup(Tuple[F, ...], Comparable):
                     for new_matches in updated_mappings:
                         if new_matches is not None:
                             yield from iter(
-                                self.unordered_comparison(
+                                self.comparison(
                                     still_need_matches=still_need_matches,
                                     operation=operation,
                                     matches=new_matches,
@@ -806,14 +807,14 @@ class ComparableGroup(Tuple[F, ...], Comparable):
     def explanations_implication(
         self, other: ComparableGroup, context: Optional[ContextRegister] = None
     ) -> Iterator[ContextRegister]:
-        yield from self.unordered_comparison(
+        yield from self.comparison(
             operation=operator.ge, still_need_matches=list(other), matches=context
         )
 
     def explanations_has_all_factors_of(
         self, other: ComparableGroup, context: Optional[ContextRegister] = None
     ) -> Iterator[ContextRegister]:
-        yield from self.unordered_comparison(
+        yield from self.comparison(
             operation=means, still_need_matches=list(other), matches=context
         )
 
@@ -832,7 +833,7 @@ class ComparableGroup(Tuple[F, ...], Comparable):
         context_for_other = context.reversed()
         yield from (
             context.reversed()
-            for context in other.unordered_comparison(
+            for context in other.comparison(
                 operation=means,
                 still_need_matches=list(self),
                 matches=context_for_other,
@@ -850,10 +851,45 @@ class ComparableGroup(Tuple[F, ...], Comparable):
         )
 
     def explanations_same_meaning(
-        self, other: ComparableGroup, context: Optional[ContextRegister] = None
+        self, other: Comparable, context: Optional[ContextRegister] = None
     ) -> Iterator[ContextRegister]:
-        for explanation in self.explanations_shares_all_factors_with(other, context):
-            yield from self.explanations_has_all_factors_of(other, explanation)
+        if isinstance(other, self.__class__):
+            for explanation in self.explanations_shares_all_factors_with(
+                other, context
+            ):
+                yield from self.explanations_has_all_factors_of(other, explanation)
+
+    def union(
+        self, other: ComparableGroup, context: Optional[ContextRegister] = None
+    ) -> Optional[ComparableGroup]:
+        new_factors = []
+        for self_factor in self:
+            broadest = self_factor
+            for other_factor in other:
+                if other_factor.contradicts(self_factor, context=context):
+                    return None
+                if self_factor.implied_by(other_factor, context=context):
+                    broadest = other_factor
+            new_factors.append(broadest)
+        factors_for_group = new_factors + [
+            factor for factor in other if factor not in new_factors
+        ]
+        return FactorGroup(factors_for_group)
+
+    def union_allowing_contradictions(
+        self, other: ComparableGroup, context: Optional[ContextRegister] = None
+    ) -> Optional[ComparableGroup]:
+        new_factors = []
+        for self_factor in self:
+            broadest = self_factor
+            for other_factor in other:
+                if self_factor.implied_by(other_factor, context=context):
+                    broadest = other_factor
+            new_factors.append(broadest)
+        factors_for_group = new_factors + [
+            factor for factor in other if factor not in new_factors
+        ]
+        return FactorGroup(factors_for_group)
 
 
 FactorGroup = ComparableGroup[Factor]

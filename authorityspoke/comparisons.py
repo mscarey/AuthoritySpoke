@@ -26,6 +26,17 @@ class Comparable(ABC):
             for explanation in self.explanations_contradiction(other, context)
         )
 
+    def implied_by(
+        self, other: Optional[Comparable], context: Optional[ContextRegister] = None
+    ):
+        """Test whether ``other`` implies ``self``."""
+        if other is None:
+            return False
+        return any(
+            register is not None
+            for register in self.explanations_implied_by(other, context=context)
+        )
+
     def implies(
         self, other: Optional[Comparable], context: Optional[ContextRegister] = None
     ) -> bool:
@@ -90,6 +101,17 @@ class Comparable(ABC):
             return None
         return explanation
 
+    def explain_implied_by(
+        self, other: Comparable, context: Optional[ContextRegister] = None
+    ) -> Optional[ContextRegister]:
+        """Get one explanation of why self implies other."""
+        explanations = self.explanations_implied_by(other, context=context)
+        try:
+            explanation = next(explanations)
+        except StopIteration:
+            return None
+        return explanation
+
     def explanations_contradiction(
         self, other: Comparable, context: Optional[ContextRegister] = None
     ) -> Iterator[ContextRegister]:
@@ -99,6 +121,17 @@ class Comparable(ABC):
         self, other: Comparable, context: Optional[ContextRegister] = None
     ) -> Iterator[ContextRegister]:
         raise NotImplementedError
+
+    def explanations_implied_by(
+        self, other: Comparable, context: Optional[ContextRegister] = None
+    ) -> Iterator[ContextRegister]:
+        context = context or ContextRegister()
+        yield from (
+            register.reversed()
+            for register in other.explanations_implication(
+                self, context=context.reversed()
+            )
+        )
 
     def explanations_same_meaning(
         self, other: Comparable, context: Optional[ContextRegister] = None
@@ -174,4 +207,3 @@ class ContextRegister(Dict[Comparable, Comparable]):
                     logger.debug("%s assigned to two different keys", in_value)
                     return None
         return self_mapping
-
