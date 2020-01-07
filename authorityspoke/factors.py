@@ -646,6 +646,19 @@ class Factor(Comparable):
 TextLinkDict = Dict[Union[Factor, Enactment], List[TextQuoteSelector]]
 
 
+def consistent(left: Factor, right: Factor) -> bool:
+    """
+    Call :meth:`.Factor.consistent_with` as function alias.
+
+    This exists because :func:`Factor._context_registers` needs
+    a function rather than a method for the `comparison` variable.
+
+    :returns:
+        whether ``other`` is consistent with ``self``.
+    """
+    return left.consistent_with(right)
+
+
 def means(left: Factor, right: Factor) -> bool:
     """
     Call :meth:`.Factor.means` as function alias.
@@ -675,6 +688,10 @@ class ComparableGroup(Tuple[F, ...], Comparable):
         if isinstance(value, Factor):
             value = (value,)
         return tuple.__new__(ComparableGroup, value)
+
+    def __add__(self, other) -> ComparableGroup:
+        added = tuple(self) + ComparableGroup(other)
+        return ComparableGroup(added)
 
     def consistent_with(
         self, other: ComparableGroup, context: Optional[ContextRegister] = None,
@@ -860,8 +877,9 @@ class ComparableGroup(Tuple[F, ...], Comparable):
                 yield from self.explanations_has_all_factors_of(other, explanation)
 
     def union(
-        self, other: ComparableGroup, context: Optional[ContextRegister] = None
+        self, other: Comparable, context: Optional[ContextRegister] = None
     ) -> Optional[ComparableGroup]:
+        other = ComparableGroup(other)
         new_factors = []
         for self_factor in self:
             broadest = self_factor
@@ -877,8 +895,9 @@ class ComparableGroup(Tuple[F, ...], Comparable):
         return FactorGroup(factors_for_group)
 
     def union_allowing_contradictions(
-        self, other: ComparableGroup, context: Optional[ContextRegister] = None
+        self, other: Comparable, context: Optional[ContextRegister] = None
     ) -> Optional[ComparableGroup]:
+        other = ComparableGroup(other)
         new_factors = []
         for self_factor in self:
             broadest = self_factor
@@ -890,6 +909,9 @@ class ComparableGroup(Tuple[F, ...], Comparable):
             factor for factor in other if factor not in new_factors
         ]
         return FactorGroup(factors_for_group)
+
+    def __or__(self, other: Comparable):
+        return self.union(other)
 
 
 FactorGroup = ComparableGroup[Factor]

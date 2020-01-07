@@ -85,3 +85,31 @@ class TestImplication:
         group = FactorGroup(factor_list)
         empty_group = FactorGroup()
         assert group.implies(empty_group)
+
+
+class TestAdd:
+    def test_add_does_not_consolidate_factors(self, watt_factor):
+        left = FactorGroup(watt_factor["f1"])
+        right = FactorGroup(watt_factor["f1"])
+        added = left + right
+        assert len(added) == 2
+        assert isinstance(added, ComparableGroup)
+
+    def test_add_factor_to_factorgroup(self, watt_factor):
+        left = FactorGroup(watt_factor["f1"])
+        right = watt_factor["f1"]
+        added = left + right
+        assert len(added) == 2
+        assert isinstance(added, ComparableGroup)
+
+
+class TestUnion:
+    def test_no_contradiction_because_entities_vary(self, watt_factor):
+        """
+        If these Factors were about the same Entity, they would contradict
+        and no union would be possible.
+        """
+        left = FactorGroup(watt_factor["f3_different_entity"])
+        right = FactorGroup(watt_factor["f3_absent"])
+        combined = left | right
+        assert len(combined) == 2
