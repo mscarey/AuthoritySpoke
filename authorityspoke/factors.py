@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 import functools
-from itertools import zip_longest
+from itertools import permutations, zip_longest
 import operator
 import textwrap
 from typing import Any, Callable, Dict, Iterable, Iterator, List
@@ -237,20 +237,6 @@ class Factor(Comparable):
             return other.new_context(self.generic_factors)
         return None
 
-    def consistent_with(
-        self, other: Factor, context: Optional[ContextRegister]
-    ) -> Iterator[ContextRegister]:
-        """
-        Check if self and other can be non-contradictory.
-
-        :returns:
-            a bool indicating whether there's at least one way to
-            match the :attr:`context_factors` of ``self`` and ``other``,
-            such that they fit the relationship ``comparison``.
-        """
-
-        raise NotImplementedError
-
     def _contradicts_if_present(
         self, other: Factor, context: Optional[ContextRegister] = None
     ) -> Iterator[ContextRegister]:
@@ -285,6 +271,23 @@ class Factor(Comparable):
             yield from self.context_factors.ordered_comparison(
                 other=other.context_factors, operation=comparison, context=context
             )
+
+    def explanations_consistent_with_factor(
+        self, other: Factor, context: Optional[ContextRegister] = None
+    ) -> Iterator[ContextRegister]:
+        """
+        Test whether ``self`` does not contradict ``other``.
+
+        This should only be called after confirming that ``other``
+        is not ``None``.
+
+        :returns:
+            ``True`` if self and other can't both be true at
+            the same time. Otherwise returns ``False``.
+        """
+        if context is None:
+            context = ContextRegister()
+        raise NotImplementedError
 
     def explanations_contradiction(
         self, other: Comparable, context: Optional[ContextRegister] = None
@@ -372,6 +375,13 @@ class Factor(Comparable):
         changes = self._make_dict_to_evolve(changes)
         new_values = self._evolve_from_dict(changes)
         return self.__class__(**new_values)
+
+    def explanations_consistent_with(
+        self, other: Comparable, context: Optional[ContextRegister] = None
+    ) -> Iterator[ContextRegister]:
+        if isinstance(other, tuple):
+            raise NotImplementedError
+        yield from self.explanations_consistent_with_factor(other, context=context)
 
     def explanations_same_meaning(
         self, other: Comparable, context: Optional[ContextRegister] = None
@@ -564,6 +574,24 @@ class Factor(Comparable):
         """
         return self.__dict__.copy()
 
+    def possible_contexts(
+        self, other: Comparable, context: Optional[ContextRegister] = None
+    ) -> Iterator[ContextRegister]:
+        context = context or ContextRegister()
+        context = ContextRegister(context)
+        unused_self = [
+            factor for factor in self.generic_factors if factor not in context.keys()
+        ]
+        unused_other = [
+            factor for factor in other.generic_factors if factor not in context.values()
+        ]
+        if not (unused_self and unused_other):
+            yield context
+        else:
+            for permutation in permutations(unused_other):
+                incoming = ContextRegister(zip_longest(unused_self, permutation))
+                yield context.merged_with(incoming)
+
     def _registers_for_interchangeable_context(
         self, matches: ContextRegister
     ) -> Iterator[ContextRegister]:
@@ -646,7 +674,7 @@ class Factor(Comparable):
 TextLinkDict = Dict[Union[Factor, Enactment], List[TextQuoteSelector]]
 
 
-def consistent(left: Factor, right: Factor) -> bool:
+def consistent_with(left: Factor, right: Factor) -> bool:
     """
     Call :meth:`.Factor.consistent_with` as function alias.
 

@@ -304,6 +304,30 @@ class TestFacts:
             in new_matches
         )
 
+class TestContextRegisters:
+
+    def test_possible_context_without_empty_spaces(self, watt_factor, make_entity):
+        left = watt_factor["f1"]
+        right = watt_factor["f1"]
+        contexts = list(left.possible_contexts(right))
+        assert len(contexts) == 1
+        assert contexts[0][make_entity["motel"]] == make_entity["motel"]
+
+    def test_all_possible_contexts_identical_factor(self, watt_factor, make_entity):
+        left = watt_factor["f2"]
+        right = watt_factor["f2"]
+        contexts = list(left.possible_contexts(right))
+        assert len(contexts) == 2
+        assert any(context[make_entity["watt"]] == make_entity["motel"] for context in contexts)
+
+    def test_limited_possible_contexts_identical_factor(self, watt_factor, make_entity):
+        left = watt_factor["f2"]
+        right = watt_factor["f2"]
+        context = {make_entity["motel"]: make_entity["motel"]}
+        contexts = list(left.possible_contexts(right, context=context))
+        assert len(contexts) == 1
+        assert contexts[0][make_entity["watt"]] == make_entity["watt"]
+
 
 class TestSameMeaning:
     def test_equality_factor_from_same_predicate(self, watt_factor):
@@ -673,6 +697,25 @@ class TestContradiction:
         )
         with pytest.raises(TypeError):
             any(register is not None for register in update)
+
+
+class TestConsistent:
+    def test_contradictory_facts_about_same_entity(self, watt_factor):
+        left = watt_factor["f8_less"]
+        right = watt_factor["f8_meters"]
+        assert not left.consistent_with(
+            right, context={left.generic_factors[0]: right.generic_factors[0]}
+        )
+
+    def test_explanations_consistent_with(self, watt_factor):
+        left = watt_factor["f8_less"]
+        right = watt_factor["f8_meters"]
+        explanations = list(
+            left.explanations_consistent_with(
+                right, context={left.generic_factors[0]: right.generic_factors[0]}
+            )
+        )
+        assert not explanations
 
 
 class TestAddition:

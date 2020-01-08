@@ -8,6 +8,25 @@ logger = logging.getLogger(__name__)
 
 
 class Comparable(ABC):
+    def consistent_with(
+        self, other: Optional[Comparable], context: Optional[ContextRegister] = None
+    ) -> bool:
+        """
+        Check if self and other can be non-contradictory.
+
+        :returns:
+            a bool indicating whether there's at least one way to
+            match the :attr:`context_factors` of ``self`` and ``other``,
+            such that they fit the relationship ``comparison``.
+        """
+
+        if other is None:
+            return True
+        return any(
+            explanation is not None
+            for explanation in self.explanations_consistent_with(other, context)
+        )
+
     def contradicts(
         self, other: Optional[Comparable], context: Optional[ContextRegister] = None
     ) -> bool:
@@ -79,6 +98,17 @@ class Comparable(ABC):
             return None
         return explanation
 
+    def explain_consistent_with(
+        self, other: Comparable, context: Optional[ContextRegister] = None
+    ) -> Optional[ContextRegister]:
+        """Get one explanation of why self and other need not contradict."""
+        explanations = self.explanations_consistent_with(other, context=context)
+        try:
+            explanation = next(explanations)
+        except StopIteration:
+            return None
+        return explanation
+
     def explain_contradiction(
         self, other: Comparable, context: Optional[ContextRegister] = None
     ) -> Optional[ContextRegister]:
@@ -111,6 +141,11 @@ class Comparable(ABC):
         except StopIteration:
             return None
         return explanation
+
+    def explanations_consistent_with(
+        self, other: Comparable, context: Optional[ContextRegister] = None
+    ) -> Iterator[ContextRegister]:
+        raise NotImplementedError
 
     def explanations_contradiction(
         self, other: Comparable, context: Optional[ContextRegister] = None

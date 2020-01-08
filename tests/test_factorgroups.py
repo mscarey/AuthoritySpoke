@@ -104,6 +104,20 @@ class TestAdd:
 
 
 class TestUnion:
+    def test_factors_combined_because_of_implication(self, watt_factor):
+        left = FactorGroup(watt_factor["f8"])
+        right = FactorGroup(watt_factor["f8_meters"])
+        added = left | right
+        assert len(added) == 1
+        assert "meter" in str(added)
+
+    def test_union_with_factor_outside_group(self, watt_factor):
+        left = FactorGroup(watt_factor["f8_meters"])
+        right = watt_factor["f8"]
+        added = left | right
+        assert len(added) == 1
+        assert "10 meter" in str(added)
+
     def test_no_contradiction_because_entities_vary(self, watt_factor):
         """
         If these Factors were about the same Entity, they would contradict
