@@ -3,6 +3,7 @@ import operator
 import pytest
 
 from authorityspoke.comparisons import ContextRegister
+from authorityspoke.factors import FactorGroup
 
 
 class TestContextRegisters:
@@ -111,6 +112,18 @@ class TestContextRegisters:
 class TestLikelyContext:
     def test_likely_context_one_factor(self, make_entity, watt_factor):
         left = watt_factor["f2"]
+        right = watt_factor["f2"]
+        context = next(left.likely_contexts(right))
+        assert context[make_entity["motel"]] == make_entity["motel"]
+
+    def test_likely_context_implication_one_factor(self, make_entity, watt_factor):
+        left = watt_factor["f8"]
+        right = watt_factor["f8_meters"]
+        context = next(left.likely_contexts(right))
+        assert context[make_entity["motel"]] == make_entity["motel"]
+
+    def test_likely_context_two_factors(self, make_entity, watt_factor):
+        left = FactorGroup((watt_factor["f9_swap_entities"], watt_factor["f2"]))
         right = watt_factor["f2"]
         context = next(left.likely_contexts(right))
         assert context[make_entity["motel"]] == make_entity["motel"]

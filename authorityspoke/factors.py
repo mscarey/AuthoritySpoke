@@ -543,6 +543,7 @@ class Factor(Comparable):
     def _likely_context_from_meaning(
         self, other: Comparable, context: ContextRegister
     ) -> Optional[ContextRegister]:
+        new_context = None
         if self.means(other, context=context) or other.means(
             self, context=context.reversed()
         ):
@@ -554,6 +555,7 @@ class Factor(Comparable):
     def _likely_context_from_implication(
         self, other: Comparable, context: ContextRegister
     ) -> Optional[ContextRegister]:
+        new_context = None
         if self.implies(other, context=context) or other.implies(
             self, context=context.reversed()
         ):
@@ -967,6 +969,34 @@ class ComparableGroup(Tuple[F, ...], Comparable):
                 other, context
             ):
                 yield from self.explanations_has_all_factors_of(other, explanation)
+
+    def _likely_contexts_for_factor(self, other: Factor, context: ContextRegister, i: int = 0
+    ) -> Iterator[ContextRegister]:
+        if i == len(self):
+            yield context
+        else:
+            next_factor = self[i]
+            for new_context in next_factor.likely_contexts(other, context):
+                yield from self._likely_contexts_for_factor(other, new_context, i + 1)
+
+    def likely_contexts(
+        self, other: Comparable, context: Optional[ContextRegister] = None
+    ) -> Iterator[ContextRegister]:
+        context = context or ContextRegister()
+        if isinstance(other, Factor):
+            yield from self._likely_contexts_for_factor(other, context)
+        else:
+            raise NotImplementedError
+        same_meaning = self._likely_context_from_meaning(other, context)
+        if same_meaning:
+            implied = self._likely_context_from_implication(other, same_meaning)
+        else:
+            implied = self._likely_context_from_implication(other, context)
+        if implied:
+            yield implied
+        if same_meaning:
+            yield same_meaning
+        yield context
 
     # @use_likely_context
     def union(
