@@ -287,7 +287,9 @@ class Factor(Comparable):
         """
         if context is None:
             context = ContextRegister()
-        raise NotImplementedError
+        for possible in self.possible_contexts(other, context):
+            if not self.contradicts(other, context=possible):
+                yield possible
 
     def explanations_contradiction(
         self, other: Comparable, context: Optional[ContextRegister] = None
@@ -577,6 +579,14 @@ class Factor(Comparable):
     def possible_contexts(
         self, other: Comparable, context: Optional[ContextRegister] = None
     ) -> Iterator[ContextRegister]:
+        r"""
+        Get permutations of generic Factor assignments not ruled out by the known context.
+
+        :param other:
+            another :class:`.Comparable` object with generic :class:`.Factor`\s
+
+        :yields: all possible ContextRegisters linking the two :class:`.Comparable`\s
+        """
         context = context or ContextRegister()
         context = ContextRegister(context)
         unused_self = [
