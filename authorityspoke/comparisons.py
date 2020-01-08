@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from abc import ABC
 import logging
-from typing import Dict, Iterator, Optional
+from typing import Dict, Iterator, List, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -44,6 +44,19 @@ class Comparable(ABC):
             explanation is not None
             for explanation in self.explanations_contradiction(other, context)
         )
+
+    @property
+    def generic_factors(self) -> List[Comparable]:
+        r"""
+        :class:`.Factor`\s that can be replaced without changing ``self``\s meaning.
+
+        :returns:
+            a :class:`list` made from a :class:`dict` with ``self``\'s
+            generic :class:`.Factor`\s as keys and ``None`` as values,
+            so that the keys can be matched to another object's
+            ``generic_factors`` to perform an equality test.
+        """
+        return []
 
     def implied_by(
         self, other: Optional[Comparable], context: Optional[ContextRegister] = None

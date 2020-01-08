@@ -8,7 +8,7 @@ or specify the :class:`.Enactment`\s that might require them.
 from __future__ import annotations
 
 import functools
-from itertools import chain
+from itertools import chain, zip_longest
 import operator
 
 from typing import Any, Callable, ClassVar, Dict, Iterable, Iterator
@@ -135,7 +135,7 @@ def use_likely_context(func: Callable):
         less_specific = find_less_specific_context(left, right, context)
         more_specific = find_more_specific_context(left, right, less_specific)
         context_to_use = more_specific or less_specific or context or ContextRegister()
-        for unused_left, unused_right in zip(
+        for unused_left, unused_right in zip_longest(
             [
                 item
                 for item in left.generic_factors

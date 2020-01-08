@@ -1,5 +1,11 @@
 Changelog
 =========
+dev
+-----------
+- Create ComparableGroup class for unordered collections of Factors
+- Create FactorSequence class for ordered collections of Factors
+- Eliminate Analogy class, moving its methods to FactorGroup and FactorSequence
+- Add Factor.consistent_with method to search for any available context that causes two Factors not to contradict
 
 0.3.4 (2020-01-02)
 -----------

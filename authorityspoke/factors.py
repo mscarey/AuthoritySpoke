@@ -4,11 +4,11 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 import functools
-from itertools import permutations, zip_longest
+from itertools import chain, permutations, zip_longest
 import operator
 import textwrap
 from typing import Any, Callable, Dict, Iterable, Iterator, List
-from typing import Optional, Sequence, Tuple, TypeVar, Union
+from typing import Optional, Sequence, Set, Tuple, TypeVar, Union
 
 from anchorpoint.textselectors import TextQuoteSelector
 
@@ -531,6 +531,52 @@ class Factor(Comparable):
             if not self.generic:
                 yield from self._implies_if_concrete(other, context)
 
+    def _update_context_from_factors(
+        self, other: Comparable, context: ContextRegister
+    ) -> Optional[ContextRegister]:
+        incoming = ContextRegister(
+            dict(zip(other.generic_factors, self.generic_factors))
+        )
+        updated_context = context.merged_with(incoming)
+        return updated_context
+
+    def _likely_context_from_meaning(
+        self, other: Comparable, context: ContextRegister
+    ) -> Optional[ContextRegister]:
+        if self.means(other, context=context) or other.means(
+            self, context=context.reversed()
+        ):
+            new_context = self._update_context_from_factors(other, context)
+        if new_context and new_context != context:
+            return new_context
+        return None
+
+    def _likely_context_from_implication(
+        self, other: Comparable, context: ContextRegister
+    ) -> Optional[ContextRegister]:
+        if self.implies(other, context=context) or other.implies(
+            self, context=context.reversed()
+        ):
+            new_context = self._update_context_from_factors(other, context)
+        if new_context and new_context != context:
+            return new_context
+        return None
+
+    def likely_contexts(
+        self, other: Comparable, context: Optional[ContextRegister] = None
+    ) -> Iterator[ContextRegister]:
+        context = context or ContextRegister()
+        same_meaning = self._likely_context_from_meaning(other, context)
+        if same_meaning:
+            implied = self._likely_context_from_implication(other, same_meaning)
+        else:
+            implied = self._likely_context_from_implication(other, context)
+        if implied:
+            yield implied
+        if same_meaning:
+            yield same_meaning
+        yield context
+
     def make_generic(self) -> Factor:
         """
         Get a copy of ``self`` except ensure ``generic`` is ``True``.
@@ -873,6 +919,14 @@ class ComparableGroup(Tuple[F, ...], Comparable):
             operation=means, still_need_matches=list(other), matches=context
         )
 
+    @property
+    def generic_factors(self) -> List[Comparable]:
+        generics: Dict[Comparable, None] = {}
+        for factor in self:
+            for generic in factor.generic_factors:
+                generics[generic] = None
+        return list(generics)
+
     def has_all_factors_of(
         self, other: ComparableGroup, context: Optional[ContextRegister] = None
     ) -> bool:
@@ -914,6 +968,7 @@ class ComparableGroup(Tuple[F, ...], Comparable):
             ):
                 yield from self.explanations_has_all_factors_of(other, explanation)
 
+    # @use_likely_context
     def union(
         self, other: Comparable, context: Optional[ContextRegister] = None
     ) -> Optional[ComparableGroup]:
