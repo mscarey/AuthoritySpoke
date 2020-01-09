@@ -127,3 +127,11 @@ class TestLikelyContext:
         right = watt_factor["f2"]
         context = next(left.likely_contexts(right))
         assert context[make_entity["motel"]] == make_entity["motel"]
+
+    def test_likely_context_two_by_two(self, make_entity, watt_factor):
+        left = FactorGroup((watt_factor["f9"], watt_factor["f2"]))
+        right = FactorGroup(
+            (watt_factor["f9_swap_entities"], watt_factor["f9_more_different_entity"])
+        )
+        context = next(left.likely_contexts(right))
+        assert context[make_entity["motel"]] == make_entity["trees"]

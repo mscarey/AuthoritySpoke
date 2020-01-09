@@ -46,6 +46,7 @@ class TestDownload:
         with pytest.raises(ValueError):
             download_case(many=True)
 
+    @pytest.mark.vcr
     def test_error_bad_cap_id(self):
         to_file = "lotus_h.json"
         with pytest.raises(ValueError):

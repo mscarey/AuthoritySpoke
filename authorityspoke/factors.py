@@ -979,6 +979,16 @@ class ComparableGroup(Tuple[F, ...], Comparable):
             for new_context in next_factor.likely_contexts(other, context):
                 yield from self._likely_contexts_for_factor(other, new_context, i + 1)
 
+    def _likely_contexts_for_factorgroup(self, other: FactorGroup, context: ContextRegister, j: int = 0
+    ) -> Iterator[ContextRegister]:
+        if j == len(other):
+            yield context
+        else:
+            next_factor = other[j]
+            for new_context in self._likely_contexts_for_factor(next_factor, context):
+                yield from self._likely_contexts_for_factorgroup(other, new_context, j + 1)
+
+
     def likely_contexts(
         self, other: Comparable, context: Optional[ContextRegister] = None
     ) -> Iterator[ContextRegister]:
@@ -986,17 +996,7 @@ class ComparableGroup(Tuple[F, ...], Comparable):
         if isinstance(other, Factor):
             yield from self._likely_contexts_for_factor(other, context)
         else:
-            raise NotImplementedError
-        same_meaning = self._likely_context_from_meaning(other, context)
-        if same_meaning:
-            implied = self._likely_context_from_implication(other, same_meaning)
-        else:
-            implied = self._likely_context_from_implication(other, context)
-        if implied:
-            yield implied
-        if same_meaning:
-            yield same_meaning
-        yield context
+            yield from self._likely_contexts_for_factorgroup(other, context)
 
     # @use_likely_context
     def union(
