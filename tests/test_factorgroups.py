@@ -127,7 +127,7 @@ class TestUnion:
         right = watt_factor["f8"]
         added = left | right
         assert len(added) == 1
-        assert "10 meter" in str(added)
+        assert "10 meter" in str(added[0])
 
     def test_no_contradiction_because_entities_vary(self, watt_factor):
         """

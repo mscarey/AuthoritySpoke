@@ -1001,6 +1001,9 @@ class ComparableGroup(Tuple[F, ...], Comparable):
     def drop_implied_factors(self) -> ComparableGroup:
         """
         Reduce group by removing redundant members implied by other members.
+
+        :returns:
+            new group with any redundant items remomved
         """
         result = []
         unchecked = list(self)
@@ -1013,6 +1016,25 @@ class ComparableGroup(Tuple[F, ...], Comparable):
                 elif current.implies_same_context(item):
                     unchecked.remove(item)
             result.append(current)
+        return ComparableGroup(result)
+
+    def internally_consistent(self, context: Optional[ContextRegister] = None) -> bool:
+        """
+        Check for contradictions among the Factors in self.
+
+        :returns: bool indicating whether self is internally consistent
+        """
+        context = context or ContextRegister()
+        unchecked = list(self)
+        while unchecked:
+            current = unchecked.pop()
+            for item in unchecked:
+                if not current.consistent_with(item, context):
+                    return False
+        return True
+
+    def new_context(self, context: ContextRegister) -> ComparableGroup:
+        result = [factor.new_context(context) for factor in self]
         return ComparableGroup(result)
 
     @use_likely_context
@@ -1028,35 +1050,19 @@ class ComparableGroup(Tuple[F, ...], Comparable):
         Convert the new list to a ComparableGroup and return it
         """
         other = ComparableGroup(other)
-        new_factors = []
-        for self_factor in self:
-            broadest = self_factor
-            for other_factor in other:
-                if not other_factor.consistent_with(self_factor, context=context):
-                    return None
-                if self_factor.implied_by(other_factor, context=context):
-                    broadest = other_factor
-            new_factors.append(broadest)
-        factors_for_group = new_factors + [
-            factor for factor in other if factor not in new_factors
-        ]
-        return FactorGroup(factors_for_group)
+        result = self + other.new_context(context)
+        result = result.drop_implied_factors()
+        if result.internally_consistent():
+            return result
+        return None
 
     def union_allowing_contradictions(
         self, other: Comparable, context: Optional[ContextRegister] = None
-    ) -> Optional[ComparableGroup]:
+    ) -> ComparableGroup:
         other = ComparableGroup(other)
-        new_factors = []
-        for self_factor in self:
-            broadest = self_factor
-            for other_factor in other:
-                if self_factor.implied_by(other_factor, context=context):
-                    broadest = other_factor
-            new_factors.append(broadest)
-        factors_for_group = new_factors + [
-            factor for factor in other if factor not in new_factors
-        ]
-        return FactorGroup(factors_for_group)
+        result = self + other.new_context(context)
+        result = result.drop_implied_factors()
+        return result
 
     def __or__(self, other: Comparable):
         return self.union(other)
