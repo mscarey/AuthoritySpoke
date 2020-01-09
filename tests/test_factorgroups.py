@@ -26,6 +26,17 @@ class TestMakeGroup:
         assert isinstance(identical_group, ComparableGroup)
         assert identical_group[0] == watt_factor["f1"]
 
+    def test_drop_implied_factors(self, watt_factor):
+        group = FactorGroup([watt_factor["f8_meters"], watt_factor["f8"]])
+        shorter = group.drop_implied_factors()
+        assert len(shorter) == 1
+        assert watt_factor["f8_meters"] in group
+
+    def test_drop_implied_factors_unmatched_context(self, watt_factor):
+        group = FactorGroup([watt_factor["f9_swap_entities"], watt_factor["f9_miles"]])
+        shorter = group.drop_implied_factors()
+        assert len(shorter) == 2
+
 
 class TestSameFactors:
     def test_group_has_same_factors_as_identical_group(self, watt_factor):

@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 from abc import ABC
+import functools
 import logging
-from typing import Dict, Iterator, List, Optional
+from typing import Callable, Dict, Iterator, List, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -79,6 +80,10 @@ class Comparable(ABC):
             register is not None
             for register in self.explanations_implication(other, context=context)
         )
+
+    def implies_same_context(self, other) -> bool:
+        same_context = ContextRegister({key: key for key in self.generic_factors})
+        return self.implies(other, context=same_context)
 
     def means(
         self, other: Optional[Comparable], context: Optional[ContextRegister] = None
@@ -255,3 +260,43 @@ class ContextRegister(Dict[Comparable, Comparable]):
                     logger.debug("%s assigned to two different keys", in_value)
                     return None
         return self_mapping
+
+
+def use_likely_context(func: Callable):
+    r"""
+    Find contexts most likely to have been intended for comparing :class:`Procedure`\s.
+
+    When such contexts are found, first tries calling the decorated comparison method
+    using those contexts. Only if no answer is found using the likely contexts
+    will the decorated method be called with no comparison method specified.
+
+    :param left:
+        a :class:`.Procedure` that is being compared to another
+        :class:`.Procedure`\, to create a new :class:`.Procedure`
+        using the context of the left :class:`.Procedure`\.
+
+    :param right:
+        a :class:`.Procedure` that is being compared to another :class:`.Procedure`\,
+        but that will have its context overwritten in the newly-created object.
+
+    :param context:
+        a :class:`.ContextRegister` identifying any known pairs of corresponding
+        context :class:`.Factor`\s between the two :class:`.Procedure`\s being
+        compared.
+
+    :returns:
+        a generator yielding :class:`.ContextRegister`\s based on the most "likely"
+        context that yields any :class:`.ContextRegister`\s at all.
+    """
+
+    @functools.wraps(func)
+    def wrapper(
+        left: Comparable, right: Comparable, context: Optional[ContextRegister] = None
+    ) -> Optional[Comparable]:
+        for likely_context in left.likely_contexts(right, context):
+            answer = func(left, right, likely_context)
+            if answer is not None:
+                return answer
+        return None
+
+    return wrapper

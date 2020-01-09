@@ -12,7 +12,7 @@ from typing import Optional, Sequence, Set, Tuple, TypeVar, Union
 
 from anchorpoint.textselectors import TextQuoteSelector
 
-from authorityspoke.comparisons import ContextRegister, Comparable
+from authorityspoke.comparisons import ContextRegister, Comparable, use_likely_context
 from authorityspoke.enactments import Enactment
 
 
@@ -998,16 +998,41 @@ class ComparableGroup(Tuple[F, ...], Comparable):
         else:
             yield from self._likely_contexts_for_factorgroup(other, context)
 
-    # @use_likely_context
+    def drop_implied_factors(self) -> ComparableGroup:
+        """
+        Reduce group by removing redundant members implied by other members.
+        """
+        result = []
+        unchecked = list(self)
+        while unchecked:
+            current = unchecked.pop()
+            for item in unchecked:
+                if item.implies_same_context(current):
+                    current = item
+                    unchecked.remove(item)
+                elif current.implies_same_context(item):
+                    unchecked.remove(item)
+            result.append(current)
+        return ComparableGroup(result)
+
+    @use_likely_context
     def union(
         self, other: Comparable, context: Optional[ContextRegister] = None
     ) -> Optional[ComparableGroup]:
+        """
+        Combine two groups of Factors if there are no contradictions among them.
+
+        Put all the Factors together in a list (handling the context change)
+        If any Factors imply one another, remove the implied Factor in favor of the implying one
+        If any Factors contradict, return None because the operation failed
+        Convert the new list to a ComparableGroup and return it
+        """
         other = ComparableGroup(other)
         new_factors = []
         for self_factor in self:
             broadest = self_factor
             for other_factor in other:
-                if other_factor.contradicts(self_factor, context=context):
+                if not other_factor.consistent_with(self_factor, context=context):
                     return None
                 if self_factor.implied_by(other_factor, context=context):
                     broadest = other_factor

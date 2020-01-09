@@ -7,7 +7,6 @@ or specify the :class:`.Enactment`\s that might require them.
 
 from __future__ import annotations
 
-import functools
 from itertools import chain, zip_longest
 import operator
 
@@ -16,7 +15,8 @@ from typing import List, Optional, Sequence, Tuple, Union
 
 from dataclasses import dataclass
 
-from authorityspoke.factors import Factor, ContextRegister, new_context_helper
+from authorityspoke.comparisons import ContextRegister, use_likely_context
+from authorityspoke.factors import Factor, new_context_helper
 from authorityspoke.factors import FactorGroup
 from authorityspoke.formatting import indented
 
@@ -99,58 +99,6 @@ def find_more_specific_context(
     if new_context and new_context != context:
         return new_context
     return None
-
-
-def use_likely_context(func: Callable):
-    r"""
-    Find contexts most likely to have been intended for comparing :class:`Procedure`\s.
-
-    When such contexts are found, first tries calling the decorated comparison method
-    using those contexts. Only if no answer is found using the likely contexts
-    will the decorated method be called with no comparison method specified.
-
-    :param left:
-        a :class:`.Procedure` that is being compared to another
-        :class:`.Procedure`\, to create a new :class:`.Procedure`
-        using the context of the left :class:`.Procedure`\.
-
-    :param right:
-        a :class:`.Procedure` that is being compared to another :class:`.Procedure`\,
-        but that will have its context overwritten in the newly-created object.
-
-    :param context:
-        a :class:`.ContextRegister` identifying any known pairs of corresponding
-        context :class:`.Factor`\s between the two :class:`.Procedure`\s being
-        compared.
-
-    :returns:
-        a generator yielding :class:`.ContextRegister`\s based on the most "likely"
-        context that yields any :class:`.ContextRegister`\s at all.
-    """
-
-    @functools.wraps(func)
-    def wrapper(
-        left: Procedure, right: Procedure, context: Optional[ContextRegister] = None
-    ) -> Iterator[ContextRegister]:
-        less_specific = find_less_specific_context(left, right, context)
-        more_specific = find_more_specific_context(left, right, less_specific)
-        context_to_use = more_specific or less_specific or context or ContextRegister()
-        for unused_left, unused_right in zip_longest(
-            [
-                item
-                for item in left.generic_factors
-                if item not in context_to_use.keys()
-            ],
-            [
-                item
-                for item in right.generic_factors
-                if item not in context_to_use.values()
-            ],
-        ):
-            context_to_use[unused_right] = unused_left
-        return func(left, right, context_to_use)
-
-    return wrapper
 
 
 @dataclass(frozen=True)
