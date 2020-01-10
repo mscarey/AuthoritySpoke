@@ -731,11 +731,11 @@ class TestUnion:
         # nothing can be inferred by their union.
         lotus_4 = lotus.holdings[2].rule.evolve("universal")
         new = lotus_4 | oracle.holdings[2].rule
+        assert new.mandatory is False
         assert (
             "<the Lotus menu command hierarchy> was the expression of an idea"
             in new.short_string
         )
-        assert new.mandatory is False
 
     def test_union_one_generic_not_matched(self, make_opinion_with_holding):
         """

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 import functools
-from itertools import chain, permutations, zip_longest
+from itertools import zip_longest
 import operator
 import textwrap
 from typing import Any, Callable, Dict, Iterable, Iterator, List
@@ -12,7 +12,8 @@ from typing import Optional, Sequence, Set, Tuple, TypeVar, Union
 
 from anchorpoint.textselectors import TextQuoteSelector
 
-from authorityspoke.comparisons import ContextRegister, Comparable, use_likely_context
+from authorityspoke.comparisons import ContextRegister, Comparable
+from authorityspoke.comparisons import use_likely_context, guess_at_remaining_context
 from authorityspoke.enactments import Enactment
 
 
@@ -1035,6 +1036,7 @@ class ComparableGroup(Tuple[F, ...], Comparable):
         result = result.drop_implied_factors()
         return result
 
+    @guess_at_remaining_context
     def __or__(self, other: Comparable):
         return self.union(other)
 

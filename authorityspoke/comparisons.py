@@ -295,24 +295,24 @@ class ContextRegister(Dict[Comparable, Comparable]):
 
 def use_likely_context(func: Callable):
     r"""
-    Find contexts most likely to have been intended for comparing :class:`Procedure`\s.
+    Find contexts most likely to have been intended for comparing Comparable.
 
     When such contexts are found, first tries calling the decorated comparison method
     using those contexts. Only if no answer is found using the likely contexts
     will the decorated method be called with no comparison method specified.
 
     :param left:
-        a :class:`.Procedure` that is being compared to another
-        :class:`.Procedure`\, to create a new :class:`.Procedure`
-        using the context of the left :class:`.Procedure`\.
+        a :class:`.Comparable` that is being compared to another
+        :class:`.Comparable`\, to create a new :class:`.Comparable`
+        using the context of the left :class:`.Comparable`\.
 
     :param right:
-        a :class:`.Procedure` that is being compared to another :class:`.Procedure`\,
-        but that will have its context overwritten in the newly-created object.
+        a :class:`.Comparable` that is being compared but that will have its context
+        overwritten in the newly-created object.
 
     :param context:
         a :class:`.ContextRegister` identifying any known pairs of corresponding
-        context :class:`.Factor`\s between the two :class:`.Procedure`\s being
+        context :class:`.Factor`\s between the two :class:`.Comparable`\s being
         compared.
 
     :returns:
@@ -327,10 +327,42 @@ def use_likely_context(func: Callable):
         for likely_context in left.likely_contexts(right, context):
             answer = func(left, right, likely_context)
             if answer is not None:
-                for possible_context in left.possible_contexts(right, likely_context):
-                    guess = func(left, right, possible_context)
-                    if guess is not None:
-                        return guess
+                return answer
+        return None
+
+    return wrapper
+
+
+def guess_at_remaining_context(func: Callable):
+    r"""
+    Match as many Factors as possible to change the context of Factors being combined.
+
+    :param left:
+        a :class:`.Comparable` that is being compared to another
+        :class:`.Comparable`\, to create a new :class:`.Comparable`
+        using the context of the left :class:`.Comparable`\.
+
+    :param right:
+        a :class:`.Comparable` that is being compared but that will have its context
+        overwritten in the newly-created object.
+
+    :param context:
+        a :class:`.ContextRegister` identifying any known pairs of corresponding
+        context :class:`.Factor`\s between the two :class:`.Comparable`\s being
+        compared.
+
+    :returns:
+        a generator yielding :class:`.ContextRegister`\s based on the most "likely"
+        context that yields any :class:`.ContextRegister`\s at all.
+    """
+
+    @functools.wraps(func)
+    def wrapper(
+        left: Comparable, right: Comparable, context: Optional[ContextRegister] = None
+    ) -> Optional[Comparable]:
+        for likely_context in left.possible_contexts(right, context):
+            answer = func(left, right, likely_context)
+            if answer is not None:
                 return answer
         return None
 
