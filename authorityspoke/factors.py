@@ -1033,7 +1033,7 @@ class ComparableGroup(Tuple[F, ...], Comparable):
 
     def union_from_explanation_allow_contradiction(
         self, other: ComparableGroup, context: ContextRegister
-    ) -> Optional[ComparableGroup]:
+    ) -> ComparableGroup:
         result = self + other.new_context(context.reversed())
         result = result.drop_implied_factors()
         return result

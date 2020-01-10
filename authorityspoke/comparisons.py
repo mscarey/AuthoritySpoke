@@ -141,7 +141,7 @@ class Comparable(ABC):
 
     def explanations_union(
         self, other: Comparable, context: Optional[ContextRegister] = None
-    ):
+    ) -> Iterator[ContextRegister]:
         context = context or ContextRegister()
         for partial in self.partial_explanations_union(other, context):
             for guess in self.possible_contexts(other, partial):
@@ -151,11 +151,14 @@ class Comparable(ABC):
 
     def union(
         self, other: Comparable, context: Optional[ContextRegister] = None
-    ) -> Optional[ComparableGroup]:
-        explanation = next(self.explanations_union(other, context))
-        if explanation:
-            return self.union_from_explanation(other, context=explanation)
-        return None
+    ) -> Optional[Comparable]:
+        context = context or ContextRegister()
+        explanations = self.explanations_union(other, context)
+        try:
+            explanation = next(explanations)
+        except StopIteration:
+            return None
+        return self.union_from_explanation(other, explanation)
 
     def explain_same_meaning(
         self, other: Comparable, context: Optional[ContextRegister] = None
