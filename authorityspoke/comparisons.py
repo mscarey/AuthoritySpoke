@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from abc import ABC
 import functools
+from itertools import permutations, zip_longest
 import logging
 from typing import Callable, Dict, Iterator, List, Optional
 
@@ -104,6 +105,36 @@ class Comparable(ABC):
             explanation is not None
             for explanation in self.explanations_same_meaning(other, context=context)
         )
+
+    def means_same_context(self, other) -> bool:
+        same_context = ContextRegister({key: key for key in self.generic_factors})
+        return self.means(other, context=same_context)
+
+    def possible_contexts(
+        self, other: Comparable, context: Optional[ContextRegister] = None
+    ) -> Iterator[ContextRegister]:
+        r"""
+        Get permutations of generic Factor assignments not ruled out by the known context.
+
+        :param other:
+            another :class:`.Comparable` object with generic :class:`.Factor`\s
+
+        :yields: all possible ContextRegisters linking the two :class:`.Comparable`\s
+        """
+        context = context or ContextRegister()
+        context = ContextRegister(context)
+        unused_self = [
+            factor for factor in self.generic_factors if factor not in context.keys()
+        ]
+        unused_other = [
+            factor for factor in other.generic_factors if factor not in context.values()
+        ]
+        if not (unused_self and unused_other):
+            yield context
+        else:
+            for permutation in permutations(unused_other):
+                incoming = ContextRegister(zip_longest(unused_self, permutation))
+                yield context.merged_with(incoming)
 
     def explain_same_meaning(
         self, other: Comparable, context: Optional[ContextRegister] = None
@@ -296,6 +327,10 @@ def use_likely_context(func: Callable):
         for likely_context in left.likely_contexts(right, context):
             answer = func(left, right, likely_context)
             if answer is not None:
+                for possible_context in left.possible_contexts(right, likely_context):
+                    guess = func(left, right, possible_context)
+                    if guess is not None:
+                        return guess
                 return answer
         return None
 

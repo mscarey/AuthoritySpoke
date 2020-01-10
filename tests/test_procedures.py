@@ -255,7 +255,7 @@ class TestProcedureUnion:
             feist.holdings[0].procedure + feist.holdings[2].procedure.inputs[0]
         )
         assert procedure_from_union.means(procedure_from_adding)
-        assert procedure_from_union == procedure_from_adding
+        assert procedure_from_union.means_same_context(procedure_from_adding)
 
 
 p_small_weight = Predicate(

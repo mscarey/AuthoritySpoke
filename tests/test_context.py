@@ -135,3 +135,48 @@ class TestLikelyContext:
         )
         context = next(left.likely_contexts(right))
         assert context[make_entity["motel"]] == make_entity["trees"]
+
+    def test_likely_context_different_context_factors(self, make_opinion_with_holding):
+        lotus = make_opinion_with_holding["lotus_majority"]
+        oracle = make_opinion_with_holding["oracle_majority"]
+        left = [lotus.holdings[2].outputs[0], lotus.holdings[2].inputs[0].to_effect]
+        left = FactorGroup(left)
+        right = FactorGroup(oracle.holdings[2].outputs[0])
+        context = next(left.likely_contexts(right))
+        lotus_menu = lotus.holdings[2].generic_factors[0]
+        java_api = oracle.generic_factors[0]
+        assert context[lotus_menu] == java_api
+
+    def test_likely_context_from_factor_meaning(self, make_opinion_with_holding):
+        lotus = make_opinion_with_holding["lotus_majority"]
+        oracle = make_opinion_with_holding["oracle_majority"]
+        left = lotus.holdings[2].outputs[0]
+        right = oracle.holdings[2].outputs[0]
+        likely = left._likely_context_from_meaning(right, context=ContextRegister())
+        lotus_menu = lotus.holdings[2].generic_factors[0]
+        java_api = oracle.generic_factors[0]
+        assert likely[lotus_menu] == java_api
+
+    def test_union_one_generic_not_matched(self, make_opinion_with_holding):
+        """
+        Here, both FactorGroups have "fact that <> was a computer program".
+        But they each have another generic that can't be matched:
+        fact that <the Java API> was a literal element of <the Java language>
+        and
+        fact that <the Lotus menu command hierarchy> provided the means by
+        which users controlled and operated <Lotus 1-2-3>
+
+        Tests that Factors from "left" should be keys and Factors from "right" values.
+        """
+        lotus = make_opinion_with_holding["lotus_majority"]
+        oracle = make_opinion_with_holding["oracle_majority"]
+        left = FactorGroup(lotus.holdings[7].inputs[:2])
+        right = FactorGroup(
+            [oracle.holdings[3].outputs[0], oracle.holdings[3].inputs[0]]
+        )
+        new = left | right
+        text = (
+            "that <the Lotus menu command hierarchy> was a "
+            "literal element of <Lotus 1-2-3>"
+        )
+        assert text in new[1].short_string

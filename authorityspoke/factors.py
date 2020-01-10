@@ -535,7 +535,7 @@ class Factor(Comparable):
         self, other: Comparable, context: ContextRegister
     ) -> Optional[ContextRegister]:
         incoming = ContextRegister(
-            dict(zip(other.generic_factors, self.generic_factors))
+            dict(zip(self.generic_factors, other.generic_factors))
         )
         updated_context = context.merged_with(incoming)
         return updated_context
@@ -623,32 +623,6 @@ class Factor(Comparable):
         when generating a new object.
         """
         return self.__dict__.copy()
-
-    def possible_contexts(
-        self, other: Comparable, context: Optional[ContextRegister] = None
-    ) -> Iterator[ContextRegister]:
-        r"""
-        Get permutations of generic Factor assignments not ruled out by the known context.
-
-        :param other:
-            another :class:`.Comparable` object with generic :class:`.Factor`\s
-
-        :yields: all possible ContextRegisters linking the two :class:`.Comparable`\s
-        """
-        context = context or ContextRegister()
-        context = ContextRegister(context)
-        unused_self = [
-            factor for factor in self.generic_factors if factor not in context.keys()
-        ]
-        unused_other = [
-            factor for factor in other.generic_factors if factor not in context.values()
-        ]
-        if not (unused_self and unused_other):
-            yield context
-        else:
-            for permutation in permutations(unused_other):
-                incoming = ContextRegister(zip_longest(unused_self, permutation))
-                yield context.merged_with(incoming)
 
     def _registers_for_interchangeable_context(
         self, matches: ContextRegister
@@ -1043,15 +1017,8 @@ class ComparableGroup(Tuple[F, ...], Comparable):
     ) -> Optional[ComparableGroup]:
         """
         Combine two groups of Factors if there are no contradictions among them.
-
-        Put all the Factors together in a list (handling the context change)
-        If any Factors imply one another, remove the implied Factor in favor of the implying one
-        If any Factors contradict, return None because the operation failed
-        Convert the new list to a ComparableGroup and return it
         """
-        other = ComparableGroup(other)
-        result = self + other.new_context(context)
-        result = result.drop_implied_factors()
+        result = self.union_allowing_contradictions(other, context)
         if result.internally_consistent():
             return result
         return None
@@ -1059,8 +1026,12 @@ class ComparableGroup(Tuple[F, ...], Comparable):
     def union_allowing_contradictions(
         self, other: Comparable, context: Optional[ContextRegister] = None
     ) -> ComparableGroup:
+        """
+        Combine two groups of Factors and return result even if it has contradictions.
+        """
+        context = context or ContextRegister()
         other = ComparableGroup(other)
-        result = self + other.new_context(context)
+        result = self + other.new_context(context.reversed())
         result = result.drop_implied_factors()
         return result
 
