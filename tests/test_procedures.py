@@ -2,7 +2,7 @@ import logging
 import pytest
 
 from authorityspoke.entities import Entity
-from authorityspoke.factors import ContextRegister, FactorGroup
+from authorityspoke.factors import ContextRegister, FactorGroup, FactorSequence
 from authorityspoke.procedures import Procedure
 from authorityspoke.predicates import Predicate, Q_
 from authorityspoke.facts import Fact
@@ -50,6 +50,9 @@ class TestProcedures:
             e["watt"],
             make_evidence["crime_absent"],
         }
+
+    def test_type_of_context_factors(self, make_procedure):
+        assert isinstance(make_procedure["c3"].context_factors, FactorSequence)
 
     def test_entities_of_inputs_for_identical_procedure(
         self, watt_factor, make_procedure, watt_mentioned

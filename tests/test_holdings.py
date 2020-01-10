@@ -2,7 +2,7 @@ import pytest
 
 from authorityspoke.entities import Entity
 from authorityspoke.explanations import Explanation
-from authorityspoke.factors import ContextRegister
+from authorityspoke.factors import ContextRegister, FactorSequence
 from authorityspoke.holdings import Holding
 
 
@@ -36,6 +36,9 @@ class TestHolding:
         should return an empty list.
         """
         assert not make_holding["h1"].inferred_from_exclusive
+
+    def test_type_of_context_factors(self, make_holding):
+        assert isinstance(make_holding["h1"].context_factors, FactorSequence)
 
 
 class TestSameMeaning:

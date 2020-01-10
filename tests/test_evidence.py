@@ -1,3 +1,4 @@
+from authorityspoke.factors import FactorSequence
 from authorityspoke.evidence import Evidence, Exhibit
 from authorityspoke.facts import build_fact
 
@@ -50,6 +51,9 @@ class TestEvidence:
 
     def test_evidence_str_with_context(self, make_evidence):
         assert "in the form testimony" in str(make_evidence["reciprocal"]).lower()
+
+    def test_type_of_context_factors(self, make_evidence):
+        assert isinstance(make_evidence["no_shooting"].context_factors, FactorSequence)
 
 
 class TestEvidenceSameMeaning:

@@ -4,7 +4,7 @@ import operator
 import pytest
 
 from authorityspoke.entities import Entity
-from authorityspoke.factors import Factor, ContextRegister, means
+from authorityspoke.factors import Factor, ContextRegister, means, FactorSequence
 from authorityspoke.facts import Fact, build_fact
 from authorityspoke.rules import Rule
 from authorityspoke.opinions import Opinion
@@ -159,6 +159,9 @@ class TestFacts:
             }
         )
         assert "<Darth Vader> operated" in str(different)
+
+    def test_type_of_context_factors(self, watt_factor):
+        assert isinstance(watt_factor["f1"].context_factors, FactorSequence)
 
     def test_concrete_to_abstract(self, make_entity, make_predicate):
         motel = make_entity["motel_specific"]
