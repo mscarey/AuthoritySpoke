@@ -7,7 +7,7 @@ or specify the :class:`.Enactment`\s that might require them.
 
 from __future__ import annotations
 
-from itertools import chain, zip_longest
+from itertools import chain
 import operator
 
 from typing import Any, Callable, ClassVar, Dict, Iterable, Iterator
@@ -16,7 +16,7 @@ from typing import List, Optional, Sequence, Tuple, Union
 from dataclasses import dataclass
 
 from authorityspoke.comparisons import ContextRegister
-from authorityspoke.comparisons import use_likely_context, guess_at_remaining_context
+from authorityspoke.comparisons import use_likely_context
 from authorityspoke.factors import Factor, new_context_helper
 from authorityspoke.factors import FactorGroup
 from authorityspoke.formatting import indented
@@ -239,9 +239,13 @@ class Procedure(Factor):
                 return added
         return None
 
-    @use_likely_context
-    def union(
+    def partial_explanations_union(
         self, other: Procedure, context: Optional[ContextRegister] = None
+    ) -> Iterable[ContextRegister]:
+        yield from self.likely_contexts(other, context)
+
+    def union_from_explanation(
+        self, other: Procedure, context: ContextRegister
     ) -> Optional[Procedure]:
         r"""
         Combine two :class:`Procedure`\s into one.
@@ -253,17 +257,13 @@ class Procedure(Factor):
         remain the same.
         """
 
-        other = other.new_context(context)
-        new_inputs = self.inputs.union(other.inputs)
-        new_outputs = self.outputs.union(other.outputs)
-        new_despite = self.despite.union_allowing_contradictions(other.despite)
+        new_inputs = self.inputs.union_from_explanation(other.inputs, context)
+        new_outputs = self.outputs.union_from_explanation(other.outputs, context)
+        new_despite = self.despite.union_from_explanation_allow_contradiction(other.despite, context)
 
         if any(group is None for group in (new_outputs, new_inputs, new_despite)):
             return None
         return Procedure(outputs=new_outputs, inputs=new_inputs, despite=new_despite)
-
-    def __or__(self, other):
-        return self.union(other)
 
     def __len__(self):
         r"""

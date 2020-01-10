@@ -136,6 +136,27 @@ class Comparable(ABC):
                 incoming = ContextRegister(zip_longest(unused_self, permutation))
                 yield context.merged_with(incoming)
 
+    def __or__(self, other: Comparable):
+        return self.union(other)
+
+    def explanations_union(
+        self, other: Comparable, context: Optional[ContextRegister] = None
+    ):
+        context = context or ContextRegister()
+        for partial in self.partial_explanations_union(other, context):
+            for guess in self.possible_contexts(other, partial):
+                answer = self.union_from_explanation(other, guess)
+                if answer:
+                    yield guess
+
+    def union(
+        self, other: Comparable, context: Optional[ContextRegister] = None
+    ) -> Optional[ComparableGroup]:
+        explanation = next(self.explanations_union(other, context))
+        if explanation:
+            return self.union_from_explanation(other, context=explanation)
+        return None
+
     def explain_same_meaning(
         self, other: Comparable, context: Optional[ContextRegister] = None
     ) -> Optional[ContextRegister]:
@@ -325,42 +346,6 @@ def use_likely_context(func: Callable):
         left: Comparable, right: Comparable, context: Optional[ContextRegister] = None
     ) -> Optional[Comparable]:
         for likely_context in left.likely_contexts(right, context):
-            answer = func(left, right, likely_context)
-            if answer is not None:
-                return answer
-        return None
-
-    return wrapper
-
-
-def guess_at_remaining_context(func: Callable):
-    r"""
-    Match as many Factors as possible to change the context of Factors being combined.
-
-    :param left:
-        a :class:`.Comparable` that is being compared to another
-        :class:`.Comparable`\, to create a new :class:`.Comparable`
-        using the context of the left :class:`.Comparable`\.
-
-    :param right:
-        a :class:`.Comparable` that is being compared but that will have its context
-        overwritten in the newly-created object.
-
-    :param context:
-        a :class:`.ContextRegister` identifying any known pairs of corresponding
-        context :class:`.Factor`\s between the two :class:`.Comparable`\s being
-        compared.
-
-    :returns:
-        a generator yielding :class:`.ContextRegister`\s based on the most "likely"
-        context that yields any :class:`.ContextRegister`\s at all.
-    """
-
-    @functools.wraps(func)
-    def wrapper(
-        left: Comparable, right: Comparable, context: Optional[ContextRegister] = None
-    ) -> Optional[Comparable]:
-        for likely_context in left.possible_contexts(right, context):
             answer = func(left, right, likely_context)
             if answer is not None:
                 return answer

@@ -13,7 +13,7 @@ from typing import Optional, Sequence, Set, Tuple, TypeVar, Union
 from anchorpoint.textselectors import TextQuoteSelector
 
 from authorityspoke.comparisons import ContextRegister, Comparable
-from authorityspoke.comparisons import use_likely_context, guess_at_remaining_context
+from authorityspoke.comparisons import use_likely_context
 from authorityspoke.enactments import Enactment
 
 
@@ -945,7 +945,8 @@ class ComparableGroup(Tuple[F, ...], Comparable):
             ):
                 yield from self.explanations_has_all_factors_of(other, explanation)
 
-    def _likely_contexts_for_factor(self, other: Factor, context: ContextRegister, i: int = 0
+    def _likely_contexts_for_factor(
+        self, other: Factor, context: ContextRegister, i: int = 0
     ) -> Iterator[ContextRegister]:
         if i == len(self):
             yield context
@@ -954,15 +955,17 @@ class ComparableGroup(Tuple[F, ...], Comparable):
             for new_context in next_factor.likely_contexts(other, context):
                 yield from self._likely_contexts_for_factor(other, new_context, i + 1)
 
-    def _likely_contexts_for_factorgroup(self, other: FactorGroup, context: ContextRegister, j: int = 0
+    def _likely_contexts_for_factorgroup(
+        self, other: FactorGroup, context: ContextRegister, j: int = 0
     ) -> Iterator[ContextRegister]:
         if j == len(other):
             yield context
         else:
             next_factor = other[j]
             for new_context in self._likely_contexts_for_factor(next_factor, context):
-                yield from self._likely_contexts_for_factorgroup(other, new_context, j + 1)
-
+                yield from self._likely_contexts_for_factorgroup(
+                    other, new_context, j + 1
+                )
 
     def likely_contexts(
         self, other: Comparable, context: Optional[ContextRegister] = None
@@ -1012,33 +1015,28 @@ class ComparableGroup(Tuple[F, ...], Comparable):
         result = [factor.new_context(context) for factor in self]
         return ComparableGroup(result)
 
-    @use_likely_context
-    def union(
-        self, other: Comparable, context: Optional[ContextRegister] = None
-    ) -> Optional[ComparableGroup]:
-        """
-        Combine two groups of Factors if there are no contradictions among them.
-        """
-        result = self.union_allowing_contradictions(other, context)
-        if result.internally_consistent():
-            return result
-        return None
+    def partial_explanations_union(
+        self, other: Comparable, context: ContextRegister
+    ) -> Iterator[ContextRegister]:
+        for likely in self.likely_contexts(other, context):
+            partial = self + other.new_context(likely.reversed())
+            if partial.internally_consistent():
+                yield likely
 
-    def union_allowing_contradictions(
-        self, other: Comparable, context: Optional[ContextRegister] = None
-    ) -> ComparableGroup:
-        """
-        Combine two groups of Factors and return result even if it has contradictions.
-        """
-        context = context or ContextRegister()
-        other = ComparableGroup(other)
+    def union_from_explanation(
+        self, other: ComparableGroup, context: ContextRegister
+    ) -> Optional[ComparableGroup]:
+        result = self.union_from_explanation_allow_contradiction(other, context)
+        if not result.internally_consistent():
+            return None
+        return result
+
+    def union_from_explanation_allow_contradiction(
+        self, other: ComparableGroup, context: ContextRegister
+    ) -> Optional[ComparableGroup]:
         result = self + other.new_context(context.reversed())
         result = result.drop_implied_factors()
         return result
-
-    @guess_at_remaining_context
-    def __or__(self, other: Comparable):
-        return self.union(other)
 
 
 FactorGroup = ComparableGroup[Factor]
