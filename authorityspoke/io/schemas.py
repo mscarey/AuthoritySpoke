@@ -1,3 +1,5 @@
+"""Marshmallow schemas for loading AuthoritySpoke objects from JSON."""
+
 from copy import deepcopy
 from typing import Any, Dict, List, Optional, Sequence, Tuple, Type, Union
 
@@ -35,16 +37,17 @@ RawHolding = Dict[str, Union[RawRule, str, bool]]
 
 
 class ExpandableSchema(Schema):
+    """Base schema for classes that can be cross-referenced by name in input JSON."""
+
     def get_from_mentioned(self, data, **kwargs):
-        """
-        Replaces data to load with any object with same name in "mentioned".
-        """
+        """Replace data to load with any object with same name in "mentioned"."""
         if isinstance(data, str):
             mentioned = self.context.get("mentioned") or Mentioned()
             return deepcopy(mentioned.get_by_name(data))
         return data
 
     def consume_type_field(self, data, **kwargs):
+        """Verify that type field is correct and then get rid of it."""
         if data.get("type"):
             ty = data.pop("type").lower()
             if ty != self.__model__.__name__.lower():
@@ -54,17 +57,13 @@ class ExpandableSchema(Schema):
         return data
 
     def remove_anchors_field(self, data, **kwargs):
-        """
-        Remove field that may have been used to link objects to :class:`.Opinion` text.
-        """
+        """Remove field that may have been used to link objects to Opinion text."""
         if data.get("anchors"):
             del data["anchors"]
         return data
 
     def wrap_single_element_in_list(self, data: Dict, many_element: str):
-        """
-        Make a specified field a list if it isn't already a list.
-        """
+        """Make a specified field a list if it isn't already a list."""
         if data.get(many_element) is not None and not isinstance(
             data[many_element], list
         ):
@@ -73,12 +72,14 @@ class ExpandableSchema(Schema):
 
     @pre_load
     def format_data_to_load(self, data: RawFactor, **kwargs) -> RawFactor:
+        """Expand data if it was just a name reference in the JSON input."""
         data = self.get_from_mentioned(data)
         data = self.consume_type_field(data)
         return data
 
     @post_load
     def make_object(self, data, **kwargs):
+        """Make AuthoritySpoke object out of whatever data has been loaded."""
         return self.__model__(**data)
 
 
@@ -90,22 +91,22 @@ RawDecision = Dict[
 
 
 class OpinionSchema(ExpandableSchema):
+    """Schema for Opinions, of which there may be several in one Decision."""
+
     __model__ = Opinion
     position = fields.Str(data_key="type", missing="majority")
     author = fields.Str(missing="")
     text = fields.Str(missing="")
 
-    @post_load
-    def make_object(self, data: RawOpinion, **kwargs) -> Opinion:
-        return self.__model__(**data)
-
     @pre_load
     def format_data_to_load(self, data: RawOpinion, **kwargs) -> RawOpinion:
+        """Standardize author name before loading object."""
         data["author"] = data.get("author", "").strip(",:")
         return data
 
 
 class CaseCitationSchema(Schema):
+    """Schema for Decision citations in CAP API response."""
 
     __model__ = CaseCitation
     cite = fields.Str()
@@ -113,10 +114,13 @@ class CaseCitationSchema(Schema):
 
     @post_load
     def make_object(self, data: RawCaseCitation, **kwargs) -> CaseCitation:
+        """Load citation."""
         return self.__model__(**data)
 
 
 class DecisionSchema(ExpandableSchema):
+    """Schema for decisions retrieved from Case Access Project API."""
+
     __model__ = Decision
     name = fields.Str()
     name_abbreviation = fields.Str(missing=None)
@@ -134,6 +138,7 @@ class DecisionSchema(ExpandableSchema):
 
     @pre_load
     def format_data_to_load(self, data: RawDecision, **kwargs) -> RawDecision:
+        """Transform data from CAP API response for loading."""
         data["court"] = data.get("court", {}).get("slug", "")
         data["jurisdiction"] = data.get("jurisdiction", {}).get("slug", "")
         data["opinions"] = (
@@ -149,6 +154,12 @@ class DecisionSchema(ExpandableSchema):
 
 
 class SelectorSchema(Schema):
+    """
+    Schema for text selectors.
+
+    As specified in `anchorpoint <https://anchorpoint.readthedocs.io/>`_
+    """
+
     __model__ = TextQuoteSelector
     prefix = fields.Str(missing="")
     exact = fields.Str(missing="")
@@ -159,6 +170,8 @@ class SelectorSchema(Schema):
         self, data: Union[str, Dict[str, str]], **kwargs
     ) -> Dict[str, str]:
         """
+        Expand text shorthand prior to loading.
+
         This will repeat an operation that already happened
         if :func:`~.text_expansion.expand_anchor_shorthand` was
         already called in :func:`~.loaders.load_holdings`\.
@@ -167,10 +180,13 @@ class SelectorSchema(Schema):
 
     @post_load
     def make_object(self, data, **kwargs):
+        """Make selector."""
         return self.__model__(**data)
 
 
 class EnactmentSchema(ExpandableSchema):
+    """Schema for passages from legislation."""
+
     __model__ = Enactment
     name = fields.String(missing=None)
     source = fields.Url(relative=True)
@@ -274,9 +290,7 @@ def read_quantity(value: Union[float, int, str]) -> Union[float, int, ureg.Quant
 
 
 def dump_quantity(obj: Predicate) -> Optional[Union[float, int, str]]:
-    """
-    Convert quantity to string if it's a pint `ureg.Quantity` object.
-    """
+    """Convert quantity to string if it's a pint ureg.Quantity object."""
     if obj is None or obj.quantity is None:
         return None
     if isinstance(obj.quantity, (int, float)):
@@ -285,6 +299,8 @@ def dump_quantity(obj: Predicate) -> Optional[Union[float, int, str]]:
 
 
 class PredicateSchema(ExpandableSchema):
+    """Schema for statements, separate from any claim about their truth or who asserts them."""
+
     __model__ = Predicate
     content = fields.Str()
     truth = fields.Bool(missing=True)
@@ -298,6 +314,7 @@ class PredicateSchema(ExpandableSchema):
     def split_quantity_from_content(
         self, content: str
     ) -> Tuple[str, Optional[str], Optional[Union[ureg.Quantity, int, float]]]:
+        """Find any reference to a quantity in the content text."""
         placeholder = "{}"
         for comparison in {
             **Predicate.normalized_comparisons,
@@ -310,6 +327,7 @@ class PredicateSchema(ExpandableSchema):
         return content, "", None
 
     def normalize_comparison(self, data: RawPredicate, **kwargs) -> RawPredicate:
+        """Reduce the number of possible symbols to represent comparisons."""
         if data.get("quantity") and not data.get("comparison"):
             data["comparison"] = "="
 
@@ -319,6 +337,7 @@ class PredicateSchema(ExpandableSchema):
 
     @pre_load
     def format_data_to_load(self, data: RawPredicate, **kwargs) -> RawPredicate:
+        """Expand any reference to a quantity in the content text."""
         if not data.get("quantity"):
             (
                 data["content"],
