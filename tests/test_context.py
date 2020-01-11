@@ -3,7 +3,7 @@ import operator
 import pytest
 
 from authorityspoke.comparisons import ContextRegister
-from authorityspoke.factors import FactorGroup
+from authorityspoke.groups import FactorGroup
 
 
 class TestContextRegisters:

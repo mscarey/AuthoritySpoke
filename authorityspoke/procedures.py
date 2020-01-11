@@ -18,7 +18,7 @@ from dataclasses import dataclass
 from authorityspoke.comparisons import ContextRegister
 from authorityspoke.comparisons import use_likely_context
 from authorityspoke.factors import Factor, new_context_helper
-from authorityspoke.factors import FactorGroup
+from authorityspoke.groups import FactorGroup
 from authorityspoke.formatting import indented
 
 
@@ -259,7 +259,9 @@ class Procedure(Factor):
 
         new_inputs = self.inputs.union_from_explanation(other.inputs, context)
         new_outputs = self.outputs.union_from_explanation(other.outputs, context)
-        new_despite = self.despite.union_from_explanation_allow_contradiction(other.despite, context)
+        new_despite = self.despite.union_from_explanation_allow_contradiction(
+            other.despite, context
+        )
 
         if any(group is None for group in (new_outputs, new_inputs, new_despite)):
             return None

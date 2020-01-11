@@ -18,8 +18,8 @@ from dataclasses import dataclass
 
 from authorityspoke.comparisons import Comparable
 from authorityspoke.explanations import Explanation
-from authorityspoke.factors import Factor, new_context_helper
-from authorityspoke.factors import ContextRegister, ComparableGroup
+from authorityspoke.factors import ContextRegister, Factor, new_context_helper
+from authorityspoke.groups import ComparableGroup
 from authorityspoke.formatting import indented, wrapped
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule

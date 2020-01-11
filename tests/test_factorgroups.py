@@ -1,4 +1,4 @@
-from authorityspoke.factors import ComparableGroup, FactorGroup
+from authorityspoke.groups import ComparableGroup, FactorGroup
 
 
 class TestMakeGroup:
