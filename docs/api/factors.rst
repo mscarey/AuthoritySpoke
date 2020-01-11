@@ -10,7 +10,7 @@ Entities
 ==============
 
 .. inheritance-diagram:: authorityspoke.entities.Entity
-    :top-classes: authorityspoke.factors.Factor
+    :top-classes: authorityspoke.comparisons.Comparable
     :parts: 1
 
 .. autoclass:: authorityspoke.entities.Entity
@@ -21,7 +21,7 @@ Facts
 ==============
 
 .. inheritance-diagram:: authorityspoke.facts.Fact
-    :top-classes: authorityspoke.factors.Factor
+    :top-classes: authorityspoke.comparisons.Comparable
     :parts: 1
 
 .. autoclass:: authorityspoke.facts.Fact
@@ -30,7 +30,7 @@ Exhibits
 ==============
 
 .. inheritance-diagram:: authorityspoke.evidence.Exhibit
-    :top-classes: authorityspoke.factors.Factor
+    :top-classes: authorityspoke.comparisons.Comparable
     :parts: 1
 
 .. autoclass:: authorityspoke.evidence.Exhibit
@@ -39,7 +39,7 @@ Evidence
 ==============
 
 .. inheritance-diagram:: authorityspoke.evidence.Evidence
-    :top-classes: authorityspoke.factors.Factor
+    :top-classes: authorityspoke.comparisons.Comparable
     :parts: 1
 
 .. autoclass:: authorityspoke.evidence.Evidence
@@ -48,7 +48,7 @@ Pleadings
 ==============
 
 .. inheritance-diagram:: authorityspoke.pleadings.Pleading
-    :top-classes: authorityspoke.factors.Factor
+    :top-classes: authorityspoke.comparisons.Comparable
     :parts: 1
 
 .. autoclass:: authorityspoke.pleadings.Pleading
@@ -57,7 +57,7 @@ Allegations
 ================
 
 .. inheritance-diagram:: authorityspoke.pleadings.Allegation
-    :top-classes: authorityspoke.factors.Factor
+    :top-classes: authorityspoke.comparisons.Comparable
     :parts: 1
 
 .. autoclass:: authorityspoke.pleadings.Allegation

@@ -14,4 +14,5 @@
     api/rules
     api/legislation
     api/context
-    api/analogies
+    api/comparisons
+    api/groups

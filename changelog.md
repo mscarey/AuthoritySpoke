@@ -9,19 +9,19 @@ dev
 - Add "or" operator for FactorGroups
 
 0.3.4 (2020-01-02)
------------
+------------------
 - Create broader conditions for Procedure.contradicts()
 
 0.3.3 (2020-01-01)
------------
+------------------
 - Add `__init__.py` to utils folder
 
 0.3.2 (2020-01-01)
------------
+------------------
 - Publish repo's utils folder as part of AuthoritySpoke package
 
 0.3.1 (2020-01-01)
------------
+------------------
 - Fix bug where some types of cross-references caused loading of Holdings from JSON to fail
 - Update case download function because Case Access Project API no longer includes "casebody" field in all responses from cases endpoint
 - `new_context` function can use string to find Factor to be replaced
