@@ -16,7 +16,7 @@ marshmallow = ">=3.2.2"
 pint = ">=0.9"
 python-dotenv = "*"
 requests = "*"
-
+roman = "*"
 
 [dev-packages]
 black = "*"

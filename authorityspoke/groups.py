@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import operator
-from typing import Iterator, Optional, Sequence, Tuple, TypeVar
+from typing import Callable, Iterator, Optional, Sequence, Tuple, TypeVar
 
 from authorityspoke.comparisons import Comparable, ContextRegister
 from authorityspoke.factors import Factor, means

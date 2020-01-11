@@ -1,6 +1,7 @@
 """
-This file (one_of_schema.py) is derived from marshmallow-oneofschema, which
-is subject to the following MIT license:
+This file (one_of_schema.py) is derived from marshmallow-oneofschema.
+
+marshmallow-oneofschema is subject to the following MIT license:
 
 Copyright 2016-2017 Maxim Kulkin
 Copyright 2018 Alex Rothberg and contributors
@@ -30,6 +31,8 @@ from marshmallow import Schema, ValidationError
 
 class OneOfSchema(Schema):
     """
+    Schema that multiplexes other schemas based on object type.
+
     This is a special kind of schema that actually multiplexes other schemas
     based on object type. When serializing values, it uses get_obj_type() method
     to get object type name. Then it uses `type_schemas` name-to-Schema mapping
@@ -38,7 +41,6 @@ class OneOfSchema(Schema):
     Deserialization is reverse.
 
     Example:
-
         class Foo(object):
             def __init__(self, foo):
                 self.foo = foo
@@ -87,10 +89,11 @@ class OneOfSchema(Schema):
     type_schemas = []
 
     def get_obj_type(self, obj):
-        """Returns name of object schema"""
+        """Return name of object schema."""
         return obj.__class__.__name__
 
     def dump(self, obj, *, many=None, **kwargs):
+        """Dump object to JSON."""
         errors = {}
         result_data = []
         result_errors = {}
@@ -137,6 +140,7 @@ class OneOfSchema(Schema):
         return result
 
     def load(self, data, *, many=None, partial=None, unknown=None):
+        """Load object from JSON."""
         errors = {}
         result_data = []
         result_errors = {}
@@ -214,6 +218,7 @@ class OneOfSchema(Schema):
         return schema.load(data, many=False, partial=partial, unknown=unknown)
 
     def validate(self, data, *, many=None, partial=None):
+        """Check if loading data produces error messages."""
         try:
             self.load(data, many=many, partial=partial)
         except ValidationError as ve:

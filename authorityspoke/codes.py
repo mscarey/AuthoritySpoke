@@ -10,7 +10,7 @@ from typing import List, Optional, Sequence, Tuple, Union
 from anchorpoint.textselectors import TextQuoteSelector, TextPositionSelector
 from bs4 import BeautifulSoup
 
-from authorityspoke.utils.roman import from_roman
+from roman import fromRoman
 
 
 class Code:
@@ -321,7 +321,7 @@ class USConstCode(Code):
         if "amendment" not in cite.lower():
             return datetime.date(1788, 9, 13)
         roman_numeral = cite.split("-")[1]
-        amendment_number = from_roman(roman_numeral)
+        amendment_number = fromRoman(roman_numeral)
         if amendment_number < 11:
             return datetime.date(1791, 12, 15)
         section = self.xml.find(id=cite)
