@@ -25,7 +25,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """
 
-
+from typing import Dict, Type
 from marshmallow import Schema, ValidationError
 
 
@@ -86,7 +86,7 @@ class OneOfSchema(Schema):
 
     type_field = "type"
     type_field_remove = True
-    type_schemas = []
+    type_schemas: Dict[str, Type[Schema]] = {}
 
     def get_obj_type(self, obj):
         """Return name of object schema."""

@@ -1,3 +1,5 @@
+"""For expanding text in input JSON into a format Marshmallow can load."""
+
 from re import findall
 from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
@@ -53,6 +55,7 @@ def expand_anchor_shorthand(
 
 
 def expand_node_shorthand(obj: Dict[str, Any]) -> Dict[str, Any]:
+    """Expand shorthand at one node while walking tree of input JSON."""
     for list_field in ("context_factors", "anchors"):
         if obj.get(list_field) is not None:
             obj = wrap_single_element_in_list(obj, list_field)

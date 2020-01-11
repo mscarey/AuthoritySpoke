@@ -15,18 +15,24 @@ RawFactor = Dict[str, Union[RawPredicate, Sequence[Any], str, bool]]
 
 
 class Mentioned(OrderedDict):
-    """
-    An index of cross-referenced objects to be used in
-    loading AuthoritySpoke objects, keyed to the phrases
-    used to reference them.
-    """
+    """Index of cross-referenced objects, keyed to phrases that reference them."""
 
     def insert_by_name(self, obj: Dict) -> None:
+        """Add record to dict, using value of record's "name" field as the dict key."""
         self[obj["name"]] = obj.copy()
         self[obj["name"]].pop("name")
         return None
 
     def get_by_name(self, name: str) -> Dict:
+        """
+        Convert retrieved record so name is a field rather than the key for the whole record.
+
+        :param name:
+            the name of the key where the record can be found in the Mentioned dict.
+
+        :returns:
+            the value stored at the key "name", plus a name field.
+        """
         if not self.get(name):
             raise ValueError(
                 f'Name "{name}" not found in the index of mentioned Factors'
@@ -36,6 +42,11 @@ class Mentioned(OrderedDict):
         return value
 
     def sorted_by_length(self) -> Mentioned:
+        """
+        Sort dict items from longest to shortest.
+
+        Used to ensure that keys nearer the start can't be substrings of later keys.
+        """
         return Mentioned(sorted(self.items(), key=lambda t: len(t[0]), reverse=True))
 
     def __str__(self):
@@ -46,8 +57,8 @@ class Mentioned(OrderedDict):
 
 
 def assign_name_from_content(obj: Dict) -> str:
-    """
-    Use the content to assign a name to any :class:`.Fact` that lacks one.
+    r"""
+    Use the content to assign a name to any Fact that lacks one.
 
     :param obj:
         object loaded from JSON to make a :class:`.Factor` or :class:`.Holding`
@@ -67,8 +78,8 @@ def assign_name_from_content(obj: Dict) -> str:
 
 
 def assign_name_for_enactment(obj: Dict) -> str:
-    """
-    Return an appropriate name for an :class:`.Enactment`
+    r"""
+    Return an appropriate name for an Enactment.
 
     :param obj: an unloaded :class:`.Enactment`
 
@@ -83,12 +94,12 @@ def assign_name_for_enactment(obj: Dict) -> str:
 
 
 def assign_name_for_evidence(obj: Dict) -> str:
-    """
-    Return an appropriate name for an :class:`.Enactment`
+    r"""
+    Return an appropriate name for Evidence.
 
-    :param obj: an unloaded :class:`.Enactment`
+    :param obj: an unloaded :class:`.Evidence`object
 
-    :returns: a name for the Enactment
+    :returns: a name for the Evidence
     """
     name = f"evidence"
     if obj.get("exhibit"):
@@ -99,12 +110,12 @@ def assign_name_for_evidence(obj: Dict) -> str:
 
 
 def assign_name_for_pleading(obj: Dict) -> str:
-    """
-    Return an appropriate name for an :class:`.Enactment`
+    r"""
+    Return an appropriate name for a Pleading.
 
-    :param obj: an unloaded :class:`.Enactment`
+    :param obj: an unloaded :class:`.Pleading`
 
-    :returns: a name for the Enactment
+    :returns: a name for the Pleading
     """
     name = f"pleading"
     if obj.get("filer"):

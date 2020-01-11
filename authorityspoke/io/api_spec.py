@@ -1,3 +1,5 @@
+"""Function for generating specification from Marshmallow schemas."""
+
 from apispec import APISpec
 from apispec.ext.marshmallow import MarshmallowPlugin
 

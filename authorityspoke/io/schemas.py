@@ -581,9 +581,7 @@ class HoldingSchema(ExpandableSchema):
     generic = fields.Bool(missing=False)
 
     def nest_fields_inside_rule(self, data: Dict) -> RawHolding:
-        """
-        Nest fields inside "rule" and "procedure", if not already nested.
-        """
+        """Nest fields inside "rule" and "procedure", if not already nested."""
         data["rule"]["procedure"] = data["rule"].get("procedure") or {}
         procedure_fields = ("inputs", "despite", "outputs")
         for field in procedure_fields:
@@ -621,9 +619,7 @@ SCHEMAS = list(ExpandableSchema.__subclasses__()) + [SelectorSchema]
 
 
 def get_schema_for_item(item: Any) -> Schema:
-    """
-    Find the Marshmallow schema for an AuthoritySpoke object.
-    """
+    """Find the Marshmallow schema for an AuthoritySpoke object."""
     for option in SCHEMAS:
         if item.__class__ == option.__model__:
             return option()
