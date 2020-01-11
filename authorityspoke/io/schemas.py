@@ -71,6 +71,16 @@ class ExpandableSchema(Schema):
             data[many_element] = [data[many_element]]
         return data
 
+    @pre_load
+    def format_data_to_load(self, data: RawFactor, **kwargs) -> RawFactor:
+        data = self.get_from_mentioned(data)
+        data = self.consume_type_field(data)
+        return data
+
+    @post_load
+    def make_object(self, data, **kwargs):
+        return self.__model__(**data)
+
 
 RawOpinion = Dict[str, str]
 RawCaseCitation = Dict[str, str]
@@ -137,10 +147,6 @@ class DecisionSchema(ExpandableSchema):
         data.pop("frontend_url", None)
         return data
 
-    @post_load
-    def make_object(self, data: RawDecision, **kwargs) -> Decision:
-        return self.__model__(**data)
-
 
 class SelectorSchema(Schema):
     __model__ = TextQuoteSelector
@@ -170,7 +176,7 @@ class EnactmentSchema(ExpandableSchema):
     source = fields.Url(relative=True)
     selector = fields.Nested(SelectorSchema, missing=None)
 
-    def move_selector_fields(self, data, **kwargs):
+    def move_selector_fields(self, data: RawEnactment, **kwargs):
         """
         Nest fields used for :class:`SelectorSchema` model.
 
@@ -192,8 +198,8 @@ class EnactmentSchema(ExpandableSchema):
                 del data[name]
         return data
 
-    def fix_source_path_errors(self, data, **kwargs):
-
+    def fix_source_path_errors(self, data: RawEnactment, **kwargs):
+        """Rescue malformed or missing reference to this Enactment's Code."""
         if not data.get("source"):
             code = self.get_code_from_regime(data)
             data["source"] = code.uri
@@ -208,6 +214,7 @@ class EnactmentSchema(ExpandableSchema):
         return data
 
     def get_code_from_regime(self, data, **kwargs) -> Code:
+        """Find reference to Code in data and collect Code from Regime."""
         if self.context.get("code"):
             return self.context["code"]
         if self.context["regime"]:
@@ -223,6 +230,7 @@ class EnactmentSchema(ExpandableSchema):
 
     @pre_load
     def format_data_to_load(self, data, **kwargs):
+        """Prepare Enactment to load."""
         data = self.get_from_mentioned(data)
         data = self.fix_source_path_errors(data)
         data = self.move_selector_fields(data)
@@ -232,6 +240,7 @@ class EnactmentSchema(ExpandableSchema):
 
     @post_load
     def make_object(self, data, **kwargs):
+        """Use data to get Code, and then expand data."""
         code = self.get_code_from_regime(data)
         return self.__model__(**data, code=code)
 
@@ -319,29 +328,19 @@ class PredicateSchema(ExpandableSchema):
         data = self.normalize_comparison(data)
         return data
 
-    @post_load
-    def make_object(self, data: RawPredicate, **kwargs) -> Predicate:
-        return self.__model__(**data)
-
 
 class EntitySchema(ExpandableSchema):
+    """Schema for Entities, which shouldn't be at the top level of a FactorGroup."""
+
     __model__: Type = Entity
     name = fields.Str(missing=None)
     generic = fields.Bool(missing=True)
     plural = fields.Bool()
 
-    @pre_load
-    def format_data_to_load(self, data: RawFactor, **kwargs) -> RawFactor:
-        data = self.get_from_mentioned(data)
-        data = self.consume_type_field(data)
-        return data
-
-    @post_load
-    def make_object(self, data: RawFactor, **kwargs) -> Entity:
-        return self.__model__(**data)
-
 
 class FactSchema(ExpandableSchema):
+    """Schema for Facts, which may contain arbitrary levels of nesting."""
+
     __model__: Type = Fact
     predicate = fields.Nested(PredicateSchema)
     context_factors = fields.Nested(lambda: FactorSchema(many=True))
@@ -424,10 +423,13 @@ class FactSchema(ExpandableSchema):
 
     @post_load
     def make_object(self, data: RawFactor, **kwargs) -> Fact:
+        """Make Fact."""
         return self.__model__(**data)
 
 
 class ExhibitSchema(ExpandableSchema):
+    """Schema for an object that may embody a statement."""
+
     __model__: Type = Exhibit
     form = fields.Str(missing=None)
     statement = fields.Nested(FactSchema, missing=None)
@@ -436,36 +438,25 @@ class ExhibitSchema(ExpandableSchema):
     absent = fields.Bool(missing=False)
     generic = fields.Bool(missing=False)
 
-    @pre_load
-    def format_data_to_load(self, data: RawFactor, **kwargs) -> RawFactor:
-        data = self.get_from_mentioned(data)
-        data = self.consume_type_field(data)
-        return data
-
     @post_load
     def make_object(self, data: RawFactor, **kwargs) -> Exhibit:
+        """Make Exhibit."""
         return self.__model__(**data)
 
 
 class PleadingSchema(ExpandableSchema):
+    """Schema for a document to link Allegations to."""
+
     __model__: Type = Pleading
     filer = fields.Nested(EntitySchema, missing=None)
     name = fields.Str(missing=None)
     absent = fields.Bool(missing=False)
     generic = fields.Bool(missing=False)
 
-    @pre_load
-    def format_data_to_load(self, data: RawFactor, **kwargs) -> RawFactor:
-        data = self.get_from_mentioned(data)
-        data = self.consume_type_field(data)
-        return data
-
-    @post_load
-    def make_object(self, data: RawFactor, **kwargs) -> Pleading:
-        return self.__model__(**data)
-
 
 class AllegationSchema(ExpandableSchema):
+    """Schema for an Allegation of a Fact."""
+
     __model__: Type = Allegation
     pleading = fields.Nested(PleadingSchema, missing=None)
     statement = fields.Nested(FactSchema, missing=None)
@@ -473,18 +464,10 @@ class AllegationSchema(ExpandableSchema):
     absent = fields.Bool(missing=False)
     generic = fields.Bool(missing=False)
 
-    @pre_load
-    def format_data_to_load(self, data: RawFactor, **kwargs) -> RawFactor:
-        data = self.get_from_mentioned(data)
-        data = self.consume_type_field(data)
-        return data
-
-    @post_load
-    def make_object(self, data: RawFactor, **kwargs) -> Allegation:
-        return self.__model__(**data)
-
 
 class EvidenceSchema(ExpandableSchema):
+    """Schema for an Exhibit and a reference to the Fact it would support."""
+
     __model__: Type = Evidence
     exhibit = fields.Nested(ExhibitSchema, missing=None)
     to_effect = fields.Nested(FactSchema, missing=None)
@@ -492,18 +475,10 @@ class EvidenceSchema(ExpandableSchema):
     absent = fields.Bool(missing=False)
     generic = fields.Bool(missing=False)
 
-    @pre_load
-    def format_data_to_load(self, data: RawFactor, **kwargs) -> RawFactor:
-        data = self.get_from_mentioned(data)
-        data = self.consume_type_field(data)
-        return data
-
-    @post_load
-    def make_object(self, data: RawFactor, **kwargs) -> Evidence:
-        return self.__model__(**data)
-
 
 class FactorSchema(OneOfSchema, ExpandableSchema):
+    """Schema that directs data to "one of" the other schemas."""
+
     __model__: Type = Factor
     type_schemas = {
         "allegation": AllegationSchema,
@@ -521,15 +496,23 @@ class FactorSchema(OneOfSchema, ExpandableSchema):
     }
 
     def pre_load(self, data: RawFactor, **kwargs) -> RawFactor:
+        """Remove text anchors because they aren't part of the referenced schemas."""
         data = self.get_from_mentioned(data)
         data = self.remove_anchors_field(data)
         return data
 
     def get_obj_type(self, obj) -> str:
+        """Return name of object schema."""
         return obj.__class__.__name__
 
 
 class ProcedureSchema(ExpandableSchema):
+    """
+    Schema for Procedure; does not require separate FactorSequence schema.
+
+    "FactorSchema, many=True" is an equivalent of a FactorSequence.
+    """
+
     __model__: Type = Procedure
     inputs = fields.Nested(FactorSchema, many=True)
     despite = fields.Nested(FactorSchema, many=True)
@@ -537,16 +520,15 @@ class ProcedureSchema(ExpandableSchema):
 
     @pre_load
     def format_data_to_load(self, data, **kwargs):
+        """Handle omission of brackets around single item."""
         for field_name in ("inputs", "despite", "outputs"):
             data = self.wrap_single_element_in_list(data, field_name)
         return data
 
-    @post_load
-    def make_object(self, data, **kwargs):
-        return self.__model__(**data)
-
 
 class RuleSchema(ExpandableSchema):
+    """Schema for Holding; can also hold Procedure fields."""
+
     __model__: Type = Rule
     procedure = fields.Nested(ProcedureSchema)
     enactments = fields.Nested(EnactmentSchema, many=True)
@@ -558,6 +540,7 @@ class RuleSchema(ExpandableSchema):
 
     @pre_load
     def format_data_to_load(self, data: Dict, **kwargs) -> RawRule:
+        """Prepare to load Rule."""
         data = self.wrap_single_element_in_list(data, "enactments")
         data = self.wrap_single_element_in_list(data, "enactments_despite")
         procedure_fields = ("inputs", "despite", "outputs")
@@ -567,12 +550,10 @@ class RuleSchema(ExpandableSchema):
                 data["procedure"][field] = data.pop(field)
         return data
 
-    @post_load
-    def make_object(self, data: RawRule, **kwargs) -> Rule:
-        return self.__model__(**data)
-
 
 class HoldingSchema(ExpandableSchema):
+    """Schema for Holding; can also hold Rule and Procedure fields."""
+
     __model__: Type = Holding
     rule = fields.Nested(RuleSchema)
     rule_valid = fields.Bool(missing=True)
@@ -594,6 +575,7 @@ class HoldingSchema(ExpandableSchema):
 
     @pre_load
     def format_data_to_load(self, data: RawHolding, **kwargs) -> RawHolding:
+        """Prepare to load Holding."""
         data = self.get_from_mentioned(data)
 
         data["rule"] = data.get("rule") or {}
@@ -609,10 +591,6 @@ class HoldingSchema(ExpandableSchema):
 
         data = self.remove_anchors_field(data)
         return data
-
-    @post_load
-    def make_object(self, data: RawHolding, **kwargs) -> Holding:
-        return self.__model__(**data)
 
 
 SCHEMAS = list(ExpandableSchema.__subclasses__()) + [SelectorSchema]
