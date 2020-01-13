@@ -146,6 +146,7 @@ class DecisionSchema(ExpandableSchema):
         )
         data.pop("docket_number", None)
         data.pop("casebody", None)
+        data.pop("preview", None)
         data.pop("reporter", None)
         data.pop("volume", None)
         del data["url"]
