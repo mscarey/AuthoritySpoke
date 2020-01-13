@@ -97,5 +97,5 @@ class TestPredicateDump:
             {"content": "{}'s favorite number is {}", "quantity": 42}
         )
         dumped = to_dict(statement)
-        new_statement = readers.read_predicate(dumped)
+        new_statement = schema.load(dumped)
         assert "{}'s favorite number is exactly equal to 42" in str(new_statement)

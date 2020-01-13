@@ -28,7 +28,7 @@ def load_code(
     filepath: Optional[pathlib.Path] = None,
 ) -> BeautifulSoup:
     r"""
-    Create a new :class:`.Code` from an XML filepath.
+    Create an XML object from the path to an XML file.
 
     Defers parsing of the XML until later, which makes "read" in the
     function name misleading.
@@ -62,6 +62,7 @@ def load_and_read_code(
     directory: Optional[pathlib.Path] = None,
     filepath: Optional[pathlib.Path] = None,
 ) -> Code:
+    """Create a new Code from an XML filepath."""
     soup = load_code(filename=filename, directory=directory, filepath=filepath)
     return readers.read_code(soup)
 
@@ -166,9 +167,7 @@ def load_holdings_with_index(
     filepath: Optional[pathlib.Path] = None,
     regime: Optional[Regime] = None,
 ) -> readers.HoldingsIndexed:
-    """
-    Read holdings with factor index from a file.
-    """
+    """Read holdings with factor index from a file."""
     raw_holdings = load_holdings(
         filename=filename, directory=directory, filepath=filepath
     )
@@ -181,9 +180,7 @@ def load_holdings_with_anchors(
     filepath: Optional[pathlib.Path] = None,
     regime: Optional[Regime] = None,
 ) -> AnchoredHoldings:
-    """
-    Read holdings from file, with Opinion text anchors for holdings and factors.
-    """
+    """Read holdings from file, with Opinion text anchors for holdings and factors."""
     raw_holdings = load_holdings(
         filename=filename, directory=directory, filepath=filepath
     )
@@ -225,6 +222,7 @@ def load_and_read_decision(
     directory: Optional[pathlib.Path] = None,
     filepath: Optional[pathlib.Path] = None,
 ) -> Decision:
+    r"""Load file containing a judicial decision and make an Opinion object."""
     raw_decision = load_decision(
         filename=filename, directory=directory, filepath=filepath
     )

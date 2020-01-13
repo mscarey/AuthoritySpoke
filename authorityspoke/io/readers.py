@@ -7,7 +7,7 @@ after they import some data from a file.
 from copy import deepcopy
 from typing import NamedTuple
 
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, Type
 
 from anchorpoint.textselectors import TextQuoteSelector
 from bs4 import BeautifulSoup
@@ -103,17 +103,16 @@ def get_code_title(xml) -> str:
 
 
 def has_uslm_schema(soup: BeautifulSoup) -> bool:
-    """
-    Determine if the Code XML has the USLM schema.
-    """
+    """Determine if the Code XML has the USLM schema."""
     return soup.find(xmlns="http://xml.house.gov/schema/uslm/1.0")
 
 
-def read_code(xml):
+def read_code(xml: BeautifulSoup):
+    """Convert XML legislation file to AuthoritySpoke Code object."""
     title = get_code_title(xml)
     uri = get_code_uri(xml, title)
     if uri.startswith("/us/const"):
-        code_class = USConstCode
+        code_class: Type = USConstCode
     elif uri.startswith("/us/cfr"):
         code_class = CFRCode
     elif uri.startswith("/us/"):
@@ -193,11 +192,6 @@ def read_enactments(
     return schema.load(deepcopy(record))
 
 
-def read_predicate(value: RawPredicate) -> Predicate:
-    schema = schemas.PredicateSchema(partial=True)
-    return schema.load(value)
-
-
 def read_fact(record: RawFactor) -> Fact:
     r"""
     Construct a :class:`Fact` after loading a dict from JSON.
@@ -242,7 +236,6 @@ def read_factors(
 
     :parame regime:
         to look up any :class:`.Enactment` references
-
     """
     schema = schemas.FactorSchema(many=True)
     record, schema.context["mentioned"] = index_names(record)
@@ -253,6 +246,19 @@ def read_factors(
 def read_procedure(
     record: Dict, regime: Optional[Regime] = None, many=False
 ) -> Procedure:
+    r"""
+    Turn fields from JSON into a :class:`Procedure` object.
+
+    :param record:
+        parameter values to pass to schema
+
+    :param many:
+        whether to use the "many" form of the Marshmallow
+        schema (whether there are multiple Procedures)
+
+    :parame regime:
+        to look up any :class:`.Enactment` references
+    """
     schema = schemas.ProcedureSchema(many=many)
     record, schema.context["mentioned"] = index_names(record)
     schema.context["regime"] = regime
@@ -289,6 +295,8 @@ def read_holding(record: RawHolding, regime: Optional[Regime] = None) -> Holding
 
 
 class HoldingsIndexed(NamedTuple):
+    """Lists :class:`.Holding` objects with corresponding text selectors."""
+
     holdings: List[Holding]
     mentioned: Mentioned
     holding_anchors: List[List[TextQuoteSelector]]
@@ -297,6 +305,7 @@ class HoldingsIndexed(NamedTuple):
 def read_holdings_with_index(
     record: List[RawHolding], regime: Optional[Regime] = None, many: bool = True
 ) -> HoldingsIndexed:
+    r"""Load a list of :class:`Holdings`\s from JSON, with "mentioned" index."""
     record, mentioned = index_names(record)
     schema = schemas.HoldingSchema(many=many)
     schema.context["regime"] = regime
@@ -309,6 +318,27 @@ def read_holdings_with_index(
 def read_holdings_with_anchors(
     record: List[RawHolding], regime: Optional[Regime] = None, many: bool = True
 ) -> AnchoredHoldings:
+    r"""
+    Load a list of :class:`Holding`\s from JSON, with text links.
+
+    :param record:
+        a list of dicts representing holdings, in the JSON input format
+
+    :param regime:
+        A collection of :class:`.Jurisdiction`\s and the :class:`.Code`\s
+        that have been enacted in each. Used for constructing
+        :class:`.Enactment`\s referenced by :class:`.Holding`\s.
+
+    :param many:
+        a bool indicating whether to use the "many" form of the Marshmallow
+        schema (whether there are multiple Holdings)
+
+    :returns:
+        a namedtuple listing :class:`.Holding` objects with
+        a list matching :class:`.Holding`\s to selectors and
+        an index matching :class:`.Factor`\s to selectors.
+    """
+
     holdings, mentioned, holding_anchors = read_holdings_with_index(
         record=record, regime=regime, many=many
     )
@@ -322,7 +352,7 @@ def read_holdings(
     code: Optional[Code] = None,
 ) -> List[Holding]:
     r"""
-    Load a list of :class:`Holdings`\s from JSON, with optional text links.
+    Load a list of :class:`Holdings`\s from JSON.
 
     :param record:
         a list of dicts representing holdings, in the JSON input format
@@ -333,8 +363,7 @@ def read_holdings(
         :class:`.Enactment`\s referenced by :class:`.Holding`\s.
 
     :returns:
-        a list of :class:`.Holding` objects, optionally with
-        an index matching :class:`.Factor`\s to selectors.
+        a list of :class:`.Holding` objects
     """
     schema = schemas.HoldingSchema(many=True)
     record, schema.context["mentioned"] = index_names(record)
@@ -363,6 +392,7 @@ def read_decision(decision_dict: RawDecision) -> Decision:
 def read_rules_with_index(
     record: List[RawRule], regime: Optional[Regime] = None, many: bool = True
 ) -> Tuple[List[Rule], Mentioned]:
+    r"""Make :class:`Rule` and "mentioned" index from dict of fields and :class:`.Regime`\."""
     record, mentioned = index_names(record)
     schema = schemas.RuleSchema(many=many)
     schema.context["regime"] = regime

@@ -4,9 +4,7 @@ from typing import Callable, Dict, List, Sequence, Union
 
 
 def nest_fields(data: Dict, nest: str, eggs: List[str]):
-    """
-    Make sure specified fields are nested under "nest" key.
-    """
+    """Make sure specified fields are nested under "nest" key."""
     for egg_field in eggs:
         if egg_field in data:
             if not data.get(nest):

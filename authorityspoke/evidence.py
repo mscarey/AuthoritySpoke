@@ -74,9 +74,7 @@ class Exhibit(Factor):
 
     @property
     def short_string(self):
-        """
-        Return string representation of the object without line breaks.
-        """
+        """Represent object as string without line breaks."""
         string = (
             f'{("attributed to " + self.statement_attribution.short_string + ", ") if self.statement_attribution else ""}'
             + f'{("asserting " + self.statement.short_string + ", ") if self.statement else ""}'
@@ -147,6 +145,7 @@ class Evidence(Factor):
 
     @property
     def short_string(self):
+        """Represent object as string without line breaks."""
         string = (
             f'{("of " + self.exhibit.short_string + ", ") if self.exhibit else ""}'
             + f'{("which supports " + self.to_effect.short_string) if self.to_effect else ""}'

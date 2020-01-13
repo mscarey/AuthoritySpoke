@@ -400,6 +400,7 @@ class Procedure(Factor):
     def has_input_or_despite_factors_implied_by_all_inputs_of(
         self, other: Procedure, context: Optional[ContextRegister] = None
     ) -> Iterator[ContextRegister]:
+        """Check if every input of other implies some input or despite factor of self."""
         self_despite_or_input = FactorGroup((*self.despite, *self.inputs))
         yield from self_despite_or_input.comparison(
             operation=operator.le, still_need_matches=other.inputs, matches=context
@@ -408,6 +409,7 @@ class Procedure(Factor):
     def has_input_or_despite_factors_implying_all_inputs_of(
         self, other: Procedure, context: Optional[ContextRegister] = None
     ) -> Iterator[ContextRegister]:
+        """Check if every input of other is implied by some input or despite factor of self."""
         self_despite_or_input = FactorGroup((*self.despite, *self.inputs))
         yield from self_despite_or_input.comparison(
             operation=operator.ge, still_need_matches=other.inputs, matches=context
@@ -461,6 +463,7 @@ class Procedure(Factor):
     def explain_implication_all_to_all(
         self, other: Factor, context: Optional[ContextRegister] = None
     ) -> Iterator[ContextRegister]:
+        """Yield contexts establishing that if self is always valid, other is always valid."""
         context = context or ContextRegister()
         if isinstance(other, self.__class__):
             yield from self._explain_implication_all_to_all_of_procedure(other, context)
@@ -515,6 +518,7 @@ class Procedure(Factor):
     def explain_implication_all_to_some(
         self, other: Factor, context: Optional[ContextRegister] = None
     ) -> Iterator[ContextRegister]:
+        """Yield contexts establishing that if self is always valid, other is sometimes valid."""
         context = context or ContextRegister()
         if isinstance(other, self.__class__):
             yield from self._explain_implication_of_procedure_all_to_some(
@@ -624,6 +628,7 @@ class Procedure(Factor):
     def explanations_same_meaning(
         self, other: Factor, context: Optional[ContextRegister] = None
     ) -> Iterator[ContextRegister]:
+        """Yield contexts that could cause self to have the same meaning as other."""
         context = context or ContextRegister()
         if isinstance(other, self.__class__):
             yield from self._explanations_same_meaning_as_procedure(other, context)
