@@ -248,31 +248,6 @@ class Factor(Comparable):
         """
         yield from iter([])
 
-    def _context_registers(
-        self,
-        other: Optional[Factor],
-        comparison: Callable,
-        context: Optional[ContextRegister] = None,
-    ) -> Iterator[ContextRegister]:
-        r"""
-        Search for ways to match :attr:`context_factors` of ``self`` and ``other``.
-
-        :yields:
-            all valid ways to make matches between
-            corresponding :class:`Factor`\s.
-        """
-        if context is None:
-            context = ContextRegister()
-        if other is None:
-            yield context
-        elif self.generic or other.generic:
-            if context.get(self) is None or (context.get(self) == other):
-                yield ContextRegister({self: other})
-        else:
-            yield from self.context_factors.ordered_comparison(
-                other=other.context_factors, operation=comparison, context=context
-            )
-
     def explanations_consistent_with_factor(
         self, other: Factor, context: Optional[ContextRegister] = None
     ) -> Iterator[ContextRegister]:
@@ -660,41 +635,6 @@ class Factor(Comparable):
         """Return string representation without line breaks."""
         return textwrap.shorten(str(self), width=5000, placeholder="...")
 
-    def update_context_register(
-        self, other: Optional[Factor], register: ContextRegister, comparison: Callable
-    ) -> Iterator[ContextRegister]:
-        r"""
-        Find ways to update ``self_mapping`` to allow relationship ``comparison``.
-
-        :param other:
-            another :class:`Factor` being compared to ``self``
-
-        :param register:
-            keys representing :class:`Factor`\s from ``self``'s context and
-            values representing :class:`Factor`\s in ``other``'s context.
-
-        :param comparison:
-            a function defining the comparison that must be ``True``
-            between ``self`` and ``other``. Could be :meth:`Factor.means` or
-            :meth:`Factor.__ge__`.
-
-        :yields:
-            every way that ``self_mapping`` can be updated to be consistent
-            with ``self`` and ``other`` having the relationship
-            ``comparison``.
-        """
-        if other and not isinstance(other, Factor):
-            raise TypeError
-        if not isinstance(register, ContextRegister):
-            register = ContextRegister(register)
-        for incoming_register in self._context_registers(other, comparison):
-            for new_register_variation in self._registers_for_interchangeable_context(
-                incoming_register
-            ):
-                register_or_none = register.merged_with(new_register_variation)
-                if register_or_none is not None:
-                    yield register_or_none
-
     @staticmethod
     def _wrap_with_tuple(item):
         if item is None:
@@ -766,7 +706,7 @@ class FactorSequence(Tuple[Optional[Comparable], ...]):
 
         def update_register(
             register: ContextRegister,
-            ordered_pairs: List[Tuple[Optional[Comparable], Optional[Comparable]]],
+            factor_pairs: List[Tuple[Optional[Comparable], Optional[Comparable]]],
             i: int = 0,
         ):
             """
@@ -776,14 +716,14 @@ class FactorSequence(Tuple[Optional[Comparable], ...]):
             unsatisfiable. It will reduce risk to check that every :class:`Factor` pair
             is satisfiable before checking that they're all satisfiable together.
             """
-            if i == len(ordered_pairs):
+            if i == len(factor_pairs):
                 yield register
             else:
-                left, right = ordered_pairs[i]
+                left, right = factor_pairs[i]
                 if left is not None or right is None:
                     if left is None:
                         yield from update_register(
-                            register, ordered_pairs=ordered_pairs, i=i + 1
+                            register, factor_pairs=factor_pairs, i=i + 1
                         )
                     else:
                         new_mapping_choices: List[ContextRegister] = []
@@ -794,11 +734,11 @@ class FactorSequence(Tuple[Optional[Comparable], ...]):
                                 new_mapping_choices.append(incoming_register)
                                 yield from update_register(
                                     incoming_register,
-                                    ordered_pairs=ordered_pairs,
+                                    factor_pairs=factor_pairs,
                                     i=i + 1,
                                 )
 
         if context is None:
             context = ContextRegister()
         ordered_pairs = list(zip_longest(self, other))
-        yield from update_register(register=context, ordered_pairs=ordered_pairs)
+        yield from update_register(register=context, factor_pairs=ordered_pairs)

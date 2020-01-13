@@ -10,6 +10,8 @@ logger = logging.getLogger(__name__)
 
 
 class Comparable(ABC):
+    generic: bool = False
+
     def consistent_with(
         self, other: Optional[Comparable], context: Optional[ContextRegister] = None
     ) -> bool:
@@ -28,6 +30,31 @@ class Comparable(ABC):
             explanation is not None
             for explanation in self.explanations_consistent_with(other, context)
         )
+
+    def _context_registers(
+        self,
+        other: Optional[Factor],
+        comparison: Callable,
+        context: Optional[ContextRegister] = None,
+    ) -> Iterator[ContextRegister]:
+        r"""
+        Search for ways to match :attr:`context_factors` of ``self`` and ``other``.
+
+        :yields:
+            all valid ways to make matches between
+            corresponding :class:`Factor`\s.
+        """
+        if context is None:
+            context = ContextRegister()
+        if other is None:
+            yield context
+        elif self.generic or other.generic:
+            if context.get(self) is None or (context.get(self) == other):
+                yield ContextRegister({self: other})
+        else:
+            yield from self.context_factors.ordered_comparison(
+                other=other.context_factors, operation=comparison, context=context
+            )
 
     def contradicts(
         self, other: Optional[Comparable], context: Optional[ContextRegister] = None
@@ -159,6 +186,44 @@ class Comparable(ABC):
         except StopIteration:
             return None
         return self.union_from_explanation(other, explanation)
+
+    def update_context_register(
+        self,
+        other: Optional[Comparable],
+        register: ContextRegister,
+        comparison: Callable,
+    ) -> Iterator[ContextRegister]:
+        r"""
+        Find ways to update ``self_mapping`` to allow relationship ``comparison``.
+
+        :param other:
+            another :class:`Comparable` being compared to ``self``
+
+        :param register:
+            keys representing :class:`Comparable`\s from ``self``'s context and
+            values representing :class:`Comparable`\s in ``other``'s context.
+
+        :param comparison:
+            a function defining the comparison that must be ``True``
+            between ``self`` and ``other``. Could be :meth:`Comparable.means` or
+            :meth:`Comparable.__ge__`.
+
+        :yields:
+            every way that ``self_mapping`` can be updated to be consistent
+            with ``self`` and ``other`` having the relationship
+            ``comparison``.
+        """
+        if other and not isinstance(other, Comparable):
+            raise TypeError
+        if not isinstance(register, ContextRegister):
+            register = ContextRegister(register)
+        for incoming_register in self._context_registers(other, comparison):
+            for new_register_variation in self._registers_for_interchangeable_context(
+                incoming_register
+            ):
+                register_or_none = register.merged_with(new_register_variation)
+                if register_or_none is not None:
+                    yield register_or_none
 
     def explain_same_meaning(
         self, other: Comparable, context: Optional[ContextRegister] = None
