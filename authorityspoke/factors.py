@@ -736,7 +736,7 @@ def means(left: Factor, right: Factor) -> bool:
 
 class FactorSequence(Tuple[Optional[Comparable], ...]):
     def __new__(cls, value: Sequence = ()):
-        if (isinstance(value, Factor) or value.__class__.__name__ == "FactorGroup"):
+        if isinstance(value, Factor) or value.__class__.__name__ == "FactorGroup":
             value = (value,)
         if value is None:
             value = (None,)
@@ -764,7 +764,11 @@ class FactorSequence(Tuple[Optional[Comparable], ...]):
             ``self.available``.
         """
 
-        def update_register(register: ContextRegister, i: int = 0):
+        def update_register(
+            register: ContextRegister,
+            ordered_pairs: List[Tuple[Optional[Comparable], Optional[Comparable]]],
+            i: int = 0,
+        ):
             """
             Recursively search through :class:`Factor` pairs trying out context assignments.
 
@@ -778,7 +782,9 @@ class FactorSequence(Tuple[Optional[Comparable], ...]):
                 left, right = ordered_pairs[i]
                 if left is not None or right is None:
                     if left is None:
-                        yield from update_register(register, i + 1)
+                        yield from update_register(
+                            register, ordered_pairs=ordered_pairs, i=i + 1
+                        )
                     else:
                         new_mapping_choices: List[ContextRegister] = []
                         for incoming_register in left.update_context_register(
@@ -786,9 +792,13 @@ class FactorSequence(Tuple[Optional[Comparable], ...]):
                         ):
                             if incoming_register not in new_mapping_choices:
                                 new_mapping_choices.append(incoming_register)
-                                yield from update_register(incoming_register, i + 1)
+                                yield from update_register(
+                                    incoming_register,
+                                    ordered_pairs=ordered_pairs,
+                                    i=i + 1,
+                                )
 
         if context is None:
             context = ContextRegister()
         ordered_pairs = list(zip_longest(self, other))
-        yield from update_register(register=context)
+        yield from update_register(register=context, ordered_pairs=ordered_pairs)

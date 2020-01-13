@@ -104,6 +104,22 @@ class Opinion(Comparable):
                 + f"{self.__class__} and {other.__class__}."
             )
 
+    def implies(
+        self, other: Optional[Comparable], context: ContextRegister = None
+    ) -> bool:
+        if isinstance(other, (Rule, Holding)):
+            return any(
+                self_holding.implies(other, context=context)
+                for self_holding in self.holdings
+            )
+        elif isinstance(other, self.__class__):
+            return self.implies_other_holdings(other.holdings)
+        if hasattr(other, "implied_by"):
+            if context:
+                context = context.reversed()
+            return other.implied_by(self, context=context)
+        return False
+
     def explanations_implication(
         self, other: Comparable, context: Optional[ContextRegister] = None,
     ) -> Iterator[ContextRegister]:
@@ -353,22 +369,6 @@ class Opinion(Comparable):
             ):
                 return False
         return True
-
-    def implies(
-        self, other: Optional[Comparable], context: ContextRegister = None
-    ) -> bool:
-        if isinstance(other, (Rule, Holding)):
-            return any(
-                self_holding.implies(other, context=context)
-                for self_holding in self.holdings
-            )
-        elif isinstance(other, self.__class__):
-            return self.implies_other_holdings(other.holdings)
-        if hasattr(other, "implied_by"):
-            if context:
-                context = context.reversed()
-            return other.implied_by(self, context=context)
-        return False
 
     def __ge__(self, other: Union[Opinion, Rule]) -> bool:
         """
