@@ -87,26 +87,32 @@ class Holding(Factor):
 
     @property
     def procedure(self):
+        """Get Procedure from Rule."""
         return self.rule.procedure
 
     @property
     def despite(self):
+        """Get Factors that specifically don't preclude application of the Holding."""
         return self.rule.procedure.despite
 
     @property
     def inputs(self):
+        """Get inputs from Procedure."""
         return self.rule.procedure.inputs
 
     @property
     def outputs(self):
+        """Get outputs from Procedure."""
         return self.rule.procedure.outputs
 
     @property
     def enactments(self):
+        """Get Enactments required to apply the Holding."""
         return self.rule.enactments
 
     @property
     def enactments_despite(self):
+        """Get Enactments that specifically don't preclude application of the Holding."""
         return self.rule.enactments_despite
 
     @property
@@ -131,19 +137,23 @@ class Holding(Factor):
 
     @property
     def mandatory(self) -> bool:
+        """Whether court "MUST" apply holding when it is applicable."""
         return self.rule.mandatory
 
     @property
     def universal(self) -> bool:
+        """Whether holding is applicable in "ALL" cases where inputs are present."""
         return self.rule.universal
 
     def add_if_not_exclusive(self, other: Holding) -> Optional[Holding]:
+        """Show how first Holding triggers second, assumed not to be "exclusive" way to reach result."""
         new_rule = self.rule + other.rule
         if new_rule is None:
             return None
         return self.evolve({"rule": self.rule + other.rule})
 
     def add_holding(self, other: Holding) -> Optional[Holding]:
+        """Show how first Holding triggers the second."""
         if not (self.decided and other.decided):
             raise NotImplementedError(
                 "Adding is not implemented for Holdings that assert a Rule is not decided."
@@ -336,6 +346,7 @@ class Holding(Factor):
     def explanations_implication(
         self, other: Holding, context: Optional[ContextRegister] = None
     ) -> Iterator[Explanation]:
+        """Yield contexts that would cause self and other to have same meaning."""
         for register in self._context_registers_for_implication(other, context=context):
             yield Explanation(self, other, register, relation="IMPLICATION")
 
@@ -433,6 +444,7 @@ class Holding(Factor):
     def explanations_same_meaning(
         self, other: Factor, context: Optional[ContextRegister] = None
     ) -> Iterator[ContextRegister]:
+        """Yield contexts that would cause self and other to have same meaning."""
         if (
             isinstance(other, self.__class__)
             and self.rule_valid == other.rule_valid
@@ -477,9 +489,7 @@ class Holding(Factor):
 
     @property
     def nonexclusive_holdings(self) -> HoldingGroup:
-        r"""
-        Yield all :class:`.Holding`\s with `exclusive is False` implied by self.
-        """
+        r"""Yield all :class:`.Holding`\s with `exclusive is False` implied by self."""
         if not self.exclusive:
             return HoldingGroup([self])
         holdings = [self.evolve("exclusive")] + self.inferred_from_exclusive
@@ -530,9 +540,7 @@ class Holding(Factor):
     def union(
         self, other: Union[Rule, Holding], context: Optional[ContextRegister] = None
     ) -> Optional[Holding]:
-        """
-        Infer a Holding from all inputs and outputs of self and other, in context.
-        """
+        """Infer a Holding from all inputs and outputs of self and other, in context."""
         context = context or ContextRegister()
         if isinstance(other, Rule):
             other = Holding(rule=other)
@@ -541,9 +549,7 @@ class Holding(Factor):
         return self._union_with_holding(other, context=context)
 
     def __or__(self, other: Union[Rule, Holding]) -> Optional[Holding]:
-        """
-        Infer a Holding from all inputs and outputs of self and other.
-        """
+        """Infer a Holding from all inputs and outputs of self and other."""
         return self.union(other)
 
     def own_attributes(self) -> Dict[str, Any]:

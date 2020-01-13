@@ -222,6 +222,7 @@ class Procedure(Factor):
         return self.evolve({"outputs": unique_new_outputs})
 
     def __add__(self, other: Procedure) -> Optional[Procedure]:
+        """Show how first Procedure triggers the second if not both are universal."""
         if not isinstance(other, self.__class__):
             return self.add_factor(other)
         for explanation in self.triggers_next_procedure(other):
@@ -231,6 +232,7 @@ class Procedure(Factor):
         return None
 
     def add_if_universal(self, other: Procedure) -> Optional[Procedure]:
+        """Show how first Procedure triggers the second if both are universal."""
         if not isinstance(other, self.__class__):
             return self.add_factor(other)
         for explanation in self.triggers_next_procedure_if_universal(other):
@@ -242,6 +244,7 @@ class Procedure(Factor):
     def partial_explanations_union(
         self, other: Procedure, context: Optional[ContextRegister] = None
     ) -> Iterable[ContextRegister]:
+        """Yield as much of the context as seems likely correct based on this Procedure."""
         yield from self.likely_contexts(other, context)
 
     def union_from_explanation(
