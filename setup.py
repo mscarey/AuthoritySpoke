@@ -23,6 +23,7 @@ setuptools.setup(
         "marshmallow",
         "pint",
         "requests",
+        "roman",
     ],
     classifiers=[
         "Development Status :: 3 - Alpha",
