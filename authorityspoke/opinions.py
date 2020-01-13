@@ -18,6 +18,7 @@ from dataclasses import dataclass, field
 
 from anchorpoint.textselectors import TextQuoteSelector
 
+from authorityspoke.comparisons import Comparable
 from authorityspoke.factors import Factor, ContextRegister
 from authorityspoke.explanations import Explanation
 from authorityspoke.holdings import Holding, HoldingGroup
@@ -37,7 +38,7 @@ class AnchoredHoldings(NamedTuple):
 
 
 @dataclass
-class Opinion:
+class Opinion(Comparable):
     """
     A document that resolves legal issues in a case and posits legal holdings.
 
@@ -71,28 +72,13 @@ class Opinion:
         self.factors: Dict[Factor, List[TextQuoteSelector]] = defaultdict(list)
 
     def clear_holdings(self):
-        r"""
-        Remove all :class:`.Holding`\s from the opinion.
-        """
+        r"""Remove all :class:`.Holding`\s from the opinion."""
         self.holding_anchors.clear()
 
-    def explain_contradiction(
-        self,
-        other: Union[Opinion, Holding, Rule],
-        context: Optional[ContextRegister] = None,
-    ) -> Optional[Explanation]:
-        explanations = self.explanations_contradiction(other, context=context)
-        try:
-            explanation = next(explanations)
-        except StopIteration:
-            return None
-        return explanation
-
     def explanations_contradiction(
-        self,
-        other: Union[Opinion, Holding, Rule],
-        context: Optional[ContextRegister] = None,
+        self, other: Comparable, context: Optional[ContextRegister] = None,
     ) -> Iterator[Explanation]:
+        """Yield contexts that would result in a contradiction between self and other."""
         if isinstance(other, Rule):
             other = Holding(rule=other)
         if isinstance(other, Holding):
@@ -118,23 +104,10 @@ class Opinion:
                 + f"{self.__class__} and {other.__class__}."
             )
 
-    def explain_implication(
-        self,
-        other: Union[Opinion, Holding, Rule],
-        context: Optional[ContextRegister] = None,
-    ) -> Optional[Explanation]:
-        explanations = self.explanations_implication(other, context=context)
-        try:
-            explanation = next(explanations)
-        except StopIteration:
-            return None
-        return explanation
-
     def explanations_implication(
-        self,
-        other: Union[Opinion, Holding, Rule],
-        context: Optional[ContextRegister] = None,
-    ) -> Iterator[Explanation]:
+        self, other: Comparable, context: Optional[ContextRegister] = None,
+    ) -> Iterator[ContextRegister]:
+        """Yield contexts that would result in self implying other."""
         if isinstance(other, Rule):
             other = Holding(rule=other)
         if isinstance(other, Holding):
@@ -155,28 +128,6 @@ class Opinion:
             raise TypeError(
                 f"'Implies' test not implemented for types {self.__class__} and {other.__class__}."
             )
-
-    def contradicts(
-        self,
-        other: Union[Opinion, Holding, Rule],
-        context: Optional[ContextRegister] = None,
-    ) -> bool:
-        """
-        Test whether ``other`` is or contains a :class:`.Holding` contradicted by ``self``.
-
-        :param other:
-            another :class:`.Opinion` or :class:`.Holding`
-
-        :returns:
-            a bool indicating whether any holding of ``self`` is
-            inconsistent with the :class:`.Rule` ``other``, or with
-            any holding of ``other`` if ``other`` is an :class:`.Opinion`.
-        """
-
-        return any(
-            explanation is not None
-            for explanation in self.explanations_contradiction(other, context=context)
-        )
 
     @property
     def generic_factors(self) -> List[Factor]:
@@ -404,7 +355,7 @@ class Opinion:
         return True
 
     def implies(
-        self, other: Union[Opinion, Holding, Rule], context: ContextRegister = None
+        self, other: Optional[Comparable], context: ContextRegister = None
     ) -> bool:
         if isinstance(other, (Rule, Holding)):
             return any(

@@ -147,11 +147,6 @@ class TestImplication:
         oracle = make_decision_with_holding["oracle"]
         assert oracle.holdings[18].implies(oracle.holdings[19])
 
-    def test_explain_implication(self, make_decision_with_holding):
-        oracle = make_decision_with_holding["oracle"]
-        explanation = oracle.holdings[18].explain_implication(oracle.holdings[19])
-        assert "implication" in str(explanation).lower()
-
     def test_explanation_same_generic_factor(self, make_decision_with_holding):
         """
         Test that the ContextRegister makes sense when the same generic
@@ -163,7 +158,7 @@ class TestImplication:
             {Entity("the Java API"): language}
         )
         explanation = new_context.explain_implication(oracle.holdings[19])
-        assert explanation.context[language] == language
+        assert explanation[language] == language
 
 
 class TestContradiction:

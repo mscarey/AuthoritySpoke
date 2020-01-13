@@ -225,6 +225,11 @@ class TestOpinionFactors:
         assert len(scenes_a_faire) == 1  # 1 Factor
         assert len(scenes_a_faire[0][1]) == 3
 
+    def test_get_factor_from_opinion(self, make_opinion_with_holding):
+        oracle = make_opinion_with_holding["oracle_majority"]
+        company = oracle.get_factor_by_name("the Java API")
+        assert isinstance(company, Entity)
+
 
 class TestImplication:
     def test_no_implication(self, make_opinion_with_holding):

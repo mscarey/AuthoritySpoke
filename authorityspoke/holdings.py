@@ -197,6 +197,20 @@ class Holding(Factor):
         r"""
         Find context matches that would result in a contradiction with other.
 
+        Works by testing whether ``self`` would imply ``other`` if
+        ``other`` had an opposite value for ``rule_valid``.
+
+        This method takes three main paths depending on
+        whether the holdings ``self`` and ``other`` assert that
+        rules are decided or undecided.
+
+        A ``decided`` :class:`Rule` can never contradict
+        a previous statement that any :class:`Rule` was undecided.
+
+        If rule A implies rule B, then a holding that B is undecided
+        contradicts a prior :class:`Rule` deciding that
+        rule A is valid or invalid.
+
         :param other:
             The :class:`.Factor` to be compared to self. Unlike with
             :meth:`~Holding.contradicts`\, this method cannot be called
@@ -242,36 +256,6 @@ class Holding(Factor):
                     other._implies_if_decided(self),
                     other._implies_if_decided(self.negated()),
                 )
-
-    def contradicts(
-        self, other: Union[Factor, "Opinion"], context: ContextRegister = None
-    ) -> bool:
-        r"""
-        Test if ``self`` :meth:`~.Factor.implies` ``other`` :meth:`~.Factor.negated`\.
-
-        Works by testing whether ``self`` would imply ``other`` if
-        ``other`` had an opposite value for ``rule_valid``.
-
-        This method takes three main paths depending on
-        whether the holdings ``self`` and ``other`` assert that
-        rules are decided or undecided.
-
-        A ``decided`` :class:`Rule` can never contradict
-        a previous statement that any :class:`Rule` was undecided.
-
-        If rule A implies rule B, then a holding that B is undecided
-        contradicts a prior :class:`Rule` deciding that
-        rule A is valid or invalid.
-
-        :returns:
-            whether ``self`` contradicts ``other``.
-        """
-        if context is None:
-            context = ContextRegister()
-        return any(
-            explanation is not None
-            for explanation in self.explanations_contradiction(other, context)
-        )
 
     def _explanations_implies_if_not_exclusive(
         self, other: Factor, context: ContextRegister = None
@@ -331,9 +315,10 @@ class Holding(Factor):
             for explanation in self.explanations_implication(other, context)
         )
 
-    def _context_registers_for_implication(
+    def explanations_implication(
         self, other: Holding, context: Optional[ContextRegister] = None
     ) -> Iterator[ContextRegister]:
+        """Yield contexts that would cause self and other to have same meaning."""
         if self.exclusive is other.exclusive is False:
             yield from self._explanations_implies_if_not_exclusive(
                 other, context=context
@@ -342,13 +327,6 @@ class Holding(Factor):
             yield from self.nonexclusive_holdings.explanations_implication(
                 other.nonexclusive_holdings, context=context
             )
-
-    def explanations_implication(
-        self, other: Holding, context: Optional[ContextRegister] = None
-    ) -> Iterator[Explanation]:
-        """Yield contexts that would cause self and other to have same meaning."""
-        for register in self._context_registers_for_implication(other, context=context):
-            yield Explanation(self, other, register, relation="IMPLICATION")
 
     def implied_by(
         self, other: Factor, context: Optional[ContextRegister] = None
@@ -451,23 +429,6 @@ class Holding(Factor):
             and self.decided == other.decided
         ):
             yield from self.rule.explanations_same_meaning(other.rule, context)
-
-    def means(
-        self, other: Optional[Factor], context: Optional[ContextRegister] = None
-    ) -> bool:
-        """
-        Test whether ``other`` has the same meaning as ``self``.
-
-        :returns:
-            whether ``other`` is a :class:`Holding` with the
-            same meaning as ``self``.
-        """
-        if other is None:
-            return False
-        return any(
-            explanation is not None
-            for explanation in self.explanations_same_meaning(other, context)
-        )
 
     def negated(self):
         """Get new copy of ``self`` with an opposite value for ``rule_valid``."""
