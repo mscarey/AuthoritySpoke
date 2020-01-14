@@ -95,9 +95,7 @@ class Opinion(Comparable):
                     ):
                         yield explanation
         elif hasattr(other, "explanations_contradiction"):
-            if context:
-                context = context.reversed()
-            yield from other.explanations_contradiction(self, context=context)
+            yield from other.explanations_contradiction(self)
         else:
             raise TypeError(
                 f"'Contradicts' test not implemented for types "
@@ -337,6 +335,7 @@ class Opinion(Comparable):
     def implied_by_holding(
         self, other: Holding, context: ContextRegister = None
     ) -> bool:
+        context = context or ContextRegister()
         return all(
             other.implies(self_holding, context=context.reversed())
             for self_holding in self.holdings

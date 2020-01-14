@@ -12,7 +12,7 @@ from __future__ import annotations
 
 from itertools import chain
 from typing import Any, Dict, Iterator, List
-from typing import Optional, Sequence, Tuple, Union
+from typing import Optional, Sequence, Tuple, TypeVar, Union
 
 from dataclasses import dataclass
 
@@ -546,4 +546,12 @@ class Holding(Factor):
         return text
 
 
-HoldingGroup = ComparableGroup[Holding]
+H = TypeVar("H", bound="Holding")
+
+
+class HoldingGroup(ComparableGroup[H]):
+    def implies_holding_group(self, other: HoldingGroup) -> bool:
+        for other_holding in other:
+            if not any(self_holding.implies(other_holding) for self_holding in self):
+                return False
+        return True

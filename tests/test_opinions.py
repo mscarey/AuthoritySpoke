@@ -1,5 +1,7 @@
 import pytest
 
+from anchorpoint.textselectors import TextQuoteSelector
+
 from authorityspoke.entities import Entity
 from authorityspoke.facts import Fact
 from authorityspoke.io import anchors, loaders, readers
@@ -114,6 +116,12 @@ class TestOpinionText:
         anchor = oracle.holding_anchors[holding][0]
         selected = oracle.select_text(selector=anchor)
         assert selected == "must be “original” to qualify"
+
+    def test_invalid_text_selector(self, make_opinion_with_holding):
+        oracle = make_opinion_with_holding["oracle_majority"]
+        anchor = TextQuoteSelector(exact="text not in opinion")
+        with pytest.raises(ValueError):
+            _ = oracle.select_text(selector=anchor)
 
 
 class TestOpinionHoldings:
@@ -262,6 +270,13 @@ class TestImplication:
         assert not watt >= make_holding["h2_undecided"]
         assert not watt > make_holding["h2_undecided"]
 
+    def test_opinion_implied_by_rule(self, make_opinion, make_holding, make_rule):
+        watt = make_opinion["oracle_majority"]
+        watt.clear_holdings()
+        watt.posit(make_holding["h2"])
+        assert watt.implied_by(make_rule["h2_despite_due_process"])
+        assert not watt.implies(make_rule["h2_despite_due_process"])
+
 
 class TestContradiction:
     def test_contradiction_of_holding(
@@ -275,6 +290,15 @@ class TestContradiction:
         oracle = make_opinion_with_holding["oracle_majority"]
         lotus = make_opinion_with_holding["lotus_majority"]
         explanation = oracle.explain_contradiction(lotus.holdings[6])
+        assert (
+            "<the java api> is like <the lotus menu command hierarchy>"
+            in str(explanation).lower()
+        )
+
+    def test_explain_opinion_contradicting_rule(self, make_opinion_with_holding):
+        oracle = make_opinion_with_holding["oracle_majority"]
+        lotus = make_opinion_with_holding["lotus_majority"]
+        explanation = oracle.explain_contradiction(lotus.holdings[6].rule)
         assert (
             "<the java api> is like <the lotus menu command hierarchy>"
             in str(explanation).lower()

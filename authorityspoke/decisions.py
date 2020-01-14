@@ -220,16 +220,8 @@ class Decision:
             context = context.reversed()
         return other.implies(self, context=context)
 
-    def implies_decision_or_opinion(
-        self, other: Union[Decision, Opinion], context: Optional[ContextRegister] = None
-    ) -> bool:
-        for other_holding in other.holdings:
-            if not any(
-                self_holding.implies(other_holding, context=context)
-                for self_holding in self.holdings
-            ):
-                return False
-        return True
+    def implies_decision_or_opinion(self, other: Union[Decision, Opinion]) -> bool:
+        return self.holdings.implies(other.holdings)
 
     def implies_holding(
         self, other: Holding, context: Optional[ContextRegister] = None
