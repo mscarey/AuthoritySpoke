@@ -4,6 +4,7 @@ import operator
 from typing import Callable, Iterator, Optional, Sequence, Tuple, TypeVar
 
 from authorityspoke.comparisons import Comparable, ContextRegister
+from authorityspoke.explanations import Explanation
 from authorityspoke.factors import Factor, means
 
 F = TypeVar("F", bound="Factor")
@@ -73,6 +74,18 @@ class ComparableGroup(Tuple[F, ...], Comparable):
                         return False
         return True
 
+    @property
+    def context_factors(self) -> FactorSequence:
+        r"""
+        Get :class:`Factor`\s used in comparisons with other :class:`Factor`\s.
+
+        :returns:
+            a tuple of attributes that are designated as the ``context_factors``
+            for whichever subclass of :class:`Factor` calls this method. These
+            can be used for comparing objects using :meth:`consistent_with`
+        """
+        return FactorSequence(context)
+
     def contradicts(
         self, other: ComparableGroup, context: Optional[ContextRegister] = None,
     ) -> bool:
@@ -122,6 +135,9 @@ class ComparableGroup(Tuple[F, ...], Comparable):
             :attr:`comparison` with some :class:`.Factor` of :attr:`available`
             for the relation to hold, and have not yet been matched.
 
+        :param matches:
+            a :class:`.ContextRegister` matching generic :class:`.Factor`\s
+
         :yields:
             context registers showing how each :class:`.Factor` in
             ``need_matches`` can have the relation ``comparison``
@@ -154,11 +170,78 @@ class ComparableGroup(Tuple[F, ...], Comparable):
                                 )
                             )
 
+    def verbose_comparison(
+        self,
+        operation: Callable,
+        still_need_matches: Sequence[Factor],
+        explanation: Explanation = None,
+    ) -> Iterator[ContextRegister]:
+        r"""
+        Find ways for two unordered sets of :class:`.Factor`\s to satisfy a comparison.
+
+        All of the elements of `other` need to fit the comparison. The elements of
+        `self` don't all need to be used.
+
+        :param context:
+            a mapping of :class:`.Factor`\s that have already been matched
+            to each other in the recursive search for a complete group of
+            matches. Usually starts empty when the method is first called.
+
+        :param still_need_matches:
+            :class:`.Factor`\s that need to satisfy the comparison
+            :attr:`comparison` with some :class:`.Factor` of :attr:`available`
+            for the relation to hold, and have not yet been matched.
+
+        :param explanation:
+            an :class:`.Explanation` showing which :class:`.Factor`\s listed in the
+            FactorGroups were matched to each other, and also including a
+            :class:`.ContextRegister`\.
+
+        :yields:
+            context registers showing how each :class:`.Factor` in
+            ``need_matches`` can have the relation ``comparison``
+            with some :class:`.Factor` in ``available_for_matching``,
+            with matching context.
+        """
+        still_need_matches = list(still_need_matches)
+
+        if explanation is None:
+            explanation = Explanation(
+                matches=[], context=ContextRegister(), operation=operation
+            )
+
+        if not still_need_matches:
+            yield explanation
+        else:
+            other_factor = still_need_matches.pop()
+            for self_factor in self:
+                if operation(self_factor, other_factor):
+                    updated_mappings = iter(
+                        self_factor.update_context_register(
+                            other=other_factor,
+                            register=explanation.context,
+                            comparison=operation,
+                        )
+                    )
+                    new_explanation = explanation.add_match((self_factor, other_factor))
+                    for new_matches in updated_mappings:
+                        if new_matches is not None:
+                            yield from iter(
+                                self.verbose_comparison(
+                                    still_need_matches=still_need_matches,
+                                    operation=operation,
+                                    explanation=new_explanation,
+                                )
+                            )
+
     def explanations_implication(
         self, other: ComparableGroup, context: Optional[ContextRegister] = None
     ) -> Iterator[ContextRegister]:
-        yield from self.comparison(
-            operation=operator.ge, still_need_matches=list(other), matches=context
+        explanation = Explanation(matches=[], context=context or ContextRegister())
+        yield from self.verbose_comparison(
+            operation=operator.ge,
+            still_need_matches=list(other),
+            explanation=explanation,
         )
 
     def explanations_has_all_factors_of(

@@ -1,28 +1,33 @@
 """Objects describing relationships between pairs of Factors or Opinions."""
+from __future__ import annotations
 
 from dataclasses import dataclass
-import textwrap
+from enum import Enum, auto
+import operator
+from typing import Callable, ClassVar, List, Optional, Tuple
 
-from authorityspoke.factors import ContextRegister, Factor
+from authorityspoke.factors import ContextRegister, Factor, means
 
 
-@dataclass(frozen=True)
+@dataclass
 class Explanation:
-    needs_match: Factor
-    available: Factor
+    matches: List[Tuple[Factor, Factor]]
     context: ContextRegister
-    relation: str = "IMPLICATION"
+    operation: Callable = operator.ge
+
+    operation_names: ClassVar = {operator.ge: "IMPLIES", means: "MEANS"}
 
     def __str__(self):
-        indent = "  "
-        needs_match_text = textwrap.indent(str(self.needs_match), prefix=indent)
-        available_text = textwrap.indent(str(self.available), prefix=indent)
+        text = ""
+        relation = self.operation_names[self.operation]
+        for match in self.matches:
+            text += f"{match[0].short_string} {relation} {match[1].short_string}\n"
+        if self.context:
+            text += self.context.prose
+        return text.rstrip("\n")
 
-        text = (
-            f"an Explanation of why there is a {self.relation} between\n"
-            f"{needs_match_text}\n"
-            f"and\n"
-            f"{available_text}\n"
-            f"is that {self.context.prose}"
+    def add_match(self, match=Tuple[Factor, Factor]) -> Explanation:
+        new_matches = self.matches + [match]
+        return Explanation(
+            matches=new_matches, context=self.context, operation=self.operation,
         )
-        return text

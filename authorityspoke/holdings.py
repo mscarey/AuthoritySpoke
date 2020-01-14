@@ -178,18 +178,13 @@ class Holding(Factor):
 
     def _explanations_contradiction_of_holding(
         self, other: Holding, context: ContextRegister
-    ) -> Iterator[Explanation]:
+    ) -> Iterator[ContextRegister]:
         for self_holding in self.nonexclusive_holdings:
             for other_holding in other.nonexclusive_holdings:
                 for register in self_holding._contradicts_if_not_exclusive(
                     other_holding, context=context
                 ):
-                    yield Explanation(
-                        needs_match=self_holding,
-                        available=other_holding,
-                        context=register,
-                        relation="CONTRADICTION",
-                    )
+                    yield register
 
     def explanations_contradiction(
         self, other: Factor, context: ContextRegister = None

@@ -1,3 +1,6 @@
+import pytest
+
+
 class TestDecision:
     def test_decision_string(self, make_decision):
         decision = make_decision["cardenas"]
@@ -24,6 +27,16 @@ class TestImplication:
         assert len(oracle.holdings) == 1
         assert len(oracle_with_holdings.holdings) > 10
         assert oracle_with_holdings >= oracle
+
+    @pytest.mark.skip(reason="slow")
+    def test_decision_implies_its_decision(self, make_decision_with_holding):
+        oracle = make_decision_with_holding["oracle"]
+        assert oracle >= oracle.majority
+
+    @pytest.mark.skip(reason="slow")
+    def test_opinion_implies_its_opinion(self, make_decision_with_holding):
+        oracle = make_decision_with_holding["oracle"]
+        assert oracle.majority >= oracle
 
 
 class TestContradiction:

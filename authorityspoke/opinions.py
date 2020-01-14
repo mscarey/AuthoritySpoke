@@ -104,20 +104,15 @@ class Opinion(Comparable):
                 + f"{self.__class__} and {other.__class__}."
             )
 
-    def implies(
-        self, other: Optional[Comparable], context: ContextRegister = None
-    ) -> bool:
+    def implies(self, other: Optional[Comparable]) -> bool:
         if isinstance(other, (Rule, Holding)):
-            return any(
-                self_holding.implies(other, context=context)
-                for self_holding in self.holdings
-            )
+            return any(self_holding.implies(other) for self_holding in self.holdings)
         elif isinstance(other, self.__class__):
             return self.implies_other_holdings(other.holdings)
+        if other is None:
+            return True
         if hasattr(other, "implied_by"):
-            if context:
-                context = context.reversed()
-            return other.implied_by(self, context=context)
+            return other.implied_by(self)
         return False
 
     def explanations_implication(
@@ -146,7 +141,7 @@ class Opinion(Comparable):
             )
 
     @property
-    def generic_factors(self) -> List[Factor]:
+    def generic_factors(self) -> List[Comparable]:
         r"""
         Get all generic :class:`.Factor`\s mentioned in ``self``.
 
@@ -359,13 +354,10 @@ class Opinion(Comparable):
             return self.implied_by_rule(other, context=context)
         return other.implies(self, context=context.reversed())
 
-    def implies_other_holdings(
-        self, other_holdings: List[Holding], context: ContextRegister = None
-    ):
+    def implies_other_holdings(self, other_holdings: Sequence[Holding]):
         for other_holding in other_holdings:
             if not any(
-                self_holding.implies(other_holding, context=context)
-                for self_holding in self.holdings
+                self_holding.implies(other_holding) for self_holding in self.holdings
             ):
                 return False
         return True
