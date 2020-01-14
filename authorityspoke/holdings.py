@@ -16,9 +16,9 @@ from typing import Optional, Sequence, Tuple, Union
 
 from dataclasses import dataclass
 
-from authorityspoke.comparisons import Comparable
+from authorityspoke.comparisons import Comparable, ContextRegister
 from authorityspoke.explanations import Explanation
-from authorityspoke.factors import ContextRegister, Factor, new_context_helper
+from authorityspoke.factors import Factor, new_context_helper, contradicts
 from authorityspoke.groups import ComparableGroup
 from authorityspoke.formatting import indented, wrapped
 from authorityspoke.procedures import Procedure
@@ -178,13 +178,17 @@ class Holding(Factor):
 
     def _explanations_contradiction_of_holding(
         self, other: Holding, context: ContextRegister
-    ) -> Iterator[ContextRegister]:
+    ) -> Iterator[Explanation]:
         for self_holding in self.nonexclusive_holdings:
             for other_holding in other.nonexclusive_holdings:
                 for register in self_holding._contradicts_if_not_exclusive(
                     other_holding, context=context
                 ):
-                    yield register
+                    yield Explanation(
+                        matches=[(self_holding, other_holding)],
+                        context=register,
+                        operation=contradicts,
+                    )
 
     def explanations_contradiction(
         self, other: Factor, context: ContextRegister = None

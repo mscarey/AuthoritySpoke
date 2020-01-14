@@ -68,7 +68,7 @@ print(explanation)
 ```
 
 ```
-an Explanation of why there is a CONTRADICTION between
+EXPLANATION: Because <the Lotus menu command hierarchy> is like <the Java API>,
   the Holding to ACCEPT
     the Rule that the court MUST ALWAYS impose the
       RESULT:
@@ -84,7 +84,7 @@ an Explanation of why there is a CONTRADICTION between
         "In no case does copyright protection for an original work of
         authorship extend to any" (Title 17, /us/usc/t17/s102/b)
         "method of operation" (Title 17, /us/usc/t17/s102/b)
-and
+CONTRADICTS
   the Holding to ACCEPT
     the Rule that the court MUST SOMETIMES impose the
       RESULT:
@@ -123,7 +123,6 @@ and
         applications for registration of such works cannot be entertained: (a)
         Words and short phrases such as names, titles, and slogans;" (Code of
         Federal Regulations Title 37, /us/cfr/t37/s202.1)
-is that <the Lotus menu command hierarchy> is like <the Java API>
 ```
 
 ## Learning about AuthoritySpoke

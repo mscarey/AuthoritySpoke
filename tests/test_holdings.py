@@ -286,7 +286,10 @@ class TestContradiction:
         oracle = make_opinion_with_holding["oracle_majority"]
         lotus = make_opinion_with_holding["lotus_majority"]
         explanation = lotus.holdings[6].explain_contradiction(oracle)
-        assert "an explanation" in str(explanation).lower()
+        assert (
+            "<the java api> is like <the lotus menu command hierarchy>"
+            in str(explanation).lower()
+        )
 
     def test_no_holding_contradiction_explanations(self, make_opinion_with_holding):
         lotus = make_opinion_with_holding["lotus_majority"]

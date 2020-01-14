@@ -664,14 +664,28 @@ def means(left: Factor, right: Factor) -> bool:
     """
     Call :meth:`.Factor.means` as function alias.
 
-    This only exists because :class:`.Analogy` objects expect
-    a function rather than a method for :attr:`~.Analogy.comparison`.
+    This exists because :class:`.Explanation` objects expect
+    a function rather than a method
 
     :returns:
         whether ``other`` is another :class:`Factor` with the same
         meaning as ``self``.
     """
     return left.means(right)
+
+
+def contradicts(left: Factor, right: Factor) -> bool:
+    """
+    Call :meth:`.Factor.contradicts` as function alias.
+
+    This exists because :class:`.Explanation` objects expect
+    a function rather than a method
+
+    :returns:
+        whether ``other`` is another :class:`Factor` that can
+        contradict ``self``, assuming relevant context factors
+    """
+    return left.contradicts(right)
 
 
 class FactorSequence(Tuple[Optional[Comparable], ...]):
