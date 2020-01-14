@@ -15,7 +15,7 @@ from typing import List, Optional, Sequence, Tuple, Union
 
 from dataclasses import dataclass
 
-from authorityspoke.comparisons import ContextRegister
+from authorityspoke.comparisons import Comparable, ContextRegister
 from authorityspoke.comparisons import use_likely_context
 from authorityspoke.factors import Factor, new_context_helper
 from authorityspoke.groups import FactorGroup
@@ -643,14 +643,16 @@ class Procedure(Factor):
         yield from same_despite(same_inputs(same_outputs(context)))
 
     def explanations_same_meaning(
-        self, other: Factor, context: Optional[ContextRegister] = None
+        self, other: Comparable, context: Optional[ContextRegister] = None
     ) -> Iterator[ContextRegister]:
         """Yield contexts that could cause self to have the same meaning as other."""
         context = context or ContextRegister()
         if isinstance(other, self.__class__):
             yield from self._explanations_same_meaning_as_procedure(other, context)
 
-    def means(self, other, context: Optional[ContextRegister] = None) -> bool:
+    def means(
+        self, other: Comparable, context: Optional[ContextRegister] = None
+    ) -> bool:
         r"""
         Determine whether ``other`` has the same meaning as ``self``.
 

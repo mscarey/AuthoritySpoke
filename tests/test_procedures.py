@@ -286,16 +286,22 @@ class TestFactorGroups:
         Verifies that the factor groups are considered "consistent"
         even though it would be possible to make an analogy that would
         make the statements contradict.
-
-        If Alice is considered analagous to Dan the two sets of
-        statements would be inconsistent, but not if
-        Alice is considered analagous to Craig.
         """
         assert FactorGroup([alice_rich, bob_poor]).consistent_with(
             FactorGroup([dan_poor, craig_rich])
         )
+
+    def test_inconsistent_factor_groups(self):
+        """
+        If Alice is considered analagous to Dan the two sets of
+        statements would be inconsistent, but not if
+        Alice is considered analagous to Craig.
+        """
         assert not FactorGroup([alice_rich, bob_poor]).consistent_with(
             FactorGroup([dan_poor, craig_rich]), context=ContextRegister({alice: dan})
+        )
+        assert FactorGroup([alice_rich, bob_poor]).consistent_with(
+            FactorGroup([dan_poor, craig_rich]), context=ContextRegister({alice: craig})
         )
 
     def test_contradictory_factor_groups(self):
