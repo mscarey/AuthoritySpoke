@@ -29,6 +29,6 @@ class TestExplainHoldings:
         oracle = make_decision_with_holding["oracle"]
         context = oracle.holdings[18].explain_implication(oracle.holdings[19])
         explanation = Explanation(
-            oracle.holdings[18], oracle.holdings[19], context=context
+            matches=[(oracle.holdings[18], oracle.holdings[19])], context=context
         )
-        assert "implication" in str(explanation).lower()
+        assert "implies" in str(explanation).lower()

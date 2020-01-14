@@ -449,14 +449,18 @@ class Procedure(Factor):
         yield from self.explanations_same_meaning(other, context)
 
         def other_outputs_implied(context: Optional[ContextRegister]):
-            yield from self.outputs.explanations_implication(
-                other=other.outputs, context=context
+            yield from self.outputs.comparison(
+                operation=operator.ge,
+                still_need_matches=list(other.outputs),
+                matches=context,
             )
 
         def self_inputs_implied(contexts: Iterable[ContextRegister]):
             for context in contexts:
-                yield from other.inputs.explanations_implication(
-                    other=self.inputs, context=context
+                yield from other.inputs.comparison(
+                    operation=operator.ge,
+                    still_need_matches=list(self.inputs),
+                    matches=context,
                 )
 
         for explanation in self_inputs_implied(other_outputs_implied(context)):
@@ -504,14 +508,18 @@ class Procedure(Factor):
         self_despite_or_input = FactorGroup((*self.despite, *self.inputs))
 
         def other_outputs_implied(context: ContextRegister):
-            yield from self.outputs.explanations_implication(
-                other=other.outputs, context=context
+            yield from self.outputs.comparison(
+                operation=operator.ge,
+                still_need_matches=list(other.outputs),
+                matches=context,
             )
 
         def other_despite_implied(contexts: Iterator[ContextRegister]):
             for context in contexts:
-                yield from self_despite_or_input.explanations_implication(
-                    other=other.despite, context=context
+                yield from self_despite_or_input.comparison(
+                    operation=operator.ge,
+                    still_need_matches=list(other.despite),
+                    matches=context,
                 )
 
         for explanation in other_despite_implied(other_outputs_implied(context)):
@@ -558,21 +566,27 @@ class Procedure(Factor):
         self, other: Procedure, context: Optional[ContextRegister] = None
     ) -> Iterator[ContextRegister]:
         def other_outputs_implied(context: Optional[ContextRegister]):
-            yield from self.outputs.explanations_implication(
-                other=other.outputs, context=context
+            yield from self.outputs.comparison(
+                operation=operator.ge,
+                still_need_matches=list(other.outputs),
+                matches=context,
             )
 
         def other_inputs_implied(contexts: Iterable[ContextRegister]):
             for context in contexts:
-                yield from self.inputs.explanations_implication(
-                    other=other.inputs, context=context
+                yield from self.inputs.comparison(
+                    operation=operator.ge,
+                    still_need_matches=list(other.inputs),
+                    matches=context,
                 )
 
         def other_despite_implied(contexts: Iterable[ContextRegister]):
             despite_or_input = FactorGroup((*self.despite, *self.inputs))
             for context in contexts:
-                yield from despite_or_input.explanations_implication(
-                    other=other.despite, context=context
+                yield from despite_or_input.comparison(
+                    operation=operator.ge,
+                    still_need_matches=list(other.despite),
+                    matches=context,
                 )
 
         yield from other_despite_implied(
@@ -695,13 +709,17 @@ class Procedure(Factor):
         context = context or ContextRegister()
 
         def other_inputs_implied(context: ContextRegister):
-            yield from self_output_or_input.explanations_implication(
-                other=other.inputs, context=context
+            yield from self_output_or_input.comparison(
+                operation=operator.ge,
+                still_need_matches=list(other.inputs),
+                matches=context,
             )
 
         for explanation in other_inputs_implied(context):
-            yield from self_despite_or_input.explanations_implication(
-                other=other.despite, context=explanation
+            yield from self_despite_or_input.comparison(
+                operation=operator.ge,
+                still_need_matches=list(other.despite),
+                matches=explanation,
             )
 
     def triggers_next_procedure_if_universal(
@@ -726,4 +744,8 @@ class Procedure(Factor):
         """
         context = context or ContextRegister()
         self_output_or_input = FactorGroup((*self.outputs, *self.inputs))
-        yield from self_output_or_input.explanations_implication(other.inputs, context)
+        yield from self_output_or_input.comparison(
+            operation=operator.ge,
+            still_need_matches=list(other.inputs),
+            matches=context,
+        )

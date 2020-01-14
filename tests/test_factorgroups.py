@@ -98,6 +98,7 @@ class TestImplication:
         assert group.implies(empty_group)
 
     def test_explanation_implication_of_factorgroup(self, watt_factor):
+        """The returned Explanation shows that f8_meters matches up with f8."""
         left = FactorGroup([watt_factor["f9_absent_miles"], watt_factor["f8_meters"]])
         right = FactorGroup([watt_factor["f8"], watt_factor["f9_absent"]])
         explanation = left.explain_implication(right)

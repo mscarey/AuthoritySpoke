@@ -175,7 +175,7 @@ class ComparableGroup(Tuple[F, ...], Comparable):
         operation: Callable,
         still_need_matches: Sequence[Factor],
         explanation: Explanation = None,
-    ) -> Iterator[ContextRegister]:
+    ) -> Iterator[Explanation]:
         r"""
         Find ways for two unordered sets of :class:`.Factor`\s to satisfy a comparison.
 
@@ -236,7 +236,7 @@ class ComparableGroup(Tuple[F, ...], Comparable):
 
     def explanations_implication(
         self, other: ComparableGroup, context: Optional[ContextRegister] = None
-    ) -> Iterator[ContextRegister]:
+    ) -> Iterator[Explanation]:
         explanation = Explanation(matches=[], context=context or ContextRegister())
         yield from self.verbose_comparison(
             operation=operator.ge,
