@@ -29,7 +29,7 @@ class TestImplication:
         assert oracle_with_holdings >= oracle
 
     # @pytest.mark.skip(reason="slow")
-    def test_decision_implies_its_decision(self, make_decision_with_holding):
+    def test_decision_implies_its_opinion(self, make_decision_with_holding):
         oracle = make_decision_with_holding["oracle"]
         assert oracle >= oracle.majority
 

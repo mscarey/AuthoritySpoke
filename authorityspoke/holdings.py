@@ -11,7 +11,8 @@ should be considered undecided.
 from __future__ import annotations
 
 from itertools import chain
-from typing import Any, Dict, Iterator, List
+import operator
+from typing import Any, Callable, Dict, Iterator, List
 from typing import Optional, Sequence, Tuple, TypeVar, Union
 
 from dataclasses import dataclass
@@ -550,8 +551,89 @@ H = TypeVar("H", bound="Holding")
 
 
 class HoldingGroup(ComparableGroup[H]):
+    def explanations_implication(self, other: Comparable) -> Iterator[Explanation]:
+        if isinstance(other, Rule):
+            other = Holding(rule=other)
+        if isinstance(other, Holding):
+            yield from self.verbose_comparison(
+                operation=operator.ge, still_need_matches=[other]
+            )
+        elif isinstance(other, self.__class__):
+            yield from self.verbose_comparison(
+                operation=operator.ge, still_need_matches=list(other)
+            )
+
+    def explain_implies_holding(self, other: Holding) -> Optional[Explanation]:
+        explanations = self.explanations_implies_holding(other)
+        try:
+            explanation = next(explanations)
+        except StopIteration:
+            return None
+        return explanation
+
+    def explanations_implies_holding(self, other: Holding) -> Iterator[Explanation]:
+        for self_holding in self:
+            if self_holding.implies(other):
+                yield Explanation(matches=[(self_holding, other)])
+
     def implies_holding_group(self, other: HoldingGroup) -> bool:
         for other_holding in other:
             if not any(self_holding.implies(other_holding) for self_holding in self):
                 return False
         return True
+
+    def verbose_comparison(
+        self,
+        operation: Callable,
+        still_need_matches: Sequence[Factor],
+        explanation: Explanation = None,
+    ) -> Iterator[Explanation]:
+        r"""
+        Find ways for two unordered sets of :class:`.Factor`\s to satisfy a comparison.
+
+        All of the elements of `other` need to fit the comparison. The elements of
+        `self` don't all need to be used.
+
+        :param context:
+            a mapping of :class:`.Factor`\s that have already been matched
+            to each other in the recursive search for a complete group of
+            matches. Usually starts empty when the method is first called.
+
+        :param still_need_matches:
+            :class:`.Factor`\s that need to satisfy the comparison
+            :attr:`comparison` with some :class:`.Factor` of :attr:`available`
+            for the relation to hold, and have not yet been matched.
+
+        :param explanation:
+            an :class:`.Explanation` showing which :class:`.Factor`\s listed in the
+            FactorGroups were matched to each other, and also including a
+            :class:`.ContextRegister`\.
+
+        :yields:
+            context registers showing how each :class:`.Factor` in
+            ``need_matches`` can have the relation ``comparison``
+            with some :class:`.Factor` in ``available_for_matching``,
+            with matching context.
+        """
+        still_need_matches = list(still_need_matches)
+
+        if explanation is None:
+            explanation = Explanation(matches=[], context=None, operation=operation)
+
+        if not still_need_matches:
+            yield explanation
+        else:
+            other_holding = still_need_matches.pop()
+            for self_holding in self:
+                if operation(self_holding, other_holding):
+                    new_explanation = explanation.add_match(
+                        (self_holding, other_holding)
+                    )
+                    next_step = iter(
+                        self.verbose_comparison(
+                            still_need_matches=still_need_matches,
+                            operation=operation,
+                            explanation=new_explanation,
+                        )
+                    )
+                    yield next(next_step)

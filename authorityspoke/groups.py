@@ -74,18 +74,6 @@ class ComparableGroup(Tuple[F, ...], Comparable):
                         return False
         return True
 
-    @property
-    def context_factors(self) -> FactorSequence:
-        r"""
-        Get :class:`Factor`\s used in comparisons with other :class:`Factor`\s.
-
-        :returns:
-            a tuple of attributes that are designated as the ``context_factors``
-            for whichever subclass of :class:`Factor` calls this method. These
-            can be used for comparing objects using :meth:`consistent_with`
-        """
-        return FactorSequence(context)
-
     def contradicts(
         self, other: ComparableGroup, context: Optional[ContextRegister] = None,
     ) -> bool:
@@ -299,6 +287,28 @@ class ComparableGroup(Tuple[F, ...], Comparable):
                 other, context
             ):
                 yield from self.explanations_has_all_factors_of(other, explanation)
+
+    def _context_registers(
+        self,
+        other: Optional[ComparableGroup],
+        comparison: Callable,
+        context: Optional[ContextRegister] = None,
+    ) -> Iterator[ContextRegister]:
+        r"""
+        Search for ways to match :attr:`context_factors` of ``self`` and ``other``.
+
+        :yields:
+            all valid ways to make matches between
+            corresponding :class:`Factor`\s.
+        """
+        if context is None:
+            context = ContextRegister()
+        if other is None:
+            yield context
+        else:
+            yield from self.comparison(
+                operation=comparison, still_need_matches=list(other), matches=context
+            )
 
     def _likely_contexts_for_factor(
         self, other: Factor, context: ContextRegister, i: int = 0

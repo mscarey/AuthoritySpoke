@@ -2,14 +2,16 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 import datetime
+import operator
 from typing import Iterable, Iterator, List
 from typing import Optional, Sequence, Union
 
 from anchorpoint.textselectors import TextQuoteSelector
 
+from authorityspoke.comparisons import Comparable
 from authorityspoke.explanations import Explanation
 from authorityspoke.factors import Factor, ContextRegister
-from authorityspoke.holdings import Holding
+from authorityspoke.holdings import Holding, HoldingGroup
 from authorityspoke.opinions import Opinion, TextLinkDict
 from authorityspoke.rules import Rule
 
@@ -84,12 +86,12 @@ class Decision:
         return f"{name}, {citation} ({self.date})"
 
     @property
-    def holdings(self):
+    def holdings(self) -> HoldingGroup:
         if self.majority is None:
             raise NotImplementedError(
                 "Cannot determine Holdings of Decision with no known majority Opinion."
             )
-        return self.majority.holdings
+        return HoldingGroup(self.majority.holdings)
 
     def contradicts(self, other):
         if isinstance(other, Decision):
@@ -194,34 +196,27 @@ class Decision:
     def __gt__(self, other) -> bool:
         return self.implies(other) and not self == other
 
-    def implied_by_holding(self, other: Holding, context: ContextRegister) -> bool:
-        if context:
-            context = context.reversed()
-        return all(
-            other.implies(self_holding, context=context.reversed())
-            for self_holding in self.holdings
-        )
+    def implied_by_holding(self, other: Holding) -> Iterator[Explanation]:
+        if all(other.implies(self_holding) for self_holding in self.holdings):
+            yield Explanation(
+                matches=[(other, self_holding) for self_holding in self.holdings],
+                operation=operator.ge,
+            )
 
-    def implied_by_rule(self, other: Rule, context: ContextRegister) -> bool:
-        return self.implied_by_holding(other=Holding(other), context=context)
-
-    def implied_by(
-        self, other: Union[Opinion, Holding, Rule], context: ContextRegister = None
-    ) -> bool:
+    def explanations_implied_by(self, other: Comparable) -> Iterator[Explanation]:
         if isinstance(other, Opinion):
-            if context:
-                context = context.reversed()
-            return other.implies_other_holdings(self.holdings, context=context)
+            other = other.holdings
+        if isinstance(other, HoldingGroup):
+            yield from other.explanations_implication(self.holdings)
+        if isinstance(other, Rule):
+            other = Holding(rule=other)
         if isinstance(other, Holding):
-            return self.implied_by_holding(other, context=context)
-        elif isinstance(other, Rule):
-            return self.implied_by_rule(other, context=context)
-        if context is not None:
-            context = context.reversed()
-        return other.implies(self, context=context)
+            yield from self.implied_by_holding(other)
 
-    def implies_decision_or_opinion(self, other: Union[Decision, Opinion]) -> bool:
-        return self.holdings.implies(other.holdings)
+    def implied_by(self, other: Optional[Comparable]) -> bool:
+        if other is None:
+            return False
+        return any(self.explanations_implied_by(other))
 
     def implies_holding(
         self, other: Holding, context: Optional[ContextRegister] = None
@@ -238,7 +233,7 @@ class Decision:
 
     def implies(self, other, context: Optional[ContextRegister] = None) -> bool:
         if isinstance(other, (Decision, Opinion)):
-            return self.implies_decision_or_opinion(other, context=context)
+            return self.holdings.implies(other.holdings)
         elif isinstance(other, Holding):
             return self.implies_holding(other, context=context)
         elif isinstance(other, Rule):

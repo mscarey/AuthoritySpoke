@@ -13,7 +13,7 @@ from authorityspoke.factors import Factor, means, contradicts
 @dataclass
 class Explanation:
     matches: List[Tuple[Factor, Factor]]
-    context: ContextRegister
+    context: Optional[ContextRegister] = None
     operation: Callable = operator.ge
 
     operation_names: ClassVar = {

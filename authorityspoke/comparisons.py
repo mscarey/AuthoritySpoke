@@ -33,7 +33,7 @@ class Comparable(ABC):
 
     def _context_registers(
         self,
-        other: Optional[Factor],
+        other: Optional[Comparable],
         comparison: Callable,
         context: Optional[ContextRegister] = None,
     ) -> Iterator[ContextRegister]:
@@ -84,6 +84,21 @@ class Comparable(ABC):
             generic :class:`.Factor`\s as keys and ``None`` as values,
             so that the keys can be matched to another object's
             ``generic_factors`` to perform an equality test.
+        """
+        return []
+
+    @property
+    def interchangeable_factors(self) -> List[ContextRegister]:
+        """
+        List ways to reorder :attr:`context_factors` but preserve ``self``\'s meaning.
+
+        The empty list is the default return value for subclasses that don't
+        have any interchangeable :attr:`context_factors`.
+
+        :returns:
+            the ways :attr:`context_factors` can be reordered without
+            changing the meaning of ``self``, or whether it would
+            be true in a particular context.
         """
         return []
 
@@ -175,6 +190,27 @@ class Comparable(ABC):
                 answer = self.union_from_explanation(other, guess)
                 if answer:
                     yield guess
+
+    def _registers_for_interchangeable_context(
+        self, matches: ContextRegister
+    ) -> Iterator[ContextRegister]:
+        r"""
+        Find possible combination of interchangeable :attr:`context_factors`.
+
+        :yields:
+            context registers with every possible combination of
+            ``self``\'s and ``other``\'s interchangeable
+            :attr:`context_factors`.
+        """
+        yield matches
+        already_returned: List[ContextRegister] = [matches]
+        for replacement_dict in self.interchangeable_factors:
+            changed_registry = matches.replace_keys(replacement_dict)
+            if not any(
+                changed_registry == returned_dict for returned_dict in already_returned
+            ):
+                already_returned.append(changed_registry)
+                yield changed_registry
 
     def union(
         self, other: Comparable, context: Optional[ContextRegister] = None
