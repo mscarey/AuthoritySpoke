@@ -16,7 +16,6 @@ from typing import List, Optional, Sequence, Tuple, Union
 from dataclasses import dataclass
 
 from authorityspoke.comparisons import Comparable, ContextRegister
-from authorityspoke.comparisons import use_likely_context
 from authorityspoke.factors import Factor, new_context_helper
 from authorityspoke.groups import FactorGroup
 from authorityspoke.formatting import indented

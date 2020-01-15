@@ -13,7 +13,6 @@ from typing import Optional, Sequence, Set, Tuple, TypeVar, Union
 from anchorpoint.textselectors import TextQuoteSelector
 
 from authorityspoke.comparisons import ContextRegister, Comparable
-from authorityspoke.comparisons import use_likely_context
 from authorityspoke.enactments import Enactment
 
 

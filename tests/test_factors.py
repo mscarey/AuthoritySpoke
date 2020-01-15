@@ -435,6 +435,17 @@ class TestImplication:
             >= make_complex_fact["f_relevant_murder_alice_craig"]
         )
 
+    def test_implied_by(self, make_complex_fact):
+        assert make_complex_fact["f_relevant_murder_whether"].implied_by(
+            make_complex_fact["f_relevant_murder"]
+        )
+
+    def test_explanation_implied_by(self, make_complex_fact):
+        explanation = make_complex_fact["f_relevant_murder_whether"].explain_implied_by(
+            make_complex_fact["f_relevant_murder"]
+        )
+        assert explanation
+
 
 class TestContradiction:
     def test_factor_different_predicate_truth_contradicts(self, watt_factor):
@@ -618,6 +629,11 @@ class TestConsistent:
             )
         )
         assert not explanations
+
+    def test_factor_consistent_with_none(self, make_exhibit):
+        assert make_exhibit["no_shooting_testimony"].consistent_with(
+            make_exhibit["no_shooting_witness_unknown_testimony"]
+        )
 
 
 class TestAddition:
