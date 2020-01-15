@@ -1,4 +1,5 @@
 from authorityspoke.groups import ComparableGroup, FactorGroup
+from authorityspoke.holdings import HoldingGroup
 
 
 class TestMakeGroup:
@@ -145,3 +146,11 @@ class TestUnion:
         right = FactorGroup(watt_factor["f3_absent"])
         combined = left | right
         assert len(combined) == 2
+
+
+class TestHoldingImplication:
+    def test_explain_holdinggroup_implication(self, make_holding):
+        left = HoldingGroup([make_holding["h1"], make_holding["h2_ALL"]])
+        right = HoldingGroup([make_holding["h2"]])
+        explanation = left.explain_implication(right)
+        assert "implies" in str(explanation).lower()

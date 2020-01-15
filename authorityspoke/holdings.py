@@ -570,16 +570,6 @@ class HoldingGroup(ComparableGroup[H]):
                 operation=operator.ge, still_need_matches=list(other)
             )
 
-    def explain_implies_holding(
-        self, other: Holding, context: Optional[ContextRegister] = None
-    ) -> Optional[Explanation]:
-        explanations = self.explanations_implies_holding(other)
-        try:
-            explanation = next(explanations)
-        except StopIteration:
-            return None
-        return explanation
-
     def explanations_implies_holding(
         self, other: Holding, context: Optional[ContextRegister] = None
     ) -> Iterator[Explanation]:

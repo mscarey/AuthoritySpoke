@@ -102,20 +102,16 @@ class Opinion(Comparable):
                 + f"{self.__class__} and {other.__class__}."
             )
 
-    def implies(self, other: Optional[Comparable]) -> bool:
-        if isinstance(other, (Rule, Holding)):
-            return any(self_holding.implies(other) for self_holding in self.holdings)
-        elif isinstance(other, self.__class__):
-            return self.implies_other_holdings(other.holdings)
+    def implies(
+        self, other: Optional[Comparable], context: Optional[ContextRegister] = None
+    ) -> bool:
         if other is None:
             return True
-        if hasattr(other, "implied_by"):
-            return other.implied_by(self)
-        return False
+        return any(self.explanations_implication(other))
 
     def explanations_implication(
-        self, other: Comparable, context: Optional[ContextRegister] = None,
-    ) -> Iterator[ContextRegister]:
+        self, other: Comparable, context: Optional[ContextRegister] = None
+    ) -> Iterator[Union[ContextRegister, Explanation]]:
         """Yield contexts that would result in self implying other."""
         if isinstance(other, Rule):
             other = Holding(rule=other)

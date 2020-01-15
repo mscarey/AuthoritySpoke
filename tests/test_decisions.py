@@ -36,7 +36,7 @@ class TestImplication:
     # @pytest.mark.skip(reason="slow")
     def test_opinion_implies_its_decision(self, make_decision_with_holding):
         cardenas = make_decision_with_holding["cardenas"]
-        assert cardenas.majority >= cardenas
+        assert cardenas.implied_by(cardenas.majority)
 
 
 class TestContradiction:

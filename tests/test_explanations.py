@@ -23,6 +23,13 @@ class TestContext:
         answers = fact_al.update_context_register(fact_alice, context, means)
         assert Entity("the bull") in next(answers).keys()
 
+    def test_explain_consistency(self):
+        fact_al = read_fact(self.al)
+        fact_alice = read_fact(self.alice)
+        context = ContextRegister({Entity("Al"): Entity("Alice")})
+        answers = fact_al.explain_consistent_with(fact_alice, context)
+        assert "<the bull> is like <the cow>" in answers.prose
+
 
 class TestExplainHoldings:
     def test_explain_implication(self, make_decision_with_holding):
