@@ -16,6 +16,12 @@ AuthoritySpoke is tested on Python 3.7 and is not yet working on Python 3.8.
 
 ## Trying it Out
 
+Even if you don't install AuthoritySpoke, you can try it out by clicking the Binder button below to interact with it through a Jupyter Notebook. If you use Binder, you'll be shown the directory structure of this repo. Navigate to the `notebooks` folder to find the tutorials.
+
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/mscarey/AuthoritySpoke/master)
+
+## An Example
+
 Here's an example that discovers contradictory legal holdings in `Oracle America, Inc. v. Google Inc., 750 F.3d 1339` (a famous case that dealt with a claim that the Android operating system infringed the copyright on the Java language) and `Lotus Development Corporation v. Borland International, 49 F.3d 807` (an older case about whether a user interface was copyrightable).
 
 Copies of both opinions can be loaded from the `example_data` folder. (But you can also use AuthoritySpoke to retrieve opinions from the [Caselaw Access Project API](https://api.case.law/v1/).)
@@ -128,10 +134,6 @@ CONTRADICTS
 ## Learning about AuthoritySpoke
 
 You can find the example above and much more information about using AuthoritySpoke in the [Introduction to AuthoritySpoke](notebooks/introduction.ipynb) Jupyter notebook.
-
-Use the button below to interact with the notebook online through Binder. If you use Binder, you'll be shown the directory structure of this repo. Navigate to the `notebooks` folder to find the tutorials.
-
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/mscarey/AuthoritySpoke/master)
 
 You can also find static versions of the tutorial notebooks, the API documentation, and more [in the project documentation](https://authorityspoke.readthedocs.io/en/latest/).
 
