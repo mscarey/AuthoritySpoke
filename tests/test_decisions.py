@@ -30,13 +30,13 @@ class TestImplication:
 
     # @pytest.mark.skip(reason="slow")
     def test_decision_implies_its_opinion(self, make_decision_with_holding):
-        oracle = make_decision_with_holding["oracle"]
-        assert oracle >= oracle.majority
+        cardenas = make_decision_with_holding["cardenas"]
+        assert cardenas >= cardenas.majority
 
     # @pytest.mark.skip(reason="slow")
     def test_opinion_implies_its_decision(self, make_decision_with_holding):
-        oracle = make_decision_with_holding["oracle"]
-        assert oracle.majority >= oracle
+        cardenas = make_decision_with_holding["cardenas"]
+        assert cardenas.majority >= cardenas
 
 
 class TestContradiction:

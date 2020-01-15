@@ -158,21 +158,6 @@ class Factor(Comparable):
         return ()
 
     @property
-    def interchangeable_factors(self) -> List[ContextRegister]:
-        """
-        List ways to reorder :attr:`context_factors` but preserve ``self``\'s meaning.
-
-        The empty list is the default return value for subclasses that don't
-        have any interchangeable :attr:`context_factors`.
-
-        :returns:
-            the ways :attr:`context_factors` can be reordered without
-            changing the meaning of ``self``, or whether it would
-            be true in a particular context.
-        """
-        return []
-
-    @property
     def generic_factors(self) -> List[Factor]:
         r"""
         :class:`.Factor`\s that can be replaced without changing ``self``\s meaning.
@@ -599,27 +584,6 @@ class Factor(Comparable):
         when generating a new object.
         """
         return self.__dict__.copy()
-
-    def _registers_for_interchangeable_context(
-        self, matches: ContextRegister
-    ) -> Iterator[ContextRegister]:
-        r"""
-        Find possible combination of interchangeable :attr:`context_factors`.
-
-        :yields:
-            context registers with every possible combination of
-            ``self``\'s and ``other``\'s interchangeable
-            :attr:`context_factors`.
-        """
-        yield matches
-        already_returned: List[ContextRegister] = [matches]
-        for replacement_dict in self.interchangeable_factors:
-            changed_registry = matches.replace_keys(replacement_dict)
-            if not any(
-                changed_registry == returned_dict for returned_dict in already_returned
-            ):
-                already_returned.append(changed_registry)
-                yield changed_registry
 
     def __str__(self):
         text = f"the {self.__class__.__name__}" + " {}"

@@ -203,20 +203,27 @@ class Decision:
                 operation=operator.ge,
             )
 
-    def explanations_implied_by(self, other: Comparable) -> Iterator[Explanation]:
+    def explanations_implied_by(
+        self, other: Comparable, context: Optional[ContextRegister] = None
+    ) -> Iterator[Explanation]:
+        context = context or ContextRegister()
         if isinstance(other, Opinion):
             other = other.holdings
         if isinstance(other, HoldingGroup):
-            yield from other.explanations_implication(self.holdings)
+            yield from other.explanations_implication(
+                self.holdings, context=context.reversed()
+            )
         if isinstance(other, Rule):
             other = Holding(rule=other)
         if isinstance(other, Holding):
-            yield from self.implied_by_holding(other)
+            yield from self.implied_by_holding(other, context)
 
-    def implied_by(self, other: Optional[Comparable]) -> bool:
+    def implied_by(
+        self, other: Optional[Comparable], context: Optional[ContextRegister] = None
+    ) -> bool:
         if other is None:
             return False
-        return any(self.explanations_implied_by(other))
+        return any(self.explanations_implied_by(other, context))
 
     def implies_holding(
         self, other: Holding, context: Optional[ContextRegister] = None

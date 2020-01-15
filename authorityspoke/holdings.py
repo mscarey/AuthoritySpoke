@@ -551,7 +551,14 @@ H = TypeVar("H", bound="Holding")
 
 
 class HoldingGroup(ComparableGroup[H]):
-    def explanations_implication(self, other: Comparable) -> Iterator[Explanation]:
+    def __new__(cls, value: Sequence = ()):
+        if isinstance(value, Holding):
+            value = (value,)
+        return tuple.__new__(HoldingGroup, value)
+
+    def explanations_implication(
+        self, other: Comparable, context: Optional[ContextRegister] = None
+    ) -> Iterator[Explanation]:
         if isinstance(other, Rule):
             other = Holding(rule=other)
         if isinstance(other, Holding):
@@ -563,7 +570,9 @@ class HoldingGroup(ComparableGroup[H]):
                 operation=operator.ge, still_need_matches=list(other)
             )
 
-    def explain_implies_holding(self, other: Holding) -> Optional[Explanation]:
+    def explain_implies_holding(
+        self, other: Holding, context: Optional[ContextRegister] = None
+    ) -> Optional[Explanation]:
         explanations = self.explanations_implies_holding(other)
         try:
             explanation = next(explanations)
@@ -571,16 +580,12 @@ class HoldingGroup(ComparableGroup[H]):
             return None
         return explanation
 
-    def explanations_implies_holding(self, other: Holding) -> Iterator[Explanation]:
+    def explanations_implies_holding(
+        self, other: Holding, context: Optional[ContextRegister] = None
+    ) -> Iterator[Explanation]:
         for self_holding in self:
             if self_holding.implies(other):
                 yield Explanation(matches=[(self_holding, other)])
-
-    def implies_holding_group(self, other: HoldingGroup) -> bool:
-        for other_holding in other:
-            if not any(self_holding.implies(other_holding) for self_holding in self):
-                return False
-        return True
 
     def verbose_comparison(
         self,
@@ -589,10 +594,12 @@ class HoldingGroup(ComparableGroup[H]):
         explanation: Explanation = None,
     ) -> Iterator[Explanation]:
         r"""
-        Find ways for two unordered sets of :class:`.Factor`\s to satisfy a comparison.
+        Find one way for two unordered sets of :class:`.Factor`\s to satisfy a comparison.
 
         All of the elements of `other` need to fit the comparison. The elements of
         `self` don't all need to be used.
+
+        Only returns one answer, to prevent expensive fruitless searching.
 
         :param context:
             a mapping of :class:`.Factor`\s that have already been matched
