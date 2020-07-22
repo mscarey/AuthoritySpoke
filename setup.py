@@ -19,6 +19,7 @@ setuptools.setup(
         "anchorpoint",
         "apispec",
         "beautifulsoup4",
+        "legislice",
         "lxml",
         "marshmallow",
         "pint",
@@ -34,6 +35,6 @@ setuptools.setup(
         "Natural Language :: English",
         "Topic :: Sociology :: History",
     ],
-    python_requires=">=3.7, <3.8",
+    python_requires=">=3.7",
     include_package_data=True,
 )

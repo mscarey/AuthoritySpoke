@@ -27,4 +27,5 @@ tests/__pycache__/
 tests/.pytest_cache/
 tests/io/cassettes/
 tests/prof/
+venv/
 xml/
