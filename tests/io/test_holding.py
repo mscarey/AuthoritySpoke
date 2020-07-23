@@ -4,8 +4,9 @@ from marshmallow import ValidationError
 import pytest
 
 from anchorpoint.textselectors import TextQuoteSelector
+from legislice import Enactment
 
-from authorityspoke.enactments import Code, Enactment
+from authorityspoke.codes import Code
 from authorityspoke.entities import Entity
 from authorityspoke.facts import Fact
 from authorityspoke.holdings import Holding

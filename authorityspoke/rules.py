@@ -12,7 +12,8 @@ from typing import List, Optional, Sequence, Tuple, Union
 
 from dataclasses import dataclass
 
-from authorityspoke.enactments import Enactment, consolidate_enactments
+from legislice.enactments import Enactment, consolidate_enactments
+
 from authorityspoke.factors import Factor, ContextRegister
 from authorityspoke.formatting import indented
 from authorityspoke.procedures import Procedure

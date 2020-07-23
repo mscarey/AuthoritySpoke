@@ -321,8 +321,8 @@ class TestEnactments:
         with pytest.raises(TypeError):
             print(make_enactment["search_clause"] + watt_factor["f3"])
 
-    def test_add_unconnected_provisions(self, make_enactment):
-        assert make_enactment["search_clause"] + make_enactment["copyright"] is None
+    def test_add_unconnected_provisions(self, make_enactment, enactment_copyright):
+        assert make_enactment["search_clause"] + enactment_copyright is None
 
     def test_add_more_specific_path_no_overlap(self, make_enactment):
         assert (
@@ -403,11 +403,11 @@ class TestTextSelection:
         selector = anchors.read_selector(data)
         assert selector.exact.startswith("method")
 
-    def test_passage_from_uslm_code(self, make_enactment):
-        copyright_exceptions = make_enactment["copyright"]
-        assert copyright_exceptions.selector.exact.strip() == (
+    def test_passage_from_uslm_code(self, enactment_copyright):
+        copyright_exceptions = enactment_copyright
+        assert copyright_exceptions.selected_text() == (
             "In no case does copyright protection "
-            + "for an original work of authorship extend to any"
+            + "for an original work of authorship extend to any..."
         )
 
     def test_section_text_from_path_and_regime(self, make_regime):

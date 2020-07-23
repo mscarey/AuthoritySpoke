@@ -1,11 +1,16 @@
+from copy import copy
+import os
 from typing import Any, Dict, List, Tuple
 
 from anchorpoint.textselectors import TextQuoteSelector
+from dotenv import load_dotenv
+from legislice import Enactment
+import legislice
+from legislice.download import Client
 import pytest
-
+import vcr
 
 from authorityspoke.codes import Code
-from authorityspoke.enactments import Enactment
 from authorityspoke.entities import Entity
 from authorityspoke.evidence import Evidence, Exhibit
 from authorityspoke.factors import Factor
@@ -19,6 +24,12 @@ from authorityspoke.rules import Procedure, Rule
 
 from authorityspoke.io import anchors, loaders, readers
 from authorityspoke.io.schemas import RawFactor, RawHolding
+
+
+load_dotenv()
+
+TOKEN = os.getenv("LEGISLICE_API_TOKEN")
+legislice_client = Client(api_token=TOKEN)
 
 
 @pytest.fixture(scope="class")
@@ -694,14 +705,17 @@ def make_code(make_regime) -> Dict[str, Code]:
     }
 
 
+@vcr.use_cassette()
+@pytest.fixture(scope="module")
+def enactment_copyright(make_selector):
+    enactment = legislice_client.read(path="/us/usc/t17/s102/b")
+    enactment.select(make_selector["copyright"])
+    return enactment
+
+
 @pytest.fixture(scope="module")
 def make_enactment(make_code, make_selector, make_regime) -> Dict[str, Enactment]:
     return {
-        "copyright": readers.read_enactment(
-            {"selector": make_selector["copyright"], "source": "/us/usc/t17/s102/b"},
-            code=make_code["usc17"],
-            regime=make_regime,
-        ),
         "copyright_requires_originality": readers.read_enactment(
             {
                 "selector": make_selector["copyright_requires_originality"],
@@ -1341,6 +1355,7 @@ def fourth_a():
         "url": "https://authorityspoke.com/api/v1/us/const/amendment/IV/",
         "parent": "https://authorityspoke.com/api/v1/us/const/amendment/",
     }
+
 
 @pytest.fixture(scope="module")
 def fifth_a():

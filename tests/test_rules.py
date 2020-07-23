@@ -2,7 +2,8 @@ import logging
 
 import pytest
 
-from authorityspoke.enactments import Enactment
+from legislice import Enactment
+
 from authorityspoke.entities import Entity
 from authorityspoke.factors import ContextRegister
 from authorityspoke.facts import Fact
@@ -148,8 +149,14 @@ class TestSameMeaning:
             "accept_murder_fact_from_relevance_and_shooting_craig"
         ]
         explanation = left.explain_same_meaning(right)
-        assert "<Craig> is like <Alice>" in explanation.prose or "<Alice> is like <Craig>" in explanation.prose
-        assert "<Dan> is like <Bob>" in explanation.prose or "<Bob> is like <Dan>" in explanation.prose
+        assert (
+            "<Craig> is like <Alice>" in explanation.prose
+            or "<Alice> is like <Craig>" in explanation.prose
+        )
+        assert (
+            "<Dan> is like <Bob>" in explanation.prose
+            or "<Bob> is like <Dan>" in explanation.prose
+        )
 
 
 class TestImplication:
@@ -391,7 +398,8 @@ class TestContradiction:
             {Entity("the stockpile of trees"): Entity("the stockpile of trees")}
         )
         assert not make_rule["h_output_distance_less"].contradicts(
-            make_rule["h_output_farther_different_entity"], context=stockpile_means_stockpile
+            make_rule["h_output_farther_different_entity"],
+            context=stockpile_means_stockpile,
         )
         assert not make_rule["h_output_farther_different_entity"].contradicts(
             make_rule["h_output_distance_less"], context=stockpile_means_stockpile

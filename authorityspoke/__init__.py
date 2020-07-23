@@ -1,6 +1,8 @@
 """AuthoritySpoke: Reading the law for the last time."""
 
-from .enactments import Code, Enactment
+from legislice import Enactment
+
+from .codes import Code
 from .entities import Entity
 from .factors import Factor
 from .jurisdictions import Jurisdiction, Regime

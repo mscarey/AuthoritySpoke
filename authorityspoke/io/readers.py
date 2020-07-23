@@ -11,10 +11,10 @@ from typing import Dict, List, Optional, Tuple, Type
 
 from anchorpoint.textselectors import TextQuoteSelector
 from bs4 import BeautifulSoup
+from legislice import Enactment
 
 from authorityspoke.decisions import Decision
 from authorityspoke.codes import Code, USCCode, USLMCode, USConstCode, CalCode, CFRCode
-from authorityspoke.enactments import Enactment
 from authorityspoke.entities import Entity
 from authorityspoke.evidence import Exhibit, Evidence
 from authorityspoke.factors import Factor

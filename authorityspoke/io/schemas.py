@@ -8,10 +8,10 @@ from marshmallow import pre_load, post_load
 from marshmallow import ValidationError
 
 from anchorpoint.textselectors import TextQuoteSelector
+from legislice import Enactment
 
 from authorityspoke.codes import Code
 from authorityspoke.decisions import CaseCitation, Decision
-from authorityspoke.enactments import Enactment
 from authorityspoke.entities import Entity
 from authorityspoke.evidence import Exhibit, Evidence
 from authorityspoke.factors import Factor

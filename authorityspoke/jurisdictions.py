@@ -14,7 +14,7 @@ from dataclasses import dataclass, field
 
 from anchorpoint.textselectors import TextQuoteSelector
 
-from authorityspoke.enactments import Code
+from authorityspoke.codes import Code
 from authorityspoke.courts import Court
 
 

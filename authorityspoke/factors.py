@@ -10,10 +10,11 @@ import textwrap
 from typing import Any, Callable, Dict, Iterable, Iterator, List
 from typing import Optional, Sequence, Set, Tuple, TypeVar, Union
 
+from legislice import Enactment
+
 from anchorpoint.textselectors import TextQuoteSelector
 
 from authorityspoke.comparisons import ContextRegister, Comparable
-from authorityspoke.enactments import Enactment
 
 
 def seek_factor_by_name(
