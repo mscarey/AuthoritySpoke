@@ -21,7 +21,6 @@ from authorityspoke.io import anchors, loaders, readers
 from authorityspoke.io.schemas import RawFactor, RawHolding
 
 
-
 @pytest.fixture(scope="class")
 def make_entity() -> Dict[str, Entity]:
     return {
@@ -213,7 +212,7 @@ def make_predicate() -> Dict[str, Predicate]:
         "p_quantity>5": Predicate(
             "The number of mice was {}", comparison=">", quantity=5
         ),
-        "p_no_context": Predicate("context was included", truth=False)
+        "p_no_context": Predicate("context was included", truth=False),
     }
 
 
@@ -387,13 +386,19 @@ def make_exhibit(
 
     return {
         "shooting_affidavit": Exhibit(
-            form="affidavit", statement=f["f_shooting"], statement_attribution=e["alice"]
+            form="affidavit",
+            statement=f["f_shooting"],
+            statement_attribution=e["alice"],
         ),
         "shooting_testimony": Exhibit(
-            form="testimony", statement=f["f_shooting"], statement_attribution=e["alice"]
+            form="testimony",
+            statement=f["f_shooting"],
+            statement_attribution=e["alice"],
         ),
         "no_shooting_testimony": Exhibit(
-            form="testimony", statement=f["f_no_shooting"], statement_attribution=e["alice"]
+            form="testimony",
+            statement=f["f_no_shooting"],
+            statement_attribution=e["alice"],
         ),
         "no_shooting_entity_order_testimony": Exhibit(
             form="testimony",
@@ -407,7 +412,9 @@ def make_exhibit(
             form="testimony", statement=f["f_no_shooting"], absent=True
         ),
         "no_shooting_different_witness_testimony": Exhibit(
-            form="testimony", statement=f["f_no_shooting"], statement_attribution=e["bob"]
+            form="testimony",
+            statement=f["f_no_shooting"],
+            statement_attribution=e["bob"],
         ),
         "reciprocal_testimony": Exhibit(
             form="testimony", statement=w["f8"], statement_attribution=e["craig"]
@@ -416,7 +423,10 @@ def make_exhibit(
             form="declaration", statement=w["f8"], statement_attribution=e["craig"]
         ),
         "reciprocal_testimony_absent": Exhibit(
-            form="testimony", statement=w["f8"], statement_attribution=e["craig"], absent=True
+            form="testimony",
+            statement=w["f8"],
+            statement_attribution=e["craig"],
+            absent=True,
         ),
         "reciprocal_testimony_less": Exhibit(
             form="testimony", statement=w["f8_less"], statement_attribution=e["craig"]
@@ -431,7 +441,9 @@ def make_exhibit(
             absent=True,
         ),
         "relevant_murder_testimony": Exhibit(
-            form="testimony", statement=c["f_relevant_murder"], statement_attribution=e["alice"]
+            form="testimony",
+            statement=c["f_relevant_murder"],
+            statement_attribution=e["alice"],
         ),
         "relevant_murder_nested_swap_testimony": Exhibit(
             form="testimony",
@@ -444,10 +456,14 @@ def make_exhibit(
             statement_attribution=e["alice"],
         ),
         "large_weight_testimony": Exhibit(
-            form="testimony", statement=f["f_large_weight"], statement_attribution=e["bob"]
+            form="testimony",
+            statement=f["f_large_weight"],
+            statement_attribution=e["bob"],
         ),
         "small_weight_testimony": Exhibit(
-            form="testimony", statement=f["f_small_weight"], statement_attribution=e["bob"]
+            form="testimony",
+            statement=f["f_small_weight"],
+            statement_attribution=e["bob"],
         ),
         "generic_exhibit": Exhibit(generic=True),
         "specific_but_featureless": Exhibit(),
@@ -508,40 +524,62 @@ def make_complex_rule(
     make_factor, make_exhibit, make_complex_fact, make_fact_about_exhibit
 ) -> Dict[str, Rule]:
     return {
-        "accept_relevance_testimony": Rule(Procedure(
-            inputs=make_exhibit["relevant_murder_testimony"],
-            outputs=make_complex_fact["f_relevant_murder"],)
+        "accept_relevance_testimony": Rule(
+            Procedure(
+                inputs=make_exhibit["relevant_murder_testimony"],
+                outputs=make_complex_fact["f_relevant_murder"],
+            )
         ),
-        "accept_relevance_testimony_ALL": Rule(Procedure(
-            inputs=make_exhibit["relevant_murder_testimony"],
-            outputs=make_complex_fact["f_relevant_murder"]),
+        "accept_relevance_testimony_ALL": Rule(
+            Procedure(
+                inputs=make_exhibit["relevant_murder_testimony"],
+                outputs=make_complex_fact["f_relevant_murder"],
+            ),
             universal=True,
         ),
-        "accept_murder_fact_from_relevance": Rule(Procedure(
-            inputs=make_complex_fact["f_relevant_murder"],
-            outputs=make_factor["f_murder"],)
+        "accept_murder_fact_from_relevance": Rule(
+            Procedure(
+                inputs=make_complex_fact["f_relevant_murder"],
+                outputs=make_factor["f_murder"],
+            )
         ),
-        "accept_murder_fact_from_relevance_and_shooting": Rule(Procedure(
-            inputs=[make_complex_fact["f_relevant_murder"], make_factor["f_shooting"]],
-            outputs=make_factor["f_murder"],)
+        "accept_murder_fact_from_relevance_and_shooting": Rule(
+            Procedure(
+                inputs=[
+                    make_complex_fact["f_relevant_murder"],
+                    make_factor["f_shooting"],
+                ],
+                outputs=make_factor["f_murder"],
+            )
         ),
-        "accept_murder_fact_from_relevance_and_shooting_craig": Rule(Procedure(
-            inputs=[make_complex_fact["f_relevant_murder_craig"], make_factor["f_shooting_craig"]],
-            outputs=make_factor["f_murder_craig"],)
+        "accept_murder_fact_from_relevance_and_shooting_craig": Rule(
+            Procedure(
+                inputs=[
+                    make_complex_fact["f_relevant_murder_craig"],
+                    make_factor["f_shooting_craig"],
+                ],
+                outputs=make_factor["f_murder_craig"],
+            )
         ),
-        "accept_small_weight_reliable": Rule(Procedure(
-            inputs=[make_factor["f_small_weight"], make_factor["f_friends"]],
-            outputs=make_fact_about_exhibit["f_reliable_small_weight"]),
+        "accept_small_weight_reliable": Rule(
+            Procedure(
+                inputs=[make_factor["f_small_weight"], make_factor["f_friends"]],
+                outputs=make_fact_about_exhibit["f_reliable_small_weight"],
+            ),
             universal=True,
         ),
-        "accept_small_weight_reliable_more_evidence": Rule(Procedure(
-            inputs=[make_factor["f_large_weight"], make_factor["f_friends"]],
-            outputs=make_fact_about_exhibit["f_reliable_small_weight"]),
+        "accept_small_weight_reliable_more_evidence": Rule(
+            Procedure(
+                inputs=[make_factor["f_large_weight"], make_factor["f_friends"]],
+                outputs=make_fact_about_exhibit["f_reliable_small_weight"],
+            ),
             universal=True,
         ),
-        "accept_large_weight_reliable": Rule(Procedure(
-            inputs=[make_factor["f_small_weight"], make_factor["f_friends"]],
-            outputs=make_fact_about_exhibit["f_reliable_large_weight"]),
+        "accept_large_weight_reliable": Rule(
+            Procedure(
+                inputs=[make_factor["f_small_weight"], make_factor["f_friends"]],
+                outputs=make_fact_about_exhibit["f_reliable_large_weight"],
+            ),
             universal=True,
         ),
     }
@@ -595,17 +633,20 @@ def make_evidence(
         "generic_absent": Evidence(x["generic_exhibit"], absent=True, generic=True),
     }
 
+
 @pytest.fixture(scope="class")
 def make_pleading(make_entity) -> Dict[str, Dict[str, Pleading]]:
-    return {
-        "craig": Pleading(filer=make_entity["craig"])
-    }
+    return {"craig": Pleading(filer=make_entity["craig"])}
+
 
 @pytest.fixture(scope="class")
 def make_allegation(make_pleading, make_factor) -> Dict[str, Dict[str, Allegation]]:
     return {
-        "shooting": Allegation(statement=make_factor["f_shooting"], pleading=make_pleading["craig"])
+        "shooting": Allegation(
+            statement=make_factor["f_shooting"], pleading=make_pleading["craig"]
+        )
     }
+
 
 @pytest.fixture(scope="module")
 def make_selector() -> Dict[str, TextQuoteSelector]:
@@ -624,6 +665,7 @@ def make_selector() -> Dict[str, TextQuoteSelector]:
         ),
     }
 
+
 @pytest.fixture(scope="module")
 def make_regime() -> Dict[str, Code]:
     usa = Regime()
@@ -639,6 +681,7 @@ def make_regime() -> Dict[str, Code]:
         usa.set_code(readers.read_code(xml))
     return usa
 
+
 @pytest.fixture(scope="module")
 def make_code(make_regime) -> Dict[str, Code]:
     return {
@@ -647,7 +690,7 @@ def make_code(make_regime) -> Dict[str, Code]:
         "cfr37": make_regime.get_code("/us/cfr/t37"),
         "ca_evid": make_regime.get_code("/us-ca/evid"),
         "ca_pen": make_regime.get_code("/us-ca/pen"),
-        "beard_act": make_regime.get_code("/au/act")
+        "beard_act": make_regime.get_code("/au/act"),
     }
 
 
@@ -655,27 +698,29 @@ def make_code(make_regime) -> Dict[str, Code]:
 def make_enactment(make_code, make_selector, make_regime) -> Dict[str, Enactment]:
     return {
         "copyright": readers.read_enactment(
-            {"selector": make_selector["copyright"],
-            "source": "/us/usc/t17/s102/b"},
+            {"selector": make_selector["copyright"], "source": "/us/usc/t17/s102/b"},
             code=make_code["usc17"],
             regime=make_regime,
         ),
         "copyright_requires_originality": readers.read_enactment(
-            {"selector": make_selector["copyright_requires_originality"],
-            "source": "/us/usc/t17/s102/a"},
+            {
+                "selector": make_selector["copyright_requires_originality"],
+                "source": "/us/usc/t17/s102/a",
+            },
             regime=make_regime,
         ),
         "securing_for_authors": Enactment(
             selector=TextQuoteSelector(
-                exact=("To promote the Progress of Science and "
-                + "useful Arts, by securing for limited Times to Authors")),
+                exact=(
+                    "To promote the Progress of Science and "
+                    + "useful Arts, by securing for limited Times to Authors"
+                )
+            ),
             source="/us/const/article-I/8/8",
             code=make_code["const"],
         ),
         "and_inventors": Enactment(
-            selector=TextQuoteSelector(
-                exact="and Inventors"
-            ),
+            selector=TextQuoteSelector(exact="and Inventors"),
             source="/us/const/article-I/8/8",
             code=make_code["const"],
         ),
@@ -694,31 +739,38 @@ def make_enactment(make_code, make_selector, make_regime) -> Dict[str, Enactment
             source="/us/const/article-I",
         ),
         "search_clause": readers.read_enactment(
-            {"exact": (
+            {
+                "exact": (
                     "The right of the people to be secure in their persons, "
                     + "houses, papers, and effects, against unreasonable searches "
                     + "and seizures, shall not be violated"
                 ),
-            "source": "/us/const/amendment-IV"},
+                "source": "/us/const/amendment-IV",
+            },
             regime=make_regime,
         ),
         "warrants_clause": readers.read_enactment(
-            {"exact": "shall not be violated, and no Warrants shall issue,",
-            "source": "/us/const/amendment-IV"},
+            {
+                "exact": "shall not be violated, and no Warrants shall issue,",
+                "source": "/us/const/amendment-IV",
+            },
             regime=make_regime,
         ),
         "fourth_a": readers.read_enactment(  # whole section, no selector
-            {"source": "/us/const/amendment-IV"},
-            regime=make_regime,
+            {"source": "/us/const/amendment-IV"}, regime=make_regime,
         ),
         "due_process_5": readers.read_enactment(
-            {"exact": "life, liberty, or property, without due process of law",
-            "source": "/us/const/amendment-V"},
+            {
+                "exact": "life, liberty, or property, without due process of law",
+                "source": "/us/const/amendment-V",
+            },
             regime=make_regime,
         ),
         "due_process_14": readers.read_enactment(
-            {"exact": "life, liberty, or property, without due process of law",
-            "source": "/us/const/amendment-XIV-1"},
+            {
+                "exact": "life, liberty, or property, without due process of law",
+                "source": "/us/const/amendment-XIV-1",
+            },
             regime=make_regime,
         ),
     }
@@ -884,7 +936,7 @@ def make_procedure(make_evidence, make_factor, watt_factor) -> Dict[str, Procedu
         "c_output_farther_different_entity": Procedure(
             outputs=(f["f9_more_different_entity"]), inputs=(f["f1"])
         ),
-        "c_no_context": Procedure(outputs=m["f_no_context"])
+        "c_no_context": Procedure(outputs=m["f_no_context"]),
     }
 
 
@@ -1078,8 +1130,11 @@ def make_rule(make_procedure, make_enactment) -> Dict[str, Rule]:
         "h_output_distance_less": Rule(
             c["c_output_distance_less"], universal=True, mandatory=True
         ),
-        "h_output_farther_different_entity": Rule(c["c_output_farther_different_entity"]),
+        "h_output_farther_different_entity": Rule(
+            c["c_output_farther_different_entity"]
+        ),
     }
+
 
 @pytest.fixture(scope="class")
 def make_beard_rule() -> List[Rule]:
@@ -1087,6 +1142,7 @@ def make_beard_rule() -> List[Rule]:
     beard_act = loaders.load_and_read_code("beard_tax_act.xml")
     beard_dictionary = loaders.load_holdings("beard_rules.json")
     return readers.read_rules(beard_dictionary, beard_act)
+
 
 @pytest.fixture(scope="class")
 def make_holding(make_rule) -> Dict[str, Holding]:
@@ -1141,6 +1197,7 @@ def make_holding(make_rule) -> Dict[str, Holding]:
 
 TEST_CASES = ("brad", "cardenas", "feist", "lotus", "oracle", "watt")
 
+
 def load_decisions_for_fixtures():
     decisions = {}
     for case in TEST_CASES:
@@ -1149,18 +1206,25 @@ def load_decisions_for_fixtures():
         decisions[case] = built
     return decisions
 
+
 @pytest.fixture(scope="class")
 def make_decision():
     return load_decisions_for_fixtures()
+
 
 @pytest.fixture(scope="class")
 def make_decision_with_holding(make_decision, make_regime):
     decisions = load_decisions_for_fixtures()
     for case in TEST_CASES:
-        holdings, mentioned, holding_anchors = loaders.load_holdings_with_index(f"holding_{case}.json", regime=make_regime)
+        holdings, mentioned, holding_anchors = loaders.load_holdings_with_index(
+            f"holding_{case}.json", regime=make_regime
+        )
         named_anchors = anchors.get_named_anchors(mentioned)
-        decisions[case].majority.posit(holdings, holding_anchors=holding_anchors, named_anchors=named_anchors)
+        decisions[case].majority.posit(
+            holdings, holding_anchors=holding_anchors, named_anchors=named_anchors
+        )
     return decisions
+
 
 @pytest.fixture(scope="class")
 def make_opinion(make_decision) -> Dict[str, Opinion]:
@@ -1170,6 +1234,7 @@ def make_opinion(make_decision) -> Dict[str, Opinion]:
             opinions[f"{case}_{opinion.position}"] = opinion
     return opinions
 
+
 @pytest.fixture(scope="class")
 def make_opinion_with_holding(make_decision_with_holding) -> Dict[str, Opinion]:
     opinions = {}
@@ -1178,19 +1243,20 @@ def make_opinion_with_holding(make_decision_with_holding) -> Dict[str, Opinion]:
             opinions[f"{case}_{opinion.position}"] = opinion
     return opinions
 
+
 @pytest.fixture(scope="class")
 def make_analysis() -> Dict[str, Dict[str, Any]]:
     """Example user analysis data."""
-    return {"minimal": [
+    return {
+        "minimal": [
             {
                 "outputs": {
                     "type": "fact",
                     "content": "{Bradley} made a minimal holding object",
                     "anchors": "upholding searches in |open fields or grounds|around a house",
                 },
-                "anchors": "Thus,|we hold|that this rule is correct."
+                "anchors": "Thus,|we hold|that this rule is correct.",
             }
-
         ],
         "no anchors": [
             {
@@ -1199,7 +1265,9 @@ def make_analysis() -> Dict[str, Dict[str, Any]]:
                     "content": "this holding has no text anchors",
                 }
             }
-        ]}
+        ],
+    }
+
 
 @pytest.fixture(scope="function")
 def raw_factor() -> RawFactor:
@@ -1208,36 +1276,38 @@ def raw_factor() -> RawFactor:
     """
     return {
         "relevant": {
-        "content": "{} is relevant to show {}",
-        "type": "Fact",
-        "name": "relevant fact",
-        "context_factors": [
-            {"content": "{Short Name} shot {Longer Name}", "type": "Fact"},
-            {
-                "content": "{} murdered {}",
-                "context_factors": ["Short Name", "Longer Name"],
-                "type": "Fact",
-            },
-        ],
+            "content": "{} is relevant to show {}",
+            "type": "Fact",
+            "name": "relevant fact",
+            "context_factors": [
+                {"content": "{Short Name} shot {Longer Name}", "type": "Fact"},
+                {
+                    "content": "{} murdered {}",
+                    "context_factors": ["Short Name", "Longer Name"],
+                    "type": "Fact",
+                },
+            ],
+        }
     }
-    }
+
 
 @pytest.fixture(scope="function")
 def raw_holding() -> RawHolding:
-    return {"bradley_house": {
-        "inputs": {"type": "fact", "content": "{Bradley} lived at Bradley's house"},
-        "outputs": {
-            "type": "evidence",
-            "to_effect": {
-                "type": "fact",
-                "name": "fact that Bradley committed a crime",
-                "content": "Bradley committed a crime",
+    return {
+        "bradley_house": {
+            "inputs": {"type": "fact", "content": "{Bradley} lived at Bradley's house"},
+            "outputs": {
+                "type": "evidence",
+                "to_effect": {
+                    "type": "fact",
+                    "name": "fact that Bradley committed a crime",
+                    "content": "Bradley committed a crime",
+                },
+                "name": "evidence of Bradley's guilt",
+                "absent": True,
             },
-            "name": "evidence of Bradley's guilt",
-            "absent": True,
         },
-    },
-    "stolen watch": {
+        "stolen watch": {
             "outputs": [
                 {
                     "type": "Fact",
@@ -1255,5 +1325,46 @@ def raw_holding() -> RawHolding:
                     },
                 }
             ],
-        }
+        },
+    }
+
+
+@pytest.fixture(scope="module")
+def fourth_a():
+    return {
+        "heading": "AMENDMENT IV.",
+        "content": "The right of the people to be secure in their persons, houses, papers, and effects, against unreasonable searches and seizures, shall not be violated, and no Warrants shall issue, but upon probable cause, supported by Oath or affirmation, and particularly describing the place to be searched, and the persons or things to be seized.",
+        "children": [],
+        "end_date": None,
+        "node": "/us/const/amendment/IV",
+        "start_date": "1791-12-15",
+        "url": "https://authorityspoke.com/api/v1/us/const/amendment/IV/",
+        "parent": "https://authorityspoke.com/api/v1/us/const/amendment/",
+    }
+
+@pytest.fixture(scope="module")
+def fifth_a():
+    return {
+        "heading": "AMENDMENT V.",
+        "content": "No person shall be held to answer for a capital, or otherwise infamous crime, unless on a presentment or indictment of a Grand Jury, except in cases arising in the land or naval forces, or in the Militia, when in actual service in time of War or public danger; nor shall any person be subject for the same offence to be twice put in jeopardy of life or limb; nor shall be compelled in any Criminal Case to be a witness against himself; nor be deprived of life, liberty, or property, without due process of law; nor shall private property be taken for public use, without just compensation.",
+        "children": [],
+        "end_date": None,
+        "node": "/us/const/amendment/V",
+        "start_date": "1791-12-15",
+        "url": "https://authorityspoke.com/api/v1/us/const/amendment/V/",
+        "parent": "https://authorityspoke.com/api/v1/us/const/amendment/",
+    }
+
+
+@pytest.fixture(scope="module")
+def fourteenth_dp():
+    return {
+        "heading": "Citizenship: security and equal protection of citizens.",
+        "content": "All persons born or naturalized in the United States, and subject to the jurisdiction thereof, are citizens of the United States and of the State wherein they reside. No State shall make or enforce any law which shall abridge the privileges or immunities of citizens of the United States; nor shall any State deprive any person of life, liberty, or property, without due process of law; nor deny to any person within its jurisdiction the equal protection of the laws.",
+        "children": [],
+        "end_date": None,
+        "node": "/us/const/amendment/IV",
+        "start_date": "1868-07-28",
+        "url": "https://authorityspoke.com/api/v1/us/const/amendment/XIV/1/",
+        "parent": "https://authorityspoke.com/api/v1/us/const/amendment/XIV/",
     }

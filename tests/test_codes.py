@@ -2,7 +2,7 @@ import datetime
 
 import pytest
 
-from anchorpoint.textselectors import TextPositionSelector
+from anchorpoint.textselectors import TextPositionSelector, TextSelectionError
 
 
 class TestCodes:
@@ -144,9 +144,7 @@ class TestCodes:
             )
 
     def test_text_interval_bad_selector(self, make_code, make_selector):
-        assert (
-            make_code["const"].text_interval(
+        with pytest.raises(TextSelectionError):
+            _ = make_code["const"].text_interval(
                 selector=make_selector["bad_selector"], path="/us/const/amendment-IV",
             )
-            is None
-        )

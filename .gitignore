@@ -25,6 +25,7 @@ prof/
 schemas/
 tests/__pycache__/
 tests/.pytest_cache/
+tests/cassettes/
 tests/io/cassettes/
 tests/prof/
 venv/

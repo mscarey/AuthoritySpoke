@@ -1,34 +1,44 @@
 import datetime
+import os
 
-from anchorpoint.textselectors import TextQuoteSelector
+from anchorpoint.textselectors import TextQuoteSelector, TextSelectionError
+from dotenv import load_dotenv
+from legislice.download import Client
+from legislice.enactments import Enactment, consolidate_enactments
+from legislice.schemas import EnactmentSchema
 import pytest
 
-from authorityspoke.enactments import Enactment, consolidate_enactments
 from authorityspoke.io import anchors, loaders, readers, dump
 
 
+load_dotenv()
+
+TOKEN = os.getenv("LEGISLICE_API_TOKEN")
+
+
 class TestEnactments:
+    client = Client(api_token=TOKEN)
+
     def test_make_enactment(self, make_enactment):
         search_clause = make_enactment["search_clause"]
         assert search_clause.text.endswith("shall not be violated")
 
+    @pytest.mark.vcr
     def test_create_enactment_with_init(self, make_code):
         """
         Using the __init__ method of the Enactment class, insteaid of
         readers.read_enactment or the Enactment marshmallow schema.
         """
-        beard_definition = Enactment(
-            source="/au/act/1934/47/1/4/", code=make_code["beard_act"]
-        )
+        beard_definition = self.client.read("/test/acts/47/4/")
         assert beard_definition.text.startswith("In this Act, beard")
 
-    def test_make_enactment_from_selector_without_code(self, make_code):
-        select = TextQuoteSelector(suffix=", shall be vested")
-        art_3 = Enactment(
-            selector=select, source="/us/const/article-III/1", code=make_code["const"]
-        )
+    @pytest.mark.vcr
+    def test_make_enactment_from_selector_without_code(self):
+        selector = TextQuoteSelector(suffix=", shall be vested")
+        art_3 = self.client.read("/us/const/article/III/1")
+        art_3.select(selector)
         assert art_3.text.startswith("The judicial Power")
-        assert art_3.text.endswith("the United States")
+        assert art_3.selected_text().endswith("the United States...")
 
     def test_make_enactment_from_dict_with_code(self, make_code):
         fourth_a = readers.read_enactment(
@@ -207,12 +217,14 @@ class TestEnactments:
         this_section = code.section_text_from_path(path=provision.source)
         assert this_section[interval.start : interval.end] == text
 
-    def test_invalid_selector_text(self, make_code, make_selector):
-        with pytest.raises(ValueError):
+    def test_invalid_selector_text(self, make_selector):
+        with pytest.raises(TextSelectionError):
             _ = Enactment(
-                source="/us/const/amendment-IV",
-                selector=make_selector["bad_selector"],
-                code=make_code["const"],
+                node="/us/const/amendment/IV",
+                selection=make_selector["bad_selector"],
+                heading="",
+                content="Not the same text as in the selector",
+                start_date="2000-01-01",
             )
 
     # Addition
@@ -248,35 +260,61 @@ class TestEnactments:
         assert combined.text == fourth_a.text
         assert combined == fourth_a
 
-    def test_consolidate_enactments(self, make_enactment):
-        assert consolidate_enactments(
-            [
-                make_enactment["search_clause"],
-                make_enactment["warrants_clause"],
-                make_enactment["fourth_a"],
-            ]
-        ) == [make_enactment["fourth_a"]]
+    def test_consolidate_enactments(self, fourth_a):
+        search_clause = fourth_a.copy()
+        search_clause["selection"] = [{"suffix": ", and no Warrants"}]
 
-    def test_consolidate_adjacent_passages(self, make_enactment):
-        combined = consolidate_enactments(
-            [
-                make_enactment["securing_for_authors"],
-                make_enactment["right_to_writings"],
-                make_enactment["copyright"],
-                make_enactment["and_inventors"],
-            ]
+        warrants_clause = fourth_a.copy()
+        warrants_clause["selection"] = [{"prefix": "shall not be violated,"}]
+
+        schema = EnactmentSchema()
+
+        fourth = schema.load(fourth_a)
+        search = schema.load(search_clause)
+        warrants = schema.load(warrants_clause)
+
+        consolidated = consolidate_enactments([fourth, search, warrants])
+        assert len(consolidated) == 1
+        assert consolidated[0].means(fourth)
+
+    @pytest.mark.vcr()
+    def test_consolidate_adjacent_passages(self):
+        copyright_clause = self.client.read("/us/const/article/I/8/8")
+        copyright_statute = self.client.read("/us/usc/t17/s102/b")
+
+        copyright_clause.select(None)
+        securing_for_authors = copyright_clause + (
+            "To promote the Progress of Science and "
+            "useful Arts, by securing for limited Times to Authors"
         )
+        and_inventors = copyright_clause + "and Inventors"
+        right_to_writings = (
+            copyright_clause + "the exclusive Right to their respective Writings"
+        )
+        to_combine = [
+            copyright_statute,
+            securing_for_authors,
+            and_inventors,
+            right_to_writings,
+        ]
+        combined = consolidate_enactments(to_combine)
         assert len(combined) == 2
         assert any(
-            law.text.startswith("To promote the Progress")
-            and law.text.endswith("their respective Writings")
+            law.selected_text().startswith("To promote the Progress")
+            and law.selected_text().endswith("their respective Writings...")
             for law in combined
         )
 
-    def test_do_not_consolidate_from_different_sections(self, make_enactment):
-        combined = consolidate_enactments(
-            [make_enactment["due_process_5"], make_enactment["due_process_14"]]
-        )
+    def test_do_not_consolidate_from_different_sections(self, fifth_a, fourteenth_dp):
+        schema = EnactmentSchema()
+
+        due_process_5 = schema.load(fifth_a)
+        due_process_14 = schema.load(fourteenth_dp)
+
+        due_process_5.select("life, liberty, or property, without due process of law")
+        due_process_14.select("life, liberty, or property, without due process of law")
+
+        combined = consolidate_enactments([due_process_5, due_process_14])
         assert len(combined) == 2
 
     def test_cant_add_fact_to_enactment(self, watt_factor, make_enactment):
@@ -330,17 +368,21 @@ class TestDump:
 
 
 class TestTextSelection:
+    client = Client(api_token=TOKEN)
+
     def test_code_from_selector(self, make_regime):
         code = make_regime.get_code("/us/usc/t17/s103")
         assert code.uri == "/us/usc/t17"
 
-    def test_usc_selection(self, make_regime, make_selector):
+    @pytest.mark.vcr
+    def test_usc_selection(self, make_selector):
+        enactment = self.client.read("/us/usc/t17/s103")
         selector = make_selector["preexisting material"]
-        source = "/us/usc/t17/s103"
-        code = make_regime.get_code(source)
-        enactment = Enactment(code=code, source=source, selector=selector)
-        assert enactment.code.level == "statute"
-        assert enactment.code.jurisdiction == "us"
+        enactment.select(selector)
+
+        assert enactment.level == "statute"
+        assert enactment.jurisdiction == "us"
+        assert enactment.code == "usc"
 
     def test_omit_terminal_slash(self, make_code):
         usc17 = make_code["usc17"]
@@ -379,7 +421,7 @@ class TestTextSelection:
 
     def test_exact_text_not_in_selection(self, make_regime):
         due_process_wrong_section = TextQuoteSelector(exact="due process")
-        with pytest.raises(ValueError):
+        with pytest.raises(TextSelectionError):
             _ = readers.read_enactment(
                 {
                     "selector": due_process_wrong_section,
