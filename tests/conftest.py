@@ -23,7 +23,7 @@ from authorityspoke.predicates import Predicate, Q_
 from authorityspoke.rules import Procedure, Rule
 
 from authorityspoke.io import anchors, loaders, readers
-from authorityspoke.io.schemas import RawFactor, RawHolding
+from authorityspoke.io.schemas import EnactmentSchema, RawFactor, RawHolding
 
 
 load_dotenv()
@@ -707,87 +707,132 @@ def make_code(make_regime) -> Dict[str, Code]:
 
 @vcr.use_cassette()
 @pytest.fixture(scope="module")
-def enactment_copyright(make_selector):
+def e_copyright(make_selector):
     enactment = legislice_client.read(path="/us/usc/t17/s102/b")
     enactment.select(make_selector["copyright"])
     return enactment
 
 
+@vcr.use_cassette()
 @pytest.fixture(scope="module")
-def make_enactment(make_code, make_selector, make_regime) -> Dict[str, Enactment]:
+def e_copyright_requires_originality(make_selector):
+    enactment = legislice_client.read(path="/us/usc/t17/s102/a")
+    enactment.select(make_selector["copyright_requires_originality"])
+
+
+@vcr.use_cassette()
+@pytest.fixture(scope="module")
+def e_securing_for_authors():
+    enactment = legislice_client.read(path="/us/const/article/I/8/8")
+    selector = TextQuoteSelector(
+        exact=(
+            "To promote the Progress of Science and "
+            + "useful Arts, by securing for limited Times to Authors"
+        )
+    )
+    enactment.select(selector)
+    return enactment
+
+
+@vcr.use_cassette()
+@pytest.fixture(scope="module")
+def e_and_inventors():
+    enactment = legislice_client.read(path="/us/const/article/I/8/8")
+    enactment.select("and Inventors")
+    return enactment
+
+
+@vcr.use_cassette()
+@pytest.fixture(scope="module")
+def e_right_to_writings():
+    enactment = legislice_client.read(path="/us/const/article/I/8/8")
+    enactment.select("the exclusive Right to their respective Writings")
+    return enactment
+
+
+@pytest.fixture(scope="module")
+def fourth_a():
     return {
-        "copyright_requires_originality": readers.read_enactment(
-            {
-                "selector": make_selector["copyright_requires_originality"],
-                "source": "/us/usc/t17/s102/a",
-            },
-            regime=make_regime,
-        ),
-        "securing_for_authors": Enactment(
-            selector=TextQuoteSelector(
-                exact=(
-                    "To promote the Progress of Science and "
-                    + "useful Arts, by securing for limited Times to Authors"
-                )
-            ),
-            source="/us/const/article-I/8/8",
-            code=make_code["const"],
-        ),
-        "and_inventors": Enactment(
-            selector=TextQuoteSelector(exact="and Inventors"),
-            source="/us/const/article-I/8/8",
-            code=make_code["const"],
-        ),
-        "right_to_writings": Enactment(
-            selector=TextQuoteSelector(
-                exact="the exclusive Right to their respective Writings",
-            ),
-            source="/us/const/article-I/8/8",
-            code=make_code["const"],
-        ),
-        "commerce_vague_path": Enactment(
-            selector=TextQuoteSelector(
-                exact="No Preference shall be given by any Regulation of Commerce",
-            ),
-            code=make_code["const"],
-            source="/us/const/article-I",
-        ),
-        "search_clause": readers.read_enactment(
-            {
-                "exact": (
-                    "The right of the people to be secure in their persons, "
-                    + "houses, papers, and effects, against unreasonable searches "
-                    + "and seizures, shall not be violated"
-                ),
-                "source": "/us/const/amendment-IV",
-            },
-            regime=make_regime,
-        ),
-        "warrants_clause": readers.read_enactment(
-            {
-                "exact": "shall not be violated, and no Warrants shall issue,",
-                "source": "/us/const/amendment-IV",
-            },
-            regime=make_regime,
-        ),
-        "fourth_a": readers.read_enactment(  # whole section, no selector
-            {"source": "/us/const/amendment-IV"}, regime=make_regime,
-        ),
-        "due_process_5": readers.read_enactment(
-            {
-                "exact": "life, liberty, or property, without due process of law",
-                "source": "/us/const/amendment-V",
-            },
-            regime=make_regime,
-        ),
-        "due_process_14": readers.read_enactment(
-            {
-                "exact": "life, liberty, or property, without due process of law",
-                "source": "/us/const/amendment-XIV-1",
-            },
-            regime=make_regime,
-        ),
+        "heading": "AMENDMENT IV.",
+        "content": "The right of the people to be secure in their persons, houses, papers, and effects, against unreasonable searches and seizures, shall not be violated, and no Warrants shall issue, but upon probable cause, supported by Oath or affirmation, and particularly describing the place to be searched, and the persons or things to be seized.",
+        "children": [],
+        "end_date": None,
+        "node": "/us/const/amendment/IV",
+        "start_date": "1791-12-15",
+        "url": "https://authorityspoke.com/api/v1/us/const/amendment/IV/",
+        "parent": "https://authorityspoke.com/api/v1/us/const/amendment/",
     }
+
+
+@pytest.fixture(scope="module")
+def fifth_a():
+    return {
+        "heading": "AMENDMENT V.",
+        "content": "No person shall be held to answer for a capital, or otherwise infamous crime, unless on a presentment or indictment of a Grand Jury, except in cases arising in the land or naval forces, or in the Militia, when in actual service in time of War or public danger; nor shall any person be subject for the same offence to be twice put in jeopardy of life or limb; nor shall be compelled in any Criminal Case to be a witness against himself; nor be deprived of life, liberty, or property, without due process of law; nor shall private property be taken for public use, without just compensation.",
+        "children": [],
+        "end_date": None,
+        "node": "/us/const/amendment/V",
+        "start_date": "1791-12-15",
+        "url": "https://authorityspoke.com/api/v1/us/const/amendment/V/",
+        "parent": "https://authorityspoke.com/api/v1/us/const/amendment/",
+    }
+
+
+@pytest.fixture(scope="module")
+def fourteenth_dp():
+    return {
+        "heading": "Citizenship: security and equal protection of citizens.",
+        "content": "All persons born or naturalized in the United States, and subject to the jurisdiction thereof, are citizens of the United States and of the State wherein they reside. No State shall make or enforce any law which shall abridge the privileges or immunities of citizens of the United States; nor shall any State deprive any person of life, liberty, or property, without due process of law; nor deny to any person within its jurisdiction the equal protection of the laws.",
+        "children": [],
+        "end_date": None,
+        "node": "/us/const/amendment/IV",
+        "start_date": "1868-07-28",
+        "url": "https://authorityspoke.com/api/v1/us/const/amendment/XIV/1/",
+        "parent": "https://authorityspoke.com/api/v1/us/const/amendment/XIV/",
+    }
+
+
+@vcr.use_cassette()
+@pytest.fixture(scope="module")
+def e_search_clause(fourth_a):
+    schema = EnactmentSchema()
+    enactment = schema.load(fourth_a)
+    selector = TextQuoteSelector(suffix=", and no Warrants shall issue")
+    enactment.select(selector)
+    return enactment
+
+
+@vcr.use_cassette()
+@pytest.fixture(scope="module")
+def e_warrants_clause(fourth_a):
+    schema = EnactmentSchema()
+    enactment = schema.load(fourth_a)
+    enactment.select("shall not be violated, and no Warrants shall issue,")
+    return enactment
+
+
+@vcr.use_cassette()
+@pytest.fixture(scope="module")
+def e_fourth_a(fourth_a):
+    schema = EnactmentSchema()
+    enactment = schema.load(fourth_a)
+    return enactment
+
+
+@vcr.use_cassette()
+@pytest.fixture(scope="module")
+def e_due_process_5():
+    enactment = legislice_client.read(path="/us/const/amendment/V")
+    enactment.select("life, liberty, or property, without due process of law")
+    return enactment
+
+
+@vcr.use_cassette()
+@pytest.fixture(scope="module")
+def e_due_process_14():
+    enactment = legislice_client.read(path="/us/const/amendment/XIV/1")
+    enactment.select("life, liberty, or property, without due process of law")
+    return enactment
 
 
 @pytest.fixture(scope="class")
@@ -955,191 +1000,175 @@ def make_procedure(make_evidence, make_factor, watt_factor) -> Dict[str, Procedu
 
 
 @pytest.fixture(scope="class")
-def real_holding(make_procedure, make_enactment) -> Dict[str, Rule]:
+def real_holding(make_procedure, e_search_clause) -> Dict[str, Rule]:
     """These holdings can be changed in case they don't accurately reflect
     what's in real cases, or in case there are API improvements that
     allow them to become more accurate. I'll try not to write any tests
     that depend on them remaining the same."""
 
     c = make_procedure
-    e = make_enactment
 
     return {
-        "h1": Holding(
-            rule=Rule(c["c1"], enactments=e["search_clause"], mandatory=True)
-        ),
-        "h2": Holding(
-            rule=Rule(c["c2"], enactments=e["search_clause"], mandatory=True)
-        ),
-        "h3": Holding(
-            rule=Rule(c["c3"], enactments=e["search_clause"], mandatory=True)
-        ),
-        "h4": Holding(
-            rule=Rule(c["c4"], enactments=e["search_clause"], mandatory=True)
-        ),
+        "h1": Holding(rule=Rule(c["c1"], enactments=e_search_clause, mandatory=True)),
+        "h2": Holding(rule=Rule(c["c2"], enactments=e_search_clause, mandatory=True)),
+        "h3": Holding(rule=Rule(c["c3"], enactments=e_search_clause, mandatory=True)),
+        "h4": Holding(rule=Rule(c["c4"], enactments=e_search_clause, mandatory=True)),
     }
 
 
 @pytest.fixture(scope="class")
-def make_rule(make_procedure, make_enactment) -> Dict[str, Rule]:
+def make_rule(
+    make_procedure, e_fourth_a, e_search_clause, e_due_process_5
+) -> Dict[str, Rule]:
     c = make_procedure
-    e = make_enactment
 
     return {
-        "h1": Rule(c["c1"], enactments=e["search_clause"]),
-        "h2": Rule(c["c2"], enactments=e["search_clause"]),
-        "h3": Rule(c["c3"], enactments=e["search_clause"]),
-        "h1_again": Rule(c["c1"], enactments=e["search_clause"]),
-        "h1_entity_order": Rule(c["c1_entity_order"], enactments=e["search_clause"]),
-        "h1_easy": Rule(c["c1_easy"], enactments=e["search_clause"]),
+        "h1": Rule(c["c1"], enactments=e_search_clause),
+        "h2": Rule(c["c2"], enactments=e_search_clause),
+        "h3": Rule(c["c3"], enactments=e_search_clause),
+        "h1_again": Rule(c["c1"], enactments=e_search_clause),
+        "h1_entity_order": Rule(c["c1_entity_order"], enactments=e_search_clause),
+        "h1_easy": Rule(c["c1_easy"], enactments=e_search_clause),
         "h2_without_cite": Rule(c["c2"]),
-        "h2_fourth_a_cite": Rule(c["c2"], enactments=e["fourth_a"]),
+        "h2_fourth_a_cite": Rule(c["c2"], enactments=e_fourth_a),
         "h2_despite_due_process": Rule(
-            c["c2"],
-            enactments=e["search_clause"],
-            enactments_despite=e["due_process_5"],
+            c["c2"], enactments=e_search_clause, enactments_despite=e_due_process_5,
         ),
         "h2_ALL_due_process": Rule(
             c["c2"],
-            enactments=(e["search_clause"], e["due_process_5"]),
+            enactments=(e_search_clause, e_due_process_5),
             mandatory=False,
             universal=True,
         ),
         "h2_ALL": Rule(
-            c["c2"], enactments=e["search_clause"], mandatory=False, universal=True
+            c["c2"], enactments=e_search_clause, mandatory=False, universal=True
         ),
         "h2_ALL_MAY_output_false": Rule(
             c["c2_output_false"],
-            enactments=e["search_clause"],
+            enactments=e_search_clause,
             mandatory=False,
             universal=True,
         ),
         "h2_ALL_MUST": Rule(
-            c["c2"], enactments=e["search_clause"], mandatory=True, universal=True
+            c["c2"], enactments=e_search_clause, mandatory=True, universal=True
         ),
         "h2_ALL_MUST_output_false": Rule(
             c["c2_output_false"],
-            enactments=e["search_clause"],
+            enactments=e_search_clause,
             mandatory=True,
             universal=True,
         ),
-        "h2_exact_quantity": Rule(
-            c["c2_exact_quantity"], enactments=e["search_clause"]
-        ),
+        "h2_exact_quantity": Rule(c["c2_exact_quantity"], enactments=e_search_clause),
         "h2_irrelevant_inputs": Rule(
-            c["c2_irrelevant_inputs"], enactments=e["search_clause"]
+            c["c2_irrelevant_inputs"], enactments=e_search_clause
         ),
         "h2_irrelevant_inputs_ALL": Rule(
-            c["c2_irrelevant_inputs"], enactments=e["search_clause"], universal=True
+            c["c2_irrelevant_inputs"], enactments=e_search_clause, universal=True
         ),
         "h2_irrelevant_inputs_MUST": Rule(
-            c["c2_irrelevant_inputs"], enactments=e["search_clause"], mandatory=True
+            c["c2_irrelevant_inputs"], enactments=e_search_clause, mandatory=True
         ),
         "h2_irrelevant_inputs_ALL_MUST": Rule(
             c["c2_irrelevant_inputs"],
-            enactments=e["search_clause"],
+            enactments=e_search_clause,
             mandatory=True,
             universal=True,
         ),
-        "h2_reciprocal_swap": Rule(
-            c["c2_reciprocal_swap"], enactments=e["search_clause"]
-        ),
+        "h2_reciprocal_swap": Rule(c["c2_reciprocal_swap"], enactments=e_search_clause),
         "h2_exact_in_despite": Rule(
-            c["c2_exact_in_despite"], enactments=e["search_clause"]
+            c["c2_exact_in_despite"], enactments=e_search_clause
         ),
         "h2_exact_in_despite_ALL": Rule(
             c["c2_exact_in_despite"],
-            enactments=e["search_clause"],
+            enactments=e_search_clause,
             mandatory=False,
             universal=True,
         ),
         "h2_exact_in_despite_ALL_entity_order": Rule(
             c["c2_exact_in_despite_entity_order"],
-            enactments=e["search_clause"],
+            enactments=e_search_clause,
             mandatory=False,
             universal=True,
         ),
         "h2_exact_quantity_ALL": Rule(
             c["c2_exact_quantity"],
-            enactments=e["search_clause"],
+            enactments=e_search_clause,
             mandatory=False,
             universal=True,
         ),
         "h2_MUST": Rule(
-            c["c2"], enactments=e["search_clause"], mandatory=True, universal=False
+            c["c2"], enactments=e_search_clause, mandatory=True, universal=False
         ),
-        "h2_output_absent": Rule(c["c2_output_absent"], enactments=e["search_clause"]),
-        "h2_output_false": Rule(c["c2_output_false"], enactments=e["search_clause"]),
+        "h2_output_absent": Rule(c["c2_output_absent"], enactments=e_search_clause),
+        "h2_output_false": Rule(c["c2_output_false"], enactments=e_search_clause),
         "h2_output_false_ALL": Rule(
-            c["c2_output_false"], enactments=e["search_clause"], universal=True
+            c["c2_output_false"], enactments=e_search_clause, universal=True
         ),
         "h2_output_false_ALL_MUST": Rule(
             c["c2_output_false"],
-            enactments=e["search_clause"],
+            enactments=e_search_clause,
             mandatory=True,
             universal=True,
         ),
         "h2_output_absent_false": Rule(
-            c["c2_output_absent_false"], enactments=e["search_clause"]
+            c["c2_output_absent_false"], enactments=e_search_clause
         ),
         "h2_SOME_MUST_output_false": Rule(
             c["c2_output_false"],
-            enactments=e["search_clause"],
+            enactments=e_search_clause,
             mandatory=True,
             universal=False,
         ),
         "h2_SOME_MUST_output_absent": Rule(
             c["c2_output_absent"],
-            enactments=e["search_clause"],
+            enactments=e_search_clause,
             mandatory=True,
             universal=False,
         ),
-        "h3_ALL": Rule(c["c3"], enactments=e["search_clause"], universal=True),
-        "h3_fewer_inputs": Rule(c["c3_fewer_inputs"], enactments=e["search_clause"]),
+        "h3_ALL": Rule(c["c3"], enactments=e_search_clause, universal=True),
+        "h3_fewer_inputs": Rule(c["c3_fewer_inputs"], enactments=e_search_clause),
         "h3_fewer_inputs_ALL": Rule(
-            c["c3_fewer_inputs"], enactments=e["search_clause"], universal=True
+            c["c3_fewer_inputs"], enactments=e_search_clause, universal=True
         ),
         "h_near_means_curtilage": Rule(
-            c["c_near_means_curtilage"], enactments=e["search_clause"]
+            c["c_near_means_curtilage"], enactments=e_search_clause
         ),
         "h_near_means_curtilage_even_if": Rule(
-            c["c_near_means_curtilage_even_if"], enactments=e["search_clause"]
+            c["c_near_means_curtilage_even_if"], enactments=e_search_clause
         ),
         "h_near_means_curtilage_ALL": Rule(
-            c["c_near_means_curtilage"], enactments=e["search_clause"], universal=True
+            c["c_near_means_curtilage"], enactments=e_search_clause, universal=True
         ),
         "h_near_means_curtilage_ALL_MUST": Rule(
             c["c_near_means_curtilage"],
-            enactments=e["search_clause"],
+            enactments=e_search_clause,
             mandatory=True,
             universal=True,
         ),
         "h_near_means_no_curtilage": Rule(
-            c["c_near_means_no_curtilage"], enactments=e["search_clause"]
+            c["c_near_means_no_curtilage"], enactments=e_search_clause
         ),
         "h_near_means_no_curtilage_ALL": Rule(
-            c["c_near_means_no_curtilage"],
-            enactments=e["search_clause"],
-            universal=True,
+            c["c_near_means_no_curtilage"], enactments=e_search_clause, universal=True,
         ),
         "h_near_means_no_curtilage_ALL_MUST": Rule(
             c["c_near_means_no_curtilage"],
-            enactments=e["search_clause"],
+            enactments=e_search_clause,
             mandatory=True,
             universal=True,
         ),
         "h_nearer_means_curtilage": Rule(
-            c["c_nearer_means_curtilage"], enactments=e["search_clause"]
+            c["c_nearer_means_curtilage"], enactments=e_search_clause
         ),
         "h_nearer_means_curtilage_ALL": Rule(
-            c["c_nearer_means_curtilage"], enactments=e["search_clause"], universal=True
+            c["c_nearer_means_curtilage"], enactments=e_search_clause, universal=True
         ),
         "h_nearer_means_curtilage_MUST": Rule(
-            c["c_nearer_means_curtilage"], enactments=e["search_clause"], mandatory=True
+            c["c_nearer_means_curtilage"], enactments=e_search_clause, mandatory=True
         ),
         "h_far_means_no_curtilage": Rule(c["c_far_means_no_curtilage"]),
         "h_far_means_no_curtilage_ALL": Rule(
-            c["c_far_means_no_curtilage"], enactments=e["search_clause"], universal=True
+            c["c_far_means_no_curtilage"], enactments=e_search_clause, universal=True
         ),
         "h_output_distance_less": Rule(
             c["c_output_distance_less"], universal=True, mandatory=True
@@ -1342,44 +1371,3 @@ def raw_holding() -> RawHolding:
         },
     }
 
-
-@pytest.fixture(scope="module")
-def fourth_a():
-    return {
-        "heading": "AMENDMENT IV.",
-        "content": "The right of the people to be secure in their persons, houses, papers, and effects, against unreasonable searches and seizures, shall not be violated, and no Warrants shall issue, but upon probable cause, supported by Oath or affirmation, and particularly describing the place to be searched, and the persons or things to be seized.",
-        "children": [],
-        "end_date": None,
-        "node": "/us/const/amendment/IV",
-        "start_date": "1791-12-15",
-        "url": "https://authorityspoke.com/api/v1/us/const/amendment/IV/",
-        "parent": "https://authorityspoke.com/api/v1/us/const/amendment/",
-    }
-
-
-@pytest.fixture(scope="module")
-def fifth_a():
-    return {
-        "heading": "AMENDMENT V.",
-        "content": "No person shall be held to answer for a capital, or otherwise infamous crime, unless on a presentment or indictment of a Grand Jury, except in cases arising in the land or naval forces, or in the Militia, when in actual service in time of War or public danger; nor shall any person be subject for the same offence to be twice put in jeopardy of life or limb; nor shall be compelled in any Criminal Case to be a witness against himself; nor be deprived of life, liberty, or property, without due process of law; nor shall private property be taken for public use, without just compensation.",
-        "children": [],
-        "end_date": None,
-        "node": "/us/const/amendment/V",
-        "start_date": "1791-12-15",
-        "url": "https://authorityspoke.com/api/v1/us/const/amendment/V/",
-        "parent": "https://authorityspoke.com/api/v1/us/const/amendment/",
-    }
-
-
-@pytest.fixture(scope="module")
-def fourteenth_dp():
-    return {
-        "heading": "Citizenship: security and equal protection of citizens.",
-        "content": "All persons born or naturalized in the United States, and subject to the jurisdiction thereof, are citizens of the United States and of the State wherein they reside. No State shall make or enforce any law which shall abridge the privileges or immunities of citizens of the United States; nor shall any State deprive any person of life, liberty, or property, without due process of law; nor deny to any person within its jurisdiction the equal protection of the laws.",
-        "children": [],
-        "end_date": None,
-        "node": "/us/const/amendment/IV",
-        "start_date": "1868-07-28",
-        "url": "https://authorityspoke.com/api/v1/us/const/amendment/XIV/1/",
-        "parent": "https://authorityspoke.com/api/v1/us/const/amendment/XIV/",
-    }

@@ -9,6 +9,7 @@ from marshmallow import ValidationError
 
 from anchorpoint.textselectors import TextQuoteSelector
 from legislice import Enactment
+from legislice.schemas import EnactmentSchema as LegisliceSchema
 
 from authorityspoke.codes import Code
 from authorityspoke.decisions import CaseCitation, Decision
@@ -185,7 +186,7 @@ class SelectorSchema(Schema):
         return self.__model__(**data)
 
 
-class EnactmentSchema(ExpandableSchema):
+class EnactmentSchema(LegisliceSchema):
     """Schema for passages from legislation."""
 
     __model__ = Enactment

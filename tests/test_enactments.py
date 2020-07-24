@@ -404,8 +404,7 @@ class TestTextSelection:
         assert selector.exact.startswith("method")
 
     def test_passage_from_uslm_code(self, enactment_copyright):
-        copyright_exceptions = enactment_copyright
-        assert copyright_exceptions.selected_text() == (
+        assert enactment_copyright.selected_text() == (
             "In no case does copyright protection "
             + "for an original work of authorship extend to any..."
         )
