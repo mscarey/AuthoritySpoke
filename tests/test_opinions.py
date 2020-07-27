@@ -283,7 +283,7 @@ class TestContradiction:
         self, make_opinion_with_holding, make_enactment, make_holding
     ):
         assert make_opinion_with_holding["watt_majority"].contradicts(
-            make_holding["h2_output_false_ALL_MUST"] + make_enactment["search_clause"]
+            make_holding["h2_output_false_ALL_MUST"] + e_search_clause
         )
 
     def test_explain_opinion_contradicting_holding(self, make_opinion_with_holding):

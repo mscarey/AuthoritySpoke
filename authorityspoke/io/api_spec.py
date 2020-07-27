@@ -36,4 +36,4 @@ def make_spec() -> APISpec:
     return holding_spec
 
 
-spec = make_spec()
+# spec = make_spec()

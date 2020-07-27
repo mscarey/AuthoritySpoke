@@ -19,9 +19,9 @@ TOKEN = os.getenv("LEGISLICE_API_TOKEN")
 class TestEnactments:
     client = Client(api_token=TOKEN)
 
-    def test_make_enactment(self, make_enactment):
-        search_clause = make_enactment["search_clause"]
-        assert search_clause.text.endswith("shall not be violated")
+    def test_make_enactment(self, e_search_clause):
+        search_clause = e_search_clause
+        assert search_clause.selected_text().endswith("shall not be violated...")
 
     @pytest.mark.vcr
     def test_create_enactment_with_init(self, make_code):
@@ -40,10 +40,8 @@ class TestEnactments:
         assert art_3.text.startswith("The judicial Power")
         assert art_3.selected_text().endswith("the United States...")
 
-    def test_make_enactment_from_dict_with_code(self, make_code):
-        fourth_a = readers.read_enactment(
-            record={"source": "/us/const/amendment-IV"}, code=make_code["const"]
-        )
+    def test_make_enactment_from_dict_with_reader(self):
+        fourth_a = readers.read_enactment(record={"source": "/us/const/amendment/IV"})
         assert fourth_a.text.endswith("and the persons or things to be seized.")
 
     def test_make_enactment_from_dict_with_code_and_regime(
@@ -107,15 +105,15 @@ class TestEnactments:
         assert "and been seven Years a Citizen" in entire_const.text
 
     def test_code_title_in_str(self, make_enactment):
-        assert "secure in their persons" in str(make_enactment["search_clause"])
+        assert "secure in their persons" in str(e_search_clause)
 
     def test_equal_enactment_text(self, make_enactment):
         assert make_enactment["due_process_5"].means(make_enactment["due_process_14"])
 
     def test_not_gt_if_equal(self, make_enactment):
-        assert make_enactment["search_clause"] == make_enactment["search_clause"]
-        assert make_enactment["search_clause"].means(make_enactment["search_clause"])
-        assert not make_enactment["search_clause"] > make_enactment["search_clause"]
+        assert e_search_clause == e_search_clause
+        assert e_search_clause.means(e_search_clause)
+        assert not e_search_clause > e_search_clause
 
     def test_enactment_subset_or_equal(self, make_enactment):
         dp5 = make_enactment["due_process_5"]
@@ -123,10 +121,10 @@ class TestEnactments:
         assert dp5 >= dp14
 
     def test_unequal_enactment_text(self, make_enactment):
-        assert make_enactment["search_clause"] != make_enactment["fourth_a"]
+        assert e_search_clause != make_enactment["fourth_a"]
 
     def test_enactment_subset(self, make_enactment):
-        assert make_enactment["search_clause"] < make_enactment["fourth_a"]
+        assert e_search_clause < make_enactment["fourth_a"]
 
     def test_comparison_to_factor_false(self, make_enactment, watt_factor):
         dp5 = make_enactment["due_process_5"]
@@ -153,9 +151,7 @@ class TestEnactments:
 
     def test_bill_of_rights_effective_date(self, make_enactment):
         # December 15, 1791
-        assert make_enactment["search_clause"].effective_date == datetime.date(
-            1791, 12, 15
-        )
+        assert e_search_clause.effective_date == datetime.date(1791, 12, 15)
 
     def test_date_and_text_from_path_and_regime(self, make_regime):
         """
@@ -230,7 +226,7 @@ class TestEnactments:
     # Addition
 
     def test_add_overlapping_enactments(self, make_enactment):
-        search_clause = make_enactment["search_clause"]
+        search_clause = e_search_clause
         warrant_clause = make_enactment["warrants_clause"]
 
         combined = search_clause + warrant_clause
@@ -243,7 +239,7 @@ class TestEnactments:
         assert passage in combined.text
 
     def test_add_shorter_plus_longer(self, make_enactment):
-        search_clause = make_enactment["search_clause"]
+        search_clause = e_search_clause
         fourth_a = make_enactment["fourth_a"]
 
         combined = search_clause + fourth_a
@@ -252,7 +248,7 @@ class TestEnactments:
         assert combined == fourth_a
 
     def test_add_longer_plus_shorter(self, make_enactment):
-        search_clause = make_enactment["search_clause"]
+        search_clause = e_search_clause
         fourth_a = make_enactment["fourth_a"]
 
         combined = fourth_a + search_clause
@@ -319,10 +315,10 @@ class TestEnactments:
 
     def test_cant_add_fact_to_enactment(self, watt_factor, make_enactment):
         with pytest.raises(TypeError):
-            print(make_enactment["search_clause"] + watt_factor["f3"])
+            print(e_search_clause + watt_factor["f3"])
 
     def test_add_unconnected_provisions(self, make_enactment, enactment_copyright):
-        assert make_enactment["search_clause"] + enactment_copyright is None
+        assert e_search_clause + enactment_copyright is None
 
     def test_add_more_specific_path_no_overlap(self, make_enactment):
         assert (

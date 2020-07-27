@@ -29,11 +29,11 @@
             }]
         },
         "enactments": [{
-                "source": "/us/const/article-I/8/8",
+                "source": "/us/const/article/I/8/8",
                 "exact": "To promote the Progress of Science and useful Arts, by securing for limited Times to Authors",
                 "name": "securing for authors"
             }, {
-                "source": "/us/const/article-I/8/8",
+                "source": "/us/const/article/I/8/8",
                 "exact": "the exclusive Right to their respective Writings",
                 "name": "right to writings"
             }, {

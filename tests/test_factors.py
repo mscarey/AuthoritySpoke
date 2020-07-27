@@ -657,4 +657,4 @@ class TestAddition:
 
     def test_cant_add_enactment_to_fact(self, watt_factor, make_enactment):
         with pytest.raises(TypeError):
-            print(watt_factor["f3"] + make_enactment["search_clause"])
+            print(watt_factor["f3"] + e_search_clause)

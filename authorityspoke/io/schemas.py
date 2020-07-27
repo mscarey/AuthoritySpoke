@@ -8,8 +8,9 @@ from marshmallow import pre_load, post_load
 from marshmallow import ValidationError
 
 from anchorpoint.textselectors import TextQuoteSelector
+from anchorpoint.schemas import SelectorSchema
 from legislice import Enactment
-from legislice.schemas import EnactmentSchema as LegisliceSchema
+from legislice.schemas import EnactmentSchema
 
 from authorityspoke.codes import Code
 from authorityspoke.decisions import CaseCitation, Decision
@@ -153,114 +154,6 @@ class DecisionSchema(ExpandableSchema):
         del data["url"]
         data.pop("frontend_url", None)
         return data
-
-
-class SelectorSchema(Schema):
-    """
-    Schema for text selectors.
-
-    As specified in `anchorpoint <https://anchorpoint.readthedocs.io/>`_
-    """
-
-    __model__ = TextQuoteSelector
-    prefix = fields.Str(missing="")
-    exact = fields.Str(missing="")
-    suffix = fields.Str(missing="")
-
-    @pre_load
-    def expand_shorthand(
-        self, data: Union[str, Dict[str, str]], **kwargs
-    ) -> Dict[str, str]:
-        """
-        Expand text shorthand prior to loading.
-
-        This will repeat an operation that already happened
-        if :func:`~.text_expansion.expand_anchor_shorthand` was
-        already called in :func:`~.loaders.load_holdings`\.
-        """
-        return text_expansion.expand_anchor_shorthand(data)
-
-    @post_load
-    def make_object(self, data, **kwargs):
-        """Make selector."""
-        return self.__model__(**data)
-
-
-class EnactmentSchema(LegisliceSchema):
-    """Schema for passages from legislation."""
-
-    __model__ = Enactment
-    name = fields.String(missing=None)
-    source = fields.Url(relative=True)
-    selector = fields.Nested(SelectorSchema, missing=None)
-
-    def move_selector_fields(self, data: RawEnactment, **kwargs):
-        """
-        Nest fields used for :class:`SelectorSchema` model.
-
-        If the fields are already nested, they need not to be moved.
-
-        The fields can only be moved into a "selector" field with a dict
-        value, not a "selectors" field with a list value.
-        """
-        # Dumping the data because it seems to need to be loaded all at once.
-        if isinstance(data.get("selector"), TextQuoteSelector):
-            data["selector"] = SelectorSchema().dump(data["selector"])
-
-        selector_field_names = ["text", "exact", "prefix", "suffix"]
-        for name in selector_field_names:
-            if data.get(name):
-                if not data.get("selector"):
-                    data["selector"] = {}
-                data["selector"][name] = data[name]
-                del data[name]
-        return data
-
-    def fix_source_path_errors(self, data: RawEnactment, **kwargs):
-        """Rescue malformed or missing reference to this Enactment's Code."""
-        if not data.get("source"):
-            code = self.get_code_from_regime(data)
-            data["source"] = code.uri
-
-        if data.get("source"):
-            if not (
-                data["source"].startswith("/") or data["source"].startswith("http")
-            ):
-                data["source"] = "/" + data["source"]
-            if data["source"].endswith("/"):
-                data["source"] = data["source"].rstrip("/")
-        return data
-
-    def get_code_from_regime(self, data, **kwargs) -> Code:
-        """Find reference to Code in data and collect Code from Regime."""
-        if self.context.get("code"):
-            return self.context["code"]
-        if self.context["regime"]:
-            if isinstance(self.context["regime"], Code):
-                return self.context["regime"]
-            return self.context["regime"].get_code(data["source"])
-
-        raise ValueError(
-            f"Must either specify a Code for Enactment '{data['source']}', "
-            + "or else specify a Regime "
-            + "and a path to find the Code within the Regime."
-        )
-
-    @pre_load
-    def format_data_to_load(self, data, **kwargs):
-        """Prepare Enactment to load."""
-        data = self.get_from_mentioned(data)
-        data = self.fix_source_path_errors(data)
-        data = self.move_selector_fields(data)
-        data = self.consume_type_field(data)
-        data = self.remove_anchors_field(data)
-        return data
-
-    @post_load
-    def make_object(self, data, **kwargs):
-        """Use data to get Code, and then expand data."""
-        code = self.get_code_from_regime(data)
-        return self.__model__(**data, code=code)
 
 
 def read_quantity(value: Union[float, int, str]) -> Union[float, int, ureg.Quantity]:
