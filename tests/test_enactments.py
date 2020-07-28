@@ -40,12 +40,14 @@ class TestEnactments:
         assert art_3.text.startswith("The judicial Power")
         assert art_3.selected_text().endswith("the United States...")
 
+    @pytest.mark.vcr
     def test_make_enactment_from_dict_with_reader(self):
         fourth_a = readers.read_enactment(
             record={"node": "/us/const/amendment/IV"}, client=self.client
         )
         assert fourth_a.text.endswith("and the persons or things to be seized.")
 
+    @pytest.mark.vcr
     def test_make_enactment_from_dict_with_text_split(self):
         fourth_a = readers.read_enactment(
             record={
@@ -54,8 +56,9 @@ class TestEnactments:
             },
             client=self.client,
         )
-        assert fourth_a.selector.exact.endswith("or things")
+        assert fourth_a.selected_text() == "...the persons or things..."
 
+    @pytest.mark.vcr
     def test_passage_from_imported_statute(self, make_regime):
         oracle_majority = loaders.load_and_read_decision(f"oracle_h.json").majority
         raw_holdings = loaders.load_holdings("holding_oracle.json")
@@ -64,73 +67,59 @@ class TestEnactments:
         despite_text = str(list(oracle_majority.holdings)[5])
         assert "In no case does copyright protection " in despite_text
 
-    def test_short_passage_from_uslm_code(self, make_code):
+    @pytest.mark.vcr
+    def test_short_passage_from_uslm_code(self):
         """Also tests adding the missing initial "/" in ``path``."""
-        usc17 = make_code["usc17"]
         method = readers.read_enactment(
             {
                 "node": "us/usc/t17/s102/b",
                 "prefix": "process, system,",
                 "suffix": ", concept, principle",
             },
-            code=usc17,
+            client=self.client,
         )
-        assert method.text.strip() == "method of operation"
+        assert method.selected_text() == "...method of operation..."
 
-    def test_chapeau_and_subsections_from_uslm_code(self, make_code):
-        beard = make_code["beard_act"]
+    @pytest.mark.vcr
+    def test_chapeau_and_subsections_from_uslm_code(self):
         definition = readers.read_enactment(
-            {"node": "/au/act/1934/47/1/4"}, code=beard,
+            {"node": "/test/acts/47/4"}, client=self.client,
         )
         assert definition.text.strip().endswith("below the nose.")
 
-    def test_passage_from_cfr_code(self, make_code):
-        cfr = make_code["cfr37"]
-        slogans = readers.read_enactment({"node": "/us/cfr/t37/s202.1"}, code=cfr)
-        assert "Words and short phrases such as names" in slogans.text
+    def test_cite_path_in_str(self, e_search_clause):
+        assert "/us/const/amendment/IV" in str(e_search_clause)
 
-    def test_cite_entire_constitution(self, make_regime):
-        entire_const = readers.read_enactment({"node": "/us/const"}, regime=make_regime)
-        assert "and been seven Years a Citizen" in entire_const.text
+    def test_equal_enactment_text(self, e_due_process_5, e_due_process_14):
+        assert e_due_process_5.means(e_due_process_14)
 
-    def test_code_title_in_str(self, make_enactment):
-        assert "secure in their persons" in str(e_search_clause)
-
-    def test_equal_enactment_text(self, make_enactment):
-        assert make_enactment["due_process_5"].means(make_enactment["due_process_14"])
-
-    def test_not_gt_if_equal(self, make_enactment):
+    def test_not_gt_if_equal(self, e_search_clause):
         assert e_search_clause == e_search_clause
         assert e_search_clause.means(e_search_clause)
         assert not e_search_clause > e_search_clause
 
-    def test_enactment_subset_or_equal(self, make_enactment):
-        dp5 = make_enactment["due_process_5"]
-        dp14 = make_enactment["due_process_14"]
-        assert dp5 >= dp14
+    def test_enactment_subset_or_equal(self, e_due_process_5, e_due_process_14):
+        assert e_due_process_5 >= e_due_process_14
 
-    def test_unequal_enactment_text(self, make_enactment):
-        assert e_search_clause != make_enactment["fourth_a"]
+    def test_unequal_enactment_text(self, e_search_clause, e_fourth_a):
+        assert e_search_clause != e_fourth_a
 
-    def test_enactment_subset(self, make_enactment):
-        assert e_search_clause < make_enactment["fourth_a"]
+    def test_enactment_subset(self, e_search_clause, e_fourth_a):
+        assert e_search_clause < e_fourth_a
 
-    def test_comparison_to_factor_false(self, make_enactment, watt_factor):
-        dp5 = make_enactment["due_process_5"]
+    def test_comparison_to_factor_false(self, e_due_process_5, watt_factor):
         f1 = watt_factor["f1"]
-        assert not dp5 == f1
+        assert not e_due_process_5 == f1
 
-    def test_implication_of_factor_fails(self, make_enactment, watt_factor):
-        dp5 = make_enactment["due_process_5"]
+    def test_implication_of_factor_fails(self, e_due_process_5, watt_factor):
         f1 = watt_factor["f1"]
         with pytest.raises(TypeError):
-            assert not dp5 > f1
+            assert not e_due_process_5 > f1
 
-    def test_implication_by_factor_fails(self, make_enactment, watt_factor):
-        dp5 = make_enactment["due_process_5"]
+    def test_implication_by_factor_fails(self, e_due_process_5, watt_factor):
         f1 = watt_factor["f1"]
         with pytest.raises(TypeError):
-            assert not dp5 < f1
+            assert not e_due_process_5 < f1
 
     def test_constitution_effective_date(self, make_regime):
         ex_post_facto_provision = readers.read_enactment(
