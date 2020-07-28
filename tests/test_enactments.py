@@ -1,5 +1,6 @@
 import datetime
 import os
+from tests.conftest import e_copyright
 
 from anchorpoint.textselectors import TextQuoteSelector, TextSelectionError
 from dotenv import load_dotenv
@@ -377,30 +378,31 @@ class TestTextSelection:
         selector = anchors.read_selector(data)
         assert selector.exact.startswith("method")
 
-    def test_passage_from_uslm_code(self, enactment_copyright):
-        assert enactment_copyright.selected_text() == (
+    def test_whitespace_when_selecting_with_suffix(self, e_copyright):
+        """Overwrite existing selector and test for trailing whitespace."""
+        copyright_selector = TextQuoteSelector(suffix="idea, procedure,")
+        e_copyright.select(copyright_selector)
+        assert e_copyright.selected_text() == (
             "In no case does copyright protection "
             + "for an original work of authorship extend to any..."
         )
 
-    def test_section_text_from_path_and_regime(self, make_regime):
+    @pytest.mark.vcr
+    def test_section_text_from_path(self):
         copyright_exceptions = readers.read_enactment(
-            {"node": "/us/usc/t17/s102/b"}, regime=make_regime
+            {"node": "/us/usc/t17/s102/b"}, client=self.client
         )
         assert copyright_exceptions.text.startswith(
             "In no case does copyright protection "
             + "for an original work of authorship extend to any"
         )
 
-    def test_exact_text_not_in_selection(self, make_regime):
-        due_process_wrong_section = TextQuoteSelector(exact="due process")
+    @pytest.mark.vcr
+    def test_exact_text_not_in_selection(self):
         with pytest.raises(TextSelectionError):
             _ = readers.read_enactment(
-                {
-                    "selector": due_process_wrong_section,
-                    "node": "/us/const/amendment-XV/1",
-                },
-                regime=make_regime,
+                {"node": "/us/const/amendment/XV/1", "exact": "due process",},
+                client=self.client,
             )
 
     def test_multiple_non_Factor_selectors_for_Holding(self):
