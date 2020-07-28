@@ -85,7 +85,7 @@ def assign_name_for_enactment(obj: Dict) -> str:
 
     :returns: a name for the Enactment
     """
-    name = obj["source"]
+    name = obj["node"]
     if obj.get("exact"):
         name += obj["exact"]
     elif obj.get("prefix") or obj.get("suffix"):
@@ -144,7 +144,7 @@ def create_name_for_factor(obj: Dict) -> str:
         return ""
     elif obj.get("predicate", {}).get("content"):
         name = assign_name_from_content(obj)
-    elif obj.get("source"):
+    elif obj.get("node"):
         name = assign_name_for_enactment(obj)
     elif (
         obj.get("exhibit")

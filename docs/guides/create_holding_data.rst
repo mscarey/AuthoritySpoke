@@ -111,7 +111,7 @@ first holding.
            },
            "mandatory": true,
            "enactments": {
-               "source": "/us/usc/t17/s102/a",
+               "node": "/us/usc/t17/s102/a",
                "exact": "Copyright protection subsists, in accordance with this title, in original works of authorship fixed in any tangible medium of expression, now known or later developed, from which they can be perceived, reproduced, or otherwise communicated, either directly or with the aid of a machine or device.",
                "name": "copyright protection provision",
                "anchors": "qualify for copyright protection. |17 U.S.C. § 102(a)|."

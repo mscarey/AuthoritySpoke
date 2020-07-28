@@ -4,9 +4,9 @@ from authorityspoke.io.loaders import load_holdings
 
 class TestEnactmentImport:
     test_enactments = [
-        {"source": "/us-ca/evid/s351"},
+        {"node": "/us-ca/evid/s351"},
         {
-            "source": "/us/const/amendment-XIV-1",
+            "node": "/us/const/amendment-XIV-1",
             "prefix": "immunities of citizens of the United States; ",
             "suffix": " nor deny to any person",
             "name": "due process clause",

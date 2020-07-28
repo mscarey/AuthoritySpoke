@@ -69,7 +69,7 @@ class TestEnactments:
         usc17 = make_code["usc17"]
         method = readers.read_enactment(
             {
-                "source": "us/usc/t17/s102/b",
+                "node": "us/usc/t17/s102/b",
                 "prefix": "process, system,",
                 "suffix": ", concept, principle",
             },
@@ -80,19 +80,17 @@ class TestEnactments:
     def test_chapeau_and_subsections_from_uslm_code(self, make_code):
         beard = make_code["beard_act"]
         definition = readers.read_enactment(
-            {"source": "/au/act/1934/47/1/4"}, code=beard,
+            {"node": "/au/act/1934/47/1/4"}, code=beard,
         )
         assert definition.text.strip().endswith("below the nose.")
 
     def test_passage_from_cfr_code(self, make_code):
         cfr = make_code["cfr37"]
-        slogans = readers.read_enactment({"source": "/us/cfr/t37/s202.1"}, code=cfr)
+        slogans = readers.read_enactment({"node": "/us/cfr/t37/s202.1"}, code=cfr)
         assert "Words and short phrases such as names" in slogans.text
 
     def test_cite_entire_constitution(self, make_regime):
-        entire_const = readers.read_enactment(
-            {"source": "/us/const"}, regime=make_regime
-        )
+        entire_const = readers.read_enactment({"node": "/us/const"}, regime=make_regime)
         assert "and been seven Years a Citizen" in entire_const.text
 
     def test_code_title_in_str(self, make_enactment):
@@ -136,7 +134,7 @@ class TestEnactments:
 
     def test_constitution_effective_date(self, make_regime):
         ex_post_facto_provision = readers.read_enactment(
-            {"source": "/us/const/article-I/9/3"}, regime=make_regime
+            {"node": "/us/const/article-I/9/3"}, regime=make_regime
         )
         assert ex_post_facto_provision.effective_date == datetime.date(1788, 9, 13)
 
@@ -156,7 +154,7 @@ class TestEnactments:
         passed to the TextQuoteSelector constructor.
         """
         amendment_12 = readers.read_enactment(
-            {"source": "/us/const/amendment-XII"}, regime=make_regime
+            {"node": "/us/const/amendment-XII"}, regime=make_regime
         )
         assert amendment_12.effective_date == datetime.date(1804, 9, 25)
         assert "Electors shall meet" in amendment_12.text
@@ -326,20 +324,20 @@ class TestDump:
 
     def test_dump_json(self, make_code):
         cfr = make_code["cfr37"]
-        slogans = readers.read_enactment({"source": "/us/cfr/t37/s202.1"}, code=cfr)
+        slogans = readers.read_enactment({"node": "/us/cfr/t37/s202.1"}, code=cfr)
         s = dump.to_json(slogans)
-        assert '"source": "/us/cfr/t37/s202.1"' in s
+        assert '"node": "/us/cfr/t37/s202.1"' in s
 
     def test_round_trip_dict(self, make_code):
         cfr = make_code["cfr37"]
-        slogans = readers.read_enactment({"source": "/us/cfr/t37/s202.1"}, code=cfr)
+        slogans = readers.read_enactment({"node": "/us/cfr/t37/s202.1"}, code=cfr)
         dumped_slogans = dump.to_dict(slogans)
         new = readers.read_enactment(dumped_slogans, code=cfr)
         assert new.source == "/us/cfr/t37/s202.1"
 
     def test_supply_missing_source_from_code(self, make_code):
         """
-        Test that when a "source" path is omitted, the load method
+        Test that when a "node" path is omitted, the load method
         at least uses the uri of the code as the source.
 
         It might make sense for the method to find a more accurate
@@ -374,14 +372,14 @@ class TestTextSelection:
     def test_omit_terminal_slash(self, make_code):
         usc17 = make_code["usc17"]
         statute = readers.read_enactment(
-            {"exact": "process, system,", "source": "us/usc/t17/s102/b/"}, code=usc17
+            {"exact": "process, system,", "node": "us/usc/t17/s102/b/"}, code=usc17
         )
         assert not statute.source.endswith("/")
 
     def test_add_omitted_initial_slash(self, make_code):
         usc17 = make_code["usc17"]
         statute = readers.read_enactment(
-            {"exact": "process, system,", "source": "us/usc/t17/s102/b/"}, code=usc17
+            {"exact": "process, system,", "node": "us/usc/t17/s102/b/"}, code=usc17
         )
         assert statute.source.startswith("/")
 
@@ -398,7 +396,7 @@ class TestTextSelection:
 
     def test_section_text_from_path_and_regime(self, make_regime):
         copyright_exceptions = readers.read_enactment(
-            {"source": "/us/usc/t17/s102/b"}, regime=make_regime
+            {"node": "/us/usc/t17/s102/b"}, regime=make_regime
         )
         assert copyright_exceptions.text.startswith(
             "In no case does copyright protection "
@@ -411,7 +409,7 @@ class TestTextSelection:
             _ = readers.read_enactment(
                 {
                     "selector": due_process_wrong_section,
-                    "source": "/us/const/amendment-XV/1",
+                    "node": "/us/const/amendment-XV/1",
                 },
                 regime=make_regime,
             )

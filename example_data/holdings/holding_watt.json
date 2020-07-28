@@ -17,7 +17,7 @@
             "content": "Hideaway Lodge was Wattenburg’s abode"
         }],
         "enactments": [{
-            "source": "/us/const/amendment-IV",
+            "node": "/us/const/amendment-IV",
             "exact": "The right of the people to be secure in their persons, houses, papers, and effects, against unreasonable searches and seizures, shall not be violated",
             "name": "search clause"
         }],
