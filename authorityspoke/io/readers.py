@@ -12,6 +12,7 @@ from typing import Dict, List, Optional, Tuple, Type
 from anchorpoint.textselectors import TextQuoteSelector
 from bs4 import BeautifulSoup
 from legislice import Enactment
+from legislice.download import Client
 
 from authorityspoke.decisions import Decision
 from authorityspoke.codes import Code, USCCode, USLMCode, USConstCode, CalCode, CFRCode
@@ -126,36 +127,21 @@ def read_code(xml: BeautifulSoup):
     return code_class(xml, title, uri)
 
 
-def read_enactment(
-    record: RawEnactment, code: Optional[Code] = None, regime: Optional[Regime] = None
-) -> Enactment:
+def read_enactment(record: RawEnactment, client: Client) -> Enactment:
     r"""
     Create a new :class:`.Enactment` object using imported JSON data.
-
-    The new :class:`.Enactment` can be composed from a :class:`.Code`
-    referenced in the ``regime`` parameter.
 
     :param record:
         :class:`dict` with string fields from JSON for constructing
         new :class:`.Enactment`
 
-    :param code:
-        the :class:`.Code` that is the source for this
-        :class:`Enactment`
-
-    :param regime:
-        the :class:`.Regime` where the :class:`.Code` that is the
-        source for this :class:`Enactment` can be found, or where
-        it should be added
+    :param client:
+        Legislice client for downloading missing fields from `record`
 
     :returns:
         a new :class:`Enactment` object, optionally with text links.
     """
-    schema = schemas.EnactmentSchema(many=False)
-    record, schema.context["mentioned"] = index_names(record)
-    schema.context["regime"] = regime
-    schema.context["code"] = code
-    return schema.load(deepcopy(record))
+    return client.read_from_json(record)
 
 
 def read_enactments(

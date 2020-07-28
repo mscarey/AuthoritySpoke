@@ -41,27 +41,18 @@ class TestEnactments:
         assert art_3.selected_text().endswith("the United States...")
 
     def test_make_enactment_from_dict_with_reader(self):
-        fourth_a = readers.read_enactment(record={"source": "/us/const/amendment/IV"})
-        assert fourth_a.text.endswith("and the persons or things to be seized.")
-
-    def test_make_enactment_from_dict_with_code_and_regime(
-        self, make_regime, make_code
-    ):
         fourth_a = readers.read_enactment(
-            record={"source": "/us/const/amendment-IV"},
-            code=make_code["const"],
-            regime=make_regime,
+            record={"node": "/us/const/amendment/IV"}, client=self.client
         )
         assert fourth_a.text.endswith("and the persons or things to be seized.")
 
-    def test_make_enactment_from_dict_with_text_split(self, make_regime, make_code):
+    def test_make_enactment_from_dict_with_text_split(self):
         fourth_a = readers.read_enactment(
             record={
-                "source": "/us/const/amendment-IV",
+                "node": "/us/const/amendment/IV",
                 "text": "and|the persons or things|to be seized.",
             },
-            code=make_code["const"],
-            regime=make_regime,
+            client=self.client,
         )
         assert fourth_a.selector.exact.endswith("or things")
 
