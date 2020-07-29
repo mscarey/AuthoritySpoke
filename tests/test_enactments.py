@@ -122,17 +122,19 @@ class TestEnactments:
         with pytest.raises(TypeError):
             assert not e_due_process_5 < f1
 
-    def test_constitution_effective_date(self, make_regime):
+    @pytest.mark.vcr
+    def test_constitution_effective_date(self):
         ex_post_facto_provision = readers.read_enactment(
-            {"node": "/us/const/article-I/9/3"}, regime=make_regime
+            {"node": "/us/const/article/I/9/3"}, client=self.client
         )
         assert ex_post_facto_provision.effective_date == datetime.date(1788, 9, 13)
 
-    def test_bill_of_rights_effective_date(self, make_enactment):
+    def test_bill_of_rights_effective_date(self, e_search_clause):
         # December 15, 1791
         assert e_search_clause.effective_date == datetime.date(1791, 12, 15)
 
-    def test_date_and_text_from_path_and_regime(self, make_regime):
+    @pytest.mark.vcr
+    def test_date_and_text_from_path_and_regime(self):
         """
         This tests different parsing code because the date is
         in the format "dated the 25th of September, 1804"
@@ -144,16 +146,14 @@ class TestEnactments:
         passed to the TextQuoteSelector constructor.
         """
         amendment_12 = readers.read_enactment(
-            {"node": "/us/const/amendment-XII"}, regime=make_regime
+            {"node": "/us/const/amendment/XII"}, client=self.client
         )
-        assert amendment_12.effective_date == datetime.date(1804, 9, 25)
+        assert amendment_12.start_date == datetime.date(1804, 9, 25)
         assert "Electors shall meet" in amendment_12.text
 
-    def test_14th_A_effective_date(self, make_enactment):
+    def test_14th_A_effective_date(self, e_due_process_14):
         # July 28, 1868
-        assert make_enactment["due_process_14"].effective_date == datetime.date(
-            1868, 7, 28
-        )
+        assert e_due_process_14.start_date == datetime.date(1868, 7, 28)
 
     def test_compare_effective_dates(self, make_enactment):
         dp5 = make_enactment["due_process_5"]
@@ -308,38 +308,28 @@ class TestEnactments:
 
 
 class TestDump:
+    client = Client(api_token=TOKEN)
+
     def test_dump_dict(self, make_enactment):
         d = dump.to_dict(make_enactment["securing_for_authors"])
         assert "Science and useful Arts" in d["selector"]["exact"]
 
-    def test_dump_json(self, make_code):
-        cfr = make_code["cfr37"]
-        slogans = readers.read_enactment({"node": "/us/cfr/t37/s202.1"}, code=cfr)
-        s = dump.to_json(slogans)
-        assert '"node": "/us/cfr/t37/s202.1"' in s
-
-    def test_round_trip_dict(self, make_code):
-        cfr = make_code["cfr37"]
-        slogans = readers.read_enactment({"node": "/us/cfr/t37/s202.1"}, code=cfr)
-        dumped_slogans = dump.to_dict(slogans)
-        new = readers.read_enactment(dumped_slogans, code=cfr)
-        assert new.source == "/us/cfr/t37/s202.1"
-
-    def test_supply_missing_source_from_code(self, make_code):
-        """
-        Test that when a "node" path is omitted, the load method
-        at least uses the uri of the code as the source.
-
-        It might make sense for the method to find a more accurate
-        source path for the specific section, but it doesn't.
-        """
-        const = make_code["const"]
-        due_process = readers.read_enactment(
-            {"prefix": "property, without ", "suffix": "nor shall private property"},
-            code=const,
+    @pytest.mark.vcr
+    def test_dump_json(self):
+        provision = readers.read_enactment(
+            {"node": "/test/acts/47/6A"}, client=self.client
         )
-        assert "due process" in due_process.text
-        assert due_process.source.startswith("/us/const")
+        dumped_provision = dump.to_json(provision)
+        assert '"node": "/test/acts/47/6A"' in dumped_provision
+
+    @pytest.mark.vcr
+    def test_round_trip_dict(self):
+        provision = readers.read_enactment(
+            {"node": "/test/acts/47/6A"}, client=self.client
+        )
+        dumped_provision = dump.to_dict(provision)
+        new = self.client.read_from_json(dumped_provision)
+        assert new.node == "/test/acts/47/6A"
 
 
 class TestTextSelection:
@@ -359,17 +349,17 @@ class TestTextSelection:
         assert enactment.jurisdiction == "us"
         assert enactment.code == "usc"
 
-    def test_omit_terminal_slash(self, make_code):
-        usc17 = make_code["usc17"]
+    def test_omit_terminal_slash(self):
         statute = readers.read_enactment(
-            {"exact": "process, system,", "node": "us/usc/t17/s102/b/"}, code=usc17
+            {"exact": "process, system,", "node": "us/usc/t17/s102/b/"},
+            client=self.client,
         )
         assert not statute.source.endswith("/")
 
-    def test_add_omitted_initial_slash(self, make_code):
-        usc17 = make_code["usc17"]
+    def test_add_omitted_initial_slash(self):
         statute = readers.read_enactment(
-            {"exact": "process, system,", "node": "us/usc/t17/s102/b/"}, code=usc17
+            {"exact": "process, system,", "node": "us/usc/t17/s102/b/"},
+            client=self.client,
         )
         assert statute.source.startswith("/")
 

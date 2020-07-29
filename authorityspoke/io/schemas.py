@@ -7,8 +7,8 @@ from marshmallow import Schema, fields, validate
 from marshmallow import pre_load, post_load
 from marshmallow import ValidationError
 
-from anchorpoint.textselectors import TextQuoteSelector
-from anchorpoint.schemas import SelectorSchema
+from anchorpoint.textselectors import TextQuoteSelector, TextPositionSelector
+from anchorpoint.schemas import SelectorSchema as AnchorSchema
 from legislice import Enactment
 from legislice.schemas import EnactmentSchema
 
@@ -36,6 +36,12 @@ RawEnactment = Dict[str, Union[str, List[RawSelector]]]
 RawProcedure = Dict[str, Sequence[RawFactor]]
 RawRule = Dict[str, Union[RawProcedure, Sequence[RawEnactment], str, bool]]
 RawHolding = Dict[str, Union[RawRule, str, bool]]
+
+
+class SelectorSchema(AnchorSchema):
+    """Temporary subclass for testing changes to Anchorpoint schema."""
+
+    __model__ = TextQuoteSelector
 
 
 class ExpandableSchema(Schema):
@@ -507,11 +513,13 @@ class HoldingSchema(ExpandableSchema):
         return data
 
 
-SCHEMAS = list(ExpandableSchema.__subclasses__()) + [SelectorSchema]
+SCHEMAS = list(ExpandableSchema.__subclasses__()) + [SelectorSchema, EnactmentSchema]
 
 
 def get_schema_for_item(item: Any) -> Schema:
     """Find the Marshmallow schema for an AuthoritySpoke object."""
+    if isinstance(item, TextPositionSelector):
+        return SelectorSchema
     for option in SCHEMAS:
         if item.__class__ == option.__model__:
             return option()
