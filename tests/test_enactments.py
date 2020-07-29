@@ -123,15 +123,15 @@ class TestEnactments:
             assert not e_due_process_5 < f1
 
     @pytest.mark.vcr
-    def test_constitution_effective_date(self):
+    def test_read_constitution_for_effective_date(self):
         ex_post_facto_provision = readers.read_enactment(
             {"node": "/us/const/article/I/9/3"}, client=self.client
         )
-        assert ex_post_facto_provision.effective_date == datetime.date(1788, 9, 13)
+        assert ex_post_facto_provision.start_date == datetime.date(1788, 9, 13)
 
     def test_bill_of_rights_effective_date(self, e_search_clause):
         # December 15, 1791
-        assert e_search_clause.effective_date == datetime.date(1791, 12, 15)
+        assert e_search_clause.start_date == datetime.date(1791, 12, 15)
 
     @pytest.mark.vcr
     def test_date_and_text_from_path_and_regime(self):
@@ -155,42 +155,10 @@ class TestEnactments:
         # July 28, 1868
         assert e_due_process_14.start_date == datetime.date(1868, 7, 28)
 
-    def test_compare_effective_dates(self, make_enactment):
+    def test_compare_effective_dates(self, e_due_process_5, e_due_process_14):
         dp5 = make_enactment["due_process_5"]
         dp14 = make_enactment["due_process_14"]
-        assert dp14.effective_date > dp5.effective_date
-
-    @pytest.mark.parametrize(
-        "enactment_name, code_name, text",
-        [
-            (
-                "due_process_5",
-                "const",
-                "life, liberty, or property, without due process of law",
-            ),
-            (
-                "copyright",
-                "usc17",
-                (
-                    "In no case does copyright protection for an original "
-                    "work of authorship extend to any"
-                ),
-            ),
-        ],
-    )
-    def test_text_interval(
-        self, make_code, make_enactment, code_name, enactment_name, text
-    ):
-        """
-        The interval represents the start and end of the phrase
-        "life, liberty, or property, without due process of law"
-        in the Fifth Amendment.
-        """
-        provision = make_enactment[enactment_name]
-        code = make_code[code_name]
-        interval = code.text_interval(provision.selector, path=provision.source)
-        this_section = code.section_text_from_path(path=provision.source)
-        assert this_section[interval.start : interval.end] == text
+        assert e_due_process_14.effective_date > e_due_process_5.effective_date
 
     def test_invalid_selector_text(self, make_selector):
         with pytest.raises(TextSelectionError):
@@ -204,11 +172,8 @@ class TestEnactments:
 
     # Addition
 
-    def test_add_overlapping_enactments(self, make_enactment):
-        search_clause = e_search_clause
-        warrant_clause = make_enactment["warrants_clause"]
-
-        combined = search_clause + warrant_clause
+    def test_add_overlapping_enactments(self, e_search_clause, e_warrants_clause):
+        combined = e_search_clause + e_warrants_clause
 
         passage = (
             "against unreasonable searches and seizures, "
@@ -217,14 +182,11 @@ class TestEnactments:
         )
         assert passage in combined.text
 
-    def test_add_shorter_plus_longer(self, make_enactment):
-        search_clause = e_search_clause
-        fourth_a = make_enactment["fourth_a"]
+    def test_add_shorter_plus_longer(self, e_fourth_a, e_search_clause):
+        combined = e_search_clause + e_fourth_a
 
-        combined = search_clause + fourth_a
-
-        assert combined.text == fourth_a.text
-        assert combined == fourth_a
+        assert combined.selected_text() == e_fourth_a.selected_text()
+        assert combined.means(e_fourth_a)
 
     def test_add_longer_plus_shorter(self, make_enactment):
         search_clause = e_search_clause
@@ -296,15 +258,11 @@ class TestEnactments:
         with pytest.raises(TypeError):
             print(e_search_clause + watt_factor["f3"])
 
-    def test_add_unconnected_provisions(self, make_enactment, enactment_copyright):
-        assert e_search_clause + enactment_copyright is None
-
-    def test_add_more_specific_path_no_overlap(self, make_enactment):
-        assert (
-            make_enactment["securing_for_authors"]
-            + make_enactment["commerce_vague_path"]
-            is None
-        )
+    def test_cant_add_enactment_that_is_not_ancestor_or_descendant(
+        self, e_search_clause, enactment_copyright
+    ):
+        with pytest.raises(ValueError):
+            e_search_clause + enactment_copyright
 
 
 class TestDump:
