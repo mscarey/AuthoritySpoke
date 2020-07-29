@@ -1,6 +1,5 @@
 import datetime
 import os
-from tests.conftest import e_copyright
 
 from anchorpoint.textselectors import TextQuoteSelector, TextSelectionError
 from dotenv import load_dotenv
@@ -156,9 +155,7 @@ class TestEnactments:
         assert e_due_process_14.start_date == datetime.date(1868, 7, 28)
 
     def test_compare_effective_dates(self, e_due_process_5, e_due_process_14):
-        dp5 = make_enactment["due_process_5"]
-        dp14 = make_enactment["due_process_14"]
-        assert e_due_process_14.effective_date > e_due_process_5.effective_date
+        assert e_due_process_14.start_date > e_due_process_5.start_date
 
     def test_invalid_selector_text(self, make_selector):
         with pytest.raises(TextSelectionError):
@@ -188,14 +185,12 @@ class TestEnactments:
         assert combined.selected_text() == e_fourth_a.selected_text()
         assert combined.means(e_fourth_a)
 
-    def test_add_longer_plus_shorter(self, make_enactment):
-        search_clause = e_search_clause
-        fourth_a = make_enactment["fourth_a"]
+    def test_add_longer_plus_shorter(self, e_fourth_a, e_search_clause):
 
-        combined = fourth_a + search_clause
+        combined = e_fourth_a + e_search_clause
 
-        assert combined.text == fourth_a.text
-        assert combined == fourth_a
+        assert combined.selected_text() == e_fourth_a.selected_text()
+        assert combined.means(e_fourth_a)
 
     def test_consolidate_enactments(self, fourth_a):
         search_clause = fourth_a.copy()
@@ -254,23 +249,26 @@ class TestEnactments:
         combined = consolidate_enactments([due_process_5, due_process_14])
         assert len(combined) == 2
 
-    def test_cant_add_fact_to_enactment(self, watt_factor, make_enactment):
-        with pytest.raises(TypeError):
+    def test_cant_add_fact_to_enactment(self, watt_factor, e_search_clause):
+        with pytest.raises(ValueError):
             print(e_search_clause + watt_factor["f3"])
 
     def test_cant_add_enactment_that_is_not_ancestor_or_descendant(
-        self, e_search_clause, enactment_copyright
+        self, e_search_clause, e_copyright
     ):
         with pytest.raises(ValueError):
-            e_search_clause + enactment_copyright
+            e_search_clause + e_copyright
 
 
 class TestDump:
     client = Client(api_token=TOKEN)
 
-    def test_dump_dict(self, make_enactment):
-        d = dump.to_dict(make_enactment["securing_for_authors"])
-        assert "Science and useful Arts" in d["selector"]["exact"]
+    def test_dump_dict(self, e_securing_for_authors):
+        d = dump.to_dict(e_securing_for_authors)
+        start = d["selection"][0]["start"]
+        end = d["selection"][0]["end"]
+        text_selection = d["content"][start:end]
+        assert "Science and useful Arts" in text_selection
 
     @pytest.mark.vcr
     def test_dump_json(self):
