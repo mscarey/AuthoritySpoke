@@ -247,7 +247,7 @@ def read_procedure(
     return schema.load(record)
 
 
-def read_holding(record: RawHolding, regime: Optional[Regime] = None) -> Holding:
+def read_holding(record: RawHolding, client: Optional[Client] = None) -> Holding:
     r"""
     Create new :class:`Holding` object from simple datatypes from JSON input.
 
@@ -270,9 +270,15 @@ def read_holding(record: RawHolding, regime: Optional[Regime] = None) -> Holding
         :class:`.Factor`\s as keys and their :class:`.TextQuoteSelector`\s
         as values.
     """
+
     schema = schemas.HoldingSchema(many=False)
+
     record, schema.context["mentioned"] = index_names(record)
-    schema.context["regime"] = regime
+    record, enactment_index = collect_enactments(record)
+    if client:
+        enactment_index = client.update_entries_in_enactment_index(enactment_index)
+    schema.context["enactment_index"] = enactment_index
+
     return schema.load(deepcopy(record))
 
 
@@ -329,9 +335,7 @@ def read_holdings_with_anchors(
 
 
 def read_holdings(
-    record: List[RawHolding],
-    regime: Optional[Regime] = None,
-    code: Optional[Code] = None,
+    record: List[RawHolding], client: Optional[Client] = None
 ) -> List[Holding]:
     r"""
     Load a list of :class:`Holdings`\s from JSON.
@@ -348,9 +352,14 @@ def read_holdings(
         a list of :class:`.Holding` objects
     """
     schema = schemas.HoldingSchema(many=True)
+
+    record, enactment_index = collect_enactments(record)
     record, schema.context["mentioned"] = index_names(record)
-    schema.context["regime"] = regime
-    schema.context["code"] = code
+
+    if client:
+        enactment_index = client.update_entries_in_enactment_index(enactment_index)
+    schema.context["enactment_index"] = enactment_index
+
     return schema.load(deepcopy(record))
 
 
