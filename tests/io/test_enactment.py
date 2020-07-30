@@ -51,6 +51,13 @@ class TestEnactmentImport:
         enactment = readers.read_enactment(input_enactment)
         assert enactment.selected_text() == ""
 
+    def test_true_as_selection(self):
+        input_enactment = self.test_enactment.copy()
+        input_enactment["selection"] = True
+
+        enactment = readers.read_enactment(input_enactment)
+        assert enactment.selected_text() == ""
+
     def test_enactment_import_from_holding(self):
         holding_cardenas = load_holdings("holding_cardenas.json")
         holdings = readers.read_holdings(holding_cardenas)
