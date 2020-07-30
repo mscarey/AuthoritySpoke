@@ -13,6 +13,7 @@ from anchorpoint.textselectors import TextQuoteSelector
 from bs4 import BeautifulSoup
 from legislice import Enactment
 from legislice.download import Client
+from legislice.name_index import collect_enactments
 
 from authorityspoke.decisions import Decision
 from authorityspoke.codes import Code, USCCode, USLMCode, USConstCode, CalCode, CFRCode
@@ -127,7 +128,7 @@ def read_code(xml: BeautifulSoup):
     return code_class(xml, title, uri)
 
 
-def read_enactment(record: RawEnactment, client: Client) -> Enactment:
+def read_enactment(record: RawEnactment, client: Optional[Client] = None) -> Enactment:
     r"""
     Create a new :class:`.Enactment` object using imported JSON data.
 
@@ -141,13 +142,13 @@ def read_enactment(record: RawEnactment, client: Client) -> Enactment:
     :returns:
         a new :class:`Enactment` object, optionally with text links.
     """
+    if client is None:
+        client = Client()
     return client.read_from_json(record)
 
 
 def read_enactments(
-    record: List[RawEnactment],
-    code: Optional[Code] = None,
-    regime: Optional[Regime] = None,
+    record: List[RawEnactment], client: Optional[Client]
 ) -> List[Enactment]:
     r"""
     Create a new :class:`Enactment` object using imported JSON data.
@@ -159,22 +160,17 @@ def read_enactments(
         sequence of :class:`dict`\s with string fields from JSON for
         constructing new :class:`.Enactment`\s
 
-    :param code:
-        a :class:`.Code` that is the source for every :class:`Enactment`
-        to be loaded, if they all come from the same :class:`.Code`
-
-    :param regime:
-        the :class:`.Regime` where the :class:`.Code`\s that are the
-        source for this :class:`Enactment` can be found, or where
-        it should be added
+    :param client:
+        Legislice client for downloading missing fields from `record`
 
     :returns:
         a list of new :class:`Enactment` objects, optionally with text links.
     """
     schema = schemas.EnactmentSchema(many=True)
-    record, schema.context["mentioned"] = index_names(record)
-    schema.context["regime"] = regime
-    schema.context["code"] = code
+    record, enactment_index = collect_enactments(record)
+    if client:
+        enactment_index = client.update_entries_in_enactment_index(enactment_index)
+    schema.context["enactment_index"] = enactment_index
     return schema.load(deepcopy(record))
 
 
