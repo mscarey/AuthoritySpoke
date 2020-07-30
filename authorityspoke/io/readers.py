@@ -148,7 +148,7 @@ def read_enactment(record: RawEnactment, client: Optional[Client] = None) -> Ena
 
 
 def read_enactments(
-    record: List[RawEnactment], client: Optional[Client]
+    record: List[RawEnactment], client: Optional[Client] = None
 ) -> List[Enactment]:
     r"""
     Create a new :class:`Enactment` object using imported JSON data.
