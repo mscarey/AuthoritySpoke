@@ -9,6 +9,7 @@ import pathlib
 from typing import Any, Dict, List, Iterator, Optional, Tuple, Union
 
 from bs4 import BeautifulSoup
+from legislice.download import Client
 
 from authorityspoke.decisions import Decision
 from authorityspoke.codes import Code
@@ -107,7 +108,7 @@ def load_rules_with_index(
     filename: Optional[str] = None,
     directory: Optional[pathlib.Path] = None,
     filepath: Optional[pathlib.Path] = None,
-    regime: Optional[Regime] = None,
+    client: Optional[Client] = None,
     many: bool = True,
 ) -> Tuple[List[Rule], Mentioned]:
     r"""
@@ -131,7 +132,7 @@ def load_rules_with_index(
         mentioned in the holding.
     """
     raw_rules = load_holdings(filename=filename, directory=directory, filepath=filepath)
-    return readers.read_rules_with_index(raw_rules, regime=regime, many=many)
+    return readers.read_rules_with_index(raw_rules, client=client, many=many)
 
 
 def load_and_read_holdings(

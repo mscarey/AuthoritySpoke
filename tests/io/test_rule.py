@@ -42,15 +42,15 @@ class TestLoadRules:
         beard_code = loaders.load_and_read_code("beard_tax_act.xml")
         assert beard_code.jurisdiction == "au"
 
-    def test_loading_rules(self, make_regime):
-        beard_rules, mentioned = loaders.load_rules_with_index(
-            "beard_rules.json", regime=make_regime
+    def test_loading_rules(self):
+        beard_rules = loaders.load_rules_with_index(
+            "beard_rules.json", client=self.client
         )
         assert beard_rules[0].outputs[0].content == "{} was a beard"
 
-    def test_imported_rule_is_type_rule(self, make_regime):
-        beard_rules, mentioned = loaders.load_rules_with_index(
-            "beard_rules.json", regime=make_regime
+    def test_imported_rule_is_type_rule(self):
+        beard_rules = loaders.load_rules_with_index(
+            "beard_rules.json", client=self.client
         )
         assert isinstance(beard_rules[0], Rule)
 
