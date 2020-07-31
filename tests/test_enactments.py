@@ -102,9 +102,11 @@ class TestEnactments:
         assert e_due_process_5 >= e_due_process_14
 
     def test_unequal_enactment_text(self, e_search_clause, e_fourth_a):
+        e_fourth_a.select_all()
         assert e_search_clause != e_fourth_a
 
     def test_enactment_subset(self, e_search_clause, e_fourth_a):
+        e_fourth_a.select_all()
         assert e_search_clause < e_fourth_a
 
     def test_comparison_to_factor_false(self, e_due_process_5, watt_factor):
@@ -180,13 +182,14 @@ class TestEnactments:
         assert passage in combined.text
 
     def test_add_shorter_plus_longer(self, e_fourth_a, e_search_clause):
+        e_fourth_a.select_all()
         combined = e_search_clause + e_fourth_a
 
         assert combined.selected_text() == e_fourth_a.selected_text()
         assert combined.means(e_fourth_a)
 
     def test_add_longer_plus_shorter(self, e_fourth_a, e_search_clause):
-
+        e_fourth_a.select_all()
         combined = e_fourth_a + e_search_clause
 
         assert combined.selected_text() == e_fourth_a.selected_text()
@@ -202,6 +205,8 @@ class TestEnactments:
         schema = EnactmentSchema()
 
         fourth = schema.load(fourth_a)
+        fourth.select_all()
+
         search = schema.load(search_clause)
         warrants = schema.load(warrants_clause)
 
