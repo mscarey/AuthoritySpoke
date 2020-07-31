@@ -311,6 +311,41 @@
             },
             {
                 "node": "/us/cfr/t37/s202.1",
+                "heading": "Material not subject to copyright.",
+                "content": "The following are examples of works not subject to copyright and applications for registration of such works cannot be entertained:",
+                "children": [
+                    {
+                        "node": "/us/cfr/t37/s202.1/a",
+                        "start_date": "1992-02-21",
+                        "heading": "",
+                        "content": "Words and short phrases such as names, titles, and slogans; familiar symbols or designs; mere variations of typographic ornamentation, lettering or coloring; mere listing of ingredients or contents;"
+                    },
+                    {
+                        "node": "/us/cfr/t37/s202.1/b",
+                        "start_date": "1992-02-21",
+                        "heading": "",
+                        "content": "Ideas, plans, methods, systems, or devices, as distinguished from the particular manner in which they are expressed or described in a writing;  "
+                    },
+                    {
+                        "node": "/us/cfr/t37/s202.1/c",
+                        "start_date": "1992-02-21",
+                        "heading": "",
+                        "content": "Blank forms, such as time cards, graph paper, account books, diaries, bank checks, scorecards, address books, report forms, order forms and the like, which are designed for recording information and do not in themselves convey information;"
+                    },
+                    {
+                        "node": "/us/cfr/t37/s202.1/d",
+                        "start_date": "1992-02-21",
+                        "heading": "",
+                        "content": "Works consisting entirely of information that is common property containing no original authorship, such as, for example: Standard calendars, height and weight charts, tape measures and rulers, schedules of sporting events, and lists or tables taken from public documents or other common sources."
+                    },
+                    {
+                        "node": "/us/cfr/t37/s202.1/e",
+                        "start_date": "1992-02-21",
+                        "heading": "",
+                        "content": "Typeface as typeface."
+                    }
+                ],
+                "start_date": "1992-02-21",
                 "name": "short phrases copyright exception",
                 "suffix": "familiar symbols or designs"
             }

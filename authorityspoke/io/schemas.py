@@ -12,7 +12,6 @@ from anchorpoint.schemas import SelectorSchema as AnchorSchema
 from legislice import Enactment
 from legislice.schemas import EnactmentSchema
 
-from authorityspoke.codes import Code
 from authorityspoke.decisions import CaseCitation, Decision
 from authorityspoke.entities import Entity
 from authorityspoke.evidence import Exhibit, Evidence

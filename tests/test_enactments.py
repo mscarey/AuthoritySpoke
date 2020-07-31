@@ -24,7 +24,7 @@ class TestEnactments:
         assert search_clause.selected_text().endswith("shall not be violated...")
 
     @pytest.mark.vcr
-    def test_create_enactment_with_init(self, make_code):
+    def test_create_enactment_with_init(self):
         """
         Using the __init__ method of the Enactment class, insteaid of
         readers.read_enactment or the Enactment marshmallow schema.
@@ -59,10 +59,10 @@ class TestEnactments:
         assert fourth_a.selected_text() == "...the persons or things..."
 
     @pytest.mark.vcr
-    def test_passage_from_imported_statute(self, make_regime):
+    def test_passage_from_imported_statute(self):
         oracle_majority = loaders.load_and_read_decision(f"oracle_h.json").majority
         raw_holdings = loaders.load_holdings("holding_oracle.json")
-        holdings = readers.read_holdings(raw_holdings, regime=make_regime)
+        holdings = readers.read_holdings(raw_holdings, client=self.client)
         oracle_majority.posit(holdings)
         despite_text = str(list(oracle_majority.holdings)[5])
         assert "In no case does copyright protection " in despite_text

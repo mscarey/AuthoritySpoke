@@ -292,9 +292,9 @@ class TestSameMeaning:
         f = make_factor
         assert not f["f_three_entities"].means(f["f_repeating_entity"])
 
-    def test_unequal_to_enactment(self, watt_factor, enactment_copyright):
-        assert not watt_factor["f1"].means(enactment_copyright)
-        assert not enactment_copyright.means(watt_factor["f1"])
+    def test_unequal_to_enactment(self, watt_factor, e_copyright):
+        assert not watt_factor["f1"].means(e_copyright)
+        assert not e_copyright.means(watt_factor["f1"])
 
     def test_standard_of_proof_inequality(self, watt_factor):
 

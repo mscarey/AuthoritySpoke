@@ -273,8 +273,8 @@ def read_holding(record: RawHolding, client: Optional[Client] = None) -> Holding
 
     schema = schemas.HoldingSchema(many=False)
 
-    record, schema.context["mentioned"] = index_names(record)
     record, enactment_index = collect_enactments(record)
+    record, schema.context["mentioned"] = index_names(record)
     if client:
         enactment_index = client.update_entries_in_enactment_index(enactment_index)
     schema.context["enactment_index"] = enactment_index
@@ -291,13 +291,15 @@ class HoldingsIndexed(NamedTuple):
 
 
 def read_holdings_with_index(
-    record: List[RawHolding], regime: Optional[Regime] = None, many: bool = True
+    record: List[RawHolding], client: Optional[Client] = None, many: bool = True
 ) -> HoldingsIndexed:
     r"""Load a list of :class:`Holdings`\s from JSON, with "mentioned" index."""
-    record, mentioned = index_names(record)
+    record, enactment_index = collect_enactments(record)
+    record, schema.context["mentioned"] = index_names(record)
+    if client:
+        enactment_index = client.update_entries_in_enactment_index(enactment_index)
+    schema.context["enactment_index"] = enactment_index
     schema = schemas.HoldingSchema(many=many)
-    schema.context["regime"] = regime
-    schema.context["mentioned"] = mentioned
     anchor_list = anchors.get_holding_anchors(record)
     holdings = schema.load(deepcopy(record))
     return HoldingsIndexed(holdings, mentioned, anchor_list)
@@ -392,7 +394,7 @@ def read_rules_with_index(
     return rules, mentioned
 
 
-def read_rule(record: Dict, regime: Optional[Regime] = None) -> Rule:
+def read_rule(record: Dict, client: Optional[Client] = None) -> Rule:
     r"""
     Make :class:`Rule` from a :class:`dict` of fields and a :class:`.Regime`\.
 
@@ -404,14 +406,17 @@ def read_rule(record: Dict, regime: Optional[Regime] = None) -> Rule:
         iterator yielding :class:`Rule`\s with the items
         from ``mentioned_entities`` as ``context_factors``
     """
-    record, mentioned = index_names(record)
     schema = schemas.RuleSchema()
-    schema.context["mentioned"] = mentioned
-    schema.context["regime"] = regime
+    record, enactment_index = collect_enactments(record)
+    record, schema.context["mentioned"] = index_names(record)
+
+    if client:
+        enactment_index = client.update_entries_in_enactment_index(enactment_index)
+    schema.context["enactment_index"] = enactment_index
     return schema.load(record)
 
 
-def read_rules(record: List[Dict], regime: Optional[Regime] = None) -> List[Rule]:
+def read_rules(record: List[Dict], client: Optional[Client] = None) -> List[Rule]:
     r"""
     Make :class:`Rule`\s from a list of fields and a :class:`.Regime`\.
 
@@ -423,8 +428,12 @@ def read_rules(record: List[Dict], regime: Optional[Regime] = None) -> List[Rule
         iterator yielding :class:`Rule`\s with the items
         from ``mentioned_entities`` as ``context_factors``
     """
-    record, mentioned = index_names(record)
+
     schema = schemas.RuleSchema(many=True)
-    schema.context["mentioned"] = mentioned
-    schema.context["regime"] = regime
+    record, enactment_index = collect_enactments(record)
+    record, schema.context["mentioned"] = index_names(record)
+
+    if client:
+        enactment_index = client.update_entries_in_enactment_index(enactment_index)
+    schema.context["enactment_index"] = enactment_index
     return schema.load(record)

@@ -1,5 +1,5 @@
 -e .
-anchorpoint>=0.3.3
+-e git+https://github.com/mscarey/anchorpoint.git#egg=anchorpoint
 apispec[validation]
 beautifulsoup4>=4.8.1
 -e git+https://github.com/mscarey/legislice.git#egg=legislice

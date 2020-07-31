@@ -24,6 +24,8 @@ class TestLoadRules:
     reference to any Opinion or Holding.
     """
 
+    client = Client(api_token=TOKEN)
+
     def test_loading_code(self):
         beard_code = loaders.load_and_read_code("beard_tax_act.xml")
         assert beard_code.jurisdiction == "au"
@@ -66,10 +68,10 @@ class TestLoadRules:
         key = "the Department of Beards granted the defendant's beard exemption"
         assert mentioned[key]["context_factors"][0] == "the Department of Beards"
 
-    def test_read_rules_without_regime(self, make_code):
+    @pytest.mark.vcr
+    def test_read_rules_without_regime(self):
         beard_dictionary = loaders.load_holdings("beard_rules.json")
-        beard_code = make_code["beard_act"]
-        beard_rules = readers.read_rules(beard_dictionary, beard_code)
+        beard_rules = readers.read_rules(beard_dictionary, client=self.client)
         assert beard_rules[0].inputs[0].short_string == (
             "the fact that <the suspected beard> was facial hair"
         )
