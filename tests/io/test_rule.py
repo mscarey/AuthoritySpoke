@@ -1,6 +1,18 @@
+import os
+
+from dotenv import load_dotenv
+import pytest
+
 from authorityspoke.io import dump, loaders, name_index, readers
 from authorityspoke.evidence import Exhibit
 from authorityspoke.rules import Rule
+
+
+from legislice.download import Client
+
+load_dotenv()
+
+TOKEN = os.getenv("LEGISLICE_API_TOKEN")
 
 
 class TestRuleDump:
