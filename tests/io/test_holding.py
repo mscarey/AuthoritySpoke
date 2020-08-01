@@ -1,12 +1,15 @@
 from collections import OrderedDict
+import os
 
 from marshmallow import ValidationError
 import pytest
+import vcr
 
 from anchorpoint.textselectors import TextQuoteSelector
+from dotenv import load_dotenv
 from legislice import Enactment
+from legislice.download import Client
 
-from authorityspoke.codes import Code
 from authorityspoke.entities import Entity
 from authorityspoke.facts import Fact
 from authorityspoke.holdings import Holding
@@ -18,20 +21,25 @@ from authorityspoke.io.loaders import load_holdings
 from authorityspoke.io import filepaths, text_expansion
 from authorityspoke.rules import Rule
 
+load_dotenv()
+
+TOKEN = os.getenv("LEGISLICE_API_TOKEN")
+legislice_client = Client(api_token=TOKEN)
+
 
 class TestHoldingDump:
-    def test_dump_holding(self, make_holding):
+    client = Client(api_token=TOKEN)
+
+    @vcr.use_cassette()
+    def test_dump_and_read_holding(self, make_holding):
         holding = make_holding["h2"]
         dumped = dump.to_dict(holding)
         content = dumped["rule"]["procedure"]["inputs"][0]["predicate"]["content"]
         assert content == "{} was on the premises of {}"
 
-    def test_dump_and_read_rule(self, make_holding, make_regime):
-        holding = make_holding["h2"]
-        dumped = dump.to_dict(holding)
-        loaded = readers.read_holding(dumped, regime=make_regime)
-        content = loaded.despite[0].predicate.content
-        assert "the distance between {} and {} was" in content
+        loaded = readers.read_holding(dumped, client=self.client)
+        loaded_content = loaded.despite[0].predicate.content
+        assert "the distance between {} and {} was" in loaded_content
 
 
 class TestEntityImport:

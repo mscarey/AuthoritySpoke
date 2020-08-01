@@ -1255,12 +1255,13 @@ def make_decision():
     return load_decisions_for_fixtures()
 
 
+@vcr.use_cassette()
 @pytest.fixture(scope="class")
-def make_decision_with_holding(make_decision, make_regime):
+def make_decision_with_holding():
     decisions = load_decisions_for_fixtures()
     for case in TEST_CASES:
         holdings, mentioned, holding_anchors = loaders.load_holdings_with_index(
-            f"holding_{case}.json", regime=make_regime
+            f"holding_{case}.json", client=legislice_client,
         )
         named_anchors = anchors.get_named_anchors(mentioned)
         decisions[case].majority.posit(

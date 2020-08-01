@@ -166,26 +166,26 @@ def load_holdings_with_index(
     filename: Optional[str] = None,
     directory: Optional[pathlib.Path] = None,
     filepath: Optional[pathlib.Path] = None,
-    regime: Optional[Regime] = None,
+    client: Optional[Client] = None,
 ) -> readers.HoldingsIndexed:
     """Read holdings with factor index from a file."""
     raw_holdings = load_holdings(
         filename=filename, directory=directory, filepath=filepath
     )
-    return readers.read_holdings_with_index(raw_holdings, regime=regime)
+    return readers.read_holdings_with_index(raw_holdings, client=client)
 
 
 def load_holdings_with_anchors(
     filename: Optional[str] = None,
     directory: Optional[pathlib.Path] = None,
     filepath: Optional[pathlib.Path] = None,
-    regime: Optional[Regime] = None,
+    client: Optional[Client] = None,
 ) -> AnchoredHoldings:
     """Read holdings from file, with Opinion text anchors for holdings and factors."""
     raw_holdings = load_holdings(
         filename=filename, directory=directory, filepath=filepath
     )
-    return readers.read_holdings_with_anchors(raw_holdings, regime=regime)
+    return readers.read_holdings_with_anchors(raw_holdings, client=client)
 
 
 def load_decision(

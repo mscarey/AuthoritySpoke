@@ -306,7 +306,7 @@ def read_holdings_with_index(
 
 
 def read_holdings_with_anchors(
-    record: List[RawHolding], regime: Optional[Regime] = None, many: bool = True
+    record: List[RawHolding], client: Optional[Client] = None, many: bool = True
 ) -> AnchoredHoldings:
     r"""
     Load a list of :class:`Holding`\s from JSON, with text links.
@@ -330,7 +330,7 @@ def read_holdings_with_anchors(
     """
 
     holdings, mentioned, holding_anchors = read_holdings_with_index(
-        record=record, regime=regime, many=many
+        record=record, client=client, many=many
     )
     text_anchors = anchors.get_named_anchors(mentioned)
     return AnchoredHoldings(holdings, holding_anchors, text_anchors)
@@ -383,13 +383,20 @@ def read_decision(decision_dict: RawDecision) -> Decision:
 
 
 def read_rules_with_index(
-    record: List[RawRule], regime: Optional[Regime] = None, many: bool = True
+    record: List[RawRule], client: Optional[Client] = None, many: bool = True
 ) -> Tuple[List[Rule], Mentioned]:
     r"""Make :class:`Rule` and "mentioned" index from dict of fields and :class:`.Regime`\."""
-    record, mentioned = index_names(record)
+
     schema = schemas.RuleSchema(many=many)
-    schema.context["regime"] = regime
+    record, enactment_index = collect_enactments(record)
+
+    if client:
+        enactment_index = client.update_entries_in_enactment_index(enactment_index)
+    record, mentioned = index_names(record)
+    schema.context["enactment_index"] = enactment_index
+
     schema.context["mentioned"] = mentioned
+
     rules = schema.load(deepcopy(record))
     return rules, mentioned
 
