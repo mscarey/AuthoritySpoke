@@ -21,7 +21,7 @@ class TestEnactmentImport:
         "heading": "",
         "content": "Except as otherwise provided by statute, all relevant evidence is admissible.",
         "name": "s351",
-        "node": "/us-ca/evid/s351",
+        "node": "/us-ca/code/evid/s351",
         "start_date": "1966-01-01",
     }
 
@@ -63,3 +63,15 @@ class TestEnactmentImport:
         holdings = readers.read_holdings(holding_cardenas)
         enactment_list = holdings[0].enactments
         assert "all relevant evidence is admissible" in enactment_list[0].text
+
+    @pytest.mark.vcr
+    def test_enactment_does_not_fail_for_excess_selector(self):
+        """Test selector that extends into the text of a subnode."""
+        exact = (
+            "In this Act, beard means any facial hair no shorter "
+            "than 5 millimetres in length that: occurs on or below the chin"
+        )
+        record = {"node": "/test/acts/47/4", "exact": exact}
+
+        enactment = readers.read_enactment(record, client=self.client)
+        assert enactment.selected_text() == exact + "..."

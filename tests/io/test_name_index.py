@@ -1,8 +1,21 @@
+import os
+
+from dotenv import load_dotenv
+import pytest
+
+from legislice.download import Client
+
+load_dotenv()
+
+TOKEN = os.getenv("LEGISLICE_API_TOKEN")
+
 from authorityspoke.io import loaders, readers, schemas
 from authorityspoke.io import name_index, text_expansion
 
 
 class TestCollectMentioned:
+    client = Client(api_token=TOKEN)
+
     def test_mentioned_from_entity(self):
         obj = {"type": "Entity", "name": "Ann"}
         obj, mentioned = name_index.collect_mentioned(obj)
@@ -83,6 +96,7 @@ class TestCollectMentioned:
         shortest = mentioned.popitem()
         assert shortest[0] == "Short Name"
 
+    @pytest.mark.vcr
     def test_name_inferred_from_content(self, make_regime):
         """
         Test that a name field is generated for Factors without them.
@@ -91,20 +105,22 @@ class TestCollectMentioned:
         """
 
         oracle_records = loaders.load_holdings("holding_oracle.json")
-        oracle_holdings = readers.read_holdings(oracle_records, regime=make_regime)
+        oracle_holdings = readers.read_holdings(oracle_records, client=self.client)
         factor = oracle_holdings[2].inputs[0]
         assert factor.content == "{} was an original work"
 
-    def test_enactment_name_index(self, make_regime):
+    @pytest.mark.vcr
+    def test_enactment_name_index(self):
         """
         Test error message:
         'Name "securing for authors" not found in the index of mentioned Factors'
         """
         feist_records = loaders.load_holdings("holding_feist.json")
-        record, mentioned = name_index.index_names(feist_records)
+        record, mentioned = name_index.index_names(feist_records, client=self.client)
         assert "securing for authors" in mentioned
 
-    def test_context_factor_not_collapsed(self, make_regime):
+    @pytest.mark.vcr
+    def test_context_factor_not_collapsed(self):
         """
         There is a context factor listed for this Fact, but it hasn't been collapsed
         in the content phrase.
@@ -126,18 +142,19 @@ class TestCollectMentioned:
             },
         }
         holding = text_expansion.expand_shorthand(holding)
-        built = readers.read_holding(record=holding, regime=make_regime)
+        built = readers.read_holding(record=holding, client=self.client)
         assert built.inputs[0].short_string.startswith(
             "the fact that <Rural's telephone listings> were names"
         )
 
+    @pytest.mark.vcr
     def test_enactment_name_in_holding(self, make_regime):
         """
         Test error message:
         'Name "securing for authors" not found in the index of mentioned Factors'
         """
         feist_records = loaders.load_holdings("holding_feist.json")
-        feist_holding = readers.read_holding(feist_records[0], regime=make_regime)
+        feist_holding = readers.read_holding(feist_records[0], client=self.client)
         assert "securing for limited Times" in feist_holding.short_string
 
 

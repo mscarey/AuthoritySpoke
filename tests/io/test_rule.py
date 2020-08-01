@@ -16,6 +16,8 @@ TOKEN = os.getenv("LEGISLICE_API_TOKEN")
 
 
 class TestRuleDump:
+    client = Client(api_token=TOKEN)
+
     def test_dump_rule(self, make_rule):
         rule = make_rule["h2"]
         dumped = dump.to_dict(rule)
@@ -25,7 +27,7 @@ class TestRuleDump:
     def test_dump_and_read_rule(self, make_rule, make_regime):
         rule = make_rule["h2"]
         dumped = dump.to_dict(rule)
-        loaded = readers.read_rule(dumped, regime=make_regime)
+        loaded = readers.read_rule(dumped, client=self.client)
         content = loaded.despite[0].predicate.content
         assert "the distance between {} and {} was" in content
 
@@ -47,7 +49,7 @@ class TestLoadRules:
 
     @pytest.mark.vcr
     def test_imported_rule_is_type_rule(self):
-        beard_rules = loaders.load_rules_with_index(
+        beard_rules, mentioned = loaders.load_rules_with_index(
             "beard_rules.json", client=self.client
         )
         assert isinstance(beard_rules[0], Rule)

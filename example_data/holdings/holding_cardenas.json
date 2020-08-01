@@ -50,24 +50,24 @@
                 "heading": "",
                 "content": "Except as otherwise provided by statute, all relevant evidence is admissible.",
                 "name": "s351",
-                "node": "/us-ca/evid/s351",
+                "node": "/us-ca/code/evid/s351",
                 "start_date": "1966-01-01"
             },
             {
-                "node": "/us-ca/evid/s352",
+                "node": "/us-ca/code/evid/s352",
                 "name": "s352",
                 "heading": "",
                 "content": "The court in its discretion may exclude evidence if its probative value is substantially outweighed by the probability that its admission will",
                 "children": [
                     {
-                        "node": "/us-ca/evid/s352/a",
+                        "node": "/us-ca/code/evid/s352/a",
                         "heading": "",
                         "content": "necessitate undue consumption of time or",
                         "selection": false,
                         "start_date": "1966-01-01"
                     },
                     {
-                        "node": "/us-ca/evid/s352/b",
+                        "node": "/us-ca/code/evid/s352/b",
                         "heading": "",
                         "content": "create substantial danger of undue prejudice, of confusing the issues, or of misleading the jury.",
                         "name": "substantial danger",
@@ -79,7 +79,7 @@
                 "start_date": "1966-01-01"
             },
             {
-                "node": "/us-ca/evid/s352/b",
+                "node": "/us-ca/code/evid/s352/b",
                 "heading": "",
                 "content": "create substantial danger of undue prejudice, of confusing the issues, or of misleading the jury.",
                 "exact": "create substantial danger of undue prejudice",
@@ -88,7 +88,7 @@
                 "start_date": "1966-01-01"
             },
             {
-                "node": "/us-ca/pen/s211",
+                "node": "/us-ca/code/pen/s211",
                 "heading": "",
                 "name": "Robbery statute",
                 "content": "Robbery is the felonious taking of personal property in the possession of another, from his person or immediate presence, and against his will, accomplished by means of force or fear.",
@@ -96,7 +96,7 @@
                 "start_date": "1873-01-01"
             },
             {
-                "node": "/us-ca/pen/s664",
+                "node": "/us-ca/code/pen/s664",
                 "content": "Every person who attempts to commit any crime, but fails, or is prevented or intercepted in its perpetration, shall be punished where no provision is made by law for the punishment of those attempts, [text omitted]",
                 "children": [],
                 "heading": "",

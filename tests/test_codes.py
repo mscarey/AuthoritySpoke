@@ -40,8 +40,8 @@ class TestCodes:
             ("usc17", "/us/usc/t17"),
             ("const", "/us/const"),
             ("cfr37", "/us/cfr/t37"),
-            ("ca_evid", "/us-ca/evid"),
-            ("ca_pen", "/us-ca/pen"),
+            ("ca_evid", "/us-ca/code/evid"),
+            ("ca_pen", "/us-ca/code/pen"),
             ("beard_act", "/au/act/1934/47"),
         ],
     )
