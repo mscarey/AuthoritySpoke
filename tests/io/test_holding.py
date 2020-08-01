@@ -3,12 +3,12 @@ import os
 
 from marshmallow import ValidationError
 import pytest
-import vcr
 
 from anchorpoint.textselectors import TextQuoteSelector
 from dotenv import load_dotenv
 from legislice import Enactment
 from legislice.download import Client
+from legislice.name_index import collect_enactments
 
 from authorityspoke.entities import Entity
 from authorityspoke.facts import Fact
@@ -30,7 +30,7 @@ legislice_client = Client(api_token=TOKEN)
 class TestHoldingDump:
     client = Client(api_token=TOKEN)
 
-    @vcr.use_cassette()
+    @pytest.mark.vcr
     def test_dump_and_read_holding(self, make_holding):
         holding = make_holding["h2"]
         dumped = dump.to_dict(holding)
@@ -95,6 +95,8 @@ class TestEntityImport:
 
 
 class TestHoldingImport:
+    client = Client(api_token=TOKEN)
+
     def test_import_some_holdings(self, make_regime):
         """
         Now generates 10, instead of 12, because the "exclusive" Holding
@@ -104,7 +106,8 @@ class TestHoldingImport:
         lotus_holdings = load_holdings("holding_lotus.json")
         assert len(lotus_holdings) == 10
 
-    def test_import_enactments_and_anchors(self, make_regime, make_opinion):
+    @pytest.mark.vcr
+    def test_import_enactments_and_anchors(self, make_opinion):
         """
         Testing issue that caused enactment expansion to fail only when
         text anchors were loaded.
@@ -137,7 +140,7 @@ class TestHoldingImport:
                 },
                 "enactments": [
                     {
-                        "node": "/us/const/article-I/8/8",
+                        "node": "/us/const/article/I/8/8",
                         "exact": (
                             "To promote the Progress of Science and useful Arts, "
                             "by securing for limited Times to Authors"
@@ -145,7 +148,7 @@ class TestHoldingImport:
                         "name": "securing for authors",
                     },
                     {
-                        "node": "/us/const/article-I/8/8",
+                        "node": "/us/const/article/I/8/8",
                         "exact": "the exclusive Right to their respective Writings",
                         "name": "right to writings",
                     },
@@ -170,13 +173,12 @@ class TestHoldingImport:
                 "anchors": "compilations of facts|generally are|",
             },
         ]
-        record, mentioned = name_index.index_names(raw_holdings)
-        holding_anchors = anchors.get_holding_anchors(record)
-        named_anchors = anchors.get_named_anchors(mentioned)
-        schema = schemas.HoldingSchema(many=True)
-        schema.context["mentioned"] = mentioned
-        schema.context["regime"] = make_regime
-        feist_holdings = schema.load(record)
+        (
+            feist_holdings,
+            holding_anchors,
+            named_anchors,
+        ) = readers.read_holdings_with_anchors(record=raw_holdings, client=self.client)
+
         feist = make_opinion["feist_majority"]
         feist.posit(
             feist_holdings, holding_anchors=holding_anchors, named_anchors=named_anchors
