@@ -419,18 +419,7 @@ class TestTextAnchors:
         """
         to_read = load_holdings("holding_watt.json")
         holdings = readers.read_holdings(to_read, client=self.client)
-        assert holdings[0].enactments[0] == holdings[1].enactments[0]
-
-    @pytest.mark.vcr
-    def test_different_enactments_same_code(self):
-        """
-        Don't expect the holdings imported from the JSON to
-        exactly match the holdings created for testing in conftest.
-        """
-        to_read = load_holdings("holding_lotus.json")
-        holdings = readers.read_holdings(to_read, client=self.client)
-        assert holdings[0].enactments[0].code == holdings[1].enactments[0].code
-        assert holdings[0].enactments[0].code is holdings[1].enactments[0].code
+        assert holdings[0].enactments[0].means(holdings[1].enactments[0])
 
     @pytest.mark.vcr
     def test_same_enactment_in_two_opinions(self):
@@ -567,7 +556,7 @@ class TestTextAnchors:
             "outputs": [{"type": "fact", "content": "the dog bit the man"}],
             "enactments": [{"node": "/us/const/amendment/IV"}],
         }
-        with pytest.raises(ValueError):
+        with pytest.raises(ValidationError):
             readers.read_holding(rule_dict)
 
     def test_repeating_read_holdings_has_same_result(self, make_analysis):
@@ -592,7 +581,12 @@ class TestExclusiveFlag:
     client = Client(api_token=TOKEN)
 
     @pytest.mark.vcr
-    def test_holding_flagged_exclusive(self, make_enactment):
+    def test_holding_flagged_exclusive(
+        self,
+        e_securing_for_authors,
+        e_right_to_writings,
+        e_copyright_requires_originality,
+    ):
         """
         Test that "exclusive" flag doesn't mess up the holding where it's placed.
 
@@ -609,9 +603,9 @@ class TestExclusiveFlag:
         original = Fact(Predicate("{} was an original work"), directory)
         copyrightable = Fact(Predicate("{} was copyrightable"), directory)
         originality_enactments = [
-            make_enactment["securing_for_authors"],
-            make_enactment["right_to_writings"],
-            make_enactment["copyright_requires_originality"],
+            e_securing_for_authors,
+            e_right_to_writings,
+            e_copyright_requires_originality,
         ]
         originality_rule = Rule(
             Procedure(outputs=copyrightable, inputs=original),

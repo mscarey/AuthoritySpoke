@@ -718,6 +718,7 @@ def e_copyright(make_selector):
 def e_copyright_requires_originality(make_selector):
     enactment = legislice_client.read(path="/us/usc/t17/s102/a")
     enactment.select(make_selector["copyright_requires_originality"])
+    return enactment
 
 
 @vcr.use_cassette()
