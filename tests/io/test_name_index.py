@@ -116,7 +116,7 @@ class TestCollectMentioned:
         'Name "securing for authors" not found in the index of mentioned Factors'
         """
         feist_records = loaders.load_holdings("holding_feist.json")
-        record, mentioned = name_index.index_names(feist_records, client=self.client)
+        record, mentioned = name_index.index_names(feist_records)
         assert "securing for authors" in mentioned
 
     @pytest.mark.vcr

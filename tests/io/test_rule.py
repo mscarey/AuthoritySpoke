@@ -42,7 +42,7 @@ class TestLoadRules:
 
     @pytest.mark.vcr
     def test_loading_rules(self):
-        beard_rules = loaders.load_rules_with_index(
+        beard_rules, mentioned = loaders.load_rules_with_index(
             "beard_rules.json", client=self.client
         )
         assert beard_rules[0].outputs[0].content == "{} was a beard"

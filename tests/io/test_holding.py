@@ -97,7 +97,7 @@ class TestEntityImport:
 class TestHoldingImport:
     client = Client(api_token=TOKEN)
 
-    def test_import_some_holdings(self, make_regime):
+    def test_import_some_holdings(self):
         """
         Now generates 10, instead of 12, because the "exclusive" Holding
         is stored with that flag instead of generating Holdings that it
@@ -186,36 +186,38 @@ class TestHoldingImport:
         assert feist.holdings[0].enactments[0].name == "securing for authors"
         assert feist.holdings[1].enactments[0].name == "securing for authors"
 
-    def test_read_holdings_and_then_get_anchors(self, make_regime):
+    @pytest.mark.vcr
+    def test_read_holdings_and_then_get_anchors(self):
         """
         Test whether read_holdings mutates raw_holding and makes it
         impossible to get text anchors.
         """
         raw_holdings = load_holdings(f"holding_oracle.json")
         oracle_holdings, mentioned, holding_anchors = readers.read_holdings_with_index(
-            raw_holdings, regime=make_regime
+            raw_holdings, client=self.client
         )
         named_anchors = anchors.get_named_anchors(mentioned)
 
         assert isinstance(oracle_holdings[0], Holding)
         assert isinstance(named_anchors.popitem()[1].pop(), TextQuoteSelector)
 
-        from authorityspoke.io.loaders import load_holdings_with_index
-
-    def test_load_and_posit_holdings_with_anchors(self, make_regime, make_opinion):
+    @pytest.mark.vcr
+    def test_load_and_posit_holdings_with_anchors(self, make_opinion):
         """
         Test that Opinion.posit can take a HoldingsIndexed as the only argument.
         Trying to combine several tasks that normally happen together, into a single command.
         """
         oracle = make_opinion["oracle_majority"]
         oracle_holdings_with_anchors = loaders.load_holdings_with_anchors(
-            "holding_oracle.json", regime=make_regime
+            "holding_oracle.json", client=self.client
         )
         oracle.posit(oracle_holdings_with_anchors)
         assert len(oracle.holdings) == 20
 
 
 class TestTextAnchors:
+    client = Client(api_token=TOKEN)
+
     def test_read_holding_with_no_anchor(self, make_opinion, make_analysis):
         oracle = make_opinion["oracle_majority"]
         raw_analysis = make_analysis["no anchors"]
@@ -242,11 +244,10 @@ class TestTextAnchors:
         record, mentioned = name_index.index_names(watch)
         assert len(mentioned["Mark stole a watch"]["anchors"]) == 2
 
-    def test_posit_one_holding_with_anchor(
-        self, make_opinion, raw_holding, make_regime
-    ):
+    @pytest.mark.vcr
+    def test_posit_one_holding_with_anchor(self, make_opinion, raw_holding):
         holding, mentioned, anchor_list = readers.read_holdings_with_index(
-            raw_holding["bradley_house"], regime=make_regime, many=False
+            raw_holding["bradley_house"], client=self.client, many=False
         )
         cardenas = make_opinion["cardenas_majority"]
         cardenas.posit_holding(
@@ -388,14 +389,15 @@ class TestTextAnchors:
         allegation = built[0].inputs[1]
         assert allegation.statement.context_factors[0].name == "defendant"
 
-    def test_enactment_has_subsection(self, make_regime):
+    def test_enactment_has_subsection(self):
         to_read = load_holdings("holding_lotus.json")
-        holdings = readers.read_holdings(to_read, regime=make_regime)
+        holdings = readers.read_holdings(to_read, client=self.client)
         assert holdings[8].enactments[0].source.split("/")[-1] == "b"
 
-    def test_enactment_text_limited_to_subsection(self, make_regime):
+    @pytest.mark.vcr
+    def test_enactment_text_limited_to_subsection(self):
         to_read = load_holdings("holding_lotus.json")
-        holdings = readers.read_holdings(to_read, regime=make_regime)
+        holdings = readers.read_holdings(to_read, client=self.client)
         assert "architectural works" not in str(holdings[8].enactments[0])
 
     @pytest.mark.xfail
@@ -409,86 +411,90 @@ class TestTextAnchors:
         watt.posit(load_holdings("holding_watt.json"))
         assert watt.holdings[0] == real_holding["h1"]
 
-    def test_same_enactment_objects_equal(self, make_regime):
+    @pytest.mark.vcr
+    def test_same_enactment_objects_equal(self):
         """
         Don't expect the holdings imported from the JSON to
         exactly match the holdings created for testing in conftest.
         """
         to_read = load_holdings("holding_watt.json")
-        holdings = readers.read_holdings(to_read, regime=make_regime)
+        holdings = readers.read_holdings(to_read, client=self.client)
         assert holdings[0].enactments[0] == holdings[1].enactments[0]
 
-    def test_different_enactments_same_code(self, make_regime):
+    @pytest.mark.vcr
+    def test_different_enactments_same_code(self):
         """
         Don't expect the holdings imported from the JSON to
         exactly match the holdings created for testing in conftest.
         """
         to_read = load_holdings("holding_lotus.json")
-        holdings = readers.read_holdings(to_read, regime=make_regime)
+        holdings = readers.read_holdings(to_read, client=self.client)
         assert holdings[0].enactments[0].code == holdings[1].enactments[0].code
         assert holdings[0].enactments[0].code is holdings[1].enactments[0].code
 
-    def test_same_enactment_in_two_opinions(self, make_regime):
+    @pytest.mark.vcr
+    def test_same_enactment_in_two_opinions(self):
         to_read = load_holdings("holding_brad.json")
-        brad_holdings = readers.read_holdings(to_read, regime=make_regime)
+        brad_holdings = readers.read_holdings(to_read, client=self.client)
 
         to_read = load_holdings("holding_watt.json")
-        watt_holdings = readers.read_holdings(to_read, regime=make_regime)
+        watt_holdings = readers.read_holdings(to_read, client=self.client)
 
         assert any(
             watt_holdings[0].enactments[0].means(brad_enactment)
             for brad_enactment in brad_holdings[0].enactments
         )
 
-    def test_same_object_for_enactment_in_import(self, make_regime):
+    @pytest.mark.vcr
+    def test_same_object_for_enactment_in_import(self):
         """
         The JSON for Bradley repeats identical fields to create the same Factor
         for multiple Rules, instead of using the "name" field as a shortcut.
         This tests whether the loaded objects turn out equal.
         """
         to_read = load_holdings("holding_brad.json")
-        holdings = readers.read_holdings(to_read, regime=make_regime)
+        holdings = readers.read_holdings(to_read, client=self.client)
         assert any(holdings[6].inputs[0] == x for x in holdings[5].inputs)
 
-    def test_fact_from_loaded_holding(self, make_regime):
+    @pytest.mark.vcr
+    def test_fact_from_loaded_holding(self):
         to_read = load_holdings("holding_watt.json")
-        holdings = readers.read_holdings(to_read, regime=make_regime)
+        holdings = readers.read_holdings(to_read, client=self.client)
         new_fact = holdings[0].inputs[1]
         assert "lived at <Hideaway Lodge>" in str(new_fact)
         assert isinstance(new_fact.context_factors[0], Entity)
 
-    def test_fact_with_quantity(self, make_regime):
+    @pytest.mark.vcr
+    def test_fact_with_quantity(self):
         to_read = load_holdings("holding_watt.json")
-        holdings = readers.read_holdings(to_read, regime=make_regime)
+        holdings = readers.read_holdings(to_read, client=self.client)
         new_fact = holdings[1].inputs[3]
         assert "was no more than 35 foot" in str(new_fact)
 
-    def test_use_int_not_pint_without_dimension(self, make_regime, make_opinion):
+    def test_use_int_not_pint_without_dimension(self, make_opinion):
 
         brad = make_opinion["brad_majority"]
         to_read = load_holdings("holding_brad.json")
-        holdings = readers.read_holdings(to_read, regime=make_regime)
+        holdings = readers.read_holdings(to_read, client=self.client)
         brad.posit(holdings)
         expectation_not_reasonable = list(brad.holdings)[6]
         assert "dimensionless" not in str(expectation_not_reasonable)
         assert isinstance(expectation_not_reasonable.inputs[0].predicate.quantity, int)
 
-    def test_opinion_posits_holding(self, make_opinion, make_regime):
+    def test_opinion_posits_holding(self, make_opinion):
         brad = make_opinion["brad_majority"]
         to_read = load_holdings("holding_brad.json")
-        holdings = readers.read_holdings(to_read, regime=make_regime)
+        holdings = readers.read_holdings(to_read, client=self.client)
         brad.posit(holdings)
         assert "warrantless search and seizure" in brad.holdings[0].short_string
 
-    def test_opinion_posits_holding_tuple_context(
-        self, make_opinion, make_regime, make_entity
-    ):
+    def test_opinion_posits_holding_tuple_context(self, make_opinion, make_entity):
         """
         Having the Watt case posit a holding from the Brad
         case, but with generic factors from Watt.
         """
         to_read = load_holdings("holding_brad.json")
-        brad_holdings = readers.read_holdings(to_read, regime=make_regime)
+        brad_holdings = readers.read_holdings(to_read, client=self.client)
         context_holding = brad_holdings[6].new_context(
             [make_entity["watt"], make_entity["trees"], make_entity["motel"]]
         )
@@ -500,9 +506,8 @@ class TestTextAnchors:
             in holding_string
         )
 
-    def test_opinion_posits_holding_dict_context(
-        self, make_opinion, make_regime, make_entity
-    ):
+    @pytest.mark.vcr
+    def test_opinion_posits_holding_dict_context(self, make_opinion, make_entity):
         """
         Having the Watt case posit a holding from the Brad
         case, but replacing one generic factor with a factor
@@ -511,7 +516,7 @@ class TestTextAnchors:
         watt = make_opinion["watt_majority"]
         brad = make_opinion["brad_majority"]
         to_read = load_holdings("holding_brad.json")
-        holdings = readers.read_holdings(to_read, regime=make_regime)
+        holdings = readers.read_holdings(to_read, client=self.client)
         brad.posit(holdings)
         expectation_not_reasonable = brad.holdings[6]
         context_holding = expectation_not_reasonable.new_context(
@@ -523,15 +528,14 @@ class TestTextAnchors:
         assert "<Wattenburg> lived at <Bradley's house>" in string
         assert "<Wattenburg> lived at <Bradley's house>" in str(watt.holdings[-1])
 
-    def test_holding_with_non_generic_value(
-        self, make_opinion, make_regime, make_entity
-    ):
+    @pytest.mark.vcr
+    def test_holding_with_non_generic_value(self, make_opinion, make_entity):
         """
         This test originally required a ValueError, but why should it?
         """
         brad = make_opinion["brad_majority"]
         to_read = load_holdings("holding_brad.json")
-        holdings = readers.read_holdings(to_read, regime=make_regime)
+        holdings = readers.read_holdings(to_read, client=self.client)
         brad.posit(holdings)
         expectation_not_reasonable = brad.holdings[6]
         generic_patch = expectation_not_reasonable.generic_factors[1]
@@ -541,7 +545,8 @@ class TestTextAnchors:
         string = context_change.short_string
         assert "plants in the stockpile of trees was at least 3" in string
 
-    def test_error_because_string_does_not_match_factor_name(self, make_regime):
+    @pytest.mark.vcr
+    def test_error_because_string_does_not_match_factor_name(self):
         rule_holding = {
             "inputs": ["this factor hasn't been mentioned"],
             "outputs": [{"type": "fact", "content": "{the dog} bit {the man}"}],
@@ -549,7 +554,7 @@ class TestTextAnchors:
             "mandatory": True,
         }
         with pytest.raises(ValueError):
-            readers.read_holding(rule_holding, regime=make_regime)
+            readers.read_holding(rule_holding, client=self.client)
 
     def test_error_classname_does_not_exist(self):
         rule_dict = {
@@ -584,7 +589,10 @@ class TestTextAnchors:
 
 
 class TestExclusiveFlag:
-    def test_holding_flagged_exclusive(self, make_regime, make_enactment):
+    client = Client(api_token=TOKEN)
+
+    @pytest.mark.vcr
+    def test_holding_flagged_exclusive(self, make_enactment):
         """
         Test that "exclusive" flag doesn't mess up the holding where it's placed.
 
@@ -595,7 +603,7 @@ class TestExclusiveFlag:
         "exclusive" in the JSON.
         """
         to_read = load_holdings("holding_feist.json")
-        feist_holdings = readers.read_holdings(to_read, regime=make_regime)
+        feist_holdings = readers.read_holdings(to_read, client=self.client)
 
         directory = Entity("Rural's telephone directory")
         original = Fact(Predicate("{} was an original work"), directory)
@@ -617,7 +625,8 @@ class TestExclusiveFlag:
         )
 
     @pytest.mark.xfail
-    def test_holding_inferred_from_exclusive(self, make_enactment, make_regime):
+    @pytest.mark.vcr
+    def test_holding_inferred_from_exclusive(self, make_enactment):
         """
         Test whether the Feist opinion object includes a holding
         that was inferred from an entry in the JSON saying that the
@@ -634,7 +643,7 @@ class TestExclusiveFlag:
         inferred Rules that aren't expanded during data loading.
         """
         to_read = load_holdings("holding_feist.json")
-        feist_holdings = readers.read_holdings(to_read, regime=make_regime)
+        feist_holdings = readers.read_holdings(to_read, client=self.client)
 
         directory = Entity("Rural's telephone directory")
         not_original = Fact(
@@ -658,7 +667,8 @@ class TestExclusiveFlag:
         )
         assert feist_holdings[4].rule.means(no_originality_rule)
 
-    def test_exclusive_does_not_result_in_more_holdings(self, make_regime):
+    @pytest.mark.vcr
+    def test_exclusive_does_not_result_in_more_holdings(self):
         """
         The intended behavior is now for the Holding to assert that
         its Rule is the "exclusive" way to reach the outputs, and
@@ -669,13 +679,16 @@ class TestExclusiveFlag:
         generated Rules as well as its original Rule.
         """
         feist_json = load_holdings("holding_feist.json")
-        feist_holdings = readers.read_holdings(feist_json, regime=make_regime)
+        feist_holdings = readers.read_holdings(feist_json, client=self.client)
 
         assert len(feist_holdings) == len(feist_json)
 
 
 class TestNestedFactorImport:
-    def test_import_holding(self, make_regime):
+    client = Client(api_token=TOKEN)
+
+    @pytest.mark.vcr
+    def test_import_holding(self):
         """
         Based on this text:
         This testimony tended “only remotely” to prove that appellant
@@ -686,5 +699,5 @@ class TestNestedFactorImport:
         concerning appellant’s use of narcotics was improper.
         """
         cardenas_json = load_holdings("holding_cardenas.json")
-        cardenas_holdings = readers.read_holdings(cardenas_json, regime=make_regime)
+        cardenas_holdings = readers.read_holdings(cardenas_json, client=self.client)
         assert len(cardenas_holdings) == 2
