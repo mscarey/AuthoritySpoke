@@ -94,7 +94,7 @@ class TestCodes:
     @pytest.mark.parametrize(
         "path, expected",
         (
-            ["/us/const/amendment-XIV/3", "No person shall be a Senator"],
+            ["/us/const/amendment/XIV/3", "No person shall be a Senator"],
             ["/article-I/5/1", "Each House shall be the Judge"],
         ),
     )
@@ -111,7 +111,7 @@ class TestCodes:
 
     def test_text_interval_constitution_section(self, make_code):
         passage = make_code["const"].select_text_from_interval(
-            path="/us/const/article-I/3/7", interval=TextPositionSelector(66, 85)
+            path="/us/const/article/I/3/7", interval=TextPositionSelector(66, 85)
         )
         assert passage == "removal from Office"
 
@@ -119,13 +119,13 @@ class TestCodes:
         """
         Returns an interval covering the entire 317-character section.
         """
-        interval = make_code["const"].text_interval(path="/us/const/article-I/3/7")
+        interval = make_code["const"].text_interval(path="/us/const/article/I/3/7")
         assert interval == (0, 317)
 
     def test_text_interval_beyond_end_of_section(self, make_code):
         with pytest.raises(IndexError):
             _ = make_code["const"].select_text_from_interval(
-                path="/us/const/article-I/3/7", interval=TextPositionSelector(66, 400)
+                path="/us/const/article/I/3/7", interval=TextPositionSelector(66, 400)
             )
 
     def test_text_interval_absent_section(self, make_code):
@@ -134,17 +134,17 @@ class TestCodes:
         """
         with pytest.raises(ValueError):
             _ = make_code["cfr37"].select_text_from_interval(
-                path="/us/const/article-I/3/7", interval=TextPositionSelector(0, 66)
+                path="/us/const/article/I/3/7", interval=TextPositionSelector(0, 66)
             )
 
     def test_text_interval_bad_source(self, make_code, make_selector):
         with pytest.raises(ValueError):
             _ = make_code["usc17"].text_interval(
-                selector=make_selector["bad_selector"], path="/us/const/amendment-IV",
+                selector=make_selector["bad_selector"], path="/us/const/amendment/IV",
             )
 
     def test_text_interval_bad_selector(self, make_code, make_selector):
         with pytest.raises(TextSelectionError):
             _ = make_code["const"].text_interval(
-                selector=make_selector["bad_selector"], path="/us/const/amendment-IV",
+                selector=make_selector["bad_selector"], path="/us/const/amendment/IV",
             )

@@ -997,9 +997,9 @@ The first step results in the Fact it is false that a generic Entity was
         GIVEN the ENACTMENTS:
           "To promote the Progress of Science and useful Arts, by securing for
           limited Times to Authors" (Constitution of the United States,
-          /us/const/article-I/8/8)
+          /us/const/article/I/8/8)
           "the exclusive Right to their respective Writings" (Constitution of
-          the United States, /us/const/article-I/8/8)
+          the United States, /us/const/article/I/8/8)
           "Copyright protection subsists, in accordance with this title, in
           original works of authorship" (Title 17, /us/usc/t17/s102/a)
           "The copyright in a compilation" (Title 17, /us/usc/t17/s103/b)
@@ -1030,9 +1030,9 @@ further result of “absence of the Fact that” a generic :class:`.Entity` was
         GIVEN the ENACTMENTS:
           "To promote the Progress of Science and useful Arts, by securing for
           limited Times to Authors" (Constitution of the United States,
-          /us/const/article-I/8/8)
+          /us/const/article/I/8/8)
           "the exclusive Right to their respective Writings" (Constitution of
-          the United States, /us/const/article-I/8/8)
+          the United States, /us/const/article/I/8/8)
           "Copyright protection subsists, in accordance with this title, in
           original works of authorship" (Title 17, /us/usc/t17/s102/a)
 
@@ -1063,9 +1063,9 @@ Holding that captures the whole process.
         GIVEN the ENACTMENTS:
           "To promote the Progress of Science and useful Arts, by securing for
           limited Times to Authors" (Constitution of the United States,
-          /us/const/article-I/8/8)
+          /us/const/article/I/8/8)
           "the exclusive Right to their respective Writings" (Constitution of
-          the United States, /us/const/article-I/8/8)
+          the United States, /us/const/article/I/8/8)
           "Copyright protection subsists, in accordance with this title, in
           original works of authorship" (Title 17, /us/usc/t17/s102/a)
           "The copyright in a compilation" (Title 17, /us/usc/t17/s103/b)
@@ -1270,9 +1270,9 @@ Holding from *Feist*, and then the union of both of them.
         GIVEN the ENACTMENTS:
           "To promote the Progress of Science and useful Arts, by securing for
           limited Times to Authors" (Constitution of the United States,
-          /us/const/article-I/8/8)
+          /us/const/article/I/8/8)
           "the exclusive Right to their respective Writings" (Constitution of
-          the United States, /us/const/article-I/8/8)
+          the United States, /us/const/article/I/8/8)
 
 
 .. code:: python
@@ -1295,10 +1295,10 @@ Holding from *Feist*, and then the union of both of them.
           the Fact that <the Java API> was an idea
         GIVEN the ENACTMENTS:
           "the exclusive Right to their respective Writings" (Constitution of
-          the United States, /us/const/article-I/8/8)
+          the United States, /us/const/article/I/8/8)
           "To promote the Progress of Science and useful Arts, by securing for
           limited Times to Authors" (Constitution of the United States,
-          /us/const/article-I/8/8)
+          /us/const/article/I/8/8)
           "Copyright protection subsists, in accordance with this title, in
           original works of authorship fixed in any tangible medium of
           expression, now known or later developed, from which they can be

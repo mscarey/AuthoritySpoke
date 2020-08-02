@@ -1279,6 +1279,7 @@ def make_opinion(make_decision) -> Dict[str, Opinion]:
     return opinions
 
 
+@vcr.use_cassette()
 @pytest.fixture(scope="class")
 def make_opinion_with_holding(make_decision_with_holding) -> Dict[str, Opinion]:
     opinions = {}

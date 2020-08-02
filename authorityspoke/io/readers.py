@@ -70,7 +70,7 @@ def get_code_uri(xml, title: str) -> str:
     if title.startswith("Title"):
         return xml.find("main").find("title")["identifier"]
     if title.startswith("California"):
-        uri = "/us-ca"
+        uri = "/us-ca/code"
         if "Penal" in title:
             return uri + "/pen"
         else:

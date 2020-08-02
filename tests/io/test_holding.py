@@ -545,7 +545,7 @@ class TestTextAnchors:
         rule_holding = {
             "inputs": ["this factor hasn't been mentioned"],
             "outputs": [{"type": "fact", "content": "{the dog} bit {the man}"}],
-            "enactments": [{"node": "/us/const/amendment-IV"}],
+            "enactments": [{"node": "/us/const/amendment/IV"}],
             "mandatory": True,
         }
         with pytest.raises(ValueError):
@@ -560,7 +560,7 @@ class TestTextAnchors:
                 }
             ],
             "outputs": [{"type": "fact", "content": "the dog bit the man"}],
-            "enactments": [{"node": "/us/const/amendment-IV"}],
+            "enactments": [{"node": "/us/const/amendment/IV"}],
         }
         with pytest.raises(ValueError):
             readers.read_holding(rule_dict)
