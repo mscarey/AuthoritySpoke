@@ -13,7 +13,7 @@ from anchorpoint.textselectors import TextQuoteSelector
 from bs4 import BeautifulSoup
 from legislice import Enactment
 from legislice.download import Client
-from legislice.name_index import collect_enactments
+from legislice.name_index import EnactmentIndex, collect_enactments
 
 from authorityspoke.decisions import Decision
 from authorityspoke.codes import Code, USCCode, USLMCode, USConstCode, CalCode, CFRCode
@@ -291,17 +291,25 @@ class HoldingsIndexed(NamedTuple):
 
 
 def read_holdings_with_index(
-    record: List[RawHolding], client: Optional[Client] = None, many: bool = True
+    record: List[RawHolding],
+    client: Optional[Client] = None,
+    many: bool = True,
+    enactment_index: Optional[EnactmentIndex] = None,
 ) -> HoldingsIndexed:
     r"""Load a list of :class:`Holdings`\s from JSON, with "mentioned" index."""
     schema = schemas.HoldingSchema(many=many)
 
-    record, enactment_index = collect_enactments(record)
+    schema.context["enactment_index"] = enactment_index
+    record, new_enactment_index = collect_enactments(record)
+    if enactment_index:
+        new_enactment_index = new_enactment_index + enactment_index
     record, mentioned = index_names(record)
     schema.context["mentioned"] = mentioned
     if client:
-        enactment_index = client.update_entries_in_enactment_index(enactment_index)
-    schema.context["enactment_index"] = enactment_index
+        new_enactment_index = client.update_entries_in_enactment_index(
+            new_enactment_index
+        )
+    schema.context["enactment_index"] = new_enactment_index
 
     anchor_list = anchors.get_holding_anchors(record)
     holdings = schema.load(deepcopy(record))

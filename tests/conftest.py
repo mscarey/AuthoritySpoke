@@ -1,11 +1,13 @@
 from copy import copy
+import json
 import os
-from typing import Any, Dict, List, Tuple
+import pathlib
+from typing import Any, Dict, List, Text, Tuple
 
 from anchorpoint.textselectors import TextQuoteSelector
 from dotenv import load_dotenv
 from legislice import Enactment
-import legislice
+from legislice.name_index import EnactmentIndex
 from legislice.download import Client
 import pytest
 import vcr
@@ -30,6 +32,14 @@ load_dotenv()
 
 TOKEN = os.getenv("LEGISLICE_API_TOKEN")
 legislice_client = Client(api_token=TOKEN)
+
+
+@pytest.fixture(scope="module")
+def vcr_config():
+    return {
+        # Replace the Authorization request header with "DUMMY" in cassettes
+        "filter_headers": [("authorization", "DUMMY")],
+    }
 
 
 @pytest.fixture(scope="class")
@@ -705,26 +715,56 @@ def make_code(make_regime) -> Dict[str, Code]:
     }
 
 
-@vcr.use_cassette()
 @pytest.fixture(scope="module")
-def e_copyright(make_selector):
-    enactment = legislice_client.read(path="/us/usc/t17/s102/b")
-    enactment.select(make_selector["copyright"])
+def make_response() -> Dict[str, Dict]:
+    """Mock api responses"""
+    this_directory = os.path.dirname(os.path.abspath(__file__))
+    responses_filepath = this_directory + "/mock_responses/usc.json"
+    with open(responses_filepath, "r") as f:
+        responses = json.load(f)
+    return responses
+
+
+@pytest.fixture(scope="module")
+def e_fourth_a(make_response):
+    schema = EnactmentSchema()
+    enactment = schema.load(make_response["/us/const/amendment/IV"])
     return enactment
 
 
-@vcr.use_cassette()
 @pytest.fixture(scope="module")
-def e_copyright_requires_originality(make_selector):
-    enactment = legislice_client.read(path="/us/usc/t17/s102/a")
-    enactment.select(make_selector["copyright_requires_originality"])
+def e_search_clause(e_fourth_a):
+    selector = TextQuoteSelector(suffix=", and no Warrants shall issue")
+    e_fourth_a.select(selector)
+    return e_fourth_a
+
+
+@pytest.fixture(scope="module")
+def e_warrants_clause(e_fourth_a):
+    e_fourth_a.select("shall not be violated, and no Warrants shall issue,")
+    return e_fourth_a
+
+
+@pytest.fixture(scope="module")
+def e_due_process_5(make_response):
+    schema = EnactmentSchema()
+    enactment = schema.load(make_response["/us/const/amendment/V"])
+    enactment.select("life, liberty, or property, without due process of law")
     return enactment
 
 
-@vcr.use_cassette()
 @pytest.fixture(scope="module")
-def e_securing_for_authors():
-    enactment = legislice_client.read(path="/us/const/article/I/8/8")
+def e_due_process_14(make_response):
+    schema = EnactmentSchema()
+    enactment = schema.load(make_response["/us/const/amendment/XIV/1"])
+    enactment.select("life, liberty, or property, without due process of law")
+    return enactment
+
+
+@pytest.fixture(scope="module")
+def e_securing_for_authors(make_response):
+    schema = EnactmentSchema()
+    enactment = schema.load(make_response["/us/const/article/I/8/8"])
     selector = TextQuoteSelector(
         exact=(
             "To promote the Progress of Science and "
@@ -735,105 +775,136 @@ def e_securing_for_authors():
     return enactment
 
 
-@vcr.use_cassette()
 @pytest.fixture(scope="module")
-def e_and_inventors():
-    enactment = legislice_client.read(path="/us/const/article/I/8/8")
+def e_securing(make_response):
+    schema = EnactmentSchema()
+    enactment = schema.load(make_response["/us/const/article/I/8/8"])
+    enactment.select(
+        "To promote the Progress of Science and useful Arts, by securing for limited Times to Authors"
+    )
+    return enactment
+
+
+@pytest.fixture(scope="module")
+def e_and_inventors(make_response):
+    schema = EnactmentSchema()
+    enactment = schema.load(make_response["/us/const/article/I/8/8"])
     enactment.select("and Inventors")
     return enactment
 
 
-@vcr.use_cassette()
 @pytest.fixture(scope="module")
-def e_right_to_writings():
-    enactment = legislice_client.read(path="/us/const/article/I/8/8")
+def e_right_to_writings(make_response):
+    enactment = schema.load(make_response["/us/const/article/I/8/8"])
     enactment.select("the exclusive Right to their respective Writings")
     return enactment
 
 
 @pytest.fixture(scope="module")
-def fourth_a():
-    return {
-        "heading": "AMENDMENT IV.",
-        "content": "The right of the people to be secure in their persons, houses, papers, and effects, against unreasonable searches and seizures, shall not be violated, and no Warrants shall issue, but upon probable cause, supported by Oath or affirmation, and particularly describing the place to be searched, and the persons or things to be seized.",
-        "children": [],
-        "end_date": None,
-        "node": "/us/const/amendment/IV",
-        "start_date": "1791-12-15",
-        "url": "https://authorityspoke.com/api/v1/us/const/amendment/IV/",
-        "parent": "https://authorityspoke.com/api/v1/us/const/amendment/",
-    }
-
-
-@pytest.fixture(scope="module")
-def fifth_a():
-    return {
-        "heading": "AMENDMENT V.",
-        "content": "No person shall be held to answer for a capital, or otherwise infamous crime, unless on a presentment or indictment of a Grand Jury, except in cases arising in the land or naval forces, or in the Militia, when in actual service in time of War or public danger; nor shall any person be subject for the same offence to be twice put in jeopardy of life or limb; nor shall be compelled in any Criminal Case to be a witness against himself; nor be deprived of life, liberty, or property, without due process of law; nor shall private property be taken for public use, without just compensation.",
-        "children": [],
-        "end_date": None,
-        "node": "/us/const/amendment/V",
-        "start_date": "1791-12-15",
-        "url": "https://authorityspoke.com/api/v1/us/const/amendment/V/",
-        "parent": "https://authorityspoke.com/api/v1/us/const/amendment/",
-    }
-
-
-@pytest.fixture(scope="module")
-def fourteenth_dp():
-    return {
-        "heading": "Citizenship: security and equal protection of citizens.",
-        "content": "All persons born or naturalized in the United States, and subject to the jurisdiction thereof, are citizens of the United States and of the State wherein they reside. No State shall make or enforce any law which shall abridge the privileges or immunities of citizens of the United States; nor shall any State deprive any person of life, liberty, or property, without due process of law; nor deny to any person within its jurisdiction the equal protection of the laws.",
-        "children": [],
-        "end_date": None,
-        "node": "/us/const/amendment/IV",
-        "start_date": "1868-07-28",
-        "url": "https://authorityspoke.com/api/v1/us/const/amendment/XIV/1/",
-        "parent": "https://authorityspoke.com/api/v1/us/const/amendment/XIV/",
-    }
-
-
-@vcr.use_cassette()
-@pytest.fixture(scope="module")
-def e_search_clause(fourth_a):
+def e_copyright_protection(make_response, make_selector):
     schema = EnactmentSchema()
-    enactment = schema.load(fourth_a)
-    selector = TextQuoteSelector(suffix=", and no Warrants shall issue")
-    enactment.select(selector)
+    enactment = schema.load(make_response["/us/usc/t17/s102/a"])
+    enactment.select(TextQuoteSelector(suffix="Works of authorship include"))
     return enactment
 
 
-@vcr.use_cassette()
 @pytest.fixture(scope="module")
-def e_warrants_clause(fourth_a):
+def e_copyright_requires_originality(make_response, make_selector):
     schema = EnactmentSchema()
-    enactment = schema.load(fourth_a)
-    enactment.select("shall not be violated, and no Warrants shall issue,")
+    enactment = schema.load(make_response["/us/usc/t17/s102/a"])
+    enactment.select(make_selector["copyright_requires_originality"])
     return enactment
 
 
-@vcr.use_cassette()
 @pytest.fixture(scope="module")
-def e_fourth_a(fourth_a):
+def e_copyright(make_response, make_selector):
     schema = EnactmentSchema()
-    enactment = schema.load(fourth_a)
+    enactment = schema.load(make_response["/us/usc/t17/s102/b"])
+    enactment.select(make_selector["copyright"])
     return enactment
 
 
-@vcr.use_cassette()
 @pytest.fixture(scope="module")
-def e_due_process_5():
-    enactment = legislice_client.read(path="/us/const/amendment/V")
-    enactment.select("life, liberty, or property, without due process of law")
+def e_copyright_exceptions(make_response):
+    schema = EnactmentSchema()
+    enactment = schema.load(make_response["/us/usc/t17/s102/b"])
+    enactment.select(TextQuoteSelector(suffix="idea, procedure, process"))
     return enactment
 
 
-@vcr.use_cassette()
 @pytest.fixture(scope="module")
-def e_due_process_14():
-    enactment = legislice_client.read(path="/us/const/amendment/XIV/1")
-    enactment.select("life, liberty, or property, without due process of law")
+def e_copyright_exceptions_full(make_response):
+    schema = EnactmentSchema()
+    enactment = schema.load(make_response["/us/usc/t17/s102/b"])
     return enactment
+
+
+@pytest.fixture(scope="module")
+def e_in_no_case(make_response):
+    schema = EnactmentSchema()
+    enactment = schema.load(make_response["/us/usc/t17/s102/b"])
+    enactment.select(
+        "In no case does copyright protection for an original work of authorship extend to any"
+    )
+    return enactment
+
+
+@pytest.fixture(scope="module")
+def e_method_of_operation(make_response):
+    schema = EnactmentSchema()
+    enactment = schema.load(make_response["/us/usc/t17/s102/b"])
+    enactment.select(TextQuoteSelector(exact="method of operation"))
+    return enactment
+
+
+@pytest.fixture(scope="module")
+def e_compilation(make_response):
+    schema = EnactmentSchema()
+    enactment = schema.load(make_response["/us/usc/t17/s103/b"])
+    enactment.select("The copyright in a compilation")
+    return enactment
+
+
+@pytest.fixture(scope="module")
+def e_preexisting_material(make_response):
+    schema = EnactmentSchema()
+    enactment = schema.load(make_response["/us/usc/t17/s103/b"])
+    enactment.select(
+        "extends only to the material contributed by the author "
+        "of such work, as distinguished from the preexisting "
+        "material employed in the work, and does not imply any "
+        "exclusive right in the preexisting material."
+    )
+    return enactment
+
+
+@pytest.fixture(scope="module")
+def copyright_enactments(
+    make_response,
+    e_copyright_protection,
+    e_copyright_exceptions_full,
+    e_securing,
+    e_right_to_writings,
+    e_compilation,
+    e_preexisting_material,
+    e_copyright_exceptions,
+) -> Dict[str, Dict]:
+    schema = EnactmentSchema()
+    enactment_index = EnactmentIndex(
+        {
+            "securing for authors": e_securing,
+            "right to writings": e_right_to_writings,
+            "copyright protection provision": e_copyright_protection,
+            "in no case clause": e_in_no_case,
+            "copyright in a compilation": e_compilation,
+            "preexisting material provision": e_preexisting_material,
+            "/us/usc/t17/s410/c": schema.load(make_response["/us/usc/t17/s410/c"]),
+            "copyright exceptions": e_copyright_exceptions,
+            "method of operation provision": e_method_of_operation,
+            "copyright exceptions full": e_copyright_exceptions_full,
+        }
+    )
+    return enactment_index
 
 
 @pytest.fixture(scope="class")
@@ -1239,7 +1310,7 @@ def make_holding(make_rule) -> Dict[str, Holding]:
     return holdings
 
 
-TEST_CASES = ("brad", "cardenas", "feist", "lotus", "oracle", "watt")
+TEST_CASES = ("feist", "lotus", "oracle")  # "brad", "cardenas", "watt"
 
 
 def load_decisions_for_fixtures():
@@ -1256,13 +1327,13 @@ def make_decision():
     return load_decisions_for_fixtures()
 
 
-@vcr.use_cassette()
 @pytest.fixture(scope="class")
 def make_decision_with_holding():
+    client_without_api_access = Client()
     decisions = load_decisions_for_fixtures()
     for case in TEST_CASES:
         holdings, mentioned, holding_anchors = loaders.load_holdings_with_index(
-            f"holding_{case}.json", client=legislice_client,
+            f"holding_{case}.json", client=client_without_api_access,
         )
         named_anchors = anchors.get_named_anchors(mentioned)
         decisions[case].majority.posit(
@@ -1280,7 +1351,6 @@ def make_opinion(make_decision) -> Dict[str, Opinion]:
     return opinions
 
 
-@vcr.use_cassette()
 @pytest.fixture(scope="class")
 def make_opinion_with_holding(make_decision_with_holding) -> Dict[str, Opinion]:
     opinions = {}

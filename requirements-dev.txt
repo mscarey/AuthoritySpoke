@@ -11,7 +11,7 @@ pylint
 pytest-cov
 pytest-profiling
 pytest-vcr
-pytest>=5.3.2
+pytest>=6.0.0
 rope
 setuptools
 sphinx-autodoc-typehints
