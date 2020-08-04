@@ -80,7 +80,7 @@
         "enactments_despite": {
             "node": "/us/usc/t17/s102/b",
             "selection": true,
-            "name": "copyrightability exceptions"
+            "name": "copyright exceptions full"
         }
     },
     {
@@ -105,7 +105,7 @@
         "universal": true,
         "enactments": [
             "copyright protection provision",
-            "copyrightability exceptions"
+            "copyright exceptions full"
         ]
     },
     {
@@ -122,7 +122,7 @@
         "universal": true,
         "enactments": [
             "copyright protection provision",
-            "copyrightability exceptions"
+            "copyright exceptions full"
         ]
     },
     {
@@ -133,7 +133,7 @@
         "outputs": "the Java API was copyrightable",
         "mandatory": true,
         "enactments": "copyright protection provision",
-        "enactments_despite": "copyrightability exceptions"
+        "enactments_despite": "copyright exceptions full"
     },
     {
         "inputs": [
@@ -153,7 +153,7 @@
         "universal": true,
         "enactments": [
             "copyright protection provision",
-            "copyrightability exceptions"
+            "copyright exceptions full"
         ]
     },
     {
@@ -175,7 +175,7 @@
         "universal": true,
         "enactments": [
             "copyright protection provision",
-            "copyrightability exceptions"
+            "copyright exceptions full"
         ]
     },
     {
@@ -206,7 +206,7 @@
         "outputs": "the Java API was copyrightable",
         "mandatory": true,
         "enactments": "copyright protection provision",
-        "enactments_despite": "copyrightability exceptions"
+        "enactments_despite": "copyright exceptions full"
     },
     {
         "inputs": [
@@ -236,7 +236,7 @@
             "anchors": "whether the non-literal elements of a program “are protected"
         },
         "mandatory": true,
-        "enactments": "copyrightability exceptions",
+        "enactments": "copyright exceptions full",
         "enactments_despite": "copyright protection provision"
     },
     {
@@ -374,7 +374,7 @@
             "anchors": "concepts of merger and scenes a faire are |affirmative defenses to claims of infringement.|"
         },
         "mandatory": true,
-        "enactments": "copyrightability exceptions",
+        "enactments": "copyright exceptions full",
         "enactments_despite": "copyright protection provision"
     },
     {
@@ -394,7 +394,7 @@
             "anchors": "concepts of merger and scenes a faire are affirmative |defenses to claims of infringement.|"
         },
         "mandatory": true,
-        "enactments": "copyrightability exceptions",
+        "enactments": "copyright exceptions full",
         "enactments_despite": "copyright protection provision"
     },
     {
@@ -422,7 +422,7 @@
             "anchors": "affirmative defenses to|claims of infringement|"
         },
         "mandatory": true,
-        "enactments": "copyrightability exceptions",
+        "enactments": "copyright exceptions full",
         "enactments_despite": "copyright protection provision"
     },
     {
@@ -446,7 +446,7 @@
         },
         "mandatory": true,
         "enactments": "copyright protection provision",
-        "enactments_despite": "copyrightability exceptions"
+        "enactments_despite": "copyright exceptions full"
     },
     {
         "inputs": [
@@ -473,7 +473,7 @@
         "mandatory": true,
         "enactments": "copyright protection provision",
         "enactments_despite": [
-            "copyrightability exceptions",
+            "copyright exceptions full",
             "short phrases copyright exception"
         ]
     },
@@ -500,7 +500,7 @@
             "content": "the Java API was a scene a faire",
             "anchors": "the scene a faire doctrine denies protection"
         },
-        "enactments": "copyrightability exceptions",
+        "enactments": "copyright exceptions full",
         "enactments_despite": "copyright protection provision"
     },
     {
@@ -532,7 +532,7 @@
             "anchors": "structure, sequence, and organization of a computer program |is eligible for copyright protection|"
         },
         "enactments": "copyright protection provision",
-        "enactments_despite": "copyrightability exceptions"
+        "enactments_despite": "copyright exceptions full"
     },
     {
         "inputs": [
@@ -559,7 +559,7 @@
         "mandatory": true,
         "universal": true,
         "enactments": "copyright protection provision",
-        "enactments_despite": "copyrightability exceptions"
+        "enactments_despite": "copyright exceptions full"
     },
     {
         "inputs": {
@@ -571,6 +571,6 @@
             "content": "the Java language was copyrightable"
         },
         "enactments": "copyright protection provision",
-        "enactments_despite": "copyrightability exceptions"
+        "enactments_despite": "copyright exceptions full"
     }
 ]

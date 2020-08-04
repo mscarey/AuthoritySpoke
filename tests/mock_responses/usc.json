@@ -1,201 +1,217 @@
 {
     "/us/const/article/I/8/8": {
-        "heading": "Patents and copyrights.",
-        "content": "To promote the Progress of Science and useful Arts, by securing for limited Times to Authors and Inventors the exclusive Right to their respective Writings and Discoveries;",
-        "children": [],
-        "end_date": null,
-        "node": "/us/const/article/I/8/8",
-        "start_date": "1788-09-13",
-        "url": "https://authorityspoke.com/api/v1/us/const/article/I/8/8/",
-        "parent": "https://authorityspoke.com/api/v1/us/const/article/I/8/"
+        "1788-09-13": {
+            "heading": "Patents and copyrights.",
+            "content": "To promote the Progress of Science and useful Arts, by securing for limited Times to Authors and Inventors the exclusive Right to their respective Writings and Discoveries;",
+            "children": [],
+            "end_date": null,
+            "node": "/us/const/article/I/8/8",
+            "start_date": "1788-09-13",
+            "url": "https://authorityspoke.com/api/v1/us/const/article/I/8/8/",
+            "parent": "https://authorityspoke.com/api/v1/us/const/article/I/8/"
+        }
     },
     "/us/const/amendment/IV": {
-        "heading": "AMENDMENT IV.",
-        "content": "The right of the people to be secure in their persons, houses, papers, and effects, against unreasonable searches and seizures, shall not be violated, and no Warrants shall issue, but upon probable cause, supported by Oath or affirmation, and particularly describing the place to be searched, and the persons or things to be seized.",
-        "children": [],
-        "end_date": null,
-        "node": "/us/const/amendment/IV",
-        "start_date": "1791-12-15",
-        "url": "https://authorityspoke.com/api/v1/us/const/amendment/IV/",
-        "parent": "https://authorityspoke.com/api/v1/us/const/amendment/"
+        "1791-12-15": {
+            "heading": "AMENDMENT IV.",
+            "content": "The right of the people to be secure in their persons, houses, papers, and effects, against unreasonable searches and seizures, shall not be violated, and no Warrants shall issue, but upon probable cause, supported by Oath or affirmation, and particularly describing the place to be searched, and the persons or things to be seized.",
+            "children": [],
+            "end_date": null,
+            "node": "/us/const/amendment/IV",
+            "start_date": "1791-12-15",
+            "url": "https://authorityspoke.com/api/v1/us/const/amendment/IV/",
+            "parent": "https://authorityspoke.com/api/v1/us/const/amendment/"
+        }
     },
     "/us/const/amendment/V": {
-        "heading": "AMENDMENT V.",
-        "content": "No person shall be held to answer for a capital, or otherwise infamous crime, unless on a presentment or indictment of a Grand Jury, except in cases arising in the land or naval forces, or in the Militia, when in actual service in time of War or public danger; nor shall any person be subject for the same offence to be twice put in jeopardy of life or limb; nor shall be compelled in any Criminal Case to be a witness against himself; nor be deprived of life, liberty, or property, without due process of law; nor shall private property be taken for public use, without just compensation.",
-        "children": [],
-        "end_date": null,
-        "node": "/us/const/amendment/V",
-        "start_date": "1791-12-15",
-        "url": "https://authorityspoke.com/api/v1/us/const/amendment/V/",
-        "parent": "https://authorityspoke.com/api/v1/us/const/amendment/"
+        "1791-12-15": {
+            "heading": "AMENDMENT V.",
+            "content": "No person shall be held to answer for a capital, or otherwise infamous crime, unless on a presentment or indictment of a Grand Jury, except in cases arising in the land or naval forces, or in the Militia, when in actual service in time of War or public danger; nor shall any person be subject for the same offence to be twice put in jeopardy of life or limb; nor shall be compelled in any Criminal Case to be a witness against himself; nor be deprived of life, liberty, or property, without due process of law; nor shall private property be taken for public use, without just compensation.",
+            "children": [],
+            "end_date": null,
+            "node": "/us/const/amendment/V",
+            "start_date": "1791-12-15",
+            "url": "https://authorityspoke.com/api/v1/us/const/amendment/V/",
+            "parent": "https://authorityspoke.com/api/v1/us/const/amendment/"
+        }
     },
     "/us/const/amendment/XIV": {
-        "heading": "AMENDMENT XIV.",
-        "content": "",
-        "children": [
-            {
-                "heading": "Citizenship: security and equal protection of citizens.",
-                "content": "All persons born or naturalized in the United States, and subject to the jurisdiction thereof, are citizens of the United States and of the State wherein they reside. No State shall make or enforce any law which shall abridge the privileges or immunities of citizens of the United States; nor shall any State deprive any person of life, liberty, or property, without due process of law; nor deny to any person within its jurisdiction the equal protection of the laws.",
-                "children": [],
-                "end_date": null,
-                "node": "/us/const/amendment/XIV/1",
-                "start_date": "1868-07-28",
-                "url": "https://authorityspoke.com/api/v1/us/const/amendment/XIV/1/"
-            },
-            {
-                "heading": "Apportionment of representation.",
-                "content": "Representatives shall be apportioned among the several States according to their respective numbers, counting the whole number of persons in each State, excluding Indians not taxed. But when the right to vote at any election for the choice of electors for President and Vice President of the United States, Representatives in Congress, the Executive and Judicial officers of a State, or the members of the Legislature thereof, is denied to any of the male inhabitants of such State, being twenty-one years of age, and citizens of the United States, or in any way abridged, except for participation in rebellion, or other crime, the basis of representation therein shall be reduced in the proportion which the number of such male citizens shall bear to the whole number of male citizens twenty-one years of age in such State.",
-                "children": [],
-                "end_date": null,
-                "node": "/us/const/amendment/XIV/2",
-                "start_date": "1868-07-28",
-                "url": "https://authorityspoke.com/api/v1/us/const/amendment/XIV/2/"
-            },
-            {
-                "heading": "Loyalty as a qualification of Senators and Representatives.",
-                "content": "No person shall be a Senator or Representative in Congress, or elector of President and Vice President, or hold any office, civil or military, under the United States, or under any State, who, having previously taken an oath, as a member of Congress, or as an officer of the United States, or as a member of any State legislature, or as an executive or judicial officer of any State, to support the Constitution of the United States, shall have engaged in insurrection or rebellion against the same, or given aid or comfort to the enemies thereof. But Congress may by a vote of two-thirds of each House, remove such disability.",
-                "children": [],
-                "end_date": null,
-                "node": "/us/const/amendment/XIV/3",
-                "start_date": "1868-07-28",
-                "url": "https://authorityspoke.com/api/v1/us/const/amendment/XIV/3/"
-            },
-            {
-                "heading": "Validity of the national debt, etc.",
-                "content": "The validity of the public debt of the United States, authorized by law, including debts incurred for payment of pensions and bounties for services in suppressing insurrection or rebellion, shall not be questioned. But neither the United States nor any State shall assume or pay any debt or obligation incurred in aid of insurrection or rebellion against the United States, or any claim for the loss or emancipation of any slave; but all such debts, obligations and claims shall be held illegal and void.",
-                "children": [],
-                "end_date": null,
-                "node": "/us/const/amendment/XIV/4",
-                "start_date": "1868-07-28",
-                "url": "https://authorityspoke.com/api/v1/us/const/amendment/XIV/4/"
-            },
-            {
-                "heading": "Enforcement of the 14th amendment.",
-                "content": "The Congress shall have power to enforce, by appropriate legislation, the provisions of this article.",
-                "children": [],
-                "end_date": null,
-                "node": "/us/const/amendment/XIV/5",
-                "start_date": "1868-07-28",
-                "url": "https://authorityspoke.com/api/v1/us/const/amendment/XIV/5/"
-            }
-        ],
-        "end_date": null,
-        "node": "/us/const/amendment/XIV",
-        "start_date": "1868-07-28",
-        "url": "https://authorityspoke.com/api/v1/us/const/amendment/XIV/",
-        "parent": "https://authorityspoke.com/api/v1/us/const/amendment/"
+        "1868-07-28": {
+            "heading": "AMENDMENT XIV.",
+            "content": "",
+            "children": [
+                {
+                    "heading": "Citizenship: security and equal protection of citizens.",
+                    "content": "All persons born or naturalized in the United States, and subject to the jurisdiction thereof, are citizens of the United States and of the State wherein they reside. No State shall make or enforce any law which shall abridge the privileges or immunities of citizens of the United States; nor shall any State deprive any person of life, liberty, or property, without due process of law; nor deny to any person within its jurisdiction the equal protection of the laws.",
+                    "children": [],
+                    "end_date": null,
+                    "node": "/us/const/amendment/XIV/1",
+                    "start_date": "1868-07-28",
+                    "url": "https://authorityspoke.com/api/v1/us/const/amendment/XIV/1/"
+                },
+                {
+                    "heading": "Apportionment of representation.",
+                    "content": "Representatives shall be apportioned among the several States according to their respective numbers, counting the whole number of persons in each State, excluding Indians not taxed. But when the right to vote at any election for the choice of electors for President and Vice President of the United States, Representatives in Congress, the Executive and Judicial officers of a State, or the members of the Legislature thereof, is denied to any of the male inhabitants of such State, being twenty-one years of age, and citizens of the United States, or in any way abridged, except for participation in rebellion, or other crime, the basis of representation therein shall be reduced in the proportion which the number of such male citizens shall bear to the whole number of male citizens twenty-one years of age in such State.",
+                    "children": [],
+                    "end_date": null,
+                    "node": "/us/const/amendment/XIV/2",
+                    "start_date": "1868-07-28",
+                    "url": "https://authorityspoke.com/api/v1/us/const/amendment/XIV/2/"
+                },
+                {
+                    "heading": "Loyalty as a qualification of Senators and Representatives.",
+                    "content": "No person shall be a Senator or Representative in Congress, or elector of President and Vice President, or hold any office, civil or military, under the United States, or under any State, who, having previously taken an oath, as a member of Congress, or as an officer of the United States, or as a member of any State legislature, or as an executive or judicial officer of any State, to support the Constitution of the United States, shall have engaged in insurrection or rebellion against the same, or given aid or comfort to the enemies thereof. But Congress may by a vote of two-thirds of each House, remove such disability.",
+                    "children": [],
+                    "end_date": null,
+                    "node": "/us/const/amendment/XIV/3",
+                    "start_date": "1868-07-28",
+                    "url": "https://authorityspoke.com/api/v1/us/const/amendment/XIV/3/"
+                },
+                {
+                    "heading": "Validity of the national debt, etc.",
+                    "content": "The validity of the public debt of the United States, authorized by law, including debts incurred for payment of pensions and bounties for services in suppressing insurrection or rebellion, shall not be questioned. But neither the United States nor any State shall assume or pay any debt or obligation incurred in aid of insurrection or rebellion against the United States, or any claim for the loss or emancipation of any slave; but all such debts, obligations and claims shall be held illegal and void.",
+                    "children": [],
+                    "end_date": null,
+                    "node": "/us/const/amendment/XIV/4",
+                    "start_date": "1868-07-28",
+                    "url": "https://authorityspoke.com/api/v1/us/const/amendment/XIV/4/"
+                },
+                {
+                    "heading": "Enforcement of the 14th amendment.",
+                    "content": "The Congress shall have power to enforce, by appropriate legislation, the provisions of this article.",
+                    "children": [],
+                    "end_date": null,
+                    "node": "/us/const/amendment/XIV/5",
+                    "start_date": "1868-07-28",
+                    "url": "https://authorityspoke.com/api/v1/us/const/amendment/XIV/5/"
+                }
+            ],
+            "end_date": null,
+            "node": "/us/const/amendment/XIV",
+            "start_date": "1868-07-28",
+            "url": "https://authorityspoke.com/api/v1/us/const/amendment/XIV/",
+            "parent": "https://authorityspoke.com/api/v1/us/const/amendment/"
+        }
     },
     "/us/usc/t17/s102/a": {
-        "heading": "",
-        "content": "Copyright protection subsists, in accordance with this title, in original works of authorship fixed in any tangible medium of expression, now known or later developed, from which they can be perceived, reproduced, or otherwise communicated, either directly or with the aid of a machine or device. Works of authorship include the following categories:",
-        "children": [
-            {
-                "heading": "",
-                "content": "literary works;",
-                "children": [],
-                "end_date": null,
-                "node": "/us/usc/t17/s102/a/1",
-                "start_date": "2013-07-18",
-                "url": "https://authorityspoke.com/api/v1/us/usc/t17/s102/a/1/"
-            },
-            {
-                "heading": "",
-                "content": "musical works, including any accompanying words;",
-                "children": [],
-                "end_date": null,
-                "node": "/us/usc/t17/s102/a/2",
-                "start_date": "2013-07-18",
-                "url": "https://authorityspoke.com/api/v1/us/usc/t17/s102/a/2/"
-            },
-            {
-                "heading": "",
-                "content": "dramatic works, including any accompanying music;",
-                "children": [],
-                "end_date": null,
-                "node": "/us/usc/t17/s102/a/3",
-                "start_date": "2013-07-18",
-                "url": "https://authorityspoke.com/api/v1/us/usc/t17/s102/a/3/"
-            },
-            {
-                "heading": "",
-                "content": "pantomimes and choreographic works;",
-                "children": [],
-                "end_date": null,
-                "node": "/us/usc/t17/s102/a/4",
-                "start_date": "2013-07-18",
-                "url": "https://authorityspoke.com/api/v1/us/usc/t17/s102/a/4/"
-            },
-            {
-                "heading": "",
-                "content": "pictorial, graphic, and sculptural works;",
-                "children": [],
-                "end_date": null,
-                "node": "/us/usc/t17/s102/a/5",
-                "start_date": "2013-07-18",
-                "url": "https://authorityspoke.com/api/v1/us/usc/t17/s102/a/5/"
-            },
-            {
-                "heading": "",
-                "content": "motion pictures and other audiovisual works;",
-                "children": [],
-                "end_date": null,
-                "node": "/us/usc/t17/s102/a/6",
-                "start_date": "2013-07-18",
-                "url": "https://authorityspoke.com/api/v1/us/usc/t17/s102/a/6/"
-            },
-            {
-                "heading": "",
-                "content": "sound recordings; and",
-                "children": [],
-                "end_date": null,
-                "node": "/us/usc/t17/s102/a/7",
-                "start_date": "2013-07-18",
-                "url": "https://authorityspoke.com/api/v1/us/usc/t17/s102/a/7/"
-            },
-            {
-                "heading": "",
-                "content": "architectural works.",
-                "children": [],
-                "end_date": null,
-                "node": "/us/usc/t17/s102/a/8",
-                "start_date": "2013-07-18",
-                "url": "https://authorityspoke.com/api/v1/us/usc/t17/s102/a/8/"
-            }
-        ],
-        "end_date": null,
-        "node": "/us/usc/t17/s102/a",
-        "start_date": "2013-07-18",
-        "url": "https://authorityspoke.com/api/v1/us/usc/t17/s102/a/",
-        "parent": "https://authorityspoke.com/api/v1/us/usc/t17/s102/"
+        "2013-07-18": {
+            "heading": "",
+            "content": "Copyright protection subsists, in accordance with this title, in original works of authorship fixed in any tangible medium of expression, now known or later developed, from which they can be perceived, reproduced, or otherwise communicated, either directly or with the aid of a machine or device. Works of authorship include the following categories:",
+            "children": [
+                {
+                    "heading": "",
+                    "content": "literary works;",
+                    "children": [],
+                    "end_date": null,
+                    "node": "/us/usc/t17/s102/a/1",
+                    "start_date": "2013-07-18",
+                    "url": "https://authorityspoke.com/api/v1/us/usc/t17/s102/a/1/"
+                },
+                {
+                    "heading": "",
+                    "content": "musical works, including any accompanying words;",
+                    "children": [],
+                    "end_date": null,
+                    "node": "/us/usc/t17/s102/a/2",
+                    "start_date": "2013-07-18",
+                    "url": "https://authorityspoke.com/api/v1/us/usc/t17/s102/a/2/"
+                },
+                {
+                    "heading": "",
+                    "content": "dramatic works, including any accompanying music;",
+                    "children": [],
+                    "end_date": null,
+                    "node": "/us/usc/t17/s102/a/3",
+                    "start_date": "2013-07-18",
+                    "url": "https://authorityspoke.com/api/v1/us/usc/t17/s102/a/3/"
+                },
+                {
+                    "heading": "",
+                    "content": "pantomimes and choreographic works;",
+                    "children": [],
+                    "end_date": null,
+                    "node": "/us/usc/t17/s102/a/4",
+                    "start_date": "2013-07-18",
+                    "url": "https://authorityspoke.com/api/v1/us/usc/t17/s102/a/4/"
+                },
+                {
+                    "heading": "",
+                    "content": "pictorial, graphic, and sculptural works;",
+                    "children": [],
+                    "end_date": null,
+                    "node": "/us/usc/t17/s102/a/5",
+                    "start_date": "2013-07-18",
+                    "url": "https://authorityspoke.com/api/v1/us/usc/t17/s102/a/5/"
+                },
+                {
+                    "heading": "",
+                    "content": "motion pictures and other audiovisual works;",
+                    "children": [],
+                    "end_date": null,
+                    "node": "/us/usc/t17/s102/a/6",
+                    "start_date": "2013-07-18",
+                    "url": "https://authorityspoke.com/api/v1/us/usc/t17/s102/a/6/"
+                },
+                {
+                    "heading": "",
+                    "content": "sound recordings; and",
+                    "children": [],
+                    "end_date": null,
+                    "node": "/us/usc/t17/s102/a/7",
+                    "start_date": "2013-07-18",
+                    "url": "https://authorityspoke.com/api/v1/us/usc/t17/s102/a/7/"
+                },
+                {
+                    "heading": "",
+                    "content": "architectural works.",
+                    "children": [],
+                    "end_date": null,
+                    "node": "/us/usc/t17/s102/a/8",
+                    "start_date": "2013-07-18",
+                    "url": "https://authorityspoke.com/api/v1/us/usc/t17/s102/a/8/"
+                }
+            ],
+            "end_date": null,
+            "node": "/us/usc/t17/s102/a",
+            "start_date": "2013-07-18",
+            "url": "https://authorityspoke.com/api/v1/us/usc/t17/s102/a/",
+            "parent": "https://authorityspoke.com/api/v1/us/usc/t17/s102/"
+        }
     },
     "/us/usc/t17/s102/b": {
-        "heading": "",
-        "content": "In no case does copyright protection for an original work of authorship extend to any idea, procedure, process, system, method of operation, concept, principle, or discovery, regardless of the form in which it is described, explained, illustrated, or embodied in such work.",
-        "children": [],
-        "end_date": null,
-        "node": "/us/usc/t17/s102/b",
-        "start_date": "2013-07-18",
-        "url": "https://authorityspoke.com/api/v1/us/usc/t17/s102/b/",
-        "parent": "https://authorityspoke.com/api/v1/us/usc/t17/s102/"
+        "2013-07-18": {
+            "heading": "",
+            "content": "In no case does copyright protection for an original work of authorship extend to any idea, procedure, process, system, method of operation, concept, principle, or discovery, regardless of the form in which it is described, explained, illustrated, or embodied in such work.",
+            "children": [],
+            "end_date": null,
+            "node": "/us/usc/t17/s102/b",
+            "start_date": "2013-07-18",
+            "url": "https://authorityspoke.com/api/v1/us/usc/t17/s102/b/",
+            "parent": "https://authorityspoke.com/api/v1/us/usc/t17/s102/"
+        }
     },
     "/us/usc/t17/s103/b": {
-        "heading": "",
-        "content": "The copyright in a compilation or derivative work extends only to the material contributed by the author of such work, as distinguished from the preexisting material employed in the work, and does not imply any exclusive right in the preexisting material. The copyright in such work is independent of, and does not affect or enlarge the scope, duration, ownership, or subsistence of, any copyright protection in the preexisting material.",
-        "children": [],
-        "end_date": null,
-        "node": "/us/usc/t17/s103/b",
-        "start_date": "2013-07-18",
-        "url": "https://authorityspoke.com/api/v1/us/usc/t17/s103/b/",
-        "parent": "https://authorityspoke.com/api/v1/us/usc/t17/s103/"
+        "2013-07-18": {
+            "heading": "",
+            "content": "The copyright in a compilation or derivative work extends only to the material contributed by the author of such work, as distinguished from the preexisting material employed in the work, and does not imply any exclusive right in the preexisting material. The copyright in such work is independent of, and does not affect or enlarge the scope, duration, ownership, or subsistence of, any copyright protection in the preexisting material.",
+            "children": [],
+            "end_date": null,
+            "node": "/us/usc/t17/s103/b",
+            "start_date": "2013-07-18",
+            "url": "https://authorityspoke.com/api/v1/us/usc/t17/s103/b/",
+            "parent": "https://authorityspoke.com/api/v1/us/usc/t17/s103/"
+        }
     },
     "/us/usc/t17/s410/c": {
-        "heading": "",
-        "content": "In any judicial proceedings the certificate of a registration made before or within five years after first publication of the work shall constitute prima facie evidence of the validity of the copyright and of the facts stated in the certificate. The evidentiary weight to be accorded the certificate of a registration made thereafter shall be within the discretion of the court.",
-        "children": [],
-        "end_date": null,
-        "node": "/us/usc/t17/s410/c",
-        "start_date": "2013-07-18",
-        "url": "https://authorityspoke.com/api/v1/us/usc/t17/s410/c/",
-        "parent": "https://authorityspoke.com/api/v1/us/usc/t17/s410/"
+        "2013-07-18": {
+            "heading": "",
+            "content": "In any judicial proceedings the certificate of a registration made before or within five years after first publication of the work shall constitute prima facie evidence of the validity of the copyright and of the facts stated in the certificate. The evidentiary weight to be accorded the certificate of a registration made thereafter shall be within the discretion of the court.",
+            "children": [],
+            "end_date": null,
+            "node": "/us/usc/t17/s410/c",
+            "start_date": "2013-07-18",
+            "url": "https://authorityspoke.com/api/v1/us/usc/t17/s410/c/",
+            "parent": "https://authorityspoke.com/api/v1/us/usc/t17/s410/"
+        }
     }
 }

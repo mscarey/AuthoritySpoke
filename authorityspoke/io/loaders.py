@@ -10,6 +10,7 @@ from typing import Any, Dict, List, Iterator, Optional, Tuple, Union
 
 from bs4 import BeautifulSoup
 from legislice.download import Client
+from legislice.name_index import EnactmentIndex
 
 from authorityspoke.decisions import Decision
 from authorityspoke.codes import Code
@@ -167,12 +168,13 @@ def load_holdings_with_index(
     directory: Optional[pathlib.Path] = None,
     filepath: Optional[pathlib.Path] = None,
     client: Optional[Client] = None,
+    enactment_index: Optional[EnactmentIndex] = None,
 ) -> readers.HoldingsIndexed:
     """Read holdings with factor index from a file."""
     raw_holdings = load_holdings(
         filename=filename, directory=directory, filepath=filepath
     )
-    return readers.read_holdings_with_index(raw_holdings, client=client)
+    return readers.read_holdings_with_index(raw_holdings, client=client, enactment_index=enactment_index)
 
 
 def load_holdings_with_anchors(

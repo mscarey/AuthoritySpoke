@@ -1,4 +1,4 @@
-from copy import copy
+from copy import deepcopy
 import json
 import os
 import pathlib
@@ -756,7 +756,8 @@ def e_due_process_5(make_response):
 @pytest.fixture(scope="module")
 def e_due_process_14(make_response):
     schema = EnactmentSchema()
-    enactment = schema.load(make_response["/us/const/amendment/XIV/1"])
+    fourteenth = make_response["/us/const/amendment/XIV"]
+    enactment = schema.load(fourteenth["children"][0])
     enactment.select("life, liberty, or property, without due process of law")
     return enactment
 
@@ -795,6 +796,7 @@ def e_and_inventors(make_response):
 
 @pytest.fixture(scope="module")
 def e_right_to_writings(make_response):
+    schema = EnactmentSchema()
     enactment = schema.load(make_response["/us/const/article/I/8/8"])
     enactment.select("the exclusive Right to their respective Writings")
     return enactment
@@ -876,35 +878,6 @@ def e_preexisting_material(make_response):
         "exclusive right in the preexisting material."
     )
     return enactment
-
-
-@pytest.fixture(scope="module")
-def copyright_enactments(
-    make_response,
-    e_copyright_protection,
-    e_copyright_exceptions_full,
-    e_securing,
-    e_right_to_writings,
-    e_compilation,
-    e_preexisting_material,
-    e_copyright_exceptions,
-) -> Dict[str, Dict]:
-    schema = EnactmentSchema()
-    enactment_index = EnactmentIndex(
-        {
-            "securing for authors": e_securing,
-            "right to writings": e_right_to_writings,
-            "copyright protection provision": e_copyright_protection,
-            "in no case clause": e_in_no_case,
-            "copyright in a compilation": e_compilation,
-            "preexisting material provision": e_preexisting_material,
-            "/us/usc/t17/s410/c": schema.load(make_response["/us/usc/t17/s410/c"]),
-            "copyright exceptions": e_copyright_exceptions,
-            "method of operation provision": e_method_of_operation,
-            "copyright exceptions full": e_copyright_exceptions_full,
-        }
-    )
-    return enactment_index
 
 
 @pytest.fixture(scope="class")
@@ -1328,12 +1301,14 @@ def make_decision():
 
 
 @pytest.fixture(scope="class")
-def make_decision_with_holding():
+def make_decision_with_holding(copyright_enactments):
     client_without_api_access = Client()
     decisions = load_decisions_for_fixtures()
     for case in TEST_CASES:
         holdings, mentioned, holding_anchors = loaders.load_holdings_with_index(
-            f"holding_{case}.json", client=client_without_api_access,
+            f"holding_{case}.json",
+            client=client_without_api_access,
+            enactment_index=copyright_enactments,
         )
         named_anchors = anchors.get_named_anchors(mentioned)
         decisions[case].majority.posit(
@@ -1443,4 +1418,3 @@ def raw_holding() -> RawHolding:
             ],
         },
     }
-

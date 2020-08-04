@@ -1,13 +1,12 @@
 import os
 
 from dotenv import load_dotenv
+from legislice.download import Client, JSONRepository
+from legislice.schemas import EnactmentSchema
 import pytest
 
 from authorityspoke.io import anchors, name_index, readers, schemas
 from authorityspoke.io.loaders import load_holdings
-
-
-from legislice.download import Client
 
 
 load_dotenv()
@@ -29,19 +28,20 @@ class TestEnactmentImport:
         enactment = readers.read_enactment(self.test_enactment)
         assert "all relevant evidence is admissible" in enactment.text
 
-    @pytest.mark.vcr
-    def test_enactment_with_anchor(self, fourteenth_dp):
+    def test_enactment_with_anchor(self, make_response):
+        fourteenth_dp = make_response["/us/const/amendment/XIV"]["1868-07-28"][
+            "children"
+        ][0]
         fourteenth_dp["exact"] = "nor shall any State deprive any person"
-        enactment = readers.read_enactment(fourteenth_dp, client=self.client)
+        enactment = readers.read_enactment(fourteenth_dp)
 
         assert enactment.selected_text().startswith("...nor shall any State")
 
-    @pytest.mark.vcr
-    def test_enactment_import_from_dict(self):
+    def test_enactment_import_from_dict(self, make_response):
         holding_brad = load_holdings("holding_brad.json")
-        enactments = readers.read_enactments(
-            holding_brad[0]["enactments"], client=self.client
-        )
+        client = JSONRepository(responses=make_response)
+        holdings = readers.read_holdings(holding_brad, client=client)
+        enactments = holdings[0].enactments
         assert enactments[0].selected_text().endswith("shall not be violated...")
 
     def test_false_as_selection(self):
