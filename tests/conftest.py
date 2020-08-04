@@ -8,7 +8,7 @@ from anchorpoint.textselectors import TextQuoteSelector
 from dotenv import load_dotenv
 from legislice import Enactment
 from legislice.name_index import EnactmentIndex
-from legislice.download import Client
+from legislice.download import Client, JSONRepository
 import pytest
 import vcr
 
@@ -1283,7 +1283,7 @@ def make_holding(make_rule) -> Dict[str, Holding]:
     return holdings
 
 
-TEST_CASES = ("feist", "lotus", "oracle")  # "brad", "cardenas", "watt"
+TEST_CASES = ("feist", "lotus", "oracle", "brad", "cardenas", "watt")
 
 
 def load_decisions_for_fixtures():
@@ -1301,14 +1301,14 @@ def make_decision():
 
 
 @pytest.fixture(scope="class")
-def make_decision_with_holding(copyright_enactments):
-    client_without_api_access = Client()
+def make_decision_with_holding(make_response):
+    client_without_api_access = JSONRepository(responses=make_response)
     decisions = load_decisions_for_fixtures()
     for case in TEST_CASES:
         holdings, mentioned, holding_anchors = loaders.load_holdings_with_index(
             f"holding_{case}.json",
             client=client_without_api_access,
-            enactment_index=copyright_enactments,
+            enactment_index=None,
         )
         named_anchors = anchors.get_named_anchors(mentioned)
         decisions[case].majority.posit(
