@@ -1,0 +1,122 @@
+{
+    "/test/acts/47/1": {
+        "1935-04-01": {
+            "heading": "Short title",
+            "content": "This Act may be cited as the Australian Beard Tax (Promotion of Enlightenment Values) Act 1934.",
+            "children": [],
+            "end_date": null,
+            "node": "/test/acts/47/1",
+            "start_date": "1935-04-01",
+            "url": "https://authorityspoke.com/api/v1/test/acts/47/1/",
+            "parent": "https://authorityspoke.com/api/v1/test/acts/47/"
+        }
+    },
+    "/test/acts/47/2": {
+        "1935-04-01": {
+            "heading": "Commencement",
+            "content": "This Act shall commence on 1 April 1935.",
+            "children": [],
+            "end_date": null,
+            "node": "/test/acts/47/2",
+            "start_date": "1935-04-01",
+            "url": "https://authorityspoke.com/api/v1/test/acts/47/2/",
+            "parent": "https://authorityspoke.com/api/v1/test/acts/47/"
+        }
+    },
+    "/test/acts/47/3": {
+        "1935-04-01": {
+            "heading": "Purpose",
+            "content": "",
+            "children": [
+                {
+                    "heading": "",
+                    "content": "This Act is enacted for the purpose of the promotion of enlightenment values.",
+                    "children": [],
+                    "end_date": null,
+                    "node": "/test/acts/47/3/a",
+                    "start_date": "2013-07-18",
+                    "url": "https://authorityspoke.com/api/v1/test/acts/47/3/a/"
+                }
+            ],
+            "end_date": null,
+            "node": "/test/acts/47/3",
+            "start_date": "2013-07-18",
+            "url": "https://authorityspoke.com/api/v1/test/acts/47/3/",
+            "parent": "https://authorityspoke.com/api/v1/test/acts/47/"
+        }
+    },
+    "/test/acts/47/4": {
+        "1935-04-01": {
+            "heading": "Beard, defined",
+            "content": "In this Act, beard means any facial hair no shorter than 5 millimetres in length that:",
+            "children": [
+                {
+                    "heading": "",
+                    "content": "occurs on or below the chin, or",
+                    "children": [],
+                    "end_date": null,
+                    "node": "/test/acts/47/4/a",
+                    "start_date": "1935-04-01",
+                    "url": "https://authorityspoke.com/api/v1/test/acts/47/4/a/"
+                },
+                {
+                    "heading": "",
+                    "content": "exists in an uninterrupted line from the front of one ear to the front of the other ear below the nose.",
+                    "children": [],
+                    "end_date": null,
+                    "node": "/test/acts/47/4/b",
+                    "start_date": "1935-04-01",
+                    "url": "https://authorityspoke.com/api/v1/test/acts/47/4/b/"
+                }
+            ],
+            "end_date": null,
+            "node": "/test/acts/47/4",
+            "start_date": "1935-04-01",
+            "url": "https://authorityspoke.com/api/v1/test/acts/47/4/",
+            "parent": "https://authorityspoke.com/api/v1/test/acts/47/"
+        }
+    },
+    "/test/acts/47/5": {
+        "1935-04-01": {
+            "heading": "Prohibition of beards",
+            "content": "The wearing of any beard whatsoever, except as provided in section 6, is prohibited within the Commonwealth of Australia.",
+            "children": [],
+            "end_date": null,
+            "node": "/test/acts/47/5",
+            "start_date": "1935-04-01",
+            "url": "https://authorityspoke.com/api/v1/test/acts/47/5/",
+            "parent": "https://authorityspoke.com/api/v1/test/acts/47/"
+        }
+    },
+    "/test/acts/47/6": {
+        "1935-04-01": {
+            "heading": "Exemption",
+            "content": "",
+            "children": [
+                {
+                    "heading": "",
+                    "content": "The office of the Department of Beards may, from time to time or as they see fit, grant exemptions to persons from the prohibition contained in section 5.",
+                    "children": [],
+                    "end_date": null,
+                    "node": "/test/acts/47/6/1",
+                    "start_date": "1935-04-01",
+                    "url": "https://authorityspoke.com/api/v1/test/acts/47/6/1/"
+                },
+                {
+                    "heading": "",
+                    "content": "Any such exemption granted under subsection 1 is to be for no longer than a period of 12 months.",
+                    "children": [],
+                    "end_date": null,
+                    "node": "/test/acts/47/6/2",
+                    "start_date": "1935-04-01",
+                    "url": "https://authorityspoke.com/api/v1/test/acts/47/6/2/"
+                }
+            ],
+            "end_date": null,
+            "node": "/test/acts/47/6",
+            "start_date": "1935-04-01",
+            "url": "https://authorityspoke.com/api/v1/test/acts/47/6/",
+            "parent": "https://authorityspoke.com/api/v1/test/acts/47/"
+        }
+    }
+}

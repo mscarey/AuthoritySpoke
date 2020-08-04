@@ -8,7 +8,7 @@ from authorityspoke.evidence import Exhibit
 from authorityspoke.rules import Rule
 
 
-from legislice.download import Client
+from legislice.download import Client, JSONRepository
 
 load_dotenv()
 
@@ -16,18 +16,17 @@ TOKEN = os.getenv("LEGISLICE_API_TOKEN")
 
 
 class TestRuleDump:
-    client = Client(api_token=TOKEN)
-
     def test_dump_rule(self, make_rule):
         rule = make_rule["h2"]
         dumped = dump.to_dict(rule)
         content = dumped["procedure"]["inputs"][0]["predicate"]["content"]
         assert content == "{} was on the premises of {}"
 
-    def test_dump_and_read_rule(self, make_rule, make_regime):
+    def test_dump_and_read_rule(self, make_rule, make_response):
+        client = JSONRepository(responses=make_response)
         rule = make_rule["h2"]
         dumped = dump.to_dict(rule)
-        loaded = readers.read_rule(dumped, client=self.client)
+        loaded = readers.read_rule(dumped, client=client)
         content = loaded.despite[0].predicate.content
         assert "the distance between {} and {} was" in content
 

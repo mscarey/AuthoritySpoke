@@ -728,7 +728,7 @@ def make_response() -> Dict[str, Dict]:
 @pytest.fixture(scope="module")
 def e_fourth_a(make_response):
     schema = EnactmentSchema()
-    enactment = schema.load(make_response["/us/const/amendment/IV"])
+    enactment = schema.load(make_response["/us/const/amendment/IV"]["1791-12-15"])
     return enactment
 
 
@@ -748,7 +748,7 @@ def e_warrants_clause(e_fourth_a):
 @pytest.fixture(scope="module")
 def e_due_process_5(make_response):
     schema = EnactmentSchema()
-    enactment = schema.load(make_response["/us/const/amendment/V"])
+    enactment = schema.load(make_response["/us/const/amendment/V"]["1791-12-15"])
     enactment.select("life, liberty, or property, without due process of law")
     return enactment
 
@@ -756,7 +756,7 @@ def e_due_process_5(make_response):
 @pytest.fixture(scope="module")
 def e_due_process_14(make_response):
     schema = EnactmentSchema()
-    fourteenth = make_response["/us/const/amendment/XIV"]
+    fourteenth = make_response["/us/const/amendment/XIV"]["1868-07-28"]
     enactment = schema.load(fourteenth["children"][0])
     enactment.select("life, liberty, or property, without due process of law")
     return enactment
@@ -765,7 +765,7 @@ def e_due_process_14(make_response):
 @pytest.fixture(scope="module")
 def e_securing_for_authors(make_response):
     schema = EnactmentSchema()
-    enactment = schema.load(make_response["/us/const/article/I/8/8"])
+    enactment = schema.load(make_response["/us/const/article/I/8/8"]["1788-09-13"])
     selector = TextQuoteSelector(
         exact=(
             "To promote the Progress of Science and "
