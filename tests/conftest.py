@@ -733,16 +733,20 @@ def e_fourth_a(make_response):
 
 
 @pytest.fixture(scope="module")
-def e_search_clause(e_fourth_a):
+def e_search_clause(make_response):
+    schema = EnactmentSchema()
+    enactment = schema.load(make_response["/us/const/amendment/IV"]["1791-12-15"])
     selector = TextQuoteSelector(suffix=", and no Warrants shall issue")
-    e_fourth_a.select(selector)
-    return e_fourth_a
+    enactment.select(selector)
+    return enactment
 
 
 @pytest.fixture(scope="module")
-def e_warrants_clause(e_fourth_a):
-    e_fourth_a.select("shall not be violated, and no Warrants shall issue,")
-    return e_fourth_a
+def e_warrants_clause(make_response):
+    schema = EnactmentSchema()
+    enactment = schema.load(make_response["/us/const/amendment/IV"]["1791-12-15"])
+    enactment.select("shall not be violated, and no Warrants shall issue,")
+    return enactment
 
 
 @pytest.fixture(scope="module")
