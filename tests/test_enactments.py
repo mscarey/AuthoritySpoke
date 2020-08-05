@@ -3,7 +3,7 @@ import os
 
 from anchorpoint.textselectors import TextQuoteSelector, TextSelectionError
 from dotenv import load_dotenv
-from legislice.download import Client
+from legislice.download import Client, JSONRepository
 from legislice.enactments import Enactment, consolidate_enactments
 from legislice.schemas import EnactmentSchema
 import pytest
@@ -195,7 +195,9 @@ class TestEnactments:
         assert combined.selected_text() == e_fourth_a.selected_text()
         assert combined.means(e_fourth_a)
 
-    def test_consolidate_enactments(self, fourth_a):
+    def test_consolidate_enactments(self, make_response):
+
+        fourth_a = make_response["/us/const/amendment/IV"]["1791-12-15"]
         search_clause = fourth_a.copy()
         search_clause["selection"] = [{"suffix": ", and no Warrants"}]
 
@@ -214,10 +216,10 @@ class TestEnactments:
         assert len(consolidated) == 1
         assert consolidated[0].means(fourth)
 
-    @pytest.mark.vcr()
-    def test_consolidate_adjacent_passages(self):
-        copyright_clause = self.client.read("/us/const/article/I/8/8")
-        copyright_statute = self.client.read("/us/usc/t17/s102/b")
+    def test_consolidate_adjacent_passages(self, make_response):
+        client = JSONRepository(responses=make_response)
+        copyright_clause = client.read("/us/const/article/I/8/8")
+        copyright_statute = client.read("/us/usc/t17/s102/b")
 
         copyright_clause.select(None)
         securing_for_authors = copyright_clause + (
@@ -242,11 +244,11 @@ class TestEnactments:
             for law in combined
         )
 
-    def test_do_not_consolidate_from_different_sections(self, fifth_a, fourteenth_dp):
-        schema = EnactmentSchema()
+    def test_do_not_consolidate_from_different_sections(self, make_response):
+        client = JSONRepository(responses=make_response)
 
-        due_process_5 = schema.load(fifth_a)
-        due_process_14 = schema.load(fourteenth_dp)
+        due_process_5 = client.read("/us/const/amendment/V")
+        due_process_14 = client.read("/us/const/amendment/XIV")
 
         due_process_5.select("life, liberty, or property, without due process of law")
         due_process_14.select("life, liberty, or property, without due process of law")

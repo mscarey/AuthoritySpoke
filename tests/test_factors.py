@@ -294,7 +294,8 @@ class TestSameMeaning:
 
     def test_unequal_to_enactment(self, watt_factor, e_copyright):
         assert not watt_factor["f1"].means(e_copyright)
-        assert not e_copyright.means(watt_factor["f1"])
+        with pytest.raises(TypeError):
+            e_copyright.means(watt_factor["f1"])
 
     def test_standard_of_proof_inequality(self, watt_factor):
 
@@ -655,6 +656,6 @@ class TestAddition:
     def test_add_unrelated_factors(self, make_factor):
         assert make_factor["f_murder"] + make_factor["f_crime"] is None
 
-    def test_cant_add_enactment_to_fact(self, watt_factor, make_enactment):
+    def test_cant_add_enactment_to_fact(self, watt_factor, e_search_clause):
         with pytest.raises(TypeError):
             print(watt_factor["f3"] + e_search_clause)
