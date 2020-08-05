@@ -779,7 +779,7 @@ def e_securing_for_authors(make_response):
 @pytest.fixture(scope="module")
 def e_securing(make_response):
     schema = EnactmentSchema()
-    enactment = schema.load(make_response["/us/const/article/I/8/8"])
+    enactment = schema.load(make_response["/us/const/article/I/8/8"]["1788-09-13"])
     enactment.select(
         "To promote the Progress of Science and useful Arts, by securing for limited Times to Authors"
     )
@@ -789,7 +789,7 @@ def e_securing(make_response):
 @pytest.fixture(scope="module")
 def e_and_inventors(make_response):
     schema = EnactmentSchema()
-    enactment = schema.load(make_response["/us/const/article/I/8/8"])
+    enactment = schema.load(make_response["/us/const/article/I/8/8"]["1788-09-13"])
     enactment.select("and Inventors")
     return enactment
 
@@ -797,7 +797,7 @@ def e_and_inventors(make_response):
 @pytest.fixture(scope="module")
 def e_right_to_writings(make_response):
     schema = EnactmentSchema()
-    enactment = schema.load(make_response["/us/const/article/I/8/8"])
+    enactment = schema.load(make_response["/us/const/article/I/8/8"]["1788-09-13"])
     enactment.select("the exclusive Right to their respective Writings")
     return enactment
 
@@ -805,7 +805,7 @@ def e_right_to_writings(make_response):
 @pytest.fixture(scope="module")
 def e_copyright_protection(make_response, make_selector):
     schema = EnactmentSchema()
-    enactment = schema.load(make_response["/us/usc/t17/s102/a"])
+    enactment = schema.load(make_response["/us/usc/t17/s102/a"]["2013-07-18"])
     enactment.select(TextQuoteSelector(suffix="Works of authorship include"))
     return enactment
 
@@ -813,7 +813,7 @@ def e_copyright_protection(make_response, make_selector):
 @pytest.fixture(scope="module")
 def e_copyright_requires_originality(make_response, make_selector):
     schema = EnactmentSchema()
-    enactment = schema.load(make_response["/us/usc/t17/s102/a"])
+    enactment = schema.load(make_response["/us/usc/t17/s102/a"]["2013-07-18"])
     enactment.select(make_selector["copyright_requires_originality"])
     return enactment
 
@@ -821,7 +821,7 @@ def e_copyright_requires_originality(make_response, make_selector):
 @pytest.fixture(scope="module")
 def e_copyright(make_response, make_selector):
     schema = EnactmentSchema()
-    enactment = schema.load(make_response["/us/usc/t17/s102/b"])
+    enactment = schema.load(make_response["/us/usc/t17/s102/b"]["2013-07-18"])
     enactment.select(make_selector["copyright"])
     return enactment
 
@@ -829,7 +829,7 @@ def e_copyright(make_response, make_selector):
 @pytest.fixture(scope="module")
 def e_copyright_exceptions(make_response):
     schema = EnactmentSchema()
-    enactment = schema.load(make_response["/us/usc/t17/s102/b"])
+    enactment = schema.load(make_response["/us/usc/t17/s102/b"]["2013-07-18"])
     enactment.select(TextQuoteSelector(suffix="idea, procedure, process"))
     return enactment
 
@@ -837,14 +837,14 @@ def e_copyright_exceptions(make_response):
 @pytest.fixture(scope="module")
 def e_copyright_exceptions_full(make_response):
     schema = EnactmentSchema()
-    enactment = schema.load(make_response["/us/usc/t17/s102/b"])
+    enactment = schema.load(make_response["/us/usc/t17/s102/b"]["2013-07-18"])
     return enactment
 
 
 @pytest.fixture(scope="module")
 def e_in_no_case(make_response):
     schema = EnactmentSchema()
-    enactment = schema.load(make_response["/us/usc/t17/s102/b"])
+    enactment = schema.load(make_response["/us/usc/t17/s102/b"]["2013-07-18"])
     enactment.select(
         "In no case does copyright protection for an original work of authorship extend to any"
     )
@@ -854,7 +854,7 @@ def e_in_no_case(make_response):
 @pytest.fixture(scope="module")
 def e_method_of_operation(make_response):
     schema = EnactmentSchema()
-    enactment = schema.load(make_response["/us/usc/t17/s102/b"])
+    enactment = schema.load(make_response["/us/usc/t17/s102/b"]["2013-07-18"])
     enactment.select(TextQuoteSelector(exact="method of operation"))
     return enactment
 
@@ -862,7 +862,7 @@ def e_method_of_operation(make_response):
 @pytest.fixture(scope="module")
 def e_compilation(make_response):
     schema = EnactmentSchema()
-    enactment = schema.load(make_response["/us/usc/t17/s103/b"])
+    enactment = schema.load(make_response["/us/usc/t17/s103/b"]["2013-07-18"])
     enactment.select("The copyright in a compilation")
     return enactment
 
@@ -870,7 +870,7 @@ def e_compilation(make_response):
 @pytest.fixture(scope="module")
 def e_preexisting_material(make_response):
     schema = EnactmentSchema()
-    enactment = schema.load(make_response["/us/usc/t17/s103/b"])
+    enactment = schema.load(make_response["/us/usc/t17/s103/b"]["2013-07-18"])
     enactment.select(
         "extends only to the material contributed by the author "
         "of such work, as distinguished from the preexisting "

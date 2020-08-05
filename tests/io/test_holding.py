@@ -245,7 +245,9 @@ class TestTextAnchors:
         record, mentioned = name_index.index_names(watch)
         assert len(mentioned["Mark stole a watch"]["anchors"]) == 2
 
-    def test_posit_one_holding_with_anchor(self, make_opinion, raw_holding):
+    def test_posit_one_holding_with_anchor(
+        self, make_opinion, raw_holding, make_response
+    ):
         mock_client = JSONRepository(responses=make_response)
         holding, mentioned, anchor_list = readers.read_holdings_with_index(
             raw_holding["bradley_house"], client=mock_client, many=False
