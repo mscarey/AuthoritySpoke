@@ -739,6 +739,7 @@ def beard_response() -> Dict[str, Dict]:
 def e_fourth_a(make_response):
     schema = EnactmentSchema()
     enactment = schema.load(make_response["/us/const/amendment/IV"]["1791-12-15"])
+    enactment.select_all()
     return enactment
 
 

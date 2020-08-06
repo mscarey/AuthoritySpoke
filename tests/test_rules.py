@@ -664,7 +664,17 @@ class TestUnion:
         new_rule = feist.holdings[0].rule | feist.holdings[2].rule
         assert len(new_rule.inputs) == 2
         assert len(new_rule.outputs) == 1
-        assert len(new_rule.enactments) == 4
+        # The two Enactments will be:
+        # 1.
+        # 'To promote the Progress of Science and useful Arts,
+        # by securing for limited Times to Authors...the exclusive Right
+        # to their respective Writings...'
+        # 2.
+        # 'The copyright in a compilation...extends only to the material
+        # contributed by the author of such work, as distinguished from
+        # the preexisting material employed in the work, and does not
+        # imply any exclusive right in the preexisting material....'
+        assert len(new_rule.enactments) == 2
 
     def test_union_of_rule_and_holding(self, make_opinion_with_holding):
         feist = make_opinion_with_holding["feist_majority"]
@@ -672,7 +682,7 @@ class TestUnion:
         assert isinstance(new_holding, Holding)
         assert len(new_holding.inputs) == 2
         assert len(new_holding.outputs) == 1
-        assert len(new_holding.enactments) == 4
+        assert len(new_holding.enactments) == 2
 
     def test_union_longer(self, make_opinion_with_holding):
         feist = make_opinion_with_holding["feist_majority"]
@@ -802,24 +812,28 @@ class TestStatuteRules:
 
     client = Client(api_token=TOKEN)
 
-    def test_greater_than_implies_equal(self, make_code, make_beard_rule):
-        beard_act = make_code["beard_act"]
+    @pytest.mark.vcr
+    def test_greater_than_implies_equal(self, beard_response, make_beard_rule):
+        client = JSONRepository(responses=beard_response)
         beard_dictionary = loaders.load_holdings("beard_rules.json")
         beard_dictionary[0]["inputs"][1][
             "content"
         ] = "the length of the suspected beard was = 8 millimetres"
-        longer_hair_rule = readers.read_rule(beard_dictionary[0], beard_act)
+        longer_hair_rule = readers.read_rule(beard_dictionary[0], client=client)
         assert make_beard_rule[0].implies(longer_hair_rule)
 
-    def test_greater_than_contradicts_not_greater(self, make_code, make_beard_rule):
-        beard_act = make_code["beard_act"]
+    @pytest.mark.vcr
+    def test_greater_than_contradicts_not_greater(
+        self, beard_response, make_beard_rule
+    ):
+        client = JSONRepository(responses=beard_response)
         beard_dictionary = loaders.load_holdings("beard_rules.json")
         beard_dictionary[1]["inputs"][1][
             "content"
         ] = "the length of the suspected beard was >= 12 inches"
         beard_dictionary[1]["outputs"][0]["truth"] = False
         beard_dictionary[1]["mandatory"] = True
-        long_hair_is_not_a_beard = readers.read_rule(beard_dictionary[1], beard_act)
+        long_hair_is_not_a_beard = readers.read_rule(beard_dictionary[1], client=client)
         assert make_beard_rule[1].contradicts(long_hair_is_not_a_beard)
 
     @pytest.mark.vcr
@@ -838,7 +852,7 @@ class TestStatuteRules:
         assert make_beard_rule[1].contradicts(long_thing_is_not_a_beard)
 
     def test_contradictory_fact_about_beard_length_reverse(
-        self, make_code, make_beard_rule, beard_response
+        self, make_beard_rule, beard_response
     ):
         client = JSONRepository(responses=beard_response)
         beard_dictionary = loaders.load_holdings("beard_rules.json")
