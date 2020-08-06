@@ -140,7 +140,7 @@ def load_and_read_holdings(
     filename: Optional[str] = None,
     directory: Optional[pathlib.Path] = None,
     filepath: Optional[pathlib.Path] = None,
-    regime: Optional[Regime] = None,
+    client: Optional[Client] = None,
 ) -> List[Holding]:
     """
     Read holdings from a file.
@@ -160,7 +160,7 @@ def load_and_read_holdings(
     raw_holdings = load_holdings(
         filename=filename, directory=directory, filepath=filepath
     )
-    return readers.read_holdings(raw_holdings, regime=regime)
+    return readers.read_holdings(raw_holdings, client=client)
 
 
 def load_holdings_with_index(
@@ -174,7 +174,9 @@ def load_holdings_with_index(
     raw_holdings = load_holdings(
         filename=filename, directory=directory, filepath=filepath
     )
-    return readers.read_holdings_with_index(raw_holdings, client=client, enactment_index=enactment_index)
+    return readers.read_holdings_with_index(
+        raw_holdings, client=client, enactment_index=enactment_index
+    )
 
 
 def load_holdings_with_anchors(
