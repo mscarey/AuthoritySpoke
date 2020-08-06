@@ -502,7 +502,7 @@ class TestAddition:
         """
         murder_rule = make_complex_rule["accept_murder_fact_from_relevance"]
         assert e_due_process_5 not in murder_rule.enactments
-        due_process_murder_rule = e_due_process_5 + murder_rule
+        due_process_murder_rule = murder_rule + e_due_process_5
         assert e_due_process_5 in due_process_murder_rule.enactments
 
     def test_add_enactment_to_rule(self, make_complex_rule, e_due_process_5):
@@ -822,8 +822,8 @@ class TestStatuteRules:
         long_hair_is_not_a_beard = readers.read_rule(beard_dictionary[1], beard_act)
         assert make_beard_rule[1].contradicts(long_hair_is_not_a_beard)
 
-    def test_contradictory_fact_about_beard_length(self, make_code, make_beard_rule):
-        beard_act = make_code["beard_act"]
+    @pytest.mark.vcr
+    def test_contradictory_fact_about_beard_length(self, make_beard_rule):
         beard_dictionary = loaders.load_holdings("beard_rules.json")
         beard_dictionary[1]["despite"] = beard_dictionary[1]["inputs"][0]
         beard_dictionary[1]["inputs"] = {
@@ -832,7 +832,9 @@ class TestStatuteRules:
         }
         beard_dictionary[1]["outputs"][0]["truth"] = False
         beard_dictionary[1]["mandatory"] = True
-        long_thing_is_not_a_beard = readers.read_rule(beard_dictionary[1], beard_act)
+        long_thing_is_not_a_beard = readers.read_rule(
+            beard_dictionary[1], client=self.client
+        )
         assert make_beard_rule[1].contradicts(long_thing_is_not_a_beard)
 
     def test_contradictory_fact_about_beard_length_reverse(
