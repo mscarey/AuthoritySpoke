@@ -257,7 +257,7 @@ class TestEnactments:
         assert len(combined) == 2
 
     def test_cant_add_fact_to_enactment(self, watt_factor, e_search_clause):
-        with pytest.raises(ValueError):
+        with pytest.raises(TypeError):
             print(e_search_clause + watt_factor["f3"])
 
     def test_cant_add_enactment_that_is_not_ancestor_or_descendant(
@@ -296,15 +296,14 @@ class TestDump:
 
 
 class TestTextSelection:
-    client = Client(api_token=TOKEN)
-
     def test_code_from_selector(self, make_regime):
         code = make_regime.get_code("/us/usc/t17/s103")
         assert code.uri == "/us/usc/t17"
 
-    @pytest.mark.vcr
-    def test_usc_selection(self, make_selector):
-        enactment = self.client.read("/us/usc/t17/s103")
+    def test_usc_selection(self, make_response, make_selector):
+        client = JSONRepository(responses=make_response)
+
+        enactment = client.read("/us/usc/t17/s103")
         selector = make_selector["preexisting material"]
         enactment.select(selector)
 
@@ -312,17 +311,17 @@ class TestTextSelection:
         assert enactment.jurisdiction == "us"
         assert enactment.code == "usc"
 
-    def test_omit_terminal_slash(self):
+    def test_omit_terminal_slash(self, make_response):
+        client = JSONRepository(responses=make_response)
         statute = readers.read_enactment(
-            {"exact": "process, system,", "node": "us/usc/t17/s102/b/"},
-            client=self.client,
+            {"exact": "process, system,", "node": "us/usc/t17/s102/b/"}, client=client,
         )
         assert not statute.source.endswith("/")
 
-    def test_add_omitted_initial_slash(self):
+    def test_add_omitted_initial_slash(self, make_response):
+        client = JSONRepository(responses=make_response)
         statute = readers.read_enactment(
-            {"exact": "process, system,", "node": "us/usc/t17/s102/b/"},
-            client=self.client,
+            {"exact": "process, system,", "node": "us/usc/t17/s102/b/"}, client=client,
         )
         assert statute.source.startswith("/")
 
@@ -340,22 +339,22 @@ class TestTextSelection:
             + "for an original work of authorship extend to any..."
         )
 
-    @pytest.mark.vcr
-    def test_section_text_from_path(self):
+    def test_section_text_from_path(self, make_response):
+        client = JSONRepository(responses=make_response)
         copyright_exceptions = readers.read_enactment(
-            {"node": "/us/usc/t17/s102/b"}, client=self.client
+            {"node": "/us/usc/t17/s102/b"}, client=client
         )
         assert copyright_exceptions.text.startswith(
             "In no case does copyright protection "
             + "for an original work of authorship extend to any"
         )
 
-    @pytest.mark.vcr
-    def test_exact_text_not_in_selection(self):
+    def test_exact_text_not_in_selection(self, make_response):
+        client = JSONRepository(responses=make_response)
         with pytest.raises(TextSelectionError):
             _ = readers.read_enactment(
                 {"node": "/us/const/amendment/XV/1", "exact": "due process",},
-                client=self.client,
+                client=client,
             )
 
     def test_multiple_non_Factor_selectors_for_Holding(self):

@@ -93,6 +93,37 @@
             "parent": "https://authorityspoke.com/api/v1/us/const/amendment/"
         }
     },
+    "/us/const/amendment/XV": {
+        "1870-03-30": {
+            "heading": "AMENDMENT XV.",
+            "content": "",
+            "children": [
+                {
+                    "heading": "Suffrage not to be abridged for race, color, etc.",
+                    "content": "The right of citizens of the United States to vote shall not be denied or abridged by the United States or by any State on account of race, color, or previous condition of servitude.",
+                    "children": [],
+                    "end_date": null,
+                    "node": "/us/const/amendment/XV/1",
+                    "start_date": "1870-03-30",
+                    "url": "https://authorityspoke.com/api/v1/us/const/amendment/XV/1/"
+                },
+                {
+                    "heading": "Section 2.",
+                    "content": "The Congress shall have power to enforce this article by appropriate legislation.",
+                    "children": [],
+                    "end_date": null,
+                    "node": "/us/const/amendment/XV/2",
+                    "start_date": "1870-03-30",
+                    "url": "https://authorityspoke.com/api/v1/us/const/amendment/XV/2/"
+                }
+            ],
+            "end_date": null,
+            "node": "/us/const/amendment/XV",
+            "start_date": "1870-03-30",
+            "url": "https://authorityspoke.com/api/v1/us/const/amendment/XV/",
+            "parent": "https://authorityspoke.com/api/v1/us/const/amendment/"
+        }
+    },
     "/us/usc/t17/s102/a": {
         "2013-07-18": {
             "heading": "",
@@ -190,16 +221,35 @@
             "parent": "https://authorityspoke.com/api/v1/us/usc/t17/s102/"
         }
     },
-    "/us/usc/t17/s103/b": {
+    "/us/usc/t17/s103": {
         "2013-07-18": {
-            "heading": "",
-            "content": "The copyright in a compilation or derivative work extends only to the material contributed by the author of such work, as distinguished from the preexisting material employed in the work, and does not imply any exclusive right in the preexisting material. The copyright in such work is independent of, and does not affect or enlarge the scope, duration, ownership, or subsistence of, any copyright protection in the preexisting material.",
-            "children": [],
+            "heading": "Subject matter of copyright: Compilations and derivative works",
+            "content": "",
+            "children": [
+                {
+                    "heading": "",
+                    "content": "The subject matter of copyright as specified by section 102 includes compilations and derivative works, but protection for a work employing preexisting material in which copyright subsists does not extend to any part of the work in which such material has been used unlawfully.",
+                    "children": [],
+                    "end_date": null,
+                    "node": "/us/usc/t17/s103/a",
+                    "start_date": "2013-07-18",
+                    "url": "https://authorityspoke.com/api/v1/us/usc/t17/s103/a/"
+                },
+                {
+                    "heading": "",
+                    "content": "The copyright in a compilation or derivative work extends only to the material contributed by the author of such work, as distinguished from the preexisting material employed in the work, and does not imply any exclusive right in the preexisting material. The copyright in such work is independent of, and does not affect or enlarge the scope, duration, ownership, or subsistence of, any copyright protection in the preexisting material.",
+                    "children": [],
+                    "end_date": null,
+                    "node": "/us/usc/t17/s103/b",
+                    "start_date": "2013-07-18",
+                    "url": "https://authorityspoke.com/api/v1/us/usc/t17/s103/b/"
+                }
+            ],
             "end_date": null,
-            "node": "/us/usc/t17/s103/b",
+            "node": "/us/usc/t17/s103",
             "start_date": "2013-07-18",
-            "url": "https://authorityspoke.com/api/v1/us/usc/t17/s103/b/",
-            "parent": "https://authorityspoke.com/api/v1/us/usc/t17/s103/"
+            "url": "https://authorityspoke.com/api/v1/us/usc/t17/s103/",
+            "parent": "https://authorityspoke.com/api/v1/us/usc/t17/"
         }
     },
     "/us/usc/t17/s410/c": {
