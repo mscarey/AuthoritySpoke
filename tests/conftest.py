@@ -726,6 +726,16 @@ def make_response() -> Dict[str, Dict]:
 
 
 @pytest.fixture(scope="module")
+def beard_response() -> Dict[str, Dict]:
+    """Mock api responses"""
+    this_directory = os.path.dirname(os.path.abspath(__file__))
+    responses_filepath = this_directory + "/mock_responses/beard_act.json"
+    with open(responses_filepath, "r") as f:
+        responses = json.load(f)
+    return responses
+
+
+@pytest.fixture(scope="module")
 def e_fourth_a(make_response):
     schema = EnactmentSchema()
     enactment = schema.load(make_response["/us/const/amendment/IV"]["1791-12-15"])
@@ -1229,11 +1239,11 @@ def make_rule(
 
 
 @pytest.fixture(scope="class")
-def make_beard_rule() -> List[Rule]:
+def make_beard_rule(beard_response) -> List[Rule]:
     """Rules from the "Beard Tax Act" example statutes."""
-    beard_act = loaders.load_and_read_code("beard_tax_act.xml")
+    client = JSONRepository(responses=beard_response)
     beard_dictionary = loaders.load_holdings("beard_rules.json")
-    return readers.read_rules(beard_dictionary, beard_act)
+    return readers.read_rules(beard_dictionary, client=client)
 
 
 @pytest.fixture(scope="class")

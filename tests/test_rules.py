@@ -17,7 +17,7 @@ from authorityspoke.io import loaders, readers
 
 class TestRules:
     def test_enactment_type_in_str(self, make_holding):
-        assert "constitution" in str(make_holding["h1"]).lower()
+        assert "const" in str(make_holding["h1"]).lower()
 
     def test_no_blank_line_in_str(self, make_holding):
         assert "\n\n" not in str(make_holding["h2"])
