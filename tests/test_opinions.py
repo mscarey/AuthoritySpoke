@@ -1,6 +1,8 @@
+from tests.conftest import make_response
 import pytest
 
 from anchorpoint.textselectors import TextQuoteSelector
+from legislice.download import JSONRepository
 
 from authorityspoke.entities import Entity
 from authorityspoke.facts import Fact
@@ -166,17 +168,18 @@ class TestOpinionHoldings:
                 context=(Entity("House on Haunted Hill"), "nonexistent factor"),
             )
 
-    def test_new_context_creates_equal_rule(self, make_opinion, make_regime):
+    def test_new_context_creates_equal_rule(self, make_opinion, make_response):
         watt = make_opinion["watt_majority"]
         brad = make_opinion["brad_majority"]
+        client = JSONRepository(responses=make_response)
 
         watt.clear_holdings()
         watt_raw = loaders.load_holdings("holding_watt.json")
-        watt.posit(readers.read_holdings(watt_raw, regime=make_regime))
+        watt.posit(readers.read_holdings(watt_raw, client=client))
 
         brad.clear_holdings()
         brad_raw = loaders.load_holdings("holding_brad.json")
-        brad.posit(readers.read_holdings(brad_raw, regime=make_regime))
+        brad.posit(readers.read_holdings(brad_raw, client=client))
 
         context_pairs = {
             "proof of Bradley's guilt": "proof of Wattenburg's guilt",
@@ -187,21 +190,21 @@ class TestOpinionHoldings:
         watt.posit(brad.holdings[0], context_pairs)
         assert watt.holdings[-1].means(brad.holdings[0])
 
-    def test_new_context_inferring_factors_to_change(self, make_opinion, make_regime):
+    def test_new_context_inferring_factors_to_change(self, make_opinion, make_response):
         """
         This changes watt's holdings; may break tests below.
         """
-
+        client = JSONRepository(responses=make_response)
         watt = make_opinion["watt_majority"]
         brad = make_opinion["brad_majority"]
 
         watt.clear_holdings()
         watt_raw = loaders.load_holdings("holding_watt.json")
-        watt.posit(readers.read_holdings(watt_raw, regime=make_regime))
+        watt.posit(readers.read_holdings(watt_raw, client=client))
 
         brad.clear_holdings()
         brad_raw = loaders.load_holdings("holding_brad.json")
-        brad.posit(readers.read_holdings(brad_raw, regime=make_regime))
+        brad.posit(readers.read_holdings(brad_raw, client=client))
 
         context_items = [
             "proof of Wattenburg's guilt",
@@ -245,11 +248,12 @@ class TestImplication:
         brad = make_opinion_with_holding["brad_majority"]
         assert not watt >= brad
 
-    def test_posit_list_of_holdings_and_imply(self, make_opinion, make_regime):
+    def test_posit_list_of_holdings_and_imply(self, make_opinion, make_response):
         watt = make_opinion["watt_majority"]
         brad = make_opinion["brad_majority"]
+        client = JSONRepository(responses=make_response)
         some_rules_raw = loaders.load_holdings(filename="holding_watt.json")
-        some_rules = readers.read_holdings(some_rules_raw, regime=make_regime)
+        some_rules = readers.read_holdings(some_rules_raw, client=client)
         for case in (watt, brad):
             case.clear_holdings()
             case.posit(some_rules[:3])
@@ -280,7 +284,7 @@ class TestImplication:
 
 class TestContradiction:
     def test_contradiction_of_holding(
-        self, make_opinion_with_holding, make_enactment, make_holding
+        self, make_opinion_with_holding, e_search_clause, make_holding
     ):
         assert make_opinion_with_holding["watt_majority"].contradicts(
             make_holding["h2_output_false_ALL_MUST"] + e_search_clause
