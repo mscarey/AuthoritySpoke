@@ -1,9 +1,21 @@
+import os
+
 import pytest
+
+from dotenv import load_dotenv
+from legislice import Enactment
+from legislice.download import Client, JSONRepository
 
 from authorityspoke.entities import Entity
 from authorityspoke.explanations import Explanation
 from authorityspoke.factors import ContextRegister, FactorSequence
 from authorityspoke.holdings import Holding
+
+
+load_dotenv()
+
+TOKEN = os.getenv("LEGISLICE_API_TOKEN")
+legislice_client = Client(api_token=TOKEN)
 
 
 class TestHolding:

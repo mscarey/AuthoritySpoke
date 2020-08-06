@@ -1,8 +1,11 @@
 import logging
+import os
 
-import pytest
 
+from dotenv import load_dotenv
+from legislice.download import Client, JSONRepository
 from legislice import Enactment
+import pytest
 
 from authorityspoke.entities import Entity
 from authorityspoke.factors import ContextRegister
@@ -13,6 +16,11 @@ from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
 
 from authorityspoke.io import loaders, readers
+
+load_dotenv()
+
+TOKEN = os.getenv("LEGISLICE_API_TOKEN")
+legislice_client = Client(api_token=TOKEN)
 
 
 class TestRules:
@@ -104,10 +112,10 @@ class TestRules:
         assert len(make_holding["h1"]) == 2
         assert len(make_holding["h3"]) == 5
 
-    def test_wrong_role_for_added_enactment(self, make_enactment, make_holding):
+    def test_wrong_role_for_added_enactment(self, e_due_process_14, make_holding):
         with pytest.raises(ValueError):
             make_holding["h1"].rule.add_enactment(
-                incoming=make_enactment["due_process_14"], role="inputs"
+                incoming=e_due_process_14, role="inputs"
             )
 
 
@@ -121,10 +129,9 @@ class TestSameMeaning:
         """
         assert make_rule["h1"].means(make_rule["h1_entity_order"])
 
-    def test_added_enactment_changes_meaning(self, make_complex_rule, make_enactment):
+    def test_added_enactment_changes_meaning(self, make_complex_rule, e_due_process_5):
         due_process_rule = (
-            make_complex_rule["accept_murder_fact_from_relevance"]
-            + make_enactment["due_process_5"]
+            make_complex_rule["accept_murder_fact_from_relevance"] + e_due_process_5
         )
 
         assert not due_process_rule.means(
@@ -487,27 +494,27 @@ class TestAddition:
         )
         assert two_input_rule.means(c["accept_murder_fact_from_relevance_and_shooting"])
 
-    def test_add_enactment_to_rule_reverse(self, make_complex_rule, make_enactment):
+    def test_add_enactment_to_rule_reverse(self, make_complex_rule, e_due_process_5):
         """
         Test that you can make a new version of a :class:`.Rule`,
         with one more input :class:`.Factor`, by using the addition operator with
         the :class:`.Rule` and input :class:`.Factor`.
         """
         murder_rule = make_complex_rule["accept_murder_fact_from_relevance"]
-        assert make_enactment["due_process_5"] not in murder_rule.enactments
-        due_process_murder_rule = make_enactment["due_process_5"] + murder_rule
-        assert make_enactment["due_process_5"] in due_process_murder_rule.enactments
+        assert e_due_process_5 not in murder_rule.enactments
+        due_process_murder_rule = e_due_process_5 + murder_rule
+        assert e_due_process_5 in due_process_murder_rule.enactments
 
-    def test_add_enactment_to_rule(self, make_complex_rule, make_enactment):
+    def test_add_enactment_to_rule(self, make_complex_rule, e_due_process_5):
         """
         Test that you can make a new version of a :class:`.Rule`,
         with one more input :class:`.Factor`, by using the addition operator with
         the :class:`.Rule` and input :class:`.Factor`.
         """
         murder_rule = make_complex_rule["accept_murder_fact_from_relevance"]
-        assert make_enactment["due_process_5"] not in murder_rule.enactments
-        due_process_murder_rule = murder_rule + make_enactment["due_process_5"]
-        assert make_enactment["due_process_5"] in due_process_murder_rule.enactments
+        assert e_due_process_5 not in murder_rule.enactments
+        due_process_murder_rule = murder_rule + e_due_process_5
+        assert e_due_process_5 in due_process_murder_rule.enactments
 
     def test_add_simple_rules(self):
         """
@@ -556,7 +563,7 @@ class TestAddition:
         )
 
     def test_add_rules_with_duplicate_enactment_text(
-        self, make_enactment, make_opinion_with_holding
+        self, e_copyright_requires_originality, make_opinion_with_holding
     ):
         """
         test implication between
@@ -576,7 +583,7 @@ class TestAddition:
         unoriginal_not_copyrightable = inferred_holding.rule
         listings_not_copyrightable = (
             listings_not_original
-            + make_enactment["copyright_requires_originality"]
+            + e_copyright_requires_originality
             + unoriginal_not_copyrightable
         )
         assert len(listings_not_copyrightable.inputs) == 1
@@ -625,7 +632,7 @@ class TestAddition:
         assert make_rule["h1"] + make_rule["h2_ALL"] is None
 
     def test_rule_requiring_more_enactments_wont_add(
-        self, make_enactment, make_complex_rule
+        self, e_due_process_5, make_complex_rule
     ):
         """
         This requirement might be changed, so that if the second
@@ -633,8 +640,7 @@ class TestAddition:
         available.
         """
         due_process_rule = (
-            make_complex_rule["accept_murder_fact_from_relevance"]
-            + make_enactment["due_process_5"]
+            make_complex_rule["accept_murder_fact_from_relevance"] + e_due_process_5
         )
         assert (
             make_complex_rule["accept_relevance_testimony_ALL"] + due_process_rule
@@ -794,6 +800,8 @@ class TestStatuteRules:
     Tests from the statute_rules Jupyter Notebook.
     """
 
+    client = Client(api_token=TOKEN)
+
     def test_greater_than_implies_equal(self, make_code, make_beard_rule):
         beard_act = make_code["beard_act"]
         beard_dictionary = loaders.load_holdings("beard_rules.json")
@@ -828,9 +836,9 @@ class TestStatuteRules:
         assert make_beard_rule[1].contradicts(long_thing_is_not_a_beard)
 
     def test_contradictory_fact_about_beard_length_reverse(
-        self, make_code, make_beard_rule
+        self, make_code, make_beard_rule, beard_response
     ):
-        beard_act = make_code["beard_act"]
+        client = JSONRepository(responses=beard_response)
         beard_dictionary = loaders.load_holdings("beard_rules.json")
         beard_dictionary[1]["despite"] = beard_dictionary[1]["inputs"][0]
         beard_dictionary[1]["inputs"] = {
@@ -839,9 +847,12 @@ class TestStatuteRules:
         }
         beard_dictionary[1]["outputs"][0]["truth"] = False
         beard_dictionary[1]["mandatory"] = True
-        long_thing_is_not_a_beard = readers.read_rule(beard_dictionary[1], beard_act)
+        long_thing_is_not_a_beard = readers.read_rule(
+            beard_dictionary[1], client=client
+        )
         assert long_thing_is_not_a_beard.contradicts(make_beard_rule[1])
 
+    @pytest.mark.vcr
     @pytest.mark.parametrize(
         (
             "facial_hair_over_5mm, facial_hair_on_or_below_chin, "
@@ -866,9 +877,10 @@ class TestStatuteRules:
         facial_hair_uninterrupted,
         outcome,
         make_beard_rule,
-        make_code,
     ):
         beard = Entity("a facial feature")
+
+        sec_4 = self.client.read(path="/test/acts/47/4/")
 
         hypothetical = Rule(
             procedure=Procedure(
@@ -901,10 +913,9 @@ class TestStatuteRules:
                 ],
                 outputs=Fact(Predicate("{} was a beard"), context_factors=beard),
             ),
-            enactments=Enactment(
-                source="/au/act/1934/47/1/4/", code=make_code["beard_act"]
-            ),
+            enactments=sec_4,
         )
+
         meets_chin_test = make_beard_rule[0].implies(hypothetical)
         meets_ear_test = make_beard_rule[1].implies(hypothetical)
         assert outcome == meets_chin_test or meets_ear_test
