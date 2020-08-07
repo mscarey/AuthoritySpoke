@@ -6,7 +6,6 @@ from marshmallow import ValidationError
 from legislice import Enactment
 import pytest
 
-from authorityspoke.codes import Code
 from authorityspoke.entities import Entity
 from authorityspoke.io import readers, schemas, name_index
 from authorityspoke.io.loaders import load_holdings

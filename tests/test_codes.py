@@ -1,11 +1,21 @@
 import datetime
+import os
 
 import pytest
 
 from anchorpoint.textselectors import TextPositionSelector, TextSelectionError
+from dotenv import load_dotenv
+
+from legislice.download import Client
+
+load_dotenv()
+
+TOKEN = os.getenv("LEGISLICE_API_TOKEN")
 
 
 class TestCodes:
+    client = Client(api_token=TOKEN)
+
     @pytest.mark.parametrize(
         "codename, name, level",
         [
@@ -16,12 +26,12 @@ class TestCodes:
             ("ca_pen", "California Penal Code", "statute"),
         ],
     )
-    def test_making_code(self, make_code, codename, name, level):
+    def test_making_code(self, codename, name, level):
         code = make_code[codename]
         assert str(code) == name
         assert code.level == level
 
-    def test_cfr_repr(self, make_code):
+    def test_cfr_repr(self):
         cfr = make_code["cfr37"]
         assert "Title 37" in repr(cfr)
 
@@ -45,90 +55,66 @@ class TestCodes:
             ("beard_act", "/au/act/1934/47"),
         ],
     )
-    def test_code_urls(self, make_code, code, path):
+    def test_code_urls(self, code, path):
         assert make_code[code].uri == path
 
+    @pytest.mark.vcr
     @pytest.mark.parametrize(
-        "code, expected",
-        [
-            ("usc17", "Title 17"),
-            ("const", "Constitution of the United States"),
-            ("cfr37", "Code of Federal Regulations Title 37"),
-            ("ca_evid", "California Evidence Code"),
-            ("ca_pen", "California Penal Code"),
-        ],
+        "path, expected",
+        [("/us/usc/t17", "COPYRIGHTS"), ("/us/const", "United States Constitution"),],
     )
-    def test_code_title(self, make_code, code, expected):
-        assert make_code[code].title == expected
+    def test_code_title(self, path, expected):
+        enactment = self.client.read(path=path)
+        assert enactment.heading == expected
 
-    def test_code_select_text(self, make_code):
-        code = make_code["beard_act"]
-        text = code.select_text("/au/act/1934/47/1")
-        assert text.startswith("This Act may be cited")
+    @pytest.mark.vcr
+    def test_code_select_text(self):
+        enactment = self.client.read(path="/test/acts/47/1")
+        assert enactment.text.startswith("This Act may be cited")
 
-    def test_code_select_text_chapeau(self, make_code):
-        code = make_code["beard_act"]
-        text = code.select_text("/au/act/1934/47/1/4/chapeau")
-        assert text.startswith("In this Act, beard means")
+    @pytest.mark.vcr
+    def test_code_select_text_chapeau(self):
+        enactment = self.client.read(path="/test/acts/47/4")
+        enactment.select()
+        assert enactment.selected_text().startswith("In this Act, beard means")
 
-    def test_get_bill_of_rights_effective_date(self, make_code):
-        const = make_code["const"]
-        bill_of_rights_date = datetime.date(1791, 12, 15)
-        assert const.provision_effective_date("amendment-V") == bill_of_rights_date
+    @pytest.mark.vcr
+    def test_get_bill_of_rights_effective_date(self):
+        enactment = self.client.read(path="/us/const/amendment/V")
+        assert enactment.start_date == datetime.date(1791, 12, 15)
 
-    def test_get_14th_A_effective_date(self, make_code):
-        const = make_code["const"]
-        equal_protection_date = datetime.date(1868, 7, 28)
-        assert const.provision_effective_date("amendment-XIV") == equal_protection_date
-
-    def test_format_uri_for_const(self, make_code):
-        """
-        This should test the example in the docstring
-        for the Code.format_uri_for_const method.
-        """
-
-        const = make_code["const"]
-        out = const.format_uri_for_const("/us/const/amendment/XIV/1")
-        assert out == "amendment-XIV-1"
-
+    @pytest.mark.vcr
     @pytest.mark.parametrize(
         "path, expected",
         (
             ["/us/const/amendment/XIV/3", "No person shall be a Senator"],
-            ["/article-I/5/1", "Each House shall be the Judge"],
+            ["/us/const/article/I/5/1", "Each House shall be the Judge"],
         ),
     )
-    def test_get_section_from_fed_const(self, make_code, path, expected):
-        const = make_code["const"]
-        section = const.get_fed_const_section(path)
-        assert section.find("text").text.startswith(expected)
+    def test_get_section_from_fed_const(self, path, expected):
+        enactment = self.client.read(path=path)
+        assert enactment.text.startswith(expected)
 
-    def test_text_interval_from_entire_code(self, make_code):
-        interval = make_code["const"].select_text_from_interval(
-            interval=TextPositionSelector(16, 50)
-        )
-        assert interval.startswith("Powers herein granted")
-
-    def test_text_interval_constitution_section(self, make_code):
-        passage = make_code["const"].select_text_from_interval(
-            path="/us/const/article/I/3/7", interval=TextPositionSelector(66, 85)
-        )
+    @pytest.mark.vcr
+    def test_text_interval_constitution_section(self):
+        enactment = self.client.read(path="/us/const/article/I/3/7")
+        passage = enactment.select_text_from_interval(TextPositionSelector(66, 85))
         assert passage == "removal from Office"
 
-    def test_text_interval_entire_section(self, make_code):
+    def test_text_interval_entire_section(self):
         """
         Returns an interval covering the entire 317-character section.
         """
         interval = make_code["const"].text_interval(path="/us/const/article/I/3/7")
         assert interval == (0, 317)
 
-    def test_text_interval_beyond_end_of_section(self, make_code):
+    def test_text_interval_beyond_end_of_section(self):
         with pytest.raises(IndexError):
             _ = make_code["const"].select_text_from_interval(
                 path="/us/const/article/I/3/7", interval=TextPositionSelector(66, 400)
             )
 
-    def test_text_interval_absent_section(self, make_code):
+    def test_text_interval_absent_section(self):
         """
         The path is a section that doesn't exist in CFR.
         """
@@ -137,13 +123,13 @@ class TestCodes:
                 path="/us/const/article/I/3/7", interval=TextPositionSelector(0, 66)
             )
 
-    def test_text_interval_bad_source(self, make_code, make_selector):
+    def test_text_interval_bad_source(self, make_selector):
         with pytest.raises(ValueError):
             _ = make_code["usc17"].text_interval(
                 selector=make_selector["bad_selector"], path="/us/const/amendment/IV",
             )
 
-    def test_text_interval_bad_selector(self, make_code, make_selector):
+    def test_text_interval_bad_selector(self, make_selector):
         with pytest.raises(TextSelectionError):
             _ = make_code["const"].text_interval(
                 selector=make_selector["bad_selector"], path="/us/const/amendment/IV",

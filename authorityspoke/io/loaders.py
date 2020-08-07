@@ -13,7 +13,6 @@ from legislice.download import Client
 from legislice.name_index import EnactmentIndex
 
 from authorityspoke.decisions import Decision
-from authorityspoke.codes import Code
 from authorityspoke.holdings import Holding
 from authorityspoke.jurisdictions import Regime
 from authorityspoke.opinions import AnchoredHoldings
@@ -57,16 +56,6 @@ def load_code(
     with open(validated_filepath) as fp:
         xml = BeautifulSoup(fp, "lxml-xml")
     return xml
-
-
-def load_and_read_code(
-    filename: Optional[str] = None,
-    directory: Optional[pathlib.Path] = None,
-    filepath: Optional[pathlib.Path] = None,
-) -> Code:
-    """Create a new Code from an XML filepath."""
-    soup = load_code(filename=filename, directory=directory, filepath=filepath)
-    return readers.read_code(soup)
 
 
 def load_holdings(

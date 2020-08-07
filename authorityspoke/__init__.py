@@ -2,7 +2,6 @@
 
 from legislice import Enactment
 
-from .codes import Code
 from .entities import Entity
 from .factors import Factor
 from .jurisdictions import Jurisdiction, Regime

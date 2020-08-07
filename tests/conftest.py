@@ -10,9 +10,7 @@ from legislice import Enactment
 from legislice.name_index import EnactmentIndex
 from legislice.download import Client, JSONRepository
 import pytest
-import vcr
 
-from authorityspoke.codes import Code
 from authorityspoke.entities import Entity
 from authorityspoke.evidence import Evidence, Exhibit
 from authorityspoke.factors import Factor
@@ -684,34 +682,6 @@ def make_selector() -> Dict[str, TextQuoteSelector]:
         "copyright_requires_originality": TextQuoteSelector(
             suffix="fixed in any tangible"
         ),
-    }
-
-
-@pytest.fixture(scope="module")
-def make_regime() -> Dict[str, Code]:
-    usa = Regime()
-    for filename in (
-        "constitution.xml",
-        "usc17.xml",
-        "cfr37.xml",
-        "ca_evidence.html",
-        "ca_penal.html",
-        "beard_tax_act.xml",
-    ):
-        xml = loaders.load_code(filename=filename)
-        usa.set_code(readers.read_code(xml))
-    return usa
-
-
-@pytest.fixture(scope="module")
-def make_code(make_regime) -> Dict[str, Code]:
-    return {
-        "const": make_regime.get_code("/us/const"),
-        "usc17": make_regime.get_code("/us/usc/t17"),
-        "cfr37": make_regime.get_code("/us/cfr/t37"),
-        "ca_evid": make_regime.get_code("/us-ca/code/evid"),
-        "ca_pen": make_regime.get_code("/us-ca/code/pen"),
-        "beard_act": make_regime.get_code("/au/act"),
     }
 
 
