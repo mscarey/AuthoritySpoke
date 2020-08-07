@@ -2,11 +2,8 @@
 
 from legislice.download import JSONRepository
 
-from authorityspoke.io.loaders import load_and_read_code
 from authorityspoke.io.loaders import load_and_read_decision
 from authorityspoke.io.loaders import load_and_read_holdings
-
-from authorityspoke import Regime
 
 
 class TestReadme:

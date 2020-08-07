@@ -12,7 +12,7 @@ AuthoritySpoke is a Python package [available on PyPI](https://pypi.org/project/
 $ pip install authorityspoke
 ```
 
-AuthoritySpoke is tested on Python 3.7 and is not yet working on Python 3.8.
+AuthoritySpoke runs on Python versions 3.7 and up.
 
 ## Trying it Out
 
@@ -34,18 +34,6 @@ lotus = load_and_read_decision("lotus_h.json")
 ```
 
 The `example_data` folder also contains legislation in XML files that can be organized by linking them to a `Regime` object.
-
-```python
-from authorityspoke import Regime
-
-from authorityspoke.io.loaders import load_and_read_code
-
-usa = Regime()
-
-usa.set_code(load_and_read_code("constitution.xml"))
-usa.set_code(load_and_read_code("usc17.xml"))
-usa.set_code(load_and_read_code("cfr37.xml"))
-```
 
 Structured annotations about the holdings in _Oracle_ and _Lotus_ can also be loaded from the `example_data` folder, and can be linked to the `Decision` objects.
 
