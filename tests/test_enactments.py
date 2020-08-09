@@ -21,7 +21,7 @@ class TestEnactments:
 
     def test_make_enactment(self, e_search_clause):
         search_clause = e_search_clause
-        assert search_clause.selected_text().endswith("shall not be violated...")
+        assert search_clause.selected_text().endswith("shall not be violated…")
 
     @pytest.mark.vcr
     def test_create_enactment_with_init(self):
@@ -38,7 +38,7 @@ class TestEnactments:
         art_3 = self.client.read("/us/const/article/III/1")
         art_3.select(selector)
         assert art_3.text.startswith("The judicial Power")
-        assert art_3.selected_text().endswith("the United States...")
+        assert art_3.selected_text().endswith("the United States…")
 
     @pytest.mark.vcr
     def test_make_enactment_from_dict_with_reader(self):
@@ -56,7 +56,7 @@ class TestEnactments:
             },
             client=self.client,
         )
-        assert fourth_a.selected_text() == "...the persons or things..."
+        assert fourth_a.selected_text() == "…the persons or things…"
 
     @pytest.mark.vcr
     def test_passage_from_imported_statute(self):
@@ -78,7 +78,7 @@ class TestEnactments:
             },
             client=self.client,
         )
-        assert method.selected_text() == "...method of operation..."
+        assert method.selected_text() == "…method of operation…"
 
     @pytest.mark.vcr
     def test_chapeau_and_subsections_from_uslm_code(self):
@@ -240,7 +240,7 @@ class TestEnactments:
         assert len(combined) == 2
         assert any(
             law.selected_text().startswith("To promote the Progress")
-            and law.selected_text().endswith("their respective Writings...")
+            and law.selected_text().endswith("their respective Writings…")
             for law in combined
         )
 
@@ -296,9 +296,10 @@ class TestDump:
 
 
 class TestTextSelection:
-    def test_code_from_selector(self, make_regime):
-        code = make_regime.get_code("/us/usc/t17/s103")
-        assert code.uri == "/us/usc/t17"
+    def test_code_from_selector(self, make_response):
+        client = JSONRepository(responses=make_response)
+        enactment = client.read("/us/usc/t17/s103")
+        assert enactment.code == "usc"
 
     def test_usc_selection(self, make_response, make_selector):
         client = JSONRepository(responses=make_response)
@@ -336,7 +337,7 @@ class TestTextSelection:
         e_copyright.select(copyright_selector)
         assert e_copyright.selected_text() == (
             "In no case does copyright protection "
-            + "for an original work of authorship extend to any..."
+            + "for an original work of authorship extend to any…"
         )
 
     def test_section_text_from_path(self, make_response):
