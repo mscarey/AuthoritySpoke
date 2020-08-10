@@ -28,6 +28,12 @@ class TestImplication:
         assert len(oracle_with_holdings.holdings) > 10
         assert oracle_with_holdings >= oracle
 
+    def test_opinion_implied_by_holding(self, make_decision, make_holding):
+        opinion = make_decision["watt"]
+        holding = make_holding["h1"]
+        opinion.posit(holding)
+        assert opinion.implied_by(holding)
+
     # @pytest.mark.skip(reason="slow")
     def test_decision_implies_its_opinion(self, make_decision_with_holding):
         cardenas = make_decision_with_holding["cardenas"]

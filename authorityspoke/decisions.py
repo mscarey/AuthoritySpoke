@@ -196,8 +196,13 @@ class Decision:
     def __gt__(self, other) -> bool:
         return self.implies(other) and not self == other
 
-    def implied_by_holding(self, other: Holding) -> Iterator[Explanation]:
-        if all(other.implies(self_holding) for self_holding in self.holdings):
+    def implied_by_holding(
+        self, other: Holding, context: Optional[ContextRegister] = None
+    ) -> Iterator[Explanation]:
+        if all(
+            other.implies(self_holding, context=context)
+            for self_holding in self.holdings
+        ):
             yield Explanation(
                 matches=[(other, self_holding) for self_holding in self.holdings],
                 operation=operator.ge,
