@@ -2,11 +2,14 @@ Changelog
 =========
 dev
 -----------
-- Create ComparableGroup class for unordered collections of Factors
-- Create FactorSequence class for ordered collections of Factors
-- Eliminate Analogy class, moving its methods to FactorGroup and FactorSequence
-- Add Factor.consistent_with method to search for any available context that causes two Factors not to contradict
-- Add "or" operator for FactorGroups
+- Create `ComparableGroup` class for unordered collections of `Factor`s
+- Create `FactorSequence` class for ordered collections of `Factor`s
+- Eliminate Analogy class, moving its methods to `FactorGroup` and `FactorSequence`
+- Add `Factor.consistent_with` method to search for available context causing two `Factor`s not to contradict
+- Add "or" operator for `FactorGroup`s
+- Integrate Legislice API client for retrieving text from US Constitution and US Code
+- Remove functions for loading legislation text from XML files. Use API client instead.
+- Delete classes for accessing XML legislation files: `Code`, `Regime`, and `Jurisdiction`
 
 0.3.4 (2020-01-02)
 ------------------
