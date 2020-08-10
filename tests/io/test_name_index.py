@@ -97,7 +97,7 @@ class TestCollectMentioned:
         assert shortest[0] == "Short Name"
 
     @pytest.mark.vcr
-    def test_name_inferred_from_content(self, make_regime):
+    def test_name_inferred_from_content(self):
         """
         Test that a name field is generated for Factors without them.
 
@@ -148,7 +148,7 @@ class TestCollectMentioned:
         )
 
     @pytest.mark.vcr
-    def test_enactment_name_in_holding(self, make_regime):
+    def test_enactment_name_in_holding(self):
         """
         Test error message:
         'Name "securing for authors" not found in the index of mentioned Factors'

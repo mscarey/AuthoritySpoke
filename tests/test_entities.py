@@ -7,13 +7,13 @@ from authorityspoke.io import readers
 
 
 class TestMakeEntities:
-    def test_make_entity_from_str_without_mentioned(self, make_regime):
+    def test_make_entity_from_str_without_mentioned(self):
         """
         This fails because it needs to look up the string factor_records
         in a "mentioned" list, but no "mentioned" parameter is given.
         """
         with pytest.raises(ValueError):
-            print(readers.read_factor(record="Bradley", regime=make_regime))
+            print(readers.read_factor(record="Bradley"))
 
     def test_conversion_to_generic(self, make_entity):
         e = make_entity

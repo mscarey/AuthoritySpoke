@@ -15,7 +15,7 @@ from authorityspoke.io.text_expansion import expand_shorthand
 
 
 class TestFactorLoad:
-    def test_find_directory_for_json(self, make_regime):
+    def test_find_directory_for_json(self):
         directory = pathlib.Path.cwd() / "tests"
         if directory.exists():
             os.chdir(directory)

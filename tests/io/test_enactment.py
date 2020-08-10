@@ -35,14 +35,14 @@ class TestEnactmentImport:
         fourteenth_dp["exact"] = "nor shall any State deprive any person"
         enactment = readers.read_enactment(fourteenth_dp)
 
-        assert enactment.selected_text().startswith("...nor shall any State")
+        assert enactment.selected_text().startswith("…nor shall any State")
 
     def test_enactment_import_from_dict(self, make_response):
         holding_brad = load_holdings("holding_brad.json")
         client = JSONRepository(responses=make_response)
         holdings = readers.read_holdings(holding_brad, client=client)
         enactments = holdings[0].enactments
-        assert enactments[0].selected_text().endswith("shall not be violated...")
+        assert enactments[0].selected_text().endswith("shall not be violated…")
 
     def test_false_as_selection(self):
         input_enactment = self.test_enactment.copy()
@@ -74,4 +74,4 @@ class TestEnactmentImport:
         record = {"node": "/test/acts/47/4", "exact": exact}
 
         enactment = readers.read_enactment(record, client=self.client)
-        assert enactment.selected_text() == exact + "..."
+        assert enactment.selected_text() == exact + "…"
