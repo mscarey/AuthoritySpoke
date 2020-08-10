@@ -6,7 +6,7 @@ import pytest
 from anchorpoint.textselectors import TextPositionSelector, TextSelectionError
 from dotenv import load_dotenv
 
-from legislice.download import Client
+from legislice.download import Client, JSONRepository
 
 load_dotenv()
 
@@ -15,21 +15,6 @@ TOKEN = os.getenv("LEGISLICE_API_TOKEN")
 
 class TestCodes:
     client = Client(api_token=TOKEN)
-
-    @pytest.mark.parametrize(
-        "codename, name, level",
-        [
-            ("usc17", "USC Title 17", "statute"),
-            ("const", "Constitution of the United States", "constitution"),
-            ("cfr37", "Code of Federal Regulations Title 37", "regulation"),
-            ("ca_evid", "California Evidence Code", "statute"),
-            ("ca_pen", "California Penal Code", "statute"),
-        ],
-    )
-    def test_making_code(self, codename, name, level):
-        code = make_code[codename]
-        assert str(code) == name
-        assert code.level == level
 
     def test_cfr_repr(self):
         cfr = make_code["cfr37"]
@@ -44,28 +29,19 @@ class TestCodes:
         beard_act = make_regime.get_code("/au/act")
         assert "Enlightenment" in str(beard_act)
 
-    @pytest.mark.parametrize(
-        "code, path",
-        [
-            ("usc17", "/us/usc/t17"),
-            ("const", "/us/const"),
-            ("cfr37", "/us/cfr/t37"),
-            ("ca_evid", "/us-ca/code/evid"),
-            ("ca_pen", "/us-ca/code/pen"),
-            ("beard_act", "/au/act/1934/47"),
-        ],
-    )
-    def test_code_urls(self, code, path):
-        assert make_code[code].uri == path
-
     @pytest.mark.vcr
     @pytest.mark.parametrize(
-        "path, expected",
-        [("/us/usc/t17", "COPYRIGHTS"), ("/us/const", "United States Constitution"),],
+        "path, heading, level",
+        [
+            ("/us/usc", "United States Code", "statute"),
+            ("/us/const", "United States Constitution", "constitution"),
+            ("/test/acts", "Acts of Australia", "statute"),
+        ],
     )
-    def test_code_title(self, path, expected):
+    def test_code_title(self, path, heading, level):
         enactment = self.client.read(path=path)
-        assert enactment.heading == expected
+        assert enactment.heading.startswith(heading)
+        assert enactment.level == level
 
     @pytest.mark.vcr
     def test_code_select_text(self):
@@ -98,21 +74,24 @@ class TestCodes:
     @pytest.mark.vcr
     def test_text_interval_constitution_section(self):
         enactment = self.client.read(path="/us/const/article/I/3/7")
-        passage = enactment.select_text_from_interval(TextPositionSelector(66, 85))
-        assert passage == "removal from Office"
 
-    def test_text_interval_entire_section(self):
-        """
-        Returns an interval covering the entire 317-character section.
-        """
-        interval = make_code["const"].text_interval(path="/us/const/article/I/3/7")
-        assert interval == (0, 317)
+        # The entire 317-character section is selected.
+        ranges = enactment.selection.ranges()
+        assert ranges[0].start == 0
+        assert ranges[0].end == 317
 
+        passage = enactment.get_passage(TextPositionSelector(66, 85))
+        assert passage == "…removal from Office…"
+
+    @pytest.mark.vcr
     def test_text_interval_beyond_end_of_section(self):
-        with pytest.raises(IndexError):
-            _ = make_code["const"].select_text_from_interval(
-                path="/us/const/article/I/3/7", interval=TextPositionSelector(66, 400)
-            )
+        """No longer raises an error, just selects to the end of the text."""
+        enactment = self.client.read(path="/us/const/article/I/3/7")
+
+        selector = TextPositionSelector(66, 400)
+        passage = enactment.get_passage(selector)
+        assert passage.startswith("…removal from Office")
+        assert passage.endswith(enactment.text[-10:])
 
     def test_text_interval_absent_section(self):
         """
@@ -129,8 +108,8 @@ class TestCodes:
                 selector=make_selector["bad_selector"], path="/us/const/amendment/IV",
             )
 
-    def test_text_interval_bad_selector(self, make_selector):
+    def test_text_interval_bad_selector(self, make_selector, make_response):
+        client = JSONRepository(responses=make_response)
+        enactment = client.read("/us/const/amendment/IV")
         with pytest.raises(TextSelectionError):
-            _ = make_code["const"].text_interval(
-                selector=make_selector["bad_selector"], path="/us/const/amendment/IV",
-            )
+            _ = enactment.convert_selection_to_set(make_selector["bad_selector"])
