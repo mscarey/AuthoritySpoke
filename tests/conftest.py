@@ -16,7 +16,6 @@ from authorityspoke.evidence import Evidence, Exhibit
 from authorityspoke.factors import Factor
 from authorityspoke.facts import Fact, build_fact
 from authorityspoke.holdings import Holding
-from authorityspoke.jurisdictions import Jurisdiction, Regime
 from authorityspoke.opinions import Opinion
 from authorityspoke.pleadings import Pleading, Allegation
 from authorityspoke.predicates import Predicate, Q_

@@ -14,7 +14,6 @@ from legislice.name_index import EnactmentIndex
 
 from authorityspoke.decisions import Decision
 from authorityspoke.holdings import Holding
-from authorityspoke.jurisdictions import Regime
 from authorityspoke.opinions import AnchoredHoldings
 from authorityspoke.rules import Rule
 

@@ -21,7 +21,6 @@ from authorityspoke.evidence import Exhibit, Evidence
 from authorityspoke.factors import Factor
 from authorityspoke.facts import Fact
 from authorityspoke.holdings import Holding
-from authorityspoke.jurisdictions import Regime
 from authorityspoke.opinions import AnchoredHoldings
 from authorityspoke.pleadings import Allegation, Pleading
 from authorityspoke.predicates import Predicate
@@ -189,25 +188,29 @@ def read_fact(record: RawFactor) -> Fact:
     return schema.load(record)
 
 
-def read_factor(record: RawFactor, regime: Optional[Regime] = None, **kwargs) -> Factor:
+def read_factor(record: RawFactor, client: Optional[Client] = None, **kwargs) -> Factor:
     r"""
     Turn fields from JSON into a :class:`Factor` object.
 
     :param record:
         parameter values to pass to schema
 
-    :parame regime:
+    :param client:
         to look up any :class:`.Enactment` references
 
     """
     schema = schemas.FactorSchema(many=False)
+    record, enactment_index = collect_enactments(record)
+    if client:
+        enactment_index = client.update_entries_in_enactment_index(enactment_index)
+    schema.context["enactment_index"] = enactment_index
     record, schema.context["mentioned"] = index_names(record)
-    schema.context["regime"] = regime
+
     return schema.load(record)
 
 
 def read_factors(
-    record: List[RawFactor], regime: Optional[Regime] = None, **kwargs
+    record: List[RawFactor], client: Optional[Client] = None, **kwargs
 ) -> Factor:
     r"""
     Turn fields from JSON into a :class:`Factor` object.
@@ -219,13 +222,16 @@ def read_factors(
         to look up any :class:`.Enactment` references
     """
     schema = schemas.FactorSchema(many=True)
+    record, enactment_index = collect_enactments(record)
+    if client:
+        enactment_index = client.update_entries_in_enactment_index(enactment_index)
+    schema.context["enactment_index"] = enactment_index
     record, schema.context["mentioned"] = index_names(record)
-    schema.context["regime"] = regime
     return schema.load(record)
 
 
 def read_procedure(
-    record: Dict, regime: Optional[Regime] = None, many=False
+    record: Dict, client: Optional[Client] = None, many=False
 ) -> Procedure:
     r"""
     Turn fields from JSON into a :class:`Procedure` object.
@@ -241,8 +247,11 @@ def read_procedure(
         to look up any :class:`.Enactment` references
     """
     schema = schemas.ProcedureSchema(many=many)
+    record, enactment_index = collect_enactments(record)
+    if client:
+        enactment_index = client.update_entries_in_enactment_index(enactment_index)
+    schema.context["enactment_index"] = enactment_index
     record, schema.context["mentioned"] = index_names(record)
-    schema.context["regime"] = regime
     return schema.load(record)
 
 
@@ -255,10 +264,8 @@ def read_holding(record: RawHolding, client: Optional[Client] = None) -> Holding
     :param record:
         dict of values for constructing :class:`.Holding`
 
-    :param regime:
-        Collection of :class:`.Jurisdiction`\s and corresponding
-        :class:`.Code`\s for discovering :class:`.Enactment`\s to
-        reference in the new :class:`Holding`.
+    :param client:
+        Legislice client for downloading missing fields from `record`
 
     :param many:
         if True, record represents a list of :class:`Holding`\s rather than
@@ -324,10 +331,8 @@ def read_holdings_with_anchors(
     :param record:
         a list of dicts representing holdings, in the JSON input format
 
-    :param regime:
-        A collection of :class:`.Jurisdiction`\s and the :class:`.Code`\s
-        that have been enacted in each. Used for constructing
-        :class:`.Enactment`\s referenced by :class:`.Holding`\s.
+    :param client:
+        Legislice client for downloading missing fields from `record`
 
     :param many:
         a bool indicating whether to use the "many" form of the Marshmallow
@@ -417,7 +422,8 @@ def read_rule(record: Dict, client: Optional[Client] = None) -> Rule:
 
     :param record:
 
-    :param regime:
+    :param client:
+        Legislice client for downloading missing fields from `record`
 
     :returns:
         iterator yielding :class:`Rule`\s with the items
@@ -439,7 +445,8 @@ def read_rules(record: List[Dict], client: Optional[Client] = None) -> List[Rule
 
     :param record:
 
-    :param regime:
+    :param client:
+        Legislice client for downloading missing fields from `record`
 
     :returns:
         iterator yielding :class:`Rule`\s with the items
