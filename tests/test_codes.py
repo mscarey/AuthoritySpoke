@@ -6,7 +6,10 @@ import pytest
 from anchorpoint.textselectors import TextPositionSelector, TextSelectionError
 from dotenv import load_dotenv
 
-from legislice.download import Client, JSONRepository
+from legislice.download import Client, JSONRepository, LegislicePathError
+from legislice.schemas import EnactmentSchema
+
+from authorityspoke.io import loaders, schemas
 
 load_dotenv()
 
@@ -17,17 +20,13 @@ class TestCodes:
     client = Client(api_token=TOKEN)
 
     def test_cfr_repr(self):
-        cfr = make_code["cfr37"]
-        assert "Title 37" in repr(cfr)
+        oracle_dictionary = loaders.load_holdings("holding_oracle.json")
+        regulation = oracle_dictionary[10]["enactments_despite"][2]
+        schema = EnactmentSchema()
+        enactment = schema.load(regulation)
 
-    def test_get_code_from_regime_with_partial_uri(self, make_regime):
-        """
-        The regime should return the appropriate "code" even though its
-        uri is more specific than the query, because it's the only one
-        available that starts with that.
-        """
-        beard_act = make_regime.get_code("/au/act")
-        assert "Enlightenment" in str(beard_act)
+        assert enactment.level == "regulation"
+        assert "/cfr/" in repr(enactment)
 
     @pytest.mark.vcr
     @pytest.mark.parametrize(
@@ -93,20 +92,13 @@ class TestCodes:
         assert passage.startswith("…removal from Office")
         assert passage.endswith(enactment.text[-10:])
 
-    def test_text_interval_absent_section(self):
+    @pytest.mark.vcr
+    def test_bad_section(self):
         """
-        The path is a section that doesn't exist in CFR.
+        The path is a section that doesn't exist in USC.
         """
-        with pytest.raises(ValueError):
-            _ = make_code["cfr37"].select_text_from_interval(
-                path="/us/const/article/I/3/7", interval=TextPositionSelector(0, 66)
-            )
-
-    def test_text_interval_bad_source(self, make_selector):
-        with pytest.raises(ValueError):
-            _ = make_code["usc17"].text_interval(
-                selector=make_selector["bad_selector"], path="/us/const/amendment/IV",
-            )
+        with pytest.raises(LegislicePathError):
+            enactment = self.client.read(path="/us/usc/article/I/3/7")
 
     def test_text_interval_bad_selector(self, make_selector, make_response):
         client = JSONRepository(responses=make_response)
