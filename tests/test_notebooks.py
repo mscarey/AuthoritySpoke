@@ -3,14 +3,22 @@ Tests of commands that appear in notebooks in
 the notebooks/ directory
 """
 
+import os
 
 from anchorpoint.textselectors import TextQuoteSelector
+from dotenv import load_dotenv
 from legislice.download import JSONRepository
 import pytest
 
 from authorityspoke import Enactment
+from authorityspoke.io.downloads import download_case
+from authorityspoke.io.readers import read_decision
 from authorityspoke.factors import ContextRegister
 from authorityspoke.entities import Entity
+
+load_dotenv()
+
+CAP_API_KEY = os.getenv("CAP_API_KEY")
 
 
 class TestIntroduction:
@@ -18,6 +26,14 @@ class TestIntroduction:
     """
     Tests of commands from the "Introduction to AuthoritySpoke" notebook
     """
+
+    @pytest.mark.vcr
+    def test_download_case(self):
+        oracle_download = download_case(
+            cite="750 F.3d 1339", full_case=True, api_key=CAP_API_KEY
+        )
+        oracle = read_decision(oracle_download)
+        assert oracle.cite == "!!"
 
     def test_oracle_20_holdings(self, make_opinion_with_holding):
         assert len(make_opinion_with_holding["oracle_majority"].holdings) == 20

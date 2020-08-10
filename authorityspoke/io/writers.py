@@ -37,7 +37,7 @@ def case_to_file(
         filename, directory, filepath, default_folder="cases"
     )
     with open(validated_filepath, "w") as fp:
-        json.dump(case, fp, ensure_ascii=False)
+        json.dump(case, fp, ensure_ascii=False, indent=4)
 
 
 def cases_to_file(
