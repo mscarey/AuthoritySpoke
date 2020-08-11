@@ -97,6 +97,19 @@ RawDecision = Dict[
 ]
 
 
+class CaseCitationSchema(Schema):
+    """Schema for Decision citations in CAP API response."""
+
+    __model__ = CaseCitation
+    cite = fields.Str()
+    reporter = fields.Str(data_key="type")
+
+    @post_load
+    def make_object(self, data: RawCaseCitation, **kwargs) -> CaseCitation:
+        """Load citation."""
+        return self.__model__(**data)
+
+
 class OpinionSchema(ExpandableSchema):
     """Schema for Opinions, of which there may be several in one Decision."""
 
@@ -110,19 +123,6 @@ class OpinionSchema(ExpandableSchema):
         """Standardize author name before loading object."""
         data["author"] = data.get("author", "").strip(",:")
         return data
-
-
-class CaseCitationSchema(Schema):
-    """Schema for Decision citations in CAP API response."""
-
-    __model__ = CaseCitation
-    cite = fields.Str()
-    reporter = fields.Str(data_key="type")
-
-    @post_load
-    def make_object(self, data: RawCaseCitation, **kwargs) -> CaseCitation:
-        """Load citation."""
-        return self.__model__(**data)
 
 
 class DecisionSchema(ExpandableSchema):
@@ -142,6 +142,7 @@ class DecisionSchema(ExpandableSchema):
     # reporter = fields.Str(missing=None)
     # volume = fields.Str(missing=None)
     _id = fields.Int(data_key="id")
+    cites_to = fields.Nested(CaseCitationSchema, many=True, missing=list)
 
     @pre_load
     def format_data_to_load(self, data: RawDecision, **kwargs) -> RawDecision:

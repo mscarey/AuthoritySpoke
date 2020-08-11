@@ -14,7 +14,7 @@ def download_case(
     cite: Optional[str] = None,
     full_case: bool = False,
     api_key: Optional[str] = None,
-    many: bool = True,
+    many: bool = False,
 ) -> Union[Dict[str, Any], List[Dict[str, Any]]]:
     """
     Download cases from Caselaw Access Project API.

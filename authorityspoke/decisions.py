@@ -19,7 +19,7 @@ from authorityspoke.rules import Rule
 @dataclass
 class CaseCitation:
     cite: str
-    reporter: str
+    reporter: Optional[str] = None
 
 
 @dataclass
@@ -78,6 +78,7 @@ class Decision:
     court: Optional[str] = None
     opinions: Sequence[Opinion] = field(default_factory=list)
     jurisdiction: Optional[str] = None
+    cites_to: Optional[Sequence[CaseCitation]] = None
     _id: Optional[int] = None
 
     def __str__(self):

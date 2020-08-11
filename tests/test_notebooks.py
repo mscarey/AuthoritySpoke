@@ -33,7 +33,7 @@ class TestIntroduction:
             cite="750 F.3d 1339", full_case=True, api_key=CAP_API_KEY
         )
         oracle = read_decision(oracle_download)
-        assert oracle.cite == "!!"
+        assert oracle.cites_to[0].cite == "527 F.3d 1318"
 
     def test_oracle_20_holdings(self, make_opinion_with_holding):
         assert len(make_opinion_with_holding["oracle_majority"].holdings) == 20
