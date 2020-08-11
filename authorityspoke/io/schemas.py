@@ -147,7 +147,8 @@ class DecisionSchema(ExpandableSchema):
     @pre_load
     def format_data_to_load(self, data: RawDecision, **kwargs) -> RawDecision:
         """Transform data from CAP API response for loading."""
-        data["court"] = data.get("court", {}).get("slug", "")
+        if not isinstance(data["court"], str):
+            data["court"] = data.get("court", {}).get("slug", "")
         data["jurisdiction"] = data.get("jurisdiction", {}).get("slug", "")
         data["opinions"] = (
             data.get("casebody", {}).get("data", {}).get("opinions", [{}])
