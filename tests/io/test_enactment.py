@@ -1,7 +1,8 @@
 import os
 
 from dotenv import load_dotenv
-from legislice.download import Client, JSONRepository
+from legislice.download import Client
+from legislice.mock_clients import JSONRepository
 from legislice.schemas import EnactmentSchema
 import pytest
 

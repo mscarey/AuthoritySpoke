@@ -6,7 +6,10 @@ import pytest
 from anchorpoint.textselectors import TextPositionSelector, TextSelectionError
 from dotenv import load_dotenv
 
-from legislice.download import Client, JSONRepository, LegislicePathError
+from legislice.download import Client, LegislicePathError
+
+from legislice.mock_clients import JSONRepository
+
 from legislice.schemas import EnactmentSchema
 
 from authorityspoke.io import loaders, schemas

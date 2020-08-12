@@ -3,8 +3,10 @@ import os
 
 from anchorpoint.textselectors import TextQuoteSelector, TextSelectionError
 from dotenv import load_dotenv
-from legislice.download import Client, JSONRepository
+from legislice.download import Client
+
 from legislice.enactments import Enactment, consolidate_enactments
+from legislice.mock_clients import JSONRepository
 from legislice.schemas import EnactmentSchema
 import pytest
 

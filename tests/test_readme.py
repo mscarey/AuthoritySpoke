@@ -1,6 +1,6 @@
 """Tests for any commands in readme.md."""
 
-from legislice.download import JSONRepository
+from legislice.mock_clients import JSONRepository
 
 from authorityspoke.io.loaders import load_and_read_decision
 from authorityspoke.io.loaders import load_and_read_holdings

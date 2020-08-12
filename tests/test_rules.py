@@ -3,8 +3,8 @@ import os
 
 
 from dotenv import load_dotenv
-from legislice.download import Client, JSONRepository
-from legislice import Enactment
+from legislice.download import Client
+from legislice.mock_clients import JSONRepository
 import pytest
 
 from authorityspoke.entities import Entity

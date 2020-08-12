@@ -8,7 +8,8 @@ from authorityspoke.evidence import Exhibit
 from authorityspoke.rules import Rule
 
 
-from legislice.download import Client, JSONRepository
+from legislice.download import Client
+from legislice.mock_clients import JSONRepository
 
 load_dotenv()
 

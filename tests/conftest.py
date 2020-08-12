@@ -8,7 +8,8 @@ from anchorpoint.textselectors import TextQuoteSelector
 from dotenv import load_dotenv
 from legislice import Enactment
 from legislice.name_index import EnactmentIndex
-from legislice.download import Client, JSONRepository
+from legislice.download import Client
+from legislice.mock_clients import JSONRepository
 import pytest
 
 from authorityspoke.entities import Entity

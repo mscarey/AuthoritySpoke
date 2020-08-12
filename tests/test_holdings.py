@@ -4,7 +4,8 @@ import pytest
 
 from dotenv import load_dotenv
 from legislice import Enactment
-from legislice.download import Client, JSONRepository
+from legislice.download import Client
+from legislice.mock_clients import JSONRepository
 
 from authorityspoke.entities import Entity
 from authorityspoke.explanations import Explanation

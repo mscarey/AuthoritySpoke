@@ -2,7 +2,7 @@ from tests.conftest import make_response
 import pytest
 
 from anchorpoint.textselectors import TextQuoteSelector
-from legislice.download import JSONRepository
+from legislice.mock_clients import JSONRepository
 
 from authorityspoke.entities import Entity
 from authorityspoke.facts import Fact

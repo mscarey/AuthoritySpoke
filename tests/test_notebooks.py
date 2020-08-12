@@ -7,7 +7,7 @@ import os
 
 from anchorpoint.textselectors import TextQuoteSelector
 from dotenv import load_dotenv
-from legislice.download import JSONRepository
+from legislice.mock_clients import JSONRepository
 import pytest
 
 from authorityspoke import Enactment
