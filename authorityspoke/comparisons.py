@@ -390,7 +390,13 @@ class ContextRegister(Dict[str, str]):
     def replace_keys(self, replacements: ContextRegister) -> ContextRegister:
         """Construct new :class:`ContextRegister` by replacing keys."""
         values = self.values()
-        keys = [replacements.get(factor) or factor for factor in self.keys()]
+        keys = []
+        for factor in self.keys():
+            replacement = replacements.get(factor)
+            if replacement:
+                keys.append(str(replacement))
+            else:
+                keys.append(factor)
         return ContextRegister(zip(keys, values))
 
     def reversed(self):

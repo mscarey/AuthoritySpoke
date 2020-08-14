@@ -164,14 +164,20 @@ class Fact(Factor):
 
         """
         if self.predicate and self.predicate.reciprocal:
-            return [
-                ContextRegister(
-                    {
-                        self.context_factors[1]: self.context_factors[0],
-                        self.context_factors[0]: self.context_factors[1],
-                    }
+            if not (self.context_factors[1] and self.context_factors[0]):
+                raise AttributeError(
+                    f"{self.predicate} cannot be marked as reciprocal without two context factors. "
+                    f"Existing context factors are {self.context_factors}."
                 )
-            ]
+            swapping_first_factors = ContextRegister()
+            swapping_first_factors.insert_pair(
+                self.context_factors[1], self.context_factors[0]
+            )
+            swapping_first_factors.insert_pair(
+                self.context_factors[0], self.context_factors[1]
+            )
+
+            return [swapping_first_factors]
         return []
 
     @property

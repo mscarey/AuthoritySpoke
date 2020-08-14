@@ -50,49 +50,50 @@ class TestContextRegisters:
             watt_factor["f1"]._context_registers(
                 watt_factor["f1_entity_order"], operator.le
             )
-        ) == {make_entity["motel"]: make_entity["watt"],}
+        ) == {str(make_entity["motel"]): make_entity["watt"],}
 
     def test_import_to_context_register(self, make_entity, watt_factor):
-        f = watt_factor["f7"]
         left = ContextRegister(
             {
-                watt_factor["f7"]: watt_factor["f7_swap_entities"],
-                make_entity["motel"]: make_entity["trees"],
+                str(watt_factor["f7"]): watt_factor["f7_swap_entities"],
+                str(make_entity["motel"]): make_entity["trees"],
             }
         )
-        right = ContextRegister({make_entity["trees"]: make_entity["motel"]})
+        right = ContextRegister({str(make_entity["trees"]): make_entity["motel"]})
         assert len(left.merged_with(right)) == 3
 
     def test_import_to_mapping_no_change(self, make_entity):
-        old_mapping = ContextRegister({make_entity["motel"]: make_entity["trees"]})
+        old_mapping = ContextRegister({str(make_entity["motel"]): make_entity["trees"]})
         assert dict(
-            old_mapping.merged_with({make_entity["motel"]: make_entity["trees"]})
-        ) == {make_entity["motel"]: make_entity["trees"],}
+            old_mapping.merged_with({str(make_entity["motel"]): make_entity["trees"]})
+        ) == {str(make_entity["motel"]): make_entity["trees"],}
 
     def test_import_to_mapping_conflict(self, make_entity):
         merged = ContextRegister(
-            {make_entity["motel"]: make_entity["trees"]}
-        ).merged_with(ContextRegister({make_entity["motel"]: make_entity["motel"]}))
+            {str(make_entity["motel"]): make_entity["trees"]}
+        ).merged_with(
+            ContextRegister({str(make_entity["motel"]): make_entity["motel"]})
+        )
         assert merged is None
 
     def test_import_to_mapping_reciprocal(self, watt_factor):
-        mapping = ContextRegister({watt_factor["f7"]: watt_factor["f7"]}).merged_with(
-            {watt_factor["f7_swap_entities"]: watt_factor["f7_swap_entities"]}
+        mapping = ContextRegister(
+            {str(watt_factor["f7"]): watt_factor["f7"]}
+        ).merged_with(
+            {str(watt_factor["f7_swap_entities"]): watt_factor["f7_swap_entities"]}
         )
-        assert mapping[watt_factor["f7"]] == watt_factor["f7"]
+        assert mapping[str(watt_factor["f7"])] == watt_factor["f7"]
 
     def test_registers_for_interchangeable_context(self, make_entity, watt_factor):
         """
         Test that _registers_for_interchangeable_context swaps the first two
         items in the ContextRegister
         """
-        matches = ContextRegister(
-            {
-                make_entity["motel"]: make_entity["trees"],
-                make_entity["trees"]: make_entity["motel"],
-                make_entity["watt"]: make_entity["watt"],
-            }
-        )
+        matches = ContextRegister()
+        matches.insert_pair(make_entity["motel"], make_entity["trees"])
+        matches.insert_pair(make_entity["trees"], make_entity["motel"])
+        matches.insert_pair(make_entity["watt"], make_entity["watt"])
+
         new_matches = [
             match
             for match in watt_factor["f7"]._registers_for_interchangeable_context(
@@ -102,9 +103,9 @@ class TestContextRegisters:
         assert (
             ContextRegister(
                 {
-                    make_entity["trees"]: make_entity["trees"],
-                    make_entity["motel"]: make_entity["motel"],
-                    make_entity["watt"]: make_entity["watt"],
+                    str(make_entity["trees"]): make_entity["trees"],
+                    str(make_entity["motel"]): make_entity["motel"],
+                    str(make_entity["watt"]): make_entity["watt"],
                 }
             )
             in new_matches
