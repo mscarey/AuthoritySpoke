@@ -49,8 +49,10 @@ class Comparable(ABC):
         if other is None:
             yield context
         elif self.generic or other.generic:
-            if context.get(self) is None or (context.get(self) == other):
-                yield ContextRegister({self: other})
+            if context.get(str(self)) is None or (context.get(str(self)) == other):
+                generic_register = ContextRegister()
+                generic_register.insert_pair(self, other)
+                yield generic_register
         else:
             yield from self.context_factors.ordered_comparison(
                 other=other.context_factors, operation=comparison, context=context
@@ -166,20 +168,22 @@ class Comparable(ABC):
         context = context or ContextRegister()
         context = ContextRegister(context)
         unused_self = [
-            str(factor)
+            factor
             for factor in self.generic_factors
             if str(factor) not in context.keys()
         ]
         unused_other = [
-            str(factor)
+            factor
             for factor in other.generic_factors
-            if str(factor) not in context.values()
+            if not context.reverse_match(factor)
         ]
         if not (unused_self and unused_other):
             yield context
         else:
             for permutation in permutations(unused_other):
-                incoming = ContextRegister(zip_longest(unused_self, permutation))
+                incoming = ContextRegister()
+                for key, value in zip_longest(unused_self, permutation):
+                    incoming.insert_pair(key=key, value=value)
                 yield context.merged_with(incoming)
 
     def __or__(self, other: Comparable):
@@ -381,7 +385,7 @@ class ContextRegister(Dict[str, str]):
         return ", ".join(similies)
 
     def insert_pair(self, key: Comparable, value: Comparable) -> None:
-        self[str(key)] = str(value)
+        self[str(key)] = value
 
     def replace_keys(self, replacements: ContextRegister) -> ContextRegister:
         """Construct new :class:`ContextRegister` by replacing keys."""
@@ -391,7 +395,15 @@ class ContextRegister(Dict[str, str]):
 
     def reversed(self):
         """Swap keys for values and vice versa."""
-        return ContextRegister({v: k for k, v in self.items()})
+        # return ContextRegister({v: k for k, v in self.items()})
+        raise NotImplementedError
+
+    def reverse_match(self, query: Comparable) -> Optional[str]:
+        value_str = str(query)
+        for key, value in self.items():
+            if str(value) == value_str:
+                return key
+        return None
 
     def merged_with(
         self, incoming_mapping: ContextRegister

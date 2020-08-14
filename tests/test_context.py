@@ -12,7 +12,7 @@ class TestContextRegisters:
         right = watt_factor["f1"]
         contexts = list(left.possible_contexts(right))
         assert len(contexts) == 1
-        assert contexts[0][str(make_entity["motel"])] == str(make_entity["motel"])
+        assert contexts[0][str(make_entity["motel"])] == make_entity["motel"]
 
     def test_all_possible_contexts_identical_factor(self, watt_factor, make_entity):
         left = watt_factor["f2"]
@@ -20,16 +20,18 @@ class TestContextRegisters:
         contexts = list(left.possible_contexts(right))
         assert len(contexts) == 2
         assert any(
-            context[make_entity["watt"]] == make_entity["motel"] for context in contexts
+            context[str(make_entity["watt"])] == make_entity["motel"]
+            for context in contexts
         )
 
     def test_limited_possible_contexts_identical_factor(self, watt_factor, make_entity):
         left = watt_factor["f2"]
         right = watt_factor["f2"]
-        context = {make_entity["motel"]: make_entity["motel"]}
+        context = ContextRegister()
+        context.insert_pair(make_entity["motel"], make_entity["motel"])
         contexts = list(left.possible_contexts(right, context=context))
         assert len(contexts) == 1
-        assert contexts[0][make_entity["watt"]] == make_entity["watt"]
+        assert contexts[0][str(make_entity["watt"])] == make_entity["watt"]
 
     def test_context_register_empty(self, make_complex_fact, watt_factor):
         """
