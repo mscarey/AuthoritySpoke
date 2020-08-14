@@ -501,8 +501,8 @@ class Factor(Comparable):
     def _update_context_from_factors(
         self, other: Comparable, context: ContextRegister
     ) -> Optional[ContextRegister]:
-        incoming = ContextRegister(
-            dict(zip(self.generic_factors, other.generic_factors))
+        incoming = ContextRegister.from_lists(
+            keys=self.generic_factors, values=other.generic_factors
         )
         updated_context = context.merged_with(incoming)
         return updated_context

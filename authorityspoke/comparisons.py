@@ -373,6 +373,16 @@ class ContextRegister(Dict[str, str]):
         items = ", ".join(item_names)
         return f"ContextRegister({items})"
 
+    @classmethod
+    def from_lists(
+        cls, keys=List[Comparable], values=List[Comparable]
+    ) -> ContextRegister:
+        pairs = zip_longest(keys, values)
+        new = cls()
+        for pair in pairs:
+            new.insert_pair(pair[0], pair[1])
+        return new
+
     @property
     def prose(self) -> str:
         """Make statement matching analagous context factors of self and other."""
