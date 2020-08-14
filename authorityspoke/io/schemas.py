@@ -8,7 +8,7 @@ from marshmallow import pre_load, post_load
 from marshmallow import ValidationError
 
 from anchorpoint.textselectors import TextQuoteSelector, TextPositionSelector
-from anchorpoint.schemas import SelectorSchema as AnchorSchema
+from anchorpoint.schemas import SelectorSchema
 from legislice import Enactment
 from legislice.schemas import EnactmentSchema
 
@@ -37,12 +37,6 @@ RawRule = Dict[str, Union[RawProcedure, Sequence[RawEnactment], str, bool]]
 RawHolding = Dict[str, Union[RawRule, str, bool]]
 
 
-class SelectorSchema(AnchorSchema):
-    """Temporary subclass for testing changes to Anchorpoint schema."""
-
-    __model__ = TextQuoteSelector
-
-
 class ExpandableSchema(Schema):
     """Base schema for classes that can be cross-referenced by name in input JSON."""
 
@@ -61,12 +55,6 @@ class ExpandableSchema(Schema):
                 raise ValidationError(
                     f'type field "{ty} does not match model type {self.__model__}'
                 )
-        return data
-
-    def remove_anchors_field(self, data, **kwargs):
-        """Remove field that may have been used to link objects to Opinion text."""
-        if data.get("anchors"):
-            del data["anchors"]
         return data
 
     def wrap_single_element_in_list(self, data: Dict, many_element: str):
@@ -257,6 +245,7 @@ class EntitySchema(ExpandableSchema):
     name = fields.Str(missing=None)
     generic = fields.Bool(missing=True)
     plural = fields.Bool()
+    anchors = fields.Nested(SelectorSchema, many=True)
 
 
 class FactSchema(ExpandableSchema):
@@ -269,6 +258,7 @@ class FactSchema(ExpandableSchema):
     name = fields.Str(missing=None)
     absent = fields.Bool(missing=False)
     generic = fields.Bool(missing=False)
+    anchors = fields.Nested(SelectorSchema, many=True)
 
     def get_references_from_mentioned(
         self,
@@ -339,7 +329,6 @@ class FactSchema(ExpandableSchema):
             data["predicate"]["content"], data.get("context_factors")
         )
         data = self.consume_type_field(data)
-        data = self.remove_anchors_field(data)
         return data
 
     @post_load
@@ -358,6 +347,7 @@ class ExhibitSchema(ExpandableSchema):
     name = fields.Str(missing=None)
     absent = fields.Bool(missing=False)
     generic = fields.Bool(missing=False)
+    anchors = fields.Nested(SelectorSchema, many=True)
 
     @post_load
     def make_object(self, data: RawFactor, **kwargs) -> Exhibit:
@@ -373,6 +363,7 @@ class PleadingSchema(ExpandableSchema):
     name = fields.Str(missing=None)
     absent = fields.Bool(missing=False)
     generic = fields.Bool(missing=False)
+    anchors = fields.Nested(SelectorSchema, many=True)
 
 
 class AllegationSchema(ExpandableSchema):
@@ -384,6 +375,7 @@ class AllegationSchema(ExpandableSchema):
     name = fields.Str(missing=None)
     absent = fields.Bool(missing=False)
     generic = fields.Bool(missing=False)
+    anchors = fields.Nested(SelectorSchema, many=True)
 
 
 class EvidenceSchema(ExpandableSchema):
@@ -395,6 +387,7 @@ class EvidenceSchema(ExpandableSchema):
     name = fields.Str(missing=None)
     absent = fields.Bool(missing=False)
     generic = fields.Bool(missing=False)
+    anchors = fields.Nested(SelectorSchema, many=True)
 
 
 class FactorSchema(OneOfSchema, ExpandableSchema):
@@ -419,7 +412,6 @@ class FactorSchema(OneOfSchema, ExpandableSchema):
     def pre_load(self, data: RawFactor, **kwargs) -> RawFactor:
         """Remove text anchors because they aren't part of the referenced schemas."""
         data = self.get_from_mentioned(data)
-        data = self.remove_anchors_field(data)
         return data
 
     def get_obj_type(self, obj) -> str:
@@ -481,6 +473,7 @@ class HoldingSchema(ExpandableSchema):
     decided = fields.Bool(missing=True)
     exclusive = fields.Bool(missing=False)
     generic = fields.Bool(missing=False)
+    anchors = fields.Nested(SelectorSchema, many=True)
 
     def nest_fields_inside_rule(self, data: Dict) -> RawHolding:
         """Nest fields inside "rule" and "procedure", if not already nested."""
@@ -510,7 +503,6 @@ class HoldingSchema(ExpandableSchema):
         data = nest_fields(data, nest="rule", eggs=to_nest)
         data = self.nest_fields_inside_rule(data)
 
-        data = self.remove_anchors_field(data)
         return data
 
 

@@ -133,12 +133,18 @@ class Factor(Comparable):
     """
 
     def __init__(
-        self, *, name: Optional[str] = None, generic: bool = False, absent: bool = False
+        self,
+        *,
+        name: Optional[str] = None,
+        generic: bool = False,
+        absent: bool = False,
+        anchors: List[TextQuoteSelector],
     ):
         """Designate attributes inherited from Factor as keyword-only."""
         self.name = name
         self.generic = generic
         self.absent = absent
+        self.anchors = anchors
 
     @property
     def context_factor_names(self) -> Tuple[str, ...]:
