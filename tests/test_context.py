@@ -12,7 +12,7 @@ class TestContextRegisters:
         right = watt_factor["f1"]
         contexts = list(left.possible_contexts(right))
         assert len(contexts) == 1
-        assert contexts[0][make_entity["motel"]] == make_entity["motel"]
+        assert contexts[0][str(make_entity["motel"])] == str(make_entity["motel"])
 
     def test_all_possible_contexts_identical_factor(self, watt_factor, make_entity):
         left = watt_factor["f2"]

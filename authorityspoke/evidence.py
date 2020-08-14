@@ -1,7 +1,9 @@
 r""":class:`.Factor`\s used to support :class:`.Fact` findings."""
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
-from typing import ClassVar, Iterator, Optional
+from typing import ClassVar, Iterator, List, Optional
+
+from anchorpoint import TextQuoteSelector
 
 from authorityspoke.entities import Entity
 from authorityspoke.factors import ContextRegister, Factor
@@ -9,7 +11,7 @@ from authorityspoke.facts import Fact
 from authorityspoke.formatting import indented, wrapped
 
 
-@dataclass(frozen=True)
+@dataclass()
 class Exhibit(Factor):
     """
     A source of information for use in litigation.
@@ -56,6 +58,7 @@ class Exhibit(Factor):
     name: Optional[str] = None
     absent: bool = False
     generic: bool = False
+    anchors: List[TextQuoteSelector] = field(default_factory=list)
     context_factor_names: ClassVar = ("statement", "statement_attribution")
 
     def _means_if_concrete(
@@ -96,7 +99,7 @@ class Exhibit(Factor):
         return super().__str__().format(text)
 
 
-@dataclass(frozen=True)
+@dataclass()
 class Evidence(Factor):
     """
     An :class:`Exhibit` admitted by a court to aid a factual determination.
@@ -129,6 +132,7 @@ class Evidence(Factor):
     name: Optional[str] = None
     absent: bool = False
     generic: bool = False
+    anchors: List[TextQuoteSelector] = field(default_factory=list)
     context_factor_names: ClassVar = ("exhibit", "to_effect")
 
     def __str__(self):

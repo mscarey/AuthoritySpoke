@@ -19,7 +19,7 @@ from authorityspoke.formatting import indented
 from authorityspoke.procedures import Procedure
 
 
-@dataclass(frozen=True)
+@dataclass()
 class Rule(Factor):
     r"""
     A statement of a legal doctrine about a :class:`.Procedure` for litigation.

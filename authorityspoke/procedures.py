@@ -21,7 +21,7 @@ from authorityspoke.groups import FactorGroup
 from authorityspoke.formatting import indented
 
 
-@dataclass(frozen=True)
+@dataclass()
 class Procedure(Factor):
     r"""
     A (potential) rule for courts to use in resolving litigation.

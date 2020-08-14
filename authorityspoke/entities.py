@@ -1,13 +1,15 @@
 """:class:`.Factor` subclass for things that exist in the outside world."""
 
 from __future__ import annotations
-from dataclasses import astuple, dataclass
-from typing import Iterator, Optional
+from dataclasses import astuple, dataclass, field
+from typing import Iterator, List, Optional
+
+from anchorpoint import TextQuoteSelector
 
 from authorityspoke.factors import Factor, ContextRegister, new_context_helper
 
 
-@dataclass(frozen=True)
+@dataclass()
 class Entity(Factor):
     r"""
     Things that exist in the outside world, like people, places, or events.
@@ -47,6 +49,7 @@ class Entity(Factor):
     name: Optional[str] = None
     generic: bool = True
     plural: bool = False
+    anchors: List[TextQuoteSelector] = field(default_factory=list)
 
     def means(self, other):
         """

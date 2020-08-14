@@ -15,7 +15,9 @@ import operator
 from typing import Any, Callable, Dict, Iterator, List
 from typing import Optional, Sequence, Tuple, TypeVar, Union
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+
+from anchorpoint import TextQuoteSelector
 
 from authorityspoke.comparisons import Comparable, ContextRegister
 from authorityspoke.explanations import Explanation
@@ -26,7 +28,7 @@ from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
 
 
-@dataclass(frozen=True)
+@dataclass()
 class Holding(Factor):
     """
     An :class:`.Opinion`\'s announcement that it posits or rejects a legal :class:`.Rule`.
@@ -67,6 +69,7 @@ class Holding(Factor):
     decided: bool = True
     exclusive: bool = False
     generic: bool = False
+    anchors: List[TextQuoteSelector] = field(default_factory=list)
 
     def __post_init__(self):
         if self.exclusive:

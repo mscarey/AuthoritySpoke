@@ -8,7 +8,7 @@ from authorityspoke.facts import Fact
 from authorityspoke.formatting import indented
 
 
-@dataclass(frozen=True)
+@dataclass()
 class Pleading(Factor):
     r"""
     A document filed by a party to make :class:`Allegation`\s.
@@ -39,7 +39,7 @@ class Pleading(Factor):
         return str(self)
 
 
-@dataclass(frozen=True)
+@dataclass()
 class Allegation(Factor):
     """
     A formal assertion of a :class:`Fact`.

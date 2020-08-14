@@ -1,9 +1,11 @@
 """Create models of assertions accepted as factual by courts."""
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import operator
 
 from typing import ClassVar, Dict, Iterator, List, Optional, Sequence, Union
+
+from anchorpoint.textselectors import TextQuoteSelector
 
 from authorityspoke.factors import new_context_helper
 from authorityspoke.factors import Factor, ContextRegister, FactorSequence
@@ -11,7 +13,7 @@ from authorityspoke.formatting import indented, wrapped
 from authorityspoke.predicates import Predicate
 
 
-@dataclass(frozen=True)
+@dataclass()
 class Fact(Factor):
     r"""
     An assertion accepted as factual by a court.
@@ -62,6 +64,7 @@ class Fact(Factor):
     standard_of_proof: Optional[str] = None
     absent: bool = False
     generic: bool = False
+    anchors: List[TextQuoteSelector] = field(default_factory=list)
     standards_of_proof: ClassVar = (
         "scintilla of evidence",
         "substantial evidence",

@@ -181,8 +181,8 @@ class Factor(Comparable):
         for factor in self.context_factors:
             if factor is not None:
                 for generic in factor.generic_factors:
-                    generics[generic] = None
-        return list(generics)
+                    generics[str(generic)] = generic
+        return list(generics.values())
 
     @property
     def context_factors(self) -> FactorSequence:

@@ -12,6 +12,7 @@ from legislice.download import Client
 from legislice.mock_clients import JSONRepository
 import pytest
 
+from authorityspoke.comparisons import ContextRegister
 from authorityspoke.entities import Entity
 from authorityspoke.evidence import Evidence, Exhibit
 from authorityspoke.factors import Factor
@@ -1403,3 +1404,11 @@ def raw_holding() -> RawHolding:
             ],
         },
     }
+
+
+@pytest.fixture(scope="function")
+def make_context_register() -> ContextRegister:
+    context_names = ContextRegister()
+    context_names.insert_pair(key=Entity("Alice"), value=Entity("Craig"))
+    context_names.insert_pair(key=Entity("Bob"), value=Entity("Dan"))
+    return context_names

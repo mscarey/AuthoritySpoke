@@ -23,7 +23,7 @@ ureg = UnitRegistry()
 Q_ = ureg.Quantity
 
 
-@dataclass(frozen=True)
+@dataclass()
 class Predicate:
     r"""
     A statement about real events or about a legal conclusion.

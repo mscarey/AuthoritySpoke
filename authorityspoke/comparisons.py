@@ -166,10 +166,14 @@ class Comparable(ABC):
         context = context or ContextRegister()
         context = ContextRegister(context)
         unused_self = [
-            factor for factor in self.generic_factors if factor not in context.keys()
+            str(factor)
+            for factor in self.generic_factors
+            if str(factor) not in context.keys()
         ]
         unused_other = [
-            factor for factor in other.generic_factors if factor not in context.values()
+            str(factor)
+            for factor in other.generic_factors
+            if str(factor) not in context.values()
         ]
         if not (unused_self and unused_other):
             yield context
@@ -348,7 +352,7 @@ class Comparable(ABC):
         raise NotImplementedError
 
 
-class ContextRegister(Dict[Comparable, Comparable]):
+class ContextRegister(Dict[str, str]):
     r"""
     A mapping of corresponding :class:`Factor`\s from two different contexts.
 
@@ -375,6 +379,9 @@ class ContextRegister(Dict[Comparable, Comparable]):
         if len(similies) > 1:
             similies[-2:] = [", and ".join(similies[-2:])]
         return ", ".join(similies)
+
+    def insert_pair(self, key: Comparable, value: Comparable) -> None:
+        self[str(key)] = str(value)
 
     def replace_keys(self, replacements: ContextRegister) -> ContextRegister:
         """Construct new :class:`ContextRegister` by replacing keys."""

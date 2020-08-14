@@ -401,9 +401,9 @@ class TestImplication:
             > make_complex_fact["f_relevant_murder_whether"]
         )
 
-    context_names = ContextRegister(
-        {Entity("Alice"): Entity("Craig"), Entity("Bob"): Entity("Dan")}
-    )
+    context_names = ContextRegister()
+    context_names.insert_pair(key=Entity("Alice"), value=Entity("Craig"))
+    context_names.insert_pair(key=Entity("Bob"), value=Entity("Dan"))
 
     def test_context_register_text(self):
         assert self.context_names.prose == (
