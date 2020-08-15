@@ -105,16 +105,12 @@ def new_context_helper(func: Callable):
                 )
             changes = ContextRegister(dict(zip(generic_factors, changes)))
 
-        expanded_changes = ContextRegister(
-            {
-                seek_factor_by_name(old, factor, context_opinion): seek_factor_by_name(
-                    new, factor, context_opinion
-                )
-                for old, new in changes.items()
-            }
-        )
+        expanded_changes = ContextRegister()
+        for old, new in changes.items():
+            factor_with_new_name = seek_factor_by_name(new, factor, context_opinion)
+            expanded_changes.insert_pair(old, factor_with_new_name)
         for old, new in expanded_changes.items():
-            if factor.means(old) and factor.name == old.name:
+            if str(factor) == old:
                 return new
 
         return func(factor, expanded_changes)
@@ -493,8 +489,12 @@ class Factor(Comparable):
             context = ContextRegister()
         if isinstance(other, self.__class__):
             if other.generic:
-                if context.get(self) is None or (context.get(self) == other):
-                    yield ContextRegister({self: other})
+                if context.get_factor(self) is None or (
+                    context.get_factor(self) == other
+                ):
+                    generic_register = ContextRegister()
+                    generic_register.insert_pair(self, other)
+                    yield generic_register
             if not self.generic:
                 yield from self._implies_if_concrete(other, context)
 

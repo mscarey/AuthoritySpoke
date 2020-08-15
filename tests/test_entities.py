@@ -1,3 +1,4 @@
+from authorityspoke.comparisons import ContextRegister
 import operator
 
 import pytest
@@ -40,15 +41,20 @@ class TestMakeEntities:
         assert any(register is not None for register in update)
 
         update = motel._context_register(watt, operator.le)
-        assert any(register == {motel: watt, watt: motel} for register in update)
+        expected = ContextRegister()
+        expected.insert_pair(motel, watt)
+        expected.insert_pair(watt, motel)
+        assert any(register == expected for register in update)
 
     def test_new_context(self, make_entity):
-        changes = {
-            make_entity["motel"]: Entity("Death Star"),
-            make_entity["watt"]: Entity("Darth Vader"),
-        }
+        changes = ContextRegister(
+            {
+                str(make_entity["motel"]): Entity("Death Star"),
+                str(make_entity["watt"]): Entity("Darth Vader"),
+            }
+        )
         motel = make_entity["motel"]
-        assert motel.new_context(changes) == changes[make_entity["motel"]]
+        assert motel.new_context(changes) == changes.get_factor(make_entity["motel"])
 
 
 class TestSameMeaning:
