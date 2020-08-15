@@ -68,8 +68,15 @@ class Opinion(Comparable):
         the outputs.
         """
 
-        self.holding_anchors: Dict[Holding, List[TextQuoteSelector]] = defaultdict(list)
-        self.factors: Dict[Factor, List[TextQuoteSelector]] = defaultdict(list)
+        self._holdings = HoldingGroup()
+
+    @property
+    def factors(self):
+        raise NotImplementedError
+
+    @property
+    def holdings(self):
+        return self._holdings
 
     def clear_holdings(self):
         r"""Remove all :class:`.Holding`\s from the opinion."""
@@ -173,15 +180,11 @@ class Opinion(Comparable):
                 return factor
         return None
 
-    @property
-    def holdings(self) -> HoldingGroup:
-        r"""
-        Get ordered list of :class:`.Holding`\s posited by this :class:`Opinion`
-
-        :returns:
-            keys of the holding_anchors :class:`.OrderedDict`, as a list
-        """
-        return HoldingGroup(list(self.holding_anchors))
+    def get_matching_holding(self, holding: Holding) -> Optional[Holding]:
+        for known_holding in self.holdings:
+            if holding.means(known_holding):
+                return known_holding
+        return None
 
     def posit_holding(
         self,
@@ -193,8 +196,6 @@ class Opinion(Comparable):
         context: Optional[Sequence[Factor]] = None,
     ) -> None:
         r"""Record that this Opinion endorses specified :class:`Holding`\s."""
-        if holding_anchors and not isinstance(holding_anchors, List):
-            holding_anchors = [holding_anchors]
         if isinstance(holding, Rule):
             logger.warning(
                 "posit_holding was called with a Rule "
@@ -205,19 +206,19 @@ class Opinion(Comparable):
         if not isinstance(holding, Holding):
             raise TypeError('"holding" must be an object of type Holding.')
 
-        if context:
-            holding = holding.new_context(context, context_opinion=self)
-        self.holding_anchors[holding].extend(holding_anchors or [])
-        if named_anchors:
-            for factor in (
-                list(holding.recursive_factors)
-                + list(holding.enactments)
-                + list(holding.enactments_despite)
-            ):
-                if hasattr(factor, "name") and factor.name in named_anchors:
-                    for anchor in named_anchors[factor.name]:
-                        if anchor not in self.factors[factor]:
-                            self.factors[factor].append(anchor)
+        if holding_anchors and not isinstance(holding_anchors, List):
+            holding_anchors = [holding_anchors]
+
+        if holding_anchors:
+            holding.anchors = holding.anchors + holding_anchors
+
+        matching_holding = self.get_matching_holding(holding)
+        if matching_holding:
+            matching_holding.anchors += holding.anchors
+        else:
+            if context:
+                holding = holding.new_context(context, context_opinion=self)
+            self._holdings = self._holdings + HoldingGroup(holding)
 
     def posit_holdings(
         self,
