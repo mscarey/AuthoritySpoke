@@ -158,6 +158,13 @@ class ComparableGroup(Tuple[F, ...], Comparable):
                                 )
                             )
 
+    def get_factor_by_name(self, name: str) -> Factor:
+        for comparable in self:
+            answer = comparable.get_factor_by_name(name)
+            if answer:
+                return answer
+        return None
+
     def verbose_comparison(
         self,
         operation: Callable,
@@ -384,7 +391,7 @@ class ComparableGroup(Tuple[F, ...], Comparable):
         self, other: Comparable, context: ContextRegister
     ) -> Iterator[ContextRegister]:
         for likely in self.likely_contexts(other, context):
-            partial = self + other.new_context(likely.reversed())
+            partial = self + other.new_context(likely.reversed(source=other))
             if partial.internally_consistent():
                 yield likely
 

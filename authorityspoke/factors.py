@@ -282,10 +282,14 @@ class Factor(Comparable):
                     yield from self._implies_if_present(other, context)
             elif self.__dict__.get("absent"):
                 if not other.__dict__.get("absent"):
-                    test = other._implies_if_present(self, context.reversed())
+                    test = other._implies_if_present(
+                        self, context.reversed(source=other)
+                    )
                 else:
-                    test = other._contradicts_if_present(self, context.reversed())
-                yield from (register.reversed() for register in test)
+                    test = other._contradicts_if_present(
+                        self, context.reversed(source=other)
+                    )
+                yield from (register.reversed(source=self) for register in test)
 
     def _evolve_attribute(
         self, changes: Dict[str, Any], attr_name: str
@@ -418,10 +422,14 @@ class Factor(Comparable):
 
             else:
                 if other.__dict__.get("absent"):
-                    test = other._implies_if_present(self, context.reversed())
+                    test = other._implies_if_present(
+                        self, context.reversed(source=other)
+                    )
                 else:
-                    test = other._contradicts_if_present(self, context.reversed())
-                yield from (register.reversed() for register in test)
+                    test = other._contradicts_if_present(
+                        self, context.reversed(source=other)
+                    )
+                yield from (register.reversed(source=other) for register in test)
 
     def __gt__(self, other: Optional[Factor]) -> bool:
         """Test whether ``self`` implies ``other`` and ``self`` != ``other``."""

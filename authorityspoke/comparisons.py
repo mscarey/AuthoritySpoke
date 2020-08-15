@@ -127,7 +127,7 @@ class Comparable(ABC):
         )
 
     def implies_same_context(self, other) -> bool:
-        same_context = ContextRegister({key: key for key in self.generic_factors})
+        same_context = ContextRegister({str(key): key for key in self.generic_factors})
         return self.implies(other, context=same_context)
 
     def means(
