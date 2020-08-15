@@ -117,7 +117,7 @@ class TestLikelyContext:
         left = watt_factor["f2"]
         right = watt_factor["f2"]
         context = next(left.likely_contexts(right))
-        assert context[make_entity["motel"]] == make_entity["motel"]
+        assert context.get_factor(make_entity["motel"]) == make_entity["motel"]
 
     def test_likely_context_implication_one_factor(self, make_entity, watt_factor):
         left = watt_factor["f8"]

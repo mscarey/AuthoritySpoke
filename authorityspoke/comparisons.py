@@ -356,7 +356,7 @@ class Comparable(ABC):
         raise NotImplementedError
 
 
-class ContextRegister(Dict[str, str]):
+class ContextRegister(Dict[str, Optional[Comparable]]):
     r"""
     A mapping of corresponding :class:`Factor`\s from two different contexts.
 
@@ -393,6 +393,11 @@ class ContextRegister(Dict[str, str]):
         if len(similies) > 1:
             similies[-2:] = [", and ".join(similies[-2:])]
         return ", ".join(similies)
+
+    def get_factor(self, key: Comparable) -> Optional[Comparable]:
+        if isinstance(key, str):
+            return self.get(key)
+        return self.get(str(key))
 
     def insert_pair(self, key: Comparable, value: Comparable) -> None:
         self[str(key)] = value
