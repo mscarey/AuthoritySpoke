@@ -255,13 +255,13 @@ class Procedure(Factor):
         """
         if self.generic:
             return [self]
-        return list(
-            {
-                generic: None
-                for factor in self.factors_all
-                for generic in factor.generic_factors
-            }
-        )
+        generic_dict = {
+            str(generic): generic
+            for factor in self.factors_all
+            for generic in factor.generic_factors
+        }
+        generic_list = list(generic_dict.values())
+        return generic_list
 
     def add_factor(self, incoming: Factor, role: str = "inputs") -> Procedure:
         """

@@ -160,27 +160,6 @@ class Factor(Comparable):
         return ()
 
     @property
-    def generic_factors(self) -> List[Factor]:
-        r"""
-        :class:`.Factor`\s that can be replaced without changing ``self``\s meaning.
-
-        :returns:
-            a :class:`list` made from a :class:`dict` with ``self``\'s
-            generic :class:`.Factor`\s as keys and ``None`` as values,
-            so that the keys can be matched to another object's
-            ``generic_factors`` to perform an equality test.
-        """
-
-        if self.generic:
-            return [self]
-        generics: Dict[Factor, None] = {}
-        for factor in self.context_factors:
-            if factor is not None:
-                for generic in factor.generic_factors:
-                    generics[str(generic)] = generic
-        return list(generics.values())
-
-    @property
     def context_factors(self) -> FactorSequence:
         r"""
         Get :class:`Factor`\s used in comparisons with other :class:`Factor`\s.
@@ -205,7 +184,7 @@ class Factor(Comparable):
             a :class:`dict` (instead of a :class:`set`,
             to preserve order) of :class:`Factor`\s.
         """
-        answers: Dict[Factor, None] = {str(self): None}
+        answers: Dict[Factor, None] = {str(self): self}
         for context in self.context_factors:
             if isinstance(context, Iterable):
                 for item in context:
@@ -282,14 +261,10 @@ class Factor(Comparable):
                     yield from self._implies_if_present(other, context)
             elif self.__dict__.get("absent"):
                 if not other.__dict__.get("absent"):
-                    test = other._implies_if_present(
-                        self, context.reversed(source=other)
-                    )
+                    test = other._implies_if_present(self, context.reversed())
                 else:
-                    test = other._contradicts_if_present(
-                        self, context.reversed(source=other)
-                    )
-                yield from (register.reversed(source=self) for register in test)
+                    test = other._contradicts_if_present(self, context.reversed())
+                yield from (register.reversed() for register in test)
 
     def _evolve_attribute(
         self, changes: Dict[str, Any], attr_name: str
@@ -363,7 +338,7 @@ class Factor(Comparable):
             and self.generic == other.generic
         ):
             if self.generic:
-                yield ContextRegister({self: other})
+                yield self.generic_register(other)
             yield from self._means_if_concrete(other, context)
 
     def _means_if_concrete(
@@ -397,6 +372,19 @@ class Factor(Comparable):
                 return factor
         return None
 
+    def get_factor_by_str(self, query: str) -> Optional[Factor]:
+        """
+        Search of ``self`` and ``self``'s attributes for :class:`Factor` with specified string.
+
+        :returns:
+            a :class:`Factor` with the specified string
+            if it exists, otherwise ``None``.
+        """
+        for factor in self.recursive_factors:
+            if str(factor) == query:
+                return factor
+        return None
+
     def explanations_implication(
         self, other: Comparable, context: Optional[ContextRegister] = None
     ) -> Iterator[ContextRegister]:
@@ -422,14 +410,10 @@ class Factor(Comparable):
 
             else:
                 if other.__dict__.get("absent"):
-                    test = other._implies_if_present(
-                        self, context.reversed(source=other)
-                    )
+                    test = other._implies_if_present(self, context.reversed())
                 else:
-                    test = other._contradicts_if_present(
-                        self, context.reversed(source=other)
-                    )
-                yield from (register.reversed(source=other) for register in test)
+                    test = other._contradicts_if_present(self, context.reversed())
+                yield from (register.reversed() for register in test)
 
     def __gt__(self, other: Optional[Factor]) -> bool:
         """Test whether ``self`` implies ``other`` and ``self`` != ``other``."""
@@ -500,9 +484,7 @@ class Factor(Comparable):
                 if context.get_factor(self) is None or (
                     context.get_factor(self) == other
                 ):
-                    generic_register = ContextRegister()
-                    generic_register.insert_pair(self, other)
-                    yield generic_register
+                    yield self.generic_register(other)
             if not self.generic:
                 yield from self._implies_if_concrete(other, context)
 
@@ -520,7 +502,7 @@ class Factor(Comparable):
     ) -> Optional[ContextRegister]:
         new_context = None
         if self.means(other, context=context) or other.means(
-            self, context=context.reversed(source=self)
+            self, context=context.reversed()
         ):
             new_context = self._update_context_from_factors(other, context)
         if new_context and new_context != context:
@@ -532,7 +514,7 @@ class Factor(Comparable):
     ) -> Optional[ContextRegister]:
         new_context = None
         if self.implies(other, context=context) or other.implies(
-            self, context=context.reversed(source=self)
+            self, context=context.reversed()
         ):
             new_context = self._update_context_from_factors(other, context)
         if new_context and new_context != context:

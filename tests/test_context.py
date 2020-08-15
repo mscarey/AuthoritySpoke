@@ -12,7 +12,7 @@ class TestContextRegisters:
         right = watt_factor["f1"]
         contexts = list(left.possible_contexts(right))
         assert len(contexts) == 1
-        assert contexts[0][str(make_entity["motel"])] == make_entity["motel"]
+        assert contexts[0].check_match(make_entity["motel"], make_entity["motel"])
 
     def test_all_possible_contexts_identical_factor(self, watt_factor, make_entity):
         left = watt_factor["f2"]
@@ -20,7 +20,7 @@ class TestContextRegisters:
         contexts = list(left.possible_contexts(right))
         assert len(contexts) == 2
         assert any(
-            context[str(make_entity["watt"])] == make_entity["motel"]
+            context.check_match(make_entity["watt"], make_entity["motel"])
             for context in contexts
         )
 
@@ -31,7 +31,7 @@ class TestContextRegisters:
         context.insert_pair(make_entity["motel"], make_entity["motel"])
         contexts = list(left.possible_contexts(right, context=context))
         assert len(contexts) == 1
-        assert contexts[0][str(make_entity["watt"])] == make_entity["watt"]
+        assert contexts[0].check_match(make_entity["watt"], make_entity["watt"])
 
     def test_context_register_empty(self, make_complex_fact, watt_factor):
         """
@@ -50,7 +50,7 @@ class TestContextRegisters:
             watt_factor["f1"]._context_registers(
                 watt_factor["f1_entity_order"], operator.le
             )
-        ) == {str(make_entity["motel"]): make_entity["watt"],}
+        ) == {str(make_entity["motel"]): str(make_entity["watt"]),}
 
     def test_import_to_context_register(self, make_entity, watt_factor):
         left = ContextRegister(
@@ -100,16 +100,11 @@ class TestContextRegisters:
                 matches
             )
         ]
-        assert (
-            ContextRegister(
-                {
-                    str(make_entity["trees"]): make_entity["trees"],
-                    str(make_entity["motel"]): make_entity["motel"],
-                    str(make_entity["watt"]): make_entity["watt"],
-                }
-            )
-            in new_matches
-        )
+        expected = ContextRegister()
+        expected.insert_pair(make_entity["trees"], make_entity["trees"])
+        expected.insert_pair(make_entity["motel"], make_entity["motel"])
+        expected.insert_pair(make_entity["watt"], make_entity["watt"])
+        assert expected in new_matches
 
 
 class TestLikelyContext:
@@ -117,19 +112,19 @@ class TestLikelyContext:
         left = watt_factor["f2"]
         right = watt_factor["f2"]
         context = next(left.likely_contexts(right))
-        assert context.get_factor(make_entity["motel"]) == make_entity["motel"]
+        assert context.check_match(make_entity["motel"], make_entity["motel"])
 
     def test_likely_context_implication_one_factor(self, make_entity, watt_factor):
         left = watt_factor["f8"]
         right = watt_factor["f8_meters"]
         context = next(left.likely_contexts(right))
-        assert context.get_factor(make_entity["motel"]) == make_entity["motel"]
+        assert context.check_match(make_entity["motel"], make_entity["motel"])
 
     def test_likely_context_two_factors(self, make_entity, watt_factor):
         left = FactorGroup((watt_factor["f9_swap_entities"], watt_factor["f2"]))
         right = watt_factor["f2"]
         context = next(left.likely_contexts(right))
-        assert context.get_factor(make_entity["motel"]) == make_entity["motel"]
+        assert context.check_match(make_entity["motel"], make_entity["motel"])
 
     def test_likely_context_two_by_two(self, make_entity, watt_factor):
         left = FactorGroup((watt_factor["f9"], watt_factor["f2"]))
@@ -137,7 +132,7 @@ class TestLikelyContext:
             (watt_factor["f9_swap_entities"], watt_factor["f9_more_different_entity"])
         )
         context = next(left.likely_contexts(right))
-        assert context.get_factor(make_entity["motel"]) == make_entity["trees"]
+        assert context.check_match(make_entity["motel"], make_entity["trees"])
 
     def test_likely_context_different_context_factors(self, make_opinion_with_holding):
         lotus = make_opinion_with_holding["lotus_majority"]
@@ -148,7 +143,7 @@ class TestLikelyContext:
         context = next(left.likely_contexts(right))
         lotus_menu = lotus.holdings[2].generic_factors[0]
         java_api = oracle.generic_factors[0]
-        assert context.get_factor(lotus_menu) == java_api
+        assert context.get_factor(lotus_menu, source=oracle) == java_api
 
     def test_likely_context_from_factor_meaning(self, make_opinion_with_holding):
         lotus = make_opinion_with_holding["lotus_majority"]

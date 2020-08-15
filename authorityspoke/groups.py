@@ -266,9 +266,9 @@ class ComparableGroup(Tuple[F, ...], Comparable):
         self, other: ComparableGroup, context: Optional[ContextRegister] = None
     ) -> Iterator[ContextRegister]:
         context = context or ContextRegister()
-        context_for_other = context.reversed(source=self)
+        context_for_other = context.reversed()
         yield from (
-            context.reversed(source=other)
+            context.reversed()
             for context in other.comparison(
                 operation=means,
                 still_need_matches=list(self),
@@ -391,7 +391,7 @@ class ComparableGroup(Tuple[F, ...], Comparable):
         self, other: Comparable, context: ContextRegister
     ) -> Iterator[ContextRegister]:
         for likely in self.likely_contexts(other, context):
-            partial = self + other.new_context(likely.reversed(source=other))
+            partial = self + other.new_context(likely.reversed())
             if partial.internally_consistent():
                 yield likely
 

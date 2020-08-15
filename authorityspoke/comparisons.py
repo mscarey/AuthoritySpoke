@@ -4,7 +4,7 @@ from abc import ABC
 import functools
 from itertools import permutations, zip_longest
 import logging
-from typing import Callable, Dict, Iterator, List, Optional
+from typing import Callable, Dict, Iterator, List, Optional, Union
 
 logger = logging.getLogger(__name__)
 
@@ -31,6 +31,11 @@ class Comparable(ABC):
             for explanation in self.explanations_consistent_with(other, context)
         )
 
+    def generic_register(self, other: Comparable) -> ContextRegister:
+        register = ContextRegister()
+        register.insert_pair(self, other)
+        return register
+
     def _context_registers(
         self,
         other: Optional[Comparable],
@@ -50,9 +55,7 @@ class Comparable(ABC):
             yield context
         elif self.generic or other.generic:
             if context.get(str(self)) is None or (context.get(str(self)) == other):
-                generic_register = ContextRegister()
-                generic_register.insert_pair(self, other)
-                yield generic_register
+                yield self.generic_register(other)
         else:
             yield from self.context_factors.ordered_comparison(
                 other=other.context_factors, operation=comparison, context=context
@@ -77,7 +80,7 @@ class Comparable(ABC):
         )
 
     @property
-    def generic_factors(self) -> List[Comparable]:
+    def context_factors(self) -> List[Comparable]:
         r"""
         :class:`.Factor`\s that can be replaced without changing ``self``\s meaning.
 
@@ -88,6 +91,27 @@ class Comparable(ABC):
             ``generic_factors`` to perform an equality test.
         """
         return []
+
+    @property
+    def generic_factors(self) -> List[Factor]:
+        r"""
+        :class:`.Factor`\s that can be replaced without changing ``self``\s meaning.
+
+        :returns:
+            a :class:`list` made from a :class:`dict` with ``self``\'s
+            generic :class:`.Factor`\s as keys and ``None`` as values,
+            so that the keys can be matched to another object's
+            ``generic_factors`` to perform an equality test.
+        """
+
+        if self.generic:
+            return [self]
+        generics: Dict[Factor, None] = {}
+        for factor in self.context_factors:
+            if factor is not None:
+                for generic in factor.generic_factors:
+                    generics[str(generic)] = generic
+        return list(generics.values())
 
     @property
     def interchangeable_factors(self) -> List[ContextRegister]:
@@ -356,7 +380,7 @@ class Comparable(ABC):
         raise NotImplementedError
 
 
-class ContextRegister(Dict[str, Optional[Comparable]]):
+class ContextRegister(Dict[str, str]):
     r"""
     A mapping of corresponding :class:`Factor`\s from two different contexts.
 
@@ -394,13 +418,26 @@ class ContextRegister(Dict[str, Optional[Comparable]]):
             similies[-2:] = [", and ".join(similies[-2:])]
         return ", ".join(similies)
 
-    def get_factor(self, key: Comparable) -> Optional[Comparable]:
+    def check_match(self, key: Comparable, value: Comparable) -> bool:
+        return self.get(str(key)) == str(value)
+
+    def get_factor(
+        self, key: Union[str, Comparable], source: Comparable
+    ) -> Optional[Comparable]:
         if isinstance(key, str):
             return self.get(key)
-        return self.get(str(key))
+        value_name = self.get(str(key))
+        value = source.get_factor_by_str(value_name)
+        return value
 
-    def insert_pair(self, key: Comparable, value: Comparable) -> None:
-        self[str(key)] = value
+    def insert_pair(
+        self, key: Union[str, Comparable], value: Union[str, Comparable]
+    ) -> None:
+        if not isinstance(key, str):
+            key = str(key)
+        if not isinstance(value, str):
+            value = str(value)
+        self[key] = value
 
     def replace_keys(self, replacements: ContextRegister) -> ContextRegister:
         """Construct new :class:`ContextRegister` by replacing keys."""
@@ -414,12 +451,9 @@ class ContextRegister(Dict[str, Optional[Comparable]]):
                 keys.append(factor)
         return ContextRegister(zip(keys, values))
 
-    def reversed(self, source: Comparable):
+    def reversed(self):
         """Swap keys for values and vice versa."""
-        return ContextRegister(
-            {str(v): source.get_factor_by_name(k) for k, v in self.items()}
-        )
-        raise NotImplementedError
+        return ContextRegister({v: k for k, v in self.items()})
 
     def reverse_match(self, query: Comparable) -> Optional[str]:
         value_str = str(query)

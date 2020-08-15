@@ -152,13 +152,11 @@ class Opinion(Comparable):
             of ``self``, with guaranteed order, including each
             generic :class:`.Factor` only once.
         """
-        return list(
-            {
-                generic: None
-                for holding in self.holdings
-                for generic in holding.generic_factors
-            }
-        )
+        generics: Dict[Factor, None] = {}
+        for holding in self.holdings:
+            for generic in holding.generic_factors:
+                generics[str(generic)] = generic
+        return list(generics.values())
 
     def get_factor_by_name(self, name: str) -> Optional[Factor]:
         """
@@ -176,6 +174,16 @@ class Opinion(Comparable):
 
         for holding in self.holdings:
             factor = holding.get_factor_by_name(name)
+            if factor is not None:
+                return factor
+        return None
+
+    def get_factor_by_str(self, query: str) -> Optional[Factor]:
+        r"""
+        Search recursively  for :class:`.Factor` in holdings of self.
+        """
+        for holding in self.holdings:
+            factor = holding.get_factor_by_str(query)
             if factor is not None:
                 return factor
         return None
