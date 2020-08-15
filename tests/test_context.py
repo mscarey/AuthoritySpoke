@@ -123,13 +123,13 @@ class TestLikelyContext:
         left = watt_factor["f8"]
         right = watt_factor["f8_meters"]
         context = next(left.likely_contexts(right))
-        assert context[make_entity["motel"]] == make_entity["motel"]
+        assert context.get_factor(make_entity["motel"]) == make_entity["motel"]
 
     def test_likely_context_two_factors(self, make_entity, watt_factor):
         left = FactorGroup((watt_factor["f9_swap_entities"], watt_factor["f2"]))
         right = watt_factor["f2"]
         context = next(left.likely_contexts(right))
-        assert context[make_entity["motel"]] == make_entity["motel"]
+        assert context.get_factor(make_entity["motel"]) == make_entity["motel"]
 
     def test_likely_context_two_by_two(self, make_entity, watt_factor):
         left = FactorGroup((watt_factor["f9"], watt_factor["f2"]))
@@ -137,7 +137,7 @@ class TestLikelyContext:
             (watt_factor["f9_swap_entities"], watt_factor["f9_more_different_entity"])
         )
         context = next(left.likely_contexts(right))
-        assert context[make_entity["motel"]] == make_entity["trees"]
+        assert context.get_factor(make_entity["motel"]) == make_entity["trees"]
 
     def test_likely_context_different_context_factors(self, make_opinion_with_holding):
         lotus = make_opinion_with_holding["lotus_majority"]
@@ -148,7 +148,7 @@ class TestLikelyContext:
         context = next(left.likely_contexts(right))
         lotus_menu = lotus.holdings[2].generic_factors[0]
         java_api = oracle.generic_factors[0]
-        assert context[lotus_menu] == java_api
+        assert context.get_factor(lotus_menu) == java_api
 
     def test_likely_context_from_factor_meaning(self, make_opinion_with_holding):
         lotus = make_opinion_with_holding["lotus_majority"]

@@ -414,9 +414,11 @@ class ContextRegister(Dict[str, Optional[Comparable]]):
                 keys.append(factor)
         return ContextRegister(zip(keys, values))
 
-    def reversed(self):
+    def reversed(self, source: Comparable):
         """Swap keys for values and vice versa."""
-        # return ContextRegister({v: k for k, v in self.items()})
+        return ContextRegister(
+            {str(v): source.get_factor_by_name(k) for k, v in self.items()}
+        )
         raise NotImplementedError
 
     def reverse_match(self, query: Comparable) -> Optional[str]:

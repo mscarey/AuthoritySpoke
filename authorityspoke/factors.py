@@ -209,7 +209,7 @@ class Factor(Comparable):
             a :class:`dict` (instead of a :class:`set`,
             to preserve order) of :class:`Factor`\s.
         """
-        answers: Dict[Factor, None] = {self: None}
+        answers: Dict[Factor, None] = {str(self): None}
         for context in self.context_factors:
             if isinstance(context, Iterable):
                 for item in context:
@@ -512,7 +512,7 @@ class Factor(Comparable):
     ) -> Optional[ContextRegister]:
         new_context = None
         if self.means(other, context=context) or other.means(
-            self, context=context.reversed()
+            self, context=context.reversed(source=self)
         ):
             new_context = self._update_context_from_factors(other, context)
         if new_context and new_context != context:
@@ -524,7 +524,7 @@ class Factor(Comparable):
     ) -> Optional[ContextRegister]:
         new_context = None
         if self.implies(other, context=context) or other.implies(
-            self, context=context.reversed()
+            self, context=context.reversed(source=self)
         ):
             new_context = self._update_context_from_factors(other, context)
         if new_context and new_context != context:
