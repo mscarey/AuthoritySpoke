@@ -259,9 +259,9 @@ class ComparableGroup(Tuple[F, ...], Comparable):
         self, other: ComparableGroup, context: Optional[ContextRegister] = None
     ) -> Iterator[ContextRegister]:
         context = context or ContextRegister()
-        context_for_other = context.reversed()
+        context_for_other = context.reversed(source=self)
         yield from (
-            context.reversed()
+            context.reversed(source=other)
             for context in other.comparison(
                 operation=means,
                 still_need_matches=list(self),
