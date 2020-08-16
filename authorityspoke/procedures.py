@@ -137,8 +137,10 @@ class Procedure(Factor):
         """Add two Procedures, given that they have already been found to be addable."""
         triggered_procedure = other.new_context(context.reversed())
         new_outputs = [*self.outputs, *triggered_procedure.outputs]
-        unique_new_outputs = tuple({key: None for key in new_outputs})
-        return self.evolve({"outputs": unique_new_outputs})
+        unique_new_outputs = {}
+        for key in new_outputs:
+            unique_new_outputs[str(key)] = key
+        return self.evolve({"outputs": list(unique_new_outputs.values())})
 
     def __add__(self, other: Procedure) -> Optional[Procedure]:
         """Show how first Procedure triggers the second if not both are universal."""

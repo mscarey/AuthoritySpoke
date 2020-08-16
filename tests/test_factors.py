@@ -183,7 +183,8 @@ class TestFacts:
         motel_near_watt = watt_factor["f7_swap_entities_4"]
         assert len(motel_near_watt.interchangeable_factors[0]) == 2
         assert (
-            make_entity["motel_specific"] in motel_near_watt.interchangeable_factors[0]
+            str(make_entity["motel_specific"])
+            in motel_near_watt.interchangeable_factors[0]
         )
 
     def test_predicate_with_entities(self, make_entity, watt_factor):

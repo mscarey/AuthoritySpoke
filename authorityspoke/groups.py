@@ -248,10 +248,9 @@ class ComparableGroup(Tuple[F, ...], Comparable):
 
     @property
     def generic_factors_by_name(self) -> Dict[str, Comparable]:
-        generics: Dict[Comparable, None] = {}
+        generics: Dict[str, Comparable] = {}
         for factor in self:
-            for generic in factor.generic_factors:
-                generics[generic] = None
+            generics.update(factor.generic_factors_by_name)
         return generics
 
     def has_all_factors_of(
