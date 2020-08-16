@@ -411,17 +411,6 @@ class ContextRegister(Dict[str, str]):
             new.insert_pair(pair[0], pair[1])
         return new
 
-    @property
-    def prose(self) -> str:
-        """Make statement matching analagous context factors of self and other."""
-        similies = [
-            f'{key} {"are" if key.__dict__.get("plural") is True else "is"} like {value}'
-            for key, value in self.items()
-        ]
-        if len(similies) > 1:
-            similies[-2:] = [", and ".join(similies[-2:])]
-        return ", ".join(similies)
-
     def check_match(self, key: Comparable, value: Comparable) -> bool:
         return self.get(str(key)) == str(value)
 
