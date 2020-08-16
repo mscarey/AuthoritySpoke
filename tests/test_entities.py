@@ -1,4 +1,4 @@
-from authorityspoke.comparisons import ContextRegister
+from authorityspoke.comparisons import ChangeRegister, ContextRegister
 import operator
 
 import pytest
@@ -47,14 +47,15 @@ class TestMakeEntities:
         assert any(register == expected for register in update)
 
     def test_new_context(self, make_entity):
-        changes = ContextRegister(
+        motel_name = str(make_entity["motel"])
+        changes = ChangeRegister(
             {
-                str(make_entity["motel"]): Entity("Death Star"),
+                motel_name: Entity("Death Star"),
                 str(make_entity["watt"]): Entity("Darth Vader"),
             }
         )
         motel = make_entity["motel"]
-        assert motel.new_context(changes) == changes.get_factor(make_entity["motel"])
+        assert motel.new_context(changes) == changes.get(motel_name)
 
 
 class TestSameMeaning:
