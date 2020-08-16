@@ -165,6 +165,20 @@ class ComparableGroup(Tuple[F, ...], Comparable):
                 return answer
         return None
 
+    def get_factor_by_str(self, query: str) -> Optional[Factor]:
+        """
+        Search of ``self`` and ``self``'s attributes for :class:`Factor` with specified string.
+
+        :returns:
+            a :class:`Factor` with the specified string
+            if it exists, otherwise ``None``.
+        """
+        for comparable in self:
+            for name, factor in comparable.recursive_factors.items():
+                if name == query:
+                    return factor
+        return None
+
     def verbose_comparison(
         self,
         operation: Callable,
@@ -382,15 +396,17 @@ class ComparableGroup(Tuple[F, ...], Comparable):
                     return False
         return True
 
-    def new_context(self, context: ContextRegister) -> ComparableGroup:
-        result = [factor.new_context(context) for factor in self]
+    def new_context(
+        self, context: ContextRegister, source: Comparable
+    ) -> ComparableGroup:
+        result = [factor.new_context(context, source=source) for factor in self]
         return ComparableGroup(result)
 
     def partial_explanations_union(
         self, other: Comparable, context: ContextRegister
     ) -> Iterator[ContextRegister]:
         for likely in self.likely_contexts(other, context):
-            partial = self + other.new_context(likely.reversed())
+            partial = self + other.new_context(likely.reversed(), source=self)
             if partial.internally_consistent():
                 yield likely
 
@@ -405,7 +421,7 @@ class ComparableGroup(Tuple[F, ...], Comparable):
     def union_from_explanation_allow_contradiction(
         self, other: ComparableGroup, context: ContextRegister
     ) -> ComparableGroup:
-        result = self + other.new_context(context.reversed())
+        result = self + other.new_context(context.reversed(), source=self)
         result = result.drop_implied_factors()
         return result
 

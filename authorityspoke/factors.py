@@ -120,7 +120,7 @@ def new_context_helper(func: Callable):
     def wrapper(
         factor: Factor,
         changes: Optional[Union[Sequence[Factor], ContextRegister]],
-        context_opinion: Optional[Opinion] = None,
+        source: Optional[Comparable] = None,
     ) -> Factor:
 
         if changes is None:
@@ -139,7 +139,7 @@ def new_context_helper(func: Callable):
 
         expanded_changes = ChangeRegister()
         for old, new in changes.items():
-            factor_with_new_name = seek_factor_by_str(new, factor, context_opinion)
+            factor_with_new_name = seek_factor_by_str(new, factor, source)
             expanded_changes.insert_pair(old, factor_with_new_name)
         for old, new in expanded_changes.items():
             if str(factor) == old:
