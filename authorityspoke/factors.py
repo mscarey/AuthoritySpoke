@@ -208,7 +208,7 @@ class Factor(Comparable):
         return FactorSequence(context)
 
     @property
-    def recursive_factors(self) -> Dict[Factor, None]:
+    def recursive_factors(self) -> Dict[str, Factor]:
         r"""
         Collect `self`'s :attr:`context_factors`, and their :attr:`context_factors`, recursively.
 
@@ -216,7 +216,7 @@ class Factor(Comparable):
             a :class:`dict` (instead of a :class:`set`,
             to preserve order) of :class:`Factor`\s.
         """
-        answers: Dict[Factor, None] = {str(self): self}
+        answers: Dict[str, Factor] = {str(self): self}
         for context in self.context_factors:
             if isinstance(context, Iterable):
                 for item in context:
@@ -748,3 +748,18 @@ class FactorSequence(Tuple[Optional[Comparable], ...]):
             context = ContextRegister()
         ordered_pairs = list(zip_longest(self, other))
         yield from update_register(register=context, factor_pairs=ordered_pairs)
+
+
+class FactorIndex(Dict[str, Factor]):
+    r"""Index of :class:`.Factor`/s that may share common anchors."""
+
+    def insert(self, key: str, value: Factor) -> None:
+        if key in self.keys():
+            self[key].anchors += value.anchors
+        else:
+            self[key] = value
+
+    def insert_factor(self, factor: Factor) -> None:
+        name = str(factor)
+        self.insert(key=name, value=factor)
+

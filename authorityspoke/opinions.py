@@ -19,7 +19,7 @@ from dataclasses import dataclass, field
 from anchorpoint.textselectors import TextQuoteSelector
 
 from authorityspoke.comparisons import Comparable
-from authorityspoke.factors import Factor, ContextRegister
+from authorityspoke.factors import Factor, ContextRegister, FactorIndex
 from authorityspoke.explanations import Explanation
 from authorityspoke.holdings import Holding, HoldingGroup
 from authorityspoke.rules import Rule
@@ -70,9 +70,16 @@ class Opinion(Comparable):
 
         self._holdings = HoldingGroup()
 
-    @property
-    def factors(self):
-        raise NotImplementedError
+    def factors(self) -> List[Factor]:
+        factors_by_name = self.factors_by_name()
+        return list(factors_by_name.values())
+
+    def factors_by_name(self) -> FactorIndex:
+        factor_index = FactorIndex()
+        for holding in self.holdings:
+            for key, value in holding.recursive_factors.items():
+                factor_index.insert(key=key, value=value)
+        return factor_index
 
     @property
     def holdings(self):
