@@ -14,7 +14,7 @@ from legislice import Enactment
 
 from anchorpoint.textselectors import TextQuoteSelector
 
-from authorityspoke.comparisons import ContextRegister, Comparable
+from authorityspoke.comparisons import ChangeRegister, ContextRegister, Comparable
 
 
 def seek_factor_by_name(

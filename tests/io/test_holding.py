@@ -1,3 +1,4 @@
+from authorityspoke.comparisons import ChangeRegister
 from collections import OrderedDict
 import os
 from marshmallow import ValidationError
@@ -12,7 +13,7 @@ from legislice.name_index import collect_enactments
 
 from authorityspoke.entities import Entity
 from authorityspoke.facts import Fact
-from authorityspoke.holdings import Holding
+from authorityspoke.holdings import Holding, HoldingGroup
 from authorityspoke.opinions import Opinion
 from authorityspoke.predicates import Predicate
 from authorityspoke.procedures import Procedure
@@ -232,8 +233,7 @@ class TestTextAnchors:
             holding_anchors=holding_anchors,
             named_anchors=named_anchors,
         )
-        has_no_anchors = oracle.holdings[0]
-        assert oracle.holding_anchors[has_no_anchors] == []
+        assert not oracle.holdings[0].anchors
 
     def test_holding_without_enactments_or_regime(self, raw_holding):
         expanded = text_expansion.expand_shorthand(raw_holding["bradley_house"])
@@ -261,7 +261,7 @@ class TestTextAnchors:
             ),
         )
         assert (
-            cardenas.holding_anchors[holding][0].exact
+            cardenas.holdings[-1].anchors[0].exact
             == "some text supporting this holding"
         )
 
@@ -517,12 +517,16 @@ class TestTextAnchors:
         brad = make_opinion["brad_majority"]
         to_read = load_holdings("holding_brad.json")
         holdings = readers.read_holdings(to_read, client=mock_client)
+        brad._holdings = HoldingGroup()
         brad.posit(holdings)
         expectation_not_reasonable = brad.holdings[6]
-        context_holding = expectation_not_reasonable.new_context(
-            {expectation_not_reasonable.generic_factors[0]: make_entity["watt"]}
+        changes = ChangeRegister()
+        changes.insert_pair(
+            key=expectation_not_reasonable.generic_factors[0], value=make_entity["watt"]
         )
+        context_holding = expectation_not_reasonable.new_context(changes)
 
+        watt._holdings = HoldingGroup()
         watt.posit(context_holding)
         string = str(context_holding)
         assert "<Wattenburg> lived at <Bradley's house>" in string
@@ -587,7 +591,7 @@ class TestTextAnchors:
         holding_anchors = anchors.get_holding_anchors(make_analysis["minimal"])
         brad = make_opinion["brad_majority"]
         brad.posit(holdings, holding_anchors=holding_anchors)
-        assert brad.holding_anchors[holdings[0]][0].exact == "we hold"
+        assert brad.holdings[0].anchors[0].exact == "we hold"
 
 
 class TestExclusiveFlag:

@@ -4,7 +4,7 @@ from abc import ABC
 import functools
 from itertools import permutations, zip_longest
 import logging
-from typing import Callable, Dict, Iterator, List, Optional, Union
+from typing import Callable, Dict, Iterator, List, Optional, Type, Union
 
 logger = logging.getLogger(__name__)
 
@@ -496,3 +496,16 @@ class ContextRegister(Dict[str, str]):
                     logger.debug("%s assigned to two different keys", in_value)
                     return None
         return self_mapping
+
+
+class ChangeRegister(Dict[str, Comparable]):
+    r"""
+    Mapping of names of :class:`Factor`\s to be changed to their replacements.
+    """
+
+    def insert_pair(self, key: Union[str, Comparable], value: Comparable) -> None:
+        if not isinstance(key, str):
+            key = str(key)
+        if not isinstance(value, Comparable):
+            raise TypeError
+        self[key] = value
