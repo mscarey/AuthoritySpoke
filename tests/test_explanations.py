@@ -12,22 +12,24 @@ class TestContext:
     def test_impossible_register(self):
         fact_al = read_fact(self.al)
         fact_alice = read_fact(self.alice)
-        context = ContextRegister({Entity("Al"): Entity("Bob")})
+        context = ContextRegister({str(Entity("Al")): Entity("Bob")})
         answers = fact_al.update_context_register(fact_alice, context, means)
         assert not any(answers)
 
     def test_possible_register(self):
         fact_al = read_fact(self.al)
         fact_alice = read_fact(self.alice)
-        context = ContextRegister({Entity("Al"): Entity("Alice")})
-        answers = fact_al.update_context_register(fact_alice, context, means)
-        assert Entity("the bull") in next(answers).keys()
+        register = ContextRegister()
+        register.insert_pair(Entity("Al"), Entity("Alice"))
+        answers = fact_al.update_context_register(fact_alice, register, means)
+        assert str(Entity("the bull")) in next(answers).keys()
 
     def test_explain_consistency(self):
         fact_al = read_fact(self.al)
         fact_alice = read_fact(self.alice)
-        context = ContextRegister({Entity("Al"): Entity("Alice")})
-        answers = fact_al.explain_consistent_with(fact_alice, context)
+        register = ContextRegister()
+        register.insert_pair(Entity("Al"), Entity("Alice"))
+        answers = fact_al.explain_consistent_with(fact_alice, register)
         assert "<the bull> is like <the cow>" in answers.prose
 
 

@@ -129,17 +129,19 @@ class TestFacts:
         assert "\n  " not in fact_text
 
     def test_new_context_replace_fact(self, make_entity, watt_factor):
-        changes = {
-            make_entity["watt"]: Entity("Darth Vader"),
-            watt_factor["f2"]: watt_factor["f10"],
-        }
+        changes = ContextRegister(
+            {
+                str(make_entity["watt"]): Entity("Darth Vader"),
+                str(watt_factor["f2"]): watt_factor["f10"],
+            }
+        )
         assert "was within the curtilage of <Hideaway Lodge>" in (
             watt_factor["f2"].new_context(changes).short_string
         )
 
     def test_get_factor_from_recursive_search(self, make_opinion_with_holding):
         holding_list = list(make_opinion_with_holding["cardenas_majority"].holdings)
-        factor_list = list(holding_list[0].recursive_factors)
+        factor_list = list(holding_list[0].recursive_factors.values())
         assert any(
             factor == Entity("parole officer") and factor.name == "parole officer"
             for factor in factor_list
@@ -152,12 +154,11 @@ class TestFacts:
         assert "Great Northern was a motel" in str(different)
 
     def test_new_concrete_context(self, make_entity, watt_factor):
-        different = watt_factor["f2"].new_context(
-            {
-                make_entity["watt"]: Entity("Darth Vader"),
-                make_entity["motel"]: Entity("Death Star"),
-            }
+        register = ContextRegister.from_lists(
+            keys=[make_entity["watt"], make_entity["motel"]],
+            values=[Entity("Darth Vader"), Entity("Death Star")],
         )
+        different = watt_factor["f2"].new_context(register)
         assert "<Darth Vader> operated" in str(different)
 
     def test_type_of_context_factors(self, watt_factor):
