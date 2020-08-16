@@ -555,7 +555,7 @@ class TestContradiction:
         w = watt_mentioned
         assert (
             watt_factor["f1"]
-            .new_context({w[0]: w[2]})
+            .new_context(ContextRegister({str(w[0]): w[2]}))
             .means(watt_factor["f1_different_entity"])
         )
 
@@ -563,18 +563,14 @@ class TestContradiction:
         left = make_factor["f_irrelevant_3"]
         right = make_factor["f_irrelevant_3_new_context"]
         e = make_entity
-        easy_update = left.update_context_register(right, {e["dan"]: e["craig"]}, means)
-        harder_update = left.update_context_register(
-            right,
-            {
-                e["alice"]: e["bob"],
-                e["bob"]: e["alice"],
-                e["craig"]: e["dan"],
-                e["dan"]: e["craig"],
-                e["circus"]: e["circus"],
-            },
-            means,
+        easy_update = left.update_context_register(
+            right, {str(e["dan"]): e["craig"]}, means
         )
+        harder_register = ContextRegister.from_lists(
+            keys=[e["alice"], e["bob"], e["craig"], e["dan"], e["circus"]],
+            values=[e["bob"], e["alice"], e["dan"], e["craig"], e["circus"]],
+        )
+        harder_update = left.update_context_register(right, harder_register, means,)
         assert any(register is not None for register in easy_update)
         assert any(register is not None for register in harder_update)
 
@@ -614,18 +610,16 @@ class TestConsistent:
     def test_contradictory_facts_about_same_entity(self, watt_factor):
         left = watt_factor["f8_less"]
         right = watt_factor["f8_meters"]
-        assert not left.consistent_with(
-            right, context={left.generic_factors[0]: right.generic_factors[0]}
-        )
+        register = ContextRegister()
+        register.insert_pair(left.generic_factors[0], right.generic_factors[0])
+        assert not left.consistent_with(right, register)
 
     def test_explanations_consistent_with(self, watt_factor):
         left = watt_factor["f8_less"]
         right = watt_factor["f8_meters"]
-        explanations = list(
-            left.explanations_consistent_with(
-                right, context={left.generic_factors[0]: right.generic_factors[0]}
-            )
-        )
+        register = ContextRegister()
+        register.insert_pair(left.generic_factors[0], right.generic_factors[0])
+        explanations = list(left.explanations_consistent_with(right, context=register))
         assert not explanations
 
     def test_factor_consistent_with_none(self, make_exhibit):

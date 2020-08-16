@@ -513,8 +513,8 @@ class Factor(Comparable):
             context = ContextRegister()
         if isinstance(other, self.__class__):
             if other.generic:
-                if context.get_factor(self) is None or (
-                    context.get_factor(self) == other
+                if context.get_factor(self, source=other) is None or (
+                    context.get_factor(self, source=other) == other
                 ):
                     yield self.generic_register(other)
             if not self.generic:
