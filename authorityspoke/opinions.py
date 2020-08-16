@@ -80,7 +80,7 @@ class Opinion(Comparable):
 
     def clear_holdings(self):
         r"""Remove all :class:`.Holding`\s from the opinion."""
-        self.holding_anchors.clear()
+        self._holdings = HoldingGroup()
 
     def explanations_contradiction(
         self, other: Comparable, context: Optional[ContextRegister] = None,

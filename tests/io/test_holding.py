@@ -517,7 +517,7 @@ class TestTextAnchors:
         brad = make_opinion["brad_majority"]
         to_read = load_holdings("holding_brad.json")
         holdings = readers.read_holdings(to_read, client=mock_client)
-        brad._holdings = HoldingGroup()
+        brad.clear_holdings()
         brad.posit(holdings)
         expectation_not_reasonable = brad.holdings[6]
         changes = ChangeRegister()
@@ -526,7 +526,7 @@ class TestTextAnchors:
         )
         context_holding = expectation_not_reasonable.new_context(changes)
 
-        watt._holdings = HoldingGroup()
+        watt.clear_holdings()
         watt.posit(context_holding)
         string = str(context_holding)
         assert "<Wattenburg> lived at <Bradley's house>" in string
@@ -545,9 +545,9 @@ class TestTextAnchors:
         brad.posit(holdings)
         expectation_not_reasonable = brad.holdings[6]
         generic_patch = expectation_not_reasonable.generic_factors[1]
-        context_change = expectation_not_reasonable.new_context(
-            {generic_patch: make_entity["trees_specific"]}
-        )
+        changes = ChangeRegister()
+        changes.insert_pair(generic_patch, make_entity["trees_specific"])
+        context_change = expectation_not_reasonable.new_context(changes)
         string = context_change.short_string
         assert "plants in the stockpile of trees was at least 3" in string
 
@@ -590,6 +590,7 @@ class TestTextAnchors:
         holdings = readers.read_holdings(make_analysis["minimal"])
         holding_anchors = anchors.get_holding_anchors(make_analysis["minimal"])
         brad = make_opinion["brad_majority"]
+        brad.clear_holdings()
         brad.posit(holdings, holding_anchors=holding_anchors)
         assert brad.holdings[0].anchors[0].exact == "we hold"
 
