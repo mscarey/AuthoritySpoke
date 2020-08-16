@@ -211,7 +211,7 @@ class Rule(Factor):
         return self.procedure.context_factors
 
     @property
-    def generic_factors(self) -> List[Factor]:
+    def generic_factors_by_name(self) -> Dict[str, Factor]:
         r"""
         Get :class:`.Factor`\s that can be replaced without changing ``self``\s meaning.
 
@@ -219,8 +219,8 @@ class Rule(Factor):
             generic :class:`.Factor`\s from ``self``'s :class:`Procedure`
         """
         if self.generic:
-            return [self]
-        return self.procedure.generic_factors
+            return {str(self): self}
+        return self.procedure.generic_factors_by_name
 
     def add_enactment(self, incoming: Enactment, role: str = "enactments") -> Rule:
         """

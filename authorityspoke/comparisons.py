@@ -93,7 +93,11 @@ class Comparable(ABC):
         return []
 
     @property
-    def generic_factors(self) -> List[Factor]:
+    def generic_factors(self) -> List[Comparable]:
+        return list(self.generic_factors_by_name.values())
+
+    @property
+    def generic_factors_by_name(self) -> Dict[str, Comparable]:
         r"""
         :class:`.Factor`\s that can be replaced without changing ``self``\s meaning.
 
@@ -105,13 +109,13 @@ class Comparable(ABC):
         """
 
         if self.generic:
-            return [self]
-        generics: Dict[Factor, None] = {}
+            return {str(self): self}
+        generics: Dict[str, Comparable] = {}
         for factor in self.context_factors:
             if factor is not None:
                 for generic in factor.generic_factors:
                     generics[str(generic)] = generic
-        return list(generics.values())
+        return generics
 
     @property
     def interchangeable_factors(self) -> List[ContextRegister]:

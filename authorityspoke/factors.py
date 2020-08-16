@@ -49,6 +49,38 @@ def seek_factor_by_name(
     return result
 
 
+def seek_factor_by_str(
+    query: Union[Factor, str], source_factor: Factor, source_opinion: Opinion
+) -> Factor:
+    r"""
+    Find a Factor matching a name in a Factor or Opinion.
+
+    :param name:
+        the name of a Factor to seek and return. Usually the name will correspond to an
+        :class:`.Entity` because Entities have shorter names.
+
+    :param source_factor:
+        A Factor that might have a context factor matching the "name". Usually the source_factor
+        is the Factor that will be assigned a new context, which would include replacing the
+        context factor that matches "name"
+
+    :param source_opinion:
+        An :class:`.Opinion` to search for a context factor matching "name" if the search of the
+        source_factor fails.
+
+    :returns:
+        a found Factor matching "name"
+    """
+    if not isinstance(query, str):
+        return query
+    result = source_factor.get_factor_by_str(query)
+    if source_opinion and not result:
+        result = source_opinion.get_factor_by_str(query)
+    if not result:
+        raise ValueError(f"Unable to find a Factor with the string '{query}'")
+    return result
+
+
 def new_context_helper(func: Callable):
     r"""
     Search :class:`.Factor` for generic :class:`.Factor`\s to use in new context.
@@ -96,18 +128,18 @@ def new_context_helper(func: Callable):
         if not isinstance(changes, Iterable):
             changes = (changes,)
         if not isinstance(changes, dict):
-            generic_factors = factor.generic_factors
+            generic_factors = factor.generic_factors_by_name.keys()
             if len(generic_factors) < len(changes):
                 raise ValueError(
                     f"The iterable {changes} is too long to be interpreted "
                     + f"as a list of replacements for the "
                     + f"{len(generic_factors)} items of generic_factors."
                 )
-            changes = ContextRegister(dict(zip(generic_factors, changes)))
+            changes = ChangeRegister(dict(zip(generic_factors, changes)))
 
-        expanded_changes = ContextRegister()
+        expanded_changes = ChangeRegister()
         for old, new in changes.items():
-            factor_with_new_name = seek_factor_by_name(new, factor, context_opinion)
+            factor_with_new_name = seek_factor_by_str(new, factor, context_opinion)
             expanded_changes.insert_pair(old, factor_with_new_name)
         for old, new in expanded_changes.items():
             if str(factor) == old:
@@ -380,8 +412,8 @@ class Factor(Comparable):
             a :class:`Factor` with the specified string
             if it exists, otherwise ``None``.
         """
-        for factor in self.recursive_factors:
-            if str(factor) == query:
+        for name, factor in self.recursive_factors.items():
+            if name == query:
                 return factor
         return None
 

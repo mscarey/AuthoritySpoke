@@ -239,7 +239,7 @@ class Procedure(Factor):
         return [*self.outputs, *inputs, *despite]
 
     @property
-    def generic_factors(self) -> List[Factor]:
+    def generic_factors_by_name(self) -> Dict[str, Factor]:
         r"""
         :class:`.Factor`\s that can be replaced without changing ``self``\s meaning.
 
@@ -260,8 +260,7 @@ class Procedure(Factor):
             for factor in self.factors_all
             for generic in factor.generic_factors
         }
-        generic_list = list(generic_dict.values())
-        return generic_list
+        return generic_dict
 
     def add_factor(self, incoming: Factor, role: str = "inputs") -> Procedure:
         """

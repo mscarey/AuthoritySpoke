@@ -153,7 +153,7 @@ class TestLikelyContext:
         likely = left._likely_context_from_meaning(right, context=ContextRegister())
         lotus_menu = lotus.holdings[2].generic_factors[0]
         java_api = oracle.generic_factors[0]
-        assert likely[lotus_menu] == java_api
+        assert likely.get_factor(lotus_menu, source=right) == java_api
 
     def test_union_one_generic_not_matched(self, make_opinion_with_holding):
         """

@@ -130,14 +130,14 @@ class Holding(Factor):
         return self.rule.procedure.context_factors
 
     @property
-    def generic_factors(self) -> List[Factor]:
+    def generic_factors_by_name(self) -> Dict[str, Factor]:
         r"""
         Get :class:`.Factor`\s that can be replaced without changing ``self``\s meaning.
 
         :returns:
             generic :class:`.Factor`\s from ``self``'s :class:`Procedure`
         """
-        return self.rule.generic_factors
+        return self.rule.generic_factors_by_name
 
     @property
     def mandatory(self) -> bool:

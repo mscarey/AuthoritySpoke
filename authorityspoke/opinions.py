@@ -142,7 +142,7 @@ class Opinion(Comparable):
             )
 
     @property
-    def generic_factors(self) -> List[Comparable]:
+    def generic_factors_by_name(self) -> Dict[str, Comparable]:
         r"""
         Get all generic :class:`.Factor`\s mentioned in ``self``.
 
@@ -152,11 +152,11 @@ class Opinion(Comparable):
             of ``self``, with guaranteed order, including each
             generic :class:`.Factor` only once.
         """
-        generics: Dict[Factor, None] = {}
+        generics: Dict[str, Comparable] = {}
         for holding in self.holdings:
             for generic in holding.generic_factors:
                 generics[str(generic)] = generic
-        return list(generics.values())
+        return generics
 
     def get_factor_by_name(self, name: str) -> Optional[Factor]:
         """
