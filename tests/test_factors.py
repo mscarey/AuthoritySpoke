@@ -337,7 +337,10 @@ class TestImplication:
 
     def test_specific_factor_implies_generic_explain(self, watt_factor):
         answer = watt_factor["f2"].explain_implication(watt_factor["f2_generic"])
-        assert (watt_factor["f2"], watt_factor["f2_generic"]) in answer.items()
+        assert (
+            str(watt_factor["f2"]),
+            str(watt_factor["f2_generic"]),
+        ) in answer.items()
 
     def test_specific_implies_generic_form_of_another_fact(self, watt_factor):
         assert watt_factor["f2"] > watt_factor["f3_generic"]
@@ -405,14 +408,16 @@ class TestImplication:
         )
 
     def test_context_register_text(self, make_context_register):
-        assert self.context_names.prose == (
-            "<Alice> is like <Craig>, and <Bob> is like <Dan>"
+        assert str(make_context_register) == (
+            "ContextRegister(<Alice> -> <Craig>, <Bob> -> <Dan>)"
         )
 
-    def test_implication_complex_explain(self, make_complex_fact):
+    def test_implication_complex_explain(
+        self, make_complex_fact, make_context_register
+    ):
         complex_true = make_complex_fact["f_relevant_murder"]
         complex_whether = make_complex_fact["f_relevant_murder_whether"].new_context(
-            self.context_names
+            make_context_register
         )
         explanation = complex_true.explain_implication(complex_whether)
         assert (Entity("Alice"), Entity("Craig")) in explanation.items()
