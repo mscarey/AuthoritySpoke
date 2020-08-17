@@ -2,7 +2,7 @@ r""":class:`Factor`\s, or inputs and outputs of legal :class:`.Rule`\s."""
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import functools
 from itertools import zip_longest
 import operator
@@ -166,7 +166,7 @@ class Factor(Comparable):
         name: Optional[str] = None,
         generic: bool = False,
         absent: bool = False,
-        anchors: List[TextQuoteSelector],
+        anchors: List[TextQuoteSelector] = field(default_factory=list),
     ):
         """Designate attributes inherited from Factor as keyword-only."""
         self.name = name

@@ -412,24 +412,24 @@ class TestImplication:
             "ContextRegister(<Alice> -> <Craig>, <Bob> -> <Dan>)"
         )
 
-    def test_implication_complex_explain(
-        self, make_complex_fact, make_context_register
-    ):
+    def test_implication_complex_explain(self, make_complex_fact, make_change_register):
         complex_true = make_complex_fact["f_relevant_murder"]
         complex_whether = make_complex_fact["f_relevant_murder_whether"].new_context(
-            make_context_register
+            make_change_register
         )
         explanation = complex_true.explain_implication(complex_whether)
-        assert (Entity("Alice"), Entity("Craig")) in explanation.items()
+        assert (str(Entity("Alice")), str(Entity("Craig"))) in explanation.items()
 
-    def test_implication_explain_keys_only_from_left(self, make_complex_fact):
+    def test_implication_explain_keys_only_from_left(
+        self, make_complex_fact, make_context_register
+    ):
         """
         Check that when implies provides a ContextRegister as an "explanation",
         it uses elements only from the left as keys and from the right as values.
         """
         complex_true = make_complex_fact["f_relevant_murder"]
         complex_whether = make_complex_fact["f_relevant_murder_whether"]
-        new = complex_whether.new_context(self.context_names)
+        new = complex_whether.new_context(make_context_register)
         explanations = list(complex_true.explanations_implication(new))
         for explanation in explanations:
             assert (Entity("Craig"), Entity("Alice")) not in explanation.items()
@@ -554,9 +554,9 @@ class TestContradiction:
         bob = Entity("Bob")
         alice_rich = Fact(p_large_weight, context_factors=alice)
         bob_poor = Fact(p_small_weight, context_factors=bob)
-        assert not alice_rich.contradicts(
-            bob_poor, context=ContextRegister({alice: alice})
-        )
+        register = ContextRegister()
+        register.insert_pair(alice, alice)
+        assert not alice_rich.contradicts(bob_poor, context=register)
 
     def test_copy_with_foreign_context(self, watt_mentioned, watt_factor):
         w = watt_mentioned
@@ -584,17 +584,19 @@ class TestContradiction:
     def test_check_entity_consistency_false(self, make_entity, make_factor):
         update = make_factor["f_irrelevant_3"].update_context_register(
             make_factor["f_irrelevant_3_new_context"],
-            {make_entity["circus"]: make_entity["alice"]},
+            {str(make_entity["circus"]): make_entity["alice"]},
             means,
         )
         assert not any(register is not None for register in update)
 
     def test_entity_consistency_identity_not_equality(self, make_entity, make_factor):
 
+        register = ContextRegister()
+        register.insert_pair(make_entity["dan"], make_entity["dan"])
         update = make_factor["f_irrelevant_3"].update_context_register(
             make_factor["f_irrelevant_3_new_context"],
-            {make_entity["dan"]: make_entity["dan"]},
-            means,
+            register=register,
+            comparison=means,
         )
         assert not any(register is not None for register in update)
 
@@ -602,12 +604,13 @@ class TestContradiction:
         self, make_entity, make_factor, make_predicate
     ):
         """
-        There would be no TypeError if it used operator.eq
+        There would be no TypeError if it used "means"
         instead of .gt. The comparison would just return False.
         """
-        m = make_factor
         update = make_factor["f_irrelevant_3"].update_context_register(
-            make_predicate["p2"], {make_entity["dan"]: make_entity["dan"]}, operator.gt
+            make_predicate["p2"],
+            {str(make_entity["dan"]): make_entity["dan"]},
+            operator.gt,
         )
         with pytest.raises(TypeError):
             any(register is not None for register in update)
