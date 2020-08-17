@@ -115,7 +115,7 @@ class TestOpinionText:
     def test_select_opinion_text_for_holding(self, make_opinion_with_holding):
         oracle = make_opinion_with_holding["oracle_majority"]
         holding = oracle.holdings[0]
-        anchor = oracle.holding_anchors[holding][0]
+        anchor = holding.anchors[0]
         selected = oracle.select_text(selector=anchor)
         assert selected == "must be “original” to qualify"
 
@@ -162,6 +162,7 @@ class TestOpinionHoldings:
         expects.
         """
         brad = make_opinion["brad_majority"]
+        brad.clear_holdings()
         with pytest.raises(ValueError):
             brad.posit(
                 make_holding["h1"],
@@ -190,13 +191,25 @@ class TestOpinionHoldings:
         watt.posit(brad.holdings[0], context_pairs)
         assert watt.holdings[-1].means(brad.holdings[0])
 
+    def test_getting_factors_from_opinion(self, make_opinion, make_response):
+        client = JSONRepository(responses=make_response)
+
+        watt = make_opinion["watt_majority"]
+        watt.clear_holdings()
+        watt_raw = loaders.load_holdings("holding_watt.json")
+        holdings_to_posit = readers.read_holdings(watt_raw, client=client)
+        watt.posit(holdings_to_posit)
+        factors = watt.factors_by_name()
+        assert "proof of Wattenburg's guilt" in factors.keys()
+
     def test_new_context_inferring_factors_to_change(self, make_opinion, make_response):
         """
         This changes watt's holdings; may break tests below.
         """
-        client = JSONRepository(responses=make_response)
         watt = make_opinion["watt_majority"]
         brad = make_opinion["brad_majority"]
+
+        client = JSONRepository(responses=make_response)
 
         watt.clear_holdings()
         watt_raw = loaders.load_holdings("holding_watt.json")

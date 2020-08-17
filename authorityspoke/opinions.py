@@ -78,6 +78,14 @@ class Opinion(Comparable):
         factor_index = FactorIndex()
         for holding in self.holdings:
             for key, value in holding.recursive_factors.items():
+                name = value.name if value.__dict__.get("name") else key
+                factor_index.insert(key=name, value=value)
+        return factor_index
+
+    def factors_by_str(self) -> FactorIndex:
+        factor_index = FactorIndex()
+        for holding in self.holdings:
+            for key, value in holding.recursive_factors.items():
                 factor_index.insert(key=key, value=value)
         return factor_index
 
