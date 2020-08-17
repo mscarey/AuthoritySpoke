@@ -421,7 +421,7 @@ class TestImplication:
         assert (str(Entity("Alice")), str(Entity("Craig"))) in explanation.items()
 
     def test_implication_explain_keys_only_from_left(
-        self, make_complex_fact, make_context_register
+        self, make_complex_fact, make_change_register
     ):
         """
         Check that when implies provides a ContextRegister as an "explanation",
@@ -429,10 +429,18 @@ class TestImplication:
         """
         complex_true = make_complex_fact["f_relevant_murder"]
         complex_whether = make_complex_fact["f_relevant_murder_whether"]
-        new = complex_whether.new_context(make_context_register)
+        new = complex_whether.new_context(make_change_register)
         explanations = list(complex_true.explanations_implication(new))
-        for explanation in explanations:
-            assert (Entity("Craig"), Entity("Alice")) not in explanation.items()
+        explanation = explanations.pop()
+        assert (str(Entity("Craig")), str(Entity("Alice"))) not in explanation.items()
+        assert (str(Entity("Alice")), str(Entity("Craig"))) in explanation.items()
+
+    def test_context_registers_for_complex_comparison(self, make_complex_fact):
+        gen = make_complex_fact["f_relevant_murder_nested_swap"]._context_registers(
+            make_complex_fact["f_relevant_murder"], operator.ge
+        )
+        register = next(gen)
+        assert register["<Alice>"] == "<Bob>"
 
     def test_no_implication_complex(self, make_complex_fact):
         assert (
