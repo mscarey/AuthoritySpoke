@@ -492,6 +492,16 @@ class ChangeRegister(Dict[str, Comparable]):
     Mapping of names of :class:`Factor`\s to be changed to their replacements.
     """
 
+    @classmethod
+    def from_lists(
+        cls, keys=List[Comparable], values=List[Comparable]
+    ) -> ContextRegister:
+        pairs = zip_longest(keys, values)
+        new = cls()
+        for pair in pairs:
+            new.insert_pair(pair[0], pair[1])
+        return new
+
     def insert_pair(self, key: Union[str, Comparable], value: Comparable) -> None:
         if not isinstance(key, str):
             key = str(key)
