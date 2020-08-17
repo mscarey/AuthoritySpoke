@@ -433,6 +433,23 @@ class Holding(Factor):
         ):
             yield from self.rule.explanations_same_meaning(other.rule, context)
 
+    def factor_anchors(self) -> List[TextQuoteSelector]:
+        r"""
+        Get text passages where a :class:`.Holding` is linked to ``self``.
+
+        :param holding:
+            a holding to find anchors for, which must be in :attr:`~Opinion.holdings`\.
+
+        :returns:
+            a :class:`list` with the text of each passage that anchors the :class:`.Holding`
+        """
+        result = []
+        for _, factor in self.recursive_factors.items():
+            if factor.anchors:
+                result.extend(factor.anchors)
+
+        return result
+
     def negated(self):
         """Get new copy of ``self`` with an opposite value for ``rule_valid``."""
         return self.evolve({"rule_valid": not self.rule_valid, "exclusive": False})

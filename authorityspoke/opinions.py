@@ -232,7 +232,7 @@ class Opinion(Comparable):
             matching_holding.anchors += holding.anchors
         else:
             if context:
-                holding = holding.new_context(context, context_opinion=self)
+                holding = holding.new_context(context, source=self)
             self._holdings = self._holdings + HoldingGroup(holding)
 
     def posit_holdings(
@@ -323,26 +323,6 @@ class Opinion(Comparable):
                 named_anchors=named_anchors,
                 context=context,
             )
-
-    def get_anchors(self, holding: Holding, include_factors: bool = True) -> List[str]:
-        r"""
-        Get text passages where a :class:`.Holding` is linked to ``self``.
-
-        :param holding:
-            a holding to find anchors for, which must be in :attr:`~Opinion.holdings`\.
-
-        :returns:
-            a :class:`list` with the text of each passage that anchors the :class:`.Holding`
-        """
-
-        anchors: List[str] = []
-        if include_factors:
-            for factor in holding.rule.procedure.factors_all:
-                if self.factors.get(factor):
-                    anchors.extend(self.factors[factor])
-        anchors.extend(self.holding_anchors[holding])
-
-        return anchors
 
     def implied_by_holding(
         self, other: Holding, context: ContextRegister = None

@@ -86,29 +86,29 @@ class TestOpinionText:
     def test_opinion_text_anchor(self, make_opinion_with_holding):
         feist = make_opinion_with_holding["feist_majority"]
         assert any(
-            "generally" in anchor.exact
-            for anchor in feist.get_anchors(feist.holdings[1])
+            "generally" in anchor.exact for anchor in feist.holdings[1].factor_anchors()
         )
 
     def test_opinion_factor_text_anchor(self, make_opinion_with_holding):
         feist = make_opinion_with_holding["feist_majority"]
-        anchors = feist.get_anchors(feist.holdings[0])
+        factor_anchors = feist.holdings[0].factor_anchors()
         assert all(
-            "No one may claim originality" not in anchor.exact for anchor in anchors
+            "No one may claim originality" not in anchor.exact
+            for anchor in factor_anchors
         )
-        assert any("as to facts" in anchor.exact for anchor in anchors)
+        assert any("as to facts" in anchor.exact for anchor in factor_anchors)
 
     def test_select_opinion_text_for_factor(self, make_opinion_with_holding):
         oracle = make_opinion_with_holding["oracle_majority"]
         factor = oracle.holdings[0].outputs[0]
-        anchor = oracle.factors[factor][0]
+        anchor = factor.anchors[0]
         selected = oracle.select_text(selector=anchor)
         assert selected == "copyright protection."
 
     def test_select_opinion_text_for_enactment(self, make_opinion_with_holding):
         oracle = make_opinion_with_holding["oracle_majority"]
         enactment = oracle.holdings[0].enactments[0]
-        anchor = oracle.factors[enactment][0]
+        anchor = enactment.anchors[0]
         selected = oracle.select_text(selector=anchor)
         assert selected == "17 U.S.C. § 102(a)"
 
@@ -228,7 +228,7 @@ class TestOpinionFactors:
         oracle = make_opinion_with_holding["oracle_majority"]
         scenes_a_faire = [
             factor
-            for factor in oracle.factors.items()
+            for factor in oracle.factors().items()
             if isinstance(factor[0], Fact)
             and factor[0].short_string
             == "the fact that <the Java API> was a scene a faire"
