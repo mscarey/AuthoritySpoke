@@ -1,3 +1,4 @@
+from authorityspoke.comparisons import ChangeRegister
 import logging
 import os
 
@@ -46,9 +47,9 @@ class TestRules:
         assert "<He-Man> operated" in str(different)
 
     def test_new_context_non_generic(self, make_holding, watt_factor):
-        different = make_holding["h1"].new_context(
-            {watt_factor["f1"]: watt_factor["f7"]}
-        )
+        changes = ChangeRegister()
+        changes.insert_pair(watt_factor["f1"], watt_factor["f7"])
+        different = make_holding["h1"].new_context(changes)
         assert "the distance between <Hideaway Lodge> and" in str(different)
 
     def test_new_context_non_generic_from_list_error(self, make_holding, watt_factor):

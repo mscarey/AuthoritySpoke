@@ -147,7 +147,7 @@ def new_context_helper(func: Callable):
             factor_with_new_name = seek_factor_by_str(new, factor, source)
             expanded_changes.insert_pair(old, factor_with_new_name)
         for old, new in expanded_changes.items():
-            if str(factor) == old:
+            if str(factor) == old or factor.__dict__.get("name") == old:
                 return new
 
         return func(factor, expanded_changes)
