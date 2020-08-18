@@ -27,6 +27,9 @@ class TestMakeGroup:
         assert isinstance(identical_group, ComparableGroup)
         assert identical_group[0] == watt_factor["f1"]
 
+    def test_one_factor_implies_and_has_same_context_as_other(self, watt_factor):
+        assert watt_factor["f8_meters"].implies_same_context(watt_factor["f8"])
+
     def test_drop_implied_factors(self, watt_factor):
         group = FactorGroup([watt_factor["f8_meters"], watt_factor["f8"]])
         shorter = group.drop_implied_factors()
