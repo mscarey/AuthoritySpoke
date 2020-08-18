@@ -44,13 +44,15 @@ class TestProcedures:
         (0, 1) or (1, 0).
         """
         e = make_entity
-        assert set(make_procedure["c3"].generic_factors) == {
+        factors = make_procedure["c3"].generic_factors
+        for factor in (
             e["motel"],
             e["tree_search"],
             e["trees"],
             e["watt"],
             make_evidence["crime_absent"],
-        }
+        ):
+            assert factor in factors
 
     def test_type_of_context_factors(self, make_procedure):
         assert isinstance(make_procedure["c3"].context_factors, FactorSequence)
@@ -297,11 +299,17 @@ class TestFactorGroups:
         statements would be inconsistent, but not if
         Alice is considered analagous to Craig.
         """
+        alice_like_dan = ContextRegister()
+        alice_like_dan.insert_pair(alice, dan)
+
+        alice_like_craig = ContextRegister()
+        alice_like_craig.insert_pair(alice, craig)
+
         assert not FactorGroup([alice_rich, bob_poor]).consistent_with(
-            FactorGroup([dan_poor, craig_rich]), context=ContextRegister({alice: dan})
+            FactorGroup([dan_poor, craig_rich]), context=alice_like_dan
         )
         assert FactorGroup([alice_rich, bob_poor]).consistent_with(
-            FactorGroup([dan_poor, craig_rich]), context=ContextRegister({alice: craig})
+            FactorGroup([dan_poor, craig_rich]), context=alice_like_craig,
         )
 
     def test_contradictory_factor_groups(self):
@@ -323,8 +331,11 @@ class TestFactorGroups:
         Because the ContextRegister matches up the two contexts
         consistently, it's impossible to reach a contradiction.
         """
+        alice_like_craig = ContextRegister()
+        alice_like_craig.insert_pair(alice, craig)
+
         assert not FactorGroup((alice_rich, bob_poor)).contradicts(
-            FactorGroup((dan_poor, craig_rich)), context=ContextRegister({alice: craig})
+            FactorGroup((dan_poor, craig_rich)), context=alice_like_craig,
         )
 
 

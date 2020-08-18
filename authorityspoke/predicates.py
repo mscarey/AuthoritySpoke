@@ -356,6 +356,7 @@ class Predicate:
             return ""
         comparison = self.comparison or "="
         expand = {
+            "==": "exactly equal to",
             "=": "exactly equal to",
             "!=": "not equal to",
             "<>": "not equal to",
