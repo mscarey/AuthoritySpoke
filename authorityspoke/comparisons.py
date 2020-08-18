@@ -1,12 +1,52 @@
 from __future__ import annotations
 
 from abc import ABC
-import functools
 from itertools import permutations, zip_longest
 import logging
 from typing import Callable, Dict, Iterator, List, Optional, Type, Union
 
 logger = logging.getLogger(__name__)
+
+
+def consistent_with(left: Comparable, right: Comparable) -> bool:
+    """
+    Call :meth:`.Factor.consistent_with` as function alias.
+
+    This exists because :func:`Factor._context_registers` needs
+    a function rather than a method for the `comparison` variable.
+
+    :returns:
+        whether ``other`` is consistent with ``self``.
+    """
+    return left.consistent_with(right)
+
+
+def means(left: Comparable, right: Comparable) -> bool:
+    """
+    Call :meth:`.Factor.means` as function alias.
+
+    This exists because :class:`.Explanation` objects expect
+    a function rather than a method
+
+    :returns:
+        whether ``other`` is another :class:`Factor` with the same
+        meaning as ``self``.
+    """
+    return left.means(right)
+
+
+def contradicts(left: Comparable, right: Comparable) -> bool:
+    """
+    Call :meth:`.Factor.contradicts` as function alias.
+
+    This exists because :class:`.Explanation` objects expect
+    a function rather than a method
+
+    :returns:
+        whether ``other`` is another :class:`Factor` that can
+        contradict ``self``, assuming relevant context factors
+    """
+    return left.contradicts(right)
 
 
 class Comparable(ABC):
@@ -60,6 +100,23 @@ class Comparable(ABC):
             yield from self.context_factors.ordered_comparison(
                 other=other.context_factors, operation=comparison, context=context
             )
+
+    def all_generic_factors_match(
+        self, other: Comparable, context: ContextRegister, source: Optional[Comparable]
+    ):
+        if all(
+            all(
+                context.get_factor(key, source=source) == context_register[str(key)]
+                or context.get_factor(context_register[str(key)], source=source)
+                == str(key)
+                for key in self.generic_factors
+            )
+            for context_register in self._context_registers(
+                other=other, comparison=means, context=context
+            )
+        ):
+            return True
+        return False
 
     def contradicts(
         self, other: Optional[Comparable], context: Optional[ContextRegister] = None

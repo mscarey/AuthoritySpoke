@@ -27,7 +27,7 @@ class TestLoadOpinion:
         cardenas = make_opinion["cardenas_majority"]
         cardenas.posit_holdings(holdings, named_anchors=named_anchors)
         output = holdings[0].outputs[0]
-        output_factor = cardenas.factors_by_name()[str(output)]
+        output_factor = cardenas.factors_by_str()[str(output)]
 
         assert any(
             selector.exact == "Mark stole a watch" for selector in output_factor.anchors

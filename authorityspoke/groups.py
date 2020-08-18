@@ -3,9 +3,9 @@ from __future__ import annotations
 import operator
 from typing import Callable, Iterator, Optional, Sequence, Tuple, TypeVar
 
-from authorityspoke.comparisons import Comparable, ContextRegister
+from authorityspoke.comparisons import Comparable, ContextRegister, means
 from authorityspoke.explanations import Explanation
-from authorityspoke.factors import Factor, means
+from authorityspoke.factors import Factor
 
 F = TypeVar("F", bound="Factor")
 
@@ -61,15 +61,8 @@ class ComparableGroup(Tuple[F, ...], Comparable):
         for self_factor in self:
             for other_factor in other:
                 if self_factor.contradicts(other_factor):
-                    if all(
-                        all(
-                            context.get(key) == context_register[key]
-                            or context.get(context_register[key]) == key
-                            for key in self_factor.generic_factors
-                        )
-                        for context_register in self_factor._context_registers(
-                            other_factor, means
-                        )
+                    if self_factor.all_generic_factors_match(
+                        other_factor, context=context, source=other
                     ):
                         return False
         return True
