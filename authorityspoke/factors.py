@@ -14,7 +14,12 @@ from legislice import Enactment
 
 from anchorpoint.textselectors import TextQuoteSelector
 
-from authorityspoke.comparisons import ChangeRegister, ContextRegister, Comparable
+from authorityspoke.comparisons import (
+    ChangeRegister,
+    ContextRegister,
+    Comparable,
+    means,
+)
 
 
 def seek_factor_by_name(
@@ -637,47 +642,6 @@ class Factor(Comparable):
 
 
 TextLinkDict = Dict[Union[Factor, Enactment], List[TextQuoteSelector]]
-
-
-def consistent_with(left: Factor, right: Factor) -> bool:
-    """
-    Call :meth:`.Factor.consistent_with` as function alias.
-
-    This exists because :func:`Factor._context_registers` needs
-    a function rather than a method for the `comparison` variable.
-
-    :returns:
-        whether ``other`` is consistent with ``self``.
-    """
-    return left.consistent_with(right)
-
-
-def means(left: Factor, right: Factor) -> bool:
-    """
-    Call :meth:`.Factor.means` as function alias.
-
-    This exists because :class:`.Explanation` objects expect
-    a function rather than a method
-
-    :returns:
-        whether ``other`` is another :class:`Factor` with the same
-        meaning as ``self``.
-    """
-    return left.means(right)
-
-
-def contradicts(left: Factor, right: Factor) -> bool:
-    """
-    Call :meth:`.Factor.contradicts` as function alias.
-
-    This exists because :class:`.Explanation` objects expect
-    a function rather than a method
-
-    :returns:
-        whether ``other`` is another :class:`Factor` that can
-        contradict ``self``, assuming relevant context factors
-    """
-    return left.contradicts(right)
 
 
 class FactorSequence(Tuple[Optional[Comparable], ...]):
