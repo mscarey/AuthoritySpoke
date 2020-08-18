@@ -19,9 +19,9 @@ from dataclasses import dataclass, field
 
 from anchorpoint import TextQuoteSelector
 
-from authorityspoke.comparisons import Comparable, ContextRegister
+from authorityspoke.comparisons import Comparable, ContextRegister, contradicts
 from authorityspoke.explanations import Explanation
-from authorityspoke.factors import Factor, new_context_helper, contradicts
+from authorityspoke.factors import Factor, new_context_helper
 from authorityspoke.groups import ComparableGroup
 from authorityspoke.formatting import indented, wrapped
 from authorityspoke.procedures import Procedure

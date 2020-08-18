@@ -6,8 +6,8 @@ import operator
 import textwrap
 from typing import Callable, ClassVar, List, Optional, Tuple
 
-from authorityspoke.comparisons import ContextRegister
-from authorityspoke.factors import Factor, means, contradicts
+from authorityspoke.comparisons import ContextRegister, means, contradicts
+from authorityspoke.factors import Factor
 
 
 class Matches(List[Tuple[Factor, Factor]]):

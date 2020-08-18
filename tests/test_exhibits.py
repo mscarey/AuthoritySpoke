@@ -43,7 +43,7 @@ class TestExhibitsSameMeaning:
         explanation = make_exhibit["no_shooting_testimony"].explain_same_meaning(
             make_exhibit["no_shooting_entity_order_testimony"]
         )
-        assert str(explanation) == "<Alice> is like <Bob>, and <Bob> is like <Alice>"
+        assert str(explanation) == "ContextRegister(<Alice> -> <Bob>, <Bob> -> <Alice>)"
 
 
 class TestExhibitsImplication:
