@@ -1,5 +1,5 @@
 from authorityspoke.explanations import Explanation
-from authorityspoke.comparisons import ChangeRegister, means
+from authorityspoke.comparisons import ContextRegister, means
 import logging
 import os
 
@@ -48,7 +48,7 @@ class TestRules:
         assert "<He-Man> operated" in str(different)
 
     def test_new_context_non_generic(self, make_holding, watt_factor):
-        changes = ChangeRegister()
+        changes = ContextRegister()
         changes.insert_pair(watt_factor["f1"], watt_factor["f7"])
         different = make_holding["h1"].new_context(changes)
         assert "the distance between <Hideaway Lodge> and" in str(different)

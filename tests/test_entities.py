@@ -1,4 +1,4 @@
-from authorityspoke.comparisons import ChangeRegister, ContextRegister
+from authorityspoke.comparisons import ContextRegister
 import operator
 
 import pytest
@@ -48,7 +48,7 @@ class TestMakeEntities:
 
     def test_new_context(self, make_entity):
         motel_name = str(make_entity["motel"])
-        changes = ChangeRegister(
+        changes = ContextRegister(
             {
                 motel_name: Entity("Death Star"),
                 str(make_entity["watt"]): Entity("Darth Vader"),

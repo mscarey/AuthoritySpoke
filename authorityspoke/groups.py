@@ -5,7 +5,6 @@ from typing import Callable, Iterator, Optional, Sequence, Tuple, TypeVar
 
 from authorityspoke.comparisons import (
     Comparable,
-    ChangeRegister,
     ContextRegister,
     means,
 )
@@ -417,7 +416,7 @@ class ComparableGroup(Tuple[F, ...], Comparable):
         return result
 
     def union_from_explanation_allow_contradiction(
-        self, other: ComparableGroup, context: ChangeRegister
+        self, other: ComparableGroup, context: ContextRegister
     ) -> ComparableGroup:
         updated_context = context.reversed(source=self) if context else None
         result = self + other.new_context(context=updated_context, source=self)

@@ -15,7 +15,6 @@ from legislice import Enactment
 from anchorpoint.textselectors import TextQuoteSelector
 
 from authorityspoke.comparisons import (
-    ChangeRegister,
     ContextRegister,
     Comparable,
     means,
@@ -140,9 +139,9 @@ def new_context_helper(func: Callable):
                     + f"as a list of replacements for the "
                     + f"{len(generic_factors)} items of generic_factors."
                 )
-            changes = ChangeRegister(dict(zip(generic_factors, changes)))
+            changes = ContextRegister.from_lists(generic_factors, changes)
 
-        expanded_changes = ChangeRegister()
+        expanded_changes = ContextRegister()
         for old, new in changes.items():
             factor_with_new_name = seek_factor_by_str(new, factor, source)
             expanded_changes.insert_pair(old, factor_with_new_name)

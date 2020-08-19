@@ -2,7 +2,7 @@ import operator
 
 import pytest
 
-from authorityspoke.comparisons import ChangeRegister, ContextRegister
+from authorityspoke.comparisons import ContextRegister
 from authorityspoke.entities import Entity
 from authorityspoke.groups import FactorGroup
 
@@ -182,12 +182,11 @@ class TestLikelyContext:
 
 
 class TestChangeRegisters:
-    def test_reverse_key_and_value_of_register(self, watt_factor):
+    def test_reverse_key_and_value_of_register(self):
         left = Entity("Siskel")
         right = Entity("Ebert")
 
-        register = ChangeRegister()
-        register.insert_pair(left, right)
+        register = ContextRegister.from_lists(left, right)
 
         assert len(register.keys()) == 1
         assert register["<Siskel>"] == Entity("Ebert")

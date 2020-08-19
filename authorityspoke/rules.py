@@ -14,7 +14,7 @@ from dataclasses import dataclass
 
 from legislice.enactments import Enactment, consolidate_enactments
 
-from authorityspoke.factors import Factor, ChangeRegister, ContextRegister
+from authorityspoke.factors import Factor, ContextRegister
 from authorityspoke.formatting import indented
 from authorityspoke.procedures import Procedure
 
@@ -471,8 +471,10 @@ class Rule(Factor):
             for explanation in self.explanations_same_meaning(other, context)
         )
 
-    def _union_with_rule(self, other: Rule, context: ChangeRegister) -> Optional[Rule]:
-        new_procedure = self.procedure.union(other.procedure, context=context)
+    def _union_with_rule(self, other: Rule, context: ContextRegister) -> Optional[Rule]:
+        new_procedure = self.procedure.union(
+            other.procedure, context=context, source=self
+        )
         if new_procedure is None:
             return None
 
@@ -506,11 +508,11 @@ class Rule(Factor):
         )
 
     def union(
-        self, other: Optional[Rule], context: Optional[ChangeRegister] = None
+        self, other: Optional[Rule], context: Optional[ContextRegister] = None
     ) -> Optional[Rule]:
         if other is None:
             return self
-        context = context or ChangeRegister()
+        context = context or ContextRegister()
         if isinstance(other, Rule):
             return self._union_with_rule(other, context=context)
         elif hasattr(other, "union") and hasattr(other, "rule"):

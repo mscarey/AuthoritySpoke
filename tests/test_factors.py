@@ -3,7 +3,7 @@ import operator
 
 import pytest
 
-from authorityspoke.comparisons import ChangeRegister, ContextRegister
+from authorityspoke.comparisons import ContextRegister
 from authorityspoke.entities import Entity
 from authorityspoke.factors import Factor, means, FactorSequence
 from authorityspoke.facts import Fact, build_fact
@@ -155,7 +155,7 @@ class TestFacts:
         assert "Great Northern was a motel" in str(different)
 
     def test_new_concrete_context(self, make_entity, watt_factor):
-        register = ChangeRegister.from_lists(
+        register = ContextRegister.from_lists(
             keys=[make_entity["watt"], make_entity["motel"]],
             values=[Entity("Darth Vader"), Entity("Death Star")],
         )

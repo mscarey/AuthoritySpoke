@@ -1,4 +1,4 @@
-from authorityspoke.comparisons import ChangeRegister
+from authorityspoke.comparisons import ContextRegister
 from collections import OrderedDict
 import os
 from marshmallow import ValidationError
@@ -520,7 +520,7 @@ class TestTextAnchors:
         brad.clear_holdings()
         brad.posit(holdings)
         expectation_not_reasonable = brad.holdings[6]
-        changes = ChangeRegister()
+        changes = ContextRegister()
         changes.insert_pair(
             key=expectation_not_reasonable.generic_factors[0], value=make_entity["watt"]
         )
@@ -545,7 +545,7 @@ class TestTextAnchors:
         brad.posit(holdings)
         expectation_not_reasonable = brad.holdings[6]
         generic_patch = expectation_not_reasonable.generic_factors[1]
-        changes = ChangeRegister()
+        changes = ContextRegister()
         changes.insert_pair(generic_patch, make_entity["trees_specific"])
         context_change = expectation_not_reasonable.new_context(changes)
         string = context_change.short_string

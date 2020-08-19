@@ -255,7 +255,6 @@ class Comparable(ABC):
         :yields: all possible ContextRegisters linking the two :class:`.Comparable`\s
         """
         context = context or ContextRegister()
-        context = ContextRegister(context)
         unused_self = [
             factor
             for factor in self.generic_factors
@@ -310,9 +309,9 @@ class Comparable(ABC):
                 yield changed_registry
 
     def union(
-        self, other: Comparable, context: Optional[ChangeRegister] = None
+        self, other: Comparable, context: Optional[ContextRegister] = None
     ) -> Optional[Comparable]:
-        context = context or ChangeRegister()
+        context = context or ContextRegister()
         explanations = self.explanations_union(other, context)
         try:
             explanation = next(explanations)
@@ -454,13 +453,25 @@ class ContextRegister(Dict[str, str]):
     like :func:`means`, :meth:`Factor.implies`, or :meth:`Factor.consistent_with`\.
     """
 
+    def __init__(self):
+        self._matches = {}
+        self._reverse_matches = {}
+
     def __repr__(self) -> str:
-        return "ContextRegister({})".format(super().__repr__())
+        return "ContextRegister({})".format(self._matches.__repr__())
 
     def __str__(self) -> str:
-        item_names = [f"{str(k)} -> {str(v)}" for k, v in self.items()]
+        item_names = [f"{str(k)} -> {str(v)}" for k, v in self.matches()]
         items = ", ".join(item_names)
         return f"ContextRegister({items})"
+
+    @property
+    def matches(self):
+        return self._matches
+
+    @property
+    def reverse_matches(self):
+        return self._reverse_matches
 
     @classmethod
     def from_lists(
@@ -473,7 +484,10 @@ class ContextRegister(Dict[str, str]):
         return new
 
     def check_match(self, key: Comparable, value: Comparable) -> bool:
-        return self.get(str(key)) == str(value)
+        return self.get(str(key)) == value
+
+    def get(self, query: str) -> Optional[Comparable]:
+        return self.matches.get(query)
 
     def get_factor(
         self, key: Union[str, Comparable], source: Comparable
@@ -484,37 +498,32 @@ class ContextRegister(Dict[str, str]):
         value = source.get_factor_by_str(value_name)
         return value
 
-    def insert_pair(
-        self, key: Union[str, Comparable], value: Union[str, Comparable]
-    ) -> None:
-        if not isinstance(key, str):
-            key = str(key)
-        if not isinstance(value, str):
-            value = str(value)
-        self[key] = value
+    def insert_pair(self, key: Comparable, value: Comparable) -> None:
+        self._matches[str(key)] = value
+        self._reverse_matches[str(value)] = key
 
     def replace_keys(self, replacements: ContextRegister) -> ContextRegister:
         """Construct new :class:`ContextRegister` by replacing keys."""
-        values = self.values()
+
         keys = []
-        for factor in self.keys():
+        for factor in self.matches.keys():
             replacement = replacements.get(factor)
             if replacement:
                 keys.append(str(replacement))
             else:
                 keys.append(factor)
-        return ContextRegister(zip(keys, values))
+        values = list(self.matches.values())
+        return ContextRegister.from_lists(keys, values)
 
     def reversed(self):
         """Swap keys for values and vice versa."""
-        return ContextRegister({v: k for k, v in self.items()})
+        return ContextRegister.from_lists(
+            keys=self.reverse_matches.keys(), values=self.reverse_matches.values()
+        )
 
     def reverse_match(self, query: Comparable) -> Optional[str]:
         value_str = str(query)
-        for key, value in self.items():
-            if str(value) == value_str:
-                return key
-        return None
+        return self.reverse_matches.get(value_str)
 
     def merged_with(
         self, incoming_mapping: ContextRegister
@@ -531,8 +540,10 @@ class ContextRegister(Dict[str, str]):
             appears to match to two different :class:`Factor`\s in the other.
             Otherwise returns an updated :class:`ContextRegister` of matches.
         """
-        self_mapping = ContextRegister(self.items())
-        for in_key, in_value in incoming_mapping.items():
+        self_mapping = ContextRegister.from_lists(
+            self.matches.keys(), self.matches.values()
+        )
+        for in_key, in_value in incoming_mapping.matches.items():
 
             if in_value:
                 if self_mapping.get(in_key) and self_mapping.get(in_key) != in_value:
@@ -541,38 +552,9 @@ class ContextRegister(Dict[str, str]):
                         + f"{self_mapping[in_key]}, not {in_value}"
                     )
                     return None
-                self_mapping[in_key] = in_value
+                key_as_factor = incoming_mapping.reverse_matches.get(str(in_value))
+                self_mapping.insert_pair(key_as_factor, in_value)
                 if list(self_mapping.values()).count(in_value) > 1:
                     logger.debug("%s assigned to two different keys", in_value)
                     return None
         return self_mapping
-
-
-class ChangeRegister(Dict[str, Comparable]):
-    r"""
-    Mapping of names of :class:`Factor`\s to be changed to their replacements.
-    """
-
-    @classmethod
-    def from_lists(
-        cls, keys=List[Comparable], values=List[Comparable]
-    ) -> ContextRegister:
-        pairs = zip_longest(keys, values)
-        new = cls()
-        for pair in pairs:
-            new.insert_pair(pair[0], pair[1])
-        return new
-
-    def insert_pair(self, key: Union[str, Comparable], value: Comparable) -> None:
-        if not isinstance(key, str):
-            key = str(key)
-        if not isinstance(value, Comparable):
-            raise TypeError
-        self[key] = value
-
-    def reversed(self, source=Comparable):
-        """Swap keys for values and vice versa."""
-        return ChangeRegister(
-            {str(v): source.get_factor_by_str(k) for k, v in self.items()}
-        )
-
