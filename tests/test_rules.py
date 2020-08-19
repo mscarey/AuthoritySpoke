@@ -1,4 +1,5 @@
-from authorityspoke.comparisons import ChangeRegister
+from authorityspoke.explanations import Explanation
+from authorityspoke.comparisons import ChangeRegister, means
 import logging
 import os
 
@@ -156,15 +157,17 @@ class TestSameMeaning:
         right = make_complex_rule[
             "accept_murder_fact_from_relevance_and_shooting_craig"
         ]
-        explanation = left.explain_same_meaning(right)
-        assert (
-            "<Craig> is like <Alice>" in explanation.prose
-            or "<Alice> is like <Craig>" in explanation.prose
+        register = left.explain_same_meaning(right)
+
+        explanation = Explanation(
+            matches=[(left, right)], context=register, operation=means,
         )
-        assert (
-            "<Dan> is like <Bob>" in explanation.prose
-            or "<Bob> is like <Dan>" in explanation.prose
-        )
+        assert "<Craig> is like <Alice>" in str(
+            explanation
+        ) or "<Alice> is like <Craig>" in str(explanation)
+        assert "<Dan> is like <Bob>" in str(
+            explanation
+        ) or "<Bob> is like <Dan>" in str(explanation)
 
 
 class TestImplication:
@@ -184,8 +187,7 @@ class TestImplication:
         explanation = make_rule["h2_exact_in_despite"].explain_implication(
             make_rule["h2"]
         )
-        hideaway = Entity("Hideaway Lodge")
-        assert explanation[hideaway] == hideaway
+        assert explanation["<Hideaway Lodge>"] == "<Hideaway Lodge>"
 
     def test_explain_all_to_all_implies_reciprocal(self, make_rule):
         """
@@ -194,7 +196,7 @@ class TestImplication:
         """
         fewer_inputs = make_rule["h3_fewer_inputs_ALL"]
         explanation = fewer_inputs.explain_implication(make_rule["h3_ALL"])
-        assert explanation[Entity("Hideaway Lodge")] == Entity("Hideaway Lodge")
+        assert explanation["<Hideaway Lodge>"] == "<Hideaway Lodge>"
 
     def test_holdings_more_specific_quantity_implies_less_specific(self, make_rule):
         assert make_rule["h2_exact_quantity"] > make_rule["h2"]
@@ -402,8 +404,9 @@ class TestContradiction:
         Given that the context parameter indicates the "circus" is not the
         same place as "the stockpile of trees", there's no contradiction.
         """
-        stockpile_means_stockpile = ContextRegister(
-            {Entity("the stockpile of trees"): Entity("the stockpile of trees")}
+        stockpile_means_stockpile = ContextRegister()
+        stockpile_means_stockpile.insert_pair(
+            key=Entity("the stockpile of trees"), value=Entity("the stockpile of trees")
         )
         assert not make_rule["h_output_distance_less"].contradicts(
             make_rule["h_output_farther_different_entity"],
