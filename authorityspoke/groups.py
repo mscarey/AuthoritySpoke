@@ -3,7 +3,12 @@ from __future__ import annotations
 import operator
 from typing import Callable, Iterator, Optional, Sequence, Tuple, TypeVar
 
-from authorityspoke.comparisons import Comparable, ContextRegister, means
+from authorityspoke.comparisons import (
+    Comparable,
+    ChangeRegister,
+    ContextRegister,
+    means,
+)
 from authorityspoke.explanations import Explanation
 from authorityspoke.factors import Factor
 
@@ -412,9 +417,10 @@ class ComparableGroup(Tuple[F, ...], Comparable):
         return result
 
     def union_from_explanation_allow_contradiction(
-        self, other: ComparableGroup, context: ContextRegister
+        self, other: ComparableGroup, context: ChangeRegister
     ) -> ComparableGroup:
-        result = self + other.new_context(context.reversed(), source=self)
+        updated_context = context.reversed(source=self) if context else None
+        result = self + other.new_context(context=updated_context, source=self)
         result = result.drop_implied_factors()
         return result
 

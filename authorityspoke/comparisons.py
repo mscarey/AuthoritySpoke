@@ -310,9 +310,9 @@ class Comparable(ABC):
                 yield changed_registry
 
     def union(
-        self, other: Comparable, context: Optional[ContextRegister] = None
+        self, other: Comparable, context: Optional[ChangeRegister] = None
     ) -> Optional[Comparable]:
-        context = context or ContextRegister()
+        context = context or ChangeRegister()
         explanations = self.explanations_union(other, context)
         try:
             explanation = next(explanations)

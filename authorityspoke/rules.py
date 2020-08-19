@@ -471,7 +471,7 @@ class Rule(Factor):
             for explanation in self.explanations_same_meaning(other, context)
         )
 
-    def _union_with_rule(self, other: Rule, context: ContextRegister) -> Optional[Rule]:
+    def _union_with_rule(self, other: Rule, context: ChangeRegister) -> Optional[Rule]:
         new_procedure = self.procedure.union(other.procedure, context=context)
         if new_procedure is None:
             return None
