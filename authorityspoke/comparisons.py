@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC
+from copy import copy
 from itertools import permutations, zip_longest
 import logging
 from typing import Callable, Dict, Iterator, List, Optional, Type, Union
@@ -272,7 +273,9 @@ class Comparable(ABC):
                 incoming = ContextRegister()
                 for key, value in zip_longest(unused_self, permutation):
                     incoming.insert_pair(key=key, value=value)
-                yield context.merged_with(incoming)
+                merged_context = context.merged_with(incoming)
+                if merged_context:
+                    yield merged_context
 
     def __or__(self, other: Comparable):
         return self.union(other)
@@ -468,6 +471,11 @@ class ContextRegister:
         items = ", ".join(item_names)
         return f"ContextRegister({items})"
 
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, self.__class__):
+            return False
+        return self.matches == other.matches
+
     @property
     def matches(self):
         return self._matches
@@ -500,6 +508,9 @@ class ContextRegister:
         value_name = self.get(str(key))
         value = source.get_factor_by_str(value_name)
         return value
+
+    def keys(self):
+        return self.matches.keys()
 
     def insert_pair(self, key: Comparable, value: Comparable) -> None:
         self._matches[str(key)] = value
@@ -543,16 +554,14 @@ class ContextRegister:
             appears to match to two different :class:`Factor`\s in the other.
             Otherwise returns an updated :class:`ContextRegister` of matches.
         """
-        self_mapping = ContextRegister.from_lists(
-            self.matches.keys(), self.matches.values()
-        )
+        self_mapping = copy(self)
         for in_key, in_value in incoming_mapping.matches.items():
 
             if in_value:
                 if self_mapping.get(in_key) and self_mapping.get(in_key) != in_value:
                     logger.debug(
                         f"{in_key} already in mapping with value "
-                        + f"{self_mapping[in_key]}, not {in_value}"
+                        + f"{self_mapping.matches[in_key]}, not {in_value}"
                     )
                     return None
                 key_as_factor = incoming_mapping.reverse_matches.get(str(in_value))

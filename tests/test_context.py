@@ -47,34 +47,41 @@ class TestContextRegisters:
             )
 
     def test_context_register_valid(self, make_entity, watt_factor):
-        assert next(
+        expected = ContextRegister()
+        expected.insert_pair(make_entity["motel"], make_entity["watt"])
+        generated = next(
             watt_factor["f1"]._context_registers(
                 watt_factor["f1_entity_order"], operator.le
             )
-        ) == {str(make_entity["motel"]): str(make_entity["watt"]),}
+        )
+        assert generated == expected
 
     def test_import_to_context_register(self, make_entity, watt_factor):
-        left = ContextRegister(
-            {
-                str(watt_factor["f7"]): watt_factor["f7_swap_entities"],
-                str(make_entity["motel"]): make_entity["trees"],
-            }
+        left = ContextRegister.from_lists(
+            keys=[watt_factor["f7"], make_entity["motel"]],
+            values=[watt_factor["f7_swap_entities"], make_entity["trees"]],
         )
-        right = ContextRegister({str(make_entity["trees"]): make_entity["motel"]})
+        right = ContextRegister()
+        right.insert_pair(make_entity["trees"], make_entity["motel"])
         assert len(left.merged_with(right)) == 3
 
     def test_import_to_mapping_no_change(self, make_entity):
-        old_mapping = ContextRegister({str(make_entity["motel"]): make_entity["trees"]})
-        assert dict(
-            old_mapping.merged_with({str(make_entity["motel"]): make_entity["trees"]})
-        ) == {str(make_entity["motel"]): make_entity["trees"],}
+        old_mapping = ContextRegister.from_lists(
+            [make_entity["motel"]], [make_entity["trees"]]
+        )
+        new_mapping = ContextRegister.from_lists(
+            [make_entity["motel"]], [make_entity["trees"]]
+        )
+        assert old_mapping.merged_with(new_mapping) == old_mapping
 
     def test_import_to_mapping_conflict(self, make_entity):
-        merged = ContextRegister(
-            {str(make_entity["motel"]): make_entity["trees"]}
-        ).merged_with(
-            ContextRegister({str(make_entity["motel"]): make_entity["motel"]})
+        old_mapping = ContextRegister.from_lists(
+            [make_entity["motel"]], [make_entity["trees"]]
         )
+        new_mapping = ContextRegister.from_lists(
+            [make_entity["motel"]], [make_entity["motel"]]
+        )
+        merged = old_mapping.merged_with(new_mapping)
         assert merged is None
 
     def test_import_to_mapping_reciprocal(self, watt_factor):
@@ -186,10 +193,10 @@ class TestChangeRegisters:
         left = Entity("Siskel")
         right = Entity("Ebert")
 
-        register = ContextRegister.from_lists(left, right)
+        register = ContextRegister.from_lists([left], [right])
 
         assert len(register.keys()) == 1
-        assert register["<Siskel>"] == Entity("Ebert")
+        assert register.get("<Siskel>") == Entity("Ebert")
 
-        new = register.reversed(source=left)
-        assert new["<Ebert>"] == left
+        new = register.reversed()
+        assert new.get("<Ebert>") == left
