@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC
-from copy import copy
+from copy import deepcopy
 from itertools import permutations, zip_longest
 import logging
 from typing import Callable, Dict, Iterator, List, Optional, Type, Union
@@ -554,7 +554,7 @@ class ContextRegister:
             appears to match to two different :class:`Factor`\s in the other.
             Otherwise returns an updated :class:`ContextRegister` of matches.
         """
-        self_mapping = copy(self)
+        self_mapping = deepcopy(self)
         for in_key, in_value in incoming_mapping.matches.items():
 
             if in_value:
