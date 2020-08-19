@@ -569,3 +569,10 @@ class ChangeRegister(Dict[str, Comparable]):
         if not isinstance(value, Comparable):
             raise TypeError
         self[key] = value
+
+    def reversed(self, source=Comparable):
+        """Swap keys for values and vice versa."""
+        return ChangeRegister(
+            {str(v): source.get_factor_by_str(k) for k, v in self.items()}
+        )
+

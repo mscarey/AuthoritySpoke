@@ -14,7 +14,7 @@ from dataclasses import dataclass
 
 from legislice.enactments import Enactment, consolidate_enactments
 
-from authorityspoke.factors import Factor, ContextRegister
+from authorityspoke.factors import Factor, ChangeRegister, ContextRegister
 from authorityspoke.formatting import indented
 from authorityspoke.procedures import Procedure
 
@@ -506,15 +506,15 @@ class Rule(Factor):
         )
 
     def union(
-        self, other: Optional[Rule], context: Optional[ContextRegister] = None
+        self, other: Optional[Rule], context: Optional[ChangeRegister] = None
     ) -> Optional[Rule]:
         if other is None:
             return self
-        context = context or ContextRegister()
+        context = context or ChangeRegister()
         if isinstance(other, Rule):
             return self._union_with_rule(other, context=context)
         elif hasattr(other, "union") and hasattr(other, "rule"):
-            return other.union(self, context=context.reversed())
+            return other.union(self, context=context.reversed(source=self))
         raise TypeError
 
     def __or__(self, other: Rule) -> Optional[Rule]:
