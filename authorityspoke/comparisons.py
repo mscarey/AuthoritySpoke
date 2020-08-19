@@ -258,12 +258,12 @@ class Comparable(ABC):
         unused_self = [
             factor
             for factor in self.generic_factors
-            if str(factor) not in context.keys()
+            if str(factor) not in context.matches.keys()
         ]
         unused_other = [
             factor
             for factor in other.generic_factors
-            if not context.reverse_match(factor)
+            if str(factor) not in context.reverse_matches.keys()
         ]
         if not (unused_self and unused_other):
             yield context
@@ -444,7 +444,7 @@ class Comparable(ABC):
         raise NotImplementedError
 
 
-class ContextRegister(Dict[str, str]):
+class ContextRegister:
     r"""
     A mapping of corresponding :class:`Factor`\s from two different contexts.
 
@@ -456,6 +456,9 @@ class ContextRegister(Dict[str, str]):
     def __init__(self):
         self._matches = {}
         self._reverse_matches = {}
+
+    def __len__(self):
+        return len(self.matches)
 
     def __repr__(self) -> str:
         return "ContextRegister({})".format(self._matches.__repr__())
@@ -554,7 +557,7 @@ class ContextRegister(Dict[str, str]):
                     return None
                 key_as_factor = incoming_mapping.reverse_matches.get(str(in_value))
                 self_mapping.insert_pair(key_as_factor, in_value)
-                if list(self_mapping.values()).count(in_value) > 1:
+                if list(self_mapping.matches.values()).count(in_value) > 1:
                     logger.debug("%s assigned to two different keys", in_value)
                     return None
         return self_mapping
