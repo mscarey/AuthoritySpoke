@@ -66,7 +66,7 @@ class ComparableGroup(Tuple[F, ...], Comparable):
             for other_factor in other:
                 if self_factor.contradicts(other_factor):
                     if self_factor.all_generic_factors_match(
-                        other_factor, context=context, source=other
+                        other_factor, context=context
                     ):
                         return False
         return True

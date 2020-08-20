@@ -102,14 +102,11 @@ class Comparable(ABC):
                 other=other.context_factors, operation=comparison, context=context
             )
 
-    def all_generic_factors_match(
-        self, other: Comparable, context: ContextRegister, source: Optional[Comparable]
-    ):
+    def all_generic_factors_match(self, other: Comparable, context: ContextRegister):
         if all(
             all(
-                context.get_factor(key, source=source) == context_register[str(key)]
-                or context.get_factor(context_register[str(key)], source=source)
-                == str(key)
+                context.get_factor(key) == context_register.get_factor(key)
+                or context.get_factor(context_register.get(str(key))) == key
                 for key in self.generic_factors
             )
             for context_register in self._context_registers(
@@ -500,8 +497,14 @@ class ContextRegister:
     def get(self, query: str) -> Optional[Comparable]:
         return self.matches.get(query)
 
-    def get_factor(self, key: Union[str, Comparable]) -> Optional[Comparable]:
-        self.get(str(key))
+    def get_reverse(self, query: str) -> Optional[Comparable]:
+        return self.reverse_matches.get(query)
+
+    def get_factor(self, query: Optional[Comparable]) -> Optional[Comparable]:
+        return self.get(str(query))
+
+    def get_reverse_factor(self, query: Optional[Comparable]) -> Optional[Comparable]:
+        return self.reverse_matches.get(str(query))
 
     def items(self):
         return self.matches.items()

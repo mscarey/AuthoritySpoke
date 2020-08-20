@@ -184,7 +184,7 @@ class TestFacts:
         assert len(motel_near_watt.interchangeable_factors[0]) == 2
         assert (
             str(make_entity["motel_specific"])
-            in motel_near_watt.interchangeable_factors[0]
+            in motel_near_watt.interchangeable_factors[0].keys()
         )
 
     def test_predicate_with_entities(self, make_entity, watt_factor):
@@ -335,10 +335,7 @@ class TestImplication:
 
     def test_specific_factor_implies_generic_explain(self, watt_factor):
         answer = watt_factor["f2"].explain_implication(watt_factor["f2_generic"])
-        assert (
-            str(watt_factor["f2"]),
-            str(watt_factor["f2_generic"]),
-        ) in answer.items()
+        assert (str(watt_factor["f2"]), watt_factor["f2_generic"],) in answer.items()
 
     def test_specific_implies_generic_form_of_another_fact(self, watt_factor):
         assert watt_factor["f2"] > watt_factor["f3_generic"]
@@ -410,16 +407,18 @@ class TestImplication:
             "ContextRegister(<Alice> -> <Craig>, <Bob> -> <Dan>)"
         )
 
-    def test_implication_complex_explain(self, make_complex_fact, make_change_register):
+    def test_implication_complex_explain(
+        self, make_complex_fact, make_context_register
+    ):
         complex_true = make_complex_fact["f_relevant_murder"]
         complex_whether = make_complex_fact["f_relevant_murder_whether"].new_context(
-            make_change_register
+            make_context_register
         )
         explanation = complex_true.explain_implication(complex_whether)
-        assert (str(Entity("Alice")), str(Entity("Craig"))) in explanation.items()
+        assert (str(Entity("Alice")), Entity("Craig")) in explanation.items()
 
     def test_implication_explain_keys_only_from_left(
-        self, make_complex_fact, make_change_register
+        self, make_complex_fact, make_context_register
     ):
         """
         Check that when implies provides a ContextRegister as an "explanation",
@@ -427,18 +426,18 @@ class TestImplication:
         """
         complex_true = make_complex_fact["f_relevant_murder"]
         complex_whether = make_complex_fact["f_relevant_murder_whether"]
-        new = complex_whether.new_context(make_change_register)
+        new = complex_whether.new_context(make_context_register)
         explanations = list(complex_true.explanations_implication(new))
         explanation = explanations.pop()
-        assert (str(Entity("Craig")), str(Entity("Alice"))) not in explanation.items()
-        assert (str(Entity("Alice")), str(Entity("Craig"))) in explanation.items()
+        assert (str(Entity("Craig")), Entity("Alice")) not in explanation.items()
+        assert (str(Entity("Alice")), Entity("Craig")) in explanation.items()
 
     def test_context_registers_for_complex_comparison(self, make_complex_fact):
         gen = make_complex_fact["f_relevant_murder_nested_swap"]._context_registers(
             make_complex_fact["f_relevant_murder"], operator.ge
         )
         register = next(gen)
-        assert register["<Alice>"] == "<Bob>"
+        assert register.matches.get("<Alice>") == Entity("Bob")
 
     def test_no_implication_complex(self, make_complex_fact):
         assert (
@@ -568,7 +567,7 @@ class TestContradiction:
         w = watt_mentioned
         assert (
             watt_factor["f1"]
-            .new_context(ContextRegister({str(w[0]): w[2]}))
+            .new_context(ContextRegister.from_lists([w[0]], [w[2]]))
             .means(watt_factor["f1_different_entity"])
         )
 
