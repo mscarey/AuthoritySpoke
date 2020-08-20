@@ -12,7 +12,8 @@ class TestContext:
     def test_impossible_register(self):
         fact_al = read_fact(self.al)
         fact_alice = read_fact(self.alice)
-        context = ContextRegister({str(Entity("Al")): Entity("Bob")})
+        context = ContextRegister()
+        context.insert_pair(Entity("Al"), Entity("Bob"))
         answers = fact_al.update_context_register(fact_alice, context, means)
         assert not any(answers)
 

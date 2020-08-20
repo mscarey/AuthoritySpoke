@@ -293,6 +293,14 @@ class TestFactorGroups:
             FactorGroup([dan_poor, craig_rich])
         )
 
+    def test_not_all_factors_match(self):
+        alice_like_craig = ContextRegister()
+        alice_like_craig.insert_pair(alice, craig)
+
+        assert alice_rich.all_generic_factors_match(
+            craig_rich, context=alice_like_craig
+        )
+
     def test_inconsistent_factor_groups(self):
         """
         If Alice is considered analagous to Dan the two sets of

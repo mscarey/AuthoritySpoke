@@ -94,9 +94,11 @@ class TestIntroduction:
         oracle = make_opinion_with_holding["oracle_majority"]
         lotus = make_opinion_with_holding["lotus_majority"]
         explanation = lotus.holdings[6].explain_contradiction(oracle.holdings[10])
-        assert explanation.context == ContextRegister(
-            {Entity("the Lotus menu command hierarchy"): Entity("the Java API")}
+        expected = ContextRegister()
+        expected.insert_pair(
+            Entity("the Lotus menu command hierarchy"), Entity("the Java API")
         )
+        assert explanation.context == expected
         assert "<the Lotus menu command hierarchy> is like <the Java API>" in str(
             explanation
         )

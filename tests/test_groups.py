@@ -1,3 +1,5 @@
+from authorityspoke.comparisons import ContextRegister, means
+from authorityspoke.entities import Entity
 from authorityspoke.groups import ComparableGroup, FactorGroup
 from authorityspoke.holdings import HoldingGroup
 
@@ -40,6 +42,22 @@ class TestMakeGroup:
         group = FactorGroup([watt_factor["f9_swap_entities"], watt_factor["f9_miles"]])
         shorter = group.drop_implied_factors()
         assert len(shorter) == 2
+
+    def test_make_context_register(self):
+        alice = Entity("Alice")
+        bob = Entity("Bob")
+        craig = Entity("Craig")
+        dan = Entity("Dan")
+
+        left = FactorGroup([alice, bob])
+        right = FactorGroup([craig, dan])
+
+        register = ContextRegister()
+        register.insert_pair(alice, craig)
+
+        gen = left._context_registers(right, comparison=means, context=register)
+        answer = next(gen)
+        assert answer.get("<Bob>") == dan
 
 
 class TestSameFactors:
@@ -88,6 +106,17 @@ class TestSameFactors:
         second_group = FactorGroup([watt_factor["f1"], watt_factor["f3"]])
         assert not first_group.means(second_group)
         assert not second_group.means(first_group)
+
+    def test_register_for_matching_entities(self):
+        known = ContextRegister()
+        alice = Entity("Alice")
+        craig = Entity("Craig")
+        dan = Entity("Dan")
+        known.insert_pair(alice, dan)
+
+        gen = alice._context_registers(other=craig, comparison=means, context=known)
+        register = next(gen)
+        assert register.get("<Alice>") == craig
 
 
 class TestImplication:

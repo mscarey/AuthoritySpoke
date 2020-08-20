@@ -2,7 +2,7 @@ import operator
 
 import pytest
 
-from authorityspoke.comparisons import ContextRegister
+from authorityspoke.comparisons import ContextRegister, means
 from authorityspoke.entities import Entity
 from authorityspoke.groups import FactorGroup
 
@@ -85,12 +85,14 @@ class TestContextRegisters:
         assert merged is None
 
     def test_import_to_mapping_reciprocal(self, watt_factor):
-        mapping = ContextRegister(
-            {str(watt_factor["f7"]): watt_factor["f7"]}
+        mapping = ContextRegister.from_lists(
+            [watt_factor["f7"]], [watt_factor["f7"]]
         ).merged_with(
-            {str(watt_factor["f7_swap_entities"]): watt_factor["f7_swap_entities"]}
+            ContextRegister.from_lists(
+                [watt_factor["f7_swap_entities"]], [watt_factor["f7_swap_entities"]]
+            )
         )
-        assert mapping[str(watt_factor["f7"])] == watt_factor["f7"]
+        assert mapping.get(str(watt_factor["f7"])) == watt_factor["f7"]
 
     def test_registers_for_interchangeable_context(self, make_entity, watt_factor):
         """
@@ -151,7 +153,7 @@ class TestLikelyContext:
         context = next(left.likely_contexts(right))
         lotus_menu = lotus.holdings[2].generic_factors[0]
         java_api = oracle.generic_factors[0]
-        assert context.get_factor(lotus_menu, source=oracle) == java_api
+        assert context.get_factor(lotus_menu) == java_api
 
     def test_likely_context_from_factor_meaning(self, make_opinion_with_holding):
         lotus = make_opinion_with_holding["lotus_majority"]
@@ -161,7 +163,7 @@ class TestLikelyContext:
         likely = left._likely_context_from_meaning(right, context=ContextRegister())
         lotus_menu = lotus.holdings[2].generic_factors[0]
         java_api = oracle.generic_factors[0]
-        assert likely.get_factor(lotus_menu, source=right) == java_api
+        assert likely.get_factor(lotus_menu) == java_api
 
     def test_union_one_generic_not_matched(self, make_opinion_with_holding):
         """
