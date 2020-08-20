@@ -47,15 +47,13 @@ class TestMakeEntities:
         assert any(register == expected for register in update)
 
     def test_new_context(self, make_entity):
-        motel_name = str(make_entity["motel"])
-        changes = ContextRegister(
-            {
-                motel_name: Entity("Death Star"),
-                str(make_entity["watt"]): Entity("Darth Vader"),
-            }
+
+        changes = ContextRegister.from_lists(
+            [make_entity["motel"], make_entity["watt"]],
+            [Entity("Death Star"), Entity("Darth Vader")],
         )
         motel = make_entity["motel"]
-        assert motel.new_context(changes) == changes.get(motel_name)
+        assert motel.new_context(changes) == changes.get_factor(make_entity["motel"])
 
 
 class TestSameMeaning:

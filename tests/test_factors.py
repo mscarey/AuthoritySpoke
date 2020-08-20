@@ -130,11 +130,9 @@ class TestFacts:
         assert "\n  " not in fact_text
 
     def test_new_context_replace_fact(self, make_entity, watt_factor):
-        changes = ContextRegister(
-            {
-                str(make_entity["watt"]): Entity("Darth Vader"),
-                str(watt_factor["f2"]): watt_factor["f10"],
-            }
+        changes = ContextRegister.from_lists(
+            [make_entity["watt"], watt_factor["f2"]],
+            [Entity("Darth Vader"), watt_factor["f10"]],
         )
         assert "was within the curtilage of <Hideaway Lodge>" in (
             watt_factor["f2"].new_context(changes).short_string

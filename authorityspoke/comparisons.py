@@ -467,7 +467,7 @@ class ContextRegister:
         return "ContextRegister({})".format(self._matches.__repr__())
 
     def __str__(self) -> str:
-        item_names = [f"{str(k)} -> {str(v)}" for k, v in self.matches()]
+        item_names = [f"{str(k)} -> {str(v)}" for k, v in self.matches.items()]
         items = ", ".join(item_names)
         return f"ContextRegister({items})"
 
@@ -500,17 +500,17 @@ class ContextRegister:
     def get(self, query: str) -> Optional[Comparable]:
         return self.matches.get(query)
 
-    def get_factor(
-        self, key: Union[str, Comparable], source: Comparable
-    ) -> Optional[Comparable]:
-        if isinstance(key, str):
-            return self.get(key)
-        value_name = self.get(str(key))
-        value = source.get_factor_by_str(value_name)
-        return value
+    def get_factor(self, key: Union[str, Comparable]) -> Optional[Comparable]:
+        self.get(str(key))
+
+    def items(self):
+        return self.matches.items()
 
     def keys(self):
         return self.matches.keys()
+
+    def values(self):
+        return self.matches.values()
 
     def insert_pair(self, key: Comparable, value: Comparable) -> None:
         self._matches[str(key)] = value

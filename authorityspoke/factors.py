@@ -85,6 +85,23 @@ def seek_factor_by_str(
     return result
 
 
+def convert_changes_to_register(
+    factor: Factor, changes: Union[Factor, List, Tuple]
+) -> ContextRegister:
+    if not isinstance(changes, Iterable):
+        changes = (changes,)
+    if isinstance(changes, (list, tuple)):
+        generic_factors = factor.generic_factors_by_name.keys()
+        if len(generic_factors) < len(changes):
+            raise ValueError(
+                f"The iterable {changes} is too long to be interpreted "
+                + f"as a list of replacements for the "
+                + f"{len(generic_factors)} items of generic_factors."
+            )
+        changes = ContextRegister.from_lists(generic_factors, changes)
+    return changes
+
+
 def new_context_helper(func: Callable):
     r"""
     Search :class:`.Factor` for generic :class:`.Factor`\s to use in new context.
@@ -111,11 +128,6 @@ def new_context_helper(func: Callable):
         indicates which generic :class:`.Factor`\s within ``factor`` should
         be replaced and what they should be replaced with.
 
-    :param context_opinion:
-        a second object with generic factors that need to be searched
-        when trying to resolve what a string in the `changes` parameter
-        refers to.
-
     :returns:
         a new :class:`.Factor` object in the new context.
     """
@@ -129,17 +141,8 @@ def new_context_helper(func: Callable):
 
         if changes is None:
             return factor
-        if not isinstance(changes, Iterable):
-            changes = (changes,)
-        if not isinstance(changes, dict):
-            generic_factors = factor.generic_factors_by_name.keys()
-            if len(generic_factors) < len(changes):
-                raise ValueError(
-                    f"The iterable {changes} is too long to be interpreted "
-                    + f"as a list of replacements for the "
-                    + f"{len(generic_factors)} items of generic_factors."
-                )
-            changes = ContextRegister.from_lists(generic_factors, changes)
+        if not isinstance(changes, ContextRegister):
+            changes = convert_changes_to_register(factor, changes)
 
         expanded_changes = ContextRegister()
         for old, new in changes.items():
@@ -599,10 +602,13 @@ class Factor(Comparable):
         :returns:
             a new :class:`.Factor` object with the replacements made.
         """
-        if any(not isinstance(item, (str, Factor)) for item in changes):
-            raise TypeError(
-                'Each item in "changes" must be a Factor or the name of a Factor'
-            )
+        for key, value in changes.matches.items():
+
+            if not isinstance(key, str):
+                raise TypeError('Each key in "changes" must be the name of a Factor')
+            if value and not isinstance(value, Factor):
+                raise TypeError('Each value in "changes" must be a Factor')
+
         new_dict = self.own_attributes()
         for name in self.context_factor_names:
             new_dict[name] = self.__dict__[name].new_context(changes)
