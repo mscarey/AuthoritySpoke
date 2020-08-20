@@ -145,15 +145,15 @@ class TestOpinionHoldings:
         watt.posit(make_rule["h1"])
         assert watt.implies(make_holding["h1"])
 
-    def test_new_context_non_iterable_changes(self, make_opinion, make_holding):
+    def test_new_context_wrong_number_of_changes(self, make_opinion, make_holding):
         """
         The context here (a Factor outside an iterable) only changes the first
         generic factor of the Rule being posited, which may not be what the user
         expects.
         """
         brad = make_opinion["brad_majority"]
-        brad.posit(make_holding["h1"], context=Entity("House on Haunted Hill"))
-        assert "Haunted Hill" in str(brad.holdings[0])
+        with pytest.raises(ValueError):
+            brad.posit(make_holding["h1"], context=Entity("House on Haunted Hill"))
 
     def test_new_context_naming_nonexistent_factor(self, make_opinion, make_holding):
         """

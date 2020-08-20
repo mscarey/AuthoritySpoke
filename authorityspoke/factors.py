@@ -92,11 +92,10 @@ def convert_changes_to_register(
         changes = (changes,)
     if isinstance(changes, (list, tuple)):
         generic_factors = factor.generic_factors_by_name.keys()
-        if len(generic_factors) < len(changes):
+        if len(generic_factors) != len(changes):
             raise ValueError(
-                f"The iterable {changes} is too long to be interpreted "
-                + f"as a list of replacements for the "
-                + f"{len(generic_factors)} items of generic_factors."
+                f"Needed {len(generic_factors)} replacements for the "
+                + f"items of generic_factors, but {len(changes)} were provided."
             )
         changes = ContextRegister.from_lists(generic_factors, changes)
     return changes

@@ -133,12 +133,11 @@ class TestImplication:
     ):
         lotus = make_opinion["lotus_majority"]
         holding = make_opinion_with_holding["oracle_majority"].holdings[0]
-        assert holding.implies(
-            lotus,
-            context=ContextRegister(
-                {Entity("the Java API"): Entity("the Lotus menu command hierarchy")}
-            ),
+        context = ContextRegister()
+        context.insert_pair(
+            Entity("the Java API"), Entity("the Lotus menu command hierarchy")
         )
+        assert holding.implies(lotus, context=context,)
 
     def test_holding_implies_none(self, make_holding):
         assert make_holding["h3"] >= None
@@ -166,12 +165,14 @@ class TestImplication:
         Factors occur in Holdings on both sides of the "implies" relationship.
         """
         oracle = make_decision_with_holding["oracle"]
+        context = ContextRegister()
         language = Entity("the Java language")
-        new_context = oracle.holdings[18].new_context(
-            {Entity("the Java API"): language}
-        )
+
+        context.insert_pair(Entity("the Java API"), language)
+
+        new_context = oracle.holdings[18].new_context(context)
         explanation = new_context.explain_implication(oracle.holdings[19])
-        assert explanation[language] == language
+        assert explanation.get_factor(language) == language
 
 
 class TestContradiction:
@@ -288,12 +289,11 @@ class TestContradiction:
     def test_holding_contradicts_opinion(self, make_opinion_with_holding):
         oracle = make_opinion_with_holding["oracle_majority"]
         lotus = make_opinion_with_holding["lotus_majority"]
-        assert lotus.holdings[6].contradicts(
-            oracle,
-            context=ContextRegister(
-                {Entity("the Lotus menu command hierarchy"): Entity("the Java API")}
-            ),
+        context = ContextRegister()
+        context.insert_pair(
+            Entity("the Lotus menu command hierarchy"), Entity("the Java API")
         )
+        assert lotus.holdings[6].contradicts(oracle, context=context,)
 
     def test_explain_holding_contradicting_opinion(self, make_opinion_with_holding):
         oracle = make_opinion_with_holding["oracle_majority"]

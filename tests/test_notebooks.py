@@ -40,12 +40,14 @@ class TestIntroduction:
 
     def test_replace_generic_factor(self, make_opinion_with_holding):
         lotus_majority = make_opinion_with_holding["lotus_majority"]
-        nosferatu_rule = lotus_majority.holdings[0].new_context(
-            {
-                Entity("Borland International"): Entity("Prana Film"),
-                Entity("the Lotus menu command hierarchy"): Entity("Dracula"),
-            }
+        context = ContextRegister.from_lists(
+            [
+                Entity("Borland International"),
+                Entity("the Lotus menu command hierarchy"),
+            ],
+            [Entity("Prana Film"), Entity("Dracula")],
         )
+        nosferatu_rule = lotus_majority.holdings[0].new_context(context)
         assert lotus_majority.holdings[0] != nosferatu_rule
         assert lotus_majority.holdings[0].means(nosferatu_rule)
 
