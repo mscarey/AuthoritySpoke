@@ -393,17 +393,15 @@ class ComparableGroup(Tuple[F, ...], Comparable):
                     return False
         return True
 
-    def new_context(
-        self, context: ContextRegister, source: Comparable
-    ) -> ComparableGroup:
-        result = [factor.new_context(context, source=source) for factor in self]
+    def new_context(self, context: ContextRegister) -> ComparableGroup:
+        result = [factor.new_context(context) for factor in self]
         return ComparableGroup(result)
 
     def partial_explanations_union(
         self, other: Comparable, context: ContextRegister
     ) -> Iterator[ContextRegister]:
         for likely in self.likely_contexts(other, context):
-            partial = self + other.new_context(likely.reversed(), source=self)
+            partial = self + other.new_context(likely.reversed())
             if partial.internally_consistent():
                 yield likely
 
@@ -418,8 +416,8 @@ class ComparableGroup(Tuple[F, ...], Comparable):
     def union_from_explanation_allow_contradiction(
         self, other: ComparableGroup, context: ContextRegister
     ) -> ComparableGroup:
-        updated_context = context.reversed(source=self) if context else None
-        result = self + other.new_context(context=updated_context, source=self)
+        updated_context = context.reversed() if context else None
+        result = self + other.new_context(context=updated_context)
         result = result.drop_implied_factors()
         return result
 

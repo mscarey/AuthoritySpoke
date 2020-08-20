@@ -472,9 +472,7 @@ class Rule(Factor):
         )
 
     def _union_with_rule(self, other: Rule, context: ContextRegister) -> Optional[Rule]:
-        new_procedure = self.procedure.union(
-            other.procedure, context=context, source=self
-        )
+        new_procedure = self.procedure.union(other.procedure, context=context)
         if new_procedure is None:
             return None
 
@@ -516,7 +514,7 @@ class Rule(Factor):
         if isinstance(other, Rule):
             return self._union_with_rule(other, context=context)
         elif hasattr(other, "union") and hasattr(other, "rule"):
-            return other.union(self, context=context.reversed(source=self))
+            return other.union(self, context=context.reversed())
         raise TypeError
 
     def __or__(self, other: Rule) -> Optional[Rule]:

@@ -187,7 +187,7 @@ class TestImplication:
         explanation = make_rule["h2_exact_in_despite"].explain_implication(
             make_rule["h2"]
         )
-        assert explanation["<Hideaway Lodge>"] == "<Hideaway Lodge>"
+        assert str(explanation.get("<Hideaway Lodge>")) == "<Hideaway Lodge>"
 
     def test_explain_all_to_all_implies_reciprocal(self, make_rule):
         """
@@ -196,7 +196,7 @@ class TestImplication:
         """
         fewer_inputs = make_rule["h3_fewer_inputs_ALL"]
         explanation = fewer_inputs.explain_implication(make_rule["h3_ALL"])
-        assert explanation["<Hideaway Lodge>"] == "<Hideaway Lodge>"
+        assert str(explanation.get("<Hideaway Lodge>")) == "<Hideaway Lodge>"
 
     def test_holdings_more_specific_quantity_implies_less_specific(self, make_rule):
         assert make_rule["h2_exact_quantity"] > make_rule["h2"]
