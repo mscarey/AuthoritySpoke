@@ -142,7 +142,7 @@ class ComparableGroup(Tuple[F, ...], Comparable):
                 if operation(self_factor, other_factor):
                     updated_mappings = iter(
                         self_factor.update_context_register(
-                            other=other_factor, register=matches, comparison=operation
+                            other=other_factor, context=matches, comparison=operation
                         )
                     )
                     for new_matches in updated_mappings:

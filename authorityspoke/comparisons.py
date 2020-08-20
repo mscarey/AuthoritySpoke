@@ -322,7 +322,7 @@ class Comparable(ABC):
     def update_context_register(
         self,
         other: Optional[Comparable],
-        register: ContextRegister,
+        context: ContextRegister,
         comparison: Callable,
     ) -> Iterator[ContextRegister]:
         r"""
@@ -347,13 +347,13 @@ class Comparable(ABC):
         """
         if other and not isinstance(other, Comparable):
             raise TypeError
-        if not isinstance(register, ContextRegister):
-            register = ContextRegister(register)
+        if not isinstance(context, ContextRegister):
+            raise TypeError
         for incoming_register in self._context_registers(other, comparison):
             for new_register_variation in self._registers_for_interchangeable_context(
                 incoming_register
             ):
-                register_or_none = register.merged_with(new_register_variation)
+                register_or_none = context.merged_with(new_register_variation)
                 if register_or_none is not None:
                     yield register_or_none
 

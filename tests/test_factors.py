@@ -587,10 +587,10 @@ class TestContradiction:
         assert any(register is not None for register in harder_update)
 
     def test_check_entity_consistency_false(self, make_entity, make_factor):
+        context = ContextRegister()
+        context.insert_pair(make_entity["circus"], make_entity["alice"])
         update = make_factor["f_irrelevant_3"].update_context_register(
-            make_factor["f_irrelevant_3_new_context"],
-            {str(make_entity["circus"]): make_entity["alice"]},
-            means,
+            make_factor["f_irrelevant_3_new_context"], comparison=means, context=context
         )
         assert not any(register is not None for register in update)
 
@@ -600,7 +600,7 @@ class TestContradiction:
         register.insert_pair(make_entity["dan"], make_entity["dan"])
         update = make_factor["f_irrelevant_3"].update_context_register(
             make_factor["f_irrelevant_3_new_context"],
-            register=register,
+            context=register,
             comparison=means,
         )
         assert not any(register is not None for register in update)
