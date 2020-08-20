@@ -293,6 +293,13 @@ class TestFactorGroups:
             FactorGroup([dan_poor, craig_rich])
         )
 
+    def test_consistent_factor_groups_with_context(self):
+        alice_like_craig = ContextRegister()
+        alice_like_craig.insert_pair(alice, craig)
+        assert FactorGroup([alice_rich, bob_poor]).consistent_with(
+            FactorGroup([dan_poor, craig_rich]), context=alice_like_craig,
+        )
+
     def test_not_all_factors_match(self):
         alice_like_craig = ContextRegister()
         alice_like_craig.insert_pair(alice, craig)
@@ -310,14 +317,8 @@ class TestFactorGroups:
         alice_like_dan = ContextRegister()
         alice_like_dan.insert_pair(alice, dan)
 
-        alice_like_craig = ContextRegister()
-        alice_like_craig.insert_pair(alice, craig)
-
         assert not FactorGroup([alice_rich, bob_poor]).consistent_with(
             FactorGroup([dan_poor, craig_rich]), context=alice_like_dan
-        )
-        assert FactorGroup([alice_rich, bob_poor]).consistent_with(
-            FactorGroup([dan_poor, craig_rich]), context=alice_like_craig,
         )
 
     def test_contradictory_factor_groups(self):

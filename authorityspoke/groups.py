@@ -64,7 +64,7 @@ class ComparableGroup(Tuple[F, ...], Comparable):
             context = ContextRegister()
         for self_factor in self:
             for other_factor in other:
-                if self_factor.contradicts(other_factor):
+                if self_factor.contradicts(other_factor, context=context):
                     if self_factor.all_generic_factors_match(
                         other_factor, context=context
                     ):
