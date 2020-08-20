@@ -225,7 +225,7 @@ class ComparableGroup(Tuple[F, ...], Comparable):
                     updated_mappings = iter(
                         self_factor.update_context_register(
                             other=other_factor,
-                            register=explanation.context,
+                            context=explanation.context,
                             comparison=operation,
                         )
                     )
@@ -393,8 +393,8 @@ class ComparableGroup(Tuple[F, ...], Comparable):
                     return False
         return True
 
-    def new_context(self, context: ContextRegister) -> ComparableGroup:
-        result = [factor.new_context(context) for factor in self]
+    def new_context(self, changes: ContextRegister) -> ComparableGroup:
+        result = [factor.new_context(changes) for factor in self]
         return ComparableGroup(result)
 
     def partial_explanations_union(
@@ -417,7 +417,7 @@ class ComparableGroup(Tuple[F, ...], Comparable):
         self, other: ComparableGroup, context: ContextRegister
     ) -> ComparableGroup:
         updated_context = context.reversed() if context else None
-        result = self + other.new_context(context=updated_context)
+        result = self + other.new_context(changes=updated_context)
         result = result.drop_implied_factors()
         return result
 

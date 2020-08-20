@@ -111,8 +111,7 @@ class TestSameFactors:
         known = ContextRegister()
         alice = Entity("Alice")
         craig = Entity("Craig")
-        dan = Entity("Dan")
-        known.insert_pair(alice, dan)
+        known.insert_pair(alice, craig)
 
         gen = alice._context_registers(other=craig, comparison=means, context=known)
         register = next(gen)

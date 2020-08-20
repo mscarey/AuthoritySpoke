@@ -575,14 +575,17 @@ class TestContradiction:
         left = make_factor["f_irrelevant_3"]
         right = make_factor["f_irrelevant_3_new_context"]
         e = make_entity
+        easy_register = ContextRegister.from_lists([e["dan"]], [e["craig"]])
         easy_update = left.update_context_register(
-            right, {str(e["dan"]): e["craig"]}, means
+            right, easy_register, comparison=means
         )
         harder_register = ContextRegister.from_lists(
             keys=[e["alice"], e["bob"], e["craig"], e["dan"], e["circus"]],
             values=[e["bob"], e["alice"], e["dan"], e["craig"], e["circus"]],
         )
-        harder_update = left.update_context_register(right, harder_register, means,)
+        harder_update = left.update_context_register(
+            right, context=harder_register, comparison=means,
+        )
         assert any(register is not None for register in easy_update)
         assert any(register is not None for register in harder_update)
 
