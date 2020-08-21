@@ -1,6 +1,6 @@
 import anchorpoint
 from authorityspoke.factors import FactorIndex
-from tests.conftest import make_response
+from tests.conftest import make_opinion_with_holding, make_response
 import pytest
 
 from anchorpoint.textselectors import TextQuoteSelector

@@ -418,9 +418,10 @@ class Factor(Comparable):
             a :class:`Factor` with the specified ``name`` attribute
             if it exists, otherwise ``None``.
         """
-        for factor in self.recursive_factors:
-            if hasattr(factor, "name") and factor.name == name:
-                return factor
+        factors_to_search = self.recursive_factors
+        for value in factors_to_search.values():
+            if hasattr(value, "name") and value.name == name:
+                return value
         return None
 
     def get_factor_by_str(self, query: str) -> Optional[Factor]:
