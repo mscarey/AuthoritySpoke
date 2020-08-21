@@ -19,8 +19,8 @@ from dataclasses import dataclass, field
 from anchorpoint.textselectors import TextQuoteSelector
 
 from authorityspoke.comparisons import Comparable
-from authorityspoke.factors import Factor, ContextRegister, FactorIndex
 from authorityspoke.explanations import Explanation
+from authorityspoke.factors import Factor, ContextRegister, FactorIndex
 from authorityspoke.holdings import Holding, HoldingGroup
 from authorityspoke.rules import Rule
 
@@ -92,7 +92,7 @@ class Opinion(Comparable):
 
     @property
     def holdings(self):
-        return self._holdings
+        return HoldingGroup(self._holdings)
 
     def clear_holdings(self):
         r"""Remove all :class:`.Holding`\s from the opinion."""
