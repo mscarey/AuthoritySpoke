@@ -8,6 +8,7 @@ from legislice.download import Client
 from legislice.mock_clients import JSONRepository
 
 from authorityspoke.entities import Entity
+from authorityspoke.evidence import Evidence
 from authorityspoke.explanations import Explanation
 from authorityspoke.factors import ContextRegister, FactorSequence
 from authorityspoke.holdings import Holding
@@ -52,6 +53,12 @@ class TestHolding:
 
     def test_type_of_context_factors(self, make_holding):
         assert isinstance(make_holding["h1"].context_factors, FactorSequence)
+
+    def test_get_exhibit_by_name_from_holding(self, make_opinion_with_holding):
+        brad = make_opinion_with_holding["brad_majority"]
+        holding = brad.holdings[4]
+        factor = holding.get_factor_by_name("proof of Wattenburg's guilt")
+        assert isinstance(factor, Evidence)
 
 
 class TestSameMeaning:

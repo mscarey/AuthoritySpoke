@@ -59,9 +59,8 @@ def seek_factor_by_str(
     r"""
     Find a Factor matching a name in a Factor or Opinion.
 
-    :param name:
-        the name of a Factor to seek and return. Usually the name will correspond to an
-        :class:`.Entity` because Entities have shorter names.
+    :param query:
+        the string representation of a Factor to seek and return.
 
     :param source_factor:
         A Factor that might have a context factor matching the "name". Usually the source_factor
@@ -83,6 +82,20 @@ def seek_factor_by_str(
     if not result:
         raise ValueError(f"Unable to find a Factor with the string '{query}'")
     return result
+
+
+def seek_factor(
+    query: Union[Factor, str], source_factor: Factor, source_opinion: Opinion
+) -> Factor:
+    try:
+        answer = seek_factor_by_str(
+            query=query, source_factor=source_factor, source_opinion=source_opinion
+        )
+    except ValueError:
+        answer = seek_factor_by_name(
+            name=query, source_factor=source_factor, source_opinion=source_opinion
+        )
+    return answer
 
 
 def convert_changes_to_register(
@@ -145,7 +158,7 @@ def new_context_helper(func: Callable):
 
         expanded_changes = ContextRegister()
         for old, new in changes.items():
-            factor_with_new_name = seek_factor_by_str(new, factor, source)
+            factor_with_new_name = seek_factor(new, factor, source)
             expanded_changes.insert_pair(old, factor_with_new_name)
         for old, new in expanded_changes.items():
             if str(factor) == old or factor.__dict__.get("name") == old:

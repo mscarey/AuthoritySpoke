@@ -241,13 +241,34 @@ class TestOpinionFactors:
         oracle = make_opinion_with_holding["oracle_majority"]
         scenes_a_faire = [
             factor
-            for factor in oracle.factors().items()
-            if isinstance(factor[0], Fact)
-            and factor[0].short_string
+            for factor in oracle.factors()
+            if isinstance(factor, Fact)
+            and factor.short_string
             == "the fact that <the Java API> was a scene a faire"
         ]
         assert len(scenes_a_faire) == 1  # 1 Factor
-        assert len(scenes_a_faire[0][1]) == 3
+
+    def test_duplicate_text_in_factor_anchors(self, make_opinion_with_holding):
+        """
+        Tests that a particular Factor appears only once, and that all
+        three of the text anchors for that Factor appear in the value
+        for the Factor in Opinion.factors.
+        """
+
+        oracle = make_opinion_with_holding["oracle_majority"]
+        scenes_a_faire = [
+            factor
+            for factor in oracle.factors()
+            if isinstance(factor, Fact)
+            and factor.short_string
+            == "the fact that <the Java API> was a scene a faire"
+        ]
+        filtered = [
+            selector
+            for selector in scenes_a_faire[0].anchors
+            if "doctrine denies protection" in selector.exact
+        ]
+        assert len(filtered) == 1
 
     def test_get_factor_from_opinion(self, make_opinion_with_holding):
         oracle = make_opinion_with_holding["oracle_majority"]
