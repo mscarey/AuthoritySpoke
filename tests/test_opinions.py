@@ -270,14 +270,13 @@ class TestOpinionFactors:
 
     def test_duplicate_text_in_factor_anchors(self, make_opinion_with_holding):
         """
-        Tests that a particular Factor appears only once, and that all
-        three of the text anchors for that Factor appear in the value
-        for the Factor in Opinion.factors.
+        Test that all of the text anchors for a particular Factor appear only once.
         """
 
         oracle = make_opinion_with_holding["oracle_majority"]
         factors = oracle.factors()
-        assert len(factors[0].anchors) == 1
+        assert len(factors[0].anchors) == 2
+        assert factors[0].anchors[0] != factors[0].anchors[1]
 
     def test_get_factor_from_opinion(self, make_opinion_with_holding):
         oracle = make_opinion_with_holding["oracle_majority"]
