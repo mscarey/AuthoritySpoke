@@ -736,7 +736,9 @@ class FactorIndex(Dict[str, Factor]):
 
     def insert(self, key: str, value: Factor) -> None:
         if key in self.keys():
-            self[key].anchors += value.anchors
+            for anchor in value.anchors:
+                if anchor not in self[key].anchors:
+                    self[key].append(anchor)
         else:
             self[key] = value
 

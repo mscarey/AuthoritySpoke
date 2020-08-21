@@ -1,3 +1,5 @@
+import anchorpoint
+from authorityspoke.factors import FactorIndex
 from tests.conftest import make_response
 import pytest
 
@@ -5,7 +7,7 @@ from anchorpoint.textselectors import TextQuoteSelector
 from legislice.mock_clients import JSONRepository
 
 from authorityspoke.entities import Entity
-from authorityspoke.facts import Fact
+from authorityspoke.facts import Fact, Predicate
 from authorityspoke.io import anchors, loaders, readers
 from authorityspoke.opinions import Opinion
 
@@ -248,6 +250,24 @@ class TestOpinionFactors:
         ]
         assert len(scenes_a_faire) == 1  # 1 Factor
 
+    def test_insert_duplicate_anchor_in_factor_index(self):
+        api = Entity(name="the Java API", generic=True, plural=False, anchors=[])
+        anchor = TextQuoteSelector(
+            exact="it possesses at least some minimal degree of creativity."
+        )
+        fact = Fact(
+            predicate=Predicate(
+                "{} possessed at least some minimal degree of creativity"
+            ),
+            context_factors=[api],
+            anchors=[anchor],
+        )
+        name = "the Java API possessed at least some minimal degree of creativity"
+
+        factor_index = FactorIndex({name: fact})
+        factor_index.insert(key=name, value=fact)
+        assert len(factor_index[name].anchors) == 1
+
     def test_duplicate_text_in_factor_anchors(self, make_opinion_with_holding):
         """
         Tests that a particular Factor appears only once, and that all
@@ -256,19 +276,8 @@ class TestOpinionFactors:
         """
 
         oracle = make_opinion_with_holding["oracle_majority"]
-        scenes_a_faire = [
-            factor
-            for factor in oracle.factors()
-            if isinstance(factor, Fact)
-            and factor.short_string
-            == "the fact that <the Java API> was a scene a faire"
-        ]
-        filtered = [
-            selector
-            for selector in scenes_a_faire[0].anchors
-            if "doctrine denies protection" in selector.exact
-        ]
-        assert len(filtered) == 1
+        factors = oracle.factors()
+        assert len(factors[0].anchors) == 1
 
     def test_get_factor_from_opinion(self, make_opinion_with_holding):
         oracle = make_opinion_with_holding["oracle_majority"]
