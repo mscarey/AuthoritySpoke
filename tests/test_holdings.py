@@ -61,6 +61,12 @@ class TestHolding:
         factor = holding.get_factor_by_name("proof of Wattenburg's guilt")
         assert factor.name == "proof of Wattenburg's guilt"
 
+    def test_enactment_text_in_holding_str(self, make_opinion_with_holding):
+        lotus = make_opinion_with_holding["lotus_majority"]
+        holding = lotus.holdings[2]
+        assert holding.enactments[0].content.startswith("In any judicial")
+        assert "In any judicial" in holding.enactments[0].selected_text()
+
 
 class TestSameMeaning:
     def test_identical_holdings_equal(self, make_holding):
