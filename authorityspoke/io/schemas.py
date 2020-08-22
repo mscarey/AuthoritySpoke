@@ -3,7 +3,7 @@
 from copy import deepcopy
 from typing import Any, Dict, List, Optional, Sequence, Tuple, Type, Union
 
-from marshmallow import Schema, fields, validate
+from marshmallow import Schema, fields, validate, EXCLUDE
 from marshmallow import pre_load, post_load
 from marshmallow import ValidationError
 
@@ -131,6 +131,9 @@ class DecisionSchema(ExpandableSchema):
     # volume = fields.Str(missing=None)
     _id = fields.Int(data_key="id")
     cites_to = fields.Nested(CaseCitationSchema, many=True, missing=list)
+
+    class Meta:
+        unknown = EXCLUDE
 
     @pre_load
     def format_data_to_load(self, data: RawDecision, **kwargs) -> RawDecision:

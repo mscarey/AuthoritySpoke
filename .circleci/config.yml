@@ -8,7 +8,7 @@ jobs:
     docker:
       # specify the version you desire here
       # use `-browsers` prefix for selenium tests, e.g. `3.6.1-browsers`
-      - image: circleci/python:3.7.3
+      - image: circleci/python:3.8.5
 
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
@@ -36,7 +36,6 @@ jobs:
             pip install pytest
             pip install pytest-cov
             pip install coveralls
-
 
       - save_cache:
           paths:
