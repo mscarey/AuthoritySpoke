@@ -104,6 +104,13 @@ def convert_changes_to_register(
     if not isinstance(changes, Iterable):
         changes = (changes,)
     if isinstance(changes, (list, tuple)):
+        if (
+            len(changes) == 2
+            and all(isinstance(item, (tuple, list)) for item in changes)
+            and all(isinstance(factor, Comparable) for factor in changes[0])
+            and all(isinstance(factor, Comparable) for factor in changes[1])
+        ):
+            return ContextRegister.from_lists(changes[0], changes[1])
         generic_factors = factor.generic_factors_by_name.keys()
         if len(generic_factors) != len(changes):
             raise ValueError(
