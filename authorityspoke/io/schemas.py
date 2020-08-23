@@ -413,7 +413,6 @@ class FactorSchema(OneOfSchema, ExpandableSchema):
     }
 
     def pre_load(self, data: RawFactor, **kwargs) -> RawFactor:
-        """Remove text anchors because they aren't part of the referenced schemas."""
         data = self.get_from_mentioned(data)
         return data
 
@@ -465,6 +464,18 @@ class RuleSchema(ExpandableSchema):
             if field in data:
                 data["procedure"][field] = data.pop(field)
         return data
+
+    @post_load
+    def make_object(self, data, **kwargs):
+        rule = self.__model__(**data)
+
+        for enactment in rule.enactments:
+            if not enactment.selected_text():
+                enactment.select_all()
+        for despite in rule.enactments_despite:
+            if not despite.selected_text():
+                despite.select_all()
+        return rule
 
 
 class HoldingSchema(ExpandableSchema):

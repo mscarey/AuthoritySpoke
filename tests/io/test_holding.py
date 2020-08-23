@@ -393,6 +393,20 @@ class TestTextAnchors:
         allegation = built[0].inputs[1]
         assert allegation.statement.context_factors[0].name == "defendant"
 
+    def test_select_enactment_text_by_default(self, make_response):
+        mock_client = JSONRepository(responses=make_response)
+        holding_dict = {
+            "outputs": [
+                {
+                    "type": "fact",
+                    "content": "the Lotus menu command hierarchy was copyrightable",
+                }
+            ],
+            "enactments": [{"node": "/us/usc/t17/s410/c"}],
+        }
+        holding = readers.read_holding(holding_dict, client=mock_client)
+        assert holding.enactments[0].selected_text().startswith("In any judicial")
+
     def test_enactment_has_subsection(self, make_response):
         mock_client = JSONRepository(responses=make_response)
         to_read = load_holdings("holding_lotus.json")
