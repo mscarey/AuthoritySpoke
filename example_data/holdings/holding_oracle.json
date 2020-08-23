@@ -302,13 +302,15 @@
         "enactments_despite": [
             {
                 "node": "/us/usc/t17/s102/b",
-                "exact": "In no case does copyright protection for an original work of authorship extend to any",
-                "name": "in no case clause"
-            },
-            {
-                "node": "/us/usc/t17/s102/b",
-                "exact": "method of operation",
-                "name": "method of operation clause"
+                "selection": [
+                    {
+                        "exact": "In no case does copyright protection for an original work of authorship extend to any"
+                    },
+                    {
+                        "exact": "method of operation"
+                    }
+                ],
+                "name": "in no case method of operation"
             },
             {
                 "node": "/us/cfr/t37/s202.1",
