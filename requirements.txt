@@ -2,7 +2,7 @@ anchorpoint>=0.4.0
 apispec[validation]
 legislice>=0.1.1
 marshmallow>=3.2.2
-pint>=0.9
+pint>=0.15
 python-dotenv
 requests
 roman

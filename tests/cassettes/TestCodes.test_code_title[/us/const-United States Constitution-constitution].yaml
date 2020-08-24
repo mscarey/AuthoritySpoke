@@ -1,0 +1,82 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.24.0
+      authorization:
+      - DUMMY
+    method: GET
+    uri: https://authorityspoke.com/api/v1/us/const
+  response:
+    body:
+      string: ''
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '0'
+      Content-Type:
+      - text/html; charset=utf-8
+      Date:
+      - Mon, 24 Aug 2020 10:26:32 GMT
+      Location:
+      - /api/v1/us/const/
+      Server:
+      - gunicorn/20.0.4
+      Via:
+      - 1.1 vegur
+      X-Content-Type-Options:
+      - nosniff
+    status:
+      code: 301
+      message: Moved Permanently
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.24.0
+      authorization:
+      - DUMMY
+    method: GET
+    uri: https://authorityspoke.com/api/v1/us/const/
+  response:
+    body:
+      string: '{"heading":"United States Constitution","content":"","children":["https://authorityspoke.com/api/v1/us/const/amendment/","https://authorityspoke.com/api/v1/us/const/article/"],"end_date":null,"node":"/us/const","start_date":"1788-09-13","url":"https://authorityspoke.com/api/v1/us/const/","parent":"https://authorityspoke.com/api/v1/us/"}'
+    headers:
+      Allow:
+      - GET, POST, HEAD, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '338'
+      Content-Type:
+      - application/json
+      Date:
+      - Mon, 24 Aug 2020 10:26:32 GMT
+      Server:
+      - gunicorn/20.0.4
+      Vary:
+      - Accept, Cookie
+      Via:
+      - 1.1 vegur
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+version: 1

@@ -6,7 +6,11 @@ from dotenv import load_dotenv
 from legislice.download import Client
 
 from legislice.enactments import Enactment, consolidate_enactments
-from legislice.mock_clients import JSONRepository
+from legislice.mock_clients import (
+    JSONRepository,
+    MOCK_BEARD_ACT_CLIENT,
+    MOCK_USC_CLIENT,
+)
 from legislice.schemas import EnactmentSchema
 import pytest
 
@@ -25,51 +29,45 @@ class TestEnactments:
         search_clause = e_search_clause
         assert search_clause.selected_text().endswith("shall not be violated…")
 
-    @pytest.mark.vcr
     def test_create_enactment_with_init(self):
         """
         Using the __init__ method of the Enactment class, insteaid of
         readers.read_enactment or the Enactment marshmallow schema.
         """
-        beard_definition = self.client.read("/test/acts/47/4/")
+        beard_definition = MOCK_BEARD_ACT_CLIENT.read("/test/acts/47/4/")
         assert beard_definition.text.startswith("In this Act, beard")
 
-    @pytest.mark.vcr
     def test_make_enactment_from_selector_without_code(self):
-        selector = TextQuoteSelector(suffix=", shall be vested")
-        art_3 = self.client.read("/us/const/article/III/1")
+        selector = TextQuoteSelector(suffix=" to their respective")
+        art_3 = MOCK_USC_CLIENT.read("/us/const/article/I/8/8")
         art_3.select(selector)
-        assert art_3.text.startswith("The judicial Power")
-        assert art_3.selected_text().endswith("the United States…")
+        assert art_3.text.startswith("To promote")
+        assert art_3.selected_text().endswith("exclusive Right…")
 
-    @pytest.mark.vcr
     def test_make_enactment_from_dict_with_reader(self):
         fourth_a = readers.read_enactment(
-            record={"node": "/us/const/amendment/IV"}, client=self.client
+            record={"node": "/us/const/amendment/IV"}, client=MOCK_USC_CLIENT
         )
         assert fourth_a.text.endswith("and the persons or things to be seized.")
 
-    @pytest.mark.vcr
     def test_make_enactment_from_dict_with_text_split(self):
         fourth_a = readers.read_enactment(
             record={
                 "node": "/us/const/amendment/IV",
                 "text": "and|the persons or things|to be seized.",
             },
-            client=self.client,
+            client=MOCK_USC_CLIENT,
         )
         assert fourth_a.selected_text() == "…the persons or things…"
 
-    @pytest.mark.vcr
     def test_passage_from_imported_statute(self):
         oracle_majority = loaders.load_and_read_decision(f"oracle_h.json").majority
         raw_holdings = loaders.load_holdings("holding_oracle.json")
-        holdings = readers.read_holdings(raw_holdings, client=self.client)
+        holdings = readers.read_holdings(raw_holdings, client=MOCK_USC_CLIENT)
         oracle_majority.posit(holdings)
         despite_text = str(list(oracle_majority.holdings)[5])
         assert "In no case does copyright protection " in despite_text
 
-    @pytest.mark.vcr
     def test_short_passage_from_uslm_code(self):
         """Also tests adding the missing initial "/" in ``path``."""
         method = readers.read_enactment(
@@ -78,14 +76,13 @@ class TestEnactments:
                 "prefix": "process, system,",
                 "suffix": ", concept, principle",
             },
-            client=self.client,
+            client=MOCK_USC_CLIENT,
         )
         assert method.selected_text() == "…method of operation…"
 
-    @pytest.mark.vcr
     def test_chapeau_and_subsections_from_uslm_code(self):
         definition = readers.read_enactment(
-            {"node": "/test/acts/47/4"}, client=self.client,
+            {"node": "/test/acts/47/4"}, client=MOCK_BEARD_ACT_CLIENT,
         )
         assert definition.text.strip().endswith("below the nose.")
 
@@ -125,10 +122,9 @@ class TestEnactments:
         with pytest.raises(TypeError):
             assert not e_due_process_5 < f1
 
-    @pytest.mark.vcr
     def test_read_constitution_for_effective_date(self):
         ex_post_facto_provision = readers.read_enactment(
-            {"node": "/us/const/article/I/9/3"}, client=self.client
+            {"node": "/us/const/article/I/8/8"}, client=MOCK_USC_CLIENT
         )
         assert ex_post_facto_provision.start_date == datetime.date(1788, 9, 13)
 
@@ -136,27 +132,18 @@ class TestEnactments:
         # December 15, 1791
         assert e_search_clause.start_date == datetime.date(1791, 12, 15)
 
-    @pytest.mark.vcr
     def test_date_and_text_from_path_and_regime(self):
         """
-        This tests different parsing code because the date is
-        in the format "dated the 25th of September, 1804"
-
-        This also verifies that providing the ``regime`` to the
-        Enactment constructor is sufficient to assign the full text of
+        This tests assigning the full text of
         the section as the text of the Enactment, even though no
-        ``exact``, ``prefix``, ``suffix``, or ``source`` parameter was
+        ``exact``, ``prefix``, or ``suffix` parameter was
         passed to the TextQuoteSelector constructor.
         """
         amendment_12 = readers.read_enactment(
-            {"node": "/us/const/amendment/XII"}, client=self.client
+            {"node": "/us/const/amendment/XIV"}, client=MOCK_USC_CLIENT
         )
-        assert amendment_12.start_date == datetime.date(1804, 9, 25)
-        assert "Electors shall meet" in amendment_12.text
-
-    def test_14th_A_effective_date(self, e_due_process_14):
-        # July 28, 1868
-        assert e_due_process_14.start_date == datetime.date(1868, 7, 28)
+        assert amendment_12.start_date == datetime.date(1868, 7, 28)
+        assert "All persons born" in amendment_12.text
 
     def test_compare_effective_dates(self, e_due_process_5, e_due_process_14):
         assert e_due_process_14.start_date > e_due_process_5.start_date
@@ -279,18 +266,16 @@ class TestDump:
         text_selection = d["content"][start:end]
         assert "Science and useful Arts" in text_selection
 
-    @pytest.mark.vcr
     def test_dump_json(self):
         provision = readers.read_enactment(
-            {"node": "/test/acts/47/6A"}, client=self.client
+            {"node": "/test/acts/47/6A"}, client=MOCK_BEARD_ACT_CLIENT
         )
         dumped_provision = dump.to_json(provision)
         assert '"node": "/test/acts/47/6A"' in dumped_provision
 
-    @pytest.mark.vcr
     def test_round_trip_dict(self):
         provision = readers.read_enactment(
-            {"node": "/test/acts/47/6A"}, client=self.client
+            {"node": "/test/acts/47/6A"}, client=MOCK_BEARD_ACT_CLIENT
         )
         dumped_provision = dump.to_dict(provision)
         new = self.client.read_from_json(dumped_provision)

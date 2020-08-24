@@ -8,7 +8,11 @@ from dotenv import load_dotenv
 
 from legislice.download import Client, LegislicePathError
 
-from legislice.mock_clients import JSONRepository
+from legislice.mock_clients import (
+    JSONRepository,
+    MOCK_BEARD_ACT_CLIENT,
+    MOCK_USC_CLIENT,
+)
 
 from legislice.schemas import EnactmentSchema
 
@@ -45,63 +49,46 @@ class TestCodes:
         assert enactment.heading.startswith(heading)
         assert enactment.level == level
 
-    @pytest.mark.vcr
     def test_code_select_text(self):
-        enactment = self.client.read(path="/test/acts/47/1")
+
+        enactment = MOCK_BEARD_ACT_CLIENT.read(path="/test/acts/47/1")
         assert enactment.text.startswith("This Act may be cited")
 
-    @pytest.mark.vcr
     def test_code_select_text_chapeau(self):
-        enactment = self.client.read(path="/test/acts/47/4")
+        enactment = MOCK_BEARD_ACT_CLIENT.read(path="/test/acts/47/4")
         enactment.select()
         assert enactment.selected_text().startswith("In this Act, beard means")
 
-    @pytest.mark.vcr
     def test_get_bill_of_rights_effective_date(self):
-        enactment = self.client.read(path="/us/const/amendment/V")
+        enactment = MOCK_USC_CLIENT.read(path="/us/const/amendment/V")
         assert enactment.start_date == datetime.date(1791, 12, 15)
 
-    @pytest.mark.vcr
-    @pytest.mark.parametrize(
-        "path, expected",
-        (
-            ["/us/const/amendment/XIV/3", "No person shall be a Senator"],
-            ["/us/const/article/I/5/1", "Each House shall be the Judge"],
-        ),
-    )
-    def test_get_section_from_fed_const(self, path, expected):
-        enactment = self.client.read(path=path)
-        assert enactment.text.startswith(expected)
-
-    @pytest.mark.vcr
     def test_text_interval_constitution_section(self):
-        enactment = self.client.read(path="/us/const/article/I/3/7")
+        enactment = MOCK_USC_CLIENT.read(path="/us/const/article/I/8/8")
 
         # The entire 317-character section is selected.
         ranges = enactment.selection.ranges()
         assert ranges[0].start == 0
-        assert ranges[0].end == 317
+        assert ranges[0].end == 172
 
-        passage = enactment.get_passage(TextPositionSelector(66, 85))
-        assert passage == "…removal from Office…"
+        passage = enactment.get_passage(TextPositionSelector(68, 81))
+        assert passage == "…limited Times…"
 
-    @pytest.mark.vcr
     def test_text_interval_beyond_end_of_section(self):
         """No longer raises an error, just selects to the end of the text."""
-        enactment = self.client.read(path="/us/const/article/I/3/7")
+        enactment = MOCK_USC_CLIENT.read(path="/us/const/article/I/8/8")
 
-        selector = TextPositionSelector(66, 400)
+        selector = TextPositionSelector(68, 400)
         passage = enactment.get_passage(selector)
-        assert passage.startswith("…removal from Office")
+        assert passage.startswith("…limited Times")
         assert passage.endswith(enactment.text[-10:])
 
-    @pytest.mark.vcr
     def test_bad_section(self):
         """
         The path is a section that doesn't exist in USC.
         """
         with pytest.raises(LegislicePathError):
-            enactment = self.client.read(path="/us/usc/article/I/3/7")
+            enactment = MOCK_USC_CLIENT.read(path="/us/usc/article/I/3/7")
 
     def test_text_interval_bad_selector(self, make_selector, make_response):
         client = JSONRepository(responses=make_response)

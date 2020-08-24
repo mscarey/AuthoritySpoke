@@ -8,7 +8,7 @@ from anchorpoint.textselectors import TextQuoteSelector
 from dotenv import load_dotenv
 from legislice import Enactment
 from legislice.download import Client
-from legislice.mock_clients import JSONRepository
+from legislice.mock_clients import JSONRepository, MOCK_USC_CLIENT
 from legislice.name_index import collect_enactments
 
 from authorityspoke.entities import Entity
@@ -29,16 +29,13 @@ legislice_client = Client(api_token=TOKEN)
 
 
 class TestHoldingDump:
-    client = Client(api_token=TOKEN)
-
-    @pytest.mark.vcr
     def test_dump_and_read_holding(self, make_holding):
         holding = make_holding["h2"]
         dumped = dump.to_dict(holding)
         content = dumped["rule"]["procedure"]["inputs"][0]["predicate"]["content"]
         assert content == "{} was on the premises of {}"
 
-        loaded = readers.read_holding(dumped, client=self.client)
+        loaded = readers.read_holding(dumped, client=MOCK_USC_CLIENT)
         loaded_content = loaded.despite[0].predicate.content
         assert "the distance between {} and {} was" in loaded_content
 
@@ -187,7 +184,6 @@ class TestHoldingImport:
         assert feist.holdings[0].enactments[0].node == "/us/const/article/I/8/8"
         assert feist.holdings[1].enactments[0].node == "/us/const/article/I/8/8"
 
-    @pytest.mark.vcr
     def test_read_holdings_and_then_get_anchors(self, make_response):
         """
         Test whether read_holdings mutates raw_holding and makes it
@@ -203,7 +199,6 @@ class TestHoldingImport:
         assert isinstance(oracle_holdings[0], Holding)
         assert isinstance(named_anchors.popitem()[1].pop(), TextQuoteSelector)
 
-    @pytest.mark.vcr
     def test_load_and_posit_holdings_with_anchors(self, make_opinion, make_response):
         """
         Test that Opinion.posit can take a HoldingsIndexed as the only argument.

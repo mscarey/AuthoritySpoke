@@ -6,7 +6,11 @@ import os
 
 from dotenv import load_dotenv
 from legislice.download import Client
-from legislice.mock_clients import JSONRepository
+from legislice.mock_clients import (
+    JSONRepository,
+    MOCK_USC_CLIENT,
+    MOCK_BEARD_ACT_CLIENT,
+)
 import pytest
 
 from authorityspoke.entities import Entity
@@ -816,7 +820,6 @@ class TestStatuteRules:
 
     client = Client(api_token=TOKEN)
 
-    @pytest.mark.vcr
     def test_greater_than_implies_equal(self, beard_response, make_beard_rule):
         client = JSONRepository(responses=beard_response)
         beard_dictionary = loaders.load_holdings("beard_rules.json")
@@ -826,7 +829,6 @@ class TestStatuteRules:
         longer_hair_rule = readers.read_rule(beard_dictionary[0], client=client)
         assert make_beard_rule[0].implies(longer_hair_rule)
 
-    @pytest.mark.vcr
     def test_greater_than_contradicts_not_greater(
         self, beard_response, make_beard_rule
     ):
@@ -840,7 +842,6 @@ class TestStatuteRules:
         long_hair_is_not_a_beard = readers.read_rule(beard_dictionary[1], client=client)
         assert make_beard_rule[1].contradicts(long_hair_is_not_a_beard)
 
-    @pytest.mark.vcr
     def test_contradictory_fact_about_beard_length(self, make_beard_rule):
         beard_dictionary = loaders.load_holdings("beard_rules.json")
         beard_dictionary[1]["despite"] = beard_dictionary[1]["inputs"][0]
@@ -851,7 +852,7 @@ class TestStatuteRules:
         beard_dictionary[1]["outputs"][0]["truth"] = False
         beard_dictionary[1]["mandatory"] = True
         long_thing_is_not_a_beard = readers.read_rule(
-            beard_dictionary[1], client=self.client
+            beard_dictionary[1], client=MOCK_BEARD_ACT_CLIENT
         )
         assert make_beard_rule[1].contradicts(long_thing_is_not_a_beard)
 
@@ -872,7 +873,6 @@ class TestStatuteRules:
         )
         assert long_thing_is_not_a_beard.contradicts(make_beard_rule[1])
 
-    @pytest.mark.vcr
     @pytest.mark.parametrize(
         (
             "facial_hair_over_5mm, facial_hair_on_or_below_chin, "
@@ -900,7 +900,7 @@ class TestStatuteRules:
     ):
         beard = Entity("a facial feature")
 
-        sec_4 = self.client.read(path="/test/acts/47/4/")
+        sec_4 = MOCK_BEARD_ACT_CLIENT.read(path="/test/acts/47/4/")
 
         hypothetical = Rule(
             procedure=Procedure(

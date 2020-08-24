@@ -9,7 +9,7 @@ from authorityspoke.rules import Rule
 
 
 from legislice.download import Client
-from legislice.mock_clients import JSONRepository
+from legislice.mock_clients import JSONRepository, MOCK_BEARD_ACT_CLIENT
 
 load_dotenv()
 
@@ -40,24 +40,21 @@ class TestLoadRules:
 
     client = Client(api_token=TOKEN)
 
-    @pytest.mark.vcr
     def test_loading_rules(self):
         beard_rules, mentioned = loaders.load_rules_with_index(
-            "beard_rules.json", client=self.client
+            "beard_rules.json", client=MOCK_BEARD_ACT_CLIENT
         )
         assert beard_rules[0].outputs[0].content == "{} was a beard"
 
-    @pytest.mark.vcr
     def test_imported_rule_is_type_rule(self):
         beard_rules, mentioned = loaders.load_rules_with_index(
-            "beard_rules.json", client=self.client
+            "beard_rules.json", client=MOCK_BEARD_ACT_CLIENT
         )
         assert isinstance(beard_rules[0], Rule)
 
-    @pytest.mark.vcr
     def test_rule_short_string(self):
         beard_rules, mentioned = loaders.load_rules_with_index(
-            "beard_rules.json", client=self.client
+            "beard_rules.json", client=MOCK_BEARD_ACT_CLIENT
         )
         assert beard_rules[0].short_string.lower().startswith("the rule")
 
@@ -67,26 +64,23 @@ class TestLoadRules:
         key = "the suspected beard occurred on or below the chin"
         assert mentioned[key]["context_factors"][0] == "the suspected beard"
 
-    @pytest.mark.vcr
     def test_rule_with_exhibit_as_context_factor(self):
         rules, mentioned = loaders.load_rules_with_index(
-            "beard_rules.json", client=self.client
+            "beard_rules.json", client=MOCK_BEARD_ACT_CLIENT
         )
         exhibit = rules[5].inputs[0].context_factors[2]
         assert isinstance(exhibit, Exhibit)
 
-    @pytest.mark.vcr
     def test_load_rules_and_index_names(self):
         rules, mentioned = loaders.load_rules_with_index(
-            "beard_rules.json", client=self.client
+            "beard_rules.json", client=MOCK_BEARD_ACT_CLIENT
         )
         key = "the Department of Beards granted the defendant's beard exemption"
         assert mentioned[key]["context_factors"][0] == "the Department of Beards"
 
-    @pytest.mark.vcr
     def test_read_rules_without_regime(self):
         beard_dictionary = loaders.load_holdings("beard_rules.json")
-        beard_rules = readers.read_rules(beard_dictionary, client=self.client)
+        beard_rules = readers.read_rules(beard_dictionary, client=MOCK_BEARD_ACT_CLIENT)
         assert beard_rules[0].inputs[0].short_string == (
             "the fact that <the suspected beard> was facial hair"
         )

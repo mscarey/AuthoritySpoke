@@ -1,0 +1,57 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.24.0
+    method: GET
+    uri: https://api.case.law/v1/cases/99999999/
+  response:
+    body:
+      string: '{"detail":"Not found."}'
+    headers:
+      Access-Control-Allow-Headers:
+      - Authorization
+      Access-Control-Allow-Origin:
+      - '*'
+      Allow:
+      - GET, HEAD, OPTIONS
+      CF-Cache-Status:
+      - MISS
+      CF-RAY:
+      - 5c7c607baca2d27a-DFW
+      Cache-Control:
+      - max-age=14400, s-maxage=0
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '23'
+      Content-Type:
+      - application/json
+      Date:
+      - Mon, 24 Aug 2020 10:26:45 GMT
+      Expect-CT:
+      - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
+      Server:
+      - cloudflare
+      Set-Cookie:
+      - __cfduid=d69db0c28461711870c89c340152471021598264805; expires=Wed, 23-Sep-20
+        10:26:45 GMT; path=/; domain=.case.law; HttpOnly; SameSite=Lax
+      Vary:
+      - Accept, Cookie, Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      cf-request-id:
+      - 04c19aa1460000d27a2fa11200000001
+    status:
+      code: 404
+      message: Not Found
+version: 1

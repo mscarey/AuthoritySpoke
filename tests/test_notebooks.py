@@ -27,6 +27,7 @@ class TestIntroduction:
     Tests of commands from the "Introduction to AuthoritySpoke" notebook
     """
 
+    @pytest.mark.skip(reason="uses API call")
     @pytest.mark.vcr
     def test_download_case(self):
         oracle_download = download_case(
@@ -65,7 +66,6 @@ class TestIntroduction:
         assert lotus_majority.holdings[0].outputs[0].absent is False
         assert lotus_majority.holdings[1].outputs[0].absent is True
 
-    @pytest.mark.vcr
     def test_evolve_rule_replacing_enactment(
         self, make_opinion_with_holding, make_response
     ):

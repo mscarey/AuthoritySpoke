@@ -2,7 +2,7 @@ import os
 
 from dotenv import load_dotenv
 from legislice.download import Client
-from legislice.mock_clients import JSONRepository
+from legislice.mock_clients import JSONRepository, MOCK_BEARD_ACT_CLIENT
 from legislice.schemas import EnactmentSchema
 import pytest
 
@@ -65,7 +65,6 @@ class TestEnactmentImport:
         enactment_list = holdings[0].enactments
         assert "all relevant evidence is admissible" in enactment_list[0].text
 
-    @pytest.mark.vcr
     def test_enactment_does_not_fail_for_excess_selector(self):
         """Test selector that extends into the text of a subnode."""
         exact = (
@@ -74,5 +73,5 @@ class TestEnactmentImport:
         )
         record = {"node": "/test/acts/47/4", "exact": exact}
 
-        enactment = readers.read_enactment(record, client=self.client)
+        enactment = readers.read_enactment(record, client=MOCK_BEARD_ACT_CLIENT)
         assert enactment.selected_text() == exact + "…"

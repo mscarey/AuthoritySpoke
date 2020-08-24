@@ -1,0 +1,63 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.24.0
+    method: GET
+    uri: https://api.case.law/v1/cases/?cite=999+Cal+9th.+9999
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA6tWSs4vzStRsjLQUcpLrShRssorzcnRUSooSi3LzC8thvGLUotLc0qKlayiY2sB
+        cO3eUzQAAAA=
+    headers:
+      Access-Control-Allow-Headers:
+      - Authorization
+      Access-Control-Allow-Origin:
+      - '*'
+      Allow:
+      - GET, HEAD, OPTIONS
+      CF-Cache-Status:
+      - MISS
+      CF-RAY:
+      - 5c7c607d1e379b60-DFW
+      Cache-Control:
+      - max-age=14400, s-maxage=86400
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json
+      Date:
+      - Mon, 24 Aug 2020 10:26:46 GMT
+      Expect-CT:
+      - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
+      Server:
+      - cloudflare
+      Set-Cookie:
+      - __cfduid=d7f172abe38c98e159300c1f6249a85c21598264805; expires=Wed, 23-Sep-20
+        10:26:45 GMT; path=/; domain=.case.law; HttpOnly; SameSite=Lax
+      Strict-Transport-Security:
+      - max-age=15768000
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept, Cookie, Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      cf-request-id:
+      - 04c19aa22d00009b60a2adc200000001
+    status:
+      code: 200
+      message: OK
+version: 1
