@@ -63,6 +63,7 @@ class TestDownload:
         with pytest.raises(ValueError):
             download_case(cite="49 F.3d 807", full_case=True)
 
+    @pytest.mark.skip(reason="uses API key")
     @pytest.mark.vcr
     def test_full_case_download(self):
         """
