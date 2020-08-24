@@ -1,6 +1,6 @@
 ..  _create_holding_data:
 
-``Creating Holding Data``
+Creating Holding Data
 ======================================
 
 This tutorial will show how to create and load objects representing

@@ -4,7 +4,7 @@
    contain the root `toctree` directive.
 
 =========================================================
-AuthoritySpoke: Reading Legal Authority for the Last Time
+AuthoritySpoke: Legal Rules as Data
 =========================================================
 
 Release v\. |release|.

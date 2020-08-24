@@ -1,4 +1,4 @@
-``Legislative Rules``
+Legislative Rules
 ===========================
 
 This tutorial will show how to use

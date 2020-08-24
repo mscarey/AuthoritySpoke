@@ -1,4 +1,4 @@
-``Core``
+Core
 ========
 
 .. toctree::

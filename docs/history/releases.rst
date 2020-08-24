@@ -1,8 +1,8 @@
 .. _releases:
 
-===============
+=====================
 Current Updates
-===============
+=====================
 
 GitHub
 ======
@@ -14,6 +14,6 @@ Twitter
 =======
 
 On Twitter, you can follow `@authorityspoke <https://twitter.com/authorityspoke>`_
-or its author Matt Carey `@mcareyaus <https://twitter.com/mcareyaus>`_ for project updates.
+or `@mcareyaus <https://twitter.com/mcareyaus>`_ for project updates.
 
 .. include:: ../../changelog.md
