@@ -8,7 +8,6 @@ import pathlib
 
 from typing import Any, Dict, List, Iterator, Optional, Tuple, Union
 
-from bs4 import BeautifulSoup
 from legislice.download import Client
 from legislice.name_index import EnactmentIndex
 
@@ -20,41 +19,6 @@ from authorityspoke.rules import Rule
 from authorityspoke.io import filepaths, readers
 from authorityspoke.io.name_index import Mentioned
 from authorityspoke.io.schemas import RawHolding, RawDecision
-
-
-def load_code(
-    filename: Optional[str] = None,
-    directory: Optional[pathlib.Path] = None,
-    filepath: Optional[pathlib.Path] = None,
-) -> BeautifulSoup:
-    r"""
-    Create an XML object from the path to an XML file.
-
-    Defers parsing of the XML until later, which makes "read" in the
-    function name misleading.
-
-    :param filename:
-        Name of the XML file representing the :class:`.Code`.
-        Ignored if filepath is given.
-
-    :param directory:
-        Directory where the XML file can be found.
-        Ignored if filepath is given.
-
-    :param filepath:
-        Complete path to the XML file representing the :class:`.Code`,
-        including filename.
-
-    :returns:
-        new :class:`.Code` object that can be used to parse the XML to
-        find text of :class:`.Enactment`\s.
-    """
-    validated_filepath = filepaths.make_filepath(
-        filename, directory, filepath, default_folder="codes"
-    )
-    with open(validated_filepath) as fp:
-        xml = BeautifulSoup(fp, "lxml-xml")
-    return xml
 
 
 def load_holdings(

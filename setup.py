@@ -18,9 +18,7 @@ setuptools.setup(
     install_requires=[
         "anchorpoint",
         "apispec",
-        "beautifulsoup4",
         "legislice",
-        "lxml",
         "marshmallow",
         "pint",
         "requests",

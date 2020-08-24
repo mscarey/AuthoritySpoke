@@ -10,7 +10,6 @@ from typing import NamedTuple
 from typing import Dict, List, Optional, Tuple, Type
 
 from anchorpoint.textselectors import TextQuoteSelector
-from bs4 import BeautifulSoup
 from legislice import Enactment
 from legislice.download import Client
 from legislice.name_index import EnactmentIndex, collect_enactments
@@ -100,30 +99,6 @@ def get_code_title(xml) -> str:
     if cfr_title:
         return f"Code of Federal Regulations Title {cfr_title.text}"
     raise NotImplementedError
-
-
-def has_uslm_schema(soup: BeautifulSoup) -> bool:
-    """Determine if the Code XML has the USLM schema."""
-    return soup.find(xmlns="http://xml.house.gov/schema/uslm/1.0")
-
-
-def read_code(xml: BeautifulSoup):
-    """Convert XML legislation file to AuthoritySpoke Code object."""
-    title = get_code_title(xml)
-    uri = get_code_uri(xml, title)
-    if uri.startswith("/us/const"):
-        code_class: Type = USConstCode
-    elif uri.startswith("/us/cfr"):
-        code_class = CFRCode
-    elif uri.startswith("/us/"):
-        code_class = USCCode
-    elif uri.startswith("/us-ca"):
-        code_class = CalCode
-    elif has_uslm_schema(xml):
-        code_class = USLMCode
-    else:
-        return Code(xml, title, uri)
-    return code_class(xml, title, uri)
 
 
 def read_enactment(record: RawEnactment, client: Optional[Client] = None) -> Enactment:

@@ -1,9 +1,6 @@
--e .
 anchorpoint>=0.4.0
 apispec[validation]
-beautifulsoup4>=4.8.1
--e git+https://github.com/mscarey/legislice.git#egg=legislice
-lxml
+legislice>=0.1.1
 marshmallow>=3.2.2
 pint>=0.9
 python-dotenv
