@@ -614,8 +614,7 @@ class TestExclusiveFlag:
 
     def test_holding_flagged_exclusive(
         self,
-        e_securing_for_authors,
-        e_right_to_writings,
+        e_securing_exclusive_right_to_writings,
         e_copyright_requires_originality,
         make_response,
     ):
@@ -627,6 +626,9 @@ class TestExclusiveFlag:
         was copyrightable" and the input "Rural's telephone
         directory was original", when that holding was marked
         "exclusive" in the JSON.
+
+        `originality_rule` will be a little broader because it's based on
+        less Enactment text
         """
         mock_client = JSONRepository(responses=make_response)
         to_read = load_holdings("holding_feist.json")
@@ -636,8 +638,7 @@ class TestExclusiveFlag:
         original = Fact(Predicate("{} was an original work"), directory)
         copyrightable = Fact(Predicate("{} was copyrightable"), directory)
         originality_enactments = [
-            e_securing_for_authors,
-            e_right_to_writings,
+            e_securing_exclusive_right_to_writings,
             e_copyright_requires_originality,
         ]
         originality_rule = Rule(
@@ -647,7 +648,7 @@ class TestExclusiveFlag:
             enactments=originality_enactments,
         )
         assert any(
-            feist_holding.rule.means(originality_rule)
+            originality_rule.implies(feist_holding.rule)
             for feist_holding in feist_holdings
         )
 

@@ -113,11 +113,11 @@ class TestCollectMentioned:
     def test_enactment_name_index(self):
         """
         Test error message:
-        'Name "securing for authors" not found in the index of mentioned Factors'
+        'Name "securing the right to writings" not found in the index of mentioned Factors'
         """
         feist_records = loaders.load_holdings("holding_feist.json")
         record, mentioned = name_index.index_names(feist_records)
-        assert "securing for authors" in mentioned
+        assert "securing the right to writings" in mentioned
 
     @pytest.mark.vcr
     def test_context_factor_not_collapsed(self):

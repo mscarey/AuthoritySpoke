@@ -763,12 +763,13 @@ def e_securing_for_authors(make_response):
 
 
 @pytest.fixture(scope="module")
-def e_securing(make_response):
+def e_securing_exclusive_right_to_writings(make_response):
     schema = EnactmentSchema()
     enactment = schema.load(make_response["/us/const/article/I/8/8"]["1788-09-13"])
     enactment.select(
         "To promote the Progress of Science and useful Arts, by securing for limited Times to Authors"
     )
+    enactment.select_more("the exclusive Right to their respective Writings")
     return enactment
 
 
