@@ -359,9 +359,12 @@ class Procedure(Factor):
 
         # For self to contradict other, some output of other
         # must be contradicted by some output of self.
+        seen_contexts = []
         for m in chain(implying_contexts, implied_contexts):
-            if self.outputs.contradicts(other.outputs, m):
-                yield m
+            if m not in seen_contexts:
+                seen_contexts.append(m)
+                if self.outputs.contradicts(other.outputs, m):
+                    yield m
 
     def _explain_implication_all_to_all_of_procedure(
         self, other: Procedure, context: ContextRegister

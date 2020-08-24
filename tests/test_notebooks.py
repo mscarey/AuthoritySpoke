@@ -170,3 +170,12 @@ class TestIntroduction:
         assert "it is false that <the Java API> was copyrightable" in str(new)
         assert "<the Java API> was an original work" in str(new)
 
+    def test_only_one_explanation_for_contradiction(self, make_opinion_with_holding):
+        lotus = make_opinion_with_holding["lotus_majority"]
+        oracle = make_opinion_with_holding["oracle_majority"]
+
+        gen = lotus.holdings[6].explanations_contradiction(oracle.holdings[10])
+        first_explanation = next(gen)
+
+        with pytest.raises(StopIteration):
+            second_explanation = next(gen)
