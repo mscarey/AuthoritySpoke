@@ -4,67 +4,98 @@ Creating Holding Data
 ======================================
 
 This tutorial will show how to create and load objects representing
-legal :class:`.Holding`\s in AuthoritySpoke.
+legal Holdings in AuthoritySpoke.
 
 To get ready, we need to repeat some setup steps we already saw in the
-``introduction`` notebook. First, import the package.
+``Introduction to AuthoritySpoke`` guide. First, import the package.
 
-.. code:: python
+.. code:: ipython3
 
     import authorityspoke
-    from authorityspoke.io.loaders import load_and_read_decision
+    from authorityspoke.io.downloads import download_case
+    from authorityspoke.io.loaders import load_decision
 
-A Holding is an :class:`.Opinion`\’s interpretation of the meaning of a
-provision of a legal :class:`.Code`\.
+Again, you have the choice of using either the real API clients or
+mockups that supply only the testing data for these examples.
 
-So we need to load some Opinions.
+.. code:: ipython3
 
-.. code:: python
+    USE_REAL_CASE_API = True
+    USE_REAL_LEGISLICE_API = True
 
-    oracle = load_and_read_decision("oracle_h.json").majority
-    lotus = load_and_read_decision("lotus_h.json").majority
+Next, we can download the judicial decisions we’re going to compare.
 
-And also load some legal Codes.
+.. code:: ipython3
 
-.. code:: python
+    import os
+    from dotenv import load_dotenv
+    load_dotenv()
 
-    from authorityspoke import Regime
+    if USE_REAL_CASE_API:
+        CAP_API_KEY = os.getenv('CAP_API_KEY')
 
-    from authorityspoke.io.loaders import load_and_read_code
+        oracle_download = download_case(
+        cite="750 F.3d 1339",
+        full_case=True,
+        api_key=CAP_API_KEY)
 
-    usa = Regime()
+        lotus_download = download_case(
+        cite="49 F.3d 807",
+        full_case=True,
+        api_key=CAP_API_KEY)
 
-    us_constitution = load_and_read_code("constitution.xml")
-    usc_title_17 = load_and_read_code("usc17.xml")
-    code_of_federal_regulations_title_37 = load_and_read_code("cfr37.xml")
+    else:
+        oracle_download = load_decision("oracle_h.json")
+        lotus_download = load_decision("lotus_h.json")
 
-    usa.set_code(us_constitution)
-    usa.set_code(usc_title_17)
-    usa.set_code(code_of_federal_regulations_title_37)
+Then we convert the JSON responses from the API into AuthoritySpoke
+``Opinion`` objects.
+
+.. code:: ipython3
+
+    from authorityspoke.io.readers import read_decision
+
+    oracle = read_decision(oracle_download).majority
+    lotus = read_decision(lotus_download).majority
+
+And we need a ``Client`` for accessing legislative provisions.
+
+.. code:: ipython3
+
+    from legislice.download import Client
+    from legislice.mock_clients import MOCK_USC_CLIENT
+
+    if USE_REAL_LEGISLICE_API:
+
+        LEGISLICE_API_TOKEN = os.getenv("LEGISLICE_API_TOKEN")
+        legis_client = Client(api_token=LEGISLICE_API_TOKEN)
+
+    else:
+        legis_client = MOCK_USC_CLIENT
 
 Loading Holdings from Existing JSON
 -----------------------------------
 
-Now we’re ready to look at the process of describing legal Holdings and
-loading that information into AuthoritySpoke. In version 0.3, although
-there’s not yet a web interface for loading this data, there is an
-interface for loading JSON files, and there’s an OpenAPI schema
-specification for the input data (see below).
+Now we’re ready to look at the process of describing legal
+``Holding``\ s and loading that information into AuthoritySpoke. In
+version 0.4, although there’s not yet a web interface for loading this
+data, there is an interface for loading JSON files, and there’s an
+OpenAPI schema specification for the input data (see below).
 
-Although there are several interfaces for loading Authorityspoke objects
-in the ``authorityspoke.io.loaders`` and ``authorityspoke.io.schemas``
-modules, the most useful way to load data is to create a JSON document
-that contains a list of objects, where each object represents one
-Holding representing a list of Holdings. Then you can load the Holdings
-into AuthoritySpoke objects using the
-:func:`.loaders.load_and_read_holdings` function.
+Although there are interfaces for loading Authorityspoke objects in the
+``authorityspoke.io.loaders`` and ``authorityspoke.io.schemas`` modules,
+the most useful way to load data is to create a JSON document that
+contains a list of objects, where each object represents one Holding
+representing a list of Holdings. Then you can load the Holdings into
+AuthoritySpoke objects using the ``loaders.load_and_read_holdings``
+function.
 
-.. code:: python
+.. code:: ipython3
 
     from authorityspoke.io.loaders import load_and_read_holdings
 
-    oracle_holdings = load_and_read_holdings("holding_oracle.json", regime=usa)
-    lotus_holdings = load_and_read_holdings("holding_lotus.json", regime=usa)
+    oracle_holdings = load_and_read_holdings("holding_oracle.json", client=legis_client)
+    lotus_holdings = load_and_read_holdings("holding_lotus.json", client=legis_client)
 
 If you want to open one of the input JSON files in your own text editor
 for comparison, you can find them in the folder
@@ -83,49 +114,51 @@ following sentence from the majority opinion:
    By statute, a work must be “original” to qualify for copyright
    protection. 17 U.S.C. § 102(a).
 
-The ``anchors`` field doesn’t do much yet in AuthoritySpoke version 0.3,
+The ``anchors`` field doesn’t do much yet in AuthoritySpoke version 0.4,
 but in future versions it’ll help link each Holding to the relevant
 parts of the Opinion.
 
 The Parts of a Holding in JSON
------------------------------------
+------------------------------
 
 Now let’s look at the part of ``holding_oracle.json`` representing that
 first holding.
 
-::
+.. code:: ipython3
 
-   "holdings": [
-       {
-           "inputs": {
-               "type": "fact",
-               "content": "{the Java API} was an original work",
-               "truth": false,
-               "anchors": "a work must be “original”"
-           },
-           "outputs": {
-               "type": "fact",
-               "content": "the Java API was copyrightable",
-               "truth": false,
-               "anchors": "must be “original” to qualify for |copyright protection.|"
-           },
-           "mandatory": true,
-           "enactments": {
-               "node": "/us/usc/t17/s102/a",
-               "exact": "Copyright protection subsists, in accordance with this title, in original works of authorship fixed in any tangible medium of expression, now known or later developed, from which they can be perceived, reproduced, or otherwise communicated, either directly or with the aid of a machine or device.",
-               "name": "copyright protection provision",
-               "anchors": "qualify for copyright protection. |17 U.S.C. § 102(a)|."
-           },
-           "anchors": "By statute, a work |must be “original” to qualify| for"
-       },
-       ]
+    from authorityspoke.io.loaders import load_holdings
+
+    holdings_to_read = load_holdings("holding_oracle.json")
+    holdings_to_read[0]
+
+
+
+
+.. parsed-literal::
+
+    {'inputs': {'type': 'fact',
+      'content': '{the Java API} was an original work',
+      'truth': False,
+      'anchors': 'a work must be “original”'},
+     'outputs': {'type': 'fact',
+      'content': 'the Java API was copyrightable',
+      'truth': False,
+      'anchors': 'must be “original” to qualify for |copyright protection.|'},
+     'mandatory': True,
+     'enactments': {'node': '/us/usc/t17/s102/a',
+      'exact': 'Copyright protection subsists, in accordance with this title, in original works of authorship fixed in any tangible medium of expression, now known or later developed, from which they can be perceived, reproduced, or otherwise communicated, either directly or with the aid of a machine or device.',
+      'name': 'copyright protection provision',
+      'anchors': 'qualify for copyright protection. |17 U.S.C. § 102(a)|.'},
+     'anchors': 'By statute, a work |must be “original” to qualify| for'}
+
+
 
 To compare the input data to the created Python objects, you can link
-the Holdings to the Opinions using the :meth:`~.Opinion.posit` method. As we look at
+the Holdings to the Opinions using the ``.posit`` method. As we look at
 the parts of the JSON file, the code cells will show how fields from the
 JSON affect the structure of the Holding object.
 
-.. code:: python
+.. code:: ipython3
 
     oracle.posit(oracle_holdings)
     lotus.posit(lotus_holdings)
@@ -142,11 +175,7 @@ JSON affect the structure of the Holding object.
         GIVEN:
           the Fact it is false that <the Java API> was an original work
         GIVEN the ENACTMENT:
-          "Copyright protection subsists, in accordance with this title, in
-          original works of authorship fixed in any tangible medium of
-          expression, now known or later developed, from which they can be
-          perceived, reproduced, or otherwise communicated, either directly or
-          with the aid of a machine or device." (Title 17, /us/usc/t17/s102/a)
+          "Copyright protection subsists, in accordance with this title, in original works of authorship fixed in any tangible medium of expression, now known or later developed, from which they can be perceived, reproduced, or otherwise communicated, either directly or with the aid of a machine or device.…" (/us/usc/t17/s102/a 2013-07-18)
 
 
 This Holding means that according to the cited enactment, if it’s false
@@ -163,7 +192,7 @@ prevent the rule from applying if they’re present. There can be more
 than one Factor in the “inputs”, “outputs” or “despite” categories, and
 if so they would be listed together in square brackets in the JSON.
 
-.. code:: python
+.. code:: ipython3
 
     print(oracle.holdings[0].inputs[0])
 
@@ -175,18 +204,17 @@ if so they would be listed together in square brackets in the JSON.
 
 The curly brackets around ``{the Java API}`` indicate that the parser
 should consider that phrase to be a reference to an Entity object, which
-becomes one of the input’s :meth:`~.Factor.context_factors`\.
-If such an object hasn’t been referenced before in the file,
-it will be created.
+becomes one of the input’s ``context_factors``. If such an object hasn’t
+been referenced before in the file, it will be created.
 
-.. code:: python
+.. code:: ipython3
 
     print(oracle.holdings[0].inputs[0].context_factors)
 
 
 .. parsed-literal::
 
-    (Entity(name='the Java API', generic=True, plural=False),)
+    (Entity(name='the Java API', generic=True, plural=False, anchors=[]),)
 
 
 The JSON representation of a Rule can also have “mandatory” and
@@ -195,7 +223,7 @@ as False. “universal” means that the Rule applies whenever its inputs
 are present. “mandatory” means that when Rule applies, the court has no
 discretion and must accept the outputs.
 
-.. code:: python
+.. code:: ipython3
 
     print(oracle.holdings[0].mandatory)
 
@@ -228,33 +256,29 @@ could have used the field:
 
    "text": "in accordance with this title, in|original works of authorship|fixed"
 
-.. code:: python
+.. code:: ipython3
 
     print(oracle.holdings[0].enactments[0])
 
 
 .. parsed-literal::
 
-    "Copyright protection subsists, in accordance with this title, in
-    original works of authorship fixed in any tangible medium of
-    expression, now known or later developed, from which they can be
-    perceived, reproduced, or otherwise communicated, either directly or
-    with the aid of a machine or device." (Title 17, /us/usc/t17/s102/a)
+    "Copyright protection subsists, in accordance with this title, in original works of authorship fixed in any tangible medium of expression, now known or later developed, from which they can be perceived, reproduced, or otherwise communicated, either directly or with the aid of a machine or device.…" (/us/usc/t17/s102/a 2013-07-18)
 
 
 The text selector in the example had just an ``exact`` field, with no
 ``prefix`` or ``suffix``.
 
-.. code:: python
+.. code:: ipython3
 
-    oracle.holdings[0].enactments[0].selector.prefix
+    oracle.holdings[0].enactments[0].selected_text()
 
 
 
 
 .. parsed-literal::
 
-    ''
+    'Copyright protection subsists, in accordance with this title, in original works of authorship fixed in any tangible medium of expression, now known or later developed, from which they can be perceived, reproduced, or otherwise communicated, either directly or with the aid of a machine or device.…'
 
 
 
@@ -268,63 +292,65 @@ containing lists of string indentifiers of Factors defined elsewhere.
 Enactment objects can be replaced the same way in the “enactments” and
 “enactments_despite” fields.
 
-.. code:: python
+.. code:: ipython3
 
-    print(oracle.holdings[0].enactments[0].name)
+    holdings_to_read[0]["enactments"]["name"]
+
+
 
 
 .. parsed-literal::
 
-    copyright protection provision
+    'copyright protection provision'
+
 
 
 In the second holding in the JSON file, you can see where the enactment
 is referenced by its name “copy protection provision” instead of being
 repeated in its entirety.
 
-::
+.. code:: ipython3
 
-       {
-           "inputs": [
-               {
-                   "type": "fact",
-                   "content": "the Java API was independently created by the author, as opposed to copied from other works",
-                   "anchors": "the work was independently created by the author (as opposed to copied from other works)"
-               },
-               {
-                   "type": "fact",
-                   "content": "the Java API possessed at least some minimal degree of creativity",
-                   "anchors": "it possesses at least some minimal degree of creativity."
-               }
-           ],
-           "outputs": {
-               "type": "fact",
-               "content": "the Java API was an original work",
-               "anchors": "Original, as the term is used in copyright"
-           },
-           "mandatory": true,
-           "universal": true,
-           "enactments": "copyright protection provision"
-       },
+    holdings_to_read[1]
+
+
+
+
+.. parsed-literal::
+
+    {'inputs': [{'type': 'fact',
+       'content': 'the Java API was independently created by the author, as opposed to copied from other works',
+       'anchors': 'the work was independently created by the author (as opposed to copied from other works)'},
+      {'type': 'fact',
+       'content': 'the Java API possessed at least some minimal degree of creativity',
+       'anchors': 'it possesses at least some minimal degree of creativity.'}],
+     'outputs': {'type': 'fact',
+      'content': 'the Java API was an original work',
+      'anchors': 'Original, as the term is used in copyright'},
+     'mandatory': True,
+     'universal': True,
+     'enactments': 'copyright protection provision'}
+
+
 
 There can also be an “enactments_despite” field, which identifies
 legislative text that doesn’t need to be present for the Rule to apply,
 but that also doesn’t negate the validity of the Rule.
 
 JSON API Specification
------------------------------------
+----------------------
 
-If you want to view the schema specification, you can view it by
-calling :func:`.io.api_spec.make_spec`\. When you read it,
-you might be surprised to see that every Holding object contains a Rule,
-and every :class:`.Rule` contains a :class:`.Procedure`\.
+If you want to view the schema specification, you can find it in the
+``io.api_spec`` module. When you read it, you might be surprised to see
+that every Holding object contains a Rule, and every Rule contains a
+Procedure.
 
 If you prefer, instead of nesting a Rule object and Procedure object
 inside the Holding object, AuthoritySpoke’s data loading library allows
 you to place all the properties of the Rule and the Procedure directly
 into the Holding object, as shown in the examples above.
 
-.. code:: python
+.. code:: ipython3
 
     from authorityspoke.io.api_spec import make_spec
 
@@ -343,6 +369,10 @@ into the Holding object, as shown in the examples above.
             absent:
               default: false
               type: boolean
+            anchors:
+              items:
+                $ref: '#/components/schemas/Selector'
+              type: array
             generic:
               default: false
               type: boolean
@@ -363,21 +393,45 @@ into the Holding object, as shown in the examples above.
           type: object
         Enactment:
           properties:
-            name:
+            anchors:
+              items:
+                $ref: '#/components/schemas/Selector'
+              type: array
+            children:
+              items:
+                $ref: '#/components/schemas/Enactment'
+              type: array
+            content:
+              type: string
+            end_date:
               default: null
+              format: date
               nullable: true
               type: string
-            selector:
-              allOf:
-              - $ref: '#/components/schemas/Selector'
-              default: null
-              nullable: true
-            source:
+            heading:
+              type: string
+            node:
               format: url
               type: string
+            selection:
+              items:
+                $ref: '#/components/schemas/Selector'
+              type: array
+            start_date:
+              format: date
+              type: string
+          required:
+          - content
+          - heading
+          - node
+          - start_date
           type: object
         Entity:
           properties:
+            anchors:
+              items:
+                $ref: '#/components/schemas/Selector'
+              type: array
             generic:
               default: true
               type: boolean
@@ -393,6 +447,10 @@ into the Holding object, as shown in the examples above.
             absent:
               default: false
               type: boolean
+            anchors:
+              items:
+                $ref: '#/components/schemas/Selector'
+              type: array
             exhibit:
               allOf:
               - $ref: '#/components/schemas/Exhibit'
@@ -416,6 +474,10 @@ into the Holding object, as shown in the examples above.
             absent:
               default: false
               type: boolean
+            anchors:
+              items:
+                $ref: '#/components/schemas/Selector'
+              type: array
             form:
               default: null
               nullable: true
@@ -427,14 +489,14 @@ into the Holding object, as shown in the examples above.
               default: null
               nullable: true
               type: string
-            stated_by:
-              allOf:
-              - $ref: '#/components/schemas/Entity'
-              default: null
-              nullable: true
             statement:
               allOf:
               - $ref: '#/components/schemas/Fact'
+              default: null
+              nullable: true
+            statement_attribution:
+              allOf:
+              - $ref: '#/components/schemas/Entity'
               default: null
               nullable: true
           type: object
@@ -443,6 +505,10 @@ into the Holding object, as shown in the examples above.
             absent:
               default: false
               type: boolean
+            anchors:
+              items:
+                $ref: '#/components/schemas/Selector'
+              type: array
             context_factors:
               items:
                 $ref: '#/components/schemas/Factor'
@@ -472,6 +538,10 @@ into the Holding object, as shown in the examples above.
           - $ref: '#/components/schemas/Allegation'
         Holding:
           properties:
+            anchors:
+              items:
+                $ref: '#/components/schemas/Selector'
+              type: array
             decided:
               default: true
               type: boolean
@@ -492,6 +562,10 @@ into the Holding object, as shown in the examples above.
             absent:
               default: false
               type: boolean
+            anchors:
+              items:
+                $ref: '#/components/schemas/Selector'
+              type: array
             filer:
               allOf:
               - $ref: '#/components/schemas/Entity'
@@ -574,14 +648,29 @@ into the Holding object, as shown in the examples above.
           type: object
         Selector:
           properties:
+            end:
+              format: int32
+              type: integer
             exact:
-              default: ''
+              default: null
+              nullable: true
               type: string
+            include_end:
+              default: false
+              type: boolean
+            include_start:
+              default: true
+              type: boolean
             prefix:
-              default: ''
+              default: null
+              nullable: true
               type: string
+            start:
+              format: int32
+              type: integer
             suffix:
-              default: ''
+              default: null
+              nullable: true
               type: string
           type: object
     info:
@@ -591,69 +680,156 @@ into the Holding object, as shown in the examples above.
     openapi: 3.0.2
     paths: {}
 
+
+
 Exporting AuthoritySpoke Holdings back to JSON
 ----------------------------------------------
 
 Finally, if you want to convert an AuthoritySpoke object back to JSON or
-to a Python dictionary, you can do so with :func:`.io.dump.to_json` or
-:func:`.io.dump.to_dict`\. If you need to make some changes to an
-AuthoritySpoke object, one way to do
-so would be to convert it to JSON, edit the JSON, and then load it back
-into AuthoritySpoke. The JSON format is also easier to store and share
-over the web.
+to a Python dictionary, you can do so with the ``io.dump`` module. If
+you need to make some changes to AuthoritySpoke objects, one way to do
+so would be to convert them to JSON, edit the JSON, and then load them
+back into AuthoritySpoke. The JSON format is also easier to store and
+share over the web.
 
-.. code:: python
+.. code:: ipython3
 
     from authorityspoke.io import dump
 
     dump.to_dict(oracle.holdings[0])
 
 
+
+
 .. parsed-literal::
 
-    {'exclusive': False,
-     'rule': {'procedure': {'inputs': [{'absent': False,
-         'name': 'false the Java API was an original work',
-         'context_factors': [{'name': 'the Java API',
-           'generic': True,
-           'plural': False,
-           'type': 'Entity'}],
-         'predicate': {'truth': False,
-          'reciprocal': False,
-          'content': '{} was an original work',
-          'quantity': None,
-          'comparison': ''},
-         'generic': False,
-         'standard_of_proof': None,
-         'type': 'Fact'}],
-       'despite': [],
+    {'generic': False,
+     'exclusive': False,
+     'rule_valid': True,
+     'rule': {'universal': False,
+      'procedure': {'despite': [],
        'outputs': [{'absent': False,
-         'name': 'false the Java API was copyrightable',
-         'context_factors': [{'name': 'the Java API',
-           'generic': True,
+         'generic': False,
+         'predicate': {'quantity': None,
+          'comparison': '',
+          'content': '{} was copyrightable',
+          'reciprocal': False,
+          'truth': False},
+         'context_factors': [{'generic': True,
+           'name': 'the Java API',
+           'anchors': [],
            'plural': False,
            'type': 'Entity'}],
-         'predicate': {'truth': False,
-          'reciprocal': False,
-          'content': '{} was copyrightable',
-          'quantity': None,
-          'comparison': ''},
-         'generic': False,
+         'name': 'false the Java API was copyrightable',
          'standard_of_proof': None,
+         'anchors': [{'prefix': 'must be “original” to qualify for ',
+           'suffix': '',
+           'exact': 'copyright protection.'},
+          {'prefix': '',
+           'suffix': '',
+           'exact': 'whether the non-literal elements of a program “are protected'}],
+         'type': 'Fact'}],
+       'inputs': [{'absent': False,
+         'generic': False,
+         'predicate': {'quantity': None,
+          'comparison': '',
+          'content': '{} was an original work',
+          'reciprocal': False,
+          'truth': False},
+         'context_factors': [{'generic': True,
+           'name': 'the Java API',
+           'anchors': [],
+           'plural': False,
+           'type': 'Entity'}],
+         'name': 'false the Java API was an original work',
+         'standard_of_proof': None,
+         'anchors': [{'prefix': '',
+           'suffix': '',
+           'exact': 'a work must be “original”'}],
          'type': 'Fact'}]},
-      'name': None,
-      'enactments': [{'name': 'copyright protection provision',
-        'selector': {'prefix': '',
-         'suffix': '',
-         'exact': 'Copyright protection subsists, in accordance with this title, in original works of authorship fixed in any tangible medium of expression, now known or later developed, from which they can be perceived, reproduced, or otherwise communicated, either directly or with the aid of a machine or device.'},
-        'source': '/us/usc/t17/s102/a'}],
-      'mandatory': True,
-      'universal': False,
       'generic': False,
+      'enactments': [{'children': [{'children': [],
+          'node': '/us/usc/t17/s102/a/1',
+          'start_date': '2013-07-18',
+          'content': 'literary works;',
+          'selection': [],
+          'anchors': [],
+          'end_date': None,
+          'heading': ''},
+         {'children': [],
+          'node': '/us/usc/t17/s102/a/2',
+          'start_date': '2013-07-18',
+          'content': 'musical works, including any accompanying words;',
+          'selection': [],
+          'anchors': [],
+          'end_date': None,
+          'heading': ''},
+         {'children': [],
+          'node': '/us/usc/t17/s102/a/3',
+          'start_date': '2013-07-18',
+          'content': 'dramatic works, including any accompanying music;',
+          'selection': [],
+          'anchors': [],
+          'end_date': None,
+          'heading': ''},
+         {'children': [],
+          'node': '/us/usc/t17/s102/a/4',
+          'start_date': '2013-07-18',
+          'content': 'pantomimes and choreographic works;',
+          'selection': [],
+          'anchors': [],
+          'end_date': None,
+          'heading': ''},
+         {'children': [],
+          'node': '/us/usc/t17/s102/a/5',
+          'start_date': '2013-07-18',
+          'content': 'pictorial, graphic, and sculptural works;',
+          'selection': [],
+          'anchors': [],
+          'end_date': None,
+          'heading': ''},
+         {'children': [],
+          'node': '/us/usc/t17/s102/a/6',
+          'start_date': '2013-07-18',
+          'content': 'motion pictures and other audiovisual works;',
+          'selection': [],
+          'anchors': [],
+          'end_date': None,
+          'heading': ''},
+         {'children': [],
+          'node': '/us/usc/t17/s102/a/7',
+          'start_date': '2013-07-18',
+          'content': 'sound recordings; and',
+          'selection': [],
+          'anchors': [],
+          'end_date': None,
+          'heading': ''},
+         {'children': [],
+          'node': '/us/usc/t17/s102/a/8',
+          'start_date': '2013-07-18',
+          'content': 'architectural works.',
+          'selection': [],
+          'anchors': [],
+          'end_date': None,
+          'heading': ''}],
+        'node': '/us/usc/t17/s102/a',
+        'start_date': '2013-07-18',
+        'content': 'Copyright protection subsists, in accordance with this title, in original works of authorship fixed in any tangible medium of expression, now known or later developed, from which they can be perceived, reproduced, or otherwise communicated, either directly or with the aid of a machine or device. Works of authorship include the following categories:',
+        'selection': [{'end': 296,
+          'include_end': False,
+          'include_start': True,
+          'start': 0}],
+        'anchors': [{'prefix': 'qualify for copyright protection. ',
+          'suffix': '.',
+          'exact': '17 U.S.C. § 102(a)'}],
+        'end_date': None,
+        'heading': ''}],
+      'mandatory': True,
+      'name': None,
       'enactments_despite': []},
      'decided': True,
-     'generic': False,
-     'rule_valid': True}
-
+     'anchors': [{'prefix': 'By statute, a work ',
+       'suffix': ' for',
+       'exact': 'must be “original” to qualify'}]}
 
 
