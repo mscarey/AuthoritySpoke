@@ -185,3 +185,8 @@ class TestHoldingImplication:
         right = HoldingGroup([make_holding["h2"]])
         explanation = left.explain_implication(right)
         assert "implies" in str(explanation).lower()
+
+    def test_explain_group_implication(self, make_holding):
+        left = HoldingGroup([make_holding["h1"], make_holding["h2_ALL"]])
+        right = make_holding["h2"]
+        assert left.implies(right)

@@ -590,13 +590,6 @@ class HoldingGroup(ComparableGroup[H]):
                 operation=operator.ge, still_need_matches=list(other)
             )
 
-    def explanations_implies_holding(
-        self, other: Holding, context: Optional[ContextRegister] = None
-    ) -> Iterator[Explanation]:
-        for self_holding in self:
-            if self_holding.implies(other):
-                yield Explanation(matches=[(self_holding, other)])
-
     def verbose_comparison(
         self,
         operation: Callable,
