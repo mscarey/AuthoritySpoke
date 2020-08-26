@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 import pytest
 
 
@@ -43,6 +45,16 @@ class TestImplication:
     def test_opinion_implies_its_decision(self, make_decision_with_holding):
         cardenas = make_decision_with_holding["cardenas"]
         assert cardenas.implied_by(cardenas.majority)
+
+    def test_decision_implies_holding_and_rule(self, make_decision_with_holding):
+        """Adding a new input makes the new Holding less specific than the original one."""
+
+        oracle = make_decision_with_holding["oracle"]
+        holding = deepcopy(oracle.holdings[1])
+        new_inputs = holding.inputs + [oracle.holdings[0].inputs[0]]
+        holding.set_inputs(new_inputs)
+        assert oracle.implies(holding)
+        assert oracle.implies(holding.rule)
 
 
 class TestContradiction:

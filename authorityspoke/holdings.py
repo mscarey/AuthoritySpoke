@@ -22,7 +22,7 @@ from anchorpoint import TextQuoteSelector
 from authorityspoke.comparisons import Comparable, ContextRegister, contradicts
 from authorityspoke.explanations import Explanation
 from authorityspoke.factors import Factor, new_context_helper
-from authorityspoke.groups import ComparableGroup
+from authorityspoke.groups import ComparableGroup, FactorGroup
 from authorityspoke.formatting import indented, wrapped
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
@@ -475,6 +475,15 @@ class Holding(Factor):
             return HoldingGroup([self])
         holdings = [self.evolve("exclusive")] + self.inferred_from_exclusive
         return HoldingGroup(holdings)
+
+    def set_inputs(self, factors: Sequence[Factor]) -> None:
+        self.rule.procedure.inputs = FactorGroup(factors)
+
+    def set_despite(self, factors: Sequence[Factor]) -> None:
+        self.rule.procedure.despite = FactorGroup(factors)
+
+    def set_outputs(self, factors: Sequence[Factor]) -> None:
+        self.rule.procedure.outputs = FactorGroup(factors)
 
     def _union_if_not_exclusive(
         self, other: Holding, context: ContextRegister
