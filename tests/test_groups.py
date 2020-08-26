@@ -186,7 +186,12 @@ class TestHoldingImplication:
         explanation = left.explain_implication(right)
         assert "implies" in str(explanation).lower()
 
-    def test_explain_group_implication(self, make_holding):
+    def test_explain_implication_of_holding(self, make_holding):
         left = HoldingGroup([make_holding["h1"], make_holding["h2_ALL"]])
         right = make_holding["h2"]
+        assert left.implies(right)
+
+    def test_explain_implication_of_rule(self, make_holding, make_rule):
+        left = HoldingGroup([make_holding["h1"], make_holding["h2_ALL"]])
+        right = make_rule["h2"]
         assert left.implies(right)
