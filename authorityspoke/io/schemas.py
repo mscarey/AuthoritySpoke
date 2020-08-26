@@ -114,7 +114,7 @@ class OpinionSchema(ExpandableSchema):
 
 
 class DecisionSchema(ExpandableSchema):
-    """Schema for decisions retrieved from Case Access Project API."""
+    """Schema for decisions retrieved from Caselaw Access Project API."""
 
     __model__ = Decision
     name = fields.Str()

@@ -21,7 +21,7 @@ legislative enactments, and structured annotations of legal procedural
 rules.
 
 To help you obtain court opinions, AuthoritySpoke provides an interface
-to the `Case Access Project <https://case.law/>`__ API, a project of the
+to the `Caselaw Access Project <https://case.law/>`__ API, a project of the
 Harvard Law School Library Innovation Lab. You’ll need to `register for
 an API key <https://case.law/user/register/>`__.
 
@@ -33,7 +33,7 @@ provides access to recent versions of the United States Code, plus the
 United States Constitution. You’ll need to `sign
 up <https://authorityspoke.com/account/signup/>`__ for an account and
 then obtain a Legislice API key from your account page. The Legislice
-API key is not the same as the Case Access Project API key.
+API key is not the same as the Caselaw Access Project API key.
 
 As of version 0.4, you mostly have to create your own procedural rule
 annotations, but the `GitHub repository for
@@ -90,7 +90,7 @@ an API, be sure the ``USE_REAL_CASE_API`` variable is set to ``False``.
 --------------------------------------
 
 Now we need some court opinions to load into AuthoritySpoke. We’ll
-collect these from the Case Access Project API. To download full cases
+collect these from the Caselaw Access Project API. To download full cases
 from CAP, you’ll need to `register for an API
 key <https://case.law/user/register/>`__. However, if you set the
 ``USE_REAL_CASE_API`` variable to ``False``, then you don’t need an API

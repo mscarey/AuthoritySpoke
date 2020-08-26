@@ -18,7 +18,7 @@ def case_to_file(
 
     :param results:
         A dict representing a case, in the format
-        of the Case Access Project API.
+        of the Caselaw Access Project API.
 
     :param filename:
         Filename (not including the directory) for the
@@ -51,7 +51,7 @@ def cases_to_file(
 
     :param results:
         A list of dicts representing cases, in the format
-        of the Case Access Project API.
+        of the Caselaw Access Project API.
 
     :param filename:
         Filename (not including the directory) for the

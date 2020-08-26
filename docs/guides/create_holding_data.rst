@@ -1,13 +1,13 @@
 ..  _create_holding_data:
 
-Creating Holding Data
-======================================
+Creating Holding Data for AuthoritySpoke
+========================================
 
 This tutorial will show how to create and load objects representing
 legal Holdings in AuthoritySpoke.
 
 To get ready, we need to repeat some setup steps we already saw in the
-``Introduction to AuthoritySpoke`` guide. First, import the package.
+:ref:`introduction` guide. First, import the package.
 
 .. code:: ipython3
 
@@ -143,13 +143,13 @@ first holding.
      'outputs': {'type': 'fact',
       'content': 'the Java API was copyrightable',
       'truth': False,
-      'anchors': 'must be “original” to qualify for |copyright protection.|'},
+      'anchors': 'must be “original” to qualify for ``|copyright protection.|``'},
      'mandatory': True,
      'enactments': {'node': '/us/usc/t17/s102/a',
       'exact': 'Copyright protection subsists, in accordance with this title, in original works of authorship fixed in any tangible medium of expression, now known or later developed, from which they can be perceived, reproduced, or otherwise communicated, either directly or with the aid of a machine or device.',
       'name': 'copyright protection provision',
-      'anchors': 'qualify for copyright protection. |17 U.S.C. § 102(a)|.'},
-     'anchors': 'By statute, a work |must be “original” to qualify| for'}
+      'anchors': 'qualify for copyright protection. ``|17 U.S.C. § 102(a)|``.'},
+     'anchors': 'By statute, a work ``|must be “original” to qualify|`` for'}
 
 
 

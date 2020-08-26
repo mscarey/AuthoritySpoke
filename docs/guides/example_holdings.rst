@@ -3,7 +3,12 @@
 Example Holdings
 ======================================
 
-This Appendix will list all of the Holding objects in
+In :ref:`introduction` and :ref:`create_holding_data`, we
+practiced creating and exploring Python objects representing the
+holdings of the cases Lotus v. Borland and Oracle v. Google.
+
+This document is essentially an appendix to those two guides.
+It contains a list of all of the Holding objects in
 ``oracle.holdings`` and ``lotus.holdings``. Each ``Holding`` will be
 preceded by a passage from the ``Opinion`` that indicates the
 ``Opinion`` has endorsed the ``Holding``. In future versions,
@@ -12,9 +17,13 @@ in ``Opinion``\ s that provide support for each ``Holding``, but that’s
 currently not fully implemented.
 
 To find the full text of the opinions, look in the
-example_data/opinions/ folder. The text delivered by the CAP API was
-collected from print sources, so it will contain some Optical Character
-Recognition errors.
+`example_data/cases/ <https://github.com/mscarey/AuthoritySpoke/tree/master/example_data/cases>`__
+folder of the AuthoritySpoke git repo.
+The text delivered by the
+`Caselaw Access Project API <https://case.law/api/>`__ was
+collected from print sources, so it will contain some Optical
+Character Recognition errors.
+
 
 *Lotus v. Borland* 49 F.3d 807 (1995)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

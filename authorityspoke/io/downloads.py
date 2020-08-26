@@ -1,7 +1,7 @@
 """
 Downloading data that can be converted to authorityspoke objects.
 
-So far this only covers the Case Access Project API.
+So far this only covers the Caselaw Access Project API.
 """
 
 from typing import Any, Dict, List, Optional, Union
@@ -48,7 +48,7 @@ def download_case(
         provided.
 
     :param api_key:
-        a Case Access Project API key. Visit
+        a Caselaw Access Project API key. Visit
         https://case.law/user/register/ to obtain one. Not needed if you
         only want to download metadata about the opinion without the
         full text.
