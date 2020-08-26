@@ -1,11 +1,12 @@
 import setuptools
+import authorityspoke
 
 with open("readme.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
     name="AuthoritySpoke",
-    version="0.3.4",
+    version=authorityspoke.__version__,
     author="Matt Carey",
     author_email="matt@authorityspoke.com",
     description="tool for managing structured data about legal authority",
