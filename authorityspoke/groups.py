@@ -36,8 +36,17 @@ class ComparableGroup(Tuple[F, ...], Comparable):
             return super().__getitem__(key)
         return self.__class__(super().__getitem__(key))
 
+    def _must_contradict_one_factor(
+        self, other_factor: Comparable, context: ContextRegister
+    ) -> bool:
+        for self_factor in self:
+            if self_factor.contradicts(other_factor, context=context):
+                if self_factor.all_generic_factors_match(other_factor, context=context):
+                    return True
+        return False
+
     def consistent_with(
-        self, other: ComparableGroup, context: Optional[ContextRegister] = None,
+        self, other: Optional[Comparable], context: Optional[ContextRegister] = None,
     ) -> bool:
         r"""
         Find whether two sets of :class:`.Factor`\s can be consistent.
@@ -48,10 +57,7 @@ class ComparableGroup(Tuple[F, ...], Comparable):
         context assignments match between the contradictory
         :class:`.Factor`\s.
 
-        .. Note::
-            Does ``Factor: None`` in matches always mean that
-            the :class:`.Factor` can avoid being matched in a
-            contradictory way?
+        :param other:
 
         :param context:
             correspondences between :class:`Factor`s in self and other
@@ -65,16 +71,16 @@ class ComparableGroup(Tuple[F, ...], Comparable):
             :class:`.Factor`\s have already been assigned as
             described by ``matches``.
         """
+        if other is None:
+            return True
         if context is None:
             context = ContextRegister()
-        for self_factor in self:
+        if isinstance(other, ComparableGroup):
             for other_factor in other:
-                if self_factor.contradicts(other_factor, context=context):
-                    if self_factor.all_generic_factors_match(
-                        other_factor, context=context
-                    ):
-                        return False
-        return True
+                if self._must_contradict_one_factor(other_factor, context=context):
+                    return False
+            return True
+        return self._must_contradict_one_factor(other, context=context)
 
     def contradicts(
         self, other: ComparableGroup, context: Optional[ContextRegister] = None,
