@@ -645,6 +645,26 @@ class TestAddition:
     def test_add_disconnected_rules_returns_none(self, make_rule):
         assert make_rule["h1"] + make_rule["h2_ALL"] is None
 
+    def test_add_universal_to_universal(
+        self, make_factor, make_exhibit, make_complex_fact
+    ):
+        accept_relevance_testimony_ALL = Rule(
+            Procedure(
+                inputs=make_exhibit["relevant_murder_testimony"],
+                outputs=make_complex_fact["f_relevant_murder"],
+            ),
+            universal=True,
+        )
+        accept_murder_fact_ALL = Rule(
+            Procedure(
+                inputs=make_complex_fact["f_relevant_murder"],
+                outputs=make_factor["f_murder"],
+            ),
+            universal=True,
+        )
+        result = accept_relevance_testimony_ALL + accept_murder_fact_ALL
+        assert result.universal is True
+
     def test_rule_requiring_more_enactments_wont_add(
         self, e_due_process_5, make_complex_rule
     ):

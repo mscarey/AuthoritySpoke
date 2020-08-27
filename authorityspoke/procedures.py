@@ -241,7 +241,7 @@ class Procedure(Comparable):
         return [*self.outputs, *inputs, *despite]
 
     @property
-    def generic_factors_by_name(self) -> Dict[str, Factor]:
+    def generic_factors_by_name(self) -> Dict[str, Comparable]:
         r"""
         :class:`.Factor`\s that can be replaced without changing ``self``\s meaning.
 

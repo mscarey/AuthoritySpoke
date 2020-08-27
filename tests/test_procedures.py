@@ -1,3 +1,4 @@
+from copy import deepcopy
 import logging
 import pytest
 
@@ -251,6 +252,15 @@ class TestProcedureContradiction:
 
     def test_no_contradiction_of_other_type(self, make_procedure, watt_factor):
         assert not make_procedure["c1"].contradicts_some_to_all(watt_factor["f1"])
+
+    def test_contradiction_some_to_all(self, watt_factor):
+        within_curtilage = Procedure(
+            inputs=(watt_factor["f9"],), outputs=watt_factor["f10"],
+        )
+        not_within_curtilage = Procedure(
+            inputs=(watt_factor["f9"],), outputs=watt_factor["f10_false"],
+        )
+        assert not_within_curtilage.contradicts_some_to_all(within_curtilage)
 
 
 class TestProcedureUnion:
