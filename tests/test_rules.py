@@ -657,6 +657,10 @@ class TestAddition:
 
 
 class TestUnion:
+    def test_union_with_none(self, make_rule):
+        rule = make_rule["h2"]
+        assert rule | None == rule
+
     def test_union_contradictory_outputs(self, make_opinion_with_holding):
         """
         Test that even when two Rules don't contradict each other,
