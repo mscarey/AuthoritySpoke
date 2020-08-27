@@ -43,64 +43,6 @@ FACTOR_SUBCLASSES = {
 }
 
 
-def get_code_uri(xml, title: str) -> str:
-    """
-    Build a URI for the ``Code`` based on its XML metadata.
-
-    .. note::
-        This handles California state statutes only with a
-        mockup, which can only refer to the Penal and Evidence
-        Codes.
-
-    :returns:
-        The `United States Legislative Markup (USLM)
-        <https://github.com/usgpo/uslm>`_ identifier that
-        describes the document as a whole, if available in
-        the XML. Otherwise returns a pseudo-USLM identifier.
-    """
-    main_element = xml.find("main")
-    if main_element:
-        identifier = main_element.findChild()["identifier"]
-        return identifier
-    if title == "Constitution of the United States":
-        return "/us/const"
-    if title.startswith("Title"):
-        return xml.find("main").find("title")["identifier"]
-    if title.startswith("California"):
-        uri = "/us-ca/code"
-        if "Penal" in title:
-            return uri + "/pen"
-        else:
-            return uri + "/evid"
-    if title.startswith("Code of Federal Regulations"):
-        title_num = title.split()[-1]
-        return f"/us/cfr/t{title_num}"
-    raise NotImplementedError
-
-
-def get_code_title(xml) -> str:
-    r"""
-    Provide "title" identifier for the :class:`Code` XML.
-
-    :returns:
-        the contents of an XML ``title`` element that
-        describes the ``Code``, if any. Otherwise
-        returns a descriptive name that may not exactly
-        appear in the XML.
-    """
-    uslm_title = xml.find("title")
-    if uslm_title:
-        return uslm_title.text
-    cal_title = xml.h3
-    if cal_title:
-        code_name = cal_title.b.text.split(" - ")[0]
-        return f"California {code_name}"
-    cfr_title = xml.CFRGRANULE.FDSYS.CFRTITLE
-    if cfr_title:
-        return f"Code of Federal Regulations Title {cfr_title.text}"
-    raise NotImplementedError
-
-
 def read_enactment(record: RawEnactment, client: Optional[Client] = None) -> Enactment:
     r"""
     Create a new :class:`.Enactment` object using imported JSON data.

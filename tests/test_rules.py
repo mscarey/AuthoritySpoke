@@ -1,5 +1,4 @@
 from typing import Type
-from tests.conftest import make_procedure
 from authorityspoke.explanations import Explanation
 from authorityspoke.comparisons import ContextRegister, means
 import logging
@@ -664,6 +663,11 @@ class TestAddition:
         )
         result = accept_relevance_testimony_ALL + accept_murder_fact_ALL
         assert result.universal is True
+
+    def test_add_universal_to_universal_irrelevant(self, make_procedure):
+
+        result = make_procedure["c3"] + make_procedure["c2_irrelevant_inputs"]
+        assert result is None
 
     def test_rule_requiring_more_enactments_wont_add(
         self, e_due_process_5, make_complex_rule
