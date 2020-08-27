@@ -323,7 +323,7 @@ class TestImplication:
     def test_fact_implies_none(self, watt_factor):
         assert watt_factor["f1"].implies(None)
 
-    def test_fact_does_not_imply_rule(self, watt_factor, make_rule):
+    def test_no_implication_of_rule(self, watt_factor, make_rule):
         assert not watt_factor["f1"].implies(make_rule["h1"])
 
     def test_fact_does_not_imply_holding(self, watt_factor, make_holding):

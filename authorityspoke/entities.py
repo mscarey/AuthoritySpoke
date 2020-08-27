@@ -6,7 +6,8 @@ from typing import Iterator, List, Optional
 
 from anchorpoint import TextQuoteSelector
 
-from authorityspoke.factors import Factor, ContextRegister, new_context_helper
+from authorityspoke.comparisons import ContextRegister, new_context_helper
+from authorityspoke.factors import Factor
 
 
 @dataclass()

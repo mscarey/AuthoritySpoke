@@ -22,7 +22,7 @@ from authorityspoke.formatting import indented
 
 
 @dataclass()
-class Procedure(Factor):
+class Procedure(Comparable):
     r"""
     A (potential) rule for courts to use in resolving litigation.
 

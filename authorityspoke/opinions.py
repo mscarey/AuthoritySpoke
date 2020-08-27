@@ -7,7 +7,7 @@ Unlike most other ``authorityspoke`` classes, :class:`Opinion`\s are not frozen.
 from __future__ import annotations
 
 from collections import defaultdict
-from itertools import zip_longest
+from itertools import compress, zip_longest
 from typing import Dict, Iterable, Iterator, List, NamedTuple
 from typing import Optional, Sequence, Union
 
@@ -120,11 +120,19 @@ class Opinion(Comparable):
                         yield explanation
         elif hasattr(other, "explanations_contradiction"):
             yield from other.explanations_contradiction(self)
-        else:
-            raise TypeError(
-                f"'Contradicts' test not implemented for types "
-                + f"{self.__class__} and {other.__class__}."
+
+    def contradicts(self, other: Comparable) -> bool:
+        if isinstance(other, (Factor, Procedure)):
+            return False
+        elif isinstance(other, Comparable):
+            return any(
+                explanation is not None
+                for explanation in self.explanations_contradiction(other, context)
             )
+        raise TypeError(
+            f"'Contradicts' test not implemented for types "
+            + f"{self.__class__} and {other.__class__}."
+        )
 
     def implies(
         self, other: Optional[Comparable], context: Optional[ContextRegister] = None

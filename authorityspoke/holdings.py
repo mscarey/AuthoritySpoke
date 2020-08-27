@@ -29,7 +29,7 @@ from authorityspoke.rules import Rule
 
 
 @dataclass()
-class Holding(Factor):
+class Holding(Comparable):
     """
     An :class:`.Opinion`\'s announcement that it posits or rejects a legal :class:`.Rule`.
 

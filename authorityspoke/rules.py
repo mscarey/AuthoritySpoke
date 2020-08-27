@@ -7,20 +7,21 @@ may describe procedural moves available in litigation.
 
 from __future__ import annotations
 
-from typing import Any, ClassVar, Dict, Iterator
+from typing import Any, ClassVar, Dict, Iterator, Type
 from typing import List, Optional, Sequence, Tuple, Union
 
 from dataclasses import dataclass
 
 from legislice.enactments import Enactment, consolidate_enactments
 
+from authorityspoke.comparisons import Comparable
 from authorityspoke.factors import Factor, ContextRegister
 from authorityspoke.formatting import indented
 from authorityspoke.procedures import Procedure
 
 
 @dataclass()
-class Rule(Factor):
+class Rule(Comparable):
     r"""
     A statement of a legal doctrine about a :class:`.Procedure` for litigation.
 
@@ -274,6 +275,11 @@ class Rule(Factor):
         if context is None:
             context = ContextRegister()
 
+        if isinstance(other, (Factor, Procedure)):
+            raise TypeError(
+                f'"contradicts" test not supported between class {self.__class__} and class {other.__class__}.'
+            )
+
         if not isinstance(other, self.__class__):
             if hasattr(other, "contradicts"):
                 return other.contradicts(self, context=context.reversed())
@@ -398,6 +404,10 @@ class Rule(Factor):
             both are :class:`Rule`/s, and
             ``rule_valid`` and ``decided`` are ``True`` for both of them.
         """
+        if isinstance(other, (Factor, Procedure)):
+            raise TypeError(
+                f'"implies" test not supported between class {self.__class__} and class {other.__class__}.'
+            )
         if not isinstance(other, self.__class__):
             if hasattr(other, "implied_by"):
                 if context:

@@ -1,3 +1,5 @@
+from typing import Type
+from tests.conftest import make_procedure
 from authorityspoke.explanations import Explanation
 from authorityspoke.comparisons import ContextRegister, means
 import logging
@@ -175,6 +177,9 @@ class TestSameMeaning:
 
 
 class TestImplication:
+    def test_rule_does_not_imply_procedure(self, make_rule):
+        assert not make_rule["h1"].implies(make_rule["h1"].procedure)
+
     def test_holdings_more_inputs_implies_fewer(self, make_rule):
         assert make_rule["h1"] > make_rule["h1_easy"]
         assert make_rule["h2_irrelevant_inputs"] > make_rule["h2"]
@@ -471,8 +476,9 @@ class TestContradiction:
             make_holding["h2_ALL_MUST_output_false"]
         )
 
-    def test_no_contradiction_of_fact(self, make_rule, watt_factor):
-        assert not make_rule["h2_MUST"].contradicts(watt_factor["f2"])
+    def test_error_testing_contradiction_of_fact(self, make_rule, watt_factor):
+        with pytest.raises(TypeError):
+            make_rule["h2_MUST"].contradicts(watt_factor["f2"])
 
     def test_error_for_contradiction_of_predicate(self, make_rule, watt_factor):
         with pytest.raises(TypeError):

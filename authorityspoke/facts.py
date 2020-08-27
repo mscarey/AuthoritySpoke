@@ -7,8 +7,9 @@ from typing import ClassVar, Dict, Iterator, List, Optional, Sequence, Union
 
 from anchorpoint.textselectors import TextQuoteSelector
 
+from authorityspoke.comparisons import FactorSequence
 from authorityspoke.factors import new_context_helper
-from authorityspoke.factors import Factor, ContextRegister, FactorSequence
+from authorityspoke.factors import Factor, ContextRegister
 from authorityspoke.formatting import indented, wrapped
 from authorityspoke.predicates import Predicate
 
