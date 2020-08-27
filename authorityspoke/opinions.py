@@ -202,11 +202,7 @@ class Opinion(Comparable):
         r"""
         Search recursively  for :class:`.Factor` in holdings of self.
         """
-        for holding in self.holdings:
-            factor = holding.get_factor_by_str(query)
-            if factor is not None:
-                return factor
-        return None
+        return self.holdings.get_factor_by_str(query)
 
     def get_matching_holding(self, holding: Holding) -> Optional[Holding]:
         for known_holding in self.holdings:
