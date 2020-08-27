@@ -3,7 +3,6 @@ coveralls
 doc8
 flake8-comprehensions
 ipykernel
-jupyterlab
 mypy
 pipenv-to-requirements
 pydocstyle
