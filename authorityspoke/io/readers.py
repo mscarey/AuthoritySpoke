@@ -43,52 +43,6 @@ FACTOR_SUBCLASSES = {
 }
 
 
-def read_enactment(record: RawEnactment, client: Optional[Client] = None) -> Enactment:
-    r"""
-    Create a new :class:`.Enactment` object using imported JSON data.
-
-    :param record:
-        :class:`dict` with string fields from JSON for constructing
-        new :class:`.Enactment`
-
-    :param client:
-        Legislice client for downloading missing fields from `record`
-
-    :returns:
-        a new :class:`Enactment` object, optionally with text links.
-    """
-    if client is None:
-        client = Client()
-    return client.read_from_json(record)
-
-
-def read_enactments(
-    record: List[RawEnactment], client: Optional[Client] = None
-) -> List[Enactment]:
-    r"""
-    Create a new :class:`Enactment` object using imported JSON data.
-
-    The new :class:`Enactment` can be composed from a :class:`.Code`
-    referenced in the ``regime`` parameter.
-
-    :param record:
-        sequence of :class:`dict`\s with string fields from JSON for
-        constructing new :class:`.Enactment`\s
-
-    :param client:
-        Legislice client for downloading missing fields from `record`
-
-    :returns:
-        a list of new :class:`Enactment` objects, optionally with text links.
-    """
-    schema = schemas.EnactmentSchema(many=True)
-    record, enactment_index = collect_enactments(record)
-    if client:
-        enactment_index = client.update_entries_in_enactment_index(enactment_index)
-    schema.context["enactment_index"] = enactment_index
-    return schema.load(deepcopy(record))
-
-
 def read_fact(record: RawFactor) -> Fact:
     r"""
     Construct a :class:`Fact` after loading a dict from JSON.

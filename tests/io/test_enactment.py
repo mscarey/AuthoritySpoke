@@ -2,7 +2,7 @@ import os
 
 from dotenv import load_dotenv
 from legislice.download import Client
-from legislice.mock_clients import JSONRepository, MOCK_BEARD_ACT_CLIENT
+from legislice.mock_clients import MOCK_USC_CLIENT, MOCK_BEARD_ACT_CLIENT
 from legislice.schemas import EnactmentSchema
 import pytest
 
@@ -26,7 +26,7 @@ class TestEnactmentImport:
     }
 
     def test_enactment_from_dict(self):
-        enactment = readers.read_enactment(self.test_enactment)
+        enactment = MOCK_USC_CLIENT.read_from_json(self.test_enactment)
         assert "all relevant evidence is admissible" in enactment.text
 
     def test_enactment_with_anchor(self, make_response):
@@ -34,14 +34,13 @@ class TestEnactmentImport:
             "children"
         ][0]
         fourteenth_dp["exact"] = "nor shall any State deprive any person"
-        enactment = readers.read_enactment(fourteenth_dp)
+        enactment = MOCK_USC_CLIENT.read_from_json(fourteenth_dp)
 
         assert enactment.selected_text().startswith("…nor shall any State")
 
-    def test_enactment_import_from_dict(self, make_response):
+    def test_enactment_import_from_dict(self):
         holding_brad = load_holdings("holding_brad.json")
-        client = JSONRepository(responses=make_response)
-        holdings = readers.read_holdings(holding_brad, client=client)
+        holdings = readers.read_holdings(holding_brad, client=MOCK_USC_CLIENT)
         enactments = holdings[0].enactments
         assert enactments[0].selected_text().endswith("shall not be violated…")
 
@@ -49,14 +48,14 @@ class TestEnactmentImport:
         input_enactment = self.test_enactment.copy()
         input_enactment["selection"] = False
 
-        enactment = readers.read_enactment(input_enactment)
+        enactment = MOCK_USC_CLIENT.read_from_json(input_enactment)
         assert enactment.selected_text() == ""
 
     def test_true_as_selection(self):
         input_enactment = self.test_enactment.copy()
         input_enactment["selection"] = True
 
-        enactment = readers.read_enactment(input_enactment)
+        enactment = MOCK_USC_CLIENT.read_from_json(input_enactment)
         assert enactment.selected_text() == enactment.text
 
     def test_enactment_import_from_holding(self):
@@ -72,6 +71,6 @@ class TestEnactmentImport:
             "than 5 millimetres in length that: occurs on or below the chin"
         )
         record = {"node": "/test/acts/47/4", "exact": exact}
-
-        enactment = readers.read_enactment(record, client=MOCK_BEARD_ACT_CLIENT)
+        client = MOCK_BEARD_ACT_CLIENT
+        enactment = client.read_from_json(record)
         assert enactment.selected_text() == exact + "…"
