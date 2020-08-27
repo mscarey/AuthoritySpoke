@@ -405,9 +405,7 @@ class Rule(Comparable):
             ``rule_valid`` and ``decided`` are ``True`` for both of them.
         """
         if isinstance(other, (Factor, Procedure)):
-            raise TypeError(
-                f'"implies" test not supported between class {self.__class__} and class {other.__class__}.'
-            )
+            return False
         if not isinstance(other, self.__class__):
             if hasattr(other, "implied_by"):
                 if context:

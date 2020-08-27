@@ -22,6 +22,7 @@ from authorityspoke.comparisons import Comparable
 from authorityspoke.explanations import Explanation
 from authorityspoke.factors import Factor, ContextRegister, FactorIndex
 from authorityspoke.holdings import Holding, HoldingGroup
+from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
 
 
@@ -121,13 +122,15 @@ class Opinion(Comparable):
         elif hasattr(other, "explanations_contradiction"):
             yield from other.explanations_contradiction(self)
 
-    def contradicts(self, other: Comparable) -> bool:
+    def contradicts(
+        self, other: Comparable, context: Optional[ContextRegister] = None
+    ) -> bool:
         if isinstance(other, (Factor, Procedure)):
             return False
         elif isinstance(other, Comparable):
             return any(
                 explanation is not None
-                for explanation in self.explanations_contradiction(other, context)
+                for explanation in self.explanations_contradiction(other)
             )
         raise TypeError(
             f"'Contradicts' test not implemented for types "
