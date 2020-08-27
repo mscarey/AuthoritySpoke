@@ -23,7 +23,6 @@ from authorityspoke.comparisons import (
 )
 
 
-@dataclass(frozen=True, init=False)
 class Factor(Comparable):
     """
     Things relevant to a :class:`.Court`\'s application of a :class:`.Rule`.

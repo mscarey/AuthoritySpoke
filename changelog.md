@@ -1,5 +1,9 @@
 Changelog
 =========
+dev
+-----------
+- Remove `read_enactments` and `read_enactment`. Use Legislice's download client or schema instead.
+
 0.4.0 (2020-08-26)
 -----------
 - Create `ComparableGroup` class for unordered collections of `Factor`s
