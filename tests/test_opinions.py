@@ -1,6 +1,6 @@
+from authorityspoke.holdings import HoldingGroup
 import anchorpoint
 from authorityspoke.factors import FactorIndex
-from tests.conftest import make_opinion_with_holding, make_response
 import pytest
 
 from anchorpoint.textselectors import TextQuoteSelector
@@ -322,6 +322,12 @@ class TestImplication:
         watt.posit(make_holding["h2"])
         assert watt.implied_by(make_rule["h2_despite_due_process"])
         assert not watt.implies(make_rule["h2_despite_due_process"])
+
+    def test_opinion_implies_holding_group(self, make_opinion_with_holding):
+        watt = make_opinion_with_holding["watt_majority"]
+        holdings = watt.holdings[:2]
+        assert isinstance(holdings, HoldingGroup)
+        assert watt.implies(holdings)
 
 
 class TestContradiction:

@@ -131,6 +131,8 @@ class Opinion(Comparable):
     ) -> bool:
         if other is None:
             return True
+        if isinstance(other, HoldingGroup):
+            return self.implies_other_holdings(other)
         return any(self.explanations_implication(other))
 
     def explanations_implication(
@@ -145,6 +147,7 @@ class Opinion(Comparable):
                     other, context
                 ):
                     yield explanation
+
         elif isinstance(other, self.__class__):
             yield from self.holdings.explanations_implication(
                 other.holdings, context=context
