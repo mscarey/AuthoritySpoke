@@ -23,7 +23,7 @@ class CaseCitation:
 
 
 @dataclass
-class Decision:
+class Decision(Comparable):
     r"""
     A court decision to resolve a step in litigation.
 
