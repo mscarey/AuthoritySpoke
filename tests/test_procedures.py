@@ -361,5 +361,6 @@ class TestFactorGroups:
 class TestEvolve:
     def test_evolve_context_to_absent(self, make_procedure):
         procedure = make_procedure["c1"]
-        evolved = procedure.evolve("outputs")
+        evolved = deepcopy(procedure)
+        evolved.outputs[0].absent = True
         assert procedure.outputs[0].contradicts(evolved.outputs[0])

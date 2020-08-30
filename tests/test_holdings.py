@@ -1,3 +1,4 @@
+from copy import deepcopy
 import os
 
 import pytest
@@ -514,18 +515,23 @@ class TestUnion:
         assert isinstance(new_holding, Holding)
 
     def test_no_union_with_an_undecided_holding(self, make_holding):
-        left = make_holding["h1"].evolve("decided")
         right = make_holding["h1"]
+        left = deepcopy(right)
+        left.decided = False
         assert left | right is None
 
     def test_union_with_two_undecided_holdings(self, make_holding):
-        narrow_undecided = make_holding["h2_ALL_MUST"].evolve("decided")
-        broad_undecided = make_holding["h2"].evolve("decided")
+        narrow_undecided = make_holding["h2_ALL_MUST"]
+        narrow_undecided.decided = False
+        broad_undecided = make_holding["h2"]
+        broad_undecided.decided = False
         new = narrow_undecided | broad_undecided
         assert new == broad_undecided
         assert broad_undecided | narrow_undecided == broad_undecided
 
     def test_union_unrelated_undecided(self, make_holding):
-        left = make_holding["h1"].evolve("decided")
-        right = make_holding["h2"].evolve("decided")
+        left = make_holding["h1"]
+        left.decided = False
+        right = make_holding["h2"]
+        right.decided = False
         assert left | right is None

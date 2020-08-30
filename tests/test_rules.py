@@ -1,9 +1,10 @@
-from typing import Type
-from authorityspoke.explanations import Explanation
-from authorityspoke.comparisons import ContextRegister, means
+from copy import deepcopy
 import logging
 import os
+from typing import Type
 
+from authorityspoke.explanations import Explanation
+from authorityspoke.comparisons import ContextRegister, means
 
 from dotenv import load_dotenv
 from legislice.download import Client
@@ -795,8 +796,9 @@ class TestUnion:
         oracle = make_opinion_with_holding["oracle_majority"]
         # changing one of the Rules to universal because otherwise
         # nothing can be inferred by their union.
-        lotus_4 = lotus.holdings[2].rule.evolve("universal")
-        new = lotus_4 | oracle.holdings[2].rule
+        lotus_rule = deepcopy(lotus.holdings[2].rule)
+        lotus_rule.universal = True
+        new = lotus_rule | oracle.holdings[2].rule
         assert new.mandatory is False
         assert (
             "<the Lotus menu command hierarchy> was the expression of an idea"
