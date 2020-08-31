@@ -1,6 +1,7 @@
 r""":class:`Factor`\s, or inputs and outputs of legal :class:`.Rule`\s."""
 
 from __future__ import annotations
+from copy import deepcopy
 
 from dataclasses import dataclass, field
 
@@ -231,7 +232,9 @@ class Factor(Comparable):
 
         :returns: a new object changing ``generic`` to ``True``.
         """
-        return self.evolve({"generic": True})
+        result = deepcopy(self)
+        result.generic = True
+        return result
 
     def __str__(self):
         text = f"the {self.__class__.__name__}" + " {}"

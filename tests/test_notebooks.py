@@ -66,7 +66,7 @@ class TestIntroduction:
         assert lotus_majority.holdings[0].outputs[0].absent is False
         assert lotus_majority.holdings[1].outputs[0].absent is True
 
-    def test_evolve_rule_replacing_enactment(self, make_opinion_with_holding):
+    def test_change_rule_replacing_enactment(self, make_opinion_with_holding):
         oracle = make_opinion_with_holding["oracle_majority"]
 
         works_of_authorship_passage = (

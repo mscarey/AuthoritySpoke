@@ -9,6 +9,7 @@ should be considered undecided.
 """
 
 from __future__ import annotations
+from copy import deepcopy
 
 from itertools import chain
 import operator
@@ -155,7 +156,9 @@ class Holding(Comparable):
         new_rule = self.rule + other.rule
         if new_rule is None:
             return None
-        return self.evolve({"rule": self.rule + other.rule})
+        new_holding = deepcopy(self)
+        new_holding.rule = new_rule
+        return new_holding
 
     def add_holding(self, other: Holding) -> Optional[Holding]:
         """Show how first Holding triggers the second."""
@@ -179,7 +182,12 @@ class Holding(Comparable):
             other = Holding(rule=other)
         if isinstance(other, Holding):
             return self.add_holding(other)
-        return self.evolve({"rule": self.rule + other})
+        new_rule = self.rule + other
+        if new_rule is None:
+            return None
+        result = deepcopy(self)
+        result.rule = new_rule
+        return result
 
     def _explanations_contradiction_of_holding(
         self, other: Holding, context: ContextRegister
@@ -453,7 +461,10 @@ class Holding(Comparable):
 
     def negated(self):
         """Get new copy of ``self`` with an opposite value for ``rule_valid``."""
-        return self.evolve({"rule_valid": not self.rule_valid, "exclusive": False})
+        result = deepcopy(self)
+        result.rule_valid = not self.rule_valid
+        result.exclusive = False
+        return result
 
     @new_context_helper
     def new_context(self, changes: ContextRegister) -> Factor:
@@ -520,7 +531,10 @@ class Holding(Comparable):
         new_rule = self.rule.union(other.rule, context=context)
         if not new_rule:
             return None
-        return self.evolve({"rule": new_rule, "exclusive": False})
+        result = deepcopy(self)
+        result.rule = new_rule
+        result.exclusive = False
+        return result
 
     def _union_with_holding(
         self, other: Holding, context: ContextRegister
