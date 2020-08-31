@@ -1,5 +1,6 @@
 """Create models of assertions accepted as factual by courts."""
 
+from copy import deepcopy
 from dataclasses import dataclass, field
 import operator
 
@@ -250,13 +251,11 @@ class Fact(Factor):
         :returns:
             a version of ``self`` with the new context.
         """
-        return self.evolve(
-            {
-                "context_factors": tuple(
-                    factor.new_context(changes) for factor in self.context_factors
-                )
-            }
+        result = deepcopy(self)
+        result.context_factors = FactorSequence(
+            factor.new_context(changes) for factor in self.context_factors
         )
+        return result
 
 
 def build_fact(

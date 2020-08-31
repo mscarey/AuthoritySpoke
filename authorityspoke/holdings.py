@@ -485,7 +485,9 @@ class Holding(Comparable):
         r"""Yield all :class:`.Holding`\s with `exclusive is False` implied by self."""
         if not self.exclusive:
             return HoldingGroup([self])
-        holdings = [self.evolve("exclusive")] + self.inferred_from_exclusive
+        nonexclusive_holding = deepcopy(self)
+        nonexclusive_holding.exclusive = False
+        holdings = [nonexclusive_holding] + self.inferred_from_exclusive
         return HoldingGroup(holdings)
 
     def set_inputs(self, factors: Sequence[Factor]) -> None:
