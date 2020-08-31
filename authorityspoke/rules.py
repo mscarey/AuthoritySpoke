@@ -6,6 +6,7 @@ may describe procedural moves available in litigation.
 """
 
 from __future__ import annotations
+from copy import deepcopy
 
 from typing import Any, ClassVar, Dict, Iterator, Type
 from typing import List, Optional, Sequence, Tuple, Union
@@ -140,13 +141,11 @@ class Rule(Comparable):
             return None
 
         if new_procedure is not None:
-            return self.evolve(
-                {
-                    "procedure": new_procedure,
-                    "universal": min(self.universal, other.universal),
-                    "mandatory": min(self.mandatory, other.mandatory),
-                }
-            )
+            result = deepcopy(self)
+            result.procedure = new_procedure
+            result.universal = min(self.universal, other.universal)
+            result.mandatory = min(self.mandatory, other.mandatory)
+            return result
         return None
 
     def get_contrapositives(self) -> Iterator[Rule]:
@@ -187,19 +186,16 @@ class Rule(Comparable):
             )
 
         for input_factor in self.inputs:
-            new_procedure = self.procedure.evolve(
-                {
-                    "inputs": [input_factor.evolve("absent")],
-                    "outputs": [self.outputs[0].evolve({"absent": True})],
-                }
-            )
-            yield self.evolve(
-                {
-                    "mandatory": not self.mandatory,
-                    "universal": not self.universal,
-                    "procedure": new_procedure,
-                }
-            )
+            result = deepcopy(self)
+            next_input = deepcopy(input_factor)
+            next_input.absent = not next_input.absent
+            next_output = deepcopy(self.outputs[0])
+            next_output.absent = True
+            result.set_inputs(next_input)
+            result.set_outputs(next_output)
+            result.mandatory = not self.mandatory
+            result.universal = not self.universal
+            yield result
 
     @property
     def context_factors(self) -> Sequence[Sequence[Factor]]:
@@ -246,7 +242,13 @@ class Rule(Comparable):
 
         new_enactments = list(self.__dict__[role]) + [incoming]
         new_enactments = consolidate_enactments(new_enactments)
-        return self.evolve({role: new_enactments})
+        result = deepcopy(self)
+        if role == "enactments":
+            result.set_enactments(new_enactments)
+        elif role == "enactments_despite":
+            result.set_enactments_despite(new_enactments)
+
+        return result
 
     def add_factor(self, incoming: Factor, role: str = "inputs") -> Rule:
         """
