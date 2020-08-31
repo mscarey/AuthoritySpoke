@@ -117,24 +117,6 @@ class Procedure(Comparable):
             }
         return changes
 
-    def evolve(self, changes: Union[str, Sequence[str], Dict[str, Any]]) -> Procedure:
-        """
-        Make new object with attributes from ``self.__dict__``, replacing attributes as specified.
-
-        :param changes:
-            a :class:`dict` where the keys are names of attributes
-            of self, and the values are new values for those attributes
-
-        :returns:
-            a new object initialized with attributes from
-            ``self.__dict__``, except that any attributes named as keys in the
-            changes parameter are replaced by the corresponding value.
-        """
-        changes = self._make_dict_to_evolve(changes)
-        new_values = self._evolve_from_dict(changes)
-        new_values.pop("context_factor_names")
-        return self.__class__(**new_values)
-
     def _trigger_addition(self, other: Procedure, context: ContextRegister):
         """Add two Procedures, given that they have already been found to be addable."""
         triggered_procedure = other.new_context(context.reversed())

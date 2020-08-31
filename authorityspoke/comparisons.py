@@ -447,25 +447,6 @@ class Comparable(ABC):
             new_dict[key] = changes[key]
         return new_dict
 
-    def evolve(self, changes: Union[str, Sequence[str], Dict[str, Any]]) -> Comparable:
-        """
-        Make new object with attributes from ``self.__dict__``, replacing attributes as specified.
-
-        :param changes:
-            a :class:`dict` where the keys are names of attributes
-            of self, and the values are new values for those attributes, or
-            else an attribute name or :class:`list` of names that need to
-            have their values replaced with their boolean opposite.
-
-        :returns:
-            a new object initialized with attributes from
-            ``self.__dict__``, except that any attributes named as keys in the
-            changes parameter are replaced by the corresponding value.
-        """
-        changes = self._make_dict_to_evolve(changes)
-        new_values = self._evolve_from_dict(changes)
-        return self.__class__(**new_values)
-
     def means(
         self, other: Optional[Comparable], context: Optional[ContextRegister] = None
     ) -> bool:

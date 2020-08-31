@@ -411,26 +411,6 @@ class Holding(Comparable):
             ]
         return []
 
-    def evolve(self, changes: Union[str, Sequence[str], Dict[str, Any]]) -> Holding:
-        """
-        Make new object with attributes from ``self.__dict__``, replacing attributes as specified.
-
-        :param changes:
-            a :class:`dict` where the keys are names of attributes
-            of self, and the values are new values for those attributes, or
-            else an attribute name or :class:`list` of names that need to
-            have their values replaced with their boolean opposite.
-
-        :returns:
-            a new object initialized with attributes from
-            ``self.__dict__``, except that any attributes named as keys in the
-            changes parameter are replaced by the corresponding value.
-        """
-        changes = self._make_dict_to_evolve(changes)
-        changes = self._evolve_attribute(changes, "rule")
-        new_values = self._evolve_from_dict(changes)
-        return self.__class__(**new_values)
-
     def explanations_same_meaning(
         self, other: Factor, context: Optional[ContextRegister] = None
     ) -> Iterator[ContextRegister]:
