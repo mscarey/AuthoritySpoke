@@ -590,7 +590,7 @@ class TestTextAnchors:
         holdings_and_anchors = readers.read_holdings(raw)
         holdings_and_anchors_again = readers.read_holdings(raw)
         assert all(
-            left == right
+            left.means(right)
             for left, right in zip(holdings_and_anchors, holdings_and_anchors_again)
         )
 

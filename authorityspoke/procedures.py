@@ -10,10 +10,8 @@ from __future__ import annotations
 from itertools import chain
 import operator
 
-from typing import Any, Callable, ClassVar, Dict, Iterable, Iterator
+from typing import Any, Dict, Iterable, Iterator
 from typing import List, Optional, Sequence, Tuple, Union
-
-from dataclasses import dataclass
 
 from authorityspoke.comparisons import Comparable, ContextRegister
 from authorityspoke.factors import Factor, new_context_helper
@@ -21,7 +19,6 @@ from authorityspoke.groups import FactorGroup
 from authorityspoke.formatting import indented
 
 
-@dataclass()
 class Procedure(Comparable):
     r"""
     A (potential) rule for courts to use in resolving litigation.
@@ -70,28 +67,31 @@ class Procedure(Comparable):
         other :class:`Procedure`.
     """
 
-    outputs: FactorGroup
-    inputs: FactorGroup = FactorGroup()
-    despite: FactorGroup = FactorGroup()
-    name: Optional[str] = None
-    absent: bool = False
-    generic: bool = False
-    context_factor_names: ClassVar = ("outputs", "inputs", "despite")
+    def __init__(
+        self,
+        outputs: FactorGroup,
+        inputs: Optional[FactorGroup] = None,
+        despite: Optional[FactorGroup] = None,
+        name: str = "",
+        absent: bool = False,
+        generic: bool = False,
+    ):
+        self.outputs = FactorGroup(outputs)
+        self.inputs = FactorGroup(inputs) if inputs else FactorGroup()
+        self.despite = FactorGroup(despite) if despite else FactorGroup()
+        self.name = name
+        self.absent = absent
+        self.generic = generic
+        self.context_factor_names = ("outputs", "inputs", "despite")
 
-    def __post_init__(self):
-        outputs = FactorGroup(self.outputs)
-        inputs = FactorGroup(self.inputs)
-        despite = FactorGroup(self.despite)
-        groups = {"outputs": outputs, "inputs": inputs, "despite": despite}
-        for group in groups:
-            for factor_obj in groups[group]:
+        for group in (self.outputs, self.inputs, self.despite):
+            for factor_obj in group:
                 if not isinstance(factor_obj, Factor):
                     raise TypeError(
                         "Input, Output, and Despite groups must contain "
                         + "only subclasses of Factor, but "
                         + f"{factor_obj} was type {type(factor_obj)}"
                     )
-            object.__setattr__(self, group, groups[group])
 
     def _make_dict_to_evolve(
         self, changes: Union[str, Sequence[str], Dict[str, Any]]
@@ -131,6 +131,7 @@ class Procedure(Comparable):
         """
         changes = self._make_dict_to_evolve(changes)
         new_values = self._evolve_from_dict(changes)
+        new_values.pop("context_factor_names")
         return self.__class__(**new_values)
 
     def _trigger_addition(self, other: Procedure, context: ContextRegister):
@@ -607,6 +608,7 @@ class Procedure(Comparable):
             new_dict[name] = tuple(
                 factor.new_context(changes) for factor in new_dict[name]
             )
+        new_dict.pop("context_factor_names")
         return self.__class__(**new_dict)
 
     def set_inputs(self, factors: Sequence[Factor]) -> None:

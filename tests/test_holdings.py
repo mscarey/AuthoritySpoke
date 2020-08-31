@@ -450,7 +450,8 @@ class TestContradiction:
 class TestAddition:
     def test_adding_same_ALL_holdings_results_in_same(self, make_opinion_with_holding):
         brad = make_opinion_with_holding["brad_majority"]
-        assert brad.holdings[0] + brad.holdings[0] == brad.holdings[0]
+        new = brad.holdings[0] + brad.holdings[0]
+        assert new.means(brad.holdings[0])
 
     def test_adding_same_SOME_holdings_results_in_None(self, make_opinion_with_holding):
         watt = make_opinion_with_holding["watt_majority"]

@@ -557,9 +557,9 @@ class Holding(Comparable):
         when generating a new object.
         """
         attrs = self.__dict__.copy()
-        for group in Procedure.context_factor_names:
+        for group in self.procedure.context_factor_names:
             attrs.pop(group, None)
-        for group in Rule.enactment_attr_names:
+        for group in self.rule.enactment_attr_names:
             attrs.pop(group, None)
         attrs.pop("procedure", None)
         return attrs

@@ -168,7 +168,7 @@ class TestProcedureImplication:
 
     def test_procedure_implies_identical_procedure(self, make_procedure):
         assert make_procedure["c1"] >= make_procedure["c1_again"]
-        assert make_procedure["c1"] == make_procedure["c1_again"]
+        assert make_procedure["c1"].means(make_procedure["c1_again"])
 
     def test_procedure_implies_same_procedure_fewer_inputs(
         self, make_procedure, caplog
