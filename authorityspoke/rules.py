@@ -560,6 +560,27 @@ class Rule(Comparable):
             attrs.pop(group, None)
         return attrs
 
+    def set_inputs(self, factors: Sequence[Factor]) -> None:
+        self.procedure.set_inputs(factors)
+
+    def set_despite(self, factors: Sequence[Factor]) -> None:
+        self.procedure.set_despite(factors)
+
+    def set_outputs(self, factors: Sequence[Factor]) -> None:
+        self.procedure.set_outputs(factors)
+
+    def set_enactments(self, enactments: Sequence[Enactment]) -> None:
+        if isinstance(enactments, Enactment):
+            self.enactments = (enactments,)
+        else:
+            self.enactments = tuple(enactments)
+
+    def set_enactments_despite(self, enactments: Sequence[Enactment]) -> None:
+        if isinstance(enactments, Enactment):
+            self._enactments_despite = (enactments,)
+        else:
+            self._enactments_despite = tuple(enactments)
+
     def __str__(self):
         mandatory = "MUST" if self.mandatory else "MAY"
         universal = "ALWAYS" if self.universal else "SOMETIMES"

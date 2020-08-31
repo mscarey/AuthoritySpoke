@@ -18,6 +18,7 @@ from typing import Optional, Sequence, Tuple, TypeVar, Union
 from dataclasses import dataclass, field
 
 from anchorpoint import TextQuoteSelector
+from legislice.enactments import Enactment
 
 from authorityspoke.comparisons import Comparable, ContextRegister, contradicts
 from authorityspoke.explanations import Explanation
@@ -477,13 +478,19 @@ class Holding(Comparable):
         return HoldingGroup(holdings)
 
     def set_inputs(self, factors: Sequence[Factor]) -> None:
-        self.rule.procedure.inputs = FactorGroup(factors)
+        self.rule.set_inputs(factors)
 
     def set_despite(self, factors: Sequence[Factor]) -> None:
-        self.rule.procedure.despite = FactorGroup(factors)
+        self.rule.set_despite(factors)
 
     def set_outputs(self, factors: Sequence[Factor]) -> None:
-        self.rule.procedure.outputs = FactorGroup(factors)
+        self.rule.set_outputs(factors)
+
+    def set_enactments(self, enactments: Sequence[Enactment]) -> None:
+        self.rule.set_enactments(enactments)
+
+    def set_enactments_despite(self, enactments: Sequence[Enactment]) -> None:
+        self.rule.set_enactments_despite(enactments)
 
     def _union_if_not_exclusive(
         self, other: Holding, context: ContextRegister

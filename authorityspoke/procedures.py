@@ -609,6 +609,15 @@ class Procedure(Comparable):
             )
         return self.__class__(**new_dict)
 
+    def set_inputs(self, factors: Sequence[Factor]) -> None:
+        self.inputs = FactorGroup(factors)
+
+    def set_despite(self, factors: Sequence[Factor]) -> None:
+        self.despite = FactorGroup(factors)
+
+    def set_outputs(self, factors: Sequence[Factor]) -> None:
+        self.outputs = FactorGroup(factors)
+
     def triggers_next_procedure(
         self, other: Procedure, context: Optional[ContextRegister] = None
     ) -> Iterator[ContextRegister]:

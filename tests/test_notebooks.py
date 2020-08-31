@@ -2,12 +2,12 @@
 Tests of commands that appear in notebooks in
 the notebooks/ directory
 """
-
+from copy import deepcopy
 import os
 
 from anchorpoint.textselectors import TextQuoteSelector
 from dotenv import load_dotenv
-from legislice.mock_clients import JSONRepository
+from legislice.mock_clients import JSONRepository, MOCK_USC_CLIENT
 import pytest
 
 from authorityspoke import Enactment
@@ -66,25 +66,21 @@ class TestIntroduction:
         assert lotus_majority.holdings[0].outputs[0].absent is False
         assert lotus_majority.holdings[1].outputs[0].absent is True
 
-    def test_evolve_rule_replacing_enactment(
-        self, make_opinion_with_holding, make_response
-    ):
+    def test_evolve_rule_replacing_enactment(self, make_opinion_with_holding):
         oracle = make_opinion_with_holding["oracle_majority"]
-        usc = oracle.holdings[0].enactments[0].code
-        works_of_authorship_selector = TextQuoteSelector(
-            exact=(
-                "Copyright protection subsists, in accordance with this title,"
-                + " in original works of authorship"
-            )
+
+        works_of_authorship_passage = (
+            "Copyright protection subsists, in accordance with this title, "
+            + "in original works of authorship"
         )
-        client = JSONRepository(responses=make_response)
-        works_of_authorship_clause = client.read("/us/usc/t17/s102/a")
-        works_of_authorship_clause.select(works_of_authorship_selector)
-        rule_with_shorter_enactment = oracle.holdings[0].evolve(
-            {"enactments": works_of_authorship_clause}
-        )
-        assert rule_with_shorter_enactment >= oracle.holdings[0]
-        assert not oracle.holdings[0] >= rule_with_shorter_enactment
+
+        works_of_authorship_clause = MOCK_USC_CLIENT.read("/us/usc/t17/s102/a")
+        works_of_authorship_clause.select(works_of_authorship_passage)
+        holding_with_shorter_enactment = deepcopy(oracle.holdings[0])
+        holding_with_shorter_enactment.set_enactments(works_of_authorship_clause)
+
+        assert holding_with_shorter_enactment >= oracle.holdings[0]
+        assert not oracle.holdings[0] >= holding_with_shorter_enactment
 
     def test_opinion_contradiction(self, make_opinion_with_holding):
         oracle = make_opinion_with_holding["oracle_majority"]
