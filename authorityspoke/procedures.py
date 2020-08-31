@@ -94,29 +94,6 @@ class Procedure(Comparable):
                         + f"{factor_obj} was type {type(factor_obj)}"
                     )
 
-    def _make_dict_to_evolve(
-        self, changes: Union[str, Sequence[str], Dict[str, Any]]
-    ) -> Dict[str, Any]:
-        """
-        Translate shorthand input to the evolve method.
-
-        If "changes" is already a dict, it won't be changed.
-
-        :param changes:
-            either a dict of field names and replacements, or one or more strings as shorthand
-
-        :returns:
-            a dict of field names and replacements
-        """
-        if isinstance(changes, str):
-            changes = (changes,)
-        if not isinstance(changes, dict):
-            changes = {
-                key: [factor.evolve("absent") for factor in self.__dict__[key]]
-                for key in changes
-            }
-        return changes
-
     def _trigger_addition(self, other: Procedure, context: ContextRegister):
         """Add two Procedures, given that they have already been found to be addable."""
         triggered_procedure = other.new_context(context.reversed())

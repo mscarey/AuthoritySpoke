@@ -689,19 +689,18 @@ can be found in subsection 102(a).
 Now we can create a new ``Holding`` object that cites to our new
 ``Enactment`` object rather than the old one. This time, instead of
 using the ``new_context`` method to create a new ``Holding`` object,
-we’ll use the ``evolve`` method. With the ``evolve`` method, instead of
-specifying ``Factor``\ s that should be replaced wherever they’re found,
-we specify which attributes of the ``Holding`` object we want to
-replace, and then specify what we want to replace those attributes’ old
-values with. This returns a new ``Holding`` object and doesn’t change
-the existing ``Holding``.
+we’ll use Python's built-in deepcopy method. This method gives us an 
+identical copy of the Holding object that we can change without 
+changing the original. Then we can use the set_enactments method to 
+change what Enactment is cited by the new Holding.
 
 .. code:: ipython3
 
-    holding_with_shorter_enactment = oracle.holdings[0].evolve(
-                {"enactments": works_of_authorship_clause}
-            )
+    from copy import deepcopy
 
+    holding_with_shorter_enactment = deepcopy(oracle.holdings[0])
+    holding_with_shorter_enactment.set_enactments(works_of_authorship_clause)
+    
 .. code:: ipython3
 
     print(holding_with_shorter_enactment)
