@@ -6,6 +6,7 @@ or specify the :class:`.Enactment`\s that might require them.
 """
 
 from __future__ import annotations
+from copy import deepcopy
 
 from itertools import chain
 import operator
@@ -141,7 +142,9 @@ class Procedure(Comparable):
         unique_new_outputs = {}
         for key in new_outputs:
             unique_new_outputs[str(key)] = key
-        return self.evolve({"outputs": list(unique_new_outputs.values())})
+        result = deepcopy(self)
+        result.set_outputs(list(unique_new_outputs.values()))
+        return result
 
     def __add__(self, other: Procedure) -> Optional[Procedure]:
         """Show how first Procedure triggers the second if not both are universal."""
@@ -284,7 +287,14 @@ class Procedure(Comparable):
             raise ValueError(f"'role' must be one of {self.context_factor_names}")
         old_factors = self.__dict__.get(role) or []
         new_factors = list(old_factors) + [incoming]
-        return self.evolve({role: new_factors})
+        result = deepcopy(self)
+        if role == "inputs":
+            result.set_inputs(new_factors)
+        if role == "despite":
+            result.set_despite(new_factors)
+        if role == "outputs":
+            result.set_outputs(new_factors)
+        return result
 
     def contradicts(self, other, context: Optional[ContextRegister] = None) -> bool:
         r"""
