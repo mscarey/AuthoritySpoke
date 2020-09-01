@@ -20,10 +20,14 @@ AuthoritySpoke helps you work with three kinds of data: court opinions,
 legislative enactments, and structured annotations of legal procedural
 rules.
 
+
+0. Getting Example Data
+-----------------------
+
 To help you obtain court opinions, AuthoritySpoke provides an interface
-to the `Caselaw Access Project <https://case.law/>`__ API, a project of the
-Harvard Law School Library Innovation Lab. You’ll need to `register for
-an API key <https://case.law/user/register/>`__.
+to the `Caselaw Access Project <https://case.law/>`__ API, a project of
+the Harvard Law School Library Innovation Lab. You’ll need to `register
+for an API key <https://case.law/user/register/>`__.
 
 To provide you with legislation text, AuthoritySpoke imports the
 `Legislice <https://pypi.org/project/legislice/>`__ Python package,
@@ -36,10 +40,17 @@ then obtain a Legislice API key from your account page. The Legislice
 API key is not the same as the Caselaw Access Project API key.
 
 As of version 0.4, you mostly have to create your own procedural rule
-annotations, but the `GitHub repository for
-AuthoritySpoke <https://github.com/mscarey/AuthoritySpoke>`__ contains
-example annotations for several cases. Some of this example data is used
-below.
+annotations, but the ``example_data`` folder of the `GitHub repository
+for AuthoritySpoke <https://github.com/mscarey/AuthoritySpoke>`__
+contains example annotations for several cases. The rest of this
+tutorial depends on having access to the ``example_data`` folder, so if
+you’re running the tutorial code interactively, you’ll need to either
+clone the AuthoritySpoke repository to your computer and run the
+tutorial from there, or else run the tutorial from a cloud environment
+like
+`Binder <https://mybinder.org/v2/gh/mscarey/AuthoritySpoke/master>`__.
+If you’ve only installed AuthoritySpoke from ``pip``, you won’t have
+access to the example data files.
 
 1. Importing the Package
 ------------------------
@@ -70,11 +81,15 @@ environment. In that case, check the `Python
 documentation <https://docs.python.org/3/installing/index.html>`__ for
 help on installing modules.
 
-1.1 Skip the Downloads and Load Decisions from a File
------------------------------------------------------
+1.1 Optional: Skip the Downloads and Load Decisions from a File
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To use the cell below to access Opinion objects from a file rather than
-an API, be sure the ``USE_REAL_CASE_API`` variable is set to ``False``.
+To use the cell below to access ``Decision`` objects from a file rather
+than an API, be sure the ``USE_REAL_CASE_API`` variable is set to
+``False``. This should work if you’re running the tutorial in a notebook
+in a cloud environment like Binder, or if you’ve cloned AuthoritySpoke’s
+GitHub repository to your hard drive and you’re using ``jupyter`` to run
+the tutorial in from the ``notebooks`` folder of the repository.
 
 .. code:: ipython3
 
@@ -89,13 +104,11 @@ an API, be sure the ``USE_REAL_CASE_API`` variable is set to ``False``.
 2. Downloading and Importing Decisions
 --------------------------------------
 
-Now we need some court opinions to load into AuthoritySpoke. We’ll
-collect these from the Caselaw Access Project API. To download full cases
-from CAP, you’ll need to `register for an API
-key <https://case.law/user/register/>`__. However, if you set the
-``USE_REAL_CASE_API`` variable to ``False``, then you don’t need an API
-key because you loaded a copy of the files from the
-“example_data/opinions” folder of this repository.
+If you didn’t load court opinions from the GitHub repository as
+described in section 1.1, then you’ll be using the Caselaw Access
+Project (CAP) API to get court opinions to load into AuthoritySpoke. To
+download full cases from CAP, you’ll need to `register for a CAP API
+key <https://case.law/user/register/>`__.
 
 One good way to use an API key in a Jupyter Notebook or other Python
 working file is to save the API key in a file called ``.env``. The
@@ -140,8 +153,8 @@ with the Lotus case.
 
 If you already loaded ``Opinion``\ s from a file, running the cells
 below with ``USE_REAL_CASE_API`` set to True will attempt to overwrite
-them with data from the API. You should be able to use the rest of the
-notebook either way.
+them with data from the API. You should be able to run the rest of the
+tutorial code either way.
 
 .. code:: ipython3
 
@@ -689,9 +702,9 @@ can be found in subsection 102(a).
 Now we can create a new ``Holding`` object that cites to our new
 ``Enactment`` object rather than the old one. This time, instead of
 using the ``new_context`` method to create a new ``Holding`` object,
-we’ll use Python's built-in deepcopy method. This method gives us an 
-identical copy of the Holding object that we can change without 
-changing the original. Then we can use the set_enactments method to 
+we’ll use Python's built-in deepcopy method. This method gives us an
+identical copy of the Holding object that we can change without
+changing the original. Then we can use the set_enactments method to
 change what Enactment is cited by the new Holding.
 
 .. code:: ipython3
@@ -700,7 +713,7 @@ change what Enactment is cited by the new Holding.
 
     holding_with_shorter_enactment = deepcopy(oracle.holdings[0])
     holding_with_shorter_enactment.set_enactments(works_of_authorship_clause)
-    
+
 .. code:: ipython3
 
     print(holding_with_shorter_enactment)

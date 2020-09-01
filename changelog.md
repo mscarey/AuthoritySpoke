@@ -5,11 +5,11 @@ dev
 - Remove `read_enactments` and `read_enactment`. Use Legislice's download client or schema instead.
 
 0.4.0 (2020-08-26)
------------
-- Create `ComparableGroup` class for unordered collections of `Factor`s
-- Create `FactorSequence` class for ordered collections of `Factor`s
+----------------------
+- Create `ComparableGroup` class for unordered `Factor` collections
+- Create `FactorSequence` class for ordered `Factor` collections
 - Eliminate Analogy class, moving its methods to `FactorGroup` and `FactorSequence`
-- Add `Factor.consistent_with` method to search for available context causing two `Factor`s not to contradict
+- Add `Factor.consistent_with` method to search for available context avoiding contradiction
 - Add "or" operator for `FactorGroup`
 - Integrate Legislice API client for retrieving text from US Constitution and US Code
 - Remove functions for loading legislation text from XML files. Use API client instead.
