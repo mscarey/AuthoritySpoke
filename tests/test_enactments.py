@@ -257,7 +257,7 @@ class TestDump:
         d = dump.to_dict(e_securing_for_authors)
         start = d["selection"][0]["start"]
         end = d["selection"][0]["end"]
-        text_selection = d["content"][start:end]
+        text_selection = d["text_version"]["content"][start:end]
         assert "Science and useful Arts" in text_selection
 
     def test_dump_json(self):
@@ -324,7 +324,10 @@ class TestTextSelection:
     def test_exact_text_not_in_selection(self):
         with pytest.raises(TextSelectionError):
             _ = MOCK_USC_CLIENT.read_from_json(
-                {"node": "/us/const/amendment/XV/1", "exact": "due process",}
+                {
+                    "node": "/us/const/amendment/XV/1",
+                    "exact": "due process",
+                }
             )
 
     def test_multiple_non_Factor_selectors_for_Holding(self):

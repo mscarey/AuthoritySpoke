@@ -936,7 +936,7 @@ class TestStatuteRules:
     ):
         beard = Entity("a facial feature")
 
-        sec_4 = MOCK_BEARD_ACT_CLIENT.read(path="/test/acts/47/4/")
+        sec_4 = MOCK_BEARD_ACT_CLIENT.read("/test/acts/47/4/")
 
         hypothetical = Rule(
             procedure=Procedure(
