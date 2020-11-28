@@ -253,8 +253,10 @@ class TestEnactments:
 class TestDump:
     client = Client(api_token=TOKEN)
 
-    def test_dump_dict(self, e_securing_for_authors):
-        d = dump.to_dict(e_securing_for_authors)
+    @pytest.mark.vcr
+    def test_dump_dict(self):
+        enactment = self.client.read("/us/const/article/I/8/8")
+        d = dump.to_dict(enactment)
         start = d["selection"][0]["start"]
         end = d["selection"][0]["end"]
         text_selection = d["text_version"]["content"][start:end]

@@ -1,6 +1,6 @@
 anchorpoint>=0.4.2
 apispec[validation]
-legislice>=0.2.0
+legislice>=0.3.0
 marshmallow>=3.2.2
 pint>=0.15
 python-dotenv
