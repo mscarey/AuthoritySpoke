@@ -16,7 +16,7 @@ def download_enactment_from_client(
     """
     Download Enactment object from an API.
 
-    Allows either a real or fake client.
+    Allows either a real client or a fake testing client.
     """
     enactment = client.read(query=path, date=date)
     return enactment
