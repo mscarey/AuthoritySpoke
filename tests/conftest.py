@@ -690,7 +690,8 @@ def make_selector() -> Dict[str, TextQuoteSelector]:
 def make_response() -> Dict[str, Dict]:
     """Mock api responses"""
     this_directory = os.path.dirname(os.path.abspath(__file__))
-    responses_filepath = this_directory + "/mock_responses/usc.json"
+    parent_directory = os.path.dirname(this_directory)
+    responses_filepath = parent_directory + "/example_data/responses/usc.json"
     with open(responses_filepath, "r") as f:
         responses = json.load(f)
     return responses
@@ -705,7 +706,8 @@ def fake_usc_client(make_response) -> FakeClient:
 def beard_response() -> Dict[str, Dict]:
     """Mock api responses"""
     this_directory = os.path.dirname(os.path.abspath(__file__))
-    responses_filepath = this_directory + "/mock_responses/beard_act.json"
+    parent_directory = os.path.dirname(this_directory)
+    responses_filepath = parent_directory + "/example_data/responses/beard_act.json"
     with open(responses_filepath, "r") as f:
         responses = json.load(f)
     return responses
