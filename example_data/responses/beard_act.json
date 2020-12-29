@@ -260,146 +260,251 @@
             "parent": "https://authorityspoke.com/api/v1/test/acts/47/"
         }
     },
-    "/test/acts/47/8/1": {
+    "/test/acts/47/8": {
         "1935-04-01": {
             "heading": "Notice to remedy",
-            "content": "",
+            "start_date": "1935-04-01",
+            "node": "/test/acts/47/8",
+            "text_version": null,
+            "url": "https://authorityspoke.com/api/v1/test/acts/47/8@1935-04-01",
+            "end_date": null,
             "children": [
                 {
                     "heading": "",
-                    "content": "Where an officer of the Department of Beards, Australian Federal Police, state or territorial police, or military police of the Australian Defence Force finds a person to be wearing a beard within the territory of the Commonwealth of Australia, and that person fails or is unable to produce a beardcoin as proof of holding an exemption under section 6, that officer shall in the first instance issue such person a notice to remedy.",
-                    "children": [],
-                    "end_date": null,
-                    "node": "/test/acts/47/8/1",
                     "start_date": "1935-04-01",
-                    "url": "https://authorityspoke.com/api/v1/test/acts/47/8/1@1935-04-01"
+                    "node": "/test/acts/47/8/1",
+                    "text_version": {
+                        "id": 1142679,
+                        "url": "https://authorityspoke.com/api/v1/textversions/1142679/",
+                        "content": "Where an officer of the Department of Beards, Australian Federal Police, state or territorial police, or military police of the Australian Defence Force finds a person to be wearing a beard within the territory of the Commonwealth of Australia, and that person fails or is unable to produce a beardcoin as proof of holding an exemption under section 6, that officer shall in the first instance issue such person a notice to remedy."
+                    },
+                    "url": "https://authorityspoke.com/api/v1/test/acts/47/8/1@1935-04-01",
+                    "end_date": null,
+                    "children": [],
+                    "citations": [
+                        {
+                            "target_uri": "/test/acts/47/6",
+                            "target_url": "https://authorityspoke.com/api/v1/test/acts/47/6@1935-04-01",
+                            "target_node": 1386965,
+                            "reference_text": "section 6"
+                        }
+                    ]
                 },
                 {
                     "heading": "",
-                    "content": "Any such person issued a notice to remedy under subsection 1 must either:",
+                    "start_date": "1935-04-01",
+                    "node": "/test/acts/47/8/2",
+                    "text_version": {
+                        "id": 1142683,
+                        "url": "https://authorityspoke.com/api/v1/textversions/1142683/",
+                        "content": "Any such person issued a notice to remedy under subsection 1 must either:"
+                    },
+                    "url": "https://authorityspoke.com/api/v1/test/acts/47/8/2@1935-04-01",
+                    "end_date": null,
                     "children": [
                         {
                             "heading": "",
-                            "content": "shave in such a way that they are no longer in breach of section 5, or",
-                            "children": [],
-                            "end_date": null,
+                            "start_date": "1935-04-01",
                             "node": "/test/acts/47/8/2/a",
-                            "start_date": "1935-04-01",
-                            "url": "https://authorityspoke.com/api/v1/test/acts/47/8/2/a@1935-04-01"
+                            "text_version": {
+                                "id": 1142680,
+                                "url": "https://authorityspoke.com/api/v1/textversions/1142680/",
+                                "content": "shave in such a way that they are no longer in breach of section 5, or"
+                            },
+                            "url": "https://authorityspoke.com/api/v1/test/acts/47/8/2/a@1935-04-01",
+                            "end_date": null,
+                            "children": [],
+                            "citations": [
+                                {
+                                    "target_uri": "/test/acts/47/5",
+                                    "target_url": "https://authorityspoke.com/api/v1/test/acts/47/5@1935-04-01",
+                                    "target_node": 1386964,
+                                    "reference_text": "section 5"
+                                }
+                            ]
                         },
                         {
                             "heading": "",
-                            "content": "obtain a beardcoin from the Department of Beards",
-                            "children": [],
-                            "end_date": "2013-07-18",
+                            "start_date": "1935-04-01",
                             "node": "/test/acts/47/8/2/b",
-                            "start_date": "1935-04-01",
-                            "url": "https://authorityspoke.com/api/v1/test/acts/47/8/2/b@1935-04-01"
+                            "text_version": {
+                                "id": 1142681,
+                                "url": "https://authorityspoke.com/api/v1/textversions/1142681/",
+                                "content": "obtain a beardcoin from the Department of Beards"
+                            },
+                            "url": "https://authorityspoke.com/api/v1/test/acts/47/8/2/b@1935-04-01",
+                            "end_date": "2013-07-18",
+                            "children": [],
+                            "citations": []
                         },
                         {
                             "heading": "",
-                            "content": "within 14 days of such notice being issued to them.",
-                            "children": [],
-                            "end_date": "2013-07-18",
-                            "node": "/test/acts/47/8/2/b-con",
                             "start_date": "1935-04-01",
-                            "url": "https://authorityspoke.com/api/v1/test/acts/47/8/2/b-con@1935-04-01"
+                            "node": "/test/acts/47/8/2/b-con",
+                            "text_version": {
+                                "id": 1142682,
+                                "url": "https://authorityspoke.com/api/v1/textversions/1142682/",
+                                "content": "within 14 days of such notice being issued to them."
+                            },
+                            "url": "https://authorityspoke.com/api/v1/test/acts/47/8/2/b-con@1935-04-01",
+                            "end_date": "2013-07-18",
+                            "children": [],
+                            "citations": []
                         }
                     ],
-                    "end_date": null,
-                    "node": "/test/acts/47/8/2",
-                    "start_date": "1935-04-01",
-                    "url": "https://authorityspoke.com/api/v1/test/acts/47/8/2@1935-04-01"
+                    "citations": [
+                        {
+                            "target_uri": "/test/acts/47/8/1",
+                            "target_url": "https://authorityspoke.com/api/v1/test/acts/47/8/1@1935-04-01",
+                            "target_node": 1386980,
+                            "reference_text": "subsection 1"
+                        }
+                    ]
                 }
             ],
-            "end_date": null,
-            "node": "/test/acts/47/8",
-            "start_date": "1935-04-01",
-            "url": "https://authorityspoke.com/api/v1/test/acts/47/8@1935-04-01",
+            "citations": [],
             "parent": "https://authorityspoke.com/api/v1/test/acts/47@1935-04-01"
         },
         "2013-07-18": {
             "heading": "Notice to remedy",
-            "content": "",
+            "start_date": "1935-04-01",
+            "node": "/test/acts/47/8",
+            "text_version": null,
+            "url": "https://authorityspoke.com/api/v1/test/acts/47/8/",
+            "end_date": null,
             "children": [
                 {
                     "heading": "",
-                    "content": "Where an officer of the Department of Beards, Australian Federal Police, state or territorial police, or military police of the Australian Defence Force finds a person to be wearing a beard within the territory of the Commonwealth of Australia, and that person fails or is unable to produce a beardcoin as proof of holding an exemption under section 6, that officer shall in the first instance issue such person a notice to remedy.",
-                    "children": [],
-                    "end_date": null,
-                    "node": "/test/acts/47/8/1",
                     "start_date": "1935-04-01",
-                    "url": "https://authorityspoke.com/api/v1/test/acts/47/8/1/"
+                    "node": "/test/acts/47/8/1",
+                    "text_version": {
+                        "id": 1142679,
+                        "url": "https://authorityspoke.com/api/v1/textversions/1142679/",
+                        "content": "Where an officer of the Department of Beards, Australian Federal Police, state or territorial police, or military police of the Australian Defence Force finds a person to be wearing a beard within the territory of the Commonwealth of Australia, and that person fails or is unable to produce a beardcoin as proof of holding an exemption under section 6, that officer shall in the first instance issue such person a notice to remedy."
+                    },
+                    "url": "https://authorityspoke.com/api/v1/test/acts/47/8/1/",
+                    "end_date": null,
+                    "children": [],
+                    "citations": [
+                        {
+                            "target_uri": "/test/acts/47/6",
+                            "target_url": "https://authorityspoke.com/api/v1/test/acts/47/6/",
+                            "target_node": 1386965,
+                            "reference_text": "section 6"
+                        }
+                    ]
                 },
                 {
                     "heading": "",
-                    "content": "Any such person issued a notice to remedy under subsection 1 must either:",
+                    "start_date": "1935-04-01",
+                    "node": "/test/acts/47/8/2",
+                    "text_version": {
+                        "id": 1142683,
+                        "url": "https://authorityspoke.com/api/v1/textversions/1142683/",
+                        "content": "Any such person issued a notice to remedy under subsection 1 must either:"
+                    },
+                    "url": "https://authorityspoke.com/api/v1/test/acts/47/8/2/",
+                    "end_date": null,
                     "children": [
                         {
                             "heading": "",
-                            "content": "shave in such a way that they are no longer in breach of section 5, or",
-                            "children": [],
-                            "end_date": null,
-                            "node": "/test/acts/47/8/2/a",
                             "start_date": "1935-04-01",
-                            "url": "https://authorityspoke.com/api/v1/test/acts/47/8/2/a/"
+                            "node": "/test/acts/47/8/2/a",
+                            "text_version": {
+                                "id": 1142680,
+                                "url": "https://authorityspoke.com/api/v1/textversions/1142680/",
+                                "content": "shave in such a way that they are no longer in breach of section 5, or"
+                            },
+                            "url": "https://authorityspoke.com/api/v1/test/acts/47/8/2/a/",
+                            "end_date": null,
+                            "children": [],
+                            "citations": [
+                                {
+                                    "target_uri": "/test/acts/47/5",
+                                    "target_url": "https://authorityspoke.com/api/v1/test/acts/47/5/",
+                                    "target_node": 1386964,
+                                    "reference_text": "section 5"
+                                }
+                            ]
                         },
                         {
                             "heading": "",
-                            "content": "remove the beard with electrolysis, or",
-                            "children": [],
-                            "end_date": null,
+                            "start_date": "2013-07-18",
                             "node": "/test/acts/47/8/2/b",
-                            "start_date": "2013-07-18",
-                            "url": "https://authorityspoke.com/api/v1/test/acts/47/8/2/b/"
+                            "text_version": {
+                                "id": 1142702,
+                                "url": "https://authorityspoke.com/api/v1/textversions/1142702/",
+                                "content": "remove the beard with electrolysis, or"
+                            },
+                            "url": "https://authorityspoke.com/api/v1/test/acts/47/8/2/b/",
+                            "end_date": null,
+                            "children": [],
+                            "citations": []
                         },
                         {
                             "heading": "",
-                            "content": "",
-                            "children": [],
-                            "end_date": null,
+                            "start_date": "2013-07-18",
                             "node": "/test/acts/47/8/2/b-con",
-                            "start_date": "2013-07-18",
-                            "url": "https://authorityspoke.com/api/v1/test/acts/47/8/2/b-con/"
+                            "text_version": null,
+                            "url": "https://authorityspoke.com/api/v1/test/acts/47/8/2/b-con/",
+                            "end_date": null,
+                            "children": [],
+                            "citations": []
                         },
                         {
                             "heading": "",
-                            "content": "remove the beard with a laser, or",
-                            "children": [],
-                            "end_date": null,
+                            "start_date": "2013-07-18",
                             "node": "/test/acts/47/8/2/c",
-                            "start_date": "2013-07-18",
-                            "url": "https://authorityspoke.com/api/v1/test/acts/47/8/2/c/"
+                            "text_version": {
+                                "id": 1142703,
+                                "url": "https://authorityspoke.com/api/v1/textversions/1142703/",
+                                "content": "remove the beard with a laser, or"
+                            },
+                            "url": "https://authorityspoke.com/api/v1/test/acts/47/8/2/c/",
+                            "end_date": null,
+                            "children": [],
+                            "citations": []
                         },
                         {
                             "heading": "",
-                            "content": "obtain a beardcoin from the Department of Beards",
-                            "children": [],
-                            "end_date": null,
+                            "start_date": "2013-07-18",
                             "node": "/test/acts/47/8/2/d",
-                            "start_date": "2013-07-18",
-                            "url": "https://authorityspoke.com/api/v1/test/acts/47/8/2/d/"
+                            "text_version": {
+                                "id": 1142681,
+                                "url": "https://authorityspoke.com/api/v1/textversions/1142681/",
+                                "content": "obtain a beardcoin from the Department of Beards"
+                            },
+                            "url": "https://authorityspoke.com/api/v1/test/acts/47/8/2/d/",
+                            "end_date": null,
+                            "children": [],
+                            "citations": []
                         },
                         {
                             "heading": "",
-                            "content": "within 14 days of such notice being issued to them.",
-                            "children": [],
-                            "end_date": null,
-                            "node": "/test/acts/47/8/2/d-con",
                             "start_date": "2013-07-18",
-                            "url": "https://authorityspoke.com/api/v1/test/acts/47/8/2/d-con/"
+                            "node": "/test/acts/47/8/2/d-con",
+                            "text_version": {
+                                "id": 1142682,
+                                "url": "https://authorityspoke.com/api/v1/textversions/1142682/",
+                                "content": "within 14 days of such notice being issued to them."
+                            },
+                            "url": "https://authorityspoke.com/api/v1/test/acts/47/8/2/d-con/",
+                            "end_date": null,
+                            "children": [],
+                            "citations": []
                         }
                     ],
-                    "end_date": null,
-                    "node": "/test/acts/47/8/2",
-                    "start_date": "1935-04-01",
-                    "url": "https://authorityspoke.com/api/v1/test/acts/47/8/2/"
+                    "citations": [
+                        {
+                            "target_uri": "/test/acts/47/8/1",
+                            "target_url": "https://authorityspoke.com/api/v1/test/acts/47/8/1/",
+                            "target_node": 1386980,
+                            "reference_text": "subsection 1"
+                        }
+                    ]
                 }
             ],
-            "end_date": null,
-            "node": "/test/acts/47/8",
-            "start_date": "1935-04-01",
-            "url": "https://authorityspoke.com/api/v1/test/acts/47/8/",
+            "citations": [],
             "parent": "https://authorityspoke.com/api/v1/test/acts/47/"
         }
     },
@@ -476,77 +581,117 @@
     "/test/acts/47/11": {
         "1935-04-01": {
             "heading": "Licensed repurchasers of beardcoin",
-            "content": "The Department of Beards may issue licenses to such barbers, hairdressers or other male grooming professionals as they see fit to purchase a beardcoin from a customer whose beard they have removed, and to resell those beardcoins to the Department of Beards.",
-            "children": [],
-            "end_date": "2013-07-18",
-            "node": "/test/acts/47/11",
             "start_date": "1935-04-01",
+            "node": "/test/acts/47/11",
+            "text_version": {
+                "id": 1142692,
+                "url": "https://authorityspoke.com/api/v1/textversions/1142692/",
+                "content": "The Department of Beards may issue licenses to such barbers, hairdressers, or other male grooming professionals as they see fit to purchase a beardcoin from a customer whose beard they have removed, and to resell those beardcoins to the Department of Beards."
+            },
             "url": "https://authorityspoke.com/api/v1/test/acts/47/11@1935-04-01",
+            "end_date": "2013-07-18",
+            "children": [],
+            "citations": [],
             "parent": "https://authorityspoke.com/api/v1/test/acts/47@1935-04-01"
         },
         "2013-07-18": {
             "heading": "Licensed repurchasers of beardcoin",
-            "content": "The Department of Beards may issue licenses to such",
+            "start_date": "2013-07-18",
+            "node": "/test/acts/47/11",
+            "text_version": {
+                "id": 1142710,
+                "url": "https://authorityspoke.com/api/v1/textversions/1142710/",
+                "content": "The Department of Beards may issue licenses to such"
+            },
+            "url": "https://authorityspoke.com/api/v1/test/acts/47/11/",
+            "end_date": null,
             "children": [
                 {
                     "heading": "",
-                    "content": "barbers,",
-                    "children": [],
-                    "end_date": null,
+                    "start_date": "2013-07-18",
                     "node": "/test/acts/47/11/i",
-                    "start_date": "2013-07-18",
-                    "url": "https://authorityspoke.com/api/v1/test/acts/47/11/i/"
+                    "text_version": {
+                        "id": 1142704,
+                        "url": "https://authorityspoke.com/api/v1/textversions/1142704/",
+                        "content": "barbers,"
+                    },
+                    "url": "https://authorityspoke.com/api/v1/test/acts/47/11/i/",
+                    "end_date": null,
+                    "children": [],
+                    "citations": []
                 },
                 {
                     "heading": "",
-                    "content": "hairdressers, or",
-                    "children": [],
-                    "end_date": null,
+                    "start_date": "2013-07-18",
                     "node": "/test/acts/47/11/ii",
-                    "start_date": "2013-07-18",
-                    "url": "https://authorityspoke.com/api/v1/test/acts/47/11/ii/"
+                    "text_version": {
+                        "id": 1142705,
+                        "url": "https://authorityspoke.com/api/v1/textversions/1142705/",
+                        "content": "hairdressers, or"
+                    },
+                    "url": "https://authorityspoke.com/api/v1/test/acts/47/11/ii/",
+                    "end_date": null,
+                    "children": [],
+                    "citations": []
                 },
                 {
                     "heading": "",
-                    "content": "other male grooming professionals",
-                    "children": [],
-                    "end_date": null,
+                    "start_date": "2013-07-18",
                     "node": "/test/acts/47/11/iii",
-                    "start_date": "2013-07-18",
-                    "url": "https://authorityspoke.com/api/v1/test/acts/47/11/iii/"
+                    "text_version": {
+                        "id": 1142706,
+                        "url": "https://authorityspoke.com/api/v1/textversions/1142706/",
+                        "content": "other male grooming professionals"
+                    },
+                    "url": "https://authorityspoke.com/api/v1/test/acts/47/11/iii/",
+                    "end_date": null,
+                    "children": [],
+                    "citations": []
                 },
                 {
                     "heading": "",
-                    "content": "as they see fit to purchase a beardcoin from a customer",
-                    "children": [],
-                    "end_date": null,
+                    "start_date": "2013-07-18",
                     "node": "/test/acts/47/11/iii-con",
-                    "start_date": "2013-07-18",
-                    "url": "https://authorityspoke.com/api/v1/test/acts/47/11/iii-con/"
+                    "text_version": {
+                        "id": 1142707,
+                        "url": "https://authorityspoke.com/api/v1/textversions/1142707/",
+                        "content": "as they see fit to purchase a beardcoin from a customer"
+                    },
+                    "url": "https://authorityspoke.com/api/v1/test/acts/47/11/iii-con/",
+                    "end_date": null,
+                    "children": [],
+                    "citations": []
                 },
                 {
                     "heading": "",
-                    "content": "whose beard they have removed,",
-                    "children": [],
-                    "end_date": null,
+                    "start_date": "2013-07-18",
                     "node": "/test/acts/47/11/iv",
-                    "start_date": "2013-07-18",
-                    "url": "https://authorityspoke.com/api/v1/test/acts/47/11/iv/"
+                    "text_version": {
+                        "id": 1142708,
+                        "url": "https://authorityspoke.com/api/v1/textversions/1142708/",
+                        "content": "whose beard they have removed,"
+                    },
+                    "url": "https://authorityspoke.com/api/v1/test/acts/47/11/iv/",
+                    "end_date": null,
+                    "children": [],
+                    "citations": []
                 },
                 {
                     "heading": "",
-                    "content": "and to resell those beardcoins to the Department of Beards.",
-                    "children": [],
-                    "end_date": null,
-                    "node": "/test/acts/47/11/iv-con",
                     "start_date": "2013-07-18",
-                    "url": "https://authorityspoke.com/api/v1/test/acts/47/11/iv-con/"
+                    "node": "/test/acts/47/11/iv-con",
+                    "text_version": {
+                        "id": 1142709,
+                        "url": "https://authorityspoke.com/api/v1/textversions/1142709/",
+                        "content": "and to resell those beardcoins to the Department of Beards."
+                    },
+                    "url": "https://authorityspoke.com/api/v1/test/acts/47/11/iv-con/",
+                    "end_date": null,
+                    "children": [],
+                    "citations": []
                 }
             ],
-            "end_date": null,
-            "node": "/test/acts/47/11",
-            "start_date": "2013-07-18",
-            "url": "https://authorityspoke.com/api/v1/test/acts/47/11/",
+            "citations": [],
             "parent": "https://authorityspoke.com/api/v1/test/acts/47/"
         }
     },

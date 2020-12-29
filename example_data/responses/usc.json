@@ -127,85 +127,130 @@
     "/us/usc/t17/s102/a": {
         "2013-07-18": {
             "heading": "",
-            "content": "Copyright protection subsists, in accordance with this title, in original works of authorship fixed in any tangible medium of expression, now known or later developed, from which they can be perceived, reproduced, or otherwise communicated, either directly or with the aid of a machine or device. Works of authorship include the following categories:",
+            "start_date": "2013-07-18",
+            "node": "/us/usc/t17/s102/a",
+            "text_version": {
+                "id": 1030579,
+                "url": "https://authorityspoke.com/api/v1/textversions/1030579/",
+                "content": "Copyright protection subsists, in accordance with this title, in original works of authorship fixed in any tangible medium of expression, now known or later developed, from which they can be perceived, reproduced, or otherwise communicated, either directly or with the aid of a machine or device. Works of authorship include the following categories:"
+            },
+            "url": "https://authorityspoke.com/api/v1/us/usc/t17/s102/a/",
+            "end_date": null,
             "children": [
                 {
                     "heading": "",
-                    "content": "literary works;",
-                    "children": [],
-                    "end_date": null,
+                    "start_date": "2013-07-18",
                     "node": "/us/usc/t17/s102/a/1",
-                    "start_date": "2013-07-18",
-                    "url": "https://authorityspoke.com/api/v1/us/usc/t17/s102/a/1/"
+                    "text_version": {
+                        "id": 1030571,
+                        "url": "https://authorityspoke.com/api/v1/textversions/1030571/",
+                        "content": "literary works;"
+                    },
+                    "url": "https://authorityspoke.com/api/v1/us/usc/t17/s102/a/1/",
+                    "end_date": null,
+                    "children": [],
+                    "citations": []
                 },
                 {
                     "heading": "",
-                    "content": "musical works, including any accompanying words;",
-                    "children": [],
-                    "end_date": null,
+                    "start_date": "2013-07-18",
                     "node": "/us/usc/t17/s102/a/2",
-                    "start_date": "2013-07-18",
-                    "url": "https://authorityspoke.com/api/v1/us/usc/t17/s102/a/2/"
+                    "text_version": {
+                        "id": 1030572,
+                        "url": "https://authorityspoke.com/api/v1/textversions/1030572/",
+                        "content": "musical works, including any accompanying words;"
+                    },
+                    "url": "https://authorityspoke.com/api/v1/us/usc/t17/s102/a/2/",
+                    "end_date": null,
+                    "children": [],
+                    "citations": []
                 },
                 {
                     "heading": "",
-                    "content": "dramatic works, including any accompanying music;",
-                    "children": [],
-                    "end_date": null,
+                    "start_date": "2013-07-18",
                     "node": "/us/usc/t17/s102/a/3",
-                    "start_date": "2013-07-18",
-                    "url": "https://authorityspoke.com/api/v1/us/usc/t17/s102/a/3/"
+                    "text_version": {
+                        "id": 1030573,
+                        "url": "https://authorityspoke.com/api/v1/textversions/1030573/",
+                        "content": "dramatic works, including any accompanying music;"
+                    },
+                    "url": "https://authorityspoke.com/api/v1/us/usc/t17/s102/a/3/",
+                    "end_date": null,
+                    "children": [],
+                    "citations": []
                 },
                 {
                     "heading": "",
-                    "content": "pantomimes and choreographic works;",
-                    "children": [],
-                    "end_date": null,
+                    "start_date": "2013-07-18",
                     "node": "/us/usc/t17/s102/a/4",
-                    "start_date": "2013-07-18",
-                    "url": "https://authorityspoke.com/api/v1/us/usc/t17/s102/a/4/"
+                    "text_version": {
+                        "id": 1030574,
+                        "url": "https://authorityspoke.com/api/v1/textversions/1030574/",
+                        "content": "pantomimes and choreographic works;"
+                    },
+                    "url": "https://authorityspoke.com/api/v1/us/usc/t17/s102/a/4/",
+                    "end_date": null,
+                    "children": [],
+                    "citations": []
                 },
                 {
                     "heading": "",
-                    "content": "pictorial, graphic, and sculptural works;",
-                    "children": [],
-                    "end_date": null,
+                    "start_date": "2013-07-18",
                     "node": "/us/usc/t17/s102/a/5",
-                    "start_date": "2013-07-18",
-                    "url": "https://authorityspoke.com/api/v1/us/usc/t17/s102/a/5/"
+                    "text_version": {
+                        "id": 1030575,
+                        "url": "https://authorityspoke.com/api/v1/textversions/1030575/",
+                        "content": "pictorial, graphic, and sculptural works;"
+                    },
+                    "url": "https://authorityspoke.com/api/v1/us/usc/t17/s102/a/5/",
+                    "end_date": null,
+                    "children": [],
+                    "citations": []
                 },
                 {
                     "heading": "",
-                    "content": "motion pictures and other audiovisual works;",
-                    "children": [],
-                    "end_date": null,
+                    "start_date": "2013-07-18",
                     "node": "/us/usc/t17/s102/a/6",
-                    "start_date": "2013-07-18",
-                    "url": "https://authorityspoke.com/api/v1/us/usc/t17/s102/a/6/"
+                    "text_version": {
+                        "id": 1030576,
+                        "url": "https://authorityspoke.com/api/v1/textversions/1030576/",
+                        "content": "motion pictures and other audiovisual works;"
+                    },
+                    "url": "https://authorityspoke.com/api/v1/us/usc/t17/s102/a/6/",
+                    "end_date": null,
+                    "children": [],
+                    "citations": []
                 },
                 {
                     "heading": "",
-                    "content": "sound recordings; and",
-                    "children": [],
-                    "end_date": null,
+                    "start_date": "2013-07-18",
                     "node": "/us/usc/t17/s102/a/7",
-                    "start_date": "2013-07-18",
-                    "url": "https://authorityspoke.com/api/v1/us/usc/t17/s102/a/7/"
+                    "text_version": {
+                        "id": 1030577,
+                        "url": "https://authorityspoke.com/api/v1/textversions/1030577/",
+                        "content": "sound recordings; and"
+                    },
+                    "url": "https://authorityspoke.com/api/v1/us/usc/t17/s102/a/7/",
+                    "end_date": null,
+                    "children": [],
+                    "citations": []
                 },
                 {
                     "heading": "",
-                    "content": "architectural works.",
-                    "children": [],
-                    "end_date": null,
-                    "node": "/us/usc/t17/s102/a/8",
                     "start_date": "2013-07-18",
-                    "url": "https://authorityspoke.com/api/v1/us/usc/t17/s102/a/8/"
+                    "node": "/us/usc/t17/s102/a/8",
+                    "text_version": {
+                        "id": 1030578,
+                        "url": "https://authorityspoke.com/api/v1/textversions/1030578/",
+                        "content": "architectural works."
+                    },
+                    "url": "https://authorityspoke.com/api/v1/us/usc/t17/s102/a/8/",
+                    "end_date": null,
+                    "children": [],
+                    "citations": []
                 }
             ],
-            "end_date": null,
-            "node": "/us/usc/t17/s102/a",
-            "start_date": "2013-07-18",
-            "url": "https://authorityspoke.com/api/v1/us/usc/t17/s102/a/",
+            "citations": [],
             "parent": "https://authorityspoke.com/api/v1/us/usc/t17/s102/"
         }
     },
