@@ -9,11 +9,55 @@ interactions:
       Connection:
       - keep-alive
       User-Agent:
-      - python-requests/2.24.0
+      - python-requests/2.25.1
       authorization:
       - DUMMY
     method: GET
-    uri: https://authorityspoke.com/api/v1/test/acts
+    uri: https://authorityspoke.com/api/v1/test/acts/
+  response:
+    body:
+      string: '{"heading":"Acts of Australia","start_date":"1935-04-01","node":"/test/acts","text_version":null,"url":"https://authorityspoke.com/api/v1/test/acts/","end_date":null,"children":["https://authorityspoke.com/api/v1/test/acts/47/"],"citations":[],"parent":"https://authorityspoke.com/api/v1/test/"}'
+    headers:
+      Allow:
+      - GET, POST, PUT, PATCH, HEAD, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '295'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 29 Dec 2020 07:13:30 GMT
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - gunicorn/20.0.4
+      Vary:
+      - Accept, Cookie
+      Via:
+      - 1.1 vegur
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.25.1
+      authorization:
+      - DUMMY
+    method: GET
+    uri: https://authorityspoke.com/api/v1/coverage/test/acts
   response:
     body:
       string: ''
@@ -25,9 +69,11 @@ interactions:
       Content-Type:
       - text/html; charset=utf-8
       Date:
-      - Mon, 24 Aug 2020 10:26:32 GMT
+      - Tue, 29 Dec 2020 07:13:30 GMT
       Location:
-      - /api/v1/test/acts/
+      - /api/v1/coverage/test/acts/
+      Referrer-Policy:
+      - same-origin
       Server:
       - gunicorn/20.0.4
       Via:
@@ -47,25 +93,27 @@ interactions:
       Connection:
       - keep-alive
       User-Agent:
-      - python-requests/2.24.0
+      - python-requests/2.25.1
       authorization:
       - DUMMY
     method: GET
-    uri: https://authorityspoke.com/api/v1/test/acts/
+    uri: https://authorityspoke.com/api/v1/coverage/test/acts/
   response:
     body:
-      string: '{"heading":"Acts of Australia","content":"","children":["https://authorityspoke.com/api/v1/test/acts/47/"],"end_date":null,"node":"/test/acts","start_date":"1935-04-01","url":"https://authorityspoke.com/api/v1/test/acts/","parent":"https://authorityspoke.com/api/v1/test/"}'
+      string: '{"uri":"/test/acts","latest_heading":null,"first_published":"1935-04-01","earliest_in_db":"1935-04-01","latest_in_db":"2013-07-18"}'
     headers:
       Allow:
-      - GET, POST, HEAD, OPTIONS
+      - GET, HEAD, OPTIONS
       Connection:
       - keep-alive
       Content-Length:
-      - '273'
+      - '131'
       Content-Type:
       - application/json
       Date:
-      - Mon, 24 Aug 2020 10:26:32 GMT
+      - Tue, 29 Dec 2020 07:13:30 GMT
+      Referrer-Policy:
+      - same-origin
       Server:
       - gunicorn/20.0.4
       Vary:

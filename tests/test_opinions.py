@@ -4,7 +4,7 @@ from authorityspoke.factors import FactorIndex
 import pytest
 
 from anchorpoint.textselectors import TextQuoteSelector
-from legislice.mock_clients import JSONRepository
+from authorityspoke.io.fake_clients import FakeClient
 
 from authorityspoke.entities import Entity
 from authorityspoke.facts import Fact, Predicate
@@ -174,7 +174,7 @@ class TestOpinionHoldings:
     def test_new_context_creates_equal_rule(self, make_opinion, make_response):
         watt = make_opinion["watt_majority"]
         brad = make_opinion["brad_majority"]
-        client = JSONRepository(responses=make_response)
+        client = FakeClient(responses=make_response)
 
         watt.clear_holdings()
         watt_raw = loaders.load_holdings("holding_watt.json")
@@ -194,7 +194,7 @@ class TestOpinionHoldings:
         assert watt.holdings[-1].means(brad.holdings[0])
 
     def test_getting_factors_from_opinion(self, make_opinion, make_response):
-        client = JSONRepository(responses=make_response)
+        client = FakeClient(responses=make_response)
 
         watt = make_opinion["watt_majority"]
         watt.clear_holdings()
@@ -211,7 +211,7 @@ class TestOpinionHoldings:
         watt = make_opinion["watt_majority"]
         brad = make_opinion["brad_majority"]
 
-        client = JSONRepository(responses=make_response)
+        client = FakeClient(responses=make_response)
 
         watt.clear_holdings()
         watt_raw = loaders.load_holdings("holding_watt.json")
@@ -293,7 +293,7 @@ class TestImplication:
     def test_posit_list_of_holdings_and_imply(self, make_opinion, make_response):
         watt = make_opinion["watt_majority"]
         brad = make_opinion["brad_majority"]
-        client = JSONRepository(responses=make_response)
+        client = FakeClient(responses=make_response)
         some_rules_raw = loaders.load_holdings(filename="holding_watt.json")
         some_rules = readers.read_holdings(some_rules_raw, client=client)
         for case in (watt, brad):

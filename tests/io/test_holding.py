@@ -8,7 +8,7 @@ from anchorpoint.textselectors import TextQuoteSelector
 from dotenv import load_dotenv
 from legislice import Enactment
 from legislice.download import Client
-from legislice.mock_clients import JSONRepository, MOCK_USC_CLIENT
+from authorityspoke.io.fake_clients import FakeClient
 from legislice.name_index import collect_enactments
 
 from authorityspoke.entities import Entity
@@ -29,13 +29,13 @@ legislice_client = Client(api_token=TOKEN)
 
 
 class TestHoldingDump:
-    def test_dump_and_read_holding(self, make_holding):
+    def test_dump_and_read_holding(self, fake_usc_client, make_holding):
         holding = make_holding["h2"]
         dumped = dump.to_dict(holding)
         content = dumped["rule"]["procedure"]["inputs"][0]["predicate"]["content"]
         assert content == "{} was on the premises of {}"
 
-        loaded = readers.read_holding(dumped, client=MOCK_USC_CLIENT)
+        loaded = readers.read_holding(dumped, client=fake_usc_client)
         loaded_content = loaded.despite[0].predicate.content
         assert "the distance between {} and {} was" in loaded_content
 
@@ -170,7 +170,7 @@ class TestHoldingImport:
                 "anchors": "compilations of facts|generally are|",
             },
         ]
-        mock_client = JSONRepository(responses=make_response)
+        mock_client = FakeClient(responses=make_response)
         (
             feist_holdings,
             holding_anchors,
@@ -189,7 +189,7 @@ class TestHoldingImport:
         Test whether read_holdings mutates raw_holding and makes it
         impossible to get text anchors.
         """
-        mock_client = JSONRepository(responses=make_response)
+        mock_client = FakeClient(responses=make_response)
         raw_holdings = load_holdings(f"holding_oracle.json")
         oracle_holdings, mentioned, holding_anchors = readers.read_holdings_with_index(
             raw_holdings, client=mock_client
@@ -204,7 +204,7 @@ class TestHoldingImport:
         Test that Opinion.posit can take a HoldingsIndexed as the only argument.
         Trying to combine several tasks that normally happen together, into a single command.
         """
-        mock_client = JSONRepository(responses=make_response)
+        mock_client = FakeClient(responses=make_response)
         oracle = make_opinion["oracle_majority"]
         oracle_holdings_with_anchors = loaders.load_holdings_with_anchors(
             "holding_oracle.json", client=mock_client
@@ -244,7 +244,7 @@ class TestTextAnchors:
     def test_posit_one_holding_with_anchor(
         self, make_opinion, raw_holding, make_response
     ):
-        mock_client = JSONRepository(responses=make_response)
+        mock_client = FakeClient(responses=make_response)
         holding, mentioned, anchor_list = readers.read_holdings_with_index(
             raw_holding["bradley_house"], client=mock_client, many=False
         )
@@ -389,7 +389,7 @@ class TestTextAnchors:
         assert allegation.statement.context_factors[0].name == "defendant"
 
     def test_select_enactment_text_by_default(self, make_response):
-        mock_client = JSONRepository(responses=make_response)
+        mock_client = FakeClient(responses=make_response)
         holding_dict = {
             "outputs": [
                 {
@@ -403,13 +403,13 @@ class TestTextAnchors:
         assert holding.enactments[0].selected_text().startswith("In any judicial")
 
     def test_enactment_has_subsection(self, make_response):
-        mock_client = JSONRepository(responses=make_response)
+        mock_client = FakeClient(responses=make_response)
         to_read = load_holdings("holding_lotus.json")
         holdings = readers.read_holdings(to_read, client=mock_client)
         assert holdings[8].enactments[0].source.split("/")[-1] == "b"
 
     def test_enactment_text_limited_to_subsection(self, make_response):
-        mock_client = JSONRepository(responses=make_response)
+        mock_client = FakeClient(responses=make_response)
         to_read = load_holdings("holding_lotus.json")
         holdings = readers.read_holdings(to_read, client=mock_client)
         assert "architectural works" not in str(holdings[8].enactments[0])
@@ -430,13 +430,13 @@ class TestTextAnchors:
         Don't expect the holdings imported from the JSON to
         exactly match the holdings created for testing in conftest.
         """
-        mock_client = JSONRepository(responses=make_response)
+        mock_client = FakeClient(responses=make_response)
         to_read = load_holdings("holding_watt.json")
         holdings = readers.read_holdings(to_read, client=mock_client)
         assert holdings[0].enactments[0].means(holdings[1].enactments[0])
 
     def test_same_enactment_in_two_opinions(self, make_response):
-        mock_client = JSONRepository(responses=make_response)
+        mock_client = FakeClient(responses=make_response)
         to_read = load_holdings("holding_brad.json")
         brad_holdings = readers.read_holdings(to_read, client=mock_client)
 
@@ -454,14 +454,14 @@ class TestTextAnchors:
         for multiple Rules, instead of using the "name" field as a shortcut.
         This tests whether the loaded objects turn out equal.
         """
-        mock_client = JSONRepository(responses=make_response)
+        mock_client = FakeClient(responses=make_response)
         to_read = load_holdings("holding_brad.json")
         holdings = readers.read_holdings(to_read, client=mock_client)
         assert any(holdings[6].inputs[0] == x for x in holdings[5].inputs)
 
     def test_fact_from_loaded_holding(self, make_response):
         to_read = load_holdings("holding_watt.json")
-        mock_client = JSONRepository(responses=make_response)
+        mock_client = FakeClient(responses=make_response)
         holdings = readers.read_holdings(to_read, client=mock_client)
         new_fact = holdings[0].inputs[1]
         assert "lived at <Hideaway Lodge>" in str(new_fact)
@@ -469,13 +469,13 @@ class TestTextAnchors:
 
     def test_fact_with_quantity(self, make_response):
         to_read = load_holdings("holding_watt.json")
-        mock_client = JSONRepository(responses=make_response)
+        mock_client = FakeClient(responses=make_response)
         holdings = readers.read_holdings(to_read, client=mock_client)
         new_fact = holdings[1].inputs[3]
         assert "was no more than 35 foot" in str(new_fact)
 
     def test_use_int_not_pint_without_dimension(self, make_opinion, make_response):
-        mock_client = JSONRepository(responses=make_response)
+        mock_client = FakeClient(responses=make_response)
         brad = make_opinion["brad_majority"]
         to_read = load_holdings("holding_brad.json")
         holdings = readers.read_holdings(to_read, client=mock_client)
@@ -485,7 +485,7 @@ class TestTextAnchors:
         assert isinstance(expectation_not_reasonable.inputs[0].predicate.quantity, int)
 
     def test_opinion_posits_holding(self, make_opinion, make_response):
-        mock_client = JSONRepository(responses=make_response)
+        mock_client = FakeClient(responses=make_response)
         brad = make_opinion["brad_majority"]
         to_read = load_holdings("holding_brad.json")
         holdings = readers.read_holdings(to_read, client=mock_client)
@@ -499,7 +499,7 @@ class TestTextAnchors:
         Having the Watt case posit a holding from the Brad
         case, but with generic factors from Watt.
         """
-        mock_client = JSONRepository(responses=make_response)
+        mock_client = FakeClient(responses=make_response)
         to_read = load_holdings("holding_brad.json")
         brad_holdings = readers.read_holdings(to_read, client=mock_client)
         context_holding = brad_holdings[6].new_context(
@@ -521,7 +521,7 @@ class TestTextAnchors:
         case, but replacing one generic factor with a factor
         from Watt.
         """
-        mock_client = JSONRepository(responses=make_response)
+        mock_client = FakeClient(responses=make_response)
         watt = make_opinion["watt_majority"]
         brad = make_opinion["brad_majority"]
         to_read = load_holdings("holding_brad.json")
@@ -547,7 +547,7 @@ class TestTextAnchors:
         """
         This test originally required a ValueError, but why should it?
         """
-        mock_client = JSONRepository(responses=make_response)
+        mock_client = FakeClient(responses=make_response)
         brad = make_opinion["brad_majority"]
         to_read = load_holdings("holding_brad.json")
         holdings = readers.read_holdings(to_read, client=mock_client)
@@ -567,7 +567,7 @@ class TestTextAnchors:
             "enactments": [{"node": "/us/const/amendment/IV"}],
             "mandatory": True,
         }
-        mock_client = JSONRepository(responses=make_response)
+        mock_client = FakeClient(responses=make_response)
         with pytest.raises(ValueError):
             readers.read_holding(rule_holding, client=mock_client)
 
@@ -625,7 +625,7 @@ class TestExclusiveFlag:
         `originality_rule` will be a little broader because it's based on
         less Enactment text
         """
-        mock_client = JSONRepository(responses=make_response)
+        mock_client = FakeClient(responses=make_response)
         to_read = load_holdings("holding_feist.json")
         feist_holdings = readers.read_holdings(to_read, client=mock_client)
 
@@ -664,7 +664,7 @@ class TestExclusiveFlag:
         inferred Holdings to be expanded. Instead, it now should generate
         inferred Rules that aren't expanded during data loading.
         """
-        mock_client = JSONRepository(responses=make_response)
+        mock_client = FakeClient(responses=make_response)
         to_read = load_holdings("holding_feist.json")
         feist_holdings = readers.read_holdings(to_read, client=mock_client)
 
@@ -700,7 +700,7 @@ class TestExclusiveFlag:
         "Implies" and "contradict" methods will be able to look at the Holding's
         generated Rules as well as its original Rule.
         """
-        mock_client = JSONRepository(responses=make_response)
+        mock_client = FakeClient(responses=make_response)
         feist_json = load_holdings("holding_feist.json")
         feist_holdings = readers.read_holdings(feist_json, client=mock_client)
 
@@ -718,7 +718,7 @@ class TestNestedFactorImport:
         testimony on the jury. Hence, admission of the testimony
         concerning appellant’s use of narcotics was improper.
         """
-        mock_client = JSONRepository(responses=make_response)
+        mock_client = FakeClient(responses=make_response)
         cardenas_json = load_holdings("holding_cardenas.json")
         cardenas_holdings = readers.read_holdings(cardenas_json, client=mock_client)
         assert len(cardenas_holdings) == 2

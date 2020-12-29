@@ -4,7 +4,6 @@ from dotenv import load_dotenv
 import pytest
 
 from legislice.download import Client
-from legislice.mock_clients import MOCK_USC_CLIENT
 
 load_dotenv()
 
@@ -97,7 +96,7 @@ class TestCollectMentioned:
         shortest = mentioned.popitem()
         assert shortest[0] == "Short Name"
 
-    def test_name_inferred_from_content(self):
+    def test_name_inferred_from_content(self, fake_usc_client):
         """
         Test that a name field is generated for Factors without them.
 
@@ -105,7 +104,7 @@ class TestCollectMentioned:
         """
 
         oracle_records = loaders.load_holdings("holding_oracle.json")
-        oracle_holdings = readers.read_holdings(oracle_records, client=MOCK_USC_CLIENT)
+        oracle_holdings = readers.read_holdings(oracle_records, client=fake_usc_client)
         factor = oracle_holdings[2].inputs[0]
         assert factor.content == "{} was an original work"
 
@@ -118,7 +117,7 @@ class TestCollectMentioned:
         record, mentioned = name_index.index_names(feist_records)
         assert "securing the right to writings" in mentioned
 
-    def test_context_factor_not_collapsed(self):
+    def test_context_factor_not_collapsed(self, fake_usc_client):
         """
         There is a context factor listed for this Fact, but it hasn't been collapsed
         in the content phrase.
@@ -140,18 +139,18 @@ class TestCollectMentioned:
             },
         }
         holding = text_expansion.expand_shorthand(holding)
-        built = readers.read_holding(record=holding, client=MOCK_USC_CLIENT)
+        built = readers.read_holding(record=holding, client=fake_usc_client)
         assert built.inputs[0].short_string.startswith(
             "the fact that <Rural's telephone listings> were names"
         )
 
-    def test_enactment_name_in_holding(self):
+    def test_enactment_name_in_holding(self, fake_usc_client):
         """
         Test error message:
         'Name "securing for authors" not found in the index of mentioned Factors'
         """
         feist_records = loaders.load_holdings("holding_feist.json")
-        feist_holding = readers.read_holding(feist_records[0], client=MOCK_USC_CLIENT)
+        feist_holding = readers.read_holding(feist_records[0], client=fake_usc_client)
         assert "securing for limited Times" in feist_holding.short_string
 
 

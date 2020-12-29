@@ -9,7 +9,6 @@ from dotenv import load_dotenv
 from legislice import Enactment
 from legislice.name_index import EnactmentIndex
 from legislice.download import Client
-from legislice.mock_clients import JSONRepository
 import pytest
 
 from authorityspoke.comparisons import ContextRegister
@@ -24,6 +23,7 @@ from authorityspoke.predicates import Predicate, Q_
 from authorityspoke.rules import Procedure, Rule
 
 from authorityspoke.io import anchors, loaders, readers
+from authorityspoke.io.fake_clients import FakeClient
 from authorityspoke.io.schemas import EnactmentSchema, RawFactor, RawHolding
 
 
@@ -697,6 +697,11 @@ def make_response() -> Dict[str, Dict]:
 
 
 @pytest.fixture(scope="module")
+def fake_usc_client(make_response) -> FakeClient:
+    return FakeClient(make_response)
+
+
+@pytest.fixture(scope="module")
 def beard_response() -> Dict[str, Dict]:
     """Mock api responses"""
     this_directory = os.path.dirname(os.path.abspath(__file__))
@@ -704,6 +709,11 @@ def beard_response() -> Dict[str, Dict]:
     with open(responses_filepath, "r") as f:
         responses = json.load(f)
     return responses
+
+
+@pytest.fixture(scope="module")
+def fake_beard_client(beard_response) -> FakeClient:
+    return FakeClient(beard_response)
 
 
 @pytest.fixture(scope="module")
@@ -1064,7 +1074,9 @@ def make_rule(
         "h2_without_cite": Rule(c["c2"]),
         "h2_fourth_a_cite": Rule(c["c2"], enactments=e_fourth_a),
         "h2_despite_due_process": Rule(
-            c["c2"], enactments=e_search_clause, enactments_despite=e_due_process_5,
+            c["c2"],
+            enactments=e_search_clause,
+            enactments_despite=e_due_process_5,
         ),
         "h2_ALL_due_process": Rule(
             c["c2"],
@@ -1181,7 +1193,9 @@ def make_rule(
             c["c_near_means_no_curtilage"], enactments=e_search_clause
         ),
         "h_near_means_no_curtilage_ALL": Rule(
-            c["c_near_means_no_curtilage"], enactments=e_search_clause, universal=True,
+            c["c_near_means_no_curtilage"],
+            enactments=e_search_clause,
+            universal=True,
         ),
         "h_near_means_no_curtilage_ALL_MUST": Rule(
             c["c_near_means_no_curtilage"],
@@ -1214,7 +1228,7 @@ def make_rule(
 @pytest.fixture(scope="class")
 def make_beard_rule(beard_response) -> List[Rule]:
     """Rules from the "Beard Tax Act" example statutes."""
-    client = JSONRepository(responses=beard_response)
+    client = FakeClient(responses=beard_response)
     beard_dictionary = loaders.load_holdings("beard_rules.json")
     return readers.read_rules(beard_dictionary, client=client)
 
@@ -1289,7 +1303,7 @@ def make_decision():
 
 @pytest.fixture(scope="class")
 def make_decision_with_holding(make_response):
-    client_without_api_access = JSONRepository(responses=make_response)
+    client_without_api_access = FakeClient(responses=make_response)
     decisions = load_decisions_for_fixtures()
     for case in TEST_CASES:
         holdings, mentioned, holding_anchors = loaders.load_holdings_with_index(
@@ -1413,4 +1427,3 @@ def make_context_register() -> ContextRegister:
     context_names.insert_pair(key=Entity("Alice"), value=Entity("Craig"))
     context_names.insert_pair(key=Entity("Bob"), value=Entity("Dan"))
     return context_names
-

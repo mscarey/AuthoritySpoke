@@ -6,7 +6,7 @@ import pytest
 from dotenv import load_dotenv
 from legislice import Enactment
 from legislice.download import Client
-from legislice.mock_clients import JSONRepository
+from authorityspoke.io.fake_clients import FakeClient
 
 from authorityspoke.entities import Entity
 from authorityspoke.evidence import Evidence
@@ -152,7 +152,10 @@ class TestImplication:
         context.insert_pair(
             Entity("the Java API"), Entity("the Lotus menu command hierarchy")
         )
-        assert holding.implies(lotus, context=context,)
+        assert holding.implies(
+            lotus,
+            context=context,
+        )
 
     def test_holding_implies_none(self, make_holding):
         assert make_holding["h3"] >= None
@@ -308,7 +311,10 @@ class TestContradiction:
         context.insert_pair(
             Entity("the Lotus menu command hierarchy"), Entity("the Java API")
         )
-        assert lotus.holdings[6].contradicts(oracle, context=context,)
+        assert lotus.holdings[6].contradicts(
+            oracle,
+            context=context,
+        )
 
     def test_explain_holding_contradicting_opinion(self, make_opinion_with_holding):
         oracle = make_opinion_with_holding["oracle_majority"]

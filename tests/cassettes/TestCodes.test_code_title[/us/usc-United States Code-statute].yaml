@@ -9,11 +9,55 @@ interactions:
       Connection:
       - keep-alive
       User-Agent:
-      - python-requests/2.24.0
+      - python-requests/2.25.1
       authorization:
       - DUMMY
     method: GET
-    uri: https://authorityspoke.com/api/v1/us/usc
+    uri: https://authorityspoke.com/api/v1/us/usc/
+  response:
+    body:
+      string: '{"heading":"United States Code (USC)","start_date":"1926-06-30","node":"/us/usc","text_version":null,"url":"https://authorityspoke.com/api/v1/us/usc/","end_date":null,"children":["https://authorityspoke.com/api/v1/us/usc/t1/","https://authorityspoke.com/api/v1/us/usc/t2/","https://authorityspoke.com/api/v1/us/usc/t3/","https://authorityspoke.com/api/v1/us/usc/t4/","https://authorityspoke.com/api/v1/us/usc/t5/","https://authorityspoke.com/api/v1/us/usc/t6/","https://authorityspoke.com/api/v1/us/usc/t7/","https://authorityspoke.com/api/v1/us/usc/t8/","https://authorityspoke.com/api/v1/us/usc/t9/","https://authorityspoke.com/api/v1/us/usc/t10/","https://authorityspoke.com/api/v1/us/usc/t11/","https://authorityspoke.com/api/v1/us/usc/t12/","https://authorityspoke.com/api/v1/us/usc/t13/","https://authorityspoke.com/api/v1/us/usc/t14/","https://authorityspoke.com/api/v1/us/usc/t15/","https://authorityspoke.com/api/v1/us/usc/t16/","https://authorityspoke.com/api/v1/us/usc/t17/","https://authorityspoke.com/api/v1/us/usc/t18/","https://authorityspoke.com/api/v1/us/usc/t19/","https://authorityspoke.com/api/v1/us/usc/t20/","https://authorityspoke.com/api/v1/us/usc/t21/","https://authorityspoke.com/api/v1/us/usc/t22/","https://authorityspoke.com/api/v1/us/usc/t23/","https://authorityspoke.com/api/v1/us/usc/t24/","https://authorityspoke.com/api/v1/us/usc/t25/","https://authorityspoke.com/api/v1/us/usc/t26/","https://authorityspoke.com/api/v1/us/usc/t27/","https://authorityspoke.com/api/v1/us/usc/t28/","https://authorityspoke.com/api/v1/us/usc/t29/","https://authorityspoke.com/api/v1/us/usc/t30/","https://authorityspoke.com/api/v1/us/usc/t31/","https://authorityspoke.com/api/v1/us/usc/t32/","https://authorityspoke.com/api/v1/us/usc/t33/","https://authorityspoke.com/api/v1/us/usc/t34/","https://authorityspoke.com/api/v1/us/usc/t35/","https://authorityspoke.com/api/v1/us/usc/t36/","https://authorityspoke.com/api/v1/us/usc/t37/","https://authorityspoke.com/api/v1/us/usc/t38/","https://authorityspoke.com/api/v1/us/usc/t39/","https://authorityspoke.com/api/v1/us/usc/t40/","https://authorityspoke.com/api/v1/us/usc/t41/","https://authorityspoke.com/api/v1/us/usc/t42/","https://authorityspoke.com/api/v1/us/usc/t43/","https://authorityspoke.com/api/v1/us/usc/t44/","https://authorityspoke.com/api/v1/us/usc/t45/","https://authorityspoke.com/api/v1/us/usc/t46/","https://authorityspoke.com/api/v1/us/usc/t47/","https://authorityspoke.com/api/v1/us/usc/t48/","https://authorityspoke.com/api/v1/us/usc/t49/","https://authorityspoke.com/api/v1/us/usc/t50/","https://authorityspoke.com/api/v1/us/usc/t51/","https://authorityspoke.com/api/v1/us/usc/t52/","https://authorityspoke.com/api/v1/us/usc/t54/"],"citations":[],"parent":"https://authorityspoke.com/api/v1/us/"}'
+    headers:
+      Allow:
+      - GET, POST, PUT, PATCH, HEAD, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '2779'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 29 Dec 2020 07:13:30 GMT
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - gunicorn/20.0.4
+      Vary:
+      - Accept, Cookie
+      Via:
+      - 1.1 vegur
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.25.1
+      authorization:
+      - DUMMY
+    method: GET
+    uri: https://authorityspoke.com/api/v1/coverage/us/usc
   response:
     body:
       string: ''
@@ -25,9 +69,11 @@ interactions:
       Content-Type:
       - text/html; charset=utf-8
       Date:
-      - Mon, 24 Aug 2020 10:26:31 GMT
+      - Tue, 29 Dec 2020 07:13:30 GMT
       Location:
-      - /api/v1/us/usc/
+      - /api/v1/coverage/us/usc/
+      Referrer-Policy:
+      - same-origin
       Server:
       - gunicorn/20.0.4
       Via:
@@ -47,25 +93,27 @@ interactions:
       Connection:
       - keep-alive
       User-Agent:
-      - python-requests/2.24.0
+      - python-requests/2.25.1
       authorization:
       - DUMMY
     method: GET
-    uri: https://authorityspoke.com/api/v1/us/usc/
+    uri: https://authorityspoke.com/api/v1/coverage/us/usc/
   response:
     body:
-      string: '{"heading":"United States Code (USC)","content":"","children":["https://authorityspoke.com/api/v1/us/usc/t1/","https://authorityspoke.com/api/v1/us/usc/t2/","https://authorityspoke.com/api/v1/us/usc/t3/","https://authorityspoke.com/api/v1/us/usc/t4/","https://authorityspoke.com/api/v1/us/usc/t5/","https://authorityspoke.com/api/v1/us/usc/t6/","https://authorityspoke.com/api/v1/us/usc/t7/","https://authorityspoke.com/api/v1/us/usc/t8/","https://authorityspoke.com/api/v1/us/usc/t9/","https://authorityspoke.com/api/v1/us/usc/t10/","https://authorityspoke.com/api/v1/us/usc/t11/","https://authorityspoke.com/api/v1/us/usc/t12/","https://authorityspoke.com/api/v1/us/usc/t13/","https://authorityspoke.com/api/v1/us/usc/t14/","https://authorityspoke.com/api/v1/us/usc/t15/","https://authorityspoke.com/api/v1/us/usc/t16/","https://authorityspoke.com/api/v1/us/usc/t17/","https://authorityspoke.com/api/v1/us/usc/t18/","https://authorityspoke.com/api/v1/us/usc/t19/","https://authorityspoke.com/api/v1/us/usc/t20/","https://authorityspoke.com/api/v1/us/usc/t21/","https://authorityspoke.com/api/v1/us/usc/t22/","https://authorityspoke.com/api/v1/us/usc/t23/","https://authorityspoke.com/api/v1/us/usc/t24/","https://authorityspoke.com/api/v1/us/usc/t25/","https://authorityspoke.com/api/v1/us/usc/t26/","https://authorityspoke.com/api/v1/us/usc/t27/","https://authorityspoke.com/api/v1/us/usc/t28/","https://authorityspoke.com/api/v1/us/usc/t29/","https://authorityspoke.com/api/v1/us/usc/t30/","https://authorityspoke.com/api/v1/us/usc/t31/","https://authorityspoke.com/api/v1/us/usc/t32/","https://authorityspoke.com/api/v1/us/usc/t33/","https://authorityspoke.com/api/v1/us/usc/t34/","https://authorityspoke.com/api/v1/us/usc/t35/","https://authorityspoke.com/api/v1/us/usc/t36/","https://authorityspoke.com/api/v1/us/usc/t37/","https://authorityspoke.com/api/v1/us/usc/t38/","https://authorityspoke.com/api/v1/us/usc/t39/","https://authorityspoke.com/api/v1/us/usc/t40/","https://authorityspoke.com/api/v1/us/usc/t41/","https://authorityspoke.com/api/v1/us/usc/t42/","https://authorityspoke.com/api/v1/us/usc/t43/","https://authorityspoke.com/api/v1/us/usc/t44/","https://authorityspoke.com/api/v1/us/usc/t45/","https://authorityspoke.com/api/v1/us/usc/t46/","https://authorityspoke.com/api/v1/us/usc/t47/","https://authorityspoke.com/api/v1/us/usc/t48/","https://authorityspoke.com/api/v1/us/usc/t49/","https://authorityspoke.com/api/v1/us/usc/t50/","https://authorityspoke.com/api/v1/us/usc/t51/","https://authorityspoke.com/api/v1/us/usc/t52/","https://authorityspoke.com/api/v1/us/usc/t54/"],"end_date":null,"node":"/us/usc","start_date":"1926-06-30","url":"https://authorityspoke.com/api/v1/us/usc/","parent":"https://authorityspoke.com/api/v1/us/"}'
+      string: '{"uri":"/us/usc","latest_heading":"United States Code (USC)","first_published":"1926-06-30","earliest_in_db":"2013-07-18","latest_in_db":"2020-08-08"}'
     headers:
       Allow:
-      - GET, POST, HEAD, OPTIONS
+      - GET, HEAD, OPTIONS
       Connection:
       - keep-alive
       Content-Length:
-      - '2757'
+      - '150'
       Content-Type:
       - application/json
       Date:
-      - Mon, 24 Aug 2020 10:26:31 GMT
+      - Tue, 29 Dec 2020 07:13:30 GMT
+      Referrer-Policy:
+      - same-origin
       Server:
       - gunicorn/20.0.4
       Vary:

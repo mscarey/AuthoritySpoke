@@ -6,16 +6,11 @@ from dotenv import load_dotenv
 from legislice.download import Client
 
 from legislice.enactments import Enactment, consolidate_enactments
-from legislice.mock_clients import (
-    JSONRepository,
-    MOCK_BEARD_ACT_CLIENT,
-    MOCK_USC_CLIENT,
-)
 from legislice.schemas import EnactmentSchema
 import pytest
 
 from authorityspoke.io import anchors, loaders, readers, dump
-
+from authorityspoke.io.fake_clients import FakeClient
 
 load_dotenv()
 
@@ -29,27 +24,27 @@ class TestEnactments:
         search_clause = e_search_clause
         assert search_clause.selected_text().endswith("shall not be violated…")
 
-    def test_create_enactment_with_init(self):
+    def test_create_enactment_with_init(self, fake_beard_client):
         """
         Using the __init__ method of the Enactment class, insteaid of
         readers.read_enactment or the Enactment marshmallow schema.
         """
-        beard_definition = MOCK_BEARD_ACT_CLIENT.read("/test/acts/47/4/")
+        beard_definition = fake_beard_client.read("/test/acts/47/4/")
         assert beard_definition.text.startswith("In this Act, beard")
 
-    def test_make_enactment_from_selector_without_code(self):
+    def test_make_enactment_from_selector_without_code(self, fake_usc_client):
         selector = TextQuoteSelector(suffix=" to their respective")
-        art_3 = MOCK_USC_CLIENT.read("/us/const/article/I/8/8")
+        art_3 = fake_usc_client.read("/us/const/article/I/8/8")
         art_3.select(selector)
         assert art_3.text.startswith("To promote")
         assert art_3.selected_text().endswith("exclusive Right…")
 
-    def test_make_enactment_from_dict_with_reader(self):
-        fourth_a = MOCK_USC_CLIENT.read_from_json({"node": "/us/const/amendment/IV"})
+    def test_make_enactment_from_dict_with_reader(self, fake_usc_client):
+        fourth_a = fake_usc_client.read_from_json({"node": "/us/const/amendment/IV"})
         assert fourth_a.text.endswith("and the persons or things to be seized.")
 
-    def test_make_enactment_from_dict_with_text_split(self):
-        fourth_a = MOCK_USC_CLIENT.read_from_json(
+    def test_make_enactment_from_dict_with_text_split(self, fake_usc_client):
+        fourth_a = fake_usc_client.read_from_json(
             {
                 "node": "/us/const/amendment/IV",
                 "text": "and|the persons or things|to be seized.",
@@ -57,17 +52,17 @@ class TestEnactments:
         )
         assert fourth_a.selected_text() == "…the persons or things…"
 
-    def test_passage_from_imported_statute(self):
+    def test_passage_from_imported_statute(self, fake_usc_client):
         oracle_majority = loaders.load_and_read_decision(f"oracle_h.json").majority
         raw_holdings = loaders.load_holdings("holding_oracle.json")
-        holdings = readers.read_holdings(raw_holdings, client=MOCK_USC_CLIENT)
+        holdings = readers.read_holdings(raw_holdings, client=fake_usc_client)
         oracle_majority.posit(holdings)
         despite_text = str(list(oracle_majority.holdings)[5])
         assert "In no case does copyright protection " in despite_text
 
-    def test_short_passage_from_uslm_code(self):
+    def test_short_passage_from_uslm_code(self, fake_usc_client):
         """Also tests adding the missing initial "/" in ``path``."""
-        method = MOCK_USC_CLIENT.read_from_json(
+        method = fake_usc_client.read_from_json(
             {
                 "node": "us/usc/t17/s102/b",
                 "prefix": "process, system,",
@@ -76,8 +71,8 @@ class TestEnactments:
         )
         assert method.selected_text() == "…method of operation…"
 
-    def test_chapeau_and_subsections_from_uslm_code(self):
-        definition = MOCK_BEARD_ACT_CLIENT.read_from_json({"node": "/test/acts/47/4"})
+    def test_chapeau_and_subsections_from_uslm_code(self, fake_beard_client):
+        definition = fake_beard_client.read_from_json({"node": "/test/acts/47/4"})
         assert definition.text.strip().endswith("below the nose.")
 
     def test_cite_path_in_str(self, e_search_clause):
@@ -116,8 +111,8 @@ class TestEnactments:
         with pytest.raises(TypeError):
             assert not e_due_process_5 < f1
 
-    def test_read_constitution_for_effective_date(self):
-        ex_post_facto_provision = MOCK_USC_CLIENT.read_from_json(
+    def test_read_constitution_for_effective_date(self, fake_usc_client):
+        ex_post_facto_provision = fake_usc_client.read_from_json(
             {"node": "/us/const/article/I/8/8"}
         )
         assert ex_post_facto_provision.start_date == datetime.date(1788, 9, 13)
@@ -126,14 +121,14 @@ class TestEnactments:
         # December 15, 1791
         assert e_search_clause.start_date == datetime.date(1791, 12, 15)
 
-    def test_date_and_text_from_path_and_regime(self):
+    def test_date_and_text_from_path_and_regime(self, fake_usc_client):
         """
         This tests assigning the full text of
         the section as the text of the Enactment, even though no
         ``exact``, ``prefix``, or ``suffix` parameter was
         passed to the TextQuoteSelector constructor.
         """
-        amendment_12 = MOCK_USC_CLIENT.read_from_json(
+        amendment_12 = fake_usc_client.read_from_json(
             {"node": "/us/const/amendment/XIV"}
         )
         assert amendment_12.start_date == datetime.date(1868, 7, 28)
@@ -200,7 +195,7 @@ class TestEnactments:
         assert consolidated[0].means(fourth)
 
     def test_consolidate_adjacent_passages(self, make_response):
-        client = JSONRepository(responses=make_response)
+        client = FakeClient(responses=make_response)
         copyright_clause = client.read("/us/const/article/I/8/8")
         copyright_statute = client.read("/us/usc/t17/s102/b")
 
@@ -228,7 +223,7 @@ class TestEnactments:
         )
 
     def test_do_not_consolidate_from_different_sections(self, make_response):
-        client = JSONRepository(responses=make_response)
+        client = FakeClient(responses=make_response)
 
         due_process_5 = client.read("/us/const/amendment/V")
         due_process_14 = client.read("/us/const/amendment/XIV")
@@ -262,25 +257,25 @@ class TestDump:
         text_selection = d["text_version"]["content"][start:end]
         assert "Science and useful Arts" in text_selection
 
-    def test_dump_json(self):
-        provision = MOCK_BEARD_ACT_CLIENT.read_from_json({"node": "/test/acts/47/6A"})
+    def test_dump_json(self, fake_beard_client):
+        provision = fake_beard_client.read_from_json({"node": "/test/acts/47/6A"})
         dumped_provision = dump.to_json(provision)
         assert '"node": "/test/acts/47/6A"' in dumped_provision
 
-    def test_round_trip_dict(self):
-        provision = MOCK_BEARD_ACT_CLIENT.read_from_json({"node": "/test/acts/47/6A"})
+    def test_round_trip_dict(self, fake_beard_client):
+        provision = fake_beard_client.read_from_json({"node": "/test/acts/47/6A"})
         dumped_provision = dump.to_dict(provision)
         new = self.client.read_from_json(dumped_provision)
         assert new.node == "/test/acts/47/6A"
 
 
 class TestTextSelection:
-    def test_code_from_selector(self):
-        enactment = MOCK_USC_CLIENT.read("/us/usc/t17/s103")
+    def test_code_from_selector(self, fake_usc_client):
+        enactment = fake_usc_client.read("/us/usc/t17/s103")
         assert enactment.code == "usc"
 
-    def test_usc_selection(self, make_selector):
-        enactment = MOCK_USC_CLIENT.read("/us/usc/t17/s103")
+    def test_usc_selection(self, make_selector, fake_usc_client):
+        enactment = fake_usc_client.read("/us/usc/t17/s103")
         selector = make_selector["preexisting material"]
         enactment.select(selector)
 
@@ -288,14 +283,14 @@ class TestTextSelection:
         assert enactment.jurisdiction == "us"
         assert enactment.code == "usc"
 
-    def test_omit_terminal_slash(self):
-        statute = MOCK_USC_CLIENT.read_from_json(
+    def test_omit_terminal_slash(self, fake_usc_client):
+        statute = fake_usc_client.read_from_json(
             {"exact": "process, system,", "node": "us/usc/t17/s102/b/"}
         )
         assert not statute.source.endswith("/")
 
-    def test_add_omitted_initial_slash(self):
-        statute = MOCK_USC_CLIENT.read_from_json(
+    def test_add_omitted_initial_slash(self, fake_usc_client):
+        statute = fake_usc_client.read_from_json(
             {"exact": "process, system,", "node": "us/usc/t17/s102/b/"}
         )
         assert statute.source.startswith("/")
@@ -314,8 +309,8 @@ class TestTextSelection:
             + "for an original work of authorship extend to any…"
         )
 
-    def test_section_text_from_path(self):
-        copyright_exceptions = MOCK_USC_CLIENT.read_from_json(
+    def test_section_text_from_path(self, fake_usc_client):
+        copyright_exceptions = fake_usc_client.read_from_json(
             {"node": "/us/usc/t17/s102/b"}
         )
         assert copyright_exceptions.text.startswith(
@@ -323,9 +318,9 @@ class TestTextSelection:
             + "for an original work of authorship extend to any"
         )
 
-    def test_exact_text_not_in_selection(self):
+    def test_exact_text_not_in_selection(self, fake_usc_client):
         with pytest.raises(TextSelectionError):
-            _ = MOCK_USC_CLIENT.read_from_json(
+            _ = fake_usc_client.read_from_json(
                 {
                     "node": "/us/const/amendment/XV/1",
                     "exact": "due process",

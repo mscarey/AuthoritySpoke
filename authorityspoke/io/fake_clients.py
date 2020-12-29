@@ -2,14 +2,46 @@
 
 from typing import Dict, Optional, Union
 
-from legislice.download import Client
+import datetime
+import json
+import os
+from typing import Dict, Optional, Union
+
+from legislice.download import RawEnactment, LegislicePathError, normalize_path
+
+from authorityspoke.io.downloads import LegisClient
 
 
-class FakeClient(Client):
+# A dict indexing responses by iso-format date strings.
+ResponsesByDate = Dict[str, Dict]
+ResponsesByDateByPath = Dict[str, Dict[str, Dict]]
+
+
+class FakeClient(LegisClient):
     """Repository for mocking API responses locally."""
 
     def __init__(self, responses: ResponsesByDateByPath):
         self.responses = responses
+        self.coverage: Dict[str, Dict[str, Union[datetime.date, str]]] = {
+            "/us/const": {
+                "latest_heading": "United States Constitution",
+                "first_published": datetime.date(1788, 6, 21),
+                "earliest_in_db": datetime.date(1788, 6, 21),
+            },
+            "/us/usc": {
+                "latest_heading": "United States Code (USC)",
+                "first_published": datetime.date(1926, 6, 30),
+                "earliest_in_db": datetime.date(2013, 7, 18),
+                "latest_in_db": datetime.date(2020, 8, 8),
+            },
+            "/test/acts": {
+                "latest_heading": "Test Acts",
+                "first_published": datetime.date(1935, 4, 1),
+                "earliest_in_db": datetime.date(1935, 4, 1),
+                "latest_in_db": datetime.date(2013, 7, 18),
+            },
+        }
+        self.update_coverage_from_api = False
 
     def get_entry_closest_to_cited_path(self, path: str) -> Optional[ResponsesByDate]:
         path = normalize_path(path)
@@ -40,9 +72,7 @@ class FakeClient(Client):
             )
         return None
 
-    def fetch(
-        self, query: Union[str, CrossReference], date: Union[datetime.date, str] = ""
-    ) -> RawEnactment:
+    def fetch(self, query: str, date: Union[datetime.date, str] = "") -> RawEnactment:
         """
         Fetches data about legislation at specified path and date from Client's assigned API root.
         :param path:
@@ -85,4 +115,4 @@ class FakeClient(Client):
         return result
 
     def _fetch_from_url(self, url: str) -> None:
-        raise RuntimeError(f"Network access not allowed from FakeClient")
+        raise RuntimeError("Network access not allowed from FakeClient")

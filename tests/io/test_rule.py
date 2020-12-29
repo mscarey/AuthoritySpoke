@@ -9,7 +9,7 @@ from authorityspoke.rules import Rule
 
 
 from legislice.download import Client
-from legislice.mock_clients import JSONRepository, MOCK_BEARD_ACT_CLIENT
+from authorityspoke.io.fake_clients import FakeClient
 
 load_dotenv()
 
@@ -24,7 +24,7 @@ class TestRuleDump:
         assert content == "{} was on the premises of {}"
 
     def test_dump_and_read_rule(self, make_rule, make_response):
-        client = JSONRepository(responses=make_response)
+        client = FakeClient(responses=make_response)
         rule = make_rule["h2"]
         dumped = dump.to_dict(rule)
         loaded = readers.read_rule(dumped, client=client)
@@ -40,21 +40,21 @@ class TestLoadRules:
 
     client = Client(api_token=TOKEN)
 
-    def test_loading_rules(self):
+    def test_loading_rules(self, fake_beard_client):
         beard_rules, mentioned = loaders.load_rules_with_index(
-            "beard_rules.json", client=MOCK_BEARD_ACT_CLIENT
+            "beard_rules.json", client=fake_beard_client
         )
         assert beard_rules[0].outputs[0].content == "{} was a beard"
 
-    def test_imported_rule_is_type_rule(self):
+    def test_imported_rule_is_type_rule(self, fake_beard_client):
         beard_rules, mentioned = loaders.load_rules_with_index(
-            "beard_rules.json", client=MOCK_BEARD_ACT_CLIENT
+            "beard_rules.json", client=fake_beard_client
         )
         assert isinstance(beard_rules[0], Rule)
 
-    def test_rule_short_string(self):
+    def test_rule_short_string(self, fake_beard_client):
         beard_rules, mentioned = loaders.load_rules_with_index(
-            "beard_rules.json", client=MOCK_BEARD_ACT_CLIENT
+            "beard_rules.json", client=fake_beard_client
         )
         assert beard_rules[0].short_string.lower().startswith("the rule")
 
@@ -64,23 +64,23 @@ class TestLoadRules:
         key = "the suspected beard occurred on or below the chin"
         assert mentioned[key]["context_factors"][0] == "the suspected beard"
 
-    def test_rule_with_exhibit_as_context_factor(self):
+    def test_rule_with_exhibit_as_context_factor(self, fake_beard_client):
         rules, mentioned = loaders.load_rules_with_index(
-            "beard_rules.json", client=MOCK_BEARD_ACT_CLIENT
+            "beard_rules.json", client=fake_beard_client
         )
         exhibit = rules[5].inputs[0].context_factors[2]
         assert isinstance(exhibit, Exhibit)
 
-    def test_load_rules_and_index_names(self):
+    def test_load_rules_and_index_names(self, fake_beard_client):
         rules, mentioned = loaders.load_rules_with_index(
-            "beard_rules.json", client=MOCK_BEARD_ACT_CLIENT
+            "beard_rules.json", client=fake_beard_client
         )
         key = "the Department of Beards granted the defendant's beard exemption"
         assert mentioned[key]["context_factors"][0] == "the Department of Beards"
 
-    def test_read_rules_without_regime(self):
+    def test_read_rules_without_regime(self, fake_beard_client):
         beard_dictionary = loaders.load_holdings("beard_rules.json")
-        beard_rules = readers.read_rules(beard_dictionary, client=MOCK_BEARD_ACT_CLIENT)
+        beard_rules = readers.read_rules(beard_dictionary, client=fake_beard_client)
         assert beard_rules[0].inputs[0].short_string == (
             "the fact that <the suspected beard> was facial hair"
         )

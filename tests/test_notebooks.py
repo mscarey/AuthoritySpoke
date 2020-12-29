@@ -7,7 +7,7 @@ import os
 
 from anchorpoint.textselectors import TextQuoteSelector
 from dotenv import load_dotenv
-from legislice.mock_clients import JSONRepository, MOCK_USC_CLIENT
+from authorityspoke.io.fake_clients import FakeClient
 import pytest
 
 from authorityspoke import Enactment
@@ -66,7 +66,9 @@ class TestIntroduction:
         assert lotus_majority.holdings[0].outputs[0].absent is False
         assert lotus_majority.holdings[1].outputs[0].absent is True
 
-    def test_change_rule_replacing_enactment(self, make_opinion_with_holding):
+    def test_change_rule_replacing_enactment(
+        self, fake_usc_client, make_opinion_with_holding
+    ):
         oracle = make_opinion_with_holding["oracle_majority"]
 
         works_of_authorship_passage = (
@@ -74,7 +76,7 @@ class TestIntroduction:
             + "in original works of authorship"
         )
 
-        works_of_authorship_clause = MOCK_USC_CLIENT.read("/us/usc/t17/s102/a")
+        works_of_authorship_clause = fake_usc_client.read("/us/usc/t17/s102/a")
         works_of_authorship_clause.select(works_of_authorship_passage)
         holding_with_shorter_enactment = deepcopy(oracle.holdings[0])
         holding_with_shorter_enactment.set_enactments(works_of_authorship_clause)
