@@ -1,9 +1,10 @@
 """Fake download clients for testing."""
-
+from __future__ import annotations
 from typing import Dict, Optional, Union
 
 import datetime
 import json
+from pathlib import Path
 import os
 from typing import Dict, Optional, Union
 
@@ -42,6 +43,14 @@ class FakeClient(LegisClient):
             },
         }
         self.update_coverage_from_api = False
+
+    @classmethod
+    def from_file(cls, filename: str) -> FakeClient:
+        parent_directory = Path(__file__).resolve().parents[2]
+        responses_filepath = parent_directory / "example_data" / "responses" / filename
+        with open(responses_filepath, "r") as f:
+            responses = json.load(f)
+        return cls(responses)
 
     def get_entry_closest_to_cited_path(self, path: str) -> Optional[ResponsesByDate]:
         path = normalize_path(path)
