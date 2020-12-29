@@ -675,7 +675,7 @@ into the Holding object, as shown in the examples above.
           type: object
     info:
       description: An interface for annotating judicial holdings
-      title: AuthoritySpoke Holding API
+      title: AuthoritySpoke Holding API Schema
       version: 0.1.0
     openapi: 3.0.2
     paths: {}

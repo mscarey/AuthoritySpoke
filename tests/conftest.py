@@ -698,7 +698,7 @@ def make_response() -> Dict[str, Dict]:
 
 
 @pytest.fixture(scope="module")
-def fake_usc_client(make_response) -> FakeClient:
+def fake_usc_client() -> FakeClient:
     return FakeClient.from_file("usc.json")
 
 
@@ -714,7 +714,7 @@ def beard_response() -> Dict[str, Dict]:
 
 
 @pytest.fixture(scope="module")
-def fake_beard_client(beard_response) -> FakeClient:
+def fake_beard_client() -> FakeClient:
     return FakeClient.from_file("beard_act.json")
 
 

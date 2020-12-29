@@ -10,7 +10,7 @@ from authorityspoke.io.schemas import EvidenceSchema, HoldingSchema
 def make_spec() -> APISpec:
     """Generate specification for data used to create AuthoritySpoke objects."""
     holding_spec = APISpec(
-        title="AuthoritySpoke Holding API",
+        title="AuthoritySpoke Holding API Schema",
         version="0.1.0",
         openapi_version="3.0.2",
         info=dict(description="An interface for annotating judicial holdings"),
@@ -31,7 +31,11 @@ def make_spec() -> APISpec:
     del holding_spec.components._schemas["Factor"]
 
     holding_spec.components.schema(
-        "Factor", {"oneOf": factor_options, "discriminator": {"propertyName": "type"},},
+        "Factor",
+        {
+            "oneOf": factor_options,
+            "discriminator": {"propertyName": "type"},
+        },
     )
     return holding_spec
 
