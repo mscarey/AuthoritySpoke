@@ -68,7 +68,9 @@ html_theme_options = {
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ["_static"]
 
-intersphinx_mapping = {"python": ("https://docs.python.org/3", None)}
+intersphinx_mapping = {
+    "python": ("https://docs.python.org/3", None),
+    "legislice": ("https://legislice.readthedocs.io/en/latest/", None),
+}
 
 autodoc_member_order = "bysource"
-
