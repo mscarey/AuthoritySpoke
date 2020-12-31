@@ -7,11 +7,10 @@ import os
 
 from anchorpoint.textselectors import TextQuoteSelector
 from dotenv import load_dotenv
-from authorityspoke.io.fake_clients import FakeClient
 import pytest
 
 from authorityspoke import Enactment
-from authorityspoke.io.downloads import download_case
+from authorityspoke.io.downloads import download_case, FakeClient
 from authorityspoke.io.readers import read_decision
 from authorityspoke.factors import ContextRegister
 from authorityspoke.entities import Entity

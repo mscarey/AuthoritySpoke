@@ -23,7 +23,7 @@ from authorityspoke.predicates import Predicate, Q_
 from authorityspoke.rules import Procedure, Rule
 
 from authorityspoke.io import anchors, loaders, readers
-from authorityspoke.io.fake_clients import FakeClient
+from authorityspoke.io.downloads import FakeClient
 from authorityspoke.io.schemas import EnactmentSchema, RawFactor, RawHolding
 
 

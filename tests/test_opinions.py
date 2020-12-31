@@ -4,11 +4,11 @@ from authorityspoke.factors import FactorIndex
 import pytest
 
 from anchorpoint.textselectors import TextQuoteSelector
-from authorityspoke.io.fake_clients import FakeClient
 
 from authorityspoke.entities import Entity
 from authorityspoke.facts import Fact, Predicate
 from authorityspoke.io import anchors, loaders, readers
+from authorityspoke.io.downloads import FakeClient
 from authorityspoke.opinions import Opinion
 
 

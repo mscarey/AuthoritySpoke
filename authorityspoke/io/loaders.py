@@ -105,8 +105,8 @@ def load_and_read_holdings(
         Complete path to the JSON file representing the :class:`.Opinion`,
         including filename.
 
-    :param regime:
-        The regime to reference for the :class:`Enactment`\s
+    :param client:
+        The client with an API key to download :class:`Enactment`\s
         mentioned in the holding.
     """
     raw_holdings = load_holdings(

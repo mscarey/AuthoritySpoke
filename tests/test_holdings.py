@@ -6,8 +6,8 @@ import pytest
 from dotenv import load_dotenv
 from legislice import Enactment
 from legislice.download import Client
-from authorityspoke.io.fake_clients import FakeClient
 
+from authorityspoke.io.downloads import FakeClient
 from authorityspoke.entities import Entity
 from authorityspoke.evidence import Evidence
 from authorityspoke.explanations import Explanation

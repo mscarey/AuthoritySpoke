@@ -12,7 +12,7 @@ from legislice.download import Client, LegislicePathError
 from legislice.schemas import EnactmentSchema
 
 from authorityspoke.io import loaders, schemas
-from authorityspoke.io.fake_clients import FakeClient
+from authorityspoke.io.downloads import FakeClient
 
 load_dotenv()
 

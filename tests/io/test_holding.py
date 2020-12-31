@@ -8,7 +8,6 @@ from anchorpoint.textselectors import TextQuoteSelector
 from dotenv import load_dotenv
 from legislice import Enactment
 from legislice.download import Client
-from authorityspoke.io.fake_clients import FakeClient
 from legislice.name_index import collect_enactments
 
 from authorityspoke.entities import Entity
@@ -18,6 +17,7 @@ from authorityspoke.opinions import Opinion
 from authorityspoke.predicates import Predicate
 from authorityspoke.procedures import Procedure
 from authorityspoke.io import anchors, loaders, readers, schemas, dump, name_index
+from authorityspoke.io.downloads import FakeClient
 from authorityspoke.io.loaders import load_holdings
 from authorityspoke.io import filepaths, text_expansion
 from authorityspoke.rules import Rule

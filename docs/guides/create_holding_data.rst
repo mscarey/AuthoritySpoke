@@ -278,6 +278,8 @@ There can also be an “enactments_despite” field, which identifies
 legislative text that doesn’t need to be present for the Rule to apply,
 but that also doesn’t negate the validity of the Rule.
 
+..  _json_api_spec:
+
 JSON API Specification
 ----------------------
 

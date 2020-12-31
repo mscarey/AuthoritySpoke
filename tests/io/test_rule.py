@@ -3,13 +3,12 @@ import os
 from dotenv import load_dotenv
 import pytest
 
+from legislice.download import Client
+
 from authorityspoke.io import dump, loaders, name_index, readers
 from authorityspoke.evidence import Exhibit
 from authorityspoke.rules import Rule
-
-
-from legislice.download import Client
-from authorityspoke.io.fake_clients import FakeClient
+from authorityspoke.io.downloads import FakeClient
 
 load_dotenv()
 

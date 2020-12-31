@@ -3,14 +3,14 @@ import logging
 import os
 from typing import Type
 
-from authorityspoke.explanations import Explanation
-from authorityspoke.comparisons import ContextRegister, means
 
 from dotenv import load_dotenv
 from legislice.download import Client
 import pytest
 
+from authorityspoke.comparisons import ContextRegister, means
 from authorityspoke.entities import Entity
+from authorityspoke.explanations import Explanation
 from authorityspoke.factors import ContextRegister
 from authorityspoke.facts import Fact
 from authorityspoke.holdings import Holding
@@ -19,7 +19,7 @@ from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
 
 from authorityspoke.io import loaders, readers
-from authorityspoke.io.fake_clients import FakeClient
+from authorityspoke.io.downloads import FakeClient
 
 load_dotenv()
 

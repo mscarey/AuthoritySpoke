@@ -10,7 +10,7 @@ from legislice.schemas import EnactmentSchema
 import pytest
 
 from authorityspoke.io import anchors, loaders, readers, dump
-from authorityspoke.io.fake_clients import FakeClient
+from authorityspoke.io.downloads import FakeClient
 
 load_dotenv()
 
@@ -262,6 +262,7 @@ class TestDump:
         dumped_provision = dump.to_json(provision)
         assert '"node": "/test/acts/47/6A"' in dumped_provision
 
+    @pytest.mark.vcr
     def test_round_trip_dict(self, fake_beard_client):
         provision = fake_beard_client.read_from_json({"node": "/test/acts/47/6A"})
         dumped_provision = dump.to_dict(provision)

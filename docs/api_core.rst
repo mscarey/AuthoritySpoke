@@ -6,6 +6,7 @@ Core
 
     api/courts
     api/opinions
+    api/decisions
     api/holdings
     api/factors
     api/predicates
