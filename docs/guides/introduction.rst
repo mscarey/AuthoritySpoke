@@ -247,8 +247,7 @@ the :class:`~legislice.enactments.Enactment` class.
 
 .. code:: ipython3
 
-    from legislice.download import Client
-    from legislice.mock_clients import MOCK_USC_CLIENT
+    from authorityspoke.io.downloads import Client, FakeClient
 
     if USE_REAL_LEGISLICE_API:
 
@@ -256,7 +255,8 @@ the :class:`~legislice.enactments.Enactment` class.
         legis_client = Client(api_token=LEGISLICE_API_TOKEN)
 
     else:
-        legis_client = MOCK_USC_CLIENT
+        legis_client = FakeClient.from_file("usc.json")
+
 
 
 4. Importing and Exporting Legal Holdings

@@ -24,13 +24,13 @@ web API that can serve the provisions of the Beard Act. You can also
 `browse the provisions <https://authorityspoke.com/legislice/test/>`__
 of the Beard Act in your web browser.
 
-For convenience, this tutorial will use Legislice’s mock API server with
-fake JSON responses, instead of connecting to the real API.
+For convenience, this tutorial will use AuthoritySpoke's fake testing
+client with fake JSON responses, instead of connecting to the real API.
 
-.. code:: ipython3
-
-    from legislice.mock_clients import MOCK_BEARD_ACT_CLIENT
-    client = MOCK_BEARD_ACT_CLIENT
+    >>> import json
+    >>> import os
+    >>> from authorityspoke.io.downloads import FakeClient
+    >>> legis_client = FakeClient.from_file("beard_act.json")
 
 Next, I’ll prepare annotations for the statute provisions in a JSON
 file, and then load them as a Python dictionary. AuthoritySpoke rules
@@ -54,18 +54,9 @@ Python instead of loading them from a JSON file. For details, see the
 manual <https://authorityspoke.readthedocs.io/en/latest/>`__. Here’s an
 example of one JSON rule annotation.
 
-.. code:: ipython3
-
-    from authorityspoke.io import loaders
-
-    beard_dictionary = loaders.load_holdings("beard_rules.json")
-    beard_dictionary[0]
-
-
-
-
-.. parsed-literal::
-
+    >>> from authorityspoke.io import loaders
+    >>> beard_dictionary = loaders.load_holdings("beard_rules.json")
+    >>> beard_dictionary[0]
     {'inputs': [{'type': 'fact',
        'content': '{the suspected beard} was facial hair'},
       {'type': 'fact',
@@ -80,26 +71,19 @@ example of one JSON rule annotation.
      'universal': True}
 
 
-
 The “universal” True/False field indicates whether the Rule is one that
 applies in every case where all of the inputs are present, or only in
 some cases. The default is False, but this Rule overrides that default
 and says it applies in every case where all of the inputs are present.
 
 Now we can have AuthoritySpoke read this JSON and convert it to a list
-of Rule objects. In particular, we’ll look at the first two Rules, which
+of :class:`~authorityspoke.rules.Rule` objects. In particular, we’ll look at the first two Rules, which
 describe two ways that an object can be defined to be a “beard”.
 
-.. code:: ipython3
 
-    from authorityspoke.io import readers
-
-    beard_rules = readers.read_rules(beard_dictionary, client=client)
-    print(beard_rules[0])
-
-
-.. parsed-literal::
-
+    >>> from authorityspoke.io import readers
+    >>> beard_rules = readers.read_rules(beard_dictionary, client=legis_client)
+    >>> print(beard_rules[0])
     the Rule that the court MAY ALWAYS impose the
       RESULT:
         the Fact that <the suspected beard> was a beard
@@ -112,13 +96,7 @@ describe two ways that an object can be defined to be a “beard”.
         "In this Act, beard means any facial hair no shorter than 5 millimetres in length that: occurs on or below the chin…" (/test/acts/47/4 1935-04-01)
 
 
-.. code:: ipython3
-
-    print(beard_rules[1])
-
-
-.. parsed-literal::
-
+    >>> print(beard_rules[1])
     the Rule that the court MAY ALWAYS impose the
       RESULT:
         the Fact that <the suspected beard> was a beard
@@ -138,16 +116,15 @@ facial hair “on or below the chin” and the second applies to facial hair
 “in an uninterrupted line from the front of one ear to the front of the
 other ear below the nose”. I’ll rename them accordingly.
 
-.. code:: ipython3
-
-    chin_rule = beard_rules[0]
-    ear_rule = beard_rules[1]
+    >>> chin_rule = beard_rules[0]
+    >>> ear_rule = beard_rules[1]
 
 Implication and Contradiction between Rules
 -------------------------------------------
 
 AuthoritySpoke doesn’t yet have a feature that directly takes a set of
-known Facts, applies a Rule to them, and then infers legal conclusions.
+known :class:`~authorityspoke.facts.Fact`\s, applies
+a :class:`~authorityspoke.rules.Rule` to them, and then infers legal conclusions.
 Instead, in its current iteration, AuthoritySpoke can be used to combine
 Rules together to make more Rules, or to check whether Rules imply or
 contradict one another.
@@ -157,15 +134,9 @@ in the Beard Tax Act except that it applies to facial hair that’s
 exactly 8 millimeters long instead of “no shorter than 5 millimetres”,
 we can determine that the original “chin rule” implies our new Rule.
 
-.. code:: ipython3
-
-    beard_dictionary[0]['inputs'][1]['content'] = 'the length of the suspected beard was = 8 millimetres'
-    longer_hair_rule = readers.read_rule(beard_dictionary[0], client=client)
-    print(longer_hair_rule)
-
-
-.. parsed-literal::
-
+    >>> beard_dictionary[0]['inputs'][1]['content'] = 'the length of the suspected beard was = 8 millimetres'
+    >>> longer_hair_rule = readers.read_rule(beard_dictionary[0], client=legis_client)
+    >>> print(longer_hair_rule)
     the Rule that the court MAY ALWAYS impose the
       RESULT:
         the Fact that <the suspected beard> was a beard
@@ -178,17 +149,8 @@ we can determine that the original “chin rule” implies our new Rule.
         "In this Act, beard means any facial hair no shorter than 5 millimetres in length that: occurs on or below the chin…" (/test/acts/47/4 1935-04-01)
 
 
-.. code:: ipython3
-
-    chin_rule.implies(longer_hair_rule)
-
-
-
-
-.. parsed-literal::
-
+    >>> chin_rule.implies(longer_hair_rule)
     True
-
 
 
 Similarly, we can create a new Rule that says facial hair is *never* a
@@ -198,22 +160,15 @@ thanks to the `pint <https://pint.readthedocs.io/en/stable/>`__
 library). And we can show that this new Rule contradicts a Rule that
 came from the Beard Tax Act.
 
-.. code:: ipython3
-
-    beard_dictionary[1]["despite"] = beard_dictionary[1]["inputs"][0]
-    beard_dictionary[1]["inputs"] = {
+    >>> beard_dictionary[1]["despite"] = beard_dictionary[1]["inputs"][0]
+    >>> beard_dictionary[1]["inputs"] = {
         "type": "fact",
         "content": "the length of the suspected beard was >= 12 inches",
     }
-    beard_dictionary[1]["outputs"][0]["truth"] = False
-    beard_dictionary[1]["mandatory"] = True
-
-    long_thing_is_not_a_beard = readers.read_rule(beard_dictionary[1], client=client)
-    print(long_thing_is_not_a_beard)
-
-
-.. parsed-literal::
-
+    >>> beard_dictionary[1]["outputs"][0]["truth"] = False
+    >>> beard_dictionary[1]["mandatory"] = True
+    >>> long_thing_is_not_a_beard = readers.read_rule(beard_dictionary[1], client=legis_client)
+    >>> print(long_thing_is_not_a_beard)
     the Rule that the court MUST ALWAYS impose the
       RESULT:
         the Fact it is false that <the suspected beard> was a beard
@@ -226,15 +181,8 @@ came from the Beard Tax Act.
         "exists in an uninterrupted line from the front of one ear to the front of the other ear below the nose." (/test/acts/47/4/b 1935-04-01)
 
 
-.. code:: ipython3
 
-    long_thing_is_not_a_beard.contradicts(ear_rule)
-
-
-
-
-.. parsed-literal::
-
+    >>> long_thing_is_not_a_beard.contradicts(ear_rule)
     True
 
 
@@ -269,14 +217,8 @@ offense:
 
 Here are the two Rules we’ll be adding together.
 
-.. code:: ipython3
-
-    elements_of_offense = beard_rules[11]
-    print(elements_of_offense)
-
-
-.. parsed-literal::
-
+    >>> elements_of_offense = beard_rules[11]
+    >>> print(elements_of_offense)
     the Rule that the court MUST ALWAYS impose the
       RESULT:
         the Fact that <the defendant> committed the offense of improper
@@ -299,14 +241,8 @@ Here are the two Rules we’ll be adding together.
         "The Department of Beards may issue licenses to such barbers, hairdressers, or other male grooming professionals as they see fit to purchase a beardcoin from a customer whose beard they have removed, and to resell those beardcoins to the Department of Beards." (/test/acts/47/11 2013-07-18)
 
 
-.. code:: ipython3
-
-    loan_is_transfer = beard_rules[7]
-    print(loan_is_transfer)
-
-
-.. parsed-literal::
-
+    >>> loan_is_transfer = beard_rules[7]
+    >>> print(loan_is_transfer)
     the Rule that the court MUST ALWAYS impose the
       RESULT:
         the Fact that <the beardcoin transaction> was a transfer of beardcoin
@@ -324,22 +260,16 @@ But there’s a problem. The ``loan_is_transfer`` Rule establishes only
 one of the elements of the offense. In order to create a Rule that we
 can add to ``elements_of_offense``, we’ll need to add Facts establishing
 the two elements other than the “transfer” element. We’ll also need to
-add one of the Enactments that the ``elements_of_offense`` Rule relies
-upon.
+add one of the :class:`~legislice.enactments.Enactment`\s that
+the ``elements_of_offense`` :class:`~legislice.rules.Rule` relies upon.
 
-.. code:: ipython3
-
-    loan_without_exceptions = (
-                loan_is_transfer
-                + elements_of_offense.inputs[1]
-                + elements_of_offense.inputs[2]
-                + elements_of_offense.enactments[1]
-            )
-    print(loan_without_exceptions)
-
-
-.. parsed-literal::
-
+    >>> loan_without_exceptions = (
+    >>>             loan_is_transfer
+    >>>             + elements_of_offense.inputs[1]
+    >>>             + elements_of_offense.inputs[2]
+    >>>             + elements_of_offense.enactments[1]
+    >>>         )
+    >>> print(loan_without_exceptions)
     the Rule that the court MUST ALWAYS impose the
       RESULT:
         the Fact that <the beardcoin transaction> was a transfer of beardcoin
@@ -360,14 +290,8 @@ upon.
 
 With these changes, we can add together two Rules to get a new one.
 
-.. code:: ipython3
-
-    loan_establishes_offense = loan_without_exceptions + elements_of_offense
-    print(loan_establishes_offense)
-
-
-.. parsed-literal::
-
+    >>> loan_establishes_offense = loan_without_exceptions + elements_of_offense
+    >>> print(loan_establishes_offense)
     the Rule that the court MUST ALWAYS impose the
       RESULT:
         the Fact that <the beardcoin transaction> was a transfer of beardcoin
@@ -395,17 +319,8 @@ For now, try browsing through the beard_rules object to see how some of
 the other provisions have been formalized. In all, there are 14 Rules in
 the dataset.
 
-.. code:: ipython3
-
-    len(beard_rules)
-
-
-
-
-.. parsed-literal::
-
+    >>> len(beard_rules)
     14
-
 
 
 Future Work
@@ -445,6 +360,9 @@ Provisions delegating fact-finding power, like
 Clauses limiting the effect of particular provisions to a certain
 statutory scope, like the words “In this Act,” in
 `/test/acts/47/4 <https://authorityspoke.com/legislice/test/acts/47/4@1935-08-01>`__
+
+For more about the use of the Beard Tax Act to describe the effectiveness
+of legal data modeling software, see the `Python for Law Blog. <https://pythonforlaw.com/2020/11/30/a-test-rubric-for-legal-rule-automation.html>`__
 
 Contact
 ~~~~~~~

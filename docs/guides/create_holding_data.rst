@@ -236,7 +236,7 @@ after loading the Enactment:
   >>> to_select = "in accordance with this title, in|original works of authorship|fixed"
   >>> oracle.holdings[0].enactments[0].select(to_select)
 
-And we can use the :meth:`~legislice.enactments.Enactment.selected_text`
+And we can use the :meth:`~legislice.enactments.BaseEnactment.selected_text`
 method to verify that the Enactment's selected text has changed.
 
   >>> oracle.holdings[0].enactments[0].selected_text()
