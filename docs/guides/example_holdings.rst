@@ -8,12 +8,15 @@ practiced creating and exploring Python objects representing the
 holdings of the cases Lotus v. Borland and Oracle v. Google.
 
 This document is essentially an appendix to those two guides.
-It contains a list of all of the Holding objects in
-``oracle.holdings`` and ``lotus.holdings``. Each ``Holding`` will be
-preceded by a passage from the ``Opinion`` that indicates the
-``Opinion`` has endorsed the ``Holding``. In future versions,
+It contains a list of all of the :class:`~authorityspoke.holdings.Holding` objects in
+``oracle.holdings`` and ``lotus.holdings``. 
+Each :class:`~authorityspoke.holdings.Holding` will be
+preceded by a passage from the :class:`~authorityspoke.opinions.Opinion` that 
+indicates the opinion has endorsed 
+the :class:`~authorityspoke.holdings.Holding`\. In future versions,
 AuthoritySpoke will give users the ability to explore the text passages
-in ``Opinion``\ s that provide support for each ``Holding``, but that’s
+in :class:`~authorityspoke.opinions.Opinion`\s that provide support for 
+each :class:`~authorityspoke.holdings.Holding`\, but that’s
 currently not fully implemented.
 
 To find the full text of the opinions, look in the
@@ -32,13 +35,7 @@ Character Recognition errors.
    ownership of a valid copyright, and (2) copying of constituent
    elements of the work that are original.”
 
-.. code:: ipython3
-
-    print(lotus.holdings[0])
-
-
-.. parsed-literal::
-
+    >>> print(lotus.holdings[0])
     the Holding to ACCEPT that the EXCLUSIVE way to reach the fact that
     <Borland International> infringed the copyright in <the Lotus menu
     command hierarchy> is
@@ -59,13 +56,7 @@ Character Recognition errors.
    original and that the plaintiff complied with applicable statutory
    formalities.
 
-.. code:: ipython3
-
-    print(lotus.holdings[1])
-
-
-.. parsed-literal::
-
+    >>> print(lotus.holdings[1])
     the Holding to ACCEPT
       the Rule that the court MAY ALWAYS impose the
         RESULT:
@@ -83,13 +74,7 @@ Character Recognition errors.
    burden to the defendant to demonstrate why the copyright is not
    valid.
 
-.. code:: ipython3
-
-    print(lotus.holdings[2])
-
-
-.. parsed-literal::
-
+    >>> print(lotus.holdings[2])
     the Holding to ACCEPT
       the Rule that the court MAY SOMETIMES impose the
         RESULT:
@@ -112,13 +97,7 @@ Character Recognition errors.
    plaintiffs copyrighted work as a factual matter; to do this, he or
    she may either present direct evidence of factual copying or…
 
-.. code:: ipython3
-
-    print(lotus.holdings[3])
-
-
-.. parsed-literal::
-
+    >>> print(lotus.holdings[3])
     the Holding to ACCEPT
       the Rule that the court MAY SOMETIMES impose the
         RESULT:
@@ -142,13 +121,8 @@ Character Recognition errors.
    similar that the court may infer that there was factual copying
    (i.e., probative similarity).
 
-.. code:: ipython3
 
-    print(lotus.holdings[4])
-
-
-.. parsed-literal::
-
+    >>> print(lotus.holdings[4])
     the Holding to ACCEPT
       the Rule that the court MAY SOMETIMES impose the
         RESULT:
@@ -176,13 +150,7 @@ Character Recognition errors.
    that it rendered the offending and copyrighted works substantially
    similar.
 
-.. code:: ipython3
-
-    print(lotus.holdings[5])
-
-
-.. parsed-literal::
-
+    >>> print(lotus.holdings[5])
     the Holding to ACCEPT
       the Rule that the court MAY SOMETIMES impose the
         RESULT:
@@ -211,13 +179,7 @@ Character Recognition errors.
    categories foreclosed from copyright protection by § 102(b), such as
    being a “method of operation.”
 
-.. code:: ipython3
-
-    print(lotus.holdings[6])
-
-
-.. parsed-literal::
-
+    >>> print(lotus.holdings[6])
     the Holding to ACCEPT
       the Rule that the court MUST ALWAYS impose the
         RESULT:
@@ -242,13 +204,7 @@ Character Recognition errors.
    command hierarchy, users would not be able to access and control, or
    indeed make use of, Lotus 1-2-3’s functional capabilities.
 
-.. code:: ipython3
-
-    print(lotus.holdings[7])
-
-
-.. parsed-literal::
-
+    >>> print(lotus.holdings[7])
     the Holding to ACCEPT
       the Rule that the court MAY SOMETIMES impose the
         RESULT:
@@ -276,13 +232,7 @@ Character Recognition errors.
    abstractions; rather, they are the means by which a user operates
    something.
 
-.. code:: ipython3
-
-    print(lotus.holdings[8])
-
-
-.. parsed-literal::
-
+    >>> print(lotus.holdings[8])
     the Holding to ACCEPT
       the Rule that the court MAY SOMETIMES impose the
         RESULT:
@@ -305,13 +255,7 @@ Character Recognition errors.
    hierarchy. Thus the Lotus 1-2-3 code is not a uncopyrightable “method
    of operation.”
 
-.. code:: ipython3
-
-    print(lotus.holdings[9])
-
-
-.. parsed-literal::
-
+    >>> print(lotus.holdings[9])
     the Holding to ACCEPT
       the Rule that the court MAY SOMETIMES impose the
         RESULT:
@@ -332,13 +276,7 @@ Character Recognition errors.
    By statute, a work must be “original” to qualify for copyright
    protection. 17 U.S.C. § 102(a).
 
-.. code:: ipython3
-
-    print(oracle.holdings[0])
-
-
-.. parsed-literal::
-
+    >>> print(oracle.holdings[0])
     the Holding to ACCEPT
       the Rule that the court MUST SOMETIMES impose the
         RESULT:
@@ -354,13 +292,7 @@ Character Recognition errors.
    other works), and that it possesses at least some minimal degree of
    creativity.
 
-.. code:: ipython3
-
-    print(oracle.holdings[1])
-
-
-.. parsed-literal::
-
+    >>> print(oracle.holdings[1])
     the Holding to ACCEPT
       the Rule that the court MUST ALWAYS impose the
         RESULT:
@@ -380,13 +312,7 @@ Character Recognition errors.
    concepts of merger and scenes a faire are affirmative defenses to
    claims of infringement.
 
-.. code:: ipython3
-
-    print(oracle.holdings[2])
-
-
-.. parsed-literal::
-
+    >>> print(oracle.holdings[2])
     the Holding to ACCEPT
       the Rule that the court MUST SOMETIMES impose the
         RESULT:
@@ -408,15 +334,7 @@ Character Recognition errors.
    The literal elements of a computer program are the source code and
    object code.
 
-.. code:: ipython3
-
-    print(oracle.holdings[3])
-    print("\n")
-    print(oracle.holdings[4])
-
-
-.. parsed-literal::
-
+    >>> print(oracle.holdings[3])
     the Holding to ACCEPT
       the Rule that the court MUST ALWAYS impose the
         RESULT:
@@ -430,7 +348,7 @@ Character Recognition errors.
           "Copyright protection subsists, in accordance with this title, in original works of authorship fixed in any tangible medium of expression, now known or later developed, from which they can be perceived, reproduced, or otherwise communicated, either directly or with the aid of a machine or device.…" (/us/usc/t17/s102/a 2013-07-18)
           "In no case does copyright protection for an original work of authorship extend to any idea, procedure, process, system, method of operation, concept, principle, or discovery, regardless of the form in which it is described, explained, illustrated, or embodied in such work." (/us/usc/t17/s102/b 2013-07-18)
 
-
+    >>> print(oracle.holdings[4])
     the Holding to ACCEPT
       the Rule that the court MUST ALWAYS impose the
         RESULT:
@@ -449,13 +367,7 @@ Character Recognition errors.
    literal and non-literal elements of a computer program. See Altai 982
    F.2d at 702.
 
-.. code:: ipython3
-
-    print(oracle.holdings[5])
-
-
-.. parsed-literal::
-
+    >>> print(oracle.holdings[5])
     the Holding to ACCEPT
       the Rule that the court MUST SOMETIMES impose the
         RESULT:
@@ -474,15 +386,7 @@ Character Recognition errors.
    things, the program’s sequence, structure, and organization, as well
    as the program’s user interface.
 
-.. code:: ipython3
-
-    print(oracle.holdings[6])
-    print("\n")
-    print(oracle.holdings[7])
-
-
-.. parsed-literal::
-
+    >>> print(oracle.holdings[6])
     the Holding to ACCEPT
       the Rule that the court MUST ALWAYS impose the
         RESULT:
@@ -496,7 +400,7 @@ Character Recognition errors.
           "Copyright protection subsists, in accordance with this title, in original works of authorship fixed in any tangible medium of expression, now known or later developed, from which they can be perceived, reproduced, or otherwise communicated, either directly or with the aid of a machine or device.…" (/us/usc/t17/s102/a 2013-07-18)
           "In no case does copyright protection for an original work of authorship extend to any idea, procedure, process, system, method of operation, concept, principle, or discovery, regardless of the form in which it is described, explained, illustrated, or embodied in such work." (/us/usc/t17/s102/b 2013-07-18)
 
-
+    >>> print(oracle.holdings[7])
     the Holding to ACCEPT
       the Rule that the court MUST ALWAYS impose the
         RESULT:
@@ -518,15 +422,8 @@ Character Recognition errors.
    component in question qualifies as an expression of an idea, or an
    idea itself.”
 
-.. code:: ipython3
-
-    print(oracle.holdings[8])
-    print("\n")
-    print(oracle.holdings[9])
-
-
-.. parsed-literal::
-
+  
+    >>> print(oracle.holdings[8])
     the Holding to ACCEPT
       the Rule that the court MUST SOMETIMES impose the
         RESULT:
@@ -542,7 +439,7 @@ Character Recognition errors.
         DESPITE the ENACTMENT:
           "In no case does copyright protection for an original work of authorship extend to any idea, procedure, process, system, method of operation, concept, principle, or discovery, regardless of the form in which it is described, explained, illustrated, or embodied in such work." (/us/usc/t17/s102/b 2013-07-18)
 
-
+    >>> print(oracle.holdings[9])
     the Holding to ACCEPT
       the Rule that the court MUST SOMETIMES impose the
         RESULT:
@@ -572,18 +469,14 @@ Character Recognition errors.
    operating” the system, it is undisputed that— other than perhaps as
    to the three core packages — Google did not need to copy the
    structure, sequence, and organization of the Java API packages to
-   write programs in the Java language.:raw-latex:`\nMore `importantly,
+   write programs in the Java language.
+   
+   More importantly,
    however, the Ninth Circuit has not adopted the court’s “method of
    operation” reasoning in Lotus, and we conclude that it is
    inconsistent with binding precedent.
 
-.. code:: ipython3
-
-    print(oracle.holdings[10])
-
-
-.. parsed-literal::
-
+    >>> print(oracle.holdings[10])
     the Holding to ACCEPT
       the Rule that the court MUST SOMETIMES impose the
         RESULT:
@@ -619,13 +512,7 @@ Character Recognition errors.
    considered questions of copyrightability, concepts of merger and
    scenes a faire are affirmative defenses to claims of infringement.
 
-.. code:: ipython3
-
-    print(oracle.holdings[11])
-
-
-.. parsed-literal::
-
+    >>> print(oracle.holdings[11])
     the Holding to ACCEPT
       the Rule that the court MUST SOMETIMES impose the
         RESULT:
@@ -648,15 +535,8 @@ Character Recognition errors.
    copyrighted work from infringement if the idea contained therein can
    be expressed in only one way.
 
-.. code:: ipython3
 
-    print(oracle.holdings[12])
-    print("\n")
-    print(oracle.holdings[13])
-
-
-.. parsed-literal::
-
+    >>> print(oracle.holdings[12])
     the Holding to ACCEPT
       the Rule that the court MUST SOMETIMES impose the
         RESULT:
@@ -672,7 +552,7 @@ Character Recognition errors.
         DESPITE the ENACTMENT:
           "Copyright protection subsists, in accordance with this title, in original works of authorship fixed in any tangible medium of expression, now known or later developed, from which they can be perceived, reproduced, or otherwise communicated, either directly or with the aid of a machine or device.…" (/us/usc/t17/s102/a 2013-07-18)
 
-
+    >>> print(oracle.holdings[13])
     the Holding to ACCEPT
       the Rule that the court MUST SOMETIMES impose the
         RESULT:
@@ -711,13 +591,7 @@ because AuthoritySpoke doesn’t yet include “Argument” objects.
    7000 lines Google copied.”…This was not a situation where Oracle was
    selecting among preordained names and phrases to create its packages.
 
-.. code:: ipython3
-
-    print(oracle.holdings[14])
-
-
-.. parsed-literal::
-
+    >>> print(oracle.holdings[14])
     the Holding to ACCEPT
       the Rule that the court MUST SOMETIMES impose the
         RESULT:
@@ -738,13 +612,7 @@ because AuthoritySpoke doesn’t yet include “Argument” objects.
    the work at issue contains short phrases — as literary works often do
    — but, rather, whether those phrases are creative.
 
-.. code:: ipython3
-
-    print(oracle.holdings[15])
-
-
-.. parsed-literal::
-
+    >>> print(oracle.holdings[15])
     the Holding to ACCEPT
       the Rule that the court MUST SOMETIMES impose the
         RESULT:
@@ -769,13 +637,7 @@ because AuthoritySpoke doesn’t yet include “Argument” objects.
    focus of the scenes a faire doctrine is on the circumstances
    presented to the creator, not the copier.
 
-.. code:: ipython3
-
-    print(oracle.holdings[16])
-
-
-.. parsed-literal::
-
+    >>> print(oracle.holdings[16])
     the Holding to ACCEPT
       the Rule that the court MAY SOMETIMES impose the
         RESULT:
@@ -798,13 +660,7 @@ because AuthoritySpoke doesn’t yet include “Argument” objects.
    of a computer program is eligible for copyright protection where it
    qualifies as an expression of an idea, rather than the idea itself.
 
-.. code:: ipython3
-
-    print(oracle.holdings[17])
-
-
-.. parsed-literal::
-
+    >>> print(oracle.holdings[17])
     the Holding to ACCEPT
       the Rule that the court MAY SOMETIMES impose the
         RESULT:
@@ -827,13 +683,7 @@ because AuthoritySpoke doesn’t yet include “Argument” objects.
    to suggest, automatically deny copyright protection to elements of a
    computer program that are functional.
 
-.. code:: ipython3
-
-    print(oracle.holdings[18])
-
-
-.. parsed-literal::
-
+    >>> print(oracle.holdings[18])
     the Holding to ACCEPT
       the Rule that the court MUST ALWAYS impose the
         RESULT:
@@ -857,13 +707,7 @@ because AuthoritySpoke doesn’t yet include “Argument” objects.
    invitation to declare that protection of software programs should be
    the domain of patent law, and only patent law.
 
-.. code:: ipython3
-
-    print(oracle.holdings[19])
-
-
-.. parsed-literal::
-
+    >>> print(oracle.holdings[19])
     the Holding to ACCEPT
       the Rule that the court MAY SOMETIMES impose the
         RESULT:

@@ -178,6 +178,12 @@ class Holding(Comparable):
         return None
 
     def __add__(self, other: Factor) -> Optional[Union[Rule, Holding]]:
+        """
+        Create new Holding combining self and other into a single step, if possible.
+
+        The Holdings can be combined only if the application of Holding ``self``
+        necessarily provides all the required inputs for the application of ``other``.
+        """
         if isinstance(other, Rule):
             other = Holding(rule=other)
         if isinstance(other, Holding):
@@ -533,7 +539,21 @@ class Holding(Comparable):
     def union(
         self, other: Union[Rule, Holding], context: Optional[ContextRegister] = None
     ) -> Optional[Holding]:
-        """Infer a Holding from all inputs and outputs of self and other, in context."""
+        """
+        Infer a Holding from all inputs and outputs of self and other, in context.
+
+        Creates a new Holding with all of the inputs and all of the outputs
+        of both of the two original Holdings.
+
+        However, you only get such a new Holding if it can be inferred by
+        accepting the truth of the two original Holdings.
+
+        If self contradicts() other, the operation returns None. Likewise, if
+        the two original Holdings both have the value False for the parameter
+        universal, the operation will return None if it’s possible that the
+        “SOME” cases where one of the original Holdings applies don’t
+        overlap with the “SOME” cases where the other applies.
+        """
         context = context or ContextRegister()
         if isinstance(other, Rule):
             other = Holding(rule=other)

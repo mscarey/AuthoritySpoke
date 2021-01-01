@@ -33,6 +33,7 @@ TextLinkDict = Dict[str, List[TextQuoteSelector]]
 
 
 class AnchoredHoldings(NamedTuple):
+    """Holdings with objects storing the Holdings' links to Opinion text."""
     holdings: List[Holding]
     holding_anchors: List[List[TextQuoteSelector]]
     named_anchors: TextLinkDict

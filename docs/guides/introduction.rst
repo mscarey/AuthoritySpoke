@@ -264,41 +264,41 @@ the :class:`~legislice.enactments.Enactment` class.
 
 Now we can link some legal analysis to each
 majority :class:`~authorityspoke.opinions.Opinion` by
-using :meth:`~authorityspoke.decisions.Decision.posit`
-or :meth:`~authorityspoke.opinions.Opinion.posit`. The parameter we pass to
-this function is a :meth:`~authorityspoke.holdings.Holding` or list 
+using :meth:`authorityspoke.decisions.Decision.posit`
+or :meth:`authorityspoke.opinions.Opinion.posit`. The parameter we pass to
+this function is a :class:`~authorityspoke.holdings.Holding` or list
 of :class:`~authorityspoke.holdings.Holding`\s posited by the
-:class:`~authorityspoke.opinions.Opinion`\. You can think of 
+:class:`~authorityspoke.opinions.Opinion`\. You can think of
 a :class:`~authorityspoke.holdings.Holding` as a statement about whether
-a :class:`~authorityspoke.rules.Rule` is or is not valid law. 
-A holding may exist in the abstract, or one or more 
-:class:`~authorityspoke.opinion.Opinion`\s may 
-:meth:`~authorityspoke.opinions.Opinion.posit` it, which 
-means that the :class:`~authorityspoke.opinions.Opinion` adopts 
+a :class:`~authorityspoke.rules.Rule` is or is not valid law.
+A holding may exist in the abstract, or one or
+more :class:`~authorityspoke.opinions.Opinion`\s may
+:meth:`~authorityspoke.opinions.Opinion.posit` it, which
+means that the :class:`~authorityspoke.opinions.Opinion` adopts
 the :class:`~authorityspoke.holdings.Holding` as its own. An
-:class:`~authorityspoke.opinions.Opinion` may posit more than 
+:class:`~authorityspoke.opinions.Opinion` may posit more than
 one :class:`~authorityspoke.holdings.Holding`\.
 
-Sadly, the labor of creating data 
+Sadly, the labor of creating data
 about :class:`~authorityspoke.holdings.Holding`\s falls mainly to
 the user rather than the computer, at least in this early version of
-AuthoritySpoke. AuthoritySpoke 
+AuthoritySpoke. AuthoritySpoke
 loads :class:`~authorityspoke.holdings.Holding`\s from structured
 descriptions that need to be created outside of AuthoritySpoke as JSON
-files. For more information on creating these JSON files, see 
+files. For more information on creating these JSON files, see
 the :ref:`create_holding_data`.
 The guide includes a :ref:`json_api_spec`
 describing the required data format.
 
 For now, this introduction will rely on example JSON files that have
 already been created. AuthoritySpoke should find them and convert them
-to AuthoritySpoke objects when we call 
+to AuthoritySpoke objects when we call
 the :func:`~authorityspoke.io.loaders.load_and_read_holdings`
 function. If you pass in a ``client`` parameter, AuthoritySpoke will
 make calls to the API at
 `authorityspoke.com <https://authorityspoke.com/>`__ to find and link
-the statutes or other :class:`~legislice.enactments.Enactment`\s cited in 
-the :class:`~legislice.holdings.Holding`\.
+the statutes or other :class:`~legislice.enactments.Enactment`\s cited in
+the :class:`~authorityspoke.holdings.Holding`\.
 
     >>> from authorityspoke.io.loaders import load_and_read_holdings
     >>> oracle_holdings = load_and_read_holdings("holding_oracle.json", client=legis_client)
@@ -313,7 +313,7 @@ the :class:`~legislice.holdings.Holding`\.
           "Copyright protection subsists, in accordance with this title, in original works of authorship fixed in any tangible medium of expression, now known or later developed, from which they can be perceived, reproduced, or otherwise communicated, either directly or with the aid of a machine or device.…" (/us/usc/t17/s102/a 2013-07-18)
 
 You can also convert Holdings back to JSON, or to a Python dictionary,
-using the ``dump`` module.
+using the :mod:`~authorityspoke.io.dump` module.
 
     >>> from authorityspoke.io.dump import to_json, to_dict
     >>> to_dict(oracle_holdings[0])["rule"]["procedure"]
@@ -364,16 +364,18 @@ using the ``dump`` module.
 -------------------------------
 
 If you want annotation anchors to link each Holding to a passage in an
-:class:`~authorityspoke.holdings.Opinion`\, you can use 
+:class:`~authorityspoke.opinions.Opinion`\, you can use
 the :func:`~authorityspoke.io.loaders.load_holdings_with_anchors` method. The
-result is type of NamedTuple called ``AnchoredHoldings``. You can pass
-this :py:class:`NamedTuple` as the only argument 
-to the :meth:`authorityspoke.opinions.Decision.posit` method
-to assign the :class:`~authorityspoke.holdings.Holding`\s to the 
+result is type of :py:class:`~typing.NamedTuple` called
+:class:`~authorityspoke.opinions.AnchoredHoldings`\. You can pass
+this NamedTuple as the only argument
+to the :meth:`authorityspoke.decisions.Decision.posit` method
+to assign the :class:`~authorityspoke.holdings.Holding`\s to the
 majority :class:`~authorityspoke.opinions.Opinion` of a
-:class:`~authorityspoke.decisions.Decision`. 
-This will also
-link the correct text passages from the Opinion to each Holding.
+:class:`~authorityspoke.decisions.Decision`.
+This will also link the correct text passages from
+the :class:`~authorityspoke.opinions.Opinion` to
+each :class:`~authorityspoke.holdings.Holding`\.
 
     >>> from authorityspoke.io.loaders import load_holdings_with_anchors
     >>> oracle_holdings_with_anchors = load_holdings_with_anchors("holding_oracle.json", client=legis_client)
@@ -382,8 +384,8 @@ link the correct text passages from the Opinion to each Holding.
     >>> lotus.posit(lotus_holdings_with_anchors)
 
 You can pass either one Holding or a list of Holdings to
-:meth:`~authorityspoke.opinions.Decision.posit`. 
-The :meth:`authorityspoke.opinions.Decision.posit` method also has a
+:meth:`authorityspoke.decisions.Decision.posit`.
+The :meth:`~authorityspoke.decisions.Decision.posit` method also has a
 ``text_links`` parameter that takes a dict indicating what text spans in
 the Opinion should be linked to which Holding.
 
@@ -392,11 +394,14 @@ the Opinion should be linked to which Holding.
 
 If you take a look in
 `holding_oracle.json <https://github.com/mscarey/AuthoritySpoke/blob/master/example_data/holdings/holding_oracle.json>`__
-in AuthoritySpoke’s git repository, you’ll see that it’s a list of 20
-holdings. (You can verify this by checking how many times the string
-“inputs” appears in the file.)
+in AuthoritySpoke’s git repository, you’ll see that it would be loaded
+in Python as a :py:class:`list` of 20 :py:class:`dict`\s, each representing a
+holding. (In case you aren't familiar with how Python handles JSON, the outer
+square brackets represent the beginning and end of the list. The start and end of each
+:py:class:`dict` in the list is shown by a matched pair of curly brackets.)
 
-Let’s make sure that the .posit() method linked all of those holdings to
+Let’s make sure that the :meth:`~authorityspoke.decisions.Decision.posit` method
+linked all of those holdings to
 our ``oracle`` :class:`~authorityspoke.holdings.Opinion` object.
 
     >>> len(oracle.holdings)
@@ -422,12 +427,14 @@ it’s hard to understand anything else about a legal rule until you
 understand what it does. Also, notice the separate heading “GIVEN the
 ENACTMENT”. This indicates that the existence of statutory text (or
 another kind of enactment such as a constitution) can also be a
-precondition for a ``Rule`` to apply. So the two preconditions that must
-be present to apply this ``Rule`` are “the Fact it is false that the
-Java API was an original work” and the statutory text creating copyright
-protection.
+precondition for a :class:`~authorityspoke.rules.Rule` to apply.
+So the two preconditions that must
+be present to apply this :class:`~authorityspoke.rules.Rule` are
+“the Fact it is false that the Java API was an original work” and
+the statutory text creating copyright protection.
 
-It’s also important to notice that a ``Rule`` can be purely hypothetical
+It’s also important to notice that
+a :class:`~authorityspoke.rules.Rule` can be purely hypothetical
 from the point of view of the Opinion that posits it. In this case, the
 court finds that there would be a certain legal significance if it was
 “GIVEN” that ``it is false that <the Java API> was an original work``,
@@ -435,8 +442,8 @@ but the court isn’t going to find that precondition applies, so it’s
 also not going to accept the “RESULT” that
 ``it is false that <the Java API> was copyrightable``.
 
-We can also access just the inputs of a ``Holding``, just the
-``Enactment``\ s, etc.
+We can also access just the inputs of a :class:`~authorityspoke.holdings.Holding`\, just the
+:class:`~authorityspoke.enactments.Enactment`\s, etc.
 
     >>> print(oracle.holdings[0].inputs[0])
     the Fact it is false that <the Java API> was an original work
@@ -450,37 +457,25 @@ We can also access just the inputs of a ``Holding``, just the
 ------------------
 
 The two instances of the phrase “the Java API” are in angle brackets to
-indicate that the Java API is a generic ``Entity`` mentioned in the
-``Fact``.
+indicate that the Java API is a generic :class:`~authorityspoke.entities.Entity` mentioned
+in the :class:`~authorityspoke.facts.Fact`\.
 
-.. code:: ipython3
-
-    oracle.holdings[0].generic_factors
-
-
-
-
-.. parsed-literal::
-
+    >>> oracle.holdings[0].generic_factors
     [Entity(name='the Java API', generic=True, plural=False, anchors=[])]
 
 
+A generic :class:`~authorityspoke.entities.Entity` is “generic”
+in the sense that in the context of
+the :class:`~authorityspoke.factors.Factor` where
+the :class:`~authorityspoke.entities.Entity` appears, it could be replaced with
+some other generic :class:`~authorityspoke.entities.Entity` without
+changing the meaning of the
+:class:`~authorityspoke.factors.Factor` or the :class:`~authorityspoke.rules.Rule` where it appears.
 
-A generic ``Entity`` is “generic” in the sense that in the context of
-the ``Factor`` where the ``Entity`` appears, it could be replaced with
-some other generic ``Entity`` without changing the meaning of the
-``Factor`` or the ``Rule`` where it appears.
-
-Let’s illustrate this idea with the first ``Holding`` from the *Lotus*
+Let’s illustrate this idea with the first holding from the *Lotus*
 case.
 
-.. code:: ipython3
-
-    print(lotus.holdings[0])
-
-
-.. parsed-literal::
-
+    >>> print(lotus.holdings[0])
     the Holding to ACCEPT that the EXCLUSIVE way to reach the fact that
     <Borland International> infringed the copyright in <the Lotus menu
     command hierarchy> is
@@ -496,27 +491,22 @@ case.
           "Copyright protection subsists, in accordance with this title, in original works of authorship fixed in any tangible medium of expression, now known or later developed, from which they can be perceived, reproduced, or otherwise communicated, either directly or with the aid of a machine or device.…" (/us/usc/t17/s102/a 2013-07-18)
 
 
-What if we wanted to generalize this ``Holding`` about copyright and
+What if we wanted to generalize
+this :class:`~authorityspoke.holdings.Holding` about copyright and
 apply it in a different context, such as a case about books or
 television shows instead of computer programs? First we could look at
-the “generic” ``Factor``\ s of the ``Holding``, which were marked off in
-angle brackets in the string representation of the ``Holding``.
+the “generic” :class:`~authorityspoke.factors.Factor`\s of
+the :class:`~authorityspoke.holdings.Holding`, which were marked off in
+angle brackets in the string representation of
+the :class:`~authorityspoke.holdings.Holding`\.
 
-.. code:: ipython3
-
-    lotus.holdings[0].generic_factors
-
-
-
-
-.. parsed-literal::
-
+    >>> lotus.holdings[0].generic_factors
     [Entity(name='Borland International', generic=True, plural=False, anchors=[]),
-     Entity(name='the Lotus menu command hierarchy', generic=True, plural=False, anchors=[])]
+    Entity(name='the Lotus menu command hierarchy', generic=True, plural=False, anchors=[])]
 
 
-
-The same ``Rule``\ s and ``Holding``\ s may be relevant to more than one
+The same :class:`~authorityspoke.rules.Rule`\s and
+:class:`~authorityspoke.holdings.Holding`\s may be relevant to more than one
 ``Opinion``. Let’s try applying the idea from ``lotus.holdings[0]`` to a
 different copyright case that’s also about a derivative work. In `Castle
 Rock Entertainment, Inc. v. Carol Publishing Group
@@ -525,19 +515,18 @@ Inc. <https://en.wikipedia.org/wiki/Castle_Rock_Entertainment,_Inc._v._Carol_Pub
 infringed the copyright in the sitcom *Seinfeld* by publishing a trivia
 book called *SAT: The Seinfeld Aptitude Test*.
 
-Maybe we’d like to see how the ``Holding`` from the *Lotus* case could
+Maybe we’d like to see how the :class:`~authorityspoke.holdings.Holding` from
+the *Lotus* case could
 have applied in the context of the *Castle Rock Entertainment* case,
 under 17 USC 102. We can check that by using the
-``Holding.new_context()`` method to replace the generic factors from the
-*Lotus* ``Holding``. One way to do this is by passing a tuple containing
-a list of factors that need to be replaced, followed by a list of their
-replacements.
+:meth:`~authorityspoke.holdings.Holding.new_context` method to replace
+the generic factors from the
+*Lotus* :class:`~authorityspoke.holdings.Holding`\. One way to do this
+is by passing a tuple containing a list of factors that need to be replaced,
+followed by a list of their replacements.
 
-.. code:: ipython3
-
-    from authorityspoke import Entity
-
-    seinfeld_holding = lotus.holdings[0].new_context(
+    >>> from authorityspoke import Entity
+    >>> seinfeld_holding = lotus.holdings[0].new_context(
         (
             [
                 Entity("Borland International"),
@@ -547,18 +536,14 @@ replacements.
         ),
     )
 
-The ``new_context`` method returns a new ``Holding`` object, which we’ve
-assigned to the name ``seinfeld_holding``, but the ``Holding`` that we
+The :meth:`~authorityspoke.holdings.Holding.new_context` method
+returns a new :class:`~authorityspoke.holdings.Holding` object,
+which we’ve assigned to the name ``seinfeld_holding``, but
+the :class:`~authorityspoke.holdings.Holding` that we
 used as a basis for the new object also still exists, and it’s
 unchanged.
 
-.. code:: ipython3
-
-    print(seinfeld_holding)
-
-
-.. parsed-literal::
-
+    >>> print(seinfeld_holding)
     the Holding to ACCEPT
       the Rule that the court MAY SOMETIMES impose the
         RESULT:
@@ -572,105 +557,80 @@ unchanged.
           "Copyright protection subsists, in accordance with this title, in original works of authorship fixed in any tangible medium of expression, now known or later developed, from which they can be perceived, reproduced, or otherwise communicated, either directly or with the aid of a machine or device.…" (/us/usc/t17/s102/a 2013-07-18)
 
 
-Even though these ``Holding``\ s have different generic factors and
-don’t evaluate equal to one another, the ``Holding.means()`` method
+Even though these :class:`~authorityspoke.holdings.Holding`\s have different
+generic factors and don’t evaluate equal to one another,
+the :meth:`~authorityspoke.holdings.Holding.means` method
 shows that they have the same meaning. In other words, they both endorse
-exactly the same legal Rule. If Holding A ``means`` Holding B, then
-Holding A also necessarily ``implies`` Holding B.
+exactly the same legal Rule. If
+Holding A :meth:`~authorityspoke.holdings.Holding.means` Holding B, then
+Holding A also necessarily :meth:`~authorityspoke.holdings.Holding.implies` Holding B.
 
-.. code:: ipython3
-
-    lotus.holdings[0] == seinfeld_holding
-
-
-
-
-.. parsed-literal::
-
+    >>> lotus.holdings[0] == seinfeld_holding
     False
 
 
-
-.. code:: ipython3
-
-    lotus.holdings[0].means(seinfeld_holding)
-
-
-
-
-.. parsed-literal::
-
+    >>> lotus.holdings[0].means(seinfeld_holding)
     True
-
 
 
 8. Enactment Objects and Implication
 ------------------------------------
 
-Sometimes it’s useful to know whether one ``Rule`` or ``Holding``
-implies another. Basically, one legal ``Holding`` implies a second
-``Holding`` if its meaning entirely includes the meaning of the second
-``Holding``. To illustrate this idea, let’s look at the ``Enactment``
-that needs to be present to trigger the ``Holding`` at
+Sometimes it’s useful to know whether
+one :class:`~authorityspoke.rules.Rule`
+or :class:`~authorityspoke.holdings.Holding`
+implies another. Basically, one
+legal :class:`~authorityspoke.holdings.Holding`
+:meth:`~authorityspoke.holdings.Holding.implies` a second
+:class:`~authorityspoke.holdings.Holding` if its meaning
+entirely includes the meaning of the second
+:class:`~authorityspoke.holdings.Holding`\. To illustrate this idea,
+let’s look at the :class:`~authorityspoke.enactments.Enactment`
+that needs to be present to support the :class:`~authorityspoke.holdings.Holding` at
 ``oracle.holdings[0]``.
 
-.. code:: ipython3
-
-    copyright_provision = oracle.holdings[0].enactments[0]
-    print(copyright_provision)
-
-
-.. parsed-literal::
-
+    >>> copyright_provision = oracle.holdings[0].enactments[0]
+    >>> print(copyright_provision)
     "Copyright protection subsists, in accordance with this title, in original works of authorship fixed in any tangible medium of expression, now known or later developed, from which they can be perceived, reproduced, or otherwise communicated, either directly or with the aid of a machine or device.…" (/us/usc/t17/s102/a 2013-07-18)
 
 
-The ``Enactment`` object refers to part of the text of subsection 102(a)
+The :class:`~legislice.enactments.Enactment` object refers to part of the text of subsection 102(a)
 from `Title 17 of the United States
 Code <https://www.copyright.gov/title17/>`__.
 
-Next, let’s create a new ``Enactment`` object representing a shorter
+Next, let’s create a new :class:`~legislice.enactments.Enactment`
+object representing a shorter
 passage of text from the same provision. We select some text from the
-provision by calling the ``select`` method with the string
-``works_of_authorship_passage``, which exactly matches some text that
-can be found in subsection 102(a).
+provision by calling the :meth:`~legislice.enactments.Enactment.select`
+method with the string "Copyright protection subsists, in accordance with this title,
+in original works of authorship", which exactly
+matches some text that can be found in subsection 102(a).
 
-.. code:: ipython3
-
-    from authorityspoke import Enactment
-    from anchorpoint import TextQuoteSelector
-
+    >>> from authorityspoke import Enactment
+    >>> from anchorpoint import TextQuoteSelector
     works_of_authorship_passage = (
         "Copyright protection subsists, in accordance with this title, "
         + "in original works of authorship"
     )
-
-
     works_of_authorship_clause = legis_client.read("/us/usc/t17/s102/a")
     works_of_authorship_clause.select(works_of_authorship_passage)
 
-Now we can create a new ``Holding`` object that cites to our new
-``Enactment`` object rather than the old one. This time, instead of
-using the ``new_context`` method to create a new ``Holding`` object,
-we’ll use Python's built-in deepcopy method. This method gives us an
-identical copy of the Holding object that we can change without
-changing the original. Then we can use the set_enactments method to
-change what Enactment is cited by the new Holding.
+Now we can create a new :class:`~authorityspoke.holdings.Holding` object
+that cites to our new :class:`~legislice.enactments.Enactment` object
+rather than the old one. This time, instead of using the
+:meth:`~authorityspoke.holdings.Holding.new_context` method to create
+a new :class:`~authorityspoke.holdings.Holding` object,
+we’ll use Python's built-in :py:func:`~copy.deepcopy` function. This method gives us an
+identical copy of the :class:`~authorityspoke.holdings.Holding` that we can change without
+changing the original. Then we can use
+the :meth:`~authorityspoke.holdings.Holding.set_enactments` method to
+change what :class:`~legislice.enactments.Enactment` is
+cited by the new :class:`~authorityspoke.holdings.Holding`\.
 
-.. code:: ipython3
-
-    from copy import deepcopy
-
-    holding_with_shorter_enactment = deepcopy(oracle.holdings[0])
-    holding_with_shorter_enactment.set_enactments(works_of_authorship_clause)
-
-.. code:: ipython3
-
-    print(holding_with_shorter_enactment)
-
-
-.. parsed-literal::
-
+    >>> from copy import deepcopy
+    >>> holding_with_shorter_enactment = deepcopy(oracle.holdings[0])
+    >>> holding_with_shorter_enactment.set_enactments(works_of_authorship_clause)
+    >>> print(holding_with_shorter_enactment)
     the Holding to ACCEPT
       the Rule that the court MUST SOMETIMES impose the
         RESULT:
@@ -681,51 +641,36 @@ change what Enactment is cited by the new Holding.
           "Copyright protection subsists, in accordance with this title, in original works of authorship…" (/us/usc/t17/s102/a 2013-07-18)
 
 
-Now let’s try comparing this new ``Holding`` with the real ``Holding``
-from the *Oracle* case, to see whether one implies the other. When
+Now let’s try comparing this new :class:`~authorityspoke.holdings.Holding`
+with the real :class:`~authorityspoke.holdings.Holding` from
+the *Oracle* case, to see whether one :meth:`~authorityspoke.holdings.Holding.implies`
+the other. When
 you’re comparing AuthoritySpoke objects, the greater than sign ``>``
 means “implies, but is not equal to”.
 
-.. code:: ipython3
-
-    holding_with_shorter_enactment > oracle.holdings[0]
-
-
-
-
-.. parsed-literal::
-
+    >>> holding_with_shorter_enactment > oracle.holdings[0]
     True
-
-
 
 You can also use the greater than or equal sign ``>=`` to mean “implies
 or is equal to”. You can also use lesser than signs to test whether an
 object on the right side of the expression implies the object on the
 left. Thus, ``<=`` would mean “is implied by or is equal to”.
 
-.. code:: ipython3
-
-    holding_with_shorter_enactment <= oracle.holdings[0]
-
-
-
-
-.. parsed-literal::
-
+    >>> holding_with_shorter_enactment <= oracle.holdings[0]
     False
 
-
-
-By comparing the string representations of the original ``Holding`` from
+By comparing the string representations of the
+original :class:`~authorityspoke.holdings.Holding` from
 the *Oracle* case and ``holding_with_shorter_enactment``, can you tell
 why the latter implies the former, and not the other way around?
 
 If you guessed that it was because ``holding_with_shorter_enactment``
-has a shorter ``Enactment``, you’re right. ``Rule``\ s that require
-fewer, or less specific, inputs are *broader* than ``Rule``\ s that have
-more inputs, because there’s a larger set of situations where those
-``Rule``\ s can be triggered.
+has a shorter :class:`~legislice.enactments.Enactment`\, you’re right.
+A :class:`~authorityspoke.rules.Rule` that requires
+fewer, or less specific, inputs is *broader* than
+a :class:`~authorityspoke.rules.Rule` that has
+more inputs, because there’s a larger set of situations where the
+:class:`~authorityspoke.rules.Rule` can be triggered.
 
 If this relationship isn’t clear to you, imagine some “Enactment A”
 containing only a subset of the text of “Enactment B”, and then imagine
@@ -745,15 +690,10 @@ It says that under a statute providing that “In no case does copyright
 protection for an original work of authorship extend to any…method of
 operation”, the fact that a Lotus menu command hierarchy was a “method
 of operation” meant that it was also uncopyrightable, despite a couple
-of ``Fact``\ s that might tempt some courts to rule the other way.
+of :class:`~authorityspoke.facts.Fact`\s that might tempt some
+courts to rule the other way.
 
-.. code:: ipython3
-
-    print(lotus.holdings[6])
-
-
-.. parsed-literal::
-
+    >>> print(lotus.holdings[6])
     the Holding to ACCEPT
       the Rule that the court MUST ALWAYS impose the
         RESULT:
@@ -771,35 +711,22 @@ of ``Fact``\ s that might tempt some courts to rule the other way.
 
 *Lotus* was a case relied upon by Google in the *Oracle v. Google* case,
 but Oracle was the winner in that decision. So we might wonder whether
-the *Oracle* Opinion contradicts the *Lotus* Opinion. Let’s check.
+the *Oracle* majority opinion
+:meth:`~authorityspoke.opinions.Opinion.contradicts` the *Lotus*
+majority opinion. Let’s check.
 
-.. code:: ipython3
-
-    oracle.contradicts(lotus)
-
-
-
-
-.. parsed-literal::
-
+    >>> oracle.contradicts(lotus)
     True
 
-
-
 That’s good to know, but we don’t want to take it on faith that a
-contradiction exists. Let’s use the ``explain_contradiction`` method to
-find the contradictory ``Holding``\ s posited by the *Oracle* and
-*Lotus* cases, and to generate a rudimentary explanation of why they
-contradict.
+contradiction exists. Let’s use
+the :meth:`~authorityspoke.opinions.Opinion.explain_contradiction` method to
+find the contradictory :class:`~authorityspoke.holdings.Holding`\s posited
+by the *Oracle* and *Lotus* cases, and to generate a rudimentary
+explanation of why they contradict.
 
-.. code:: ipython3
-
-    explanation = lotus.explain_contradiction(oracle)
-    print(explanation)
-
-
-.. parsed-literal::
-
+    >>> explanation = lotus.explain_contradiction(oracle)
+    >>> print(explanation)
     EXPLANATION: Because <the Lotus menu command hierarchy> is like <the Java API>,
       the Holding to ACCEPT
         the Rule that the court MUST ALWAYS impose the
@@ -849,37 +776,38 @@ contradict.
 That’s a really complicated holding! Good thing we have AuthoritySpoke
 to help us grapple with it.
 
-We can use the ``explanations_contradiction`` method directly on
-``Holding``\ s to generate all available “explanations” of why a
-contradiction is possible between these lotus.holdings[6] and
-oracle.holdings[10]. Each ``Explanation`` includes a mapping that shows
-how the context factors of the ``Holding`` on the left can be mapped
-onto the ``Holding`` on the right. The explanation we’ve already been
-given is that these two ``Holding``\ s contradict each other if you
+We can use the :meth:`~authorityspoke.holdings.Holding.explain_contradiction` method
+directly on a :class:`~authorityspoke.holdings.Holding` to generate all
+available :class:`~authorityspoke.explanations.Explanation`\s of why a
+contradiction is possible between `lotus.holdings[6]` and
+`oracle.holdings[10]`. Each :class:`~authorityspoke.explanations.Explanation`
+includes a mapping that shows how the context factors of
+the :class:`~authorityspoke.holdings.Holding` on the left can be mapped
+onto the :class:`~authorityspoke.holdings.Holding` on the right.
+The explanation we’ve already been
+given is that these two :class:`~authorityspoke.holdings.Holding`\s
+contradict each other if you
 consider ‘the Lotus menu command hierarchy’ to be analagous to ‘the Java
 API’. The other possible explanation AuthoritySpoke could have given
 would have been that ‘the Lotus menu command hierarchy’ is analagous to
-‘the Java language’. Let’s see if the other possible ``Explanation``
-also appears in ``explanations``. (The ``explain_contradiction`` method
-returns only one one ``Explanation``, but ``explanations_contradiction``
-returns all it can find.)
-
-.. code:: ipython3
-
-    explanations = list(lotus.holdings[6].explanations_contradiction(oracle.holdings[10]))
-    len(explanations)
+‘the Java language’. Let’s see if the other
+possible :class:`~authorityspoke.explanations.Explanation`
+also appears in ``explanations``.
 
 
-
-
-.. parsed-literal::
-
+    >>> explanations = list(lotus.holdings[6].explanations_contradiction(oracle.holdings[10]))
+    >>> len(explanations)
     1
 
-
-
-No, there’s only the one explanation of how these rules can contradict
-each other. If you read the *Oracle* case, this makes sense. It’s only
+No, there’s only one :class:`~authorityspoke.explanations.Explanation`
+given for how these rules can contradict each other.
+(The :meth:`~authorityspoke.holdings.Holding.explain_contradiction` method
+returns only one one :class:`~authorityspoke.explanations.Explanation`, but
+:meth:`~authorityspoke.holdings.Holding.explanations_contradiction`
+is a generator that yields every :class:`~authorityspoke.explanations.Explanation`
+it can find.) If you read the *Oracle* case, is makes sense that ‘the
+Lotus menu command hierarchy’ is not considered analagous to
+‘the Java language’. The *Oracle* case is only
 about infringing the copyright in the Java API, not the copyright in the
 whole Java language. A statement about infringement of ‘the Java
 language’ would be irrelevant, not contradictory.
@@ -887,7 +815,8 @@ language’ would be irrelevant, not contradictory.
 But what exactly is the contradiction between the two ``Holding``\ s?
 
 The first obvious contrast between ``lotus.holdings[6]`` and
-``oracle.holdings[10]`` is that the ``Holding`` from the *Lotus* case is
+``oracle.holdings[10]`` is that
+the :class:`~authorityspoke.holdings.Holding` from the *Lotus* case is
 relatively succinct and categorical. The *Lotus* court interprets
 Section 102(b) of the Copyright Act to mean that if a work is a “method
 of operation”, it’s simply impossible for that work to be copyrighted,
@@ -907,21 +836,25 @@ Federal Circuit’s view.
    F.3d 1366, 1372 (10th Cir.1997)
 
 And that’s why AuthoritySpoke finds a contradiction between these two
-``Rule``\ s. The *Oracle* opinion says that courts can sometimes accept
-the result ``the Fact that <the Java API> was copyrightable`` despite
-the ``Fact`` ``<the Java API> was a method of operation``. The *Lotus*
-Opinion would consider that impossible.
+:class:`~authorityspoke.rules.Rule`\s. The *Oracle* opinion says that
+courts can sometimes accept the result ``the Fact that <the Java API>
+was copyrightable`` despite
+the :class:`~authorityspoke.facts.Fact` ``<the Java API> was a method
+of operation``. The *Lotus* :class:`~authorityspoke.opinions.Opinion`
+would consider that impossible.
 
 By the way, AuthoritySpoke does not draw on any Natural Language
-Understanding technologies to determine the meaning of each ``Fact``.
-AuthoritySpoke mostly won’t recognize that ``Fact``\ s have the same
+Understanding technologies to determine the meaning of
+each :class:`~authorityspoke.facts.Fact`\.
+AuthoritySpoke mostly won’t recognize
+that :class:`~authorityspoke.facts.Fact`\s have the same
 meaning unless their ``content`` values are exactly the same string. As
 discussed above, they can also differ in their references to generic
 factors, which are the phrases that appear in brackets when you use the
-``str()`` command on them. (Also, AuthoritySpoke has a limited ability
-to compare numerical statements in ``Fact``\ s using
+``str()`` command on them. Also, AuthoritySpoke has a limited ability
+to compare numerical statements in :class:`~authorityspoke.facts.Fact`\s using
 `pint <https://pint.readthedocs.io/en/stable/>`__, an amazing Python
-library that performs dimensional analysis.)
+library that performs dimensional analysis.
 
 10. Adding Holdings to One Another
 ----------------------------------
@@ -929,10 +862,8 @@ library that performs dimensional analysis.)
 To try out the addition operation, let’s load another case from the
 ``example_data`` folder.
 
-.. code:: ipython3
-
-    feist = load_and_read_decision("feist_h.json")
-    feist.posit(load_holdings_with_anchors("holding_feist.json", client=legis_client))
+    >>> feist = load_and_read_decision("feist_h.json")
+    >>> feist.posit(load_holdings_with_anchors("holding_feist.json", client=legis_client))
 
 
 `Feist Publications, Inc. v. Rural Telephone Service
@@ -941,16 +872,11 @@ was a case that held that the listings in a telephone directory did not
 qualify as “an original work” and that only original works are eligible
 for protection under the Copyright Act. This is a two-step analysis.
 
-The first step results in the ``Fact`` it is false that a generic
-``Entity`` was “an original work”:
+The first step results in
+the :class:`~authorityspoke.facts.Fact` it is false that a generic
+:class:`~authorityspoke.entities.Entity` was “an original work”:
 
-.. code:: ipython3
-
-    print(feist.holdings[10])
-
-
-.. parsed-literal::
-
+    >>> print(feist.holdings[10])
     the Holding to ACCEPT
       the Rule that the court MAY SOMETIMES impose the
         RESULT:
@@ -966,16 +892,10 @@ The first step results in the ``Fact`` it is false that a generic
 
 
 And the second step relies on the result of the first step to reach the
-further result of “absence of the Fact that” a generic ``Entity`` was
-“copyrightable”.
+further result of “absence of the Fact that” a
+generic :class:`~authorityspoke.entities.Entity` was “copyrightable”.
 
-.. code:: ipython3
-
-    print(feist.holdings[3])
-
-
-.. parsed-literal::
-
+    >>> print(feist.holdings[3])
     the Holding to ACCEPT that the EXCLUSIVE way to reach the fact that
     <Rural's telephone directory> was copyrightable is
       the Rule that the court MAY SOMETIMES impose the
@@ -988,19 +908,14 @@ further result of “absence of the Fact that” a generic ``Entity`` was
           "Copyright protection subsists, in accordance with this title, in original works of authorship…" (/us/usc/t17/s102/a 2013-07-18)
 
 
-In this situation, anytime the first Holding (feist.holdings[10]) is
+In this situation, anytime the
+first :class:`~authorityspoke.holdings.Holding` (feist.holdings[10]) is
 applied, the second Holding (feist.holdings[3]) can be applied as well.
-That means the two Holdings can be added together to make a single
-Holding that captures the whole process.
+That means the two Holdings can be :meth:`~authorityspoke.holdings.Holding.__add__`\ed
+together to make a single Holding that captures the whole process.
 
-.. code:: ipython3
-
-    listings_not_copyrightable = feist.holdings[10] + feist.holdings[3]
-    print(listings_not_copyrightable)
-
-
-.. parsed-literal::
-
+    >>> listings_not_copyrightable = feist.holdings[10] + feist.holdings[3]
+    >>> print(listings_not_copyrightable)
     the Holding to ACCEPT
       the Rule that the court MAY SOMETIMES impose the
         RESULT:
@@ -1019,69 +934,34 @@ Holding that captures the whole process.
 
 The difference between ``feist.holdings[10]`` and the newly-created
 Holding ``listings_not_copyrightable`` is that
-``listings_not_copyrightable`` has two Factors under its “RESULT”, not
+``listings_not_copyrightable`` has
+two :class:`~authorityspoke.factors.Factor`\s under its “RESULT”, not
 just one. Notice that it doesn’t matter that the two original Holdings
-reference different generic Entities (“Rural’s telephone directory”
-versus “Rural’s telephone listings”). Because they’re generic, they’re
-interchangeable for this purpose.
+reference different generic :class:`~authorityspoke.entities.Entity` objects 
+(“Rural’s telephone directory” versus “Rural’s telephone listings”). 
+Because they’re generic, they’re interchangeable for this purpose.
 
 You might recall that oracle.holdings[0] also was also about the
 relationship between originality and copyrightability. Let’s see what
 happens when we add oracle.holdings[0] to feist.holdings[10].
 
-.. code:: ipython3
-
-    print(feist.holdings[10] + oracle.holdings[0])
-
-
-.. parsed-literal::
-
+    >>> print(feist.holdings[10] + oracle.holdings[0])
     None
 
 
-Can you guess why it’s not possible to add these two Holdings together?
+Can you guess why it’s not possible to add these 
+two :class:`~authorityspoke.holdings.Holding`\s together?
 Here’s a hint:
 
-.. code:: ipython3
-
-    feist.holdings[10].exclusive
-
-
-
-
-.. parsed-literal::
-
+    >>> feist.holdings[10].exclusive
     False
-
-
-
-.. code:: ipython3
-
-    oracle.holdings[0].exclusive
-
-
-
-
-.. parsed-literal::
-
+    >>> oracle.holdings[0].exclusive
     False
-
-
-
-.. code:: ipython3
-
-    feist.holdings[3].exclusive
-
-
-
-
-.. parsed-literal::
-
+    >>> feist.holdings[3].exclusive
     True
 
-
-
-``feist.holdings[10]`` and ``oracle.holdings[0]`` are both Holdings that
+``feist.holdings[10]`` and ``oracle.holdings[0]`` are 
+both :class:`~authorityspoke.holdings.Holding`\s that
 purport to apply in only “SOME” cases where the specified inputs are
 present, while ``feist.holdings[3]`` purports to be the “EXCLUSIVE” way
 to reach its output, which indicates a statement about “ALL” cases.
@@ -1097,83 +977,41 @@ where ``feist.holdings[10]`` applies.
 11. Set Operations with Holdings
 --------------------------------
 
-In AuthoritySpoke, the union operation is different from the addition
+In AuthoritySpoke, the :meth:`~authorityspoke.holdings.Holding.__or__` operator
+(the \| symbol) is an alias for the :meth:`~authorityspoke.holdings.Holding.union`
+operation. This operation is different from 
+the :meth:`~authorityspoke.holdings.Holding.__add__` 
 operation, and it usually gives different results.
 
-.. code:: ipython3
-
-    result_of_adding = feist.holdings[10] + feist.holdings[3]
-    result_of_union = feist.holdings[10] | feist.holdings[3]
-
-    result_of_adding == result_of_union
-
-
-
-
-.. parsed-literal::
-
+    >>> result_of_adding = feist.holdings[10] + feist.holdings[3]
+    >>> result_of_union = feist.holdings[10] | feist.holdings[3]
+    >>> result_of_adding == result_of_union
     False
 
+Although the existence of the :meth:`~authorityspoke.holdings.Holding.union` 
+operation might suggest that there 
+should also be an intersection operation, an intersection operation 
+is not yet implemented in AuthoritySpoke 0.4.
 
 
-Two set operations that can be meaningfully applied to AuthoritySpoke
-objects are the union operation (using Python’s \| operator) and the
-intersection operation (not yet implemented in AuthoritySpoke 0.3).
-
-For context, let’s review how these operators apply to ordinary Python
-sets. The union operator combines two sets by returning a new set with
-all of the elements of either of the original sets.
-
-.. code:: ipython3
-
-    {3, 4} | {1, 4, 5}
-
-
-
-
-.. parsed-literal::
-
-    {1, 3, 4, 5}
-
-
-
-The intersection operator returns a new set with only the elements that
-were in both original sets.
-
-.. code:: ipython3
-
-    {3, 4} & {1, 4, 5}
-
-
-
-
-.. parsed-literal::
-
-    {4}
-
-
-
-Apply the union operator to two ``Holding``\ s to get a new ``Holding``
+Apply the :meth:`~authorityspoke.holdings.Holding.union` operator 
+to two :class:`~authorityspoke.holdings.Holding`\s to get a 
+new :class:`~authorityspoke.holdings.Holding`
 with all of the inputs and all of the outputs of both of the two
-original ``Holding``\ s. However, you only get such a new ``Holding`` if
+original ``Holding``\s. However, you only get such a new ``Holding`` if
 it can be inferred by accepting the truth of the two original
-``Holding``\ s. If the two original ``Holding``\ s contradict one
-another, the operation returns ``None``. Likewise, if the two original
+``Holding``\s. If ``self`` :meth:`~authorityspoke.holdings.Holding.contradicts` 
+``other``, the operation returns ``None``. Likewise, if the two original
 ``Holding``\ s both have the value ``False`` for the parameter
 ``universal``, the operation will return ``None`` if it’s possible that
-the “SOME” cases where one of the original ``Holding``\ s applies don’t
+the “SOME” cases where one of the original ``Holding``\s applies don’t
 overlap with the “SOME” cases where the other applies.
 
 In this example, we’ll look at a ``Holding`` from *Oracle*, then a
-``Holding`` from *Feist*, and then the union of both of them.
+``Holding`` from *Feist*, and then 
+the :meth:`~authorityspoke.holdings.Holding.union` of both of them.
 
-.. code:: ipython3
-
-    print(oracle.holdings[1])
-
-
-.. parsed-literal::
-
+    >>> print(oracle.holdings[1])
     the Holding to ACCEPT
       the Rule that the court MUST ALWAYS impose the
         RESULT:
@@ -1187,13 +1025,7 @@ In this example, we’ll look at a ``Holding`` from *Oracle*, then a
           "Copyright protection subsists, in accordance with this title, in original works of authorship fixed in any tangible medium of expression, now known or later developed, from which they can be perceived, reproduced, or otherwise communicated, either directly or with the aid of a machine or device.…" (/us/usc/t17/s102/a 2013-07-18)
 
 
-.. code:: ipython3
-
-    print(feist.holdings[2])
-
-
-.. parsed-literal::
-
+    >>> print(feist.holdings[2])
     the Holding to ACCEPT
       the Rule that the court MUST ALWAYS impose the
         RESULT:
@@ -1205,13 +1037,7 @@ In this example, we’ll look at a ``Holding`` from *Oracle*, then a
           "To promote the Progress of Science and useful Arts, by securing for limited Times to Authors…the exclusive Right to their respective Writings…" (/us/const/article/I/8/8 1788-09-13)
 
 
-.. code:: ipython3
-
-    print(oracle.holdings[1] | feist.holdings[2])
-
-
-.. parsed-literal::
-
+    >>> print(oracle.holdings[1] | feist.holdings[2])
     the Holding to ACCEPT
       the Rule that the court MUST ALWAYS impose the
         RESULT:
@@ -1236,8 +1062,10 @@ that the court would have to find both
 ``the Fact that <the Java API> was an original work`` and
 ``the Fact it is false that <the Java API> was copyrightable``.
 
-The union operator is useful for searching for contradictions in a
-collection of ``Holding``\ s. When two ``Holding``\ s are combined
+The :meth:`~authorityspoke.holdings.Holding.union` operator is useful 
+for searching for contradictions in a
+collection of :class:`~authorityspoke.holdings.Holding`\s. When two 
+:class:`~authorityspoke.holdings.Holding`\s are combined
 together with the union operator, their union might contradict other
-``Holding``\ s that neither of the two original ``Holding``\ s would
+Holdings that neither of the two original Holdings would
 have contradicted on their own.

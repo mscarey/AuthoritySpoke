@@ -223,22 +223,24 @@ can be saved as a ``text`` field with pipe characters that split it into
 three parts for “prefix”, “exact”, and “suffix” fields.
 
 For instance, to get just the phrase “original works of authorship”, we
-could have used the field:
+could have included this field in the JSON input:
 
 .. parsed-literal::
 
    "text": "in accordance with this title, in|original works of authorship|fixed"
 
-  >>> print(oracle.holdings[0].enactments[0])
-  "Copyright protection subsists, in accordance with this title, in original works of authorship fixed in any tangible medium of expression, now known or later developed, from which they can be perceived, reproduced, or otherwise communicated, either directly or with the aid of a machine or device.…" (/us/usc/t17/s102/a 2013-07-18)
+We can also :meth:`~legislice.enactments.Enactment.select` that same string
+to change the :class:`~legislice.enactments.Enactment`\'s selected text
+after loading the Enactment:
 
+  >>> to_select = "in accordance with this title, in|original works of authorship|fixed"
+  >>> oracle.holdings[0].enactments[0].select(to_select)
 
-The text selector in the example had just an ``exact`` field, with no
-``prefix`` or ``suffix``.
+And we can use the :meth:`~legislice.enactments.Enactment.selected_text`
+method to verify that the Enactment's selected text has changed.
 
   >>> oracle.holdings[0].enactments[0].selected_text()
-  'Copyright protection subsists, in accordance with this title, in original works of authorship fixed in any tangible medium of expression, now known or later developed, from which they can be perceived, reproduced, or otherwise communicated, either directly or with the aid of a machine or device.…'
-
+  '…original works of authorship…'
 
 The “name” field is a nickname that can be used to refer to the passage
 again later in the same file. For any Factor or Enactment object, you
