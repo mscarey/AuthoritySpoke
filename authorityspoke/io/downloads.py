@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
 import requests
-from legislice.download import Client, normalize_path, LegislicePathError
+from legislice.download import Client, normalize_path, LegislicePathError, RawEnactment
 
 
 def download_enactment_from_client(
@@ -217,14 +217,19 @@ class FakeClient(Client):
     def fetch(self, query: str, date: Union[datetime.date, str] = "") -> RawEnactment:
         """
         Fetches data about legislation at specified path and date from Client's assigned API root.
+
         :param path:
             A path to the desired legislation section using the United States Legislation Markup
-            tree-like citation format. Examples: "/us/const/amendment/IV", "/us/usc/t17/s103"
+            tree-like citation format. Examples: /us/const/amendment/IV, /us/usc/t17/s103
+
         :param date:
             A date when the desired version of the legislation was in effect. This does not need to
             be the "effective date" or the first date when the version was in effect. However, if
             you select a date when two versions of the provision were in effect at the same time,
             you will be given the version that became effective later.
+
+        :returns:
+            A fake JSON response in the format of the Legislice API.
         """
         responses = self.get_entry_closest_to_cited_path(query)
         if not responses:
