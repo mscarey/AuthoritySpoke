@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import re
 
-from typing import ClassVar, Iterable
+from typing import ClassVar, Dict, Iterable
 from typing import Optional, Sequence, Union
 
 from dataclasses import dataclass
@@ -67,7 +67,7 @@ class Predicate:
     reciprocal: bool = False
     comparison: str = ""
     quantity: Optional[Union[int, float, ureg.Quantity]] = None
-    opposite_comparisons: ClassVar = {
+    opposite_comparisons: ClassVar[Dict[str, str]] = {
         ">=": "<",
         "==": "!=",
         "<>": "=",
@@ -76,7 +76,7 @@ class Predicate:
         ">": "<=",
         "<": ">=",
     }
-    normalized_comparisons: ClassVar = {"==": "=", "!=": "<>"}
+    normalized_comparisons: ClassVar[Dict[str, str]] = {"==": "=", "!=": "<>"}
 
     def __post_init__(self):
         """

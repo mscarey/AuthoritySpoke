@@ -1,11 +1,13 @@
 Changelog
 =========
-dev
------------
+
+0.4.1 (2021-01-02)
+------------------
+- Increase minimum Legislice version to 0.4.1
 - Remove `read_enactments` and `read_enactment`. Use Legislice's download client or schema instead.
 
 0.4.0 (2020-08-26)
-----------------------
+------------------
 - Create `ComparableGroup` class for unordered `Factor` collections
 - Create `FactorSequence` class for ordered `Factor` collections
 - Eliminate Analogy class, moving its methods to `FactorGroup` and `FactorSequence`

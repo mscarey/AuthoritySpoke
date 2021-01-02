@@ -1,7 +1,7 @@
 anchorpoint>=0.4.2
 apispec[validation]
-marshmallow>=3.2.2
-git+https://github.com/mscarey/legislice.git@master
+marshmallow~=3.2
+legislice>=0.4.1
 pint>=0.15
 python-dotenv
 requests
