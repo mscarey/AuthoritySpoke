@@ -72,10 +72,10 @@ class TestPredicateLoad:
     def test_make_comparison_when_absent(self):
         schema = schemas.PredicateSchema()
         statement = schema.load(
-            {"content": "{}'s favorite number is {}", "quantity": 42}
+            {"content": "{}'s favorite number was {}", "quantity": 42}
         )
         assert statement.comparison == "="
-        assert "{}'s favorite number is exactly equal to 42" in str(statement)
+        assert "{}'s favorite number was exactly equal to 42" in str(statement)
         assert len(statement) == 1
 
 
@@ -94,8 +94,8 @@ class TestPredicateDump:
     def test_round_trip(self):
         schema = schemas.PredicateSchema()
         statement = schema.load(
-            {"content": "{}'s favorite number is {}", "quantity": 42}
+            {"content": "{}'s favorite number was {}", "quantity": 42}
         )
         dumped = to_dict(statement)
         new_statement = schema.load(dumped)
-        assert "{}'s favorite number is exactly equal to 42" in str(new_statement)
+        assert "{}'s favorite number was exactly equal to 42" in str(new_statement)

@@ -381,7 +381,7 @@ class Predicate:
         if self.truth is None:
             truth_prefix = "whether "
         elif self.truth is False:
-            truth_prefix = "it is false that "
+            truth_prefix = "it was false that "
         else:
             truth_prefix = "that "
         if self.quantity:
