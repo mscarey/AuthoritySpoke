@@ -485,7 +485,7 @@ class TestAddition:
         feist = make_opinion_with_holding["feist_majority"]
         new_holding = feist.holdings[10] + feist.holdings[3]
         output_strings = (
-            "the fact it is false that <Rural's telephone listings> were an original work",
+            "the fact it was false that <Rural's telephone listings> were an original work",
             "absence of the fact that <Rural's telephone listings> were copyrightable",
         )
         for output in new_holding.outputs:

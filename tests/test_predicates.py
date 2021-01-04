@@ -98,11 +98,14 @@ class TestPredicates:
 
     def test_equal_float_and_int(self, make_predicate):
         """
-        These don't evaluate equal because they don't have the same
-        string, but the :meth:`.Predicate.means` method considers them
-        to have the same meaning.
+        These now evaluate equal even though their equal quantities are different types
         """
-        assert not make_predicate["p8_int"] == make_predicate["p8_float"]
+        assert make_predicate["p8_int"] == make_predicate["p8_float"]
+
+    def test_same_meaning_float_and_int(self, make_predicate):
+        """
+        The Predicate means method considers equal quantities of different types to have the same meaning.
+        """
         assert make_predicate["p8_int"].means(make_predicate["p8_float"])
 
     def test_no_equality_with_inconsistent_dimensionality(self, make_predicate):
@@ -140,12 +143,8 @@ class TestPredicates:
         assert not make_predicate["p_quantity>=4"] > make_predicate["p_quantity>5"]
 
     def test_no_implication_of_greater_or_equal_quantity(self):
-        less = Predicate(
-            content="The number of mice was {}", comparison=">", quantity=4
-        )
-        more = Predicate(
-            content="The number of mice was {}", comparison=">=", quantity=5
-        )
+        less = Predicate(content="The number of mice was", comparison=">", quantity=4)
+        more = Predicate(content="The number of mice was", comparison=">=", quantity=5)
         assert not less.implies(more)
 
     def test_equal_implies_greater_or_equal(self, make_predicate):

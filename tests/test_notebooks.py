@@ -113,7 +113,7 @@ class TestIntroduction:
         assert "<the Lotus menu command hierarchy> is like <the Java API>" in str(
             explanation
         )
-        assert "the Fact it is false that <the Lotus" in str(explanation)
+        assert "the Fact it was false that <the Lotus" in str(explanation)
 
     def test_register_string(self, make_opinion_with_holding):
         oracle = make_opinion_with_holding["oracle_majority"]
@@ -164,7 +164,7 @@ class TestIntroduction:
         oracle = make_opinion_with_holding["oracle_majority"]
         feist = make_opinion_with_holding["feist_majority"]
         new = oracle.holdings[1] | feist.holdings[2]
-        assert "it is false that <the Java API> was copyrightable" in str(new)
+        assert "it was false that <the Java API> was copyrightable" in str(new)
         assert "<the Java API> was an original work" in str(new)
 
     def test_only_one_explanation_for_contradiction(self, make_opinion_with_holding):

@@ -77,104 +77,104 @@ def make_predicate() -> Dict[str, Predicate]:
         "p5": Predicate("{} was a stockpile of Christmas trees"),
         "p6": Predicate("{} was among some standing trees"),
         "p7": Predicate(
-            "the distance between {} and {} was {}",
+            "the distance between {} and {} was",
             truth=False,
             reciprocal=True,
             comparison=">",
             quantity=Q_("35 feet"),
         ),
         "p7_obverse": Predicate(
-            "the distance between {} and {} was {}",
+            "the distance between {} and {} was",
             truth=True,
             reciprocal=True,
             comparison="<=",
             quantity=Q_("35 feet"),
         ),
         "p7_opposite": Predicate(
-            "the distance between {} and {} was {}",
+            "the distance between {} and {} was",
             truth=True,
             reciprocal=True,
             comparison=">",
             quantity=Q_("35 feet"),
         ),
         "p7_not_equal": Predicate(
-            "the distance between {} and {} was {}",
+            "the distance between {} and {} was",
             truth=True,
             reciprocal=True,
             comparison="<>",
             quantity=Q_("35 feet"),
         ),
         "p7_true": Predicate(
-            "the distance between {} and {} was {}",
+            "the distance between {} and {} was",
             truth=True,
             reciprocal=True,
             comparison="<",
             quantity=Q_("35 feet"),
         ),
         "p8": Predicate(
-            "the distance between {} and {} was {}",
+            "the distance between {} and {} was",
             reciprocal=True,
             comparison=">=",
             quantity=Q_("20 feet"),
         ),
         "p8_exact": Predicate(
-            "the distance between {} and {} was {}",
+            "the distance between {} and {} was",
             reciprocal=True,
             comparison="==",
             quantity=Q_("25 feet"),
         ),
         "p8_less": Predicate(
-            "the distance between {} and {} was {}",
+            "the distance between {} and {} was",
             reciprocal=True,
             comparison="<=",
             quantity=Q_("20 feet"),
         ),
         "p8_meters": Predicate(
-            "the distance between {} and {} was {}",
+            "the distance between {} and {} was",
             reciprocal=True,
             comparison=">=",
             quantity=Q_("10 meters"),
         ),
         "p8_int": Predicate(
-            "the distance between {} and {} was {}",
+            "the distance between {} and {} was",
             reciprocal=True,
             comparison=">=",
             quantity=20,
         ),
         "p8_float": Predicate(
-            "The distance between {} and {} was {}",
+            "the distance between {} and {} was",
             reciprocal=True,
             comparison=">=",
             quantity=20.0,
         ),
         "p8_higher_int": Predicate(
-            "the distance between {} and {} was {}",
+            "the distance between {} and {} was",
             reciprocal=True,
             comparison=">=",
             quantity=30,
         ),
         "p9": Predicate(
-            "the distance between {} and a parking area used by personnel and patrons of {} was {}",
+            "the distance between {} and a parking area used by personnel and patrons of {} was",
             comparison="<=",
             quantity=Q_("5 feet"),
         ),
         "p9_exact": Predicate(
-            "the distance between {} and a parking area used by personnel and patrons of {} was {}",
+            "the distance between {} and a parking area used by personnel and patrons of {} was",
             comparison="=",
             quantity=Q_("5 feet"),
         ),
         "p9_miles": Predicate(
-            "the distance between {} and a parking area used by personnel and patrons of {} was {}",
+            "the distance between {} and a parking area used by personnel and patrons of {} was",
             comparison="<=",
             quantity=Q_("5 miles"),
         ),
         "p9_more": Predicate(
-            "the distance between {} and a parking area used by personnel and patrons of {} was {}",
+            "the distance between {} and a parking area used by personnel and patrons of {} was",
             comparison=">",
             quantity=Q_("5 feet"),
         ),
         "p9_acres": Predicate(
-            "the distance between {} and a parking area used by personnel and patrons of {} was {}",
+            "the distance between {} and a parking area used by personnel and patrons of {} was",
             comparison="<=",
             quantity=Q_("5 acres"),
         ),
@@ -190,7 +190,9 @@ def make_predicate() -> Dict[str, Predicate]:
             "In {}, several law enforcement officials meticulously went through {}"
         ),
         "p18": Predicate(
-            "{} continued for {}", comparison=">=", quantity=Q_("385 minutes")
+            "the length of time that {} continued was",
+            comparison=">=",
+            quantity=Q_("385 minutes"),
         ),
         "p19": Predicate("{} continued after night fell"),
         # Use the irrelevant predicates/factors to make sure they don't affect an outcome.
@@ -212,26 +214,24 @@ def make_predicate() -> Dict[str, Predicate]:
         "p_no_crime": Predicate("{} committed a crime", truth=False),
         "p_three_entities": Predicate("{} told {} to hire {}"),
         "p_small_weight": Predicate(
-            "the amount of gold {} possessed was {}",
+            "the amount of gold {} possessed was",
             comparison=">=",
             quantity=Q_("1 gram"),
         ),
         "p_large_weight": Predicate(
-            "the amount of gold {} possessed was {}",
+            "the amount of gold {} possessed was",
             comparison=">=",
             quantity=Q_("100 kilograms"),
         ),
         "p_friends": Predicate("{} and {} were friends", reciprocal=True),
         "p_reliable": Predicate("{} was reliable"),
         "p_quantity=3": Predicate(
-            "The number of mice was {}", comparison="==", quantity=3
+            "The number of mice was", comparison="==", quantity=3
         ),
         "p_quantity>=4": Predicate(
-            "The number of mice was {}", comparison=">=", quantity=4
+            "The number of mice was", comparison=">=", quantity=4
         ),
-        "p_quantity>5": Predicate(
-            "The number of mice was {}", comparison=">", quantity=5
-        ),
+        "p_quantity>5": Predicate("The number of mice was", comparison=">", quantity=5),
         "p_no_context": Predicate("context was included", truth=False),
     }
 

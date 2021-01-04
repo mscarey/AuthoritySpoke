@@ -14,6 +14,7 @@ from typing import ClassVar, Dict, Iterable
 from typing import Optional, Sequence, Union
 
 from dataclasses import dataclass
+from _pytest.python_api import raises
 
 from pint import UnitRegistry
 
@@ -107,6 +108,13 @@ class Predicate:
                 self, "comparison", self.opposite_comparisons[self.comparison]
             )
 
+        if self.quantity is not None and not self.content.endswith("was"):
+            raise ValueError(
+                "If a Predicate includes a quantity, its 'content' must end "
+                "with the word 'was' to signal the comparison with the quantity. "
+                f"The word 'was' is not the end of the string '{self.content}'."
+            )
+
     @property
     def context_slots(self) -> int:
         r"""
@@ -118,8 +126,6 @@ class Predicate:
         """
 
         slots = self.content.count("{}")
-        if self.quantity:
-            slots -= 1
         return slots
 
     def content_with_entities(self, context: Union[Factor, Sequence[Factor]]) -> str:
@@ -385,8 +391,7 @@ class Predicate:
         else:
             truth_prefix = "that "
         if self.quantity:
-            slots = ("{}" for slot in range(len(self)))
-            content = self.content.format(*slots, self.quantity_comparison())
+            content = f"{self.content} {self.quantity_comparison()} {self.quantity}"
         else:
             content = self.content
         return f"{truth_prefix}{content}"

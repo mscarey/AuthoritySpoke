@@ -17,11 +17,24 @@ class TestPredicateLoad:
         assert p4.truth is True
         assert p4.comparison == ""
 
+    def test_load_comparison_not_ending_with_was(self):
+        schema = schemas.PredicateSchema()
+        with pytest.raises(ValueError):
+            schema.load(
+                {
+                    "content": "the distance between {} and {} was",
+                    "truth": True,
+                    "reciprocal": True,
+                    "comparison": "!=",
+                    "quantity": "35 feet",
+                }
+            )
+
     def test_load_comparison(self):
         schema = schemas.PredicateSchema()
         p7 = schema.load(
             {
-                "content": "the distance between {} and {} was {}",
+                "content": "the distance between {} and {} was",
                 "truth": True,
                 "reciprocal": True,
                 "comparison": "!=",
@@ -56,7 +69,7 @@ class TestPredicateLoad:
         schema = schemas.PredicateSchema()
         p7 = schema.load(
             data={
-                "content": "the distance between {} and {} was {}",
+                "content": "the distance between {} and {} was",
                 "truth": True,
                 "reciprocal": True,
                 "comparison": "!=",
@@ -82,7 +95,7 @@ class TestPredicateLoad:
 class TestPredicateDump:
     def test_dump_to_dict_with_units(self):
         predicate = Predicate(
-            "the distance between {} and {} was {}",
+            "the distance between {} and {} was",
             truth=True,
             reciprocal=True,
             comparison="<>",

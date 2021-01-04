@@ -140,7 +140,7 @@ class TestProcedureImplication:
 
     def test_implied_procedure_with_reciprocal_entities(self, make_procedure):
         """
-        Because both procedures have a form of "The distance between {} and {} was {}"
+        Because both procedures have a form of "the distance between {} and {} was"
         factor and those factors are reciprocal, the entities of one of them in reversed
         order can be used as the entities of the other, and one will still imply the other.
         (But if there had been more than two entities, only the first two would have been
@@ -255,10 +255,12 @@ class TestProcedureContradiction:
 
     def test_contradiction_some_to_all(self, watt_factor):
         within_curtilage = Procedure(
-            inputs=(watt_factor["f9"],), outputs=watt_factor["f10"],
+            inputs=(watt_factor["f9"],),
+            outputs=watt_factor["f10"],
         )
         not_within_curtilage = Procedure(
-            inputs=(watt_factor["f9"],), outputs=watt_factor["f10_false"],
+            inputs=(watt_factor["f9"],),
+            outputs=watt_factor["f10_false"],
         )
         assert not_within_curtilage.contradicts_some_to_all(within_curtilage)
 
@@ -275,10 +277,10 @@ class TestProcedureUnion:
 
 
 p_small_weight = Predicate(
-    "the amount of gold {} possessed was {}", comparison="<", quantity=Q_("1 gram")
+    "the amount of gold {} possessed was", comparison="<", quantity=Q_("1 gram")
 )
 p_large_weight = Predicate(
-    "the amount of gold {} possessed was {}",
+    "the amount of gold {} possessed was",
     comparison=">=",
     quantity=Q_("100 kilograms"),
 )
@@ -307,7 +309,8 @@ class TestFactorGroups:
         alice_like_craig = ContextRegister()
         alice_like_craig.insert_pair(alice, craig)
         assert FactorGroup([alice_rich, bob_poor]).consistent_with(
-            FactorGroup([dan_poor, craig_rich]), context=alice_like_craig,
+            FactorGroup([dan_poor, craig_rich]),
+            context=alice_like_craig,
         )
 
     def test_not_all_factors_match(self):
@@ -354,7 +357,8 @@ class TestFactorGroups:
         alice_like_craig.insert_pair(alice, craig)
 
         assert not FactorGroup((alice_rich, bob_poor)).contradicts(
-            FactorGroup((dan_poor, craig_rich)), context=alice_like_craig,
+            FactorGroup((dan_poor, craig_rich)),
+            context=alice_like_craig,
         )
 
 

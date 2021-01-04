@@ -55,7 +55,9 @@ class TestFacts:
     ):
         e = make_entity
         f2 = build_fact(
-            make_predicate["p2"], indices=(1, 2), case_factors=watt_mentioned,
+            make_predicate["p2"],
+            indices=(1, 2),
+            case_factors=watt_mentioned,
         )
         assert f2.context_factors == (e["watt"], e["trees"])
 
@@ -65,13 +67,17 @@ class TestFacts:
         e = make_entity
         with pytest.raises(TypeError):
             f2 = build_fact(
-                make_predicate["p1"], indices=("nonsense"), case_factors=watt_mentioned,
+                make_predicate["p1"],
+                indices=("nonsense"),
+                case_factors=watt_mentioned,
             )
 
     def test_invalid_index_for_case_factors_in_init(self, make_predicate, make_entity):
         with pytest.raises(IndexError):
             _ = build_fact(
-                make_predicate["p1"], indices=2, case_factors=make_entity["watt"],
+                make_predicate["p1"],
+                indices=2,
+                case_factors=make_entity["watt"],
             )
 
     def test_convert_int_context_factors_to_tuple(self, make_predicate, watt_mentioned):
@@ -335,7 +341,10 @@ class TestImplication:
 
     def test_specific_factor_implies_generic_explain(self, watt_factor):
         answer = watt_factor["f2"].explain_implication(watt_factor["f2_generic"])
-        assert (str(watt_factor["f2"]), watt_factor["f2_generic"],) in answer.items()
+        assert (
+            str(watt_factor["f2"]),
+            watt_factor["f2_generic"],
+        ) in answer.items()
 
     def test_specific_implies_generic_form_of_another_fact(self, watt_factor):
         assert watt_factor["f2"] > watt_factor["f3_generic"]
@@ -524,12 +533,12 @@ class TestContradiction:
         contradiction if you assume they correspond to one another.
         """
         p_small_weight = Predicate(
-            "the amount of gold {} possessed was {}",
+            "the amount of gold {} possessed was",
             comparison="<",
             quantity=Q_("1 gram"),
         )
         p_large_weight = Predicate(
-            "the amount of gold {} possessed was {}",
+            "the amount of gold {} possessed was",
             comparison=">=",
             quantity=Q_("100 kilograms"),
         )
@@ -546,12 +555,12 @@ class TestContradiction:
         So there's no contradiction.
         """
         p_small_weight = Predicate(
-            "the amount of gold {} possessed was {}",
+            "the amount of gold {} possessed was",
             comparison="<",
             quantity=Q_("1 gram"),
         )
         p_large_weight = Predicate(
-            "the amount of gold {} possessed was {}",
+            "the amount of gold {} possessed was",
             comparison=">=",
             quantity=Q_("100 kilograms"),
         )
@@ -584,7 +593,9 @@ class TestContradiction:
             values=[e["bob"], e["alice"], e["dan"], e["craig"], e["circus"]],
         )
         harder_update = left.update_context_register(
-            right, context=harder_register, comparison=means,
+            right,
+            context=harder_register,
+            comparison=means,
         )
         assert any(register is not None for register in easy_update)
         assert any(register is not None for register in harder_update)
