@@ -5,6 +5,7 @@ from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
 from marshmallow import ValidationError
 
+from authorityspoke.predicates import StatementTemplate
 from authorityspoke.io import nesting
 
 
@@ -63,7 +64,7 @@ def expand_node_shorthand(obj: Dict[str, Any]) -> Dict[str, Any]:
     to_nest = ["content", "truth", "reciprocal", "comparison", "quantity"]
     obj = nesting.nest_fields(obj, nest="predicate", eggs=to_nest)
 
-    obj = collapse_known_factors(obj)
+    # obj = collapse_known_factors(obj)
 
     if obj.get("anchors"):
         obj["anchors"] = [expand_anchor_shorthand(anchor) for anchor in obj["anchors"]]
@@ -134,43 +135,36 @@ def add_found_context(
     return content, context_factors
 
 
-def get_references_from_string(
-    content: str, context_factors: Optional[List[Dict]]
-) -> Tuple[str, Sequence[Dict]]:
+def get_references_from_string(content: str) -> List[Dict]:
     r"""
     Make :class:`.Entity` context :class:`.Factor`\s from string.
 
     This function identifies context :class:`.Factor`\s by finding
-    brackets around them, while :func:`get_references_from_mentioned`
+    :py:class:`string.Template` identifiers in `content`,
+    while :func:`get_references_from_mentioned`
     depends on knowing the names of the context factors in advance.
     Also, this function works only when all the context_factors
     are type :class:`.Entity`.
 
-    Despite "placeholder" being defined as a variable elsewhere,
-    this function isn't compatible with any placeholder string other
-    than "{}".
-
     :param content:
         a string containing a clause making an assertion.
-        Curly brackets surround the names of :class:`.Entity`
+        :py:class:`~string.Template` string identifiers
+        mark the names of :class:`.Entity`
         context factors to be created.
 
     :returns:
-        a :class:`Predicate` and :class:`.Entity` objects
-        from a string that has curly brackets around the
-        context factors and the comparison/quantity.
+        A dict to be expanded as :class:`.Entity` objects
+        based on the names found in `content`
     """
-    pattern = r"\{([^\{]+)\}"
-    entities_as_text = findall(pattern, content)
-    entities_as_text.sort(key=len, reverse=True)
-    context_factors = context_factors or []
-    for entity_name in entities_as_text:
-        entity = {"type": "Entity", "name": entity_name}
-        content, context_factors = add_found_context_with_brackets(
-            content, context_factors, entity
-        )
+    temp = StatementTemplate(template=content)
+    entities_as_text = [
+        placeholder.replace("_", " ") for placeholder in temp.placeholders
+    ]
+    context_factors = [
+        {"type": "Entity", "name": entity_name} for entity_name in entities_as_text
+    ]
 
-    return content, context_factors
+    return context_factors
 
 
 def wrap_single_element_in_list(data: Dict, many_element: str):

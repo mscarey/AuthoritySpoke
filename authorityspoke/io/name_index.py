@@ -232,9 +232,8 @@ def update_name_index_from_fact_content(
     content: str = predicate.get("content", "")
     if content:
         context_factors: RawContextFactors = obj.get("context_factors", [])
-        content, context_factors = text_expansion.get_references_from_string(
-            content=content, context_factors=context_factors
-        )
+        if not context_factors:
+            context_factors = text_expansion.get_references_from_string(content=content)
         mentioned = update_name_index_from_context_factors(context_factors, mentioned)
 
         for name in mentioned.keys():

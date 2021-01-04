@@ -13,7 +13,7 @@ class TestPredicateLoad:
 
     def test_load_just_content(self):
         schema = schemas.PredicateSchema()
-        p4 = schema.load({"content": "{} was on the premises of {}"})
+        p4 = schema.load({"content": "$person was on the premises of $place"})
         assert p4.truth is True
         assert p4.comparison == ""
 

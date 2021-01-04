@@ -71,9 +71,13 @@ class TestEntityLoad:
 
 class TestFactLoad:
     house_data = {
-        "content": "the price in dollars at which {Alice} sold {Alice's house} was > 300000"
+        "content": "the price in dollars at which $person sold $property was > 300000",
+        "context_factors": [
+            {"type": "Entity", "name": "Alice"},
+            {"type": "Entity", "name": "Alice's house"},
+        ],
     }
-    story_data = {"content": "The number of castles {the king} had was > 3"}
+    story_data = {"content": "The number of castles ${the_king} had was > 3"}
 
     def test_import_fact_with_entity_name_containing_another(self):
         expanded = expand_shorthand(self.house_data)
@@ -88,10 +92,24 @@ class TestFactLoad:
         assert story.predicate.comparison == ">"
         assert story.predicate.quantity == 3
 
-    def test_make_fact_from_string(self, watt_factor):
+    def test_make_nonreciprocal_fact_from_string(self, watt_factor):
         fact_float_data = {
-            "content": "the distance between {Ann} and {Lee} was >= 20.1",
+            "content": "the distance $Ann traveled to meet $Lee was >= 20.1 miles",
             "reciprocal": True,
+            "context_factors": ["Ann", "Lee"],
+        }
+        fact_float_more = expand_shorthand(fact_float_data)
+        fact_float_more = readers.read_fact(fact_float_more)
+        fact_float_less = watt_factor["f8_miles"]
+        assert fact_float_more >= fact_float_less
+
+    def test_make_fact_from_known_context_factors(self, watt_factor):
+        fact_float_data = {
+            "content": "the distance between $person1 and $person2 was >= 20.1",
+            "context_factors": [
+                {"name": "Ann", "type": "Entity"},
+                {"name": "Lee", "type": "Entity"},
+            ],
         }
         fact_float_more = expand_shorthand(fact_float_data)
         fact_float_more = readers.read_fact(fact_float_more)
