@@ -10,8 +10,9 @@ from __future__ import annotations
 
 import re
 
+from string import Template
 from typing import ClassVar, Dict, Iterable
-from typing import Optional, Sequence, Union
+from typing import List, Optional, Sequence, Union
 
 from dataclasses import dataclass
 from _pytest.python_api import raises
@@ -22,6 +23,43 @@ from authorityspoke.factors import Factor
 
 ureg = UnitRegistry()
 Q_ = ureg.Quantity
+
+
+class StatementTemplate(Template):
+    def __init__(self, template: str) -> None:
+        super().__init__(template)
+        self.make_content_singular()
+
+    def make_content_singular(self) -> None:
+        """Convert template text for self.context to singular "was"."""
+        for placeholder in self.placeholders:
+            bracketed = "{" + placeholder + "}"
+            if bracketed in self.template:
+                self.template = self.template.replace(
+                    f"{bracketed} were", f"{bracketed} was"
+                )
+            else:
+                self.template = self.template.replace(
+                    f"{placeholder} were", f"{placeholder} was"
+                )
+        return None
+
+    @property
+    def placeholders(self) -> List[str]:
+        r"""
+        Count bracket pairs in ``self.content``, minus 1 if ``self.quantity==True``.
+
+        :returns:
+            the number of context :class:`.Factor`\s that must be
+            specified to fill in the blanks in ``self.content``.
+        """
+
+        placeholders = [
+            m.group("named") or m.group("braced")
+            for m in self.pattern.finditer(self.template)
+            if m.group("named") or m.group("braced")
+        ]
+        return placeholders
 
 
 @dataclass()
@@ -63,7 +101,7 @@ class Predicate:
         may contain no more than one ``comparison`` and one ``quantity``.
     """
 
-    content: str
+    content: Union[str, StatementTemplate]
     truth: Optional[bool] = True
     reciprocal: bool = False
     comparison: str = ""
@@ -86,17 +124,15 @@ class Predicate:
         If the :attr:`content` sentence is phrased to have a plural
         context factor, normalizes it by changing "were" to "was".
         """
-
-        # Conjugating a verb using .replace feels like a very brittle solution.
-        # An NLP library may be used here in future versions.
-        object.__setattr__(self, "content", self.content.replace("{} were", "{} was"))
+        if not isinstance(self.content, Template):
+            self.content = StatementTemplate(self.content)
 
         if self.comparison and self.comparison not in self.opposite_comparisons.keys():
             raise ValueError(
                 f'"comparison" string parameter must be one of {self.opposite_comparisons.keys()}.'
             )
 
-        if self.context_slots < 2 and self.reciprocal:
+        if len(self) < 2 and self.reciprocal:
             raise ValueError(
                 f'"reciprocal" flag not allowed because "{self.content}" has '
                 f"{self.context_slots} spaces for context entities. At least 2 spaces needed."
@@ -108,25 +144,12 @@ class Predicate:
                 self, "comparison", self.opposite_comparisons[self.comparison]
             )
 
-        if self.quantity is not None and not self.content.endswith("was"):
+        if self.quantity is not None and not self.content.template.endswith("was"):
             raise ValueError(
                 "If a Predicate includes a quantity, its 'content' must end "
                 "with the word 'was' to signal the comparison with the quantity. "
                 f"The word 'was' is not the end of the string '{self.content}'."
             )
-
-    @property
-    def context_slots(self) -> int:
-        r"""
-        Count bracket pairs in ``self.content``, minus 1 if ``self.quantity==True``.
-
-        :returns:
-            the number of context :class:`.Factor`\s that must be
-            specified to fill in the blanks in ``self.content``.
-        """
-
-        slots = self.content.count("{}")
-        return slots
 
     def content_with_entities(self, context: Union[Factor, Sequence[Factor]]) -> str:
         r"""
@@ -346,7 +369,7 @@ class Predicate:
             in the ``self.content`` string.
         """
 
-        return self.context_slots
+        return len(self.content.placeholders)
 
     def quantity_comparison(self) -> str:
         """
