@@ -103,7 +103,7 @@
             },
             {
                 "type": "fact",
-                "content": "officers' search of the stockpile continued for >= 385 minutes"
+                "content": "the time duration of officers' search of the stockpile was >= 385 minutes"
             }
         ],
         "outputs": {

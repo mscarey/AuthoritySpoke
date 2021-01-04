@@ -469,7 +469,7 @@ class TestAddition:
         rule_from_lotus = lotus.holdings[0].inferred_from_exclusive[0].rule
         new_holding = oracle.holdings[0] + rule_from_lotus
         output_strings = (
-            "the fact it is false that <the Java API> was copyrightable",
+            "the fact it was false that <the Java API> was copyrightable",
             "absence of the fact that <Borland International> "
             + "infringed the copyright in <the Java API>",
         )

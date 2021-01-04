@@ -945,7 +945,7 @@ class TestStatuteRules:
                     Fact(Predicate("{} was facial hair"), context_factors=beard),
                     Fact(
                         Predicate(
-                            "the length of {} was {}",
+                            "the length of {} was",
                             comparison=">=",
                             quantity=Q_("5 millimeters"),
                             truth=facial_hair_over_5mm,

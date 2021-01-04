@@ -22,7 +22,7 @@ class TestPredicateLoad:
         with pytest.raises(ValueError):
             schema.load(
                 {
-                    "content": "the distance between {} and {} was",
+                    "content": "the distance between {} and {} was 35 feet",
                     "truth": True,
                     "reciprocal": True,
                     "comparison": "!=",
@@ -84,9 +84,7 @@ class TestPredicateLoad:
 
     def test_make_comparison_when_absent(self):
         schema = schemas.PredicateSchema()
-        statement = schema.load(
-            {"content": "{}'s favorite number was {}", "quantity": 42}
-        )
+        statement = schema.load({"content": "{}'s favorite number was", "quantity": 42})
         assert statement.comparison == "="
         assert "{}'s favorite number was exactly equal to 42" in str(statement)
         assert len(statement) == 1
@@ -106,9 +104,7 @@ class TestPredicateDump:
 
     def test_round_trip(self):
         schema = schemas.PredicateSchema()
-        statement = schema.load(
-            {"content": "{}'s favorite number was {}", "quantity": 42}
-        )
+        statement = schema.load({"content": "{}'s favorite number was", "quantity": 42})
         dumped = to_dict(statement)
         new_statement = schema.load(dumped)
         assert "{}'s favorite number was exactly equal to 42" in str(new_statement)

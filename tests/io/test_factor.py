@@ -71,7 +71,7 @@ class TestEntityLoad:
 
 class TestFactLoad:
     house_data = {
-        "content": "{Alice} sold {Alice's house} for a price in dollars of > 300000"
+        "content": "the price in dollars at which {Alice} sold {Alice's house} was > 300000"
     }
     story_data = {"content": "The number of castles {the king} had was > 3"}
 
