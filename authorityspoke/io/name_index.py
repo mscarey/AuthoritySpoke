@@ -233,13 +233,16 @@ def update_name_index_from_fact_content(
     if content:
         context_factors: RawContextFactors = obj.get("context_factors", [])
         if not context_factors:
-            context_factors = text_expansion.get_references_from_string(content=content)
+            context_factors = text_expansion.get_references_from_string(
+                template=content
+            )
+
         mentioned = update_name_index_from_context_factors(context_factors, mentioned)
 
         for name in mentioned.keys():
             if name in content and name != content:
                 (content, context_factors,) = text_expansion.add_found_context(
-                    content=content,
+                    template=content,
                     context_factors=context_factors,
                     factor=mentioned.get_by_name(name),
                 )

@@ -20,7 +20,7 @@ class TestRuleDump:
         rule = make_rule["h2"]
         dumped = dump.to_dict(rule)
         content = dumped["procedure"]["inputs"][0]["predicate"]["content"]
-        assert content == "{} was on the premises of {}"
+        assert content == "$thing was on the premises of $place"
 
     def test_dump_and_read_rule(self, make_rule, make_response):
         client = FakeClient(responses=make_response)
@@ -28,7 +28,7 @@ class TestRuleDump:
         dumped = dump.to_dict(rule)
         loaded = readers.read_rule(dumped, client=client)
         content = loaded.despite[0].predicate.content
-        assert "the distance between {} and {} was" in content
+        assert "the distance between $place1 and $place2 was" in content
 
 
 class TestLoadRules:

@@ -143,7 +143,7 @@ class TestEnactments:
                 node="/us/const/amendment/IV",
                 selection=make_selector["bad_selector"],
                 heading="",
-                content="Not the same text as in the selector",
+                template="Not the same text as in the selector",
                 start_date="2000-01-01",
             )
 

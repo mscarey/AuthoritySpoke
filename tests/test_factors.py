@@ -533,12 +533,12 @@ class TestContradiction:
         contradiction if you assume they correspond to one another.
         """
         p_small_weight = Predicate(
-            "the amount of gold {} possessed was",
+            "the amount of gold $person possessed was",
             comparison="<",
             quantity=Q_("1 gram"),
         )
         p_large_weight = Predicate(
-            "the amount of gold {} possessed was",
+            "the amount of gold $person possessed was",
             comparison=">=",
             quantity=Q_("100 kilograms"),
         )
@@ -555,12 +555,12 @@ class TestContradiction:
         So there's no contradiction.
         """
         p_small_weight = Predicate(
-            "the amount of gold {} possessed was",
+            "the amount of gold $person possessed was",
             comparison="<",
             quantity=Q_("1 gram"),
         )
         p_large_weight = Predicate(
-            "the amount of gold {} possessed was",
+            "the amount of gold $person possessed was",
             comparison=">=",
             quantity=Q_("100 kilograms"),
         )

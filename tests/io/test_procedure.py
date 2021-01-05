@@ -7,7 +7,7 @@ class TestProcedureDump:
         procedure = make_procedure["c2"]
         dumped = dump.to_dict(procedure)
         content = dumped["inputs"][0]["predicate"]["content"]
-        assert content == "{} was on the premises of {}"
+        assert content == "$thing was on the premises of $place"
 
     def test_dump_and_load_procedure(self, make_procedure):
         procedure = make_procedure["c2"]
@@ -15,7 +15,7 @@ class TestProcedureDump:
         schema = schemas.ProcedureSchema()
         loaded = schema.load(dumped)
         content = loaded.despite[0].predicate.content
-        assert "the distance between {} and {} was" in content
+        assert "the distance between $place1 and $place2 was" in content
 
 
 class TestProcedureLoad:

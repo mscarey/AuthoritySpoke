@@ -14,9 +14,6 @@ from string import Template
 from typing import ClassVar, Dict, Iterable
 from typing import List, Optional, Sequence, Union
 
-from dataclasses import dataclass
-from _pytest.python_api import raises
-
 from pint import UnitRegistry
 
 from authorityspoke.factors import Factor
@@ -62,7 +59,6 @@ class StatementTemplate(Template):
         return placeholders
 
 
-@dataclass()
 class Predicate:
     r"""
     A statement about real events or about a legal conclusion.
@@ -101,11 +97,6 @@ class Predicate:
         may contain no more than one ``comparison`` and one ``quantity``.
     """
 
-    content: Union[str, StatementTemplate]
-    truth: Optional[bool] = True
-    reciprocal: bool = False
-    comparison: str = ""
-    quantity: Optional[Union[int, float, ureg.Quantity]] = None
     opposite_comparisons: ClassVar[Dict[str, str]] = {
         ">=": "<",
         "==": "!=",
@@ -117,15 +108,25 @@ class Predicate:
     }
     normalized_comparisons: ClassVar[Dict[str, str]] = {"==": "=", "!=": "<>"}
 
-    def __post_init__(self):
+    def __init__(
+        self,
+        template: Union[str, StatementTemplate],
+        truth: Optional[bool] = True,
+        reciprocal: bool = False,
+        comparison: str = "",
+        quantity: Optional[Union[int, float, ureg.Quantity]] = None,
+    ):
         """
         Clean up and test validity of attributes.
 
         If the :attr:`content` sentence is phrased to have a plural
         context factor, normalizes it by changing "were" to "was".
         """
-        if not isinstance(self.content, Template):
-            self.content = StatementTemplate(self.content)
+        self.template = StatementTemplate(template)
+        self.truth = truth
+        self.reciprocal = reciprocal
+        self.comparison = comparison
+        self.quantity = quantity
 
         if self.comparison and self.comparison not in self.opposite_comparisons.keys():
             raise ValueError(
@@ -135,21 +136,30 @@ class Predicate:
         if len(self) < 2 and self.reciprocal:
             raise ValueError(
                 f'"reciprocal" flag not allowed because "{self.content}" has '
-                f"{self.context_slots} spaces for context entities. At least 2 spaces needed."
+                f"{len(self)} spaces for context entities. At least 2 spaces needed."
             )
 
         if self.comparison and self.truth is False:
-            object.__setattr__(self, "truth", True)
-            object.__setattr__(
-                self, "comparison", self.opposite_comparisons[self.comparison]
-            )
+            self.truth = True
+            self.comparison = self.opposite_comparisons[self.comparison]
 
-        if self.quantity is not None and not self.content.template.endswith("was"):
+        if self.quantity is not None and not self.content.endswith("was"):
             raise ValueError(
                 "If a Predicate includes a quantity, its 'content' must end "
                 "with the word 'was' to signal the comparison with the quantity. "
                 f"The word 'was' is not the end of the string '{self.content}'."
             )
+
+    def __repr__(self):
+        return (
+            f'Predicate(template="{self.template.template}", '
+            "truth={self.truth}, reciprocal={self.reciprocal}, "
+            'comparison="{self.comparison}", quantity={self.quantity})'
+        )
+
+    @property
+    def content(self) -> str:
+        return self.template.template
 
     def content_with_entities(self, context: Union[Factor, Sequence[Factor]]) -> str:
         r"""
@@ -369,7 +379,7 @@ class Predicate:
             in the ``self.content`` string.
         """
 
-        return len(self.content.placeholders)
+        return len(self.template.placeholders)
 
     def quantity_comparison(self) -> str:
         """
@@ -399,7 +409,7 @@ class Predicate:
     def negated(self) -> Predicate:
         """Copy ``self``, with the opposite truth value."""
         return Predicate(
-            content=self.content,
+            template=self.content,
             truth=not self.truth,
             reciprocal=self.reciprocal,
             comparison=self.comparison,
@@ -414,7 +424,7 @@ class Predicate:
         else:
             truth_prefix = "that "
         if self.quantity:
-            content = f"{self.content} {self.quantity_comparison()} {self.quantity}"
+            content = f"{self.content} {self.quantity_comparison()}"
         else:
             content = self.content
         return f"{truth_prefix}{content}"

@@ -181,11 +181,11 @@ class TestRetrieveMentioned:
         "mentioned" when they first appeared.
         """
         relevant_dict = {
-            "predicate": {"content": "{} is relevant to show {}"},
+            "predicate": {"content": "$evidence is relevant to show $fact"},
             "type": "Fact",
             "context_factors": [
                 {
-                    "predicate": {"content": "{} shot {}"},
+                    "predicate": {"content": "$person1 shot $person2"},
                     "context_factors": [
                         {"name": "Alice", "type": "Entity"},
                         {"name": "Bob", "type": "Entity"},
@@ -193,7 +193,7 @@ class TestRetrieveMentioned:
                     "type": "Fact",
                 },
                 {
-                    "predicate": {"content": "{} murdered {}"},
+                    "predicate": {"content": "$person1 murdered $person2"},
                     "context_factors": ["Alice", "Bob"],
                     "type": "Fact",
                 },

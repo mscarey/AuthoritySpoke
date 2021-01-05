@@ -34,7 +34,7 @@ class TestPredicateLoad:
         schema = schemas.PredicateSchema()
         p7 = schema.load(
             {
-                "content": "the distance between {} and {} was",
+                "content": "the distance between $place1 and $place2 was",
                 "truth": True,
                 "reciprocal": True,
                 "comparison": "!=",
@@ -69,7 +69,7 @@ class TestPredicateLoad:
         schema = schemas.PredicateSchema()
         p7 = schema.load(
             data={
-                "content": "the distance between {} and {} was",
+                "content": "the distance between $place1 and $place2 was",
                 "truth": True,
                 "reciprocal": True,
                 "comparison": "!=",
@@ -93,7 +93,7 @@ class TestPredicateLoad:
 class TestPredicateDump:
     def test_dump_to_dict_with_units(self):
         predicate = Predicate(
-            "the distance between {} and {} was",
+            "the distance between $place1 and $place2 was",
             truth=True,
             reciprocal=True,
             comparison="<>",

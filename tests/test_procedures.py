@@ -140,7 +140,7 @@ class TestProcedureImplication:
 
     def test_implied_procedure_with_reciprocal_entities(self, make_procedure):
         """
-        Because both procedures have a form of "the distance between {} and {} was"
+        Because both procedures have a form of "the distance between $place1 and $place2 was"
         factor and those factors are reciprocal, the entities of one of them in reversed
         order can be used as the entities of the other, and one will still imply the other.
         (But if there had been more than two entities, only the first two would have been
@@ -277,10 +277,10 @@ class TestProcedureUnion:
 
 
 p_small_weight = Predicate(
-    "the amount of gold {} possessed was", comparison="<", quantity=Q_("1 gram")
+    "the amount of gold $person possessed was", comparison="<", quantity=Q_("1 gram")
 )
 p_large_weight = Predicate(
-    "the amount of gold {} possessed was",
+    "the amount of gold $person possessed was",
     comparison=">=",
     quantity=Q_("100 kilograms"),
 )
