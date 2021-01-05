@@ -89,7 +89,8 @@ class TestFacts:
         assert "absence of the fact" in str(watt_factor["f3_absent"]).lower()
 
     def test_string_no_truth_value(self, watt_factor):
-        assert "whether" in str(watt_factor["f2_no_truth"])
+        factor = watt_factor["f2_no_truth"]
+        assert "whether" in str(factor)
 
     def test_repeating_entity_string(self, make_factor):
         """I'm not convinced that a model of a Fact ever needs to include

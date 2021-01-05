@@ -95,13 +95,13 @@ class TestPredicates:
         assert not make_predicate["p2"].means(watt_factor["f2"])
 
     def test_obverse_predicates_equal(self, make_predicate):
-        assert make_predicate["p7"] == make_predicate["p7_obverse"]
+        assert make_predicate["p7"].means(make_predicate["p7_obverse"])
 
     def test_equal_float_and_int(self, make_predicate):
         """
         These now evaluate equal even though their equal quantities are different types
         """
-        assert make_predicate["p8_int"] == make_predicate["p8_float"]
+        assert make_predicate["p8_int"].means(make_predicate["p8_float"])
 
     def test_same_meaning_float_and_int(self, make_predicate):
         """
@@ -110,12 +110,14 @@ class TestPredicates:
         assert make_predicate["p8_int"].means(make_predicate["p8_float"])
 
     def test_no_equality_with_inconsistent_dimensionality(self, make_predicate):
-        assert make_predicate["p9"] != make_predicate["p9_acres"]
+        assert not make_predicate["p9"].means(make_predicate["p9_acres"])
 
     def test_different_truth_value_prevents_equality(self, make_predicate):
-        assert make_predicate["p_murder"] != make_predicate["p_murder_whether"]
-        assert make_predicate["p_murder_false"] != make_predicate["p_murder_whether"]
-        assert make_predicate["p_murder_false"] != make_predicate["p_murder"]
+        assert not make_predicate["p_murder"].means(make_predicate["p_murder_whether"])
+        assert not make_predicate["p_murder_false"].means(
+            make_predicate["p_murder_whether"]
+        )
+        assert not make_predicate["p_murder_false"].means(make_predicate["p_murder"])
 
     def test_predicate_does_not_mean_fact(self, make_predicate, watt_factor):
         assert not make_predicate["p8"].means(watt_factor["f8"])

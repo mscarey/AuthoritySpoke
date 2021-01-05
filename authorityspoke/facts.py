@@ -1,5 +1,6 @@
 """Create models of assertions accepted as factual by courts."""
 
+from authorityspoke.io.name_index import RawFactor
 from copy import deepcopy
 from dataclasses import dataclass, field
 import operator

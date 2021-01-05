@@ -161,6 +161,22 @@ class Predicate:
     def content(self) -> str:
         return self.template.template
 
+    def context_factors_mapping(
+        self, context_factors: List[Factor]
+    ) -> Dict[str, Factor]:
+        placeholders = self.template.placeholders
+        return dict(zip(placeholders, context_factors))
+
+    def mapping_placeholder_to_string(self, context: List[Factor]) -> Dict[str, str]:
+        mapping = self.context_factors_mapping(context)
+        mapping_to_string = {k: v.short_string for k, v in mapping.items()}
+        return mapping_to_string
+
+    def phrase_with_context(self) -> str:
+        mapping = self.mapping_placeholder_to_string()
+
+        return self.predicate.template.substitute(**mapping)
+
     def content_with_entities(self, context: Union[Factor, Sequence[Factor]]) -> str:
         r"""
         Make a sentence by filling in ``self.content`` with generic :class:`.Factor`\s.
@@ -189,7 +205,8 @@ class Predicate:
                     sentence=add_plurals, index=index
                 )
 
-        return add_plurals.format(*(e.short_string for e in context))
+        plural_template = Template(add_plurals)
+        return plural_template.substitute(**self.mapping_placeholder_to_string(context))
 
     def consistent_dimensionality(self, other: Predicate) -> bool:
         """Test if ``other`` has a quantity parameter consistent with ``self``."""
