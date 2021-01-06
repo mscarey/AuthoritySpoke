@@ -196,9 +196,7 @@ class PredicateSchema(ExpandableSchema):
 
     __model__ = Predicate
     template = fields.Str(data_key="content", load_only=True)
-    content = fields.Method(
-        serialize="get_content_without_placeholders", dump_only=True
-    )
+    content = fields.Method(serialize="get_content_with_placeholders", dump_only=True)
     truth = fields.Bool(missing=True)
     reciprocal = fields.Bool(missing=False)
     comparison = fields.Str(
@@ -207,8 +205,8 @@ class PredicateSchema(ExpandableSchema):
     )
     quantity = fields.Function(dump_quantity, deserialize=read_quantity, missing=None)
 
-    def get_content_without_placeholders(self, obj) -> str:
-        return obj.content_without_placeholders()
+    def get_content_with_placeholders(self, obj) -> str:
+        return obj.template.template
 
     def split_quantity_from_content(
         self, content: str

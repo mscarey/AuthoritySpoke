@@ -7,6 +7,7 @@ from copy import deepcopy
 
 from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
+from authorityspoke.predicates import StatementTemplate
 from authorityspoke.io import text_expansion
 
 
@@ -68,9 +69,10 @@ def assign_name_from_content(obj: Dict) -> str:
     """
 
     if obj.get("context_factors"):
-        content_for_name = obj["predicate"]["content"]
-        for context_factor in obj["context_factors"]:
-            content_for_name = content_for_name.replace("{}", context_factor, 1)
+
+        template = StatementTemplate(obj["predicate"]["content"])
+        substitutions = dict(zip(template.placeholders, obj["context_factors"]))
+        content_for_name = template.substitute(substitutions)
     else:
         content_for_name = obj["predicate"]["content"]
     false_modifier = "false " if obj["predicate"].get("truth") is False else ""

@@ -90,10 +90,10 @@ def collapse_known_factors(obj: Dict):
 def collapse_name_in_content(content: str, name: str):
     """Replace name with placeholder to show it is referenced in context_factors."""
     slug = slugify(text=name, separator="_", replacements=[[" ", "_"]])
-    content = content.replace(name, "${" + slug + "}", 1)
+    content = content.replace(name, "${" + slug + "}")
 
-    content = content.replace("{${", "${", 1)
-    content = content.replace("}}", "}", 1)
+    content = content.replace("{${", "${")
+    content = content.replace("}}", "}")
     return content
 
 
@@ -109,7 +109,7 @@ def add_found_context_with_brackets(
         corresponding to its position in the context phrase.
     """
     bracketed_name = "{" + factor["name"] + "}"
-    while bracketed_name in content:
+    if bracketed_name in content:
         index_in_content = content.index(bracketed_name)
         index_in_factor_list = content[:index_in_content].count("${")
         context_factors.insert(index_in_factor_list, factor)

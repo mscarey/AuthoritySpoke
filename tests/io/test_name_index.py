@@ -68,7 +68,7 @@ class TestCollectMentioned:
         new_content, context_factors = text_expansion.get_references_from_string(
             content, context_factors
         )
-        assert new_content == "{} sent a message to {}"
+        assert new_content == "{} sent a message to ${bob_s_friend}"
         assert len(context_factors) == 2
 
     def test_assign_name(self, raw_factor):
