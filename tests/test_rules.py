@@ -939,13 +939,15 @@ class TestStatuteRules:
 
         sec_4 = fake_beard_client.read("/test/acts/47/4/")
 
+        was_facial_hair = Predicate("$thing was facial hair")
+        fact_was_facial_hair = Fact(was_facial_hair, context_factors=beard)
         hypothetical = Rule(
             procedure=Procedure(
                 inputs=[
-                    Fact(Predicate("{} was facial hair"), context_factors=beard),
+                    fact_was_facial_hair,
                     Fact(
                         Predicate(
-                            "the length of {} was",
+                            "the length of $thing was",
                             comparison=">=",
                             quantity=Q_("5 millimeters"),
                             truth=facial_hair_over_5mm,
@@ -954,21 +956,21 @@ class TestStatuteRules:
                     ),
                     Fact(
                         Predicate(
-                            "{} occurred on or below the chin",
+                            "$thing occurred on or below the chin",
                             truth=facial_hair_on_or_below_chin,
                         ),
                         context_factors=beard,
                     ),
                     Fact(
                         Predicate(
-                            "{} existed in an uninterrupted line from the front "
+                            "$thing existed in an uninterrupted line from the front "
                             "of one ear to the front of the other ear below the nose",
                             truth=facial_hair_uninterrupted,
                         ),
                         context_factors=beard,
                     ),
                 ],
-                outputs=Fact(Predicate("{} was a beard"), context_factors=beard),
+                outputs=Fact(Predicate("$thing was a beard"), context_factors=beard),
             ),
             enactments=sec_4,
         )

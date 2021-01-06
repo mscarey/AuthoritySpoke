@@ -6,7 +6,7 @@ from authorityspoke.predicates import Predicate, Q_
 class TestPredicates:
     def test_predicate_with_wrong_number_of_entities(self):
         with pytest.raises(ValueError):
-            _ = Predicate("{} was a motel", reciprocal=True)
+            _ = Predicate("$place was a motel", reciprocal=True)
 
     def test_predicate_with_wrong_comparison_symbol(self):
         with pytest.raises(ValueError):
@@ -38,16 +38,16 @@ class TestPredicates:
         assert make_predicate["p1"].quantity_comparison() == ""
 
     def test_context_slots(self, make_predicate):
-        assert make_predicate["p7"].context_slots == 2
+        assert len(make_predicate["p7"]) == 2
 
     def test_str_for_predicate_with_number_quantity(self, make_predicate):
-        assert "distance between {} and {} was at least 20" in str(
+        assert "distance between $place1 and $place2 was at least 20" in str(
             make_predicate["p8_int"]
         )
-        assert "distance between {} and {} was at least 20.0" in str(
+        assert "distance between $place1 and $place2 was at least 20.0" in str(
             make_predicate["p8_float"]
         )
-        assert "distance between {} and {} was at least 20 foot" in str(
+        assert "distance between $place1 and $place2 was at least 20 foot" in str(
             make_predicate["p8"]
         )
 
@@ -76,31 +76,32 @@ class TestPredicates:
         assert plural_version.startswith(expected)
 
     def test_str_not_equal(self, make_predicate):
-        assert "the distance between {} and {} was not equal to 35 foot" in str(
-            make_predicate["p7_not_equal"]
+        assert (
+            "the distance between $place1 and $place2 was not equal to 35 foot"
+            in str(make_predicate["p7_not_equal"])
         )
 
     def test_negated_method(self, make_predicate):
-        assert make_predicate["p7"].negated() == make_predicate["p7_opposite"]
-        assert make_predicate["p3"].negated() == make_predicate["p3_false"]
+        assert make_predicate["p7"].negated().means(make_predicate["p7_opposite"])
+        assert make_predicate["p3"].negated().means(make_predicate["p3_false"])
 
     # Equality
 
     def test_predicate_equality(self, make_predicate):
-        assert make_predicate["p1"] == make_predicate["p1_again"]
+        assert make_predicate["p1"].means(make_predicate["p1_again"])
 
     def test_predicate_inequality(self, make_predicate, watt_factor):
-        assert make_predicate["p2"] != make_predicate["p2_reciprocal"]
-        assert make_predicate["p2"] != watt_factor["f2"]
+        assert not make_predicate["p2"].means(make_predicate["p2_reciprocal"])
+        assert not make_predicate["p2"].means(watt_factor["f2"])
 
     def test_obverse_predicates_equal(self, make_predicate):
-        assert make_predicate["p7"] == make_predicate["p7_obverse"]
+        assert make_predicate["p7"].means(make_predicate["p7_obverse"])
 
     def test_equal_float_and_int(self, make_predicate):
         """
         These now evaluate equal even though their equal quantities are different types
         """
-        assert make_predicate["p8_int"] == make_predicate["p8_float"]
+        assert make_predicate["p8_int"].means(make_predicate["p8_float"])
 
     def test_same_meaning_float_and_int(self, make_predicate):
         """
@@ -109,12 +110,14 @@ class TestPredicates:
         assert make_predicate["p8_int"].means(make_predicate["p8_float"])
 
     def test_no_equality_with_inconsistent_dimensionality(self, make_predicate):
-        assert make_predicate["p9"] != make_predicate["p9_acres"]
+        assert not make_predicate["p9"].means(make_predicate["p9_acres"])
 
     def test_different_truth_value_prevents_equality(self, make_predicate):
-        assert make_predicate["p_murder"] != make_predicate["p_murder_whether"]
-        assert make_predicate["p_murder_false"] != make_predicate["p_murder_whether"]
-        assert make_predicate["p_murder_false"] != make_predicate["p_murder"]
+        assert not make_predicate["p_murder"].means(make_predicate["p_murder_whether"])
+        assert not make_predicate["p_murder_false"].means(
+            make_predicate["p_murder_whether"]
+        )
+        assert not make_predicate["p_murder_false"].means(make_predicate["p_murder"])
 
     def test_predicate_does_not_mean_fact(self, make_predicate, watt_factor):
         assert not make_predicate["p8"].means(watt_factor["f8"])
@@ -143,8 +146,8 @@ class TestPredicates:
         assert not make_predicate["p_quantity>=4"] > make_predicate["p_quantity>5"]
 
     def test_no_implication_of_greater_or_equal_quantity(self):
-        less = Predicate(content="The number of mice was", comparison=">", quantity=4)
-        more = Predicate(content="The number of mice was", comparison=">=", quantity=5)
+        less = Predicate(template="The number of mice was", comparison=">", quantity=4)
+        more = Predicate(template="The number of mice was", comparison=">=", quantity=5)
         assert not less.implies(more)
 
     def test_equal_implies_greater_or_equal(self, make_predicate):

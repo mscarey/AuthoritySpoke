@@ -10,11 +10,9 @@ from __future__ import annotations
 
 import re
 
+from string import Template
 from typing import ClassVar, Dict, Iterable
-from typing import Optional, Sequence, Union
-
-from dataclasses import dataclass
-from _pytest.python_api import raises
+from typing import List, Optional, Sequence, Union
 
 from pint import UnitRegistry
 
@@ -24,7 +22,43 @@ ureg = UnitRegistry()
 Q_ = ureg.Quantity
 
 
-@dataclass()
+class StatementTemplate(Template):
+    def __init__(self, template: str) -> None:
+        super().__init__(template)
+        self.make_content_singular()
+
+    def make_content_singular(self) -> None:
+        """Convert template text for self.context to singular "was"."""
+        for placeholder in self.placeholders:
+            bracketed = "{" + placeholder + "}"
+            if bracketed in self.template:
+                self.template = self.template.replace(
+                    f"{bracketed} were", f"{bracketed} was"
+                )
+            else:
+                self.template = self.template.replace(
+                    f"{placeholder} were", f"{placeholder} was"
+                )
+        return None
+
+    @property
+    def placeholders(self) -> List[str]:
+        r"""
+        Count bracket pairs in ``self.content``, minus 1 if ``self.quantity==True``.
+
+        :returns:
+            the number of context :class:`.Factor`\s that must be
+            specified to fill in the blanks in ``self.content``.
+        """
+
+        placeholders = [
+            m.group("named") or m.group("braced")
+            for m in self.pattern.finditer(self.template)
+            if m.group("named") or m.group("braced")
+        ]
+        return placeholders
+
+
 class Predicate:
     r"""
     A statement about real events or about a legal conclusion.
@@ -63,11 +97,6 @@ class Predicate:
         may contain no more than one ``comparison`` and one ``quantity``.
     """
 
-    content: str
-    truth: Optional[bool] = True
-    reciprocal: bool = False
-    comparison: str = ""
-    quantity: Optional[Union[int, float, ureg.Quantity]] = None
     opposite_comparisons: ClassVar[Dict[str, str]] = {
         ">=": "<",
         "==": "!=",
@@ -79,34 +108,40 @@ class Predicate:
     }
     normalized_comparisons: ClassVar[Dict[str, str]] = {"==": "=", "!=": "<>"}
 
-    def __post_init__(self):
+    def __init__(
+        self,
+        template: Union[str, StatementTemplate],
+        truth: Optional[bool] = True,
+        reciprocal: bool = False,
+        comparison: str = "",
+        quantity: Optional[Union[int, float, ureg.Quantity]] = None,
+    ):
         """
         Clean up and test validity of attributes.
 
         If the :attr:`content` sentence is phrased to have a plural
         context factor, normalizes it by changing "were" to "was".
         """
-
-        # Conjugating a verb using .replace feels like a very brittle solution.
-        # An NLP library may be used here in future versions.
-        object.__setattr__(self, "content", self.content.replace("{} were", "{} was"))
+        self.template = StatementTemplate(template)
+        self.truth = truth
+        self.reciprocal = reciprocal
+        self.comparison = comparison
+        self.quantity = quantity
 
         if self.comparison and self.comparison not in self.opposite_comparisons.keys():
             raise ValueError(
                 f'"comparison" string parameter must be one of {self.opposite_comparisons.keys()}.'
             )
 
-        if self.context_slots < 2 and self.reciprocal:
+        if len(self) < 2 and self.reciprocal:
             raise ValueError(
                 f'"reciprocal" flag not allowed because "{self.content}" has '
-                f"{self.context_slots} spaces for context entities. At least 2 spaces needed."
+                f"{len(self)} spaces for context entities. At least 2 spaces needed."
             )
 
         if self.comparison and self.truth is False:
-            object.__setattr__(self, "truth", True)
-            object.__setattr__(
-                self, "comparison", self.opposite_comparisons[self.comparison]
-            )
+            self.truth = True
+            self.comparison = self.opposite_comparisons[self.comparison]
 
         if self.quantity is not None and not self.content.endswith("was"):
             raise ValueError(
@@ -115,18 +150,32 @@ class Predicate:
                 f"The word 'was' is not the end of the string '{self.content}'."
             )
 
+    def __repr__(self):
+        return (
+            f'Predicate(template="{self.template.template}", '
+            "truth={self.truth}, reciprocal={self.reciprocal}, "
+            'comparison="{self.comparison}", quantity={self.quantity})'
+        )
+
     @property
-    def context_slots(self) -> int:
-        r"""
-        Count bracket pairs in ``self.content``, minus 1 if ``self.quantity==True``.
+    def content(self) -> str:
+        return self.template.template
 
-        :returns:
-            the number of context :class:`.Factor`\s that must be
-            specified to fill in the blanks in ``self.content``.
-        """
+    def context_factors_mapping(
+        self, context_factors: List[Factor]
+    ) -> Dict[str, Factor]:
+        placeholders = self.template.placeholders
+        return dict(zip(placeholders, context_factors))
 
-        slots = self.content.count("{}")
-        return slots
+    def mapping_placeholder_to_string(self, context: List[Factor]) -> Dict[str, str]:
+        mapping = self.context_factors_mapping(context)
+        mapping_to_string = {k: v.short_string for k, v in mapping.items()}
+        return mapping_to_string
+
+    def phrase_with_context(self) -> str:
+        mapping = self.mapping_placeholder_to_string()
+
+        return self.predicate.template.substitute(**mapping)
 
     def content_with_entities(self, context: Union[Factor, Sequence[Factor]]) -> str:
         r"""
@@ -156,7 +205,8 @@ class Predicate:
                     sentence=add_plurals, index=index
                 )
 
-        return add_plurals.format(*(e.short_string for e in context))
+        plural_template = Template(add_plurals)
+        return plural_template.substitute(**self.mapping_placeholder_to_string(context))
 
     def consistent_dimensionality(self, other: Predicate) -> bool:
         """Test if ``other`` has a quantity parameter consistent with ``self``."""
@@ -346,7 +396,7 @@ class Predicate:
             in the ``self.content`` string.
         """
 
-        return self.context_slots
+        return len(self.template.placeholders)
 
     def quantity_comparison(self) -> str:
         """
@@ -376,7 +426,7 @@ class Predicate:
     def negated(self) -> Predicate:
         """Copy ``self``, with the opposite truth value."""
         return Predicate(
-            content=self.content,
+            template=self.content,
             truth=not self.truth,
             reciprocal=self.reciprocal,
             comparison=self.comparison,
@@ -391,7 +441,7 @@ class Predicate:
         else:
             truth_prefix = "that "
         if self.quantity:
-            content = f"{self.content} {self.quantity_comparison()} {self.quantity}"
+            content = f"{self.content} {self.quantity_comparison()}"
         else:
             content = self.content
         return f"{truth_prefix}{content}"

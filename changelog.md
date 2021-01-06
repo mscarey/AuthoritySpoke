@@ -1,5 +1,8 @@
 Changelog
 =========
+dev
+------------------
+- Predicate.content attribute no longer includes an extra placeholder for a "quantity"
 
 0.4.1 (2021-01-02)
 ------------------

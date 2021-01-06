@@ -89,7 +89,8 @@ class TestFacts:
         assert "absence of the fact" in str(watt_factor["f3_absent"]).lower()
 
     def test_string_no_truth_value(self, watt_factor):
-        assert "whether" in str(watt_factor["f2_no_truth"])
+        factor = watt_factor["f2_no_truth"]
+        assert "whether" in str(factor)
 
     def test_repeating_entity_string(self, make_factor):
         """I'm not convinced that a model of a Fact ever needs to include
@@ -533,12 +534,12 @@ class TestContradiction:
         contradiction if you assume they correspond to one another.
         """
         p_small_weight = Predicate(
-            "the amount of gold {} possessed was",
+            "the amount of gold $person possessed was",
             comparison="<",
             quantity=Q_("1 gram"),
         )
         p_large_weight = Predicate(
-            "the amount of gold {} possessed was",
+            "the amount of gold $person possessed was",
             comparison=">=",
             quantity=Q_("100 kilograms"),
         )
@@ -555,12 +556,12 @@ class TestContradiction:
         So there's no contradiction.
         """
         p_small_weight = Predicate(
-            "the amount of gold {} possessed was",
+            "the amount of gold $person possessed was",
             comparison="<",
             quantity=Q_("1 gram"),
         )
         p_large_weight = Predicate(
-            "the amount of gold {} possessed was",
+            "the amount of gold $person possessed was",
             comparison=">=",
             quantity=Q_("100 kilograms"),
         )
