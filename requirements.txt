@@ -4,5 +4,6 @@ marshmallow~=3.2
 legislice>=0.4.1
 pint>=0.15
 python-dotenv
+python-slugify
 requests
 roman

@@ -4,6 +4,7 @@ from re import findall
 from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
 from marshmallow import ValidationError
+from slugify import slugify
 
 from authorityspoke.io import nesting
 
@@ -86,12 +87,13 @@ def collapse_known_factors(obj: Dict):
     return obj
 
 
-def collapse_name_in_content(content: str, name: str, placeholder: str = "{}"):
+def collapse_name_in_content(content: str, name: str):
     """Replace name with placeholder to show it is referenced in context_factors."""
-    content = content.replace(name, placeholder, 1)
-    double_placeholder = placeholder[0] + placeholder + placeholder[1]
-    if double_placeholder in content:
-        content = content.replace(double_placeholder, placeholder, 1)
+    slug = slugify(text=name, separator="_", replacements=[[" ", "_"]])
+    content = content.replace(name, "${" + slug + "}", 1)
+
+    content = content.replace("{${", "${", 1)
+    content = content.replace("}}", "}", 1)
     return content
 
 
@@ -109,9 +111,9 @@ def add_found_context_with_brackets(
     bracketed_name = "{" + factor["name"] + "}"
     while bracketed_name in content:
         index_in_content = content.index(bracketed_name)
-        index_in_factor_list = content[:index_in_content].count(placeholder)
+        index_in_factor_list = content[:index_in_content].count("${")
         context_factors.insert(index_in_factor_list, factor)
-        content = collapse_name_in_content(content, bracketed_name, placeholder)
+        content = collapse_name_in_content(content, factor["name"])
     return content, context_factors
 
 
@@ -130,7 +132,7 @@ def add_found_context(
         index_in_content = content.index(factor["name"])
         index_in_factor_list = content[:index_in_content].count(placeholder)
         context_factors.insert(index_in_factor_list, factor)
-        content = collapse_name_in_content(content, factor["name"], placeholder)
+        content = collapse_name_in_content(content, factor["name"])
     return content, context_factors
 
 
