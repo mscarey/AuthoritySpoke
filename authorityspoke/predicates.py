@@ -110,7 +110,7 @@ class Predicate:
 
     def __init__(
         self,
-        template: Union[str, StatementTemplate],
+        template: str,
         truth: Optional[bool] = True,
         reciprocal: bool = False,
         comparison: str = "",
@@ -160,6 +160,10 @@ class Predicate:
     @property
     def content(self) -> str:
         return self.template.template
+
+    def content_without_placeholders(self) -> str:
+        changes = {p: "{}" for p in self.template.placeholders}
+        return self.template.substitute(**changes)
 
     def context_factors_mapping(
         self, context_factors: List[Factor]
@@ -267,7 +271,10 @@ class Predicate:
             whether ``self`` and ``other`` have :attr:`~Predicate.content` strings
             similar enough to be considered to have the same meaning.
         """
-        return self.content.lower() == other.content.lower()
+        return (
+            self.content_without_placeholders().lower()
+            == other.content_without_placeholders().lower()
+        )
 
     def means(self, other) -> bool:
         """
