@@ -141,7 +141,7 @@ class TestCollectMentioned:
         holding = text_expansion.expand_shorthand(holding)
         built = readers.read_holding(record=holding, client=fake_usc_client)
         assert built.inputs[0].short_string.startswith(
-            "the fact that <Rural's telephone listings> were names"
+            "the fact <Rural's telephone listings> were names"
         )
 
     def test_enactment_name_in_holding(self, fake_usc_client):

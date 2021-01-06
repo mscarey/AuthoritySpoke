@@ -202,15 +202,14 @@ class Predicate:
                 f"Exactly {len(self)} entities needed to complete "
                 + f'"{self.content}", but {len(context)} were given.'
             )
-        add_plurals = str(self)
-        for index, context_factor in enumerate(context):
-            if context_factor.__dict__.get("plural"):
-                add_plurals = Predicate.make_context_plural(
-                    sentence=add_plurals, index=index
-                )
+        add_plurals = self.template.substitute(
+            **self.mapping_placeholder_to_string(context)
+        )
 
-        plural_template = Template(add_plurals)
-        return plural_template.substitute(**self.mapping_placeholder_to_string(context))
+        with_plurals = Predicate.make_context_plural(
+            sentence=add_plurals, context=context
+        )
+        return with_plurals
 
     def consistent_dimensionality(self, other: Predicate) -> bool:
         """Test if ``other`` has a quantity parameter consistent with ``self``."""
@@ -454,9 +453,11 @@ class Predicate:
         return f"{truth_prefix}{content}"
 
     @staticmethod
-    def make_context_plural(sentence: str, index: int = 0) -> str:
+    def make_context_plural(sentence: str, context: Iterable[Factor]) -> str:
         """
         Replace "was" with "were" after a context slot in a sentence.
+
+        TODO: move method somewhere where it belongs
 
         :param sentence:
             a sentence with pairs of curly braces representing slots for
@@ -470,20 +471,10 @@ class Predicate:
             a form of the sentence with one instance of "was" replaced
             with "were"
         """
-        pattern = re.compile(
-            r"""
-            ^       # from beginning of string
-            (       # start capture group \1
-            [^{]*?  # everything before the first {
-            (?:     # start noncapturing group \2
-            \{\}    # literal curly brackets next to each other
-            [^{]*?  # everything before the next literal curly bracket
-            ){%d}   # group \2 occurs "index" times (could be 0)
-            )       # end of \1, which will be in the re.sub replacement string
-            \{\}    # literal curly brackets
-            \ was   # literal " was"
-            """
-            % index,
-            re.VERBOSE,
-        )
-        return re.sub(pattern, r"\1{} were", sentence)
+        for factor in context:
+            if factor.__dict__.get("name"):
+                sentence = sentence.replace(f"{factor.name} was", f"{factor.name} were")
+                sentence = sentence.replace(
+                    f"{factor.name}> was", f"{factor.name}> were"
+                )
+        return sentence
