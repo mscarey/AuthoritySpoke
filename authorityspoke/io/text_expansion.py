@@ -90,10 +90,10 @@ def collapse_known_factors(obj: Dict):
 def collapse_name_in_content(content: str, name: str):
     """Replace name with placeholder to show it is referenced in context_factors."""
     slug = slugify(text=name, separator="_", replacements=[[" ", "_"]])
-    content = content.replace(name, "${" + slug + "}")
-
-    content = content.replace("{${", "${")
-    content = content.replace("}}", "}")
+    placeholder_slug = "${" + slug + "}"
+    if placeholder_slug not in content:
+        content = content.replace(name, "${" + slug + "}")
+        content = content.replace("{${", "${", 1).replace("}}", "}", 1)
     return content
 
 
@@ -128,7 +128,7 @@ def add_found_context(
         a context_factors list with the factor inserted in a position
         corresponding to its position in the context phrase.
     """
-    while factor["name"] in content:
+    if factor["name"] in content:
         index_in_content = content.index(factor["name"])
         index_in_factor_list = content[:index_in_content].count(placeholder)
         context_factors.insert(index_in_factor_list, factor)
@@ -162,7 +162,7 @@ def get_references_from_string(
         from a string that has curly brackets around the
         context factors and the comparison/quantity.
     """
-    pattern = r"\{([^\{]+)\}"
+    pattern = r"(?<!/$)\{([^\{]+)\}"  # matches bracketed text not preceded by $
     entities_as_text = findall(pattern, content)
     entities_as_text.sort(key=len, reverse=True)
     context_factors = context_factors or []

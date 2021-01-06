@@ -119,7 +119,7 @@ class TestCollectMentioned:
 
     def test_context_factor_not_collapsed(self, fake_usc_client):
         """
-        There is a context factor listed for this Fact, but it hasn't been collapsed
+        There is a context factor listed for this Holding, but it hasn't been collapsed
         in the content phrase.
         """
         holding = {
@@ -171,7 +171,9 @@ class TestRetrieveMentioned:
         ) = text_expansion.add_found_context(
             fact["predicate"]["content"], fact["context_factors"], obj
         )
-        assert fact["predicate"]["content"] == "{} threw a pie at {} but it hit {}"
+        assert (
+            fact["predicate"]["content"] == "{} threw a pie at ${larry} but it hit {}"
+        )
         assert fact["context_factors"][1]["name"] == "Larry"
 
     def test_retrieve_mentioned_during_load(self):
