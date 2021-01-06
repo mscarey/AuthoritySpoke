@@ -195,7 +195,7 @@ class PredicateSchema(ExpandableSchema):
     """Schema for statements, separate from any claim about their truth or who asserts them."""
 
     __model__ = Predicate
-    content = fields.Str()
+    template = fields.Str(data_key="content")
     truth = fields.Bool(missing=True)
     reciprocal = fields.Bool(missing=False)
     comparison = fields.Str(
