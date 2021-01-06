@@ -106,7 +106,7 @@ class TestCollectMentioned:
         oracle_records = loaders.load_holdings("holding_oracle.json")
         oracle_holdings = readers.read_holdings(oracle_records, client=fake_usc_client)
         factor = oracle_holdings[2].inputs[0]
-        assert factor.content == "{} was an original work"
+        assert factor.content == "${the_java_api} was an original work"
 
     def test_enactment_name_index(self):
         """

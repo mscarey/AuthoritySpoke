@@ -162,7 +162,7 @@ def get_references_from_string(
         from a string that has curly brackets around the
         context factors and the comparison/quantity.
     """
-    pattern = r"(?<!/$)\{([^\{]+)\}"  # matches bracketed text not preceded by $
+    pattern = r"(?<!\$)\{([^\{]+)\}"  # matches bracketed text not preceded by $
     entities_as_text = findall(pattern, content)
     entities_as_text.sort(key=len, reverse=True)
     context_factors = context_factors or []
