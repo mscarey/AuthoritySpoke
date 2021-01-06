@@ -81,10 +81,24 @@ def collapse_known_factors(obj: Dict):
             else:
                 name = factor.get("name")
             if name:
-                obj["predicate"]["content"] = collapse_name_in_content(
-                    obj["predicate"]["content"], name
-                )
+                if name in obj["predicate"]["content"]:
+                    obj["predicate"]["content"] = collapse_name_in_content(
+                        obj["predicate"]["content"], name
+                    )
+                else:
+                    obj["predicate"]["content"] = replace_brackets_with_placeholder(
+                        obj["predicate"]["content"], name
+                    )
     return obj
+
+
+def replace_brackets_with_placeholder(content: str, name: str):
+    """Replace brackets with placeholder to show it is referenced in context_factors."""
+    slug = slugify(text=name, separator="_", replacements=[[" ", "_"]])
+    placeholder_slug = "${" + slug + "}"
+    if placeholder_slug not in content:
+        content = content.replace("{}", "${" + slug + "}", 1)
+    return content
 
 
 def collapse_name_in_content(content: str, name: str):
@@ -92,7 +106,7 @@ def collapse_name_in_content(content: str, name: str):
     slug = slugify(text=name, separator="_", replacements=[[" ", "_"]])
     placeholder_slug = "${" + slug + "}"
     if placeholder_slug not in content:
-        content = content.replace(name, "${" + slug + "}")
+        content = content.replace(name, placeholder_slug)
         content = content.replace("{${", "${", 1).replace("}}", "}", 1)
     return content
 
@@ -118,7 +132,7 @@ def add_found_context_with_brackets(
 
 
 def add_found_context(
-    content: str, context_factors: List[Dict], factor: Dict, placeholder="{}"
+    content: str, context_factors: List[Dict], factor: Dict
 ) -> Tuple[str, List[Dict[str, Any]]]:
     """
     Replace mentions of factor with placeholder and list replacements.
@@ -130,7 +144,7 @@ def add_found_context(
     """
     if factor["name"] in content:
         index_in_content = content.index(factor["name"])
-        index_in_factor_list = content[:index_in_content].count(placeholder)
+        index_in_factor_list = content[:index_in_content].count("{")
         context_factors.insert(index_in_factor_list, factor)
         content = collapse_name_in_content(content, factor["name"])
     return content, context_factors

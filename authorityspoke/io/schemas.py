@@ -296,7 +296,6 @@ class FactSchema(ExpandableSchema):
                     content,
                     context_factors,
                     factor=deepcopy(obj),
-                    placeholder=placeholder,
                 )
         return content, context_factors
 

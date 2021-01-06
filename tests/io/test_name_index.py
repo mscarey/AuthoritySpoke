@@ -259,7 +259,7 @@ class TestRetrieveMentioned:
         mentioned = mentioned.sorted_by_length()
         schema.context["mentioned"] = mentioned
         new_content, context = schema.get_references_from_mentioned(content)
-        assert new_content == "{} threw {} at {}"
+        assert new_content == "${mecha_godzilla} threw ${mothra} at ${godzilla}"
         assert context[2] == {"name": "Godzilla", "type": "Entity"}
 
     def test_mentioned_object_string(self):
