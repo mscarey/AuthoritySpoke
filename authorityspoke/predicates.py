@@ -402,7 +402,7 @@ class Predicate:
             in the ``self.content`` string.
         """
 
-        return len(self.template.placeholders)
+        return len(set(self.template.placeholders))
 
     def quantity_comparison(self) -> str:
         """
