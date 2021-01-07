@@ -68,7 +68,7 @@ def make_predicate() -> Dict[str, Predicate]:
         "p1": Predicate("$place was a motel"),
         "p1_again": Predicate("$place was a motel"),
         "p2": Predicate("$person operated and lived at $place"),
-        "p2_reciprocal": Predicate(
+        "p2_reflexive": Predicate(
             "$person operated and lived at $person", reciprocal=True
         ),
         "p2_no_truth": Predicate("$person operated and lived at $place", truth=None),

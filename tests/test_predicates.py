@@ -91,7 +91,7 @@ class TestPredicates:
         assert make_predicate["p1"].means(make_predicate["p1_again"])
 
     def test_predicate_inequality(self, make_predicate, watt_factor):
-        assert not make_predicate["p2"].means(make_predicate["p2_reciprocal"])
+        assert not make_predicate["p2"].means(make_predicate["p2_reflexive"])
         assert not make_predicate["p2"].means(watt_factor["f2"])
 
     def test_obverse_predicates_equal(self, make_predicate):

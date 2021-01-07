@@ -133,12 +133,6 @@ class Predicate:
                 f'"comparison" string parameter must be one of {self.opposite_comparisons.keys()}.'
             )
 
-        if len(self) < 2 and self.reciprocal:
-            raise ValueError(
-                f'"reciprocal" flag not allowed because "{self.content}" has '
-                f"{len(self)} spaces for context entities. At least 2 spaces needed."
-            )
-
         if self.comparison and self.truth is False:
             self.truth = True
             self.comparison = self.opposite_comparisons[self.comparison]
