@@ -33,11 +33,11 @@ class TestHoldingDump:
         holding = make_holding["h2"]
         dumped = dump.to_dict(holding)
         content = dumped["rule"]["procedure"]["inputs"][0]["predicate"]["content"]
-        assert content == "{} was on the premises of {}"
+        assert content == "$thing was on the premises of $place"
 
         loaded = readers.read_holding(dumped, client=fake_usc_client)
         loaded_content = loaded.despite[0].predicate.content
-        assert "the distance between {} and {} was" in loaded_content
+        assert "the distance between $place1 and $place2 was" in loaded_content
 
 
 class TestEntityImport:

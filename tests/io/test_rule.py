@@ -28,7 +28,7 @@ class TestRuleDump:
         dumped = dump.to_dict(rule)
         loaded = readers.read_rule(dumped, client=client)
         content = loaded.despite[0].predicate.content
-        assert "the distance between {} and {} was" in content
+        assert "the distance between $place1 and $place2 was" in content
 
 
 class TestLoadRules:

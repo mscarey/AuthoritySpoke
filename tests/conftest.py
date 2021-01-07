@@ -287,7 +287,7 @@ def watt_factor(make_predicate, make_entity, watt_mentioned) -> Dict[str, Factor
         "f2_no_truth": build_fact(p["p2_no_truth"], (1, 0), case_factors=c),
         "f2_false": build_fact(p["p2_false"], case_factors=c),
         "f2_false_absent": build_fact(p["p2_false"], absent=True, case_factors=c),
-        "f2_reciprocal": build_fact(p["p2_reciprocal"], case_factors=c),
+        "f2_reflexive": build_fact(p["p2_reflexive"], case_factors=c),
         "f2_generic": build_fact(p["p2"], generic=True, case_factors=c),
         "f2_false_generic": build_fact(p["p2_false"], generic=True, case_factors=c),
         "f3_generic": build_fact(p["p3"], generic=True, case_factors=c),

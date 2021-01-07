@@ -270,7 +270,7 @@ class TestRetrieveMentioned:
     def test_unmarked_factor_when_one_was_marked(self):
         fact = {
             "type": "fact",
-            "content": "{} lived at Elsinore",
+            "content": "$Hamlet lived at Elsinore",
             "context_factors": [{"type": "Entity", "name": "Hamlet"}],
         }
         schema = schemas.FactSchema()
@@ -278,4 +278,4 @@ class TestRetrieveMentioned:
             {"Elsinore": {"type": "Entity"}}
         )
         loaded = schema.load(fact)
-        assert loaded.predicate.content == "{} lived at {}"
+        assert loaded.predicate.content == "$Hamlet lived at ${elsinore}"

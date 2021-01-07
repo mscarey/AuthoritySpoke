@@ -7,7 +7,7 @@ class TestProcedureDump:
         procedure = make_procedure["c2"]
         dumped = dump.to_dict(procedure)
         content = dumped["inputs"][0]["predicate"]["content"]
-        assert content == "{} was on the premises of {}"
+        assert content == "$thing was on the premises of $place"
 
     def test_dump_and_load_procedure(self, make_procedure):
         procedure = make_procedure["c2"]
