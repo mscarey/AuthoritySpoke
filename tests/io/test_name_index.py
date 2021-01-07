@@ -153,12 +153,42 @@ class TestCollectMentioned:
         feist_holding = readers.read_holding(feist_records[0], client=fake_usc_client)
         assert "securing for limited Times" in feist_holding.short_string
 
+    def test_update_name_index_with_longer_factor(self):
+        raw_fact = {
+            "predicate": {"content": "{Bradley} lived at Bradley's house"},
+            "type": "fact",
+        }
+        old_mentioned = name_index.Mentioned({"Bradley's house": {"type": "Entity"}})
+        obj, new_mentioned = name_index.update_name_index_from_fact_content(
+            obj=raw_fact, mentioned=old_mentioned
+        )
+        found_content = obj["predicate"]["content"].lower()
+        assert found_content == "${bradley} lived at ${bradley_s_house}"
+        # Check that context_factors match the order of the sentence
+        assert obj["context_factors"][0]["name"] == "Bradley"
+        assert obj["context_factors"][1]["name"] == "Bradley's house"
+
+    def test_link_longest_context_factors_first(self):
+        """
+        If read_holdings interprets the second "Bradley" string as
+        a reference to Bradley rather than "Bradley's house", it's wrong.
+        """
+        to_read = {
+            "outputs": [
+                {"type": "fact", "content": "{Bradley's house} was a house"},
+                {"type": "fact", "content": "{Bradley} lived at Bradley's house"},
+            ]
+        }
+        record, mentioned = name_index.index_names(to_read)
+        lived_at = record["outputs"][1]
+        assert mentioned[lived_at]["context_factors"][1] == "Bradley's house"
+
 
 class TestRetrieveMentioned:
     def test_add_found_context_to_content(self):
         fact = {
             "type": "fact",
-            "predicate": {"content": "{} threw a pie at Larry but it hit {}"},
+            "predicate": {"content": "$moe threw a pie at Larry but it hit $curly"},
             "context_factors": [
                 {"type": "Entity", "name": "Moe"},
                 {"type": "Entity", "name": "Curly"},
@@ -172,7 +202,8 @@ class TestRetrieveMentioned:
             fact["predicate"]["content"], fact["context_factors"], obj
         )
         assert (
-            fact["predicate"]["content"] == "{} threw a pie at ${larry} but it hit {}"
+            fact["predicate"]["content"]
+            == "$moe threw a pie at ${larry} but it hit $curly"
         )
         assert fact["context_factors"][1]["name"] == "Larry"
 

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections import OrderedDict
 from copy import deepcopy
-
+from re import findall
 from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
 from authorityspoke.predicates import StatementTemplate
@@ -217,19 +217,30 @@ def update_name_index_from_context_factors(
 RawContextFactors = List[Union[RawFactor, str]]
 
 
+def update_name_index_from_bracketed_phrases(
+    content: str, mentioned: Mentioned
+) -> Mentioned:
+    pattern = r"(?<!\$)\{([^\{]+)\}"  # matches bracketed text not preceded by $
+    entities_as_text = findall(pattern, content)
+    entities_as_text.sort(key=len, reverse=True)
+
+    for entity_name in entities_as_text:
+        if entity_name not in mentioned:
+            entity = {"type": "Entity", "name": entity_name}
+            mentioned.insert_by_name(entity)
+    return mentioned
+
+
 def update_name_index_from_fact_content(
     obj: RawFactor, mentioned: Mentioned
 ) -> Tuple[RawFactor, Mentioned]:
     r"""
     Update index of mentioned Factors from Factors mentioned in Fact's content, and vice versa.
-
     :param obj:
         data from JSON to be loaded as a :class:`.Factor`
-
     :param mentioned:
         :class:`.RawFactor`\s indexed by name for retrieval when loading objects
         using a Marshmallow schema.
-
     :returns:
         both 'obj' and 'mentioned', updated with values from each other
     """
@@ -238,8 +249,8 @@ def update_name_index_from_fact_content(
     content: str = predicate.get("content", "")
     if content:
         context_factors: RawContextFactors = obj.get("context_factors", [])
-        content, context_factors = text_expansion.get_references_from_string(
-            content=content, context_factors=context_factors
+        mentioned = update_name_index_from_bracketed_phrases(
+            content=content, mentioned=mentioned
         )
         mentioned = update_name_index_from_context_factors(context_factors, mentioned)
 
@@ -295,7 +306,6 @@ def collect_mentioned(
 ) -> Tuple[RawFactor, Mentioned]:
     """
     Make a dict of all nested objects labeled by name, creating names if needed.
-
     To be used during loading to expand name references to full objects.
     """
     mentioned = mentioned or Mentioned()

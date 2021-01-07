@@ -41,20 +41,6 @@ class TestHoldingDump:
 
 
 class TestEntityImport:
-    def test_link_longest_context_factors_first(self):
-        """
-        If read_holdings interprets the second "Bradley" string as
-        a reference to Bradley rather than "Bradley's house", it's wrong.
-        """
-        to_read = {
-            "outputs": [
-                {"type": "fact", "content": "{Bradley's house} was a house"},
-                {"type": "fact", "content": "{Bradley} lived at Bradley's house"},
-            ]
-        }
-        record, mentioned = name_index.index_names(to_read)
-        lived_at = record["outputs"][1]
-        assert mentioned[lived_at]["context_factors"][1] == "Bradley's house"
 
     smith_holdings = [
         {

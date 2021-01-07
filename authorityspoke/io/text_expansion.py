@@ -144,7 +144,7 @@ def add_found_context(
     """
     if factor["name"] in content:
         index_in_content = content.index(factor["name"])
-        index_in_factor_list = content[:index_in_content].count("{")
+        index_in_factor_list = content[:index_in_content].count("$")
         context_factors.insert(index_in_factor_list, factor)
         content = collapse_name_in_content(content, factor["name"])
     return content, context_factors
