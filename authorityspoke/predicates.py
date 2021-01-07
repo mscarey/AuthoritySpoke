@@ -472,7 +472,7 @@ class Predicate:
             with "were"
         """
         for factor in context:
-            if factor.__dict__.get("name"):
+            if factor.__dict__.get("name") and factor.__dict__.get("plural") is True:
                 sentence = sentence.replace(f"{factor.name} was", f"{factor.name} were")
                 sentence = sentence.replace(
                     f"{factor.name}> was", f"{factor.name}> were"

@@ -43,7 +43,7 @@ class TestLoadRules:
         beard_rules, mentioned = loaders.load_rules_with_index(
             "beard_rules.json", client=fake_beard_client
         )
-        assert beard_rules[0].outputs[0].content == "{} was a beard"
+        assert beard_rules[0].outputs[0].content == "{the_suspected_beard} was a beard"
 
     def test_imported_rule_is_type_rule(self, fake_beard_client):
         beard_rules, mentioned = loaders.load_rules_with_index(
