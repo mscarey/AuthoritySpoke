@@ -333,7 +333,7 @@ class Predicate:
         return self.includes_other_quantity(other)
 
     def __ge__(self, other: Predicate) -> bool:
-        if self == other:
+        if self.means(other):
             return True
         return self.implies(other)
 
