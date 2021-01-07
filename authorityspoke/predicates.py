@@ -444,7 +444,7 @@ class Predicate:
             full_content = f"{content} {self.quantity_comparison()}"
         else:
             full_content = content
-        return f"{truth_prefix}{content}"
+        return f"{truth_prefix}{full_content}"
 
     def __str__(self):
         return self.add_truth_to_content(self.content)
