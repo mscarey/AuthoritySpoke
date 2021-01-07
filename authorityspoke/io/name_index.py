@@ -328,6 +328,16 @@ def collect_mentioned(
                     obj[key] = new_value
         obj = ensure_factor_has_name(obj)
 
+        # Added because a top-level factor was not having its brackets replaced
+        if obj.get("predicate", {}).get("content"):
+            for factor in obj.get("context_factors", []):
+                if factor not in obj["predicate"]["content"]:
+                    obj["predicate"][
+                        "content"
+                    ] = text_expansion.replace_brackets_with_placeholder(
+                        content=obj["predicate"]["content"], name=factor
+                    )
+
         obj, mentioned = update_name_index_with_factor(obj, mentioned)
     return obj, mentioned
 
