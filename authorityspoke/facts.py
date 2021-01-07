@@ -107,7 +107,8 @@ class Fact(Factor):
             )
 
     def __str__(self):
-        unwrapped = str(self.predicate.content_with_entities(self.context_factors))
+        content = str(self.predicate.content_with_entities(self.context_factors))
+        unwrapped = self.predicate.add_truth_to_content(content)
         text = wrapped(super().__str__().format(unwrapped))
         if self.standard_of_proof:
             text += f"\n" + indented("by the STANDARD {self.standard_of_proof}")

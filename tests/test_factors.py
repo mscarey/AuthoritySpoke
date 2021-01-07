@@ -263,7 +263,7 @@ class TestSameMeaning:
         assert not watt_factor["f2"].means(watt_factor["f2_generic"])
 
     def test_factor_reciprocal_unequal(self, watt_factor):
-        assert not watt_factor["f2"].means(watt_factor["f2_reciprocal"])
+        assert not watt_factor["f2"].means(watt_factor["f2_reflexive"])
 
     def test_factor_different_predicate_truth_unequal(self, watt_factor):
         assert not watt_factor["f7"].means(watt_factor["f7_opposite"])
@@ -315,10 +315,10 @@ class TestSameMeaning:
         directory = Entity("Rural's telephone directory", plural=False)
         listings = Entity("Rural's telephone listings", plural=True)
         directory_original = Fact(
-            Predicate("{} was original"), context_factors=directory
+            Predicate("$thing was original"), context_factors=directory
         )
         listings_original = Fact(
-            Predicate("{} were original"), context_factors=listings
+            Predicate("$thing were original"), context_factors=listings
         )
         assert directory_original.means(listings_original)
 

@@ -433,7 +433,7 @@ class Predicate:
             quantity=self.quantity,
         )
 
-    def __str__(self):
+    def add_truth_to_content(self, content: str) -> str:
         if self.truth is None:
             truth_prefix = "whether "
         elif self.truth is False:
@@ -441,10 +441,13 @@ class Predicate:
         else:
             truth_prefix = "that "
         if self.quantity:
-            content = f"{self.content} {self.quantity_comparison()}"
+            full_content = f"{content} {self.quantity_comparison()}"
         else:
-            content = self.content
+            full_content = content
         return f"{truth_prefix}{content}"
+
+    def __str__(self):
+        return self.add_truth_to_content(self.content)
 
     @staticmethod
     def make_context_plural(sentence: str, context: Iterable[Factor]) -> str:
