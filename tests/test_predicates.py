@@ -1,13 +1,10 @@
 import pytest
 
+from authorityspoke.entities import Entity
 from authorityspoke.predicates import Predicate, Q_
 
 
 class TestPredicates:
-    def test_predicate_with_wrong_number_of_entities(self):
-        with pytest.raises(ValueError):
-            _ = Predicate("$place was a motel", reciprocal=True)
-
     def test_predicate_with_wrong_comparison_symbol(self):
         with pytest.raises(ValueError):
             _ = Predicate(
@@ -52,27 +49,35 @@ class TestPredicates:
         )
 
     @pytest.mark.parametrize(
-        "sentence, index, expected",
+        "sentence, context, expected",
         [
             (
-                "{} was names, towns, and telephone numbers of telephone subscribers",
-                0,
-                "{} were names, towns,",
+                "things was names, towns, and telephone numbers of telephone subscribers",
+                [Entity(name="things", plural=True)],
+                "things were names, towns,",
             ),
             (
-                "all of {} and {} was at the meeting",
-                0,
-                "all of {} and {} was at the meeting",
+                "all of things and person was at the meeting",
+                [
+                    Entity(name="things", plural=True),
+                    Entity(name="person", plural=False),
+                ],
+                "all of things and person was at the meeting",
             ),
             (
-                "all of {} and {} was at the meeting",
-                1,
-                "all of {} and {} were at the meeting",
+                "all of thing and people was at the meeting",
+                [
+                    Entity(name="thing", plural=False),
+                    Entity(name="people", plural=True),
+                ],
+                "all of thing and people were at the meeting",
             ),
         ],
     )
-    def test_make_str_plural(self, sentence, index, expected):
-        plural_version = Predicate.make_context_plural(sentence=sentence, index=index)
+    def test_make_str_plural(self, sentence, context, expected):
+        plural_version = Predicate.make_context_plural(
+            sentence=sentence, context=context
+        )
         assert plural_version.startswith(expected)
 
     def test_str_not_equal(self, make_predicate):
