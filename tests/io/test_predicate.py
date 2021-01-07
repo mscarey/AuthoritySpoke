@@ -22,7 +22,7 @@ class TestPredicateLoad:
         with pytest.raises(ValueError):
             schema.load(
                 {
-                    "content": "the distance between {} and {} was 35 feet",
+                    "content": "the distance between $place1 and $place2 was 35 feet",
                     "truth": True,
                     "reciprocal": True,
                     "comparison": "!=",
@@ -34,7 +34,7 @@ class TestPredicateLoad:
         schema = schemas.PredicateSchema()
         p7 = schema.load(
             {
-                "content": "the distance between {} and {} was",
+                "content": "the distance between $place1 and $place2 was",
                 "truth": True,
                 "reciprocal": True,
                 "comparison": "!=",
@@ -47,7 +47,7 @@ class TestPredicateLoad:
         schema = schemas.PredicateSchema()
         p7 = schema.load(
             data={
-                "content": "the distance between {} and {} was > 35 feet",
+                "content": "the distance between $place1 and $place2 was > 35 feet",
                 "truth": True,
                 "reciprocal": True,
             }
@@ -58,7 +58,7 @@ class TestPredicateLoad:
         schema = schemas.PredicateSchema()
         p7 = schema.load(
             data={
-                "content": "the distance between {} and {} was != 35 feet",
+                "content": "the distance between $place1 and $place2 was != 35 feet",
                 "truth": True,
                 "reciprocal": True,
             }
@@ -69,7 +69,7 @@ class TestPredicateLoad:
         schema = schemas.PredicateSchema()
         p7 = schema.load(
             data={
-                "content": "the distance between {} and {} was",
+                "content": "the distance between $place1 and $place2 was",
                 "truth": True,
                 "reciprocal": True,
                 "comparison": "!=",
@@ -84,16 +84,18 @@ class TestPredicateLoad:
 
     def test_make_comparison_when_absent(self):
         schema = schemas.PredicateSchema()
-        statement = schema.load({"content": "{}'s favorite number was", "quantity": 42})
+        statement = schema.load(
+            {"content": "$person's favorite number was", "quantity": 42}
+        )
         assert statement.comparison == "="
-        assert "{}'s favorite number was exactly equal to 42" in str(statement)
+        assert "$person's favorite number was exactly equal to 42" in str(statement)
         assert len(statement) == 1
 
 
 class TestPredicateDump:
     def test_dump_to_dict_with_units(self):
         predicate = Predicate(
-            "the distance between {} and {} was",
+            "the distance between $place1 and $place2 was",
             truth=True,
             reciprocal=True,
             comparison="<>",

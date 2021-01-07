@@ -15,7 +15,7 @@ class TestProcedureDump:
         schema = schemas.ProcedureSchema()
         loaded = schema.load(dumped)
         content = loaded.despite[0].predicate.content
-        assert "the distance between {} and {} was" in content
+        assert "the distance between $place1 and $place2 was" in content
 
 
 class TestProcedureLoad:

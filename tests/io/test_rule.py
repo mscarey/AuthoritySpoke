@@ -20,7 +20,7 @@ class TestRuleDump:
         rule = make_rule["h2"]
         dumped = dump.to_dict(rule)
         content = dumped["procedure"]["inputs"][0]["predicate"]["content"]
-        assert content == "{} was on the premises of {}"
+        assert content == "$thing was on the premises of $place"
 
     def test_dump_and_read_rule(self, make_rule, make_response):
         client = FakeClient(responses=make_response)
@@ -43,7 +43,7 @@ class TestLoadRules:
         beard_rules, mentioned = loaders.load_rules_with_index(
             "beard_rules.json", client=fake_beard_client
         )
-        assert beard_rules[0].outputs[0].content == "{the_suspected_beard} was a beard"
+        assert beard_rules[0].outputs[0].content == "${the_suspected_beard} was a beard"
 
     def test_imported_rule_is_type_rule(self, fake_beard_client):
         beard_rules, mentioned = loaders.load_rules_with_index(
@@ -81,5 +81,5 @@ class TestLoadRules:
         beard_dictionary = loaders.load_holdings("beard_rules.json")
         beard_rules = readers.read_rules(beard_dictionary, client=fake_beard_client)
         assert beard_rules[0].inputs[0].short_string == (
-            "the fact that <the suspected beard> was facial hair"
+            "the fact <the suspected beard> was facial hair"
         )
