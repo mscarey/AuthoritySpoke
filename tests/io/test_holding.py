@@ -1,4 +1,3 @@
-from authorityspoke.comparisons import ContextRegister
 from collections import OrderedDict
 import os
 from marshmallow import ValidationError
@@ -10,6 +9,7 @@ from legislice import Enactment
 from legislice.download import Client
 from legislice.name_index import collect_enactments
 
+from authorityspoke.comparisons import ContextRegister
 from authorityspoke.entities import Entity
 from authorityspoke.facts import Fact
 from authorityspoke.holdings import Holding, HoldingGroup

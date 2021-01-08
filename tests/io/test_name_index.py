@@ -1,16 +1,15 @@
 import os
 
 from dotenv import load_dotenv
-import pytest
 
 from legislice.download import Client
+
+from authorityspoke.io import loaders, readers, schemas
+from authorityspoke.io import name_index, text_expansion
 
 load_dotenv()
 
 TOKEN = os.getenv("LEGISLICE_API_TOKEN")
-
-from authorityspoke.io import loaders, readers, schemas
-from authorityspoke.io import name_index, text_expansion
 
 
 class TestCollectMentioned:
@@ -125,7 +124,10 @@ class TestCollectMentioned:
         holding = {
             "inputs": {
                 "type": "fact",
-                "content": "Rural's telephone listings were names, towns, and telephone numbers of telephone subscribers",
+                "content": (
+                    "Rural's telephone listings were names, towns, and telephone "
+                    "numbers of telephone subscribers"
+                ),
                 "context_factors": {
                     "type": "entity",
                     "name": "Rural's telephone listings",

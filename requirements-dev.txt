@@ -6,7 +6,6 @@ ipykernel
 mypy
 pipenv-to-requirements
 pydocstyle
-pylint
 pytest-cov
 pytest-profiling
 pytest-vcr

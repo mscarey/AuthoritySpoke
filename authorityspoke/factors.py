@@ -3,11 +3,9 @@ r""":class:`Factor`\s, or inputs and outputs of legal :class:`.Rule`\s."""
 from __future__ import annotations
 from copy import deepcopy
 
-from dataclasses import dataclass, field
+from dataclasses import field
 
-from itertools import zip_longest
 import operator
-import textwrap
 from typing import Any, Callable, Dict, Iterable, Iterator, List
 from typing import Optional, Sequence, Set, Tuple, TypeVar, Union
 
@@ -20,7 +18,6 @@ from authorityspoke.comparisons import (
     Comparable,
     FactorSequence,
     means,
-    new_context_helper,
 )
 
 
@@ -286,8 +283,3 @@ class FactorIndex(Dict[str, Factor]):
                     )
         else:
             self[key] = value
-
-    def insert_factor(self, factor: Factor) -> None:
-        name = str(factor)
-        self.insert(key=name, value=factor)
-

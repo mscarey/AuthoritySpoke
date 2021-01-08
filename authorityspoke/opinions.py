@@ -34,6 +34,7 @@ TextLinkDict = Dict[str, List[TextQuoteSelector]]
 
 class AnchoredHoldings(NamedTuple):
     """Holdings with objects storing the Holdings' links to Opinion text."""
+
     holdings: List[Holding]
     holding_anchors: List[List[TextQuoteSelector]]
     named_anchors: TextLinkDict
@@ -102,7 +103,9 @@ class Opinion(Comparable):
         self._holdings = HoldingGroup()
 
     def explanations_contradiction(
-        self, other: Comparable, context: Optional[ContextRegister] = None,
+        self,
+        other: Comparable,
+        context: Optional[ContextRegister] = None,
     ) -> Iterator[Explanation]:
         """Yield contexts that would result in a contradiction between self and other."""
         if isinstance(other, Rule):
@@ -134,7 +137,7 @@ class Opinion(Comparable):
                 for explanation in self.explanations_contradiction(other)
             )
         raise TypeError(
-            f"'Contradicts' test not implemented for types "
+            "'Contradicts' test not implemented for types "
             + f"{self.__class__} and {other.__class__}."
         )
 

@@ -1,13 +1,12 @@
-from authorityspoke.holdings import HoldingGroup
-import anchorpoint
-from authorityspoke.factors import FactorIndex
 import pytest
 
 from anchorpoint.textselectors import TextQuoteSelector
 
 from authorityspoke.entities import Entity
+from authorityspoke.factors import FactorIndex
 from authorityspoke.facts import Fact, Predicate
-from authorityspoke.io import anchors, loaders, readers
+from authorityspoke.holdings import HoldingGroup
+from authorityspoke.io import loaders, readers
 from authorityspoke.io.downloads import FakeClient
 from authorityspoke.opinions import Opinion
 

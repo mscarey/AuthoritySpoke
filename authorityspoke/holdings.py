@@ -21,9 +21,14 @@ from dataclasses import dataclass, field
 from anchorpoint import TextQuoteSelector
 from legislice.enactments import Enactment
 
-from authorityspoke.comparisons import Comparable, ContextRegister, contradicts
+from authorityspoke.comparisons import (
+    Comparable,
+    ContextRegister,
+    contradicts,
+    new_context_helper,
+)
 from authorityspoke.explanations import Explanation
-from authorityspoke.factors import Factor, new_context_helper
+from authorityspoke.factors import Factor
 from authorityspoke.groups import ComparableGroup, FactorGroup
 from authorityspoke.formatting import indented, wrapped
 from authorityspoke.procedures import Procedure
