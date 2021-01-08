@@ -207,6 +207,21 @@ class TestRetrieveMentioned:
         )
         assert fact["context_factors"][1]["name"] == "Larry"
 
+    def test_add_found_context_included_in_placeholder_name(self):
+        content = (
+            "$the_Amazon has slower Amazon deliveries because of ${the_Amazon}'s size"
+        )
+        context_factors = [{"type": "Entity", "name": "the Amazon"}]
+        new_content, new_context_factors = text_expansion.add_found_context(
+            content=content,
+            context_factors=context_factors,
+            factor={"type": "Entity", "name": "Amazon"},
+        )
+        expected = "$the_Amazon has slower ${amazon} deliveries because of ${the_Amazon}'s size"
+        assert new_content == expected
+        assert len(new_context_factors) == 2
+        assert new_context_factors[1]["name"] == "Amazon"
+
     def test_retrieve_mentioned_during_load(self):
         """
         Test that the schema can recreate the Entity objects "Alice" and

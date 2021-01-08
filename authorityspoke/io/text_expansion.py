@@ -1,6 +1,8 @@
 """For expanding text in input JSON into a format Marshmallow can load."""
 
+from authorityspoke.predicates import StatementTemplate
 from re import findall
+from string import Template
 from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
 from marshmallow import ValidationError
@@ -142,11 +144,25 @@ def add_found_context(
         a context_factors list with the factor inserted in a position
         corresponding to its position in the context phrase.
     """
+    # if factor["name"] is inside an existing placeholder, replace it with a special placeholder
+    template = Template(content)
+    matches = list(template.pattern.finditer(template.template))
+    for match in matches[::-1]:  # backwards to avoid changing index of a later match
+        mangled_placeholder = content[match.start() : match.end()].replace(
+            factor["name"], "@@@@"
+        )
+        content = (
+            content[: match.start()] + mangled_placeholder + content[match.end() :]
+        )
+
     if factor["name"] in content:
         index_in_content = content.index(factor["name"])
         index_in_factor_list = content[:index_in_content].count("$")
         context_factors.insert(index_in_factor_list, factor)
         content = collapse_name_in_content(content, factor["name"])
+
+    # replace the special placeholder with factor["name"]
+    content = content.replace("@@@@", factor["name"])
     return content, context_factors
 
 
