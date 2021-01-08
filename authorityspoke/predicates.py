@@ -29,7 +29,7 @@ class StatementTemplate(Template):
 
     def make_content_singular(self) -> None:
         """Convert template text for self.context to singular "was"."""
-        for placeholder in self.placeholders:
+        for placeholder in self.get_placeholders():
             bracketed = "{" + placeholder + "}"
             if bracketed in self.template:
                 self.template = self.template.replace(
@@ -41,8 +41,7 @@ class StatementTemplate(Template):
                 )
         return None
 
-    @property
-    def placeholders(self) -> List[str]:
+    def get_placeholders(self) -> List[str]:
         r"""
         Count bracket pairs in ``self.content``, minus 1 if ``self.quantity==True``.
 
@@ -156,13 +155,13 @@ class Predicate:
         return self.template.template
 
     def content_without_placeholders(self) -> str:
-        changes = {p: "{}" for p in self.template.placeholders}
+        changes = {p: "{}" for p in self.template.get_placeholders()}
         return self.template.substitute(**changes)
 
     def context_factors_mapping(
         self, context_factors: List[Factor]
     ) -> Dict[str, Factor]:
-        placeholders = self.template.placeholders
+        placeholders = self.template.get_placeholders()
         return dict(zip(placeholders, context_factors))
 
     def mapping_placeholder_to_string(self, context: List[Factor]) -> Dict[str, str]:
@@ -396,7 +395,7 @@ class Predicate:
             in the ``self.content`` string.
         """
 
-        return len(set(self.template.placeholders))
+        return len(set(self.template.get_placeholders()))
 
     def quantity_comparison(self) -> str:
         """

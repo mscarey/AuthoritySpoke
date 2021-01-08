@@ -339,7 +339,7 @@ class TestTextAnchors:
                 "outputs": [
                     {
                         "type": "Fact",
-                        "content": "the probative value of officer's testimony that defendant was addicted to heroin, in showing fact that defendant committed an attempted robbery, was outweighed by unfair prejudice to defendant",
+                        "content": "the probative value of officer's testimony that defendant was addicted to heroin, in indicating fact that defendant committed an attempted robbery, was outweighed by unfair prejudice to defendant",
                     }
                 ],
                 "mandatory": True,
