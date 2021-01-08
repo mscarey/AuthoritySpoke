@@ -257,7 +257,7 @@ class TestOpinionFactors:
         )
         fact = Fact(
             predicate=Predicate(
-                "{} possessed at least some minimal degree of creativity"
+                "$product possessed at least some minimal degree of creativity"
             ),
             context_factors=[api],
             anchors=[anchor],

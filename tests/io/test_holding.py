@@ -443,7 +443,7 @@ class TestTextAnchors:
         mock_client = FakeClient(responses=make_response)
         to_read = load_holdings("holding_brad.json")
         holdings = readers.read_holdings(to_read, client=mock_client)
-        assert any(holdings[6].inputs[0] == x for x in holdings[5].inputs)
+        assert any(holdings[6].inputs[0].means(x) for x in holdings[5].inputs)
 
     def test_fact_from_loaded_holding(self, make_response):
         to_read = load_holdings("holding_watt.json")
@@ -616,8 +616,8 @@ class TestExclusiveFlag:
         feist_holdings = readers.read_holdings(to_read, client=mock_client)
 
         directory = Entity("Rural's telephone directory")
-        original = Fact(Predicate("{} was an original work"), directory)
-        copyrightable = Fact(Predicate("{} was copyrightable"), directory)
+        original = Fact(Predicate("$work was an original work"), directory)
+        copyrightable = Fact(Predicate("$work was copyrightable"), directory)
         originality_enactments = [
             e_securing_exclusive_right_to_writings,
             e_copyright_requires_originality,

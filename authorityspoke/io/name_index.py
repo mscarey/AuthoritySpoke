@@ -61,6 +61,8 @@ def assign_name_from_content(obj: Dict) -> str:
     r"""
     Use the content to assign a name to any Fact that lacks one.
 
+    This can fail if the parser replaces placeholder text with another placeholder
+
     :param obj:
         object loaded from JSON to make a :class:`.Factor` or :class:`.Holding`
 

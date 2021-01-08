@@ -81,5 +81,5 @@ class TestLoadRules:
         beard_dictionary = loaders.load_holdings("beard_rules.json")
         beard_rules = readers.read_rules(beard_dictionary, client=fake_beard_client)
         assert beard_rules[0].inputs[0].short_string == (
-            "the fact <the suspected beard> was facial hair"
+            "the fact that <the suspected beard> was facial hair"
         )

@@ -542,9 +542,9 @@ class TestAddition:
 
         fact_not_original = Rule(
             Procedure(
-                inputs=Fact(Predicate("{} was a fact"), context_factors=context),
+                inputs=Fact(Predicate("$work was a fact"), context_factors=context),
                 outputs=Fact(
-                    Predicate("{} was an original work", truth=False),
+                    Predicate("$work was an original work", truth=False),
                     context_factors=context,
                 ),
             ),
@@ -553,11 +553,11 @@ class TestAddition:
         unoriginal_not_copyrightable = Rule(
             Procedure(
                 inputs=Fact(
-                    Predicate("{} was an original work", truth=False),
+                    Predicate("$work was an original work", truth=False),
                     context_factors=three,
                 ),
                 outputs=Fact(
-                    Predicate("{} was copyrightable", truth=False),
+                    Predicate("${work} was copyrightable", truth=False),
                     context_factors=three,
                 ),
             ),
@@ -631,13 +631,14 @@ class TestAddition:
             + make_complex_rule["accept_murder_fact_from_relevance"]
         )
         assert new_rule.universal is False
-        assert (
-            new_rule.inputs
-            == make_complex_rule["accept_relevance_testimony_ALL"].inputs
+        assert new_rule.inputs.means(
+            make_complex_rule["accept_relevance_testimony_ALL"].inputs
         )
-        assert (
-            make_complex_rule["accept_murder_fact_from_relevance"].outputs[0]
-            in new_rule.outputs
+        assert any(
+            make_complex_rule["accept_murder_fact_from_relevance"]
+            .outputs[0]
+            .means(output)
+            for output in new_rule.outputs
         )
 
     def test_add_disconnected_rules_returns_none(self, make_rule):
