@@ -92,7 +92,7 @@ class TestContextRegisters:
                 [watt_factor["f7_swap_entities"]], [watt_factor["f7_swap_entities"]]
             )
         )
-        assert mapping.get(str(watt_factor["f7"])) == watt_factor["f7"]
+        assert mapping.get(str(watt_factor["f7"])).means(watt_factor["f7"])
 
     def test_registers_for_interchangeable_context(self, make_entity, watt_factor):
         """

@@ -42,7 +42,8 @@ class TestHolding:
         """
         exclusive_holding = make_opinion_with_holding["lotus_majority"].holdings[0]
         inferred = exclusive_holding.inferred_from_exclusive[0]
-        assert inferred.outputs[0].content == "{} infringed the copyright in {}"
+        lower = "absence of the fact that <Borland International> infringed the copyright in <the Lotus menu command hierarchy>".lower()
+        assert inferred.outputs[0].short_string.lower() == lower
         assert inferred.outputs[0].absent
 
     def test_infer_from_not_exclusive(self, make_holding):

@@ -672,7 +672,8 @@ class TestAddition:
         ],
     )
     def test_addition(self, make_factor, left, right, expected):
-        assert make_factor[left] + make_factor[right] == make_factor[expected]
+        answer = make_factor[left] + make_factor[right]
+        assert answer.means(make_factor[expected])
 
     def test_add_unrelated_factors(self, make_factor):
         assert make_factor["f_murder"] + make_factor["f_crime"] is None

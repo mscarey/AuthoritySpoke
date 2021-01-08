@@ -136,13 +136,14 @@ class Fact(Factor):
     @property
     def short_string(self):
         """Create one-line string representation for inclusion in other Facts."""
-        predicate = str(self.predicate.content_with_entities(self.context_factors))
+        content = str(self.predicate.content_with_entities(self.context_factors))
+        unwrapped = self.predicate.add_truth_to_content(content)
         standard = (
             f"by the standard {self.standard_of_proof}, "
             if self.standard_of_proof
             else ""
         )
-        string = f"{standard}{predicate}"
+        string = f"{standard}{unwrapped}"
         return super().__str__().format(string).replace("Fact", "fact")
 
     @property

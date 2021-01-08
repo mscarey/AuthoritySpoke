@@ -159,7 +159,7 @@ class TestUnion:
         right = FactorGroup(watt_factor["f8_meters"])
         added = left | right
         assert len(added) == 1
-        assert "meter" in str(added)
+        assert "meter" in str(added[0])
 
     def test_union_with_factor_outside_group(self, watt_factor):
         left = FactorGroup(watt_factor["f8_meters"])
