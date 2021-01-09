@@ -88,6 +88,34 @@ class StatementTemplate(Template):
             )
         return None
 
+    def mapping_placeholder_to_term(
+        self, context: Sequence[Factor]
+    ) -> Dict[str, Factor]:
+        """
+        Get a mapping of template placeholders to context terms.
+
+        :param context:
+            a list of context :class:`.factors.Factor`/s, in the same
+            order they appear in the template string.
+        """
+        placeholders = self.get_placeholders()
+        self._check_number_of_terms(placeholders, context)
+        return dict(zip(placeholders, context))
+
+    def mapping_placeholder_to_term_name(
+        self, context: Sequence[Factor]
+    ) -> Dict[str, str]:
+        """
+        Get a mapping of template placeholders to the names of their context terms.
+
+        :param context:
+            a list of context :class:`.factors.Factor`/s, in the same
+            order they appear in the template string.
+        """
+        mapping = self.mapping_placeholder_to_term(context)
+        mapping_to_string = {k: v.short_string for k, v in mapping.items()}
+        return mapping_to_string
+
     def substitute_with_plurals(self, context: Sequence[Factor]) -> str:
         """
         Update template text with strings representing Factor terms.
@@ -101,12 +129,9 @@ class StatementTemplate(Template):
             updated version of template text
         """
         new_content = self.get_template_with_plurals(context=context)
-        placeholders = self.get_placeholders()
-        self._check_number_of_terms(placeholders, context)
-
-        names = [term.short_string for term in context]
+        substitutions = self.mapping_placeholder_to_term_name(context=context)
         new_template = self.__class__(new_content, make_singular=False)
-        return new_template.substitute(**dict(zip(placeholders, names)))
+        return new_template.substitute(substitutions)
 
 
 class Predicate:
@@ -117,9 +142,11 @@ class Predicate:
     "found" to be factual by a jury verdict or a judge's finding of fact.
 
     :param content:
-        a clause containing an assertion, with blanks represented
-        by curly brackets showing where references to specific
-        entities from the case can be inserted to make the clause specific.
+        a clause containing an assertion in English in the past tense, with
+        placeholders showing where references to specific
+        :class:`~authorityspoke.factors.Factor`\s
+        from the case can be inserted to make the clause specific.
+        This string must be a valid Python :py:class:`string.Template`\.
 
     :param truth:
         indicates whether the clause in ``content`` is asserted to be
@@ -208,17 +235,6 @@ class Predicate:
     def content_without_placeholders(self) -> str:
         changes = {p: "{}" for p in self.template.get_placeholders()}
         return self.template.substitute(**changes)
-
-    def context_factors_mapping(
-        self, context_factors: List[Factor]
-    ) -> Dict[str, Factor]:
-        placeholders = self.template.get_placeholders()
-        return dict(zip(placeholders, context_factors))
-
-    def mapping_placeholder_to_string(self, context: List[Factor]) -> Dict[str, str]:
-        mapping = self.context_factors_mapping(context)
-        mapping_to_string = {k: v.short_string for k, v in mapping.items()}
-        return mapping_to_string
 
     def content_with_terms(self, context: Union[Factor, Sequence[Factor]]) -> str:
         r"""
