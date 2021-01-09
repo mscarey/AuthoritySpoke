@@ -14,8 +14,8 @@ import operator
 from typing import Any, Dict, Iterable, Iterator
 from typing import List, Optional, Sequence, Tuple, Union
 
-from authorityspoke.comparisons import Comparable, ContextRegister
-from authorityspoke.factors import Factor, new_context_helper
+from authorityspoke.comparisons import Comparable, ContextRegister, new_context_helper
+from authorityspoke.factors import Factor
 from authorityspoke.groups import FactorGroup
 from authorityspoke.formatting import indented
 

@@ -23,23 +23,44 @@ Q_ = ureg.Quantity
 
 
 class StatementTemplate(Template):
-    def __init__(self, template: str) -> None:
+    def __init__(self, template: str, make_singular: bool = True) -> None:
         super().__init__(template)
-        self.make_content_singular()
+        if make_singular:
+            self.make_content_singular()
 
     def make_content_singular(self) -> None:
         """Convert template text for self.context to singular "was"."""
         for placeholder in self.get_placeholders():
-            bracketed = "{" + placeholder + "}"
-            if bracketed in self.template:
-                self.template = self.template.replace(
-                    f"{bracketed} were", f"{bracketed} was"
-                )
-            else:
-                self.template = self.template.replace(
-                    f"{placeholder} were", f"{placeholder} was"
-                )
+            named_pattern = "$" + placeholder + " were"
+            braced_pattern = "${" + placeholder + "} were"
+            self.template = self.template.replace(
+                named_pattern, "$" + placeholder + " was"
+            )
+            self.template = self.template.replace(
+                braced_pattern, "$" + placeholder + " was"
+            )
         return None
+
+    def get_template_with_plurals(self, context: Sequence[Factor]) -> str:
+        """
+        Get a version of self with "was" replaced by "were" for any plural terms.
+
+        Does not modify this object's template attribute.
+        """
+        result = self.template[:]
+        placeholders = self.get_placeholders()
+        self._check_number_of_terms(placeholders, context)
+        for idx, factor in enumerate(context):
+            if factor.__dict__.get("plural") is True:
+                named_pattern = "$" + placeholders[idx] + " was"
+                braced_pattern = "${" + placeholders[idx] + "} was"
+                result = result.replace(
+                    named_pattern, "$" + placeholders[idx] + " were"
+                )
+                result = result.replace(
+                    braced_pattern, "$" + placeholders[idx] + " were"
+                )
+        return result
 
     def get_placeholders(self) -> List[str]:
         r"""
@@ -56,6 +77,36 @@ class StatementTemplate(Template):
             if m.group("named") or m.group("braced")
         ]
         return placeholders
+
+    def _check_number_of_terms(
+        self, placeholders: List[str], context: Sequence[Factor]
+    ) -> None:
+        if len(placeholders) != len(context):
+            raise ValueError(
+                f"The number of terms passed in 'context' ({len(context)}) must be equal to the "
+                f"number of placeholders in the StatementTemplate ({len(placeholders)})."
+            )
+        return None
+
+    def substitute_with_plurals(self, context: Sequence[Factor]) -> str:
+        """
+        Update template text with strings representing Factor terms.
+
+        :param context:
+            Factors with :meth:`~authorityspoke.factors.Factor.short_string`
+            methods to substitute into template, and optionally with `plural`
+            attributes to indicate whether to change the word "was" to "were"
+
+        :returns:
+            updated version of template text
+        """
+        new_content = self.get_template_with_plurals(context=context)
+        placeholders = self.get_placeholders()
+        self._check_number_of_terms(placeholders, context)
+
+        names = [term.short_string for term in context]
+        new_template = self.__class__(new_content, make_singular=False)
+        return new_template.substitute(**dict(zip(placeholders, names)))
 
 
 class Predicate:
@@ -121,7 +172,7 @@ class Predicate:
         If the :attr:`content` sentence is phrased to have a plural
         context factor, normalizes it by changing "were" to "was".
         """
-        self.template = StatementTemplate(template)
+        self.template = StatementTemplate(template, make_singular=True)
         self.truth = truth
         self.reciprocal = reciprocal
         self.comparison = comparison
@@ -169,39 +220,23 @@ class Predicate:
         mapping_to_string = {k: v.short_string for k, v in mapping.items()}
         return mapping_to_string
 
-    def phrase_with_context(self) -> str:
-        mapping = self.mapping_placeholder_to_string()
-
-        return self.predicate.template.substitute(**mapping)
-
-    def content_with_entities(self, context: Union[Factor, Sequence[Factor]]) -> str:
+    def content_with_terms(self, context: Union[Factor, Sequence[Factor]]) -> str:
         r"""
-        Make a sentence by filling in ``self.content`` with generic :class:`.Factor`\s.
+        Make a sentence by filling in placeholders with names of Factors.
 
         :param context:
-            generic :class:`.Factor`\s to be mentioned in the context of
-            this Predicate. They do not need to be type :class:`.Entity`.
+            :class:`.Factor`\s to be mentioned in the context of
+            this Predicate. They do not need to be type :class:`.Entity`
 
         :returns:
             a sentence created by substituting string representations
-            of generic factors from a particular case into the return
-            value of the :meth:`__str__` method.
+            Factors for the placeholders in the content template
         """
 
         if not isinstance(context, Iterable):
             context = (context,)
-        if len(context) != len(self):
-            raise ValueError(
-                f"Exactly {len(self)} entities needed to complete "
-                + f'"{self.content}", but {len(context)} were given.'
-            )
-        add_plurals = self.template.substitute(
-            **self.mapping_placeholder_to_string(context)
-        )
+        with_plurals = self.template.substitute_with_plurals(context)
 
-        with_plurals = Predicate.make_context_plural(
-            sentence=add_plurals, context=context
-        )
         return with_plurals
 
     def consistent_dimensionality(self, other: Predicate) -> bool:
@@ -447,30 +482,3 @@ class Predicate:
 
     def __str__(self):
         return self.add_truth_to_content(self.content)
-
-    @staticmethod
-    def make_context_plural(sentence: str, context: Iterable[Factor]) -> str:
-        """
-        Replace "was" with "were" after a context slot in a sentence.
-
-        TODO: move method somewhere where it belongs
-
-        :param sentence:
-            a sentence with pairs of curly braces representing slots for
-            context factors
-
-        :param index:
-            the index of the context factor that is plural, counting
-            from the start of the sentence
-
-        :returns:
-            a form of the sentence with one instance of "was" replaced
-            with "were"
-        """
-        for factor in context:
-            if factor.__dict__.get("name") and factor.__dict__.get("plural") is True:
-                sentence = sentence.replace(f"{factor.name} was", f"{factor.name} were")
-                sentence = sentence.replace(
-                    f"{factor.name}> was", f"{factor.name}> were"
-                )
-        return sentence

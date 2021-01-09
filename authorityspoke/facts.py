@@ -8,8 +8,7 @@ from typing import ClassVar, Dict, Iterator, List, Optional, Sequence, Union
 
 from anchorpoint.textselectors import TextQuoteSelector
 
-from authorityspoke.comparisons import FactorSequence
-from authorityspoke.factors import new_context_helper
+from authorityspoke.comparisons import FactorSequence, new_context_helper
 from authorityspoke.factors import Factor, ContextRegister
 from authorityspoke.formatting import indented, wrapped
 from authorityspoke.predicates import Predicate
@@ -107,7 +106,7 @@ class Fact(Factor):
             )
 
     def __str__(self):
-        content = str(self.predicate.content_with_entities(self.context_factors))
+        content = str(self.predicate.content_with_terms(self.context_factors))
         unwrapped = self.predicate.add_truth_to_content(content)
         text = wrapped(super().__str__().format(unwrapped))
         if self.standard_of_proof:
@@ -136,7 +135,7 @@ class Fact(Factor):
     @property
     def short_string(self):
         """Create one-line string representation for inclusion in other Facts."""
-        content = str(self.predicate.content_with_entities(self.context_factors))
+        content = str(self.predicate.content_with_terms(self.context_factors))
         unwrapped = self.predicate.add_truth_to_content(content)
         standard = (
             f"by the standard {self.standard_of_proof}, "

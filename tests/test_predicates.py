@@ -49,36 +49,25 @@ class TestPredicates:
         )
 
     @pytest.mark.parametrize(
-        "sentence, context, expected",
+        "context, expected",
         [
             (
-                "things was names, towns, and telephone numbers of telephone subscribers",
-                [Entity(name="things", plural=True)],
-                "things were names, towns,",
+                [Entity(name="the book", plural=False)],
+                "<the book> was names, towns,",
             ),
             (
-                "all of things and person was at the meeting",
-                [
-                    Entity(name="things", plural=True),
-                    Entity(name="person", plural=False),
-                ],
-                "all of things and person was at the meeting",
-            ),
-            (
-                "all of thing and people was at the meeting",
-                [
-                    Entity(name="thing", plural=False),
-                    Entity(name="people", plural=True),
-                ],
-                "all of thing and people were at the meeting",
+                [Entity(name="the book's listings", plural=True)],
+                "<the book's listings> were names, towns,",
             ),
         ],
     )
-    def test_make_str_plural(self, sentence, context, expected):
-        plural_version = Predicate.make_context_plural(
-            sentence=sentence, context=context
+    def test_make_str_plural(self, context, expected):
+        phrase = (
+            "$thing were names, towns, and telephone numbers of telephone subscribers"
         )
-        assert plural_version.startswith(expected)
+        predicate = Predicate(phrase)
+        with_context = predicate.content_with_terms(context)
+        assert with_context.startswith(expected)
 
     def test_str_not_equal(self, make_predicate):
         assert (

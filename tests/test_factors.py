@@ -197,7 +197,7 @@ class TestFacts:
     def test_predicate_with_entities(self, make_entity, watt_factor):
         assert "<Hideaway Lodge> was a motel" in watt_factor[
             "f1"
-        ].predicate.content_with_entities((make_entity["motel"]))
+        ].predicate.content_with_terms((make_entity["motel"]))
 
     def test_factor_context_factors_do_not_match_predicate(
         self, make_predicate, watt_mentioned
@@ -211,14 +211,14 @@ class TestFacts:
 
     def test_reciprocal_with_wrong_number_of_entities(self, make_entity, watt_factor):
         with pytest.raises(ValueError):
-            watt_factor["f1"].predicate.content_with_entities(
+            watt_factor["f1"].predicate.content_with_terms(
                 (make_entity["motel"], make_entity["watt"])
             )
 
     def test_entity_and_human_in_predicate(self, make_entity, watt_factor):
         assert "<Wattenburg> operated and lived at <Hideaway Lodge>" in watt_factor[
             "f2"
-        ].predicate.content_with_entities((make_entity["watt"], make_entity["motel"]))
+        ].predicate.content_with_terms((make_entity["watt"], make_entity["motel"]))
 
     def test_standard_of_proof_must_be_listed(self, make_predicate, watt_mentioned):
         with pytest.raises(ValueError):
