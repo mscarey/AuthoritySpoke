@@ -25,23 +25,35 @@ class TestPredicates:
             "player2": {2, 4},
         }
 
-    def test_term_placeholders_do_not_change_result(self):
-        left = Predicate(
-            template="$organizer1 and $organizer2 planned for $player1 to play $game with $player2."
+    def test_term_positions_with_repetition(self):
+        predicate = Predicate(
+            template="$organizer1 and $organizer2 planned for $organizer1 to play $game with $organizer2."
         )
-        right = Predicate(
-            template="$promoter1 and $promoter2 planned for $player1 to play $chess with $player2."
-        )
-        assert left.means(right)
+        assert predicate.term_positions() == {
+            "organizer1": {0, 1},
+            "organizer2": {0, 1},
+            "game": {2},
+        }
 
-    def test_term_positions_change_result(self):
-        left = Predicate(
+    def test_term_permutations(self):
+        predicate = Predicate(
             template="$organizer1 and $organizer2 planned for $player1 to play $game with $player2."
         )
-        right = Predicate(
-            template="$organizer1 and $organizer2 planned for $player1 to play $game with $organizer1."
+        assert predicate.term_permutations() == [
+            (0, 1, 2, 3, 4),
+            (0, 1, 4, 3, 2),
+            (1, 0, 2, 3, 4),
+            (1, 0, 4, 3, 2),
+        ]
+
+    def test_term_permutations_with_repetition(self):
+        predicate = Predicate(
+            template="$organizer1 and $organizer2 planned for $organizer1 to play $game with $organizer2."
         )
-        assert not left.means(right)
+        assert predicate.term_permutations() == [
+            (0, 1, 2),
+            (1, 0, 2),
+        ]
 
     def test_convert_false_statement_about_quantity_to_obverse(self, make_predicate):
         assert make_predicate["p7_obverse"].truth is True
@@ -109,8 +121,8 @@ class TestPredicates:
         assert make_predicate["p7"].negated().means(make_predicate["p7_opposite"])
         assert make_predicate["p3"].negated().means(make_predicate["p3_false"])
 
-    # Equality
 
+class TestSameMeaning:
     def test_predicate_equality(self, make_predicate):
         assert make_predicate["p1"].means(make_predicate["p1_again"])
 
@@ -146,8 +158,26 @@ class TestPredicates:
     def test_predicate_does_not_mean_fact(self, make_predicate, watt_factor):
         assert not make_predicate["p8"].means(watt_factor["f8"])
 
-    # Implication
+    def test_term_placeholders_do_not_change_result(self):
+        left = Predicate(
+            template="$organizer1 and $organizer2 planned for $player1 to play $game with $player2."
+        )
+        right = Predicate(
+            template="$promoter1 and $promoter2 planned for $player1 to play $chess with $player2."
+        )
+        assert left.means(right)
 
+    def test_term_positions_change_result(self):
+        left = Predicate(
+            template="$organizer1 and $organizer2 planned for $player1 to play $game with $player2."
+        )
+        right = Predicate(
+            template="$organizer1 and $organizer2 planned for $organizer1 to play $game with $organizer2."
+        )
+        assert not left.means(right)
+
+
+class TestImplication:
     def test_greater_than_because_of_quantity(self, make_predicate):
         assert make_predicate["p8_meters"] > make_predicate["p8"]
         assert make_predicate["p8_meters"] != make_predicate["p8"]
@@ -197,8 +227,8 @@ class TestPredicates:
     def test_predicate_implies_none(self, make_predicate):
         assert make_predicate["p7_true"] > None
 
-    # Contradiction
 
+class TestContradiction:
     def test_predicate_contradictions(self, make_predicate):
         assert make_predicate["p7"].contradicts(make_predicate["p7_true"])
         assert not make_predicate["p1"].contradicts(make_predicate["p1_again"])

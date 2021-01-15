@@ -8,11 +8,12 @@ the `pint <https://pint.readthedocs.io/en/0.9/>`_ library.)
 
 from __future__ import annotations
 
+from itertools import product
 import re
 
 from string import Template
-from typing import ClassVar, Dict, Iterable
-from typing import List, Optional, Sequence, Union
+from typing import ClassVar, Dict, Iterable, Iterator
+from typing import List, Optional, Sequence, Set, Union
 
 from pint import UnitRegistry
 
@@ -499,14 +500,21 @@ class Predicate:
         """
 
         placeholders = self.template.get_placeholders()
-        result = {p: {i} for i, p in enumerate(placeholders)}
+        without_duplicates = list(dict.fromkeys(placeholders))
+        result = {p: {i} for i, p in enumerate(without_duplicates)}
 
-        for index, placeholder in enumerate(placeholders):
+        for index, placeholder in enumerate(without_duplicates):
             if placeholder[-1].isdigit:
                 for k in result.keys():
                     if k[-1].isdigit() and k[:-1] == placeholder[:-1]:
                         result[k].add(index)
         return result
+
+    def term_permutations(self) -> List[List[int]]:
+        """Get the arrangements of all this Predicate's terms that preserve the same meaning."""
+        product_of_positions = product(*self.term_positions().values())
+        without_duplicates = [x for x in product_of_positions if len(set(x)) == len(x)]
+        return without_duplicates
 
     def add_truth_to_content(self, content: str) -> str:
         if self.truth is None:
