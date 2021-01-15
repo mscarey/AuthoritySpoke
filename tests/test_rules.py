@@ -13,6 +13,7 @@ from authorityspoke.entities import Entity
 from authorityspoke.explanations import Explanation
 from authorityspoke.factors import ContextRegister
 from authorityspoke.facts import Fact
+from authorityspoke.groups import FactorGroup
 from authorityspoke.holdings import Holding
 from authorityspoke.predicates import Predicate, Q_
 from authorityspoke.procedures import Procedure
@@ -309,6 +310,43 @@ class TestImplication:
             make_complex_rule["accept_small_weight_reliable_more_evidence"]
         )
         assert small_reliable >= small_more_reliable_holding
+
+    def test_implication_interchangeable_terms(self):
+        ate_together = Predicate(template="$person1 ate at $place with $person2")
+        shot = Predicate(template="$attacker shot $victim")
+        murder = Predicate(template="$attacker murdered $victim")
+
+        alice = Entity("Alice")
+        bob = Entity("Bob")
+        diane = Entity("Diane")
+        ed = Entity("Ed")
+
+        grove = Entity("Shady Grove")
+        magnolia = Entity("Magnolia Cafe")
+
+        alice_and_bob_rule = Rule(
+            procedure=Procedure(
+                outputs=FactorGroup(Fact(predicate=murder), terms=(alice, bob)),
+                inputs=FactorGroup(
+                    Fact(predicate=ate_together, terms=(alice, grove, bob)),
+                    Fact(predicate=shot, terms=(alice, bob)),
+                ),
+            ),
+            mandatory=True,
+            universal=True,
+        )
+        diane_and_ed_rule = Rule(
+            procedure=Procedure(
+                outputs=FactorGroup(Fact(predicate=murder), terms=(diane, ed)),
+                inputs=FactorGroup(
+                    Fact(predicate=ate_together, terms=(ed, magnolia, diane)),
+                    Fact(predicate=shot, terms=(diane, ed)),
+                ),
+            ),
+            mandatory=True,
+            universal=True,
+        )
+        assert alice_and_bob_rule.implies(diane_and_ed_rule)
 
 
 class TestContradiction:
