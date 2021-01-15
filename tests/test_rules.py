@@ -326,8 +326,8 @@ class TestImplication:
 
         alice_and_bob_rule = Rule(
             procedure=Procedure(
-                outputs=FactorGroup(Fact(predicate=murder), terms=(alice, bob)),
-                inputs=FactorGroup(
+                outputs=(Fact(predicate=murder, terms=(alice, bob))),
+                inputs=(
                     Fact(predicate=ate_together, terms=(alice, grove, bob)),
                     Fact(predicate=shot, terms=(alice, bob)),
                 ),
@@ -337,8 +337,8 @@ class TestImplication:
         )
         diane_and_ed_rule = Rule(
             procedure=Procedure(
-                outputs=FactorGroup(Fact(predicate=murder), terms=(diane, ed)),
-                inputs=FactorGroup(
+                outputs=(Fact(predicate=murder, terms=(diane, ed))),
+                inputs=(
                     Fact(predicate=ate_together, terms=(ed, magnolia, diane)),
                     Fact(predicate=shot, terms=(diane, ed)),
                 ),
@@ -580,10 +580,10 @@ class TestAddition:
 
         fact_not_original = Rule(
             Procedure(
-                inputs=Fact(Predicate("$work was a fact"), context_factors=context),
+                inputs=Fact(Predicate("$work was a fact"), terms=context),
                 outputs=Fact(
                     Predicate("$work was an original work", truth=False),
-                    context_factors=context,
+                    terms=context,
                 ),
             ),
             universal=True,
@@ -592,11 +592,11 @@ class TestAddition:
             Procedure(
                 inputs=Fact(
                     Predicate("$work was an original work", truth=False),
-                    context_factors=three,
+                    terms=three,
                 ),
                 outputs=Fact(
                     Predicate("${work} was copyrightable", truth=False),
-                    context_factors=three,
+                    terms=three,
                 ),
             ),
             universal=True,
@@ -979,7 +979,7 @@ class TestStatuteRules:
         sec_4 = fake_beard_client.read("/test/acts/47/4/")
 
         was_facial_hair = Predicate("$thing was facial hair")
-        fact_was_facial_hair = Fact(was_facial_hair, context_factors=beard)
+        fact_was_facial_hair = Fact(was_facial_hair, terms=beard)
         hypothetical = Rule(
             procedure=Procedure(
                 inputs=[
@@ -991,14 +991,14 @@ class TestStatuteRules:
                             quantity=Q_("5 millimeters"),
                             truth=facial_hair_over_5mm,
                         ),
-                        context_factors=beard,
+                        terms=beard,
                     ),
                     Fact(
                         Predicate(
                             "$thing occurred on or below the chin",
                             truth=facial_hair_on_or_below_chin,
                         ),
-                        context_factors=beard,
+                        terms=beard,
                     ),
                     Fact(
                         Predicate(
@@ -1006,10 +1006,10 @@ class TestStatuteRules:
                             "of one ear to the front of the other ear below the nose",
                             truth=facial_hair_uninterrupted,
                         ),
-                        context_factors=beard,
+                        terms=beard,
                     ),
                 ],
-                outputs=Fact(Predicate("$thing was a beard"), context_factors=beard),
+                outputs=Fact(Predicate("$thing was a beard"), terms=beard),
             ),
             enactments=sec_4,
         )

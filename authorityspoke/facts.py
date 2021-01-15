@@ -23,10 +23,10 @@ class Fact(Factor):
 
     :param predicate:
         a natural-language clause with zero or more slots
-        to insert ``context_factors`` that are typically the
+        to insert ``terms`` that are typically the
         subject and objects of the clause.
 
-    :param context_factors:
+    :param terms:
         a series of :class:`Factor` objects that fill in
         the blank spaces in the ``predicate`` statement.
 
@@ -60,7 +60,7 @@ class Fact(Factor):
     """
 
     predicate: Predicate
-    context_factors: FactorSequence = FactorSequence()
+    terms: FactorSequence = FactorSequence()
     name: Optional[str] = None
     standard_of_proof: Optional[str] = None
     absent: bool = False
@@ -84,29 +84,29 @@ class Fact(Factor):
                 f"standard of proof must be one of {self.standards_of_proof} or None."
             )
 
-        if not isinstance(self.context_factors, FactorSequence):
-            context_factors = FactorSequence(self.context_factors)
-            object.__setattr__(self, "context_factors", context_factors)
+        if not isinstance(self.terms, FactorSequence):
+            terms = FactorSequence(self.terms)
+            object.__setattr__(self, "terms", terms)
 
-        if len(self.context_factors) != len(self.predicate):
+        if len(self.terms) != len(self.predicate):
             message = (
-                "The number of items in 'context_factors' must be "
-                + f"{len(self.predicate)}, not {len(self.context_factors)}, "
+                "The number of items in 'terms' must be "
+                + f"{len(self.predicate)}, not {len(self.terms)}, "
                 + f"to match predicate.context_slots "
                 + f"for '{self.predicate.content}'"
             )
             if hasattr(self, "name"):
                 message += f" for '{self.name}'"
             raise ValueError(message)
-        if any(not isinstance(s, Factor) for s in self.context_factors):
+        if any(not isinstance(s, Factor) for s in self.terms):
             raise TypeError(
-                "Items in the context_factors parameter should "
+                "Items in the terms parameter should "
                 + "be Factor or a subclass of Factor, or should be integer "
                 + "indices of Factor objects in the case_factors parameter."
             )
 
     def __str__(self):
-        content = str(self.predicate.content_with_terms(self.context_factors))
+        content = str(self.predicate.content_with_terms(self.terms))
         unwrapped = self.predicate.add_truth_to_content(content)
         text = wrapped(super().__str__().format(unwrapped))
         if self.standard_of_proof:
@@ -122,9 +122,7 @@ class Fact(Factor):
             the same as the __str__ method, but with an added "SPECIFIC CONTEXT" section
         """
         text = str(self)
-        concrete_context = [
-            factor for factor in self.context_factors if not factor.generic
-        ]
+        concrete_context = [factor for factor in self.terms if not factor.generic]
         if any(concrete_context) and not self.generic:
             text += f"\n" + indented("SPECIFIC CONTEXT:")
             for factor in concrete_context:
@@ -135,7 +133,7 @@ class Fact(Factor):
     @property
     def short_string(self):
         """Create one-line string representation for inclusion in other Facts."""
-        content = str(self.predicate.content_with_terms(self.context_factors))
+        content = str(self.predicate.content_with_terms(self.terms))
         unwrapped = self.predicate.add_truth_to_content(content)
         standard = (
             f"by the standard {self.standard_of_proof}, "
@@ -167,18 +165,14 @@ class Fact(Factor):
 
         """
         if self.predicate and self.predicate.reciprocal:
-            if not (self.context_factors[1] and self.context_factors[0]):
+            if not (self.terms[1] and self.terms[0]):
                 raise AttributeError(
                     f"{self.predicate} cannot be marked as reciprocal without two context factors. "
-                    f"Existing context factors are {self.context_factors}."
+                    f"Existing context factors are {self.terms}."
                 )
             swapping_first_factors = ContextRegister()
-            swapping_first_factors.insert_pair(
-                self.context_factors[1], self.context_factors[0]
-            )
-            swapping_first_factors.insert_pair(
-                self.context_factors[0], self.context_factors[1]
-            )
+            swapping_first_factors.insert_pair(self.terms[1], self.terms[0])
+            swapping_first_factors.insert_pair(self.terms[0], self.terms[1])
 
             return [swapping_first_factors]
         return []
@@ -204,7 +198,7 @@ class Fact(Factor):
             yield from super()._means_if_concrete(other, context)
 
     def __len__(self):
-        return len(self.context_factors)
+        return len(self.terms)
 
     def _implies_if_concrete(
         self, other: Factor, context: Optional[ContextRegister] = None
@@ -253,8 +247,8 @@ class Fact(Factor):
             a version of ``self`` with the new context.
         """
         result = deepcopy(self)
-        result.context_factors = FactorSequence(
-            factor.new_context(changes) for factor in self.context_factors
+        result.terms = FactorSequence(
+            factor.new_context(changes) for factor in self.terms
         )
         return result
 
@@ -273,10 +267,10 @@ def build_fact(
 
     :param predicate:
         a natural-language clause with zero or more slots
-        to insert ``context_factors`` that are typically the
+        to insert ``terms`` that are typically the
         subject and objects of the clause.
 
-    :param context_factors:
+    :param terms:
         a series of integer indices of generic factors to
         fill in the blanks in the :class:`.Predicate`
 
@@ -313,10 +307,10 @@ def build_fact(
     if isinstance(case_factors, Factor):
         case_factors = [case_factors]
 
-    context_factors = tuple(case_factors[i] for i in indices)
+    terms = tuple(case_factors[i] for i in indices)
     return Fact(
         predicate=predicate,
-        context_factors=context_factors,
+        terms=terms,
         name=name,
         standard_of_proof=standard_of_proof,
         absent=absent,

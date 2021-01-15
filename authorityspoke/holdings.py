@@ -127,14 +127,14 @@ class Holding(Comparable):
         return self.rule.enactments_despite
 
     @property
-    def context_factors(self) -> Tuple:
+    def terms(self) -> Tuple:
         r"""
-        Call :class:`Procedure`\'s :meth:`~Procedure.context_factors` method.
+        Call :class:`Procedure`\'s :meth:`~Procedure.terms` method.
 
         :returns:
-            context_factors from ``self``'s :class:`Procedure`
+            terms from ``self``'s :class:`Procedure`
         """
-        return self.rule.procedure.context_factors
+        return self.rule.procedure.terms
 
     @property
     def generic_factors_by_name(self) -> Dict[str, Factor]:

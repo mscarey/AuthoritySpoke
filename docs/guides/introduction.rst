@@ -328,7 +328,7 @@ using the :mod:`~authorityspoke.io.dump` module.
       'anchors': [OrderedDict([('exact', 'a work must be “original”'),
                     ('prefix', ''),
                     ('suffix', '')])],
-      'context_factors': [{'name': 'the Java API',
+      'terms': [{'name': 'the Java API',
         'anchors': [],
         'plural': False,
         'generic': True,
@@ -350,7 +350,7 @@ using the :mod:`~authorityspoke.io.dump` module.
                       'whether the non-literal elements of a program “are protected'),
                     ('prefix', ''),
                     ('suffix', '')])],
-      'context_factors': [{'name': 'the Java API',
+      'terms': [{'name': 'the Java API',
         'anchors': [],
         'plural': False,
         'generic': True,
@@ -937,8 +937,8 @@ Holding ``listings_not_copyrightable`` is that
 ``listings_not_copyrightable`` has
 two :class:`~authorityspoke.factors.Factor`\s under its “RESULT”, not
 just one. Notice that it doesn’t matter that the two original Holdings
-reference different generic :class:`~authorityspoke.entities.Entity` objects 
-(“Rural’s telephone directory” versus “Rural’s telephone listings”). 
+reference different generic :class:`~authorityspoke.entities.Entity` objects
+(“Rural’s telephone directory” versus “Rural’s telephone listings”).
 Because they’re generic, they’re interchangeable for this purpose.
 
 You might recall that oracle.holdings[0] also was also about the
@@ -949,7 +949,7 @@ happens when we add oracle.holdings[0] to feist.holdings[10].
     None
 
 
-Can you guess why it’s not possible to add these 
+Can you guess why it’s not possible to add these
 two :class:`~authorityspoke.holdings.Holding`\s together?
 Here’s a hint:
 
@@ -960,7 +960,7 @@ Here’s a hint:
     >>> feist.holdings[3].exclusive
     True
 
-``feist.holdings[10]`` and ``oracle.holdings[0]`` are 
+``feist.holdings[10]`` and ``oracle.holdings[0]`` are
 both :class:`~authorityspoke.holdings.Holding`\s that
 purport to apply in only “SOME” cases where the specified inputs are
 present, while ``feist.holdings[3]`` purports to be the “EXCLUSIVE” way
@@ -979,8 +979,8 @@ where ``feist.holdings[10]`` applies.
 
 In AuthoritySpoke, the :meth:`~authorityspoke.holdings.Holding.__or__` operator
 (the \| symbol) is an alias for the :meth:`~authorityspoke.holdings.Holding.union`
-operation. This operation is different from 
-the :meth:`~authorityspoke.holdings.Holding.__add__` 
+operation. This operation is different from
+the :meth:`~authorityspoke.holdings.Holding.__add__`
 operation, and it usually gives different results.
 
     >>> result_of_adding = feist.holdings[10] + feist.holdings[3]
@@ -988,19 +988,19 @@ operation, and it usually gives different results.
     >>> result_of_adding == result_of_union
     False
 
-Although the existence of the :meth:`~authorityspoke.holdings.Holding.union` 
-operation might suggest that there 
-should also be an intersection operation, an intersection operation 
+Although the existence of the :meth:`~authorityspoke.holdings.Holding.union`
+operation might suggest that there
+should also be an intersection operation, an intersection operation
 is not yet implemented in AuthoritySpoke 0.4.
 
 
-Apply the :meth:`~authorityspoke.holdings.Holding.union` operator 
-to two :class:`~authorityspoke.holdings.Holding`\s to get a 
+Apply the :meth:`~authorityspoke.holdings.Holding.union` operator
+to two :class:`~authorityspoke.holdings.Holding`\s to get a
 new :class:`~authorityspoke.holdings.Holding`
 with all of the inputs and all of the outputs of both of the two
 original ``Holding``\s. However, you only get such a new ``Holding`` if
 it can be inferred by accepting the truth of the two original
-``Holding``\s. If ``self`` :meth:`~authorityspoke.holdings.Holding.contradicts` 
+``Holding``\s. If ``self`` :meth:`~authorityspoke.holdings.Holding.contradicts`
 ``other``, the operation returns ``None``. Likewise, if the two original
 ``Holding``\ s both have the value ``False`` for the parameter
 ``universal``, the operation will return ``None`` if it’s possible that
@@ -1008,7 +1008,7 @@ the “SOME” cases where one of the original ``Holding``\s applies don’t
 overlap with the “SOME” cases where the other applies.
 
 In this example, we’ll look at a ``Holding`` from *Oracle*, then a
-``Holding`` from *Feist*, and then 
+``Holding`` from *Feist*, and then
 the :meth:`~authorityspoke.holdings.Holding.union` of both of them.
 
     >>> print(oracle.holdings[1])
@@ -1062,9 +1062,9 @@ that the court would have to find both
 ``the Fact that <the Java API> was an original work`` and
 ``the Fact it is false that <the Java API> was copyrightable``.
 
-The :meth:`~authorityspoke.holdings.Holding.union` operator is useful 
+The :meth:`~authorityspoke.holdings.Holding.union` operator is useful
 for searching for contradictions in a
-collection of :class:`~authorityspoke.holdings.Holding`\s. When two 
+collection of :class:`~authorityspoke.holdings.Holding`\s. When two
 :class:`~authorityspoke.holdings.Holding`\s are combined
 together with the union operator, their union might contradict other
 Holdings that neither of the two original Holdings would

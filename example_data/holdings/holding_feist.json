@@ -274,7 +274,7 @@
         "inputs": {
             "type": "fact",
             "content": "Rural's telephone listings were names, towns, and telephone numbers of telephone subscribers",
-            "context_factors": {
+            "terms": {
                 "type": "entity",
                 "name": "Rural's telephone listings",
                 "plural": true

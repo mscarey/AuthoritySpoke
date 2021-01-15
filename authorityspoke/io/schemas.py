@@ -258,7 +258,7 @@ class FactSchema(ExpandableSchema):
 
     __model__: Type = Fact
     predicate = fields.Nested(PredicateSchema)
-    context_factors = fields.Nested(lambda: FactorSchema(many=True))
+    terms = fields.Nested(lambda: FactorSchema(many=True))
     standard_of_proof = fields.Str(missing=None)
     name = fields.Str(missing=None)
     absent = fields.Bool(missing=False)
@@ -268,7 +268,7 @@ class FactSchema(ExpandableSchema):
     def get_references_from_mentioned(
         self,
         content: str,
-        context_factors: Optional[List[Dict]] = None,
+        terms: Optional[List[Dict]] = None,
         placeholder: str = "{}",
     ) -> Tuple[str, List[Dict]]:
         r"""
@@ -288,16 +288,16 @@ class FactSchema(ExpandableSchema):
             :class:`.Factor`\s in the order they appeared in content.
         """
         mentioned = self.context.get("mentioned") or Mentioned({})
-        context_factors = context_factors or []
+        terms = terms or []
         for factor_name in mentioned.keys():
             if factor_name in content and factor_name != content:
                 obj = mentioned.get_by_name(factor_name)
-                content, context_factors = text_expansion.add_found_context(
+                content, terms = text_expansion.add_found_context(
                     content,
-                    context_factors,
+                    terms,
                     factor=deepcopy(obj),
                 )
-        return content, context_factors
+        return content, terms
 
     @pre_load
     def format_data_to_load(self, data: RawFactor, **kwargs) -> RawFactor:
@@ -325,12 +325,12 @@ class FactSchema(ExpandableSchema):
             "quantity",
         ]
         data = nest_fields(data, nest="predicate", eggs=to_nest)
-        data = self.wrap_single_element_in_list(data, "context_factors")
+        data = self.wrap_single_element_in_list(data, "terms")
         (
             data["predicate"]["content"],
-            data["context_factors"],
+            data["terms"],
         ) = self.get_references_from_mentioned(
-            data["predicate"]["content"], data.get("context_factors")
+            data["predicate"]["content"], data.get("terms")
         )
         data = self.consume_type_field(data)
         return data

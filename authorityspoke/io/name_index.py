@@ -70,15 +70,15 @@ def assign_name_from_content(obj: Dict) -> str:
         a new name
     """
 
-    if obj.get("context_factors"):
+    if obj.get("terms"):
         template = StatementTemplate(obj["predicate"]["content"])
         placeholders = template.get_placeholders()
         if any(placeholders):
-            substitutions = dict(zip(placeholders, obj["context_factors"]))
+            substitutions = dict(zip(placeholders, obj["terms"]))
             content_for_name = template.substitute(substitutions)
         else:
             content_for_name = obj["predicate"]["content"]
-            for context_factor in obj["context_factors"]:
+            for context_factor in obj["terms"]:
                 content_for_name = content_for_name.replace("{}", context_factor, 1)
     else:
         content_for_name = obj["predicate"]["content"]
@@ -184,13 +184,11 @@ def ensure_factor_has_name(obj: Dict) -> Dict:
     return obj
 
 
-def update_name_index_from_context_factors(
-    context_factors: List[RawFactor], mentioned: Mentioned
-):
+def update_name_index_from_terms(terms: List[RawFactor], mentioned: Mentioned):
     r"""
     Update name index from a list of :class:`.RawFactor`\s or strings referencing them.
 
-    :param context_factors:
+    :param terms:
         a list of :class:`.RawFactor`\s or strings referencing them. Both
         :class:`.RawFactor`\s and strings may exist in the list.
 
@@ -202,7 +200,7 @@ def update_name_index_from_context_factors(
         an updated "mentioned" name index
     """
 
-    for factor in context_factors:
+    for factor in terms:
         if isinstance(factor, str):
             factor_name = factor
             if factor_name not in mentioned:
@@ -251,20 +249,20 @@ def update_name_index_from_fact_content(
     predicate: RawPredicate = obj.get("predicate", {})
     content: str = predicate.get("content", "")
     if content:
-        context_factors: RawContextFactors = obj.get("context_factors", [])
+        terms: RawContextFactors = obj.get("terms", [])
         mentioned = update_name_index_from_bracketed_phrases(
             content=content, mentioned=mentioned
         )
-        mentioned = update_name_index_from_context_factors(context_factors, mentioned)
+        mentioned = update_name_index_from_terms(terms, mentioned)
 
         for name in mentioned.keys():
             if name in content and name != content:
-                (content, context_factors,) = text_expansion.add_found_context(
+                (content, terms,) = text_expansion.add_found_context(
                     content=content,
-                    context_factors=context_factors,
+                    terms=terms,
                     factor=mentioned.get_by_name(name),
                 )
-        obj["context_factors"] = context_factors
+        obj["terms"] = terms
         obj["predicate"]["content"] = content
     return obj, mentioned
 
@@ -333,7 +331,7 @@ def collect_mentioned(
 
         # Added because a top-level factor was not having its brackets replaced
         if obj.get("predicate", {}).get("content"):
-            for factor in obj.get("context_factors", []):
+            for factor in obj.get("terms", []):
                 if factor not in obj["predicate"]["content"]:
                     obj["predicate"][
                         "content"

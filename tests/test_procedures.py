@@ -19,7 +19,7 @@ class TestProcedures:
         with pytest.raises(TypeError):
             Procedure(inputs=(make_predicate["p1"]), outputs=(make_predicate["p2"]))
 
-    def test_get_context_factors(self, make_procedure):
+    def test_get_terms(self, make_procedure):
         # motel, watt
         assert len(make_procedure["c1"].generic_factors) == 2
         # trees, motel
@@ -55,8 +55,8 @@ class TestProcedures:
         ):
             assert factor in factors
 
-    def test_type_of_context_factors(self, make_procedure):
-        assert isinstance(make_procedure["c3"].context_factors, FactorSequence)
+    def test_type_of_terms(self, make_procedure):
+        assert isinstance(make_procedure["c3"].terms, FactorSequence)
 
     def test_entities_of_inputs_for_identical_procedure(
         self, watt_factor, make_procedure, watt_mentioned
@@ -66,10 +66,10 @@ class TestProcedures:
         c1_again = make_procedure["c1_again"]
         assert f["f1"] in c1.inputs
         assert f["f1"] in c1_again.inputs
-        assert f["f1"].context_factors == (watt_mentioned[0],)
+        assert f["f1"].terms == (watt_mentioned[0],)
         assert f["f2"] in c1.inputs
         assert f["f2"] in c1_again.inputs
-        assert f["f2"].context_factors == (watt_mentioned[1], watt_mentioned[0])
+        assert f["f2"].terms == (watt_mentioned[1], watt_mentioned[0])
 
     def test_wrong_role_for_added_factor(self, watt_factor, make_procedure):
         with pytest.raises(ValueError):
@@ -288,10 +288,10 @@ alice = Entity("Alice")
 bob = Entity("Bob")
 craig = Entity("Craig")
 dan = Entity("Dan")
-alice_rich = Fact(p_large_weight, context_factors=alice)
-bob_poor = Fact(p_small_weight, context_factors=bob)
-craig_rich = Fact(p_large_weight, context_factors=craig)
-dan_poor = Fact(p_small_weight, context_factors=dan)
+alice_rich = Fact(p_large_weight, terms=alice)
+bob_poor = Fact(p_small_weight, terms=bob)
+craig_rich = Fact(p_large_weight, terms=craig)
+dan_poor = Fact(p_small_weight, terms=dan)
 
 
 class TestFactorGroups:

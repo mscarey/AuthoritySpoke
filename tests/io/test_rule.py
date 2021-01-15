@@ -61,13 +61,13 @@ class TestLoadRules:
         raw_rules = loaders.load_holdings("beard_rules.json")
         indexed_rules, mentioned = name_index.index_names(raw_rules[0]["inputs"])
         key = "the suspected beard occurred on or below the chin"
-        assert mentioned[key]["context_factors"][0] == "the suspected beard"
+        assert mentioned[key]["terms"][0] == "the suspected beard"
 
     def test_rule_with_exhibit_as_context_factor(self, fake_beard_client):
         rules, mentioned = loaders.load_rules_with_index(
             "beard_rules.json", client=fake_beard_client
         )
-        exhibit = rules[5].inputs[0].context_factors[2]
+        exhibit = rules[5].inputs[0].terms[2]
         assert isinstance(exhibit, Exhibit)
 
     def test_load_rules_and_index_names(self, fake_beard_client):
@@ -75,7 +75,7 @@ class TestLoadRules:
             "beard_rules.json", client=fake_beard_client
         )
         key = "the Department of Beards granted the defendant's beard exemption"
-        assert mentioned[key]["context_factors"][0] == "the Department of Beards"
+        assert mentioned[key]["terms"][0] == "the Department of Beards"
 
     def test_read_rules_without_regime(self, fake_beard_client):
         beard_dictionary = loaders.load_holdings("beard_rules.json")

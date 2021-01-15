@@ -29,14 +29,14 @@ class TestCollectMentioned:
 
     def test_index_names(self, raw_factor):
         obj, mentioned = name_index.index_names(raw_factor["relevant"])
-        factor = mentioned[obj]["context_factors"][0]
-        assert mentioned[factor]["context_factors"][0] == "Short Name"
+        factor = mentioned[obj]["terms"][0]
+        assert mentioned[factor]["terms"][0] == "Short Name"
 
     def test_index_names_turns_context_factor_str_into_list(self, raw_factor):
         short_shot_long, mentioned = name_index.index_names(
-            raw_factor["relevant"]["context_factors"][0]
+            raw_factor["relevant"]["terms"][0]
         )
-        assert isinstance(mentioned[short_shot_long]["context_factors"], list)
+        assert isinstance(mentioned[short_shot_long]["terms"], list)
 
     def test_index_before_apostrophe(self):
         """
@@ -57,18 +57,16 @@ class TestCollectMentioned:
         }
         holding, mentioned = name_index.index_names(raw_holding)
         factor_name_1 = holding["outputs"][0]
-        assert mentioned[factor_name_1]["context_factors"][0] == "possessive noun"
+        assert mentioned[factor_name_1]["terms"][0] == "possessive noun"
         factor_name_2 = holding["outputs"][1]
-        assert mentioned[factor_name_2]["context_factors"][0] == "possessive noun"
+        assert mentioned[factor_name_2]["terms"][0] == "possessive noun"
 
     def test_update_context_from_bracketed_name(self):
         content = "{} sent a message to {Bob's friend}"
-        context_factors = [{"type": "Entity", "name": "Bob"}]
-        new_content, context_factors = text_expansion.get_references_from_string(
-            content, context_factors
-        )
+        terms = [{"type": "Entity", "name": "Bob"}]
+        new_content, terms = text_expansion.get_references_from_string(content, terms)
         assert new_content == "{} sent a message to ${bob_s_friend}"
-        assert len(context_factors) == 2
+        assert len(terms) == 2
 
     def test_assign_name(self, raw_factor):
         """
@@ -76,18 +74,18 @@ class TestCollectMentioned:
         because it doesn't already have one.
         """
         short_shot_long = text_expansion.expand_shorthand(
-            raw_factor["relevant"]["context_factors"][0]
+            raw_factor["relevant"]["terms"][0]
         )
         collapsed, mentioned = name_index.collect_mentioned(short_shot_long)
         assert collapsed == "Short Name shot Longer Name"
-        assert mentioned[collapsed]["context_factors"][0] == "Short Name"
+        assert mentioned[collapsed]["terms"][0] == "Short Name"
 
     def test_mentioned_from_fact_and_entities(self, raw_factor):
         obj = text_expansion.expand_shorthand(raw_factor["relevant"])
         obj, mentioned = name_index.collect_mentioned(obj)
         assert mentioned["relevant fact"]["type"] == "Fact"
-        shooting = mentioned["relevant fact"]["context_factors"][0]
-        assert mentioned[shooting]["context_factors"][0] == "Short Name"
+        shooting = mentioned["relevant fact"]["terms"][0]
+        assert mentioned[shooting]["terms"][0] == "Short Name"
 
     def test_mentioned_ordered_by_length(self, raw_factor):
         obj = text_expansion.expand_shorthand(raw_factor["relevant"])
@@ -128,7 +126,7 @@ class TestCollectMentioned:
                     "Rural's telephone listings were names, towns, and telephone "
                     "numbers of telephone subscribers"
                 ),
-                "context_factors": {
+                "terms": {
                     "type": "entity",
                     "name": "Rural's telephone listings",
                     "plural": True,
@@ -166,11 +164,11 @@ class TestCollectMentioned:
         )
         found_content = obj["predicate"]["content"].lower()
         assert found_content == "${bradley} lived at ${bradley_s_house}"
-        # Check that context_factors match the order of the sentence
-        assert obj["context_factors"][0]["name"] == "Bradley"
-        assert obj["context_factors"][1]["name"] == "Bradley's house"
+        # Check that terms match the order of the sentence
+        assert obj["terms"][0]["name"] == "Bradley"
+        assert obj["terms"][1]["name"] == "Bradley's house"
 
-    def test_link_longest_context_factors_first(self):
+    def test_link_longest_terms_first(self):
         """
         If read_holdings interprets the second "Bradley" string as
         a reference to Bradley rather than "Bradley's house", it's wrong.
@@ -183,7 +181,7 @@ class TestCollectMentioned:
         }
         record, mentioned = name_index.index_names(to_read)
         lived_at = record["outputs"][1]
-        assert mentioned[lived_at]["context_factors"][1] == "Bradley's house"
+        assert mentioned[lived_at]["terms"][1] == "Bradley's house"
 
 
 class TestRetrieveMentioned:
@@ -191,7 +189,7 @@ class TestRetrieveMentioned:
         fact = {
             "type": "fact",
             "predicate": {"content": "$moe threw a pie at Larry but it hit $curly"},
-            "context_factors": [
+            "terms": [
                 {"type": "Entity", "name": "Moe"},
                 {"type": "Entity", "name": "Curly"},
             ],
@@ -199,30 +197,30 @@ class TestRetrieveMentioned:
         obj = {"type": "Entity", "name": "Larry"}
         (
             fact["predicate"]["content"],
-            fact["context_factors"],
+            fact["terms"],
         ) = text_expansion.add_found_context(
-            fact["predicate"]["content"], fact["context_factors"], obj
+            fact["predicate"]["content"], fact["terms"], obj
         )
         assert (
             fact["predicate"]["content"]
             == "$moe threw a pie at ${larry} but it hit $curly"
         )
-        assert fact["context_factors"][1]["name"] == "Larry"
+        assert fact["terms"][1]["name"] == "Larry"
 
     def test_add_found_context_included_in_placeholder_name(self):
         content = (
             "$the_Amazon has slower Amazon deliveries because of ${the_Amazon}'s size"
         )
-        context_factors = [{"type": "Entity", "name": "the Amazon"}]
-        new_content, new_context_factors = text_expansion.add_found_context(
+        terms = [{"type": "Entity", "name": "the Amazon"}]
+        new_content, new_terms = text_expansion.add_found_context(
             content=content,
-            context_factors=context_factors,
+            terms=terms,
             factor={"type": "Entity", "name": "Amazon"},
         )
         expected = "$the_Amazon has slower ${amazon} deliveries because of ${the_Amazon}'s size"
         assert new_content == expected
-        assert len(new_context_factors) == 2
-        assert new_context_factors[1]["name"] == "Amazon"
+        assert len(new_terms) == 2
+        assert new_terms[1]["name"] == "Amazon"
 
     def test_retrieve_mentioned_during_load(self):
         """
@@ -233,10 +231,10 @@ class TestRetrieveMentioned:
         relevant_dict = {
             "predicate": {"content": "{} is relevant to show {}"},
             "type": "Fact",
-            "context_factors": [
+            "terms": [
                 {
                     "predicate": {"content": "{} shot {}"},
-                    "context_factors": [
+                    "terms": [
                         {"name": "Alice", "type": "Entity"},
                         {"name": "Bob", "type": "Entity"},
                     ],
@@ -244,13 +242,13 @@ class TestRetrieveMentioned:
                 },
                 {
                     "predicate": {"content": "{} murdered {}"},
-                    "context_factors": ["Alice", "Bob"],
+                    "terms": ["Alice", "Bob"],
                     "type": "Fact",
                 },
             ],
         }
         relevant_fact = readers.read_fact(relevant_dict)
-        assert relevant_fact.context_factors[1].context_factors[1].name == "Bob"
+        assert relevant_fact.terms[1].terms[1].name == "Bob"
 
     def test_get_references_without_changing_mentioned(self):
         """
@@ -277,7 +275,7 @@ class TestRetrieveMentioned:
             "outputs": {"type": "fact", "content": "Bradley committed a tort"},
         }
         holding = schema.load(new)
-        assert holding.inputs[0].context_factors[0].name == "Bradley"
+        assert holding.inputs[0].terms[0].name == "Bradley"
         # Making the same assertion again to show it's still true
         assert (
             schema.context["mentioned"]["fact that Bradley committed a crime"][
@@ -319,7 +317,7 @@ class TestRetrieveMentioned:
         fact = {
             "type": "fact",
             "content": "$Hamlet lived at Elsinore",
-            "context_factors": [{"type": "Entity", "name": "Hamlet"}],
+            "terms": [{"type": "Entity", "name": "Hamlet"}],
         }
         schema = schemas.FactSchema()
         schema.context["mentioned"] = name_index.Mentioned(

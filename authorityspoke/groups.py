@@ -46,7 +46,9 @@ class ComparableGroup(Tuple[F, ...], Comparable):
         return False
 
     def consistent_with(
-        self, other: Optional[Comparable], context: Optional[ContextRegister] = None,
+        self,
+        other: Optional[Comparable],
+        context: Optional[ContextRegister] = None,
     ) -> bool:
         r"""
         Find whether two sets of :class:`.Factor`\s can be consistent.
@@ -83,7 +85,9 @@ class ComparableGroup(Tuple[F, ...], Comparable):
         return self._must_contradict_one_factor(other, context=context)
 
     def contradicts(
-        self, other: ComparableGroup, context: Optional[ContextRegister] = None,
+        self,
+        other: ComparableGroup,
+        context: Optional[ContextRegister] = None,
     ) -> bool:
         r"""
         Find whether two sets of :class:`.Factor`\s can be contradictory.
@@ -323,7 +327,7 @@ class ComparableGroup(Tuple[F, ...], Comparable):
         context: Optional[ContextRegister] = None,
     ) -> Iterator[ContextRegister]:
         r"""
-        Search for ways to match :attr:`context_factors` of ``self`` and ``other``.
+        Search for ways to match :attr:`terms` of ``self`` and ``other``.
 
         :yields:
             all valid ways to make matches between

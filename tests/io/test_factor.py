@@ -78,7 +78,7 @@ class TestFactLoad:
     def test_import_fact_with_entity_name_containing_another(self):
         expanded = expand_shorthand(self.house_data)
         house_fact = readers.read_fact(expanded)
-        assert house_fact.context_factors[1].name == "Alice's house"
+        assert house_fact.terms[1].name == "Alice's house"
 
     def test_import_predicate_with_quantity(self):
         story = expand_shorthand(self.story_data)
@@ -103,12 +103,12 @@ class TestFactorLoad:
     def test_import_fact_with_factor_schema(self):
         loaded = load_holdings("holding_cardenas.json")
         entity = readers.read_factor(loaded[0]["inputs"][0])
-        inner_context = entity.context_factors[0].context_factors[0]
+        inner_context = entity.terms[0].terms[0]
         assert inner_context.name == "the defendant"
 
     def test_import_facts_with_factor_schema(self):
         loaded = load_holdings("holding_cardenas.json")
-        factor = readers.read_factors(loaded[0]["inputs"])[1].context_factors[0]
+        factor = readers.read_factors(loaded[0]["inputs"])[1].terms[0]
         assert factor.content == "${the_defendant} committed an attempted robbery"
 
 
@@ -120,8 +120,8 @@ class TestFactDump:
     def test_dump_complex_fact(self, make_complex_fact):
         relevant_fact = make_complex_fact["f_relevant_murder"]
         relevant_dict = to_dict(relevant_fact)
-        shooting_dict = relevant_dict["context_factors"][0]
-        assert shooting_dict["context_factors"][0]["name"] == "Alice"
+        shooting_dict = relevant_dict["terms"][0]
+        assert shooting_dict["terms"][0]["name"] == "Alice"
 
 
 class TestExhibitDump:
@@ -129,7 +129,7 @@ class TestExhibitDump:
         exhibit = make_exhibit["shooting_affidavit"]
         schema = schemas.ExhibitSchema()
         dumped = schema.dump(exhibit)
-        assert dumped["statement"]["context_factors"][0]["name"] == "Alice"
+        assert dumped["statement"]["terms"][0]["name"] == "Alice"
 
     def test_dump_and_load_exhibit(self, make_exhibit):
         exhibit = make_exhibit["no_shooting_entity_order_testimony"]
@@ -169,4 +169,4 @@ class TestAllegationDump:
         allegation = make_allegation["shooting"]
         schema = schemas.AllegationSchema()
         dumped = schema.dump(allegation)
-        assert dumped["statement"]["context_factors"][0]["name"] == "Alice"
+        assert dumped["statement"]["terms"][0]["name"] == "Alice"

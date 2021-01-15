@@ -1379,11 +1379,11 @@ def raw_factor() -> RawFactor:
             "content": "{} is relevant to show {}",
             "type": "Fact",
             "name": "relevant fact",
-            "context_factors": [
+            "terms": [
                 {"content": "{Short Name} shot {Longer Name}", "type": "Fact"},
                 {
                     "content": "{} murdered {}",
-                    "context_factors": ["Short Name", "Longer Name"],
+                    "terms": ["Short Name", "Longer Name"],
                     "type": "Fact",
                 },
             ],

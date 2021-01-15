@@ -189,10 +189,10 @@ if so they would be listed together in square brackets in the JSON.
 
 The curly brackets around ``{the Java API}`` indicate that the parser
 should consider that phrase to be a reference to an Entity object, which
-becomes one of the input’s ``context_factors``. If such an object hasn’t
+becomes one of the input’s ``terms``. If such an object hasn’t
 been referenced before in the file, it will be created.
 
-    >>> print(oracle.holdings[0].inputs[0].context_factors)
+    >>> print(oracle.holdings[0].inputs[0].terms)
     (Entity(name='the Java API', generic=True, plural=False, anchors=[]),)
 
 
@@ -449,7 +449,7 @@ into the Holding object, as shown in the examples above.
               items:
                 $ref: '#/components/schemas/Selector'
               type: array
-            context_factors:
+            terms:
               items:
                 $ref: '#/components/schemas/Factor'
               type: array
@@ -632,4 +632,4 @@ share over the web.
 
     >>> from authorityspoke.io import dump
     >>> dump.to_json(oracle.holdings[0].outputs[0])
-    '{"name": "false the Java API was copyrightable", "standard_of_proof": null, "context_factors": [{"name": "the Java API", "plural": false, "anchors": [], "generic": true, "type": "Entity"}], "predicate": {"quantity": null, "truth": false, "comparison": "", "reciprocal": false, "content": "{} was copyrightable"}, "generic": false, "absent": false, "anchors": [{"exact": "copyright protection.", "prefix": "must be \\u201coriginal\\u201d to qualify for ", "suffix": ""}, {"exact": "whether the non-literal elements of a program \\u201care protected", "prefix": "", "suffix": ""}]}'
+    '{"name": "false the Java API was copyrightable", "standard_of_proof": null, "terms": [{"name": "the Java API", "plural": false, "anchors": [], "generic": true, "type": "Entity"}], "predicate": {"quantity": null, "truth": false, "comparison": "", "reciprocal": false, "content": "{} was copyrightable"}, "generic": false, "absent": false, "anchors": [{"exact": "copyright protection.", "prefix": "must be \\u201coriginal\\u201d to qualify for ", "suffix": ""}, {"exact": "whether the non-literal elements of a program \\u201care protected", "prefix": "", "suffix": ""}]}'

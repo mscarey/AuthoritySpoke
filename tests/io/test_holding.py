@@ -48,7 +48,7 @@ class TestEntityImport:
                 {
                     "type": "fact",
                     "content": "{} stole a car",
-                    "context_factors": {
+                    "terms": {
                         "type": "Entity",
                         "name": "Smith",
                         "generic": False,
@@ -66,7 +66,7 @@ class TestEntityImport:
     def test_index_names_from_otherwise_identical_factors(self):
         expanded, mentioned = name_index.index_names(self.smith_holdings)
         fact = mentioned[expanded[1]["inputs"][0]]
-        assert fact["context_factors"][0] == "Smythe"
+        assert fact["terms"][0] == "Smythe"
 
     def test_specific_entity(self):
 
@@ -219,7 +219,7 @@ class TestTextAnchors:
     def test_holding_without_enactments_or_regime(self, raw_holding):
         expanded = text_expansion.expand_shorthand(raw_holding["bradley_house"])
         built = readers.read_holding(expanded)
-        new_factor = built.outputs[0].to_effect.context_factors[0]
+        new_factor = built.outputs[0].to_effect.terms[0]
         assert new_factor.name == "Bradley"
 
     def test_anchor_not_overwritten_when_indexing(self, raw_holding):
@@ -278,13 +278,13 @@ class TestTextAnchors:
         ]
         expanded = text_expansion.expand_shorthand(holdings)
         built = readers.read_holdings(expanded)
-        new_factor = built[0].outputs[0].to_effect.context_factors[0]
+        new_factor = built[0].outputs[0].to_effect.terms[0]
         assert new_factor.name == "Bradley"
 
     def test_holdings_with_allegation_and_exhibit(self):
         """
         Testing the error message:
-        The number of items in 'context_factors' must be 1,
+        The number of items in 'terms' must be 1,
         to match predicate.context_slots for '{} committed
         an attempted robbery' for 'fact that defendant
         committed an attempted robbery'
@@ -372,7 +372,7 @@ class TestTextAnchors:
         expanded = text_expansion.expand_shorthand(holdings)
         built = readers.read_holdings(expanded)
         allegation = built[0].inputs[1]
-        assert allegation.statement.context_factors[0].name == "defendant"
+        assert allegation.statement.terms[0].name == "defendant"
 
     def test_select_enactment_text_by_default(self, make_response):
         mock_client = FakeClient(responses=make_response)
@@ -451,7 +451,7 @@ class TestTextAnchors:
         holdings = readers.read_holdings(to_read, client=mock_client)
         new_fact = holdings[0].inputs[1]
         assert "lived at <Hideaway Lodge>" in str(new_fact)
-        assert isinstance(new_fact.context_factors[0], Entity)
+        assert isinstance(new_fact.terms[0], Entity)
 
     def test_fact_with_quantity(self, make_response):
         to_read = load_holdings("holding_watt.json")

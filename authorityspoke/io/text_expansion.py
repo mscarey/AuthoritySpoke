@@ -59,7 +59,7 @@ def expand_anchor_shorthand(
 
 def expand_node_shorthand(obj: Dict[str, Any]) -> Dict[str, Any]:
     """Expand shorthand at one node while walking tree of input JSON."""
-    for list_field in ("context_factors", "anchors"):
+    for list_field in ("terms", "anchors"):
         if obj.get(list_field) is not None:
             obj = wrap_single_element_in_list(obj, list_field)
 
@@ -76,8 +76,8 @@ def expand_node_shorthand(obj: Dict[str, Any]) -> Dict[str, Any]:
 
 def collapse_known_factors(obj: Dict):
     """Replace all names of known context factors with placeholder strings."""
-    if obj.get("context_factors"):
-        for factor in obj["context_factors"]:
+    if obj.get("terms"):
+        for factor in obj["terms"]:
             if isinstance(factor, str):
                 name = factor
             else:
@@ -95,7 +95,7 @@ def collapse_known_factors(obj: Dict):
 
 
 def replace_brackets_with_placeholder(content: str, name: str):
-    """Replace brackets with placeholder to show it is referenced in context_factors."""
+    """Replace brackets with placeholder to show it is referenced in terms."""
     slug = slugify(text=name, separator="_", replacements=[[" ", "_"]])
     placeholder_slug = "${" + slug + "}"
     if placeholder_slug not in content:
@@ -104,7 +104,7 @@ def replace_brackets_with_placeholder(content: str, name: str):
 
 
 def collapse_name_in_content(content: str, name: str):
-    """Replace name with placeholder to show it is referenced in context_factors."""
+    """Replace name with placeholder to show it is referenced in terms."""
     slug = slugify(text=name, separator="_", replacements=[[" ", "_"]])
     placeholder_slug = "${" + slug + "}"
     if placeholder_slug not in content:
@@ -114,34 +114,34 @@ def collapse_name_in_content(content: str, name: str):
 
 
 def add_found_context_with_brackets(
-    content: str, context_factors: List[Dict], factor: Dict, placeholder="{}"
+    content: str, terms: List[Dict], factor: Dict, placeholder="{}"
 ) -> Tuple[str, List[Dict[str, Any]]]:
     """
     Remove bracketed mentions of factor with placeholder and list replacements.
 
     :returns:
         Content with mentions of factor replaced by placeholder, and
-        a context_factors list with the factor inserted in a position
+        a terms list with the factor inserted in a position
         corresponding to its position in the context phrase.
     """
     bracketed_name = "{" + factor["name"] + "}"
     if bracketed_name in content:
         index_in_content = content.index(bracketed_name)
         index_in_factor_list = content[:index_in_content].count("${")
-        context_factors.insert(index_in_factor_list, factor)
+        terms.insert(index_in_factor_list, factor)
         content = collapse_name_in_content(content, factor["name"])
-    return content, context_factors
+    return content, terms
 
 
 def add_found_context(
-    content: str, context_factors: List[Dict], factor: Dict
+    content: str, terms: List[Dict], factor: Dict
 ) -> Tuple[str, List[Dict[str, Any]]]:
     """
     Replace mentions of factor with placeholder and list replacements.
 
     :returns:
         Content with mentions of factor replaced by placeholder, and
-        a context_factors list with the factor inserted in a position
+        a terms list with the factor inserted in a position
         corresponding to its position in the context phrase.
     """
     # if factor["name"] is inside an existing placeholder, replace it with a special placeholder
@@ -158,16 +158,16 @@ def add_found_context(
     if factor["name"] in content:
         index_in_content = content.index(factor["name"])
         index_in_factor_list = content[:index_in_content].count("$")
-        context_factors.insert(index_in_factor_list, factor)
+        terms.insert(index_in_factor_list, factor)
         content = collapse_name_in_content(content, factor["name"])
 
     # replace the special placeholder with factor["name"]
     content = content.replace("@@@@", factor["name"])
-    return content, context_factors
+    return content, terms
 
 
 def get_references_from_string(
-    content: str, context_factors: Optional[List[Dict]]
+    content: str, terms: Optional[List[Dict]]
 ) -> Tuple[str, Sequence[Dict]]:
     r"""
     Make :class:`.Entity` context :class:`.Factor`\s from string.
@@ -175,7 +175,7 @@ def get_references_from_string(
     This function identifies context :class:`.Factor`\s by finding
     brackets around them, while :func:`get_references_from_mentioned`
     depends on knowing the names of the context factors in advance.
-    Also, this function works only when all the context_factors
+    Also, this function works only when all the terms
     are type :class:`.Entity`.
 
     Despite "placeholder" being defined as a variable elsewhere,
@@ -195,14 +195,12 @@ def get_references_from_string(
     pattern = r"(?<!\$)\{([^\{]+)\}"  # matches bracketed text not preceded by $
     entities_as_text = findall(pattern, content)
     entities_as_text.sort(key=len, reverse=True)
-    context_factors = context_factors or []
+    terms = terms or []
     for entity_name in entities_as_text:
         entity = {"type": "Entity", "name": entity_name}
-        content, context_factors = add_found_context_with_brackets(
-            content, context_factors, entity
-        )
+        content, terms = add_found_context_with_brackets(content, terms, entity)
 
-    return content, context_factors
+    return content, terms
 
 
 def wrap_single_element_in_list(data: Dict, many_element: str):

@@ -13,16 +13,14 @@ from authorityspoke.predicates import Q_, Predicate
 
 
 class TestFacts:
-    def test_default_context_factors_for_fact(
-        self, make_entity, make_predicate, watt_mentioned
-    ):
+    def test_default_terms_for_fact(self, make_entity, make_predicate, watt_mentioned):
         e = make_entity
         f1 = build_fact(make_predicate["p1"], case_factors=watt_mentioned)
-        assert f1.context_factors == (e["motel"],)
+        assert f1.terms == (e["motel"],)
 
     def test_build_fact(self, make_predicate, watt_mentioned):
         """
-        Check that context_factors is created as a (hashable) tuple, not list
+        Check that terms is created as a (hashable) tuple, not list
         """
         shooting = build_fact(
             make_predicate["p_shooting"],
@@ -30,9 +28,9 @@ class TestFacts:
             case_factors=watt_mentioned,
             standard_of_proof="preponderance of evidence",
         )
-        assert isinstance(shooting.context_factors, tuple)
+        assert isinstance(shooting.terms, tuple)
 
-    def test_context_factors_from_case_factor_indices(
+    def test_terms_from_case_factor_indices(
         self, make_entity, make_predicate, watt_mentioned
     ):
         """
@@ -48,7 +46,7 @@ class TestFacts:
         f2 = build_fact(
             make_predicate["p2"], indices=(1, 0), case_factors=watt_mentioned
         )
-        assert f2.context_factors == (e["watt"], e["motel"])
+        assert f2.terms == (e["watt"], e["motel"])
 
     def test_correct_factors_from_indices_in_build_fact(
         self, make_entity, make_predicate, watt_mentioned
@@ -59,9 +57,9 @@ class TestFacts:
             indices=(1, 2),
             case_factors=watt_mentioned,
         )
-        assert f2.context_factors == (e["watt"], e["trees"])
+        assert f2.terms == (e["watt"], e["trees"])
 
-    def test_wrong_type_in_context_factors_in_init(
+    def test_wrong_type_in_terms_in_init(
         self, make_entity, make_predicate, watt_mentioned
     ):
         e = make_entity
@@ -80,9 +78,9 @@ class TestFacts:
                 case_factors=make_entity["watt"],
             )
 
-    def test_convert_int_context_factors_to_tuple(self, make_predicate, watt_mentioned):
+    def test_convert_int_terms_to_tuple(self, make_predicate, watt_mentioned):
         f = build_fact(make_predicate["p_irrelevant_1"], 3, case_factors=watt_mentioned)
-        assert f.context_factors == (watt_mentioned[3],)
+        assert f.terms == (watt_mentioned[3],)
 
     def test_string_representation_of_factor(self, watt_factor):
         assert "<Hideaway Lodge> was a motel" in str(watt_factor["f1"])
@@ -167,13 +165,13 @@ class TestFacts:
         different = watt_factor["f2"].new_context(register)
         assert "<Darth Vader> operated" in str(different)
 
-    def test_type_of_context_factors(self, watt_factor):
-        assert isinstance(watt_factor["f1"].context_factors, FactorSequence)
+    def test_type_of_terms(self, watt_factor):
+        assert isinstance(watt_factor["f1"].terms, FactorSequence)
 
     def test_concrete_to_abstract(self, make_entity, make_predicate):
         motel = make_entity["motel_specific"]
         d = make_entity["watt"]
-        fact = Fact(predicate=make_predicate["p2"], context_factors=(d, motel))
+        fact = Fact(predicate=make_predicate["p2"], terms=(d, motel))
         assert "<Wattenburg> operated and lived at Hideaway Lodge" in str(fact)
         assert "<Wattenburg> operated and lived at Hideaway Lodge>" in str(
             fact.make_generic()
@@ -183,8 +181,8 @@ class TestFacts:
         assert len(watt_factor["f1"].predicate) == 1
         assert len(watt_factor["f1"]) == 1
 
-    def test_context_factors_reciprocal(self, make_entity, watt_factor):
-        """Predicate.new() no longer coerces the order of self.context_factors.
+    def test_terms_reciprocal(self, make_entity, watt_factor):
+        """Predicate.new() no longer coerces the order of self.terms.
         Instead, Fact.entity_orders() returns every possible order."""
 
         motel_near_watt = watt_factor["f7_swap_entities_4"]
@@ -199,9 +197,7 @@ class TestFacts:
             "f1"
         ].predicate.content_with_terms((make_entity["motel"]))
 
-    def test_factor_context_factors_do_not_match_predicate(
-        self, make_predicate, watt_mentioned
-    ):
+    def test_factor_terms_do_not_match_predicate(self, make_predicate, watt_mentioned):
         """
         make_predicate["p1"] has only one slot for context factors, but
         this tells it to look for three.
@@ -273,7 +269,7 @@ class TestSameMeaning:
 
     def test_copies_of_identical_factor(self, make_factor):
         """
-        Even if the two factors have different entity markers in self.context_factors,
+        Even if the two factors have different entity markers in self.terms,
         I expect them to evaluate equal because the choice of entity markers is
         arbitrary.
         """
@@ -314,15 +310,11 @@ class TestSameMeaning:
     def test_means_despite_plural(self):
         directory = Entity("Rural's telephone directory", plural=False)
         listings = Entity("Rural's telephone listings", plural=True)
-        directory_original = Fact(
-            Predicate("$thing was original"), context_factors=directory
-        )
-        listings_original = Fact(
-            Predicate("$thing were original"), context_factors=listings
-        )
+        directory_original = Fact(Predicate("$thing was original"), terms=directory)
+        listings_original = Fact(Predicate("$thing were original"), terms=listings)
         assert directory_original.means(listings_original)
 
-    def test_same_meaning_no_context_factors(self, make_factor):
+    def test_same_meaning_no_terms(self, make_factor):
         assert make_factor["f_no_context"].means(make_factor["f_no_context"])
 
 
@@ -545,8 +537,8 @@ class TestContradiction:
         )
         alice = Entity("Alice")
         bob = Entity("Bob")
-        alice_rich = Fact(p_large_weight, context_factors=alice)
-        bob_poor = Fact(p_small_weight, context_factors=bob)
+        alice_rich = Fact(p_large_weight, terms=alice)
+        bob_poor = Fact(p_small_weight, terms=bob)
         assert alice_rich.contradicts(bob_poor)
 
     def test_inconsistent_statements_about_corresponding_entities(self):
@@ -567,8 +559,8 @@ class TestContradiction:
         )
         alice = Entity("Alice")
         bob = Entity("Bob")
-        alice_rich = Fact(p_large_weight, context_factors=alice)
-        bob_poor = Fact(p_small_weight, context_factors=bob)
+        alice_rich = Fact(p_large_weight, terms=alice)
+        bob_poor = Fact(p_small_weight, terms=bob)
         register = ContextRegister()
         register.insert_pair(alice, alice)
         assert not alice_rich.contradicts(bob_poor, context=register)

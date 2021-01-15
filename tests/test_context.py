@@ -144,7 +144,7 @@ class TestLikelyContext:
         context = next(left.likely_contexts(right))
         assert context.check_match(make_entity["motel"], make_entity["trees"])
 
-    def test_likely_context_different_context_factors(self, make_opinion_with_holding):
+    def test_likely_context_different_terms(self, make_opinion_with_holding):
         lotus = make_opinion_with_holding["lotus_majority"]
         oracle = make_opinion_with_holding["oracle_majority"]
         left = [lotus.holdings[2].outputs[0], lotus.holdings[2].inputs[0].to_effect]

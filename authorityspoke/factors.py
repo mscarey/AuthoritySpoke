@@ -62,12 +62,12 @@ class Factor(Comparable):
         return ()
 
     @property
-    def context_factors(self) -> FactorSequence:
+    def terms(self) -> FactorSequence:
         r"""
         Get :class:`Factor`\s used in comparisons with other :class:`Factor`\s.
 
         :returns:
-            a tuple of attributes that are designated as the ``context_factors``
+            a tuple of attributes that are designated as the ``terms``
             for whichever subclass of :class:`Factor` calls this method. These
             can be used for comparing objects using :meth:`consistent_with`
         """
@@ -142,7 +142,7 @@ class Factor(Comparable):
         self, other: Factor, context: Optional[ContextRegister]
     ) -> Iterator[ContextRegister]:
         """
-        Test equality based on :attr:`context_factors`.
+        Test equality based on :attr:`terms`.
 
         Usually called after a subclasses has injected its own tests
         based on other attributes.
@@ -153,10 +153,10 @@ class Factor(Comparable):
             has ``absent=True``, neither has ``generic=True``, and
             ``other`` is an instance of ``self``'s class.
         """
-        if self.compare_context_factors(other, means):
+        if self.compare_terms(other, means):
             yield from self._context_registers(other, comparison=means, context=context)
 
-    def compare_context_factors(self, other: Factor, relation: Callable) -> bool:
+    def compare_terms(self, other: Factor, relation: Callable) -> bool:
         r"""
         Test if relation holds for corresponding context factors of self and other.
 
@@ -167,11 +167,9 @@ class Factor(Comparable):
         process. Or maybe it's useful for testing.
         """
         valid = True
-        for i, self_factor in enumerate(self.context_factors):
-            if not (self_factor is other.context_factors[i] is None):
-                if not (
-                    self_factor and relation(self_factor, other.context_factors[i])
-                ):
+        for i, self_factor in enumerate(self.terms):
+            if not (self_factor is other.terms[i] is None):
+                if not (self_factor and relation(self_factor, other.terms[i])):
                     valid = False
         return valid
 
@@ -181,7 +179,7 @@ class Factor(Comparable):
         """
         Find if ``self`` would imply ``other`` if they aren't absent or generic.
 
-        Used to test implication based on :attr:`context_factors`,
+        Used to test implication based on :attr:`terms`,
         usually after a subclass has injected its own tests
         based on other attributes.
 
@@ -191,7 +189,7 @@ class Factor(Comparable):
             has ``absent=True``, neither has ``generic=True``, and
             ``other`` is an instance of ``self``'s class.
         """
-        if self.compare_context_factors(other, operator.ge):
+        if self.compare_terms(other, operator.ge):
             yield from self._context_registers(other, operator.ge, context)
 
     def _implies_if_present(

@@ -298,7 +298,7 @@ def read_rule(record: Dict, client: Optional[Client] = None) -> Rule:
 
     :returns:
         iterator yielding :class:`Rule`\s with the items
-        from ``mentioned_entities`` as ``context_factors``
+        from ``mentioned_entities`` as ``terms``
     """
     schema = schemas.RuleSchema()
     record, enactment_index = collect_enactments(record)
@@ -321,7 +321,7 @@ def read_rules(record: List[Dict], client: Optional[Client] = None) -> List[Rule
 
     :returns:
         iterator yielding :class:`Rule`\s with the items
-        from ``mentioned_entities`` as ``context_factors``
+        from ``mentioned_entities`` as ``terms``
     """
 
     schema = schemas.RuleSchema(many=True)

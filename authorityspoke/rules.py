@@ -198,14 +198,14 @@ class Rule(Comparable):
             yield result
 
     @property
-    def context_factors(self) -> Sequence[Sequence[Factor]]:
+    def terms(self) -> Sequence[Sequence[Factor]]:
         """
-        Call :class:`Procedure`\'s :meth:`~Procedure.context_factors` method.
+        Call :class:`Procedure`\'s :meth:`~Procedure.terms` method.
 
         :returns:
-            context_factors from ``self``'s :class:`Procedure`
+            terms from ``self``'s :class:`Procedure`
         """
-        return self.procedure.context_factors
+        return self.procedure.terms
 
     @property
     def generic_factors_by_name(self) -> Dict[str, Factor]:

@@ -258,7 +258,7 @@ class TestOpinionFactors:
             predicate=Predicate(
                 "$product possessed at least some minimal degree of creativity"
             ),
-            context_factors=[api],
+            terms=[api],
             anchors=[anchor],
         )
         name = "the Java API possessed at least some minimal degree of creativity"

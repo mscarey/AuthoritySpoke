@@ -224,7 +224,7 @@ class Comparable(ABC):
 
         :returns:
             a bool indicating whether there's at least one way to
-            match the :attr:`context_factors` of ``self`` and ``other``,
+            match the :attr:`terms` of ``self`` and ``other``,
             such that they fit the relationship ``comparison``.
         """
 
@@ -247,7 +247,7 @@ class Comparable(ABC):
         context: Optional[ContextRegister] = None,
     ) -> Iterator[ContextRegister]:
         r"""
-        Search for ways to match :attr:`context_factors` of ``self`` and ``other``.
+        Search for ways to match :attr:`terms` of ``self`` and ``other``.
 
         :yields:
             all valid ways to make matches between
@@ -261,8 +261,8 @@ class Comparable(ABC):
             if context.get(str(self)) is None or (context.get(str(self)) == other):
                 yield self.generic_register(other)
         else:
-            yield from self.context_factors.ordered_comparison(
-                other=other.context_factors, operation=comparison, context=context
+            yield from self.terms.ordered_comparison(
+                other=other.terms, operation=comparison, context=context
             )
 
     def all_generic_factors_match(self, other: Comparable, context: ContextRegister):
@@ -298,12 +298,12 @@ class Comparable(ABC):
         )
 
     @property
-    def context_factors(self) -> FactorSequence:
+    def terms(self) -> FactorSequence:
         r"""
         Get :class:`Factor`\s used in comparisons with other :class:`Factor`\s.
 
         :returns:
-            a tuple of attributes that are designated as the ``context_factors``
+            a tuple of attributes that are designated as the ``terms``
             for whichever subclass of :class:`Factor` calls this method. These
             can be used for comparing objects using :meth:`consistent_with`
         """
@@ -332,7 +332,7 @@ class Comparable(ABC):
         if self.generic:
             return {str(self): self}
         generics: Dict[str, Comparable] = {}
-        for factor in self.context_factors:
+        for factor in self.terms:
             if factor is not None:
                 for generic in factor.generic_factors:
                     generics[str(generic)] = generic
@@ -368,13 +368,13 @@ class Comparable(ABC):
     @property
     def interchangeable_factors(self) -> List[ContextRegister]:
         """
-        List ways to reorder :attr:`context_factors` but preserve ``self``\'s meaning.
+        List ways to reorder :attr:`terms` but preserve ``self``\'s meaning.
 
         The empty list is the default return value for subclasses that don't
-        have any interchangeable :attr:`context_factors`.
+        have any interchangeable :attr:`terms`.
 
         :returns:
-            the ways :attr:`context_factors` can be reordered without
+            the ways :attr:`terms` can be reordered without
             changing the meaning of ``self``, or whether it would
             be true in a particular context.
         """
@@ -509,14 +509,14 @@ class Comparable(ABC):
     @property
     def recursive_factors(self) -> Dict[str, Comparable]:
         r"""
-        Collect `self`'s :attr:`context_factors`, and their :attr:`context_factors`, recursively.
+        Collect `self`'s :attr:`terms`, and their :attr:`terms`, recursively.
 
         :returns:
             a :class:`dict` (instead of a :class:`set`,
             to preserve order) of :class:`Factor`\s.
         """
         answers: Dict[str, Comparable] = {str(self): self}
-        for context in self.context_factors:
+        for context in self.terms:
             if isinstance(context, Iterable):
                 for item in context:
                     answers.update(item.recursive_factors)
@@ -541,12 +541,12 @@ class Comparable(ABC):
         self, matches: ContextRegister
     ) -> Iterator[ContextRegister]:
         r"""
-        Find possible combination of interchangeable :attr:`context_factors`.
+        Find possible combination of interchangeable :attr:`terms`.
 
         :yields:
             context registers with every possible combination of
             ``self``\'s and ``other``\'s interchangeable
-            :attr:`context_factors`.
+            :attr:`terms`.
         """
         yield matches
         already_returned: List[ContextRegister] = [matches]

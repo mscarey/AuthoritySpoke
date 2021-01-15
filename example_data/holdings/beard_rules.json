@@ -141,7 +141,7 @@
         "inputs": {
             "type": "fact",
             "content": "{the beardcoin transaction} was {the defendant}'s purchase of any beardcoin from {the counterparty}",
-            "context_factors": [
+            "terms": [
                 {
                     "type": "exhibit",
                     "form": "token",

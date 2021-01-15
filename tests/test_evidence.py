@@ -41,19 +41,19 @@ class TestEvidence:
         assert "fact" in evidence.short_string
 
     def test_get_entity_orders(self, make_evidence):
-        context = make_evidence["no_shooting"].exhibit.statement.context_factors
+        context = make_evidence["no_shooting"].exhibit.statement.terms
         assert "Alice" in str(context[0])
         assert "Bob" in str(context[1])
 
     def test_get_entity_orders_no_statement(self, make_factor):
         e = Evidence(Exhibit(form="testimony"), to_effect=make_factor["f_no_crime"])
-        assert len(e.to_effect.context_factors) == 1
+        assert len(e.to_effect.terms) == 1
 
     def test_evidence_str_with_context(self, make_evidence):
         assert "in the form testimony" in str(make_evidence["reciprocal"]).lower()
 
-    def test_type_of_context_factors(self, make_evidence):
-        assert isinstance(make_evidence["no_shooting"].context_factors, FactorSequence)
+    def test_type_of_terms(self, make_evidence):
+        assert isinstance(make_evidence["no_shooting"].terms, FactorSequence)
 
 
 class TestEvidenceSameMeaning:

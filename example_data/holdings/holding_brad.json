@@ -40,7 +40,7 @@
             {
                 "type": "fact",
                 "content": "{} was derived from {}",
-                "context_factors": [
+                "terms": [
                     {
                         "type": "exhibit",
                         "name": "proof of Bradley's guilt",

@@ -53,8 +53,8 @@ class TestHolding:
         """
         assert not make_holding["h1"].inferred_from_exclusive
 
-    def test_type_of_context_factors(self, make_holding):
-        assert isinstance(make_holding["h1"].context_factors, FactorSequence)
+    def test_type_of_terms(self, make_holding):
+        assert isinstance(make_holding["h1"].terms, FactorSequence)
 
     def test_get_evidence_by_name_from_holding(self, make_opinion_with_holding):
         watt = make_opinion_with_holding["watt_majority"]
