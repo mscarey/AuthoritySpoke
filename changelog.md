@@ -4,6 +4,7 @@ dev
 ------------------
 - Predicate.content attribute no longer includes an extra placeholder for a "quantity"
 - Predicate.content attribute must be a valid Python string template
+- Rename "context_factors" field to "terms"
 
 0.4.1 (2021-01-02)
 ------------------

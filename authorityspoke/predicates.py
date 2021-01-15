@@ -291,9 +291,7 @@ class Predicate:
         if not self.consistent_dimensionality(other):
             return False
 
-        if not (
-            self.same_content_meaning(other) and self.reciprocal == other.reciprocal
-        ):
+        if not (self.same_content_meaning(other) and self.same_term_positions(other)):
             return False
 
         if self.quantity and other.quantity:
@@ -319,6 +317,12 @@ class Predicate:
             == other.content_without_placeholders().lower()
         )
 
+    def same_term_positions(self, other: Predicate) -> bool:
+
+        return list(self.term_positions().values()) == list(
+            other.term_positions().values()
+        )
+
     def means(self, other) -> bool:
         """
         Test whether ``self`` and ``other`` have identical meanings.
@@ -332,7 +336,10 @@ class Predicate:
         if not self.same_content_meaning(other):
             return False
 
-        if self.reciprocal != other.reciprocal or self.quantity != other.quantity:
+        if not self.same_term_positions(other):
+            return False
+
+        if self.quantity != other.quantity:
             return False
 
         return self.truth == other.truth and self.comparison == other.comparison
@@ -482,6 +489,24 @@ class Predicate:
             comparison=self.comparison,
             quantity=self.quantity,
         )
+
+    def term_positions(self):
+        """
+        Create list of positions that each term could take without changing Predicate's meaning.
+
+        Assumes that if placeholders are the same except for a final digit, that means
+        they've been labeled as interchangeable with one another.
+        """
+
+        placeholders = self.template.get_placeholders()
+        result = {p: {i} for i, p in enumerate(placeholders)}
+
+        for index, placeholder in enumerate(placeholders):
+            if placeholder[-1].isdigit:
+                for k in result.keys():
+                    if k[-1].isdigit() and k[:-1] == placeholder[:-1]:
+                        result[k].add(index)
+        return result
 
     def add_truth_to_content(self, content: str) -> str:
         if self.truth is None:

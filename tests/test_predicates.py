@@ -13,6 +13,36 @@ class TestPredicates:
                 quantity=Q_("160 centimeters"),
             )
 
+    def test_term_positions(self):
+        predicate = Predicate(
+            template="$organizer1 and $organizer2 planned for $player1 to play $game with $player2."
+        )
+        assert predicate.term_positions() == {
+            "organizer1": {0, 1},
+            "organizer2": {0, 1},
+            "player1": {2, 4},
+            "game": {3},
+            "player2": {2, 4},
+        }
+
+    def test_term_placeholders_do_not_change_result(self):
+        left = Predicate(
+            template="$organizer1 and $organizer2 planned for $player1 to play $game with $player2."
+        )
+        right = Predicate(
+            template="$promoter1 and $promoter2 planned for $player1 to play $chess with $player2."
+        )
+        assert left.means(right)
+
+    def test_term_positions_change_result(self):
+        left = Predicate(
+            template="$organizer1 and $organizer2 planned for $player1 to play $game with $player2."
+        )
+        right = Predicate(
+            template="$organizer1 and $organizer2 planned for $player1 to play $game with $organizer1."
+        )
+        assert not left.means(right)
+
     def test_convert_false_statement_about_quantity_to_obverse(self, make_predicate):
         assert make_predicate["p7_obverse"].truth is True
         assert make_predicate["p7_obverse"].quantity == Q_(35, "foot")
