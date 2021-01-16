@@ -45,9 +45,20 @@
             },
             {
                 "type": "fact",
-                "content": "the distance between the stockpile of trees and Hideaway Lodge was > 35 feet",
+                "content": "the distance between $place1 and $place2 was > 35 feet",
+                "terms": [
+                    {
+                        "type": "entity",
+                        "name": "the stockpile of trees"
+                    },
+                    {
+                        "type": "entity",
+                        "name": "Hideaway Lodge"
+                    }
+                ],
                 "truth": false,
-                "reciprocal": true
+                "reciprocal": true,
+                "name": "long distance"
             },
             {
                 "type": "fact",
@@ -57,7 +68,17 @@
         "despite": [
             {
                 "type": "fact",
-                "content": "the distance between the stockpile of trees and Hideaway Lodge was >= 20 feet"
+                "content": "the distance between $place1 and $place2 was >= 20 feet",
+                "terms": [
+                    {
+                        "type": "entity",
+                        "name": "the stockpile of trees"
+                    },
+                    {
+                        "type": "entity",
+                        "name": "Hideaway Lodge"
+                    }
+                ]
             }
         ],
         "outputs": [
@@ -133,12 +154,7 @@
                 "type": "fact",
                 "content": "the stockpile of trees was among some standing trees"
             },
-            {
-                "type": "fact",
-                "content": "the distance between the stockpile of trees and Hideaway Lodge was > 35 feet",
-                "truth": false,
-                "reciprocal": true
-            },
+            "long distance",
             {
                 "type": "fact",
                 "content": "the distance between the stockpile of trees and a parking area used by personnel and patrons of Hideaway Lodge was <= 5 feet"
@@ -183,12 +199,7 @@
                 "type": "fact",
                 "content": "Wattenburg sought to preserve the stockpile of trees as private"
             },
-            {
-                "type": "fact",
-                "content": "the distance between the stockpile of trees and Hideaway Lodge was > 35 feet",
-                "truth": false,
-                "reciprocal": true
-            },
+            "long distance",
             {
                 "type": "fact",
                 "content": "{} was derived from {}",
@@ -209,7 +220,17 @@
             },
             {
                 "type": "fact",
-                "content": "the distance between the stockpile of trees and Hideaway Lodge was >= 20 feet"
+                "content": "the distance between the $place1 and $place2 was >= 20 feet",
+                "terms": [
+                    {
+                        "type": "entity",
+                        "name": "the stockpile of trees"
+                    },
+                    {
+                        "type": "entity",
+                        "name": "Hideaway Lodge"
+                    }
+                ]
             }
         ],
         "outputs": [
