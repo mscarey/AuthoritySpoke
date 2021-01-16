@@ -186,6 +186,38 @@ class Predicate:
     }
     normalized_comparisons: ClassVar[Dict[str, str]] = {"==": "=", "!=": "<>"}
 
+    @classmethod
+    def read_quantity(
+        cls, value: Union[float, int, str]
+    ) -> Union[float, int, ureg.Quantity]:
+        """
+        Create pint quantity object from text.
+
+        See `pint tutorial <https://pint.readthedocs.io/en/0.9/tutorial.html>`_
+
+        :param quantity:
+            when a string is being parsed for conversion to a
+            :class:`Predicate`, this is the part of the string
+            after the equals or inequality sign.
+        :returns:
+            a Python number object or a :class:`Quantity`
+            object created with `pint.UnitRegistry
+            <https://pint.readthedocs.io/en/0.9/tutorial.html>`_.
+        """
+        if value is None:
+            return None
+        if isinstance(value, (int, float, ureg.Quantity)):
+            return value
+        quantity = value.strip()
+        if quantity.isdigit():
+            return int(quantity)
+        float_parts = quantity.split(".")
+        if len(float_parts) == 2 and all(
+            substring.isnumeric() for substring in float_parts
+        ):
+            return float(quantity)
+        return Q_(quantity)
+
     def __init__(
         self,
         template: str,
@@ -204,7 +236,7 @@ class Predicate:
         self.truth = truth
         self.reciprocal = reciprocal
         self.comparison = comparison
-        self.quantity = quantity
+        self.quantity = self.read_quantity(quantity)
 
         if self.comparison and self.comparison not in self.opposite_comparisons.keys():
             raise ValueError(
@@ -510,7 +542,7 @@ class Predicate:
                         result[k].add(index)
         return result
 
-    def term_permutations(self) -> List[List[int]]:
+    def term_index_permutations(self) -> List[List[int]]:
         """Get the arrangements of all this Predicate's terms that preserve the same meaning."""
         product_of_positions = product(*self.term_positions().values())
         without_duplicates = [x for x in product_of_positions if len(set(x)) == len(x)]

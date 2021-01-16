@@ -154,34 +154,6 @@ class DecisionSchema(ExpandableSchema):
         return data
 
 
-def read_quantity(value: Union[float, int, str]) -> Union[float, int, ureg.Quantity]:
-    """
-    Create pint quantity object from text.
-
-    See `pint tutorial <https://pint.readthedocs.io/en/0.9/tutorial.html>`_
-
-    :param quantity:
-        when a string is being parsed for conversion to a
-        :class:`Predicate`, this is the part of the string
-        after the equals or inequality sign.
-    :returns:
-        a Python number object or a :class:`Quantity`
-        object created with `pint.UnitRegistry
-        <https://pint.readthedocs.io/en/0.9/tutorial.html>`_.
-    """
-    if isinstance(value, (int, float)):
-        return value
-    quantity = value.strip()
-    if quantity.isdigit():
-        return int(quantity)
-    float_parts = quantity.split(".")
-    if len(float_parts) == 2 and all(
-        substring.isnumeric() for substring in float_parts
-    ):
-        return float(quantity)
-    return Q_(quantity)
-
-
 def dump_quantity(obj: Predicate) -> Optional[Union[float, int, str]]:
     """Convert quantity to string if it's a pint ureg.Quantity object."""
     if obj is None or obj.quantity is None:
@@ -203,7 +175,9 @@ class PredicateSchema(ExpandableSchema):
         missing="",
         validate=validate.OneOf([""] + list(Predicate.opposite_comparisons.keys())),
     )
-    quantity = fields.Function(dump_quantity, deserialize=read_quantity, missing=None)
+    quantity = fields.Function(
+        dump_quantity, deserialize=Predicate.read_quantity, missing=None
+    )
 
     def get_content_with_placeholders(self, obj) -> str:
         return obj.template.template
