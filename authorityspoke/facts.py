@@ -252,6 +252,12 @@ class Fact(Factor):
         )
         return result
 
+    def term_permutations(self) -> Iterator[FactorSequence]:
+        """Generate permutations of context factors that preserve same meaning."""
+        for pattern in self.predicate.term_index_permutations():
+            sorted_terms = [x for _, x in sorted(zip(pattern, self.terms))]
+            yield FactorSequence(sorted_terms)
+
 
 def build_fact(
     predicate: Predicate,

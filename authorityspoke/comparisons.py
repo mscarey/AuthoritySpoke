@@ -537,6 +537,10 @@ class Comparable(ABC):
                 if answer:
                     yield guess
 
+    def term_permutations(self) -> Iterator[FactorSequence]:
+        """Generate permutations of context factors that preserve same meaning."""
+        yield self.terms
+
     def _registers_for_interchangeable_context(
         self, matches: ContextRegister
     ) -> Iterator[ContextRegister]:
@@ -549,9 +553,13 @@ class Comparable(ABC):
             :attr:`terms`.
         """
         yield matches
+        gen = self.term_permutations()
+        unchanged_permutation = next(gen)
         already_returned: List[ContextRegister] = [matches]
-        for replacement_dict in self.interchangeable_factors:
-            changed_registry = matches.replace_keys(replacement_dict)
+
+        for term_permutation in gen:
+            changes = ContextRegister.from_lists(self.terms, term_permutation)
+            changed_registry = matches.replace_keys(changes)
             if not any(
                 changed_registry == returned_dict for returned_dict in already_returned
             ):

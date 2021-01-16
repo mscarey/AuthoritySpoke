@@ -99,22 +99,11 @@ class TestContextRegisters:
         Test that _registers_for_interchangeable_context swaps the first two
         items in the ContextRegister
         """
-        matches = ContextRegister()
-        matches.insert_pair(make_entity["motel"], make_entity["trees"])
-        matches.insert_pair(make_entity["trees"], make_entity["motel"])
-        matches.insert_pair(make_entity["watt"], make_entity["watt"])
-
-        new_matches = [
-            match
-            for match in watt_factor["f7"]._registers_for_interchangeable_context(
-                matches
-            )
-        ]
-        expected = ContextRegister()
-        expected.insert_pair(make_entity["trees"], make_entity["trees"])
-        expected.insert_pair(make_entity["motel"], make_entity["motel"])
-        expected.insert_pair(make_entity["watt"], make_entity["watt"])
-        assert expected in new_matches
+        factor = watt_factor["f7"]
+        first_pattern, second_pattern = list(factor.term_permutations())
+        assert first_pattern[0] == second_pattern[1]
+        assert first_pattern[1] == second_pattern[0]
+        assert first_pattern[0] != first_pattern[1]
 
 
 class TestLikelyContext:

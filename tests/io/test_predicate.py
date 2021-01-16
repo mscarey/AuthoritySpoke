@@ -79,7 +79,7 @@ class TestPredicateLoad:
         assert p7.comparison == "<>"
 
     def test_read_quantity(self):
-        quantity = schemas.read_quantity("35 feet")
+        quantity = Predicate.read_quantity("35 feet")
         assert str(quantity.units) == "foot"
 
     def test_make_comparison_when_absent(self):

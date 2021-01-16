@@ -39,7 +39,7 @@ class TestPredicates:
         predicate = Predicate(
             template="$organizer1 and $organizer2 planned for $player1 to play $game with $player2."
         )
-        assert predicate.term_permutations() == [
+        assert predicate.term_index_permutations() == [
             (0, 1, 2, 3, 4),
             (0, 1, 4, 3, 2),
             (1, 0, 2, 3, 4),
@@ -50,7 +50,7 @@ class TestPredicates:
         predicate = Predicate(
             template="$organizer1 and $organizer2 planned for $organizer1 to play $game with $organizer2."
         )
-        assert predicate.term_permutations() == [
+        assert predicate.term_index_permutations() == [
             (0, 1, 2),
             (1, 0, 2),
         ]

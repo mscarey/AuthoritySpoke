@@ -1,3 +1,5 @@
+from authorityspoke.comparisons import FactorSequence
+from authorityspoke.predicates import Predicate
 import json
 import os
 import pathlib
@@ -7,6 +9,7 @@ from legislice import Enactment
 import pytest
 
 from authorityspoke.entities import Entity
+from authorityspoke.facts import Fact
 from authorityspoke.io import readers, schemas, name_index
 from authorityspoke.io.loaders import load_holdings
 from authorityspoke.io import filepaths
@@ -100,6 +103,29 @@ class TestFactLoad:
 
 
 class TestFactorLoad:
+    def test_load_factor_marked_reciprocal(self):
+        fact = Fact(
+            Predicate(
+                "the distance between $place1 and $place2 was",
+                comparison="<",
+                quantity="5 miles",
+            ),
+            terms=FactorSequence([Entity("the apartment"), Entity("the office")]),
+        )
+        assert hasattr(fact.predicate.quantity, "dimensionality")
+        data = {
+            "type": "fact",
+            "content": "the distance between ${place1} and ${place2} was",
+            "comparison": "<",
+            "quantity": "5 miles",
+            "terms": [
+                {"type": "entity", "name": "the office"},
+                {"type": "entity", "name": "the apartment"},
+            ],
+        }
+        loaded_fact = readers.read_factor(data)
+        assert loaded_fact.means(fact)
+
     def test_import_fact_with_factor_schema(self):
         loaded = load_holdings("holding_cardenas.json")
         entity = readers.read_factor(loaded[0]["inputs"][0])

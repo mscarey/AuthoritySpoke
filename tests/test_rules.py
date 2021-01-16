@@ -503,6 +503,16 @@ class TestContradiction:
         assert not make_rule["h2_MUST"].contradicts(make_rule["h2"])
         assert not make_rule["h2"].contradicts(make_rule["h2_MUST"])
 
+    def test_abbreviated_contradiction_with_distance(
+        self, make_opinion_with_holding, make_holding
+    ):
+        watt = make_opinion_with_holding["watt_majority"]
+        watt_rule = list(watt.holdings)[1].rule
+        must_not_rule = make_holding["h2_output_false_ALL_MUST"]
+        watt_rule.procedure.inputs = FactorGroup([watt_rule.inputs[3]])
+        must_not_rule.procedure.inputs = FactorGroup([must_not_rule.inputs[3]])
+        assert watt_rule.contradicts(must_not_rule)
+
     # Contradiction of other types
 
     def test_sometimes_must_contradicts_holding_always_must_not(
