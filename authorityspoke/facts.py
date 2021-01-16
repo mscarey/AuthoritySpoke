@@ -144,40 +144,6 @@ class Fact(Factor):
         return super().__str__().format(string).replace("Fact", "fact")
 
     @property
-    def interchangeable_factors(self) -> List[ContextRegister]:
-        r"""
-        Get ways to reorder context :class:`Factor`\s without changing truth value of ``self``.
-
-        Each :class:`dict` returned has :class:`Factor`\s to replace as keys,
-        and :class:`Factor`\s to replace them with as values.
-        If there's more than one way to rearrange the context factors,
-        more than one :class:`dict` should be returned.
-
-        Currently the predicate must be phrased either in a way that
-        doesn't make any context factors interchangeable, or if the
-        ``reciprocal`` flag is set, in a way that allows only the
-        first two context factors to switch places.
-
-        :returns:
-            the ways the context factors referenced by the
-            :class:`Factor` object can be reordered without changing
-            the truth value of the :class:`Factor`.
-
-        """
-        if self.predicate and self.predicate.reciprocal:
-            if not (self.terms[1] and self.terms[0]):
-                raise AttributeError(
-                    f"{self.predicate} cannot be marked as reciprocal without two context factors. "
-                    f"Existing context factors are {self.terms}."
-                )
-            swapping_first_factors = ContextRegister()
-            swapping_first_factors.insert_pair(self.terms[1], self.terms[0])
-            swapping_first_factors.insert_pair(self.terms[0], self.terms[1])
-
-            return [swapping_first_factors]
-        return []
-
-    @property
     def content(self) -> Optional[str]:
         """Access :attr:`~Predicate.content` attribute."""
         return self.predicate.content

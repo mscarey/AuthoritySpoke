@@ -5,6 +5,8 @@ dev
 - Predicate.content attribute no longer includes an extra placeholder for a "quantity"
 - Predicate.content attribute must be a valid Python string template
 - Rename "context_factors" field to "terms"
+- Rely on Predicate placeholder names to label terms as interchangeable
+- Remove Predicate.reciprocal field used to label terms as interchangeable
 
 0.4.1 (2021-01-02)
 ------------------

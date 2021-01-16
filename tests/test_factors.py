@@ -181,17 +181,6 @@ class TestFacts:
         assert len(watt_factor["f1"].predicate) == 1
         assert len(watt_factor["f1"]) == 1
 
-    def test_terms_reciprocal(self, make_entity, watt_factor):
-        """Predicate.new() no longer coerces the order of self.terms.
-        Instead, Fact.entity_orders() returns every possible order."""
-
-        motel_near_watt = watt_factor["f7_swap_entities_4"]
-        assert len(motel_near_watt.interchangeable_factors[0]) == 2
-        assert (
-            str(make_entity["motel_specific"])
-            in motel_near_watt.interchangeable_factors[0].keys()
-        )
-
     def test_predicate_with_entities(self, make_entity, watt_factor):
         assert "<Hideaway Lodge> was a motel" in watt_factor[
             "f1"

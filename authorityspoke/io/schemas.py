@@ -170,7 +170,6 @@ class PredicateSchema(ExpandableSchema):
     template = fields.Str(data_key="content", load_only=True)
     content = fields.Method(serialize="get_content_with_placeholders", dump_only=True)
     truth = fields.Bool(missing=True)
-    reciprocal = fields.Bool(missing=False)
     comparison = fields.Str(
         missing="",
         validate=validate.OneOf([""] + list(Predicate.opposite_comparisons.keys())),
@@ -294,7 +293,6 @@ class FactSchema(ExpandableSchema):
         to_nest = [
             "content",
             "truth",
-            "reciprocal",
             "comparison",
             "quantity",
         ]

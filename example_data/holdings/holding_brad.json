@@ -318,8 +318,7 @@
             },
             {
                 "type": "fact",
-                "content": "the distance between Bradley's marijuana patch and Bradley's house was >= 20 feet",
-                "reciprocal": true
+                "content": "the distance between Bradley's marijuana patch and Bradley's house was >= 20 feet"
             },
             {
                 "type": "fact",
@@ -391,8 +390,7 @@
                         "type": "entity",
                         "name": "Bradley's house"
                     }
-                ],
-                "reciprocal": true
+                ]
             },
             {
                 "type": "fact",

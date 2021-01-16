@@ -49,7 +49,7 @@ class Factor(Comparable):
         """
         Get names of attributes to compare in :meth:`~Factor.means` or :meth:`~Factor.__ge__`.
 
-        This method and :meth:`interchangeable_factors` should be the only parts
+        This method should be the only part
         of the context-matching process that need to be unique for each
         subclass of :class:`Factor`.
 

@@ -24,7 +24,6 @@ class TestPredicateLoad:
                 {
                     "content": "the distance between $place1 and $place2 was 35 feet",
                     "truth": True,
-                    "reciprocal": True,
                     "comparison": "!=",
                     "quantity": "35 feet",
                 }
@@ -36,7 +35,6 @@ class TestPredicateLoad:
             {
                 "content": "the distance between $place1 and $place2 was",
                 "truth": True,
-                "reciprocal": True,
                 "comparison": "!=",
                 "quantity": "35 feet",
             }
@@ -49,7 +47,6 @@ class TestPredicateLoad:
             data={
                 "content": "the distance between $place1 and $place2 was > 35 feet",
                 "truth": True,
-                "reciprocal": True,
             }
         )
         assert p7.comparison == ">"
@@ -60,7 +57,6 @@ class TestPredicateLoad:
             data={
                 "content": "the distance between $place1 and $place2 was != 35 feet",
                 "truth": True,
-                "reciprocal": True,
             }
         )
         assert p7.comparison == "<>"
@@ -71,7 +67,6 @@ class TestPredicateLoad:
             data={
                 "content": "the distance between $place1 and $place2 was",
                 "truth": True,
-                "reciprocal": True,
                 "comparison": "!=",
                 "quantity": "35 feet",
             }
@@ -97,7 +92,6 @@ class TestPredicateDump:
         predicate = Predicate(
             "the distance between $place1 and $place2 was",
             truth=True,
-            reciprocal=True,
             comparison="<>",
             quantity=Q_("35 feet"),
         )

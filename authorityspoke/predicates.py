@@ -154,11 +154,6 @@ class Predicate:
         true or false. ``None`` indicates an assertion as to "whether"
         the clause is true or false, without specifying which.
 
-    :param reciprocal:
-        if True, then the order of the first two entities
-        is considered interchangeable. There's no way to make any entities
-        interchangeable other than the first two.
-
     :param comparison:
         A string representing an equality or inequality sign like ``==``,
         ``>``, or ``<=``. Used to indicate that the clause ends with a
@@ -222,7 +217,6 @@ class Predicate:
         self,
         template: str,
         truth: Optional[bool] = True,
-        reciprocal: bool = False,
         comparison: str = "",
         quantity: Optional[Union[int, float, ureg.Quantity]] = None,
     ):
@@ -234,7 +228,6 @@ class Predicate:
         """
         self.template = StatementTemplate(template, make_singular=True)
         self.truth = truth
-        self.reciprocal = reciprocal
         self.comparison = comparison
         self.quantity = self.read_quantity(quantity)
 
@@ -257,7 +250,7 @@ class Predicate:
     def __repr__(self):
         return (
             f'Predicate(template="{self.template.template}", '
-            "truth={self.truth}, reciprocal={self.reciprocal}, "
+            "truth={self.truth}, "
             'comparison="{self.comparison}", quantity={self.quantity})'
         )
 
@@ -405,7 +398,8 @@ class Predicate:
 
         # Assumes no predicate implies another based on meaning of their content text
         if not (
-            self.same_content_meaning(other) and self.reciprocal == other.reciprocal
+            self.same_content_meaning(other)
+            and self.term_index_permutations() == other.term_index_permutations()
         ):
             return False
 
@@ -518,7 +512,6 @@ class Predicate:
         return Predicate(
             template=self.content,
             truth=not self.truth,
-            reciprocal=self.reciprocal,
             comparison=self.comparison,
             quantity=self.quantity,
         )

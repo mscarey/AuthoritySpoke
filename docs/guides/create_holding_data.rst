@@ -538,9 +538,6 @@ into the Holding object, as shown in the examples above.
             quantity:
               default: null
               nullable: true
-            reciprocal:
-              default: false
-              type: boolean
             truth:
               default: true
               type: boolean
@@ -632,4 +629,4 @@ share over the web.
 
     >>> from authorityspoke.io import dump
     >>> dump.to_json(oracle.holdings[0].outputs[0])
-    '{"name": "false the Java API was copyrightable", "standard_of_proof": null, "terms": [{"name": "the Java API", "plural": false, "anchors": [], "generic": true, "type": "Entity"}], "predicate": {"quantity": null, "truth": false, "comparison": "", "reciprocal": false, "content": "{} was copyrightable"}, "generic": false, "absent": false, "anchors": [{"exact": "copyright protection.", "prefix": "must be \\u201coriginal\\u201d to qualify for ", "suffix": ""}, {"exact": "whether the non-literal elements of a program \\u201care protected", "prefix": "", "suffix": ""}]}'
+    '{"name": "false the Java API was copyrightable", "standard_of_proof": null, "terms": [{"name": "the Java API", "plural": false, "anchors": [], "generic": true, "type": "Entity"}], "predicate": {"quantity": null, "truth": false, "comparison": "", "content": "{} was copyrightable"}, "generic": false, "absent": false, "anchors": [{"exact": "copyright protection.", "prefix": "must be \\u201coriginal\\u201d to qualify for ", "suffix": ""}, {"exact": "whether the non-literal elements of a program \\u201care protected", "prefix": "", "suffix": ""}]}'

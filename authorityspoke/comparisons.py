@@ -6,7 +6,7 @@ import functools
 from itertools import permutations, zip_longest
 import logging
 import textwrap
-from typing import Any, Callable, Dict, Iterable, Iterator
+from typing import Any, Callable, ClassVar, Dict, Iterable, Iterator
 from typing import List, Optional, Sequence, Tuple, Union
 
 logger = logging.getLogger(__name__)
@@ -210,6 +210,7 @@ def convert_changes_to_register(
 
 class Comparable(ABC):
     generic: bool = False
+    context_factor_names: ClassVar[Tuple] = ()
 
     @property
     def short_string(self) -> str:
@@ -364,21 +365,6 @@ class Comparable(ABC):
             if name == query:
                 return factor
         return None
-
-    @property
-    def interchangeable_factors(self) -> List[ContextRegister]:
-        """
-        List ways to reorder :attr:`terms` but preserve ``self``\'s meaning.
-
-        The empty list is the default return value for subclasses that don't
-        have any interchangeable :attr:`terms`.
-
-        :returns:
-            the ways :attr:`terms` can be reordered without
-            changing the meaning of ``self``, or whether it would
-            be true in a particular context.
-        """
-        return []
 
     def implied_by(
         self, other: Optional[Comparable], context: Optional[ContextRegister] = None

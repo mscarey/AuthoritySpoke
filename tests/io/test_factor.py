@@ -94,7 +94,6 @@ class TestFactLoad:
     def test_make_fact_from_string(self, watt_factor):
         fact_float_data = {
             "content": "the distance between {Ann} and {Lee} was >= 20.1",
-            "reciprocal": True,
         }
         fact_float_more = expand_shorthand(fact_float_data)
         fact_float_more = readers.read_fact(fact_float_more)

@@ -68,9 +68,7 @@ def make_predicate() -> Dict[str, Predicate]:
         "p1": Predicate("$place was a motel"),
         "p1_again": Predicate("$place was a motel"),
         "p2": Predicate("$person operated and lived at $place"),
-        "p2_reflexive": Predicate(
-            "$person operated and lived at $person", reciprocal=True
-        ),
+        "p2_reflexive": Predicate("$person operated and lived at $person"),
         "p2_no_truth": Predicate("$person operated and lived at $place", truth=None),
         "p2_false": Predicate("$person operated and lived at $place", truth=False),
         "p3": Predicate("$place was ${person}’s abode"),
@@ -81,77 +79,65 @@ def make_predicate() -> Dict[str, Predicate]:
         "p7": Predicate(
             "the distance between $place1 and $place2 was",
             truth=False,
-            reciprocal=True,
             comparison=">",
             quantity=Q_("35 feet"),
         ),
         "p7_obverse": Predicate(
             "the distance between $place1 and $place2 was",
             truth=True,
-            reciprocal=True,
             comparison="<=",
             quantity=Q_("35 feet"),
         ),
         "p7_opposite": Predicate(
             "the distance between $place1 and $place2 was",
             truth=True,
-            reciprocal=True,
             comparison=">",
             quantity=Q_("35 feet"),
         ),
         "p7_not_equal": Predicate(
             "the distance between $place1 and $place2 was",
             truth=True,
-            reciprocal=True,
             comparison="<>",
             quantity=Q_("35 feet"),
         ),
         "p7_true": Predicate(
             "the distance between $place1 and $place2 was",
             truth=True,
-            reciprocal=True,
             comparison="<",
             quantity=Q_("35 feet"),
         ),
         "p8": Predicate(
             "the distance between $place1 and $place2 was",
-            reciprocal=True,
             comparison=">=",
             quantity=Q_("20 feet"),
         ),
         "p8_exact": Predicate(
             "the distance between $place1 and $place2 was",
-            reciprocal=True,
             comparison="==",
             quantity=Q_("25 feet"),
         ),
         "p8_less": Predicate(
             "the distance between $place1 and $place2 was",
-            reciprocal=True,
             comparison="<=",
             quantity=Q_("20 feet"),
         ),
         "p8_meters": Predicate(
             "the distance between $place1 and $place2 was",
-            reciprocal=True,
             comparison=">=",
             quantity=Q_("10 meters"),
         ),
         "p8_int": Predicate(
             "the distance between $place1 and $place2 was",
-            reciprocal=True,
             comparison=">=",
             quantity=20,
         ),
         "p8_float": Predicate(
             "the distance between $place1 and $place2 was",
-            reciprocal=True,
             comparison=">=",
             quantity=20.0,
         ),
         "p8_higher_int": Predicate(
             "the distance between $place1 and $place2 was",
-            reciprocal=True,
             comparison=">=",
             quantity=30,
         ),
@@ -229,7 +215,7 @@ def make_predicate() -> Dict[str, Predicate]:
             comparison=">=",
             quantity=Q_("100 kilograms"),
         ),
-        "p_friends": Predicate("$person1 and $person2 were friends", reciprocal=True),
+        "p_friends": Predicate("$person1 and $person2 were friends"),
         "p_reliable": Predicate("$evidence was reliable"),
         "p_quantity=3": Predicate(
             "The number of mice was", comparison="==", quantity=3
