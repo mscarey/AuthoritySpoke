@@ -223,6 +223,15 @@ class TestFacts:
         factor = build_fact(predicate)
         assert not hasattr(factor, "case_factors")
 
+    def test_repeated_placeholder_in_fact(self, make_opinion_with_holding):
+        holding = make_opinion_with_holding["lotus_majority"].holdings[9]
+        fact = holding.inputs[1]
+        assert fact.short_string == (
+            "the fact it was false that the precise formulation "
+            "of <Lotus 1-2-3>'s code was necessary for <Lotus 1-2-3> to work"
+        )
+        assert len(fact.terms) == 1
+
 
 class TestSameMeaning:
     def test_equality_factor_from_same_predicate(self, watt_factor):

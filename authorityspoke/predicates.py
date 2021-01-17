@@ -82,7 +82,7 @@ class StatementTemplate(Template):
     def _check_number_of_terms(
         self, placeholders: List[str], context: Sequence[Factor]
     ) -> None:
-        if len(placeholders) != len(context):
+        if len(set(placeholders)) != len(context):
             raise ValueError(
                 f"The number of terms passed in 'context' ({len(context)}) must be equal to the "
                 f"number of placeholders in the StatementTemplate ({len(placeholders)})."
