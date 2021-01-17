@@ -203,7 +203,7 @@ class Procedure(Comparable):
         despite = self.despite or ()
         return [*self.outputs, *inputs, *despite]
 
-    def generic_factors_by_name(self) -> Dict[str, Comparable]:
+    def generic_factors_by_str(self) -> Dict[str, Comparable]:
         r"""
         :class:`.Factor`\s that can be replaced without changing ``self``\s meaning.
 

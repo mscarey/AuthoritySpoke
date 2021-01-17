@@ -207,7 +207,7 @@ class Rule(Comparable):
         """
         return self.procedure.terms
 
-    def generic_factors_by_name(self) -> Dict[str, Comparable]:
+    def generic_factors_by_str(self) -> Dict[str, Comparable]:
         r"""
         Get :class:`.Factor`\s that can be replaced without changing ``self``\s meaning.
 
@@ -216,7 +216,7 @@ class Rule(Comparable):
         """
         if self.generic:
             return {str(self): self}
-        return self.procedure.generic_factors_by_name()
+        return self.procedure.generic_factors_by_str()
 
     def add_enactment(self, incoming: Enactment, role: str = "enactments") -> Rule:
         """

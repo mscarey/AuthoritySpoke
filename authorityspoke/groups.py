@@ -272,10 +272,10 @@ class ComparableGroup(Tuple[F, ...], Comparable):
             operation=means, still_need_matches=list(other), matches=context
         )
 
-    def generic_factors_by_name(self) -> Dict[str, Comparable]:
+    def generic_factors_by_str(self) -> Dict[str, Comparable]:
         generics: Dict[str, Comparable] = {}
         for factor in self:
-            generics.update(factor.generic_factors_by_name())
+            generics.update(factor.generic_factors_by_str())
         return generics
 
     def has_all_factors_of(

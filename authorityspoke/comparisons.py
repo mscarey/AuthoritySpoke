@@ -198,7 +198,7 @@ def convert_changes_to_register(
             and all(isinstance(factor, Comparable) for factor in changes[1])
         ):
             return ContextRegister.from_lists(changes[0], changes[1])
-        generic_factors = factor.generic_factors_by_name().keys()
+        generic_factors = factor.generic_factors_by_str().keys()
         if len(generic_factors) != len(changes):
             raise ValueError(
                 f"Needed {len(generic_factors)} replacements for the "
@@ -317,9 +317,9 @@ class Comparable(ABC):
         return FactorSequence(context)
 
     def generic_factors(self) -> List[Comparable]:
-        return list(self.generic_factors_by_name().values())
+        return list(self.generic_factors_by_str().values())
 
-    def generic_factors_by_name(self) -> Dict[str, Comparable]:
+    def generic_factors_by_str(self) -> Dict[str, Comparable]:
         r"""
         :class:`.Factor`\s that can be replaced without changing ``self``\s meaning.
 
