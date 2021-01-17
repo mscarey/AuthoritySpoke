@@ -86,22 +86,6 @@ def assign_name_from_content(obj: Dict) -> str:
     return f"{false_modifier}{content_for_name}".replace("{", "").replace("}", "")
 
 
-def assign_name_for_enactment(obj: Dict) -> str:
-    r"""
-    Return an appropriate name for an Enactment.
-
-    :param obj: an unloaded :class:`.Enactment`
-
-    :returns: a name for the Enactment
-    """
-    name = obj["node"]
-    if obj.get("exact"):
-        name += obj["exact"]
-    elif obj.get("prefix") or obj.get("suffix"):
-        name += f' {obj.get("prefix")} {obj.get("suffix")}'.strip()
-    return name
-
-
 def assign_name_for_evidence(obj: Dict) -> str:
     r"""
     Return an appropriate name for Evidence.
@@ -153,8 +137,6 @@ def create_name_for_factor(obj: Dict) -> str:
         return ""
     elif obj.get("predicate", {}).get("content"):
         name = assign_name_from_content(obj)
-    elif obj.get("node"):
-        name = assign_name_for_enactment(obj)
     elif (
         obj.get("exhibit")
         or (obj.get("type") and obj.get("type").lower()) == "evidence"
