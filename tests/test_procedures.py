@@ -21,9 +21,9 @@ class TestProcedures:
 
     def test_get_terms(self, make_procedure):
         # motel, watt
-        assert len(make_procedure["c1"].generic_factors) == 2
+        assert len(make_procedure["c1"].generic_factors()) == 2
         # trees, motel
-        assert len(make_procedure["c2"].generic_factors) == 2
+        assert len(make_procedure["c2"].generic_factors()) == 2
 
     def test_procedure_length(self, make_procedure):
         """Consider deleting Procedure.__len__() and this test."""
@@ -45,7 +45,7 @@ class TestProcedures:
         (0, 1) or (1, 0).
         """
         e = make_entity
-        factors = make_procedure["c3"].generic_factors
+        factors = make_procedure["c3"].generic_factors()
         for factor in (
             e["motel"],
             e["tree_search"],

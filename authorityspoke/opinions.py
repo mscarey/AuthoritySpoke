@@ -176,7 +176,6 @@ class Opinion(Comparable):
                 f"'Implies' test not implemented for types {self.__class__} and {other.__class__}."
             )
 
-    @property
     def generic_factors_by_name(self) -> Dict[str, Comparable]:
         r"""
         Get all generic :class:`.Factor`\s mentioned in ``self``.
@@ -189,7 +188,7 @@ class Opinion(Comparable):
         """
         generics: Dict[str, Comparable] = {}
         for holding in self.holdings:
-            for generic in holding.generic_factors:
+            for generic in holding.generic_factors():
                 generics[str(generic)] = generic
         return generics
 

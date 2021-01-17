@@ -96,7 +96,7 @@ class TestImplication:
         and "plural": true
         """
         feist = make_opinion_with_holding["feist_majority"]
-        assert any(entity.plural is True for entity in feist.generic_factors)
+        assert any(entity.plural is True for entity in feist.generic_factors())
 
 
 class TestContradiction:

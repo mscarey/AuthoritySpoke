@@ -75,15 +75,15 @@ class TestRules:
     def test_new_context_choose_factor_to_replace_by_name(self, make_beard_rule):
         transfer_rule = make_beard_rule[11]
         barber_rule = make_beard_rule[-1]
-        defendant = transfer_rule.generic_factors[0]
-        counterparty = transfer_rule.generic_factors[2]
+        defendant = transfer_rule.generic_factors()[0]
+        counterparty = transfer_rule.generic_factors()[2]
         defendant_rule = barber_rule.new_context(
             {"the barber": defendant, "the customer": counterparty}
         )
-        assert defendant_rule.generic_factors[1].name == "the defendant"
+        assert defendant_rule.generic_factors()[1].name == "the defendant"
 
     def test_generic_factors(self, make_entity, make_holding):
-        generics = make_holding["h3"].generic_factors
+        generics = make_holding["h3"].generic_factors()
         assert make_entity["motel"] in generics
         assert make_entity["tree_search"] in generics
 
@@ -93,7 +93,7 @@ class TestRules:
     def test_generic_factors_order(self, make_entity, make_holding):
         """The motel is mentioned in the first input in the JSON,
         so it should be first."""
-        generics = make_holding["h1"].generic_factors
+        generics = make_holding["h1"].generic_factors()
         assert list(generics) == [make_entity["motel"], make_entity["watt"]]
 
     def test_string_with_line_breaks(self, make_opinion_with_holding):

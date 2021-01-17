@@ -24,6 +24,7 @@ from legislice.enactments import Enactment
 from authorityspoke.comparisons import (
     Comparable,
     ContextRegister,
+    FactorSequence,
     contradicts,
     new_context_helper,
 )
@@ -127,7 +128,7 @@ class Holding(Comparable):
         return self.rule.enactments_despite
 
     @property
-    def terms(self) -> Tuple:
+    def terms(self) -> FactorSequence:
         r"""
         Call :class:`Procedure`\'s :meth:`~Procedure.terms` method.
 
@@ -136,15 +137,14 @@ class Holding(Comparable):
         """
         return self.rule.procedure.terms
 
-    @property
-    def generic_factors_by_name(self) -> Dict[str, Factor]:
+    def generic_factors_by_name(self) -> Dict[str, Comparable]:
         r"""
         Get :class:`.Factor`\s that can be replaced without changing ``self``\s meaning.
 
         :returns:
             generic :class:`.Factor`\s from ``self``'s :class:`Procedure`
         """
-        return self.rule.generic_factors_by_name
+        return self.rule.generic_factors_by_name()
 
     @property
     def mandatory(self) -> bool:

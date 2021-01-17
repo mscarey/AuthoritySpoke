@@ -85,7 +85,7 @@ class Factor(Comparable):
         if self >= other:
             return self
         if other >= self:
-            return other.new_context(self.generic_factors)
+            return other.new_context(self.generic_factors())
         return None
 
     def _contradicts_if_present(

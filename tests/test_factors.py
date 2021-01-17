@@ -631,14 +631,14 @@ class TestConsistent:
         left = watt_factor["f8_less"]
         right = watt_factor["f8_meters"]
         register = ContextRegister()
-        register.insert_pair(left.generic_factors[0], right.generic_factors[0])
+        register.insert_pair(left.generic_factors()[0], right.generic_factors()[0])
         assert not left.consistent_with(right, register)
 
     def test_explanations_consistent_with(self, watt_factor):
         left = watt_factor["f8_less"]
         right = watt_factor["f8_meters"]
         register = ContextRegister()
-        register.insert_pair(left.generic_factors[0], right.generic_factors[0])
+        register.insert_pair(left.generic_factors()[0], right.generic_factors()[0])
         explanations = list(left.explanations_consistent_with(right, context=register))
         assert not explanations
 

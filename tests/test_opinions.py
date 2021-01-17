@@ -62,7 +62,7 @@ class TestOpinions:
         watt.posit(
             h["h4"], context=(e["trees"], e["tree_search"], e["motel"], e["watt"])
         )
-        assert make_entity["watt"] in make_opinion["watt_majority"].generic_factors
+        assert make_entity["watt"] in make_opinion["watt_majority"].generic_factors()
 
     def test_opinion_date(self, make_decision):
         """

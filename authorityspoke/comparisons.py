@@ -198,7 +198,7 @@ def convert_changes_to_register(
             and all(isinstance(factor, Comparable) for factor in changes[1])
         ):
             return ContextRegister.from_lists(changes[0], changes[1])
-        generic_factors = factor.generic_factors_by_name.keys()
+        generic_factors = factor.generic_factors_by_name().keys()
         if len(generic_factors) != len(changes):
             raise ValueError(
                 f"Needed {len(generic_factors)} replacements for the "
@@ -266,12 +266,14 @@ class Comparable(ABC):
                 other=other.terms, operation=comparison, context=context
             )
 
-    def all_generic_factors_match(self, other: Comparable, context: ContextRegister):
+    def all_generic_factors_match(
+        self, other: Comparable, context: ContextRegister
+    ) -> bool:
         if all(
             all(
                 context.get_factor(key) == context_register.get_factor(key)
                 or context.get_factor(context_register.get(str(key))) == key
-                for key in self.generic_factors
+                for key in self.generic_factors()
             )
             for context_register in self._context_registers(
                 other=other, comparison=means, context=context
@@ -314,11 +316,9 @@ class Comparable(ABC):
             context.append(next_factor)
         return FactorSequence(context)
 
-    @property
     def generic_factors(self) -> List[Comparable]:
-        return list(self.generic_factors_by_name.values())
+        return list(self.generic_factors_by_name().values())
 
-    @property
     def generic_factors_by_name(self) -> Dict[str, Comparable]:
         r"""
         :class:`.Factor`\s that can be replaced without changing ``self``\s meaning.
@@ -335,7 +335,7 @@ class Comparable(ABC):
         generics: Dict[str, Comparable] = {}
         for factor in self.terms:
             if factor is not None:
-                for generic in factor.generic_factors:
+                for generic in factor.generic_factors():
                     generics[str(generic)] = generic
         return generics
 
@@ -394,7 +394,7 @@ class Comparable(ABC):
 
     def implies_same_context(self, other) -> bool:
         same_context = ContextRegister()
-        for key in self.generic_factors:
+        for key in self.generic_factors():
             same_context.insert_pair(key, key)
         return self.implies(other, context=same_context)
 
@@ -420,7 +420,7 @@ class Comparable(ABC):
 
     def means_same_context(self, other) -> bool:
         same_context = ContextRegister()
-        for key in self.generic_factors:
+        for key in self.generic_factors():
             same_context.insert_pair(key, key)
         return self.means(other, context=same_context)
 
@@ -473,12 +473,12 @@ class Comparable(ABC):
         context = context or ContextRegister()
         unused_self = [
             factor
-            for factor in self.generic_factors
+            for factor in self.generic_factors()
             if str(factor) not in context.matches.keys()
         ]
         unused_other = [
             factor
-            for factor in other.generic_factors
+            for factor in other.generic_factors()
             if str(factor) not in context.reverse_matches.keys()
         ]
         if not (unused_self and unused_other):
@@ -792,7 +792,7 @@ class Comparable(ABC):
         self, other: Comparable, context: ContextRegister
     ) -> Optional[ContextRegister]:
         incoming = ContextRegister.from_lists(
-            keys=self.generic_factors, values=other.generic_factors
+            keys=self.generic_factors(), values=other.generic_factors()
         )
         updated_context = context.merged_with(incoming)
         return updated_context

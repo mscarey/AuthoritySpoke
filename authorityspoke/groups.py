@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import operator
-from typing import Callable, Iterator, Optional, Sequence, Tuple, TypeVar
+from typing import Callable, Dict, Iterator, Optional, Sequence, Tuple, TypeVar
 
 from authorityspoke.comparisons import (
     Comparable,
@@ -272,11 +272,10 @@ class ComparableGroup(Tuple[F, ...], Comparable):
             operation=means, still_need_matches=list(other), matches=context
         )
 
-    @property
     def generic_factors_by_name(self) -> Dict[str, Comparable]:
         generics: Dict[str, Comparable] = {}
         for factor in self:
-            generics.update(factor.generic_factors_by_name)
+            generics.update(factor.generic_factors_by_name())
         return generics
 
     def has_all_factors_of(

@@ -163,7 +163,7 @@ class Procedure(Comparable):
             specified for this :class:`Procedure`.
         """
 
-        return len(self.generic_factors)
+        return len(self.generic_factors())
 
     def __repr__(self):
         text = (
@@ -203,7 +203,6 @@ class Procedure(Comparable):
         despite = self.despite or ()
         return [*self.outputs, *inputs, *despite]
 
-    @property
     def generic_factors_by_name(self) -> Dict[str, Comparable]:
         r"""
         :class:`.Factor`\s that can be replaced without changing ``self``\s meaning.
@@ -223,7 +222,7 @@ class Procedure(Comparable):
         generic_dict = {
             str(generic): generic
             for factor in self.factors_all
-            for generic in factor.generic_factors
+            for generic in factor.generic_factors()
         }
         return generic_dict
 

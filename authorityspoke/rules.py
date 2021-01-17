@@ -15,7 +15,7 @@ from dataclasses import dataclass
 
 from legislice.enactments import Enactment, consolidate_enactments
 
-from authorityspoke.comparisons import Comparable
+from authorityspoke.comparisons import Comparable, FactorSequence
 from authorityspoke.factors import Factor, ContextRegister
 from authorityspoke.formatting import indented
 from authorityspoke.procedures import Procedure
@@ -198,7 +198,7 @@ class Rule(Comparable):
             yield result
 
     @property
-    def terms(self) -> Sequence[Sequence[Factor]]:
+    def terms(self) -> FactorSequence:
         """
         Call :class:`Procedure`\'s :meth:`~Procedure.terms` method.
 
@@ -207,8 +207,7 @@ class Rule(Comparable):
         """
         return self.procedure.terms
 
-    @property
-    def generic_factors_by_name(self) -> Dict[str, Factor]:
+    def generic_factors_by_name(self) -> Dict[str, Comparable]:
         r"""
         Get :class:`.Factor`\s that can be replaced without changing ``self``\s meaning.
 
@@ -217,7 +216,7 @@ class Rule(Comparable):
         """
         if self.generic:
             return {str(self): self}
-        return self.procedure.generic_factors_by_name
+        return self.procedure.generic_factors_by_name()
 
     def add_enactment(self, incoming: Enactment, role: str = "enactments") -> Rule:
         """
