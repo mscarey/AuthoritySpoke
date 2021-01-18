@@ -4,7 +4,7 @@ from copy import deepcopy
 from dataclasses import dataclass, field
 import operator
 
-from typing import ClassVar, Dict, Iterator, List, Optional, Sequence, Union
+from typing import ClassVar, Dict, Iterator, List, Optional, Sequence, Tuple, Union
 
 from anchorpoint.textselectors import TextQuoteSelector
 
@@ -66,7 +66,7 @@ class Fact(Factor):
     absent: bool = False
     generic: bool = False
     anchors: List[TextQuoteSelector] = field(default_factory=list)
-    standards_of_proof: ClassVar = (
+    standards_of_proof: ClassVar[Tuple[str, ...]] = (
         "scintilla of evidence",
         "substantial evidence",
         "preponderance of evidence",
@@ -92,8 +92,7 @@ class Fact(Factor):
             message = (
                 "The number of items in 'terms' must be "
                 + f"{len(self.predicate)}, not {len(self.terms)}, "
-                + f"to match predicate.context_slots "
-                + f"for '{self.predicate.content}'"
+                + f"to match predicate.context_slots for '{self.predicate.content}'"
             )
             if hasattr(self, "name"):
                 message += f" for '{self.name}'"
@@ -110,7 +109,7 @@ class Fact(Factor):
         unwrapped = self.predicate.add_truth_to_content(content)
         text = wrapped(super().__str__().format(unwrapped))
         if self.standard_of_proof:
-            text += f"\n" + indented("by the STANDARD {self.standard_of_proof}")
+            text += "\n" + indented("by the STANDARD {self.standard_of_proof}")
         return text
 
     @property
@@ -124,7 +123,7 @@ class Fact(Factor):
         text = str(self)
         concrete_context = [factor for factor in self.terms if not factor.generic]
         if any(concrete_context) and not self.generic:
-            text += f"\n" + indented("SPECIFIC CONTEXT:")
+            text += "\n" + indented("SPECIFIC CONTEXT:")
             for factor in concrete_context:
                 factor_text = indented(str(factor), tabs=2)
                 text += f"\n{str(factor_text)}"
@@ -214,7 +213,7 @@ class Fact(Factor):
         """
         result = deepcopy(self)
         result.terms = FactorSequence(
-            factor.new_context(changes) for factor in self.terms
+            [factor.new_context(changes) for factor in self.terms]
         )
         return result
 
@@ -279,7 +278,7 @@ def build_fact(
     if isinstance(case_factors, Factor):
         case_factors = [case_factors]
 
-    terms = tuple(case_factors[i] for i in indices)
+    terms = FactorSequence([case_factors[i] for i in indices])
     return Fact(
         predicate=predicate,
         terms=terms,

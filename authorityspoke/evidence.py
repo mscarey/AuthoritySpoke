@@ -1,7 +1,7 @@
 r""":class:`.Factor`\s used to support :class:`.Fact` findings."""
 from dataclasses import dataclass, field
 
-from typing import ClassVar, Iterator, List, Optional
+from typing import ClassVar, Iterator, List, Optional, Tuple
 
 from anchorpoint import TextQuoteSelector
 
@@ -59,7 +59,10 @@ class Exhibit(Factor):
     absent: bool = False
     generic: bool = False
     anchors: List[TextQuoteSelector] = field(default_factory=list)
-    context_factor_names: ClassVar = ("statement", "statement_attribution")
+    context_factor_names: ClassVar[Tuple[str, ...]] = (
+        "statement",
+        "statement_attribution",
+    )
 
     def _means_if_concrete(
         self, other: Factor, context: Optional[ContextRegister] = None
@@ -90,11 +93,11 @@ class Exhibit(Factor):
         if self.form:
             text += f"in the FORM {self.form}"
         if self.statement:
-            text += f"\n" + indented(f"WITH THE ASSERTION:")
+            text += "\n" + indented("WITH THE ASSERTION:")
             factor_text = indented(str(self.statement), tabs=2)
             text += f"\n{str(factor_text)},"
         if self.statement_attribution:
-            text += f"\n" + indented(f"ATTRIBUTED TO {str(self.statement_attribution)}")
+            text += "\n" + indented(f"ATTRIBUTED TO {str(self.statement_attribution)}")
 
         return super().__str__().format(text)
 
@@ -133,7 +136,7 @@ class Evidence(Factor):
     absent: bool = False
     generic: bool = False
     anchors: List[TextQuoteSelector] = field(default_factory=list)
-    context_factor_names: ClassVar = ("exhibit", "to_effect")
+    context_factor_names: ClassVar[Tuple[str, ...]] = ("exhibit", "to_effect")
 
     def __str__(self):
         text = ""

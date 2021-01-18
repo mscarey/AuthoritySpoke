@@ -58,32 +58,6 @@ class TestEnactmentImport:
         enactment = fake_usc_client.read_from_json(input_enactment)
         assert enactment.selected_text() == enactment.text
 
-    def test_make_name_for_enactment(self, fake_usc_client):
-        data = {
-            "inputs": {
-                "type": "fact",
-                "content": "{the Java API} was an original work",
-                "truth": False,
-                "anchors": "a work must be “original”",
-            },
-            "outputs": {
-                "type": "fact",
-                "content": "the Java API was copyrightable",
-                "truth": False,
-                "anchors": "must be “original” to qualify for |copyright protection.|",
-            },
-            "mandatory": True,
-            "enactments": {
-                "node": "/us/usc/t17/s102/a",
-                "exact": "in accordance with this title,",
-                "anchors": "qualify for copyright protection. |17 U.S.C. § 102(a)|.",
-            },
-            "anchors": "By statute, a work |must be “original” to qualify| for",
-        }
-        holding = read_holding(data, client=fake_usc_client)
-        enactment = holding.enactments[0]
-        assert enactment.name == ""
-
     def test_enactment_import_from_holding(self):
         holding_cardenas = load_holdings("holding_cardenas.json")
         holdings = readers.read_holdings(holding_cardenas)

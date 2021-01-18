@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from typing import ClassVar, Optional
+from typing import ClassVar, Optional, Tuple
 
 from authorityspoke.entities import Entity
 from authorityspoke.factors import Factor
@@ -65,7 +65,7 @@ class Allegation(Factor):
     name: Optional[str] = None
     absent: bool = False
     generic: bool = False
-    context_factor_names: ClassVar = ("statement", "pleading")
+    context_factor_names: ClassVar[Tuple[str, ...]] = ("statement", "pleading")
 
     def __str__(self):
         text = ""

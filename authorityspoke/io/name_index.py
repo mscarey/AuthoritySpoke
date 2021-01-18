@@ -94,7 +94,7 @@ def assign_name_for_evidence(obj: Dict) -> str:
 
     :returns: a name for the Evidence
     """
-    name = f"evidence"
+    name = "evidence"
     if obj.get("exhibit"):
         name += f' of {obj["exhibit"]}'
     if obj.get("to_effect"):
@@ -110,7 +110,7 @@ def assign_name_for_pleading(obj: Dict) -> str:
 
     :returns: a name for the Pleading
     """
-    name = f"pleading"
+    name = "pleading"
     if obj.get("filer"):
         name += f' filed by {obj["filer"]}'
     return name
@@ -137,12 +137,9 @@ def create_name_for_factor(obj: Dict) -> str:
         return ""
     elif obj.get("predicate", {}).get("content"):
         name = assign_name_from_content(obj)
-    elif (
-        obj.get("exhibit")
-        or (obj.get("type") and obj.get("type").lower()) == "evidence"
-    ):
+    elif obj.get("exhibit") or (obj.get("type") and obj["type"].lower()) == "evidence":
         name = assign_name_for_evidence(obj)
-    elif obj.get("type") and obj.get("type").lower() == "pleading":
+    elif obj.get("type") and obj["type"].lower() == "pleading":
         name = assign_name_for_pleading(obj)
     else:
         raise NotImplementedError
