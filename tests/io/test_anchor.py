@@ -49,8 +49,8 @@ class TestCollectAnchors:
         even if it isn't wrapped in a list, it'll be normalized
         into a list containing a dict with an "exact" field.
         """
-        obj = expand_shorthand(self.fact_string_anchor)
-        assert obj["anchors"][0]["exact"].startswith("In preparing")
+        selector = anchors.read_selector(self.fact_string_anchor["anchors"])
+        assert selector.exact.startswith("In preparing")
 
     def test_anchors_from_fact_with_inferred_name(self):
         record, mentioned = index_names(self.fact)
