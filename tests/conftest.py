@@ -79,91 +79,91 @@ def make_predicate() -> Dict[str, Predicate]:
         "p7": Predicate(
             "the distance between $place1 and $place2 was",
             truth=False,
-            comparison=">",
+            sign=">",
             quantity=Q_("35 feet"),
         ),
         "p7_obverse": Predicate(
             "the distance between $place1 and $place2 was",
             truth=True,
-            comparison="<=",
+            sign="<=",
             quantity=Q_("35 feet"),
         ),
         "p7_opposite": Predicate(
             "the distance between $place1 and $place2 was",
             truth=True,
-            comparison=">",
+            sign=">",
             quantity=Q_("35 feet"),
         ),
         "p7_not_equal": Predicate(
             "the distance between $place1 and $place2 was",
             truth=True,
-            comparison="<>",
+            sign="<>",
             quantity=Q_("35 feet"),
         ),
         "p7_true": Predicate(
             "the distance between $place1 and $place2 was",
             truth=True,
-            comparison="<",
+            sign="<",
             quantity=Q_("35 feet"),
         ),
         "p8": Predicate(
             "the distance between $place1 and $place2 was",
-            comparison=">=",
+            sign=">=",
             quantity=Q_("20 feet"),
         ),
         "p8_exact": Predicate(
             "the distance between $place1 and $place2 was",
-            comparison="==",
+            sign="==",
             quantity=Q_("25 feet"),
         ),
         "p8_less": Predicate(
             "the distance between $place1 and $place2 was",
-            comparison="<=",
+            sign="<=",
             quantity=Q_("20 feet"),
         ),
         "p8_meters": Predicate(
             "the distance between $place1 and $place2 was",
-            comparison=">=",
+            sign=">=",
             quantity=Q_("10 meters"),
         ),
         "p8_int": Predicate(
             "the distance between $place1 and $place2 was",
-            comparison=">=",
+            sign=">=",
             quantity=20,
         ),
         "p8_float": Predicate(
             "the distance between $place1 and $place2 was",
-            comparison=">=",
+            sign=">=",
             quantity=20.0,
         ),
         "p8_higher_int": Predicate(
             "the distance between $place1 and $place2 was",
-            comparison=">=",
+            sign=">=",
             quantity=30,
         ),
         "p9": Predicate(
             "the distance between $thing and a parking area used by personnel and patrons of $place was",
-            comparison="<=",
+            sign="<=",
             quantity=Q_("5 feet"),
         ),
         "p9_exact": Predicate(
             "the distance between $thing and a parking area used by personnel and patrons of $place was",
-            comparison="=",
+            sign="=",
             quantity=Q_("5 feet"),
         ),
         "p9_miles": Predicate(
             "the distance between $thing and a parking area used by personnel and patrons of $place was",
-            comparison="<=",
+            sign="<=",
             quantity=Q_("5 miles"),
         ),
         "p9_more": Predicate(
             "the distance between $thing and a parking area used by personnel and patrons of $place was",
-            comparison=">",
+            sign=">",
             quantity=Q_("5 feet"),
         ),
         "p9_acres": Predicate(
             "the distance between $thing and a parking area used by personnel and patrons of $place was",
-            comparison="<=",
+            sign="<=",
             quantity=Q_("5 acres"),
         ),
         "p10": Predicate("$thing was within the curtilage of $place"),
@@ -181,7 +181,7 @@ def make_predicate() -> Dict[str, Predicate]:
         ),
         "p18": Predicate(
             "the length of time that $act continued was",
-            comparison=">=",
+            sign=">=",
             quantity=Q_("385 minutes"),
         ),
         "p19": Predicate("$act continued after night fell"),
@@ -207,23 +207,19 @@ def make_predicate() -> Dict[str, Predicate]:
         "p_three_entities": Predicate("$planner told $intermediary to hire $shooter"),
         "p_small_weight": Predicate(
             "the amount of gold $person possessed was",
-            comparison=">=",
+            sign=">=",
             quantity=Q_("1 gram"),
         ),
         "p_large_weight": Predicate(
             "the amount of gold $person possessed was",
-            comparison=">=",
+            sign=">=",
             quantity=Q_("100 kilograms"),
         ),
         "p_friends": Predicate("$person1 and $person2 were friends"),
         "p_reliable": Predicate("$evidence was reliable"),
-        "p_quantity=3": Predicate(
-            "The number of mice was", comparison="==", quantity=3
-        ),
-        "p_quantity>=4": Predicate(
-            "The number of mice was", comparison=">=", quantity=4
-        ),
-        "p_quantity>5": Predicate("The number of mice was", comparison=">", quantity=5),
+        "p_quantity=3": Predicate("The number of mice was", sign="==", quantity=3),
+        "p_quantity>=4": Predicate("The number of mice was", sign=">=", quantity=4),
+        "p_quantity>5": Predicate("The number of mice was", sign=">", quantity=5),
         "p_no_context": Predicate("context was included", truth=False),
     }
 

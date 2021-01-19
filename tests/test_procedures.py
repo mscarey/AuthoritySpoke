@@ -277,11 +277,11 @@ class TestProcedureUnion:
 
 
 p_small_weight = Predicate(
-    "the amount of gold $person possessed was", comparison="<", quantity=Q_("1 gram")
+    "the amount of gold $person possessed was", sign="<", quantity=Q_("1 gram")
 )
 p_large_weight = Predicate(
     "the amount of gold $person possessed was",
-    comparison=">=",
+    sign=">=",
     quantity=Q_("100 kilograms"),
 )
 alice = Entity("Alice")

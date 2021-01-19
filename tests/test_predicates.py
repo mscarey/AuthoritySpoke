@@ -9,7 +9,7 @@ class TestPredicates:
         with pytest.raises(ValueError):
             _ = Predicate(
                 "the height of {} was {}",
-                comparison=">>",
+                sign=">>",
                 quantity=Q_("160 centimeters"),
             )
 
@@ -59,8 +59,8 @@ class TestPredicates:
         assert make_predicate["p7_obverse"].truth is True
         assert make_predicate["p7_obverse"].quantity == Q_(35, "foot")
         assert make_predicate["p7"].truth is True
-        assert make_predicate["p7"].comparison == "<="
-        assert make_predicate["p7_obverse"].comparison == "<="
+        assert make_predicate["p7"].sign == "<="
+        assert make_predicate["p7_obverse"].sign == "<="
 
     def test_quantity_type(self, make_predicate):
         assert isinstance(make_predicate["p7"].quantity, Q_)
@@ -200,8 +200,8 @@ class TestImplication:
         assert not make_predicate["p_quantity>=4"] > make_predicate["p_quantity>5"]
 
     def test_no_implication_of_greater_or_equal_quantity(self):
-        less = Predicate(template="The number of mice was", comparison=">", quantity=4)
-        more = Predicate(template="The number of mice was", comparison=">=", quantity=5)
+        less = Predicate(template="The number of mice was", sign=">", quantity=4)
+        more = Predicate(template="The number of mice was", sign=">=", quantity=5)
         assert not less.implies(more)
 
     def test_equal_implies_greater_or_equal(self, make_predicate):

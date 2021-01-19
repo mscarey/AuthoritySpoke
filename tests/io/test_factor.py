@@ -88,7 +88,7 @@ class TestFactLoad:
         story = readers.read_fact(story)
         assert len(story.predicate) == 1
         assert story.predicate.content.startswith("The number of castles")
-        assert story.predicate.comparison == ">"
+        assert story.predicate.sign == ">"
         assert story.predicate.quantity == 3
 
     def test_make_fact_from_string(self, watt_factor):
@@ -110,7 +110,7 @@ class TestFactorLoad:
         fact = Fact(
             Predicate(
                 "the distance between $place1 and $place2 was",
-                comparison="<",
+                sign="<",
                 quantity="5 miles",
             ),
             terms=FactorSequence([Entity("the apartment"), Entity("the office")]),
@@ -119,7 +119,7 @@ class TestFactorLoad:
         data = {
             "type": "fact",
             "content": "the distance between ${place1} and ${place2} was",
-            "comparison": "<",
+            "sign": "<",
             "quantity": "5 miles",
             "terms": [
                 {"type": "entity", "name": "the office"},

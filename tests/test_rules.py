@@ -997,7 +997,7 @@ class TestStatuteRules:
                     Fact(
                         Predicate(
                             "the length of $thing was",
-                            comparison=">=",
+                            sign=">=",
                             quantity=Q_("5 millimeters"),
                             truth=facial_hair_over_5mm,
                         ),

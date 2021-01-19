@@ -15,7 +15,7 @@ class TestPredicateLoad:
         schema = schemas.PredicateSchema()
         p4 = schema.load({"content": "{} was on the premises of {}"})
         assert p4.truth is True
-        assert p4.comparison == ""
+        assert p4.sign == ""
 
     def test_load_comparison_not_ending_with_was(self):
         schema = schemas.PredicateSchema()
@@ -24,7 +24,7 @@ class TestPredicateLoad:
                 {
                     "content": "the distance between $place1 and $place2 was 35 feet",
                     "truth": True,
-                    "comparison": "!=",
+                    "sign": "!=",
                     "quantity": "35 feet",
                 }
             )
@@ -35,11 +35,11 @@ class TestPredicateLoad:
             {
                 "content": "the distance between $place1 and $place2 was",
                 "truth": True,
-                "comparison": "!=",
+                "sign": "!=",
                 "quantity": "35 feet",
             }
         )
-        assert p7.comparison == "<>"
+        assert p7.sign == "<>"
 
     def test_load_and_find_quantity(self):
         schema = schemas.PredicateSchema()
@@ -49,7 +49,7 @@ class TestPredicateLoad:
                 "truth": True,
             }
         )
-        assert p7.comparison == ">"
+        assert p7.sign == ">"
 
     def test_load_and_normalize_quantity(self):
         schema = schemas.PredicateSchema()
@@ -59,7 +59,7 @@ class TestPredicateLoad:
                 "truth": True,
             }
         )
-        assert p7.comparison == "<>"
+        assert p7.sign == "<>"
 
     def test_load_and_normalize_comparison(self):
         schema = schemas.PredicateSchema()
@@ -67,11 +67,11 @@ class TestPredicateLoad:
             data={
                 "content": "the distance between $place1 and $place2 was",
                 "truth": True,
-                "comparison": "!=",
+                "sign": "!=",
                 "quantity": "35 feet",
             }
         )
-        assert p7.comparison == "<>"
+        assert p7.sign == "<>"
 
     def test_read_quantity(self):
         quantity = Predicate.read_quantity("35 feet")
@@ -82,7 +82,7 @@ class TestPredicateLoad:
         statement = schema.load(
             {"content": "$person's favorite number was", "quantity": 42}
         )
-        assert statement.comparison == "="
+        assert statement.sign == "="
         assert "$person's favorite number was exactly equal to 42" in str(statement)
         assert len(statement) == 1
 
@@ -92,7 +92,7 @@ class TestPredicateDump:
         predicate = Predicate(
             "the distance between $place1 and $place2 was",
             truth=True,
-            comparison="<>",
+            sign="<>",
             quantity=Q_("35 feet"),
         )
         dumped = to_dict(predicate)

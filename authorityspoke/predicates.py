@@ -154,7 +154,7 @@ class Predicate:
         true or false. ``None`` indicates an assertion as to "whether"
         the clause is true or false, without specifying which.
 
-    :param comparison:
+    :param sign:
         A string representing an equality or inequality sign like ``==``,
         ``>``, or ``<=``. Used to indicate that the clause ends with a
         comparison to some quantity. Should be defined if and only if a
@@ -167,7 +167,7 @@ class Predicate:
         `pint <https://pint.readthedocs.io/en/0.9/>`_ library. Comparisons to
         quantities can be used to determine whether :class:`Predicate`\s
         imply or contradict each other. A single :class:`Predicate`
-        may contain no more than one ``comparison`` and one ``quantity``.
+        may contain no more than one ``sign`` and one ``quantity``.
     """
 
     opposite_comparisons: ClassVar[Dict[str, str]] = {
@@ -217,7 +217,7 @@ class Predicate:
         self,
         template: str,
         truth: Optional[bool] = True,
-        comparison: str = "",
+        sign: str = "",
         quantity: Optional[Union[int, float, ureg.Quantity]] = None,
     ):
         """
@@ -228,17 +228,17 @@ class Predicate:
         """
         self.template = StatementTemplate(template, make_singular=True)
         self.truth = truth
-        self.comparison = comparison
+        self.sign = sign
         self.quantity = self.read_quantity(quantity)
 
-        if self.comparison and self.comparison not in self.opposite_comparisons.keys():
+        if self.sign and self.sign not in self.opposite_comparisons.keys():
             raise ValueError(
                 f'"comparison" string parameter must be one of {self.opposite_comparisons.keys()}.'
             )
 
-        if self.comparison and self.truth is False:
+        if self.sign and self.truth is False:
             self.truth = True
-            self.comparison = self.opposite_comparisons[self.comparison]
+            self.sign = self.opposite_comparisons[self.sign]
 
         if self.quantity is not None and not self.content.endswith("was"):
             raise ValueError(
@@ -368,7 +368,7 @@ class Predicate:
         if self.quantity != other.quantity:
             return False
 
-        return self.truth == other.truth and self.comparison == other.comparison
+        return self.truth == other.truth and self.sign == other.sign
 
     def __gt__(self, other: Optional[Predicate]) -> bool:
         """
@@ -409,9 +409,7 @@ class Predicate:
         if self.truth is None:
             return False
 
-        if not (
-            self.quantity and other.quantity and self.comparison and other.comparison
-        ):
+        if not (self.quantity and other.quantity and self.sign and other.sign):
             return False
 
         return self.includes_other_quantity(other)
@@ -431,13 +429,13 @@ class Predicate:
             return False
 
         if self.quantity > other.quantity:
-            if "<" not in self.comparison and ">" not in other.comparison:
+            if "<" not in self.sign and ">" not in other.sign:
                 return True
         if self.quantity < other.quantity:
-            if ">" not in self.comparison and "<" not in other.comparison:
+            if ">" not in self.sign and "<" not in other.sign:
                 return True
         return self.quantity == other.quantity and (
-            ("=" in self.comparison) != ("=" in other.comparison)
+            ("=" in self.sign) != ("=" in other.sign)
         )
 
     def includes_other_quantity(self, other: Predicate) -> bool:
@@ -450,23 +448,23 @@ class Predicate:
 
         if (
             (self.quantity < other.quantity)
-            and ("<" in self.comparison or "=" in self.comparison)
-            and ("<" in other.comparison)
+            and ("<" in self.sign or "=" in self.sign)
+            and ("<" in other.sign)
         ):
             return True
         if (
             (self.quantity > other.quantity)
-            and (">" in self.comparison or "=" in self.comparison)
-            and (">" in other.comparison)
+            and (">" in self.sign or "=" in self.sign)
+            and (">" in other.sign)
         ):
             return True
-        if "=" in self.comparison:
-            if ("<" in other.comparison and self.quantity < other.quantity) or (
-                ">" in other.comparison and self.quantity > other.quantity
+        if "=" in self.sign:
+            if ("<" in other.sign and self.quantity < other.quantity) or (
+                ">" in other.sign and self.quantity > other.quantity
             ):
                 return True
         return self.quantity == other.quantity and (
-            ("=" in self.comparison) == ("=" in other.comparison)
+            ("=" in self.sign) == ("=" in other.sign)
         )
 
     def __len__(self):
@@ -494,7 +492,7 @@ class Predicate:
 
         if not self.quantity:
             return ""
-        comparison = self.comparison or "="
+        comparison = self.sign or "="
         expand = {
             "==": "exactly equal to",
             "=": "exactly equal to",
@@ -512,7 +510,7 @@ class Predicate:
         return Predicate(
             template=self.content,
             truth=not self.truth,
-            comparison=self.comparison,
+            sign=self.sign,
             quantity=self.quantity,
         )
 

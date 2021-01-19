@@ -170,7 +170,7 @@ class PredicateSchema(ExpandableSchema):
     template = fields.Str(data_key="content", load_only=True)
     content = fields.Method(serialize="get_content_with_placeholders", dump_only=True)
     truth = fields.Bool(missing=True)
-    comparison = fields.Str(
+    sign = fields.Str(
         missing="",
         validate=validate.OneOf([""] + list(Predicate.opposite_comparisons.keys())),
     )
@@ -196,11 +196,11 @@ class PredicateSchema(ExpandableSchema):
 
     def normalize_comparison(self, data: RawPredicate, **kwargs) -> RawPredicate:
         """Reduce the number of possible symbols to represent comparisons."""
-        if data.get("quantity") and not data.get("comparison"):
-            data["comparison"] = "="
+        if data.get("quantity") and not data.get("sign"):
+            data["sign"] = "="
 
-        if data.get("comparison") in Predicate.normalized_comparisons:
-            data["comparison"] = Predicate.normalized_comparisons[data["comparison"]]
+        if data.get("sign") in Predicate.normalized_comparisons:
+            data["sign"] = Predicate.normalized_comparisons[data["sign"]]
         return data
 
     @pre_load
@@ -209,7 +209,7 @@ class PredicateSchema(ExpandableSchema):
         if not data.get("quantity"):
             (
                 data["content"],
-                data["comparison"],
+                data["sign"],
                 data["quantity"],
             ) = self.split_quantity_from_content(data["content"])
         data = self.normalize_comparison(data)
@@ -293,7 +293,7 @@ class FactSchema(ExpandableSchema):
         to_nest = [
             "content",
             "truth",
-            "comparison",
+            "sign",
             "quantity",
         ]
         data = nest_fields(data, nest="predicate", eggs=to_nest)
