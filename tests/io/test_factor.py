@@ -185,6 +185,12 @@ class TestEvidenceDump:
         assert dumped["exhibit"]["statement_attribution"]["name"] == "Alice"
 
 
+class TestPleading:
+    def test_pleading_short_string(self, make_pleading):
+        pleading = make_pleading["craig"]
+        assert pleading.short_string == "the pleading filed by <Craig>"
+
+
 class TestPleadingDump:
     def test_dump_pleading(self, make_pleading):
         pleading = make_pleading["craig"]

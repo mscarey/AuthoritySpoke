@@ -65,7 +65,12 @@ class TestEnactmentImport:
         assert "all relevant evidence is admissible" in enactment_list[0].text
 
     def test_enactment_does_not_fail_for_excess_selector(self, fake_beard_client):
-        """Test selector that extends into the text of a subnode."""
+        """
+        Test selector that extends into the text of a subnode.
+
+        Demonstrates that the API has downloaded the entire text of the provision
+        and included it in the Enactment object.
+        """
         exact = (
             "In this Act, beard means any facial hair no shorter "
             "than 5 millimetres in length that: occurs on or below the chin"
@@ -74,3 +79,4 @@ class TestEnactmentImport:
         client = fake_beard_client
         enactment = client.read_from_json(record)
         assert enactment.selected_text() == exact + "…"
+        assert "exists in an uninterrupted line" in enactment.children[1].content
