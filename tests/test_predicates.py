@@ -1,18 +1,20 @@
 import pytest
 
 from authorityspoke.entities import Entity
-from authorityspoke.predicates import Predicate, Q_
+from authorityspoke.predicates import Predicate, Comparison, Q_
 
 
-class TestPredicates:
-    def test_predicate_with_wrong_comparison_symbol(self):
+class TestComparisons:
+    def test_comparison_with_wrong_comparison_symbol(self):
         with pytest.raises(ValueError):
-            _ = Predicate(
+            _ = Comparison(
                 "the height of {} was {}",
                 sign=">>",
                 quantity=Q_("160 centimeters"),
             )
 
+
+class TestPredicates:
     def test_term_positions(self):
         predicate = Predicate(
             template="$organizer1 and $organizer2 planned for $player1 to play $game with $player2."
@@ -74,7 +76,10 @@ class TestPredicates:
     def test_quantity_comparison(self, make_predicate):
         assert make_predicate["p7"].quantity_comparison() == "no more than 35 foot"
         assert make_predicate["p9"].quantity_comparison() == "no more than 5 foot"
-        assert make_predicate["p1"].quantity_comparison() == ""
+
+    def test_predicate_has_no_quantity_comparison(self, make_predicate):
+        with pytest.raises(AttributeError):
+            make_predicate["p1"].quantity_comparison() == ""
 
     def test_context_slots(self, make_predicate):
         assert len(make_predicate["p7"]) == 2
@@ -200,8 +205,8 @@ class TestImplication:
         assert not make_predicate["p_quantity>=4"] > make_predicate["p_quantity>5"]
 
     def test_no_implication_of_greater_or_equal_quantity(self):
-        less = Predicate(template="The number of mice was", sign=">", quantity=4)
-        more = Predicate(template="The number of mice was", sign=">=", quantity=5)
+        less = Comparison(template="The number of mice was", sign=">", quantity=4)
+        more = Comparison(template="The number of mice was", sign=">=", quantity=5)
         assert not less.implies(more)
 
     def test_equal_implies_greater_or_equal(self, make_predicate):

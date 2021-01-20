@@ -6,7 +6,7 @@ from authorityspoke.entities import Entity
 from authorityspoke.factors import ContextRegister, FactorSequence
 from authorityspoke.groups import FactorGroup
 from authorityspoke.procedures import Procedure
-from authorityspoke.predicates import Predicate, Q_
+from authorityspoke.predicates import Comparison, Predicate, Q_
 from authorityspoke.facts import Fact
 
 
@@ -276,10 +276,10 @@ class TestProcedureUnion:
         assert procedure_from_union.means_same_context(procedure_from_adding)
 
 
-p_small_weight = Predicate(
+p_small_weight = Comparison(
     "the amount of gold $person possessed was", sign="<", quantity=Q_("1 gram")
 )
-p_large_weight = Predicate(
+p_large_weight = Comparison(
     "the amount of gold $person possessed was",
     sign=">=",
     quantity=Q_("100 kilograms"),

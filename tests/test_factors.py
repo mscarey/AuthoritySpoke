@@ -9,7 +9,7 @@ from authorityspoke.factors import Factor, means, FactorSequence
 from authorityspoke.facts import Fact, build_fact
 from authorityspoke.rules import Rule
 from authorityspoke.opinions import Opinion
-from authorityspoke.predicates import Q_, Predicate
+from authorityspoke.predicates import Comparison, Q_, Predicate
 
 
 class TestFacts:
@@ -358,6 +358,10 @@ class TestImplication:
         assert watt_factor["f2"] > watt_factor["f2_no_truth"]
         assert not watt_factor["f2_no_truth"] > watt_factor["f2"]
 
+    def test_comparison_implies_no_truth_value(self, watt_factor):
+        assert watt_factor["f8"] > watt_factor["f8_no_truth"]
+        assert not watt_factor["f8_no_truth"] > watt_factor["f8"]
+
     def test_implication_standard_of_proof(self, make_factor):
         assert (
             not make_factor["f_shooting_craig_poe"]
@@ -516,6 +520,24 @@ class TestContradiction:
     def test_contradicts_if_present_one_absent(self, watt_factor):
         assert watt_factor["f2"]._contradicts_if_present(watt_factor["f2_false_absent"])
 
+    def test_false_does_not_contradict_absent(self):
+        absent_fact = Fact(
+            predicate=Predicate(
+                template="${rural_s_telephone_directory} was copyrightable", truth=True
+            ),
+            terms=(Entity(name="Rural's telephone directory")),
+            absent=True,
+        )
+        false_fact = Fact(
+            predicate=Predicate(
+                template="${the_java_api} was copyrightable", truth=False
+            ),
+            terms=(Entity(name="the Java API", generic=True, plural=False)),
+            absent=False,
+        )
+        assert not false_fact.contradicts(absent_fact)
+        assert not absent_fact.contradicts(false_fact)
+
     # Consistency with Entity/Factor assignments
 
     def test_inconsistent_statements_about_different_entities(self):
@@ -523,12 +545,12 @@ class TestContradiction:
         Alice and Bob are both generics. So it's possible to reach a
         contradiction if you assume they correspond to one another.
         """
-        p_small_weight = Predicate(
+        p_small_weight = Comparison(
             "the amount of gold $person possessed was",
             sign="<",
             quantity=Q_("1 gram"),
         )
-        p_large_weight = Predicate(
+        p_large_weight = Comparison(
             "the amount of gold $person possessed was",
             sign=">=",
             quantity=Q_("100 kilograms"),

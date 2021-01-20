@@ -24,7 +24,7 @@ from authorityspoke.io.nesting import nest_fields
 from authorityspoke.io import text_expansion
 from authorityspoke.opinions import Opinion
 from authorityspoke.pleadings import Pleading, Allegation
-from authorityspoke.predicates import Predicate, ureg, Q_
+from authorityspoke.predicates import Predicate, Comparison, ureg, Q_
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
 
@@ -75,6 +75,8 @@ class ExpandableSchema(Schema):
     @post_load
     def make_object(self, data, **kwargs):
         """Make AuthoritySpoke object out of whatever data has been loaded."""
+        if data.get("quantity") is not None:
+            return Comparison(**data)
         return self.__model__(**data)
 
 
@@ -171,11 +173,11 @@ class PredicateSchema(ExpandableSchema):
     content = fields.Method(serialize="get_content_with_placeholders", dump_only=True)
     truth = fields.Bool(missing=True)
     sign = fields.Str(
-        missing="",
-        validate=validate.OneOf([""] + list(Predicate.opposite_comparisons.keys())),
+        missing=None,
+        validate=validate.OneOf([""] + list(Comparison.opposite_comparisons.keys())),
     )
     quantity = fields.Function(
-        dump_quantity, deserialize=Predicate.read_quantity, missing=None
+        dump_quantity, deserialize=Comparison.read_quantity, missing=None
     )
 
     def get_content_with_placeholders(self, obj) -> str:
@@ -186,8 +188,8 @@ class PredicateSchema(ExpandableSchema):
     ) -> Tuple[str, Optional[str], Optional[Union[ureg.Quantity, int, float]]]:
         """Find any reference to a quantity in the content text."""
         for comparison in {
-            **Predicate.normalized_comparisons,
-            **Predicate.opposite_comparisons,
+            **Comparison.normalized_comparisons,
+            **Comparison.opposite_comparisons,
         }:
             if comparison in content:
                 content, quantity_text = content.split(comparison)
@@ -199,8 +201,8 @@ class PredicateSchema(ExpandableSchema):
         if data.get("quantity") and not data.get("sign"):
             data["sign"] = "="
 
-        if data.get("sign") in Predicate.normalized_comparisons:
-            data["sign"] = Predicate.normalized_comparisons[data["sign"]]
+        if data.get("sign") in Comparison.normalized_comparisons:
+            data["sign"] = Comparison.normalized_comparisons[data["sign"]]
         return data
 
     @pre_load

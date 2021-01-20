@@ -317,7 +317,7 @@ using the :mod:`~authorityspoke.io.dump` module.
 
     >>> from authorityspoke.io.dump import to_json, to_dict
     >>> to_dict(oracle_holdings[0])["rule"]["procedure"]
-    {'inputs': [{'predicate': {'comparison': '',
+    {'inputs': [{'predicate': {'sign': '',
         'content': '{} was an original work',
         'quantity': None,
         'truth': False},
@@ -334,7 +334,7 @@ using the :mod:`~authorityspoke.io.dump` module.
         'type': 'Entity'}],
       'absent': False,
       'type': 'Fact'}],
-    'outputs': [{'predicate': {'comparison': '',
+    'outputs': [{'predicate': {'sign': '',
         'content': '{} was copyrightable',
         'quantity': None,
         'truth': False},

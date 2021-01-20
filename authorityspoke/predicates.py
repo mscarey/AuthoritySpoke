@@ -170,56 +170,7 @@ class Predicate:
         may contain no more than one ``sign`` and one ``quantity``.
     """
 
-    opposite_comparisons: ClassVar[Dict[str, str]] = {
-        ">=": "<",
-        "==": "!=",
-        "<>": "=",
-        "<=": ">",
-        "=": "!=",
-        ">": "<=",
-        "<": ">=",
-    }
-    normalized_comparisons: ClassVar[Dict[str, str]] = {"==": "=", "!=": "<>"}
-
-    @classmethod
-    def read_quantity(
-        cls, value: Union[float, int, str]
-    ) -> Union[float, int, ureg.Quantity]:
-        """
-        Create pint quantity object from text.
-
-        See `pint tutorial <https://pint.readthedocs.io/en/0.9/tutorial.html>`_
-
-        :param quantity:
-            when a string is being parsed for conversion to a
-            :class:`Predicate`, this is the part of the string
-            after the equals or inequality sign.
-        :returns:
-            a Python number object or a :class:`Quantity`
-            object created with `pint.UnitRegistry
-            <https://pint.readthedocs.io/en/0.9/tutorial.html>`_.
-        """
-        if value is None:
-            return None
-        if isinstance(value, (int, float, ureg.Quantity)):
-            return value
-        quantity = value.strip()
-        if quantity.isdigit():
-            return int(quantity)
-        float_parts = quantity.split(".")
-        if len(float_parts) == 2 and all(
-            substring.isnumeric() for substring in float_parts
-        ):
-            return float(quantity)
-        return Q_(quantity)
-
-    def __init__(
-        self,
-        template: str,
-        truth: Optional[bool] = True,
-        sign: str = "",
-        quantity: Optional[Union[int, float, ureg.Quantity]] = None,
-    ):
+    def __init__(self, template: str, truth: Optional[bool] = True, *args, **kwargs):
         """
         Clean up and test validity of attributes.
 
@@ -228,30 +179,11 @@ class Predicate:
         """
         self.template = StatementTemplate(template, make_singular=True)
         self.truth = truth
-        self.sign = sign
-        self.quantity = self.read_quantity(quantity)
-
-        if self.sign and self.sign not in self.opposite_comparisons.keys():
-            raise ValueError(
-                f'"comparison" string parameter must be one of {self.opposite_comparisons.keys()}.'
-            )
-
-        if self.sign and self.truth is False:
-            self.truth = True
-            self.sign = self.opposite_comparisons[self.sign]
-
-        if self.quantity is not None and not self.content.endswith("was"):
-            raise ValueError(
-                "If a Predicate includes a quantity, its 'content' must end "
-                "with the word 'was' to signal the comparison with the quantity. "
-                f"The word 'was' is not the end of the string '{self.content}'."
-            )
 
     def __repr__(self):
         return (
-            f'Predicate(template="{self.template.template}", '
-            "truth={self.truth}, "
-            'comparison="{self.comparison}", quantity={self.quantity})'
+            f'{self.__class__.__name__}(template="{self.template.template}", '
+            f"truth={self.truth}, "
         )
 
     @property
@@ -281,18 +213,6 @@ class Predicate:
 
         return with_plurals
 
-    def consistent_dimensionality(self, other: Predicate) -> bool:
-        """Test if ``other`` has a quantity parameter consistent with ``self``."""
-
-        if isinstance(self.quantity, ureg.Quantity):
-            if not isinstance(other.quantity, ureg.Quantity):
-                return False
-            if self.quantity.dimensionality != other.quantity.dimensionality:
-                return False
-        elif isinstance(other.quantity, ureg.Quantity):
-            return False
-        return True
-
     def contradicts(self, other: Optional[Predicate]) -> bool:
         r"""
         Test whether ``other`` and ``self`` have contradictory meanings.
@@ -314,14 +234,9 @@ class Predicate:
         if self.truth is None or other.truth is None:
             return False
 
-        if not self.consistent_dimensionality(other):
-            return False
-
         if not (self.same_content_meaning(other) and self.same_term_positions(other)):
             return False
 
-        if self.quantity and other.quantity:
-            return self.excludes_other_quantity(other)
         return self.truth != other.truth
 
     def same_content_meaning(self, other: Predicate) -> bool:
@@ -365,10 +280,7 @@ class Predicate:
         if not self.same_term_positions(other):
             return False
 
-        if self.quantity != other.quantity:
-            return False
-
-        return self.truth == other.truth and self.sign == other.sign
+        return self.truth == other.truth
 
     def __gt__(self, other: Optional[Predicate]) -> bool:
         """
@@ -391,10 +303,7 @@ class Predicate:
         if other is None:
             return True
         if not isinstance(other, self.__class__):
-            raise TypeError(
-                f"{self.__class__} objects may only be compared for "
-                + f"implication with other {self.__class__} objects or None."
-            )
+            return False
 
         # Assumes no predicate implies another based on meaning of their content text
         if not (
@@ -403,16 +312,10 @@ class Predicate:
         ):
             return False
 
-        if other.truth is None:
-            return True
-
         if self.truth is None:
             return False
 
-        if not (self.quantity and other.quantity and self.sign and other.sign):
-            return False
-
-        return self.includes_other_quantity(other)
+        return True
 
     def __ge__(self, other: Predicate) -> bool:
         if self.means(other):
@@ -480,38 +383,11 @@ class Predicate:
 
         return len(set(self.template.get_placeholders()))
 
-    def quantity_comparison(self) -> str:
-        """
-        Convert text to a comparison with a quantity.
-
-        :returns:
-            string representation of a comparison with a
-            quantity, which can include units due to the
-            `pint <pint.readthedocs.io>`_  library.
-        """
-
-        if not self.quantity:
-            return ""
-        comparison = self.sign or "="
-        expand = {
-            "==": "exactly equal to",
-            "=": "exactly equal to",
-            "!=": "not equal to",
-            "<>": "not equal to",
-            ">": "greater than",
-            "<": "less than",
-            ">=": "at least",
-            "<=": "no more than",
-        }
-        return f"{expand[comparison]} {self.quantity}"
-
     def negated(self) -> Predicate:
         """Copy ``self``, with the opposite truth value."""
         return Predicate(
             template=self.content,
             truth=not self.truth,
-            sign=self.sign,
-            quantity=self.quantity,
         )
 
     def term_positions(self):
@@ -546,11 +422,172 @@ class Predicate:
             truth_prefix = "it was false that "
         else:
             truth_prefix = "that "
-        if self.quantity:
-            full_content = f"{content} {self.quantity_comparison()}"
-        else:
-            full_content = content
-        return f"{truth_prefix}{full_content}"
+        return f"{truth_prefix}{content}"
 
     def __str__(self):
         return self.add_truth_to_content(self.content)
+
+
+class Comparison(Predicate):
+    """A Predicate that compares a described quantity to a constant."""
+
+    opposite_comparisons: ClassVar[Dict[str, str]] = {
+        ">=": "<",
+        "==": "!=",
+        "<>": "=",
+        "<=": ">",
+        "=": "!=",
+        ">": "<=",
+        "<": ">=",
+    }
+    normalized_comparisons: ClassVar[Dict[str, str]] = {"==": "=", "!=": "<>"}
+
+    def __init__(
+        self,
+        template: str,
+        truth: Optional[bool] = True,
+        sign: str = "",
+        quantity: Optional[Union[int, float, ureg.Quantity]] = None,
+    ):
+        """
+        Clean up and test validity of attributes.
+
+        If the :attr:`content` sentence is phrased to have a plural
+        context factor, normalizes it by changing "were" to "was".
+        """
+        super().__init__(template, truth=truth)
+        self.sign = sign
+        self.quantity = self.read_quantity(quantity)
+
+        if self.sign and self.sign not in self.opposite_comparisons.keys():
+            raise ValueError(
+                f'"sign" string parameter must be one of {self.opposite_comparisons.keys()}.'
+            )
+
+        if self.sign and self.truth is False:
+            self.truth = True
+            self.sign = self.opposite_comparisons[self.sign]
+
+        if self.quantity is not None and not self.content.endswith("was"):
+            raise ValueError(
+                "If a Predicate includes a quantity, its 'content' must end "
+                "with the word 'was' to signal the comparison with the quantity. "
+                f"The word 'was' is not the end of the string '{self.content}'."
+            )
+
+    def __repr__(self):
+        return (
+            f'{self.__class__.__name__}(template="{self.template.template}", '
+            "truth={self.truth}, "
+            'comparison="{self.comparison}", quantity={self.quantity})'
+        )
+
+    @classmethod
+    def read_quantity(
+        cls, value: Union[float, int, str]
+    ) -> Union[float, int, ureg.Quantity]:
+        """
+        Create pint quantity object from text.
+
+        See `pint tutorial <https://pint.readthedocs.io/en/0.9/tutorial.html>`_
+
+        :param quantity:
+            when a string is being parsed for conversion to a
+            :class:`Comparison`, this is the part of the string
+            after the equals or inequality sign.
+        :returns:
+            a Python number object or a :class:`Quantity`
+            object created with `pint.UnitRegistry
+            <https://pint.readthedocs.io/en/0.9/tutorial.html>`_.
+        """
+        if value is None:
+            return None
+        if isinstance(value, (int, float, ureg.Quantity)):
+            return value
+        quantity = value.strip()
+        if quantity.isdigit():
+            return int(quantity)
+        float_parts = quantity.split(".")
+        if len(float_parts) == 2 and all(
+            substring.isnumeric() for substring in float_parts
+        ):
+            return float(quantity)
+        return Q_(quantity)
+
+    def add_truth_to_content(self, content: str) -> str:
+        content = super().add_truth_to_content(content)
+        return f"{content} {self.quantity_comparison()}"
+
+    def consistent_dimensionality(self, other: Predicate) -> bool:
+        """Test if ``other`` has a quantity parameter consistent with ``self``."""
+
+        if isinstance(self.quantity, ureg.Quantity):
+            if not isinstance(other.quantity, ureg.Quantity):
+                return False
+            if self.quantity.dimensionality != other.quantity.dimensionality:
+                return False
+        elif isinstance(other.quantity, ureg.Quantity):
+            return False
+        return True
+
+    def implies(self, other: Optional[Predicate]) -> bool:
+        if other is None:
+            return True
+
+        if not super().implies(other):
+            return False
+
+        if not (self.quantity and other.quantity and self.sign and other.sign):
+            return False
+
+        return self.includes_other_quantity(other)
+
+    def means(self, other: Optional[Predicate]) -> bool:
+
+        if not super().means(other):
+            return False
+
+        return self.quantity == other.quantity and self.sign == other.sign
+
+    def contradicts(self, other: Optional[Predicate]) -> bool:
+        if other is None:
+            return False
+        if super().contradicts(other):
+            return True
+        if not self.consistent_dimensionality(other):
+            return False
+        return self.excludes_other_quantity(other)
+
+    def negated(self) -> Comparison:
+        """Copy ``self``, with the opposite truth value."""
+        return Comparison(
+            template=self.content,
+            truth=not self.truth,
+            sign=self.sign,
+            quantity=self.quantity,
+        )
+
+    def quantity_comparison(self) -> str:
+        """
+        Convert text to a comparison with a quantity.
+
+        :returns:
+            string representation of a comparison with a
+            quantity, which can include units due to the
+            `pint <pint.readthedocs.io>`_  library.
+        """
+
+        if not self.quantity:
+            return ""
+        comparison = self.sign or "="
+        expand = {
+            "==": "exactly equal to",
+            "=": "exactly equal to",
+            "!=": "not equal to",
+            "<>": "not equal to",
+            ">": "greater than",
+            "<": "less than",
+            ">=": "at least",
+            "<=": "no more than",
+        }
+        return f"{expand[comparison]} {self.quantity}"
