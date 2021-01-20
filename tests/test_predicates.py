@@ -224,13 +224,8 @@ class TestImplication:
         assert make_predicate["p2"] > make_predicate["p2_no_truth"]
 
     def test_error_predicate_imply_factor(self, make_predicate, watt_factor):
-        with pytest.raises(TypeError):
-            assert make_predicate["p7_true"] > (watt_factor["f7"])
-        with pytest.raises(TypeError):
-            assert make_predicate["p7_true"] >= (watt_factor["f7"])
-
-    def test_predicate_implies_none(self, make_predicate):
-        assert make_predicate["p7_true"] > None
+        assert not make_predicate["p7_true"] > (watt_factor["f7"])
+        assert not make_predicate["p7_true"] >= (watt_factor["f7"])
 
 
 class TestContradiction:
@@ -276,9 +271,6 @@ class TestContradiction:
     def test_no_contradiction_with_inconsistent_dimensionality(self, make_predicate):
         assert not make_predicate["p9"].contradicts(make_predicate["p9_acres"])
         assert not make_predicate["p9_acres"].contradicts(make_predicate["p9"])
-
-    def test_no_contradiction_of_none(self, make_predicate):
-        assert not make_predicate["p7_true"].contradicts(None)
 
     def test_contradiction_with_quantity(self, make_predicate):
         assert make_predicate["p8_less"].contradicts(make_predicate["p8_meters"])

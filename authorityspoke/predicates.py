@@ -264,25 +264,31 @@ class Predicate:
             other.term_positions().values()
         )
 
-    def means(self, other) -> bool:
+    def _same_meaning_if_true(self, other: Predicate) -> bool:
         """
-        Test whether ``self`` and ``other`` have identical meanings.
-
-        To return ``True``, ``other`` can be neither broader nor narrower.
+        Test whether ``self`` and ``other`` mean the same if they are both True.
         """
-
         if not isinstance(other, self.__class__):
             return False
 
         if not self.same_content_meaning(other):
             return False
 
-        if not self.same_term_positions(other):
+        return self.same_term_positions(other)
+
+    def means(self, other: Predicate) -> bool:
+        """
+        Test whether ``self`` and ``other`` have identical meanings.
+
+        To return ``True``, ``other`` can be neither broader nor narrower.
+        """
+
+        if not self._same_meaning_if_true(other):
             return False
 
         return self.truth == other.truth
 
-    def __gt__(self, other: Optional[Predicate]) -> bool:
+    def __gt__(self, other: Predicate) -> bool:
         """
         Test whether ``self`` implies ``other``.
 
@@ -292,30 +298,17 @@ class Predicate:
         """
         return self.implies(other)
 
-    def implies(self, other: Optional[Predicate]) -> bool:
+    def implies(self, other: Predicate) -> bool:
         """
         Test whether ``self`` implies ``other``.
-
-        :returns:
-            whether ``self`` implies ``other``, which is ``True``
-            if their statements about quantity imply it.
         """
-        if other is None:
-            return True
-        if not isinstance(other, self.__class__):
-            return False
-
-        # Assumes no predicate implies another based on meaning of their content text
-        if not (
-            self.same_content_meaning(other)
-            and self.term_index_permutations() == other.term_index_permutations()
-        ):
-            return False
-
         if self.truth is None:
             return False
-
-        return True
+        if not self._same_meaning_if_true(other):
+            return False
+        if other.truth is None:
+            return True
+        return self.truth == other.truth
 
     def __ge__(self, other: Predicate) -> bool:
         if self.means(other):
@@ -530,9 +523,7 @@ class Comparison(Predicate):
             return False
         return True
 
-    def implies(self, other: Optional[Predicate]) -> bool:
-        if other is None:
-            return True
+    def implies(self, other: Predicate) -> bool:
 
         if not super().implies(other):
             return False
@@ -542,16 +533,15 @@ class Comparison(Predicate):
 
         return self.includes_other_quantity(other)
 
-    def means(self, other: Optional[Predicate]) -> bool:
+    def means(self, other: Predicate) -> bool:
 
         if not super().means(other):
             return False
 
         return self.quantity == other.quantity and self.sign == other.sign
 
-    def contradicts(self, other: Optional[Predicate]) -> bool:
-        if other is None:
-            return False
+    def contradicts(self, other: Predicate) -> bool:
+
         if super().contradicts(other):
             return True
         if not self.consistent_dimensionality(other):
