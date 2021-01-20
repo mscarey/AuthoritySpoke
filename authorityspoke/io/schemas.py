@@ -77,6 +77,8 @@ class ExpandableSchema(Schema):
         """Make AuthoritySpoke object out of whatever data has been loaded."""
         if data.get("quantity") is not None:
             return Comparison(**data)
+        data.pop("quantity", None)
+        data.pop("sign", None)
         return self.__model__(**data)
 
 
@@ -158,7 +160,7 @@ class DecisionSchema(ExpandableSchema):
 
 def dump_quantity(obj: Predicate) -> Optional[Union[float, int, str]]:
     """Convert quantity to string if it's a pint ureg.Quantity object."""
-    if obj is None or obj.quantity is None:
+    if obj is None or obj.__dict__.get("quantity") is None:
         return None
     if isinstance(obj.quantity, (int, float)):
         return obj.quantity
@@ -501,7 +503,9 @@ SCHEMAS = list(ExpandableSchema.__subclasses__()) + [SelectorSchema, EnactmentSc
 def get_schema_for_item(item: Any) -> Schema:
     """Find the Marshmallow schema for an AuthoritySpoke object."""
     if isinstance(item, TextPositionSelector):
-        return SelectorSchema
+        return SelectorSchema()
+    if isinstance(item, Comparison):
+        return PredicateSchema()
     for option in SCHEMAS:
         if item.__class__ == option.__model__:
             return option()

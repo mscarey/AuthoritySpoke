@@ -1,5 +1,5 @@
 from authorityspoke.comparisons import FactorSequence
-from authorityspoke.predicates import Predicate
+from authorityspoke.predicates import Comparison, Predicate
 import json
 import os
 import pathlib
@@ -108,7 +108,7 @@ class TestFactLoad:
 class TestFactorLoad:
     def test_load_factor_marked_reciprocal(self):
         fact = Fact(
-            Predicate(
+            Comparison(
                 "the distance between $place1 and $place2 was",
                 sign="<",
                 quantity="5 miles",

@@ -226,10 +226,7 @@ class Predicate:
             return False
 
         if not isinstance(other, self.__class__):
-            raise TypeError(
-                f"{self.__class__} objects may only be compared for "
-                + f"contradiction with other {self.__class__} objects or None."
-            )
+            return False
 
         if self.truth is None or other.truth is None:
             return False
@@ -511,8 +508,10 @@ class Comparison(Predicate):
         content = super().add_truth_to_content(content)
         return f"{content} {self.quantity_comparison()}"
 
-    def consistent_dimensionality(self, other: Predicate) -> bool:
+    def consistent_dimensionality(self, other: Comparison) -> bool:
         """Test if ``other`` has a quantity parameter consistent with ``self``."""
+        if not isinstance(other, Comparison):
+            return False
 
         if isinstance(self.quantity, ureg.Quantity):
             if not isinstance(other.quantity, ureg.Quantity):

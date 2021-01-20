@@ -1,6 +1,6 @@
 import pytest
 
-from authorityspoke.predicates import Predicate, Q_
+from authorityspoke.predicates import Comparison, Predicate, Q_
 from authorityspoke.io import readers, schemas
 from authorityspoke.io.dump import to_dict, to_json
 
@@ -15,7 +15,6 @@ class TestPredicateLoad:
         schema = schemas.PredicateSchema()
         p4 = schema.load({"content": "{} was on the premises of {}"})
         assert p4.truth is True
-        assert p4.sign == ""
 
     def test_load_comparison_not_ending_with_was(self):
         schema = schemas.PredicateSchema()
@@ -74,7 +73,7 @@ class TestPredicateLoad:
         assert p7.sign == "<>"
 
     def test_read_quantity(self):
-        quantity = Predicate.read_quantity("35 feet")
+        quantity = Comparison.read_quantity("35 feet")
         assert str(quantity.units) == "foot"
 
     def test_make_comparison_when_absent(self):
@@ -89,7 +88,7 @@ class TestPredicateLoad:
 
 class TestPredicateDump:
     def test_dump_to_dict_with_units(self):
-        predicate = Predicate(
+        predicate = Comparison(
             "the distance between $place1 and $place2 was",
             truth=True,
             sign="<>",

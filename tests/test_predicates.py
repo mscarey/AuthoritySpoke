@@ -261,8 +261,7 @@ class TestContradiction:
         )
 
     def test_error_predicate_contradict_factor(self, make_predicate, watt_factor):
-        with pytest.raises(TypeError):
-            make_predicate["p7_true"].contradicts(watt_factor["f7"])
+        assert not make_predicate["p7_true"].contradicts(watt_factor["f7"])
 
     def test_no_contradiction_with_no_truth_value(self, make_predicate):
         assert not make_predicate["p2_no_truth"].contradicts(make_predicate["p2"])
