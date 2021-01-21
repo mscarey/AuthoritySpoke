@@ -10,7 +10,7 @@ class TestComparisons:
             _ = Comparison(
                 "the height of {} was {}",
                 sign=">>",
-                quantity=Q_("160 centimeters"),
+                expression=Q_("160 centimeters"),
             )
 
 
@@ -59,27 +59,28 @@ class TestPredicates:
 
     def test_convert_false_statement_about_quantity_to_obverse(self, make_predicate):
         assert make_predicate["p7_obverse"].truth is True
-        assert make_predicate["p7_obverse"].quantity == Q_(35, "foot")
+        assert make_predicate["p7_obverse"].expression == Q_(35, "foot")
         assert make_predicate["p7"].truth is True
         assert make_predicate["p7"].sign == "<="
+        assert 'comparison="<="' in repr(make_predicate["p7"])
         assert make_predicate["p7_obverse"].sign == "<="
 
     def test_quantity_type(self, make_predicate):
-        assert isinstance(make_predicate["p7"].quantity, Q_)
+        assert isinstance(make_predicate["p7"].expression, Q_)
 
     def test_quantity_string(self, make_predicate):
-        assert str(make_predicate["p7"].quantity) == "35 foot"
+        assert str(make_predicate["p7"].expression) == "35 foot"
 
     def test_predicate_content_comparison(self, make_predicate):
         assert make_predicate["p8_exact"].content == make_predicate["p7"].content
 
-    def test_quantity_comparison(self, make_predicate):
-        assert make_predicate["p7"].quantity_comparison() == "no more than 35 foot"
-        assert make_predicate["p9"].quantity_comparison() == "no more than 5 foot"
+    def test_expression_comparison(self, make_predicate):
+        assert make_predicate["p7"].expression_comparison() == "no more than 35 foot"
+        assert make_predicate["p9"].expression_comparison() == "no more than 5 foot"
 
-    def test_predicate_has_no_quantity_comparison(self, make_predicate):
+    def test_predicate_has_no_expression_comparison(self, make_predicate):
         with pytest.raises(AttributeError):
-            make_predicate["p1"].quantity_comparison() == ""
+            make_predicate["p1"].expression_comparison() == ""
 
     def test_context_slots(self, make_predicate):
         assert len(make_predicate["p7"]) == 2
@@ -205,8 +206,8 @@ class TestImplication:
         assert not make_predicate["p_quantity>=4"] > make_predicate["p_quantity>5"]
 
     def test_no_implication_of_greater_or_equal_quantity(self):
-        less = Comparison(template="The number of mice was", sign=">", quantity=4)
-        more = Comparison(template="The number of mice was", sign=">=", quantity=5)
+        less = Comparison(template="The number of mice was", sign=">", expression=4)
+        more = Comparison(template="The number of mice was", sign=">=", expression=5)
         assert not less.implies(more)
 
     def test_equal_implies_greater_or_equal(self, make_predicate):

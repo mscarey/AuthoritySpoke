@@ -75,9 +75,9 @@ class ExpandableSchema(Schema):
     @post_load
     def make_object(self, data, **kwargs):
         """Make AuthoritySpoke object out of whatever data has been loaded."""
-        if data.get("quantity") is not None:
+        if data.get("expression") is not None:
             return Comparison(**data)
-        data.pop("quantity", None)
+        data.pop("expression", None)
         data.pop("sign", None)
         return self.__model__(**data)
 
@@ -160,11 +160,11 @@ class DecisionSchema(ExpandableSchema):
 
 def dump_quantity(obj: Predicate) -> Optional[Union[float, int, str]]:
     """Convert quantity to string if it's a pint ureg.Quantity object."""
-    if obj is None or obj.__dict__.get("quantity") is None:
+    if obj is None or obj.__dict__.get("expression") is None:
         return None
-    if isinstance(obj.quantity, (int, float)):
-        return obj.quantity
-    return f"{obj.quantity.magnitude} {obj.quantity.units}"
+    if isinstance(obj.expression, (int, float)):
+        return obj.expression
+    return f"{obj.expression.magnitude} {obj.expression.units}"
 
 
 class PredicateSchema(ExpandableSchema):
@@ -178,7 +178,7 @@ class PredicateSchema(ExpandableSchema):
         missing=None,
         validate=validate.OneOf([""] + list(Comparison.opposite_comparisons.keys())),
     )
-    quantity = fields.Function(
+    expression = fields.Function(
         dump_quantity, deserialize=Comparison.read_quantity, missing=None
     )
 
@@ -200,7 +200,7 @@ class PredicateSchema(ExpandableSchema):
 
     def normalize_comparison(self, data: RawPredicate, **kwargs) -> RawPredicate:
         """Reduce the number of possible symbols to represent comparisons."""
-        if data.get("quantity") and not data.get("sign"):
+        if data.get("expression") and not data.get("sign"):
             data["sign"] = "="
 
         if data.get("sign") in Comparison.normalized_comparisons:
@@ -210,11 +210,11 @@ class PredicateSchema(ExpandableSchema):
     @pre_load
     def format_data_to_load(self, data: RawPredicate, **kwargs) -> RawPredicate:
         """Expand any reference to a quantity in the content text."""
-        if not data.get("quantity"):
+        if not data.get("expression"):
             (
                 data["content"],
                 data["sign"],
-                data["quantity"],
+                data["expression"],
             ) = self.split_quantity_from_content(data["content"])
         data = self.normalize_comparison(data)
         return data
@@ -298,7 +298,7 @@ class FactSchema(ExpandableSchema):
             "content",
             "truth",
             "sign",
-            "quantity",
+            "expression",
         ]
         data = nest_fields(data, nest="predicate", eggs=to_nest)
         data = self.wrap_single_element_in_list(data, "terms")

@@ -998,7 +998,7 @@ class TestStatuteRules:
                         Comparison(
                             "the length of $thing was",
                             sign=">=",
-                            quantity=Q_("5 millimeters"),
+                            expression=Q_("5 millimeters"),
                             truth=facial_hair_over_5mm,
                         ),
                         terms=beard,

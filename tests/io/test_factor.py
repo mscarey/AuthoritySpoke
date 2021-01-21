@@ -89,7 +89,7 @@ class TestFactLoad:
         assert len(story.predicate) == 1
         assert story.predicate.content.startswith("The number of castles")
         assert story.predicate.sign == ">"
-        assert story.predicate.quantity == 3
+        assert story.predicate.expression == 3
 
     def test_make_fact_from_string(self, watt_factor):
         fact_float_data = {
@@ -111,16 +111,16 @@ class TestFactorLoad:
             Comparison(
                 "the distance between $place1 and $place2 was",
                 sign="<",
-                quantity="5 miles",
+                expression="5 miles",
             ),
             terms=FactorSequence([Entity("the apartment"), Entity("the office")]),
         )
-        assert hasattr(fact.predicate.quantity, "dimensionality")
+        assert hasattr(fact.predicate.expression, "dimensionality")
         data = {
             "type": "fact",
             "content": "the distance between ${place1} and ${place2} was",
             "sign": "<",
-            "quantity": "5 miles",
+            "expression": "5 miles",
             "terms": [
                 {"type": "entity", "name": "the office"},
                 {"type": "entity", "name": "the apartment"},
@@ -144,7 +144,7 @@ class TestFactorLoad:
 class TestFactDump:
     def test_dump_with_quantity(self, watt_factor):
         f8_dict = to_dict(watt_factor["f8"])
-        assert f8_dict["predicate"]["quantity"] == "20 foot"
+        assert f8_dict["predicate"]["expression"] == "20 foot"
 
     def test_dump_complex_fact(self, make_complex_fact):
         relevant_fact = make_complex_fact["f_relevant_murder"]

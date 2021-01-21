@@ -24,7 +24,7 @@ def expand_node_shorthand(obj: Dict[str, Any]) -> Dict[str, Any]:
         if obj.get(list_field) is not None:
             obj = wrap_single_element_in_list(obj, list_field)
 
-    to_nest = ["content", "truth", "sign", "quantity"]
+    to_nest = ["content", "truth", "sign", "expression"]
     obj = nesting.nest_fields(obj, nest="predicate", eggs=to_nest)
 
     obj = collapse_known_factors(obj)

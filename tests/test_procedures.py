@@ -277,12 +277,12 @@ class TestProcedureUnion:
 
 
 p_small_weight = Comparison(
-    "the amount of gold $person possessed was", sign="<", quantity=Q_("1 gram")
+    "the amount of gold $person possessed was", sign="<", expression=Q_("1 gram")
 )
 p_large_weight = Comparison(
     "the amount of gold $person possessed was",
     sign=">=",
-    quantity=Q_("100 kilograms"),
+    expression=Q_("100 kilograms"),
 )
 alice = Entity("Alice")
 bob = Entity("Bob")

@@ -13,7 +13,7 @@ class TestPredicateLoad:
 
     def test_load_just_content(self):
         schema = schemas.PredicateSchema()
-        p4 = schema.load({"content": "{} was on the premises of {}"})
+        p4 = schema.load({"content": "$person was on the premises of $place"})
         assert p4.truth is True
 
     def test_load_comparison_not_ending_with_was(self):
@@ -24,7 +24,7 @@ class TestPredicateLoad:
                     "content": "the distance between $place1 and $place2 was 35 feet",
                     "truth": True,
                     "sign": "!=",
-                    "quantity": "35 feet",
+                    "expression": "35 feet",
                 }
             )
 
@@ -35,7 +35,7 @@ class TestPredicateLoad:
                 "content": "the distance between $place1 and $place2 was",
                 "truth": True,
                 "sign": "!=",
-                "quantity": "35 feet",
+                "expression": "35 feet",
             }
         )
         assert p7.sign == "<>"
@@ -67,7 +67,7 @@ class TestPredicateLoad:
                 "content": "the distance between $place1 and $place2 was",
                 "truth": True,
                 "sign": "!=",
-                "quantity": "35 feet",
+                "expression": "35 feet",
             }
         )
         assert p7.sign == "<>"
@@ -79,7 +79,7 @@ class TestPredicateLoad:
     def test_make_comparison_when_absent(self):
         schema = schemas.PredicateSchema()
         statement = schema.load(
-            {"content": "$person's favorite number was", "quantity": 42}
+            {"content": "$person's favorite number was", "expression": 42}
         )
         assert statement.sign == "="
         assert "$person's favorite number was exactly equal to 42" in str(statement)
@@ -92,14 +92,16 @@ class TestPredicateDump:
             "the distance between $place1 and $place2 was",
             truth=True,
             sign="<>",
-            quantity=Q_("35 feet"),
+            expression=Q_("35 feet"),
         )
         dumped = to_dict(predicate)
-        assert dumped["quantity"] == "35 foot"
+        assert dumped["expression"] == "35 foot"
 
     def test_round_trip(self):
         schema = schemas.PredicateSchema()
-        statement = schema.load({"content": "{}'s favorite number was", "quantity": 42})
+        statement = schema.load(
+            {"content": "{}'s favorite number was", "expression": 42}
+        )
         dumped = to_dict(statement)
         new_statement = schema.load(dumped)
         assert "{}'s favorite number was exactly equal to 42" in str(new_statement)

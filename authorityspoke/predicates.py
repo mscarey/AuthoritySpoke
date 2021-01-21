@@ -29,6 +29,9 @@ class StatementTemplate(Template):
         if make_singular:
             self.make_content_singular()
 
+    def __str__(self) -> str:
+        return f"StatementTemplate({self.template})"
+
     def make_content_singular(self) -> None:
         """Convert template text for self.context to singular "was"."""
         for placeholder in self.get_placeholders():
@@ -65,11 +68,11 @@ class StatementTemplate(Template):
 
     def get_placeholders(self) -> List[str]:
         r"""
-        Count bracket pairs in ``self.content``, minus 1 if ``self.quantity==True``.
+        Count bracket pairs in ``self.template``.
 
         :returns:
             the number of context :class:`.Factor`\s that must be
-            specified to fill in the blanks in ``self.content``.
+            specified to fill in the blanks in ``self.template``.
         """
 
         placeholders = [
@@ -154,20 +157,6 @@ class Predicate:
         true or false. ``None`` indicates an assertion as to "whether"
         the clause is true or false, without specifying which.
 
-    :param sign:
-        A string representing an equality or inequality sign like ``==``,
-        ``>``, or ``<=``. Used to indicate that the clause ends with a
-        comparison to some quantity. Should be defined if and only if a
-        ``quantity`` is defined. Even though "=" is the default, it's
-        the least useful, because courts almost always state rules that
-        are intended to apply to quantities above or below some threshold.
-
-    :param quantity:
-        a Python number object or :class:`ureg.Quantity` from the
-        `pint <https://pint.readthedocs.io/en/0.9/>`_ library. Comparisons to
-        quantities can be used to determine whether :class:`Predicate`\s
-        imply or contradict each other. A single :class:`Predicate`
-        may contain no more than one ``sign`` and one ``quantity``.
     """
 
     def __init__(self, template: str, truth: Optional[bool] = True, *args, **kwargs):
@@ -315,48 +304,48 @@ class Predicate:
     def excludes_other_quantity(self, other: Predicate) -> bool:
         """Test if quantity ranges in self and other are non-overlapping."""
         if (
-            not self.quantity
-            or not other.quantity
+            not self.expression
+            or not other.expression
             or not self.consistent_dimensionality(other)
         ):
             return False
 
-        if self.quantity > other.quantity:
+        if self.expression > other.expression:
             if "<" not in self.sign and ">" not in other.sign:
                 return True
-        if self.quantity < other.quantity:
+        if self.expression < other.expression:
             if ">" not in self.sign and "<" not in other.sign:
                 return True
-        return self.quantity == other.quantity and (
+        return self.expression == other.expression and (
             ("=" in self.sign) != ("=" in other.sign)
         )
 
     def includes_other_quantity(self, other: Predicate) -> bool:
         """Test if the range of quantities mentioned in self is a subset of other's."""
-        if not self.quantity or not other.quantity:
-            return bool(self.quantity)
+        if not self.expression or not other.expression:
+            return bool(self.expression)
 
         if not self.consistent_dimensionality(other):
             return False
 
         if (
-            (self.quantity < other.quantity)
+            (self.expression < other.expression)
             and ("<" in self.sign or "=" in self.sign)
             and ("<" in other.sign)
         ):
             return True
         if (
-            (self.quantity > other.quantity)
+            (self.expression > other.expression)
             and (">" in self.sign or "=" in self.sign)
             and (">" in other.sign)
         ):
             return True
         if "=" in self.sign:
-            if ("<" in other.sign and self.quantity < other.quantity) or (
-                ">" in other.sign and self.quantity > other.quantity
+            if ("<" in other.sign and self.expression < other.expression) or (
+                ">" in other.sign and self.expression > other.expression
             ):
                 return True
-        return self.quantity == other.quantity and (
+        return self.expression == other.expression and (
             ("=" in self.sign) == ("=" in other.sign)
         )
 
@@ -366,8 +355,8 @@ class Predicate:
 
         :returns:
             the number of entities that can fit in the pairs of brackets
-            in the predicate. ``self.quantity`` doesn't count as one of these entities,
-            even though the place where ``self.quantity`` goes in represented by brackets
+            in the predicate. ``self.expression`` doesn't count as one of these entities,
+            even though the place where ``self.expression`` goes in represented by brackets
             in the ``self.content`` string.
         """
 
@@ -419,7 +408,24 @@ class Predicate:
 
 
 class Comparison(Predicate):
-    """A Predicate that compares a described quantity to a constant."""
+    """
+    A Predicate that compares a described quantity to a constant.
+
+    :param sign:
+        A string representing an equality or inequality sign like ``==``,
+        ``>``, or ``<=``. Used to indicate that the clause ends with a
+        comparison to some quantity. Should be defined if and only if a
+        ``quantity`` is defined. Even though "=" is the default, it's
+        the least useful, because courts almost always state rules that
+        are intended to apply to quantities above or below some threshold.
+
+    :param quantity:
+        a Python number object or :class:`ureg.Quantity` from the
+        `pint <https://pint.readthedocs.io/en/0.9/>`_ library. Comparisons to
+        quantities can be used to determine whether :class:`Predicate`\s
+        imply or contradict each other. A single :class:`Predicate`
+        may contain no more than one ``sign`` and one ``quantity``.
+    """
 
     opposite_comparisons: ClassVar[Dict[str, str]] = {
         ">=": "<",
@@ -435,9 +441,9 @@ class Comparison(Predicate):
     def __init__(
         self,
         template: str,
+        sign: str = "=",
+        expression: Union[int, float, ureg.Quantity] = 0,
         truth: Optional[bool] = True,
-        sign: str = "",
-        quantity: Optional[Union[int, float, ureg.Quantity]] = None,
     ):
         """
         Clean up and test validity of attributes.
@@ -447,7 +453,7 @@ class Comparison(Predicate):
         """
         super().__init__(template, truth=truth)
         self.sign = sign
-        self.quantity = self.read_quantity(quantity)
+        self.expression = self.read_quantity(expression)
 
         if self.sign and self.sign not in self.opposite_comparisons.keys():
             raise ValueError(
@@ -458,7 +464,7 @@ class Comparison(Predicate):
             self.truth = True
             self.sign = self.opposite_comparisons[self.sign]
 
-        if self.quantity is not None and not self.content.endswith("was"):
+        if self.expression is not None and not self.content.endswith("was"):
             raise ValueError(
                 "If a Predicate includes a quantity, its 'content' must end "
                 "with the word 'was' to signal the comparison with the quantity. "
@@ -468,8 +474,8 @@ class Comparison(Predicate):
     def __repr__(self):
         return (
             f'{self.__class__.__name__}(template="{self.template.template}", '
-            "truth={self.truth}, "
-            'comparison="{self.comparison}", quantity={self.quantity})'
+            f"truth={self.truth}, "
+            f'comparison="{self.sign}", quantity={self.expression})'
         )
 
     @classmethod
@@ -506,19 +512,19 @@ class Comparison(Predicate):
 
     def add_truth_to_content(self, content: str) -> str:
         content = super().add_truth_to_content(content)
-        return f"{content} {self.quantity_comparison()}"
+        return f"{content} {self.expression_comparison()}"
 
     def consistent_dimensionality(self, other: Comparison) -> bool:
         """Test if ``other`` has a quantity parameter consistent with ``self``."""
         if not isinstance(other, Comparison):
             return False
 
-        if isinstance(self.quantity, ureg.Quantity):
-            if not isinstance(other.quantity, ureg.Quantity):
+        if isinstance(self.expression, ureg.Quantity):
+            if not isinstance(other.expression, ureg.Quantity):
                 return False
-            if self.quantity.dimensionality != other.quantity.dimensionality:
+            if self.expression.dimensionality != other.expression.dimensionality:
                 return False
-        elif isinstance(other.quantity, ureg.Quantity):
+        elif isinstance(other.expression, ureg.Quantity):
             return False
         return True
 
@@ -527,7 +533,7 @@ class Comparison(Predicate):
         if not super().implies(other):
             return False
 
-        if not (self.quantity and other.quantity and self.sign and other.sign):
+        if not (self.expression and other.expression and self.sign and other.sign):
             return False
 
         return self.includes_other_quantity(other)
@@ -537,7 +543,7 @@ class Comparison(Predicate):
         if not super().means(other):
             return False
 
-        return self.quantity == other.quantity and self.sign == other.sign
+        return self.expression == other.expression and self.sign == other.sign
 
     def contradicts(self, other: Predicate) -> bool:
 
@@ -553,10 +559,10 @@ class Comparison(Predicate):
             template=self.content,
             truth=not self.truth,
             sign=self.sign,
-            quantity=self.quantity,
+            expression=self.expression,
         )
 
-    def quantity_comparison(self) -> str:
+    def expression_comparison(self) -> str:
         """
         Convert text to a comparison with a quantity.
 
@@ -566,7 +572,7 @@ class Comparison(Predicate):
             `pint <pint.readthedocs.io>`_  library.
         """
 
-        if not self.quantity:
+        if not self.expression:
             return ""
         comparison = self.sign or "="
         expand = {
@@ -579,4 +585,4 @@ class Comparison(Predicate):
             ">=": "at least",
             "<=": "no more than",
         }
-        return f"{expand[comparison]} {self.quantity}"
+        return f"{expand[comparison]} {self.expression}"
