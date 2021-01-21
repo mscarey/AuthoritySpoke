@@ -144,13 +144,19 @@ class Predicate:
 
     Predicates may be "alleged" by a pleading, "supported" by evidence, or
     "found" to be factual by a jury verdict or a judge's finding of fact.
+    The past tense is used because legal analysis is usually backward-looking,
+    determining the legal effect of past acts or past conditions.
 
-    :param content:
+    :param template:
         a clause containing an assertion in English in the past tense, with
         placeholders showing where references to specific
         :class:`~authorityspoke.factors.Factor`\s
         from the case can be inserted to make the clause specific.
         This string must be a valid Python :py:class:`string.Template`\.
+        Don't use capitalization or end punctuation to signal the beginning
+        or end of the phrase, because the phrase may be used in a
+        context where it's only part of a longer sentence.
+
 
     :param truth:
         indicates whether the clause in ``content`` is asserted to be

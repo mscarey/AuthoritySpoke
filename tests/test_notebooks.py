@@ -13,7 +13,9 @@ from authorityspoke import Enactment
 from authorityspoke.io.downloads import download_case, FakeClient
 from authorityspoke.io.readers import read_decision
 from authorityspoke.factors import ContextRegister
+from authorityspoke.facts import Fact
 from authorityspoke.entities import Entity
+from authorityspoke.predicates import Comparison
 
 load_dotenv()
 
@@ -176,3 +178,15 @@ class TestIntroduction:
 
         with pytest.raises(StopIteration):
             second_explanation = next(gen)
+
+
+class TestTemplateStrings:
+    """Tests from the notebook introducing template strings."""
+
+    def test_no_line_break_in_fact_string(self):
+        elaine = Entity("Elaine", generic=True)
+        tax_rate_over_25 = Comparison(
+            "${taxpayer}'s marginal income tax rate was", sign=">", expression=0.25
+        )
+        elaine_tax_rate = Fact(tax_rate_over_25, terms=elaine)
+        assert "\n" not in str(elaine_tax_rate)
