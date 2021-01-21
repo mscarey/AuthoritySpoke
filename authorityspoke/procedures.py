@@ -178,15 +178,15 @@ class Procedure(Comparable):
 
         text = "RESULT:"
         for f in self.outputs:
-            text += "\n" + indented(str(f))
+            text += "\n" + indented(f.wrapped_string)
         if self.inputs:
             text += "\nGIVEN:"
             for f in self.inputs:
-                text += "\n" + indented(str(f))
+                text += "\n" + indented(f.wrapped_string)
         if self.despite:
             text += "\nDESPITE:"
             for f in self.despite:
-                text += "\n" + indented(str(f))
+                text += "\n" + indented(f.wrapped_string)
 
         return text
 

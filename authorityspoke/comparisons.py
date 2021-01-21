@@ -217,6 +217,10 @@ class Comparable(ABC):
         """Return string representation without line breaks."""
         return textwrap.shorten(str(self), width=5000, placeholder="...")
 
+    @property
+    def wrapped_string(self) -> str:
+        return str(self)
+
     def consistent_with(
         self, other: Optional[Comparable], context: Optional[ContextRegister] = None
     ) -> bool:

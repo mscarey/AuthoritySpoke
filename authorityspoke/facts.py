@@ -104,7 +104,8 @@ class Fact(Factor):
                 + "indices of Factor objects in the case_factors parameter."
             )
 
-    def __str__(self):
+    @property
+    def wrapped_string(self):
         content = str(self.predicate.content_with_terms(self.terms))
         unwrapped = self.predicate.add_truth_to_content(content)
         text = wrapped(super().__str__().format(unwrapped))
@@ -129,8 +130,7 @@ class Fact(Factor):
                 text += f"\n{str(factor_text)}"
         return text
 
-    @property
-    def short_string(self):
+    def __str__(self):
         """Create one-line string representation for inclusion in other Facts."""
         content = str(self.predicate.content_with_terms(self.terms))
         unwrapped = self.predicate.add_truth_to_content(content)

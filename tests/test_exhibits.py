@@ -8,6 +8,15 @@ class TestExhibits:
         e = Exhibit(form="testimony")
         assert not e.absent
 
+    def test_exhibit_short_string(self, make_exhibit):
+        assert (
+            make_exhibit["no_shooting_testimony"].short_string.lower()
+            == (
+                "the testimony attributed to <Alice>, asserting "
+                "the fact it was false that <Alice> shot <Bob>,"
+            ).lower()
+        )
+
 
 class TestExhibitsSameMeaning:
     def test_equality(self, make_exhibit):
@@ -43,7 +52,10 @@ class TestExhibitsSameMeaning:
         explanation = make_exhibit["no_shooting_testimony"].explain_same_meaning(
             make_exhibit["no_shooting_entity_order_testimony"]
         )
-        assert str(explanation) == "ContextRegister(<Alice> -> <Bob>, <Bob> -> <Alice>)"
+        assert (
+            str(explanation)
+            == "ContextRegister(<Alice> is like <Bob>, <Bob> is like <Alice>)"
+        )
 
 
 class TestExhibitsImplication:
