@@ -80,7 +80,7 @@ class StatementTemplate(Template):
             for m in self.pattern.finditer(self.template)
             if m.group("named") or m.group("braced")
         ]
-        return placeholders
+        return list(dict.fromkeys(placeholders))
 
     def _check_number_of_terms(
         self, placeholders: List[str], context: Sequence[Factor]
@@ -383,8 +383,7 @@ class Predicate:
         they've been labeled as interchangeable with one another.
         """
 
-        placeholders = self.template.get_placeholders()
-        without_duplicates = list(dict.fromkeys(placeholders))
+        without_duplicates = self.template.get_placeholders()
         result = {p: {i} for i, p in enumerate(without_duplicates)}
 
         for index, placeholder in enumerate(without_duplicates):

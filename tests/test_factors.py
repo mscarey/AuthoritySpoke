@@ -113,6 +113,17 @@ class TestFacts:
         """
         assert "Hideaway Lodge was a motel" in str(watt_factor["f1_specific"])
 
+    def test_string_for_fact_with_identical_terms(self):
+        devon = Entity("Devon", generic=True)
+        elaine = Entity("Elaine", generic=True)
+        opened_account = Fact(
+            Predicate("$applicant opened a bank account for $applicant and $cosigner"),
+            terms=(devon, elaine),
+        )
+        assert "<Devon> opened a bank account for <Devon> and <Elaine>" in str(
+            opened_account
+        )
+
     def test_str_with_concrete_context(self, make_opinion_with_holding):
         holding = list(make_opinion_with_holding["cardenas_majority"].holdings)[1]
         longer_str = holding.inputs[0].str_with_concrete_context
