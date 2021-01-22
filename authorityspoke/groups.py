@@ -62,7 +62,7 @@ class ComparableGroup(Tuple[F, ...], Comparable):
         :param other:
 
         :param context:
-            correspondences between :class:`Factor`s in self and other
+            correspondences between :class:`Factor`\s in self and other
             that can't be changed in seeking a way to interpret the groups
             as consistent
 
@@ -97,7 +97,7 @@ class ComparableGroup(Tuple[F, ...], Comparable):
             are internally consistent, but may not be consistent with ``self_factors``.
 
         :param context:
-            correspondences between :class:`Factor`s in self and other
+            correspondences between :class:`Factor`\s in self and other
             that can't be changed in seeking a contradiction
 
         :returns:

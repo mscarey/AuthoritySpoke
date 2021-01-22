@@ -354,12 +354,12 @@ class Comparable(ABC):
                     generics[str(generic)] = generic
         return generics
 
-    def get_factor_by_name(self, name: str) -> Optional[Factor]:
+    def get_factor_by_name(self, name: str) -> Optional[Comparable]:
         """
         Search of ``self`` and ``self``'s attributes for :class:`Factor` with specified ``name``.
 
         :returns:
-            a :class:`Factor` with the specified ``name`` attribute
+            a :class:`Comparable` with the specified ``name`` attribute
             if it exists, otherwise ``None``.
         """
         factors_to_search = self.recursive_factors
@@ -368,7 +368,7 @@ class Comparable(ABC):
                 return value
         return None
 
-    def get_factor_by_str(self, query: str) -> Optional[Factor]:
+    def get_factor_by_str(self, query: str) -> Optional[Comparable]:
         """
         Search of ``self`` and ``self``'s attributes for :class:`Factor` with specified string.
 

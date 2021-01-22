@@ -208,7 +208,7 @@ class Predicate:
 
         return with_plurals
 
-    def contradicts(self, other: Optional[Predicate]) -> bool:
+    def contradicts(self, other: Predicate) -> bool:
         r"""
         Test whether ``other`` and ``self`` have contradictory meanings.
 
@@ -217,8 +217,6 @@ class Predicate:
         no quantities, it returns ``False`` only if the content is exactly
         the same and ``self.truth`` is different.
         """
-        if other is None:
-            return False
 
         if not isinstance(other, self.__class__):
             return False
