@@ -298,6 +298,22 @@ class TestSameMeaning:
         """
         assert watt_factor["f7"].means(watt_factor["f7_swap_entities"])
 
+    def test_interchangeable_concrete_terms(self):
+        """Detect that placeholders differing only by a final digit are interchangeable."""
+        ann = Entity("Ann", generic=False)
+        bob = Entity("Bob", generic=False)
+
+        ann_and_bob_were_family = Fact(
+            Predicate("$relative1 and $relative2 were members of the same family"),
+            terms=(ann, bob),
+        )
+        bob_and_ann_were_family = Fact(
+            Predicate("$relative1 and $relative2 were members of the same family"),
+            terms=(bob, ann),
+        )
+
+        assert ann_and_bob_were_family.means(bob_and_ann_were_family)
+
     def test_unequal_due_to_repeating_entity(self, make_factor):
         """I'm not convinced that a model of a Fact ever needs to include
         multiple references to the same Entity just because the name of the

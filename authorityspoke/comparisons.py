@@ -186,8 +186,11 @@ def seek_factor(
 
 
 def convert_changes_to_register(
-    factor: Comparable, changes: Union[Comparable, List, Tuple]
+    factor: Comparable,
+    changes: Union[Comparable, Dict[str, Comparable], List[Comparable]],
 ) -> ContextRegister:
+    if isinstance(changes, ContextRegister):
+        return changes
     if not isinstance(changes, Iterable):
         changes = (changes,)
     if isinstance(changes, (list, tuple)):
@@ -198,14 +201,14 @@ def convert_changes_to_register(
             and all(isinstance(factor, Comparable) for factor in changes[1])
         ):
             return ContextRegister.from_lists(changes[0], changes[1])
-        generic_factors = factor.generic_factors_by_str().keys()
+        generic_factors = list(factor.generic_factors_by_str().keys())
         if len(generic_factors) != len(changes):
             raise ValueError(
                 f"Needed {len(generic_factors)} replacements for the "
                 + f"items of generic_factors, but {len(changes)} were provided."
             )
-        changes = ContextRegister.from_lists(generic_factors, changes)
-    return changes
+        return ContextRegister.from_lists(generic_factors, changes)
+    return ContextRegister.from_dict(changes)
 
 
 class Comparable(ABC):
@@ -848,14 +851,19 @@ class ContextRegister:
         return self._reverse_matches
 
     @classmethod
-    def from_lists(
-        cls, keys=List[Comparable], values=List[Comparable]
-    ) -> ContextRegister:
+    def from_lists(cls, keys: List[str], values: List[Comparable]) -> ContextRegister:
         pairs = zip_longest(keys, values)
         new = cls()
         for pair in pairs:
             new.insert_pair(pair[0], pair[1])
         return new
+
+    @classmethod
+    def from_dict(cls, data: Dict) -> ContextRegister:
+        result = ContextRegister()
+        for k, v in data.items():
+            result.insert_pair(key=k, value=v)
+        return result
 
     def check_match(self, key: Comparable, value: Comparable) -> bool:
         return self.get(str(key)) == value
