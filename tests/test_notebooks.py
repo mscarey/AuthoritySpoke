@@ -44,13 +44,11 @@ class TestIntroduction:
         lotus_majority = make_opinion_with_holding["lotus_majority"]
 
         seinfeld_holding = lotus_majority.holdings[0].new_context(
-            (
-                [
-                    Entity("Borland International"),
-                    Entity("the Lotus menu command hierarchy"),
-                ],
-                [Entity("Carol Publishing Group"), Entity("Seinfeld")],
-            ),
+            terms_to_replace=[
+                Entity("Borland International"),
+                Entity("the Lotus menu command hierarchy"),
+            ],
+            changes=[Entity("Carol Publishing Group"), Entity("Seinfeld")],
         )
 
         assert lotus_majority.holdings[0] != seinfeld_holding

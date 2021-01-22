@@ -87,13 +87,15 @@ def new_context_helper(func: Callable):
     def wrapper(
         factor: Comparable,
         changes: Optional[Union[Sequence[Comparable], ContextRegister]],
+        terms_to_replace: Optional[Sequence[Comparable]] = None,
         source: Optional[Comparable] = None,
     ) -> Comparable:
 
         if changes is None:
             return factor
-        if not isinstance(changes, ContextRegister):
-            changes = convert_changes_to_register(factor, changes)
+        changes = convert_changes_to_register(
+            factor=factor, changes=changes, terms_to_replace=terms_to_replace
+        )
 
         expanded_changes = ContextRegister()
         for old, new in changes.items():
@@ -188,20 +190,26 @@ def seek_factor(
 def convert_changes_to_register(
     factor: Comparable,
     changes: Union[Comparable, Dict[str, Comparable], List[Comparable]],
+    terms_to_replace: Optional[List[Comparable]] = None,
 ) -> ContextRegister:
     if isinstance(changes, ContextRegister):
         return changes
     if not isinstance(changes, Iterable):
-        changes = (changes,)
+        changes = [changes]
+    if terms_to_replace:
+        if not isinstance(changes, List):
+            raise TypeError(
+                "If 'terms_to_replace' is given, 'changes' must be a list of replacements, "
+                f"not type {type(changes)}."
+            )
+        if len(terms_to_replace) != len(changes):
+            raise ValueError(
+                "Cannot create ContextRegister because 'terms_to_replace' is not the same length "
+                f"as 'changes'.\nterms_to_replace: ({terms_to_replace})\nchanges: ({changes})"
+            )
+        return ContextRegister.from_lists(keys=terms_to_replace, values=changes)
     if isinstance(changes, (list, tuple)):
-        if (
-            len(changes) == 2
-            and all(isinstance(item, (tuple, list)) for item in changes)
-            and all(isinstance(factor, Comparable) for factor in changes[0])
-            and all(isinstance(factor, Comparable) for factor in changes[1])
-        ):
-            return ContextRegister.from_lists(changes[0], changes[1])
-        generic_factors = list(factor.generic_factors_by_str().keys())
+        generic_factors = list(factor.generic_factors_by_str().values())
         if len(generic_factors) != len(changes):
             raise ValueError(
                 f"Needed {len(generic_factors)} replacements for the "
@@ -851,7 +859,9 @@ class ContextRegister:
         return self._reverse_matches
 
     @classmethod
-    def from_lists(cls, keys: List[str], values: List[Comparable]) -> ContextRegister:
+    def from_lists(
+        cls, keys: List[Comparable], values: List[Comparable]
+    ) -> ContextRegister:
         pairs = zip_longest(keys, values)
         new = cls()
         for pair in pairs:

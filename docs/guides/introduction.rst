@@ -525,13 +525,11 @@ followed by a list of their replacements.
 
     >>> from authorityspoke import Entity
     >>> seinfeld_holding = lotus.holdings[0].new_context(
-        (
-            [
+        terms_to_replace=[
                 Entity("Borland International"),
                 Entity("the Lotus menu command hierarchy"),
             ],
-            [Entity("Carol Publishing Group"), Entity("Seinfeld")],
-        ),
+        changes=[Entity("Carol Publishing Group"), Entity("Seinfeld")]
     )
 
 The :meth:`~authorityspoke.holdings.Holding.new_context` method
