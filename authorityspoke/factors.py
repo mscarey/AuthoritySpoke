@@ -166,8 +166,28 @@ class Factor(Comparable):
         a comparison before moving on to the more costly :class:`Analogy`
         process. Or maybe it's useful for testing.
         """
+        orderings = self.term_permutations()
+        for ordering in orderings:
+            if self.compare_ordering_of_terms(
+                other=other, relation=relation, ordering=ordering
+            ):
+                return True
+        return False
+
+    def compare_ordering_of_terms(
+        self, other: Factor, relation: Callable, ordering: FactorSequence
+    ) -> bool:
+        """
+        Determine whether one ordering of self's terms matches other's terms.
+
+        Multiple term orderings exist where the terms can be rearranged without
+        changing the Fact's meaning.
+
+        For instance, "<Ann> and <Bob> both were members of the same family" has a
+        second ordering "<Bob> and <Ann> both were members of the same family".
+        """
         valid = True
-        for i, self_factor in enumerate(self.terms):
+        for i, self_factor in enumerate(ordering):
             if not (self_factor is other.terms[i] is None):
                 if not (self_factor and relation(self_factor, other.terms[i])):
                     valid = False

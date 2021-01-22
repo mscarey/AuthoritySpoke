@@ -304,11 +304,11 @@ class TestSameMeaning:
         bob = Entity("Bob", generic=False)
 
         ann_and_bob_were_family = Fact(
-            Predicate("$relative1 and $relative2 were members of the same family"),
+            Predicate("$relative1 and $relative2 both were members of the same family"),
             terms=(ann, bob),
         )
         bob_and_ann_were_family = Fact(
-            Predicate("$relative1 and $relative2 were members of the same family"),
+            Predicate("$relative1 and $relative2 both were members of the same family"),
             terms=(bob, ann),
         )
 
