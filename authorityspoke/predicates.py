@@ -12,7 +12,7 @@ from itertools import product
 import re
 
 from string import Template
-from typing import ClassVar, Dict, Iterable, Iterator
+from typing import Any, ClassVar, Dict, Iterable, Iterator
 from typing import List, Optional, Sequence, Set, Union
 
 from pint import UnitRegistry
@@ -208,19 +208,19 @@ class Predicate:
 
         return with_plurals
 
-    def contradicts(self, other: Predicate) -> bool:
+    def contradicts(self, other: Any) -> bool:
         r"""
         Test whether ``other`` and ``self`` have contradictory meanings.
 
-        This first tries to find a contradiction based on the relationship
-        between the quantities in the :class:`Predicate`\s. If there are
-        no quantities, it returns ``False`` only if the content is exactly
-        the same and ``self.truth`` is different.
+        This is determined only by the ``truth`` value, the exact template
+        content, and whether the placeholders indicate interchangeable terms.
         """
 
         if not isinstance(other, self.__class__):
             return False
+        return self._contradicts_predicate(other)
 
+    def _contradicts_predicate(self, other: Predicate) -> bool:
         if self.truth is None or other.truth is None:
             return False
 
@@ -411,7 +411,7 @@ class Predicate:
 
 
 class Comparison(Predicate):
-    """
+    r"""
     A Predicate that compares a described quantity to a constant.
 
     :param sign:
@@ -548,9 +548,18 @@ class Comparison(Predicate):
 
         return self.expression == other.expression and self.sign == other.sign
 
-    def contradicts(self, other: Predicate) -> bool:
+    def contradicts(self, other: Any) -> bool:
+        """
+        Test whether ``other`` and ``self`` have contradictory meanings.
 
-        if super().contradicts(other):
+        If the checks in the Predicate class find no contradiction, this
+        method looks for a contradiction in the dimensionality detected by the
+        ``pint`` library, or in the possible ranges for each Comparison's
+        numeric ``expression``.
+        """
+        if not isinstance(other, self.__class__):
+            return False
+        if self._contradicts_predicate(other):
             return True
         if not self.consistent_dimensionality(other):
             return False
