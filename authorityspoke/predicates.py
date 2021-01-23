@@ -436,17 +436,18 @@ class Comparison(Predicate):
 
     @classmethod
     def read_quantity(
-        cls, value: Union[float, int, str]
-    ) -> Union[float, int, ureg.Quantity]:
-        """
-        Create pint quantity object from text.
+        cls, value: Union[date, float, int, str]
+    ) -> Union[date, float, int, ureg.Quantity]:
+        r"""
+        Create numeric expression from text for Comparison class.
 
-        See `pint tutorial <https://pint.readthedocs.io/en/0.9/tutorial.html>`_
+        This expression can be a datetime.date, an int, a float, or a
+        pint quantity. (See `pint
+        tutorial <https://pint.readthedocs.io/en/0.9/tutorial.html>`_)
 
         :param quantity:
-            when a string is being parsed for conversion to a
-            :class:`Comparison`, this is the part of the string
-            after the equals or inequality sign.
+            an object to be interpreted as the ``expression`` field
+            of a :class:`Comparison`
         :returns:
             a Python number object or a :class:`Quantity`
             object created with `pint.UnitRegistry
@@ -457,6 +458,13 @@ class Comparison(Predicate):
         if isinstance(value, (int, float, ureg.Quantity, date)):
             return value
         quantity = value.strip()
+
+        try:
+            result = date.fromisoformat(value)
+            return result
+        except ValueError:
+            pass
+
         if quantity.isdigit():
             return int(quantity)
         float_parts = quantity.split(".")

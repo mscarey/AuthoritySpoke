@@ -1,3 +1,5 @@
+from datetime import date
+
 import pytest
 
 from authorityspoke.predicates import Comparison, Predicate, Q_
@@ -85,6 +87,17 @@ class TestPredicateLoad:
         assert "$person's favorite number was exactly equal to 42" in str(statement)
         assert len(statement) == 1
 
+    def test_load_predicate_with_date_expression(self):
+        schema = schemas.PredicateSchema()
+        data = {
+            "content": "the date when $work was created was",
+            "expression": "1978-01-01",
+            "sign": ">=",
+            "truth": True,
+        }
+        statement = schema.load(data)
+        assert statement.expression == date(1978, 1, 1)
+
 
 class TestPredicateDump:
     def test_dump_to_dict_with_units(self):
@@ -105,3 +118,12 @@ class TestPredicateDump:
         dumped = to_dict(statement)
         new_statement = schema.load(dumped)
         assert "{}'s favorite number was exactly equal to 42" in str(new_statement)
+
+    def test_dump_predicate_with_date_expression(self):
+        copyright_date_range = Comparison(
+            "the date when $work was created was",
+            sign=">=",
+            expression=date(1978, 1, 1),
+        )
+        dumped = to_dict(copyright_date_range)
+        assert dumped["expression"] == "1978-01-01"

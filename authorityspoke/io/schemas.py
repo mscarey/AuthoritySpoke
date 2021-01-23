@@ -1,6 +1,7 @@
 """Marshmallow schemas for loading AuthoritySpoke objects from JSON."""
 
 from copy import deepcopy
+from datetime import date
 from typing import Any, Dict, List, Optional, Sequence, Tuple, Type, Union
 
 from marshmallow import Schema, fields, validate, EXCLUDE
@@ -158,10 +159,12 @@ class DecisionSchema(ExpandableSchema):
         return data
 
 
-def dump_quantity(obj: Predicate) -> Optional[Union[float, int, str]]:
+def dump_quantity(obj: Comparison) -> Optional[Union[date, float, int, str]]:
     """Convert quantity to string if it's a pint ureg.Quantity object."""
     if obj is None or obj.__dict__.get("expression") is None:
         return None
+    if isinstance(obj.expression, date):
+        return obj.expression.isoformat()
     if isinstance(obj.expression, (int, float)):
         return obj.expression
     return f"{obj.expression.magnitude} {obj.expression.units}"
