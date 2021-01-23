@@ -377,7 +377,7 @@ class Comparison(Predicate):
 
     :param quantity:
         a Python number object or :class:`ureg.Quantity` from the
-        `pint <https://pint.readthedocs.io/en/0.9/>`_ library. Comparisons to
+        `pint <https://pint.readthedocs.io/>`_ library. Comparisons to
         quantities can be used to determine whether :class:`Predicate`\s
         imply or contradict each other. A single :class:`Predicate`
         may contain no more than one ``sign`` and one ``quantity``.
@@ -398,7 +398,7 @@ class Comparison(Predicate):
         self,
         template: str,
         sign: str = "=",
-        expression: Union[int, float, ureg.Quantity] = 0,
+        expression: Union[date, int, float, ureg.Quantity] = 0,
         truth: Optional[bool] = True,
     ):
         """
@@ -443,15 +443,14 @@ class Comparison(Predicate):
 
         This expression can be a datetime.date, an int, a float, or a
         pint quantity. (See `pint
-        tutorial <https://pint.readthedocs.io/en/0.9/tutorial.html>`_)
+        tutorial <https://pint.readthedocs.io/en/16.1/tutorial.html>`_)
 
         :param quantity:
             an object to be interpreted as the ``expression`` field
-            of a :class:`Comparison`
+            of a :class:`~authorityspoke.predicate.Comparison`
         :returns:
-            a Python number object or a :class:`Quantity`
-            object created with `pint.UnitRegistry
-            <https://pint.readthedocs.io/en/0.9/tutorial.html>`_.
+            a Python number object or a :class:`pint.Quantity`
+            object created with :class:`pint.UnitRegistry`.
         """
         if value is None:
             return None
@@ -481,6 +480,9 @@ class Comparison(Predicate):
     def consistent_dimensionality(self, other: Comparison) -> bool:
         """Test if ``other`` has a quantity parameter consistent with ``self``."""
         if not isinstance(other, Comparison):
+            return False
+
+        if isinstance(self.expression, date) != isinstance(other.expression, date):
             return False
 
         if isinstance(self.expression, ureg.Quantity):
@@ -545,9 +547,6 @@ class Comparison(Predicate):
             `pint <pint.readthedocs.io>`_  library.
         """
 
-        if not self.expression:
-            return ""
-        comparison = self.sign or "="
         expand = {
             "==": "exactly equal to",
             "=": "exactly equal to",
@@ -558,15 +557,11 @@ class Comparison(Predicate):
             ">=": "at least",
             "<=": "no more than",
         }
-        return f"{expand[comparison]} {self.expression}"
+        return f"{expand[self.sign]} {self.expression}"
 
     def excludes_other_quantity(self, other: Comparison) -> bool:
         """Test if quantity ranges in self and other are non-overlapping."""
-        if (
-            not self.expression
-            or not other.expression
-            or not self.consistent_dimensionality(other)
-        ):
+        if not self.consistent_dimensionality(other):
             return False
 
         if self.expression > other.expression:

@@ -90,7 +90,7 @@ def assign_name_for_evidence(obj: Dict) -> str:
     r"""
     Return an appropriate name for Evidence.
 
-    :param obj: an unloaded :class:`.Evidence`object
+    :param obj: an unloaded :class:`.Evidence` object
 
     :returns: a name for the Evidence
     """
@@ -216,11 +216,13 @@ def update_name_index_from_fact_content(
 ) -> Tuple[RawFactor, Mentioned]:
     r"""
     Update index of mentioned Factors from Factors mentioned in Fact's content, and vice versa.
+
     :param obj:
         data from JSON to be loaded as a :class:`.Factor`
     :param mentioned:
         :class:`.RawFactor`\s indexed by name for retrieval when loading objects
         using a Marshmallow schema.
+
     :returns:
         both 'obj' and 'mentioned', updated with values from each other
     """

@@ -13,5 +13,5 @@ Core
     api/procedures
     api/rules
     api/context
-    api/comparisons
+    api/explanations
     api/groups
