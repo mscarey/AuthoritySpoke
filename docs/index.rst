@@ -35,6 +35,7 @@ of the repository using `Binder <https://mybinder.org/v2/gh/mscarey/AuthoritySpo
     :maxdepth: 2
 
     guides/introduction.rst
+    guides/template_strings.rst
     guides/create_holding_data.rst
     guides/example_holdings.rst
     guides/statute_rules.rst

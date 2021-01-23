@@ -1,3 +1,4 @@
+from datetime import date
 import pytest
 
 from authorityspoke.entities import Entity
@@ -15,6 +16,14 @@ class TestComparisons:
 
 
 class TestPredicates:
+    def test_no_sign_allowed_for_predicate(self):
+        with pytest.raises(TypeError):
+            Predicate(
+                "the date when $work was created was",
+                sign=">=",
+                expression=date(1978, 1, 1),
+            )
+
     def test_term_positions(self):
         predicate = Predicate(
             template="$organizer1 and $organizer2 planned for $player1 to play $game with $player2."
@@ -67,6 +76,14 @@ class TestPredicates:
 
     def test_quantity_type(self, make_predicate):
         assert isinstance(make_predicate["p7"].expression, Q_)
+
+    def test_string_for_date_as_expression(self):
+        copyright_date_range = Comparison(
+            "the date when $work was created was",
+            sign=">=",
+            expression=date(1978, 1, 1),
+        )
+        assert str(copyright_date_range).endswith("1978-01-01")
 
     def test_quantity_string(self, make_predicate):
         assert str(make_predicate["p7"].expression) == "35 foot"
@@ -227,6 +244,19 @@ class TestImplication:
     def test_error_predicate_imply_factor(self, make_predicate, watt_factor):
         assert not make_predicate["p7_true"] > (watt_factor["f7"])
         assert not make_predicate["p7_true"] >= (watt_factor["f7"])
+
+    def test_implication_due_to_dates(self):
+        copyright_date_range = Comparison(
+            "the date when $work was created was",
+            sign=">=",
+            expression=date(1978, 1, 1),
+        )
+        copyright_date_specific = Comparison(
+            "the date when $work was created was",
+            sign="=",
+            expression=date(1980, 6, 20),
+        )
+        assert copyright_date_specific.implies(copyright_date_range)
 
 
 class TestContradiction:

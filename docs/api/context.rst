@@ -2,4 +2,4 @@
 Context
 ============================
 
-.. autodecorator:: authorityspoke.factors.new_context_helper
+.. autodecorator:: authorityspoke.comparisons.new_context_helper

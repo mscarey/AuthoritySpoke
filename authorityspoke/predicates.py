@@ -8,8 +8,8 @@ the `pint <https://pint.readthedocs.io/en/0.9/>`_ library.)
 
 from __future__ import annotations
 
+from datetime import date
 from itertools import product
-import re
 
 from string import Template
 from typing import Any, ClassVar, Dict, Iterable, Iterator
@@ -165,7 +165,7 @@ class Predicate:
 
     """
 
-    def __init__(self, template: str, truth: Optional[bool] = True, *args, **kwargs):
+    def __init__(self, template: str, truth: Optional[bool] = True):
         """
         Clean up and test validity of attributes.
 
@@ -258,20 +258,19 @@ class Predicate:
         """
         Test whether ``self`` and ``other`` mean the same if they are both True.
         """
-        if not isinstance(other, self.__class__):
-            return False
-
         if not self.same_content_meaning(other):
             return False
 
         return self.same_term_positions(other)
 
-    def means(self, other: Predicate) -> bool:
+    def means(self, other: Any) -> bool:
         """
         Test whether ``self`` and ``other`` have identical meanings.
 
         To return ``True``, ``other`` can be neither broader nor narrower.
         """
+        if not isinstance(other, self.__class__):
+            return False
 
         if not self._same_meaning_if_true(other):
             return False
@@ -288,10 +287,12 @@ class Predicate:
         """
         return self.implies(other)
 
-    def implies(self, other: Predicate) -> bool:
+    def implies(self, other: Any) -> bool:
         """
         Test whether ``self`` implies ``other``.
         """
+        if not isinstance(other, self.__class__):
+            return False
         if self.truth is None:
             return False
         if not self._same_meaning_if_true(other):
@@ -304,54 +305,6 @@ class Predicate:
         if self.means(other):
             return True
         return self.implies(other)
-
-    def excludes_other_quantity(self, other: Predicate) -> bool:
-        """Test if quantity ranges in self and other are non-overlapping."""
-        if (
-            not self.expression
-            or not other.expression
-            or not self.consistent_dimensionality(other)
-        ):
-            return False
-
-        if self.expression > other.expression:
-            if "<" not in self.sign and ">" not in other.sign:
-                return True
-        if self.expression < other.expression:
-            if ">" not in self.sign and "<" not in other.sign:
-                return True
-        return self.expression == other.expression and (
-            ("=" in self.sign) != ("=" in other.sign)
-        )
-
-    def includes_other_quantity(self, other: Predicate) -> bool:
-        """Test if the range of quantities mentioned in self is a subset of other's."""
-        if not self.expression or not other.expression:
-            return bool(self.expression)
-
-        if not self.consistent_dimensionality(other):
-            return False
-
-        if (
-            (self.expression < other.expression)
-            and ("<" in self.sign or "=" in self.sign)
-            and ("<" in other.sign)
-        ):
-            return True
-        if (
-            (self.expression > other.expression)
-            and (">" in self.sign or "=" in self.sign)
-            and (">" in other.sign)
-        ):
-            return True
-        if "=" in self.sign:
-            if ("<" in other.sign and self.expression < other.expression) or (
-                ">" in other.sign and self.expression > other.expression
-            ):
-                return True
-        return self.expression == other.expression and (
-            ("=" in self.sign) == ("=" in other.sign)
-        )
 
     def __len__(self):
         """
@@ -501,7 +454,7 @@ class Comparison(Predicate):
         """
         if value is None:
             return None
-        if isinstance(value, (int, float, ureg.Quantity)):
+        if isinstance(value, (int, float, ureg.Quantity, date)):
             return value
         quantity = value.strip()
         if quantity.isdigit():
@@ -531,7 +484,7 @@ class Comparison(Predicate):
             return False
         return True
 
-    def implies(self, other: Predicate) -> bool:
+    def implies(self, other: Any) -> bool:
 
         if not super().implies(other):
             return False
@@ -541,7 +494,7 @@ class Comparison(Predicate):
 
         return self.includes_other_quantity(other)
 
-    def means(self, other: Predicate) -> bool:
+    def means(self, other: Any) -> bool:
 
         if not super().means(other):
             return False
@@ -598,3 +551,51 @@ class Comparison(Predicate):
             "<=": "no more than",
         }
         return f"{expand[comparison]} {self.expression}"
+
+    def excludes_other_quantity(self, other: Comparison) -> bool:
+        """Test if quantity ranges in self and other are non-overlapping."""
+        if (
+            not self.expression
+            or not other.expression
+            or not self.consistent_dimensionality(other)
+        ):
+            return False
+
+        if self.expression > other.expression:
+            if "<" not in self.sign and ">" not in other.sign:
+                return True
+        if self.expression < other.expression:
+            if ">" not in self.sign and "<" not in other.sign:
+                return True
+        return self.expression == other.expression and (
+            ("=" in self.sign) != ("=" in other.sign)
+        )
+
+    def includes_other_quantity(self, other: Comparison) -> bool:
+        """Test if the range of quantities mentioned in self is a subset of other's."""
+        if not self.expression or not other.expression:
+            return bool(self.expression)
+
+        if not self.consistent_dimensionality(other):
+            return False
+
+        if (
+            (self.expression < other.expression)
+            and ("<" in self.sign or "=" in self.sign)
+            and ("<" in other.sign)
+        ):
+            return True
+        if (
+            (self.expression > other.expression)
+            and (">" in self.sign or "=" in self.sign)
+            and (">" in other.sign)
+        ):
+            return True
+        if "=" in self.sign:
+            if ("<" in other.sign and self.expression < other.expression) or (
+                ">" in other.sign and self.expression > other.expression
+            ):
+                return True
+        return self.expression == other.expression and (
+            ("=" in self.sign) == ("=" in other.sign)
+        )
