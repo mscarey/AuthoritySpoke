@@ -283,10 +283,8 @@ Fact about one of them implies a Fact about the other.
 
     >>> devon = Entity("Devon", generic=True)
     >>> elaine = Entity("Elaine", generic=True)
-
     >>> devon_tax_rate = Fact(specific_tax_rate, terms=devon)
     >>> elaine_tax_rate = Fact(tax_rate_over_25, terms=elaine)
-
     >>> devon_tax_rate.implies(elaine_tax_rate)
     True
 
@@ -348,8 +346,10 @@ each end with a different digit.
     >>>     terms=(bob, ann))
     >>> str(ann_and_bob_were_family)
     'the fact that Ann and Bob both were members of the same family'
+
     >>> str(bob_and_ann_were_family)
     'the fact that Bob and Ann both were members of the same family'
+
     >>> ann_and_bob_were_family.means(bob_and_ann_were_family)
     True
 
@@ -363,8 +363,10 @@ change the meaning of the Fact.
     >>> bob_is_parent = Fact(parent_sentence, terms = (bob, ann))
     >>> str(ann_is_parent)
     "the fact that Ann was Bob's parent"
+
     >>> str(bob_is_parent)
     "the fact that Bob was Ann's parent"
+
     >>> ann_is_parent.means(bob_is_parent)
     False
 
@@ -396,6 +398,7 @@ grams.
     >>> bob_told_ann_about_more_drugs = Fact(statement, terms=(bob, ann, bob_had_more_drugs))
     >>> str(bob_told_ann_about_more_drugs)
     'the fact that Bob told Ann the fact that the weight of marijuana that Bob possessed was at least 0.5 kilogram'
+
     >>> bob_told_ann_about_more_drugs.implies(bob_told_ann_about_drugs)
     True
 
@@ -409,6 +412,7 @@ has said two contradictory things.
     >>> bob_told_ann_about_less_drugs = Fact(statement, terms=(bob, ann, bob_had_less_drugs))
     >>> str(bob_told_ann_about_less_drugs)
     'the fact that Bob told Ann the fact that the weight of marijuana that Bob possessed was no more than 10 gram'
+
     >>> bob_told_ann_about_less_drugs.contradicts(bob_told_ann_about_more_drugs)
     False
 
@@ -422,5 +426,6 @@ first-order Fact.
     >>> bob_told_ann_about_claude = Fact(statement, terms=(bob, ann, claude_had_drugs))
     >>> str(bob_told_ann_about_claude)
     'the fact that Bob told Ann the fact that the weight of marijuana that Claude possessed was at least 250 gram'
+
     >>> bob_told_ann_about_drugs.implies(bob_told_ann_about_claude)
     False

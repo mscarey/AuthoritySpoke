@@ -28,7 +28,7 @@ class Pleading(Factor):
     name: Optional[str] = None
     absent: bool = False
     generic: bool = False
-    context_factor_names: ClassVar = ("filer",)
+    context_factor_names: ClassVar[Tuple[str]] = ("filer",)
 
     def __str__(self):
         string = f'{("filed by " + str(self.filer) if self.filer else "")}'
@@ -67,11 +67,12 @@ class Allegation(Factor):
     generic: bool = False
     context_factor_names: ClassVar[Tuple[str, ...]] = ("statement", "pleading")
 
-    def __str__(self):
+    @property
+    def wrapped_string(self):
         text = ""
         if self.statement:
-            text += f"\n" + indented("OF:")
-            factor_text = indented(str(self.statement), tabs=2)
+            text += "\n" + indented("OF:")
+            factor_text = indented(self.statement.wrapped_string, tabs=2)
             text += f"\n{str(factor_text)}"
         if self.pleading:
             text += f"\n" + indented("FOUND IN:")
@@ -79,8 +80,7 @@ class Allegation(Factor):
             text += f"\n{str(factor_text)}"
         return super().__str__().format(text).strip()
 
-    @property
-    def short_string(self):
+    def __str__(self):
         string = (
             f'{("in " + self.pleading.short_string + ",") if self.pleading else ""}'
             + f'{("claiming " + self.statement.short_string + ",") if self.statement else ""}'

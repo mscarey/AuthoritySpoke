@@ -35,6 +35,21 @@ class TestHolding:
         lotus = make_opinion_with_holding["lotus_majority"]
         assert "    OF:\n" in str(lotus.holdings[2])
 
+    def test_line_break_in_fact_within_holding(self, make_opinion_with_holding):
+        """
+        Test that holding uses the Fact string method with line breaks.
+
+        TODO: Objects should have string methods with and without line breaks.
+        TODO: Update .rst before committing notebook
+        """
+        lotus = make_opinion_with_holding["lotus_majority"]
+        assert "registered a copyright\n" in str(lotus.holdings[2])
+
+    def test_caps_class_name_for_fact_within_holding(self, make_opinion_with_holding):
+        lotus = make_opinion_with_holding["lotus_majority"]
+        assert "the Fact that <Lotus" in str(lotus.holdings[2])
+        assert "the fact that <Lotus" not in str(lotus.holdings[2])
+
     def test_infer_from_exclusive(self, make_opinion_with_holding):
         """
         Test that the correct inference is made from a Holding being marked

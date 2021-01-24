@@ -50,7 +50,10 @@ class TestEvidence:
         assert len(e.to_effect.terms) == 1
 
     def test_evidence_str_with_context(self, make_evidence):
-        assert "in the form testimony" in str(make_evidence["reciprocal"]).lower()
+        assert (
+            "in the form testimony"
+            in make_evidence["reciprocal"].wrapped_string.lower()
+        )
 
     def test_type_of_terms(self, make_evidence):
         assert isinstance(make_evidence["no_shooting"].terms, FactorSequence)

@@ -78,8 +78,7 @@ class Exhibit(Factor):
         ):
             yield from super()._implies_if_concrete(other, context)
 
-    @property
-    def short_string(self):
+    def __str__(self):
         """Represent object as string without line breaks."""
         string = (
             f'{("attributed to " + self.statement_attribution.short_string + ", ") if self.statement_attribution else ""}'
@@ -88,16 +87,19 @@ class Exhibit(Factor):
         string = super().__str__().format(string)
         return string.replace("Exhibit", self.form or "exhibit").strip()
 
-    def __str__(self):
+    @property
+    def wrapped_string(self):
         text = ""
         if self.form:
             text += f"in the FORM {self.form}"
         if self.statement:
             text += "\n" + indented("WITH THE ASSERTION:")
-            factor_text = indented(str(self.statement), tabs=2)
+            factor_text = indented(self.statement.wrapped_string, tabs=2)
             text += f"\n{str(factor_text)},"
         if self.statement_attribution:
-            text += "\n" + indented(f"ATTRIBUTED TO {str(self.statement_attribution)}")
+            text += "\n" + indented(
+                f"ATTRIBUTED TO {self.statement_attribution.wrapped_string}"
+            )
 
         return super().__str__().format(text)
 
@@ -139,22 +141,21 @@ class Evidence(Factor):
     context_factor_names: ClassVar[Tuple[str, ...]] = ("exhibit", "to_effect")
 
     def __str__(self):
-        text = ""
-        if self.exhibit:
-            text += f"\n" + indented("OF:")
-            factor_text = indented(str(self.exhibit), tabs=2)
-            text += f"\n{str(factor_text)}"
-        if self.to_effect:
-            text += f"\n" + indented("INDICATING:")
-            factor_text = indented(str(self.to_effect), tabs=2)
-            text += f"\n{str(factor_text)}"
-        return super().__str__().format(text).strip()
-
-    @property
-    def short_string(self):
-        """Represent object as string without line breaks."""
         string = (
             f'{("of " + self.exhibit.short_string + ", ") if self.exhibit else ""}'
             + f'{("which supports " + self.to_effect.short_string) if self.to_effect else ""}'
         )
         return super().__str__().format(string).strip().replace("Evidence", "evidence")
+
+    @property
+    def wrapped_string(self):
+        text = ""
+        if self.exhibit:
+            text += "\n" + indented("OF:")
+            factor_text = indented(self.exhibit.wrapped_string, tabs=2)
+            text += f"\n{str(factor_text)}"
+        if self.to_effect:
+            text += "\n" + indented("INDICATING:")
+            factor_text = indented(self.to_effect.wrapped_string, tabs=2)
+            text += f"\n{str(factor_text)}"
+        return super().__str__().format(text).strip()

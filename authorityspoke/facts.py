@@ -126,7 +126,7 @@ class Fact(Factor):
         if any(concrete_context) and not self.generic:
             text += "\n" + indented("SPECIFIC CONTEXT:")
             for factor in concrete_context:
-                factor_text = indented(str(factor), tabs=2)
+                factor_text = indented(factor.wrapped_string, tabs=2)
                 text += f"\n{str(factor_text)}"
         return text
 
