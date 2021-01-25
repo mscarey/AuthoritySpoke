@@ -142,10 +142,30 @@ class Predicate:
     r"""
     A statement about real events or about a legal conclusion.
 
-    Predicates may be "alleged" by a pleading, "supported" by evidence, or
-    "found" to be factual by a jury verdict or a judge's finding of fact.
-    The past tense is used because legal analysis is usually backward-looking,
+    Should contain an English-language phrase in the past tense. The past tense
+    is used because legal analysis is usually backward-looking,
     determining the legal effect of past acts or past conditions.
+
+    Don't use capitalization or end punctuation to signal the beginning
+    or end of the phrase, because the phrase may be used in a
+    context where it's only part of a longer sentence.
+
+    If you need to mention the same term more than once in a Predicate,
+    use the same placeholder for that term each time. If you later create
+    a Fact object using the same Predicate, you will only include each unique
+    term once.
+
+        >>> # the template has two placeholders referring to the identical term
+        >>> Predicate("$applicant opened a bank account for $applicant and $cosigner")
+
+    Sometimes, a Predicate or Comparison needs to mention two terms that are
+    different from each other, but that have interchangeable positions in that
+    particular phrase. To convey interchangeability, the template string should
+    use identical text for the placeholders for the interchangeable terms,
+    except that the different placeholders should each end with a different digit.
+
+        >>> # the template has two placeholders referring to different but interchangeable terms
+        >>> Predicate("$relative1 and $relative2 both were members of the same family")
 
     :param template:
         a clause containing an assertion in English in the past tense, with
@@ -153,10 +173,6 @@ class Predicate:
         :class:`~authorityspoke.factors.Factor`\s
         from the case can be inserted to make the clause specific.
         This string must be a valid Python :py:class:`string.Template`\.
-        Don't use capitalization or end punctuation to signal the beginning
-        or end of the phrase, because the phrase may be used in a
-        context where it's only part of a longer sentence.
-
 
     :param truth:
         indicates whether the clause in ``content`` is asserted to be
@@ -367,6 +383,47 @@ class Comparison(Predicate):
     r"""
     A Predicate that compares a described quantity to a constant.
 
+    The Comparison class extends the concept of a Predicate.
+    A Comparison still contains a truth value and a template string,
+    but that template should be used to identify a quantity that will
+    be compared to an expression using a sign such as an equal sign
+    or a greater-than sign. This expression must be a constant: either
+    an integer, a floating point number, or a physical quantity expressed
+    in units that can be parsed using the pint library.
+
+    To encourage consistent phrasing, the template string in every
+    Comparison object must end with the word “was”.
+
+    If you phrase a Comparison with an inequality sign using truth=False,
+    AuthoritySpoke will silently modify your statement so it can have
+    truth=True with a different sign. In this example, the user’s input
+    indicates that it’s false that the weight of marijuana possessed by a defendant
+    was more than 10 grams. AuthoritySpoke interprets this to mean it’s
+    true that the weight was no more than 10 grams.
+
+        >>> # example comparing a pint Quantity
+        >>> drug_comparison_with_upper_bound = Comparison(
+        >>>     "the weight of marijuana that $defendant possessed was",
+        >>>     sign=">",
+        >>>     expression="10 grams",
+        >>>     truth=False)
+        >>> str(drug_comparison_with_upper_bound)
+        'that the weight of marijuana that $defendant possessed was no more than 10 gram'
+
+    When the number needed for a Comparison isn’t a physical quantity that can be described
+    with the units in the pint library library, you should phrase the text in the template
+    string to explain what the number describes. The template string will still need to
+    end with the word “was”. The value of the expression parameter should be an integer
+    or a floating point number, not a string to be parsed.
+
+        >>> # example comparing an integer
+        >>> three_children = Comparison(
+        >>>     "the number of children in ${taxpayer}'s household was",
+        >>>     sign="=",
+        >>>     expression=3)
+        >>> str(three_children)
+        "that the number of children in ${taxpayer}'s household was exactly equal to 3"
+
     :param sign:
         A string representing an equality or inequality sign like ``==``,
         ``>``, or ``<=``. Used to indicate that the clause ends with a
@@ -377,7 +434,7 @@ class Comparison(Predicate):
 
     :param quantity:
         a Python number object or :class:`ureg.Quantity` from the
-        `pint <https://pint.readthedocs.io/>`_ library. Comparisons to
+        `pint library <https://pint.readthedocs.io/>`_. Comparisons to
         quantities can be used to determine whether :class:`Predicate`\s
         imply or contradict each other. A single :class:`Predicate`
         may contain no more than one ``sign`` and one ``quantity``.
@@ -422,9 +479,9 @@ class Comparison(Predicate):
 
         if self.expression is not None and not self.content.endswith("was"):
             raise ValueError(
-                "If a Predicate includes a quantity, its 'content' must end "
+                "A Comparison's template string must end "
                 "with the word 'was' to signal the comparison with the quantity. "
-                f"The word 'was' is not the end of the string '{self.content}'."
+                f"The word 'was' is not the end of the string '{self.template}'."
             )
 
     def __repr__(self):

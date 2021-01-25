@@ -19,7 +19,7 @@ so you can install it from the command line with pip:
 .. parsed-literal::
     $ pip install AuthoritySpoke
 
-AuthoritySpoke runs on Python versions 3.7 and up.
+AuthoritySpoke runs on Python versions 3.8 and up.
 
 To access these guides in an interactive Jupyter Notebook, you can download the
 AuthoritySpoke git repository, or navigate to the "notebooks" folder

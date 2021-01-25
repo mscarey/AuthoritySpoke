@@ -5,7 +5,7 @@ with open("readme.md", "r") as fh:
 
 setuptools.setup(
     name="AuthoritySpoke",
-    version="0.4.1",
+    version="0.5.0",
     author="Matt Carey",
     author_email="matt@authorityspoke.com",
     description="tool for managing structured data about legal authority",
@@ -28,11 +28,11 @@ setuptools.setup(
         "Development Status :: 3 - Alpha",
         "Intended Audience :: Legal Industry",
         "License :: Free To Use But Restricted",
-        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.9",
         "Operating System :: OS Independent",
         "Natural Language :: English",
         "Topic :: Sociology :: History",
     ],
-    python_requires=">=3.7",
+    python_requires=">=3.8",
     include_package_data=True,
 )

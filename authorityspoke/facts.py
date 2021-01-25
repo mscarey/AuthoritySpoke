@@ -21,6 +21,9 @@ class Fact(Factor):
 
     Often based on factfinding by a judge or jury.
 
+    Facts may be "alleged" by a pleading, "supported" by evidence, or
+    "found" to be factual by a jury verdict or a judge's finding of fact.
+
     :param predicate:
         a natural-language clause with zero or more slots
         to insert ``terms`` that are typically the

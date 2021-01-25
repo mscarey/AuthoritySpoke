@@ -1,6 +1,6 @@
 Changelog
 =========
-dev
+0.5.0 (2021-01-25)
 ------------------
 - Predicate.content attribute no longer includes an extra placeholder for a "quantity"
 - Predicate.content attribute must be a valid Python string template
