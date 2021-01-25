@@ -1,6 +1,6 @@
 ..  _example_holdings:
 
-Example Holdings
+Example Annotated Holdings
 ======================================
 
 In :ref:`introduction` and :ref:`create_holding_data`, we
@@ -9,13 +9,13 @@ holdings of the cases Lotus v. Borland and Oracle v. Google.
 
 This document is essentially an appendix to those two guides.
 It contains a list of all of the :class:`~authorityspoke.holdings.Holding` objects in
-``oracle.holdings`` and ``lotus.holdings``. 
+``oracle.holdings`` and ``lotus.holdings``.
 Each :class:`~authorityspoke.holdings.Holding` will be
-preceded by a passage from the :class:`~authorityspoke.opinions.Opinion` that 
-indicates the opinion has endorsed 
+preceded by a passage from the :class:`~authorityspoke.opinions.Opinion` that
+indicates the opinion has endorsed
 the :class:`~authorityspoke.holdings.Holding`\. In future versions,
 AuthoritySpoke will give users the ability to explore the text passages
-in :class:`~authorityspoke.opinions.Opinion`\s that provide support for 
+in :class:`~authorityspoke.opinions.Opinion`\s that provide support for
 each :class:`~authorityspoke.holdings.Holding`\, but that’s
 currently not fully implemented.
 
@@ -422,7 +422,7 @@ Character Recognition errors.
    component in question qualifies as an expression of an idea, or an
    idea itself.”
 
-  
+
     >>> print(oracle.holdings[8])
     the Holding to ACCEPT
       the Rule that the court MUST SOMETIMES impose the
@@ -470,7 +470,7 @@ Character Recognition errors.
    to the three core packages — Google did not need to copy the
    structure, sequence, and organization of the Java API packages to
    write programs in the Java language.
-   
+
    More importantly,
    however, the Ninth Circuit has not adopted the court’s “method of
    operation” reasoning in Lotus, and we conclude that it is

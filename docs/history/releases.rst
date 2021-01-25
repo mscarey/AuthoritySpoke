@@ -1,8 +1,6 @@
 .. _releases:
 
-=====================
-Current Updates
-=====================
+.. include:: ../../changelog.md
 
 GitHub
 ======
@@ -15,5 +13,3 @@ Twitter
 
 On Twitter, you can follow `@authorityspoke <https://twitter.com/authorityspoke>`_
 or `@mcareyaus <https://twitter.com/mcareyaus>`_ for project updates.
-
-.. include:: ../../changelog.md

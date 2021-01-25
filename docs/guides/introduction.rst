@@ -23,7 +23,7 @@ You can also `participate in its
 development <https://github.com/mscarey/AuthoritySpoke>`__ by submitting
 issues, bug reports, and pull requests.
 
-0. Getting Example Data
+Getting Example Data
 -----------------------
 
 AuthoritySpoke helps you work with three kinds of data: court opinions,
@@ -59,7 +59,7 @@ If you’ve installed AuthoritySpoke and you need access to the example
 data files, you'll need to download them from the `GitHub
 repository <https://github.com/mscarey/AuthoritySpoke>`__.
 
-1. Importing the Package
+Importing the Package
 ------------------------
 
 If you want to use AuthoritySpoke in your own Python environment, be
@@ -89,7 +89,7 @@ environment. In that case, check the `Python
 documentation <https://docs.python.org/3/installing/index.html>`__ for
 help on installing modules.
 
-1.1 Optional: Skip the Downloads and Load Decisions from a File
+Optional: Skip the Downloads and Load Decisions from a File
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To use the cell below to access ``Decision`` objects from a file rather
@@ -112,7 +112,7 @@ notebook is running.
         oracle_download = load_decision("oracle_h.json")
         lotus_download = load_decision("lotus_h.json")
 
-2. Downloading and Importing Decisions
+Downloading and Importing Decisions
 --------------------------------------
 
 If you didn’t load court opinions from the GitHub repository as
@@ -232,7 +232,7 @@ object to get the majority opinion.
     >>> print(lotus.majority)
     majority Opinion by STAHL, Circuit Judge.
 
-3. Downloading Enactments
+Downloading Enactments
 -------------------------
 
 The interface for downloading legislation is a little different. First
@@ -259,7 +259,7 @@ the :class:`~legislice.enactments.Enactment` class.
 
 
 
-4. Importing and Exporting Legal Holdings
+Importing and Exporting Legal Holdings
 -----------------------------------------
 
 Now we can link some legal analysis to each
@@ -358,7 +358,7 @@ using the :mod:`~authorityspoke.io.dump` module.
     'despite': []}
 
 
-5. Linking Holdings to Opinions
+Linking Holdings to Opinions
 -------------------------------
 
 If you want annotation anchors to link each Holding to a passage in an
@@ -387,7 +387,7 @@ The :meth:`~authorityspoke.decisions.Decision.posit` method also has a
 ``text_links`` parameter that takes a dict indicating what text spans in
 the Opinion should be linked to which Holding.
 
-6. Viewing an Opinion’s Holdings
+Viewing an Opinion’s Holdings
 --------------------------------
 
 If you take a look in
@@ -451,7 +451,7 @@ We can also access just the inputs of a :class:`~authorityspoke.holdings.Holding
     "Copyright protection subsists, in accordance with this title, in original works of authorship fixed in any tangible medium of expression, now known or later developed, from which they can be perceived, reproduced, or otherwise communicated, either directly or with the aid of a machine or device.…" (/us/usc/t17/s102/a 2013-07-18)
 
 
-7. Generic Factors
+Generic Factors
 ------------------
 
 The two instances of the phrase “the Java API” are in angle brackets to
@@ -569,7 +569,7 @@ Holding A also necessarily :meth:`~authorityspoke.holdings.Holding.implies` Hold
     True
 
 
-8. Enactment Objects and Implication
+Enactment Objects and Implication
 ------------------------------------
 
 Sometimes it’s useful to know whether
@@ -677,7 +677,7 @@ that text would no longer be available. Thus a requirement to cite
 Enactment A could be satisfied in every situation where a requirement to
 cite Enactment B could be satisfied, and then some.
 
-9. Checking for Contradictions
+Checking for Contradictions
 ------------------------------
 
 Let’s turn back to the *Lotus* case.
@@ -852,7 +852,7 @@ to compare numerical statements in :class:`~authorityspoke.facts.Fact`\s using
 `pint <https://pint.readthedocs.io/en/stable/>`__, an amazing Python
 library that performs dimensional analysis.
 
-10. Adding Holdings to One Another
+Adding Holdings to One Another
 ----------------------------------
 
 To try out the addition operation, let’s load another case from the
@@ -970,7 +970,7 @@ applies and the “SOME” cases where the other applies. But if
 then we know they can both apply together in any of the “SOME” cases
 where ``feist.holdings[10]`` applies.
 
-11. Set Operations with Holdings
+Set Operations with Holdings
 --------------------------------
 
 In AuthoritySpoke, the :meth:`~authorityspoke.holdings.Holding.__or__` operator

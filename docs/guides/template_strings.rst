@@ -5,7 +5,7 @@ Using Python Template Strings to Represent Legal Explanations
 
 The AuthoritySpoke library provides you with Python classes that you can
 use to represent a limited subset of English statements, so you can
-create smart annotations representing aspects of legal reasoning and
+create computable annotations representing aspects of legal reasoning and
 factfinding. The interface for creating these phrases is similar to
 `Predicate
 logic <https://en.wikipedia.org/wiki/Category:Predicate_logic>`__: it
@@ -190,7 +190,7 @@ When the number needed for
 a :class:`~authorityspoke.predicates.Comparison` isn’t a
 physical :class:`~pint.quantity.Quantity` that
 can be described with the units in the `pint
-library <https://pint.readthedocs.io/en/stable/>`__ library, you should
+library <https://pint.readthedocs.io/en/stable/>`__, you should
 phrase the text in the template string to explain what the number
 describes. The template string will still need to end with the word
 “was”. The value of the expression parameter should be an integer or a
