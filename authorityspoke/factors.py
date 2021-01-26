@@ -60,16 +60,10 @@ class Factor(Comparable):
             context.append(next_factor)
         return FactorSequence(context)
 
-    def __add__(self, other) -> Optional[Factor]:
+    def __add__(self, other: Comparable) -> Optional[Comparable]:
         if other.__class__.__name__ in ("Procedure", "Rule"):
             return other + self
-        if not isinstance(other, Factor):
-            raise TypeError
-        if self >= other:
-            return self
-        if other >= self:
-            return other.new_context(self.generic_factors())
-        return None
+        return super().__add__(other)
 
     def _contradicts_if_present(
         self, other: Factor, context: Optional[ContextRegister] = None

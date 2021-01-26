@@ -368,6 +368,15 @@ class Comparable(ABC):
             context.append(next_factor)
         return FactorSequence(context)
 
+    def __add__(self, other: Comparable) -> Optional[Comparable]:
+        if not isinstance(other, Comparable):
+            raise TypeError
+        if self >= other:
+            return self
+        if other >= self:
+            return other.new_context(self.generic_factors())
+        return None
+
     def generic_factors(self) -> List[Comparable]:
         return list(self.generic_factors_by_str().values())
 
