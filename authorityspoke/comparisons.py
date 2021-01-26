@@ -5,6 +5,7 @@ from copy import deepcopy
 import functools
 from itertools import permutations, zip_longest
 import logging
+import operator
 import textwrap
 from typing import Any, Callable, ClassVar, Dict, Iterable, Iterator
 from typing import List, Optional, Sequence, Tuple, Union
@@ -232,6 +233,87 @@ class Comparable(ABC):
     def wrapped_string(self) -> str:
         return str(self)
 
+    @property
+    def recursive_factors(self) -> Dict[str, Comparable]:
+        r"""
+        Collect `self`'s :attr:`terms`, and their :attr:`terms`, recursively.
+
+        :returns:
+            a :class:`dict` (instead of a :class:`set`,
+            to preserve order) of :class:`Factor`\s.
+        """
+        answers: Dict[str, Comparable] = {str(self): self}
+        for context in self.terms:
+            if isinstance(context, Iterable):
+                for item in context:
+                    answers.update(item.recursive_factors)
+            elif context is not None:
+                answers.update(context.recursive_factors)
+        return answers
+
+    @property
+    def terms(self) -> FactorSequence:
+        r"""
+        Get :class:`Factor`\s used in comparisons with other :class:`Factor`\s.
+
+        :returns:
+            a tuple of attributes that are designated as the ``terms``
+            for whichever subclass of :class:`Factor` calls this method. These
+            can be used for comparing objects using :meth:`consistent_with`
+        """
+        context: List[Optional[Comparable]] = []
+        for factor_name in self.context_factor_names:
+            next_factor: Optional[Comparable] = self.__dict__.get(factor_name)
+            context.append(next_factor)
+        return FactorSequence(context)
+
+    def __add__(self, other: Comparable) -> Optional[Comparable]:
+        if not isinstance(other, Comparable):
+            raise TypeError
+        if self >= other:
+            return self
+        if other >= self:
+            return other.new_context(self.generic_factors())
+        return None
+
+    def __ge__(self, other: Optional[Comparable]) -> bool:
+        """
+        Call :meth:`implies` as an alias.
+
+        :returns:
+            bool indicating whether ``self`` implies ``other``
+        """
+        return bool(self.implies(other))
+
+    def __gt__(self, other: Optional[Comparable]) -> bool:
+        """Test whether ``self`` implies ``other`` and ``self`` != ``other``."""
+        return bool(self.implies(other) and self != other)
+
+    def __or__(self, other: Comparable):
+        return self.union(other)
+
+    def __str__(self):
+        text = f"the {self.__class__.__name__}" + " {}"
+        if self.generic:
+            text = f"<{text}>"
+        return text
+
+    def all_generic_factors_match(
+        self, other: Comparable, context: ContextRegister
+    ) -> bool:
+        if all(
+            all(
+                context.get_factor(key) == context_register.get_factor(key)
+                or context.get_factor(context_register.get(str(key))) == key
+                for key in self.generic_factors()
+            )
+            for context_register in self._context_registers(
+                other=other, comparison=means, context=context
+            )
+        ):
+            return True
+        return False
+
     def consistent_with(
         self, other: Optional[Comparable], context: Optional[ContextRegister] = None
     ) -> bool:
@@ -250,52 +332,6 @@ class Comparable(ABC):
             explanation is not None
             for explanation in self.explanations_consistent_with(other, context)
         )
-
-    def generic_register(self, other: Comparable) -> ContextRegister:
-        register = ContextRegister()
-        register.insert_pair(self, other)
-        return register
-
-    def _context_registers(
-        self,
-        other: Optional[Comparable],
-        comparison: Callable,
-        context: Optional[ContextRegister] = None,
-    ) -> Iterator[ContextRegister]:
-        r"""
-        Search for ways to match :attr:`terms` of ``self`` and ``other``.
-
-        :yields:
-            all valid ways to make matches between
-            corresponding :class:`Factor`\s.
-        """
-        if context is None:
-            context = ContextRegister()
-        if other is None:
-            yield context
-        elif self.generic or other.generic:
-            if context.get(str(self)) is None or (context.get(str(self)) == other):
-                yield self.generic_register(other)
-        else:
-            yield from self.terms.ordered_comparison(
-                other=other.terms, operation=comparison, context=context
-            )
-
-    def all_generic_factors_match(
-        self, other: Comparable, context: ContextRegister
-    ) -> bool:
-        if all(
-            all(
-                context.get_factor(key) == context_register.get_factor(key)
-                or context.get_factor(context_register.get(str(key))) == key
-                for key in self.generic_factors()
-            )
-            for context_register in self._context_registers(
-                other=other, comparison=means, context=context
-            )
-        ):
-            return True
-        return False
 
     def compare_terms(self, other: Comparable, relation: Callable) -> bool:
         r"""
@@ -334,6 +370,31 @@ class Comparable(ABC):
                     valid = False
         return valid
 
+    def _context_registers(
+        self,
+        other: Optional[Comparable],
+        comparison: Callable,
+        context: Optional[ContextRegister] = None,
+    ) -> Iterator[ContextRegister]:
+        r"""
+        Search for ways to match :attr:`terms` of ``self`` and ``other``.
+
+        :yields:
+            all valid ways to make matches between
+            corresponding :class:`Factor`\s.
+        """
+        if context is None:
+            context = ContextRegister()
+        if other is None:
+            yield context
+        elif self.generic or other.generic:
+            if context.get(str(self)) is None or (context.get(str(self)) == other):
+                yield self.generic_register(other)
+        else:
+            yield from self.terms.ordered_comparison(
+                other=other.terms, operation=comparison, context=context
+            )
+
     def contradicts(
         self, other: Optional[Comparable], context: Optional[ContextRegister] = None
     ) -> bool:
@@ -361,325 +422,6 @@ class Comparable(ABC):
         The default is to yield nothing where no class-specific method is available.
         """
         yield from iter([])
-
-    @property
-    def terms(self) -> FactorSequence:
-        r"""
-        Get :class:`Factor`\s used in comparisons with other :class:`Factor`\s.
-
-        :returns:
-            a tuple of attributes that are designated as the ``terms``
-            for whichever subclass of :class:`Factor` calls this method. These
-            can be used for comparing objects using :meth:`consistent_with`
-        """
-        context: List[Optional[Comparable]] = []
-        for factor_name in self.context_factor_names:
-            next_factor: Optional[Comparable] = self.__dict__.get(factor_name)
-            context.append(next_factor)
-        return FactorSequence(context)
-
-    def __add__(self, other: Comparable) -> Optional[Comparable]:
-        if not isinstance(other, Comparable):
-            raise TypeError
-        if self >= other:
-            return self
-        if other >= self:
-            return other.new_context(self.generic_factors())
-        return None
-
-    def generic_factors(self) -> List[Comparable]:
-        return list(self.generic_factors_by_str().values())
-
-    def generic_factors_by_str(self) -> Dict[str, Comparable]:
-        r"""
-        :class:`.Factor`\s that can be replaced without changing ``self``\s meaning.
-
-        :returns:
-            a :class:`list` made from a :class:`dict` with ``self``\'s
-            generic :class:`.Factor`\s as keys and ``None`` as values,
-            so that the keys can be matched to another object's
-            ``generic_factors`` to perform an equality test.
-        """
-
-        if self.generic:
-            return {str(self): self}
-        generics: Dict[str, Comparable] = {}
-        for factor in self.terms:
-            if factor is not None:
-                for generic in factor.generic_factors():
-                    generics[str(generic)] = generic
-        return generics
-
-    def get_factor_by_name(self, name: str) -> Optional[Comparable]:
-        """
-        Search of ``self`` and ``self``'s attributes for :class:`Factor` with specified ``name``.
-
-        :returns:
-            a :class:`Comparable` with the specified ``name`` attribute
-            if it exists, otherwise ``None``.
-        """
-        factors_to_search = self.recursive_factors
-        for value in factors_to_search.values():
-            if hasattr(value, "name") and value.name == name:
-                return value
-        return None
-
-    def get_factor_by_str(self, query: str) -> Optional[Comparable]:
-        """
-        Search of ``self`` and ``self``'s attributes for :class:`Factor` with specified string.
-
-        :returns:
-            a :class:`Factor` with the specified string
-            if it exists, otherwise ``None``.
-        """
-        for name, factor in self.recursive_factors.items():
-            if name == query:
-                return factor
-        return None
-
-    def implied_by(
-        self, other: Optional[Comparable], context: Optional[ContextRegister] = None
-    ):
-        """Test whether ``other`` implies ``self``."""
-        if other is None:
-            return False
-        return any(
-            register is not None
-            for register in self.explanations_implied_by(other, context=context)
-        )
-
-    def implies(
-        self, other: Optional[Comparable], context: Optional[ContextRegister] = None
-    ) -> bool:
-        """Test whether ``self`` implies ``other``."""
-        if other is None:
-            return True
-        return any(
-            register is not None
-            for register in self.explanations_implication(other, context=context)
-        )
-
-    def __gt__(self, other: Optional[Comparable]) -> bool:
-        """Test whether ``self`` implies ``other`` and ``self`` != ``other``."""
-        return bool(self.implies(other) and self != other)
-
-    def implies_same_context(self, other) -> bool:
-        same_context = ContextRegister()
-        for key in self.generic_factors():
-            same_context.insert_pair(key, key)
-        return self.implies(other, context=same_context)
-
-    def means(
-        self, other: Optional[Comparable], context: Optional[ContextRegister] = None
-    ) -> bool:
-        r"""
-        Test whether ``self`` and ``other`` have identical meanings.
-
-        :returns:
-            whether ``other`` is another :class:`Factor`
-            with the same meaning as ``self``. Not the same as an
-            equality comparison with the ``==`` symbol, which simply
-            converts ``self``\'s and ``other``\'s fields to tuples
-            and compares them.
-        """
-        if other is None:
-            return False
-        return any(
-            explanation is not None
-            for explanation in self.explanations_same_meaning(other, context=context)
-        )
-
-    def means_same_context(self, other) -> bool:
-        same_context = ContextRegister()
-        for key in self.generic_factors():
-            same_context.insert_pair(key, key)
-        return self.means(other, context=same_context)
-
-    @new_context_helper
-    def new_context(self, changes: ContextRegister) -> Comparable:
-        r"""
-        Create new :class:`Comparable`, replacing keys of ``changes`` with values.
-
-        :param changes:
-            has :class:`.Comparable`\s to replace as keys, and has
-            their replacements as the corresponding values.
-
-        :returns:
-            a new :class:`.Comparable` object with the replacements made.
-        """
-        for key, value in changes.matches.items():
-
-            if not isinstance(key, str):
-                raise TypeError(
-                    'Each key in "changes" must be the name of a Comparable'
-                )
-            if value and not isinstance(value, Comparable):
-                raise TypeError('Each value in "changes" must be a Comparable')
-
-        new_dict = self.own_attributes()
-        for name in self.context_factor_names:
-            new_dict[name] = self.__dict__[name].new_context(changes)
-        return self.__class__(**new_dict)
-
-    def own_attributes(self) -> Dict[str, Any]:
-        """
-        Return attributes of ``self`` that aren't inherited from another class.
-
-        Used for getting parameters to pass to :meth:`~Factor.__init__`
-        when generating a new object.
-        """
-        return self.__dict__.copy()
-
-    def possible_contexts(
-        self, other: Comparable, context: Optional[ContextRegister] = None
-    ) -> Iterator[ContextRegister]:
-        r"""
-        Get permutations of generic Factor assignments not ruled out by the known context.
-
-        :param other:
-            another :class:`.Comparable` object with generic :class:`.Factor`\s
-
-        :yields: all possible ContextRegisters linking the two :class:`.Comparable`\s
-        """
-        context = context or ContextRegister()
-        unused_self = [
-            factor
-            for factor in self.generic_factors()
-            if str(factor) not in context.matches.keys()
-        ]
-        unused_other = [
-            factor
-            for factor in other.generic_factors()
-            if str(factor) not in context.reverse_matches.keys()
-        ]
-        if not (unused_self and unused_other):
-            yield context
-        else:
-            for permutation in permutations(unused_other):
-                incoming = ContextRegister()
-                for key, value in zip_longest(unused_self, permutation):
-                    incoming.insert_pair(key=key, value=value)
-                merged_context = context.merged_with(incoming)
-                if merged_context:
-                    yield merged_context
-
-    @property
-    def recursive_factors(self) -> Dict[str, Comparable]:
-        r"""
-        Collect `self`'s :attr:`terms`, and their :attr:`terms`, recursively.
-
-        :returns:
-            a :class:`dict` (instead of a :class:`set`,
-            to preserve order) of :class:`Factor`\s.
-        """
-        answers: Dict[str, Comparable] = {str(self): self}
-        for context in self.terms:
-            if isinstance(context, Iterable):
-                for item in context:
-                    answers.update(item.recursive_factors)
-            elif context is not None:
-                answers.update(context.recursive_factors)
-        return answers
-
-    def __or__(self, other: Comparable):
-        return self.union(other)
-
-    def explanations_union(
-        self, other: Comparable, context: Optional[ContextRegister] = None
-    ) -> Iterator[ContextRegister]:
-        context = context or ContextRegister()
-        for partial in self.partial_explanations_union(other, context):
-            for guess in self.possible_contexts(other, partial):
-                answer = self.union_from_explanation(other, guess)
-                if answer:
-                    yield guess
-
-    def term_permutations(self) -> Iterator[FactorSequence]:
-        """Generate permutations of context factors that preserve same meaning."""
-        yield self.terms
-
-    def _registers_for_interchangeable_context(
-        self, matches: ContextRegister
-    ) -> Iterator[ContextRegister]:
-        r"""
-        Find possible combination of interchangeable :attr:`terms`.
-
-        :yields:
-            context registers with every possible combination of
-            ``self``\'s and ``other``\'s interchangeable
-            :attr:`terms`.
-        """
-        yield matches
-        gen = self.term_permutations()
-        unchanged_permutation = next(gen)
-        already_returned: List[ContextRegister] = [matches]
-
-        for term_permutation in gen:
-            changes = ContextRegister.from_lists(self.terms, term_permutation)
-            changed_registry = matches.replace_keys(changes)
-            if not any(
-                changed_registry == returned_dict for returned_dict in already_returned
-            ):
-                already_returned.append(changed_registry)
-                yield changed_registry
-
-    def union(
-        self, other: Comparable, context: Optional[ContextRegister] = None
-    ) -> Optional[Comparable]:
-        context = context or ContextRegister()
-        explanations = self.explanations_union(other, context)
-        try:
-            explanation = next(explanations)
-        except StopIteration:
-            return None
-        return self.union_from_explanation(other, explanation)
-
-    def update_context_register(
-        self,
-        other: Optional[Comparable],
-        context: ContextRegister,
-        comparison: Callable,
-    ) -> Iterator[ContextRegister]:
-        r"""
-        Find ways to update ``self_mapping`` to allow relationship ``comparison``.
-
-        :param other:
-            another :class:`Comparable` being compared to ``self``
-
-        :param register:
-            keys representing :class:`Comparable`\s from ``self``'s context and
-            values representing :class:`Comparable`\s in ``other``'s context.
-
-        :param comparison:
-            a function defining the comparison that must be ``True``
-            between ``self`` and ``other``. Could be :meth:`Comparable.means` or
-            :meth:`Comparable.__ge__`.
-
-        :yields:
-            every way that ``self_mapping`` can be updated to be consistent
-            with ``self`` and ``other`` having the relationship
-            ``comparison``.
-        """
-        if other and not isinstance(other, Comparable):
-            raise TypeError
-        if not isinstance(context, ContextRegister):
-            raise TypeError
-        for incoming_register in self._context_registers(other, comparison):
-            for new_register_variation in self._registers_for_interchangeable_context(
-                incoming_register
-            ):
-                register_or_none = context.merged_with(new_register_variation)
-                if register_or_none is not None:
-                    yield register_or_none
-
-    def __ge__(self, other: Optional[Comparable]) -> bool:
-        """
-        Call :meth:`implies` as an alias.
-
-        :returns:
-            bool indicating whether ``self`` implies ``other``
-        """
-        return bool(self.implies(other))
 
     def explain_same_meaning(
         self, other: Comparable, context: Optional[ContextRegister] = None
@@ -832,31 +574,145 @@ class Comparable(ABC):
     def explanations_same_meaning(
         self, other: Comparable, context: Optional[ContextRegister] = None
     ) -> Iterator[ContextRegister]:
-        raise NotImplementedError
+        """Generate ways to match contexts of self and other so they mean the same."""
+        if self.__class__ == other.__class__ and self.generic == other.generic:
+            if self.generic:
+                yield self.generic_register(other)
+            yield from self._means_if_concrete(other, context)
 
-    def _likely_context_from_meaning(
-        self, other: Comparable, context: ContextRegister
-    ) -> Optional[ContextRegister]:
-        new_context = None
-        if self.means(other, context=context) or other.means(
-            self, context=context.reversed()
-        ):
-            new_context = self._update_context_from_factors(other, context)
-        if new_context and new_context != context:
-            return new_context
+    def explanations_union(
+        self, other: Comparable, context: Optional[ContextRegister] = None
+    ) -> Iterator[ContextRegister]:
+        context = context or ContextRegister()
+        for partial in self.partial_explanations_union(other, context):
+            for guess in self.possible_contexts(other, partial):
+                answer = self.union_from_explanation(other, guess)
+                if answer:
+                    yield guess
+
+    def generic_register(self, other: Comparable) -> ContextRegister:
+        register = ContextRegister()
+        register.insert_pair(self, other)
+        return register
+
+    def _implies_if_present(
+        self, other: Comparable, context: Optional[ContextRegister] = None
+    ) -> Iterator[ContextRegister]:
+        """
+        Find if ``self`` would imply ``other`` if they aren't absent.
+
+        :returns:
+            bool indicating whether ``self`` would imply ``other``,
+            under the assumption that neither self nor other has
+            the attribute ``absent == True``.
+        """
+        if context is None:
+            context = ContextRegister()
+        if isinstance(other, self.__class__):
+            if other.generic:
+                if context.get_factor(self) is None or (
+                    context.get_factor(self) == other
+                ):
+                    yield self.generic_register(other)
+            if not self.generic:
+                yield from self._implies_if_concrete(other, context)
+
+    def generic_factors(self) -> List[Comparable]:
+        return list(self.generic_factors_by_str().values())
+
+    def generic_factors_by_str(self) -> Dict[str, Comparable]:
+        r"""
+        :class:`.Factor`\s that can be replaced without changing ``self``\s meaning.
+
+        :returns:
+            a :class:`list` made from a :class:`dict` with ``self``\'s
+            generic :class:`.Factor`\s as keys and ``None`` as values,
+            so that the keys can be matched to another object's
+            ``generic_factors`` to perform an equality test.
+        """
+
+        if self.generic:
+            return {str(self): self}
+        generics: Dict[str, Comparable] = {}
+        for factor in self.terms:
+            if factor is not None:
+                for generic in factor.generic_factors():
+                    generics[str(generic)] = generic
+        return generics
+
+    def get_factor_by_name(self, name: str) -> Optional[Comparable]:
+        """
+        Search of ``self`` and ``self``'s attributes for :class:`Factor` with specified ``name``.
+
+        :returns:
+            a :class:`Comparable` with the specified ``name`` attribute
+            if it exists, otherwise ``None``.
+        """
+        factors_to_search = self.recursive_factors
+        for value in factors_to_search.values():
+            if hasattr(value, "name") and value.name == name:
+                return value
         return None
 
-    def _likely_context_from_implication(
-        self, other: Comparable, context: ContextRegister
-    ) -> Optional[ContextRegister]:
-        new_context = None
-        if self.implies(other, context=context) or other.implies(
-            self, context=context.reversed()
-        ):
-            new_context = self._update_context_from_factors(other, context)
-        if new_context and new_context != context:
-            return new_context
+    def get_factor_by_str(self, query: str) -> Optional[Comparable]:
+        """
+        Search of ``self`` and ``self``'s attributes for :class:`Factor` with specified string.
+
+        :returns:
+            a :class:`Factor` with the specified string
+            if it exists, otherwise ``None``.
+        """
+        for name, factor in self.recursive_factors.items():
+            if name == query:
+                return factor
         return None
+
+    def implied_by(
+        self, other: Optional[Comparable], context: Optional[ContextRegister] = None
+    ):
+        """Test whether ``other`` implies ``self``."""
+        if other is None:
+            return False
+        return any(
+            register is not None
+            for register in self.explanations_implied_by(other, context=context)
+        )
+
+    def implies(
+        self, other: Optional[Comparable], context: Optional[ContextRegister] = None
+    ) -> bool:
+        """Test whether ``self`` implies ``other``."""
+        if other is None:
+            return True
+        return any(
+            register is not None
+            for register in self.explanations_implication(other, context=context)
+        )
+
+    def _implies_if_concrete(
+        self, other: Comparable, context: Optional[ContextRegister] = None
+    ) -> Iterator[ContextRegister]:
+        """
+        Find if ``self`` would imply ``other`` if they aren't absent or generic.
+
+        Used to test implication based on :attr:`terms`,
+        usually after a subclass has injected its own tests
+        based on other attributes.
+
+        :returns:
+            context assignments where ``self`` would imply ``other``,
+            under the assumptions that neither ``self`` nor ``other``
+            has ``absent=True``, neither has ``generic=True``, and
+            ``other`` is an instance of ``self``'s class.
+        """
+        if self.compare_terms(other, operator.ge):
+            yield from self._context_registers(other, operator.ge, context)
+
+    def implies_same_context(self, other) -> bool:
+        same_context = ContextRegister()
+        for key in self.generic_factors():
+            same_context.insert_pair(key, key)
+        return self.implies(other, context=same_context)
 
     def likely_contexts(
         self, other: Comparable, context: Optional[ContextRegister] = None
@@ -873,6 +729,188 @@ class Comparable(ABC):
             yield same_meaning
         yield context
 
+    def _likely_context_from_implication(
+        self, other: Comparable, context: ContextRegister
+    ) -> Optional[ContextRegister]:
+        new_context = None
+        if self.implies(other, context=context) or other.implies(
+            self, context=context.reversed()
+        ):
+            new_context = self._update_context_from_factors(other, context)
+        if new_context and new_context != context:
+            return new_context
+        return None
+
+    def _likely_context_from_meaning(
+        self, other: Comparable, context: ContextRegister
+    ) -> Optional[ContextRegister]:
+        new_context = None
+        if self.means(other, context=context) or other.means(
+            self, context=context.reversed()
+        ):
+            new_context = self._update_context_from_factors(other, context)
+        if new_context and new_context != context:
+            return new_context
+        return None
+
+    def make_generic(self) -> Comparable:
+        """
+        Get a copy of ``self`` except ensure ``generic`` is ``True``.
+
+        .. note::
+            The new object created with this method will have all the
+            attributes of ``self`` except ``generic=False``.
+            Therefore the method isn't equivalent to creating a new
+            instance of the class with only the ``generic`` attribute
+            specified. To do that, you would use ``Fact(generic=True)``.
+
+        :returns: a new object changing ``generic`` to ``True``.
+        """
+        result = deepcopy(self)
+        result.generic = True
+        return result
+
+    def means(
+        self, other: Optional[Comparable], context: Optional[ContextRegister] = None
+    ) -> bool:
+        r"""
+        Test whether ``self`` and ``other`` have identical meanings.
+
+        :returns:
+            whether ``other`` is another :class:`Factor`
+            with the same meaning as ``self``. Not the same as an
+            equality comparison with the ``==`` symbol, which simply
+            converts ``self``\'s and ``other``\'s fields to tuples
+            and compares them.
+        """
+        if other is None:
+            return False
+        return any(
+            explanation is not None
+            for explanation in self.explanations_same_meaning(other, context=context)
+        )
+
+    def _means_if_concrete(
+        self, other: Comparable, context: Optional[ContextRegister]
+    ) -> Iterator[ContextRegister]:
+        """
+        Test equality based on :attr:`terms`.
+
+        Usually called after a subclasses has injected its own tests
+        based on other attributes.
+
+        :returns:
+            bool indicating whether ``self`` would equal ``other``,
+            under the assumptions that neither ``self`` nor ``other``
+            has ``absent=True``, neither has ``generic=True``, and
+            ``other`` is an instance of ``self``'s class.
+        """
+        if self.compare_terms(other, means):
+            yield from self._context_registers(other, comparison=means, context=context)
+
+    def means_same_context(self, other) -> bool:
+        same_context = ContextRegister()
+        for key in self.generic_factors():
+            same_context.insert_pair(key, key)
+        return self.means(other, context=same_context)
+
+    @new_context_helper
+    def new_context(self, changes: ContextRegister) -> Comparable:
+        r"""
+        Create new :class:`Comparable`, replacing keys of ``changes`` with values.
+
+        :param changes:
+            has :class:`.Comparable`\s to replace as keys, and has
+            their replacements as the corresponding values.
+
+        :returns:
+            a new :class:`.Comparable` object with the replacements made.
+        """
+        for key, value in changes.matches.items():
+
+            if not isinstance(key, str):
+                raise TypeError(
+                    'Each key in "changes" must be the name of a Comparable'
+                )
+            if value and not isinstance(value, Comparable):
+                raise TypeError('Each value in "changes" must be a Comparable')
+
+        new_dict = self.own_attributes()
+        for name in self.context_factor_names:
+            new_dict[name] = self.__dict__[name].new_context(changes)
+        return self.__class__(**new_dict)
+
+    def own_attributes(self) -> Dict[str, Any]:
+        """
+        Return attributes of ``self`` that aren't inherited from another class.
+
+        Used for getting parameters to pass to :meth:`~Factor.__init__`
+        when generating a new object.
+        """
+        return self.__dict__.copy()
+
+    def possible_contexts(
+        self, other: Comparable, context: Optional[ContextRegister] = None
+    ) -> Iterator[ContextRegister]:
+        r"""
+        Get permutations of generic Factor assignments not ruled out by the known context.
+
+        :param other:
+            another :class:`.Comparable` object with generic :class:`.Factor`\s
+
+        :yields: all possible ContextRegisters linking the two :class:`.Comparable`\s
+        """
+        context = context or ContextRegister()
+        unused_self = [
+            factor
+            for factor in self.generic_factors()
+            if str(factor) not in context.matches.keys()
+        ]
+        unused_other = [
+            factor
+            for factor in other.generic_factors()
+            if str(factor) not in context.reverse_matches.keys()
+        ]
+        if not (unused_self and unused_other):
+            yield context
+        else:
+            for permutation in permutations(unused_other):
+                incoming = ContextRegister()
+                for key, value in zip_longest(unused_self, permutation):
+                    incoming.insert_pair(key=key, value=value)
+                merged_context = context.merged_with(incoming)
+                if merged_context:
+                    yield merged_context
+
+    def _registers_for_interchangeable_context(
+        self, matches: ContextRegister
+    ) -> Iterator[ContextRegister]:
+        r"""
+        Find possible combination of interchangeable :attr:`terms`.
+
+        :yields:
+            context registers with every possible combination of
+            ``self``\'s and ``other``\'s interchangeable
+            :attr:`terms`.
+        """
+        yield matches
+        gen = self.term_permutations()
+        unchanged_permutation = next(gen)
+        already_returned: List[ContextRegister] = [matches]
+
+        for term_permutation in gen:
+            changes = ContextRegister.from_lists(self.terms, term_permutation)
+            changed_registry = matches.replace_keys(changes)
+            if not any(
+                changed_registry == returned_dict for returned_dict in already_returned
+            ):
+                already_returned.append(changed_registry)
+                yield changed_registry
+
+    def term_permutations(self) -> Iterator[FactorSequence]:
+        """Generate permutations of context factors that preserve same meaning."""
+        yield self.terms
+
     def _update_context_from_factors(
         self, other: Comparable, context: ContextRegister
     ) -> Optional[ContextRegister]:
@@ -881,6 +919,55 @@ class Comparable(ABC):
         )
         updated_context = context.merged_with(incoming)
         return updated_context
+
+    def union(
+        self, other: Comparable, context: Optional[ContextRegister] = None
+    ) -> Optional[Comparable]:
+        context = context or ContextRegister()
+        explanations = self.explanations_union(other, context)
+        try:
+            explanation = next(explanations)
+        except StopIteration:
+            return None
+        return self.union_from_explanation(other, explanation)
+
+    def update_context_register(
+        self,
+        other: Optional[Comparable],
+        context: ContextRegister,
+        comparison: Callable,
+    ) -> Iterator[ContextRegister]:
+        r"""
+        Find ways to update ``self_mapping`` to allow relationship ``comparison``.
+
+        :param other:
+            another :class:`Comparable` being compared to ``self``
+
+        :param register:
+            keys representing :class:`Comparable`\s from ``self``'s context and
+            values representing :class:`Comparable`\s in ``other``'s context.
+
+        :param comparison:
+            a function defining the comparison that must be ``True``
+            between ``self`` and ``other``. Could be :meth:`Comparable.means` or
+            :meth:`Comparable.__ge__`.
+
+        :yields:
+            every way that ``self_mapping`` can be updated to be consistent
+            with ``self`` and ``other`` having the relationship
+            ``comparison``.
+        """
+        if other and not isinstance(other, Comparable):
+            raise TypeError
+        if not isinstance(context, ContextRegister):
+            raise TypeError
+        for incoming_register in self._context_registers(other, comparison):
+            for new_register_variation in self._registers_for_interchangeable_context(
+                incoming_register
+            ):
+                register_or_none = context.merged_with(new_register_variation)
+                if register_or_none is not None:
+                    yield register_or_none
 
     @staticmethod
     def _wrap_with_tuple(item):

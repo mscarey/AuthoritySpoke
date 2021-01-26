@@ -5,7 +5,6 @@ from copy import deepcopy
 
 from dataclasses import field
 
-import operator
 from typing import Any, Callable, Dict, Iterable, Iterator, List
 from typing import Optional, Sequence, Set, Tuple, TypeVar, Union
 
@@ -69,96 +68,11 @@ class Factor(Comparable):
         self, other: Comparable, context: Optional[ContextRegister] = None
     ) -> Iterator[ContextRegister]:
         """Generate ways to match contexts of self and other so they mean the same."""
-        if (
-            isinstance(other, Factor)
-            and self.__class__ == other.__class__
-            and self.absent == other.absent
-            and self.generic == other.generic
-        ):
-            if self.generic:
-                yield self.generic_register(other)
-            yield from self._means_if_concrete(other, context)
-
-    def _means_if_concrete(
-        self, other: Factor, context: Optional[ContextRegister]
-    ) -> Iterator[ContextRegister]:
-        """
-        Test equality based on :attr:`terms`.
-
-        Usually called after a subclasses has injected its own tests
-        based on other attributes.
-
-        :returns:
-            bool indicating whether ``self`` would equal ``other``,
-            under the assumptions that neither ``self`` nor ``other``
-            has ``absent=True``, neither has ``generic=True``, and
-            ``other`` is an instance of ``self``'s class.
-        """
-        if self.compare_terms(other, means):
-            yield from self._context_registers(other, comparison=means, context=context)
-
-    def _implies_if_concrete(
-        self, other: Factor, context: Optional[ContextRegister] = None
-    ) -> Iterator[ContextRegister]:
-        """
-        Find if ``self`` would imply ``other`` if they aren't absent or generic.
-
-        Used to test implication based on :attr:`terms`,
-        usually after a subclass has injected its own tests
-        based on other attributes.
-
-        :returns:
-            context assignments where ``self`` would imply ``other``,
-            under the assumptions that neither ``self`` nor ``other``
-            has ``absent=True``, neither has ``generic=True``, and
-            ``other`` is an instance of ``self``'s class.
-        """
-        if self.compare_terms(other, operator.ge):
-            yield from self._context_registers(other, operator.ge, context)
-
-    def _implies_if_present(
-        self, other: Factor, context: Optional[ContextRegister] = None
-    ) -> Iterator[ContextRegister]:
-        """
-        Find if ``self`` would imply ``other`` if they aren't absent.
-
-        :returns:
-            bool indicating whether ``self`` would imply ``other``,
-            under the assumption that neither self nor other has
-            the attribute ``absent == True``.
-        """
-        if context is None:
-            context = ContextRegister()
-        if isinstance(other, self.__class__):
-            if other.generic:
-                if context.get_factor(self) is None or (
-                    context.get_factor(self) == other
-                ):
-                    yield self.generic_register(other)
-            if not self.generic:
-                yield from self._implies_if_concrete(other, context)
-
-    def make_generic(self) -> Factor:
-        """
-        Get a copy of ``self`` except ensure ``generic`` is ``True``.
-
-        .. note::
-            The new object created with this method will have all the
-            attributes of ``self`` except ``generic=False``.
-            Therefore the method isn't equivalent to creating a new
-            instance of the class with only the ``generic`` attribute
-            specified. To do that, you would use ``Fact(generic=True)``.
-
-        :returns: a new object changing ``generic`` to ``True``.
-        """
-        result = deepcopy(self)
-        result.generic = True
-        return result
+        if isinstance(other, self.__class__) and self.absent == other.absent:
+            yield from super().explanations_same_meaning(other, context=context)
 
     def __str__(self):
-        text = f"the {self.__class__.__name__}" + " {}"
-        if self.generic:
-            text = f"<{text}>"
+        text = super().__str__()
         if self.absent:
             text = "absence of " + text
 
