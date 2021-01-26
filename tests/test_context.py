@@ -4,7 +4,7 @@ import pytest
 
 from authorityspoke.comparisons import ContextRegister, means
 from authorityspoke.entities import Entity
-from authorityspoke.groups import FactorGroup
+from authorityspoke.groups import ComparableGroup, FactorGroup
 
 
 class TestContextRegisters:
@@ -120,7 +120,7 @@ class TestLikelyContext:
         assert context.check_match(make_entity["motel"], make_entity["motel"])
 
     def test_likely_context_two_factors(self, make_entity, watt_factor):
-        left = FactorGroup((watt_factor["f9_swap_entities"], watt_factor["f2"]))
+        left = ComparableGroup((watt_factor["f9_swap_entities"], watt_factor["f2"]))
         right = watt_factor["f2"]
         context = next(left.likely_contexts(right))
         assert context.check_match(make_entity["motel"], make_entity["motel"])

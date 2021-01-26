@@ -565,8 +565,6 @@ class TestContradiction:
         assert not false_fact.contradicts(absent_fact)
         assert not absent_fact.contradicts(false_fact)
 
-    # Consistency with Entity/Factor assignments
-
     def test_inconsistent_statements_about_different_entities(self):
         """
         Alice and Bob are both generics. So it's possible to reach a
@@ -720,3 +718,23 @@ class TestAddition:
     def test_cant_add_enactment_to_fact(self, watt_factor, e_search_clause):
         with pytest.raises(TypeError):
             print(watt_factor["f3"] + e_search_clause)
+
+
+class TestUnion:
+    def test_union_same_as_adding(self):
+        dave = Entity("Dave")
+        speed_template = "${driver}'s driving speed was"
+        fast_fact = Fact(
+            Comparison(speed_template, sign=">=", expression="100 miles per hour"),
+            terms=dave,
+        )
+        slow_fact = Fact(
+            Comparison(
+                speed_template,
+                sign=">=",
+                expression="20 miles per hour",
+            ),
+            terms=dave,
+        )
+        new = fast_fact | slow_fact
+        assert new.means(fast_fact)
