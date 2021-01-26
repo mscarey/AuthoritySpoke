@@ -45,23 +45,6 @@ class Factor(Comparable):
         self.anchors = anchors
 
     @property
-    def context_factor_names(self) -> Tuple[str, ...]:
-        """
-        Get names of attributes to compare in :meth:`~Factor.means` or :meth:`~Factor.__ge__`.
-
-        This method should be the only part
-        of the context-matching process that need to be unique for each
-        subclass of :class:`Factor`.
-
-        :returns:
-            attribute names identifying which attributes of ``self`` and
-            ``other`` must match, for a :class:`.Analogy` to hold between
-            this :class:`Factor` and another.
-        """
-
-        return ()
-
-    @property
     def terms(self) -> FactorSequence:
         r"""
         Get :class:`Factor`\s used in comparisons with other :class:`Factor`\s.
@@ -155,43 +138,6 @@ class Factor(Comparable):
         """
         if self.compare_terms(other, means):
             yield from self._context_registers(other, comparison=means, context=context)
-
-    def compare_terms(self, other: Factor, relation: Callable) -> bool:
-        r"""
-        Test if relation holds for corresponding context factors of self and other.
-
-        This doesn't track a persistent :class:`ContextRegister` as it goes
-        down the sequence of :class:`Factor` pairs. Perhaps(?) this simpler
-        process can weed out :class:`Factor`\s that clearly don't satisfy
-        a comparison before moving on to the more costly :class:`Analogy`
-        process. Or maybe it's useful for testing.
-        """
-        orderings = self.term_permutations()
-        for ordering in orderings:
-            if self.compare_ordering_of_terms(
-                other=other, relation=relation, ordering=ordering
-            ):
-                return True
-        return False
-
-    def compare_ordering_of_terms(
-        self, other: Factor, relation: Callable, ordering: FactorSequence
-    ) -> bool:
-        """
-        Determine whether one ordering of self's terms matches other's terms.
-
-        Multiple term orderings exist where the terms can be rearranged without
-        changing the Fact's meaning.
-
-        For instance, "<Ann> and <Bob> both were members of the same family" has a
-        second ordering "<Bob> and <Ann> both were members of the same family".
-        """
-        valid = True
-        for i, self_factor in enumerate(ordering):
-            if not (self_factor is other.terms[i] is None):
-                if not (self_factor and relation(self_factor, other.terms[i])):
-                    valid = False
-        return valid
 
     def _implies_if_concrete(
         self, other: Factor, context: Optional[ContextRegister] = None

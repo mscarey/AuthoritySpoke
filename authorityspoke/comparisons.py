@@ -111,8 +111,8 @@ def new_context_helper(func: Callable):
 
 
 def seek_factor_by_name(
-    name: Union[Factor, str], source_factor: Factor, source_opinion: Comparable
-) -> Factor:
+    name: Union[Comparable, str], source_factor: Comparable, source_opinion: Comparable
+) -> Comparable:
     r"""
     Find a Factor matching a name in a Factor or Opinion.
 
@@ -221,7 +221,7 @@ def convert_changes_to_register(
 
 class Comparable(ABC):
     generic: bool = False
-    context_factor_names: ClassVar[Tuple] = ()
+    context_factor_names: ClassVar[Tuple[str, ...]] = ()
 
     @property
     def short_string(self) -> str:
@@ -296,6 +296,43 @@ class Comparable(ABC):
         ):
             return True
         return False
+
+    def compare_terms(self, other: Comparable, relation: Callable) -> bool:
+        r"""
+        Test if relation holds for corresponding context factors of self and other.
+
+        This doesn't track a persistent :class:`ContextRegister` as it goes
+        down the sequence of :class:`Factor` pairs. Perhaps(?) this simpler
+        process can weed out :class:`Factor`\s that clearly don't satisfy
+        a comparison before moving on to the more costly :class:`Analogy`
+        process. Or maybe it's useful for testing.
+        """
+        orderings = self.term_permutations()
+        for ordering in orderings:
+            if self.compare_ordering_of_terms(
+                other=other, relation=relation, ordering=ordering
+            ):
+                return True
+        return False
+
+    def compare_ordering_of_terms(
+        self, other: Comparable, relation: Callable, ordering: FactorSequence
+    ) -> bool:
+        """
+        Determine whether one ordering of self's terms matches other's terms.
+
+        Multiple term orderings exist where the terms can be rearranged without
+        changing the Fact's meaning.
+
+        For instance, "<Ann> and <Bob> both were members of the same family" has a
+        second ordering "<Bob> and <Ann> both were members of the same family".
+        """
+        valid = True
+        for i, self_factor in enumerate(ordering):
+            if not (self_factor is other.terms[i] is None):
+                if not (self_factor and relation(self_factor, other.terms[i])):
+                    valid = False
+        return valid
 
     def contradicts(
         self, other: Optional[Comparable], context: Optional[ContextRegister] = None
