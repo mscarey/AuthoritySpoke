@@ -65,42 +65,6 @@ class Factor(Comparable):
             return other + self
         return super().__add__(other)
 
-    def _contradicts_if_present(
-        self, other: Factor, context: Optional[ContextRegister] = None
-    ) -> Iterator[ContextRegister]:
-        """
-        Test if ``self`` would contradict ``other`` if neither was ``absent``.
-
-        The default is to yield nothing where no class-specific method is available.
-        """
-        yield from iter([])
-
-    def explanations_consistent_with_factor(
-        self, other: Factor, context: Optional[ContextRegister] = None
-    ) -> Iterator[ContextRegister]:
-        """
-        Test whether ``self`` does not contradict ``other``.
-
-        This should only be called after confirming that ``other``
-        is not ``None``.
-
-        :returns:
-            ``True`` if self and other can't both be true at
-            the same time. Otherwise returns ``False``.
-        """
-        if context is None:
-            context = ContextRegister()
-        for possible in self.possible_contexts(other, context):
-            if not self.contradicts(other, context=possible):
-                yield possible
-
-    def explanations_consistent_with(
-        self, other: Comparable, context: Optional[ContextRegister] = None
-    ) -> Iterator[ContextRegister]:
-        if isinstance(other, tuple):
-            raise NotImplementedError
-        yield from self.explanations_consistent_with_factor(other, context=context)
-
     def explanations_same_meaning(
         self, other: Comparable, context: Optional[ContextRegister] = None
     ) -> Iterator[ContextRegister]:

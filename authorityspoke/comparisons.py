@@ -352,6 +352,16 @@ class Comparable(ABC):
             for explanation in self.explanations_contradiction(other, context)
         )
 
+    def _contradicts_if_present(
+        self, other: Comparable, context: Optional[ContextRegister] = None
+    ) -> Iterator[ContextRegister]:
+        """
+        Test if ``self`` would contradict ``other`` if neither was ``absent``.
+
+        The default is to yield nothing where no class-specific method is available.
+        """
+        yield from iter([])
+
     @property
     def terms(self) -> FactorSequence:
         r"""
@@ -729,7 +739,21 @@ class Comparable(ABC):
     def explanations_consistent_with(
         self, other: Comparable, context: Optional[ContextRegister] = None
     ) -> Iterator[ContextRegister]:
-        raise NotImplementedError
+        """
+        Test whether ``self`` does not contradict ``other``.
+
+        This should only be called after confirming that ``other``
+        is not ``None``.
+
+        :returns:
+            ``True`` if self and other can't both be true at
+            the same time. Otherwise returns ``False``.
+        """
+        if context is None:
+            context = ContextRegister()
+        for possible in self.possible_contexts(other, context):
+            if not self.contradicts(other, context=possible):
+                yield possible
 
     def explanations_contradiction(
         self, other: Comparable, context: Optional[ContextRegister] = None
