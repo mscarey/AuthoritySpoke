@@ -129,6 +129,12 @@ Comparison object must end with the word “was”. AuthoritySpoke will then
 build the rest of the phrase using the comparison sign and expression
 that you provide.
 
+Comparisons with Measurements and Units
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To use a measurement as a Comparison’s ``expression``, pass the measurement as
+a string when constructing the Comparison object, and it will be converted to a :class:`pint.Quantity`\.
+
     >>> from authorityspoke import Comparison
     >>> drug_comparison = Comparison(
     >>>     "the weight of marijuana that $defendant possessed was",
@@ -182,6 +188,10 @@ asserted the weight was much greater.
 
     >>> drug_comparison_with_upper_bound.contradicts(drug_comparison)
     True
+
+The unit that the Comparison parses doesn't have to be weight. It could also be distance, time, volume,
+units of surface area such as square kilometers or acres, or units that combine multiple dimensions
+such as miles per hour or meters per second.
 
 Comparisons with Integer and Float Expressions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
