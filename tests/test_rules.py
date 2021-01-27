@@ -177,7 +177,8 @@ class TestSameMeaning:
 
 class TestImplication:
     def test_rule_does_not_imply_procedure(self, make_rule):
-        assert not make_rule["h1"].implies(make_rule["h1"].procedure)
+        with pytest.raises(TypeError):
+            make_rule["h1"].implies(make_rule["h1"].procedure)
 
     def test_holdings_more_inputs_implies_fewer(self, make_rule):
         assert make_rule["h1"] > make_rule["h1_easy"]

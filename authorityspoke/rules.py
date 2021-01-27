@@ -267,6 +267,16 @@ class Rule(Comparable):
         result.procedure = new_procedure
         return result
 
+    def comparable_with(self, other: Any) -> bool:
+        """Check if other can be compared to self for implication or contradiction."""
+        if not isinstance(other, Comparable):
+            return False
+        if isinstance(other, Procedure):
+            return False
+        if hasattr(other, "absent"):
+            return False
+        return True
+
     def contradicts(self, other, context: Optional[ContextRegister] = None) -> bool:
         """
         Test if ``self`` contradicts ``other``.
@@ -276,13 +286,14 @@ class Rule(Comparable):
             :class:`.Holding` with :attr:`~Holding.rule_valid``
             and :attr:`~Holding.decided`
         """
-        if context is None:
-            context = ContextRegister()
 
-        if isinstance(other, (Factor, Procedure)):
+        if not self.comparable_with(other):
             raise TypeError(
                 f'"contradicts" test not supported between class {self.__class__} and class {other.__class__}.'
             )
+
+        if context is None:
+            context = ContextRegister()
 
         if not isinstance(other, self.__class__):
             if hasattr(other, "contradicts"):
@@ -388,8 +399,10 @@ class Rule(Comparable):
             both are :class:`Rule`/s, and
             ``rule_valid`` and ``decided`` are ``True`` for both of them.
         """
-        if isinstance(other, (Factor, Procedure)):
-            return False
+        if not self.comparable_with(other):
+            raise TypeError(
+                f'"implies" test not supported between class {self.__class__} and class {other.__class__}.'
+            )
         if not isinstance(other, self.__class__):
             if hasattr(other, "implied_by"):
                 if context:
