@@ -153,7 +153,21 @@ def convert_changes_to_register(
 
 
 class Comparable(ABC):
+    """
+    Objects that can be compared for implication, same meaning, contradiction, and consistency.
+
+    :attr generic:
+        Whether the object is referred to in a generic sense. If True, substituting
+        this object for another generic object of the same class does not change the
+        meaning of other Comparable objects that incorporate this one as a term.
+
+    :attr name:
+        An identifier for this object. May be used as a shorthand way of referring to
+        this object when replacing another Comparable object's generic terms.
+    """
+
     generic: bool = False
+    name: Optional[str] = None,
     context_factor_names: ClassVar[Tuple[str, ...]] = ()
 
     @property

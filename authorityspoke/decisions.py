@@ -69,8 +69,8 @@ class Decision(Comparable):
         unique ID from CAP API
     """
 
-    name: str
     date: datetime.date
+    name: Optional[str] = None
     name_abbreviation: Optional[str] = None
     citations: Optional[Sequence[CaseCitation]] = None
     first_page: Optional[int] = None

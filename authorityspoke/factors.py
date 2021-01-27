@@ -31,9 +31,9 @@ class Factor(Comparable):
     def __init__(
         self,
         *,
-        name: Optional[str] = None,
         generic: bool = False,
         absent: bool = False,
+        name: Optional[str] = None,
         anchors: List[TextQuoteSelector] = field(default_factory=list),
     ):
         """Designate attributes inherited from Factor as keyword-only."""
