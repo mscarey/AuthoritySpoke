@@ -100,8 +100,17 @@ def new_context_helper(func: Callable):
 
         expanded_changes = ContextRegister()
         for old, new in changes.items():
-            factor_with_new_name = seek_factor(new, factor, source)
+
+            if isinstance(new, str):
+                factor_with_new_name = factor.get_factor(new)
+                if source and factor_with_new_name is None:
+                    factor_with_new_name = source.get_factor(new)
+            else:
+                factor_with_new_name = new
+            if factor_with_new_name is None:
+                raise ValueError(f'Unable to find replacement factor "{new}"')
             expanded_changes.insert_pair(old, factor_with_new_name)
+
         for old, new in expanded_changes.items():
             if str(factor) == old or factor.__dict__.get("name") == old:
                 return new
@@ -111,87 +120,10 @@ def new_context_helper(func: Callable):
     return wrapper
 
 
-def seek_factor_by_name(
-    name: Union[Comparable, str], source_factor: Comparable, source_opinion: Comparable
-) -> Comparable:
-    r"""
-    Find a Factor matching a name in a Factor or Opinion.
-
-    :param name:
-        the name of a Factor to seek and return. Usually the name will correspond to an
-        :class:`.Entity` because Entities have shorter names.
-
-    :param source_factor:
-        A Factor that might have a context factor matching the "name". Usually the source_factor
-        is the Factor that will be assigned a new context, which would include replacing the
-        context factor that matches "name"
-
-    :param source_opinion:
-        An :class:`.Opinion` to search for a context factor matching "name" if the search of the
-        source_factor fails.
-
-    :returns:
-        a found Factor matching "name"
-    """
-    if not isinstance(name, str):
-        return name
-    result = source_factor.get_factor_by_name(name)
-    if source_opinion and not result:
-        result = source_opinion.get_factor_by_name(name)
-    if not result:
-        raise ValueError(f"Unable to find a Factor with the name '{name}'")
-    return result
-
-
-def seek_factor_by_str(
-    query: Union[Factor, str], source_factor: Factor, source_opinion: Opinion
-) -> Factor:
-    r"""
-    Find a Factor matching a name in a Factor or Opinion.
-
-    :param query:
-        the string representation of a Factor to seek and return.
-
-    :param source_factor:
-        A Factor that might have a context factor matching the "name". Usually the source_factor
-        is the Factor that will be assigned a new context, which would include replacing the
-        context factor that matches "name"
-
-    :param source_opinion:
-        An :class:`.Opinion` to search for a context factor matching "name" if the search of the
-        source_factor fails.
-
-    :returns:
-        a found Factor matching "name"
-    """
-    if not isinstance(query, str):
-        return query
-    result = source_factor.get_factor_by_str(query)
-    if source_opinion and not result:
-        result = source_opinion.get_factor_by_str(query)
-    if not result:
-        raise ValueError(f"Unable to find a Factor with the string '{query}'")
-    return result
-
-
-def seek_factor(
-    query: Union[Comparable, str], source_factor: Comparable, source_opinion: Comparable
-) -> Comparable:
-    try:
-        answer = seek_factor_by_str(
-            query=query, source_factor=source_factor, source_opinion=source_opinion
-        )
-    except ValueError:
-        answer = seek_factor_by_name(
-            name=query, source_factor=source_factor, source_opinion=source_opinion
-        )
-    return answer
-
-
 def convert_changes_to_register(
     factor: Comparable,
-    changes: Union[Comparable, Dict[str, Comparable], List[Comparable]],
-    terms_to_replace: Optional[List[Comparable]] = None,
+    changes: Union[Comparable, ContextRegister, Sequence[Comparable]],
+    terms_to_replace: Optional[Sequence[Comparable]] = None,
 ) -> ContextRegister:
     if isinstance(changes, ContextRegister):
         return changes
@@ -647,6 +579,19 @@ class Comparable(ABC):
                 for generic in factor.generic_factors():
                     generics[str(generic)] = generic
         return generics
+
+    def get_factor(self, query: str) -> Optional[Comparable]:
+        """
+        Search for Comparable with str or name matching query
+
+        :param query:
+            a string that matches the desired Comparable's ``name`` or the
+            output of its __str__ method.
+        """
+        result = self.get_factor_by_str(query)
+        if result is None:
+            result = self.get_factor_by_name(query)
+        return result
 
     def get_factor_by_name(self, name: str) -> Optional[Comparable]:
         """

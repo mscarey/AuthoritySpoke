@@ -16,7 +16,6 @@ from authorityspoke.comparisons import (
     ContextRegister,
     Comparable,
     FactorSequence,
-    means,
 )
 
 

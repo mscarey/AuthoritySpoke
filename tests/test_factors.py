@@ -3,9 +3,9 @@ import operator
 
 import pytest
 
-from authorityspoke.comparisons import ContextRegister
+from authorityspoke.comparisons import ContextRegister, means
 from authorityspoke.entities import Entity
-from authorityspoke.factors import Factor, means, FactorSequence
+from authorityspoke.factors import Factor, FactorSequence
 from authorityspoke.facts import Fact, build_fact
 from authorityspoke.rules import Rule
 from authorityspoke.opinions import Opinion
