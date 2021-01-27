@@ -547,13 +547,6 @@ class TestAddition:
         )
         assert two_input_rule.means(c["accept_murder_fact_from_relevance_and_shooting"])
 
-    def test_add_factor_to_rule_reverse(self, make_complex_rule, make_factor):
-        c = make_complex_rule
-        two_input_rule = (
-            make_factor["f_shooting"] + c["accept_murder_fact_from_relevance"]
-        )
-        assert two_input_rule.means(c["accept_murder_fact_from_relevance_and_shooting"])
-
     def test_add_enactment_to_rule_reverse(self, make_complex_rule, e_due_process_5):
         """
         Test that you can make a new version of a :class:`.Rule`,

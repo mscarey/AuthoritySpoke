@@ -42,11 +42,6 @@ class Factor(Comparable):
         self.absent = absent
         self.anchors = anchors
 
-    def __add__(self, other: Comparable) -> Optional[Comparable]:
-        if other.__class__.__name__ in ("Procedure", "Rule"):
-            return other + self
-        return super().__add__(other)
-
     def explanations_same_meaning(
         self, other: Comparable, context: Optional[ContextRegister] = None
     ) -> Iterator[ContextRegister]:
