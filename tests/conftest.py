@@ -11,7 +11,7 @@ from legislice.name_index import EnactmentIndex
 from legislice.download import Client
 import pytest
 
-from authorityspoke.comparisons import ContextRegister
+from authorityspoke.statements.comparable import ContextRegister
 from authorityspoke.entities import Entity
 from authorityspoke.evidence import Evidence, Exhibit
 from authorityspoke.factors import Factor

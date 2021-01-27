@@ -141,15 +141,16 @@ def convert_changes_to_register(
                 f"as 'changes'.\nterms_to_replace: ({terms_to_replace})\nchanges: ({changes})"
             )
         return ContextRegister.from_lists(keys=terms_to_replace, values=changes)
-    if isinstance(changes, (list, tuple)):
-        generic_factors = list(factor.generic_factors_by_str().values())
-        if len(generic_factors) != len(changes):
-            raise ValueError(
-                f"Needed {len(generic_factors)} replacements for the "
-                + f"items of generic_factors, but {len(changes)} were provided."
-            )
-        return ContextRegister.from_lists(generic_factors, changes)
-    return ContextRegister.from_dict(changes)
+    if isinstance(changes, dict):
+        return ContextRegister.from_dict(changes)
+    generic_factors = list(factor.generic_factors_by_str().values())
+    if len(generic_factors) != len(changes):
+        raise ValueError(
+            f"Needed {len(generic_factors)} replacements for the "
+            + f"items of generic_factors, but {len(changes)} were provided."
+        )
+    return ContextRegister.from_lists(generic_factors, changes)
+
 
 
 class Comparable(ABC):
@@ -984,7 +985,7 @@ class ContextRegister:
 
     @classmethod
     def from_lists(
-        cls, keys: List[Comparable], values: List[Comparable]
+        cls, keys: Sequence[Comparable], values: Sequence[Comparable]
     ) -> ContextRegister:
         pairs = zip_longest(keys, values)
         new = cls()

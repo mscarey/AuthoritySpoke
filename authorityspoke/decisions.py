@@ -8,7 +8,7 @@ from typing import Optional, Sequence, Union
 
 from anchorpoint.textselectors import TextQuoteSelector
 
-from authorityspoke.comparisons import Comparable
+from authorityspoke.statements.comparable import Comparable
 from authorityspoke.explanations import Explanation
 from authorityspoke.factors import Factor, ContextRegister
 from authorityspoke.holdings import Holding, HoldingGroup

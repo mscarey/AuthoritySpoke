@@ -1,4 +1,4 @@
-from authorityspoke.comparisons import ContextRegister
+from authorityspoke.statements.comparable import ContextRegister
 import operator
 
 import pytest

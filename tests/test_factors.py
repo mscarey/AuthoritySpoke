@@ -3,7 +3,7 @@ import operator
 
 import pytest
 
-from authorityspoke.comparisons import ContextRegister, means
+from authorityspoke.statements.comparable import ContextRegister, means
 from authorityspoke.entities import Entity
 from authorityspoke.factors import Factor, FactorSequence
 from authorityspoke.facts import Fact, build_fact

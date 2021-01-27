@@ -1,4 +1,4 @@
-from authorityspoke.comparisons import means
+from authorityspoke.statements.comparable import means
 from authorityspoke.entities import Entity
 from authorityspoke.explanations import Explanation
 from authorityspoke.factors import ContextRegister

@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 from legislice.download import Client
 import pytest
 
-from authorityspoke.comparisons import ContextRegister, means
+from authorityspoke.statements.comparable import ContextRegister, means
 from authorityspoke.entities import Entity
 from authorityspoke.explanations import Explanation
 from authorityspoke.factors import ContextRegister

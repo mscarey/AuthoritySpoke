@@ -1,4 +1,4 @@
-from authorityspoke.comparisons import FactorSequence
+from authorityspoke.statements.comparable import FactorSequence
 from authorityspoke.predicates import Comparison, Predicate
 import json
 import os

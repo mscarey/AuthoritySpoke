@@ -15,7 +15,7 @@ from dataclasses import dataclass
 
 from legislice.enactments import Enactment, consolidate_enactments
 
-from authorityspoke.comparisons import Comparable, FactorSequence
+from authorityspoke.statements.comparable import Comparable, FactorSequence
 from authorityspoke.factors import Factor, ContextRegister
 from authorityspoke.formatting import indented
 from authorityspoke.procedures import Procedure

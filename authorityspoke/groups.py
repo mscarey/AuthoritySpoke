@@ -3,7 +3,7 @@ from __future__ import annotations
 import operator
 from typing import Callable, Dict, Iterator, Optional, Sequence, Tuple, TypeVar
 
-from authorityspoke.comparisons import (
+from authorityspoke.statements.comparable import (
     Comparable,
     ContextRegister,
     means,

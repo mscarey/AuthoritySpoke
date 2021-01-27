@@ -12,7 +12,7 @@ from legislice import Enactment
 
 from anchorpoint.textselectors import TextQuoteSelector
 
-from authorityspoke.comparisons import (
+from authorityspoke.statements.comparable import (
     ContextRegister,
     Comparable,
     FactorSequence,

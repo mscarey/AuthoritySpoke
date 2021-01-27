@@ -6,7 +6,7 @@ import operator
 import textwrap
 from typing import Callable, ClassVar, List, Optional, Tuple
 
-from authorityspoke.comparisons import ContextRegister, means, contradicts
+from authorityspoke.statements.comparable import ContextRegister, means, contradicts
 from authorityspoke.factors import Factor
 
 
@@ -69,5 +69,7 @@ class Explanation:
     def add_match(self, match=Tuple[Factor, Factor]) -> Explanation:
         new_matches = self.matches + [match]
         return Explanation(
-            matches=new_matches, context=self.context, operation=self.operation,
+            matches=new_matches,
+            context=self.context,
+            operation=self.operation,
         )

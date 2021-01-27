@@ -21,7 +21,7 @@ from dataclasses import dataclass, field
 from anchorpoint import TextQuoteSelector
 from legislice.enactments import Enactment
 
-from authorityspoke.comparisons import (
+from authorityspoke.statements.comparable import (
     Comparable,
     ContextRegister,
     FactorSequence,
