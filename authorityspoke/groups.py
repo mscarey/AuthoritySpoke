@@ -1,7 +1,17 @@
 from __future__ import annotations
 
 import operator
-from typing import Callable, Dict, Iterator, Optional, Sequence, Tuple, TypeVar
+from typing import (
+    Callable,
+    Dict,
+    Iterable,
+    Iterator,
+    Optional,
+    Sequence,
+    Tuple,
+    TypeVar,
+    Union,
+)
 
 from authorityspoke.statements.comparable import (
     Comparable,
@@ -11,7 +21,7 @@ from authorityspoke.statements.comparable import (
 from authorityspoke.explanations import Explanation
 from authorityspoke.factors import Factor
 
-F = TypeVar("F", bound="Factor")
+F = TypeVar("F", bound="Comparable")
 
 
 class ComparableGroup(Tuple[F, ...], Comparable):
@@ -23,8 +33,7 @@ class ComparableGroup(Tuple[F, ...], Comparable):
     """
 
     def __new__(cls, value: Sequence = ()):
-        if isinstance(value, Factor):
-            value = (value,)
+        value = Comparable.wrap_with_tuple(value)
         return tuple.__new__(ComparableGroup, value)
 
     def __add__(self, other) -> ComparableGroup:
@@ -364,13 +373,15 @@ class ComparableGroup(Tuple[F, ...], Comparable):
                 )
 
     def likely_contexts(
-        self, other: Comparable, context: Optional[ContextRegister] = None
+        self,
+        other: Comparable,
+        context: Optional[ContextRegister] = None,
     ) -> Iterator[ContextRegister]:
         context = context or ContextRegister()
-        if isinstance(other, Factor):
-            yield from self._likely_contexts_for_factor(other, context)
-        else:
+        if isinstance(other, Iterable):
             yield from self._likely_contexts_for_factorgroup(other, context)
+        else:
+            yield from self._likely_contexts_for_factor(other, context)
 
     def drop_implied_factors(self) -> ComparableGroup:
         """

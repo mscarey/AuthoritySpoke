@@ -84,7 +84,7 @@ class Rule(Comparable):
         for attr in self.enactment_attr_names:
             value = self.__dict__[attr]
             if not isinstance(value, Tuple):
-                object.__setattr__(self, attr, self._wrap_with_tuple(value))
+                object.__setattr__(self, attr, self.wrap_with_tuple(value))
 
     @property
     def despite(self):

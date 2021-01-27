@@ -938,7 +938,7 @@ class Comparable(ABC):
                     yield register_or_none
 
     @staticmethod
-    def _wrap_with_tuple(item):
+    def wrap_with_tuple(item):
         if item is None:
             return ()
         if isinstance(item, Iterable):

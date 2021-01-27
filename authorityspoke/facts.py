@@ -104,11 +104,11 @@ class Fact(Factor):
             if hasattr(self, "name"):
                 message += f" for '{self.name}'"
             raise ValueError(message)
-        if any(not isinstance(s, Factor) for s in self.terms):
+        if any(not isinstance(s, Comparable) for s in self.terms):
             raise TypeError(
                 "Items in the terms parameter should "
-                + "be Factor or a subclass of Factor, or should be integer "
-                + "indices of Factor objects in the case_factors parameter."
+                + "be a subclass of Comparable, or should be integer "
+                + "indices of Comparable objects in the case_factors parameter."
             )
 
     @property
@@ -294,10 +294,7 @@ def build_fact(
     if isinstance(indices, int):
         indices = (indices,)
 
-    if case_factors is None:
-        case_factors = []
-    if isinstance(case_factors, Factor):
-        case_factors = [case_factors]
+    case_factors = Comparable.wrap_with_tuple(case_factors)
 
     terms = FactorSequence([case_factors[i] for i in indices])
     return Fact(
