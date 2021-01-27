@@ -8,7 +8,7 @@ from typing import ClassVar, Dict, Iterator, List, Optional, Sequence, Tuple, Un
 
 from anchorpoint.textselectors import TextQuoteSelector
 
-from authorityspoke.comparisons import FactorSequence, new_context_helper
+from authorityspoke.comparisons import Comparable, FactorSequence, new_context_helper
 from authorityspoke.factors import Factor, ContextRegister
 from authorityspoke.formatting import indented, wrapped
 from authorityspoke.predicates import Predicate
@@ -225,6 +225,20 @@ class Fact(Factor):
         for pattern in self.predicate.term_index_permutations():
             sorted_terms = [x for _, x in sorted(zip(pattern, self.terms))]
             yield FactorSequence(sorted_terms)
+
+    def __or__(self, other: Comparable):
+        return self.union(other)
+
+    def union(
+        self, other: Comparable, context: Optional[ContextRegister] = None
+    ) -> Optional[Comparable]:
+        if not isinstance(other, Comparable):
+            raise TypeError
+        if self.implies(other, context=context):
+            return self
+        if other.implies(self, context=context):
+            return other.new_context(self.generic_factors())
+        return None
 
 
 def build_fact(

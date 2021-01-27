@@ -411,14 +411,6 @@ class ComparableGroup(Tuple[F, ...], Comparable):
         result = [factor.new_context(changes) for factor in self]
         return ComparableGroup(result)
 
-    def partial_explanations_union(
-        self, other: Comparable, context: ContextRegister
-    ) -> Iterator[ContextRegister]:
-        for likely in self.likely_contexts(other, context):
-            partial = self + other.new_context(likely.reversed())
-            if partial.internally_consistent():
-                yield likely
-
     def union_from_explanation(
         self, other: ComparableGroup, context: ContextRegister
     ) -> Optional[ComparableGroup]:

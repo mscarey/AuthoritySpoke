@@ -584,11 +584,19 @@ class Comparable(ABC):
         self, other: Comparable, context: Optional[ContextRegister] = None
     ) -> Iterator[ContextRegister]:
         context = context or ContextRegister()
-        for partial in self.partial_explanations_union(other, context):
+        for partial in self.explanations_union_partial(other, context):
             for guess in self.possible_contexts(other, partial):
                 answer = self.union_from_explanation(other, guess)
                 if answer:
                     yield guess
+
+    def explanations_union_partial(
+        self, other: Comparable, context: ContextRegister
+    ) -> Iterator[ContextRegister]:
+        for likely in self.likely_contexts(other, context):
+            partial = self + other.new_context(likely.reversed())
+            if partial.internally_consistent():
+                yield likely
 
     def generic_register(self, other: Comparable) -> ContextRegister:
         register = ContextRegister()
@@ -911,15 +919,6 @@ class Comparable(ABC):
         """Generate permutations of context factors that preserve same meaning."""
         yield self.terms
 
-    def _update_context_from_factors(
-        self, other: Comparable, context: ContextRegister
-    ) -> Optional[ContextRegister]:
-        incoming = ContextRegister.from_lists(
-            keys=self.generic_factors(), values=other.generic_factors()
-        )
-        updated_context = context.merged_with(incoming)
-        return updated_context
-
     def union(
         self, other: Comparable, context: Optional[ContextRegister] = None
     ) -> Optional[Comparable]:
@@ -930,6 +929,15 @@ class Comparable(ABC):
         except StopIteration:
             return None
         return self.union_from_explanation(other, explanation)
+
+    def _update_context_from_factors(
+        self, other: Comparable, context: ContextRegister
+    ) -> Optional[ContextRegister]:
+        incoming = ContextRegister.from_lists(
+            keys=self.generic_factors(), values=other.generic_factors()
+        )
+        updated_context = context.merged_with(incoming)
+        return updated_context
 
     def update_context_register(
         self,
