@@ -252,7 +252,7 @@ class Holding(Comparable):
             other = Holding(rule=other)
         if isinstance(other, self.__class__):
             yield from self._explanations_contradiction_of_holding(other, context)
-        elif isinstance(other, Factor):
+        elif hasattr(other, "absent"):  # other is a Factor
             yield from []  # no possible contradiction
         elif hasattr(other, "explanations_contradiction"):
             if context:

@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from collections import defaultdict
 from itertools import compress, zip_longest
-from typing import Dict, Iterable, Iterator, List, NamedTuple
+from typing import Any, Dict, Iterable, Iterator, List, NamedTuple
 from typing import Optional, Sequence, Union
 
 import logging
@@ -126,19 +126,27 @@ class Opinion(Comparable):
         elif hasattr(other, "explanations_contradiction"):
             yield from other.explanations_contradiction(self)
 
+    def comparable_with(self, other: Any) -> bool:
+        """Check if other can be compared to self for implication or contradiction."""
+        if not isinstance(other, Comparable):
+            return False
+        if isinstance(other, Procedure):
+            return False
+        if hasattr(other, "absent"):
+            return False
+        return True
+
     def contradicts(
         self, other: Comparable, context: Optional[ContextRegister] = None
     ) -> bool:
-        if isinstance(other, (Factor, Procedure)):
-            return False
-        elif isinstance(other, Comparable):
-            return any(
-                explanation is not None
-                for explanation in self.explanations_contradiction(other)
+        if not self.comparable_with(other):
+            raise TypeError(
+                "'Contradicts' test not implemented for types "
+                + f"{self.__class__} and {other.__class__}."
             )
-        raise TypeError(
-            "'Contradicts' test not implemented for types "
-            + f"{self.__class__} and {other.__class__}."
+        return any(
+            explanation is not None
+            for explanation in self.explanations_contradiction(other)
         )
 
     def implies(
@@ -154,6 +162,10 @@ class Opinion(Comparable):
         self, other: Comparable, context: Optional[ContextRegister] = None
     ) -> Iterator[Union[ContextRegister, Explanation]]:
         """Yield contexts that would result in self implying other."""
+        if not self.comparable_with(other):
+            raise TypeError(
+                f"'Implies' test not implemented for types {self.__class__} and {other.__class__}."
+            )
         if isinstance(other, Rule):
             other = Holding(rule=other)
         if isinstance(other, Holding):
@@ -171,10 +183,6 @@ class Opinion(Comparable):
             if context:
                 context = context.reversed()
             yield from other.explanations_implication(self, context=context)
-        else:
-            raise TypeError(
-                f"'Implies' test not implemented for types {self.__class__} and {other.__class__}."
-            )
 
     def generic_factors_by_str(self) -> Dict[str, Comparable]:
         r"""

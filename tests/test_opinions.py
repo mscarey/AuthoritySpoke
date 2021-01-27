@@ -371,4 +371,5 @@ class TestContradiction:
         assert "contradicts" in str(explanation).lower()
 
     def test_error_contradiction_with_procedure(self, make_opinion, make_procedure):
-        assert not make_opinion["watt_majority"].contradicts(make_procedure["c1"])
+        with pytest.raises(TypeError):
+            make_opinion["watt_majority"].contradicts(make_procedure["c1"])
