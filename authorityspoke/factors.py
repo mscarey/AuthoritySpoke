@@ -42,22 +42,6 @@ class Factor(Comparable):
         self.absent = absent
         self.anchors = anchors
 
-    @property
-    def terms(self) -> FactorSequence:
-        r"""
-        Get :class:`Factor`\s used in comparisons with other :class:`Factor`\s.
-
-        :returns:
-            a tuple of attributes that are designated as the ``terms``
-            for whichever subclass of :class:`Factor` calls this method. These
-            can be used for comparing objects using :meth:`consistent_with`
-        """
-        context: List[Optional[Factor]] = []
-        for factor_name in self.context_factor_names:
-            next_factor: Optional[Factor] = self.__dict__.get(factor_name)
-            context.append(next_factor)
-        return FactorSequence(context)
-
     def __add__(self, other: Comparable) -> Optional[Comparable]:
         if other.__class__.__name__ in ("Procedure", "Rule"):
             return other + self
