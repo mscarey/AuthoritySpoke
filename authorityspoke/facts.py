@@ -15,7 +15,6 @@ from authorityspoke.formatting import indented, wrapped
 from authorityspoke.statements.comparable import (
     Comparable,
     FactorSequence,
-    new_context_helper,
 )
 from authorityspoke.statements.predicates import Predicate
 from authorityspoke.statements.statements import Statement
@@ -168,55 +167,6 @@ class Fact(Factor, Statement):
             and self.predicate >= other.predicate
         ):
             yield from super()._implies_if_concrete(other, context)
-
-    def _contradicts_if_present(
-        self, other: Factor, context: Optional[ContextRegister] = None
-    ) -> Iterator[ContextRegister]:
-        """
-        Test if ``self`` contradicts :class:`Fact` ``other`` if neither is ``absent``.
-
-        :returns:
-            whether ``self`` and ``other`` can't both be true at
-            the same time under the given assumption.
-        """
-        if context is None:
-            context = ContextRegister()
-        if isinstance(other, Fact) and self.predicate.contradicts(other.predicate):
-            yield from self._context_registers(other, operator.ge, context)
-
-    @new_context_helper
-    def new_context(self, changes: Dict[Factor, Factor]) -> Factor:
-        """
-        Create new :class:`Factor`, replacing keys of ``changes`` with values.
-
-        :returns:
-            a version of ``self`` with the new context.
-        """
-        result = deepcopy(self)
-        result.terms = FactorSequence(
-            [factor.new_context(changes) for factor in self.terms]
-        )
-        return result
-
-    def term_permutations(self) -> Iterator[FactorSequence]:
-        """Generate permutations of context factors that preserve same meaning."""
-        for pattern in self.predicate.term_index_permutations():
-            sorted_terms = [x for _, x in sorted(zip(pattern, self.terms))]
-            yield FactorSequence(sorted_terms)
-
-    def __or__(self, other: Comparable):
-        return self.union(other)
-
-    def union(
-        self, other: Comparable, context: Optional[ContextRegister] = None
-    ) -> Optional[Comparable]:
-        if not isinstance(other, Comparable):
-            raise TypeError
-        if self.implies(other, context=context):
-            return self
-        if other.implies(self, context=context):
-            return other.new_context(self.generic_factors())
-        return None
 
 
 def build_fact(
