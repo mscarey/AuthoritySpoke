@@ -77,15 +77,15 @@ class Procedure(Comparable):
         outputs: FactorGroup,
         inputs: Optional[FactorGroup] = None,
         despite: Optional[FactorGroup] = None,
-        name: str = "",
-        absent: bool = False,
         generic: bool = False,
+        absent: bool = False,
+        name: str = "",
     ):
         self.outputs = FactorGroup(outputs)
         self.inputs = FactorGroup(inputs) if inputs else FactorGroup()
         self.despite = FactorGroup(despite) if despite else FactorGroup()
         self.name = name
-        self.absent = absent
+        self.absent = False
         self.generic = generic
         self.context_factor_names = ("outputs", "inputs", "despite")
 

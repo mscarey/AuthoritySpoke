@@ -77,6 +77,7 @@ class Holding(Comparable):
     decided: bool = True
     exclusive: bool = False
     generic: bool = False
+    absent: bool = False
     anchors: List[TextQuoteSelector] = field(default_factory=list)
 
     def __post_init__(self):
@@ -252,7 +253,7 @@ class Holding(Comparable):
             other = Holding(rule=other)
         if isinstance(other, self.__class__):
             yield from self._explanations_contradiction_of_holding(other, context)
-        elif hasattr(other, "absent"):  # other is a Factor
+        elif isinstance(other, Factor):  # other is a Factor
             yield from []  # no possible contradiction
         elif hasattr(other, "explanations_contradiction"):
             if context:

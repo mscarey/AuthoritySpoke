@@ -75,12 +75,15 @@ class Rule(Comparable):
     mandatory: bool = False
     universal: bool = False
     generic: bool = False
+    absent: bool = False
     name: Optional[str] = None
 
     context_factor_names: ClassVar = ("procedure",)
     enactment_attr_names: ClassVar = ("enactments", "enactments_despite")
 
     def __post_init__(self):
+        self.absent = False
+
         for attr in self.enactment_attr_names:
             value = self.__dict__[attr]
             if not isinstance(value, Tuple):
@@ -273,7 +276,7 @@ class Rule(Comparable):
             return False
         if isinstance(other, Procedure):
             return False
-        if hasattr(other, "absent"):
+        if isinstance(other, Factor):
             return False
         return True
 

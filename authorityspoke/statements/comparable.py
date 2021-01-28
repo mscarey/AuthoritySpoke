@@ -152,7 +152,6 @@ def convert_changes_to_register(
     return ContextRegister.from_lists(generic_factors, changes)
 
 
-
 class Comparable(ABC):
     """
     Objects that can be compared for implication, same meaning, contradiction, and consistency.
@@ -168,7 +167,8 @@ class Comparable(ABC):
     """
 
     generic: bool = False
-    name: Optional[str] = None,
+    absent: bool = False
+    name: Optional[str] = None
     context_factor_names: ClassVar[Tuple[str, ...]] = ()
 
     @property

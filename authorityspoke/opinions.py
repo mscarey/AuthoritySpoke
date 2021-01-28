@@ -132,7 +132,7 @@ class Opinion(Comparable):
             return False
         if isinstance(other, Procedure):
             return False
-        if hasattr(other, "absent"):
+        if isinstance(other, Factor):
             return False
         return True
 
