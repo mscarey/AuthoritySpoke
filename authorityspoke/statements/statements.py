@@ -1,5 +1,4 @@
 from copy import deepcopy
-from dataclasses import dataclass, field
 import operator
 
 from typing import ClassVar, Dict, Iterator, List
@@ -18,7 +17,6 @@ from authorityspoke.formatting import indented, wrapped
 from authorityspoke.statements.predicates import Predicate
 
 
-@dataclass()
 class Statement(Comparable):
     r"""
     An assertion accepted as factual by a court.
@@ -66,15 +64,16 @@ class Statement(Comparable):
             approach of hard-coding their names and order will have to change.
     """
 
-    predicate: Predicate
-    terms: FactorSequence = FactorSequence()
-    name: Optional[str] = None
-    standard_of_proof: Optional[str] = None
-    absent: bool = False
-    generic: bool = False
-
-    def __post_init__(self):
-
+    def __init__(
+        self,
+        predicate: Predicate,
+        terms: FactorSequence = FactorSequence(),
+        absent: bool = False,
+        generic: bool = False,
+    ):
+        self.predicate = predicate
+        self.absent = absent
+        self.generic = generic
         if not isinstance(self.terms, FactorSequence):
             terms = FactorSequence(self.terms)
             object.__setattr__(self, "terms", terms)
@@ -85,14 +84,11 @@ class Statement(Comparable):
                 + f"{len(self.predicate)}, not {len(self.terms)}, "
                 + f"to match predicate.context_slots for '{self.predicate.content}'"
             )
-            if hasattr(self, "name"):
-                message += f" for '{self.name}'"
             raise ValueError(message)
         if any(not isinstance(s, Comparable) for s in self.terms):
             raise TypeError(
-                "Items in the terms parameter should "
-                + "be a subclass of Comparable, or should be integer "
-                + "indices of Comparable objects in the case_factors parameter."
+                "Items in the 'terms' parameter should "
+                + "be a subclass of Comparable."
             )
 
     @property
@@ -123,13 +119,7 @@ class Statement(Comparable):
         """Create one-line string representation for inclusion in other Facts."""
         content = str(self.predicate.content_with_terms(self.terms))
         unwrapped = self.predicate.add_truth_to_content(content)
-        standard = (
-            f"by the standard {self.standard_of_proof}, "
-            if self.standard_of_proof
-            else ""
-        )
-        string = f"{standard}{unwrapped}"
-        return super().__str__().format(string).replace("Fact", "fact")
+        return super().__str__().format(unwrapped).replace("Fact", "fact")
 
     @property
     def content(self) -> Optional[str]:

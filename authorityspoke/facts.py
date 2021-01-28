@@ -121,23 +121,6 @@ class Fact(Factor, Statement):
             text += "\n" + indented("by the STANDARD {self.standard_of_proof}")
         return text
 
-    @property
-    def str_with_concrete_context(self):
-        """
-        Identify this Fact more verbosely, specifying which text is a concrete context factor.
-
-        :returns:
-            the same as the __str__ method, but with an added "SPECIFIC CONTEXT" section
-        """
-        text = str(self)
-        concrete_context = [factor for factor in self.terms if not factor.generic]
-        if any(concrete_context) and not self.generic:
-            text += "\n" + indented("SPECIFIC CONTEXT:")
-            for factor in concrete_context:
-                factor_text = indented(factor.wrapped_string, tabs=2)
-                text += f"\n{str(factor_text)}"
-        return text
-
     def __str__(self):
         """Create one-line string representation for inclusion in other Facts."""
         content = str(self.predicate.content_with_terms(self.terms))
@@ -148,17 +131,7 @@ class Fact(Factor, Statement):
             else ""
         )
         string = f"{standard}{unwrapped}"
-        return super().__str__().format(string).replace("Fact", "fact")
-
-    @property
-    def content(self) -> Optional[str]:
-        """Access :attr:`~Predicate.content` attribute."""
-        return self.predicate.content
-
-    @property
-    def truth(self) -> Optional[bool]:
-        """Access :attr:`~Predicate.truth` attribute."""
-        return self.predicate.truth
+        return Comparable.__str__(self).format(string).replace("Fact", "fact")
 
     def _means_if_concrete(
         self, other: Factor, context: Optional[ContextRegister] = None
