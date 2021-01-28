@@ -243,6 +243,8 @@ class Comparable(ABC):
         text = f"the {self.__class__.__name__}" + " {}"
         if self.generic:
             text = f"<{text}>"
+        if self.absent:
+            text = "absence of " + text
         return text
 
     def all_generic_factors_match(
@@ -522,7 +524,11 @@ class Comparable(ABC):
         self, other: Comparable, context: Optional[ContextRegister] = None
     ) -> Iterator[ContextRegister]:
         """Generate ways to match contexts of self and other so they mean the same."""
-        if self.__class__ == other.__class__ and self.generic == other.generic:
+        if (
+            self.__class__ == other.__class__
+            and self.generic == other.generic
+            and self.absent == other.absent
+        ):
             if self.generic:
                 yield self.generic_register(other)
             yield from self._means_if_concrete(other, context)

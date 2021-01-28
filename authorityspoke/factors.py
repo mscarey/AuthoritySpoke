@@ -42,20 +42,6 @@ class Factor(Comparable):
         self.absent = absent
         self.anchors = anchors
 
-    def explanations_same_meaning(
-        self, other: Comparable, context: Optional[ContextRegister] = None
-    ) -> Iterator[ContextRegister]:
-        """Generate ways to match contexts of self and other so they mean the same."""
-        if isinstance(other, self.__class__) and self.absent == other.absent:
-            yield from super().explanations_same_meaning(other, context=context)
-
-    def __str__(self):
-        text = super().__str__()
-        if self.absent:
-            text = "absence of " + text
-
-        return text
-
 
 TextLinkDict = Dict[Union[Factor, Enactment], List[TextQuoteSelector]]
 
