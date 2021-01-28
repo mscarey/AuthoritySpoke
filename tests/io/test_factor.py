@@ -1,5 +1,5 @@
 from authorityspoke.statements.comparable import FactorSequence
-from authorityspoke.predicates import Comparison, Predicate
+from authorityspoke.statements.predicates import Comparison, Predicate
 import json
 import os
 import pathlib

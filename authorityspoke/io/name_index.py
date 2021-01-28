@@ -7,7 +7,7 @@ from copy import deepcopy
 from re import findall
 from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
-from authorityspoke.predicates import StatementTemplate
+from authorityspoke.statements.predicates import StatementTemplate
 from authorityspoke.io import text_expansion
 
 

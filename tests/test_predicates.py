@@ -2,7 +2,7 @@ from datetime import date
 import pytest
 
 from authorityspoke.entities import Entity
-from authorityspoke.predicates import Predicate, Comparison, Q_
+from authorityspoke.statements.predicates import Predicate, Comparison, Q_
 
 
 class TestComparisons:

@@ -19,7 +19,7 @@ from authorityspoke.facts import Fact, build_fact
 from authorityspoke.holdings import Holding
 from authorityspoke.opinions import Opinion
 from authorityspoke.pleadings import Pleading, Allegation
-from authorityspoke.predicates import Predicate, Comparison, Q_
+from authorityspoke.statements.predicates import Predicate, Comparison, Q_
 from authorityspoke.rules import Procedure, Rule
 
 from authorityspoke.io import anchors, loaders, readers

@@ -14,7 +14,7 @@ from authorityspoke.entities import Entity
 from authorityspoke.facts import Fact
 from authorityspoke.holdings import Holding, HoldingGroup
 from authorityspoke.opinions import Opinion
-from authorityspoke.predicates import Predicate
+from authorityspoke.statements.predicates import Predicate
 from authorityspoke.procedures import Procedure
 from authorityspoke.io import anchors, loaders, readers, schemas, dump, name_index
 from authorityspoke.io.downloads import FakeClient

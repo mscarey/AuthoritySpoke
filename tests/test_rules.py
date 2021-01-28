@@ -15,7 +15,7 @@ from authorityspoke.factors import ContextRegister
 from authorityspoke.facts import Fact
 from authorityspoke.groups import FactorGroup
 from authorityspoke.holdings import Holding
-from authorityspoke.predicates import Comparison, Predicate, Q_
+from authorityspoke.statements.predicates import Comparison, Predicate, Q_
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
 

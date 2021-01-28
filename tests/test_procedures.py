@@ -6,7 +6,7 @@ from authorityspoke.entities import Entity
 from authorityspoke.factors import ContextRegister, FactorSequence
 from authorityspoke.groups import FactorGroup
 from authorityspoke.procedures import Procedure
-from authorityspoke.predicates import Comparison, Predicate, Q_
+from authorityspoke.statements.predicates import Comparison, Predicate, Q_
 from authorityspoke.facts import Fact
 
 

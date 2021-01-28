@@ -15,7 +15,7 @@ from authorityspoke.io.readers import read_decision
 from authorityspoke.factors import ContextRegister
 from authorityspoke.facts import Fact
 from authorityspoke.entities import Entity
-from authorityspoke.predicates import Comparison
+from authorityspoke.statements.predicates import Comparison
 
 load_dotenv()
 

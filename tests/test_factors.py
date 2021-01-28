@@ -9,7 +9,7 @@ from authorityspoke.factors import Factor, FactorSequence
 from authorityspoke.facts import Fact, build_fact
 from authorityspoke.rules import Rule
 from authorityspoke.opinions import Opinion
-from authorityspoke.predicates import Comparison, Q_, Predicate
+from authorityspoke.statements.predicates import Comparison, Q_, Predicate
 
 
 class TestFacts:

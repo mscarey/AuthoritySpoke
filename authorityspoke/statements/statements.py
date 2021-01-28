@@ -1,28 +1,25 @@
-"""Create models of assertions accepted as factual by courts."""
-
 from copy import deepcopy
 from dataclasses import dataclass, field
 import operator
 
-from typing import ClassVar, Dict, Iterator, List, Optional, Sequence, Tuple, Union
+from typing import ClassVar, Dict, Iterator, List
+from typing import Optional, Sequence, Tuple, Union
 
 from anchorpoint.textselectors import TextQuoteSelector
-
-
-from authorityspoke.factors import Factor, ContextRegister
-from authorityspoke.formatting import indented, wrapped
 
 from authorityspoke.statements.comparable import (
     Comparable,
     FactorSequence,
+    ContextRegister,
     new_context_helper,
 )
+
+from authorityspoke.formatting import indented, wrapped
 from authorityspoke.statements.predicates import Predicate
-from authorityspoke.statements.statements import Statement
 
 
 @dataclass()
-class Fact(Factor, Statement):
+class Statement(Comparable):
     r"""
     An assertion accepted as factual by a court.
 
@@ -75,24 +72,8 @@ class Fact(Factor, Statement):
     standard_of_proof: Optional[str] = None
     absent: bool = False
     generic: bool = False
-    anchors: List[TextQuoteSelector] = field(default_factory=list)
-    standards_of_proof: ClassVar[Tuple[str, ...]] = (
-        "scintilla of evidence",
-        "substantial evidence",
-        "preponderance of evidence",
-        "clear and convincing",
-        "beyond reasonable doubt",
-    )
 
     def __post_init__(self):
-
-        if (
-            self.standard_of_proof
-            and self.standard_of_proof not in self.standards_of_proof
-        ):
-            raise ValueError(
-                f"standard of proof must be one of {self.standards_of_proof} or None."
-            )
 
         if not isinstance(self.terms, FactorSequence):
             terms = FactorSequence(self.terms)
@@ -116,9 +97,9 @@ class Fact(Factor, Statement):
 
     @property
     def wrapped_string(self):
-        text = super().wrapped_string
-        if self.standard_of_proof:
-            text += "\n" + indented("by the STANDARD {self.standard_of_proof}")
+        content = str(self.predicate.content_with_terms(self.terms))
+        unwrapped = self.predicate.add_truth_to_content(content)
+        text = wrapped(super().__str__().format(unwrapped))
         return text
 
     @property
@@ -161,7 +142,7 @@ class Fact(Factor, Statement):
         return self.predicate.truth
 
     def _means_if_concrete(
-        self, other: Factor, context: Optional[ContextRegister] = None
+        self, other: Comparable, context: Optional[ContextRegister] = None
     ) -> Iterator[ContextRegister]:
         if (
             isinstance(other, self.__class__)
@@ -174,7 +155,7 @@ class Fact(Factor, Statement):
         return len(self.terms)
 
     def _implies_if_concrete(
-        self, other: Factor, context: Optional[ContextRegister] = None
+        self, other: Comparable, context: Optional[ContextRegister] = None
     ) -> Iterator[ContextRegister]:
         """
         Test if ``self`` impliess ``other``, assuming they are not ``generic``.
@@ -197,7 +178,7 @@ class Fact(Factor, Statement):
             yield from super()._implies_if_concrete(other, context)
 
     def _contradicts_if_present(
-        self, other: Factor, context: Optional[ContextRegister] = None
+        self, other: Comparable, context: Optional[ContextRegister] = None
     ) -> Iterator[ContextRegister]:
         """
         Test if ``self`` contradicts :class:`Fact` ``other`` if neither is ``absent``.
@@ -208,11 +189,13 @@ class Fact(Factor, Statement):
         """
         if context is None:
             context = ContextRegister()
-        if isinstance(other, Fact) and self.predicate.contradicts(other.predicate):
+        if isinstance(other, self.__class__) and self.predicate.contradicts(
+            other.predicate
+        ):
             yield from self._context_registers(other, operator.ge, context)
 
     @new_context_helper
-    def new_context(self, changes: Dict[Factor, Factor]) -> Factor:
+    def new_context(self, changes: Dict[Comparable, Comparable]) -> Comparable:
         """
         Create new :class:`Factor`, replacing keys of ``changes`` with values.
 
@@ -244,65 +227,3 @@ class Fact(Factor, Statement):
         if other.implies(self, context=context):
             return other.new_context(self.generic_factors())
         return None
-
-
-def build_fact(
-    predicate: Predicate,
-    indices: Optional[Union[int, Sequence[int]]] = None,
-    case_factors: Optional[Union[Factor, Sequence[Factor]]] = None,
-    name: Optional[str] = None,
-    standard_of_proof: Optional[str] = None,
-    absent: bool = False,
-    generic: bool = False,
-):
-    r"""
-    Build a :class:`.Fact` with generics selected from a list.
-
-    :param predicate:
-        a natural-language clause with zero or more slots
-        to insert ``terms`` that are typically the
-        subject and objects of the clause.
-
-    :param terms:
-        a series of integer indices of generic factors to
-        fill in the blanks in the :class:`.Predicate`
-
-    :param name:
-        an identifier for this object, often used if the object needs
-        to be referred to multiple times in the process of composing
-        other :class:`.Factor` objects
-
-    :param standard_of_proof:
-        a descriptor for the degree of certainty associated
-        with the assertion in the :class:`.Predicate`
-
-    :param absent:
-        whether the absence, rather than the presence, of the legal
-        fact described above is being asserted.
-
-    :param generic:
-        whether this object could be replaced by another generic
-        object of the same class without changing the truth of the
-        :class:`Rule` in which it is mentioned.
-
-    :param case_factors:
-        a series of :class:`.Factor`\s that have already been mentioned
-        in the :class:`.Opinion`. They are available for composing the
-        new :class:`.Factor` object and don't need to be recreated.
-    """
-    if not indices:
-        indices = range(len(predicate))
-    if isinstance(indices, int):
-        indices = (indices,)
-
-    case_factors = Comparable.wrap_with_tuple(case_factors)
-
-    terms = FactorSequence([case_factors[i] for i in indices])
-    return Fact(
-        predicate=predicate,
-        terms=terms,
-        name=name,
-        standard_of_proof=standard_of_proof,
-        absent=absent,
-        generic=generic,
-    )

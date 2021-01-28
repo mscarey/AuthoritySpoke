@@ -15,7 +15,7 @@ from string import Template
 from typing import Any, ClassVar, Dict, Iterable, Iterator
 from typing import List, Optional, Sequence, Set, Union
 
-from pint import UnitRegistry
+from pint import UnitRegistry, Quantity
 
 from authorityspoke.factors import Factor
 
@@ -455,7 +455,7 @@ class Comparison(Predicate):
         self,
         template: str,
         sign: str = "=",
-        expression: Union[date, int, float, ureg.Quantity] = 0,
+        expression: Union[date, int, float, Quantity] = 0,
         truth: Optional[bool] = True,
     ):
         """
@@ -494,7 +494,7 @@ class Comparison(Predicate):
     @classmethod
     def read_quantity(
         cls, value: Union[date, float, int, str]
-    ) -> Union[date, float, int, ureg.Quantity]:
+    ) -> Union[date, float, int, Quantity]:
         r"""
         Create numeric expression from text for Comparison class.
 

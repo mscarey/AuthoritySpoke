@@ -22,7 +22,7 @@ from authorityspoke.facts import Fact
 from authorityspoke.holdings import Holding
 from authorityspoke.opinions import AnchoredHoldings
 from authorityspoke.pleadings import Allegation, Pleading
-from authorityspoke.predicates import Predicate
+from authorityspoke.statements.predicates import Predicate
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
 

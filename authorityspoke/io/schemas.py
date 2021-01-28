@@ -25,7 +25,7 @@ from authorityspoke.io.nesting import nest_fields
 from authorityspoke.io import text_expansion
 from authorityspoke.opinions import Opinion
 from authorityspoke.pleadings import Pleading, Allegation
-from authorityspoke.predicates import Predicate, Comparison, ureg, Q_
+from authorityspoke.statements.predicates import Predicate, Comparison, ureg, Q_
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
 
