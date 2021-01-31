@@ -1092,7 +1092,10 @@ class ContextRegister:
 
 class FactorSequence(Tuple[Optional[Comparable], ...]):
     def __new__(cls, value: Sequence = ()):
-        if isinstance(value, Comparable) or value.__class__.__name__ == "FactorGroup":
+        if (
+            isinstance(value, Comparable)
+            or value.__class__.__name__ == "ComparableGroup"
+        ):
             value = (value,)
         if value is None:
             value = (None,)
@@ -1105,11 +1108,11 @@ class FactorSequence(Tuple[Optional[Comparable], ...]):
         context: Optional[ContextRegister] = None,
     ) -> Iterator[ContextRegister]:
         r"""
-        Find ways for a series of pairs of :class:`.Factor`\s to satisfy a comparison.
+        Find ways for a series of pairs of :class:`.Comparable` terms to satisfy a comparison.
 
         :param context:
-            keys representing :class:`.Factor`\s in ``self`` and
-            values representing :class:`.Factor`\s in ``other``. The
+            keys representing terms in ``self`` and
+            values representing terms in ``other``. The
             keys and values have been found in corresponding positions
             in ``self`` and ``other``.
 

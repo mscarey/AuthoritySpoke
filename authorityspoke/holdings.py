@@ -30,7 +30,7 @@ from authorityspoke.statements.comparable import (
 )
 from authorityspoke.explanations import Explanation
 from authorityspoke.factors import Factor
-from authorityspoke.groups import ComparableGroup, FactorGroup
+from authorityspoke.groups import ComparableGroup
 from authorityspoke.formatting import indented, wrapped
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule

@@ -200,7 +200,7 @@ class Opinion(Comparable):
                 generics[str(generic)] = generic
         return generics
 
-    def get_factor_by_name(self, name: str) -> Optional[Factor]:
+    def get_factor_by_name(self, name: str) -> Optional[Comparable]:
         """
         Search recursively in holdings of ``self`` for :class:`.Factor` with ``name``.
 

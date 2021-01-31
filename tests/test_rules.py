@@ -13,7 +13,7 @@ from authorityspoke.entities import Entity
 from authorityspoke.explanations import Explanation
 from authorityspoke.factors import ContextRegister
 from authorityspoke.facts import Fact
-from authorityspoke.groups import FactorGroup
+from authorityspoke.groups import ComparableGroup
 from authorityspoke.holdings import Holding
 from authorityspoke.statements.predicates import Comparison, Predicate, Q_
 from authorityspoke.procedures import Procedure
@@ -510,8 +510,8 @@ class TestContradiction:
         watt = make_opinion_with_holding["watt_majority"]
         watt_rule = list(watt.holdings)[1].rule
         must_not_rule = make_holding["h2_output_false_ALL_MUST"]
-        watt_rule.procedure.inputs = FactorGroup([watt_rule.inputs[3]])
-        must_not_rule.procedure.inputs = FactorGroup([must_not_rule.inputs[3]])
+        watt_rule.procedure.inputs = ComparableGroup([watt_rule.inputs[3]])
+        must_not_rule.procedure.inputs = ComparableGroup([must_not_rule.inputs[3]])
         assert watt_rule.contradicts(must_not_rule)
 
     # Contradiction of other types

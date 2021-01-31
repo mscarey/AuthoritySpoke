@@ -10,7 +10,6 @@ from typing import (
     Sequence,
     Tuple,
     TypeVar,
-    Union,
 )
 
 from authorityspoke.statements.comparable import (
@@ -19,7 +18,6 @@ from authorityspoke.statements.comparable import (
     means,
 )
 from authorityspoke.explanations import Explanation
-from authorityspoke.factors import Factor
 
 F = TypeVar("F", bound="Comparable")
 
@@ -28,8 +26,8 @@ class ComparableGroup(Tuple[F, ...], Comparable):
     r"""
     Factors to be used together in a comparison.
 
-    The inputs, outputs, and despite :class:`.Factor`\s of
-    a :class:`.Procedure` should be FactorGroups.
+    The inputs, outputs, and despite terms of
+    a :class:`.Procedure` should be ComparableGroups.
     """
 
     def __new__(cls, value: Sequence = ()):
@@ -125,7 +123,7 @@ class ComparableGroup(Tuple[F, ...], Comparable):
     def comparison(
         self,
         operation: Callable,
-        still_need_matches: Sequence[Factor],
+        still_need_matches: Sequence[Comparable],
         matches: ContextRegister = None,
     ) -> Iterator[ContextRegister]:
         r"""
@@ -179,14 +177,14 @@ class ComparableGroup(Tuple[F, ...], Comparable):
                                 )
                             )
 
-    def get_factor_by_name(self, name: str) -> Factor:
+    def get_factor_by_name(self, name: str) -> Optional[Comparable]:
         for comparable in self:
             answer = comparable.get_factor_by_name(name)
             if answer:
                 return answer
         return None
 
-    def get_factor_by_str(self, query: str) -> Optional[Factor]:
+    def get_factor_by_str(self, query: str) -> Optional[Comparable]:
         """
         Search of ``self`` and ``self``'s attributes for :class:`Factor` with specified string.
 
@@ -203,7 +201,7 @@ class ComparableGroup(Tuple[F, ...], Comparable):
     def verbose_comparison(
         self,
         operation: Callable,
-        still_need_matches: Sequence[Factor],
+        still_need_matches: Sequence[Comparable],
         explanation: Explanation = None,
     ) -> Iterator[Explanation]:
         r"""
@@ -224,7 +222,7 @@ class ComparableGroup(Tuple[F, ...], Comparable):
 
         :param explanation:
             an :class:`.Explanation` showing which :class:`.Factor`\s listed in the
-            FactorGroups were matched to each other, and also including a
+            ComparableGroups were matched to each other, and also including a
             :class:`.ContextRegister`\.
 
         :yields:
@@ -351,7 +349,7 @@ class ComparableGroup(Tuple[F, ...], Comparable):
             )
 
     def _likely_contexts_for_factor(
-        self, other: Factor, context: ContextRegister, i: int = 0
+        self, other: Comparable, context: ContextRegister, i: int = 0
     ) -> Iterator[ContextRegister]:
         if i == len(self):
             yield context
@@ -361,7 +359,7 @@ class ComparableGroup(Tuple[F, ...], Comparable):
                 yield from self._likely_contexts_for_factor(other, new_context, i + 1)
 
     def _likely_contexts_for_factorgroup(
-        self, other: FactorGroup, context: ContextRegister, j: int = 0
+        self, other: ComparableGroup, context: ContextRegister, j: int = 0
     ) -> Iterator[ContextRegister]:
         if j == len(other):
             yield context
@@ -437,6 +435,3 @@ class ComparableGroup(Tuple[F, ...], Comparable):
         result = self + other.new_context(changes=updated_context)
         result = result.drop_implied_factors()
         return result
-
-
-FactorGroup = ComparableGroup[Factor]

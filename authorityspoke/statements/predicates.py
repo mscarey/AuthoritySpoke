@@ -1,23 +1,22 @@
 r"""
-Phrases that contain meanings of :class:`.Factor`\s, particularly :class:`.Fact`\s.
+Phrases that contain meanings of :class:`.Statement`\s.
 
-Can contain references to other :class:`.Factor`\s,
-to numeric values, or to quantities (with the use of
-the `pint <https://pint.readthedocs.io/en/0.9/>`_ library.)
+Can contain references to other :class:`.Statement`\s,
+to numeric values, to dates, or to quantities (with the use of
+the `pint <https://pint.readthedocs.io/en/>`_ library).
 """
 
 from __future__ import annotations
+from authorityspoke.statements.comparable import Comparable
 
 from datetime import date
 from itertools import product
 
 from string import Template
-from typing import Any, ClassVar, Dict, Iterable, Iterator
-from typing import List, Optional, Sequence, Set, Union
+from typing import Any, ClassVar, Dict, Iterable
+from typing import List, Optional, Sequence, Union
 
 from pint import UnitRegistry, Quantity
-
-from authorityspoke.factors import Factor
 
 ureg = UnitRegistry()
 Q_ = ureg.Quantity
@@ -45,7 +44,7 @@ class StatementTemplate(Template):
             )
         return None
 
-    def get_template_with_plurals(self, context: Sequence[Factor]) -> str:
+    def get_template_with_plurals(self, context: Sequence[Comparable]) -> str:
         """
         Get a version of self with "was" replaced by "were" for any plural terms.
 
@@ -71,8 +70,8 @@ class StatementTemplate(Template):
         Count bracket pairs in ``self.template``.
 
         :returns:
-            the number of context :class:`.Factor`\s that must be
-            specified to fill in the blanks in ``self.template``.
+            the strings to be replaced with :class:`.Comparable`\s
+            to fill in the blanks in ``self.template``.
         """
 
         placeholders = [
@@ -83,7 +82,7 @@ class StatementTemplate(Template):
         return list(dict.fromkeys(placeholders))
 
     def _check_number_of_terms(
-        self, placeholders: List[str], context: Sequence[Factor]
+        self, placeholders: List[str], context: Sequence[Comparable]
     ) -> None:
         if len(set(placeholders)) != len(context):
             raise ValueError(
@@ -93,8 +92,8 @@ class StatementTemplate(Template):
         return None
 
     def mapping_placeholder_to_term(
-        self, context: Sequence[Factor]
-    ) -> Dict[str, Factor]:
+        self, context: Sequence[Comparable]
+    ) -> Dict[str, Comparable]:
         """
         Get a mapping of template placeholders to context terms.
 
@@ -107,25 +106,26 @@ class StatementTemplate(Template):
         return dict(zip(placeholders, context))
 
     def mapping_placeholder_to_term_name(
-        self, context: Sequence[Factor]
+        self, context: Sequence[Comparable]
     ) -> Dict[str, str]:
         """
         Get a mapping of template placeholders to the names of their context terms.
 
         :param context:
-            a list of context :class:`.factors.Factor`/s, in the same
+            a list of :class:`~authorityspoke.comparable.Comparable`
+            context terms in the same
             order they appear in the template string.
         """
         mapping = self.mapping_placeholder_to_term(context)
         mapping_to_string = {k: v.short_string for k, v in mapping.items()}
         return mapping_to_string
 
-    def substitute_with_plurals(self, context: Sequence[Factor]) -> str:
+    def substitute_with_plurals(self, context: Sequence[Comparable]) -> str:
         """
-        Update template text with strings representing Factor terms.
+        Update template text with strings representing Comparable terms.
 
         :param context:
-            Factors with :meth:`~authorityspoke.factors.Factor.short_string`
+            terms with `.short_string()`
             methods to substitute into template, and optionally with `plural`
             attributes to indicate whether to change the word "was" to "were"
 
@@ -169,8 +169,7 @@ class Predicate:
 
     :param template:
         a clause containing an assertion in English in the past tense, with
-        placeholders showing where references to specific
-        :class:`~authorityspoke.factors.Factor`\s
+        placeholders showing where references to specific terms
         from the case can be inserted to make the clause specific.
         This string must be a valid Python :py:class:`string.Template`\.
 
@@ -186,7 +185,7 @@ class Predicate:
         Clean up and test validity of attributes.
 
         If the :attr:`content` sentence is phrased to have a plural
-        context factor, normalizes it by changing "were" to "was".
+        context term, normalizes it by changing "were" to "was".
         """
         self.template = StatementTemplate(template, make_singular=True)
         self.truth = truth
@@ -205,17 +204,19 @@ class Predicate:
         changes = {p: "{}" for p in self.template.get_placeholders()}
         return self.template.substitute(**changes)
 
-    def content_with_terms(self, context: Union[Factor, Sequence[Factor]]) -> str:
+    def content_with_terms(
+        self, context: Union[Comparable, Sequence[Comparable]]
+    ) -> str:
         r"""
         Make a sentence by filling in placeholders with names of Factors.
 
         :param context:
-            :class:`.Factor`\s to be mentioned in the context of
+            terms to be mentioned in the context of
             this Predicate. They do not need to be type :class:`.Entity`
 
         :returns:
             a sentence created by substituting string representations
-            Factors for the placeholders in the content template
+            of terms for the placeholders in the content template
         """
 
         if not isinstance(context, Iterable):
@@ -462,7 +463,7 @@ class Comparison(Predicate):
         Clean up and test validity of attributes.
 
         If the :attr:`content` sentence is phrased to have a plural
-        context factor, normalizes it by changing "were" to "was".
+        context term, normalizes it by changing "were" to "was".
         """
         super().__init__(template, truth=truth)
         self.sign = sign

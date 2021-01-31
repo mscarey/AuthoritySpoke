@@ -4,7 +4,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 import operator
 import textwrap
-from typing import Callable, ClassVar, List, Optional, Tuple
+from typing import Callable, ClassVar, Dict, List, Optional, Tuple
 
 from authorityspoke.statements.comparable import ContextRegister, means, contradicts
 from authorityspoke.factors import Factor
@@ -31,7 +31,7 @@ class Explanation:
     context: Optional[ContextRegister] = None
     operation: Callable = operator.ge
 
-    operation_names: ClassVar = {
+    operation_names: ClassVar[Dict[Callable, str]] = {
         operator.ge: "IMPLIES",
         means: "MEANS",
         contradicts: "CONTRADICTS",
