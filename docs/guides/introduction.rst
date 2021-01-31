@@ -455,18 +455,18 @@ Generic Factors
 ------------------
 
 The two instances of the phrase “the Java API” are in angle brackets to
-indicate that the Java API is a generic :class:`~authorityspoke.entities.Entity` mentioned
+indicate that the Java API is a generic :class:`~authorityspoke.statements.entities.Entity` mentioned
 in the :class:`~authorityspoke.facts.Fact`\.
 
     >>> oracle.holdings[0].generic_factors
     [Entity(name='the Java API', generic=True, plural=False, anchors=[])]
 
 
-A generic :class:`~authorityspoke.entities.Entity` is “generic”
+A generic :class:`~authorityspoke.statements.entities.Entity` is “generic”
 in the sense that in the context of
 the :class:`~authorityspoke.factors.Factor` where
-the :class:`~authorityspoke.entities.Entity` appears, it could be replaced with
-some other generic :class:`~authorityspoke.entities.Entity` without
+the :class:`~authorityspoke.statements.entities.Entity` appears, it could be replaced with
+some other generic :class:`~authorityspoke.statements.entities.Entity` without
 changing the meaning of the
 :class:`~authorityspoke.factors.Factor` or the :class:`~authorityspoke.rules.Rule` where it appears.
 
@@ -774,9 +774,9 @@ to help us grapple with it.
 
 We can use the :meth:`~authorityspoke.holdings.Holding.explain_contradiction` method
 directly on a :class:`~authorityspoke.holdings.Holding` to generate all
-available :class:`~authorityspoke.explanations.Explanation`\s of why a
+available :class:`~authorityspoke.statements.explanations.Explanation`\s of why a
 contradiction is possible between `lotus.holdings[6]` and
-`oracle.holdings[10]`. Each :class:`~authorityspoke.explanations.Explanation`
+`oracle.holdings[10]`. Each :class:`~authorityspoke.statements.explanations.Explanation`
 includes a mapping that shows how the context factors of
 the :class:`~authorityspoke.holdings.Holding` on the left can be mapped
 onto the :class:`~authorityspoke.holdings.Holding` on the right.
@@ -787,7 +787,7 @@ consider ‘the Lotus menu command hierarchy’ to be analagous to ‘the Java
 API’. The other possible explanation AuthoritySpoke could have given
 would have been that ‘the Lotus menu command hierarchy’ is analagous to
 ‘the Java language’. Let’s see if the other
-possible :class:`~authorityspoke.explanations.Explanation`
+possible :class:`~authorityspoke.statements.explanations.Explanation`
 also appears in ``explanations``.
 
 
@@ -795,12 +795,12 @@ also appears in ``explanations``.
     >>> len(explanations)
     1
 
-No, there’s only one :class:`~authorityspoke.explanations.Explanation`
+No, there’s only one :class:`~authorityspoke.statements.explanations.Explanation`
 given for how these rules can contradict each other.
 (The :meth:`~authorityspoke.holdings.Holding.explain_contradiction` method
-returns only one one :class:`~authorityspoke.explanations.Explanation`, but
+returns only one one :class:`~authorityspoke.statements.explanations.Explanation`, but
 :meth:`~authorityspoke.holdings.Holding.explanations_contradiction`
-is a generator that yields every :class:`~authorityspoke.explanations.Explanation`
+is a generator that yields every :class:`~authorityspoke.statements.explanations.Explanation`
 it can find.) If you read the *Oracle* case, is makes sense that ‘the
 Lotus menu command hierarchy’ is not considered analagous to
 ‘the Java language’. The *Oracle* case is only
@@ -870,7 +870,7 @@ for protection under the Copyright Act. This is a two-step analysis.
 
 The first step results in
 the :class:`~authorityspoke.facts.Fact` it is false that a generic
-:class:`~authorityspoke.entities.Entity` was “an original work”:
+:class:`~authorityspoke.statements.entities.Entity` was “an original work”:
 
     >>> print(feist.holdings[10])
     the Holding to ACCEPT
@@ -889,7 +889,7 @@ the :class:`~authorityspoke.facts.Fact` it is false that a generic
 
 And the second step relies on the result of the first step to reach the
 further result of “absence of the Fact that” a
-generic :class:`~authorityspoke.entities.Entity` was “copyrightable”.
+generic :class:`~authorityspoke.statements.entities.Entity` was “copyrightable”.
 
     >>> print(feist.holdings[3])
     the Holding to ACCEPT that the EXCLUSIVE way to reach the fact that
@@ -933,7 +933,7 @@ Holding ``listings_not_copyrightable`` is that
 ``listings_not_copyrightable`` has
 two :class:`~authorityspoke.factors.Factor`\s under its “RESULT”, not
 just one. Notice that it doesn’t matter that the two original Holdings
-reference different generic :class:`~authorityspoke.entities.Entity` objects
+reference different generic :class:`~authorityspoke.statements.entities.Entity` objects
 (“Rural’s telephone directory” versus “Rural’s telephone listings”).
 Because they’re generic, they’re interchangeable for this purpose.
 

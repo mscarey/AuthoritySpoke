@@ -4,7 +4,7 @@ import operator
 import pytest
 
 from authorityspoke.statements.comparable import ContextRegister, means
-from authorityspoke.entities import Entity
+from authorityspoke.statements.entities import Entity
 from authorityspoke.factors import Factor, FactorSequence
 from authorityspoke.facts import Fact, build_fact
 from authorityspoke.rules import Rule

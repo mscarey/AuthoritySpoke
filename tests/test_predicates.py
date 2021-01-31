@@ -1,7 +1,7 @@
 from datetime import date
 import pytest
 
-from authorityspoke.entities import Entity
+from authorityspoke.statements.entities import Entity
 from authorityspoke.statements.predicates import Predicate, Comparison, Q_
 
 

@@ -14,7 +14,7 @@ from legislice import Enactment
 from legislice.schemas import EnactmentSchema
 
 from authorityspoke.decisions import CaseCitation, Decision
-from authorityspoke.entities import Entity
+from authorityspoke.statements.entities import Entity
 from authorityspoke.evidence import Exhibit, Evidence
 from authorityspoke.factors import Factor
 from authorityspoke.facts import Fact

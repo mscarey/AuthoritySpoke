@@ -15,7 +15,7 @@ from legislice.download import Client
 from legislice.name_index import EnactmentIndex, collect_enactments
 
 from authorityspoke.decisions import Decision
-from authorityspoke.entities import Entity
+from authorityspoke.statements.entities import Entity
 from authorityspoke.evidence import Exhibit, Evidence
 from authorityspoke.factors import Factor
 from authorityspoke.facts import Fact

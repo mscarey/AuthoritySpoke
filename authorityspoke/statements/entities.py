@@ -2,16 +2,19 @@
 
 from __future__ import annotations
 from dataclasses import astuple, dataclass, field
-from typing import Iterator, List, Optional
+from typing import Callable, Iterator, List, Optional
 
 from anchorpoint import TextQuoteSelector
 
-from authorityspoke.statements.comparable import ContextRegister, new_context_helper
-from authorityspoke.factors import Factor
+from authorityspoke.statements.comparable import (
+    Comparable,
+    ContextRegister,
+    new_context_helper,
+)
 
 
 @dataclass()
-class Entity(Factor):
+class Entity(Comparable):
     r"""
     Things that exist in the outside world, like people, places, or events.
 
@@ -67,7 +70,7 @@ class Entity(Factor):
             return True
         return astuple(self) == astuple(other)
 
-    def __ge__(self, other: Optional[Factor]):
+    def __ge__(self, other: Optional[Comparable]):
         if other is None:
             return True
         if not isinstance(other, Entity):
@@ -81,7 +84,9 @@ class Entity(Factor):
             return f"<{self.name}>"
         return self.name
 
-    def _context_register(self, other: Factor, comparison) -> Iterator[ContextRegister]:
+    def _context_register(
+        self, other: Comparable, comparison: Callable
+    ) -> Iterator[ContextRegister]:
         """
         Find how ``self``\'s context of can be mapped onto ``other``\'s.
 

@@ -10,7 +10,7 @@ from legislice.download import Client
 from legislice.name_index import collect_enactments
 
 from authorityspoke.statements.comparable import ContextRegister
-from authorityspoke.entities import Entity
+from authorityspoke.statements.entities import Entity
 from authorityspoke.facts import Fact
 from authorityspoke.holdings import Holding, HoldingGroup
 from authorityspoke.opinions import Opinion

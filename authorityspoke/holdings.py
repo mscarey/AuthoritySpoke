@@ -28,10 +28,10 @@ from authorityspoke.statements.comparable import (
     contradicts,
     new_context_helper,
 )
-from authorityspoke.explanations import Explanation
+from authorityspoke.statements.explanations import Explanation
 from authorityspoke.factors import Factor
-from authorityspoke.groups import ComparableGroup
-from authorityspoke.formatting import indented, wrapped
+from authorityspoke.statements.groups import ComparableGroup
+from authorityspoke.statements.formatting import indented, wrapped
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
 

@@ -8,9 +8,9 @@ from legislice import Enactment
 from legislice.download import Client
 
 from authorityspoke.io.downloads import FakeClient
-from authorityspoke.entities import Entity
+from authorityspoke.statements.entities import Entity
 from authorityspoke.evidence import Evidence
-from authorityspoke.explanations import Explanation
+from authorityspoke.statements.explanations import Explanation
 from authorityspoke.factors import ContextRegister, FactorSequence
 from authorityspoke.holdings import Holding
 

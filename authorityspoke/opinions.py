@@ -19,7 +19,7 @@ from dataclasses import dataclass, field
 from anchorpoint.textselectors import TextQuoteSelector
 
 from authorityspoke.statements.comparable import Comparable
-from authorityspoke.explanations import Explanation
+from authorityspoke.statements.explanations import Explanation
 from authorityspoke.factors import Factor, ContextRegister, FactorIndex
 from authorityspoke.holdings import Holding, HoldingGroup
 from authorityspoke.procedures import Procedure

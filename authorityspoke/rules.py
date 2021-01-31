@@ -17,7 +17,7 @@ from legislice.enactments import Enactment, consolidate_enactments
 
 from authorityspoke.statements.comparable import Comparable, FactorSequence
 from authorityspoke.factors import Factor, ContextRegister
-from authorityspoke.formatting import indented
+from authorityspoke.statements.formatting import indented
 from authorityspoke.procedures import Procedure
 
 

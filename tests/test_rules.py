@@ -9,11 +9,11 @@ from legislice.download import Client
 import pytest
 
 from authorityspoke.statements.comparable import ContextRegister, means
-from authorityspoke.entities import Entity
-from authorityspoke.explanations import Explanation
+from authorityspoke.statements.entities import Entity
+from authorityspoke.statements.explanations import Explanation
 from authorityspoke.factors import ContextRegister
 from authorityspoke.facts import Fact
-from authorityspoke.groups import ComparableGroup
+from authorityspoke.statements.groups import ComparableGroup
 from authorityspoke.holdings import Holding
 from authorityspoke.statements.predicates import Comparison, Predicate, Q_
 from authorityspoke.procedures import Procedure

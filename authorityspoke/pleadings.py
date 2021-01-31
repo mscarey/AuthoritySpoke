@@ -2,10 +2,10 @@ from dataclasses import dataclass
 
 from typing import ClassVar, Optional, Tuple
 
-from authorityspoke.entities import Entity
+from authorityspoke.statements.entities import Entity
 from authorityspoke.factors import Factor
 from authorityspoke.facts import Fact
-from authorityspoke.formatting import indented
+from authorityspoke.statements.formatting import indented
 
 
 @dataclass()

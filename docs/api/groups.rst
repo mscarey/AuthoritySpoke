@@ -2,5 +2,5 @@
 Factor Groups
 ================
 
-.. autoclass:: authorityspoke.groups.ComparableGroup
+.. autoclass:: authorityspoke.statements.groups.ComparableGroup
     :members:

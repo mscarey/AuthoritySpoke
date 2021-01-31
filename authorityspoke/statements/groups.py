@@ -17,7 +17,7 @@ from authorityspoke.statements.comparable import (
     ContextRegister,
     means,
 )
-from authorityspoke.explanations import Explanation
+from authorityspoke.statements.explanations import Explanation
 
 F = TypeVar("F", bound="Comparable")
 

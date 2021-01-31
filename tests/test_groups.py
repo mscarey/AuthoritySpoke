@@ -1,6 +1,6 @@
 from authorityspoke.statements.comparable import ContextRegister, means
-from authorityspoke.entities import Entity
-from authorityspoke.groups import ComparableGroup
+from authorityspoke.statements.entities import Entity
+from authorityspoke.statements.groups import ComparableGroup
 from authorityspoke.holdings import HoldingGroup
 
 

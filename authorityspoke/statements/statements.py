@@ -13,7 +13,7 @@ from authorityspoke.statements.comparable import (
     new_context_helper,
 )
 
-from authorityspoke.formatting import indented, wrapped
+from authorityspoke.statements.formatting import indented, wrapped
 from authorityspoke.statements.predicates import Predicate
 
 

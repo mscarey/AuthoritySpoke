@@ -7,7 +7,6 @@ the `pint <https://pint.readthedocs.io/en/>`_ library).
 """
 
 from __future__ import annotations
-from authorityspoke.statements.comparable import Comparable
 
 from datetime import date
 from itertools import product
@@ -17,6 +16,8 @@ from typing import Any, ClassVar, Dict, Iterable
 from typing import List, Optional, Sequence, Union
 
 from pint import UnitRegistry, Quantity
+
+from authorityspoke.statements.comparable import Comparable
 
 ureg = UnitRegistry()
 Q_ = ureg.Quantity

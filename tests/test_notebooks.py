@@ -14,7 +14,7 @@ from authorityspoke.io.downloads import download_case, FakeClient
 from authorityspoke.io.readers import read_decision
 from authorityspoke.factors import ContextRegister
 from authorityspoke.facts import Fact
-from authorityspoke.entities import Entity
+from authorityspoke.statements.entities import Entity
 from authorityspoke.statements.predicates import Comparison
 
 load_dotenv()

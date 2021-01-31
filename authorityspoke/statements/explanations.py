@@ -1,4 +1,4 @@
-"""Objects describing relationships between pairs of Factors or Opinions."""
+"""Objects describing relationships between pairs of Comparables or Opinions."""
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -6,12 +6,16 @@ import operator
 import textwrap
 from typing import Callable, ClassVar, Dict, List, Optional, Tuple
 
-from authorityspoke.statements.comparable import ContextRegister, means, contradicts
-from authorityspoke.factors import Factor
+from authorityspoke.statements.comparable import (
+    Comparable,
+    ContextRegister,
+    means,
+    contradicts,
+)
 
 
-class Matches(List[Tuple[Factor, Factor]]):
-    def get_factor_by_str(self, query: str) -> Optional[Factor]:
+class Matches(List[Tuple[Comparable, Comparable]]):
+    def get_factor_by_str(self, query: str) -> Optional[Comparable]:
         for pair in self:
             for item in pair:
                 if str(item) == query:
@@ -66,7 +70,7 @@ class Explanation:
             text += match_text
         return text.rstrip("\n")
 
-    def add_match(self, match=Tuple[Factor, Factor]) -> Explanation:
+    def add_match(self, match=Tuple[Comparable, Comparable]) -> Explanation:
         new_matches = self.matches + [match]
         return Explanation(
             matches=new_matches,

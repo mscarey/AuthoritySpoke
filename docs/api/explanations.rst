@@ -6,6 +6,6 @@ Explanations
     :members:
     :special-members:
 
-.. autoclass:: authorityspoke.explanations.Explanation
+.. autoclass:: authorityspoke.statements.explanations.Explanation
     :members:
     :special-members:

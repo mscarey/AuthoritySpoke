@@ -20,8 +20,8 @@ from authorityspoke.statements.comparable import (
     new_context_helper,
 )
 from authorityspoke.factors import Factor
-from authorityspoke.groups import ComparableGroup
-from authorityspoke.formatting import indented
+from authorityspoke.statements.groups import ComparableGroup
+from authorityspoke.statements.formatting import indented
 
 
 class Procedure(Comparable):

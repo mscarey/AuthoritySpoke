@@ -10,7 +10,7 @@ from anchorpoint.textselectors import TextQuoteSelector
 
 
 from authorityspoke.factors import Factor, ContextRegister
-from authorityspoke.formatting import indented, wrapped
+from authorityspoke.statements.formatting import indented, wrapped
 
 from authorityspoke.statements.comparable import (
     Comparable,

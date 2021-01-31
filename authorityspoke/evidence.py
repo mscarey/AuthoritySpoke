@@ -5,10 +5,10 @@ from typing import ClassVar, Iterator, List, Optional, Tuple
 
 from anchorpoint import TextQuoteSelector
 
-from authorityspoke.entities import Entity
+from authorityspoke.statements.entities import Entity
 from authorityspoke.factors import ContextRegister, Factor
 from authorityspoke.facts import Fact
-from authorityspoke.formatting import indented, wrapped
+from authorityspoke.statements.formatting import indented
 
 
 @dataclass()
