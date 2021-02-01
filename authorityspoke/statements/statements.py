@@ -40,10 +40,6 @@ class Statement(Comparable):
         to be referred to multiple times in the process of composing
         other :class:`Factor` objects.
 
-    :param standard_of_proof:
-        a descriptor for the degree of certainty associated
-        with the assertion in the ``predicate``.
-
     :param absent:
         whether the absence, rather than the presence, of the legal
         fact described above is being asserted.
@@ -52,16 +48,6 @@ class Statement(Comparable):
         whether this object could be replaced by another generic
         object of the same class without changing the truth of the
         :class:`Rule` in which it is mentioned.
-
-    :attr standards_of_proof:
-        a tuple with every allowable name for a standard of
-        proof, in order from weakest to strongest.
-
-        .. note:
-            If any courts anywhere in a legal regime disagree about the
-            relative strength of the various standards of proof, or if
-            any court considers the order context-specific, then this
-            approach of hard-coding their names and order will have to change.
     """
 
     def __init__(
@@ -138,11 +124,7 @@ class Statement(Comparable):
     def _means_if_concrete(
         self, other: Comparable, context: Optional[ContextRegister] = None
     ) -> Iterator[ContextRegister]:
-        if (
-            isinstance(other, self.__class__)
-            and self.predicate.means(other.predicate)
-            and self.standard_of_proof == other.standard_of_proof
-        ):
+        if self.predicate.means(other.predicate):
             yield from super()._means_if_concrete(other, context)
 
     def __len__(self):
@@ -157,18 +139,7 @@ class Statement(Comparable):
         :returns:
             whether ``self`` implies ``other`` under the given assumption.
         """
-        if (
-            isinstance(other, self.__class__)
-            and bool(self.standard_of_proof) == bool(other.standard_of_proof)
-            and not (
-                self.standard_of_proof
-                and (
-                    self.standards_of_proof.index(self.standard_of_proof)
-                    < self.standards_of_proof.index(other.standard_of_proof)
-                )
-            )
-            and self.predicate >= other.predicate
-        ):
+        if self.predicate >= other.predicate:
             yield from super()._implies_if_concrete(other, context)
 
     def _contradicts_if_present(
