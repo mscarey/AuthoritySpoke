@@ -4,26 +4,20 @@ import pytest
 
 from authorityspoke.statements.comparable import ContextRegister, means
 from authorityspoke.statements.entities import Entity
-from authorityspoke.factors import Factor, FactorSequence
-from authorityspoke.facts import Fact, build_fact
 from authorityspoke.statements.predicates import Comparison, Q_, Predicate
+from authorityspoke.statements.statements import Statement
+
+from authorityspoke.factors import FactorSequence
 
 
 class TestFacts:
-    def test_default_terms_for_fact(self, make_entity, make_predicate, watt_mentioned):
-        e = make_entity
-        f1 = build_fact(make_predicate["p1"], case_factors=watt_mentioned)
-        assert f1.terms == (e["motel"],)
-
-    def test_build_fact(self, make_predicate, watt_mentioned):
+    def test_build_fact(self, make_predicate, make_entity):
         """
         Check that terms is created as a (hashable) tuple, not list
         """
-        shooting = build_fact(
+        shooting = Statement(
             make_predicate["p_shooting"],
-            (2, 3),
-            case_factors=watt_mentioned,
-            standard_of_proof="preponderance of evidence",
+            terms=[make_entity["alice"], make_entity["bob"]],
         )
         assert isinstance(shooting.terms, tuple)
 
@@ -113,7 +107,7 @@ class TestFacts:
     def test_string_for_fact_with_identical_terms(self):
         devon = Entity("Devon", generic=True)
         elaine = Entity("Elaine", generic=True)
-        opened_account = Fact(
+        opened_account = Statement(
             Predicate("$applicant opened a bank account for $applicant and $cosigner"),
             terms=(devon, elaine),
         )
@@ -179,7 +173,7 @@ class TestFacts:
     def test_concrete_to_abstract(self, make_entity, make_predicate):
         motel = make_entity["motel_specific"]
         d = make_entity["watt"]
-        fact = Fact(predicate=make_predicate["p2"], terms=(d, motel))
+        fact = Statement(predicate=make_predicate["p2"], terms=(d, motel))
         assert "<Wattenburg> operated and lived at Hideaway Lodge" in str(fact)
         assert "<Wattenburg> operated and lived at Hideaway Lodge>" in str(
             fact.make_generic()
@@ -300,11 +294,11 @@ class TestSameMeaning:
         ann = Entity("Ann", generic=False)
         bob = Entity("Bob", generic=False)
 
-        ann_and_bob_were_family = Fact(
+        ann_and_bob_were_family = Statement(
             Predicate("$relative1 and $relative2 both were members of the same family"),
             terms=(ann, bob),
         )
-        bob_and_ann_were_family = Fact(
+        bob_and_ann_were_family = Statement(
             Predicate("$relative1 and $relative2 both were members of the same family"),
             terms=(bob, ann),
         )
@@ -332,8 +326,10 @@ class TestSameMeaning:
     def test_means_despite_plural(self):
         directory = Entity("Rural's telephone directory", plural=False)
         listings = Entity("Rural's telephone listings", plural=True)
-        directory_original = Fact(Predicate("$thing was original"), terms=directory)
-        listings_original = Fact(Predicate("$thing were original"), terms=listings)
+        directory_original = Statement(
+            Predicate("$thing was original"), terms=directory
+        )
+        listings_original = Statement(Predicate("$thing were original"), terms=listings)
         assert directory_original.means(listings_original)
 
     def test_same_meaning_no_terms(self, make_factor):
@@ -545,14 +541,14 @@ class TestContradiction:
         assert watt_factor["f2"]._contradicts_if_present(watt_factor["f2_false_absent"])
 
     def test_false_does_not_contradict_absent(self):
-        absent_fact = Fact(
+        absent_fact = Statement(
             predicate=Predicate(
                 template="${rural_s_telephone_directory} was copyrightable", truth=True
             ),
             terms=(Entity(name="Rural's telephone directory")),
             absent=True,
         )
-        false_fact = Fact(
+        false_fact = Statement(
             predicate=Predicate(
                 template="${the_java_api} was copyrightable", truth=False
             ),
@@ -579,8 +575,8 @@ class TestContradiction:
         )
         alice = Entity("Alice")
         bob = Entity("Bob")
-        alice_rich = Fact(p_large_weight, terms=alice)
-        bob_poor = Fact(p_small_weight, terms=bob)
+        alice_rich = Statement(p_large_weight, terms=alice)
+        bob_poor = Statement(p_small_weight, terms=bob)
         assert alice_rich.contradicts(bob_poor)
 
     def test_inconsistent_statements_about_corresponding_entities(self):
@@ -601,8 +597,8 @@ class TestContradiction:
         )
         alice = Entity("Alice")
         bob = Entity("Bob")
-        alice_rich = Fact(p_large_weight, terms=alice)
-        bob_poor = Fact(p_small_weight, terms=bob)
+        alice_rich = Statement(p_large_weight, terms=alice)
+        bob_poor = Statement(p_small_weight, terms=bob)
         register = ContextRegister()
         register.insert_pair(alice, alice)
         assert not alice_rich.contradicts(bob_poor, context=register)
@@ -721,11 +717,11 @@ class TestUnion:
     def test_union_same_as_adding(self):
         dave = Entity("Dave")
         speed_template = "${driver}'s driving speed was"
-        fast_fact = Fact(
+        fast_fact = Statement(
             Comparison(speed_template, sign=">=", expression="100 miles per hour"),
             terms=dave,
         )
-        slow_fact = Fact(
+        slow_fact = Statement(
             Comparison(
                 speed_template,
                 sign=">=",

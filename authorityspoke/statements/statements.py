@@ -74,9 +74,9 @@ class Statement(Comparable):
         self.predicate = predicate
         self.absent = absent
         self.generic = generic
-        if not isinstance(self.terms, FactorSequence):
-            terms = FactorSequence(self.terms)
-            object.__setattr__(self, "terms", terms)
+        if not isinstance(terms, FactorSequence):
+            terms = FactorSequence(terms)
+        self._terms = terms
 
         if len(self.terms) != len(self.predicate):
             message = (
@@ -90,6 +90,10 @@ class Statement(Comparable):
                 "Items in the 'terms' parameter should "
                 + "be a subclass of Comparable."
             )
+
+    @property
+    def terms(self) -> FactorSequence:
+        return self._terms
 
     @property
     def wrapped_string(self):
