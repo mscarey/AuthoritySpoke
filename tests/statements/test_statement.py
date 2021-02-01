@@ -10,7 +10,7 @@ from authorityspoke.statements.statements import Statement
 from authorityspoke.factors import FactorSequence
 
 
-class TestFacts:
+class TestStatements:
     def test_build_fact(self, make_predicate, make_entity):
         """
         Check that terms is created as a (hashable) tuple, not list
@@ -21,70 +21,24 @@ class TestFacts:
         )
         assert isinstance(shooting.terms, tuple)
 
-    def test_terms_from_case_factor_indices(
-        self, make_entity, make_predicate, watt_mentioned
-    ):
-        """
-        If you pass in integers instead of Factor objects to fill the blanks
-        in the Predicate (which was the only way to do things in the first
-        version of the Fact class's __init__ method), then the integers
-        you pass in should be used as indices to select Factor objects
-        from case_factors.
-        """
+    def test_string_representation_of_factor(self):
+        city = Predicate("$place was a city")
+        statement = Statement(city, terms=Entity("New York"))
+        assert "<New York> was a city" in str(statement)
 
-        e = make_entity
-
-        f2 = build_fact(
-            make_predicate["p2"], indices=(1, 0), case_factors=watt_mentioned
-        )
-        assert f2.terms == (e["watt"], e["motel"])
-
-    def test_correct_factors_from_indices_in_build_fact(
-        self, make_entity, make_predicate, watt_mentioned
-    ):
-        e = make_entity
-        f2 = build_fact(
-            make_predicate["p2"],
-            indices=(1, 2),
-            case_factors=watt_mentioned,
-        )
-        assert f2.terms == (e["watt"], e["trees"])
-
-    def test_wrong_type_in_terms_in_init(
-        self, make_entity, make_predicate, watt_mentioned
-    ):
-        e = make_entity
-        with pytest.raises(TypeError):
-            f2 = build_fact(
-                make_predicate["p1"],
-                indices=("nonsense"),
-                case_factors=watt_mentioned,
-            )
-
-    def test_invalid_index_for_case_factors_in_init(self, make_predicate, make_entity):
-        with pytest.raises(IndexError):
-            _ = build_fact(
-                make_predicate["p1"],
-                indices=2,
-                case_factors=make_entity["watt"],
-            )
-
-    def test_convert_int_terms_to_tuple(self, make_predicate, watt_mentioned):
-        f = build_fact(make_predicate["p_irrelevant_1"], 3, case_factors=watt_mentioned)
-        assert f.terms == (watt_mentioned[3],)
-
-    def test_string_representation_of_factor(self, watt_factor):
-        assert "<Hideaway Lodge> was a motel" in str(watt_factor["f1"])
-        assert "absence of the fact" in str(watt_factor["f3_absent"]).lower()
+    def test_string_representation_of_absent_factor(self):
+        predicate = Predicate("$company was the best brand")
+        statement = Statement(predicate, terms=Entity("Acme"), absent=True)
+        assert "absence of the statement" in str(statement).lower()
 
     def test_string_no_truth_value(self, watt_factor):
-        factor = watt_factor["f2_no_truth"]
-        assert "whether" in str(factor)
+        predicate = Predicate("$bird came before $ovum", truth=None)
+        statement = Statement(
+            predicate, terms=[Entity("the chicken"), Entity("the egg")]
+        )
+        assert "whether <the chicken> came before <the egg>" in str(statement)
 
     def test_repeating_entity_string(self, make_factor):
-        """I'm not convinced that a model of a Fact ever needs to include
-        multiple references to the same Entity just because the name of the
-        Entity appears more than once in the Predicate."""
         f = make_factor
         assert (
             "Fact that <Alice> told <Bob> to hire <Craig>".lower()
@@ -170,31 +124,35 @@ class TestFacts:
     def test_type_of_terms(self, watt_factor):
         assert isinstance(watt_factor["f1"].terms, FactorSequence)
 
-    def test_concrete_to_abstract(self, make_entity, make_predicate):
-        motel = make_entity["motel_specific"]
-        d = make_entity["watt"]
-        fact = Statement(predicate=make_predicate["p2"], terms=(d, motel))
-        assert "<Wattenburg> operated and lived at Hideaway Lodge" in str(fact)
-        assert "<Wattenburg> operated and lived at Hideaway Lodge>" in str(
-            fact.make_generic()
-        )
+    def test_concrete_to_abstract(self):
+        predicate = Predicate("$person had a farm")
+        statement = Statement(predicate, terms=Entity("Old MacDonald"))
+        assert str(statement).lower() == "the statement that <old macdonald> had a farm"
+        generic_str = str(statement.make_generic()).lower()
+        assert generic_str == "<the statement that <old macdonald> had a farm>"
 
     def test_entity_slots_as_length_of_factor(self, watt_factor):
         assert len(watt_factor["f1"].predicate) == 1
         assert len(watt_factor["f1"]) == 1
 
     def test_predicate_with_entities(self, make_entity, watt_factor):
-        assert "<Hideaway Lodge> was a motel" in watt_factor[
-            "f1"
-        ].predicate.content_with_terms((make_entity["motel"]))
+        predicate = Predicate("$person1 and $person2 went up the hill")
+        terms = [Entity("Jack"), Entity("Jill")]
+        assert (
+            predicate.content_with_terms(terms) == "<Jack> and <Jill> went up the hill"
+        )
 
     def test_factor_terms_do_not_match_predicate(self, make_predicate, watt_mentioned):
         """
         make_predicate["p1"] has only one slot for context factors, but
         this tells it to look for three.
         """
+        e = watt_mentioned
         with pytest.raises(ValueError):
-            _ = build_fact(make_predicate["p1"], (0, 1, 2), case_factors=watt_mentioned)
+            Statement(
+                Predicate("$sentence had only one context term"),
+                terms=[e[0], e[1], e[2]],
+            )
 
     def test_reciprocal_with_wrong_number_of_entities(self, make_entity, watt_factor):
         with pytest.raises(ValueError):
@@ -207,23 +165,9 @@ class TestFacts:
             "f2"
         ].predicate.content_with_terms((make_entity["watt"], make_entity["motel"]))
 
-    def test_standard_of_proof_must_be_listed(self, make_predicate, watt_mentioned):
-        with pytest.raises(ValueError):
-            _ = build_fact(
-                make_predicate["p2"],
-                case_factors=watt_mentioned,
-                standard_of_proof="probably so",
-            )
-
     def test_standard_of_proof_in_str(self, watt_factor):
         factor = watt_factor["f2_preponderance_of_evidence"]
         assert factor.standard_of_proof in factor.short_string
-
-    def test_case_factors_deleted_from_fact(self, watt_factor):
-        """This attribute should have been deleted during Fact.__post_init__"""
-        predicate = Predicate("some things happened")
-        factor = build_fact(predicate)
-        assert not hasattr(factor, "case_factors")
 
     def test_repeated_placeholder_in_fact(self, make_opinion_with_holding):
         holding = make_opinion_with_holding["lotus_majority"].holdings[9]

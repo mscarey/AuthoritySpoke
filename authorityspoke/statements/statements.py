@@ -168,7 +168,7 @@ class Statement(Comparable):
             a version of ``self`` with the new context.
         """
         result = deepcopy(self)
-        result.terms = FactorSequence(
+        result._terms = FactorSequence(
             [factor.new_context(changes) for factor in self.terms]
         )
         return result
