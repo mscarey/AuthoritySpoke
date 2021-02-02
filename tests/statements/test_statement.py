@@ -11,13 +11,13 @@ from authorityspoke.factors import FactorSequence
 
 
 class TestStatements:
-    def test_build_fact(self, make_predicate, make_entity):
+    def test_build_fact(self):
         """
         Check that terms is created as a (hashable) tuple, not list
         """
         shooting = Statement(
-            make_predicate["p_shooting"],
-            terms=[make_entity["alice"], make_entity["bob"]],
+            Predicate("$shooter shot $victim"),
+            terms=[Entity("alice"), Entity("bob")],
         )
         assert isinstance(shooting.terms, tuple)
 
@@ -38,25 +38,33 @@ class TestStatements:
         )
         assert "whether <the chicken> came before <the egg>" in str(statement)
 
-    def test_repeating_entity_string(self, make_factor):
-        f = make_factor
+    def test_terms_param_can_be_dict(self):
+        predicate = Predicate("$advisor told $employer to hire $applicant")
+        three_entities = Statement(
+            predicate,
+            terms={
+                "advisor": Entity("Alice"),
+                "employer": Entity("Bob"),
+                "applicant": Entity("Craig"),
+            },
+        )
+        repeating_predicate = Predicate("$applicant told $employer to hire $applicant")
+        two_entities = Statement(
+            repeating_predicate,
+            terms={
+                "applicant": Entity("Alice"),
+                "employer": Entity("Bob"),
+            },
+        )
+        assert not three_entities.means(repeating_predicate)
         assert (
-            "Fact that <Alice> told <Bob> to hire <Craig>".lower()
-            in str(f["f_three_entities"]).lower()
+            "Statement that <Alice> told <Bob> to hire <Craig>".lower()
+            in str(three_entities).lower()
         )
         assert (
-            "Fact that <Alice> told <Bob> to hire <Alice>".lower()
-            in str(f["f_repeating_entity"]).lower()
+            "Statement that <Alice> told <Bob> to hire <Alice>".lower()
+            in str(two_entities).lower()
         )
-
-    def test_string_representation_with_concrete_entities(self, watt_factor):
-        """
-        "Hideaway Lodge" is still a string representation of an Entity
-        object, but it's not in angle brackets because it can't be
-        replaced by another Entity object without changing the meaning
-        of the Fact.
-        """
-        assert "Hideaway Lodge was a motel" in str(watt_factor["f1_specific"])
 
     def test_string_for_fact_with_identical_terms(self):
         devon = Entity("Devon", generic=True)
@@ -108,6 +116,12 @@ class TestStatements:
         )
 
     def test_new_concrete_context(self):
+        """
+        "Dragonfly Inn" is still a string representation of an Entity
+        object, but it's not in angle brackets because it can't be
+        replaced by another Entity object without changing the meaning
+        of the Fact.
+        """
         predicate = Predicate("$place was a hotel")
         statement = Statement(predicate, terms=[Entity("Independence Inn")])
         different = statement.new_context(Entity("Dragonfly Inn", generic=False))
@@ -119,7 +133,6 @@ class TestStatements:
         different = statement.new_context(
             [Entity("Darth Vader"), Entity("the Death Star")]
         )
-
         assert "<Darth Vader> managed" in str(different)
 
     def test_type_of_terms(self, watt_factor):
@@ -133,8 +146,10 @@ class TestStatements:
         assert generic_str == "<the statement that <old macdonald> had a farm>"
 
     def test_entity_slots_as_length_of_factor(self, watt_factor):
-        assert len(watt_factor["f1"].predicate) == 1
-        assert len(watt_factor["f1"]) == 1
+        predicate = Predicate("$person had a farm")
+        statement = Statement(predicate, terms=Entity("Old MacDonald"))
+        assert len(statement.predicate) == 1
+        assert len(statement) == 1
 
     def test_predicate_with_entities(self, make_entity, watt_factor):
         predicate = Predicate("$person1 and $person2 went up the hill")
@@ -145,7 +160,7 @@ class TestStatements:
 
     def test_factor_terms_do_not_match_predicate(self, make_predicate, watt_mentioned):
         """
-        make_predicate["p1"] has only one slot for context factors, but
+        predicate has only one slot for context factors, but
         this tells it to look for three.
         """
         e = watt_mentioned
@@ -155,21 +170,17 @@ class TestStatements:
                 terms=[e[0], e[1], e[2]],
             )
 
-    def test_entity_and_human_in_predicate(self, make_entity, watt_factor):
-        assert "<Wattenburg> operated and lived at <Hideaway Lodge>" in watt_factor[
-            "f2"
-        ].predicate.content_with_terms((make_entity["watt"], make_entity["motel"]))
-
-    def test_standard_of_proof_in_str(self, watt_factor):
-        factor = watt_factor["f2_preponderance_of_evidence"]
-        assert factor.standard_of_proof in factor.short_string
-
     def test_repeated_placeholder_in_fact(self, make_opinion_with_holding):
-        holding = make_opinion_with_holding["lotus_majority"].holdings[9]
-        fact = holding.inputs[1]
-        assert fact.short_string == (
-            "the fact it was false that the precise formulation "
-            "of <Lotus 1-2-3>'s code was necessary for <Lotus 1-2-3> to work"
+        predicate = Predicate(
+            "the precise formulation "
+            "of ${program}'s code was necessary for $program to work",
+            truth=False,
+        )
+        fact = Statement(predicate, terms=Entity("Lotus 1-2-3"))
+
+        assert fact.short_string.lower() == (
+            "the statement it was false that the precise formulation "
+            "of <lotus 1-2-3>'s code was necessary for <lotus 1-2-3> to work"
         )
         assert len(fact.terms) == 1
 

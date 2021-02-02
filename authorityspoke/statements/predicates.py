@@ -12,12 +12,12 @@ from datetime import date
 from itertools import product
 
 from string import Template
-from typing import Any, ClassVar, Dict, Iterable
+from typing import Any, ClassVar, Dict, Iterable, Mapping
 from typing import List, Optional, Sequence, Union
 
 from pint import UnitRegistry, Quantity
 
-from authorityspoke.statements.comparable import Comparable
+from authorityspoke.statements.comparable import Comparable, FactorSequence
 
 ureg = UnitRegistry()
 Q_ = ureg.Quantity
@@ -81,6 +81,14 @@ class StatementTemplate(Template):
             if m.group("named") or m.group("braced")
         ]
         return list(dict.fromkeys(placeholders))
+
+    def get_term_sequence_from_mapping(
+        self, term_mapping: Mapping[str, Comparable]
+    ) -> Sequence[Comparable]:
+        """Get an ordered list of terms from a mapping of placeholder names to terms."""
+        placeholders = self.get_placeholders()
+        result = [term_mapping[placeholder] for placeholder in placeholders]
+        return FactorSequence(result)
 
     def _check_number_of_terms(
         self, placeholders: List[str], context: Sequence[Comparable]
@@ -637,7 +645,6 @@ class Comparison(Predicate):
         """Test if the range of quantities mentioned in self is a subset of other's."""
         if not self.expression or not other.expression:
             return bool(self.expression)
-
         if not self.consistent_dimensionality(other):
             return False
 

@@ -1,7 +1,7 @@
 from copy import deepcopy
 import operator
 
-from typing import ClassVar, Dict, Iterator, List
+from typing import ClassVar, Dict, Iterator, List, Mapping
 from typing import Optional, Sequence, Tuple, Union
 
 from anchorpoint.textselectors import TextQuoteSelector
@@ -60,8 +60,13 @@ class Statement(Comparable):
         self.predicate = predicate
         self.absent = absent
         self.generic = generic
+
+        if isinstance(terms, Mapping):
+            terms = predicate.template.get_term_sequence_from_mapping(terms)
+
         if not isinstance(terms, FactorSequence):
             terms = FactorSequence(terms)
+
         self._terms = terms
 
         if len(self.terms) != len(self.predicate):
@@ -71,6 +76,7 @@ class Statement(Comparable):
                 + f"to match predicate.context_slots for '{self.predicate.content}'"
             )
             raise ValueError(message)
+
         if any(not isinstance(s, Comparable) for s in self.terms):
             raise TypeError(
                 "Items in the 'terms' parameter should "
