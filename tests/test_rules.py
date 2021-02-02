@@ -11,11 +11,11 @@ import pytest
 from authorityspoke.statements.comparable import ContextRegister, means
 from authorityspoke.statements.entities import Entity
 from authorityspoke.statements.explanations import Explanation
-from authorityspoke.factors import ContextRegister
 from authorityspoke.facts import Fact
 from authorityspoke.statements.groups import ComparableGroup
 from authorityspoke.holdings import Holding
 from authorityspoke.statements.predicates import Comparison, Predicate, Q_
+from authorityspoke.statements.statements import Statement
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
 
@@ -348,6 +348,11 @@ class TestImplication:
             universal=True,
         )
         assert alice_and_bob_rule.implies(diane_and_ed_rule)
+
+    def test_not_implied_by_statement(self, make_rule):
+        assert not Statement(
+            Predicate("$person was a person"), terms=Entity("Alice")
+        ).implies(make_rule["h1"])
 
 
 class TestContradiction:

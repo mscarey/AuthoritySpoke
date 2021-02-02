@@ -11,6 +11,9 @@ import pytest
 
 from authorityspoke.io import anchors, loaders, readers, dump
 from authorityspoke.io.downloads import FakeClient
+from authorityspoke.statements.entities import Entity
+from authorityspoke.statements.predicates import Predicate
+from authorityspoke.statements.statements import Statement
 
 load_dotenv()
 
@@ -77,6 +80,16 @@ class TestEnactments:
 
     def test_cite_path_in_str(self, e_search_clause):
         assert "/us/const/amendment/IV" in str(e_search_clause)
+
+    def test_unequal_to_statement(self, watt_factor, e_copyright):
+        stole_predicate = Predicate("$defendant stole $object")
+        stole_fact = Statement(
+            stole_predicate, terms=[Entity("Alice"), Entity("the gold bar")]
+        )
+
+        assert not stole_fact.means(e_copyright)
+        with pytest.raises(TypeError):
+            e_copyright.means(watt_factor["f1"])
 
     def test_equal_enactment_text(self, e_due_process_5, e_due_process_14):
         assert e_due_process_5.means(e_due_process_14)

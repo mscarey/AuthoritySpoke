@@ -11,6 +11,8 @@ from authorityspoke.io.downloads import FakeClient
 from authorityspoke.statements.entities import Entity
 from authorityspoke.evidence import Evidence
 from authorityspoke.statements.explanations import Explanation
+from authorityspoke.statements.predicates import Predicate
+from authorityspoke.statements.statements import Statement
 from authorityspoke.factors import ContextRegister, FactorSequence
 from authorityspoke.holdings import Holding
 
@@ -207,6 +209,11 @@ class TestImplication:
         new_context = oracle.holdings[18].new_context(context)
         explanation = new_context.explain_implication(oracle.holdings[19])
         assert explanation.get_factor(language) == language
+
+    def test_not_implied_by_statement(self, make_holding):
+        assert not Statement(
+            Predicate("$person was a person"), terms=Entity("Alice")
+        ).implies(make_holding["h1"])
 
 
 class TestContradiction:

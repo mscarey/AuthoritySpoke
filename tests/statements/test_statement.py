@@ -48,22 +48,9 @@ class TestStatements:
                 "applicant": Entity("Craig"),
             },
         )
-        repeating_predicate = Predicate("$applicant told $employer to hire $applicant")
-        two_entities = Statement(
-            repeating_predicate,
-            terms={
-                "applicant": Entity("Alice"),
-                "employer": Entity("Bob"),
-            },
-        )
-        assert not three_entities.means(repeating_predicate)
         assert (
             "Statement that <Alice> told <Bob> to hire <Craig>".lower()
             in str(three_entities).lower()
-        )
-        assert (
-            "Statement that <Alice> told <Bob> to hire <Alice>".lower()
-            in str(two_entities).lower()
         )
 
     def test_string_for_fact_with_identical_terms(self):
@@ -77,12 +64,6 @@ class TestStatements:
             opened_account
         )
 
-    def test_str_with_concrete_context(self, make_opinion_with_holding):
-        holding = list(make_opinion_with_holding["cardenas_majority"].holdings)[1]
-        longer_str = holding.inputs[0].str_with_concrete_context
-        assert "the Exhibit in the FORM testimony" in longer_str
-        assert "the Exhibit in the FORM testimony" not in str(holding.inputs[0])
-
     def test_complex_fact_no_line_break_in_predicate(self, make_opinion_with_holding):
         """
         Tests that the string representation of this Holding's only input
@@ -92,28 +73,41 @@ class TestStatements:
         The representation of the Exhibit mentioned in the Fact should
         not introduce any indented lines inside the Fact's string.
         """
-        holding = list(make_opinion_with_holding["cardenas_majority"].holdings)[1]
-        fact_text = str(holding.inputs[0])
+        predicate_shot = Predicate("$shooter shot $victim")
+        predicate_told = Predicate("$speaker told $hearer $statement")
+        shot = Statement(predicate_shot, terms=[Entity("Alice"), Entity("Bob")])
+        told = Statement(predicate_told, terms=[Entity("Henry"), Entity("Jenna"), shot])
+
+        fact_text = str(told)
         if "SPECIFIC CONTEXT" in fact_text:
             fact_text = fact_text.split("SPECIFIC CONTEXT")[0].strip()
         assert "\n  " not in fact_text
 
-    def test_new_context_replace_fact(self, make_entity, watt_factor):
+    def test_new_context_replace_fact(self):
+        predicate_shot = Predicate("$shooter shot $victim")
+        predicate_no_gun = Predicate("$suspect had a gun", truth=False)
+        predicate_told = Predicate("$speaker told $hearer $statement")
+        shot = Statement(predicate_shot, terms=[Entity("Alice"), Entity("Bob")])
+        told = Statement(predicate_told, terms=[Entity("Henry"), Entity("Jenna"), shot])
+        no_gun = Statement(predicate_no_gun, terms=Entity("Dan"))
+
         changes = ContextRegister.from_lists(
-            [make_entity["watt"], watt_factor["f2"]],
-            [Entity("Darth Vader"), watt_factor["f10"]],
+            [Entity("Alice"), Entity("Henry"), Entity("Jenna"), shot],
+            [Entity("Dan"), Entity("Leslie"), Entity("Mike"), no_gun],
         )
-        assert "was within the curtilage of <Hideaway Lodge>" in (
-            watt_factor["f2"].new_context(changes).short_string
+        result = told.new_context(changes)
+        assert (
+            "told <Mike> the Statement it was false that <Dan> had a gun".lower()
+            in result.short_string.lower()
         )
 
-    def test_get_factor_from_recursive_search(self, make_opinion_with_holding):
-        holding_list = list(make_opinion_with_holding["cardenas_majority"].holdings)
-        factor_list = list(holding_list[0].recursive_factors.values())
-        assert any(
-            factor == Entity("parole officer") and factor.name == "parole officer"
-            for factor in factor_list
-        )
+    def test_get_factor_from_recursive_search(self):
+        predicate_shot = Predicate("$shooter shot $victim")
+        predicate_told = Predicate("$speaker told $hearer $statement")
+        shot = Statement(predicate_shot, terms=[Entity("Alice"), Entity("Bob")])
+        told = Statement(predicate_told, terms=[Entity("Henry"), Entity("Jenna"), shot])
+        factors = told.recursive_factors
+        assert factors["<Alice>"] == Entity("Alice")
 
     def test_new_concrete_context(self):
         """
@@ -127,16 +121,14 @@ class TestStatements:
         different = statement.new_context(Entity("Dragonfly Inn", generic=False))
         assert "Dragonfly Inn was a hotel" in str(different)
 
-    def test_new_concrete_from_entities(self, make_entity, watt_factor):
+    def test_new_statement_from_entities(self):
         predicate = Predicate("$person managed $place")
         statement = Statement(predicate, terms=[Entity("Steve Jobs"), Entity("Apple")])
         different = statement.new_context(
             [Entity("Darth Vader"), Entity("the Death Star")]
         )
         assert "<Darth Vader> managed" in str(different)
-
-    def test_type_of_terms(self, watt_factor):
-        assert isinstance(watt_factor["f1"].terms, FactorSequence)
+        assert isinstance(different.terms, FactorSequence)
 
     def test_concrete_to_abstract(self):
         predicate = Predicate("$person had a farm")
@@ -145,32 +137,31 @@ class TestStatements:
         generic_str = str(statement.make_generic()).lower()
         assert generic_str == "<the statement that <old macdonald> had a farm>"
 
-    def test_entity_slots_as_length_of_factor(self, watt_factor):
+    def test_entity_slots_as_length_of_factor(self):
         predicate = Predicate("$person had a farm")
         statement = Statement(predicate, terms=Entity("Old MacDonald"))
         assert len(statement.predicate) == 1
         assert len(statement) == 1
 
-    def test_predicate_with_entities(self, make_entity, watt_factor):
+    def test_predicate_with_entities(self):
         predicate = Predicate("$person1 and $person2 went up the hill")
         terms = [Entity("Jack"), Entity("Jill")]
         assert (
             predicate.content_with_terms(terms) == "<Jack> and <Jill> went up the hill"
         )
 
-    def test_factor_terms_do_not_match_predicate(self, make_predicate, watt_mentioned):
+    def test_factor_terms_do_not_match_predicate(self):
         """
         predicate has only one slot for context factors, but
         this tells it to look for three.
         """
-        e = watt_mentioned
         with pytest.raises(ValueError):
             Statement(
                 Predicate("$sentence had only one context term"),
-                terms=[e[0], e[1], e[2]],
+                terms=[Entity("Al"), Entity("Ed"), Entity("Xu")],
             )
 
-    def test_repeated_placeholder_in_fact(self, make_opinion_with_holding):
+    def test_repeated_placeholder_in_fact(self):
         predicate = Predicate(
             "the precise formulation "
             "of ${program}'s code was necessary for $program to work",
@@ -186,58 +177,106 @@ class TestStatements:
 
 
 class TestSameMeaning:
-    def test_equality_factor_from_same_predicate(self, watt_factor):
-        assert watt_factor["f1"].means(watt_factor["f1b"])
+    def test_equality_factor_from_same_predicate(self):
+        predicate = Predicate("$speaker greeted $listener")
+        fact = Statement(predicate, terms=[Entity("Al"), Entity("Meg")])
+        fact_b = Statement(predicate, terms=[Entity("Al"), Entity("Meg")])
+        assert fact.means(fact_b)
 
-    def test_equality_factor_from_equal_predicate(self, watt_factor):
-        assert watt_factor["f1"].means(watt_factor["f1c"])
+    def test_equality_factor_from_equal_predicate(self):
+        predicate = Predicate("$speaker greeted $listener")
+        equal_predicate = Predicate("$speaker greeted $listener")
+        fact = Statement(predicate, terms=[Entity("Al"), Entity("Meg")])
+        fact_b = Statement(equal_predicate, terms=[Entity("Al"), Entity("Meg")])
+        assert fact.means(fact_b)
 
-    def test_equality_because_factors_are_generic_entities(self, watt_factor):
-        assert watt_factor["f1"].means(watt_factor["f1_different_entity"])
+    def test_equality_because_factors_are_generic_entities(self):
+        predicate = Predicate("$speaker greeted $listener")
+        fact = Statement(predicate, terms=[Entity("Al"), Entity("Meg")])
+        fact_b = Statement(predicate, terms=[Entity("Ed"), Entity("Imogene")])
+        assert fact.means(fact_b)
 
-    def test_unequal_because_a_factor_is_not_generic(self, watt_factor):
-        assert not watt_factor["f9_swap_entities_4"].means(watt_factor["f9"])
+    def test_unequal_because_a_factor_is_not_generic(self):
+        predicate = Predicate("$speaker greeted $listener")
+        fact = Statement(predicate, terms=[Entity("Al"), Entity("Meg")])
+        fact_b = Statement(
+            predicate, terms=[Entity("Ed"), Entity("Imogene", generic=False)]
+        )
+        assert not fact.means(fact_b)
 
-    def test_generic_factors_equal(self, watt_factor):
-        assert watt_factor["f2_generic"].means(watt_factor["f2_false_generic"])
-        assert watt_factor["f2_generic"].means(watt_factor["f3_generic"])
+    def test_true_and_false_generic_factors_equal(self):
+        predicate = Predicate("$speaker greeted $listener")
+        false_predicate = Predicate("$speaker greeted $listener", truth=False)
+        fact = Statement(predicate, terms=[Entity("Al"), Entity("Meg")], generic=True)
+        false_fact = Statement(
+            false_predicate, terms=[Entity("Ed"), Entity("Imogene")], generic=True
+        )
+        assert fact.means(false_fact)
 
-    def test_equal_referencing_diffent_generic_factors(self, make_factor):
-        assert make_factor["f_murder"].means(make_factor["f_murder_craig"])
+    def test_generic_factors_with_different_text_equal(self):
+        predicate = Predicate("$speaker greeted $listener")
+        different_predicate = Predicate("$speaker attacked $listener")
+        fact = Statement(predicate, terms=[Entity("Al"), Entity("Meg")], generic=True)
+        different_fact = Statement(
+            different_predicate, terms=[Entity("Al"), Entity("Meg")], generic=True
+        )
+        assert fact.means(different_fact)
 
-    def test_generic_and_specific_factors_unequal(self, watt_factor):
-        assert not watt_factor["f2"].means(watt_factor["f2_generic"])
+    def test_equal_referencing_diffent_generic_factors(self):
+        predicate = Predicate("$speaker greeted $listener")
+        fact = Statement(predicate, terms=[Entity("Al"), Entity("Meg")])
+        fact_b = Statement(predicate, terms=[Entity("Jim"), Entity("Ned")])
+        assert fact.means(fact_b)
 
     def test_factor_reciprocal_unequal(self, watt_factor):
-        assert not watt_factor["f2"].means(watt_factor["f2_reflexive"])
-
-    def test_factor_different_predicate_truth_unequal(self, watt_factor):
-        assert not watt_factor["f7"].means(watt_factor["f7_opposite"])
-
-    def test_unequal_because_one_factor_is_absent(self, watt_factor):
-        assert not watt_factor["f8"].means(watt_factor["f8_absent"])
-
-    def test_copies_of_identical_factor(self, make_factor):
-        """
-        Even if the two factors have different entity markers in self.terms,
-        I expect them to evaluate equal because the choice of entity markers is
-        arbitrary.
-        """
-        f = make_factor
-        assert f["f_irrelevant_3"].means(f["f_irrelevant_3"])
-        assert f["f_irrelevant_3"].means(f["f_irrelevant_3_new_context"])
-
-    def test_equal_with_different_generic_subfactors(self, make_complex_statement):
-        assert make_complex_statement["f_relevant_murder"].means(
-            make_complex_statement["f_relevant_murder_craig"]
+        predicate = Predicate("$advisor told $employer to hire $applicant")
+        three_entities = Statement(
+            predicate,
+            terms={
+                "advisor": Entity("Alice"),
+                "employer": Entity("Bob"),
+                "applicant": Entity("Craig"),
+            },
         )
+        repeating_predicate = Predicate("$applicant told $employer to hire $applicant")
+        two_entities = Statement(
+            repeating_predicate,
+            terms={
+                "applicant": Entity("Alice"),
+                "employer": Entity("Bob"),
+            },
+        )
+        assert not three_entities.means(two_entities)
 
-    def test_reciprocal_context_register(self, watt_factor):
-        """
-        This test describes two objects with the same meaning that have been
-        made in two different ways, each with a different id and repr.
-        """
-        assert watt_factor["f7"].means(watt_factor["f7_swap_entities"])
+    def test_factor_different_predicate_truth_unequal(self):
+        predicate = Predicate("$shooter shot $victim")
+        false_predicate = Predicate("$shooter shot $victim", truth=False)
+        fact = Statement(predicate, terms=[Entity("Al"), Entity("Meg")])
+        fact_b = Statement(false_predicate, terms=[Entity("Al"), Entity("Meg")])
+        assert not fact.means(fact_b)
+
+    def test_unequal_because_one_factor_is_absent(self):
+        predicate = Predicate("$shooter shot $victim")
+        fact = Statement(predicate, terms=[Entity("Al"), Entity("Meg")])
+        fact_b = Statement(predicate, terms=[Entity("Al"), Entity("Meg")], absent=True)
+        assert not fact.means(fact_b)
+
+    def test_equal_with_different_generic_subfactors(self):
+        shot_predicate = Predicate("$shooter shot $victim")
+        shot_fact = Statement(shot_predicate, terms=[Entity("Alice"), Entity("Bob")])
+        murder_predicate = Predicate("$shooter murdered $victim")
+        murder_fact = Statement(
+            murder_predicate, terms=[Entity("Alice"), Entity("Bob")]
+        )
+        relevant_predicate = Predicate("$clue was relevant to $conclusion")
+        relevant_fact = Statement(relevant_predicate, terms=[shot_fact, murder_fact])
+
+        changes = ContextRegister.from_lists(
+            [Entity("Alice"), Entity("Bob")], [Entity("Deb"), Entity("Eve")]
+        )
+        new_fact = relevant_fact.new_context(changes)
+
+        assert relevant_fact.means(new_fact)
 
     def test_interchangeable_concrete_terms(self):
         """Detect that placeholders differing only by a final digit are interchangeable."""
@@ -255,74 +294,124 @@ class TestSameMeaning:
 
         assert ann_and_bob_were_family.means(bob_and_ann_were_family)
 
-    def test_unequal_due_to_repeating_entity(self, make_factor):
-        """I'm not convinced that a model of a Fact ever needs to include
-        multiple references to the same Entity just because the name of the
-        Entity appears more than once in the Predicate."""
-        f = make_factor
-        assert not f["f_three_entities"].means(f["f_repeating_entity"])
-
-    def test_unequal_to_enactment(self, watt_factor, e_copyright):
-        assert not watt_factor["f1"].means(e_copyright)
-        with pytest.raises(TypeError):
-            e_copyright.means(watt_factor["f1"])
-
-    def test_standard_of_proof_inequality(self, watt_factor):
-
-        f = watt_factor
-        assert not f["f2_clear_and_convincing"].means(f["f2_preponderance_of_evidence"])
-        assert not f["f2_clear_and_convincing"].means(f["f2"])
-
     def test_means_despite_plural(self):
-        directory = Entity("Rural's telephone directory", plural=False)
-        listings = Entity("Rural's telephone listings", plural=True)
+        directory = Entity("the telephone directory", plural=False)
+        listings = Entity("the telephone listings", plural=True)
         directory_original = Statement(
             Predicate("$thing was original"), terms=directory
         )
         listings_original = Statement(Predicate("$thing were original"), terms=listings)
         assert directory_original.means(listings_original)
 
-    def test_same_meaning_no_terms(self, make_factor):
-        assert make_factor["f_no_context"].means(make_factor["f_no_context"])
+    def test_same_meaning_no_terms(self):
+        assert Statement(Predicate("good morning")).means(
+            Statement(Predicate("good morning"))
+        )
 
 
 class TestImplication:
-    def test_fact_implies_none(self, watt_factor):
-        assert watt_factor["f1"].implies(None)
+    def test_statement_implies_none(self):
+        assert Statement(Predicate("good morning")).implies(None)
 
-    def test_no_implication_of_rule(self, watt_factor, make_rule):
-        assert not watt_factor["f1"].implies(make_rule["h1"])
+    def test_specific_statement_implies_generic(self):
+        concrete = Statement(Predicate("$person was a person"), terms=Entity("Alice"))
+        generic = Statement(
+            Predicate("$person was a person"), terms=Entity("Alice"), generic=True
+        )
+        assert concrete > generic
+        assert not generic > concrete
 
-    def test_fact_does_not_imply_holding(self, watt_factor, make_holding):
-        assert not watt_factor["f1"].implies(make_holding["h1"])
+    def test_specific_implies_generic_explain(self):
+        concrete = Statement(Predicate("$person was a person"), terms=Entity("Alice"))
+        generic = Statement(
+            Predicate("$person was a person"), terms=Entity("Alice"), generic=True
+        )
 
-    def test_specific_factor_implies_generic(self, watt_factor):
-        assert watt_factor["f2"] > watt_factor["f2_generic"]
-        assert not watt_factor["f2_generic"] > watt_factor["f2"]
+        answer = concrete.explain_implication(generic)
+        assert (str(concrete), generic) in answer.items()
 
-    def test_specific_factor_implies_generic_explain(self, watt_factor):
-        answer = watt_factor["f2"].explain_implication(watt_factor["f2_generic"])
-        assert (
-            str(watt_factor["f2"]),
-            watt_factor["f2_generic"],
-        ) in answer.items()
+    def test_specific_implies_generic_form_of_another_fact(self):
+        concrete = Statement(Predicate("$person was a person"), terms=Entity("Alice"))
+        generic_merperson = Statement(
+            Predicate("$person was a merperson"), terms=Entity("Alice"), generic=True
+        )
 
-    def test_specific_implies_generic_form_of_another_fact(self, watt_factor):
-        assert watt_factor["f2"] > watt_factor["f3_generic"]
+        assert concrete > generic_merperson
 
-    def test_specific_fact_does_not_imply_generic_entity(
-        self, make_entity, watt_factor
-    ):
-        assert not watt_factor["f2"] > make_entity["motel"]
+    def test_specific_fact_does_not_imply_generic_entity(self):
+        concrete = Statement(Predicate("$person was a person"), terms=Entity("Alice"))
+        assert not concrete > Entity("Tim")
 
-    def test_factor_does_not_imply_predicate(self, make_predicate, watt_factor):
+    def test_statement_does_not_imply_comparison(self, make_predicate, watt_factor):
+        phrase = Comparison(
+            "the distance north from $south to $north was",
+            sign=">",
+            expression="180 miles",
+        )
+        statement = Statement(phrase, terms=[Entity("Austin"), Entity("Dallas")])
+
         with pytest.raises(TypeError):
-            assert not watt_factor["f8_meters"] > make_predicate["p8"]
+            statement > phrase
 
-    def test_factor_implies_because_of_quantity(self, watt_factor):
-        assert watt_factor["f8_meters"] > watt_factor["f8"]
-        assert watt_factor["f8_higher_int"] > watt_factor["f8_float"]
-        assert watt_factor["f8_int"] < watt_factor["f8_higher_int"]
+    def test_statement_implies_because_of_quantity(self):
+        statement = Statement(
+            Comparison(
+                "the distance north from $south to $north was",
+                sign=">",
+                expression="180 miles",
+            ),
+            terms=[Entity("Austin"), Entity("Dallas")],
+        )
+        statement_meters = Statement(
+            Comparison(
+                "the distance north from $south to $north was",
+                sign=">",
+                expression="180 meters",
+            ),
+            terms=[Entity("Austin"), Entity("Dallas")],
+        )
+
+        assert statement > statement_meters
+
+    def test_statement_implies_with_int_and_float(self):
+        statement = Statement(
+            Comparison(
+                "the distance north from $south to $north was",
+                sign=">",
+                expression=180,
+            ),
+            terms=[Entity("Austin"), Entity("Dallas")],
+        )
+        statement_float = Statement(
+            Comparison(
+                "the distance north from $south to $north was",
+                sign=">",
+                expression=170.22,
+            ),
+            terms=[Entity("Austin"), Entity("Dallas")],
+        )
+
+        assert statement > statement_float
+
+    def test_statement_implies_with_ints(self):
+        statement_higher = Statement(
+            Comparison(
+                "the distance north from $south to $north was",
+                sign=">",
+                expression=180,
+            ),
+            terms=[Entity("Austin"), Entity("Dallas")],
+        )
+        statement_lower = Statement(
+            Comparison(
+                "the distance north from $south to $north was",
+                sign=">",
+                expression=170,
+            ),
+            terms=[Entity("Austin"), Entity("Dallas")],
+        )
+
+        assert statement_lower < statement_higher
 
     def test_factor_implies_no_truth_value(self, watt_factor):
         assert watt_factor["f2"] > watt_factor["f2_no_truth"]
