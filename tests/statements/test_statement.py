@@ -107,19 +107,20 @@ class TestStatements:
             for factor in factor_list
         )
 
-    def test_new_context_from_factor(self, watt_factor):
-        different = watt_factor["f1"].new_context(
-            Entity("Great Northern", generic=False)
-        )
-        assert "Great Northern was a motel" in str(different)
+    def test_new_concrete_context(self):
+        predicate = Predicate("$place was a hotel")
+        statement = Statement(predicate, terms=[Entity("Independence Inn")])
+        different = statement.new_context(Entity("Dragonfly Inn", generic=False))
+        assert "Dragonfly Inn was a hotel" in str(different)
 
-    def test_new_concrete_context(self, make_entity, watt_factor):
-        register = ContextRegister.from_lists(
-            keys=[make_entity["watt"], make_entity["motel"]],
-            values=[Entity("Darth Vader"), Entity("Death Star")],
+    def test_new_concrete_from_entities(self, make_entity, watt_factor):
+        predicate = Predicate("$person managed $place")
+        statement = Statement(predicate, terms=[Entity("Steve Jobs"), Entity("Apple")])
+        different = statement.new_context(
+            [Entity("Darth Vader"), Entity("the Death Star")]
         )
-        different = watt_factor["f2"].new_context(register)
-        assert "<Darth Vader> operated" in str(different)
+
+        assert "<Darth Vader> managed" in str(different)
 
     def test_type_of_terms(self, watt_factor):
         assert isinstance(watt_factor["f1"].terms, FactorSequence)
@@ -152,12 +153,6 @@ class TestStatements:
             Statement(
                 Predicate("$sentence had only one context term"),
                 terms=[e[0], e[1], e[2]],
-            )
-
-    def test_reciprocal_with_wrong_number_of_entities(self, make_entity, watt_factor):
-        with pytest.raises(ValueError):
-            watt_factor["f1"].predicate.content_with_terms(
-                (make_entity["motel"], make_entity["watt"])
             )
 
     def test_entity_and_human_in_predicate(self, make_entity, watt_factor):
@@ -221,9 +216,9 @@ class TestSameMeaning:
         assert f["f_irrelevant_3"].means(f["f_irrelevant_3"])
         assert f["f_irrelevant_3"].means(f["f_irrelevant_3_new_context"])
 
-    def test_equal_with_different_generic_subfactors(self, make_complex_fact):
-        assert make_complex_fact["f_relevant_murder"].means(
-            make_complex_fact["f_relevant_murder_craig"]
+    def test_equal_with_different_generic_subfactors(self, make_complex_statement):
+        assert make_complex_statement["f_relevant_murder"].means(
+            make_complex_statement["f_relevant_murder_craig"]
         )
 
     def test_reciprocal_context_register(self, watt_factor):
@@ -352,22 +347,10 @@ class TestImplication:
         assert f["f7"] <= f["f7"]
         assert not f["f7"] > f["f7"]
 
-    def test_standard_of_proof_comparison(self, watt_factor):
-        f = watt_factor
-        assert f["f2_clear_and_convincing"].implies(f["f2_preponderance_of_evidence"])
-        assert f["f2_beyond_reasonable_doubt"] >= f["f2_clear_and_convincing"]
-
-    def test_no_implication_between_factors_with_and_without_standards(
-        self, watt_factor
-    ):
-        f = watt_factor
-        assert not f["f2_clear_and_convincing"] > f["f2"]
-        assert not f["f2"] > f["f2_preponderance_of_evidence"]
-
-    def test_implication_complex(self, make_complex_fact):
+    def test_implication_complex(self, make_complex_statement):
         assert (
-            make_complex_fact["f_relevant_murder"]
-            > make_complex_fact["f_relevant_murder_whether"]
+            make_complex_statement["f_relevant_murder"]
+            > make_complex_statement["f_relevant_murder_whether"]
         )
 
     def test_context_register_text(self, make_context_register):
@@ -376,52 +359,52 @@ class TestImplication:
         )
 
     def test_implication_complex_explain(
-        self, make_complex_fact, make_context_register
+        self, make_complex_statement, make_context_register
     ):
-        complex_true = make_complex_fact["f_relevant_murder"]
-        complex_whether = make_complex_fact["f_relevant_murder_whether"].new_context(
-            make_context_register
-        )
+        complex_true = make_complex_statement["f_relevant_murder"]
+        complex_whether = make_complex_statement[
+            "f_relevant_murder_whether"
+        ].new_context(make_context_register)
         explanation = complex_true.explain_implication(complex_whether)
         assert (str(Entity("Alice")), Entity("Craig")) in explanation.items()
 
     def test_implication_explain_keys_only_from_left(
-        self, make_complex_fact, make_context_register
+        self, make_complex_statement, make_context_register
     ):
         """
         Check that when implies provides a ContextRegister as an "explanation",
         it uses elements only from the left as keys and from the right as values.
         """
-        complex_true = make_complex_fact["f_relevant_murder"]
-        complex_whether = make_complex_fact["f_relevant_murder_whether"]
+        complex_true = make_complex_statement["f_relevant_murder"]
+        complex_whether = make_complex_statement["f_relevant_murder_whether"]
         new = complex_whether.new_context(make_context_register)
         explanations = list(complex_true.explanations_implication(new))
         explanation = explanations.pop()
         assert (str(Entity("Craig")), Entity("Alice")) not in explanation.items()
         assert (str(Entity("Alice")), Entity("Craig")) in explanation.items()
 
-    def test_context_registers_for_complex_comparison(self, make_complex_fact):
-        gen = make_complex_fact["f_relevant_murder_nested_swap"]._context_registers(
-            make_complex_fact["f_relevant_murder"], operator.ge
-        )
+    def test_context_registers_for_complex_comparison(self, make_complex_statement):
+        gen = make_complex_statement[
+            "f_relevant_murder_nested_swap"
+        ]._context_registers(make_complex_statement["f_relevant_murder"], operator.ge)
         register = next(gen)
         assert register.matches.get("<Alice>") == Entity("Bob")
 
-    def test_no_implication_complex(self, make_complex_fact):
+    def test_no_implication_complex(self, make_complex_statement):
         assert (
-            not make_complex_fact["f_relevant_murder"]
-            >= make_complex_fact["f_relevant_murder_alice_craig"]
+            not make_complex_statement["f_relevant_murder"]
+            >= make_complex_statement["f_relevant_murder_alice_craig"]
         )
 
-    def test_implied_by(self, make_complex_fact):
-        assert make_complex_fact["f_relevant_murder_whether"].implied_by(
-            make_complex_fact["f_relevant_murder"]
+    def test_implied_by(self, make_complex_statement):
+        assert make_complex_statement["f_relevant_murder_whether"].implied_by(
+            make_complex_statement["f_relevant_murder"]
         )
 
-    def test_explanation_implied_by(self, make_complex_fact):
-        explanation = make_complex_fact["f_relevant_murder_whether"].explain_implied_by(
-            make_complex_fact["f_relevant_murder"]
-        )
+    def test_explanation_implied_by(self, make_complex_statement):
+        explanation = make_complex_statement[
+            "f_relevant_murder_whether"
+        ].explain_implied_by(make_complex_statement["f_relevant_murder"])
         assert explanation
 
 
@@ -461,14 +444,14 @@ class TestContradiction:
         assert not watt_factor["f9_absent"].contradicts(watt_factor["f9_miles"])
         assert not watt_factor["f9_miles"].contradicts(watt_factor["f9_absent"])
 
-    def test_contradiction_complex(self, make_complex_fact):
-        assert make_complex_fact["f_irrelevant_murder"].contradicts(
-            make_complex_fact["f_relevant_murder_craig"]
+    def test_contradiction_complex(self, make_complex_statement):
+        assert make_complex_statement["f_irrelevant_murder"].contradicts(
+            make_complex_statement["f_relevant_murder_craig"]
         )
 
-    def test_no_contradiction_complex(self, make_complex_fact):
-        assert not make_complex_fact["f_irrelevant_murder"].contradicts(
-            make_complex_fact["f_relevant_murder_alice_craig"]
+    def test_no_contradiction_complex(self, make_complex_statement):
+        assert not make_complex_statement["f_irrelevant_murder"].contradicts(
+            make_complex_statement["f_relevant_murder_alice_craig"]
         )
 
     def test_no_contradiction_of_None(self, watt_factor):
