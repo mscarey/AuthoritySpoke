@@ -1,10 +1,6 @@
 """Create models of assertions accepted as factual by courts."""
 
-from copy import deepcopy
-from dataclasses import dataclass, field
-import operator
-
-from typing import ClassVar, Dict, Iterator, List, Optional, Sequence, Tuple, Union
+from typing import ClassVar, Iterator, List, Optional, Sequence, Tuple, Union
 
 from anchorpoint.textselectors import TextQuoteSelector
 
@@ -20,8 +16,7 @@ from authorityspoke.statements.predicates import Predicate
 from authorityspoke.statements.statements import Statement
 
 
-@dataclass()
-class Fact(Factor, Statement):
+class Fact(Statement, Factor):
     r"""
     An assertion accepted as factual by a court.
 
@@ -68,13 +63,6 @@ class Fact(Factor, Statement):
             approach of hard-coding their names and order will have to change.
     """
 
-    predicate: Predicate
-    terms: FactorSequence = FactorSequence()
-    name: Optional[str] = None
-    standard_of_proof: Optional[str] = None
-    absent: bool = False
-    generic: bool = False
-    anchors: List[TextQuoteSelector] = field(default_factory=list)
     standards_of_proof: ClassVar[Tuple[str, ...]] = (
         "scintilla of evidence",
         "substantial evidence",
@@ -83,8 +71,22 @@ class Fact(Factor, Statement):
         "beyond reasonable doubt",
     )
 
-    def __post_init__(self):
-
+    def __init__(
+        self,
+        predicate: Predicate,
+        terms: FactorSequence = FactorSequence(),
+        name: Optional[str] = None,
+        standard_of_proof: Optional[str] = None,
+        absent: bool = False,
+        generic: bool = False,
+        anchors: Optional[List[TextQuoteSelector]] = None,
+    ):
+        Statement.__init__(
+            self, predicate=predicate, terms=terms, absent=absent, generic=generic
+        )
+        self.standard_of_proof = standard_of_proof
+        self.anchors = anchors or []
+        self.name = name
         if (
             self.standard_of_proof
             and self.standard_of_proof not in self.standards_of_proof
