@@ -965,6 +965,9 @@ class ContextRegister:
         self._matches = {}
         self._reverse_matches = {}
 
+    def __getitem__(self, item: str) -> Comparable:
+        return self.matches[item]
+
     def __len__(self):
         return len(self.matches)
 

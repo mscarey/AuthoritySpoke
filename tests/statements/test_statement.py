@@ -413,105 +413,163 @@ class TestImplication:
 
         assert statement_lower < statement_higher
 
-    def test_factor_implies_no_truth_value(self, watt_factor):
-        assert watt_factor["f2"] > watt_factor["f2_no_truth"]
-        assert not watt_factor["f2_no_truth"] > watt_factor["f2"]
+    def test_statement_implies_no_truth_value(self, watt_factor):
+        fact = Statement(Predicate("$person was a person"), terms=Entity("Alice"))
+        whether = Statement(
+            Predicate("$person was a person", truth=None), terms=Entity("Alice")
+        )
+        assert fact >= whether
+        assert not whether > fact
 
     def test_comparison_implies_no_truth_value(self, watt_factor):
-        assert watt_factor["f8"] > watt_factor["f8_no_truth"]
-        assert not watt_factor["f8_no_truth"] > watt_factor["f8"]
-
-    def test_implication_standard_of_proof(self, make_factor):
-        assert (
-            not make_factor["f_shooting_craig_poe"]
-            > make_factor["f_shooting_craig_brd"]
+        fact = Statement(
+            Comparison("${person}'s weight was", sign=">", expression="150 pounds"),
+            terms=Entity("Alice"),
         )
-        assert make_factor["f_shooting_craig_brd"] > make_factor["f_shooting_craig_poe"]
+        whether = Statement(
+            Comparison(
+                "${person}'s weight was", sign=">", expression="150 pounds", truth=None
+            ),
+            terms=Entity("Alice"),
+        )
+
+        assert fact >= whether
+        assert not whether > fact
 
     def test_factor_implies_because_of_exact_quantity(self, watt_factor):
-        assert watt_factor["f8_exact"] > watt_factor["f7"]
-        assert watt_factor["f8_exact"] >= watt_factor["f8"]
+        fact_exact = Statement(
+            Comparison("${person}'s height was", sign="=", expression="66 inches"),
+            terms=Entity("Alice"),
+        )
+        fact_greater = Statement(
+            Comparison("${person}'s height was", sign=">", expression="60 inches"),
+            terms=Entity("Alice"),
+        )
+
+        assert fact_exact >= fact_greater
+        assert not fact_greater >= fact_exact
 
     def test_no_implication_pint_quantity_and_int(self, watt_factor):
-        assert not watt_factor["f8"] > watt_factor["f8_int"]
-        assert not watt_factor["f8"] < watt_factor["f8_int"]
+        fact_exact = Statement(
+            Comparison("${person}'s height was", sign="=", expression=66),
+            terms=Entity("Alice"),
+        )
+        fact_greater = Statement(
+            Comparison("${person}'s height was", sign=">", expression="60 inches"),
+            terms=Entity("Alice"),
+        )
+        assert not fact_exact >= fact_greater
+        assert not fact_greater >= fact_exact
 
     def test_absent_factor_implies_absent_factor_with_lesser_quantity(
         self, watt_factor
     ):
-        assert watt_factor["f9_absent_miles"] > watt_factor["f9_absent"]
-
-    def test_equal_factors_not_gt(self, watt_factor):
-        f = watt_factor
-        assert f["f7"] >= f["f7"]
-        assert f["f7"] <= f["f7"]
-        assert not f["f7"] > f["f7"]
-
-    def test_implication_complex(self, make_complex_statement):
-        assert (
-            make_complex_statement["f_relevant_murder"]
-            > make_complex_statement["f_relevant_murder_whether"]
+        absent_broader = Statement(
+            Comparison(
+                "the distance north from $south to $north was",
+                sign="<",
+                expression="200 miles",
+            ),
+            terms=[Entity("Austin"), Entity("Dallas")],
+            absent=True,
         )
-
-    def test_context_register_text(self, make_context_register):
-        assert str(make_context_register) == (
-            "ContextRegister(<Alice> is like <Craig>, <Bob> is like <Dan>)"
+        absent_narrower = Statement(
+            Comparison(
+                "the distance north from $south to $north was",
+                sign="<",
+                expression="50 miles",
+            ),
+            terms=[Entity("Austin"), Entity("Dallas")],
+            absent=True,
         )
+        assert absent_broader >= absent_narrower
+        assert not absent_narrower >= absent_broader
 
-    def test_implication_complex_explain(
-        self, make_complex_statement, make_context_register
-    ):
-        complex_true = make_complex_statement["f_relevant_murder"]
-        complex_whether = make_complex_statement[
-            "f_relevant_murder_whether"
-        ].new_context(make_context_register)
-        explanation = complex_true.explain_implication(complex_whether)
-        assert (str(Entity("Alice")), Entity("Craig")) in explanation.items()
+    def test_equal_factors_not_gt(self):
+        fact = Statement(Predicate("$person was a person"), terms=Entity("Alice"))
+        assert fact >= fact
+        assert fact <= fact
+        assert not fact > fact
 
-    def test_implication_explain_keys_only_from_left(
-        self, make_complex_statement, make_context_register
-    ):
+    shot_predicate = Predicate("$shooter shot $victim")
+    shot_fact = Statement(shot_predicate, terms=[Entity("Alice"), Entity("Bob")])
+    murder_predicate = Predicate("$shooter murdered $victim")
+    murder_fact = Statement(murder_predicate, terms=[Entity("Alice"), Entity("Bob")])
+    relevant_predicate = Predicate("$clue was relevant to $conclusion")
+    relevant_fact = Statement(relevant_predicate, terms=[shot_fact, murder_fact])
+    predicate_whether = Predicate("$clue was relevant to $conclusion", truth=None)
+    relevant_whether = Statement(predicate_whether, terms=[shot_fact, murder_fact])
+
+    def test_implication_complex_whether(self):
+
+        assert self.relevant_fact > self.relevant_whether
+
+    def test_implication_complex_explain(self):
         """
-        Check that when implies provides a ContextRegister as an "explanation",
+        Check that when .implies() provides a ContextRegister as an "explanation",
         it uses elements only from the left as keys and from the right as values.
         """
-        complex_true = make_complex_statement["f_relevant_murder"]
-        complex_whether = make_complex_statement["f_relevant_murder_whether"]
-        new = complex_whether.new_context(make_context_register)
-        explanations = list(complex_true.explanations_implication(new))
-        explanation = explanations.pop()
+
+        context_names = ContextRegister()
+        context_names.insert_pair(key=Entity("Alice"), value=Entity("Craig"))
+        context_names.insert_pair(key=Entity("Bob"), value=Entity("Dan"))
+
+        complex_whether = self.relevant_whether.new_context(context_names)
+        explanation = self.relevant_fact.explain_implication(complex_whether)
+        assert (str(Entity("Alice")), Entity("Craig")) in explanation.items()
+        assert (
+            str(explanation)
+            == "ContextRegister(<Alice> is like <Craig>, <Bob> is like <Dan>)"
+        )
         assert (str(Entity("Craig")), Entity("Alice")) not in explanation.items()
         assert (str(Entity("Alice")), Entity("Craig")) in explanation.items()
 
-    def test_context_registers_for_complex_comparison(self, make_complex_statement):
-        gen = make_complex_statement[
-            "f_relevant_murder_nested_swap"
-        ]._context_registers(make_complex_statement["f_relevant_murder"], operator.ge)
+    def test_context_registers_for_complex_comparison(self):
+        context_names = ContextRegister()
+        context_names.insert_pair(key=Entity("Alice"), value=Entity("Bob"))
+        context_names.insert_pair(key=Entity("Bob"), value=Entity("Alice"))
+
+        swapped_entities = self.relevant_fact.new_context(context_names)
+        gen = swapped_entities._context_registers(self.relevant_fact, operator.ge)
         register = next(gen)
         assert register.matches.get("<Alice>") == Entity("Bob")
 
-    def test_no_implication_complex(self, make_complex_statement):
-        assert (
-            not make_complex_statement["f_relevant_murder"]
-            >= make_complex_statement["f_relevant_murder_alice_craig"]
+    def test_no_implication_complex(self):
+        murder_fact = Statement(
+            self.murder_predicate, terms=[Entity("Alice"), Entity("Craig")]
+        )
+        relevant_to_craig = Statement(
+            self.relevant_predicate, terms=[self.shot_fact, murder_fact]
         )
 
-    def test_implied_by(self, make_complex_statement):
-        assert make_complex_statement["f_relevant_murder_whether"].implied_by(
-            make_complex_statement["f_relevant_murder"]
-        )
+        assert not self.relevant_fact >= relevant_to_craig
 
-    def test_explanation_implied_by(self, make_complex_statement):
-        explanation = make_complex_statement[
-            "f_relevant_murder_whether"
-        ].explain_implied_by(make_complex_statement["f_relevant_murder"])
-        assert explanation
+    def test_implied_by(self):
+        assert self.relevant_whether.implied_by(self.relevant_fact)
+
+    def test_explanation_implied_by(self):
+        explanation = self.relevant_whether.explain_implied_by(self.relevant_fact)
+        assert explanation["<Alice>"].name == "Alice"
 
 
 class TestContradiction:
-    def test_factor_different_predicate_truth_contradicts(self, watt_factor):
-        assert watt_factor["f7"].contradicts(watt_factor["f7_opposite"])
-        assert watt_factor["f7_opposite"].contradicts(watt_factor["f7"])
+    def test_factor_different_predicate_truth_contradicts(self):
+        predicate = Comparison(
+            "the distance between $place1 and $place2 was",
+            sign=">",
+            expression=Q_("30 miles"),
+        )
+        predicate_opposite = Comparison(
+            "the distance between $place1 and $place2 was",
+            sign="<",
+            expression=Q_("30 miles"),
+        )
+        terms = [Entity("New York"), Entity("Los Angeles")]
+        fact = Statement(predicate, terms=terms)
+        fact_opposite = Statement(predicate_opposite, terms=terms)
+
+        assert fact.contradicts(fact_opposite)
+        assert fact_opposite.contradicts(fact)
 
     def test_same_predicate_true_vs_false(self, watt_factor):
         assert watt_factor["f10"].contradicts(watt_factor["f10_false"])

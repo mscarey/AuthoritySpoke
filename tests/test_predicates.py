@@ -304,3 +304,17 @@ class TestContradiction:
 
     def test_contradiction_with_quantity(self, make_predicate):
         assert make_predicate["p8_less"].contradicts(make_predicate["p8_meters"])
+
+    def test_contradiction_due_to_different_signs(self):
+        comparison = Comparison(
+            "the distance between $place1 and $place2 was",
+            sign=">",
+            expression=Q_("30 miles"),
+        )
+        comparison_opposite = Comparison(
+            "the distance between $place1 and $place2 was",
+            sign="<",
+            expression=Q_("30 miles"),
+        )
+        assert comparison.contradicts(comparison_opposite)
+        assert comparison_opposite.contradicts(comparison)

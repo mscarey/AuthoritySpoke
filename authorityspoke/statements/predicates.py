@@ -637,9 +637,10 @@ class Comparison(Predicate):
         if self.expression < other.expression:
             if ">" not in self.sign and "<" not in other.sign:
                 return True
-        return self.expression == other.expression and (
-            ("=" in self.sign) != ("=" in other.sign)
-        )
+        if self.expression == other.expression:
+            if ("=" in self.sign) != ("=" in other.sign):
+                return True
+            return {self.sign, other.sign} == {"<", ">"}
 
     def includes_other_quantity(self, other: Comparison) -> bool:
         """Test if the range of quantities mentioned in self is a subset of other's."""
