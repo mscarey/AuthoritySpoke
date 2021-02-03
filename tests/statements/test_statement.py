@@ -571,20 +571,46 @@ class TestContradiction:
         assert fact.contradicts(fact_opposite)
         assert fact_opposite.contradicts(fact)
 
-    def test_same_predicate_true_vs_false(self, watt_factor):
-        assert watt_factor["f10"].contradicts(watt_factor["f10_false"])
-        assert watt_factor["f10"].truth != watt_factor["f10_false"].truth
+    def test_same_predicate_true_vs_false(self):
+        fact = Statement(Predicate("$person was a person"), terms=Entity("Alice"))
+        fiction = Statement(
+            Predicate("$person was a person", truth=False), terms=Entity("Alice")
+        )
+        assert fact.contradicts(fiction)
+        assert fact.truth != fiction.truth
 
-    def test_factor_does_not_contradict_predicate(self, make_predicate, watt_factor):
+    def test_factor_does_not_contradict_predicate(self):
+        predicate = Predicate("$person was a person")
+        fact = Statement(predicate, terms=Entity("Alice"))
+
         with pytest.raises(TypeError):
-            _ = watt_factor["f7"].contradicts(make_predicate["p7_true"])
+            fact.contradicts(predicate)
 
-    def test_factor_contradiction_absent_predicate(self, watt_factor):
-        assert watt_factor["f3"].contradicts(watt_factor["f3_absent"])
-        assert watt_factor["f3_absent"].contradicts(watt_factor["f3"])
+    def test_factor_contradiction_absent_predicate(self):
+        predicate = Predicate("$person was a person")
+        fact = Statement(predicate, terms=Entity("Alice"))
+        absent_fact = Statement(predicate, terms=Entity("Alice"), absent=True)
+
+        assert fact.contradicts(absent_fact)
+        assert absent_fact.contradicts(fact)
 
     def test_absences_of_contradictory_facts_consistent(self, watt_factor):
-        assert not watt_factor["f8_absent"].contradicts(watt_factor["f8_less_absent"])
+        predicate = Comparison(
+            "the distance between $place1 and $place2 was",
+            sign=">",
+            expression=Q_("30 miles"),
+        )
+        predicate_opposite = Comparison(
+            "the distance between $place1 and $place2 was",
+            sign="<",
+            expression=Q_("30 miles"),
+        )
+        terms = [Entity("New York"), Entity("Los Angeles")]
+        fact = Statement(predicate, terms=terms, absent=True)
+        fact_opposite = Statement(predicate_opposite, terms=terms, absent=True)
+
+        assert not fact.contradicts(fact_opposite)
+        assert not fact_opposite.contradicts(fact)
 
     def test_factor_no_contradiction_no_truth_value(self, watt_factor):
         assert not watt_factor["f2"].contradicts(watt_factor["f2_no_truth"])

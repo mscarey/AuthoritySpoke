@@ -473,11 +473,10 @@ class Comparable(ABC):
                 else:
                     yield from self._implies_if_present(other, context)
             elif self.__dict__.get("absent"):
+                # No contradiction between absences of any two Comparables
                 if not other.__dict__.get("absent"):
                     test = other._implies_if_present(self, context.reversed())
-                else:
-                    test = other._contradicts_if_present(self, context.reversed())
-                yield from (register.reversed() for register in test)
+                    yield from (register.reversed() for register in test)
 
     def explanations_implication(
         self, other: Comparable, context: Optional[ContextRegister] = None
