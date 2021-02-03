@@ -613,43 +613,136 @@ class TestContradiction:
         assert not fact_opposite.contradicts(fact)
 
     def test_factor_no_contradiction_no_truth_value(self, watt_factor):
-        assert not watt_factor["f2"].contradicts(watt_factor["f2_no_truth"])
-        assert not watt_factor["f2_no_truth"].contradicts(watt_factor["f2_false"])
+        fact = Statement(Predicate("$person was a person"), terms=Entity("Alice"))
+        fact_no_truth = Statement(
+            Predicate("$person was a person"), terms=Entity("Alice")
+        )
+        assert not fact.contradicts(fact_no_truth)
+        assert not fact_no_truth.contradicts(fact)
 
-    def test_absent_factor_contradicts_broader_quantity_statement(self, watt_factor):
-        assert watt_factor["f8_absent"].contradicts(watt_factor["f8_meters"])
-        assert watt_factor["f8_meters"].contradicts(watt_factor["f8_absent"])
+    def test_broader_absent_factor_contradicts_quantity_statement(self, watt_factor):
+        predicate_less = Comparison(
+            "${vehicle}'s speed was",
+            sign=">",
+            expression=Q_("30 miles per hour"),
+        )
+        predicate_more = Comparison(
+            "${vehicle}'s speed was",
+            sign=">",
+            expression=Q_("60 miles per hour"),
+        )
+        terms = [Entity("the car")]
+        absent_general_fact = Statement(predicate_less, terms=terms, absent=True)
+        specific_fact = Statement(predicate_more, terms=terms)
+
+        assert absent_general_fact.contradicts(specific_fact)
+        assert specific_fact.contradicts(absent_general_fact)
 
     def test_less_specific_absent_contradicts_more_specific(self, watt_factor):
-        assert watt_factor["f9_absent_miles"].contradicts(watt_factor["f9"])
-        assert watt_factor["f9"].contradicts(watt_factor["f9_absent_miles"])
-
-    def test_no_contradiction_with_more_specific_absent(self, watt_factor):
-        assert not watt_factor["f9_absent"].contradicts(watt_factor["f9_miles"])
-        assert not watt_factor["f9_miles"].contradicts(watt_factor["f9_absent"])
-
-    def test_contradiction_complex(self, make_complex_statement):
-        assert make_complex_statement["f_irrelevant_murder"].contradicts(
-            make_complex_statement["f_relevant_murder_craig"]
+        predicate_less = Comparison(
+            "${vehicle}'s speed was",
+            sign="<",
+            expression=Q_("30 miles per hour"),
         )
-
-    def test_no_contradiction_complex(self, make_complex_statement):
-        assert not make_complex_statement["f_irrelevant_murder"].contradicts(
-            make_complex_statement["f_relevant_murder_alice_craig"]
+        predicate_more = Comparison(
+            "${vehicle}'s speed was",
+            sign="<",
+            expression=Q_("60 miles per hour"),
         )
+        terms = [Entity("the car")]
+        absent_general_fact = Statement(predicate_more, terms=terms, absent=True)
+        specific_fact = Statement(predicate_less, terms=terms)
+
+        assert absent_general_fact.contradicts(specific_fact)
+        assert specific_fact.contradicts(absent_general_fact)
+
+    def test_no_contradiction_with_more_specific_absent(self):
+        predicate_less = Comparison(
+            "${vehicle}'s speed was",
+            sign="<",
+            expression=Q_("30 miles per hour"),
+        )
+        predicate_more = Comparison(
+            "${vehicle}'s speed was",
+            sign="<",
+            expression=Q_("60 miles per hour"),
+        )
+        terms = [Entity("the car")]
+        general_fact = Statement(predicate_more, terms=terms)
+        absent_specific_fact = Statement(predicate_less, terms=terms, absent=True)
+
+        assert not general_fact.contradicts(absent_specific_fact)
+        assert not absent_specific_fact.contradicts(general_fact)
+
+    def test_contradiction_complex(self):
+        shot_predicate = Predicate("$shooter shot $victim")
+        shot_fact = Statement(shot_predicate, terms=[Entity("Alice"), Entity("Bob")])
+        murder_predicate = Predicate("$shooter murdered $victim")
+        murder_fact = Statement(
+            murder_predicate, terms=[Entity("Alice"), Entity("Bob")]
+        )
+        relevant_predicate = Predicate("$clue was relevant to $conclusion")
+        relevant_fact = Statement(relevant_predicate, terms=[shot_fact, murder_fact])
+        irrelevant_predicate = Predicate(
+            "$clue was relevant to $conclusion", truth=False
+        )
+        irrelevant_fact = Statement(
+            irrelevant_predicate, terms=[shot_fact, murder_fact]
+        )
+        assert relevant_fact.contradicts(irrelevant_fact)
+
+    def test_no_contradiction_complex(self):
+        shot_predicate = Predicate("$shooter shot $victim")
+        shot_fact = Statement(shot_predicate, terms=[Entity("Alice"), Entity("Bob")])
+        murder_predicate = Predicate("$shooter murdered $victim")
+        murder_fact = Statement(
+            murder_predicate, terms=[Entity("Alice"), Entity("Bob")]
+        )
+        murder_socrates = Statement(
+            murder_predicate, terms=[Entity("Alice"), Entity("Socrates")]
+        )
+        relevant_predicate = Predicate("$clue was relevant to $conclusion")
+        relevant_fact = Statement(relevant_predicate, terms=[shot_fact, murder_fact])
+        irrelevant_predicate = Predicate(
+            "$clue was relevant to $conclusion", truth=False
+        )
+        irrelevant_fact = Statement(
+            irrelevant_predicate, terms=[shot_fact, murder_socrates]
+        )
+        assert not relevant_fact.contradicts(irrelevant_fact)
+        assert not irrelevant_fact.contradicts(relevant_fact)
 
     def test_no_contradiction_of_None(self, watt_factor):
-        assert not watt_factor["f1"].contradicts(None)
+        shot_predicate = Predicate("$shooter shot $victim")
+        shot_fact = Statement(shot_predicate, terms=[Entity("Alice"), Entity("Bob")])
+        assert not shot_fact.contradicts(None)
 
     def test_contradicts_if_present_both_present(self, watt_factor):
         """
         Test a helper function that checks whether there would
         be a contradiction if neither Factor was "absent".
         """
-        assert watt_factor["f2"]._contradicts_if_present(watt_factor["f2_false"])
+        shot_fact = Statement(
+            Predicate("$shooter shot $victim"), terms=[Entity("Alice"), Entity("Bob")]
+        )
+        shot_false = Statement(
+            Predicate("$shooter shot $victim", truth=False),
+            terms=[Entity("Alice"), Entity("Bob")],
+        )
+        assert shot_fact._contradicts_if_present(shot_false)
+        assert shot_false._contradicts_if_present(shot_fact)
 
     def test_contradicts_if_present_one_absent(self, watt_factor):
-        assert watt_factor["f2"]._contradicts_if_present(watt_factor["f2_false_absent"])
+        shot_fact = Statement(
+            Predicate("$shooter shot $victim"), terms=[Entity("Alice"), Entity("Bob")]
+        )
+        shot_false = Statement(
+            Predicate("$shooter shot $victim", truth=False),
+            terms=[Entity("Alice"), Entity("Bob")],
+            absent=True,
+        )
+        assert shot_fact._contradicts_if_present(shot_false)
+        assert shot_false._contradicts_if_present(shot_fact)
 
     def test_false_does_not_contradict_absent(self):
         absent_fact = Statement(
@@ -714,51 +807,37 @@ class TestContradiction:
         register.insert_pair(alice, alice)
         assert not alice_rich.contradicts(bob_poor, context=register)
 
-    def test_copy_with_foreign_context(self, watt_mentioned, watt_factor):
-        w = watt_mentioned
-        assert (
-            watt_factor["f1"]
-            .new_context(ContextRegister.from_lists([w[0]], [w[2]]))
-            .means(watt_factor["f1_different_entity"])
+    def test_check_entity_consistency_true(self):
+        left = Statement(
+            Predicate("$shooter shot $victim"), terms=[Entity("Alice"), Entity("Bob")]
         )
+        right = Statement(
+            Predicate("$shooter shot $victim"), terms=[Entity("Craig"), Entity("Dan")]
+        )
+        register = ContextRegister.from_lists([Entity("Alice")], [Entity("Craig")])
+        update = left.update_context_register(right, register, comparison=means)
+        assert any(register is not None for register in update)
 
-    def test_check_entity_consistency_true(self, make_entity, make_factor):
-        left = make_factor["f_irrelevant_3"]
-        right = make_factor["f_irrelevant_3_new_context"]
-        e = make_entity
-        easy_register = ContextRegister.from_lists([e["dan"]], [e["craig"]])
-        easy_update = left.update_context_register(
-            right, easy_register, comparison=means
+    def test_check_entity_consistency_false(self):
+        left = Statement(
+            Predicate("$shooter shot $victim"), terms=[Entity("Alice"), Entity("Bob")]
         )
-        harder_register = ContextRegister.from_lists(
-            keys=[e["alice"], e["bob"], e["craig"], e["dan"], e["circus"]],
-            values=[e["bob"], e["alice"], e["dan"], e["craig"], e["circus"]],
+        right = Statement(
+            Predicate("$shooter shot $victim"), terms=[Entity("Craig"), Entity("Dan")]
         )
-        harder_update = left.update_context_register(
-            right,
-            context=harder_register,
-            comparison=means,
-        )
-        assert any(register is not None for register in easy_update)
-        assert any(register is not None for register in harder_update)
-
-    def test_check_entity_consistency_false(self, make_entity, make_factor):
-        context = ContextRegister()
-        context.insert_pair(make_entity["circus"], make_entity["alice"])
-        update = make_factor["f_irrelevant_3"].update_context_register(
-            make_factor["f_irrelevant_3_new_context"], comparison=means, context=context
-        )
+        register = ContextRegister.from_lists([Entity("Alice")], [Entity("Dan")])
+        update = left.update_context_register(right, register, comparison=means)
         assert not any(register is not None for register in update)
 
     def test_entity_consistency_identity_not_equality(self, make_entity, make_factor):
-
-        register = ContextRegister()
-        register.insert_pair(make_entity["dan"], make_entity["dan"])
-        update = make_factor["f_irrelevant_3"].update_context_register(
-            make_factor["f_irrelevant_3_new_context"],
-            context=register,
-            comparison=means,
+        left = Statement(
+            Predicate("$shooter shot $victim"), terms=[Entity("Alice"), Entity("Bob")]
         )
+        right = Statement(
+            Predicate("$shooter shot $victim"), terms=[Entity("Craig"), Entity("Dan")]
+        )
+        register = ContextRegister.from_lists([Entity("Dan")], [Entity("Dan")])
+        update = left.update_context_register(right, register, comparison=means)
         assert not any(register is not None for register in update)
 
     def test_check_entity_consistency_type_error(
@@ -768,9 +847,13 @@ class TestContradiction:
         There would be no TypeError if it used "means"
         instead of .gt. The comparison would just return False.
         """
-        update = make_factor["f_irrelevant_3"].update_context_register(
-            make_predicate["p2"],
-            {str(make_entity["dan"]): make_entity["dan"]},
+        right = Statement(
+            Predicate("$shooter shot $victim"), terms=[Entity("Craig"), Entity("Dan")]
+        )
+        register = ContextRegister.from_lists([Entity("Dan")], [Entity("Dan")])
+        update = right.update_context_register(
+            right.predicate,
+            register,
             operator.gt,
         )
         with pytest.raises(TypeError):
@@ -779,8 +862,19 @@ class TestContradiction:
 
 class TestConsistent:
     def test_contradictory_facts_about_same_entity(self, watt_factor):
-        left = watt_factor["f8_less"]
-        right = watt_factor["f8_meters"]
+        p_small_weight = Comparison(
+            "the amount of gold $person possessed was",
+            sign="<",
+            expression=Q_("1 gram"),
+        )
+        p_large_weight = Comparison(
+            "the amount of gold $person possessed was",
+            sign=">=",
+            expression=Q_("100 kilograms"),
+        )
+        left = Statement(p_large_weight, terms=Entity("Alice"))
+        right = Statement(p_small_weight, terms=Entity("Bob"))
+
         register = ContextRegister()
         register.insert_pair(left.generic_factors()[0], right.generic_factors()[0])
         assert not left.consistent_with(right, register)
