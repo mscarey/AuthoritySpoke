@@ -111,6 +111,12 @@ class Statement(Comparable):
                 text += f"\n{str(factor_text)}"
         return text
 
+    def __repr__(self):
+        return (
+            f"{self.__class__.__name__}({self.predicate}, terms='{self.terms}', "
+            f"absent={self.absent}, generic={self.generic})"
+        )
+
     def __str__(self):
         """Create one-line string representation for inclusion in other Facts."""
         content = str(self.predicate.content_with_terms(self.terms))

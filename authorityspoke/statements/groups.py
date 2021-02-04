@@ -105,12 +105,26 @@ class ComparableGroup(Tuple[F, ...], Comparable):
             return True
         return not self._must_contradict_one_factor(other, context=context)
 
-    def _contradicts_factor(self, other: Comparable, context: ContextRegister) -> bool:
+    def _explain_contradicts_factor(
+        self, other: Comparable, context: ContextRegister
+    ) -> Iterator[Explanation]:
 
         for self_factor in self:
-            if self_factor.contradicts(other, context):
-                return True
-        return False
+            yield from self_factor.explanations_contradiction(other, context)
+
+    def explanations_contradiction(
+        self, other: Comparable, context: Optional[ContextRegister] = None
+    ) -> Iterator[Explanation]:
+        if context is None:
+            context = ContextRegister()
+
+        if isinstance(other, Sequence):
+            for other_factor in other:
+                yield from self._explain_contradicts_factor(
+                    other_factor, context=context
+                )
+        else:
+            yield from self._explain_contradicts_factor(other, context=context)
 
     def contradicts(
         self,
@@ -135,14 +149,7 @@ class ComparableGroup(Tuple[F, ...], Comparable):
         """
         if other is None:
             return False
-        if context is None:
-            context = ContextRegister()
-        if isinstance(other, Sequence):
-            return any(
-                self._contradicts_factor(other_factor, context=context)
-                for other_factor in other
-            )
-        return self._contradicts_factor(other, context=context)
+        return any(self.explanations_contradiction(other, context=context))
 
     def comparison(
         self,
