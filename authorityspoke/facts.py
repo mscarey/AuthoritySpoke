@@ -137,11 +137,7 @@ class Fact(Statement, Factor):
     def _means_if_concrete(
         self, other: Factor, context: Optional[ContextRegister] = None
     ) -> Iterator[ContextRegister]:
-        if (
-            isinstance(other, self.__class__)
-            and self.predicate.means(other.predicate)
-            and self.standard_of_proof == other.standard_of_proof
-        ):
+        if self.standard_of_proof == other.standard_of_proof:
             yield from super()._means_if_concrete(other, context)
 
     def __len__(self):
@@ -166,7 +162,6 @@ class Fact(Statement, Factor):
                     < self.standards_of_proof.index(other.standard_of_proof)
                 )
             )
-            and self.predicate >= other.predicate
         ):
             yield from super()._implies_if_concrete(other, context)
 
@@ -220,9 +215,9 @@ def build_fact(
     if isinstance(indices, int):
         indices = (indices,)
 
-    case_factors = Comparable.wrap_with_tuple(case_factors)
+    wrapped_factors = Comparable.wrap_with_tuple(case_factors)
 
-    terms = FactorSequence([case_factors[i] for i in indices])
+    terms = FactorSequence([wrapped_factors[i] for i in indices])
     return Fact(
         predicate=predicate,
         terms=terms,
