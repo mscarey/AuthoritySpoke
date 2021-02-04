@@ -43,6 +43,20 @@ class ComparableGroup(Tuple[F, ...], Comparable):
             return super().__getitem__(key)
         return self.__class__(super().__getitem__(key))
 
+    @property
+    def recursive_factors(self) -> Dict[str, Comparable]:
+        r"""
+        Collect `self`'s :attr:`terms`, and their :attr:`terms`, recursively.
+
+        :returns:
+            a :class:`dict` (instead of a :class:`set`,
+            to preserve order) of :class:`Factor`\s.
+        """
+        result: Dict[str, Comparable] = {}
+        for context in self:
+            result.update(context.recursive_factors)
+        return result
+
     def _must_contradict_one_factor(
         self, other_factor: Comparable, context: ContextRegister
     ) -> bool:
@@ -176,27 +190,6 @@ class ComparableGroup(Tuple[F, ...], Comparable):
                                     matches=new_matches,
                                 )
                             )
-
-    def get_factor_by_name(self, name: str) -> Optional[Comparable]:
-        for comparable in self:
-            answer = comparable.get_factor_by_name(name)
-            if answer:
-                return answer
-        return None
-
-    def get_factor_by_str(self, query: str) -> Optional[Comparable]:
-        """
-        Search of ``self`` and ``self``'s attributes for :class:`Factor` with specified string.
-
-        :returns:
-            a :class:`Factor` with the specified string
-            if it exists, otherwise ``None``.
-        """
-        for comparable in self:
-            for name, factor in comparable.recursive_factors.items():
-                if name == query:
-                    return factor
-        return None
 
     def verbose_comparison(
         self,
