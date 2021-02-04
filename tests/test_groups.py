@@ -1,6 +1,8 @@
 from authorityspoke.statements.comparable import ContextRegister, means
 from authorityspoke.statements.entities import Entity
 from authorityspoke.statements.groups import ComparableGroup
+from authorityspoke.statements.predicates import Predicate, Comparison
+from authorityspoke.statements.statements import Statement
 from authorityspoke.holdings import HoldingGroup
 
 
@@ -181,6 +183,67 @@ class TestUnion:
         right = ComparableGroup(watt_factor["f3_absent"])
         combined = left | right
         assert len(combined) == 2
+
+
+class TestConsistent:
+    def test_groups_with_one_statement_consistent(self):
+        predicate_less = Comparison(
+            "${vehicle}'s speed was",
+            sign="<",
+            expression="30 miles per hour",
+        )
+        predicate_more = Comparison(
+            "${vehicle}'s speed was",
+            sign="<",
+            expression="60 miles per hour",
+        )
+        slower_statement = Statement(predicate_less, terms=Entity("the car"))
+        faster_statement = Statement(predicate_more, terms=Entity("the pickup"))
+
+        specific_group = ComparableGroup([slower_statement])
+        general_group = ComparableGroup([faster_statement])
+        assert specific_group.consistent_with(general_group)
+
+    def test_group_inconsistent_with_one_statement(self):
+        predicate_less = Comparison(
+            "${vehicle}'s speed was",
+            sign="<",
+            expression="30 miles per hour",
+        )
+        predicate_more = Comparison(
+            "${vehicle}'s speed was",
+            sign=">",
+            expression="60 miles per hour",
+        )
+        predicate_farm = Predicate("$person had a farm")
+        slower_statement = Statement(predicate_less, terms=Entity("the car"))
+        faster_statement = Statement(predicate_more, terms=Entity("the pickup"))
+        farm_statement = Statement(predicate_farm, terms=Entity("Old MacDonald"))
+
+        group = ComparableGroup([slower_statement, farm_statement])
+        register = ContextRegister()
+        register.insert_pair(Entity("the car"), Entity("the pickup"))
+        assert not group.consistent_with(faster_statement, context=register)
+
+    def test_one_statement_inconsistent_with_group(self):
+        predicate_less = Comparison(
+            "${vehicle}'s speed was",
+            sign="<",
+            expression="30 miles per hour",
+        )
+        predicate_more = Comparison(
+            "${vehicle}'s speed was",
+            sign=">",
+            expression="60 miles per hour",
+        )
+        predicate_farm = Predicate("$person had a farm")
+        slower_statement = Statement(predicate_less, terms=Entity("the car"))
+        faster_statement = Statement(predicate_more, terms=Entity("the pickup"))
+        farm_statement = Statement(predicate_farm, terms=Entity("Old MacDonald"))
+        group = ComparableGroup([slower_statement, farm_statement])
+        register = ContextRegister()
+        register.insert_pair(Entity("the pickup"), Entity("the car"))
+        assert not faster_statement.consistent_with(group, context=register)
 
 
 class TestHoldingGroupImplies:

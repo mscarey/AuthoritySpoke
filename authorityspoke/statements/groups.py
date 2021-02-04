@@ -103,7 +103,7 @@ class ComparableGroup(Tuple[F, ...], Comparable):
                 if self._must_contradict_one_factor(other_factor, context=context):
                     return False
             return True
-        return self._must_contradict_one_factor(other, context=context)
+        return not self._must_contradict_one_factor(other, context=context)
 
     def contradicts(
         self,
