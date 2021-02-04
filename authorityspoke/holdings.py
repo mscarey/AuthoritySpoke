@@ -619,20 +619,27 @@ class HoldingGroup(ComparableGroup[H]):
     ) -> Iterator[Explanation]:
         if isinstance(other, Rule):
             other = Holding(rule=other)
+        explanation = Explanation(
+            matches=[], context=context or ContextRegister(), operation=operator.ge
+        )
         if isinstance(other, Holding):
             yield from self.verbose_comparison(
-                operation=operator.ge, still_need_matches=[other]
+                operation=operator.ge,
+                still_need_matches=[other],
+                explanation=explanation,
             )
         elif isinstance(other, self.__class__):
             yield from self.verbose_comparison(
-                operation=operator.ge, still_need_matches=list(other)
+                operation=operator.ge,
+                still_need_matches=list(other),
+                explanation=explanation,
             )
 
     def verbose_comparison(
         self,
         operation: Callable,
         still_need_matches: Sequence[Factor],
-        explanation: Explanation = None,
+        explanation: Explanation,
     ) -> Iterator[Explanation]:
         r"""
         Find one way for two unordered sets of :class:`.Factor`\s to satisfy a comparison.
@@ -664,9 +671,6 @@ class HoldingGroup(ComparableGroup[H]):
             with matching context.
         """
         still_need_matches = list(still_need_matches)
-
-        if explanation is None:
-            explanation = Explanation(matches=[], context=None, operation=operation)
 
         if not still_need_matches:
             yield explanation
