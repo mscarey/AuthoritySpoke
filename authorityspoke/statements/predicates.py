@@ -591,8 +591,6 @@ class Comparison(Predicate):
             return False
         if self._contradicts_predicate(other):
             return True
-        if not self.consistent_dimensionality(other):
-            return False
         return self.excludes_other_quantity(other)
 
     def negated(self) -> Comparison:

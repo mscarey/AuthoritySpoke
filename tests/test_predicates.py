@@ -227,6 +227,16 @@ class TestImplication:
         more = Comparison(template="The number of mice was", sign=">=", expression=5)
         assert not less.implies(more)
 
+    def test_no_contradiction_inconsistent_dimensions(self):
+        equal = Comparison(
+            "${defendant}'s sentence was", sign="=", expression="8 years"
+        )
+        less = Comparison(
+            "${defendant}'s sentence was", sign="<=", expression="10 parsecs"
+        )
+        assert not equal.contradicts(less)
+        assert not equal.implies(less)
+
     def test_equal_implies_greater_or_equal(self, make_predicate):
         assert make_predicate["p9_exact"] > make_predicate["p9"]
 
