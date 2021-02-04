@@ -217,6 +217,12 @@ class TestConsistent:
         register.insert_pair(Entity("the car"), Entity("the pickup"))
         assert group.contradicts(self.faster_statement, context=register)
 
+    def test_one_statement_does_not_contradict_group(self):
+        group = ComparableGroup([self.slower_general_statement, self.farm_statement])
+        register = ContextRegister()
+        register.insert_pair(Entity("the pickup"), Entity("the pickup"))
+        assert not self.faster_statement.contradicts(group, context=register)
+
     def test_group_inconsistent_with_single_factor(self):
         group = ComparableGroup([self.slower_specific_statement, self.farm_statement])
         register = ContextRegister()
@@ -239,6 +245,12 @@ class TestConsistent:
         register = ContextRegister()
         register.insert_pair(Entity("the pickup"), Entity("the car"))
         assert not self.faster_statement.consistent_with(group, context=register)
+
+    def test_one_statement_consistent_with_group(self):
+        group = ComparableGroup([self.slower_general_statement, self.farm_statement])
+        register = ContextRegister()
+        register.insert_pair(Entity("the pickup"), Entity("the pickup"))
+        assert self.faster_statement.consistent_with(group, context=register)
 
 
 class TestHoldingGroupImplies:
