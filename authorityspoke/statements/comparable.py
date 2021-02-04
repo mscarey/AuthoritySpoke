@@ -476,6 +476,10 @@ class Comparable(ABC):
                 if not other.__dict__.get("absent"):
                     test = other._implies_if_present(self, context.reversed())
                     yield from (register.reversed() for register in test)
+        elif isinstance(other, Sequence):
+            yield from other.explanations_contradiction(
+                self, context=context.reversed()
+            )
 
     def explanations_implication(
         self, other: Comparable, context: Optional[ContextRegister] = None
