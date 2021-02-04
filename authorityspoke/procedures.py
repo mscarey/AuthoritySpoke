@@ -129,7 +129,7 @@ class Procedure(Comparable):
                 return added
         return None
 
-    def explanations_union_partial(
+    def _explanations_union_partial(
         self, other: Procedure, context: Optional[ContextRegister] = None
     ) -> Iterable[ContextRegister]:
         """Yield as much of the context as seems likely correct based on this Procedure."""

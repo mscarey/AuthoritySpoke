@@ -330,7 +330,7 @@ class ComparableGroup(Tuple[F, ...], Comparable):
         self,
         other: Optional[ComparableGroup],
         comparison: Callable,
-        context: Optional[ContextRegister] = None,
+        context: ContextRegister,
     ) -> Iterator[ContextRegister]:
         r"""
         Search for ways to match :attr:`terms` of ``self`` and ``other``.
@@ -339,14 +339,9 @@ class ComparableGroup(Tuple[F, ...], Comparable):
             all valid ways to make matches between
             corresponding :class:`Factor`\s.
         """
-        if context is None:
-            context = ContextRegister()
-        if other is None:
-            yield context
-        else:
-            yield from self.comparison(
-                operation=comparison, still_need_matches=list(other), matches=context
-            )
+        yield from self.comparison(
+            operation=comparison, still_need_matches=list(other), matches=context
+        )
 
     def _likely_contexts_for_factor(
         self, other: Comparable, context: ContextRegister, i: int = 0

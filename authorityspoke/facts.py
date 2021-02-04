@@ -135,7 +135,7 @@ class Fact(Statement, Factor):
         return Comparable.__str__(self).format(string).replace("Fact", "fact")
 
     def _means_if_concrete(
-        self, other: Factor, context: Optional[ContextRegister] = None
+        self, other: Factor, context: ContextRegister
     ) -> Iterator[ContextRegister]:
         if self.standard_of_proof == other.standard_of_proof:
             yield from super()._means_if_concrete(other, context)
@@ -144,7 +144,7 @@ class Fact(Statement, Factor):
         return len(self.terms)
 
     def _implies_if_concrete(
-        self, other: Factor, context: Optional[ContextRegister] = None
+        self, other: Factor, context: ContextRegister
     ) -> Iterator[ContextRegister]:
         """
         Test if ``self`` impliess ``other``, assuming they are not ``generic``.

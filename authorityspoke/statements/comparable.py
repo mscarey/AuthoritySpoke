@@ -459,8 +459,7 @@ class Comparable(ABC):
             ``True`` if self and other can't both be true at
             the same time. Otherwise returns ``False``.
         """
-        if context is None:
-            context = ContextRegister()
+        context = context or ContextRegister()
         if not isinstance(other, Comparable):
             raise TypeError(
                 f"{self.__class__} objects may only be compared for "
@@ -530,19 +529,20 @@ class Comparable(ABC):
         ):
             if self.generic:
                 yield self.generic_register(other)
+            context = context or ContextRegister()
             yield from self._means_if_concrete(other, context)
 
     def explanations_union(
         self, other: Comparable, context: Optional[ContextRegister] = None
     ) -> Iterator[ContextRegister]:
         context = context or ContextRegister()
-        for partial in self.explanations_union_partial(other, context):
+        for partial in self._explanations_union_partial(other, context):
             for guess in self.possible_contexts(other, partial):
                 answer = self.union_from_explanation(other, guess)
                 if answer:
                     yield guess
 
-    def explanations_union_partial(
+    def _explanations_union_partial(
         self, other: Comparable, context: ContextRegister
     ) -> Iterator[ContextRegister]:
         for likely in self.likely_contexts(other, context):
@@ -556,7 +556,7 @@ class Comparable(ABC):
         return register
 
     def _implies_if_present(
-        self, other: Comparable, context: Optional[ContextRegister] = None
+        self, other: Comparable, context: ContextRegister
     ) -> Iterator[ContextRegister]:
         """
         Find if ``self`` would imply ``other`` if they aren't absent.
@@ -566,8 +566,6 @@ class Comparable(ABC):
             under the assumption that neither self nor other has
             the attribute ``absent == True``.
         """
-        if context is None:
-            context = ContextRegister()
         if isinstance(other, self.__class__):
             if other.generic:
                 if context.get_factor(self) is None or (

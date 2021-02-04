@@ -65,7 +65,7 @@ class Exhibit(Factor):
     )
 
     def _means_if_concrete(
-        self, other: Factor, context: Optional[ContextRegister] = None
+        self, other: Factor, context: ContextRegister
     ) -> Iterator[ContextRegister]:
         if isinstance(other, self.__class__) and self.form == other.form:
             yield from super()._means_if_concrete(other, context)
