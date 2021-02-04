@@ -31,7 +31,7 @@ class TestStatements:
         statement = Statement(predicate, terms=Entity("Acme"), absent=True)
         assert "absence of the statement" in str(statement).lower()
 
-    def test_string_no_truth_value(self, watt_factor):
+    def test_string_no_truth_value(self):
         predicate = Predicate("$bird came before $ovum", truth=None)
         statement = Statement(
             predicate, terms=[Entity("the chicken"), Entity("the egg")]
@@ -64,7 +64,7 @@ class TestStatements:
             opened_account
         )
 
-    def test_complex_fact_no_line_break_in_predicate(self, make_opinion_with_holding):
+    def test_complex_fact_no_line_break_in_predicate(self):
         """
         Tests that the string representation of this Holding's only input
         Fact does not contain indented new lines, except in the "SPECIFIC
@@ -129,6 +129,11 @@ class TestStatements:
         )
         assert "<Darth Vader> managed" in str(different)
         assert isinstance(different.terms, FactorSequence)
+
+    def test_term_cannot_be_string(self):
+        city = Predicate("$place was a city")
+        with pytest.raises(TypeError):
+            Statement(city, terms=["New York"])
 
     def test_concrete_to_abstract(self):
         predicate = Predicate("$person had a farm")
@@ -228,7 +233,7 @@ class TestSameMeaning:
         fact_b = Statement(predicate, terms=[Entity("Jim"), Entity("Ned")])
         assert fact.means(fact_b)
 
-    def test_factor_reciprocal_unequal(self, watt_factor):
+    def test_factor_reciprocal_unequal(self):
         predicate = Predicate("$advisor told $employer to hire $applicant")
         three_entities = Statement(
             predicate,
@@ -342,7 +347,7 @@ class TestImplication:
         concrete = Statement(Predicate("$person was a person"), terms=Entity("Alice"))
         assert not concrete > Entity("Tim")
 
-    def test_statement_does_not_imply_comparison(self, make_predicate, watt_factor):
+    def test_statement_does_not_imply_comparison(self):
         phrase = Comparison(
             "the distance north from $south to $north was",
             sign=">",
@@ -413,7 +418,7 @@ class TestImplication:
 
         assert statement_lower < statement_higher
 
-    def test_statement_implies_no_truth_value(self, watt_factor):
+    def test_statement_implies_no_truth_value(self):
         fact = Statement(Predicate("$person was a person"), terms=Entity("Alice"))
         whether = Statement(
             Predicate("$person was a person", truth=None), terms=Entity("Alice")
@@ -421,7 +426,7 @@ class TestImplication:
         assert fact >= whether
         assert not whether > fact
 
-    def test_comparison_implies_no_truth_value(self, watt_factor):
+    def test_comparison_implies_no_truth_value(self):
         fact = Statement(
             Comparison("${person}'s weight was", sign=">", expression="150 pounds"),
             terms=Entity("Alice"),
@@ -436,7 +441,7 @@ class TestImplication:
         assert fact >= whether
         assert not whether > fact
 
-    def test_factor_implies_because_of_exact_quantity(self, watt_factor):
+    def test_factor_implies_because_of_exact_quantity(self):
         fact_exact = Statement(
             Comparison("${person}'s height was", sign="=", expression="66 inches"),
             terms=Entity("Alice"),
@@ -449,7 +454,7 @@ class TestImplication:
         assert fact_exact >= fact_greater
         assert not fact_greater >= fact_exact
 
-    def test_no_implication_pint_quantity_and_int(self, watt_factor):
+    def test_no_implication_pint_quantity_and_int(self):
         fact_exact = Statement(
             Comparison("${person}'s height was", sign="=", expression=66),
             terms=Entity("Alice"),
@@ -594,7 +599,7 @@ class TestContradiction:
         assert fact.contradicts(absent_fact)
         assert absent_fact.contradicts(fact)
 
-    def test_absences_of_contradictory_facts_consistent(self, watt_factor):
+    def test_absences_of_contradictory_facts_consistent(self):
         predicate = Comparison(
             "the distance between $place1 and $place2 was",
             sign=">",
@@ -612,7 +617,7 @@ class TestContradiction:
         assert not fact.contradicts(fact_opposite)
         assert not fact_opposite.contradicts(fact)
 
-    def test_factor_no_contradiction_no_truth_value(self, watt_factor):
+    def test_factor_no_contradiction_no_truth_value(self):
         fact = Statement(Predicate("$person was a person"), terms=Entity("Alice"))
         fact_no_truth = Statement(
             Predicate("$person was a person"), terms=Entity("Alice")
@@ -620,7 +625,7 @@ class TestContradiction:
         assert not fact.contradicts(fact_no_truth)
         assert not fact_no_truth.contradicts(fact)
 
-    def test_broader_absent_factor_contradicts_quantity_statement(self, watt_factor):
+    def test_broader_absent_factor_contradicts_quantity_statement(self):
         predicate_less = Comparison(
             "${vehicle}'s speed was",
             sign=">",
@@ -638,7 +643,7 @@ class TestContradiction:
         assert absent_general_fact.contradicts(specific_fact)
         assert specific_fact.contradicts(absent_general_fact)
 
-    def test_less_specific_absent_contradicts_more_specific(self, watt_factor):
+    def test_less_specific_absent_contradicts_more_specific(self):
         predicate_less = Comparison(
             "${vehicle}'s speed was",
             sign="<",
@@ -712,12 +717,12 @@ class TestContradiction:
         assert not relevant_fact.contradicts(irrelevant_fact)
         assert not irrelevant_fact.contradicts(relevant_fact)
 
-    def test_no_contradiction_of_None(self, watt_factor):
+    def test_no_contradiction_of_None(self):
         shot_predicate = Predicate("$shooter shot $victim")
         shot_fact = Statement(shot_predicate, terms=[Entity("Alice"), Entity("Bob")])
         assert not shot_fact.contradicts(None)
 
-    def test_contradicts_if_present_both_present(self, watt_factor):
+    def test_contradicts_if_present_both_present(self):
         """
         Test a helper function that checks whether there would
         be a contradiction if neither Factor was "absent".
@@ -729,10 +734,10 @@ class TestContradiction:
             Predicate("$shooter shot $victim", truth=False),
             terms=[Entity("Alice"), Entity("Bob")],
         )
-        assert shot_fact._contradicts_if_present(shot_false)
-        assert shot_false._contradicts_if_present(shot_fact)
+        assert shot_fact._contradicts_if_present(shot_false, context=ContextRegister())
+        assert shot_false._contradicts_if_present(shot_fact, context=ContextRegister())
 
-    def test_contradicts_if_present_one_absent(self, watt_factor):
+    def test_contradicts_if_present_one_absent(self):
         shot_fact = Statement(
             Predicate("$shooter shot $victim"), terms=[Entity("Alice"), Entity("Bob")]
         )
@@ -741,8 +746,8 @@ class TestContradiction:
             terms=[Entity("Alice"), Entity("Bob")],
             absent=True,
         )
-        assert shot_fact._contradicts_if_present(shot_false)
-        assert shot_false._contradicts_if_present(shot_fact)
+        assert shot_fact._contradicts_if_present(shot_false, context=ContextRegister())
+        assert shot_false._contradicts_if_present(shot_fact, context=ContextRegister())
 
     def test_false_does_not_contradict_absent(self):
         absent_fact = Statement(
@@ -829,7 +834,7 @@ class TestContradiction:
         update = left.update_context_register(right, register, comparison=means)
         assert not any(register is not None for register in update)
 
-    def test_entity_consistency_identity_not_equality(self, make_entity, make_factor):
+    def test_entity_consistency_identity_not_equality(self):
         left = Statement(
             Predicate("$shooter shot $victim"), terms=[Entity("Alice"), Entity("Bob")]
         )
@@ -861,64 +866,66 @@ class TestContradiction:
 
 
 class TestConsistent:
-    def test_contradictory_facts_about_same_entity(self, watt_factor):
-        p_small_weight = Comparison(
-            "the amount of gold $person possessed was",
-            sign="<",
-            expression=Q_("1 gram"),
-        )
-        p_large_weight = Comparison(
-            "the amount of gold $person possessed was",
-            sign=">=",
-            expression=Q_("100 kilograms"),
-        )
-        left = Statement(p_large_weight, terms=Entity("Alice"))
-        right = Statement(p_small_weight, terms=Entity("Bob"))
+    p_small_weight = Comparison(
+        "the amount of gold $person possessed was",
+        sign="<",
+        expression=Q_("1 gram"),
+    )
+    p_large_weight = Comparison(
+        "the amount of gold $person possessed was",
+        sign=">=",
+        expression=Q_("100 kilograms"),
+    )
+    small = Statement(p_large_weight, terms=Entity("Alice"))
+    big = Statement(p_small_weight, terms=Entity("Bob"))
 
+    def test_contradictory_facts_about_same_entity(self):
         register = ContextRegister()
-        register.insert_pair(left.generic_factors()[0], right.generic_factors()[0])
-        assert not left.consistent_with(right, register)
-
-    def test_explanations_consistent_with(self, watt_factor):
-        left = watt_factor["f8_less"]
-        right = watt_factor["f8_meters"]
-        register = ContextRegister()
-        register.insert_pair(left.generic_factors()[0], right.generic_factors()[0])
-        explanations = list(left.explanations_consistent_with(right, context=register))
+        register.insert_pair(Entity("Alice"), Entity("Bob"))
+        assert not self.small.consistent_with(self.big, register)
+        explanations = list(
+            self.small.explanations_consistent_with(self.big, context=register)
+        )
         assert not explanations
 
-    def test_factor_consistent_with_none(self, make_exhibit):
-        assert make_exhibit["no_shooting_testimony"].consistent_with(
-            make_exhibit["no_shooting_witness_unknown_testimony"]
-        )
+    def test_factor_consistent_with_none(self):
+        assert self.small.consistent_with(None)
 
 
 class TestAddition:
-    @pytest.mark.parametrize(
-        "left, right, expected",
-        [
-            ("f_shooting_craig_poe", "f_shooting_craig_brd", "f_shooting_craig_brd"),
-            ("f_irrelevant_3", "f_irrelevant_3_new_context", "f_irrelevant_3"),
-            (
-                "f_irrelevant_3_new_context",
-                "f_irrelevant_3",
-                "f_irrelevant_3_new_context",
-            ),
-        ],
+
+    predicate_less = Comparison(
+        "${vehicle}'s speed was",
+        sign=">",
+        expression=Q_("30 miles per hour"),
     )
-    def test_addition(self, make_factor, left, right, expected):
-        answer = make_factor[left] + make_factor[right]
-        assert answer.means(make_factor[expected])
+    predicate_more = Comparison(
+        "${vehicle}'s speed was",
+        sign=">=",
+        expression=Q_("60 miles per hour"),
+    )
+    general_fact = Statement(predicate_less, terms=Entity("the car"))
+    specific_fact = Statement(predicate_more, terms=Entity("the motorcycle"))
 
-    def test_add_unrelated_factors(self, make_factor):
-        assert make_factor["f_murder"] + make_factor["f_crime"] is None
+    def test_addition_returns_broader_operand(self):
+        answer = self.specific_fact + self.general_fact
+        assert answer.means(self.specific_fact)
 
-    def test_cant_add_enactment_to_fact(self, watt_factor, e_search_clause):
+    def test_addition_uses_terms_from_left(self):
+        answer = self.general_fact + self.specific_fact
+        assert "<the car>" in str(answer)
+
+    def test_add_unrelated_factors(self):
+        murder = Statement(Predicate("$person committed a murder"), terms=Entity("Al"))
+        crime = Statement(Predicate("$person committed a crime"), terms=Entity("Al"))
+        assert murder + crime is None
+        assert murder | crime is None
+
+    def test_union_with_string_fails(self):
+        murder = Statement(Predicate("$person committed a murder"), terms=Entity("Al"))
         with pytest.raises(TypeError):
-            print(watt_factor["f3"] + e_search_clause)
+            murder | "a string"
 
-
-class TestUnion:
     def test_union_same_as_adding(self):
         dave = Entity("Dave")
         speed_template = "${driver}'s driving speed was"
@@ -936,3 +943,8 @@ class TestUnion:
         )
         new = fast_fact | slow_fact
         assert new.means(fast_fact)
+
+    def test_union_uses_terms_from_left(self):
+        new = self.general_fact | self.specific_fact
+        assert new.means(self.specific_fact)
+        assert new.terms[0] == Entity("the car")

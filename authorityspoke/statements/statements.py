@@ -149,7 +149,7 @@ class Statement(Comparable):
             yield from super()._implies_if_concrete(other, context)
 
     def _contradicts_if_present(
-        self, other: Comparable, context: Optional[ContextRegister] = None
+        self, other: Comparable, context: ContextRegister
     ) -> Iterator[ContextRegister]:
         """
         Test if ``self`` contradicts :class:`Fact` ``other`` if neither is ``absent``.
@@ -158,8 +158,6 @@ class Statement(Comparable):
             whether ``self`` and ``other`` can't both be true at
             the same time under the given assumption.
         """
-        if context is None:
-            context = ContextRegister()
         if isinstance(other, self.__class__) and self.predicate.contradicts(
             other.predicate
         ):

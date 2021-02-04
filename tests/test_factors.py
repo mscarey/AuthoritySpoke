@@ -539,10 +539,14 @@ class TestContradiction:
         Test a helper function that checks whether there would
         be a contradiction if neither Factor was "absent".
         """
-        assert watt_factor["f2"]._contradicts_if_present(watt_factor["f2_false"])
+        assert watt_factor["f2"]._contradicts_if_present(
+            watt_factor["f2_false"], context=ContextRegister()
+        )
 
     def test_contradicts_if_present_one_absent(self, watt_factor):
-        assert watt_factor["f2"]._contradicts_if_present(watt_factor["f2_false_absent"])
+        assert watt_factor["f2"]._contradicts_if_present(
+            watt_factor["f2_false_absent"], context=ContextRegister()
+        )
 
     def test_false_does_not_contradict_absent(self):
         absent_fact = Fact(

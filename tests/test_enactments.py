@@ -247,9 +247,23 @@ class TestEnactments:
         combined = consolidate_enactments([due_process_5, due_process_14])
         assert len(combined) == 2
 
-    def test_cant_add_fact_to_enactment(self, watt_factor, e_search_clause):
+    def test_cannot_add_fact_to_enactment(self, watt_factor, e_search_clause):
         with pytest.raises(TypeError):
             print(e_search_clause + watt_factor["f3"])
+
+    def test_cannot_add_enactment_to_statement(self, e_search_clause):
+        statement = Statement(
+            Predicate("$person committed a murder"), terms=Entity("Al")
+        )
+        with pytest.raises(TypeError):
+            statement + e_search_clause
+
+    def test_cannot_add_statement_to_enactment(self, e_search_clause):
+        statement = Statement(
+            Predicate("$person committed a murder"), terms=Entity("Al")
+        )
+        with pytest.raises(TypeError):
+            e_search_clause + statement
 
     def test_cant_add_enactment_that_is_not_ancestor_or_descendant(
         self, e_search_clause, e_copyright
