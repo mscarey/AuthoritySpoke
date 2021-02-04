@@ -105,9 +105,16 @@ class ComparableGroup(Tuple[F, ...], Comparable):
             return True
         return not self._must_contradict_one_factor(other, context=context)
 
+    def _contradicts_factor(self, other: Comparable, context: ContextRegister) -> bool:
+
+        for self_factor in self:
+            if self_factor.contradicts(other, context):
+                return True
+        return False
+
     def contradicts(
         self,
-        other: ComparableGroup,
+        other: Optional[Comparable],
         context: Optional[ContextRegister] = None,
     ) -> bool:
         r"""
@@ -126,13 +133,16 @@ class ComparableGroup(Tuple[F, ...], Comparable):
             makes a :class:`.Factor` in the output of ``other`` contradict
             a :class:`.Factor` in the output of ``self``.
         """
+        if other is None:
+            return False
         if context is None:
             context = ContextRegister()
-        for other_factor in other:
-            for self_factor in self:
-                if self_factor.contradicts(other_factor, context):
-                    return True
-        return False
+        if isinstance(other, Sequence):
+            return any(
+                self._contradicts_factor(other_factor, context=context)
+                for other_factor in other
+            )
+        return self._contradicts_factor(other, context=context)
 
     def comparison(
         self,
