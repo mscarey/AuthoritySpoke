@@ -252,6 +252,14 @@ class TestConsistent:
         register.insert_pair(Entity("the pickup"), Entity("the pickup"))
         assert self.faster_statement.consistent_with(group, context=register)
 
+    def test_no_contradiction_of_none(self):
+        group = ComparableGroup([self.slower_general_statement, self.farm_statement])
+        assert not group.contradicts(None)
+
+    def test_consistent_with_none(self):
+        group = ComparableGroup([self.slower_general_statement, self.farm_statement])
+        assert group.consistent_with(None)
+
 
 class TestHoldingGroupImplies:
     def test_explain_holdinggroup_implication(self, make_holding):

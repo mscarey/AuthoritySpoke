@@ -280,7 +280,9 @@ class Rule(Comparable):
             return False
         return True
 
-    def contradicts(self, other, context: Optional[ContextRegister] = None) -> bool:
+    def contradicts(
+        self, other: Optional[Comparable], context: Optional[ContextRegister] = None
+    ) -> bool:
         """
         Test if ``self`` contradicts ``other``.
 
@@ -299,7 +301,7 @@ class Rule(Comparable):
             context = ContextRegister()
 
         if not isinstance(other, self.__class__):
-            if hasattr(other, "contradicts"):
+            if other and hasattr(other, "contradicts"):
                 return other.contradicts(self, context=context.reversed())
             return False
 
