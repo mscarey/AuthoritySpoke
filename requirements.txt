@@ -7,3 +7,4 @@ python-dotenv
 python-slugify
 requests
 roman
+sympy

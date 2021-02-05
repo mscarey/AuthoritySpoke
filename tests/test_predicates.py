@@ -315,6 +315,8 @@ class TestContradiction:
     def test_contradiction_with_quantity(self, make_predicate):
         assert make_predicate["p8_less"].contradicts(make_predicate["p8_meters"])
 
+
+class TestQuantities:
     def test_does_not_exclude_other_quantity(self):
         comparison = Comparison(
             "the distance between $place1 and $place2 was",
@@ -327,3 +329,17 @@ class TestContradiction:
             expression=Q_("30 miles"),
         )
         assert comparison.excludes_other_quantity(comparison_opposite) is False
+
+    def test_convert_quantity_of_Comparison(self):
+        comparison = Comparison(
+            "the distance between $place1 and $place2 was",
+            sign=">",
+            expression=Q_("20 miles"),
+        )
+        comparison_km = Comparison(
+            "the distance between $place1 and $place2 was",
+            sign=">",
+            expression=Q_("30 kilometers"),
+        )
+        result = comparison.convert_other_quantity(comparison_km.expression)
+        assert Q_("18 miles") < result < Q_("19 miles")

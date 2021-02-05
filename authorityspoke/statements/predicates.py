@@ -549,9 +549,6 @@ class Comparison(Predicate):
         if not isinstance(other, Comparison):
             return False
 
-        if isinstance(self.expression, date) != isinstance(other.expression, date):
-            return False
-
         if isinstance(self.expression, ureg.Quantity):
             if not isinstance(other.expression, ureg.Quantity):
                 return False
@@ -561,13 +558,19 @@ class Comparison(Predicate):
             return False
         return True
 
+    def convert_other_quantity(self, other_quantity: ureg.Quantity) -> ureg.Quantity:
+        """Convert other's quantity to match dimensional units of self's quantity."""
+        if not isinstance(self.expression, ureg.Quantity):
+            raise TypeError(f"{other_quantity} is not a Pint Quantity.")
+        return other_quantity.to(self.expression.units)
+
     def implies(self, other: Any) -> bool:
 
         if not super().implies(other):
             return False
 
-        if not (self.expression and other.expression and self.sign and other.sign):
-            return False
+        if isinstance(self.expression, date):
+            return self.includes_other_date(other)
 
         return self.includes_other_quantity(other)
 
@@ -591,6 +594,8 @@ class Comparison(Predicate):
             return False
         if self._contradicts_predicate(other):
             return True
+        if isinstance(self.expression, date):
+            return self.excludes_other_date(other)
         return self.excludes_other_quantity(other)
 
     def negated(self) -> Comparison:
@@ -624,6 +629,24 @@ class Comparison(Predicate):
         }
         return f"{expand[self.sign]} {self.expression}"
 
+    def excludes_other_date(self, other: Comparison) -> bool:
+        if not isinstance(other.expression, date):
+            return False
+        if not isinstance(self.expression, date):
+            return False
+
+        if self.expression > other.expression:
+            if "<" not in self.sign and ">" not in other.sign:
+                return True
+        if self.expression < other.expression:
+            if ">" not in self.sign and "<" not in other.sign:
+                return True
+        if self.expression == other.expression:
+            if ("=" in self.sign) != ("=" in other.sign):
+                return True
+            return {self.sign, other.sign} == {"<", ">"}
+        return False
+
     def excludes_other_quantity(self, other: Comparison) -> bool:
         """Test if quantity ranges in self and other are non-overlapping."""
         if not self.consistent_dimensionality(other):
@@ -641,8 +664,36 @@ class Comparison(Predicate):
             return {self.sign, other.sign} == {"<", ">"}
         return False
 
+    def includes_other_date(self, other: Comparison) -> bool:
+        if not isinstance(other.expression, date):
+            return False
+        if not isinstance(self.expression, date):
+            return False
+
+        if (
+            (self.expression < other.expression)
+            and ("<" in self.sign or "=" in self.sign)
+            and ("<" in other.sign)
+        ):
+            return True
+        if (
+            (self.expression > other.expression)
+            and (">" in self.sign or "=" in self.sign)
+            and (">" in other.sign)
+        ):
+            return True
+        if "=" in self.sign:
+            if ("<" in other.sign and self.expression < other.expression) or (
+                ">" in other.sign and self.expression > other.expression
+            ):
+                return True
+        return self.expression == other.expression and (
+            ("=" in self.sign) == ("=" in other.sign)
+        )
+
     def includes_other_quantity(self, other: Comparison) -> bool:
         """Test if the range of quantities mentioned in self is a subset of other's."""
+
         if not self.consistent_dimensionality(other):
             return False
 
