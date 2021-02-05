@@ -6,8 +6,7 @@ Unlike most other ``authorityspoke`` classes, :class:`Opinion`\s are not frozen.
 
 from __future__ import annotations
 
-from collections import defaultdict
-from itertools import compress, zip_longest
+from itertools import zip_longest
 from typing import Any, Dict, Iterable, Iterator, List, NamedTuple
 from typing import Optional, Sequence, Union
 

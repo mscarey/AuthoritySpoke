@@ -1,12 +1,9 @@
 r""":class:`Factor`\s, or inputs and outputs of legal :class:`.Rule`\s."""
 
 from __future__ import annotations
-from copy import deepcopy
-
 from dataclasses import field
 
-from typing import Any, Callable, Dict, Iterable, Iterator, List
-from typing import Optional, Sequence, Set, Tuple, TypeVar, Union
+from typing import Dict, List, Optional, Union
 
 from legislice import Enactment
 
@@ -51,7 +48,7 @@ class FactorIndex(Dict[str, Factor]):
 
         If the Factor has no name attr, use its str as key instead.
         """
-        if value.__dict__.get("name"):
+        if value.name:
             self.insert(key=value.name, value=value)
             return None
         key = str(value)

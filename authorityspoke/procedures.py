@@ -222,7 +222,7 @@ class Procedure(Comparable):
             with :meth:`.Factor.means` or :meth:`.Factor.__ge__`.
         """
         if self.generic:
-            return [self]
+            return {str(self): self}
         generic_dict = {
             str(generic): generic
             for factor in self.factors_all
