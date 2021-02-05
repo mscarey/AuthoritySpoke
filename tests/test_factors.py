@@ -2,9 +2,8 @@ import operator
 
 import pytest
 
-from authorityspoke.statements.comparable import ContextRegister, means
+from authorityspoke.statements.comparable import ContextRegister, FactorSequence, means
 from authorityspoke.statements.entities import Entity
-from authorityspoke.factors import Factor, FactorSequence
 from authorityspoke.facts import Fact, build_fact
 from authorityspoke.statements.predicates import Comparison, Q_, Predicate
 

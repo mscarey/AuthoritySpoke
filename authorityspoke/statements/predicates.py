@@ -643,8 +643,6 @@ class Comparison(Predicate):
 
     def includes_other_quantity(self, other: Comparison) -> bool:
         """Test if the range of quantities mentioned in self is a subset of other's."""
-        if not self.expression or not other.expression:
-            return bool(self.expression)
         if not self.consistent_dimensionality(other):
             return False
 

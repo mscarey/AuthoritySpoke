@@ -2,12 +2,13 @@ from copy import deepcopy
 import logging
 import pytest
 
-from authorityspoke.statements.entities import Entity
-from authorityspoke.factors import ContextRegister, FactorSequence
-from authorityspoke.statements.groups import ComparableGroup
-from authorityspoke.procedures import Procedure
-from authorityspoke.statements.predicates import Comparison, Predicate, Q_
 from authorityspoke.facts import Fact
+from authorityspoke.procedures import Procedure
+
+from authorityspoke.statements.comparable import ContextRegister, FactorSequence
+from authorityspoke.statements.entities import Entity
+from authorityspoke.statements.groups import ComparableGroup
+from authorityspoke.statements.predicates import Comparison, Predicate, Q_
 
 
 class TestProcedures:

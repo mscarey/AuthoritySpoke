@@ -4,12 +4,12 @@ from typing import ClassVar, Iterator, List, Optional, Sequence, Tuple, Union
 
 from anchorpoint.textselectors import TextQuoteSelector
 
-
-from authorityspoke.factors import Factor, ContextRegister
-from authorityspoke.statements.formatting import indented, wrapped
+from authorityspoke.factors import Factor
+from authorityspoke.statements.formatting import indented
 
 from authorityspoke.statements.comparable import (
     Comparable,
+    ContextRegister,
     FactorSequence,
 )
 from authorityspoke.statements.predicates import Predicate

@@ -2,12 +2,10 @@ import operator
 
 import pytest
 
-from authorityspoke.statements.comparable import ContextRegister, means
+from authorityspoke.statements.comparable import ContextRegister, FactorSequence, means
 from authorityspoke.statements.entities import Entity
 from authorityspoke.statements.predicates import Comparison, Q_, Predicate
 from authorityspoke.statements.statements import Statement
-
-from authorityspoke.factors import FactorSequence
 
 
 class TestStatements:

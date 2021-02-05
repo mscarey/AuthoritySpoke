@@ -1,7 +1,6 @@
-from authorityspoke.statements.comparable import means
+from authorityspoke.statements.comparable import ContextRegister, means
 from authorityspoke.statements.entities import Entity
 from authorityspoke.statements.explanations import Explanation
-from authorityspoke.factors import ContextRegister
 from authorityspoke.io.readers import read_fact
 from authorityspoke.io.text_expansion import expand_shorthand
 

@@ -4,17 +4,14 @@ import os
 import pytest
 
 from dotenv import load_dotenv
-from legislice import Enactment
 from legislice.download import Client
 
-from authorityspoke.io.downloads import FakeClient
+from authorityspoke.holdings import Holding
+
+from authorityspoke.statements.comparable import ContextRegister, FactorSequence
 from authorityspoke.statements.entities import Entity
-from authorityspoke.evidence import Evidence
-from authorityspoke.statements.explanations import Explanation
 from authorityspoke.statements.predicates import Predicate
 from authorityspoke.statements.statements import Statement
-from authorityspoke.factors import ContextRegister, FactorSequence
-from authorityspoke.holdings import Holding
 
 
 load_dotenv()

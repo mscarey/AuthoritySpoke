@@ -9,11 +9,11 @@ from anchorpoint.textselectors import TextQuoteSelector
 from dotenv import load_dotenv
 import pytest
 
-from authorityspoke import Enactment
-from authorityspoke.io.downloads import download_case, FakeClient
-from authorityspoke.io.readers import read_decision
-from authorityspoke.factors import ContextRegister
 from authorityspoke.facts import Fact
+from authorityspoke.io.downloads import download_case
+from authorityspoke.io.readers import read_decision
+
+from authorityspoke.statements.comparable import ContextRegister
 from authorityspoke.statements.entities import Entity
 from authorityspoke.statements.predicates import Comparison
 

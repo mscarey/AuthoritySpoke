@@ -870,7 +870,7 @@ class Comparable(ABC):
         """
         yield matches
         gen = self.term_permutations()
-        unchanged_permutation = next(gen)
+        _ = next(gen)  # unchanged permutation
         already_returned: List[ContextRegister] = [matches]
 
         for term_permutation in gen:
@@ -995,7 +995,9 @@ class ContextRegister:
 
     @classmethod
     def from_lists(
-        cls, keys: Sequence[Comparable], values: Sequence[Comparable]
+        cls,
+        keys: Union[FactorSequence, Sequence[Comparable]],
+        values: Union[FactorSequence, Sequence[Comparable]],
     ) -> ContextRegister:
         pairs = zip_longest(keys, values)
         new = cls()

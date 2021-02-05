@@ -1,6 +1,7 @@
-from authorityspoke.factors import FactorSequence
 from authorityspoke.evidence import Evidence, Exhibit
 from authorityspoke.facts import build_fact
+
+from authorityspoke.statements.comparable import FactorSequence
 
 
 class TestEvidence:
