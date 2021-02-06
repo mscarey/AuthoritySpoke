@@ -16,6 +16,9 @@ from typing import Any, ClassVar, Dict, Iterable, Mapping
 from typing import List, Optional, Sequence, Union
 
 from pint import UnitRegistry, Quantity
+from slugify import slugify
+from sympy import Poly, Symbol
+from sympy.solvers.inequalities import solve_rational_inequalities
 
 from authorityspoke.statements.comparable import Comparable, FactorSequence
 
@@ -453,13 +456,14 @@ class Comparison(Predicate):
     opposite_comparisons: ClassVar[Dict[str, str]] = {
         ">=": "<",
         "==": "!=",
-        "<>": "=",
+        "!=": "=",
         "<=": ">",
-        "=": "!=",
+        "==": "!=",
+        "<>": "=",
         ">": "<=",
         "<": ">=",
     }
-    normalized_comparisons: ClassVar[Dict[str, str]] = {"==": "=", "!=": "<>"}
+    normalized_comparisons: ClassVar[Dict[str, str]] = {"=": "==", "<>": "!="}
 
     def __init__(
         self,
@@ -475,6 +479,8 @@ class Comparison(Predicate):
         context term, normalizes it by changing "were" to "was".
         """
         super().__init__(template, truth=truth)
+        if sign in self.normalized_comparisons:
+            sign = self.normalized_comparisons[sign]
         self.sign = sign
         self.expression = self.read_quantity(expression)
 
@@ -491,7 +497,7 @@ class Comparison(Predicate):
             raise ValueError(
                 "A Comparison's template string must end "
                 "with the word 'was' to signal the comparison with the quantity. "
-                f"The word 'was' is not the end of the string '{self.template}'."
+                f"The word 'was' is not the end of the string '{self.template.template}'."
             )
 
     def __repr__(self):
@@ -696,6 +702,25 @@ class Comparison(Predicate):
 
         if not self.consistent_dimensionality(other):
             return False
+
+        if isinstance(other.expression, ureg.Quantity):
+            right_quantity = self.convert_other_quantity(other.expression)
+            x = Symbol(name=slugify(self.template.template))
+            # Sympy needs ratios here: the first Poly is the numerator, and
+            # the second Poly is the denominator 1 (specifying the variable x
+            # as the other parameter because it isn't in the denominator).
+            left_inequality = (
+                (Poly(x - self.expression.magnitude), Poly(1, x)),
+                self.sign,
+            )
+            right_inequality = (
+                (Poly(x - right_quantity.magnitude), Poly(1, x)),
+                other.sign,
+            )
+            solution = solve_rational_inequalities(
+                [[left_inequality, right_inequality]]
+            )
+            return bool(solution)
 
         if (
             (self.expression < other.expression)

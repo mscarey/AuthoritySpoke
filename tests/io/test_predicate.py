@@ -40,7 +40,7 @@ class TestPredicateLoad:
                 "expression": "35 feet",
             }
         )
-        assert p7.sign == "<>"
+        assert p7.sign == "!="
 
     def test_load_and_find_quantity(self):
         schema = schemas.PredicateSchema()
@@ -60,7 +60,7 @@ class TestPredicateLoad:
                 "truth": True,
             }
         )
-        assert p7.sign == "<>"
+        assert p7.sign == "!="
 
     def test_load_and_normalize_comparison(self):
         schema = schemas.PredicateSchema()
@@ -72,7 +72,7 @@ class TestPredicateLoad:
                 "expression": "35 feet",
             }
         )
-        assert p7.sign == "<>"
+        assert p7.sign == "!="
 
     def test_read_quantity(self):
         quantity = Comparison.read_quantity("35 feet")

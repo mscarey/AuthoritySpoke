@@ -193,8 +193,8 @@ class PredicateSchema(ExpandableSchema):
     ) -> Tuple[str, Optional[str], Optional[Union[ureg.Quantity, int, float]]]:
         """Find any reference to a quantity in the content text."""
         for comparison in {
-            **Comparison.normalized_comparisons,
             **Comparison.opposite_comparisons,
+            **Comparison.normalized_comparisons,
         }:
             if comparison in content:
                 content, quantity_text = content.split(comparison)
