@@ -17,7 +17,8 @@ from typing import List, Optional, Sequence, Union
 
 from pint import UnitRegistry, Quantity
 from slugify import slugify
-from sympy import Poly, Symbol
+import sympy
+from sympy import Integer, Float, Interval, Poly, Symbol, oo, sympify
 from sympy.solvers.inequalities import solve_rational_inequalities
 
 from authorityspoke.statements.comparable import Comparable, FactorSequence
@@ -575,10 +576,34 @@ class Comparison(Predicate):
         if not super().implies(other):
             return False
 
+        if isinstance(self.expression, ureg.Quantity):
+            return self.includes_other_quantity(other)
+
         if isinstance(self.expression, date):
             return self.includes_other_date(other)
 
-        return self.includes_other_quantity(other)
+        return self.includes_other_number(other)
+
+    @property
+    def interval(self) -> Union[Float, Integer, Interval, sympy.Union]:
+        if self.sign == "==":
+            return sympify(self.magnitude)
+        elif ">" in self.sign:
+            return Interval(self.magnitude, oo, left_open=bool("=" not in self.sign))
+        elif "<" in self.sign:
+            return Interval(-oo, self.magnitude, right_open=bool("=" not in self.sign))
+        return sympy.Union(
+            Interval(-oo, self.magnitude, right_open=True),
+            Interval(self.magnitude, oo, left_open=True),
+        )  # self.sign == "!="
+
+    @property
+    def magnitude(self) -> Union[int, float]:
+        if isinstance(self.expression, ureg.Quantity):
+            return self.expression.magnitude
+        elif isinstance(self.expression, date):
+            return int(self.expression.strftime("%Y%m%d"))
+        return self.expression
 
     def means(self, other: Any) -> bool:
 
@@ -600,9 +625,14 @@ class Comparison(Predicate):
             return False
         if self._contradicts_predicate(other):
             return True
+
+        if isinstance(self.expression, ureg.Quantity):
+            return self.excludes_other_quantity(other)
+
         if isinstance(self.expression, date):
             return self.excludes_other_date(other)
-        return self.excludes_other_quantity(other)
+
+        return self.excludes_other_number(other)
 
     def negated(self) -> Comparison:
         """Copy ``self``, with the opposite truth value."""
@@ -635,110 +665,93 @@ class Comparison(Predicate):
         }
         return f"{expand[self.sign]} {self.expression}"
 
-    def excludes_other_date(self, other: Comparison) -> bool:
+    def compare_other_magnitude(
+        self,
+        self_magnitude: Union[int, float],
+        other_magnitude: Union[int, float],
+        other_sign: str,
+    ):
+        x = Symbol(name=slugify(self.template.template))
+        # Sympy needs ratios here: the first Poly is the numerator, and
+        # the second Poly is the denominator 1 (specifying the variable x
+        # as the other parameter because it isn't in the denominator).
+        left_inequality = (
+            (Poly(x - self_magnitude), Poly(1, x)),
+            self.sign,
+        )
+        right_inequality = (
+            (Poly(x - other_magnitude), Poly(1, x)),
+            other_sign,
+        )
+        solution = solve_rational_inequalities([[left_inequality, right_inequality]])
+        return solution
+
+    def compare_other_date(self, other: Comparison) -> Union[bool, Interval]:
         if not isinstance(other.expression, date):
             return False
         if not isinstance(self.expression, date):
             return False
 
-        if self.expression > other.expression:
-            if "<" not in self.sign and ">" not in other.sign:
-                return True
-        if self.expression < other.expression:
-            if ">" not in self.sign and "<" not in other.sign:
-                return True
-        if self.expression == other.expression:
-            if ("=" in self.sign) != ("=" in other.sign):
-                return True
-            return {self.sign, other.sign} == {"<", ">"}
-        return False
+        result = self.compare_other_magnitude(
+            self_magnitude=int(self.expression.strftime("%Y%m%d")),
+            other_magnitude=int(other.expression.strftime("%Y%m%d")),
+            other_sign=other.sign,
+        )
+        return result
 
-    def excludes_other_quantity(self, other: Comparison) -> bool:
-        """Test if quantity ranges in self and other are non-overlapping."""
+    def compare_other_number(self, other: Comparison) -> Union[bool, Interval]:
+        if not isinstance(other.expression, (float, int)):
+            return False
+        if not isinstance(self.expression, (float, int)):
+            return False
+
+        result = self.compare_other_magnitude(
+            self_magnitude=self.expression,
+            other_magnitude=other.expression,
+            other_sign=other.sign,
+        )
+        return result
+
+    def compare_other_quantity(self, other: Comparison) -> Union[bool, Interval]:
         if not self.consistent_dimensionality(other):
             return False
 
-        if self.expression > other.expression:
-            if "<" not in self.sign and ">" not in other.sign:
-                return True
-        if self.expression < other.expression:
-            if ">" not in self.sign and "<" not in other.sign:
-                return True
-        if self.expression == other.expression:
-            if ("=" in self.sign) != ("=" in other.sign):
-                return True
-            return {self.sign, other.sign} == {"<", ">"}
-        return False
-
-    def includes_other_date(self, other: Comparison) -> bool:
-        if not isinstance(other.expression, date):
-            return False
-        if not isinstance(self.expression, date):
-            return False
-
-        if (
-            (self.expression < other.expression)
-            and ("<" in self.sign or "=" in self.sign)
-            and ("<" in other.sign)
-        ):
-            return True
-        if (
-            (self.expression > other.expression)
-            and (">" in self.sign or "=" in self.sign)
-            and (">" in other.sign)
-        ):
-            return True
-        if "=" in self.sign:
-            if ("<" in other.sign and self.expression < other.expression) or (
-                ">" in other.sign and self.expression > other.expression
-            ):
-                return True
-        return self.expression == other.expression and (
-            ("=" in self.sign) == ("=" in other.sign)
+        right_quantity = self.convert_other_quantity(other.expression)
+        solution = self.compare_other_magnitude(
+            self_magnitude=self.expression.magnitude,
+            other_magnitude=right_quantity.magnitude,
+            other_sign=other.sign,
         )
+        return solution
+
+    def excludes_other_date(self, other: Comparison) -> bool:
+        interval = self.compare_other_date(other)
+        return interval is False
+
+    def excludes_other_number(self, other: Comparison) -> bool:
+        interval = self.compare_other_number(other)
+        return interval is False
+
+    def excludes_other_quantity(self, other: Comparison) -> bool:
+        """Test if quantity ranges in self and other are non-overlapping."""
+        interval = self.compare_other_quantity(other)
+        return interval is False
 
     def includes_other_quantity(self, other: Comparison) -> bool:
         """Test if the range of quantities mentioned in self is a subset of other's."""
 
-        if not self.consistent_dimensionality(other):
-            return False
+        interval = self.compare_other_quantity(other)
+        # TODO: needs to test whether self's Interval is the same as the combined Interval
+        return bool(interval)
 
-        if isinstance(other.expression, ureg.Quantity):
-            right_quantity = self.convert_other_quantity(other.expression)
-            x = Symbol(name=slugify(self.template.template))
-            # Sympy needs ratios here: the first Poly is the numerator, and
-            # the second Poly is the denominator 1 (specifying the variable x
-            # as the other parameter because it isn't in the denominator).
-            left_inequality = (
-                (Poly(x - self.expression.magnitude), Poly(1, x)),
-                self.sign,
-            )
-            right_inequality = (
-                (Poly(x - right_quantity.magnitude), Poly(1, x)),
-                other.sign,
-            )
-            solution = solve_rational_inequalities(
-                [[left_inequality, right_inequality]]
-            )
-            return bool(solution)
+    def includes_other_number(self, other: Comparison) -> bool:
+        interval = self.compare_other_number(other)
 
-        if (
-            (self.expression < other.expression)
-            and ("<" in self.sign or "=" in self.sign)
-            and ("<" in other.sign)
-        ):
-            return True
-        if (
-            (self.expression > other.expression)
-            and (">" in self.sign or "=" in self.sign)
-            and (">" in other.sign)
-        ):
-            return True
-        if "=" in self.sign:
-            if ("<" in other.sign and self.expression < other.expression) or (
-                ">" in other.sign and self.expression > other.expression
-            ):
-                return True
-        return self.expression == other.expression and (
-            ("=" in self.sign) == ("=" in other.sign)
-        )
+        # TODO: needs to test whether self's Interval is the same as the combined Interval
+        return bool(interval)
+
+    def includes_other_date(self, other: Comparison) -> bool:
+        interval = self.compare_other_date(other)
+
+        # TODO: needs to test whether self's Interval is the same as the combined Interval
+        return bool(interval)

@@ -1,5 +1,8 @@
 from datetime import date
 import pytest
+import sympy
+from sympy import Interval, oo
+
 
 from authorityspoke.statements.entities import Entity
 from authorityspoke.statements.predicates import Predicate, Comparison, Q_
@@ -13,6 +16,24 @@ class TestComparisons:
                 sign=">>",
                 expression=Q_("160 centimeters"),
             )
+
+    def test_comparison_interval(self):
+        comparison = Comparison(
+            "the distance between $place1 and $place2 was",
+            sign=">",
+            expression=Q_("20 miles"),
+        )
+        assert comparison.interval == Interval(20, oo, left_open=True)
+
+    def test_comparison_not_equal(self):
+        comparison = Comparison(
+            "the distance between $place1 and $place2 was",
+            sign="!=",
+            expression=Q_("20 miles"),
+        )
+        assert comparison.interval == sympy.Union(
+            Interval(-oo, 20, right_open=True), Interval(20, oo, left_open=True)
+        )
 
 
 class TestPredicates:
