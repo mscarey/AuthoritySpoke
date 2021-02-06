@@ -234,10 +234,10 @@ class TestImplication:
         assert make_predicate["p_murder"] > make_predicate["p_murder_whether"]
         assert make_predicate["p_murder_false"] > make_predicate["p_murder_whether"]
 
-    def test_no_implication_by_equal_quantity(self, make_predicate):
+    def test_no_implication_by_exact_quantity(self, make_predicate):
         assert not make_predicate["p_quantity=3"] > make_predicate["p_quantity>5"]
 
-    def test_no_implication_of_equal_quantity(self, make_predicate):
+    def test_no_implication_of_exact_quantity(self, make_predicate):
         assert not make_predicate["p_quantity>5"] > make_predicate["p_quantity=3"]
 
     def test_no_implication_by_greater_or_equal_quantity(self, make_predicate):

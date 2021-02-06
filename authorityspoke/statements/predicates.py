@@ -18,7 +18,8 @@ from typing import List, Optional, Sequence, Union
 from pint import UnitRegistry, Quantity
 from slugify import slugify
 import sympy
-from sympy import Integer, Float, Interval, Poly, Symbol, oo, sympify
+from sympy import Eq, Integer, Float, Interval, Poly, Symbol, oo, sympify
+from sympy.sets import EmptySet, FiniteSet
 from sympy.solvers.inequalities import solve_rational_inequalities
 
 from authorityspoke.statements.comparable import Comparable, FactorSequence
@@ -585,17 +586,18 @@ class Comparison(Predicate):
         return self.includes_other_number(other)
 
     @property
-    def interval(self) -> Union[Float, Integer, Interval, sympy.Union]:
+    def interval(self) -> Union[FiniteSet, Interval, sympy.Union]:
         if self.sign == "==":
-            return sympify(self.magnitude)
+            return FiniteSet(self.magnitude)
         elif ">" in self.sign:
             return Interval(self.magnitude, oo, left_open=bool("=" not in self.sign))
         elif "<" in self.sign:
             return Interval(-oo, self.magnitude, right_open=bool("=" not in self.sign))
+        # self.sign == "!="
         return sympy.Union(
             Interval(-oo, self.magnitude, right_open=True),
             Interval(self.magnitude, oo, left_open=True),
-        )  # self.sign == "!="
+        )
 
     @property
     def magnitude(self) -> Union[int, float]:
@@ -670,7 +672,7 @@ class Comparison(Predicate):
         self_magnitude: Union[int, float],
         other_magnitude: Union[int, float],
         other_sign: str,
-    ):
+    ) -> Union[sympy.Union, Interval, EmptySet]:
         x = Symbol(name=slugify(self.template.template))
         # Sympy needs ratios here: the first Poly is the numerator, and
         # the second Poly is the denominator 1 (specifying the variable x
@@ -686,20 +688,24 @@ class Comparison(Predicate):
         solution = solve_rational_inequalities([[left_inequality, right_inequality]])
         return solution
 
-    def compare_other_date(self, other: Comparison) -> Union[bool, Interval]:
+    def compare_other_date(
+        self, other: Comparison
+    ) -> Union[bool, EmptySet, Interval, sympy.Union]:
         if not isinstance(other.expression, date):
             return False
         if not isinstance(self.expression, date):
             return False
 
         result = self.compare_other_magnitude(
-            self_magnitude=int(self.expression.strftime("%Y%m%d")),
-            other_magnitude=int(other.expression.strftime("%Y%m%d")),
+            self_magnitude=self.magnitude,
+            other_magnitude=other.magnitude,
             other_sign=other.sign,
         )
         return result
 
-    def compare_other_number(self, other: Comparison) -> Union[bool, Interval]:
+    def compare_other_number(
+        self, other: Comparison
+    ) -> Union[bool, EmptySet, Interval, sympy.Union]:
         if not isinstance(other.expression, (float, int)):
             return False
         if not isinstance(self.expression, (float, int)):
@@ -712,7 +718,9 @@ class Comparison(Predicate):
         )
         return result
 
-    def compare_other_quantity(self, other: Comparison) -> Union[bool, Interval]:
+    def compare_other_quantity(
+        self, other: Comparison
+    ) -> Union[bool, EmptySet, Interval, sympy.Union]:
         if not self.consistent_dimensionality(other):
             return False
 
@@ -726,32 +734,29 @@ class Comparison(Predicate):
 
     def excludes_other_date(self, other: Comparison) -> bool:
         interval = self.compare_other_date(other)
-        return interval is False
+        return interval == EmptySet
 
     def excludes_other_number(self, other: Comparison) -> bool:
         interval = self.compare_other_number(other)
-        return interval is False
+        return interval == EmptySet
 
     def excludes_other_quantity(self, other: Comparison) -> bool:
         """Test if quantity ranges in self and other are non-overlapping."""
         interval = self.compare_other_quantity(other)
-        return interval is False
+        return interval == EmptySet
 
     def includes_other_quantity(self, other: Comparison) -> bool:
         """Test if the range of quantities mentioned in self is a subset of other's."""
 
         interval = self.compare_other_quantity(other)
-        # TODO: needs to test whether self's Interval is the same as the combined Interval
-        return bool(interval)
+        return interval != EmptySet and Eq(interval, self.interval)
 
     def includes_other_number(self, other: Comparison) -> bool:
         interval = self.compare_other_number(other)
 
-        # TODO: needs to test whether self's Interval is the same as the combined Interval
-        return bool(interval)
+        return interval != EmptySet and Eq(interval, self.interval)
 
     def includes_other_date(self, other: Comparison) -> bool:
         interval = self.compare_other_date(other)
 
-        # TODO: needs to test whether self's Interval is the same as the combined Interval
-        return bool(interval)
+        return interval != EmptySet and Eq(interval, self.interval)
