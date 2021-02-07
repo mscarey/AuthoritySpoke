@@ -467,9 +467,11 @@ class TestContradiction:
             make_rule["h_output_distance_less"], context=stockpile_means_stockpile
         )
 
-    def test_contradicts_if_valid_all_vs_all(self, make_rule):
-
+    @pytest.mark.xfail(reason="Passed before due to bug.")
+    def test_contradicts_overlapping_ranges_all_vs_all(self, make_rule):
         """
+        Test that contradictory assertions about overlapping ranges are contradictory.
+
         The assertion here is:
         In ALL cases where the distance between A and B is less than 35 feet
         the court MUST find that
@@ -480,12 +482,25 @@ class TestContradiction:
         In ALL cases where the distance between A and B is more than 20 feet
         the court MAY find that
         A is not in the curtilage of B
+
+        This test passed before only because of a bug.
+        Should it pass?
+        Or is it a mistake to assume there are any cases where the distance is
+        between 20 and 35 feet?
         """
 
         assert make_rule["h_near_means_curtilage_ALL_MUST"].contradicts(
             make_rule["h_far_means_no_curtilage_ALL"]
         )
         assert make_rule["h_far_means_no_curtilage_ALL"].contradicts(
+            make_rule["h_near_means_curtilage_ALL_MUST"]
+        )
+
+    def test_contradicts_exact_quantity_all_vs_all(self, make_rule):
+        assert make_rule["h_near_means_curtilage_ALL_MUST"].contradicts(
+            make_rule["h_exact_means_no_curtilage_ALL"]
+        )
+        assert make_rule["h_exact_means_no_curtilage_ALL"].contradicts(
             make_rule["h_near_means_curtilage_ALL_MUST"]
         )
 

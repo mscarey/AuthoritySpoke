@@ -1022,6 +1022,9 @@ def make_procedure(make_evidence, make_factor, watt_factor) -> Dict[str, Procedu
         "c_near_means_curtilage_even_if": Procedure(
             outputs=(f["f10"],), inputs=(f["f7"]), despite=(f["f8"])
         ),
+        "c_exact_means_no_curtilage": Procedure(
+            outputs=(f["f10_false"],), inputs=(f["f8_exact"])
+        ),
         "c_far_means_no_curtilage": Procedure(
             outputs=(f["f10_false"],), inputs=(f["f8"])
         ),
@@ -1210,6 +1213,9 @@ def make_rule(
             c["c_nearer_means_curtilage"], enactments=e_search_clause, mandatory=True
         ),
         "h_far_means_no_curtilage": Rule(c["c_far_means_no_curtilage"]),
+        "h_exact_means_no_curtilage_ALL": Rule(
+            c["c_exact_means_no_curtilage"], universal=True
+        ),
         "h_far_means_no_curtilage_ALL": Rule(
             c["c_far_means_no_curtilage"], universal=True
         ),
