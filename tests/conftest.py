@@ -1026,7 +1026,7 @@ def make_procedure(make_evidence, make_factor, watt_factor) -> Dict[str, Procedu
             outputs=(f["f10_false"],), inputs=(f["f8_exact"])
         ),
         "c_far_means_no_curtilage": Procedure(
-            outputs=(f["f10_false"],), inputs=(f["f8"])
+            outputs=(f["f10_false"],), inputs=(f["f8"]), despite=(f["f7"])
         ),
         "c3_fewer_inputs": Procedure(
             outputs=e["crime_absent"],

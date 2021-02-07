@@ -467,7 +467,6 @@ class TestContradiction:
             make_rule["h_output_distance_less"], context=stockpile_means_stockpile
         )
 
-    @pytest.mark.xfail(reason="Passed before due to bug.")
     def test_contradicts_overlapping_ranges_all_vs_all(self, make_rule):
         """
         Test that contradictory assertions about overlapping ranges are contradictory.
@@ -482,10 +481,12 @@ class TestContradiction:
         In ALL cases where the distance between A and B is more than 20 feet
         the court MAY find that
         A is not in the curtilage of B
+        EVEN IF the distance between A and B is less than 35 feet
 
         This test passed before only because of a bug.
-        Should it pass?
-        Or is it a mistake to assume there are any cases where the distance is
+        Now it passes because of the addition of the EVEN IF clause.
+        Should it pass without the EVEN IF clause?
+        Or would it be a mistake to assume there are any cases where the distance is
         between 20 and 35 feet?
         """
 
