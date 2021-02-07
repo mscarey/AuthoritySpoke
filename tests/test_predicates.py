@@ -291,8 +291,8 @@ class TestImplication:
 
 
 class TestContradiction:
-    def test_predicate_contradictions(self, make_predicate):
-        assert make_predicate["p7"].contradicts(make_predicate["p7_true"])
+    def test_predicate_no_contradictions(self, make_predicate):
+        assert not make_predicate["p7"].contradicts(make_predicate["p7_true"])
         assert not make_predicate["p1"].contradicts(make_predicate["p1_again"])
         assert not make_predicate["p3"].contradicts(make_predicate["p7"])
 

@@ -83,7 +83,7 @@ class TestPredicateLoad:
         statement = schema.load(
             {"content": "$person's favorite number was", "expression": 42}
         )
-        assert statement.sign == "="
+        assert statement.sign == "=="
         assert "$person's favorite number was exactly equal to 42" in str(statement)
         assert len(statement) == 1
 

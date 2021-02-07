@@ -483,9 +483,9 @@ class TestContradiction:
         """
 
         assert make_rule["h_near_means_curtilage_ALL_MUST"].contradicts(
-            make_rule["h_far_means_no_curtilage"]
+            make_rule["h_far_means_no_curtilage_ALL"]
         )
-        assert make_rule["h_far_means_no_curtilage"].contradicts(
+        assert make_rule["h_far_means_no_curtilage_ALL"].contradicts(
             make_rule["h_near_means_curtilage_ALL_MUST"]
         )
 

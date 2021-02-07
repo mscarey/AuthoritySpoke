@@ -1211,7 +1211,7 @@ def make_rule(
         ),
         "h_far_means_no_curtilage": Rule(c["c_far_means_no_curtilage"]),
         "h_far_means_no_curtilage_ALL": Rule(
-            c["c_far_means_no_curtilage"], enactments=e_search_clause, universal=True
+            c["c_far_means_no_curtilage"], universal=True
         ),
         "h_output_distance_less": Rule(
             c["c_output_distance_less"], universal=True, mandatory=True
