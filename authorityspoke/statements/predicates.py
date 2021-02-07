@@ -31,6 +31,13 @@ Q_ = ureg.Quantity
 class StatementTemplate(Template):
     def __init__(self, template: str, make_singular: bool = True) -> None:
         super().__init__(template)
+        placeholders = [
+            m.group("named") or m.group("braced")
+            for m in self.pattern.finditer(self.template)
+            if m.group("named") or m.group("braced")
+        ]
+        self._placeholders = list(dict.fromkeys(placeholders))
+
         if make_singular:
             self.make_content_singular()
 
@@ -39,7 +46,7 @@ class StatementTemplate(Template):
 
     def make_content_singular(self) -> None:
         """Convert template text for self.context to singular "was"."""
-        for placeholder in self.get_placeholders():
+        for placeholder in self.placeholders:
             named_pattern = "$" + placeholder + " were"
             braced_pattern = "${" + placeholder + "} were"
             self.template = self.template.replace(
@@ -57,7 +64,7 @@ class StatementTemplate(Template):
         Does not modify this object's template attribute.
         """
         result = self.template[:]
-        placeholders = self.get_placeholders()
+        placeholders = self.placeholders
         self._check_number_of_terms(placeholders, context)
         for idx, factor in enumerate(context):
             if factor.__dict__.get("plural") is True:
@@ -71,27 +78,15 @@ class StatementTemplate(Template):
                 )
         return result
 
-    def get_placeholders(self) -> List[str]:
-        r"""
-        Count bracket pairs in ``self.template``.
-
-        :returns:
-            the strings to be replaced with :class:`.Comparable`\s
-            to fill in the blanks in ``self.template``.
-        """
-
-        placeholders = [
-            m.group("named") or m.group("braced")
-            for m in self.pattern.finditer(self.template)
-            if m.group("named") or m.group("braced")
-        ]
-        return list(dict.fromkeys(placeholders))
+    @property
+    def placeholders(self) -> List[str]:
+        return self._placeholders
 
     def get_term_sequence_from_mapping(
         self, term_mapping: Mapping[str, Comparable]
     ) -> Sequence[Comparable]:
         """Get an ordered list of terms from a mapping of placeholder names to terms."""
-        placeholders = self.get_placeholders()
+        placeholders = self.placeholders
         result = [term_mapping[placeholder] for placeholder in placeholders]
         return FactorSequence(result)
 
@@ -115,9 +110,8 @@ class StatementTemplate(Template):
             a list of context :class:`.factors.Factor`/s, in the same
             order they appear in the template string.
         """
-        placeholders = self.get_placeholders()
-        self._check_number_of_terms(placeholders, context)
-        return dict(zip(placeholders, context))
+        self._check_number_of_terms(self.placeholders, context)
+        return dict(zip(self.placeholders, context))
 
     def mapping_placeholder_to_term_name(
         self, context: Sequence[Comparable]
@@ -215,7 +209,7 @@ class Predicate:
         return self.template.template
 
     def content_without_placeholders(self) -> str:
-        changes = {p: "{}" for p in self.template.get_placeholders()}
+        changes = {p: "{}" for p in self.template.placeholders}
         return self.template.substitute(**changes)
 
     def content_with_terms(
@@ -348,7 +342,7 @@ class Predicate:
             in the ``self.content`` string.
         """
 
-        return len(set(self.template.get_placeholders()))
+        return len(set(self.template.placeholders))
 
     def negated(self) -> Predicate:
         """Copy ``self``, with the opposite truth value."""
@@ -365,7 +359,7 @@ class Predicate:
         they've been labeled as interchangeable with one another.
         """
 
-        without_duplicates = self.template.get_placeholders()
+        without_duplicates = self.template.placeholders
         result = {p: {i} for i, p in enumerate(without_duplicates)}
 
         for index, placeholder in enumerate(without_duplicates):
