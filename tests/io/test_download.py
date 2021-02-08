@@ -48,7 +48,6 @@ class TestDownload:
 
     @pytest.mark.vcr
     def test_error_bad_cap_id(self):
-        to_file = "lotus_h.json"
         with pytest.raises(ValueError):
             download_case(cap_id=99999999)
 
@@ -59,7 +58,6 @@ class TestDownload:
 
     @pytest.mark.vcr
     def test_error_full_case_download_without_api_key(self):
-        to_file = "lotus_h.json"
         with pytest.raises(ValueError):
             download_case(cite="49 F.3d 807", full_case=True)
 

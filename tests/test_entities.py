@@ -4,6 +4,7 @@ import operator
 import pytest
 
 from authorityspoke.statements.entities import Entity
+from authorityspoke.statements.statements import Statement
 from authorityspoke.io import readers
 
 
@@ -69,6 +70,12 @@ class TestSameMeaning:
         assert e["motel"].means(e["trees"])
         assert not e["motel"] == e["trees"]
 
+    def test_entity_does_not_mean_statement(self):
+        entity = Entity("Bob")
+        statement = Statement("$person loves ice cream", terms=entity)
+        assert not entity.means(statement)
+        assert not statement.means(entity)
+
 
 class TestImplication:
     def test_implication_of_generic_entity(self, make_entity):
@@ -97,6 +104,30 @@ class TestImplication:
         """
         feist = make_opinion_with_holding["feist_majority"]
         assert any(entity.plural is True for entity in feist.generic_factors())
+
+    def test_implies_concrete_with_same_name(self):
+        concrete = Entity("Bob", generic=False)
+        other = Entity("Bob", generic=False)
+        assert concrete.implies(other)
+        assert concrete >= other
+        assert not concrete > other
+
+    def test_implication_concrete_with_different_name(self):
+        concrete = Entity("Bob", generic=False)
+        generic = Entity("Barb")
+        assert concrete.implies(generic)
+        assert concrete > generic
+        assert concrete >= generic
+
+    def test_entity_does_not_imply_statement(self):
+        entity = Entity("Bob")
+        statement = Statement("$person loves ice cream", terms=entity)
+        assert not entity.implies(statement)
+        assert not statement.implies(entity)
+        assert not entity >= statement
+        assert not statement >= entity
+        assert not entity > statement
+        assert not statement > entity
 
 
 class TestContradiction:

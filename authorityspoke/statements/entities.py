@@ -70,15 +70,6 @@ class Entity(Comparable):
             return True
         return astuple(self) == astuple(other)
 
-    def __ge__(self, other: Optional[Comparable]):
-        if other is None:
-            return True
-        if not isinstance(other, Entity):
-            return False
-        if self.generic is False and self.name == other.name:
-            return True
-        return other.generic
-
     def __str__(self):
         if self.generic:
             return f"<{self.name}>"
