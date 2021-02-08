@@ -1096,12 +1096,10 @@ class ContextRegister:
         return self_mapping
 
 
-class FactorSequence(Tuple[Optional[Comparable], ...]):
+class FactorSequence(Tuple[Comparable, ...]):
     def __new__(cls, value: Sequence = ()):
         if isinstance(value, Comparable):
             value = (value,)
-        if value is None:
-            value = (None,)
         return tuple.__new__(FactorSequence, value)
 
     def ordered_comparison(
