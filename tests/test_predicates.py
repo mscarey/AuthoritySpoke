@@ -135,6 +135,10 @@ class TestPredicates:
             make_predicate["p8"]
         )
 
+    def test_template_singular_by_default(self):
+        predicate = Predicate("$people were in $city")
+        assert str(predicate.template) == 'StatementTemplate("$people was in $city")'
+
     @pytest.mark.parametrize(
         "context, expected",
         [
@@ -398,6 +402,16 @@ class TestContradiction:
         )
         assert not more_cows.contradicts(fewer_horses)
         assert not fewer_horses.contradicts(more_cows)
+
+    def test_no_contradiction_of_predicate(self):
+        more_cows = Comparison(
+            "the number of cows $person owned was",
+            sign=">",
+            expression=10,
+        )
+        no_cows = Predicate("the number of cows $person owned was", truth=False)
+        assert not more_cows.contradicts(no_cows)
+        assert not no_cows.contradicts(more_cows)
 
 
 class TestQuantities:

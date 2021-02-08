@@ -42,7 +42,7 @@ class StatementTemplate(Template):
             self.make_content_singular()
 
     def __str__(self) -> str:
-        return f"StatementTemplate({self.template})"
+        return f'StatementTemplate("{self.template}")'
 
     def make_content_singular(self) -> None:
         """Convert template text for self.context to singular "was"."""
@@ -201,7 +201,7 @@ class Predicate:
     def __repr__(self):
         return (
             f'{self.__class__.__name__}(template="{self.template.template}", '
-            f"truth={self.truth}, "
+            f"truth={self.truth})"
         )
 
     @property
@@ -240,17 +240,13 @@ class Predicate:
         This is determined only by the ``truth`` value, the exact template
         content, and whether the placeholders indicate interchangeable terms.
         """
-
-        if not isinstance(other, Predicate):
-            raise TypeError(
-                f"{self.__class__.__name__} can't be compared for "
-                f"contradiction with type {other.__class__.__name__}"
-            )
+        if not self._same_meaning_as_true_predicate(other):
+            return False
 
         if self.truth is None or other.truth is None:
             return False
 
-        if not (self.same_content_meaning(other) and self.same_term_positions(other)):
+        if self.__class__.__name__ != other.__class__.__name__:
             return False
 
         return self.truth != other.truth
@@ -499,10 +495,10 @@ class Comparison(Predicate):
             )
 
     def __repr__(self):
+        result = super().__repr__()
         return (
-            f'{self.__class__.__name__}(template="{self.template.template}", '
-            f"truth={self.truth}, "
-            f'comparison="{self.sign}", quantity={self.expression})'
+            result.rstrip(")")
+            + f', comparison="{self.sign}", quantity={self.expression})'
         )
 
     @classmethod
