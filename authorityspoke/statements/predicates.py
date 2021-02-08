@@ -279,7 +279,7 @@ class Predicate:
             other.term_positions().values()
         )
 
-    def _same_meaning_if_true(self, other: Predicate) -> bool:
+    def _same_meaning_as_true_predicate(self, other: Predicate) -> bool:
         """
         Test whether ``self`` and ``other`` mean the same if they are both True.
         """
@@ -297,7 +297,7 @@ class Predicate:
         if not isinstance(other, self.__class__):
             return False
 
-        if not self._same_meaning_if_true(other):
+        if not self._same_meaning_as_true_predicate(other):
             return False
 
         return self.truth == other.truth
@@ -320,7 +320,7 @@ class Predicate:
             return False
         if self.truth is None:
             return False
-        if not self._same_meaning_if_true(other):
+        if not self._same_meaning_as_true_predicate(other):
             return False
         if other.truth is None:
             return True
@@ -619,8 +619,8 @@ class Comparison(Predicate):
         """
         if not isinstance(other, self.__class__):
             return False
-        if self._contradicts_predicate(other):
-            return True
+        if not self._same_meaning_as_true_predicate(other):
+            return False
 
         if isinstance(self.expression, ureg.Quantity):
             return self.excludes_other_quantity(other)
@@ -685,9 +685,9 @@ class Comparison(Predicate):
     def compare_other_date(
         self, other: Comparison
     ) -> Union[bool, EmptySet, Interval, sympy.Union]:
-        if not isinstance(other.expression, date):
-            return False
-        if not isinstance(self.expression, date):
+        if not (
+            isinstance(self.expression, date) and isinstance(other.expression, date)
+        ):
             return False
 
         result = self.compare_other_magnitude(
@@ -700,9 +700,10 @@ class Comparison(Predicate):
     def compare_other_number(
         self, other: Comparison
     ) -> Union[bool, EmptySet, Interval, sympy.Union]:
-        if not isinstance(other.expression, (float, int)):
-            return False
-        if not isinstance(self.expression, (float, int)):
+        if not (
+            isinstance(self.expression, (float, int))
+            and isinstance(other.expression, (float, int))
+        ):
             return False
 
         result = self.compare_other_magnitude(
@@ -720,7 +721,7 @@ class Comparison(Predicate):
 
         right_quantity = self.convert_other_quantity(other.expression)
         solution = self.compare_other_magnitude(
-            self_magnitude=self.expression.magnitude,
+            self_magnitude=self.magnitude,
             other_magnitude=right_quantity.magnitude,
             other_sign=other.sign,
         )

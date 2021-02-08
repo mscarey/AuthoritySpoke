@@ -336,6 +336,34 @@ class TestContradiction:
     def test_contradiction_with_quantity(self, make_predicate):
         assert make_predicate["p8_less"].contradicts(make_predicate["p8_meters"])
 
+    def test_contradictory_date_ranges(self):
+        later = Comparison(
+            "the date $dentist became a licensed dentist was",
+            sign=">",
+            expression=date(2010, 1, 1),
+        )
+        earlier = Comparison(
+            "the date $dentist became a licensed dentist was",
+            sign="<",
+            expression=date(1990, 1, 1),
+        )
+        assert later.contradicts(earlier)
+        assert earlier.contradicts(later)
+
+    def test_no_contradiction_irrelevant_quantities(self):
+        more_cows = Comparison(
+            "the number of cows $person owned was",
+            sign=">",
+            expression=10,
+        )
+        fewer_horses = Comparison(
+            "the number of horses $person owned was",
+            sign="<",
+            expression=3,
+        )
+        assert not more_cows.contradicts(fewer_horses)
+        assert not fewer_horses.contradicts(more_cows)
+
 
 class TestQuantities:
     def test_does_not_exclude_other_quantity(self):
