@@ -18,7 +18,7 @@ from typing import List, Optional, Sequence, Union
 from pint import UnitRegistry, Quantity
 from slugify import slugify
 import sympy
-from sympy import Eq, Integer, Float, Interval, Poly, Symbol, oo, sympify
+from sympy import Eq, Interval, Poly, Symbol, oo
 from sympy.sets import EmptySet, FiniteSet
 from sympy.solvers.inequalities import solve_rational_inequalities
 

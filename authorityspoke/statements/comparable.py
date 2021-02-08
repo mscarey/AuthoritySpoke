@@ -1098,10 +1098,7 @@ class ContextRegister:
 
 class FactorSequence(Tuple[Optional[Comparable], ...]):
     def __new__(cls, value: Sequence = ()):
-        if (
-            isinstance(value, Comparable)
-            or value.__class__.__name__ == "ComparableGroup"
-        ):
+        if isinstance(value, Comparable):
             value = (value,)
         if value is None:
             value = (None,)
@@ -1163,7 +1160,6 @@ class FactorSequence(Tuple[Optional[Comparable], ...]):
                                     i=i + 1,
                                 )
 
-        if context is None:
-            context = ContextRegister()
+        context = context or ContextRegister()
         ordered_pairs = list(zip_longest(self, other))
         yield from update_register(register=context, factor_pairs=ordered_pairs)

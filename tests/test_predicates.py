@@ -488,7 +488,7 @@ class TestQuantities:
         assert not number.consistent_dimensionality(day)
         assert not day.consistent_dimensionality(number)
 
-    def test_inconsistent_dimensionality_date(self):
+    def test_quantity_comparison_to_predicate(self):
         distance = Comparison(
             "the distance between $place1 and $place2 was",
             sign=">",
