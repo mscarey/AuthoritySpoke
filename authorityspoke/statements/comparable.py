@@ -87,13 +87,11 @@ def new_context_helper(func: Callable):
     @functools.wraps(func)
     def wrapper(
         factor: Comparable,
-        changes: Optional[Union[Sequence[Comparable], ContextRegister]],
+        changes: Union[Sequence[Comparable], ContextRegister],
         terms_to_replace: Optional[Sequence[Comparable]] = None,
         source: Optional[Comparable] = None,
     ) -> Comparable:
 
-        if changes is None:
-            return factor
         changes = convert_changes_to_register(
             factor=factor, changes=changes, terms_to_replace=terms_to_replace
         )
