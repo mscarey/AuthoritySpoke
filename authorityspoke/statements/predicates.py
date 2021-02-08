@@ -243,9 +243,7 @@ class Predicate:
 
         if not isinstance(other, self.__class__):
             return False
-        return self._contradicts_predicate(other)
 
-    def _contradicts_predicate(self, other: Predicate) -> bool:
         if self.truth is None or other.truth is None:
             return False
 
@@ -521,8 +519,6 @@ class Comparison(Predicate):
             a Python number object or a :class:`pint.Quantity`
             object created with :class:`pint.UnitRegistry`.
         """
-        if value is None:
-            return None
         if isinstance(value, (int, float, ureg.Quantity, date)):
             return value
         quantity = value.strip()
@@ -558,11 +554,13 @@ class Comparison(Predicate):
                 return False
         elif isinstance(other.expression, ureg.Quantity):
             return False
-        return True
+        return isinstance(self.expression, date) == isinstance(other.expression, date)
 
     def convert_other_quantity(self, other_quantity: ureg.Quantity) -> ureg.Quantity:
         """Convert other's quantity to match dimensional units of self's quantity."""
         if not isinstance(self.expression, ureg.Quantity):
+            raise TypeError(f"{self.expression} is not a Pint Quantity.")
+        if not isinstance(other_quantity, ureg.Quantity):
             raise TypeError(f"{other_quantity} is not a Pint Quantity.")
         return other_quantity.to(self.expression.units)
 

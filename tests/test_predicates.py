@@ -1,4 +1,5 @@
 from datetime import date
+from typing import Type
 import pytest
 import sympy
 from sympy import Interval, oo
@@ -350,6 +351,20 @@ class TestContradiction:
         assert later.contradicts(earlier)
         assert earlier.contradicts(later)
 
+    def test_no_contradiction_date_and_time_period(self):
+        later = Comparison(
+            "the date $dentist became a licensed dentist was",
+            sign=">",
+            expression=date(2010, 1, 1),
+        )
+        earlier = Comparison(
+            "the date $dentist became a licensed dentist was",
+            sign="<",
+            expression="2000 years",
+        )
+        assert not later.contradicts(earlier)
+        assert not earlier.contradicts(later)
+
     def test_no_contradiction_irrelevant_quantities(self):
         more_cows = Comparison(
             "the number of cows $person owned was",
@@ -392,3 +407,58 @@ class TestQuantities:
         )
         result = comparison.convert_other_quantity(comparison_km.expression)
         assert Q_("18 miles") < result < Q_("19 miles")
+
+    def test_cannot_convert_date_to_time_period(self):
+        time = Comparison(
+            "the time $object took to biodegrade was",
+            sign=">",
+            expression=Q_("2000 years"),
+        )
+        with pytest.raises(TypeError):
+            time.convert_other_quantity(date(2020, 1, 1))
+
+    def test_cannot_convert_time_period_to_date(self):
+        time = Comparison(
+            "the date $buyer bought $object was",
+            sign=">",
+            expression=date(2020, 1, 1),
+        )
+        with pytest.raises(TypeError):
+            time.convert_other_quantity(date(2020, 1, 1))
+
+    def test_inconsistent_dimensionality_quantity(self):
+        number = Comparison(
+            "the distance between $place1 and $place2 was",
+            sign=">",
+            expression=20,
+        )
+        distance = Comparison(
+            "the distance between $place1 and $place2 was",
+            sign=">",
+            expression=Q_("20 miles"),
+        )
+        assert not number.consistent_dimensionality(distance)
+        assert not distance.consistent_dimensionality(number)
+
+    def test_inconsistent_dimensionality_date(self):
+        number = Comparison(
+            "the distance between $place1 and $place2 was",
+            sign=">",
+            expression=20,
+        )
+        day = Comparison(
+            "the distance between $place1 and $place2 was",
+            sign=">",
+            expression=date(2000, 1, 1),
+        )
+        assert not number.consistent_dimensionality(day)
+        assert not day.consistent_dimensionality(number)
+
+    def test_inconsistent_dimensionality_date(self):
+        distance = Comparison(
+            "the distance between $place1 and $place2 was",
+            sign=">",
+            expression="20 miles",
+        )
+        predicate = Predicate("the distance between $place1 and $place2 was")
+        assert not distance.compare_other_quantity(predicate)
