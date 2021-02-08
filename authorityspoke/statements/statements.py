@@ -52,11 +52,13 @@ class Statement(Comparable):
 
     def __init__(
         self,
-        predicate: Predicate,
+        predicate: Union[Predicate, str],
         terms: FactorSequence = FactorSequence(),
         absent: bool = False,
         generic: bool = False,
     ):
+        if isinstance(predicate, str):
+            predicate = Predicate(predicate)
         self.predicate = predicate
         self.absent = absent
         self.generic = generic

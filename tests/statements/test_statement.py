@@ -99,6 +99,18 @@ class TestStatements:
             in result.short_string.lower()
         )
 
+    def test_too_much_info_to_change_context(self):
+        """Test that a list of terms to replace requires "changes" to be consistent."""
+        statement = Statement(
+            "$person1 loved $person2",
+            terms=[Entity("Donald"), Entity("Daisy")],
+        )
+        with pytest.raises(ValueError):
+            statement.new_context(
+                changes=Entity("Mickey"),
+                terms_to_replace=[Entity("Donald"), Entity("Daisy")],
+            )
+
     def test_get_factor_from_recursive_search(self):
         predicate_shot = Predicate("$shooter shot $victim")
         predicate_told = Predicate("$speaker told $hearer $statement")

@@ -131,7 +131,7 @@ def convert_changes_to_register(
         changes = [changes]
     if terms_to_replace:
         if not isinstance(changes, List):
-            raise TypeError(
+            raise ValueError(
                 "If 'terms_to_replace' is given, 'changes' must be a list of replacements, "
                 f"not type {type(changes)}."
             )
@@ -1058,10 +1058,6 @@ class ContextRegister:
         return ContextRegister.from_lists(
             keys=self.reverse_matches.keys(), values=self.reverse_matches.values()
         )
-
-    def reverse_match(self, query: Comparable) -> Optional[str]:
-        value_str = str(query)
-        return self.reverse_matches.get(value_str)
 
     def merged_with(
         self, incoming_mapping: ContextRegister

@@ -316,6 +316,9 @@ class TestSameMeaning:
         Entity appears more than once in the Predicate."""
         f = make_factor
         assert not f["f_three_entities"].means(f["f_repeating_entity"])
+        assert (
+            f["f_three_entities"].explain_same_meaning(f["f_repeating_entity"]) is None
+        )
 
     def test_unequal_to_enactment(self, watt_factor, e_copyright):
         assert not watt_factor["f1"].means(e_copyright)
@@ -467,10 +470,10 @@ class TestImplication:
         assert register.matches.get("<Alice>") == Entity("Bob")
 
     def test_no_implication_complex(self, make_complex_fact):
-        assert (
-            not make_complex_fact["f_relevant_murder"]
-            >= make_complex_fact["f_relevant_murder_alice_craig"]
-        )
+        left = make_complex_fact["f_relevant_murder"]
+        right = make_complex_fact["f_relevant_murder_alice_craig"]
+        assert not left >= right
+        assert left.explain_implication(right) is None
 
     def test_implied_by(self, make_complex_fact):
         assert make_complex_fact["f_relevant_murder_whether"].implied_by(
@@ -482,6 +485,11 @@ class TestImplication:
             make_complex_fact["f_relevant_murder"]
         )
         assert explanation
+
+    def test_explain_not_implied_by(self, make_complex_fact):
+        left = make_complex_fact["f_relevant_murder"]
+        right = make_complex_fact["f_relevant_murder_whether"]
+        assert left.explain_implied_by(right) is None
 
 
 class TestContradiction:
@@ -680,6 +688,7 @@ class TestConsistent:
         register = ContextRegister()
         register.insert_pair(left.generic_factors()[0], right.generic_factors()[0])
         assert not left.consistent_with(right, register)
+        assert left.explain_consistent_with(right, register) is None
 
     def test_explanations_consistent_with(self, watt_factor):
         left = watt_factor["f8_less"]
