@@ -173,7 +173,10 @@ class TestSameMeaning:
 
     def test_predicate_inequality(self, make_predicate, watt_factor):
         assert not make_predicate["p2"].means(make_predicate["p2_reflexive"])
-        assert not make_predicate["p2"].means(watt_factor["f2"])
+
+    def test_error_predicate_means_fact(self, make_predicate, watt_factor):
+        with pytest.raises(TypeError):
+            make_predicate["p2"].means(watt_factor["f2"])
 
     def test_obverse_predicates_equal(self, make_predicate):
         assert make_predicate["p7"].means(make_predicate["p7_obverse"])
@@ -201,7 +204,8 @@ class TestSameMeaning:
         assert not make_predicate["p_murder_false"].means(make_predicate["p_murder"])
 
     def test_predicate_does_not_mean_fact(self, make_predicate, watt_factor):
-        assert not make_predicate["p8"].means(watt_factor["f8"])
+        with pytest.raises(TypeError):
+            make_predicate["p8"].means(watt_factor["f8"])
 
     def test_term_placeholders_do_not_change_result(self):
         left = Predicate(
@@ -274,8 +278,8 @@ class TestImplication:
         assert make_predicate["p2"] > make_predicate["p2_no_truth"]
 
     def test_error_predicate_imply_factor(self, make_predicate, watt_factor):
-        assert not make_predicate["p7_true"] > (watt_factor["f7"])
-        assert not make_predicate["p7_true"] >= (watt_factor["f7"])
+        with pytest.raises(TypeError):
+            make_predicate["p7_true"] > (watt_factor["f7"])
 
     def test_implication_due_to_dates(self):
         copyright_date_range = Comparison(
@@ -324,7 +328,8 @@ class TestContradiction:
         )
 
     def test_error_predicate_contradict_factor(self, make_predicate, watt_factor):
-        assert not make_predicate["p7_true"].contradicts(watt_factor["f7"])
+        with pytest.raises(TypeError):
+            make_predicate["p7_true"].contradicts(watt_factor["f7"])
 
     def test_no_contradiction_with_no_truth_value(self, make_predicate):
         assert not make_predicate["p2_no_truth"].contradicts(make_predicate["p2"])
@@ -350,6 +355,21 @@ class TestContradiction:
         )
         assert later.contradicts(earlier)
         assert earlier.contradicts(later)
+
+    def test_no_contradiction_without_truth_value(self):
+        later = Comparison(
+            "the date $dentist became a licensed dentist was",
+            sign=">",
+            expression=date(2010, 1, 1),
+            truth=None,
+        )
+        earlier = Comparison(
+            "the date $dentist became a licensed dentist was",
+            sign="<",
+            expression=date(1990, 1, 1),
+        )
+        assert not later.contradicts(earlier)
+        assert not earlier.contradicts(later)
 
     def test_no_contradiction_date_and_time_period(self):
         later = Comparison(

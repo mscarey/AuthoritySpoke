@@ -241,8 +241,11 @@ class Predicate:
         content, and whether the placeholders indicate interchangeable terms.
         """
 
-        if not isinstance(other, self.__class__):
-            return False
+        if not isinstance(other, Predicate):
+            raise TypeError(
+                f"{self.__class__.__name__} can't be compared for "
+                f"contradiction with type {other.__class__.__name__}"
+            )
 
         if self.truth is None or other.truth is None:
             return False
@@ -281,6 +284,11 @@ class Predicate:
         """
         Test whether ``self`` and ``other`` mean the same if they are both True.
         """
+        if not isinstance(other, Predicate):
+            raise TypeError(
+                f"Type {self.__class__.__name__} can't imply, contradict, or "
+                f"have same meaning as type {other.__class__.__name__}"
+            )
         if not self.same_content_meaning(other):
             return False
 
@@ -292,8 +300,6 @@ class Predicate:
 
         To return ``True``, ``other`` can be neither broader nor narrower.
         """
-        if not isinstance(other, self.__class__):
-            return False
 
         if not self._same_meaning_as_true_predicate(other):
             return False
@@ -314,8 +320,6 @@ class Predicate:
         """
         Test whether ``self`` implies ``other``.
         """
-        if not isinstance(other, self.__class__):
-            return False
         if self.truth is None:
             return False
         if not self._same_meaning_as_true_predicate(other):
@@ -615,9 +619,13 @@ class Comparison(Predicate):
         ``pint`` library, or in the possible ranges for each Comparison's
         numeric ``expression``.
         """
-        if not isinstance(other, self.__class__):
-            return False
         if not self._same_meaning_as_true_predicate(other):
+            return False
+
+        if not isinstance(other, Comparison):
+            return False
+
+        if not (self.truth is other.truth is True):
             return False
 
         if isinstance(self.expression, ureg.Quantity):
