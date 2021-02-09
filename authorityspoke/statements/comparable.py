@@ -1039,17 +1039,20 @@ class ContextRegister:
         self._reverse_matches[str(value)] = key
 
     def replace_keys(self, replacements: ContextRegister) -> ContextRegister:
-        """Construct new :class:`ContextRegister` by replacing keys."""
+        """
+        Construct new :class:`ContextRegister` by replacing keys.
 
-        keys = []
-        for factor in self.matches.keys():
-            replacement = replacements.get(factor)
-            if replacement:
-                keys.append(str(replacement))
-            else:
-                keys.append(factor)
-        values = list(self.matches.values())
-        return ContextRegister.from_lists(keys, values)
+        Used when making permutations of the key orders because some are interchangeable.
+
+        e.g. in "Amy and Bob were married" the order of "Amy" and "Bob" is interchangeable.
+        """
+
+        result = ContextRegister()
+        for key, value in self.matches.items():
+            replacement = replacements[key]
+            result.insert_pair(key=replacement, value=value)
+
+        return result
 
     def reversed(self):
         """Swap keys for values and vice versa."""
