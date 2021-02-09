@@ -1016,9 +1016,6 @@ class ContextRegister:
     def get(self, query: str) -> Optional[Comparable]:
         return self.matches.get(query)
 
-    def get_reverse(self, query: str) -> Optional[Comparable]:
-        return self.reverse_matches.get(query)
-
     def get_factor(self, query: Optional[Comparable]) -> Optional[Comparable]:
         return self.get(str(query))
 
@@ -1085,9 +1082,9 @@ class ContextRegister:
                         + f"{self_mapping.matches[in_key]}, not {in_value}"
                     )
                     return None
-                key_as_factor = incoming_mapping.reverse_matches.get(str(in_value))
+                key_as_factor = incoming_mapping.get_reverse_factor(in_value)
                 self_mapping.insert_pair(key_as_factor, in_value)
-                if list(self_mapping.matches.values()).count(in_value) > 1:
+                if list(self_mapping.values()).count(in_value) > 1:
                     logger.debug("%s assigned to two different keys", in_value)
                     return None
         return self_mapping
