@@ -164,7 +164,7 @@ class TestOpinionHoldings:
         """
         brad = make_opinion["brad_majority"]
         brad.clear_holdings()
-        with pytest.raises(TypeError):
+        with pytest.raises(ValueError):
             brad.posit(
                 make_holding["h1"],
                 context=(Entity("House on Haunted Hill"), "nonexistent factor"),
@@ -222,10 +222,10 @@ class TestOpinionHoldings:
 
         context_items = [
             "proof of Wattenburg's guilt",
-            "Wattenburg",
-            "officers' search of the stockpile",
-            "Hideaway Lodge",
-            "the stockpile of trees",
+            "<Wattenburg>",
+            "<officers' search of the stockpile>",
+            "<Hideaway Lodge>",
+            "<the stockpile of trees>",
         ]
         watt.posit(brad.holdings[0], context=context_items)
         assert watt.holdings[-1].means(brad.holdings[0])

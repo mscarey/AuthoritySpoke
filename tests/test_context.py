@@ -212,3 +212,10 @@ class TestChangeRegisters:
 
         new = register.reversed()
         assert new.get("<Ebert>") == left
+
+    def test_factor_pairs(self):
+        register = ContextRegister.from_lists(
+            [Entity("apple"), Entity("lemon")], [Entity("pear"), Entity("orange")]
+        )
+        gen = register.factor_pairs()
+        assert next(gen) == (Entity("apple"), Entity("pear"))

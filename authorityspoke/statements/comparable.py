@@ -986,11 +986,11 @@ class ContextRegister:
         return self.matches == other.matches
 
     @property
-    def matches(self):
+    def matches(self) -> Dict[str, Comparable]:
         return self._matches
 
     @property
-    def reverse_matches(self):
+    def reverse_matches(self) -> Dict[str, Comparable]:
         return self._reverse_matches
 
     @classmethod
@@ -1017,7 +1017,7 @@ class ContextRegister:
 
     def factor_pairs(self) -> Iterator[Tuple[Comparable, Comparable]]:
         for key, value in self.items():
-            yield (self.reverse_matches.get(key), value)
+            yield (self.get_reverse_factor(value), value)
 
     def get(self, query: str) -> Optional[Comparable]:
         return self.matches.get(query)
@@ -1025,8 +1025,8 @@ class ContextRegister:
     def get_factor(self, query: Optional[Comparable]) -> Optional[Comparable]:
         return self.get(str(query))
 
-    def get_reverse_factor(self, query: Optional[Comparable]) -> Optional[Comparable]:
-        return self.reverse_matches.get(str(query))
+    def get_reverse_factor(self, query: Comparable) -> Comparable:
+        return self.reverse_matches[str(query)]
 
     def items(self):
         return self.matches.items()

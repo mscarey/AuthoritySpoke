@@ -491,6 +491,10 @@ class TestImplication:
         right = make_complex_fact["f_relevant_murder_whether"]
         assert left.explain_implied_by(right) is None
 
+    def test_not_implied_by_none(self, make_complex_fact):
+        left = make_complex_fact["f_relevant_murder"]
+        assert not left.implied_by(None)
+
 
 class TestContradiction:
     def test_factor_different_predicate_truth_contradicts(self, watt_factor):
