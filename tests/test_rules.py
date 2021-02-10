@@ -78,7 +78,8 @@ class TestRules:
         defendant = transfer_rule.generic_factors()[0]
         counterparty = transfer_rule.generic_factors()[2]
         defendant_rule = barber_rule.new_context(
-            {"the barber": defendant, "the customer": counterparty}
+            changes=[defendant, counterparty],
+            terms_to_replace=[Entity("the barber"), Entity("the customer")],
         )
         assert defendant_rule.generic_factors()[1].name == "the defendant"
 

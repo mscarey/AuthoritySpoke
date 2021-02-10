@@ -93,7 +93,10 @@ def new_context_helper(func: Callable):
     ) -> Comparable:
 
         expanded_changes = convert_changes_to_register(
-            factor=factor, changes=changes, terms_to_replace=terms_to_replace
+            factor=factor,
+            changes=changes,
+            terms_to_replace=terms_to_replace,
+            source=source,
         )
 
         for old, new in expanded_changes.items():
@@ -105,9 +108,22 @@ def new_context_helper(func: Callable):
     return wrapper
 
 
+def expand_string_from_source(
+    factor: Union[str, Comparable], source: Comparable
+) -> Comparable:
+    if isinstance(factor, str):
+        result = source.get_factor(factor)
+    else:
+        return factor
+    if result is None:
+        raise ValueError(f'Unable to find replacement term for text "{factor}"')
+    return result
+
+
 def convert_changes_to_register(
     factor: Comparable,
     changes: Union[Comparable, ContextRegister, Sequence[Comparable]],
+    source: Comparable,
     terms_to_replace: Optional[Sequence[Comparable]] = None,
 ) -> ContextRegister:
     if isinstance(changes, ContextRegister):
@@ -128,6 +144,8 @@ def convert_changes_to_register(
         return ContextRegister.from_lists(keys=terms_to_replace, values=changes)
     if isinstance(changes, dict):
         return ContextRegister.from_dict(changes)
+    if source:
+        changes = [expand_string_from_source(change, source) for change in changes]
     generic_factors = list(factor.generic_factors_by_str().values())
     if len(generic_factors) != len(changes):
         raise ValueError(
@@ -876,6 +894,12 @@ class Comparable(ABC):
     def _update_context_from_factors(
         self, other: Comparable, context: ContextRegister
     ) -> Optional[ContextRegister]:
+        """
+        Update context produce a likely way self corresponds to other.
+
+        It's not guaranteed that by exchanging generic terms in order will
+        produce the right updated context.
+        """
         incoming = ContextRegister.from_lists(
             keys=self.generic_factors(), values=other.generic_factors()
         )
@@ -975,7 +999,7 @@ class ContextRegister:
         keys: Union[FactorSequence, Sequence[Comparable]],
         values: Union[FactorSequence, Sequence[Comparable]],
     ) -> ContextRegister:
-        pairs = zip_longest(keys, values)
+        pairs = zip(keys, values)
         new = cls()
         for pair in pairs:
             new.insert_pair(pair[0], pair[1])
