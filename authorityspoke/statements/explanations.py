@@ -13,21 +13,6 @@ from authorityspoke.statements.comparable import (
 )
 
 
-class Matches(List[Tuple[Comparable, Comparable]]):
-    def get_factor_by_str(self, query: str) -> Optional[Comparable]:
-        for pair in self:
-            for item in pair:
-                if str(item) == query:
-                    return item
-        return None
-
-    def is_factor_plural(self, name: str) -> bool:
-        factor = self.get_factor_by_str(name)
-        if factor and factor.__dict__.get("plural") is True:
-            return True
-        return False
-
-
 class Explanation:
 
     operation_names: ClassVar[Dict[Callable, str]] = {
@@ -38,7 +23,7 @@ class Explanation:
 
     def __init__(
         self,
-        factor_matches: Matches,
+        factor_matches: ContextRegister,
         context: Optional[ContextRegister] = None,
         operation: Callable = operator.ge,
     ):
