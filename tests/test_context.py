@@ -5,6 +5,7 @@ import pytest
 from authorityspoke.statements.comparable import ContextRegister, means
 from authorityspoke.statements.entities import Entity
 from authorityspoke.statements.groups import ComparableGroup
+from authorityspoke.statements.statements import Statement
 
 
 class TestContextRegisters:
@@ -24,6 +25,26 @@ class TestContextRegisters:
             context.check_match(make_entity["watt"], make_entity["motel"])
             for context in contexts
         )
+
+    def test_context_not_equal_to_list(self):
+        changes = ContextRegister.from_lists(
+            [Entity("Alice")],
+            [Entity("Dan")],
+        )
+        assert changes != [[Entity("Alice")], [Entity("Dan")]]
+
+    def test_cannot_update_context_register_from_lists(self):
+        left = Statement(
+            "$shooter shot $victim", terms=[Entity("Alice"), Entity("Bob")]
+        )
+        right = Statement(
+            "$shooter shot $victim", terms=[Entity("Craig"), Entity("Dan")]
+        )
+        update = left.update_context_register(
+            right, context=[[Entity("Alice")], [Entity("Craig")]], comparison=means
+        )
+        with pytest.raises(TypeError):
+            next(update)
 
     def test_limited_possible_contexts_identical_factor(self, watt_factor, make_entity):
         left = watt_factor["f2"]

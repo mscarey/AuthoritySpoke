@@ -92,22 +92,9 @@ def new_context_helper(func: Callable):
         source: Optional[Comparable] = None,
     ) -> Comparable:
 
-        changes = convert_changes_to_register(
+        expanded_changes = convert_changes_to_register(
             factor=factor, changes=changes, terms_to_replace=terms_to_replace
         )
-
-        expanded_changes = ContextRegister()
-        for old, new in changes.items():
-
-            if isinstance(new, str):
-                factor_with_new_name = factor.get_factor(new)
-                if source and factor_with_new_name is None:
-                    factor_with_new_name = source.get_factor(new)
-            else:
-                factor_with_new_name = new
-            if factor_with_new_name is None:
-                raise ValueError(f'Unable to find replacement factor "{new}"')
-            expanded_changes.insert_pair(old, factor_with_new_name)
 
         for old, new in expanded_changes.items():
             if str(factor) == old or factor.__dict__.get("name") == old:
@@ -799,15 +786,6 @@ class Comparable(ABC):
         :returns:
             a new :class:`.Comparable` object with the replacements made.
         """
-        for key, value in changes.matches.items():
-
-            if not isinstance(key, str):
-                raise TypeError(
-                    'Each key in "changes" must be the name of a Comparable'
-                )
-            if value and not isinstance(value, Comparable):
-                raise TypeError('Each value in "changes" must be a Comparable')
-
         new_dict = self.own_attributes()
         for name in self.context_factor_names:
             new_dict[name] = self.__dict__[name].new_context(changes)
@@ -849,7 +827,7 @@ class Comparable(ABC):
         else:
             for permutation in permutations(unused_other):
                 incoming = ContextRegister()
-                for key, value in zip_longest(unused_self, permutation):
+                for key, value in zip(unused_self, permutation):
                     incoming.insert_pair(key=key, value=value)
                 merged_context = context.merged_with(incoming)
                 if merged_context:
@@ -978,7 +956,7 @@ class ContextRegister:
         items = ", ".join(item_names)
         return f"ContextRegister({items})"
 
-    def __eq__(self, other: object) -> bool:
+    def __eq__(self, other: Any) -> bool:
         if not isinstance(other, self.__class__):
             return False
         return self.matches == other.matches
@@ -1013,6 +991,10 @@ class ContextRegister:
     def check_match(self, key: Comparable, value: Comparable) -> bool:
         return self.get(str(key)) == value
 
+    def factor_pairs(self) -> Iterator[Tuple[Comparable, Comparable]]:
+        for key, value in self.items():
+            yield (self.reverse_matches.get(key), value)
+
     def get(self, query: str) -> Optional[Comparable]:
         return self.matches.get(query)
 
@@ -1032,6 +1014,12 @@ class ContextRegister:
         return self.matches.values()
 
     def insert_pair(self, key: Comparable, value: Comparable) -> None:
+        for comp in (key, value):
+            if not isinstance(comp, Comparable):
+                raise TypeError(
+                    "'key' and 'value' must both be subclasses of 'Comparable'",
+                    f"but {comp} was type {type(comp)}.",
+                )
         self._matches[str(key)] = value
         self._reverse_matches[str(value)] = key
 
@@ -1054,7 +1042,7 @@ class ContextRegister:
     def reversed(self):
         """Swap keys for values and vice versa."""
         return ContextRegister.from_lists(
-            keys=self.reverse_matches.keys(), values=self.reverse_matches.values()
+            keys=self.values(), values=self.reverse_matches.values()
         )
 
     def merged_with(

@@ -164,7 +164,7 @@ class TestOpinionHoldings:
         """
         brad = make_opinion["brad_majority"]
         brad.clear_holdings()
-        with pytest.raises(ValueError):
+        with pytest.raises(TypeError):
             brad.posit(
                 make_holding["h1"],
                 context=(Entity("House on Haunted Hill"), "nonexistent factor"),
