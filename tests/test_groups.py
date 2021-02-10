@@ -143,6 +143,33 @@ class TestImplication:
         assert "implies" in str(explanation).lower()
 
 
+class TestContradiction:
+    def test_contradiction_of_group(self):
+        lived_at = Predicate("$person lived at $residence")
+        bob_lived = Statement(lived_at, terms=[Entity("Bob"), Entity("Bob's house")])
+        carl_lived = Statement(lived_at, terms=[Entity("Carl"), Entity("Carl's house")])
+        distance_long = Comparison(
+            "the distance from the center of $city to $residence was",
+            sign=">=",
+            expression="50 miles",
+        )
+        statement_long = Statement(
+            distance_long, terms=[Entity("Houston"), Entity("Bob's house")]
+        )
+        distance_short = Comparison(
+            "the distance from the center of $city to $residence was",
+            sign="<=",
+            expression="10 kilometers",
+        )
+        statement_short = Statement(
+            distance_short, terms=[Entity("El Paso"), Entity("Carl's house")]
+        )
+        left = ComparableGroup([bob_lived, statement_long])
+        right = ComparableGroup([carl_lived, statement_short])
+        explanation = left.explain_contradiction(right)
+        assert explanation["<Houston>"].name == "El Paso"
+
+
 class TestAdd:
     def test_add_does_not_consolidate_factors(self, watt_factor):
         left = ComparableGroup(watt_factor["f1"])

@@ -62,11 +62,18 @@ class TestRules:
                 [watt_factor["f1"], watt_factor["f7"], watt_factor["f2"]]
             )
 
-    def test_new_context_dict_must_contain_only_factors(
+    def test_cannot_change_context_with_dict(self, make_holding, make_predicate):
+        with pytest.raises(ValueError):
+            make_holding["h1"].new_context({make_predicate["p1"]: make_predicate["p7"]})
+
+    def test_cannot_change_context_with_dict_and_terms(
         self, make_holding, make_predicate
     ):
-        with pytest.raises(TypeError):
-            make_holding["h1"].new_context({make_predicate["p1"]: make_predicate["p7"]})
+        with pytest.raises(ValueError):
+            make_holding["h1"].new_context(
+                {make_predicate["p1"]: make_predicate["p7"]},
+                terms_to_replace=[Entity("Bob")],
+            )
 
     def test_new_context_dict_must_be_dict(self, make_holding, make_predicate):
         with pytest.raises(TypeError):

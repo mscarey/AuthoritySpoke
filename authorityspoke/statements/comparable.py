@@ -142,8 +142,7 @@ def convert_changes_to_register(
                 f"as 'changes'.\nterms_to_replace: ({terms_to_replace})\nchanges: ({changes})"
             )
         return ContextRegister.from_lists(keys=terms_to_replace, values=changes)
-    if isinstance(changes, dict):
-        return ContextRegister.from_dict(changes)
+
     if source:
         changes = [expand_string_from_source(change, source) for change in changes]
     generic_factors = list(factor.generic_factors_by_str().values())
@@ -1004,13 +1003,6 @@ class ContextRegister:
         for pair in pairs:
             new.insert_pair(pair[0], pair[1])
         return new
-
-    @classmethod
-    def from_dict(cls, data: Dict) -> ContextRegister:
-        result = ContextRegister()
-        for k, v in data.items():
-            result.insert_pair(key=k, value=v)
-        return result
 
     def check_match(self, key: Comparable, value: Comparable) -> bool:
         return self.get(str(key)) == value
