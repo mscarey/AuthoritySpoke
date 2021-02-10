@@ -1,7 +1,6 @@
 """Objects describing relationships between pairs of Comparables or Opinions."""
 from __future__ import annotations
 
-from dataclasses import dataclass
 import operator
 import textwrap
 from typing import Callable, ClassVar, Dict, List, Optional, Tuple
@@ -29,11 +28,7 @@ class Matches(List[Tuple[Comparable, Comparable]]):
         return False
 
 
-@dataclass
 class Explanation:
-    matches: Matches
-    context: Optional[ContextRegister] = None
-    operation: Callable = operator.ge
 
     operation_names: ClassVar[Dict[Callable, str]] = {
         operator.ge: "IMPLIES",
@@ -41,22 +36,29 @@ class Explanation:
         contradicts: "CONTRADICTS",
     }
 
-    def __post_init__(self):
-        if not isinstance(self.matches, Matches):
-            self.matches = Matches(self.matches)
+    def __init__(
+        self,
+        matches: Matches,
+        context: Optional[ContextRegister] = None,
+        operation: Callable = operator.ge,
+    ):
+        if not isinstance(matches, Matches):
+            matches = Matches(matches)
+        self.matches = matches
+        self.context = context or ContextRegister()
+        self.operation = operation
 
     @property
     def reason(self) -> str:
         """Make statement matching analagous context factors of self and other."""
-        if self.context:
-            similies = [
-                f'{key} {"are" if self.matches.is_factor_plural(key) else "is"} like {value}'
-                for key, value in self.context.items()
-            ]
-            if len(similies) > 1:
-                similies[-2:] = [", and ".join(similies[-2:])]
-            return ", ".join(similies)
-        return ""
+
+        similies = [
+            f'{key} {"are" if self.matches.is_factor_plural(key) else "is"} like {value}'
+            for key, value in self.context.items()
+        ]
+        if len(similies) > 1:
+            similies[-2:] = [", and ".join(similies[-2:])]
+        return ", ".join(similies)
 
     def __str__(self):
         indent = "  "
@@ -69,6 +71,9 @@ class Explanation:
             match_text = f"{left}\n" f"{relation}\n" f"{right}\n"
             text += match_text
         return text.rstrip("\n")
+
+    def __repr__(self) -> str:
+        return f"Explanation(matches={repr(self.matches)}, context={repr(self.context)}), operation={repr(self.operation)})"
 
     def add_match(self, match=Tuple[Comparable, Comparable]) -> Explanation:
         new_matches = self.matches + [match]
