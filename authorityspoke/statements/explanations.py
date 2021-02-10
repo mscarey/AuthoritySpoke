@@ -38,13 +38,11 @@ class Explanation:
 
     def __init__(
         self,
-        matches: Matches,
+        factor_matches: Matches,
         context: Optional[ContextRegister] = None,
         operation: Callable = operator.ge,
     ):
-        if not isinstance(matches, Matches):
-            matches = Matches(matches)
-        self.matches = matches
+        self.factor_matches = factor_matches
         self.context = context or ContextRegister()
         self.operation = operation
 
@@ -53,8 +51,8 @@ class Explanation:
         """Make statement matching analagous context factors of self and other."""
 
         similies = [
-            f'{key} {"are" if self.matches.is_factor_plural(key) else "is"} like {value}'
-            for key, value in self.context.items()
+            f'{key} {"are" if (key.plural) else "is"} like {value}'
+            for key, value in self.context.factor_pairs()
         ]
         if len(similies) > 1:
             similies[-2:] = [", and ".join(similies[-2:])]
@@ -65,7 +63,7 @@ class Explanation:
         relation = self.operation_names[self.operation]
         context_text = f" Because {self.reason},\n" if self.context else "\n"
         text = f"EXPLANATION:{context_text}"
-        for match in self.matches:
+        for match in self.factor_matches:
             left = textwrap.indent(str(match[0]), prefix=indent)
             right = textwrap.indent(str(match[1]), prefix=indent)
             match_text = f"{left}\n" f"{relation}\n" f"{right}\n"
@@ -73,12 +71,12 @@ class Explanation:
         return text.rstrip("\n")
 
     def __repr__(self) -> str:
-        return f"Explanation(matches={repr(self.matches)}, context={repr(self.context)}), operation={repr(self.operation)})"
+        return f"Explanation(matches={repr(self.factor_matches)}, context={repr(self.context)}), operation={repr(self.operation)})"
 
     def add_match(self, match=Tuple[Comparable, Comparable]) -> Explanation:
-        new_matches = self.matches + [match]
+        new_matches = self.factor_matches + [match]
         return Explanation(
-            matches=new_matches,
+            factor_matches=new_matches,
             context=self.context,
             operation=self.operation,
         )

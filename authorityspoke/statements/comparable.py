@@ -171,6 +171,7 @@ class Comparable(ABC):
     generic: bool = False
     absent: bool = False
     name: Optional[str] = None
+    plural: bool = False
     context_factor_names: ClassVar[Tuple[str, ...]] = ()
 
     @property

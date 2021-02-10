@@ -210,7 +210,7 @@ class Holding(Comparable):
                     other_holding, context=context
                 ):
                     yield Explanation(
-                        matches=[(self_holding, other_holding)],
+                        factor_matches=[(self_holding, other_holding)],
                         context=register,
                         operation=contradicts,
                     )
@@ -620,7 +620,9 @@ class HoldingGroup(ComparableGroup[H]):
         if isinstance(other, Rule):
             other = Holding(rule=other)
         explanation = Explanation(
-            matches=[], context=context or ContextRegister(), operation=operator.ge
+            factor_matches=[],
+            context=context or ContextRegister(),
+            operation=operator.ge,
         )
         if isinstance(other, Holding):
             yield from self.verbose_comparison(

@@ -31,7 +31,9 @@ class TestContext:
         register = ContextRegister()
         register.insert_pair(Entity("Al"), Entity("Alice"))
         answers = fact_al.explain_consistent_with(fact_alice, register)
-        explanation = Explanation(matches=[(fact_al, fact_alice)], context=answers)
+        explanation = Explanation(
+            factor_matches=[(fact_al, fact_alice)], context=answers
+        )
         assert "<the bull> is like <the cow>" in explanation.reason
 
 
@@ -40,6 +42,6 @@ class TestExplainHoldings:
         oracle = make_decision_with_holding["oracle"]
         context = oracle.holdings[18].explain_implication(oracle.holdings[19])
         explanation = Explanation(
-            matches=[(oracle.holdings[18], oracle.holdings[19])], context=context
+            factor_matches=[(oracle.holdings[18], oracle.holdings[19])], context=context
         )
         assert "implies" in str(explanation).lower()

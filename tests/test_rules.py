@@ -171,7 +171,7 @@ class TestSameMeaning:
         register = left.explain_same_meaning(right)
 
         explanation = Explanation(
-            matches=[(left, right)],
+            factor_matches=[(left, right)],
             context=register,
             operation=means,
         )

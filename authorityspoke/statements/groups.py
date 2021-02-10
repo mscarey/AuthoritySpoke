@@ -272,7 +272,9 @@ class ComparableGroup(Tuple[F, ...], Comparable):
     ) -> Iterator[Explanation]:
 
         explanation = Explanation(
-            matches=[], context=context or ContextRegister(), operation=operator.ge
+            factor_matches=[],
+            context=context or ContextRegister(),
+            operation=operator.ge,
         )
 
         yield from self.verbose_comparison(
