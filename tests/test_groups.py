@@ -1,4 +1,9 @@
-from authorityspoke.statements.comparable import ContextRegister, means
+from authorityspoke.statements.comparable import (
+    ContextRegister,
+    consistent_with,
+    contradicts,
+    means,
+)
 from authorityspoke.statements.entities import Entity
 from authorityspoke.statements.groups import ComparableGroup
 from authorityspoke.statements.predicates import Predicate, Comparison
@@ -102,6 +107,7 @@ class TestSameFactors:
         first_group = ComparableGroup([watt_factor["f1"], watt_factor["f3"]])
         second_group = ComparableGroup([watt_factor["f1"], watt_factor["f3"]])
         assert first_group.means(second_group)
+        assert means(first_group, second_group)
 
     def test_group_does_not_mean_different_group(self, watt_factor):
         first_group = ComparableGroup(
@@ -168,6 +174,7 @@ class TestContradiction:
         right = ComparableGroup([carl_lived, statement_short])
         explanation = left.explain_contradiction(right)
         assert explanation["<Houston>"].name == "El Paso"
+        assert contradicts(left, right)
 
 
 class TestAdd:
@@ -255,11 +262,13 @@ class TestConsistent:
         register = ContextRegister()
         register.insert_pair(Entity("the car"), Entity("the pickup"))
         assert not group.consistent_with(self.faster_statement, context=register)
+        assert not consistent_with(group, self.faster_statement, context=register)
 
     def test_groups_with_one_statement_consistent(self):
         specific_group = ComparableGroup([self.slower_specific_statement])
         general_group = ComparableGroup([self.faster_statement])
         assert specific_group.consistent_with(general_group)
+        assert consistent_with(specific_group, general_group)
 
     def test_group_inconsistent_with_one_statement(self):
         group = ComparableGroup([self.slower_specific_statement, self.farm_statement])

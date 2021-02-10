@@ -13,7 +13,9 @@ from typing import List, Optional, Sequence, Tuple, Union
 logger = logging.getLogger(__name__)
 
 
-def consistent_with(left: Comparable, right: Comparable) -> bool:
+def consistent_with(
+    left: Comparable, right: Comparable, context: Optional[ContextRegister] = None
+) -> bool:
     """
     Call :meth:`.Factor.consistent_with` as function alias.
 
@@ -23,7 +25,8 @@ def consistent_with(left: Comparable, right: Comparable) -> bool:
     :returns:
         whether ``other`` is consistent with ``self``.
     """
-    return left.consistent_with(right)
+    context = context or ContextRegister()
+    return left.consistent_with(right, context)
 
 
 def means(left: Comparable, right: Comparable) -> bool:
