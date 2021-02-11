@@ -61,22 +61,6 @@ class Entity(Term):
             return f"<{self.name}>"
         return self.name
 
-    def _context_register(
-        self, other: Comparable, comparison: Callable
-    ) -> Iterator[ContextRegister]:
-        """
-        Find how ``self``\'s context of can be mapped onto ``other``\'s.
-
-        :yields:
-            the only possible way the context of one ``Entity`` can be
-            mapped onto the context of another.
-        """
-        if comparison(self, other):
-            generic_register = ContextRegister()
-            generic_register.insert_pair(self, other)
-            generic_register.insert_pair(other, self)
-            yield generic_register
-
     @new_context_helper
     def new_context(self, changes: ContextRegister) -> Entity:
         """

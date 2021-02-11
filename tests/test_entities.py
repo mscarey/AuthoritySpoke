@@ -32,21 +32,6 @@ class TestMakeEntities:
         motel_b = motel.make_generic()
         assert repr(motel) == repr(motel_b)
 
-    def test_context_register(self, make_entity):
-        """
-        There will be a match because both object are :class:`.Entity`.
-        """
-        motel = make_entity["motel"]
-        watt = make_entity["watt"]
-        update = motel._context_register(watt, operator.ge)
-        assert any(register is not None for register in update)
-
-        update = motel._context_register(watt, operator.le)
-        expected = ContextRegister()
-        expected.insert_pair(motel, watt)
-        expected.insert_pair(watt, motel)
-        assert any(register == expected for register in update)
-
     def test_new_context(self, make_entity):
 
         changes = ContextRegister.from_lists(
