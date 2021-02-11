@@ -2,7 +2,7 @@ import pytest
 
 from anchorpoint.textselectors import TextQuoteSelector
 
-from authorityspoke.statements.entities import Entity
+from authorityspoke.entities import Entity
 from authorityspoke.factors import FactorIndex
 from authorityspoke.facts import Fact, Predicate
 from authorityspoke.holdings import HoldingGroup

@@ -9,7 +9,7 @@ from legislice.download import Client
 import pytest
 
 from authorityspoke.statements.comparable import ContextRegister, means
-from authorityspoke.statements.entities import Entity
+from authorityspoke.entities import Entity
 from authorityspoke.statements.explanations import Explanation
 from authorityspoke.facts import Fact
 from authorityspoke.statements.groups import ComparableGroup

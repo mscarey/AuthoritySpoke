@@ -12,6 +12,7 @@ from authorityspoke.statements.comparable import (
     ContextRegister,
     new_context_helper,
 )
+from authorityspoke.statements.terms import Term
 
 from authorityspoke.statements.formatting import indented, wrapped
 from authorityspoke.statements.predicates import Predicate

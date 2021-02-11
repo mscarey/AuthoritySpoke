@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 from typing import ClassVar, Optional, Tuple
 
-from authorityspoke.statements.entities import Entity
+from authorityspoke.entities import Entity
 from authorityspoke.factors import Factor
 from authorityspoke.facts import Fact
 from authorityspoke.statements.formatting import indented

@@ -3,7 +3,7 @@ import operator
 
 import pytest
 
-from authorityspoke.statements.entities import Entity
+from authorityspoke.entities import Entity
 from authorityspoke.statements.statements import Statement
 from authorityspoke.io import readers
 

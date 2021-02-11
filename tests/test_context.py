@@ -3,7 +3,7 @@ import operator
 import pytest
 
 from authorityspoke.statements.comparable import ContextRegister, means
-from authorityspoke.statements.entities import Entity
+from authorityspoke.entities import Entity
 from authorityspoke.statements.groups import ComparableGroup
 from authorityspoke.statements.statements import Statement
 

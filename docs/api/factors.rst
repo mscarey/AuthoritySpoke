@@ -9,11 +9,11 @@ Factors
 Entities
 ==============
 
-.. inheritance-diagram:: authorityspoke.statements.entities.Entity
+.. inheritance-diagram:: authorityspoke.entities.Entity
     :top-classes: authorityspoke.comparisons.Comparable
     :parts: 1
 
-.. autoclass:: authorityspoke.statements.entities.Entity
+.. autoclass:: authorityspoke.entities.Entity
     :members:
     :special-members:
 

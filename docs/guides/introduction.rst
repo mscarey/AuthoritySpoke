@@ -455,18 +455,18 @@ Generic Factors
 ------------------
 
 The two instances of the phrase “the Java API” are in angle brackets to
-indicate that the Java API is a generic :class:`~authorityspoke.statements.entities.Entity` mentioned
+indicate that the Java API is a generic :class:`~authorityspoke.entities.Entity` mentioned
 in the :class:`~authorityspoke.facts.Fact`\.
 
     >>> oracle.holdings[0].generic_factors
     [Entity(name='the Java API', generic=True, plural=False, anchors=[])]
 
 
-A generic :class:`~authorityspoke.statements.entities.Entity` is “generic”
+A generic :class:`~authorityspoke.entities.Entity` is “generic”
 in the sense that in the context of
 the :class:`~authorityspoke.factors.Factor` where
-the :class:`~authorityspoke.statements.entities.Entity` appears, it could be replaced with
-some other generic :class:`~authorityspoke.statements.entities.Entity` without
+the :class:`~authorityspoke.entities.Entity` appears, it could be replaced with
+some other generic :class:`~authorityspoke.entities.Entity` without
 changing the meaning of the
 :class:`~authorityspoke.factors.Factor` or the :class:`~authorityspoke.rules.Rule` where it appears.
 
@@ -870,7 +870,7 @@ for protection under the Copyright Act. This is a two-step analysis.
 
 The first step results in
 the :class:`~authorityspoke.facts.Fact` it is false that a generic
-:class:`~authorityspoke.statements.entities.Entity` was “an original work”:
+:class:`~authorityspoke.entities.Entity` was “an original work”:
 
     >>> print(feist.holdings[10])
     the Holding to ACCEPT
@@ -889,7 +889,7 @@ the :class:`~authorityspoke.facts.Fact` it is false that a generic
 
 And the second step relies on the result of the first step to reach the
 further result of “absence of the Fact that” a
-generic :class:`~authorityspoke.statements.entities.Entity` was “copyrightable”.
+generic :class:`~authorityspoke.entities.Entity` was “copyrightable”.
 
     >>> print(feist.holdings[3])
     the Holding to ACCEPT that the EXCLUSIVE way to reach the fact that
@@ -933,7 +933,7 @@ Holding ``listings_not_copyrightable`` is that
 ``listings_not_copyrightable`` has
 two :class:`~authorityspoke.factors.Factor`\s under its “RESULT”, not
 just one. Notice that it doesn’t matter that the two original Holdings
-reference different generic :class:`~authorityspoke.statements.entities.Entity` objects
+reference different generic :class:`~authorityspoke.entities.Entity` objects
 (“Rural’s telephone directory” versus “Rural’s telephone listings”).
 Because they’re generic, they’re interchangeable for this purpose.
 

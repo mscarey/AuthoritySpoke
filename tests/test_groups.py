@@ -4,7 +4,7 @@ from authorityspoke.statements.comparable import (
     contradicts,
     means,
 )
-from authorityspoke.statements.entities import Entity
+from authorityspoke.entities import Entity
 from authorityspoke.statements.groups import ComparableGroup
 from authorityspoke.statements.predicates import Predicate, Comparison
 from authorityspoke.statements.statements import Statement

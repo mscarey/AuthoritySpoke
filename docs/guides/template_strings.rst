@@ -256,7 +256,7 @@ AuthoritySpoke isn’t limited to
 comparing :class:`~authorityspoke.predicates.Predicate`\s
 and :class:`~authorityspoke.predicates.Comparison`\s
 containing unassigned placeholder text. You can
-use :class:`~authorityspoke.statements.entities.Entity` objects to
+use :class:`~authorityspoke.entities.Entity` objects to
 assign specific terms to the placeholders. You then link the terms to
 the :class:`~authorityspoke.predicates.Predicate`
 or :class:`~authorityspoke.predicates.Comparison` inside

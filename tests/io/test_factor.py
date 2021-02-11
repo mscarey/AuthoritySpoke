@@ -8,7 +8,7 @@ from marshmallow import ValidationError
 from legislice import Enactment
 import pytest
 
-from authorityspoke.statements.entities import Entity
+from authorityspoke.entities import Entity
 from authorityspoke.facts import Fact
 from authorityspoke.io import readers, schemas, name_index
 from authorityspoke.io.loaders import load_holdings

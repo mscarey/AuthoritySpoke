@@ -2,7 +2,7 @@
 
 from legislice import Enactment
 
-from .statements.entities import Entity
+from .entities import Entity
 from .factors import Factor
 from .facts import Fact
 from .opinions import Opinion

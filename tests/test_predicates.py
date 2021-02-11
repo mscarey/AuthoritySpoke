@@ -5,7 +5,7 @@ import sympy
 from sympy import Interval, oo
 
 
-from authorityspoke.statements.entities import Entity
+from authorityspoke.entities import Entity
 from authorityspoke.statements.predicates import Predicate, Comparison, Q_
 
 

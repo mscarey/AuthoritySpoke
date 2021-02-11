@@ -11,7 +11,7 @@ import pytest
 
 from authorityspoke.io import anchors, loaders, readers, dump
 from authorityspoke.io.downloads import FakeClient
-from authorityspoke.statements.entities import Entity
+from authorityspoke.entities import Entity
 from authorityspoke.statements.predicates import Predicate
 from authorityspoke.statements.statements import Statement
 

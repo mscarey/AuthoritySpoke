@@ -12,7 +12,7 @@ from legislice.download import Client
 import pytest
 
 from authorityspoke.statements.comparable import ContextRegister
-from authorityspoke.statements.entities import Entity
+from authorityspoke.entities import Entity
 from authorityspoke.evidence import Evidence, Exhibit
 from authorityspoke.factors import Factor
 from authorityspoke.facts import Fact, build_fact

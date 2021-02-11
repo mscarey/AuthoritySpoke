@@ -1,10 +1,8 @@
-""":class:`.Factor` subclass for things that exist in the outside world."""
+""":class:`.Comparable` subclass for things that can be referenced in a Statement."""
 
 from __future__ import annotations
-from dataclasses import astuple, dataclass, field
+from dataclasses import astuple, dataclass
 from typing import Callable, Iterator, List, Optional
-
-from anchorpoint import TextQuoteSelector
 
 from authorityspoke.statements.comparable import (
     Comparable,
@@ -14,22 +12,11 @@ from authorityspoke.statements.comparable import (
 
 
 @dataclass()
-class Entity(Comparable):
+class Term(Comparable):
     r"""
-    Things that exist in the outside world, like people, places, or events.
+    Things that can be referenced in a Statement.
 
-    Not concepts that derive their meaning from litigation,
-    such as a legal Fact, an Allegation, a Pleading, etc.
-
-    Best used to specify things to be mentioned in
-    multiple :class:`.Factor`\s in a :class:`.Rule`, often in the
-    :class:`.Predicate` of a :class:`.Fact` object.
-
-    An :class:`Entity` is often, but not always, ``generic`` with
-    respect to the meaning of the :class:`.Rule` in which it is
-    mentioned, which means that the :class:`.Rule` is understood
-    to apply generally even if some other :class:`Entity` was
-    substituted.
+    The name of a Term can replace the placeholder in a StatementTemplate
 
     :param name:
         An identifier. An :class:`Entity` with the same ``name``
@@ -51,9 +38,9 @@ class Entity(Comparable):
     """
 
     name: Optional[str] = None
+    absent: bool = False
     generic: bool = True
     plural: bool = False
-    anchors: List[TextQuoteSelector] = field(default_factory=list)
 
     def means(self, other):
         """
@@ -92,7 +79,7 @@ class Entity(Comparable):
             yield generic_register
 
     @new_context_helper
-    def new_context(self, changes: ContextRegister) -> Entity:
+    def new_context(self, changes: ContextRegister) -> Term:
         """
         Create new :class:`Factor`, replacing keys of ``changes`` with values.
 
