@@ -126,7 +126,7 @@ def expand_string_from_source(
 def convert_changes_to_register(
     factor: Comparable,
     changes: Union[Comparable, ContextRegister, Sequence[Comparable]],
-    source: Comparable,
+    source: Optional[Comparable],
     terms_to_replace: Optional[Sequence[Comparable]] = None,
 ) -> ContextRegister:
     if isinstance(changes, ContextRegister):
@@ -166,9 +166,17 @@ class Comparable(ABC):
         this object for another generic object of the same class does not change the
         meaning of other Comparable objects that incorporate this one as a term.
 
+    :attr absent:
+        Indicates the absence of the described object. The absence of two
+        contradictory objects is not contradictory.
+
     :attr name:
         An identifier for this object. May be used as a shorthand way of referring to
         this object when replacing another Comparable object's generic terms.
+
+    :attr plural:
+        Indicates whether the object refers to multiple things. Can be checked
+        by a StatementTemplate to see whether a verb needs to be made plural.
     """
 
     generic: bool = False
