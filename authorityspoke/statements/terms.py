@@ -46,13 +46,3 @@ class Term(Comparable):
         if self.generic:
             return f"<{self.name}>"
         return self.name
-
-    @new_context_helper
-    def new_context(self, changes: ContextRegister) -> Term:
-        """
-        Create new :class:`Factor`, replacing keys of ``changes`` with values.
-
-        Assumes no changes are possible because the :func:`new_context_helper`
-        decorator would have replaced ``self`` if any replacement was available.
-        """
-        return self
