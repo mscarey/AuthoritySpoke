@@ -18,7 +18,7 @@ from authorityspoke.statements.formatting import indented, wrapped
 from authorityspoke.statements.predicates import Predicate
 
 
-class Statement(Comparable):
+class Statement(Term):
     r"""
     An assertion accepted as factual by a court.
 
@@ -85,6 +85,10 @@ class Statement(Comparable):
                 "Items in the 'terms' parameter should "
                 + "be a subclass of Comparable."
             )
+
+    @property
+    def short_string(self) -> str:
+        return str(self)
 
     @property
     def terms(self) -> FactorSequence:

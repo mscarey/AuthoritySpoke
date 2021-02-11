@@ -106,13 +106,11 @@ class TestContextRegisters:
         assert merged is None
 
     def test_import_to_mapping_reciprocal(self, watt_factor):
-        mapping = ContextRegister.from_lists(
-            [watt_factor["f7"]], [watt_factor["f7"]]
-        ).merged_with(
-            ContextRegister.from_lists(
-                [watt_factor["f7_swap_entities"]], [watt_factor["f7_swap_entities"]]
-            )
+        left = ContextRegister.from_lists([watt_factor["f7"]], [watt_factor["f7"]])
+        right = ContextRegister.from_lists(
+            [watt_factor["f7_swap_entities"]], [watt_factor["f7_swap_entities"]]
         )
+        mapping = left.merged_with(right)
         assert mapping.get(str(watt_factor["f7"])).means(watt_factor["f7"])
 
     def test_registers_for_interchangeable_context(self, make_entity, watt_factor):

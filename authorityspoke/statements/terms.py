@@ -1,17 +1,11 @@
 """:class:`.Comparable` subclass for things that can be referenced in a Statement."""
 
 from __future__ import annotations
-from dataclasses import astuple, dataclass
 from typing import Callable, Iterator, List, Optional
 
-from authorityspoke.statements.comparable import (
-    Comparable,
-    ContextRegister,
-    new_context_helper,
-)
+from authorityspoke.statements.comparable import Comparable
 
 
-@dataclass()
 class Term(Comparable):
     r"""
     Things that can be referenced in a Statement.
@@ -37,12 +31,20 @@ class Term(Comparable):
         be represented by a plural noun.
     """
 
-    name: Optional[str] = None
-    absent: bool = False
-    generic: bool = True
-    plural: bool = False
+    def __init__(
+        self,
+        name: Optional[str] = None,
+        absent: bool = False,
+        generic: bool = True,
+        plural: bool = False,
+    ) -> None:
+        self.name = name
+        self.absent = absent
+        self.generic = generic
+        self.plural = plural
 
-    def __str__(self):
+    @property
+    def short_string(self):
         if self.generic:
             return f"<{self.name}>"
         return self.name
