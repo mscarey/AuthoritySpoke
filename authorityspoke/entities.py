@@ -56,21 +56,6 @@ class Entity(Term):
     plural: bool = False
     anchors: List[TextQuoteSelector] = field(default_factory=list)
 
-    def means(self, other):
-        """
-        Test whether ``other`` has the same meaning as ``self``.
-
-        ``Generic`` :class:`Entity` objects are considered equivalent
-        in meaning as long as they're the same class. If not ``generic``,
-        they're considered equivalent if all their attributes are the same.
-        """
-
-        if self.__class__ != other.__class__:
-            return False
-        if self.generic and other.generic:
-            return True
-        return astuple(self) == astuple(other)
-
     def __str__(self):
         if self.generic:
             return f"<{self.name}>"
