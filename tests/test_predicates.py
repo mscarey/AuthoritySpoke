@@ -5,7 +5,7 @@ import sympy
 from sympy import Interval, oo
 
 
-from authorityspoke.entities import Entity
+from nettlesome.entities import Entity
 from nettlesome.predicates import Predicate, Comparison, Q_
 
 
@@ -33,7 +33,7 @@ class TestComparisons:
             expression=Q_("20 miles"),
         )
         assert comparison.interval == sympy.Union(
-            Interval(-oo, 20, right_open=True), Interval(20, oo, left_open=True)
+            Interval(0, 20, right_open=True), Interval(20, oo, left_open=True)
         )
 
 
@@ -157,7 +157,7 @@ class TestPredicates:
             "$thing were names, towns, and telephone numbers of telephone subscribers"
         )
         predicate = Predicate(phrase)
-        with_context = predicate.content_with_terms(context)
+        with_context = predicate._content_with_terms(context)
         assert with_context.startswith(expected)
 
     def test_str_not_equal(self, make_predicate):
@@ -426,7 +426,7 @@ class TestQuantities:
             sign="<",
             expression=Q_("30 miles"),
         )
-        assert comparison.excludes_other_quantity(comparison_opposite) is False
+        assert not comparison.contradicts(comparison_opposite)
 
     def test_convert_quantity_of_Comparison(self):
         comparison = Comparison(

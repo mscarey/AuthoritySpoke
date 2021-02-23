@@ -6,19 +6,19 @@ from typing import Type
 
 from dotenv import load_dotenv
 from legislice.download import Client
-import pytest
-
 from nettlesome.comparable import ContextRegister, means
-from authorityspoke.entities import Entity
+from nettlesome.entities import Entity
 from nettlesome.explanations import Explanation
-from authorityspoke.facts import Fact
 from nettlesome.groups import FactorGroup
-from authorityspoke.holdings import Holding
 from nettlesome.predicates import Comparison, Predicate, Q_
 from nettlesome.statements import Statement
+import pytest
+
+
+from authorityspoke.facts import Fact
+from authorityspoke.holdings import Holding
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
-
 from authorityspoke.io import loaders, readers
 from authorityspoke.io.downloads import FakeClient
 
@@ -69,7 +69,7 @@ class TestRules:
     def test_cannot_change_context_with_dict_and_terms(
         self, make_holding, make_predicate
     ):
-        with pytest.raises(ValueError):
+        with pytest.raises(TypeError):
             make_holding["h1"].new_context(
                 {make_predicate["p1"]: make_predicate["p7"]},
                 terms_to_replace=[Entity("Bob")],
@@ -110,7 +110,7 @@ class TestRules:
 
     def test_string_mentions_absence(self, make_opinion_with_holding):
         cardenas = make_opinion_with_holding["cardenas_majority"]
-        assert "absence of the Evidence" in str(cardenas.holdings[1])
+        assert "absence of the evidence" in str(cardenas.holdings[1]).lower()
 
     def test_factor_properties_for_rule(self, make_opinion_with_holding):
         cardenas = make_opinion_with_holding["cardenas_majority"]
@@ -204,7 +204,7 @@ class TestImplication:
         explanation = make_rule["h2_exact_in_despite"].explain_implication(
             make_rule["h2"]
         )
-        assert str(explanation.get("<Hideaway Lodge>")) == "<Hideaway Lodge>"
+        assert explanation.get("<Hideaway Lodge>").key == "<Hideaway Lodge>"
 
     def test_explain_all_to_all_implies_reciprocal(self, make_rule):
         """
@@ -213,7 +213,7 @@ class TestImplication:
         """
         fewer_inputs = make_rule["h3_fewer_inputs_ALL"]
         explanation = fewer_inputs.explain_implication(make_rule["h3_ALL"])
-        assert str(explanation.get("<Hideaway Lodge>")) == "<Hideaway Lodge>"
+        assert explanation.get("<Hideaway Lodge>").key == "<Hideaway Lodge>"
 
     def test_holdings_more_specific_quantity_implies_less_specific(self, make_rule):
         assert make_rule["h2_exact_quantity"] > make_rule["h2"]

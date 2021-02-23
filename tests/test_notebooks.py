@@ -14,7 +14,7 @@ from authorityspoke.io.downloads import download_case
 from authorityspoke.io.readers import read_decision
 
 from nettlesome.comparable import ContextRegister
-from authorityspoke.entities import Entity
+from nettlesome.entities import Entity
 from nettlesome.predicates import Comparison
 
 load_dotenv()
@@ -113,7 +113,9 @@ class TestIntroduction:
         assert "<the Lotus menu command hierarchy> is like <the Java API>" in str(
             explanation
         )
-        assert "the Fact it was false that <the Lotus" in str(explanation)
+        assert (
+            "the Fact it was false that <the Lotus".lower() in str(explanation).lower()
+        )
 
     def test_register_string(self, make_opinion_with_holding):
         oracle = make_opinion_with_holding["oracle_majority"]

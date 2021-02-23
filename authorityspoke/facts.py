@@ -106,8 +106,7 @@ class Fact(Statement):
 
     def __str__(self):
         """Create one-line string representation for inclusion in other Facts."""
-        content = str(self.predicate._content_with_terms(self.terms))
-        unwrapped = self.predicate.add_truth_to_content(content)
+        unwrapped = self.predicate.add_truth_to_content(self.content)
         standard = (
             f"by the standard {self.standard_of_proof}, "
             if self.standard_of_proof
@@ -115,6 +114,10 @@ class Fact(Statement):
         )
         string = f"{standard}{unwrapped}"
         return Comparable.__str__(self).format(string)
+
+    @property
+    def content(self) -> str:
+        return str(self.predicate._content_with_terms(self.terms))
 
     def _means_if_concrete(
         self, other: Comparable, context: ContextRegister

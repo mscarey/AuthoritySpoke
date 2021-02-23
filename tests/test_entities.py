@@ -1,10 +1,9 @@
-from nettlesome.comparable import ContextRegister
-import operator
-
 import pytest
 
-from authorityspoke.entities import Entity
+from nettlesome.comparable import ContextRegister
+from nettlesome.entities import Entity
 from nettlesome.statements import Statement
+
 from authorityspoke.io import readers
 
 

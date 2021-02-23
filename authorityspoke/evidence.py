@@ -6,10 +6,11 @@ from typing import ClassVar, Iterator, List, Optional, Tuple
 from anchorpoint import TextQuoteSelector
 
 from nettlesome.comparable import ContextRegister
-from authorityspoke.entities import Entity
+from nettlesome.entities import Entity
+from nettlesome.formatting import indented
+
 from authorityspoke.factors import Factor
 from authorityspoke.facts import Fact
-from nettlesome.formatting import indented
 
 
 @dataclass()
@@ -86,7 +87,7 @@ class Exhibit(Factor):
             + f'{("asserting " + self.statement.short_string + ", ") if self.statement else ""}'
         )
         string = super().__str__().format(string)
-        return string.replace("Exhibit", self.form or "exhibit").strip()
+        return string.replace("exhibit", self.form or "exhibit").strip()
 
     @property
     def wrapped_string(self):

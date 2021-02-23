@@ -13,19 +13,18 @@ from anchorpoint.textselectors import TextQuoteSelector
 from legislice import Enactment
 from legislice.download import Client
 from legislice.name_index import EnactmentIndex, collect_enactments
+from nettlesome.entities import Entity
+from nettlesome.predicates import Predicate
 
 from authorityspoke.decisions import Decision
-from authorityspoke.entities import Entity
 from authorityspoke.evidence import Exhibit, Evidence
 from authorityspoke.factors import Factor
 from authorityspoke.facts import Fact
 from authorityspoke.holdings import Holding
 from authorityspoke.opinions import AnchoredHoldings
 from authorityspoke.pleadings import Allegation, Pleading
-from nettlesome.predicates import Predicate
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
-
 from authorityspoke.io import anchors, schemas
 from authorityspoke.io.schemas import (
     RawEnactment,

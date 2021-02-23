@@ -9,7 +9,7 @@ from legislice.download import Client
 from authorityspoke.holdings import Holding
 
 from nettlesome.comparable import ContextRegister, FactorSequence
-from authorityspoke.entities import Entity
+from nettlesome.entities import Entity
 from nettlesome.predicates import Predicate
 from nettlesome.statements import Statement
 
@@ -44,10 +44,10 @@ class TestHolding:
         lotus = make_opinion_with_holding["lotus_majority"]
         assert "registered a copyright\n" in str(lotus.holdings[2])
 
-    def test_caps_class_name_for_fact_within_holding(self, make_opinion_with_holding):
+    def test_case_class_name_for_fact_within_holding(self, make_opinion_with_holding):
         lotus = make_opinion_with_holding["lotus_majority"]
-        assert "the fact that <Lotus" not in str(lotus.holdings[2])
-        assert "the Fact that <Lotus" in str(lotus.holdings[2])
+        assert "the Fact that <Lotus" not in str(lotus.holdings[2])
+        assert "the fact that <Lotus" in str(lotus.holdings[2])
 
     def test_infer_from_exclusive(self, make_opinion_with_holding):
         """
@@ -205,7 +205,7 @@ class TestImplication:
 
         new_context = oracle.holdings[18].new_context(context)
         explanation = new_context.explain_implication(oracle.holdings[19])
-        assert explanation.get_factor(language) == language
+        assert explanation.get_factor(language).compare_keys(language)
 
     def test_not_implied_by_statement(self, make_holding):
         assert not Statement(

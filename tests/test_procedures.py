@@ -2,13 +2,13 @@ from copy import deepcopy
 import logging
 import pytest
 
-from authorityspoke.facts import Fact
-from authorityspoke.procedures import Procedure
-
 from nettlesome.comparable import ContextRegister, FactorSequence
-from authorityspoke.entities import Entity
+from nettlesome.entities import Entity
 from nettlesome.groups import FactorGroup
 from nettlesome.predicates import Comparison, Predicate, Q_
+
+from authorityspoke.facts import Fact
+from authorityspoke.procedures import Procedure
 
 
 class TestProcedures:
@@ -274,7 +274,6 @@ class TestProcedureUnion:
             feist.holdings[0].procedure + feist.holdings[2].procedure.inputs[0]
         )
         assert procedure_from_union.means(procedure_from_adding)
-        assert procedure_from_union.means_same_context(procedure_from_adding)
 
 
 p_small_weight = Comparison(

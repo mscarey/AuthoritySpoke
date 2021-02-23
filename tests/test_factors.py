@@ -3,9 +3,10 @@ import operator
 import pytest
 
 from nettlesome.comparable import ContextRegister, FactorSequence, means
-from authorityspoke.entities import Entity
-from authorityspoke.facts import Fact, build_fact
+from nettlesome.entities import Entity
 from nettlesome.predicates import Comparison, Q_, Predicate
+
+from authorityspoke.facts import Fact, build_fact
 
 
 class TestFacts:
@@ -123,8 +124,8 @@ class TestFacts:
     def test_str_with_concrete_context(self, make_opinion_with_holding):
         holding = list(make_opinion_with_holding["cardenas_majority"].holdings)[1]
         longer_str = holding.inputs[0].str_with_concrete_context
-        assert "the Exhibit in the FORM testimony" in longer_str
-        assert "the Exhibit in the FORM testimony" not in str(holding.inputs[0])
+        assert "the exhibit in the form testimony" in longer_str.lower()
+        assert "the exhibit in the form testimony" not in str(holding.inputs[0]).lower()
 
     def test_complex_fact_no_line_break_in_predicate(self, make_opinion_with_holding):
         """
@@ -154,7 +155,8 @@ class TestFacts:
         holding_list = list(make_opinion_with_holding["cardenas_majority"].holdings)
         factor_list = list(holding_list[0].recursive_factors.values())
         assert any(
-            factor == Entity("parole officer") and factor.name == "parole officer"
+            factor.compare_keys(Entity("parole officer"))
+            and factor.name == "parole officer"
             for factor in factor_list
         )
 
@@ -189,9 +191,7 @@ class TestFacts:
         assert len(watt_factor["f1"]) == 1
 
     def test_predicate_with_entities(self, make_entity, watt_factor):
-        assert "<Hideaway Lodge> was a motel" in watt_factor[
-            "f1"
-        ].predicate.content_with_terms((make_entity["motel"]))
+        assert "<Hideaway Lodge> was a motel" in str(watt_factor["f1"])
 
     def test_factor_terms_do_not_match_predicate(self, make_predicate, watt_mentioned):
         """
@@ -203,14 +203,14 @@ class TestFacts:
 
     def test_reciprocal_with_wrong_number_of_entities(self, make_entity, watt_factor):
         with pytest.raises(ValueError):
-            watt_factor["f1"].predicate.content_with_terms(
+            watt_factor["f1"].predicate._content_with_terms(
                 (make_entity["motel"], make_entity["watt"])
             )
 
     def test_entity_and_human_in_predicate(self, make_entity, watt_factor):
         assert "<Wattenburg> operated and lived at <Hideaway Lodge>" in watt_factor[
             "f2"
-        ].predicate.content_with_terms((make_entity["watt"], make_entity["motel"]))
+        ].predicate._content_with_terms((make_entity["watt"], make_entity["motel"]))
 
     def test_standard_of_proof_must_be_listed(self, make_predicate, watt_mentioned):
         with pytest.raises(ValueError):
@@ -445,7 +445,7 @@ class TestImplication:
             make_context_register
         )
         explanation = complex_true.explain_implication(complex_whether)
-        assert (str(Entity("Alice")), Entity("Craig")) in explanation.items()
+        assert explanation[Entity("Alice").key].compare_keys(Entity("Craig"))
 
     def test_implication_explain_keys_only_from_left(
         self, make_complex_fact, make_context_register
@@ -459,15 +459,15 @@ class TestImplication:
         new = complex_whether.new_context(make_context_register)
         explanations = list(complex_true.explanations_implication(new))
         explanation = explanations.pop()
-        assert (str(Entity("Craig")), Entity("Alice")) not in explanation.items()
-        assert (str(Entity("Alice")), Entity("Craig")) in explanation.items()
+        assert explanation.get("<Craig>") != Entity("Alice")
+        assert explanation.get("<Alice>").compare_keys(Entity("Craig"))
 
     def test_context_registers_for_complex_comparison(self, make_complex_fact):
         gen = make_complex_fact["f_relevant_murder_nested_swap"]._context_registers(
             make_complex_fact["f_relevant_murder"], operator.ge
         )
         register = next(gen)
-        assert register.matches.get("<Alice>") == Entity("Bob")
+        assert register.matches.get("<Alice>").compare_keys(Entity("Bob"))
 
     def test_no_implication_complex(self, make_complex_fact):
         left = make_complex_fact["f_relevant_murder"]
@@ -731,23 +731,3 @@ class TestAddition:
     def test_cant_add_enactment_to_fact(self, watt_factor, e_search_clause):
         with pytest.raises(TypeError):
             print(watt_factor["f3"] + e_search_clause)
-
-
-class TestUnion:
-    def test_union_same_as_adding(self):
-        dave = Entity("Dave")
-        speed_template = "${driver}'s driving speed was"
-        fast_fact = Fact(
-            Comparison(speed_template, sign=">=", expression="100 miles per hour"),
-            terms=dave,
-        )
-        slow_fact = Fact(
-            Comparison(
-                speed_template,
-                sign=">=",
-                expression="20 miles per hour",
-            ),
-            terms=dave,
-        )
-        new = fast_fact | slow_fact
-        assert new.means(fast_fact)

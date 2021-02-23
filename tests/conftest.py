@@ -9,10 +9,10 @@ from dotenv import load_dotenv
 from legislice import Enactment
 from legislice.name_index import EnactmentIndex
 from legislice.download import Client
+from nettlesome.comparable import ContextRegister
+from nettlesome.entities import Entity
 import pytest
 
-from nettlesome.comparable import ContextRegister
-from authorityspoke.entities import Entity
 from authorityspoke.evidence import Evidence, Exhibit
 from authorityspoke.factors import Factor
 from authorityspoke.facts import Fact, build_fact

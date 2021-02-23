@@ -12,9 +12,10 @@ from anchorpoint.textselectors import TextQuoteSelector, TextPositionSelector
 from anchorpoint.schemas import SelectorSchema
 from legislice import Enactment
 from legislice.schemas import EnactmentSchema
+from nettlesome.entities import Entity
+from nettlesome.predicates import Predicate, Comparison, ureg, Q_
 
 from authorityspoke.decisions import CaseCitation, Decision
-from authorityspoke.entities import Entity
 from authorityspoke.evidence import Exhibit, Evidence
 from authorityspoke.factors import Factor
 from authorityspoke.facts import Fact
@@ -25,7 +26,7 @@ from authorityspoke.io.nesting import nest_fields
 from authorityspoke.io import text_expansion
 from authorityspoke.opinions import Opinion
 from authorityspoke.pleadings import Pleading, Allegation
-from nettlesome.predicates import Predicate, Comparison, ureg, Q_
+
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
 

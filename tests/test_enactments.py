@@ -7,13 +7,14 @@ from legislice.download import Client
 
 from legislice.enactments import Enactment, consolidate_enactments
 from legislice.schemas import EnactmentSchema
+from nettlesome.entities import Entity
+from nettlesome.predicates import Predicate
+from nettlesome.statements import Statement
 import pytest
 
 from authorityspoke.io import anchors, loaders, readers, dump
 from authorityspoke.io.downloads import FakeClient
-from authorityspoke.entities import Entity
-from nettlesome.predicates import Predicate
-from nettlesome.statements import Statement
+
 
 load_dotenv()
 

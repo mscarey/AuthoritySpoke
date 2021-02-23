@@ -3,7 +3,7 @@ import operator
 import pytest
 
 from nettlesome.comparable import ContextRegister, FactorSequence, means
-from authorityspoke.entities import Entity
+from nettlesome.entities import Entity
 from nettlesome.predicates import Comparison, Q_, Predicate
 from nettlesome.statements import Statement
 
@@ -117,7 +117,7 @@ class TestStatements:
         shot = Statement(predicate_shot, terms=[Entity("Alice"), Entity("Bob")])
         told = Statement(predicate_told, terms=[Entity("Henry"), Entity("Jenna"), shot])
         factors = told.recursive_factors
-        assert factors["<Alice>"] == Entity("Alice")
+        assert factors["<Alice>"].compare_keys(Entity("Alice"))
 
     def test_new_concrete_context(self):
         """
@@ -531,13 +531,13 @@ class TestImplication:
 
         complex_whether = self.relevant_whether.new_context(context_names)
         explanation = self.relevant_fact.explain_implication(complex_whether)
-        assert (str(Entity("Alice")), Entity("Craig")) in explanation.items()
+        assert explanation.get("<Alice>").compare_keys(Entity("Craig"))
         assert (
             str(explanation)
             == "ContextRegister(<Alice> is like <Craig>, <Bob> is like <Dan>)"
         )
-        assert (str(Entity("Craig")), Entity("Alice")) not in explanation.items()
-        assert (str(Entity("Alice")), Entity("Craig")) in explanation.items()
+        assert explanation.get(Entity("Craig").key) is None
+        assert explanation.get(Entity("Alice").key).compare_keys(Entity("Craig"))
 
     def test_context_registers_for_complex_comparison(self):
         context_names = ContextRegister()
@@ -547,7 +547,7 @@ class TestImplication:
         swapped_entities = self.relevant_fact.new_context(context_names)
         gen = swapped_entities._context_registers(self.relevant_fact, operator.ge)
         register = next(gen)
-        assert register.matches.get("<Alice>") == Entity("Bob")
+        assert register.matches.get("<Alice>").compare_keys(Entity("Bob"))
 
     def test_no_implication_complex(self):
         murder_fact = Statement(
@@ -929,7 +929,6 @@ class TestAddition:
         murder = Statement(Predicate("$person committed a murder"), terms=Entity("Al"))
         crime = Statement(Predicate("$person committed a crime"), terms=Entity("Al"))
         assert murder + crime is None
-        assert murder | crime is None
 
     def test_union_with_string_fails(self):
         murder = Statement(Predicate("$person committed a murder"), terms=Entity("Al"))

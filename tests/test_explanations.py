@@ -1,6 +1,7 @@
 from nettlesome.comparable import ContextRegister, means
-from authorityspoke.entities import Entity
+from nettlesome.entities import Entity
 from nettlesome.explanations import Explanation
+
 from authorityspoke.io.readers import read_fact
 from authorityspoke.io.text_expansion import expand_shorthand
 

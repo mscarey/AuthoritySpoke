@@ -1,12 +1,11 @@
 """AuthoritySpoke: Reading the law for the last time."""
 
 from legislice import Enactment
+from nettlesome.entities import Entity
+from nettlesome.predicates import Predicate, Comparison
 
-from .entities import Entity
-from .factors import Factor
 from .facts import Fact
 from .opinions import Opinion
-from .statements.predicates import Predicate, Comparison
 from .rules import Rule
 from .io.dump import to_dict, to_json
 

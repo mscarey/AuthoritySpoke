@@ -2,10 +2,11 @@ from dataclasses import dataclass
 
 from typing import ClassVar, Optional, Tuple
 
-from authorityspoke.entities import Entity
+from nettlesome.entities import Entity
+from nettlesome.formatting import indented
+
 from authorityspoke.factors import Factor
 from authorityspoke.facts import Fact
-from nettlesome.formatting import indented
 
 
 @dataclass()
@@ -31,8 +32,8 @@ class Pleading(Factor):
     context_factor_names: ClassVar[Tuple[str]] = ("filer",)
 
     def __str__(self):
-        string = f'{("filed by " + str(self.filer) if self.filer else "")}'
-        return super().__str__().format(string).replace("Pleading", "pleading")
+        string = f'{("filed by " + self.filer.short_string if self.filer else "")}'
+        return super().__str__().format(string)
 
     @property
     def short_string(self):

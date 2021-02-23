@@ -3,7 +3,7 @@ import operator
 import pytest
 
 from nettlesome.comparable import ContextRegister, means
-from authorityspoke.entities import Entity
+from nettlesome.entities import Entity
 from nettlesome.groups import FactorGroup
 from nettlesome.statements import Statement
 

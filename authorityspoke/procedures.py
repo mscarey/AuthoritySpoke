@@ -135,7 +135,17 @@ class Procedure(Comparable):
         """Yield as much of the context as seems likely correct based on this Procedure."""
         yield from self.likely_contexts(other, context)
 
-    def union_from_explanation(
+    def explanations_union(
+        self, other: Procedure, context: Optional[ContextRegister] = None
+    ) -> Iterator[ContextRegister]:
+        context = context or ContextRegister()
+        for partial in self._explanations_union_partial(other, context):
+            for guess in self.possible_contexts(other, partial):
+                answer = self._union_from_explanation(other, guess)
+                if answer:
+                    yield guess
+
+    def _union_from_explanation(
         self, other: Procedure, context: ContextRegister
     ) -> Optional[Procedure]:
         r"""
@@ -148,9 +158,9 @@ class Procedure(Comparable):
         remain the same.
         """
 
-        new_inputs = self.inputs.union_from_explanation(other.inputs, context)
-        new_outputs = self.outputs.union_from_explanation(other.outputs, context)
-        new_despite = self.despite.union_from_explanation_allow_contradiction(
+        new_inputs = self.inputs._union_from_explanation(other.inputs, context)
+        new_outputs = self.outputs._union_from_explanation(other.outputs, context)
+        new_despite = self.despite._union_from_explanation_allow_contradiction(
             other.despite, context
         )
 
@@ -657,3 +667,17 @@ class Procedure(Comparable):
             still_need_matches=list(other.inputs),
             matches=context,
         )
+
+    def __or__(self, other: Comparable) -> Optional[Comparable]:
+        return self.union(other)
+
+    def union(
+        self, other: Comparable, context: Optional[ContextRegister] = None
+    ) -> Optional[Comparable]:
+        context = context or ContextRegister()
+        explanations = self.explanations_union(other, context)
+        try:
+            explanation = next(explanations)
+        except StopIteration:
+            return None
+        return self._union_from_explanation(other, explanation)

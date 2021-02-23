@@ -4,7 +4,7 @@ from nettlesome.comparable import (
     contradicts,
     means,
 )
-from authorityspoke.entities import Entity
+from nettlesome.entities import Entity
 from nettlesome.groups import FactorGroup
 from nettlesome.predicates import Predicate, Comparison
 from nettlesome.statements import Statement
