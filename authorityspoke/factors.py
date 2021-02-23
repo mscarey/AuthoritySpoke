@@ -9,31 +9,8 @@ from legislice import Enactment
 
 from anchorpoint.textselectors import TextQuoteSelector
 
-from authorityspoke.statements.comparable import Comparable
-
-
-class Factor(Comparable):
-    """
-    Things relevant to a :class:`.Court`\'s application of a :class:`.Rule`.
-
-    The same :class:`Factor` that is in the ``outputs`` for the
-    :class:`.Procedure` of one legal :class:`.Rule` might be in the
-    ``inputs`` of the :class:`.Procedure` for another.
-    """
-
-    def __init__(
-        self,
-        *,
-        generic: bool = False,
-        absent: bool = False,
-        name: Optional[str] = None,
-        anchors: List[TextQuoteSelector] = field(default_factory=list),
-    ):
-        """Designate attributes inherited from Factor as keyword-only."""
-        self.name = name
-        self.generic = generic
-        self.absent = absent
-        self.anchors = anchors
+from nettlesome.comparable import Comparable
+from nettlesome.factors import Factor
 
 
 TextLinkDict = Dict[Union[Factor, Enactment], List[TextQuoteSelector]]

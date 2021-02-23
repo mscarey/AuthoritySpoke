@@ -1,22 +1,22 @@
 """Create models of assertions accepted as factual by courts."""
 
-from typing import ClassVar, Iterator, List, Optional, Sequence, Tuple, Union
+from typing import ClassVar, Iterable, Iterator, List, Optional, Sequence, Tuple, Union
 
 from anchorpoint.textselectors import TextQuoteSelector
 
-from authorityspoke.factors import Factor
-from authorityspoke.statements.formatting import indented
+from nettlesome.factors import Factor
+from nettlesome.formatting import indented
 
-from authorityspoke.statements.comparable import (
+from nettlesome.comparable import (
     Comparable,
     ContextRegister,
     FactorSequence,
 )
-from authorityspoke.statements.predicates import Predicate
-from authorityspoke.statements.statements import Statement
+from nettlesome.predicates import Predicate
+from nettlesome.statements import Statement
 
 
-class Fact(Statement, Factor):
+class Fact(Statement):
     r"""
     An assertion accepted as factual by a court.
 
@@ -86,7 +86,6 @@ class Fact(Statement, Factor):
         )
         self.standard_of_proof = standard_of_proof
         self.anchors = anchors or []
-        self.name = name
         if (
             self.standard_of_proof
             and self.standard_of_proof not in self.standards_of_proof
@@ -94,26 +93,9 @@ class Fact(Statement, Factor):
             raise ValueError(
                 f"standard of proof must be one of {self.standards_of_proof} or None."
             )
-
-        if not isinstance(self.terms, FactorSequence):
-            terms = FactorSequence(self.terms)
-            object.__setattr__(self, "terms", terms)
-
-        if len(self.terms) != len(self.predicate):
-            message = (
-                "The number of items in 'terms' must be "
-                + f"{len(self.predicate)}, not {len(self.terms)}, "
-                + f"to match predicate.context_slots for '{self.predicate.content}'"
-            )
-            if hasattr(self, "name"):
-                message += f" for '{self.name}'"
-            raise ValueError(message)
-        if any(not isinstance(s, Comparable) for s in self.terms):
-            raise TypeError(
-                "Items in the terms parameter should "
-                + "be a subclass of Comparable, or should be integer "
-                + "indices of Comparable objects in the case_factors parameter."
-            )
+        super().__init__(
+            predicate=predicate, terms=terms, name=name, absent=absent, generic=generic
+        )
 
     @property
     def wrapped_string(self):
@@ -124,7 +106,7 @@ class Fact(Statement, Factor):
 
     def __str__(self):
         """Create one-line string representation for inclusion in other Facts."""
-        content = str(self.predicate.content_with_terms(self.terms))
+        content = str(self.predicate._content_with_terms(self.terms))
         unwrapped = self.predicate.add_truth_to_content(content)
         standard = (
             f"by the standard {self.standard_of_proof}, "
@@ -132,19 +114,19 @@ class Fact(Statement, Factor):
             else ""
         )
         string = f"{standard}{unwrapped}"
-        return Comparable.__str__(self).format(string).replace("Fact", "fact")
+        return Comparable.__str__(self).format(string)
 
     def _means_if_concrete(
-        self, other: Factor, context: ContextRegister
+        self, other: Comparable, context: ContextRegister
     ) -> Iterator[ContextRegister]:
-        if self.standard_of_proof == other.standard_of_proof:
+        if self.standard_of_proof == other.__dict__.get("standard_of_proof"):
             yield from super()._means_if_concrete(other, context)
 
     def __len__(self):
         return len(self.terms)
 
     def _implies_if_concrete(
-        self, other: Factor, context: ContextRegister
+        self, other: Comparable, context: ContextRegister
     ) -> Iterator[ContextRegister]:
         """
         Test if ``self`` impliess ``other``, assuming they are not ``generic``.
@@ -215,7 +197,11 @@ def build_fact(
     if isinstance(indices, int):
         indices = (indices,)
 
-    wrapped_factors = Comparable.wrap_with_tuple(case_factors)
+    case_factors = case_factors or ()
+    if not isinstance(case_factors, Iterable):
+        wrapped_factors = (case_factors,)
+    else:
+        wrapped_factors = tuple(case_factors)
 
     terms = FactorSequence([wrapped_factors[i] for i in indices])
     return Fact(

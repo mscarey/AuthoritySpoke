@@ -9,12 +9,12 @@ from legislice import Enactment
 from legislice.download import Client
 from legislice.name_index import collect_enactments
 
-from authorityspoke.statements.comparable import ContextRegister
+from nettlesome.comparable import ContextRegister
 from authorityspoke.entities import Entity
 from authorityspoke.facts import Fact
 from authorityspoke.holdings import Holding, HoldingGroup
 from authorityspoke.opinions import Opinion
-from authorityspoke.statements.predicates import Predicate
+from nettlesome.predicates import Predicate
 from authorityspoke.procedures import Procedure
 from authorityspoke.io import anchors, loaders, readers, schemas, dump, name_index
 from authorityspoke.io.downloads import FakeClient

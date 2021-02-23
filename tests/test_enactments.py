@@ -12,8 +12,8 @@ import pytest
 from authorityspoke.io import anchors, loaders, readers, dump
 from authorityspoke.io.downloads import FakeClient
 from authorityspoke.entities import Entity
-from authorityspoke.statements.predicates import Predicate
-from authorityspoke.statements.statements import Statement
+from nettlesome.predicates import Predicate
+from nettlesome.statements import Statement
 
 load_dotenv()
 

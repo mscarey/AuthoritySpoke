@@ -2,10 +2,10 @@ import operator
 
 import pytest
 
-from authorityspoke.statements.comparable import ContextRegister, FactorSequence, means
+from nettlesome.comparable import ContextRegister, FactorSequence, means
 from authorityspoke.entities import Entity
 from authorityspoke.facts import Fact, build_fact
-from authorityspoke.statements.predicates import Comparison, Q_, Predicate
+from nettlesome.predicates import Comparison, Q_, Predicate
 
 
 class TestFacts:

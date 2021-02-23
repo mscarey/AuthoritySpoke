@@ -6,12 +6,12 @@ from typing import Callable, Iterator, List, Optional
 
 from anchorpoint import TextQuoteSelector
 
-from authorityspoke.statements.comparable import (
+from nettlesome.comparable import (
     Comparable,
     ContextRegister,
     new_context_helper,
 )
-from authorityspoke.statements.terms import Term
+from nettlesome.terms import Term
 
 
 @dataclass()

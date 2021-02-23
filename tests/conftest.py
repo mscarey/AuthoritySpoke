@@ -11,7 +11,7 @@ from legislice.name_index import EnactmentIndex
 from legislice.download import Client
 import pytest
 
-from authorityspoke.statements.comparable import ContextRegister
+from nettlesome.comparable import ContextRegister
 from authorityspoke.entities import Entity
 from authorityspoke.evidence import Evidence, Exhibit
 from authorityspoke.factors import Factor
@@ -19,7 +19,7 @@ from authorityspoke.facts import Fact, build_fact
 from authorityspoke.holdings import Holding
 from authorityspoke.opinions import Opinion
 from authorityspoke.pleadings import Pleading, Allegation
-from authorityspoke.statements.predicates import Predicate, Comparison, Q_
+from nettlesome.predicates import Predicate, Comparison, Q_
 from authorityspoke.rules import Procedure, Rule
 
 from authorityspoke.io import anchors, loaders, readers

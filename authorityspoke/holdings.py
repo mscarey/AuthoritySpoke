@@ -13,7 +13,7 @@ from copy import deepcopy
 
 from itertools import chain
 import operator
-from typing import Any, Callable, Dict, Iterator, List
+from typing import Any, Callable, Dict, Iterable, Iterator, List
 from typing import Optional, Sequence, Tuple, TypeVar, Union
 
 from dataclasses import dataclass, field
@@ -21,17 +21,17 @@ from dataclasses import dataclass, field
 from anchorpoint import TextQuoteSelector
 from legislice.enactments import Enactment
 
-from authorityspoke.statements.comparable import (
+from nettlesome.comparable import (
     Comparable,
     ContextRegister,
     FactorSequence,
     contradicts,
     new_context_helper,
 )
-from authorityspoke.statements.explanations import Explanation
+from nettlesome.explanations import Explanation
 from authorityspoke.factors import Factor
-from authorityspoke.statements.groups import ComparableGroup
-from authorityspoke.statements.formatting import indented, wrapped
+from nettlesome.groups import TermGroup
+from nettlesome.formatting import indented, wrapped
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
 
@@ -605,14 +605,21 @@ class Holding(Comparable):
         return text
 
 
-H = TypeVar("H", bound="Holding")
+class HoldingGroup(TermGroup):
+    term_class = Holding
 
-
-class HoldingGroup(ComparableGroup[H]):
-    def __new__(cls, value: Sequence = ()):
-        if isinstance(value, Holding):
-            value = (value,)
-        return tuple.__new__(HoldingGroup, value)
+    def __init__(self, holdings: Union[Sequence[Holding], Holding] = ()):
+        if isinstance(holdings, Iterable):
+            self.sequence = tuple(holdings)
+        else:
+            self.sequence = (holdings,)
+        for holding in self.sequence:
+            if not isinstance(holding, Holding):
+                raise TypeError(
+                    f'Object "{holding} could not be included in '
+                    f"{self.__class__.__name__} because it is "
+                    f"type {holding.__class__.__name__}, not type Holding"
+                )
 
     def explanations_implication(
         self, other: Comparable, context: Optional[ContextRegister] = None

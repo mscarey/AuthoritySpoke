@@ -8,20 +8,20 @@ may describe procedural moves available in litigation.
 from __future__ import annotations
 from copy import deepcopy
 
-from typing import Any, ClassVar, Dict, Iterator, Type
+from typing import Any, ClassVar, Dict, Iterable, Iterator, Type
 from typing import List, Optional, Sequence, Tuple, Union
 
 from dataclasses import dataclass
 
 from legislice.enactments import Enactment, consolidate_enactments
 
-from authorityspoke.statements.comparable import (
+from nettlesome.comparable import (
     Comparable,
     ContextRegister,
     FactorSequence,
 )
 from authorityspoke.factors import Factor
-from authorityspoke.statements.formatting import indented
+from nettlesome.formatting import indented
 from authorityspoke.procedures import Procedure
 
 
@@ -90,8 +90,12 @@ class Rule(Comparable):
 
         for attr in self.enactment_attr_names:
             value = self.__dict__[attr]
-            if not isinstance(value, Tuple):
-                object.__setattr__(self, attr, self.wrap_with_tuple(value))
+            if not value:
+                object.__setattr__(self, attr, ())
+            elif isinstance(value, Iterable):
+                object.__setattr__(self, attr, tuple(value))
+            else:
+                object.__setattr__(self, attr, (value,))
 
     @property
     def despite(self):

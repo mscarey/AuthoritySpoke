@@ -6,7 +6,7 @@ from sympy import Interval, oo
 
 
 from authorityspoke.entities import Entity
-from authorityspoke.statements.predicates import Predicate, Comparison, Q_
+from nettlesome.predicates import Predicate, Comparison, Q_
 
 
 class TestComparisons:

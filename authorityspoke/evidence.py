@@ -5,11 +5,11 @@ from typing import ClassVar, Iterator, List, Optional, Tuple
 
 from anchorpoint import TextQuoteSelector
 
-from authorityspoke.statements.comparable import ContextRegister
+from nettlesome.comparable import ContextRegister
 from authorityspoke.entities import Entity
 from authorityspoke.factors import Factor
 from authorityspoke.facts import Fact
-from authorityspoke.statements.formatting import indented
+from nettlesome.formatting import indented
 
 
 @dataclass()

@@ -2,10 +2,10 @@ import operator
 
 import pytest
 
-from authorityspoke.statements.comparable import ContextRegister, FactorSequence, means
+from nettlesome.comparable import ContextRegister, FactorSequence, means
 from authorityspoke.entities import Entity
-from authorityspoke.statements.predicates import Comparison, Q_, Predicate
-from authorityspoke.statements.statements import Statement
+from nettlesome.predicates import Comparison, Q_, Predicate
+from nettlesome.statements import Statement
 
 
 class TestStatements:
@@ -162,7 +162,7 @@ class TestStatements:
         predicate = Predicate("$person1 and $person2 went up the hill")
         terms = [Entity("Jack"), Entity("Jill")]
         assert (
-            predicate.content_with_terms(terms) == "<Jack> and <Jill> went up the hill"
+            predicate._content_with_terms(terms) == "<Jack> and <Jill> went up the hill"
         )
 
     def test_factor_terms_do_not_match_predicate(self):
@@ -935,26 +935,3 @@ class TestAddition:
         murder = Statement(Predicate("$person committed a murder"), terms=Entity("Al"))
         with pytest.raises(TypeError):
             murder | "a string"
-
-    def test_union_same_as_adding(self):
-        dave = Entity("Dave")
-        speed_template = "${driver}'s driving speed was"
-        fast_fact = Statement(
-            Comparison(speed_template, sign=">=", expression="100 miles per hour"),
-            terms=dave,
-        )
-        slow_fact = Statement(
-            Comparison(
-                speed_template,
-                sign=">=",
-                expression="20 miles per hour",
-            ),
-            terms=dave,
-        )
-        new = fast_fact | slow_fact
-        assert new.means(fast_fact)
-
-    def test_union_uses_terms_from_left(self):
-        new = self.general_fact | self.specific_fact
-        assert new.means(self.specific_fact)
-        assert new.terms[0] == Entity("the car")

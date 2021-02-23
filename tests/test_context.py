@@ -2,10 +2,10 @@ import operator
 
 import pytest
 
-from authorityspoke.statements.comparable import ContextRegister, means
+from nettlesome.comparable import ContextRegister, means
 from authorityspoke.entities import Entity
-from authorityspoke.statements.groups import ComparableGroup
-from authorityspoke.statements.statements import Statement
+from nettlesome.groups import FactorGroup
+from nettlesome.statements import Statement
 
 
 class TestContextRegisters:
@@ -139,14 +139,14 @@ class TestLikelyContext:
         assert context.check_match(make_entity["motel"], make_entity["motel"])
 
     def test_likely_context_two_factors(self, make_entity, watt_factor):
-        left = ComparableGroup((watt_factor["f9_swap_entities"], watt_factor["f2"]))
+        left = FactorGroup((watt_factor["f9_swap_entities"], watt_factor["f2"]))
         right = watt_factor["f2"]
         context = next(left.likely_contexts(right))
         assert context.check_match(make_entity["motel"], make_entity["motel"])
 
     def test_likely_context_two_by_two(self, make_entity, watt_factor):
-        left = ComparableGroup((watt_factor["f9"], watt_factor["f2"]))
-        right = ComparableGroup(
+        left = FactorGroup((watt_factor["f9"], watt_factor["f2"]))
+        right = FactorGroup(
             (watt_factor["f9_swap_entities"], watt_factor["f9_more_different_entity"])
         )
         context = next(left.likely_contexts(right))
@@ -156,8 +156,8 @@ class TestLikelyContext:
         lotus = make_opinion_with_holding["lotus_majority"]
         oracle = make_opinion_with_holding["oracle_majority"]
         left = [lotus.holdings[2].outputs[0], lotus.holdings[2].inputs[0].to_effect]
-        left = ComparableGroup(left)
-        right = ComparableGroup(oracle.holdings[2].outputs[0])
+        left = FactorGroup(left)
+        right = FactorGroup(oracle.holdings[2].outputs[0])
         context = next(left.likely_contexts(right))
         lotus_menu = lotus.holdings[2].generic_factors()[0]
         java_api = oracle.generic_factors()[0]
@@ -175,7 +175,7 @@ class TestLikelyContext:
 
     def test_union_one_generic_not_matched(self, make_opinion_with_holding):
         """
-        Here, both ComparableGroups have "fact that <> was a computer program".
+        Here, both FactorGroups have "fact that <> was a computer program".
         But they each have another generic that can't be matched:
         fact that <the Java API> was a literal element of <the Java language>
         and
@@ -186,8 +186,8 @@ class TestLikelyContext:
         """
         lotus = make_opinion_with_holding["lotus_majority"]
         oracle = make_opinion_with_holding["oracle_majority"]
-        left = ComparableGroup(lotus.holdings[7].inputs[:2])
-        right = ComparableGroup(
+        left = FactorGroup(lotus.holdings[7].inputs[:2])
+        right = FactorGroup(
             [oracle.holdings[3].outputs[0], oracle.holdings[3].inputs[0]]
         )
         new = left | right

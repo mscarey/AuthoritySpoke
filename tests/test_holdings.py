@@ -8,10 +8,10 @@ from legislice.download import Client
 
 from authorityspoke.holdings import Holding
 
-from authorityspoke.statements.comparable import ContextRegister, FactorSequence
+from nettlesome.comparable import ContextRegister, FactorSequence
 from authorityspoke.entities import Entity
-from authorityspoke.statements.predicates import Predicate
-from authorityspoke.statements.statements import Statement
+from nettlesome.predicates import Predicate
+from nettlesome.statements import Statement
 
 
 load_dotenv()

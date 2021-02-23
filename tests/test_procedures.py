@@ -5,10 +5,10 @@ import pytest
 from authorityspoke.facts import Fact
 from authorityspoke.procedures import Procedure
 
-from authorityspoke.statements.comparable import ContextRegister, FactorSequence
+from nettlesome.comparable import ContextRegister, FactorSequence
 from authorityspoke.entities import Entity
-from authorityspoke.statements.groups import ComparableGroup
-from authorityspoke.statements.predicates import Comparison, Predicate, Q_
+from nettlesome.groups import FactorGroup
+from nettlesome.predicates import Comparison, Predicate, Q_
 
 
 class TestProcedures:
@@ -302,15 +302,15 @@ class TestFactorGroups:
         even though it would be possible to make an analogy that would
         make the statements contradict.
         """
-        assert ComparableGroup([alice_rich, bob_poor]).consistent_with(
-            ComparableGroup([dan_poor, craig_rich])
+        assert FactorGroup([alice_rich, bob_poor]).consistent_with(
+            FactorGroup([dan_poor, craig_rich])
         )
 
     def test_consistent_factor_groups_with_context(self):
         alice_like_craig = ContextRegister()
         alice_like_craig.insert_pair(alice, craig)
-        assert ComparableGroup([alice_rich, bob_poor]).consistent_with(
-            ComparableGroup([dan_poor, craig_rich]),
+        assert FactorGroup([alice_rich, bob_poor]).consistent_with(
+            FactorGroup([dan_poor, craig_rich]),
             context=alice_like_craig,
         )
 
@@ -331,8 +331,8 @@ class TestFactorGroups:
         alice_like_dan = ContextRegister()
         alice_like_dan.insert_pair(alice, dan)
 
-        assert not ComparableGroup([alice_rich, bob_poor]).consistent_with(
-            ComparableGroup([dan_poor, craig_rich]), context=alice_like_dan
+        assert not FactorGroup([alice_rich, bob_poor]).consistent_with(
+            FactorGroup([dan_poor, craig_rich]), context=alice_like_dan
         )
 
     def test_contradictory_factor_groups(self):
@@ -345,8 +345,8 @@ class TestFactorGroups:
         statements would be contradictory, but not if
         Alice is considered analagous to Craig.
         """
-        assert ComparableGroup([alice_rich, bob_poor]).contradicts(
-            ComparableGroup([craig_rich, dan_poor])
+        assert FactorGroup([alice_rich, bob_poor]).contradicts(
+            FactorGroup([craig_rich, dan_poor])
         )
 
     def test_not_contradictory_factor_groups(self):
@@ -357,8 +357,8 @@ class TestFactorGroups:
         alice_like_craig = ContextRegister()
         alice_like_craig.insert_pair(alice, craig)
 
-        assert not ComparableGroup((alice_rich, bob_poor)).contradicts(
-            ComparableGroup((dan_poor, craig_rich)),
+        assert not FactorGroup((alice_rich, bob_poor)).contradicts(
+            FactorGroup((dan_poor, craig_rich)),
             context=alice_like_craig,
         )
 

@@ -2,7 +2,7 @@ from datetime import date
 
 import pytest
 
-from authorityspoke.statements.predicates import Comparison, Predicate, Q_
+from nettlesome.predicates import Comparison, Predicate, Q_
 from authorityspoke.io import readers, schemas
 from authorityspoke.io.dump import to_dict, to_json
 

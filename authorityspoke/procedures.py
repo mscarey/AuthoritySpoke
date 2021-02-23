@@ -14,14 +14,14 @@ import operator
 from typing import Any, Dict, Iterable, Iterator
 from typing import List, Optional, Sequence, Tuple, Union
 
-from authorityspoke.statements.comparable import (
+from nettlesome.comparable import (
     Comparable,
     ContextRegister,
     new_context_helper,
 )
 from authorityspoke.factors import Factor
-from authorityspoke.statements.groups import ComparableGroup
-from authorityspoke.statements.formatting import indented
+from nettlesome.groups import FactorGroup
+from nettlesome.formatting import indented
 
 
 class Procedure(Comparable):
@@ -74,16 +74,16 @@ class Procedure(Comparable):
 
     def __init__(
         self,
-        outputs: ComparableGroup,
-        inputs: Optional[ComparableGroup] = None,
-        despite: Optional[ComparableGroup] = None,
+        outputs: FactorGroup,
+        inputs: Optional[FactorGroup] = None,
+        despite: Optional[FactorGroup] = None,
         generic: bool = False,
         absent: bool = False,
         name: str = "",
     ):
-        self.outputs = ComparableGroup(outputs)
-        self.inputs = ComparableGroup(inputs) if inputs else ComparableGroup()
-        self.despite = ComparableGroup(despite) if despite else ComparableGroup()
+        self.outputs = FactorGroup(outputs)
+        self.inputs = FactorGroup(inputs) if inputs else FactorGroup()
+        self.despite = FactorGroup(despite) if despite else FactorGroup()
         self.name = name
         self.absent = False
         self.generic = generic
@@ -297,7 +297,7 @@ class Procedure(Comparable):
         self, other: Procedure, context: Optional[ContextRegister] = None
     ) -> Iterator[ContextRegister]:
         """Check if every input of other implies some input or despite factor of self."""
-        self_despite_or_input = ComparableGroup((*self.despite, *self.inputs))
+        self_despite_or_input = FactorGroup((*self.despite, *self.inputs))
         yield from self_despite_or_input.comparison(
             operation=operator.le, still_need_matches=other.inputs, matches=context
         )
@@ -306,7 +306,7 @@ class Procedure(Comparable):
         self, other: Procedure, context: Optional[ContextRegister] = None
     ) -> Iterator[ContextRegister]:
         """Check if every input of other is implied by some input or despite factor of self."""
-        self_despite_or_input = ComparableGroup((*self.despite, *self.inputs))
+        self_despite_or_input = FactorGroup((*self.despite, *self.inputs))
         yield from self_despite_or_input.comparison(
             operation=operator.ge, still_need_matches=other.inputs, matches=context
         )
@@ -400,8 +400,8 @@ class Procedure(Comparable):
     ) -> Iterator[ContextRegister]:
         yield from self.explain_implication_all_to_all(other, context)
 
-        other_despite_or_input = ComparableGroup((*other.despite, *other.inputs))
-        self_despite_or_input = ComparableGroup((*self.despite, *self.inputs))
+        other_despite_or_input = FactorGroup((*other.despite, *other.inputs))
+        self_despite_or_input = FactorGroup((*self.despite, *self.inputs))
 
         def other_outputs_implied(context: ContextRegister):
             yield from self.outputs.comparison(
@@ -477,7 +477,7 @@ class Procedure(Comparable):
                 )
 
         def other_despite_implied(contexts: Iterable[ContextRegister]):
-            despite_or_input = ComparableGroup((*self.despite, *self.inputs))
+            despite_or_input = FactorGroup((*self.despite, *self.inputs))
             for context in contexts:
                 yield from despite_or_input.comparison(
                     operation=operator.ge,
@@ -584,13 +584,13 @@ class Procedure(Comparable):
         return self.__class__(**new_dict)
 
     def set_inputs(self, factors: Sequence[Factor]) -> None:
-        self.inputs = ComparableGroup(factors)
+        self.inputs = FactorGroup(factors)
 
     def set_despite(self, factors: Sequence[Factor]) -> None:
-        self.despite = ComparableGroup(factors)
+        self.despite = FactorGroup(factors)
 
     def set_outputs(self, factors: Sequence[Factor]) -> None:
-        self.outputs = ComparableGroup(factors)
+        self.outputs = FactorGroup(factors)
 
     def triggers_next_procedure(
         self, other: Procedure, context: Optional[ContextRegister] = None
@@ -612,8 +612,8 @@ class Procedure(Comparable):
             whether the set of :class:`Factor`\s that exist after ``self``
             is fired could trigger ``other``
         """
-        self_despite_or_input = ComparableGroup((*self.despite, *self.inputs))
-        self_output_or_input = ComparableGroup((*self.outputs, *self.inputs))
+        self_despite_or_input = FactorGroup((*self.despite, *self.inputs))
+        self_output_or_input = FactorGroup((*self.outputs, *self.inputs))
         context = context or ContextRegister()
 
         def other_inputs_implied(context: ContextRegister):
@@ -651,7 +651,7 @@ class Procedure(Comparable):
             is fired could trigger ``other``
         """
         context = context or ContextRegister()
-        self_output_or_input = ComparableGroup((*self.outputs, *self.inputs))
+        self_output_or_input = FactorGroup((*self.outputs, *self.inputs))
         yield from self_output_or_input.comparison(
             operation=operator.ge,
             still_need_matches=list(other.inputs),

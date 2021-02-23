@@ -1,5 +1,10 @@
 Changelog
 =========
+
+dev
+------------------
+- Import Nettlesome library as dependency
+
 0.5.0 (2021-01-25)
 ------------------
 - Predicate.content attribute no longer includes an extra placeholder for a "quantity"
