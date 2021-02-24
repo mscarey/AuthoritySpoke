@@ -161,7 +161,7 @@ class TestLikelyContext:
         context = next(left.likely_contexts(right))
         lotus_menu = lotus.holdings[2].generic_factors()[0]
         java_api = oracle.generic_factors()[0]
-        assert context.get_factor(lotus_menu) == java_api
+        assert context.get_factor(lotus_menu).compare_keys(java_api)
 
     def test_likely_context_from_factor_meaning(self, make_opinion_with_holding):
         lotus = make_opinion_with_holding["lotus_majority"]
@@ -171,7 +171,7 @@ class TestLikelyContext:
         likely = left._likely_context_from_meaning(right, context=ContextRegister())
         lotus_menu = lotus.holdings[2].generic_factors()[0]
         java_api = oracle.generic_factors()[0]
-        assert likely.get_factor(lotus_menu) == java_api
+        assert likely.get_factor(lotus_menu).compare_keys(java_api)
 
     def test_union_one_generic_not_matched(self, make_opinion_with_holding):
         """
@@ -206,14 +206,16 @@ class TestChangeRegisters:
         register = ContextRegister.from_lists([left], [right])
 
         assert len(register.keys()) == 1
-        assert register.get("<Siskel>") == Entity("Ebert")
+        assert register.get("<Siskel>").compare_keys(Entity("Ebert"))
 
         new = register.reversed()
-        assert new.get("<Ebert>") == left
+        assert new.get("<Ebert>").compare_keys(left)
 
     def test_factor_pairs(self):
         register = ContextRegister.from_lists(
             [Entity("apple"), Entity("lemon")], [Entity("pear"), Entity("orange")]
         )
         gen = register.factor_pairs()
-        assert next(gen) == (Entity("apple"), Entity("pear"))
+        pair = next(gen)
+        assert pair[0].name == "apple"
+        assert pair[1].name == "pear"
