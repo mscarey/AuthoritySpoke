@@ -18,7 +18,9 @@ class TestMakeEntities:
 
     def test_conversion_to_generic(self, make_entity):
         e = make_entity
-        assert e["motel_specific"].make_generic() == e["motel"]
+        assert e["motel_specific"].generic is False
+        new = e["motel_specific"].make_generic()
+        assert new.generic is True
 
     def test_repr_equal_after_make_generic(self, make_entity):
         """

@@ -24,7 +24,7 @@ class TestContext:
         register = ContextRegister()
         register.insert_pair(Entity("Al"), Entity("Alice"))
         answers = fact_al.update_context_register(fact_alice, register, means)
-        assert str(Entity("the bull")) in next(answers).keys()
+        assert Entity("the bull").key in next(answers).keys()
 
     def test_explain_consistency(self):
         fact_al = read_fact(self.al)

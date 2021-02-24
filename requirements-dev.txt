@@ -4,7 +4,6 @@ doc8
 flake8-comprehensions
 ipykernel
 mypy
-pipenv-to-requirements
 pydocstyle
 pytest-cov
 pytest-profiling
