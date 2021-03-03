@@ -8,4 +8,4 @@ class TestFileLoad:
             filename="holding_feist.json", directory=directory
         )
         raw_holdings = loaders.load_holdings(filepath=path)
-        assert raw_holdings[0]["outputs"]["type"] == "fact"
+        assert raw_holdings["holdings"][0]["outputs"]["type"] == "fact"

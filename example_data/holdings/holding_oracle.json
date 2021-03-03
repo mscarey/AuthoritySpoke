@@ -11,7 +11,7 @@
                 "that element may nevertheless contain expression that is eligible for copyright protection",
                 "structure, sequence, and organization of a computer program |is eligible for copyright protection|"
             ]
-        }
+        },
         {
             "name": "false that the Java API was copyrightable",
             "quotes": [
@@ -116,8 +116,8 @@
         {
             "name": "the Java API contained short phrases",
             "quotes": "purposes is not whether |the work at issue contains short phrases|"
-        }
-    {
+        },
+        {
             "name": "the Java API became so popular that it was the industry standard",
             "quotes": "the Java API packages because they had become the effective industry standard"
         },
@@ -398,7 +398,7 @@
                 },
                 {
                     "type": "fact",
-                    "content": "the Java API was an idea",
+                    "content": "the Java API was an idea"
                 }
             ],
             "outputs": {
@@ -575,7 +575,7 @@
             ],
             "outputs": {
                 "type": "fact",
-                "content": "Google infringed the copyright on the Java API",
+                "content": "Google infringed the copyright on the Java API"
             },
             "mandatory": true,
             "enactments": "copyright exceptions full",

@@ -229,7 +229,7 @@
             "inputs": [
                 {
                     "type": "fact",
-                    "content": "Rural's telephone directory was a telephone directory.",
+                    "content": "Rural's telephone directory was a telephone directory."
                 },
                 {
                     "type": "fact",
@@ -301,7 +301,7 @@
                 "exact": "ideas",
                 "prefix": "no one may copyright facts or"
             }
-        }
+        },
         {
             "name": "Rural's telephone listings were names, towns, and telephone numbers of telephone subscribers",
             "quotes": [
