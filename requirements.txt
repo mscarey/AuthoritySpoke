@@ -2,10 +2,10 @@ anchorpoint>=0.4.4
 apispec[validation]
 marshmallow>=3.10
 legislice>=0.4.1
+nettlesome>=0.2.0
 pint>=0.15
 python-dotenv
 python-slugify
-git+git://github.com/mscarey/nettlesome.git@f8126d6fbc7f745a38aebd2e62a4310835521c08#egg=nettlesome
 requests
 roman
 sympy

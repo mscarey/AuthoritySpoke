@@ -10,7 +10,6 @@ from nettlesome.entities import Entity
 import pytest
 
 from authorityspoke.facts import Fact
-from authorityspoke.opinions import AnchoredFactor
 from authorityspoke.io import readers, schemas, name_index
 from authorityspoke.io.loaders import load_holdings
 from authorityspoke.io import filepaths
