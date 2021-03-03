@@ -534,7 +534,7 @@ class TestImplication:
         assert explanation.get("<Alice>").compare_keys(Entity("Craig"))
         assert (
             str(explanation)
-            == "ContextRegister(<Alice> is like <Craig>, <Bob> is like <Dan>)"
+            == "ContextRegister(<Alice> is like <Craig>, and <Bob> is like <Dan>)"
         )
         assert explanation.get(Entity("Craig").key) is None
         assert explanation.get(Entity("Alice").key).compare_keys(Entity("Craig"))

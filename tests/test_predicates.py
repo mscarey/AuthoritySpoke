@@ -93,7 +93,7 @@ class TestPredicates:
         assert make_predicate["p7_obverse"].expression == Q_(35, "foot")
         assert make_predicate["p7"].truth is True
         assert make_predicate["p7"].sign == "<="
-        assert 'comparison="<="' in repr(make_predicate["p7"])
+        assert 'sign="<="' in repr(make_predicate["p7"])
         assert make_predicate["p7_obverse"].sign == "<="
 
     def test_quantity_type(self, make_predicate):

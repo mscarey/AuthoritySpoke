@@ -434,7 +434,7 @@ class TestImplication:
 
     def test_context_register_text(self, make_context_register):
         assert str(make_context_register) == (
-            "ContextRegister(<Alice> is like <Craig>, <Bob> is like <Dan>)"
+            "ContextRegister(<Alice> is like <Craig>, and <Bob> is like <Dan>)"
         )
 
     def test_implication_complex_explain(

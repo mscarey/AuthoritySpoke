@@ -248,6 +248,7 @@ class TestConsistent:
         general_group = FactorGroup([self.faster_statement])
         assert specific_group.consistent_with(general_group)
         assert consistent_with(specific_group, general_group)
+        assert repr(specific_group).startswith("FactorGroup([")
 
     def test_group_inconsistent_with_one_statement(self):
         group = FactorGroup([self.slower_specific_statement, self.farm_statement])

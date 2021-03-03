@@ -54,7 +54,7 @@ class TestExhibitsSameMeaning:
         )
         assert (
             str(explanation)
-            == "ContextRegister(<Alice> is like <Bob>, <Bob> is like <Alice>)"
+            == "ContextRegister(<Alice> is like <Bob>, and <Bob> is like <Alice>)"
         )
 
 
