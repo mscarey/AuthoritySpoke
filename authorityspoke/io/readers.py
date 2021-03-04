@@ -174,7 +174,7 @@ def read_holdings_with_index(
     enactment_index: Optional[EnactmentIndex] = None,
 ) -> HoldingsIndexed:
     r"""Load a list of :class:`Holdings`\s from JSON, with "mentioned" index."""
-    schema = schemas.HoldingsWithAnchorsSchema
+    schema = schemas.HoldingSchema()
 
     schema.context["enactment_index"] = enactment_index
     record, new_enactment_index = collect_enactments(record)
@@ -216,14 +216,17 @@ def read_holdings_with_anchors(
         a list matching :class:`.Holding`\s to selectors and
         an index matching :class:`.Factor`\s to selectors.
     """
-    schema = schemas.AnchoredHoldingsSchema(many=True)
+    schema = schemas.AnchoredHoldingsSchema()
 
     record, enactment_index = collect_enactments(record)
     if client:
         enactment_index = client.update_entries_in_enactment_index(enactment_index)
 
+    holding_anchors = [
+        anchors.collect_anchors(holding) for holding in record["holdings"]
+    ]
     record["holdings"], schema.context["mentioned"] = index_names(record["holdings"])
-    holding_anchors = anchors.get_holding_anchors(record["holdings"])
+    schema.context["enactment_index"] = enactment_index
 
     holdings, named_anchors = schema.load(deepcopy(record))
     return AnchoredHoldings(holdings, holding_anchors, named_anchors)

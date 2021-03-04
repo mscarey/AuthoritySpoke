@@ -503,6 +503,12 @@ class AnchoredHoldingsSchema(ExpandableSchema):
         keys=fields.Str(), values=fields.Nested(SelectorSchema, many=True)
     )
 
+    @pre_load
+    def format_data_to_load(self, data: RawFactor, **kwargs) -> RawFactor:
+        """Expand data if it was just a name reference in the JSON input."""
+        data["holdings"] = self.get_from_mentioned(data["holdings"])
+        return data
+
 
 SCHEMAS = list(ExpandableSchema.__subclasses__()) + [SelectorSchema, EnactmentSchema]
 

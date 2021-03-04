@@ -88,7 +88,7 @@ class TestHoldingImport:
         implies.
         """
         lotus_holdings = load_holdings("holding_lotus.json")
-        assert len(lotus_holdings) == 10
+        assert len(lotus_holdings["holdings"]) == 10
 
     def test_import_enactments_and_anchors(self, make_opinion, make_response):
         """

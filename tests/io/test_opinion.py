@@ -22,20 +22,18 @@ class TestLoadOpinion:
         of the different text anchors for that Fact are attached to it.
         """
         watch = raw_holding["stolen watch"]
-        holdings, _, named_anchors = readers.read_holdings_with_anchors([watch])
+        holdings = readers.read_holdings([watch])
         cardenas = make_opinion["cardenas_majority"]
-        cardenas.posit_holdings(holdings, named_anchors=named_anchors)
-        output = holdings[0].outputs[0]
-        output_factor = cardenas.factors_by_str()[str(output)]
+        cardenas.posit_holdings(holdings)
 
         assert any(
-            selector.exact == "Mark stole a watch" for selector in output_factor.anchors
+            selector.exact == "Mark stole a watch" for selector in holdings[0].anchors
         )
         assert any(
             selector.exact == "a watch was stolen by Mark"
-            for selector in output_factor.anchors
+            for selector in holdings[0].anchors
         )
-        assert len(output_factor.anchors) == 2
+        assert len(holdings[0].anchors) == 2
 
 
 class TestLoadDecision:
