@@ -7,7 +7,7 @@ after they import some data from a file.
 from copy import deepcopy
 from typing import NamedTuple
 
-from typing import Dict, List, Optional, Tuple, Type
+from typing import Dict, List, Optional, Tuple, Type, Union
 
 from anchorpoint.textselectors import TextQuoteSelector
 from legislice import Enactment
@@ -33,6 +33,7 @@ from authorityspoke.io.schemas import (
     RawPredicate,
     RawFactor,
     RawDecision,
+    RawSelector,
 )
 from authorityspoke.io.name_index import index_names, Mentioned
 
@@ -173,13 +174,13 @@ def read_holdings_with_index(
     enactment_index: Optional[EnactmentIndex] = None,
 ) -> HoldingsIndexed:
     r"""Load a list of :class:`Holdings`\s from JSON, with "mentioned" index."""
-    schema = schemas.HoldingSchema(many=many)
+    schema = schemas.HoldingsWithAnchorsSchema
 
     schema.context["enactment_index"] = enactment_index
     record, new_enactment_index = collect_enactments(record)
     if enactment_index:
         new_enactment_index = new_enactment_index + enactment_index
-    record, mentioned = index_names(record)
+    record["holdings"], mentioned = index_names(record["holdings"])
     schema.context["mentioned"] = mentioned
     if client:
         new_enactment_index = client.update_entries_in_enactment_index(
@@ -193,7 +194,9 @@ def read_holdings_with_index(
 
 
 def read_holdings_with_anchors(
-    record: List[RawHolding], client: Optional[Client] = None, many: bool = True
+    record: Dict[str, Union[List[RawHolding], List[RawSelector]]],
+    client: Optional[Client] = None,
+    many: bool = True,
 ) -> AnchoredHoldings:
     r"""
     Load a list of :class:`Holding`\s from JSON, with text links.
@@ -213,12 +216,17 @@ def read_holdings_with_anchors(
         a list matching :class:`.Holding`\s to selectors and
         an index matching :class:`.Factor`\s to selectors.
     """
+    schema = schemas.AnchoredHoldingsSchema(many=True)
 
-    holdings, mentioned, holding_anchors = read_holdings_with_index(
-        record=record, client=client, many=many
-    )
-    text_anchors = anchors.get_named_anchors(mentioned)
-    return AnchoredHoldings(holdings, holding_anchors, text_anchors)
+    record, enactment_index = collect_enactments(record)
+    if client:
+        enactment_index = client.update_entries_in_enactment_index(enactment_index)
+
+    record["holdings"], schema.context["mentioned"] = index_names(record["holdings"])
+    holding_anchors = anchors.get_holding_anchors(record["holdings"])
+
+    holdings, named_anchors = schema.load(deepcopy(record))
+    return AnchoredHoldings(holdings, holding_anchors, named_anchors)
 
 
 def read_holdings(

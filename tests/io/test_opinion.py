@@ -22,8 +22,7 @@ class TestLoadOpinion:
         of the different text anchors for that Fact are attached to it.
         """
         watch = raw_holding["stolen watch"]
-        holdings, mentioned, holding_anchors = readers.read_holdings_with_index([watch])
-        named_anchors = anchors.get_named_anchors(mentioned)
+        holdings, _, named_anchors = readers.read_holdings_with_anchors([watch])
         cardenas = make_opinion["cardenas_majority"]
         cardenas.posit_holdings(holdings, named_anchors=named_anchors)
         output = holdings[0].outputs[0]

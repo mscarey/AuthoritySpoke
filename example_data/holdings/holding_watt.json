@@ -1,4 +1,4 @@
-[
+{"holdings": [
     {
         "inputs": [
             {
@@ -248,4 +248,4 @@
         ],
         "mandatory": true
     }
-]
+]}

@@ -1309,12 +1309,11 @@ def make_decision_with_holding(make_response):
     client_without_api_access = FakeClient(responses=make_response)
     decisions = load_decisions_for_fixtures()
     for case in TEST_CASES:
-        holdings, mentioned, holding_anchors = loaders.load_holdings_with_index(
+        holdings, holding_anchors, named_anchors = loaders.load_holdings_with_anchors(
             f"holding_{case}.json",
             client=client_without_api_access,
             enactment_index=None,
         )
-        named_anchors = anchors.get_named_anchors(mentioned)
         decisions[case].majority.posit(
             holdings, holding_anchors=holding_anchors, named_anchors=named_anchors
         )
@@ -1403,21 +1402,17 @@ def raw_holding() -> RawHolding:
             },
         },
         "stolen watch": {
+            "anchors": [
+                {"exact": "Mark stole a watch"},
+                {"exact": "a watch was stolen by Mark"},
+            ],
             "outputs": [
-                {
-                    "type": "Fact",
-                    "content": "{Mark} stole a watch",
-                    "anchors": [{"exact": "Mark stole a watch"}],
-                },
+                {"type": "Fact", "content": "{Mark} stole a watch"},
             ],
             "inputs": [
                 {
                     "type": "Evidence",
-                    "to_effect": {
-                        "type": "Fact",
-                        "content": "{Mark} stole a watch",
-                        "anchors": [{"exact": "a watch was stolen by Mark"}],
-                    },
+                    "to_effect": {"type": "Fact", "content": "{Mark} stole a watch"},
                 }
             ],
         },

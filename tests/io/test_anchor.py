@@ -52,14 +52,6 @@ class TestCollectAnchors:
         selector = anchors.read_selector(self.fact_string_anchor["anchors"])
         assert selector.exact.startswith("In preparing")
 
-    def test_anchors_from_fact_with_inferred_name(self):
-        record, mentioned = index_names(self.fact)
-        factor_anchors = anchors.get_named_anchors(mentioned)
-        fact_anchors = factor_anchors[
-            "false Rural's telephone directory was copyrightable"
-        ]
-        assert fact_anchors[1].exact == "no one may copyright"
-
     def test_make_enactment_anchor(self):
         record, mentioned = index_names(self.enactment_anchor)
         named_anchors = anchors.get_named_anchors(mentioned)
