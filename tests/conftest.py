@@ -1342,18 +1342,13 @@ def make_analysis() -> Dict[str, Dict[str, Any]]:
     """Example user analysis data."""
     return {
         "minimal": {
-            "anchors": [
-                {
-                    "name": "Bradley made a minimal holding object",
-                    "quotes": "upholding searches in |open fields or grounds|around a house",
-                }
-            ],
             "holdings": [
                 {
+                    "anchors": "upholding searches in |open fields or grounds|around a house",
                     "outputs": {
                         "type": "fact",
                         "content": "{Bradley} made a minimal holding object",
-                    }
+                    },
                 }
             ],
         },

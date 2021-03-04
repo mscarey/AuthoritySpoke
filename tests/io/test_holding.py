@@ -586,7 +586,7 @@ class TestTextAnchors:
         brad = make_opinion["brad_majority"]
         brad.clear_holdings()
         brad.posit(holdings, holding_anchors=holding_anchors)
-        assert brad.holdings[0].anchors[0].exact == "we hold"
+        assert brad.holdings[0].anchors[0].exact == "open fields or grounds"
 
 
 class TestExclusiveFlag:
@@ -610,9 +610,9 @@ class TestExclusiveFlag:
         `originality_rule` will be a little broader because it's based on
         less Enactment text
         """
-        mock_client = FakeClient(responses=make_response)
-        to_read = load_holdings_with_anchors("holding_feist.json")
-        feist_holdings = readers.read_holdings(to_read["holdings"], client=mock_client)
+        holdings, _, _ = load_holdings_with_anchors(
+            "holding_feist.json", client=self.client
+        )
 
         directory = Entity("Rural's telephone directory")
         original = Fact(Predicate("$work was an original work"), directory)
@@ -628,8 +628,7 @@ class TestExclusiveFlag:
             enactments=originality_enactments,
         )
         assert any(
-            originality_rule.implies(feist_holding.rule)
-            for feist_holding in feist_holdings
+            originality_rule.implies(feist_holding.rule) for feist_holding in holdings
         )
 
     @pytest.mark.xfail

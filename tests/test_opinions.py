@@ -250,7 +250,7 @@ class TestOpinionFactors:
         assert len(scenes_a_faire) == 1  # 1 Factor
 
     def test_insert_duplicate_anchor_in_factor_index(self):
-        api = Entity(name="the Java API", generic=True, plural=False, anchors=[])
+        api = Entity(name="the Java API", generic=True, plural=False)
         anchor = TextQuoteSelector(
             exact="it possesses at least some minimal degree of creativity."
         )
