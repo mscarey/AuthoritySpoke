@@ -181,12 +181,11 @@ class TestHoldingImport:
         """
         mock_client = FakeClient(responses=make_response)
         raw_holdings = load_holdings(f"holding_oracle.json")
-        oracle_holdings, mentioned, holding_anchors = readers.read_holdings_with_index(
+        holdings, holding_anchors, named_anchors = readers.read_holdings_with_anchors(
             raw_holdings, client=mock_client
         )
-        named_anchors = anchors.get_named_anchors(mentioned)
 
-        assert isinstance(oracle_holdings[0], Holding)
+        assert isinstance(holdings[0], Holding)
         assert isinstance(named_anchors.popitem()[1].pop(), TextQuoteSelector)
 
     def test_load_and_posit_holdings_with_anchors(self, make_opinion, make_response):
@@ -209,10 +208,11 @@ class TestTextAnchors:
     def test_read_holding_with_no_anchor(self, make_opinion, make_analysis):
         oracle = make_opinion["oracle_majority"]
         raw_analysis = make_analysis["no anchors"]
-        oracle_holdings, mentioned, holding_anchors = readers.read_holdings_with_index(
-            raw_analysis
-        )
-        named_anchors = anchors.get_named_anchors(mentioned)
+        (
+            oracle_holdings,
+            holding_anchors,
+            named_anchors,
+        ) = readers.read_holdings_with_anchors(raw_analysis)
         oracle.posit(
             oracle_holdings,
             holding_anchors=holding_anchors,
@@ -226,18 +226,11 @@ class TestTextAnchors:
         new_factor = built.outputs[0].to_effect.terms[0]
         assert new_factor.name == "Bradley"
 
-    def test_anchor_not_overwritten_when_indexing(self, raw_holding):
-        watch = raw_holding["stolen watch"]
-        record, mentioned = name_index.index_names(watch)
-        assert len(mentioned["Mark stole a watch"]["anchors"]) == 2
-
     def test_posit_one_holding_with_anchor(
         self, make_opinion, raw_holding, make_response
     ):
         mock_client = FakeClient(responses=make_response)
-        holding, mentioned, anchor_list = readers.read_holdings_with_index(
-            raw_holding["bradley_house"], client=mock_client, many=False
-        )
+        holding = readers.read_holding(raw_holding["bradley_house"], client=mock_client)
         cardenas = make_opinion["cardenas_majority"]
         cardenas.posit_holding(
             holding,
@@ -580,17 +573,16 @@ class TestTextAnchors:
 
     def test_repeating_read_holdings_has_same_result(self, make_analysis):
         raw = make_analysis["minimal"]
-        holdings_and_anchors = readers.read_holdings(raw)
-        holdings_and_anchors_again = readers.read_holdings(raw)
-        assert all(
-            left.means(right)
-            for left, right in zip(holdings_and_anchors, holdings_and_anchors_again)
-        )
+        holdings = readers.read_holdings_with_anchors(raw).holdings
+        holdings_again = readers.read_holdings_with_anchors(raw).holdings
+        assert all(left.means(right) for left, right in zip(holdings, holdings_again))
 
     def test_posit_holding_with_selector(self, make_analysis, make_opinion):
 
-        holdings = readers.read_holdings(make_analysis["minimal"])
-        holding_anchors = anchors.get_holding_anchors(make_analysis["minimal"])
+        holdings, holding_anchors, named_anchors = readers.read_holdings_with_anchors(
+            make_analysis["minimal"]
+        )
+
         brad = make_opinion["brad_majority"]
         brad.clear_holdings()
         brad.posit(holdings, holding_anchors=holding_anchors)

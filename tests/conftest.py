@@ -1312,7 +1312,6 @@ def make_decision_with_holding(make_response):
         holdings, holding_anchors, named_anchors = loaders.load_holdings_with_anchors(
             f"holding_{case}.json",
             client=client_without_api_access,
-            enactment_index=None,
         )
         decisions[case].majority.posit(
             holdings, holding_anchors=holding_anchors, named_anchors=named_anchors
@@ -1342,24 +1341,32 @@ def make_opinion_with_holding(make_decision_with_holding) -> Dict[str, Opinion]:
 def make_analysis() -> Dict[str, Dict[str, Any]]:
     """Example user analysis data."""
     return {
-        "minimal": [
-            {
-                "outputs": {
-                    "type": "fact",
-                    "content": "{Bradley} made a minimal holding object",
-                    "anchors": "upholding searches in |open fields or grounds|around a house",
-                },
-                "anchors": "Thus,|we hold|that this rule is correct.",
-            }
-        ],
-        "no anchors": [
-            {
-                "outputs": {
-                    "type": "fact",
-                    "content": "this holding has no text anchors",
+        "minimal": {
+            "anchors": [
+                {
+                    "name": "Bradley made a minimal holding object",
+                    "quotes": "upholding searches in |open fields or grounds|around a house",
                 }
-            }
-        ],
+            ],
+            "holdings": [
+                {
+                    "outputs": {
+                        "type": "fact",
+                        "content": "{Bradley} made a minimal holding object",
+                    }
+                }
+            ],
+        },
+        "no anchors": {
+            "holdings": [
+                {
+                    "outputs": {
+                        "type": "fact",
+                        "content": "this holding has no text anchors",
+                    }
+                }
+            ]
+        },
     }
 
 

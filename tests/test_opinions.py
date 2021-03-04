@@ -102,10 +102,9 @@ class TestOpinionText:
 
     def test_select_opinion_text_for_factor(self, make_opinion_with_holding):
         oracle = make_opinion_with_holding["oracle_majority"]
-        factor = oracle.holdings[0].outputs[0]
-        anchor = factor.anchors[0]
+        anchor = oracle.holdings[0].anchors[0]
         selected = oracle.select_text(selector=anchor)
-        assert selected == "copyright protection."
+        assert selected == "must be “original” to qualify"
 
     def test_select_opinion_text_for_enactment(self, make_opinion_with_holding):
         oracle = make_opinion_with_holding["oracle_majority"]

@@ -8,6 +8,7 @@ from anchorpoint.textselectors import TextQuoteSelector
 
 from authorityspoke.opinions import TextLinkDict
 
+from authorityspoke.io.anchors_named import NamedAnchorsSchema
 from authorityspoke.io.name_index import Mentioned, RawFactor
 
 RawSelector = Union[str, Dict[str, str]]
@@ -53,7 +54,8 @@ def collect_anchors(obj: Dict) -> List[TextQuoteSelector]:
     anchors = obj.get("anchors") or []
     if not isinstance(anchors, List):
         anchors = [anchors]
-    return read_selectors(anchors)
+    selector_schema = NamedAnchorsSchema(many=True)
+    return selector_schema.load(anchors)
 
 
 def get_named_anchors(mentioned: Mentioned) -> TextLinkDict:

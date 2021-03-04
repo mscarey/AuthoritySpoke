@@ -20,7 +20,7 @@ from authorityspoke.evidence import Exhibit, Evidence
 from authorityspoke.factors import Factor
 from authorityspoke.facts import Fact
 from authorityspoke.holdings import Holding
-from authorityspoke.io import anchors
+from authorityspoke.io.anchors_named import NamedAnchorsSchema
 from authorityspoke.io.name_index import Mentioned
 from authorityspoke.io.name_index import RawFactor, RawPredicate
 from authorityspoke.io.nesting import nest_fields
@@ -496,23 +496,6 @@ class HoldingSchema(ExpandableSchema):
         return data
 
 
-class NamedAnchors(NamedTuple):
-    name: str
-    quotes: List[TextQuoteSelector]
-
-
-class NamedAnchorsSchema(ExpandableSchema):
-    __model__ = NamedAnchors
-
-    name = fields.Str()
-    quotes = fields.Nested(SelectorSchema, many=True)
-
-    @pre_load
-    def format_data_to_load(self, data, **kwargs):
-        data = self.wrap_single_element_in_list(data, "quotes")
-        return data
-
-
 class AnchoredHoldingsSchema(ExpandableSchema):
     __model__ = AnchoredHoldings
 
@@ -532,7 +515,7 @@ class AnchoredHoldingsSchema(ExpandableSchema):
         text_links = {}
         if data.get("anchors"):
             for linked in data["anchors"]:
-                text_links[linked.name] = linked.quotes
+                text_links[linked["name"]] = linked["quotes"]
         holding_anchors = [holding.anchors for holding in data["holdings"]]
         return AnchoredHoldings(
             data["holdings"], holding_anchors, named_anchors=text_links
