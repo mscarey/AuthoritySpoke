@@ -558,7 +558,7 @@ class TestTextAnchors:
         }
         mock_client = FakeClient(responses=make_response)
         with pytest.raises(ValueError):
-            readers.read_holding(rule_holding["holdings"], client=mock_client)
+            readers.read_holding(rule_holding, client=mock_client)
 
     def test_error_classname_does_not_exist(self):
         rule_dict = {
@@ -690,10 +690,8 @@ class TestExclusiveFlag:
         generated Rules as well as its original Rule.
         """
         mock_client = FakeClient(responses=make_response)
-        feist_json = load_holdings("holding_feist.json")
-        feist_holdings = readers.read_holdings(
-            feist_json["holdings"], client=mock_client
-        )
+        feist_json = load_holdings("holding_feist.json")["holdings"]
+        feist_holdings = readers.read_holdings(feist_json, client=mock_client)
 
         assert len(feist_holdings) == len(feist_json)
 

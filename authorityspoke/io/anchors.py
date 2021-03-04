@@ -1,15 +1,20 @@
 """Functions for loading TextQuoteSelectors."""
 
 from collections import defaultdict
-from typing import Any, Dict, Iterable, List, Union
+from typing import Any, Dict, Iterable, List, Sequence, Union
 
+from anchorpoint.schemas import SelectorSchema
 from anchorpoint.textselectors import TextQuoteSelector
 
 from authorityspoke.opinions import TextLinkDict
 
-from authorityspoke.io import schemas
-from authorityspoke.io.schemas import RawSelector, RawHolding
-from authorityspoke.io.name_index import Mentioned
+from authorityspoke.io.name_index import Mentioned, RawFactor
+
+RawSelector = Union[str, Dict[str, str]]
+RawEnactment = Dict[str, Union[str, List[RawSelector]]]
+RawProcedure = Dict[str, Sequence[RawFactor]]
+RawRule = Dict[str, Union[RawProcedure, Sequence[RawEnactment], str, bool]]
+RawHolding = Dict[str, Union[RawRule, str, bool]]
 
 
 def read_selector(record: RawSelector) -> TextQuoteSelector:
@@ -21,7 +26,7 @@ def read_selector(record: RawSelector) -> TextQuoteSelector:
 
     :returns: a new :class:`TextQuoteSelector`
     """
-    selector_schema = schemas.SelectorSchema(many=False)
+    selector_schema = SelectorSchema(many=False)
     return selector_schema.load(record)
 
 
@@ -39,7 +44,7 @@ def read_selectors(record: Iterable[RawSelector]) -> List[TextQuoteSelector]:
 
     :returns: a list of :class:`TextQuoteSelector`\s
     """
-    selector_schema = schemas.SelectorSchema(many=True)
+    selector_schema = SelectorSchema(many=True)
     return selector_schema.load(record)
 
 

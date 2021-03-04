@@ -247,8 +247,9 @@
             ]
         }
     ],
-    "anchors": {
-        "Rural's telephone directory was a fact": {
+    "anchors": [
+        {
+            "name": "Rural's telephone directory was a fact",
             "quotes": [
                 {
                     "exact": "facts",
@@ -264,7 +265,8 @@
                 }
             ]
         },
-        "Rural's telephone directory was copyrightable": {
+        {
+            "name": "Rural's telephone directory was copyrightable",
             "quotes": [
                 {
                     "exact": "are not copyrightable",
@@ -282,7 +284,8 @@
                 "Even if a work qualifies as a copyrightable compilation"
             ]
         },
-        "Rural's telephone directory was a compilation of facts": {
+        {
+            "name": "Rural's telephone directory was a compilation of facts",
             "quotes": [
                 {
                     "exact": "compilations of facts",
@@ -292,55 +295,69 @@
                 "Even if a work qualifies as a copyrightable compilation"
             ]
         },
-        "Rural's telephone directory was an idea": {
+        {
+            "name": "Rural's telephone directory was an idea",
             "quotes": {
                 "exact": "ideas",
                 "prefix": "no one may copyright facts or"
             }
         },
-        "Rural's telephone listings were names, towns, and telephone numbers of telephone subscribers": {
+        {
+            "name": "Rural's telephone listings were names, towns, and telephone numbers of telephone subscribers",
             "quotes": [
                 "There is no doubt that Feist took from the white pages of Rural’s directory a substantial amount of factual information. At a minimum, Feist copied the names, towns, and telephone numbers of 1,309 of Rural’s subscribers."
             ]
         },
-        "Rural's arragement of its telephone listings was an original work": {
+        {
+            "name": "Rural's arragement of its telephone listings was an original work",
             "quotes": "The end product is a garden-variety white pages directory, devoid of even the slightest trace of creativity.\nRural’s selection of listings could not be more obvious: It publishes the most basic information — name, town, and telephone number — about each person who applies to it for telephone service. This is “selection” of a sort, but it lacks the modicum of creativity necessary to transform mere selection into copyrightable expression."
         },
-        "Rural's telephone directory was a telephone directory.": {
+        {
+            "name": "Rural's telephone directory was a telephone directory.",
             "quotes": "Rural publishes a typical telephone directory, consisting of white pages and yellow pages."
         },
-        "Rural's arragement of its telephone listings was the method of listing subscribers alphabetically by surname in Rural's telephone directory": {
+        {
+            "name": "Rural's arragement of its telephone listings was the method of listing subscribers alphabetically by surname in Rural's telephone directory",
             "quotes": "In preparing its white pages, Rural simply takes the data provided by its subscribers and lists it alphabetically by surname."
         },
-        "Rural's telephone directory was an original work": {
+        {
+            "name": "Rural's telephone directory was an original work",
             "quotes": [
                 "The sine qua non of copyright is|originality|",
                 "Original, as the term is used in copyright",
                 "No one may claim originality"
             ]
         },
-        "Rural's telephone directory was independently created by Rural Telephone Service Company, as opposed to copied from other works": {
+        {
+            "name": "Rural's telephone directory was independently created by Rural Telephone Service Company, as opposed to copied from other works",
             "quotes": "the work was independently created by the author (as opposed to copied from other works)"
         },
-        "Rural's telephone directory possessed at least some minimal degree of creativity": {
+        {
+            "name": "Rural's telephone directory possessed at least some minimal degree of creativity",
             "quotes": "it possesses at least some minimal degree of creativity"
         },
-        "false that Rural's telephone listings were an original work": {
+        {
+            "name": "false that Rural's telephone listings were an original work",
             "quotes": "In other words, did Feist, by taking 1,309 names, towns, and telephone numbers from Rural’s white pages, copy anything that was “original” to Rural? Certainly, the raw data does not satisfy the originality requirement."
         },
-        "false that Feist Publications infringed the copyright on Rural's telephone directory": {
+        {
+            "name": "false that Feist Publications infringed the copyright on Rural's telephone directory",
             "quotes": "may be freely copied because copyright protects only the elements that owe their origin to the compiler"
         },
-        "Feist Publications freely copied the facts contained in Rural's telephone directory, in preparing Feist's telephone directory": {
+        {
+            "name": "Feist Publications freely copied the facts contained in Rural's telephone directory, in preparing Feist's telephone directory",
             "quotes": "the facts contained in existing works may be freely copied"
         },
-        "Feist's telephone directory did not feature the same selection and arrangement of facts as Rural's telephone directory": {
+        {
+            "name": "Feist's telephone directory did not feature the same selection and arrangement of facts as Rural's telephone directory",
             "quotes": "the author make the selection or arrangement independently (i. e., without copying that selection or arrangement from another work)"
         },
-        "false that Rural's telephone directory contained written expression protectable by copyright": {
+        {
+            "name": "false that Rural's telephone directory contained written expression protectable by copyright",
             "quotes": "a directory that contains absolutely no protectible written expression"
         },
-        "Rural Telephone Service Company independently used a degree of creativity to choose in what order to place the facts in Rural's telephone directory, and how to arrange the collected data so that they could be used effectively by readers": {
+        {
+            "name": "Rural Telephone Service Company independently used a degree of creativity to choose in what order to place the facts in Rural's telephone directory, and how to arrange the collected data so that they could be used effectively by readers",
             "quotes": [
                 "The compilation author typically chooses",
                 "in what order to place them, and how to arrange the collected data so that they may be used effectively by readers",
@@ -348,18 +365,21 @@
                 "and entail a minimal degree of creativity"
             ]
         },
-        "Rural Telephone Service Company independently used a degree of creativity to choose which facts to include in Rural's telephone directory": {
+        {
+            "name": "Rural Telephone Service Company independently used a degree of creativity to choose which facts to include in Rural's telephone directory",
             "quotes": [
                 "The compilation author typically chooses which facts to include",
                 "so long as they are made independently",
                 "and entail a minimal degree of creativity"
             ]
         },
-        "Rural Telephone Service Company was the compiler of Rural's telephone directory": {
+        {
+            "name": "Rural Telephone Service Company was the compiler of Rural's telephone directory",
             "quotes": "by the compiler"
         },
-        "Rural's telephone directory closely resembled other works": {
+        {
+            "name": "Rural's telephone directory closely resembled other works",
             "quotes": "it closely resembles other works"
         }
-    }
+    ]
 }

@@ -222,13 +222,10 @@ def read_holdings_with_anchors(
     if client:
         enactment_index = client.update_entries_in_enactment_index(enactment_index)
 
-    holding_anchors = [
-        anchors.collect_anchors(holding) for holding in record["holdings"]
-    ]
     record["holdings"], schema.context["mentioned"] = index_names(record["holdings"])
     schema.context["enactment_index"] = enactment_index
 
-    holdings, named_anchors = schema.load(deepcopy(record))
+    holdings, holding_anchors, named_anchors = schema.load(deepcopy(record))
     return AnchoredHoldings(holdings, holding_anchors, named_anchors)
 
 

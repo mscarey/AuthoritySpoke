@@ -13,9 +13,6 @@ from nettlesome.comparable import Comparable
 from nettlesome.factors import Factor
 
 
-TextLinkDict = Dict[Union[Factor, Enactment], List[TextQuoteSelector]]
-
-
 class FactorIndex(Dict[str, Factor]):
     r"""Index of :class:`.Factor`/s that may share common anchors."""
 

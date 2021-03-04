@@ -2,7 +2,7 @@
 
 from copy import deepcopy
 from datetime import date
-from typing import Any, Dict, List, Optional, Sequence, Tuple, Type, Union
+from typing import Any, Dict, List, NamedTuple, Optional, Sequence, Tuple, Type, Union
 
 from marshmallow import Schema, fields, validate, EXCLUDE
 from marshmallow import pre_load, post_load
@@ -20,6 +20,7 @@ from authorityspoke.evidence import Exhibit, Evidence
 from authorityspoke.factors import Factor
 from authorityspoke.facts import Fact
 from authorityspoke.holdings import Holding
+from authorityspoke.io import anchors
 from authorityspoke.io.name_index import Mentioned
 from authorityspoke.io.name_index import RawFactor, RawPredicate
 from authorityspoke.io.nesting import nest_fields
@@ -495,19 +496,47 @@ class HoldingSchema(ExpandableSchema):
         return data
 
 
+class NamedAnchors(NamedTuple):
+    name: str
+    quotes: List[TextQuoteSelector]
+
+
+class NamedAnchorsSchema(ExpandableSchema):
+    __model__ = NamedAnchors
+
+    name = fields.Str()
+    quotes = fields.Nested(SelectorSchema, many=True)
+
+    @pre_load
+    def format_data_to_load(self, data, **kwargs):
+        data = self.wrap_single_element_in_list(data, "quotes")
+        return data
+
+
 class AnchoredHoldingsSchema(ExpandableSchema):
     __model__ = AnchoredHoldings
 
     holdings = fields.Nested(HoldingSchema, many=True)
-    anchors = fields.Dict(
-        keys=fields.Str(), values=fields.Nested(SelectorSchema, many=True)
-    )
+    anchors = fields.Nested(NamedAnchorsSchema, many=True)
 
     @pre_load
     def format_data_to_load(self, data: RawFactor, **kwargs) -> RawFactor:
         """Expand data if it was just a name reference in the JSON input."""
+
         data["holdings"] = self.get_from_mentioned(data["holdings"])
         return data
+
+    @post_load
+    def make_object(self, data, **kwargs) -> AnchoredHoldings:
+        """Make AuthoritySpoke object out of whatever data has been loaded."""
+        text_links = {}
+        if data.get("anchors"):
+            for linked in data["anchors"]:
+                text_links[linked.name] = linked.quotes
+        holding_anchors = [holding.anchors for holding in data["holdings"]]
+        return AnchoredHoldings(
+            data["holdings"], holding_anchors, named_anchors=text_links
+        )
 
 
 SCHEMAS = list(ExpandableSchema.__subclasses__()) + [SelectorSchema, EnactmentSchema]
