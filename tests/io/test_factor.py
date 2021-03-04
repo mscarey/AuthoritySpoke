@@ -131,13 +131,13 @@ class TestFactorLoad:
 
     def test_import_fact_with_factor_schema(self):
         loaded = load_holdings("holding_cardenas.json")
-        entity = readers.read_factor(loaded[0]["inputs"][0])
+        entity = readers.read_factor(loaded["holdings"][0]["inputs"][0])
         inner_context = entity.terms[0].terms[0]
         assert inner_context.name == "the defendant"
 
     def test_import_facts_with_factor_schema(self):
         loaded = load_holdings("holding_cardenas.json")
-        factor = readers.read_factors(loaded[0]["inputs"])[1].terms[0]
+        factor = readers.read_factors(loaded["holdings"][0]["inputs"])[1].terms[0]
         assert (
             factor.predicate.content
             == "${the_defendant} committed an attempted robbery"
@@ -174,7 +174,7 @@ class TestExhibitDump:
 
 class TestEvidenceLoad:
     def test_wrong_schema(self, make_evidence):
-        fact_dict = load_holdings("holding_cardenas.json")[1]["inputs"][0]
+        fact_dict = load_holdings("holding_cardenas.json")["holdings"][1]["inputs"][0]
         wrong_schema = schemas.EvidenceSchema()
         with pytest.raises(ValidationError):
             wrong_schema.load(fact_dict)

@@ -95,12 +95,11 @@ class TestHoldingImport:
         Testing issue that caused enactment expansion to fail only when
         text anchors were loaded.
         """
-        raw_holdings = [
-            {
-                "inputs": {
-                    "type": "fact",
-                    "content": "{Rural's telephone directory} was a fact",
-                    "anchors": [
+        raw_holdings = {
+            "anchors": [
+                {
+                    "name": "Rural's telephone directory was a fact",
+                    "quotes": [
                         {"exact": "facts", "prefix": "The first is that"},
                         {
                             "exact": "as to facts",
@@ -109,53 +108,58 @@ class TestHoldingImport:
                         {"exact": "facts", "prefix": "no one may copyright"},
                     ],
                 },
-                "outputs": {
-                    "type": "fact",
-                    "content": "Rural's telephone directory was copyrightable",
-                    "truth": False,
-                    "anchors": [
-                        {
-                            "exact": "are not copyrightable",
-                            "prefix": "The first is that facts",
-                        },
-                        {"exact": "no one may copyright", "suffix": "facts"},
-                    ],
-                },
-                "enactments": [
-                    {
-                        "node": "/us/const/article/I/8/8",
-                        "exact": (
-                            "To promote the Progress of Science and useful Arts, "
-                            "by securing for limited Times to Authors"
-                        ),
-                        "name": "securing for authors",
-                    },
-                    {
-                        "node": "/us/const/article/I/8/8",
-                        "exact": "the exclusive Right to their respective Writings",
-                        "name": "right to writings",
-                    },
-                ],
-                "mandatory": True,
-                "universal": True,
-            },
-            {
-                "outputs": {
-                    "type": "fact",
-                    "content": "Rural's telephone directory was copyrightable",
-                    "anchors": [
+                {
+                    "name": "Rural's telephone directory was copyrightable",
+                    "quotes": [
                         {
                             "exact": "copyrightable",
                             "prefix": "first is that facts are not",
                         },
                         "The sine qua non of|copyright|",
+                        {"exact": "no one may copyright", "suffix": "facts"},
                     ],
                 },
-                "enactments": ["securing for authors", "right to writings"],
-                "mandatory": True,
-                "anchors": "compilations of facts|generally are|",
-            },
-        ]
+            ],
+            "holdings": [
+                {
+                    "inputs": {
+                        "type": "fact",
+                        "content": "{Rural's telephone directory} was a fact",
+                    },
+                    "outputs": {
+                        "type": "fact",
+                        "content": "Rural's telephone directory was copyrightable",
+                        "truth": False,
+                    },
+                    "enactments": [
+                        {
+                            "node": "/us/const/article/I/8/8",
+                            "exact": (
+                                "To promote the Progress of Science and useful Arts, "
+                                "by securing for limited Times to Authors"
+                            ),
+                            "name": "securing for authors",
+                        },
+                        {
+                            "node": "/us/const/article/I/8/8",
+                            "exact": "the exclusive Right to their respective Writings",
+                            "name": "right to writings",
+                        },
+                    ],
+                    "mandatory": True,
+                    "universal": True,
+                },
+                {
+                    "outputs": {
+                        "type": "fact",
+                        "content": "Rural's telephone directory was copyrightable",
+                    },
+                    "enactments": ["securing for authors", "right to writings"],
+                    "mandatory": True,
+                    "anchors": "compilations of facts|generally are|",
+                },
+            ],
+        }
         mock_client = FakeClient(responses=make_response)
         (
             feist_holdings,
