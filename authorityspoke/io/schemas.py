@@ -24,7 +24,7 @@ from authorityspoke.io.name_index import Mentioned
 from authorityspoke.io.name_index import RawFactor, RawPredicate
 from authorityspoke.io.nesting import nest_fields
 from authorityspoke.io import text_expansion
-from authorityspoke.opinions import Opinion
+from authorityspoke.opinions import Opinion, AnchoredHoldings
 from authorityspoke.pleadings import Pleading, Allegation
 
 from authorityspoke.procedures import Procedure
@@ -231,7 +231,6 @@ class EntitySchema(ExpandableSchema):
     name = fields.Str(missing=None)
     generic = fields.Bool(missing=True)
     plural = fields.Bool()
-    anchors = fields.Nested(SelectorSchema, many=True)
 
 
 class FactSchema(ExpandableSchema):
@@ -244,7 +243,6 @@ class FactSchema(ExpandableSchema):
     name = fields.Str(missing=None)
     absent = fields.Bool(missing=False)
     generic = fields.Bool(missing=False)
-    anchors = fields.Nested(SelectorSchema, many=True)
 
     def get_references_from_mentioned(
         self,
@@ -331,7 +329,6 @@ class ExhibitSchema(ExpandableSchema):
     name = fields.Str(missing=None)
     absent = fields.Bool(missing=False)
     generic = fields.Bool(missing=False)
-    anchors = fields.Nested(SelectorSchema, many=True)
 
     @post_load
     def make_object(self, data: RawFactor, **kwargs) -> Exhibit:
@@ -347,7 +344,6 @@ class PleadingSchema(ExpandableSchema):
     name = fields.Str(missing=None)
     absent = fields.Bool(missing=False)
     generic = fields.Bool(missing=False)
-    anchors = fields.Nested(SelectorSchema, many=True)
 
 
 class AllegationSchema(ExpandableSchema):
@@ -359,7 +355,6 @@ class AllegationSchema(ExpandableSchema):
     name = fields.Str(missing=None)
     absent = fields.Bool(missing=False)
     generic = fields.Bool(missing=False)
-    anchors = fields.Nested(SelectorSchema, many=True)
 
 
 class EvidenceSchema(ExpandableSchema):
@@ -371,7 +366,6 @@ class EvidenceSchema(ExpandableSchema):
     name = fields.Str(missing=None)
     absent = fields.Bool(missing=False)
     generic = fields.Bool(missing=False)
-    anchors = fields.Nested(SelectorSchema, many=True)
 
 
 class FactorSchema(OneOfSchema, ExpandableSchema):
@@ -499,6 +493,15 @@ class HoldingSchema(ExpandableSchema):
         data = self.nest_fields_inside_rule(data)
 
         return data
+
+
+class AnchoredHoldingsSchema(ExpandableSchema):
+    __model__ = AnchoredHoldings
+
+    holdings = fields.Nested(HoldingSchema, many=True)
+    anchors = fields.Dict(
+        keys=fields.Str(), values=fields.Nested(SelectorSchema, many=True)
+    )
 
 
 SCHEMAS = list(ExpandableSchema.__subclasses__()) + [SelectorSchema, EnactmentSchema]
