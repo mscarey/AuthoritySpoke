@@ -528,11 +528,29 @@ class NamedAnchorsSchema(ExpandableSchema):
         return data
 
 
+class AnchoredEnactments(NamedTuple):
+    enactment: Enactment
+    quotes: List[TextQuoteSelector]
+
+
+class AnchoredEnactmentsSchema(ExpandableSchema):
+    __model__ = AnchoredEnactments
+
+    enactment = fields.Nested(EnactmentSchema)
+    quotes = fields.Nested(SelectorSchema, many=True)
+
+    @pre_load
+    def format_data_to_load(self, data, **kwargs):
+        data = self.wrap_single_element_in_list(data, "quotes")
+        return data
+
+
 class AnchoredHoldingsSchema(ExpandableSchema):
     __model__ = AnchoredHoldings
 
     holdings = fields.Nested(HoldingSchema, many=True)
     factor_anchors = fields.Nested(NamedAnchorsSchema, many=True)
+    enactment_anchors = fields.Nested(AnchoredEnactmentsSchema, many=True)
 
     @pre_load
     def format_data_to_load(self, data: RawFactor, **kwargs) -> RawFactor:

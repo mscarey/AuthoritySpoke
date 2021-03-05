@@ -1,4 +1,10 @@
 {
+    "enactment_anchors": [
+        {
+            "enactment": "copyright protection provision",
+            "quotes": "qualify for copyright protection. |17 U.S.C. § 102(a)|."
+        }
+    ],
     "factor_anchors": [
         {
             "name": "the Java API was an original work",
@@ -18,10 +24,6 @@
                 "must be “original” to qualify for |copyright protection.|",
                 "whether the non-literal elements of a program “are protected"
             ]
-        },
-        {
-            "name": "copyright protection provision",
-            "quotes": "qualify for copyright protection. |17 U.S.C. § 102(a)|."
         },
         {
             "name": "the Java API was independently created by the author, as opposed to copied from other works",
