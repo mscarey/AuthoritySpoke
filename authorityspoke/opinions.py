@@ -37,6 +37,7 @@ class AnchoredHoldings(NamedTuple):
     holdings: List[Holding]
     holding_anchors: List[List[TextQuoteSelector]]
     named_anchors: TextLinkDict
+    enactment_anchors: TextLinkDict
 
 
 @dataclass
@@ -72,6 +73,7 @@ class Opinion(Comparable):
 
         self._holdings = HoldingGroup()
         self.factor_anchors = {}
+        self.enactment_anchors = {}
 
     def factors(self) -> List[Factor]:
         factors_by_name = self.factors_by_name()
@@ -239,6 +241,7 @@ class Opinion(Comparable):
             Union[TextQuoteSelector, List[TextQuoteSelector]]
         ] = None,
         named_anchors: Optional[TextLinkDict] = None,
+        enactment_anchors: Optional[TextLinkDict] = None,
         context: Optional[Sequence[Factor]] = None,
     ) -> None:
         r"""Record that this Opinion endorses specified :class:`Holding`\s."""
@@ -261,6 +264,9 @@ class Opinion(Comparable):
         if named_anchors:
             self.factor_anchors = {**self.factor_anchors, **named_anchors}
 
+        if enactment_anchors:
+            self.enactment_anchors = {**self.enactment_anchors, **enactment_anchors}
+
         matching_holding = self.get_matching_holding(holding)
         if matching_holding:
             matching_holding.anchors += holding.anchors
@@ -274,6 +280,7 @@ class Opinion(Comparable):
         holdings: Union[AnchoredHoldings, Iterable[Union[Holding, Rule]]],
         holding_anchors: Optional[List[List[TextQuoteSelector]]] = None,
         named_anchors: Optional[TextLinkDict] = None,
+        enactment_anchors: Optional[TextLinkDict] = None,
         context: Optional[Sequence[Factor]] = None,
     ):
         r"""
@@ -298,7 +305,7 @@ class Opinion(Comparable):
             present case.
         """
         if isinstance(holdings, AnchoredHoldings):
-            (holdings, holding_anchors, named_anchors) = holdings
+            (holdings, holding_anchors, named_anchors, enactment_anchors) = holdings
 
         holding_anchors = holding_anchors or []
         for (holding, selector_list) in zip_longest(holdings, holding_anchors):
@@ -306,6 +313,7 @@ class Opinion(Comparable):
                 holding,
                 holding_anchors=selector_list,
                 named_anchors=named_anchors,
+                enactment_anchors=enactment_anchors,
                 context=context,
             )
 
@@ -316,6 +324,7 @@ class Opinion(Comparable):
             List[Union[TextQuoteSelector, List[TextQuoteSelector]]]
         ] = None,
         named_anchors: Optional[TextLinkDict] = None,
+        enactment_anchors: Optional[TextLinkDict] = None,
         context: Optional[Sequence[Factor]] = None,
     ) -> None:
         r"""
@@ -348,6 +357,7 @@ class Opinion(Comparable):
                 holdings,
                 holding_anchors=holding_anchors,
                 named_anchors=named_anchors,
+                enactment_anchors=enactment_anchors,
                 context=context,
             )
         else:
@@ -355,6 +365,7 @@ class Opinion(Comparable):
                 holdings,
                 holding_anchors=holding_anchors,
                 named_anchors=named_anchors,
+                enactment_anchors=enactment_anchors,
                 context=context,
             )
 

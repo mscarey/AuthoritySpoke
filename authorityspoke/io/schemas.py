@@ -563,15 +563,22 @@ class AnchoredHoldingsSchema(ExpandableSchema):
     def make_object(self, data, **kwargs) -> AnchoredHoldings:
         """Make AuthoritySpoke object out of whatever data has been loaded."""
         text_links = {}
+        enactment_links = {}
+
         if data.get("factor_anchors"):
             for linked in data["factor_anchors"]:
-                try:
-                    text_links[linked.name.key] = linked.quotes
-                except AttributeError:
-                    print(linked)
+                text_links[linked.name.key] = linked.quotes
+
+        if data.get("enactment_anchors"):
+            for linked in data["enactment_anchors"]:
+                enactment_links[str(linked.enactment)] = linked.quotes
+
         holding_anchors = [holding.anchors for holding in data["holdings"]]
         return AnchoredHoldings(
-            data["holdings"], holding_anchors, named_anchors=text_links
+            data["holdings"],
+            holding_anchors,
+            named_anchors=text_links,
+            enactment_anchors=enactment_links,
         )
 
 

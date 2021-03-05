@@ -101,9 +101,12 @@ class TestCollectMentioned:
         """
 
         oracle_records = loaders.load_holdings("holding_oracle.json")
-        holdings, holding_anchors, named_anchors = readers.read_holdings_with_anchors(
-            oracle_records, client=fake_usc_client
-        )
+        (
+            holdings,
+            holding_anchors,
+            _,
+            _,
+        ) = readers.read_holdings_with_anchors(oracle_records, client=fake_usc_client)
         factor = holdings[2].inputs[0]
         assert factor.predicate.content == "${the_java_api} was an original work"
 

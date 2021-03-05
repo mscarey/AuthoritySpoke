@@ -165,11 +165,15 @@ class TestHoldingImport:
             feist_holdings,
             holding_anchors,
             named_anchors,
+            enactment_anchors,
         ) = readers.read_holdings_with_anchors(record=raw_holdings, client=mock_client)
 
         feist = make_opinion["feist_majority"]
         feist.posit(
-            feist_holdings, holding_anchors=holding_anchors, named_anchors=named_anchors
+            feist_holdings,
+            holding_anchors=holding_anchors,
+            named_anchors=named_anchors,
+            enactment_anchors=enactment_anchors,
         )
         assert feist.holdings[0].enactments[0].node == "/us/const/article/I/8/8"
         assert feist.holdings[1].enactments[0].node == "/us/const/article/I/8/8"
@@ -181,9 +185,12 @@ class TestHoldingImport:
         """
         mock_client = FakeClient(responses=make_response)
         raw_holdings = load_holdings(f"holding_oracle.json")
-        holdings, holding_anchors, named_anchors = readers.read_holdings_with_anchors(
-            raw_holdings, client=mock_client
-        )
+        (
+            holdings,
+            holding_anchors,
+            named_anchors,
+            _,
+        ) = readers.read_holdings_with_anchors(raw_holdings, client=mock_client)
 
         assert isinstance(holdings[0], Holding)
         assert isinstance(named_anchors.popitem()[1].pop(), TextQuoteSelector)
@@ -212,11 +219,13 @@ class TestTextAnchors:
             oracle_holdings,
             holding_anchors,
             named_anchors,
+            enactment_anchors,
         ) = readers.read_holdings_with_anchors(raw_analysis)
         oracle.posit(
             oracle_holdings,
             holding_anchors=holding_anchors,
             named_anchors=named_anchors,
+            enactment_anchors=enactment_anchors,
         )
         assert not oracle.holdings[0].anchors
 
@@ -579,9 +588,12 @@ class TestTextAnchors:
 
     def test_posit_holding_with_selector(self, make_analysis, make_opinion):
 
-        holdings, holding_anchors, named_anchors = readers.read_holdings_with_anchors(
-            make_analysis["minimal"]
-        )
+        (
+            holdings,
+            holding_anchors,
+            _,
+            _,
+        ) = readers.read_holdings_with_anchors(make_analysis["minimal"])
 
         brad = make_opinion["brad_majority"]
         brad.clear_holdings()
@@ -610,7 +622,7 @@ class TestExclusiveFlag:
         `originality_rule` will be a little broader because it's based on
         less Enactment text
         """
-        holdings, _, _ = load_holdings_with_anchors(
+        holdings, _, _, _ = load_holdings_with_anchors(
             "holding_feist.json", client=self.client
         )
 

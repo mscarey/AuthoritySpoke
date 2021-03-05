@@ -88,17 +88,8 @@ class TestOpinionText:
     def test_opinion_text_anchor(self, make_opinion_with_holding):
         feist = make_opinion_with_holding["feist_majority"]
         assert any(
-            "generally" in anchor.exact for anchor in feist.holdings[1].factor_anchors()
+            "ideas" in anchor[0].exact for anchor in feist.factor_anchors.values()
         )
-
-    def test_opinion_factor_text_anchor(self, make_opinion_with_holding):
-        feist = make_opinion_with_holding["feist_majority"]
-        factor_anchors = feist.holdings[0].factor_anchors()
-        assert all(
-            "No one may claim originality" not in anchor.exact
-            for anchor in factor_anchors
-        )
-        assert any("as to facts" in anchor.exact for anchor in factor_anchors)
 
     def test_select_opinion_text_for_factor(self, make_opinion_with_holding):
         oracle = make_opinion_with_holding["oracle_majority"]
@@ -108,8 +99,8 @@ class TestOpinionText:
 
     def test_select_opinion_text_for_enactment(self, make_opinion_with_holding):
         oracle = make_opinion_with_holding["oracle_majority"]
-        enactment = oracle.holdings[0].enactments[0]
-        anchor = enactment.anchors[0]
+        enactment_name = str(oracle.holdings[0].enactments[0])
+        anchor = oracle.enactment_anchors[enactment_name][0]
         selected = oracle.select_text(selector=anchor)
         assert selected == "17 U.S.C. § 102(a)"
 
@@ -214,11 +205,11 @@ class TestOpinionHoldings:
 
         watt.clear_holdings()
         watt_raw = loaders.load_holdings("holding_watt.json")
-        watt.posit(readers.read_holdings(watt_raw, client=client))
+        watt.posit(readers.read_holdings(watt_raw["holdings"], client=client))
 
         brad.clear_holdings()
         brad_raw = loaders.load_holdings("holding_brad.json")
-        brad.posit(readers.read_holdings(brad_raw, client=client))
+        brad.posit(readers.read_holdings(brad_raw["holdings"], client=client))
 
         context_items = [
             "proof of Wattenburg's guilt",
@@ -266,16 +257,6 @@ class TestOpinionFactors:
         factor_index = FactorIndex({name: fact})
         factor_index.insert(key=name, value=fact)
         assert len(factor_index[name].anchors) == 1
-
-    def test_duplicate_text_in_factor_anchors(self, make_opinion_with_holding):
-        """
-        Test that all of the text anchors for a particular Factor appear only once.
-        """
-
-        oracle = make_opinion_with_holding["oracle_majority"]
-        factors = oracle.factors()
-        assert len(factors[0].anchors) == 2
-        assert factors[0].anchors[0] != factors[0].anchors[1]
 
     def test_get_factor_from_opinion(self, make_opinion_with_holding):
         oracle = make_opinion_with_holding["oracle_majority"]

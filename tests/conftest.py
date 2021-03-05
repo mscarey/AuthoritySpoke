@@ -1309,12 +1309,20 @@ def make_decision_with_holding(make_response):
     client_without_api_access = FakeClient(responses=make_response)
     decisions = load_decisions_for_fixtures()
     for case in TEST_CASES:
-        holdings, holding_anchors, named_anchors = loaders.load_holdings_with_anchors(
+        (
+            holdings,
+            holding_anchors,
+            named_anchors,
+            enactment_anchors,
+        ) = loaders.load_holdings_with_anchors(
             f"holding_{case}.json",
             client=client_without_api_access,
         )
         decisions[case].majority.posit(
-            holdings, holding_anchors=holding_anchors, named_anchors=named_anchors
+            holdings,
+            holding_anchors=holding_anchors,
+            named_anchors=named_anchors,
+            enactment_anchors=enactment_anchors,
         )
     return decisions
 

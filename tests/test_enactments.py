@@ -368,7 +368,7 @@ class TestTextSelection:
             ]
         """
 
-        holdings, holding_anchors, named_anchors = loaders.load_holdings_with_anchors(
+        holdings, holding_anchors, _, _ = loaders.load_holdings_with_anchors(
             "holding_feist.json", client=self.client
         )
         assert len(holding_anchors[6]) == 2

@@ -17,20 +17,26 @@ class TestReadme:
             oracle_holdings,
             oracle_anchors,
             oracle_named_anchors,
+            oracle_e,
         ) = load_holdings_with_anchors("holding_oracle.json", client=client)
-        lotus_holdings, lotus_anchors, lotus_named_anchors = load_holdings_with_anchors(
-            "holding_lotus.json", client=client
-        )
+        (
+            lotus_holdings,
+            lotus_anchors,
+            lotus_named_anchors,
+            lotus_e,
+        ) = load_holdings_with_anchors("holding_lotus.json", client=client)
 
         oracle.posit(
             holdings=oracle_holdings,
             holding_anchors=oracle_anchors,
             named_anchors=oracle_named_anchors,
+            enactment_anchors=oracle_e,
         )
         lotus.posit(
             holdings=lotus_holdings,
             holding_anchors=lotus_anchors,
             named_anchors=lotus_named_anchors,
+            enactment_anchors=lotus_e,
         )
 
         assert lotus.contradicts(oracle)
