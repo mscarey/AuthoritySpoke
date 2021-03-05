@@ -71,7 +71,7 @@ def assign_name_from_content(obj: Dict) -> str:
     """
 
     if obj.get("terms"):
-        template = StatementTemplate(obj["predicate"]["content"])
+        template = StatementTemplate(obj["predicate"]["content"], make_singular=False)
         placeholders = template.placeholders
         if any(placeholders):
             substitutions = dict(zip(placeholders, obj["terms"]))
