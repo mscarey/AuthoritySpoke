@@ -28,7 +28,7 @@ def make_spec() -> APISpec:
     for factor_name in factor_names:
         factor_options.append({"$ref": f"#/components/schemas/{factor_name}"})
 
-    del holding_spec.components._schemas["Factor"]
+    del holding_spec.components.schemas["Factor"]
 
     holding_spec.components.schema(
         "Factor",

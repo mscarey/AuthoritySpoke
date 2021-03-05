@@ -1,5 +1,5 @@
 anchorpoint>=0.4.4
-apispec[validation]
+apispec[validation]~=4.3.0
 marshmallow>=3.10
 legislice>=0.4.1
 nettlesome>=0.2.0
