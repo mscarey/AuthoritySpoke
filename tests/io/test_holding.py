@@ -96,7 +96,7 @@ class TestHoldingImport:
         text anchors were loaded.
         """
         raw_holdings = {
-            "anchors": [
+            "factor_anchors": [
                 {
                     "name": "Rural's telephone directory was a fact",
                     "quotes": [

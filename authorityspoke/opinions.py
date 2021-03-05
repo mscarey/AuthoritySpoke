@@ -71,6 +71,7 @@ class Opinion(Comparable):
         """
 
         self._holdings = HoldingGroup()
+        self.factor_anchors = {}
 
     def factors(self) -> List[Factor]:
         factors_by_name = self.factors_by_name()
@@ -256,6 +257,9 @@ class Opinion(Comparable):
 
         if holding_anchors:
             holding.anchors = holding.anchors + holding_anchors
+
+        if named_anchors:
+            self.factor_anchors = {**self.factor_anchors, **named_anchors}
 
         matching_holding = self.get_matching_holding(holding)
         if matching_holding:

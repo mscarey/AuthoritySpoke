@@ -37,9 +37,6 @@ class FactorIndex(Dict[str, Factor]):
     def insert(self, key: str, value: Factor) -> None:
         """Insert Factor using its str as its key."""
         if key in self.keys():
-            for anchor in value.anchors:
-                if anchor not in self[key].anchors:
-                    self[key].anchors.append(anchor)
             if value.name:
                 if not self[key].name:
                     self[key].name = value.name

@@ -642,7 +642,7 @@ class TestAddition:
         )
         assert len(facts_not_copyrightable.outputs) == 2
         assert str(facts_not_copyrightable.outputs[1]).endswith(
-            "false <the Pythagorean theorem> was copyrightable"
+            "false that <the Pythagorean theorem> was copyrightable"
         )
 
     def test_add_rules_with_duplicate_enactment_text(
