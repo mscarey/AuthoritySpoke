@@ -558,18 +558,6 @@ class Rule(Comparable):
         """
         return self.union(other)
 
-    def own_attributes(self) -> Dict[str, Any]:
-        """
-        Return attributes of ``self`` that aren't inherited from another class.
-
-        Used for getting parameters to pass to :meth:`~Rule.__init__`
-        when generating a new object.
-        """
-        attrs = self.__dict__.copy()
-        for group in self.procedure.context_factor_names:
-            attrs.pop(group, None)
-        return attrs
-
     def set_inputs(self, factors: Sequence[Factor]) -> None:
         self.procedure.set_inputs(factors)
 

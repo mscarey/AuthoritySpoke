@@ -434,23 +434,6 @@ class Holding(Comparable):
         ):
             yield from self.rule.explanations_same_meaning(other.rule, context)
 
-    def factor_anchors(self) -> List[TextQuoteSelector]:
-        r"""
-        Get text passages where a :class:`.Holding` is linked to ``self``.
-
-        :param holding:
-            a holding to find anchors for, which must be in :attr:`~Opinion.holdings`\.
-
-        :returns:
-            a :class:`list` with the text of each passage that anchors the :class:`.Holding`
-        """
-        result = []
-        for _, factor in self.recursive_factors.items():
-            if factor.anchors:
-                result.extend(factor.anchors)
-
-        return result
-
     def negated(self):
         """Get new copy of ``self`` with an opposite value for ``rule_valid``."""
         result = deepcopy(self)
@@ -570,21 +553,6 @@ class Holding(Comparable):
     def __or__(self, other: Union[Rule, Holding]) -> Optional[Holding]:
         """Infer a Holding from all inputs and outputs of self and other."""
         return self.union(other)
-
-    def own_attributes(self) -> Dict[str, Any]:
-        """
-        Return attributes of ``self`` that aren't inherited from another class.
-
-        Used for getting parameters to pass to :meth:`~Holding.__init__`
-        when generating a new object.
-        """
-        attrs = self.__dict__.copy()
-        for group in self.procedure.context_factor_names:
-            attrs.pop(group, None)
-        for group in self.rule.enactment_attr_names:
-            attrs.pop(group, None)
-        attrs.pop("procedure", None)
-        return attrs
 
     def __str__(self):
         action = (
