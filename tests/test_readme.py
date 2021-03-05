@@ -2,7 +2,7 @@
 
 from authorityspoke.io.downloads import FakeClient
 
-from authorityspoke.io.loaders import load_and_read_decision
+from authorityspoke.io.loaders import load_and_read_decision, load_holdings_with_anchors
 from authorityspoke.io.loaders import load_and_read_holdings
 
 
@@ -13,8 +13,25 @@ class TestReadme:
         oracle = load_and_read_decision("oracle_h.json").majority
         lotus = load_and_read_decision("lotus_h.json").majority
 
-        oracle.posit(load_and_read_holdings("holding_oracle.json", client=client))
-        lotus.posit(load_and_read_holdings("holding_lotus.json", client=client))
+        (
+            oracle_holdings,
+            oracle_anchors,
+            oracle_named_anchors,
+        ) = load_holdings_with_anchors("holding_oracle.json", client=client)
+        lotus_holdings, lotus_anchors, lotus_named_anchors = load_holdings_with_anchors(
+            "holding_lotus.json", client=client
+        )
+
+        oracle.posit(
+            holdings=oracle_holdings,
+            holding_anchors=oracle_anchors,
+            named_anchors=oracle_named_anchors,
+        )
+        lotus.posit(
+            holdings=lotus_holdings,
+            holding_anchors=lotus_anchors,
+            named_anchors=lotus_named_anchors,
+        )
 
         assert lotus.contradicts(oracle)
 

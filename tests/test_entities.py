@@ -1,5 +1,7 @@
 import pytest
 
+from marshmallow.exceptions import ValidationError
+
 from nettlesome.comparable import ContextRegister
 from nettlesome.entities import Entity
 from nettlesome.statements import Statement
@@ -13,7 +15,7 @@ class TestMakeEntities:
         This fails because it needs to look up the string factor_records
         in a "mentioned" list, but no "mentioned" parameter is given.
         """
-        with pytest.raises(ValueError):
+        with pytest.raises(ValidationError):
             print(readers.read_factor(record="Bradley"))
 
     def test_conversion_to_generic(self, make_entity):

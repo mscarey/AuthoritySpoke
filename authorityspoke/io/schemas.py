@@ -20,7 +20,7 @@ from authorityspoke.evidence import Exhibit, Evidence
 from authorityspoke.factors import Factor
 from authorityspoke.facts import Fact
 from authorityspoke.holdings import Holding
-from authorityspoke.io.anchors_named import NamedAnchorsSchema
+from authorityspoke.io.anchors_named import NamedAnchors
 from authorityspoke.io.name_index import Mentioned
 from authorityspoke.io.name_index import RawFactor, RawPredicate
 from authorityspoke.io.nesting import nest_fields
@@ -47,7 +47,10 @@ class ExpandableSchema(Schema):
         """Replace data to load with any object with same name in "mentioned"."""
         if isinstance(data, str):
             mentioned = self.context.get("mentioned") or Mentioned()
-            return deepcopy(mentioned.get_by_name(data))
+            try:
+                return deepcopy(mentioned.get_by_name(data))
+            except ValueError:
+                print(data)
         return data
 
     def consume_type_field(self, data, **kwargs):
@@ -496,11 +499,40 @@ class HoldingSchema(ExpandableSchema):
         return data
 
 
+class NamedAnchorsSchema(ExpandableSchema):
+    __model__ = NamedAnchors
+
+    name = fields.Nested(FactorSchema)
+    quotes = fields.Nested(SelectorSchema, many=True)
+
+    def get_name_from_mentioned(self, data, **kwargs):
+        """
+        Replace data to load with any object with same name in "mentioned".
+
+        TODO: eliminate by replacing `name` schema
+        """
+        if isinstance(data["name"], str):
+            mentioned = self.context.get("mentioned") or Mentioned()
+            try:
+                data["name"] = deepcopy(mentioned.get_by_name(data["name"]))
+            except ValueError:
+                data["name"] = deepcopy(
+                    self.context["enactment_index"].get_by_name(data["name"])
+                )
+        return data
+
+    @pre_load
+    def format_data_to_load(self, data, **kwargs):
+        data = self.wrap_single_element_in_list(data, "quotes")
+        # data = self.get_name_from_mentioned(data)
+        return data
+
+
 class AnchoredHoldingsSchema(ExpandableSchema):
     __model__ = AnchoredHoldings
 
     holdings = fields.Nested(HoldingSchema, many=True)
-    anchors = fields.Nested(NamedAnchorsSchema, many=True)
+    factor_anchors = fields.Nested(NamedAnchorsSchema, many=True)
 
     @pre_load
     def format_data_to_load(self, data: RawFactor, **kwargs) -> RawFactor:
@@ -513,9 +545,12 @@ class AnchoredHoldingsSchema(ExpandableSchema):
     def make_object(self, data, **kwargs) -> AnchoredHoldings:
         """Make AuthoritySpoke object out of whatever data has been loaded."""
         text_links = {}
-        if data.get("anchors"):
-            for linked in data["anchors"]:
-                text_links[linked["name"]] = linked["quotes"]
+        if data.get("factor_anchors"):
+            for linked in data["factor_anchors"]:
+                try:
+                    text_links[linked.name.key] = linked.quotes
+                except AttributeError:
+                    print(linked)
         holding_anchors = [holding.anchors for holding in data["holdings"]]
         return AnchoredHoldings(
             data["holdings"], holding_anchors, named_anchors=text_links

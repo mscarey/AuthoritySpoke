@@ -8,8 +8,8 @@ from anchorpoint.textselectors import TextQuoteSelector
 
 from authorityspoke.opinions import TextLinkDict
 
-from authorityspoke.io.anchors_named import NamedAnchorsSchema
 from authorityspoke.io.name_index import Mentioned, RawFactor
+from authorityspoke.io.schemas import NamedAnchorsSchema
 
 RawSelector = Union[str, Dict[str, str]]
 RawEnactment = Dict[str, Union[str, List[RawSelector]]]

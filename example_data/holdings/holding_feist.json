@@ -216,7 +216,7 @@
             "outputs": {
                 "type": "fact",
                 "content": "Rural's telephone listings were an original work",
-                "name": "false that Rural's telephone listings were an original work",
+                "name": "false Rural's telephone listings were an original work",
                 "truth": false
             },
             "enactments": [
@@ -247,7 +247,7 @@
             ]
         }
     ],
-    "anchors": [
+    "factor_anchors": [
         {
             "name": "Rural's telephone directory was a fact",
             "quotes": [
@@ -337,11 +337,11 @@
             "quotes": "it possesses at least some minimal degree of creativity"
         },
         {
-            "name": "false that Rural's telephone listings were an original work",
+            "name": "false Rural's telephone listings were an original work",
             "quotes": "In other words, did Feist, by taking 1,309 names, towns, and telephone numbers from Rural’s white pages, copy anything that was “original” to Rural? Certainly, the raw data does not satisfy the originality requirement."
         },
         {
-            "name": "false that Feist Publications infringed the copyright on Rural's telephone directory",
+            "name": "false Feist Publications infringed the copyright on Rural's telephone directory",
             "quotes": "may be freely copied because copyright protects only the elements that owe their origin to the compiler"
         },
         {
@@ -353,7 +353,7 @@
             "quotes": "the author make the selection or arrangement independently (i. e., without copying that selection or arrangement from another work)"
         },
         {
-            "name": "false that Rural's telephone directory contained written expression protectable by copyright",
+            "name": "false Rural's telephone directory contained written expression protectable by copyright",
             "quotes": "a directory that contains absolutely no protectible written expression"
         },
         {
