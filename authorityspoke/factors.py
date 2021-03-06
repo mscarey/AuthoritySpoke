@@ -9,7 +9,7 @@ from legislice import Enactment
 
 from anchorpoint.textselectors import TextQuoteSelector
 
-from nettlesome.comparable import Comparable
+from nettlesome.terms import Comparable
 from nettlesome.factors import Factor
 
 

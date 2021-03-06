@@ -5,7 +5,7 @@ from typing import ClassVar, Iterator, List, Optional, Tuple
 
 from anchorpoint import TextQuoteSelector
 
-from nettlesome.comparable import ContextRegister
+from nettlesome.terms import ContextRegister
 from nettlesome.entities import Entity
 from nettlesome.formatting import indented
 

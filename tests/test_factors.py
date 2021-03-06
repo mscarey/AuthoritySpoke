@@ -2,9 +2,10 @@ import operator
 
 import pytest
 
-from nettlesome.comparable import ContextRegister, FactorSequence, means
+from nettlesome.terms import ContextRegister, TermSequence, means
 from nettlesome.entities import Entity
-from nettlesome.predicates import Comparison, Q_, Predicate
+from nettlesome.predicates import Predicate
+from nettlesome.quantities import Comparison, Q_
 
 from authorityspoke.facts import Fact, build_fact
 
@@ -175,7 +176,7 @@ class TestFacts:
         assert "<Darth Vader> operated" in str(different)
 
     def test_type_of_terms(self, watt_factor):
-        assert isinstance(watt_factor["f1"].terms, FactorSequence)
+        assert isinstance(watt_factor["f1"].terms, TermSequence)
 
     def test_concrete_to_abstract(self, make_entity, make_predicate):
         motel = make_entity["motel_specific"]

@@ -8,7 +8,7 @@ from legislice.download import Client
 
 from authorityspoke.holdings import Holding
 
-from nettlesome.comparable import ContextRegister, FactorSequence
+from nettlesome.terms import ContextRegister, TermSequence
 from nettlesome.entities import Entity
 from nettlesome.predicates import Predicate
 from nettlesome.statements import Statement
@@ -68,7 +68,7 @@ class TestHolding:
         assert not make_holding["h1"].inferred_from_exclusive
 
     def test_type_of_terms(self, make_holding):
-        assert isinstance(make_holding["h1"].terms, FactorSequence)
+        assert isinstance(make_holding["h1"].terms, TermSequence)
 
     def test_get_evidence_by_name_from_holding(self, make_opinion_with_holding):
         watt = make_opinion_with_holding["watt_majority"]

@@ -6,7 +6,8 @@ from sympy import Interval, oo
 
 
 from nettlesome.entities import Entity
-from nettlesome.predicates import Predicate, Comparison, Q_
+from nettlesome.predicates import Predicate
+from nettlesome.quantities import Comparison, Q_, Quantity
 
 
 class TestComparisons:
@@ -90,14 +91,14 @@ class TestPredicates:
 
     def test_convert_false_statement_about_quantity_to_obverse(self, make_predicate):
         assert make_predicate["p7_obverse"].truth is True
-        assert make_predicate["p7_obverse"].expression == Q_(35, "foot")
+        assert make_predicate["p7_obverse"].quantity == Q_(35, "foot")
         assert make_predicate["p7"].truth is True
         assert make_predicate["p7"].sign == "<="
         assert 'sign="<="' in repr(make_predicate["p7"])
         assert make_predicate["p7_obverse"].sign == "<="
 
     def test_quantity_type(self, make_predicate):
-        assert isinstance(make_predicate["p7"].expression, Q_)
+        assert isinstance(make_predicate["p7"].quantity, Quantity)
 
     def test_string_for_date_as_expression(self):
         copyright_date_range = Comparison(
@@ -108,14 +109,14 @@ class TestPredicates:
         assert str(copyright_date_range).endswith("1978-01-01")
 
     def test_quantity_string(self, make_predicate):
-        assert str(make_predicate["p7"].expression) == "35 foot"
+        assert str(make_predicate["p7"].quantity) == "35 foot"
 
     def test_predicate_content_comparison(self, make_predicate):
         assert make_predicate["p8_exact"].content == make_predicate["p7"].content
 
     def test_expression_comparison(self, make_predicate):
-        assert make_predicate["p7"].expression_comparison() == "no more than 35 foot"
-        assert make_predicate["p9"].expression_comparison() == "no more than 5 foot"
+        assert str(make_predicate["p7"].quantity_range) == "no more than 35 foot"
+        assert str(make_predicate["p9"].quantity_range) == "no more than 5 foot"
 
     def test_predicate_has_no_expression_comparison(self, make_predicate):
         with pytest.raises(AttributeError):
@@ -281,9 +282,8 @@ class TestImplication:
         assert not make_predicate["p2_no_truth"] > make_predicate["p2"]
         assert make_predicate["p2"] > make_predicate["p2_no_truth"]
 
-    def test_error_predicate_imply_factor(self, make_predicate, watt_factor):
-        with pytest.raises(TypeError):
-            make_predicate["p7_true"] > (watt_factor["f7"])
+    def test_predicate_cannot_imply_factor(self, make_predicate, watt_factor):
+        assert not make_predicate["p7_true"] > watt_factor["f7"]
 
     def test_implication_due_to_dates(self):
         copyright_date_range = Comparison(
@@ -439,54 +439,7 @@ class TestQuantities:
             sign=">",
             expression=Q_("30 kilometers"),
         )
-        result = comparison.convert_other_quantity(comparison_km.expression)
-        assert Q_("18 miles") < result < Q_("19 miles")
-
-    def test_cannot_convert_date_to_time_period(self):
-        time = Comparison(
-            "the time $object took to biodegrade was",
-            sign=">",
-            expression=Q_("2000 years"),
-        )
-        with pytest.raises(TypeError):
-            time.convert_other_quantity(date(2020, 1, 1))
-
-    def test_cannot_convert_time_period_to_date(self):
-        time = Comparison(
-            "the date $buyer bought $object was",
-            sign=">",
-            expression=date(2020, 1, 1),
-        )
-        with pytest.raises(TypeError):
-            time.convert_other_quantity(date(2020, 1, 1))
-
-    def test_inconsistent_dimensionality_quantity(self):
-        number = Comparison(
-            "the distance between $place1 and $place2 was",
-            sign=">",
-            expression=20,
-        )
-        distance = Comparison(
-            "the distance between $place1 and $place2 was",
-            sign=">",
-            expression=Q_("20 miles"),
-        )
-        assert not number.consistent_dimensionality(distance)
-        assert not distance.consistent_dimensionality(number)
-
-    def test_inconsistent_dimensionality_date(self):
-        number = Comparison(
-            "the distance between $place1 and $place2 was",
-            sign=">",
-            expression=20,
-        )
-        day = Comparison(
-            "the distance between $place1 and $place2 was",
-            sign=">",
-            expression=date(2000, 1, 1),
-        )
-        assert not number.consistent_dimensionality(day)
-        assert not day.consistent_dimensionality(number)
+        assert comparison > comparison_km
 
     def test_quantity_comparison_to_predicate(self):
         distance = Comparison(
@@ -495,4 +448,4 @@ class TestQuantities:
             expression="20 miles",
         )
         predicate = Predicate("the distance between $place1 and $place2 was")
-        assert not distance.compare_other_quantity(predicate)
+        assert not distance >= predicate

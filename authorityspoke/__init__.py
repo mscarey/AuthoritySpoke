@@ -2,7 +2,8 @@
 
 from legislice import Enactment
 from nettlesome.entities import Entity
-from nettlesome.predicates import Predicate, Comparison
+from nettlesome.predicates import Predicate
+from nettlesome.quantities import Comparison
 
 from .facts import Fact
 from .opinions import Opinion

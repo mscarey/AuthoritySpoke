@@ -13,9 +13,9 @@ from authorityspoke.facts import Fact
 from authorityspoke.io.downloads import download_case
 from authorityspoke.io.readers import read_decision
 
-from nettlesome.comparable import ContextRegister
+from nettlesome.terms import ContextRegister
 from nettlesome.entities import Entity
-from nettlesome.predicates import Comparison
+from nettlesome.quantities import Comparison
 
 load_dotenv()
 

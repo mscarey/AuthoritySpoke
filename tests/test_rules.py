@@ -6,11 +6,12 @@ from typing import Type
 
 from dotenv import load_dotenv
 from legislice.download import Client
-from nettlesome.comparable import ContextRegister, means
+from nettlesome.terms import ContextRegister, means
 from nettlesome.entities import Entity
 from nettlesome.explanations import Explanation
 from nettlesome.groups import FactorGroup
-from nettlesome.predicates import Comparison, Predicate, Q_
+from nettlesome.predicates import Predicate
+from nettlesome.quantities import Comparison, Q_
 from nettlesome.statements import Statement
 import pytest
 

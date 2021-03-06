@@ -14,7 +14,7 @@ import operator
 from typing import Any, Dict, Iterable, Iterator
 from typing import List, Optional, Sequence, Tuple, Union
 
-from nettlesome.comparable import (
+from nettlesome.terms import (
     Comparable,
     ContextRegister,
     new_context_helper,

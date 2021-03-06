@@ -7,10 +7,10 @@ from anchorpoint.textselectors import TextQuoteSelector
 from nettlesome.factors import Factor
 from nettlesome.formatting import indented
 
-from nettlesome.comparable import (
+from nettlesome.terms import (
     Comparable,
     ContextRegister,
-    FactorSequence,
+    TermSequence,
 )
 from nettlesome.predicates import Predicate
 from nettlesome.statements import Statement
@@ -74,7 +74,7 @@ class Fact(Statement):
     def __init__(
         self,
         predicate: Predicate,
-        terms: FactorSequence = FactorSequence(),
+        terms: TermSequence = TermSequence(),
         name: Optional[str] = None,
         standard_of_proof: Optional[str] = None,
         absent: bool = False,
@@ -206,7 +206,7 @@ def build_fact(
     else:
         wrapped_factors = tuple(case_factors)
 
-    terms = FactorSequence([wrapped_factors[i] for i in indices])
+    terms = TermSequence([wrapped_factors[i] for i in indices])
     return Fact(
         predicate=predicate,
         terms=terms,

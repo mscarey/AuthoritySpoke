@@ -1,5 +1,3 @@
-from nettlesome.comparable import FactorSequence
-from nettlesome.predicates import Comparison, Predicate
 import json
 import os
 import pathlib
@@ -7,6 +5,10 @@ import pathlib
 from marshmallow import ValidationError
 from legislice import Enactment
 from nettlesome.entities import Entity
+from nettlesome.terms import TermSequence
+from nettlesome.predicates import Predicate
+from nettlesome.quantities import Comparison, QuantityRange
+
 import pytest
 
 from authorityspoke.facts import Fact
@@ -89,7 +91,7 @@ class TestFactLoad:
         assert len(story.predicate) == 1
         assert story.predicate.content.startswith("The number of castles")
         assert story.predicate.sign == ">"
-        assert story.predicate.expression == 3
+        assert story.predicate.quantity == 3
 
     def test_make_fact_from_string(self, watt_factor):
         fact_float_data = {
@@ -113,9 +115,9 @@ class TestFactorLoad:
                 sign="<",
                 expression="5 miles",
             ),
-            terms=FactorSequence([Entity("the apartment"), Entity("the office")]),
+            terms=TermSequence([Entity("the apartment"), Entity("the office")]),
         )
-        assert hasattr(fact.predicate.expression, "dimensionality")
+        assert hasattr(fact.predicate.quantity, "dimensionality")
         data = {
             "type": "fact",
             "content": "the distance between ${place1} and ${place2} was",

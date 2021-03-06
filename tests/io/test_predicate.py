@@ -2,7 +2,8 @@ from datetime import date
 
 import pytest
 
-from nettlesome.predicates import Comparison, Predicate, Q_
+from nettlesome.quantities import Comparison, Q_
+
 from authorityspoke.io import readers, schemas
 from authorityspoke.io.dump import to_dict, to_json
 
@@ -96,7 +97,7 @@ class TestPredicateLoad:
             "truth": True,
         }
         statement = schema.load(data)
-        assert statement.expression == date(1978, 1, 1)
+        assert statement.quantity == date(1978, 1, 1)
 
 
 class TestPredicateDump:

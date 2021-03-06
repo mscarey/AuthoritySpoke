@@ -9,8 +9,10 @@ from dotenv import load_dotenv
 from legislice import Enactment
 from legislice.name_index import EnactmentIndex
 from legislice.download import Client
-from nettlesome.comparable import ContextRegister
+from nettlesome.terms import ContextRegister
 from nettlesome.entities import Entity
+from nettlesome.predicates import Predicate
+from nettlesome.quantities import Comparison, Q_
 import pytest
 
 from authorityspoke.evidence import Evidence, Exhibit
@@ -19,7 +21,6 @@ from authorityspoke.facts import Fact, build_fact
 from authorityspoke.holdings import Holding
 from authorityspoke.opinions import Opinion
 from authorityspoke.pleadings import Pleading, Allegation
-from nettlesome.predicates import Predicate, Comparison, Q_
 from authorityspoke.rules import Procedure, Rule
 
 from authorityspoke.io import anchors, loaders, readers

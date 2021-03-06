@@ -2,9 +2,10 @@ import operator
 
 import pytest
 
-from nettlesome.comparable import ContextRegister, FactorSequence, means
+from nettlesome.terms import ContextRegister, TermSequence, means
 from nettlesome.entities import Entity
-from nettlesome.predicates import Comparison, Q_, Predicate
+from nettlesome.predicates import Predicate
+from nettlesome.quantities import Comparison, Q_
 from nettlesome.statements import Statement
 
 
@@ -138,7 +139,7 @@ class TestStatements:
             [Entity("Darth Vader"), Entity("the Death Star")]
         )
         assert "<Darth Vader> managed" in str(different)
-        assert isinstance(different.terms, FactorSequence)
+        assert isinstance(different.terms, TermSequence)
 
     def test_term_cannot_be_string(self):
         city = Predicate("$place was a city")

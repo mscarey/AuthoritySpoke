@@ -15,10 +15,10 @@ from dataclasses import dataclass
 
 from legislice.enactments import Enactment, consolidate_enactments
 
-from nettlesome.comparable import (
+from nettlesome.terms import (
     Comparable,
     ContextRegister,
-    FactorSequence,
+    TermSequence,
 )
 from authorityspoke.factors import Factor
 from nettlesome.formatting import indented
@@ -209,7 +209,7 @@ class Rule(Comparable):
             yield result
 
     @property
-    def terms(self) -> FactorSequence:
+    def terms(self) -> TermSequence:
         """
         Call :class:`Procedure`\'s :meth:`~Procedure.terms` method.
 

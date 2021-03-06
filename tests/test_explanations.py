@@ -1,4 +1,4 @@
-from nettlesome.comparable import ContextRegister, means
+from nettlesome.terms import ContextRegister, means
 from nettlesome.entities import Entity
 from nettlesome.explanations import Explanation
 

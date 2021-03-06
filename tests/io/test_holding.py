@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 from legislice import Enactment
 from legislice.download import Client
 from legislice.name_index import collect_enactments
-from nettlesome.comparable import ContextRegister
+from nettlesome.terms import ContextRegister
 from nettlesome.entities import Entity
 from nettlesome.predicates import Predicate
 
@@ -474,9 +474,7 @@ class TestTextAnchors:
         brad.posit(holdings)
         expectation_not_reasonable = list(brad.holdings)[6]
         assert "dimensionless" not in str(expectation_not_reasonable)
-        assert isinstance(
-            expectation_not_reasonable.inputs[0].predicate.expression, int
-        )
+        assert isinstance(expectation_not_reasonable.inputs[0].predicate.quantity, int)
 
     def test_opinion_posits_holding(self, make_opinion, make_response):
         mock_client = FakeClient(responses=make_response)

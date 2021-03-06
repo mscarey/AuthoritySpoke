@@ -21,10 +21,10 @@ from dataclasses import dataclass, field
 from anchorpoint import TextQuoteSelector
 from legislice.enactments import Enactment
 
-from nettlesome.comparable import (
+from nettlesome.terms import (
     Comparable,
     ContextRegister,
-    FactorSequence,
+    TermSequence,
     contradicts,
     new_context_helper,
 )
@@ -129,7 +129,7 @@ class Holding(Comparable):
         return self.rule.enactments_despite
 
     @property
-    def terms(self) -> FactorSequence:
+    def terms(self) -> TermSequence:
         r"""
         Call :class:`Procedure`\'s :meth:`~Procedure.terms` method.
 

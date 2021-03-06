@@ -2,10 +2,11 @@ from copy import deepcopy
 import logging
 import pytest
 
-from nettlesome.comparable import ContextRegister, FactorSequence
+from nettlesome.terms import ContextRegister, TermSequence
 from nettlesome.entities import Entity
 from nettlesome.groups import FactorGroup
-from nettlesome.predicates import Comparison, Predicate, Q_
+from nettlesome.predicates import Predicate
+from nettlesome.quantities import Comparison, Q_
 
 from authorityspoke.facts import Fact
 from authorityspoke.procedures import Procedure
@@ -57,7 +58,7 @@ class TestProcedures:
             assert factor in factors
 
     def test_type_of_terms(self, make_procedure):
-        assert isinstance(make_procedure["c3"].terms, FactorSequence)
+        assert isinstance(make_procedure["c3"].terms, TermSequence)
 
     def test_entities_of_inputs_for_identical_procedure(
         self, watt_factor, make_procedure, watt_mentioned
@@ -313,13 +314,11 @@ class TestFactorGroups:
             context=alice_like_craig,
         )
 
-    def test_not_all_factors_match(self):
+    def test_context_indicates_factors_match(self):
         alice_like_craig = ContextRegister()
         alice_like_craig.insert_pair(alice, craig)
 
-        assert alice_rich.all_generic_factors_match(
-            craig_rich, context=alice_like_craig
-        )
+        assert alice_rich.means(craig_rich, context=alice_like_craig)
 
     def test_inconsistent_factor_groups(self):
         """

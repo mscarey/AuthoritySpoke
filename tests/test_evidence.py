@@ -1,7 +1,7 @@
 from authorityspoke.evidence import Evidence, Exhibit
 from authorityspoke.facts import build_fact
 
-from nettlesome.comparable import FactorSequence
+from nettlesome.terms import TermSequence
 
 
 class TestEvidence:
@@ -57,7 +57,7 @@ class TestEvidence:
         )
 
     def test_type_of_terms(self, make_evidence):
-        assert isinstance(make_evidence["no_shooting"].terms, FactorSequence)
+        assert isinstance(make_evidence["no_shooting"].terms, TermSequence)
 
 
 class TestEvidenceSameMeaning:

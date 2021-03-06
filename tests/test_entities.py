@@ -2,7 +2,7 @@ import pytest
 
 from marshmallow.exceptions import ValidationError
 
-from nettlesome.comparable import ContextRegister
+from nettlesome.terms import ContextRegister
 from nettlesome.entities import Entity
 from nettlesome.statements import Statement
 

@@ -13,7 +13,8 @@ from anchorpoint.schemas import SelectorSchema
 from legislice import Enactment
 from legislice.schemas import EnactmentSchema
 from nettlesome.entities import Entity
-from nettlesome.predicates import Predicate, Comparison, ureg, Q_
+from nettlesome.predicates import Predicate
+from nettlesome.quantities import Comparison, QuantityRange, Quantity
 
 from authorityspoke.decisions import CaseCitation, Decision
 from authorityspoke.evidence import Exhibit, Evidence
@@ -184,7 +185,7 @@ class PredicateSchema(ExpandableSchema):
     truth = fields.Bool(missing=True)
     sign = fields.Str(
         missing=None,
-        validate=validate.OneOf([""] + list(Comparison.opposite_comparisons.keys())),
+        validate=validate.OneOf([""] + list(QuantityRange.opposite_comparisons.keys())),
     )
     expression = fields.Function(
         dump_quantity, deserialize=Comparison.read_quantity, missing=None
@@ -195,11 +196,11 @@ class PredicateSchema(ExpandableSchema):
 
     def split_quantity_from_content(
         self, content: str
-    ) -> Tuple[str, Optional[str], Optional[Union[ureg.Quantity, int, float]]]:
+    ) -> Tuple[str, Optional[str], Optional[Union[Quantity, int, float]]]:
         """Find any reference to a quantity in the content text."""
         for comparison in {
-            **Comparison.opposite_comparisons,
-            **Comparison.normalized_comparisons,
+            **QuantityRange.opposite_comparisons,
+            **QuantityRange.normalized_comparisons,
         }:
             if comparison in content:
                 content, quantity_text = content.split(comparison)
@@ -211,8 +212,8 @@ class PredicateSchema(ExpandableSchema):
         if data.get("expression") and not data.get("sign"):
             data["sign"] = "="
 
-        if data.get("sign") in Comparison.normalized_comparisons:
-            data["sign"] = Comparison.normalized_comparisons[data["sign"]]
+        if data.get("sign") in QuantityRange.normalized_comparisons:
+            data["sign"] = QuantityRange.normalized_comparisons[data["sign"]]
         return data
 
     @pre_load
@@ -402,9 +403,9 @@ class FactorSchema(OneOfSchema, ExpandableSchema):
 
 class ProcedureSchema(ExpandableSchema):
     """
-    Schema for Procedure; does not require separate FactorSequence schema.
+    Schema for Procedure; does not require separate TermSequence schema.
 
-    "FactorSchema, many=True" is an equivalent of a FactorSequence.
+    "FactorSchema, many=True" is an equivalent of a TermSequence.
     """
 
     __model__: Type = Procedure
