@@ -21,7 +21,6 @@ from authorityspoke.evidence import Exhibit, Evidence
 from authorityspoke.factors import Factor
 from authorityspoke.facts import Fact
 from authorityspoke.holdings import Holding
-from authorityspoke.io.anchors_named import NamedAnchors
 from authorityspoke.io.name_index import Mentioned
 from authorityspoke.io.name_index import RawFactor, RawPredicate
 from authorityspoke.io.nesting import nest_fields
@@ -500,32 +499,20 @@ class HoldingSchema(ExpandableSchema):
         return data
 
 
+class NamedAnchors(NamedTuple):
+    name: Factor
+    quotes: List[TextQuoteSelector]
+
+
 class NamedAnchorsSchema(ExpandableSchema):
     __model__ = NamedAnchors
 
     name = fields.Nested(FactorSchema)
     quotes = fields.Nested(SelectorSchema, many=True)
 
-    def get_name_from_mentioned(self, data, **kwargs):
-        """
-        Replace data to load with any object with same name in "mentioned".
-
-        TODO: eliminate by replacing `name` schema
-        """
-        if isinstance(data["name"], str):
-            mentioned = self.context.get("mentioned") or Mentioned()
-            try:
-                data["name"] = deepcopy(mentioned.get_by_name(data["name"]))
-            except ValueError:
-                data["name"] = deepcopy(
-                    self.context["enactment_index"].get_by_name(data["name"])
-                )
-        return data
-
     @pre_load
     def format_data_to_load(self, data, **kwargs):
         data = self.wrap_single_element_in_list(data, "quotes")
-        # data = self.get_name_from_mentioned(data)
         return data
 
 
