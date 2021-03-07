@@ -165,15 +165,15 @@ class DecisionSchema(ExpandableSchema):
         return data
 
 
-def dump_quantity(obj: Comparison) -> Optional[Union[date, float, int, str]]:
+def dump_quantity(obj: Predicate) -> Optional[Union[date, float, int, str]]:
     """Convert quantity to string if it's a pint ureg.Quantity object."""
-    if obj is None or obj.__dict__.get("expression") is None:
+    if not hasattr(obj, "quantity"):
         return None
-    if isinstance(obj.expression, date):
-        return obj.expression.isoformat()
-    if isinstance(obj.expression, (int, float)):
-        return obj.expression
-    return f"{obj.expression.magnitude} {obj.expression.units}"
+    if isinstance(obj.quantity, date):
+        return obj.quantity.isoformat()
+    if isinstance(obj.quantity, (int, float)):
+        return obj.quantity
+    return f"{obj.quantity.magnitude} {obj.quantity.units}"
 
 
 class PredicateSchema(ExpandableSchema):
