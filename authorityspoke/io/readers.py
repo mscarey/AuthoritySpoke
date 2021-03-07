@@ -167,32 +167,6 @@ class HoldingsIndexed(NamedTuple):
     holding_anchors: List[List[TextQuoteSelector]]
 
 
-def read_holdings_with_index(
-    record: List[RawHolding],
-    client: Optional[Client] = None,
-    many: bool = True,
-    enactment_index: Optional[EnactmentIndex] = None,
-) -> HoldingsIndexed:
-    r"""Load a list of :class:`Holdings`\s from JSON, with "mentioned" index."""
-    schema = schemas.HoldingSchema()
-
-    schema.context["enactment_index"] = enactment_index
-    record, new_enactment_index = collect_enactments(record)
-    if enactment_index:
-        new_enactment_index = new_enactment_index + enactment_index
-    record["holdings"], mentioned = index_names(record["holdings"])
-    schema.context["mentioned"] = mentioned
-    if client:
-        new_enactment_index = client.update_entries_in_enactment_index(
-            new_enactment_index
-        )
-    schema.context["enactment_index"] = new_enactment_index
-
-    anchor_list = anchors.get_holding_anchors(record)
-    holdings = schema.load(deepcopy(record))
-    return HoldingsIndexed(holdings, mentioned, anchor_list)
-
-
 def read_holdings_with_anchors(
     record: Dict[str, Union[List[RawHolding], List[RawSelector]]],
     client: Optional[Client] = None,

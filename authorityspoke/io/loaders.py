@@ -115,22 +115,6 @@ def load_and_read_holdings(
     return readers.read_holdings(raw_holdings, client=client)
 
 
-def load_holdings_with_index(
-    filename: Optional[str] = None,
-    directory: Optional[pathlib.Path] = None,
-    filepath: Optional[pathlib.Path] = None,
-    client: Optional[Client] = None,
-    enactment_index: Optional[EnactmentIndex] = None,
-) -> readers.HoldingsIndexed:
-    """Read holdings with factor index from a file."""
-    raw_holdings = load_holdings(
-        filename=filename, directory=directory, filepath=filepath
-    )
-    return readers.read_holdings_with_index(
-        raw_holdings, client=client, enactment_index=enactment_index
-    )
-
-
 def load_holdings_with_anchors(
     filename: Optional[str] = None,
     directory: Optional[pathlib.Path] = None,
