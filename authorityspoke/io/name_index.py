@@ -284,7 +284,12 @@ def update_name_index_with_factor(
 def collect_mentioned(
     obj: Union[RawFactor, List[Union[RawFactor, str]]],
     mentioned: Optional[Mentioned] = None,
-    keys_to_ignore: Sequence[str] = ("predicate", "anchors"),
+    keys_to_ignore: Sequence[str] = (
+        "predicate",
+        "anchors",
+        "factor_anchors",
+        "enactment_anchors",
+    ),
 ) -> Tuple[RawFactor, Mentioned]:
     """
     Make a dict of all nested objects labeled by name, creating names if needed.

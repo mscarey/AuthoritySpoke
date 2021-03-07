@@ -18,14 +18,14 @@ from authorityspoke.rules import Rule
 
 from authorityspoke.io import filepaths, readers
 from authorityspoke.io.name_index import Mentioned
-from authorityspoke.io.schemas import RawHolding, RawDecision
+from authorityspoke.io.schemas import RawEnactment, RawFactor, RawHolding, RawDecision
 
 
 def load_holdings(
     filename: Optional[str] = None,
     directory: Optional[pathlib.Path] = None,
     filepath: Optional[pathlib.Path] = None,
-) -> List[RawHolding]:
+) -> Dict[str, Union[Dict[str, RawFactor], Dict[str, RawEnactment], List[RawHolding]]]:
     r"""
     Load a list of records from JSON to create :class:`.Holding`\s.
 
@@ -112,6 +112,8 @@ def load_and_read_holdings(
     raw_holdings = load_holdings(
         filename=filename, directory=directory, filepath=filepath
     )
+    if "holdings" in raw_holdings:
+        return readers.read_holdings(raw_holdings["holdings"], client=client)
     return readers.read_holdings(raw_holdings, client=client)
 
 
