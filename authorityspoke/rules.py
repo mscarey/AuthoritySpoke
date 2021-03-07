@@ -124,8 +124,8 @@ class Rule(Comparable):
         The new ``universal`` and ``mandatory`` values are the
         lesser of the old values for each.
 
-        Don't test whether ``self`` could be triggered by the outputs
-        of other. Let user do ``other + self`` for that.
+        Does not test whether ``self`` could be triggered by the outputs
+        of other. Use ``other + self`` for that.
 
         :param other:
             another :class:`Rule` to try to add to ``self``

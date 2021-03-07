@@ -94,7 +94,7 @@ def load_and_read_holdings(
     filepath: Optional[pathlib.Path] = None,
     client: Optional[Client] = None,
 ) -> List[Holding]:
-    """
+    r"""
     Read holdings from a file.
 
     :param filename: The name of the input JSON file.

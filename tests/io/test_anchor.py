@@ -51,9 +51,3 @@ class TestCollectAnchors:
         """
         selector = anchors.read_selector(self.fact_string_anchor["anchors"])
         assert selector.exact.startswith("In preparing")
-
-    def test_make_enactment_anchor(self):
-        record, mentioned = index_names(self.enactment_anchor)
-        named_anchors = anchors.get_named_anchors(mentioned)
-        enactment_anchors = named_anchors["copyright protection provision"]
-        assert enactment_anchors[0].exact == "17 U.S.C. § 102(a)"
