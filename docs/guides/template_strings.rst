@@ -26,14 +26,14 @@ Predicate objects
 -----------------
 
 Here’s an example of a template string used to create
-a :class:`~authorityspoke.predicates.Predicate` object
+a :class:`~nettlesome.predicates.Predicate` object
 in AuthoritySpoke version 0.5:
 
     >>> from authorityspoke import Predicate
     >>> parent_sentence = Predicate("$mother was ${child}'s parent")
 
 The phrase that we passed to
-the :class:`~authorityspoke.predicates.Predicate` constructor is used to create
+the :class:`~nettlesome.predicates.Predicate` constructor is used to create
 a Python template string. `Template
 strings <https://docs.python.org/3/library/string.html#string.Template>`__
 are part of the Python standard library. The dollar signs and curly
@@ -47,7 +47,7 @@ with a mapping showing how to replace the placeholders with new text.
     "Ann was Bob's parent"
 
 Don’t worry: the use of the past tense doesn’t indicate that a tragedy
-has befallen Ann or Bob. The :class:`~authorityspoke.predicates.Predicate` class
+has befallen Ann or Bob. The :class:`~nettlesome.predicates.Predicate` class
 is designed to be used only
 with an English-language phrase in the past tense. The past tense is
 used because legal analysis is usually backward-looking, determining the
@@ -56,16 +56,16 @@ or end punctuation to signal the beginning or end of the phrase, because
 the phrase may be used in a context where it’s only part of a longer
 sentence.
 
-Predicates can be compared using AuthoritySpoke’s :meth:`~authorityspoke.predicates.Predicate.means`\,
-:meth:`~authorityspoke.predicates.Predicate.implies`\,
-and :meth:`~authorityspoke.predicates.Predicate.contradicts` methods.
-The :meth:`~authorityspoke.predicates.Predicate.means` method
-checks whether one :class:`~authorityspoke.predicates.Predicate` has
-the same meaning as another :class:`~authorityspoke.predicates.Predicate`\.
+Predicates can be compared using AuthoritySpoke’s :meth:`~nettlesome.predicates.Predicate.means`\,
+:meth:`~nettlesome.predicates.Predicate.implies`\,
+and :meth:`~nettlesome.predicates.Predicate.contradicts` methods.
+The :meth:`~nettlesome.predicates.Predicate.means` method
+checks whether one :class:`~nettlesome.predicates.Predicate` has
+the same meaning as another :class:`~nettlesome.predicates.Predicate`\.
 One reason for comparing Predicates using
-the :meth:`~authorityspoke.predicates.Predicate.means` method instead
+the :meth:`~nettlesome.predicates.Predicate.means` method instead
 of Python’s ``==`` operator is
-that the :meth:`~authorityspoke.predicates.Predicate.means` method can still
+that the :meth:`~nettlesome.predicates.Predicate.means` method can still
 consider Predicates to have the same meaning even if they use different
 identifiers for their placeholders.
 
@@ -114,10 +114,10 @@ identifiers <https://docassemble.org/docs/fields.html#variable%20names>`__.
 Comparison objects
 ------------------
 
-AuthoritySpoke’s :class:`~authorityspoke.predicates.Comparison` class
+AuthoritySpoke’s :class:`~nettlesome.predicates.Comparison` class
 extends the concept of a
-:class:`~authorityspoke.predicates.Predicate`\.
-A :class:`~authorityspoke.predicates.Comparison` still contains a ``truth`` value and a
+:class:`~nettlesome.predicates.Predicate`\.
+A :class:`~nettlesome.predicates.Comparison` still contains a ``truth`` value and a
 ``template`` string, but that template should be used to identify a
 quantity that will be compared to an ``expression`` using a ``sign``
 such as an equal sign or a greater-than sign. This ``expression`` must
@@ -149,8 +149,8 @@ when rendering them as text.)
 
 By making the quantitative part of the phrase explicit, you make it
 possible for AuthoritySpoke to consider quantities when checking whether
-one Comparison :meth:`~authorityspoke.predicates.Comparison.implies` or
-:meth:`~authorityspoke.predicates.Comparison.contradicts` another.
+one Comparison :meth:`~nettlesome.predicates.Comparison.implies` or
+:meth:`~nettlesome.predicates.Comparison.contradicts` another.
 
     >>> smaller_drug_comparison = Comparison(
     >>>     "the weight of marijuana that $defendant possessed was",
@@ -165,7 +165,7 @@ kilograms, that implies it was also at least 250 grams.
     >>> drug_comparison.implies(smaller_drug_comparison)
     True
 
-If you phrase a :class:`~authorityspoke.predicates.Comparison` with an
+If you phrase a :class:`~nettlesome.predicates.Comparison` with an
 inequality sign using ``truth=False``, AuthoritySpoke will silently
 modify your statement so
 it can have ``truth=True`` with a different sign. In this example, the
@@ -182,7 +182,7 @@ that the weight was no more than 10 grams.
     'that the weight of marijuana that $defendant possessed was no more than 10 gram'
 
 
-Of course, this Comparison :meth:`~authorityspoke.predicates.Comparison.contradicts`
+Of course, this Comparison :meth:`~nettlesome.predicates.Comparison.contradicts`
 the other Comparisons that
 asserted the weight was much greater.
 
@@ -197,7 +197,7 @@ Comparisons with Integer and Float Expressions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 When the number needed for
-a :class:`~authorityspoke.predicates.Comparison` isn’t a
+a :class:`~nettlesome.predicates.Comparison` isn’t a
 physical :class:`~pint.quantity.Quantity` that
 can be described with the units in the `pint
 library <https://pint.readthedocs.io/en/stable/>`__, you should
@@ -214,8 +214,8 @@ floating point number, not a string to be parsed.
     "that the number of children in ${taxpayer}'s household was exactly equal to 3"
 
 The numeric expression will still be available for comparison methods
-like :meth:`~authorityspoke.predicates.Comparison.implies`
-or :meth:`~authorityspoke.predicates.Comparison.contradicts`\,
+like :meth:`~nettlesome.predicates.Comparison.implies`
+or :meth:`~nettlesome.predicates.Comparison.contradicts`\,
 but no unit conversion will be available.
 
     >>> at_least_two_children = Comparison("the number of children in ${taxpayer}'s household was", sign=">=", expression=2)
@@ -234,7 +234,7 @@ Comparisons with Dates
 ~~~~~~~~~~~~~~~~~~~~~~
 
 The ``expression`` field of
-a :class:`~authorityspoke.predicates.Comparison` can be a :py:class:`datetime.date`\.
+a :class:`~nettlesome.predicates.Comparison` can be a :py:class:`datetime.date`\.
 
     >>> from datetime import date
     >>> copyright_date_range = Comparison("the date when $work was created was", sign=">=", expression = date(1978,1,1))
@@ -253,13 +253,13 @@ Using Entities as Context Terms
 -------------------------------
 
 AuthoritySpoke isn’t limited to
-comparing :class:`~authorityspoke.predicates.Predicate`\s
-and :class:`~authorityspoke.predicates.Comparison`\s
+comparing :class:`~nettlesome.predicates.Predicate`\s
+and :class:`~nettlesome.predicates.Comparison`\s
 containing unassigned placeholder text. You can
-use :class:`~authorityspoke.entities.Entity` objects to
+use :class:`nettlesome.entities.Entity` objects to
 assign specific terms to the placeholders. You then link the terms to
-the :class:`~authorityspoke.predicates.Predicate`
-or :class:`~authorityspoke.predicates.Comparison` inside
+the :class:`~nettlesome.predicates.Predicate`
+or :class:`~nettlesome.predicates.Comparison` inside
 a :class:`~authorityspoke.facts.Fact` object.
 
     >>> from authorityspoke import Entity, Fact
@@ -275,7 +275,7 @@ a :class:`~authorityspoke.facts.Fact` object.
 
 
 Before, we saw that the Comparison ``specific_tax_rate``
-:meth:`~authorityspoke.predicates.Comparison.implies`
+:meth:`~nettlesome.predicates.Comparison.implies`
 ``tax_rate_over_25``. But when we have a fact about the tax rate of a
 specific person named Ann, it doesn’t imply anything about Claude’s tax
 rate.
@@ -309,9 +309,9 @@ to different Entities when being compared to other objects.
     "the fact that <Elaine>'s marginal income tax rate was greater than 0.25"
 
 
-When the :meth:`~authorityspoke.predicates.Comparison.implies` method
+When the :meth:`~nettlesome.predicates.Comparison.implies` method
 produces the answer ``True``, we can also
-use the :meth:`~authorityspoke.comparisons.Comparable.explain_implication`
+use the :meth:`~nettlesome.quantities.Comparable.explain_implication`
 method to find out which pairs of
 generic terms can be considered analagous to one another.
 

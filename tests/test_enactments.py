@@ -367,8 +367,8 @@ class TestTextSelection:
             "|may|possess the requisite originality"
             ]
         """
-
+        client = FakeClient.from_file("usc.json")
         holdings, holding_anchors, _, _ = loaders.read_anchored_holdings_from_file(
-            "holding_feist.json", client=self.client
+            "holding_feist.json", client=client
         )
         assert len(holding_anchors[6]) == 2

@@ -20,8 +20,8 @@ from authorityspoke.io import anchors, loaders, readers, schemas, dump, name_ind
 from authorityspoke.io.downloads import FakeClient
 from authorityspoke.io.loaders import (
     load_holdings,
+    read_holdings_from_file,
     load_anchored_holdings,
-    read_anchored_holdings_from_file,
 )
 from authorityspoke.io import filepaths, text_expansion
 from authorityspoke.rules import Rule
@@ -624,9 +624,8 @@ class TestExclusiveFlag:
         `originality_rule` will be a little broader because it's based on
         less Enactment text
         """
-        holdings, _, _, _ = read_anchored_holdings_from_file(
-            "holding_feist.json", client=self.client
-        )
+        fake_client = FakeClient(responses=make_response)
+        holdings = read_holdings_from_file("holding_feist.json", client=fake_client)
 
         directory = Entity("Rural's telephone directory")
         original = Fact(Predicate("$work was an original work"), directory)
