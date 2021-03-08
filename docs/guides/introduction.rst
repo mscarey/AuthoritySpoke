@@ -92,7 +92,8 @@ help on installing modules.
 Optional: Skip the Downloads and Load Decisions from a File
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To use the cell below to access ``Decision`` objects from a file rather
+To use the cell below to access :class:`authorityspoke.decisions.Decision`
+objects from a file rather
 than an API, be sure the ``USE_REAL_CASE_API`` variable is set to
 ``False``. This should work if you’re running the tutorial in a notebook
 in a cloud environment like Binder, or if you’ve cloned AuthoritySpoke’s
@@ -293,15 +294,15 @@ describing the required data format.
 For now, this introduction will rely on example JSON files that have
 already been created. AuthoritySpoke should find them and convert them
 to AuthoritySpoke objects when we call
-the :func:`~authorityspoke.io.loaders.load_and_read_holdings`
+the :func:`~authorityspoke.io.loaders.read_holdings_from_file`
 function. If you pass in a ``client`` parameter, AuthoritySpoke will
 make calls to the API at
 `authorityspoke.com <https://authorityspoke.com/>`__ to find and link
 the statutes or other :class:`~legislice.enactments.Enactment`\s cited in
 the :class:`~authorityspoke.holdings.Holding`\.
 
-    >>> from authorityspoke.io.loaders import load_and_read_holdings
-    >>> oracle_holdings = load_and_read_holdings("holding_oracle.json", client=legis_client)
+    >>> from authorityspoke.io.loaders import read_holdings_from_file
+    >>> oracle_holdings = read_holdings_from_file("holding_oracle.json", client=legis_client)
     >>> print(oracle_holdings[0])
     the Holding to ACCEPT
       the Rule that the court MUST SOMETIMES impose the

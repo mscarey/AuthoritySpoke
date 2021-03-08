@@ -6,7 +6,7 @@ I/O
 
     io/dump
     io/schemas
-    io/schema_specs
+    io/api_spec
     io/downloads
     io/loaders
     io/readers

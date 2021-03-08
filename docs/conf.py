@@ -73,6 +73,7 @@ html_static_path = ["_static"]
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
     "legislice": ("https://legislice.readthedocs.io/en/latest/", None),
+    "nettlesome": ("https://nettlesome.readthedocs.io/en/latest/", None),
     "pint": ("https://pint.readthedocs.io/en/stable/", None),
 }
 

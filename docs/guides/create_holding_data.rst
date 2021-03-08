@@ -48,8 +48,8 @@ Next, we can download the judicial decisions we’re going to compare.
         oracle_download = load_decision("oracle_h.json")
         lotus_download = load_decision("lotus_h.json")
 
-Then we convert the JSON responses from the API into AuthoritySpoke
-``Opinion`` objects.
+Then we convert the JSON responses from the API
+into :class:`authorityspoke.opinions.Opinion` objects.
 
 .. code:: ipython3
 
@@ -58,7 +58,7 @@ Then we convert the JSON responses from the API into AuthoritySpoke
     oracle = read_decision(oracle_download).majority
     lotus = read_decision(lotus_download).majority
 
-And we need a :class:`~authorityspoke.io.downloads.Client` for
+And we need a :class:`~legislice.download.Client` for
 accessing legislative provisions.
 
 .. code:: ipython3
@@ -66,7 +66,7 @@ accessing legislative provisions.
     import json
 
     from authorityspoke.io.downloads import Client
-    from authorityspoke.io.fake_clients import FakeClient
+    from authorityspoke.io.downloads import FakeClient
 
     if USE_REAL_LEGISLICE_API:
 
@@ -92,14 +92,14 @@ the most useful way to load data is to create a JSON document that
 contains a list of objects, where each object represents one Holding
 representing a list of Holdings. Then you can load the Holdings into
 AuthoritySpoke objects using
-the :func:`~authorityspoke.io.loaders.load_and_read_holdings` function.
+the :func:`~authorityspoke.io.loaders.read_holdings_from_file` function.
 
 .. code:: ipython3
 
-    from authorityspoke.io.loaders import load_and_read_holdings
+    from authorityspoke.io.loaders import read_holdings_from_file
 
-    oracle_holdings = load_and_read_holdings("holding_oracle.json", client=legis_client)
-    lotus_holdings = load_and_read_holdings("holding_lotus.json", client=legis_client)
+    oracle_holdings = read_holdings_from_file("holding_oracle.json", client=legis_client)
+    lotus_holdings = read_holdings_from_file("holding_lotus.json", client=legis_client)
 
 If you want to open one of the input JSON files in your own text editor
 for comparison, you can find them in the folder
@@ -172,7 +172,7 @@ cited :class:`~legislice.enactments.Enactment`, if it’s false
 that “the Java API was an original work”, then it’s mandatory for the
 court to find it to be false that “the Java API was copyrightable”.
 
-The JSON file represented these :class:`~authorityspoke.factors.Factor`\s
+The JSON file represented these :class:`~nettlesome.factors.Factor`\s
 inside an “inputs” field
 (labeled as the “GIVEN” Factors when you print the Holding object) and
 an “outputs” field (labeled as “RESULT” Factors). Inputs are the
@@ -286,7 +286,8 @@ JSON API Specification
 ----------------------
 
 If you want to view the schema specification, you can find it in the
-``io.api_spec`` module. When you read it, you might be surprised to see
+:mod:`authorityspoke.io.api_spec` module. When you read it, you
+might be surprised to see
 that every Holding object contains a Rule, and every Rule contains a
 Procedure.
 
@@ -302,320 +303,331 @@ into the Holding object, as shown in the examples above.
 
 .. parsed-literal::
 
-    components:
-      schemas:
-        Allegation:
-          properties:
-            absent:
-              default: false
-              type: boolean
-            anchors:
-              items:
-                $ref: '#/components/schemas/Selector'
-              type: array
-            generic:
-              default: false
-              type: boolean
-            name:
-              default: null
-              nullable: true
-              type: string
-            pleading:
-              allOf:
-              - $ref: '#/components/schemas/Pleading'
-              default: null
-              nullable: true
-            statement:
-              allOf:
-              - $ref: '#/components/schemas/Fact'
-              default: null
-              nullable: true
-          type: object
-        Enactment:
-          properties:
-            anchors:
-              items:
-                $ref: '#/components/schemas/Selector'
-              type: array
-            children:
-              items:
-                $ref: '#/components/schemas/Enactment'
-              type: array
-            content:
-              type: string
-            end_date:
-              default: null
-              format: date
-              nullable: true
-              type: string
-            heading:
-              type: string
-            node:
-              format: url
-              type: string
-            selection:
-              items:
-                $ref: '#/components/schemas/Selector'
-              type: array
-            start_date:
-              format: date
-              type: string
-          required:
-          - content
-          - heading
-          - node
-          - start_date
-          type: object
-        Entity:
-          properties:
-            anchors:
-              items:
-                $ref: '#/components/schemas/Selector'
-              type: array
-            generic:
-              default: true
-              type: boolean
-            name:
-              default: null
-              nullable: true
-              type: string
-            plural:
-              type: boolean
-          type: object
-        Evidence:
-          properties:
-            absent:
-              default: false
-              type: boolean
-            anchors:
-              items:
-                $ref: '#/components/schemas/Selector'
-              type: array
-            exhibit:
-              allOf:
-              - $ref: '#/components/schemas/Exhibit'
-              default: null
-              nullable: true
-            generic:
-              default: false
-              type: boolean
-            name:
-              default: null
-              nullable: true
-              type: string
-            to_effect:
-              allOf:
-              - $ref: '#/components/schemas/Fact'
-              default: null
-              nullable: true
-          type: object
-        Exhibit:
-          properties:
-            absent:
-              default: false
-              type: boolean
-            anchors:
-              items:
-                $ref: '#/components/schemas/Selector'
-              type: array
-            form:
-              default: null
-              nullable: true
-              type: string
-            generic:
-              default: false
-              type: boolean
-            name:
-              default: null
-              nullable: true
-              type: string
-            statement:
-              allOf:
-              - $ref: '#/components/schemas/Fact'
-              default: null
-              nullable: true
-            statement_attribution:
-              allOf:
-              - $ref: '#/components/schemas/Entity'
-              default: null
-              nullable: true
-          type: object
-        Fact:
-          properties:
-            absent:
-              default: false
-              type: boolean
-            anchors:
-              items:
-                $ref: '#/components/schemas/Selector'
-              type: array
-            terms:
-              items:
-                $ref: '#/components/schemas/Factor'
-              type: array
-            generic:
-              default: false
-              type: boolean
-            name:
-              default: null
-              nullable: true
-              type: string
-            predicate:
-              $ref: '#/components/schemas/Predicate'
-            standard_of_proof:
-              default: null
-              nullable: true
-              type: string
-          type: object
-        Factor:
-          discriminator:
-            propertyName: type
-          oneOf:
-          - $ref: '#/components/schemas/Fact'
-          - $ref: '#/components/schemas/Exhibit'
-          - $ref: '#/components/schemas/Evidence'
+components:
+  schemas:
+    Allegation:
+      properties:
+        absent:
+          default: false
+          type: boolean
+        generic:
+          default: false
+          type: boolean
+        name:
+          default: null
+          nullable: true
+          type: string
+        pleading:
+          allOf:
           - $ref: '#/components/schemas/Pleading'
-          - $ref: '#/components/schemas/Allegation'
-        Holding:
-          properties:
-            anchors:
-              items:
-                $ref: '#/components/schemas/Selector'
-              type: array
-            decided:
-              default: true
-              type: boolean
-            exclusive:
-              default: false
-              type: boolean
-            generic:
-              default: false
-              type: boolean
-            rule:
-              $ref: '#/components/schemas/Rule'
-            rule_valid:
-              default: true
-              type: boolean
-          type: object
-        Pleading:
-          properties:
-            absent:
-              default: false
-              type: boolean
-            anchors:
-              items:
-                $ref: '#/components/schemas/Selector'
-              type: array
-            filer:
-              allOf:
-              - $ref: '#/components/schemas/Entity'
-              default: null
-              nullable: true
-            generic:
-              default: false
-              type: boolean
-            name:
-              default: null
-              nullable: true
-              type: string
-          type: object
-        Predicate:
-          properties:
-            comparison:
-              default: ''
-              enum:
-              - ''
-              - '>='
-              - ==
-              - <>
-              - <=
-              - '='
-              - '>'
-              - <
-              type: string
-            content:
-              type: string
-            quantity:
-              default: null
-              nullable: true
-            truth:
-              default: true
-              type: boolean
-          type: object
-        Procedure:
-          properties:
-            despite:
-              items:
-                $ref: '#/components/schemas/Factor'
-              type: array
-            inputs:
-              items:
-                $ref: '#/components/schemas/Factor'
-              type: array
-            outputs:
-              items:
-                $ref: '#/components/schemas/Factor'
-              type: array
-          type: object
-        Rule:
-          properties:
-            enactments:
-              items:
-                $ref: '#/components/schemas/Enactment'
-              type: array
-            enactments_despite:
-              items:
-                $ref: '#/components/schemas/Enactment'
-              type: array
-            generic:
-              default: false
-              type: boolean
-            mandatory:
-              default: false
-              type: boolean
-            name:
-              default: null
-              nullable: true
-              type: string
-            procedure:
-              $ref: '#/components/schemas/Procedure'
-            universal:
-              default: false
-              type: boolean
-          type: object
-        Selector:
-          properties:
-            end:
-              format: int32
-              type: integer
-            exact:
-              default: null
-              nullable: true
-              type: string
-            include_end:
-              default: false
-              type: boolean
-            include_start:
-              default: true
-              type: boolean
-            prefix:
-              default: null
-              nullable: true
-              type: string
-            start:
-              format: int32
-              type: integer
-            suffix:
-              default: null
-              nullable: true
-              type: string
-          type: object
-    info:
-      description: An interface for annotating judicial holdings
-      title: AuthoritySpoke Holding API Schema
-      version: 0.1.0
-    openapi: 3.0.2
-    paths: {}
+          default: null
+          nullable: true
+        statement:
+          allOf:
+          - $ref: '#/components/schemas/Fact'
+          default: null
+          nullable: true
+      type: object
+    CrossReference:
+      properties:
+        reference_text:
+          type: string
+        target_node:
+          type: integer
+        target_uri:
+          type: string
+        target_url:
+          format: url
+          type: string
+      required:
+      - reference_text
+      - target_uri
+      - target_url
+      type: object
+    Enactment:
+      properties:
+        node:
+          format: url
+          type: string
+        heading:
+          type: string
+        text_version:
+          allOf:
+          - $ref: '#/components/schemas/TextVersion'
+          default: null
+          nullable: true
+        start_date:
+          format: date
+          type: string
+        end_date:
+          default: null
+          format: date
+          nullable: true
+          type: string
+        known_revision_date:
+          type: boolean
+        selection:
+          items:
+            $ref: '#/components/schemas/Selector'
+          type: array
+        anchors:
+          items:
+            $ref: '#/components/schemas/Selector'
+          type: array
+        citations:
+          items:
+            $ref: '#/components/schemas/CrossReference'
+          type: array
+        children:
+          items:
+            $ref: '#/components/schemas/Enactment'
+          type: array
+      required:
+      - heading
+      - node
+      - start_date
+      type: object
+    Entity:
+      properties:
+        generic:
+          default: true
+          type: boolean
+        name:
+          default: null
+          nullable: true
+          type: string
+        plural:
+          type: boolean
+      type: object
+    Evidence:
+      properties:
+        absent:
+          default: false
+          type: boolean
+        exhibit:
+          allOf:
+          - $ref: '#/components/schemas/Exhibit'
+          default: null
+          nullable: true
+        generic:
+          default: false
+          type: boolean
+        name:
+          default: null
+          nullable: true
+          type: string
+        to_effect:
+          allOf:
+          - $ref: '#/components/schemas/Fact'
+          default: null
+          nullable: true
+      type: object
+    Exhibit:
+      properties:
+        absent:
+          default: false
+          type: boolean
+        form:
+          default: null
+          nullable: true
+          type: string
+        generic:
+          default: false
+          type: boolean
+        name:
+          default: null
+          nullable: true
+          type: string
+        statement:
+          allOf:
+          - $ref: '#/components/schemas/Fact'
+          default: null
+          nullable: true
+        statement_attribution:
+          allOf:
+          - $ref: '#/components/schemas/Entity'
+          default: null
+          nullable: true
+      type: object
+    Fact:
+      properties:
+        absent:
+          default: false
+          type: boolean
+        generic:
+          default: false
+          type: boolean
+        name:
+          default: null
+          nullable: true
+          type: string
+        predicate:
+          $ref: '#/components/schemas/Predicate'
+        standard_of_proof:
+          default: null
+          nullable: true
+          type: string
+        terms:
+          items:
+            $ref: '#/components/schemas/Factor'
+          type: array
+      type: object
+    Factor:
+      discriminator:
+        propertyName: type
+      oneOf:
+      - $ref: '#/components/schemas/Fact'
+      - $ref: '#/components/schemas/Exhibit'
+      - $ref: '#/components/schemas/Evidence'
+      - $ref: '#/components/schemas/Pleading'
+      - $ref: '#/components/schemas/Allegation'
+    Holding:
+      properties:
+        anchors:
+          items:
+            $ref: '#/components/schemas/Selector'
+          type: array
+        decided:
+          default: true
+          type: boolean
+        exclusive:
+          default: false
+          type: boolean
+        generic:
+          default: false
+          type: boolean
+        rule:
+          $ref: '#/components/schemas/Rule'
+        rule_valid:
+          default: true
+          type: boolean
+      type: object
+    Pleading:
+      properties:
+        absent:
+          default: false
+          type: boolean
+        filer:
+          allOf:
+          - $ref: '#/components/schemas/Entity'
+          default: null
+          nullable: true
+        generic:
+          default: false
+          type: boolean
+        name:
+          default: null
+          nullable: true
+          type: string
+      type: object
+    Predicate:
+      properties:
+        content:
+          readOnly: true
+        expression:
+          default: null
+          nullable: true
+        sign:
+          default: null
+          enum:
+          - ''
+          - '>='
+          - ==
+          - '!='
+          - <=
+          - <>
+          - '>'
+          - <
+          nullable: true
+          type: string
+        truth:
+          default: true
+          type: boolean
+      type: object
+    Procedure:
+      properties:
+        despite:
+          items:
+            $ref: '#/components/schemas/Factor'
+          type: array
+        inputs:
+          items:
+            $ref: '#/components/schemas/Factor'
+          type: array
+        outputs:
+          items:
+            $ref: '#/components/schemas/Factor'
+          type: array
+      type: object
+    Rule:
+      properties:
+        enactments:
+          items:
+            $ref: '#/components/schemas/Enactment'
+          type: array
+        enactments_despite:
+          items:
+            $ref: '#/components/schemas/Enactment'
+          type: array
+        generic:
+          default: false
+          type: boolean
+        mandatory:
+          default: false
+          type: boolean
+        name:
+          default: null
+          nullable: true
+          type: string
+        procedure:
+          $ref: '#/components/schemas/Procedure'
+        universal:
+          default: false
+          type: boolean
+      type: object
+    Selector:
+      properties:
+        exact:
+          default: null
+          nullable: true
+          type: string
+        prefix:
+          default: null
+          nullable: true
+          type: string
+        suffix:
+          default: null
+          nullable: true
+          type: string
+        start:
+          type: integer
+        end:
+          default: null
+          nullable: true
+          type: integer
+        include_start:
+          default: true
+          type: boolean
+          writeOnly: true
+        include_end:
+          default: false
+          type: boolean
+          writeOnly: true
+      type: object
+    TextVersion:
+      properties:
+        content:
+          type: string
+      required:
+      - content
+      type: object
+info:
+  description: An interface for annotating judicial holdings
+  title: AuthoritySpoke Holding API Schema
+  version: 0.2.0
+openapi: 3.0.2
+paths: {}
+
 
 
 Exporting AuthoritySpoke Holdings back to JSON

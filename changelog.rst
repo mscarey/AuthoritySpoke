@@ -4,6 +4,7 @@ Changelog
 dev
 ------------------
 - Import Nettlesome library as dependency
+- Remove "anchors" fields from Factors in AuthoritySpoke Holding API Schema
 
 0.5.0 (2021-01-25)
 ------------------

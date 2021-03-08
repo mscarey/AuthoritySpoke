@@ -1,6 +1,6 @@
 .. _releases:
 
-.. include:: ../../changelog.md
+.. include:: ../../changelog.rst
 
 GitHub
 ======

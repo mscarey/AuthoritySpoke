@@ -38,10 +38,10 @@ The `example_data` folder also contains legislation in XML files that can be org
 Structured annotations about the holdings in _Oracle_ and _Lotus_ can also be loaded from the `example_data` folder, and can be linked to the `Decision` objects.
 
 ```python
-from authorityspoke.io.loaders import load_and_read_holdings
+from authorityspoke.io.loaders import read_holdings_from_file
 
-oracle.posit(load_and_read_holdings("holding_oracle.json", regime=usa))
-lotus.posit(load_and_read_holdings("holding_lotus.json", regime=usa))
+oracle.posit(read_holdings_from_file("holding_oracle.json", regime=usa))
+lotus.posit(read_holdings_from_file("holding_lotus.json", regime=usa))
 ```
 
 Now, each `Decision` has a `.contradicts` method that can return a boolean indicating whether its holdings conflict with the holdings of another `Decision`.

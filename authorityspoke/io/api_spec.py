@@ -11,7 +11,7 @@ def make_spec() -> APISpec:
     """Generate specification for data used to create AuthoritySpoke objects."""
     holding_spec = APISpec(
         title="AuthoritySpoke Holding API Schema",
-        version="0.1.0",
+        version="0.2.0",
         openapi_version="3.0.2",
         info=dict(description="An interface for annotating judicial holdings"),
         plugins=[MarshmallowPlugin()],

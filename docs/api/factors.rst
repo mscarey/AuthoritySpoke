@@ -2,21 +2,6 @@
 Factors
 ==============
 
-.. autoclass:: authorityspoke.factors.Factor
-    :members:
-    :special-members:
-
-Entities
-==============
-
-.. inheritance-diagram:: authorityspoke.entities.Entity
-    :top-classes: authorityspoke.comparisons.Comparable
-    :parts: 1
-
-.. autoclass:: authorityspoke.entities.Entity
-    :members:
-    :special-members:
-
 Facts
 ==============
 

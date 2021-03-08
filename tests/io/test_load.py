@@ -14,7 +14,7 @@ class TestFileLoad:
 
 
 class TestLoadAndRead:
-    def test_load_and_read_holdings(self):
+    def test_read_holdings_from_file(self):
         legis_client = FakeClient.from_file("usc.json")
         oracle_holdings = read_holdings_from_file(
             "holding_oracle.json", client=legis_client

@@ -31,20 +31,22 @@ class Decision(Comparable):
     the `Caselaw Access Project API <https://api.case.law/v1/cases/>`_.
     One of these records may contain multiple :class:`.Opinion`\s.
 
-    Typically one record will contain all the :class:`.Opinion`\s
+    Typically one record will contain all
+    the :class:`~authorityspoke.opinions.Opinion`\s
     from one appeal, but not necessarily from the whole lawsuit. One
     lawsuit may contain multiple appeals or other petitions, and
-    if more then one of those generates published :class:`.Opinion`\s,
-    the CAP API will divide those :class:`.Opinion`\s into a separate
+    if more then one of those generates published Opinions,
+    the CAP API will divide those Opinions into a separate
     record for each appeal.
 
     The outcome of a decision may be determined by one majority
-    :class:`Opinion` or by the combined effect of multiple Opinions.
+    :class:`~authorityspoke.opinions.Opinion` or by the combined
+    effect of multiple Opinions.
     The lead opinion is commonly, but not always, the only
-    :class:`.Opinion` that creates binding legal authority.
-    Usually every :class:`.Rule` posited by the lead :class:`.Opinion` is
+    Opinion that creates binding legal authority.
+    Usually every :class:`~authorityspoke.rules.Rule` posited by the lead Opinion is
     binding, but some may not be, often because parts of the
-    :class:`.Opinion` fail to command a majority of the panel
+    Opinion fail to command a majority of the panel
     of judges.
 
 
