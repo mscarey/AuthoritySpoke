@@ -1315,7 +1315,7 @@ def make_decision_with_holding(make_response):
             holding_anchors,
             named_anchors,
             enactment_anchors,
-        ) = loaders.load_holdings_with_anchors(
+        ) = loaders.read_anchored_holdings_from_file(
             f"holding_{case}.json",
             client=client_without_api_access,
         )

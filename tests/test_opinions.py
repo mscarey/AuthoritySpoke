@@ -168,11 +168,11 @@ class TestOpinionHoldings:
 
         watt.clear_holdings()
         watt_raw = loaders.load_holdings("holding_watt.json")
-        watt.posit(readers.read_holdings(watt_raw["holdings"], client=client))
+        watt.posit(readers.read_holdings(watt_raw, client=client))
 
         brad.clear_holdings()
         brad_raw = loaders.load_holdings("holding_brad.json")
-        brad.posit(readers.read_holdings(brad_raw["holdings"], client=client))
+        brad.posit(readers.read_holdings(brad_raw, client=client))
 
         context_pairs = {
             "proof of Bradley's guilt": "proof of Wattenburg's guilt",
@@ -189,7 +189,7 @@ class TestOpinionHoldings:
         watt = make_opinion["watt_majority"]
         watt.clear_holdings()
         watt_raw = loaders.load_holdings("holding_watt.json")
-        holdings_to_posit = readers.read_holdings(watt_raw["holdings"], client=client)
+        holdings_to_posit = readers.read_holdings(watt_raw, client=client)
         watt.posit(holdings_to_posit)
         factors = watt.factors_by_name()
         assert "proof of Wattenburg's guilt" in factors.keys()
@@ -205,11 +205,11 @@ class TestOpinionHoldings:
 
         watt.clear_holdings()
         watt_raw = loaders.load_holdings("holding_watt.json")
-        watt.posit(readers.read_holdings(watt_raw["holdings"], client=client))
+        watt.posit(readers.read_holdings(watt_raw, client=client))
 
         brad.clear_holdings()
         brad_raw = loaders.load_holdings("holding_brad.json")
-        brad.posit(readers.read_holdings(brad_raw["holdings"], client=client))
+        brad.posit(readers.read_holdings(brad_raw, client=client))
 
         context_items = [
             "proof of Wattenburg's guilt",
@@ -275,7 +275,7 @@ class TestImplication:
         brad = make_opinion["brad_majority"]
         client = FakeClient(responses=make_response)
         some_rules_raw = loaders.load_holdings(filename="holding_watt.json")
-        some_rules = readers.read_holdings(some_rules_raw["holdings"], client=client)
+        some_rules = readers.read_holdings(some_rules_raw, client=client)
         for case in (watt, brad):
             case.clear_holdings()
             case.posit(some_rules[:3])

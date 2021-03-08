@@ -24,7 +24,7 @@ class TestCodes:
 
     def test_cfr_repr(self):
         oracle_dictionary = loaders.load_holdings("holding_oracle.json")
-        regulation = oracle_dictionary["holdings"][10]["enactments_despite"][1]
+        regulation = oracle_dictionary[10]["enactments_despite"][1]
         schema = EnactmentSchema()
         enactment = schema.load(regulation)
 

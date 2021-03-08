@@ -40,9 +40,7 @@ class TestEnactmentImport:
 
     def test_enactment_import_from_dict(self, fake_usc_client):
         holding_brad = load_holdings("holding_brad.json")
-        holdings = readers.read_holdings(
-            holding_brad["holdings"], client=fake_usc_client
-        )
+        holdings = readers.read_holdings(holding_brad, client=fake_usc_client)
         enactments = holdings[0].enactments
         assert enactments[0].selected_text().endswith("shall not be violated…")
 
@@ -62,7 +60,7 @@ class TestEnactmentImport:
 
     def test_enactment_import_from_holding(self):
         holding_cardenas = load_holdings("holding_cardenas.json")
-        holdings = readers.read_holdings(holding_cardenas["holdings"])
+        holdings = readers.read_holdings(holding_cardenas)
         enactment_list = holdings[0].enactments
         assert "all relevant evidence is admissible" in enactment_list[0].text
 

@@ -101,12 +101,7 @@ class TestCollectMentioned:
         """
 
         oracle_records = loaders.load_holdings("holding_oracle.json")
-        (
-            holdings,
-            holding_anchors,
-            _,
-            _,
-        ) = readers.read_holdings_with_anchors(oracle_records, client=fake_usc_client)
+        holdings = readers.read_holdings(oracle_records, client=fake_usc_client)
         factor = holdings[2].inputs[0]
         assert factor.predicate.content == "${the_java_api} was an original work"
 
@@ -116,7 +111,7 @@ class TestCollectMentioned:
         'Name "securing the right to writings" not found in the index of mentioned Factors'
         """
         feist_records = loaders.load_holdings("holding_feist.json")
-        record, mentioned = name_index.index_names(feist_records["holdings"])
+        record, mentioned = name_index.index_names(feist_records)
         assert "securing the right to writings" in mentioned
 
     def test_context_factor_not_collapsed(self, fake_usc_client):
@@ -155,9 +150,7 @@ class TestCollectMentioned:
         'Name "securing for authors" not found in the index of mentioned Factors'
         """
         feist_records = loaders.load_holdings("holding_feist.json")
-        feist_holding = readers.read_holding(
-            feist_records["holdings"][0], client=fake_usc_client
-        )
+        feist_holding = readers.read_holding(feist_records[0], client=fake_usc_client)
         assert "securing for limited Times" in feist_holding.short_string
 
     def test_update_name_index_with_longer_factor(self):

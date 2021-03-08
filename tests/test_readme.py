@@ -2,8 +2,11 @@
 
 from authorityspoke.io.downloads import FakeClient
 
-from authorityspoke.io.loaders import load_and_read_decision, load_holdings_with_anchors
-from authorityspoke.io.loaders import load_and_read_holdings
+from authorityspoke.io.loaders import (
+    load_and_read_decision,
+    read_anchored_holdings_from_file,
+)
+from authorityspoke.io.loaders import read_holdings_from_file
 
 
 class TestReadme:
@@ -18,13 +21,13 @@ class TestReadme:
             oracle_anchors,
             oracle_named_anchors,
             oracle_e,
-        ) = load_holdings_with_anchors("holding_oracle.json", client=client)
+        ) = read_anchored_holdings_from_file("holding_oracle.json", client=client)
         (
             lotus_holdings,
             lotus_anchors,
             lotus_named_anchors,
             lotus_e,
-        ) = load_holdings_with_anchors("holding_lotus.json", client=client)
+        ) = read_anchored_holdings_from_file("holding_lotus.json", client=client)
 
         oracle.posit(
             holdings=oracle_holdings,

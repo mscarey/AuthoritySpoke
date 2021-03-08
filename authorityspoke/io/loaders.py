@@ -21,6 +21,42 @@ from authorityspoke.io.name_index import Mentioned
 from authorityspoke.io.schemas import RawEnactment, RawFactor, RawHolding, RawDecision
 
 
+def load_anchored_holdings(
+    filename: Optional[str] = None,
+    directory: Optional[pathlib.Path] = None,
+    filepath: Optional[pathlib.Path] = None,
+) -> Dict[str, Union[Dict[str, RawFactor], Dict[str, RawEnactment], List[RawHolding]]]:
+    r"""
+    Load a list of records from JSON to create :class:`.Holding`\s with text selectors.
+
+    :param filename:
+        the name of the JSON file to look in for :class:`Holding`
+        data in the format that lists ``mentioned_factors``
+        followed by a list of holdings.
+
+    :param directory:
+        the path of the directory containing the JSON file.
+
+    :param filepath:
+        Complete path to the XML file representing the :class:`.Code`,
+        including filename.
+
+    :parame regime:
+
+    :returns:
+        a list of :class:`Holding`\s from a JSON file in the
+        ``example_data/holdings`` subdirectory, from a JSON
+        file.
+    """
+    validated_filepath = filepaths.make_filepath(
+        filename, directory, filepath, default_folder="holdings"
+    )
+    with open(validated_filepath, "r") as f:
+        holdings = json.load(f)
+
+    return holdings
+
+
 def load_holdings(
     filename: Optional[str] = None,
     directory: Optional[pathlib.Path] = None,
@@ -48,12 +84,12 @@ def load_holdings(
         ``example_data/holdings`` subdirectory, from a JSON
         file.
     """
-    validated_filepath = filepaths.make_filepath(
-        filename, directory, filepath, default_folder="holdings"
+    holdings = load_anchored_holdings(
+        filename=filename, directory=directory, filepath=filepath
     )
-    with open(validated_filepath, "r") as f:
-        holdings = json.load(f)
 
+    if isinstance(holdings, Dict):
+        return holdings["holdings"]
     return holdings
 
 
@@ -88,7 +124,7 @@ def load_rules_with_index(
     return readers.read_rules_with_index(raw_rules, client=client, many=many)
 
 
-def load_and_read_holdings(
+def read_holdings_from_file(
     filename: Optional[str] = None,
     directory: Optional[pathlib.Path] = None,
     filepath: Optional[pathlib.Path] = None,
@@ -112,19 +148,18 @@ def load_and_read_holdings(
     raw_holdings = load_holdings(
         filename=filename, directory=directory, filepath=filepath
     )
-    if "holdings" in raw_holdings:
-        return readers.read_holdings(raw_holdings["holdings"], client=client)
+
     return readers.read_holdings(raw_holdings, client=client)
 
 
-def load_holdings_with_anchors(
+def read_anchored_holdings_from_file(
     filename: Optional[str] = None,
     directory: Optional[pathlib.Path] = None,
     filepath: Optional[pathlib.Path] = None,
     client: Optional[Client] = None,
 ) -> AnchoredHoldings:
     """Read holdings from file, with Opinion text anchors for holdings and factors."""
-    raw_holdings = load_holdings(
+    raw_holdings = load_anchored_holdings(
         filename=filename, directory=directory, filepath=filepath
     )
     return readers.read_holdings_with_anchors(raw_holdings, client=client)

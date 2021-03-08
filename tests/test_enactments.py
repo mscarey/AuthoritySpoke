@@ -59,7 +59,7 @@ class TestEnactments:
     def test_passage_from_imported_statute(self, fake_usc_client):
         oracle_majority = loaders.load_and_read_decision(f"oracle_h.json").majority
         loaded = loaders.load_holdings("holding_oracle.json")
-        holdings = readers.read_holdings(loaded["holdings"], client=fake_usc_client)
+        holdings = readers.read_holdings(loaded, client=fake_usc_client)
         oracle_majority.posit(holdings)
         despite_text = str(list(oracle_majority.holdings)[5])
         assert "In no case does copyright protection " in despite_text
@@ -368,7 +368,7 @@ class TestTextSelection:
             ]
         """
 
-        holdings, holding_anchors, _, _ = loaders.load_holdings_with_anchors(
+        holdings, holding_anchors, _, _ = loaders.read_anchored_holdings_from_file(
             "holding_feist.json", client=self.client
         )
         assert len(holding_anchors[6]) == 2
