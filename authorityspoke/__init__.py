@@ -10,4 +10,4 @@ from .opinions import Opinion
 from .rules import Rule
 from .io.dump import to_dict, to_json
 
-__version__ = "0.5.0"
+__version__ = "0.5.1"
