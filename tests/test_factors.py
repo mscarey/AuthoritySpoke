@@ -362,7 +362,7 @@ class TestImplication:
         assert (
             str(watt_factor["f2"]),
             watt_factor["f2_generic"],
-        ) in answer.items()
+        ) in answer.context.items()
 
     def test_specific_implies_generic_form_of_another_fact(self, watt_factor):
         assert watt_factor["f2"] > watt_factor["f3_generic"]
@@ -446,7 +446,7 @@ class TestImplication:
             make_context_register
         )
         explanation = complex_true.explain_implication(complex_whether)
-        assert explanation[Entity("Alice").key].compare_keys(Entity("Craig"))
+        assert explanation.context[Entity("Alice").key].compare_keys(Entity("Craig"))
 
     def test_implication_explain_keys_only_from_left(
         self, make_complex_fact, make_context_register
@@ -460,8 +460,8 @@ class TestImplication:
         new = complex_whether.new_context(make_context_register)
         explanations = list(complex_true.explanations_implication(new))
         explanation = explanations.pop()
-        assert explanation.get("<Craig>") != Entity("Alice")
-        assert explanation.get("<Alice>").compare_keys(Entity("Craig"))
+        assert explanation.context.get("<Craig>") != Entity("Alice")
+        assert explanation.context.get("<Alice>").compare_keys(Entity("Craig"))
 
     def test_context_registers_for_complex_comparison(self, make_complex_fact):
         gen = make_complex_fact["f_relevant_murder_nested_swap"]._context_registers(

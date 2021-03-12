@@ -220,10 +220,6 @@ class TestContradiction:
         assert make_holding["h2"] >= make_holding["h2_invalid"].negated()
 
     def test_contradicts_if_valid(self, make_holding):
-        """
-        This helper method should return the same value as "contradicts"
-        because both holdings are valid.
-        """
 
         assert make_holding["h2_ALL"].contradicts(
             make_holding["h2_SOME_MUST_output_false"]

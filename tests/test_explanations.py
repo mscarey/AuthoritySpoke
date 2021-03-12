@@ -1,6 +1,5 @@
-from nettlesome.terms import ContextRegister, means
+from nettlesome.terms import ContextRegister, means, Explanation
 from nettlesome.entities import Entity
-from nettlesome.explanations import Explanation
 
 from authorityspoke.io.readers import read_fact
 from authorityspoke.io.text_expansion import expand_shorthand
@@ -31,18 +30,15 @@ class TestContext:
         fact_alice = read_fact(self.alice)
         register = ContextRegister()
         register.insert_pair(Entity("Al"), Entity("Alice"))
-        answers = fact_al.explain_consistent_with(fact_alice, register)
-        explanation = Explanation(
-            factor_matches=[(fact_al, fact_alice)], context=answers
-        )
+        explanation = fact_al.explain_consistent_with(fact_alice, register)
         assert "<the bull> is like <the cow>" in str(explanation.context)
 
 
 class TestExplainHoldings:
     def test_explain_implication(self, make_decision_with_holding):
         oracle = make_decision_with_holding["oracle"]
-        context = oracle.holdings[18].explain_implication(oracle.holdings[19])
-        explanation = Explanation(
-            factor_matches=[(oracle.holdings[18], oracle.holdings[19])], context=context
-        )
+        left = oracle.holdings[18]
+        right = oracle.holdings[19]
+        explanation = left.explain_implication(right)
+
         assert "implies" in str(explanation).lower()
