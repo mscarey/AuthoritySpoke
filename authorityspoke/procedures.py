@@ -99,9 +99,11 @@ class Procedure(Comparable):
                         + f"{factor_obj} was type {type(factor_obj)}"
                     )
 
-    def _trigger_addition(self, other: Procedure, context: ContextRegister):
+    def _trigger_addition(
+        self, other: Procedure, explanation: Explanation
+    ) -> Procedure:
         """Add two Procedures, given that they have already been found to be addable."""
-        triggered_procedure = other.new_context(context.reversed())
+        triggered_procedure = other.new_context(explanation.context.reversed())
         new_outputs = [*self.outputs, *triggered_procedure.outputs]
         unique_new_outputs = {}
         for key in new_outputs:
@@ -606,8 +608,10 @@ class Procedure(Comparable):
         self.outputs = FactorGroup(factors)
 
     def triggers_next_procedure(
-        self, other: Procedure, context: Optional[ContextRegister] = None
-    ) -> Iterator[ContextRegister]:
+        self,
+        other: Procedure,
+        context: Optional[Union[ContextRegister, Explanation]] = None,
+    ) -> Iterator[Explanation]:
         r"""
         Test if :class:`.Factor`\s from firing ``self`` would trigger ``other``.
 
@@ -627,24 +631,21 @@ class Procedure(Comparable):
         """
         self_despite_or_input = FactorGroup((*self.despite, *self.inputs))
         self_output_or_input = FactorGroup((*self.outputs, *self.inputs))
-        context = context or ContextRegister()
 
-        def other_inputs_implied(context: ContextRegister):
-            yield from self_output_or_input.comparison(
-                operation=operator.ge,
-                still_need_matches=list(other.inputs),
-                matches=context,
-            )
+        if not isinstance(context, Explanation):
+            context = Explanation.from_context(context)
 
-        for explanation in other_inputs_implied(context):
-            yield from self_despite_or_input.comparison(
-                operation=operator.ge,
-                still_need_matches=list(other.despite),
-                matches=explanation,
+        for explanation_1 in self_output_or_input.explanations_implication(
+            other.inputs, context=context
+        ):
+            yield from self_despite_or_input.explanations_implication(
+                other.despite, context=explanation_1
             )
 
     def triggers_next_procedure_if_universal(
-        self, other: Procedure, context: Optional[ContextRegister] = None
+        self,
+        other: Procedure,
+        context: Optional[Union[ContextRegister, Explanation]] = None,
     ) -> Iterator[ContextRegister]:
         r"""
         Test if Factors from firing `self` trigger `other` if both are universal.
@@ -663,12 +664,11 @@ class Procedure(Comparable):
             whether the set of :class:`Factor`\s that exist after ``self``
             is fired could trigger ``other``
         """
-        context = context or ContextRegister()
+        if not isinstance(context, Explanation):
+            context = Explanation.from_context(context)
         self_output_or_input = FactorGroup((*self.outputs, *self.inputs))
-        yield from self_output_or_input.comparison(
-            operation=operator.ge,
-            still_need_matches=list(other.inputs),
-            matches=context,
+        yield from self_output_or_input.explanations_implication(
+            other.inputs, context=context
         )
 
     def __or__(self, other: Comparable) -> Optional[Comparable]:
