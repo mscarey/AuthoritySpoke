@@ -169,13 +169,8 @@ class TestSameMeaning:
         right = make_complex_rule[
             "accept_murder_fact_from_relevance_and_shooting_craig"
         ]
-        register = left.explain_same_meaning(right)
+        explanation = left.explain_same_meaning(right)
 
-        explanation = Explanation(
-            factor_matches=[(left, right)],
-            context=register,
-            operation=means,
-        )
         assert "<Craig> is like <Alice>" in str(
             explanation
         ) or "<Alice> is like <Craig>" in str(explanation)

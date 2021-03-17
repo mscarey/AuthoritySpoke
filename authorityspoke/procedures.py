@@ -307,8 +307,10 @@ class Procedure(Comparable):
         )
 
     def has_input_or_despite_factors_implied_by_all_inputs_of(
-        self, other: Procedure, context: Optional[ContextRegister] = None
-    ) -> Iterator[ContextRegister]:
+        self,
+        other: Procedure,
+        context: Optional[Union[ContextRegister, Explanation]] = None,
+    ) -> Iterator[Explanation]:
         """Check if every input of other implies some input or despite factor of self."""
         if not isinstance(context, Explanation):
             context = Explanation.from_context(context)
@@ -320,8 +322,10 @@ class Procedure(Comparable):
         )
 
     def has_input_or_despite_factors_implying_all_inputs_of(
-        self, other: Procedure, context: Optional[ContextRegister] = None
-    ) -> Iterator[ContextRegister]:
+        self,
+        other: Procedure,
+        context: Optional[Union[ContextRegister, Explanation]] = None,
+    ) -> Iterator[Explanation]:
         """Check if every input of other is implied by some input or despite factor of self."""
         self_despite_or_input = FactorGroup((*self.despite, *self.inputs))
         yield from self_despite_or_input.explanations_contradiction(
@@ -329,11 +333,13 @@ class Procedure(Comparable):
         )
 
     def explain_contradiction_some_to_all(
-        self, other: Procedure, context: Optional[ContextRegister] = None
-    ) -> Iterator[ContextRegister]:
+        self,
+        other: Procedure,
+        context: Optional[Union[ContextRegister, Explanation]] = None,
+    ) -> Iterator[Explanation]:
         """Explain why ``other`` can't apply in all cases if ``self`` applies in some."""
-        if context is None:
-            context = ContextRegister()
+        if not isinstance(context, Explanation):
+            context = Explanation.from_context(context)
 
         # For self to contradict other, either every input of other
         # must imply some input or despite factor of self...
@@ -353,8 +359,7 @@ class Procedure(Comparable):
         for m in chain(implying_contexts, implied_contexts):
             if m.context not in seen_contexts:
                 seen_contexts.append(m.context)
-                if self.outputs.contradicts(other.outputs, m.context):
-                    yield m
+                yield from self.outputs.explanations_contradiction(other.outputs, m)
 
     def _explain_implication_all_to_all_of_procedure(
         self, other: Procedure, context: ContextRegister

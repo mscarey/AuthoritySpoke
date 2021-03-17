@@ -331,10 +331,8 @@ class TestContradiction:
         oracle = make_opinion_with_holding["oracle_majority"]
         lotus = make_opinion_with_holding["lotus_majority"]
         explanation = oracle.explain_contradiction(lotus.holdings[6].rule)
-        assert (
-            "<the java api> is like <the lotus menu command hierarchy>"
-            in str(explanation).lower()
-        )
+        expected = "<the java api> is like <the lotus menu command hierarchy>"
+        assert expected in str(explanation).lower()
 
     def test_contradiction_of_decision(
         self, make_opinion_with_holding, make_decision_with_holding
