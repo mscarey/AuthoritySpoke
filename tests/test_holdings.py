@@ -205,7 +205,7 @@ class TestImplication:
 
         new_context = oracle.holdings[18].new_context(context)
         explanation = new_context.explain_implication(oracle.holdings[19])
-        assert explanation.get_factor(language).compare_keys(language)
+        assert explanation.context.get_factor(language).compare_keys(language)
 
     def test_not_implied_by_statement(self, make_holding):
         assert not Statement(

@@ -18,6 +18,7 @@ from legislice.enactments import Enactment, consolidate_enactments
 from nettlesome.terms import (
     Comparable,
     ContextRegister,
+    Explanation,
     TermSequence,
 )
 from authorityspoke.factors import Factor
@@ -328,16 +329,16 @@ class Rule(Comparable):
         self, other, context: Optional[ContextRegister] = None
     ) -> Iterator[ContextRegister]:
         """Find context matches that would result in a contradiction with other."""
-        if context is None:
-            context = ContextRegister()
+        if not isinstance(context, Explanation):
+            context = Explanation.from_context(context)
 
         self_to_other = self.procedure.explain_contradiction_some_to_all(
             other.procedure, context
         )
         other_to_self = (
-            register.reversed()
+            register.reversed_context()
             for register in other.procedure.explain_contradiction_some_to_all(
-                self.procedure, context.reversed()
+                self.procedure, context.reversed_context()
             )
         )
 

@@ -310,6 +310,10 @@ class Procedure(Comparable):
         self, other: Procedure, context: Optional[ContextRegister] = None
     ) -> Iterator[ContextRegister]:
         """Check if every input of other implies some input or despite factor of self."""
+        if not isinstance(context, Explanation):
+            context = Explanation.from_context(context)
+        if isinstance(context.context, Explanation):
+            raise TypeError
         self_despite_or_input = FactorGroup((*self.despite, *self.inputs))
         yield from self_despite_or_input.explanations_implied_by(
             other.inputs, context=context
@@ -366,15 +370,15 @@ class Procedure(Comparable):
         def self_inputs_implied(explanations: Iterable[ContextRegister]):
             for explanation in explanations:
                 for result in other.inputs.explanations_implication(
-                    self.inputs, context=context
+                    self.inputs, context=explanation
                 ):
                     yield result
 
         for explanation in self_inputs_implied(other_outputs_implied(context)):
-            if self.inputs.consistent_with(
-                other=other.despite, context=explanation.context
+            for result in self.inputs.explanations_consistent_with(
+                other=other.despite, context=explanation
             ):
-                yield explanation
+                yield result
 
     def explain_implication_all_to_all(
         self, other: Factor, context: Optional[ContextRegister] = None
@@ -436,10 +440,13 @@ class Procedure(Comparable):
                 yield explanation
 
     def explain_implication_all_to_some(
-        self, other: Factor, context: Optional[ContextRegister] = None
-    ) -> Iterator[ContextRegister]:
+        self,
+        other: Factor,
+        context: Optional[Union[ContextRegister, Explanation]] = None,
+    ) -> Iterator[Explanation]:
         """Yield contexts establishing that if self is always valid, other is sometimes valid."""
-        context = context or ContextRegister()
+        if not isinstance(context, Explanation):
+            context = Explanation.from_context(context)
         if isinstance(other, self.__class__):
             yield from self._explain_implication_of_procedure_all_to_some(
                 other=other, context=context

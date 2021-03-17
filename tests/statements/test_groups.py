@@ -154,7 +154,7 @@ class TestContradiction:
         left = FactorGroup([bob_lived, statement_long])
         right = FactorGroup([carl_lived, statement_short])
         explanation = left.explain_contradiction(right)
-        assert explanation["<Houston>"].name == "El Paso"
+        assert explanation.context["<Houston>"].name == "El Paso"
         assert contradicts(left, right)
 
 
