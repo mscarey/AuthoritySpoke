@@ -17,8 +17,7 @@ from dataclasses import dataclass, field
 
 from anchorpoint.textselectors import TextQuoteSelector
 
-from nettlesome.terms import Comparable, ContextRegister
-from nettlesome.explanations import Explanation
+from nettlesome.terms import Comparable, ContextRegister, Explanation
 from authorityspoke.factors import Factor, FactorIndex
 from authorityspoke.holdings import Holding, HoldingGroup
 from authorityspoke.procedures import Procedure

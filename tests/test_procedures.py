@@ -81,8 +81,7 @@ class TestProcedures:
 
 
 class TestProcedureSameMeaning:
-    def test_procedure_equality(self, make_procedure, caplog):
-        caplog.set_level(logging.DEBUG)
+    def test_procedure_equality(self, make_procedure):
         assert make_procedure["c1"].means(make_procedure["c1_again"])
 
     def test_procedure_equality_entity_order(self, make_procedure):

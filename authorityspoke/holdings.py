@@ -28,9 +28,9 @@ from nettlesome.terms import (
     contradicts,
     new_context_helper,
 )
-from nettlesome.explanations import Explanation
+from nettlesome.terms import Explanation
 from authorityspoke.factors import Factor
-from nettlesome.groups import TermGroup
+from nettlesome.groups import FactorGroup
 from nettlesome.formatting import indented, wrapped
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
@@ -247,6 +247,10 @@ class Holding(Comparable):
 
         if context is None:
             context = ContextRegister()
+        if not isinstance(context, ContextRegister):
+            raise TypeError(
+                f"context must by type ContextRegister, not {type(context)}"
+            )
         if isinstance(other, Procedure):
             other = Rule(procedure=other)
         if isinstance(other, Rule):
@@ -573,7 +577,7 @@ class Holding(Comparable):
         return text
 
 
-class HoldingGroup(TermGroup):
+class HoldingGroup(FactorGroup):
     term_class = Holding
 
     def __init__(self, holdings: Union[Sequence[Holding], Holding] = ()):
@@ -581,13 +585,8 @@ class HoldingGroup(TermGroup):
             self.sequence = tuple(holdings)
         else:
             self.sequence = (holdings,)
-        for holding in self.sequence:
-            if not isinstance(holding, Holding):
-                raise TypeError(
-                    f'Object "{holding} could not be included in '
-                    f"{self.__class__.__name__} because it is "
-                    f"type {holding.__class__.__name__}, not type Holding"
-                )
+        if any(not isinstance(holding, Holding) for holding in self.sequence):
+            raise TypeError("All objects in HoldingGroup must be type Holding.")
 
     def explanations_implication(
         self, other: Comparable, context: Optional[ContextRegister] = None

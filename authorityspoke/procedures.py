@@ -17,6 +17,7 @@ from typing import List, Optional, Sequence, Tuple, Union
 from nettlesome.terms import (
     Comparable,
     ContextRegister,
+    Explanation,
     new_context_helper,
 )
 from authorityspoke.factors import Factor
@@ -308,8 +309,8 @@ class Procedure(Comparable):
     ) -> Iterator[ContextRegister]:
         """Check if every input of other implies some input or despite factor of self."""
         self_despite_or_input = FactorGroup((*self.despite, *self.inputs))
-        yield from self_despite_or_input.comparison(
-            operation=operator.le, still_need_matches=other.inputs, matches=context
+        yield from self_despite_or_input.explanations_implied_by(
+            other.inputs, context=context
         )
 
     def has_input_or_despite_factors_implying_all_inputs_of(
@@ -317,8 +318,8 @@ class Procedure(Comparable):
     ) -> Iterator[ContextRegister]:
         """Check if every input of other is implied by some input or despite factor of self."""
         self_despite_or_input = FactorGroup((*self.despite, *self.inputs))
-        yield from self_despite_or_input.comparison(
-            operation=operator.ge, still_need_matches=other.inputs, matches=context
+        yield from self_despite_or_input.explanations_contradiction(
+            other.inputs, context=context
         )
 
     def explain_contradiction_some_to_all(
@@ -344,9 +345,9 @@ class Procedure(Comparable):
         # must be contradicted by some output of self.
         seen_contexts = []
         for m in chain(implying_contexts, implied_contexts):
-            if m not in seen_contexts:
-                seen_contexts.append(m)
-                if self.outputs.contradicts(other.outputs, m):
+            if m.context not in seen_contexts:
+                seen_contexts.append(m.context)
+                if self.outputs.contradicts(other.outputs, m.context):
                     yield m
 
     def _explain_implication_all_to_all_of_procedure(
@@ -355,22 +356,22 @@ class Procedure(Comparable):
         yield from self.explanations_same_meaning(other, context)
 
         def other_outputs_implied(context: Optional[ContextRegister]):
-            yield from self.outputs.comparison(
-                operation=operator.ge,
-                still_need_matches=list(other.outputs),
-                matches=context,
-            )
+            for explanation in self.outputs.explanations_implication(
+                other.outputs, context=context
+            ):
+                yield explanation
 
-        def self_inputs_implied(contexts: Iterable[ContextRegister]):
-            for context in contexts:
-                yield from other.inputs.comparison(
-                    operation=operator.ge,
-                    still_need_matches=list(self.inputs),
-                    matches=context,
-                )
+        def self_inputs_implied(explanations: Iterable[ContextRegister]):
+            for explanation in explanations:
+                for result in other.inputs.explanations_implication(
+                    self.inputs, context=context
+                ):
+                    yield result
 
         for explanation in self_inputs_implied(other_outputs_implied(context)):
-            if self.inputs.consistent_with(other=other.despite, context=explanation):
+            if self.inputs.consistent_with(
+                other=other.despite, context=explanation.context
+            ):
                 yield explanation
 
     def explain_implication_all_to_all(
@@ -414,22 +415,22 @@ class Procedure(Comparable):
         self_despite_or_input = FactorGroup((*self.despite, *self.inputs))
 
         def other_outputs_implied(context: ContextRegister):
-            yield from self.outputs.comparison(
-                operation=operator.ge,
-                still_need_matches=list(other.outputs),
-                matches=context,
-            )
+            for explanation in self.outputs.explanations_implication(
+                other.outputs, context=context
+            ):
+                yield explanation
 
-        def other_despite_implied(contexts: Iterator[ContextRegister]):
-            for context in contexts:
-                yield from self_despite_or_input.comparison(
-                    operation=operator.ge,
-                    still_need_matches=list(other.despite),
-                    matches=context,
-                )
+        def other_despite_implied(explanations: Iterator[ContextRegister]):
+            for explanation in explanations:
+                for result in self_despite_or_input.explanations_implication(
+                    other.despite, context=context
+                ):
+                    yield result
 
         for explanation in other_despite_implied(other_outputs_implied(context)):
-            if self.inputs.consistent_with(other_despite_or_input, explanation):
+            if self.inputs.consistent_with(
+                other_despite_or_input, context=explanation.context
+            ):
                 yield explanation
 
     def explain_implication_all_to_some(
@@ -469,35 +470,29 @@ class Procedure(Comparable):
         )
 
     def _implies_procedure_if_present(
-        self, other: Procedure, context: Optional[ContextRegister] = None
-    ) -> Iterator[ContextRegister]:
-        def other_outputs_implied(context: Optional[ContextRegister]):
-            yield from self.outputs.comparison(
-                operation=operator.ge,
-                still_need_matches=list(other.outputs),
-                matches=context,
+        self, other: Procedure, context: Explanation
+    ) -> Iterator[Explanation]:
+        def other_outputs_implied(context: Explanation):
+            yield from self.outputs.explanations_implication(
+                other.outputs, context=context
             )
 
-        def other_inputs_implied(contexts: Iterable[ContextRegister]):
-            for context in contexts:
-                yield from self.inputs.comparison(
-                    operation=operator.ge,
-                    still_need_matches=list(other.inputs),
-                    matches=context,
-                )
+        def other_inputs_implied(context: Explanation):
+            yield from self.inputs.explanations_implication(
+                other.inputs, context=context
+            )
 
-        def other_despite_implied(contexts: Iterable[ContextRegister]):
+        def other_despite_implied(context: Explanation):
             despite_or_input = FactorGroup((*self.despite, *self.inputs))
-            for context in contexts:
-                yield from despite_or_input.comparison(
-                    operation=operator.ge,
-                    still_need_matches=list(other.despite),
-                    matches=context,
-                )
+            yield from despite_or_input.explanations_implication(
+                other.despite,
+                context=context,
+            )
 
-        yield from other_despite_implied(
-            other_inputs_implied(other_outputs_implied(context))
-        )
+        for outputs_explanation in other_outputs_implied(context):
+            for inputs_explanation in other_inputs_implied(outputs_explanation):
+                for despite_explanation in other_despite_implied(inputs_explanation):
+                    yield despite_explanation
 
     def _implies_if_present(
         self, other: Factor, context: Optional[ContextRegister] = None
@@ -527,32 +522,40 @@ class Procedure(Comparable):
             yield from self._implies_procedure_if_present(other=other, context=context)
 
     def _explanations_same_meaning_as_procedure(
-        self, other: Procedure, context: ContextRegister
+        self, other: Procedure, context: Explanation
     ):
-        def same_outputs(context: Optional[ContextRegister]):
-            yield from self.outputs.explanations_same_meaning(
+        def same_outputs(context: Explanation):
+            for explanation in self.outputs.explanations_same_meaning(
                 other=other.outputs, context=context
-            )
+            ):
+                yield explanation
 
-        def same_inputs(contexts: Iterable[ContextRegister]):
+        def same_inputs(contexts: Iterable[Explanation]):
             for context in contexts:
-                yield from self.inputs.explanations_same_meaning(
+                for explanation in self.inputs.explanations_same_meaning(
                     other=other.inputs, context=context
-                )
+                ):
+                    yield explanation
 
-        def same_despite(contexts: Iterable[ContextRegister]):
+        def same_despite(contexts: Iterable[Explanation]):
             for context in contexts:
-                yield from self.despite.explanations_same_meaning(
+                for explanation in self.despite.explanations_same_meaning(
                     other=other.despite, context=context
-                )
+                ):
+                    yield explanation
 
         yield from same_despite(same_inputs(same_outputs(context)))
 
     def explanations_same_meaning(
-        self, other: Comparable, context: Optional[ContextRegister] = None
-    ) -> Iterator[ContextRegister]:
+        self,
+        other: Comparable,
+        context: Optional[Union[ContextRegister, Explanation]] = None,
+    ) -> Iterator[Explanation]:
         """Yield contexts that could cause self to have the same meaning as other."""
-        context = context or ContextRegister()
+
+        if not isinstance(context, Explanation):
+            context = Explanation.from_context(context)
+
         if isinstance(other, self.__class__):
             yield from self._explanations_same_meaning_as_procedure(other, context)
 

@@ -2,7 +2,7 @@ import operator
 
 import pytest
 
-from nettlesome.terms import ContextRegister, TermSequence, means
+from nettlesome.terms import ContextRegister, Explanation, TermSequence, means
 from nettlesome.entities import Entity
 from nettlesome.predicates import Predicate
 from nettlesome.quantities import Comparison, Q_
@@ -552,12 +552,12 @@ class TestContradiction:
         be a contradiction if neither Factor was "absent".
         """
         assert watt_factor["f2"]._contradicts_if_present(
-            watt_factor["f2_false"], context=ContextRegister()
+            watt_factor["f2_false"], explanation=Explanation.from_context()
         )
 
     def test_contradicts_if_present_one_absent(self, watt_factor):
         assert watt_factor["f2"]._contradicts_if_present(
-            watt_factor["f2_false_absent"], context=ContextRegister()
+            watt_factor["f2_false_absent"], explanation=Explanation.from_context()
         )
 
     def test_false_does_not_contradict_absent(self):

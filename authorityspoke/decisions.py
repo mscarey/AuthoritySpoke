@@ -8,8 +8,7 @@ from typing import Optional, Sequence, Union
 
 from anchorpoint.textselectors import TextQuoteSelector
 
-from nettlesome.terms import Comparable, ContextRegister
-from nettlesome.explanations import Explanation
+from nettlesome.terms import Comparable, ContextRegister, Explanation
 from authorityspoke.factors import Factor
 from authorityspoke.holdings import Holding, HoldingGroup
 from authorityspoke.opinions import Opinion, TextLinkDict

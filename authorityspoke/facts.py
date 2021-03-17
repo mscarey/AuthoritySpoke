@@ -10,6 +10,7 @@ from nettlesome.formatting import indented
 from nettlesome.terms import (
     Comparable,
     ContextRegister,
+    Explanation,
     TermSequence,
 )
 from nettlesome.predicates import Predicate
@@ -120,8 +121,8 @@ class Fact(Statement):
         return str(self.predicate._content_with_terms(self.terms))
 
     def _means_if_concrete(
-        self, other: Comparable, context: ContextRegister
-    ) -> Iterator[ContextRegister]:
+        self, other: Comparable, context: Explanation
+    ) -> Iterator[Explanation]:
         if self.standard_of_proof == other.__dict__.get("standard_of_proof"):
             yield from super()._means_if_concrete(other, context)
 
@@ -132,7 +133,7 @@ class Fact(Statement):
         self, other: Comparable, context: ContextRegister
     ) -> Iterator[ContextRegister]:
         """
-        Test if ``self`` impliess ``other``, assuming they are not ``generic``.
+        Test if ``self`` implies ``other``, assuming they are not ``generic``.
 
         :returns:
             whether ``self`` implies ``other`` under the given assumption.
