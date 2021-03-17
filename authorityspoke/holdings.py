@@ -24,6 +24,7 @@ from legislice.enactments import Enactment
 from nettlesome.terms import (
     Comparable,
     ContextRegister,
+    FactorMatch,
     TermSequence,
     contradicts,
     new_context_helper,
@@ -202,17 +203,19 @@ class Holding(Comparable):
         return result
 
     def _explanations_contradiction_of_holding(
-        self, other: Holding, context: ContextRegister
+        self, other: Holding, context: Explanation
     ) -> Iterator[Explanation]:
         for self_holding in self.nonexclusive_holdings:
             for other_holding in other.nonexclusive_holdings:
-                for register in self_holding._contradicts_if_not_exclusive(
+                for explanation in self_holding._contradicts_if_not_exclusive(
                     other_holding, context=context
                 ):
-                    yield Explanation(
-                        factor_matches=[(self_holding, other_holding)],
-                        context=register,
-                        operation=contradicts,
+                    yield explanation.with_match(
+                        FactorMatch(
+                            left=self_holding,
+                            operation=contradicts,
+                            right=other_holding,
+                        )
                     )
 
     def explanations_contradiction(
@@ -245,12 +248,8 @@ class Holding(Comparable):
             contradiction.
         """
 
-        if context is None:
-            context = ContextRegister()
-        if not isinstance(context, ContextRegister):
-            raise TypeError(
-                f"context must by type ContextRegister, not {type(context)}"
-            )
+        if not isinstance(context, Explanation):
+            context = Explanation.from_context(context)
         if isinstance(other, Procedure):
             other = Rule(procedure=other)
         if isinstance(other, Rule):
@@ -260,9 +259,9 @@ class Holding(Comparable):
         elif isinstance(other, Factor):  # other is a Factor
             yield from []  # no possible contradiction
         elif hasattr(other, "explanations_contradiction"):
-            if context:
-                context = context.reversed()
-            yield from other.explanations_contradiction(self, context=context)
+            yield from other.explanations_contradiction(
+                self, context=context.context_reversed()
+            )
         else:
             raise TypeError(
                 f"'Contradicts' test not implemented for types "
@@ -270,10 +269,8 @@ class Holding(Comparable):
             )
 
     def _contradicts_if_not_exclusive(
-        self, other: Holding, context: ContextRegister = None
-    ) -> Iterator[ContextRegister]:
-        if context is None:
-            context = ContextRegister()
+        self, other: Holding, context: Explanation
+    ) -> Iterator[Explanation]:
         if isinstance(other, Holding) and other.decided:
             if self.decided:
                 yield from self._explanations_implies_if_not_exclusive(
@@ -281,13 +278,13 @@ class Holding(Comparable):
                 )
             else:
                 yield from chain(
-                    other._implies_if_decided(self),
-                    other._implies_if_decided(self.negated()),
+                    other._implies_if_decided(self, context=context),
+                    other._implies_if_decided(self.negated(), context=context),
                 )
 
     def _explanations_implies_if_not_exclusive(
-        self, other: Factor, context: ContextRegister = None
-    ) -> Iterator[ContextRegister]:
+        self, other: Factor, context: Explanation
+    ) -> Iterator[Explanation]:
         if not isinstance(other, self.__class__):
             raise TypeError
 
@@ -347,6 +344,8 @@ class Holding(Comparable):
         self, other: Holding, context: Optional[ContextRegister] = None
     ) -> Iterator[ContextRegister]:
         """Yield contexts that would cause self and other to have same meaning."""
+        if not isinstance(context, Explanation):
+            context = Explanation.from_context(context)
         if self.exclusive is other.exclusive is False:
             yield from self._explanations_implies_if_not_exclusive(
                 other, context=context
@@ -654,8 +653,12 @@ class HoldingGroup(FactorGroup):
             other_holding = still_need_matches.pop()
             for self_holding in self:
                 if operation(self_holding, other_holding):
-                    new_explanation = explanation.add_match(
-                        (self_holding, other_holding)
+                    new_explanation = explanation.with_match(
+                        FactorMatch(
+                            left=self_holding,
+                            operation=explanation.operation,
+                            right=other_holding,
+                        )
                     )
                     next_step = iter(
                         self.verbose_comparison(
