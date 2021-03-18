@@ -99,6 +99,13 @@ class TestProcedureSameMeaning:
     def test_same_meaning_no_context(self, make_procedure):
         assert make_procedure["c_no_context"].means(make_procedure["c_no_context"])
 
+    def test_explain_same_meaning(self, make_procedure):
+        left = make_procedure["c1_factor_and_entity_order"]
+        right = make_procedure["c1"]
+        explanation = left.explain_same_meaning(right)
+        assert "<Wattenburg> is like <Hideaway Lodge>" in str(explanation)
+        assert "<Hideaway Lodge> is like <Wattenburg>" in str(explanation)
+
 
 class TestProcedureImplication:
     def test_entities_of_implied_inputs_for_implied_procedure(
