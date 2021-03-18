@@ -107,9 +107,9 @@ class TestIntroduction:
         oracle = make_decision_with_holding["oracle"]
         lotus = make_decision_with_holding["lotus"]
         explanation = lotus.explain_contradiction(oracle)
-        assert "<the Lotus menu command hierarchy> is like <the Java API>" in str(
-            explanation
-        )
+        lotus_like = "<the Lotus menu command hierarchy> is like <the Java API>"
+        java_like = "<the Java API> is like <the Lotus menu command hierarchy>"
+        assert lotus_like in str(explanation) or java_like in str(explanation)
         assert (
             "the Fact it was false that <the Lotus".lower() in str(explanation).lower()
         )
