@@ -434,7 +434,7 @@ class Procedure(Comparable):
         def other_despite_implied(explanations: Iterator[ContextRegister]):
             for explanation in explanations:
                 for result in self_despite_or_input.explanations_implication(
-                    other.despite, context=context
+                    other.despite, context=explanation
                 ):
                     yield result
 

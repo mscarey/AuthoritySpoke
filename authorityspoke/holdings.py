@@ -581,11 +581,12 @@ class HoldingGroup(FactorGroup):
 
     def __init__(self, holdings: Union[Sequence[Holding], Holding] = ()):
         if isinstance(holdings, Iterable):
-            self.sequence = tuple(holdings)
+            holdings = tuple(holdings)
         else:
-            self.sequence = (holdings,)
-        if any(not isinstance(holding, Holding) for holding in self.sequence):
+            holdings = (holdings,)
+        if any(not isinstance(holding, Holding) for holding in holdings):
             raise TypeError("All objects in HoldingGroup must be type Holding.")
+        self.sequence = holdings
 
     def _explanations_implication_of_holding(
         self, other: Holding, context: Explanation
