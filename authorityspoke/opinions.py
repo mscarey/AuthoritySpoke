@@ -112,18 +112,11 @@ class Opinion(Comparable):
         if isinstance(other, Rule):
             other = Holding(rule=other)
         if isinstance(other, Holding):
-            for self_holding in self.holdings:
-                for explanation in self_holding.explanations_contradiction(
-                    other, context
-                ):
-                    yield explanation
+            yield from self.holdings.explanations_contradiction(other, context)
+
         elif isinstance(other, self.__class__):
-            for self_holding in self.holdings:
-                for other_holding in other.holdings:
-                    for explanation in self_holding.explanations_contradiction(
-                        other_holding, context
-                    ):
-                        yield explanation
+            yield from self.holdings.explanations_contradiction(other, context)
+
         elif hasattr(other, "explanations_contradiction"):
             yield from other.explanations_contradiction(self)
 
@@ -171,10 +164,7 @@ class Opinion(Comparable):
             other = Holding(rule=other)
         if isinstance(other, Holding):
             for self_holding in self.holdings:
-                for explanation in self_holding.explanations_implication(
-                    other, context
-                ):
-                    yield explanation
+                yield from self_holding.explanations_implication(other, context)
 
         elif isinstance(other, self.__class__):
             yield from self.holdings.explanations_implication(

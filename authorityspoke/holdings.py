@@ -260,7 +260,7 @@ class Holding(Comparable):
             yield from []  # no possible contradiction
         elif hasattr(other, "explanations_contradiction"):
             yield from other.explanations_contradiction(
-                self, context=context.context_reversed()
+                self, context=context.reversed_context()
             )
         else:
             raise TypeError(
@@ -587,6 +587,15 @@ class HoldingGroup(FactorGroup):
         if any(not isinstance(holding, Holding) for holding in self.sequence):
             raise TypeError("All objects in HoldingGroup must be type Holding.")
 
+    def _explanations_implication_of_holding(
+        self, other: Holding, context: Explanation
+    ) -> Iterator[Explanation]:
+        for self_holding in self.sequence:
+            for result in self_holding.explanations_implication(other, context=context):
+                yield result.with_match(
+                    FactorMatch(left=self_holding, operation=operator.ge, right=other)
+                )
+
     def explanations_implication(
         self, other: Comparable, context: Optional[ContextRegister] = None
     ) -> Iterator[Explanation]:
@@ -598,10 +607,8 @@ class HoldingGroup(FactorGroup):
             operation=operator.ge,
         )
         if isinstance(other, Holding):
-            yield from self.verbose_comparison(
-                operation=operator.ge,
-                still_need_matches=[other],
-                explanation=explanation,
+            yield from self._explanations_implication_of_holding(
+                other=other, context=context
             )
         elif isinstance(other, self.__class__):
             yield from self.verbose_comparison(
