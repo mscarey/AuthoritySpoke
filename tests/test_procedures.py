@@ -359,6 +359,30 @@ class TestFactorGroups:
             context=alice_like_craig,
         )
 
+    def test_input_or_despite_factors(self):
+        """Test part of the process of checking contradiction."""
+        rural = Entity(name="Rural's telephone directory")
+        compilation = Predicate(
+            "${rural_s_telephone_directory} was a compilation of facts"
+        )
+        idea = Predicate(template="${rural_s_telephone_directory} was an idea")
+        copyrightable = Fact(
+            Predicate(template="${rural_s_telephone_directory} was copyrightable"),
+            terms=rural,
+        )
+        left = Procedure(
+            outputs=(copyrightable),
+            inputs=(Fact(compilation, terms=rural)),
+        )
+        right = Procedure(
+            outputs=(copyrightable),
+            inputs=(Fact(idea, terms=rural)),
+        )
+        context = ContextRegister()
+        gen = left.has_input_or_despite_factors_implied_by_all_inputs_of(right, context)
+        with pytest.raises(StopIteration):
+            next(gen)
+
 
 class TestEvolve:
     def test_evolve_context_to_absent(self, make_procedure):

@@ -328,7 +328,7 @@ class Procedure(Comparable):
     ) -> Iterator[Explanation]:
         """Check if every input of other is implied by some input or despite factor of self."""
         self_despite_or_input = FactorGroup((*self.despite, *self.inputs))
-        yield from self_despite_or_input.explanations_contradiction(
+        yield from self_despite_or_input.explanations_implication(
             other.inputs, context=context
         )
 
