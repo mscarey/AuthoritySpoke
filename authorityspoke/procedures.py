@@ -317,8 +317,8 @@ class Procedure(Comparable):
         if isinstance(context.context, Explanation):
             raise TypeError
         self_despite_or_input = FactorGroup((*self.despite, *self.inputs))
-        yield from self_despite_or_input.explanations_implied_by(
-            other.inputs, context=context
+        yield from self_despite_or_input._explanations_implied_by(
+            other.inputs, explanation=context
         )
 
     def has_input_or_despite_factors_implying_all_inputs_of(
@@ -328,8 +328,8 @@ class Procedure(Comparable):
     ) -> Iterator[Explanation]:
         """Check if every input of other is implied by some input or despite factor of self."""
         self_despite_or_input = FactorGroup((*self.despite, *self.inputs))
-        yield from self_despite_or_input.explanations_implication(
-            other.inputs, context=context
+        yield from self_despite_or_input._explanations_implication(
+            other.inputs, explanation=context
         )
 
     def explain_contradiction_some_to_all(
@@ -359,7 +359,7 @@ class Procedure(Comparable):
         for m in chain(implying_contexts, implied_contexts):
             if m.context not in seen_contexts:
                 seen_contexts.append(m.context)
-                yield from self.outputs.explanations_contradiction(other.outputs, m)
+                yield from self.outputs._explanations_contradiction(other.outputs, m)
 
     def _explain_implication_all_to_all_of_procedure(
         self, other: Procedure, context: ContextRegister

@@ -77,8 +77,6 @@ def load_holdings(
         Complete path to the XML file representing the :class:`.Code`,
         including filename.
 
-    :parame regime:
-
     :returns:
         a list of :class:`Holding`\s from a JSON file in the
         ``example_data/holdings`` subdirectory, from a JSON

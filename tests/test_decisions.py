@@ -56,6 +56,12 @@ class TestImplication:
         assert oracle.implies(holding)
         assert oracle.implies(holding.rule)
 
+    def test_decision_does_not_imply_procedure(
+        self, make_procedure, make_decision_with_holding
+    ):
+        oracle = make_decision_with_holding["oracle"]
+        assert not oracle.implies(make_procedure["c1"])
+
 
 class TestContradiction:
     def test_oracle_contradicts_lotus(self, make_decision_with_holding):

@@ -6,7 +6,7 @@ from nettlesome.entities import Entity
 
 from authorityspoke.factors import FactorIndex
 from authorityspoke.facts import Fact, Predicate
-from authorityspoke.holdings import HoldingGroup
+from authorityspoke.holdings import Holding, HoldingGroup
 from authorityspoke.io import loaders, readers
 from authorityspoke.io.downloads import FakeClient
 from authorityspoke.opinions import Opinion
@@ -311,6 +311,20 @@ class TestImplication:
 
 
 class TestContradiction:
+    def test_opinion_contradicts_opinion(self, make_opinion_with_holding):
+        """Return the only contradictory pair of Holdings between these two Opinions."""
+        oracle = make_opinion_with_holding["oracle_majority"]
+        lotus = make_opinion_with_holding["lotus_majority"]
+
+        left = Opinion()
+        left.posit(lotus.holdings[6])
+        right = Opinion()
+        right.posit(oracle.holdings[10])
+        explanation = left.explain_contradiction(right)
+        assert len(explanation.reasons) == 1
+        assert isinstance(explanation.reasons[0].left, Holding)
+        assert isinstance(explanation.reasons[0].right, Holding)
+
     def test_contradiction_of_holding(
         self, make_opinion_with_holding, e_search_clause, make_holding
     ):

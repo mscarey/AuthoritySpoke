@@ -115,7 +115,7 @@ class Opinion(Comparable):
             yield from self.holdings.explanations_contradiction(other, context)
 
         elif isinstance(other, self.__class__):
-            yield from self.holdings.explanations_contradiction(other, context)
+            yield from self.holdings.explanations_contradiction(other.holdings, context)
 
         elif hasattr(other, "explanations_contradiction"):
             yield from other.explanations_contradiction(self)

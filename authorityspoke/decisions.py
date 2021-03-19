@@ -206,9 +206,7 @@ class Decision(Comparable):
             for self_holding in self.holdings
         ):
             yield Explanation(
-                factor_matches=[
-                    (other, self_holding) for self_holding in self.holdings
-                ],
+                reasons=[(other, self_holding) for self_holding in self.holdings],
                 operation=operator.ge,
             )
 

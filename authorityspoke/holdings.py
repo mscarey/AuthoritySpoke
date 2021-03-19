@@ -24,12 +24,12 @@ from legislice.enactments import Enactment
 from nettlesome.terms import (
     Comparable,
     ContextRegister,
+    Explanation,
     FactorMatch,
     TermSequence,
     contradicts,
     new_context_helper,
 )
-from nettlesome.terms import Explanation
 from authorityspoke.factors import Factor
 from nettlesome.groups import FactorGroup
 from nettlesome.formatting import indented, wrapped
@@ -210,13 +210,14 @@ class Holding(Comparable):
                 for explanation in self_holding._contradicts_if_not_exclusive(
                     other_holding, context=context
                 ):
-                    yield explanation.with_match(
-                        FactorMatch(
+                    explanation.reasons = [
+                        HoldingMatch(
                             left=self_holding,
                             operation=contradicts,
                             right=other_holding,
                         )
-                    )
+                    ]
+                    yield explanation
 
     def explanations_contradiction(
         self, other: Factor, context: ContextRegister = None
@@ -399,7 +400,7 @@ class Holding(Comparable):
         # If decided rule A contradicts B, then B also contradicts A
 
         else:
-            yield from self.rule.explanations_contradiction(other.rule, context)
+            yield from self.rule._explanations_contradiction(other.rule, context)
 
     def __len__(self):
         r"""
@@ -576,6 +577,12 @@ class Holding(Comparable):
         return text
 
 
+class HoldingMatch(FactorMatch):
+    left: Holding
+    operation: Callable
+    right: Holding
+
+
 class HoldingGroup(FactorGroup):
     term_class = Holding
 
@@ -603,7 +610,7 @@ class HoldingGroup(FactorGroup):
         if isinstance(other, Rule):
             other = Holding(rule=other)
         explanation = Explanation(
-            factor_matches=[],
+            reasons=[],
             context=context or ContextRegister(),
             operation=operator.ge,
         )

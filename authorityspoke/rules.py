@@ -325,13 +325,9 @@ class Rule(Comparable):
             for register in self.explanations_contradiction(other, context)
         )
 
-    def explanations_contradiction(
-        self, other, context: Optional[ContextRegister] = None
-    ) -> Iterator[ContextRegister]:
-        """Find context matches that would result in a contradiction with other."""
-        if not isinstance(context, Explanation):
-            context = Explanation.from_context(context)
-
+    def _explanations_contradiction(
+        self, other, context: Explanation
+    ) -> Iterator[Explanation]:
         self_to_other = self.procedure.explain_contradiction_some_to_all(
             other.procedure, context
         )
@@ -347,6 +343,15 @@ class Rule(Comparable):
 
         if self.universal:
             yield from other_to_self
+
+    def explanations_contradiction(
+        self, other, context: Optional[Union[ContextRegister, Explanation]] = None
+    ) -> Iterator[ContextRegister]:
+        """Find context matches that would result in a contradiction with other."""
+        if not isinstance(context, Explanation):
+            context = Explanation.from_context(context)
+
+        yield from self._explanations_contradiction(other=other, context=context)
 
     def needs_subset_of_enactments(self, other) -> bool:
         r"""
