@@ -160,7 +160,10 @@ thanks to the `pint <https://pint.readthedocs.io/en/stable/>`__
 library). And we can show that this new Rule contradicts a Rule that
 came from the Beard Tax Act.
 
-    >>> beard_dictionary[1]["despite"] = beard_dictionary[1]["inputs"][0]
+    >>> beard_dictionary[1]["despite"] = [
+    >>>   beard_dictionary[1]["inputs"][0],
+    >>>   beard_dictionary[1]["inputs"][2],
+    >>>  ]
     >>> beard_dictionary[1]["inputs"] = {
         "type": "fact",
         "content": "the length of the suspected beard was >= 12 inches",
