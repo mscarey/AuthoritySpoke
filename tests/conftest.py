@@ -23,7 +23,7 @@ from authorityspoke.opinions import Opinion
 from authorityspoke.pleadings import Pleading, Allegation
 from authorityspoke.rules import Procedure, Rule
 
-from authorityspoke.io import anchors, loaders, readers
+from authorityspoke.io import loaders, readers
 from authorityspoke.io.downloads import FakeClient
 from authorityspoke.io.schemas import EnactmentSchema, RawFactor, RawHolding
 

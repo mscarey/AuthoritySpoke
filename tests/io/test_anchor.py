@@ -1,6 +1,4 @@
-from authorityspoke.io import anchors, name_index
-from authorityspoke.io.name_index import index_names
-from authorityspoke.io.text_expansion import expand_shorthand
+from authorityspoke.io import schemas
 
 
 class TestCollectAnchors:
@@ -49,5 +47,6 @@ class TestCollectAnchors:
         even if it isn't wrapped in a list, it'll be normalized
         into a list containing a dict with an "exact" field.
         """
-        selector = anchors.read_selector(self.fact_string_anchor["anchors"])
+        schema = schemas.SelectorSchema()
+        selector = schema.load(self.fact_string_anchor["anchors"])
         assert selector.exact.startswith("In preparing")

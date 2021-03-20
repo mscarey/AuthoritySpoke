@@ -25,7 +25,7 @@ from authorityspoke.opinions import AnchoredHoldings
 from authorityspoke.pleadings import Allegation, Pleading
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
-from authorityspoke.io import anchors, schemas
+from authorityspoke.io import schemas
 from authorityspoke.io.schemas import (
     RawEnactment,
     RawHolding,

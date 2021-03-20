@@ -1,6 +1,6 @@
 from typing import Dict, List
 
-from authorityspoke.io import anchors, loaders, readers, schemas
+from authorityspoke.io import loaders, readers, schemas
 
 
 class TestLoadOpinion:

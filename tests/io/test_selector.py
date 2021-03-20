@@ -1,13 +1,14 @@
 import pytest
 from marshmallow import ValidationError
 
-from authorityspoke.io import anchors, dump, schemas
+from authorityspoke.io import dump, schemas
 
 
 class TestLoadSelector:
     def test_get_schema_for_selector(self):
         data = {"text": "process, system,|method of operation|, concept, principle"}
-        selector = anchors.read_selector(data)
+        selector_schema = schemas.SelectorSchema()
+        selector = selector_schema.load(data)
         schema = schemas.get_schema_for_item(selector)
         assert isinstance(schema, schemas.SelectorSchema)
 
@@ -19,7 +20,8 @@ class TestLoadSelector:
 
         data = {"text": "process, system,|method of operation, concept, principle"}
         with pytest.raises(ValidationError):
-            _ = anchors.read_selector(data)
+            schema = schemas.SelectorSchema()
+            schema.load(data)
 
 
 class TestDumpSelector:
@@ -30,22 +32,25 @@ class TestDumpSelector:
         """
 
         data = {"text": "process, system,|method of operation|, concept, principle"}
-        selector = anchors.read_selector(data)
+        selector_schema = schemas.SelectorSchema(many=False)
+        selector = selector_schema.load(data)
         selector_dict = dump.to_dict(selector)
         assert isinstance(selector_dict, dict)
         assert selector_dict["prefix"].startswith("process, system")
 
     def test_string_dump_selector(self):
         data = {"text": "process, system,|method of operation|, concept, principle"}
-        selector = anchors.read_selector(data)
+        selector_schema = schemas.SelectorSchema(many=False)
+        selector = selector_schema.load(data)
         selector_str = dump.to_json(selector)
         assert isinstance(selector_str, str)
         assert '"prefix": "process, system' in selector_str
 
     def test_round_trip_dict(self):
         data = {"exact": "method of operation"}
-        selector = anchors.read_selector(data)
+        selector_schema = schemas.SelectorSchema(many=False)
+        selector = selector_schema.load(data)
         selector_dict = dump.to_dict(selector)
-        new = anchors.read_selector(selector_dict)
+        new = selector_schema.load(selector_dict)
         assert not new.prefix
         assert new.exact == "method of operation"

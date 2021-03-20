@@ -5,7 +5,7 @@ from legislice.download import Client
 from legislice.schemas import EnactmentSchema
 import pytest
 
-from authorityspoke.io import anchors, name_index, readers, schemas
+from authorityspoke.io import name_index, readers, schemas
 from authorityspoke.io.loaders import load_holdings
 from authorityspoke.io.readers import read_holding
 
