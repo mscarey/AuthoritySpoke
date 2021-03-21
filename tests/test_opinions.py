@@ -7,6 +7,8 @@ from nettlesome.entities import Entity
 from authorityspoke.factors import FactorIndex
 from authorityspoke.facts import Fact, Predicate
 from authorityspoke.holdings import Holding, HoldingGroup
+from authorityspoke.procedures import Procedure
+from authorityspoke.rules import Rule
 from authorityspoke.io import loaders, readers
 from authorityspoke.io.downloads import FakeClient
 from authorityspoke.opinions import Opinion
@@ -221,6 +223,21 @@ class TestOpinionHoldings:
         watt.posit(brad.holdings[0], context=context_items)
         assert watt.holdings[-1].means(brad.holdings[0])
 
+    def test_getting_factors_from_new_holding(self, make_opinion):
+        watt = make_opinion["watt_majority"]
+        elephants = Fact("$animal was an elephant", terms=Entity("the elephant"))
+        mouseholes = Fact(
+            Predicate("$animal hides in mouseholes", truth=False),
+            terms=Entity("the elephant"),
+        )
+        procedure = Procedure(inputs=elephants, outputs=mouseholes)
+        rule = Rule(procedure=procedure)
+        holding = Holding(rule=rule)
+        watt.posit(holding)
+        factors = watt.factors_by_name()
+        factor = factors["the fact that <the elephant> was an elephant"]
+        assert factor.terms[0].name == "the elephant"
+
 
 class TestOpinionFactors:
     def test_only_one_factor_with_same_content(self, make_opinion_with_holding):
@@ -262,6 +279,12 @@ class TestOpinionFactors:
         oracle = make_opinion_with_holding["oracle_majority"]
         company = oracle.get_factor_by_name("the Java API")
         assert isinstance(company, Entity)
+
+    def test_factors_by_name(self, make_opinion_with_holding):
+        oracle = make_opinion_with_holding["oracle_majority"]
+        factors = oracle.factors_by_name()
+        factor = factors["false the Java API was an original work"]
+        assert factor.terms[0].name == "the Java API"
 
 
 class TestImplication:

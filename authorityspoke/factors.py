@@ -26,12 +26,6 @@ class FactorIndex(Dict[str, Factor]):
             self.insert(key=value.name, value=value)
             return None
         key = str(value)
-        for name, saved_factor in self.items():
-            if key == str(saved_factor):
-                for anchor in value.anchors:
-                    if anchor not in self[name].anchors:
-                        self[name].anchors.append(anchor)
-                return None
         self.insert(key=key, value=value)
 
     def insert(self, key: str, value: Factor) -> None:
