@@ -18,7 +18,7 @@ from nettlesome.quantities import Comparison, QuantityRange, Quantity
 
 from authorityspoke.decisions import CaseCitation, Decision
 from authorityspoke.evidence import Exhibit, Evidence
-from authorityspoke.factors import Factor
+from nettlesome.factors import Factor
 from authorityspoke.facts import Fact
 from authorityspoke.holdings import Holding
 from authorityspoke.io.name_index import Mentioned

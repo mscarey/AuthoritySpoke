@@ -21,7 +21,7 @@ from nettlesome.terms import (
     Explanation,
     TermSequence,
 )
-from authorityspoke.factors import Factor
+from nettlesome.factors import Factor
 from nettlesome.formatting import indented
 from authorityspoke.procedures import Procedure
 

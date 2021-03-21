@@ -9,7 +9,7 @@ from nettlesome.terms import ContextRegister
 from nettlesome.entities import Entity
 from nettlesome.formatting import indented
 
-from authorityspoke.factors import Factor
+from nettlesome.factors import Factor
 from authorityspoke.facts import Fact
 
 

@@ -18,7 +18,7 @@ from nettlesome.predicates import Predicate
 
 from authorityspoke.decisions import Decision
 from authorityspoke.evidence import Exhibit, Evidence
-from authorityspoke.factors import Factor
+from nettlesome.factors import Factor
 from authorityspoke.facts import Fact
 from authorityspoke.holdings import Holding
 from authorityspoke.opinions import AnchoredHoldings

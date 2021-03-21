@@ -451,11 +451,11 @@ in the :class:`~authorityspoke.facts.Fact`\.
 
 A generic :class:`~nettlesome.entities.Entity` is “generic”
 in the sense that in the context of
-the :class:`~authorityspoke.factors.Factor` where
+the :class:`~nettlesome.factors.Factor` where
 the :class:`~nettlesome.entities.Entity` appears, it could be replaced with
 some other generic :class:`~nettlesome.entities.Entity` without
 changing the meaning of the
-:class:`~authorityspoke.factors.Factor` or the :class:`~authorityspoke.rules.Rule` where it appears.
+:class:`~nettlesome.factors.Factor` or the :class:`~authorityspoke.rules.Rule` where it appears.
 
 Let’s illustrate this idea with the first holding from the *Lotus*
 case.
@@ -480,7 +480,7 @@ What if we wanted to generalize
 this :class:`~authorityspoke.holdings.Holding` about copyright and
 apply it in a different context, such as a case about books or
 television shows instead of computer programs? First we could look at
-the “generic” :class:`~authorityspoke.factors.Factor`\s of
+the “generic” :class:`~nettlesome.factors.Factor`\s of
 the :class:`~authorityspoke.holdings.Holding`, which were marked off in
 angle brackets in the string representation of
 the :class:`~authorityspoke.holdings.Holding`\.
@@ -918,7 +918,7 @@ together to make a single Holding that captures the whole process.
 The difference between ``feist.holdings[10]`` and the newly-created
 Holding ``listings_not_copyrightable`` is that
 ``listings_not_copyrightable`` has
-two :class:`~authorityspoke.factors.Factor`\s under its “RESULT”, not
+two :class:`~nettlesome.factors.Factor`\s under its “RESULT”, not
 just one. Notice that it doesn’t matter that the two original Holdings
 reference different generic :class:`nettlesome.entities.Entity` objects
 (“Rural’s telephone directory” versus “Rural’s telephone listings”).

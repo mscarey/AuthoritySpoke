@@ -4,14 +4,13 @@ from anchorpoint.textselectors import TextQuoteSelector
 
 from nettlesome.entities import Entity
 
-from authorityspoke.factors import FactorIndex
 from authorityspoke.facts import Fact, Predicate
 from authorityspoke.holdings import Holding, HoldingGroup
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
 from authorityspoke.io import loaders, readers
 from authorityspoke.io.downloads import FakeClient
-from authorityspoke.opinions import Opinion
+from authorityspoke.opinions import Opinion, FactorIndex
 
 
 class TestOpinions:

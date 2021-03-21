@@ -30,9 +30,10 @@ from nettlesome.terms import (
     contradicts,
     new_context_helper,
 )
-from authorityspoke.factors import Factor
-from nettlesome.groups import FactorGroup
+from nettlesome.factors import Factor
 from nettlesome.formatting import indented, wrapped
+from nettlesome.groups import FactorGroup
+
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
 

@@ -18,7 +18,7 @@ from dataclasses import dataclass, field
 from anchorpoint.textselectors import TextQuoteSelector
 
 from nettlesome.terms import Comparable, ContextRegister, Explanation
-from authorityspoke.factors import Factor, FactorIndex
+from nettlesome.factors import Factor
 from authorityspoke.holdings import Holding, HoldingGroup
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
@@ -430,3 +430,33 @@ class Opinion(Comparable):
 
     def __str__(self):
         return f"{self.position} Opinion by {self.author}"
+
+
+class FactorIndex(Dict[str, Factor]):
+    r"""Index of :class:`.Factor`/s that may share common anchors."""
+
+    def insert_by_name(self, value: Factor) -> None:
+        """
+        Insert Factor using its name as key if possible.
+
+        If the Factor has no name attr, use its str as key instead.
+        """
+        if value.name:
+            self.insert(key=value.name, value=value)
+            return None
+        key = str(value)
+        self.insert(key=key, value=value)
+
+    def insert(self, key: str, value: Factor) -> None:
+        """Insert Factor using its str as its key."""
+        if key in self.keys():
+            if value.name:
+                if not self[key].name:
+                    self[key].name = value.name
+                if value.name != self[key].name:
+                    raise NameError(
+                        f"{type(value)} objects with identical representation ({str(value)}) "
+                        f"have differing names: '{value.name}' and '{self[key].name}'"
+                    )
+        else:
+            self[key] = value

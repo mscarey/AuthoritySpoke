@@ -20,7 +20,7 @@ from nettlesome.terms import (
     Explanation,
     new_context_helper,
 )
-from authorityspoke.factors import Factor
+from nettlesome.factors import Factor
 from nettlesome.groups import FactorGroup
 from nettlesome.formatting import indented
 

@@ -16,7 +16,7 @@ from nettlesome.quantities import Comparison, Q_
 import pytest
 
 from authorityspoke.evidence import Evidence, Exhibit
-from authorityspoke.factors import Factor
+from nettlesome.factors import Factor
 from authorityspoke.facts import Fact, build_fact
 from authorityspoke.holdings import Holding
 from authorityspoke.opinions import Opinion
