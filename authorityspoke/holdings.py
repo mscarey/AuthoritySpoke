@@ -574,8 +574,7 @@ class Holding(Comparable):
             else ""
         )
         rule_text = indented(str(self.rule))
-        text = wrapped(f"the Holding to {action}{exclusive}") + f"\n{rule_text}"
-        return text
+        return wrapped(f"the Holding to {action}{exclusive}") + f"\n{rule_text}"
 
 
 class HoldingMatch(FactorMatch):

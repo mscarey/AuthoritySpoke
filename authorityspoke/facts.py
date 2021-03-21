@@ -1,5 +1,6 @@
 """Create models of assertions accepted as factual by courts."""
-
+from __future__ import annotations
+from copy import deepcopy
 from typing import ClassVar, Iterable, Iterator, List, Optional, Sequence, Tuple, Union
 
 from anchorpoint.textselectors import TextQuoteSelector
@@ -150,6 +151,12 @@ class Fact(Statement):
             )
         ):
             yield from super()._implies_if_concrete(other, context)
+
+    def negated(self) -> Fact:
+        """Return copy of self with opposite truth value."""
+        result = deepcopy(self)
+        result.predicate = result.predicate.negated()
+        return result
 
 
 def build_fact(

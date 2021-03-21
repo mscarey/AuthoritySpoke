@@ -83,8 +83,11 @@ class Rule(Comparable):
     absent: bool = False
     name: Optional[str] = None
 
-    context_factor_names: ClassVar = ("procedure",)
-    enactment_attr_names: ClassVar = ("enactments", "enactments_despite")
+    context_factor_names: ClassVar[Tuple[str, ...]] = ("procedure",)
+    enactment_attr_names: ClassVar[Tuple[str, ...]] = (
+        "enactments",
+        "enactments_despite",
+    )
 
     def __post_init__(self):
         self.absent = False

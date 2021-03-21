@@ -126,9 +126,7 @@ class Opinion(Comparable):
             return False
         if isinstance(other, Procedure):
             return False
-        if isinstance(other, Factor):
-            return False
-        return True
+        return not isinstance(other, Factor)
 
     def contradicts(
         self, other: Comparable, context: Optional[ContextRegister] = None

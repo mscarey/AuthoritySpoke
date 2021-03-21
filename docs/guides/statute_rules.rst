@@ -170,8 +170,8 @@ came from the Beard Tax Act.
     }
     >>> beard_dictionary[1]["outputs"][0]["truth"] = False
     >>> beard_dictionary[1]["mandatory"] = True
-    >>> long_thing_is_not_a_beard = readers.read_rule(beard_dictionary[1], client=legis_client)
-    >>> print(long_thing_is_not_a_beard)
+    >>> long_means_not_beard = readers.read_rule(beard_dictionary[1], client=legis_client)
+    >>> print(long_means_not_beard)
     the Rule that the court MUST ALWAYS impose the
       RESULT:
         the Fact it is false that <the suspected beard> was a beard
@@ -185,7 +185,7 @@ came from the Beard Tax Act.
 
 
 
-    >>> long_thing_is_not_a_beard.contradicts(ear_rule)
+    >>> long_means_not_beard.contradicts(ear_rule)
     True
 
 
