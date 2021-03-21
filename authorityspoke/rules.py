@@ -264,7 +264,7 @@ class Rule(Comparable):
 
         return result
 
-    def add_factor(self, incoming: Factor, role: str = "inputs") -> Rule:
+    def add_factor(self, incoming: Factor) -> Rule:
         """
         Make new version of ``self`` with an added input, output, or despite :class:`.Factor`.
 
@@ -277,7 +277,7 @@ class Rule(Comparable):
         :returns:
             a new version of ``self`` with the specified change
         """
-        new_procedure = self.procedure.add_factor(incoming, role)
+        new_procedure = self.procedure.add_factor(incoming)
         result = deepcopy(self)
         result.procedure = new_procedure
         return result

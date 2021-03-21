@@ -243,32 +243,19 @@ class Procedure(Comparable):
         }
         return generic_dict
 
-    def add_factor(self, incoming: Factor, role: str = "inputs") -> Procedure:
+    def add_factor(self, incoming: Factor) -> Procedure:
         """
-        Add an output, input, or despite :class:`.Factor`.
+        Add an input :class:`.Factor`.
 
         :param incoming:
             the new :class:`.Factor` to be added to input, output, or despite
 
-        :param role:
-            specifies whether the new :class:`.Factor` should be added to
-            input, output, or despite
-
         :returns:
             a new version of ``self`` with the specified change
         """
-
-        if role not in self.context_factor_names:
-            raise ValueError(f"'role' must be one of {self.context_factor_names}")
-        old_factors = self.__dict__.get(role) or []
-        new_factors = list(old_factors) + [incoming]
+        new_factors = list(self.inputs) + [incoming]
         result = deepcopy(self)
-        if role == "inputs":
-            result.set_inputs(new_factors)
-        if role == "despite":
-            result.set_despite(new_factors)
-        if role == "outputs":
-            result.set_outputs(new_factors)
+        result.set_inputs(new_factors)
         return result
 
     def contradicts(self, other, context: Optional[ContextRegister] = None) -> bool:
@@ -306,25 +293,21 @@ class Procedure(Comparable):
             for context in self.explain_contradiction_some_to_all(other, context)
         )
 
-    def has_input_or_despite_factors_implied_by_all_inputs_of(
+    def _has_input_or_despite_factors_implied_by_all_inputs_of(
         self,
         other: Procedure,
-        context: Optional[Union[ContextRegister, Explanation]] = None,
+        context: Explanation,
     ) -> Iterator[Explanation]:
         """Check if every input of other implies some input or despite factor of self."""
-        if not isinstance(context, Explanation):
-            context = Explanation.from_context(context)
-        if isinstance(context.context, Explanation):
-            raise TypeError
         self_despite_or_input = FactorGroup((*self.despite, *self.inputs))
         yield from self_despite_or_input._explanations_implied_by(
             other.inputs, explanation=context
         )
 
-    def has_input_or_despite_factors_implying_all_inputs_of(
+    def _has_input_or_despite_factors_implying_all_inputs_of(
         self,
         other: Procedure,
-        context: Optional[Union[ContextRegister, Explanation]] = None,
+        context: Explanation,
     ) -> Iterator[Explanation]:
         """Check if every input of other is implied by some input or despite factor of self."""
         self_despite_or_input = FactorGroup((*self.despite, *self.inputs))
@@ -343,13 +326,13 @@ class Procedure(Comparable):
 
         # For self to contradict other, either every input of other
         # must imply some input or despite factor of self...
-        implied_contexts = self.has_input_or_despite_factors_implied_by_all_inputs_of(
+        implied_contexts = self._has_input_or_despite_factors_implied_by_all_inputs_of(
             other, context
         )
 
         # or every input of other must be implied by
         # some input or despite factor of self.
-        implying_contexts = self.has_input_or_despite_factors_implying_all_inputs_of(
+        implying_contexts = self._has_input_or_despite_factors_implying_all_inputs_of(
             other, context
         )
 

@@ -2,7 +2,7 @@ from copy import deepcopy
 import logging
 import pytest
 
-from nettlesome.terms import ContextRegister, TermSequence
+from nettlesome.terms import ContextRegister, Explanation, TermSequence
 from nettlesome.entities import Entity
 from nettlesome.groups import FactorGroup
 from nettlesome.predicates import Predicate
@@ -72,12 +72,6 @@ class TestProcedures:
         assert f["f2"] in c1.inputs
         assert f["f2"] in c1_again.inputs
         assert f["f2"].terms == (watt_mentioned[1], watt_mentioned[0])
-
-    def test_wrong_role_for_added_factor(self, watt_factor, make_procedure):
-        with pytest.raises(ValueError):
-            _ = make_procedure["c1"].add_factor(
-                incoming=watt_factor["f8"], role="generic"
-            )
 
 
 class TestProcedureSameMeaning:
@@ -386,7 +380,10 @@ class TestFactorGroups:
             inputs=(Fact(idea, terms=rural)),
         )
         context = ContextRegister()
-        gen = left.has_input_or_despite_factors_implied_by_all_inputs_of(right, context)
+        explanation = Explanation.from_context(context)
+        gen = left._has_input_or_despite_factors_implied_by_all_inputs_of(
+            right, explanation
+        )
         with pytest.raises(StopIteration):
             next(gen)
 
