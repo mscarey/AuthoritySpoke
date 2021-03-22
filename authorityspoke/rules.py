@@ -233,35 +233,42 @@ class Rule(Comparable):
             return {str(self): self}
         return self.procedure.generic_factors_by_str()
 
-    def add_enactment(self, incoming: Enactment, role: str = "enactments") -> Rule:
+    def add_enactment(self, incoming: Enactment) -> Rule:
         """
         Make new version of ``self`` with an :class:`.Enactment` added.
 
         :param incoming:
-            the new :class:`.Enactment` to be added to enactments or
-            enactments_despite
-
-        :param role:
-            specifies whether the new :class:`.Enactment` should be added
-            to enactments or enactments_despite
+            the new :class:`.Enactment` to be added to enactments
 
         :returns:
             a new version of ``self`` with the specified change
         """
-        if role not in self.enactment_attr_names:
-            raise ValueError(f"'role' must be one of {self.enactment_attr_names}")
-
         if not isinstance(incoming, Enactment):
             raise TypeError
 
-        new_enactments = list(self.__dict__[role]) + [incoming]
+        new_enactments = list(self.enactments) + [incoming]
         new_enactments = consolidate_enactments(new_enactments)
         result = deepcopy(self)
-        if role == "enactments":
-            result.set_enactments(new_enactments)
-        elif role == "enactments_despite":
-            result.set_enactments_despite(new_enactments)
+        result.set_enactments(new_enactments)
+        return result
 
+    def add_enactment_despite(self, incoming: Enactment) -> Rule:
+        r"""
+        Make new version of ``self`` that applies despite the incoming :class:`.Enactment`\.
+
+        :param incoming:
+            the new :class:`.Enactment` to be added to enactments_despite
+
+        :returns:
+            a new version of ``self`` with the specified change
+        """
+        if not isinstance(incoming, Enactment):
+            raise TypeError
+
+        new_enactments = list(self.enactments_despite) + [incoming]
+        new_enactments = consolidate_enactments(new_enactments)
+        result = deepcopy(self)
+        result.set_enactments_despite(new_enactments)
         return result
 
     def add_factor(self, incoming: Factor) -> Rule:
@@ -576,17 +583,19 @@ class Rule(Comparable):
     def set_outputs(self, factors: Sequence[Factor]) -> None:
         self.procedure.set_outputs(factors)
 
-    def set_enactments(self, enactments: Sequence[Enactment]) -> None:
+    def set_enactments(self, enactments: Union[Enactment, Sequence[Enactment]]) -> None:
         if isinstance(enactments, Enactment):
             self.enactments = (enactments,)
         else:
             self.enactments = tuple(enactments)
 
-    def set_enactments_despite(self, enactments: Sequence[Enactment]) -> None:
+    def set_enactments_despite(
+        self, enactments: Union[Enactment, Sequence[Enactment]]
+    ) -> None:
         if isinstance(enactments, Enactment):
-            self._enactments_despite = (enactments,)
+            self.enactments_despite = (enactments,)
         else:
-            self._enactments_despite = tuple(enactments)
+            self.enactments_despite = tuple(enactments)
 
     def __str__(self):
         mandatory = "MUST" if self.mandatory else "MAY"

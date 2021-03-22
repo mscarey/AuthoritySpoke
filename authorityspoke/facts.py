@@ -82,9 +82,15 @@ class Fact(Statement):
         absent: bool = False,
         generic: bool = False,
         anchors: Optional[List[TextQuoteSelector]] = None,
+        truth: Optional[bool] = None,
     ):
         Statement.__init__(
-            self, predicate=predicate, terms=terms, absent=absent, generic=generic
+            self,
+            predicate=predicate,
+            terms=terms,
+            absent=absent,
+            generic=generic,
+            truth=truth,
         )
         self.standard_of_proof = standard_of_proof
         self.anchors = anchors or []
@@ -95,9 +101,6 @@ class Fact(Statement):
             raise ValueError(
                 f"standard of proof must be one of {self.standards_of_proof} or None."
             )
-        super().__init__(
-            predicate=predicate, terms=terms, name=name, absent=absent, generic=generic
-        )
 
     @property
     def wrapped_string(self):

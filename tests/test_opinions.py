@@ -282,7 +282,9 @@ class TestOpinionFactors:
     def test_factors_by_name(self, make_opinion_with_holding):
         oracle = make_opinion_with_holding["oracle_majority"]
         factors = oracle.factors_by_name()
-        factor = factors["false the Java API was an original work"]
+        factor = factors[
+            "the fact it was false that <the Java API> was an original work"
+        ]
         assert factor.terms[0].name == "the Java API"
 
 

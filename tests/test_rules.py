@@ -126,11 +126,9 @@ class TestRules:
         assert len(make_holding["h1"]) == 2
         assert len(make_holding["h3"]) == 5
 
-    def test_wrong_role_for_added_enactment(self, e_due_process_14, make_holding):
-        with pytest.raises(ValueError):
-            make_holding["h1"].rule.add_enactment(
-                incoming=e_due_process_14, role="inputs"
-            )
+    def test_despite_role_for_added_enactment(self, e_due_process_14, make_holding):
+        rule = make_holding["h1"].rule.add_enactment_despite(e_due_process_14)
+        assert "life, liberty, or property" in str(rule).split("DESPITE")[1]
 
 
 class TestSameMeaning:
