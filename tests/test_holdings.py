@@ -37,9 +37,6 @@ class TestHolding:
     def test_line_break_in_fact_within_holding(self, make_opinion_with_holding):
         """
         Test that holding uses the Fact string method with line breaks.
-
-        TODO: Objects should have string methods with and without line breaks.
-        TODO: Update .rst before committing notebook
         """
         lotus = make_opinion_with_holding["lotus_majority"]
         assert "registered a copyright\n" in str(lotus.holdings[2])
@@ -506,6 +503,11 @@ class TestAddition:
         )
         for output in new_holding.outputs:
             assert output.short_string in output_strings
+
+    def test_universal_holding_that_cannot_be_added(self, make_rule):
+        left = make_rule["h2_ALL"]
+        right = make_rule["h3_ALL"]
+        assert left + right is None
 
 
 class TestUnion:

@@ -40,6 +40,14 @@ class TestProcedures:
             make_procedure["c2_irrelevant_inputs"]
         )
 
+    def test_cannot_add_nonfactor_as_input(self, make_factor):
+        with pytest.raises(TypeError):
+            Procedure(inputs="factor name", outputs=make_factor["f_shooting"])
+
+    def test_cannot_add_term_as_input(self, make_factor):
+        with pytest.raises(TypeError):
+            Procedure(inputs=Entity("Al"), outputs=make_factor["f_shooting"])
+
     def test_generic_factors(self, make_entity, make_procedure, make_evidence):
         """
         Finds that for factor f["f7"], it would be consistent with the

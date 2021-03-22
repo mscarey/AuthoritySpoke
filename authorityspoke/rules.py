@@ -148,7 +148,7 @@ class Rule(Comparable):
             return None
 
         if self.universal and other.universal:
-            new_procedure = self.procedure.add_if_universal(other.procedure)
+            new_procedure = self.procedure._add_if_universal(other.procedure)
         else:
             new_procedure = self.procedure + other.procedure
 

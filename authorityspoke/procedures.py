@@ -87,17 +87,8 @@ class Procedure(Comparable):
         self.despite = FactorGroup(despite) if despite else FactorGroup()
         self.name = name
         self.absent = False
-        self.generic = generic
+        self.generic = False
         self.context_factor_names = ("outputs", "inputs", "despite")
-
-        for group in (self.outputs, self.inputs, self.despite):
-            for factor_obj in group:
-                if not isinstance(factor_obj, Factor):
-                    raise TypeError(
-                        "Input, Output, and Despite groups must contain "
-                        + "only subclasses of Factor, but "
-                        + f"{factor_obj} was type {type(factor_obj)}"
-                    )
 
     def _trigger_addition(
         self, other: Procedure, explanation: Explanation
@@ -122,10 +113,8 @@ class Procedure(Comparable):
                 return added
         return None
 
-    def add_if_universal(self, other: Procedure) -> Optional[Procedure]:
+    def _add_if_universal(self, other: Procedure) -> Optional[Procedure]:
         """Show how first Procedure triggers the second if both are universal."""
-        if not isinstance(other, self.__class__):
-            return self.add_factor(other)
         for explanation in self.triggers_next_procedure_if_universal(other):
             added = self._trigger_addition(other, explanation)
             if added:
@@ -224,9 +213,7 @@ class Procedure(Comparable):
         r"""
         :class:`.Factor`\s that can be replaced without changing ``self``\s meaning.
 
-        If ``self.generic is True`` then the only generic :class:`.Factor` is ``self``.
-        This could happen if the :class:`.Procedure` was mentioned generically in an
-        :class:`.Argument` about preserving objections for appeal, for instance.
+        self.generic can't be True for :class:`.Procedure`.
 
         :returns:
             ``self``'s generic :class:`.Factor`\s,
@@ -234,8 +221,6 @@ class Procedure(Comparable):
             perform equality or implication tests between :class:`.Factor`\s
             with :meth:`.Factor.means` or :meth:`.Factor.__ge__`.
         """
-        if self.generic:
-            return {str(self): self}
         generic_dict = {
             str(generic): generic
             for factor in self.factors_all
