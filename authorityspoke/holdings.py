@@ -100,6 +100,32 @@ class Holding(Comparable):
                     + "without the 'exclusive' keyword."
                 )
 
+    @classmethod
+    def from_factors(
+        self,
+        outputs: FactorGroup,
+        inputs: Optional[FactorGroup] = None,
+        despite: Optional[FactorGroup] = None,
+        enactments: Sequence[Enactment] = (),
+        enactments_despite: Sequence[Enactment] = (),
+        mandatory: bool = False,
+        universal: bool = False,
+        generic: bool = False,
+        decided: bool = True,
+        exclusive: bool = False,
+        absent: bool = False,
+    ):
+        """Create new Holding without an existing Rule or Procedure."""
+        procedure = Procedure(inputs=inputs, outputs=outputs, despite=despite)
+        rule = Rule(
+            procedure=procedure,
+            enactments=enactments,
+            enactments_despite=enactments_despite,
+            mandatory=mandatory,
+            universal=universal,
+        )
+        return Holding(rule=rule, generic=generic, decided=decided, exclusive=exclusive)
+
     @property
     def procedure(self):
         """Get Procedure from Rule."""

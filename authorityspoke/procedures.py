@@ -90,6 +90,51 @@ class Procedure(Comparable):
         self.generic = False
         self.context_factor_names = ("outputs", "inputs", "despite")
 
+    def add(
+        self,
+        other: Comparable,
+        context: Optional[Union[ContextRegister, Explanation]] = None,
+    ) -> Optional[Procedure]:
+        """Show how first Procedure triggers the second if not both are universal."""
+        if not isinstance(other, self.__class__):
+            return self.add_factor(other)
+        for explanation in self.triggers_next_procedure(other, context=context):
+            added = self._trigger_addition(other, explanation)
+            if added:
+                return added
+        return None
+
+    def __add__(self, other: Procedure) -> Optional[Procedure]:
+        """Show how first Procedure triggers the second if not both are universal."""
+        return self.add(other)
+
+    def _add_if_universal(
+        self, other: Procedure, explanation: Explanation
+    ) -> Optional[Procedure]:
+        """Show how first Procedure triggers the second if both are universal."""
+        self_output_or_input = FactorGroup((*self.outputs, *self.inputs))
+        other_input = list(other.inputs)
+        implied_inputs = []
+        not_implied = []
+
+        while other_input:
+            current = other_input.pop()
+            implying_explanation = self_output_or_input.explain_implication(
+                current, context=explanation
+            )
+            if implying_explanation is not None:
+                explanation = implying_explanation
+                implied_inputs.append(current)
+            else:
+                not_implied.append(current)
+
+        if not any(implied_inputs):
+            return None
+        to_combine = Procedure(
+            inputs=not_implied, outputs=other.outputs, despite=other.despite
+        )
+        return self | to_combine
+
     def _trigger_addition(
         self, other: Procedure, explanation: Explanation
     ) -> Procedure:
@@ -102,24 +147,6 @@ class Procedure(Comparable):
         result = deepcopy(self)
         result.set_outputs(list(unique_new_outputs.values()))
         return result
-
-    def __add__(self, other: Procedure) -> Optional[Procedure]:
-        """Show how first Procedure triggers the second if not both are universal."""
-        if not isinstance(other, self.__class__):
-            return self.add_factor(other)
-        for explanation in self.triggers_next_procedure(other):
-            added = self._trigger_addition(other, explanation)
-            if added:
-                return added
-        return None
-
-    def _add_if_universal(self, other: Procedure) -> Optional[Procedure]:
-        """Show how first Procedure triggers the second if both are universal."""
-        for explanation in self.triggers_next_procedure_if_universal(other):
-            added = self._trigger_addition(other, explanation)
-            if added:
-                return added
-        return None
 
     def _explanations_union_partial(
         self, other: Procedure, context: Optional[ContextRegister] = None

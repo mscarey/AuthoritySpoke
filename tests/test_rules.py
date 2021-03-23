@@ -635,8 +635,8 @@ class TestAddition:
             "act that <the Pythagorean theorem> was a fact"
         )
         assert len(facts_not_copyrightable.outputs) == 2
-        assert str(facts_not_copyrightable.outputs[1]).endswith(
-            "false that <the Pythagorean theorem> was copyrightable"
+        assert "false that <the Pythagorean theorem> was copyrightable" in str(
+            facts_not_copyrightable.outputs
         )
 
     def test_add_rules_with_duplicate_enactment_text(
@@ -734,7 +734,7 @@ class TestAddition:
         result = make_procedure["c3"] + make_procedure["c2_irrelevant_inputs"]
         assert result is None
 
-    def test_rule_requiring_more_enactments_wont_add(
+    def test_rule_requiring_more_enactments_will_add(
         self, e_due_process_5, make_complex_rule
     ):
         """
@@ -745,10 +745,12 @@ class TestAddition:
         due_process_rule = (
             make_complex_rule["accept_murder_fact_from_relevance"] + e_due_process_5
         )
-        assert (
+        combined = (
             make_complex_rule["accept_relevance_testimony_ALL"] + due_process_rule
-            is None
         )
+        assert len(combined.outputs) == 2
+        assert "the fact that <Alice> murdered <Bob>" in str(combined.outputs)
+        assert "ATTRIBUTED TO <Alice>" in str(combined)
 
 
 class TestUnion:

@@ -113,6 +113,40 @@ class Rule(Comparable):
     def outputs(self):
         return self.procedure.outputs
 
+    def add(
+        self,
+        other: Comparable,
+        context: Optional[Union[ContextRegister, Explanation]] = None,
+    ) -> Optional[Rule]:
+        if not isinstance(other, Rule):
+            if isinstance(other, Factor):
+                return self.add_factor(other)
+            if isinstance(other, Enactment):
+                return self.add_enactment(other)
+            raise TypeError
+        if self.universal is False and other.universal is False:
+            return None
+
+        if self.universal and other.universal:
+            new_procedure = self.procedure._add_if_universal(
+                other.procedure, explanation=context
+            )
+        else:
+            new_procedure = self.procedure.add(other.procedure, context=context)
+
+        new_enactments = self.enactments + other.enactments
+        new_despite = self.enactments_despite + other.enactments_despite
+
+        if new_procedure is not None:
+            result = deepcopy(self)
+            result.procedure = new_procedure
+            result.universal = min(self.universal, other.universal)
+            result.mandatory = min(self.mandatory, other.mandatory)
+            result.enactments = new_enactments
+            result.enactments_despite = new_despite
+            return result
+        return None
+
     def __add__(self, other) -> Optional[Rule]:
         r"""
         Create new :class:`Rule` if ``self`` can satisfy the :attr:`inputs` of ``other``.
@@ -138,30 +172,7 @@ class Rule(Comparable):
             a combined :class:`Rule` that extends the procedural
             move made in ``self``, if possible. Otherwise ``None``.
         """
-        if not isinstance(other, Rule):
-            if isinstance(other, Factor):
-                return self.add_factor(other)
-            if isinstance(other, Enactment):
-                return self.add_enactment(other)
-            raise TypeError
-        if self.universal is False and other.universal is False:
-            return None
-
-        if self.universal and other.universal:
-            new_procedure = self.procedure._add_if_universal(other.procedure)
-        else:
-            new_procedure = self.procedure + other.procedure
-
-        if not other.needs_subset_of_enactments(self):
-            return None
-
-        if new_procedure is not None:
-            result = deepcopy(self)
-            result.procedure = new_procedure
-            result.universal = min(self.universal, other.universal)
-            result.mandatory = min(self.mandatory, other.mandatory)
-            return result
-        return None
+        return self.add(other)
 
     def get_contrapositives(self) -> Iterator[Rule]:
         r"""
