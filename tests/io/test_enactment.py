@@ -42,7 +42,9 @@ class TestEnactmentImport:
         holding_brad = load_holdings("holding_brad.json")
         holdings = readers.read_holdings(holding_brad, client=fake_usc_client)
         enactments = holdings[0].enactments
-        assert enactments[0].selected_text().endswith("shall not be violated…")
+        assert any(
+            law.selected_text().endswith("shall not be violated…") for law in enactments
+        )
 
     def test_false_as_selection(self, fake_usc_client):
         input_enactment = self.test_enactment.copy()
@@ -62,7 +64,10 @@ class TestEnactmentImport:
         holding_cardenas = load_holdings("holding_cardenas.json")
         holdings = readers.read_holdings(holding_cardenas)
         enactment_list = holdings[0].enactments
-        assert "all relevant evidence is admissible" in enactment_list[0].text
+        assert any(
+            "all relevant evidence is admissible" in enactment.text
+            for enactment in enactment_list
+        )
 
     def test_enactment_does_not_fail_for_excess_selector(self, fake_beard_client):
         """

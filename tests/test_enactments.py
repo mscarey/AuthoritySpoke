@@ -5,7 +5,8 @@ from anchorpoint.textselectors import TextQuoteSelector, TextSelectionError
 from dotenv import load_dotenv
 from legislice.download import Client
 
-from legislice.enactments import Enactment, consolidate_enactments
+from legislice.enactments import Enactment
+from legislice.groups import EnactmentGroup
 from legislice.schemas import EnactmentSchema
 
 from nettlesome.entities import Entity
@@ -205,7 +206,7 @@ class TestEnactments:
         search = schema.load(search_clause)
         warrants = schema.load(warrants_clause)
 
-        consolidated = consolidate_enactments([fourth, search, warrants])
+        consolidated = EnactmentGroup([fourth, search, warrants])
         assert len(consolidated) == 1
         assert consolidated[0].means(fourth)
 
@@ -229,7 +230,7 @@ class TestEnactments:
             and_inventors,
             right_to_writings,
         ]
-        combined = consolidate_enactments(to_combine)
+        combined = EnactmentGroup(to_combine)
         assert len(combined) == 2
         assert any(
             law.selected_text().startswith("To promote the Progress")
@@ -246,7 +247,7 @@ class TestEnactments:
         due_process_5.select("life, liberty, or property, without due process of law")
         due_process_14.select("life, liberty, or property, without due process of law")
 
-        combined = consolidate_enactments([due_process_5, due_process_14])
+        combined = EnactmentGroup([due_process_5, due_process_14])
         assert len(combined) == 2
 
     def test_cannot_add_fact_to_enactment(self, watt_factor, e_search_clause):

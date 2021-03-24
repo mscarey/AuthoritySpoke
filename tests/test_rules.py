@@ -6,6 +6,7 @@ from typing import Type
 
 from dotenv import load_dotenv
 from legislice.download import Client
+from legislice.groups import EnactmentGroup
 from nettlesome.terms import ContextRegister, means
 from nettlesome.entities import Entity
 from nettlesome.terms import Explanation
@@ -120,7 +121,7 @@ class TestRules:
         assert len(cardenas.holdings[1].despite) == 1
 
     def test_single_enactment_converted_to_tuple(self, make_holding):
-        assert isinstance(make_holding["h2"].enactments, tuple)
+        assert isinstance(make_holding["h2"].enactments, EnactmentGroup)
 
     def test_holding_len(self, make_holding):
         assert len(make_holding["h1"]) == 2
@@ -737,11 +738,6 @@ class TestAddition:
     def test_rule_requiring_more_enactments_will_add(
         self, e_due_process_5, make_complex_rule
     ):
-        """
-        This requirement might be changed, so that if the second
-        Rule requires more Enactments the method will just assume they're
-        available.
-        """
         due_process_rule = (
             make_complex_rule["accept_murder_fact_from_relevance"] + e_due_process_5
         )

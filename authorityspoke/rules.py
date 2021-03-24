@@ -11,9 +11,8 @@ from copy import deepcopy
 from typing import Any, ClassVar, Dict, Iterable, Iterator, Type
 from typing import List, Optional, Sequence, Tuple, Union
 
-from dataclasses import dataclass
-
-from legislice.enactments import Enactment, consolidate_enactments
+from legislice.enactments import Enactment
+from legislice.groups import EnactmentGroup
 
 from nettlesome.terms import (
     Comparable,
@@ -26,7 +25,6 @@ from nettlesome.formatting import indented
 from authorityspoke.procedures import Procedure
 
 
-@dataclass()
 class Rule(Comparable):
     r"""
     A statement of a legal doctrine about a :class:`.Procedure` for litigation.
@@ -74,32 +72,35 @@ class Rule(Comparable):
         object.
     """
 
-    procedure: Procedure
-    enactments: Sequence[Enactment] = ()
-    enactments_despite: Sequence[Enactment] = ()
-    mandatory: bool = False
-    universal: bool = False
-    generic: bool = False
-    absent: bool = False
-    name: Optional[str] = None
-
     context_factor_names: ClassVar[Tuple[str, ...]] = ("procedure",)
     enactment_attr_names: ClassVar[Tuple[str, ...]] = (
         "enactments",
         "enactments_despite",
     )
 
-    def __post_init__(self):
+    def __init__(
+        self,
+        procedure: Procedure,
+        enactments: Optional[
+            Union[Enactment, EnactmentGroup, Sequence[Enactment]]
+        ] = None,
+        enactments_despite: Optional[
+            Union[Enactment, EnactmentGroup, Sequence[Enactment]]
+        ] = None,
+        mandatory: bool = False,
+        universal: bool = False,
+        generic: bool = False,
+        absent: bool = False,
+        name: Optional[str] = None,
+    ):
+        self.procedure = procedure
+        self.enactments = EnactmentGroup(enactments)
+        self.enactments_despite = EnactmentGroup(enactments_despite)
+        self.mandatory = mandatory
+        self.universal = universal
+        self.generic = generic
         self.absent = False
-
-        for attr in self.enactment_attr_names:
-            value = self.__dict__[attr]
-            if not value:
-                object.__setattr__(self, attr, ())
-            elif isinstance(value, Iterable):
-                object.__setattr__(self, attr, tuple(value))
-            else:
-                object.__setattr__(self, attr, (value,))
+        self.name = name
 
     @property
     def despite(self):
@@ -257,8 +258,7 @@ class Rule(Comparable):
         if not isinstance(incoming, Enactment):
             raise TypeError
 
-        new_enactments = list(self.enactments) + [incoming]
-        new_enactments = consolidate_enactments(new_enactments)
+        new_enactments = self.enactments + incoming
         result = deepcopy(self)
         result.set_enactments(new_enactments)
         return result
@@ -276,8 +276,7 @@ class Rule(Comparable):
         if not isinstance(incoming, Enactment):
             raise TypeError
 
-        new_enactments = list(self.enactments_despite) + [incoming]
-        new_enactments = consolidate_enactments(new_enactments)
+        new_enactments = self.enactments_despite + incoming
         result = deepcopy(self)
         result.set_enactments_despite(new_enactments)
         return result
@@ -521,12 +520,8 @@ class Rule(Comparable):
         if new_procedure is None:
             return None
 
-        enactments = consolidate_enactments(
-            list(self.enactments) + list(other.enactments)
-        )
-        enactments_despite = consolidate_enactments(
-            list(self.enactments_despite) + list(other.enactments_despite)
-        )
+        enactments = self.enactments + other.enactments
+        enactments_despite = self.enactments_despite + other.enactments_despite
 
         if self.procedure.implies_all_to_all(
             other.procedure, context=context
@@ -594,19 +589,15 @@ class Rule(Comparable):
     def set_outputs(self, factors: Sequence[Factor]) -> None:
         self.procedure.set_outputs(factors)
 
-    def set_enactments(self, enactments: Union[Enactment, Sequence[Enactment]]) -> None:
-        if isinstance(enactments, Enactment):
-            self.enactments = (enactments,)
-        else:
-            self.enactments = tuple(enactments)
+    def set_enactments(
+        self, enactments: Union[Enactment, Sequence[Enactment], EnactmentGroup]
+    ) -> None:
+        self.enactments = EnactmentGroup(enactments)
 
     def set_enactments_despite(
-        self, enactments: Union[Enactment, Sequence[Enactment]]
+        self, enactments: Union[Enactment, Sequence[Enactment], EnactmentGroup]
     ) -> None:
-        if isinstance(enactments, Enactment):
-            self.enactments_despite = (enactments,)
-        else:
-            self.enactments_despite = tuple(enactments)
+        self.enactments_despite = EnactmentGroup(enactments)
 
     def __str__(self):
         mandatory = "MUST" if self.mandatory else "MAY"
