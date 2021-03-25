@@ -419,7 +419,9 @@ class Rule(Comparable):
                     other.procedure, context
                 )
 
-    def implies(self, other, context: Optional[ContextRegister] = None) -> bool:
+    def implies(
+        self, other: Comparable, context: Optional[ContextRegister] = None
+    ) -> bool:
         r"""
         Test if ``self`` implies ``other`` if posited in valid and decided :class:`.Holding`\s.
 
@@ -443,11 +445,9 @@ class Rule(Comparable):
                 f'"implies" test not supported between class {self.__class__} and class {other.__class__}.'
             )
         if not isinstance(other, self.__class__):
-            if hasattr(other, "implied_by"):
-                if context:
-                    context = context.reversed()
-                return other.implied_by(self, context=context)
-            return False
+            if context:
+                context = context.reversed()
+            return other.implied_by(self, context=context)
         return any(
             explanation is not None
             for explanation in self.explanations_implication(other, context)
@@ -555,7 +555,7 @@ class Rule(Comparable):
             return self._union_with_rule(other, context=context)
         elif hasattr(other, "union") and hasattr(other, "rule"):
             return other.union(self, context=context.reversed())
-        raise TypeError
+        raise TypeError(f"Union operation not possible between Rule and {type(other)}.")
 
     def __or__(self, other: Rule) -> Optional[Rule]:
         r"""

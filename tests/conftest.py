@@ -1,4 +1,5 @@
 from copy import deepcopy
+import datetime
 import json
 import os
 import pathlib
@@ -6,8 +7,6 @@ from typing import Any, Dict, List, Text, Tuple
 
 from anchorpoint.textselectors import TextQuoteSelector
 from dotenv import load_dotenv
-from legislice import Enactment
-from legislice.name_index import EnactmentIndex
 from legislice.download import Client
 from nettlesome.terms import ContextRegister
 from nettlesome.entities import Entity
@@ -31,6 +30,7 @@ from authorityspoke.io.schemas import EnactmentSchema, RawFactor, RawHolding
 load_dotenv()
 
 TOKEN = os.getenv("LEGISLICE_API_TOKEN")
+API_ROOT = "https://authorityspoke.com/api/v1"
 legislice_client = Client(api_token=TOKEN)
 
 
@@ -39,6 +39,176 @@ def vcr_config():
     return {
         # Replace the Authorization request header with "DUMMY" in cassettes
         "filter_headers": [("authorization", "DUMMY")],
+    }
+
+
+@pytest.fixture(scope="class")
+def test_client() -> Client:
+    client = Client(api_token=TOKEN, api_root=API_ROOT)
+    client.coverage["/us/usc"] = {
+        "latest_heading": "United States Code (USC)",
+        "first_published": datetime.date(1926, 6, 30),
+        "earliest_in_db": datetime.date(2013, 7, 18),
+        "latest_in_db": datetime.date(2020, 8, 8),
+    }
+    client.coverage["/test/acts"] = {
+        "latest_heading": "Test Acts",
+        "first_published": datetime.date(1935, 4, 1),
+        "earliest_in_db": datetime.date(1935, 4, 1),
+        "latest_in_db": datetime.date(2013, 7, 18),
+    }
+    return client
+
+
+@pytest.fixture(scope="class")
+def section6d():
+    return {
+        "heading": "Waiver of beard tax in special circumstances",
+        "content": "",
+        "children": [
+            {
+                "heading": "",
+                "content": "The Department of Beards shall waive the collection of beard tax upon issuance of beardcoin under Section 6C where the reason the maintainer wears a beard is due to bona fide religious, cultural, or medical reasons.",
+                "children": [],
+                "end_date": None,
+                "node": "/test/acts/47/6D/1",
+                "start_date": "2013-07-18",
+                "url": "http://127.0.0.1:8000/api/v1/test/acts/47/6D/1@2018-03-11/",
+            },
+            {
+                "heading": "",
+                "content": "The determination of the Department of Beards as to what constitutes bona fide religious or cultural reasons shall be final and no right of appeal shall exist.",
+                "children": [],
+                "end_date": None,
+                "node": "/test/acts/47/6D/2",
+                "start_date": "1935-04-01",
+                "url": "http://127.0.0.1:8000/api/v1/test/acts/47/6D/2@2018-03-11/",
+            },
+        ],
+        "end_date": None,
+        "node": "/test/acts/47/6D",
+        "start_date": "1935-04-01",
+        "url": "http://127.0.0.1:8000/api/v1/test/acts/47/6D@2018-03-11/",
+        "parent": "http://127.0.0.1:8000/api/v1/test/acts/47@2018-03-11/",
+    }
+
+
+@pytest.fixture(scope="function")
+def section_11_subdivided():
+    return {
+        "heading": "Licensed repurchasers of beardcoin",
+        "start_date": "2013-07-18",
+        "node": "/test/acts/47/11",
+        "text_version": {
+            "id": 1142710,
+            "url": "https://authorityspoke.com/api/v1/textversions/1142710/",
+            "content": "The Department of Beards may issue licenses to such",
+        },
+        "url": "https://authorityspoke.com/api/v1/test/acts/47/11/",
+        "end_date": None,
+        "children": [
+            {
+                "heading": "",
+                "start_date": "2013-07-18",
+                "node": "/test/acts/47/11/i",
+                "text_version": {
+                    "id": 1142704,
+                    "url": "https://authorityspoke.com/api/v1/textversions/1142704/",
+                    "content": "barbers,",
+                },
+                "url": "https://authorityspoke.com/api/v1/test/acts/47/11/i/",
+                "end_date": None,
+                "children": [],
+                "citations": [],
+            },
+            {
+                "heading": "",
+                "start_date": "2013-07-18",
+                "node": "/test/acts/47/11/ii",
+                "text_version": {
+                    "id": 1142705,
+                    "url": "https://authorityspoke.com/api/v1/textversions/1142705/",
+                    "content": "hairdressers, or",
+                },
+                "url": "https://authorityspoke.com/api/v1/test/acts/47/11/ii/",
+                "end_date": None,
+                "children": [],
+                "citations": [],
+            },
+            {
+                "heading": "",
+                "start_date": "2013-07-18",
+                "node": "/test/acts/47/11/iii",
+                "text_version": {
+                    "id": 1142706,
+                    "url": "https://authorityspoke.com/api/v1/textversions/1142706/",
+                    "content": "other male grooming professionals",
+                },
+                "url": "https://authorityspoke.com/api/v1/test/acts/47/11/iii/",
+                "end_date": None,
+                "children": [],
+                "citations": [],
+            },
+            {
+                "heading": "",
+                "start_date": "2013-07-18",
+                "node": "/test/acts/47/11/iii-con",
+                "text_version": {
+                    "id": 1142707,
+                    "url": "https://authorityspoke.com/api/v1/textversions/1142707/",
+                    "content": "as they see fit to purchase a beardcoin from a customer",
+                },
+                "url": "https://authorityspoke.com/api/v1/test/acts/47/11/iii-con/",
+                "end_date": None,
+                "children": [],
+                "citations": [],
+            },
+            {
+                "heading": "",
+                "start_date": "2013-07-18",
+                "node": "/test/acts/47/11/iv",
+                "text_version": {
+                    "id": 1142708,
+                    "url": "https://authorityspoke.com/api/v1/textversions/1142708/",
+                    "content": "whose beard they have removed,",
+                },
+                "url": "https://authorityspoke.com/api/v1/test/acts/47/11/iv/",
+                "end_date": None,
+                "children": [],
+                "citations": [],
+            },
+            {
+                "heading": "",
+                "start_date": "2013-07-18",
+                "node": "/test/acts/47/11/iv-con",
+                "text_version": {
+                    "id": 1142709,
+                    "url": "https://authorityspoke.com/api/v1/textversions/1142709/",
+                    "content": "and to resell those beardcoins to the Department of Beards.",
+                },
+                "url": "https://authorityspoke.com/api/v1/test/acts/47/11/iv-con/",
+                "end_date": None,
+                "children": [],
+                "citations": [],
+            },
+        ],
+        "citations": [],
+        "parent": "https://authorityspoke.com/api/v1/test/acts/47/",
+    }
+
+
+@pytest.fixture(scope="module")
+def fifth_a():
+    return {
+        "heading": "AMENDMENT V.",
+        "content": "No person shall be held to answer for a capital, or otherwise infamous crime, unless on a presentment or indictment of a Grand Jury, except in cases arising in the land or naval forces, or in the Militia, when in actual service in time of War or public danger; nor shall any person be subject for the same offence to be twice put in jeopardy of life or limb; nor shall be compelled in any Criminal Case to be a witness against himself; nor be deprived of life, liberty, or property, without due process of law; nor shall private property be taken for public use, without just compensation.",
+        "children": [],
+        "end_date": None,
+        "node": "/us/const/amendment/V",
+        "start_date": "1791-12-15",
+        "url": "https://authorityspoke.com/api/v1/us/const/amendment/V/",
+        "parent": "https://authorityspoke.com/api/v1/us/const/amendment/",
+        "selection": True,
     }
 
 
@@ -349,6 +519,11 @@ def make_factor(make_predicate, make_entity) -> Dict[str, Factor]:
             p["p_irrelevant_3"], (3, 0), case_factors=c
         ),
         "f_crime": build_fact(p["p_crime"], case_factors=c),
+        "f_crime_craig_poe": Fact(
+            p["p_crime"],
+            terms=e["craig"],
+            standard_of_proof="preponderance of evidence",
+        ),
         "f_watt_crime": build_fact(p["p_crime"], case_factors=make_entity["watt"]),
         "f_no_crime": build_fact(p["p_no_crime"], case_factors=c),
         "f_no_crime_entity_order": build_fact(p["p_no_crime"], (1,), case_factors=c),

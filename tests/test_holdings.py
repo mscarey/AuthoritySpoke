@@ -80,6 +80,16 @@ class TestHolding:
         assert holding.enactments[0].content.startswith("In any judicial")
         assert "In any judicial" in holding.enactments[0].selected_text()
 
+    def test_holding_with_standard_of_proof(self, make_factor):
+        holding = Holding.from_factors(
+            inputs=make_factor["f_shooting_craig_brd"],
+            outputs=make_factor["f_crime_craig_poe"],
+        )
+        assert (
+            "by the STANDARD beyond reasonable doubt".lower()
+            in holding.wrapped_string.lower()
+        )
+
 
 class TestSameMeaning:
     def test_identical_holdings_equal(self, make_holding):

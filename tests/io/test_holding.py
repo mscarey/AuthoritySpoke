@@ -7,7 +7,6 @@ from anchorpoint.textselectors import TextQuoteSelector
 from dotenv import load_dotenv
 from legislice import Enactment
 from legislice.download import Client
-from legislice.name_index import collect_enactments
 from nettlesome.terms import ContextRegister
 from nettlesome.entities import Entity
 from nettlesome.predicates import Predicate
@@ -16,7 +15,7 @@ from authorityspoke.facts import Fact
 from authorityspoke.holdings import Holding, HoldingGroup
 from authorityspoke.opinions import Opinion
 from authorityspoke.procedures import Procedure
-from authorityspoke.io import loaders, readers, schemas, dump, name_index
+from authorityspoke.io import loaders, readers, dump, name_index
 from authorityspoke.io.downloads import FakeClient
 from authorityspoke.io.loaders import (
     load_holdings,

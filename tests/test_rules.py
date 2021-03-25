@@ -315,6 +315,20 @@ class TestImplication:
         )
         assert small_reliable >= small_more_reliable_holding
 
+    def test_does_not_imply_holding_due_to_context(self, make_complex_rule):
+        """
+        The Rule class doesn't know anything about the Holding class, but it
+        should check whether Holding has an is_implied_by method and call it.
+        """
+        small_reliable = make_complex_rule["accept_small_weight_reliable"]
+        small_more_reliable_holding = Holding(
+            make_complex_rule["accept_small_weight_reliable_more_evidence"]
+        )
+        assert not small_reliable.implies(
+            small_more_reliable_holding,
+            context=ContextRegister.from_lists([Entity("Alice")], [Entity("Bob")]),
+        )
+
     def test_implication_interchangeable_terms(self):
         ate_together = Predicate(template="$person1 ate at $place with $person2")
         shot = Predicate(template="$attacker shot $victim")
@@ -356,6 +370,13 @@ class TestImplication:
         assert not Statement(
             Predicate("$person was a person"), terms=Entity("Alice")
         ).implies(make_rule["h1"])
+
+    def test_not_implied_by_procedure(self, make_procedure, make_rule):
+        assert not make_rule["h1"].implied_by(make_procedure["c1"])
+
+    def test_error_to_check_implies_procedure(self, make_procedure, make_rule):
+        with pytest.raises(TypeError):
+            make_rule["h1"].implies(make_procedure["c1"])
 
 
 class TestContradiction:
@@ -788,6 +809,11 @@ class TestUnion:
         assert len(new_holding.inputs) == 2
         assert len(new_holding.outputs) == 1
         assert len(new_holding.enactments) == 2
+
+    def test_union_rule_and_fact(self, make_opinion_with_holding, make_factor):
+        feist = make_opinion_with_holding["feist_majority"]
+        with pytest.raises(TypeError):
+            feist.holdings[0].rule | make_factor["f_irrelevant_0"]
 
     def test_union_longer(self, make_opinion_with_holding):
         feist = make_opinion_with_holding["feist_majority"]

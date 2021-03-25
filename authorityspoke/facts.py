@@ -106,7 +106,7 @@ class Fact(Statement):
     def wrapped_string(self):
         text = super().wrapped_string
         if self.standard_of_proof:
-            text += "\n" + indented("by the STANDARD {self.standard_of_proof}")
+            text += "\n" + indented(f"by the STANDARD {self.standard_of_proof}")
         return text
 
     def __str__(self):

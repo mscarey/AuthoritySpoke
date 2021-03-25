@@ -1,0 +1,48 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.25.1
+      authorization:
+      - DUMMY
+    method: GET
+    uri: https://authorityspoke.com/api/v1/test/acts/47/4/b/
+  response:
+    body:
+      string: '{"heading":"","start_date":"1935-04-01","node":"/test/acts/47/4/b","text_version":{"id":1142665,"url":"https://authorityspoke.com/api/v1/textversions/1142665/","content":"exists
+        in an uninterrupted line from the front of one ear to the front of the other
+        ear below the nose."},"url":"https://authorityspoke.com/api/v1/test/acts/47/4/b/","end_date":null,"children":[],"citations":[],"parent":"https://authorityspoke.com/api/v1/test/acts/47/4/"}'
+    headers:
+      Allow:
+      - GET, POST, PUT, PATCH, HEAD, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '443'
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 25 Mar 2021 16:13:39 GMT
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - gunicorn/20.0.4
+      Vary:
+      - Accept, Cookie
+      Via:
+      - 1.1 vegur
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+version: 1

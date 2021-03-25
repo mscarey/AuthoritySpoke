@@ -9,7 +9,7 @@ import pathlib
 from typing import Any, Dict, List, Iterator, Optional, Tuple, Union
 
 from legislice.download import Client
-from legislice.name_index import EnactmentIndex
+
 
 from authorityspoke.decisions import Decision
 from authorityspoke.holdings import Holding

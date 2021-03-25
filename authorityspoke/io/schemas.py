@@ -11,7 +11,8 @@ from marshmallow import ValidationError
 from anchorpoint.textselectors import TextQuoteSelector, TextPositionSelector
 from anchorpoint.schemas import SelectorSchema
 from legislice import Enactment
-from legislice.schemas import EnactmentSchema
+from legislice.schemas import EnactmentSchema as LegisliceSchema
+from legislice.schemas import enactment_needs_api_update
 from nettlesome.entities import Entity
 from nettlesome.predicates import Predicate
 from nettlesome.quantities import Comparison, QuantityRange, Quantity
@@ -21,6 +22,7 @@ from authorityspoke.evidence import Exhibit, Evidence
 from nettlesome.factors import Factor
 from authorityspoke.facts import Fact
 from authorityspoke.holdings import Holding
+from authorityspoke.io.enactment_index import EnactmentIndex
 from authorityspoke.io.name_index import Mentioned
 from authorityspoke.io.name_index import RawFactor, RawPredicate
 from authorityspoke.io.nesting import nest_fields
@@ -162,6 +164,26 @@ class DecisionSchema(ExpandableSchema):
         del data["url"]
         data.pop("frontend_url", None)
         return data
+
+
+class EnactmentSchema(LegisliceSchema):
+    def get_indexed_enactment(self, data, **kwargs):
+        """Replace data to load with any object with same name in "enactment_index"."""
+        if isinstance(data, str):
+            name_to_retrieve = data
+        elif data.get("name") and enactment_needs_api_update(data):
+            name_to_retrieve = data["name"]
+        else:
+            return data
+
+        mentioned = self.context.get("enactment_index") or EnactmentIndex()
+        return deepcopy(mentioned.get_by_name(name_to_retrieve))
+
+    @pre_load
+    def format_data_to_load(self, data, **kwargs):
+        """Prepare Enactment to load."""
+        data = self.get_indexed_enactment(data)
+        return super().format_data_to_load(data)
 
 
 def dump_quantity(obj: Predicate) -> Optional[Union[date, float, int, str]]:

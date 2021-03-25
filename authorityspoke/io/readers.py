@@ -10,15 +10,12 @@ from typing import NamedTuple
 from typing import Dict, List, Optional, Tuple, Type, Union
 
 from anchorpoint.textselectors import TextQuoteSelector
-from legislice import Enactment
 from legislice.download import Client
-from legislice.name_index import EnactmentIndex, collect_enactments
 from nettlesome.entities import Entity
-from nettlesome.predicates import Predicate
+from nettlesome.factors import Factor
 
 from authorityspoke.decisions import Decision
 from authorityspoke.evidence import Exhibit, Evidence
-from nettlesome.factors import Factor
 from authorityspoke.facts import Fact
 from authorityspoke.holdings import Holding
 from authorityspoke.opinions import AnchoredHoldings
@@ -36,6 +33,7 @@ from authorityspoke.io.schemas import (
     RawSelector,
 )
 from authorityspoke.io.name_index import index_names, Mentioned
+from authorityspoke.io.enactment_index import collect_enactments
 
 FACTOR_SUBCLASSES = {
     class_obj.__name__: class_obj
