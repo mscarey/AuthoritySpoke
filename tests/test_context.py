@@ -79,8 +79,8 @@ class TestContextRegisters:
 
     def test_import_to_context_register(self, make_entity, watt_factor):
         left = ContextRegister.from_lists(
-            keys=[watt_factor["f7"], make_entity["motel"]],
-            values=[watt_factor["f7_swap_entities"], make_entity["trees"]],
+            to_replace=[watt_factor["f7"], make_entity["motel"]],
+            replacements=[watt_factor["f7_swap_entities"], make_entity["trees"]],
         )
         right = ContextRegister()
         right.insert_pair(make_entity["trees"], make_entity["motel"])
@@ -159,8 +159,8 @@ class TestLikelyContext:
         left = FactorGroup(left)
         right = FactorGroup(oracle.holdings[2].outputs[0])
         context = next(left.likely_contexts(right))
-        lotus_menu = lotus.holdings[2].generic_factors()[0]
-        java_api = oracle.generic_factors()[0]
+        lotus_menu = lotus.holdings[2].generic_terms()[0]
+        java_api = oracle.generic_terms()[0]
         assert context.get_factor(lotus_menu).compare_keys(java_api)
 
     def test_likely_context_from_factor_meaning(self, make_opinion_with_holding):
@@ -169,8 +169,8 @@ class TestLikelyContext:
         left = lotus.holdings[2].outputs[0]
         right = oracle.holdings[2].outputs[0]
         likely = left._likely_context_from_meaning(right, context=ContextRegister())
-        lotus_menu = lotus.holdings[2].generic_factors()[0]
-        java_api = oracle.generic_factors()[0]
+        lotus_menu = lotus.holdings[2].generic_terms()[0]
+        java_api = oracle.generic_terms()[0]
         assert likely.get_factor(lotus_menu).compare_keys(java_api)
 
     def test_union_one_generic_not_matched(self, make_opinion_with_holding):

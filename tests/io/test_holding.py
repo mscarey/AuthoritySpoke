@@ -75,8 +75,8 @@ class TestEntityImport:
 
         different_entity_holdings = readers.read_holdings(self.smith_holdings)
         assert (
-            different_entity_holdings[1].generic_factors
-            != different_entity_holdings[0].generic_factors
+            different_entity_holdings[1].generic_terms
+            != different_entity_holdings[0].generic_terms
         )
         assert not different_entity_holdings[1] >= different_entity_holdings[0]
 
@@ -526,7 +526,7 @@ class TestTextAnchors:
         expectation_not_reasonable = brad.holdings[6]
         changes = ContextRegister()
         changes.insert_pair(
-            key=expectation_not_reasonable.generic_factors()[0],
+            key=expectation_not_reasonable.generic_terms()[0],
             value=make_entity["watt"],
         )
         context_holding = expectation_not_reasonable.new_context(changes)
@@ -549,7 +549,7 @@ class TestTextAnchors:
         holdings = readers.read_holdings(to_read, client=mock_client)
         brad.posit(holdings)
         expectation_not_reasonable = brad.holdings[6]
-        generic_patch = expectation_not_reasonable.generic_factors()[1]
+        generic_patch = expectation_not_reasonable.generic_terms()[1]
         changes = ContextRegister()
         changes.insert_pair(generic_patch, make_entity["trees_specific"])
         context_change = expectation_not_reasonable.new_context(changes)

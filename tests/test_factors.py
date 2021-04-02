@@ -88,19 +88,15 @@ class TestFacts:
         factor = watt_factor["f2_no_truth"]
         assert "whether" in str(factor)
 
-    def test_repeating_entity_string(self, make_factor):
+    def test_repeating_entity_string(self, make_predicate):
         """I'm not convinced that a model of a Fact ever needs to include
         multiple references to the same Entity just because the name of the
         Entity appears more than once in the Predicate."""
-        f = make_factor
-        assert (
-            "Fact that <Alice> told <Bob> to hire <Craig>".lower()
-            in str(f["f_three_entities"]).lower()
-        )
-        assert (
-            "Fact that <Alice> told <Bob> to hire <Alice>".lower()
-            in str(f["f_repeating_entity"]).lower()
-        )
+        with pytest.raises(ValueError):
+            Fact(
+                make_predicate["p_three_entities"],
+                terms=[Entity("Al"), Entity("Bob"), Entity("Al")],
+            )
 
     def test_string_representation_with_concrete_entities(self, watt_factor):
         """
@@ -154,7 +150,7 @@ class TestFacts:
 
     def test_get_factor_from_recursive_search(self, make_opinion_with_holding):
         holding_list = list(make_opinion_with_holding["cardenas_majority"].holdings)
-        factor_list = list(holding_list[0].recursive_factors.values())
+        factor_list = list(holding_list[0].recursive_terms.values())
         assert any(
             factor.compare_keys(Entity("parole officer"))
             and factor.name == "parole officer"
@@ -169,8 +165,8 @@ class TestFacts:
 
     def test_new_concrete_context(self, make_entity, watt_factor):
         register = ContextRegister.from_lists(
-            keys=[make_entity["watt"], make_entity["motel"]],
-            values=[Entity("Darth Vader"), Entity("Death Star")],
+            to_replace=[make_entity["watt"], make_entity["motel"]],
+            replacements=[Entity("Darth Vader"), Entity("Death Star")],
         )
         different = watt_factor["f2"].new_context(register)
         assert "<Darth Vader> operated" in str(different)
@@ -254,11 +250,11 @@ class TestSameMeaning:
     def test_unequal_because_a_factor_is_not_generic(self, watt_factor):
         assert not watt_factor["f9_swap_entities_4"].means(watt_factor["f9"])
 
-    def test_generic_factors_equal(self, watt_factor):
+    def test_generic_terms_equal(self, watt_factor):
         assert watt_factor["f2_generic"].means(watt_factor["f2_false_generic"])
         assert watt_factor["f2_generic"].means(watt_factor["f3_generic"])
 
-    def test_equal_referencing_diffent_generic_factors(self, make_factor):
+    def test_equal_referencing_diffent_generic_terms(self, make_factor):
         assert make_factor["f_murder"].means(make_factor["f_murder_craig"])
 
     def test_generic_and_specific_factors_unequal(self, watt_factor):
@@ -310,16 +306,6 @@ class TestSameMeaning:
         )
 
         assert ann_and_bob_were_family.means(bob_and_ann_were_family)
-
-    def test_unequal_due_to_repeating_entity(self, make_factor):
-        """I'm not convinced that a model of a Fact ever needs to include
-        multiple references to the same Entity just because the name of the
-        Entity appears more than once in the Predicate."""
-        f = make_factor
-        assert not f["f_three_entities"].means(f["f_repeating_entity"])
-        assert (
-            f["f_three_entities"].explain_same_meaning(f["f_repeating_entity"]) is None
-        )
 
     def test_unequal_to_enactment(self, watt_factor, e_copyright):
         assert not watt_factor["f1"].means(e_copyright)
@@ -640,8 +626,8 @@ class TestContradiction:
             right, easy_register, comparison=means
         )
         harder_register = ContextRegister.from_lists(
-            keys=[e["alice"], e["bob"], e["craig"], e["dan"], e["circus"]],
-            values=[e["bob"], e["alice"], e["dan"], e["craig"], e["circus"]],
+            to_replace=[e["alice"], e["bob"], e["craig"], e["dan"], e["circus"]],
+            replacements=[e["bob"], e["alice"], e["dan"], e["craig"], e["circus"]],
         )
         harder_update = left.update_context_register(
             right,
@@ -691,7 +677,7 @@ class TestConsistent:
         left = watt_factor["f8_less"]
         right = watt_factor["f8_meters"]
         register = ContextRegister()
-        register.insert_pair(left.generic_factors()[0], right.generic_factors()[0])
+        register.insert_pair(left.generic_terms()[0], right.generic_terms()[0])
         assert not left.consistent_with(right, register)
         assert left.explain_consistent_with(right, register) is None
 
@@ -699,7 +685,7 @@ class TestConsistent:
         left = watt_factor["f8_less"]
         right = watt_factor["f8_meters"]
         register = ContextRegister()
-        register.insert_pair(left.generic_factors()[0], right.generic_factors()[0])
+        register.insert_pair(left.generic_terms()[0], right.generic_terms()[0])
         explanations = list(left.explanations_consistent_with(right, context=register))
         assert not explanations
 

@@ -1,8 +1,7 @@
 marshmallow
-pint>=0.9
+pint>=0.15
 python-slugify
 requests
 sphinx>=2.1.2
 sphinx-autodoc-typehints
 sphinx-rtd-theme
--e .

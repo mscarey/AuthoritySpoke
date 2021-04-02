@@ -220,7 +220,7 @@ class TestSameMeaning:
         )
         assert not fact.means(fact_b)
 
-    def test_true_and_false_generic_factors_equal(self):
+    def test_true_and_false_generic_terms_equal(self):
         predicate = Predicate("$speaker greeted $listener")
         false_predicate = Predicate("$speaker greeted $listener", truth=False)
         fact = Statement(predicate, terms=[Entity("Al"), Entity("Meg")], generic=True)
@@ -229,7 +229,7 @@ class TestSameMeaning:
         )
         assert fact.means(false_fact)
 
-    def test_generic_factors_with_different_text_equal(self):
+    def test_generic_terms_with_different_text_equal(self):
         predicate = Predicate("$speaker greeted $listener")
         different_predicate = Predicate("$speaker attacked $listener")
         fact = Statement(predicate, terms=[Entity("Al"), Entity("Meg")], generic=True)
@@ -238,7 +238,7 @@ class TestSameMeaning:
         )
         assert fact.means(different_fact)
 
-    def test_equal_referencing_diffent_generic_factors(self):
+    def test_equal_referencing_diffent_generic_terms(self):
         predicate = Predicate("$speaker greeted $listener")
         fact = Statement(predicate, terms=[Entity("Al"), Entity("Meg")])
         fact_b = Statement(predicate, terms=[Entity("Jim"), Entity("Ned")])

@@ -23,9 +23,9 @@ class TestProcedures:
 
     def test_get_terms(self, make_procedure):
         # motel, watt
-        assert len(make_procedure["c1"].generic_factors()) == 2
+        assert len(make_procedure["c1"].generic_terms()) == 2
         # trees, motel
-        assert len(make_procedure["c2"].generic_factors()) == 2
+        assert len(make_procedure["c2"].generic_terms()) == 2
 
     def test_procedure_length(self, make_procedure):
         """Consider deleting Procedure.__len__() and this test."""
@@ -48,14 +48,14 @@ class TestProcedures:
         with pytest.raises(TypeError):
             Procedure(inputs=Entity("Al"), outputs=make_factor["f_shooting"])
 
-    def test_generic_factors(self, make_entity, make_procedure, make_evidence):
+    def test_generic_terms(self, make_entity, make_procedure, make_evidence):
         """
         Finds that for factor f["f7"], it would be consistent with the
         other group of factors for f["f7"]'s two slots to be assigned
         (0, 1) or (1, 0).
         """
         e = make_entity
-        factors = make_procedure["c3"].generic_factors()
+        factors = make_procedure["c3"].generic_terms()
         for factor in (
             e["motel"],
             e["tree_search"],

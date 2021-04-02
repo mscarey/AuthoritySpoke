@@ -445,7 +445,7 @@ The two instances of the phrase “the Java API” are in angle brackets to
 indicate that the Java API is a generic :class:`nettlesome.entities.Entity` mentioned
 in the :class:`~authorityspoke.facts.Fact`\.
 
-    >>> oracle.holdings[0].generic_factors
+    >>> oracle.holdings[0].generic_terms
     [Entity(name='the Java API', generic=True, plural=False, anchors=[])]
 
 
@@ -485,7 +485,7 @@ the :class:`~authorityspoke.holdings.Holding`, which were marked off in
 angle brackets in the string representation of
 the :class:`~authorityspoke.holdings.Holding`\.
 
-    >>> lotus.holdings[0].generic_factors
+    >>> lotus.holdings[0].generic_terms
     [Entity(name='Borland International', generic=True, plural=False, anchors=[]),
     Entity(name='the Lotus menu command hierarchy', generic=True, plural=False, anchors=[])]
 

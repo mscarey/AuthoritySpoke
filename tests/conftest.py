@@ -556,9 +556,6 @@ def make_factor(make_predicate, make_entity) -> Dict[str, Factor]:
         "f_three_entities": build_fact(
             p["p_three_entities"], (0, 1, 2), case_factors=c
         ),
-        "f_repeating_entity": build_fact(
-            p["p_three_entities"], (0, 1, 0), case_factors=c
-        ),
         "f_large_weight": build_fact(p["p_large_weight"], (0,), case_factors=c),
         "f_small_weight": build_fact(p["p_small_weight"], (0,), case_factors=c),
         "f_friends": build_fact(p["p_friends"], (0, 1), case_factors=c),

@@ -166,14 +166,14 @@ class Holding(Comparable):
         """
         return self.rule.procedure.terms
 
-    def generic_factors_by_str(self) -> Dict[str, Comparable]:
+    def generic_terms_by_str(self) -> Dict[str, Comparable]:
         r"""
         Get :class:`.Factor`\s that can be replaced without changing ``self``\s meaning.
 
         :returns:
             generic :class:`.Factor`\s from ``self``'s :class:`Procedure`
         """
-        return self.rule.generic_factors_by_str()
+        return self.rule.generic_terms_by_str()
 
     @property
     def mandatory(self) -> bool:

@@ -81,7 +81,7 @@ class Opinion(Comparable):
     def factors_by_name(self) -> FactorIndex:
         factor_index = FactorIndex()
         for holding in self.holdings:
-            factors_for_holding = holding.recursive_factors
+            factors_for_holding = holding.recursive_terms
             for value in factors_for_holding.values():
                 if not isinstance(value, Holding):
                     factor_index.insert_by_name(value=value)
@@ -90,7 +90,7 @@ class Opinion(Comparable):
     def factors_by_str(self) -> FactorIndex:
         factor_index = FactorIndex()
         for holding in self.holdings:
-            for key, value in holding.recursive_factors.items():
+            for key, value in holding.recursive_terms.items():
                 if not isinstance(value, Holding):
                     factor_index.insert(key=key, value=value)
         return factor_index
@@ -173,7 +173,7 @@ class Opinion(Comparable):
                 context = context.reversed()
             yield from other.explanations_implication(self, context=context)
 
-    def generic_factors_by_str(self) -> Dict[str, Comparable]:
+    def generic_terms_by_str(self) -> Dict[str, Comparable]:
         r"""
         Get all generic :class:`.Factor`\s mentioned in ``self``.
 
@@ -185,7 +185,7 @@ class Opinion(Comparable):
         """
         generics: Dict[str, Comparable] = {}
         for holding in self.holdings:
-            for generic in holding.generic_factors():
+            for generic in holding.generic_terms():
                 generics[str(generic)] = generic
         return generics
 

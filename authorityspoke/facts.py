@@ -111,7 +111,7 @@ class Fact(Statement):
 
     def __str__(self):
         """Create one-line string representation for inclusion in other Facts."""
-        unwrapped = self.predicate.add_truth_to_content(self.content)
+        unwrapped = self.predicate._add_truth_to_content(self.content)
         standard = (
             f"by the standard {self.standard_of_proof}, "
             if self.standard_of_proof

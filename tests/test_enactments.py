@@ -320,13 +320,13 @@ class TestTextSelection:
         statute = fake_usc_client.read_from_json(
             {"exact": "process, system,", "node": "us/usc/t17/s102/b/"}
         )
-        assert not statute.source.endswith("/")
+        assert not statute.node.endswith("/")
 
     def test_add_omitted_initial_slash(self, fake_usc_client):
         statute = fake_usc_client.read_from_json(
             {"exact": "process, system,", "node": "us/usc/t17/s102/b/"}
         )
-        assert statute.source.startswith("/")
+        assert statute.node.startswith("/")
 
     def test_selector_text_split(self):
         data = {"text": "process, system,|method of operation|, concept, principle"}
