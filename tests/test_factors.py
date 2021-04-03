@@ -157,6 +157,10 @@ class TestFacts:
             for factor in factor_list
         )
 
+    def test_no_duplicate_comma_in_evidence(self, make_opinion_with_holding):
+        holding_list = list(make_opinion_with_holding["cardenas_majority"].holdings)
+        assert "addicted to heroin, in showing the fact" in holding_list[0].outputs[0]
+
     def test_new_context_from_factor(self, watt_factor):
         different = watt_factor["f1"].new_context(
             Entity("Great Northern", generic=False)

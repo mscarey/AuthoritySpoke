@@ -68,6 +68,11 @@ class TestProcedures:
     def test_type_of_terms(self, make_procedure):
         assert isinstance(make_procedure["c3"].terms, TermSequence)
 
+    def test_repr(self, make_procedure):
+        assert 'to_effect=Fact(Predicate(template="$person committed a crime"' in repr(
+            make_procedure["c3"]
+        )
+
     def test_entities_of_inputs_for_identical_procedure(
         self, watt_factor, make_procedure, watt_mentioned
     ):

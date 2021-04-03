@@ -87,7 +87,7 @@ class Exhibit(Factor):
             + f'{("asserting " + self.statement.short_string + ", ") if self.statement else ""}'
         )
         string = super().__str__().format(string)
-        return string.replace("exhibit", self.form or "exhibit").strip()
+        return string.replace("exhibit", self.form or "exhibit").strip().strip(",")
 
     @property
     def wrapped_string(self):
