@@ -64,8 +64,8 @@ class TestRules:
                 [watt_factor["f1"], watt_factor["f7"], watt_factor["f2"]]
             )
 
-    def test_cannot_change_context_with_dict(self, make_holding, make_predicate):
-        with pytest.raises(ValueError):
+    def test_cannot_change_context_with_predicates(self, make_holding, make_predicate):
+        with pytest.raises(TypeError):
             make_holding["h1"].new_context({make_predicate["p1"]: make_predicate["p7"]})
 
     def test_cannot_change_context_with_dict_and_terms(
