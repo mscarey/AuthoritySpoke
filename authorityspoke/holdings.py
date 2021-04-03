@@ -157,6 +157,17 @@ class Holding(Comparable):
         return self.rule.enactments_despite
 
     @property
+    def recursive_terms(self) -> Dict[str, Term]:
+        r"""
+        Collect `self`'s :attr:`terms`, and their :attr:`terms`, recursively.
+
+        :returns:
+            a :class:`dict` (instead of a :class:`set`,
+            to preserve order) of :class:`Term`\s.
+        """
+        return self.rule.recursive_terms
+
+    @property
     def terms(self) -> TermSequence:
         r"""
         Call :class:`Procedure`\'s :meth:`~Procedure.terms` method.

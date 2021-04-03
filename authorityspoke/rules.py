@@ -18,6 +18,7 @@ from nettlesome.terms import (
     Comparable,
     ContextRegister,
     Explanation,
+    Term,
     TermSequence,
 )
 from nettlesome.factors import Factor
@@ -113,6 +114,17 @@ class Rule(Comparable):
     @property
     def outputs(self):
         return self.procedure.outputs
+
+    @property
+    def recursive_terms(self) -> Dict[str, Term]:
+        r"""
+        Collect `self`'s :attr:`terms`, and their :attr:`terms`, recursively.
+
+        :returns:
+            a :class:`dict` (instead of a :class:`set`,
+            to preserve order) of :class:`Term`\s.
+        """
+        return self.procedure.recursive_terms
 
     def add(
         self,

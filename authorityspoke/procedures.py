@@ -19,6 +19,7 @@ from nettlesome.terms import (
     ContextRegister,
     Explanation,
     new_context_helper,
+    Term,
 )
 from nettlesome.factors import Factor
 from nettlesome.groups import FactorGroup
@@ -89,6 +90,10 @@ class Procedure(Comparable):
         self.absent = False
         self.generic = False
         self.context_factor_names = ("outputs", "inputs", "despite")
+
+    @property
+    def groups(self) -> List[FactorGroup]:
+        return [self.outputs, self.inputs, self.despite]
 
     def add(
         self,
@@ -236,7 +241,23 @@ class Procedure(Comparable):
         despite = self.despite or ()
         return [*self.outputs, *inputs, *despite]
 
-    def generic_terms_by_str(self) -> Dict[str, Comparable]:
+    @property
+    def recursive_terms(self) -> Dict[str, Term]:
+        r"""
+        Collect `self`'s :attr:`terms`, and their :attr:`terms`, recursively.
+
+        :returns:
+            a :class:`dict` (instead of a :class:`set`,
+            to preserve order) of :class:`Term`\s.
+        """
+        answers: Dict[str, Term] = {}
+
+        for context in self.groups:
+            if context:
+                answers.update(context.recursive_terms)
+        return answers
+
+    def generic_terms_by_str(self) -> Dict[str, Term]:
         r"""
         :class:`.Factor`\s that can be replaced without changing ``self``\s meaning.
 
