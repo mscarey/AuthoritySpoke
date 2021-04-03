@@ -20,6 +20,7 @@ from nettlesome.terms import (
     Explanation,
     new_context_helper,
     Term,
+    TermSequence,
 )
 from nettlesome.factors import Factor
 from nettlesome.groups import FactorGroup
@@ -256,6 +257,22 @@ class Procedure(Comparable):
             if context:
                 answers.update(context.recursive_terms)
         return answers
+
+    @property
+    def terms(self) -> TermSequence:
+        r"""
+        Get :class:`Factor`\s used in comparisons with other :class:`Factor`\s.
+
+        :returns:
+            a tuple of attributes that are designated as the ``terms``
+            for whichever subclass of :class:`Factor` calls this method. These
+            can be used for comparing objects using :meth:`consistent_with`
+        """
+        result: List[Term] = []
+        result.extend(self.outputs)
+        result.extend(self.inputs)
+        result.extend(self.despite)
+        return TermSequence(result)
 
     def generic_terms_by_str(self) -> Dict[str, Term]:
         r"""

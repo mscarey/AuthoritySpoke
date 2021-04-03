@@ -401,7 +401,7 @@ class TestTextAnchors:
         mock_client = FakeClient(responses=make_response)
         to_read = load_holdings("holding_lotus.json")
         holdings = readers.read_holdings(to_read, client=mock_client)
-        assert holdings[8].enactments[0].source.split("/")[-1] == "b"
+        assert holdings[8].enactments[0].node.split("/")[-1] == "b"
 
     def test_enactment_text_limited_to_subsection(self, make_response):
         mock_client = FakeClient(responses=make_response)
