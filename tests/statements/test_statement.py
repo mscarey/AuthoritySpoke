@@ -8,6 +8,8 @@ from nettlesome.predicates import Predicate
 from nettlesome.quantities import Comparison, Q_
 from nettlesome.statements import Statement
 
+from authorityspoke.facts import Fact
+
 
 class TestStatements:
     def test_build_fact(self):
@@ -102,15 +104,15 @@ class TestStatements:
 
     def test_too_much_info_to_change_context(self):
         """Test that a list of terms to replace requires "changes" to be consistent."""
-        statement = Statement(
+        statement = Fact(
             "$person1 loved $person2",
             terms=[Entity("Donald"), Entity("Daisy")],
         )
-        with pytest.raises(ValueError):
-            statement.new_context(
-                changes=Entity("Mickey"),
-                terms_to_replace=[Entity("Donald"), Entity("Daisy")],
-            )
+        new = statement.new_context(
+            changes=Entity("Mickey"),
+            terms_to_replace=[Entity("Donald"), Entity("Daisy")],
+        )
+        assert "<Mickey> loved <Daisy>" in str(new)
 
     def test_get_factor_from_recursive_search(self):
         predicate_shot = Predicate("$shooter shot $victim")

@@ -2,7 +2,8 @@ import operator
 
 import pytest
 
-from nettlesome.terms import ContextRegister, Explanation, TermSequence, means
+from nettlesome.terms import ContextRegister, DuplicateTermError
+from nettlesome.terms import Explanation, TermSequence, means
 from nettlesome.entities import Entity
 from nettlesome.predicates import Predicate
 from nettlesome.quantities import Comparison, Q_
@@ -92,7 +93,7 @@ class TestFacts:
         """I'm not convinced that a model of a Fact ever needs to include
         multiple references to the same Entity just because the name of the
         Entity appears more than once in the Predicate."""
-        with pytest.raises(ValueError):
+        with pytest.raises(DuplicateTermError):
             Fact(
                 make_predicate["p_three_entities"],
                 terms=[Entity("Al"), Entity("Bob"), Entity("Al")],
