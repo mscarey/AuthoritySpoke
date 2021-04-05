@@ -202,27 +202,7 @@ class Rule(Comparable):
         :returns:
             iterator yielding :class:`Rule`\s.
         """
-
-        if len(self.outputs) != 1:
-            raise ValueError(
-                "The 'exclusive' attribute is not allowed for Rules "
-                + "with more than one 'output' Factor. If the set of Factors "
-                + "in 'inputs' is really the only way to reach any of the "
-                + "'outputs', consider making a separate 'exclusive' Rule "
-                + "for each output."
-            )
-        if self.outputs[0].absent:
-            raise ValueError(
-                "The 'exclusive' attribute is not allowed for Rules "
-                + "with an 'absent' 'output' Factor. This would indicate "
-                + "that the output can or must be present in every litigation "
-                + "unless specified inputs are present, which is unlikely."
-            )
-        if not self.inputs:
-            raise ValueError(
-                "The 'exclusive' attribute is not allowed for Rules "
-                + "with no 'input' Factors."
-            )
+        self.procedure.valid_for_exclusive_tag()
 
         for input_factor in self.inputs:
             result = deepcopy(self)

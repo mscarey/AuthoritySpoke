@@ -52,6 +52,9 @@ class TestRules:
         )
         assert "<He-Man> operated" in str(different)
 
+    def test_terms_of_rule_are_its_factors(self, make_rule):
+        assert len(make_rule["h1"].terms) == 3
+
     def test_new_context_non_generic(self, make_holding, watt_factor):
         changes = ContextRegister()
         changes.insert_pair(watt_factor["f1"], watt_factor["f7"])
@@ -63,6 +66,13 @@ class TestRules:
             make_holding["h1"].new_context(
                 [watt_factor["f1"], watt_factor["f7"], watt_factor["f2"]]
             )
+
+    def test_generic_term_by_str(self, make_rule):
+        holding = make_rule["h2"]
+        assert len(holding.generic_terms_by_str()) == 2
+        holding.generic = True
+        result = holding.generic_terms_by_str()
+        assert len(result) == 1
 
     def test_cannot_change_context_with_predicates(self, make_holding, make_predicate):
         with pytest.raises(TypeError):
@@ -603,6 +613,10 @@ class TestAddition:
             c["accept_murder_fact_from_relevance"] + make_factor["f_shooting"]
         )
         assert two_input_rule.means(c["accept_murder_fact_from_relevance_and_shooting"])
+
+    def test_cannot_add_holding_to_rule(self, make_rule, make_holding):
+        with pytest.raises(TypeError):
+            make_rule["h1"] + make_holding["h1"]
 
     def test_add_enactment_to_rule_reverse(self, make_complex_rule, e_due_process_5):
         """

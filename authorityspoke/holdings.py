@@ -99,6 +99,7 @@ class Holding(Comparable):
                     + "not implemented. Try expressing this in another way "
                     + "without the 'exclusive' keyword."
                 )
+            self.rule.procedure.valid_for_exclusive_tag()
 
     @classmethod
     def from_factors(

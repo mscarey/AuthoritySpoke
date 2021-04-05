@@ -6,6 +6,8 @@ import pytest
 from dotenv import load_dotenv
 from legislice.download import Client
 
+from authorityspoke.procedures import Procedure
+from authorityspoke.rules import Rule
 from authorityspoke.holdings import Holding
 
 from nettlesome.terms import ContextRegister, TermSequence
@@ -45,6 +47,28 @@ class TestHolding:
         lotus = make_opinion_with_holding["lotus_majority"]
         assert "the Fact that <Lotus" not in str(lotus.holdings[2])
         assert "the fact that <Lotus" in str(lotus.holdings[2])
+
+    def test_holding_without_inputs_not_exclusive(self, make_factor):
+        with pytest.raises(ValueError):
+            Holding(Rule(Procedure(outputs=make_factor["f_no_crime"])), exclusive=True)
+
+    def test_holding_with_absent_output_not_exclusive(self, make_exhibit):
+        with pytest.raises(ValueError):
+            Holding(
+                Rule(Procedure(outputs=make_exhibit["reciprocal_testimony_absent"])),
+                exclusive=True,
+            )
+
+    def test_holding_with_two_outputs_not_exclusive(self, make_factor):
+        with pytest.raises(ValueError):
+            Holding(
+                Rule(
+                    Procedure(
+                        outputs=[make_factor["f_no_crime"], make_factor["f_shooting"]]
+                    )
+                ),
+                exclusive=True,
+            )
 
     def test_infer_from_exclusive(self, make_opinion_with_holding):
         """

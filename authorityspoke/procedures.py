@@ -700,3 +700,27 @@ class Procedure(Comparable):
         except StopIteration:
             return None
         return self._union_from_explanation(other, explanation)
+
+    def valid_for_exclusive_tag(self) -> None:
+        if len(self.outputs) != 1:
+            raise ValueError(
+                "The 'exclusive' attribute is not allowed for Holdings "
+                + "with more than one 'output' Factor. If the set of Factors "
+                + "in 'inputs' is really the only way to reach any of the "
+                + "'outputs', consider making a separate 'exclusive' Rule "
+                + "for each output."
+            )
+        if self.outputs[0].absent:
+            raise ValueError(
+                "The 'exclusive' attribute is not allowed for Holdings "
+                + "with an 'absent' 'output' Factor. This would indicate "
+                + "that the output can or must be present in every litigation "
+                + "unless specified inputs are present, which is unlikely."
+            )
+        if not self.inputs:
+            raise ValueError(
+                "The 'exclusive' attribute is not allowed for Holdings "
+                + "with no 'input' Factors, since the 'exclusive' attribute "
+                + "asserts that the inputs are the only way to reach the output."
+            )
+        return None
