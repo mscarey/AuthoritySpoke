@@ -313,13 +313,11 @@ class Rule(Comparable):
 
     def comparable_with(self, other: Any) -> bool:
         """Check if other can be compared to self for implication or contradiction."""
-        if not isinstance(other, Comparable):
+        if other and not isinstance(other, Comparable):
             return False
         if isinstance(other, Procedure):
             return False
-        if isinstance(other, Factor):
-            return False
-        return True
+        return not isinstance(other, Factor)
 
     def contradicts(
         self, other: Optional[Comparable], context: Optional[ContextRegister] = None

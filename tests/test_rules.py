@@ -131,6 +131,14 @@ class TestRules:
         rule = make_holding["h1"].rule.add_enactment_despite(e_due_process_14)
         assert "life, liberty, or property" in str(rule).split("DESPITE")[1]
 
+    def test_despite_role_for_added_enactment_typeerror(self, make_holding):
+        with pytest.raises(TypeError):
+            make_holding["h1"].rule.add_enactment_despite(make_holding["h2"])
+
+    def test_add_enactment_typeerror(self, make_holding):
+        with pytest.raises(TypeError):
+            make_holding["h1"].rule.add_enactment(make_holding["h2"])
+
 
 class TestSameMeaning:
     def test_holdings_equivalent_entity_orders_equal(self, make_rule):
@@ -560,6 +568,9 @@ class TestContradiction:
         assert watt_rule.contradicts(must_not_rule)
 
     # Contradiction of other types
+
+    def test_rule_does_not_contradict_none(self, make_rule):
+        assert not make_rule["h1"].contradicts(None)
 
     def test_sometimes_must_contradicts_holding_always_must_not(
         self, make_rule, make_holding
