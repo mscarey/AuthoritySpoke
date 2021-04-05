@@ -687,35 +687,6 @@ class Procedure(Comparable):
                 other.despite, context=explanation_1
             )
 
-    def triggers_next_procedure_if_universal(
-        self,
-        other: Procedure,
-        context: Optional[Union[ContextRegister, Explanation]] = None,
-    ) -> Iterator[ContextRegister]:
-        r"""
-        Test if Factors from firing `self` trigger `other` if both are universal.
-
-        The difference from :func:`triggers_next_procedure` is that this
-        function doesn't require the "despite" :class:`.Factor`\s to
-        be addressed. If both calling :class:`.Rules`\s apply in "ALL"
-        cases where their inputs are present, then it doesn't matter
-        what Factors they apply "despite".
-
-        :param other:
-            another :class:`Procedure` to test to see whether it can
-            be triggered by triggering ``self``
-
-        :returns:
-            whether the set of :class:`Factor`\s that exist after ``self``
-            is fired could trigger ``other``
-        """
-        if not isinstance(context, Explanation):
-            context = Explanation.from_context(context)
-        self_output_or_input = FactorGroup((*self.outputs, *self.inputs))
-        yield from self_output_or_input.explanations_implication(
-            other.inputs, context=context
-        )
-
     def __or__(self, other: Comparable) -> Optional[Comparable]:
         return self.union(other)
 
