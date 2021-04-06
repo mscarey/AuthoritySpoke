@@ -6,6 +6,7 @@ import pytest
 from dotenv import load_dotenv
 from legislice.download import Client
 
+from authorityspoke.facts import Fact
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
 from authorityspoke.holdings import Holding
@@ -14,6 +15,7 @@ from nettlesome.terms import ContextRegister, TermSequence
 from nettlesome.entities import Entity
 from nettlesome.predicates import Predicate
 from nettlesome.statements import Statement
+from nettlesome.groups import FactorGroup
 
 
 load_dotenv()
@@ -113,6 +115,27 @@ class TestHolding:
             "by the STANDARD beyond reasonable doubt".lower()
             in holding.wrapped_string.lower()
         )
+
+    def test_holding_applies_despite_enactments(
+        self, make_holding, e_copyright_requires_originality
+    ):
+        holding = make_holding["h2_despite_due_process"]
+        assert "due process" in str(holding)
+        holding.set_enactments_despite(e_copyright_requires_originality)
+        assert "due process" not in str(holding)
+        assert "Copyright protection subsists" in str(holding)
+
+    def test_set_blank_despite(self, make_holding):
+        holding = make_holding["h2"]
+        assert len(holding.despite) == 1
+        holding.set_despite([])
+        assert len(holding.despite) == 0
+
+    def test_change_outputs(self, make_holding, watt_factor):
+        holding = make_holding["h2"]
+        assert len(holding.outputs) == 1
+        holding.set_outputs([watt_factor["f11"]])
+        assert len(holding.outputs) == 1
 
 
 class TestSameMeaning:
@@ -222,6 +245,31 @@ class TestImplication:
         """
         oracle = make_decision_with_holding["oracle"]
         assert oracle.holdings[18].implies(oracle.holdings[19])
+        assert oracle.holdings[19].implied_by(oracle.holdings[18])
+
+    def test_implication_by_exclusive_holding(
+        self, make_decision_with_holding, e_copyright_protection
+    ):
+        lotus_holding = make_decision_with_holding["lotus"].holdings[0]
+        nonexclusive = Holding.from_factors(
+            inputs=FactorGroup(
+                [
+                    Fact(
+                        "${work} was copyrightable", terms=Entity("the birthday song")
+                    ),
+                    Fact(
+                        "$person copied constituent elements of $work that were original",
+                        terms=[Entity("Eve"), Entity("the birthday song")],
+                    ),
+                ]
+            ),
+            outputs=Fact(
+                "$person infringed the copyright in $work",
+                terms=[Entity("Eve"), Entity("the birthday song")],
+            ),
+            enactments=e_copyright_protection,
+        )
+        assert lotus_holding.implies(nonexclusive)
 
     def test_explanation_same_generic_factor(self, make_decision_with_holding):
         """

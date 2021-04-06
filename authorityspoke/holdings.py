@@ -643,14 +643,14 @@ class HoldingGroup(FactorGroup):
                 )
 
     def explanations_implication(
-        self, other: Comparable, context: Optional[ContextRegister] = None
+        self,
+        other: Comparable,
+        context: Optional[Union[ContextRegister, Explanation]] = None,
     ) -> Iterator[Explanation]:
         if isinstance(other, Rule):
             other = Holding(rule=other)
-        explanation = Explanation(
-            reasons=[],
-            context=context or ContextRegister(),
-            operation=operator.ge,
+        explanation = Explanation.from_context(
+            context=context, current=self, incoming=other
         )
         if isinstance(other, Holding):
             yield from self._explanations_implication_of_holding(

@@ -1,4 +1,12 @@
+import pytest
+
 from authorityspoke.holdings import HoldingGroup
+
+
+class TestMakeHoldingGroup:
+    def test_all_members_must_be_holdings(self, make_rule):
+        with pytest.raises(TypeError):
+            HoldingGroup([make_rule["h1"]])
 
 
 class TestHoldingGroupImplies:
