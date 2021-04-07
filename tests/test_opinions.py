@@ -293,6 +293,7 @@ class TestImplication:
         watt = make_opinion_with_holding["watt_majority"]
         brad = make_opinion_with_holding["brad_majority"]
         assert not watt >= brad
+        assert not watt.implies(brad.holdings)
 
     def test_posit_list_of_holdings_and_imply(self, make_opinion, make_response):
         watt = make_opinion["watt_majority"]
@@ -332,6 +333,14 @@ class TestImplication:
         holdings = watt.holdings[:2]
         assert isinstance(holdings, HoldingGroup)
         assert watt.implies(holdings)
+
+    def test_opinion_implied_by_decision(
+        self, make_holding, make_decision_with_holding
+    ):
+        watt = make_decision_with_holding["watt"]
+        opinion = Opinion()
+        opinion.posit(watt.holdings[0])
+        assert opinion.implied_by(watt)
 
 
 class TestContradiction:

@@ -356,26 +356,28 @@ class Opinion(Comparable):
                 context=context,
             )
 
-    def implied_by_holding(
-        self, other: Holding, context: ContextRegister = None
-    ) -> bool:
-        context = context or ContextRegister()
+    def _implied_by_holding(self, other: Holding, context: Explanation) -> bool:
         return all(
-            other.implies(self_holding, context=context.reversed())
+            other.implies(self_holding, context=context.reversed_context())
             for self_holding in self.holdings
         )
 
-    def implied_by_rule(self, other: Rule, context: ContextRegister = None) -> bool:
-        return self.implied_by_holding(other=Holding(other), context=context)
+    def _implied_by_rule(self, other: Rule, context: Explanation) -> bool:
+        return self._implied_by_holding(other=Holding(other), context=context)
 
     def implied_by(
-        self, other: Union[Opinion, Holding, Rule], context: ContextRegister = None
+        self,
+        other: Union[Opinion, Holding, Rule],
+        context: Optional[Union[ContextRegister, Explanation]] = None,
     ) -> bool:
+        """Determine if other implies all the Holdings of self."""
+        if not isinstance(context, Explanation):
+            context = Explanation.from_context(context)
         if isinstance(other, Holding):
-            return self.implied_by_holding(other, context=context)
+            return self._implied_by_holding(other, context=context)
         elif isinstance(other, Rule):
-            return self.implied_by_rule(other, context=context)
-        return other.implies(self, context=context.reversed())
+            return self._implied_by_rule(other, context=context)
+        return other.implies(self, context=context.reversed_context())
 
     def implies_other_holdings(self, other_holdings: Sequence[Holding]):
         for other_holding in other_holdings:
