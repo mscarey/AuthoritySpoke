@@ -1,5 +1,6 @@
 from copy import deepcopy
 import os
+from typing import Type
 
 import pytest
 
@@ -221,10 +222,7 @@ class TestImplication:
         context.insert_pair(
             Entity("the Java API"), Entity("the Lotus menu command hierarchy")
         )
-        assert holding.implies(
-            lotus,
-            context=context,
-        )
+        assert holding.implies(lotus, context=context)
 
     def test_holding_implies_none(self, make_holding):
         assert make_holding["h3"] >= None
@@ -290,6 +288,14 @@ class TestImplication:
         assert not Statement(
             Predicate("$person was a person"), terms=Entity("Alice")
         ).implies(make_holding["h1"])
+
+    def test_cannot_check_if_holding_implies_factor(self, make_holding, make_factor):
+        with pytest.raises(TypeError):
+            make_holding["h1"].implies(make_factor["f_no_crime"])
+
+    def test_cannot_check_if_holding_implies_string(self, make_holding):
+        with pytest.raises(TypeError):
+            make_holding["h1"].implies("f_no_crime")
 
 
 class TestContradiction:
@@ -425,8 +431,11 @@ class TestContradiction:
         explanation = lotus.holdings[1].explain_contradiction(lotus.holdings[2])
         assert explanation is None
 
+    def test_no_comparison_holding_to_fact(self, make_holding, watt_factor):
+        with pytest.raises(TypeError):
+            make_holding["h1"].contradicts(watt_factor["f1"])
+
     def test_holding_does_not_contradict_fact(self, make_holding, watt_factor):
-        assert not make_holding["h1"].contradicts(watt_factor["f1"])
         assert not watt_factor["f1"].contradicts(make_holding["h1"])
 
     def test_error_no_contradiction_test(self, make_holding):

@@ -26,6 +26,7 @@ from nettlesome.terms import (
     ContextRegister,
     Explanation,
     FactorMatch,
+    Term,
     TermSequence,
     contradicts,
     new_context_helper,
@@ -287,7 +288,8 @@ class Holding(Comparable):
             a generator yielding :class:`.ContextRegister`\s that cause a
             contradiction.
         """
-
+        if not self.comparable_with(other):
+            raise TypeError(f"Type Holding cannot be compared with type {type(other)}.")
         if not isinstance(context, Explanation):
             context = Explanation.from_context(context)
         if isinstance(other, Procedure):
@@ -296,16 +298,9 @@ class Holding(Comparable):
             other = Holding(rule=other)
         if isinstance(other, self.__class__):
             yield from self._explanations_contradiction_of_holding(other, context)
-        elif isinstance(other, Factor):  # other is a Factor
-            yield from []  # no possible contradiction
-        elif hasattr(other, "explanations_contradiction"):
+        else:
             yield from other.explanations_contradiction(
                 self, context=context.reversed_context()
-            )
-        else:
-            raise TypeError(
-                f"'Contradicts' test not implemented for types "
-                f"{self.__class__} and {other.__class__}."
             )
 
     def _contradicts_if_not_exclusive(
@@ -325,8 +320,6 @@ class Holding(Comparable):
     def _explanations_implies_if_not_exclusive(
         self, other: Factor, context: Explanation
     ) -> Iterator[Explanation]:
-        if not isinstance(other, self.__class__):
-            raise TypeError
 
         if self.decided and other.decided:
             yield from self._implies_if_decided(other, context)
@@ -346,6 +339,12 @@ class Holding(Comparable):
 
     def __ge__(self, other: Optional[Factor]) -> bool:
         return self.implies(other)
+
+    def comparable_with(self, other: Any) -> bool:
+        """Check if other can be compared to self for implication or contradiction."""
+        if other and not isinstance(other, Comparable):
+            return False
+        return not isinstance(other, Factor)
 
     def implies(
         self, other: Optional[Comparable], context: ContextRegister = None
@@ -367,26 +366,29 @@ class Holding(Comparable):
         """
         if other is None:
             return True
-        if isinstance(other, (Rule, Procedure)):
-            other = Holding(rule=other)
-        if not isinstance(other, self.__class__):
-            if hasattr(other, "implied_by"):
-                if context:
-                    context = context.reversed()
-                return other.implied_by(self, context=context)
-            return False
         return any(
             explanation is not None
             for explanation in self.explanations_implication(other, context)
         )
 
     def explanations_implication(
-        self, other: Holding, context: Optional[ContextRegister] = None
+        self,
+        other: Comparable,
+        context: Optional[Union[ContextRegister, Explanation]] = None,
     ) -> Iterator[ContextRegister]:
         """Yield contexts that would cause self and other to have same meaning."""
+        if not self.comparable_with(other):
+            raise TypeError(f"Type Holding cannot be compared with type {type(other)}.")
         if not isinstance(context, Explanation):
             context = Explanation.from_context(context)
-        if self.exclusive is other.exclusive is False:
+        if isinstance(other, (Rule, Procedure)):
+            other = Holding(rule=other)
+        if not isinstance(other, self.__class__):
+            if context:
+                context = context.reversed_context()
+            if other.implied_by(self, context=context):
+                yield context
+        elif self.exclusive is other.exclusive is False:
             yield from self._explanations_implies_if_not_exclusive(
                 other, context=context
             )
