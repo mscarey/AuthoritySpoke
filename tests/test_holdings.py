@@ -28,7 +28,7 @@ legislice_client = Client(api_token=TOKEN)
 class TestHolding:
     def test_complex_string(self, make_complex_rule):
         holding = Holding(make_complex_rule["accept_murder_fact_from_relevance"])
-        string = " ".join([x.strip() for x in str(holding).splitlines()])
+        string = " ".join(x.strip() for x in str(holding).splitlines())
         assert "is relevant to show the fact that <Alice>" in string.replace("/n", " ")
 
     def test_string_indentation(self, make_opinion_with_holding):
@@ -128,6 +128,7 @@ class TestHolding:
         holding.set_enactments_despite(e_copyright_requires_originality)
         assert "due process" not in str(holding)
         assert "Copyright protection subsists" in str(holding)
+        assert len(holding.enactments_despite) == 1
 
     def test_set_blank_despite(self, make_holding):
         holding = make_holding["h2"]
@@ -140,6 +141,14 @@ class TestHolding:
         assert len(holding.outputs) == 1
         holding.set_outputs([watt_factor["f11"]])
         assert len(holding.outputs) == 1
+
+    def test_cannot_be_exclusive_and_invalid(self, make_rule):
+        with pytest.raises(NotImplementedError):
+            Holding(rule=make_rule["h1"], exclusive=True, rule_valid=False)
+
+    def test_cannot_be_exclusive_and_undecided(self, make_rule):
+        with pytest.raises(NotImplementedError):
+            Holding(rule=make_rule["h1"], exclusive=True, decided=False)
 
 
 class TestSameMeaning:
@@ -608,6 +617,14 @@ class TestAddition:
         factor = holding.inputs[0].negated()
         assert holding + factor is None
 
+    def test_cannot_add_invalid(self, make_holding):
+        with pytest.raises(NotImplementedError):
+            make_holding["h2"] + make_holding["h2_invalid"]
+
+    def test_cannot_add_undecided(self, make_holding):
+        with pytest.raises(NotImplementedError):
+            make_holding["h2_undecided"] + make_holding["h2"]
+
 
 class TestUnion:
     def test_union_neither_universal(self, make_opinion_with_holding):
@@ -625,6 +642,15 @@ class TestUnion:
         feist = make_opinion_with_holding["feist_majority"]
         result_of_union = feist.holdings[10] | feist.holdings[3]
         assert isinstance(result_of_union, Holding)
+        assert result_of_union.universal is False
+
+    def test_union_of_mandatory_and_mandatory_is_mandatory(
+        self, make_opinion_with_holding
+    ):
+        feist = make_opinion_with_holding["feist_majority"]
+        result_of_union = feist.holdings[0] | feist.holdings[2]
+        assert result_of_union.mandatory
+        assert result_of_union.universal
 
     def test_no_union_with_opinion(self, make_holding, make_opinion_with_holding):
         holding = make_holding["h1"]
