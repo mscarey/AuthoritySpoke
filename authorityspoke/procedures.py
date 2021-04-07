@@ -293,7 +293,7 @@ class Procedure(Comparable):
         }
         return generic_dict
 
-    def add_factor(self, incoming: Factor) -> Procedure:
+    def add_factor(self, incoming: Factor) -> Optional[Procedure]:
         """
         Add an input :class:`.Factor`.
 
@@ -303,7 +303,9 @@ class Procedure(Comparable):
         :returns:
             a new version of ``self`` with the specified change
         """
-        new_factors = list(self.inputs) + [incoming]
+        new_factors = self.inputs + incoming
+        if new_factors is None:
+            return None
         result = deepcopy(self)
         result.set_inputs(new_factors)
         return result

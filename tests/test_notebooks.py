@@ -101,7 +101,7 @@ class TestIntroduction:
         assert "<the Lotus menu command hierarchy> is like <the Java API>" in str(
             explanation
         )
-        assert 'Entity(name="the Java API"' in repr(explanation)
+        assert "Entity(name='the Java API'" in repr(explanation)
 
     def test_decision_explain_contradiction(self, make_decision_with_holding):
         oracle = make_decision_with_holding["oracle"]

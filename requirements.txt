@@ -2,7 +2,7 @@ anchorpoint>=0.4.4
 apispec[validation]~=4.3.0
 marshmallow>=3.10
 legislice>=0.5.0
-git+git://github.com/mscarey/nettlesome.git@c1c680b542ce74edc39747d32ea024ff24363ae6#egg=nettlesome
+git+git://github.com/mscarey/nettlesome.git@beb4d3f6eb2c731d47afcdcec4d422745400a3d0#egg=nettlesome
 pint>=0.15
 python-dotenv
 python-slugify

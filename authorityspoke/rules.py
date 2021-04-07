@@ -273,7 +273,7 @@ class Rule(Comparable):
         result.set_enactments_despite(new_enactments)
         return result
 
-    def add_factor(self, incoming: Factor) -> Rule:
+    def add_factor(self, incoming: Factor) -> Optional[Rule]:
         """
         Make new version of ``self`` with an added input, output, or despite :class:`.Factor`.
 
@@ -287,6 +287,8 @@ class Rule(Comparable):
             a new version of ``self`` with the specified change
         """
         new_procedure = self.procedure.add_factor(incoming)
+        if new_procedure is None:
+            return None
         result = deepcopy(self)
         result.procedure = new_procedure
         return result

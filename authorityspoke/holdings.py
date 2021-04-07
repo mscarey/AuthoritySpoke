@@ -224,7 +224,7 @@ class Holding(Comparable):
                     return added
         return None
 
-    def __add__(self, other: Factor) -> Optional[Union[Rule, Holding]]:
+    def __add__(self, other: Comparable) -> Optional[Union[Rule, Holding]]:
         """
         Create new Holding combining self and other into a single step, if possible.
 

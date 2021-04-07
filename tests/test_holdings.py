@@ -39,6 +39,9 @@ class TestHolding:
         lotus = make_opinion_with_holding["lotus_majority"]
         assert "    OF:\n" in str(lotus.holdings[2])
 
+    def test_repr(self, make_holding):
+        assert "rule=Rule(" in repr(make_holding["h1"])
+
     def test_line_break_in_fact_within_holding(self, make_opinion_with_holding):
         """
         Test that holding uses the Fact string method with line breaks.
@@ -599,6 +602,11 @@ class TestAddition:
         left = make_rule["h2_ALL"]
         right = make_rule["h3_ALL"]
         assert left + right is None
+
+    def test_add_contradictory_factor(self, make_holding):
+        holding = make_holding["h1"]
+        factor = holding.inputs[0].negated()
+        assert holding + factor is None
 
 
 class TestUnion:
