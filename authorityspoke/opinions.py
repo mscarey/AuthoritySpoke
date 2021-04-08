@@ -168,10 +168,10 @@ class Opinion(Comparable):
             yield from self.holdings.explanations_implication(
                 other.holdings, context=context
             )
-        elif hasattr(other, "explanations_implication"):
+        else:
             if context:
                 context = context.reversed()
-            yield from other.explanations_implication(self, context=context)
+            yield from other.explanations_implied_by(self, context=context)
 
     def generic_terms_by_str(self) -> Dict[str, Comparable]:
         r"""

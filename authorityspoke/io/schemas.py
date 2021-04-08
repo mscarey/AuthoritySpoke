@@ -141,7 +141,7 @@ class DecisionSchema(ExpandableSchema):
     # docket_number = fields.Str(missing=None)
     # reporter = fields.Str(missing=None)
     # volume = fields.Str(missing=None)
-    _id = fields.Int(data_key="id")
+    id = fields.Int()
     cites_to = fields.Nested(CaseCitationSchema, many=True, missing=list)
 
     class Meta:

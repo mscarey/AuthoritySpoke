@@ -1,12 +1,20 @@
 from copy import deepcopy
+from datetime import date
 
 import pytest
+
+from authorityspoke.decisions import Decision, Opinion
 
 
 class TestDecision:
     def test_decision_string(self, make_decision):
         decision = make_decision["cardenas"]
         assert str(decision) == "People v. Cardenas, 31 Cal. 3d 897 (1982-07-08)"
+
+    def test_decision_no_opinions(self):
+        decision = Decision(date(2000, 2, 2))
+        assert decision.majority is None
+        assert not decision.implied_by(None)
 
     def test_posit_holdings(self, make_decision, make_holding):
         """
@@ -61,6 +69,14 @@ class TestImplication:
     ):
         oracle = make_decision_with_holding["oracle"]
         assert not oracle.implies(make_procedure["c1"])
+
+    def test_opinion_implies_decision(self, make_holding, make_opinion_with_holding):
+        watt = make_opinion_with_holding["watt_majority"]
+        decision = Decision(
+            date=date(2000, 1, 1), opinions=Opinion(position="majority")
+        )
+        decision.posit(watt.holdings[0])
+        assert watt.implies(decision)
 
 
 class TestContradiction:
