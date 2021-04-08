@@ -87,14 +87,6 @@ class Opinion(Comparable):
                     factor_index.insert_by_name(value=value)
         return factor_index
 
-    def factors_by_str(self) -> FactorIndex:
-        factor_index = FactorIndex()
-        for holding in self.holdings:
-            for key, value in holding.recursive_terms.items():
-                if not isinstance(value, Holding):
-                    factor_index.insert(key=key, value=value)
-        return factor_index
-
     @property
     def holdings(self):
         return HoldingGroup(self._holdings)
