@@ -1,5 +1,20 @@
 Changelog
 =========
+dev
+-----------------
+- Comparison methods use Explanations instead of ContextRegisters
+- remove io/anchors module
+- remove "factors" module that conflicted with Nettlesome module of same name
+- add Fact.negated method
+- remove "role" param for Procedure.add_factor
+- let either operand have extra Enactments when adding Rules
+- Procedure.recursive_terms doesn't include FactorGroups
+- Procedure.terms doesn't include FactorGroups
+- add comparable_with methods
+- Decision is no longer a dataclass
+- remove context param from Opinion comparisons
+- handle Opinion.explanations_implication(HoldingGroup)
+- Increase minimum Nettlesome version to 0.5.0
 
 0.5.1 (2021-03-08)
 ------------------
