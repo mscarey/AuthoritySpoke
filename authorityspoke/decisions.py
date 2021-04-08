@@ -108,9 +108,7 @@ class Decision(Comparable):
     @property
     def holdings(self) -> HoldingGroup:
         if self.majority is None:
-            raise NotImplementedError(
-                "Cannot determine Holdings of Decision with no known majority Opinion."
-            )
+            return HoldingGroup()
         return HoldingGroup(self.majority.holdings)
 
     def contradicts(self, other):

@@ -308,6 +308,20 @@ class TestImplication:
         assert watt > brad
         assert not brad >= watt
 
+    def test_error_to_compare_to_str(self, make_opinion):
+        watt = make_opinion["watt_majority"]
+        with pytest.raises(TypeError):
+            watt.implies("this")
+
+    def test_error_to_check_contradiction_of_str(self, make_opinion):
+        watt = make_opinion["watt_majority"]
+        with pytest.raises(TypeError):
+            watt.contradicts("this")
+
+    def test_opinion_implies_None(self, make_opinion, make_holding):
+        watt = make_opinion["watt_majority"]
+        assert watt.implies(None)
+
     def test_opinion_implies_holding(self, make_opinion, make_holding):
         watt = make_opinion["watt_majority"]
         watt.posit(make_holding["h2_invalid_undecided"])
@@ -405,6 +419,14 @@ class TestContradiction:
         lotus = make_decision_with_holding["lotus"]
         explanation = oracle_majority.explain_contradiction(lotus)
         assert "contradicts" in str(explanation).lower()
+
+    def test_no_explanation_of_contradiction(self, make_opinion_with_holding):
+        watt = make_opinion_with_holding["watt_majority"]
+        holdings = watt.holdings[:2]
+        assert isinstance(holdings, HoldingGroup)
+        assert watt.implies(holdings)
+        explanation = watt.explain_contradiction(holdings)
+        assert explanation is None
 
     def test_error_contradiction_with_procedure(self, make_opinion, make_procedure):
         with pytest.raises(TypeError):
