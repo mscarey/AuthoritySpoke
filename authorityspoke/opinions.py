@@ -106,16 +106,19 @@ class Opinion(Comparable):
     def explanations_contradiction(
         self,
         other: Comparable,
-        context: Optional[ContextRegister] = None,
     ) -> Iterator[Explanation]:
         """Yield contexts that would result in a contradiction between self and other."""
+        if not self.comparable_with(other):
+            raise TypeError(
+                f"'Implies' test not implemented for types {self.__class__} and {other.__class__}."
+            )
         if isinstance(other, Rule):
             other = Holding(rule=other)
         if isinstance(other, Holding):
-            yield from self.holdings.explanations_contradiction(other, context)
+            yield from self.holdings.explanations_contradiction(other)
 
         elif isinstance(other, self.__class__):
-            yield from self.holdings.explanations_contradiction(other.holdings, context)
+            yield from self.holdings.explanations_contradiction(other.holdings)
 
         elif hasattr(other, "explanations_contradiction"):
             yield from other.explanations_contradiction(self)
@@ -150,8 +153,28 @@ class Opinion(Comparable):
             return self.implies_other_holdings(other)
         return any(self.explanations_implication(other))
 
+    def explain_implication(
+        self,
+        other: Comparable,
+    ) -> Optional[Explanation]:
+        explanations = self.explanations_implication(other)
+        try:
+            explanation = next(explanations)
+        except StopIteration:
+            return None
+        return explanation
+
+    def explain_contradiction(self, other: Comparable) -> Optional[Explanation]:
+        explanations = self.explanations_contradiction(other)
+        try:
+            explanation = next(explanations)
+        except StopIteration:
+            return None
+        return explanation
+
     def explanations_implication(
-        self, other: Comparable, context: Optional[ContextRegister] = None
+        self,
+        other: Comparable,
     ) -> Iterator[Union[ContextRegister, Explanation]]:
         """Yield contexts that would result in self implying other."""
         if not self.comparable_with(other):
@@ -162,16 +185,12 @@ class Opinion(Comparable):
             other = Holding(rule=other)
         if isinstance(other, Holding):
             for self_holding in self.holdings:
-                yield from self_holding.explanations_implication(other, context)
+                yield from self_holding.explanations_implication(other)
 
         elif isinstance(other, self.__class__):
-            yield from self.holdings.explanations_implication(
-                other.holdings, context=context
-            )
+            yield from self.holdings.explanations_implication(other.holdings)
         else:
-            if context:
-                context = context.reversed()
-            yield from other.explanations_implied_by(self, context=context)
+            yield from other.explanations_implied_by(self)
 
     def generic_terms_by_str(self) -> Dict[str, Comparable]:
         r"""

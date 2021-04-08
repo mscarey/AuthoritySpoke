@@ -299,9 +299,7 @@ class Holding(Comparable):
         if isinstance(other, self.__class__):
             yield from self._explanations_contradiction_of_holding(other, context)
         else:
-            yield from other.explanations_contradiction(
-                self, context=context.reversed_context()
-            )
+            yield from other.explanations_contradiction(self)
 
     def _contradicts_if_not_exclusive(
         self, other: Holding, context: Explanation

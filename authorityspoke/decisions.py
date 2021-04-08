@@ -121,11 +121,9 @@ class Decision(Comparable):
         return self.majority.contradicts(other)
 
     def explain_contradiction(
-        self,
-        other: Union[Opinion, Holding, Rule],
-        context: Optional[ContextRegister] = None,
+        self, other: Union[Opinion, Holding, Rule]
     ) -> Optional[Explanation]:
-        explanations = self.explanations_contradiction(other, context=context)
+        explanations = self.explanations_contradiction(other)
         try:
             explanation = next(explanations)
         except StopIteration:
@@ -135,18 +133,13 @@ class Decision(Comparable):
     def explanations_contradiction(
         self,
         other: Union[Decision, Opinion, Holding, Rule],
-        context: Optional[ContextRegister] = None,
     ) -> Iterator[Explanation]:
         if isinstance(other, Decision):
             if self.majority and other.majority:
-                yield from self.majority.explanations_contradiction(
-                    other.majority, context=context
-                )
+                yield from self.majority.explanations_contradiction(other.majority)
         elif isinstance(other, (Rule, Holding, Opinion)):
             if self.majority:
-                yield from self.majority.explanations_contradiction(
-                    other, context=context
-                )
+                yield from self.majority.explanations_contradiction(other)
         else:
             raise TypeError(
                 f"'Contradicts' test not implemented for types "
@@ -156,9 +149,8 @@ class Decision(Comparable):
     def explain_implication(
         self,
         other: Union[Opinion, Holding, Rule],
-        context: Optional[ContextRegister] = None,
     ) -> Optional[Explanation]:
-        explanations = self.explanations_implication(other, context=context)
+        explanations = self.explanations_implication(other)
         try:
             explanation = next(explanations)
         except StopIteration:
@@ -166,20 +158,14 @@ class Decision(Comparable):
         return explanation
 
     def explanations_implication(
-        self,
-        other: Union[Decision, Opinion, Holding, Rule],
-        context: Optional[ContextRegister] = None,
+        self, other: Union[Decision, Opinion, Holding, Rule]
     ) -> Iterator[Explanation]:
         if isinstance(other, Decision):
             if self.majority and other.majority:
-                yield from self.majority.explanations_implication(
-                    other.majority, context=context
-                )
+                yield from self.majority.explanations_implication(other.majority)
         elif isinstance(other, (Rule, Holding, Opinion)):
             if self.majority:
-                yield from self.majority.explanations_implication(
-                    other, context=context
-                )
+                yield from self.majority.explanations_implication(other)
         else:
             raise TypeError(
                 f"'Implication' test not implemented for types "
