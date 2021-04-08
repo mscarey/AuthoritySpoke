@@ -333,6 +333,16 @@ class TestImplication:
         holdings = watt.holdings[:2]
         assert isinstance(holdings, HoldingGroup)
         assert watt.implies(holdings)
+        explanation = watt.explain_implication(holdings)
+        assert len(explanation.reasons) == 2
+
+    def test_opinion_does_not_imply_holding_group(self, make_opinion_with_holding):
+        watt = make_opinion_with_holding["watt_majority"]
+        holdings = make_opinion_with_holding["oracle_majority"].holdings
+        assert isinstance(holdings, HoldingGroup)
+        assert not watt.implies(holdings)
+        explanation = watt.explain_implication(holdings)
+        assert explanation is None
 
     def test_opinion_implied_by_decision(
         self, make_holding, make_decision_with_holding

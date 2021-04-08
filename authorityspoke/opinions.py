@@ -186,7 +186,8 @@ class Opinion(Comparable):
         if isinstance(other, Holding):
             for self_holding in self.holdings:
                 yield from self_holding.explanations_implication(other)
-
+        if isinstance(other, HoldingGroup):
+            yield from self.holdings.explanations_implication(other)
         elif isinstance(other, self.__class__):
             yield from self.holdings.explanations_implication(other.holdings)
         else:
