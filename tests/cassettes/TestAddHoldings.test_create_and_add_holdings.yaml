@@ -1,0 +1,141 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.25.1
+      authorization:
+      - DUMMY
+    method: GET
+    uri: https://authorityspoke.com/api/v1/us/usc/t18/s1960/a/
+  response:
+    body:
+      string: '{"heading":"","start_date":"2013-07-18","node":"/us/usc/t18/s1960/a","text_version":{"id":943736,"url":"https://authorityspoke.com/api/v1/textversions/943736/","content":"Whoever
+        knowingly conducts, controls, manages, supervises, directs, or owns all or
+        part of an unlicensed money transmitting business, shall be fined in accordance
+        with this title or imprisoned not more than 5 years, or both."},"url":"https://authorityspoke.com/api/v1/us/usc/t18/s1960/a/","end_date":null,"children":[],"citations":[],"parent":"https://authorityspoke.com/api/v1/us/usc/t18/s1960/"}'
+    headers:
+      Allow:
+      - GET, POST, PUT, PATCH, HEAD, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '568'
+      Content-Type:
+      - application/json
+      Date:
+      - Fri, 09 Apr 2021 20:23:04 GMT
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - gunicorn/20.0.4
+      Vary:
+      - Accept, Cookie
+      Via:
+      - 1.1 vegur
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.25.1
+      authorization:
+      - DUMMY
+    method: GET
+    uri: https://authorityspoke.com/api/v1/coverage/us/usc/
+  response:
+    body:
+      string: '{"uri":"/us/usc","latest_heading":"United States Code (USC)","first_published":"1926-06-30","earliest_in_db":"2013-07-18","latest_in_db":"2021-01-05"}'
+    headers:
+      Allow:
+      - GET, HEAD, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '150'
+      Content-Type:
+      - application/json
+      Date:
+      - Fri, 09 Apr 2021 20:23:05 GMT
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - gunicorn/20.0.4
+      Vary:
+      - Accept, Cookie
+      Via:
+      - 1.1 vegur
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.25.1
+      authorization:
+      - DUMMY
+    method: GET
+    uri: https://authorityspoke.com/api/v1/us/usc/t18/s1960/b/2/
+  response:
+    body:
+      string: "{\"heading\":\"\",\"start_date\":\"2013-07-18\",\"node\":\"/us/usc/t18/s1960/b/2\",\"text_version\":{\"id\":943741,\"url\":\"https://authorityspoke.com/api/v1/textversions/943741/\",\"content\":\"the
+        term \u201Cmoney transmitting\u201D includes transferring funds on behalf
+        of the public by any and all means including but not limited to transfers
+        within this country or to locations abroad by wire, check, draft, facsimile,
+        or courier; and\"},\"url\":\"https://authorityspoke.com/api/v1/us/usc/t18/s1960/b/2/\",\"end_date\":null,\"children\":[],\"citations\":[],\"parent\":\"https://authorityspoke.com/api/v1/us/usc/t18/s1960/b/\"}"
+    headers:
+      Allow:
+      - GET, POST, PUT, PATCH, HEAD, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '588'
+      Content-Type:
+      - application/json
+      Date:
+      - Fri, 09 Apr 2021 20:23:05 GMT
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - gunicorn/20.0.4
+      Vary:
+      - Accept, Cookie
+      Via:
+      - 1.1 vegur
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+version: 1

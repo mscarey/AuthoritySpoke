@@ -1,6 +1,8 @@
 import os
 from dotenv import load_dotenv
 
+import pytest
+
 from legislice.download import Client
 from authorityspoke import Entity, Fact, Predicate, Holding
 
@@ -18,6 +20,7 @@ class TestAddHoldings:
     No. 2019-0395 (D.D.C. 2020) (December 24th, 2020)
     """
 
+    @pytest.mark.vcr
     def test_create_and_add_holdings(self):
         offense_statute = CLIENT.read("/us/usc/t18/s1960/a")
         no_license = Fact(
