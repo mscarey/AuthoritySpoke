@@ -125,47 +125,6 @@ class OpinionSchema(ExpandableSchema):
         return data
 
 
-class DecisionSchema(ExpandableSchema):
-    """Schema for decisions retrieved from Caselaw Access Project API."""
-
-    __model__ = Decision
-    name = fields.Str()
-    name_abbreviation = fields.Str(missing=None)
-    citations = fields.Nested(CaseCitationSchema, many=True)
-    opinions = fields.Nested(OpinionSchema, many=True)
-    first_page = fields.Int()
-    last_page = fields.Int()
-    date = fields.Date(data_key="decision_date")
-    court = fields.Str()
-    jurisdiction = fields.Str(missing=None)
-    # docket_number = fields.Str(missing=None)
-    # reporter = fields.Str(missing=None)
-    # volume = fields.Str(missing=None)
-    id = fields.Int()
-    cites_to = fields.Nested(CaseCitationSchema, many=True, missing=list)
-
-    class Meta:
-        unknown = EXCLUDE
-
-    @pre_load
-    def format_data_to_load(self, data: RawDecision, **kwargs) -> RawDecision:
-        """Transform data from CAP API response for loading."""
-        if not isinstance(data["court"], str):
-            data["court"] = data.get("court", {}).get("slug", "")
-        data["jurisdiction"] = data.get("jurisdiction", {}).get("slug", "")
-        data["opinions"] = (
-            data.get("casebody", {}).get("data", {}).get("opinions", [{}])
-        )
-        data.pop("docket_number", None)
-        data.pop("casebody", None)
-        data.pop("preview", None)
-        data.pop("reporter", None)
-        data.pop("volume", None)
-        del data["url"]
-        data.pop("frontend_url", None)
-        return data
-
-
 class EnactmentSchema(LegisliceSchema):
     def get_indexed_enactment(self, data, **kwargs):
         """Replace data to load with any object with same name in "enactment_index"."""

@@ -11,7 +11,7 @@ from marshmallow import ValidationError
 from anchorpoint.textselectors import TextQuoteSelector, TextPositionSelector
 from anchorpoint.schemas import SelectorSchema
 from legislice import Enactment
-from legislice.schemas import EnactmentSchema as LegisliceSchema
+from legislice.schemas import EnactmentSchema
 from legislice.schemas import enactment_needs_api_update
 from nettlesome.entities import Entity
 from nettlesome.predicates import Predicate
@@ -121,25 +121,9 @@ class DecisionSchema(Schema):
         data.pop("frontend_url", None)
         return data
 
-
-class EnactmentSchema(LegisliceSchema):
-    def get_indexed_enactment(self, data, **kwargs):
-        """Replace data to load with any object with same name in "enactment_index"."""
-        if isinstance(data, str):
-            name_to_retrieve = data
-        elif data.get("name") and enactment_needs_api_update(data):
-            name_to_retrieve = data["name"]
-        else:
-            return data
-
-        mentioned = self.context.get("enactment_index") or EnactmentIndex()
-        return deepcopy(mentioned.get_by_name(name_to_retrieve))
-
-    @pre_load
-    def format_data_to_load(self, data, **kwargs):
-        """Prepare Enactment to load."""
-        data = self.get_indexed_enactment(data)
-        return super().format_data_to_load(data)
+    @post_load
+    def make_object(self, data, **kwargs):
+        return self.__model__(**data)
 
 
 def dump_quantity(obj: Predicate) -> Optional[Union[date, float, int, str]]:
@@ -347,29 +331,9 @@ class RuleSchema(Schema):
     name = fields.Str(missing=None)
     generic = fields.Bool(missing=False)
 
-    @pre_load
-    def format_data_to_load(self, data: Dict, **kwargs) -> RawRule:
-        """Prepare to load Rule."""
-        data = self.wrap_single_element_in_list(data, "enactments")
-        data = self.wrap_single_element_in_list(data, "enactments_despite")
-        procedure_fields = ("inputs", "despite", "outputs")
-        data["procedure"] = data.get("procedure") or {}
-        for field in procedure_fields:
-            if field in data:
-                data["procedure"][field] = data.pop(field)
-        return data
-
     @post_load
     def make_object(self, data, **kwargs):
-        rule = self.__model__(**data)
-
-        for enactment in rule.enactments:
-            if not enactment.selected_text():
-                enactment.select_all()
-        for despite in rule.enactments_despite:
-            if not despite.selected_text():
-                despite.select_all()
-        return rule
+        return self.__model__(**data)
 
 
 class HoldingSchema(Schema):
@@ -383,36 +347,6 @@ class HoldingSchema(Schema):
     generic = fields.Bool(missing=False)
     anchors = fields.Nested(SelectorSchema, many=True)
 
-    def nest_fields_inside_rule(self, data: Dict) -> RawHolding:
-        """Nest fields inside "rule" and "procedure", if not already nested."""
-        data["rule"]["procedure"] = data["rule"].get("procedure") or {}
-        procedure_fields = ("inputs", "despite", "outputs")
-        for field in procedure_fields:
-            if field in data:
-                data["rule"]["procedure"][field] = data.pop(field)
-            if field in data["rule"]:
-                data["rule"]["procedure"][field] = data["rule"].pop(field)
-
-        return data
-
-    @pre_load
-    def format_data_to_load(self, data: RawHolding, **kwargs) -> RawHolding:
-        """Prepare to load Holding."""
-        data = self.get_from_mentioned(data)
-
-        data["rule"] = data.get("rule") or {}
-        to_nest = [
-            "procedure",
-            "enactments",
-            "enactments_despite",
-            "mandatory",
-            "universal",
-        ]
-        data = nest_fields(data, nest="rule", eggs=to_nest)
-        data = self.nest_fields_inside_rule(data)
-
-        return data
-
 
 class NamedAnchors(NamedTuple):
     name: Factor
@@ -425,11 +359,6 @@ class NamedAnchorsSchema(Schema):
     name = fields.Nested(FactorSchema)
     quotes = fields.Nested(SelectorSchema, many=True)
 
-    @pre_load
-    def format_data_to_load(self, data, **kwargs):
-        data = self.wrap_single_element_in_list(data, "quotes")
-        return data
-
 
 class AnchoredEnactments(NamedTuple):
     enactment: Enactment
@@ -441,48 +370,6 @@ class AnchoredEnactmentsSchema(Schema):
 
     enactment = fields.Nested(EnactmentSchema)
     quotes = fields.Nested(SelectorSchema, many=True)
-
-    @pre_load
-    def format_data_to_load(self, data, **kwargs):
-        data = self.wrap_single_element_in_list(data, "quotes")
-        return data
-
-
-class AnchoredHoldingsSchema(Schema):
-    __model__ = AnchoredHoldings
-
-    holdings = fields.Nested(HoldingSchema, many=True)
-    factor_anchors = fields.Nested(NamedAnchorsSchema, many=True)
-    enactment_anchors = fields.Nested(AnchoredEnactmentsSchema, many=True)
-
-    @pre_load
-    def format_data_to_load(self, data: RawFactor, **kwargs) -> RawFactor:
-        """Expand data if it was just a name reference in the JSON input."""
-
-        data["holdings"] = self.get_from_mentioned(data["holdings"])
-        return data
-
-    @post_load
-    def make_object(self, data, **kwargs) -> AnchoredHoldings:
-        """Make AuthoritySpoke object out of whatever data has been loaded."""
-        text_links = {}
-        enactment_links = {}
-
-        if data.get("factor_anchors"):
-            for linked in data["factor_anchors"]:
-                text_links[linked.name.key] = linked.quotes
-
-        if data.get("enactment_anchors"):
-            for linked in data["enactment_anchors"]:
-                enactment_links[str(linked.enactment)] = linked.quotes
-
-        holding_anchors = [holding.anchors for holding in data["holdings"]]
-        return AnchoredHoldings(
-            data["holdings"],
-            holding_anchors,
-            named_anchors=text_links,
-            enactment_anchors=enactment_links,
-        )
 
 
 SCHEMAS = list(Schema.__subclasses__()) + [SelectorSchema, EnactmentSchema]

@@ -103,6 +103,13 @@ class Rule(Comparable):
         self.absent = False
         self.name = name
 
+        for enactment in self.enactments:
+            if not enactment.selected_text():
+                enactment.select_all()
+        for despite in self.enactments_despite:
+            if not despite.selected_text():
+                despite.select_all()
+
     @property
     def despite(self):
         return self.procedure.despite
