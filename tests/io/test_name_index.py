@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 
 from legislice.download import Client
 
-from authorityspoke.io import loaders, readers, schemas
+from authorityspoke.io import loaders, readers, schemas_yaml
 from authorityspoke.io import name_index, text_expansion
 
 load_dotenv()
@@ -254,7 +254,7 @@ class TestRetrieveMentioned:
         """
         This isn't catching the bug where the mentioned dict is mutated.
         """
-        schema = schemas.HoldingSchema()
+        schema = schemas_yaml.HoldingSchema()
         schema.context["mentioned"] = name_index.Mentioned(
             {
                 "Bradley": {"type": "entity"},
@@ -301,7 +301,7 @@ class TestRetrieveMentioned:
 
         mentioned = name_index.Mentioned(self.overlapping_names_mentioned)
         content = "Mecha Godzilla threw Mothra at Godzilla"
-        schema = schemas.FactSchema()
+        schema = schemas_yaml.FactSchema()
         mentioned = mentioned.sorted_by_length()
         schema.context["mentioned"] = mentioned
         new_content, context = schema.get_references_from_mentioned(content)
@@ -319,7 +319,7 @@ class TestRetrieveMentioned:
             "content": "$Hamlet lived at Elsinore",
             "terms": [{"type": "Entity", "name": "Hamlet"}],
         }
-        schema = schemas.FactSchema()
+        schema = schemas_yaml.FactSchema()
         schema.context["mentioned"] = name_index.Mentioned(
             {"Elsinore": {"type": "Entity"}}
         )

@@ -4,8 +4,9 @@ import pytest
 
 from nettlesome.quantities import Comparison, Q_
 
-from authorityspoke.io import readers, schemas
+from authorityspoke.io import readers
 from authorityspoke.io.dump import to_dict, to_json
+from authorityspoke.io import schemas_json as schemas
 
 
 class TestPredicateLoad:

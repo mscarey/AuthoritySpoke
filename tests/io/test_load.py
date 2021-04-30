@@ -3,11 +3,19 @@ from authorityspoke.io.downloads import FakeClient
 from authorityspoke.io.loaders import read_holdings_from_file
 
 
-class TestFileLoad:
-    def test_get_correct_filepath(self):
+class TestHoldingLoad:
+    def test_get_json_filepath(self):
         directory = filepaths.get_directory_path("holdings")
         path = filepaths.make_filepath(
             filename="holding_feist.json", directory=directory
+        )
+        raw_holdings = loaders.load_holdings(filepath=path)
+        assert raw_holdings[0]["outputs"]["type"] == "fact"
+
+    def test_get_yaml_filepath(self):
+        directory = filepaths.get_directory_path("holdings")
+        path = filepaths.make_filepath(
+            filename="holding_feist.yaml", directory=directory
         )
         raw_holdings = loaders.load_holdings(filepath=path)
         assert raw_holdings[0]["outputs"]["type"] == "fact"

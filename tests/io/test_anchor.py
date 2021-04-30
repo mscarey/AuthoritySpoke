@@ -1,4 +1,4 @@
-from authorityspoke.io import schemas
+from authorityspoke.io import schemas_yaml
 
 
 class TestCollectAnchors:
@@ -47,6 +47,6 @@ class TestCollectAnchors:
         even if it isn't wrapped in a list, it'll be normalized
         into a list containing a dict with an "exact" field.
         """
-        schema = schemas.SelectorSchema()
+        schema = schemas_yaml.SelectorSchema()
         selector = schema.load(self.fact_string_anchor["anchors"])
         assert selector.exact.startswith("In preparing")

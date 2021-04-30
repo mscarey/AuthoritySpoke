@@ -8,6 +8,8 @@ import pathlib
 
 from typing import Any, Dict, List, Iterator, Optional, Tuple, Union
 
+import yaml
+
 from legislice.download import Client
 
 
@@ -18,7 +20,12 @@ from authorityspoke.rules import Rule
 
 from authorityspoke.io import filepaths, readers
 from authorityspoke.io.name_index import Mentioned
-from authorityspoke.io.schemas import RawEnactment, RawFactor, RawHolding, RawDecision
+from authorityspoke.io.schemas_yaml import (
+    RawEnactment,
+    RawFactor,
+    RawHolding,
+    RawDecision,
+)
 
 
 def load_anchored_holdings(
@@ -51,8 +58,12 @@ def load_anchored_holdings(
     validated_filepath = filepaths.make_filepath(
         filename, directory, filepath, default_folder="holdings"
     )
+
     with open(validated_filepath, "r") as f:
-        holdings = json.load(f)
+        if validated_filepath.suffix == ".yaml":
+            holdings = yaml.safe_load(f)
+        else:
+            holdings = json.load(f)
 
     return holdings
 

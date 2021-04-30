@@ -3,15 +3,15 @@
 from apispec import APISpec
 from apispec.ext.marshmallow import MarshmallowPlugin
 
-from authorityspoke.io.schemas import AllegationSchema, FactSchema
-from authorityspoke.io.schemas import EvidenceSchema, HoldingSchema
+from authorityspoke.io.schemas_json import AllegationSchema, FactSchema
+from authorityspoke.io.schemas_json import EvidenceSchema, HoldingSchema
 
 
 def make_spec() -> APISpec:
     """Generate specification for data used to create AuthoritySpoke objects."""
     holding_spec = APISpec(
         title="AuthoritySpoke Holding API Schema",
-        version="0.2.0",
+        version="0.3.0",
         openapi_version="3.0.2",
         info=dict(description="An interface for annotating judicial holdings"),
         plugins=[MarshmallowPlugin()],

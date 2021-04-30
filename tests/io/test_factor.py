@@ -12,7 +12,8 @@ from nettlesome.quantities import Comparison, QuantityRange
 import pytest
 
 from authorityspoke.facts import Fact
-from authorityspoke.io import readers, schemas, name_index
+from authorityspoke.io import readers, name_index
+from authorityspoke.io import schemas_json, schemas_yaml
 from authorityspoke.io.loaders import load_holdings
 from authorityspoke.io import filepaths
 from authorityspoke.io.dump import to_dict, to_json
@@ -31,27 +32,27 @@ class TestFactorLoad:
 class TestEntityLoad:
     def test_get_entity_schema(self):
         record = {"type": "Entity", "name": "George Washington"}
-        schema = schemas.FactorSchema()
+        schema = schemas_json.FactorSchema()
         obj = schema.load(record)
         assert obj.name == "George Washington"
         assert isinstance(obj, Entity)
 
     def test_load_entity_from_factor_schema(self):
         record = {"type": "Entity", "name": "George Washington"}
-        schema = schemas.FactorSchema()
+        schema = schemas_json.FactorSchema()
         george = schema.load(record)
         assert george.generic is True
 
     def test_load_entity_from_mentioned(self):
         mentioned = name_index.Mentioned({"Lee": {"type": "entity"}})
-        schema = schemas.EntitySchema()
+        schema = schemas_yaml.EntitySchema()
         schema.context["mentioned"] = mentioned
         lee = schema.load("Lee")
         assert lee.name == "Lee"
 
     def test_dump_entity_from_factor_schema(self):
         george = Entity("George Washington")
-        schema = schemas.FactorSchema()
+        schema = schemas_json.FactorSchema()
         record = schema.dump(george)
         assert record["generic"] is True
         assert record["type"] == "Entity"
@@ -66,10 +67,10 @@ class TestEntityLoad:
         it is.
         """
         record = {"name": "John Adams"}
-        schema = schemas.EntitySchema()
+        schema = schemas_json.EntitySchema()
         john = schema.load(record)
         assert john.generic is True
-        factor_schema = schemas.FactorSchema()
+        factor_schema = schemas_json.FactorSchema()
         john_dict = factor_schema.dump(john)
         assert john_dict["type"] == "Entity"
 
@@ -161,13 +162,13 @@ class TestFactDump:
 class TestExhibitDump:
     def test_dump_exhibit(self, make_exhibit):
         exhibit = make_exhibit["shooting_affidavit"]
-        schema = schemas.ExhibitSchema()
+        schema = schemas_json.ExhibitSchema()
         dumped = schema.dump(exhibit)
         assert dumped["statement"]["terms"][0]["name"] == "Alice"
 
     def test_dump_and_load_exhibit(self, make_exhibit):
         exhibit = make_exhibit["no_shooting_entity_order_testimony"]
-        schema = schemas.ExhibitSchema()
+        schema = schemas_json.ExhibitSchema()
         dumped = schema.dump(exhibit)
         loaded = schema.load(dumped)
         assert loaded.form == "testimony"
@@ -177,7 +178,7 @@ class TestExhibitDump:
 class TestEvidenceLoad:
     def test_wrong_schema(self, make_evidence):
         fact_dict = load_holdings("holding_cardenas.json")[1]["inputs"][0]
-        wrong_schema = schemas.EvidenceSchema()
+        wrong_schema = schemas_json.EvidenceSchema()
         with pytest.raises(ValidationError):
             wrong_schema.load(fact_dict)
 
@@ -185,7 +186,7 @@ class TestEvidenceLoad:
 class TestEvidenceDump:
     def test_dump_evidence(self, make_evidence):
         evidence = make_evidence["shooting"]
-        schema = schemas.EvidenceSchema()
+        schema = schemas_json.EvidenceSchema()
         dumped = schema.dump(evidence)
         assert dumped["exhibit"]["statement_attribution"]["name"] == "Alice"
 
@@ -199,7 +200,7 @@ class TestPleading:
 class TestPleadingDump:
     def test_dump_pleading(self, make_pleading):
         pleading = make_pleading["craig"]
-        schema = schemas.PleadingSchema()
+        schema = schemas_json.PleadingSchema()
         dumped = schema.dump(pleading)
         assert dumped["filer"]["name"] == "Craig"
 
@@ -207,6 +208,6 @@ class TestPleadingDump:
 class TestAllegationDump:
     def test_dump_allegation(self, make_allegation):
         allegation = make_allegation["shooting"]
-        schema = schemas.AllegationSchema()
+        schema = schemas_json.AllegationSchema()
         dumped = schema.dump(allegation)
         assert dumped["statement"]["terms"][0]["name"] == "Alice"

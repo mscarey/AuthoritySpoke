@@ -76,6 +76,10 @@ class OpinionSchema(Schema):
         data["author"] = data.get("author", "").strip(",:")
         return data
 
+    @post_load
+    def make_object(self, data: RawOpinion, **kwargs) -> CaseCitation:
+        return self.__model__(**data)
+
 
 class DecisionSchema(Schema):
     """Schema for decisions retrieved from Caselaw Access Project API."""
@@ -219,6 +223,10 @@ class EntitySchema(Schema):
     generic = fields.Bool(missing=True)
     plural = fields.Bool()
 
+    @post_load
+    def make_object(self, data: Dict[str, Union[bool, str]], **kwargs) -> CaseCitation:
+        return self.__model__(**data)
+
 
 class FactSchema(Schema):
     """Schema for Facts, which may contain arbitrary levels of nesting."""
@@ -305,10 +313,6 @@ class FactorSchema(OneOfSchema, Schema):
         "Pleading": PleadingSchema,
     }
 
-    def pre_load(self, data: RawFactor, **kwargs) -> RawFactor:
-        data = self.get_from_mentioned(data)
-        return data
-
     def get_obj_type(self, obj) -> str:
         """Return name of object schema."""
         return obj.__class__.__name__
@@ -326,12 +330,9 @@ class ProcedureSchema(Schema):
     despite = fields.Nested(FactorSchema, many=True)
     outputs = fields.Nested(FactorSchema, many=True)
 
-    @pre_load
-    def format_data_to_load(self, data, **kwargs):
-        """Handle omission of brackets around single item."""
-        for field_name in ("inputs", "despite", "outputs"):
-            data = self.wrap_single_element_in_list(data, field_name)
-        return data
+    @post_load
+    def make_object(self, data, **kwargs):
+        return self.__model__(**data)
 
 
 class RuleSchema(Schema):
@@ -487,13 +488,24 @@ class AnchoredHoldingsSchema(Schema):
 SCHEMAS = list(Schema.__subclasses__()) + [SelectorSchema, EnactmentSchema]
 
 
-def get_schema_for_item(item: Any) -> Schema:
+def get_schema_for_item(classname: str) -> Schema:
     """Find the Marshmallow schema for an AuthoritySpoke object."""
-    if isinstance(item, TextPositionSelector):
-        return SelectorSchema()
-    if isinstance(item, Comparison):
-        return PredicateSchema()
-    for option in SCHEMAS:
-        if item.__class__ == option.__model__:
-            return option()
-    raise ValueError(f"No schema found for class '{item.__class__}'")
+    schemas_for_names = {
+        "TextPositionSelector": SelectorSchema,
+        "TextQuoteSelector": SelectorSchema,
+        "Comparison": PredicateSchema,
+        "Predicate": PredicateSchema,
+        "Fact": FactSchema,
+        "Evidence": EvidenceSchema,
+        "Exhibit": ExhibitSchema,
+        "Allegation": AllegationSchema,
+        "Pleading": PleadingSchema,
+        "Holding": HoldingSchema,
+        "Rule": RuleSchema,
+        "Procedure": ProcedureSchema,
+        "Enactment": EnactmentSchema,
+    }
+    result = schemas_for_names.get(classname)
+    if result is None:
+        raise ValueError(f"No schema found for class '{classname}'")
+    return result()

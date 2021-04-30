@@ -24,7 +24,7 @@ from authorityspoke.rules import Procedure, Rule
 
 from authorityspoke.io import loaders, readers
 from authorityspoke.io.downloads import FakeClient
-from authorityspoke.io.schemas import EnactmentSchema, RawFactor, RawHolding
+from authorityspoke.io.schemas_json import EnactmentSchema, RawFactor, RawHolding
 
 
 load_dotenv()

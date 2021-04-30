@@ -1,5 +1,5 @@
-from authorityspoke.io import dump, text_expansion
-from authorityspoke.io import readers, schemas
+from authorityspoke.io import dump, text_expansion, readers
+from authorityspoke.io import schemas_json as schemas
 
 
 class TestProcedureDump:

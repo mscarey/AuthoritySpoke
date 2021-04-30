@@ -18,12 +18,13 @@ from authorityspoke.decisions import Decision
 from authorityspoke.evidence import Exhibit, Evidence
 from authorityspoke.facts import Fact
 from authorityspoke.holdings import Holding
+from authorityspoke.io import schemas_yaml
 from authorityspoke.opinions import AnchoredHoldings
 from authorityspoke.pleadings import Allegation, Pleading
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
-from authorityspoke.io import schemas
-from authorityspoke.io.schemas import (
+from authorityspoke.io import schemas_json
+from authorityspoke.io.schemas_yaml import (
     RawEnactment,
     RawHolding,
     RawRule,
@@ -43,7 +44,7 @@ FACTOR_SUBCLASSES = {
 
 def read_fact(record: RawFactor) -> Fact:
     r"""
-    Construct a :class:`Fact` after loading a dict from JSON.
+    Construct a :class:`Fact` after loading a dict from YAML.
 
     :param record:
         parameter values to pass to :class:`.FactSchema`\.
@@ -52,14 +53,14 @@ def read_fact(record: RawFactor) -> Fact:
         a :class:`Fact`, with optional mentioned factors
     """
     record, mentioned = index_names(record)
-    schema = schemas.FactSchema()
+    schema = schemas_yaml.FactSchema()
     schema.context["mentioned"] = mentioned
     return schema.load(record)
 
 
 def read_factor(record: RawFactor, client: Optional[Client] = None, **kwargs) -> Factor:
     r"""
-    Turn fields from JSON into a :class:`Factor` object.
+    Turn fields from YAML into a :class:`Factor` object.
 
     :param record:
         parameter values to pass to schema
@@ -68,7 +69,7 @@ def read_factor(record: RawFactor, client: Optional[Client] = None, **kwargs) ->
         to look up any :class:`.Enactment` references
 
     """
-    schema = schemas.FactorSchema(many=False)
+    schema = schemas_yaml.FactorSchema(many=False)
     record, enactment_index = collect_enactments(record)
     if client:
         enactment_index = client.update_entries_in_enactment_index(enactment_index)
@@ -82,7 +83,7 @@ def read_factors(
     record: List[RawFactor], client: Optional[Client] = None, **kwargs
 ) -> Factor:
     r"""
-    Turn fields from JSON into a :class:`Factor` object.
+    Turn fields from YAML into a :class:`Factor` object.
 
     :param record:
         parameter values to pass to schema
@@ -90,7 +91,7 @@ def read_factors(
     :parame regime:
         to look up any :class:`.Enactment` references
     """
-    schema = schemas.FactorSchema(many=True)
+    schema = schemas_yaml.FactorSchema(many=True)
     record, enactment_index = collect_enactments(record)
     if client:
         enactment_index = client.update_entries_in_enactment_index(enactment_index)
@@ -103,7 +104,7 @@ def read_procedure(
     record: Dict, client: Optional[Client] = None, many=False
 ) -> Procedure:
     r"""
-    Turn fields from JSON into a :class:`Procedure` object.
+    Turn fields from YAML into a :class:`Procedure` object.
 
     :param record:
         parameter values to pass to schema
@@ -115,7 +116,7 @@ def read_procedure(
     :parame regime:
         to look up any :class:`.Enactment` references
     """
-    schema = schemas.ProcedureSchema(many=many)
+    schema = schemas_yaml.ProcedureSchema(many=many)
     record, enactment_index = collect_enactments(record)
     if client:
         enactment_index = client.update_entries_in_enactment_index(enactment_index)
@@ -146,7 +147,7 @@ def read_holding(record: RawHolding, client: Optional[Client] = None) -> Holding
         as values.
     """
 
-    schema = schemas.HoldingSchema(many=False)
+    schema = schemas_yaml.HoldingSchema(many=False)
 
     record, enactment_index = collect_enactments(record)
     record, schema.context["mentioned"] = index_names(record)
@@ -188,7 +189,7 @@ def read_holdings_with_anchors(
         a list matching :class:`.Holding`\s to selectors and
         an index matching :class:`.Factor`\s to selectors.
     """
-    schema = schemas.AnchoredHoldingsSchema()
+    schema = schemas_yaml.AnchoredHoldingsSchema()
 
     record, enactment_index = collect_enactments(record)
     if client:
@@ -220,7 +221,7 @@ def read_holdings(
     :returns:
         a list of :class:`.Holding` objects
     """
-    schema = schemas.HoldingSchema(many=True)
+    schema = schemas_yaml.HoldingSchema(many=True)
 
     record, enactment_index = collect_enactments(record)
     record, schema.context["mentioned"] = index_names(record)
@@ -245,7 +246,7 @@ def read_decision(decision_dict: RawDecision) -> Decision:
     :param decision_dict:
         A dict created from a Caselaw Access Project API response.
     """
-    schema = schemas.DecisionSchema()
+    schema = schemas_yaml.DecisionSchema()
     return schema.load(decision_dict)
 
 
@@ -254,7 +255,7 @@ def read_rules_with_index(
 ) -> Tuple[List[Rule], Mentioned]:
     r"""Make :class:`Rule` and "mentioned" index from dict of fields and :class:`.Regime`\."""
 
-    schema = schemas.RuleSchema(many=many)
+    schema = schemas_yaml.RuleSchema(many=many)
     record, enactment_index = collect_enactments(record)
 
     if client:
@@ -281,7 +282,7 @@ def read_rule(record: Dict, client: Optional[Client] = None) -> Rule:
         iterator yielding :class:`Rule`\s with the items
         from ``mentioned_entities`` as ``terms``
     """
-    schema = schemas.RuleSchema()
+    schema = schemas_yaml.RuleSchema()
     record, enactment_index = collect_enactments(record)
     record, schema.context["mentioned"] = index_names(record)
 
@@ -305,7 +306,7 @@ def read_rules(record: List[Dict], client: Optional[Client] = None) -> List[Rule
         from ``mentioned_entities`` as ``terms``
     """
 
-    schema = schemas.RuleSchema(many=True)
+    schema = schemas_yaml.RuleSchema(many=True)
     record, enactment_index = collect_enactments(record)
     record, schema.context["mentioned"] = index_names(record)
 

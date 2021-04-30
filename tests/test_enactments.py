@@ -14,7 +14,7 @@ from nettlesome.predicates import Predicate
 from nettlesome.statements import Statement
 import pytest
 
-from authorityspoke.io import loaders, readers, schemas, dump
+from authorityspoke.io import loaders, readers, schemas_yaml, dump
 from authorityspoke.io.downloads import FakeClient
 
 
@@ -330,7 +330,7 @@ class TestTextSelection:
 
     def test_selector_text_split(self):
         data = {"text": "process, system,|method of operation|, concept, principle"}
-        schema = schemas.SelectorSchema()
+        schema = schemas_yaml.SelectorSchema()
         selector = schema.load(data)
         assert selector.exact.startswith("method")
 
