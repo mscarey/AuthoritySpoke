@@ -1,18 +1,20 @@
-"""Marshmallow schemas for loading AuthoritySpoke objects from JSON."""
+"""
+Marshmallow schemas for loading AuthoritySpoke objects from JSON.
 
-from copy import deepcopy
+Intended for use with machine-generated API responses.
+Should be suitable for generating an OpenAPI specification.
+"""
+
 from datetime import date
 from typing import Any, Dict, List, NamedTuple, Optional, Sequence, Tuple, Type, Union
 
 from marshmallow import Schema, fields, validate, EXCLUDE
 from marshmallow import pre_load, post_load
-from marshmallow import ValidationError
 
 from anchorpoint.textselectors import TextQuoteSelector, TextPositionSelector
 from anchorpoint.schemas import SelectorSchema
 from legislice import Enactment
 from legislice.schemas import EnactmentSchema
-from legislice.schemas import enactment_needs_api_update
 from nettlesome.entities import Entity
 from nettlesome.predicates import Predicate
 from nettlesome.quantities import Comparison, QuantityRange, Quantity
@@ -22,12 +24,8 @@ from authorityspoke.evidence import Exhibit, Evidence
 from nettlesome.factors import Factor
 from authorityspoke.facts import Fact
 from authorityspoke.holdings import Holding
-from authorityspoke.io.enactment_index import EnactmentIndex
-from authorityspoke.io.name_index import Mentioned
 from authorityspoke.io.name_index import RawFactor, RawPredicate
-from authorityspoke.io.nesting import nest_fields
-from authorityspoke.io import text_expansion
-from authorityspoke.opinions import Opinion, AnchoredHoldings
+from authorityspoke.opinions import Opinion
 from authorityspoke.pleadings import Pleading, Allegation
 
 from authorityspoke.procedures import Procedure
@@ -346,6 +344,10 @@ class HoldingSchema(Schema):
     exclusive = fields.Bool(missing=False)
     generic = fields.Bool(missing=False)
     anchors = fields.Nested(SelectorSchema, many=True)
+
+    @post_load
+    def make_object(self, data, **kwargs):
+        return self.__model__(**data)
 
 
 class NamedAnchors(NamedTuple):

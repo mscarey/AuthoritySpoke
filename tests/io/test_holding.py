@@ -23,6 +23,7 @@ from authorityspoke.io.loaders import (
     load_anchored_holdings,
 )
 from authorityspoke.io import filepaths, text_expansion
+from authorityspoke.io import schemas_json
 from authorityspoke.rules import Rule
 
 load_dotenv()
@@ -33,6 +34,7 @@ legislice_client = Client(api_token=TOKEN)
 
 class TestHoldingDump:
     def test_dump_and_read_holding(self, fake_usc_client, make_holding):
+        """Dump holding and read it as if it came from YAML."""
         holding = make_holding["h2"]
         dumped = dump.to_dict(holding)
         content = dumped["rule"]["procedure"]["inputs"][0]["predicate"]["content"]
@@ -41,6 +43,17 @@ class TestHoldingDump:
         loaded = readers.read_holding(dumped, client=fake_usc_client)
         loaded_content = loaded.despite[0].predicate.content
         assert "the distance between $place1 and $place2 was" in loaded_content
+
+    def test_dump_and_load_holding(self, fake_usc_client, make_holding):
+        """Dump holding and load it as if it was a JSON API response."""
+        holding = make_holding["h2"]
+        dumped = dump.to_dict(holding)
+        content = dumped["rule"]["procedure"]["inputs"][1]["predicate"]["content"]
+        assert content == "$thing was a stockpile of Christmas trees"
+        schema = schemas_json.HoldingSchema()
+        loaded = schema.load(dumped)
+        loaded_content = loaded.inputs[0].predicate.content
+        assert "$thing was on the premises of $place" in loaded_content
 
 
 class TestEntityImport:

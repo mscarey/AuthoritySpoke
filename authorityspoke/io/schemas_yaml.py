@@ -1,4 +1,9 @@
-"""Marshmallow schemas for loading AuthoritySpoke objects from JSON."""
+"""
+Marshmallow schemas for loading AuthoritySpoke objects from YAML.
+
+Intended for use with human-generated files.
+Some shortened syntax is allowed.
+"""
 
 from copy import deepcopy
 from datetime import date
