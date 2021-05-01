@@ -10,6 +10,7 @@ from typing import Any, Dict, List, NamedTuple, Optional, Sequence, Tuple, Type,
 
 from marshmallow import Schema, fields, validate, EXCLUDE
 from marshmallow import pre_load, post_load
+from marshmallow_oneofschema import OneOfSchema
 
 from anchorpoint.textselectors import TextQuoteSelector, TextPositionSelector
 from anchorpoint.schemas import SelectorSchema
@@ -30,8 +31,6 @@ from authorityspoke.pleadings import Pleading, Allegation
 
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
-
-from authorityspoke.utils.marshmallow_oneofschema.one_of_schema import OneOfSchema
 
 RawSelector = Union[str, Dict[str, str]]
 RawEnactment = Dict[str, Union[str, List[RawSelector]]]
@@ -238,22 +237,16 @@ class EvidenceSchema(Schema):
     generic = fields.Bool(missing=False)
 
 
-class FactorSchema(OneOfSchema, Schema):
+class FactorSchema(OneOfSchema):
     """Schema that directs data to "one of" the other schemas."""
 
     __model__: Type = Factor
     type_schemas = {
-        "allegation": AllegationSchema,
         "Allegation": AllegationSchema,
-        "entity": EntitySchema,
         "Entity": EntitySchema,
-        "evidence": EvidenceSchema,
         "Evidence": EvidenceSchema,
-        "exhibit": ExhibitSchema,
         "Exhibit": ExhibitSchema,
-        "fact": FactSchema,
         "Fact": FactSchema,
-        "pleading": PleadingSchema,
         "Pleading": PleadingSchema,
     }
 
