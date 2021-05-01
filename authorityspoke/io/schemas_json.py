@@ -139,8 +139,7 @@ class PredicateSchema(Schema):
     """Schema for statements, separate from any claim about their truth or who asserts them."""
 
     __model__ = Predicate
-    template = fields.Str(data_key="content", load_only=True)
-    content = fields.Method(serialize="get_content_with_placeholders", dump_only=True)
+    content = fields.Str()
     truth = fields.Bool(missing=True)
     sign = fields.Str(
         missing=None,
@@ -150,46 +149,9 @@ class PredicateSchema(Schema):
         dump_quantity, deserialize=Comparison.read_quantity, missing=None
     )
 
-    def get_content_with_placeholders(self, obj) -> str:
-        return obj.template.template
-
-    def split_quantity_from_content(
-        self, content: str
-    ) -> Tuple[str, Optional[str], Optional[Union[Quantity, int, float]]]:
-        """Find any reference to a quantity in the content text."""
-        for comparison in {
-            **QuantityRange.opposite_comparisons,
-            **QuantityRange.normalized_comparisons,
-        }:
-            if comparison in content:
-                content, quantity_text = content.split(comparison)
-                return content.rstrip(), comparison, quantity_text.lstrip()
-        return content, "", None
-
-    def normalize_comparison(self, data: RawPredicate, **kwargs) -> RawPredicate:
-        """Reduce the number of possible symbols to represent comparisons."""
-        if data.get("expression") and not data.get("sign"):
-            data["sign"] = "="
-
-        if data.get("sign") in QuantityRange.normalized_comparisons:
-            data["sign"] = QuantityRange.normalized_comparisons[data["sign"]]
-        return data
-
-    @pre_load
-    def format_data_to_load(self, data: RawPredicate, **kwargs) -> RawPredicate:
-        """Expand any reference to a quantity in the content text."""
-        if not data.get("expression"):
-            (
-                data["content"],
-                data["sign"],
-                data["expression"],
-            ) = self.split_quantity_from_content(data["content"])
-        data = self.normalize_comparison(data)
-        return data
-
     @post_load
     def make_object(self, data, **kwargs):
-        """Make AuthoritySpoke object out of whatever data has been loaded."""
+        """Make either a Predicate or a Comparison."""
         if data.get("expression") is not None:
             return Comparison(**data)
         data.pop("expression", None)

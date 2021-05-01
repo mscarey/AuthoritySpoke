@@ -378,9 +378,9 @@ class TestFactorGroups:
         compilation = Predicate(
             "${rural_s_telephone_directory} was a compilation of facts"
         )
-        idea = Predicate(template="${rural_s_telephone_directory} was an idea")
+        idea = Predicate(content="${rural_s_telephone_directory} was an idea")
         copyrightable = Fact(
-            Predicate(template="${rural_s_telephone_directory} was copyrightable"),
+            Predicate(content="${rural_s_telephone_directory} was copyrightable"),
             terms=rural,
         )
         left = Procedure(

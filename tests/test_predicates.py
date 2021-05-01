@@ -49,7 +49,7 @@ class TestPredicates:
 
     def test_term_positions(self):
         predicate = Predicate(
-            template="$organizer1 and $organizer2 planned for $player1 to play $game with $player2."
+            content="$organizer1 and $organizer2 planned for $player1 to play $game with $player2."
         )
         assert predicate.term_positions() == {
             "organizer1": {0, 1},
@@ -61,7 +61,7 @@ class TestPredicates:
 
     def test_term_positions_with_repetition(self):
         predicate = Predicate(
-            template="$organizer1 and $organizer2 planned for $organizer1 to play $game with $organizer2."
+            content="$organizer1 and $organizer2 planned for $organizer1 to play $game with $organizer2."
         )
         assert predicate.term_positions() == {
             "organizer1": {0, 1},
@@ -71,7 +71,7 @@ class TestPredicates:
 
     def test_term_permutations(self):
         predicate = Predicate(
-            template="$organizer1 and $organizer2 planned for $player1 to play $game with $player2."
+            content="$organizer1 and $organizer2 planned for $player1 to play $game with $player2."
         )
         assert predicate.term_index_permutations() == [
             (0, 1, 2, 3, 4),
@@ -82,7 +82,7 @@ class TestPredicates:
 
     def test_term_permutations_with_repetition(self):
         predicate = Predicate(
-            template="$organizer1 and $organizer2 planned for $organizer1 to play $game with $organizer2."
+            content="$organizer1 and $organizer2 planned for $organizer1 to play $game with $organizer2."
         )
         assert predicate.term_index_permutations() == [
             (0, 1, 2),
@@ -214,19 +214,19 @@ class TestSameMeaning:
 
     def test_term_placeholders_do_not_change_result(self):
         left = Predicate(
-            template="$organizer1 and $organizer2 planned for $player1 to play $game with $player2."
+            content="$organizer1 and $organizer2 planned for $player1 to play $game with $player2."
         )
         right = Predicate(
-            template="$promoter1 and $promoter2 planned for $player1 to play $chess with $player2."
+            content="$promoter1 and $promoter2 planned for $player1 to play $chess with $player2."
         )
         assert left.means(right)
 
     def test_term_positions_change_result(self):
         left = Predicate(
-            template="$organizer1 and $organizer2 planned for $player1 to play $game with $player2."
+            content="$organizer1 and $organizer2 planned for $player1 to play $game with $player2."
         )
         right = Predicate(
-            template="$organizer1 and $organizer2 planned for $organizer1 to play $game with $organizer2."
+            content="$organizer1 and $organizer2 planned for $organizer1 to play $game with $organizer2."
         )
         assert not left.means(right)
 
@@ -254,8 +254,8 @@ class TestImplication:
         assert not make_predicate["p_quantity>=4"] > make_predicate["p_quantity>5"]
 
     def test_no_implication_of_greater_or_equal_quantity(self):
-        less = Comparison(template="The number of mice was", sign=">", expression=4)
-        more = Comparison(template="The number of mice was", sign=">=", expression=5)
+        less = Comparison(content="The number of mice was", sign=">", expression=4)
+        more = Comparison(content="The number of mice was", sign=">=", expression=5)
         assert not less.implies(more)
 
     def test_no_contradiction_inconsistent_dimensions(self):

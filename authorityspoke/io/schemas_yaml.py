@@ -165,8 +165,9 @@ class PredicateSchema(ExpandableSchema):
     """Schema for statements, separate from any claim about their truth or who asserts them."""
 
     __model__ = Predicate
-    template = fields.Str(data_key="content", load_only=True)
-    content = fields.Method(serialize="get_content_with_placeholders", dump_only=True)
+    content = fields.Method(
+        serialize="get_content_with_placeholders", deserialize="get_content_field"
+    )
     truth = fields.Bool(missing=True)
     sign = fields.Str(
         missing=None,
@@ -177,7 +178,10 @@ class PredicateSchema(ExpandableSchema):
     )
 
     def get_content_with_placeholders(self, obj) -> str:
-        return obj.template.template
+        return obj.content.template
+
+    def get_content_field(self, data) -> str:
+        return str(data)
 
     def split_quantity_from_content(
         self, content: str

@@ -348,9 +348,9 @@ class TestImplication:
         )
 
     def test_implication_interchangeable_terms(self):
-        ate_together = Predicate(template="$person1 ate at $place with $person2")
-        shot = Predicate(template="$attacker shot $victim")
-        murder = Predicate(template="$attacker murdered $victim")
+        ate_together = Predicate(content="$person1 ate at $place with $person2")
+        shot = Predicate(content="$attacker shot $victim")
+        murder = Predicate(content="$attacker murdered $victim")
 
         alice = Entity("Alice")
         bob = Entity("Bob")

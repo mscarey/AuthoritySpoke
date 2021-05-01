@@ -764,14 +764,14 @@ class TestContradiction:
     def test_false_does_not_contradict_absent(self):
         absent_fact = Statement(
             predicate=Predicate(
-                template="${rural_s_telephone_directory} was copyrightable", truth=True
+                content="${rural_s_telephone_directory} was copyrightable", truth=True
             ),
             terms=(Entity(name="Rural's telephone directory")),
             absent=True,
         )
         false_fact = Statement(
             predicate=Predicate(
-                template="${the_java_api} was copyrightable", truth=False
+                content="${the_java_api} was copyrightable", truth=False
             ),
             terms=(Entity(name="the Java API", generic=True, plural=False)),
             absent=False,

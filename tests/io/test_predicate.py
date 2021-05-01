@@ -6,7 +6,7 @@ from nettlesome.quantities import Comparison, Q_
 
 from authorityspoke.io import readers
 from authorityspoke.io.dump import to_dict, to_json
-from authorityspoke.io import schemas_json as schemas
+from authorityspoke.io import schemas_json, schemas_yaml
 
 
 class TestPredicateLoad:
@@ -16,12 +16,12 @@ class TestPredicateLoad:
     """
 
     def test_load_just_content(self):
-        schema = schemas.PredicateSchema()
+        schema = schemas_yaml.PredicateSchema()
         p4 = schema.load({"content": "$person was on the premises of $place"})
         assert p4.truth is True
 
     def test_load_comparison_not_ending_with_was(self):
-        schema = schemas.PredicateSchema()
+        schema = schemas_yaml.PredicateSchema()
         with pytest.raises(ValueError):
             schema.load(
                 {
@@ -33,7 +33,7 @@ class TestPredicateLoad:
             )
 
     def test_load_comparison(self):
-        schema = schemas.PredicateSchema()
+        schema = schemas_json.PredicateSchema()
         p7 = schema.load(
             {
                 "content": "the distance between $place1 and $place2 was",
@@ -45,7 +45,7 @@ class TestPredicateLoad:
         assert p7.sign == "!="
 
     def test_load_and_find_quantity(self):
-        schema = schemas.PredicateSchema()
+        schema = schemas_yaml.PredicateSchema()
         p7 = schema.load(
             data={
                 "content": "the distance between $place1 and $place2 was > 35 feet",
@@ -55,7 +55,7 @@ class TestPredicateLoad:
         assert p7.sign == ">"
 
     def test_load_and_normalize_quantity(self):
-        schema = schemas.PredicateSchema()
+        schema = schemas_yaml.PredicateSchema()
         p7 = schema.load(
             data={
                 "content": "the distance between $place1 and $place2 was != 35 feet",
@@ -65,7 +65,7 @@ class TestPredicateLoad:
         assert p7.sign == "!="
 
     def test_load_and_normalize_comparison(self):
-        schema = schemas.PredicateSchema()
+        schema = schemas_json.PredicateSchema()
         p7 = schema.load(
             data={
                 "content": "the distance between $place1 and $place2 was",
@@ -81,7 +81,7 @@ class TestPredicateLoad:
         assert str(quantity.units) == "foot"
 
     def test_make_comparison_when_absent(self):
-        schema = schemas.PredicateSchema()
+        schema = schemas_yaml.PredicateSchema()
         statement = schema.load(
             {"content": "$person's favorite number was", "expression": 42}
         )
@@ -90,7 +90,7 @@ class TestPredicateLoad:
         assert len(statement) == 1
 
     def test_load_predicate_with_date_expression(self):
-        schema = schemas.PredicateSchema()
+        schema = schemas_yaml.PredicateSchema()
         data = {
             "content": "the date when $work was created was",
             "expression": "1978-01-01",
@@ -113,7 +113,7 @@ class TestPredicateDump:
         assert dumped["expression"] == "35 foot"
 
     def test_round_trip(self):
-        schema = schemas.PredicateSchema()
+        schema = schemas_yaml.PredicateSchema()
         statement = schema.load(
             {"content": "{}'s favorite number was", "expression": 42}
         )
