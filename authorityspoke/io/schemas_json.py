@@ -5,10 +5,9 @@ Intended for use with machine-generated API responses.
 Should be suitable for generating an OpenAPI specification.
 """
 
-from datetime import date
-from typing import Any, Dict, List, NamedTuple, Optional, Sequence, Tuple, Type, Union
+from typing import Dict, List, NamedTuple, Optional, Sequence, Tuple, Type, Union
 
-from marshmallow import Schema, fields, validate, EXCLUDE
+from marshmallow import Schema, fields, EXCLUDE
 from marshmallow import pre_load, post_load
 from marshmallow_oneofschema import OneOfSchema
 
@@ -16,19 +15,15 @@ from anchorpoint.textselectors import TextQuoteSelector, TextPositionSelector
 from anchorpoint.schemas import SelectorSchema
 from legislice import Enactment
 from legislice.schemas import EnactmentSchema
-from nettlesome.entities import Entity
-from nettlesome.predicates import Predicate
-from nettlesome.quantities import Comparison, QuantityRange, Quantity
+from nettlesome.schemas import PredicateSchema, EntitySchema, RawFactor
 
 from authorityspoke.decisions import CaseCitation, Decision
 from authorityspoke.evidence import Exhibit, Evidence
 from nettlesome.factors import Factor
 from authorityspoke.facts import Fact
 from authorityspoke.holdings import Holding
-from authorityspoke.io.name_index import RawFactor, RawPredicate
 from authorityspoke.opinions import Opinion
 from authorityspoke.pleadings import Pleading, Allegation
-
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
 
@@ -120,54 +115,6 @@ class DecisionSchema(Schema):
 
     @post_load
     def make_object(self, data, **kwargs):
-        return self.__model__(**data)
-
-
-def dump_quantity(obj: Predicate) -> Optional[Union[date, float, int, str]]:
-    """Convert quantity to string if it's a pint ureg.Quantity object."""
-    if not hasattr(obj, "quantity"):
-        return None
-    if isinstance(obj.quantity, date):
-        return obj.quantity.isoformat()
-    if isinstance(obj.quantity, (int, float)):
-        return obj.quantity
-    return f"{obj.quantity.magnitude} {obj.quantity.units}"
-
-
-class PredicateSchema(Schema):
-    """Schema for statements, separate from any claim about their truth or who asserts them."""
-
-    __model__ = Predicate
-    content = fields.Str()
-    truth = fields.Bool(missing=True)
-    sign = fields.Str(
-        missing=None,
-        validate=validate.OneOf([""] + list(QuantityRange.opposite_comparisons.keys())),
-    )
-    expression = fields.Function(
-        dump_quantity, deserialize=Comparison.read_quantity, missing=None
-    )
-
-    @post_load
-    def make_object(self, data, **kwargs):
-        """Make either a Predicate or a Comparison."""
-        if data.get("expression") is not None:
-            return Comparison(**data)
-        data.pop("expression", None)
-        data.pop("sign", None)
-        return self.__model__(**data)
-
-
-class EntitySchema(Schema):
-    """Schema for Entities, which shouldn't be at the top level of a FactorGroup."""
-
-    __model__: Type = Entity
-    name = fields.Str(missing=None)
-    generic = fields.Bool(missing=True)
-    plural = fields.Bool()
-
-    @post_load
-    def make_object(self, data: Dict[str, Union[bool, str]], **kwargs) -> CaseCitation:
         return self.__model__(**data)
 
 
