@@ -12,49 +12,6 @@ import requests
 from legislice.download import Client, normalize_path, LegislicePathError, RawEnactment
 
 
-def download_enactment_from_client(
-    path: str,
-    client: Union[Client, FakeClient],
-    date: Union[datetime.date, str] = "",
-):
-    """
-    Download Enactment object from an API.
-
-    Allows either a real client or a fake testing client.
-    """
-    enactment = client.read(query=path, date=date)
-    return enactment
-
-
-def download_enactment(
-    path: str,
-    date: Union[datetime.date, str] = "",
-    api_token: str = "",
-    api_root: str = "https://authorityspoke.com/api/v1",
-):
-    """
-    Download Enactment object from an API using the Legislice JSON schema.
-
-    :param path:
-        a path to the desired legislation section using the United States
-        Legislation Markup tree-like citation format.
-
-    :param date:
-        The date of the desired version of the provision to be downloaded.
-        This is not needed if a CrossReference passed to the query param
-        specifies a date. If no date is provided, the API will use the most
-        recent date.
-
-    :param api_token:
-        An authentication key for the API that will serve the enactment data.
-
-    :param api_root:
-        The URL where the API can be found.
-    """
-    client = Client(api_token=api_token, api_root=api_root)
-    return download_enactment_from_client(path=path, client=client, date=date)
-
-
 def download_case(
     cap_id: Optional[int] = None,
     cite: Optional[str] = None,
