@@ -9,7 +9,7 @@ from authorityspoke.holdings import Holding, HoldingGroup
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
 from authorityspoke.io import loaders, readers
-from authorityspoke.io.downloads import FakeClient
+from authorityspoke.io.fake_enactments import FakeClient
 from authorityspoke.opinions import Opinion, FactorIndex
 
 

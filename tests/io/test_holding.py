@@ -16,7 +16,7 @@ from authorityspoke.holdings import Holding, HoldingGroup
 from authorityspoke.opinions import Opinion
 from authorityspoke.procedures import Procedure
 from authorityspoke.io import loaders, readers, dump, name_index
-from authorityspoke.io.downloads import FakeClient
+from authorityspoke.io.fake_enactments import FakeClient
 from authorityspoke.io.loaders import (
     load_holdings,
     read_holdings_from_file,

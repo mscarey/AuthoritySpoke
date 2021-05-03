@@ -22,7 +22,7 @@ from authorityspoke.holdings import Holding
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
 from authorityspoke.io import loaders, readers
-from authorityspoke.io.downloads import FakeClient
+from authorityspoke.io.fake_enactments import FakeClient
 
 load_dotenv()
 

@@ -248,7 +248,8 @@ the :class:`~legislice.enactments.Enactment` class.
 
 .. code:: ipython3
 
-    from authorityspoke.io.downloads import Client, FakeClient
+    from authorityspoke.io.downloads import Client
+    from authorityspoke.io.fake_enactments import FakeClient
 
     if USE_REAL_LEGISLICE_API:
 

@@ -29,7 +29,7 @@ client with fake JSON responses, instead of connecting to the real API.
 
     >>> import json
     >>> import os
-    >>> from authorityspoke.io.downloads import FakeClient
+    >>> from authorityspoke.io.fake_enactments import FakeClient
     >>> legis_client = FakeClient.from_file("beard_act.json")
 
 Next, I’ll prepare annotations for the statute provisions in a JSON

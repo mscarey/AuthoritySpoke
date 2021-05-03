@@ -1,5 +1,5 @@
 from authorityspoke.io import filepaths, loaders, readers
-from authorityspoke.io.downloads import FakeClient
+from authorityspoke.io.fake_enactments import FakeClient
 from authorityspoke.io.loaders import read_holdings_from_file
 
 

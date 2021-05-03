@@ -1,6 +1,6 @@
 """Tests for any commands in readme.md."""
 
-from authorityspoke.io.downloads import FakeClient
+from authorityspoke.io.fake_enactments import FakeClient
 
 from authorityspoke.io.loaders import (
     load_and_read_decision,

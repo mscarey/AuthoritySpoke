@@ -66,7 +66,7 @@ accessing legislative provisions.
     import json
 
     from authorityspoke.io.downloads import Client
-    from authorityspoke.io.downloads import FakeClient
+    from authorityspoke.io.fake_enactments import FakeClient
 
     if USE_REAL_LEGISLICE_API:
 

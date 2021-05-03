@@ -15,7 +15,7 @@ from nettlesome.statements import Statement
 import pytest
 
 from authorityspoke.io import loaders, readers, schemas_yaml, dump
-from authorityspoke.io.downloads import FakeClient
+from authorityspoke.io.fake_enactments import FakeClient
 
 
 load_dotenv()

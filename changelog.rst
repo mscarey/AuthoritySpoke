@@ -1,5 +1,9 @@
 Changelog
 =========
+dev
+-----------------
+- remove download_enactment functions (use Legislice download client instead)
+
 0.6.0 (2021-04-09)
 -----------------
 - Comparison methods use Explanations instead of ContextRegisters
