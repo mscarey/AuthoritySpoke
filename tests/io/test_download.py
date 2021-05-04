@@ -75,3 +75,13 @@ class TestDownload:
         """
         lotus = self.client.fetch_by_cite(cite="49 F.3d 807", full_case=True)
         assert lotus["casebody"]["data"]["opinions"][0]["author"].startswith("STAHL")
+
+    @pytest.mark.vcr
+    def test_read_case_using_client(self):
+        licensing_case = self.client.read_by_cite(cite="621 F.3d 205", full_case=False)
+        assert licensing_case.name_abbreviation == "United States v. Mazza-Alaluf"
+
+    @pytest.mark.vcr
+    def test_read_case_from_id_using_client(self):
+        case = self.client.read_by_id(cap_id=3675682, full_case=False)
+        assert case.name_abbreviation == "Kimbrough v. United States"

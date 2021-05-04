@@ -8,8 +8,8 @@ import eyecite
 from eyecite.models import CaseCitation
 import requests
 
-from authorityspoke.decisions import CAPCitation
-from authorityspoke.io.schemas_json import RawDecision
+from authorityspoke.decisions import CAPCitation, Decision
+from authorityspoke.io.schemas_json import RawDecision, DecisionSchema
 
 
 class AuthoritySpokeAPIError(Exception):
@@ -94,6 +94,32 @@ class CAPClient:
         response = requests.get(self.endpoint, params=params, headers=headers).json()
         return response["results"]
 
+    def read_decision_list_by_cite(
+        self, cite: Union[str, CaseCitation, CAPCitation], full_case: bool = False
+    ) -> Decision:
+        """
+        Download and deserialize the "results" list for a queried citation from the CAP API.
+
+        :param cite:
+            a citation linked to an opinion in the
+            `Caselaw Access Project database <https://case.law/api/>`_.
+            Usually these will be in the traditional format
+            ``[Volume Number] [Reporter Name Abbreviation] [Page Number]``, e.g.
+            `750 F.3d 1339 <https://case.law/search/#/cases?page=1&cite=%22750%20F.3d%201339%22>`_
+            for Oracle America, Inc. v. Google Inc.
+
+        :param full_case:
+            whether to request the full text of the opinion from the
+            `Caselaw Access Project API <https://api.case.law/v1/cases/>`_.
+            If this is ``True``, the CAPClient must have the `api_token` attribute.
+
+        :returns:
+            the first case in the "results" list for this queried citation.
+        """
+        response = self.fetch_decision_list_by_cite(cite=cite, full_case=full_case)
+        schema = DecisionSchema(many=True)
+        return schema.load(response)
+
     def fetch_by_cite(
         self, cite: Union[str, CaseCitation, CAPCitation], full_case: bool = False
     ) -> RawDecision:
@@ -118,6 +144,32 @@ class CAPClient:
         """
         result_list = self.fetch_decision_list_by_cite(cite=cite, full_case=full_case)
         return result_list[0]
+
+    def read_by_cite(
+        self, cite: Union[str, CaseCitation, CAPCitation], full_case: bool = False
+    ) -> Decision:
+        """
+        Download and deserialize a Decision from Caselaw Access Project API.
+
+        :param cite:
+            a citation linked to an opinion in the
+            `Caselaw Access Project database <https://case.law/api/>`_.
+            Usually these will be in the traditional format
+            ``[Volume Number] [Reporter Name Abbreviation] [Page Number]``, e.g.
+            `750 F.3d 1339 <https://case.law/search/#/cases?page=1&cite=%22750%20F.3d%201339%22>`_
+            for Oracle America, Inc. v. Google Inc.
+
+        :param full_case:
+            whether to request the full text of the opinion from the
+            `Caselaw Access Project API <https://api.case.law/v1/cases/>`_.
+            If this is ``True``, the CAPClient must have the `api_token` attribute.
+
+        :returns:
+            the first case in the "results" list for this queried citation.
+        """
+        response = self.fetch_by_cite(cite=cite, full_case=full_case)
+        schema = DecisionSchema()
+        return schema.load(response)
 
     def fetch_by_id(self, cap_id: int, full_case: bool = False) -> RawDecision:
         """
@@ -146,3 +198,26 @@ class CAPClient:
         if cap_id and response.get("detail") == "Not found.":
             raise AuthoritySpokeAPIError(f"API returned no cases with id {cap_id}")
         return response
+
+    def read_by_id(self, cap_id: int, full_case: bool = False) -> Decision:
+        """
+        Download a decision from Caselaw Access Project API.
+
+        :param cap_id:
+            an identifier for an opinion in the
+            `Caselaw Access Project database <https://case.law/api/>`_,
+            e.g. 4066790 for
+            `Oracle America, Inc. v. Google Inc. <https://api.case.law/v1/cases/4066790/>`_.
+
+        :param full_case:
+            whether to request the full text of the opinion from the
+            `Caselaw Access Project API <https://api.case.law/v1/cases/>`_.
+            If this is ``True``, the CAPClient must have the `api_token` attribute.
+
+        :returns:
+            a Decision created from the first case in the "results" list for
+            this queried citation.
+        """
+        response = self.fetch_by_id(cap_id=cap_id, full_case=full_case)
+        schema = DecisionSchema()
+        return schema.load(response)
