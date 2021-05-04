@@ -16,9 +16,15 @@ from authorityspoke.rules import Rule
 
 
 @dataclass
-class CaseCitation:
+class CAPCitation:
     cite: str
     reporter: Optional[str] = None
+
+
+@dataclass
+class CAPCitationTo:
+    cite: str
+    case_ids: List[int] = field(default_factory=list)
 
 
 class Decision(Comparable):
@@ -74,13 +80,13 @@ class Decision(Comparable):
         date: datetime.date,
         name: Optional[str] = None,
         name_abbreviation: Optional[str] = None,
-        citations: Optional[Sequence[CaseCitation]] = None,
+        citations: Optional[Sequence[CAPCitation]] = None,
         first_page: Optional[int] = None,
         last_page: Optional[int] = None,
         court: Optional[str] = None,
         opinions: Optional[Union[Opinion, Sequence[Opinion]]] = None,
         jurisdiction: Optional[str] = None,
-        cites_to: Optional[Sequence[CaseCitation]] = None,
+        cites_to: Optional[Sequence[CAPCitation]] = None,
         id: Optional[int] = None,
     ) -> None:
         self.date = date

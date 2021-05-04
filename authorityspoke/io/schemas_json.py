@@ -5,7 +5,7 @@ Intended for use with machine-generated API responses.
 Should be suitable for generating an OpenAPI specification.
 """
 
-from typing import Dict, List, NamedTuple, Optional, Sequence, Tuple, Type, Union
+from typing import Dict, List, NamedTuple, Optional, Sequence, TypedDict, Type, Union
 
 from marshmallow import Schema, fields, EXCLUDE
 from marshmallow import pre_load, post_load
@@ -17,7 +17,7 @@ from legislice import Enactment
 from legislice.schemas import EnactmentSchema
 from nettlesome.schemas import PredicateSchema, EntitySchema, RawFactor
 
-from authorityspoke.decisions import CaseCitation, Decision
+from authorityspoke.decisions import CAPCitation, CAPCitationTo, Decision
 from authorityspoke.evidence import Exhibit, Evidence
 from nettlesome.factors import Factor
 from authorityspoke.facts import Fact
@@ -35,23 +35,34 @@ RawHolding = Dict[str, Union[RawRule, str, bool]]
 
 
 RawOpinion = Dict[str, str]
-RawCaseCitation = Dict[str, str]
-RawDecision = Dict[
-    str, Union[str, int, Sequence[RawOpinion], Sequence[RawCaseCitation]]
-]
+RawCAPCitation = Dict[str, str]
+RawDecision = Dict[str, Union[str, int, Sequence[RawOpinion], Sequence[RawCAPCitation]]]
 
 
-class CaseCitationSchema(Schema):
+class CAPCitationSchema(Schema):
     """Schema for Decision citations in CAP API response."""
 
-    __model__ = CaseCitation
+    __model__ = CAPCitation
     cite = fields.Str()
     reporter = fields.Str(data_key="type")
 
     @post_load
-    def make_object(self, data: RawCaseCitation, **kwargs) -> CaseCitation:
+    def make_object(self, data: RawCAPCitation, **kwargs) -> CAPCitation:
         """Load citation."""
         return self.__model__(**data)
+
+
+class CAPCitationToSchema(Schema):
+    """Schema for Decision citations in CAP API response."""
+
+    __model__ = CAPCitationTo
+    cite = fields.Str()
+    case_ids = fields.List(fields.Int())
+
+    @post_load
+    def make_object(self, data: RawCAPCitation, **kwargs) -> CAPCitation:
+        """Load citation."""
+        return self.__model__(cite=data["cite"])
 
 
 class OpinionSchema(Schema):
@@ -69,7 +80,7 @@ class OpinionSchema(Schema):
         return data
 
     @post_load
-    def make_object(self, data: RawOpinion, **kwargs) -> CaseCitation:
+    def make_object(self, data: RawOpinion, **kwargs) -> CAPCitation:
         return self.__model__(**data)
 
 
@@ -79,7 +90,7 @@ class DecisionSchema(Schema):
     __model__ = Decision
     name = fields.Str()
     name_abbreviation = fields.Str(missing=None)
-    citations = fields.Nested(CaseCitationSchema, many=True)
+    citations = fields.Nested(CAPCitationSchema, many=True)
     opinions = fields.Nested(OpinionSchema, many=True)
     first_page = fields.Int()
     last_page = fields.Int()
@@ -90,7 +101,7 @@ class DecisionSchema(Schema):
     # reporter = fields.Str(missing=None)
     # volume = fields.Str(missing=None)
     id = fields.Int()
-    cites_to = fields.Nested(CaseCitationSchema, many=True, missing=list)
+    cites_to = fields.Nested(CAPCitationToSchema, many=True, missing=list)
 
     class Meta:
         unknown = EXCLUDE
@@ -100,7 +111,8 @@ class DecisionSchema(Schema):
         """Transform data from CAP API response for loading."""
         if not isinstance(data["court"], str):
             data["court"] = data.get("court", {}).get("slug", "")
-        data["jurisdiction"] = data.get("jurisdiction", {}).get("slug", "")
+        if not isinstance(data["jurisdiction"], str):
+            data["jurisdiction"] = data.get("jurisdiction", {}).get("slug", "")
         data["opinions"] = (
             data.get("casebody", {}).get("data", {}).get("opinions", [{}])
         )

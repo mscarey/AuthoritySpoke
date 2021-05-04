@@ -22,7 +22,7 @@ from nettlesome.entities import Entity
 from nettlesome.predicates import Predicate
 from nettlesome.quantities import Comparison, QuantityRange, Quantity
 
-from authorityspoke.decisions import CaseCitation, Decision
+from authorityspoke.decisions import CAPCitation, Decision
 from authorityspoke.evidence import Exhibit, Evidence
 from nettlesome.factors import Factor
 from authorityspoke.facts import Fact
@@ -96,21 +96,19 @@ class ExpandableSchema(Schema):
 
 
 RawOpinion = Dict[str, str]
-RawCaseCitation = Dict[str, str]
-RawDecision = Dict[
-    str, Union[str, int, Sequence[RawOpinion], Sequence[RawCaseCitation]]
-]
+RawCAPCitation = Dict[str, str]
+RawDecision = Dict[str, Union[str, int, Sequence[RawOpinion], Sequence[RawCAPCitation]]]
 
 
-class CaseCitationSchema(Schema):
+class CAPCitationSchema(Schema):
     """Schema for Decision citations in CAP API response."""
 
-    __model__ = CaseCitation
+    __model__ = CAPCitation
     cite = fields.Str()
     reporter = fields.Str(data_key="type")
 
     @post_load
-    def make_object(self, data: RawCaseCitation, **kwargs) -> CaseCitation:
+    def make_object(self, data: RawCAPCitation, **kwargs) -> CAPCitation:
         """Load citation."""
         return self.__model__(**data)
 

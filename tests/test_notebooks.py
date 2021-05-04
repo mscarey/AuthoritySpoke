@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 import pytest
 
 from authorityspoke.facts import Fact
-from authorityspoke.io.downloads import download_case
+from authorityspoke.io.downloads import CAPClient
 from authorityspoke.io.readers import read_decision
 
 from authorityspoke import Entity, Predicate, Comparison
@@ -26,14 +26,17 @@ class TestIntroduction:
     Tests of commands from the "Introduction to AuthoritySpoke" notebook
     """
 
-    @pytest.mark.skip(reason="uses API call")
+    client = CAPClient(api_token=CAP_API_KEY)
+
+    # @pytest.mark.skip(reason="uses API call")
     @pytest.mark.vcr
     def test_download_case(self):
-        oracle_download = download_case(
-            cite="750 F.3d 1339", full_case=True, api_key=CAP_API_KEY
+        oracle_download = self.client.fetch_by_cite(
+            cite="750 F.3d 1339", full_case=True
         )
         oracle = read_decision(oracle_download)
-        assert oracle.cites_to[0].cite == "527 F.3d 1318"
+        citations = [out_citation.cite for out_citation in oracle.cites_to]
+        assert "527 F.3d 1318" in citations
 
     def test_oracle_20_holdings(self, make_opinion_with_holding):
         assert len(make_opinion_with_holding["oracle_majority"].holdings) == 20

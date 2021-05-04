@@ -1,6 +1,7 @@
 anchorpoint>=0.4.4
 apispec[validation]~=4.3.0
 apispec-oneofschema
+eyecite
 legislice>=0.5.0
 marshmallow>=3.10
 marshmallow-oneofschema
