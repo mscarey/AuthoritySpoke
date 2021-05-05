@@ -16,7 +16,7 @@ load_dotenv()
 
 
 class TestDownload:
-    client = CAPClient(api_token=CAP_API_KEY)
+    client = CAPClient(api_token="Token " + CAP_API_KEY)
 
     @pytest.mark.vcr
     def test_download_case_by_id(self):
@@ -85,3 +85,24 @@ class TestDownload:
     def test_read_case_from_id_using_client(self):
         case = self.client.read_by_id(cap_id=3675682, full_case=False)
         assert case.name_abbreviation == "Kimbrough v. United States"
+        cited_case = self.client.read_by_cite(cite=case.cites_to[0])
+        assert cited_case.name_abbreviation == "???"
+
+    @pytest.mark.vcr
+    def test_read_full_case_from_id_using_client(self):
+        """Test full case not requiring API key because Arkansas is a free jurisdiction."""
+        case = self.client.read_by_id(cap_id=236682, full_case=True)
+        assert "clerical misprision" in case.majority.text
+        assert not case.majority.author
+        # Add day if missing from date
+        assert case.date.isoformat() == "1821-06-01"
+
+    @pytest.mark.vcr
+    def test_read_case_list_from_cite(self):
+        cases = self.client.read_decision_list_by_cite(cite="9 F. Cas. 50")
+        assert cases[0].name_abbreviation == "Fikes v. Bentley"
+
+    @pytest.mark.vcr
+    def test_fail_to_read_id_cite(self):
+        with pytest.raises(ValueError, match="was type IdCitation, not CaseCitation"):
+            self.client.read_decision_list_by_cite(cite="id. at 37")

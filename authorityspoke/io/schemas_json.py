@@ -76,7 +76,8 @@ class OpinionSchema(Schema):
     @pre_load
     def format_data_to_load(self, data: RawOpinion, **kwargs) -> RawOpinion:
         """Standardize author name before loading object."""
-        data["author"] = data.get("author", "").strip(",:")
+        author = data.get("author") or ""
+        data["author"] = author.strip(",:")
         return data
 
     @post_load
@@ -123,6 +124,10 @@ class DecisionSchema(Schema):
         data.pop("volume", None)
         del data["url"]
         data.pop("frontend_url", None)
+
+        # change month to ISO date
+        if data.get("decision_date") and data["decision_date"].count("-") == 1:
+            data["decision_date"] += "-01"
         return data
 
     @post_load
