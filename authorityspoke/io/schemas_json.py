@@ -17,7 +17,7 @@ from legislice import Enactment
 from legislice.schemas import EnactmentSchema
 from nettlesome.schemas import PredicateSchema, EntitySchema, RawFactor
 
-from authorityspoke.decisions import CAPCitation, CAPCitationTo, Decision
+from authorityspoke.decisions import CAPCitation, Decision
 from authorityspoke.evidence import Exhibit, Evidence
 from nettlesome.factors import Factor
 from authorityspoke.facts import Fact
@@ -44,25 +44,13 @@ class CAPCitationSchema(Schema):
 
     __model__ = CAPCitation
     cite = fields.Str()
-    reporter = fields.Str(data_key="type")
+    reporter = fields.Str(data_key="type", missing=None)
+    case_ids = fields.List(fields.Int(), allow_none=True)
 
     @post_load
     def make_object(self, data: RawCAPCitation, **kwargs) -> CAPCitation:
         """Load citation."""
         return self.__model__(**data)
-
-
-class CAPCitationToSchema(Schema):
-    """Schema for Decision citations in CAP API response."""
-
-    __model__ = CAPCitationTo
-    cite = fields.Str()
-    case_ids = fields.List(fields.Int())
-
-    @post_load
-    def make_object(self, data: RawCAPCitation, **kwargs) -> CAPCitation:
-        """Load citation."""
-        return self.__model__(cite=data["cite"])
 
 
 class OpinionSchema(Schema):
@@ -102,7 +90,7 @@ class DecisionSchema(Schema):
     # reporter = fields.Str(missing=None)
     # volume = fields.Str(missing=None)
     id = fields.Int()
-    cites_to = fields.Nested(CAPCitationToSchema, many=True, missing=list)
+    cites_to = fields.Nested(CAPCitationSchema, many=True, missing=list)
 
     class Meta:
         unknown = EXCLUDE

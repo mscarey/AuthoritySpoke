@@ -19,11 +19,6 @@ from authorityspoke.rules import Rule
 class CAPCitation:
     cite: str
     reporter: Optional[str] = None
-
-
-@dataclass
-class CAPCitationTo:
-    cite: str
     case_ids: List[int] = field(default_factory=list)
 
 
