@@ -10,6 +10,7 @@ from legislice.download import Client, LegislicePathError
 
 
 from legislice.schemas import EnactmentSchema
+from legislice.yaml_schemas import ExpandableEnactmentSchema
 
 from authorityspoke.io import loaders
 from authorityspoke.io.fake_enactments import FakeClient
@@ -25,7 +26,7 @@ class TestCodes:
     def test_cfr_repr(self):
         oracle_dictionary = loaders.load_holdings("holding_oracle.json")
         regulation = oracle_dictionary[10]["enactments_despite"][1]
-        schema = EnactmentSchema()
+        schema = ExpandableEnactmentSchema()
         enactment = schema.load(regulation)
 
         assert enactment.level == "regulation"

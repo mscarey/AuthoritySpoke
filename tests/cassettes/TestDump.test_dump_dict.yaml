@@ -9,68 +9,28 @@ interactions:
       Connection:
       - keep-alive
       User-Agent:
-      - python-requests/2.25.0
-      authorization:
-      - DUMMY
-    method: GET
-    uri: https://authorityspoke.com/api/v1/us/const/article/I/8/8
-  response:
-    body:
-      string: ''
-    headers:
-      Connection:
-      - keep-alive
-      Content-Length:
-      - '0'
-      Content-Type:
-      - text/html; charset=utf-8
-      Date:
-      - Sat, 28 Nov 2020 10:19:39 GMT
-      Location:
-      - /api/v1/us/const/article/I/8/8/
-      Referrer-Policy:
-      - same-origin
-      Server:
-      - gunicorn/20.0.4
-      Via:
-      - 1.1 vegur
-      X-Content-Type-Options:
-      - nosniff
-    status:
-      code: 301
-      message: Moved Permanently
-- request:
-    body: null
-    headers:
-      Accept:
-      - '*/*'
-      Accept-Encoding:
-      - gzip, deflate
-      Connection:
-      - keep-alive
-      User-Agent:
-      - python-requests/2.25.0
+      - python-requests/2.25.1
       authorization:
       - DUMMY
     method: GET
     uri: https://authorityspoke.com/api/v1/us/const/article/I/8/8/
   response:
     body:
-      string: '{"heading":"Patents and copyrights.","start_date":"1788-09-13","node":"/us/const/article/I/8/8","url":"https://authorityspoke.com/api/v1/us/const/article/I/8/8/","end_date":null,"content":"To
+      string: '{"heading":"Patents and copyrights.","start_date":"1788-09-13","node":"/us/const/article/I/8/8","text_version":{"id":735650,"url":"https://authorityspoke.com/api/v1/textversions/735650/","content":"To
         promote the Progress of Science and useful Arts, by securing for limited Times
         to Authors and Inventors the exclusive Right to their respective Writings
-        and Discoveries;","children":[],"citations":[],"parent":"https://authorityspoke.com/api/v1/us/const/article/I/8/"}'
+        and Discoveries;"},"url":"https://authorityspoke.com/api/v1/us/const/article/I/8/8/","end_date":null,"children":[],"citations":[],"parent":"https://authorityspoke.com/api/v1/us/const/article/I/8/"}'
     headers:
       Allow:
       - GET, POST, PUT, PATCH, HEAD, OPTIONS
       Connection:
       - keep-alive
       Content-Length:
-      - '459'
+      - '551'
       Content-Type:
       - application/json
       Date:
-      - Sat, 28 Nov 2020 10:19:39 GMT
+      - Fri, 07 May 2021 06:20:32 GMT
       Referrer-Policy:
       - same-origin
       Server:

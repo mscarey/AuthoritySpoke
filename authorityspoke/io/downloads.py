@@ -6,6 +6,7 @@ from typing import Any, Dict, List, Optional, Union
 
 import eyecite
 from eyecite.models import CaseCitation
+from legislice import Client as LegisClient
 import requests
 
 from authorityspoke.decisions import CAPCitation, Decision

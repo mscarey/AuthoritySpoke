@@ -8,6 +8,7 @@ from typing import Any, Dict, List, Text, Tuple
 from anchorpoint.textselectors import TextQuoteSelector
 from dotenv import load_dotenv
 from legislice.download import Client
+from legislice.yaml_schemas import ExpandableEnactmentSchema as EnactmentSchema
 from nettlesome.terms import ContextRegister
 from nettlesome.entities import Entity
 from nettlesome.predicates import Predicate
@@ -24,7 +25,7 @@ from authorityspoke.rules import Procedure, Rule
 
 from authorityspoke.io import loaders, readers
 from authorityspoke.io.fake_enactments import FakeClient
-from authorityspoke.io.schemas_json import EnactmentSchema, RawFactor, RawHolding
+from authorityspoke.io.schemas_json import RawFactor, RawHolding
 
 
 load_dotenv()

@@ -16,8 +16,9 @@ from marshmallow import ValidationError
 from anchorpoint.textselectors import TextQuoteSelector, TextPositionSelector
 from anchorpoint.schemas import SelectorSchema
 from legislice import Enactment
-from legislice.schemas import EnactmentSchema as LegisliceSchema
 from legislice.schemas import enactment_needs_api_update
+from legislice.yaml_schemas import ExpandableEnactmentSchema as LegisliceSchema
+
 from nettlesome.entities import Entity
 from nettlesome.predicates import Predicate
 from nettlesome.quantities import Comparison, QuantityRange, Quantity
@@ -32,6 +33,7 @@ from authorityspoke.io.name_index import Mentioned
 from authorityspoke.io.name_index import RawFactor, RawPredicate
 from authorityspoke.io.nesting import nest_fields
 from authorityspoke.io import text_expansion
+
 from authorityspoke.opinions import Opinion, AnchoredHoldings
 from authorityspoke.pleadings import Pleading, Allegation
 

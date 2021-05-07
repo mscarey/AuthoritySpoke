@@ -189,26 +189,6 @@ class TestEnactments:
         assert combined.selected_text() == e_fourth_a.selected_text()
         assert combined.means(e_fourth_a)
 
-    def test_consolidate_enactments(self, make_response):
-
-        fourth_a = make_response["/us/const/amendment/IV"]["1791-12-15"]
-        search_clause = fourth_a.copy()
-        search_clause["selection"] = [{"suffix": ", and no Warrants"}]
-
-        warrants_clause = fourth_a.copy()
-        warrants_clause["selection"] = [{"prefix": "shall not be violated,"}]
-
-        schema = EnactmentSchema()
-
-        fourth = schema.load(fourth_a)
-        fourth.select_all()
-
-        search = schema.load(search_clause)
-        warrants = schema.load(warrants_clause)
-
-        consolidated = EnactmentGroup([fourth, search, warrants])
-        assert len(consolidated) == 1
-        assert consolidated[0].means(fourth)
 
     def test_consolidate_adjacent_passages(self, make_response):
         client = FakeClient(responses=make_response)

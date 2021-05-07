@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Dict, Optional, Union
 
 from legislice.download import Client, normalize_path, LegislicePathError, RawEnactment
+from legislice.enactments import CrossReference, Enactment
 
 
 # A dict indexing responses by iso-format date strings.
@@ -127,3 +128,16 @@ class FakeClient(Client):
 
     def _fetch_from_url(self, url: str) -> None:
         raise RuntimeError("Network access not allowed from FakeClient")
+
+    def read(
+        self,
+        query: Union[str, CrossReference],
+        date: Union[datetime.date, str] = "",
+    ) -> Enactment:
+        """
+        Use text expansion, unlike a real client.
+        """
+        raw_enactment = self.fetch(query=query, date=date)
+        enactment = self.read_from_json(raw_enactment, use_text_expansion=True)
+        enactment.select_all()
+        return enactment
