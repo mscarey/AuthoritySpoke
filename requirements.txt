@@ -5,7 +5,7 @@ eyecite
 git+git://github.com/mscarey/legislice.git@ca0042818d4c997bdb11bc66f1040aae78054520#egg=legislice
 marshmallow>=3.10
 marshmallow-oneofschema
-nettlesome>=0.5.0
+git+git://github.com/mscarey/nettlesome.git@7f82361eba65e9418c3b35cb79a4c245f293793e#egg=nettlesome
 pint>=0.15
 python-dotenv
 python-slugify

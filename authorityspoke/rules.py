@@ -140,7 +140,7 @@ class Rule(Comparable):
     ) -> Optional[Rule]:
         if not isinstance(other, Rule):
             if isinstance(other, Factor):
-                return self.add_factor(other)
+                return self.with_factor(other)
             if isinstance(other, Enactment):
                 return self.with_enactment(other)
             raise TypeError
@@ -314,10 +314,10 @@ class Rule(Comparable):
 
     def add_factor(self, incoming: Factor) -> Optional[Rule]:
         """
-        Make new version of ``self`` with an added input, output, or despite :class:`.Factor`.
+        Make new version of ``self`` with an added input :class:`.Factor`.
 
         :param incoming:
-            the new :class:`.Factor` to be added to input, output, or despite
+            the new :class:`.Factor` to be added to input
 
         :param role:
             specifies whether the new :class:`.Factor` should be added to input, output, or despite
@@ -326,6 +326,26 @@ class Rule(Comparable):
             a new version of ``self`` with the specified change
         """
         new_procedure = self.procedure.add_factor(incoming)
+        if new_procedure is None:
+            return None
+        result = deepcopy(self)
+        result.procedure = new_procedure
+        return result
+
+    def with_factor(self, incoming: Factor) -> Optional[Rule]:
+        """
+        Make new version of ``self`` with an added input :class:`.Factor`.
+
+        :param incoming:
+            the new :class:`.Factor` to be added to input
+
+        :param role:
+            specifies whether the new :class:`.Factor` should be added to input, output, or despite
+
+        :returns:
+            a new version of ``self`` with the specified change
+        """
+        new_procedure = self.procedure.with_factor(incoming)
         if new_procedure is None:
             return None
         result = deepcopy(self)

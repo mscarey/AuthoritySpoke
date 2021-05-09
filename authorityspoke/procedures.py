@@ -103,7 +103,7 @@ class Procedure(Comparable):
     ) -> Optional[Procedure]:
         """Show how first Procedure triggers the second if not both are universal."""
         if not isinstance(other, self.__class__):
-            return self.add_factor(other)
+            return self.with_factor(other)
         for explanation in self.triggers_next_procedure(other, context=context):
             added = self._trigger_addition(other, explanation)
             if added:
@@ -293,12 +293,25 @@ class Procedure(Comparable):
         }
         return generic_dict
 
-    def add_factor(self, incoming: Factor) -> Optional[Procedure]:
+    def add_factor(self, incoming: Factor) -> None:
         """
         Add an input :class:`.Factor`.
 
         :param incoming:
-            the new :class:`.Factor` to be added to input, output, or despite
+            the new :class:`.Factor` to be added to input
+
+        :returns:
+            None
+        """
+        new_factors = self.inputs.add_or_raise_error(incoming)
+        self.set_inputs(new_factors)
+
+    def with_factor(self, incoming: Factor) -> Optional[Procedure]:
+        """
+        Create new Procedure with added input :class:`.Factor`.
+
+        :param incoming:
+            the new :class:`.Factor` to be added to input
 
         :returns:
             a new version of ``self`` with the specified change
