@@ -6,10 +6,8 @@ import pytest
 from anchorpoint.textselectors import TextPositionSelector, TextSelectionError
 from dotenv import load_dotenv
 
+from legislice.citations import CodeLevel
 from legislice.download import Client, LegislicePathError
-
-
-from legislice.schemas import EnactmentSchema
 from legislice.yaml_schemas import ExpandableEnactmentSchema
 
 from authorityspoke.io import loaders
@@ -29,16 +27,16 @@ class TestCodes:
         schema = ExpandableEnactmentSchema()
         enactment = schema.load(regulation)
 
-        assert enactment.level == "regulation"
+        assert enactment.level == CodeLevel.REGULATION
         assert "/cfr/" in repr(enactment)
 
     @pytest.mark.vcr
     @pytest.mark.parametrize(
         "path, heading, level",
         [
-            ("/us/usc", "United States Code", "statute"),
-            ("/us/const", "United States Constitution", "constitution"),
-            ("/test/acts", "Acts of Australia", "statute"),
+            ("/us/usc", "United States Code", CodeLevel.STATUTE),
+            ("/us/const", "United States Constitution", CodeLevel.CONSTITUTION),
+            ("/test/acts", "Acts of Australia", CodeLevel.STATUTE),
         ],
     )
     def test_code_title(self, path, heading, level):

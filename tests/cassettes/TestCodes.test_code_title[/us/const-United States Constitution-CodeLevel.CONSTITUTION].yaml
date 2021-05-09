@@ -1,0 +1,46 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.25.1
+      authorization:
+      - DUMMY
+    method: GET
+    uri: https://authorityspoke.com/api/v1/us/const/
+  response:
+    body:
+      string: '{"heading":"United States Constitution","start_date":"1788-09-13","node":"/us/const","text_version":null,"url":"https://authorityspoke.com/api/v1/us/const/","end_date":null,"children":["https://authorityspoke.com/api/v1/us/const/amendment/","https://authorityspoke.com/api/v1/us/const/article/"],"citations":[],"parent":"https://authorityspoke.com/api/v1/us/"}'
+    headers:
+      Allow:
+      - GET, POST, PUT, PATCH, HEAD, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '360'
+      Content-Type:
+      - application/json
+      Date:
+      - Sun, 09 May 2021 06:42:54 GMT
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - gunicorn/20.0.4
+      Vary:
+      - Accept, Cookie
+      Via:
+      - 1.1 vegur
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+version: 1

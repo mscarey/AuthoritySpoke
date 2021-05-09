@@ -20,12 +20,12 @@ class TestDownload:
 
     @pytest.mark.vcr
     def test_download_case_by_id(self):
-        case = self.client.fetch_by_id(cap_id=4066790)
+        case = self.client.fetch_id(cap_id=4066790)
         assert case["name_abbreviation"] == "Oracle America, Inc. v. Google Inc."
 
     @pytest.mark.vcr
     def test_download_case_by_cite(self):
-        case = self.client.fetch_by_cite(cite="49 F.3d 807")
+        case = self.client.fetch_cite(cite="49 F.3d 807")
         assert case["decision_date"] == "1995-03-09"
 
     @pytest.mark.vcr
@@ -38,7 +38,7 @@ class TestDownload:
     @pytest.mark.vcr
     def test_download_save_and_make_opinion(self, tmp_path):
         to_file = "lotus_h.json"
-        lotus_from_api = self.client.fetch_by_cite(cite="49 F.3d 807")
+        lotus_from_api = self.client.fetch_cite(cite="49 F.3d 807")
         writers.case_to_file(case=lotus_from_api, filename=to_file, directory=tmp_path)
         filepath = tmp_path / to_file
         lotus_from_file = load_and_read_decision(filepath=filepath)
@@ -47,23 +47,23 @@ class TestDownload:
 
     def test_error_download_without_case_reference(self):
         with pytest.raises(TypeError):
-            self.client.fetch_by_cite()
+            self.client.fetch_cite()
 
     @pytest.mark.vcr
     def test_error_bad_cap_id(self):
         with pytest.raises(AuthoritySpokeAPIError):
-            self.client.fetch_by_id(cap_id=99999999)
+            self.client.fetch_id(cap_id=99999999)
 
     @pytest.mark.vcr
     def test_error_bad_cite(self):
         with pytest.raises(ValueError):
-            self.client.fetch_by_cite(cite="999 Cal 9th. 9999")
+            self.client.fetch_cite(cite="999 Cal 9th. 9999")
 
     @pytest.mark.vcr
     def test_error_full_case_download_without_api_key(self):
         bad_client = CAPClient()
         with pytest.raises(AuthoritySpokeAPIError):
-            bad_client.fetch_by_cite(cite="49 F.3d 807", full_case=True)
+            bad_client.fetch_cite(cite="49 F.3d 807", full_case=True)
 
     @pytest.mark.skip(reason="uses API key")
     @pytest.mark.vcr
@@ -73,25 +73,25 @@ class TestDownload:
 
         The author field is only available because of the full_case flag.
         """
-        lotus = self.client.fetch_by_cite(cite="49 F.3d 807", full_case=True)
+        lotus = self.client.fetch_cite(cite="49 F.3d 807", full_case=True)
         assert lotus["casebody"]["data"]["opinions"][0]["author"].startswith("STAHL")
 
     @pytest.mark.vcr
     def test_read_case_using_client(self):
-        licensing_case = self.client.read_by_cite(cite="621 F.3d 205", full_case=False)
+        licensing_case = self.client.read_cite(cite="621 F.3d 205", full_case=False)
         assert licensing_case.name_abbreviation == "United States v. Mazza-Alaluf"
 
     @pytest.mark.vcr
     def test_read_case_from_id_using_client(self):
-        case = self.client.read_by_id(cap_id=3675682, full_case=False)
+        case = self.client.read_id(cap_id=3675682, full_case=False)
         assert case.name_abbreviation == "Kimbrough v. United States"
-        cited_case = self.client.read_by_cite(cite=case.cites_to[0])
+        cited_case = self.client.read_cite(cite=case.cites_to[0])
         assert cited_case.name_abbreviation == "United States v. Booker"
 
     @pytest.mark.vcr
     def test_read_full_case_from_id_using_client(self):
         """Test full case not requiring API key because Arkansas is a free jurisdiction."""
-        case = self.client.read_by_id(cap_id=236682, full_case=True)
+        case = self.client.read_id(cap_id=236682, full_case=True)
         assert "clerical misprision" in case.majority.text
         assert not case.majority.author
         # Add day if missing from date

@@ -142,7 +142,7 @@ class Rule(Comparable):
             if isinstance(other, Factor):
                 return self.add_factor(other)
             if isinstance(other, Enactment):
-                return self.add_enactment(other)
+                return self.with_enactment(other)
             raise TypeError
         if self.universal is False and other.universal is False:
             return None
@@ -244,12 +244,44 @@ class Rule(Comparable):
             return {str(self): self}
         return self.procedure.generic_terms_by_str()
 
-    def add_enactment(self, incoming: Enactment) -> Rule:
+    def add_enactment(self, incoming: Enactment) -> None:
         """
-        Make new version of ``self`` with an :class:`.Enactment` added.
+        Add Enactment and sort self's Enactments.
 
         :param incoming:
             the new :class:`.Enactment` to be added to enactments
+
+        :returns:
+            None
+        """
+        if not isinstance(incoming, Enactment):
+            raise TypeError
+
+        new_enactments = self.enactments + incoming
+        self.set_enactments(new_enactments)
+
+    def add_enactment_despite(self, incoming: Enactment) -> None:
+        r"""
+        Add "despite" Enactment and sort self's "despite" Enactments.
+
+        :param incoming:
+            the new :class:`.Enactment` to be added to enactments_despite
+
+        :returns:
+            None
+        """
+        if not isinstance(incoming, Enactment):
+            raise TypeError
+
+        new_enactments = self.enactments_despite + incoming
+        self.set_enactments(new_enactments)
+
+    def with_enactment(self, incoming: Enactment) -> Rule:
+        r"""
+        Create new Rule with added Enactment.
+
+        :param incoming:
+            the new :class:`.Enactment` to be added to enactments_despite
 
         :returns:
             a new version of ``self`` with the specified change
@@ -262,9 +294,9 @@ class Rule(Comparable):
         result.set_enactments(new_enactments)
         return result
 
-    def add_enactment_despite(self, incoming: Enactment) -> Rule:
+    def with_enactment_despite(self, incoming: Enactment) -> Rule:
         r"""
-        Make new version of ``self`` that applies despite the incoming :class:`.Enactment`\.
+        Create new Rule with added "despite" Enactment.
 
         :param incoming:
             the new :class:`.Enactment` to be added to enactments_despite

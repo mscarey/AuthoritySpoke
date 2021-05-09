@@ -138,7 +138,7 @@ class TestRules:
         assert len(make_holding["h3"]) == 5
 
     def test_despite_role_for_added_enactment(self, e_due_process_14, make_holding):
-        rule = make_holding["h1"].rule.add_enactment_despite(e_due_process_14)
+        rule = make_holding["h1"].rule.with_enactment_despite(e_due_process_14)
         assert "life, liberty, or property" in str(rule).split("DESPITE")[1]
 
     def test_despite_role_for_added_enactment_typeerror(self, make_holding):

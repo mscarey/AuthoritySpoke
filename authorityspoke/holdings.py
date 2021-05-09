@@ -207,17 +207,13 @@ class Holding(Comparable):
         new_holding.rule = new_rule
         return new_holding
 
-    def add_enactment(self, enactment: Enactment) -> Holding:
-        result = deepcopy(self)
-        new_rule = result.rule.add_enactment(enactment)
-        result.rule = new_rule
-        return result
+    def add_enactment(self, enactment: Enactment) -> None:
+        """Add enactment and sort self's Enactments."""
+        self.rule.add_enactment(enactment)
 
-    def add_enactment_despite(self, enactment: Enactment) -> Holding:
-        result = deepcopy(self)
-        new_rule = result.rule.add_enactment_despite(enactment)
-        result.rule = new_rule
-        return result
+    def add_enactment_despite(self, enactment: Enactment) -> None:
+        """Add "despite" enactment and sort self's "despite" Enactments."""
+        self.rule.add_enactment_despite(enactment)
 
     def add_holding(self, other: Holding) -> Optional[Holding]:
         """Show how first Holding triggers the second."""

@@ -31,9 +31,7 @@ class TestIntroduction:
     # @pytest.mark.skip(reason="uses API call")
     @pytest.mark.vcr
     def test_download_case(self):
-        oracle_download = self.client.fetch_by_cite(
-            cite="750 F.3d 1339", full_case=True
-        )
+        oracle_download = self.client.fetch_cite(cite="750 F.3d 1339", full_case=True)
         oracle = read_decision(oracle_download)
         citations = [out_citation.cite for out_citation in oracle.cites_to]
         assert "527 F.3d 1318" in citations

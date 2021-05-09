@@ -5,6 +5,7 @@ from anchorpoint.textselectors import TextQuoteSelector, TextSelectionError
 from dotenv import load_dotenv
 from legislice.download import Client
 
+from legislice.citations import CodeLevel
 from legislice.enactments import Enactment
 from legislice.groups import EnactmentGroup
 from legislice.schemas import EnactmentSchema
@@ -189,7 +190,6 @@ class TestEnactments:
         assert combined.selected_text() == e_fourth_a.selected_text()
         assert combined.means(e_fourth_a)
 
-
     def test_consolidate_adjacent_passages(self, make_response):
         client = FakeClient(responses=make_response)
         copyright_clause = client.read("/us/const/article/I/8/8")
@@ -292,7 +292,7 @@ class TestTextSelection:
         selector = make_selector["preexisting material"]
         enactment.select(selector)
 
-        assert enactment.level == "statute"
+        assert enactment.level == CodeLevel.STATUTE
         assert enactment.jurisdiction == "us"
         assert enactment.code == "usc"
 

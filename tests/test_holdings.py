@@ -1,6 +1,8 @@
 from copy import deepcopy
+from datetime import date
 import os
 from typing import Type
+from legislice.enactments import Enactment
 
 import pytest
 
@@ -129,6 +131,20 @@ class TestHolding:
         assert "due process" not in str(holding)
         assert "Copyright protection subsists" in str(holding)
         assert len(holding.enactments_despite) == 1
+
+    def test_regulation_ordered_after_statute(
+        self, make_holding, e_copyright_requires_originality
+    ):
+        holding = make_holding["h2"]
+        regulation = Enactment(
+            node="/us/cfr/t37/s202.1",
+            heading="",
+            start_date=date(1992, 2, 21),
+            content="The following are examples of works not subject to copyright",
+        )
+        holding.add_enactment(regulation)
+        holding.add_enactment(e_copyright_requires_originality)
+        assert holding.enactments[-1].node == "/us/cfr/t37/s202.1"
 
     def test_set_blank_despite(self, make_holding):
         holding = make_holding["h2"]
