@@ -1,8 +1,8 @@
-git+git://github.com/mscarey/anchorpoint.git@b866676a9f2ca420ac921523023052593bc1a7c8#egg=anchorpoint
+anchorpoint>=0.5.0
 apispec[validation]~=4.3.0
 apispec-oneofschema
 eyecite
-git+git://github.com/mscarey/legislice.git@a9b9ad563c2096702f74fdc12267dbee2c018f34#egg=legislice
+git+git://github.com/mscarey/legislice.git@ca0042818d4c997bdb11bc66f1040aae78054520#egg=legislice
 marshmallow>=3.10
 marshmallow-oneofschema
 nettlesome>=0.5.0

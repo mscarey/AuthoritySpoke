@@ -121,7 +121,7 @@ class CAPClient:
         schema = DecisionSchema(many=True)
         return schema.load(response)
 
-    def fetch_by_cite(
+    def fetch_cite(
         self, cite: Union[str, CaseCitation, CAPCitation], full_case: bool = False
     ) -> RawDecision:
         """
@@ -146,7 +146,7 @@ class CAPClient:
         result_list = self.fetch_decision_list_by_cite(cite=cite, full_case=full_case)
         return result_list[0]
 
-    def read_by_cite(
+    def read_cite(
         self, cite: Union[str, CaseCitation, CAPCitation], full_case: bool = False
     ) -> Decision:
         """
@@ -168,11 +168,11 @@ class CAPClient:
         :returns:
             the first case in the "results" list for this queried citation.
         """
-        response = self.fetch_by_cite(cite=cite, full_case=full_case)
+        response = self.fetch_cite(cite=cite, full_case=full_case)
         schema = DecisionSchema()
         return schema.load(response)
 
-    def fetch_by_id(self, cap_id: int, full_case: bool = False) -> RawDecision:
+    def fetch_id(self, cap_id: int, full_case: bool = False) -> RawDecision:
         """
         Download a decision from Caselaw Access Project API.
 
@@ -200,7 +200,7 @@ class CAPClient:
             raise AuthoritySpokeAPIError(f"API returned no cases with id {cap_id}")
         return response
 
-    def read_by_id(self, cap_id: int, full_case: bool = False) -> Decision:
+    def read_id(self, cap_id: int, full_case: bool = False) -> Decision:
         """
         Download a decision from Caselaw Access Project API.
 
@@ -219,6 +219,6 @@ class CAPClient:
             a Decision created from the first case in the "results" list for
             this queried citation.
         """
-        response = self.fetch_by_id(cap_id=cap_id, full_case=full_case)
+        response = self.fetch_id(cap_id=cap_id, full_case=full_case)
         schema = DecisionSchema()
         return schema.load(response)
