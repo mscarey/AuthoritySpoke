@@ -1,6 +1,16 @@
+import os
+
+import pytest
+
+from authorityspoke import LegisClient
 from authorityspoke.io import filepaths, loaders, readers
 from authorityspoke.io.fake_enactments import FakeClient
-from authorityspoke.io.loaders import read_holdings_from_file
+from authorityspoke.io.loaders import (
+    read_holdings_from_file,
+    read_anchored_holdings_from_file,
+)
+
+LEGISLICE_API_TOKEN = os.getenv("LEGISLICE_API_TOKEN")
 
 
 class TestHoldingLoad:
@@ -21,10 +31,26 @@ class TestHoldingLoad:
         assert raw_holdings[0]["outputs"]["type"] == "fact"
 
 
-class TestLoadAndRead:
+class TestLoadAndReadFake:
     def test_read_holdings_from_file(self):
         legis_client = FakeClient.from_file("usc.json")
         oracle_holdings = read_holdings_from_file(
             "holding_oracle.json", client=legis_client
         )
         assert oracle_holdings[0]
+
+
+class TestLoadAndRead:
+    client = LegisClient(api_token=LEGISLICE_API_TOKEN)
+
+    @pytest.mark.vcr
+    def test_read_holdings_from_yaml(self):
+        money_holdings = read_anchored_holdings_from_file(
+            "holding_mazza_alaluf.yaml", client=self.client
+        )
+        assert (
+            "Turismo conducted substantial money transmitting business"
+            in money_holdings.named_anchors[
+                "the fact that <Turismo Costa Brava> was a money transmitting business"
+            ][0].exact
+        )

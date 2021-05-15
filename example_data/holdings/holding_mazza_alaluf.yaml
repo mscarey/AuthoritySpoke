@@ -1,0 +1,40 @@
+holdings:
+  - inputs:
+      - type: fact
+        content: "{Mazza-Alaluf} operated {Turismo Costa Brava} without an appropriate money transmitting license in a State where such operation was punishable as a misdemeanor or a felony under State law"
+        name: no license
+      - type: fact
+        content: Mazza-Alaluf operated Turismo Costa Brava as a business
+        name: operated as business
+      - type: fact
+        content: Turismo Costa Brava was a money transmitting business
+        name: was money transmitting business
+    despite:
+      - type: fact
+        content: Turismo Costa Brava was a domestic financial institution
+        truth: False
+        name: not domestic
+    outputs:
+      - type: fact
+        content: Mazza-Alaluf committed the offense of conducting a money transmitting business without a license required by state law
+        name: offense of unlicensed money transmitting
+    enactments:
+      - node: /us/usc/t18/s1960/b/1/A
+        name: definition statute
+    enactments_despite:
+      - node: /us/usc/t31/s5312/b/1
+        name: domestic institution statute
+enactment_anchors:
+  - enactment: definition statute
+    quotes: state money transmitting licenses, see |18 U.S.C. § 1960(b)(1)(A)|
+  - enactment: domestic institution statute
+    quotes: § 5312(b)(1) (defining "domestic financial institution")
+factor_anchors:
+  - name: operated as business
+    quotes: Mazza-Alaluf does not contest that he owned and managed Turismo
+  - name: was money transmitting business
+    quotes: record evidence that Turismo conducted substantial money transmitting business in the three states
+  - name: not domestic
+    quotes: without respect to whether or not Turismo was a "domestic financial institution"
+  - name: offense of unlicensed money transmitting
+    quotes: a crime to operate a money transmitting business without appropriate state licenses,

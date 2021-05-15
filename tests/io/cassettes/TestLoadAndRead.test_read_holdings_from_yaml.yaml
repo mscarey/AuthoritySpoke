@@ -1,0 +1,96 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.25.1
+      authorization:
+      - DUMMY
+    method: GET
+    uri: https://authorityspoke.com/api/v1/us/usc/t18/s1960/b/1/A/
+  response:
+    body:
+      string: '{"heading":"","start_date":"2013-07-18","node":"/us/usc/t18/s1960/b/1/A","text_version":{"id":943737,"url":"https://authorityspoke.com/api/v1/textversions/943737/","content":"is
+        operated without an appropriate money transmitting license in a State where
+        such operation is punishable as a misdemeanor or a felony under State law,
+        whether or not the defendant knew that the operation was required to be licensed
+        or that the operation was so punishable;"},"url":"https://authorityspoke.com/api/v1/us/usc/t18/s1960/b/1/A/","end_date":null,"children":[],"citations":[],"parent":"https://authorityspoke.com/api/v1/us/usc/t18/s1960/b/1/"}'
+    headers:
+      Allow:
+      - GET, POST, PUT, PATCH, HEAD, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '631'
+      Content-Type:
+      - application/json
+      Date:
+      - Sat, 15 May 2021 06:33:26 GMT
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - gunicorn/20.0.4
+      Vary:
+      - Accept, Cookie
+      Via:
+      - 1.1 vegur
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.25.1
+      authorization:
+      - DUMMY
+    method: GET
+    uri: https://authorityspoke.com/api/v1/us/usc/t31/s5312/b/1/
+  response:
+    body:
+      string: "{\"heading\":\"\",\"start_date\":\"2013-07-18\",\"node\":\"/us/usc/t31/s5312/b/1\",\"text_version\":{\"id\":1267044,\"url\":\"https://authorityspoke.com/api/v1/textversions/1267044/\",\"content\":\"\u201Cdomestic
+        financial agency\u201D and \u201Cdomestic financial institution\u201D apply
+        to an action in the United States of a financial agency or institution.\"},\"url\":\"https://authorityspoke.com/api/v1/us/usc/t31/s5312/b/1/\",\"end_date\":null,\"children\":[],\"citations\":[],\"parent\":\"https://authorityspoke.com/api/v1/us/usc/t31/s5312/b/\"}"
+    headers:
+      Allow:
+      - GET, POST, PUT, PATCH, HEAD, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '502'
+      Content-Type:
+      - application/json
+      Date:
+      - Sat, 15 May 2021 06:33:26 GMT
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - gunicorn/20.0.4
+      Vary:
+      - Accept, Cookie
+      Via:
+      - 1.1 vegur
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+version: 1

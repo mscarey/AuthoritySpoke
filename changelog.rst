@@ -2,7 +2,18 @@ Changelog
 =========
 dev
 -----------------
-- remove download_enactment functions (use Legislice download client instead)
+- remove Enactment download functions (use Legislice download client instead)
+- remove Opinion download functions (use CAPClient class instead)
+- use different Legislice schema imports for JSON and YAML
+- move fake download client to separate module
+- replace opinion download function with client class
+- add read methods to CAP opinion download client
+- add read methods to CAPClient
+- DecisionSchema can accept months instead of dates
+- merge CAPCitation and CAPCitationTo schemas
+- Holding has separate add_enactment and with_enactment methods
+- Rule has separate add_enactment and with_enactment methods
+- Procedure has separate add_factor and with_factor methods
 
 0.6.0 (2021-04-09)
 -----------------

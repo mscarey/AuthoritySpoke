@@ -1,6 +1,7 @@
 """AuthoritySpoke: Reading the law for the last time."""
 
 from legislice import Enactment
+from legislice.download import Client as LegisClient
 from nettlesome.entities import Entity
 from nettlesome.predicates import Predicate
 from nettlesome.quantities import Comparison

@@ -34,7 +34,7 @@ def load_anchored_holdings(
     filepath: Optional[pathlib.Path] = None,
 ) -> Dict[str, Union[Dict[str, RawFactor], Dict[str, RawEnactment], List[RawHolding]]]:
     r"""
-    Load a list of records from JSON to create :class:`.Holding`\s with text selectors.
+    Load list of records from YAML or JSON to create :class:`.Holding`\s with text selectors.
 
     :param filename:
         the name of the JSON file to look in for :class:`Holding`

@@ -1,7 +1,7 @@
 anchorpoint>=0.5.0
 apispec[validation]~=4.3.0
 apispec-oneofschema
-eyecite
+git+git://github.com/freelawproject/eyecite.git@2a8241c2b20a7aa6c923784c56baefdb47fc3148#egg=eyecite
 git+git://github.com/mscarey/legislice.git@ca0042818d4c997bdb11bc66f1040aae78054520#egg=legislice
 marshmallow>=3.10
 marshmallow-oneofschema
