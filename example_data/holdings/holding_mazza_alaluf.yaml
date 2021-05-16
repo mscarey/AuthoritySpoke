@@ -24,12 +24,18 @@ holdings:
     enactments_despite:
       - node: /us/usc/t31/s5312/b/1
         name: domestic institution statute
+    anchors:
+      - prefix: Accordingly, we conclude that the
+        suffix: In any event
 enactment_anchors:
   - enactment: definition statute
     quotes: state money transmitting licenses, see |18 U.S.C. § 1960(b)(1)(A)|
   - enactment: domestic institution statute
     quotes: § 5312(b)(1) (defining "domestic financial institution")
 factor_anchors:
+  - name: no license
+    quotes:
+      prefix: In sum, we conclude that
   - name: operated as business
     quotes: Mazza-Alaluf does not contest that he owned and managed Turismo
   - name: was money transmitting business

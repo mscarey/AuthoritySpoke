@@ -54,3 +54,5 @@ class TestLoadAndRead:
                 "the fact that <Turismo Costa Brava> was a money transmitting business"
             ][0].exact
         )
+
+        assert "In any event" in money_holdings.holding_anchors[0].suffix
