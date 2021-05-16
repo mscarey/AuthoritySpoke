@@ -156,7 +156,7 @@ def ensure_factor_has_name(obj: Dict) -> Dict:
 
     :returns: the same :class:`.Factor` with a name field added
     """
-    if not obj.get("name") and not obj.get("anchors"):
+    if not obj.get("name"):
         new_name = create_name_for_factor(obj)
         if new_name:
             obj["name"] = new_name

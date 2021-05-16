@@ -8,7 +8,23 @@
             "outputs": {
                 "type": "fact",
                 "content": "Rural's telephone directory was copyrightable",
-                "truth": false
+                "truth": false,
+                "anchors": [
+                    {
+                        "exact": "are not copyrightable",
+                        "prefix": "The first is that facts"
+                    },
+                    {
+                        "exact": "no one may copyright",
+                        "suffix": "facts"
+                    },
+                    {
+                        "exact": "copyrightable",
+                        "prefix": "first is that facts are not"
+                    },
+                    "The sine qua non of|copyright|",
+                    "Even if a work qualifies as a copyrightable compilation"
+                ]
             },
             "enactments": [
                 {
@@ -96,7 +112,8 @@
             ],
             "despite": {
                 "type": "fact",
-                "content": "Rural's telephone directory closely resembled other works"
+                "content": "Rural's telephone directory closely resembled other works",
+                "anchors": "it closely resembles other works"
             },
             "outputs": "Rural's telephone directory was an original work",
             "enactments": [
@@ -120,22 +137,48 @@
                 }
             ],
             "mandatory": true,
-            "universal": true
+            "universal": true,
+            "anchors": [
+                {
+                    "exact": "facts",
+                    "prefix": "The first is that"
+                },
+                {
+                    "exact": "as to facts",
+                    "prefix": "No one may claim originality"
+                },
+                {
+                    "exact": "facts",
+                    "prefix": "no one may copyright"
+                }
+            ]
         },
         {
             "inputs": [
                 "Rural's telephone directory was a compilation of facts",
                 {
                     "type": "fact",
-                    "content": "Rural Telephone Service Company was the compiler of Rural's telephone directory"
+                    "content": "Rural Telephone Service Company was the compiler of Rural's telephone directory",
+                    "anchors": "by the compiler"
                 },
                 {
                     "type": "fact",
-                    "content": "Rural Telephone Service Company independently used a degree of creativity to choose which facts to include in Rural's telephone directory"
+                    "content": "Rural Telephone Service Company independently used a degree of creativity to choose which facts to include in Rural's telephone directory",
+                    "anchors": [
+                        "The compilation author typically chooses which facts to include",
+                        "so long as they are made independently",
+                        "and entail a minimal degree of creativity"
+                    ]
                 },
                 {
                     "type": "fact",
-                    "content": "Rural Telephone Service Company independently used a degree of creativity to choose in what order to place the facts in Rural's telephone directory, and how to arrange the collected data so that they could be used effectively by readers"
+                    "content": "Rural Telephone Service Company independently used a degree of creativity to choose in what order to place the facts in Rural's telephone directory, and how to arrange the collected data so that they could be used effectively by readers",
+                    "quotes": [
+                        "The compilation author typically chooses",
+                        "in what order to place them, and how to arrange the collected data so that they may be used effectively by readers",
+                        "so long as they are made independently",
+                        "and entail a minimal degree of creativity"
+                    ]
                 }
             ],
             "outputs": "Rural's telephone directory was an original work",
@@ -153,7 +196,8 @@
                 {
                     "type": "fact",
                     "content": "Rural's telephone directory contained written expression protectable by copyright",
-                    "truth": false
+                    "truth": false,
+                    "anchors": "a directory that contains absolutely no protectible written expression"
                 }
             ],
             "despite": [
@@ -249,42 +293,6 @@
     ],
     "factor_anchors": [
         {
-            "name": "Rural's telephone directory was a fact",
-            "quotes": [
-                {
-                    "exact": "facts",
-                    "prefix": "The first is that"
-                },
-                {
-                    "exact": "as to facts",
-                    "prefix": "No one may claim originality"
-                },
-                {
-                    "exact": "facts",
-                    "prefix": "no one may copyright"
-                }
-            ]
-        },
-        {
-            "name": "Rural's telephone directory was copyrightable",
-            "quotes": [
-                {
-                    "exact": "are not copyrightable",
-                    "prefix": "The first is that facts"
-                },
-                {
-                    "exact": "no one may copyright",
-                    "suffix": "facts"
-                },
-                {
-                    "exact": "copyrightable",
-                    "prefix": "first is that facts are not"
-                },
-                "The sine qua non of|copyright|",
-                "Even if a work qualifies as a copyrightable compilation"
-            ]
-        },
-        {
             "name": "Rural's telephone directory was a compilation of facts",
             "quotes": [
                 {
@@ -351,35 +359,6 @@
         {
             "name": "Feist's telephone directory did not feature the same selection and arrangement of facts as Rural's telephone directory",
             "quotes": "the author make the selection or arrangement independently (i. e., without copying that selection or arrangement from another work)"
-        },
-        {
-            "name": "false Rural's telephone directory contained written expression protectable by copyright",
-            "quotes": "a directory that contains absolutely no protectible written expression"
-        },
-        {
-            "name": "Rural Telephone Service Company independently used a degree of creativity to choose in what order to place the facts in Rural's telephone directory, and how to arrange the collected data so that they could be used effectively by readers",
-            "quotes": [
-                "The compilation author typically chooses",
-                "in what order to place them, and how to arrange the collected data so that they may be used effectively by readers",
-                "so long as they are made independently",
-                "and entail a minimal degree of creativity"
-            ]
-        },
-        {
-            "name": "Rural Telephone Service Company independently used a degree of creativity to choose which facts to include in Rural's telephone directory",
-            "quotes": [
-                "The compilation author typically chooses which facts to include",
-                "so long as they are made independently",
-                "and entail a minimal degree of creativity"
-            ]
-        },
-        {
-            "name": "Rural Telephone Service Company was the compiler of Rural's telephone directory",
-            "quotes": "by the compiler"
-        },
-        {
-            "name": "Rural's telephone directory closely resembled other works",
-            "quotes": "it closely resembles other works"
         }
     ]
 }

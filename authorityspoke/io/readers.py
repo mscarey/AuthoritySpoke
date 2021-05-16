@@ -150,10 +150,14 @@ def read_holding(record: RawHolding, client: Optional[Client] = None) -> Holding
     schema = schemas_yaml.HoldingSchema(many=False)
 
     record, enactment_index = collect_enactments(record)
-    record, schema.context["mentioned"] = index_names(record)
     if client:
         enactment_index = client.update_entries_in_enactment_index(enactment_index)
+    anchors, enactment_index = collect_anchors_from_index(enactment_index, "enactment")
     schema.context["enactment_index"] = enactment_index
+
+    record, factor_index = index_names(record)
+    anchors, factor_index = collect_anchors_from_index(factor_index, "name")
+    schema.context["mentioned"] = factor_index
 
     return schema.load(deepcopy(record))
 
@@ -164,6 +168,17 @@ class HoldingsIndexed(NamedTuple):
     holdings: List[Holding]
     mentioned: Mentioned
     holding_anchors: List[List[TextQuoteSelector]]
+
+
+def collect_anchors_from_index(object_index, field_name: str):
+    anchors = []
+    for key, value in object_index.items():
+        if value.get("anchors"):
+            anchored_object: Dict[str, Any] = {}
+            anchored_object["quotes"] = value.pop("anchors")
+            anchored_object[field_name] = value
+            anchors.append(anchored_object)
+    return anchors, object_index
 
 
 def read_holdings_with_anchors(
@@ -196,17 +211,20 @@ def read_holdings_with_anchors(
         enactment_index = client.update_entries_in_enactment_index(enactment_index)
 
     # move anchors out of enactments
-    for key, value in enactment_index.items():
-        if value.get("anchors"):
-            if not record.get("enactment_anchors"):
-                record["enactment_anchors"] = []
-            anchored_enactment: Dict[str, Any] = {}
-            anchored_enactment["quotes"] = value.pop("anchors")
-            anchored_enactment["enactment"] = value
-            record["enactment_anchors"].append(anchored_enactment)
-
-    record["holdings"], schema.context["mentioned"] = index_names(record["holdings"])
+    anchors, enactment_index = collect_anchors_from_index(enactment_index, "enactment")
+    if not record.get("enactment_anchors"):
+        record["enactment_anchors"] = []
+    record["enactment_anchors"] = record["enactment_anchors"] + anchors
     schema.context["enactment_index"] = enactment_index
+
+    record["holdings"], factor_index = index_names(record["holdings"])
+
+    # move anchors out of factors
+    anchors, factor_index = collect_anchors_from_index(factor_index, "name")
+    if not record.get("factor_anchors"):
+        record["factor_anchors"] = []
+    record["factor_anchors"] = record["factor_anchors"] + anchors
+    schema.context["mentioned"] = factor_index
 
     holdings, holding_anchors, named_anchors, enactment_anchors = schema.load(
         deepcopy(record)
@@ -234,11 +252,14 @@ def read_holdings(
     schema = schemas_yaml.HoldingSchema(many=True)
 
     record, enactment_index = collect_enactments(record)
-    record, schema.context["mentioned"] = index_names(record)
-
     if client:
         enactment_index = client.update_entries_in_enactment_index(enactment_index)
+    anchors, enactment_index = collect_anchors_from_index(enactment_index, "enactment")
     schema.context["enactment_index"] = enactment_index
+
+    record, factor_index = index_names(record)
+    anchors, factor_index = collect_anchors_from_index(factor_index, "name")
+    schema.context["mentioned"] = factor_index
 
     return schema.load(deepcopy(record))
 
