@@ -549,6 +549,8 @@ class AnchoredHoldingsSchema(ExpandableSchema):
 
         if data.get("enactment_anchors"):
             for linked in data["enactment_anchors"]:
+                if not linked.enactment.selected_text():
+                    linked.enactment.select_all()
                 enactment_links[str(linked.enactment)] = linked.quotes
 
         holding_anchors = [holding.anchors for holding in data["holdings"]]

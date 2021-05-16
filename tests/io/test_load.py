@@ -60,7 +60,5 @@ class TestLoadAndRead:
         assert "In any event" in anchored.holding_anchors[0][0].suffix
 
         # enactment anchor
-        assert (
-            "domestic financial"
-            in anchored.enactment_anchors["domestic institution statute"][0].exact
-        )
+        key = str(anchored.holdings[0].enactments_despite[0])
+        assert "domestic financial" in anchored.enactment_anchors[key][0].exact
