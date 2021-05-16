@@ -33,13 +33,13 @@ holdings:
         suffix: In any event
 factor_anchors:
   - name: no license
-    quotes:
+    anchors:
       prefix: In sum, we conclude that
   - name: operated as business
-    quotes: Mazza-Alaluf does not contest that he owned and managed Turismo
+    anchors: Mazza-Alaluf does not contest that he owned and managed Turismo
   - name: was money transmitting business
-    quotes: record evidence that Turismo conducted substantial money transmitting business in the three states
+    anchors: record evidence that Turismo conducted substantial money transmitting business in the three states
   - name: not domestic
-    quotes: without respect to whether or not Turismo was a "domestic financial institution"
+    anchors: without respect to whether or not Turismo was a "domestic financial institution"
   - name: offense of unlicensed money transmitting
-    quotes: a crime to operate a money transmitting business without appropriate state licenses,
+    anchors: a crime to operate a money transmitting business without appropriate state licenses,

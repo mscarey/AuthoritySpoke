@@ -491,35 +491,35 @@ class HoldingSchema(ExpandableSchema):
 
 class NamedAnchors(NamedTuple):
     name: Factor
-    quotes: List[TextQuoteSelector]
+    anchors: List[TextQuoteSelector]
 
 
 class NamedAnchorsSchema(ExpandableSchema):
     __model__ = NamedAnchors
 
     name = fields.Nested(FactorSchema)
-    quotes = fields.Nested(SelectorSchema, many=True)
+    anchors = fields.Nested(SelectorSchema, many=True)
 
     @pre_load
     def format_data_to_load(self, data, **kwargs):
-        data = self.wrap_single_element_in_list(data, "quotes")
+        data = self.wrap_single_element_in_list(data, "anchors")
         return data
 
 
 class AnchoredEnactments(NamedTuple):
     enactment: Enactment
-    quotes: List[TextQuoteSelector]
+    anchors: List[TextQuoteSelector]
 
 
 class AnchoredEnactmentsSchema(ExpandableSchema):
     __model__ = AnchoredEnactments
 
     enactment = fields.Nested(EnactmentSchema)
-    quotes = fields.Nested(SelectorSchema, many=True)
+    anchors = fields.Nested(SelectorSchema, many=True)
 
     @pre_load
     def format_data_to_load(self, data, **kwargs):
-        data = self.wrap_single_element_in_list(data, "quotes")
+        data = self.wrap_single_element_in_list(data, "anchors")
         return data
 
 
@@ -545,13 +545,13 @@ class AnchoredHoldingsSchema(ExpandableSchema):
 
         if data.get("factor_anchors"):
             for linked in data["factor_anchors"]:
-                text_links[linked.name.key] = linked.quotes
+                text_links[linked.name.key] = linked.anchors
 
         if data.get("enactment_anchors"):
             for linked in data["enactment_anchors"]:
                 if not linked.enactment.selected_text():
                     linked.enactment.select_all()
-                enactment_links[str(linked.enactment)] = linked.quotes
+                enactment_links[str(linked.enactment)] = linked.anchors
 
         holding_anchors = [holding.anchors for holding in data["holdings"]]
         return AnchoredHoldings(

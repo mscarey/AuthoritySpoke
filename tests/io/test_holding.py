@@ -115,7 +115,7 @@ class TestHoldingImport:
             "factor_anchors": [
                 {
                     "name": "Rural's telephone directory was a fact",
-                    "quotes": [
+                    "anchors": [
                         {"exact": "facts", "prefix": "The first is that"},
                         {
                             "exact": "as to facts",
@@ -126,7 +126,7 @@ class TestHoldingImport:
                 },
                 {
                     "name": "Rural's telephone directory was copyrightable",
-                    "quotes": [
+                    "anchors": [
                         {
                             "exact": "copyrightable",
                             "prefix": "first is that facts are not",

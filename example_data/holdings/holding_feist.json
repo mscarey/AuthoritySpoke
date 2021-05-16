@@ -173,7 +173,7 @@
                 {
                     "type": "fact",
                     "content": "Rural Telephone Service Company independently used a degree of creativity to choose in what order to place the facts in Rural's telephone directory, and how to arrange the collected data so that they could be used effectively by readers",
-                    "quotes": [
+                    "anchors": [
                         "The compilation author typically chooses",
                         "in what order to place them, and how to arrange the collected data so that they may be used effectively by readers",
                         "so long as they are made independently",
@@ -294,7 +294,7 @@
     "factor_anchors": [
         {
             "name": "Rural's telephone directory was a compilation of facts",
-            "quotes": [
+            "anchors": [
                 {
                     "exact": "compilations of facts",
                     "suffix": "generally are"
@@ -305,32 +305,32 @@
         },
         {
             "name": "Rural's telephone directory was an idea",
-            "quotes": {
+            "anchors": {
                 "exact": "ideas",
                 "prefix": "no one may copyright facts or"
             }
         },
         {
             "name": "Rural's telephone listings were names, towns, and telephone numbers of telephone subscribers",
-            "quotes": [
+            "anchors": [
                 "There is no doubt that Feist took from the white pages of Rural’s directory a substantial amount of factual information. At a minimum, Feist copied the names, towns, and telephone numbers of 1,309 of Rural’s subscribers."
             ]
         },
         {
             "name": "false Rural's arragement of its telephone listings was an original work",
-            "quotes": "The end product is a garden-variety white pages directory, devoid of even the slightest trace of creativity.\nRural’s selection of listings could not be more obvious: It publishes the most basic information — name, town, and telephone number — about each person who applies to it for telephone service. This is “selection” of a sort, but it lacks the modicum of creativity necessary to transform mere selection into copyrightable expression."
+            "anchors": "The end product is a garden-variety white pages directory, devoid of even the slightest trace of creativity.\nRural’s selection of listings could not be more obvious: It publishes the most basic information — name, town, and telephone number — about each person who applies to it for telephone service. This is “selection” of a sort, but it lacks the modicum of creativity necessary to transform mere selection into copyrightable expression."
         },
         {
             "name": "Rural's telephone directory was a telephone directory.",
-            "quotes": "Rural publishes a typical telephone directory, consisting of white pages and yellow pages."
+            "anchors": "Rural publishes a typical telephone directory, consisting of white pages and yellow pages."
         },
         {
             "name": "Rural's arragement of its telephone listings was the method of listing subscribers alphabetically by surname in Rural's telephone directory",
-            "quotes": "In preparing its white pages, Rural simply takes the data provided by its subscribers and lists it alphabetically by surname."
+            "anchors": "In preparing its white pages, Rural simply takes the data provided by its subscribers and lists it alphabetically by surname."
         },
         {
             "name": "Rural's telephone directory was an original work",
-            "quotes": [
+            "anchors": [
                 "The sine qua non of copyright is|originality|",
                 "Original, as the term is used in copyright",
                 "No one may claim originality"
@@ -338,27 +338,27 @@
         },
         {
             "name": "Rural's telephone directory was independently created by Rural Telephone Service Company, as opposed to copied from other works",
-            "quotes": "the work was independently created by the author (as opposed to copied from other works)"
+            "anchors": "the work was independently created by the author (as opposed to copied from other works)"
         },
         {
             "name": "Rural's telephone directory possessed at least some minimal degree of creativity",
-            "quotes": "it possesses at least some minimal degree of creativity"
+            "anchors": "it possesses at least some minimal degree of creativity"
         },
         {
             "name": "false Rural's telephone listings were an original work",
-            "quotes": "In other words, did Feist, by taking 1,309 names, towns, and telephone numbers from Rural’s white pages, copy anything that was “original” to Rural? Certainly, the raw data does not satisfy the originality requirement."
+            "anchors": "In other words, did Feist, by taking 1,309 names, towns, and telephone numbers from Rural’s white pages, copy anything that was “original” to Rural? Certainly, the raw data does not satisfy the originality requirement."
         },
         {
             "name": "false Feist Publications infringed the copyright on Rural's telephone directory",
-            "quotes": "may be freely copied because copyright protects only the elements that owe their origin to the compiler"
+            "anchors": "may be freely copied because copyright protects only the elements that owe their origin to the compiler"
         },
         {
             "name": "Feist Publications freely copied the facts contained in Rural's telephone directory, in preparing Feist's telephone directory",
-            "quotes": "the facts contained in existing works may be freely copied"
+            "anchors": "the facts contained in existing works may be freely copied"
         },
         {
             "name": "Feist's telephone directory did not feature the same selection and arrangement of facts as Rural's telephone directory",
-            "quotes": "the author make the selection or arrangement independently (i. e., without copying that selection or arrangement from another work)"
+            "anchors": "the author make the selection or arrangement independently (i. e., without copying that selection or arrangement from another work)"
         }
     ]
 }
