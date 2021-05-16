@@ -5,7 +5,7 @@ These functions will usually be called by functions from the io.loaders module
 after they import some data from a file.
 """
 from copy import deepcopy
-from typing import NamedTuple
+from typing import Any, NamedTuple
 
 from typing import Dict, List, Optional, Tuple, Type, Union
 
@@ -194,6 +194,16 @@ def read_holdings_with_anchors(
     record, enactment_index = collect_enactments(record)
     if client:
         enactment_index = client.update_entries_in_enactment_index(enactment_index)
+
+    # move anchors out of enactments
+    for key, value in enactment_index.items():
+        if value.get("anchors"):
+            if not record.get("enactment_anchors"):
+                record["enactment_anchors"] = []
+            anchored_enactment: Dict[str, Any] = {}
+            anchored_enactment["quotes"] = value.pop("anchors")
+            anchored_enactment["enactment"] = value
+            record["enactment_anchors"].append(anchored_enactment)
 
     record["holdings"], schema.context["mentioned"] = index_names(record["holdings"])
     schema.context["enactment_index"] = enactment_index

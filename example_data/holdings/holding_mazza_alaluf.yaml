@@ -21,17 +21,16 @@ holdings:
     enactments:
       - node: /us/usc/t18/s1960/b/1/A
         name: definition statute
+        anchors:
+          - state money transmitting licenses, see |18 U.S.C. § 1960(b)(1)(A)|
     enactments_despite:
       - node: /us/usc/t31/s5312/b/1
         name: domestic institution statute
+        anchors:
+          - § 5312(b)(1) (defining "domestic financial institution")
     anchors:
       - prefix: Accordingly, we conclude that the
         suffix: In any event
-enactment_anchors:
-  - enactment: definition statute
-    quotes: state money transmitting licenses, see |18 U.S.C. § 1960(b)(1)(A)|
-  - enactment: domestic institution statute
-    quotes: § 5312(b)(1) (defining "domestic financial institution")
 factor_anchors:
   - name: no license
     quotes:

@@ -45,14 +45,22 @@ class TestLoadAndRead:
 
     @pytest.mark.vcr
     def test_read_holdings_from_yaml(self):
-        money_holdings = read_anchored_holdings_from_file(
+        anchored = read_anchored_holdings_from_file(
             "holding_mazza_alaluf.yaml", client=self.client
         )
+        # factor anchor
         assert (
             "Turismo conducted substantial money transmitting business"
-            in money_holdings.named_anchors[
+            in anchored.named_anchors[
                 "the fact that <Turismo Costa Brava> was a money transmitting business"
             ][0].exact
         )
 
-        assert "In any event" in money_holdings.holding_anchors[0].suffix
+        # holding anchor
+        assert "In any event" in anchored.holding_anchors[0][0].suffix
+
+        # enactment anchor
+        assert (
+            "domestic financial"
+            in anchored.enactment_anchors["domestic institution statute"][0].exact
+        )
