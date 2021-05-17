@@ -92,47 +92,48 @@ holdings:
   enactments:
   - search clause
   mandatory: true
-- inputs:
-  - type: fact
-    content: Hideaway Lodge was Wattenburg’s abode
-  - type: fact
-    content: officers' search of the stockpile was a warrantless search and seizure
-  - type: fact
-    content: officers' search of the stockpile was performed by law enforcement officers
-  - type: fact
-    content: officers' search of the stockpile was performed by federal officers
-  - type: fact
-    content: officers' search of the stockpile constituted an intrusion upon the stockpile
-      of trees
-  - type: fact
-    content: the stockpile of trees was on the premises of Hideaway Lodge
-  - type: fact
-    content: Wattenburg sought to preserve the stockpile of trees as private
-  - long distance
-  - type: fact
-    content: '{} was derived from {}'
-    terms:
-    - type: exhibit
-      name: proof of Wattenburg's guilt
-      generic: true
-    - officers' search of the stockpile
-  despite:
-  - type: fact
-    content: the stockpile of trees was in an area accessible to the public
-  - type: fact
-    content: the distance between the $place1 and $place2 was >= 20 feet
-    terms:
-    - type: entity
-      name: the stockpile of trees
-    - type: entity
-      name: Hideaway Lodge
-  outputs:
-  - type: evidence
-    exhibit: proof of Wattenburg's guilt
-    to_effect:
-      type: fact
-      content: Wattenburg committed a crime
-    absent: true
-  enactments:
-  - search clause
-  mandatory: true
+- rule:
+    inputs:
+      - type: fact
+        content: Hideaway Lodge was Wattenburg’s abode
+      - type: fact
+        content: officers' search of the stockpile was a warrantless search and seizure
+      - type: fact
+        content: officers' search of the stockpile was performed by law enforcement officers
+      - type: fact
+        content: officers' search of the stockpile was performed by federal officers
+      - type: fact
+        content: officers' search of the stockpile constituted an intrusion upon the stockpile
+          of trees
+      - type: fact
+        content: the stockpile of trees was on the premises of Hideaway Lodge
+      - type: fact
+        content: Wattenburg sought to preserve the stockpile of trees as private
+      - long distance
+      - type: fact
+        content: '{} was derived from {}'
+        terms:
+        - type: exhibit
+          name: proof of Wattenburg's guilt
+          generic: true
+        - officers' search of the stockpile
+    despite:
+      - type: fact
+        content: the stockpile of trees was in an area accessible to the public
+      - type: fact
+        content: the distance between the $place1 and $place2 was >= 20 feet
+        terms:
+        - type: entity
+          name: the stockpile of trees
+        - type: entity
+          name: Hideaway Lodge
+    outputs:
+      - type: evidence
+        exhibit: proof of Wattenburg's guilt
+        to_effect:
+          type: fact
+          content: Wattenburg committed a crime
+        absent: true
+    enactments:
+      - search clause
+    mandatory: true
