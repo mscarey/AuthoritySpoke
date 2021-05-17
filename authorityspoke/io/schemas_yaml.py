@@ -117,21 +117,6 @@ class CAPCitationSchema(Schema):
         return self.__model__(**data)
 
 
-class OpinionSchema(ExpandableSchema):
-    """Schema for Opinions, of which there may be several in one Decision."""
-
-    __model__ = Opinion
-    position = fields.Str(data_key="type", missing="majority")
-    author = fields.Str(missing="")
-    text = fields.Str(missing="")
-
-    @pre_load
-    def format_data_to_load(self, data: RawOpinion, **kwargs) -> RawOpinion:
-        """Standardize author name before loading object."""
-        data["author"] = data.get("author", "").strip(",:")
-        return data
-
-
 class EnactmentSchema(LegisliceSchema):
     def get_indexed_enactment(self, data, **kwargs):
         """Replace data to load with any object with same name in "enactment_index"."""
