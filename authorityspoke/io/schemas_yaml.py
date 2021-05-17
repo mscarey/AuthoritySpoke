@@ -412,15 +412,7 @@ class RuleSchema(ExpandableSchema):
 
     @post_load
     def make_object(self, data, **kwargs):
-        rule = self.__model__(**data)
-
-        for enactment in rule.enactments:
-            if not enactment.selected_text():
-                enactment.select_all()
-        for despite in rule.enactments_despite:
-            if not despite.selected_text():
-                despite.select_all()
-        return rule
+        return self.__model__(**data)
 
 
 class HoldingSchema(ExpandableSchema):
