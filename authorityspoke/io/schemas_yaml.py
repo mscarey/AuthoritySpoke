@@ -67,11 +67,7 @@ class ExpandableSchema(Schema):
     def consume_type_field(self, data, **kwargs):
         """Verify that type field is correct and then get rid of it."""
         if data.get("type"):
-            ty = data.pop("type").lower()
-            if ty != self.__model__.__name__.lower():
-                raise ValidationError(
-                    f'type field "{ty} does not match model type {self.__model__}'
-                )
+            data.pop("type")
         return data
 
     def wrap_single_element_in_list(self, data: Dict, many_element: str):

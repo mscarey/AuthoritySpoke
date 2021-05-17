@@ -1,5 +1,6 @@
 import os
 
+from marshmallow import ValidationError
 import pytest
 
 from authorityspoke import LegisClient
@@ -39,6 +40,10 @@ class TestLoadAndReadFake:
             "holding_oracle.json", client=self.client
         )
         assert oracle_holdings[0]
+
+    def test_read_holdings_in_nested_rule(self):
+        watt_holdings = read_holdings_from_file("holding_watt.yaml", client=self.client)
+        assert watt_holdings[4].inputs[0].terms[0].name == "Hideaway Lodge"
 
     def test_read_holdings_in_nested_rule(self):
         watt_holdings = read_holdings_from_file("holding_watt.yaml", client=self.client)

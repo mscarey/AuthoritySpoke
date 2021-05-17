@@ -656,6 +656,21 @@ class TestExclusiveFlag:
             originality_rule.implies(feist_holding.rule) for feist_holding in holdings
         )
 
+    def test_fact_containing_wrong_type(self, make_response):
+        mock_client = FakeClient(responses=make_response)
+        to_read = load_holdings("holding_feist.json")
+        holding = to_read[0]
+        holding["outputs"]["type"] = "wrong_type"
+        with pytest.raises(ValidationError):
+            readers.read_holding(holding, client=mock_client)
+
+    def test_type_field_removed_from_factor(self, make_response):
+        mock_client = FakeClient(responses=make_response)
+        to_read = load_holdings("holding_feist.json")
+        holding = to_read[0]
+        holding = readers.read_holding(holding, client=mock_client)
+        assert holding.inputs[0].__dict__.get("type") is None
+
     @pytest.mark.xfail
     def test_holding_inferred_from_exclusive(self, make_enactment, make_response):
         """
