@@ -20,12 +20,14 @@ from legislice.schemas import enactment_needs_api_update
 from legislice.yaml_schemas import ExpandableEnactmentSchema as LegisliceSchema
 
 from nettlesome.entities import Entity
+from nettlesome.factors import Factor
 from nettlesome.predicates import Predicate
 from nettlesome.quantities import Comparison, QuantityRange, Quantity
+from nettlesome.schemas import dump_quantity
 
 from authorityspoke.decisions import CAPCitation, Decision
 from authorityspoke.evidence import Exhibit, Evidence
-from nettlesome.factors import Factor
+
 from authorityspoke.facts import Fact
 from authorityspoke.holdings import Holding
 from authorityspoke.io.enactment_index import EnactmentIndex
@@ -150,17 +152,6 @@ class EnactmentSchema(LegisliceSchema):
         return super().format_data_to_load(data)
 
 
-def dump_quantity(obj: Predicate) -> Optional[Union[date, float, int, str]]:
-    """Convert quantity to string if it's a pint ureg.Quantity object."""
-    if not hasattr(obj, "quantity"):
-        return None
-    if isinstance(obj.quantity, date):
-        return obj.quantity.isoformat()
-    if isinstance(obj.quantity, (int, float)):
-        return obj.quantity
-    return f"{obj.quantity.magnitude} {obj.quantity.units}"
-
-
 class PredicateSchema(ExpandableSchema):
     """Schema for statements, separate from any claim about their truth or who asserts them."""
 
@@ -178,7 +169,7 @@ class PredicateSchema(ExpandableSchema):
     )
 
     def get_content_with_placeholders(self, obj) -> str:
-        return obj.content.template
+        return obj.template.template
 
     def get_content_field(self, data) -> str:
         return str(data)
