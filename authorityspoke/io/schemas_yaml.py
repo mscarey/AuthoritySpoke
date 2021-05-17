@@ -536,18 +536,3 @@ class AnchoredHoldingsSchema(ExpandableSchema):
             named_anchors=text_links,
             enactment_anchors=enactment_links,
         )
-
-
-SCHEMAS = list(ExpandableSchema.__subclasses__()) + [SelectorSchema, EnactmentSchema]
-
-
-def get_schema_for_item(item: Any) -> Schema:
-    """Find the Marshmallow schema for an AuthoritySpoke object."""
-    if isinstance(item, TextPositionSelector):
-        return SelectorSchema()
-    if isinstance(item, Comparison):
-        return PredicateSchema()
-    for option in SCHEMAS:
-        if item.__class__ == option.__model__:
-            return option()
-    raise ValueError(f"No schema found for class '{item.__class__}'")

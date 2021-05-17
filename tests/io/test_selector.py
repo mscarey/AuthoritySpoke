@@ -5,13 +5,6 @@ from authorityspoke.io import dump, schemas_yaml, schemas_json
 
 
 class TestLoadSelector:
-    def test_get_schema_for_selector(self):
-        data = {"text": "process, system,|method of operation|, concept, principle"}
-        selector_schema = schemas_yaml.SelectorSchema()
-        selector = selector_schema.load(data)
-        schema = schemas_yaml.get_schema_for_item(selector)
-        assert isinstance(schema, schemas_yaml.SelectorSchema)
-
     def test_wrong_selector_shorthand(self):
         """
         This should fail because there's only one pipe symbol so there's
