@@ -104,19 +104,6 @@ RawCAPCitation = Dict[str, str]
 RawDecision = Dict[str, Union[str, int, Sequence[RawOpinion], Sequence[RawCAPCitation]]]
 
 
-class CAPCitationSchema(Schema):
-    """Schema for Decision citations in CAP API response."""
-
-    __model__ = CAPCitation
-    cite = fields.Str()
-    reporter = fields.Str(data_key="type")
-
-    @post_load
-    def make_object(self, data: RawCAPCitation, **kwargs) -> CAPCitation:
-        """Load citation."""
-        return self.__model__(**data)
-
-
 class EnactmentSchema(LegisliceSchema):
     def get_indexed_enactment(self, data, **kwargs):
         """Replace data to load with any object with same name in "enactment_index"."""
