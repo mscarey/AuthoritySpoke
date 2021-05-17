@@ -71,7 +71,8 @@ holdings:
     content: officers' search of the stockpile constituted an intrusion upon the stockpile
       of trees
   enactments:
-  - search clause
+  - name: search clause
+    node: /us/const/amendment/IV
   mandatory: true
 - inputs:
   - type: fact

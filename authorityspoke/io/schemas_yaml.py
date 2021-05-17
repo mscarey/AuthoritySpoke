@@ -120,15 +120,11 @@ class CAPCitationSchema(Schema):
 class EnactmentSchema(LegisliceSchema):
     def get_indexed_enactment(self, data, **kwargs):
         """Replace data to load with any object with same name in "enactment_index"."""
-        if isinstance(data, str):
-            name_to_retrieve = data
-        elif data.get("name") and enactment_needs_api_update(data):
-            name_to_retrieve = data["name"]
-        else:
+        if not isinstance(data, str):
             return data
 
         mentioned = self.context.get("enactment_index") or EnactmentIndex()
-        return deepcopy(mentioned.get_by_name(name_to_retrieve))
+        return deepcopy(mentioned.get_by_name(data))
 
     @pre_load
     def format_data_to_load(self, data, **kwargs):
