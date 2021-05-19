@@ -300,6 +300,8 @@ def get_schema_for_item(classname: str) -> Schema:
         "Rule": RuleSchema,
         "Procedure": ProcedureSchema,
         "Enactment": EnactmentSchema,
+        "Decision": DecisionSchema,
+        "Opinion": OpinionSchema,
     }
     result = schemas_for_names.get(classname)
     if result is None:

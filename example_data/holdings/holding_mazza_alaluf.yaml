@@ -2,44 +2,31 @@ holdings:
   - inputs:
       - type: fact
         content: "{Mazza-Alaluf} operated {Turismo Costa Brava} without an appropriate money transmitting license in a State where such operation was punishable as a misdemeanor or a felony under State law"
-        name: no license
+        anchors: we conclude that sufficient evidence supports Mazza-Alaluf's convictions under 18 U.S.C. § 1960(b)(1)(A) for conspiring to operate and operating a money transmitting business without appropriate state licenses.
       - type: fact
         content: Mazza-Alaluf operated Turismo Costa Brava as a business
-        name: operated as business
+        anchors: Mazza-Alaluf does not contest that he owned and managed Turismo
       - type: fact
         content: Turismo Costa Brava was a money transmitting business
-        name: was money transmitting business
+        anchors: record evidence that Turismo conducted substantial money transmitting business in the three states
     despite:
       - type: fact
         content: Turismo Costa Brava was a domestic financial institution
         truth: False
-        name: not domestic
+        anchors: without respect to whether or not Turismo was a "domestic financial institution"
     outputs:
       - type: fact
         content: Mazza-Alaluf committed the offense of conducting a money transmitting business without a license required by state law
-        name: offense of unlicensed money transmitting
+        anchors: a crime to operate a money transmitting business without appropriate state licenses,
     enactments:
       - node: /us/usc/t18/s1960/b/1/A
-        name: definition statute
-        anchors:
-          - state money transmitting licenses, see |18 U.S.C. § 1960(b)(1)(A)|
+        anchors: state money transmitting licenses, see |18 U.S.C. § 1960(b)(1)(A)|
     enactments_despite:
       - node: /us/usc/t31/s5312/b/1
-        name: domestic institution statute
         anchors:
           - § 5312(b)(1) (defining "domestic financial institution")
     anchors:
       - prefix: Accordingly, we conclude that the
         suffix: In any event
-factor_anchors:
-  - name: no license
-    anchors:
-      prefix: In sum, we conclude that
-  - name: operated as business
-    anchors: Mazza-Alaluf does not contest that he owned and managed Turismo
-  - name: was money transmitting business
-    anchors: record evidence that Turismo conducted substantial money transmitting business in the three states
-  - name: not domestic
-    anchors: without respect to whether or not Turismo was a "domestic financial institution"
-  - name: offense of unlicensed money transmitting
-    anchors: a crime to operate a money transmitting business without appropriate state licenses,
+    universal: true
+    mandatory: true
