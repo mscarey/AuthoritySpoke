@@ -1,8 +1,19 @@
 holdings:
   - inputs:
-      - type: fact
-        content: "{Mazza-Alaluf} operated {Turismo Costa Brava} without an appropriate money transmitting license in a State where such operation was punishable as a misdemeanor or a felony under State law"
-        anchors: we conclude that sufficient evidence supports Mazza-Alaluf's convictions under 18 U.S.C. § 1960(b)(1)(A) for conspiring to operate and operating a money transmitting business without appropriate state licenses.
+    - type: fact
+      content: "{Mazza-Alaluf} used Mazza-Alaluf's business {Turismo Costa Brava} to commit the New York offense of engaging in the business of receiving money for transmission or transmitting the same, without a license therefor"
+    outputs:
+    - type: fact
+      content: Mazza-Alaluf operated Turismo Costa Brava without an appropriate money transmitting license in a State where such operation was punishable as a misdemeanor or a felony under State law
+      anchors: we conclude that sufficient evidence supports Mazza-Alaluf's convictions under 18 U.S.C. § 1960(b)(1)(A) for conspiring to operate and operating a money transmitting business without appropriate state licenses.
+      name: operated without license
+    enactments:
+    - node: /us/usc/t18/s1960/b/1
+      anchors: state money transmitting licenses, see |18 U.S.C. § 1960(b)(1)(A)|
+      name: state money transmitting license provision
+    universal: true
+  - inputs:
+      - operated without license
       - type: fact
         content: Mazza-Alaluf operated Turismo Costa Brava as a business
         anchors: Mazza-Alaluf does not contest that he owned and managed Turismo
@@ -19,8 +30,7 @@ holdings:
         content: Mazza-Alaluf committed the offense of conducting a money transmitting business without a license required by state law
         anchors: a crime to operate a money transmitting business without appropriate state licenses,
     enactments:
-      - node: /us/usc/t18/s1960/b/1/A
-        anchors: state money transmitting licenses, see |18 U.S.C. § 1960(b)(1)(A)|
+      - state money transmitting license provision
     enactments_despite:
       - node: /us/usc/t31/s5312/b/1
         anchors:

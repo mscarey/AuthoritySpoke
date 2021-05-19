@@ -15,6 +15,8 @@ LEGISLICE_API_TOKEN = os.getenv("LEGISLICE_API_TOKEN")
 
 
 class TestHoldingLoad:
+    client = LegisClient(api_token=LEGISLICE_API_TOKEN)
+
     def test_get_json_filepath(self):
         directory = filepaths.get_directory_path("holdings")
         path = filepaths.make_filepath(
@@ -30,6 +32,13 @@ class TestHoldingLoad:
         )
         raw_holdings = loaders.load_holdings(filepath=path)
         assert raw_holdings[0]["outputs"]["type"] == "fact"
+
+    @pytest.mark.vcr
+    def test_load_and_read_yaml(self):
+        both_holdings_with_anchors = read_anchored_holdings_from_file(
+            filename="holding_mazza_alaluf.yaml", client=self.client
+        )
+        assert len(both_holdings_with_anchors.holdings) == 2
 
 
 class TestLoadAndReadFake:
@@ -67,8 +76,8 @@ class TestLoadAndRead:
         )
 
         # holding anchor
-        assert "In any event" in anchored.holding_anchors[0][0].suffix
+        assert "In any event" in anchored.holding_anchors[1][0].suffix
 
         # enactment anchor
-        key = str(anchored.holdings[0].enactments_despite[0])
+        key = str(anchored.holdings[1].enactments_despite[0])
         assert "domestic financial" in anchored.enactment_anchors[key][0].exact

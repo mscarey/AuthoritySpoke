@@ -19,6 +19,7 @@ example_data/holdings/unused
 example_data/cases/flf/
 example_data/cases/unused
 notebooks/.ipynb_checkpoints
+notebooks/path
 notebooks/unused
 notebooks/request_cases.ipynb
 notebooks/making_holding.ipynb
