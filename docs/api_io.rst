@@ -5,12 +5,12 @@ I/O
     :maxdepth: 2
 
     io/dump
-    io/schemas
+    io/schemas_json
+    io/schemas_yaml
     io/api_spec
     io/downloads
     io/loaders
     io/readers
     io/writers
-    io/anchors
     io/filepaths
     io/name_index

@@ -31,6 +31,7 @@ of the repository using `Binder <https://mybinder.org/v2/gh/mscarey/AuthoritySpo
 
     guides/introduction.rst
     guides/template_strings.rst
+    guides/load_yaml_holdings.rst
     guides/create_holding_data.rst
     guides/example_holdings.rst
     guides/statute_rules.rst
