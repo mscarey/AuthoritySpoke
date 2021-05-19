@@ -599,7 +599,7 @@ class TestContradiction:
 
 
 class TestAddition:
-    def test_add_factor_to_rule(self, make_complex_rule, make_factor):
+    def test_add_factor_and_rule(self, make_complex_rule, make_factor):
         """
         Test that you can make a new version of a :class:`.Rule`,
         with one more input :class:`.Factor`, by using the addition operator with
@@ -613,6 +613,36 @@ class TestAddition:
             c["accept_murder_fact_from_relevance"] + make_factor["f_shooting"]
         )
         assert two_input_rule.means(c["accept_murder_fact_from_relevance_and_shooting"])
+
+    def test_add_factor_to_rule_in_place(self, make_complex_rule, make_factor):
+        """
+        Test that you can make a new version of a :class:`.Rule`,
+        with one more input :class:`.Factor`, by using the addition operator with
+        the :class:`.Rule` and input :class:`.Factor`.
+        """
+        c = make_complex_rule
+        assert not c["accept_murder_fact_from_relevance"].means(
+            c["accept_murder_fact_from_relevance_and_shooting"]
+        )
+        two_input_rule = deepcopy(c["accept_murder_fact_from_relevance"])
+        two_input_rule.add_factor(make_factor["f_shooting"])
+        assert two_input_rule.means(c["accept_murder_fact_from_relevance_and_shooting"])
+
+    def test_add_contradictory_factor_to_rule_in_place(
+        self, make_complex_rule, make_factor
+    ):
+        """
+        Test that you can make a new version of a :class:`.Rule`,
+        with one more input :class:`.Factor`, by using the addition operator with
+        the :class:`.Rule` and input :class:`.Factor`.
+        """
+        c = make_complex_rule
+        assert not c["accept_murder_fact_from_relevance"].means(
+            c["accept_murder_fact_from_relevance_and_shooting"]
+        )
+        two_input_rule = deepcopy(c["accept_murder_fact_from_relevance"])
+        with pytest.raises(ValueError):
+            two_input_rule.add_factor(two_input_rule.inputs[0].negated())
 
     def test_cannot_add_holding_to_rule(self, make_rule, make_holding):
         with pytest.raises(TypeError):
