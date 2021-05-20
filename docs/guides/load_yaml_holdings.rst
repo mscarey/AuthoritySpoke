@@ -373,7 +373,7 @@ set to True. The fields are:
 Here's the complete ``holdings`` field of the YAML file, with all the
 Factors filled in. Two boolean fields appear at the end.
 
-::
+.. parsed-literal::
 
     holdings:
       - inputs:
@@ -397,7 +397,7 @@ Factors filled in. Two boolean fields appear at the end.
             anchors: a crime to operate a money transmitting business without appropriate state licenses,
         enactments:
           - node: /us/usc/t18/s1960/b/1/A
-            anchors: state money transmitting licenses, see |18 U.S.C. § 1960(b)(1)(A)|
+            anchors: state money transmitting licenses, see :kbd:`|18 U.S.C. § 1960(b)(1)(A)|`
         enactments_despite:
           - node: /us/usc/t31/s5312/b/1
             anchors:
@@ -529,7 +529,7 @@ updated YAML file. (This is the same as the file
         name: operated without license
       enactments:
       - node: /us/usc/t18/s1960/b/1
-        anchors: state money transmitting licenses, see |18 U.S.C. § 1960(b)(1)(A)|
+        anchors: state money transmitting licenses, see :kbd:`|18 U.S.C. § 1960(b)(1)(A)|`
         name: state money transmitting license provision
       universal: true
     - inputs:
