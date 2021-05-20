@@ -47,7 +47,7 @@ def read_fact(record: RawFactor) -> Fact:
     Construct a :class:`Fact` after loading a dict from YAML.
 
     :param record:
-        parameter values to pass to :class:`.FactSchema`\.
+        parameter values to pass to :class:`authorityspoke.schemas_yaml.FactSchema`\.
 
     :returns:
         a :class:`Fact`, with optional mentioned factors
