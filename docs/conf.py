@@ -12,6 +12,7 @@
 #
 import os
 import sys
+import pathlib
 import sphinx_rtd_theme
 
 sys.path.insert(0, os.path.abspath(".."))
@@ -78,3 +79,10 @@ intersphinx_mapping = {
 }
 
 autodoc_member_order = "bysource"
+
+if "READTHEDOCS" in os.environ:
+    src_folder = pathlib.Path(__file__).resolve().parent.parent / "authorityspoke"
+    sys.path.append(str(src_folder))
+
+    print("Detected running on ReadTheDocs")
+    print(f"Added {src_folder} to sys.path")
