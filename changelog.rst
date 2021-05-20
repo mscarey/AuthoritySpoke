@@ -16,7 +16,7 @@ dev
 - Procedure has separate add_factor and with_factor methods
 
 0.6.0 (2021-04-09)
------------------
+------------------
 - Comparison methods use Explanations instead of ContextRegisters
 - Remove io/anchors module
 - Remove "factors" module that conflicted with Nettlesome module of same name

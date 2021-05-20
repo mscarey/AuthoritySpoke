@@ -20,12 +20,17 @@ class TestDownload:
 
     @pytest.mark.vcr
     def test_download_case_by_id(self):
-        case = self.client.fetch_id(cap_id=4066790)
+        case = self.client.fetch(4066790)
+        assert case["name_abbreviation"] == "Oracle America, Inc. v. Google Inc."
+
+    @pytest.mark.vcr
+    def test_download_case_by_string_id(self):
+        case = self.client.fetch("4066790")
         assert case["name_abbreviation"] == "Oracle America, Inc. v. Google Inc."
 
     @pytest.mark.vcr
     def test_download_case_by_cite(self):
-        case = self.client.fetch_cite(cite="49 F.3d 807")
+        case = self.client.fetch("49 F.3d 807")
         assert case["decision_date"] == "1995-03-09"
 
     @pytest.mark.vcr
@@ -78,12 +83,12 @@ class TestDownload:
 
     @pytest.mark.vcr
     def test_read_case_using_client(self):
-        licensing_case = self.client.read_cite(cite="621 F.3d 205", full_case=False)
+        licensing_case = self.client.read(query="621 F.3d 205", full_case=False)
         assert licensing_case.name_abbreviation == "United States v. Mazza-Alaluf"
 
     @pytest.mark.vcr
     def test_read_case_from_id_using_client(self):
-        case = self.client.read_id(cap_id=3675682, full_case=False)
+        case = self.client.read(query=3675682, full_case=False)
         assert case.name_abbreviation == "Kimbrough v. United States"
         cited_case = self.client.read_cite(cite=case.cites_to[0])
         assert cited_case.name_abbreviation == "United States v. Booker"

@@ -47,11 +47,8 @@ decisions, which means to fetch them and then
 convert them into AuthoritySpoke Decision objects. Since we know the
 citation of the case we want, we'll use the ``read_cite`` method.
 
-.. code:: ipython3
-
-    from authorityspoke.io.downloads import CAPClient
-
-    client = CAPClient(api_token=CAP_API_KEY)
+>>> from authorityspoke.io.downloads import CAPClient
+  client = CAPClient(api_token=CAP_API_KEY)
 
     licensing_case = client.read_cite(
         cite="621 F.3d 205",

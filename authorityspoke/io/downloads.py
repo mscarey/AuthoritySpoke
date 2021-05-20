@@ -222,3 +222,19 @@ class CAPClient:
         response = self.fetch_id(cap_id=cap_id, full_case=full_case)
         schema = DecisionSchema()
         return schema.load(response)
+
+    def fetch(
+        self, query: Union[int, str, CaseCitation, CAPCitation], full_case: bool = False
+    ) -> RawDecision:
+        """Query by CAP id or citation, and download Decision from CAP API."""
+        if isinstance(query, int) or (isinstance(query, str) and query.isdigit()):
+            return self.fetch_id(int(query), full_case=full_case)
+        return self.fetch_cite(query)
+
+    def read(
+        self, query: Union[int, str, CaseCitation, CAPCitation], full_case: bool = False
+    ) -> Decision:
+        """Query by CAP id or citation, download, and load Decision from CAP API."""
+        if isinstance(query, int) or (isinstance(query, str) and query.isdigit()):
+            return self.read_id(int(query), full_case=full_case)
+        return self.read_cite(query)

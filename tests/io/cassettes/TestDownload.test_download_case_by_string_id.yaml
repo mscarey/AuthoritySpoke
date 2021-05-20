@@ -1,0 +1,103 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.25.1
+    method: GET
+    uri: https://api.case.law/v1/cases/4066790/
+  response:
+    body:
+      string: !!binary |
+        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
+        ZIli8+3/VIUuKh4hAAA=
+    headers:
+      Accept-Ranges:
+      - bytes
+      Access-Control-Allow-Headers:
+      - Authorization
+      Access-Control-Allow-Origin:
+      - '*'
+      Allow:
+      - GET, HEAD, OPTIONS
+      CF-Cache-Status:
+      - MISS
+      CF-RAY:
+      - 6522978abf032f79-DFW
+      Cache-Control:
+      - s-maxage=86400, max-age=3600
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Length:
+      - '2294'
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 20 May 2021 03:48:54 GMT
+      Expect-CT:
+      - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - cloudflare
+      Strict-Transport-Security:
+      - max-age=15768000
+      Vary:
+      - Accept, Cookie, Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+      cf-request-id:
+      - 0a297d0ab800002f7909bd8000000001
+    status:
+      code: 200
+      message: OK
+version: 1
