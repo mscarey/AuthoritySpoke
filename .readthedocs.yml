@@ -21,8 +21,9 @@ python:
   version: 3.8
   install:
     - requirements: requirements.txt
+    - requirements: requirements-docs.txt 
 
     - method: pip
       path: .
       extra_requirements:
-        - requirements-docs.txt 
+        - docs
