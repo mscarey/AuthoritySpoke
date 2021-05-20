@@ -55,6 +55,10 @@ citation of the case we want, we'll use the :meth:`~authorityspoke.io.downloads.
     >>> print(licensing_case)
     United States v. Mazza-Alaluf, 621 F.3d 205 (2010-09-22)
 
+Because we used ``full_case=True``, we have the option to view the full
+text of the majority opinion using the command
+``licensing_case.majority.text``.
+    
 
 Creating Holdings with Python
 -----------------------------
@@ -570,4 +574,14 @@ Now when we load a file with this YAML, we'll get both Holdings.
     >>>     filename="holding_mazza_alaluf.yaml",
     >>>     client=LEGIS_CLIENT)
     >>> len(both_holdings_with_anchors.holdings)
+    2
+
+Now that we generated this :class:`~authorityspoke.opinions.AnchoredHoldings` object 
+containing the data from the YAML file, we can use the posit method to link those 
+:class:`~authorityspoke.holdings.Holding`\s to the judicial :class:`~authorityspoke.decisions.Decision` 
+we created from the data we downloaded from the CAP API. Then we can verify that 
+those two Holdings are now considered the two holdings of the Decision.
+
+    >>> licensing_case.posit(both_holdings_with_anchors)
+    >>> len(licensing_case.holdings)
     2
