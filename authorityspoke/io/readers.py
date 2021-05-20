@@ -187,7 +187,7 @@ def read_holdings_with_anchors(
     many: bool = True,
 ) -> AnchoredHoldings:
     r"""
-    Load a list of :class:`Holding`\s from JSON, with text links.
+    Load a list of Holdings from JSON, with text links.
 
     :param record:
         a list of dicts representing holdings, in the JSON input format
