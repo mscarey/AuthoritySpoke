@@ -1,7 +1,7 @@
 Changelog
 =========
 0.7.0 (2021-05-20)
------------------
+------------------
 * remove Enactment download functions (use Legislice download client instead)
 * remove Opinion download functions (use CAPClient class instead)
 * use different Legislice schema imports for JSON and YAML

@@ -12,7 +12,7 @@ AuthoritySpoke is a Python package [available on PyPI](https://pypi.org/project/
 $ pip install authorityspoke
 ```
 
-AuthoritySpoke runs on Python versions 3.7 and up.
+AuthoritySpoke runs on Python versions 3.8 and up.
 
 ## Trying it Out
 
