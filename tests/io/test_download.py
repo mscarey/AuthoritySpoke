@@ -7,7 +7,6 @@ import pytest
 
 from authorityspoke.io.downloads import CAPClient, AuthoritySpokeAPIError
 from authorityspoke.io.readers import read_decision
-from authorityspoke.io.loaders import load_decision
 from authorityspoke.io.loaders import load_and_read_decision
 from authorityspoke.io import writers
 from tests.test_notebooks import CAP_API_KEY

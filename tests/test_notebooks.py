@@ -17,7 +17,7 @@ from nettlesome import Statement
 
 load_dotenv()
 
-CAP_API_KEY = os.getenv("CAP_API_KEY")
+CAP_API_KEY = os.getenv("CAP_API_KEY") or ""
 
 
 class TestIntroduction:
