@@ -13,11 +13,10 @@ from authorityspoke.io.downloads import CAPClient
 from authorityspoke.io.readers import read_decision
 
 from authorityspoke import Entity, Predicate, Comparison
-from nettlesome import Statement
 
 load_dotenv()
 
-CAP_API_KEY = os.getenv("CAP_API_KEY") or ""
+CAP_API_KEY = os.getenv("CAP_API_KEY") or "wrong key"
 
 
 class TestIntroduction:
@@ -28,7 +27,6 @@ class TestIntroduction:
 
     client = CAPClient(api_token=CAP_API_KEY)
 
-    # @pytest.mark.skip(reason="uses API call")
     @pytest.mark.vcr
     def test_download_case(self):
         oracle_download = self.client.fetch_cite(cite="750 F.3d 1339", full_case=True)
