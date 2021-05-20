@@ -12,7 +12,6 @@
 #
 import os
 import sys
-import authorityspoke
 import sphinx_rtd_theme
 
 sys.path.insert(0, os.path.abspath(".."))
@@ -24,7 +23,7 @@ copyright = "2019-2020, Matt Carey"
 author = "Matt Carey"
 
 # The full version, including alpha/beta/rc tags
-release = authorityspoke.__version__
+release = "0.6.0"
 
 
 # -- General configuration ---------------------------------------------------
