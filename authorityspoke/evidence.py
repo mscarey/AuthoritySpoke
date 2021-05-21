@@ -87,7 +87,7 @@ class Exhibit(Factor):
             + f'{("asserting " + self.statement.short_string + ", ") if self.statement else ""}'
         )
         string = super().__str__().format(string)
-        return string.replace("exhibit", self.form or "exhibit").strip().strip(",")
+        return string.replace("exhibit", self.form or "exhibit").strip()
 
     @property
     def wrapped_string(self):
@@ -144,7 +144,7 @@ class Evidence(Factor):
 
     def __str__(self):
         string = (
-            f'{("of " + self.exhibit.short_string + ", ") if self.exhibit else ""}'
+            f'{("of " + self.exhibit.short_string + " ") if self.exhibit else ""}'
             + f'{("which supports " + self.to_effect.short_string) if self.to_effect else ""}'
         )
         return super().__str__().format(string).strip().replace("Evidence", "evidence")

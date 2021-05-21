@@ -27,6 +27,12 @@ The text delivered by the
 collected from print sources, so it will contain some Optical
 Character Recognition errors.
 
+    >>> from authorityspoke.io.loaders import load_decision
+    >>> from authorityspoke.io.readers import read_decision
+    >>> oracle_download = load_decision("oracle_h.json")
+    >>> lotus_download = load_decision("lotus_h.json")
+    >>> oracle = read_decision(oracle_download)
+    >>> lotus = read_decision(lotus_download)
 
 *Lotus v. Borland* 49 F.3d 807 (1995)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

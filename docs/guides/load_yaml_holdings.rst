@@ -35,6 +35,7 @@ documentation <https://saurabh-kumar.com/python-dotenv/#getting-started>`__.
     >>> import os
     >>> from dotenv import load_dotenv
     >>> load_dotenv()
+    True
     >>> CAP_API_KEY = os.getenv('CAP_API_KEY')
 
 Next, we'll create a :class:`~authorityspoke.io.downloads.CAPClient` object,
@@ -58,7 +59,7 @@ citation of the case we want, we'll use the :meth:`~authorityspoke.io.downloads.
 Because we used ``full_case=True``, we have the option to view the full
 text of the majority opinion using the command
 ``licensing_case.majority.text``.
-    
+
 
 Creating Holdings with Python
 -----------------------------
@@ -216,9 +217,9 @@ Factors and Entities in AuthoritySpoke YAML
 The fields ``inputs``, ``outputs``, and ``despite`` should each contain
 a list of :class:`~nettlesome.factors.Factor`\s. (If any of them is an empty list with no Factors,
 then it can be omitted.) A :class:`~nettlesome.factors.Factor` can be any of several ``type``\ s,
-including :class:`~authorityspoke.facts.Fact`\, :class:`~authorityspoke.evidence.Evidence`\, 
+including :class:`~authorityspoke.facts.Fact`\, :class:`~authorityspoke.evidence.Evidence`\,
 :class:`~authorityspoke.evidence.Exhibit`\, :class:`~authorityspoke.pleadings.Pleading`\, or
-:class:`~authorityspoke.pleadings.Allegation`\. Let's add one :class:`~nettlesome.factors.Factor` 
+:class:`~authorityspoke.pleadings.Allegation`\. Let's add one :class:`~nettlesome.factors.Factor`
 to the ``inputs`` field of the first :class:`~authorityspoke.holdings.Holding`\.
 
 ::
@@ -236,12 +237,12 @@ factor is being displayed visually as an annotation to the opinion). In
 this case, we simply copied the full text of the phrase from the :class:`~authorityspoke.opinions.Opinion`
 where the anchor should be
 placed. However, as we'll see later, we also could have used the
-:class:`~anchorpoint.textselectors.TextQuoteSelector` syntax from 
+:class:`~anchorpoint.textselectors.TextQuoteSelector` syntax from
 the `anchorpoint <https://anchorpoint.readthedocs.io/en/latest/>`__ package.
 
 The pairs of curly brackets in the "content" field above also have
 special meaning. A bracketed phrase in a ``content`` field identifies an
-:class:`~authorityspoke.entities.Entity`\. Typically 
+:class:`~authorityspoke.entities.Entity`\. Typically
 an ``Entity`` is a person or party, but important
 objects or concepts can also be labelled as class ``Entity``. If you
 identify a phrase as an ``Entity`` by putting brackets around it, the
@@ -494,12 +495,12 @@ Assigning Names to Factors and Enactments in YAML
 -------------------------------------------------
 
 The YAML data input format is still verbose, but there's one more
-feature we can use to shorten it. If a :class:`~nettlesome.factors.Factor` 
+feature we can use to shorten it. If a :class:`~nettlesome.factors.Factor`
 or :class:`~legislice.enactments.Enactment` is going to
 be used more than once in the same file, we can add a ``name`` field to
 the YAML for that object. Then, anytime the same object needs to be
 reused, we can just repeat the object's ``name`` rather than rewriting the
-whole object. 
+whole object.
 
 .. warning::
     Similar to the names of Entities as discussed above, any
@@ -576,10 +577,10 @@ Now when we load a file with this YAML, we'll get both Holdings.
     >>> len(both_holdings_with_anchors.holdings)
     2
 
-Now that we generated this :class:`~authorityspoke.opinions.AnchoredHoldings` object 
-containing the data from the YAML file, we can use the posit method to link those 
-:class:`~authorityspoke.holdings.Holding`\s to the judicial :class:`~authorityspoke.decisions.Decision` 
-we created from the data we downloaded from the CAP API. Then we can verify that 
+Now that we generated this :class:`~authorityspoke.opinions.AnchoredHoldings` object
+containing the data from the YAML file, we can use the posit method to link those
+:class:`~authorityspoke.holdings.Holding`\s to the judicial :class:`~authorityspoke.decisions.Decision`
+we created from the data we downloaded from the CAP API. Then we can verify that
 those two Holdings are now considered the two holdings of the Decision.
 
     >>> licensing_case.posit(both_holdings_with_anchors)

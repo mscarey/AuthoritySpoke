@@ -13,7 +13,7 @@ class TestExhibits:
             make_exhibit["no_shooting_testimony"].short_string.lower()
             == (
                 "the testimony attributed to <Alice>, asserting "
-                "the fact it was false that <Alice> shot <Bob>"
+                "the fact it was false that <Alice> shot <Bob>,"
             ).lower()
         )
 

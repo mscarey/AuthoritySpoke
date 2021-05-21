@@ -54,20 +54,24 @@ Python instead of loading them from a JSON file. For details, see the
 manual <https://authorityspoke.readthedocs.io/en/latest/>`__. Here’s an
 example of one JSON rule annotation.
 
+    >>> from pprint import pprint
     >>> from authorityspoke.io import loaders
     >>> beard_dictionary = loaders.load_holdings("beard_rules.json")
-    >>> beard_dictionary[0]
+    >>> pprint(beard_dictionary[0], sort_dicts=False)
     {'inputs': [{'type': 'fact',
-       'content': '{the suspected beard} was facial hair'},
-      {'type': 'fact',
-       'content': 'the length of the suspected beard was >= 5 millimetres'},
-      {'type': 'fact',
-       'content': 'the suspected beard occurred on or below the chin'}],
+                 'content': '{the suspected beard} was facial hair'},
+                {'type': 'fact',
+                 'content': 'the length of the suspected beard was >= 5 '
+                            'millimetres'},
+                {'type': 'fact',
+                 'content': 'the suspected beard occurred on or below the chin'}],
      'outputs': [{'type': 'fact',
-       'content': 'the suspected beard was a beard',
-       'name': 'the fact that the facial hair was a beard'}],
+                  'content': 'the suspected beard was a beard',
+                  'name': 'the fact that the facial hair was a beard'}],
      'enactments': [{'node': '/test/acts/47/4',
-       'exact': 'In this Act, beard means any facial hair no shorter than 5 millimetres in length that: occurs on or below the chin'}],
+                     'exact': 'In this Act, beard means any facial hair no shorter '
+                              'than 5 millimetres in length that: occurs on or '
+                              'below the chin'}],
      'universal': True}
 
 
@@ -86,12 +90,12 @@ describe two ways that an object can be defined to be a “beard”.
     >>> print(beard_rules[0])
     the Rule that the court MAY ALWAYS impose the
       RESULT:
-        the Fact that <the suspected beard> was a beard
+        the fact that <the suspected beard> was a beard
       GIVEN:
-        the Fact that <the suspected beard> was facial hair
-        the Fact that the length of <the suspected beard> was at least 5
+        the fact that <the suspected beard> was facial hair
+        the fact that the length of <the suspected beard> was at least 5
         millimeter
-        the Fact that <the suspected beard> occurred on or below the chin
+        the fact that <the suspected beard> occurred on or below the chin
       GIVEN the ENACTMENT:
         "In this Act, beard means any facial hair no shorter than 5 millimetres in length that: occurs on or below the chin…" (/test/acts/47/4 1935-04-01)
 
@@ -99,16 +103,15 @@ describe two ways that an object can be defined to be a “beard”.
     >>> print(beard_rules[1])
     the Rule that the court MAY ALWAYS impose the
       RESULT:
-        the Fact that <the suspected beard> was a beard
+        the fact that <the suspected beard> was a beard
       GIVEN:
-        the Fact that <the suspected beard> was facial hair
-        the Fact that the length of <the suspected beard> was at least 5
+        the fact that <the suspected beard> was facial hair
+        the fact that the length of <the suspected beard> was at least 5
         millimeter
-        the Fact that <the suspected beard> existed in an uninterrupted line
+        the fact that <the suspected beard> existed in an uninterrupted line
         from the front of one ear to the front of the other ear below the nose
-      GIVEN the ENACTMENTS:
+      GIVEN the ENACTMENT:
         "In this Act, beard means any facial hair no shorter than 5 millimetres in length that:…exists in an uninterrupted line from the front of one ear to the front of the other ear below the nose." (/test/acts/47/4 1935-04-01)
-        "exists in an uninterrupted line from the front of one ear to the front of the other ear below the nose." (/test/acts/47/4/b 1935-04-01)
 
 
 The difference between these two Rules is that the first one applies to
@@ -139,12 +142,12 @@ we can determine that the original “chin rule” implies our new Rule.
     >>> print(longer_hair_rule)
     the Rule that the court MAY ALWAYS impose the
       RESULT:
-        the Fact that <the suspected beard> was a beard
+        the fact that <the suspected beard> was a beard
       GIVEN:
-        the Fact that <the suspected beard> was facial hair
-        the Fact that the length of <the suspected beard> was exactly equal to
+        the fact that <the suspected beard> was facial hair
+        the fact that the length of <the suspected beard> was exactly equal to
         8 millimeter
-        the Fact that <the suspected beard> occurred on or below the chin
+        the fact that <the suspected beard> occurred on or below the chin
       GIVEN the ENACTMENT:
         "In this Act, beard means any facial hair no shorter than 5 millimetres in length that: occurs on or below the chin…" (/test/acts/47/4 1935-04-01)
 
@@ -161,27 +164,26 @@ library). And we can show that this new Rule contradicts a Rule that
 came from the Beard Tax Act.
 
     >>> beard_dictionary[1]["despite"] = [
-    >>>   beard_dictionary[1]["inputs"][0],
-    >>>   beard_dictionary[1]["inputs"][2],
-    >>>  ]
+    ...     beard_dictionary[1]["inputs"][0],
+    ...     beard_dictionary[1]["inputs"][2]]
     >>> beard_dictionary[1]["inputs"] = {
-        "type": "fact",
-        "content": "the length of the suspected beard was >= 12 inches",
-    }
+    ...    "type": "fact",
+    ...    "content": "the length of the suspected beard was >= 12 inches"}
     >>> beard_dictionary[1]["outputs"][0]["truth"] = False
     >>> beard_dictionary[1]["mandatory"] = True
     >>> long_means_not_beard = readers.read_rule(beard_dictionary[1], client=legis_client)
     >>> print(long_means_not_beard)
     the Rule that the court MUST ALWAYS impose the
       RESULT:
-        the Fact it is false that <the suspected beard> was a beard
+        the fact it was false that <the suspected beard> was a beard
       GIVEN:
-        the Fact that the length of <the suspected beard> was at least 12 inch
+        the fact that the length of <the suspected beard> was at least 12 inch
       DESPITE:
-        the Fact that <the suspected beard> was facial hair
-      GIVEN the ENACTMENTS:
+        the fact that <the suspected beard> was facial hair
+        the fact that <the suspected beard> existed in an uninterrupted line
+        from the front of one ear to the front of the other ear below the nose
+      GIVEN the ENACTMENT:
         "In this Act, beard means any facial hair no shorter than 5 millimetres in length that:…exists in an uninterrupted line from the front of one ear to the front of the other ear below the nose." (/test/acts/47/4 1935-04-01)
-        "exists in an uninterrupted line from the front of one ear to the front of the other ear below the nose." (/test/acts/47/4/b 1935-04-01)
 
 
 
@@ -234,7 +236,7 @@ Here are the two Rules we’ll be adding together.
         the Fact it is false that <the counterparty> was <the Department of
         Beards>
       DESPITE:
-        the Fact that the token attributed to <the Department of Beards>,
+        the fact that the token attributed to <the Department of Beards>,
         asserting the fact that <the Department of Beards> granted an
         exemption from the prohibition of wearing beards, was counterfeit
       GIVEN the ENACTMENTS:
