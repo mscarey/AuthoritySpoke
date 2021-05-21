@@ -259,26 +259,26 @@ class HoldingSchema(Schema):
 
 class NamedAnchors(NamedTuple):
     name: Factor
-    quotes: List[TextQuoteSelector]
+    anchors: List[TextQuoteSelector]
 
 
 class NamedAnchorsSchema(Schema):
     __model__ = NamedAnchors
 
     name = fields.Nested(FactorSchema)
-    quotes = fields.Nested(SelectorSchema, many=True)
+    anchors = fields.Nested(SelectorSchema, many=True)
 
 
 class AnchoredEnactments(NamedTuple):
     enactment: Enactment
-    quotes: List[TextQuoteSelector]
+    anchors: List[TextQuoteSelector]
 
 
 class AnchoredEnactmentsSchema(Schema):
     __model__ = AnchoredEnactments
 
     enactment = fields.Nested(EnactmentSchema)
-    quotes = fields.Nested(SelectorSchema, many=True)
+    anchors = fields.Nested(SelectorSchema, many=True)
 
 
 SCHEMAS = list(Schema.__subclasses__()) + [SelectorSchema, EnactmentSchema]
