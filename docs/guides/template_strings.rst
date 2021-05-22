@@ -137,9 +137,9 @@ a string when constructing the Comparison object, and it will be converted to a 
 
     >>> from authorityspoke import Comparison
     >>> drug_comparison = Comparison(
-    >>>     "the weight of marijuana that $defendant possessed was",
-    >>>     sign=">=",
-    >>>     expression="0.5 kilograms")
+    ...     "the weight of marijuana that $defendant possessed was",
+    ...     sign=">=",
+    ...     expression="0.5 kilograms")
     >>> str(drug_comparison)
     'that the weight of marijuana that $defendant possessed was at least 0.5 kilogram'
 
@@ -153,9 +153,9 @@ one Comparison :meth:`~nettlesome.predicates.Comparison.implies` or
 :meth:`~nettlesome.predicates.Comparison.contradicts` another.
 
     >>> smaller_drug_comparison = Comparison(
-    >>>     "the weight of marijuana that $defendant possessed was",
-    >>>     sign=">=",
-    >>>     expression="250 grams")
+    ...     "the weight of marijuana that $defendant possessed was",
+    ...     sign=">=",
+    ...     expression="250 grams")
     >>> str(smaller_drug_comparison)
     'that the weight of marijuana that $defendant possessed was at least 250 gram'
 
@@ -174,10 +174,10 @@ was more than 10 grams. AuthoritySpoke interprets this to mean it’s true
 that the weight was no more than 10 grams.
 
     >>> drug_comparison_with_upper_bound = Comparison(
-    >>>     "the weight of marijuana that $defendant possessed was",
-    >>>     sign=">",
-    >>>     expression="10 grams",
-    >>>     truth=False)
+    ...     "the weight of marijuana that $defendant possessed was",
+    ...     sign=">",
+    ...     expression="10 grams",
+    ...     truth=False)
     >>> str(drug_comparison_with_upper_bound)
     'that the weight of marijuana that $defendant possessed was no more than 10 gram'
 
@@ -207,9 +207,9 @@ describes. The template string will still need to end with the word
 floating point number, not a string to be parsed.
 
     >>> three_children = Comparison(
-    >>>     "the number of children in ${taxpayer}'s household was",
-    >>>     sign="=",
-    >>>     expression=3)
+    ...     "the number of children in ${taxpayer}'s household was",
+    ...     sign="=",
+    ...     expression=3)
     >>> str(three_children)
     "that the number of children in ${taxpayer}'s household was exactly equal to 3"
 
@@ -316,8 +316,11 @@ method to find out which pairs of
 generic terms can be considered analagous to one another.
 
     >>> explanation = devon_tax_rate.explain_implication(elaine_tax_rate)
-    >>> str(explanation)
-    'ContextRegister(<Devon> is like <Elaine>)'
+    >>> print(explanation)
+    Because <Devon> is like <Elaine>,
+      the fact that <Devon>'s marginal income tax rate was exactly equal to 0.3
+    IMPLIES
+      the fact that <Elaine>'s marginal income tax rate was greater than 0.25
 
 
 Identical Terms
@@ -330,8 +333,8 @@ that Predicate, only include each unique term once. The terms should be
 listed in the same order that they first appear in the template text.
 
     >>> opened_account = Fact(
-    >>>     Predicate("$applicant opened a bank account for $applicant and $cosigner"),
-    >>>     terms=(devon, elaine))
+    ...     Predicate("$applicant opened a bank account for $applicant and $cosigner"),
+    ...     terms=(devon, elaine))
     >>> str(opened_account)
     'the fact that <Devon> opened a bank account for <Devon> and <Elaine>'
 
@@ -349,11 +352,11 @@ each end with a different digit.
     >>> ann = Entity("Ann", generic=False)
     >>> bob = Entity("Bob", generic=False)
     >>> ann_and_bob_were_family = Fact(
-    >>>     predicate=Predicate("$relative1 and $relative2 both were members of the same family"),
-    >>>     terms=(ann, bob))
+    ...     predicate=Predicate("$relative1 and $relative2 both were members of the same family"),
+    ...     terms=(ann, bob))
     >>> bob_and_ann_were_family = Fact(
-    >>>     predicate=Predicate("$relative1 and $relative2 both were members of the same family"),
-    >>>     terms=(bob, ann))
+    ...     predicate=Predicate("$relative1 and $relative2 both were members of the same family"),
+    ...     terms=(bob, ann))
     >>> str(ann_and_bob_were_family)
     'the fact that Ann and Bob both were members of the same family'
 

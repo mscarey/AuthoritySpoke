@@ -10,6 +10,7 @@ holdings:
     enactments:
     - node: /us/usc/t18/s1960/b/1
       anchors: state money transmitting licenses, see |18 U.S.C. § 1960(b)(1)(A)|
+      exact: is operated without an appropriate money transmitting license in a State where such operation is punishable as a misdemeanor or a felony under State law, whether or not the defendant knew that the operation was required to be licensed or that the operation was so punishable
       name: state money transmitting license provision
     universal: true
   - inputs:

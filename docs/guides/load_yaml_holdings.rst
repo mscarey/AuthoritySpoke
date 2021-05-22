@@ -51,14 +51,13 @@ citation of the case we want, we'll use the :meth:`~authorityspoke.io.downloads.
     >>> from authorityspoke.io.downloads import CAPClient
     >>> client = CAPClient(api_token=CAP_API_KEY)
     >>> licensing_case = client.read_cite(
-    >>>     cite="621 F.3d 205",
-    >>>     full_case=True)
+    ...     cite="621 F.3d 205",
+    ...     full_case=False)
     >>> print(licensing_case)
     United States v. Mazza-Alaluf, 621 F.3d 205 (2010-09-22)
 
-Because we used ``full_case=True``, we have the option to view the full
-text of the majority opinion using the command
-``licensing_case.majority.text``.
+If we had used ``full_case=True``, we would have the option to view the full
+text of the majority opinion using the command ``licensing_case.majority.text``.
 
 
 Creating Holdings with Python
@@ -74,19 +73,19 @@ something about how one factual finding can lead to another.
 
     >>> from authorityspoke import Entity, Fact, Holding
     >>> new_york_offense = Fact(
-    >>>     "$defendant used ${defendant}'s business $business to commit the New York offense "
-    >>>     "of engaging in the business of receiving money "
-    >>>     "for transmission or transmitting the same, without a license therefor",
-    >>>     terms=[Entity("Mazza-Alaluf"), Entity("Turismo Costa Brava")])
+    ...     "$defendant used ${defendant}'s business $business to commit the New York offense "
+    ...     "of engaging in the business of receiving money "
+    ...     "for transmission or transmitting the same, without a license therefor",
+    ...     terms=[Entity("Mazza-Alaluf"), Entity("Turismo Costa Brava")])
     >>> no_appropriate_state_license = Fact(
-    >>>     ("$defendant operated $business without an appropriate money transmitting "
-    >>>     "license in a State where such operation was punishable as a misdemeanor "
-    >>>     "or a felony under State law"),
-    >>>     terms=[Entity("Mazza-Alaluf"), Entity("Turismo Costa Brava")])
+    ...     ("$defendant operated $business without an appropriate money transmitting "
+    ...     "license in a State where such operation was punishable as a misdemeanor "
+    ...     "or a felony under State law"),
+    ...     terms=[Entity("Mazza-Alaluf"), Entity("Turismo Costa Brava")])
     >>> new_york_holding = Holding.from_factors(
-    >>>     inputs=new_york_offense,
-    >>>     outputs=no_appropriate_state_license,
-    >>>     universal=True)
+    ...     inputs=new_york_offense,
+    ...     outputs=no_appropriate_state_license,
+    ...     universal=True)
     >>> print(new_york_holding)
     the Holding to ACCEPT
       the Rule that the court MAY ALWAYS impose the
@@ -417,14 +416,13 @@ AuthoritySpoke. Let's say the YAML file will be called ``myfile.yaml``,
 and the path to that file from this notebook will be
 ``path/to/myfile.yaml``. In order to load not just the Holdings but also
 the text anchors, we'll load the file using the
-:func:`authorityspoke.io.readers.read_holdings_with_anchors` function. Notice that we're using the
-``filepath`` parameter instead of ``filename``.
+:func:`authorityspoke.io.readers.read_holdings_with_anchors` function.
 
     >>> from authorityspoke.io.loaders import read_anchored_holdings_from_file
     >>> holding_and_anchors = read_anchored_holdings_from_file(
-    >>>     filepath="path/to/myfile.yaml",
-    >>>     client=LEGIS_CLIENT)
-    >>> holding_from_yaml = holding_and_anchors.holdings[0]
+    ...     filename="holding_mazza_alaluf.yaml",
+    ...     client=LEGIS_CLIENT)
+    >>> holding_from_yaml = holding_and_anchors.holdings[1]
 
 Next, we'll print the holding we loaded to see how AuthoritySpoke
 interpreted the YAML file.
@@ -446,7 +444,7 @@ interpreted the YAML file.
           the fact it was false that <Turismo Costa Brava> was a domestic
           financial institution
         GIVEN the ENACTMENT:
-          "is operated without an appropriate money transmitting license in a State where such operation is punishable as a misdemeanor or a felony under State law, whether or not the defendant knew that the operation was required to be licensed or that the operation was so punishable;" (/us/usc/t18/s1960/b/1/A 2013-07-18)
+          "…is operated without an appropriate money transmitting license in a State where such operation is punishable as a misdemeanor or a felony under State law, whether or not the defendant knew that the operation was required to be licensed or that the operation was so punishable…" (/us/usc/t18/s1960/b/1 2013-07-18)
         DESPITE the ENACTMENT:
           "“domestic financial agency” and “domestic financial institution” apply to an action in the United States of a financial agency or institution." (/us/usc/t31/s5312/b/1 2013-07-18)
 
@@ -478,7 +476,7 @@ information from both of them.
           the fact it was false that <Turismo Costa Brava> was a domestic
           financial institution
         GIVEN the ENACTMENT:
-          "the term “unlicensed money transmitting business” means a money transmitting business which affects interstate or foreign commerce in any manner or degree and— is operated without an appropriate money transmitting license in a State where such operation is punishable as a misdemeanor or a felony under State law, whether or not the defendant knew that the operation was required to be licensed or that the operation was so punishable;…" (/us/usc/t18/s1960/b/1 2013-07-18)
+          "the term “unlicensed money transmitting business” means a money transmitting business which affects interstate or foreign commerce in any manner or degree and— is operated without an appropriate money transmitting license in a State where such operation is punishable as a misdemeanor or a felony under State law, whether or not the defendant knew that the operation was required to be licensed or that the operation was so punishable…" (/us/usc/t18/s1960/b/1 2013-07-18)
         DESPITE the ENACTMENT:
           "“domestic financial agency” and “domestic financial institution” apply to an action in the United States of a financial agency or institution." (/us/usc/t31/s5312/b/1 2013-07-18)
 
@@ -572,8 +570,8 @@ provision".
 Now when we load a file with this YAML, we'll get both Holdings.
 
     >>> both_holdings_with_anchors = read_anchored_holdings_from_file(
-    >>>     filename="holding_mazza_alaluf.yaml",
-    >>>     client=LEGIS_CLIENT)
+    ...     filename="holding_mazza_alaluf.yaml",
+    ...     client=LEGIS_CLIENT)
     >>> len(both_holdings_with_anchors.holdings)
     2
 

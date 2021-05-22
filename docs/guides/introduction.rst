@@ -69,17 +69,19 @@ Package Index <https://pypi.org/project/AuthoritySpoke/>`__ for more
 details.
 
 With a Python environment activated, let’s import AuthoritySpoke by
-running the cell below. If you’re running this code on your own machine
+running the cell below.
+
+    >>> import authorityspoke
+    >>> USE_REAL_CASE_API = True
+    >>> USE_REAL_LEGISLICE_API = True
+
+If you’re running this code on your own machine
 but you don’t want to obtain API keys or make real API calls over the
 Internet, you can change the two ``True`` variables to ``False`` to
 use fake versions of the APIs.
 
-.. code:: ipython3
-
-    import authorityspoke
-
-    USE_REAL_CASE_API = True
-    USE_REAL_LEGISLICE_API = True
+    >>> USE_REAL_CASE_API = False
+    >>> USE_REAL_LEGISLICE_API = False
 
 If you executed that cell with no error messages, then it worked!
 
@@ -103,15 +105,11 @@ notebook will try to find the data for the fake APIs in the
 ``example_data`` folder alongside a ``notebooks`` folder where this
 notebook is running.
 
-.. code:: ipython3
-
-    from authorityspoke.io.loaders import load_decision
-    from authorityspoke.io.readers import read_decision
-
-    if not USE_REAL_CASE_API:
-
-        oracle_download = load_decision("oracle_h.json")
-        lotus_download = load_decision("lotus_h.json")
+    >>> from authorityspoke.io.loaders import load_decision
+    >>> from authorityspoke.io.readers import read_decision
+    >>> if not USE_REAL_CASE_API:
+    ...     oracle_download = load_decision("oracle_h.json")
+    ...     lotus_download = load_decision("lotus_h.json")
 
 Downloading and Importing Decisions
 --------------------------------------
@@ -137,13 +135,11 @@ Binder, you probably won’t be able to create an environment variable.
 Instead, you could replace ``os.getenv('CAP_API_KEY')`` with a string
 containing your own API key.
 
-.. code:: ipython3
-
-    import os
-    from dotenv import load_dotenv
-    load_dotenv()
-
-    CAP_API_KEY = os.getenv('CAP_API_KEY')
+    >>> import os
+    >>> from dotenv import load_dotenv
+    >>> load_dotenv()
+    True
+    >>> CAP_API_KEY = os.getenv('CAP_API_KEY')
 
 Next we need to download some cases for analysis.
 
@@ -170,20 +166,18 @@ below with ``USE_REAL_CASE_API`` set to True will attempt to overwrite
 them with data from the API. You should be able to run the rest of the
 tutorial code either way.
 
-.. code:: ipython3
-
-    from authorityspoke.io.downloads import download_case
-    from authorityspoke.io.loaders import load_and_read_decision
-
-    if USE_REAL_CASE_API:
-        oracle_download = download_case(cite="750 F.3d 1339")
+    >>> from authorityspoke import LegisClient
+    >>> from authorityspoke.io.loaders import load_and_read_decision
+    >>> if USE_REAL_CASE_API:
+    ...     client = LegisClient(api_token=CAP_API_KEY)
+    ...     oracle_download = client.fetch(cite="750 F.3d 1339")
 
 Now we have a record representing the *Oracle* case, which can also be
 found in the “example_data/opinions” folder under the filename
 “oracle_h.json”. Let’s look at a field from the API response.
 
-  >>> oracle_download["name"]
-  'ORACLE AMERICA, INC., Plaintiff-Appellant, v. GOOGLE INC., Defendant-Cross-Appellant'
+    >>> oracle_download["name"]
+    'ORACLE AMERICA, INC., Plaintiff-Appellant, v. GOOGLE INC., Defendant-Cross-Appellant'
 
 Yes, this is the correct case name. But if we had provided the API key
 and used the ``full_case`` flag, we could have received more
@@ -191,23 +185,19 @@ information, like whether there are any non-majority opinions in the
 case, and the names of the opinion authors. So let’s request the
 *Oracle* case with ``full_case=True``.
 
-.. code:: ipython3
-
-    if USE_REAL_CASE_API:
-        oracle_download = download_case(
-        cite="750 F.3d 1339",
-        full_case=True,
-        api_key=CAP_API_KEY)
+    >>> if USE_REAL_CASE_API:
+    ...     oracle_download = download_case(
+    ...     cite="750 F.3d 1339",
+    ...     full_case=True,
+    ...     api_key=CAP_API_KEY)
 
 And then do the same for the *Lotus* case.
 
-.. code:: ipython3
-
-    if USE_REAL_CASE_API:
-        lotus_download = download_case(
-        cite="49 F.3d 807",
-        full_case=True,
-        api_key=CAP_API_KEY)
+    >>> if USE_REAL_CASE_API:
+    ...    lotus_download = download_case(
+    ...    cite="49 F.3d 807",
+    ...    full_case=True,
+    ...    api_key=CAP_API_KEY)
 
 Now let’s convert the *Oracle* API response to an AuthoritySpoke object.
 
@@ -246,18 +236,13 @@ use :meth:`legislice.download.Client.read`, which also
 fetches the JSON but then loads it into an instance of
 the :class:`~legislice.enactments.Enactment` class.
 
-.. code:: ipython3
-
-    from authorityspoke.io.downloads import Client
-    from authorityspoke.io.fake_enactments import FakeClient
-
-    if USE_REAL_LEGISLICE_API:
-
-        LEGISLICE_API_TOKEN = os.getenv("LEGISLICE_API_TOKEN")
-        legis_client = Client(api_token=LEGISLICE_API_TOKEN)
-
-    else:
-        legis_client = FakeClient.from_file("usc.json")
+    >>> from authorityspoke.io.downloads import LegisClient
+    >>> from authorityspoke.io.fake_enactments import FakeClient
+    >>> if USE_REAL_LEGISLICE_API:
+    ...    LEGISLICE_API_TOKEN = os.getenv("LEGISLICE_API_TOKEN")
+    ...    legis_client = LegisClient(api_token=LEGISLICE_API_TOKEN)
+    ... else:
+    ...    legis_client = FakeClient.from_file("usc.json")
 
 
 
@@ -308,43 +293,43 @@ the :class:`~authorityspoke.holdings.Holding`\.
     the Holding to ACCEPT
       the Rule that the court MUST SOMETIMES impose the
         RESULT:
-          the Fact it is false that <the Java API> was copyrightable
+          the fact it was false that <the Java API> was copyrightable
         GIVEN:
-          the Fact it is false that <the Java API> was an original work
+          the fact it was false that <the Java API> was an original work
         GIVEN the ENACTMENT:
           "Copyright protection subsists, in accordance with this title, in original works of authorship fixed in any tangible medium of expression, now known or later developed, from which they can be perceived, reproduced, or otherwise communicated, either directly or with the aid of a machine or device.…" (/us/usc/t17/s102/a 2013-07-18)
 
 You can also convert Holdings back to JSON, or to a Python dictionary,
 using the :mod:`~authorityspoke.io.dump` module.
 
+    >>> from pprint import pprint
     >>> from authorityspoke.io.dump import to_json, to_dict
-    >>> to_dict(oracle_holdings[0])["rule"]["procedure"]
-    {'outputs': [{'predicate': {'content': '${the_java_api} was copyrightable',
-        'expression': None,
-        'truth': False},
-      'terms': [{'plural': False,
-        'name': 'the Java API',
-        'generic': True,
-        'type': 'Entity'}],
-      'absent': False,
-      'name': 'false the Java API was copyrightable',
-      'standard_of_proof': None,
-      'generic': False,
-      'type': 'Fact'}],
-    'despite': [],
-    'inputs': [{'predicate': {'content': '${the_java_api} was an original work',
-        'expression': None,
-        'truth': False},
-      'terms': [{'plural': False,
-        'name': 'the Java API',
-        'generic': True,
-        'type': 'Entity'}],
-      'absent': False,
-      'name': 'false the Java API was an original work',
-      'standard_of_proof': None,
-      'generic': False,
-      'type': 'Fact'}]}
-
+    >>> pprint(to_dict(oracle_holdings[0])["rule"]["procedure"])
+    {'despite': [],
+     'inputs': [{'absent': False,
+                 'generic': False,
+                 'name': '',
+                 'predicate': {'content': '${the_java_api} was an original work',
+                               'expression': None,
+                               'truth': False},
+                 'standard_of_proof': None,
+                 'terms': [{'generic': True,
+                            'name': 'the Java API',
+                            'plural': False,
+                            'type': 'Entity'}],
+                 'type': 'Fact'}],
+     'outputs': [{'absent': False,
+                  'generic': False,
+                  'name': '',
+                  'predicate': {'content': '${the_java_api} was copyrightable',
+                                'expression': None,
+                                'truth': False},
+                  'standard_of_proof': None,
+                  'terms': [{'generic': True,
+                             'name': 'the Java API',
+                             'plural': False,
+                             'type': 'Entity'}],
+                  'type': 'Fact'}]}
 
 Linking Holdings to Opinions
 -------------------------------
@@ -363,9 +348,9 @@ This will also link the correct text passages from
 the :class:`~authorityspoke.opinions.Opinion` to
 each :class:`~authorityspoke.holdings.Holding`\.
 
-    >>> from authorityspoke.io.loaders import load_holdings_with_anchors
-    >>> oracle_holdings_with_anchors = load_holdings_with_anchors("holding_oracle.json", client=legis_client)
-    >>> lotus_holdings_with_anchors = load_holdings_with_anchors("holding_lotus.json", client=legis_client)
+    >>> from authorityspoke.io.loaders import read_anchored_holdings_from_file
+    >>> oracle_holdings_with_anchors = read_anchored_holdings_from_file("holding_oracle.json", client=legis_client)
+    >>> lotus_holdings_with_anchors = read_anchored_holdings_from_file("holding_lotus.json", client=legis_client)
     >>> oracle.posit(oracle_holdings_with_anchors)
     >>> lotus.posit(lotus_holdings_with_anchors)
 
@@ -400,9 +385,9 @@ object we created from the structured JSON we saw above.
     the Holding to ACCEPT
       the Rule that the court MUST SOMETIMES impose the
         RESULT:
-          the Fact it is false that <the Java API> was copyrightable
+          the fact it was false that <the Java API> was copyrightable
         GIVEN:
-          the Fact it is false that <the Java API> was an original work
+          the fact it was false that <the Java API> was an original work
         GIVEN the ENACTMENT:
           "Copyright protection subsists, in accordance with this title, in original works of authorship fixed in any tangible medium of expression, now known or later developed, from which they can be perceived, reproduced, or otherwise communicated, either directly or with the aid of a machine or device.…" (/us/usc/t17/s102/a 2013-07-18)
 
@@ -416,7 +401,7 @@ another kind of enactment such as a constitution) can also be a
 precondition for a :class:`~authorityspoke.rules.Rule` to apply.
 So the two preconditions that must
 be present to apply this :class:`~authorityspoke.rules.Rule` are
-“the Fact it is false that the Java API was an original work” and
+“the fact it was false that the Java API was an original work” and
 the statutory text creating copyright protection.
 
 It’s also important to notice that
@@ -432,7 +417,7 @@ We can also access just the inputs of a :class:`~authorityspoke.holdings.Holding
 :class:`~authorityspoke.enactments.Enactment`\s, etc.
 
     >>> print(oracle.holdings[0].inputs[0])
-    the Fact it is false that <the Java API> was an original work
+    the fact it was false that <the Java API> was an original work
 
 
     >>> print(oracle.holdings[0].enactments[0])
@@ -446,8 +431,8 @@ The two instances of the phrase “the Java API” are in angle brackets to
 indicate that the Java API is a generic :class:`nettlesome.entities.Entity` mentioned
 in the :class:`~authorityspoke.facts.Fact`\.
 
-    >>> oracle.holdings[0].generic_terms
-    [Entity(name='the Java API', generic=True, plural=False, anchors=[])]
+    >>> oracle.holdings[0].generic_terms()
+    [Entity(name='the Java API')]
 
 
 A generic :class:`~nettlesome.entities.Entity` is “generic”
@@ -467,11 +452,11 @@ case.
     command hierarchy> is
       the Rule that the court MAY SOMETIMES impose the
         RESULT:
-          the Fact that <Borland International> infringed the copyright in <the
+          the fact that <Borland International> infringed the copyright in <the
           Lotus menu command hierarchy>
         GIVEN:
-          the Fact that <the Lotus menu command hierarchy> was copyrightable
-          the Fact that <Borland International> copied constituent elements of
+          the fact that <the Lotus menu command hierarchy> was copyrightable
+          the fact that <Borland International> copied constituent elements of
           <the Lotus menu command hierarchy> that were original
         GIVEN the ENACTMENT:
           "Copyright protection subsists, in accordance with this title, in original works of authorship fixed in any tangible medium of expression, now known or later developed, from which they can be perceived, reproduced, or otherwise communicated, either directly or with the aid of a machine or device.…" (/us/usc/t17/s102/a 2013-07-18)
@@ -486,9 +471,8 @@ the :class:`~authorityspoke.holdings.Holding`, which were marked off in
 angle brackets in the string representation of
 the :class:`~authorityspoke.holdings.Holding`\.
 
-    >>> lotus.holdings[0].generic_terms
-    [Entity(name='Borland International', generic=True, plural=False, anchors=[]),
-    Entity(name='the Lotus menu command hierarchy', generic=True, plural=False, anchors=[])]
+    >>> lotus.holdings[0].generic_terms()
+    [Entity(name='Borland International'), Entity(name='the Lotus menu command hierarchy')]
 
 
 The same :class:`~authorityspoke.rules.Rule`\s and
@@ -513,12 +497,10 @@ followed by a list of their replacements.
 
     >>> from authorityspoke import Entity
     >>> seinfeld_holding = lotus.holdings[0].new_context(
-        terms_to_replace=[
-                Entity("Borland International"),
-                Entity("the Lotus menu command hierarchy"),
-            ],
-        changes=[Entity("Carol Publishing Group"), Entity("Seinfeld")]
-    )
+    ...    terms_to_replace=[
+    ...        Entity("Borland International"),
+    ...        Entity("the Lotus menu command hierarchy")],
+    ...    changes=[Entity("Carol Publishing Group"), Entity("Seinfeld")])
 
 The :meth:`~authorityspoke.holdings.Holding.new_context` method
 returns a new :class:`~authorityspoke.holdings.Holding` object,
@@ -531,11 +513,11 @@ unchanged.
     the Holding to ACCEPT
       the Rule that the court MAY SOMETIMES impose the
         RESULT:
-          the Fact that <Carol Publishing Group> infringed the copyright in
+          the fact that <Carol Publishing Group> infringed the copyright in
           <Seinfeld>
         GIVEN:
-          the Fact that <Seinfeld> was copyrightable
-          the Fact that <Carol Publishing Group> copied constituent elements of
+          the fact that <Seinfeld> was copyrightable
+          the fact that <Carol Publishing Group> copied constituent elements of
           <Seinfeld> that were original
         GIVEN the ENACTMENT:
           "Copyright protection subsists, in accordance with this title, in original works of authorship fixed in any tangible medium of expression, now known or later developed, from which they can be perceived, reproduced, or otherwise communicated, either directly or with the aid of a machine or device.…" (/us/usc/t17/s102/a 2013-07-18)
@@ -592,12 +574,11 @@ matches some text that can be found in subsection 102(a).
 
     >>> from authorityspoke import Enactment
     >>> from anchorpoint import TextQuoteSelector
-    works_of_authorship_passage = (
-        "Copyright protection subsists, in accordance with this title, "
-        + "in original works of authorship"
-    )
-    works_of_authorship_clause = legis_client.read("/us/usc/t17/s102/a")
-    works_of_authorship_clause.select(works_of_authorship_passage)
+    >>> works_of_authorship_passage = (
+    ...     "Copyright protection subsists, in accordance with this title, "
+    ...     + "in original works of authorship")
+    >>> works_of_authorship_clause = legis_client.read("/us/usc/t17/s102/a")
+    >>> works_of_authorship_clause.select(works_of_authorship_passage)
 
 Now we can create a new :class:`~authorityspoke.holdings.Holding` object
 that cites to our new :class:`~legislice.enactments.Enactment` object
@@ -618,9 +599,9 @@ cited by the new :class:`~authorityspoke.holdings.Holding`\.
     the Holding to ACCEPT
       the Rule that the court MUST SOMETIMES impose the
         RESULT:
-          the Fact it is false that <the Java API> was copyrightable
+          the fact it was false that <the Java API> was copyrightable
         GIVEN:
-          the Fact it is false that <the Java API> was an original work
+          the fact it was false that <the Java API> was an original work
         GIVEN the ENACTMENT:
           "Copyright protection subsists, in accordance with this title, in original works of authorship…" (/us/usc/t17/s102/a 2013-07-18)
 
@@ -681,14 +662,14 @@ courts to rule the other way.
     the Holding to ACCEPT
       the Rule that the court MUST ALWAYS impose the
         RESULT:
-          the Fact it is false that <the Lotus menu command hierarchy> was
+          the fact it was false that <the Lotus menu command hierarchy> was
           copyrightable
         GIVEN:
-          the Fact that <the Lotus menu command hierarchy> was a method of
+          the fact that <the Lotus menu command hierarchy> was a method of
           operation
         DESPITE:
-          the Fact that a text described <the Lotus menu command hierarchy>
-          the Fact that <the Lotus menu command hierarchy> was an original work
+          the fact that a text described <the Lotus menu command hierarchy>
+          the fact that <the Lotus menu command hierarchy> was an original work
         GIVEN the ENACTMENT:
           "In no case does copyright protection for an original work of authorship extend to any…method of operation…" (/us/usc/t17/s102/b 2013-07-18)
 
@@ -711,44 +692,44 @@ explanation of why they contradict.
 
     >>> explanation = lotus.explain_contradiction(oracle)
     >>> print(explanation)
-    EXPLANATION: Because <the Lotus menu command hierarchy> is like <the Java API>,
+    Because <the Lotus menu command hierarchy> is like <the Java API>,
       the Holding to ACCEPT
         the Rule that the court MUST ALWAYS impose the
           RESULT:
-            the Fact it is false that <the Lotus menu command hierarchy> was
+            the fact it was false that <the Lotus menu command hierarchy> was
             copyrightable
           GIVEN:
-            the Fact that <the Lotus menu command hierarchy> was a method of
+            the fact that <the Lotus menu command hierarchy> was a method of
             operation
           DESPITE:
-            the Fact that a text described <the Lotus menu command hierarchy>
-            the Fact that <the Lotus menu command hierarchy> was an original work
+            the fact that a text described <the Lotus menu command hierarchy>
+            the fact that <the Lotus menu command hierarchy> was an original work
           GIVEN the ENACTMENT:
             "In no case does copyright protection for an original work of authorship extend to any…method of operation…" (/us/usc/t17/s102/b 2013-07-18)
     CONTRADICTS
       the Holding to ACCEPT
         the Rule that the court MUST SOMETIMES impose the
           RESULT:
-            the Fact that <the Java API> was copyrightable
+            the fact that <the Java API> was copyrightable
           GIVEN:
-            the Fact that <the Java language> was a computer program
-            the Fact that <the Java API> was a set of application programming
+            the fact that <the Java language> was a computer program
+            the fact that <the Java API> was a set of application programming
             interface declarations
-            the Fact that <the Java API> was an original work
-            the Fact that <the Java API> was a non-literal element of <the Java
+            the fact that <the Java API> was an original work
+            the fact that <the Java API> was a non-literal element of <the Java
             language>
-            the Fact that <the Java API> was the expression of an idea
-            the Fact it is false that <the Java API> was essentially the only way
+            the fact that <the Java API> was the expression of an idea
+            the fact it was false that <the Java API> was essentially the only way
             to express the idea that it embodied
-            the Fact that <the Java API> was creative
-            the Fact that it was possible to use <the Java language> without
+            the fact that <the Java API> was creative
+            the fact that it was possible to use <the Java language> without
             copying <the Java API>
           DESPITE:
-            the Fact that <the Java API> was a method of operation
-            the Fact that <the Java API> contained short phrases
-            the Fact that <the Java API> became so popular that it was the
+            the fact that <the Java API> was a method of operation
+            the fact that <the Java API> contained short phrases
+            the fact that <the Java API> became so popular that it was the
             industry standard
-            the Fact that there was a preexisting community of programmers
+            the fact that there was a preexisting community of programmers
             accustomed to using <the Java API>
           GIVEN the ENACTMENT:
             "Copyright protection subsists, in accordance with this title, in original works of authorship fixed in any tangible medium of expression, now known or later developed, from which they can be perceived, reproduced, or otherwise communicated, either directly or with the aid of a machine or device.…" (/us/usc/t17/s102/a 2013-07-18)
@@ -821,7 +802,7 @@ Federal Circuit’s view.
 
 And that’s why AuthoritySpoke finds a contradiction between these two
 :class:`~authorityspoke.rules.Rule`\s. The *Oracle* opinion says that
-courts can sometimes accept the result ``the Fact that <the Java API>
+courts can sometimes accept the result ``the fact that <the Java API>
 was copyrightable`` despite
 the :class:`~authorityspoke.facts.Fact` ``<the Java API> was a method
 of operation``. The *Lotus* :class:`~authorityspoke.opinions.Opinion`
@@ -847,7 +828,7 @@ To try out the addition operation, let’s load another case from the
 ``example_data`` folder.
 
     >>> feist = load_and_read_decision("feist_h.json")
-    >>> feist.posit(load_holdings_with_anchors("holding_feist.json", client=legis_client))
+    >>> feist.posit(read_anchored_holdings_from_file("holding_feist.json", client=legis_client))
 
 
 `Feist Publications, Inc. v. Rural Telephone Service
@@ -864,10 +845,10 @@ the :class:`~authorityspoke.facts.Fact` it is false that a generic
     the Holding to ACCEPT
       the Rule that the court MAY SOMETIMES impose the
         RESULT:
-          the Fact it is false that <Rural's telephone listings> were an
+          the fact it was false that <Rural's telephone listings> were an
           original work
         GIVEN:
-          the Fact that <Rural's telephone listings> were names, towns, and
+          the fact that <Rural's telephone listings> were names, towns, and
           telephone numbers of telephone subscribers
         GIVEN the ENACTMENTS:
           "To promote the Progress of Science and useful Arts, by securing for limited Times to Authors…the exclusive Right to their respective Writings…" (/us/const/article/I/8/8 1788-09-13)
@@ -876,7 +857,7 @@ the :class:`~authorityspoke.facts.Fact` it is false that a generic
 
 
 And the second step relies on the result of the first step to reach the
-further result of “absence of the Fact that” a
+further result of “absence of the fact that” a
 generic :class:`nettlesome.entities.Entity` was “copyrightable”.
 
     >>> print(feist.holdings[3])
@@ -884,9 +865,9 @@ generic :class:`nettlesome.entities.Entity` was “copyrightable”.
     <Rural's telephone directory> was copyrightable is
       the Rule that the court MAY SOMETIMES impose the
         RESULT:
-          the Fact that <Rural's telephone directory> was copyrightable
+          the fact that <Rural's telephone directory> was copyrightable
         GIVEN:
-          the Fact that <Rural's telephone directory> was an original work
+          the fact that <Rural's telephone directory> was an original work
         GIVEN the ENACTMENTS:
           "To promote the Progress of Science and useful Arts, by securing for limited Times to Authors…the exclusive Right to their respective Writings…" (/us/const/article/I/8/8 1788-09-13)
           "Copyright protection subsists, in accordance with this title, in original works of authorship…" (/us/usc/t17/s102/a 2013-07-18)
@@ -903,12 +884,12 @@ together to make a single Holding that captures the whole process.
     the Holding to ACCEPT
       the Rule that the court MAY SOMETIMES impose the
         RESULT:
-          the Fact it is false that <Rural's telephone listings> were an
+          the fact it was false that <Rural's telephone listings> were an
           original work
-          absence of the Fact that <Rural's telephone listings> were
+          absence of the fact that <Rural's telephone listings> were
           copyrightable
         GIVEN:
-          the Fact that <Rural's telephone listings> were names, towns, and
+          the fact that <Rural's telephone listings> were names, towns, and
           telephone numbers of telephone subscribers
         GIVEN the ENACTMENTS:
           "To promote the Progress of Science and useful Arts, by securing for limited Times to Authors…the exclusive Right to their respective Writings…" (/us/const/article/I/8/8 1788-09-13)
@@ -999,11 +980,11 @@ the :meth:`~authorityspoke.holdings.Holding.union` of both of them.
     the Holding to ACCEPT
       the Rule that the court MUST ALWAYS impose the
         RESULT:
-          the Fact that <the Java API> was an original work
+          the fact that <the Java API> was an original work
         GIVEN:
-          the Fact that <the Java API> was independently created by the author,
+          the fact that <the Java API> was independently created by the author,
           as opposed to copied from other works
-          the Fact that <the Java API> possessed at least some minimal degree of
+          the fact that <the Java API> possessed at least some minimal degree of
           creativity
         GIVEN the ENACTMENT:
           "Copyright protection subsists, in accordance with this title, in original works of authorship fixed in any tangible medium of expression, now known or later developed, from which they can be perceived, reproduced, or otherwise communicated, either directly or with the aid of a machine or device.…" (/us/usc/t17/s102/a 2013-07-18)
@@ -1013,10 +994,10 @@ the :meth:`~authorityspoke.holdings.Holding.union` of both of them.
     the Holding to ACCEPT
       the Rule that the court MUST ALWAYS impose the
         RESULT:
-          the Fact it is false that <Rural's telephone directory> was
+          the fact it was false that <Rural's telephone directory> was
           copyrightable
         GIVEN:
-          the Fact that <Rural's telephone directory> was an idea
+          the fact that <Rural's telephone directory> was an idea
         GIVEN the ENACTMENT:
           "To promote the Progress of Science and useful Arts, by securing for limited Times to Authors…the exclusive Right to their respective Writings…" (/us/const/article/I/8/8 1788-09-13)
 
@@ -1025,13 +1006,13 @@ the :meth:`~authorityspoke.holdings.Holding.union` of both of them.
     the Holding to ACCEPT
       the Rule that the court MUST ALWAYS impose the
         RESULT:
-          the Fact it is false that <the Java API> was copyrightable
-          the Fact that <the Java API> was an original work
+          the fact it was false that <the Java API> was copyrightable
+          the fact that <the Java API> was an original work
         GIVEN:
-          the Fact that <the Java API> was an idea
-          the Fact that <the Java API> possessed at least some minimal degree of
+          the fact that <the Java API> was an idea
+          the fact that <the Java API> possessed at least some minimal degree of
           creativity
-          the Fact that <the Java API> was independently created by the author,
+          the fact that <the Java API> was independently created by the author,
           as opposed to copied from other works
         GIVEN the ENACTMENTS:
           "To promote the Progress of Science and useful Arts, by securing for limited Times to Authors…the exclusive Right to their respective Writings…" (/us/const/article/I/8/8 1788-09-13)
@@ -1043,8 +1024,8 @@ Factors listed above in a single case in a court where
 ``oracle.holdings[1]`` and ``feist.holdings[2]`` were both valid law,
 but if they could, then it seems correct for AuthoritySpoke to conclude
 that the court would have to find both
-``the Fact that <the Java API> was an original work`` and
-``the Fact it is false that <the Java API> was copyrightable``.
+``the fact that <the Java API> was an original work`` and
+``the fact it was false that <the Java API> was copyrightable``.
 
 The :meth:`~authorityspoke.holdings.Holding.union` operator is useful
 for searching for contradictions in a
