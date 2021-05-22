@@ -226,14 +226,14 @@ Here are the two Rules we’ll be adding together.
     >>> print(elements_of_offense)
     the Rule that the court MUST ALWAYS impose the
       RESULT:
-        the Fact that <the defendant> committed the offense of improper
+        the fact that <the defendant> committed the offense of improper
         transfer of beardcoin
       GIVEN:
-        the Fact that <the beardcoin transaction> was a transfer of beardcoin
+        the fact that <the beardcoin transaction> was a transfer of beardcoin
         between <the defendant> and <the counterparty>
-        absence of the Fact that <the beardcoin transaction> was a licensed
+        absence of the fact that <the beardcoin transaction> was a licensed
         beardcoin repurchase
-        the Fact it is false that <the counterparty> was <the Department of
+        the fact it was false that <the counterparty> was <the Department of
         Beards>
       DESPITE:
         the fact that the token attributed to <the Department of Beards>,
@@ -250,10 +250,10 @@ Here are the two Rules we’ll be adding together.
     >>> print(loan_is_transfer)
     the Rule that the court MUST ALWAYS impose the
       RESULT:
-        the Fact that <the beardcoin transaction> was a transfer of beardcoin
+        the fact that <the beardcoin transaction> was a transfer of beardcoin
         between <the defendant> and <the counterparty>
       GIVEN:
-        the Fact that <the beardcoin transaction> was <the defendant>'s loan
+        the fact that <the beardcoin transaction> was <the defendant>'s loan
         of the token attributed to <the Department of Beards>, asserting the
         fact that <the Department of Beards> granted an exemption from the
         prohibition of wearing beards, to <the counterparty>
@@ -269,29 +269,28 @@ add one of the :class:`~legislice.enactments.Enactment`\s that
 the ``elements_of_offense`` :class:`~legislice.rules.Rule` relies upon.
 
     >>> loan_without_exceptions = (
-    >>>             loan_is_transfer
-    >>>             + elements_of_offense.inputs[1]
-    >>>             + elements_of_offense.inputs[2]
-    >>>             + elements_of_offense.enactments[1]
-    >>>         )
+    ...             loan_is_transfer
+    ...             + elements_of_offense.inputs[1]
+    ...             + elements_of_offense.inputs[2]
+    ...             + elements_of_offense.enactments[1]
+    ...         )
     >>> print(loan_without_exceptions)
     the Rule that the court MUST ALWAYS impose the
       RESULT:
-        the Fact that <the beardcoin transaction> was a transfer of beardcoin
+        the fact that <the beardcoin transaction> was a transfer of beardcoin
         between <the defendant> and <the counterparty>
       GIVEN:
-        the Fact that <the beardcoin transaction> was <the defendant>'s loan
+        the fact that <the beardcoin transaction> was <the defendant>'s loan
         of the token attributed to <the Department of Beards>, asserting the
         fact that <the Department of Beards> granted an exemption from the
         prohibition of wearing beards, to <the counterparty>
-        absence of the Fact that <the beardcoin transaction> was a licensed
+        absence of the fact that <the beardcoin transaction> was a licensed
         beardcoin repurchase
-        the Fact it is false that <the counterparty> was <the Department of
+        the fact it was false that <the counterparty> was <the Department of
         Beards>
       GIVEN the ENACTMENTS:
-        "It shall be no defense to a charge under section 7A that the purchase, sale, lease, gift, transfer or receipt was of counterfeit beardcoin rather than genuine beardcoin." (/test/acts/47/7B/2 1935-04-01)
         "It shall be an offence to buy, sell, lend, lease, gift, transfer or receive in any way a beardcoin from any person or body other than the Department of Beards, except as provided in Part 4." (/test/acts/47/7A 1935-04-01)
-
+        "It shall be no defense to a charge under section 7A that the purchase, sale, lease, gift, transfer or receipt was of counterfeit beardcoin rather than genuine beardcoin." (/test/acts/47/7B/2 1935-04-01)
 
 With these changes, we can add together two Rules to get a new one.
 
@@ -299,23 +298,28 @@ With these changes, we can add together two Rules to get a new one.
     >>> print(loan_establishes_offense)
     the Rule that the court MUST ALWAYS impose the
       RESULT:
-        the Fact that <the beardcoin transaction> was a transfer of beardcoin
-        between <the defendant> and <the counterparty>
-        the Fact that <the defendant> committed the offense of improper
+        the fact that <the defendant> committed the offense of improper
         transfer of beardcoin
+        the fact that <the beardcoin transaction> was a transfer of beardcoin
+        between <the defendant> and <the counterparty>
       GIVEN:
-        the Fact that <the beardcoin transaction> was <the defendant>'s loan
+        the fact it was false that <the counterparty> was <the Department of
+        Beards>
+        absence of the fact that <the beardcoin transaction> was a licensed
+        beardcoin repurchase
+        the fact that <the beardcoin transaction> was <the defendant>'s loan
         of the token attributed to <the Department of Beards>, asserting the
         fact that <the Department of Beards> granted an exemption from the
         prohibition of wearing beards, to <the counterparty>
-        absence of the Fact that <the beardcoin transaction> was a licensed
-        beardcoin repurchase
-        the Fact it is false that <the counterparty> was <the Department of
-        Beards>
+      DESPITE:
+        the fact that the token attributed to <the defendant>, asserting the
+        fact that <the defendant> granted an exemption from the prohibition of
+        wearing beards, was counterfeit
       GIVEN the ENACTMENTS:
-        "It shall be no defense to a charge under section 7A that the purchase, sale, lease, gift, transfer or receipt was of counterfeit beardcoin rather than genuine beardcoin." (/test/acts/47/7B/2 1935-04-01)
         "It shall be an offence to buy, sell, lend, lease, gift, transfer or receive in any way a beardcoin from any person or body other than the Department of Beards, except as provided in Part 4." (/test/acts/47/7A 1935-04-01)
-
+        "It shall be no defense to a charge under section 7A that the purchase, sale, lease, gift, transfer or receipt was of counterfeit beardcoin rather than genuine beardcoin." (/test/acts/47/7B/2 1935-04-01)
+      DESPITE the ENACTMENT:
+        "The Department of Beards may issue licenses to such barbers, hairdressers, or other male grooming professionals as they see fit to purchase a beardcoin from a customer whose beard they have removed, and to resell those beardcoins to the Department of Beards." (/test/acts/47/11 2013-07-18)
 
 There will be additional methods for combining Rules in future versions
 of AuthoritySpoke.

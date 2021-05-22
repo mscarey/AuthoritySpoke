@@ -139,7 +139,7 @@ class Procedure(Comparable):
         to_combine = Procedure(
             inputs=not_implied, outputs=other.outputs, despite=other.despite
         )
-        return self | to_combine
+        return self.union(to_combine, context=explanation)
 
     def _trigger_addition(
         self, other: Procedure, explanation: Explanation
@@ -161,10 +161,13 @@ class Procedure(Comparable):
         yield from self.likely_contexts(other, context)
 
     def explanations_union(
-        self, other: Procedure, context: Optional[ContextRegister] = None
+        self,
+        other: Procedure,
+        context: Optional[Union[ContextRegister, Explanation]] = None,
     ) -> Iterator[ContextRegister]:
-        context = context or ContextRegister()
-        for partial in self._explanations_union_partial(other, context):
+        if not isinstance(context, Explanation):
+            context = Explanation.from_context(context)
+        for partial in self._explanations_union_partial(other, context.context):
             for guess in self.possible_contexts(other, partial):
                 answer = self._union_from_explanation(other, guess)
                 if answer:
@@ -706,9 +709,12 @@ class Procedure(Comparable):
         return self.union(other)
 
     def union(
-        self, other: Comparable, context: Optional[ContextRegister] = None
+        self,
+        other: Comparable,
+        context: Optional[Union[ContextRegister, Explanation]] = None,
     ) -> Optional[Comparable]:
-        context = context or ContextRegister()
+        if not isinstance(context, Explanation):
+            context = Explanation.from_context(context)
         explanations = self.explanations_union(other, context)
         try:
             explanation = next(explanations)

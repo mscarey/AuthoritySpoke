@@ -1,6 +1,9 @@
 import logging
 
+from nettlesome import Entity
+
 from authorityspoke.evidence import Exhibit
+from authorityspoke.facts import Fact, Predicate
 
 
 class TestExhibits:
@@ -15,6 +18,24 @@ class TestExhibits:
                 "the testimony attributed to <Alice>, asserting "
                 "the fact it was false that <Alice> shot <Bob>,"
             ).lower()
+        )
+
+    def test_comma_when_exhibit_is_in_fact(self):
+        coin = Exhibit(
+            form="token",
+            statement=Fact(
+                predicate=Predicate(
+                    "$agency granted an exemption from the prohibition of wearing beards"
+                ),
+                terms=Entity("the Department of Beards"),
+            ),
+            statement_attribution=Entity("the Department of Beards"),
+        )
+        counterfeit = Fact(predicate="$thing was counterfeit", terms=coin)
+        assert str(counterfeit) == (
+            "the fact that the token attributed to <the Department of Beards>, "
+            "asserting the fact that <the Department of Beards> granted an "
+            "exemption from the prohibition of wearing beards, was counterfeit"
         )
 
 

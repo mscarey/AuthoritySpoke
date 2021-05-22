@@ -118,7 +118,7 @@ class Fact(Statement):
             else ""
         )
         string = f"{standard}{unwrapped}"
-        return Comparable.__str__(self).format(string)
+        return Comparable.__str__(self).format(string).replace(",,", ",")
 
     @property
     def content(self) -> str:

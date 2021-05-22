@@ -86,3 +86,20 @@ class TestLoadRules:
         assert beard_rules[0].inputs[0].short_string == (
             "the fact that <the suspected beard> was facial hair"
         )
+
+    def test_correct_context_when_adding_rules(self, fake_beard_client):
+        beard_dictionary = loaders.load_holdings("beard_rules.json")
+        beard_rules = readers.read_rules(beard_dictionary, client=fake_beard_client)
+        loan_is_transfer = beard_rules[7]
+        elements_of_offense = beard_rules[11]
+        loan_without_exceptions = (
+            loan_is_transfer
+            + elements_of_offense.inputs[1]
+            + elements_of_offense.inputs[2]
+            + elements_of_offense.enactments[1]
+        )
+        loan_establishes_offense = loan_without_exceptions + elements_of_offense
+        assert str(loan_establishes_offense.outputs[0]) == (
+            "the fact that <the defendant> committed the offense of improper "
+            "transfer of beardcoin"
+        )
