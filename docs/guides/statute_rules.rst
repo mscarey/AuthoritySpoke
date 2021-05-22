@@ -56,7 +56,7 @@ example of one JSON rule annotation.
 
     >>> from pprint import pprint
     >>> from authorityspoke.io import loaders
-    >>> beard_dictionary = loaders.load_holdings("beard_rules.json")
+    >>> beard_dictionary = loaders.load_holdings("beard_rules.yaml")
     >>> pprint(beard_dictionary[0], sort_dicts=False)
     {'inputs': [{'type': 'fact',
                  'content': '{the suspected beard} was facial hair'},
@@ -84,34 +84,34 @@ Now we can have AuthoritySpoke read this JSON and convert it to a list
 of :class:`~authorityspoke.rules.Rule` objects. In particular, we’ll look at the first two Rules, which
 describe two ways that an object can be defined to be a “beard”.
 
+    >>> beard_holdings = loaders.read_holdings_from_file("beard_rules.yaml", client=legis_client)
+    >>> print(beard_holdings[0])
+    the Holding to ACCEPT
+      the Rule that the court MAY ALWAYS impose the
+        RESULT:
+          the fact that <the suspected beard> was a beard
+        GIVEN:
+          the fact that <the suspected beard> was facial hair
+          the fact that the length of <the suspected beard> was at least 5
+          millimeter
+          the fact that <the suspected beard> occurred on or below the chin
+        GIVEN the ENACTMENT:
+          "In this Act, beard means any facial hair no shorter than 5 millimetres in length that: occurs on or below the chin…" (/test/acts/47/4 1935-04-01)
 
-    >>> from authorityspoke.io import readers
-    >>> beard_rules = readers.read_rules(beard_dictionary, client=legis_client)
-    >>> print(beard_rules[0])
-    the Rule that the court MAY ALWAYS impose the
-      RESULT:
-        the fact that <the suspected beard> was a beard
-      GIVEN:
-        the fact that <the suspected beard> was facial hair
-        the fact that the length of <the suspected beard> was at least 5
-        millimeter
-        the fact that <the suspected beard> occurred on or below the chin
-      GIVEN the ENACTMENT:
-        "In this Act, beard means any facial hair no shorter than 5 millimetres in length that: occurs on or below the chin…" (/test/acts/47/4 1935-04-01)
 
-
-    >>> print(beard_rules[1])
-    the Rule that the court MAY ALWAYS impose the
-      RESULT:
-        the fact that <the suspected beard> was a beard
-      GIVEN:
-        the fact that <the suspected beard> was facial hair
-        the fact that the length of <the suspected beard> was at least 5
-        millimeter
-        the fact that <the suspected beard> existed in an uninterrupted line
-        from the front of one ear to the front of the other ear below the nose
-      GIVEN the ENACTMENT:
-        "In this Act, beard means any facial hair no shorter than 5 millimetres in length that:…exists in an uninterrupted line from the front of one ear to the front of the other ear below the nose." (/test/acts/47/4 1935-04-01)
+    >>> print(beard_holdings[1])
+    the Holding to ACCEPT
+      the Rule that the court MAY ALWAYS impose the
+        RESULT:
+          the fact that <the suspected beard> was a beard
+        GIVEN:
+          the fact that <the suspected beard> was facial hair
+          the fact that the length of <the suspected beard> was at least 5
+          millimeter
+          the fact that <the suspected beard> existed in an uninterrupted line
+          from the front of one ear to the front of the other ear below the nose
+        GIVEN the ENACTMENT:
+          "In this Act, beard means any facial hair no shorter than 5 millimetres in length that:…exists in an uninterrupted line from the front of one ear to the front of the other ear below the nose." (/test/acts/47/4 1935-04-01)
 
 
 The difference between these two Rules is that the first one applies to
@@ -119,8 +119,8 @@ facial hair “on or below the chin” and the second applies to facial hair
 “in an uninterrupted line from the front of one ear to the front of the
 other ear below the nose”. I’ll rename them accordingly.
 
-    >>> chin_rule = beard_rules[0]
-    >>> ear_rule = beard_rules[1]
+    >>> chin_rule = beard_holdings[0].rule
+    >>> ear_rule = beard_holdings[1].rule
 
 Implication and Contradiction between Rules
 -------------------------------------------
@@ -137,19 +137,21 @@ in the Beard Tax Act except that it applies to facial hair that’s
 exactly 8 millimeters long instead of “no shorter than 5 millimetres”,
 we can determine that the original “chin rule” implies our new Rule.
 
+    >>> from authorityspoke.io import readers
     >>> beard_dictionary[0]['inputs'][1]['content'] = 'the length of the suspected beard was = 8 millimetres'
-    >>> longer_hair_rule = readers.read_rule(beard_dictionary[0], client=legis_client)
+    >>> longer_hair_rule = readers.read_holding(beard_dictionary[0], client=legis_client)
     >>> print(longer_hair_rule)
-    the Rule that the court MAY ALWAYS impose the
-      RESULT:
-        the fact that <the suspected beard> was a beard
-      GIVEN:
-        the fact that <the suspected beard> was facial hair
-        the fact that the length of <the suspected beard> was exactly equal to
-        8 millimeter
-        the fact that <the suspected beard> occurred on or below the chin
-      GIVEN the ENACTMENT:
-        "In this Act, beard means any facial hair no shorter than 5 millimetres in length that: occurs on or below the chin…" (/test/acts/47/4 1935-04-01)
+    the Holding to ACCEPT
+      the Rule that the court MAY ALWAYS impose the
+        RESULT:
+          the fact that <the suspected beard> was a beard
+        GIVEN:
+          the fact that <the suspected beard> was facial hair
+          the fact that the length of <the suspected beard> was exactly equal to
+          8 millimeter
+          the fact that <the suspected beard> occurred on or below the chin
+        GIVEN the ENACTMENT:
+          "In this Act, beard means any facial hair no shorter than 5 millimetres in length that: occurs on or below the chin…" (/test/acts/47/4 1935-04-01)
 
 
     >>> chin_rule.implies(longer_hair_rule)
@@ -222,7 +224,7 @@ offense:
 
 Here are the two Rules we’ll be adding together.
 
-    >>> elements_of_offense = beard_rules[11]
+    >>> elements_of_offense = beard_holdings[11].rule
     >>> print(elements_of_offense)
     the Rule that the court MUST ALWAYS impose the
       RESULT:
@@ -246,7 +248,7 @@ Here are the two Rules we’ll be adding together.
         "The Department of Beards may issue licenses to such barbers, hairdressers, or other male grooming professionals as they see fit to purchase a beardcoin from a customer whose beard they have removed, and to resell those beardcoins to the Department of Beards." (/test/acts/47/11 2013-07-18)
 
 
-    >>> loan_is_transfer = beard_rules[7]
+    >>> loan_is_transfer = beard_holdings[7].rule
     >>> print(loan_is_transfer)
     the Rule that the court MUST ALWAYS impose the
       RESULT:
@@ -266,7 +268,7 @@ one of the elements of the offense. In order to create a Rule that we
 can add to ``elements_of_offense``, we’ll need to add Facts establishing
 the two elements other than the “transfer” element. We’ll also need to
 add one of the :class:`~legislice.enactments.Enactment`\s that
-the ``elements_of_offense`` :class:`~legislice.rules.Rule` relies upon.
+the ``elements_of_offense`` :class:`~authorityspoke.rules.Rule` relies upon.
 
     >>> loan_without_exceptions = (
     ...             loan_is_transfer
@@ -292,34 +294,43 @@ the ``elements_of_offense`` :class:`~legislice.rules.Rule` relies upon.
         "It shall be an offence to buy, sell, lend, lease, gift, transfer or receive in any way a beardcoin from any person or body other than the Department of Beards, except as provided in Part 4." (/test/acts/47/7A 1935-04-01)
         "It shall be no defense to a charge under section 7A that the purchase, sale, lease, gift, transfer or receipt was of counterfeit beardcoin rather than genuine beardcoin." (/test/acts/47/7B/2 1935-04-01)
 
-With these changes, we can add together two Rules to get a new one.
+With these changes, we can add together two Holdings to get a new one.
 
+    >>> loan_is_transfer = beard_holdings[7]
+    >>> elements_of_offense = beard_holdings[11]
+    >>> loan_without_exceptions = (
+    ...     loan_is_transfer
+    ...     + elements_of_offense.inputs[1]
+    ...     + elements_of_offense.inputs[2]
+    ...     + elements_of_offense.enactments[1]
+    ... )
     >>> loan_establishes_offense = loan_without_exceptions + elements_of_offense
     >>> print(loan_establishes_offense)
-    the Rule that the court MUST ALWAYS impose the
-      RESULT:
-        the fact that <the defendant> committed the offense of improper
-        transfer of beardcoin
-        the fact that <the beardcoin transaction> was a transfer of beardcoin
-        between <the defendant> and <the counterparty>
-      GIVEN:
-        the fact it was false that <the counterparty> was <the Department of
-        Beards>
-        absence of the fact that <the beardcoin transaction> was a licensed
-        beardcoin repurchase
-        the fact that <the beardcoin transaction> was <the defendant>'s loan
-        of the token attributed to <the Department of Beards>, asserting the
-        fact that <the Department of Beards> granted an exemption from the
-        prohibition of wearing beards, to <the counterparty>
-      DESPITE:
-        the fact that the token attributed to <the defendant>, asserting the
-        fact that <the defendant> granted an exemption from the prohibition of
-        wearing beards, was counterfeit
-      GIVEN the ENACTMENTS:
-        "It shall be an offence to buy, sell, lend, lease, gift, transfer or receive in any way a beardcoin from any person or body other than the Department of Beards, except as provided in Part 4." (/test/acts/47/7A 1935-04-01)
-        "It shall be no defense to a charge under section 7A that the purchase, sale, lease, gift, transfer or receipt was of counterfeit beardcoin rather than genuine beardcoin." (/test/acts/47/7B/2 1935-04-01)
-      DESPITE the ENACTMENT:
-        "The Department of Beards may issue licenses to such barbers, hairdressers, or other male grooming professionals as they see fit to purchase a beardcoin from a customer whose beard they have removed, and to resell those beardcoins to the Department of Beards." (/test/acts/47/11 2013-07-18)
+    the Holding to ACCEPT
+      the Rule that the court MUST ALWAYS impose the
+        RESULT:
+          the fact that <the defendant> committed the offense of improper
+          transfer of beardcoin
+          the fact that <the beardcoin transaction> was a transfer of beardcoin
+          between <the defendant> and <the counterparty>
+        GIVEN:
+          the fact it was false that <the counterparty> was <the Department of
+          Beards>
+          absence of the fact that <the beardcoin transaction> was a licensed
+          beardcoin repurchase
+          the fact that <the beardcoin transaction> was <the defendant>'s loan
+          of the token attributed to <the Department of Beards>, asserting the
+          fact that <the Department of Beards> granted an exemption from the
+          prohibition of wearing beards, to <the counterparty>
+        DESPITE:
+          the fact that the token attributed to <the Department of Beards>,
+          asserting the fact that <the Department of Beards> granted an
+          exemption from the prohibition of wearing beards, was counterfeit
+        GIVEN the ENACTMENTS:
+          "It shall be an offence to buy, sell, lend, lease, gift, transfer or receive in any way a beardcoin from any person or body other than the Department of Beards, except as provided in Part 4." (/test/acts/47/7A 1935-04-01)
+          "It shall be no defense to a charge under section 7A that the purchase, sale, lease, gift, transfer or receipt was of counterfeit beardcoin rather than genuine beardcoin." (/test/acts/47/7B/2 1935-04-01)
+        DESPITE the ENACTMENT:
+          "The Department of Beards may issue licenses to such barbers, hairdressers, or other male grooming professionals as they see fit to purchase a beardcoin from a customer whose beard they have removed, and to resell those beardcoins to the Department of Beards." (/test/acts/47/11 2013-07-18)
 
 There will be additional methods for combining Rules in future versions
 of AuthoritySpoke.
@@ -328,7 +339,7 @@ For now, try browsing through the beard_rules object to see how some of
 the other provisions have been formalized. In all, there are 14 Rules in
 the dataset.
 
-    >>> len(beard_rules)
+    >>> len(beard_holdings)
     14
 
 

@@ -63,9 +63,9 @@ class Rule(Comparable):
     :param generic:
         whether the :class:`Rule` is being mentioned in a generic
         context. e.g., if the :class:`Rule` is being mentioned in
-        an :class:`.Argument` object merely as an example of the
+        an :class:`~authorityspoke.Argument` object merely as an example of the
         kind of :class:`Rule` that might be mentioned in such an
-        :class:`.Argument`.
+        :class:`~authorityspoke..Argument`.
 
     :param name:
         an identifier used to retrieve this :class:`Rule` when
