@@ -48,7 +48,7 @@ jobs:
           name: run tests
           command: |
             . venv/bin/activate
-            pytest --cov-report term --cov=authorityspoke tests/ --vcr-record=none
+            pytest tests/ --cov-report term --cov=authorityspoke tests/ --vcr-record=none
             coveralls
 
       - store_artifacts:
