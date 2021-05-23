@@ -55,7 +55,7 @@ class Opinion(Comparable):
     :param text:
     """
 
-    position: Optional[str] = None
+    position: str = "majority"
     author: Optional[str] = None
     text: Optional[str] = field(default=None, repr=False)
 

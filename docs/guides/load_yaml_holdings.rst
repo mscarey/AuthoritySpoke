@@ -32,11 +32,13 @@ variable by saving it as a file called ``.env``. This process is
 described in the `python-dotenv
 documentation <https://saurabh-kumar.com/python-dotenv/#getting-started>`__.
 
+    >>> from datetime import date
     >>> import os
     >>> from dotenv import load_dotenv
     >>> load_dotenv()
     True
     >>> CAP_API_KEY = os.getenv('CAP_API_KEY')
+    >>> USE_REAL_CASE_API = False
 
 Next, we'll create a :class:`~authorityspoke.io.downloads.CAPClient` object,
 which is a download client for
@@ -49,10 +51,18 @@ convert them into AuthoritySpoke :class:`~authorityspoke.decisions.Decision` obj
 citation of the case we want, we'll use the :meth:`~authorityspoke.io.downloads.CAPClient.read_cite` method.
 
     >>> from authorityspoke.io.downloads import CAPClient
-    >>> client = CAPClient(api_token=CAP_API_KEY)
-    >>> licensing_case = client.read_cite(
-    ...     cite="621 F.3d 205",
-    ...     full_case=False)
+    >>> from authorityspoke.decisions import Decision, Opinion, CAPCitation
+    >>> if USE_REAL_CASE_API:
+    ...     client = CAPClient(api_token=CAP_API_KEY)
+    ...     licensing_case = client.read_cite(
+    ...         cite="621 F.3d 205",
+    ...        full_case=False)
+    ... else:
+    ...     licensing_case = Decision(
+    ...        date=date(2010,9,22),
+    ...        name_abbreviation="United States v. Mazza-Alaluf",
+    ...        citations=[CAPCitation(cite="621 F.3d 205")],
+    ...        opinions=Opinion())
     >>> print(licensing_case)
     United States v. Mazza-Alaluf, 621 F.3d 205 (2010-09-22)
 
