@@ -82,10 +82,9 @@ class Exhibit(Factor):
 
     def __str__(self):
         """Represent object as string without line breaks."""
-        string = (
-            f'{("attributed to " + self.statement_attribution.short_string) if self.statement_attribution else ""}'
-            + f'{(", asserting " + self.statement.short_string + ",") if self.statement else ""}'
-        )
+        string = f'{("attributed to " + self.statement_attribution.short_string) if self.statement_attribution else ""}'
+        if self.statement:
+            string += ", asserting " + self.statement.short_string + ","
         string = super().__str__().format(string)
         return string.replace("exhibit", self.form or "exhibit").strip()
 

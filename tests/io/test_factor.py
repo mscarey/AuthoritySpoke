@@ -159,6 +159,29 @@ class TestFactDump:
         assert shooting_dict["terms"][0]["name"] == "Alice"
 
 
+class TestExhibitLoad:
+    def test_load_exhibit_with_bracketed_names(self):
+        fact_data = {
+            "content": "the distance that $officer pursued $suspect was >= 5 miles",
+            "terms": [
+                {"type": "Entity", "name": "Officer Lin"},
+                {"type": "Entity", "name": "Al"},
+            ],
+        }
+        exhibit_data = {
+            "form": "testimony",
+            "statement": fact_data,
+            "statement_attribution": {"name": "Officer Lin"},
+        }
+        schema = schemas_yaml.ExhibitSchema()
+        exhibit = schema.load(exhibit_data)
+        assert str(exhibit) == (
+            "the testimony attributed to <Officer Lin>, "
+            "asserting the fact that the distance that <Officer Lin> "
+            "pursued <Al> was at least 5 mile,"
+        )
+
+
 class TestExhibitDump:
     def test_dump_exhibit(self, make_exhibit):
         exhibit = make_exhibit["shooting_affidavit"]

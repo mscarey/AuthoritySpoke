@@ -308,5 +308,82 @@
             "url": "https://authorityspoke.com/api/v1/us/usc/t17/s410/c/",
             "parent": "https://authorityspoke.com/api/v1/us/usc/t17/s410/"
         }
+    },
+    "/us/usc/t18/s1960/b/1": {
+        "2013-07-18": {
+            "heading": "",
+            "start_date": "2013-07-18",
+            "node": "/us/usc/t18/s1960/b/1",
+            "text_version": {
+                "id": 943740,
+                "url": "https://authorityspoke.com/api/v1/textversions/943740/",
+                "content": "the term “unlicensed money transmitting business” means a money transmitting business which affects interstate or foreign commerce in any manner or degree and—"
+            },
+            "url": "https://authorityspoke.com/api/v1/us/usc/t18/s1960/b/1/",
+            "end_date": null,
+            "children": [
+                {
+                    "heading": "",
+                    "start_date": "2013-07-18",
+                    "node": "/us/usc/t18/s1960/b/1/A",
+                    "text_version": {
+                        "id": 943737,
+                        "url": "https://authorityspoke.com/api/v1/textversions/943737/",
+                        "content": "is operated without an appropriate money transmitting license in a State where such operation is punishable as a misdemeanor or a felony under State law, whether or not the defendant knew that the operation was required to be licensed or that the operation was so punishable;"
+                    },
+                    "url": "https://authorityspoke.com/api/v1/us/usc/t18/s1960/b/1/A/",
+                    "end_date": null,
+                    "children": [],
+                    "citations": []
+                },
+                {
+                    "heading": "",
+                    "start_date": "2013-07-18",
+                    "node": "/us/usc/t18/s1960/b/1/B",
+                    "text_version": {
+                        "id": 943738,
+                        "url": "https://authorityspoke.com/api/v1/textversions/943738/",
+                        "content": "fails to comply with the money transmitting business registration requirements under section 5330 of title 31, United States Code, or regulations prescribed under such section; or"
+                    },
+                    "url": "https://authorityspoke.com/api/v1/us/usc/t18/s1960/b/1/B/",
+                    "end_date": null,
+                    "children": [],
+                    "citations": []
+                },
+                {
+                    "heading": "",
+                    "start_date": "2013-07-18",
+                    "node": "/us/usc/t18/s1960/b/1/C",
+                    "text_version": {
+                        "id": 943739,
+                        "url": "https://authorityspoke.com/api/v1/textversions/943739/",
+                        "content": "otherwise involves the transportation or transmission of funds that are known to the defendant to have been derived from a criminal offense or are intended to be used to promote or support unlawful activity;"
+                    },
+                    "url": "https://authorityspoke.com/api/v1/us/usc/t18/s1960/b/1/C/",
+                    "end_date": null,
+                    "children": [],
+                    "citations": []
+                }
+            ],
+            "citations": [],
+            "parent": "https://authorityspoke.com/api/v1/us/usc/t18/s1960/b/"
+        }
+    },
+    "/us/usc/t31/s5312/b/1": {
+        "2013-07-18": {
+            "heading": "",
+            "start_date": "2013-07-18",
+            "node": "/us/usc/t31/s5312/b/1",
+            "text_version": {
+                "id": 1267044,
+                "url": "https://authorityspoke.com/api/v1/textversions/1267044/",
+                "content": "“domestic financial agency” and “domestic financial institution” apply to an action in the United States of a financial agency or institution."
+            },
+            "url": "https://authorityspoke.com/api/v1/us/usc/t31/s5312/b/1/",
+            "end_date": null,
+            "children": [],
+            "citations": [],
+            "parent": "https://authorityspoke.com/api/v1/us/usc/t31/s5312/b/"
+        }
     }
 }

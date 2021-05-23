@@ -36,7 +36,7 @@ from authorityspoke.io.name_index import RawFactor, RawPredicate
 from authorityspoke.io.nesting import nest_fields
 from authorityspoke.io import text_expansion
 
-from authorityspoke.opinions import Opinion, AnchoredHoldings
+from authorityspoke.opinions import AnchoredHoldings
 from authorityspoke.pleadings import Pleading, Allegation
 
 from authorityspoke.procedures import Procedure
@@ -101,6 +101,27 @@ RawDecision = Dict[str, Union[str, int, Sequence[RawOpinion], Sequence[RawCAPCit
 
 
 class EnactmentSchema(LegisliceSchema):
+    """
+    Schema to load Enactments from JSON created from user-created YAML.
+
+        >>> enactment_data = {
+        ...     "name": "original works",
+        ...     "node": "/us/usc/t17/s102",
+        ...     "start_date": "1990-12-01",
+        ...     "content": (
+        ...         "Copyright protection subsists, in accordance with this title, "
+        ...         "in original works of authorship fixed in any tangible medium of expression, "
+        ...         "now known or later developed."),
+        ...     "selection": [{"suffix": ", in accordance"}, "title,|in original works of authorship|fixed"]}
+        >>> schema = EnactmentSchema()
+        >>> enactment_index = EnactmentIndex()
+        >>> enactment_index.insert_by_name(enactment_data)
+        >>> schema.context["enactment_index"] = enactment_index
+        >>> enactment = schema.load("original works")
+        >>> enactment.selected_text()
+        'Copyright protection subsists…in original works of authorship…'
+    """
+
     def get_indexed_enactment(self, data, **kwargs):
         """Replace data to load with any object with same name in "enactment_index"."""
         if not isinstance(data, str):
@@ -117,7 +138,17 @@ class EnactmentSchema(LegisliceSchema):
 
 
 class PredicateSchema(ExpandableSchema):
-    """Schema for statements, separate from any claim about their truth or who asserts them."""
+    """
+    Schema for statements, separate from any claim about their truth or who asserts them.
+
+        >>> data = {
+        ...     "content": "the distance that $officer pursued $suspect was >= 5 miles"
+        ... }
+        >>> schema = PredicateSchema()
+        >>> predicate = schema.load(data)
+        >>> predicate.quantity
+        <Quantity(5, 'mile')>
+    """
 
     __model__ = Predicate
     content = fields.Method(
@@ -174,7 +205,19 @@ class PredicateSchema(ExpandableSchema):
 
 
 class EntitySchema(ExpandableSchema):
-    """Schema for Entities, which shouldn't be at the top level of a FactorGroup."""
+    """
+    Schema for Entities, which shouldn't be at the top level of a FactorGroup.
+
+        >>> entity = {"name": "Lotus Development Corporation", "generic": False}
+        >>> schema = EntitySchema()
+        >>> factor_index = Mentioned()
+        >>> factor_index.insert_by_name(entity)
+        >>> schema.context["mentioned"] = factor_index
+        >>> loaded = schema.load("Lotus Development Corporation")
+        >>> loaded.generic
+        False
+
+    """
 
     __model__: Type = Entity
     name = fields.Str(missing=None)
@@ -183,7 +226,16 @@ class EntitySchema(ExpandableSchema):
 
 
 class FactSchema(ExpandableSchema):
-    """Schema for Facts, which may contain arbitrary levels of nesting."""
+    """
+    Schema for Facts, which may contain arbitrary levels of nesting.
+
+        >>> data = {"content": "the distance that {Officer Lin} pursued {Al} was >= 5 miles"}
+        >>> schema = FactSchema()
+        >>> fact = schema.load(data)
+        >>> print(fact)
+        the fact that the distance that {Officer Lin} pursued {Al} was at least 5 mile
+
+    """
 
     __model__: Type = Fact
     predicate = fields.Nested(PredicateSchema)
@@ -269,7 +321,27 @@ class FactSchema(ExpandableSchema):
 
 
 class ExhibitSchema(ExpandableSchema):
-    """Schema for an object that may embody a statement."""
+    """
+    Schema for an object that may embody a statement.
+
+        >>> fact_data = {
+        ...     "content": "the distance that $officer pursued $suspect was >= 5 miles",
+        ...     "terms": [
+        ...         {"type": "Entity", "name": "Officer Lin"},
+        ...         {"type": "Entity", "name": "Al"},
+        ...     ],
+        ... }
+        >>> exhibit_data = {
+        ...     "form": "testimony",
+        ...     "statement": fact_data,
+        ...     "statement_attribution": {"name": "Officer Lin"},
+        ... }
+        >>> schema = ExhibitSchema()
+        >>> exhibit = schema.load(exhibit_data)
+        >>> print(exhibit)
+        the testimony attributed to <Officer Lin>, asserting the fact that the distance that <Officer Lin> pursued <Al> was at least 5 mile,
+
+    """
 
     __model__: Type = Exhibit
     form = fields.Str(missing=None)
@@ -318,7 +390,15 @@ class EvidenceSchema(ExpandableSchema):
 
 
 class FactorSchema(OneOfSchema, ExpandableSchema):
-    """Schema that directs data to "one of" the other schemas."""
+    """
+    Schema that directs data to "one of" the other schemas.
+
+        >>> factor_data = [{"type": "Entity", "name": "Al"}, {"type": "Entity", "name": "Bob"}]
+        >>> schema = FactorSchema(many=True)
+        >>> factors = schema.load(factor_data)
+        >>> factors[1].name
+        'Bob'
+    """
 
     __model__: Type = Factor
     type_schemas = {
