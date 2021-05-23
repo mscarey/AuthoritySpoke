@@ -33,9 +33,13 @@ of the repository using `Binder <https://mybinder.org/v2/gh/mscarey/AuthoritySpo
     guides/template_strings.rst
     guides/load_yaml_holdings.rst
     guides/create_holding_data.rst
-    guides/example_holdings.rst
     guides/statute_rules.rst
 
+.. toctree::
+    :maxdepth: 2
+    :caption: Examples
+
+    examples/example_holdings.rst
 
 .. toctree::
     :maxdepth: 1
