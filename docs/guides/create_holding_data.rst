@@ -9,75 +9,54 @@ legal Holdings in AuthoritySpoke.
 To get ready, we need to repeat some setup steps we already saw in the
 :ref:`introduction` guide. First, import the package.
 
-.. code:: ipython3
-
-    import authorityspoke
+    >>> import authorityspoke
 
 Again, you have the choice of using either the real API clients or
 mockups that supply only the testing data for these examples.
 
-.. code:: ipython3
-
-    USE_REAL_CASE_API = True
-    USE_REAL_LEGISLICE_API = True
+    >>> USE_REAL_CASE_API = False
+    >>> USE_REAL_LEGISLICE_API = False
 
 Next, we can download the judicial decisions we’re going to compare.
 
-.. code:: ipython3
-
-
-    import os
-    from dotenv import load_dotenv
-
-    from authorityspoke.io.loaders import load_decision
-    from authorityspoke.io.downloads import CAPClient
-
-    load_dotenv()
-
-    CAP_API_KEY = os.getenv('CAP_API_KEY')
-    client = CAPClient(api_token=CAP_API_KEY)
-
-    if USE_REAL_CASE_API:
-
-        client.read_cite(
-        cite="750 F.3d 1339",
-        full_case=True)
-
-        client.read_cite(
-        cite="49 F.3d 807",
-        full_case=True)
-
-    else:
-        oracle_download = load_decision("oracle_h.json")
-        lotus_download = load_decision("lotus_h.json")
+    >>> import os
+    >>> from dotenv import load_dotenv
+    >>> from authorityspoke.io.loaders import load_decision
+    >>> from authorityspoke.io.downloads import CAPClient
+    >>> load_dotenv()
+    True
+    >>> if USE_REAL_CASE_API:
+    ...     CAP_API_KEY = os.getenv('CAP_API_KEY')
+    ...     client = CAPClient(api_token=CAP_API_KEY)
+    ...     oracle_download = client.read_cite(
+    ...     cite="750 F.3d 1339",
+    ...     full_case=True)
+    ...     lotus_download = client.read_cite(
+    ...     cite="49 F.3d 807",
+    ...     full_case=True)
+    ... else:
+    ...     oracle_download = load_decision("oracle_h.json")
+    ...     lotus_download = load_decision("lotus_h.json")
 
 Then we convert the JSON responses from the API
 into :class:`authorityspoke.opinions.Opinion` objects.
 
-.. code:: ipython3
-
-    from authorityspoke.io.readers import read_decision
-
-    oracle = read_decision(oracle_download).majority
-    lotus = read_decision(lotus_download).majority
+    >>> from authorityspoke.io.readers import read_decision
+    >>> oracle = read_decision(oracle_download).majority
+    >>> lotus = read_decision(lotus_download).majority
 
 And we need a :class:`~legislice.download.Client` for
 accessing legislative provisions.
 
-.. code:: ipython3
+    >>> import json
 
-    import json
-
-    from authorityspoke.io.downloads import Client
-    from authorityspoke.io.fake_enactments import FakeClient
-
-    if USE_REAL_LEGISLICE_API:
-
-        LEGISLICE_API_TOKEN = os.getenv("LEGISLICE_API_TOKEN")
-        legis_client = Client(api_token=LEGISLICE_API_TOKEN)
-
-    else:
-        legis_client = FakeClient.from_file("usc.json")
+    >>> from authorityspoke.io.downloads import LegisClient
+    >>> from authorityspoke.io.fake_enactments import FakeClient
+    >>> if USE_REAL_LEGISLICE_API:
+    ...     LEGISLICE_API_TOKEN = os.getenv("LEGISLICE_API_TOKEN")
+    ...     legis_client = LegisClient(api_token=LEGISLICE_API_TOKEN)
+    ... else:
+    ...     legis_client = FakeClient.from_file("usc.json")
 
 Loading Holdings from Existing JSON
 -----------------------------------
@@ -97,12 +76,10 @@ Then we can load the Holdings into
 AuthoritySpoke objects using
 the :func:`~authorityspoke.io.loaders.read_holdings_from_file` function.
 
-.. code:: ipython3
+    >>> from authorityspoke.io.loaders import read_holdings_from_file
 
-    from authorityspoke.io.loaders import read_holdings_from_file
-
-    oracle_holdings = read_holdings_from_file("holding_oracle.json", client=legis_client)
-    lotus_holdings = read_holdings_from_file("holding_lotus.json", client=legis_client)
+    >>> oracle_holdings = read_holdings_from_file("holding_oracle.json", client=legis_client)
+    >>> lotus_holdings = read_holdings_from_file("holding_lotus.json", client=legis_client)
 
 If we want to open one of the input YAML files in a text editor
 for comparison, they can be found in the folder
@@ -134,25 +111,26 @@ will convert the YAML file to a Python dictionary
 (with a structure similar to JSON), but won't yet load it as an
 AuthoritySpoke object.
 
+    >>> from pprint import pprint
     >>> from authorityspoke.io.loaders import load_holdings
     >>> holdings_to_read = load_holdings("holding_oracle.json")
-    >>> holdings_to_read[0]
+    >>> pprint(holdings_to_read[0], sort_dicts=False)
     {'inputs': {'type': 'fact',
-      'content': '{the Java API} was an original work',
-      'truth': False,
-      'anchors': 'a work must be “original”'},
+                'content': '{the Java API} was an original work',
+                'truth': False},
      'outputs': {'type': 'fact',
-      'content': 'the Java API was copyrightable',
-      'truth': False,
-      'anchors': 'must be “original” to qualify for ``|copyright protection.|``'},
+                 'content': 'the Java API was copyrightable',
+                 'truth': False},
      'mandatory': True,
      'enactments': {'node': '/us/usc/t17/s102/a',
-      'exact': 'Copyright protection subsists, in accordance with this title, in original works of authorship fixed in any tangible medium of expression, now known or later developed, from which they can be perceived, reproduced, or otherwise communicated, either directly or with the aid of a machine or device.',
-      'name': 'copyright protection provision',
-      'anchors': 'qualify for copyright protection. ``|17 U.S.C. § 102(a)|``.'},
-     'anchors': 'By statute, a work ``|must be “original” to qualify|`` for'}
-
-
+                    'exact': 'Copyright protection subsists, in accordance with '
+                             'this title, in original works of authorship fixed in '
+                             'any tangible medium of expression, now known or '
+                             'later developed, from which they can be perceived, '
+                             'reproduced, or otherwise communicated, either '
+                             'directly or with the aid of a machine or device.',
+                    'name': 'copyright protection provision'},
+     'anchors': 'By statute, a work |must be “original” to qualify| for'}
 
 To compare the input data to the created Python objects, link
 the Holdings to the :class:`~authorityspoke.opinions.Opinion` using
@@ -163,14 +141,14 @@ JSON affect the structure of the :class:`~authorityspoke.holdings.Holding` objec
     >>> oracle.posit(oracle_holdings)
     >>> lotus.posit(lotus_holdings)
     >>> print(oracle.holdings[0])
-    "the Holding to ACCEPT
+    the Holding to ACCEPT
       the Rule that the court MUST SOMETIMES impose the
         RESULT:
-          the Fact it is false that <the Java API> was copyrightable
+          the fact it was false that <the Java API> was copyrightable
         GIVEN:
-          the Fact it is false that <the Java API> was an original work
+          the fact it was false that <the Java API> was an original work
         GIVEN the ENACTMENT:
-          "Copyright protection subsists, in accordance with this title, in original works of authorship fixed in any tangible medium of expression, now known or later developed, from which they can be perceived, reproduced, or otherwise communicated, either directly or with the aid of a machine or device.…" (/us/usc/t17/s102/a 2013-07-18)"
+          "Copyright protection subsists, in accordance with this title, in original works of authorship fixed in any tangible medium of expression, now known or later developed, from which they can be perceived, reproduced, or otherwise communicated, either directly or with the aid of a machine or device.…" (/us/usc/t17/s102/a 2013-07-18)
 
 
 This Holding means that according to the
@@ -190,7 +168,7 @@ than one Factor in the “inputs”, “outputs” or “despite” categories, 
 if so they would be listed together in square brackets in the JSON.
 
     >>> print(oracle.holdings[0].inputs[0])
-    "the Fact it is false that <the Java API> was an original work"
+    the fact it was false that <the Java API> was an original work
 
 
 The curly brackets around ``{the Java API}`` indicate that the parser
@@ -199,7 +177,7 @@ becomes one of the input’s ``terms``. If such an object hasn’t
 been referenced before in the file, it will be created.
 
     >>> print(oracle.holdings[0].inputs[0].terms)
-    (Entity(name='the Java API', generic=True, plural=False, anchors=[]),)
+    (Entity(name='the Java API'),)
 
 
 The JSON representation of a Rule can also have “mandatory” and
@@ -267,21 +245,17 @@ we can see where the enactment
 is referenced by its name “copy protection provision” instead of being
 repeated in its entirety.
 
-    >>> holdings_to_read[1]
-    {'inputs': [{'type': 'fact',
-       'content': 'the Java API was independently created by the author, as opposed to copied from other works',
-       'anchors': 'the work was independently created by the author (as opposed to copied from other works)'},
-      {'type': 'fact',
-       'content': 'the Java API possessed at least some minimal degree of creativity',
-       'anchors': 'it possesses at least some minimal degree of creativity.'}],
-     'outputs': {'type': 'fact',
-      'content': 'the Java API was an original work',
-      'anchors': 'Original, as the term is used in copyright'},
+    >>> pprint(holdings_to_read[1])
+    {'enactments': 'copyright protection provision',
+     'inputs': [{'content': 'the Java API was independently created by the author, '
+                            'as opposed to copied from other works',
+                 'type': 'fact'},
+                {'content': 'the Java API possessed at least some minimal degree '
+                            'of creativity',
+                 'type': 'fact'}],
      'mandatory': True,
-     'universal': True,
-     'enactments': 'copyright protection provision'}
-
-
+     'outputs': {'content': 'the Java API was an original work', 'type': 'fact'},
+     'universal': True}
 
 There can also be an “enactments_despite” field, which identifies
 legislative text that doesn’t need to be present for the Rule to apply,
@@ -303,359 +277,356 @@ schema below.
     >>> from authorityspoke.io.api_spec import make_spec
     >>> yaml = make_spec().to_yaml()
     >>> print(yaml)
-
-
-.. parsed-literal::
-
-  components:
-    schemas:
-      Allegation:
-        properties:
-          absent:
-            default: false
-            type: boolean
-          generic:
-            default: false
-            type: boolean
-          name:
-            default: null
-            nullable: true
-            type: string
-          pleading:
-            allOf:
-            - $ref: '#/components/schemas/Pleading'
-            default: null
-            nullable: true
-          statement:
-            allOf:
-            - $ref: '#/components/schemas/Fact'
-            default: null
-            nullable: true
-        type: object
-      CrossReference:
-        properties:
-          reference_text:
-            type: string
-          target_node:
-            type: integer
-          target_uri:
-            type: string
-          target_url:
-            format: url
-            type: string
-        required:
-        - reference_text
-        - target_uri
-        - target_url
-        type: object
-      Enactment:
-        properties:
-          node:
-            format: url
-            type: string
-          heading:
-            default: ''
-            type: string
-          text_version:
-            allOf:
-            - $ref: '#/components/schemas/TextVersion'
-            default: null
-            nullable: true
-          start_date:
-            format: date
-            type: string
-          end_date:
-            default: null
-            format: date
-            nullable: true
-            type: string
-          known_revision_date:
-            type: boolean
-          selection:
-            items:
-              $ref: '#/components/schemas/PositionSelector'
-            type: array
-          anchors:
-            items:
-              $ref: '#/components/schemas/PositionSelector'
-            type: array
-          citations:
-            items:
-              $ref: '#/components/schemas/CrossReference'
-            type: array
-          children:
-            items:
-              $ref: '#/components/schemas/Enactment'
-            type: array
-        required:
-        - node
-        - start_date
-        type: object
-      Entity:
-        properties:
-          generic:
-            default: true
-            type: boolean
-          name:
-            default: null
-            nullable: true
-            type: string
-          plural:
-            type: boolean
-        type: object
-      Evidence:
-        properties:
-          absent:
-            default: false
-            type: boolean
-          exhibit:
-            allOf:
-            - $ref: '#/components/schemas/Exhibit'
-            default: null
-            nullable: true
-          generic:
-            default: false
-            type: boolean
-          name:
-            default: null
-            nullable: true
-            type: string
-          to_effect:
-            allOf:
-            - $ref: '#/components/schemas/Fact'
-            default: null
-            nullable: true
-        type: object
-      Exhibit:
-        properties:
-          absent:
-            default: false
-            type: boolean
-          form:
-            default: null
-            nullable: true
-            type: string
-          generic:
-            default: false
-            type: boolean
-          name:
-            default: null
-            nullable: true
-            type: string
-          statement:
-            allOf:
-            - $ref: '#/components/schemas/Fact'
-            default: null
-            nullable: true
-          statement_attribution:
-            allOf:
-            - $ref: '#/components/schemas/Entity'
-            default: null
-            nullable: true
-        type: object
-      Fact:
-        properties:
-          absent:
-            default: false
-            type: boolean
-          generic:
-            default: false
-            type: boolean
-          name:
-            default: null
-            nullable: true
-            type: string
-          predicate:
-            $ref: '#/components/schemas/Predicate'
-          standard_of_proof:
-            default: null
-            nullable: true
-            type: string
-          terms:
-            items:
-              $ref: '#/components/schemas/Factor'
-            type: array
-        type: object
-      Factor:
-        discriminator:
-          mapping:
-            Allegation: '#/components/schemas/Allegation'
-            Entity: '#/components/schemas/Entity'
-            Evidence: '#/components/schemas/Evidence'
-            Exhibit: '#/components/schemas/Exhibit'
-            Fact: '#/components/schemas/Fact'
-            Pleading: '#/components/schemas/Pleading'
-          propertyName: type
-        oneOf:
-        - $ref: '#/components/schemas/Allegation'
-        - $ref: '#/components/schemas/Entity'
-        - $ref: '#/components/schemas/Evidence'
-        - $ref: '#/components/schemas/Exhibit'
-        - $ref: '#/components/schemas/Fact'
-        - $ref: '#/components/schemas/Pleading'
-      Holding:
-        properties:
-          anchors:
-            items:
-              $ref: '#/components/schemas/Selector'
-            type: array
-          decided:
-            default: true
-            type: boolean
-          exclusive:
-            default: false
-            type: boolean
-          generic:
-            default: false
-            type: boolean
-          rule:
-            $ref: '#/components/schemas/Rule'
-          rule_valid:
-            default: true
-            type: boolean
-        type: object
-      Pleading:
-        properties:
-          absent:
-            default: false
-            type: boolean
-          filer:
-            allOf:
-            - $ref: '#/components/schemas/Entity'
-            default: null
-            nullable: true
-          generic:
-            default: false
-            type: boolean
-          name:
-            default: null
-            nullable: true
-            type: string
-        type: object
-      PositionSelector:
-        properties:
-          start:
-            type: integer
-          end:
-            default: null
-            nullable: true
-            type: integer
-          include_start:
-            default: true
-            type: boolean
-            writeOnly: true
-          include_end:
-            default: false
-            type: boolean
-            writeOnly: true
-        type: object
-      Predicate:
-        properties:
-          content:
-            type: string
-          expression:
-            default: null
-            nullable: true
-          sign:
-            default: null
-            enum:
-            - ''
-            - '>='
-            - ==
-            - '!='
-            - <=
-            - <>
-            - '>'
-            - <
-            nullable: true
-            type: string
-          truth:
-            default: true
-            type: boolean
-        type: object
-      Procedure:
-        properties:
-          despite:
-            items:
-              $ref: '#/components/schemas/Factor'
-            type: array
-          inputs:
-            items:
-              $ref: '#/components/schemas/Factor'
-            type: array
-          outputs:
-            items:
-              $ref: '#/components/schemas/Factor'
-            type: array
-        type: object
-      Rule:
-        properties:
-          enactments:
-            items:
-              $ref: '#/components/schemas/Enactment'
-            type: array
-          enactments_despite:
-            items:
-              $ref: '#/components/schemas/Enactment'
-            type: array
-          generic:
-            default: false
-            type: boolean
-          mandatory:
-            default: false
-            type: boolean
-          name:
-            default: null
-            nullable: true
-            type: string
-          procedure:
-            $ref: '#/components/schemas/Procedure'
-          universal:
-            default: false
-            type: boolean
-        type: object
-      Selector:
-        properties:
-          exact:
-            default: null
-            nullable: true
-            type: string
-          prefix:
-            default: null
-            nullable: true
-            type: string
-          suffix:
-            default: null
-            nullable: true
-            type: string
-          start:
-            type: integer
-          end:
-            default: null
-            nullable: true
-            type: integer
-          include_start:
-            default: true
-            type: boolean
-            writeOnly: true
-          include_end:
-            default: false
-            type: boolean
-            writeOnly: true
-        type: object
-      TextVersion:
-        properties:
-          content:
-            type: string
-        required:
-        - content
-        type: object
-  info:
-    description: An interface for annotating judicial holdings
-    title: AuthoritySpoke Holding API Schema
-    version: 0.3.0
-  openapi: 3.0.2
-  paths: {}
+    components:
+      schemas:
+        Allegation:
+          properties:
+            absent:
+              default: false
+              type: boolean
+            generic:
+              default: false
+              type: boolean
+            name:
+              default: null
+              nullable: true
+              type: string
+            pleading:
+              allOf:
+              - $ref: '#/components/schemas/Pleading'
+              default: null
+              nullable: true
+            statement:
+              allOf:
+              - $ref: '#/components/schemas/Fact'
+              default: null
+              nullable: true
+          type: object
+        CrossReference:
+          properties:
+            reference_text:
+              type: string
+            target_node:
+              type: integer
+            target_uri:
+              type: string
+            target_url:
+              format: url
+              type: string
+          required:
+          - reference_text
+          - target_uri
+          - target_url
+          type: object
+        Enactment:
+          properties:
+            node:
+              format: url
+              type: string
+            heading:
+              default: ''
+              type: string
+            text_version:
+              allOf:
+              - $ref: '#/components/schemas/TextVersion'
+              default: null
+              nullable: true
+            start_date:
+              format: date
+              type: string
+            end_date:
+              default: null
+              format: date
+              nullable: true
+              type: string
+            known_revision_date:
+              type: boolean
+            selection:
+              items:
+                $ref: '#/components/schemas/PositionSelector'
+              type: array
+            anchors:
+              items:
+                $ref: '#/components/schemas/PositionSelector'
+              type: array
+            citations:
+              items:
+                $ref: '#/components/schemas/CrossReference'
+              type: array
+            children:
+              items:
+                $ref: '#/components/schemas/Enactment'
+              type: array
+          required:
+          - node
+          - start_date
+          type: object
+        Entity:
+          properties:
+            generic:
+              default: true
+              type: boolean
+            name:
+              default: null
+              nullable: true
+              type: string
+            plural:
+              type: boolean
+          type: object
+        Evidence:
+          properties:
+            absent:
+              default: false
+              type: boolean
+            exhibit:
+              allOf:
+              - $ref: '#/components/schemas/Exhibit'
+              default: null
+              nullable: true
+            generic:
+              default: false
+              type: boolean
+            name:
+              default: null
+              nullable: true
+              type: string
+            to_effect:
+              allOf:
+              - $ref: '#/components/schemas/Fact'
+              default: null
+              nullable: true
+          type: object
+        Exhibit:
+          properties:
+            absent:
+              default: false
+              type: boolean
+            form:
+              default: null
+              nullable: true
+              type: string
+            generic:
+              default: false
+              type: boolean
+            name:
+              default: null
+              nullable: true
+              type: string
+            statement:
+              allOf:
+              - $ref: '#/components/schemas/Fact'
+              default: null
+              nullable: true
+            statement_attribution:
+              allOf:
+              - $ref: '#/components/schemas/Entity'
+              default: null
+              nullable: true
+          type: object
+        Fact:
+          properties:
+            absent:
+              default: false
+              type: boolean
+            generic:
+              default: false
+              type: boolean
+            name:
+              default: null
+              nullable: true
+              type: string
+            predicate:
+              $ref: '#/components/schemas/Predicate'
+            standard_of_proof:
+              default: null
+              nullable: true
+              type: string
+            terms:
+              items:
+                $ref: '#/components/schemas/Factor'
+              type: array
+          type: object
+        Factor:
+          discriminator:
+            mapping:
+              Allegation: '#/components/schemas/Allegation'
+              Entity: '#/components/schemas/Entity'
+              Evidence: '#/components/schemas/Evidence'
+              Exhibit: '#/components/schemas/Exhibit'
+              Fact: '#/components/schemas/Fact'
+              Pleading: '#/components/schemas/Pleading'
+            propertyName: type
+          oneOf:
+          - $ref: '#/components/schemas/Allegation'
+          - $ref: '#/components/schemas/Entity'
+          - $ref: '#/components/schemas/Evidence'
+          - $ref: '#/components/schemas/Exhibit'
+          - $ref: '#/components/schemas/Fact'
+          - $ref: '#/components/schemas/Pleading'
+        Holding:
+          properties:
+            anchors:
+              items:
+                $ref: '#/components/schemas/Selector'
+              type: array
+            decided:
+              default: true
+              type: boolean
+            exclusive:
+              default: false
+              type: boolean
+            generic:
+              default: false
+              type: boolean
+            rule:
+              $ref: '#/components/schemas/Rule'
+            rule_valid:
+              default: true
+              type: boolean
+          type: object
+        Pleading:
+          properties:
+            absent:
+              default: false
+              type: boolean
+            filer:
+              allOf:
+              - $ref: '#/components/schemas/Entity'
+              default: null
+              nullable: true
+            generic:
+              default: false
+              type: boolean
+            name:
+              default: null
+              nullable: true
+              type: string
+          type: object
+        PositionSelector:
+          properties:
+            start:
+              type: integer
+            end:
+              default: null
+              nullable: true
+              type: integer
+            include_start:
+              default: true
+              type: boolean
+              writeOnly: true
+            include_end:
+              default: false
+              type: boolean
+              writeOnly: true
+          type: object
+        Predicate:
+          properties:
+            content:
+              type: string
+            expression:
+              default: null
+              nullable: true
+            sign:
+              default: null
+              enum:
+              - ''
+              - '>='
+              - ==
+              - '!='
+              - <=
+              - <>
+              - '>'
+              - <
+              nullable: true
+              type: string
+            truth:
+              default: true
+              type: boolean
+          type: object
+        Procedure:
+          properties:
+            despite:
+              items:
+                $ref: '#/components/schemas/Factor'
+              type: array
+            inputs:
+              items:
+                $ref: '#/components/schemas/Factor'
+              type: array
+            outputs:
+              items:
+                $ref: '#/components/schemas/Factor'
+              type: array
+          type: object
+        Rule:
+          properties:
+            enactments:
+              items:
+                $ref: '#/components/schemas/Enactment'
+              type: array
+            enactments_despite:
+              items:
+                $ref: '#/components/schemas/Enactment'
+              type: array
+            generic:
+              default: false
+              type: boolean
+            mandatory:
+              default: false
+              type: boolean
+            name:
+              default: null
+              nullable: true
+              type: string
+            procedure:
+              $ref: '#/components/schemas/Procedure'
+            universal:
+              default: false
+              type: boolean
+          type: object
+        Selector:
+          properties:
+            exact:
+              default: null
+              nullable: true
+              type: string
+            prefix:
+              default: null
+              nullable: true
+              type: string
+            suffix:
+              default: null
+              nullable: true
+              type: string
+            start:
+              type: integer
+            end:
+              default: null
+              nullable: true
+              type: integer
+            include_start:
+              default: true
+              type: boolean
+              writeOnly: true
+            include_end:
+              default: false
+              type: boolean
+              writeOnly: true
+          type: object
+        TextVersion:
+          properties:
+            content:
+              type: string
+          required:
+          - content
+          type: object
+    info:
+      description: An interface for annotating judicial holdings
+      title: AuthoritySpoke Holding API Schema
+      version: 0.3.0
+    openapi: 3.0.2
+    paths: {}
+    <BLANKLINE>
 
 
 
@@ -669,5 +640,6 @@ AuthoritySpoke Holding Schema, this JSON format is easier to store and
 share over the web.
 
     >>> from authorityspoke.io import dump
-    >>> dump.to_json(oracle.holdings[0].outputs[0])
-    '{"name": "false the Java API was copyrightable", "standard_of_proof": null, "terms": [{"name": "the Java API", "plural": false, "anchors": [], "generic": true, "type": "Entity"}], "predicate": {"expression": null, "truth": false, "sign": "", "content": "{} was copyrightable"}, "generic": false, "absent": false, "anchors": [{"exact": "copyright protection.", "prefix": "must be \\u201coriginal\\u201d to qualify for ", "suffix": ""}, {"exact": "whether the non-literal elements of a program \\u201care protected", "prefix": "", "suffix": ""}]}'
+    >>> factor_as_json = dump.to_json(oracle.holdings[0].outputs[0])
+    >>> '"content": "${the_java_api} was copyrightable"' in factor_as_json
+    True
