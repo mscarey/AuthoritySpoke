@@ -17,7 +17,11 @@ ResponsesByDateByPath = Dict[str, Dict[str, Dict]]
 
 
 class FakeClient(Client):
-    """Repository for mocking API responses locally."""
+    """
+    Repository for mocking API responses locally.
+
+    Imitates the interface of :class:`legislice.download.Client`
+    """
 
     def __init__(self, responses: ResponsesByDateByPath):
         self.responses = responses

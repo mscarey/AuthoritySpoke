@@ -19,7 +19,6 @@ from authorityspoke.opinions import AnchoredHoldings
 from authorityspoke.rules import Rule
 
 from authorityspoke.io import filepaths, readers
-from authorityspoke.io.fake_enactments import FakeClient
 from authorityspoke.io.name_index import Mentioned
 from authorityspoke.io.schemas_yaml import (
     RawEnactment,
@@ -169,18 +168,22 @@ def read_anchored_holdings_from_file(
     """
     Read holdings from file, with Opinion text anchors for holdings and factors.
 
-        This function can accept a file containing Holding summaries in the YAML format
+        This function can accept a file containing :class:`.authorityspoke.holdings.Holding`
+        summaries in the YAML format
         that may contain abbreviations and expandable named entities.
 
-        In the example below, a FakeClient is used to add fields to Enactments in the Holding
-        objects, to avoid using the network or making API calls. The real LegisClient class
+        In the example below, a :class:`~authorityspoke.io.fake_enactments.FakeClient` is used to
+        add fields to :class:`~legislice.enactments.Enactment`\s in the Holding
+        objects, to avoid using the network or making API calls. The
+        real :class:`~authorityspoke.io.downloads.LegisClient` class
         would also have worked (with an appropriate API key).
 
+        >>> from authorityspoke.io.fake_enactments import FakeClient
+        >>> fake_client = FakeClient.from_file("usc.json")
         >>> filepath = filepaths.make_filepath(filename="holding_mazza_alaluf.yaml")
         >>> with open(filepath, "r") as f:
         ...     yaml.safe_load(f)
         {'holdings': [{'inputs': [{'type': 'fact', 'content': "{Mazza-Alaluf} used Mazza-Alaluf's business {Turismo Costa Brava} to commit the New York offense of engaging in the business of receiving money for transmission or transmitting the same, without a license therefor"}], 'outputs': [{'type': 'fact', 'content': 'Mazza-Alaluf operated Turismo Costa Brava without an appropriate money transmitting license in a State where such operation was punishable as a misdemeanor or a felony under State law', 'anchors': "we conclude that sufficient evidence supports Mazza-Alaluf's convictions under 18 U.S.C. § 1960(b)(1)(A) for conspiring to operate and operating a money transmitting business without appropriate state licenses.", 'name': 'operated without license'}], 'enactments': [{'node': '/us/usc/t18/s1960/b/1', 'anchors': 'state money transmitting licenses, see |18 U.S.C. § 1960(b)(1)(A)|', 'exact': 'is operated without an appropriate money transmitting license in a State where such operation is punishable as a misdemeanor or a felony under State law, whether or not the defendant knew that the operation was required to be licensed or that the operation was so punishable', 'name': 'state money transmitting license provision'}], 'universal': True}, {'inputs': ['operated without license', {'type': 'fact', 'content': 'Mazza-Alaluf operated Turismo Costa Brava as a business', 'anchors': 'Mazza-Alaluf does not contest that he owned and managed Turismo'}, {'type': 'fact', 'content': 'Turismo Costa Brava was a money transmitting business', 'anchors': 'record evidence that Turismo conducted substantial money transmitting business in the three states'}], 'despite': [{'type': 'fact', 'content': 'Turismo Costa Brava was a domestic financial institution', 'truth': False, 'anchors': 'without respect to whether or not Turismo was a "domestic financial institution"'}], 'outputs': [{'type': 'fact', 'content': 'Mazza-Alaluf committed the offense of conducting a money transmitting business without a license required by state law', 'anchors': 'a crime to operate a money transmitting business without appropriate state licenses,'}], 'enactments': ['state money transmitting license provision'], 'enactments_despite': [{'node': '/us/usc/t31/s5312/b/1', 'anchors': ['§ 5312(b)(1) (defining "domestic financial institution")']}], 'anchors': [{'prefix': 'Accordingly, we conclude that the', 'suffix': 'In any event'}], 'universal': True, 'mandatory': True}]}
-        >>> fake_client = FakeClient.from_file("usc.json")
         >>> result = read_anchored_holdings_from_file(filepath=filepath, client=fake_client)
         >>> selector = result.named_anchors["the fact it was false that <Turismo Costa Brava> was a domestic financial institution"][0]
         >>> selector.exact
