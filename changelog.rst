@@ -1,5 +1,11 @@
 Changelog
 =========
+dev
+------------------
+* change "quotes" schema field names to "anchors"
+* add doctests to documentation
+* update example in readme to work with current version
+
 0.7.0 (2021-05-20)
 ------------------
 * remove Enactment download functions (use Legislice download client instead)
@@ -16,7 +22,7 @@ Changelog
 * Procedure has separate add_factor and with_factor methods
 * increase versions of Nettlesome and Legislice dependencies
 * add CAPClient to top level of package
-* add "Creating and Loading Holding Data" documentation page 
+* add "Creating and Loading Holding Data" documentation page
 * Rules select all text of Enactments without selected text only during init, not during schema load
 * change field name from "quotes" to "anchors" in YAML import files
 * fix bug: dump methods couldn't find Decision and Opinion schemas
