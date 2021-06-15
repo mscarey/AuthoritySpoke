@@ -165,7 +165,7 @@ def read_anchored_holdings_from_file(
     filepath: Optional[pathlib.Path] = None,
     client: Optional[Client] = None,
 ) -> AnchoredHoldings:
-    """
+    r"""
     Read holdings from file, with Opinion text anchors for holdings and factors.
 
         This function can accept a file containing :class:`.authorityspoke.holdings.Holding`
