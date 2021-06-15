@@ -168,15 +168,15 @@ def read_anchored_holdings_from_file(
     r"""
     Read holdings from file, with Opinion text anchors for holdings and factors.
 
-        This function can accept a file containing :class:`.authorityspoke.holdings.Holding`
-        summaries in the YAML format
-        that may contain abbreviations and expandable named entities.
+    This function can accept a file containing :class:`.authorityspoke.holdings.Holding`
+    summaries in the YAML format
+    that may contain abbreviations and expandable named entities.
 
-        In the example below, a :class:`~authorityspoke.io.fake_enactments.FakeClient` is used to
-        add fields to :class:`~legislice.enactments.Enactment`\s in the Holding
-        objects, to avoid using the network or making API calls. The
-        real :class:`~authorityspoke.io.downloads.LegisClient` class
-        would also have worked (with an appropriate API key).
+    In the example below, a :class:`~authorityspoke.io.fake_enactments.FakeClient` is used to
+    add fields to :class:`~legislice.enactments.Enactment`\s in the Holding
+    objects, to avoid using the network or making API calls. The
+    real :class:`~authorityspoke.io.downloads.LegisClient` class
+    would also have worked (with an appropriate API key).
 
         >>> from authorityspoke.io.fake_enactments import FakeClient
         >>> fake_client = FakeClient.from_file("usc.json")
