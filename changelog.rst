@@ -1,10 +1,11 @@
 Changelog
 =========
-dev
+0.7.1 (2021-06-15)
 ------------------
 * change "quotes" schema field names to "anchors"
 * add doctests to documentation
 * update example in readme to work with current version
+* use new Eyecite API changing "base_citation" to "corrected_citation"
 
 0.7.0 (2021-05-20)
 ------------------

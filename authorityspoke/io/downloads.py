@@ -28,13 +28,13 @@ def normalize_case_cite(cite: Union[str, CaseCitation, CAPCitation]) -> str:
         bad_cites = []
         for possible in possible_cites:
             if isinstance(possible, CaseCitation):
-                return possible.base_citation()
+                return possible.corrected_citation()
             bad_cites.append(possible)
         error_msg = f"Could not locate a CaseCitation in the text {cite}."
         for bad_cite in bad_cites:
             error_msg += f" {str(bad_cite)} was type {bad_cite.__class__.__name__}, not CaseCitation."
         raise ValueError(error_msg)
-    return cite.base_citation()
+    return cite.corrected_citation()
 
 
 class CAPClient:
