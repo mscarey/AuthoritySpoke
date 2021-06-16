@@ -1,5 +1,10 @@
 Changelog
 =========
+0.7.2 (2021-06-16)
+------------------
+* accept added fields in CAPCitation schema
+* change method for FakeEnactment finding file
+
 0.7.1 (2021-06-15)
 ------------------
 * change "quotes" schema field names to "anchors"
