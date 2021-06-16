@@ -13,7 +13,6 @@
 import os
 import sys
 import pathlib
-import sphinx_rtd_theme
 
 sys.path.insert(0, os.path.abspath(".."))
 
@@ -24,7 +23,7 @@ copyright = "2019-2021, Matt Carey"
 author = "Matt Carey"
 
 # The full version, including alpha/beta/rc tags
-release = "0.7.1"
+release = "0.7.2"
 
 
 # -- General configuration ---------------------------------------------------

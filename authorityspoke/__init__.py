@@ -13,4 +13,4 @@ from .rules import Rule
 from .io.downloads import CAPClient
 from .io.dump import to_dict, to_json
 
-__version__ = "0.7.1"
+__version__ = "0.7.2"
