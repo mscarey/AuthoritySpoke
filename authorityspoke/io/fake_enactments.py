@@ -10,6 +10,8 @@ from typing import Dict, Optional, Union
 from legislice.download import Client, normalize_path, LegislicePathError, RawEnactment
 from legislice.enactments import CrossReference, Enactment
 
+from authorityspoke.io import filepaths
+
 
 # A dict indexing responses by iso-format date strings.
 ResponsesByDate = Dict[str, Dict]
@@ -48,9 +50,9 @@ class FakeClient(Client):
 
     @classmethod
     def from_file(cls, filename: str) -> FakeClient:
-        parent_directory = Path(__file__).resolve().parents[2]
-        responses_filepath = parent_directory / "example_data" / "responses" / filename
-        with open(responses_filepath, "r") as f:
+        responses_filepath = filepaths.get_directory_path("responses")
+        response_path = responses_filepath / filename
+        with open(response_path, "r") as f:
             responses = json.load(f)
         return cls(responses)
 
