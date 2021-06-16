@@ -44,8 +44,12 @@ class CAPCitationSchema(Schema):
 
     __model__ = CAPCitation
     cite = fields.Str()
-    reporter = fields.Str(data_key="type", missing=None)
+    category = fields.Str(missing=None)
+    reporter = fields.Str(missing=None)
     case_ids = fields.List(fields.Int(), allow_none=True)
+
+    class Meta:
+        unknown = EXCLUDE
 
     @post_load
     def make_object(self, data: RawCAPCitation, **kwargs) -> CAPCitation:

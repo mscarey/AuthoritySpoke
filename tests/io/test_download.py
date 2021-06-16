@@ -90,7 +90,7 @@ class TestDownload:
         case = self.client.read(query=3675682, full_case=False)
         assert case.name_abbreviation == "Kimbrough v. United States"
         cited_case = self.client.read_cite(cite=case.cites_to[0])
-        assert cited_case.name_abbreviation == "United States v. Booker"
+        assert cited_case.name_abbreviation == "United States v. Castillo"
 
     @pytest.mark.vcr
     def test_read_full_case_from_id_using_client(self):

@@ -19,6 +19,7 @@ from authorityspoke.rules import Rule
 class CAPCitation:
     cite: str
     reporter: Optional[str] = None
+    category: Optional[str] = None
     case_ids: List[int] = field(default_factory=list)
 
 
