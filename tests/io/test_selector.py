@@ -1,5 +1,5 @@
 import pytest
-from marshmallow import ValidationError
+from anchorpoint.textselectors import TextSelectionError
 
 from authorityspoke.io import dump, schemas_yaml, schemas_json
 
@@ -12,7 +12,7 @@ class TestLoadSelector:
         """
 
         data = {"text": "process, system,|method of operation, concept, principle"}
-        with pytest.raises(ValidationError):
+        with pytest.raises(TextSelectionError):
             schema = schemas_yaml.SelectorSchema()
             schema.load(data)
 
