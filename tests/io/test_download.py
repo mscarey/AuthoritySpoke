@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 import eyecite
 import pytest
 
-from authorityspoke.io.downloads import CAPClient, AuthoritySpokeAPIError
+from authorityspoke.io.downloads import CAPClient, CaseAccessProjectAPIError
 from authorityspoke.io.readers import read_decision
 from authorityspoke.io.loaders import load_and_read_decision
 from authorityspoke.io import writers
@@ -55,7 +55,7 @@ class TestDownload:
 
     @pytest.mark.vcr
     def test_error_bad_cap_id(self):
-        with pytest.raises(AuthoritySpokeAPIError):
+        with pytest.raises(CaseAccessProjectAPIError):
             self.client.fetch_id(cap_id=99999999)
 
     @pytest.mark.vcr
@@ -66,7 +66,7 @@ class TestDownload:
     @pytest.mark.vcr
     def test_error_full_case_download_without_api_key(self):
         bad_client = CAPClient()
-        with pytest.raises(AuthoritySpokeAPIError):
+        with pytest.raises(CaseAccessProjectAPIError):
             bad_client.fetch_cite(cite="49 F.3d 807", full_case=True)
 
     @pytest.mark.skip(reason="uses API key")

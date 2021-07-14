@@ -13,7 +13,7 @@ class TestDecision:
         assert str(decision) == "People v. Cardenas, 31 Cal. 3d 897 (1982-07-08)"
 
     def test_decision_no_opinions(self):
-        decision = Decision(date(2000, 2, 2))
+        decision = Decision(decision_date=date(2000, 2, 2))
         assert decision.majority is None
         assert not decision.implied_by(None)
 
@@ -28,7 +28,7 @@ class TestDecision:
         assert watt.majority.holdings[-1] == make_holding["h2"]
 
     def test_need_opinion_to_posit_holding(self, make_holding):
-        decision = Decision(date=(datetime.date(1900, 1, 1)))
+        decision = Decision(decision_date=(datetime.date(1900, 1, 1)))
         with pytest.raises(AttributeError):
             decision.posit(make_holding["h1"])
 
@@ -81,7 +81,7 @@ class TestImplication:
         assert not explanation.reasons
 
     def test_no_holdings_of_blank_decision(self):
-        blank = Decision(date=(2000, 1, 2))
+        blank = Decision(decision_date=datetime.date(2000, 1, 2))
         assert len(blank.holdings) == 0
 
     # @pytest.mark.skip(reason="slow")

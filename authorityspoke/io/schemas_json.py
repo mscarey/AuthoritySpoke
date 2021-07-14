@@ -72,7 +72,7 @@ class OpinionSchema(Schema):
     """
 
     __model__ = Opinion
-    position = fields.Str(data_key="type", missing="majority")
+    type = fields.Str(missing="majority")
     author = fields.Str(missing="")
     text = fields.Str(missing="")
 

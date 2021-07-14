@@ -16,9 +16,11 @@ import re
 from dataclasses import dataclass, field
 
 from anchorpoint.textselectors import TextQuoteSelector
-
+from justopinion.decisions import Opinion as CAPOpinion
 from nettlesome.terms import Comparable, ContextRegister, Explanation
 from nettlesome.factors import Factor
+from pydantic import BaseModel, Field
+
 from authorityspoke.holdings import Holding, HoldingGroup
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
@@ -47,7 +49,7 @@ class Opinion(Comparable):
     Usually an opinion must have ``position="majority"``
     to create holdings binding on any courts.
 
-    :param position:
+    :param type:
         the opinion's attitude toward the court's disposition of the case.
         e.g. ``majority``, ``dissenting``, ``concurring``, ``concurring in the result``
     :param author:
@@ -55,11 +57,20 @@ class Opinion(Comparable):
     :param text:
     """
 
-    position: str = "majority"
+    type: Optional[str] = None
     author: Optional[str] = None
-    text: Optional[str] = field(default=None, repr=False)
+    text: Optional[str] = None
+    _holdings: HoldingGroup = HoldingGroup()
+    factor_anchors: dict = {}
+    enactment_anchors: dict = {}
 
-    def __post_init__(self):
+    def __str__(self) -> str:
+        name = f"{self.__class__.__name__}[{self.author}]"
+        if self.position:
+            name = f"{self.position} {name}"
+        return name
+
+    def __init__(self):
         r"""
         Add attributes to store Holdings and Factors keyed to their text selectors.
 
@@ -69,10 +80,6 @@ class Opinion(Comparable):
         ``valid``, or ``decided``, or show the ``exclusive`` way to reach
         the outputs.
         """
-
-        self._holdings = HoldingGroup()
-        self.factor_anchors = {}
-        self.enactment_anchors = {}
 
     def factors(self) -> List[Factor]:
         factors_by_name = self.factors_by_name()

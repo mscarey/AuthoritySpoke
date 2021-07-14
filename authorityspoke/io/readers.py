@@ -277,8 +277,7 @@ def read_decision(decision_dict: RawDecision) -> Decision:
     :param decision_dict:
         A dict created from a Caselaw Access Project API response.
     """
-    schema = schemas_json.DecisionSchema()
-    return schema.load(decision_dict)
+    return Decision(**decision_dict)
 
 
 def read_rules_with_index(
