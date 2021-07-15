@@ -67,7 +67,7 @@ class OpinionSchema(Schema):
         ...     "text": "I respectfully dissent."}
         >>> schema = OpinionSchema()
         >>> opinion = schema.load(data)
-        >>> opinion.position
+        >>> opinion.type
         'dissent'
     """
 

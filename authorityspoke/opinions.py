@@ -45,11 +45,9 @@ class AnchoredHoldings(NamedTuple):
 class Opinion(Comparable):
     """
     A document that resolves legal issues in a case and posits legal holdings.
-
     Usually an opinion must have ``position="majority"``
     to create holdings binding on any courts.
-
-    :param type:
+    :param position:
         the opinion's attitude toward the court's disposition of the case.
         e.g. ``majority``, ``dissenting``, ``concurring``, ``concurring in the result``
     :param author:
@@ -57,29 +55,23 @@ class Opinion(Comparable):
     :param text:
     """
 
-    type: Optional[str] = None
+    position: str = "majority"
     author: Optional[str] = None
-    text: Optional[str] = None
-    _holdings: HoldingGroup = HoldingGroup()
-    factor_anchors: dict = {}
-    enactment_anchors: dict = {}
+    text: Optional[str] = field(default=None, repr=False)
 
-    def __str__(self) -> str:
-        name = f"{self.__class__.__name__}[{self.author}]"
-        if self.position:
-            name = f"{self.position} {name}"
-        return name
-
-    def __init__(self):
+    def __post_init__(self):
         r"""
         Add attributes to store Holdings and Factors keyed to their text selectors.
-
         The ``holding_anchors`` are text selectors for the whole :class:`Holding`, not for any
         individual :class:`.Factor`. Often select text used to
         indicate whether the :class:`.Rule` is ``mandatory``, ``universal``,
         ``valid``, or ``decided``, or show the ``exclusive`` way to reach
         the outputs.
         """
+
+        self._holdings = HoldingGroup()
+        self.factor_anchors = {}
+        self.enactment_anchors = {}
 
     def factors(self) -> List[Factor]:
         factors_by_name = self.factors_by_name()
@@ -446,9 +438,6 @@ class Opinion(Comparable):
             f'Passage "{selector.exact}" from TextQuoteSelector '
             + f'not found in Opinion "{self}".'
         )
-
-    def __str__(self):
-        return f"{self.position} Opinion by {self.author}"
 
 
 class FactorIndex(Dict[str, Factor]):

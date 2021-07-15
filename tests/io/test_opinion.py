@@ -13,7 +13,7 @@ class TestLoadOpinion:
         brad_dict = loaders.load_decision("brad_h.json")
         dissent = brad_dict["casebody"]["data"]["opinions"][1]
         opinion = schema.load(dissent)
-        assert opinion.position == "concurring-in-part-and-dissenting-in-part"
+        assert opinion.type == "concurring-in-part-and-dissenting-in-part"
 
     def test_selectors_not_duplicated(self, make_opinion, raw_holding):
         """
@@ -41,4 +41,4 @@ class TestLoadDecision:
         brad_dict = loaders.load_decision("brad_h.json")
         brad = readers.read_decision(brad_dict)
         dissent = brad.opinions[1]
-        assert dissent.position == "concurring-in-part-and-dissenting-in-part"
+        assert dissent.type == "concurring-in-part-and-dissenting-in-part"

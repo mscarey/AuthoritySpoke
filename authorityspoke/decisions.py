@@ -43,14 +43,12 @@ class CaseBody(BaseModel):
     data: CaseData
 
 
-class Decision(Comparable, CAPDecision):
+class Decision(Comparable):
     r"""
     A court decision to resolve a step in litigation.
-
     Uses the model of a judicial decision from
     the `Caselaw Access Project API <https://api.case.law/v1/cases/>`_.
     One of these records may contain multiple :class:`.Opinion`\s.
-
     Typically one record will contain all
     the :class:`~authorityspoke.opinions.Opinion`\s
     from one appeal, but not necessarily from the whole lawsuit. One
@@ -58,7 +56,6 @@ class Decision(Comparable, CAPDecision):
     if more then one of those generates published Opinions,
     the CAP API will divide those Opinions into a separate
     record for each appeal.
-
     The outcome of a decision may be determined by one majority
     :class:`~authorityspoke.opinions.Opinion` or by the combined
     effect of multiple Opinions.
@@ -68,8 +65,6 @@ class Decision(Comparable, CAPDecision):
     binding, but some may not be, often because parts of the
     Opinion fail to command a majority of the panel
     of judges.
-
-
     :param name:
         full name of the opinion, e.g. "ORACLE AMERICA, INC.,
         Plaintiff-Appellant, v. GOOGLE INC., Defendant-Cross-Appellant"
@@ -91,12 +86,41 @@ class Decision(Comparable, CAPDecision):
         unique ID from CAP API
     """
 
-    casebody: Optional[CaseBody] = None
+    def __init__(
+        self,
+        date: datetime.date,
+        name: Optional[str] = None,
+        name_abbreviation: Optional[str] = None,
+        citations: Optional[Sequence[CAPCitation]] = None,
+        first_page: Optional[int] = None,
+        last_page: Optional[int] = None,
+        court: Optional[str] = None,
+        opinions: Optional[Union[Opinion, Sequence[Opinion]]] = None,
+        jurisdiction: Optional[str] = None,
+        cites_to: Optional[Sequence[CAPCitation]] = None,
+        id: Optional[int] = None,
+    ) -> None:
+        self.date = date
+        self.name = name
+        self.name_abbreviation = name_abbreviation
+        self.citations = citations
+        self.first_page = first_page
+        self.last_page = last_page
+        self.court = court
+        if isinstance(opinions, Opinion):
+            self.opinions = [opinions]
+        elif not opinions:
+            self.opinions = []
+        else:
+            self.opinions = list(opinions)
+        self.jurisdiction = jurisdiction
+        self.cites_to = cites_to
+        self._id = id
 
     def __str__(self):
         citation = self.citations[0].cite if self.citations else ""
         name = self.name_abbreviation or self.name
-        return f"{name}, {citation} ({self.date})"
+        return f"{name}, {citation} ({self.decision_date})"
 
     @property
     def holdings(self) -> HoldingGroup:
