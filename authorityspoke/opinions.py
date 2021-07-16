@@ -19,7 +19,7 @@ from anchorpoint.textselectors import TextQuoteSelector
 from justopinion.decisions import CAPOpinion
 from nettlesome.terms import Comparable, ContextRegister, Explanation
 from nettlesome.factors import Factor
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, validator
 
 from authorityspoke.holdings import Holding, HoldingGroup
 from authorityspoke.procedures import Procedure
@@ -41,8 +41,7 @@ class AnchoredHoldings(NamedTuple):
     enactment_anchors: TextLinkDict
 
 
-@dataclass
-class Opinion(Comparable):
+class Opinion(Comparable, CAPOpinion):
     """
     A document that resolves legal issues in a case and posits legal holdings.
     Usually an opinion must have ``type="majority"``
@@ -53,25 +52,24 @@ class Opinion(Comparable):
     :param author:
         name of the judge who authored the opinion, if identified
     :param text:
+    :param _holdings:
+        a list of :class:`.Holding`\s in the opinion
+
     """
 
     type: str = "majority"
     author: Optional[str] = None
     text: Optional[str] = None
+    _holdings: Sequence = []
+    factor_anchors: Dict = {}
+    enactment_anchors: Dict = {}
 
-    def __post_init__(self):
-        r"""
-        Add attributes to store Holdings and Factors keyed to their text selectors.
-        The ``holding_anchors`` are text selectors for the whole :class:`Holding`, not for any
-        individual :class:`.Factor`. Often select text used to
-        indicate whether the :class:`.Rule` is ``mandatory``, ``universal``,
-        ``valid``, or ``decided``, or show the ``exclusive`` way to reach
-        the outputs.
-        """
-
-        self._holdings = HoldingGroup()
-        self.factor_anchors = {}
-        self.enactment_anchors = {}
+    @validator("_holdings", check_fields=False)
+    def check_holdings_type(cls, v) -> HoldingGroup:
+        """Convert Opinion from CAPOpinion if needed."""
+        if not isinstance(v, HoldingGroup):
+            return HoldingGroup(v)
+        return v
 
     def factors(self) -> List[Factor]:
         factors_by_name = self.factors_by_name()
@@ -271,7 +269,7 @@ class Opinion(Comparable):
         else:
             if context:
                 holding = holding.new_context(context, source=self)
-            self._holdings = self._holdings + HoldingGroup(holding)
+            self._holdings = self.holdings + HoldingGroup(holding)
 
     def posit_holdings(
         self,
