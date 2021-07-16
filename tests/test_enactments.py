@@ -60,7 +60,8 @@ class TestEnactments:
         assert fourth_a.selected_text() == "…the persons or things…"
 
     def test_passage_from_imported_statute(self, fake_usc_client):
-        oracle_majority = loaders.load_and_read_decision(f"oracle_h.json").majority
+        oracle = loaders.load_and_read_decision(f"oracle_h.json")
+        oracle_majority = oracle.majority
         loaded = loaders.load_holdings("holding_oracle.json")
         holdings = readers.read_holdings(loaded, client=fake_usc_client)
         oracle_majority.posit(holdings)

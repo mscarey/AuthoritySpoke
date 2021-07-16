@@ -16,7 +16,7 @@ import re
 from dataclasses import dataclass, field
 
 from anchorpoint.textselectors import TextQuoteSelector
-from justopinion.decisions import Opinion as CAPOpinion
+from justopinion.decisions import CAPOpinion
 from nettlesome.terms import Comparable, ContextRegister, Explanation
 from nettlesome.factors import Factor
 from pydantic import BaseModel, Field
@@ -45,9 +45,9 @@ class AnchoredHoldings(NamedTuple):
 class Opinion(Comparable):
     """
     A document that resolves legal issues in a case and posits legal holdings.
-    Usually an opinion must have ``position="majority"``
+    Usually an opinion must have ``type="majority"``
     to create holdings binding on any courts.
-    :param position:
+    :param type:
         the opinion's attitude toward the court's disposition of the case.
         e.g. ``majority``, ``dissenting``, ``concurring``, ``concurring in the result``
     :param author:
@@ -55,9 +55,9 @@ class Opinion(Comparable):
     :param text:
     """
 
-    position: str = "majority"
+    type: str = "majority"
     author: Optional[str] = None
-    text: Optional[str] = field(default=None, repr=False)
+    text: Optional[str] = None
 
     def __post_init__(self):
         r"""

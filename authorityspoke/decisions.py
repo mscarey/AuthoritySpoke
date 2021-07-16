@@ -7,22 +7,20 @@ from typing import Iterable, Iterator, List
 from typing import Optional, Sequence, Union
 
 from anchorpoint.textselectors import TextQuoteSelector
-from justopinion.decisions import Decision as CAPDecision
+from justopinion.decisions import (
+    CAPDecision,
+    CAPCitation,
+    Court,
+    Jurisdiction,
+    DecisionAnalysis,
+)
 from nettlesome.terms import Comparable, ContextRegister, Explanation
 from nettlesome.factors import Factor
-from pydantic import BaseModel
+from pydantic import BaseModel, HttpUrl, validator
 
 from authorityspoke.holdings import Holding, HoldingGroup
 from authorityspoke.opinions import Opinion, TextLinkDict
 from authorityspoke.rules import Rule
-
-
-@dataclass
-class CAPCitation:
-    cite: str
-    reporter: Optional[str] = None
-    category: Optional[str] = None
-    case_ids: List[int] = field(default_factory=list)
 
 
 class CaseData(BaseModel):
@@ -37,13 +35,21 @@ class CaseData(BaseModel):
     opinions: List[Opinion] = []
     judges: List[str] = []
 
+    @validator("opinions", each_item=True)
+    def check_opinion_type(cls, v):
+        """Convert Opinion from CAPOpinion if needed."""
+        if not isinstance(v, Opinion):
+            values = v.dict()
+            return Opinion(**values)
+        return v
+
 
 class CaseBody(BaseModel):
     status: str
     data: CaseData
 
 
-class Decision(Comparable):
+class Decision(Comparable, CAPDecision):
     r"""
     A court decision to resolve a step in litigation.
     Uses the model of a judicial decision from
@@ -65,6 +71,7 @@ class Decision(Comparable):
     binding, but some may not be, often because parts of the
     Opinion fail to command a majority of the panel
     of judges.
+
     :param name:
         full name of the opinion, e.g. "ORACLE AMERICA, INC.,
         Plaintiff-Appellant, v. GOOGLE INC., Defendant-Cross-Appellant"
@@ -86,36 +93,23 @@ class Decision(Comparable):
         unique ID from CAP API
     """
 
-    def __init__(
-        self,
-        date: datetime.date,
-        name: Optional[str] = None,
-        name_abbreviation: Optional[str] = None,
-        citations: Optional[Sequence[CAPCitation]] = None,
-        first_page: Optional[int] = None,
-        last_page: Optional[int] = None,
-        court: Optional[str] = None,
-        opinions: Optional[Union[Opinion, Sequence[Opinion]]] = None,
-        jurisdiction: Optional[str] = None,
-        cites_to: Optional[Sequence[CAPCitation]] = None,
-        id: Optional[int] = None,
-    ) -> None:
-        self.date = date
-        self.name = name
-        self.name_abbreviation = name_abbreviation
-        self.citations = citations
-        self.first_page = first_page
-        self.last_page = last_page
-        self.court = court
-        if isinstance(opinions, Opinion):
-            self.opinions = [opinions]
-        elif not opinions:
-            self.opinions = []
-        else:
-            self.opinions = list(opinions)
-        self.jurisdiction = jurisdiction
-        self.cites_to = cites_to
-        self._id = id
+    decision_date: datetime.date
+    name: Optional[str] = None
+    name_abbreviation: Optional[str] = None
+    docket_num: Optional[str] = None
+    citations: Optional[Sequence[CAPCitation]] = None
+    parties: List[str] = []
+    attorneys: List[str] = []
+    first_page: Optional[int] = None
+    last_page: Optional[int] = None
+    court: Optional[Court] = None
+    casebody: Optional[CaseBody] = None
+    jurisdiction: Optional[Jurisdiction] = None
+    cites_to: Optional[Sequence[CAPCitation]] = None
+    id: Optional[int] = None
+    last_updated: Optional[datetime.datetime] = None
+    frontend_url: Optional[HttpUrl] = None
+    analysis: Optional[DecisionAnalysis] = None
 
     def __str__(self):
         citation = self.citations[0].cite if self.citations else ""
