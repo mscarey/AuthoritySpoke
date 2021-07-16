@@ -42,7 +42,7 @@ class AnchoredHoldings(NamedTuple):
 
 
 class Opinion(Comparable, CAPOpinion):
-    """
+    r"""
     A document that resolves legal issues in a case and posits legal holdings.
     Usually an opinion must have ``type="majority"``
     to create holdings binding on any courts.
@@ -52,19 +52,19 @@ class Opinion(Comparable, CAPOpinion):
     :param author:
         name of the judge who authored the opinion, if identified
     :param text:
-    :param _holdings:
-        a list of :class:`.Holding`\s in the opinion
+    :param holdings:
+        a group of :class:`.Holding`\s in the opinion
 
     """
 
     type: str = "majority"
     author: Optional[str] = None
     text: Optional[str] = None
-    _holdings: Sequence = []
+    holdings: Sequence = HoldingGroup()
     factor_anchors: Dict = {}
     enactment_anchors: Dict = {}
 
-    @validator("_holdings", check_fields=False)
+    @validator("holdings", check_fields=False)
     def check_holdings_type(cls, v) -> HoldingGroup:
         """Convert Opinion from CAPOpinion if needed."""
         if not isinstance(v, HoldingGroup):
@@ -84,13 +84,9 @@ class Opinion(Comparable, CAPOpinion):
                     factor_index.insert_by_name(value=value)
         return factor_index
 
-    @property
-    def holdings(self):
-        return HoldingGroup(self._holdings)
-
     def clear_holdings(self):
         r"""Remove all :class:`.Holding`\s from the opinion."""
-        self._holdings = HoldingGroup()
+        self.holdings = HoldingGroup()
 
     def explanations_contradiction(
         self,
@@ -269,7 +265,7 @@ class Opinion(Comparable, CAPOpinion):
         else:
             if context:
                 holding = holding.new_context(context, source=self)
-            self._holdings = self.holdings + HoldingGroup(holding)
+            self.holdings = self.holdings + HoldingGroup(holding)
 
     def posit_holdings(
         self,
