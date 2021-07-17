@@ -2,13 +2,16 @@
 import json
 import pathlib
 
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Union
 
+from justopinion.decisions import CAPDecision
+
+from authorityspoke.decisions import Decision
 from authorityspoke.io import filepaths
 
 
 def case_to_file(
-    case: Dict,
+    case: Union[CAPDecision, Decision],
     filename: Optional[str] = None,
     directory: Optional[pathlib.Path] = None,
     filepath: Optional[pathlib.Path] = None,
@@ -37,7 +40,7 @@ def case_to_file(
         filename, directory, filepath, default_folder="cases"
     )
     with open(validated_filepath, "w") as fp:
-        json.dump(case, fp, ensure_ascii=False, indent=4)
+        fp.write(case.json(indent=4))
 
 
 def cases_to_file(

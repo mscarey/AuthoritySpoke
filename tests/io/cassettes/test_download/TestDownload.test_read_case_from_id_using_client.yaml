@@ -57,18 +57,18 @@ interactions:
       - Authorization
       Access-Control-Allow-Origin:
       - '*'
-      Age:
-      - '1333'
       Allow:
       - GET, HEAD, OPTIONS
       CF-Cache-Status:
-      - HIT
+      - MISS
       CF-RAY:
-      - 660141aa5b1c288f-DFW
+      - 6701c8eb0b78ecaa-DFW
       Cache-Control:
       - s-maxage=86400, max-age=3600
       Connection:
       - keep-alive
+      Content-Disposition:
+      - attachment; filename="CAP_2021-07-17 07:33:55.177461.json"
       Content-Encoding:
       - gzip
       Content-Length:
@@ -76,7 +76,7 @@ interactions:
       Content-Type:
       - application/json
       Date:
-      - Wed, 16 Jun 2021 04:22:20 GMT
+      - Sat, 17 Jul 2021 07:33:55 GMT
       Expect-CT:
       - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
       Referrer-Policy:
@@ -91,8 +91,6 @@ interactions:
       - nosniff
       X-Frame-Options:
       - DENY
-      cf-request-id:
-      - 0ab4a75e770000288f5b0ae000000001
     status:
       code: 200
       message: OK
@@ -167,20 +165,18 @@ interactions:
       - Authorization
       Access-Control-Allow-Origin:
       - '*'
-      Age:
-      - '402'
       Allow:
       - GET, HEAD, OPTIONS
       CF-Cache-Status:
-      - HIT
+      - MISS
       CF-RAY:
-      - 660141ab0f162f3d-DFW
+      - 6701c8ec8c3f0bc4-DFW
       Cache-Control:
       - s-maxage=86400, max-age=3600
       Connection:
       - keep-alive
       Content-Disposition:
-      - attachment; filename="CAP_2021-06-16 04:15:38.266599.json"
+      - attachment; filename="CAP_2021-07-17 07:33:55.449022.json"
       Content-Encoding:
       - gzip
       Content-Length:
@@ -188,7 +184,7 @@ interactions:
       Content-Type:
       - application/json
       Date:
-      - Wed, 16 Jun 2021 04:22:20 GMT
+      - Sat, 17 Jul 2021 07:33:55 GMT
       Expect-CT:
       - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
       Referrer-Policy:
@@ -203,8 +199,6 @@ interactions:
       - nosniff
       X-Frame-Options:
       - DENY
-      cf-request-id:
-      - 0ab4a75ee500002f3d0caac000000001
     status:
       code: 200
       message: OK

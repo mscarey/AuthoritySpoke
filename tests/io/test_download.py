@@ -5,6 +5,8 @@ from dotenv import load_dotenv
 import eyecite
 import pytest
 
+from justopinion.decisions import CAPDecision
+
 from authorityspoke.io.downloads import CAPClient, CaseAccessProjectAPIError
 from authorityspoke.io.readers import read_decision
 from authorityspoke.io.loaders import load_and_read_decision
@@ -22,27 +24,44 @@ class TestDownload:
         case = self.client.fetch(4066790)
         assert case["name_abbreviation"] == "Oracle America, Inc. v. Google Inc."
 
+    @pytest.mark.default_cassette("TestDownload.test_download_case_by_id.yaml")
     @pytest.mark.vcr
     def test_download_case_by_string_id(self):
-        case = self.client.fetch("4066790")
-        assert case["name_abbreviation"] == "Oracle America, Inc. v. Google Inc."
+        response = self.client.fetch("4066790")
+        oracle = self.client.read_decision_from_response(response)
+        assert oracle["name_abbreviation"] == "Oracle America, Inc. v. Google Inc."
+
+    @pytest.mark.vcr
+    def test_full_case_download(self):
+        """
+        This test costs one of your 500 daily full_case API calls every time you run it.
+
+        The author field is only available because of the full_case flag.
+        """
+        response = self.client.fetch_cite(cite="49 F.3d 807", full_case=True)
+        lotus = self.client.read_decision_from_response(response)
+        assert lotus.casebody.data.opinions[0].author.startswith("STAHL")
+
+    @pytest.mark.default_cassette("TestDownload.test_full_case_download.yaml")
+    @pytest.mark.vcr
+    def test_download_and_make_opinion(self):
+        response = self.client.read_decision_list_by_cite(
+            cite="49 F.3d 807", full_case=True
+        )
+        lotus = response[0]
+        lotus_opinion = lotus.majority
+        assert lotus_opinion.__class__.__name__ == "CAPOpinion"
 
     @pytest.mark.vcr
     def test_download_case_by_cite(self):
-        case = self.client.fetch("49 F.3d 807")
-        assert case["decision_date"] == "1995-03-09"
+        case = self.client.read_cite("49 F.3d 807")
+        assert case.decision_date.isoformat() == "1995-03-09"
 
-    @pytest.mark.vcr
-    def test_download_and_make_opinion(self):
-        response = self.client.fetch_decision_list_by_cite(cite="49 F.3d 807")
-        lotus = response[0]
-        lotus_opinion = read_decision(lotus).majority
-        assert lotus_opinion.__class__.__name__ == "Opinion"
-
+    @pytest.mark.default_cassette("TestDownload.test_download_case_by_cite.yaml")
     @pytest.mark.vcr
     def test_download_save_and_make_opinion(self, tmp_path):
         to_file = "lotus_h.json"
-        lotus_from_api = self.client.fetch_cite(cite="49 F.3d 807")
+        lotus_from_api = self.client.read_cite(cite="49 F.3d 807")
         writers.case_to_file(case=lotus_from_api, filename=to_file, directory=tmp_path)
         filepath = tmp_path / to_file
         lotus_from_file = load_and_read_decision(filepath=filepath)
@@ -69,17 +88,6 @@ class TestDownload:
         with pytest.raises(CaseAccessProjectAPIError):
             bad_client.fetch_cite(cite="49 F.3d 807", full_case=True)
 
-    @pytest.mark.skip(reason="uses API key")
-    @pytest.mark.vcr
-    def test_full_case_download(self):
-        """
-        This test costs one of your 500 daily full_case API calls every time you run it.
-
-        The author field is only available because of the full_case flag.
-        """
-        lotus = self.client.fetch_cite(cite="49 F.3d 807", full_case=True)
-        assert lotus["casebody"]["data"]["opinions"][0]["author"].startswith("STAHL")
-
     @pytest.mark.vcr
     def test_read_case_using_client(self):
         licensing_case = self.client.read(query="621 F.3d 205", full_case=False)
@@ -99,7 +107,7 @@ class TestDownload:
         assert "clerical misprision" in case.majority.text
         assert not case.majority.author
         # Add day if missing from date
-        assert case.date.isoformat() == "1821-06-01"
+        assert case.decision_date.isoformat() == "1821-06-01"
 
     @pytest.mark.vcr
     def test_read_case_list_from_eyecite_case_citation(self):

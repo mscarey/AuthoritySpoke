@@ -111,6 +111,11 @@ class Decision(Comparable, CAPDecision):
     frontend_url: Optional[HttpUrl] = None
     analysis: Optional[DecisionAnalysis] = None
 
+    class Config:
+        json_encoders = {
+            datetime.date: lambda v: v.isoformat(),
+        }
+
     def __str__(self):
         citation = self.citations[0].cite if self.citations else ""
         name = self.name_abbreviation or self.name
