@@ -31,18 +31,25 @@ class TestCodes:
         assert "/cfr/" in repr(enactment)
 
     @pytest.mark.vcr
-    @pytest.mark.parametrize(
-        "path, heading, level",
-        [
-            ("/us/usc", "United States Code", CodeLevel.STATUTE),
-            ("/us/const", "United States Constitution", CodeLevel.CONSTITUTION),
-            ("/test/acts", "Acts of Australia", CodeLevel.STATUTE),
-        ],
-    )
-    def test_code_title(self, path, heading, level):
-        enactment = self.client.read(path)
-        assert enactment.heading.startswith(heading)
-        assert enactment.level == level
+    @pytest.mark.default_cassette("test_us_code_title.yaml")
+    def test_us_code_title(self):
+        enactment = self.client.read("/us/usc")
+        assert enactment.heading.startswith("United States Code")
+        assert enactment.level == CodeLevel.STATUTE
+
+    @pytest.mark.vcr
+    @pytest.mark.default_cassette("test_const_code_title.yaml")
+    def test_const_code_title(self):
+        enactment = self.client.read("/us/const")
+        assert enactment.heading.startswith("United States Constitution")
+        assert enactment.level == CodeLevel.CONSTITUTION
+
+    @pytest.mark.vcr
+    @pytest.mark.default_cassette("test_acts_code_title.yaml")
+    def test_acts_code_title(self):
+        enactment = self.client.read("/test/acts")
+        assert enactment.heading.startswith("Acts of Australia")
+        assert enactment.level == CodeLevel.STATUTE
 
     def test_code_select_text(self, fake_beard_client):
 
