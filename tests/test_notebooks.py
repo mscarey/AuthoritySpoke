@@ -29,8 +29,7 @@ class TestIntroduction:
 
     @pytest.mark.vcr
     def test_download_case(self):
-        oracle_download = self.client.read_cite(cite="750 F.3d 1339", full_case=True)
-        oracle = read_decision(oracle_download)
+        oracle = self.client.read_cite(cite="750 F.3d 1339", full_case=True)
         citations = [out_citation.cite for out_citation in oracle.cites_to]
         assert "527 F.3d 1318" in citations
 
