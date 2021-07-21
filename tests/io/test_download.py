@@ -22,14 +22,14 @@ class TestDownload:
     @pytest.mark.vcr
     def test_download_case_by_id(self):
         case = self.client.fetch(4066790)
-        assert case["name_abbreviation"] == "Oracle America, Inc. v. Google Inc."
+        assert case.json()["name_abbreviation"] == "Oracle America, Inc. v. Google Inc."
 
     @pytest.mark.default_cassette("TestDownload.test_download_case_by_id.yaml")
     @pytest.mark.vcr
     def test_download_case_by_string_id(self):
         response = self.client.fetch("4066790")
         oracle = self.client.read_decision_from_response(response)
-        assert oracle["name_abbreviation"] == "Oracle America, Inc. v. Google Inc."
+        assert oracle.name_abbreviation == "Oracle America, Inc. v. Google Inc."
 
     @pytest.mark.vcr
     def test_full_case_download(self):
