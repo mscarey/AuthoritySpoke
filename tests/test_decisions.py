@@ -113,9 +113,8 @@ class TestImplication:
 
     def test_opinion_implies_decision(self, make_holding, make_opinion_with_holding):
         watt = make_opinion_with_holding["watt_majority"]
-        decision = Decision(
-            date=date(2000, 1, 1), opinions=Opinion(position="majority")
-        )
+        decision = Decision(decision_date=date(2000, 1, 1))
+        decision.add_opinion(opinion=Opinion(type="majority"))
         decision.posit(watt.holdings[0])
         assert watt.implies(decision)
 
@@ -154,7 +153,8 @@ class TestContradiction:
     def test_no_contradiction_with_plurality(self, make_decision_with_holding):
         oracle = make_decision_with_holding["oracle"]
         other = Decision(
-            date=datetime.date(2020, 1, 1), opinions=[Opinion(position="plurality")]
+            decision_date=datetime.date(2020, 1, 1),
+            opinions=[Opinion(position="plurality")],
         )
         assert not oracle.contradicts(other)
 
@@ -162,9 +162,8 @@ class TestContradiction:
         self, make_decision_with_holding
     ):
         oracle = make_decision_with_holding["oracle"]
-        other = Decision(
-            date=datetime.date(2020, 1, 1), opinions=[Opinion(position="majority")]
-        )
+        other = Decision(decision_date=datetime.date(2020, 1, 1))
+        other.add_opinion(Opinion(position="majority"))
         assert not oracle.contradicts(other)
 
     def test_decision_contradicts_holding(self, make_decision_with_holding):

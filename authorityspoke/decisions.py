@@ -45,8 +45,8 @@ class CaseData(BaseModel):
 
 
 class CaseBody(BaseModel):
-    status: str
     data: CaseData
+    status: str = ""
 
 
 class Decision(Comparable, CAPDecision):
@@ -98,8 +98,6 @@ class Decision(Comparable, CAPDecision):
     name_abbreviation: Optional[str] = None
     docket_num: Optional[str] = None
     citations: Optional[Sequence[CAPCitation]] = None
-    parties: List[str] = []
-    attorneys: List[str] = []
     first_page: Optional[int] = None
     last_page: Optional[int] = None
     court: Optional[Court] = None
@@ -126,6 +124,18 @@ class Decision(Comparable, CAPDecision):
         if self.majority is None:
             return HoldingGroup()
         return HoldingGroup(self.majority.holdings)
+
+    @property
+    def majority(self) -> Optional[Opinion]:
+        for opinion in self.opinions:
+            if opinion.type == "majority":
+                return opinion
+        return None
+
+    def add_opinion(self, opinion: Opinion) -> None:
+        if not self.casebody:
+            self.casebody = CaseBody(data=CaseData())
+        self.casebody.data.opinions.append(opinion)
 
     def contradicts(self, other):
         if isinstance(other, Decision):
@@ -271,10 +281,3 @@ class Decision(Comparable, CAPDecision):
         elif isinstance(other, Rule):
             return self.implies_rule(other, context=context)
         return False
-
-    @property
-    def majority(self) -> Optional[Opinion]:
-        for opinion in self.opinions:
-            if opinion.type == "majority":
-                return opinion
-        return None
