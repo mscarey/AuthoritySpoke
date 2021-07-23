@@ -102,6 +102,9 @@ class Opinion(Comparable, CAPOpinion):
         if isinstance(other, Holding):
             yield from self.holdings.explanations_contradiction(other)
 
+        if isinstance(other, HoldingGroup):
+            yield from self.holdings.explanations_contradiction(other)
+
         elif isinstance(other, self.__class__):
             yield from self.holdings.explanations_contradiction(other.holdings)
 
