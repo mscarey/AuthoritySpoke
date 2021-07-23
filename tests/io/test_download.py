@@ -34,7 +34,7 @@ class TestDownload:
     @pytest.mark.vcr
     def test_full_case_download(self):
         """
-        This test costs one of your 500 daily full_case API calls every time you run it.
+        This costs one of your 500 daily full_case API calls if there's no VCR cassette.
 
         The author field is only available because of the full_case flag.
         """
