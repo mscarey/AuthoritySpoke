@@ -236,7 +236,7 @@ use :meth:`legislice.download.Client.read`, which also
 fetches the JSON but then loads it into an instance of
 the :class:`~legislice.enactments.Enactment` class.
 
-    >>> from authorityspoke.io.downloads import LegisClient
+    >>> from authorityspoke import LegisClient
     >>> from authorityspoke.io.fake_enactments import FakeClient
     >>> if USE_REAL_LEGISLICE_API:
     ...    LEGISLICE_API_TOKEN = os.getenv("LEGISLICE_API_TOKEN")

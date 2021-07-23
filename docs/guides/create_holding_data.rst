@@ -50,7 +50,7 @@ accessing legislative provisions.
 
     >>> import json
 
-    >>> from authorityspoke.io.downloads import LegisClient
+    >>> from authorityspoke import LegisClient
     >>> from authorityspoke.io.fake_enactments import FakeClient
     >>> if USE_REAL_LEGISLICE_API:
     ...     LEGISLICE_API_TOKEN = os.getenv("LEGISLICE_API_TOKEN")

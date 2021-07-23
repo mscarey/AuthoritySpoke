@@ -49,7 +49,7 @@ True
 AuthoritySpoke can be used to create structured annotations for these cases by bringing together data from two sources: user-created annotations for judicial holdings, and legislative quotations that can be downloaded from the API at [authorityspoke.com](https://authorityspoke.com/). The `example_data` folder contains example annotations for the holdings in several cases, including the _Oracle_ and _Lotus_ cases. The LegisClient class is also a download client, and it can be used to retrieve legislative quotations.
 
 ```python
->>> from authorityspoke.io.downloads import LegisClient
+>>> from authorityspoke import LegisClient
 >>> from authorityspoke.io.loaders import read_holdings_from_file
 >>> LEGISLICE_API_TOKEN = os.getenv("LEGISLICE_API_TOKEN")
 >>> legis_client = LegisClient(api_token=LEGISLICE_API_TOKEN)

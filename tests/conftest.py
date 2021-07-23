@@ -1510,7 +1510,7 @@ def make_opinion(make_decision) -> Dict[str, Opinion]:
     opinions = {}
     for case in TEST_CASES:
         for opinion in make_decision[case].opinions:
-            opinions[f"{case}_{opinion.position}"] = opinion
+            opinions[f"{case}_{opinion.type}"] = opinion
     return opinions
 
 

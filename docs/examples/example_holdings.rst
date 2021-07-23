@@ -32,7 +32,7 @@ Character Recognition errors.
     >>> lotus_download = load_decision("lotus_h.json")
     >>> lotus = read_decision(lotus_download)
     >>> USE_REAL_LEGISLICE_API = False
-    >>> from authorityspoke.io.downloads import LegisClient
+    >>> from authorityspoke import LegisClient
     >>> from authorityspoke.io.fake_enactments import FakeClient
     >>> if USE_REAL_LEGISLICE_API:
     ...     LEGISLICE_API_TOKEN = os.getenv("LEGISLICE_API_TOKEN")

@@ -59,10 +59,10 @@ citation of the case we want, we'll use the :meth:`~authorityspoke.io.downloads.
     ...        full_case=False)
     ... else:
     ...     licensing_case = Decision(
-    ...        date=date(2010,9,22),
+    ...        decision_date=date(2010,9,22),
     ...        name_abbreviation="United States v. Mazza-Alaluf",
-    ...        citations=[CAPCitation(cite="621 F.3d 205")],
-    ...        opinions=Opinion())
+    ...        citations=[CAPCitation(cite="621 F.3d 205")])
+    ...     licensing_case.add_opinion(Opinion())
     >>> print(licensing_case)
     United States v. Mazza-Alaluf, 621 F.3d 205 (2010-09-22)
 
@@ -121,7 +121,7 @@ up for an API token <https://authorityspoke.com/account/signup/>`__,
 then save that API token in the ``.env`` file, and then load the API
 token using `dotenv <https://saurabh-kumar.com/python-dotenv/#getting-started>`__.
 
-    >>> from authorityspoke.io.downloads import LegisClient
+    >>> from authorityspoke import LegisClient
     >>> LEGISLICE_API_TOKEN = os.getenv("LEGISLICE_API_TOKEN")
     >>> LEGIS_CLIENT = LegisClient(api_token=LEGISLICE_API_TOKEN)
 
