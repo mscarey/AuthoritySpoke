@@ -15,7 +15,7 @@ from authorityspoke.opinions import Opinion, FactorIndex
 
 class TestOpinions:
     def test_opinion_features(self, make_decision):
-        assert make_decision["watt"].court == "9th-cir"
+        assert make_decision["watt"].court.slug == "9th-cir"
         assert make_decision["watt"].citations[0].cite == "388 F.2d 853"
 
     def test_repr(self, make_opinion):
@@ -72,7 +72,7 @@ class TestOpinions:
         have the same date, because the date field has been moved to the
         Decision class.
         """
-        assert make_decision["watt"].date < make_decision["brad"].date
+        assert make_decision["watt"].decision_date < make_decision["brad"].decision_date
 
     def test_opinion_string(self, make_opinion):
         opinion = make_opinion["cardenas_majority"]
