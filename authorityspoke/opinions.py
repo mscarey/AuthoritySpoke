@@ -41,7 +41,7 @@ class AnchoredHoldings(NamedTuple):
     enactment_anchors: TextLinkDict
 
 
-class Opinion(Comparable, CAPOpinion):
+class Opinion(CAPOpinion, Comparable):
     r"""
     A document that resolves legal issues in a case and posits legal holdings.
     Usually an opinion must have ``type="majority"``
@@ -70,6 +70,9 @@ class Opinion(Comparable, CAPOpinion):
         if not isinstance(v, HoldingGroup):
             return HoldingGroup(v)
         return v
+
+    def __str__(self):
+        return super().__str__()
 
     def factors(self) -> List[Factor]:
         factors_by_name = self.factors_by_name()

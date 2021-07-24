@@ -225,15 +225,3 @@ def load_decision(
         decision_dict = json.load(f)
 
     return decision_dict
-
-
-def load_and_read_decision(
-    filename: Optional[str] = None,
-    directory: Optional[pathlib.Path] = None,
-    filepath: Optional[pathlib.Path] = None,
-) -> Decision:
-    r"""Load file containing a judicial decision and make an Opinion object."""
-    raw_decision = load_decision(
-        filename=filename, directory=directory, filepath=filepath
-    )
-    return readers.read_decision(raw_decision)

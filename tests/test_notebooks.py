@@ -10,7 +10,6 @@ import pytest
 
 from authorityspoke.facts import Fact
 from authorityspoke.io.downloads import CAPClient
-from authorityspoke.io.readers import read_decision
 
 from authorityspoke import Entity, Predicate, Comparison
 

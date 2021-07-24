@@ -30,7 +30,6 @@ from authorityspoke.io.schemas_yaml import (
     RawRule,
     RawPredicate,
     RawFactor,
-    RawDecision,
     RawSelector,
 )
 from authorityspoke.io.name_index import index_names, Mentioned
@@ -262,22 +261,6 @@ def read_holdings(
     schema.context["mentioned"] = factor_index
 
     return schema.load(deepcopy(record))
-
-
-def read_decision(decision_dict: RawDecision) -> Decision:
-    r"""
-    Create and return one or more :class:`.Opinion` objects from a dict API response.
-
-    Relies on the JSON format from the `Caselaw Access Project
-    API <https://api.case.law/v1/cases/>`_.
-
-    This function is a more convenient way to call read_opinions with an entire
-    case from the CAP API as a single parameter.
-
-    :param decision_dict:
-        A dict created from a Caselaw Access Project API response.
-    """
-    return Decision(**decision_dict)
 
 
 def read_rules_with_index(

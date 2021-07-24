@@ -3,7 +3,7 @@
 from authorityspoke.io.fake_enactments import FakeClient
 
 from authorityspoke.io.loaders import (
-    load_and_read_decision,
+    load_decision,
     read_anchored_holdings_from_file,
 )
 from authorityspoke.io.loaders import read_holdings_from_file
@@ -13,8 +13,8 @@ class TestReadme:
     def test_posit_holdings(self, make_response):
         client = FakeClient(responses=make_response)
 
-        oracle = load_and_read_decision("oracle_h.json").majority
-        lotus = load_and_read_decision("lotus_h.json").majority
+        oracle = load_decision("oracle_h.json").majority
+        lotus = load_decision("lotus_h.json").majority
 
         (
             oracle_holdings,

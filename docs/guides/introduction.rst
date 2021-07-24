@@ -221,7 +221,7 @@ Access the ``majority`` attribute of the :class:`~authorityspoke.decisions.Decis
 object to get the majority opinion.
 
     >>> print(lotus.majority)
-    majority Opinion by STAHL, Circuit Judge.
+    majority opinion by STAHL, Circuit Judge
 
 Downloading Enactments
 -------------------------
