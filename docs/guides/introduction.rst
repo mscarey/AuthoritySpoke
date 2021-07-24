@@ -826,7 +826,8 @@ Adding Holdings to One Another
 To try out the addition operation, let’s load another case from the
 ``example_data`` folder.
 
-    >>> feist = load_and_read_decision("feist_h.json")
+    >>> feist_as_dict = load_decision("feist_h.json")
+    >>> feist = Decision(**feist_as_dict)
     >>> feist.posit(read_anchored_holdings_from_file("holding_feist.json", client=legis_client))
 
 
