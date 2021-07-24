@@ -1,5 +1,6 @@
 from typing import Dict, List
 
+from authorityspoke import Opinion
 from authorityspoke.io import loaders, readers, schemas_json as schemas
 
 
@@ -9,10 +10,9 @@ class TestLoadOpinion:
         assert watt_dict["name_abbreviation"] == "Wattenburg v. United States"
 
     def test_load_opinion(self):
-        schema = schemas.OpinionSchema(many=False)
         brad_dict = loaders.load_decision("brad_h.json")
         dissent = brad_dict["casebody"]["data"]["opinions"][1]
-        opinion = schema.load(dissent)
+        opinion = Opinion(**dissent)
         assert opinion.type == "concurring-in-part-and-dissenting-in-part"
 
     def test_selectors_not_duplicated(self, make_opinion, raw_holding):

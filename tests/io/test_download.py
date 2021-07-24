@@ -1,3 +1,4 @@
+from authorityspoke.decisions import Decision
 import json
 import os
 
@@ -8,8 +9,8 @@ import pytest
 from justopinion.decisions import CAPDecision
 
 from authorityspoke.io.downloads import CAPClient, CaseAccessProjectAPIError
-from authorityspoke.io.readers import read_decision
-from authorityspoke.io.loaders import load_and_read_decision
+from authorityspoke import LegisClient
+from authorityspoke.io.loaders import load_decision
 from authorityspoke.io import writers
 from tests.test_notebooks import CAP_API_KEY
 
@@ -57,16 +58,17 @@ class TestDownload:
         case = self.client.read_cite("49 F.3d 807")
         assert case.decision_date.isoformat() == "1995-03-09"
 
-    @pytest.mark.default_cassette("TestDownload.test_download_case_by_cite.yaml")
+    @pytest.mark.default_cassette("TestDownload.test_full_case_download.yaml")
     @pytest.mark.vcr
     def test_download_save_and_make_opinion(self, tmp_path):
         to_file = "lotus_h.json"
-        lotus_from_api = self.client.read_cite(cite="49 F.3d 807")
+        lotus_from_api = self.client.read_cite(cite="49 F.3d 807", full_case=True)
         writers.case_to_file(case=lotus_from_api, filename=to_file, directory=tmp_path)
         filepath = tmp_path / to_file
-        lotus_from_file = load_and_read_decision(filepath=filepath)
-        assert lotus_from_file.majority.__class__.__name__ == "Opinion"
-        assert "Lotus" in lotus_from_file.name_abbreviation
+        lotus_from_file = load_decision(filepath=filepath)
+        lotus = Decision(**lotus_from_file)
+        assert lotus.majority.__class__.__name__ == "Opinion"
+        assert "Lotus" in lotus.name_abbreviation
 
     def test_error_download_without_case_reference(self):
         with pytest.raises(TypeError):

@@ -1,5 +1,11 @@
 """Tests for any commands in readme.md."""
 
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+from authorityspoke import CAPClient, Decision
 from authorityspoke.io.fake_enactments import FakeClient
 
 from authorityspoke.io.loaders import (
@@ -13,8 +19,10 @@ class TestReadme:
     def test_posit_holdings(self, make_response):
         client = FakeClient(responses=make_response)
 
-        oracle = load_decision("oracle_h.json").majority
-        lotus = load_decision("lotus_h.json").majority
+        oracle_dict = load_decision("oracle_h.json")
+        lotus_dict = load_decision("lotus_h.json")
+        oracle = Decision(**oracle_dict)
+        lotus = Decision(**lotus_dict)
 
         (
             oracle_holdings,

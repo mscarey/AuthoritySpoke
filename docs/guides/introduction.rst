@@ -167,7 +167,6 @@ them with data from the API. You should be able to run the rest of the
 tutorial code either way.
 
     >>> from authorityspoke import LegisClient
-    >>> from authorityspoke.io.loaders import load_and_read_decision
     >>> if USE_REAL_CASE_API:
     ...     client = LegisClient(api_token=CAP_API_KEY)
     ...     oracle_download = client.fetch(cite="750 F.3d 1339")
@@ -201,8 +200,8 @@ And then do the same for the *Lotus* case.
 
 Now let’s convert the *Oracle* API response to an AuthoritySpoke object.
 
-    >>> from authorityspoke.io.readers import read_decision
-    >>> oracle = read_decision(oracle_download)
+    >>> from authorityspoke import Decision
+    >>> oracle = Decision(**oracle_download)
 
 And take a look at the object we made.
 

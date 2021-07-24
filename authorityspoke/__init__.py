@@ -6,6 +6,7 @@ from nettlesome.entities import Entity
 from nettlesome.predicates import Predicate
 from nettlesome.quantities import Comparison
 
+from .decisions import Decision
 from .facts import Fact
 from .holdings import Holding
 from .opinions import Opinion

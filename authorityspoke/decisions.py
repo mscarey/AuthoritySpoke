@@ -203,6 +203,7 @@ class Decision(Comparable, CAPDecision):
             List[Union[TextQuoteSelector, List[TextQuoteSelector]]]
         ] = None,
         named_anchors: Optional[TextLinkDict] = None,
+        enactment_anchors: Optional[TextLinkDict] = None,
         context: Optional[Sequence[Factor]] = None,
     ) -> None:
         """
@@ -217,6 +218,7 @@ class Decision(Comparable, CAPDecision):
             holdings=holdings,
             holding_anchors=holding_anchors,
             named_anchors=named_anchors,
+            enactment_anchors=enactment_anchors,
             context=context,
         )
 
