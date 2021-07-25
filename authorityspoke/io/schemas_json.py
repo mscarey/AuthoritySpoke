@@ -55,10 +55,10 @@ class FactSchema(Schema):
     __model__: Type = Fact
     predicate = fields.Nested(PredicateSchema)
     terms = fields.Nested(lambda: FactorSchema(many=True))
-    standard_of_proof = fields.Str(missing=None)
-    name = fields.Str(missing=None)
-    absent = fields.Bool(missing=False)
-    generic = fields.Bool(missing=False)
+    standard_of_proof = fields.Str(load_default=None)
+    name = fields.Str(load_default=None)
+    absent = fields.Bool(load_default=False)
+    generic = fields.Bool(load_default=False)
 
     @post_load
     def make_object(self, data: RawFactor, **kwargs) -> Fact:
@@ -88,12 +88,12 @@ class ExhibitSchema(Schema):
     """
 
     __model__: Type = Exhibit
-    form = fields.Str(missing=None)
-    statement = fields.Nested(FactSchema, missing=None)
-    statement_attribution = fields.Nested(EntitySchema, missing=None)
-    name = fields.Str(missing=None)
-    absent = fields.Bool(missing=False)
-    generic = fields.Bool(missing=False)
+    form = fields.Str(load_default=None)
+    statement = fields.Nested(FactSchema, load_default=None)
+    statement_attribution = fields.Nested(EntitySchema, load_default=None)
+    name = fields.Str(load_default=None)
+    absent = fields.Bool(load_default=False)
+    generic = fields.Bool(load_default=False)
 
     @post_load
     def make_object(self, data: RawFactor, **kwargs) -> Exhibit:
@@ -114,10 +114,10 @@ class PleadingSchema(Schema):
     """
 
     __model__: Type = Pleading
-    filer = fields.Nested(EntitySchema, missing=None)
-    name = fields.Str(missing=None)
-    absent = fields.Bool(missing=False)
-    generic = fields.Bool(missing=False)
+    filer = fields.Nested(EntitySchema, load_default=None)
+    name = fields.Str(load_default=None)
+    absent = fields.Bool(load_default=False)
+    generic = fields.Bool(load_default=False)
 
     @post_load
     def make_pleading(self, data: RawFactor, **kwargs) -> Pleading:
@@ -128,11 +128,11 @@ class AllegationSchema(Schema):
     """Schema for an Allegation of a Fact."""
 
     __model__: Type = Allegation
-    pleading = fields.Nested(PleadingSchema, missing=None)
-    statement = fields.Nested(FactSchema, missing=None)
-    name = fields.Str(missing=None)
-    absent = fields.Bool(missing=False)
-    generic = fields.Bool(missing=False)
+    pleading = fields.Nested(PleadingSchema, load_default=None)
+    statement = fields.Nested(FactSchema, load_default=None)
+    name = fields.Str(load_default=None)
+    absent = fields.Bool(load_default=False)
+    generic = fields.Bool(load_default=False)
 
     @post_load
     def make_allegation(self, data: RawFactor, **kwargs) -> Allegation:
@@ -168,11 +168,11 @@ class EvidenceSchema(Schema):
     """
 
     __model__: Type = Evidence
-    exhibit = fields.Nested(ExhibitSchema, missing=None)
-    to_effect = fields.Nested(FactSchema, missing=None)
-    name = fields.Str(missing=None)
-    absent = fields.Bool(missing=False)
-    generic = fields.Bool(missing=False)
+    exhibit = fields.Nested(ExhibitSchema, load_default=None)
+    to_effect = fields.Nested(FactSchema, load_default=None)
+    name = fields.Str(load_default=None)
+    absent = fields.Bool(load_default=False)
+    generic = fields.Bool(load_default=False)
 
     @post_load
     def make_evidence(self, data: RawFactor, **kwargs) -> Evidence:
@@ -284,10 +284,10 @@ class RuleSchema(Schema):
     procedure = fields.Nested(ProcedureSchema)
     enactments = fields.Nested(EnactmentSchema, many=True)
     enactments_despite = fields.Nested(EnactmentSchema, many=True)
-    mandatory = fields.Bool(missing=False)
-    universal = fields.Bool(missing=False)
-    name = fields.Str(missing=None)
-    generic = fields.Bool(missing=False)
+    mandatory = fields.Bool(load_default=False)
+    universal = fields.Bool(load_default=False)
+    name = fields.Str(load_default=None)
+    generic = fields.Bool(load_default=False)
 
     @post_load
     def make_object(self, data, **kwargs):
@@ -329,10 +329,10 @@ class HoldingSchema(Schema):
 
     __model__: Type = Holding
     rule = fields.Nested(RuleSchema)
-    rule_valid = fields.Bool(missing=True)
-    decided = fields.Bool(missing=True)
-    exclusive = fields.Bool(missing=False)
-    generic = fields.Bool(missing=False)
+    rule_valid = fields.Bool(load_default=True)
+    decided = fields.Bool(load_default=True)
+    exclusive = fields.Bool(load_default=False)
+    generic = fields.Bool(load_default=False)
     anchors = fields.Nested(SelectorSchema, many=True)
 
     @post_load
