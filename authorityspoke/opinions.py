@@ -64,7 +64,7 @@ class Opinion(CAPOpinion, Comparable):
     factor_anchors: Dict = {}
     enactment_anchors: Dict = {}
 
-    @validator("holdings", check_fields=False)
+    @validator("holdings")
     def check_holdings_type(cls, v) -> HoldingGroup:
         """Convert Opinion from CAPOpinion if needed."""
         if not isinstance(v, HoldingGroup):

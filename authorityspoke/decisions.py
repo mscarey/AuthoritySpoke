@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, field
 import datetime
 import operator
 from typing import Iterable, Iterator, List
@@ -226,7 +225,7 @@ class Decision(Comparable, CAPDecision):
         return self.implies(other)
 
     def __gt__(self, other) -> bool:
-        return self.implies(other) and not self == other
+        return self.implies(other) and self != other
 
     def implied_by_holding(
         self, other: Holding, context: Optional[ContextRegister] = None
