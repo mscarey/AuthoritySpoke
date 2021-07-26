@@ -54,9 +54,11 @@ class DecisionReading(Comparable):
     An interpretation of what Holdings are supported by the Opinions of a Decision.
     """
 
-    def __init__(self, **kwargs):
-        self.decision: Decision
-        self.opinion_readings: List[OpinionReading] = []
+    def __init__(
+        self, decision: Decision, opinion_readings: List[OpinionReading] = None
+    ):
+        self.decision = decision
+        self.opinion_readings = opinion_readings or []
 
     def __str__(self):
         citation = self.decision.citations[0].cite if self.decision.citations else ""
@@ -67,7 +69,20 @@ class DecisionReading(Comparable):
     def majority(self) -> Optional[Opinion]:
         for reading in self.opinion_readings:
             if reading.opinion.type == "majority":
-                return reading.opinion
+                return reading
+        return None
+
+    def get_majority(self) -> Optional[Opinion]:
+        """
+        Return the majority OpinionReading, creating it if needed.
+        """
+        majority = self.majority
+        if majority:
+            return majority
+        for opinion in self.decision.opinions:
+            if opinion.type == "majority":
+                self.opinion_readings.append(OpinionReading(opinion=opinion))
+                return opinion
         return None
 
     @property
@@ -153,7 +168,7 @@ class DecisionReading(Comparable):
         """
         Add one or more Holdings to the majority Opinion of this Decision.
         """
-        if self.majority is None:
+        if self.get_majority() is None:
             raise AttributeError(
                 "Cannot posit Holding because this Decision has no known majority Opinion."
                 " Try having an Opinion posit the Holding directly."
@@ -220,7 +235,7 @@ class DecisionReading(Comparable):
         return self.implies_holding(Holding(other), context=context)
 
     def implies(self, other, context: Optional[ContextRegister] = None) -> bool:
-        if isinstance(other, (Decision, Opinion)):
+        if isinstance(other, (DecisionReading, OpinionReading)):
             return self.holdings.implies(other.holdings)
         elif isinstance(other, Holding):
             return self.implies_holding(other, context=context)

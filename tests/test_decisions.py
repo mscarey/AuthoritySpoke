@@ -4,7 +4,7 @@ import datetime
 
 import pytest
 
-from authorityspoke.decisions import Decision, Opinion
+from authorityspoke.decisions import Decision, DecisionReading, Opinion
 
 
 class TestDecision:
@@ -14,8 +14,9 @@ class TestDecision:
 
     def test_decision_no_opinions(self):
         decision = Decision(decision_date=date(2000, 2, 2))
-        assert decision.majority is None
-        assert not decision.implied_by(None)
+        reading = DecisionReading(decision=decision)
+        assert reading.majority is None
+        assert not reading.implied_by(None)
 
     def test_posit_holdings(self, make_decision, make_holding):
         """
@@ -24,8 +25,9 @@ class TestDecision:
         """
 
         watt = make_decision["watt"]
-        watt.posit([make_holding["h1"], make_holding["h2"]])
-        assert watt.majority.holdings[-1] == make_holding["h2"]
+        reading = DecisionReading(decision=watt)
+        reading.posit([make_holding["h1"], make_holding["h2"]])
+        assert reading.majority.holdings[-1] == make_holding["h2"]
 
     def test_need_opinion_to_posit_holding(self, make_holding):
         decision = Decision(decision_date=(datetime.date(1900, 1, 1)))
@@ -37,7 +39,8 @@ class TestImplication:
     def test_implication_of_decision_with_one_of_same_holdings(
         self, make_decision, make_decision_with_holding
     ):
-        oracle = make_decision["oracle"]
+        decision = make_decision["oracle"]
+        oracle = DecisionReading(decision=decision)
         oracle_with_holdings = make_decision_with_holding["oracle"]
         oracle.posit(oracle_with_holdings.holdings[0])
         assert len(oracle.holdings) == 1
@@ -46,9 +49,10 @@ class TestImplication:
 
     def test_decision_implied_by_holding(self, make_decision, make_holding):
         decision = make_decision["watt"]
+        reading = DecisionReading(decision=decision)
         holding = make_holding["h1"]
-        decision.posit(holding)
-        assert decision.implied_by(holding)
+        reading.posit(holding)
+        assert reading.implied_by(holding)
 
     def test_decision_explain_implication(
         self, make_decision_with_holding, make_holding

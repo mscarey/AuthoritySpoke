@@ -50,6 +50,7 @@ class OpinionReading(Comparable):
         holdings: Sequence = HoldingGroup(),
         factor_anchors: TextLinkDict = {},
         enactment_anchors: TextLinkDict = {},
+        holding_anchors: Optional[List[List[TextQuoteSelector]]] = None,
     ) -> None:
 
         super().__init__()
@@ -59,6 +60,7 @@ class OpinionReading(Comparable):
         self.holdings = holdings
         self.factor_anchors = factor_anchors
         self.enactment_anchors = enactment_anchors
+        self.holding_anchors = holding_anchors or []
 
     def __str__(self):
         return super().__str__()

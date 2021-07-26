@@ -1489,7 +1489,7 @@ def make_decision_with_holding(make_response):
     client_without_api_access = FakeClient(responses=make_response)
     decisions = load_decisions_for_fixtures()
     result = {}
-    for name, decision in decisions:
+    for name, decision in decisions.items():
         (
             holdings,
             holding_anchors,
