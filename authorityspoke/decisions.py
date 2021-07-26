@@ -143,11 +143,11 @@ class DecisionReading(Comparable):
     def explanations_implication(
         self, other: Union[Decision, Opinion, Holding, Rule]
     ) -> Iterator[Explanation]:
-        if isinstance(other, Decision):
-            if self.majority and other.majority:
+        if isinstance(other, DecisionReading):
+            if self.get_majority() and other.get_majority():
                 yield from self.majority.explanations_implication(other.majority)
-        elif isinstance(other, (Rule, Holding, Opinion)):
-            if self.majority:
+        elif isinstance(other, (Rule, Holding, OpinionReading)):
+            if self.get_majority():
                 yield from self.majority.explanations_implication(other)
         else:
             raise TypeError(

@@ -81,12 +81,14 @@ class TestImplication:
     ):
         oracle = make_decision_with_holding["oracle"]
         blank = make_decision["lotus"]
-        explanation = oracle.explain_implication(blank)
+        blank_reading = DecisionReading(decision=blank)
+        explanation = oracle.explain_implication(blank_reading)
         assert not explanation.reasons
 
     def test_no_holdings_of_blank_decision(self):
         blank = Decision(decision_date=datetime.date(2000, 1, 2))
-        assert len(blank.holdings) == 0
+        reading = DecisionReading(decision=blank)
+        assert len(reading.holdings) == 0
 
     # @pytest.mark.skip(reason="slow")
     def test_decision_implies_its_opinion(self, make_decision_with_holding):
