@@ -1,3 +1,4 @@
+from authorityspoke.decisions import DecisionReading
 from copy import deepcopy
 import datetime
 import json
@@ -7,19 +8,20 @@ from typing import Any, Dict, List, Text, Tuple
 
 from anchorpoint.textselectors import TextQuoteSelector
 from dotenv import load_dotenv
+from justopinion.decisions import CAPDecision, CAPOpinion
 from legislice.download import Client
 from legislice.yaml_schemas import ExpandableEnactmentSchema as EnactmentSchema
 from nettlesome.terms import ContextRegister
 from nettlesome.entities import Entity
+from nettlesome.factors import Factor
 from nettlesome.predicates import Predicate
 from nettlesome.quantities import Comparison, Q_
 import pytest
 
 from authorityspoke.evidence import Evidence, Exhibit
-from nettlesome.factors import Factor
 from authorityspoke.facts import Fact, build_fact
 from authorityspoke.holdings import Holding
-from authorityspoke.opinions import Opinion
+from authorityspoke.opinions import Opinion, OpinionReading
 from authorityspoke.pleadings import Pleading, Allegation
 from authorityspoke.rules import Procedure, Rule
 
@@ -1486,23 +1488,31 @@ def make_decision():
 def make_decision_with_holding(make_response):
     client_without_api_access = FakeClient(responses=make_response)
     decisions = load_decisions_for_fixtures()
-    for case in TEST_CASES:
+    result = {}
+    for name, decision in decisions:
         (
             holdings,
             holding_anchors,
             named_anchors,
             enactment_anchors,
         ) = loaders.read_anchored_holdings_from_file(
-            f"holding_{case}.json",
+            f"holding_{name}.json",
             client=client_without_api_access,
         )
-        decisions[case].majority.posit(
-            holdings,
-            holding_anchors=holding_anchors,
-            named_anchors=named_anchors,
-            enactment_anchors=enactment_anchors,
+        result[name] = DecisionReading(
+            decision=decision,
+            opinion_readings=[
+                OpinionReading(
+                    opinion=decision.majority,
+                    holdings=holdings,
+                    holding_anchors=holding_anchors,
+                    factor_anchors=named_anchors,
+                    enactment_anchors=enactment_anchors,
+                )
+            ],
         )
-    return decisions
+
+    return result
 
 
 @pytest.fixture(scope="class")

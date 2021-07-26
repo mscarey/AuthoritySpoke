@@ -1,7 +1,5 @@
 r"""
 :class:`Court` documents that decide litigation and posit :class:`.Rule`\s.
-
-Unlike most other ``authorityspoke`` classes, :class:`Opinion`\s are not frozen.
 """
 
 from __future__ import annotations
@@ -16,7 +14,7 @@ import re
 from dataclasses import dataclass, field
 
 from anchorpoint.textselectors import TextQuoteSelector
-from justopinion.decisions import CAPOpinion
+from justopinion.decisions import CAPOpinion as Opinion
 from nettlesome.terms import Comparable, ContextRegister, Explanation
 from nettlesome.factors import Factor
 from pydantic import BaseModel, Field, validator
@@ -41,35 +39,26 @@ class AnchoredHoldings(NamedTuple):
     enactment_anchors: TextLinkDict
 
 
-class Opinion(CAPOpinion, Comparable):
-    r"""
-    A document that resolves legal issues in a case and posits legal holdings.
-    Usually an opinion must have ``type="majority"``
-    to create holdings binding on any courts.
-    :param type:
-        the opinion's attitude toward the court's disposition of the case.
-        e.g. ``majority``, ``dissenting``, ``concurring``, ``concurring in the result``
-    :param author:
-        name of the judge who authored the opinion, if identified
-    :param text:
-    :param holdings:
-        a group of :class:`.Holding`\s in the opinion
-
+class OpinionReading(Comparable):
+    """
+    An interpretation of what Holdings are supported by the text of an Opinion.
     """
 
-    type: str = "majority"
-    author: Optional[str] = None
-    text: Optional[str] = None
-    holdings: Sequence = HoldingGroup()
-    factor_anchors: Dict = {}
-    enactment_anchors: Dict = {}
+    def __init__(
+        self,
+        opinion: Opinion,
+        holdings: Sequence = HoldingGroup(),
+        factor_anchors: TextLinkDict = {},
+        enactment_anchors: TextLinkDict = {},
+    ) -> None:
 
-    @validator("holdings")
-    def check_holdings_type(cls, v) -> HoldingGroup:
-        """Convert Opinion from CAPOpinion if needed."""
-        if not isinstance(v, HoldingGroup):
-            return HoldingGroup(v)
-        return v
+        super().__init__()
+        self.opinion = opinion
+        if not isinstance(holdings, HoldingGroup):
+            holdings = HoldingGroup(holdings)
+        self.holdings = holdings
+        self.factor_anchors = factor_anchors
+        self.enactment_anchors = enactment_anchors
 
     def __str__(self):
         return super().__str__()
@@ -282,17 +271,17 @@ class Opinion(CAPOpinion, Comparable):
         context: Optional[Sequence[Factor]] = None,
     ):
         r"""
-        Add :class:`.Holding`\s to this ``Opinion`` from a sequence.
+        Add :class:`.Holding`\s to this ``OpinionReading`` from a sequence.
 
         :param holdings:
-            a sequence of :class:`.Holding`\s that this :class:`.Opinion`
+            a sequence of :class:`.Holding`\s that this :class:`.OpinionReading`
             posits as valid in its own court or jurisdiction, regardless of
             whether ``self`` accepts that the ``inputs`` correspond to the
             reality of the current case, and regardless of whether the
             court orders that the ``outputs`` be put into effect.
 
         :param text_links:
-            mapping of :class:`Factor`\s to the :class:`Opinion` passages where
+            mapping of :class:`Factor`\s to the :class:`OpinionReading` passages where
             they can be found. Can be obtained as the `mentioned` return value
             of one of the functions in :mod:`authorityspoke.io.readers`\.
 
@@ -326,14 +315,14 @@ class Opinion(CAPOpinion, Comparable):
         context: Optional[Sequence[Factor]] = None,
     ) -> None:
         r"""
-        Add one or more :class:`.Holding`\s to this ``Opinion``.
+        Add one or more :class:`.Holding`\s to this ``OpinionReading``.
 
         This method passes its values to :meth:`~posit_holding` or
         :meth:`~posit_holdings` depending on whether the `holding` parameter
         is one :class:`.Holding` or a :class:`list`\.
 
         :param holdings:
-            a :class:`.Holding` that the :class:`.Opinion` ``self`` posits
+            a :class:`.Holding` that the :class:`.OpinionReading` ``self`` posits
             as valid in its own court or jurisdiction, regardless of
             whether ``self`` accepts that the ``inputs`` of the
             :class:`.Holding` correspond to the reality of the current
@@ -378,7 +367,7 @@ class Opinion(CAPOpinion, Comparable):
 
     def implied_by(
         self,
-        other: Union[Opinion, Holding, Rule],
+        other: Union[OpinionReading, Holding, Rule],
         context: Optional[Union[ContextRegister, Explanation]] = None,
     ) -> bool:
         """Determine if other implies all the Holdings of self."""
@@ -398,14 +387,14 @@ class Opinion(CAPOpinion, Comparable):
                 return False
         return True
 
-    def __ge__(self, other: Union[Opinion, Rule]) -> bool:
+    def __ge__(self, other: Union[OpinionReading, Holding, Rule]) -> bool:
         """
         Find whether ``self``'s holdings imply all the holdings of ``other``.
 
         :returns:
-            a bool indicating whether the :class:`.Rule` ``other``
-            (or every holding of ``other``, if other is an :class:`.Opinion`)
-            is implied by some :class:`.Rule` in ``self.holdings``.
+            a bool indicating whether the :class:`.Holding` ``other``
+            (or every holding of ``other``, if other is an :class:`.OpinionReading`)
+            is implied by some :class:`.Holding` in ``self.holdings``.
         """
         return self.implies(other)
 
@@ -413,7 +402,7 @@ class Opinion(CAPOpinion, Comparable):
         """
         Find whether ``self``\'s holdings imply ``other``\'s but self != other.
 
-        This actually tests for inequality because ``Opinion`` does not
+        This actually tests for inequality because ``OpinionReading`` does not
         have a ``means`` method.
 
         :returns:
@@ -426,7 +415,7 @@ class Opinion(CAPOpinion, Comparable):
         Get text using a :class:`.TextQuoteSelector`.
 
         :param selector:
-            a selector referencing a text passage in this :class:`Opinion`.
+            a selector referencing a text passage in the :class:`Opinion`.
 
         :returns:
             the text referenced by the selector, or ``None`` if the text

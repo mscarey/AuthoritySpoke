@@ -266,7 +266,7 @@ def read_holdings(
 
 def read_decision(decision_dict: RawDecision) -> Decision:
     r"""
-    Create and return one or more :class:`.Opinion` objects from a dict API response.
+    Create and return one or more :class:`.Decision` objects from a dict API response.
 
     Relies on the JSON format from the `Caselaw Access Project
     API <https://api.case.law/v1/cases/>`_.

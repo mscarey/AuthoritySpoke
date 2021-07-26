@@ -6,8 +6,9 @@ from typing import Iterable, Iterator, List
 from typing import Optional, Sequence, Union
 
 from anchorpoint.textselectors import TextQuoteSelector
+from justopinion.decisions import CAPDecision as Decision
+
 from justopinion.decisions import (
-    CAPDecision,
     CAPCitation,
     Court,
     Jurisdiction,
@@ -18,7 +19,7 @@ from nettlesome.factors import Factor
 from pydantic import BaseModel, HttpUrl, validator
 
 from authorityspoke.holdings import Holding, HoldingGroup
-from authorityspoke.opinions import Opinion, TextLinkDict
+from authorityspoke.opinions import Opinion, OpinionReading, TextLinkDict
 from authorityspoke.rules import Rule
 
 
@@ -48,96 +49,40 @@ class CaseBody(BaseModel):
     status: str = ""
 
 
-class Decision(Comparable, CAPDecision):
-    r"""
-    A court decision to resolve a step in litigation.
-    Uses the model of a judicial decision from
-    the `Caselaw Access Project API <https://api.case.law/v1/cases/>`_.
-    One of these records may contain multiple :class:`.Opinion`\s.
-    Typically one record will contain all
-    the :class:`~authorityspoke.opinions.Opinion`\s
-    from one appeal, but not necessarily from the whole lawsuit. One
-    lawsuit may contain multiple appeals or other petitions, and
-    if more then one of those generates published Opinions,
-    the CAP API will divide those Opinions into a separate
-    record for each appeal.
-    The outcome of a decision may be determined by one majority
-    :class:`~authorityspoke.opinions.Opinion` or by the combined
-    effect of multiple Opinions.
-    The lead opinion is commonly, but not always, the only
-    Opinion that creates binding legal authority.
-    Usually every :class:`~authorityspoke.rules.Rule` posited by the lead Opinion is
-    binding, but some may not be, often because parts of the
-    Opinion fail to command a majority of the panel
-    of judges.
-
-    :param name:
-        full name of the opinion, e.g. "ORACLE AMERICA, INC.,
-        Plaintiff-Appellant, v. GOOGLE INC., Defendant-Cross-Appellant"
-    :param name_abbreviation:
-        shorter name of the opinion, e.g. "Oracle America, Inc. v. Google Inc."
-    :param citations:
-        citations to the opinion, usually in the format
-        ``[Volume Number] [Reporter Name Abbreviation] [Page Number]``
-    :param first_page:
-        the page where the opinion begins in its official reporter
-    :param last_page:
-        the page where the opinion ends in its official reporter
-    :param decision_date:
-        date when the opinion was first published by the court
-        (not the publication date of the reporter volume)
-    :param court:
-        name of the court that published the opinion
-    :param _id:
-        unique ID from CAP API
+class DecisionReading(Comparable):
+    """
+    An interpretation of what Holdings are supported by the Opinions of a Decision.
     """
 
-    decision_date: datetime.date
-    name: Optional[str] = None
-    name_abbreviation: Optional[str] = None
-    docket_num: Optional[str] = None
-    citations: Optional[Sequence[CAPCitation]] = None
-    first_page: Optional[int] = None
-    last_page: Optional[int] = None
-    court: Optional[Court] = None
-    casebody: Optional[CaseBody] = None
-    jurisdiction: Optional[Jurisdiction] = None
-    cites_to: Optional[Sequence[CAPCitation]] = None
-    id: Optional[int] = None
-    last_updated: Optional[datetime.datetime] = None
-    frontend_url: Optional[HttpUrl] = None
-    analysis: Optional[DecisionAnalysis] = None
-
-    class Config:
-        json_encoders = {
-            datetime.date: lambda v: v.isoformat(),
-        }
+    def __init__(self, **kwargs):
+        self.decision: Decision
+        self.opinion_readings: List[OpinionReading] = []
 
     def __str__(self):
-        citation = self.citations[0].cite if self.citations else ""
-        name = self.name_abbreviation or self.name
-        return f"{name}, {citation} ({self.decision_date})"
-
-    @property
-    def holdings(self) -> HoldingGroup:
-        if self.majority is None:
-            return HoldingGroup()
-        return HoldingGroup(self.majority.holdings)
+        citation = self.decision.citations[0].cite if self.decision.citations else ""
+        name = self.decision.name_abbreviation or self.decision.name
+        return f"Reading for {name}, {citation} ({self.decision.decision_date})"
 
     @property
     def majority(self) -> Optional[Opinion]:
-        for opinion in self.opinions:
-            if opinion.type == "majority":
-                return opinion
+        for reading in self.opinion_readings:
+            if reading.opinion.type == "majority":
+                return reading.opinion
         return None
 
+    @property
+    def holdings(self) -> HoldingGroup:
+        if self.decision.majority is None:
+            return HoldingGroup()
+        return HoldingGroup(self.majority.holdings)
+
     def add_opinion(self, opinion: Opinion) -> None:
-        if not self.casebody:
-            self.casebody = CaseBody(data=CaseData())
-        self.casebody.data.opinions.append(opinion)
+        if not self.decision.casebody:
+            self.decision.casebody = CaseBody(data=CaseData())
+        self.decision.casebody.data.opinions.append(opinion)
 
     def contradicts(self, other):
-        if isinstance(other, Decision):
+        if isinstance(other, DecisionReading):
             if self.majority and other.majority:
                 return self.majority.contradicts(other.majority)
             return False
