@@ -34,6 +34,12 @@ class TestDecision:
         with pytest.raises(AttributeError):
             decision.posit(make_holding["h1"])
 
+    def test_decision_reading_has_opinion_readings(self, make_decision):
+        watt = make_decision["watt"]
+        reading = DecisionReading(decision=watt)
+        hamley = "hamley, circuit judge"
+        assert reading.opinion_readings[0].opinion.author.lower() == hamley
+
 
 class TestImplication:
     def test_implication_of_decision_with_one_of_same_holdings(
@@ -117,12 +123,9 @@ class TestImplication:
         oracle = make_decision_with_holding["oracle"]
         assert not oracle.implies(make_procedure["c1"])
 
-    def test_opinion_implies_decision(self, make_holding, make_opinion_with_holding):
-        watt = make_opinion_with_holding["watt_majority"]
-        decision = Decision(decision_date=date(2000, 1, 1))
-        decision.add_opinion(opinion=Opinion(type="majority"))
-        decision.posit(watt.holdings[0])
-        assert watt.implies(decision)
+    def test_opinion_implies_decision(self, make_decision_with_holding):
+        watt = make_decision_with_holding["watt"]
+        assert watt.opinion_readings[0].implies(watt)
 
     def test_rule_implied_by_decision(self, make_decision_with_holding):
         oracle = make_decision_with_holding["oracle"]
@@ -162,15 +165,17 @@ class TestContradiction:
             decision_date=datetime.date(2020, 1, 1),
             opinions=[Opinion(position="plurality")],
         )
-        assert not oracle.contradicts(other)
+        reading = DecisionReading(decision=other)
+        assert not oracle.contradicts(reading)
 
     def test_no_contradiction_of_majority_without_holdings(
         self, make_decision_with_holding
     ):
         oracle = make_decision_with_holding["oracle"]
         other = Decision(decision_date=datetime.date(2020, 1, 1))
-        other.add_opinion(Opinion(position="majority"))
-        assert not oracle.contradicts(other)
+        other.opinions.append(Opinion(position="majority"))
+        reading = DecisionReading(decision=other)
+        assert not oracle.contradicts(reading)
 
     def test_decision_contradicts_holding(self, make_decision_with_holding):
         oracle = make_decision_with_holding["oracle"]

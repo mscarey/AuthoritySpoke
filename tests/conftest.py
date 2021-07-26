@@ -1528,8 +1528,8 @@ def make_opinion(make_decision) -> Dict[str, Opinion]:
 def make_opinion_with_holding(make_decision_with_holding) -> Dict[str, Opinion]:
     opinions = {}
     for case in TEST_CASES:
-        for opinion in make_decision_with_holding[case].opinions:
-            opinions[f"{case}_{opinion.type}"] = opinion
+        for reading in make_decision_with_holding[case].opinion_readings:
+            opinions[f"{case}_{reading.opinion.type}"] = reading
     return opinions
 
 

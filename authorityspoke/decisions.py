@@ -59,6 +59,12 @@ class DecisionReading(Comparable):
     ):
         self.decision = decision
         self.opinion_readings = opinion_readings or []
+        for opinion in self.decision.opinions:
+            if not any(
+                opinion.text == reading.opinion.text
+                for reading in self.opinion_readings
+            ):
+                self.opinion_readings.append(OpinionReading(opinion=opinion))
 
     def __str__(self):
         citation = self.decision.citations[0].cite if self.decision.citations else ""
@@ -104,7 +110,7 @@ class DecisionReading(Comparable):
         return self.majority.contradicts(other)
 
     def explain_contradiction(
-        self, other: Union[Opinion, Holding, Rule]
+        self, other: Union[OpinionReading, Holding, Rule]
     ) -> Optional[Explanation]:
         explanations = self.explanations_contradiction(other)
         try:
@@ -115,12 +121,12 @@ class DecisionReading(Comparable):
 
     def explanations_contradiction(
         self,
-        other: Union[Decision, Opinion, Holding, Rule],
+        other: Union[DecisionReading, Opinion, Holding, Rule],
     ) -> Iterator[Explanation]:
-        if isinstance(other, Decision):
+        if isinstance(other, DecisionReading):
             if self.majority and other.majority:
                 yield from self.majority.explanations_contradiction(other.majority)
-        elif isinstance(other, (Rule, Holding, Opinion)):
+        elif isinstance(other, (Rule, Holding, OpinionReading)):
             if self.majority:
                 yield from self.majority.explanations_contradiction(other)
         else:
@@ -203,7 +209,7 @@ class DecisionReading(Comparable):
         self, other: Comparable, context: Optional[ContextRegister] = None
     ) -> Iterator[Explanation]:
         context = context or ContextRegister()
-        if isinstance(other, Opinion):
+        if isinstance(other, OpinionReading):
             other = other.holdings
         if isinstance(other, HoldingGroup):
             yield from other.explanations_implication(
