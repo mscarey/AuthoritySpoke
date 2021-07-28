@@ -1,6 +1,6 @@
 import pytest
 
-from anchorpoint.textselectors import TextQuoteSelector
+from anchorpoint.textselectors import TextQuoteSelector, TextSelectionError
 
 from nettlesome.entities import Entity
 
@@ -48,10 +48,10 @@ class TestOpinions:
         watt = make_opinion["watt_majority"]
         h = real_holding
         e = make_entity
-
-        watt.posit(h["h1"], context=(e["motel"], e["watt"]))
-        watt.posit(h["h2"], context=(e["trees"], e["motel"]))
-        watt.posit(
+        reading = OpinionReading(opinion=watt)
+        reading.posit(h["h1"], context=(e["motel"], e["watt"]))
+        reading.posit(h["h2"], context=(e["trees"], e["motel"]))
+        reading.posit(
             h["h3"],
             context=(
                 make_evidence["generic"],
@@ -61,10 +61,10 @@ class TestOpinions:
                 e["tree_search"],
             ),
         )
-        watt.posit(
+        reading.posit(
             h["h4"], context=(e["trees"], e["tree_search"], e["motel"], e["watt"])
         )
-        assert make_entity["watt"] in make_opinion["watt_majority"].generic_terms()
+        assert make_entity["watt"] in reading.generic_terms()
 
     def test_opinion_date(self, make_decision):
         """
@@ -103,7 +103,7 @@ class TestOpinionText:
         enactment_name = str(oracle.holdings[0].enactments[0])
         anchor = oracle.enactment_anchors[enactment_name][0]
         selected = oracle.select_text(selector=anchor)
-        assert selected == "17 U.S.C. § 102(a)"
+        assert str(selected) == "…17 U.S.C. § 102(a)…"
 
     def test_select_opinion_text_for_holding(self, make_opinion_with_holding):
         oracle = make_opinion_with_holding["oracle_majority"]
@@ -115,7 +115,7 @@ class TestOpinionText:
     def test_invalid_text_selector(self, make_opinion_with_holding):
         oracle = make_opinion_with_holding["oracle_majority"]
         anchor = TextQuoteSelector(exact="text not in opinion")
-        with pytest.raises(ValueError):
+        with pytest.raises(TextSelectionError):
             _ = oracle.select_text(selector=anchor)
 
 
@@ -301,6 +301,25 @@ class TestOpinionFactors:
 
 
 class TestImplication:
+    def test_opinion_implies_holding_group(self, make_opinion_with_holding):
+        """Can be affected by order of tests."""
+        watt = make_opinion_with_holding["watt_majority"]
+        holdings = watt.holdings[:2]
+        assert isinstance(holdings, HoldingGroup)
+        assert watt.implies(holdings)
+        explanation = watt.explain_implication(holdings)
+        assert len(explanation.reasons) == 2
+
+    def test_opinion_implied_by_rule(
+        self, make_opinion_with_holding, make_holding, make_rule
+    ):
+        """Can be affected by order of tests."""
+        watt = make_opinion_with_holding["oracle_majority"]
+        watt.clear_holdings()
+        watt.posit(make_holding["h2"])
+        assert watt.implied_by(make_rule["h2_despite_due_process"])
+        assert not watt.implies(make_rule["h2_despite_due_process"])
+
     def test_no_implication(self, make_opinion_with_holding):
         watt = make_opinion_with_holding["watt_majority"]
         brad = make_opinion_with_holding["brad_majority"]
@@ -353,23 +372,6 @@ class TestImplication:
         watt.posit(make_holding["h2_irrelevant_inputs_undecided"])
         assert not watt >= make_holding["h2_undecided"]
         assert not watt > make_holding["h2_undecided"]
-
-    def test_opinion_implied_by_rule(
-        self, make_opinion_with_holding, make_holding, make_rule
-    ):
-        watt = make_opinion_with_holding["oracle_majority"]
-        watt.clear_holdings()
-        watt.posit(make_holding["h2"])
-        assert watt.implied_by(make_rule["h2_despite_due_process"])
-        assert not watt.implies(make_rule["h2_despite_due_process"])
-
-    def test_opinion_implies_holding_group(self, make_opinion_with_holding):
-        watt = make_opinion_with_holding["watt_majority"]
-        holdings = watt.holdings[:2]
-        assert isinstance(holdings, HoldingGroup)
-        assert watt.implies(holdings)
-        explanation = watt.explain_implication(holdings)
-        assert len(explanation.reasons) == 2
 
     def test_opinion_does_not_imply_holding_group(self, make_opinion_with_holding):
         watt = make_opinion_with_holding["watt_majority"]

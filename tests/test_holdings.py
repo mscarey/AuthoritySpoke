@@ -1,3 +1,4 @@
+from authorityspoke.opinions import OpinionReading
 from copy import deepcopy
 from datetime import date
 import os
@@ -245,12 +246,13 @@ class TestImplication:
         self, make_opinion_with_holding, make_opinion
     ):
         lotus = make_opinion["lotus_majority"]
+        reading = OpinionReading(opinion=lotus)
         holding = make_opinion_with_holding["oracle_majority"].holdings[0]
         context = ContextRegister()
         context.insert_pair(
             Entity("the Java API"), Entity("the Lotus menu command hierarchy")
         )
-        assert holding.implies(lotus, context=context)
+        assert holding.implies(reading, context=context)
 
     def test_holding_implies_none(self, make_holding):
         assert make_holding["h3"] >= None
