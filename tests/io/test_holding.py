@@ -11,6 +11,7 @@ from nettlesome.terms import ContextRegister
 from nettlesome.entities import Entity
 from nettlesome.predicates import Predicate
 
+from authorityspoke.decisions import DecisionReading
 from authorityspoke.facts import Fact
 from authorityspoke.holdings import Holding, HoldingGroup
 from authorityspoke.opinions import Opinion, OpinionReading
@@ -227,6 +228,20 @@ class TestHoldingImport:
         reading = OpinionReading(opinion=oracle)
         reading.posit(oracle_holdings_with_anchors)
         assert len(reading.holdings) == 20
+
+    def test_pass_holdings_to_decision_reading_constructor(
+        self, make_decision, make_response
+    ):
+        mock_client = FakeClient(responses=make_response)
+        oracle = make_decision["oracle"]
+        oracle_holdings = read_holdings_from_file(
+            "holding_oracle.yaml", client=mock_client
+        )
+        oracle_reading = DecisionReading(decision=oracle, holdings=oracle_holdings)
+        assert (
+            oracle_reading.opinion_readings[0].holdings[0].enactments[0].node
+            == "/us/const/article/I/8/8"
+        )
 
 
 class TestTextAnchors:
