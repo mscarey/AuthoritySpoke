@@ -67,7 +67,7 @@ class TestDownload:
         filepath = tmp_path / to_file
         lotus_from_file = load_decision(filepath=filepath)
         lotus = Decision(**lotus_from_file)
-        assert lotus.majority.__class__.__name__ == "Opinion"
+        assert lotus.majority.__class__.__name__ == "CAPOpinion"
         assert "Lotus" in lotus.name_abbreviation
 
     def test_error_download_without_case_reference(self):

@@ -36,8 +36,8 @@ class TestOpinions:
             == "TOBRINER, J."
         )
 
-    def test_opinion_holding_list(self, make_opinion, real_holding):
-        watt = make_opinion["watt_majority"]
+    def test_opinion_holding_list(self, make_opinion_with_holding, real_holding):
+        watt = make_opinion_with_holding["watt_majority"]
         h3_specific = real_holding["h3"]
         watt.posit(h3_specific)
         assert h3_specific in watt.holdings
@@ -96,7 +96,7 @@ class TestOpinionText:
         oracle = make_opinion_with_holding["oracle_majority"]
         anchor = oracle.holdings[0].anchors[0]
         selected = oracle.select_text(selector=anchor)
-        assert selected == "must be “original” to qualify"
+        assert str(selected) == "…must be “original” to qualify…"
 
     def test_select_opinion_text_for_enactment(self, make_opinion_with_holding):
         oracle = make_opinion_with_holding["oracle_majority"]
@@ -110,7 +110,7 @@ class TestOpinionText:
         holding = oracle.holdings[0]
         anchor = holding.anchors[0]
         selected = oracle.select_text(selector=anchor)
-        assert selected == "must be “original” to qualify"
+        assert str(selected) == "…must be “original” to qualify…"
 
     def test_invalid_text_selector(self, make_opinion_with_holding):
         oracle = make_opinion_with_holding["oracle_majority"]

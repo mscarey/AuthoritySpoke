@@ -13,7 +13,7 @@ from nettlesome.predicates import Predicate
 
 from authorityspoke.facts import Fact
 from authorityspoke.holdings import Holding, HoldingGroup
-from authorityspoke.opinions import Opinion
+from authorityspoke.opinions import Opinion, OpinionReading
 from authorityspoke.procedures import Procedure
 from authorityspoke.io import loaders, readers, dump, name_index
 from authorityspoke.io.fake_enactments import FakeClient
@@ -106,7 +106,9 @@ class TestHoldingImport:
         lotus_holdings = load_holdings("holding_lotus.json")
         assert len(lotus_holdings) == 10
 
-    def test_import_enactments_and_anchors(self, make_opinion, make_response):
+    def test_import_enactments_and_anchors(
+        self, make_opinion_with_holding, make_response
+    ):
         """
         Testing issue that caused enactment expansion to fail only when
         text anchors were loaded.
@@ -184,7 +186,8 @@ class TestHoldingImport:
             enactment_anchors,
         ) = readers.read_holdings_with_anchors(record=raw_holdings, client=mock_client)
 
-        feist = make_opinion["feist_majority"]
+        feist = make_opinion_with_holding["feist_majority"]
+        feist.clear_holdings()
         feist.posit(
             feist_holdings,
             holding_anchors=holding_anchors,
@@ -221,8 +224,9 @@ class TestHoldingImport:
         oracle_holdings_with_anchors = loaders.read_anchored_holdings_from_file(
             "holding_oracle.json", client=mock_client
         )
-        oracle.posit(oracle_holdings_with_anchors)
-        assert len(oracle.holdings) == 20
+        reading = OpinionReading(opinion=oracle)
+        reading.posit(oracle_holdings_with_anchors)
+        assert len(reading.holdings) == 20
 
 
 class TestTextAnchors:
@@ -231,19 +235,20 @@ class TestTextAnchors:
     def test_read_holding_with_no_anchor(self, make_opinion, make_analysis):
         oracle = make_opinion["oracle_majority"]
         raw_analysis = make_analysis["no anchors"]
+        reading = OpinionReading(opinion=oracle)
         (
             oracle_holdings,
             holding_anchors,
             named_anchors,
             enactment_anchors,
         ) = readers.read_holdings_with_anchors(raw_analysis)
-        oracle.posit(
+        reading.posit(
             oracle_holdings,
             holding_anchors=holding_anchors,
             named_anchors=named_anchors,
             enactment_anchors=enactment_anchors,
         )
-        assert not oracle.holdings[0].anchors
+        assert not reading.holdings[0].anchors
 
     def test_holding_without_enactments_or_regime(self, raw_holding):
         expanded = text_expansion.expand_shorthand(raw_holding["bradley_house"])
@@ -257,15 +262,15 @@ class TestTextAnchors:
         mock_client = FakeClient(responses=make_response)
         holding = readers.read_holding(raw_holding["bradley_house"], client=mock_client)
         cardenas = make_opinion["cardenas_majority"]
-        cardenas.posit_holding(
+        reading = OpinionReading(opinion=cardenas)
+        reading.posit_holding(
             holding,
             holding_anchors=TextQuoteSelector(
                 exact="some text supporting this holding"
             ),
         )
         assert (
-            cardenas.holdings[-1].anchors[0].exact
-            == "some text supporting this holding"
+            reading.holdings[-1].anchors[0].exact == "some text supporting this holding"
         )
 
     def test_mentioned_context_changing(self):
@@ -487,8 +492,8 @@ class TestTextAnchors:
         brad = make_opinion["brad_majority"]
         to_read = load_holdings("holding_brad.json")
         holdings = readers.read_holdings(to_read, client=mock_client)
-        brad.posit(holdings)
-        expectation_not_reasonable = list(brad.holdings)[6]
+        reading = OpinionReading(opinion=brad, holdings=holdings)
+        expectation_not_reasonable = list(reading.holdings)[6]
         assert "dimensionless" not in str(expectation_not_reasonable)
         assert isinstance(expectation_not_reasonable.inputs[0].predicate.quantity, int)
 
@@ -497,8 +502,9 @@ class TestTextAnchors:
         brad = make_opinion["brad_majority"]
         to_read = load_holdings("holding_brad.json")
         holdings = readers.read_holdings(to_read, client=mock_client)
-        brad.posit(holdings)
-        assert "warrantless search and seizure" in brad.holdings[0].short_string
+        reading = OpinionReading(opinion=brad)
+        reading.posit(holdings[0])
+        assert "warrantless search and seizure" in reading.holdings[0].short_string
 
     def test_opinion_posits_holding_tuple_context(
         self, make_opinion, make_entity, make_response
@@ -514,8 +520,9 @@ class TestTextAnchors:
             [make_entity["watt"], make_entity["trees"], make_entity["motel"]]
         )
         watt = make_opinion["watt_majority"]
-        watt.posit(context_holding)
-        holding_string = watt.holdings[-1].short_string
+        reading = OpinionReading(opinion=watt)
+        reading.posit(context_holding)
+        holding_string = reading.holdings[-1].short_string
         assert (
             "the number of marijuana plants in <the stockpile of trees> was at least 3"
             in holding_string
@@ -534,21 +541,22 @@ class TestTextAnchors:
         brad = make_opinion["brad_majority"]
         to_read = load_holdings("holding_brad.json")
         holdings = readers.read_holdings(to_read, client=mock_client)
-        brad.clear_holdings()
-        brad.posit(holdings)
-        expectation_not_reasonable = brad.holdings[6]
+        breading = OpinionReading(opinion=brad)
+        breading.clear_holdings()
+        breading.posit(holdings)
+        expectation_not_reasonable = breading.holdings[6]
         changes = ContextRegister()
         changes.insert_pair(
             key=expectation_not_reasonable.generic_terms()[0],
             value=make_entity["watt"],
         )
         context_holding = expectation_not_reasonable.new_context(changes)
-
-        watt.clear_holdings()
-        watt.posit(context_holding)
+        wreading = OpinionReading(opinion=watt)
+        wreading.clear_holdings()
+        wreading.posit(context_holding)
         string = str(context_holding)
         assert "<Wattenburg> lived at <Bradley's house>" in string
-        assert "<Wattenburg> lived at <Bradley's house>" in str(watt.holdings[-1])
+        assert "<Wattenburg> lived at <Bradley's house>" in str(wreading.holdings[-1])
 
     def test_holding_with_non_generic_value(
         self, make_opinion, make_entity, make_response
@@ -558,10 +566,11 @@ class TestTextAnchors:
         """
         mock_client = FakeClient(responses=make_response)
         brad = make_opinion["brad_majority"]
+        reading = OpinionReading(opinion=brad)
         to_read = load_holdings("holding_brad.json")
         holdings = readers.read_holdings(to_read, client=mock_client)
-        brad.posit(holdings)
-        expectation_not_reasonable = brad.holdings[6]
+        reading.posit(holdings)
+        expectation_not_reasonable = reading.holdings[6]
         generic_patch = expectation_not_reasonable.generic_terms()[1]
         changes = ContextRegister()
         changes.insert_pair(generic_patch, make_entity["trees_specific"])
@@ -610,9 +619,10 @@ class TestTextAnchors:
         ) = readers.read_holdings_with_anchors(make_analysis["minimal"])
 
         brad = make_opinion["brad_majority"]
-        brad.clear_holdings()
-        brad.posit(holdings, holding_anchors=holding_anchors)
-        assert brad.holdings[0].anchors[0].exact == "open fields or grounds"
+        reading = OpinionReading(opinion=brad)
+        reading.clear_holdings()
+        reading.posit(holdings, holding_anchors=holding_anchors)
+        assert reading.holdings[0].anchors[0].exact == "open fields or grounds"
 
 
 class TestExclusiveFlag:

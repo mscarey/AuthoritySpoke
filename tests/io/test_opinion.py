@@ -3,6 +3,7 @@ from typing import Dict, List
 
 from authorityspoke import Opinion
 from authorityspoke.io import loaders, readers, schemas_json as schemas
+from authorityspoke.opinions import OpinionReading
 
 
 class TestLoadOpinion:
@@ -17,15 +18,17 @@ class TestLoadOpinion:
         assert opinion.type == "concurring-in-part-and-dissenting-in-part"
 
     def test_empty_holding_list_when_loading_opinion(self):
-        opinion = Opinion(type="majority", holdings=[])
-        assert isinstance(opinion.holdings, HoldingGroup)
+        opinion = Opinion(type="majority")
+        reading = OpinionReading(opinion=opinion, holdings=[])
+        assert isinstance(reading.holdings, HoldingGroup)
 
     def test_loading_opinion_with_one_holding_in_list(self, make_holding):
-        opinion = Opinion(type="majority", holdings=[make_holding["h1"]])
-        assert isinstance(opinion.holdings, HoldingGroup)
-        assert len(opinion.holdings) == 1
+        opinion = Opinion(type="majority")
+        reading = OpinionReading(opinion=opinion, holdings=[make_holding["h1"]])
+        assert isinstance(reading.holdings, HoldingGroup)
+        assert len(reading.holdings) == 1
 
-    def test_selectors_not_duplicated(self, make_opinion, raw_holding):
+    def test_selectors_not_duplicated(self, make_opinion_with_holding, raw_holding):
         """
         Test that the factors attribute for this Opinion contains
         one instance of the Fact "Mark stole a watch", but that both
@@ -33,7 +36,8 @@ class TestLoadOpinion:
         """
         watch = raw_holding["stolen watch"]
         holdings = readers.read_holdings([watch])
-        cardenas = make_opinion["cardenas_majority"]
+        cardenas = make_opinion_with_holding["cardenas_majority"]
+        cardenas.clear_holdings()
         cardenas.posit_holdings(holdings)
 
         assert any(

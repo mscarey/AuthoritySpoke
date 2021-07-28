@@ -1,4 +1,4 @@
-from authorityspoke.decisions import Decision
+from authorityspoke.decisions import Decision, DecisionReading
 import datetime
 import os
 
@@ -63,11 +63,11 @@ class TestEnactments:
     def test_passage_from_imported_statute(self, fake_usc_client):
         oracle = loaders.load_decision(f"oracle_h.json")
         oracle_decision = Decision(**oracle)
-        oracle_majority = oracle_decision.majority
+        reading = DecisionReading(oracle_decision)
         loaded = loaders.load_holdings("holding_oracle.json")
         holdings = readers.read_holdings(loaded, client=fake_usc_client)
-        oracle_majority.posit(holdings)
-        despite_text = str(list(oracle_majority.holdings)[5])
+        reading.posit(holdings)
+        despite_text = str(list(reading.holdings)[5])
         assert "In no case does copyright protection " in despite_text
 
     def test_short_passage_from_uslm_code(self, fake_usc_client):

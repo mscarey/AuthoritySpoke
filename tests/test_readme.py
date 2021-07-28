@@ -1,5 +1,6 @@
 """Tests for any commands in readme.md."""
 
+from authorityspoke.decisions import DecisionReading
 import os
 from dotenv import load_dotenv
 
@@ -37,20 +38,23 @@ class TestReadme:
             lotus_e,
         ) = read_anchored_holdings_from_file("holding_lotus.json", client=client)
 
-        oracle.posit(
+        oracle_reading = DecisionReading(oracle)
+        lotus_reading = DecisionReading(lotus)
+
+        oracle_reading.posit(
             holdings=oracle_holdings,
             holding_anchors=oracle_anchors,
             named_anchors=oracle_named_anchors,
             enactment_anchors=oracle_e,
         )
-        lotus.posit(
+        lotus_reading.posit(
             holdings=lotus_holdings,
             holding_anchors=lotus_anchors,
             named_anchors=lotus_named_anchors,
             enactment_anchors=lotus_e,
         )
 
-        assert lotus.contradicts(oracle)
+        assert lotus_reading.contradicts(oracle_reading)
 
     def test_explain_contradiction(self, make_decision_with_holding):
         lotus = make_decision_with_holding["lotus"]

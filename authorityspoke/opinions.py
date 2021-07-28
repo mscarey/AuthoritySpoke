@@ -6,14 +6,14 @@ from __future__ import annotations
 
 from itertools import zip_longest
 from typing import Any, Dict, Iterable, Iterator, List, NamedTuple
-from typing import Optional, Sequence, Union
+from typing import Optional, Sequence, Tuple, Union
 
 import logging
 import re
 
 from dataclasses import dataclass, field
 
-from anchorpoint.textselectors import TextQuoteSelector
+from anchorpoint.textselectors import TextQuoteSelector, TextPositionSelector
 from justopinion.decisions import CAPOpinion as Opinion
 from nettlesome.terms import Comparable, ContextRegister, Explanation
 from nettlesome.factors import Factor
@@ -412,7 +412,18 @@ class OpinionReading(Comparable):
         """
         return (self >= other) and (self != other)
 
-    def select_text(self, selector: TextQuoteSelector) -> Optional[str]:
+    def select_text(
+        self,
+        selector: Union[
+            bool,
+            str,
+            TextPositionSelector,
+            TextQuoteSelector,
+            Sequence[
+                Union[str, Tuple[int, int], TextQuoteSelector, TextPositionSelector]
+            ],
+        ],
+    ) -> Optional[str]:
         r"""
         Get text using a :class:`.TextQuoteSelector`.
 
@@ -423,12 +434,7 @@ class OpinionReading(Comparable):
             the text referenced by the selector, or ``None`` if the text
             can't be found.
         """
-        if re.search(selector.passage_regex(), self.text, re.IGNORECASE):
-            return selector.exact
-        raise ValueError(
-            f'Passage "{selector.exact}" from TextQuoteSelector '
-            + f'not found in Opinion "{self}".'
-        )
+        return self.opinion.select_text(selector)
 
 
 class FactorIndex(Dict[str, Factor]):
