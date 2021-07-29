@@ -1,9 +1,31 @@
-from authorityspoke.holdings import HoldingGroup
+import os
 from typing import Dict, List
 
+from dotenv import load_dotenv
+
+import pytest
+
 from authorityspoke import Opinion
+from authorityspoke.holdings import HoldingGroup
 from authorityspoke.io import loaders, readers, schemas_json as schemas
+from authorityspoke.io.downloads import CAPClient
+from authorityspoke.decisions import DecisionReading
 from authorityspoke.opinions import OpinionReading
+
+
+load_dotenv()
+
+CAP_API_KEY = os.getenv("CAP_API_KEY") or "wrong key"
+
+
+class TestLoadDecision:
+    case_client = CAPClient(api_token="Token " + CAP_API_KEY)
+
+    def test_load_decision(self):
+        brad_dict = loaders.load_decision("brad_h.json")
+        brad = readers.read_decision(brad_dict)
+        dissent = brad.opinions[1]
+        assert dissent.type == "concurring-in-part-and-dissenting-in-part"
 
 
 class TestLoadOpinion:
@@ -48,11 +70,3 @@ class TestLoadOpinion:
             for selector in holdings[0].anchors
         )
         assert len(holdings[0].anchors) == 2
-
-
-class TestLoadDecision:
-    def test_load_decision(self):
-        brad_dict = loaders.load_decision("brad_h.json")
-        brad = readers.read_decision(brad_dict)
-        dissent = brad.opinions[1]
-        assert dissent.type == "concurring-in-part-and-dissenting-in-part"

@@ -237,10 +237,11 @@ class TestHoldingImport:
         oracle_holdings = read_holdings_from_file(
             "holding_oracle.yaml", client=mock_client
         )
-        oracle_reading = DecisionReading(decision=oracle, holdings=oracle_holdings)
+        oracle_reading = DecisionReading(decision=oracle)
+        oracle_reading.posit(oracle_holdings)
         assert (
             oracle_reading.opinion_readings[0].holdings[0].enactments[0].node
-            == "/us/const/article/I/8/8"
+            == "/us/usc/t17/s102/a"
         )
 
 

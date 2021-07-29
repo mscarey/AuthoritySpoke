@@ -6,10 +6,10 @@ from nettlesome.entities import Entity
 from nettlesome.predicates import Predicate
 from nettlesome.quantities import Comparison
 
-from .decisions import Decision
+from .decisions import Decision, DecisionReading
 from .facts import Fact
 from .holdings import Holding
-from .opinions import Opinion
+from .opinions import Opinion, OpinionReading
 from .rules import Rule
 from .io.downloads import CAPClient
 from .io.dump import to_dict, to_json

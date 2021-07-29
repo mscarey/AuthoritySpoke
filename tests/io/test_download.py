@@ -9,7 +9,7 @@ import pytest
 from justopinion.decisions import CAPDecision
 
 from authorityspoke.io.downloads import CAPClient, CaseAccessProjectAPIError
-from authorityspoke import LegisClient
+from authorityspoke import LegisClient, DecisionReading
 from authorityspoke.io.loaders import load_decision
 from authorityspoke.io import writers
 from tests.test_notebooks import CAP_API_KEY
@@ -57,6 +57,16 @@ class TestDownload:
     def test_download_case_by_cite(self):
         case = self.client.read_cite("49 F.3d 807")
         assert case.decision_date.isoformat() == "1995-03-09"
+
+    @pytest.mark.default_cassette("TestDownload.test_download_case_by_cite.yaml")
+    @pytest.mark.vcr
+    def test_decision_without_opinion_posits_holding(self, make_holding):
+        """Test that a blank opinion is created when the decision doesn't have an opinion."""
+        decision = self.client.read_cite("49 F.3d 807")
+        reading = DecisionReading(decision=decision)
+        reading.posit(make_holding["h2"])
+        assert len(reading.holdings) == 1
+        assert reading.casebody.status != "ok"
 
     @pytest.mark.default_cassette("TestDownload.test_full_case_download.yaml")
     @pytest.mark.vcr

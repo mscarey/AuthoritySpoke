@@ -225,3 +225,4 @@ def load_decision(
         decision_dict = json.load(f)
 
     return decision_dict
+

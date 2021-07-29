@@ -1,10 +1,12 @@
 from copy import deepcopy
 from datetime import date
 import datetime
+import os
 
 import pytest
 
 from authorityspoke.decisions import Decision, DecisionReading, Opinion
+from authorityspoke.io.loaders import read_anchored_holdings_from_file
 
 
 class TestDecision:
@@ -39,6 +41,14 @@ class TestDecision:
         reading = DecisionReading(decision=watt)
         hamley = "hamley, circuit judge"
         assert reading.opinion_readings[0].opinion.author.lower() == hamley
+
+    def test_decision_posits_anchored_holdins(self, fake_usc_client, make_decision):
+        lotus_analysis = read_anchored_holdings_from_file(
+            "holding_lotus.yaml", client=fake_usc_client
+        )
+        lotus_reading = DecisionReading(decision=make_decision["lotus"])
+        lotus_reading.posit(lotus_analysis)
+        assert len(lotus_reading.majority.holdings) == len(lotus_analysis.holdings)
 
 
 class TestImplication:
