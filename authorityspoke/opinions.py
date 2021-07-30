@@ -46,7 +46,7 @@ class OpinionReading(Comparable):
 
     def __init__(
         self,
-        opinion: Opinion,
+        opinion: Optional[Opinion] = None,
         holdings: Sequence = HoldingGroup(),
         factor_anchors: TextLinkDict = {},
         enactment_anchors: TextLinkDict = {},

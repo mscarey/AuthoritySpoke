@@ -72,13 +72,13 @@ class DecisionReading(Comparable):
         return f"Reading for {name}, {citation} ({self.decision.decision_date})"
 
     @property
-    def majority(self) -> Optional[Opinion]:
+    def majority(self) -> Optional[OpinionReading]:
         for reading in self.opinion_readings:
             if reading.opinion.type == "majority":
                 return reading
         return None
 
-    def get_majority(self) -> Optional[Opinion]:
+    def get_majority(self) -> Optional[OpinionReading]:
         """
         Return the majority OpinionReading, creating it if needed.
         """
@@ -174,12 +174,22 @@ class DecisionReading(Comparable):
         """
         Add one or more Holdings to the majority Opinion of this Decision.
         """
-        if self.get_majority() is None:
+        majority = self.get_majority()
+        if majority is not None:
+            reading_to_use = majority
+        elif len(self.opinion_readings) == 1:
+            reading_to_use = self.opinion_readings[0]
+        elif not self.opinion_readings:
+            self.opinion_readings = [OpinionReading()]
+            reading_to_use = self.opinion_readings[0]
+        else:
             raise AttributeError(
-                "Cannot posit Holding because this Decision has no known majority Opinion."
-                " Try having an Opinion posit the Holding directly."
+                "Cannot determine how to posit the Holding because this DecisionReading "
+                "has multiple OpinionReadings, none of which is linked to a majority "
+                "Opinion. Try using the .posit() method of one of the OpinionReadings "
+                "on this object's `opinion_readings` attribute."
             )
-        self.majority.posit(
+        reading_to_use.posit(
             holdings=holdings,
             holding_anchors=holding_anchors,
             named_anchors=named_anchors,
