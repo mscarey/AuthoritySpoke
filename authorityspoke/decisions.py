@@ -93,9 +93,11 @@ class DecisionReading(Comparable):
 
     @property
     def holdings(self) -> HoldingGroup:
-        if self.decision.majority is None:
-            return HoldingGroup()
-        return HoldingGroup(self.majority.holdings)
+        if self.majority is not None:
+            return HoldingGroup(self.majority.holdings)
+        elif len(self.opinion_readings) == 1:
+            return HoldingGroup(self.opinion_readings[0].holdings)
+        return HoldingGroup()
 
     def add_opinion(self, opinion: Opinion) -> None:
         if not self.decision.casebody:
