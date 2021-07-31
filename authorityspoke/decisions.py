@@ -35,14 +35,6 @@ class CaseData(BaseModel):
     opinions: List[Opinion] = []
     judges: List[str] = []
 
-    @validator("opinions", each_item=True)
-    def check_opinion_type(cls, v):
-        """Convert Opinion from CAPOpinion if needed."""
-        if not isinstance(v, Opinion):
-            values = v.dict()
-            return Opinion(**values)
-        return v
-
 
 class CaseBody(BaseModel):
     data: CaseData
