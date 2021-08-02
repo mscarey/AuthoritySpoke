@@ -92,31 +92,31 @@ class TestOpinionText:
             "ideas" in anchor[0].exact for anchor in feist.factor_anchors.values()
         )
 
-    def test_select_opinion_text_for_factor(self, make_opinion_with_holding):
-        oracle = make_opinion_with_holding["oracle_majority"]
+    def test_select_opinion_text_for_factor(self, make_decision_with_holding):
+        oracle = make_decision_with_holding["oracle"]
         anchor = oracle.holdings[0].anchors[0]
-        selected = oracle.select_text(selector=anchor)
+        selected = oracle.select_text(selector=anchor, opinion_type="majority")
         assert str(selected) == "…must be “original” to qualify…"
 
-    def test_select_opinion_text_for_enactment(self, make_opinion_with_holding):
-        oracle = make_opinion_with_holding["oracle_majority"]
+    def test_select_opinion_text_for_enactment(self, make_decision_with_holding):
+        oracle = make_decision_with_holding["oracle"]
         enactment_name = str(oracle.holdings[0].enactments[0])
-        anchor = oracle.enactment_anchors[enactment_name][0]
-        selected = oracle.select_text(selector=anchor)
+        anchor = oracle.majority.enactment_anchors[enactment_name][0]
+        selected = oracle.select_text(selector=anchor, opinion_type="majority")
         assert str(selected) == "…17 U.S.C. § 102(a)…"
 
-    def test_select_opinion_text_for_holding(self, make_opinion_with_holding):
-        oracle = make_opinion_with_holding["oracle_majority"]
+    def test_select_opinion_text_for_holding(self, make_decision_with_holding):
+        oracle = make_decision_with_holding["oracle"]
         holding = oracle.holdings[0]
         anchor = holding.anchors[0]
-        selected = oracle.select_text(selector=anchor)
+        selected = oracle.select_text(selector=anchor, opinion_type="majority")
         assert str(selected) == "…must be “original” to qualify…"
 
-    def test_invalid_text_selector(self, make_opinion_with_holding):
-        oracle = make_opinion_with_holding["oracle_majority"]
+    def test_invalid_text_selector(self, make_decision_with_holding):
+        oracle = make_decision_with_holding["oracle"]
         anchor = TextQuoteSelector(exact="text not in opinion")
         with pytest.raises(TextSelectionError):
-            _ = oracle.select_text(selector=anchor)
+            _ = oracle.decision.majority.select_text(selector=anchor)
 
 
 class TestOpinionHoldings:
@@ -396,9 +396,13 @@ class TestContradiction:
         oracle = make_opinion_with_holding["oracle_majority"]
         lotus = make_opinion_with_holding["lotus_majority"]
 
-        left = OpinionReading(opinion=oracle)
+        left = OpinionReading(
+            opinion_type="majority", opinion_author=oracle.opinion_author
+        )
         left.posit(lotus.holdings[6])
-        right = OpinionReading(opinion=lotus)
+        right = OpinionReading(
+            opinion_type="majority", opinion_author=lotus.opinion_author
+        )
         right.posit(oracle.holdings[10])
         explanation = left.explain_contradiction(right)
         assert len(explanation.reasons) == 1

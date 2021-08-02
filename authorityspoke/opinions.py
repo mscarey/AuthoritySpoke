@@ -414,30 +414,6 @@ class OpinionReading(Comparable):
         """
         return (self >= other) and (self != other)
 
-    def select_text(
-        self,
-        selector: Union[
-            bool,
-            str,
-            TextPositionSelector,
-            TextQuoteSelector,
-            Sequence[
-                Union[str, Tuple[int, int], TextQuoteSelector, TextPositionSelector]
-            ],
-        ],
-    ) -> Optional[str]:
-        r"""
-        Get text using a :class:`.TextQuoteSelector`.
-
-        :param selector:
-            a selector referencing a text passage in the :class:`Opinion`.
-
-        :returns:
-            the text referenced by the selector, or ``None`` if the text
-            can't be found.
-        """
-        return self.opinion.select_text(selector)
-
 
 class FactorIndex(Dict[str, Factor]):
     r"""Index of :class:`.Factor`/s that may share common anchors."""

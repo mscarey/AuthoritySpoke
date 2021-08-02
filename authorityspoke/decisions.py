@@ -3,9 +3,9 @@ from __future__ import annotations
 import datetime
 import operator
 from typing import Iterable, Iterator, List
-from typing import Optional, Sequence, Union
+from typing import Optional, Sequence, Tuple, Union
 
-from anchorpoint.textselectors import TextQuoteSelector
+from anchorpoint.textselectors import TextQuoteSelector, TextPositionSelector
 from justopinion.decisions import CAPDecision as Decision
 
 from justopinion.decisions import (
@@ -67,24 +67,57 @@ class DecisionReading(Comparable):
                 return reading
         return None
 
-    def find_opinion_matching_reading(
+    def find_matching_opinion(
         self,
-        opinion_reading: OpinionReading,
+        opinion_type: str = "",
+        opinion_author: str = "",
     ) -> Optional[Opinion]:
-        if not opinion_reading.opinion_type and not opinion_reading.opinion_author:
+        if not opinion_type and not opinion_author:
             if len(self.decision.opinions) == 1:
                 return self.decision.opinions[0]
             return None
         for opinion in self.decision.opinions:
-            if (
-                (opinion_reading.opinion_type == opinion.type)
-                or not opinion_reading.opinion_type
-            ) and (
-                (opinion_reading.opinion_author == opinion.author)
-                or not opinion_reading.opinion_author
+            if ((opinion_type == opinion.type) or not opinion_type) and (
+                (opinion_author == opinion.author) or not opinion_author
             ):
                 return opinion
         return None
+
+    def find_opinion_matching_reading(
+        self,
+        opinion_reading: OpinionReading,
+    ) -> Optional[Opinion]:
+        return self.find_matching_opinion(
+            opinion_type=opinion_reading.opinion_type,
+            opinion_author=opinion_reading.opinion_author,
+        )
+
+    def select_text(
+        self,
+        selector: Union[
+            bool,
+            str,
+            TextPositionSelector,
+            TextQuoteSelector,
+            Sequence[
+                Union[str, Tuple[int, int], TextQuoteSelector, TextPositionSelector]
+            ],
+        ],
+        opinion_type: str = "",
+        opinion_author: str = "",
+    ) -> Optional[str]:
+        r"""
+        Get text using a :class:`.TextQuoteSelector`.
+
+        :param selector:
+            a selector referencing a text passage in the :class:`Opinion`.
+
+        :returns:
+            the text referenced by the selector, or ``None`` if the text
+            can't be found.
+        """
+        opinion = self.find_matching_opinion(opinion_type, opinion_author)
+        return opinion.select_text(selector)
 
     def add_opinion_reading(self, opinion_reading: OpinionReading) -> None:
         matching_opinion = self.find_opinion_matching_reading(opinion_reading)
