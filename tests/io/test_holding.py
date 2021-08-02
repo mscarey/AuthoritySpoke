@@ -215,17 +215,16 @@ class TestHoldingImport:
         assert isinstance(holdings[0], Holding)
         assert isinstance(named_anchors.popitem()[1].pop(), TextQuoteSelector)
 
-    def test_load_and_posit_holdings_with_anchors(self, make_opinion, make_response):
+    def test_load_and_posit_holdings_with_anchors(self, make_response):
         """
         Test that Opinion.posit can take a HoldingsIndexed as the only argument.
         Trying to combine several tasks that normally happen together, into a single command.
         """
         mock_client = FakeClient(responses=make_response)
-        oracle = make_opinion["oracle_majority"]
         oracle_holdings_with_anchors = loaders.read_anchored_holdings_from_file(
             "holding_oracle.json", client=mock_client
         )
-        reading = OpinionReading(opinion=oracle)
+        reading = OpinionReading()
         reading.posit(oracle_holdings_with_anchors)
         assert len(reading.holdings) == 20
 
@@ -248,10 +247,9 @@ class TestHoldingImport:
 class TestTextAnchors:
     client = Client(api_token=TOKEN)
 
-    def test_read_holding_with_no_anchor(self, make_opinion, make_analysis):
-        oracle = make_opinion["oracle_majority"]
+    def test_read_holding_with_no_anchor(self, make_analysis):
         raw_analysis = make_analysis["no anchors"]
-        reading = OpinionReading(opinion=oracle)
+        reading = OpinionReading()
         (
             oracle_holdings,
             holding_anchors,
@@ -272,13 +270,10 @@ class TestTextAnchors:
         new_factor = built.outputs[0].to_effect.terms[0]
         assert new_factor.name == "Bradley"
 
-    def test_posit_one_holding_with_anchor(
-        self, make_opinion, raw_holding, make_response
-    ):
+    def test_posit_one_holding_with_anchor(self, raw_holding, make_response):
         mock_client = FakeClient(responses=make_response)
         holding = readers.read_holding(raw_holding["bradley_house"], client=mock_client)
-        cardenas = make_opinion["cardenas_majority"]
-        reading = OpinionReading(opinion=cardenas)
+        reading = OpinionReading()
         reading.posit_holding(
             holding,
             holding_anchors=TextQuoteSelector(
@@ -503,28 +498,24 @@ class TestTextAnchors:
         new_fact = holdings[1].inputs[3]
         assert "was no more than 35 foot" in str(new_fact)
 
-    def test_use_int_not_pint_without_dimension(self, make_opinion, make_response):
+    def test_use_int_not_pint_without_dimension(self, make_response):
         mock_client = FakeClient(responses=make_response)
-        brad = make_opinion["brad_majority"]
         to_read = load_holdings("holding_brad.json")
         holdings = readers.read_holdings(to_read, client=mock_client)
-        reading = OpinionReading(opinion=brad, holdings=holdings)
+        reading = OpinionReading(holdings=holdings)
         expectation_not_reasonable = list(reading.holdings)[6]
         assert "dimensionless" not in str(expectation_not_reasonable)
         assert isinstance(expectation_not_reasonable.inputs[0].predicate.quantity, int)
 
-    def test_opinion_posits_holding(self, make_opinion, make_response):
+    def test_opinion_posits_holding(self, make_response):
         mock_client = FakeClient(responses=make_response)
-        brad = make_opinion["brad_majority"]
         to_read = load_holdings("holding_brad.json")
         holdings = readers.read_holdings(to_read, client=mock_client)
-        reading = OpinionReading(opinion=brad)
+        reading = OpinionReading()
         reading.posit(holdings[0])
         assert "warrantless search and seizure" in reading.holdings[0].short_string
 
-    def test_opinion_posits_holding_tuple_context(
-        self, make_opinion, make_entity, make_response
-    ):
+    def test_opinion_posits_holding_tuple_context(self, make_entity, make_response):
         """
         Having the Watt case posit a holding from the Brad
         case, but with generic factors from Watt.
@@ -535,8 +526,7 @@ class TestTextAnchors:
         context_holding = brad_holdings[6].new_context(
             [make_entity["watt"], make_entity["trees"], make_entity["motel"]]
         )
-        watt = make_opinion["watt_majority"]
-        reading = OpinionReading(opinion=watt)
+        reading = OpinionReading()
         reading.posit(context_holding)
         holding_string = reading.holdings[-1].short_string
         assert (
@@ -544,20 +534,16 @@ class TestTextAnchors:
             in holding_string
         )
 
-    def test_opinion_posits_holding_dict_context(
-        self, make_opinion, make_entity, make_response
-    ):
+    def test_opinion_posits_holding_dict_context(self, make_entity, make_response):
         """
         Having the Watt case posit a holding from the Brad
         case, but replacing one generic factor with a factor
         from Watt.
         """
         mock_client = FakeClient(responses=make_response)
-        watt = make_opinion["watt_majority"]
-        brad = make_opinion["brad_majority"]
         to_read = load_holdings("holding_brad.json")
         holdings = readers.read_holdings(to_read, client=mock_client)
-        breading = OpinionReading(opinion=brad)
+        breading = OpinionReading()
         breading.clear_holdings()
         breading.posit(holdings)
         expectation_not_reasonable = breading.holdings[6]
@@ -567,22 +553,19 @@ class TestTextAnchors:
             value=make_entity["watt"],
         )
         context_holding = expectation_not_reasonable.new_context(changes)
-        wreading = OpinionReading(opinion=watt)
+        wreading = OpinionReading()
         wreading.clear_holdings()
         wreading.posit(context_holding)
         string = str(context_holding)
         assert "<Wattenburg> lived at <Bradley's house>" in string
         assert "<Wattenburg> lived at <Bradley's house>" in str(wreading.holdings[-1])
 
-    def test_holding_with_non_generic_value(
-        self, make_opinion, make_entity, make_response
-    ):
+    def test_holding_with_non_generic_value(self, make_entity, make_response):
         """
         This test originally required a ValueError, but why should it?
         """
         mock_client = FakeClient(responses=make_response)
-        brad = make_opinion["brad_majority"]
-        reading = OpinionReading(opinion=brad)
+        reading = OpinionReading()
         to_read = load_holdings("holding_brad.json")
         holdings = readers.read_holdings(to_read, client=mock_client)
         reading.posit(holdings)
@@ -635,8 +618,7 @@ class TestTextAnchors:
         ) = readers.read_holdings_with_anchors(make_analysis["minimal"])
 
         brad = make_opinion["brad_majority"]
-        reading = OpinionReading(opinion=brad)
-        reading.clear_holdings()
+        reading = OpinionReading(opinion_type="majority", opinion_author=brad.author)
         reading.posit(holdings, holding_anchors=holding_anchors)
         assert reading.holdings[0].anchors[0].exact == "open fields or grounds"
 

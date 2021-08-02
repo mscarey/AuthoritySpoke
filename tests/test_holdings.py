@@ -246,7 +246,7 @@ class TestImplication:
         self, make_opinion_with_holding, make_opinion
     ):
         lotus = make_opinion["lotus_majority"]
-        reading = OpinionReading(opinion=lotus)
+        reading = OpinionReading()
         holding = make_opinion_with_holding["oracle_majority"].holdings[0]
         context = ContextRegister()
         context.insert_pair(

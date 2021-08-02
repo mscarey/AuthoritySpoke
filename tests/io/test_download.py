@@ -61,12 +61,12 @@ class TestDownload:
     @pytest.mark.default_cassette("TestDownload.test_download_case_by_cite.yaml")
     @pytest.mark.vcr
     def test_decision_without_opinion_posits_holding(self, make_holding):
-        """Test that a blank opinion is created when the decision doesn't have an opinion."""
+        """Test that a blank OpinionReading is created for a decision's Holding."""
         decision = self.client.read_cite("49 F.3d 807")
         reading = DecisionReading(decision=decision)
         reading.posit(make_holding["h2"])
         assert len(reading.holdings) == 1
-        assert reading.casebody.status != "ok"
+        assert len(reading.opinion_readings[0].holdings) == 1
 
     @pytest.mark.default_cassette("TestDownload.test_full_case_download.yaml")
     @pytest.mark.vcr

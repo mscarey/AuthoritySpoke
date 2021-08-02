@@ -40,13 +40,11 @@ class TestLoadOpinion:
         assert opinion.type == "concurring-in-part-and-dissenting-in-part"
 
     def test_empty_holding_list_when_loading_opinion(self):
-        opinion = Opinion(type="majority")
-        reading = OpinionReading(opinion=opinion, holdings=[])
+        reading = OpinionReading(opinion_type="majority", holdings=[])
         assert isinstance(reading.holdings, HoldingGroup)
 
     def test_loading_opinion_with_one_holding_in_list(self, make_holding):
-        opinion = Opinion(type="majority")
-        reading = OpinionReading(opinion=opinion, holdings=[make_holding["h1"]])
+        reading = OpinionReading(holdings=[make_holding["h1"]])
         assert isinstance(reading.holdings, HoldingGroup)
         assert len(reading.holdings) == 1
 
