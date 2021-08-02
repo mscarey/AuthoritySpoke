@@ -48,7 +48,7 @@ class TestOpinions:
         watt = make_opinion["watt_majority"]
         h = real_holding
         e = make_entity
-        reading = OpinionReading(opinion=watt)
+        reading = OpinionReading(opinion_type=watt.type, opinion_author=watt.author)
         reading.posit(h["h1"], context=(e["motel"], e["watt"]))
         reading.posit(h["h2"], context=(e["trees"], e["motel"]))
         reading.posit(
@@ -385,9 +385,9 @@ class TestImplication:
         self, make_holding, make_decision_with_holding
     ):
         watt = make_decision_with_holding["watt"]
-        opinion = OpinionReading(opinion=watt.decision.opinions[0])
-        opinion.posit(watt.holdings[0])
-        assert opinion.implied_by(watt)
+        reading = OpinionReading()
+        reading.posit(watt.holdings[0])
+        assert reading.implied_by(watt)
 
 
 class TestContradiction:
