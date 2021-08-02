@@ -1503,7 +1503,8 @@ def make_decision_with_holding(make_response):
             decision=decision,
             opinion_readings=[
                 OpinionReading(
-                    opinion=decision.majority,
+                    opinion_type=decision.majority.type,
+                    opinion_author=decision.majority.author,
                     holdings=holdings,
                     holding_anchors=holding_anchors,
                     factor_anchors=named_anchors,

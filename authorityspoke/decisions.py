@@ -50,13 +50,10 @@ class DecisionReading(Comparable):
         self, decision: Decision, opinion_readings: List[OpinionReading] = None
     ):
         self.decision = decision
-        self.opinion_readings = opinion_readings or []
-        for opinion in self.decision.opinions:
-            if not any(
-                opinion.text == reading.opinion.text
-                for reading in self.opinion_readings
-            ):
-                self.opinion_readings.append(OpinionReading(opinion=opinion))
+        self.opinion_readings: List[OpinionReading] = []
+        incoming_readings = opinion_readings or []
+        for reading in incoming_readings:
+            self.add_opinion_reading(reading)
 
     def __str__(self):
         citation = self.decision.citations[0].cite if self.decision.citations else ""
@@ -66,9 +63,39 @@ class DecisionReading(Comparable):
     @property
     def majority(self) -> Optional[OpinionReading]:
         for reading in self.opinion_readings:
-            if reading.opinion.type == "majority":
+            if reading.opinion_type == "majority":
                 return reading
         return None
+
+    def find_opinion_matching_reading(
+        self,
+        opinion_reading: OpinionReading,
+    ) -> Optional[Opinion]:
+        if not opinion_reading.opinion_type and not opinion_reading.opinion_author:
+            if len(self.decision.opinions) == 1:
+                return self.decision.opinions[0]
+            return None
+        for opinion in self.decision.opinions:
+            if (
+                (opinion_reading.opinion_type == opinion.type)
+                or not opinion_reading.opinion_type
+            ) and (
+                (opinion_reading.opinion_author == opinion.author)
+                or not opinion_reading.opinion_author
+            ):
+                return opinion
+        return None
+
+    def add_opinion_reading(self, opinion_reading: OpinionReading) -> None:
+        matching_opinion = self.find_opinion_matching_reading(opinion_reading)
+        if matching_opinion:
+            opinion_reading.opinion_type = (
+                matching_opinion.type or opinion_reading.opinion_type
+            )
+            opinion_reading.opinion_author = (
+                matching_opinion.author or opinion_reading.opinion_author
+            )
+        self.opinion_readings.append(opinion_reading)
 
     def get_majority(self) -> Optional[OpinionReading]:
         """
@@ -79,8 +106,11 @@ class DecisionReading(Comparable):
             return majority
         for opinion in self.decision.opinions:
             if opinion.type == "majority":
-                self.opinion_readings.append(OpinionReading(opinion=opinion))
-                return opinion
+                new_reading = OpinionReading(
+                    opinion_type=opinion.type, opinion_author=opinion.author
+                )
+                self.opinion_readings.append(new_reading)
+                return new_reading
         return None
 
     @property

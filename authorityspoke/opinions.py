@@ -46,7 +46,8 @@ class OpinionReading(Comparable):
 
     def __init__(
         self,
-        opinion: Optional[Opinion] = None,
+        opinion_type: str = "",
+        opinion_author: str = "",
         holdings: Sequence = HoldingGroup(),
         factor_anchors: TextLinkDict = {},
         enactment_anchors: TextLinkDict = {},
@@ -54,7 +55,8 @@ class OpinionReading(Comparable):
     ) -> None:
 
         super().__init__()
-        self.opinion = opinion
+        self.opinion_author = opinion_author
+        self.opinion_type = opinion_type
         if not isinstance(holdings, HoldingGroup):
             holdings = HoldingGroup(holdings)
         self.holdings = holdings

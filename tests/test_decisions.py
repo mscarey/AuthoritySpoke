@@ -37,11 +37,13 @@ class TestDecision:
         with pytest.raises(AttributeError):
             decision.posit(make_holding["h1"])
 
-    def test_decision_reading_has_opinion_readings(self, make_decision):
+    def test_decision_reading_has_opinion_readings(self, make_decision, make_holding):
         watt = make_decision["watt"]
         reading = DecisionReading(decision=watt)
+        reading.posit(make_holding["h1"])
         hamley = "hamley, circuit judge"
-        assert reading.opinion_readings[0].opinion.author.lower() == hamley
+        assert reading.opinion_readings[0].opinion_author.lower() == hamley
+        assert reading.opinion_readings[0].holdings[0].means(make_holding["h1"])
 
     def test_decision_posits_holding(self, fake_usc_client, make_decision):
         lotus_analysis = read_anchored_holdings_from_file(
@@ -50,6 +52,7 @@ class TestDecision:
         lotus_reading = DecisionReading(decision=make_decision["lotus"])
         lotus_reading.posit(lotus_analysis)
         assert len(lotus_reading.majority.holdings) == len(lotus_analysis.holdings)
+        assert str(lotus_reading).startswith("Reading for Lotus Development Corp.")
 
     def test_decision_with_opinion_reading_posits_holding(self, fake_usc_client):
         lotus_analysis = read_anchored_holdings_from_file(
@@ -57,7 +60,7 @@ class TestDecision:
         )
         decision_reading = DecisionReading(
             decision=Decision(decision_date=date(2000, 2, 2)),
-            opinion_readings=[OpinionReading(opinion=Opinion(type="plurality"))],
+            opinion_readings=[OpinionReading(opinion_type="plurality")],
         )
         decision_reading.posit(lotus_analysis)
         assert len(decision_reading.holdings) == len(lotus_analysis.holdings)
@@ -66,8 +69,8 @@ class TestDecision:
         lotus_analysis = read_anchored_holdings_from_file(
             "holding_lotus.yaml", client=fake_usc_client
         )
-        reading1 = OpinionReading(opinion=Opinion(type="plurality"))
-        reading2 = OpinionReading(opinion=Opinion(type="concurring"))
+        reading1 = OpinionReading(opinion_type="plurality")
+        reading2 = OpinionReading(opinion_type="concurring")
         decision_reading = DecisionReading(
             decision=Decision(decision_date=date(2000, 2, 2)),
             opinion_readings=[reading1, reading2],
