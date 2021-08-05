@@ -594,5 +594,5 @@ we created from the data we downloaded from the CAP API. Then we can verify that
 those two Holdings are now considered the two holdings of the Decision.
 
     >>> licensing_case_reading.posit(both_holdings_with_anchors)
-    >>> len(licensing_case.holdings)
+    >>> len(licensing_case_reading.holdings)
     2

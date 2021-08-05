@@ -161,9 +161,9 @@ below with ``USE_REAL_CASE_API`` set to True will attempt to overwrite
 it with data from the API. You should be able to run the rest of the
 tutorial code either way.
 
-    >>> from authorityspoke import LegisClient
+    >>> from authorityspoke import CAPClient
     >>> if USE_REAL_CASE_API:
-    ...     case_client = LegisClient(api_token=CAP_API_KEY)
+    ...     case_client = CAPClient(api_token=CAP_API_KEY)
     ...     oracle_case = case_client.read_cite(cite="750 F.3d 1339")
 
 Now we have a record representing the *Oracle* case, which can also be
@@ -334,12 +334,12 @@ This will also link the correct text passages from
 the :class:`~authorityspoke.opinions.Opinion` to
 each :class:`~authorityspoke.holdings.Holding`\.
 
-    >>> from authorityspoke import authorityspoke
+    >>> from authorityspoke import Decision, DecisionReading
     >>> from authorityspoke.io.loaders import read_anchored_holdings_from_file
     >>> oracle_holdings_with_anchors = read_anchored_holdings_from_file("holding_oracle.json", client=legis_client)
     >>> lotus_holdings_with_anchors = read_anchored_holdings_from_file("holding_lotus.json", client=legis_client)
-    >>> oracle = DecisionReading(oracle_holdings_with_anchors)
-    >>> lotus = DecisionReading(lotus_holdings_with_anchors)
+    >>> oracle = DecisionReading(decision=oracle_case)
+    >>> lotus = DecisionReading(decision=lotus_case)
     >>> oracle.posit(oracle_holdings_with_anchors)
     >>> lotus.posit(lotus_holdings_with_anchors)
 
@@ -816,8 +816,8 @@ Adding Holdings to One Another
 To try out the addition operation, let’s load another case from the
 ``example_data`` folder.
 
-    >>> feist_as_dict = load_decision("feist_h.json")
-    >>> feist = Decision(**feist_as_dict)
+    >>> feist_case = read_decision(load_decision("feist_h.json"))
+    >>> feist = DecisionReading(decision=feist_case)
     >>> feist.posit(read_anchored_holdings_from_file("holding_feist.json", client=legis_client))
 
 

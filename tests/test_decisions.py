@@ -21,6 +21,10 @@ class TestDecision:
         assert reading.majority is None
         assert not reading.implied_by(None)
 
+    def test_decision_reading_with_opinion_instead_of_decision(self, make_opinion):
+        with pytest.raises(TypeError):
+            DecisionReading(decision=make_opinion["lotus_majority"])
+
     def test_posit_holdings(self, make_decision, make_holding):
         """
         "Positing" Holdings causes the Holdings to be assigned to the Decision's

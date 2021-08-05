@@ -1,4 +1,5 @@
 from collections import OrderedDict
+from datetime import date
 import os
 from marshmallow import ValidationError
 import pytest
@@ -11,7 +12,7 @@ from nettlesome.terms import ContextRegister
 from nettlesome.entities import Entity
 from nettlesome.predicates import Predicate
 
-from authorityspoke.decisions import DecisionReading
+from authorityspoke.decisions import Decision, DecisionReading
 from authorityspoke.facts import Fact
 from authorityspoke.holdings import Holding, HoldingGroup
 from authorityspoke.opinions import Opinion, OpinionReading
@@ -225,6 +226,15 @@ class TestHoldingImport:
             "holding_oracle.json", client=mock_client
         )
         reading = OpinionReading()
+        reading.posit(oracle_holdings_with_anchors)
+        assert len(reading.holdings) == 20
+
+    def test_decision_posits_holdings_with_anchors(self, make_response):
+        mock_client = FakeClient(responses=make_response)
+        oracle_holdings_with_anchors = loaders.read_anchored_holdings_from_file(
+            "holding_oracle.json", client=mock_client
+        )
+        reading = DecisionReading(decision=Decision(decision_date=date(2019, 1, 1)))
         reading.posit(oracle_holdings_with_anchors)
         assert len(reading.holdings) == 20
 

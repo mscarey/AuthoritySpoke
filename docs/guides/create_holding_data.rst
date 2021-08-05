@@ -41,9 +41,9 @@ Next, we can download the judicial decisions we’re going to compare.
 Then we convert the JSON responses from the API
 into :class:`authorityspoke.decisions.DecisionReading` objects.
 
-    >>> from authorityspoke import Decision
-    >>> oracle_decision = Decision(**oracle_download).majority
-    >>> lotus_decision = Decision(**lotus_download).majority
+    >>> from authorityspoke import Decision, DecisionReading
+    >>> oracle_decision = Decision(**oracle_download)
+    >>> lotus_decision = Decision(**lotus_download)
     >>> oracle = DecisionReading(decision=oracle_decision)
     >>> lotus = DecisionReading(decision=lotus_decision)
 

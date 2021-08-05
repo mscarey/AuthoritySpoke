@@ -49,6 +49,8 @@ class DecisionReading(Comparable):
     def __init__(
         self, decision: Decision, opinion_readings: List[OpinionReading] = None
     ):
+        if not isinstance(decision, Decision):
+            raise TypeError(f"Expected Decision, got {decision.__class__}.")
         self.decision = decision
         self.opinion_readings: List[OpinionReading] = []
         incoming_readings = opinion_readings or []
