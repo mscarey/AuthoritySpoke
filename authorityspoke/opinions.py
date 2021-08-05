@@ -14,7 +14,7 @@ import re
 from dataclasses import dataclass, field
 
 from anchorpoint.textselectors import TextQuoteSelector, TextPositionSelector
-from justopinion.decisions import CAPOpinion as Opinion
+from justopinion.decisions import Opinion
 from nettlesome.terms import Comparable, ContextRegister, Explanation
 from nettlesome.factors import Factor
 from pydantic import BaseModel, Field, validator

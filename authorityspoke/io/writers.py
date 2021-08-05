@@ -4,14 +4,14 @@ import pathlib
 
 from typing import Dict, List, Optional, Union
 
-from justopinion.decisions import CAPDecision
+from justopinion.decisions import Decision
 
 from authorityspoke.decisions import Decision
 from authorityspoke.io import filepaths
 
 
 def case_to_file(
-    case: Union[CAPDecision, Decision],
+    case: Union[Decision, Decision],
     filename: Optional[str] = None,
     directory: Optional[pathlib.Path] = None,
     filepath: Optional[pathlib.Path] = None,

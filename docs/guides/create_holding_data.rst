@@ -39,11 +39,13 @@ Next, we can download the judicial decisions we’re going to compare.
     ...     lotus_download = load_decision("lotus_h.json")
 
 Then we convert the JSON responses from the API
-into :class:`authorityspoke.opinions.Opinion` objects.
+into :class:`authorityspoke.decisions.DecisionReading` objects.
 
     >>> from authorityspoke import Decision
-    >>> oracle = Decision(**oracle_download).majority
-    >>> lotus = Decision(**lotus_download).majority
+    >>> oracle_decision = Decision(**oracle_download).majority
+    >>> lotus_decision = Decision(**lotus_download).majority
+    >>> oracle = DecisionReading(decision=oracle_decision)
+    >>> lotus = DecisionReading(decision=lotus_decision)
 
 And we need a :class:`~legislice.download.Client` for
 accessing legislative provisions.
@@ -133,11 +135,10 @@ AuthoritySpoke object.
      'anchors': 'By statute, a work |must be “original” to qualify| for'}
 
 To compare the input data to the created Python objects, link
-the Holdings to the :class:`~authorityspoke.opinions.Opinion` using
-the :meth:`~authorityspoke.opinions.Opinion.posit` method. As we look at
+the Holdings to the :class:`~authorityspoke.opinions.OpinionReading` using
+the :meth:`~authorityspoke.opinions.OpinionReading.posit` method. As we look at
 the parts of the JSON file, the code cells will show how fields from the
-JSON affect the structure of the :class:`~authorityspoke.holdings.Holding` object.
-
+JSON affect the structure of the :class:`~authorityspoke.holdings.Holding`.
     >>> oracle.posit(oracle_holdings)
     >>> lotus.posit(lotus_holdings)
     >>> print(oracle.holdings[0])

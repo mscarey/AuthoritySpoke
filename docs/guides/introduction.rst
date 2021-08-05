@@ -45,7 +45,7 @@ up <https://authorityspoke.com/account/signup/>`__ for an account and
 then obtain a Legislice API key from your account page. The Legislice
 API key is not the same as the Caselaw Access Project API key.
 
-As of version 0.4, you mostly have to create your own procedural rule
+In the current version, you mostly have to create your own procedural rule
 annotations, but the ``example_data`` folder of the `GitHub repository
 for AuthoritySpoke <https://github.com/mscarey/AuthoritySpoke>`__
 contains example annotations for several cases. The rest of this
@@ -108,14 +108,14 @@ notebook is running.
     >>> from authorityspoke.io.loaders import load_decision
     >>> from authorityspoke.io.readers import read_decision
     >>> if not USE_REAL_CASE_API:
-    ...     oracle_download = load_decision("oracle_h.json")
-    ...     lotus_download = load_decision("lotus_h.json")
+    ...     oracle_case = read_decision(load_decision("oracle_h.json"))
+    ...     lotus_case = read_decision(load_decision("lotus_h.json"))
 
 Downloading and Importing Decisions
 --------------------------------------
 
 If you didn’t load court opinions from the GitHub repository as
-described in section 1.1, then you’ll be using the Caselaw Access
+described above, then you’ll be using the Caselaw Access
 Project (CAP) API to get court opinions to load into AuthoritySpoke. To
 download full cases from CAP, you’ll need to `register for a CAP API
 key <https://case.law/user/register/>`__.
@@ -129,11 +129,6 @@ Python package to load the API key as an environment variable without
 ever writing the API key in the notebook. That makes it easier to keep
 your API key secret, even if you publish your copy of the notebook and
 make it visible on the internet.
-
-However, if you’re viewing this tutorial in a cloud environment like
-Binder, you probably won’t be able to create an environment variable.
-Instead, you could replace ``os.getenv('CAP_API_KEY')`` with a string
-containing your own API key.
 
     >>> import os
     >>> from dotenv import load_dotenv
@@ -160,22 +155,22 @@ uncopyrightable because it was a “method of operation” under the
 Copyright Act. As we’ll see, the Oracle case discusses and disagrees
 with the Lotus case.
 
-If you already loaded an :class:`~authorityspoke.opinions.Opinion`
+If you already loaded a :class:`~authorityspoke.decisions.Decision`
 from a file, running the cells
 below with ``USE_REAL_CASE_API`` set to True will attempt to overwrite
-them with data from the API. You should be able to run the rest of the
+it with data from the API. You should be able to run the rest of the
 tutorial code either way.
 
     >>> from authorityspoke import LegisClient
     >>> if USE_REAL_CASE_API:
-    ...     client = LegisClient(api_token=CAP_API_KEY)
-    ...     oracle_download = client.fetch(cite="750 F.3d 1339")
+    ...     case_client = LegisClient(api_token=CAP_API_KEY)
+    ...     oracle_case = case_client.read_cite(cite="750 F.3d 1339")
 
 Now we have a record representing the *Oracle* case, which can also be
 found in the “example_data/opinions” folder under the filename
 “oracle_h.json”. Let’s look at a field from the API response.
 
-    >>> oracle_download["name"]
+    >>> oracle_case.name
     'ORACLE AMERICA, INC., Plaintiff-Appellant, v. GOOGLE INC., Defendant-Cross-Appellant'
 
 Yes, this is the correct case name. But if we had provided the API key
@@ -185,31 +180,23 @@ case, and the names of the opinion authors. So let’s request the
 *Oracle* case with ``full_case=True``.
 
     >>> if USE_REAL_CASE_API:
-    ...     oracle_download = download_case(
+    ...     oracle_case = case_client.read_cite(
     ...     cite="750 F.3d 1339",
-    ...     full_case=True,
-    ...     api_key=CAP_API_KEY)
+    ...     full_case=True)
 
 And then do the same for the *Lotus* case.
 
     >>> if USE_REAL_CASE_API:
-    ...    lotus_download = download_case(
+    ...    lotus_case = case_client.read_cite(
     ...    cite="49 F.3d 807",
-    ...    full_case=True,
-    ...    api_key=CAP_API_KEY)
+    ...    full_case=True)
 
-Now let’s convert the *Oracle* API response to an AuthoritySpoke object.
+Now let’s look at the objects we made.
 
-    >>> from authorityspoke import Decision
-    >>> oracle = Decision(**oracle_download)
-
-And take a look at the object we made.
-
-    >>> print(oracle)
+    >>> print(oracle_case)
     Oracle America, Inc. v. Google Inc., 750 F.3d 1339 (2014-05-09)
 
-    >>> lotus = read_decision(lotus_download)
-    >>> print(lotus)
+    >>> print(lotus_case)
     Lotus Development Corp. v. Borland International, Inc., 49 F.3d 807 (1995-03-09)
 
 One judicial :class:`~authorityspoke.decisions.Decision` can include
@@ -219,7 +206,7 @@ as well as a majority opinion.
 Access the ``majority`` attribute of the :class:`~authorityspoke.decisions.Decision`
 object to get the majority opinion.
 
-    >>> print(lotus.majority)
+    >>> print(lotus_case.majority)
     majority opinion by STAHL, Circuit Judge
 
 Downloading Enactments
@@ -347,9 +334,12 @@ This will also link the correct text passages from
 the :class:`~authorityspoke.opinions.Opinion` to
 each :class:`~authorityspoke.holdings.Holding`\.
 
+    >>> from authorityspoke import authorityspoke
     >>> from authorityspoke.io.loaders import read_anchored_holdings_from_file
     >>> oracle_holdings_with_anchors = read_anchored_holdings_from_file("holding_oracle.json", client=legis_client)
     >>> lotus_holdings_with_anchors = read_anchored_holdings_from_file("holding_lotus.json", client=legis_client)
+    >>> oracle = DecisionReading(oracle_holdings_with_anchors)
+    >>> lotus = DecisionReading(lotus_holdings_with_anchors)
     >>> oracle.posit(oracle_holdings_with_anchors)
     >>> lotus.posit(lotus_holdings_with_anchors)
 

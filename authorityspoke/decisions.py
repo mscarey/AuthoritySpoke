@@ -6,7 +6,7 @@ from typing import Iterable, Iterator, List
 from typing import Optional, Sequence, Tuple, Union
 
 from anchorpoint.textselectors import TextQuoteSelector, TextPositionSelector
-from justopinion.decisions import CAPDecision as Decision
+from justopinion.decisions import Decision
 
 from justopinion.decisions import (
     CAPCitation,
@@ -72,16 +72,10 @@ class DecisionReading(Comparable):
         opinion_type: str = "",
         opinion_author: str = "",
     ) -> Optional[Opinion]:
-        if not opinion_type and not opinion_author:
-            if len(self.decision.opinions) == 1:
-                return self.decision.opinions[0]
-            return None
-        for opinion in self.decision.opinions:
-            if ((opinion_type == opinion.type) or not opinion_type) and (
-                (opinion_author == opinion.author) or not opinion_author
-            ):
-                return opinion
-        return None
+        """Find an Opinion described by the given attributes."""
+        return self.decision.find_matching_opinion(
+            opinion_type=opinion_type, opinion_author=opinion_author
+        )
 
     def find_opinion_matching_reading(
         self,

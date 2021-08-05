@@ -51,7 +51,7 @@ convert them into AuthoritySpoke :class:`~authorityspoke.decisions.Decision` obj
 citation of the case we want, we'll use the :meth:`~authorityspoke.io.downloads.CAPClient.read_cite` method.
 
     >>> from authorityspoke.io.downloads import CAPClient
-    >>> from authorityspoke.decisions import Decision, Opinion, CAPCitation
+    >>> from authorityspoke.decisions import DecisionReading, Decision, Opinion, CAPCitation
     >>> if USE_REAL_CASE_API:
     ...     client = CAPClient(api_token=CAP_API_KEY)
     ...     licensing_case = client.read_cite(
@@ -65,6 +65,7 @@ citation of the case we want, we'll use the :meth:`~authorityspoke.io.downloads.
     ...     licensing_case.add_opinion(Opinion())
     >>> print(licensing_case)
     United States v. Mazza-Alaluf, 621 F.3d 205 (2010-09-22)
+    >>> licensing_case_reading = DecisionReading(decision=licensing_case)
 
 If we had used ``full_case=True``, we would have the option to view the full
 text of the majority opinion using the command ``licensing_case.majority.text``.
@@ -586,11 +587,12 @@ Now when we load a file with this YAML, we'll get both Holdings.
     2
 
 Now that we generated this :class:`~authorityspoke.opinions.AnchoredHoldings` object
-containing the data from the YAML file, we can use the posit method to link those
+containing the data from the YAML file, we can use
+the :class:`~authorityspoke.decisions.DecisionReading.posit` method to link those
 :class:`~authorityspoke.holdings.Holding`\s to the judicial :class:`~authorityspoke.decisions.Decision`
 we created from the data we downloaded from the CAP API. Then we can verify that
 those two Holdings are now considered the two holdings of the Decision.
 
-    >>> licensing_case.posit(both_holdings_with_anchors)
+    >>> licensing_case_reading.posit(both_holdings_with_anchors)
     >>> len(licensing_case.holdings)
     2

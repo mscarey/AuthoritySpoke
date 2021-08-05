@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 import eyecite
 import pytest
 
-from justopinion.decisions import CAPDecision
+from justopinion.decisions import Decision
 
 from authorityspoke.io.downloads import CAPClient, CaseAccessProjectAPIError
 from authorityspoke import LegisClient, DecisionReading
@@ -51,7 +51,7 @@ class TestDownload:
         )
         lotus = response[0]
         lotus_opinion = lotus.majority
-        assert lotus_opinion.__class__.__name__ == "CAPOpinion"
+        assert lotus_opinion.__class__.__name__ == "Opinion"
 
     @pytest.mark.vcr
     def test_download_case_by_cite(self):
@@ -77,7 +77,7 @@ class TestDownload:
         filepath = tmp_path / to_file
         lotus_from_file = load_decision(filepath=filepath)
         lotus = Decision(**lotus_from_file)
-        assert lotus.majority.__class__.__name__ == "CAPOpinion"
+        assert lotus.majority.__class__.__name__ == "Opinion"
         assert "Lotus" in lotus.name_abbreviation
 
     def test_error_download_without_case_reference(self):

@@ -8,7 +8,7 @@ from typing import Any, Dict, List, Text, Tuple
 
 from anchorpoint.textselectors import TextQuoteSelector
 from dotenv import load_dotenv
-from justopinion.decisions import CAPDecision, CAPOpinion
+from justopinion.decisions import Decision, Opinion
 from legislice.download import Client
 from legislice.yaml_schemas import ExpandableEnactmentSchema as EnactmentSchema
 from nettlesome.terms import ContextRegister
