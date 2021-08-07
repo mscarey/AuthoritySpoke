@@ -65,7 +65,6 @@ citation of the case we want, we'll use the :meth:`~authorityspoke.io.downloads.
     ...     licensing_case.add_opinion(Opinion())
     >>> print(licensing_case)
     United States v. Mazza-Alaluf, 621 F.3d 205 (2010-09-22)
-    >>> licensing_case_reading = DecisionReading(decision=licensing_case)
 
 If we had used ``full_case=True``, we would have the option to view the full
 text of the majority opinion using the command ``licensing_case.majority.text``.
@@ -587,12 +586,19 @@ Now when we load a file with this YAML, we'll get both Holdings.
     2
 
 Now that we generated this :class:`~authorityspoke.opinions.AnchoredHoldings` object
-containing the data from the YAML file, we can use
-the :class:`~authorityspoke.decisions.DecisionReading.posit` method to link those
-:class:`~authorityspoke.holdings.Holding`\s to the judicial :class:`~authorityspoke.decisions.Decision`
-we created from the data we downloaded from the CAP API. Then we can verify that
-those two Holdings are now considered the two holdings of the Decision.
+containing the data from the YAML file, we can link the :class:`~authorityspoke.holdings.Holding`\s
+to the :class:`~justopinion.decisions.Decision` with
+a :class:`~authorityspoke.decisions.DecisionReading` object.
+While a :class:`~justopinion.decisions.Decision` is a record of what a court actually published,
+a :class:`~authorityspoke.decisions.DecisionReading` represents the user's "reading" of the Decision.
+The DecisionReading indicates what Holdings are supported by the Decision,
+as well as what text passages support each Holding.
 
+We'll use the :meth:`~authorityspoke.decisions.DecisionReading.posit` method to
+link the Holdings to the Decision. Then we can verify that those two Holdings
+are now considered the two holdings of the Decision.
+
+    >>> licensing_case_reading = DecisionReading(decision=licensing_case)
     >>> licensing_case_reading.posit(both_holdings_with_anchors)
     >>> len(licensing_case_reading.holdings)
     2
