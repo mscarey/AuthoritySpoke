@@ -17,37 +17,34 @@ mockups that supply only the testing data for these examples.
     >>> USE_REAL_CASE_API = False
     >>> USE_REAL_LEGISLICE_API = False
 
-Next, we can download the judicial decisions we’re going to compare.
+Next, we can download the judicial decisions we’re going to compare
+and convert the JSON responses from the API
+into :class:`authorityspoke.decisions.DecisionReading` objects.
 
     >>> import os
     >>> from dotenv import load_dotenv
-    >>> from authorityspoke.io.loaders import load_decision
+    >>> from authorityspoke import Decision, DecisionReading
+    >>> from authorityspoke.io.loaders import load_decision_as_reading
     >>> from authorityspoke.io.downloads import CAPClient
     >>> load_dotenv()
     True
     >>> if USE_REAL_CASE_API:
     ...     CAP_API_KEY = os.getenv('CAP_API_KEY')
     ...     client = CAPClient(api_token=CAP_API_KEY)
-    ...     oracle_download = client.read_cite(
+    ...     oracle_decision = client.read_cite(
     ...     cite="750 F.3d 1339",
     ...     full_case=True)
-    ...     lotus_download = client.read_cite(
+    ...     lotus_decision = client.read_cite(
     ...     cite="49 F.3d 807",
     ...     full_case=True)
+    ...     oracle = DecisionReading(oracle_decision)
+    ...     lotus = DecisionReading(lotus_decision)
     ... else:
-    ...     oracle_download = load_decision("oracle_h.json")
-    ...     lotus_download = load_decision("lotus_h.json")
+    ...     oracle = load_decision_as_reading("oracle_h.json")
+    ...     lotus = load_decision_as_reading("lotus_h.json")
 
-Then we convert the JSON responses from the API
-into :class:`authorityspoke.decisions.DecisionReading` objects.
 
-    >>> from authorityspoke import Decision, DecisionReading
-    >>> oracle_decision = Decision(**oracle_download)
-    >>> lotus_decision = Decision(**lotus_download)
-    >>> oracle = DecisionReading(decision=oracle_decision)
-    >>> lotus = DecisionReading(decision=lotus_decision)
-
-And we need a :class:`~legislice.download.Client` for
+And we need a download :class:`~legislice.download.Client` for
 accessing legislative provisions.
 
     >>> import json
