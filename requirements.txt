@@ -2,7 +2,7 @@ anchorpoint~=0.5.2
 apispec[validation]~=4.3.0
 apispec-oneofschema
 eyecite~=2.2.0
--git+git:/github.com/mscarey/justopinion.git@4999049584194de86d75d2f4103e8d06b4b41d24#egg=justopinion
+justopinion~=0.2.1
 legislice>=0.5.2
 marshmallow>=3.10
 marshmallow-oneofschema
