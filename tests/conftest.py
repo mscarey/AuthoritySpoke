@@ -1,4 +1,3 @@
-from authorityspoke.decisions import DecisionReading
 from copy import deepcopy
 import datetime
 import json
@@ -18,6 +17,7 @@ from nettlesome.predicates import Predicate
 from nettlesome.quantities import Comparison, Q_
 import pytest
 
+from authorityspoke.decisions import DecisionReading
 from authorityspoke.evidence import Evidence, Exhibit
 from authorityspoke.facts import Fact, build_fact
 from authorityspoke.holdings import Holding
