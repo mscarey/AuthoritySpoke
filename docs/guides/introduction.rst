@@ -106,10 +106,10 @@ notebook will try to find the data for the fake APIs in the
 notebook is running.
 
     >>> from authorityspoke.io.loaders import load_decision
-    >>> from authorityspoke.io.readers import read_decision
+    >>> from authorityspoke import Decision
     >>> if not USE_REAL_CASE_API:
-    ...     oracle_case = read_decision(load_decision("oracle_h.json"))
-    ...     lotus_case = read_decision(load_decision("lotus_h.json"))
+    ...     oracle_case = Decision(**load_decision("oracle_h.json"))
+    ...     lotus_case = Decision(**load_decision("lotus_h.json"))
 
 Downloading and Importing Decisions
 --------------------------------------
@@ -816,8 +816,8 @@ Adding Holdings to One Another
 To try out the addition operation, let’s load another case from the
 ``example_data`` folder.
 
-    >>> feist_case = read_decision(load_decision("feist_h.json"))
-    >>> feist = DecisionReading(decision=feist_case)
+    >>> from authorityspoke.io.loaders import load_decision_as_reading
+    >>> feist = load_decision_as_reading("feist_h.json")
     >>> feist.posit(read_anchored_holdings_from_file("holding_feist.json", client=legis_client))
 
 

@@ -264,7 +264,7 @@ def read_holdings(
     return schema.load(deepcopy(record))
 
 
-def read_decision(decision: Union[RawDecision, Decision]) -> Decision:
+def read_decision(decision: Union[RawDecision, Decision]) -> DecisionReading:
     r"""
     Create and return a :class:`~authorityspoke.decisions.DecisionReading` from a dict API response.
 

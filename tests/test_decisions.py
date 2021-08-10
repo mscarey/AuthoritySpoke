@@ -36,7 +36,7 @@ class TestDecision:
         reading.posit([make_holding["h1"], make_holding["h2"]])
         assert reading.majority.holdings[-1] == make_holding["h2"]
 
-    def test_need_opinion_to_posit_holding(self, make_holding):
+    def test_need_reading_to_posit_holding(self, make_holding):
         decision = Decision(decision_date=(datetime.date(1900, 1, 1)))
         with pytest.raises(AttributeError):
             decision.posit(make_holding["h1"])

@@ -13,7 +13,7 @@ import yaml
 from legislice.download import Client
 
 
-from authorityspoke.decisions import Decision
+from authorityspoke.decisions import Decision, DecisionReading
 from authorityspoke.holdings import Holding
 from authorityspoke.opinions import AnchoredHoldings
 from authorityspoke.rules import Rule
@@ -226,3 +226,26 @@ def load_decision(
 
     return decision_dict
 
+
+def load_decision_as_reading(
+    filename: Optional[str] = None,
+    directory: Optional[pathlib.Path] = None,
+    filepath: Optional[pathlib.Path] = None,
+) -> DecisionReading:
+    r"""
+    Load file containing a judicial decision with one or more opinions.
+
+    Relies on the JSON format from the `Caselaw Access Project
+    API <https://api.case.law/v1/cases/>`_.
+
+    :param filename: The name of the input JSON file.
+
+    :param directory: The directory where the input JSON file is located.
+
+    :param filepath:
+        Complete path to the JSON file representing the :class:`.Opinion`,
+        including filename.
+    """
+
+    loaded = load_decision(filename=filename, directory=directory, filepath=filepath)
+    return readers.read_decision(loaded)
