@@ -1474,7 +1474,7 @@ def load_decisions_for_fixtures():
     decisions = {}
     for case in TEST_CASES:
         decision = loaders.load_decision(f"{case}_h.json")
-        built = readers.read_decision(decision)
+        built = Decision(**decision)
         decisions[case] = built
     return decisions
 

@@ -14,7 +14,7 @@ from legislice.download import Client
 from nettlesome.entities import Entity
 from nettlesome.factors import Factor
 
-from authorityspoke.decisions import Decision
+from authorityspoke.decisions import Decision, DecisionReading
 from authorityspoke.evidence import Exhibit, Evidence
 from authorityspoke.facts import Fact
 from authorityspoke.holdings import Holding
@@ -264,20 +264,19 @@ def read_holdings(
     return schema.load(deepcopy(record))
 
 
-def read_decision(decision_dict: RawDecision) -> Decision:
+def read_decision(decision: Union[RawDecision, Decision]) -> Decision:
     r"""
-    Create and return one or more :class:`.Decision` objects from a dict API response.
+    Create and return a :class:`~authorityspoke.decisions.DecisionReading` from a dict API response.
 
     Relies on the JSON format from the `Caselaw Access Project
     API <https://api.case.law/v1/cases/>`_.
 
-    This function is a more convenient way to call read_opinions with an entire
-    case from the CAP API as a single parameter.
-
     :param decision_dict:
         A dict created from a Caselaw Access Project API response.
     """
-    return Decision(**decision_dict)
+    if not isinstance(decision, Decision):
+        decision = Decision(**decision)
+    return DecisionReading(decision)
 
 
 def read_rules_with_index(

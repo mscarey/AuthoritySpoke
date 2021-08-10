@@ -69,6 +69,10 @@ class DecisionReading(Comparable):
                 return reading
         return None
 
+    @property
+    def opinions(self) -> List[Opinion]:
+        return self.decision.opinions
+
     def find_matching_opinion(
         self,
         opinion_type: str = "",
