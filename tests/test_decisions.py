@@ -43,8 +43,18 @@ class TestDecision:
         reading = DecisionReading(decision=watt, holdings=holdings)
         assert reading.majority.holdings[-1] == make_holding["h2"]
 
-    def test_make_reading_with_anchored_holdings(self, make_decision, make_holding):
-        assert False
+    def test_make_reading_with_anchored_holdings(
+        self, make_decision, make_anchored_holding
+    ):
+        watt = make_decision["watt"]
+        holding = make_anchored_holding["lotus"]
+        reading = DecisionReading(decision=watt, holdings=holding)
+        assert (
+            str(reading.majority.holdings[0].inputs[0]).lower()
+            == "the fact that <the lotus menu command hierarchy> was copyrightable"
+        )
+        assert reading.majority.opinion_author.startswith("HAMLEY")
+        assert reading.decision.opinions[0].author.startswith("HAMLEY")
 
     def test_need_reading_to_posit_holding(self, make_holding):
         decision = Decision(decision_date=(datetime.date(1900, 1, 1)))

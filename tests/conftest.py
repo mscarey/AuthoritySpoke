@@ -1485,20 +1485,27 @@ def make_decision():
 
 
 @pytest.fixture(scope="class")
-def make_decision_with_holding(make_response):
+def make_anchored_holding(make_response, make_decision):
     client_without_api_access = FakeClient(responses=make_response)
-    decisions = load_decisions_for_fixtures()
+    holdings = {}
+    for name in make_decision.keys():
+        holdings[name] = loaders.read_anchored_holdings_from_file(
+            f"holding_{name}.json",
+            client=client_without_api_access,
+        )
+    return holdings
+
+
+@pytest.fixture(scope="class")
+def make_decision_with_holding(make_response, make_decision, make_anchored_holding):
     result = {}
-    for name, decision in decisions.items():
+    for name, decision in make_decision.items():
         (
             holdings,
             holding_anchors,
             named_anchors,
             enactment_anchors,
-        ) = loaders.read_anchored_holdings_from_file(
-            f"holding_{name}.json",
-            client=client_without_api_access,
-        )
+        ) = make_anchored_holding[name]
         result[name] = DecisionReading(
             decision=decision,
             opinion_readings=[
