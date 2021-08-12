@@ -89,7 +89,44 @@ AuthoritySpoke has concluded that these interpretations of the _Lotus_ and _Orac
 
     >>> explanation = lotus.explain_contradiction(oracle)
     >>> str(explanation)
-    'Because <the Lotus menu command hierarchy> is like <the Java API>,\n  the Holding to ACCEPT\n    the Rule that the court MUST ALWAYS impose the\n      RESULT:\n        the fact it was false that <the Lotus menu command hierarchy> was\n        copyrightable\n      GIVEN:\n        the fact that <the Lotus menu command hierarchy> was a method of\n        operation\n      DESPITE:\n        the fact that a text described <the Lotus menu command hierarchy>\n        the fact that <the Lotus menu command hierarchy> was an original work\n      GIVEN the ENACTMENT:\n        "In no case does copyright protection for an original work of authorship extend to any…method of operation…" (/us/usc/t17/s102/b 2013-07-18)\nCONTRADICTS\n  the Holding to ACCEPT\n    the Rule that the court MUST SOMETIMES impose the\n      RESULT:\n        the fact that <the Java API> was copyrightable\n      GIVEN:\n        the fact that <the Java language> was a computer program\n        the fact that <the Java API> was a set of application programming\n        interface declarations\n        the fact that <the Java API> was an original work\n        the fact that <the Java API> was a non-literal element of <the Java\n        language>\n        the fact that <the Java API> was the expression of an idea\n        the fact it was false that <the Java API> was essentially the only way\n        to express the idea that it embodied\n        the fact that <the Java API> was creative\n        the fact that it was possible to use <the Java language> without\n        copying <the Java API>\n      DESPITE:\n        the fact that <the Java API> was a method of operation\n        the fact that <the Java API> contained short phrases\n        the fact that <the Java API> became so popular that it was the\n        industry standard\n        the fact that there was a preexisting community of programmers\n        accustomed to using <the Java API>\n      GIVEN the ENACTMENT:\n        "Copyright protection subsists, in accordance with this title, in original works of authorship fixed in any tangible medium of expression, now known or later developed, from which they can be perceived, reproduced, or otherwise communicated, either directly or with the aid of a machine or device.…" (/us/usc/t17/s102/a 2013-07-18)\n      DESPITE the ENACTMENTS:\n        "In no case does copyright protection for an original work of authorship extend to any…method of operation…" (/us/usc/t17/s102/b 2013-07-18)\n        "The following are examples of works not subject to copyright and applications for registration of such works cannot be entertained: Words and short phrases such as names, titles, and slogans; familiar symbols or designs; mere variations of typographic ornamentation, lettering or coloring; mere listing of ingredients or contents; Ideas, plans, methods, systems, or devices, as distinguished from the particular manner in which they are expressed or described in a writing;  Blank forms, such as time cards, graph paper, account books, diaries, bank checks, scorecards, address books, report forms, order forms and the like, which are designed for recording information and do not in themselves convey information; Works consisting entirely of information that is common property containing no original authorship, such as, for example: Standard calendars, height and weight charts, tape measures and rulers, schedules of sporting events, and lists or tables taken from public documents or other common sources. Typeface as typeface." (/us/cfr/t37/s202.1 1992-02-21)'
+    """
+    Because <the Lotus menu command hierarchy> is like <the Java API>,
+    the Holding to ACCEPT
+        the Rule that the court MUST ALWAYS impose the
+        RESULT:
+            the fact it was false that <the Lotus menu command hierarchy> was copyrightable
+        GIVEN:
+            the fact that <the Lotus menu command hierarchy> was a method of operation
+        DESPITE:
+            the fact that a text described <the Lotus menu command hierarchy>
+            the fact that <the Lotus menu command hierarchy> was an original work
+        GIVEN the ENACTMENT:
+            "In no case does copyright protection for an original work of authorship extend to any…method of operation…" (/us/usc/t17/s102/b 2013-07-18)
+    CONTRADICTS
+    the Holding to ACCEPT
+        the Rule that the court MUST SOMETIMES impose the
+        RESULT:
+            the fact that <the Java API> was copyrightable
+        GIVEN:
+            the fact that <the Java language> was a computer program
+            the fact that <the Java API> was a set of application programming interface declarations
+            the fact that <the Java API> was an original work
+            the fact that <the Java API> was a non-literal element of <the Java language>
+            the fact that <the Java API> was the expression of an idea
+            the fact it was false that <the Java API> was essentially the only way to express the idea that it embodied
+            the fact that <the Java API> was creative
+            the fact that it was possible to use <the Java language> without copying <the Java API>
+        DESPITE:
+            the fact that <the Java API> was a method of operation
+            the fact that <the Java API> contained short phrases
+            the fact that <the Java API> became so popular that it was the industry standard
+            the fact that there was a preexisting community of programmers accustomed to using <the Java API>
+        GIVEN the ENACTMENT:
+            "Copyright protection subsists, in accordance with this title, in original works of authorship fixed in any tangible medium of expression, now known or later developed, from which they can be perceived, reproduced, or otherwise communicated, either directly or with the aid of a machine or device.…" (/us/usc/t17/s102/a 2013-07-18)
+        DESPITE the ENACTMENTS:
+            "In no case does copyright protection for an original work of authorship extend to any…method of operation…" (/us/usc/t17/s102/b 2013-07-18)
+            "The following are examples of works not subject to copyright and applications for registration of such works cannot be entertained: Words and short phrases such as names, titles, and slogans; familiar symbols or designs; mere variations of typographic ornamentation, lettering or coloring; mere listing of ingredients or contents; Ideas, plans, methods, systems, or devices, as distinguished from the particular manner in which they are expressed or described in a writing;  Blank forms, such as time cards, graph paper, account books, diaries, bank checks, scorecards, address books, report forms, order forms and the like, which are designed for recording information and do not in themselves convey information; Works consisting entirely of information that is common property containing no original authorship, such as, for example: Standard calendars, height and weight charts, tape measures and rulers, schedules of sporting events, and lists or tables taken from public documents or other common sources. Typeface as typeface." (/us/cfr/t37/s202.1 1992-02-21)
+            """
 
 In other words, because "the Lotus menu command hierarchy" has a similar role in the _Lotus_ case to the role of "the Java API" in the _Oracle_ case, a Holding from the _Lotus_ case (identified by the text before the word "CONTRADICTS") contradicts a Holding from the _Oracle_ case (identified by the text after the word "CONTRADICTS").
 
