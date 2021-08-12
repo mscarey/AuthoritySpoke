@@ -1,3 +1,4 @@
+from authorityspoke.holdings import HoldingGroup
 from authorityspoke.opinions import OpinionReading
 from copy import deepcopy
 from datetime import date
@@ -35,6 +36,15 @@ class TestDecision:
         reading = DecisionReading(decision=watt)
         reading.posit([make_holding["h1"], make_holding["h2"]])
         assert reading.majority.holdings[-1] == make_holding["h2"]
+
+    def test_make_reading_with_holdings(self, make_decision, make_holding):
+        watt = make_decision["watt"]
+        holdings = HoldingGroup([make_holding["h1"], make_holding["h2"]])
+        reading = DecisionReading(decision=watt, holdings=holdings)
+        assert reading.majority.holdings[-1] == make_holding["h2"]
+
+    def test_make_reading_with_anchored_holdings(self, make_decision, make_holding):
+        assert False
 
     def test_need_reading_to_posit_holding(self, make_holding):
         decision = Decision(decision_date=(datetime.date(1900, 1, 1)))

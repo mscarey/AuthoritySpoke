@@ -284,11 +284,6 @@ class OpinionReading(Comparable):
             reality of the current case, and regardless of whether the
             court orders that the ``outputs`` be put into effect.
 
-        :param text_links:
-            mapping of :class:`Factor`\s to the :class:`OpinionReading` passages where
-            they can be found. Can be obtained as the `mentioned` return value
-            of one of the functions in :mod:`authorityspoke.io.readers`\.
-
         :param context:
             an ordered sequence (probably :py:class:`dict`) of
             generic :class:`.Factor` objects from ``self`` which
@@ -332,10 +327,6 @@ class OpinionReading(Comparable):
             :class:`.Holding` correspond to the reality of the current
             case, and regardless of whether the court orders that
             the ``outputs`` of the :class:`.Holding` be put into effect.
-
-        :param text_links:
-            list of lists of :class:`.Opinion` passages where references to each
-            :class:`.Holding` can be found.
 
         :param context:
             an ordered sequence (probably :py:class:`dict`) of

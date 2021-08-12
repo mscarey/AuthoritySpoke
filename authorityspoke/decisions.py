@@ -47,7 +47,16 @@ class DecisionReading(Comparable):
     """
 
     def __init__(
-        self, decision: Decision, opinion_readings: List[OpinionReading] = None
+        self,
+        decision: Decision,
+        opinion_readings: List[OpinionReading] = None,
+        holdings: Union[Holding, Iterable[Union[Holding, Rule]]] = None,
+        holding_anchors: Optional[
+            List[Union[TextQuoteSelector, List[TextQuoteSelector]]]
+        ] = None,
+        named_anchors: Optional[TextLinkDict] = None,
+        enactment_anchors: Optional[TextLinkDict] = None,
+        context: Optional[Sequence[Factor]] = None,
     ):
         if not isinstance(decision, Decision):
             raise TypeError(f"Expected Decision, got {decision.__class__}.")
@@ -56,6 +65,14 @@ class DecisionReading(Comparable):
         incoming_readings = opinion_readings or []
         for reading in incoming_readings:
             self.add_opinion_reading(reading)
+        if holdings:
+            self.posit(
+                holdings=holdings,
+                holding_anchors=holding_anchors,
+                named_anchors=named_anchors,
+                enactment_anchors=enactment_anchors,
+                context=context,
+            )
 
     def __str__(self):
         citation = self.decision.citations[0].cite if self.decision.citations else ""
