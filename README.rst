@@ -7,8 +7,8 @@ AuthoritySpoke is the first open source legal authority automation tool.
     :target: https://ethicalsource.dev/licenses/
     :alt: An Ethical Open Source Project
 
-.. image:: https://coveralls.io/repos/github/mscarey/authorityspoke/badge.svg?branch=master
-    :target: https://coveralls.io/github/mscarey/authorityspoke?branch=master
+.. image:: https://coveralls.io/repos/github/mscarey/AuthoritySpoke/badge.svg?branch=master
+    :target: https://coveralls.io/github/mscarey/AuthoritySpoke?branch=master
     :alt: Test Coverage Percentage
 
 .. image:: https://github.com/mscarey/authorityspoke/actions/workflows/python-package.yml/badge.svg
