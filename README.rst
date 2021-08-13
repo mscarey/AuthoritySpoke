@@ -25,7 +25,8 @@ Installing AuthoritySpoke
 
 AuthoritySpoke is a Python package `available on PyPI <https://pypi.org/project/AuthoritySpoke/>`__, so you can install it with pip:
 
-.. code-block:: shell
+.. code-block:: bash
+
     $ pip install authorityspoke
 
 AuthoritySpoke runs on Python versions 3.8 and up.
