@@ -1,5 +1,14 @@
 Changelog
 =========
+0.8.0 (2021-08-12)
+------------------
+* import Opinion, Decision, and Court data classes from Justopinion package
+* depend on Justopinion package to download caselaw with CAPClient class
+* Holdings of an Opinion are now stored on an OpinionReading, not on the Opinion
+* read_decision function now makes a DecisionReading, not a Decision
+* install with setup.py, not setup.cfg
+* fix error in Opinion.explain_contradiction(HoldingGroup)
+
 0.7.2 (2021-06-16)
 ------------------
 * accept added fields in CAPCitation schema

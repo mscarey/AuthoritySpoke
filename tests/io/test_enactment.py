@@ -19,7 +19,7 @@ class TestEnactmentImport:
     client = Client(api_token=TOKEN)
     test_enactment = {
         "heading": "",
-        "content": "Except as otherwise provided by statute, all relevant evidence is admissible.",
+        "text_version": "Except as otherwise provided by statute, all relevant evidence is admissible.",
         "name": "s351",
         "node": "/us-ca/code/evid/s351",
         "start_date": "1966-01-01",
@@ -33,10 +33,10 @@ class TestEnactmentImport:
         fourteenth_dp = make_response["/us/const/amendment/XIV"]["1868-07-28"][
             "children"
         ][0]
-        fourteenth_dp["exact"] = "nor shall any State deprive any person"
         enactment = fake_usc_client.read_from_json(fourteenth_dp)
+        passage = enactment.select("nor shall any State deprive any person")
 
-        assert enactment.selected_text().startswith("…nor shall any State")
+        assert passage.selected_text().startswith("…nor shall any State")
 
     def test_enactment_import_from_dict(self, fake_usc_client):
         holding_brad = load_holdings("holding_brad.json")

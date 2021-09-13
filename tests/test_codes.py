@@ -58,8 +58,8 @@ class TestCodes:
 
     def test_code_select_text_chapeau(self, fake_beard_client):
         enactment = fake_beard_client.read("/test/acts/47/4")
-        enactment.select()
-        assert enactment.selected_text().startswith("In this Act, beard means")
+        passage = enactment.select()
+        assert passage.selected_text().startswith("In this Act, beard means")
 
     def test_get_bill_of_rights_effective_date(self, fake_usc_client):
         enactment = fake_usc_client.read("/us/const/amendment/V")
@@ -67,23 +67,24 @@ class TestCodes:
 
     def test_text_interval_constitution_section(self, fake_usc_client):
         enactment = fake_usc_client.read("/us/const/article/I/8/8")
+        passage = enactment.select()
 
         # The entire 317-character section is selected.
-        ranges = enactment.selection.ranges()
+        ranges = passage.selection.ranges()
         assert ranges[0].start == 0
         assert ranges[0].end == 172
 
-        passage = enactment.get_passage(TextPositionSelector(68, 81))
-        assert passage == "…limited Times…"
+        passage.select(TextPositionSelector(start=68, end=81))
+        assert passage.selected_text() == "…limited Times…"
 
     def test_text_interval_beyond_end_of_section(self, fake_usc_client):
         """No longer raises an error, just selects to the end of the text."""
         enactment = fake_usc_client.read("/us/const/article/I/8/8")
 
-        selector = TextPositionSelector(68, 400)
-        passage = enactment.get_passage(selector)
-        assert passage.startswith("…limited Times")
-        assert passage.endswith(enactment.text[-10:])
+        selector = TextPositionSelector(start=68, end=400)
+        passage = enactment.select(selector)
+        assert passage.selected_text().startswith("…limited Times")
+        assert passage.selected_text().endswith(enactment.text[-10:])
 
     def test_bad_section(self, fake_usc_client):
         """

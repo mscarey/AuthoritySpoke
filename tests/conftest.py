@@ -67,11 +67,11 @@ def test_client() -> Client:
 def section6d():
     return {
         "heading": "Waiver of beard tax in special circumstances",
-        "content": "",
+        "text_version": "",
         "children": [
             {
                 "heading": "",
-                "content": "The Department of Beards shall waive the collection of beard tax upon issuance of beardcoin under Section 6C where the reason the maintainer wears a beard is due to bona fide religious, cultural, or medical reasons.",
+                "text_version": "The Department of Beards shall waive the collection of beard tax upon issuance of beardcoin under Section 6C where the reason the maintainer wears a beard is due to bona fide religious, cultural, or medical reasons.",
                 "children": [],
                 "end_date": None,
                 "node": "/test/acts/47/6D/1",
@@ -80,7 +80,7 @@ def section6d():
             },
             {
                 "heading": "",
-                "content": "The determination of the Department of Beards as to what constitutes bona fide religious or cultural reasons shall be final and no right of appeal shall exist.",
+                "text_version": "The determination of the Department of Beards as to what constitutes bona fide religious or cultural reasons shall be final and no right of appeal shall exist.",
                 "children": [],
                 "end_date": None,
                 "node": "/test/acts/47/6D/2",
@@ -105,7 +105,7 @@ def section_11_subdivided():
         "text_version": {
             "id": 1142710,
             "url": "https://authorityspoke.com/api/v1/textversions/1142710/",
-            "content": "The Department of Beards may issue licenses to such",
+            "text_version": "The Department of Beards may issue licenses to such",
         },
         "url": "https://authorityspoke.com/api/v1/test/acts/47/11/",
         "end_date": None,
@@ -117,7 +117,7 @@ def section_11_subdivided():
                 "text_version": {
                     "id": 1142704,
                     "url": "https://authorityspoke.com/api/v1/textversions/1142704/",
-                    "content": "barbers,",
+                    "text_version": "barbers,",
                 },
                 "url": "https://authorityspoke.com/api/v1/test/acts/47/11/i/",
                 "end_date": None,
@@ -131,7 +131,7 @@ def section_11_subdivided():
                 "text_version": {
                     "id": 1142705,
                     "url": "https://authorityspoke.com/api/v1/textversions/1142705/",
-                    "content": "hairdressers, or",
+                    "text_version": "hairdressers, or",
                 },
                 "url": "https://authorityspoke.com/api/v1/test/acts/47/11/ii/",
                 "end_date": None,
@@ -145,7 +145,7 @@ def section_11_subdivided():
                 "text_version": {
                     "id": 1142706,
                     "url": "https://authorityspoke.com/api/v1/textversions/1142706/",
-                    "content": "other male grooming professionals",
+                    "text_version": "other male grooming professionals",
                 },
                 "url": "https://authorityspoke.com/api/v1/test/acts/47/11/iii/",
                 "end_date": None,
@@ -159,7 +159,7 @@ def section_11_subdivided():
                 "text_version": {
                     "id": 1142707,
                     "url": "https://authorityspoke.com/api/v1/textversions/1142707/",
-                    "content": "as they see fit to purchase a beardcoin from a customer",
+                    "text_version": "as they see fit to purchase a beardcoin from a customer",
                 },
                 "url": "https://authorityspoke.com/api/v1/test/acts/47/11/iii-con/",
                 "end_date": None,
@@ -173,7 +173,7 @@ def section_11_subdivided():
                 "text_version": {
                     "id": 1142708,
                     "url": "https://authorityspoke.com/api/v1/textversions/1142708/",
-                    "content": "whose beard they have removed,",
+                    "text_version": "whose beard they have removed,",
                 },
                 "url": "https://authorityspoke.com/api/v1/test/acts/47/11/iv/",
                 "end_date": None,
@@ -187,7 +187,7 @@ def section_11_subdivided():
                 "text_version": {
                     "id": 1142709,
                     "url": "https://authorityspoke.com/api/v1/textversions/1142709/",
-                    "content": "and to resell those beardcoins to the Department of Beards.",
+                    "text_version": "and to resell those beardcoins to the Department of Beards.",
                 },
                 "url": "https://authorityspoke.com/api/v1/test/acts/47/11/iv-con/",
                 "end_date": None,
@@ -204,7 +204,7 @@ def section_11_subdivided():
 def fifth_a():
     return {
         "heading": "AMENDMENT V.",
-        "content": "No person shall be held to answer for a capital, or otherwise infamous crime, unless on a presentment or indictment of a Grand Jury, except in cases arising in the land or naval forces, or in the Militia, when in actual service in time of War or public danger; nor shall any person be subject for the same offence to be twice put in jeopardy of life or limb; nor shall be compelled in any Criminal Case to be a witness against himself; nor be deprived of life, liberty, or property, without due process of law; nor shall private property be taken for public use, without just compensation.",
+        "text_version": "No person shall be held to answer for a capital, or otherwise infamous crime, unless on a presentment or indictment of a Grand Jury, except in cases arising in the land or naval forces, or in the Militia, when in actual service in time of War or public danger; nor shall any person be subject for the same offence to be twice put in jeopardy of life or limb; nor shall be compelled in any Criminal Case to be a witness against himself; nor be deprived of life, liberty, or property, without due process of law; nor shall private property be taken for public use, without just compensation.",
         "children": [],
         "end_date": None,
         "node": "/us/const/amendment/V",
