@@ -39,7 +39,7 @@ class TestEnactmentImport:
         assert passage.selected_text().startswith("…nor shall any State")
 
     def test_enactment_import_from_dict(self, fake_usc_client):
-        holding_brad = load_holdings("holding_brad.json")
+        holding_brad = load_holdings("holding_brad.yaml")
         holdings = readers.read_holdings(holding_brad, client=fake_usc_client)
         enactments = holdings[0].enactments
         assert any(
