@@ -69,6 +69,7 @@ class TestEnactmentImport:
             for enactment in enactment_list
         )
 
+    @pytest.mark.vcr
     def test_enactment_does_not_fail_for_excess_selector(self, fake_beard_client):
         """
         Test selector that extends into the text of a subnode.
@@ -80,8 +81,11 @@ class TestEnactmentImport:
             "In this Act, beard means any facial hair no shorter "
             "than 5 millimetres in length that: occurs on or below the chin"
         )
-        record = {"node": "/test/acts/47/4", "exact": exact}
-        client = fake_beard_client
-        enactment = client.read_from_json(record)
-        assert enactment.selected_text() == exact + "…"
-        assert "exists in an uninterrupted line" in enactment.children[1].content
+        record = {
+            "enactment": {"node": "/test/acts/47/4"},
+            "selection": {"quotes": {"exact": exact}},
+        }
+        client = self.client
+        passage = client.read_passage_from_json(record)
+        assert passage.selected_text() == exact + "…"
+        assert "in an uninterrupted line" in passage.enactment.children[1].content

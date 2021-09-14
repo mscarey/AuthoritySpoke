@@ -450,8 +450,8 @@ class RuleSchema(ExpandableSchema):
 
     __model__: Type = Rule
     procedure = fields.Nested(ProcedureSchema)
-    enactments = fields.Nested(EnactmentPassageSchema, many=True)
-    enactments_despite = fields.Nested(EnactmentPassageSchema, many=True)
+    enactments = fields.Nested(LegisliceSchema, many=True)
+    enactments_despite = fields.Nested(LegisliceSchema, many=True)
     mandatory = fields.Bool(load_default=False)
     universal = fields.Bool(load_default=False)
     name = fields.Str(load_default=None)
