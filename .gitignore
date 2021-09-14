@@ -18,6 +18,7 @@ htmlcov/
 example_data/holdings/unused
 example_data/cases/flf/
 example_data/cases/unused
+legislice/
 notebooks/.ipynb_checkpoints
 notebooks/path
 notebooks/unused

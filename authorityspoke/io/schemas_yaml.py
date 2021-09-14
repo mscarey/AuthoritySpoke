@@ -15,7 +15,7 @@ from marshmallow import ValidationError
 
 from anchorpoint.textselectors import TextQuoteSelector, TextPositionSelector
 from anchorpoint.schemas import SelectorSchema
-from legislice import Enactment
+from legislice.enactments import Enactment, EnactmentPassage
 from legislice.schemas import enactment_needs_api_update
 from legislice.yaml_schemas import EnactmentPassageSchema as LegisliceSchema
 
@@ -100,7 +100,7 @@ RawCAPCitation = Dict[str, str]
 RawDecision = Dict[str, Union[str, int, Sequence[RawOpinion], Sequence[RawCAPCitation]]]
 
 
-class EnactmentSchema(LegisliceSchema):
+class EnactmentPassageSchema(LegisliceSchema):
     """
     Schema to load Enactments from JSON created from user-created YAML.
 
@@ -135,6 +135,10 @@ class EnactmentSchema(LegisliceSchema):
         """Prepare Enactment to load."""
         data = self.get_indexed_enactment(data)
         return super().format_data_to_load(data)
+
+    @post_load
+    def make_object(self, data, **kwargs):
+        return EnactmentPassage(**data)
 
 
 class PredicateSchema(ExpandableSchema):
@@ -450,8 +454,8 @@ class RuleSchema(ExpandableSchema):
 
     __model__: Type = Rule
     procedure = fields.Nested(ProcedureSchema)
-    enactments = fields.Nested(LegisliceSchema, many=True)
-    enactments_despite = fields.Nested(LegisliceSchema, many=True)
+    enactments = fields.Nested(EnactmentPassageSchema, many=True)
+    enactments_despite = fields.Nested(EnactmentPassageSchema, many=True)
     mandatory = fields.Bool(load_default=False)
     universal = fields.Bool(load_default=False)
     name = fields.Str(load_default=None)
@@ -541,7 +545,7 @@ class AnchoredEnactments(NamedTuple):
 class AnchoredEnactmentsSchema(ExpandableSchema):
     __model__ = AnchoredEnactments
 
-    enactment = fields.Nested(EnactmentSchema)
+    enactment = fields.Nested(EnactmentPassageSchema)
     anchors = fields.Nested(SelectorSchema, many=True)
 
     @pre_load

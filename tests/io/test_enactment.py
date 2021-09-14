@@ -38,9 +38,10 @@ class TestEnactmentImport:
 
         assert passage.selected_text().startswith("…nor shall any State")
 
-    def test_enactment_import_from_dict(self, fake_usc_client):
+    @pytest.mark.vcr
+    def test_enactment_import_from_yaml(self):
         holding_brad = load_holdings("holding_brad.yaml")
-        holdings = readers.read_holdings(holding_brad, client=fake_usc_client)
+        holdings = readers.read_holdings(holding_brad, client=self.client)
         enactments = holdings[0].enactments
         assert any(
             law.selected_text().endswith("shall not be violated…") for law in enactments
