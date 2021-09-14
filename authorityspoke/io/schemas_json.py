@@ -12,7 +12,7 @@ from marshmallow import pre_load, post_load
 from marshmallow_oneofschema import OneOfSchema
 
 from anchorpoint.textselectors import TextQuoteSelector, TextPositionSelector
-from anchorpoint.schemas import SelectorSchema
+from anchorpoint.schemas import TextPositionSetSchema, PositionSchema, QuoteSchema
 from justopinion.decisions import Jurisdiction, Court
 from legislice import Enactment
 from legislice.schemas import EnactmentSchema
@@ -333,7 +333,7 @@ class HoldingSchema(Schema):
     decided = fields.Bool(load_default=True)
     exclusive = fields.Bool(load_default=False)
     generic = fields.Bool(load_default=False)
-    anchors = fields.Nested(SelectorSchema, many=True)
+    anchors = fields.Nested(TextPositionSetSchema)
 
     @post_load
     def make_object(self, data, **kwargs):
@@ -349,7 +349,7 @@ class NamedAnchorsSchema(Schema):
     __model__ = NamedAnchors
 
     name = fields.Nested(FactorSchema)
-    anchors = fields.Nested(SelectorSchema, many=True)
+    anchors = fields.Nested(TextPositionSetSchema)
 
 
 class AnchoredEnactments(NamedTuple):
@@ -361,17 +361,17 @@ class AnchoredEnactmentsSchema(Schema):
     __model__ = AnchoredEnactments
 
     enactment = fields.Nested(EnactmentSchema)
-    anchors = fields.Nested(SelectorSchema, many=True)
+    anchors = fields.Nested(TextPositionSetSchema)
 
 
-SCHEMAS = list(Schema.__subclasses__()) + [SelectorSchema, EnactmentSchema]
+SCHEMAS = list(Schema.__subclasses__()) + [PositionSchema, QuoteSchema, EnactmentSchema]
 
 
 def get_schema_for_item(classname: str) -> Schema:
     """Find the Marshmallow schema for an AuthoritySpoke object."""
     schemas_for_names = {
-        "TextPositionSelector": SelectorSchema,
-        "TextQuoteSelector": SelectorSchema,
+        "TextPositionSelector": PositionSchema,
+        "TextQuoteSelector": QuoteSchema,
         "Comparison": PredicateSchema,
         "Predicate": PredicateSchema,
         "Fact": FactSchema,

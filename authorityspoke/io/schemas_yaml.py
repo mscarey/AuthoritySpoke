@@ -14,10 +14,10 @@ from marshmallow import pre_load, post_load
 from marshmallow import ValidationError
 
 from anchorpoint.textselectors import TextQuoteSelector, TextPositionSelector
-from anchorpoint.schemas import SelectorSchema
+from anchorpoint.schemas import TextPositionSetSchema
 from legislice.enactments import Enactment, EnactmentPassage
 from legislice.schemas import enactment_needs_api_update
-from legislice.yaml_schemas import EnactmentPassageSchema as LegisliceSchema
+from legislice.yaml_schemas import ExpandablePassageSchema as LegisliceSchema
 
 from nettlesome.entities import Entity
 from nettlesome.factors import Factor
@@ -134,7 +134,7 @@ class EnactmentPassageSchema(LegisliceSchema):
     def format_data_to_load(self, data, **kwargs):
         """Prepare Enactment to load."""
         data = self.get_indexed_enactment(data)
-        return super().format_data_to_load(data)
+        return data
 
     @post_load
     def make_object(self, data, **kwargs):
@@ -487,7 +487,7 @@ class HoldingSchema(ExpandableSchema):
     decided = fields.Bool(load_default=True)
     exclusive = fields.Bool(load_default=False)
     generic = fields.Bool(load_default=False)
-    anchors = fields.Nested(SelectorSchema, many=True)
+    anchors = fields.Nested(TextPositionSetSchema, many=True)
 
     def nest_fields_inside_rule(self, data: Dict) -> RawHolding:
         """Nest fields inside "rule" and "procedure", if not already nested."""
@@ -529,7 +529,7 @@ class NamedAnchorsSchema(ExpandableSchema):
     __model__ = NamedAnchors
 
     name = fields.Nested(FactorSchema)
-    anchors = fields.Nested(SelectorSchema, many=True)
+    anchors = fields.Nested(TextPositionSetSchema, many=True)
 
     @pre_load
     def format_data_to_load(self, data, **kwargs):
@@ -546,7 +546,7 @@ class AnchoredEnactmentsSchema(ExpandableSchema):
     __model__ = AnchoredEnactments
 
     enactment = fields.Nested(EnactmentPassageSchema)
-    anchors = fields.Nested(SelectorSchema, many=True)
+    anchors = fields.Nested(TextPositionSetSchema, many=True)
 
     @pre_load
     def format_data_to_load(self, data, **kwargs):

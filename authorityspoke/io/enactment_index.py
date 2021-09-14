@@ -82,6 +82,8 @@ class EnactmentIndex(OrderedDict):
 
 
 def create_name_for_enactment(obj: RawEnactment) -> str:
+    if "node" not in obj.keys():
+        return create_name_for_enactment(obj["enactment"])
     name: str = obj["node"]
     if obj.get("start_date"):
         name += f'@{obj["start_date"]}'
@@ -161,11 +163,7 @@ def collect_enactments(
             else:
                 new_dict[key] = value
 
-        if (
-            new_dict.get("enactment")
-            or new_dict.get("node")
-            or (new_dict.get("name") in mentioned.keys())
-        ):
+        if new_dict.get("enactment") or (new_dict.get("name") in mentioned.keys()):
             new_dict = nest_enactment_fields(new_dict)
             new_dict = ensure_enactment_has_name(new_dict)
             new_dict = mentioned.index_enactment(new_dict)
