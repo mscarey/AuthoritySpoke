@@ -9,6 +9,7 @@ from anchorpoint.textselectors import TextQuoteSelector
 from dotenv import load_dotenv
 from justopinion.decisions import Decision, Opinion
 from legislice.download import Client
+from legislice.enactments import Enactment
 from legislice.yaml_schemas import ExpandableEnactmentSchema as EnactmentSchema
 from nettlesome.terms import ContextRegister
 from nettlesome.entities import Entity
@@ -891,163 +892,145 @@ def fake_beard_client() -> FakeClient:
 
 @pytest.fixture(scope="module")
 def e_fourth_a(make_response):
-    schema = EnactmentSchema()
-    enactment = schema.load(make_response["/us/const/amendment/IV"]["1791-12-15"])
-    enactment.select_all()
-    return enactment
+    enactment = Enactment(**make_response["/us/const/amendment/IV"]["1791-12-15"])
+    passage = enactment.select_all()
+    return passage
 
 
 @pytest.fixture(scope="module")
 def e_search_clause(make_response):
-    schema = EnactmentSchema()
-    enactment = schema.load(make_response["/us/const/amendment/IV"]["1791-12-15"])
+    enactment = Enactment(**make_response["/us/const/amendment/IV"]["1791-12-15"])
     selector = TextQuoteSelector(suffix=", and no Warrants shall issue")
-    enactment.select(selector)
-    return enactment
+    passage = enactment.select(selector)
+    return passage
 
 
 @pytest.fixture(scope="module")
 def e_warrants_clause(make_response):
-    schema = EnactmentSchema()
-    enactment = schema.load(make_response["/us/const/amendment/IV"]["1791-12-15"])
-    enactment.select("shall not be violated, and no Warrants shall issue,")
-    return enactment
+    enactment = Enactment(**make_response["/us/const/amendment/IV"]["1791-12-15"])
+    passage = enactment.select("shall not be violated, and no Warrants shall issue,")
+    return passage
 
 
 @pytest.fixture(scope="module")
 def e_due_process_5(make_response):
-    schema = EnactmentSchema()
-    enactment = schema.load(make_response["/us/const/amendment/V"]["1791-12-15"])
-    enactment.select("life, liberty, or property, without due process of law")
-    return enactment
+    enactment = Enactment(**make_response["/us/const/amendment/V"]["1791-12-15"])
+    passage = enactment.select("life, liberty, or property, without due process of law")
+    return passage
 
 
 @pytest.fixture(scope="module")
 def e_due_process_14(make_response):
-    schema = EnactmentSchema()
     fourteenth = make_response["/us/const/amendment/XIV"]["1868-07-28"]
-    enactment = schema.load(fourteenth["children"][0])
-    enactment.select("life, liberty, or property, without due process of law")
-    return enactment
+    enactment = Enactment(**fourteenth["children"][0])
+    passage = enactment.select("life, liberty, or property, without due process of law")
+    return passage
 
 
 @pytest.fixture(scope="module")
 def e_securing_for_authors(make_response):
-    schema = EnactmentSchema()
-    enactment = schema.load(make_response["/us/const/article/I/8/8"]["1788-09-13"])
+    enactment = Enactment(**make_response["/us/const/article/I/8/8"]["1788-09-13"])
     selector = TextQuoteSelector(
         exact=(
             "To promote the Progress of Science and "
             + "useful Arts, by securing for limited Times to Authors"
         )
     )
-    enactment.select(selector)
-    return enactment
+    passage = enactment.select(selector)
+    return passage
 
 
 @pytest.fixture(scope="module")
 def e_securing_exclusive_right_to_writings(make_response):
-    schema = EnactmentSchema()
-    enactment = schema.load(make_response["/us/const/article/I/8/8"]["1788-09-13"])
-    enactment.select(
+    enactment = Enactment(**make_response["/us/const/article/I/8/8"]["1788-09-13"])
+    passage = enactment.select(
         "To promote the Progress of Science and useful Arts, by securing for limited Times to Authors"
     )
-    enactment.select_more("the exclusive Right to their respective Writings")
-    return enactment
+    passage.select_more("the exclusive Right to their respective Writings")
+    return passage
 
 
 @pytest.fixture(scope="module")
 def e_and_inventors(make_response):
-    schema = EnactmentSchema()
-    enactment = schema.load(make_response["/us/const/article/I/8/8"]["1788-09-13"])
-    enactment.select("and Inventors")
-    return enactment
+    enactment = Enactment(**make_response["/us/const/article/I/8/8"]["1788-09-13"])
+    passage = enactment.select("and Inventors")
+    return passage
 
 
 @pytest.fixture(scope="module")
 def e_right_to_writings(make_response):
-    schema = EnactmentSchema()
-    enactment = schema.load(make_response["/us/const/article/I/8/8"]["1788-09-13"])
-    enactment.select("the exclusive Right to their respective Writings")
-    return enactment
+    enactment = Enactment(**make_response["/us/const/article/I/8/8"]["1788-09-13"])
+    passage = enactment.select("the exclusive Right to their respective Writings")
+    return passage
 
 
 @pytest.fixture(scope="module")
 def e_copyright_protection(make_response, make_selector):
-    schema = EnactmentSchema()
-    enactment = schema.load(make_response["/us/usc/t17/s102/a"]["2013-07-18"])
-    enactment.select(TextQuoteSelector(suffix="Works of authorship include"))
-    return enactment
+    enactment = Enactment(**make_response["/us/usc/t17/s102/a"]["2013-07-18"])
+    passage = enactment.select(TextQuoteSelector(suffix="Works of authorship include"))
+    return passage
 
 
 @pytest.fixture(scope="module")
 def e_copyright_requires_originality(make_response, make_selector):
-    schema = EnactmentSchema()
-    enactment = schema.load(make_response["/us/usc/t17/s102/a"]["2013-07-18"])
-    enactment.select(make_selector["copyright_requires_originality"])
-    return enactment
+    enactment = Enactment(**make_response["/us/usc/t17/s102/a"]["2013-07-18"])
+    passage = enactment.select(make_selector["copyright_requires_originality"])
+    return passage
 
 
 @pytest.fixture(scope="module")
 def e_copyright(make_response, make_selector):
-    schema = EnactmentSchema()
-    enactment = schema.load(make_response["/us/usc/t17/s102/b"]["2013-07-18"])
-    enactment.select(make_selector["copyright"])
-    return enactment
+    enactment = Enactment(**make_response["/us/usc/t17/s102/b"]["2013-07-18"])
+    passage = enactment.select(make_selector["copyright"])
+    return passage
 
 
 @pytest.fixture(scope="module")
 def e_copyright_exceptions(make_response):
-    schema = EnactmentSchema()
-    enactment = schema.load(make_response["/us/usc/t17/s102/b"]["2013-07-18"])
-    enactment.select(TextQuoteSelector(suffix="idea, procedure, process"))
-    return enactment
+    enactment = Enactment(**make_response["/us/usc/t17/s102/b"]["2013-07-18"])
+    passage = enactment.select(TextQuoteSelector(suffix="idea, procedure, process"))
+    return passage
 
 
 @pytest.fixture(scope="module")
 def e_copyright_exceptions_full(make_response):
-    schema = EnactmentSchema()
-    enactment = schema.load(make_response["/us/usc/t17/s102/b"]["2013-07-18"])
+    enactment = Enactment(**make_response["/us/usc/t17/s102/b"]["2013-07-18"])
     return enactment
 
 
 @pytest.fixture(scope="module")
 def e_in_no_case(make_response):
-    schema = EnactmentSchema()
-    enactment = schema.load(make_response["/us/usc/t17/s102/b"]["2013-07-18"])
-    enactment.select(
+    enactment = Enactment(**make_response["/us/usc/t17/s102/b"]["2013-07-18"])
+    passage = enactment.select(
         "In no case does copyright protection for an original work of authorship extend to any"
     )
-    return enactment
+    return passage
 
 
 @pytest.fixture(scope="module")
 def e_method_of_operation(make_response):
-    schema = EnactmentSchema()
-    enactment = schema.load(make_response["/us/usc/t17/s102/b"]["2013-07-18"])
-    enactment.select(TextQuoteSelector(exact="method of operation"))
-    return enactment
+    enactment = Enactment(**make_response["/us/usc/t17/s102/b"]["2013-07-18"])
+    passage = nactment.select(TextQuoteSelector(exact="method of operation"))
+    return passage
 
 
 @pytest.fixture(scope="module")
 def e_compilation(make_response):
-    schema = EnactmentSchema()
-    enactment = schema.load(make_response["/us/usc/t17/s103/b"]["2013-07-18"])
-    enactment.select("The copyright in a compilation")
-    return enactment
+    enactment = Enactment(**make_response["/us/usc/t17/s103/b"]["2013-07-18"])
+    passage = enactment.select("The copyright in a compilation")
+    return passage
 
 
 @pytest.fixture(scope="module")
 def e_preexisting_material(make_response):
-    schema = EnactmentSchema()
-    enactment = schema.load(make_response["/us/usc/t17/s103/b"]["2013-07-18"])
-    enactment.select(
+    enactment = Enactment(**make_response["/us/usc/t17/s103/b"]["2013-07-18"])
+    passage = enactment.select(
         "extends only to the material contributed by the author "
         "of such work, as distinguished from the preexisting "
         "material employed in the work, and does not imply any "
         "exclusive right in the preexisting material."
     )
-    return enactment
+    return passage
 
 
 @pytest.fixture(scope="class")

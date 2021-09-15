@@ -1,5 +1,7 @@
 from authorityspoke.io import schemas_yaml
 
+import pytest
+
 
 class TestCollectAnchors:
     fact = {
@@ -41,6 +43,9 @@ class TestCollectAnchors:
         },
     }
 
+    @pytest.mark.xfail(
+        reason="This tests Anchorpoint. Is the test needed for AuthoritySpoke's test fixtures?"
+    )
     def test_anchor_not_wrapped_in_list(self):
         """
         Test that when the anchor field is loaded in,
