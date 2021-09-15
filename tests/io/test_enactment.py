@@ -47,20 +47,6 @@ class TestEnactmentImport:
             law.selected_text().endswith("shall not be violated…") for law in enactments
         )
 
-    def test_false_as_selection(self, fake_usc_client):
-        input_enactment = self.test_enactment.copy()
-        input_enactment["selection"] = False
-
-        enactment = fake_usc_client.read_from_json(input_enactment)
-        assert enactment.selected_text() == ""
-
-    def test_true_as_selection(self, fake_usc_client):
-        input_enactment = self.test_enactment.copy()
-        input_enactment["selection"] = True
-
-        enactment = fake_usc_client.read_from_json(input_enactment)
-        assert enactment.selected_text() == enactment.text
-
     def test_enactment_import_from_holding(self):
         holding_cardenas = load_holdings("holding_cardenas.yaml")
         holdings = readers.read_holdings(holding_cardenas)
