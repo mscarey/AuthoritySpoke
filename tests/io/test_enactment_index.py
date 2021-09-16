@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 
 import pytest
 
+from legislice.enactments import Enactment
 from legislice.yaml_schemas import EnactmentSchema
 from authorityspoke.io.enactment_index import EnactmentIndex, collect_enactments
 
@@ -163,12 +164,12 @@ class TestCollectEnactments:
     @pytest.mark.vcr
     def test_load_updated_enactment_data(self, test_client):
         example_rules, mentioned = collect_enactments(self.example_rules)
-        updated = test_client.update_enactment_from_api(mentioned["ear rule"])
-        schema = EnactmentSchema()
-        enactment = schema.load(updated)
+        updated = test_client.update_enactment_from_api(
+            mentioned["ear rule"]["enactment"]
+        )
+        enactment = Enactment(**updated)
         assert enactment.start_date == date(1935, 4, 1)
         assert enactment.content.startswith("exists in an uninterrupted")
-        assert enactment.anchors[2].start == 100
 
     def test_retrieve_enactment_by_name(self, section6d, section_11_subdivided):
         obj, indexed = collect_enactments([section6d, section_11_subdivided])

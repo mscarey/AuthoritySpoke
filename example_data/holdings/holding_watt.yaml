@@ -10,10 +10,13 @@ holdings:
   - type: fact
     content: Hideaway Lodge was Wattenburg’s abode
   enactments:
-  - node: /us/const/amendment/IV
-    exact: The right of the people to be secure in their persons, houses, papers,
-      and effects, against unreasonable searches and seizures, shall not be violated
-    name: search clause
+  - name: search clause
+    enactment:
+      node: /us/const/amendment/IV
+    selection:
+      quotes:
+        - exact: The right of the people to be secure in their persons, houses, papers,
+            and effects, against unreasonable searches and seizures, shall not be violated
   mandatory: true
 - inputs:
   - type: fact
@@ -71,8 +74,7 @@ holdings:
     content: officers' search of the stockpile constituted an intrusion upon the stockpile
       of trees
   enactments:
-  - name: search clause
-    node: /us/const/amendment/IV
+  - search clause
   mandatory: true
 - inputs:
   - type: fact
@@ -136,5 +138,5 @@ holdings:
           content: Wattenburg committed a crime
         absent: true
     enactments:
-      - search clause
+    - search clause
     mandatory: true

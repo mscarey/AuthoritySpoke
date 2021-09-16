@@ -68,7 +68,7 @@ def test_client() -> Client:
 def section6d():
     return {
         "heading": "Waiver of beard tax in special circumstances",
-        "text_version": "",
+        "text_version": None,
         "children": [
             {
                 "heading": "",
@@ -106,7 +106,7 @@ def section_11_subdivided():
         "text_version": {
             "id": 1142710,
             "url": "https://authorityspoke.com/api/v1/textversions/1142710/",
-            "text_version": "The Department of Beards may issue licenses to such",
+            "content": "The Department of Beards may issue licenses to such",
         },
         "url": "https://authorityspoke.com/api/v1/test/acts/47/11/",
         "end_date": None,
@@ -118,7 +118,7 @@ def section_11_subdivided():
                 "text_version": {
                     "id": 1142704,
                     "url": "https://authorityspoke.com/api/v1/textversions/1142704/",
-                    "text_version": "barbers,",
+                    "content": "barbers,",
                 },
                 "url": "https://authorityspoke.com/api/v1/test/acts/47/11/i/",
                 "end_date": None,
@@ -132,7 +132,7 @@ def section_11_subdivided():
                 "text_version": {
                     "id": 1142705,
                     "url": "https://authorityspoke.com/api/v1/textversions/1142705/",
-                    "text_version": "hairdressers, or",
+                    "content": "hairdressers, or",
                 },
                 "url": "https://authorityspoke.com/api/v1/test/acts/47/11/ii/",
                 "end_date": None,
@@ -146,7 +146,7 @@ def section_11_subdivided():
                 "text_version": {
                     "id": 1142706,
                     "url": "https://authorityspoke.com/api/v1/textversions/1142706/",
-                    "text_version": "other male grooming professionals",
+                    "content": "other male grooming professionals",
                 },
                 "url": "https://authorityspoke.com/api/v1/test/acts/47/11/iii/",
                 "end_date": None,
@@ -160,7 +160,7 @@ def section_11_subdivided():
                 "text_version": {
                     "id": 1142707,
                     "url": "https://authorityspoke.com/api/v1/textversions/1142707/",
-                    "text_version": "as they see fit to purchase a beardcoin from a customer",
+                    "content": "as they see fit to purchase a beardcoin from a customer",
                 },
                 "url": "https://authorityspoke.com/api/v1/test/acts/47/11/iii-con/",
                 "end_date": None,
@@ -174,7 +174,7 @@ def section_11_subdivided():
                 "text_version": {
                     "id": 1142708,
                     "url": "https://authorityspoke.com/api/v1/textversions/1142708/",
-                    "text_version": "whose beard they have removed,",
+                    "content": "whose beard they have removed,",
                 },
                 "url": "https://authorityspoke.com/api/v1/test/acts/47/11/iv/",
                 "end_date": None,
@@ -188,7 +188,7 @@ def section_11_subdivided():
                 "text_version": {
                     "id": 1142709,
                     "url": "https://authorityspoke.com/api/v1/textversions/1142709/",
-                    "text_version": "and to resell those beardcoins to the Department of Beards.",
+                    "content": "and to resell those beardcoins to the Department of Beards.",
                 },
                 "url": "https://authorityspoke.com/api/v1/test/acts/47/11/iv-con/",
                 "end_date": None,
