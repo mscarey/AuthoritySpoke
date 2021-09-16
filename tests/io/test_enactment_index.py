@@ -54,15 +54,19 @@ class TestCollectEnactments:
             ],
             "enactments": [
                 {
-                    "node": "/test/acts/47/4",
-                    "exact": "In this Act, beard means any facial hair no shorter than 5 millimetres in length that:",
                     "name": "beard means",
+                    "enactment": {
+                        "node": "/test/acts/47/4",
+                        "exact": "In this Act, beard means any facial hair no shorter than 5 millimetres in length that:",
+                    },
                 },
-                {"node": "/test/acts/47/4/a", "suffix": ", or"},
+                {"enactment": {"node": "/test/acts/47/4/a", "suffix": ", or"}},
                 {
-                    "node": "/test/acts/47/4/b",
                     "name": "ear rule",
-                    "anchors": [{"start": 10, "end": 20}, {"start": 40, "end": 50}],
+                    "enactment": {
+                        "node": "/test/acts/47/4/b",
+                        "anchors": [{"start": 10, "end": 20}, {"start": 40, "end": 50}],
+                    },
                 },
             ],
             "universal": True,
@@ -88,7 +92,7 @@ class TestCollectEnactments:
             ],
             "enactments": [
                 "beard means",
-                {"name": "ear rule", "anchors": [{"start": 100, "end": 150}]},
+                {"passage": "ear rule", "anchors": [{"start": 100, "end": 150}]},
             ],
             "universal": True,
         },
@@ -97,18 +101,19 @@ class TestCollectEnactments:
     def test_collect_enactments_from_list(
         self, section6d, section_11_subdivided, fifth_a
     ):
-        section_11_subdivided["name"] = "s11"
-        section6d["name"] = "6c"
-        fifth_a["name"] = "5a"
-        obj, mentioned = collect_enactments([section6d, section_11_subdivided, fifth_a])
-        schema = EnactmentSchema()
-        mentioned_entry = mentioned.get_by_name("5a")
-        enactment = schema.load(mentioned_entry)
-        assert enactment.start_date == date(1791, 12, 15)
+        data = {
+            "enactments": [
+                {"name": "s11", "enactment": section_11_subdivided},
+                {"name": "6d", "enactment": section6d},
+                {"name": "5a", "enactment": fifth_a},
+            ]
+        }
+        obj, mentioned = collect_enactments(data)
+        assert mentioned["s11"]["enactment"]["node"] == "/test/acts/47/11"
 
     def test_collect_enactments_from_dict(self):
         obj, mentioned = collect_enactments(self.example_rules)
-        assert mentioned["beard means"]["node"] == "/test/acts/47/4"
+        assert mentioned["beard means"]["enactment"]["node"] == "/test/acts/47/4"
 
     def test_add_two_enactment_indexes(self):
         """
@@ -133,19 +138,23 @@ class TestCollectEnactments:
         assert example_rules[0]["enactments"][0] == "beard means"
         assert example_rules[0]["enactments"][1] == '/test/acts/47/4/a:suffix=", or"'
 
+    @pytest.mark.xfail(
+        reason="Text anchors for one passage no longer consolidated in one place."
+    )
     def test_collect_enactment_anchors_from_dict(self):
         """Anchors for this Enactment are collected in two different places."""
         example_rules, mentioned = collect_enactments(self.example_rules)
-        assert mentioned["ear rule"]["anchors"][0]["start"] == 10
-        assert mentioned["ear rule"]["anchors"][2]["start"] == 100
+        assert mentioned["ear rule"]["enactment"]["anchors"][0]["start"] == 10
+        assert mentioned["ear rule"]["enactment"]["anchors"][2]["start"] == 100
 
     @pytest.mark.vcr
     def test_update_unloaded_enactment_from_api(self, test_client):
         example_rules, mentioned = collect_enactments(self.example_rules)
-        updated = test_client.update_enactment_from_api(mentioned["ear rule"])
+        updated = test_client.update_enactment_from_api(
+            mentioned["ear rule"]["enactment"]
+        )
         assert updated["node"] == "/test/acts/47/4/b"
         assert updated["anchors"][0]["start"] == 10
-        assert updated["anchors"][2]["start"] == 100
         assert updated["text_version"]["content"].startswith(
             "exists in an uninterrupted"
         )
