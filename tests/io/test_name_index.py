@@ -100,7 +100,7 @@ class TestCollectMentioned:
         The Factors must be inserted in "mentioned" with the generated name.
         """
 
-        oracle_records = loaders.load_holdings("holding_oracle.json")
+        oracle_records = loaders.load_holdings("holding_oracle.yaml")
         holdings = readers.read_holdings(oracle_records, client=fake_usc_client)
         factor = holdings[2].inputs[0]
         assert factor.predicate.content == "${the_java_api} was an original work"
@@ -149,7 +149,7 @@ class TestCollectMentioned:
         Test error message:
         'Name "securing for authors" not found in the index of mentioned Factors'
         """
-        feist_records = loaders.load_holdings("holding_feist.json")
+        feist_records = loaders.load_holdings("holding_feist.yaml")
         feist_holding = readers.read_holding(feist_records[0], client=fake_usc_client)
         assert "securing for limited Times" in feist_holding.short_string
 

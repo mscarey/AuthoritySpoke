@@ -9,16 +9,20 @@ holdings:
       truth: false
     mandatory: true
     enactments:
-      node: /us/usc/t17/s102/a
-      exact:
-        Copyright protection subsists, in accordance with this title, in original
-        works of authorship fixed in any tangible medium of expression, now known or
-        later developed, from which they can be perceived, reproduced, or otherwise
-        communicated, either directly or with the aid of a machine or device.
       name: copyright protection provision
+      enactment:
+        node: /us/usc/t17/s102/a
+      selection:
+        quotes:
+        - exact: Copyright protection subsists, in accordance with this title, in original
+            works of authorship fixed in any tangible medium of expression, now known or
+            later developed, from which they can be perceived, reproduced, or otherwise
+            communicated, either directly or with the aid of a machine or device.
       anchors:
+        quotes:
         - qualify for copyright protection. |17 U.S.C. § 102(a)|.
-    anchors: By statute, a work |must be “original” to qualify| for
+    anchors: 
+      quotes: By statute, a work |must be “original” to qualify| for
   - inputs:
       - type: fact
         content:
@@ -31,7 +35,8 @@ holdings:
       content: the Java API was an original work
     mandatory: true
     universal: true
-    enactments: copyright protection provision
+    enactments: 
+      - copyright protection provision
   - inputs:
       - the Java API was an original work
       - type: fact
@@ -50,10 +55,11 @@ holdings:
       type: fact
       content: the Java API was copyrightable
     mandatory: true
-    enactments: copyright protection provision
+    enactments: 
+      - copyright protection provision
     enactments_despite:
-      node: /us/usc/t17/s102/b
-      selection: true
+      enactment:
+        node: /us/usc/t17/s102/b
       name: copyright exceptions full
   - inputs:
       - type: fact
@@ -83,8 +89,10 @@ holdings:
       - the Java API was a literal element of the Java language
     outputs: the Java API was copyrightable
     mandatory: true
-    enactments: copyright protection provision
-    enactments_despite: copyright exceptions full
+    enactments: 
+      - copyright protection provision
+    enactments_despite: 
+      - copyright exceptions full
   - inputs:
       - the Java language was a computer program
       - type: fact
@@ -124,8 +132,10 @@ holdings:
         truth: false
     outputs: the Java API was copyrightable
     mandatory: true
-    enactments: copyright protection provision
-    enactments_despite: copyright exceptions full
+    enactments: 
+      - copyright protection provision
+    enactments_despite: 
+      - copyright exceptions full
   - inputs:
       - the Java language was a computer program
       - the Java API was a non-literal element of the Java language
@@ -139,8 +149,10 @@ holdings:
       content: the Java API was copyrightable
       truth: false
     mandatory: true
-    enactments: copyright exceptions full
-    enactments_despite: copyright protection provision
+    enactments: 
+      - copyright exceptions full
+    enactments_despite: 
+      - copyright protection provision
   - inputs:
       - the Java language was a computer program
       - type: fact
@@ -172,26 +184,32 @@ holdings:
       type: fact
       content: the Java API was copyrightable
     mandatory: true
-    enactments: copyright protection provision
+    enactments: 
+      - copyright protection provision
     enactments_despite:
-      - node: /us/usc/t17/s102/b
+      - name: in no case method of operation
+        enactment:
+          node: /us/usc/t17/s102/b
         selection:
-          - exact:
-              In no case does copyright protection for an original work of authorship
-              extend to any
+          quotes:
+          - exact: In no case does copyright protection for an original work of authorship extend to any
           - exact: method of operation
-        name: in no case method of operation
-      - node: /us/cfr/t37/s202.1
-        heading: Material not subject to copyright.
-        content:
-          "The following are examples of works not subject to copyright and applications
-          for registration of such works cannot be entertained:"
-        children:
+      - name: short phrases copyright exception
+        selection:
+          quotes:
+          - suffix: familiar symbols or designs
+        enactment:
+          node: /us/cfr/t37/s202.1
+          heading: Material not subject to copyright.
+          start_date: "1992-02-21"
+          text_version: "The following are examples of works not subject to copyright and applications
+            for registration of such works cannot be entertained:"
+          children:
           - node: /us/cfr/t37/s202.1/a
             start_date: "1992-02-21"
             selection: true
             heading: ""
-            content:
+            text_version:
               Words and short phrases such as names, titles, and slogans; familiar
               symbols or designs; mere variations of typographic ornamentation, lettering
               or coloring; mere listing of ingredients or contents;
@@ -199,14 +217,14 @@ holdings:
             start_date: "1992-02-21"
             selection: true
             heading: ""
-            content:
+            text_version:
               "Ideas, plans, methods, systems, or devices, as distinguished from
               the particular manner in which they are expressed or described in a writing;  "
           - node: /us/cfr/t37/s202.1/c
             start_date: "1992-02-21"
             selection: true
             heading: ""
-            content:
+            text_version:
               Blank forms, such as time cards, graph paper, account books, diaries,
               bank checks, scorecards, address books, report forms, order forms and the
               like, which are designed for recording information and do not in themselves
@@ -215,7 +233,7 @@ holdings:
             start_date: "1992-02-21"
             selection: true
             heading: ""
-            content:
+            text_version:
               "Works consisting entirely of information that is common property containing
               no original authorship, such as, for example: Standard calendars, height and
               weight charts, tape measures and rulers, schedules of sporting events, and
@@ -224,10 +242,7 @@ holdings:
             start_date: "1992-02-21"
             selection: true
             heading: ""
-            content: Typeface as typeface.
-        start_date: "1992-02-21"
-        name: short phrases copyright exception
-        suffix: familiar symbols or designs
+            text_version: Typeface as typeface.
   - inputs:
       type: fact
       content: the Java API was a scene a faire

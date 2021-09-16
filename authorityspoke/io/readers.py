@@ -254,7 +254,10 @@ def read_holdings(
     record, enactment_index = collect_enactments(record)
     if client:
         enactment_index = client.update_entries_in_enactment_index(enactment_index)
-    anchors, enactment_index = collect_anchors_from_index(enactment_index, "enactment")
+    factor_anchors, enactment_index = collect_anchors_from_index(
+        enactment_index, "enactment"
+    )
+
     schema.context["enactment_index"] = enactment_index
 
     record, factor_index = index_names(record)

@@ -743,7 +743,7 @@ class TestExclusiveFlag:
         generated Rules as well as its original Rule.
         """
         mock_client = FakeClient(responses=make_response)
-        feist_json = load_holdings("holding_feist.json")
+        feist_json = load_holdings("holding_feist.yaml")
         feist_holdings = readers.read_holdings(feist_json, client=mock_client)
 
         assert len(feist_holdings) == len(feist_json)
@@ -761,6 +761,6 @@ class TestNestedFactorImport:
         concerning appellant’s use of narcotics was improper.
         """
         mock_client = FakeClient(responses=make_response)
-        cardenas_json = load_holdings("holding_cardenas.json")
+        cardenas_json = load_holdings("holding_cardenas.yaml")
         cardenas_holdings = readers.read_holdings(cardenas_json, client=mock_client)
         assert len(cardenas_holdings) == 2
