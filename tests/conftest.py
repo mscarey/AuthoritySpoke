@@ -1395,7 +1395,7 @@ def make_rule(
 def make_beard_rule(beard_response) -> List[Rule]:
     """Rules from the "Beard Tax Act" example statutes."""
     client = FakeClient(responses=beard_response)
-    beard_dictionary = loaders.load_holdings("beard_rules.json")
+    beard_dictionary = loaders.load_holdings("beard_rules.yaml")
     return readers.read_rules(beard_dictionary, client=client)
 
 

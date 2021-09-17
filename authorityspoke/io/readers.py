@@ -170,6 +170,17 @@ class HoldingsIndexed(NamedTuple):
     holding_anchors: List[List[TextQuoteSelector]]
 
 
+def collect_enactment_anchors(object_index):
+    anchors = []
+    for key, value in object_index.items():
+        if value.get("anchors"):
+            anchored_object: Dict[str, Any] = {}
+            anchored_object["anchors"] = value.pop("anchors")
+            anchored_object["passage"] = value
+            anchors.append(anchored_object)
+    return anchors, object_index
+
+
 def collect_anchors_from_index(object_index, field_name: str):
     anchors = []
     for key, value in object_index.items():
@@ -211,7 +222,7 @@ def read_holdings_with_anchors(
         enactment_index = client.update_entries_in_enactment_index(enactment_index)
 
     # move anchors out of enactments
-    anchors, enactment_index = collect_anchors_from_index(enactment_index, "enactment")
+    anchors, enactment_index = collect_enactment_anchors(enactment_index)
     if not record.get("enactment_anchors"):
         record["enactment_anchors"] = []
     record["enactment_anchors"] = record["enactment_anchors"] + anchors
@@ -262,6 +273,7 @@ def read_holdings(
 
     record, factor_index = index_names(record)
     anchors, factor_index = collect_anchors_from_index(factor_index, "name")
+    holding_anchors = [holding.pop("anchors", None) for holding in record]
     schema.context["mentioned"] = factor_index
 
     return schema.load(deepcopy(record))

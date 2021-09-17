@@ -3,9 +3,11 @@ import os
 from dotenv import load_dotenv
 
 from legislice.download import Client
+import pytest
 
 from authorityspoke.io import loaders, readers, schemas_yaml
 from authorityspoke.io import name_index, text_expansion
+
 
 load_dotenv()
 
@@ -93,7 +95,7 @@ class TestCollectMentioned:
         shortest = mentioned.popitem()
         assert shortest[0] == "Short Name"
 
-    def test_name_inferred_from_content(self, fake_usc_client):
+    def test_name_inferred_from_content(self):
         """
         Test that a name field is generated for Factors without them.
 
@@ -101,9 +103,15 @@ class TestCollectMentioned:
         """
 
         oracle_records = loaders.load_holdings("holding_oracle.yaml")
-        holdings = readers.read_holdings(oracle_records, client=fake_usc_client)
-        factor = holdings[2].inputs[0]
-        assert factor.predicate.content == "${the_java_api} was an original work"
+        for holding in oracle_records:
+            holding.pop("enactments", None)
+            holding.pop("enactments_despite", None)
+        holdings, mentioned = name_index.index_names(oracle_records)
+        assert holdings[2]["inputs"][0] == "the Java API was an original work"
+        assert (
+            mentioned["the Java API was an original work"]["predicate"]["content"]
+            == "${the_java_api} was an original work"
+        )
 
     def test_enactment_name_index(self):
         """

@@ -1,73 +1,85 @@
 - inputs:
-  - type: fact
-    content: '{the suspected beard} was facial hair'
-  - type: fact
-    content: the length of the suspected beard was >= 5 millimetres
-  - type: fact
-    content: the suspected beard occurred on or below the chin
+    - type: fact
+      content: "{the suspected beard} was facial hair"
+    - type: fact
+      content: the length of the suspected beard was >= 5 millimetres
+    - type: fact
+      content: the suspected beard occurred on or below the chin
   outputs:
-  - type: fact
-    content: the suspected beard was a beard
-    name: the fact that the facial hair was a beard
+    - type: fact
+      content: the suspected beard was a beard
+      name: the fact that the facial hair was a beard
   enactments:
-  - node: /test/acts/47/4
-    exact: 'In this Act, beard means any facial hair no shorter than 5 millimetres
-      in length that: occurs on or below the chin'
+    - enactment:
+        node: /test/acts/47/4
+      selection:
+        quotes:
+          - exact: "In this Act, beard means any facial hair no shorter than 5 millimetres in length that: occurs on or below the chin"
   universal: true
 - inputs:
-  - type: fact
-    content: '{the suspected beard} was facial hair'
-  - type: fact
-    content: the length of the suspected beard was >= 5 millimetres
-  - type: fact
-    content: the suspected beard existed in an uninterrupted line from the front of
-      one ear to the front of the other ear below the nose
+    - type: fact
+      content: "{the suspected beard} was facial hair"
+    - type: fact
+      content: the length of the suspected beard was >= 5 millimetres
+    - type: fact
+      content:
+        the suspected beard existed in an uninterrupted line from the front of
+        one ear to the front of the other ear below the nose
   outputs:
-  - type: fact
-    content: the suspected beard was a beard
-    name: the fact that the facial hair was a beard
+    - type: fact
+      content: the suspected beard was a beard
+      name: the fact that the facial hair was a beard
   enactments:
-  - node: /test/acts/47/4
-    selection:
-    - exact: 'In this Act, beard means any facial hair no shorter than 5 millimetres
-        in length that:'
-    - exact: exists in an uninterrupted line from the front of one ear to the front
-        of the other ear below the nose.
-  - node: /test/acts/47/4/b
+    - enactment:
+        node: /test/acts/47/4
+      selection:
+        quotes:
+          - exact: "In this Act, beard means any facial hair no shorter than 5 millimetres in length that:"
+          - exact: exists in an uninterrupted line from the front of one ear to the front of the other ear below the nose.
+    - enactment:
+        node: /test/acts/47/4/b
   universal: true
 - inputs:
-  - the fact that the facial hair was a beard
-  - type: fact
-    content: '{the defendant} wore the suspected beard'
-    name: the defendant's act of wearing the suspected beard
-  - type: fact
-    content: the office of {the Department of Beards} granted an exemption authorizing
-      the defendant's act of wearing the suspected beard
-    truth: false
+    - the fact that the facial hair was a beard
+    - type: fact
+      content: "{the defendant} wore the suspected beard"
+      name: the defendant's act of wearing the suspected beard
+    - type: fact
+      content:
+        the office of {the Department of Beards} granted an exemption authorizing
+        the defendant's act of wearing the suspected beard
+      truth: false
   outputs:
     type: fact
-    content: '{the defendant} committed the offense of wearing of a beard without
-      exemption'
+    content:
+      "{the defendant} committed the offense of wearing of a beard without
+      exemption"
     name: offense of wearing a beard without exemption
   enactments:
-  - node: /test/acts/47/5
-  - node: /test/acts/47/7
+    - enactment:
+        node: /test/acts/47/5
+    - enactment:
+        node: /test/acts/47/7
   enactments_despite:
-    node: /test/acts/47/6
+    - enactment:
+        node: /test/acts/47/6
   universal: true
 - inputs:
     type: fact
-    content: the Department of Beards granted an exemption authorizing the defendant's
+    content:
+      the Department of Beards granted an exemption authorizing the defendant's
       act of wearing the suspected beard
     name: the Department of Beards granted the defendant's beard exemption
   outputs:
     type: fact
-    content: the Department of Beards granted an exemption from the prohibition of
+    content:
+      the Department of Beards granted an exemption from the prohibition of
       wearing beards
   universal: true
   mandatory: true
   enactments:
-    node: /test/acts/47/6/1
+    - enactment:
+        node: /test/acts/47/6/1
 - inputs:
     type: exhibit
     form: token
@@ -80,42 +92,50 @@
     to_effect: the Department of Beards granted the defendant's beard exemption
   universal: true
   enactments:
-  - node: /test/acts/47/6C
+    - enactment:
+        node: /test/acts/47/6C
 - inputs:
     type: fact
-    content: '{the beardcoin transaction} was {the defendant}''s purchase of any beardcoin
-      from {the counterparty}'
+    content:
+      "{the beardcoin transaction} was {the defendant}'s purchase of any beardcoin
+      from {the counterparty}"
     terms:
-    - type: exhibit
-      form: token
-      statement:
-        type: fact
-        content: the Department of Beards granted an exemption from the prohibition
-          of wearing beards
-        name: the Department of Beards granted a beard exemption
-      statement_attribution: the Department of Beards
-      name: any beardcoin
+      - type: exhibit
+        form: token
+        statement:
+          type: fact
+          content:
+            the Department of Beards granted an exemption from the prohibition
+            of wearing beards
+          name: the Department of Beards granted a beard exemption
+        statement_attribution: the Department of Beards
+        name: any beardcoin
   outputs:
     type: fact
-    content: the beardcoin transaction was a transfer of beardcoin between the defendant
+    content:
+      the beardcoin transaction was a transfer of beardcoin between the defendant
       and the counterparty
     name: beardcoin transfer
   enactments:
-    node: /test/acts/47/7A
+    - enactment:
+        node: /test/acts/47/7A
   universal: true
   mandatory: true
 - inputs:
     type: fact
-    content: the beardcoin transaction was the counterparty's purchase of any beardcoin
+    content:
+      the beardcoin transaction was the counterparty's purchase of any beardcoin
       from the defendant
   outputs: beardcoin transfer
   enactments:
-    node: /test/acts/47/7A
+    - enactment:
+        node: /test/acts/47/7A
   universal: true
   mandatory: true
 - inputs:
     type: fact
-    content: the beardcoin transaction was the defendant's loan of any beardcoin to
+    content:
+      the beardcoin transaction was the defendant's loan of any beardcoin to
       the counterparty
   outputs: beardcoin transfer
   enactments:
@@ -124,39 +144,45 @@
   mandatory: true
 - inputs:
     type: fact
-    content: the beardcoin transaction was the defendant's lease of any beardcoin
+    content:
+      the beardcoin transaction was the defendant's lease of any beardcoin
       to the counterparty
   outputs: beardcoin transfer
   enactments:
-    node: /test/acts/47/7A
+    - enactment:
+        node: /test/acts/47/7A
   universal: true
   mandatory: true
 - inputs:
     type: fact
-    content: the beardcoin transaction was the defendant's gift of any beardcoin to
+    content:
+      the beardcoin transaction was the defendant's gift of any beardcoin to
       the counterparty
   outputs: beardcoin transfer
   enactments:
-    node: /test/acts/47/7A
+    - enactment:
+        node: /test/acts/47/7A
   universal: true
   mandatory: true
 - inputs:
     type: fact
-    content: the beardcoin transaction was the defendant's receipt of any beardcoin
+    content:
+      the beardcoin transaction was the defendant's receipt of any beardcoin
       from the counterparty
   outputs: beardcoin transfer
   enactments:
-    node: /test/acts/47/7A
+    - enactment:
+        node: /test/acts/47/7A
   universal: true
   mandatory: true
 - inputs:
-  - beardcoin transfer
-  - type: fact
-    content: the beardcoin transaction was a licensed beardcoin repurchase
-    absent: true
-  - type: fact
-    content: the counterparty was the Department of Beards
-    truth: false
+    - beardcoin transfer
+    - type: fact
+      content: the beardcoin transaction was a licensed beardcoin repurchase
+      absent: true
+    - type: fact
+      content: the counterparty was the Department of Beards
+      truth: false
   despite:
     type: fact
     content: any beardcoin was counterfeit
@@ -164,33 +190,42 @@
     type: fact
     content: the defendant committed the offense of improper transfer of beardcoin
   enactments:
-  - node: /test/acts/47/7A
-  - node: /test/acts/47/7B/2
+    - enactment:
+        node: /test/acts/47/7A
+    - enactment:
+        node: /test/acts/47/7B/2
   enactments_despite:
-  - node: /test/acts/47/11
+    - enactment:
+        node: /test/acts/47/11
   mandatory: true
   universal: true
 - inputs:
     type: fact
-    content: the defendant produced, altered, or manufactured tokens with the appearance
+    content:
+      the defendant produced, altered, or manufactured tokens with the appearance
       of and purporting to be genuine beardcoin
   outputs:
     type: fact
     content: the defendant committed the offense of counterfeiting beardcoin
   enactments:
-  - node: /test/acts/47/7B/1
+    - enactment:
+        node: /test/acts/47/7B/1
 - inputs:
-  - type: fact
-    content: the beardcoin transaction was {the barber}'s purchase of any beardcoin
-      from {the customer}
-  - type: fact
-    content: the barber removed the customer's beard with barbering, hairdressing,
-      or other male grooming services
-  - type: fact
-    content: the Department of Beards licensed the barber to purchase beardcoins from
-      customers
+    - type: fact
+      content:
+        the beardcoin transaction was {the barber}'s purchase of any beardcoin
+        from {the customer}
+    - type: fact
+      content:
+        the barber removed the customer's beard with barbering, hairdressing,
+        or other male grooming services
+    - type: fact
+      content:
+        the Department of Beards licensed the barber to purchase beardcoins from
+        customers
   outputs:
     type: fact
     content: the beardcoin transaction was a licensed beardcoin repurchase
   enactments:
-    node: /test/acts/47/11
+    - enactment:
+        node: /test/acts/47/11

@@ -57,9 +57,10 @@ class TestHoldingLoad:
 class TestLoadAndReadFake:
     client = FakeClient.from_file("usc.json")
 
+    @pytest.mark.vcr
     def test_read_holdings_from_file(self):
         oracle_holdings = read_holdings_from_file(
-            "holding_oracle.json", client=self.client
+            "holding_oracle.yaml", client=self.client
         )
         assert oracle_holdings[0]
 
