@@ -139,7 +139,8 @@
       the counterparty
   outputs: beardcoin transfer
   enactments:
-    node: /test/acts/47/7A
+    - enactment:
+      node: /test/acts/47/7A
   universal: true
   mandatory: true
 - inputs:

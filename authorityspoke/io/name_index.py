@@ -289,6 +289,7 @@ def collect_mentioned(
         "anchors",
         "factor_anchors",
         "enactment_anchors",
+        "enactments",
     ),
 ) -> Tuple[RawFactor, Mentioned]:
     """

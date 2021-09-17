@@ -15,7 +15,7 @@ from anchorpoint.textselectors import TextQuoteSelector, TextPositionSelector
 from anchorpoint.schemas import TextPositionSetSchema, PositionSchema, QuoteSchema
 from justopinion.decisions import Jurisdiction, Court
 from legislice import Enactment
-from legislice.schemas import EnactmentSchema
+from legislice.schemas import EnactmentSchema, EnactmentPassageSchema
 from nettlesome.factors import Factor
 from nettlesome.schemas import PredicateSchema, EntitySchema, RawFactor
 
@@ -282,8 +282,8 @@ class RuleSchema(Schema):
 
     __model__: Type = Rule
     procedure = fields.Nested(ProcedureSchema)
-    enactments = fields.Nested(EnactmentSchema, many=True)
-    enactments_despite = fields.Nested(EnactmentSchema, many=True)
+    enactments = fields.Nested(EnactmentPassageSchema, many=True)
+    enactments_despite = fields.Nested(EnactmentPassageSchema, many=True)
     mandatory = fields.Bool(load_default=False)
     universal = fields.Bool(load_default=False)
     name = fields.Str(load_default=None)
