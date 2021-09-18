@@ -2,7 +2,7 @@ import pytest
 from marshmallow import ValidationError
 
 from anchorpoint.textselectors import TextSelectionError
-from anchorpoint.schemas import QuoteSchema
+from authorityspoke.io.schemas_anchor import QuoteSchema
 from authorityspoke.io import dump, schemas_yaml, schemas_json
 
 

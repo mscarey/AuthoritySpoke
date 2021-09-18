@@ -8,10 +8,10 @@ from dotenv import load_dotenv
 
 from legislice.citations import CodeLevel
 from legislice.download import Client, LegislicePathError
-from legislice.yaml_schemas import ExpandableEnactmentSchema
 
 from authorityspoke.io import loaders
 from authorityspoke.io.fake_enactments import FakeClient
+from authorityspoke.io.schemas_legis import ExpandableEnactmentSchema
 
 load_dotenv()
 

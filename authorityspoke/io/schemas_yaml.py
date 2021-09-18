@@ -14,10 +14,7 @@ from marshmallow import pre_load, post_load
 from marshmallow import ValidationError
 
 from anchorpoint.textselectors import TextQuoteSelector, TextPositionSelector
-from anchorpoint.schemas import TextPositionSetSchema
 from legislice.enactments import Enactment, EnactmentPassage
-from legislice.schemas import enactment_needs_api_update
-from legislice.yaml_schemas import ExpandablePassageSchema as LegisliceSchema
 
 from nettlesome.entities import Entity
 from nettlesome.factors import Factor
@@ -35,6 +32,9 @@ from authorityspoke.io.name_index import Mentioned
 from authorityspoke.io.name_index import RawFactor, RawPredicate
 from authorityspoke.io.nesting import nest_fields
 from authorityspoke.io import text_expansion
+from authorityspoke.io.schemas_anchor import TextPositionSetSchema
+from authorityspoke.io.schemas_legis import AnchoredEnactmentPassageSchema
+from authorityspoke.io.schemas_legis import EnactmentPassageSchema as LegisliceSchema
 
 from authorityspoke.opinions import AnchoredHoldings
 from authorityspoke.pleadings import Pleading, Allegation
@@ -537,29 +537,12 @@ class NamedAnchorsSchema(ExpandableSchema):
         return data
 
 
-class AnchoredEnactments(NamedTuple):
-    enactment: Enactment
-    anchors: List[TextQuoteSelector]
-
-
-class AnchoredEnactmentsSchema(ExpandableSchema):
-    __model__ = AnchoredEnactments
-
-    enactment = fields.Nested(EnactmentPassageSchema)
-    anchors = fields.Nested(TextPositionSetSchema, many=True)
-
-    @pre_load
-    def format_data_to_load(self, data, **kwargs):
-        data = self.wrap_single_element_in_list(data, "anchors")
-        return data
-
-
 class AnchoredHoldingsSchema(ExpandableSchema):
     __model__ = AnchoredHoldings
 
     holdings = fields.Nested(HoldingSchema, many=True)
     factor_anchors = fields.Nested(NamedAnchorsSchema, many=True)
-    enactment_anchors = fields.Nested(AnchoredEnactmentsSchema, many=True)
+    enactment_anchors = fields.Nested(AnchoredEnactmentPassageSchema, many=True)
 
     @pre_load
     def format_data_to_load(self, data: RawFactor, **kwargs) -> RawFactor:

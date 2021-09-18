@@ -6,8 +6,9 @@ from dotenv import load_dotenv
 import pytest
 
 from legislice.enactments import Enactment
-from legislice.yaml_schemas import EnactmentSchema
+
 from authorityspoke.io.enactment_index import EnactmentIndex, collect_enactments
+from authorityspoke.io.schemas_legis import EnactmentSchema
 
 load_dotenv()
 

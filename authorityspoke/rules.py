@@ -95,8 +95,14 @@ class Rule(Comparable):
         name: Optional[str] = None,
     ):
         self.procedure = procedure
-        self.enactments = EnactmentGroup(enactments)
-        self.enactments_despite = EnactmentGroup(enactments_despite)
+        self.enactments = (
+            EnactmentGroup(passages=enactments) if enactments else EnactmentGroup()
+        )
+        self.enactments_despite = (
+            EnactmentGroup(passages=enactments_despite)
+            if enactments_despite
+            else EnactmentGroup()
+        )
         self.mandatory = mandatory
         self.universal = universal
         self.generic = generic

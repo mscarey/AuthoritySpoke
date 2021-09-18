@@ -9,7 +9,6 @@ from legislice.download import Client
 from legislice.citations import CodeLevel
 from legislice.enactments import Enactment
 from legislice.groups import EnactmentGroup
-from legislice.schemas import EnactmentSchema
 
 from nettlesome.entities import Entity
 from nettlesome.predicates import Predicate

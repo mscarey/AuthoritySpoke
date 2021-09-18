@@ -2,7 +2,6 @@ import os
 
 from dotenv import load_dotenv
 from legislice.download import Client
-from legislice.schemas import EnactmentSchema
 import pytest
 
 from authorityspoke.io import name_index, readers

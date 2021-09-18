@@ -7,7 +7,7 @@ holdings:
       content: Mazza-Alaluf operated Turismo Costa Brava without an appropriate money transmitting license in a State where such operation was punishable as a misdemeanor or a felony under State law
       anchors: 
         quotes: 
-          - we conclude that sufficient evidence supports Mazza-Alaluf's convictions under 18 U.S.C. § 1960(b)(1)(A) for conspiring to operate and operating a money transmitting business without appropriate state licenses.
+          - exact: we conclude that sufficient evidence supports Mazza-Alaluf's convictions under 18 U.S.C. § 1960(b)(1)(A) for conspiring to operate and operating a money transmitting business without appropriate state licenses.
       name: operated without license
     enactments:
     - name: state money transmitting license provision

@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 from justopinion.decisions import Decision, Opinion
 from legislice.download import Client
 from legislice.enactments import Enactment
-from legislice.yaml_schemas import ExpandableEnactmentSchema as EnactmentSchema
+
 from nettlesome.terms import ContextRegister
 from nettlesome.entities import Entity
 from nettlesome.factors import Factor
@@ -29,7 +29,6 @@ from authorityspoke.rules import Procedure, Rule
 from authorityspoke.io import loaders, readers
 from authorityspoke.io.fake_enactments import FakeClient
 from authorityspoke.io.schemas_json import RawFactor, RawHolding
-
 
 load_dotenv()
 

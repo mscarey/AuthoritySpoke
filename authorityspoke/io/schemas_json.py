@@ -12,10 +12,10 @@ from marshmallow import pre_load, post_load
 from marshmallow_oneofschema import OneOfSchema
 
 from anchorpoint.textselectors import TextQuoteSelector, TextPositionSelector
-from anchorpoint.schemas import TextPositionSetSchema, PositionSchema, QuoteSchema
+
 from justopinion.decisions import Jurisdiction, Court
 from legislice import Enactment
-from legislice.schemas import EnactmentSchema, EnactmentPassageSchema
+
 from nettlesome.factors import Factor
 from nettlesome.schemas import PredicateSchema, EntitySchema, RawFactor
 
@@ -27,6 +27,12 @@ from authorityspoke.opinions import Opinion
 from authorityspoke.pleadings import Pleading, Allegation
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
+from authorityspoke.io.schemas_legis import EnactmentSchema, EnactmentPassageSchema
+from authorityspoke.io.schemas_anchor import (
+    TextPositionSetSchema,
+    PositionSchema,
+    QuoteSchema,
+)
 
 RawSelector = Union[str, Dict[str, str]]
 RawEnactment = Dict[str, Union[str, List[RawSelector]]]

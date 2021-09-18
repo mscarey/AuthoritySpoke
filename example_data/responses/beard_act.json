@@ -2,7 +2,7 @@
     "/test/acts/47/1": {
         "1935-04-01": {
             "heading": "Short title",
-            "content": "This Act may be cited as the Australian Beard Tax (Promotion of Enlightenment Values) Act 1934.",
+            "text_version": "This Act may be cited as the Australian Beard Tax (Promotion of Enlightenment Values) Act 1934.",
             "children": [],
             "end_date": null,
             "node": "/test/acts/47/1",
@@ -14,7 +14,7 @@
     "/test/acts/47/2": {
         "1935-04-01": {
             "heading": "Commencement",
-            "content": "This Act shall commence on 1 April 1935.",
+            "text_version": "This Act shall commence on 1 April 1935.",
             "children": [],
             "end_date": null,
             "node": "/test/acts/47/2",
@@ -26,11 +26,11 @@
     "/test/acts/47/3": {
         "1935-04-01": {
             "heading": "Purpose",
-            "content": "",
+            "text_version": "",
             "children": [
                 {
                     "heading": "",
-                    "content": "This Act is enacted for the purpose of the promotion of enlightenment values.",
+                    "text_version": "This Act is enacted for the purpose of the promotion of enlightenment values.",
                     "children": [],
                     "end_date": null,
                     "node": "/test/acts/47/3/a",
@@ -48,11 +48,11 @@
     "/test/acts/47/4": {
         "1935-04-01": {
             "heading": "Beard, defined",
-            "content": "In this Act, beard means any facial hair no shorter than 5 millimetres in length that:",
+            "text_version": "In this Act, beard means any facial hair no shorter than 5 millimetres in length that:",
             "children": [
                 {
                     "heading": "",
-                    "content": "occurs on or below the chin, or",
+                    "text_version": "occurs on or below the chin, or",
                     "children": [],
                     "end_date": null,
                     "node": "/test/acts/47/4/a",
@@ -61,7 +61,7 @@
                 },
                 {
                     "heading": "",
-                    "content": "exists in an uninterrupted line from the front of one ear to the front of the other ear below the nose.",
+                    "text_version": "exists in an uninterrupted line from the front of one ear to the front of the other ear below the nose.",
                     "children": [],
                     "end_date": null,
                     "node": "/test/acts/47/4/b",
@@ -79,7 +79,7 @@
     "/test/acts/47/5": {
         "1935-04-01": {
             "heading": "Prohibition of beards",
-            "content": "The wearing of any beard whatsoever, except as provided in section 6, is prohibited within the Commonwealth of Australia.",
+            "text_version": "The wearing of any beard whatsoever, except as provided in section 6, is prohibited within the Commonwealth of Australia.",
             "children": [],
             "end_date": null,
             "node": "/test/acts/47/5",
@@ -91,11 +91,11 @@
     "/test/acts/47/6": {
         "1935-04-01": {
             "heading": "Exemption",
-            "content": "",
+            "text_version": "",
             "children": [
                 {
                     "heading": "",
-                    "content": "The office of the Department of Beards may, from time to time or as they see fit, grant exemptions to persons from the prohibition contained in section 5.",
+                    "text_version": "The office of the Department of Beards may, from time to time or as they see fit, grant exemptions to persons from the prohibition contained in section 5.",
                     "children": [],
                     "end_date": null,
                     "node": "/test/acts/47/6/1",
@@ -104,7 +104,7 @@
                 },
                 {
                     "heading": "",
-                    "content": "Any such exemption granted under subsection 1 is to be for no longer than a period of 12 months.",
+                    "text_version": "Any such exemption granted under subsection 1 is to be for no longer than a period of 12 months.",
                     "children": [],
                     "end_date": null,
                     "node": "/test/acts/47/6/2",
@@ -122,7 +122,7 @@
     "/test/acts/47/6A": {
         "1935-04-01": {
             "heading": "Levy of beard tax",
-            "content": "Where the Department provides an exemption from the prohibition in section 5, except as defined in section 6D, the person to whom such exemption is granted shall be liable to pay to the Department of Beards such fee as may be levied under section 6B.",
+            "text_version": "Where the Department provides an exemption from the prohibition in section 5, except as defined in section 6D, the person to whom such exemption is granted shall be liable to pay to the Department of Beards such fee as may be levied under section 6B.",
             "children": [],
             "end_date": null,
             "node": "/test/acts/47/6A",
@@ -134,7 +134,7 @@
     "/test/acts/47/6B": {
         "1935-04-01": {
             "heading": "Regulatory power of the Minister for Beards",
-            "content": "The Minister for Beards may, by Order in Council, issue such regulations, including but not limited to levies to be paid by persons exempted under section 6 from the prohibition in section 5, as is necessary for the good governance and financial stability of the Department of Beards.",
+            "text_version": "The Minister for Beards may, by Order in Council, issue such regulations, including but not limited to levies to be paid by persons exempted under section 6 from the prohibition in section 5, as is necessary for the good governance and financial stability of the Department of Beards.",
             "children": [],
             "end_date": null,
             "node": "/test/acts/47/6B",
@@ -146,11 +146,11 @@
     "/test/acts/47/6C": {
         "2013-07-18": {
             "heading": "Issuance of beardcoin",
-            "content": "Where an exemption is granted under section 6, the Department of Beards shall issue to the person so exempted a token, hereinafter referred to as a beardcoin, that shall for all purposes be regarded as substantive proof of such exemption.",
+            "text_version": "Where an exemption is granted under section 6, the Department of Beards shall issue to the person so exempted a token, hereinafter referred to as a beardcoin, that shall for all purposes be regarded as substantive proof of such exemption.",
             "children": [
                 {
                     "heading": "",
-                    "content": "The beardcoin shall be a cryptocurrency token using a blockchain approved by the Department of Beards.",
+                    "text_version": "The beardcoin shall be a cryptocurrency token using a blockchain approved by the Department of Beards.",
                     "children": [],
                     "end_date": null,
                     "node": "/test/acts/47/6C/1",
@@ -159,7 +159,7 @@
                 },
                 {
                     "heading": "",
-                    "content": "The beardcoin's blockchain shall be in substantially the following form. WHEREAS this beardcoin is approved by the Department of Beards under section 6,\n                     it is secured by the following blockchain: □□□□□□□□□□.",
+                    "text_version": "The beardcoin's blockchain shall be in substantially the following form. WHEREAS this beardcoin is approved by the Department of Beards under section 6,\n                     it is secured by the following blockchain: □□□□□□□□□□.",
                     "children": [],
                     "end_date": null,
                     "node": "/test/acts/47/6C/1-con",
@@ -177,11 +177,11 @@
     "/test/acts/47/6D": {
         "2013-07-18": {
             "heading": "Waiver of beard tax in special circumstances",
-            "content": "",
+            "text_version": "",
             "children": [
                 {
                     "heading": "",
-                    "content": "The Department of Beards shall waive the collection of beard tax upon issuance of beardcoin under Section 6C where the reason the maintainer wears a beard is due to bona fide religious, cultural, or medical reasons.",
+                    "text_version": "The Department of Beards shall waive the collection of beard tax upon issuance of beardcoin under Section 6C where the reason the maintainer wears a beard is due to bona fide religious, cultural, or medical reasons.",
                     "children": [],
                     "end_date": null,
                     "node": "/test/acts/47/6D/1",
@@ -190,7 +190,7 @@
                 },
                 {
                     "heading": "",
-                    "content": "The determination of the Department of Beards as to what constitutes bona fide religious or cultural reasons shall be final and no right of appeal shall exist.",
+                    "text_version": "The determination of the Department of Beards as to what constitutes bona fide religious or cultural reasons shall be final and no right of appeal shall exist.",
                     "children": [],
                     "end_date": null,
                     "node": "/test/acts/47/6D/2",
@@ -208,7 +208,7 @@
     "/test/acts/47/7": {
         "1935-04-01": {
             "heading": "Wearing of a beard without exemption",
-            "content": "Any person found to be wearing a beard within the Commonwealth of Australia without proper exemption as granted under section 6 commits an offence.",
+            "text_version": "Any person found to be wearing a beard within the Commonwealth of Australia without proper exemption as granted under section 6 commits an offence.",
             "children": [],
             "end_date": null,
             "node": "/test/acts/47/7",
@@ -220,7 +220,7 @@
     "/test/acts/47/7A": {
         "1935-04-01": {
             "heading": "Improper transfer of beardcoin",
-            "content": "It shall be an offence to buy, sell, lend, lease, gift, transfer or receive in any way a beardcoin from any person or body other than the Department of Beards, except as provided in Part 4.",
+            "text_version": "It shall be an offence to buy, sell, lend, lease, gift, transfer or receive in any way a beardcoin from any person or body other than the Department of Beards, except as provided in Part 4.",
             "children": [],
             "end_date": null,
             "node": "/test/acts/47/7A",
@@ -232,11 +232,11 @@
     "/test/acts/47/7B": {
         "1935-04-01": {
             "heading": "Counterfeit beardcoin",
-            "content": "",
+            "text_version": "",
             "children": [
                 {
                     "heading": "",
-                    "content": "It shall be an offense to produce, alter, or manufacture tokens with the appearance of and purporting to be genuine beardcoin.",
+                    "text_version": "It shall be an offense to produce, alter, or manufacture tokens with the appearance of and purporting to be genuine beardcoin.",
                     "children": [],
                     "end_date": null,
                     "node": "/test/acts/47/7B/1",
@@ -245,7 +245,7 @@
                 },
                 {
                     "heading": "",
-                    "content": "It shall be no defense to a charge under section 7A that the purchase, sale, lease, gift, transfer or receipt was of counterfeit beardcoin rather than genuine beardcoin.",
+                    "text_version": "It shall be no defense to a charge under section 7A that the purchase, sale, lease, gift, transfer or receipt was of counterfeit beardcoin rather than genuine beardcoin.",
                     "children": [],
                     "end_date": null,
                     "node": "/test/acts/47/7B/2",
@@ -276,7 +276,7 @@
                     "text_version": {
                         "id": 1142679,
                         "url": "https://authorityspoke.com/api/v1/textversions/1142679/",
-                        "content": "Where an officer of the Department of Beards, Australian Federal Police, state or territorial police, or military police of the Australian Defence Force finds a person to be wearing a beard within the territory of the Commonwealth of Australia, and that person fails or is unable to produce a beardcoin as proof of holding an exemption under section 6, that officer shall in the first instance issue such person a notice to remedy."
+                        "text_version": "Where an officer of the Department of Beards, Australian Federal Police, state or territorial police, or military police of the Australian Defence Force finds a person to be wearing a beard within the territory of the Commonwealth of Australia, and that person fails or is unable to produce a beardcoin as proof of holding an exemption under section 6, that officer shall in the first instance issue such person a notice to remedy."
                     },
                     "url": "https://authorityspoke.com/api/v1/test/acts/47/8/1@1935-04-01",
                     "end_date": null,
@@ -297,7 +297,7 @@
                     "text_version": {
                         "id": 1142683,
                         "url": "https://authorityspoke.com/api/v1/textversions/1142683/",
-                        "content": "Any such person issued a notice to remedy under subsection 1 must either:"
+                        "text_version": "Any such person issued a notice to remedy under subsection 1 must either:"
                     },
                     "url": "https://authorityspoke.com/api/v1/test/acts/47/8/2@1935-04-01",
                     "end_date": null,
@@ -309,7 +309,7 @@
                             "text_version": {
                                 "id": 1142680,
                                 "url": "https://authorityspoke.com/api/v1/textversions/1142680/",
-                                "content": "shave in such a way that they are no longer in breach of section 5, or"
+                                "text_version": "shave in such a way that they are no longer in breach of section 5, or"
                             },
                             "url": "https://authorityspoke.com/api/v1/test/acts/47/8/2/a@1935-04-01",
                             "end_date": null,
@@ -330,7 +330,7 @@
                             "text_version": {
                                 "id": 1142681,
                                 "url": "https://authorityspoke.com/api/v1/textversions/1142681/",
-                                "content": "obtain a beardcoin from the Department of Beards"
+                                "text_version": "obtain a beardcoin from the Department of Beards"
                             },
                             "url": "https://authorityspoke.com/api/v1/test/acts/47/8/2/b@1935-04-01",
                             "end_date": "2013-07-18",
@@ -344,7 +344,7 @@
                             "text_version": {
                                 "id": 1142682,
                                 "url": "https://authorityspoke.com/api/v1/textversions/1142682/",
-                                "content": "within 14 days of such notice being issued to them."
+                                "text_version": "within 14 days of such notice being issued to them."
                             },
                             "url": "https://authorityspoke.com/api/v1/test/acts/47/8/2/b-con@1935-04-01",
                             "end_date": "2013-07-18",
@@ -380,7 +380,7 @@
                     "text_version": {
                         "id": 1142679,
                         "url": "https://authorityspoke.com/api/v1/textversions/1142679/",
-                        "content": "Where an officer of the Department of Beards, Australian Federal Police, state or territorial police, or military police of the Australian Defence Force finds a person to be wearing a beard within the territory of the Commonwealth of Australia, and that person fails or is unable to produce a beardcoin as proof of holding an exemption under section 6, that officer shall in the first instance issue such person a notice to remedy."
+                        "text_version": "Where an officer of the Department of Beards, Australian Federal Police, state or territorial police, or military police of the Australian Defence Force finds a person to be wearing a beard within the territory of the Commonwealth of Australia, and that person fails or is unable to produce a beardcoin as proof of holding an exemption under section 6, that officer shall in the first instance issue such person a notice to remedy."
                     },
                     "url": "https://authorityspoke.com/api/v1/test/acts/47/8/1/",
                     "end_date": null,
@@ -401,7 +401,7 @@
                     "text_version": {
                         "id": 1142683,
                         "url": "https://authorityspoke.com/api/v1/textversions/1142683/",
-                        "content": "Any such person issued a notice to remedy under subsection 1 must either:"
+                        "text_version": "Any such person issued a notice to remedy under subsection 1 must either:"
                     },
                     "url": "https://authorityspoke.com/api/v1/test/acts/47/8/2/",
                     "end_date": null,
@@ -413,7 +413,7 @@
                             "text_version": {
                                 "id": 1142680,
                                 "url": "https://authorityspoke.com/api/v1/textversions/1142680/",
-                                "content": "shave in such a way that they are no longer in breach of section 5, or"
+                                "text_version": "shave in such a way that they are no longer in breach of section 5, or"
                             },
                             "url": "https://authorityspoke.com/api/v1/test/acts/47/8/2/a/",
                             "end_date": null,
@@ -434,7 +434,7 @@
                             "text_version": {
                                 "id": 1142702,
                                 "url": "https://authorityspoke.com/api/v1/textversions/1142702/",
-                                "content": "remove the beard with electrolysis, or"
+                                "text_version": "remove the beard with electrolysis, or"
                             },
                             "url": "https://authorityspoke.com/api/v1/test/acts/47/8/2/b/",
                             "end_date": null,
@@ -458,7 +458,7 @@
                             "text_version": {
                                 "id": 1142703,
                                 "url": "https://authorityspoke.com/api/v1/textversions/1142703/",
-                                "content": "remove the beard with a laser, or"
+                                "text_version": "remove the beard with a laser, or"
                             },
                             "url": "https://authorityspoke.com/api/v1/test/acts/47/8/2/c/",
                             "end_date": null,
@@ -472,7 +472,7 @@
                             "text_version": {
                                 "id": 1142681,
                                 "url": "https://authorityspoke.com/api/v1/textversions/1142681/",
-                                "content": "obtain a beardcoin from the Department of Beards"
+                                "text_version": "obtain a beardcoin from the Department of Beards"
                             },
                             "url": "https://authorityspoke.com/api/v1/test/acts/47/8/2/d/",
                             "end_date": null,
@@ -486,7 +486,7 @@
                             "text_version": {
                                 "id": 1142682,
                                 "url": "https://authorityspoke.com/api/v1/textversions/1142682/",
-                                "content": "within 14 days of such notice being issued to them."
+                                "text_version": "within 14 days of such notice being issued to them."
                             },
                             "url": "https://authorityspoke.com/api/v1/test/acts/47/8/2/d-con/",
                             "end_date": null,
@@ -511,11 +511,11 @@
     "/test/acts/47/9": {
         "2013-07-18": {
             "heading": "Penalties",
-            "content": "",
+            "text_version": "",
             "children": [
                 {
                     "heading": "",
-                    "content": "Any person summarily convicted of a first offence under section 7 of unlawfully wearing a beard within the Commonwealth of Australia shall be liable to a fine not exceeding $200.",
+                    "text_version": "Any person summarily convicted of a first offence under section 7 of unlawfully wearing a beard within the Commonwealth of Australia shall be liable to a fine not exceeding $200.",
                     "children": [],
                     "end_date": null,
                     "node": "/test/acts/47/9/1",
@@ -524,7 +524,7 @@
                 },
                 {
                     "heading": "",
-                    "content": "Any person summarily convicted of a second or subsequent offence under section 7 shall be liable to a fine not exceeding $1000, or a period of imprisonment until such time as they no longer are in breach of section 5.",
+                    "text_version": "Any person summarily convicted of a second or subsequent offence under section 7 shall be liable to a fine not exceeding $1000, or a period of imprisonment until such time as they no longer are in breach of section 5.",
                     "children": [],
                     "end_date": null,
                     "node": "/test/acts/47/9/2",
@@ -533,7 +533,7 @@
                 },
                 {
                     "heading": "",
-                    "content": "No penalty shall be applied to any person who, within 14 days of receiving a notice to remedy under section 8(1), takes the action required of them under section 8(2).",
+                    "text_version": "No penalty shall be applied to any person who, within 14 days of receiving a notice to remedy under section 8(1), takes the action required of them under section 8(2).",
                     "children": [],
                     "end_date": null,
                     "node": "/test/acts/47/9/3",
@@ -542,7 +542,7 @@
                 },
                 {
                     "heading": "",
-                    "content": "",
+                    "text_version": "",
                     "children": [],
                     "end_date": null,
                     "node": "/test/acts/47/9/3-con",
@@ -551,7 +551,7 @@
                 },
                 {
                     "heading": "",
-                    "content": "Any person convicted of an offence under section 7A or section 7B(1) shall be liable to a fine not exceeding $5000 and/or a period of imprisonment not exceeding 12 months.",
+                    "text_version": "Any person convicted of an offence under section 7A or section 7B(1) shall be liable to a fine not exceeding $5000 and/or a period of imprisonment not exceeding 12 months.",
                     "children": [],
                     "end_date": null,
                     "node": "/test/acts/47/9/4",
@@ -569,7 +569,7 @@
     "/test/acts/47/10": {
         "1935-04-01": {
             "heading": "Purpose of Part 4.—",
-            "content": "Part 4 of the Australian Beard Tax (Promotion of Enlightement Values) Act 1934 exists for the purpose of incentivising Australians, and those visiting Australia, to relieve themselves from the burdensome habit of wearing a beard.",
+            "text_version": "Part 4 of the Australian Beard Tax (Promotion of Enlightement Values) Act 1934 exists for the purpose of incentivising Australians, and those visiting Australia, to relieve themselves from the burdensome habit of wearing a beard.",
             "children": [],
             "end_date": null,
             "node": "/test/acts/47/10",
@@ -586,7 +586,7 @@
             "text_version": {
                 "id": 1142692,
                 "url": "https://authorityspoke.com/api/v1/textversions/1142692/",
-                "content": "The Department of Beards may issue licenses to such barbers, hairdressers, or other male grooming professionals as they see fit to purchase a beardcoin from a customer whose beard they have removed, and to resell those beardcoins to the Department of Beards."
+                "text_version": "The Department of Beards may issue licenses to such barbers, hairdressers, or other male grooming professionals as they see fit to purchase a beardcoin from a customer whose beard they have removed, and to resell those beardcoins to the Department of Beards."
             },
             "url": "https://authorityspoke.com/api/v1/test/acts/47/11@1935-04-01",
             "end_date": "2013-07-18",
@@ -601,7 +601,7 @@
             "text_version": {
                 "id": 1142710,
                 "url": "https://authorityspoke.com/api/v1/textversions/1142710/",
-                "content": "The Department of Beards may issue licenses to such"
+                "text_version": "The Department of Beards may issue licenses to such"
             },
             "url": "https://authorityspoke.com/api/v1/test/acts/47/11/",
             "end_date": null,
@@ -613,7 +613,7 @@
                     "text_version": {
                         "id": 1142704,
                         "url": "https://authorityspoke.com/api/v1/textversions/1142704/",
-                        "content": "barbers,"
+                        "text_version": "barbers,"
                     },
                     "url": "https://authorityspoke.com/api/v1/test/acts/47/11/i/",
                     "end_date": null,
@@ -627,7 +627,7 @@
                     "text_version": {
                         "id": 1142705,
                         "url": "https://authorityspoke.com/api/v1/textversions/1142705/",
-                        "content": "hairdressers, or"
+                        "text_version": "hairdressers, or"
                     },
                     "url": "https://authorityspoke.com/api/v1/test/acts/47/11/ii/",
                     "end_date": null,
@@ -641,7 +641,7 @@
                     "text_version": {
                         "id": 1142706,
                         "url": "https://authorityspoke.com/api/v1/textversions/1142706/",
-                        "content": "other male grooming professionals"
+                        "text_version": "other male grooming professionals"
                     },
                     "url": "https://authorityspoke.com/api/v1/test/acts/47/11/iii/",
                     "end_date": null,
@@ -655,7 +655,7 @@
                     "text_version": {
                         "id": 1142707,
                         "url": "https://authorityspoke.com/api/v1/textversions/1142707/",
-                        "content": "as they see fit to purchase a beardcoin from a customer"
+                        "text_version": "as they see fit to purchase a beardcoin from a customer"
                     },
                     "url": "https://authorityspoke.com/api/v1/test/acts/47/11/iii-con/",
                     "end_date": null,
@@ -669,7 +669,7 @@
                     "text_version": {
                         "id": 1142708,
                         "url": "https://authorityspoke.com/api/v1/textversions/1142708/",
-                        "content": "whose beard they have removed,"
+                        "text_version": "whose beard they have removed,"
                     },
                     "url": "https://authorityspoke.com/api/v1/test/acts/47/11/iv/",
                     "end_date": null,
@@ -683,7 +683,7 @@
                     "text_version": {
                         "id": 1142709,
                         "url": "https://authorityspoke.com/api/v1/textversions/1142709/",
-                        "content": "and to resell those beardcoins to the Department of Beards."
+                        "text_version": "and to resell those beardcoins to the Department of Beards."
                     },
                     "url": "https://authorityspoke.com/api/v1/test/acts/47/11/iv-con/",
                     "end_date": null,
@@ -698,7 +698,7 @@
     "/test/acts/47/12": {
         "1935-04-01": {
             "heading": "Rate to be paid to repurchasers of beardcoin",
-            "content": "The value to be transfered to licensed repurchasers of beardcoin under section 11 shall be defined by Order in Council by the Minister for Beards under section 6B on a per coin basis.",
+            "text_version": "The value to be transfered to licensed repurchasers of beardcoin under section 11 shall be defined by Order in Council by the Minister for Beards under section 6B on a per coin basis.",
             "children": [],
             "end_date": null,
             "node": "/test/acts/47/12",
@@ -710,7 +710,7 @@
     "/test/acts/47/13": {
         "1935-04-01": {
             "heading": "Removal of GST from razors and shavers",
-            "content": "The items set out in Annexe 1 of this Act shall be exempt from the goods and sales tax provisions of the Taxation Administration Act 1953.",
+            "text_version": "The items set out in Annexe 1 of this Act shall be exempt from the goods and sales tax provisions of the Taxation Administration Act 1953.",
             "children": [],
             "end_date": "2013-07-18",
             "node": "/test/acts/47/13",
@@ -720,7 +720,7 @@
         },
         "2013-07-18": {
             "heading": "",
-            "content": "",
+            "text_version": "",
             "children": [],
             "end_date": null,
             "node": "/test/acts/47/13",
