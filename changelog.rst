@@ -1,5 +1,14 @@
 Changelog
 =========
+0.8.1 (2021-09-18)
+------------------
+* limit version range for Legislice import
+
+0.8.0 (2021-08-13)
+------------------
+* import JustOpinion to manage caselaw downloads
+* add DecisionReading and OpinionReading classes
+
 0.7.2 (2021-06-16)
 ------------------
 * accept added fields in CAPCitation schema
