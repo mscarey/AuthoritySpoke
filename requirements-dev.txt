@@ -3,7 +3,6 @@ coveralls
 doc8
 flake8-comprehensions
 ipykernel
-justopinion~=0.2.3
 mypy
 pydocstyle
 pytest-cov

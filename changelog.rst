@@ -1,5 +1,9 @@
 Changelog
 =========
+0.8.1 (2021-09-18)
+------------------
+* limit version range for Legislice import
+
 0.8.0 (2021-08-12)
 ------------------
 * import Opinion, Decision, and Court data classes from Justopinion package

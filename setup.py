@@ -5,7 +5,7 @@ with open("README.rst", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="AuthoritySpoke",
-    version="0.8.0",
+    version="0.8.1",
     author="Matt Carey",
     author_email="matt@authorityspoke.com",
     description="legal authority automation",
@@ -31,10 +31,10 @@ setuptools.setup(
         "apispec-oneofschema",
         "eyecite~=2.2.0",
         "justopinion~=0.2.3",
-        "legislice>=0.5.2",
+        "legislice~=0.5.2",
         "marshmallow>=3.10",
         "marshmallow-oneofschema",
-        "nettlesome>=0.5.1",
+        "nettlesome~=0.5.1",
         "pint>=0.15",
         "pydantic",
         "python-dotenv",
