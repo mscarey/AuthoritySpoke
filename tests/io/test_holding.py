@@ -761,6 +761,6 @@ class TestNestedFactorImport:
         concerning appellant’s use of narcotics was improper.
         """
         mock_client = FakeClient(responses=make_response)
-        cardenas_json = load_holdings("holding_cardenas.yaml")
-        cardenas_holdings = readers.read_holdings(cardenas_json, client=mock_client)
+        cardenas_dict = load_holdings("holding_cardenas.yaml")
+        cardenas_holdings = readers.read_holdings(cardenas_dict, client=mock_client)
         assert len(cardenas_holdings) == 2

@@ -35,23 +35,27 @@ holdings:
   - name: s351
     enactment:
       heading: ''
-      content: Except as otherwise provided by statute, all relevant evidence is admissible.
+      text_version:
+        content: Except as otherwise provided by statute, all relevant evidence is admissible.
       node: /us-ca/code/evid/s351
       start_date: '1966-01-01'
   - name: substantial danger of undue prejudice statute
     enactment:
       node: /us-ca/code/evid/s352
       heading: ''
-      content: The court in its discretion may exclude evidence if its probative value is substantially outweighed by the probability that its admission will
+      text_version:
+        content: The court in its discretion may exclude evidence if its probative value is substantially outweighed by the probability that its admission will
       start_date: '1966-01-01'
       children:
       - node: /us-ca/code/evid/s352/a
         heading: ''
-        content: necessitate undue consumption of time or
+        text_version:
+          content: necessitate undue consumption of time or
         start_date: '1966-01-01'
       - node: /us-ca/code/evid/s352/b
         heading: ''
-        content: create substantial danger of undue prejudice, of confusing the issues, or of misleading the jury.
+        text_version:
+          content: create substantial danger of undue prejudice, of confusing the issues, or of misleading the jury.
         selection: false
         start_date: '1966-01-01'
     selection:
