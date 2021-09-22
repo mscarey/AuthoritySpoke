@@ -1,9 +1,9 @@
-git+git://github.com/mscarey/anchorpoint.git@8d2fb0bf2c0c8a5539286c5161fcae65ac453b7e#egg=anchorpoint
+anchorpoint~=0.6.0
 apispec[validation]~=4.3.0
 apispec-oneofschema
 eyecite~=2.2.0
 justopinion~=0.2.4
-legislice~=0.5.2
+legislice~=0.6.0
 marshmallow~=3.13
 marshmallow-oneofschema
 nettlesome~=0.5.1

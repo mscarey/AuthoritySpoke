@@ -20,7 +20,7 @@ class TestHoldingLoad:
     def test_get_json_filepath(self):
         directory = filepaths.get_directory_path("holdings")
         path = filepaths.make_filepath(
-            filename="holding_feist.json", directory=directory
+            filename="holding_feist.yaml", directory=directory
         )
         raw_holdings = loaders.load_holdings(filepath=path)
         assert raw_holdings[0]["outputs"]["type"] == "fact"

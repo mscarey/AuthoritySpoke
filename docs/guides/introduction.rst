@@ -818,7 +818,7 @@ To try out the addition operation, let’s load another case from the
 
     >>> from authorityspoke.io.loaders import load_decision_as_reading
     >>> feist = load_decision_as_reading("feist_h.json")
-    >>> feist.posit(read_anchored_holdings_from_file("holding_feist.json", client=legis_client))
+    >>> feist.posit(read_anchored_holdings_from_file("holding_feist.yaml", client=legis_client))
 
 
 `Feist Publications, Inc. v. Rural Telephone Service
