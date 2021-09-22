@@ -1472,7 +1472,7 @@ def make_anchored_holding(make_response, make_decision):
     holdings = {}
     for name in make_decision.keys():
         holdings[name] = loaders.read_anchored_holdings_from_file(
-            f"holding_{name}.json",
+            f"holding_{name}.yaml",
             client=client_without_api_access,
         )
     return holdings
@@ -1533,9 +1533,11 @@ def make_analysis() -> Dict[str, Dict[str, Any]]:
                     "anchors": {
                         "quotes": "upholding searches in |open fields or grounds|around a house"
                     },
-                    "outputs": {
-                        "type": "fact",
-                        "content": "{Bradley} made a minimal holding object",
+                    "holding": {
+                        "outputs": {
+                            "type": "fact",
+                            "content": "{Bradley} made a minimal holding object",
+                        },
                     },
                 }
             ],

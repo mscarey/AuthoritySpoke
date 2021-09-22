@@ -13,7 +13,7 @@ import re
 
 from dataclasses import dataclass, field
 
-from anchorpoint.textselectors import TextQuoteSelector, TextPositionSelector
+from anchorpoint.textselectors import TextQuoteSelector, TextPositionSet
 from justopinion.decisions import Opinion
 from nettlesome.terms import Comparable, ContextRegister, Explanation
 from nettlesome.factors import Factor
@@ -34,7 +34,7 @@ class AnchoredHoldings(NamedTuple):
     """Holdings with objects storing the Holdings' links to Opinion text."""
 
     holdings: List[Holding]
-    holding_anchors: List[List[TextQuoteSelector]]
+    holding_anchors: List[TextPositionSet]
     named_anchors: TextLinkDict
     enactment_anchors: TextLinkDict
 
