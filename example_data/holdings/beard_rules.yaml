@@ -140,7 +140,7 @@
   outputs: beardcoin transfer
   enactments:
     - enactment:
-      node: /test/acts/47/7A
+        node: /test/acts/47/7A
   universal: true
   mandatory: true
 - inputs:

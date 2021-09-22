@@ -11,7 +11,7 @@ from typing import Any, Dict, List, NamedTuple, Optional, Sequence, Tuple, Type,
 
 from marshmallow import Schema, fields, validate, EXCLUDE
 from marshmallow import pre_load, post_load
-from marshmallow import ValidationError
+from pydantic import ValidationError
 
 from anchorpoint.textselectors import TextQuoteSelector, TextPositionSelector
 from legislice.enactments import Enactment, EnactmentPassage
@@ -497,7 +497,12 @@ class RuleSchema(ExpandableSchema):
             mentioned = self.context.get("enactment_index") or EnactmentIndex()
             data = deepcopy(mentioned.get_by_name(data))
         data = self.is_revision_date_known(data)
-        return EnactmentPassage(**data)
+        try:
+            return EnactmentPassage(**data)
+        except ValidationError as e:
+            raise ValidationError(
+                f"{e.messages} in {data} for {self.__model__.__name__}"
+            )
 
     def load_enactments(self, data: List[Dict[str, Any]]) -> List[EnactmentPassage]:
         """Load EnactmentPassage objects from data."""

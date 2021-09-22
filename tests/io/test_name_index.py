@@ -118,7 +118,7 @@ class TestCollectMentioned:
         Test error message:
         'Name "securing the right to writings" not found in the index of mentioned Factors'
         """
-        feist_records = loaders.load_holdings("holding_feist.json")
+        feist_records = loaders.load_holdings("holding_feist.yaml")
         record, mentioned = name_index.index_names(feist_records)
         assert "securing the right to writings" in mentioned
 
