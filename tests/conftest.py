@@ -1530,7 +1530,9 @@ def make_analysis() -> Dict[str, Dict[str, Any]]:
         "minimal": {
             "holdings": [
                 {
-                    "anchors": "upholding searches in |open fields or grounds|around a house",
+                    "anchors": {
+                        "quotes": "upholding searches in |open fields or grounds|around a house"
+                    },
                     "outputs": {
                         "type": "fact",
                         "content": "{Bradley} made a minimal holding object",

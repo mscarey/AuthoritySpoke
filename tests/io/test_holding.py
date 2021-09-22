@@ -655,7 +655,7 @@ class TestExclusiveFlag:
         less Enactment text
         """
         fake_client = FakeClient(responses=make_response)
-        holdings = read_holdings_from_file("holding_feist.json", client=fake_client)
+        holdings = read_holdings_from_file("holding_feist.yaml", client=fake_client)
 
         directory = Entity("Rural's telephone directory")
         original = Fact(Predicate("$work was an original work"), directory)
