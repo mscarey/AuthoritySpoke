@@ -194,17 +194,6 @@ class EnactmentPassageSchema(Schema):
         return self.__model__(**data)
 
 
-class AnchoredEnactmentPassageSchema(Schema):
-
-    __model__ = AnchoredEnactmentPassage
-    passage = fields.Nested(EnactmentPassageSchema)
-    anchors = fields.Nested(TextPositionSetSchema, required=False)
-
-    @post_load
-    def make_object(self, data, **kwargs):
-        return self.__model__(**data)
-
-
 class ExpandableLinkedEnactmentSchema(LinkedEnactmentSchema):
     """Schema for passages from legislation without the full text of child nodes."""
 

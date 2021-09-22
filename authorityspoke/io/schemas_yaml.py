@@ -14,7 +14,7 @@ from marshmallow import pre_load, post_load
 from pydantic import ValidationError
 
 from anchorpoint.textselectors import TextQuoteSelector, TextPositionSelector
-from legislice.enactments import Enactment, EnactmentPassage
+from legislice.enactments import Enactment, EnactmentPassage, AnchoredEnactmentPassage
 
 from nettlesome.entities import Entity
 from nettlesome.factors import Factor
@@ -33,7 +33,6 @@ from authorityspoke.io.name_index import RawFactor, RawPredicate
 from authorityspoke.io.nesting import nest_fields
 from authorityspoke.io import text_expansion
 from authorityspoke.io.schemas_anchor import TextPositionSetSchema
-from authorityspoke.io.schemas_legis import AnchoredEnactmentPassageSchema
 from authorityspoke.io.schemas_legis import EnactmentPassageSchema as LegisliceSchema
 
 from authorityspoke.opinions import AnchoredHoldings
@@ -78,6 +77,46 @@ class ExpandableSchema(Schema):
             data[many_element] = [data[many_element]]
         return data
 
+    def is_revision_date_known(self, data):
+        r"""
+        Determine if Enactment's start_date reflects its last revision date.
+        If not, then the `start_date` merely reflects the earliest date that versions
+        of the :class:`Enactment`\'s code exist in the database.
+        """
+        if not self.context.get("coverage"):
+            data["known_revision_date"] = False
+        elif self.context["coverage"]["earliest_in_db"] and (
+            self.context["coverage"]["earliest_in_db"]
+            < date.fromisoformat(data["start_date"])
+        ):
+            data["known_revision_date"] = True
+        elif (
+            self.context["coverage"]["earliest_in_db"]
+            and self.context["coverage"]["first_published"]
+            and (
+                self.context["coverage"]["earliest_in_db"]
+                <= self.context["coverage"]["first_published"]
+            )
+        ):
+            data["known_revision_date"] = True
+        else:
+            data["known_revision_date"] = False
+        return data
+
+    def enactments_to_dicts(self, obj: EnactmentPassage) -> List[Dict[str, Any]]:
+        return [item.to_dict() for item in obj]
+
+    def load_enactment(self, data: Dict[str, Any]) -> EnactmentPassage:
+        if isinstance(data, str):
+            mentioned = self.context.get("enactment_index") or EnactmentIndex()
+            data = deepcopy(mentioned.get_by_name(data))
+        data = self.is_revision_date_known(data)
+        return EnactmentPassage(**data)
+
+    def load_enactments(self, data: List[Dict[str, Any]]) -> List[EnactmentPassage]:
+        """Load EnactmentPassage objects from data."""
+        return [self.load_enactment(item) for item in data]
+
     @pre_load
     def format_data_to_load(self, data: RawFactor, **kwargs) -> RawFactor:
         """Expand data if it was just a name reference in the JSON input."""
@@ -98,6 +137,27 @@ class ExpandableSchema(Schema):
 RawOpinion = Dict[str, str]
 RawCAPCitation = Dict[str, str]
 RawDecision = Dict[str, Union[str, int, Sequence[RawOpinion], Sequence[RawCAPCitation]]]
+
+
+class AnchoredEnactmentPassageSchema(ExpandableSchema):
+
+    __model__ = AnchoredEnactmentPassage
+    passage = fields.Method(serialize="enactment_to_dict", deserialize="load_enactment")
+    anchors = fields.Nested(TextPositionSetSchema, required=False)
+
+    def enactment_to_dict(self, obj: EnactmentPassage) -> Dict[str, Any]:
+        return obj.dict()
+
+    def load_enactment(self, data: Dict[str, Any]) -> EnactmentPassage:
+        if isinstance(data, str):
+            mentioned = self.context.get("enactment_index") or EnactmentIndex()
+            data = deepcopy(mentioned.get_by_name(data))
+        data = self.is_revision_date_known(data)
+        return EnactmentPassage(**data)
+
+    @post_load
+    def make_object(self, data, **kwargs):
+        return self.__model__(**data)
 
 
 class EnactmentPassageSchema(LegisliceSchema):
@@ -454,59 +514,16 @@ class RuleSchema(ExpandableSchema):
 
     __model__: Type = Rule
     procedure = fields.Nested(ProcedureSchema)
-    enactments = fields.Method(serialize="to_dicts", deserialize="load_enactments")
+    enactments = fields.Method(
+        serialize="enactments_to_dicts", deserialize="load_enactments"
+    )
     enactments_despite = fields.Method(
-        serialize="to_dicts", deserialize="load_enactments"
+        serialize="enactments_to_dicts", deserialize="load_enactments"
     )
     mandatory = fields.Bool(load_default=False)
     universal = fields.Bool(load_default=False)
     name = fields.Str(load_default=None)
     generic = fields.Bool(load_default=False)
-
-    def is_revision_date_known(self, data):
-        r"""
-        Determine if Enactment's start_date reflects its last revision date.
-        If not, then the `start_date` merely reflects the earliest date that versions
-        of the :class:`Enactment`\'s code exist in the database.
-        """
-        if not self.context.get("coverage"):
-            data["known_revision_date"] = False
-        elif self.context["coverage"]["earliest_in_db"] and (
-            self.context["coverage"]["earliest_in_db"]
-            < date.fromisoformat(data["start_date"])
-        ):
-            data["known_revision_date"] = True
-        elif (
-            self.context["coverage"]["earliest_in_db"]
-            and self.context["coverage"]["first_published"]
-            and (
-                self.context["coverage"]["earliest_in_db"]
-                <= self.context["coverage"]["first_published"]
-            )
-        ):
-            data["known_revision_date"] = True
-        else:
-            data["known_revision_date"] = False
-        return data
-
-    def to_dicts(self, obj: EnactmentPassage) -> List[Dict[str, Any]]:
-        return [item.to_dict() for item in obj]
-
-    def load_enactment(self, data: Dict[str, Any]) -> EnactmentPassage:
-        if isinstance(data, str):
-            mentioned = self.context.get("enactment_index") or EnactmentIndex()
-            data = deepcopy(mentioned.get_by_name(data))
-        data = self.is_revision_date_known(data)
-        try:
-            return EnactmentPassage(**data)
-        except ValidationError as e:
-            raise ValidationError(
-                f"{e.messages} in {data} for {self.__model__.__name__}"
-            )
-
-    def load_enactments(self, data: List[Dict[str, Any]]) -> List[EnactmentPassage]:
-        """Load EnactmentPassage objects from data."""
-        return [self.load_enactment(item) for item in data]
 
     @pre_load
     def format_data_to_load(self, data: Dict, **kwargs) -> RawRule:
