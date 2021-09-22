@@ -454,12 +454,54 @@ class RuleSchema(ExpandableSchema):
 
     __model__: Type = Rule
     procedure = fields.Nested(ProcedureSchema)
-    enactments = fields.Nested(EnactmentPassageSchema, many=True)
-    enactments_despite = fields.Nested(EnactmentPassageSchema, many=True)
+    enactments = fields.Method(serialize="to_dicts", deserialize="load_enactments")
+    enactments_despite = fields.Method(
+        serialize="to_dicts", deserialize="load_enactments"
+    )
     mandatory = fields.Bool(load_default=False)
     universal = fields.Bool(load_default=False)
     name = fields.Str(load_default=None)
     generic = fields.Bool(load_default=False)
+
+    def is_revision_date_known(self, data):
+        r"""
+        Determine if Enactment's start_date reflects its last revision date.
+        If not, then the `start_date` merely reflects the earliest date that versions
+        of the :class:`Enactment`\'s code exist in the database.
+        """
+        if not self.context.get("coverage"):
+            data["known_revision_date"] = False
+        elif self.context["coverage"]["earliest_in_db"] and (
+            self.context["coverage"]["earliest_in_db"]
+            < date.fromisoformat(data["start_date"])
+        ):
+            data["known_revision_date"] = True
+        elif (
+            self.context["coverage"]["earliest_in_db"]
+            and self.context["coverage"]["first_published"]
+            and (
+                self.context["coverage"]["earliest_in_db"]
+                <= self.context["coverage"]["first_published"]
+            )
+        ):
+            data["known_revision_date"] = True
+        else:
+            data["known_revision_date"] = False
+        return data
+
+    def to_dicts(self, obj: EnactmentPassage) -> List[Dict[str, Any]]:
+        return [item.to_dict() for item in obj]
+
+    def load_enactment(self, data: Dict[str, Any]) -> EnactmentPassage:
+        if isinstance(data, str):
+            mentioned = self.context.get("enactment_index") or EnactmentIndex()
+            data = deepcopy(mentioned.get_by_name(data))
+        data = self.is_revision_date_known(data)
+        return EnactmentPassage(**data)
+
+    def load_enactments(self, data: List[Dict[str, Any]]) -> List[EnactmentPassage]:
+        """Load EnactmentPassage objects from data."""
+        return [self.load_enactment(item) for item in data]
 
     @pre_load
     def format_data_to_load(self, data: Dict, **kwargs) -> RawRule:
