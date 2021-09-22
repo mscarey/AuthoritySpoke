@@ -67,9 +67,10 @@ holdings:
     enactment:
       node: /us-ca/code/pen/s211
       heading: ''
-      content: Robbery is the felonious taking of personal property in the possession
-        of another, from his person or immediate presence, and against his will, accomplished
-        by means of force or fear.
+      text_version:
+        content: Robbery is the felonious taking of personal property in the possession
+          of another, from his person or immediate presence, and against his will, accomplished
+          by means of force or fear.
       children: []
       start_date: '1873-01-01'
   - name: s664
@@ -78,9 +79,10 @@ holdings:
         - suffix: where no provision is
     enactment:
       node: /us-ca/code/pen/s664
-      content: Every person who attempts to commit any crime, but fails, or is prevented
-        or intercepted in its perpetration, shall be punished where no provision is
-        made by law for the punishment of those attempts, [text omitted]
+      text_version:
+        content: Every person who attempts to commit any crime, but fails, or is prevented
+          or intercepted in its perpetration, shall be punished where no provision is
+          made by law for the punishment of those attempts, [text omitted]
       children: []
       heading: ''
       start_date: '2011-04-04'

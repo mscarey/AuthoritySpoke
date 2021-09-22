@@ -172,7 +172,7 @@
             "text_version": {
                 "id": 1030579,
                 "url": "https://authorityspoke.com/api/v1/textversions/1030579/",
-                "text_version": "Copyright protection subsists, in accordance with this title, in original works of authorship fixed in any tangible medium of expression, now known or later developed, from which they can be perceived, reproduced, or otherwise communicated, either directly or with the aid of a machine or device. Works of authorship include the following categories:"
+                "content": "Copyright protection subsists, in accordance with this title, in original works of authorship fixed in any tangible medium of expression, now known or later developed, from which they can be perceived, reproduced, or otherwise communicated, either directly or with the aid of a machine or device. Works of authorship include the following categories:"
             },
             "url": "https://authorityspoke.com/api/v1/us/usc/t17/s102/a/",
             "end_date": null,
@@ -184,7 +184,7 @@
                     "text_version": {
                         "id": 1030571,
                         "url": "https://authorityspoke.com/api/v1/textversions/1030571/",
-                        "text_version": "literary works;"
+                        "content": "literary works;"
                     },
                     "url": "https://authorityspoke.com/api/v1/us/usc/t17/s102/a/1/",
                     "end_date": null,
@@ -198,7 +198,7 @@
                     "text_version": {
                         "id": 1030572,
                         "url": "https://authorityspoke.com/api/v1/textversions/1030572/",
-                        "text_version": "musical works, including any accompanying words;"
+                        "content": "musical works, including any accompanying words;"
                     },
                     "url": "https://authorityspoke.com/api/v1/us/usc/t17/s102/a/2/",
                     "end_date": null,
@@ -212,7 +212,7 @@
                     "text_version": {
                         "id": 1030573,
                         "url": "https://authorityspoke.com/api/v1/textversions/1030573/",
-                        "text_version": "dramatic works, including any accompanying music;"
+                        "content": "dramatic works, including any accompanying music;"
                     },
                     "url": "https://authorityspoke.com/api/v1/us/usc/t17/s102/a/3/",
                     "end_date": null,
@@ -226,7 +226,7 @@
                     "text_version": {
                         "id": 1030574,
                         "url": "https://authorityspoke.com/api/v1/textversions/1030574/",
-                        "text_version": "pantomimes and choreographic works;"
+                        "content": "pantomimes and choreographic works;"
                     },
                     "url": "https://authorityspoke.com/api/v1/us/usc/t17/s102/a/4/",
                     "end_date": null,
@@ -240,7 +240,7 @@
                     "text_version": {
                         "id": 1030575,
                         "url": "https://authorityspoke.com/api/v1/textversions/1030575/",
-                        "text_version": "pictorial, graphic, and sculptural works;"
+                        "content": "pictorial, graphic, and sculptural works;"
                     },
                     "url": "https://authorityspoke.com/api/v1/us/usc/t17/s102/a/5/",
                     "end_date": null,
@@ -254,7 +254,7 @@
                     "text_version": {
                         "id": 1030576,
                         "url": "https://authorityspoke.com/api/v1/textversions/1030576/",
-                        "text_version": "motion pictures and other audiovisual works;"
+                        "content": "motion pictures and other audiovisual works;"
                     },
                     "url": "https://authorityspoke.com/api/v1/us/usc/t17/s102/a/6/",
                     "end_date": null,
@@ -268,7 +268,7 @@
                     "text_version": {
                         "id": 1030577,
                         "url": "https://authorityspoke.com/api/v1/textversions/1030577/",
-                        "text_version": "sound recordings; and"
+                        "content": "sound recordings; and"
                     },
                     "url": "https://authorityspoke.com/api/v1/us/usc/t17/s102/a/7/",
                     "end_date": null,
@@ -282,7 +282,7 @@
                     "text_version": {
                         "id": 1030578,
                         "url": "https://authorityspoke.com/api/v1/textversions/1030578/",
-                        "text_version": "architectural works."
+                        "content": "architectural works."
                     },
                     "url": "https://authorityspoke.com/api/v1/us/usc/t17/s102/a/8/",
                     "end_date": null,
@@ -373,7 +373,7 @@
             "text_version": {
                 "id": 943740,
                 "url": "https://authorityspoke.com/api/v1/textversions/943740/",
-                "text_version": "the term “unlicensed money transmitting business” means a money transmitting business which affects interstate or foreign commerce in any manner or degree and—"
+                "content": "the term “unlicensed money transmitting business” means a money transmitting business which affects interstate or foreign commerce in any manner or degree and—"
             },
             "url": "https://authorityspoke.com/api/v1/us/usc/t18/s1960/b/1/",
             "end_date": null,
@@ -385,7 +385,7 @@
                     "text_version": {
                         "id": 943737,
                         "url": "https://authorityspoke.com/api/v1/textversions/943737/",
-                        "text_version": "is operated without an appropriate money transmitting license in a State where such operation is punishable as a misdemeanor or a felony under State law, whether or not the defendant knew that the operation was required to be licensed or that the operation was so punishable;"
+                        "content": "is operated without an appropriate money transmitting license in a State where such operation is punishable as a misdemeanor or a felony under State law, whether or not the defendant knew that the operation was required to be licensed or that the operation was so punishable;"
                     },
                     "url": "https://authorityspoke.com/api/v1/us/usc/t18/s1960/b/1/A/",
                     "end_date": null,
@@ -399,7 +399,7 @@
                     "text_version": {
                         "id": 943738,
                         "url": "https://authorityspoke.com/api/v1/textversions/943738/",
-                        "text_version": "fails to comply with the money transmitting business registration requirements under section 5330 of title 31, United States Code, or regulations prescribed under such section; or"
+                        "content": "fails to comply with the money transmitting business registration requirements under section 5330 of title 31, United States Code, or regulations prescribed under such section; or"
                     },
                     "url": "https://authorityspoke.com/api/v1/us/usc/t18/s1960/b/1/B/",
                     "end_date": null,
@@ -413,7 +413,7 @@
                     "text_version": {
                         "id": 943739,
                         "url": "https://authorityspoke.com/api/v1/textversions/943739/",
-                        "text_version": "otherwise involves the transportation or transmission of funds that are known to the defendant to have been derived from a criminal offense or are intended to be used to promote or support unlawful activity;"
+                        "content": "otherwise involves the transportation or transmission of funds that are known to the defendant to have been derived from a criminal offense or are intended to be used to promote or support unlawful activity;"
                     },
                     "url": "https://authorityspoke.com/api/v1/us/usc/t18/s1960/b/1/C/",
                     "end_date": null,
@@ -433,7 +433,7 @@
             "text_version": {
                 "id": 1267044,
                 "url": "https://authorityspoke.com/api/v1/textversions/1267044/",
-                "text_version": "“domestic financial agency” and “domestic financial institution” apply to an action in the United States of a financial agency or institution."
+                "content": "“domestic financial agency” and “domestic financial institution” apply to an action in the United States of a financial agency or institution."
             },
             "url": "https://authorityspoke.com/api/v1/us/usc/t31/s5312/b/1/",
             "end_date": null,
