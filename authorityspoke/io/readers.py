@@ -186,7 +186,8 @@ def collect_anchors_from_index(object_index, field_name: str):
     for key, value in object_index.items():
         if value.get("anchors"):
             anchored_object: Dict[str, Any] = {}
-            anchored_object["anchors"] = value.pop("anchors")
+            # TODO: prevent anchored_object["anchors"] from being a list
+            anchored_object["anchors"] = value.pop("anchors")[0]
             anchored_object[field_name] = value
             anchors.append(anchored_object)
     return anchors, object_index

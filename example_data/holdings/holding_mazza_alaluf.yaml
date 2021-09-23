@@ -1,45 +1,45 @@
 holdings:
   - inputs:
-    - type: fact
-      content: "{Mazza-Alaluf} used Mazza-Alaluf's business {Turismo Costa Brava} to commit the New York offense of engaging in the business of receiving money for transmission or transmitting the same, without a license therefor"
+      - type: fact
+        content: "{Mazza-Alaluf} used Mazza-Alaluf's business {Turismo Costa Brava} to commit the New York offense of engaging in the business of receiving money for transmission or transmitting the same, without a license therefor"
     outputs:
-    - type: fact
-      content: Mazza-Alaluf operated Turismo Costa Brava without an appropriate money transmitting license in a State where such operation was punishable as a misdemeanor or a felony under State law
-      anchors: 
-        quotes: 
-          - exact: we conclude that sufficient evidence supports Mazza-Alaluf's convictions under 18 U.S.C. § 1960(b)(1)(A) for conspiring to operate and operating a money transmitting business without appropriate state licenses.
-      name: operated without license
+      - type: fact
+        content: Mazza-Alaluf operated Turismo Costa Brava without an appropriate money transmitting license in a State where such operation was punishable as a misdemeanor or a felony under State law
+        anchors:
+          quotes:
+            - exact: we conclude that sufficient evidence supports Mazza-Alaluf's convictions under 18 U.S.C. § 1960(b)(1)(A) for conspiring to operate and operating a money transmitting business without appropriate state licenses.
+        name: operated without license
     enactments:
-    - name: state money transmitting license provision
-      enactment:
-        node: /us/usc/t18/s1960/b/1
-      anchors: 
-        quotes:
+      - name: state money transmitting license provision
+        enactment:
+          node: /us/usc/t18/s1960/b/1
+        anchors:
+          quotes:
             - state money transmitting licenses, see |18 U.S.C. § 1960(b)(1)(A)|
-      selection:
-        quotes:
-          - exact: is operated without an appropriate money transmitting license in a State where such operation is punishable as a misdemeanor or a felony under State law, whether or not the defendant knew that the operation was required to be licensed or that the operation was so punishable
+        selection:
+          quotes:
+            - exact: is operated without an appropriate money transmitting license in a State where such operation is punishable as a misdemeanor or a felony under State law, whether or not the defendant knew that the operation was required to be licensed or that the operation was so punishable
     universal: true
   - inputs:
       - operated without license
       - type: fact
         content: Mazza-Alaluf operated Turismo Costa Brava as a business
-        anchors: 
+        anchors:
           quotes: Mazza-Alaluf does not contest that he owned and managed Turismo
       - type: fact
         content: Turismo Costa Brava was a money transmitting business
-        anchors: 
+        anchors:
           quotes: record evidence that Turismo conducted substantial money transmitting business in the three states
     despite:
       - type: fact
         content: Turismo Costa Brava was a domestic financial institution
         truth: False
-        anchors: 
+        anchors:
           quotes: without respect to whether or not Turismo was a "domestic financial institution"
     outputs:
       - type: fact
         content: Mazza-Alaluf committed the offense of conducting a money transmitting business without a license required by state law
-        anchors: 
+        anchors:
           quotes: a crime to operate a money transmitting business without appropriate state licenses,
     enactments:
       - state money transmitting license provision
@@ -48,10 +48,10 @@ holdings:
           node: /us/usc/t31/s5312/b/1
           anchors:
             quotes:
-            - § 5312(b)(1) (defining "domestic financial institution")
+              - § 5312(b)(1) (defining "domestic financial institution")
     anchors:
       quotes:
-      - prefix: Accordingly, we conclude that the
-        suffix: In any event
+        - prefix: Accordingly, we conclude that the
+          suffix: In any event
     universal: true
     mandatory: true

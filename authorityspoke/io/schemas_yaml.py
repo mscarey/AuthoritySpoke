@@ -13,7 +13,7 @@ from marshmallow import Schema, fields, validate, EXCLUDE
 from marshmallow import pre_load, post_load
 from pydantic import ValidationError
 
-from anchorpoint.textselectors import TextQuoteSelector, TextPositionSelector
+from anchorpoint.textselectors import TextQuoteSelector, TextPositionSet
 from legislice.enactments import Enactment, EnactmentPassage, AnchoredEnactmentPassage
 
 from nettlesome.entities import Entity
@@ -593,11 +593,18 @@ class NamedAnchorsSchema(ExpandableSchema):
     __model__ = NamedAnchors
 
     name = fields.Nested(FactorSchema)
-    anchors = fields.Nested(TextPositionSetSchema, many=True)
+    anchors = fields.Method(
+        serialize="selection_set_to_dict", deserialize="load_selection_set"
+    )
+
+    def selection_set_to_dict(self, obj: TextPositionSet, **kwargs) -> Dict:
+        return obj.dict()
+
+    def load_selection_set(self, data: Dict, **kwargs) -> TextPositionSet:
+        return TextPositionSet(**data)
 
     @pre_load
     def format_data_to_load(self, data, **kwargs):
-        data = self.wrap_single_element_in_list(data, "anchors")
         return data
 
 
@@ -627,9 +634,9 @@ class AnchoredHoldingsSchema(ExpandableSchema):
 
         if data.get("enactment_anchors"):
             for linked in data["enactment_anchors"]:
-                if not linked.enactment.selected_text():
-                    linked.enactment.select_all()
-                enactment_links[str(linked.enactment)] = linked.anchors
+                if not linked.passage.selected_text():
+                    linked.passage.select_all()
+                enactment_links[str(linked.passage)] = linked.anchors
 
         holding_anchors = [holding.anchors for holding in data["holdings"]]
         return AnchoredHoldings(

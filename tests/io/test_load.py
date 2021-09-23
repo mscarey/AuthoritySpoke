@@ -46,7 +46,7 @@ class TestHoldingLoad:
         result = read_anchored_holdings_from_file(filepath=filepath, client=fake_client)
         selector = result.named_anchors[
             "the fact it was false that <Turismo Costa Brava> was a domestic financial institution"
-        ][0]
+        ].quotes[0]
         assert (
             selector.exact
             == 'without respect to whether or not Turismo was a "domestic financial institution"'
