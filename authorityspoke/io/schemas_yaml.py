@@ -32,8 +32,6 @@ from authorityspoke.io.name_index import Mentioned
 from authorityspoke.io.name_index import RawFactor, RawPredicate
 from authorityspoke.io.nesting import nest_fields
 from authorityspoke.io import text_expansion
-from authorityspoke.io.schemas_anchor import TextPositionSetSchema
-from authorityspoke.io.schemas_legis import EnactmentPassageSchema as LegisliceSchema
 
 from authorityspoke.opinions import AnchoredHoldings
 from authorityspoke.pleadings import Pleading, Allegation
@@ -103,8 +101,11 @@ class ExpandableSchema(Schema):
             data["known_revision_date"] = False
         return data
 
-    def enactments_to_dicts(self, obj: EnactmentPassage) -> List[Dict[str, Any]]:
-        return [item.to_dict() for item in obj]
+    def enactments_to_dicts(self, obj: Rule) -> List[Dict[str, Any]]:
+        return [item.dict() for item in obj.enactments]
+
+    def enactments_despite_to_dicts(self, obj: Rule) -> List[Dict[str, Any]]:
+        return [item.dict() for item in obj.enactments_despite]
 
     def load_enactment(self, data: Dict[str, Any]) -> EnactmentPassage:
         if isinstance(data, str):
@@ -140,10 +141,43 @@ RawDecision = Dict[str, Union[str, int, Sequence[RawOpinion], Sequence[RawCAPCit
 
 
 class AnchoredEnactmentPassageSchema(ExpandableSchema):
+    """
+    Schema to load Enactments from JSON created from user-created YAML.
+
+        >>> enactment_data = {
+        ...     "name": "original works",
+        ...     "enactment": {
+        ...     "node": "/us/usc/t17/s102",
+        ...     "start_date": "1990-12-01",
+        ...     "content": (
+        ...         "Copyright protection subsists, in accordance with this title, "
+        ...         "in original works of authorship fixed in any tangible medium of expression, "
+        ...         "now known or later developed."),
+        ...     },
+        ...     "selection": [{"suffix": ", in accordance"}, "title,|in original works of authorship|fixed"]}
+        >>> schema = EnactmentSchema()
+        >>> enactment_index = EnactmentIndex()
+        >>> enactment_index.insert_by_name(enactment_data)
+        >>> schema.context["enactment_index"] = enactment_index
+        >>> enactment = schema.load("original works")
+        >>> enactment.selected_text()
+        'Copyright protection subsists…in original works of authorship…'
+    """
 
     __model__ = AnchoredEnactmentPassage
-    passage = fields.Method(serialize="enactment_to_dict", deserialize="load_enactment")
-    anchors = fields.Nested(TextPositionSetSchema, required=False)
+    passage = fields.Method(
+        serialize="enactment_to_dict", deserialize="load_enactment", required=False
+    )
+    anchors = fields.Method(
+        serialize="anchorset_to_dict", deserialize="load_anchorset", required=False
+    )
+
+    def load_anchorset(self, data: Dict[str, Any]) -> TextPositionSet:
+        """Load EnactmentPassage objects from data."""
+        return TextPositionSet(**data)
+
+    def anchorset_to_dict(self, obj: TextPositionSet) -> Dict[str, Any]:
+        return obj.to_dict()
 
     def enactment_to_dict(self, obj: EnactmentPassage) -> Dict[str, Any]:
         return obj.dict()
@@ -158,47 +192,6 @@ class AnchoredEnactmentPassageSchema(ExpandableSchema):
     @post_load
     def make_object(self, data, **kwargs):
         return self.__model__(**data)
-
-
-class EnactmentPassageSchema(LegisliceSchema):
-    """
-    Schema to load Enactments from JSON created from user-created YAML.
-
-        >>> enactment_data = {
-        ...     "name": "original works",
-        ...     "node": "/us/usc/t17/s102",
-        ...     "start_date": "1990-12-01",
-        ...     "content": (
-        ...         "Copyright protection subsists, in accordance with this title, "
-        ...         "in original works of authorship fixed in any tangible medium of expression, "
-        ...         "now known or later developed."),
-        ...     "selection": [{"suffix": ", in accordance"}, "title,|in original works of authorship|fixed"]}
-        >>> schema = EnactmentSchema()
-        >>> enactment_index = EnactmentIndex()
-        >>> enactment_index.insert_by_name(enactment_data)
-        >>> schema.context["enactment_index"] = enactment_index
-        >>> enactment = schema.load("original works")
-        >>> enactment.selected_text()
-        'Copyright protection subsists…in original works of authorship…'
-    """
-
-    def get_indexed_enactment(self, data, **kwargs):
-        """Replace data to load with any object with same name in "enactment_index"."""
-        if not isinstance(data, str):
-            return data
-
-        mentioned = self.context.get("enactment_index") or EnactmentIndex()
-        return deepcopy(mentioned.get_by_name(data))
-
-    @pre_load
-    def format_data_to_load(self, data, **kwargs):
-        """Prepare Enactment to load."""
-        data = self.get_indexed_enactment(data)
-        return data
-
-    @post_load
-    def make_object(self, data, **kwargs) -> EnactmentPassage:
-        return EnactmentPassage(**data)
 
 
 class PredicateSchema(ExpandableSchema):
@@ -518,7 +511,7 @@ class RuleSchema(ExpandableSchema):
         serialize="enactments_to_dicts", deserialize="load_enactments"
     )
     enactments_despite = fields.Method(
-        serialize="enactments_to_dicts", deserialize="load_enactments"
+        serialize="enactments_despite_to_dicts", deserialize="load_enactments"
     )
     mandatory = fields.Bool(load_default=False)
     universal = fields.Bool(load_default=False)
@@ -551,7 +544,6 @@ class HoldingSchema(ExpandableSchema):
     decided = fields.Bool(load_default=True)
     exclusive = fields.Bool(load_default=False)
     generic = fields.Bool(load_default=False)
-    anchors = fields.Nested(TextPositionSetSchema, many=True)
 
     def nest_fields_inside_rule(self, data: Dict) -> RawHolding:
         """Nest fields inside "rule" and "procedure", if not already nested."""

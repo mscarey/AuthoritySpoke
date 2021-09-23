@@ -5,16 +5,16 @@ Intended for use with machine-generated API responses.
 Should be suitable for generating an OpenAPI specification.
 """
 
-from typing import Dict, List, NamedTuple, Optional, Sequence, TypedDict, Type, Union
+from typing import Any, Dict, List, NamedTuple, Optional, Sequence, Type, Union
 
 from marshmallow import Schema, fields, EXCLUDE
 from marshmallow import pre_load, post_load
 from marshmallow_oneofschema import OneOfSchema
 
-from anchorpoint.textselectors import TextQuoteSelector, TextPositionSelector
+from anchorpoint.textselectors import TextQuoteSelector, TextPositionSet
 
 from justopinion.decisions import Jurisdiction, Court
-from legislice import Enactment
+from legislice.enactments import Enactment, EnactmentPassage
 
 from nettlesome.factors import Factor
 from nettlesome.schemas import PredicateSchema, EntitySchema, RawFactor
@@ -27,12 +27,7 @@ from authorityspoke.opinions import Opinion
 from authorityspoke.pleadings import Pleading, Allegation
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
-from authorityspoke.io.schemas_legis import EnactmentSchema, EnactmentPassageSchema
-from authorityspoke.io.schemas_anchor import (
-    TextPositionSetSchema,
-    PositionSchema,
-    QuoteSchema,
-)
+
 
 RawSelector = Union[str, Dict[str, str]]
 RawEnactment = Dict[str, Union[str, List[RawSelector]]]
@@ -288,12 +283,31 @@ class RuleSchema(Schema):
 
     __model__: Type = Rule
     procedure = fields.Nested(ProcedureSchema)
-    enactments = fields.Nested(EnactmentPassageSchema, many=True)
-    enactments_despite = fields.Nested(EnactmentPassageSchema, many=True)
+    enactments = fields.Method(
+        serialize="enactments_to_dicts", deserialize="load_enactments_without_expansion"
+    )
+    enactments_despite = fields.Method(
+        serialize="enactments_despite_to_dicts",
+        deserialize="load_enactments_without_expansion",
+    )
     mandatory = fields.Bool(load_default=False)
     universal = fields.Bool(load_default=False)
     name = fields.Str(load_default=None)
     generic = fields.Bool(load_default=False)
+
+    def load_enactments_without_expansion(
+        self, data: List[Dict[str, Any]]
+    ) -> List[EnactmentPassage]:
+        """Load EnactmentPassage objects from data."""
+        return [EnactmentPassage(**item) for item in data]
+
+    def enactments_despite_to_dicts(
+        self, obj: EnactmentPassage
+    ) -> List[Dict[str, Any]]:
+        return [item.dict() for item in obj]
+
+    def enactments_to_dicts(self, obj: EnactmentPassage) -> List[Dict[str, Any]]:
+        return [item.dict() for item in obj]
 
     @post_load
     def make_object(self, data, **kwargs):
@@ -339,7 +353,14 @@ class HoldingSchema(Schema):
     decided = fields.Bool(load_default=True)
     exclusive = fields.Bool(load_default=False)
     generic = fields.Bool(load_default=False)
-    anchors = fields.Nested(TextPositionSetSchema)
+    anchors = fields.Method(serialize="anchorset_to_dict", deserialize="load_anchorset")
+
+    def load_anchorset(self, data: Dict[str, Any]) -> TextPositionSet:
+        """Load EnactmentPassage objects from data."""
+        return TextPositionSet(**data)
+
+    def anchorset_to_dict(self, obj: TextPositionSet) -> Dict[str, Any]:
+        return obj.to_dict()
 
     @post_load
     def make_object(self, data, **kwargs):
@@ -355,7 +376,14 @@ class NamedAnchorsSchema(Schema):
     __model__ = NamedAnchors
 
     name = fields.Nested(FactorSchema)
-    anchors = fields.Nested(TextPositionSetSchema)
+    anchors = fields.Method(serialize="anchorset_to_dict", deserialize="load_anchorset")
+
+    def load_anchorset(self, data: Dict[str, Any]) -> TextPositionSet:
+        """Load EnactmentPassage objects from data."""
+        return TextPositionSet(**data)
+
+    def anchorset_to_dict(self, obj: TextPositionSet) -> Dict[str, Any]:
+        return obj.to_dict()
 
 
 class AnchoredEnactments(NamedTuple):
@@ -363,21 +391,12 @@ class AnchoredEnactments(NamedTuple):
     anchors: List[TextQuoteSelector]
 
 
-class AnchoredEnactmentsSchema(Schema):
-    __model__ = AnchoredEnactments
-
-    enactment = fields.Nested(EnactmentSchema)
-    anchors = fields.Nested(TextPositionSetSchema)
-
-
-SCHEMAS = list(Schema.__subclasses__()) + [PositionSchema, QuoteSchema, EnactmentSchema]
+SCHEMAS = list(Schema.__subclasses__())
 
 
 def get_schema_for_item(classname: str) -> Schema:
     """Find the Marshmallow schema for an AuthoritySpoke object."""
     schemas_for_names = {
-        "TextPositionSelector": PositionSchema,
-        "TextQuoteSelector": QuoteSchema,
         "Comparison": PredicateSchema,
         "Predicate": PredicateSchema,
         "Fact": FactSchema,
@@ -388,7 +407,6 @@ def get_schema_for_item(classname: str) -> Schema:
         "Holding": HoldingSchema,
         "Rule": RuleSchema,
         "Procedure": ProcedureSchema,
-        "Enactment": EnactmentSchema,
     }
     result = schemas_for_names.get(classname)
     if result is None:

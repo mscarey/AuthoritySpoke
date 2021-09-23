@@ -2,8 +2,7 @@ import pytest
 from marshmallow import ValidationError
 
 from anchorpoint.textselectors import TextSelectionError
-from authorityspoke.io.schemas_anchor import QuoteSchema
-from authorityspoke.io import dump, schemas_yaml, schemas_json
+from authorityspoke.io import dump
 
 
 class TestLoadSelector:

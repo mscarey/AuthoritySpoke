@@ -8,7 +8,6 @@ import pytest
 from legislice.enactments import Enactment
 
 from authorityspoke.io.enactment_index import EnactmentIndex, collect_enactments
-from authorityspoke.io.schemas_legis import EnactmentSchema
 
 load_dotenv()
 
@@ -173,8 +172,6 @@ class TestCollectEnactments:
         assert enactment.content.startswith("exists in an uninterrupted")
 
     def test_retrieve_enactment_by_name(self, section6d, section_11_subdivided):
-        obj, indexed = collect_enactments([section6d, section_11_subdivided])
-        schema = EnactmentSchema(many=True)
-        schema.context["enactment_index"] = indexed
-        enactments = schema.load(obj)
+        data, indexed = collect_enactments([section6d, section_11_subdivided])
+        enactments = [Enactment(**item) for item in data]
         assert enactments[0].start_date.isoformat() == "1935-04-01"
