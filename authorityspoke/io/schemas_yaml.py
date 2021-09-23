@@ -600,7 +600,13 @@ class NamedAnchorsSchema(ExpandableSchema):
     def selection_set_to_dict(self, obj: TextPositionSet, **kwargs) -> Dict:
         return obj.dict()
 
-    def load_selection_set(self, data: Dict, **kwargs) -> TextPositionSet:
+    def load_selection_set(
+        self, data: Union[List[Dict], Dict], **kwargs
+    ) -> TextPositionSet:
+        if isinstance(data, list):
+            if len(data) > 1:
+                raise TypeError("Can't convert multi-item list to TextPositionSet.")
+            data = data[0]
         return TextPositionSet(**data)
 
     @pre_load

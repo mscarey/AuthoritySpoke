@@ -18,7 +18,7 @@ from typing import Optional, Sequence, Tuple, TypeVar, Union
 
 from dataclasses import dataclass, field
 
-from anchorpoint import TextQuoteSelector
+from anchorpoint import TextPositionSet
 from legislice.enactments import Enactment
 
 from nettlesome.terms import (
@@ -81,7 +81,7 @@ class Holding(Comparable):
     exclusive: bool = False
     generic: bool = False
     absent: bool = False
-    anchors: List[TextQuoteSelector] = field(default_factory=list)
+    anchors: TextPositionSet = field(default_factory=TextPositionSet)
 
     def __post_init__(self):
         if self.exclusive:

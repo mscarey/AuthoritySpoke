@@ -3,7 +3,7 @@ apispec[validation]~=4.3.0
 apispec-oneofschema
 eyecite~=2.2.0
 justopinion~=0.2.4
-legislice~=0.6.0
+git+git://github.com/mscarey/legislice.git@ba21890cb46336045c6d9ba69190e0b7fcdc40f3#egg=legislice
 marshmallow~=3.13
 marshmallow-oneofschema
 nettlesome~=0.5.1

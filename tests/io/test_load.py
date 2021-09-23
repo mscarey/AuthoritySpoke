@@ -82,11 +82,10 @@ class TestLoadAndRead:
             "holding_mazza_alaluf.yaml", client=self.client
         )
         # factor anchor
+        key = "the fact that <Turismo Costa Brava> was a money transmitting business"
         assert (
             "Turismo conducted substantial money transmitting business"
-            in anchored.named_anchors[
-                "the fact that <Turismo Costa Brava> was a money transmitting business"
-            ][0].exact
+            in anchored.named_anchors[key].quotes[0].exact
         )
 
         # holding anchor
@@ -94,4 +93,23 @@ class TestLoadAndRead:
 
         # enactment anchor
         key = str(anchored.holdings[1].enactments_despite[0])
+        assert "domestic financial" in anchored.enactment_anchors[key][0].exact
+
+    @pytest.mark.vcr("TestLoadAndRead.test_read_holdings_from_yaml.yaml")
+    def test_read_holding_anchors_from_yaml(self):
+        anchored = read_anchored_holdings_from_file(
+            "holding_mazza_alaluf.yaml", client=self.client
+        )
+
+        # holding anchor
+        assert "In any event" in anchored.holding_anchors[1].quotes[0].suffix
+
+    @pytest.mark.vcr("TestLoadAndRead.test_read_holdings_from_yaml.yaml")
+    def test_read_enactment_anchors_from_yaml(self):
+        anchored = read_anchored_holdings_from_file(
+            "holding_mazza_alaluf.yaml", client=self.client
+        )
+
+        # enactment anchor
+        key = anchored.holdings[1].enactments_despite[0].node
         assert "domestic financial" in anchored.enactment_anchors[key][0].exact
