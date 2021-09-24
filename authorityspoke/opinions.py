@@ -13,7 +13,11 @@ import re
 
 from dataclasses import dataclass, field
 
-from anchorpoint.textselectors import TextQuoteSelector, TextPositionSet
+from anchorpoint.textselectors import (
+    TextPositionSetFactory,
+    TextQuoteSelector,
+    TextPositionSet,
+)
 from justopinion.decisions import Opinion
 from nettlesome.terms import Comparable, ContextRegister, Explanation
 from nettlesome.factors import Factor
@@ -36,7 +40,7 @@ class HoldingWithAnchors(NamedTuple):
     """
 
     holding: Holding
-    anchors: TextPositionSet
+    anchors: TextPositionSet = field(default_factory=TextPositionSet())
 
 
 class AnchoredHoldings(NamedTuple):
@@ -54,23 +58,28 @@ class OpinionReading(Comparable):
 
     def __init__(
         self,
+        anchored_holdings: Optional[List[HoldingWithAnchors]] = None,
         opinion_type: str = "",
         opinion_author: str = "",
-        holdings: Sequence = HoldingGroup(),
         factor_anchors: TextLinkDict = {},
         enactment_anchors: TextLinkDict = {},
-        holding_anchors: Optional[List[List[TextQuoteSelector]]] = None,
     ) -> None:
 
         super().__init__()
+        anchored_holdings = anchored_holdings or []
         self.opinion_author = opinion_author
         self.opinion_type = opinion_type
-        if not isinstance(holdings, HoldingGroup):
-            holdings = HoldingGroup(holdings)
-        self.holdings = holdings
+        self.anchored_holdings = anchored_holdings
         self.factor_anchors = factor_anchors
         self.enactment_anchors = enactment_anchors
-        self.holding_anchors = holding_anchors or []
+
+    @property
+    def holdings(self) -> HoldingGroup:
+        return HoldingGroup([item.holding for item in self.anchored_holdings])
+
+    @property
+    def holding_anchors(self) -> List[TextPositionSet]:
+        return [item.anchors for item in self.anchored_holdings]
 
     def __str__(self):
         return super().__str__()
@@ -90,7 +99,7 @@ class OpinionReading(Comparable):
 
     def clear_holdings(self):
         r"""Remove all :class:`.Holding`\s from the opinion."""
-        self.holdings = HoldingGroup()
+        self.anchored_holdings = []
 
     def explanations_contradiction(
         self,
@@ -245,8 +254,7 @@ class OpinionReading(Comparable):
     ) -> None:
         r"""Record that this Opinion endorses specified :class:`Holding`\s."""
         if isinstance(holding, HoldingWithAnchors):
-            holding = holding.holding
-            holding_anchors = holding.anchors
+            holding, holding_anchors = holding.holding, holding.anchors
         if isinstance(holding, Rule):
             logger.warning(
                 "posit_holding was called with a Rule "
@@ -256,9 +264,6 @@ class OpinionReading(Comparable):
 
         if not isinstance(holding, Holding):
             raise TypeError('"holding" must be an object of type Holding.')
-
-        if holding_anchors and not isinstance(holding_anchors, List):
-            holding_anchors = [holding_anchors]
 
         if named_anchors:
             self.factor_anchors = {**self.factor_anchors, **named_anchors}
@@ -272,7 +277,9 @@ class OpinionReading(Comparable):
         else:
             if context:
                 holding = holding.new_context(context, source=self)
-            self.holdings = self.holdings + HoldingGroup(holding)
+            self.anchored_holdings.append(
+                HoldingWithAnchors(holding=holding, anchors=holding_anchors)
+            )
 
     def posit_holdings(
         self,

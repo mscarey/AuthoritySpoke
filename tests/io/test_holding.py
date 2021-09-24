@@ -15,7 +15,7 @@ from nettlesome.predicates import Predicate
 from authorityspoke.decisions import Decision, DecisionReading
 from authorityspoke.facts import Fact
 from authorityspoke.holdings import Holding, HoldingGroup
-from authorityspoke.opinions import Opinion, OpinionReading
+from authorityspoke.opinions import HoldingWithAnchors, Opinion, OpinionReading
 from authorityspoke.procedures import Procedure
 from authorityspoke.io import loaders, readers, dump, name_index
 from authorityspoke.io.fake_enactments import FakeClient
@@ -291,7 +291,8 @@ class TestTextAnchors:
             ),
         )
         assert (
-            reading.holdings[-1].anchors[0].exact == "some text supporting this holding"
+            reading.holdings_anchors[-1].quotes.exact
+            == "some text supporting this holding"
         )
 
     def test_mentioned_context_changing(self):
@@ -512,7 +513,9 @@ class TestTextAnchors:
         mock_client = FakeClient(responses=make_response)
         to_read = load_holdings("holding_brad.yaml")
         holdings = readers.read_holdings(to_read, client=mock_client)
-        reading = OpinionReading(holdings=holdings)
+        reading = OpinionReading(
+            anchored_holdings=[HoldingWithAnchors(holding=item) for item in holdings]
+        )
         expectation_not_reasonable = list(reading.holdings)[6]
         assert "dimensionless" not in str(expectation_not_reasonable)
         assert isinstance(expectation_not_reasonable.inputs[0].predicate.quantity, int)
@@ -615,7 +618,10 @@ class TestTextAnchors:
         raw = make_analysis["minimal"]
         holdings = readers.read_holdings_with_anchors(raw).holdings
         holdings_again = readers.read_holdings_with_anchors(raw).holdings
-        assert all(left.means(right) for left, right in zip(holdings, holdings_again))
+        assert all(
+            left.holding.means(right.holding)
+            for left, right in zip(holdings, holdings_again)
+        )
 
     def test_posit_holding_with_selector(self, make_analysis, make_opinion):
 
@@ -628,7 +634,7 @@ class TestTextAnchors:
         brad = make_opinion["brad_majority"]
         reading = OpinionReading(opinion_type="majority", opinion_author=brad.author)
         reading.posit(holdings)
-        assert reading.holdings[0].anchors[0].exact == "open fields or grounds"
+        assert reading.holding_anchors[0].quotes[0].exact == "open fields or grounds"
 
 
 class TestExclusiveFlag:
