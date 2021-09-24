@@ -291,7 +291,7 @@ class TestTextAnchors:
             ),
         )
         assert (
-            reading.holdings_anchors[-1].quotes.exact
+            reading.anchored_holdings[-1].anchors.quotes[0].exact
             == "some text supporting this holding"
         )
 

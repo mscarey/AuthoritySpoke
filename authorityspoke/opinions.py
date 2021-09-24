@@ -246,7 +246,7 @@ class OpinionReading(Comparable):
         self,
         holding: Union[Holding, Rule, HoldingWithAnchors],
         holding_anchors: Optional[
-            Union[TextQuoteSelector, List[TextQuoteSelector]]
+            Union[TextPositionSelector, TextQuoteSelector, TextPositionSet]
         ] = None,
         named_anchors: Optional[TextLinkDict] = None,
         enactment_anchors: Optional[TextLinkDict] = None,
@@ -255,6 +255,12 @@ class OpinionReading(Comparable):
         r"""Record that this Opinion endorses specified :class:`Holding`\s."""
         if isinstance(holding, HoldingWithAnchors):
             holding, holding_anchors = holding.holding, holding.anchors
+        if isinstance(holding_anchors, (TextQuoteSelector, str)):
+            holding_anchors = [holding_anchors]
+        if isinstance(holding_anchors, List) and isinstance(
+            holding_anchors[0], (str, TextQuoteSelector)
+        ):
+            holding_anchors = TextPositionSet.from_quotes(holding_anchors)
         if isinstance(holding, Rule):
             logger.warning(
                 "posit_holding was called with a Rule "

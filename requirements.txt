@@ -1,14 +1,15 @@
-anchorpoint~=0.6.0
+git+git://github.com/mscarey/anchorpoint.git@c33cfa2f4ffd680ef45a7f77194e4b5882eabe9a#egg=anchorpoint
 apispec[validation]~=4.3.0
 apispec-oneofschema
 eyecite~=2.2.0
 justopinion~=0.2.4
-git+git://github.com/mscarey/legislice.git@ba21890cb46336045c6d9ba69190e0b7fcdc40f3#egg=legislice
+git+git://github.com/mscarey/legislice.git@88aeb137f154fba1e5ecce22be5bed8975d11c27#egg=legislice
 marshmallow~=3.13
 marshmallow-oneofschema
 nettlesome~=0.5.1
 pint>=0.15
 python-dotenv
+python-ranges~=0.2.1
 python-slugify
 pyyaml
 requests
