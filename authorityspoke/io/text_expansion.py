@@ -20,7 +20,7 @@ def expand_shorthand(obj: Union[List, Dict]) -> Union[List, Dict[str, Any]]:
 
 def expand_node_shorthand(obj: Dict[str, Any]) -> Dict[str, Any]:
     """Expand shorthand at one node while walking tree of input JSON."""
-    for list_field in ("terms", "anchors"):
+    for list_field in ("terms",):
         if obj.get(list_field) is not None:
             obj = wrap_single_element_in_list(obj, list_field)
 

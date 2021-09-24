@@ -30,11 +30,19 @@ logger = logging.getLogger(__name__)
 TextLinkDict = Dict[str, List[TextQuoteSelector]]
 
 
+class HoldingWithAnchors(NamedTuple):
+    """
+    A :class:`.Holding` with a :class:`.TextPositionSet` that anchors it.
+    """
+
+    holding: Holding
+    anchors: TextPositionSet
+
+
 class AnchoredHoldings(NamedTuple):
     """Holdings with objects storing the Holdings' links to Opinion text."""
 
-    holdings: List[Holding]
-    holding_anchors: List[TextPositionSet]
+    holdings: List[HoldingWithAnchors]
     named_anchors: TextLinkDict
     enactment_anchors: TextLinkDict
 
@@ -227,7 +235,7 @@ class OpinionReading(Comparable):
 
     def posit_holding(
         self,
-        holding: Union[Holding, Rule],
+        holding: Union[Holding, Rule, HoldingWithAnchors],
         holding_anchors: Optional[
             Union[TextQuoteSelector, List[TextQuoteSelector]]
         ] = None,
@@ -236,6 +244,9 @@ class OpinionReading(Comparable):
         context: Optional[Sequence[Factor]] = None,
     ) -> None:
         r"""Record that this Opinion endorses specified :class:`Holding`\s."""
+        if isinstance(holding, HoldingWithAnchors):
+            holding = holding.holding
+            holding_anchors = holding.anchors
         if isinstance(holding, Rule):
             logger.warning(
                 "posit_holding was called with a Rule "
@@ -248,9 +259,6 @@ class OpinionReading(Comparable):
 
         if holding_anchors and not isinstance(holding_anchors, List):
             holding_anchors = [holding_anchors]
-
-        if holding_anchors:
-            holding.anchors = holding.anchors + holding_anchors
 
         if named_anchors:
             self.factor_anchors = {**self.factor_anchors, **named_anchors}

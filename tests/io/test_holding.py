@@ -621,14 +621,13 @@ class TestTextAnchors:
 
         (
             holdings,
-            holding_anchors,
             _,
             _,
         ) = readers.read_holdings_with_anchors(make_analysis["minimal"])
 
         brad = make_opinion["brad_majority"]
         reading = OpinionReading(opinion_type="majority", opinion_author=brad.author)
-        reading.posit(holdings, holding_anchors=holding_anchors)
+        reading.posit(holdings)
         assert reading.holdings[0].anchors[0].exact == "open fields or grounds"
 
 

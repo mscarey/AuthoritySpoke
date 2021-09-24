@@ -33,7 +33,7 @@ from authorityspoke.io.name_index import RawFactor, RawPredicate
 from authorityspoke.io.nesting import nest_fields
 from authorityspoke.io import text_expansion
 
-from authorityspoke.opinions import AnchoredHoldings
+from authorityspoke.opinions import AnchoredHoldings, HoldingWithAnchors
 from authorityspoke.pleadings import Pleading, Allegation
 
 from authorityspoke.procedures import Procedure
@@ -606,10 +606,26 @@ class NamedAnchorsSchema(ExpandableSchema):
         return data
 
 
+class HoldingWithAnchorsSchema(ExpandableSchema):
+    __model__ = HoldingWithAnchors
+
+    holding = fields.Nested(HoldingSchema)
+    anchors = fields.Method(
+        serialize="anchorset_to_dict", deserialize="load_anchorset", required=False
+    )
+
+    def load_anchorset(self, data: Dict[str, Any]) -> TextPositionSet:
+        """Load EnactmentPassage objects from data."""
+        return TextPositionSet(**data)
+
+    def anchorset_to_dict(self, obj: TextPositionSet) -> Dict[str, Any]:
+        return obj.to_dict()
+
+
 class AnchoredHoldingsSchema(ExpandableSchema):
     __model__ = AnchoredHoldings
 
-    holdings = fields.Nested(HoldingSchema, many=True)
+    holdings = fields.Nested(HoldingWithAnchorsSchema, many=True)
     factor_anchors = fields.Nested(NamedAnchorsSchema, many=True)
     enactment_anchors = fields.Nested(AnchoredEnactmentPassageSchema, many=True)
 
@@ -636,10 +652,8 @@ class AnchoredHoldingsSchema(ExpandableSchema):
                     linked.passage.select_all()
                 enactment_links[str(linked.passage)] = linked.anchors
 
-        holding_anchors = [holding.anchors for holding in data["holdings"]]
         return AnchoredHoldings(
-            data["holdings"],
-            holding_anchors,
+            holdings=data["holdings"],
             named_anchors=text_links,
             enactment_anchors=enactment_links,
         )
