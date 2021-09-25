@@ -312,17 +312,23 @@ class OpinionReading(Comparable):
             present case.
         """
         if isinstance(holdings, AnchoredHoldings):
-            (holdings, holding_anchors, named_anchors, enactment_anchors) = holdings
-
-        holding_anchors = holding_anchors or []
-        for (holding, selector_list) in zip_longest(holdings, holding_anchors):
-            self.posit_holding(
-                holding,
-                holding_anchors=selector_list,
-                named_anchors=named_anchors,
-                enactment_anchors=enactment_anchors,
-                context=context,
-            )
+            for holding_with_anchor in holdings.holdings:
+                self.posit_holding(
+                    holding=holding_with_anchor,
+                    named_anchors=named_anchors,
+                    enactment_anchors=enactment_anchors,
+                    context=context,
+                )
+        else:
+            holding_anchors = holding_anchors or []
+            for (holding, selector_list) in zip_longest(holdings, holding_anchors):
+                self.posit_holding(
+                    holding=holding,
+                    holding_anchors=selector_list,
+                    named_anchors=named_anchors,
+                    enactment_anchors=enactment_anchors,
+                    context=context,
+                )
 
     def posit(
         self,

@@ -617,8 +617,12 @@ class HoldingWithAnchorsSchema(ExpandableSchema):
     @pre_load
     def format_data_to_load(self, data: RawFactor, **kwargs) -> RawFactor:
         """Expand data if it was just a name reference in the JSON input."""
+        if data.get("holding"):
+            data["holding"] = self.get_from_mentioned(data["holding"])
+        if not data.get("holding"):
+            anchors = data.pop("anchors", {})
+            data = {"holding": data, "anchors": anchors}
 
-        data["holding"] = self.get_from_mentioned(data["holding"])
         outer_anchors = data.get("anchors", {})
         nested_anchors = data["holding"].pop("anchors", {})
         data["anchors"] = {**outer_anchors, **nested_anchors}
@@ -644,6 +648,7 @@ class AnchoredHoldingsSchema(ExpandableSchema):
         """Expand data if it was just a name reference in the JSON input."""
 
         data["holdings"] = self.get_from_mentioned(data["holdings"])
+
         return data
 
     @post_load
