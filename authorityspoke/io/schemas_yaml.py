@@ -624,7 +624,13 @@ class HoldingWithAnchorsSchema(ExpandableSchema):
             data = {"holding": data, "anchors": anchors}
 
         outer_anchors = data.get("anchors", {})
+        if isinstance(outer_anchors, str):
+            outer_anchors = {"quotes": outer_anchors}
         nested_anchors = data["holding"].pop("anchors", {})
+        if isinstance(outer_anchors, str):
+            raise TypeError
+        if isinstance(nested_anchors, str):
+            raise TypeError
         data["anchors"] = {**outer_anchors, **nested_anchors}
         return data
 

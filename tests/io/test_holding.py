@@ -119,25 +119,29 @@ class TestHoldingImport:
             "factor_anchors": [
                 {
                     "name": "Rural's telephone directory was a fact",
-                    "anchors": [
-                        {"exact": "facts", "prefix": "The first is that"},
-                        {
-                            "exact": "as to facts",
-                            "prefix": "No one may claim originality",
-                        },
-                        {"exact": "facts", "prefix": "no one may copyright"},
-                    ],
+                    "anchors": {
+                        "quotes": [
+                            {"exact": "facts", "prefix": "The first is that"},
+                            {
+                                "exact": "as to facts",
+                                "prefix": "No one may claim originality",
+                            },
+                            {"exact": "facts", "prefix": "no one may copyright"},
+                        ]
+                    },
                 },
                 {
                     "name": "Rural's telephone directory was copyrightable",
-                    "anchors": [
-                        {
-                            "exact": "copyrightable",
-                            "prefix": "first is that facts are not",
-                        },
-                        "The sine qua non of|copyright|",
-                        {"exact": "no one may copyright", "suffix": "facts"},
-                    ],
+                    "anchors": {
+                        "quotes": [
+                            {
+                                "exact": "copyrightable",
+                                "prefix": "first is that facts are not",
+                            },
+                            "The sine qua non of|copyright|",
+                            {"exact": "no one may copyright", "suffix": "facts"},
+                        ]
+                    },
                 },
             ],
             "holdings": [
@@ -153,17 +157,21 @@ class TestHoldingImport:
                     },
                     "enactments": [
                         {
-                            "node": "/us/const/article/I/8/8",
-                            "exact": (
-                                "To promote the Progress of Science and useful Arts, "
-                                "by securing for limited Times to Authors"
-                            ),
                             "name": "securing for authors",
+                            "enactment": {
+                                "node": "/us/const/article/I/8/8",
+                                "exact": (
+                                    "To promote the Progress of Science and useful Arts, "
+                                    "by securing for limited Times to Authors"
+                                ),
+                            },
                         },
                         {
-                            "node": "/us/const/article/I/8/8",
-                            "exact": "the exclusive Right to their respective Writings",
                             "name": "right to writings",
+                            "enactment": {
+                                "node": "/us/const/article/I/8/8",
+                                "exact": "the exclusive Right to their respective Writings",
+                            },
                         },
                     ],
                     "mandatory": True,
@@ -183,7 +191,6 @@ class TestHoldingImport:
         mock_client = FakeClient(responses=make_response)
         (
             feist_holdings,
-            holding_anchors,
             named_anchors,
             enactment_anchors,
         ) = readers.read_holdings_with_anchors(record=raw_holdings, client=mock_client)
@@ -192,7 +199,6 @@ class TestHoldingImport:
         feist.clear_holdings()
         feist.posit(
             feist_holdings,
-            holding_anchors=holding_anchors,
             named_anchors=named_anchors,
             enactment_anchors=enactment_anchors,
         )

@@ -1484,7 +1484,6 @@ def make_decision_with_holding(make_response, make_decision, make_anchored_holdi
     for name, decision in make_decision.items():
         (
             holdings,
-            holding_anchors,
             named_anchors,
             enactment_anchors,
         ) = make_anchored_holding[name]
@@ -1494,8 +1493,7 @@ def make_decision_with_holding(make_response, make_decision, make_anchored_holdi
                 OpinionReading(
                     opinion_type=decision.majority.type,
                     opinion_author=decision.majority.author,
-                    holdings=holdings,
-                    holding_anchors=holding_anchors,
+                    anchored_holdings=holdings,
                     factor_anchors=named_anchors,
                     enactment_anchors=enactment_anchors,
                 )
