@@ -88,13 +88,6 @@ class TestLoadAndRead:
             in anchored.named_anchors[key].quotes[0].exact
         )
 
-        # holding anchor
-        assert "In any event" in anchored.holding_anchors[1][0].suffix
-
-        # enactment anchor
-        key = str(anchored.holdings[1].enactments_despite[0])
-        assert "domestic financial" in anchored.enactment_anchors[key][0].exact
-
     @pytest.mark.vcr("TestLoadAndRead.test_read_holdings_from_yaml.yaml")
     def test_read_holding_anchors_from_yaml(self):
         anchored = read_anchored_holdings_from_file(
@@ -102,7 +95,7 @@ class TestLoadAndRead:
         )
 
         # holding anchor
-        assert "In any event" in anchored.holding_anchors[1].quotes[0].suffix
+        assert "In any event" in anchored.holdings[1].anchors.quotes[0].suffix
 
     @pytest.mark.vcr("TestLoadAndRead.test_read_holdings_from_yaml.yaml")
     def test_read_enactment_anchors_from_yaml(self):
@@ -111,5 +104,5 @@ class TestLoadAndRead:
         )
 
         # enactment anchor
-        key = anchored.holdings[1].enactments_despite[0].node
+        key = str(anchored.holdings[1].holding.enactments_despite[0])
         assert "domestic financial" in anchored.enactment_anchors[key][0].exact

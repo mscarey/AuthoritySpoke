@@ -40,7 +40,7 @@ class TestLoadOpinion:
         assert opinion.type == "concurring-in-part-and-dissenting-in-part"
 
     def test_empty_holding_list_when_loading_opinion(self):
-        reading = OpinionReading(opinion_type="majority", holdings=[])
+        reading = OpinionReading(opinion_type="majority")
         assert isinstance(reading.holdings, HoldingGroup)
 
     def test_loading_opinion_with_one_holding_in_list(self, make_holding):
@@ -55,16 +55,19 @@ class TestLoadOpinion:
         of the different text anchors for that Fact are attached to it.
         """
         watch = raw_holding["stolen watch"]
-        holdings = readers.read_holdings([watch])
+        holdings, _, _ = readers.read_holdings_with_anchors(
+            {"holdings": [{"holding": watch}]}
+        )
         cardenas = make_opinion_with_holding["cardenas_majority"]
         cardenas.clear_holdings()
         cardenas.posit_holdings(holdings)
 
         assert any(
-            selector.exact == "Mark stole a watch" for selector in holdings[0].anchors
+            selector.exact == "Mark stole a watch"
+            for selector in holdings[0].anchors.quotes
         )
         assert any(
             selector.exact == "a watch was stolen by Mark"
-            for selector in holdings[0].anchors
+            for selector in holdings[0].anchors.quotes
         )
-        assert len(holdings[0].anchors) == 2
+        assert len(holdings[0].anchors.quotes) == 2
