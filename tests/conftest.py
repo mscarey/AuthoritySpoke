@@ -1545,9 +1545,11 @@ def make_analysis() -> Dict[str, Dict[str, Any]]:
         "no anchors": {
             "holdings": [
                 {
-                    "outputs": {
-                        "type": "fact",
-                        "content": "this holding has no text anchors",
+                    "holding": {
+                        "outputs": {
+                            "type": "fact",
+                            "content": "this holding has no text anchors",
+                        }
                     }
                 }
             ]

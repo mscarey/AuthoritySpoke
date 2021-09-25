@@ -262,17 +262,16 @@ class TestTextAnchors:
         reading = OpinionReading()
         (
             oracle_holdings,
-            holding_anchors,
             named_anchors,
             enactment_anchors,
         ) = readers.read_holdings_with_anchors(raw_analysis)
         reading.posit(
             oracle_holdings,
-            holding_anchors=holding_anchors,
             named_anchors=named_anchors,
             enactment_anchors=enactment_anchors,
         )
-        assert not reading.holdings[0].anchors
+        assert not reading.holdings[0].anchors.positions
+        assert not reading.holdings[0].anchors.quotes
 
     def test_holding_without_enactments_or_regime(self, raw_holding):
         expanded = text_expansion.expand_shorthand(raw_holding["bradley_house"])

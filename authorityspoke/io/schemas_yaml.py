@@ -614,6 +614,16 @@ class HoldingWithAnchorsSchema(ExpandableSchema):
         serialize="anchorset_to_dict", deserialize="load_anchorset", required=False
     )
 
+    @pre_load
+    def format_data_to_load(self, data: RawFactor, **kwargs) -> RawFactor:
+        """Expand data if it was just a name reference in the JSON input."""
+
+        data["holding"] = self.get_from_mentioned(data["holding"])
+        outer_anchors = data.get("anchors", {})
+        nested_anchors = data["holding"].pop("anchors", {})
+        data["anchors"] = {**outer_anchors, **nested_anchors}
+        return data
+
     def load_anchorset(self, data: Dict[str, Any]) -> TextPositionSet:
         """Load EnactmentPassage objects from data."""
         return TextPositionSet(**data)
