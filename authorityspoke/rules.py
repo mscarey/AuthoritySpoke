@@ -13,7 +13,7 @@ from typing import List, Optional, Sequence, Tuple, Union
 
 from pydantic import ValidationError
 
-from legislice.enactments import Enactment
+from legislice.enactments import Enactment, EnactmentPassage
 from legislice.groups import EnactmentGroup
 
 from nettlesome.terms import (
@@ -159,7 +159,7 @@ class Rule(Comparable):
         if not isinstance(other, Rule):
             if isinstance(other, Factor):
                 return self.with_factor(other)
-            if isinstance(other, Enactment):
+            if isinstance(other, (Enactment, EnactmentPassage)):
                 return self.with_enactment(other)
             raise TypeError
         if self.universal is False and other.universal is False:
@@ -304,7 +304,7 @@ class Rule(Comparable):
         :returns:
             a new version of ``self`` with the specified change
         """
-        if not isinstance(incoming, Enactment):
+        if not isinstance(incoming, (Enactment, EnactmentPassage)):
             raise TypeError
 
         new_enactments = self.enactments + incoming
@@ -322,7 +322,7 @@ class Rule(Comparable):
         :returns:
             a new version of ``self`` with the specified change
         """
-        if not isinstance(incoming, Enactment):
+        if not isinstance(incoming, (Enactment, EnactmentPassage)):
             raise TypeError
 
         new_enactments = self.enactments_despite + incoming
@@ -648,12 +648,12 @@ class Rule(Comparable):
     def set_enactments(
         self, enactments: Union[Enactment, Sequence[Enactment], EnactmentGroup]
     ) -> None:
-        self.enactments = EnactmentGroup(enactments)
+        self.enactments = EnactmentGroup(passages=enactments)
 
     def set_enactments_despite(
         self, enactments: Union[Enactment, Sequence[Enactment], EnactmentGroup]
     ) -> None:
-        self.enactments_despite = EnactmentGroup(enactments)
+        self.enactments_despite = EnactmentGroup(passages=enactments)
 
     def __str__(self):
         mandatory = "MUST" if self.mandatory else "MAY"

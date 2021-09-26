@@ -99,9 +99,9 @@ class TestLoadRules:
         )
 
     @pytest.mark.vcr
-    def test_correct_context_when_adding_rules(self, fake_beard_cli):
+    def test_generic_terms_after_adding_rules(self, fake_beard_client):
         beard_dictionary = loaders.load_holdings("beard_rules.yaml")
-        beard_rules = readers.read_rules(beard_dictionary, client=self.client)
+        beard_rules = readers.read_rules(beard_dictionary, client=fake_beard_client)
         loan_is_transfer = beard_rules[7]
         elements_of_offense = beard_rules[11]
         loan_without_exceptions = (
