@@ -93,11 +93,14 @@ class TestOpinionText:
             for anchor in feist.factor_anchors.values()
         )
 
-    def test_select_opinion_text_for_factor(self, make_anchored_holding):
+    def test_select_opinion_text_for_factor(self, make_opinion, make_anchored_holding):
+        opinion = make_opinion["oracle_majority"]
         oracle = make_anchored_holding["oracle"]
-        anchor = oracle.holdings[0].anchors.quotes[0]
-        selected = oracle.select_text(selector=anchor, opinion_type="majority")
-        assert str(selected) == "…must be “original” to qualify…"
+        anchor = oracle.named_anchors["the fact that <the Java API> was copyrightable"]
+        selected = opinion.select_text(selector=anchor)
+        assert str(selected).startswith(
+            "…that element may nevertheless contain expression"
+        )
 
     def test_select_opinion_text_for_enactment(self, make_decision_with_holding):
         oracle = make_decision_with_holding["oracle"]
@@ -106,10 +109,10 @@ class TestOpinionText:
         selected = oracle.select_text(selector=anchor, opinion_type="majority")
         assert str(selected) == "…17 U.S.C. § 102(a)…"
 
-    def test_select_opinion_text_for_holding(self, make_decision_with_holding):
-        oracle = make_decision_with_holding["oracle"]
-        anchor = oracle.holding_anchors[0]
-        selected = oracle.select_text(selector=anchor, opinion_type="majority")
+    def test_select_opinion_text_for_holding(self, make_opinion, make_anchored_holding):
+        opinion = make_opinion["oracle_majority"]
+        anchor = make_anchored_holding["oracle"].holdings[0].anchors
+        selected = opinion.select_text(selector=anchor)
         assert str(selected) == "…must be “original” to qualify…"
 
     def test_invalid_text_selector(self, make_decision_with_holding):

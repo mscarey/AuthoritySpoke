@@ -1,5 +1,6 @@
 import datetime
 import os
+from legislice.enactments import EnactmentPassage
 
 import pytest
 
@@ -22,9 +23,9 @@ class TestCodes:
     client = Client(api_token=TOKEN)
 
     def test_cfr_repr(self):
-        oracle_dictionary = loaders.load_holdings("holding_oracle.json")
+        oracle_dictionary = loaders.load_holdings("holding_oracle.yaml")
         regulation = oracle_dictionary[10]["enactments_despite"][1]
-        enactment = Enactment(**regulation)
+        enactment = EnactmentPassage(**regulation)
 
         assert enactment.level == CodeLevel.REGULATION
         assert "/cfr/" in repr(enactment)

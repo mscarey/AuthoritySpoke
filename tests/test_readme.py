@@ -27,13 +27,11 @@ class TestReadme:
 
         (
             oracle_holdings,
-            oracle_anchors,
             oracle_named_anchors,
             oracle_e,
         ) = read_anchored_holdings_from_file("holding_oracle.yaml", client=client)
         (
             lotus_holdings,
-            lotus_anchors,
             lotus_named_anchors,
             lotus_e,
         ) = read_anchored_holdings_from_file("holding_lotus.yaml", client=client)
@@ -43,13 +41,11 @@ class TestReadme:
 
         oracle_reading.posit(
             holdings=oracle_holdings,
-            holding_anchors=oracle_anchors,
             named_anchors=oracle_named_anchors,
             enactment_anchors=oracle_e,
         )
         lotus_reading.posit(
             holdings=lotus_holdings,
-            holding_anchors=lotus_anchors,
             named_anchors=lotus_named_anchors,
             enactment_anchors=lotus_e,
         )
