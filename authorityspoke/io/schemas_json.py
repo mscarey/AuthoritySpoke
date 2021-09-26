@@ -358,7 +358,7 @@ class HoldingSchema(Schema):
         return TextPositionSet(**data)
 
     def anchorset_to_dict(self, obj: TextPositionSet) -> Dict[str, Any]:
-        return obj.to_dict()
+        return obj.anchors.dict()
 
     @post_load
     def make_object(self, data, **kwargs):

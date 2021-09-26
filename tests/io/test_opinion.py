@@ -43,8 +43,9 @@ class TestLoadOpinion:
         reading = OpinionReading(opinion_type="majority")
         assert isinstance(reading.holdings, HoldingGroup)
 
-    def test_loading_opinion_with_one_holding_in_list(self, make_holding):
-        reading = OpinionReading(holdings=[make_holding["h1"]])
+    def test_loading_opinion_with_one_holding_in_list(self, make_anchored_holding):
+        holding = make_anchored_holding["watt"].holdings[0]
+        reading = OpinionReading(anchored_holdings=[holding])
         assert isinstance(reading.holdings, HoldingGroup)
         assert len(reading.holdings) == 1
 
