@@ -351,14 +351,6 @@ class HoldingSchema(Schema):
     decided = fields.Bool(load_default=True)
     exclusive = fields.Bool(load_default=False)
     generic = fields.Bool(load_default=False)
-    anchors = fields.Method(serialize="anchorset_to_dict", deserialize="load_anchorset")
-
-    def load_anchorset(self, data: Dict[str, Any]) -> TextPositionSet:
-        """Load EnactmentPassage objects from data."""
-        return TextPositionSet(**data)
-
-    def anchorset_to_dict(self, obj: TextPositionSet) -> Dict[str, Any]:
-        return obj.anchors.dict()
 
     @post_load
     def make_object(self, data, **kwargs):

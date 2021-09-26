@@ -81,7 +81,6 @@ class Holding(Comparable):
     exclusive: bool = False
     generic: bool = False
     absent: bool = False
-    anchors: TextPositionSet = field(default_factory=TextPositionSet)
 
     def __post_init__(self):
         if self.exclusive:

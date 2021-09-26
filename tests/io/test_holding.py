@@ -275,8 +275,8 @@ class TestTextAnchors:
             named_anchors=named_anchors,
             enactment_anchors=enactment_anchors,
         )
-        assert not reading.holdings[0].anchors.positions
-        assert not reading.holdings[0].anchors.quotes
+        assert not reading.holding_anchors[0].positions
+        assert not reading.holding_anchors[0].quotes
 
     def test_holding_without_enactments_or_regime(self, raw_holding):
         expanded = text_expansion.expand_shorthand(raw_holding["bradley_house"])
