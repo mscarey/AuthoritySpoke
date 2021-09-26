@@ -11,6 +11,8 @@ from copy import deepcopy
 from typing import Any, ClassVar, Dict, Iterable, Iterator, Type
 from typing import List, Optional, Sequence, Tuple, Union
 
+from pydantic import ValidationError
+
 from legislice.enactments import Enactment
 from legislice.groups import EnactmentGroup
 
@@ -95,14 +97,24 @@ class Rule(Comparable):
         name: Optional[str] = None,
     ):
         self.procedure = procedure
-        self.enactments = (
-            EnactmentGroup(passages=enactments) if enactments else EnactmentGroup()
-        )
-        self.enactments_despite = (
-            EnactmentGroup(passages=enactments_despite)
-            if enactments_despite
-            else EnactmentGroup()
-        )
+
+        # TODO: use a pydantic validator to standardize the enactments
+        try:
+            self.enactments = (
+                EnactmentGroup(passages=list(enactments))
+                if enactments
+                else EnactmentGroup()
+            )
+        except ValidationError:
+            self.enactments = EnactmentGroup(passages=[enactments])
+        try:
+            self.enactments_despite = (
+                EnactmentGroup(passages=list(enactments_despite))
+                if enactments_despite
+                else EnactmentGroup()
+            )
+        except ValidationError:
+            self.enactments_despite = EnactmentGroup(passages=[enactments_despite])
         self.mandatory = mandatory
         self.universal = universal
         self.generic = generic

@@ -102,7 +102,7 @@ class TestOpinionText:
     def test_select_opinion_text_for_enactment(self, make_decision_with_holding):
         oracle = make_decision_with_holding["oracle"]
         enactment_name = str(oracle.holdings[0].enactments[0])
-        anchor = oracle.majority.enactment_anchors[enactment_name][0]
+        anchor = oracle.majority.enactment_anchors[enactment_name]
         selected = oracle.select_text(selector=anchor, opinion_type="majority")
         assert str(selected) == "…17 U.S.C. § 102(a)…"
 

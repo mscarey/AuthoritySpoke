@@ -9,6 +9,7 @@ AuthoritySpoke.egg-info
 .tox
 .vscode
 .mypy_cache/
+anchorpoint/
 ausvenv/
 build/
 dist/
