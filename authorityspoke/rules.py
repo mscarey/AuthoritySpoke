@@ -272,7 +272,7 @@ class Rule(Comparable):
         :returns:
             None
         """
-        if not isinstance(incoming, Enactment):
+        if not isinstance(incoming, (Enactment, EnactmentPassage)):
             raise TypeError
 
         new_enactments = self.enactments + incoming
@@ -288,7 +288,7 @@ class Rule(Comparable):
         :returns:
             None
         """
-        if not isinstance(incoming, Enactment):
+        if not isinstance(incoming, (Enactment, EnactmentPassage)):
             raise TypeError
 
         new_enactments = self.enactments_despite + incoming

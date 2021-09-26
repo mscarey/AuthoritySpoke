@@ -93,8 +93,8 @@ class TestOpinionText:
             for anchor in feist.factor_anchors.values()
         )
 
-    def test_select_opinion_text_for_factor(self, make_decision_with_holding):
-        oracle = make_decision_with_holding["oracle"]
+    def test_select_opinion_text_for_factor(self, make_anchored_holding):
+        oracle = make_anchored_holding["oracle"]
         anchor = oracle.holdings[0].anchors.quotes[0]
         selected = oracle.select_text(selector=anchor, opinion_type="majority")
         assert str(selected) == "…must be “original” to qualify…"
@@ -108,8 +108,7 @@ class TestOpinionText:
 
     def test_select_opinion_text_for_holding(self, make_decision_with_holding):
         oracle = make_decision_with_holding["oracle"]
-        holding = oracle.holdings[0]
-        anchor = holding.anchors
+        anchor = oracle.holding_anchors[0]
         selected = oracle.select_text(selector=anchor, opinion_type="majority")
         assert str(selected) == "…must be “original” to qualify…"
 

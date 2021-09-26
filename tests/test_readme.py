@@ -30,13 +30,13 @@ class TestReadme:
             oracle_anchors,
             oracle_named_anchors,
             oracle_e,
-        ) = read_anchored_holdings_from_file("holding_oracle.json", client=client)
+        ) = read_anchored_holdings_from_file("holding_oracle.yaml", client=client)
         (
             lotus_holdings,
             lotus_anchors,
             lotus_named_anchors,
             lotus_e,
-        ) = read_anchored_holdings_from_file("holding_lotus.json", client=client)
+        ) = read_anchored_holdings_from_file("holding_lotus.yaml", client=client)
 
         oracle_reading = DecisionReading(oracle)
         lotus_reading = DecisionReading(lotus)

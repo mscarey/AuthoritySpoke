@@ -110,7 +110,7 @@ class TestHolding:
     def test_enactment_text_in_holding_str(self, make_opinion_with_holding):
         lotus = make_opinion_with_holding["lotus_majority"]
         holding = lotus.holdings[2]
-        assert holding.enactments[0].content.startswith("In any judicial")
+        assert holding.enactments[0].enactment.content.startswith("In any judicial")
         assert "In any judicial" in holding.enactments[0].selected_text()
 
     def test_holding_with_standard_of_proof(self, make_factor):
