@@ -301,13 +301,11 @@ class RuleSchema(Schema):
         """Load EnactmentPassage objects from data."""
         return [EnactmentPassage(**item) for item in data]
 
-    def enactments_despite_to_dicts(
-        self, obj: EnactmentPassage
-    ) -> List[Dict[str, Any]]:
-        return [item.dict() for item in obj]
+    def enactments_despite_to_dicts(self, obj: Rule) -> List[Dict[str, Any]]:
+        return [item.dict() for item in obj.enactments]
 
-    def enactments_to_dicts(self, obj: EnactmentPassage) -> List[Dict[str, Any]]:
-        return [item.dict() for item in obj]
+    def enactments_to_dicts(self, obj: Rule) -> List[Dict[str, Any]]:
+        return [item.dict() for item in obj.enactments_despite]
 
     @post_load
     def make_object(self, data, **kwargs):
