@@ -89,12 +89,13 @@ class TestOpinionText:
     def test_opinion_text_anchor(self, make_opinion_with_holding):
         feist = make_opinion_with_holding["feist_majority"]
         assert any(
-            "ideas" in anchor[0].exact for anchor in feist.factor_anchors.values()
+            "ideas" in anchor.quotes[0].exact
+            for anchor in feist.factor_anchors.values()
         )
 
     def test_select_opinion_text_for_factor(self, make_decision_with_holding):
         oracle = make_decision_with_holding["oracle"]
-        anchor = oracle.holdings[0].anchors[0]
+        anchor = oracle.holdings[0].anchors.quotes[0]
         selected = oracle.select_text(selector=anchor, opinion_type="majority")
         assert str(selected) == "…must be “original” to qualify…"
 
@@ -108,7 +109,7 @@ class TestOpinionText:
     def test_select_opinion_text_for_holding(self, make_decision_with_holding):
         oracle = make_decision_with_holding["oracle"]
         holding = oracle.holdings[0]
-        anchor = holding.anchors[0]
+        anchor = holding.anchors
         selected = oracle.select_text(selector=anchor, opinion_type="majority")
         assert str(selected) == "…must be “original” to qualify…"
 
@@ -175,11 +176,11 @@ class TestOpinionHoldings:
         client = FakeClient(responses=make_response)
 
         watt.clear_holdings()
-        watt_raw = loaders.load_holdings("holding_watt.json")
+        watt_raw = loaders.load_holdings("holding_watt.yaml")
         watt.posit(readers.read_holdings(watt_raw, client=client))
 
         brad.clear_holdings()
-        brad_raw = loaders.load_holdings("holding_brad.json")
+        brad_raw = loaders.load_holdings("holding_brad.yaml")
         brad.posit(readers.read_holdings(brad_raw, client=client))
 
         context_pairs = {
@@ -198,7 +199,7 @@ class TestOpinionHoldings:
 
         watt = make_opinion_with_holding["watt_majority"]
         watt.clear_holdings()
-        watt_raw = loaders.load_holdings("holding_watt.json")
+        watt_raw = loaders.load_holdings("holding_watt.yaml")
         holdings_to_posit = readers.read_holdings(watt_raw, client=client)
         watt.posit(holdings_to_posit)
         factors = watt.factors_by_name()
@@ -216,11 +217,11 @@ class TestOpinionHoldings:
         client = FakeClient(responses=make_response)
 
         watt.clear_holdings()
-        watt_raw = loaders.load_holdings("holding_watt.json")
+        watt_raw = loaders.load_holdings("holding_watt.yaml")
         watt.posit(readers.read_holdings(watt_raw, client=client))
 
         brad.clear_holdings()
-        brad_raw = loaders.load_holdings("holding_brad.json")
+        brad_raw = loaders.load_holdings("holding_brad.yaml")
         brad.posit(readers.read_holdings(brad_raw, client=client))
 
         context_items = [
@@ -334,7 +335,7 @@ class TestImplication:
         watt.clear_holdings()
         brad.clear_holdings()
         client = FakeClient(responses=make_response)
-        some_rules_raw = loaders.load_holdings(filename="holding_watt.json")
+        some_rules_raw = loaders.load_holdings(filename="holding_watt.yaml")
         some_rules = readers.read_holdings(some_rules_raw, client=client)
         for case in (watt, brad):
             case.clear_holdings()
