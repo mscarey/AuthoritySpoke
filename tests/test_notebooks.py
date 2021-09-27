@@ -71,9 +71,9 @@ class TestIntroduction:
         )
 
         works_of_authorship_clause = fake_usc_client.read("/us/usc/t17/s102/a")
-        works_of_authorship_clause.select(works_of_authorship_passage)
+        passage = works_of_authorship_clause.select(works_of_authorship_passage)
         holding_with_shorter_enactment = deepcopy(oracle.holdings[0])
-        holding_with_shorter_enactment.set_enactments(works_of_authorship_clause)
+        holding_with_shorter_enactment.set_enactments(passage)
 
         assert holding_with_shorter_enactment >= oracle.holdings[0]
         assert not oracle.holdings[0] >= holding_with_shorter_enactment
