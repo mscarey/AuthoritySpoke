@@ -94,39 +94,6 @@ def create_name_for_enactment(obj: RawEnactment) -> str:
     return name
 
 
-def nest_enactment_fields(obj: RawEnactment) -> RawEnactment:
-    """
-    Nest fields from the enactment object into the "enactment" field.
-    """
-    if not obj.get("enactment"):
-        obj["enactment"] = {}
-        obj["enactment"]["node"] = obj.pop("node")
-
-        start_date = obj.pop("start_date", None)
-        if start_date:
-            obj["enactment"]["start_date"] = start_date
-
-        end_date = obj.pop("end_date", None)
-        if end_date:
-            obj["enactment"]["end_date"] = start_date
-
-    for quote_field in ["prefix", "exact", "suffix"]:
-        if obj.get(quote_field):
-            if not obj.get("selection"):
-                obj["selection"] = {}
-            if not obj["selection"].get("quotes"):
-                obj["selection"]["quotes"] = {}
-            obj["selection"]["quotes"][quote_field] = obj.pop(quote_field)
-    for position_field in ["start", "end"]:
-        if obj.get(position_field):
-            if not obj.get("selection"):
-                obj["selection"] = {}
-            if not obj["selection"].get("positions"):
-                obj["selection"]["positions"] = {}
-            obj["selection"]["positions"][position_field] = obj.pop(position_field)
-    return obj
-
-
 def ensure_enactment_has_name(obj: RawEnactment) -> RawEnactment:
 
     if not obj.get("name"):
@@ -164,7 +131,6 @@ def collect_enactments(
                 new_dict[key] = value
 
         if new_dict.get("enactment") or (new_dict.get("name") in mentioned.keys()):
-            new_dict = nest_enactment_fields(new_dict)
             new_dict = ensure_enactment_has_name(new_dict)
             new_dict = mentioned.index_enactment(new_dict)
         obj = new_dict
