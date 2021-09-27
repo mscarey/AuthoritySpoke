@@ -176,11 +176,11 @@ class AnchoredEnactmentPassageSchema(ExpandableSchema):
         """Load EnactmentPassage objects from data."""
         return TextPositionSet(**data)
 
-    def anchorset_to_dict(self, obj: TextPositionSet) -> Dict[str, Any]:
-        return obj.to_dict()
+    def anchorset_to_dict(self, obj: AnchoredEnactmentPassage) -> Dict[str, Any]:
+        return obj.anchors.dict()
 
-    def enactment_to_dict(self, obj: EnactmentPassage) -> Dict[str, Any]:
-        return obj.dict()
+    def enactment_to_dict(self, obj: AnchoredEnactmentPassage) -> Dict[str, Any]:
+        return obj.passage.dict()
 
     def load_enactment(self, data: Dict[str, Any]) -> EnactmentPassage:
         if isinstance(data, str):
