@@ -1,24 +1,28 @@
 """Create models of assertions accepted as factual by courts."""
 from __future__ import annotations
 from copy import deepcopy
-from typing import ClassVar, Iterable, Iterator, List, Optional, Sequence, Tuple, Union
+from typing import ClassVar, Iterable, Iterator, List
+from typing import Mapping, Optional, Sequence, Tuple, Union
+
+from pydantic import BaseModel, validator, root_validator
 
 from anchorpoint.textselectors import TextQuoteSelector
-
+from nettlesome.entities import Entity
 from nettlesome.factors import Factor
 from nettlesome.formatting import indented
-
 from nettlesome.terms import (
     Comparable,
     ContextRegister,
     Explanation,
+    Term,
     TermSequence,
 )
 from nettlesome.predicates import Predicate
+from nettlesome.quantities import Comparison
 from nettlesome.statements import Statement
 
 
-class Fact(Statement):
+class Fact(Factor, BaseModel):
     r"""
     An assertion accepted as factual by a court.
 
@@ -65,6 +69,13 @@ class Fact(Statement):
             approach of hard-coding their names and order will have to change.
     """
 
+    predicate: Union[Predicate, Comparison]
+    terms: List[Union[Entity, "Fact", "Allegation", "Pleading", "Exhibit", "Evidence"]]
+    name: str = ""
+    absent: bool = False
+    generic: bool = False
+    truth: Optional[bool] = None
+    standard_of_proof: Optional[str] = None
     standards_of_proof: ClassVar[Tuple[str, ...]] = (
         "scintilla of evidence",
         "substantial evidence",
@@ -73,34 +84,38 @@ class Fact(Statement):
         "beyond reasonable doubt",
     )
 
-    def __init__(
-        self,
-        predicate: Predicate,
-        terms: TermSequence = TermSequence(),
-        name: Optional[str] = None,
-        standard_of_proof: Optional[str] = None,
-        absent: bool = False,
-        generic: bool = False,
-        anchors: Optional[List[TextQuoteSelector]] = None,
-        truth: Optional[bool] = None,
-    ):
-        Statement.__init__(
-            self,
-            predicate=predicate,
-            terms=terms,
-            absent=absent,
-            generic=generic,
-            truth=truth,
-        )
-        self.standard_of_proof = standard_of_proof
-        self.anchors = anchors or []
-        if (
-            self.standard_of_proof
-            and self.standard_of_proof not in self.standards_of_proof
-        ):
-            raise ValueError(
-                f"standard of proof must be one of {self.standards_of_proof} or None."
+    @root_validator(pre=True)
+    def move_truth_to_predicate(cls, values):
+        if isinstance(values["predicate"], str):
+            values["predicate"] = Predicate(content=values["predicate"])
+        if "truth" in values:
+            values["predicate"].truth = values["truth"]
+            del values["truth"]
+        if isinstance(values.get("terms"), Mapping):
+            values["terms"] = values[
+                "predicate"
+            ].template.get_term_sequence_from_mapping(values["terms"])
+        if not values.get("terms"):
+            values["terms"] = []
+        elif isinstance(values["terms"], Term):
+            values["terms"] = [values["terms"]]
+        return values
+
+    @validator("terms")
+    def _validate_terms(cls, v, values, **kwargs):
+        """Normalize ``terms`` to initialize Statement."""
+
+        # make TermSequence for validation, then ignore it
+        TermSequence.validate_terms(v)
+
+        if len(v) != len(values["predicate"]):
+            message = (
+                "The number of items in 'terms' must be "
+                + f"{len(values['predicate'])}, not {len(v)}, "
+                + f"to match predicate.context_slots for '{values['predicate']}'"
             )
+            raise ValueError(message)
+        return v
 
     @property
     def wrapped_string(self):
@@ -108,6 +123,25 @@ class Fact(Statement):
         if self.standard_of_proof:
             text += "\n" + indented(f"by the STANDARD {self.standard_of_proof}")
         return text
+
+    @validator("standard_of_proof")
+    def validate_standard_of_proof(cls, v: Optional[str]) -> Optional[str]:
+        """
+        Validate that standard of proof is one of the allowable values.
+
+        :param v:
+            the value to validate.
+
+        :returns:
+            the validated value.
+        """
+        if v is None:
+            return v
+        if v not in self.standards_of_proof:
+            raise ValueError(
+                f"standard of proof must be one of {self.standards_of_proof} or None."
+            )
+        return v
 
     def __str__(self):
         """Create one-line string representation for inclusion in other Facts."""
@@ -217,7 +251,7 @@ def build_fact(
     else:
         wrapped_factors = tuple(case_factors)
 
-    terms = TermSequence([wrapped_factors[i] for i in indices])
+    terms = [wrapped_factors[i] for i in indices]
     return Fact(
         predicate=predicate,
         terms=terms,
@@ -226,3 +260,234 @@ def build_fact(
         absent=absent,
         generic=generic,
     )
+
+
+class Exhibit(Factor, BaseModel):
+    """
+    A source of information for use in litigation.
+
+    :param form:
+        a term describing the category of exhibit. For example: testimony,
+        declaration, document, or recording.
+
+    :param statement:
+        a fact assertion made via the exhibit. For instance, if the exhibit
+        is a document, this parameter could refer to a statement printed
+        on the document.
+
+    :param statement_attribution:
+        the :class:`.Entity` that the exhibit imputes the statement to. For
+        instance, for a signed declaration, this would refer to the person
+        whose signature appears on the declaration, regardless of any
+        authentication concerns. The statement_attribution parameter may
+        appear without the statement parameter, especially if the content
+        of the statement is irrelevant.
+
+    :param name:
+        a string identifier for the exhibit
+
+    :param absent:
+        if True, indicates that no exhibit meeting the description exists
+        in the litigation. If the exhibit has merely been rejected as
+        evidence, use the absent attribute on an :class:`Evidence` object
+        instead.
+
+    :param generic:
+        if True, indicates that the specific attributes of the exhibit
+        are irrelevant in the context of the :class:`.Holding` where
+        the exhibit is being referenced.
+
+    .. note
+        The form parameter may be replaced by a limited
+        ontology of terms when sufficient example data is available.
+    """
+
+    form: Optional[str] = None
+    statement: Optional[Fact] = None
+    statement_attribution: Optional[Entity] = None
+    name: Optional[str] = None
+    absent: bool = False
+    generic: bool = False
+    context_factor_names: ClassVar[Tuple[str, ...]] = (
+        "statement",
+        "statement_attribution",
+    )
+
+    def _means_if_concrete(
+        self, other: Factor, context: ContextRegister
+    ) -> Iterator[ContextRegister]:
+        if isinstance(other, self.__class__) and self.form == other.form:
+            yield from super()._means_if_concrete(other, context)
+
+    def _implies_if_concrete(
+        self, other: Factor, context: Optional[ContextRegister] = None
+    ) -> Iterator[ContextRegister]:
+        if isinstance(other, self.__class__) and (
+            self.form == other.form or other.form is None
+        ):
+            yield from super()._implies_if_concrete(other, context)
+
+    def __str__(self):
+        """Represent object as string without line breaks."""
+        string = f'{("attributed to " + self.statement_attribution.short_string) if self.statement_attribution else ""}'
+        if self.statement:
+            string += ", asserting " + self.statement.short_string + ","
+        string = super().__str__().format(string)
+        return string.replace("exhibit", self.form or "exhibit").strip()
+
+    @property
+    def wrapped_string(self):
+        text = ""
+        if self.form:
+            text += f"in the FORM {self.form}"
+        if self.statement:
+            text += "\n" + indented("WITH THE ASSERTION:")
+            factor_text = indented(self.statement.wrapped_string, tabs=2)
+            text += f"\n{str(factor_text)},"
+        if self.statement_attribution:
+            text += "\n" + indented(
+                f"ATTRIBUTED TO {self.statement_attribution.wrapped_string}"
+            )
+
+        return super().__str__().format(text)
+
+
+class Evidence(Factor, BaseModel):
+    """
+    An :class:`Exhibit` admitted by a court to aid a factual determination.
+
+    :param exhibit:
+        the thing that is being used to aid a factual determination
+
+    :param to_effect:
+        the :class:`.Fact` finding that would be supported by the evidence.
+        If the Fact object includes a non-null standard_of_proof attribute, it
+        indicates that that the evidence would support a factual finding by
+        that standard of proof.
+
+    :param name:
+        a string identifier
+
+    :param absent:
+        if True, indicates that no evidence meeting the description has been
+        admitted, regardless of whether a corresponding :class:`Exhibit` has
+        been presented
+
+    :param generic:
+        if True, indicates that the specific attributes of the evidence
+        are irrelevant in the context of the :class:`.Holding` where
+        the evidence is being referenced.
+    """
+
+    exhibit: Optional[Exhibit] = None
+    to_effect: Optional[Fact] = None
+    name: Optional[str] = None
+    absent: bool = False
+    generic: bool = False
+    context_factor_names: ClassVar[Tuple[str, ...]] = ("exhibit", "to_effect")
+
+    def __str__(self):
+        string = (
+            f'{("of " + self.exhibit.short_string + " ") if self.exhibit else ""}'
+            + f'{("which supports " + self.to_effect.short_string) if self.to_effect else ""}'
+        )
+        return super().__str__().format(string).strip().replace("Evidence", "evidence")
+
+    @property
+    def wrapped_string(self):
+        text = ""
+        if self.exhibit:
+            text += "\n" + indented("OF:")
+            factor_text = indented(self.exhibit.wrapped_string, tabs=2)
+            text += f"\n{str(factor_text)}"
+        if self.to_effect:
+            text += "\n" + indented("INDICATING:")
+            factor_text = indented(self.to_effect.wrapped_string, tabs=2)
+            text += f"\n{str(factor_text)}"
+        return super().__str__().format(text).strip()
+
+
+class Pleading(Factor, BaseModel):
+    r"""
+    A document filed by a party to make :class:`Allegation`\s.
+
+    :param filer:
+        the :class:`.Entity` that the pleading references as having filed it,
+        regardless of any questions about the identification of the filer.
+
+    :param name:
+
+    :param absent:
+
+    :param generic:
+    """
+
+    filer: Optional[Entity] = None
+    name: Optional[str] = None
+    absent: bool = False
+    generic: bool = False
+    context_factor_names: ClassVar[Tuple[str]] = ("filer",)
+
+    def __str__(self):
+        string = f'{("filed by " + self.filer.short_string if self.filer else "")}'
+        return super().__str__().format(string)
+
+    @property
+    def short_string(self):
+        return str(self)
+
+
+class Allegation(Factor, BaseModel):
+    """
+    A formal assertion of a :class:`Fact`.
+
+    May be included by a party in a :class:`Pleading`
+    to establish a cause of action.
+
+    :param statement:
+        a :class:`Fact` being alleged
+
+    :param pleading:
+        the :class:`Pleading` in where the allegation appears
+
+    :param name:
+
+    :param absent:
+
+    :param generic:
+    """
+
+    statement: Optional[Fact] = None
+    pleading: Optional[Pleading] = None
+    name: Optional[str] = None
+    absent: bool = False
+    generic: bool = False
+    context_factor_names: ClassVar[Tuple[str, ...]] = ("statement", "pleading")
+
+    @property
+    def wrapped_string(self):
+        text = ""
+        if self.statement:
+            text += "\n" + indented("OF:")
+            factor_text = indented(self.statement.wrapped_string, tabs=2)
+            text += f"\n{str(factor_text)}"
+        if self.pleading:
+            text += f"\n" + indented("FOUND IN:")
+            factor_text = indented(str(self.pleading), tabs=2)
+            text += f"\n{str(factor_text)}"
+        return super().__str__().format(text).strip()
+
+    def __str__(self):
+        string = (
+            f'{("in " + self.pleading.short_string + ",") if self.pleading else ""}'
+            + f'{("claiming " + self.statement.short_string + ",") if self.statement else ""}'
+        )
+        string = string.strip(",")
+        return super().__str__().format(string).replace("Allegation", "allegation")
+
+
+Fact.update_forward_refs()
+Exhibit.update_forward_refs()
+Evidence.update_forward_refs()
+Allegation.update_forward_refs()
+Pleading.update_forward_refs()

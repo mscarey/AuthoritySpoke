@@ -303,10 +303,10 @@ alice = Entity(name="Alice")
 bob = Entity(name="Bob")
 craig = Entity(name="Craig")
 dan = Entity(name="Dan")
-alice_rich = Fact(p_large_weight, terms=alice)
-bob_poor = Fact(p_small_weight, terms=bob)
-craig_rich = Fact(p_large_weight, terms=craig)
-dan_poor = Fact(p_small_weight, terms=dan)
+alice_rich = Fact(predicate=p_large_weight, terms=alice)
+bob_poor = Fact(predicate=p_small_weight, terms=bob)
+craig_rich = Fact(predicate=p_large_weight, terms=craig)
+dan_poor = Fact(predicate=p_small_weight, terms=dan)
 
 
 class TestFactorGroups:
