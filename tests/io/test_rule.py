@@ -5,7 +5,7 @@ import pytest
 
 from legislice.download import Client
 
-from authorityspoke.io import dump, loaders, name_index, readers
+from authorityspoke.io import loaders, name_index, readers
 from authorityspoke.evidence import Exhibit
 from authorityspoke.rules import Rule
 from authorityspoke.io.fake_enactments import FakeClient
@@ -18,14 +18,14 @@ TOKEN = os.getenv("LEGISLICE_API_TOKEN")
 class TestRuleDump:
     def test_dump_rule(self, make_rule):
         rule = make_rule["h2"]
-        dumped = dump.to_dict(rule)
+        dumped = rule.dict()
         content = dumped["procedure"]["inputs"][0]["predicate"]["content"]
         assert content == "$thing was on the premises of $place"
 
     def test_dump_and_read_rule(self, make_rule, make_response):
         client = FakeClient(responses=make_response)
         rule = make_rule["h2"]
-        dumped = dump.to_dict(rule)
+        dumped = rule.dict()
         loaded = readers.read_rule(dumped, client=client)
         content = loaded.despite[0].predicate.content
         assert "the distance between $place1 and $place2 was" in content

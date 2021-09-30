@@ -28,20 +28,22 @@ class TestContextRegisters:
 
     def test_context_not_equal_to_list(self):
         changes = ContextRegister.from_lists(
-            [Entity("Alice")],
-            [Entity("Dan")],
+            [Entity(name="Alice")],
+            [Entity(name="Dan")],
         )
-        assert changes != [[Entity("Alice")], [Entity("Dan")]]
+        assert changes != [[Entity(name="Alice")], [Entity(name="Dan")]]
 
     def test_cannot_update_context_register_from_lists(self):
         left = Statement(
-            "$shooter shot $victim", terms=[Entity("Alice"), Entity("Bob")]
+            "$shooter shot $victim", terms=[Entity(name="Alice"), Entity(name="Bob")]
         )
         right = Statement(
-            "$shooter shot $victim", terms=[Entity("Craig"), Entity("Dan")]
+            "$shooter shot $victim", terms=[Entity(name="Craig"), Entity(name="Dan")]
         )
         update = left.update_context_register(
-            right, context=[[Entity("Alice")], [Entity("Craig")]], comparison=means
+            right,
+            context=[[Entity(name="Alice")], [Entity(name="Craig")]],
+            comparison=means,
         )
         with pytest.raises(TypeError):
             next(update)
@@ -200,20 +202,21 @@ class TestLikelyContext:
 
 class TestChangeRegisters:
     def test_reverse_key_and_value_of_register(self):
-        left = Entity("Siskel")
-        right = Entity("Ebert")
+        left = Entity(name="Siskel")
+        right = Entity(name="Ebert")
 
         register = ContextRegister.from_lists([left], [right])
 
         assert len(register.keys()) == 1
-        assert register.get("<Siskel>").compare_keys(Entity("Ebert"))
+        assert register.get("<Siskel>").compare_keys(Entity(name="Ebert"))
 
         new = register.reversed()
         assert new.get("<Ebert>").compare_keys(left)
 
     def test_factor_pairs(self):
         register = ContextRegister.from_lists(
-            [Entity("apple"), Entity("lemon")], [Entity("pear"), Entity("orange")]
+            [Entity(name="apple"), Entity(name="lemon")],
+            [Entity(name="pear"), Entity(name="orange")],
         )
         gen = register.factor_pairs()
         pair = next(gen)

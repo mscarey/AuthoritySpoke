@@ -40,10 +40,10 @@ class TestIntroduction:
 
         seinfeld_holding = lotus_majority.holdings[0].new_context(
             terms_to_replace=[
-                Entity("Borland International"),
-                Entity("the Lotus menu command hierarchy"),
+                Entity(name="Borland International"),
+                Entity(name="the Lotus menu command hierarchy"),
             ],
-            changes=[Entity("Carol Publishing Group"), Entity("Seinfeld")],
+            changes=[Entity(name="Carol Publishing Group"), Entity(name="Seinfeld")],
         )
 
         assert lotus_majority.holdings[0] != seinfeld_holding
@@ -180,17 +180,19 @@ class TestTemplateStrings:
     """Tests from the notebook introducing template strings."""
 
     def test_no_line_break_in_fact_string(self):
-        elaine = Entity("Elaine", generic=True)
+        elaine = Entity(name="Elaine", generic=True)
         tax_rate_over_25 = Comparison(
-            "${taxpayer}'s marginal income tax rate was", sign=">", expression=0.25
+            content="${taxpayer}'s marginal income tax rate was",
+            sign=">",
+            expression=0.25,
         )
         elaine_tax_rate = Fact(tax_rate_over_25, terms=elaine)
         assert "\n" not in str(elaine_tax_rate)
 
     def test_changing_order_of_concrete_terms_changes_meaning(self):
-        ann = Entity("Ann", generic=False)
-        bob = Entity("Bob", generic=False)
-        parent_sentence = Predicate("$mother was ${child}'s parent")
+        ann = Entity(name="Ann", generic=False)
+        bob = Entity(name="Bob", generic=False)
+        parent_sentence = Predicate(content="$mother was ${child}'s parent")
         ann_parent = Fact(parent_sentence, terms=(ann, bob))
         bob_parent = Fact(parent_sentence, terms=(bob, ann))
         assert str(ann_parent).lower() == "the fact that Ann was Bob's parent".lower()

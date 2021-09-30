@@ -487,9 +487,9 @@ followed by a list of their replacements.
     >>> from authorityspoke import Entity
     >>> seinfeld_holding = lotus.holdings[0].new_context(
     ...    terms_to_replace=[
-    ...        Entity("Borland International"),
-    ...        Entity("the Lotus menu command hierarchy")],
-    ...    changes=[Entity("Carol Publishing Group"), Entity("Seinfeld")])
+    ...        Entity(name="Borland International"),
+    ...        Entity(name="the Lotus menu command hierarchy")],
+    ...    changes=[Entity(name="Carol Publishing Group"), Entity(name="Seinfeld")])
 
 The :meth:`~authorityspoke.holdings.Holding.new_context` method
 returns a new :class:`~authorityspoke.holdings.Holding` object,

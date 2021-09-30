@@ -23,7 +23,6 @@ from authorityspoke.opinions import AnchoredHoldings
 from authorityspoke.pleadings import Allegation, Pleading
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
-from authorityspoke.io import schemas_json
 from authorityspoke.io.schemas_yaml import (
     RawEnactment,
     RawHolding,

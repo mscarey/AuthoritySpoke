@@ -17,7 +17,7 @@ from authorityspoke.facts import Fact
 from authorityspoke.holdings import Holding, HoldingGroup
 from authorityspoke.opinions import HoldingWithAnchors, Opinion, OpinionReading
 from authorityspoke.procedures import Procedure
-from authorityspoke.io import loaders, readers, dump, name_index
+from authorityspoke.io import loaders, readers, name_index
 from authorityspoke.io.fake_enactments import FakeClient
 from authorityspoke.io.loaders import (
     load_holdings,
@@ -25,7 +25,6 @@ from authorityspoke.io.loaders import (
     load_anchored_holdings,
 )
 from authorityspoke.io import filepaths, text_expansion
-from authorityspoke.io import schemas_json
 from authorityspoke.rules import Rule
 
 load_dotenv()
@@ -38,7 +37,7 @@ class TestHoldingDump:
     def test_dump_and_read_holding(self, fake_usc_client, make_holding):
         """Dump holding and read it as if it came from YAML."""
         holding = make_holding["h2"]
-        dumped = dump.to_dict(holding)
+        dumped = holding.dict()
         content = dumped["rule"]["procedure"]["inputs"][0]["predicate"]["content"]
         assert content == "$thing was on the premises of $place"
 
@@ -49,13 +48,22 @@ class TestHoldingDump:
     def test_dump_and_load_holding(self, fake_usc_client, make_holding):
         """Dump holding and load it as if it was a JSON API response."""
         holding = make_holding["h2"]
-        dumped = dump.to_dict(holding)
+        dumped = holding.dict()
         content = dumped["rule"]["procedure"]["inputs"][1]["predicate"]["content"]
         assert content == "$thing was a stockpile of Christmas trees"
-        schema = schemas_json.HoldingSchema()
-        loaded = schema.load(dumped)
+        loaded = Holding(**dumped)
         loaded_content = loaded.inputs[0].predicate.content
         assert "$thing was on the premises of $place" in loaded_content
+
+    def test_dump_holdings_with_comparison(self, fake_usc_client):
+
+        holdings = read_holdings_from_file("holding_watt.yaml", client=fake_usc_client)
+        assert "was no more than 35 foot" in str(holdings[1])
+        dumped = holdings[1].dict()
+        assert (
+            dumped["rule"]["procedure"]["inputs"][3]["predicate"]["expression"]
+            == "35 foot"
+        )
 
 
 class TestEntityImport:
@@ -665,9 +673,9 @@ class TestExclusiveFlag:
         fake_client = FakeClient(responses=make_response)
         holdings = read_holdings_from_file("holding_feist.yaml", client=fake_client)
 
-        directory = Entity("Rural's telephone directory")
-        original = Fact(Predicate("$work was an original work"), directory)
-        copyrightable = Fact(Predicate("$work was copyrightable"), directory)
+        directory = Entity(name="Rural's telephone directory")
+        original = Fact(Predicate(content="$work was an original work"), directory)
+        copyrightable = Fact(Predicate(content="$work was copyrightable"), directory)
         originality_enactments = [
             e_securing_exclusive_right_to_writings,
             e_copyright_requires_originality,
@@ -718,12 +726,12 @@ class TestExclusiveFlag:
         to_read = load_holdings("holding_feist.yaml")
         feist_holdings = readers.read_holdings(to_read["holdings"], client=mock_client)
 
-        directory = Entity("Rural's telephone directory")
+        directory = Entity(name="Rural's telephone directory")
         not_original = Fact(
-            Predicate("{} was an original work"), directory, absent=True
+            Predicate(content="{} was an original work"), directory, absent=True
         )
         not_copyrightable = Fact(
-            Predicate("{} was copyrightable"), directory, absent=True
+            Predicate(content="{} was copyrightable"), directory, absent=True
         )
         no_originality_procedure = Procedure(
             outputs=not_copyrightable, inputs=not_original

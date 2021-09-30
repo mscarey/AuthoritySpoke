@@ -250,7 +250,7 @@ class TestImplication:
         holding = make_opinion_with_holding["oracle_majority"].holdings[0]
         context = ContextRegister()
         context.insert_pair(
-            Entity("the Java API"), Entity("the Lotus menu command hierarchy")
+            Entity(name="the Java API"), Entity(name="the Lotus menu command hierarchy")
         )
         assert holding.implies(reading, context=context)
 
@@ -283,17 +283,18 @@ class TestImplication:
             inputs=FactorGroup(
                 [
                     Fact(
-                        "${work} was copyrightable", terms=Entity("the birthday song")
+                        "${work} was copyrightable",
+                        terms=Entity(name="the birthday song"),
                     ),
                     Fact(
                         "$person copied constituent elements of $work that were original",
-                        terms=[Entity("Eve"), Entity("the birthday song")],
+                        terms=[Entity(name="Eve"), Entity(name="the birthday song")],
                     ),
                 ]
             ),
             outputs=Fact(
                 "$person infringed the copyright in $work",
-                terms=[Entity("Eve"), Entity("the birthday song")],
+                terms=[Entity(name="Eve"), Entity(name="the birthday song")],
             ),
             enactments=e_copyright_protection,
         )
@@ -306,9 +307,9 @@ class TestImplication:
         """
         oracle = make_decision_with_holding["oracle"]
         context = ContextRegister()
-        language = Entity("the Java language")
+        language = Entity(name="the Java language")
 
-        context.insert_pair(Entity("the Java API"), language)
+        context.insert_pair(Entity(name="the Java API"), language)
 
         new_context = oracle.holdings[18].new_context(context)
         explanation = new_context.explain_implication(oracle.holdings[19])
@@ -316,7 +317,8 @@ class TestImplication:
 
     def test_not_implied_by_statement(self, make_holding):
         assert not Statement(
-            Predicate("$person was a person"), terms=Entity("Alice")
+            predicate=Predicate(content="$person was a person"),
+            terms=Entity(name="Alice"),
         ).implies(make_holding["h1"])
 
     def test_cannot_check_if_holding_implies_factor(self, make_holding, make_factor):
@@ -440,7 +442,7 @@ class TestContradiction:
         lotus = make_opinion_with_holding["lotus_majority"]
         context = ContextRegister()
         context.insert_pair(
-            Entity("the Lotus menu command hierarchy"), Entity("the Java API")
+            Entity(name="the Lotus menu command hierarchy"), Entity(name="the Java API")
         )
         assert lotus.holdings[6].contradicts(
             oracle,

@@ -15,7 +15,7 @@ from nettlesome.predicates import Predicate
 from nettlesome.statements import Statement
 import pytest
 
-from authorityspoke.io import loaders, readers, schemas_yaml, dump
+from authorityspoke.io import loaders, readers
 from authorityspoke.io.fake_enactments import FakeClient
 
 
@@ -68,9 +68,9 @@ class TestEnactments:
         assert "/us/const/amendment/IV" in str(e_search_clause)
 
     def test_unequal_to_statement(self, watt_factor, e_copyright):
-        stole_predicate = Predicate("$defendant stole $object")
+        stole_predicate = Predicate(content="$defendant stole $object")
         stole_fact = Statement(
-            stole_predicate, terms=[Entity("Alice"), Entity("the gold bar")]
+            stole_predicate, terms=[Entity(name="Alice"), Entity(name="the gold bar")]
         )
 
         assert not stole_fact.means(e_copyright)
@@ -216,14 +216,16 @@ class TestEnactments:
 
     def test_cannot_add_enactment_to_statement(self, e_search_clause):
         statement = Statement(
-            Predicate("$person committed a murder"), terms=Entity("Al")
+            predicate=Predicate(content="$person committed a murder"),
+            terms=Entity(name="Al"),
         )
         with pytest.raises(TypeError):
             statement + e_search_clause
 
     def test_cannot_add_statement_to_enactment(self, e_search_clause):
         statement = Statement(
-            Predicate("$person committed a murder"), terms=Entity("Al")
+            predicate=Predicate(content="$person committed a murder"),
+            terms=Entity(name="Al"),
         )
         with pytest.raises(TypeError):
             e_search_clause + statement

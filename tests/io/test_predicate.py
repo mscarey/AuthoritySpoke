@@ -1,12 +1,11 @@
 from datetime import date
+from nettlesome.predicates import Predicate
 
 import pytest
 
 from nettlesome.quantities import Comparison, Q_
 
-from authorityspoke.io import readers
-from authorityspoke.io.dump import to_dict, to_json
-from authorityspoke.io import schemas_json, schemas_yaml
+from authorityspoke.io import schemas_yaml
 
 
 class TestPredicateLoad:
@@ -104,28 +103,27 @@ class TestPredicateLoad:
 class TestPredicateDump:
     def test_dump_to_dict_with_units(self):
         predicate = Comparison(
-            "the distance between $place1 and $place2 was",
+            content="the distance between $place1 and $place2 was",
             truth=True,
             sign="<>",
             expression=Q_("35 feet"),
         )
-        dumped = to_dict(predicate)
+        dumped = predicate.dict()
         assert dumped["expression"] == "35 foot"
 
     def test_round_trip(self):
-        schema = schemas_yaml.PredicateSchema()
-        statement = schema.load(
+        statement = Predicate.load(
             {"content": "{}'s favorite number was", "expression": 42}
         )
-        dumped = to_dict(statement)
-        new_statement = schema.load(dumped)
+        dumped = statement.dict()
+        new_statement = Predicate(**dumped)
         assert "{}'s favorite number was exactly equal to 42" in str(new_statement)
 
     def test_dump_predicate_with_date_expression(self):
         copyright_date_range = Comparison(
-            "the date when $work was created was",
+            content="the date when $work was created was",
             sign=">=",
             expression=date(1978, 1, 1),
         )
-        dumped = to_dict(copyright_date_range)
+        dumped = copyright_date_range.dict()
         assert dumped["expression"] == "1978-01-01"

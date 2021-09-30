@@ -96,7 +96,7 @@ class TestFacts:
         with pytest.raises(DuplicateTermError):
             Fact(
                 make_predicate["p_three_entities"],
-                terms=[Entity("Al"), Entity("Bob"), Entity("Al")],
+                terms=[Entity(name="Al"), Entity(name="Bob"), Entity(name="Al")],
             )
 
     def test_string_representation_with_concrete_entities(self, watt_factor):
@@ -109,10 +109,12 @@ class TestFacts:
         assert "Hideaway Lodge was a motel" in str(watt_factor["f1_specific"])
 
     def test_string_for_fact_with_identical_terms(self):
-        devon = Entity("Devon", generic=True)
-        elaine = Entity("Elaine", generic=True)
+        devon = Entity(name="Devon", generic=True)
+        elaine = Entity(name="Elaine", generic=True)
         opened_account = Fact(
-            Predicate("$applicant opened a bank account for $applicant and $cosigner"),
+            Predicate(
+                content="$applicant opened a bank account for $applicant and $cosigner"
+            ),
             terms=(devon, elaine),
         )
         assert "<Devon> opened a bank account for <Devon> and <Elaine>" in str(
@@ -143,7 +145,7 @@ class TestFacts:
     def test_new_context_replace_fact(self, make_entity, watt_factor):
         changes = ContextRegister.from_lists(
             [make_entity["watt"], watt_factor["f2"]],
-            [Entity("Darth Vader"), watt_factor["f10"]],
+            [Entity(name="Darth Vader"), watt_factor["f10"]],
         )
         assert "was within the curtilage of <Hideaway Lodge>" in (
             watt_factor["f2"].new_context(changes).short_string
@@ -153,7 +155,7 @@ class TestFacts:
         holding_list = list(make_opinion_with_holding["cardenas_majority"].holdings)
         factor_list = list(holding_list[0].recursive_terms.values())
         assert any(
-            factor.compare_keys(Entity("parole officer"))
+            factor.compare_keys(Entity(name="parole officer"))
             and factor.name == "parole officer"
             for factor in factor_list
         )
@@ -164,14 +166,14 @@ class TestFacts:
 
     def test_new_context_from_factor(self, watt_factor):
         different = watt_factor["f1"].new_context(
-            Entity("Great Northern", generic=False)
+            Entity(name="Great Northern", generic=False)
         )
         assert "Great Northern was a motel" in str(different)
 
     def test_new_concrete_context(self, make_entity, watt_factor):
         register = ContextRegister.from_lists(
             to_replace=[make_entity["watt"], make_entity["motel"]],
-            replacements=[Entity("Darth Vader"), Entity("Death Star")],
+            replacements=[Entity(name="Darth Vader"), Entity(name="Death Star")],
         )
         different = watt_factor["f2"].new_context(register)
         assert "<Darth Vader> operated" in str(different)
@@ -228,7 +230,7 @@ class TestFacts:
 
     def test_case_factors_deleted_from_fact(self, watt_factor):
         """This attribute should have been deleted during Fact.__post_init__"""
-        predicate = Predicate("some things happened")
+        predicate = Predicate(content="some things happened")
         factor = build_fact(predicate)
         assert not hasattr(factor, "case_factors")
 
@@ -298,15 +300,19 @@ class TestSameMeaning:
 
     def test_interchangeable_concrete_terms(self):
         """Detect that placeholders differing only by a final digit are interchangeable."""
-        ann = Entity("Ann", generic=False)
-        bob = Entity("Bob", generic=False)
+        ann = Entity(name="Ann", generic=False)
+        bob = Entity(name="Bob", generic=False)
 
         ann_and_bob_were_family = Fact(
-            Predicate("$relative1 and $relative2 both were members of the same family"),
+            Predicate(
+                content="$relative1 and $relative2 both were members of the same family"
+            ),
             terms=(ann, bob),
         )
         bob_and_ann_were_family = Fact(
-            Predicate("$relative1 and $relative2 both were members of the same family"),
+            Predicate(
+                content="$relative1 and $relative2 both were members of the same family"
+            ),
             terms=(bob, ann),
         )
 
@@ -324,10 +330,14 @@ class TestSameMeaning:
         assert not f["f2_clear_and_convincing"].means(f["f2"])
 
     def test_means_despite_plural(self):
-        directory = Entity("Rural's telephone directory", plural=False)
-        listings = Entity("Rural's telephone listings", plural=True)
-        directory_original = Fact(Predicate("$thing was original"), terms=directory)
-        listings_original = Fact(Predicate("$thing were original"), terms=listings)
+        directory = Entity(name="Rural's telephone directory", plural=False)
+        listings = Entity(name="Rural's telephone listings", plural=True)
+        directory_original = Fact(
+            Predicate(content="$thing was original"), terms=directory
+        )
+        listings_original = Fact(
+            Predicate(content="$thing were original"), terms=listings
+        )
         assert directory_original.means(listings_original)
 
     def test_same_meaning_no_terms(self, make_factor):
@@ -437,7 +447,9 @@ class TestImplication:
             make_context_register
         )
         explanation = complex_true.explain_implication(complex_whether)
-        assert explanation.context[Entity("Alice").key].compare_keys(Entity("Craig"))
+        assert explanation.context[Entity(name="Alice").key].compare_keys(
+            Entity(name="Craig")
+        )
 
     def test_implication_explain_keys_only_from_left(
         self, make_complex_fact, make_context_register
@@ -451,15 +463,15 @@ class TestImplication:
         new = complex_whether.new_context(make_context_register)
         explanations = list(complex_true.explanations_implication(new))
         explanation = explanations.pop()
-        assert explanation.context.get("<Craig>") != Entity("Alice")
-        assert explanation.context.get("<Alice>").compare_keys(Entity("Craig"))
+        assert explanation.context.get("<Craig>") != Entity(name="Alice")
+        assert explanation.context.get("<Alice>").compare_keys(Entity(name="Craig"))
 
     def test_context_registers_for_complex_comparison(self, make_complex_fact):
         gen = make_complex_fact["f_relevant_murder_nested_swap"]._context_registers(
             make_complex_fact["f_relevant_murder"], operator.ge
         )
         register = next(gen)
-        assert register.matches.get("<Alice>").compare_keys(Entity("Bob"))
+        assert register.matches.get("<Alice>").compare_keys(Entity(name="Bob"))
 
     def test_no_implication_complex(self, make_complex_fact):
         left = make_complex_fact["f_relevant_murder"]
@@ -575,17 +587,17 @@ class TestContradiction:
         contradiction if you assume they correspond to one another.
         """
         p_small_weight = Comparison(
-            "the amount of gold $person possessed was",
+            content="the amount of gold $person possessed was",
             sign="<",
             expression=Q_("1 gram"),
         )
         p_large_weight = Comparison(
-            "the amount of gold $person possessed was",
+            content="the amount of gold $person possessed was",
             sign=">=",
             expression=Q_("100 kilograms"),
         )
-        alice = Entity("Alice")
-        bob = Entity("Bob")
+        alice = Entity(name="Alice")
+        bob = Entity(name="Bob")
         alice_rich = Fact(p_large_weight, terms=alice)
         bob_poor = Fact(p_small_weight, terms=bob)
         assert alice_rich.contradicts(bob_poor)
@@ -597,17 +609,17 @@ class TestContradiction:
         So there's no contradiction.
         """
         p_small_weight = Comparison(
-            "the amount of gold $person possessed was",
+            content="the amount of gold $person possessed was",
             sign="<",
             expression=Q_("1 gram"),
         )
         p_large_weight = Comparison(
-            "the amount of gold $person possessed was",
+            content="the amount of gold $person possessed was",
             sign=">=",
             expression=Q_("100 kilograms"),
         )
-        alice = Entity("Alice")
-        bob = Entity("Bob")
+        alice = Entity(name="Alice")
+        bob = Entity(name="Bob")
         alice_rich = Fact(p_large_weight, terms=alice)
         bob_poor = Fact(p_small_weight, terms=bob)
         register = ContextRegister()

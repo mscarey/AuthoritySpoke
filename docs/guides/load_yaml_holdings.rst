@@ -86,12 +86,12 @@ something about how one factual finding can lead to another.
     ...     "$defendant used ${defendant}'s business $business to commit the New York offense "
     ...     "of engaging in the business of receiving money "
     ...     "for transmission or transmitting the same, without a license therefor",
-    ...     terms=[Entity("Mazza-Alaluf"), Entity("Turismo Costa Brava")])
+    ...     terms=[Entity(name="Mazza-Alaluf"), Entity(name="Turismo Costa Brava")])
     >>> no_appropriate_state_license = Fact(
     ...     ("$defendant operated $business without an appropriate money transmitting "
     ...     "license in a State where such operation was punishable as a misdemeanor "
     ...     "or a felony under State law"),
-    ...     terms=[Entity("Mazza-Alaluf"), Entity("Turismo Costa Brava")])
+    ...     terms=[Entity(name="Mazza-Alaluf"), Entity(name="Turismo Costa Brava")])
     >>> new_york_holding = Holding.from_factors(
     ...     inputs=new_york_offense,
     ...     outputs=no_appropriate_state_license,

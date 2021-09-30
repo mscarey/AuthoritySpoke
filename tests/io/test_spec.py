@@ -1,6 +1,6 @@
 import apispec
 
-from authorityspoke.io.api_spec import make_spec
+from authorityspoke.holdings import Holding
 
 
 class TestSpec:
@@ -10,10 +10,8 @@ class TestSpec:
         which is a OneOfSchema. It's difficult to document
         OneOf subschemas with apispec.
         """
-        spec = make_spec()
-        d = spec.to_dict()
-        schemas = d["components"]["schemas"]
-        assert "Fact" in schemas
+        spec = Holding.schema_json()
+        assert "Fact" in spec["??"]
 
     def test_factor_one_of(self):
         spec = make_spec()

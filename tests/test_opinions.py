@@ -152,7 +152,7 @@ class TestOpinionHoldings:
         """
         brad = make_opinion_with_holding["brad_majority"]
         with pytest.raises(ValueError):
-            brad.posit(make_holding["h1"], context=Entity("House on Haunted Hill"))
+            brad.posit(make_holding["h1"], context=Entity(name="House on Haunted Hill"))
 
     def test_new_context_naming_nonexistent_factor(
         self, make_opinion_with_holding, make_holding
@@ -167,7 +167,7 @@ class TestOpinionHoldings:
         with pytest.raises(ValueError):
             brad.posit(
                 make_holding["h1"],
-                context=(Entity("House on Haunted Hill"), "nonexistent factor"),
+                context=(Entity(name="House on Haunted Hill"), "nonexistent factor"),
             )
 
     def test_new_context_creates_equal_rule(
@@ -239,10 +239,10 @@ class TestOpinionHoldings:
     def test_getting_factors_from_new_holding(self, make_opinion_with_holding):
         watt = make_opinion_with_holding["watt_majority"]
         watt.clear_holdings()
-        elephants = Fact("$animal was an elephant", terms=Entity("the elephant"))
+        elephants = Fact("$animal was an elephant", terms=Entity(name="the elephant"))
         mouseholes = Fact(
-            Predicate("$animal hides in mouseholes", truth=False),
-            terms=Entity("the elephant"),
+            Predicate(content="$animal hides in mouseholes", truth=False),
+            terms=Entity(name="the elephant"),
         )
         procedure = Procedure(inputs=elephants, outputs=mouseholes)
         rule = Rule(procedure=procedure)

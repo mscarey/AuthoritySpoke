@@ -48,7 +48,7 @@ class TestRules:
 
     def test_new_concrete_context(self, make_holding):
         different = make_holding["h1"].new_context(
-            [Entity("Castle Grayskull"), Entity("He-Man")]
+            [Entity(name="Castle Grayskull"), Entity(name="He-Man")]
         )
         assert "<He-Man> operated" in str(different)
 
@@ -84,7 +84,7 @@ class TestRules:
         with pytest.raises(TypeError):
             make_holding["h1"].new_context(
                 {make_predicate["p1"]: make_predicate["p7"]},
-                terms_to_replace=[Entity("Bob")],
+                terms_to_replace=[Entity(name="Bob")],
             )
 
     def test_new_context_dict_must_be_dict(self, make_holding, make_predicate):
@@ -98,7 +98,7 @@ class TestRules:
         counterparty = transfer_rule.generic_terms()[2]
         defendant_rule = barber_rule.new_context(
             changes=[defendant, counterparty],
-            terms_to_replace=[Entity("the barber"), Entity("the customer")],
+            terms_to_replace=[Entity(name="the barber"), Entity(name="the customer")],
         )
         assert defendant_rule.generic_terms()[1].name == "the defendant"
 
@@ -344,7 +344,9 @@ class TestImplication:
         )
         assert not small_reliable.implies(
             small_more_reliable_holding,
-            context=ContextRegister.from_lists([Entity("Alice")], [Entity("Bob")]),
+            context=ContextRegister.from_lists(
+                [Entity(name="Alice")], [Entity(name="Bob")]
+            ),
         )
 
     def test_implication_interchangeable_terms(self):
@@ -352,13 +354,13 @@ class TestImplication:
         shot = Predicate(content="$attacker shot $victim")
         murder = Predicate(content="$attacker murdered $victim")
 
-        alice = Entity("Alice")
-        bob = Entity("Bob")
-        diane = Entity("Diane")
-        ed = Entity("Ed")
+        alice = Entity(name="Alice")
+        bob = Entity(name="Bob")
+        diane = Entity(name="Diane")
+        ed = Entity(name="Ed")
 
-        grove = Entity("Shady Grove")
-        magnolia = Entity("Magnolia Cafe")
+        grove = Entity(name="Shady Grove")
+        magnolia = Entity(name="Magnolia Cafe")
 
         alice_and_bob_rule = Rule(
             procedure=Procedure(
@@ -386,7 +388,8 @@ class TestImplication:
 
     def test_not_implied_by_statement(self, make_rule):
         assert not Statement(
-            Predicate("$person was a person"), terms=Entity("Alice")
+            predicate=Predicate(content="$person was a person"),
+            terms=Entity(name="Alice"),
         ).implies(make_rule["h1"])
 
     def test_not_implied_by_procedure(self, make_procedure, make_rule):
@@ -499,7 +502,8 @@ class TestContradiction:
         """
         stockpile_means_stockpile = ContextRegister()
         stockpile_means_stockpile.insert_pair(
-            key=Entity("the stockpile of trees"), value=Entity("the stockpile of trees")
+            key=Entity(name="the stockpile of trees"),
+            value=Entity(name="the stockpile of trees"),
         )
         assert not make_rule["h_output_distance_less"].contradicts(
             make_rule["h_output_farther_different_entity"],
@@ -679,14 +683,14 @@ class TestAddition:
         the operand on the left, but will give it the output from the operand
         on the right.
         """
-        context = Entity("the Pythagorean theorem")
-        three = Entity("the number three")
+        context = Entity(name="the Pythagorean theorem")
+        three = Entity(name="the number three")
 
         fact_not_original = Rule(
             Procedure(
-                inputs=Fact(Predicate("$work was a fact"), terms=context),
+                inputs=Fact(Predicate(content="$work was a fact"), terms=context),
                 outputs=Fact(
-                    Predicate("$work was an original work", truth=False),
+                    Predicate(content="$work was an original work", truth=False),
                     terms=context,
                 ),
             ),
@@ -695,11 +699,11 @@ class TestAddition:
         unoriginal_not_copyrightable = Rule(
             Procedure(
                 inputs=Fact(
-                    Predicate("$work was an original work", truth=False),
+                    Predicate(content="$work was an original work", truth=False),
                     terms=three,
                 ),
                 outputs=Fact(
-                    Predicate("${work} was copyrightable", truth=False),
+                    Predicate(content="${work} was copyrightable", truth=False),
                     terms=three,
                 ),
             ),
@@ -1064,11 +1068,11 @@ class TestStatuteRules:
         fake_beard_client,
         make_beard_rule,
     ):
-        beard = Entity("a facial feature")
+        beard = Entity(name="a facial feature")
 
         sec_4 = fake_beard_client.read("/test/acts/47/4/")
 
-        was_facial_hair = Predicate("$thing was facial hair")
+        was_facial_hair = Predicate(content="$thing was facial hair")
         fact_was_facial_hair = Fact(was_facial_hair, terms=beard)
         hypothetical = Rule(
             procedure=Procedure(
@@ -1076,7 +1080,7 @@ class TestStatuteRules:
                     fact_was_facial_hair,
                     Fact(
                         Comparison(
-                            "the length of $thing was",
+                            content="the length of $thing was",
                             sign=">=",
                             expression=Q_("5 millimeters"),
                             truth=facial_hair_over_5mm,
@@ -1099,7 +1103,7 @@ class TestStatuteRules:
                         terms=beard,
                     ),
                 ],
-                outputs=Fact(Predicate("$thing was a beard"), terms=beard),
+                outputs=Fact(Predicate(content="$thing was a beard"), terms=beard),
             ),
             enactments=sec_4,
         )

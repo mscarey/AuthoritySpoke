@@ -30,7 +30,7 @@ a :class:`~nettlesome.predicates.Predicate` object
 in AuthoritySpoke version 0.5:
 
     >>> from authorityspoke import Predicate
-    >>> parent_sentence = Predicate("$mother was ${child}'s parent")
+    >>> parent_sentence = Predicate(content="$mother was ${child}'s parent")
 
 The phrase that we passed to
 the :class:`~nettlesome.predicates.Predicate` constructor is used to create
@@ -69,7 +69,7 @@ that the :meth:`~nettlesome.predicates.Predicate.means` method can still
 consider Predicates to have the same meaning even if they use different
 identifiers for their placeholders.
 
-    >>> another_parent_sentence = Predicate("$adult was ${kid}'s parent")
+    >>> another_parent_sentence = Predicate(content="$adult was ${kid}'s parent")
     >>> parent_sentence.template == another_parent_sentence.template
     False
 
@@ -83,7 +83,7 @@ relationships between the truth values of different Predicates
 with the same template text. If you omit a ``truth`` parameter when
 creating a Predicate, the default value is ``True``.
 
-    >>> not_parent_sentence = Predicate("$adult was ${kid}'s parent", truth=False)
+    >>> not_parent_sentence = Predicate(content="$adult was ${kid}'s parent", truth=False)
     >>> str(not_parent_sentence)
     "it was false that $adult was ${kid}'s parent"
 
@@ -263,8 +263,8 @@ or :class:`~nettlesome.predicates.Comparison` inside
 a :class:`~authorityspoke.facts.Fact` object.
 
     >>> from authorityspoke import Entity, Fact
-    >>> ann = Entity("Ann", generic=False)
-    >>> claude = Entity("Claude", generic=False)
+    >>> ann = Entity(name="Ann", generic=False)
+    >>> claude = Entity(name="Claude", generic=False)
     >>> ann_tax_rate = Fact(specific_tax_rate, terms=ann)
     >>> claude_tax_rate = Fact(tax_rate_over_25, terms=claude)
     >>> str(ann_tax_rate)
@@ -291,8 +291,8 @@ to many different people regardless of exactly who those people are. To
 illustrate that idea, let’s create two “generic” people and show that a
 Fact about one of them implies a Fact about the other.
 
-    >>> devon = Entity("Devon", generic=True)
-    >>> elaine = Entity("Elaine", generic=True)
+    >>> devon = Entity(name="Devon", generic=True)
+    >>> elaine = Entity(name="Elaine", generic=True)
     >>> devon_tax_rate = Fact(specific_tax_rate, terms=devon)
     >>> elaine_tax_rate = Fact(tax_rate_over_25, terms=elaine)
     >>> devon_tax_rate.implies(elaine_tax_rate)
@@ -333,7 +333,7 @@ that Predicate, only include each unique term once. The terms should be
 listed in the same order that they first appear in the template text.
 
     >>> opened_account = Fact(
-    ...     Predicate("$applicant opened a bank account for $applicant and $cosigner"),
+    ...     Predicate(content="$applicant opened a bank account for $applicant and $cosigner"),
     ...     terms=(devon, elaine))
     >>> str(opened_account)
     'the fact that <Devon> opened a bank account for <Devon> and <Elaine>'
@@ -349,13 +349,13 @@ string should use identical text for the placeholders for the
 interchangeable terms, except that the different placeholders should
 each end with a different digit.
 
-    >>> ann = Entity("Ann", generic=False)
-    >>> bob = Entity("Bob", generic=False)
+    >>> ann = Entity(name="Ann", generic=False)
+    >>> bob = Entity(name="Bob", generic=False)
     >>> ann_and_bob_were_family = Fact(
-    ...     predicate=Predicate("$relative1 and $relative2 both were members of the same family"),
+    ...     predicate=Predicate(content="$relative1 and $relative2 both were members of the same family"),
     ...     terms=(ann, bob))
     >>> bob_and_ann_were_family = Fact(
-    ...     predicate=Predicate("$relative1 and $relative2 both were members of the same family"),
+    ...     predicate=Predicate(content="$relative1 and $relative2 both were members of the same family"),
     ...     terms=(bob, ann))
     >>> str(ann_and_bob_were_family)
     'the fact that Ann and Bob both were members of the same family'
@@ -371,7 +371,7 @@ that don’t fit the pattern of being identical
 except for a final digit, then transposing two non-generic terms will
 change the meaning of the Fact.
 
-    >>> parent_sentence = Predicate("$mother was ${child}'s parent")
+    >>> parent_sentence = Predicate(content="$mother was ${child}'s parent")
     >>> ann_is_parent = Fact(parent_sentence, terms = (ann, bob))
     >>> bob_is_parent = Fact(parent_sentence, terms = (bob, ann))
     >>> str(ann_is_parent)
@@ -393,7 +393,7 @@ contain references to Facts as well as Entities. That mean they can
 include the text of other Predicates. This feature is intended for
 incorporating references to what people said, knew, or believed.
 
-    >>> statement = Predicate("$speaker told $listener $event")
+    >>> statement = Predicate(content="$speaker told $listener $event")
     >>> bob_had_drugs = Fact(smaller_drug_comparison, terms=bob)
     >>> bob_told_ann_about_drugs = Fact(statement, terms=(bob, ann, bob_had_drugs))
     >>> str(bob_told_ann_about_drugs)

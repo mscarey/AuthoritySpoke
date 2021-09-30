@@ -46,7 +46,7 @@ class TestProcedures:
 
     def test_cannot_add_term_as_input(self, make_factor):
         with pytest.raises(TypeError):
-            Procedure(inputs=Entity("Al"), outputs=make_factor["f_shooting"])
+            Procedure(inputs=Entity(name="Al"), outputs=make_factor["f_shooting"])
 
     def test_generic_terms(self, make_entity, make_procedure, make_evidence):
         """
@@ -290,17 +290,19 @@ class TestProcedureUnion:
 
 
 p_small_weight = Comparison(
-    "the amount of gold $person possessed was", sign="<", expression=Q_("1 gram")
+    content="the amount of gold $person possessed was",
+    sign="<",
+    expression=Q_("1 gram"),
 )
 p_large_weight = Comparison(
-    "the amount of gold $person possessed was",
+    content="the amount of gold $person possessed was",
     sign=">=",
     expression=Q_("100 kilograms"),
 )
-alice = Entity("Alice")
-bob = Entity("Bob")
-craig = Entity("Craig")
-dan = Entity("Dan")
+alice = Entity(name="Alice")
+bob = Entity(name="Bob")
+craig = Entity(name="Craig")
+dan = Entity(name="Dan")
 alice_rich = Fact(p_large_weight, terms=alice)
 bob_poor = Fact(p_small_weight, terms=bob)
 craig_rich = Fact(p_large_weight, terms=craig)

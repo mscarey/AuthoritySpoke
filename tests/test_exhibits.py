@@ -27,9 +27,9 @@ class TestExhibits:
                 predicate=Predicate(
                     "$agency granted an exemption from the prohibition of wearing beards"
                 ),
-                terms=Entity("the Department of Beards"),
+                terms=Entity(name="the Department of Beards"),
             ),
-            statement_attribution=Entity("the Department of Beards"),
+            statement_attribution=Entity(name="the Department of Beards"),
         )
         counterfeit = Fact(predicate="$thing was counterfeit", terms=coin)
         assert str(counterfeit) == (

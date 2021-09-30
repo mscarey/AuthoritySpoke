@@ -3,11 +3,9 @@ from typing import Dict, List
 
 from dotenv import load_dotenv
 
-import pytest
-
 from authorityspoke import Opinion
 from authorityspoke.holdings import HoldingGroup
-from authorityspoke.io import loaders, readers, schemas_json as schemas
+from authorityspoke.io import loaders, readers
 from authorityspoke.io.downloads import CAPClient
 from authorityspoke.decisions import DecisionReading
 from authorityspoke.opinions import OpinionReading

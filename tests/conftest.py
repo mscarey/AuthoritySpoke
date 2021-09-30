@@ -27,8 +27,9 @@ from authorityspoke.pleadings import Pleading, Allegation
 from authorityspoke.rules import Procedure, Rule
 
 from authorityspoke.io import loaders, readers
+from authorityspoke.io.enactment_index import RawFactor
 from authorityspoke.io.fake_enactments import FakeClient
-from authorityspoke.io.schemas_json import RawFactor, RawHolding
+from authorityspoke.io.schemas_yaml import RawHolding
 
 load_dotenv()
 
@@ -218,20 +219,20 @@ def fifth_a():
 @pytest.fixture(scope="class")
 def make_entity() -> Dict[str, Entity]:
     return {
-        "motel": Entity("Hideaway Lodge"),
-        "motel_specific": Entity("Hideaway Lodge", generic=False),
-        "watt": Entity("Wattenburg"),
-        "trees": Entity("the stockpile of trees"),
-        "trees_specific": Entity("the stockpile of trees", generic=False),
-        "tree_search": Entity("officers' search of the stockpile of trees"),
+        "motel": Entity(name="Hideaway Lodge"),
+        "motel_specific": Entity(name="Hideaway Lodge", generic=False),
+        "watt": Entity(name="Wattenburg"),
+        "trees": Entity(name="the stockpile of trees"),
+        "trees_specific": Entity(name="the stockpile of trees", generic=False),
+        "tree_search": Entity(name="officers' search of the stockpile of trees"),
         "tree_search_specific": Entity(
             "officers' search of the stockpile of trees", generic=False
         ),
-        "alice": Entity("Alice"),
-        "bob": Entity("Bob"),
-        "craig": Entity("Craig"),
-        "dan": Entity("Dan"),
-        "circus": Entity("circus"),
+        "alice": Entity(name="Alice"),
+        "bob": Entity(name="Bob"),
+        "craig": Entity(name="Craig"),
+        "dan": Entity(name="Dan"),
+        "circus": Entity(name="circus"),
     }
 
 
@@ -239,168 +240,178 @@ def make_entity() -> Dict[str, Entity]:
 def make_predicate() -> Dict[str, Predicate]:
 
     return {
-        "p1": Predicate("$place was a motel"),
-        "p1_again": Predicate("$place was a motel"),
-        "p2": Predicate("$person operated and lived at $place"),
-        "p2_reflexive": Predicate("$person operated and lived at $person"),
-        "p2_no_truth": Predicate("$person operated and lived at $place", truth=None),
-        "p2_false": Predicate("$person operated and lived at $place", truth=False),
-        "p3": Predicate("$place was ${person}’s abode"),
-        "p3_false": Predicate("$place was ${person}’s abode", truth=False),
-        "p4": Predicate("$thing was on the premises of $place"),
-        "p5": Predicate("$thing was a stockpile of Christmas trees"),
-        "p6": Predicate("$thing was among some standing trees"),
+        "p1": Predicate(content="$place was a motel"),
+        "p1_again": Predicate(content="$place was a motel"),
+        "p2": Predicate(content="$person operated and lived at $place"),
+        "p2_reflexive": Predicate(content="$person operated and lived at $person"),
+        "p2_no_truth": Predicate(
+            content="$person operated and lived at $place", truth=None
+        ),
+        "p2_false": Predicate(
+            content="$person operated and lived at $place", truth=False
+        ),
+        "p3": Predicate(content="$place was ${person}’s abode"),
+        "p3_false": Predicate(content="$place was ${person}’s abode", truth=False),
+        "p4": Predicate(content="$thing was on the premises of $place"),
+        "p5": Predicate(content="$thing was a stockpile of Christmas trees"),
+        "p6": Predicate(content="$thing was among some standing trees"),
         "p7": Comparison(
-            "the distance between $place1 and $place2 was",
+            content="the distance between $place1 and $place2 was",
             truth=False,
             sign=">",
             expression=Q_("35 feet"),
         ),
         "p7_obverse": Comparison(
-            "the distance between $place1 and $place2 was",
+            content="the distance between $place1 and $place2 was",
             truth=True,
             sign="<=",
             expression=Q_("35 feet"),
         ),
         "p7_opposite": Comparison(
-            "the distance between $place1 and $place2 was",
+            content="the distance between $place1 and $place2 was",
             truth=True,
             sign=">",
             expression=Q_("35 feet"),
         ),
         "p7_not_equal": Comparison(
-            "the distance between $place1 and $place2 was",
+            content="the distance between $place1 and $place2 was",
             truth=True,
             sign="<>",
             expression=Q_("35 feet"),
         ),
         "p7_true": Comparison(
-            "the distance between $place1 and $place2 was",
+            content="the distance between $place1 and $place2 was",
             truth=True,
             sign="<",
             expression=Q_("35 feet"),
         ),
         "p8": Comparison(
-            "the distance between $place1 and $place2 was",
+            content="the distance between $place1 and $place2 was",
             sign=">=",
             expression=Q_("20 feet"),
         ),
         "p8_no_truth": Comparison(
-            "the distance between $place1 and $place2 was",
+            content="the distance between $place1 and $place2 was",
             truth=None,
             sign=">=",
             expression=Q_("20 feet"),
         ),
         "p8_exact": Comparison(
-            "the distance between $place1 and $place2 was",
+            content="the distance between $place1 and $place2 was",
             sign="==",
             expression=Q_("25 feet"),
         ),
         "p8_less": Comparison(
-            "the distance between $place1 and $place2 was",
+            content="the distance between $place1 and $place2 was",
             sign="<=",
             expression=Q_("20 feet"),
         ),
         "p8_meters": Comparison(
-            "the distance between $place1 and $place2 was",
+            content="the distance between $place1 and $place2 was",
             sign=">=",
             expression=Q_("10 meters"),
         ),
         "p8_int": Comparison(
-            "the distance between $place1 and $place2 was",
+            content="the distance between $place1 and $place2 was",
             sign=">=",
             expression=20,
         ),
         "p8_float": Comparison(
-            "the distance between $place1 and $place2 was",
+            content="the distance between $place1 and $place2 was",
             sign=">=",
             expression=20.0,
         ),
         "p8_higher_int": Comparison(
-            "the distance between $place1 and $place2 was",
+            content="the distance between $place1 and $place2 was",
             sign=">=",
             expression=30,
         ),
         "p9": Comparison(
-            "the distance between $thing and a parking area used by personnel and patrons of $place was",
+            content="the distance between $thing and a parking area used by personnel and patrons of $place was",
             sign="<=",
             expression=Q_("5 feet"),
         ),
         "p9_exact": Comparison(
-            "the distance between $thing and a parking area used by personnel and patrons of $place was",
+            content="the distance between $thing and a parking area used by personnel and patrons of $place was",
             sign="=",
             expression=Q_("5 feet"),
         ),
         "p9_miles": Comparison(
-            "the distance between $thing and a parking area used by personnel and patrons of $place was",
+            content="the distance between $thing and a parking area used by personnel and patrons of $place was",
             sign="<=",
             expression=Q_("5 miles"),
         ),
         "p9_more": Comparison(
-            "the distance between $thing and a parking area used by personnel and patrons of $place was",
+            content="the distance between $thing and a parking area used by personnel and patrons of $place was",
             sign=">",
             expression=Q_("5 feet"),
         ),
         "p9_acres": Comparison(
-            "the distance between $thing and a parking area used by personnel and patrons of $place was",
+            content="the distance between $thing and a parking area used by personnel and patrons of $place was",
             sign="<=",
             expression=Q_("5 acres"),
         ),
-        "p10": Predicate("$thing was within the curtilage of $place"),
+        "p10": Predicate(content="$thing was within the curtilage of $place"),
         "p10_false": Predicate(
             "$thing was within the curtilage of $place", truth=False
         ),
-        "p11": Predicate("$act was a warrantless search and seizure"),
-        "p12": Predicate("$act was performed by federal law enforcement officers"),
-        "p13": Predicate("$act constituted an intrusion upon $place"),
-        "p14": Predicate("$person sought to preserve $thing as private"),
-        "p15": Predicate("$thing was in an area adjacent to $place"),
-        "p16": Predicate("$thing was in an area accessible to the public"),
+        "p11": Predicate(content="$act was a warrantless search and seizure"),
+        "p12": Predicate(
+            content="$act was performed by federal law enforcement officers"
+        ),
+        "p13": Predicate(content="$act constituted an intrusion upon $place"),
+        "p14": Predicate(content="$person sought to preserve $thing as private"),
+        "p15": Predicate(content="$thing was in an area adjacent to $place"),
+        "p16": Predicate(content="$thing was in an area accessible to the public"),
         "p17": Predicate(
             "In $act, several law enforcement officials meticulously went through $thing"
         ),
         "p18": Comparison(
-            "the length of time that $act continued was",
+            content="the length of time that $act continued was",
             sign=">=",
             expression=Q_("385 minutes"),
         ),
-        "p19": Predicate("$act continued after night fell"),
+        "p19": Predicate(content="$act continued after night fell"),
         # Use the irrelevant predicates/factors to make sure they don't affect an outcome.
-        "p_irrelevant_0": Predicate("$person was a clown"),
-        "p_irrelevant_1": Predicate("$person was a bear"),
-        "p_irrelevant_2": Predicate("$place was a circus"),
-        "p_irrelevant_3": Predicate("$person performed at $place"),
-        "p_crime": Predicate("$person committed a crime"),
-        "p_murder": Predicate("$shooter murdered $victim"),
-        "p_murder_whether": Predicate("$shooter murdered $victim", truth=None),
-        "p_murder_false": Predicate("$shooter murdered $victim", truth=False),
-        "p_irrelevant": Predicate("$evidence is relevant to show $fact", truth=False),
-        "p_relevant": Predicate("$evidence is relevant to show $fact"),
+        "p_irrelevant_0": Predicate(content="$person was a clown"),
+        "p_irrelevant_1": Predicate(content="$person was a bear"),
+        "p_irrelevant_2": Predicate(content="$place was a circus"),
+        "p_irrelevant_3": Predicate(content="$person performed at $place"),
+        "p_crime": Predicate(content="$person committed a crime"),
+        "p_murder": Predicate(content="$shooter murdered $victim"),
+        "p_murder_whether": Predicate(content="$shooter murdered $victim", truth=None),
+        "p_murder_false": Predicate(content="$shooter murdered $victim", truth=False),
+        "p_irrelevant": Predicate(
+            content="$evidence is relevant to show $fact", truth=False
+        ),
+        "p_relevant": Predicate(content="$evidence is relevant to show $fact"),
         "p_relevant_whether": Predicate(
             "$evidence is relevant to show $fact", truth=None
         ),
-        "p_shooting": Predicate("$shooter shot $victim"),
-        "p_shooting_self": Predicate("$shooter shot $shooter"),
-        "p_no_shooting": Predicate("$shooter shot $victim", truth=False),
-        "p_shooting_whether": Predicate("$shooter shot $victim", truth=None),
-        "p_no_crime": Predicate("$person1 committed a crime", truth=False),
-        "p_three_entities": Predicate("$planner told $intermediary to hire $shooter"),
+        "p_shooting": Predicate(content="$shooter shot $victim"),
+        "p_shooting_self": Predicate(content="$shooter shot $shooter"),
+        "p_no_shooting": Predicate(content="$shooter shot $victim", truth=False),
+        "p_shooting_whether": Predicate(content="$shooter shot $victim", truth=None),
+        "p_no_crime": Predicate(content="$person1 committed a crime", truth=False),
+        "p_three_entities": Predicate(
+            content="$planner told $intermediary to hire $shooter"
+        ),
         "p_small_weight": Comparison(
-            "the amount of gold $person possessed was",
+            content="the amount of gold $person possessed was",
             sign=">=",
             expression=Q_("1 gram"),
         ),
         "p_large_weight": Comparison(
-            "the amount of gold $person possessed was",
+            content="the amount of gold $person possessed was",
             sign=">=",
             expression=Q_("100 kilograms"),
         ),
-        "p_friends": Predicate("$person1 and $person2 were friends"),
-        "p_reliable": Predicate("$evidence was reliable"),
+        "p_friends": Predicate(content="$person1 and $person2 were friends"),
+        "p_reliable": Predicate(content="$evidence was reliable"),
         "p_quantity=3": Comparison("The number of mice was", sign="==", expression=3),
         "p_quantity>=4": Comparison("The number of mice was", sign=">=", expression=4),
         "p_quantity>5": Comparison("The number of mice was", sign=">", expression=5),
-        "p_no_context": Predicate("context was included", truth=False),
+        "p_no_context": Predicate(content="context was included", truth=False),
     }
 
 
@@ -1616,6 +1627,6 @@ def raw_holding() -> RawHolding:
 @pytest.fixture(scope="function")
 def make_context_register() -> ContextRegister:
     context_names = ContextRegister()
-    context_names.insert_pair(key=Entity("Alice"), value=Entity("Craig"))
-    context_names.insert_pair(key=Entity("Bob"), value=Entity("Dan"))
+    context_names.insert_pair(key=Entity(name="Alice"), value=Entity(name="Craig"))
+    context_names.insert_pair(key=Entity(name="Bob"), value=Entity(name="Dan"))
     return context_names

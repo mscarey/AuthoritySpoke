@@ -102,8 +102,8 @@ class TestSameFactors:
 
     def test_register_for_matching_entities(self):
         known = ContextRegister()
-        alice = Entity("Alice")
-        craig = Entity("Craig")
+        alice = Entity(name="Alice")
+        craig = Entity(name="Craig")
         known.insert_pair(alice, craig)
 
         gen = alice._context_registers(other=craig, comparison=means, context=known)
@@ -132,24 +132,28 @@ class TestImplication:
 
 class TestContradiction:
     def test_contradiction_of_group(self):
-        lived_at = Predicate("$person lived at $residence")
-        bob_lived = Statement(lived_at, terms=[Entity("Bob"), Entity("Bob's house")])
-        carl_lived = Statement(lived_at, terms=[Entity("Carl"), Entity("Carl's house")])
+        lived_at = Predicate(content="$person lived at $residence")
+        bob_lived = Statement(
+            lived_at, terms=[Entity(name="Bob"), Entity(name="Bob's house")]
+        )
+        carl_lived = Statement(
+            lived_at, terms=[Entity(name="Carl"), Entity(name="Carl's house")]
+        )
         distance_long = Comparison(
-            "the distance from the center of $city to $residence was",
+            content="the distance from the center of $city to $residence was",
             sign=">=",
             expression="50 miles",
         )
         statement_long = Statement(
-            distance_long, terms=[Entity("Houston"), Entity("Bob's house")]
+            distance_long, terms=[Entity(name="Houston"), Entity(name="Bob's house")]
         )
         distance_short = Comparison(
-            "the distance from the center of $city to $residence was",
+            content="the distance from the center of $city to $residence was",
             sign="<=",
             expression="10 kilometers",
         )
         statement_short = Statement(
-            distance_short, terms=[Entity("El Paso"), Entity("Carl's house")]
+            distance_short, terms=[Entity(name="El Paso"), Entity(name="Carl's house")]
         )
         left = FactorGroup([bob_lived, statement_long])
         right = FactorGroup([carl_lived, statement_short])
@@ -202,46 +206,50 @@ class TestUnion:
 
 class TestConsistent:
     predicate_less_specific = Comparison(
-        "${vehicle}'s speed was",
+        content="${vehicle}'s speed was",
         sign="<",
         expression="30 miles per hour",
     )
     predicate_less_general = Comparison(
-        "${vehicle}'s speed was",
+        content="${vehicle}'s speed was",
         sign="<",
         expression="60 miles per hour",
     )
     predicate_more = Comparison(
-        "${vehicle}'s speed was",
+        content="${vehicle}'s speed was",
         sign=">",
         expression="55 miles per hour",
     )
-    predicate_farm = Predicate("$person had a farm")
+    predicate_farm = Predicate(content="$person had a farm")
     slower_specific_statement = Statement(
-        predicate_less_specific, terms=Entity("the car")
+        predicate=predicate_less_specific, terms=Entity(name="the car")
     )
     slower_general_statement = Statement(
-        predicate_less_general, terms=Entity("the pickup")
+        predicate=predicate_less_general, terms=Entity(name="the pickup")
     )
-    faster_statement = Statement(predicate_more, terms=Entity("the pickup"))
-    farm_statement = Statement(predicate_farm, terms=Entity("Old MacDonald"))
+    faster_statement = Statement(
+        predicate=predicate_more, terms=Entity(name="the pickup")
+    )
+    farm_statement = Statement(
+        predicate=predicate_farm, terms=Entity(name="Old MacDonald")
+    )
 
     def test_group_contradicts_single_factor(self):
         group = FactorGroup([self.slower_specific_statement, self.farm_statement])
         register = ContextRegister()
-        register.insert_pair(Entity("the car"), Entity("the pickup"))
+        register.insert_pair(Entity(name="the car"), Entity(name="the pickup"))
         assert group.contradicts(self.faster_statement, context=register)
 
     def test_one_statement_does_not_contradict_group(self):
         group = FactorGroup([self.slower_general_statement, self.farm_statement])
         register = ContextRegister()
-        register.insert_pair(Entity("the pickup"), Entity("the pickup"))
+        register.insert_pair(Entity(name="the pickup"), Entity(name="the pickup"))
         assert not self.faster_statement.contradicts(group, context=register)
 
     def test_group_inconsistent_with_single_factor(self):
         group = FactorGroup([self.slower_specific_statement, self.farm_statement])
         register = ContextRegister()
-        register.insert_pair(Entity("the car"), Entity("the pickup"))
+        register.insert_pair(Entity(name="the car"), Entity(name="the pickup"))
         assert not group.consistent_with(self.faster_statement, context=register)
         assert not consistent_with(group, self.faster_statement, context=register)
 
@@ -255,19 +263,19 @@ class TestConsistent:
     def test_group_inconsistent_with_one_statement(self):
         group = FactorGroup([self.slower_specific_statement, self.farm_statement])
         register = ContextRegister()
-        register.insert_pair(Entity("the car"), Entity("the pickup"))
+        register.insert_pair(Entity(name="the car"), Entity(name="the pickup"))
         assert not group.consistent_with(self.faster_statement, context=register)
 
     def test_one_statement_inconsistent_with_group(self):
         group = FactorGroup([self.slower_specific_statement, self.farm_statement])
         register = ContextRegister()
-        register.insert_pair(Entity("the pickup"), Entity("the car"))
+        register.insert_pair(Entity(name="the pickup"), Entity(name="the car"))
         assert not self.faster_statement.consistent_with(group, context=register)
 
     def test_one_statement_consistent_with_group(self):
         group = FactorGroup([self.slower_general_statement, self.farm_statement])
         register = ContextRegister()
-        register.insert_pair(Entity("the pickup"), Entity("the pickup"))
+        register.insert_pair(Entity(name="the pickup"), Entity(name="the pickup"))
         assert self.faster_statement.consistent_with(group, context=register)
 
     def test_no_contradiction_of_none(self):
