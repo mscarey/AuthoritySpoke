@@ -540,7 +540,7 @@ def make_factor(make_predicate, make_entity) -> Dict[str, Factor]:
         ),
         "f_crime": build_fact(p["p_crime"], case_factors=c),
         "f_crime_craig_poe": Fact(
-            p["p_crime"],
+            predicate=p["p_crime"],
             terms=e["craig"],
             standard_of_proof="preponderance of evidence",
         ),
@@ -686,29 +686,35 @@ def make_complex_fact(make_predicate, make_factor) -> Dict[str, Fact]:
 
     return {
         "f_irrelevant_murder": Fact(
-            p["p_irrelevant"], (f["f_shooting"], f["f_murder"])
+            predicate=p["p_irrelevant"], terms=(f["f_shooting"], f["f_murder"])
         ),
-        "f_relevant_murder": Fact(p["p_relevant"], (f["f_shooting"], f["f_murder"])),
+        "f_relevant_murder": Fact(
+            predicate=p["p_relevant"], terms=(f["f_shooting"], f["f_murder"])
+        ),
         "f_relevant_murder_swap_entities": Fact(
-            p["p_relevant"], (f["f_shooting"], f["f_murder"])
+            predicate=p["p_relevant"], terms=(f["f_shooting"], f["f_murder"])
         ),
         "f_relevant_murder_nested_swap": Fact(
-            p["p_relevant"], (f["f_shooting_entity_order"], f["f_murder_entity_swap"])
+            predicate=p["p_relevant"],
+            terms=(f["f_shooting_entity_order"], f["f_murder_entity_swap"]),
         ),
         "f_relevant_murder_whether": Fact(
-            p["p_relevant"], (f["f_shooting"], f["f_murder_whether"])
+            predicate=p["p_relevant"], terms=(f["f_shooting"], f["f_murder_whether"])
         ),
         "f_whether_relevant_murder_whether": Fact(
-            p["p_relevant"], (f["f_shooting_whether"], f["f_murder_whether"])
+            predicate=p["p_relevant"],
+            terms=(f["f_shooting_whether"], f["f_murder_whether"]),
         ),
         "f_relevant_murder_swap": Fact(
-            p["p_relevant"], (f["f_shooting"], f["f_murder_entity_swap"])
+            predicate=p["p_relevant"],
+            terms=(f["f_shooting"], f["f_murder_entity_swap"]),
         ),
         "f_relevant_murder_craig": Fact(
-            p["p_relevant"], (f["f_shooting_craig"], f["f_murder_craig"])
+            predicate=p["p_relevant"],
+            terms=(f["f_shooting_craig"], f["f_murder_craig"]),
         ),
         "f_relevant_murder_alice_craig": Fact(
-            p["p_relevant"], (f["f_shooting"], f["f_murder_craig"])
+            predicate=p["p_relevant"], terms=(f["f_shooting"], f["f_murder_craig"])
         ),
     }
 
@@ -719,10 +725,10 @@ def make_fact_about_exhibit(make_predicate, make_exhibit) -> Dict[str, Evidence]
     e = make_exhibit
     return {
         "f_reliable_large_weight": Fact(
-            p["p_reliable"], (e["large_weight_testimony"],)
+            predicate=p["p_reliable"], terms=(e["large_weight_testimony"],)
         ),
         "f_reliable_small_weight": Fact(
-            p["p_reliable"], (e["small_weight_testimony"],)
+            predicate=p["p_reliable"], terms=(e["small_weight_testimony"],)
         ),
     }
 

@@ -1,10 +1,12 @@
 """Create models of assertions accepted as factual by courts."""
 from __future__ import annotations
 from copy import deepcopy
-from typing import ClassVar, Iterable, Iterator, List
+import operator
+from typing import ClassVar, Dict, Iterable, Iterator, List
 from typing import Mapping, Optional, Sequence, Tuple, Union
 
 from pydantic import BaseModel, validator, root_validator
+from slugify import slugify
 
 from anchorpoint.textselectors import TextQuoteSelector
 from nettlesome.entities import Entity
@@ -16,6 +18,7 @@ from nettlesome.terms import (
     Explanation,
     Term,
     TermSequence,
+    new_context_helper,
 )
 from nettlesome.predicates import Predicate
 from nettlesome.quantities import Comparison
@@ -74,7 +77,6 @@ class Fact(Factor, BaseModel):
     name: str = ""
     absent: bool = False
     generic: bool = False
-    truth: Optional[bool] = None
     standard_of_proof: Optional[str] = None
     standards_of_proof: ClassVar[Tuple[str, ...]] = (
         "scintilla of evidence",
@@ -83,6 +85,66 @@ class Fact(Factor, BaseModel):
         "clear and convincing",
         "beyond reasonable doubt",
     )
+
+    @property
+    def term_sequence(self) -> TermSequence:
+        """Return a TermSequence of the terms in this Statement."""
+        return TermSequence(self.terms)
+
+    @property
+    def terms_without_nulls(self) -> Sequence[Term]:
+        """
+        Get Terms that are not None.
+        No Terms should be None for the Statement class, so this method is like an
+        assertion for type checking.
+        """
+        return [term for term in self.terms if term is not None]
+
+    @property
+    def short_string(self) -> str:
+        """Represent object without line breaks."""
+        return str(self)
+
+    @property
+    def slug(self) -> str:
+        """
+        Get a representation of self without whitespace.
+        Intended for use as a sympy :class:`~sympy.core.symbol.Symbol`
+        """
+        terms = [term for term in self.terms if term is not None]
+        subject = self.predicate._content_with_terms(terms).removesuffix(" was")
+        return slugify(subject)
+
+    @property
+    def str_with_concrete_context(self) -> str:
+        """
+        Identify this Statement more verbosely, specifying which text is a concrete context factor.
+        :returns:
+            the same as the __str__ method, but with an added "SPECIFIC CONTEXT" section
+        """
+        text = str(self)
+        concrete_context = [
+            factor for factor in self.terms_without_nulls if not factor.generic
+        ]
+        if any(concrete_context) and not self.generic:
+            text += "\n" + indented("SPECIFIC CONTEXT:")
+            for factor in concrete_context:
+                factor_text = indented(factor.wrapped_string, tabs=2)
+                text += f"\n{str(factor_text)}"
+        return text
+
+    @property
+    def truth(self) -> Optional[bool]:
+        """Access :attr:`~Predicate.truth` attribute."""
+        return self.predicate.truth
+
+    @property
+    def wrapped_string(self):
+        """Wrap text in string representation of ``self``."""
+        content = str(self.predicate._content_with_terms(self.terms))
+        unwrapped = self.predicate._add_truth_to_content(content)
+        text = wrapped(super().__str__().format(unwrapped))
+        return text
 
     @root_validator(pre=True)
     def move_truth_to_predicate(cls, values):
@@ -139,7 +201,7 @@ class Fact(Factor, BaseModel):
             return v
         if v not in cls.standards_of_proof:
             raise ValueError(
-                f"standard of proof must be one of {self.standards_of_proof} or None."
+                f"standard of proof must be one of {cls.standards_of_proof} or None."
             )
         return v
 
@@ -161,11 +223,13 @@ class Fact(Factor, BaseModel):
     def _means_if_concrete(
         self, other: Comparable, context: Explanation
     ) -> Iterator[Explanation]:
-        if self.standard_of_proof == other.__dict__.get("standard_of_proof"):
+        if self.standard_of_proof == other.__dict__.get("standard_of_proof") and len(
+            self.terms
+        ) == len(other.terms):
             yield from super()._means_if_concrete(other, context)
 
     def __len__(self):
-        return len(self.terms)
+        return len(self.generic_terms())
 
     def _implies_if_concrete(
         self, other: Comparable, context: ContextRegister
@@ -178,6 +242,7 @@ class Fact(Factor, BaseModel):
         """
         if (
             isinstance(other, self.__class__)
+            and self.predicate >= other.predicate
             and bool(self.standard_of_proof) == bool(other.standard_of_proof)
             and not (
                 self.standard_of_proof
@@ -189,11 +254,76 @@ class Fact(Factor, BaseModel):
         ):
             yield from super()._implies_if_concrete(other, context)
 
+    def _contradicts_if_present(
+        self, other: Comparable, explanation: Explanation
+    ) -> Iterator[Explanation]:
+        """
+        Test if ``self`` contradicts :class:`Fact` ``other`` if neither is ``absent``.
+        :returns:
+            whether ``self`` and ``other`` can't both be true at
+            the same time under the given assumption.
+        """
+        if isinstance(other, self.__class__) and self.predicate.contradicts(
+            other.predicate
+        ):
+            for context in self._context_registers(
+                other, operator.ge, explanation.context
+            ):
+                yield explanation.with_context(context)
+
     def negated(self) -> Fact:
         """Return copy of self with opposite truth value."""
         result = deepcopy(self)
         result.predicate = result.predicate.negated()
         return result
+
+    @new_context_helper
+    def new_context(self, changes: Dict[Comparable, Comparable]) -> Comparable:
+        """
+        Create new :class:`Factor`, replacing keys of ``changes`` with values.
+        :returns:
+            a version of ``self`` with the new context.
+        """
+        result = deepcopy(self)
+        new_terms = TermSequence(
+            [factor.new_context(changes) for factor in self.terms_without_nulls]
+        )
+        result.terms = list(new_terms)
+        return result
+
+    def _registers_for_interchangeable_context(
+        self, matches: ContextRegister
+    ) -> Iterator[ContextRegister]:
+        r"""
+        Find possible combination of interchangeable :attr:`terms`.
+        :param matches:
+            matching Terms between self and other
+        :yields:
+            context registers with every possible combination of
+            ``self``\'s and ``other``\'s interchangeable
+            :attr:`terms`.
+        """
+        yield matches
+        gen = self.term_permutations()
+        _ = next(gen)  # unchanged permutation
+        already_returned: List[ContextRegister] = [matches]
+
+        for term_permutation in gen:
+            left = [term for term in self.terms if term is not None]
+            right = [term for term in term_permutation if term is not None]
+            changes = ContextRegister.from_lists(left, right)
+            changed_registry = matches.replace_keys(changes)
+            if all(
+                changed_registry != returned_dict for returned_dict in already_returned
+            ):
+                already_returned.append(changed_registry)
+                yield changed_registry
+
+    def term_permutations(self) -> Iterator[TermSequence]:
+        """Generate permutations of context factors that preserve same meaning."""
+        for pattern in self.predicate.term_index_permutations():
+            sorted_terms = [x for _, x in sorted(zip(pattern, self.terms))]
+            yield TermSequence(sorted_terms)
 
 
 def build_fact(
@@ -246,10 +376,10 @@ def build_fact(
         indices = (indices,)
 
     case_factors = case_factors or ()
-    if not isinstance(case_factors, Iterable):
+    if isinstance(case_factors, BaseModel):
         wrapped_factors = (case_factors,)
     else:
-        wrapped_factors = tuple(case_factors)
+        wrapped_factors = list(case_factors)
 
     terms = [wrapped_factors[i] for i in indices]
     return Fact(
@@ -316,7 +446,11 @@ class Exhibit(Factor, BaseModel):
     def _means_if_concrete(
         self, other: Factor, context: ContextRegister
     ) -> Iterator[ContextRegister]:
-        if isinstance(other, self.__class__) and self.form == other.form:
+        if (
+            isinstance(other, self.__class__)
+            and self.predicate.means(other.predicate)
+            and self.form == other.form
+        ):
             yield from super()._means_if_concrete(other, context)
 
     def _implies_if_concrete(

@@ -265,8 +265,8 @@ a :class:`~authorityspoke.facts.Fact` object.
     >>> from authorityspoke import Entity, Fact
     >>> ann = Entity(name="Ann", generic=False)
     >>> claude = Entity(name="Claude", generic=False)
-    >>> ann_tax_rate = Fact(specific_tax_rate, terms=ann)
-    >>> claude_tax_rate = Fact(tax_rate_over_25, terms=claude)
+    >>> ann_tax_rate = Fact(predicate=specific_tax_rate, terms=ann)
+    >>> claude_tax_rate = Fact(predicate=tax_rate_over_25, terms=claude)
     >>> str(ann_tax_rate)
     "the fact that Ann's marginal income tax rate was exactly equal to 0.3"
 
@@ -293,8 +293,8 @@ Fact about one of them implies a Fact about the other.
 
     >>> devon = Entity(name="Devon", generic=True)
     >>> elaine = Entity(name="Elaine", generic=True)
-    >>> devon_tax_rate = Fact(specific_tax_rate, terms=devon)
-    >>> elaine_tax_rate = Fact(tax_rate_over_25, terms=elaine)
+    >>> devon_tax_rate = Fact(predicate=specific_tax_rate, terms=devon)
+    >>> elaine_tax_rate = Fact(predicate=tax_rate_over_25, terms=elaine)
     >>> devon_tax_rate.implies(elaine_tax_rate)
     True
 
@@ -333,7 +333,7 @@ that Predicate, only include each unique term once. The terms should be
 listed in the same order that they first appear in the template text.
 
     >>> opened_account = Fact(
-    ...     Predicate(content="$applicant opened a bank account for $applicant and $cosigner"),
+    ...     predicate=Predicate(content="$applicant opened a bank account for $applicant and $cosigner"),
     ...     terms=(devon, elaine))
     >>> str(opened_account)
     'the fact that <Devon> opened a bank account for <Devon> and <Elaine>'
@@ -372,8 +372,8 @@ except for a final digit, then transposing two non-generic terms will
 change the meaning of the Fact.
 
     >>> parent_sentence = Predicate(content="$mother was ${child}'s parent")
-    >>> ann_is_parent = Fact(parent_sentence, terms = (ann, bob))
-    >>> bob_is_parent = Fact(parent_sentence, terms = (bob, ann))
+    >>> ann_is_parent = Fact(predicate=parent_sentence, terms = (ann, bob))
+    >>> bob_is_parent = Fact(predicate=parent_sentence, terms = (bob, ann))
     >>> str(ann_is_parent)
     "the fact that Ann was Bob's parent"
 
@@ -394,8 +394,8 @@ include the text of other Predicates. This feature is intended for
 incorporating references to what people said, knew, or believed.
 
     >>> statement = Predicate(content="$speaker told $listener $event")
-    >>> bob_had_drugs = Fact(smaller_drug_comparison, terms=bob)
-    >>> bob_told_ann_about_drugs = Fact(statement, terms=(bob, ann, bob_had_drugs))
+    >>> bob_had_drugs = Fact(predicate=smaller_drug_comparison, terms=bob)
+    >>> bob_told_ann_about_drugs = Fact(predicate=statement, terms=(bob, ann, bob_had_drugs))
     >>> str(bob_told_ann_about_drugs)
     'the fact that Bob told Ann the fact that the weight of marijuana that Bob possessed was at least 250 gram'
 
@@ -407,8 +407,8 @@ said. In this example, the fact that Bob told Ann he possessed more than
 0.5 kilograms means he also told Ann that he possessed more than 250
 grams.
 
-    >>> bob_had_more_drugs = Fact(drug_comparison, terms=bob)
-    >>> bob_told_ann_about_more_drugs = Fact(statement, terms=(bob, ann, bob_had_more_drugs))
+    >>> bob_had_more_drugs = predicate=drug_comparison, terms=bob)
+    >>> bob_told_ann_about_more_drugs = Fact(predicate=statement, terms=(bob, ann, bob_had_more_drugs))
     >>> str(bob_told_ann_about_more_drugs)
     'the fact that Bob told Ann the fact that the weight of marijuana that Bob possessed was at least 0.5 kilogram'
 
@@ -421,8 +421,8 @@ Predicates doesn’t cause the first-order Facts to contradict one
 another. For example, it’s not contradictory to say that a person
 has said two contradictory things.
 
-    >>> bob_had_less_drugs = Fact(drug_comparison_with_upper_bound, terms=bob)
-    >>> bob_told_ann_about_less_drugs = Fact(statement, terms=(bob, ann, bob_had_less_drugs))
+    >>> bob_had_less_drugs = predicate=drug_comparison_with_upper_bound, terms=bob)
+    >>> bob_told_ann_about_less_drugs = Fact(predicate=statement, terms=(bob, ann, bob_had_less_drugs))
     >>> str(bob_told_ann_about_less_drugs)
     'the fact that Bob told Ann the fact that the weight of marijuana that Bob possessed was no more than 10 gram'
 
@@ -435,8 +435,8 @@ first-order Fact. AuthoritySpoke will recognize that the use of
 different terms in the second-order Fact changes the meaning of the
 first-order Fact.
 
-    >>> claude_had_drugs = Fact(smaller_drug_comparison, terms=claude)
-    >>> bob_told_ann_about_claude = Fact(statement, terms=(bob, ann, claude_had_drugs))
+    >>> claude_had_drugs = Fact(predicate=smaller_drug_comparison, terms=claude)
+    >>> bob_told_ann_about_claude = Fact(predicate=statement, terms=(bob, ann, claude_had_drugs))
     >>> str(bob_told_ann_about_claude)
     'the fact that Bob told Ann the fact that the weight of marijuana that Claude possessed was at least 250 gram'
 

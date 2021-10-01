@@ -27,7 +27,7 @@ class TestFacts:
             case_factors=watt_mentioned,
             standard_of_proof="preponderance of evidence",
         )
-        assert isinstance(shooting.terms, tuple)
+        assert isinstance(shooting.terms, list)
 
     def test_terms_from_case_factor_indices(
         self, make_entity, make_predicate, watt_mentioned
@@ -45,7 +45,7 @@ class TestFacts:
         f2 = build_fact(
             make_predicate["p2"], indices=(1, 0), case_factors=watt_mentioned
         )
-        assert f2.terms == (e["watt"], e["motel"])
+        assert f2.terms == [e["watt"], e["motel"]]
 
     def test_correct_factors_from_indices_in_build_fact(
         self, make_entity, make_predicate, watt_mentioned
@@ -56,7 +56,7 @@ class TestFacts:
             indices=(1, 2),
             case_factors=watt_mentioned,
         )
-        assert f2.terms == (e["watt"], e["trees"])
+        assert f2.terms == [e["watt"], e["trees"]]
 
     def test_wrong_type_in_terms_in_init(
         self, make_entity, make_predicate, watt_mentioned
@@ -79,7 +79,7 @@ class TestFacts:
 
     def test_convert_int_terms_to_tuple(self, make_predicate, watt_mentioned):
         f = build_fact(make_predicate["p_irrelevant_1"], 3, case_factors=watt_mentioned)
-        assert f.terms == (watt_mentioned[3],)
+        assert f.terms == [watt_mentioned[3]]
 
     def test_string_representation_of_factor(self, watt_factor):
         assert "<Hideaway Lodge> was a motel" in str(watt_factor["f1"])
@@ -95,7 +95,7 @@ class TestFacts:
         Entity appears more than once in the Predicate."""
         with pytest.raises(DuplicateTermError):
             Fact(
-                make_predicate["p_three_entities"],
+                predicate=make_predicate["p_three_entities"],
                 terms=[Entity(name="Al"), Entity(name="Bob"), Entity(name="Al")],
             )
 
@@ -112,7 +112,7 @@ class TestFacts:
         devon = Entity(name="Devon", generic=True)
         elaine = Entity(name="Elaine", generic=True)
         opened_account = Fact(
-            Predicate(
+            predicate=Predicate(
                 content="$applicant opened a bank account for $applicant and $cosigner"
             ),
             terms=(devon, elaine),
@@ -267,7 +267,7 @@ class TestSameMeaning:
     def test_generic_and_specific_factors_unequal(self, watt_factor):
         assert not watt_factor["f2"].means(watt_factor["f2_generic"])
 
-    def test_factor_reciprocal_unequal(self, watt_factor):
+    def test_factor_unequal_due_to_repeated_term(self, watt_factor):
         assert not watt_factor["f2"].means(watt_factor["f2_reflexive"])
 
     def test_factor_different_predicate_truth_unequal(self, watt_factor):
@@ -304,13 +304,13 @@ class TestSameMeaning:
         bob = Entity(name="Bob", generic=False)
 
         ann_and_bob_were_family = Fact(
-            Predicate(
+            predicate=Predicate(
                 content="$relative1 and $relative2 both were members of the same family"
             ),
             terms=(ann, bob),
         )
         bob_and_ann_were_family = Fact(
-            Predicate(
+            predicate=Predicate(
                 content="$relative1 and $relative2 both were members of the same family"
             ),
             terms=(bob, ann),
@@ -333,10 +333,10 @@ class TestSameMeaning:
         directory = Entity(name="Rural's telephone directory", plural=False)
         listings = Entity(name="Rural's telephone listings", plural=True)
         directory_original = Fact(
-            Predicate(content="$thing was original"), terms=directory
+            predicate=Predicate(content="$thing was original"), terms=directory
         )
         listings_original = Fact(
-            Predicate(content="$thing were original"), terms=listings
+            predicate=Predicate(content="$thing were original"), terms=listings
         )
         assert directory_original.means(listings_original)
 
@@ -598,8 +598,8 @@ class TestContradiction:
         )
         alice = Entity(name="Alice")
         bob = Entity(name="Bob")
-        alice_rich = Fact(p_large_weight, terms=alice)
-        bob_poor = Fact(p_small_weight, terms=bob)
+        alice_rich = Fact(predicate=p_large_weight, terms=alice)
+        bob_poor = Fact(predicate=p_small_weight, terms=bob)
         assert alice_rich.contradicts(bob_poor)
 
     def test_inconsistent_statements_about_corresponding_entities(self):
@@ -620,8 +620,8 @@ class TestContradiction:
         )
         alice = Entity(name="Alice")
         bob = Entity(name="Bob")
-        alice_rich = Fact(p_large_weight, terms=alice)
-        bob_poor = Fact(p_small_weight, terms=bob)
+        alice_rich = Fact(predicate=p_large_weight, terms=alice)
+        bob_poor = Fact(predicate=p_small_weight, terms=bob)
         register = ContextRegister()
         register.insert_pair(alice, alice)
         assert not alice_rich.contradicts(bob_poor, context=register)
