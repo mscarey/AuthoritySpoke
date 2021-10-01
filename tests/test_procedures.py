@@ -7,6 +7,7 @@ from nettlesome.entities import Entity
 from nettlesome.groups import FactorGroup
 from nettlesome.predicates import Predicate
 from nettlesome.quantities import Comparison, Q_
+from pydantic import ValidationError
 
 from authorityspoke.facts import Fact
 from authorityspoke.procedures import Procedure
@@ -14,11 +15,11 @@ from authorityspoke.procedures import Procedure
 
 class TestProcedures:
     def test_exception_for_wrong_type_for_procedure(self, make_predicate):
-        with pytest.raises(TypeError):
+        with pytest.raises(ValidationError):
             Procedure(inputs=make_predicate["p1"], outputs=make_predicate["p2"])
 
     def test_exception_for_wrong_type_in_tuple_for_procedure(self, make_predicate):
-        with pytest.raises(TypeError):
+        with pytest.raises(ValidationError):
             Procedure(inputs=(make_predicate["p1"]), outputs=(make_predicate["p2"]))
 
     def test_get_terms(self, make_procedure):
@@ -44,7 +45,7 @@ class TestProcedures:
         with pytest.raises(TypeError):
             Procedure(inputs="factor name", outputs=make_factor["f_shooting"])
 
-    def test_cannot_add_term_as_input(self, make_factor):
+    def test_cannot_add_entity_as_input(self, make_factor):
         with pytest.raises(TypeError):
             Procedure(inputs=Entity(name="Al"), outputs=make_factor["f_shooting"])
 
@@ -83,7 +84,7 @@ class TestProcedures:
         assert f["f1"].terms == (watt_mentioned[0],)
         assert f["f2"] in c1.inputs
         assert f["f2"] in c1_again.inputs
-        assert f["f2"].terms == (watt_mentioned[1], watt_mentioned[0])
+        assert f["f2"].terms == [watt_mentioned[1], watt_mentioned[0]]
 
 
 class TestProcedureSameMeaning:
@@ -378,20 +379,22 @@ class TestFactorGroups:
         """Test part of the process of checking contradiction."""
         rural = Entity(name="Rural's telephone directory")
         compilation = Predicate(
-            "${rural_s_telephone_directory} was a compilation of facts"
+            content="${rural_s_telephone_directory} was a compilation of facts"
         )
         idea = Predicate(content="${rural_s_telephone_directory} was an idea")
         copyrightable = Fact(
-            Predicate(content="${rural_s_telephone_directory} was copyrightable"),
+            predicate=Predicate(
+                content="${rural_s_telephone_directory} was copyrightable"
+            ),
             terms=rural,
         )
         left = Procedure(
             outputs=(copyrightable),
-            inputs=(Fact(compilation, terms=rural)),
+            inputs=(Fact(predicate=compilation, terms=rural)),
         )
         right = Procedure(
             outputs=(copyrightable),
-            inputs=(Fact(idea, terms=rural)),
+            inputs=(Fact(predicate=idea, terms=rural)),
         )
         context = ContextRegister()
         explanation = Explanation.from_context(context)

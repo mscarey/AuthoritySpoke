@@ -35,10 +35,12 @@ class TestContextRegisters:
 
     def test_cannot_update_context_register_from_lists(self):
         left = Statement(
-            "$shooter shot $victim", terms=[Entity(name="Alice"), Entity(name="Bob")]
+            predicate="$shooter shot $victim",
+            terms=[Entity(name="Alice"), Entity(name="Bob")],
         )
         right = Statement(
-            "$shooter shot $victim", terms=[Entity(name="Craig"), Entity(name="Dan")]
+            predicate="$shooter shot $victim",
+            terms=[Entity(name="Craig"), Entity(name="Dan")],
         )
         update = left.update_context_register(
             right,

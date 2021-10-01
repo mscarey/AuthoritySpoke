@@ -25,7 +25,7 @@ class TestExhibits:
             form="token",
             statement=Fact(
                 predicate=Predicate(
-                    "$agency granted an exemption from the prohibition of wearing beards"
+                    content="$agency granted an exemption from the prohibition of wearing beards"
                 ),
                 terms=Entity(name="the Department of Beards"),
             ),

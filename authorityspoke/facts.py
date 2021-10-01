@@ -5,7 +5,7 @@ import operator
 from typing import ClassVar, Dict, Iterable, Iterator, List
 from typing import Mapping, Optional, Sequence, Tuple, Union
 
-from pydantic import BaseModel, validator, root_validator
+from pydantic import BaseModel, ValidationError, validator, root_validator
 from slugify import slugify
 
 from anchorpoint.textselectors import TextQuoteSelector
@@ -148,7 +148,7 @@ class Fact(Factor, BaseModel):
 
     @root_validator(pre=True)
     def move_truth_to_predicate(cls, values):
-        if isinstance(values["predicate"], str):
+        if isinstance(values.get("predicate"), str):
             values["predicate"] = Predicate(content=values["predicate"])
         if "truth" in values:
             values["predicate"].truth = values["truth"]
@@ -169,6 +169,9 @@ class Fact(Factor, BaseModel):
 
         # make TermSequence for validation, then ignore it
         TermSequence.validate_terms(v)
+
+        if not values.get("predicate"):
+            raise ValidationError("Predicate field is required.")
 
         if len(v) != len(values["predicate"]):
             message = (

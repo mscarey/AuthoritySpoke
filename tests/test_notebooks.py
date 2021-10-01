@@ -186,15 +186,15 @@ class TestTemplateStrings:
             sign=">",
             expression=0.25,
         )
-        elaine_tax_rate = Fact(tax_rate_over_25, terms=elaine)
+        elaine_tax_rate = Fact(predicate=tax_rate_over_25, terms=elaine)
         assert "\n" not in str(elaine_tax_rate)
 
     def test_changing_order_of_concrete_terms_changes_meaning(self):
         ann = Entity(name="Ann", generic=False)
         bob = Entity(name="Bob", generic=False)
         parent_sentence = Predicate(content="$mother was ${child}'s parent")
-        ann_parent = Fact(parent_sentence, terms=(ann, bob))
-        bob_parent = Fact(parent_sentence, terms=(bob, ann))
+        ann_parent = Fact(predicate=parent_sentence, terms=(ann, bob))
+        bob_parent = Fact(predicate=parent_sentence, terms=(bob, ann))
         assert str(ann_parent).lower() == "the fact that Ann was Bob's parent".lower()
         assert str(bob_parent).lower() == "the fact that Bob was Ann's parent".lower()
         assert not ann_parent.means(bob_parent)
