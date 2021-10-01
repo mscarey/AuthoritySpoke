@@ -226,7 +226,7 @@ def make_entity() -> Dict[str, Entity]:
         "trees_specific": Entity(name="the stockpile of trees", generic=False),
         "tree_search": Entity(name="officers' search of the stockpile of trees"),
         "tree_search_specific": Entity(
-            "officers' search of the stockpile of trees", generic=False
+            name="officers' search of the stockpile of trees", generic=False
         ),
         "alice": Entity(name="Alice"),
         "bob": Entity(name="Bob"),
@@ -353,7 +353,7 @@ def make_predicate() -> Dict[str, Predicate]:
         ),
         "p10": Predicate(content="$thing was within the curtilage of $place"),
         "p10_false": Predicate(
-            "$thing was within the curtilage of $place", truth=False
+            content="$thing was within the curtilage of $place", truth=False
         ),
         "p11": Predicate(content="$act was a warrantless search and seizure"),
         "p12": Predicate(
@@ -364,7 +364,7 @@ def make_predicate() -> Dict[str, Predicate]:
         "p15": Predicate(content="$thing was in an area adjacent to $place"),
         "p16": Predicate(content="$thing was in an area accessible to the public"),
         "p17": Predicate(
-            "In $act, several law enforcement officials meticulously went through $thing"
+            content="In $act, several law enforcement officials meticulously went through $thing"
         ),
         "p18": Comparison(
             content="the length of time that $act continued was",
@@ -386,7 +386,7 @@ def make_predicate() -> Dict[str, Predicate]:
         ),
         "p_relevant": Predicate(content="$evidence is relevant to show $fact"),
         "p_relevant_whether": Predicate(
-            "$evidence is relevant to show $fact", truth=None
+            content="$evidence is relevant to show $fact", truth=None
         ),
         "p_shooting": Predicate(content="$shooter shot $victim"),
         "p_shooting_self": Predicate(content="$shooter shot $shooter"),
@@ -408,9 +408,15 @@ def make_predicate() -> Dict[str, Predicate]:
         ),
         "p_friends": Predicate(content="$person1 and $person2 were friends"),
         "p_reliable": Predicate(content="$evidence was reliable"),
-        "p_quantity=3": Comparison("The number of mice was", sign="==", expression=3),
-        "p_quantity>=4": Comparison("The number of mice was", sign=">=", expression=4),
-        "p_quantity>5": Comparison("The number of mice was", sign=">", expression=5),
+        "p_quantity=3": Comparison(
+            content="The number of mice was", sign="==", expression=3
+        ),
+        "p_quantity>=4": Comparison(
+            content="The number of mice was", sign=">=", expression=4
+        ),
+        "p_quantity>5": Comparison(
+            content="The number of mice was", sign=">", expression=5
+        ),
         "p_no_context": Predicate(content="context was included", truth=False),
     }
 
@@ -493,7 +499,7 @@ def watt_factor(make_predicate, make_entity, watt_mentioned) -> Dict[str, Factor
             p["p9_miles"], (2, 0), absent=True, case_factors=c
         ),
         "f9_more_different_entity": Fact(
-            p["p9_more"], (make_entity["circus"], make_entity["motel"])
+            predicate=p["p9_more"], terms=(make_entity["circus"], make_entity["motel"])
         ),
         "f9_swap_entities": build_fact(p["p9"], (0, 2), case_factors=c),
         "f9_swap_entities_4": build_fact(p["p9"], (1, 4), case_factors=c),

@@ -137,7 +137,7 @@ class Fact(Factor, BaseModel):
         """
         if v is None:
             return v
-        if v not in self.standards_of_proof:
+        if v not in cls.standards_of_proof:
             raise ValueError(
                 f"standard of proof must be one of {self.standards_of_proof} or None."
             )
@@ -255,7 +255,7 @@ def build_fact(
     return Fact(
         predicate=predicate,
         terms=terms,
-        name=name,
+        name=name or "",
         standard_of_proof=standard_of_proof,
         absent=absent,
         generic=generic,

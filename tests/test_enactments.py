@@ -13,6 +13,8 @@ from legislice.groups import EnactmentGroup
 from nettlesome.entities import Entity
 from nettlesome.predicates import Predicate
 from nettlesome.statements import Statement
+
+from pydantic import ValidationError
 import pytest
 
 from authorityspoke.io import loaders, readers
@@ -70,7 +72,8 @@ class TestEnactments:
     def test_unequal_to_statement(self, watt_factor, e_copyright):
         stole_predicate = Predicate(content="$defendant stole $object")
         stole_fact = Statement(
-            stole_predicate, terms=[Entity(name="Alice"), Entity(name="the gold bar")]
+            predicate=stole_predicate,
+            terms=[Entity(name="Alice"), Entity(name="the gold bar")],
         )
 
         assert not stole_fact.means(e_copyright)
@@ -211,7 +214,7 @@ class TestEnactments:
         assert len(combined) == 2
 
     def test_cannot_add_fact_to_enactment(self, watt_factor, e_search_clause):
-        with pytest.raises(TypeError):
+        with pytest.raises(ValidationError):
             print(e_search_clause + watt_factor["f3"])
 
     def test_cannot_add_enactment_to_statement(self, e_search_clause):
@@ -227,7 +230,7 @@ class TestEnactments:
             predicate=Predicate(content="$person committed a murder"),
             terms=Entity(name="Al"),
         )
-        with pytest.raises(TypeError):
+        with pytest.raises(ValidationError):
             e_search_clause + statement
 
     def test_cant_add_enactment_that_is_not_ancestor_or_descendant(
