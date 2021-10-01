@@ -94,7 +94,7 @@ class TestPredicates:
         assert make_predicate["p7_obverse"].quantity == Q_(35, "foot")
         assert make_predicate["p7"].truth is True
         assert make_predicate["p7"].sign == "<="
-        assert 'sign="<="' in repr(make_predicate["p7"])
+        assert "sign='<='" in repr(make_predicate["p7"])
         assert make_predicate["p7_obverse"].sign == "<="
 
     def test_quantity_type(self, make_predicate):
@@ -157,7 +157,7 @@ class TestPredicates:
         phrase = (
             "$thing were names, towns, and telephone numbers of telephone subscribers"
         )
-        predicate = Predicate(phrase)
+        predicate = Predicate(content=phrase)
         with_context = predicate._content_with_terms(context)
         assert with_context.startswith(expected)
 
