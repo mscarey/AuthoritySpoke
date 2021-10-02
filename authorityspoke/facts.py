@@ -435,6 +435,7 @@ class Exhibit(Factor, BaseModel):
         ontology of terms when sufficient example data is available.
     """
 
+    offered_by: Entity
     form: Optional[str] = None
     statement: Optional[Fact] = None
     statement_attribution: Optional[Entity] = None
@@ -516,7 +517,7 @@ class Evidence(Factor, BaseModel):
         the evidence is being referenced.
     """
 
-    exhibit: Optional[Exhibit] = None
+    exhibit: Exhibit
     to_effect: Optional[Fact] = None
     name: Optional[str] = None
     absent: bool = False
@@ -559,7 +560,7 @@ class Pleading(Factor, BaseModel):
     :param generic:
     """
 
-    filer: Optional[Entity] = None
+    filer: Entity
     name: Optional[str] = None
     absent: bool = False
     generic: bool = False
