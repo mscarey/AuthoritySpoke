@@ -22,15 +22,10 @@ class TestProcedures:
         with pytest.raises(ValidationError):
             Procedure(inputs=(make_predicate["p1"]), outputs=(make_predicate["p2"]))
 
-    def test_make_procedure_with_despite(self, make_evidence, watt_factor):
+    def test_make_procedure_with_evidence_output(self, make_evidence):
         e = make_evidence
-        f = watt_factor
-        c3 = Procedure(
-            outputs=(e["crime_absent"]),
-            inputs=(f["f3"], f["f11"], f["f12"], f["f13"], f["f14"], f["f15"]),
-            despite=(f["f16"]),
-        )
-        assert str(c3) == "to_effect"
+        c3 = Procedure(outputs=[e["crime_absent"]])
+        assert str(c3) == "??to_effect"
 
     def test_get_terms(self, make_procedure):
         # motel, watt

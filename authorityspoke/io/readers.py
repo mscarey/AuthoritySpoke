@@ -15,12 +15,10 @@ from nettlesome.entities import Entity
 from nettlesome.factors import Factor
 
 from authorityspoke.decisions import Decision, DecisionReading
-from authorityspoke.evidence import Exhibit, Evidence
-from authorityspoke.facts import Fact
+from authorityspoke.facts import Fact, Exhibit, Evidence, Allegation, Pleading
 from authorityspoke.holdings import Holding
 from authorityspoke.io import schemas_yaml
 from authorityspoke.opinions import AnchoredHoldings
-from authorityspoke.pleadings import Allegation, Pleading
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
 from authorityspoke.io.schemas_yaml import (

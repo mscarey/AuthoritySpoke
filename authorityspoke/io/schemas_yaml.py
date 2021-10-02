@@ -23,9 +23,8 @@ from nettlesome.quantities import Comparison, QuantityRange, Quantity
 
 
 from authorityspoke.decisions import CAPCitation, Decision
-from authorityspoke.evidence import Exhibit, Evidence
 
-from authorityspoke.facts import Fact
+from authorityspoke.facts import Fact, Exhibit, Evidence, Pleading, Allegation
 from authorityspoke.holdings import Holding
 from authorityspoke.io.enactment_index import EnactmentIndex
 from authorityspoke.io.name_index import Mentioned
@@ -34,7 +33,6 @@ from authorityspoke.io.nesting import nest_fields
 from authorityspoke.io import text_expansion
 
 from authorityspoke.opinions import AnchoredHoldings, HoldingWithAnchors
-from authorityspoke.pleadings import Pleading, Allegation
 
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule

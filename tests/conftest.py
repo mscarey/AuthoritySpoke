@@ -19,11 +19,10 @@ from nettlesome.quantities import Comparison, Q_
 import pytest
 
 from authorityspoke.decisions import DecisionReading
-from authorityspoke.evidence import Evidence, Exhibit
-from authorityspoke.facts import Fact, build_fact
+from authorityspoke.facts import Allegation, Fact, build_fact, Evidence
+from authorityspoke.facts import Exhibit, Pleading
 from authorityspoke.holdings import Holding
 from authorityspoke.opinions import Opinion, OpinionReading
-from authorityspoke.pleadings import Pleading, Allegation
 from authorityspoke.rules import Procedure, Rule
 
 from authorityspoke.io import loaders, readers
