@@ -15,7 +15,12 @@ class TestFacts:
     def test_default_terms_for_fact(self, make_entity, make_predicate, watt_mentioned):
         e = make_entity
         f1 = build_fact(make_predicate["p1"], case_factors=watt_mentioned)
-        assert f1.terms == (e["motel"],)
+        assert f1.terms == [e["motel"]]
+
+    def test_no_terms_for_fact(self):
+        predicate = Predicate(content="context was included", truth=False)
+        fact = Fact(predicate=predicate, terms=[])
+        assert str(fact) == "the fact it was false that context was included"
 
     def test_build_fact(self, make_predicate, watt_mentioned):
         """

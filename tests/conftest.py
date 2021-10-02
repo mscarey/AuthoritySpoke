@@ -579,7 +579,7 @@ def make_factor(make_predicate, make_entity) -> Dict[str, Factor]:
         "f_large_weight": build_fact(p["p_large_weight"], (0,), case_factors=c),
         "f_small_weight": build_fact(p["p_small_weight"], (0,), case_factors=c),
         "f_friends": build_fact(p["p_friends"], (0, 1), case_factors=c),
-        "f_no_context": build_fact(p["p_no_context"], case_factors=c),
+        "f_no_context": Fact(predicate=p["p_no_context"], terms=[]),
     }
 
 

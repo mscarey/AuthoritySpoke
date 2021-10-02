@@ -170,7 +170,7 @@ class Fact(Factor, BaseModel):
         # make TermSequence for validation, then ignore it
         TermSequence.validate_terms(v)
 
-        if not values.get("predicate"):
+        if values.get("predicate") is None:
             raise ValidationError("Predicate field is required.")
 
         if len(v) != len(values["predicate"]):
