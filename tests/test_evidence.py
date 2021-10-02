@@ -1,7 +1,6 @@
-from authorityspoke.evidence import Evidence, Exhibit
-from authorityspoke.facts import build_fact
-
 from nettlesome.terms import TermSequence
+
+from authorityspoke.facts import build_fact, Evidence, Exhibit
 
 
 class TestEvidence:

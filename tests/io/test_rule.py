@@ -6,7 +6,7 @@ import pytest
 from legislice.download import Client
 
 from authorityspoke.io import loaders, name_index, readers
-from authorityspoke.evidence import Exhibit
+from authorityspoke.facts import Exhibit
 from authorityspoke.rules import Rule
 from authorityspoke.io.fake_enactments import FakeClient
 

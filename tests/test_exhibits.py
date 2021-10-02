@@ -2,8 +2,7 @@ import logging
 
 from nettlesome import Entity
 
-from authorityspoke.evidence import Exhibit
-from authorityspoke.facts import Fact, Predicate
+from authorityspoke.facts import Fact, Predicate, Exhibit
 
 
 class TestExhibits:

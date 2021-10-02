@@ -11,8 +11,7 @@ from nettlesome.quantities import Comparison, QuantityRange
 
 import pytest
 
-from authorityspoke.facts import Fact
-from authorityspoke.evidence import Exhibit, Evidence
+from authorityspoke.facts import Fact, Exhibit, Evidence
 from authorityspoke.io import readers, name_index
 from authorityspoke.io import schemas_yaml
 from authorityspoke.io.loaders import load_holdings
