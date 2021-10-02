@@ -1069,12 +1069,12 @@ def make_procedure(make_evidence, make_factor, watt_factor) -> Dict[str, Procedu
             despite=(f["f8"],),
         ),
         "c3": Procedure(
-            outputs=e["crime_absent"],
+            outputs=(e["crime_absent"]),
             inputs=(f["f3"], f["f11"], f["f12"], f["f13"], f["f14"], f["f15"]),
             despite=(f["f16"]),
         ),
         "c4": Procedure(
-            outputs=f["f13"],
+            outputs=(f["f13"]),
             inputs=(
                 f["f1"],
                 f["f2"],
@@ -1214,7 +1214,7 @@ def make_procedure(make_evidence, make_factor, watt_factor) -> Dict[str, Procedu
             outputs=(f["f10_false"],), inputs=(f["f8"]), despite=(f["f7"])
         ),
         "c3_fewer_inputs": Procedure(
-            outputs=e["crime_absent"],
+            outputs=(e["crime_absent"]),
             inputs=(f["f3"], f["f11"], f["f12"], f["f15"]),
             despite=(f["f16"]),
         ),
@@ -1222,7 +1222,7 @@ def make_procedure(make_evidence, make_factor, watt_factor) -> Dict[str, Procedu
         "c_output_farther_different_entity": Procedure(
             outputs=(f["f9_more_different_entity"]), inputs=(f["f1"])
         ),
-        "c_no_context": Procedure(outputs=m["f_no_context"]),
+        "c_no_context": Procedure(outputs=(m["f_no_context"])),
     }
 
 

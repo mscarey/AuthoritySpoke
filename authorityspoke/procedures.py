@@ -109,6 +109,8 @@ class Procedure(Comparable, BaseModel):
             raise ValueError("Procedure must have at least one output")
         if isinstance(v, (Term, Dict)):
             return [v]
+        if isinstance(v, str):
+            raise TypeError("outputs of Procedure cannot be type str")
         return list(v)
 
     @validator("inputs", "despite", pre=True)
@@ -117,6 +119,10 @@ class Procedure(Comparable, BaseModel):
     ) -> List[Factor]:
         if isinstance(v, (Term, Dict)):
             return [v]
+        if isinstance(v, str):
+            raise TypeError(
+                "inputs and despite factors of Procedure cannot be type str"
+            )
         elif v is None:
             return []
         return list(v)
@@ -235,15 +241,6 @@ class Procedure(Comparable, BaseModel):
         """
 
         return len(self.generic_terms())
-
-    def __repr__(self):
-        text = (
-            f"{self.__class__.__name__}(outputs=("
-            + f"{', '.join(repr(factor) for factor in self.outputs)}), "
-            + f"inputs=({', '.join(repr(factor) for factor in self.inputs)}), "
-            + f"despite=({', '.join(repr(factor) for factor in self.despite)}))"
-        )
-        return text
 
     def __str__(self):
 

@@ -22,6 +22,16 @@ class TestProcedures:
         with pytest.raises(ValidationError):
             Procedure(inputs=(make_predicate["p1"]), outputs=(make_predicate["p2"]))
 
+    def test_make_procedure_with_despite(self, make_evidence, watt_factor):
+        e = make_evidence
+        f = watt_factor
+        c3 = Procedure(
+            outputs=(e["crime_absent"]),
+            inputs=(f["f3"], f["f11"], f["f12"], f["f13"], f["f14"], f["f15"]),
+            despite=(f["f16"]),
+        )
+        assert str(c3) == "to_effect"
+
     def test_get_terms(self, make_procedure):
         # motel, watt
         assert len(make_procedure["c1"].generic_terms()) == 2
@@ -42,11 +52,11 @@ class TestProcedures:
         )
 
     def test_cannot_add_nonfactor_as_input(self, make_factor):
-        with pytest.raises(TypeError):
+        with pytest.raises(ValidationError):
             Procedure(inputs="factor name", outputs=make_factor["f_shooting"])
 
     def test_cannot_add_entity_as_input(self, make_factor):
-        with pytest.raises(TypeError):
+        with pytest.raises(ValidationError):
             Procedure(inputs=Entity(name="Al"), outputs=make_factor["f_shooting"])
 
     def test_generic_terms(self, make_entity, make_procedure, make_evidence):

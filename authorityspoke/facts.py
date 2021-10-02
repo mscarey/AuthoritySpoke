@@ -594,7 +594,7 @@ class Allegation(Factor, BaseModel):
     :param generic:
     """
 
-    statement: Optional[Fact] = None
+    statement: Fact
     pleading: Optional[Pleading] = None
     name: Optional[str] = None
     absent: bool = False
