@@ -345,8 +345,9 @@ class TestSameMeaning:
         )
         assert directory_original.means(listings_original)
 
-    def test_same_meaning_no_terms(self, make_factor):
-        assert make_factor["f_no_context"].means(make_factor["f_no_context"])
+    def test_same_meaning_no_terms(self, make_predicate):
+        no_context = Fact(predicate=make_predicate["p_no_context"], terms=[])
+        assert no_context.means(no_context)
 
 
 class TestImplication:

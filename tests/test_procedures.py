@@ -25,7 +25,12 @@ class TestProcedures:
     def test_make_procedure_with_evidence_output(self, make_evidence):
         e = make_evidence
         c3 = Procedure(outputs=[e["crime_absent"]])
-        assert str(c3) == "??to_effect"
+        assert "absence of <the evidence" in str(c3)
+
+    def test_make_procedure_with_output_without_context(self, make_predicate):
+        no_context = Fact(predicate=make_predicate["p_no_context"], terms=[])
+        c3 = Procedure(outputs=[no_context])
+        assert "the fact it was false that context was included" in str(c3)
 
     def test_get_terms(self, make_procedure):
         # motel, watt
@@ -108,8 +113,12 @@ class TestProcedureSameMeaning:
     def test_unequal_after_swapping_nonreciprocal_entities(self, make_procedure):
         assert not make_procedure["c2"].means(make_procedure["c2_nonreciprocal_swap"])
 
-    def test_same_meaning_no_context(self, make_procedure):
-        assert make_procedure["c_no_context"].means(make_procedure["c_no_context"])
+    def test_same_meaning_no_context(self, make_factor):
+
+        no_context_fact = make_factor["f_no_context"]
+        c_no_context = Procedure(outputs=(no_context_fact))
+
+        assert c_no_context.means(c_no_context)
 
     def test_explain_same_meaning(self, make_procedure):
         left = make_procedure["c1_factor_and_entity_order"]

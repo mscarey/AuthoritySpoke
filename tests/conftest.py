@@ -578,7 +578,6 @@ def make_factor(make_predicate, make_entity) -> Dict[str, Factor]:
         "f_large_weight": build_fact(p["p_large_weight"], (0,), case_factors=c),
         "f_small_weight": build_fact(p["p_small_weight"], (0,), case_factors=c),
         "f_friends": build_fact(p["p_friends"], (0, 1), case_factors=c),
-        "f_no_context": Fact(predicate=p["p_no_context"], terms=[]),
     }
 
 
@@ -590,91 +589,118 @@ def make_exhibit(
     f = make_factor
     w = watt_factor
     c = make_complex_fact
+    al = Entity(name="Al")
 
     return {
         "shooting_affidavit": Exhibit(
+            offered_by=al,
             form="affidavit",
             statement=f["f_shooting"],
             statement_attribution=e["alice"],
         ),
         "shooting_testimony": Exhibit(
+            offered_by=al,
             form="testimony",
             statement=f["f_shooting"],
             statement_attribution=e["alice"],
         ),
         "no_shooting_testimony": Exhibit(
+            offered_by=al,
             form="testimony",
             statement=f["f_no_shooting"],
             statement_attribution=e["alice"],
         ),
         "no_shooting_entity_order_testimony": Exhibit(
+            offered_by=al,
             form="testimony",
             statement=f["f_no_shooting_entity_order"],
             statement_attribution=e["bob"],
         ),
         "no_shooting_witness_unknown_testimony": Exhibit(
-            form="testimony", statement=f["f_no_shooting"]
+            offered_by=al, form="testimony", statement=f["f_no_shooting"]
         ),
         "no_shooting_witness_unknown_absent_testimony": Exhibit(
-            form="testimony", statement=f["f_no_shooting"], absent=True
+            offered_by=al, form="testimony", statement=f["f_no_shooting"], absent=True
         ),
         "no_shooting_different_witness_testimony": Exhibit(
+            offered_by=al,
             form="testimony",
             statement=f["f_no_shooting"],
             statement_attribution=e["bob"],
         ),
         "reciprocal_testimony": Exhibit(
-            form="testimony", statement=w["f8"], statement_attribution=e["craig"]
+            offered_by=al,
+            form="testimony",
+            statement=w["f8"],
+            statement_attribution=e["craig"],
         ),
         "reciprocal_declaration": Exhibit(
-            form="declaration", statement=w["f8"], statement_attribution=e["craig"]
+            offered_by=al,
+            form="declaration",
+            statement=w["f8"],
+            statement_attribution=e["craig"],
         ),
         "reciprocal_testimony_absent": Exhibit(
+            offered_by=al,
             form="testimony",
             statement=w["f8"],
             statement_attribution=e["craig"],
             absent=True,
         ),
         "reciprocal_testimony_less": Exhibit(
-            form="testimony", statement=w["f8_less"], statement_attribution=e["craig"]
+            offered_by=al,
+            form="testimony",
+            statement=w["f8_less"],
+            statement_attribution=e["craig"],
         ),
         "reciprocal_testimony_specific": Exhibit(
-            form="testimony", statement=w["f8_meters"], statement_attribution=e["craig"]
+            offered_by=al,
+            form="testimony",
+            statement=w["f8_meters"],
+            statement_attribution=e["craig"],
         ),
         "reciprocal_testimony_specific_absent": Exhibit(
+            offered_by=al,
             form="testimony",
             statement=w["f8_meters"],
             statement_attribution=e["craig"],
             absent=True,
         ),
         "relevant_murder_testimony": Exhibit(
+            offered_by=al,
             form="testimony",
             statement=c["f_relevant_murder"],
             statement_attribution=e["alice"],
         ),
         "relevant_murder_nested_swap_testimony": Exhibit(
+            offered_by=al,
             form="testimony",
             statement=c["f_relevant_murder_nested_swap"],
             statement_attribution=e["bob"],
         ),
         "relevant_murder_alice_craig_testimony": Exhibit(
+            offered_by=al,
             form="testimony",
             statement=c["f_relevant_murder_alice_craig"],
             statement_attribution=e["alice"],
         ),
         "large_weight_testimony": Exhibit(
+            offered_by=al,
             form="testimony",
             statement=f["f_large_weight"],
             statement_attribution=e["bob"],
         ),
         "small_weight_testimony": Exhibit(
+            offered_by=al,
             form="testimony",
             statement=f["f_small_weight"],
             statement_attribution=e["bob"],
         ),
-        "generic_exhibit": Exhibit(generic=True),
-        "specific_but_featureless": Exhibit(),
-        "testimony_no_statement": Exhibit(form="testimony"),
+        "generic_exhibit": Exhibit(offered_by=al, generic=True),
+        "specific_but_featureless": Exhibit(
+            offered_by=al,
+        ),
+        "testimony_no_statement": Exhibit(offered_by=al, form="testimony"),
     }
 
 
@@ -807,43 +833,55 @@ def make_evidence(
     w = watt_factor
     x = make_exhibit
     return {
-        "shooting": Evidence(x["shooting_testimony"], to_effect=f["f_crime"]),
-        "shooting_no_effect": Evidence(x["shooting_testimony"]),
-        "no_shooting": Evidence(x["no_shooting_testimony"], to_effect=f["f_no_crime"]),
+        "shooting": Evidence(exhibit=x["shooting_testimony"], to_effect=f["f_crime"]),
+        "shooting_no_effect": Evidence(exhibit=x["shooting_testimony"]),
+        "no_shooting": Evidence(
+            exhibit=x["no_shooting_testimony"], to_effect=f["f_no_crime"]
+        ),
         "no_shooting_absent": Evidence(
-            x["no_shooting_testimony"], to_effect=f["f_no_crime"], absent=True
+            exhibit=x["no_shooting_testimony"], to_effect=f["f_no_crime"], absent=True
         ),
         "no_shooting_entity_order": Evidence(
-            x["no_shooting_entity_order_testimony"],
+            exhibit=x["no_shooting_entity_order_testimony"],
             to_effect=f["f_no_crime_entity_order"],
         ),
         "no_shooting_witness_unknown": Evidence(
-            x["no_shooting_witness_unknown_testimony"], to_effect=f["f_no_crime"]
+            exhibit=x["no_shooting_witness_unknown_testimony"],
+            to_effect=f["f_no_crime"],
         ),
         "no_shooting_witness_unknown_absent": Evidence(
-            x["no_shooting_witness_unknown_testimony"],
+            exhibit=x["no_shooting_witness_unknown_testimony"],
             to_effect=f["f_no_crime"],
             absent=True,
         ),
         # Here the Exhibit is absent, not the Evidence. Pointless distinction?
         "no_shooting_witness_unknown_absent_exhibit": Evidence(
-            x["no_shooting_witness_unknown_absent_testimony"], to_effect=f["f_no_crime"]
+            exhibit=x["no_shooting_witness_unknown_absent_testimony"],
+            to_effect=f["f_no_crime"],
         ),
         "no_shooting_no_effect_entity_order": Evidence(
-            x["no_shooting_entity_order_testimony"]
+            exhibit=x["no_shooting_entity_order_testimony"]
         ),
         "no_shooting_different_witness": Evidence(
-            x["no_shooting_different_witness_testimony"], to_effect=f["f_no_crime"]
+            exhibit=x["no_shooting_different_witness_testimony"],
+            to_effect=f["f_no_crime"],
         ),
-        "reciprocal": Evidence(x["reciprocal_testimony"], to_effect=f["f_no_crime"]),
+        "reciprocal": Evidence(
+            exhibit=x["reciprocal_testimony"], to_effect=f["f_no_crime"]
+        ),
         "crime": Evidence(
-            x["generic_exhibit"], to_effect=f["f_watt_crime"], generic=True
+            exhibit=x["generic_exhibit"], to_effect=f["f_watt_crime"], generic=True
         ),
         "crime_absent": Evidence(
-            x["generic_exhibit"], to_effect=f["f_watt_crime"], absent=True, generic=True
+            exhibit=x["generic_exhibit"],
+            to_effect=f["f_watt_crime"],
+            absent=True,
+            generic=True,
         ),
-        "generic": Evidence(x["generic_exhibit"], generic=True),
-        "generic_absent": Evidence(x["generic_exhibit"], absent=True, generic=True),
+        "generic": Evidence(exhibit=x["generic_exhibit"], generic=True),
+        "generic_absent": Evidence(
+            exhibit=x["generic_exhibit"], absent=True, generic=True
+        ),
     }
 
 
@@ -1221,7 +1259,6 @@ def make_procedure(make_evidence, make_factor, watt_factor) -> Dict[str, Procedu
         "c_output_farther_different_entity": Procedure(
             outputs=(f["f9_more_different_entity"]), inputs=(f["f1"])
         ),
-        "c_no_context": Procedure(outputs=(m["f_no_context"])),
     }
 
 
