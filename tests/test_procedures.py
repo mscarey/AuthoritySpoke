@@ -81,7 +81,7 @@ class TestProcedures:
 
     def test_repr(self, make_procedure):
         rep = repr(make_procedure["c3"])
-        assert "to_effect=Fact(predicate=Predicate(template='$person committed" in rep
+        assert "to_effect=Fact(predicate=Predicate(content='$person committed" in rep
 
     def test_entities_of_inputs_for_identical_procedure(
         self, watt_factor, make_procedure, watt_mentioned
@@ -91,7 +91,7 @@ class TestProcedures:
         c1_again = make_procedure["c1_again"]
         assert f["f1"] in c1.inputs
         assert f["f1"] in c1_again.inputs
-        assert f["f1"].terms == (watt_mentioned[0],)
+        assert f["f1"].terms == [watt_mentioned[0]]
         assert f["f2"] in c1.inputs
         assert f["f2"] in c1_again.inputs
         assert f["f2"].terms == [watt_mentioned[1], watt_mentioned[0]]

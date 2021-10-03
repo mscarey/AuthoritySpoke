@@ -6,7 +6,7 @@ justopinion~=0.2.4
 git+git://github.com/mscarey/legislice.git@348a6a8e93b75e535d81f2796fdfc0a1dc5ddf7e#egg=legislice
 marshmallow~=3.13
 marshmallow-oneofschema
-git+git://github.com/mscarey/nettlesome.git@f184fe4221d61b18922ac316f9c8499cdc2d71d1#egg=nettlesome
+git+git://github.com/mscarey/nettlesome.git@2dea1761e893fac1eccdcf0f4cdea97e551741d3#egg=nettlesome
 pint>=0.15
 python-dotenv
 python-ranges~=0.2.1
