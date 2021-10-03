@@ -578,7 +578,7 @@ class Procedure(Comparable, BaseModel):
         def other_despite_implied(context: Explanation):
             despite_or_input = FactorGroup((*self.despite, *self.inputs))
             yield from despite_or_input.explanations_implication(
-                other.despite,
+                other.despite_group,
                 context=context,
             )
 
@@ -690,13 +690,13 @@ class Procedure(Comparable, BaseModel):
         return self.__class__(**new_dict)
 
     def set_inputs(self, factors: Sequence[Factor]) -> None:
-        self.inputs = FactorGroup(factors)
+        self.inputs = FactorGroup(factors).sequence
 
     def set_despite(self, factors: Sequence[Factor]) -> None:
-        self.despite = FactorGroup(factors)
+        self.despite = FactorGroup(factors).sequence
 
     def set_outputs(self, factors: Sequence[Factor]) -> None:
-        self.outputs = FactorGroup(factors)
+        self.outputs = FactorGroup(factors).sequence
 
     def triggers_next_procedure(
         self,
@@ -727,10 +727,10 @@ class Procedure(Comparable, BaseModel):
             context = Explanation.from_context(context)
 
         for explanation_1 in self_output_or_input.explanations_implication(
-            other.inputs, context=context
+            other.inputs_group, context=context
         ):
             yield from self_despite_or_input.explanations_implication(
-                other.despite, context=explanation_1
+                other.despite_group, context=explanation_1
             )
 
     def __or__(self, other: Comparable) -> Optional[Comparable]:

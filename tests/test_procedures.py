@@ -113,10 +113,10 @@ class TestProcedureSameMeaning:
     def test_unequal_after_swapping_nonreciprocal_entities(self, make_procedure):
         assert not make_procedure["c2"].means(make_procedure["c2_nonreciprocal_swap"])
 
-    def test_same_meaning_no_context(self, make_factor):
+    def test_same_meaning_no_context(self, make_predicate):
 
-        no_context_fact = make_factor["f_no_context"]
-        c_no_context = Procedure(outputs=(no_context_fact))
+        no_context = Fact(predicate=make_predicate["p_no_context"], terms=[])
+        c_no_context = Procedure(outputs=(no_context))
 
         assert c_no_context.means(c_no_context)
 
