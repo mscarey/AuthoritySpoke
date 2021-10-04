@@ -212,7 +212,6 @@ def read_holdings_with_anchors(
         a list matching :class:`.Holding`\s to selectors and
         an index matching :class:`.Factor`\s to selectors.
     """
-    schema = schemas_yaml.AnchoredHoldingsSchema()
 
     record, enactment_index = collect_enactments(record)
     if client:
@@ -223,7 +222,6 @@ def read_holdings_with_anchors(
     if not record.get("enactment_anchors"):
         record["enactment_anchors"] = []
     record["enactment_anchors"] = record["enactment_anchors"] + anchors
-    schema.context["enactment_index"] = enactment_index
 
     record["holdings"], factor_index = index_names(record["holdings"])
 
@@ -232,6 +230,9 @@ def read_holdings_with_anchors(
     if not record.get("factor_anchors"):
         record["factor_anchors"] = []
     record["factor_anchors"] = record["factor_anchors"] + anchors
+
+    schema = schemas_yaml.AnchoredHoldingsSchema()
+    schema.context["enactment_index"] = enactment_index
     schema.context["mentioned"] = factor_index
 
     holdings_with_anchors, named_anchors, enactment_anchors = schema.load(
