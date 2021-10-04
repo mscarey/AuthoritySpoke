@@ -35,12 +35,13 @@ from nettlesome.factors import Factor
 from nettlesome.formatting import indented, wrapped
 from nettlesome.groups import FactorGroup
 
+from pydantic import BaseModel, validator
+
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
 
 
-@dataclass()
-class Holding(Comparable):
+class Holding(Comparable, BaseModel):
     """
     An :class:`.Opinion`\'s announcement that it posits or rejects a legal :class:`.Rule`.
 
@@ -82,9 +83,10 @@ class Holding(Comparable):
     generic: bool = False
     absent: bool = False
 
-    def __post_init__(self):
-        if self.exclusive:
-            if not self.rule_valid:
+    @validator("exclusive")
+    def not_invalid_and_exclusive(cls, v: bool, values) -> bool:
+        if v:
+            if not values["rule_valid"]:
                 raise NotImplementedError(
                     "The ability to state that it is not 'valid' to assert "
                     + "that a Rule is the 'exclusive' way to reach an output is "
@@ -92,14 +94,20 @@ class Holding(Comparable):
                     + "'exclusive' is True. Try expressing this in another way "
                     + "without the 'exclusive' keyword."
                 )
-            if not self.decided:
+        return v
+
+    @validator("exclusive")
+    def not_undecided_and_exclusive(cls, v: bool, values) -> bool:
+        if v:
+            if not values["decided"]:
                 raise NotImplementedError(
                     "The ability to state that it is not 'decided' whether "
                     + "a Rule is the 'exclusive' way to reach an output is "
                     + "not implemented. Try expressing this in another way "
                     + "without the 'exclusive' keyword."
                 )
-            self.rule.procedure.valid_for_exclusive_tag()
+            values["rule"].procedure.valid_for_exclusive_tag()
+        return v
 
     @classmethod
     def from_factors(
@@ -135,17 +143,17 @@ class Holding(Comparable):
     @property
     def despite(self):
         """Get Factors that specifically don't preclude application of the Holding."""
-        return self.rule.procedure.despite
+        return self.rule.procedure.despite_group
 
     @property
     def inputs(self):
         """Get inputs from Procedure."""
-        return self.rule.procedure.inputs
+        return self.rule.procedure.inputs_group
 
     @property
     def outputs(self):
         """Get outputs from Procedure."""
-        return self.rule.procedure.outputs
+        return self.rule.procedure.outputs_group
 
     @property
     def enactments(self):
@@ -386,7 +394,9 @@ class Holding(Comparable):
             raise TypeError(f"Type Holding cannot be compared with type {type(other)}.")
         if not isinstance(context, Explanation):
             context = Explanation.from_context(context)
-        if isinstance(other, (Rule, Procedure)):
+        if isinstance(other, Procedure):
+            other = Rule(procedure=other)
+        if isinstance(other, Rule):
             other = Holding(rule=other)
         if not isinstance(other, self.__class__):
             if context:

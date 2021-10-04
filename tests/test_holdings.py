@@ -30,7 +30,7 @@ legislice_client = Client(api_token=TOKEN)
 
 class TestHolding:
     def test_complex_string(self, make_complex_rule):
-        holding = Holding(make_complex_rule["accept_murder_fact_from_relevance"])
+        holding = Holding(rule=make_complex_rule["accept_murder_fact_from_relevance"])
         string = " ".join(x.strip() for x in str(holding).splitlines())
         assert "is relevant to show the fact that <Alice>" in string.replace("/n", " ")
 
@@ -59,20 +59,27 @@ class TestHolding:
 
     def test_holding_without_inputs_not_exclusive(self, make_factor):
         with pytest.raises(ValueError):
-            Holding(Rule(Procedure(outputs=make_factor["f_no_crime"])), exclusive=True)
+            Holding(
+                rule=Rule(procedure=Procedure(outputs=make_factor["f_no_crime"])),
+                exclusive=True,
+            )
 
     def test_holding_with_absent_output_not_exclusive(self, make_exhibit):
         with pytest.raises(ValueError):
             Holding(
-                Rule(Procedure(outputs=make_exhibit["reciprocal_testimony_absent"])),
+                rule=Rule(
+                    procedure=Procedure(
+                        outputs=make_exhibit["reciprocal_testimony_absent"]
+                    )
+                ),
                 exclusive=True,
             )
 
     def test_holding_with_two_outputs_not_exclusive(self, make_factor):
         with pytest.raises(ValueError):
             Holding(
-                Rule(
-                    Procedure(
+                rule=Rule(
+                    procedure=Procedure(
                         outputs=[make_factor["f_no_crime"], make_factor["f_shooting"]]
                     )
                 ),
