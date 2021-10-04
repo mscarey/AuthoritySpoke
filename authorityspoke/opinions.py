@@ -361,8 +361,8 @@ class OpinionReading(Comparable):
             will provide the context for the new holding in the
             present case.
         """
-        if isinstance(holdings, Iterable):
-            self.posit_holdings(
+        if isinstance(holdings, (Holding, Rule, HoldingWithAnchors)):
+            self.posit_holding(
                 holdings,
                 holding_anchors=holding_anchors,
                 named_anchors=named_anchors,
@@ -370,7 +370,7 @@ class OpinionReading(Comparable):
                 context=context,
             )
         else:
-            self.posit_holding(
+            self.posit_holdings(
                 holdings,
                 holding_anchors=holding_anchors,
                 named_anchors=named_anchors,
