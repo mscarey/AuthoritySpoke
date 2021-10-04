@@ -332,7 +332,7 @@ class Procedure(Comparable, BaseModel):
         :returns:
             None
         """
-        new_factors = self.inputs.add_or_raise_error(incoming)
+        new_factors = self.inputs_group.add_or_raise_error(incoming)
         self.set_inputs(new_factors)
 
     def with_factor(self, incoming: Factor) -> Optional[Procedure]:

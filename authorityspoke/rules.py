@@ -110,15 +110,15 @@ class Rule(Comparable, BaseModel):
 
     @property
     def despite(self):
-        return self.procedure.despite
+        return self.procedure.despite_group
 
     @property
     def inputs(self):
-        return self.procedure.inputs
+        return self.procedure.inputs_group
 
     @property
     def outputs(self):
-        return self.procedure.outputs
+        return self.procedure.outputs_group
 
     @property
     def recursive_terms(self) -> Dict[str, Term]:

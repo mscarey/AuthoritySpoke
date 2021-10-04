@@ -764,26 +764,26 @@ def make_complex_rule(
 ) -> Dict[str, Rule]:
     return {
         "accept_relevance_testimony": Rule(
-            Procedure(
+            procedure=Procedure(
                 inputs=make_exhibit["relevant_murder_testimony"],
                 outputs=make_complex_fact["f_relevant_murder"],
             )
         ),
         "accept_relevance_testimony_ALL": Rule(
-            Procedure(
+            procedure=Procedure(
                 inputs=make_exhibit["relevant_murder_testimony"],
                 outputs=make_complex_fact["f_relevant_murder"],
             ),
             universal=True,
         ),
         "accept_murder_fact_from_relevance": Rule(
-            Procedure(
+            procedure=Procedure(
                 inputs=make_complex_fact["f_relevant_murder"],
                 outputs=make_factor["f_murder"],
             )
         ),
         "accept_murder_fact_from_relevance_and_shooting": Rule(
-            Procedure(
+            procedure=Procedure(
                 inputs=[
                     make_complex_fact["f_relevant_murder"],
                     make_factor["f_shooting"],
@@ -792,7 +792,7 @@ def make_complex_rule(
             )
         ),
         "accept_murder_fact_from_relevance_and_shooting_craig": Rule(
-            Procedure(
+            procedure=Procedure(
                 inputs=[
                     make_complex_fact["f_relevant_murder_craig"],
                     make_factor["f_shooting_craig"],
@@ -801,21 +801,21 @@ def make_complex_rule(
             )
         ),
         "accept_small_weight_reliable": Rule(
-            Procedure(
+            procedure=Procedure(
                 inputs=[make_factor["f_small_weight"], make_factor["f_friends"]],
                 outputs=make_fact_about_exhibit["f_reliable_small_weight"],
             ),
             universal=True,
         ),
         "accept_small_weight_reliable_more_evidence": Rule(
-            Procedure(
+            procedure=Procedure(
                 inputs=[make_factor["f_large_weight"], make_factor["f_friends"]],
                 outputs=make_fact_about_exhibit["f_reliable_small_weight"],
             ),
             universal=True,
         ),
         "accept_large_weight_reliable": Rule(
-            Procedure(
+            procedure=Procedure(
                 inputs=[make_factor["f_small_weight"], make_factor["f_friends"]],
                 outputs=make_fact_about_exhibit["f_reliable_large_weight"],
             ),

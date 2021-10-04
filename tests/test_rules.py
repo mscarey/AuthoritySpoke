@@ -833,7 +833,9 @@ class TestAddition:
             make_complex_rule["accept_relevance_testimony_ALL"] + due_process_rule
         )
         assert len(combined.outputs) == 2
-        assert "the fact that <Alice> murdered <Bob>" in str(combined.outputs)
+        assert "the fact that <Alice> murdered <Bob>" in [
+            str(output) for output in combined.outputs
+        ]
         assert "ATTRIBUTED TO <Alice>" in str(combined)
 
 
