@@ -7,7 +7,7 @@ from authorityspoke.facts import Fact, Predicate, Exhibit
 
 class TestExhibits:
     def test_make_exhibit_object(self):
-        e = Exhibit(form="testimony")
+        e = Exhibit(form="testimony", offered_by=Entity(name="Alice"))
         assert not e.absent
 
     def test_exhibit_short_string(self, make_exhibit):
@@ -21,6 +21,7 @@ class TestExhibits:
 
     def test_comma_when_exhibit_is_in_fact(self):
         coin = Exhibit(
+            offered_by=Entity(name="Alice"),
             form="token",
             statement=Fact(
                 predicate=Predicate(

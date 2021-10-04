@@ -452,8 +452,8 @@ class Exhibit(Factor, BaseModel):
     ) -> Iterator[ContextRegister]:
         if (
             isinstance(other, self.__class__)
-            and self.predicate.means(other.predicate)
             and self.form == other.form
+            and self.offered_by.means(other.offered_by)
         ):
             yield from super()._means_if_concrete(other, context)
 
@@ -595,12 +595,12 @@ class Allegation(Factor, BaseModel):
     :param generic:
     """
 
-    statement: Fact
+    fact: Fact
     pleading: Optional[Pleading] = None
     name: Optional[str] = None
     absent: bool = False
     generic: bool = False
-    context_factor_names: ClassVar[Tuple[str, ...]] = ("statement", "pleading")
+    context_factor_names: ClassVar[Tuple[str, ...]] = ("fact", "pleading")
 
     @property
     def wrapped_string(self):
