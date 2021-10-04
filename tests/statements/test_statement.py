@@ -24,7 +24,7 @@ class TestStatements:
 
     def test_string_representation_of_factor(self):
         city = Predicate(content="$place was a city")
-        statement = Statement(city, terms=Entity(name="New York"))
+        statement = Statement(predicate=city, terms=Entity(name="New York"))
         assert "<New York> was a city" in str(statement)
 
     def test_string_representation_of_absent_factor(self):
@@ -82,10 +82,11 @@ class TestStatements:
         predicate_shot = Predicate(content="$shooter shot $victim")
         predicate_told = Predicate(content="$speaker told $hearer $statement")
         shot = Statement(
-            predicate_shot, terms=[Entity(name="Alice"), Entity(name="Bob")]
+            predicate=predicate_shot, terms=[Entity(name="Alice"), Entity(name="Bob")]
         )
         told = Statement(
-            predicate_told, terms=[Entity(name="Henry"), Entity(name="Jenna"), shot]
+            predicate=predicate_told,
+            terms=[Entity(name="Henry"), Entity(name="Jenna"), shot],
         )
 
         fact_text = str(told)
@@ -98,12 +99,13 @@ class TestStatements:
         predicate_no_gun = Predicate(content="$suspect had a gun", truth=False)
         predicate_told = Predicate(content="$speaker told $hearer $statement")
         shot = Statement(
-            predicate_shot, terms=[Entity(name="Alice"), Entity(name="Bob")]
+            predicate=predicate_shot, terms=[Entity(name="Alice"), Entity(name="Bob")]
         )
         told = Statement(
-            predicate_told, terms=[Entity(name="Henry"), Entity(name="Jenna"), shot]
+            predicate=predicate_told,
+            terms=[Entity(name="Henry"), Entity(name="Jenna"), shot],
         )
-        no_gun = Statement(predicate_no_gun, terms=Entity(name="Dan"))
+        no_gun = Statement(predicate=predicate_no_gun, terms=Entity(name="Dan"))
 
         changes = ContextRegister.from_lists(
             [Entity(name="Alice"), Entity(name="Henry"), Entity(name="Jenna"), shot],
@@ -118,7 +120,7 @@ class TestStatements:
     def test_too_much_info_to_change_context(self):
         """Test that a list of terms to replace requires "changes" to be consistent."""
         statement = Fact(
-            "$person1 loved $person2",
+            predicate="$person1 loved $person2",
             terms=[Entity(name="Donald"), Entity(name="Daisy")],
         )
         new = statement.new_context(
@@ -202,7 +204,7 @@ class TestStatements:
 
     def test_repeated_placeholder_in_fact(self):
         predicate = Predicate(
-            "the precise formulation "
+            content="the precise formulation "
             "of ${program}'s code was necessary for $program to work",
             truth=False,
         )
