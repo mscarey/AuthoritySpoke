@@ -1272,10 +1272,18 @@ def real_holding(make_procedure, e_search_clause) -> Dict[str, Rule]:
     c = make_procedure
 
     return {
-        "h1": Holding(rule=Rule(c["c1"], enactments=e_search_clause, mandatory=True)),
-        "h2": Holding(rule=Rule(c["c2"], enactments=e_search_clause, mandatory=True)),
-        "h3": Holding(rule=Rule(c["c3"], enactments=e_search_clause, mandatory=True)),
-        "h4": Holding(rule=Rule(c["c4"], enactments=e_search_clause, mandatory=True)),
+        "h1": Holding(
+            rule=Rule(procedure=c["c1"], enactments=e_search_clause, mandatory=True)
+        ),
+        "h2": Holding(
+            rule=Rule(procedure=c["c2"], enactments=e_search_clause, mandatory=True)
+        ),
+        "h3": Holding(
+            rule=Rule(procedure=c["c3"], enactments=e_search_clause, mandatory=True)
+        ),
+        "h4": Holding(
+            rule=Rule(procedure=c["c4"], enactments=e_search_clause, mandatory=True)
+        ),
     }
 
 
@@ -1286,165 +1294,196 @@ def make_rule(
     c = make_procedure
 
     return {
-        "h1": Rule(c["c1"], enactments=e_search_clause),
-        "h2": Rule(c["c2"], enactments=e_search_clause),
-        "h3": Rule(c["c3"], enactments=e_search_clause),
-        "h1_again": Rule(c["c1"], enactments=e_search_clause),
-        "h1_entity_order": Rule(c["c1_entity_order"], enactments=e_search_clause),
-        "h1_easy": Rule(c["c1_easy"], enactments=e_search_clause),
-        "h2_without_cite": Rule(c["c2"]),
-        "h2_fourth_a_cite": Rule(c["c2"], enactments=e_fourth_a),
+        "h1": Rule(procedure=c["c1"], enactments=e_search_clause),
+        "h2": Rule(procedure=c["c2"], enactments=e_search_clause),
+        "h3": Rule(procedure=c["c3"], enactments=e_search_clause),
+        "h1_again": Rule(procedure=c["c1"], enactments=e_search_clause),
+        "h1_entity_order": Rule(
+            procedure=c["c1_entity_order"], enactments=e_search_clause
+        ),
+        "h1_easy": Rule(procedure=c["c1_easy"], enactments=e_search_clause),
+        "h2_without_cite": Rule(procedure=c["c2"]),
+        "h2_fourth_a_cite": Rule(procedure=c["c2"], enactments=e_fourth_a),
         "h2_despite_due_process": Rule(
-            c["c2"],
+            procedure=c["c2"],
             enactments=e_search_clause,
             enactments_despite=e_due_process_5,
         ),
         "h2_ALL_due_process": Rule(
-            c["c2"],
+            procedure=c["c2"],
             enactments=(e_search_clause, e_due_process_5),
             mandatory=False,
             universal=True,
         ),
         "h2_ALL": Rule(
-            c["c2"], enactments=e_search_clause, mandatory=False, universal=True
+            procedure=c["c2"],
+            enactments=e_search_clause,
+            mandatory=False,
+            universal=True,
         ),
         "h2_ALL_MAY_output_false": Rule(
-            c["c2_output_false"],
+            procedure=c["c2_output_false"],
             enactments=e_search_clause,
             mandatory=False,
             universal=True,
         ),
         "h2_ALL_MUST": Rule(
-            c["c2"], enactments=e_search_clause, mandatory=True, universal=True
+            procedure=c["c2"],
+            enactments=e_search_clause,
+            mandatory=True,
+            universal=True,
         ),
         "h2_ALL_MUST_output_false": Rule(
-            c["c2_output_false"],
+            procedure=c["c2_output_false"],
             enactments=e_search_clause,
             mandatory=True,
             universal=True,
         ),
-        "h2_exact_quantity": Rule(c["c2_exact_quantity"], enactments=e_search_clause),
+        "h2_exact_quantity": Rule(
+            procedure=c["c2_exact_quantity"], enactments=e_search_clause
+        ),
         "h2_irrelevant_inputs": Rule(
-            c["c2_irrelevant_inputs"], enactments=e_search_clause
+            procedure=c["c2_irrelevant_inputs"], enactments=e_search_clause
         ),
         "h2_irrelevant_inputs_ALL": Rule(
-            c["c2_irrelevant_inputs"], enactments=e_search_clause, universal=True
+            procedure=c["c2_irrelevant_inputs"],
+            enactments=e_search_clause,
+            universal=True,
         ),
         "h2_irrelevant_inputs_MUST": Rule(
-            c["c2_irrelevant_inputs"], enactments=e_search_clause, mandatory=True
+            procedure=c["c2_irrelevant_inputs"],
+            enactments=e_search_clause,
+            mandatory=True,
         ),
         "h2_irrelevant_inputs_ALL_MUST": Rule(
-            c["c2_irrelevant_inputs"],
+            procedure=c["c2_irrelevant_inputs"],
             enactments=e_search_clause,
             mandatory=True,
             universal=True,
         ),
-        "h2_reciprocal_swap": Rule(c["c2_reciprocal_swap"], enactments=e_search_clause),
+        "h2_reciprocal_swap": Rule(
+            procedure=c["c2_reciprocal_swap"], enactments=e_search_clause
+        ),
         "h2_exact_in_despite": Rule(
-            c["c2_exact_in_despite"], enactments=e_search_clause
+            procedure=c["c2_exact_in_despite"], enactments=e_search_clause
         ),
         "h2_exact_in_despite_ALL": Rule(
-            c["c2_exact_in_despite"],
+            procedure=c["c2_exact_in_despite"],
             enactments=e_search_clause,
             mandatory=False,
             universal=True,
         ),
         "h2_exact_in_despite_ALL_entity_order": Rule(
-            c["c2_exact_in_despite_entity_order"],
+            procedure=c["c2_exact_in_despite_entity_order"],
             enactments=e_search_clause,
             mandatory=False,
             universal=True,
         ),
         "h2_exact_quantity_ALL": Rule(
-            c["c2_exact_quantity"],
+            procedure=c["c2_exact_quantity"],
             enactments=e_search_clause,
             mandatory=False,
             universal=True,
         ),
         "h2_MUST": Rule(
-            c["c2"], enactments=e_search_clause, mandatory=True, universal=False
+            procedure=c["c2"],
+            enactments=e_search_clause,
+            mandatory=True,
+            universal=False,
         ),
-        "h2_output_absent": Rule(c["c2_output_absent"], enactments=e_search_clause),
-        "h2_output_false": Rule(c["c2_output_false"], enactments=e_search_clause),
+        "h2_output_absent": Rule(
+            procedure=c["c2_output_absent"], enactments=e_search_clause
+        ),
+        "h2_output_false": Rule(
+            procedure=c["c2_output_false"], enactments=e_search_clause
+        ),
         "h2_output_false_ALL": Rule(
-            c["c2_output_false"], enactments=e_search_clause, universal=True
+            procedure=c["c2_output_false"], enactments=e_search_clause, universal=True
         ),
         "h2_output_false_ALL_MUST": Rule(
-            c["c2_output_false"],
+            procedure=c["c2_output_false"],
             enactments=e_search_clause,
             mandatory=True,
             universal=True,
         ),
         "h2_output_absent_false": Rule(
-            c["c2_output_absent_false"], enactments=e_search_clause
+            procedure=c["c2_output_absent_false"], enactments=e_search_clause
         ),
         "h2_SOME_MUST_output_false": Rule(
-            c["c2_output_false"],
+            procedure=c["c2_output_false"],
             enactments=e_search_clause,
             mandatory=True,
             universal=False,
         ),
         "h2_SOME_MUST_output_absent": Rule(
-            c["c2_output_absent"],
+            procedure=c["c2_output_absent"],
             enactments=e_search_clause,
             mandatory=True,
             universal=False,
         ),
-        "h3_ALL": Rule(c["c3"], enactments=e_search_clause, universal=True),
-        "h3_fewer_inputs": Rule(c["c3_fewer_inputs"], enactments=e_search_clause),
+        "h3_ALL": Rule(procedure=c["c3"], enactments=e_search_clause, universal=True),
+        "h3_fewer_inputs": Rule(
+            procedure=c["c3_fewer_inputs"], enactments=e_search_clause
+        ),
         "h3_fewer_inputs_ALL": Rule(
-            c["c3_fewer_inputs"], enactments=e_search_clause, universal=True
+            procedure=c["c3_fewer_inputs"], enactments=e_search_clause, universal=True
         ),
         "h_near_means_curtilage": Rule(
-            c["c_near_means_curtilage"], enactments=e_search_clause
+            procedure=c["c_near_means_curtilage"], enactments=e_search_clause
         ),
         "h_near_means_curtilage_even_if": Rule(
-            c["c_near_means_curtilage_even_if"], enactments=e_search_clause
+            procedure=c["c_near_means_curtilage_even_if"], enactments=e_search_clause
         ),
         "h_near_means_curtilage_ALL": Rule(
-            c["c_near_means_curtilage"], enactments=e_search_clause, universal=True
+            procedure=c["c_near_means_curtilage"],
+            enactments=e_search_clause,
+            universal=True,
         ),
         "h_near_means_curtilage_ALL_MUST": Rule(
-            c["c_near_means_curtilage"],
+            procedure=c["c_near_means_curtilage"],
             enactments=e_search_clause,
             mandatory=True,
             universal=True,
         ),
         "h_near_means_no_curtilage": Rule(
-            c["c_near_means_no_curtilage"], enactments=e_search_clause
+            procedure=c["c_near_means_no_curtilage"], enactments=e_search_clause
         ),
         "h_near_means_no_curtilage_ALL": Rule(
-            c["c_near_means_no_curtilage"],
+            procedure=c["c_near_means_no_curtilage"],
             enactments=e_search_clause,
             universal=True,
         ),
         "h_near_means_no_curtilage_ALL_MUST": Rule(
-            c["c_near_means_no_curtilage"],
+            procedure=c["c_near_means_no_curtilage"],
             enactments=e_search_clause,
             mandatory=True,
             universal=True,
         ),
         "h_nearer_means_curtilage": Rule(
-            c["c_nearer_means_curtilage"], enactments=e_search_clause
+            procedure=c["c_nearer_means_curtilage"], enactments=e_search_clause
         ),
         "h_nearer_means_curtilage_ALL": Rule(
-            c["c_nearer_means_curtilage"], enactments=e_search_clause, universal=True
+            procedure=c["c_nearer_means_curtilage"],
+            enactments=e_search_clause,
+            universal=True,
         ),
         "h_nearer_means_curtilage_MUST": Rule(
-            c["c_nearer_means_curtilage"], enactments=e_search_clause, mandatory=True
+            procedure=c["c_nearer_means_curtilage"],
+            enactments=e_search_clause,
+            mandatory=True,
         ),
-        "h_far_means_no_curtilage": Rule(c["c_far_means_no_curtilage"]),
+        "h_far_means_no_curtilage": Rule(procedure=c["c_far_means_no_curtilage"]),
         "h_exact_means_no_curtilage_ALL": Rule(
-            c["c_exact_means_no_curtilage"], universal=True
+            procedure=c["c_exact_means_no_curtilage"], universal=True
         ),
         "h_far_means_no_curtilage_ALL": Rule(
-            c["c_far_means_no_curtilage"], universal=True
+            procedure=c["c_far_means_no_curtilage"], universal=True
         ),
         "h_output_distance_less": Rule(
-            c["c_output_distance_less"], universal=True, mandatory=True
+            procedure=c["c_output_distance_less"], universal=True, mandatory=True
         ),
         "h_output_farther_different_entity": Rule(
-            c["c_output_farther_different_entity"]
+            procedure=c["c_output_farther_different_entity"]
         ),
     }
 

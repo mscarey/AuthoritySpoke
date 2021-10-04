@@ -11,7 +11,8 @@ from copy import deepcopy
 from typing import Any, ClassVar, Dict, Iterable, Iterator, Type
 from typing import List, Optional, Sequence, Tuple, Union
 
-from pydantic import ValidationError
+from pydantic import BaseModel, ValidationError
+from pydantic.class_validators import validator
 
 from legislice.enactments import Enactment, EnactmentPassage
 from legislice.groups import EnactmentGroup
@@ -28,7 +29,7 @@ from nettlesome.formatting import indented
 from authorityspoke.procedures import Procedure
 
 
-class Rule(Comparable):
+class Rule(Comparable, BaseModel):
     r"""
     A statement of a legal doctrine about a :class:`.Procedure` for litigation.
 
@@ -75,58 +76,37 @@ class Rule(Comparable):
         object.
     """
 
+    procedure: Procedure
+    enactments: EnactmentGroup = EnactmentGroup()
+    enactments_despite: EnactmentGroup = EnactmentGroup()
+    mandatory: bool = False
+    universal: bool = False
+    generic: bool = False
+    absent: bool = False
+    name: Optional[str] = None
     context_factor_names: ClassVar[Tuple[str, ...]] = ("procedure",)
     enactment_attr_names: ClassVar[Tuple[str, ...]] = (
         "enactments",
         "enactments_despite",
     )
 
-    def __init__(
-        self,
-        procedure: Procedure,
-        enactments: Optional[
-            Union[Enactment, EnactmentGroup, Sequence[Enactment]]
-        ] = None,
-        enactments_despite: Optional[
-            Union[Enactment, EnactmentGroup, Sequence[Enactment]]
-        ] = None,
-        mandatory: bool = False,
-        universal: bool = False,
-        generic: bool = False,
-        absent: bool = False,
-        name: Optional[str] = None,
-    ):
-        self.procedure = procedure
+    @validator("enactments", "enactments_despite", pre=True)
+    def validate_enactment_groups(
+        cls, v: Union[EnactmentPassage, Sequence[EnactmentPassage], EnactmentGroup]
+    ) -> EnactmentGroup:
+        if not isinstance(v, EnactmentGroup):
+            try:
+                v = EnactmentGroup(passages=list(v)) if v else EnactmentGroup()
+            except ValidationError:
+                v = EnactmentGroup(passages=[v])
+        return v
 
-        # TODO: use a pydantic validator to standardize the enactments
-        try:
-            self.enactments = (
-                EnactmentGroup(passages=list(enactments))
-                if enactments
-                else EnactmentGroup()
-            )
-        except ValidationError:
-            self.enactments = EnactmentGroup(passages=[enactments])
-        try:
-            self.enactments_despite = (
-                EnactmentGroup(passages=list(enactments_despite))
-                if enactments_despite
-                else EnactmentGroup()
-            )
-        except ValidationError:
-            self.enactments_despite = EnactmentGroup(passages=[enactments_despite])
-        self.mandatory = mandatory
-        self.universal = universal
-        self.generic = generic
-        self.absent = False
-        self.name = name
-
-        for enactment in self.enactments:
+    @validator("enactments", "enactments_despite", pre=True)
+    def select_enactment_text(cls, v: EnactmentGroup) -> EnactmentGroup:
+        for enactment in v:
             if not enactment.selected_text():
                 enactment.select_all()
-        for despite in self.enactments_despite:
-            if not despite.selected_text():
-                despite.select_all()
+        return v
 
     @property
     def despite(self):

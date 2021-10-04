@@ -687,23 +687,31 @@ class TestAddition:
         three = Entity(name="the number three")
 
         fact_not_original = Rule(
-            Procedure(
-                inputs=Fact(Predicate(content="$work was a fact"), terms=context),
+            procedure=Procedure(
+                inputs=Fact(
+                    predicate=Predicate(content="$work was a fact"), terms=context
+                ),
                 outputs=Fact(
-                    Predicate(content="$work was an original work", truth=False),
+                    predicate=Predicate(
+                        content="$work was an original work", truth=False
+                    ),
                     terms=context,
                 ),
             ),
             universal=True,
         )
         unoriginal_not_copyrightable = Rule(
-            Procedure(
+            procedure=Procedure(
                 inputs=Fact(
-                    Predicate(content="$work was an original work", truth=False),
+                    predicate=Predicate(
+                        content="$work was an original work", truth=False
+                    ),
                     terms=three,
                 ),
                 outputs=Fact(
-                    Predicate(content="${work} was copyrightable", truth=False),
+                    predicate=Predicate(
+                        content="${work} was copyrightable", truth=False
+                    ),
                     terms=three,
                 ),
             ),
@@ -717,7 +725,7 @@ class TestAddition:
         )
         assert len(facts_not_copyrightable.outputs) == 2
         assert "false that <the Pythagorean theorem> was copyrightable" in str(
-            facts_not_copyrightable.outputs
+            facts_not_copyrightable
         )
 
     def test_add_rules_with_duplicate_enactment_text(
@@ -794,14 +802,14 @@ class TestAddition:
         self, make_factor, make_exhibit, make_complex_fact
     ):
         accept_relevance_testimony_ALL = Rule(
-            Procedure(
+            procedure=Procedure(
                 inputs=make_exhibit["relevant_murder_testimony"],
                 outputs=make_complex_fact["f_relevant_murder"],
             ),
             universal=True,
         )
         accept_murder_fact_ALL = Rule(
-            Procedure(
+            procedure=Procedure(
                 inputs=make_complex_fact["f_relevant_murder"],
                 outputs=make_factor["f_murder"],
             ),

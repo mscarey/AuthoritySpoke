@@ -686,7 +686,6 @@ class Procedure(Comparable, BaseModel):
             new_dict[name] = tuple(
                 factor.new_context(changes) for factor in new_dict[name]
             )
-        new_dict.pop("context_factor_names")
         return self.__class__(**new_dict)
 
     def set_inputs(self, factors: Sequence[Factor]) -> None:
