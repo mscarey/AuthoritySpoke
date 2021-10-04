@@ -226,9 +226,9 @@ class Fact(Factor, BaseModel):
     def _means_if_concrete(
         self, other: Comparable, context: Explanation
     ) -> Iterator[Explanation]:
-        if self.standard_of_proof == other.__dict__.get("standard_of_proof") and len(
-            self.terms
-        ) == len(other.terms):
+        if self.standard_of_proof == other.__dict__.get(
+            "standard_of_proof"
+        ) and self.predicate.means(other.predicate):
             yield from super()._means_if_concrete(other, context)
 
     def __len__(self):

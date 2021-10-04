@@ -935,8 +935,8 @@ class TestContradiction:
         )
         alice = Entity(name="Alice")
         bob = Entity(name="Bob")
-        alice_rich = Statement(p_large_weight, terms=alice)
-        bob_poor = Statement(p_small_weight, terms=bob)
+        alice_rich = Statement(predicate=p_large_weight, terms=alice)
+        bob_poor = Statement(predicate=p_small_weight, terms=bob)
         assert alice_rich.contradicts(bob_poor)
 
     def test_inconsistent_statements_about_corresponding_entities(self):
@@ -957,8 +957,8 @@ class TestContradiction:
         )
         alice = Entity(name="Alice")
         bob = Entity(name="Bob")
-        alice_rich = Statement(p_large_weight, terms=alice)
-        bob_poor = Statement(p_small_weight, terms=bob)
+        alice_rich = Statement(predicate=p_large_weight, terms=alice)
+        bob_poor = Statement(predicate=p_small_weight, terms=bob)
         register = ContextRegister()
         register.insert_pair(alice, alice)
         assert not alice_rich.contradicts(bob_poor, context=register)
