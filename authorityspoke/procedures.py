@@ -345,7 +345,7 @@ class Procedure(Comparable, BaseModel):
         :returns:
             a new version of ``self`` with the specified change
         """
-        new_factors = self.inputs + incoming
+        new_factors = self.inputs_group + incoming
         if new_factors is None:
             return None
         result = deepcopy(self)
