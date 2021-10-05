@@ -39,7 +39,7 @@ class TestLoadRules:
     client = Client(api_token=TOKEN)
 
     def test_loading_rules(self, fake_beard_client):
-        beard_rules, mentioned = loaders.load_rules_with_index(
+        beard_rules = loaders.read_holdings_from_file(
             "beard_rules.yaml", client=fake_beard_client
         )
         assert (
@@ -48,16 +48,16 @@ class TestLoadRules:
         )
 
     def test_imported_rule_is_type_rule(self, fake_beard_client):
-        beard_rules, mentioned = loaders.load_rules_with_index(
+        beard_rules = loaders.read_holdings_from_file(
             "beard_rules.yaml", client=fake_beard_client
         )
-        assert isinstance(beard_rules[0], Rule)
+        assert isinstance(beard_rules[0].rule, Rule)
 
     def test_rule_short_string(self, fake_beard_client):
-        beard_rules, mentioned = loaders.load_rules_with_index(
+        beard_rules = loaders.read_holdings_from_file(
             "beard_rules.yaml", client=fake_beard_client
         )
-        assert beard_rules[0].short_string.lower().startswith("the rule")
+        assert beard_rules[0].rule.short_string.lower().startswith("the rule")
 
     def test_index_names_from_sibling_inputs(self):
         raw_rules = loaders.load_holdings("beard_rules.yaml")
@@ -66,22 +66,16 @@ class TestLoadRules:
         assert mentioned[key]["terms"][0] == "the suspected beard"
 
     def test_rule_with_exhibit_as_context_factor(self, fake_beard_client):
-        rules, mentioned = loaders.load_rules_with_index(
+        rules = loaders.read_holdings_from_file(
             "beard_rules.yaml", client=fake_beard_client
         )
         exhibit = rules[5].inputs[0].terms[2]
         assert isinstance(exhibit, Exhibit)
 
-    def test_load_rules_and_index_names(self, fake_beard_client):
-        rules, mentioned = loaders.load_rules_with_index(
+    def test_read_rules_without_regime(self, fake_beard_client):
+        beard_rules = loaders.read_holdings_from_file(
             "beard_rules.yaml", client=fake_beard_client
         )
-        key = "the Department of Beards granted the defendant's beard exemption"
-        assert mentioned[key]["terms"][0] == "the Department of Beards"
-
-    def test_read_rules_without_regime(self, fake_beard_client):
-        beard_dictionary = loaders.load_holdings("beard_rules.yaml")
-        beard_rules = readers.read_rules(beard_dictionary, client=fake_beard_client)
         assert beard_rules[0].inputs[0].short_string == (
             "the fact that <the suspected beard> was facial hair"
         )
@@ -96,6 +90,12 @@ class TestLoadRules:
             elements_of_offense.despite[0].generic_terms()[0].name
             == "the Department of Beards"
         )
+
+    def test_load_any_enactments(self, fake_beard_client):
+        beard_dictionary = loaders.load_holdings("beard_rules.yaml")
+        shorter = [beard_dictionary[0]]
+        beard_rules = readers.read_holdings(shorter, client=fake_beard_client)
+        assert beard_rules[0].enactments[0].selected_text() == "the beard"
 
     @pytest.mark.vcr
     def test_generic_terms_after_adding_rules(self, fake_beard_client):
