@@ -21,7 +21,7 @@ from nettlesome.terms import (
     new_context_helper,
 )
 from nettlesome.predicates import Predicate
-from nettlesome.quantities import Comparison
+from nettlesome.quantities import Comparison, QuantityRange
 from nettlesome.statements import Statement
 
 
@@ -85,6 +85,26 @@ class Fact(Factor, BaseModel):
         "clear and convincing",
         "beyond reasonable doubt",
     )
+
+    @root_validator(pre=True)
+    def nest_predicate_fields(cls, values):
+        if values.get("content"):
+            for sign in {
+                **QuantityRange.opposite_comparisons,
+                **QuantityRange.normalized_comparisons,
+            }:
+                if sign in values["content"]:
+                    content, quantity_text = values["content"].split(sign)
+                    values["content"] = content.strip()
+                    values["expression"] = quantity_text.strip()
+                    values["sign"] = sign
+                    break
+
+        for field_name in ["content", "truth", "sign", "expression"]:
+            if field_name in values:
+                values["predicate"] = values.get("predicate", {})
+                values["predicate"][field_name] = values.pop(field_name)
+        return values
 
     @property
     def term_sequence(self) -> TermSequence:

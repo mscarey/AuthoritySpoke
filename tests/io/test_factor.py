@@ -127,7 +127,7 @@ class TestFactorLoad:
 class TestFactDump:
     def test_dump_with_quantity(self, watt_factor):
         f8_dict = watt_factor["f8"].dict()
-        assert f8_dict["predicate"]["expression"] == "20 foot"
+        assert f8_dict["predicate"]["quantity_range"]["quantity"] == "20 foot"
 
     def test_dump_complex_fact(self, make_complex_fact):
         relevant_fact = make_complex_fact["f_relevant_murder"]
@@ -146,12 +146,12 @@ class TestExhibitLoad:
             ],
         }
         exhibit_data = {
+            "offered_by": {"type": "Entity", "name": "Officer Lin"},
             "form": "testimony",
             "statement": fact_data,
             "statement_attribution": {"name": "Officer Lin"},
         }
-        schema = schemas_yaml.ExhibitSchema()
-        exhibit = schema.load(exhibit_data)
+        exhibit = Exhibit(**exhibit_data)
         assert str(exhibit) == (
             "the testimony attributed to <Officer Lin>, "
             "asserting the fact that the distance that <Officer Lin> "
