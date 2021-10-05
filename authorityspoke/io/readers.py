@@ -57,48 +57,6 @@ def read_fact(record: RawFactor) -> Fact:
     return Fact(**expanded)
 
 
-def read_factor(record: RawFactor, client: Optional[Client] = None, **kwargs) -> Factor:
-    r"""
-    Turn fields from YAML into a :class:`Factor` object.
-
-    :param record:
-        parameter values to pass to schema
-
-    :param client:
-        to look up any :class:`.Enactment` references
-
-    """
-    schema = schemas_yaml.FactorSchema(many=False)
-    record, enactment_index = collect_enactments(record)
-    if client:
-        enactment_index = client.update_entries_in_enactment_index(enactment_index)
-    schema.context["enactment_index"] = enactment_index
-    record, schema.context["mentioned"] = index_names(record)
-
-    return schema.load(record)
-
-
-def read_factors(
-    record: List[RawFactor], client: Optional[Client] = None, **kwargs
-) -> Factor:
-    r"""
-    Turn fields from YAML into a :class:`Factor` object.
-
-    :param record:
-        parameter values to pass to schema
-
-    :parame regime:
-        to look up any :class:`.Enactment` references
-    """
-    schema = schemas_yaml.FactorSchema(many=True)
-    record, enactment_index = collect_enactments(record)
-    if client:
-        enactment_index = client.update_entries_in_enactment_index(enactment_index)
-    schema.context["enactment_index"] = enactment_index
-    record, schema.context["mentioned"] = index_names(record)
-    return schema.load(record)
-
-
 def read_procedure(
     record: Dict, client: Optional[Client] = None, many=False
 ) -> Procedure:

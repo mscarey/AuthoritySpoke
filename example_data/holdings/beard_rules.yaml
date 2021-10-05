@@ -82,6 +82,7 @@
         node: /test/acts/47/6/1
 - inputs:
     type: exhibit
+    offered_by: the defendant
     form: token
     statement: the Department of Beards granted the defendant's beard exemption
     statement_attribution: the Department of Beards
@@ -101,6 +102,7 @@
       from {the counterparty}"
     terms:
       - type: exhibit
+        offered_by: the defendant
         form: token
         statement:
           type: fact

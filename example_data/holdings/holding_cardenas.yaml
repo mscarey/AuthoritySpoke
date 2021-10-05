@@ -20,7 +20,7 @@ holdings:
       filer:
         type: Entity
         name: The People of California
-    statement:
+    fact:
       type: Fact
       name: fact that the defendant committed an attempted robbery
       content: the defendant committed an attempted robbery

@@ -112,7 +112,7 @@ class TestFactorLoad:
     def test_import_facts_with_factor_schema(self):
         loaded = load_holdings("holding_cardenas.yaml")
         holdings = readers.read_holdings(loaded)
-        factor = holdings[0]["inputs"][1].terms[0]
+        factor = holdings[0].inputs[1].fact
         assert (
             factor.predicate.content
             == "${the_defendant} committed an attempted robbery"
