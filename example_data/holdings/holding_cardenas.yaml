@@ -3,6 +3,9 @@ holdings:
   - type: Exhibit
     name: officer's testimony that the defendant was addicted to heroin
     form: testimony
+    offered_by:
+      type: Entity
+      name: The People of California      
     statement:
       type: Fact
       name: fact that the defendant was addicted to heroin

@@ -106,18 +106,13 @@ class TestFactorLoad:
                 {"type": "entity", "name": "the apartment"},
             ],
         }
-        loaded_fact = readers.read_factor(data)
+        loaded_fact = Fact(**data)
         assert loaded_fact.means(fact)
-
-    def test_import_fact_with_factor_schema(self):
-        loaded = load_holdings("holding_cardenas.yaml")
-        entity = readers.read_factor(loaded[0]["inputs"][0])
-        inner_context = entity.terms[0].terms[0]
-        assert inner_context.name == "the defendant"
 
     def test_import_facts_with_factor_schema(self):
         loaded = load_holdings("holding_cardenas.yaml")
-        factor = readers.read_factors(loaded[0]["inputs"])[1].terms[0]
+        holdings = readers.read_holdings(loaded)
+        factor = holdings[0]["inputs"][1].terms[0]
         assert (
             factor.predicate.content
             == "${the_defendant} committed an attempted robbery"

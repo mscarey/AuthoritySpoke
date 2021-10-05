@@ -88,6 +88,10 @@ class Fact(Factor, BaseModel):
 
     @root_validator(pre=True)
     def nest_predicate_fields(cls, values):
+        if values.get("type") and values["type"].lower() != "fact":
+            type_str = values["type"]
+            raise ValidationError(f"type {type_str} was passed to Fact model")
+
         for field_name in ["content", "truth", "sign", "expression"]:
             if field_name in values:
                 values["predicate"] = values.get("predicate", {})
