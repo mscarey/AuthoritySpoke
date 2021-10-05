@@ -92,10 +92,12 @@ class TestLoadRules:
         )
 
     def test_load_any_enactments(self, fake_beard_client):
+        """Test bug where holding's enactment's aren't loaded."""
         beard_dictionary = loaders.load_holdings("beard_rules.yaml")
         shorter = [beard_dictionary[0]]
         beard_rules = readers.read_holdings(shorter, client=fake_beard_client)
-        assert beard_rules[0].enactments[0].selected_text() == "the beard"
+        expected = "facial hair no shorter than 5 millimetres"
+        assert expected in beard_rules[0].enactments[0].selected_text()
 
     @pytest.mark.vcr
     def test_generic_terms_after_adding_rules(self, fake_beard_client):

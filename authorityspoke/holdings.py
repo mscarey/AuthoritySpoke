@@ -89,9 +89,17 @@ class Holding(Comparable, BaseModel):
             if field_name in values:
                 values["procedure"] = values.get("procedure", {})
                 values["procedure"][field_name] = values.pop(field_name)
-        if "procedure" in values:
-            values["rule"] = values.get("rule", {})
-            values["rule"]["procedure"] = values.pop("procedure")
+        values["rule"] = values.get("rule", {})
+
+        for field_to_nest in [
+            "procedure",
+            "enactments",
+            "enactments_despite",
+            "universal",
+            "mandatory",
+        ]:
+            if field_to_nest in values:
+                values["rule"][field_to_nest] = values.pop(field_to_nest)
         return values
 
     @validator("exclusive")
