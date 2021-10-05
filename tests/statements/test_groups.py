@@ -11,6 +11,8 @@ from nettlesome.predicates import Predicate
 from nettlesome.quantities import Comparison
 from nettlesome.statements import Statement
 
+from authorityspoke.facts import Fact
+
 
 class TestMakeGroup:
     def test_group_from_list(self, watt_factor):

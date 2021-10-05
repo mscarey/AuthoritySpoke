@@ -92,16 +92,22 @@ class Rule(Comparable, BaseModel):
 
     @validator("enactments", "enactments_despite", pre=True)
     def validate_enactment_groups(
-        cls, v: Union[EnactmentPassage, Sequence[EnactmentPassage], EnactmentGroup]
+        cls,
+        v: Union[Dict, EnactmentPassage, Sequence[EnactmentPassage], EnactmentGroup],
     ) -> EnactmentGroup:
+        if isinstance(v, EnactmentPassage):
+            v = {"passages": [v]}
+        elif v and not isinstance(v, EnactmentGroup):
+            if not isinstance(v, dict) or "passages" not in v:
+                try:
+                    v = EnactmentGroup(passages=list(v)) if v else EnactmentGroup()
+                except ValidationError:
+                    v = EnactmentGroup(passages=[v])
         if not isinstance(v, EnactmentGroup):
-            try:
-                v = EnactmentGroup(passages=list(v)) if v else EnactmentGroup()
-            except ValidationError:
-                v = EnactmentGroup(passages=[v])
+            print(v)
         return v
 
-    @validator("enactments", "enactments_despite", pre=True)
+    @validator("enactments", "enactments_despite", pre=False)
     def select_enactment_text(cls, v: EnactmentGroup) -> EnactmentGroup:
         for enactment in v:
             if not enactment.selected_text():
