@@ -63,8 +63,7 @@ class TestFactLoad:
         assert mentioned["Alice's house"]["type"] == "Entity"
 
     def test_import_predicate_with_quantity(self):
-        story = expand_shorthand(self.story_data)
-        story = readers.read_fact(story)
+        story = readers.read_fact(self.story_data)
         assert len(story.predicate) == 1
         assert story.predicate.content.startswith("The number of castles")
         assert story.predicate.sign == ">"
@@ -205,4 +204,4 @@ class TestAllegationDump:
     def test_dump_allegation(self, make_allegation):
         allegation = make_allegation["shooting"]
         dumped = allegation.dict()
-        assert dumped["statement"]["terms"][0]["name"] == "Alice"
+        assert dumped["fact"]["terms"][0]["name"] == "Alice"

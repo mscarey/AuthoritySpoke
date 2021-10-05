@@ -53,7 +53,7 @@ def read_fact(record: RawFactor) -> Fact:
     """
     record = expand_shorthand(record)
     record, mentioned = index_names(record)
-    expanded = expand_names(record, mentioned)
+    expanded = expand_factor(record, mentioned)
     return Fact(**expanded)
 
 
@@ -243,16 +243,7 @@ def read_holdings_with_anchors(
     return AnchoredHoldings(holdings_with_anchors, named_anchors, enactment_anchors)
 
 
-def expand_names(
-    record: List[Union[str, RawFactor]], factor_index: Mentioned
-) -> List[RawFactor]:
-    r"""
-    Expand a list of names into a list of factors.
-    """
-    if isinstance(record, str):
-        record = [record]
-    if isinstance(record, bool):
-        return record
+def expand_factor(record: Union[str, RawFactor], factor_index: Mentioned) -> RawFactor:
     to_expand = [
         "statement",
         "statement_attribution",
@@ -263,13 +254,33 @@ def expand_names(
         "filer",
         "pleading",
     ]
+    expanded = factor_index.get_if_present(record)
+    if not isinstance(expanded, Dict):
+        return expanded
+    if "terms" in expanded:
+        expanded["terms"] = expand_names(expanded["terms"], factor_index)
+    for field in to_expand:
+        if field in expanded:
+            expanded[field] = expand_factor(expanded[field], factor_index)
+    return expanded
+
+
+def expand_names(
+    record: List[Union[str, RawFactor]], factor_index: Mentioned
+) -> List[RawFactor]:
+    r"""
+    Expand a list of names into a list of factors.
+    """
+    if isinstance(record, str):
+        record = [record]
+    if isinstance(record, bool):
+        return record
+
     result = []
 
     for name in record:
-        expanded = factor_index.get_if_present(name)
-        if isinstance(expanded, Dict) and "terms" in expanded:
-            expanded["terms"] = expand_names(expanded["terms"], factor_index)
-        result.append(expanded)
+
+        result.append(expand_factor(name, factor_index=factor_index))
 
     return result
 

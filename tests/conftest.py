@@ -894,7 +894,7 @@ def make_pleading(make_entity) -> Dict[str, Dict[str, Pleading]]:
 def make_allegation(make_pleading, make_factor) -> Dict[str, Dict[str, Allegation]]:
     return {
         "shooting": Allegation(
-            statement=make_factor["f_shooting"], pleading=make_pleading["craig"]
+            fact=make_factor["f_shooting"], pleading=make_pleading["craig"]
         )
     }
 
