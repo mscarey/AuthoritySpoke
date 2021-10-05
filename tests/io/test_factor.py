@@ -12,19 +12,20 @@ from nettlesome.quantities import Comparison, QuantityRange
 import pytest
 
 from authorityspoke.facts import Fact, Exhibit, Evidence
-from authorityspoke.io import readers, name_index
+from authorityspoke.io.name_index import index_names
+from authorityspoke.io import readers
 from authorityspoke.io import schemas_yaml
 from authorityspoke.io.loaders import load_holdings
 from authorityspoke.io import filepaths
 from authorityspoke.io.text_expansion import expand_shorthand
 
 
-class TestFactorLoad:
+class TestFactorFileLoad:
     def test_find_directory_for_json(self):
         directory = pathlib.Path.cwd() / "tests"
         if directory.exists():
             os.chdir(directory)
-        input_directory = filepaths.get_directory_path("holdings") / "holding_watt.json"
+        input_directory = filepaths.get_directory_path("holdings") / "holding_watt.yaml"
         assert input_directory.exists()
 
 
@@ -57,8 +58,9 @@ class TestFactLoad:
 
     def test_import_fact_with_entity_name_containing_another(self):
         expanded = expand_shorthand(self.house_data)
-        house_fact = readers.read_fact(expanded)
-        assert house_fact.terms[1].name == "Alice's house"
+        record, mentioned = index_names(expanded)
+
+        assert mentioned["Alice's house"]["type"] == "Entity"
 
     def test_import_predicate_with_quantity(self):
         story = expand_shorthand(self.story_data)
@@ -85,7 +87,7 @@ class TestFactLoad:
 class TestFactorLoad:
     def test_load_factor_marked_reciprocal(self):
         fact = Fact(
-            Comparison(
+            predicate=Comparison(
                 content="the distance between $place1 and $place2 was",
                 sign="<",
                 expression="5 miles",

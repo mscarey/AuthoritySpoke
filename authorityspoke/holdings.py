@@ -35,7 +35,7 @@ from nettlesome.factors import Factor
 from nettlesome.formatting import indented, wrapped
 from nettlesome.groups import FactorGroup
 
-from pydantic import BaseModel, validator
+from pydantic import BaseModel, root_validator, validator
 
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
@@ -82,6 +82,17 @@ class Holding(Comparable, BaseModel):
     exclusive: bool = False
     generic: bool = False
     absent: bool = False
+
+    @root_validator(pre=True)
+    def nest_factor_fields(cls, values):
+        for field_name in ["inputs", "outputs", "despite"]:
+            if field_name in values:
+                values["procedure"] = values.get("procedure", {})
+                values["procedure"][field_name] = values.pop(field_name)
+        if "procedure" in values:
+            values["rule"] = values.get("rule", {})
+            values["rule"]["procedure"] = values.pop("procedure")
+        return values
 
     @validator("exclusive")
     def not_invalid_and_exclusive(cls, v: bool, values) -> bool:

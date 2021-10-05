@@ -21,6 +21,7 @@ from authorityspoke.io import schemas_yaml
 from authorityspoke.opinions import AnchoredHoldings
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
+from authorityspoke.io.nesting import nest_fields, walk_tree_and_modify
 from authorityspoke.io.schemas_yaml import (
     RawEnactment,
     RawHolding,
@@ -31,7 +32,8 @@ from authorityspoke.io.schemas_yaml import (
     RawSelector,
 )
 from authorityspoke.io.name_index import index_names, Mentioned
-from authorityspoke.io.enactment_index import collect_enactments
+from authorityspoke.io.enactment_index import EnactmentIndex, collect_enactments
+from authorityspoke.io.text_expansion import expand_shorthand
 
 FACTOR_SUBCLASSES = {
     class_obj.__name__: class_obj
@@ -49,10 +51,10 @@ def read_fact(record: RawFactor) -> Fact:
     :returns:
         a :class:`Fact`, with optional mentioned factors
     """
+    record = expand_shorthand(record)
     record, mentioned = index_names(record)
-    schema = schemas_yaml.FactSchema()
-    schema.context["mentioned"] = mentioned
-    return schema.load(record)
+    expanded = expand_names(record, mentioned)
+    return Fact(**expanded)
 
 
 def read_factor(record: RawFactor, client: Optional[Client] = None, **kwargs) -> Factor:
@@ -241,6 +243,81 @@ def read_holdings_with_anchors(
     return AnchoredHoldings(holdings_with_anchors, named_anchors, enactment_anchors)
 
 
+def expand_names(
+    record: List[Union[str, RawFactor]], factor_index: Mentioned
+) -> List[RawFactor]:
+    r"""
+    Expand a list of names into a list of factors.
+    """
+    if isinstance(record, str):
+        record = [record]
+    if isinstance(record, bool):
+        return record
+    to_expand = [
+        "statement",
+        "statement_attribution",
+        "fact",
+        "offered_by",
+        "exhibit",
+        "to_effect",
+        "filer",
+        "pleading",
+    ]
+    result = []
+
+    for name in record:
+        expanded = factor_index.get_if_present(name)
+        if isinstance(expanded, Dict) and "terms" in expanded:
+            expanded["terms"] = expand_names(expanded["terms"], factor_index)
+        result.append(expanded)
+
+    return result
+
+
+def expand_enactments(
+    record: List[Union[str, RawEnactment]], enactment_index: EnactmentIndex
+) -> List[RawEnactment]:
+    r"""
+    Expand a list of enactments into a list of dicts.
+
+    :param record:
+        a list of enactments, either as strings or dicts
+
+    :param enactment_index:
+        a dict of names to enactments
+
+    :returns:
+        a list of dicts representing enactments
+    """
+    return [enactment_index.get_if_present(name) for name in record]
+
+
+def expand_holding(
+    record: RawHolding, factor_index: Mentioned, enactment_index: EnactmentIndex
+) -> RawHolding:
+    for key, value in record.items():
+        if key in ["enactments_despite", "enactments"]:
+            record[key] = expand_enactments(value, enactment_index)
+        elif key not in ["mandatory", "universal", "exclusive"]:
+            record[key] = expand_names(value, factor_index)
+    return record
+
+
+def expand_holdings(
+    record: List[RawHolding],
+    factor_index: Dict[str, Dict],
+    enactment_index: Dict[str, Dict],
+) -> List[RawHolding]:
+    holdings = [factor_index.get_if_present(holding) for holding in record]
+    holdings = [
+        expand_holding(
+            holding, factor_index=factor_index, enactment_index=enactment_index
+        )
+        for holding in holdings
+    ]
+    return holdings
+
+
 def read_holdings(
     record: List[RawHolding], client: Optional[Client] = None
 ) -> List[Holding]:
@@ -258,7 +335,6 @@ def read_holdings(
     :returns:
         a list of :class:`.Holding` objects
     """
-    schema = schemas_yaml.HoldingSchema(many=True)
 
     record, enactment_index = collect_enactments(record)
     if client:
@@ -266,15 +342,15 @@ def read_holdings(
     factor_anchors, enactment_index = collect_anchors_from_index(
         enactment_index, "enactment"
     )
-
-    schema.context["enactment_index"] = enactment_index
-
     record, factor_index = index_names(record)
     anchors, factor_index = collect_anchors_from_index(factor_index, "name")
     holding_anchors = [holding.pop("anchors", None) for holding in record]
-    schema.context["mentioned"] = factor_index
 
-    return schema.load(deepcopy(record))
+    expanded = expand_holdings(
+        record, factor_index=factor_index, enactment_index=enactment_index
+    )
+
+    return [Holding(**holding) for holding in expanded]
 
 
 def read_decision(decision: Union[RawDecision, Decision]) -> DecisionReading:

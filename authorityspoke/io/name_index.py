@@ -42,6 +42,18 @@ class Mentioned(OrderedDict):
         value.update(self[name])
         return value
 
+    def get_if_present(self, name: str) -> Union[Dict, str]:
+        """
+        Retrieve a record from the index, if it exists.
+        :param name:
+            the name of the key where the record can be found in the Mentioned dict.
+        :returns:
+            the value stored at the key "name", plus a name field.
+        """
+        if isinstance(name, str) and name in self:
+            return self.get_by_name(name)
+        return name
+
     def sorted_by_length(self) -> Mentioned:
         """
         Sort dict items from longest to shortest.
