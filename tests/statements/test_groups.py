@@ -133,10 +133,10 @@ class TestImplication:
 class TestContradiction:
     def test_contradiction_of_group(self):
         lived_at = Predicate(content="$person lived at $residence")
-        bob_lived = Statement(
+        bob_lived = Fact(
             lived_at, terms=[Entity(name="Bob"), Entity(name="Bob's house")]
         )
-        carl_lived = Statement(
+        carl_lived = Fact(
             lived_at, terms=[Entity(name="Carl"), Entity(name="Carl's house")]
         )
         distance_long = Comparison(
@@ -144,7 +144,7 @@ class TestContradiction:
             sign=">=",
             expression="50 miles",
         )
-        statement_long = Statement(
+        statement_long = Fact(
             distance_long, terms=[Entity(name="Houston"), Entity(name="Bob's house")]
         )
         distance_short = Comparison(
@@ -152,7 +152,7 @@ class TestContradiction:
             sign="<=",
             expression="10 kilometers",
         )
-        statement_short = Statement(
+        statement_short = Fact(
             distance_short, terms=[Entity(name="El Paso"), Entity(name="Carl's house")]
         )
         left = FactorGroup([bob_lived, statement_long])
@@ -221,18 +221,14 @@ class TestConsistent:
         expression="55 miles per hour",
     )
     predicate_farm = Predicate(content="$person had a farm")
-    slower_specific_statement = Statement(
+    slower_specific_statement = Fact(
         predicate=predicate_less_specific, terms=Entity(name="the car")
     )
-    slower_general_statement = Statement(
+    slower_general_statement = Fact(
         predicate=predicate_less_general, terms=Entity(name="the pickup")
     )
-    faster_statement = Statement(
-        predicate=predicate_more, terms=Entity(name="the pickup")
-    )
-    farm_statement = Statement(
-        predicate=predicate_farm, terms=Entity(name="Old MacDonald")
-    )
+    faster_statement = Fact(predicate=predicate_more, terms=Entity(name="the pickup"))
+    farm_statement = Fact(predicate=predicate_farm, terms=Entity(name="Old MacDonald"))
 
     def test_group_contradicts_single_factor(self):
         group = FactorGroup([self.slower_specific_statement, self.farm_statement])

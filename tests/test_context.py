@@ -34,11 +34,11 @@ class TestContextRegisters:
         assert changes != [[Entity(name="Alice")], [Entity(name="Dan")]]
 
     def test_cannot_update_context_register_from_lists(self):
-        left = Statement(
+        left = Fact(
             predicate="$shooter shot $victim",
             terms=[Entity(name="Alice"), Entity(name="Bob")],
         )
-        right = Statement(
+        right = Fact(
             predicate="$shooter shot $victim",
             terms=[Entity(name="Craig"), Entity(name="Dan")],
         )

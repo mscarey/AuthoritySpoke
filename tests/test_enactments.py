@@ -71,7 +71,7 @@ class TestEnactments:
 
     def test_unequal_to_statement(self, watt_factor, e_copyright):
         stole_predicate = Predicate(content="$defendant stole $object")
-        stole_fact = Statement(
+        stole_fact = Fact(
             predicate=stole_predicate,
             terms=[Entity(name="Alice"), Entity(name="the gold bar")],
         )
@@ -218,7 +218,7 @@ class TestEnactments:
             print(e_search_clause + watt_factor["f3"])
 
     def test_cannot_add_enactment_to_statement(self, e_search_clause):
-        statement = Statement(
+        statement = Fact(
             predicate=Predicate(content="$person committed a murder"),
             terms=Entity(name="Al"),
         )
@@ -226,7 +226,7 @@ class TestEnactments:
             statement + e_search_clause
 
     def test_cannot_add_statement_to_enactment(self, e_search_clause):
-        statement = Statement(
+        statement = Fact(
             predicate=Predicate(content="$person committed a murder"),
             terms=Entity(name="Al"),
         )

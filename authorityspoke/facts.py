@@ -5,7 +5,7 @@ import operator
 from typing import ClassVar, Dict, Iterable, Iterator, List
 from typing import Mapping, Optional, Sequence, Tuple, Union
 
-from pydantic import BaseModel, ValidationError, validator, root_validator
+from pydantic import BaseModel, Extra, ValidationError, validator, root_validator
 from slugify import slugify
 
 from anchorpoint.textselectors import TextQuoteSelector
@@ -86,17 +86,22 @@ class Fact(Factor, BaseModel):
         "beyond reasonable doubt",
     )
 
+    class Config:
+        extra = Extra.forbid
+
     @root_validator(pre=True)
     def nest_predicate_fields(cls, values):
-        if values.get("type") and values["type"].lower() != "fact":
-            type_str = values["type"]
+        type_str = values.pop("type", "")
+        if type_str and type_str.lower() != "fact":
             raise ValidationError(f"type {type_str} was passed to Fact model")
 
         for field_name in ["content", "truth", "sign", "expression"]:
             if field_name in values:
                 values["predicate"] = values.get("predicate", {})
                 values["predicate"][field_name] = values.pop(field_name)
-        if isinstance(values["predicate"], dict) and values["predicate"].get("content"):
+        if isinstance(values.get("predicate"), dict) and values["predicate"].get(
+            "content"
+        ):
             for sign in {
                 **QuantityRange.opposite_comparisons,
                 **QuantityRange.normalized_comparisons,
