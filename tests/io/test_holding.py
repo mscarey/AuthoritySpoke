@@ -323,6 +323,12 @@ class TestTextAnchors:
                 },
                 "outputs": {
                     "type": "evidence",
+                    "exhibit": {
+                        "offered_by": {
+                            "type": "entity",
+                            "name": "the People"
+                        }
+                    },
                     "to_effect": {
                         "type": "fact",
                         "name": "fact that Bradley committed a crime",
@@ -364,6 +370,10 @@ class TestTextAnchors:
                         "type": "Exhibit",
                         "name": "officer's testimony that defendant was addicted to heroin",
                         "form": "testimony",
+                        "offered_by": {
+                            "type": "Entity",
+                            "name": "The People of California",
+                        },
                         "statement": {
                             "type": "Fact",
                             "name": "fact that defendant was addicted to heroin",
@@ -384,7 +394,7 @@ class TestTextAnchors:
                                 "name": "The People of California",
                             },
                         },
-                        "statement": {
+                        "fact": {
                             "type": "Fact",
                             "name": "fact that defendant committed an attempted robbery",
                             "content": "defendant committed an attempted robbery",
@@ -433,7 +443,7 @@ class TestTextAnchors:
         expanded = text_expansion.expand_shorthand(holdings)
         built = readers.read_holdings(expanded)
         allegation = built[0].inputs[1]
-        assert allegation.statement.terms[0].name == "defendant"
+        assert allegation.fact.terms[0].name == "defendant"
 
     def test_select_enactment_text_by_default(self, make_response):
         mock_client = FakeClient(responses=make_response)
