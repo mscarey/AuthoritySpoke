@@ -1,5 +1,19 @@
 holdings:
-- inputs:
+- outputs:
+  - type: evidence
+    exhibit: 
+      offered_by:
+        type: entity
+        name: the prosecution
+      name: proof of Bradley's guilt
+      generic: true
+    to_effect:
+      type: fact
+      name: fact that Bradley committed a crime
+      content: Bradley committed a crime
+    name: absence of evidence of Bradley's guilt
+    absent: true
+  inputs:
   - type: fact
     content: '{officers'' search of the yard} was a warrantless search and seizure'
   - type: fact
@@ -25,20 +39,9 @@ holdings:
   - type: fact
     content: '{} was derived from {}'
     terms:
-    - type: exhibit
-      name: proof of Bradley's guilt
-      generic: true
+    - proof of Bradley's guilt
     - type: entity
       name: officers' search of the yard
-  outputs:
-    type: evidence
-    exhibit: proof of Bradley's guilt
-    to_effect:
-      type: fact
-      name: fact that Bradley committed a crime
-      content: Bradley committed a crime
-    name: absence of evidence of Bradley's guilt
-    absent: true
   enactments:
   - name: search clause
     enactment:
