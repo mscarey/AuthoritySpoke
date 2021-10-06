@@ -347,11 +347,12 @@ def extract_anchors_from_holding_record(
             print(anchor)
 
     factor_anchors = [TermWithAnchors(**anchor) for anchor in factor_anchors]
-    holding_anchors = [holding.pop("anchors", None) for holding in record]
 
     expanded = expand_holdings(
         record, factor_index=factor_index, enactment_index=enactment_index
     )
+    holding_anchors = [holding.pop("anchors", None) for holding in expanded]
+
     result = []
     for holding in expanded:
         result.append(Holding(**holding))

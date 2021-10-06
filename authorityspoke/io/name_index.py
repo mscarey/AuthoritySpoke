@@ -146,6 +146,7 @@ def create_name_for_factor(obj: Dict) -> str:
         or obj.get("prefix")
         or obj.get("suffix")  # Text Selectors don't need names
         or obj.get("passages") is not None  # EnactmentGroups don't need names
+        or obj.get("factor_anchors")  # AnchoredHoldings doesn't need name
     ):
         return ""
     elif obj.get("predicate", {}).get("content"):

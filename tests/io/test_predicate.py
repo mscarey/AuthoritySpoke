@@ -5,6 +5,7 @@ import pytest
 
 from nettlesome.quantities import Comparison, Q_
 
+from authorityspoke import Fact
 from authorityspoke.io import schemas_yaml
 
 
@@ -39,17 +40,11 @@ class TestPredicateLoad:
         p7 = Comparison(**data)
         assert p7.sign == "!="
 
-    def test_load_and_find_quantity(self):
-        data = {
-            "content": "the distance between $place1 and $place2 was > 35 feet",
-            "truth": True,
-        }
-        p7 = Comparison(**data)
-        assert p7.sign == ">"
-
     def test_load_and_normalize_quantity(self):
         data = {
-            "content": "the distance between $place1 and $place2 was != 35 feet",
+            "content": "the distance between $place1 and $place2 was",
+            "sign": "!=",
+            "expression": "35 feet",
             "truth": True,
         }
         p7 = Comparison(**data)

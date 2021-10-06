@@ -147,7 +147,8 @@ class TestContradiction:
             expression="50 miles",
         )
         statement_long = Fact(
-            distance_long, terms=[Entity(name="Houston"), Entity(name="Bob's house")]
+            predicate=distance_long,
+            terms=[Entity(name="Houston"), Entity(name="Bob's house")],
         )
         distance_short = Comparison(
             content="the distance from the center of $city to $residence was",
