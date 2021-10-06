@@ -33,7 +33,6 @@ class TestProcedureLoad:
     }
 
     def test_load_example(self):
-        procedure = text_expansion.expand_shorthand(self.example)
-        procedure = readers.read_procedure(procedure)
-        factor = procedure.outputs[0].terms[0]
+        holdings = readers.read_holdings([self.example])
+        factor = holdings[0].outputs[0].terms[0]
         assert factor.name == "the Java API"
