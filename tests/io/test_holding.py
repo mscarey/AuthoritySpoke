@@ -1,7 +1,7 @@
 from collections import OrderedDict
 from datetime import date
 import os
-from marshmallow import ValidationError
+from pydantic import ValidationError
 import pytest
 
 from anchorpoint.textselectors import TextQuoteSelector
@@ -609,7 +609,7 @@ class TestTextAnchors:
         }
         mock_client = FakeClient(responses=make_response)
         with pytest.raises(ValidationError):
-            readers.read_holding(rule_holding, client=mock_client)
+            readers.read_holdings([rule_holding], client=mock_client)
 
     def test_error_classname_does_not_exist(self):
         rule_dict = {
@@ -622,7 +622,7 @@ class TestTextAnchors:
             "outputs": [{"type": "fact", "content": "the dog bit the man"}],
         }
         with pytest.raises(ValidationError):
-            readers.read_holding(rule_dict)
+            readers.read_holdings([rule_dict])
 
     def test_repeating_read_holdings_has_same_result(self, make_analysis):
         raw = make_analysis["minimal"]
@@ -672,14 +672,18 @@ class TestExclusiveFlag:
         holdings = read_holdings_from_file("holding_feist.yaml", client=fake_client)
 
         directory = Entity(name="Rural's telephone directory")
-        original = Fact(Predicate(content="$work was an original work"), directory)
-        copyrightable = Fact(Predicate(content="$work was copyrightable"), directory)
+        original = Fact(
+            predicate=Predicate(content="$work was an original work"), terms=directory
+        )
+        copyrightable = Fact(
+            predicate=Predicate(content="$work was copyrightable"), terms=directory
+        )
         originality_enactments = [
             e_securing_exclusive_right_to_writings,
             e_copyright_requires_originality,
         ]
         originality_rule = Rule(
-            Procedure(outputs=copyrightable, inputs=original),
+            procedure=Procedure(outputs=copyrightable, inputs=original),
             mandatory=False,
             universal=False,
             enactments=originality_enactments,
@@ -691,17 +695,15 @@ class TestExclusiveFlag:
     def test_fact_containing_wrong_type(self, make_response):
         mock_client = FakeClient(responses=make_response)
         to_read = load_holdings("holding_feist.yaml")
-        holding = to_read[0]
-        holding["outputs"]["type"] = "wrong_type"
+        to_read[0]["outputs"]["type"] = "wrong_type"
         with pytest.raises(ValidationError):
-            readers.read_holding(holding, client=mock_client)
+            readers.read_holdings([to_read[0]], client=mock_client)
 
     def test_type_field_removed_from_factor(self, make_response):
         mock_client = FakeClient(responses=make_response)
         to_read = load_holdings("holding_feist.yaml")
-        holding = to_read[0]
-        holding = readers.read_holding(holding, client=mock_client)
-        assert holding.inputs[0].__dict__.get("type") is None
+        holdings = readers.read_holdings([to_read[0]], client=mock_client)
+        assert holdings[0].inputs[0].__dict__.get("type") is None
 
     @pytest.mark.xfail
     def test_holding_inferred_from_exclusive(self, make_enactment, make_response):

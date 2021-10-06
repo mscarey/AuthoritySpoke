@@ -305,6 +305,8 @@ def expand_holdings(
     factor_index: Dict[str, Dict],
     enactment_index: Dict[str, Dict],
 ) -> List[RawHolding]:
+    if isinstance(record, dict):
+        record = [record]
     holdings = [factor_index.get_if_present(holding) for holding in record]
     holdings = [
         expand_holding(
@@ -344,7 +346,7 @@ def extract_anchors_from_holding_record(
         try:
             factor_result.append(TermWithAnchors(**anchor))
         except ValidationError:
-            print(anchor)
+            print(anchor)  # TODO: remove
 
     factor_anchors = [TermWithAnchors(**anchor) for anchor in factor_anchors]
 

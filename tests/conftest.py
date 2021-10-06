@@ -1620,36 +1620,28 @@ def make_opinion_with_holding(make_decision_with_holding) -> Dict[str, Opinion]:
 
 
 @pytest.fixture(scope="class")
-def make_analysis() -> Dict[str, Dict[str, Any]]:
+def make_analysis() -> Dict[str, List[RawHolding]]:
     """Example user analysis data."""
     return {
-        "minimal": {
-            "holdings": [
-                {
-                    "anchors": {
-                        "quotes": "upholding searches in |open fields or grounds|around a house"
-                    },
-                    "holding": {
-                        "outputs": {
-                            "type": "fact",
-                            "content": "{Bradley} made a minimal holding object",
-                        },
-                    },
+        "minimal": [
+            {
+                "outputs": {
+                    "type": "fact",
+                    "content": "{Bradley} made a minimal holding object",
+                },
+                "anchors": {
+                    "quotes": "upholding searches in |open fields or grounds|around a house"
+                },
+            }
+        ],
+        "no anchors": [
+            {
+                "outputs": {
+                    "type": "fact",
+                    "content": "this holding has no text anchors",
                 }
-            ],
-        },
-        "no anchors": {
-            "holdings": [
-                {
-                    "holding": {
-                        "outputs": {
-                            "type": "fact",
-                            "content": "this holding has no text anchors",
-                        }
-                    }
-                }
-            ]
-        },
+            }
+        ],
     }
 
 
