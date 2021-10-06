@@ -356,8 +356,10 @@ def read_holdings(
     expanded = expand_holdings(
         record, factor_index=factor_index, enactment_index=enactment_index
     )
-
-    return [Holding(**holding) for holding in expanded]
+    result = []
+    for holding in expanded:
+        result.append(Holding(**holding))
+    return result
 
 
 def read_decision(decision: Union[RawDecision, Decision]) -> DecisionReading:
