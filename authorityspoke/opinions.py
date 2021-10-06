@@ -19,10 +19,12 @@ from anchorpoint.textselectors import (
     TextPositionSet,
 )
 from justopinion.decisions import Opinion
-from nettlesome.terms import Comparable, ContextRegister, Explanation
+from legislice.enactments import EnactmentPassage
+from nettlesome.terms import Comparable, ContextRegister, Explanation, Term
 from nettlesome.factors import Factor
 from pydantic import BaseModel, Field, validator
 
+from authorityspoke.facts import Entity, Fact, Allegation, Pleading, Exhibit, Evidence
 from authorityspoke.holdings import Holding, HoldingGroup
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
@@ -34,21 +36,62 @@ logger = logging.getLogger(__name__)
 TextLinkDict = Dict[str, List[TextQuoteSelector]]
 
 
-class HoldingWithAnchors(NamedTuple):
+class EnactmentWithAnchors(BaseModel):
+    """A term with a set of anchors."""
+
+    passage: EnactmentPassage
+    anchors: TextPositionSet
+
+    @validator("anchors", pre=True)
+    def validate_anchors(cls, value: TextPositionSet) -> TextPositionSet:
+        """
+        Validate that the anchors are non-empty.
+        """
+        if value is None:
+            return TextPositionSet()
+        return value
+
+
+class TermWithAnchors(BaseModel):
+    """A term with a set of anchors."""
+
+    term: Union[Entity, Fact, Allegation, Pleading, Exhibit, Evidence]
+    anchors: TextPositionSet
+
+    @validator("anchors", pre=True)
+    def validate_anchors(cls, value: TextPositionSet) -> TextPositionSet:
+        """
+        Validate that the anchors are non-empty.
+        """
+        if value is None:
+            return TextPositionSet()
+        return value
+
+
+class HoldingWithAnchors(BaseModel):
     """
     A :class:`.Holding` with a :class:`.TextPositionSet` that anchors it.
     """
 
     holding: Holding
-    anchors: TextPositionSet = field(default_factory=TextPositionSet())
+    anchors: TextPositionSet
+
+    @validator("anchors", pre=True)
+    def validate_anchors(cls, value: TextPositionSet) -> TextPositionSet:
+        """
+        Validate that the anchors are non-empty.
+        """
+        if value is None:
+            return TextPositionSet()
+        return value
 
 
 class AnchoredHoldings(NamedTuple):
     """Holdings with objects storing the Holdings' links to Opinion text."""
 
     holdings: List[HoldingWithAnchors]
-    named_anchors: TextLinkDict
-    enactment_anchors: TextLinkDict
+    named_anchors: List[TermWithAnchors]
+    enactment_anchors: List[EnactmentWithAnchors]
 
 
 class OpinionReading(Comparable):

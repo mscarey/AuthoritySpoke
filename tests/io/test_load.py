@@ -44,12 +44,10 @@ class TestHoldingLoad:
         fake_client = FakeClient.from_file("usc.json")
         filepath = filepaths.make_filepath(filename="holding_mazza_alaluf.yaml")
         result = read_anchored_holdings_from_file(filepath=filepath, client=fake_client)
-        selector = result.named_anchors[
-            "the fact it was false that <Turismo Costa Brava> was a domestic financial institution"
-        ].quotes[0]
-        assert (
-            selector.exact
-            == 'without respect to whether or not Turismo was a "domestic financial institution"'
+        key = "the fact it was false that <Turismo Costa Brava> was a domestic financial institution"
+        anchors = result.named_anchors.get_anchors(key)
+        assert anchors.quotes[0].exact.startswith(
+            "without respect to whether or not Turismo"
         )
         assert len(result.holdings) == 2
 

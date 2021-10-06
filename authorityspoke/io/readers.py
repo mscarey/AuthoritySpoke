@@ -6,8 +6,9 @@ after they import some data from a file.
 """
 from copy import deepcopy
 from typing import Any, NamedTuple
-
 from typing import Dict, List, Optional, Tuple, Sequence, Union
+
+from pydantic import ValidationError
 
 from anchorpoint.textselectors import TextQuoteSelector
 from legislice.download import Client
@@ -18,7 +19,12 @@ from authorityspoke.decisions import Decision, DecisionReading
 from authorityspoke.facts import Fact, Exhibit, Evidence, Allegation, Pleading
 from authorityspoke.holdings import Holding
 from authorityspoke.io import schemas_yaml
-from authorityspoke.opinions import AnchoredHoldings, HoldingWithAnchors
+from authorityspoke.opinions import (
+    AnchoredHoldings,
+    EnactmentWithAnchors,
+    TermWithAnchors,
+    HoldingWithAnchors,
+)
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
 from authorityspoke.io.nesting import nest_fields, walk_tree_and_modify
@@ -179,7 +185,7 @@ def read_holdings_with_anchors(
         holding_anchors,
     ) = extract_anchors_from_holding_record(record, client)
     holdings_with_anchors = [
-        HoldingWithAnchors(holding, holding_anchors[i])
+        HoldingWithAnchors(holding=holding, anchors=holding_anchors[i])
         for i, holding in enumerate(holdings)
     ]
     return AnchoredHoldings(holdings_with_anchors, factor_anchors, enactment_anchors)
@@ -316,10 +322,33 @@ def extract_anchors_from_holding_record(
     if client:
         enactment_index = client.update_entries_in_enactment_index(enactment_index)
     enactment_anchors, enactment_index = collect_anchors_from_index(
-        enactment_index, "enactment"
+        enactment_index, "passage"
     )
+
+    enactment_result = []
+    for anchor in enactment_anchors:
+        anchor["passage"] = expand_enactments(
+            anchor["passage"], enactment_index=enactment_index
+        )
+        try:
+            enactment_result.append(EnactmentWithAnchors(**anchor))
+        except ValidationError:
+            print(anchor)
+
     record, factor_index = index_names(record)
-    factor_anchors, factor_index = collect_anchors_from_index(factor_index, "name")
+    factor_anchors, factor_index = collect_anchors_from_index(factor_index, "term")
+
+    factor_result = []
+    for anchor in factor_anchors:
+        anchor["term"] = expand_holding(
+            anchor["term"], factor_index=factor_index, enactment_index=enactment_index
+        )
+        try:
+            factor_result.append(TermWithAnchors(**anchor))
+        except ValidationError:
+            print(anchor)
+
+    factor_anchors = [TermWithAnchors(**anchor) for anchor in factor_anchors]
     holding_anchors = [holding.pop("anchors", None) for holding in record]
 
     expanded = expand_holdings(
@@ -328,7 +357,7 @@ def extract_anchors_from_holding_record(
     result = []
     for holding in expanded:
         result.append(Holding(**holding))
-    return result, enactment_anchors, factor_anchors, holding_anchors
+    return result, enactment_result, factor_result, holding_anchors
 
 
 def read_holdings(
