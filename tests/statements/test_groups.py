@@ -136,10 +136,10 @@ class TestContradiction:
     def test_contradiction_of_group(self):
         lived_at = Predicate(content="$person lived at $residence")
         bob_lived = Fact(
-            lived_at, terms=[Entity(name="Bob"), Entity(name="Bob's house")]
+            predicate=lived_at, terms=[Entity(name="Bob"), Entity(name="Bob's house")]
         )
         carl_lived = Fact(
-            lived_at, terms=[Entity(name="Carl"), Entity(name="Carl's house")]
+            predicate=lived_at, terms=[Entity(name="Carl"), Entity(name="Carl's house")]
         )
         distance_long = Comparison(
             content="the distance from the center of $city to $residence was",
@@ -155,7 +155,8 @@ class TestContradiction:
             expression="10 kilometers",
         )
         statement_short = Fact(
-            distance_short, terms=[Entity(name="El Paso"), Entity(name="Carl's house")]
+            predicate=distance_short,
+            terms=[Entity(name="El Paso"), Entity(name="Carl's house")],
         )
         left = FactorGroup([bob_lived, statement_long])
         right = FactorGroup([carl_lived, statement_short])
