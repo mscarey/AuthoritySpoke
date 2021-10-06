@@ -327,9 +327,7 @@ def extract_anchors_from_holding_record(
 
     enactment_result = []
     for anchor in enactment_anchors:
-        anchor["passage"] = expand_enactments(
-            anchor["passage"], enactment_index=enactment_index
-        )
+        anchor["passage"] = enactment_index.get_if_present(anchor["passage"])
         try:
             enactment_result.append(EnactmentWithAnchors(**anchor))
         except ValidationError:

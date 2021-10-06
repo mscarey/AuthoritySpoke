@@ -45,9 +45,9 @@
   enactments_despite:
     - enactment:
         node: /us/usc/t31/s5312/b/1
-        anchors:
-          quotes:
-            - § 5312(b)(1) (defining "domestic financial institution")
+      anchors:
+        quotes:
+        - § 5312(b)(1) (defining "domestic financial institution")
   anchors:
     quotes:
       - prefix: Accordingly, we conclude that the

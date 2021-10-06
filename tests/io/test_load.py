@@ -45,7 +45,7 @@ class TestHoldingLoad:
         filepath = filepaths.make_filepath(filename="holding_mazza_alaluf.yaml")
         result = read_anchored_holdings_from_file(filepath=filepath, client=fake_client)
         key = "the fact it was false that <Turismo Costa Brava> was a domestic financial institution"
-        anchors = result.named_anchors.get_anchors(key)
+        anchors = result.get_term_anchors(key)
         assert anchors.quotes[0].exact.startswith(
             "without respect to whether or not Turismo"
         )
@@ -83,7 +83,7 @@ class TestLoadAndRead:
         key = "the fact that <Turismo Costa Brava> was a money transmitting business"
         assert (
             "Turismo conducted substantial money transmitting business"
-            in anchored.named_anchors[key].quotes[0].exact
+            in anchored.get_term_anchors(key).quotes[0].exact
         )
 
     @pytest.mark.vcr("TestLoadAndRead.test_read_holdings_from_yaml.yaml")
@@ -103,4 +103,5 @@ class TestLoadAndRead:
 
         # enactment anchor
         key = str(anchored.holdings[1].holding.enactments_despite[0])
-        assert "domestic financial" in anchored.enactment_anchors[key][0].exact
+        quotes = anchored.get_enactment_anchors(key).quotes
+        assert "domestic financial" in quotes[0].exact

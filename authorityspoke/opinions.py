@@ -93,6 +93,20 @@ class AnchoredHoldings(NamedTuple):
     named_anchors: List[TermWithAnchors]
     enactment_anchors: List[EnactmentWithAnchors]
 
+    def get_term_anchors(self, key: str) -> TextPositionSet:
+        """Get the anchors for a term."""
+        for item in self.named_anchors:
+            if item.term.key == key:
+                return item.anchors
+        raise KeyError(f"Term with key '{key}' not found")
+
+    def get_enactment_anchors(self, key: str) -> TextPositionSet:
+        """Get the anchors for a term."""
+        for item in self.enactment_anchors:
+            if str(item.passage) == key:
+                return item.anchors
+        raise KeyError(f"Enactment passage with key '{key}' not found")
+
 
 class OpinionReading(Comparable):
     """
