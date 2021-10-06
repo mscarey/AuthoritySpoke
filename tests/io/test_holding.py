@@ -41,8 +41,8 @@ class TestHoldingDump:
         content = dumped["rule"]["procedure"]["inputs"][0]["predicate"]["content"]
         assert content == "$thing was on the premises of $place"
 
-        loaded = readers.read_holding(dumped, client=fake_usc_client)
-        loaded_content = loaded.despite[0].predicate.content
+        loaded = readers.read_holdings([dumped], client=fake_usc_client)
+        loaded_content = loaded[0].despite[0].predicate.content
         assert "the distance between $place1 and $place2 was" in loaded_content
 
     def test_dump_and_load_holding(self, fake_usc_client, make_holding):

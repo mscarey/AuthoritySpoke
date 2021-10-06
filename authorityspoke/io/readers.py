@@ -7,7 +7,7 @@ after they import some data from a file.
 from copy import deepcopy
 from typing import Any, NamedTuple
 
-from typing import Dict, List, Optional, Tuple, Type, Union
+from typing import Dict, List, Optional, Tuple, Sequence, Union
 
 from anchorpoint.textselectors import TextQuoteSelector
 from legislice.download import Client
@@ -261,15 +261,53 @@ def expand_enactments(
     return [enactment_index.get_if_present(name) for name in record]
 
 
+def walk_tree_and_expand(
+    obj: Union[Dict, List], mentioned: Mentioned, ignore: Sequence[str] = ()
+) -> Union[Dict, List]:
+    """
+    Traverse tree of dicts and lists, and modify each node.
+
+    :param obj: the object to traverse
+
+    :param func:
+        the function to call on each dict node, returning a dict
+
+    :param ignore: the names of keys that should not be explored
+
+    :returns: a version of the tree with every node modified by `func`
+    """
+    if isinstance(obj, str):
+        obj = mentioned.get_if_present(obj)
+    if isinstance(obj, List):
+        obj = [mentioned.get_if_present(item) for item in obj]
+        return [walk_tree_and_expand(item, mentioned, ignore) for item in obj]
+    if isinstance(obj, Dict):
+
+        obj_dict: Dict = {}
+        for key, value in obj.items():
+            if key not in ignore:
+                obj_dict[key] = mentioned.get_if_present(value)
+            else:
+                obj_dict[key] = value
+
+        for key, value in obj_dict.items():
+            if isinstance(value, (Dict, List)) and key not in ignore:
+                obj_dict[key] = walk_tree_and_expand(value, mentioned, ignore)
+
+        return obj_dict
+
+    return obj
+
+
 def expand_holding(
     record: RawHolding, factor_index: Mentioned, enactment_index: EnactmentIndex
 ) -> RawHolding:
-    for key, value in record.items():
-        if key in ["enactments_despite", "enactments"]:
-            record[key] = expand_enactments(value, enactment_index)
-        elif key not in ["mandatory", "universal", "exclusive"]:
-            record[key] = expand_names(value, factor_index)
-    return record
+    new_index = Mentioned({**factor_index, **enactment_index})
+    return walk_tree_and_expand(
+        record,
+        mentioned=new_index,
+        ignore=["predicate", "enactment", "selection", "name"],
+    )
 
 
 def expand_holdings(

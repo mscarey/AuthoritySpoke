@@ -103,8 +103,6 @@ class Rule(Comparable, BaseModel):
                     v = EnactmentGroup(passages=list(v)) if v else EnactmentGroup()
                 except ValidationError:
                     v = EnactmentGroup(passages=[v])
-        if not isinstance(v, EnactmentGroup):
-            print(v)
         return v
 
     @validator("enactments", "enactments_despite", pre=False)
