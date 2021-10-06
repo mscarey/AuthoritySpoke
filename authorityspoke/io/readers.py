@@ -18,7 +18,7 @@ from authorityspoke.decisions import Decision, DecisionReading
 from authorityspoke.facts import Fact, Exhibit, Evidence, Allegation, Pleading
 from authorityspoke.holdings import Holding
 from authorityspoke.io import schemas_yaml
-from authorityspoke.opinions import AnchoredHoldings
+from authorityspoke.opinions import AnchoredHoldings, HoldingWithAnchors
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
 from authorityspoke.io.nesting import nest_fields, walk_tree_and_modify
@@ -152,7 +152,6 @@ def collect_anchors_from_index(object_index, field_name: str):
 def read_holdings_with_anchors(
     record: Dict[str, Union[List[RawHolding], List[RawSelector]]],
     client: Optional[Client] = None,
-    many: bool = True,
 ) -> AnchoredHoldings:
     r"""
     Load a list of Holdings from JSON, with text links.
@@ -173,32 +172,17 @@ def read_holdings_with_anchors(
         an index matching :class:`.Factor`\s to selectors.
     """
 
-    record, enactment_index = collect_enactments(record)
-    if client:
-        enactment_index = client.update_entries_in_enactment_index(enactment_index)
-
-    # move anchors out of enactments
-    anchors, enactment_index = collect_enactment_anchors(enactment_index)
-    if not record.get("enactment_anchors"):
-        record["enactment_anchors"] = []
-    record["enactment_anchors"] = record["enactment_anchors"] + anchors
-
-    record["holdings"], factor_index = index_names(record["holdings"])
-
-    # move anchors out of factors
-    anchors, factor_index = collect_anchors_from_index(factor_index, "name")
-    if not record.get("factor_anchors"):
-        record["factor_anchors"] = []
-    record["factor_anchors"] = record["factor_anchors"] + anchors
-
-    schema = schemas_yaml.AnchoredHoldingsSchema()
-    schema.context["enactment_index"] = enactment_index
-    schema.context["mentioned"] = factor_index
-
-    holdings_with_anchors, named_anchors, enactment_anchors = schema.load(
-        deepcopy(record)
-    )
-    return AnchoredHoldings(holdings_with_anchors, named_anchors, enactment_anchors)
+    (
+        holdings,
+        enactment_anchors,
+        factor_anchors,
+        holding_anchors,
+    ) = extract_anchors_from_holding_record(record, client)
+    holdings_with_anchors = [
+        HoldingWithAnchors(holding, holding_anchors[i])
+        for i, holding in enumerate(holdings)
+    ]
+    return AnchoredHoldings(holdings_with_anchors, factor_anchors, enactment_anchors)
 
 
 def expand_factor(record: Union[str, RawFactor], factor_index: Mentioned) -> RawFactor:
@@ -325,6 +309,28 @@ def expand_holdings(
     return holdings
 
 
+def extract_anchors_from_holding_record(
+    record: List[RawHolding], client: Optional[Client] = None
+):
+    record, enactment_index = collect_enactments(record)
+    if client:
+        enactment_index = client.update_entries_in_enactment_index(enactment_index)
+    enactment_anchors, enactment_index = collect_anchors_from_index(
+        enactment_index, "enactment"
+    )
+    record, factor_index = index_names(record)
+    factor_anchors, factor_index = collect_anchors_from_index(factor_index, "name")
+    holding_anchors = [holding.pop("anchors", None) for holding in record]
+
+    expanded = expand_holdings(
+        record, factor_index=factor_index, enactment_index=enactment_index
+    )
+    result = []
+    for holding in expanded:
+        result.append(Holding(**holding))
+    return result, enactment_anchors, factor_anchors, holding_anchors
+
+
 def read_holdings(
     record: List[RawHolding], client: Optional[Client] = None
 ) -> List[Holding]:
@@ -342,24 +348,14 @@ def read_holdings(
     :returns:
         a list of :class:`.Holding` objects
     """
+    (
+        holdings,
+        enactment_anchors,
+        factor_anchors,
+        holding_anchors,
+    ) = extract_anchors_from_holding_record(record, client)
 
-    record, enactment_index = collect_enactments(record)
-    if client:
-        enactment_index = client.update_entries_in_enactment_index(enactment_index)
-    factor_anchors, enactment_index = collect_anchors_from_index(
-        enactment_index, "enactment"
-    )
-    record, factor_index = index_names(record)
-    anchors, factor_index = collect_anchors_from_index(factor_index, "name")
-    holding_anchors = [holding.pop("anchors", None) for holding in record]
-
-    expanded = expand_holdings(
-        record, factor_index=factor_index, enactment_index=enactment_index
-    )
-    result = []
-    for holding in expanded:
-        result.append(Holding(**holding))
-    return result
+    return holdings
 
 
 def read_decision(decision: Union[RawDecision, Decision]) -> DecisionReading:
