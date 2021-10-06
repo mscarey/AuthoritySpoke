@@ -286,13 +286,15 @@ class TestTextAnchors:
 
     def test_holding_without_enactments_or_regime(self, raw_holding):
         expanded = text_expansion.expand_shorthand(raw_holding["bradley_house"])
-        built = readers.read_holding(expanded)
+        built = readers.read_holdings([expanded])
         new_factor = built.outputs[0].to_effect.terms[0]
         assert new_factor.name == "Bradley"
 
     def test_posit_one_holding_with_anchor(self, raw_holding, make_response):
         mock_client = FakeClient(responses=make_response)
-        holding = readers.read_holding(raw_holding["bradley_house"], client=mock_client)
+        holding = readers.read_holdings(
+            [raw_holding["bradley_house"]], client=mock_client
+        )
         reading = OpinionReading()
         reading.posit_holding(
             holding,
@@ -444,8 +446,8 @@ class TestTextAnchors:
             ],
             "enactments": {"enactment": {"node": "/us/usc/t17/s410/c"}},
         }
-        holding = readers.read_holding(holding_dict, client=mock_client)
-        assert holding.enactments[0].selected_text().startswith("In any judicial")
+        holding = readers.read_holdings([holding_dict], client=mock_client)
+        assert holding[0].enactments[0].selected_text().startswith("In any judicial")
 
     def test_enactment_has_subsection(self, make_response):
         mock_client = FakeClient(responses=make_response)

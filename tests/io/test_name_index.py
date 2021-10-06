@@ -147,7 +147,7 @@ class TestCollectMentioned:
             },
         }
         holding = text_expansion.expand_shorthand(holding)
-        built = readers.read_holding(record=holding, client=fake_usc_client)
+        built = readers.read_holdings(record=[holding], client=fake_usc_client)
         assert built.inputs[0].short_string.startswith(
             "the fact that <Rural's telephone listings> were names"
         )
@@ -158,7 +158,9 @@ class TestCollectMentioned:
         'Name "securing for authors" not found in the index of mentioned Factors'
         """
         feist_records = loaders.load_holdings("holding_feist.yaml")
-        feist_holding = readers.read_holding(feist_records[0], client=fake_usc_client)
+        feist_holding = readers.read_holdings(
+            [feist_records[0]], client=fake_usc_client
+        )
         assert "securing for limited Times" in feist_holding.short_string
 
     def test_update_name_index_with_longer_factor(self):

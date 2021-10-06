@@ -139,7 +139,7 @@ we can determine that the original “chin rule” implies our new Rule.
 
     >>> from authorityspoke.io import readers
     >>> beard_dictionary[0]['inputs'][1]['content'] = 'the length of the suspected beard was = 8 millimetres'
-    >>> longer_hair_rule = readers.read_holding(beard_dictionary[0], client=legis_client)
+    >>> longer_hair_rule = readers.read_holdings([beard_dictionary[0]], client=legis_client)
     >>> print(longer_hair_rule)
     the Holding to ACCEPT
       the Rule that the court MAY ALWAYS impose the
