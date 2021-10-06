@@ -8,6 +8,7 @@ from re import findall
 from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
 from nettlesome.predicates import StatementTemplate
+from authorityspoke.facts import Exhibit
 from authorityspoke.io import text_expansion
 
 
@@ -114,6 +115,10 @@ def assign_name_for_evidence(obj: Dict) -> str:
     return name
 
 
+def assign_name_for_exhibit(obj: Dict) -> str:
+    return str(obj)
+
+
 def assign_name_for_pleading(obj: Dict) -> str:
     r"""
     Return an appropriate name for a Pleading.
@@ -156,6 +161,10 @@ def create_name_for_factor(obj: Dict) -> str:
         name = assign_name_for_evidence(obj)
     elif obj.get("type") and obj["type"].lower() == "pleading":
         name = assign_name_for_pleading(obj)
+    elif (
+        obj.get("offered_by") or (obj.get("type") and obj["type"].lower()) == "exhibit"
+    ):
+        name = assign_name_for_exhibit(obj)
     else:
         raise NotImplementedError
     if obj.get("absent") is True:

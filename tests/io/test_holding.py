@@ -528,7 +528,7 @@ class TestTextAnchors:
         )
         expectation_not_reasonable = list(reading.holdings)[6]
         assert "dimensionless" not in str(expectation_not_reasonable)
-        assert isinstance(expectation_not_reasonable.inputs[0].predicate.quantity, int)
+        assert expectation_not_reasonable.inputs[0].predicate.quantity == 3
 
     def test_opinion_posits_holding(self, make_response):
         mock_client = FakeClient(responses=make_response)

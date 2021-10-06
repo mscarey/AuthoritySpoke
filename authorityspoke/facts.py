@@ -503,6 +503,10 @@ class Exhibit(Factor, BaseModel):
         return string.replace("exhibit", self.form or "exhibit").strip()
 
     @property
+    def short_string(self):
+        return str(self)
+
+    @property
     def wrapped_string(self):
         text = ""
         if self.form:

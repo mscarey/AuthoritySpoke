@@ -1,4 +1,4 @@
-holdings:
+
 - inputs:
   - type: fact
     content: '{the Lotus menu command hierarchy} was copyrightable'
@@ -32,6 +32,9 @@ holdings:
   - type: evidence
     exhibit:
       type: exhibit
+      offered_by:
+        name: Lotus Development Corporation
+        type: entity
       name: Lotus's copyright registration
       form: certificate of copyright registration
     to_effect:
@@ -51,6 +54,10 @@ holdings:
       node: /us/usc/t17/s410/c
 - inputs:
   - type: evidence
+    exhibit:
+      offered_by:
+        name: Lotus Development Corporation
+        type: entity
     to_effect:
       type: fact
       content: Borland International copied the Lotus menu command hierarchy in creating
@@ -63,12 +70,20 @@ holdings:
   - copyright protection
 - inputs:
   - type: evidence
+    exhibit:
+      offered_by:
+        name: Lotus Development Corporation
+        type: entity
     to_effect:
       type: fact
       content: Borland International had access to the Lotus menu command hierarchy
   - type: fact
     content: Borland International published Quattro's Lotus Emulation Interface
   - type: evidence
+    exhibit:
+      offered_by:
+        name: Lotus Development Corporation
+        type: entity
     to_effect:
       type: fact
       content: Quattro's Lotus Emulation Interface was very similar to the Lotus menu

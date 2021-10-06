@@ -40,7 +40,7 @@ class EnactmentWithAnchors(BaseModel):
     """A term with a set of anchors."""
 
     passage: EnactmentPassage
-    anchors: TextPositionSet
+    anchors: TextPositionSet = TextPositionSet()
 
     @validator("anchors", pre=True)
     def validate_anchors(cls, value: TextPositionSet) -> TextPositionSet:
@@ -56,7 +56,7 @@ class TermWithAnchors(BaseModel):
     """A term with a set of anchors."""
 
     term: Union[Entity, Fact, Allegation, Pleading, Exhibit, Evidence]
-    anchors: TextPositionSet
+    anchors: TextPositionSet = TextPositionSet()
 
     @validator("anchors", pre=True)
     def validate_anchors(cls, value: TextPositionSet) -> TextPositionSet:
@@ -74,7 +74,7 @@ class HoldingWithAnchors(BaseModel):
     """
 
     holding: Holding
-    anchors: TextPositionSet
+    anchors: TextPositionSet = TextPositionSet()
 
     @validator("anchors", pre=True)
     def validate_anchors(cls, value: TextPositionSet) -> TextPositionSet:
