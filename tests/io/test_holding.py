@@ -60,10 +60,8 @@ class TestHoldingDump:
         holdings = read_holdings_from_file("holding_watt.yaml", client=fake_usc_client)
         assert "was no more than 35 foot" in str(holdings[1])
         dumped = holdings[1].dict()
-        assert (
-            dumped["rule"]["procedure"]["inputs"][3]["predicate"]["expression"]
-            == "35 foot"
-        )
+        predicate = dumped["rule"]["procedure"]["inputs"][3]["predicate"]
+        assert predicate["quantity_range"]["quantity"] == "35 foot"
 
 
 class TestEntityImport:

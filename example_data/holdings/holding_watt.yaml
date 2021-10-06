@@ -117,7 +117,7 @@ holdings:
     terms:
     - type: exhibit
       offered_by:
-      - type: entity
+        type: entity
         name: prosecutor
       name: proof of Wattenburg's guilt
       generic: true
@@ -136,7 +136,7 @@ holdings:
   - type: evidence
     exhibit: proof of Wattenburg's guilt
     to_effect:
-    - type: fact
+      type: fact
       content: Wattenburg committed a crime
     absent: true
   enactments:
