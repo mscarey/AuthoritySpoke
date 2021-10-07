@@ -329,7 +329,7 @@ class TestImplication:
         """
         small_reliable = make_complex_rule["accept_small_weight_reliable"]
         small_more_reliable_holding = Holding(
-            make_complex_rule["accept_small_weight_reliable_more_evidence"]
+            rule=make_complex_rule["accept_small_weight_reliable_more_evidence"]
         )
         assert small_reliable >= small_more_reliable_holding
 
@@ -340,7 +340,7 @@ class TestImplication:
         """
         small_reliable = make_complex_rule["accept_small_weight_reliable"]
         small_more_reliable_holding = Holding(
-            make_complex_rule["accept_small_weight_reliable_more_evidence"]
+            rule=make_complex_rule["accept_small_weight_reliable_more_evidence"]
         )
         assert not small_reliable.implies(
             small_more_reliable_holding,
@@ -1019,8 +1019,8 @@ class TestStatuteRules:
         beard_dictionary[0]["inputs"][1][
             "content"
         ] = "the length of the suspected beard was = 8 millimetres"
-        longer_hair_rule = readers.read_rule(beard_dictionary[0], client=client)
-        assert make_beard_rule[0].implies(longer_hair_rule)
+        longer_hair_rule = readers.read_holdings([beard_dictionary[0]], client=client)
+        assert make_beard_rule[0].implies(longer_hair_rule[0])
 
     def test_greater_than_contradicts_not_greater(
         self, beard_response, make_beard_rule
@@ -1032,16 +1032,18 @@ class TestStatuteRules:
         ] = "the length of the suspected beard was >= 12 inches"
         beard_dictionary[1]["outputs"][0]["truth"] = False
         beard_dictionary[1]["mandatory"] = True
-        long_hair_is_not_a_beard = readers.read_rule(beard_dictionary[1], client=client)
-        assert make_beard_rule[1].contradicts(long_hair_is_not_a_beard)
+        long_hair_is_not_a_beard = readers.read_holdings(
+            [beard_dictionary[1]], client=client
+        )
+        assert make_beard_rule[1].contradicts(long_hair_is_not_a_beard[0])
 
     def test_contradictory_fact_about_beard_length(
         self, fake_beard_client, make_beard_rule
     ):
         beard_dictionary = loaders.load_holdings("beard_rules.yaml")
-        long_means_not_beard = readers.read_rule(
+        long_means_not_beard = readers.read_holdings(
             beard_dictionary[1], client=fake_beard_client
-        )
+        )[0].rule
         long_means_not_beard.set_despite(
             [long_means_not_beard.inputs[0], long_means_not_beard.inputs[2]]
         )
@@ -1083,13 +1085,13 @@ class TestStatuteRules:
         sec_4 = fake_beard_client.read("/test/acts/47/4/")
 
         was_facial_hair = Predicate(content="$thing was facial hair")
-        fact_was_facial_hair = Fact(was_facial_hair, terms=beard)
+        fact_was_facial_hair = Fact(predicate=was_facial_hair, terms=beard)
         hypothetical = Rule(
             procedure=Procedure(
                 inputs=[
                     fact_was_facial_hair,
                     Fact(
-                        Comparison(
+                        predicate=Comparison(
                             content="the length of $thing was",
                             sign=">=",
                             expression=Q_("5 millimeters"),
@@ -1098,22 +1100,24 @@ class TestStatuteRules:
                         terms=beard,
                     ),
                     Fact(
-                        Predicate(
-                            "$thing occurred on or below the chin",
+                        predicate=Predicate(
+                            content="$thing occurred on or below the chin",
                             truth=facial_hair_on_or_below_chin,
                         ),
                         terms=beard,
                     ),
                     Fact(
-                        Predicate(
-                            "$thing existed in an uninterrupted line from the front "
+                        predicate=Predicate(
+                            content="$thing existed in an uninterrupted line from the front "
                             "of one ear to the front of the other ear below the nose",
                             truth=facial_hair_uninterrupted,
                         ),
                         terms=beard,
                     ),
                 ],
-                outputs=Fact(Predicate(content="$thing was a beard"), terms=beard),
+                outputs=Fact(
+                    predicate=Predicate(content="$thing was a beard"), terms=beard
+                ),
             ),
             enactments=sec_4,
         )

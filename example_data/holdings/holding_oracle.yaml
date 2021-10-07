@@ -6,7 +6,6 @@
       type: fact
       content: the Java API was copyrightable
       truth: false
-      name: the Java API was copyrightable
       anchors:
         quotes:
         - questions regarding originality are considered questions of |copyrightability|

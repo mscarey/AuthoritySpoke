@@ -648,9 +648,9 @@ class Allegation(Factor, BaseModel):
     @property
     def wrapped_string(self):
         text = ""
-        if self.statement:
+        if self.fact:
             text += "\n" + indented("OF:")
-            factor_text = indented(self.statement.wrapped_string, tabs=2)
+            factor_text = indented(self.fact.wrapped_string, tabs=2)
             text += f"\n{str(factor_text)}"
         if self.pleading:
             text += f"\n" + indented("FOUND IN:")
@@ -661,7 +661,7 @@ class Allegation(Factor, BaseModel):
     def __str__(self):
         string = (
             f'{("in " + self.pleading.short_string + ",") if self.pleading else ""}'
-            + f'{("claiming " + self.statement.short_string + ",") if self.statement else ""}'
+            + f'{("claiming " + self.fact.short_string + ",") if self.fact else ""}'
         )
         string = string.strip(",")
         return super().__str__().format(string).replace("Allegation", "allegation")
