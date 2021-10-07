@@ -184,10 +184,10 @@ def read_holdings_with_anchors(
         factor_anchors,
         holding_anchors,
     ) = extract_anchors_from_holding_record(record, client)
-    holdings_with_anchors = [
-        HoldingWithAnchors(holding=holding, anchors=holding_anchors[i])
-        for i, holding in enumerate(holdings)
-    ]
+    holdings_with_anchors = []
+    for i, holding in enumerate(holdings):
+        new = HoldingWithAnchors(holding=holding, anchors=holding_anchors[i])
+        holdings_with_anchors.append(new)
     return AnchoredHoldings(holdings_with_anchors, factor_anchors, enactment_anchors)
 
 

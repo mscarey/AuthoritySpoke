@@ -47,26 +47,22 @@ class TestLoadOpinion:
         assert isinstance(reading.holdings, HoldingGroup)
         assert len(reading.holdings) == 1
 
-    def test_selectors_not_duplicated(self, make_opinion_with_holding, raw_holding):
+    def test_selectors_not_duplicated(self, make_decision, raw_holding):
         """
         Test that the factors attribute for this Opinion contains
         one instance of the Fact "Mark stole a watch", but that both
         of the different text anchors for that Fact are attached to it.
         """
         watch = raw_holding["stolen watch"]
-        holdings, _, _ = readers.read_holdings_with_anchors(
-            {"holdings": [{"holding": watch}]}
-        )
-        cardenas = make_opinion_with_holding["cardenas_majority"]
-        cardenas.clear_holdings()
-        cardenas.posit_holdings(holdings)
+        holdings, _, _ = readers.read_holdings_with_anchors([watch])
+        cardenas = OpinionReading(anchored_holdings=holdings)
 
         assert any(
-            selector.exact == "Mark stole a watch"
-            for selector in holdings[0].anchors.quotes
+            selector.exact == "Mark stole the watch"
+            for selector in cardenas.anchored_holdings[0].anchors.quotes
         )
         assert any(
             selector.exact == "a watch was stolen by Mark"
-            for selector in holdings[0].anchors.quotes
+            for selector in cardenas.anchored_holdings[0].anchors.quotes
         )
-        assert len(holdings[0].anchors.quotes) == 2
+        assert len(cardenas.anchored_holdings[0].anchors.quotes) == 2

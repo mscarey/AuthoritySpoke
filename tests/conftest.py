@@ -1686,7 +1686,7 @@ def raw_holding() -> RawHolding:
         "stolen watch": {
             "anchors": {
                 "quotes": [
-                    {"exact": "Mark stole a watch"},
+                    {"exact": "Mark stole the watch"},
                     {"exact": "a watch was stolen by Mark"},
                 ]
             },
