@@ -550,12 +550,22 @@ class Evidence(Factor, BaseModel):
         the evidence is being referenced.
     """
 
-    exhibit: Exhibit
+    exhibit: Optional[Exhibit] = None
     to_effect: Optional[Fact] = None
     name: Optional[str] = None
     absent: bool = False
     generic: bool = False
     context_factor_names: ClassVar[Tuple[str, ...]] = ("exhibit", "to_effect")
+
+    class Config:
+        extra = Extra.forbid
+
+    @root_validator(pre=True)
+    def check_type_field(cls, values):
+        type_str = values.pop("type", "")
+        if type_str and type_str.lower() != "evidence":
+            raise ValidationError(f"type {type_str} was passed to Evidence model")
+        return values
 
     def __str__(self):
         string = (

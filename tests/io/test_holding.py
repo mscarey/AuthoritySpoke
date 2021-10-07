@@ -287,17 +287,17 @@ class TestTextAnchors:
     def test_holding_without_enactments_or_regime(self, raw_holding):
         expanded = text_expansion.expand_shorthand(raw_holding["bradley_house"])
         built = readers.read_holdings([expanded])
-        new_factor = built.outputs[0].to_effect.terms[0]
+        new_factor = built[0].outputs[0].to_effect.terms[0]
         assert new_factor.name == "Bradley"
 
     def test_posit_one_holding_with_anchor(self, raw_holding, make_response):
         mock_client = FakeClient(responses=make_response)
-        holding = readers.read_holdings(
+        holdings = readers.read_holdings(
             [raw_holding["bradley_house"]], client=mock_client
         )
         reading = OpinionReading()
         reading.posit_holding(
-            holding,
+            holdings[0],
             holding_anchors=TextQuoteSelector(
                 exact="some text supporting this holding"
             ),
@@ -323,12 +323,7 @@ class TestTextAnchors:
                 },
                 "outputs": {
                     "type": "evidence",
-                    "exhibit": {
-                        "offered_by": {
-                            "type": "entity",
-                            "name": "the People"
-                        }
-                    },
+                    "exhibit": {"offered_by": {"type": "entity", "name": "the People"}},
                     "to_effect": {
                         "type": "fact",
                         "name": "fact that Bradley committed a crime",

@@ -1,4 +1,3 @@
-holdings:
   - inputs:
       type: fact
       content: "{the Java API} was an original work"
@@ -7,6 +6,16 @@ holdings:
       type: fact
       content: the Java API was copyrightable
       truth: false
+      name: the Java API was copyrightable
+      anchors:
+        quotes:
+        - questions regarding originality are considered questions of |copyrightability|
+        - that element may nevertheless contain expression that is eligible for copyright
+          protection
+        - structure, sequence, and organization of a computer program |is eligible for copyright
+          protection|
+        - must be “original” to qualify for |copyright protection.|
+        - whether the non-literal elements of a program “are protected
     mandatory: true
     enactments:
       name: copyright protection provision
@@ -21,41 +30,84 @@ holdings:
       anchors:
         quotes:
         - qualify for copyright protection. |17 U.S.C. § 102(a)|.
-    anchors: 
+    anchors:
       quotes: By statute, a work |must be “original” to qualify| for
   - inputs:
       - type: fact
         content:
           the Java API was independently created by the author, as opposed to copied
           from other works
+        name:
+          the Java API was independently created by the author, as opposed to copied
+          from other works
+        anchors:
+          quotes: the work was independently created by the author (as opposed to copied from other works)
       - type: fact
         content: the Java API possessed at least some minimal degree of creativity
+        name: the Java API possessed at least some minimal degree of creativity
+        anchors:
+          quotes: it possesses at least some minimal degree of creativity.
     outputs:
       type: fact
       content: the Java API was an original work
+      name: the Java API was an original work
+      anchors:
+        quotes:
+        - exact: a work must be “original”
+        - exact: Original, as the term is used in copyright
     mandatory: true
     universal: true
-    enactments: 
+    enactments:
       - copyright protection provision
   - inputs:
       - the Java API was an original work
       - type: fact
         content: the Java API was the expression of an idea
+        name: the Java API was the expression of an idea
+        anchors:
+          quotes:
+          - whether, on the particular facts of each case, the component in question qualifies
+            as
+          - an |expression of an idea,| or an idea itself.
+          - Copyright protection extends only to |the expression of an idea|
+          - the component in question qualifies as an expression of an idea
+          - "|where it qualifies as an expression of an idea|, rather than the idea itself."
       - type: fact
         content: the Java API was an idea
         truth: false
+        name: false the Java API was an idea
+        anchors:
+          quotes:
+          - whether, on the particular facts of each case, the component in question qualifies
+            as an expression of an idea
+          - not to the underlying idea itself
+          - "|the component in question qualifies as| an expression of an idea,"
+          - or |an idea itself.|
+          - where it qualifies as an expression of an idea, |rather than the idea itself.|
     despite:
       - type: fact
         content:
-          the Java API was essentially the only way to express the idea that it
-          embodied
+          the Java API was essentially the only way to express the idea that it embodied
+        name: the Java API was essentially the only way to express the idea that it embodied
+        anchors:
+          quotes:
+          - concepts of|merger|and scenes a faire
+          - "|concepts of merger| and scenes a faire are affirmative defenses to claims of
+            infringement."
       - type: fact
         content: the Java API was a scene a faire
+        name: the Java API was a scene a faire
+        anchors:
+          quotes:
+          - concepts of merger and |scenes a faire|
+          - concepts of merger and |scenes a faire| are affirmative defenses to claims of
+            infringement.
+          - the scene a faire doctrine denies protection
     outputs:
       type: fact
       content: the Java API was copyrightable
     mandatory: true
-    enactments: 
+    enactments:
       - copyright protection provision
     enactments_despite:
       enactment:
@@ -64,11 +116,24 @@ holdings:
   - inputs:
       - type: fact
         content: "{the Java language} was a computer program"
+        name: the Java language was a computer program
+        anchors:
+          quotes:
+          - The literal elements of |a computer program|are
+          - the scene a faire doctrine denies protection to |program| elements
       - type: fact
         content: the Java API was the source code of the Java language
+        name: the Java API was the source code of the Java language
+        anchors:
+          quotes: "|are the source code|and object code."
     outputs:
       type: fact
       content: the Java API was a literal element of the Java language
+      name: the Java API was a literal element of the Java language
+      anchors:
+        quotes: 
+        - the scene a faire doctrine denies protection to program| elements|
+        - The literal elements of a computer program are
     mandatory: true
     universal: true
     enactments:
@@ -78,6 +143,9 @@ holdings:
       - the Java language was a computer program
       - type: fact
         content: the Java API was the object code of the Java language
+        name: the Java API was the object code of the Java language
+        anchors:
+          quotes: are the source code and |object code.|
     outputs: the Java API was a literal element of the Java language
     mandatory: true
     universal: true
@@ -89,9 +157,9 @@ holdings:
       - the Java API was a literal element of the Java language
     outputs: the Java API was copyrightable
     mandatory: true
-    enactments: 
+    enactments:
       - copyright protection provision
-    enactments_despite: 
+    enactments_despite:
       - copyright exceptions full
   - inputs:
       - the Java language was a computer program
@@ -99,9 +167,15 @@ holdings:
         content:
           the Java API was the sequence, structure, and organization of the Java
           language
+        name: the Java API was the sequence, structure, and organization of the Java language
+        anchors:
+          quotes: include, among other things, |the program’s sequence, structure, and organization,|
     outputs:
       type: fact
       content: the Java API was a non-literal element of the Java language
+      name: the Java API was a non-literal element of the Java language
+      anchors:
+        quotes: "|The non-literal components of a computer program|include,"
     mandatory: true
     universal: true
     enactments:
@@ -132,9 +206,9 @@ holdings:
         truth: false
     outputs: the Java API was copyrightable
     mandatory: true
-    enactments: 
+    enactments:
       - copyright protection provision
-    enactments_despite: 
+    enactments_despite:
       - copyright exceptions full
   - inputs:
       - the Java language was a computer program
@@ -142,6 +216,7 @@ holdings:
       - type: fact
         content: the Java API was the expression of an idea
         truth: false
+        name: false the Java API was the expression of an idea
       - type: fact
         content: the Java API was an idea
     outputs:
@@ -149,14 +224,17 @@ holdings:
       content: the Java API was copyrightable
       truth: false
     mandatory: true
-    enactments: 
+    enactments:
       - copyright exceptions full
-    enactments_despite: 
+    enactments_despite:
       - copyright protection provision
   - inputs:
       - the Java language was a computer program
       - type: fact
         content: the Java API was a set of application programming interface declarations
+        name: the Java API was a set of application programming interface declarations
+        anchors:
+          quotes: literal elements of its API packages — the 7,000 lines of declaring source code
       - the Java API was an original work
       - the Java API was a non-literal element of the Java language
       - the Java API was the expression of an idea
@@ -165,26 +243,59 @@ holdings:
           the Java API was essentially the only way to express the idea that it
           embodied
         truth: false
+        name:
+          false the Java API was essentially the only way to express the idea that it
+          embodied
+        anchors:
+          quotes:
+          - we agree that merger cannot bar copyright protection for any lines of declaring
+            source code unless Sun/Oracle had only one way, or a limited number of ways, to
+            write them
+          - Oracle had “unlimited options as to the selection and arrangement of the 7000
+            lines Google copied.
+          - merger does not apply on the record before us
       - type: fact
         content: the Java API was creative
+        name: the Java API was creative
+        anchors:
+          quotes: it is undisputed here that the declaring code and the structure and organization of the API packages are both creative
       - type: fact
         content: it was possible to use the Java language without copying the Java API
+        name: it was possible to use the Java language without copying the Java API
+        anchors:
+          quotes: Google did not need to copy the structure, sequence, and organization of the Java API packages to write programs in the Java language
     despite:
       - type: fact
         content: the Java API was a method of operation
+        name: the Java API was a method of operation
+        anchors:
+          quotes: although an element of a work may be characterized as a method of operation
       - type: fact
         content: the Java API contained short phrases
+        name: the Java API contained short phrases
+        anchors:
+          quotes: 
+          - whether the work at issue contains short phrases
+          - purposes is not whether |the work at issue contains short phrases|
       - type: fact
         content: the Java API became so popular that it was the industry standard
+        name: the Java API became so popular that it was the industry standard
+        anchors:
+          quotes: the Java API packages because they had become the effective industry standard
       - type: fact
         content:
           there was a preexisting community of programmers accustomed to using
           the Java API
+        name:
+          there was a preexisting community of programmers accustomed to using the Java
+          API
+        anchors:
+          quotes: the preexisting community of programmers who were accustomed to using the Java API packages
     outputs:
       type: fact
       content: the Java API was copyrightable
     mandatory: true
-    enactments: 
+    enactments:
       - copyright protection provision
     enactments_despite:
       - name: in no case method of operation
@@ -253,6 +364,9 @@ holdings:
       type: fact
       content: "{Google} infringed the copyright on the Java API"
       truth: false
+      name: false Google infringed the copyright on the Java API
+      anchors:
+        quotes: concepts of merger and scenes a faire are |affirmative defenses to claims of infringement.|
     mandatory: true
     enactments: copyright exceptions full
     enactments_despite: copyright protection provision
@@ -280,10 +394,14 @@ holdings:
           embodied
         absent: true
         name: absent essentially the only way
+        anchors:
+          quotes: "|concepts of merger| and scenes a faire are affirmative defenses "
       - type: fact
         content: the Java API was a scene a faire
         absent: true
         name: absent scene a faire
+        anchors:
+          quotes: "concepts of merger and |scenes a faire| are affirmative defenses "
     outputs:
       type: fact
       content: Google infringed the copyright on the Java API
@@ -293,10 +411,19 @@ holdings:
   - inputs:
       - type: fact
         content: "{Sun Microsystems} created the Java API"
+        name: Sun Microsystems created the Java API
+        anchors:
+          quotes: Sun Microsystems, Inc. (“Sun”) developed the Java “platform” for computer programming
       - type: fact
         content:
           when creating the Java API, Sun Microsystems could have selected and
           arranged its names and phrases in unlimited different ways
+        name:
+          when creating the Java API, Sun Microsystems could have selected and arranged
+          its names and phrases in unlimited different ways
+    anchors:
+      quotes: Oracle had “unlimited options as to the selection and arrangement of the 7000 lines Google copied.
+
     outputs:
       type: fact
       content:
@@ -309,8 +436,14 @@ holdings:
   - inputs:
       - type: fact
         content: the Java API was a literary work
+        name: the Java API was a literary work
+        anchors:
+          quotes: as literary works often do
       - type: fact
         content: the Java API contained short phrases that were creative
+        name: the Java API contained short phrases that were creative
+        anchors:
+          quotes: whether those phrases are creative.
     despite:
       type: fact
       content: the Java API contained short phrases
@@ -333,6 +466,15 @@ holdings:
           the mechanical specifications of the computer on which the Java language was
           intended to run or widely accepted programming practices within the computer
           industry
+        name:
+          the creation of the Java API was dictated by external factors such as the
+          mechanical specifications of the computer on which the Java language was intended
+          to run or widely accepted programming practices within the computer industry
+        anchors:
+          quotes:
+            that are dictated by external factors such as ‘the mechanical specifications
+            of the computer on which a particular program is intended to run’ or ‘widely accepted
+            programming practices within the computer industry.
     outputs:
       type: fact
       content: the Java API was a scene a faire
@@ -345,6 +487,9 @@ holdings:
         content:
           the Java API was the structure, sequence, and organization of the Java
           language
+        name: the Java API was the structure, sequence, and organization of the Java language
+        anchors:
+          quotes: "|the structure, sequence, and organization of a computer program| is eligible for copyright protection"
       - type: fact
         content: the Java API was the expression of an idea
       - type: fact
@@ -363,9 +508,17 @@ holdings:
         content:
           when creating the Java API, Sun Microsystems had multiple ways to express
           its underlying idea
+        name:
+          when creating the Java API, Sun Microsystems had multiple ways to express
+          its underlying idea
+    anchors:
+      quotes: as long as the author had multiple ways to express the underlying idea
     despite:
       type: fact
       content: the Java API served a function
+      name: the Java API served a function
+      anchors:
+        quotes: an original work — even one that serves a function
     outputs:
       type: fact
       content: the Java API was copyrightable
@@ -381,176 +534,30 @@ holdings:
       content: the Java language was copyrightable
     enactments: copyright protection provision
     enactments_despite: copyright exceptions full
-factor_anchors:
-  - name: the Java API was an original work
-    anchors: 
-      quotes: 
-      - exact: a work must be “original”
-  - name: the Java API was copyrightable
-    anchors:
-      quotes:
-      - questions regarding originality are considered questions of |copyrightability|
-      - that element may nevertheless contain expression that is eligible for copyright
-        protection
-      - structure, sequence, and organization of a computer program |is eligible for copyright
-        protection|
-  - name: false the Java API was copyrightable
-    anchors:
-      quotes:
-      - must be “original” to qualify for |copyright protection.|
-      - whether the non-literal elements of a program “are protected
-  - name:
-      the Java API was independently created by the author, as opposed to copied
-      from other works
-    anchors:
-      quotes: the work was independently created by the author (as opposed to copied from other works)
-  - name: the Java API was an original work
-    anchors: 
-      quotes: Original, as the term is used in copyright
-  - name: the Java API possessed at least some minimal degree of creativity
-    anchors: 
-      quotes: it possesses at least some minimal degree of creativity.
-  - name: the Java API was the expression of an idea
-    anchors:
-      quotes: 
-      - Copyright protection extends only to |the expression of an idea|
-      - the component in question qualifies as an expression of an idea
-      - "|where it qualifies as an expression of an idea|, rather than the idea itself."
-  - name: false the Java API was an idea
-    anchors:
-      quotes: 
-      - not to the underlying idea itself
-      - "|the component in question qualifies as| an expression of an idea,"
-      - or |an idea itself.|
-      - where it qualifies as an expression of an idea, |rather than the idea itself.|
-  - name: the Java API was essentially the only way to express the idea that it embodied
-    anchors:
-      quotes: 
-      - concepts of|merger|and scenes a faire
-      - "|concepts of merger| and scenes a faire are affirmative defenses to claims of
-        infringement."
-  - name: the Java API was a scene a faire
-    anchors:
-      quotes: 
-      - concepts of merger and |scenes a faire|
-      - concepts of merger and |scenes a faire| are affirmative defenses to claims of
-        infringement.
-      - the scene a faire doctrine denies protection
-  - name: the Java language was a computer program
-    anchors:
-      quotes: 
-      - The literal elements of |a computer program|are
-      - the scene a faire doctrine denies protection to |program| elements
-  - name: the Java API was the source code of the Java language
-    anchors: 
-      quotes: "|are the source code|and object code."
-  - name: the Java API was a set of application programming interface declarations
-    anchors:
-      quotes: literal elements of its API packages — the 7,000 lines of declaring source code
-  - name:
-      false the Java API was essentially the only way to express the idea that it
-      embodied
-    anchors:
-      quotes: 
-      - we agree that merger cannot bar copyright protection for any lines of declaring
-        source code unless Sun/Oracle had only one way, or a limited number of ways, to
-        write them
-      - Oracle had “unlimited options as to the selection and arrangement of the 7000
-        lines Google copied.
-  - name: the Java API was creative
-    anchors:
-      quotes: it is undisputed here that the declaring code and the structure and organization of the API packages are both creative
-  - name: it was possible to use the Java language without copying the Java API
-    anchors:
-      quotes: Google did not need to copy the structure, sequence, and organization of the Java API packages to write programs in the Java language
-  - name: the Java API was a literal element of the Java language
-    anchors:
-      quotes: The literal elements of a computer program are
-  - name: absent essentially the only way
-    anchors:
-      quotes: "|concepts of merger| and scenes a faire are affirmative defenses "
-  - name: absent scene a faire
-    anchors:
-      quotes: "concepts of merger and |scenes a faire| are affirmative defenses "
-  - name: the Java API was a method of operation
-    anchors: 
-      quotes: although an element of a work may be characterized as a method of operation
-  - name: the Java API contained short phrases
-    anchors: 
-      quotes: purposes is not whether |the work at issue contains short phrases|
-  - name: the Java API became so popular that it was the industry standard
-    anchors: 
-      quotes: the Java API packages because they had become the effective industry standard
-  - name:
-      there was a preexisting community of programmers accustomed to using the Java
-      API
-    anchors:
-      quotes: the preexisting community of programmers who were accustomed to using the Java API packages
-  - name: false Google infringed the copyright on the Java API
-    anchors:
-      quotes: concepts of merger and scenes a faire are |affirmative defenses to claims of infringement.|
-  - name: Sun Microsystems created the Java API
-    anchors:
-      quotes: Sun Microsystems, Inc. (“Sun”) developed the Java “platform” for computer programming
-  - name:
-      when creating the Java API, Sun Microsystems could have selected and arranged
-      its names and phrases in unlimited different ways
-    anchors:
-      quotes: Oracle had “unlimited options as to the selection and arrangement of the 7000 lines Google copied.
-  - name:
-      false the Java API was essentially the only way to express the idea that it
-      embodied
-    anchors:
-      quotes: merger does not apply on the record before us
-  - name: the Java API was the object code of the Java language
-    anchors:
-      quotes: are the source code and |object code.|
-  - name: the Java API was the sequence, structure, and organization of the Java language
-    anchors:
-      quotes: include, among other things, |the program’s sequence, structure, and organization,|
-  - name: the Java API was a non-literal element of the Java language
-    anchors:
-      quotes: "|The non-literal components of a computer program|include,"
-  - name: false the Java API was the expression of an idea
-    anchors:
-      quotes: 
-      - whether, on the particular facts of each case, the component in question qualifies
-        as
-      - an expression of an idea, or |an idea itself.|
-  - name: the Java API was an idea
-    anchors:
-      quotes: 
-      - whether, on the particular facts of each case, the component in question qualifies
-        as an expression of an idea
-  - name: the Java API was a literary work
-    anchors:
-      quotes: as literary works often do
-  - name: the Java API contained short phrases that were creative
-    anchors:
-      quotes: whether those phrases are creative.
-  - name: the Java API contained short phrases
-    anchors: 
-      quotes: whether the work at issue contains short phrases
-  - name: the Java API was an element of the Java language
-    anchors: 
-      quotes: the scene a faire doctrine denies protection to program| elements|
-  - name:
-      the creation of the Java API was dictated by external factors such as the
-      mechanical specifications of the computer on which the Java language was intended
-      to run or widely accepted programming practices within the computer industry
-    anchors:
-      quotes: 
-        that are dictated by external factors such as ‘the mechanical specifications
-        of the computer on which a particular program is intended to run’ or ‘widely accepted
-        programming practices within the computer industry.
-  - name:
-      when creating the Java API, Sun Microsystems had multiple ways to express
-      its underlying idea
-    anchors:
-      quotes: as long as the author had multiple ways to express the underlying idea
-  - name: the Java API served a function
-    anchors:
-      quotes: an original work — even one that serves a function
-  - name: the Java API was the structure, sequence, and organization of the Java language
-    anchors:
-      quotes: "|the structure, sequence, and organization of a computer program| is eligible for copyright protection"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

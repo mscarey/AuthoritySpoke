@@ -296,9 +296,16 @@ def update_name_index_with_factor(
     """
     if obj.get("name"):
         if obj["name"] in mentioned:
-            if obj.get("anchors"):
-                for anchor in obj["anchors"]:
-                    mentioned[obj["name"]]["anchors"].append(anchor)
+            if obj.get("anchors", {}).get("quotes"):
+                mentioned[obj["name"]]["anchors"] = (
+                    mentioned[obj["name"]]["anchors"] or {}
+                )
+                mentioned[obj["name"]]["anchors"]["quotes"] = (
+                    mentioned[obj["name"]]["anchors"].get("quotes") or []
+                )
+                mentioned[obj["name"]]["anchors"]["quotes"].append(
+                    obj["anchors"]["quotes"][0]
+                )
         else:
             mentioned.insert_by_name(obj)
         obj = obj["name"]
