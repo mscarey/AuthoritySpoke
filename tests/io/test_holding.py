@@ -121,9 +121,11 @@ class TestHoldingImport:
         Testing issue that caused enactment expansion to fail only when
         text anchors were loaded.
         """
-        raw_holdings = {
-            "factor_anchors": [
-                {
+        raw_holdings = [
+            {
+                "inputs": {
+                    "type": "fact",
+                    "content": "{Rural's telephone directory} was a fact",
                     "name": "Rural's telephone directory was a fact",
                     "anchors": {
                         "quotes": [
@@ -136,8 +138,10 @@ class TestHoldingImport:
                         ]
                     },
                 },
-                {
-                    "name": "Rural's telephone directory was copyrightable",
+                "outputs": {
+                    "type": "fact",
+                    "content": "Rural's telephone directory was copyrightable",
+                    "truth": False,
                     "anchors": {
                         "quotes": [
                             {
@@ -149,51 +153,38 @@ class TestHoldingImport:
                         ]
                     },
                 },
-            ],
-            "holdings": [
-                {
-                    "inputs": {
-                        "type": "fact",
-                        "content": "{Rural's telephone directory} was a fact",
-                    },
-                    "outputs": {
-                        "type": "fact",
-                        "content": "Rural's telephone directory was copyrightable",
-                        "truth": False,
-                    },
-                    "enactments": [
-                        {
-                            "name": "securing for authors",
-                            "enactment": {
-                                "node": "/us/const/article/I/8/8",
-                                "exact": (
-                                    "To promote the Progress of Science and useful Arts, "
-                                    "by securing for limited Times to Authors"
-                                ),
-                            },
+                "enactments": [
+                    {
+                        "name": "securing for authors",
+                        "enactment": {
+                            "node": "/us/const/article/I/8/8",
+                            "exact": (
+                                "To promote the Progress of Science and useful Arts, "
+                                "by securing for limited Times to Authors"
+                            ),
                         },
-                        {
-                            "name": "right to writings",
-                            "enactment": {
-                                "node": "/us/const/article/I/8/8",
-                                "exact": "the exclusive Right to their respective Writings",
-                            },
-                        },
-                    ],
-                    "mandatory": True,
-                    "universal": True,
-                },
-                {
-                    "outputs": {
-                        "type": "fact",
-                        "content": "Rural's telephone directory was copyrightable",
                     },
-                    "enactments": ["securing for authors", "right to writings"],
-                    "mandatory": True,
-                    "anchors": "compilations of facts|generally are|",
+                    {
+                        "name": "right to writings",
+                        "enactment": {
+                            "node": "/us/const/article/I/8/8",
+                            "exact": "the exclusive Right to their respective Writings",
+                        },
+                    },
+                ],
+                "mandatory": True,
+                "universal": True,
+            },
+            {
+                "outputs": {
+                    "type": "fact",
+                    "content": "Rural's telephone directory was copyrightable",
                 },
-            ],
-        }
+                "enactments": ["securing for authors", "right to writings"],
+                "mandatory": True,
+                "anchors": {"quotes": ["compilations of facts|generally are|"]},
+            },
+        ]
         mock_client = FakeClient(responses=make_response)
         (
             feist_holdings,
