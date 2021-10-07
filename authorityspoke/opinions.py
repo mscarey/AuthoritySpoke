@@ -398,7 +398,9 @@ class OpinionReading(Comparable, BaseModel):
 
     def posit(
         self,
-        holdings: Union[AnchoredHoldings, Holding, Iterable[Union[Holding, Rule]]],
+        holdings: Union[
+            List[HoldingWithAnchors], Holding, Iterable[Union[Holding, Rule]]
+        ],
         holding_anchors: Optional[
             List[Union[TextQuoteSelector, List[TextQuoteSelector]]]
         ] = None,

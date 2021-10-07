@@ -15,7 +15,12 @@ from nettlesome.predicates import Predicate
 from authorityspoke.decisions import Decision, DecisionReading
 from authorityspoke.facts import Fact
 from authorityspoke.holdings import Holding, HoldingGroup
-from authorityspoke.opinions import HoldingWithAnchors, Opinion, OpinionReading
+from authorityspoke.opinions import (
+    HoldingWithAnchors,
+    Opinion,
+    OpinionReading,
+    AnchoredHoldings,
+)
 from authorityspoke.procedures import Procedure
 from authorityspoke.io import loaders, readers, name_index
 from authorityspoke.io.fake_enactments import FakeClient
@@ -262,15 +267,11 @@ class TestTextAnchors:
     def test_read_holding_with_no_anchor(self, make_analysis):
         raw_analysis = make_analysis["no anchors"]
         reading = OpinionReading()
-        (
-            oracle_holdings,
-            named_anchors,
-            enactment_anchors,
-        ) = readers.read_holdings_with_anchors(raw_analysis)
+        anchored_holdings = readers.read_holdings_with_anchors(raw_analysis)
         reading.posit(
-            oracle_holdings,
-            named_anchors=named_anchors,
-            enactment_anchors=enactment_anchors,
+            holdings=anchored_holdings.holdings,
+            named_anchors=anchored_holdings.named_anchors,
+            enactment_anchors=anchored_holdings.enactment_anchors,
         )
         assert not reading.holding_anchors[0].positions
         assert not reading.holding_anchors[0].quotes
@@ -294,7 +295,7 @@ class TestTextAnchors:
             ),
         )
         assert (
-            reading.anchored_holdings[-1].anchors.quotes[0].exact
+            reading.anchored_holdings.holdings[-1].anchors.quotes[0].exact
             == "some text supporting this holding"
         )
 
@@ -520,10 +521,11 @@ class TestTextAnchors:
     def test_use_int_not_pint_without_dimension(self, make_response):
         mock_client = FakeClient(responses=make_response)
         to_read = load_holdings("holding_brad.yaml")
-        holdings = readers.read_holdings(to_read, client=mock_client)
-        reading = OpinionReading(
-            anchored_holdings=[HoldingWithAnchors(holding=item) for item in holdings]
+        loaded_holdings = readers.read_holdings(to_read, client=mock_client)
+        anchored_holdings = AnchoredHoldings(
+            holdings=[HoldingWithAnchors(holding=item) for item in loaded_holdings]
         )
+        reading = OpinionReading(anchored_holdings=anchored_holdings)
         expectation_not_reasonable = list(reading.holdings)[6]
         assert "dimensionless" not in str(expectation_not_reasonable)
         assert expectation_not_reasonable.inputs[0].predicate.quantity == 3
