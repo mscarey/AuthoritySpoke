@@ -188,7 +188,11 @@ def read_holdings_with_anchors(
     for i, holding in enumerate(holdings):
         new = HoldingWithAnchors(holding=holding, anchors=holding_anchors[i])
         holdings_with_anchors.append(new)
-    return AnchoredHoldings(holdings_with_anchors, factor_anchors, enactment_anchors)
+    return AnchoredHoldings(
+        holdings=holdings_with_anchors,
+        named_anchors=factor_anchors,
+        enactment_anchors=enactment_anchors,
+    )
 
 
 def expand_factor(record: Union[str, RawFactor], factor_index: Mentioned) -> RawFactor:

@@ -22,7 +22,7 @@ from authorityspoke.decisions import DecisionReading
 from authorityspoke.facts import Allegation, Fact, build_fact, Evidence
 from authorityspoke.facts import Exhibit, Pleading
 from authorityspoke.holdings import Holding
-from authorityspoke.opinions import Opinion, OpinionReading
+from authorityspoke.opinions import Opinion, OpinionReading, AnchoredHoldings
 from authorityspoke.rules import Procedure, Rule
 
 from authorityspoke.io import loaders, readers
@@ -1592,9 +1592,11 @@ def make_decision_with_holding(make_response, make_decision, make_anchored_holdi
                 OpinionReading(
                     opinion_type=decision.majority.type,
                     opinion_author=decision.majority.author,
-                    anchored_holdings=holdings,
-                    factor_anchors=named_anchors,
-                    enactment_anchors=enactment_anchors,
+                    anchored_holdings=AnchoredHoldings(
+                        holdings=holdings,
+                        named_anchors=named_anchors,
+                        enactment_anchors=enactment_anchors,
+                    ),
                 )
             ],
         )

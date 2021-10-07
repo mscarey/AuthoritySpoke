@@ -86,12 +86,27 @@ class HoldingWithAnchors(BaseModel):
         return value
 
 
-class AnchoredHoldings(NamedTuple):
+class AnchoredHoldings(BaseModel):
     """Holdings with objects storing the Holdings' links to Opinion text."""
 
-    holdings: List[HoldingWithAnchors]
+    holdings: List[HoldingWithAnchors] = []
     named_anchors: List[TermWithAnchors] = []
     enactment_anchors: List[EnactmentWithAnchors] = []
+
+    def find_term_index(self, term: Term) -> Optional[int]:
+        """Find the index of a term in the holdings."""
+        key = term.key
+        for index, term_with_anchors in enumerate(self.named_anchors):
+            if term_with_anchors.term.key == key:
+                return index
+        return None
+
+    def insert_term(self, term: Term, anchors: TextPositionSet) -> None:
+        term_index = self.find_term_index(term)
+        if term_index is None:
+            self.named_anchors.append(TermWithAnchors(term=term, anchors=anchors))
+        else:
+            self.named_anchors[term_index].anchors += anchors
 
     def get_term_anchors(self, key: str) -> TextPositionSet:
         """Get the anchors for a term."""
@@ -108,35 +123,22 @@ class AnchoredHoldings(NamedTuple):
         raise KeyError(f"Enactment passage with key '{key}' not found")
 
 
-class OpinionReading(Comparable):
+class OpinionReading(Comparable, BaseModel):
     """
     An interpretation of what Holdings are supported by the text of an Opinion.
     """
 
-    def __init__(
-        self,
-        anchored_holdings: Optional[List[HoldingWithAnchors]] = None,
-        opinion_type: str = "",
-        opinion_author: str = "",
-        factor_anchors: TextLinkDict = {},
-        enactment_anchors: TextLinkDict = {},
-    ) -> None:
-
-        super().__init__()
-        anchored_holdings = anchored_holdings or []
-        self.opinion_author = opinion_author
-        self.opinion_type = opinion_type
-        self.anchored_holdings = anchored_holdings
-        self.factor_anchors = factor_anchors
-        self.enactment_anchors = enactment_anchors
+    anchored_holdings: AnchoredHoldings = AnchoredHoldings()
+    opinion_type: str = ""
+    opinion_author: str = ""
 
     @property
     def holdings(self) -> HoldingGroup:
-        return HoldingGroup([item.holding for item in self.anchored_holdings])
+        return HoldingGroup([item.holding for item in self.anchored_holdings.holdings])
 
     @property
     def holding_anchors(self) -> List[TextPositionSet]:
-        return [item.anchors for item in self.anchored_holdings]
+        return [item.anchors for item in self.anchored_holdings.holdings]
 
     def __str__(self):
         return super().__str__()
@@ -305,11 +307,14 @@ class OpinionReading(Comparable):
         holding_anchors: Optional[
             Union[TextPositionSelector, TextQuoteSelector, TextPositionSet]
         ] = None,
-        named_anchors: Optional[TextLinkDict] = None,
-        enactment_anchors: Optional[TextLinkDict] = None,
+        named_anchors: Optional[List[TermWithAnchors]] = None,
+        enactment_anchors: Optional[List[EnactmentWithAnchors]] = None,
         context: Optional[Sequence[Factor]] = None,
     ) -> None:
         r"""Record that this Opinion endorses specified :class:`Holding`\s."""
+        named_anchors = named_anchors or []
+        enactment_anchors = enactment_anchors or []
+
         if isinstance(holding, HoldingWithAnchors):
             holding, holding_anchors = holding.holding, holding.anchors
         if isinstance(holding_anchors, (TextQuoteSelector, str)):
@@ -328,11 +333,15 @@ class OpinionReading(Comparable):
         if not isinstance(holding, Holding):
             raise TypeError('"holding" must be an object of type Holding.')
 
-        if named_anchors:
-            self.factor_anchors = {**self.factor_anchors, **named_anchors}
+        for named_anchor in named_anchors:
+            self.anchored_holdings.add_term(
+                term=named_anchor.term, anchors=named_anchor.anchors
+            )
 
-        if enactment_anchors:
-            self.enactment_anchors = {**self.enactment_anchors, **enactment_anchors}
+        for enactment_anchor in enactment_anchors:
+            self.anchored_holdings.add_enactment_with_anchors(
+                enactment=enactment_anchor.term, anchors=named_anchor.anchors
+            )
 
         matching_holding = self.get_matching_holding(holding)
         if matching_holding:
@@ -340,7 +349,7 @@ class OpinionReading(Comparable):
         else:
             if context:
                 holding = holding.new_context(context, source=self)
-            self.anchored_holdings.append(
+            self.anchored_holdings.holdings.append(
                 HoldingWithAnchors(holding=holding, anchors=holding_anchors)
             )
 

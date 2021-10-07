@@ -105,7 +105,9 @@ class TestOpinionText:
     def test_select_opinion_text_for_factor(self, make_opinion, make_anchored_holding):
         opinion = make_opinion["oracle_majority"]
         oracle = make_anchored_holding["oracle"]
-        anchor = oracle.named_anchors["the fact that <the Java API> was copyrightable"]
+        anchor = oracle.get_term_anchors(
+            key="the fact that <the Java API> was copyrightable"
+        )
         selected = opinion.select_text(selector=anchor)
         assert str(selected).startswith(
             "…that element may nevertheless contain expression"

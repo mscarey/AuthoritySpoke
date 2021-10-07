@@ -6,15 +6,10 @@
       type: fact
       content: the Java API was copyrightable
       truth: false
+      name: false the Java API was copyrightable
       anchors:
         quotes:
         - questions regarding originality are considered questions of |copyrightability|
-        - that element may nevertheless contain expression that is eligible for copyright
-          protection
-        - structure, sequence, and organization of a computer program |is eligible for copyright
-          protection|
-        - must be “original” to qualify for |copyright protection.|
-        - whether the non-literal elements of a program “are protected
     mandatory: true
     enactments:
       name: copyright protection provision
@@ -105,6 +100,15 @@
     outputs:
       type: fact
       content: the Java API was copyrightable
+      name: the Java API was copyrightable
+      anchors:
+        quotes:
+        - that element may nevertheless contain expression that is eligible for copyright
+          protection
+        - structure, sequence, and organization of a computer program |is eligible for copyright
+          protection|
+        - must be “original” to qualify for |copyright protection.|
+        - whether the non-literal elements of a program “are protected
     mandatory: true
     enactments:
       - copyright protection provision
@@ -486,7 +490,7 @@
         content:
           the Java API was the structure, sequence, and organization of the Java
           language
-        name: the Java API was the structure, sequence, and organization of the Java language
+        name: the Java API was the sequence, structure, and organization of the Java language
         anchors:
           quotes: "|the structure, sequence, and organization of a computer program| is eligible for copyright protection"
       - type: fact
