@@ -5,7 +5,8 @@ import pytest
 from nettlesome.terms import ContextRegister, means
 from nettlesome.entities import Entity
 from nettlesome.groups import FactorGroup
-from nettlesome.statements import Statement
+
+from authorityspoke.facts import Fact
 
 
 class TestContextRegisters:
