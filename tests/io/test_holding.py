@@ -225,7 +225,7 @@ class TestHoldingImport:
         ) = readers.read_holdings_with_anchors(raw_holdings, client=mock_client)
 
         assert isinstance(holdings[0], HoldingWithAnchors)
-        assert isinstance(named_anchors.popitem()[1].quotes[0], TextQuoteSelector)
+        assert isinstance(named_anchors[1].anchors.quotes[0], TextQuoteSelector)
 
     def test_load_and_posit_holdings_with_anchors(self, make_response):
         """

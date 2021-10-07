@@ -148,8 +148,12 @@ class TestCollectMentioned:
         }
         holding = text_expansion.expand_shorthand(holding)
         built = readers.read_holdings(record=[holding], client=fake_usc_client)
-        assert built.inputs[0].short_string.startswith(
-            "the fact that <Rural's telephone listings> were names"
+        assert (
+            built[0]
+            .inputs[0]
+            .short_string.startswith(
+                "the fact that <Rural's telephone listings> were names"
+            )
         )
 
     def test_enactment_name_in_holding(self, fake_usc_client):
@@ -158,10 +162,10 @@ class TestCollectMentioned:
         'Name "securing for authors" not found in the index of mentioned Factors'
         """
         feist_records = loaders.load_holdings("holding_feist.yaml")
-        feist_holding = readers.read_holdings(
+        feist_holdings = readers.read_holdings(
             [feist_records[0]], client=fake_usc_client
         )
-        assert "securing for limited Times" in feist_holding.short_string
+        assert "securing for limited Times" in feist_holdings[0].short_string
 
     def test_update_name_index_with_longer_factor(self):
         raw_fact = {
@@ -260,40 +264,6 @@ class TestRetrieveMentioned:
         relevant_fact = readers.read_fact(relevant_dict)
         assert relevant_fact.terms[1].terms[1].name == "Bob"
 
-    def test_get_references_without_changing_mentioned(self):
-        """
-        This isn't catching the bug where the mentioned dict is mutated.
-        """
-        schema = schemas_yaml.HoldingSchema()
-        schema.context["mentioned"] = name_index.Mentioned(
-            {
-                "Bradley": {"type": "entity"},
-                "fact that Bradley committed a crime": {
-                    "type": "fact",
-                    "content": "Bradley committed a crime",
-                },
-            }
-        )
-        assert (
-            schema.context["mentioned"]["fact that Bradley committed a crime"][
-                "content"
-            ]
-            == "Bradley committed a crime"
-        )
-        new = {
-            "inputs": "fact that Bradley committed a crime",
-            "outputs": {"type": "fact", "content": "Bradley committed a tort"},
-        }
-        holding = schema.load(new)
-        assert holding.inputs[0].terms[0].name == "Bradley"
-        # Making the same assertion again to show it's still true
-        assert (
-            schema.context["mentioned"]["fact that Bradley committed a crime"][
-                "content"
-            ]
-            == "Bradley committed a crime"
-        )
-
     overlapping_names_mentioned = {
         "Godzilla": {"type": "Entity"},
         "Mothra": {"type": "Entity"},
@@ -317,21 +287,3 @@ class TestRetrieveMentioned:
         new_content, context = schema.get_references_from_mentioned(content)
         assert new_content == "${mecha_godzilla} threw ${mothra} at ${godzilla}"
         assert context[2] == {"name": "Godzilla", "type": "Entity"}
-
-    def test_mentioned_object_string(self):
-        mentioned = name_index.Mentioned(self.overlapping_names_mentioned)
-        assert "Mentioned({'Godzilla'" in str(mentioned)
-        assert "Mentioned({'Godzilla'" in repr(mentioned)
-
-    def test_unmarked_factor_when_one_was_marked(self):
-        fact = {
-            "type": "fact",
-            "content": "$Hamlet lived at Elsinore",
-            "terms": [{"type": "Entity", "name": "Hamlet"}],
-        }
-        schema = schemas_yaml.FactSchema()
-        schema.context["mentioned"] = name_index.Mentioned(
-            {"Elsinore": {"type": "Entity"}}
-        )
-        loaded = schema.load(fact)
-        assert loaded.predicate.content == "$Hamlet lived at ${elsinore}"
