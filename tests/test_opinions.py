@@ -1,6 +1,10 @@
 import pytest
 
-from anchorpoint.textselectors import TextQuoteSelector, TextSelectionError
+from anchorpoint.textselectors import (
+    TextPositionSet,
+    TextQuoteSelector,
+    TextSelectionError,
+)
 
 from nettlesome.entities import Entity
 
@@ -10,7 +14,13 @@ from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
 from authorityspoke.io import loaders, readers
 from authorityspoke.io.fake_enactments import FakeClient
-from authorityspoke.opinions import Opinion, FactorIndex, OpinionReading
+from authorityspoke.opinions import (
+    AnchoredHoldings,
+    Opinion,
+    FactorIndex,
+    OpinionReading,
+    TermWithAnchors,
+)
 
 
 class TestOpinions:
@@ -89,8 +99,7 @@ class TestOpinionText:
     def test_opinion_text_anchor(self, make_opinion_with_holding):
         feist = make_opinion_with_holding["feist_majority"]
         assert any(
-            "ideas" in anchor.quotes[0].exact
-            for anchor in feist.factor_anchors.values()
+            "ideas" in factor.anchors.quotes[0].exact for factor in feist.factor_anchors
         )
 
     def test_select_opinion_text_for_factor(self, make_opinion, make_anchored_holding):
@@ -275,21 +284,22 @@ class TestOpinionFactors:
 
     def test_insert_duplicate_anchor_in_factor_index(self):
         api = Entity(name="the Java API", generic=True, plural=False)
-        anchor = TextQuoteSelector(
+        quote_selector = TextQuoteSelector(
             exact="it possesses at least some minimal degree of creativity."
         )
+        anchors = TextPositionSet(quotes=quote_selector)
         fact = Fact(
             predicate=Predicate(
                 content="$product possessed at least some minimal degree of creativity"
             ),
             terms=[api],
-            anchors=[anchor],
         )
-        name = "the Java API possessed at least some minimal degree of creativity"
+        term = TermWithAnchors(term=fact, anchors=anchors)
+        index = AnchoredHoldings(holdings=[], named_anchors=[term])
 
-        factor_index = FactorIndex({name: fact})
-        factor_index.insert(key=name, value=fact)
-        assert len(factor_index[name].anchors) == 1
+        index.insert_term(term=fact, anchors=anchors)
+        assert len(index.named_anchors) == 1
+        assert index.named_anchors[0].anchors.quotes == [quote_selector]
 
     def test_get_factor_from_opinion(self, make_opinion_with_holding):
         oracle = make_opinion_with_holding["oracle_majority"]

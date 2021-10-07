@@ -90,8 +90,8 @@ class AnchoredHoldings(NamedTuple):
     """Holdings with objects storing the Holdings' links to Opinion text."""
 
     holdings: List[HoldingWithAnchors]
-    named_anchors: List[TermWithAnchors]
-    enactment_anchors: List[EnactmentWithAnchors]
+    named_anchors: List[TermWithAnchors] = []
+    enactment_anchors: List[EnactmentWithAnchors] = []
 
     def get_term_anchors(self, key: str) -> TextPositionSet:
         """Get the anchors for a term."""
