@@ -158,7 +158,7 @@ class OpinionReading(Comparable, BaseModel):
 
     def clear_holdings(self):
         r"""Remove all :class:`.Holding`\s from the opinion."""
-        self.anchored_holdings = []
+        self.anchored_holdings.holdings = []
 
     def explanations_contradiction(
         self,

@@ -301,8 +301,9 @@ def update_name_index_with_factor(
                     mentioned[obj["name"]]["anchors"] or {}
                 )
                 mentioned[obj["name"]]["anchors"]["quotes"] = (
-                    mentioned[obj["name"]]["anchors"].get("quotes") or []
+                    list(mentioned[obj["name"]]["anchors"].get("quotes")) or []
                 )
+
                 mentioned[obj["name"]]["anchors"]["quotes"].append(
                     obj["anchors"]["quotes"][0]
                 )

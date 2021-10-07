@@ -633,15 +633,11 @@ class TestTextAnchors:
 
     def test_posit_holding_with_selector(self, make_analysis, make_opinion):
 
-        (
-            holdings,
-            _,
-            _,
-        ) = readers.read_holdings_with_anchors(make_analysis["minimal"])
+        anchored_holdings = readers.read_holdings_with_anchors(make_analysis["minimal"])
 
         brad = make_opinion["brad_majority"]
         reading = OpinionReading(opinion_type="majority", opinion_author=brad.author)
-        reading.posit(holdings)
+        reading.posit(anchored_holdings.holdings)
         assert reading.holding_anchors[0].quotes[0].exact == "open fields or grounds"
 
 

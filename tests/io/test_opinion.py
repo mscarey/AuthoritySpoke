@@ -54,15 +54,15 @@ class TestLoadOpinion:
         of the different text anchors for that Fact are attached to it.
         """
         watch = raw_holding["stolen watch"]
-        holdings, _, _ = readers.read_holdings_with_anchors([watch])
+        holdings = readers.read_holdings_with_anchors([watch])
         cardenas = OpinionReading(anchored_holdings=holdings)
 
         assert any(
             selector.exact == "Mark stole the watch"
-            for selector in cardenas.anchored_holdings[0].anchors.quotes
+            for selector in cardenas.anchored_holdings.holdings[0].anchors.quotes
         )
         assert any(
             selector.exact == "a watch was stolen by Mark"
-            for selector in cardenas.anchored_holdings[0].anchors.quotes
+            for selector in cardenas.anchored_holdings.holdings[0].anchors.quotes
         )
-        assert len(cardenas.anchored_holdings[0].anchors.quotes) == 2
+        assert len(cardenas.anchored_holdings.holdings[0].anchors.quotes) == 2
