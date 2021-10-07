@@ -184,7 +184,7 @@ class TestFacts:
         assert "<Darth Vader> operated" in str(different)
 
     def test_type_of_terms(self, watt_factor):
-        assert isinstance(watt_factor["f1"].terms, TermSequence)
+        assert isinstance(watt_factor["f1"].term_sequence, TermSequence)
 
     def test_concrete_to_abstract(self, make_entity, make_predicate):
         motel = make_entity["motel_specific"]

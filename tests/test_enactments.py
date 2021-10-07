@@ -17,6 +17,7 @@ from nettlesome.statements import Statement
 from pydantic import ValidationError
 import pytest
 
+from authorityspoke.facts import Fact
 from authorityspoke.io import loaders, readers
 from authorityspoke.io.fake_enactments import FakeClient
 

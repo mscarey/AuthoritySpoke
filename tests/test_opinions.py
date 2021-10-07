@@ -239,9 +239,11 @@ class TestOpinionHoldings:
     def test_getting_factors_from_new_holding(self, make_opinion_with_holding):
         watt = make_opinion_with_holding["watt_majority"]
         watt.clear_holdings()
-        elephants = Fact("$animal was an elephant", terms=Entity(name="the elephant"))
+        elephants = Fact(
+            predicate="$animal was an elephant", terms=Entity(name="the elephant")
+        )
         mouseholes = Fact(
-            Predicate(content="$animal hides in mouseholes", truth=False),
+            predicate=Predicate(content="$animal hides in mouseholes", truth=False),
             terms=Entity(name="the elephant"),
         )
         procedure = Procedure(inputs=elephants, outputs=mouseholes)
@@ -278,7 +280,7 @@ class TestOpinionFactors:
         )
         fact = Fact(
             predicate=Predicate(
-                "$product possessed at least some minimal degree of creativity"
+                content="$product possessed at least some minimal degree of creativity"
             ),
             terms=[api],
             anchors=[anchor],
@@ -297,9 +299,7 @@ class TestOpinionFactors:
     def test_factors_by_name(self, make_opinion_with_holding):
         oracle = make_opinion_with_holding["oracle_majority"]
         factors = oracle.factors_by_name()
-        factor = factors[
-            "the fact it was false that <the Java API> was an original work"
-        ]
+        factor = factors["false the Java API was an original work"]
         assert factor.terms[0].name == "the Java API"
 
 

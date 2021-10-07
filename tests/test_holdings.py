@@ -50,7 +50,8 @@ class TestHolding:
         Test that holding uses the Fact string method with line breaks.
         """
         lotus = make_opinion_with_holding["lotus_majority"]
-        assert "registered a copyright\n" in str(lotus.holdings[2])
+        assert "registered a copyright" in str(lotus.holdings[2])
+        assert "\n" in str(lotus.holdings[2])
 
     def test_case_class_name_for_fact_within_holding(self, make_opinion_with_holding):
         lotus = make_opinion_with_holding["lotus_majority"]

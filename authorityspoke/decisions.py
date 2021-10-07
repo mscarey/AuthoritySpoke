@@ -322,7 +322,7 @@ class DecisionReading(Comparable):
     def implies_rule(
         self, other: Rule, context: Optional[ContextRegister] = None
     ) -> bool:
-        return self.implies_holding(Holding(other), context=context)
+        return self.implies_holding(Holding(rule=other), context=context)
 
     def implies(self, other, context: Optional[ContextRegister] = None) -> bool:
         if isinstance(other, (DecisionReading, OpinionReading)):

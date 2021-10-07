@@ -1,11 +1,12 @@
 import pytest
 
-from marshmallow.exceptions import ValidationError
+from pydantic import ValidationError
 
 from nettlesome.terms import ContextRegister
 from nettlesome.entities import Entity
 from nettlesome.statements import Statement
 
+from authorityspoke.facts import Fact
 from authorityspoke.io import readers
 
 
@@ -16,7 +17,7 @@ class TestMakeEntities:
         in a "mentioned" list, but no "mentioned" parameter is given.
         """
         with pytest.raises(ValidationError):
-            print(readers.read_factor(record="Bradley"))
+            readers.read_holdings(record=[{"outputs": ["Bradley"]}])
 
     def test_conversion_to_generic(self, make_entity):
         e = make_entity

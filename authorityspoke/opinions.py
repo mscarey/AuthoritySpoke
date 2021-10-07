@@ -442,7 +442,7 @@ class OpinionReading(Comparable):
         )
 
     def _implied_by_rule(self, other: Rule, context: Explanation) -> bool:
-        return self._implied_by_holding(other=Holding(other), context=context)
+        return self._implied_by_holding(other=Holding(rule=other), context=context)
 
     def implied_by(
         self,
