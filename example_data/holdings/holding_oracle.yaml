@@ -173,7 +173,9 @@
       name: the Java API was the sequence, structure, and organization of the Java language
       anchors:
         quotes: 
-          - "include, among other things, |the program’s sequence, structure, and organization|,"
+        - prefix: include, among other things, 
+          exact: the program’s sequence, structure, and organization, 
+          suffix: as well as
   outputs:
     type: fact
     content: the Java API was a non-literal element of the Java language
