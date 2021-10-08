@@ -1,6 +1,5 @@
 import os
 
-from marshmallow import ValidationError
 import pytest
 
 from authorityspoke import LegisClient

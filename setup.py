@@ -27,13 +27,9 @@ setuptools.setup(
     packages=setuptools.find_packages(exclude=["tests"]),
     install_requires=[
         "anchorpoint~=0.5.2",
-        "apispec[validation]~=4.3.0",
-        "apispec-oneofschema",
         "eyecite~=2.2.0",
         "justopinion~=0.2.3",
         "legislice~=0.5.2",
-        "marshmallow>=3.10",
-        "marshmallow-oneofschema",
         "nettlesome~=0.5.1",
         "pint>=0.15",
         "pydantic",

@@ -36,7 +36,7 @@ class TestEnactments:
 
     def test_create_enactment_with_init(self, fake_beard_client):
         """
-        Using the __init__ method of the Enactment class, insteaid of
+        Using the __init__ method of the Enactment class, instead of
         readers.read_enactment or the Enactment marshmallow schema.
         """
         beard_definition = fake_beard_client.read("/test/acts/47/4/")

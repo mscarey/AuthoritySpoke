@@ -1,5 +1,3 @@
-import apispec
-
 from authorityspoke.holdings import Holding
 
 

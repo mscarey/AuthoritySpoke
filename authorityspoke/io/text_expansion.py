@@ -5,7 +5,6 @@ from re import findall
 from string import Template
 from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
-from marshmallow import ValidationError
 from slugify import slugify
 
 from authorityspoke.io import nesting

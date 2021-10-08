@@ -1,5 +1,11 @@
 Changelog
 =========
+dev
+------------------
+* remove marshmallow and marshmallow-oneofschema
+* remove apispec and apispec-oneofschema
+* replace marshmallow and apispec with pydantic
+
 0.8.1 (2021-09-18)
 ------------------
 * limit version range for Legislice import
