@@ -292,4 +292,4 @@ class TestRetrieveMentioned:
         sorted_mentioned = mentioned.sorted_by_length()
 
         assert obj[0]["outputs"][0] == "Mecha Godzilla threw Mothra at Godzilla"
-        assert sorted_mentioned[2] == ("Godzilla", {"type": "Entity"})
+        assert list(sorted_mentioned.items())[2] == ("Godzilla", {"type": "Entity"})
