@@ -5,9 +5,6 @@ import pytest
 
 from nettlesome.quantities import Comparison, Q_
 
-from authorityspoke import Fact
-from authorityspoke.io import schemas_yaml
-
 
 class TestPredicateLoad:
     """

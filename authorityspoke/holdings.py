@@ -38,7 +38,9 @@ from nettlesome.groups import FactorGroup
 from pydantic import BaseModel, root_validator, validator
 
 from authorityspoke.procedures import Procedure
-from authorityspoke.rules import Rule
+from authorityspoke.rules import Rule, RawRule
+
+RawHolding = Dict[str, Union[RawRule, str, bool]]
 
 
 class Holding(Comparable, BaseModel):

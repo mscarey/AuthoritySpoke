@@ -12,34 +12,28 @@ from pydantic import ValidationError
 
 from anchorpoint.textselectors import TextQuoteSelector
 from legislice.download import Client
+from legislice.enactments import RawEnactment
 from nettlesome.entities import Entity
 from nettlesome.factors import Factor
 
-from authorityspoke.decisions import Decision, DecisionReading
+from authorityspoke.decisions import Decision, DecisionReading, RawDecision
 from authorityspoke.facts import Fact, Exhibit, Evidence, Allegation, Pleading
-from authorityspoke.holdings import Holding
-from authorityspoke.io import schemas_yaml
+from authorityspoke.holdings import Holding, RawHolding
 from authorityspoke.opinions import (
     AnchoredHoldings,
     EnactmentWithAnchors,
     TermWithAnchors,
     HoldingWithAnchors,
 )
+from authorityspoke.facts import RawFactor
 from authorityspoke.procedures import Procedure
-from authorityspoke.rules import Rule
-from authorityspoke.io.nesting import nest_fields, walk_tree_and_modify
-from authorityspoke.io.schemas_yaml import (
-    RawEnactment,
-    RawHolding,
-    RawRule,
-    RawPredicate,
-    RawFactor,
-    RawDecision,
-    RawSelector,
-)
+
 from authorityspoke.io.name_index import index_names, Mentioned
 from authorityspoke.io.enactment_index import EnactmentIndex, collect_enactments
 from authorityspoke.io.text_expansion import expand_shorthand
+
+RawSelector = Union[str, Dict[str, str]]
+
 
 FACTOR_SUBCLASSES = {
     class_obj.__name__: class_obj
@@ -61,68 +55,6 @@ def read_fact(record: RawFactor) -> Fact:
     record, mentioned = index_names(record)
     expanded = expand_factor(record, mentioned)
     return Fact(**expanded)
-
-
-def read_procedure(
-    record: Dict, client: Optional[Client] = None, many=False
-) -> Procedure:
-    r"""
-    Turn fields from YAML into a :class:`Procedure` object.
-
-    :param record:
-        parameter values to pass to schema
-
-    :param many:
-        whether to use the "many" form of the Marshmallow
-        schema (whether there are multiple Procedures)
-
-    :parame regime:
-        to look up any :class:`.Enactment` references
-    """
-    schema = schemas_yaml.ProcedureSchema(many=many)
-    record, enactment_index = collect_enactments(record)
-    if client:
-        enactment_index = client.update_entries_in_enactment_index(enactment_index)
-    schema.context["enactment_index"] = enactment_index
-    record, schema.context["mentioned"] = index_names(record)
-    return schema.load(record)
-
-
-def read_holding(record: RawHolding, client: Optional[Client] = None) -> Holding:
-    r"""
-    Create new :class:`Holding` object from simple datatypes from JSON input.
-
-    Will yield multiple items if ``exclusive: True`` is present in ``record``.
-
-    :param record:
-        dict of values for constructing :class:`.Holding`
-
-    :param client:
-        Legislice client for downloading missing fields from `record`
-
-    :param many:
-        if True, record represents a list of :class:`Holding`\s rather than
-        just one.
-
-    :returns:
-        New :class:`.Holding`, and an updated dictionary with mentioned
-        :class:`.Factor`\s as keys and their :class:`.TextQuoteSelector`\s
-        as values.
-    """
-
-    schema = schemas_yaml.HoldingSchema(many=False)
-
-    record, enactment_index = collect_enactments(record)
-    if client:
-        enactment_index = client.update_entries_in_enactment_index(enactment_index)
-    anchors, enactment_index = collect_anchors_from_index(enactment_index, "enactment")
-    schema.context["enactment_index"] = enactment_index
-
-    record, factor_index = index_names(record)
-    anchors, factor_index = collect_anchors_from_index(factor_index, "name")
-    schema.context["mentioned"] = factor_index
-
-    return schema.load(deepcopy(record))
 
 
 class HoldingsIndexed(NamedTuple):

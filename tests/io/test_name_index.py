@@ -3,9 +3,8 @@ import os
 from dotenv import load_dotenv
 
 from legislice.download import Client
-import pytest
 
-from authorityspoke.io import loaders, readers, schemas_yaml
+from authorityspoke.io import loaders, readers
 from authorityspoke.io import name_index, text_expansion, enactment_index
 
 

@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import datetime
 import json
-from pathlib import Path
 from typing import Dict, Optional, Union
 
 from legislice.download import Client, normalize_path, LegislicePathError, RawEnactment

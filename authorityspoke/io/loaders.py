@@ -11,21 +11,17 @@ from typing import Any, Dict, List, Iterator, Optional, Tuple, Union
 import yaml
 
 from legislice.download import Client
+from legislice.enactments import RawEnactment
 
 
-from authorityspoke.decisions import Decision, DecisionReading
-from authorityspoke.holdings import Holding
+from authorityspoke.decisions import Decision, DecisionReading, RawDecision
+from authorityspoke.facts import RawFactor
+from authorityspoke.holdings import Holding, RawHolding
 from authorityspoke.opinions import AnchoredHoldings
 from authorityspoke.rules import Rule
 
 from authorityspoke.io import filepaths, readers
 from authorityspoke.io.name_index import Mentioned
-from authorityspoke.io.schemas_yaml import (
-    RawEnactment,
-    RawFactor,
-    RawHolding,
-    RawDecision,
-)
 
 
 def load_anchored_holdings(

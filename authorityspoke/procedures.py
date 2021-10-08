@@ -29,6 +29,10 @@ from nettlesome.groups import FactorGroup
 from nettlesome.formatting import indented
 
 from authorityspoke.facts import Fact, Allegation, Pleading, Exhibit, Evidence
+from authorityspoke.facts import RawFactor
+
+
+RawProcedure = Dict[str, Sequence[RawFactor]]
 
 
 class Procedure(Comparable, BaseModel):

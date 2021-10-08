@@ -5,9 +5,7 @@ from copy import deepcopy
 from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
 from legislice.enactments import RawEnactment
-
-RawPredicate = Dict[str, Union[str, bool]]
-RawFactor = Dict[str, Union[RawPredicate, Sequence[Any], str, bool]]
+from authorityspoke.facts import RawPredicate, RawFactor
 
 
 class EnactmentIndex(OrderedDict):

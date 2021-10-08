@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import datetime
 import operator
-from typing import Iterable, Iterator, List
+from typing import Dict, Iterable, Iterator, List
 from typing import Optional, Sequence, Tuple, Union
 
 from anchorpoint.textselectors import TextQuoteSelector, TextPositionSelector
@@ -21,6 +21,11 @@ from pydantic import BaseModel, HttpUrl, validator
 from authorityspoke.holdings import Holding, HoldingGroup
 from authorityspoke.opinions import Opinion, OpinionReading, TextLinkDict
 from authorityspoke.rules import Rule
+
+
+RawCAPCitation = Dict[str, str]
+RawOpinion = Dict[str, str]
+RawDecision = Dict[str, Union[str, int, Sequence[RawOpinion], Sequence[RawCAPCitation]]]
 
 
 class CaseData(BaseModel):

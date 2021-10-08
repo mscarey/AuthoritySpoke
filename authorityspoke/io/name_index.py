@@ -8,12 +8,8 @@ from re import findall
 from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
 from nettlesome.predicates import StatementTemplate
-from authorityspoke.facts import Exhibit
+from authorityspoke.facts import Exhibit, RawPredicate, RawFactor
 from authorityspoke.io import text_expansion
-
-
-RawPredicate = Dict[str, Union[str, bool]]
-RawFactor = Dict[str, Union[RawPredicate, Sequence[Any], str, bool]]
 
 
 class Mentioned(OrderedDict):

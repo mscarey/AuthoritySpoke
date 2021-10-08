@@ -8,7 +8,6 @@ import pytest
 
 from authorityspoke.io import name_index, readers
 from authorityspoke.io.loaders import load_holdings
-from authorityspoke.io.readers import read_holding
 
 
 load_dotenv()

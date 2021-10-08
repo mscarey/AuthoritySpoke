@@ -3,7 +3,6 @@ import os
 import pathlib
 
 from pydantic import ValidationError
-from legislice import Enactment
 from nettlesome.entities import Entity
 from nettlesome.terms import TermSequence
 from nettlesome.predicates import Predicate
@@ -14,7 +13,6 @@ import pytest
 from authorityspoke.facts import Fact, Exhibit, Evidence
 from authorityspoke.io.name_index import index_names
 from authorityspoke.io import readers
-from authorityspoke.io import schemas_yaml
 from authorityspoke.io.loaders import load_holdings
 from authorityspoke.io import filepaths
 from authorityspoke.io.text_expansion import expand_shorthand

@@ -1,5 +1,3 @@
-from authorityspoke.io import schemas_yaml
-
 import pytest
 
 
@@ -42,16 +40,3 @@ class TestCollectAnchors:
             "anchors": "qualify for copyright protection. |17 U.S.C. § 102(a)|.",
         },
     }
-
-    @pytest.mark.xfail(
-        reason="This tests Anchorpoint. Is the test needed for AuthoritySpoke's test fixtures?"
-    )
-    def test_anchor_not_wrapped_in_list(self):
-        """
-        Test that when the anchor field is loaded in,
-        even if it isn't wrapped in a list, it'll be normalized
-        into a list containing a dict with an "exact" field.
-        """
-        schema = schemas_yaml.SelectorSchema()
-        selector = schema.load(self.fact_string_anchor["anchors"])
-        assert selector.exact.startswith("In preparing")

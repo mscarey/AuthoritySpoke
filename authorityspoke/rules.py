@@ -14,7 +14,7 @@ from typing import List, Optional, Sequence, Tuple, Union
 from pydantic import BaseModel, ValidationError
 from pydantic.class_validators import validator
 
-from legislice.enactments import Enactment, EnactmentPassage
+from legislice.enactments import Enactment, EnactmentPassage, RawEnactment
 from legislice.groups import EnactmentGroup
 
 from nettlesome.terms import (
@@ -26,7 +26,9 @@ from nettlesome.terms import (
 )
 from nettlesome.factors import Factor
 from nettlesome.formatting import indented
-from authorityspoke.procedures import Procedure
+from authorityspoke.procedures import Procedure, RawProcedure
+
+RawRule = Dict[str, Union[RawProcedure, Sequence[RawEnactment], str, bool]]
 
 
 class Rule(Comparable, BaseModel):

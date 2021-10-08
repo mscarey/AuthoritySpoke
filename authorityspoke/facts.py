@@ -2,7 +2,7 @@
 from __future__ import annotations
 from copy import deepcopy
 import operator
-from typing import ClassVar, Dict, Iterable, Iterator, List
+from typing import Any, ClassVar, Dict, Iterable, Iterator, List
 from typing import Mapping, Optional, Sequence, Tuple, Union
 
 from pydantic import BaseModel, Extra, ValidationError, validator, root_validator
@@ -23,6 +23,10 @@ from nettlesome.terms import (
 from nettlesome.predicates import Predicate
 from nettlesome.quantities import Comparison, QuantityRange
 from nettlesome.statements import Statement
+
+
+RawPredicate = Dict[str, Union[str, bool]]
+RawFactor = Dict[str, Union[RawPredicate, Sequence[Any], str, bool]]
 
 
 class Fact(Factor, BaseModel):
