@@ -3,12 +3,12 @@
   - type: fact
     content: '{the Lotus menu command hierarchy} was copyrightable'
   - type: fact
-    content: Borland International copied constituent elements of the Lotus menu command
-      hierarchy that were original
+    content: '{Borland International} copied constituent elements of the Lotus menu command
+      hierarchy that were original'
   outputs:
   - type: fact
-    content: '{Borland International} infringed the copyright in the Lotus menu command
-      hierarchy'
+    content: Borland International infringed the copyright in the Lotus menu command
+      hierarchy
   enactments:
   - name: copyright protection
     enactment:

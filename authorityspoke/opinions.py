@@ -187,6 +187,14 @@ class OpinionReading(Comparable, BaseModel):
         r"""Remove all :class:`.Holding`\s from the opinion."""
         self.anchored_holdings.holdings = []
 
+    def get_enactment_anchors(self, key: str) -> TextPositionSet:
+        """Get the anchors for an enactment passage."""
+        return self.anchored_holdings.get_enactment_anchors(key)
+
+    def get_term_anchors(self, key: str) -> TextPositionSet:
+        """Get the anchors for an enactment passage."""
+        return self.anchored_holdings.get_term_anchors(key)
+
     def explanations_contradiction(
         self,
         other: Comparable,
