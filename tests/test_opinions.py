@@ -299,7 +299,7 @@ class TestOpinionFactors:
         term = TermWithAnchors(term=fact, anchors=anchors)
         index = AnchoredHoldings(holdings=[], named_anchors=[term])
 
-        index.insert_term(term=fact, anchors=anchors)
+        index.add_term(term=fact, anchors=anchors)
         assert len(index.named_anchors) == 1
         assert index.named_anchors[0].anchors.quotes == [quote_selector]
 

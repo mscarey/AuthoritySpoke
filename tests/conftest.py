@@ -1581,22 +1581,15 @@ def make_anchored_holding(make_response, make_decision):
 def make_decision_with_holding(make_response, make_decision, make_anchored_holding):
     result = {}
     for name, decision in make_decision.items():
-        (
-            holdings,
-            named_anchors,
-            enactment_anchors,
-        ) = make_anchored_holding[name]
+        anchored_holdings = make_anchored_holding[name]
+
         result[name] = DecisionReading(
             decision=decision,
             opinion_readings=[
                 OpinionReading(
                     opinion_type=decision.majority.type,
                     opinion_author=decision.majority.author,
-                    anchored_holdings=AnchoredHoldings(
-                        holdings=holdings,
-                        named_anchors=named_anchors,
-                        enactment_anchors=enactment_anchors,
-                    ),
+                    anchored_holdings=anchored_holdings,
                 )
             ],
         )

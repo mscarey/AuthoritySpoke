@@ -101,7 +101,7 @@ class AnchoredHoldings(BaseModel):
                 return index
         return None
 
-    def insert_term(self, term: Term, anchors: TextPositionSet) -> None:
+    def add_term(self, term: Term, anchors: TextPositionSet) -> None:
         term_index = self.find_term_index(term)
         if term_index is None:
             self.named_anchors.append(TermWithAnchors(term=term, anchors=anchors))

@@ -191,18 +191,16 @@ class TestHoldingImport:
             },
         ]
         mock_client = FakeClient(responses=make_response)
-        (
-            feist_holdings,
-            named_anchors,
-            enactment_anchors,
-        ) = readers.read_holdings_with_anchors(record=raw_holdings, client=mock_client)
+        f_anchored_holdings = readers.read_holdings_with_anchors(
+            record=raw_holdings, client=mock_client
+        )
 
         feist = make_opinion_with_holding["feist_majority"]
         feist.clear_holdings()
         feist.posit(
-            feist_holdings,
-            named_anchors=named_anchors,
-            enactment_anchors=enactment_anchors,
+            f_anchored_holdings.holdings,
+            named_anchors=f_anchored_holdings.named_anchors,
+            enactment_anchors=f_anchored_holdings.enactment_anchors,
         )
         assert feist.holdings[0].enactments[0].node == "/us/const/article/I/8/8"
         assert feist.holdings[1].enactments[0].node == "/us/const/article/I/8/8"
