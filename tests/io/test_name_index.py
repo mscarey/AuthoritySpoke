@@ -273,17 +273,23 @@ class TestRetrieveMentioned:
     def test_retrieve_references_with_substring(self):
         """
         The Mentioned object must be sorted longest to shortest.
-
-        Also, the name used as the key for the Mentioned dict will
-        have to be included in each Entity dict in the `context`
-        list created by `get_references_from_mentioned`.
         """
 
-        mentioned = name_index.Mentioned(self.overlapping_names_mentioned)
-        content = "Mecha Godzilla threw Mothra at Godzilla"
-        schema = schemas_yaml.FactSchema()
-        mentioned = mentioned.sorted_by_length()
-        schema.context["mentioned"] = mentioned
-        new_content, context = schema.get_references_from_mentioned(content)
-        assert new_content == "${mecha_godzilla} threw ${mothra} at ${godzilla}"
-        assert context[2] == {"name": "Godzilla", "type": "Entity"}
+        record = [
+            {
+                "outputs": [
+                    {
+                        "type": "fact",
+                        "predicate": {
+                            "content": "{Mecha Godzilla} threw {Mothra} at {Godzilla}"
+                        },
+                    }
+                ]
+            }
+        ]
+
+        obj, mentioned = name_index.collect_mentioned(record)
+        sorted_mentioned = mentioned.sorted_by_length()
+
+        assert obj[0]["outputs"][0] == "Mecha Godzilla threw Mothra at Godzilla"
+        assert sorted_mentioned[2] == ("Godzilla", {"type": "Entity"})
