@@ -159,6 +159,14 @@ class OpinionReading(Comparable, BaseModel):
     def holding_anchors(self) -> List[TextPositionSet]:
         return [item.anchors for item in self.anchored_holdings.holdings]
 
+    @property
+    def anchored_factors(self) -> List[TermWithAnchors]:
+        return self.anchored_holdings.named_anchors
+
+    @property
+    def anchored_enactments(self) -> List[EnactmentWithAnchors]:
+        return self.anchored_holdings.enactment_anchors
+
     def __str__(self):
         return super().__str__()
 

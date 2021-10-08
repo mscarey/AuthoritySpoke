@@ -99,7 +99,8 @@ class TestOpinionText:
     def test_opinion_text_anchor(self, make_opinion_with_holding):
         feist = make_opinion_with_holding["feist_majority"]
         assert any(
-            "ideas" in factor.anchors.quotes[0].exact for factor in feist.factor_anchors
+            "ideas" in factor.anchors.quotes[0].exact
+            for factor in feist.anchored_factors
         )
 
     def test_select_opinion_text_for_factor(self, make_opinion, make_anchored_holding):
@@ -109,9 +110,7 @@ class TestOpinionText:
             key="the fact that <the Java API> was copyrightable"
         )
         selected = opinion.select_text(selector=anchor)
-        assert str(selected).startswith(
-            "…that element may nevertheless contain expression"
-        )
+        assert str(selected).startswith("…copyright protection.")
 
     def test_select_opinion_text_for_enactment(self, make_decision_with_holding):
         oracle = make_decision_with_holding["oracle"]

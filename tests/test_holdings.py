@@ -291,17 +291,17 @@ class TestImplication:
             inputs=FactorGroup(
                 [
                     Fact(
-                        "${work} was copyrightable",
+                        predicate="${work} was copyrightable",
                         terms=Entity(name="the birthday song"),
                     ),
                     Fact(
-                        "$person copied constituent elements of $work that were original",
+                        predicate="$person copied constituent elements of $work that were original",
                         terms=[Entity(name="Eve"), Entity(name="the birthday song")],
                     ),
                 ]
             ),
             outputs=Fact(
-                "$person infringed the copyright in $work",
+                predicate="$person infringed the copyright in $work",
                 terms=[Entity(name="Eve"), Entity(name="the birthday song")],
             ),
             enactments=e_copyright_protection,
