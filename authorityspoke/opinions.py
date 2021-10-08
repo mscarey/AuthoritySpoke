@@ -115,6 +115,25 @@ class AnchoredHoldings(BaseModel):
                 return item.anchors
         raise KeyError(f"Term with key '{key}' not found")
 
+    def find_enactment_index(self, enactment: EnactmentPassage) -> Optional[int]:
+        """Find the index of a term in the holdings."""
+        key = str(enactment)
+        for index, enactment_with_anchors in enumerate(self.enactment_anchors):
+            if str(enactment_with_anchors.passage) == key:
+                return index
+        return None
+
+    def add_enactment(
+        self, enactment: EnactmentPassage, anchors: TextPositionSet
+    ) -> None:
+        term_index = self.find_enactment_index(enactment)
+        if term_index is None:
+            self.enactment_anchors.append(
+                EnactmentWithAnchors(passage=enactment, anchors=anchors)
+            )
+        else:
+            self.enactment_anchors[term_index].anchors += anchors
+
     def get_enactment_anchors(self, key: str) -> TextPositionSet:
         """Get the anchors for a term."""
         for item in self.enactment_anchors:
@@ -339,8 +358,8 @@ class OpinionReading(Comparable, BaseModel):
             )
 
         for enactment_anchor in enactment_anchors:
-            self.anchored_holdings.add_enactment_with_anchors(
-                enactment=enactment_anchor.term, anchors=named_anchor.anchors
+            self.anchored_holdings.add_enactment(
+                enactment=enactment_anchor.passage, anchors=named_anchor.anchors
             )
 
         matching_holding = self.get_matching_holding(holding)

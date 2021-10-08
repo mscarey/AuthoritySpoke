@@ -25,29 +25,23 @@ class TestReadme:
         oracle = Decision(**oracle_dict)
         lotus = Decision(**lotus_dict)
 
-        (
-            oracle_holdings,
-            oracle_named_anchors,
-            oracle_e,
-        ) = read_anchored_holdings_from_file("holding_oracle.yaml", client=client)
-        (
-            lotus_holdings,
-            lotus_named_anchors,
-            lotus_e,
-        ) = read_anchored_holdings_from_file("holding_lotus.yaml", client=client)
+        oracle_ah = read_anchored_holdings_from_file(
+            "holding_oracle.yaml", client=client
+        )
+        lotus_ah = read_anchored_holdings_from_file("holding_lotus.yaml", client=client)
 
         oracle_reading = DecisionReading(oracle)
         lotus_reading = DecisionReading(lotus)
 
         oracle_reading.posit(
-            holdings=oracle_holdings,
-            named_anchors=oracle_named_anchors,
-            enactment_anchors=oracle_e,
+            holdings=oracle_ah.holdings,
+            named_anchors=oracle_ah.named_anchors,
+            enactment_anchors=oracle_ah.enactment_anchors,
         )
         lotus_reading.posit(
-            holdings=lotus_holdings,
-            named_anchors=lotus_named_anchors,
-            enactment_anchors=lotus_e,
+            holdings=lotus_ah.holdings,
+            named_anchors=lotus_ah.named_anchors,
+            enactment_anchors=lotus_ah.enactment_anchors,
         )
 
         assert lotus_reading.contradicts(oracle_reading)
