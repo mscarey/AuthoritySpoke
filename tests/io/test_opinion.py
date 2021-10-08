@@ -8,7 +8,7 @@ from authorityspoke.holdings import HoldingGroup
 from authorityspoke.io import loaders, readers
 from authorityspoke.io.downloads import CAPClient
 from authorityspoke.decisions import DecisionReading
-from authorityspoke.opinions import OpinionReading
+from authorityspoke.opinions import AnchoredHoldings, OpinionReading
 
 
 load_dotenv()
@@ -43,7 +43,7 @@ class TestLoadOpinion:
 
     def test_loading_opinion_with_one_holding_in_list(self, make_anchored_holding):
         holding = make_anchored_holding["watt"].holdings[0]
-        reading = OpinionReading(anchored_holdings=[holding])
+        reading = OpinionReading(anchored_holdings=AnchoredHoldings(holdings=[holding]))
         assert isinstance(reading.holdings, HoldingGroup)
         assert len(reading.holdings) == 1
 

@@ -214,14 +214,10 @@ class TestHoldingImport:
         """
         mock_client = FakeClient(responses=make_response)
         raw_holdings = load_anchored_holdings(f"holding_oracle.yaml")
-        (
-            holdings,
-            named_anchors,
-            _,
-        ) = readers.read_holdings_with_anchors(raw_holdings, client=mock_client)
+        loaded = readers.read_holdings_with_anchors(raw_holdings, client=mock_client)
 
-        assert isinstance(holdings[0], HoldingWithAnchors)
-        assert isinstance(named_anchors[1].anchors.quotes[0], TextQuoteSelector)
+        assert isinstance(loaded.holdings[0], HoldingWithAnchors)
+        assert isinstance(loaded.named_anchors[1].anchors.quotes[0], TextQuoteSelector)
 
     def test_load_and_posit_holdings_with_anchors(self, make_response):
         """
