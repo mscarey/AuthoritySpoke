@@ -279,10 +279,7 @@ def extract_anchors_from_holding_record(
         anchor["term"] = expand_holding(
             anchor["term"], factor_index=factor_index, enactment_index=enactment_index
         )
-        try:
-            factor_result.append(TermWithAnchors(**anchor))
-        except ValidationError:
-            print(anchor)  # TODO: remove
+        factor_result.append(TermWithAnchors(**anchor))
 
     factor_anchors = [TermWithAnchors(**anchor) for anchor in factor_anchors]
 

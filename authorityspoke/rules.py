@@ -278,7 +278,7 @@ class Rule(Comparable, BaseModel):
             raise TypeError
 
         new_enactments = self.enactments_despite + incoming
-        self.set_enactments(new_enactments)
+        self.set_enactments_despite(new_enactments)
 
     def with_enactment(self, incoming: Enactment) -> Rule:
         r"""
