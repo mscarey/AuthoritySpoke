@@ -12,7 +12,6 @@ from legislice.groups import EnactmentGroup
 
 from nettlesome.entities import Entity
 from nettlesome.predicates import Predicate
-from nettlesome.statements import Statement
 
 from pydantic import ValidationError
 import pytest
@@ -54,7 +53,7 @@ class TestEnactments:
         assert fourth_a.text.endswith("and the persons or things to be seized.")
 
     def test_passage_from_imported_statute(self, fake_usc_client):
-        oracle = loaders.load_decision(f"oracle_h.json")
+        oracle = loaders.load_decision("oracle_h.json")
         oracle_decision = Decision(**oracle)
         reading = DecisionReading(oracle_decision)
         loaded = loaders.load_holdings("holding_oracle.yaml")

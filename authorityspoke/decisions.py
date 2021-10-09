@@ -132,7 +132,7 @@ class DecisionReading(Comparable):
             can't be found.
         """
         opinion = self.find_matching_opinion(opinion_type, opinion_author)
-        return opinion.select_text(selector)
+        return opinion.select_text(selector) if opinion else None
 
     def add_opinion_reading(self, opinion_reading: OpinionReading) -> None:
         matching_opinion = self.find_opinion_matching_reading(opinion_reading)

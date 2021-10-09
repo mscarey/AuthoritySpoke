@@ -3,8 +3,6 @@ from authorityspoke.opinions import OpinionReading
 from copy import deepcopy
 from datetime import date
 import datetime
-import os
-
 import pytest
 
 from authorityspoke.decisions import Decision, DecisionReading, Opinion
@@ -217,7 +215,6 @@ class TestContradiction:
 
     def test_cannot_check_contradiction_of_str(self, make_decision_with_holding):
         oracle = make_decision_with_holding["oracle"]
-        feist = make_decision_with_holding["feist"]
         with pytest.raises(TypeError):
             oracle.explain_contradiction("feist")
 

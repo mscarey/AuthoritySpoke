@@ -16,9 +16,6 @@ import operator
 from typing import Any, Callable, Dict, Iterable, Iterator, List
 from typing import Optional, Sequence, Tuple, TypeVar, Union
 
-from dataclasses import dataclass, field
-
-from anchorpoint import TextPositionSet
 from legislice.enactments import Enactment
 
 from nettlesome.terms import (

@@ -89,7 +89,6 @@ class TestFacts:
     def test_string_representation_of_factor(self, watt_factor):
         assert "<Hideaway Lodge> was a motel" in str(watt_factor["f1"])
         assert "absence of the fact" in str(watt_factor["f3_absent"]).lower()
-        assert "absence of the fact" in watt_factor["f3_absent"].wrapped_string
 
     def test_string_no_truth_value(self, watt_factor):
         factor = watt_factor["f2_no_truth"]
@@ -334,6 +333,9 @@ class TestSameMeaning:
         f = watt_factor
         assert not f["f2_clear_and_convincing"].means(f["f2_preponderance_of_evidence"])
         assert not f["f2_clear_and_convincing"].means(f["f2"])
+        assert f["f2_clear_and_convincing"].wrapped_string.endswith(
+            "\n  by the STANDARD clear and convincing"
+        )
 
     def test_means_despite_plural(self):
         directory = Entity(name="Rural's telephone directory", plural=False)

@@ -10,7 +10,7 @@ from slugify import slugify
 
 from nettlesome.entities import Entity
 from nettlesome.factors import Factor
-from nettlesome.formatting import indented
+from nettlesome.formatting import indented, wrapped
 from nettlesome.terms import (
     Comparable,
     ContextRegister,
@@ -169,14 +169,6 @@ class Fact(Factor, BaseModel):
         """Access :attr:`~Predicate.truth` attribute."""
         return self.predicate.truth
 
-    @property
-    def wrapped_string(self):
-        """Wrap text in string representation of ``self``."""
-        content = str(self.predicate._content_with_terms(self.terms))
-        unwrapped = self.predicate._add_truth_to_content(content)
-        text = wrapped(super().__str__().format(unwrapped))
-        return text
-
     @root_validator(pre=True)
     def move_truth_to_predicate(cls, values):
         if isinstance(values.get("predicate"), str):
@@ -215,7 +207,10 @@ class Fact(Factor, BaseModel):
 
     @property
     def wrapped_string(self):
-        text = super().wrapped_string
+        """Wrap text in string representation of ``self``."""
+        content = str(self.predicate._content_with_terms(self.terms))
+        unwrapped = self.predicate._add_truth_to_content(content)
+        text = wrapped(super().__str__().format(unwrapped))
         if self.standard_of_proof:
             text += "\n" + indented(f"by the STANDARD {self.standard_of_proof}")
         return text
@@ -655,7 +650,7 @@ class Allegation(Factor, BaseModel):
             factor_text = indented(self.fact.wrapped_string, tabs=2)
             text += f"\n{str(factor_text)}"
         if self.pleading:
-            text += f"\n" + indented("FOUND IN:")
+            text += "\n" + indented("FOUND IN:")
             factor_text = indented(str(self.pleading), tabs=2)
             text += f"\n{str(factor_text)}"
         return super().__str__().format(text).strip()

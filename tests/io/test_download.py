@@ -1,7 +1,3 @@
-from authorityspoke.decisions import Decision
-import json
-import os
-
 from dotenv import load_dotenv
 import eyecite
 import pytest
@@ -11,6 +7,7 @@ from justopinion.decisions import Decision
 from justopinion.download import CaseAccessProjectAPIError
 
 from authorityspoke import LegisClient, DecisionReading
+from authorityspoke.decisions import Decision
 from authorityspoke.io.loaders import load_decision
 from authorityspoke.io import writers
 from tests.test_notebooks import CAP_API_KEY
