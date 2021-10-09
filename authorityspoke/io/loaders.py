@@ -96,37 +96,6 @@ def load_holdings(
     return holdings
 
 
-def load_rules_with_index(
-    filename: Optional[str] = None,
-    directory: Optional[pathlib.Path] = None,
-    filepath: Optional[pathlib.Path] = None,
-    client: Optional[Client] = None,
-    many: bool = True,
-) -> Tuple[List[Rule], Mentioned]:
-    r"""
-    Read :class:`.Rule`\s from a file.
-
-    Even though this function will generate :class:`.Rule`\s instead
-    of :class:`.Holding`\s, it uses the :func:`load_holding` function.
-    Some fields that can exist in a :class:`.Holding` object (rule_valid,
-    decided, exclusive) are not applicable to :class:`.Rule`\s.
-
-    :param filename: The name of the input JSON file.
-
-    :param directory: The directory where the input JSON file is located.
-
-    :param filepath:
-        Complete path to the JSON file representing the :class:`.Opinion`,
-        including filename.
-
-    :param regime:
-        The regime to reference for the :class:`Enactment`\s
-        mentioned in the holding.
-    """
-    raw_rules = load_holdings(filename=filename, directory=directory, filepath=filepath)
-    return readers.read_rules_with_index(raw_rules, client=client, many=many)
-
-
 def read_holdings_from_file(
     filename: Optional[str] = None,
     directory: Optional[pathlib.Path] = None,
