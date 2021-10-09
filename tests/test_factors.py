@@ -89,6 +89,7 @@ class TestFacts:
     def test_string_representation_of_factor(self, watt_factor):
         assert "<Hideaway Lodge> was a motel" in str(watt_factor["f1"])
         assert "absence of the fact" in str(watt_factor["f3_absent"]).lower()
+        assert "absence of the fact" in watt_factor["f3_absent"].wrapped_string
 
     def test_string_no_truth_value(self, watt_factor):
         factor = watt_factor["f2_no_truth"]

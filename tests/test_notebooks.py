@@ -8,8 +8,9 @@ import os
 from dotenv import load_dotenv
 import pytest
 
+from justopinion import CAPClient
+
 from authorityspoke.facts import Fact
-from authorityspoke.io.downloads import CAPClient
 
 from authorityspoke import Entity, Predicate, Comparison
 

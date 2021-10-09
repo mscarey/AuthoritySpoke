@@ -6,9 +6,10 @@ from dotenv import load_dotenv
 import eyecite
 import pytest
 
+from justopinion import CAPClient
 from justopinion.decisions import Decision
+from justopinion.download import CaseAccessProjectAPIError
 
-from authorityspoke.io.downloads import CAPClient, CaseAccessProjectAPIError
 from authorityspoke import LegisClient, DecisionReading
 from authorityspoke.io.loaders import load_decision
 from authorityspoke.io import writers

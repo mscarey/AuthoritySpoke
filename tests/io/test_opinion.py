@@ -3,11 +3,11 @@ from typing import Dict, List
 
 from dotenv import load_dotenv
 
+from justopinion import CAPClient
+
 from authorityspoke import Opinion
 from authorityspoke.holdings import HoldingGroup
 from authorityspoke.io import loaders, readers
-from authorityspoke.io.downloads import CAPClient
-from authorityspoke.decisions import DecisionReading
 from authorityspoke.opinions import AnchoredHoldings, OpinionReading
 
 
