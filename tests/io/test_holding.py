@@ -24,11 +24,7 @@ from authorityspoke.opinions import (
 from authorityspoke.procedures import Procedure
 from authorityspoke.io import loaders, readers, name_index
 from authorityspoke.io.fake_enactments import FakeClient
-from authorityspoke.io.loaders import (
-    load_holdings,
-    read_holdings_from_file,
-    load_anchored_holdings,
-)
+from authorityspoke.io.loaders import load_holdings, read_holdings_from_file
 from authorityspoke.io import filepaths, text_expansion
 from authorityspoke.rules import Rule
 
@@ -211,7 +207,7 @@ class TestHoldingImport:
         impossible to get text anchors.
         """
         mock_client = FakeClient(responses=make_response)
-        raw_holdings = load_anchored_holdings(f"holding_oracle.yaml")
+        raw_holdings = load_holdings(f"holding_oracle.yaml")
         loaded = readers.read_holdings_with_anchors(raw_holdings, client=mock_client)
 
         assert isinstance(loaded.holdings[0], HoldingWithAnchors)

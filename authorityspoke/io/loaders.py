@@ -24,11 +24,11 @@ from authorityspoke.io import filepaths, readers
 from authorityspoke.io.name_index import Mentioned
 
 
-def load_anchored_holdings(
+def load_holdings(
     filename: Optional[str] = None,
     directory: Optional[pathlib.Path] = None,
     filepath: Optional[pathlib.Path] = None,
-) -> Dict[str, Union[Dict[str, RawFactor], Dict[str, RawEnactment], List[RawHolding]]]:
+) -> List[RawHolding]:
     r"""
     Load list of records from YAML or JSON to create :class:`.Holding`\s with text selectors.
 
@@ -59,40 +59,6 @@ def load_anchored_holdings(
         else:
             holdings = json.load(f)
 
-    return holdings
-
-
-def load_holdings(
-    filename: Optional[str] = None,
-    directory: Optional[pathlib.Path] = None,
-    filepath: Optional[pathlib.Path] = None,
-) -> Dict[str, Union[Dict[str, RawFactor], Dict[str, RawEnactment], List[RawHolding]]]:
-    r"""
-    Load a list of records from JSON to create :class:`.Holding`\s.
-
-    :param filename:
-        the name of the JSON file to look in for :class:`Holding`
-        data in the format that lists ``mentioned_factors``
-        followed by a list of holdings.
-
-    :param directory:
-        the path of the directory containing the JSON file.
-
-    :param filepath:
-        Complete path to the XML file representing the :class:`.Code`,
-        including filename.
-
-    :returns:
-        a list of :class:`Holding`\s from a JSON file in the
-        ``example_data/holdings`` subdirectory, from a JSON
-        file.
-    """
-    holdings = load_anchored_holdings(
-        filename=filename, directory=directory, filepath=filepath
-    )
-
-    if isinstance(holdings, Dict):
-        return holdings["holdings"]
     return holdings
 
 
@@ -156,7 +122,7 @@ def read_anchored_holdings_from_file(
         >>> print(result.holdings[0].outputs[0])
         the fact that <Mazza-Alaluf> operated <Turismo Costa Brava> without an appropriate money transmitting license in a State where such operation was punishable as a misdemeanor or a felony under State law
     """
-    raw_holdings = load_anchored_holdings(
+    raw_holdings = load_holdings(
         filename=filename, directory=directory, filepath=filepath
     )
     return readers.read_holdings_with_anchors(raw_holdings, client=client)
