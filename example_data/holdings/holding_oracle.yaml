@@ -496,7 +496,7 @@
         language
       name: the Java API was the sequence, structure, and organization of the Java language
       anchors:
-        quotes: "|the structure, sequence, and organization of a computer program| is eligible for copyright protection"
+        quotes: "case law recognizing that |the structure, sequence, and organization of a computer program| is eligible for copyright protection"
     - type: fact
       content: the Java API was the expression of an idea
     - type: fact

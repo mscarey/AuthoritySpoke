@@ -77,14 +77,17 @@ def collect_enactment_anchors(object_index):
 
 
 def collect_anchors_from_index(object_index, field_name: str):
-    anchors = []
+    result = []
     for key, value in object_index.items():
         if value.get("anchors"):
             anchored_object: Dict[str, Any] = {}
-            anchored_object["anchors"] = value.pop("anchors")
+            anchors = value.pop("anchors")
+            if isinstance(anchors, List):
+                anchors = [anchor for anchor in anchors if anchor != "|"]
+            anchored_object["anchors"] = anchors
             anchored_object[field_name] = value
-            anchors.append(anchored_object)
-    return anchors, object_index
+            result.append(anchored_object)
+    return result, object_index
 
 
 def read_holdings_with_anchors(
@@ -256,32 +259,44 @@ def expand_holdings(
 def extract_anchors_from_holding_record(
     record: List[RawHolding], client: Optional[Client] = None
 ):
-    record, enactment_index = collect_enactments(record)
+    record_post_enactments, enactment_index = collect_enactments(record)
     if client:
-        enactment_index = client.update_entries_in_enactment_index(enactment_index)
-    enactment_anchors, enactment_index = collect_anchors_from_index(
-        enactment_index, "passage"
+        enactment_index_post_client = client.update_entries_in_enactment_index(
+            enactment_index
+        )
+    else:
+        enactment_index_post_client = enactment_index
+    enactment_anchors, enactment_index_post_anchors = collect_anchors_from_index(
+        enactment_index_post_client, "passage"
     )
 
     enactment_result = []
     for anchor in enactment_anchors:
-        anchor["passage"] = enactment_index.get_if_present(anchor["passage"])
+        anchor["passage"] = enactment_index_post_anchors.get_if_present(
+            anchor["passage"]
+        )
         enactment_result.append(EnactmentWithAnchors(**anchor))
 
-    record, factor_index = index_names(record)
-    factor_anchors, factor_index = collect_anchors_from_index(factor_index, "term")
+    record_post_terms, factor_index = index_names(record_post_enactments)
+    factor_anchors, factor_index_post_anchors = collect_anchors_from_index(
+        factor_index, "term"
+    )
 
     factor_result = []
     for anchor in factor_anchors:
         anchor["term"] = expand_holding(
-            anchor["term"], factor_index=factor_index, enactment_index=enactment_index
+            anchor["term"],
+            factor_index=factor_index_post_anchors,
+            enactment_index=enactment_index_post_anchors,
         )
         factor_result.append(TermWithAnchors(**anchor))
 
     factor_anchors = [TermWithAnchors(**anchor) for anchor in factor_anchors]
 
     expanded = expand_holdings(
-        record, factor_index=factor_index, enactment_index=enactment_index
+        record_post_terms,
+        factor_index=factor_index_post_anchors,
+        enactment_index=enactment_index_post_anchors,
     )
     holding_anchors = [holding.pop("anchors", None) for holding in expanded]
 
