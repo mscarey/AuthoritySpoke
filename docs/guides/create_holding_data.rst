@@ -25,7 +25,7 @@ into :class:`authorityspoke.decisions.DecisionReading` objects.
     >>> from dotenv import load_dotenv
     >>> from authorityspoke import Decision, DecisionReading
     >>> from authorityspoke.io.loaders import load_decision_as_reading
-    >>> from authorityspoke.io.downloads import CAPClient
+    >>> from authorityspoke.io import CAPClient
     >>> load_dotenv()
     True
     >>> if USE_REAL_CASE_API:

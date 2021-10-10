@@ -137,7 +137,7 @@ a string when constructing the Comparison object, and it will be converted to a 
 
     >>> from authorityspoke import Comparison
     >>> drug_comparison = Comparison(
-    ...     "the weight of marijuana that $defendant possessed was",
+    ...     predicate="the weight of marijuana that $defendant possessed was",
     ...     sign=">=",
     ...     expression="0.5 kilograms")
     >>> str(drug_comparison)
