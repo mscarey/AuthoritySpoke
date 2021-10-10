@@ -207,7 +207,7 @@ class TestHoldingImport:
         impossible to get text anchors.
         """
         mock_client = FakeClient(responses=make_response)
-        raw_holdings = load_holdings(f"holding_oracle.yaml")
+        raw_holdings = load_holdings("holding_oracle.yaml")
         loaded = readers.read_holdings_with_anchors(raw_holdings, client=mock_client)
 
         assert isinstance(loaded.holdings[0], HoldingWithAnchors)

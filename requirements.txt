@@ -1,6 +1,6 @@
-git+git://github.com/mscarey/anchorpoint.git@9b9758b1ebd2b82cfda92935ce77f26c99d6ced2#egg=anchorpoint
+anchorpoint~=0.7.0
 eyecite~=2.2.0
-justopinion~=0.2.4
+justopinion~=0.2.5
 git+git://github.com/mscarey/legislice.git@348a6a8e93b75e535d81f2796fdfc0a1dc5ddf7e#egg=legislice
 git+git://github.com/mscarey/nettlesome.git@e15d4290e11223b28a8ef6512d902385d638357d#egg=nettlesome
 pint>=0.15

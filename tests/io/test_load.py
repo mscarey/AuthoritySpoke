@@ -67,10 +67,6 @@ class TestLoadAndReadFake:
         watt_holdings = read_holdings_from_file("holding_watt.yaml", client=self.client)
         assert watt_holdings[4].inputs[0].terms[0].name == "Hideaway Lodge"
 
-    def test_read_holdings_in_nested_rule(self):
-        watt_holdings = read_holdings_from_file("holding_watt.yaml", client=self.client)
-        assert watt_holdings[4].inputs[0].terms[0].name == "Hideaway Lodge"
-
 
 class TestLoadAndRead:
     client = LegisClient(api_token=LEGISLICE_API_TOKEN)

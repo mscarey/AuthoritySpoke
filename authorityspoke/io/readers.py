@@ -237,9 +237,9 @@ def expand_holding(
 
 
 def expand_holdings(
-    record: List[RawHolding],
-    factor_index: Dict[str, Dict],
-    enactment_index: Dict[str, Dict],
+    record: List[Union[str, RawHolding]],
+    factor_index: Mentioned,
+    enactment_index: EnactmentIndex,
 ) -> List[RawHolding]:
     if isinstance(record, dict):
         record = [record]

@@ -9,6 +9,7 @@ from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
 from nettlesome.predicates import StatementTemplate
 from authorityspoke.facts import Exhibit, RawPredicate, RawFactor
+from authorityspoke.holdings import RawHolding
 from authorityspoke.io import text_expansion
 
 
@@ -39,7 +40,7 @@ class Mentioned(OrderedDict):
         value.update(self[name])
         return value
 
-    def get_if_present(self, name: str) -> Union[Dict, str]:
+    def get_if_present(self, name: Union[str, RawHolding]) -> RawHolding:
         """
         Retrieve a record from the index, if it exists.
         :param name:
