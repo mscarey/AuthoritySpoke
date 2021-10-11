@@ -5,7 +5,7 @@ from typing import Dict, Iterable, Iterator, List
 from typing import Optional, Sequence, Tuple, Union
 
 from anchorpoint.textselectors import TextQuoteSelector, TextPositionSelector
-from justopinion.decisions import Decision
+from justopinion.decisions import Decision, CAPCitation
 
 from nettlesome.terms import Comparable, ContextRegister, Explanation
 from nettlesome.factors import Factor

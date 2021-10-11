@@ -137,7 +137,7 @@ a string when constructing the Comparison object, and it will be converted to a 
 
     >>> from authorityspoke import Comparison
     >>> drug_comparison = Comparison(
-    ...     predicate="the weight of marijuana that $defendant possessed was",
+    ...     content="the weight of marijuana that $defendant possessed was",
     ...     sign=">=",
     ...     expression="0.5 kilograms")
     >>> str(drug_comparison)
@@ -153,7 +153,7 @@ one Comparison :meth:`~nettlesome.predicates.Comparison.implies` or
 :meth:`~nettlesome.predicates.Comparison.contradicts` another.
 
     >>> smaller_drug_comparison = Comparison(
-    ...     "the weight of marijuana that $defendant possessed was",
+    ...     content="the weight of marijuana that $defendant possessed was",
     ...     sign=">=",
     ...     expression="250 grams")
     >>> str(smaller_drug_comparison)
@@ -174,7 +174,7 @@ was more than 10 grams. AuthoritySpoke interprets this to mean it’s true
 that the weight was no more than 10 grams.
 
     >>> drug_comparison_with_upper_bound = Comparison(
-    ...     "the weight of marijuana that $defendant possessed was",
+    ...     content="the weight of marijuana that $defendant possessed was",
     ...     sign=">",
     ...     expression="10 grams",
     ...     truth=False)
@@ -207,7 +207,7 @@ describes. The template string will still need to end with the word
 floating point number, not a string to be parsed.
 
     >>> three_children = Comparison(
-    ...     "the number of children in ${taxpayer}'s household was",
+    ...     content="the number of children in ${taxpayer}'s household was",
     ...     sign="=",
     ...     expression=3)
     >>> str(three_children)
@@ -218,14 +218,19 @@ like :meth:`~nettlesome.predicates.Comparison.implies`
 or :meth:`~nettlesome.predicates.Comparison.contradicts`\,
 but no unit conversion will be available.
 
-    >>> at_least_two_children = Comparison("the number of children in ${taxpayer}'s household was", sign=">=", expression=2)
+    >>> at_least_two_children = Comparison(
+    ...     content="the number of children in ${taxpayer}'s household was",
+    ...     sign=">=",
+    ...     expression=2)
     >>> three_children.implies(at_least_two_children)
     True
 
-Floating point comparisons work similarly.
+Comparisons of decimal numbers work similarly.
 
-    >>> specific_tax_rate = Comparison("${taxpayer}'s marginal income tax rate was", sign="=", expression=.3)
-    >>> tax_rate_over_25 = Comparison("${taxpayer}'s marginal income tax rate was", sign=">", expression=.25)
+    >>> specific_tax_rate = Comparison(
+    ...     content="${taxpayer}'s marginal income tax rate was", sign="=", expression=.3)
+    >>> tax_rate_over_25 = Comparison(
+    ...     content="${taxpayer}'s marginal income tax rate was", sign=">", expression=.25)
     >>> specific_tax_rate.implies(tax_rate_over_25)
     True
 
@@ -237,7 +242,8 @@ The ``expression`` field of
 a :class:`~nettlesome.predicates.Comparison` can be a :py:class:`datetime.date`\.
 
     >>> from datetime import date
-    >>> copyright_date_range = Comparison("the date when $work was created was", sign=">=", expression = date(1978,1,1))
+    >>> copyright_date_range = Comparison(
+    ...     content="the date when $work was created was", sign=">=", expression = date(1978,1,1))
     >>> str(copyright_date_range)
     'that the date when $work was created was at least 1978-01-01'
 
@@ -245,7 +251,8 @@ a :class:`~nettlesome.predicates.Comparison` can be a :py:class:`datetime.date`\
 And :py:class:`~datetime.date`\s and :py:class:`~datetime.date` ranges can be compared with each other,
 similar to how numbers can be compared to number ranges.
 
-    >>> copyright_date_specific = Comparison("the date when $work was created was", sign="=", expression = date(1980,6,20))
+    >>> copyright_date_specific = Comparison(
+    ...     content="the date when $work was created was", sign="=", expression = date(1980,6,20))
     >>> copyright_date_specific.implies(copyright_date_range)
     True
 
@@ -333,7 +340,8 @@ that Predicate, only include each unique term once. The terms should be
 listed in the same order that they first appear in the template text.
 
     >>> opened_account = Fact(
-    ...     predicate=Predicate(content="$applicant opened a bank account for $applicant and $cosigner"),
+    ...     predicate=Predicate(
+    ...         content="$applicant opened a bank account for $applicant and $cosigner"),
     ...     terms=(devon, elaine))
     >>> str(opened_account)
     'the fact that <Devon> opened a bank account for <Devon> and <Elaine>'
@@ -407,7 +415,7 @@ said. In this example, the fact that Bob told Ann he possessed more than
 0.5 kilograms means he also told Ann that he possessed more than 250
 grams.
 
-    >>> bob_had_more_drugs = predicate=drug_comparison, terms=bob)
+    >>> bob_had_more_drugs = Fact(predicate=drug_comparison, terms=bob)
     >>> bob_told_ann_about_more_drugs = Fact(predicate=statement, terms=(bob, ann, bob_had_more_drugs))
     >>> str(bob_told_ann_about_more_drugs)
     'the fact that Bob told Ann the fact that the weight of marijuana that Bob possessed was at least 0.5 kilogram'
@@ -421,7 +429,7 @@ Predicates doesn’t cause the first-order Facts to contradict one
 another. For example, it’s not contradictory to say that a person
 has said two contradictory things.
 
-    >>> bob_had_less_drugs = predicate=drug_comparison_with_upper_bound, terms=bob)
+    >>> bob_had_less_drugs = Fact(predicate=drug_comparison_with_upper_bound, terms=bob)
     >>> bob_told_ann_about_less_drugs = Fact(predicate=statement, terms=(bob, ann, bob_had_less_drugs))
     >>> str(bob_told_ann_about_less_drugs)
     'the fact that Bob told Ann the fact that the weight of marijuana that Bob possessed was no more than 10 gram'

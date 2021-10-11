@@ -274,7 +274,7 @@ the statutes or other :class:`~legislice.enactments.Enactment`\s cited in
 the :class:`~authorityspoke.holdings.Holding`\.
 
     >>> from authorityspoke.io.loaders import read_holdings_from_file
-    >>> oracle_holdings = read_holdings_from_file("holding_oracle.json", client=legis_client)
+    >>> oracle_holdings = read_holdings_from_file("holding_oracle.yaml", client=legis_client)
     >>> print(oracle_holdings[0])
     the Holding to ACCEPT
       the Rule that the court MUST SOMETIMES impose the
@@ -289,33 +289,13 @@ You can also convert Holdings back to JSON, or to a Python dictionary,
 using the :mod:`~authorityspoke.io.dump` module.
 
     >>> from pprint import pprint
-    >>> from authorityspoke.io.dump import to_json, to_dict
-    >>> pprint(to_dict(oracle_holdings[0])["rule"]["procedure"])
-    {'despite': [],
-     'inputs': [{'absent': False,
-                 'generic': False,
-                 'name': '',
-                 'predicate': {'content': '${the_java_api} was an original work',
-                               'expression': None,
-                               'truth': False},
-                 'standard_of_proof': None,
-                 'terms': [{'generic': True,
-                            'name': 'the Java API',
-                            'plural': False,
-                            'type': 'Entity'}],
-                 'type': 'Fact'}],
-     'outputs': [{'absent': False,
-                  'generic': False,
-                  'name': '',
-                  'predicate': {'content': '${the_java_api} was copyrightable',
-                                'expression': None,
-                                'truth': False},
-                  'standard_of_proof': None,
-                  'terms': [{'generic': True,
-                             'name': 'the Java API',
-                             'plural': False,
-                             'type': 'Entity'}],
-                  'type': 'Fact'}]}
+    >>> pprint(oracle_holdings[0].dict()["rule"]["procedure"]["outputs"])
+    [{'absent': False,
+      'generic': False,
+      'name': 'false the Java API was copyrightable',
+      'predicate': {'content': '${the_java_api} was copyrightable', 'truth': False},
+      'standard_of_proof': None,
+      'terms': [{'generic': True, 'name': 'the Java API', 'plural': False}]}]
 
 Linking Holdings to Opinions
 -------------------------------
@@ -336,8 +316,8 @@ each :class:`~authorityspoke.holdings.Holding`\.
 
     >>> from authorityspoke import Decision, DecisionReading
     >>> from authorityspoke.io.loaders import read_anchored_holdings_from_file
-    >>> oracle_holdings_with_anchors = read_anchored_holdings_from_file("holding_oracle.json", client=legis_client)
-    >>> lotus_holdings_with_anchors = read_anchored_holdings_from_file("holding_lotus.json", client=legis_client)
+    >>> oracle_holdings_with_anchors = read_anchored_holdings_from_file("holding_oracle.yaml", client=legis_client)
+    >>> lotus_holdings_with_anchors = read_anchored_holdings_from_file("holding_lotus.yaml", client=legis_client)
     >>> oracle = DecisionReading(decision=oracle_case)
     >>> lotus = DecisionReading(decision=lotus_case)
     >>> oracle.posit(oracle_holdings_with_anchors)
@@ -421,8 +401,7 @@ indicate that the Java API is a generic :class:`nettlesome.entities.Entity` ment
 in the :class:`~authorityspoke.facts.Fact`\.
 
     >>> oracle.holdings[0].generic_terms()
-    [Entity(name='the Java API')]
-
+    [Entity(name='the Java API', generic=True, plural=False)]
 
 A generic :class:`~nettlesome.entities.Entity` is “generic”
 in the sense that in the context of
@@ -461,7 +440,7 @@ angle brackets in the string representation of
 the :class:`~authorityspoke.holdings.Holding`\.
 
     >>> lotus.holdings[0].generic_terms()
-    [Entity(name='Borland International'), Entity(name='the Lotus menu command hierarchy')]
+    [Entity(name='Borland International', generic=True, plural=False), Entity(name='the Lotus menu command hierarchy', generic=True, plural=False)]
 
 
 The same :class:`~authorityspoke.rules.Rule`\s and
@@ -567,7 +546,7 @@ matches some text that can be found in subsection 102(a).
     ...     "Copyright protection subsists, in accordance with this title, "
     ...     + "in original works of authorship")
     >>> works_of_authorship_clause = legis_client.read("/us/usc/t17/s102/a")
-    >>> works_of_authorship_clause.select(works_of_authorship_passage)
+    >>> works_of_authorship_selection = works_of_authorship_clause.select(works_of_authorship_passage)
 
 Now we can create a new :class:`~authorityspoke.holdings.Holding` object
 that cites to our new :class:`~legislice.enactments.Enactment` object
@@ -583,7 +562,7 @@ cited by the new :class:`~authorityspoke.holdings.Holding`\.
 
     >>> from copy import deepcopy
     >>> holding_with_shorter_enactment = deepcopy(oracle.holdings[0])
-    >>> holding_with_shorter_enactment.set_enactments(works_of_authorship_clause)
+    >>> holding_with_shorter_enactment.set_enactments(works_of_authorship_selection)
     >>> print(holding_with_shorter_enactment)
     the Holding to ACCEPT
       the Rule that the court MUST SOMETIMES impose the
@@ -724,7 +703,7 @@ explanation of why they contradict.
             "Copyright protection subsists, in accordance with this title, in original works of authorship fixed in any tangible medium of expression, now known or later developed, from which they can be perceived, reproduced, or otherwise communicated, either directly or with the aid of a machine or device.…" (/us/usc/t17/s102/a 2013-07-18)
           DESPITE the ENACTMENTS:
             "In no case does copyright protection for an original work of authorship extend to any…method of operation…" (/us/usc/t17/s102/b 2013-07-18)
-            "The following are examples of works not subject to copyright and applications for registration of such works cannot be entertained: Words and short phrases such as names, titles, and slogans; familiar symbols or designs; mere variations of typographic ornamentation, lettering or coloring; mere listing of ingredients or contents; Ideas, plans, methods, systems, or devices, as distinguished from the particular manner in which they are expressed or described in a writing;  Blank forms, such as time cards, graph paper, account books, diaries, bank checks, scorecards, address books, report forms, order forms and the like, which are designed for recording information and do not in themselves convey information; Works consisting entirely of information that is common property containing no original authorship, such as, for example: Standard calendars, height and weight charts, tape measures and rulers, schedules of sporting events, and lists or tables taken from public documents or other common sources. Typeface as typeface." (/us/cfr/t37/s202.1 1992-02-21)
+            "The following are examples of works not subject to copyright and applications for registration of such works cannot be entertained: Words and short phrases such as names, titles, and slogans;…" (/us/cfr/t37/s202.1 1992-02-21)
 
 
 That’s a really complicated holding! Good thing we have AuthoritySpoke
