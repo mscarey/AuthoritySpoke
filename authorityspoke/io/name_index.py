@@ -43,8 +43,10 @@ class Mentioned(OrderedDict):
     def get_if_present(self, name: Union[str, RawHolding]) -> RawHolding:
         """
         Retrieve a record from the index, if it exists.
+
         :param name:
             the name of the key where the record can be found in the Mentioned dict.
+        
         :returns:
             the value stored at the key "name", plus a name field.
         """
@@ -112,10 +114,6 @@ def assign_name_for_evidence(obj: Dict) -> str:
     return name
 
 
-def assign_name_for_exhibit(obj: Dict) -> str:
-    return str(obj)
-
-
 def assign_name_for_pleading(obj: Dict) -> str:
     r"""
     Return an appropriate name for a Pleading.
@@ -161,7 +159,7 @@ def create_name_for_factor(obj: Dict) -> str:
     elif (
         obj.get("offered_by") or (obj.get("type") and obj["type"].lower()) == "exhibit"
     ):
-        name = assign_name_for_exhibit(obj)
+        name = str(obj)  # obj is Exhibit
     else:
         raise NotImplementedError
     if obj.get("absent") is True:
@@ -221,6 +219,7 @@ RawContextFactors = List[Union[RawFactor, str]]
 def update_name_index_from_bracketed_phrases(
     content: str, mentioned: Mentioned
 ) -> Mentioned:
+    """Find string template placeholders in content, and use them to create dicts to be loaded as Entities."""
     pattern = r"(?<!\$)\{([^\{]+)\}"  # matches bracketed text not preceded by $
     entities_as_text = findall(pattern, content)
     entities_as_text.sort(key=len, reverse=True)
@@ -323,6 +322,7 @@ def collect_mentioned(
 ) -> Tuple[RawFactor, Mentioned]:
     """
     Make a dict of all nested objects labeled by name, creating names if needed.
+
     To be used during loading to expand name references to full objects.
     """
     mentioned = mentioned or Mentioned()

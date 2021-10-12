@@ -25,6 +25,7 @@ class FakeClient(Client):
     """
 
     def __init__(self, responses: ResponsesByDateByPath):
+        """Populate fake client with fake response data."""
         self.responses = responses
         self.coverage: Dict[str, Dict[str, Union[datetime.date, str]]] = {
             "/us/const": {
@@ -86,7 +87,7 @@ class FakeClient(Client):
 
     def fetch(self, query: str, date: Union[datetime.date, str] = "") -> RawEnactment:
         """
-        Fetches data about legislation at specified path and date from Client's assigned API root.
+        Fetch data about legislation at specified path and date from Client's assigned API root.
 
         :param path:
             A path to the desired legislation section using the United States Legislation Markup
@@ -139,9 +140,7 @@ class FakeClient(Client):
         query: Union[str, CrossReference],
         date: Union[datetime.date, str] = "",
     ) -> Enactment:
-        """
-        Use text expansion, unlike a real client.
-        """
+        """Use text expansion, unlike a real client."""
         raw_enactment = self.fetch(query=query, date=date)
         enactment = self.read_from_json(raw_enactment, use_text_expansion=True)
         enactment.select_all()
