@@ -9,7 +9,7 @@ from nettlesome.predicates import Predicate
 from nettlesome.quantities import Comparison
 
 from .decisions import DecisionReading
-from .facts import Fact
+from .facts import Fact, Exhibit, Evidence, Allegation, Pleading
 from .holdings import Holding
 from .opinions import Opinion, OpinionReading
 from .rules import Rule

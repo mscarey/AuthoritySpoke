@@ -1022,6 +1022,25 @@ class TestStatuteRules:
         longer_hair_rule = readers.read_holdings([beard_dictionary[0]], client=client)
         assert make_beard_rule[0].implies(longer_hair_rule[0])
 
+    def test_reset_inputs_to_create_contradiction(
+        self, beard_response, make_beard_rule
+    ):
+        """Test missing 'False' truth value in output of long_means_not_beard"""
+        ear_rule = make_beard_rule[1]
+        client = FakeClient(responses=beard_response)
+        beard_rule_data = loaders.load_holdings("beard_rules.yaml")[:2]
+        changed_holdings = readers.read_holdings(beard_rule_data, client=client)
+        long_means_not_beard = changed_holdings[1]
+        long_means_not_beard.set_despite([ear_rule.inputs[0], ear_rule.inputs[2]])
+        fact = Fact(
+            content="the length of ${the_suspected_beard} was >= 12 inches",
+            terms=[Entity(name="the suspected beard")],
+        )
+        long_means_not_beard.set_inputs(fact)
+        long_means_not_beard.set_outputs(long_means_not_beard.outputs[0].negated())
+        long_means_not_beard.rule.mandatory = True
+        assert long_means_not_beard.contradicts(ear_rule)
+
     def test_greater_than_contradicts_not_greater(
         self, beard_response, make_beard_rule
     ):

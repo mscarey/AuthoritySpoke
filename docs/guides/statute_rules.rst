@@ -138,7 +138,8 @@ contradict one another.
 For instance, if we create a new Rule that’s identical to the first Rule
 in the Beard Tax Act except that it applies to facial hair that’s
 exactly 8 millimeters long instead of “no shorter than 5 millimetres”,
-we can determine that the original “chin rule” implies our new Rule.
+we can determine that the original “chin rule” 
+:meth:`~authorityspoke.rules.Rule.implies` our new :class:`~authorityspoke.rules.Rule`\.
 
     >>> from authorityspoke.io import readers
     >>> beard_rule_data[0]['inputs'][1]['content'] = 'the length of the suspected beard was = 8 millimetres'
@@ -166,30 +167,28 @@ thanks to the `pint <https://pint.readthedocs.io/en/stable/>`__
 library). And we can show that this new Rule contradicts a Rule that
 came from the Beard Tax Act.
 
-    >>> beard_rule_data[1]["despite"] = [
-    ...     beard_rule_data[1]["inputs"][0],
-    ...     beard_rule_data[1]["inputs"][2]]
-    >>> beard_rule_data[1]["inputs"] = {
-    ...    "type": "fact",
-    ...    "content": "the length of the suspected beard was >= 12 inches"}
-    >>> beard_rule_data[1]["outputs"][0]["truth"] = False
-    >>> beard_rule_data[1]["mandatory"] = True
-    >>> changed_holdings = readers.read_holdings(beard_rule_data, client=legis_client)
-    >>> long_means_not_beard = changed_holdings[1]
+    >>> from authorityspoke import Fact, Entity
+    >>> changed_holdings = loaders.read_holdings_from_file("beard_rules.yaml", client=legis_client)
+    >>> long_means_not_beard = changed_holdings[1].rule
+    >>> long_means_not_beard.set_despite([ear_rule.inputs[0], ear_rule.inputs[2]])
+    >>> long_means_not_beard.set_inputs(Fact(
+    ...     content="the length of ${the_suspected_beard} was >= 12 inches",
+    ...     terms=[Entity(name="the suspected beard")]))
+    >>> long_means_not_beard.set_outputs(long_means_not_beard.outputs[0].negated())
+    >>> long_means_not_beard.mandatory = True
     >>> print(long_means_not_beard)
-    the Holding to ACCEPT
-      the Rule that the court MUST ALWAYS impose the
-        RESULT:
-          the fact that <the suspected beard> was a beard
-        GIVEN:
-          the fact that the length of <the suspected beard> was at least 12 inch
-        DESPITE:
-          the fact that <the suspected beard> was facial hair
-          the fact that <the suspected beard> existed in an uninterrupted line
-          from the front of one ear to the front of the other ear below the nose
-        GIVEN the ENACTMENTS:
-          "In this Act, beard means any facial hair no shorter than 5 millimetres in length that: occurs on or below the chin…" (/test/acts/47/4 1935-04-01)
-          "exists in an uninterrupted line from the front of one ear to the front of the other ear below the nose." (/test/acts/47/4/b 1935-04-01)
+    the Rule that the court MUST ALWAYS impose the
+      RESULT:
+        the fact it was false that <the suspected beard> was a beard
+      GIVEN:
+        the fact that the length of <the suspected beard> was at least 12 inch
+      DESPITE:
+        the fact that <the suspected beard> was facial hair
+        the fact that <the suspected beard> existed in an uninterrupted line
+        from the front of one ear to the front of the other ear below the nose
+      GIVEN the ENACTMENTS:
+        "In this Act, beard means any facial hair no shorter than 5 millimetres in length that: occurs on or below the chin…" (/test/acts/47/4 1935-04-01)
+        "exists in an uninterrupted line from the front of one ear to the front of the other ear below the nose." (/test/acts/47/4/b 1935-04-01)
     >>> long_means_not_beard.contradicts(ear_rule)
     True
 
