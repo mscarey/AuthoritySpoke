@@ -46,7 +46,7 @@ class Mentioned(OrderedDict):
 
         :param name:
             the name of the key where the record can be found in the Mentioned dict.
-        
+
         :returns:
             the value stored at the key "name", plus a name field.
         """

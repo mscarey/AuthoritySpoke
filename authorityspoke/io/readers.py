@@ -65,17 +65,6 @@ class HoldingsIndexed(NamedTuple):
     holding_anchors: List[List[TextQuoteSelector]]
 
 
-def collect_enactment_anchors(object_index):
-    anchors = []
-    for key, value in object_index.items():
-        if value.get("anchors"):
-            anchored_object: Dict[str, Any] = {}
-            anchored_object["anchors"] = value.pop("anchors")
-            anchored_object["passage"] = value
-            anchors.append(anchored_object)
-    return anchors, object_index
-
-
 def collect_anchors_from_index(object_index, field_name: str):
     result = []
     for key, value in object_index.items():
@@ -155,9 +144,7 @@ def expand_factor(record: Union[str, RawFactor], factor_index: Mentioned) -> Raw
 def expand_names(
     record: List[Union[str, RawFactor]], factor_index: Mentioned
 ) -> List[RawFactor]:
-    r"""
-    Expand a list of names into a list of factors.
-    """
+    r"""Expand a list of names into a list of factors."""
     if isinstance(record, str):
         record = [record]
     if isinstance(record, bool):
