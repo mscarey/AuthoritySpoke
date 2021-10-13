@@ -18,25 +18,6 @@ from authorityspoke.io.name_index import Mentioned
 class EnactmentIndex(Mentioned):
     """Index of cross-referenced objects, keyed to phrases that reference them."""
 
-    def insert_by_name(self, obj: Dict) -> None:
-        """Add record to dict, using value of record's "name" field as the dict key."""
-        self[obj["name"]] = obj.copy()
-        self[obj["name"]].pop("name")
-        return None
-
-    def get_by_name(self, name: str) -> Dict:
-        """
-        Convert retrieved record so name is a field rather than the key for the whole record.
-
-        :param name:
-            the name of the key where the record can be found in the Mentioned dict.
-        :returns:
-            the value stored at the key "name", plus a name field.
-        """
-        value = {"name": name}
-        value.update(self[name])
-        return value
-
     def get_if_present(self, name: str) -> Union[Dict, str]:
         """
         Retrieve a record from the index, if it exists.
