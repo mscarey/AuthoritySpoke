@@ -18,22 +18,6 @@ from authorityspoke.io.name_index import Mentioned
 class EnactmentIndex(Mentioned):
     """Index of cross-referenced objects, keyed to phrases that reference them."""
 
-    def get_if_present(self, name: str) -> Union[Dict, str]:
-        """
-        Retrieve a record from the index, if it exists.
-
-        :param name:
-            the name of the key where the record can be found in the Mentioned dict.
-        :returns:
-            the value stored at the key "name", plus a name field.
-        """
-        if isinstance(name, str) and name in self:
-            return self.get_by_name(name)
-        return name
-
-    def __repr__(self):
-        return f"EnactmentIndex({repr(dict(self))})"
-
     def enactment_has_anchor(
         self, enactment_name: str, anchor: Dict[str, Union[str, int]]
     ) -> bool:

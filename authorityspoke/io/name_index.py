@@ -38,7 +38,7 @@ class Mentioned(OrderedDict):
         value.update(self[name])
         return value
 
-    def get_if_present(self, name: Union[str, RawHolding]) -> RawHolding:
+    def get_if_present(self, name: str) -> Union[Dict, str]:
         """
         Retrieve a record from the index, if it exists.
 
@@ -61,7 +61,7 @@ class Mentioned(OrderedDict):
         return Mentioned(sorted(self.items(), key=lambda t: len(t[0]), reverse=True))
 
     def __repr__(self):
-        return f"Mentioned({repr(dict(self))})"
+        return f"{self.__class__.__name__}({repr(dict(self))})"
 
 
 def assign_name_from_content(obj: Dict) -> str:
