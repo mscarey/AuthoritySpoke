@@ -124,11 +124,7 @@ class Fact(Factor, BaseModel):
 
     @property
     def terms_without_nulls(self) -> Sequence[Term]:
-        """
-        Get Terms that are not None.
-        No Terms should be None for the Statement class, so this method is like an
-        assertion for type checking.
-        """
+        """Get Terms that are not None."""
         return [term for term in self.terms if term is not None]
 
     @property

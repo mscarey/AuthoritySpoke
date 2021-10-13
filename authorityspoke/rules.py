@@ -634,11 +634,21 @@ class Rule(Comparable, BaseModel):
     def set_enactments(
         self, enactments: Union[Enactment, Sequence[Enactment], EnactmentGroup]
     ) -> None:
+        """
+        Set the list of Enactments cited as the basis for this Rule.
+        
+        Any prior enactments are replaced.
+        """
         self.enactments = EnactmentGroup(passages=enactments)
 
     def set_enactments_despite(
         self, enactments: Union[Enactment, Sequence[Enactment], EnactmentGroup]
     ) -> None:
+        """
+        Set the list of Enactments known not to preclude application of this Rule.
+        
+        Any prior despite enactments are replaced.
+        """
         self.enactments_despite = EnactmentGroup(passages=enactments)
 
     def __str__(self):

@@ -651,15 +651,18 @@ class Holding(Comparable, BaseModel):
 
 
 class HoldingMatch(FactorMatch):
+    """A logical relation between two holdings, e.g. implies, contradicts."""
     left: Holding
     operation: Callable
     right: Holding
 
 
 class HoldingGroup(FactorGroup):
+    """Group of Holdings that can be compared as a group with other Holdings."""
     term_class = Holding
 
     def __init__(self, holdings: Union[Sequence[Holding], Holding] = ()):
+        """Validate that HoldingGroup is created from a sequence of Holdings."""
         if isinstance(holdings, Iterable):
             holdings = tuple(holdings)
         else:
@@ -682,6 +685,7 @@ class HoldingGroup(FactorGroup):
         other: Comparable,
         context: Optional[Union[ContextRegister, Explanation]] = None,
     ) -> Iterator[Explanation]:
+        """Generate contexts in which all Holdings in other are implied by self."""
         if isinstance(other, Rule):
             other = Holding(rule=other)
         explanation = Explanation.from_context(

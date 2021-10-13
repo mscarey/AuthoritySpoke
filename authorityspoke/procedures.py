@@ -200,6 +200,7 @@ class Procedure(Comparable, BaseModel):
         other: Procedure,
         context: Optional[Union[ContextRegister, Explanation]] = None,
     ) -> Iterator[ContextRegister]:
+        """Yield explanations of contexts that allow combining these Procedures."""
         if not isinstance(context, Explanation):
             context = Explanation.from_context(context)
         for partial in self._explanations_union_partial(other, context.context):
@@ -754,6 +755,7 @@ class Procedure(Comparable, BaseModel):
         return self._union_from_explanation(other, explanation)
 
     def valid_for_exclusive_tag(self) -> None:
+        """Check if Procedure is suitable to be labeled the "exclusive" method to reach an output."""
         if len(self.outputs) != 1:
             raise ValueError(
                 "The 'exclusive' attribute is not allowed for Holdings "

@@ -169,12 +169,6 @@ class TestFacts:
         holdings = list(make_opinion_with_holding["cardenas_majority"].holdings)
         assert "addicted to heroin, in showing the fact" in str(holdings[0].outputs[0])
 
-    def test_new_context_from_factor(self, watt_factor):
-        different = watt_factor["f1"].new_context(
-            Entity(name="Great Northern", generic=False)
-        )
-        assert "Great Northern was a motel" in str(different)
-
     def test_new_concrete_context(self, make_entity, watt_factor):
         register = ContextRegister.from_lists(
             to_replace=[make_entity["watt"], make_entity["motel"]],

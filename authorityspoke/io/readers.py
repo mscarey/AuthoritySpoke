@@ -120,6 +120,7 @@ def read_holdings_with_anchors(
 
 
 def expand_factor(record: Union[str, RawFactor], factor_index: Mentioned) -> RawFactor:
+    """Expand fields of Factor from index of mentioned factors."""
     to_expand = [
         "statement",
         "statement_attribution",
@@ -218,6 +219,7 @@ def walk_tree_and_expand(
 def expand_holding(
     record: RawHolding, factor_index: Mentioned, enactment_index: EnactmentIndex
 ) -> RawHolding:
+    """Expand one holding from index of expanded terms and enactments."""
     new_index = Mentioned({**factor_index, **enactment_index})
     return walk_tree_and_expand(
         record,
@@ -231,6 +233,7 @@ def expand_holdings(
     factor_index: Mentioned,
     enactment_index: EnactmentIndex,
 ) -> List[RawHolding]:
+    """Expand holdings from index of expanded terms and enactments."""
     if isinstance(record, dict):
         record = [record]
     holdings = [factor_index.get_if_present(holding) for holding in record]

@@ -14,7 +14,6 @@ import re
 from dataclasses import dataclass, field
 
 from anchorpoint.textselectors import (
-    TextPositionSetFactory,
     TextQuoteSelector,
     TextPositionSet,
 )
@@ -44,9 +43,8 @@ class EnactmentWithAnchors(BaseModel):
 
     @validator("anchors", pre=True)
     def validate_anchors(cls, value: TextPositionSet) -> TextPositionSet:
-        """
-        Validate that the anchors are non-empty.
-        """
+        """Validate that the anchors are non-empty."""
+
         if value is None:
             return TextPositionSet()
         return value
@@ -60,18 +58,15 @@ class TermWithAnchors(BaseModel):
 
     @validator("anchors", pre=True)
     def validate_anchors(cls, value: TextPositionSet) -> TextPositionSet:
-        """
-        Validate that the anchors are non-empty.
-        """
+        """Validate that the anchors are non-empty."""
+
         if value is None:
             return TextPositionSet()
         return value
 
 
 class HoldingWithAnchors(BaseModel):
-    """
-    A :class:`.Holding` with a :class:`.TextPositionSet` that anchors it.
-    """
+    """A :class:`.Holding` with a :class:`.TextPositionSet` that anchors it."""
 
     holding: Holding
     anchors: TextPositionSet = TextPositionSet()
@@ -102,6 +97,7 @@ class AnchoredHoldings(BaseModel):
         return None
 
     def add_term(self, term: Term, anchors: TextPositionSet) -> None:
+        """Add a term that can be found in self's holdings, with the term's anchors to the text."""
         term_index = self.find_term_index(term)
         if term_index is None:
             self.named_anchors.append(TermWithAnchors(term=term, anchors=anchors))
@@ -126,6 +122,7 @@ class AnchoredHoldings(BaseModel):
     def add_enactment(
         self, enactment: EnactmentPassage, anchors: TextPositionSet
     ) -> None:
+        """Add EnactmentPassage with text anchors, if it isn't a duplicate."""
         term_index = self.find_enactment_index(enactment)
         if term_index is None:
             self.enactment_anchors.append(
@@ -143,9 +140,7 @@ class AnchoredHoldings(BaseModel):
 
 
 class OpinionReading(Comparable, BaseModel):
-    """
-    An interpretation of what Holdings are supported by the text of an Opinion.
-    """
+    """An interpretation of what Holdings are supported by the text of an Opinion."""
 
     anchored_holdings: AnchoredHoldings = AnchoredHoldings()
     opinion_type: str = ""
@@ -242,6 +237,7 @@ class OpinionReading(Comparable, BaseModel):
     def implies(
         self, other: Optional[Comparable], context: Optional[ContextRegister] = None
     ) -> bool:
+        """Check if all of other's Holdings are implied by holdings of self."""
         if other is None:
             return True
         if isinstance(other, HoldingGroup):

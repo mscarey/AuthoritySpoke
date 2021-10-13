@@ -50,6 +50,7 @@ class FakeClient(Client):
 
     @classmethod
     def from_file(cls, filename: str) -> FakeClient:
+        """Create new FakeClient from JSON data."""
         responses_filepath = filepaths.get_directory_path("responses")
         response_path = responses_filepath / filename
         with open(response_path, "r") as f:
@@ -57,6 +58,7 @@ class FakeClient(Client):
         return cls(responses)
 
     def get_entry_closest_to_cited_path(self, path: str) -> Optional[ResponsesByDate]:
+        """Get key from responses attribute that gets the closest to the given path."""
         path = normalize_path(path)
         if self.responses.get(path):
             return self.responses[path]
@@ -71,6 +73,7 @@ class FakeClient(Client):
     def search_tree_for_path(
         self, path: str, branch: Dict
     ) -> Optional[ResponsesByDate]:
+        """Search responses attribute for keys that are partial paths to the given path."""
         path = normalize_path(path)
         if branch["node"] == path:
             return branch

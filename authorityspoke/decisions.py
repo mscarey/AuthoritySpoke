@@ -243,9 +243,7 @@ class DecisionReading(Comparable):
         enactment_anchors: Optional[TextLinkDict] = None,
         context: Optional[Sequence[Factor]] = None,
     ) -> None:
-        """
-        Add one or more Holdings to the majority Opinion of this Decision.
-        """
+        """Add one or more Holdings to the majority Opinion of this Decision."""
         majority = self.get_majority()
         if majority is not None:
             reading_to_use = majority

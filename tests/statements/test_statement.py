@@ -122,7 +122,7 @@ class TestStatements:
             terms=[Entity(name="Donald"), Entity(name="Daisy")],
         )
         new = statement.new_context(
-            changes=Entity(name="Mickey"),
+            changes=[Entity(name="Mickey")],
             terms_to_replace=[Entity(name="Donald"), Entity(name="Daisy")],
         )
         assert "<Mickey> loved <Daisy>" in str(new)
@@ -149,7 +149,7 @@ class TestStatements:
         """
         predicate = Predicate(content="$place was a hotel")
         statement = Fact(predicate=predicate, terms=[Entity(name="Independence Inn")])
-        different = statement.new_context(Entity(name="Dragonfly Inn", generic=False))
+        different = statement.new_context([Entity(name="Dragonfly Inn", generic=False)])
         assert "Dragonfly Inn was a hotel" in str(different)
 
     def test_new_statement_from_entities(self):

@@ -155,14 +155,11 @@ class TestOpinionHoldings:
     def test_new_context_wrong_number_of_changes(
         self, make_opinion_with_holding, make_holding
     ):
-        """
-        The context here (a Factor outside an iterable) only changes the first
-        generic factor of the Rule being posited, which may not be what the user
-        expects.
-        """
         brad = make_opinion_with_holding["brad_majority"]
         with pytest.raises(ValueError):
-            brad.posit(make_holding["h1"], context=Entity(name="House on Haunted Hill"))
+            brad.posit(
+                make_holding["h1"], context=[Entity(name="House on Haunted Hill")]
+            )
 
     def test_new_context_naming_nonexistent_factor(
         self, make_opinion_with_holding, make_holding
