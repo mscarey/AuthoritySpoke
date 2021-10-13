@@ -7,6 +7,7 @@ from copy import deepcopy
 from re import findall
 from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
+from legislice.enactments import RawEnactment
 from nettlesome.predicates import StatementTemplate
 from authorityspoke.facts import Exhibit, RawPredicate, RawFactor
 from authorityspoke.holdings import RawHolding
@@ -62,6 +63,32 @@ class Mentioned(OrderedDict):
 
     def __repr__(self):
         return f"{self.__class__.__name__}({repr(dict(self))})"
+
+    def update_anchors_or_insert(
+        self, obj: Union[str, RawEnactment, RawFactor]
+    ) -> Union[str, RawEnactment, RawFactor]:
+        r"""
+        Update index of mentioned Factors with 'obj', if obj is named.
+
+        If there is already an entry in the mentioned index with the same name
+        as obj, the old entry won't be replaced. But if any additional text
+        anchors are present in the new obj, the anchors will be added.
+        If obj has a name, it will be collapsed to a name reference.
+
+        :param obj:
+            data from JSON to be loaded as a :class:`.Enactment`
+        """
+        if obj.get("name"):
+            if obj["name"] in self:
+                if obj.get("anchors"):
+                    for anchor in obj["anchors"]:
+                        self.add_anchor_for_enactment(
+                            enactment_name=obj["name"], anchor=anchor
+                        )
+            else:
+                self.insert_by_name(obj)
+            obj = obj["name"]
+        return obj
 
 
 def assign_name_from_content(obj: Dict) -> str:
@@ -204,7 +231,7 @@ def update_name_index_from_terms(terms: List[RawFactor], mentioned: Mentioned):
         else:
             factor_name = factor.get("name")
             if factor_name and factor_name not in mentioned:
-                mentioned.insert_by_name(factor)
+                mentioned.update_anchors_or_insert(factor)
     return mentioned.sorted_by_length()
 
 

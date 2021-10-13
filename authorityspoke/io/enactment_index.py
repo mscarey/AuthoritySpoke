@@ -37,30 +37,6 @@ class EnactmentIndex(Mentioned):
             anchors_for_selected_element.append(anchor)
         self[enactment_name]["anchors"] = anchors_for_selected_element
 
-    def index_enactment(self, obj: RawEnactment) -> Union[str, RawEnactment]:
-        r"""
-        Update index of mentioned Factors with 'obj', if obj is named.
-
-        If there is already an entry in the mentioned index with the same name
-        as obj, the old entry won't be replaced. But if any additional text
-        anchors are present in the new obj, the anchors will be added.
-        If obj has a name, it will be collapsed to a name reference.
-
-        :param obj:
-            data from JSON to be loaded as a :class:`.Enactment`
-        """
-        if obj.get("name"):
-            if obj["name"] in self:
-                if obj.get("anchors"):
-                    for anchor in obj["anchors"]:
-                        self.add_anchor_for_enactment(
-                            enactment_name=obj["name"], anchor=anchor
-                        )
-            else:
-                self.insert_by_name(obj)
-            obj = obj["name"]
-        return obj
-
 
 def create_name_for_enactment(obj: RawEnactment) -> str:
     """Create unique name for unloaded Enactment data, for indexing."""
@@ -115,6 +91,6 @@ def collect_enactments(
 
         if new_dict.get("enactment") or (new_dict.get("name") in mentioned.keys()):
             new_dict = ensure_enactment_has_name(new_dict)
-            new_dict = mentioned.index_enactment(new_dict)
+            new_dict = mentioned.update_anchors_or_insert(new_dict)
         obj = new_dict
     return obj, mentioned

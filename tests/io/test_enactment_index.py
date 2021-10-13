@@ -18,14 +18,14 @@ class TestIndexEnactments:
     def test_index_section_with_name(self, section6d):
         mentioned = EnactmentIndex()
         section6d["name"] = "section6d"
-        mentioned.index_enactment(section6d)
+        mentioned.update_anchors_or_insert(section6d)
         assert mentioned["section6d"]["start_date"] == "1935-04-01"
         assert "EnactmentIndex({'section6d" in str(mentioned)
 
     def test_index_key_error(self, section6d):
         mentioned = EnactmentIndex()
         section6d["name"] = "section6d"
-        mentioned.index_enactment(section6d)
+        mentioned.update_anchors_or_insert(section6d)
         with pytest.raises(KeyError):
             mentioned.get_by_name("not in index")
 
