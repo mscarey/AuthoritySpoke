@@ -62,9 +62,6 @@ class Mentioned(OrderedDict):
         """
         return Mentioned(sorted(self.items(), key=lambda t: len(t[0]), reverse=True))
 
-    def __str__(self):
-        return f"Mentioned({str(dict(self))})"
-
     def __repr__(self):
         return f"Mentioned({repr(dict(self))})"
 

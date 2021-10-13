@@ -12,9 +12,10 @@ from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
 from legislice.enactments import RawEnactment
 from authorityspoke.facts import RawPredicate, RawFactor
+from authorityspoke.io.name_index import Mentioned
 
 
-class EnactmentIndex(OrderedDict):
+class EnactmentIndex(Mentioned):
     """Index of cross-referenced objects, keyed to phrases that reference them."""
 
     def insert_by_name(self, obj: Dict) -> None:
@@ -86,7 +87,7 @@ class EnactmentIndex(OrderedDict):
         as obj, the old entry won't be replaced. But if any additional text
         anchors are present in the new obj, the anchors will be added.
         If obj has a name, it will be collapsed to a name reference.
-        
+
         :param obj:
             data from JSON to be loaded as a :class:`.Enactment`
         """
