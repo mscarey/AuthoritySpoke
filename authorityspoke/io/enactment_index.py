@@ -18,25 +18,6 @@ from authorityspoke.io.name_index import Mentioned
 class EnactmentIndex(Mentioned):
     """Index of cross-referenced objects, keyed to phrases that reference them."""
 
-    def enactment_has_anchor(
-        self, enactment_name: str, anchor: Dict[str, Union[str, int]]
-    ) -> bool:
-        """Check if unloaded Enactment data has fields for a text anchor."""
-        anchors_for_selected_element = self[enactment_name].get("anchors") or []
-        return any(
-            existing_anchor == anchor
-            for existing_anchor in anchors_for_selected_element
-        )
-
-    def add_anchor_for_enactment(
-        self, enactment_name: str, anchor: Dict[str, Union[str, int]]
-    ) -> None:
-        """Add fields for a text anchor to unloaded Enactment data."""
-        anchors_for_selected_element = self[enactment_name].get("anchors") or []
-        if not self.enactment_has_anchor(enactment_name, anchor):
-            anchors_for_selected_element.append(anchor)
-        self[enactment_name]["anchors"] = anchors_for_selected_element
-
 
 def create_name_for_enactment(obj: RawEnactment) -> str:
     """Create unique name for unloaded Enactment data, for indexing."""
