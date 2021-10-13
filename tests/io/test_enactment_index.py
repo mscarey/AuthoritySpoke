@@ -116,24 +116,6 @@ class TestCollectEnactments:
         obj, mentioned = collect_enactments(self.example_rules)
         assert mentioned["beard means"]["enactment"]["node"] == "/test/acts/47/4"
 
-    def test_add_two_enactment_indexes(self):
-        """
-        Test that adding another EnactmentIndex puts its anchors in the first EnactmentIndex.
-        The anchors won't be merged yet because the Enactment hasn't been loaded by the serializer.
-        """
-        obj, enactment_index = collect_enactments(self.example_rules)
-
-        more_enactments = EnactmentIndex(
-            {
-                "ear rule": {
-                    "node": "/test/acts/47/4/b",
-                    "anchors": [{"start": 15, "end": 45}],
-                }
-            }
-        )
-        new_index = enactment_index + more_enactments
-        assert {"start": 15, "end": 45} in new_index["ear rule"]["anchors"]
-
     def test_replace_enactment_in_source_with_name(self):
         example_rules, mentioned = collect_enactments(self.example_rules)
         assert example_rules[0]["enactments"][0] == "beard means"

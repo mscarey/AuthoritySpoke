@@ -37,13 +37,6 @@ class EnactmentIndex(Mentioned):
             anchors_for_selected_element.append(anchor)
         self[enactment_name]["anchors"] = anchors_for_selected_element
 
-    def __add__(self, other: EnactmentIndex) -> EnactmentIndex:
-        new_index = deepcopy(self)
-        for key in other.keys():
-            other_dict = other.get_by_name(key)
-            new_index.index_enactment(other_dict)
-        return new_index
-
     def index_enactment(self, obj: RawEnactment) -> Union[str, RawEnactment]:
         r"""
         Update index of mentioned Factors with 'obj', if obj is named.
