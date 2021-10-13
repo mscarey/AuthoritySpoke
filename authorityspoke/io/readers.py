@@ -29,7 +29,7 @@ from authorityspoke.facts import RawFactor
 from authorityspoke.procedures import Procedure
 
 from authorityspoke.io.name_index import index_names, Mentioned
-from authorityspoke.io.enactment_index import EnactmentIndex, collect_enactments
+from authorityspoke.io.enactment_index import Mentioned, collect_enactments
 from authorityspoke.io.text_expansion import expand_shorthand
 
 RawSelector = Union[str, Dict[str, str]]
@@ -161,7 +161,7 @@ def expand_names(
 
 
 def expand_enactments(
-    record: List[Union[str, RawEnactment]], enactment_index: EnactmentIndex
+    record: List[Union[str, RawEnactment]], enactment_index: Mentioned
 ) -> List[RawEnactment]:
     r"""
     Expand a list of enactments into a list of dicts.
@@ -217,7 +217,7 @@ def walk_tree_and_expand(
 
 
 def expand_holding(
-    record: RawHolding, factor_index: Mentioned, enactment_index: EnactmentIndex
+    record: RawHolding, factor_index: Mentioned, enactment_index: Mentioned
 ) -> RawHolding:
     """Expand one holding from index of expanded terms and enactments."""
     new_index = Mentioned({**factor_index, **enactment_index})
@@ -231,7 +231,7 @@ def expand_holding(
 def expand_holdings(
     record: List[Union[str, RawHolding]],
     factor_index: Mentioned,
-    enactment_index: EnactmentIndex,
+    enactment_index: Mentioned,
 ) -> List[RawHolding]:
     """Expand holdings from index of expanded terms and enactments."""
     if isinstance(record, dict):

@@ -7,7 +7,7 @@ import pytest
 
 from legislice.enactments import Enactment
 
-from authorityspoke.io.enactment_index import EnactmentIndex, collect_enactments
+from authorityspoke.io.enactment_index import Mentioned, collect_enactments
 
 load_dotenv()
 
@@ -16,14 +16,14 @@ TOKEN = os.getenv("LEGISLICE_API_TOKEN")
 
 class TestIndexEnactments:
     def test_index_section_with_name(self, section6d):
-        mentioned = EnactmentIndex()
+        mentioned = Mentioned()
         section6d["name"] = "section6d"
         mentioned.update_anchors_or_insert(section6d)
         assert mentioned["section6d"]["start_date"] == "1935-04-01"
-        assert "EnactmentIndex({'section6d" in str(mentioned)
+        assert "Mentioned({'section6d" in str(mentioned)
 
     def test_index_key_error(self, section6d):
-        mentioned = EnactmentIndex()
+        mentioned = Mentioned()
         section6d["name"] = "section6d"
         mentioned.update_anchors_or_insert(section6d)
         with pytest.raises(KeyError):

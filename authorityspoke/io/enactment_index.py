@@ -6,17 +6,11 @@ The index is used for expanding name references to full objects.
 
 from __future__ import annotations
 
-from collections import OrderedDict
-from copy import deepcopy
 from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
 from legislice.enactments import RawEnactment
 from authorityspoke.facts import RawPredicate, RawFactor
 from authorityspoke.io.name_index import Mentioned
-
-
-class EnactmentIndex(Mentioned):
-    """Index of cross-referenced objects, keyed to phrases that reference them."""
 
 
 def create_name_for_enactment(obj: RawEnactment) -> str:
@@ -44,15 +38,15 @@ def ensure_enactment_has_name(obj: RawEnactment) -> RawEnactment:
 
 def collect_enactments(
     obj: Union[RawFactor, List[Union[RawFactor, str]]],
-    mentioned: Optional[EnactmentIndex] = None,
+    mentioned: Optional[Mentioned] = None,
     keys_to_ignore: Sequence[str] = ("predicate", "anchors", "children"),
-) -> Tuple[RawFactor, EnactmentIndex]:
+) -> Tuple[RawFactor, Mentioned]:
     """
     Make a dict of all nested objects labeled by name, creating names if needed.
 
     To be used during loading to expand name references to full objects.
     """
-    mentioned = mentioned or EnactmentIndex()
+    mentioned = mentioned or Mentioned()
     if isinstance(obj, List):
         new_list = []
         for item in obj:
