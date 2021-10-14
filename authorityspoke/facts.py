@@ -97,6 +97,11 @@ class Fact(Factor, BaseModel):
         if type_str and type_str.lower() != "fact":
             raise ValidationError(f"type {type_str} was passed to Fact model")
 
+        if isinstance(values.get("predicate"), str):
+            values["predicate"] = Predicate(content=values["predicate"])
+            if "truth" in values:
+                values["predicate"].truth = values.pop("truth")
+
         for field_name in ["content", "truth", "sign", "expression"]:
             if field_name in values:
                 values["predicate"] = values.get("predicate", {})
@@ -115,6 +120,14 @@ class Fact(Factor, BaseModel):
                     values["predicate"]["sign"] = sign
                     break
 
+        if isinstance(values.get("terms"), Mapping):
+            values["terms"] = values[
+                "predicate"
+            ].template.get_term_sequence_from_mapping(values["terms"])
+        if not values.get("terms"):
+            values["terms"] = []
+        elif isinstance(values["terms"], Term):
+            values["terms"] = [values["terms"]]
         return values
 
     @property
@@ -164,23 +177,6 @@ class Fact(Factor, BaseModel):
     def truth(self) -> Optional[bool]:
         """Access :attr:`~Predicate.truth` attribute."""
         return self.predicate.truth
-
-    @root_validator(pre=True)
-    def move_truth_to_predicate(cls, values):
-        if isinstance(values.get("predicate"), str):
-            values["predicate"] = Predicate(content=values["predicate"])
-        if "truth" in values:
-            values["predicate"].truth = values["truth"]
-            del values["truth"]
-        if isinstance(values.get("terms"), Mapping):
-            values["terms"] = values[
-                "predicate"
-            ].template.get_term_sequence_from_mapping(values["terms"])
-        if not values.get("terms"):
-            values["terms"] = []
-        elif isinstance(values["terms"], Term):
-            values["terms"] = [values["terms"]]
-        return values
 
     @validator("terms")
     def _validate_terms(cls, v, values, **kwargs):

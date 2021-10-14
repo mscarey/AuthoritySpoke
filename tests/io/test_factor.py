@@ -107,6 +107,11 @@ class TestFactorLoad:
         loaded_fact = Fact(**data)
         assert loaded_fact.means(fact)
 
+    def test_load_fact_with_false(self):
+        fact = Fact(predicate="pigs flew", truth=False)
+        assert fact.truth is False
+        assert str(fact) == "the fact it was false that pigs flew"
+
     def test_import_facts_with_factor_schema(self):
         loaded = load_holdings("holding_cardenas.yaml")
         holdings = readers.read_holdings(loaded)

@@ -79,7 +79,7 @@ class TestEvidenceSameMeaning:
         e = make_evidence
         assert not e["no_shooting"].means(e["no_shooting_different_witness"])
 
-    def test_unequal_due_to_more_complex_entity_order(self, make_exhibit):
+    def test_implies_due_to_more_complex_entity_order(self, make_exhibit):
         """Test the entire _registers_for_interchangeable_context function."""
 
         hit = Fact(
