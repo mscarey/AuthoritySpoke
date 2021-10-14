@@ -16,17 +16,9 @@ from authorityspoke.io.name_index import (
     update_name_index_from_fact_content,
     ensure_factor_has_name,
     create_name_for_enactment,
+    ensure_enactment_has_name,
 )
 from authorityspoke.io import text_expansion
-
-
-def ensure_enactment_has_name(obj: RawEnactment) -> RawEnactment:
-    """Create "name" field for unloaded Enactment data, if needed."""
-    if not obj.get("name"):
-        new_name = create_name_for_enactment(obj)
-        if new_name:
-            obj["name"] = new_name
-    return obj
 
 
 def collect_enactments(
@@ -82,9 +74,7 @@ def collect_enactments(
                         content=new_dict["predicate"]["content"], name=factor
                     )
 
-        if new_dict.get("enactment"):
-            new_dict = ensure_enactment_has_name(new_dict)
-            new_dict, mentioned = update_name_index_with_factor(new_dict, mentioned)
+        new_dict, mentioned = update_name_index_with_factor(new_dict, mentioned)
         obj = new_dict
 
     return obj, mentioned

@@ -316,7 +316,7 @@ def update_name_index_with_factor(
     :returns:
         both 'obj' and 'mentioned', as updated
     """
-    if obj.get("name"):
+    if obj.get("name") and not obj.get("node"):
         if obj["name"] in mentioned:
             if obj.get("anchors", {}).get("quotes"):
                 mentioned[obj["name"]]["anchors"] = (
@@ -333,6 +333,15 @@ def update_name_index_with_factor(
             mentioned.insert_by_name(obj)
         obj = obj["name"]
     return obj, mentioned
+
+
+def ensure_enactment_has_name(obj: RawEnactment) -> RawEnactment:
+    """Create "name" field for unloaded Enactment data, if needed."""
+    if not obj.get("name"):
+        new_name = create_name_for_enactment(obj)
+        if new_name:
+            obj["name"] = new_name
+    return obj
 
 
 def collect_mentioned(

@@ -18,9 +18,9 @@ TOKEN = os.getenv("LEGISLICE_API_TOKEN")
 class TestIndexEnactments:
     def test_index_section_with_name(self, section6d):
         mentioned = Mentioned()
-        section6d["name"] = "section6d"
-        obj, mentioned = update_name_index_with_factor(section6d, mentioned)
-        assert mentioned["section6d"]["start_date"] == "1935-04-01"
+        passage = {"enactment": section6d, "name": "section6d"}
+        obj, mentioned = update_name_index_with_factor(passage, mentioned)
+        assert mentioned["section6d"]["enactment"]["start_date"] == "1935-04-01"
         assert "Mentioned({'section6d" in str(mentioned)
 
     def test_index_key_error(self, section6d):
