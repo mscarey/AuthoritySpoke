@@ -10,21 +10,13 @@ from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
 from legislice.enactments import RawEnactment
 from authorityspoke.facts import RawPredicate, RawFactor
-from authorityspoke.io.name_index import Mentioned, update_name_index_with_factor
-
-
-def create_name_for_enactment(obj: RawEnactment) -> str:
-    """Create unique name for unloaded Enactment data, for indexing."""
-    if "node" not in obj.keys():
-        return create_name_for_enactment(obj["enactment"])
-    name: str = obj["node"]
-    if obj.get("start_date"):
-        name += f'@{obj["start_date"]}'
-
-    for field_name in ["start", "end", "prefix", "exact", "suffix"]:
-        if obj.get(field_name):
-            name += f':{field_name}="{obj[field_name]}"'
-    return name
+from authorityspoke.io.name_index import (
+    Mentioned,
+    update_name_index_with_factor,
+    update_name_index_from_fact_content,
+    ensure_factor_has_name,
+    create_name_for_enactment,
+)
 
 
 def ensure_enactment_has_name(obj: RawEnactment) -> RawEnactment:
@@ -39,7 +31,15 @@ def ensure_enactment_has_name(obj: RawEnactment) -> RawEnactment:
 def collect_enactments(
     obj: Union[RawFactor, List[Union[RawFactor, str]]],
     mentioned: Optional[Mentioned] = None,
-    keys_to_ignore: Sequence[str] = ("predicate", "anchors", "children"),
+    keys_to_ignore: Sequence[str] = (
+        "predicate",
+        "anchors",
+        "children",
+        "inputs",
+        "despite",
+        "outputs",
+        "selection",
+    ),
 ) -> Tuple[RawFactor, Mentioned]:
     """
     Make a dict of all nested objects labeled by name, creating names if needed.
@@ -55,6 +55,7 @@ def collect_enactments(
             new_list.append(new_item)
         obj = new_list
     if isinstance(obj, Dict):
+        obj, mentioned = update_name_index_from_fact_content(obj, mentioned)
         new_dict = {}
         for key, value in obj.items():
             if key not in keys_to_ignore and isinstance(value, (Dict, List)):
@@ -64,8 +65,11 @@ def collect_enactments(
             else:
                 new_dict[key] = value
 
+        new_dict = ensure_factor_has_name(new_dict)
+
         if new_dict.get("enactment") or (new_dict.get("name") in mentioned.keys()):
             new_dict = ensure_enactment_has_name(new_dict)
             new_dict, mentioned = update_name_index_with_factor(new_dict, mentioned)
         obj = new_dict
+
     return obj, mentioned

@@ -124,6 +124,33 @@ def assign_name_for_pleading(obj: Dict) -> str:
     return name
 
 
+def create_name_for_enactment(obj: RawEnactment) -> str:
+    """Create unique name for unloaded Enactment data, for indexing."""
+    if "node" not in obj.keys():
+        return create_name_for_enactment(obj["enactment"])
+    name: str = obj["node"]
+    if obj.get("start_date"):
+        name += f'@{obj["start_date"]}'
+
+    for field_name in ["start", "end", "prefix", "exact", "suffix"]:
+        if obj.get(field_name):
+            name += f':{field_name}="{obj[field_name]}"'
+    return name
+
+
+def create_name_for_enactment_passage(obj: RawEnactment) -> str:
+    """Create unique name for unloaded Enactment data, for indexing."""
+    if isinstance(obj["enactment"], str):
+        name = obj["enactment"]
+    else:
+        name = create_name_for_enactment(obj["enactment"])
+
+    for field_name in ["start", "end", "prefix", "exact", "suffix"]:
+        if obj.get("selection", {}).get(field_name):
+            name += f':{field_name}="{obj["selection"][field_name]}"'
+    return name
+
+
 def create_name_for_factor(obj: Dict) -> str:
     """
     Determine what kind of RawFactor the input is and return an appropriate name.
@@ -144,10 +171,15 @@ def create_name_for_factor(obj: Dict) -> str:
         or obj.get("passages") is not None  # EnactmentGroups don't need names
         or obj.get("factor_anchors")  # AnchoredHoldings doesn't need name
         or obj.get("holdings")
+        or obj.get("passage")  # AnchoredPassages don't need names
     ):
         return ""
     elif obj.get("predicate", {}).get("content"):
         name = assign_name_from_content(obj)
+    elif obj.get("enactment"):
+        name = create_name_for_enactment_passage(obj)
+    elif obj.get("node"):
+        name = create_name_for_enactment(obj)
     elif obj.get("exhibit") or (obj.get("type") and obj["type"].lower()) == "evidence":
         name = assign_name_for_evidence(obj)
     elif obj.get("type") and obj["type"].lower() == "pleading":
@@ -328,7 +360,6 @@ def collect_mentioned(
             new_list.append(new_item)
         obj = new_list
     if isinstance(obj, Dict):
-
         obj, mentioned = update_name_index_from_fact_content(obj, mentioned)
 
         for key, value in obj.items():

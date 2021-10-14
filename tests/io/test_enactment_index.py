@@ -104,11 +104,12 @@ class TestCollectEnactments:
         self, section6d, section_11_subdivided, fifth_a
     ):
         data = {
+            "outputs": [{"type": "fact", "content": "the beard grew"}],
             "enactments": [
                 {"name": "s11", "enactment": section_11_subdivided},
                 {"name": "6d", "enactment": section6d},
                 {"name": "5a", "enactment": fifth_a},
-            ]
+            ],
         }
         obj, mentioned = collect_enactments(data)
         assert mentioned["s11"]["enactment"]["node"] == "/test/acts/47/11"
