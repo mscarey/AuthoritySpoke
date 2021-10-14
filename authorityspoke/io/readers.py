@@ -10,7 +10,7 @@ from typing import Dict, List, Optional, Tuple, Sequence, Union
 
 from anchorpoint.textselectors import TextQuoteSelector
 from legislice.download import Client
-from legislice.enactments import RawEnactment
+from legislice.enactments import AnchoredEnactmentPassage, RawEnactment
 from nettlesome.entities import Entity
 
 from authorityspoke.decisions import Decision, DecisionReading, RawDecision
@@ -60,6 +60,7 @@ class HoldingsIndexed(NamedTuple):
 
 
 def collect_anchors_from_index(object_index, field_name: str):
+    """Get text anchors out of an index of terms or enactments."""
     result = []
     for key, value in object_index.items():
         if value.get("anchors"):
@@ -85,10 +86,6 @@ def read_holdings_with_anchors(
 
     :param client:
         Legislice client for downloading missing fields from `record`
-
-    :param many:
-        a bool indicating whether to use the "many" form of the Marshmallow
-        schema (whether there are multiple Holdings)
 
     :returns:
         a namedtuple listing :class:`.Holding` objects with
@@ -246,7 +243,25 @@ def expand_holdings(
 
 def extract_anchors_from_holding_record(
     record: List[RawHolding], client: Optional[Client] = None
-):
+) -> Tuple[
+    List[RawHolding],
+    List[EnactmentWithAnchors],
+    List[TermWithAnchors],
+    List[Dict[str, str]],
+]:
+    r"""
+    Load a list of Holdings from JSON, with text links.
+
+    :param record:
+        a list of dicts representing holdings, in the JSON input format
+
+    :param client:
+        Legislice client for downloading missing fields from `record`
+
+    :returns:
+        a tuple of four objects containing holdings, terms, enactments,
+        and anchors.
+    """
     record_post_enactments, enactment_index = collect_enactments(record)
     if client:
         enactment_index_post_client = client.update_entries_in_enactment_index(

@@ -652,6 +652,7 @@ class Holding(Comparable, BaseModel):
 
 class HoldingMatch(FactorMatch):
     """A logical relation between two holdings, e.g. implies, contradicts."""
+
     left: Holding
     operation: Callable
     right: Holding
@@ -659,6 +660,7 @@ class HoldingMatch(FactorMatch):
 
 class HoldingGroup(FactorGroup):
     """Group of Holdings that can be compared as a group with other Holdings."""
+
     term_class = Holding
 
     def __init__(self, holdings: Union[Sequence[Holding], Holding] = ()):

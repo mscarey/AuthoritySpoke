@@ -95,6 +95,7 @@ class Fact(Factor, BaseModel):
 
     @root_validator(pre=True)
     def nest_predicate_fields(cls, values):
+        """Move fields passed to the Fact model that really belong to the Predicate model."""
         type_str = values.pop("type", "")
         if type_str and type_str.lower() != "fact":
             raise ValidationError(f"type {type_str} was passed to Fact model")
@@ -125,7 +126,7 @@ class Fact(Factor, BaseModel):
 
     @validator("terms", pre=True)
     def terms_as_sequence(cls, v, values) -> Sequence[Any]:
-
+        """Convert "terms" field to a sequence."""
         if isinstance(v, Mapping):
             v = values["predicate"].template.get_term_sequence_from_mapping(v)
         if not v:
@@ -284,6 +285,7 @@ class Fact(Factor, BaseModel):
     ) -> Iterator[Explanation]:
         """
         Test if ``self`` contradicts :class:`Fact` ``other`` if neither is ``absent``.
+
         :returns:
             whether ``self`` and ``other`` can't both be true at
             the same time under the given assumption.
@@ -306,6 +308,7 @@ class Fact(Factor, BaseModel):
     def new_context(self, changes: Dict[Comparable, Comparable]) -> Comparable:
         """
         Create new :class:`Factor`, replacing keys of ``changes`` with values.
+
         :returns:
             a version of ``self`` with the new context.
         """
@@ -321,6 +324,7 @@ class Fact(Factor, BaseModel):
     ) -> Iterator[ContextRegister]:
         r"""
         Find possible combination of interchangeable :attr:`terms`.
+
         :param matches:
             matching Terms between self and other
         :yields:

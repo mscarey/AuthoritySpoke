@@ -163,6 +163,7 @@ class DecisionReading(Comparable):
 
     @property
     def holdings(self) -> HoldingGroup:
+        """Get the holdings of this Decision's majority Opinion."""
         if self.majority is not None:
             return HoldingGroup(self.majority.holdings)
         elif len(self.opinion_readings) == 1:
@@ -170,11 +171,13 @@ class DecisionReading(Comparable):
         return HoldingGroup()
 
     def add_opinion(self, opinion: Opinion) -> None:
+        """Link an Opinion document to this Decision."""
         if not self.decision.casebody:
             self.decision.casebody = CaseBody(data=CaseData())
         self.decision.casebody.data.opinions.append(opinion)
 
     def contradicts(self, other):
+        """Check if a holding attributed to this decision contradicts a holding attributed in "other"."""
         if isinstance(other, DecisionReading):
             if self.majority and other.majority:
                 return self.majority.contradicts(other.majority)
@@ -184,6 +187,7 @@ class DecisionReading(Comparable):
     def explain_contradiction(
         self, other: Union[OpinionReading, Holding, Rule]
     ) -> Optional[Explanation]:
+        """Get the first generated explanation of how a Holding of self contradicts a Holding of other."""
         explanations = self.explanations_contradiction(other)
         try:
             explanation = next(explanations)
@@ -195,6 +199,7 @@ class DecisionReading(Comparable):
         self,
         other: Union[DecisionReading, Opinion, Holding, Rule],
     ) -> Iterator[Explanation]:
+        """Generate explanations of how a Holding of self contradicts a Holding of other."""
         if isinstance(other, DecisionReading):
             if self.majority and other.majority:
                 yield from self.majority.explanations_contradiction(other.majority)
@@ -211,6 +216,7 @@ class DecisionReading(Comparable):
         self,
         other: Union[Opinion, Holding, Rule],
     ) -> Optional[Explanation]:
+        """Get the first generated explanation of how a Holding of self implies a Holding of other."""
         explanations = self.explanations_implication(other)
         try:
             explanation = next(explanations)

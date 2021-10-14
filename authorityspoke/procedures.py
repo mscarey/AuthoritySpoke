@@ -694,12 +694,15 @@ class Procedure(Comparable, BaseModel):
         return self.__class__(**new_dict)
 
     def set_inputs(self, factors: Sequence[Factor]) -> None:
+        """Set factors required to invoke this Procedure."""
         self.inputs = FactorGroup(factors).sequence
 
     def set_despite(self, factors: Sequence[Factor]) -> None:
+        """Set factors that do not preclude application of this Procedure."""
         self.despite = FactorGroup(factors).sequence
 
     def set_outputs(self, factors: Sequence[Factor]) -> None:
+        """Set the outputs of this Procedure."""
         self.outputs = FactorGroup(factors).sequence
 
     def triggers_next_procedure(
@@ -745,6 +748,7 @@ class Procedure(Comparable, BaseModel):
         other: Comparable,
         context: Optional[Union[ContextRegister, Explanation]] = None,
     ) -> Optional[Comparable]:
+        """Get a procedure with all the inputs and outputs of self and other."""
         if not isinstance(context, Explanation):
             context = Explanation.from_context(context)
         explanations = self.explanations_union(other, context)
