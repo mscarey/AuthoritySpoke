@@ -10,7 +10,7 @@ from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
 from legislice.enactments import RawEnactment
 from authorityspoke.facts import RawPredicate, RawFactor
-from authorityspoke.io.name_index import Mentioned
+from authorityspoke.io.name_index import Mentioned, update_name_index_with_factor
 
 
 def create_name_for_enactment(obj: RawEnactment) -> str:
@@ -66,6 +66,6 @@ def collect_enactments(
 
         if new_dict.get("enactment") or (new_dict.get("name") in mentioned.keys()):
             new_dict = ensure_enactment_has_name(new_dict)
-            new_dict = mentioned.update_anchors_or_insert(new_dict)
+            new_dict, mentioned = update_name_index_with_factor(new_dict, mentioned)
         obj = new_dict
     return obj, mentioned
