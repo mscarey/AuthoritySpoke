@@ -50,7 +50,9 @@ def collect_enactments(
     if isinstance(obj, List):
         new_list = []
         for item in obj:
-            new_item, new_mentioned = collect_enactments(item, mentioned)
+            new_item, new_mentioned = collect_enactments(
+                item, mentioned, keys_to_ignore
+            )
             mentioned.update(new_mentioned)
             new_list.append(new_item)
         obj = new_list
@@ -59,7 +61,9 @@ def collect_enactments(
         new_dict = {}
         for key, value in obj.items():
             if key not in keys_to_ignore and isinstance(value, (Dict, List)):
-                new_value, new_mentioned = collect_enactments(value, mentioned)
+                new_value, new_mentioned = collect_enactments(
+                    value, mentioned, keys_to_ignore
+                )
                 mentioned.update(new_mentioned)
                 new_dict[key] = new_value
             else:

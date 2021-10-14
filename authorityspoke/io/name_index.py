@@ -355,7 +355,7 @@ def collect_mentioned(
     if isinstance(obj, List):
         new_list = []
         for item in obj:
-            new_item, new_mentioned = collect_mentioned(item, mentioned)
+            new_item, new_mentioned = collect_mentioned(item, mentioned, keys_to_ignore)
             mentioned.update(new_mentioned)
             new_list.append(new_item)
         obj = new_list
@@ -365,7 +365,9 @@ def collect_mentioned(
         for key, value in obj.items():
             if key not in keys_to_ignore:
                 if isinstance(value, (Dict, List)):
-                    new_value, new_mentioned = collect_mentioned(value, mentioned)
+                    new_value, new_mentioned = collect_mentioned(
+                        value, mentioned, keys_to_ignore
+                    )
                     mentioned.update(new_mentioned)
                     obj[key] = new_value
         obj = ensure_factor_has_name(obj)
