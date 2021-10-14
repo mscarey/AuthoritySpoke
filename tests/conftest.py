@@ -19,14 +19,13 @@ from nettlesome.quantities import Comparison, Q_
 import pytest
 
 from authorityspoke.decisions import DecisionReading
-from authorityspoke.facts import Allegation, Fact, build_fact, Evidence
+from authorityspoke.facts import Allegation, Fact, build_fact, Evidence, RawFactor
 from authorityspoke.facts import Exhibit, Pleading
 from authorityspoke.holdings import Holding, RawHolding
 from authorityspoke.opinions import Opinion, OpinionReading, AnchoredHoldings
 from authorityspoke.rules import Procedure, Rule
 
 from authorityspoke.io import loaders, readers
-from authorityspoke.io.enactment_index import RawFactor
 from authorityspoke.io.fake_enactments import FakeClient
 
 load_dotenv()

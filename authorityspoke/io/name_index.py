@@ -335,19 +335,10 @@ def update_name_index_with_factor(
     return obj, mentioned
 
 
-def ensure_enactment_has_name(obj: RawEnactment) -> RawEnactment:
-    """Create "name" field for unloaded Enactment data, if needed."""
-    if not obj.get("name"):
-        new_name = create_name_for_enactment(obj)
-        if new_name:
-            obj["name"] = new_name
-    return obj
-
-
 def collect_mentioned(
     obj: Union[RawFactor, List[Union[RawFactor, str]]],
     mentioned: Optional[Mentioned] = None,
-    keys_to_ignore: Sequence[str] = (
+    ignore: Sequence[str] = (
         "predicate",
         "anchors",
         "factor_anchors",
@@ -364,7 +355,7 @@ def collect_mentioned(
     if isinstance(obj, List):
         new_list = []
         for item in obj:
-            new_item, new_mentioned = collect_mentioned(item, mentioned, keys_to_ignore)
+            new_item, new_mentioned = collect_mentioned(item, mentioned, ignore)
             mentioned.update(new_mentioned)
             new_list.append(new_item)
         obj = new_list
@@ -372,10 +363,8 @@ def collect_mentioned(
         obj, mentioned = update_name_index_from_fact_content(obj, mentioned)
         new_dict = {}
         for key, value in obj.items():
-            if key not in keys_to_ignore and isinstance(value, (Dict, List)):
-                new_value, new_mentioned = collect_mentioned(
-                    value, mentioned, keys_to_ignore
-                )
+            if key not in ignore and isinstance(value, (Dict, List)):
+                new_value, new_mentioned = collect_mentioned(value, mentioned, ignore)
                 mentioned.update(new_mentioned)
                 new_dict[key] = new_value
             else:
@@ -395,6 +384,27 @@ def collect_mentioned(
         new_dict, mentioned = update_name_index_with_factor(new_dict, mentioned)
         obj = new_dict
     return obj, mentioned
+
+
+def collect_enactments(
+    obj: Union[RawFactor, List[Union[RawFactor, str]]],
+    mentioned: Optional[Mentioned] = None,
+    ignore: Sequence[str] = (
+        "predicate",
+        "anchors",
+        "children",
+        "inputs",
+        "despite",
+        "outputs",
+        "selection",
+    ),
+) -> Tuple[RawFactor, Mentioned]:
+    """
+    Make a dict of all nested objects labeled by name, creating names if needed.
+
+    To be used during loading to expand name references to full objects.
+    """
+    return collect_mentioned(obj=obj, mentioned=mentioned, ignore=ignore)
 
 
 def index_names(record: Union[List, Dict]) -> Mentioned:

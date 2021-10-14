@@ -7,8 +7,11 @@ import pytest
 
 from legislice.enactments import Enactment
 
-from authorityspoke.io.enactment_index import Mentioned, collect_enactments
-from authorityspoke.io.name_index import update_name_index_with_factor
+from authorityspoke.io.name_index import (
+    update_name_index_with_factor,
+    Mentioned,
+    collect_enactments,
+)
 
 load_dotenv()
 

@@ -28,8 +28,7 @@ from authorityspoke.opinions import (
 from authorityspoke.facts import RawFactor
 from authorityspoke.procedures import Procedure
 
-from authorityspoke.io.name_index import index_names, Mentioned
-from authorityspoke.io.enactment_index import collect_enactments
+from authorityspoke.io.name_index import index_names, Mentioned, collect_enactments
 from authorityspoke.io.text_expansion import expand_shorthand
 
 RawSelector = Union[str, Dict[str, str]]
