@@ -361,28 +361,30 @@ def collect_mentioned(
         obj = new_list
     if isinstance(obj, Dict):
         obj, mentioned = update_name_index_from_fact_content(obj, mentioned)
-
+        new_dict = {}
         for key, value in obj.items():
-            if key not in keys_to_ignore:
-                if isinstance(value, (Dict, List)):
-                    new_value, new_mentioned = collect_mentioned(
-                        value, mentioned, keys_to_ignore
-                    )
-                    mentioned.update(new_mentioned)
-                    obj[key] = new_value
-        obj = ensure_factor_has_name(obj)
+            if key not in keys_to_ignore and isinstance(value, (Dict, List)):
+                new_value, new_mentioned = collect_mentioned(
+                    value, mentioned, keys_to_ignore
+                )
+                mentioned.update(new_mentioned)
+                new_dict[key] = new_value
+            else:
+                new_dict[key] = value
+        new_dict = ensure_factor_has_name(new_dict)
 
         # Added because a top-level factor was not having its brackets replaced
-        if obj.get("predicate", {}).get("content"):
-            for factor in obj.get("terms", []):
-                if factor not in obj["predicate"]["content"]:
-                    obj["predicate"][
+        if new_dict.get("predicate", {}).get("content"):
+            for factor in new_dict.get("terms", []):
+                if factor not in new_dict["predicate"]["content"]:
+                    new_dict["predicate"][
                         "content"
                     ] = text_expansion.replace_brackets_with_placeholder(
-                        content=obj["predicate"]["content"], name=factor
+                        content=new_dict["predicate"]["content"], name=factor
                     )
 
-        obj, mentioned = update_name_index_with_factor(obj, mentioned)
+        new_dict, mentioned = update_name_index_with_factor(new_dict, mentioned)
+        obj = new_dict
     return obj, mentioned
 
 
