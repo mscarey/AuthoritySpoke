@@ -4,17 +4,14 @@ Converting simple structured data from XML or JSON into authorityspoke objects.
 These functions will usually be called by functions from the io.loaders module
 after they import some data from a file.
 """
-from copy import deepcopy
 from typing import Any, NamedTuple
 from typing import Dict, List, Optional, Tuple, Sequence, Union
 
-from pydantic import ValidationError
 
 from anchorpoint.textselectors import TextQuoteSelector
 from legislice.download import Client
 from legislice.enactments import RawEnactment
 from nettlesome.entities import Entity
-from nettlesome.factors import Factor
 
 from authorityspoke.decisions import Decision, DecisionReading, RawDecision
 from authorityspoke.facts import Fact, Exhibit, Evidence, Allegation, Pleading
@@ -26,8 +23,6 @@ from authorityspoke.opinions import (
     HoldingWithAnchors,
 )
 from authorityspoke.facts import RawFactor
-from authorityspoke.procedures import Procedure
-
 from authorityspoke.io.name_index import index_names, Mentioned, collect_enactments
 from authorityspoke.io.text_expansion import expand_shorthand
 
@@ -118,7 +113,9 @@ def read_holdings_with_anchors(
     )
 
 
-def expand_factor(record: Union[str, RawFactor], factor_index: Mentioned) -> RawFactor:
+def expand_factor(
+    record: Union[str, RawFactor], factor_index: Mentioned
+) -> Union[str, RawFactor]:
     """Expand fields of Factor from index of mentioned factors."""
     to_expand = [
         "statement",
@@ -130,7 +127,9 @@ def expand_factor(record: Union[str, RawFactor], factor_index: Mentioned) -> Raw
         "filer",
         "pleading",
     ]
-    expanded = factor_index.get_if_present(record)
+    expanded = (
+        factor_index.get_if_present(record) if isinstance(record, str) else record
+    )
     if not isinstance(expanded, Dict):
         return expanded
     if "terms" in expanded:

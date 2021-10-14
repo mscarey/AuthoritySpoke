@@ -1,8 +1,6 @@
-from copy import deepcopy
 import datetime
 import json
 import os
-import pathlib
 from typing import Any, Dict, List, Text, Tuple
 
 from anchorpoint.textselectors import TextQuoteSelector

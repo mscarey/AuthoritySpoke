@@ -174,7 +174,7 @@ class Fact(Factor, BaseModel):
             text += "\n" + indented("SPECIFIC CONTEXT:")
             for factor in concrete_context:
                 factor_text = indented(factor.wrapped_string, tabs=2)
-                text += f"\n{str(factor_text)}"
+                text += f"\n{factor_text}"
         return text
 
     @property
@@ -507,7 +507,7 @@ class Exhibit(Factor, BaseModel):
         if self.statement:
             text += "\n" + indented("WITH THE ASSERTION:")
             factor_text = indented(self.statement.wrapped_string, tabs=2)
-            text += f"\n{str(factor_text)},"
+            text += f"\n{factor_text},"
         if self.statement_attribution:
             text += "\n" + indented(
                 f"ATTRIBUTED TO {self.statement_attribution.wrapped_string}"
@@ -577,7 +577,7 @@ class Evidence(Factor, BaseModel):
         if self.to_effect:
             text += "\n" + indented("INDICATING:")
             factor_text = indented(self.to_effect.wrapped_string, tabs=2)
-            text += f"\n{str(factor_text)}"
+            text += f"\n{factor_text}"
         return super().__str__().format(text).strip()
 
 
@@ -648,7 +648,7 @@ class Allegation(Factor, BaseModel):
         if self.pleading:
             text += "\n" + indented("FOUND IN:")
             factor_text = indented(str(self.pleading), tabs=2)
-            text += f"\n{str(factor_text)}"
+            text += f"\n{factor_text}"
         return super().__str__().format(text).strip()
 
     def __str__(self):

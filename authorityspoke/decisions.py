@@ -219,7 +219,7 @@ class DecisionReading(Comparable):
         return explanation
 
     def explanations_implication(
-        self, other: Union[Decision, Opinion, Holding, Rule]
+        self, other: Union[DecisionReading, Decision, Opinion, Holding, Rule]
     ) -> Iterator[Explanation]:
         if isinstance(other, DecisionReading):
             if self.get_majority() and other.get_majority():

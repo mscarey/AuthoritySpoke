@@ -5,8 +5,7 @@ import pathlib
 from pydantic import ValidationError
 from nettlesome.entities import Entity
 from nettlesome.terms import TermSequence
-from nettlesome.predicates import Predicate
-from nettlesome.quantities import Comparison, QuantityRange
+from nettlesome.quantities import Comparison
 
 import pytest
 
