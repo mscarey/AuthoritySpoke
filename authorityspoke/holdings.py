@@ -84,6 +84,7 @@ class Holding(Comparable, BaseModel):
 
     @root_validator(pre=True)
     def nest_factor_fields(cls, values):
+        """Move misplaced fields that belong on Rule or Predicate models."""
         for field_name in ["inputs", "outputs", "despite"]:
             if field_name in values:
                 values["procedure"] = values.get("procedure", {})
@@ -103,19 +104,20 @@ class Holding(Comparable, BaseModel):
 
     @validator("exclusive")
     def not_invalid_and_exclusive(cls, v: bool, values) -> bool:
-        if v:
-            if not values["rule_valid"]:
-                raise NotImplementedError(
-                    "The ability to state that it is not 'valid' to assert "
-                    + "that a Rule is the 'exclusive' way to reach an output is "
-                    + "not implemented, so 'rule_valid' cannot be False while "
-                    + "'exclusive' is True. Try expressing this in another way "
-                    + "without the 'exclusive' keyword."
-                )
+        """Block "exclusive" flag from being used when "rule_valid" is False."""
+        if v and not values["rule_valid"]:
+            raise NotImplementedError(
+                "The ability to state that it is not 'valid' to assert "
+                + "that a Rule is the 'exclusive' way to reach an output is "
+                + "not implemented, so 'rule_valid' cannot be False while "
+                + "'exclusive' is True. Try expressing this in another way "
+                + "without the 'exclusive' keyword."
+            )
         return v
 
     @validator("exclusive")
     def not_undecided_and_exclusive(cls, v: bool, values) -> bool:
+        """Block "exclusive" flag from being used when "decided" is False."""
         if v:
             if not values["decided"]:
                 raise NotImplementedError(
@@ -544,18 +546,23 @@ class Holding(Comparable, BaseModel):
         return HoldingGroup(holdings)
 
     def set_inputs(self, factors: Sequence[Factor]) -> None:
+        """Set inputs of this Holding."""
         self.rule.set_inputs(factors)
 
     def set_despite(self, factors: Sequence[Factor]) -> None:
+        """Set Factors that specifically do not preclude applying this Holding."""
         self.rule.set_despite(factors)
 
     def set_outputs(self, factors: Sequence[Factor]) -> None:
+        """Set outputs of this Holding."""
         self.rule.set_outputs(factors)
 
     def set_enactments(self, enactments: Sequence[Enactment]) -> None:
+        """Set Enactments required to apply this Holding."""
         self.rule.set_enactments(enactments)
 
     def set_enactments_despite(self, enactments: Sequence[Enactment]) -> None:
+        """Set Enactments that specifically do not preclude applying this Holding."""
         self.rule.set_enactments_despite(enactments)
 
     def _union_if_not_exclusive(

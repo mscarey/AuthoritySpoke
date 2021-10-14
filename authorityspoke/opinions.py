@@ -240,8 +240,6 @@ class OpinionReading(Comparable, BaseModel):
         """Check if all of other's Holdings are implied by holdings of self."""
         if other is None:
             return True
-        if isinstance(other, HoldingGroup):
-            return self.implies_other_holdings(other)
         return any(self.explanations_implication(other))
 
     def explain_implication(
@@ -499,14 +497,6 @@ class OpinionReading(Comparable, BaseModel):
         elif isinstance(other, Rule):
             return self._implied_by_rule(other, context=context)
         return other.implies(self, context=context.reversed_context())
-
-    def implies_other_holdings(self, other_holdings: Sequence[Holding]):
-        for other_holding in other_holdings:
-            if not any(
-                self_holding.implies(other_holding) for self_holding in self.holdings
-            ):
-                return False
-        return True
 
     def __ge__(self, other: Union[OpinionReading, Holding, Rule]) -> bool:
         """

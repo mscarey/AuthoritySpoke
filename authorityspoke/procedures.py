@@ -93,18 +93,22 @@ class Procedure(Comparable, BaseModel):
 
     @property
     def outputs_group(self) -> FactorGroup:
+        """Get input Factors as a FactorGroup."""
         return FactorGroup(self.outputs)
 
     @property
     def inputs_group(self) -> FactorGroup:
+        """Get input Factors as a FactorGroup."""
         return FactorGroup(self.inputs) if self.inputs else FactorGroup()
 
     @property
     def despite_group(self) -> FactorGroup:
+        """Get despite Factors as a FactorGroup."""
         return FactorGroup(self.despite) if self.despite else FactorGroup()
 
     @property
     def groups(self) -> List[FactorGroup]:
+        """Get input, output, and despite Factors as FactorGroups."""
         return [self.outputs_group, self.inputs_group, self.despite_group]
 
     @validator("outputs", pre=True)
