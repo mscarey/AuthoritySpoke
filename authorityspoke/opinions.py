@@ -5,23 +5,21 @@ r"""
 from __future__ import annotations
 
 from itertools import zip_longest
-from typing import Any, Dict, Iterable, Iterator, List, NamedTuple
+from typing import Any, Dict, Iterable, Iterator, List
 from typing import Optional, Sequence, Tuple, Union
 
 import logging
-import re
-
-from dataclasses import dataclass, field
 
 from anchorpoint.textselectors import (
     TextQuoteSelector,
     TextPositionSet,
+    TextPositionSelector,
 )
 from justopinion.decisions import Opinion
 from legislice.enactments import EnactmentPassage
 from nettlesome.terms import Comparable, ContextRegister, Explanation, Term
 from nettlesome.factors import Factor
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, validator
 
 from authorityspoke.facts import Entity, Fact, Allegation, Pleading, Exhibit, Evidence
 from authorityspoke.holdings import Holding, HoldingGroup
@@ -170,6 +168,7 @@ class OpinionReading(Comparable, BaseModel):
         return list(factors_by_name.values())
 
     def factors_by_name(self) -> FactorIndex:
+        """Get an index of Factors, indexed by name."""
         factor_index = FactorIndex()
         for holding in self.holdings:
             factors_for_holding = holding.recursive_terms
@@ -224,6 +223,7 @@ class OpinionReading(Comparable, BaseModel):
     def contradicts(
         self, other: Comparable, context: Optional[ContextRegister] = None
     ) -> bool:
+        """Check if other contradicts one of self's Holdings."""
         if not self.comparable_with(other):
             raise TypeError(
                 "'Contradicts' test not implemented for types "
@@ -246,6 +246,7 @@ class OpinionReading(Comparable, BaseModel):
         self,
         other: Comparable,
     ) -> Optional[Explanation]:
+        """Get first Explanation of how one of self's Holdings implies other."""
         explanations = self.explanations_implication(other)
         try:
             explanation = next(explanations)
@@ -254,6 +255,7 @@ class OpinionReading(Comparable, BaseModel):
         return explanation
 
     def explain_contradiction(self, other: Comparable) -> Optional[Explanation]:
+        """Get first Explanation of how other contradicts one of self's Holdings."""
         explanations = self.explanations_contradiction(other)
         try:
             explanation = next(explanations)
@@ -319,12 +321,11 @@ class OpinionReading(Comparable, BaseModel):
         return None
 
     def get_factor_by_str(self, query: str) -> Optional[Factor]:
-        r"""
-        Search recursively  for :class:`.Factor` in holdings of self.
-        """
+        r"""Search recursively for :class:`.Factor` in holdings of self."""
         return self.holdings.get_factor_by_str(query)
 
     def get_matching_holding(self, holding: Holding) -> Optional[Holding]:
+        """Check self's Holdings for a Holding with the same meaning."""
         for known_holding in self.holdings:
             if holding.means(known_holding):
                 return known_holding
