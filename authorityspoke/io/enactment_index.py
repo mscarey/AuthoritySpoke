@@ -17,6 +17,7 @@ from authorityspoke.io.name_index import (
     ensure_factor_has_name,
     create_name_for_enactment,
 )
+from authorityspoke.io import text_expansion
 
 
 def ensure_enactment_has_name(obj: RawEnactment) -> RawEnactment:
@@ -71,7 +72,17 @@ def collect_enactments(
 
         new_dict = ensure_factor_has_name(new_dict)
 
-        if new_dict.get("enactment") or (new_dict.get("name") in mentioned.keys()):
+        # Added because a top-level factor was not having its brackets replaced
+        if new_dict.get("predicate", {}).get("content"):
+            for factor in new_dict.get("terms", []):
+                if factor not in new_dict["predicate"]["content"]:
+                    new_dict["predicate"][
+                        "content"
+                    ] = text_expansion.replace_brackets_with_placeholder(
+                        content=new_dict["predicate"]["content"], name=factor
+                    )
+
+        if new_dict.get("enactment"):
             new_dict = ensure_enactment_has_name(new_dict)
             new_dict, mentioned = update_name_index_with_factor(new_dict, mentioned)
         obj = new_dict
