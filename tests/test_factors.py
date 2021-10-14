@@ -5,6 +5,7 @@ import pytest
 from nettlesome.terms import ContextRegister, DuplicateTermError
 from nettlesome.terms import Explanation, TermSequence, means
 from nettlesome.entities import Entity
+from nettlesome.groups import FactorGroup
 from nettlesome.predicates import Predicate
 from nettlesome.quantities import Comparison, Q_
 
@@ -501,6 +502,48 @@ class TestImplication:
     def test_not_implied_by_none(self, make_complex_fact):
         left = make_complex_fact["f_relevant_murder"]
         assert not left.implied_by(None)
+
+    def test_some_interchangeable_entities(self):
+        hit = Fact(
+            predicate="$person1 hit $target1 and $target2",
+            terms=[Entity(name="Moe"), Entity(name="Curly"), Entity(name="Larry")],
+        )
+        hit2 = Fact(
+            predicate="$person1 hit $target1 and $target2",
+            terms=[
+                Entity(name="Joker"),
+                Entity(name="Batman"),
+                Entity(name="Superman"),
+            ],
+        )
+        assert hit.means(hit2)
+
+    def test_interchangeable_entities_in_group(self):
+        fought = Fact(
+            predicate="$person1, $person2, and $person3 fought each other",
+            terms=[Entity(name="Larry"), Entity(name="Moe"), Entity(name="Curly")],
+        )
+        hit = Fact(
+            predicate="$person1 hit $target1 and $target2",
+            terms=[Entity(name="Moe"), Entity(name="Curly"), Entity(name="Larry")],
+        )
+        fought2 = Fact(
+            predicate="$person1, $person2, and $person3 fought each other",
+            terms=[
+                Entity(name="Superman"),
+                Entity(name="Batman"),
+                Entity(name="Joker"),
+            ],
+        )
+        hit2 = Fact(
+            predicate="$person1 hit $target1 and $target2",
+            terms=[
+                Entity(name="Joker"),
+                Entity(name="Batman"),
+                Entity(name="Superman"),
+            ],
+        )
+        assert FactorGroup([fought, hit]).implies(FactorGroup([fought2, hit2]))
 
 
 class TestContradiction:
