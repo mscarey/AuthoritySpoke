@@ -75,7 +75,9 @@ class Fact(Factor, BaseModel):
     """
 
     predicate: Union[Predicate, Comparison]
-    terms: List[Union[Entity, "Fact", "Allegation", "Pleading", "Exhibit", "Evidence"]]
+    terms: List[
+        Union[Entity, "Fact", "Allegation", "Pleading", "Exhibit", "Evidence"]
+    ] = []
     name: str = ""
     absent: bool = False
     generic: bool = False
@@ -119,16 +121,18 @@ class Fact(Factor, BaseModel):
                     values["predicate"]["expression"] = quantity_text.strip()
                     values["predicate"]["sign"] = sign
                     break
-
-        if isinstance(values.get("terms"), Mapping):
-            values["terms"] = values[
-                "predicate"
-            ].template.get_term_sequence_from_mapping(values["terms"])
-        if not values.get("terms"):
-            values["terms"] = []
-        elif isinstance(values["terms"], Term):
-            values["terms"] = [values["terms"]]
         return values
+
+    @validator("terms", pre=True)
+    def terms_as_sequence(cls, v, values) -> Sequence[Any]:
+
+        if isinstance(v, Mapping):
+            v = values["predicate"].template.get_term_sequence_from_mapping(v)
+        if not v:
+            v = []
+        elif isinstance(v, Term):
+            v = [v]
+        return v
 
     @property
     def term_sequence(self) -> TermSequence:
