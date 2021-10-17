@@ -5,7 +5,7 @@ from typing import Dict, Iterable, Iterator, List
 from typing import Optional, Sequence, Tuple, Union
 
 from anchorpoint.textselectors import TextQuoteSelector, TextPositionSelector
-from justopinion.decisions import Decision, CAPCitation
+from justopinion.decisions import Decision, CaseBody, CaseData
 
 from nettlesome.terms import Comparable, ContextRegister, Explanation
 from nettlesome.factors import Factor
@@ -19,24 +19,6 @@ from authorityspoke.rules import Rule
 RawCAPCitation = Dict[str, str]
 RawOpinion = Dict[str, str]
 RawDecision = Dict[str, Union[str, int, Sequence[RawOpinion], Sequence[RawCAPCitation]]]
-
-
-class CaseData(BaseModel):
-    """
-    The content of a Decision, including Opinions.
-    """
-
-    head_matter: Optional[str] = None
-    corrections: Optional[str] = None
-    parties: List[str] = []
-    attorneys: List[str] = []
-    opinions: List[Opinion] = []
-    judges: List[str] = []
-
-
-class CaseBody(BaseModel):
-    data: CaseData
-    status: str = ""
 
 
 class DecisionReading(BaseModel, Comparable):
