@@ -103,6 +103,24 @@ class TestDecision:
         with pytest.raises(AttributeError):
             decision_reading.posit(lotus_analysis)
 
+    def test_add_opinion_to_decision(
+        self, make_decision, make_opinion, make_opinion_with_holding
+    ):
+        reading = DecisionReading(decision=Decision(decision_date=date(2000, 2, 2)))
+        assert len(reading.opinions) == 0
+        reading.add_opinion(make_opinion["oracle_majority"])
+        assert len(reading.opinions) == 1
+
+    def test_add_opinion_with_holdings(
+        self, make_decision, make_opinion, make_opinion_with_holding
+    ):
+        reading = DecisionReading(decision=make_decision["oracle"])
+        assert len(reading.opinion_readings) == 0
+        assert len(reading.holdings) == 0
+        reading.add_opinion_reading(make_opinion_with_holding["oracle_majority"])
+        assert len(reading.opinion_readings) == 1
+        assert len(reading.holdings) == 20
+
 
 class TestImplication:
     def test_implication_of_decision_with_one_of_same_holdings(
