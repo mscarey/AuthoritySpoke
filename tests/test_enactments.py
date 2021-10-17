@@ -55,7 +55,7 @@ class TestEnactments:
     def test_passage_from_imported_statute(self, fake_usc_client):
         oracle = loaders.load_decision("oracle_h.json")
         oracle_decision = Decision(**oracle)
-        reading = DecisionReading(oracle_decision)
+        reading = DecisionReading(decision=oracle_decision)
         loaded = loaders.load_holdings("holding_oracle.yaml")
         holdings = readers.read_holdings(loaded, client=fake_usc_client)
         reading.posit(holdings)

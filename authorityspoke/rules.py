@@ -97,6 +97,7 @@ class Rule(Comparable, BaseModel):
         cls,
         v: Union[Dict, EnactmentPassage, Sequence[EnactmentPassage], EnactmentGroup],
     ) -> EnactmentGroup:
+        """Convert EnactmentPassage to EnactmentGroup."""
         if isinstance(v, EnactmentPassage):
             v = {"passages": [v]}
         elif v and not isinstance(v, EnactmentGroup):
@@ -109,6 +110,7 @@ class Rule(Comparable, BaseModel):
 
     @validator("enactments", "enactments_despite", pre=False)
     def select_enactment_text(cls, v: EnactmentGroup) -> EnactmentGroup:
+        """For Enactments with no text selection, select all text."""
         for enactment in v:
             if not enactment.selected_text():
                 enactment.select_all()
@@ -116,14 +118,17 @@ class Rule(Comparable, BaseModel):
 
     @property
     def despite(self):
+        """Get despite Factors as a FactorGroup."""
         return self.procedure.despite_group
 
     @property
     def inputs(self):
+        """Get input Factors as a FactorGroup."""
         return self.procedure.inputs_group
 
     @property
     def outputs(self):
+        """Get output Factors as a FactorGroup."""
         return self.procedure.outputs_group
 
     @property
@@ -142,6 +147,7 @@ class Rule(Comparable, BaseModel):
         other: Comparable,
         context: Optional[Union[ContextRegister, Explanation]] = None,
     ) -> Optional[Rule]:
+        """Create new Rule by using the outputs of self as inputs of other."""
         if not isinstance(other, Rule):
             if isinstance(other, Factor):
                 return self.with_factor(other)
@@ -440,6 +446,7 @@ class Rule(Comparable, BaseModel):
     def explanations_implication(
         self, other, context: Optional[ContextRegister] = None
     ) -> Iterator[ContextRegister]:
+        """Find context matches that would result in self implying other."""
         if (
             self.needs_subset_of_enactments(other)
             and self.mandatory >= other.mandatory
@@ -590,6 +597,7 @@ class Rule(Comparable, BaseModel):
     def union(
         self, other: Optional[Rule], context: Optional[ContextRegister] = None
     ) -> Optional[Rule]:
+        """Get new Rule with all the Factors of self and other."""
         if other is None:
             return self
         context = context or ContextRegister()
@@ -623,12 +631,15 @@ class Rule(Comparable, BaseModel):
         return self.union(other)
 
     def set_inputs(self, factors: Sequence[Factor]) -> None:
+        """Set factors required to invoke this Procedure."""
         self.procedure.set_inputs(factors)
 
     def set_despite(self, factors: Sequence[Factor]) -> None:
+        """Set factors that do not preclude application of this Rule."""
         self.procedure.set_despite(factors)
 
     def set_outputs(self, factors: Sequence[Factor]) -> None:
+        """Set the outputs of this Rule."""
         self.procedure.set_outputs(factors)
 
     def set_enactments(
@@ -636,7 +647,7 @@ class Rule(Comparable, BaseModel):
     ) -> None:
         """
         Set the list of Enactments cited as the basis for this Rule.
-        
+
         Any prior enactments are replaced.
         """
         self.enactments = EnactmentGroup(passages=enactments)
@@ -646,7 +657,7 @@ class Rule(Comparable, BaseModel):
     ) -> None:
         """
         Set the list of Enactments known not to preclude application of this Rule.
-        
+
         Any prior despite enactments are replaced.
         """
         self.enactments_despite = EnactmentGroup(passages=enactments)

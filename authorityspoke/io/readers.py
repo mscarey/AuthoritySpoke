@@ -348,4 +348,4 @@ def read_decision(decision: Union[RawDecision, Decision]) -> DecisionReading:
     """
     if not isinstance(decision, Decision):
         decision = Decision(**decision)
-    return DecisionReading(decision)
+    return DecisionReading(decision=decision)

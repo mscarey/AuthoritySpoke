@@ -30,8 +30,8 @@ class TestReadme:
         )
         lotus_ah = read_anchored_holdings_from_file("holding_lotus.yaml", client=client)
 
-        oracle_reading = DecisionReading(oracle)
-        lotus_reading = DecisionReading(lotus)
+        oracle_reading = DecisionReading(decision=oracle)
+        lotus_reading = DecisionReading(decision=lotus)
 
         oracle_reading.posit(
             holdings=oracle_ah.holdings,

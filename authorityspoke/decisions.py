@@ -39,38 +39,11 @@ class CaseBody(BaseModel):
     status: str = ""
 
 
-class DecisionReading(Comparable):
-    """
-    An interpretation of what Holdings are supported by the Opinions of a Decision.
-    """
+class DecisionReading(BaseModel, Comparable):
+    """An interpretation of what Holdings are supported by the Opinions of a Decision."""
 
-    def __init__(
-        self,
-        decision: Decision,
-        opinion_readings: List[OpinionReading] = None,
-        holdings: Union[Holding, Iterable[Union[Holding, Rule]]] = None,
-        holding_anchors: Optional[
-            List[Union[TextQuoteSelector, List[TextQuoteSelector]]]
-        ] = None,
-        named_anchors: Optional[TextLinkDict] = None,
-        enactment_anchors: Optional[TextLinkDict] = None,
-        context: Optional[Sequence[Factor]] = None,
-    ):
-        if not isinstance(decision, Decision):
-            raise TypeError(f"Expected Decision, got {decision.__class__}.")
-        self.decision = decision
-        self.opinion_readings: List[OpinionReading] = []
-        incoming_readings = opinion_readings or []
-        for reading in incoming_readings:
-            self.add_opinion_reading(reading)
-        if holdings:
-            self.posit(
-                holdings=holdings,
-                holding_anchors=holding_anchors,
-                named_anchors=named_anchors,
-                enactment_anchors=enactment_anchors,
-                context=context,
-            )
+    decision: Decision
+    opinion_readings: List[OpinionReading] = []
 
     def __str__(self):
         citation = self.decision.citations[0].cite if self.decision.citations else ""
@@ -79,6 +52,7 @@ class DecisionReading(Comparable):
 
     @property
     def majority(self) -> Optional[OpinionReading]:
+        """Return the majority OpinionReading, or None if it doesn't exist."""
         for reading in self.opinion_readings:
             if reading.opinion_type == "majority":
                 return reading
@@ -86,6 +60,7 @@ class DecisionReading(Comparable):
 
     @property
     def opinions(self) -> List[Opinion]:
+        """Get the Opinions for this DecisionReading's Decision."""
         return self.decision.opinions
 
     def find_matching_opinion(
@@ -102,6 +77,7 @@ class DecisionReading(Comparable):
         self,
         opinion_reading: OpinionReading,
     ) -> Optional[Opinion]:
+        """Find the Opinion corresponding to an OpinionReading."""
         return self.find_matching_opinion(
             opinion_type=opinion_reading.opinion_type,
             opinion_author=opinion_reading.opinion_author,
@@ -135,6 +111,7 @@ class DecisionReading(Comparable):
         return opinion.select_text(selector) if opinion else None
 
     def add_opinion_reading(self, opinion_reading: OpinionReading) -> None:
+        """Add an OpinionReading for an existing Opinion of the Decision."""
         matching_opinion = self.find_opinion_matching_reading(opinion_reading)
         if matching_opinion:
             opinion_reading.opinion_type = (
@@ -146,9 +123,7 @@ class DecisionReading(Comparable):
         self.opinion_readings.append(opinion_reading)
 
     def get_majority(self) -> Optional[OpinionReading]:
-        """
-        Return the majority OpinionReading, creating it if needed.
-        """
+        """Return the majority OpinionReading, creating it if needed."""
         majority = self.majority
         if majority:
             return majority
@@ -227,6 +202,7 @@ class DecisionReading(Comparable):
     def explanations_implication(
         self, other: Union[DecisionReading, Decision, Opinion, Holding, Rule]
     ) -> Iterator[Explanation]:
+        """Generate explanation of how self's Holdings can imply other."""
         if isinstance(other, DecisionReading):
             if self.get_majority() and other.get_majority():
                 yield from self.majority.explanations_implication(other.majority)
@@ -282,6 +258,7 @@ class DecisionReading(Comparable):
     def implied_by_holding(
         self, other: Holding, context: Optional[ContextRegister] = None
     ) -> Iterator[Explanation]:
+        """Check if a Holding implies all the Holdings of self."""
         if all(
             other.implies(self_holding, context=context)
             for self_holding in self.holdings
@@ -294,6 +271,7 @@ class DecisionReading(Comparable):
     def explanations_implied_by(
         self, other: Comparable, context: Optional[ContextRegister] = None
     ) -> Iterator[Explanation]:
+        """Generate explanation of how other can imply all the Holdings of self."""
         context = context or ContextRegister()
         if isinstance(other, OpinionReading):
             other = other.holdings
@@ -309,6 +287,7 @@ class DecisionReading(Comparable):
     def implied_by(
         self, other: Optional[Comparable], context: Optional[ContextRegister] = None
     ) -> bool:
+        """Check if other implies all the Holdings of self."""
         if other is None:
             return False
         return any(self.explanations_implied_by(other, context))
@@ -316,6 +295,7 @@ class DecisionReading(Comparable):
     def implies_holding(
         self, other: Holding, context: Optional[ContextRegister] = None
     ) -> bool:
+        """Check if a Holding of self implies a Holding made from other."""
         return any(
             self_holding.implies(other, context=context)
             for self_holding in self.holdings
@@ -324,9 +304,11 @@ class DecisionReading(Comparable):
     def implies_rule(
         self, other: Rule, context: Optional[ContextRegister] = None
     ) -> bool:
+        """Check if a Holding of self implies a Holding made from other Rule."""
         return self.implies_holding(Holding(rule=other), context=context)
 
     def implies(self, other, context: Optional[ContextRegister] = None) -> bool:
+        """Check if the Holdings of self imply other."""
         if isinstance(other, (DecisionReading, OpinionReading)):
             return self.holdings.implies(other.holdings)
         elif isinstance(other, Holding):

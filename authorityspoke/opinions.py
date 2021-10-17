@@ -1,6 +1,4 @@
-r"""
-:class:`Court` documents that decide litigation and posit :class:`.Rule`\s.
-"""
+r""":class:`Court` documents that decide litigation and posit :class:`.Rule`\s."""
 
 from __future__ import annotations
 
@@ -71,9 +69,7 @@ class HoldingWithAnchors(BaseModel):
 
     @validator("anchors", pre=True)
     def validate_anchors(cls, value: TextPositionSet) -> TextPositionSet:
-        """
-        Validate that the anchors are non-empty.
-        """
+        """Validate that the anchors are non-empty."""
         if value is None:
             return TextPositionSet()
         return value
@@ -146,24 +142,29 @@ class OpinionReading(Comparable, BaseModel):
 
     @property
     def holdings(self) -> HoldingGroup:
+        """Get Holdings for the Opinion."""
         return HoldingGroup([item.holding for item in self.anchored_holdings.holdings])
 
     @property
     def holding_anchors(self) -> List[TextPositionSet]:
+        """Get Holdings with corresponding anchors for the Opinion."""
         return [item.anchors for item in self.anchored_holdings.holdings]
 
     @property
     def anchored_factors(self) -> List[TermWithAnchors]:
+        """Get Factors with corresponding anchors for the Opinion."""
         return self.anchored_holdings.named_anchors
 
     @property
     def anchored_enactments(self) -> List[EnactmentWithAnchors]:
+        """Get Enactment passages with corresponding anchors for the Opinion."""
         return self.anchored_holdings.enactment_anchors
 
     def __str__(self):
         return super().__str__()
 
     def factors(self) -> List[Factor]:
+        """Get all factors from the Holdings of the Opinion, without duplication."""
         factors_by_name = self.factors_by_name()
         return list(factors_by_name.values())
 

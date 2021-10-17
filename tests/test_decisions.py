@@ -3,6 +3,7 @@ from authorityspoke.opinions import OpinionReading
 from copy import deepcopy
 from datetime import date
 import datetime
+from pydantic import ValidationError
 import pytest
 
 from authorityspoke.decisions import Decision, DecisionReading, Opinion
@@ -21,7 +22,7 @@ class TestDecision:
         assert not reading.implied_by(None)
 
     def test_decision_reading_with_opinion_instead_of_decision(self, make_opinion):
-        with pytest.raises(TypeError):
+        with pytest.raises(ValidationError):
             DecisionReading(decision=make_opinion["lotus_majority"])
 
     def test_posit_holdings(self, make_decision, make_holding):
@@ -38,7 +39,8 @@ class TestDecision:
     def test_make_reading_with_holdings(self, make_decision, make_holding):
         watt = make_decision["watt"]
         holdings = HoldingGroup([make_holding["h1"], make_holding["h2"]])
-        reading = DecisionReading(decision=watt, holdings=holdings)
+        reading = DecisionReading(decision=watt)
+        reading.posit(holdings)
         assert reading.majority.holdings[-1] == make_holding["h2"]
 
     def test_make_reading_with_anchored_holdings(
@@ -46,7 +48,8 @@ class TestDecision:
     ):
         watt = make_decision["watt"]
         holding = make_anchored_holding["lotus"]
-        reading = DecisionReading(decision=watt, holdings=holding)
+        reading = DecisionReading(decision=watt)
+        reading.posit(holding)
         assert (
             str(reading.majority.holdings[0].inputs[0]).lower()
             == "the fact that <the lotus menu command hierarchy> was copyrightable"
