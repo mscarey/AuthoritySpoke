@@ -1,3 +1,12 @@
+"""
+Interpretations (or "readings") of judicial Decisions.
+
+Each :class:`.justopinion.decisions.Decision` may include
+multiple :class:`.justopinion.decisions.Opinion`\s. A
+:class:`.authorityspoke.decision.DecisionReading` may link
+to multiple :class:`.authorityspoke.opinion.OpinionReading`\s.
+"""
+
 from __future__ import annotations
 
 import operator
@@ -5,7 +14,7 @@ from typing import Dict, Iterable, Iterator, List
 from typing import Optional, Sequence, Tuple, Union
 
 from anchorpoint.textselectors import TextQuoteSelector, TextPositionSelector
-from justopinion.decisions import Decision, CaseBody, CaseData
+from justopinion.decisions import Decision, CaseBody, CaseData, CAPCitation
 
 from nettlesome.terms import Comparable, ContextRegister, Explanation
 from nettlesome.factors import Factor

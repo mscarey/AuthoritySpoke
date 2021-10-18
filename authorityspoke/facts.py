@@ -91,6 +91,8 @@ class Fact(Factor, BaseModel):
     )
 
     class Config:
+        """Fail validation if the input data has data not specified in the model."""
+
         extra = Extra.forbid
 
     @root_validator(pre=True)
@@ -146,14 +148,10 @@ class Fact(Factor, BaseModel):
         return [term for term in self.terms if term is not None]
 
     @property
-    def short_string(self) -> str:
-        """Represent object without line breaks."""
-        return str(self)
-
-    @property
     def slug(self) -> str:
         """
         Get a representation of self without whitespace.
+
         Intended for use as a sympy :class:`~sympy.core.symbol.Symbol`
         """
         terms = [term for term in self.terms if term is not None]
@@ -163,7 +161,8 @@ class Fact(Factor, BaseModel):
     @property
     def str_with_concrete_context(self) -> str:
         """
-        Identify this Statement more verbosely, specifying which text is a concrete context factor.
+        Identify self more verbosely, specifying which text is a concrete context factor.
+
         :returns:
             the same as the __str__ method, but with an added "SPECIFIC CONTEXT" section
         """
@@ -244,6 +243,7 @@ class Fact(Factor, BaseModel):
 
     @property
     def content(self) -> str:
+        """Return the content of self's Predicate."""
         return str(self.predicate._content_with_terms(self.terms))
 
     def _means_if_concrete(
@@ -500,11 +500,8 @@ class Exhibit(Factor, BaseModel):
         return string.replace("exhibit", self.form or "exhibit").strip()
 
     @property
-    def short_string(self):
-        return str(self)
-
-    @property
     def wrapped_string(self):
+        """Create a string describing the Exhibit split over multiple lines."""
         text = ""
         if self.form:
             text += f"in the FORM {self.form}"
@@ -555,10 +552,13 @@ class Evidence(Factor, BaseModel):
     context_factor_names: ClassVar[Tuple[str, ...]] = ("exhibit", "to_effect")
 
     class Config:
+        """Fail validation if the input data has data not specified in the model."""
+
         extra = Extra.forbid
 
     @root_validator(pre=True)
     def check_type_field(cls, values):
+        """Fail valitation if the input has a "type" field without the class name."""
         type_str = values.pop("type", "")
         if type_str and type_str.lower() != "evidence":
             raise ValidationError(f"type {type_str} was passed to Evidence model")
@@ -573,6 +573,7 @@ class Evidence(Factor, BaseModel):
 
     @property
     def wrapped_string(self):
+        """Create a string describing the Evidence split over multiple lines."""
         text = ""
         if self.exhibit:
             text += "\n" + indented("OF:")
@@ -610,10 +611,6 @@ class Pleading(Factor, BaseModel):
         string = f'{("filed by " + self.filer.short_string if self.filer else "")}'
         return super().__str__().format(string)
 
-    @property
-    def short_string(self):
-        return str(self)
-
 
 class Allegation(Factor, BaseModel):
     """
@@ -644,6 +641,7 @@ class Allegation(Factor, BaseModel):
 
     @property
     def wrapped_string(self):
+        """Create a string describing the Allegation split over multiple lines."""
         text = ""
         if self.fact:
             text += "\n" + indented("OF:")

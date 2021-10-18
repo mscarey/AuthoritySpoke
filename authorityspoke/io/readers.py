@@ -338,7 +338,7 @@ def read_holdings(
 
 def read_decision(decision: Union[RawDecision, Decision]) -> DecisionReading:
     r"""
-    Create and return a :class:`~authorityspoke.decisions.DecisionReading` from a dict API response.
+    Create and return a :class:`~authorityspoke.decisions.Decision` from a dict API response.
 
     Relies on the JSON format from the `Caselaw Access Project
     API <https://api.case.law/v1/cases/>`_.

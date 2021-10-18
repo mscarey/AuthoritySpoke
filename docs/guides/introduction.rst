@@ -94,7 +94,7 @@ help on installing modules.
 Optional: Skip the Downloads and Load Decisions from a File
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To use the cell below to access :class:`authorityspoke.decisions.Decision`
+To use the cell below to access :class:`justopinion.decisions.Decision`
 objects from a file rather
 than an API, be sure the ``USE_REAL_CASE_API`` variable is set to
 ``False``. This should work if you’re running the tutorial in a notebook
@@ -155,7 +155,7 @@ uncopyrightable because it was a “method of operation” under the
 Copyright Act. As we’ll see, the Oracle case discusses and disagrees
 with the Lotus case.
 
-If you already loaded a :class:`~authorityspoke.decisions.Decision`
+If you already loaded a :class:`~justopinion.decisions.Decision`
 from a file, running the cells
 below with ``USE_REAL_CASE_API`` set to True will attempt to overwrite
 it with data from the API. You should be able to run the rest of the
@@ -199,11 +199,11 @@ Now let’s look at the objects we made.
     >>> print(lotus_case)
     Lotus Development Corp. v. Borland International, Inc., 49 F.3d 807 (1995-03-09)
 
-One judicial :class:`~authorityspoke.decisions.Decision` can include
+One judicial :class:`~justopinion.decisions.Decision` can include
 multiple :class:`~authorityspoke.opinions.Opinion`\s. The Lotus
-:class:`~authorityspoke.decisions.Decision` has a concurring opinion
+:class:`~justopinion.decisions.Decision` has a concurring opinion
 as well as a majority opinion.
-Access the ``majority`` attribute of the :class:`~authorityspoke.decisions.Decision`
+Access the ``majority`` attribute of the :class:`~justopinion.decisions.Decision`
 object to get the majority opinion.
 
     >>> print(lotus_case.majority)
@@ -237,7 +237,7 @@ Importing and Exporting Legal Holdings
 
 Now we can link some legal analysis to each
 majority :class:`~authorityspoke.opinions.Opinion` by
-using :meth:`authorityspoke.decisions.Decision.posit`
+using :meth:`justopinion.decisions.Decision.posit`
 or :meth:`authorityspoke.opinions.Opinion.posit`. The parameter we pass to
 this function is a :class:`~authorityspoke.holdings.Holding` or list
 of :class:`~authorityspoke.holdings.Holding`\s posited by the
@@ -306,10 +306,10 @@ the :func:`~authorityspoke.io.loaders.load_holdings_with_anchors` method. The
 result is type of :py:class:`~typing.NamedTuple` called
 :class:`~authorityspoke.opinions.AnchoredHoldings`\. You can pass
 this NamedTuple as the only argument
-to the :meth:`authorityspoke.decisions.Decision.posit` method
+to the :meth:`justopinion.decisions.Decision.posit` method
 to assign the :class:`~authorityspoke.holdings.Holding`\s to the
 majority :class:`~authorityspoke.opinions.Opinion` of a
-:class:`~authorityspoke.decisions.Decision`.
+:class:`~justopinion.decisions.Decision`.
 This will also link the correct text passages from
 the :class:`~authorityspoke.opinions.Opinion` to
 each :class:`~authorityspoke.holdings.Holding`\.
@@ -324,8 +324,8 @@ each :class:`~authorityspoke.holdings.Holding`\.
     >>> lotus.posit(lotus_holdings_with_anchors)
 
 You can pass either one Holding or a list of Holdings to
-:meth:`authorityspoke.decisions.Decision.posit`.
-The :meth:`~authorityspoke.decisions.Decision.posit` method also has a
+:meth:`justopinion.decisions.Decision.posit`.
+The :meth:`~justopinion.decisions.Decision.posit` method also has a
 ``text_links`` parameter that takes a dict indicating what text spans in
 the Opinion should be linked to which Holding.
 
@@ -340,7 +340,7 @@ holding. (In case you aren't familiar with how Python handles JSON, the outer
 square brackets represent the beginning and end of the list. The start and end of each
 :py:class:`dict` in the list is shown by a matched pair of curly brackets.)
 
-Let’s make sure that the :meth:`~authorityspoke.decisions.Decision.posit` method
+Let’s make sure that the :meth:`~justopinion.decisions.Decision.posit` method
 linked all of those holdings to
 our ``oracle`` :class:`~authorityspoke.holdings.Opinion` object.
 

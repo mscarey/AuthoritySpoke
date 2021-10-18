@@ -47,7 +47,7 @@ getting decisions from the Caselaw Access Project. It has methods to
 which means to get them in standard JSON format, and
 also methods to :meth:`~authorityspoke.io.downloads.CAPClient.read`
 decisions, which means to fetch them and then
-convert them into AuthoritySpoke :class:`~authorityspoke.decisions.Decision` objects. Since we know the
+convert them into AuthoritySpoke :class:`~justopinion.decisions.Decision` objects. Since we know the
 citation of the case we want, we'll use the :meth:`~authorityspoke.io.downloads.CAPClient.read_cite` method.
 
     >>> from authorityspoke.io import CAPClient
@@ -591,13 +591,13 @@ Now when we load a file with this YAML, we'll get both Holdings.
 Now that we generated this :class:`~authorityspoke.opinions.AnchoredHoldings` object
 containing the data from the YAML file, we can link the :class:`~authorityspoke.holdings.Holding`\s
 to the :class:`~justopinion.decisions.Decision` with
-a :class:`~authorityspoke.decisions.DecisionReading` object.
+a :class:`~authorityspoke.decisions.Decision` object.
 While a :class:`~justopinion.decisions.Decision` is a record of what a court actually published,
-a :class:`~authorityspoke.decisions.DecisionReading` represents the user's "reading" of the Decision.
+a :class:`~authorityspoke.decisions.Decision` represents the user's "reading" of the Decision.
 The DecisionReading indicates what Holdings are supported by the Decision,
 as well as what text passages support each Holding.
 
-We'll use the :meth:`~authorityspoke.decisions.DecisionReading.posit` method to
+We'll use the :meth:`~authorityspoke.decisions.Decision.posit` method to
 link the Holdings to the Decision. Then we can verify that those two Holdings
 are now considered the two holdings of the Decision.
 

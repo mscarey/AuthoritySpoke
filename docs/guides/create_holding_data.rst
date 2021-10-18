@@ -19,7 +19,7 @@ mockups that supply only the testing data for these examples.
 
 Next, we can download the judicial decisions we’re going to compare
 and convert the JSON responses from the API
-into :class:`authorityspoke.decisions.DecisionReading` objects.
+into :class:`authorityspoke.decisions.Decision` objects.
 
     >>> import os
     >>> from dotenv import load_dotenv
@@ -123,6 +123,7 @@ the Holdings to the :class:`~authorityspoke.opinions.OpinionReading` using
 the :meth:`~authorityspoke.opinions.OpinionReading.posit` method. As we look at
 the parts of the JSON file, the code cells will show how fields from the
 JSON affect the structure of the :class:`~authorityspoke.holdings.Holding`.
+    
     >>> oracle.posit(oracle_holdings)
     >>> lotus.posit(lotus_holdings)
     >>> print(oracle.holdings[0])
@@ -252,5 +253,5 @@ shows how to generate the schema as a Python dict and then view just the
     >>> schema["properties"]
     {'rule': {'$ref': '#/definitions/Rule'}, 'rule_valid': {'title': 'Rule Valid', 'default': True, 'type': 'boolean'}, 'decided': {'title': 'Decided', 'default': True, 'type': 'boolean'}, 'exclusive': {'title': 'Exclusive', 'default': False, 'type': 'boolean'}, 'generic': {'title': 'Generic', 'default': False, 'type': 'boolean'}, 'absent': {'title': 'Absent', 'default': False, 'type': 'boolean'}}
 
-The schema can also be exported as JSON using 
+The schema can also be exported as JSON using
 the :meth:`authorityspoke.holdings.Holding.schema_json` method.
