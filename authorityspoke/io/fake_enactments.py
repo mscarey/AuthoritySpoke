@@ -6,8 +6,9 @@ import datetime
 import json
 from typing import Dict, Optional, Union
 
-from legislice.download import Client, normalize_path, LegislicePathError, RawEnactment
+from legislice.download import Client, normalize_path, LegislicePathError
 from legislice.enactments import CrossReference, Enactment
+from legislice.types import RawEnactment
 
 from authorityspoke.io import filepaths
 

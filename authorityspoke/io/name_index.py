@@ -7,7 +7,7 @@ from copy import deepcopy
 from re import findall
 from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
-from legislice.enactments import RawEnactment
+from legislice.types import RawEnactment
 from nettlesome.predicates import StatementTemplate
 from authorityspoke.facts import Exhibit, RawPredicate, RawFactor
 from authorityspoke.holdings import RawHolding

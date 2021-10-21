@@ -48,7 +48,7 @@ class TestContextRegisters:
             context=[[Entity(name="Alice")], [Entity(name="Craig")]],
             comparison=means,
         )
-        with pytest.raises(TypeError):
+        with pytest.raises(AttributeError):
             next(update)
 
     def test_limited_possible_contexts_identical_factor(self, watt_factor, make_entity):

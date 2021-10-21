@@ -1,8 +1,8 @@
 anchorpoint~=0.7.0
 eyecite~=2.2.0
 justopinion~=0.2.5
-git+git://github.com/mscarey/legislice.git@0ab9bf7a3bede123510461bc7af36f275ce3ba62#egg=legislice
-git+git://github.com/mscarey/nettlesome.git@f6daa6cc81282fc9ce380d66ade3c6f05aff1bda#egg=nettlesome
+legislice~=0.7.0
+nettlesome~=0.6.0
 pint>=0.15
 python-dotenv
 python-ranges~=0.2.1

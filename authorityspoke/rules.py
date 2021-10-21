@@ -14,8 +14,9 @@ from typing import List, Optional, Sequence, Tuple, Union
 from pydantic import BaseModel, ValidationError
 from pydantic.class_validators import validator
 
-from legislice.enactments import Enactment, EnactmentPassage, RawEnactment
+from legislice.enactments import Enactment, EnactmentPassage
 from legislice.groups import EnactmentGroup
+from legislice.types import RawEnactment
 
 from nettlesome.terms import (
     Comparable,

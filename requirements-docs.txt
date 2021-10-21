@@ -1,6 +1,6 @@
 justopinion~=0.2.4
-legislice~=0.5.2
-nettlesome~=0.5.1
+legislice~=0.7.0
+nettlesome~=0.6.0
 pint>=0.15
 python-slugify
 requests

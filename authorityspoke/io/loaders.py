@@ -11,8 +11,7 @@ from typing import Any, Dict, List, Iterator, Optional, Tuple, Union
 import yaml
 
 from legislice.download import Client
-from legislice.enactments import RawEnactment
-
+from legislice.types import RawEnactment
 
 from authorityspoke.decisions import Decision, DecisionReading, RawDecision
 from authorityspoke.facts import RawFactor
