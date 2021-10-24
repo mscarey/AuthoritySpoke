@@ -14,14 +14,14 @@ from typing import Dict, Iterable, Iterator, List
 from typing import Optional, Sequence, Tuple, Union
 
 from anchorpoint.textselectors import TextQuoteSelector, TextPositionSelector
-from justopinion.decisions import Decision, CaseBody, CaseData, CAPCitation
+from justopinion.decisions import Decision, CaseBody, CaseData, Opinion
 
 from nettlesome.terms import Comparable, ContextRegister, Explanation
 from nettlesome.factors import Factor
 from pydantic import BaseModel
 
 from authorityspoke.holdings import Holding, HoldingGroup
-from authorityspoke.opinions import Opinion, OpinionReading, TextLinkDict
+from authorityspoke.opinions import OpinionReading, TextLinkDict
 from authorityspoke.rules import Rule
 
 

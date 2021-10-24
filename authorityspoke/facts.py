@@ -406,7 +406,7 @@ def build_fact(
 
     case_factors = case_factors or ()
     if isinstance(case_factors, BaseModel):
-        wrapped_factors = (case_factors,)
+        wrapped_factors = [case_factors]
     else:
         wrapped_factors = list(case_factors)
 

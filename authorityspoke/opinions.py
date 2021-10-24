@@ -3,8 +3,8 @@ r""":class:`Court` documents that decide litigation and posit :class:`.Rule`\s."
 from __future__ import annotations
 
 from itertools import zip_longest
-from typing import Any, Dict, Iterable, Iterator, List
-from typing import Optional, Sequence, Tuple, Union
+from typing import Any, Dict, Iterator, List
+from typing import Optional, Sequence, Union
 
 import logging
 
@@ -13,7 +13,7 @@ from anchorpoint.textselectors import (
     TextPositionSet,
     TextPositionSelector,
 )
-from justopinion.decisions import Opinion
+from justopinion import Opinion
 from legislice.enactments import EnactmentPassage
 from nettlesome.terms import Comparable, ContextRegister, Explanation, Term
 from nettlesome.factors import Factor
@@ -386,10 +386,12 @@ class OpinionReading(Comparable, BaseModel):
 
     def posit_holdings(
         self,
-        holdings: Union[AnchoredHoldings, Iterable[Union[Holding, Rule]]],
-        holding_anchors: Optional[List[List[TextQuoteSelector]]] = None,
-        named_anchors: Optional[TextLinkDict] = None,
-        enactment_anchors: Optional[TextLinkDict] = None,
+        holdings: Union[
+            AnchoredHoldings, List[Union[HoldingWithAnchors, Holding, Rule]]
+        ],
+        holding_anchors: Optional[List[HoldingWithAnchors]] = None,
+        named_anchors: Optional[List[TermWithAnchors]] = None,
+        enactment_anchors: Optional[List[EnactmentWithAnchors]] = None,
         context: Optional[Sequence[Factor]] = None,
     ):
         r"""
@@ -430,13 +432,15 @@ class OpinionReading(Comparable, BaseModel):
     def posit(
         self,
         holdings: Union[
-            List[HoldingWithAnchors], Holding, Iterable[Union[Holding, Rule]]
+            AnchoredHoldings,
+            Holding,
+            Rule,
+            HoldingWithAnchors,
+            List[Union[HoldingWithAnchors, Holding, Rule]],
         ],
-        holding_anchors: Optional[
-            List[Union[TextQuoteSelector, List[TextQuoteSelector]]]
-        ] = None,
-        named_anchors: Optional[TextLinkDict] = None,
-        enactment_anchors: Optional[TextLinkDict] = None,
+        holding_anchors: Optional[List[HoldingWithAnchors]] = None,
+        named_anchors: Optional[List[TermWithAnchors]] = None,
+        enactment_anchors: Optional[List[EnactmentWithAnchors]] = None,
         context: Optional[Sequence[Factor]] = None,
     ) -> None:
         r"""

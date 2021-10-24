@@ -14,7 +14,7 @@ from copy import deepcopy
 from itertools import chain
 import operator
 from typing import Any, Callable, Dict, Iterable, Iterator, List
-from typing import Optional, Sequence, Tuple, TypeVar, Union
+from typing import Optional, Sequence, Union
 
 from legislice.enactments import Enactment
 
