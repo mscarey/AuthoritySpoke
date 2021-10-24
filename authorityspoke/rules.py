@@ -671,14 +671,14 @@ class Rule(Comparable, BaseModel):
             + indented(str(self.procedure))
         )
         if self.enactments:
-            text += f"\n  GIVEN the ENACTMENT"
+            text += "\n  GIVEN the ENACTMENT"
             if len(self.enactments) > 1:
                 text += "S"
             text += ":"
             for enactment in self.enactments:
                 text += "\n" + indented(str(enactment), tabs=2)
         if self.enactments_despite:
-            text += f"\n  DESPITE the ENACTMENT"
+            text += "\n  DESPITE the ENACTMENT"
             if len(self.enactments_despite) > 1:
                 text += "S"
             text += ":"

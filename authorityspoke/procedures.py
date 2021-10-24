@@ -9,7 +9,6 @@ from __future__ import annotations
 from copy import deepcopy
 
 from itertools import chain
-import operator
 
 from typing import Any, ClassVar, Dict, Iterable, Iterator
 from typing import List, Optional, Sequence, Tuple, Union

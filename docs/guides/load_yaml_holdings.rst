@@ -591,9 +591,9 @@ Now when we load a file with this YAML, we'll get both Holdings.
 Now that we generated this :class:`~authorityspoke.opinions.AnchoredHoldings` object
 containing the data from the YAML file, we can link the :class:`~authorityspoke.holdings.Holding`\s
 to the :class:`~justopinion.decisions.Decision` with
-a :class:`~authorityspoke.decisions.Decision` object.
+a :class:`~authorityspoke.decisions.DecisionReading` object.
 While a :class:`~justopinion.decisions.Decision` is a record of what a court actually published,
-a :class:`~authorityspoke.decisions.Decision` represents the user's "reading" of the Decision.
+a :class:`~authorityspoke.decisions.DecisionReading` represents the user's "reading" of the Decision.
 The DecisionReading indicates what Holdings are supported by the Decision,
 as well as what text passages support each Holding.
 

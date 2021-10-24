@@ -1,4 +1,4 @@
-"""
+r"""
 Interpretations (or "readings") of judicial Decisions.
 
 Each :class:`.justopinion.decisions.Decision` may include
@@ -195,11 +195,13 @@ class DecisionReading(BaseModel, Comparable):
     ) -> Iterator[Explanation]:
         """Generate explanation of how self's Holdings can imply other."""
         if isinstance(other, DecisionReading):
-            if self.get_majority() and other.get_majority():
-                yield from self.majority.explanations_implication(other.majority)
+            self_majority = self.get_majority()
+            if self_majority and other.get_majority():
+                yield from self_majority.explanations_implication(other.majority)
         elif isinstance(other, (Rule, Holding, OpinionReading)):
-            if self.get_majority():
-                yield from self.majority.explanations_implication(other)
+            self_majority = self.get_majority()
+            if self_majority:
+                yield from self_majority.explanations_implication(other)
         else:
             raise TypeError(
                 f"'Implication' test not implemented for types "

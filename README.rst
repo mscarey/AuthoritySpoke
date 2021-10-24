@@ -19,6 +19,10 @@ AuthoritySpoke is the first open source legal authority automation tool.
     :target: https://authorityspoke.readthedocs.io/en/latest/?badge=latest
     :alt: Documentation Status
 
+.. image:: https://img.shields.io/pypi/pyversions/authorityspoke
+    :target: https://pypi.org/project/authorityspoke/
+    :alt: Supported Python Versions
+
 
 Installing AuthoritySpoke
 -------------------------
