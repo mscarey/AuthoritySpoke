@@ -21,7 +21,13 @@ from nettlesome.factors import Factor
 from pydantic import BaseModel
 
 from authorityspoke.holdings import Holding, HoldingGroup
-from authorityspoke.opinions import OpinionReading, TextLinkDict
+from authorityspoke.opinions import (
+    OpinionReading,
+    TermWithAnchors,
+    AnchoredHoldings,
+    HoldingWithAnchors,
+    EnactmentWithAnchors,
+)
 from authorityspoke.rules import Rule
 
 
@@ -210,12 +216,16 @@ class DecisionReading(BaseModel, Comparable):
 
     def posit(
         self,
-        holdings: Union[Holding, Iterable[Union[Holding, Rule]]],
-        holding_anchors: Optional[
-            List[Union[TextQuoteSelector, List[TextQuoteSelector]]]
-        ] = None,
-        named_anchors: Optional[TextLinkDict] = None,
-        enactment_anchors: Optional[TextLinkDict] = None,
+        holdings: Union[
+            AnchoredHoldings,
+            Holding,
+            Rule,
+            HoldingWithAnchors,
+            List[Union[HoldingWithAnchors, Holding, Rule]],
+        ],
+        holding_anchors: Optional[List[HoldingWithAnchors]] = None,
+        named_anchors: Optional[List[TermWithAnchors]] = None,
+        enactment_anchors: Optional[List[EnactmentWithAnchors]] = None,
         context: Optional[Sequence[Factor]] = None,
     ) -> None:
         """Add one or more Holdings to the majority Opinion of this Decision."""

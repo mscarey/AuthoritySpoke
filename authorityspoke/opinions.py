@@ -28,9 +28,6 @@ from authorityspoke.rules import Rule
 logger = logging.getLogger(__name__)
 
 
-TextLinkDict = Dict[str, List[TextQuoteSelector]]
-
-
 class EnactmentWithAnchors(BaseModel):
     """A term with a set of anchors."""
 

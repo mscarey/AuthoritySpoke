@@ -10,7 +10,7 @@ from copy import deepcopy
 
 from itertools import chain
 
-from typing import Any, ClassVar, Dict, Iterable, Iterator
+from typing import ClassVar, Dict, Iterable, Iterator
 from typing import List, Optional, Sequence, Tuple, Union
 
 from pydantic import BaseModel, validator
