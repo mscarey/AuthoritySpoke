@@ -60,7 +60,11 @@ class TestFactLoad:
         assert mentioned["Alice's house"]["type"] == "Entity"
 
     def test_import_predicate_with_quantity(self):
-        story = readers.read_fact(self.story_data)
+        record = expand_shorthand(self.story_data)
+        record, mentioned = index_names(record)
+        expanded = readers.expand_factor(record, mentioned)
+        story = Fact(**expanded)
+
         assert len(story.predicate) == 1
         assert story.predicate.content.startswith("The number of castles")
         assert story.predicate.sign == ">"
@@ -74,8 +78,11 @@ class TestFactLoad:
                 {"type": "Entity", "name": "Lee"},
             ],
         }
-        fact_float_more = expand_shorthand(fact_float_data)
-        fact_float_more = readers.read_fact(fact_float_more)
+        record = expand_shorthand(fact_float_data)
+        record, mentioned = index_names(record)
+        expanded = readers.expand_factor(record, mentioned)
+
+        fact_float_more = Fact(**expanded)
         fact_float_less = watt_factor["f8_int"]
         assert fact_float_more >= fact_float_less
 

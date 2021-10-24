@@ -35,22 +35,6 @@ FACTOR_SUBCLASSES = {
 }
 
 
-def read_fact(record: RawFactor) -> Fact:
-    r"""
-    Construct a :class:`Fact` after loading a dict from YAML.
-
-    :param record:
-        parameter values to pass to :class:`authorityspoke.schemas_yaml.FactSchema`\.
-
-    :returns:
-        a :class:`Fact`, with optional mentioned factors
-    """
-    record = expand_shorthand(record)
-    record, mentioned = index_names(record)
-    expanded = expand_factor(record, mentioned)
-    return Fact(**expanded)
-
-
 class HoldingsIndexed(NamedTuple):
     """Lists :class:`.Holding` objects with corresponding text selectors."""
 
@@ -244,7 +228,7 @@ def expand_holdings(
 def extract_anchors_from_holding_record(
     record: List[RawHolding], client: Optional[Client] = None
 ) -> Tuple[
-    List[RawHolding],
+    List[Holding],
     List[EnactmentWithAnchors],
     List[TermWithAnchors],
     List[Dict[str, str]],

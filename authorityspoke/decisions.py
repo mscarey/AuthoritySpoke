@@ -10,11 +10,11 @@ to multiple :class:`.authorityspoke.opinion.OpinionReading`\s.
 from __future__ import annotations
 
 import operator
-from typing import Dict, Iterable, Iterator, List
+from typing import Dict, Iterator, List
 from typing import Optional, Sequence, Tuple, Union
 
 from anchorpoint.textselectors import TextQuoteSelector, TextPositionSelector
-from justopinion.decisions import Decision, CaseBody, CaseData, Opinion
+from justopinion.decisions import Decision, CaseBody, CaseData, Opinion, CAPCitation
 
 from nettlesome.terms import Comparable, ContextRegister, Explanation
 from nettlesome.factors import Factor

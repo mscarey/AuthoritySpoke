@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 
 from legislice.download import Client
 
+from authorityspoke import Fact
 from authorityspoke.io import loaders, readers
 from authorityspoke.io import name_index, text_expansion
 
@@ -260,7 +261,11 @@ class TestRetrieveMentioned:
                 },
             ],
         }
-        relevant_fact = readers.read_fact(relevant_dict)
+        record = readers.expand_shorthand(relevant_dict)
+        record, mentioned = readers.index_names(record)
+        expanded = readers.expand_factor(record, mentioned)
+
+        relevant_fact = Fact(**expanded)
         assert relevant_fact.terms[1].terms[1].name == "Bob"
 
     overlapping_names_mentioned = {

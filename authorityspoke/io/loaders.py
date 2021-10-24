@@ -6,21 +6,18 @@ Will usually hand off data to the io.readers module to create authorityspoke obj
 import json
 import pathlib
 
-from typing import Any, Dict, List, Iterator, Optional, Tuple, Union
+from typing import List, Optional
 
 import yaml
 
 from legislice.download import Client
-from legislice.types import RawEnactment
 
 from authorityspoke.decisions import Decision, DecisionReading, RawDecision
 from authorityspoke.facts import RawFactor
 from authorityspoke.holdings import Holding, RawHolding
 from authorityspoke.opinions import AnchoredHoldings
-from authorityspoke.rules import Rule
 
 from authorityspoke.io import filepaths, readers
-from authorityspoke.io.name_index import Mentioned
 
 
 def load_holdings(

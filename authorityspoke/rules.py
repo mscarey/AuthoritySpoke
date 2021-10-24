@@ -8,8 +8,8 @@ may describe procedural moves available in litigation.
 from __future__ import annotations
 from copy import deepcopy
 
-from typing import Any, ClassVar, Dict, Iterable, Iterator, Type
-from typing import List, Optional, Sequence, Tuple, Union
+from typing import Any, ClassVar, Dict, Iterator
+from typing import Optional, Sequence, Tuple, Union
 
 from pydantic import BaseModel, ValidationError
 from pydantic.class_validators import validator
