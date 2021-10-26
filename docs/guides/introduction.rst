@@ -59,14 +59,62 @@ If you’ve installed AuthoritySpoke and you need access to the example
 data files, you'll need to download them from the `GitHub
 repository <https://github.com/mscarey/AuthoritySpoke>`__.
 
-Importing the Package
-------------------------
+Installing AuthoritySpoke
+-------------------------
+
+AuthoritySpoke is a `Python package <https://pypi.org/project/AuthoritySpoke/>`__ that
+should be installed
+with `pip <https://www.w3schools.com/python/python_pip.asp>`__.
+
+Because AuthoritySpoke installs many other Python packages
+as dependencies, you're strongly encouraged to install it
+in a virtual environment using a tool
+like `venv <https://docs.python.org/3.9/library/venv.html>`__.
+For example, to create a virtual environment called "myvenv", you
+could use your computer's terminal command line to navigate to the folder that
+you want to use as your project folder, and then type:
+
+.. code-block:: console
+
+    $ python3 -m venv myvenv
+
+Remember to activate the virtual environment you have created.
+
+.. code-block:: console
+
+    $ source myvenv/bin/activate
+
+And then install the package.
+
+.. code-block:: console
+
+    $ pip install AuthoritySpoke
+
+.. warning::
+    AuthoritySpoke may fail to install on Python version 3.10, especially on
+    MacOS. For now, the only work-around is to use Python version 3.9 or 3.8
+    instead. A `GitHub issue thread <https://github.com/mscarey/AuthoritySpoke/issues/111>`__
+    is available to track progress on diagnosing this problem.
+
+When you're done using your virtual environment, you can deactivate it with:
+
+.. code-block:: console
+
+    $ deactivate
+
+Deactivating the virtual environment does not delete it, so you can reactivate it
+without needing to create it again.
+
+Visit `the Python
+Package Index <https://packaging.python.org/tutorials/installing-packages/>`__ for more
+details on installing Python packages like AuthoritySpoke.
+
+Importing AuthoritySpoke in Python
+----------------------------------
 
 If you want to use AuthoritySpoke in your own Python environment, be
 sure you have installed AuthoritySpoke using a command like
-``pip install AuthoritySpoke`` on the command line. Visit `the Python
-Package Index <https://pypi.org/project/AuthoritySpoke/>`__ for more
-details.
+``pip install AuthoritySpoke`` on the command line.
 
 With a Python environment activated, let’s import AuthoritySpoke by
 running the cell below.

@@ -1,5 +1,5 @@
 anchorpoint~=0.7.0
-eyecite~=2.2.0
+eyecite~=2.3.0
 justopinion~=0.2.5
 legislice~=0.7.0
 nettlesome~=0.6.1
