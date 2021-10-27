@@ -5,8 +5,8 @@ with open("README.rst", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="AuthoritySpoke",
-    version="0.8.1",
-    author="Matt Carey",
+    version="0.9.0",
+    author="Matthew Carey",
     author_email="matt@authorityspoke.com",
     description="legal authority automation",
     long_description=long_description,
@@ -17,7 +17,7 @@ setuptools.setup(
         "Documentation": "https://authorityspoke.readthedocs.io/en/latest/",
     },
     classifiers=[
-        "Development Status :: 3 - Alpha",
+        "Development Status :: 4 - Beta",
         "Intended Audience :: Legal Industry",
         "License :: Free To Use But Restricted",
         "Programming Language :: Python :: 3.8",

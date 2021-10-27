@@ -1,10 +1,30 @@
 Changelog
 =========
-dev
+0.9.0 (2021-10-27)
 ------------------
-* remove marshmallow and marshmallow-oneofschema
-* remove apispec and apispec-oneofschema
-* replace marshmallow and apispec with pydantic
+* replace marshmallow serializers with pydantic
+* add OpinionReading methods for getting anchored terms/passages
+* add OpinionReading.anchored factors property
+* add AnchoredHoldings.add_enactment method
+* add AnchoredHoldings.insert_term method
+* rename AnchoredHoldings.insert_term to add_term
+* fix bug in "ignore" parameter to collect_mentioned data loading function
+* fix bug: wrong function was used to expand text in enactment test data
+* import CaseBody and CaseData models from Justopinion
+* bump legislice dependency to 0.7.0
+* bump anchorpoint dependency to 0.7.0
+* remove marshmallow and marshmallow-oneofschema dependencies
+* remove apispec and apispec-oneofschema dependencies
+* remove enactment_index module
+* remove downloads module
+* remove schemas_yaml module
+* remove EnactmentIndex class
+* remove OpinionReading.implies_other_holdings method
+* remove load_anchored_holdings function
+* remove load_rules_with_index function
+* remove collect_enactment_anchors function
+* remove read_fact function
+* remove TextLinkDict type annotation
 
 0.8.1 (2021-09-18)
 ------------------

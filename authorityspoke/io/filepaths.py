@@ -41,8 +41,6 @@ def get_directory_path(stem: str) -> pathlib.Path:
     """
     Find a data directory for importing files.
 
-    Only in this module temporarily to prevent a circular import.
-
     :param stem:
         name of the folder where the desired example data files
         can be found, e.g. "holdings" or "opinions".
