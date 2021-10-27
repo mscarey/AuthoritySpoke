@@ -82,8 +82,10 @@ AuthoritySpoke can be used to create structured annotations for these cases by b
 With a `DecisionReading` object, a judicial `Decision` can be linked together with user-created annotations for the decision's `Holdings`.
 
     >>> from authorityspoke import DecisionReading
-    >>> oracle = DecisionReading(decision=oracle_case, holdings=oracle_holdings)
-    >>> lotus = DecisionReading(decision=lotus_case, holdings=lotus_holdings)
+    >>> oracle = DecisionReading(decision=oracle_case)
+    >>> lotus = DecisionReading(decision=lotus_case)
+    >>> oracle.posit(holdings=oracle_holdings)
+    >>> lotus.posit(holdings=lotus_holdings)
 
 Each `DecisionReading` has a `.contradicts` method that can return a boolean indicating whether its holdings conflict with the holdings of another `DecisionReading`.
 

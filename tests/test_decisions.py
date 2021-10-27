@@ -227,6 +227,7 @@ class TestContradiction:
         oracle = make_decision_with_holding["oracle"]
         lotus = make_decision_with_holding["lotus"]
         assert oracle.contradicts(lotus)
+        assert lotus.contradicts(oracle)
 
     def test_no_contradiction_explanations(self, make_decision_with_holding):
         oracle = make_decision_with_holding["oracle"]
