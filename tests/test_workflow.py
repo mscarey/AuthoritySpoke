@@ -24,20 +24,25 @@ class TestAddHoldings:
     def test_create_and_add_holdings(self):
         offense_statute = CLIENT.read("/us/usc/t18/s1960/a")
         no_license = Fact(
-            "$business was licensed as a money transmitting business",
-            truth=False,
-            terms=Entity("Helix"),
+            predicate=Predicate(
+                content="$business was licensed as a money transmitting business",
+                truth=False,
+            ),
+            terms=Entity(name="Helix"),
         )
         operated = Fact(
-            "$person operated $business as a business",
-            terms=[Entity("Harmon"), Entity("Helix")],
+            predicate=Predicate(content="$person operated $business as a business"),
+            terms=[Entity(name="Harmon"), Entity(name="Helix")],
         )
         transmitting = Fact(
-            "$business was a money transmitting business", terms=Entity("Helix")
+            predicate=Predicate(content="$business was a money transmitting business"),
+            terms=Entity(name="Helix"),
         )
         offense = Fact(
-            "$person committed the offense of conducting an unlicensed money transmitting business",
-            terms=Entity("Harmon"),
+            predicate=Predicate(
+                content="$person committed the offense of conducting an unlicensed money transmitting business"
+            ),
+            terms=Entity(name="Harmon"),
         )
         offense_holding = Holding.from_factors(
             inputs=[operated, transmitting, no_license],
@@ -47,8 +52,10 @@ class TestAddHoldings:
         )
         definition_statute = CLIENT.read("/us/usc/t18/s1960/b/2")
         bitcoin = Fact(
-            "$business transferred bitcoin on behalf of the public",
-            terms=Entity("Helix"),
+            predicate=Predicate(
+                content="$business transferred bitcoin on behalf of the public"
+            ),
+            terms=Entity(name="Helix"),
         )
         bitcoin_holding = Holding.from_factors(
             inputs=bitcoin,

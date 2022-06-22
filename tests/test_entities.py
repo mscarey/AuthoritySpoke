@@ -1,11 +1,12 @@
 import pytest
 
-from marshmallow.exceptions import ValidationError
+from pydantic import ValidationError
 
 from nettlesome.terms import ContextRegister
 from nettlesome.entities import Entity
 from nettlesome.statements import Statement
 
+from authorityspoke.facts import Fact
 from authorityspoke.io import readers
 
 
@@ -16,7 +17,7 @@ class TestMakeEntities:
         in a "mentioned" list, but no "mentioned" parameter is given.
         """
         with pytest.raises(ValidationError):
-            print(readers.read_factor(record="Bradley"))
+            readers.read_holdings(record=[{"outputs": ["Bradley"]}])
 
     def test_conversion_to_generic(self, make_entity):
         e = make_entity
@@ -39,7 +40,7 @@ class TestMakeEntities:
 
         changes = ContextRegister.from_lists(
             [make_entity["motel"], make_entity["watt"]],
-            [Entity("Death Star"), Entity("Darth Vader")],
+            [Entity(name="Death Star"), Entity(name="Darth Vader")],
         )
         motel = make_entity["motel"]
         assert motel.new_context(changes) == changes.get_factor(make_entity["motel"])
@@ -59,8 +60,8 @@ class TestSameMeaning:
         assert not e["motel"] == e["trees"]
 
     def test_entity_does_not_mean_statement(self):
-        entity = Entity("Bob")
-        statement = Statement("$person loves ice cream", terms=entity)
+        entity = Entity(name="Bob")
+        statement = Fact(predicate="$person loves ice cream", terms=entity)
         assert not entity.means(statement)
         assert not statement.means(entity)
 
@@ -94,22 +95,22 @@ class TestImplication:
         assert any(entity.plural is True for entity in feist.generic_terms())
 
     def test_implies_concrete_with_same_name(self):
-        concrete = Entity("Bob", generic=False)
-        other = Entity("Bob", generic=False)
+        concrete = Entity(name="Bob", generic=False)
+        other = Entity(name="Bob", generic=False)
         assert concrete.implies(other)
         assert concrete >= other
         assert not concrete > other
 
     def test_implication_concrete_with_different_name(self):
-        concrete = Entity("Bob", generic=False)
-        generic = Entity("Barb")
+        concrete = Entity(name="Bob", generic=False)
+        generic = Entity(name="Barb")
         assert concrete.implies(generic)
         assert concrete > generic
         assert concrete >= generic
 
     def test_entity_does_not_imply_statement(self):
-        entity = Entity("Bob")
-        statement = Statement("$person loves ice cream", terms=entity)
+        entity = Entity(name="Bob")
+        statement = Fact(predicate="$person loves ice cream", terms=entity)
         assert not entity.implies(statement)
         assert not statement.implies(entity)
         assert not entity >= statement

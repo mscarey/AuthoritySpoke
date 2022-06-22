@@ -8,11 +8,15 @@ may describe procedural moves available in litigation.
 from __future__ import annotations
 from copy import deepcopy
 
-from typing import Any, ClassVar, Dict, Iterable, Iterator, Type
-from typing import List, Optional, Sequence, Tuple, Union
+from typing import Any, ClassVar, Dict, Iterator
+from typing import Optional, Sequence, Tuple, Union
 
-from legislice.enactments import Enactment
+from pydantic import BaseModel, ValidationError
+from pydantic.class_validators import validator
+
+from legislice.enactments import Enactment, EnactmentPassage
 from legislice.groups import EnactmentGroup
+from legislice.types import RawEnactment
 
 from nettlesome.terms import (
     Comparable,
@@ -23,10 +27,12 @@ from nettlesome.terms import (
 )
 from nettlesome.factors import Factor
 from nettlesome.formatting import indented
-from authorityspoke.procedures import Procedure
+from authorityspoke.procedures import Procedure, RawProcedure
+
+RawRule = Dict[str, Union[RawProcedure, Sequence[RawEnactment], str, bool]]
 
 
-class Rule(Comparable):
+class Rule(Comparable, BaseModel):
     r"""
     A statement of a legal doctrine about a :class:`.Procedure` for litigation.
 
@@ -73,54 +79,58 @@ class Rule(Comparable):
         object.
     """
 
+    procedure: Procedure
+    enactments: EnactmentGroup = EnactmentGroup()
+    enactments_despite: EnactmentGroup = EnactmentGroup()
+    mandatory: bool = False
+    universal: bool = False
+    generic: bool = False
+    absent: bool = False
+    name: Optional[str] = None
     context_factor_names: ClassVar[Tuple[str, ...]] = ("procedure",)
     enactment_attr_names: ClassVar[Tuple[str, ...]] = (
         "enactments",
         "enactments_despite",
     )
 
-    def __init__(
-        self,
-        procedure: Procedure,
-        enactments: Optional[
-            Union[Enactment, EnactmentGroup, Sequence[Enactment]]
-        ] = None,
-        enactments_despite: Optional[
-            Union[Enactment, EnactmentGroup, Sequence[Enactment]]
-        ] = None,
-        mandatory: bool = False,
-        universal: bool = False,
-        generic: bool = False,
-        absent: bool = False,
-        name: Optional[str] = None,
-    ):
-        self.procedure = procedure
-        self.enactments = EnactmentGroup(enactments)
-        self.enactments_despite = EnactmentGroup(enactments_despite)
-        self.mandatory = mandatory
-        self.universal = universal
-        self.generic = generic
-        self.absent = False
-        self.name = name
+    @validator("enactments", "enactments_despite", pre=True)
+    def validate_enactment_groups(
+        cls,
+        v: Union[Dict, EnactmentPassage, Sequence[EnactmentPassage], EnactmentGroup],
+    ) -> EnactmentGroup:
+        """Convert EnactmentPassage to EnactmentGroup."""
+        if isinstance(v, EnactmentPassage):
+            v = {"passages": [v]}
+        elif v and not isinstance(v, EnactmentGroup):
+            if not isinstance(v, dict) or "passages" not in v:
+                try:
+                    v = EnactmentGroup(passages=list(v)) if v else EnactmentGroup()
+                except ValidationError:
+                    v = EnactmentGroup(passages=[v])
+        return v
 
-        for enactment in self.enactments:
+    @validator("enactments", "enactments_despite", pre=False)
+    def select_enactment_text(cls, v: EnactmentGroup) -> EnactmentGroup:
+        """For Enactments with no text selection, select all text."""
+        for enactment in v:
             if not enactment.selected_text():
                 enactment.select_all()
-        for despite in self.enactments_despite:
-            if not despite.selected_text():
-                despite.select_all()
+        return v
 
     @property
     def despite(self):
-        return self.procedure.despite
+        """Get despite Factors as a FactorGroup."""
+        return self.procedure.despite_group
 
     @property
     def inputs(self):
-        return self.procedure.inputs
+        """Get input Factors as a FactorGroup."""
+        return self.procedure.inputs_group
 
     @property
     def outputs(self):
-        return self.procedure.outputs
+        """Get output Factors as a FactorGroup."""
+        return self.procedure.outputs_group
 
     @property
     def recursive_terms(self) -> Dict[str, Term]:
@@ -138,10 +148,11 @@ class Rule(Comparable):
         other: Comparable,
         context: Optional[Union[ContextRegister, Explanation]] = None,
     ) -> Optional[Rule]:
+        """Create new Rule by using the outputs of self as inputs of other."""
         if not isinstance(other, Rule):
             if isinstance(other, Factor):
                 return self.with_factor(other)
-            if isinstance(other, Enactment):
+            if isinstance(other, (Enactment, EnactmentPassage)):
                 return self.with_enactment(other)
             raise TypeError
         if self.universal is False and other.universal is False:
@@ -254,7 +265,7 @@ class Rule(Comparable):
         :returns:
             None
         """
-        if not isinstance(incoming, Enactment):
+        if not isinstance(incoming, (Enactment, EnactmentPassage)):
             raise TypeError
 
         new_enactments = self.enactments + incoming
@@ -270,11 +281,11 @@ class Rule(Comparable):
         :returns:
             None
         """
-        if not isinstance(incoming, Enactment):
+        if not isinstance(incoming, (Enactment, EnactmentPassage)):
             raise TypeError
 
         new_enactments = self.enactments_despite + incoming
-        self.set_enactments(new_enactments)
+        self.set_enactments_despite(new_enactments)
 
     def with_enactment(self, incoming: Enactment) -> Rule:
         r"""
@@ -286,7 +297,7 @@ class Rule(Comparable):
         :returns:
             a new version of ``self`` with the specified change
         """
-        if not isinstance(incoming, Enactment):
+        if not isinstance(incoming, (Enactment, EnactmentPassage)):
             raise TypeError
 
         new_enactments = self.enactments + incoming
@@ -304,7 +315,7 @@ class Rule(Comparable):
         :returns:
             a new version of ``self`` with the specified change
         """
-        if not isinstance(incoming, Enactment):
+        if not isinstance(incoming, (Enactment, EnactmentPassage)):
             raise TypeError
 
         new_enactments = self.enactments_despite + incoming
@@ -436,6 +447,7 @@ class Rule(Comparable):
     def explanations_implication(
         self, other, context: Optional[ContextRegister] = None
     ) -> Iterator[ContextRegister]:
+        """Find context matches that would result in self implying other."""
         if (
             self.needs_subset_of_enactments(other)
             and self.mandatory >= other.mandatory
@@ -586,6 +598,7 @@ class Rule(Comparable):
     def union(
         self, other: Optional[Rule], context: Optional[ContextRegister] = None
     ) -> Optional[Rule]:
+        """Get new Rule with all the Factors of self and other."""
         if other is None:
             return self
         context = context or ContextRegister()
@@ -619,23 +632,36 @@ class Rule(Comparable):
         return self.union(other)
 
     def set_inputs(self, factors: Sequence[Factor]) -> None:
+        """Set factors required to invoke this Procedure."""
         self.procedure.set_inputs(factors)
 
     def set_despite(self, factors: Sequence[Factor]) -> None:
+        """Set factors that do not preclude application of this Rule."""
         self.procedure.set_despite(factors)
 
     def set_outputs(self, factors: Sequence[Factor]) -> None:
+        """Set the outputs of this Rule."""
         self.procedure.set_outputs(factors)
 
     def set_enactments(
         self, enactments: Union[Enactment, Sequence[Enactment], EnactmentGroup]
     ) -> None:
-        self.enactments = EnactmentGroup(enactments)
+        """
+        Set the list of Enactments cited as the basis for this Rule.
+
+        Any prior enactments are replaced.
+        """
+        self.enactments = EnactmentGroup(passages=enactments)
 
     def set_enactments_despite(
         self, enactments: Union[Enactment, Sequence[Enactment], EnactmentGroup]
     ) -> None:
-        self.enactments_despite = EnactmentGroup(enactments)
+        """
+        Set the list of Enactments known not to preclude application of this Rule.
+
+        Any prior despite enactments are replaced.
+        """
+        self.enactments_despite = EnactmentGroup(passages=enactments)
 
     def __str__(self):
         mandatory = "MUST" if self.mandatory else "MAY"
@@ -645,14 +671,14 @@ class Rule(Comparable):
             + indented(str(self.procedure))
         )
         if self.enactments:
-            text += f"\n  GIVEN the ENACTMENT"
+            text += "\n  GIVEN the ENACTMENT"
             if len(self.enactments) > 1:
                 text += "S"
             text += ":"
             for enactment in self.enactments:
                 text += "\n" + indented(str(enactment), tabs=2)
         if self.enactments_despite:
-            text += f"\n  DESPITE the ENACTMENT"
+            text += "\n  DESPITE the ENACTMENT"
             if len(self.enactments_despite) > 1:
                 text += "S"
             text += ":"

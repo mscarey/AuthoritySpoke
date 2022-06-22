@@ -1,128 +1,165 @@
+r"""
+Interpretations (or "readings") of judicial Decisions.
+
+Each :class:`.justopinion.decisions.Decision` may include
+multiple :class:`.justopinion.decisions.Opinion`\s. A
+:class:`.authorityspoke.decision.DecisionReading` may link
+to multiple :class:`.authorityspoke.opinion.OpinionReading`\s.
+"""
+
 from __future__ import annotations
 
-from dataclasses import dataclass, field
-import datetime
 import operator
-from typing import Iterable, Iterator, List
-from typing import Optional, Sequence, Union
+from typing import Dict, Iterator, List
+from typing import Optional, Sequence, Tuple, Union
 
-from anchorpoint.textselectors import TextQuoteSelector
+from anchorpoint.textselectors import TextQuoteSelector, TextPositionSelector
+from justopinion.decisions import Decision, CaseBody, CaseData, Opinion, CAPCitation
 
 from nettlesome.terms import Comparable, ContextRegister, Explanation
 from nettlesome.factors import Factor
+from pydantic import BaseModel
+
 from authorityspoke.holdings import Holding, HoldingGroup
-from authorityspoke.opinions import Opinion, TextLinkDict
+from authorityspoke.opinions import (
+    OpinionReading,
+    TermWithAnchors,
+    AnchoredHoldings,
+    HoldingWithAnchors,
+    EnactmentWithAnchors,
+)
 from authorityspoke.rules import Rule
 
 
-@dataclass
-class CAPCitation:
-    cite: str
-    reporter: Optional[str] = None
-    category: Optional[str] = None
-    case_ids: List[int] = field(default_factory=list)
+RawCAPCitation = Dict[str, str]
+RawOpinion = Dict[str, str]
+RawDecision = Dict[str, Union[str, int, Sequence[RawOpinion], Sequence[RawCAPCitation]]]
 
 
-class Decision(Comparable):
-    r"""
-    A court decision to resolve a step in litigation.
+class DecisionReading(BaseModel, Comparable):
+    """An interpretation of what Holdings are supported by the Opinions of a Decision."""
 
-    Uses the model of a judicial decision from
-    the `Caselaw Access Project API <https://api.case.law/v1/cases/>`_.
-    One of these records may contain multiple :class:`.Opinion`\s.
-
-    Typically one record will contain all
-    the :class:`~authorityspoke.opinions.Opinion`\s
-    from one appeal, but not necessarily from the whole lawsuit. One
-    lawsuit may contain multiple appeals or other petitions, and
-    if more then one of those generates published Opinions,
-    the CAP API will divide those Opinions into a separate
-    record for each appeal.
-
-    The outcome of a decision may be determined by one majority
-    :class:`~authorityspoke.opinions.Opinion` or by the combined
-    effect of multiple Opinions.
-    The lead opinion is commonly, but not always, the only
-    Opinion that creates binding legal authority.
-    Usually every :class:`~authorityspoke.rules.Rule` posited by the lead Opinion is
-    binding, but some may not be, often because parts of the
-    Opinion fail to command a majority of the panel
-    of judges.
-
-
-    :param name:
-        full name of the opinion, e.g. "ORACLE AMERICA, INC.,
-        Plaintiff-Appellant, v. GOOGLE INC., Defendant-Cross-Appellant"
-    :param name_abbreviation:
-        shorter name of the opinion, e.g. "Oracle America, Inc. v. Google Inc."
-    :param citations:
-        citations to the opinion, usually in the format
-        ``[Volume Number] [Reporter Name Abbreviation] [Page Number]``
-    :param first_page:
-        the page where the opinion begins in its official reporter
-    :param last_page:
-        the page where the opinion ends in its official reporter
-    :param decision_date:
-        date when the opinion was first published by the court
-        (not the publication date of the reporter volume)
-    :param court:
-        name of the court that published the opinion
-    :param _id:
-        unique ID from CAP API
-    """
-
-    def __init__(
-        self,
-        date: datetime.date,
-        name: Optional[str] = None,
-        name_abbreviation: Optional[str] = None,
-        citations: Optional[Sequence[CAPCitation]] = None,
-        first_page: Optional[int] = None,
-        last_page: Optional[int] = None,
-        court: Optional[str] = None,
-        opinions: Optional[Union[Opinion, Sequence[Opinion]]] = None,
-        jurisdiction: Optional[str] = None,
-        cites_to: Optional[Sequence[CAPCitation]] = None,
-        id: Optional[int] = None,
-    ) -> None:
-        self.date = date
-        self.name = name
-        self.name_abbreviation = name_abbreviation
-        self.citations = citations
-        self.first_page = first_page
-        self.last_page = last_page
-        self.court = court
-        if isinstance(opinions, Opinion):
-            self.opinions = [opinions]
-        elif not opinions:
-            self.opinions = []
-        else:
-            self.opinions = list(opinions)
-        self.jurisdiction = jurisdiction
-        self.cites_to = cites_to
-        self._id = id
+    decision: Decision
+    opinion_readings: List[OpinionReading] = []
 
     def __str__(self):
-        citation = self.citations[0].cite if self.citations else ""
-        name = self.name_abbreviation or self.name
-        return f"{name}, {citation} ({self.date})"
+        citation = self.decision.citations[0].cite if self.decision.citations else ""
+        name = self.decision.name_abbreviation or self.decision.name
+        return f"Reading for {name}, {citation} ({self.decision.decision_date})"
+
+    @property
+    def majority(self) -> Optional[OpinionReading]:
+        """Return the majority OpinionReading, or None if it doesn't exist."""
+        for reading in self.opinion_readings:
+            if reading.opinion_type == "majority":
+                return reading
+        return None
+
+    @property
+    def opinions(self) -> List[Opinion]:
+        """Get the Opinions for this DecisionReading's Decision."""
+        return self.decision.opinions
+
+    def find_matching_opinion(
+        self,
+        opinion_type: str = "",
+        opinion_author: str = "",
+    ) -> Optional[Opinion]:
+        """Find an Opinion described by the given attributes."""
+        return self.decision.find_matching_opinion(
+            opinion_type=opinion_type, opinion_author=opinion_author
+        )
+
+    def find_opinion_matching_reading(
+        self,
+        opinion_reading: OpinionReading,
+    ) -> Optional[Opinion]:
+        """Find the Opinion corresponding to an OpinionReading."""
+        return self.find_matching_opinion(
+            opinion_type=opinion_reading.opinion_type,
+            opinion_author=opinion_reading.opinion_author,
+        )
+
+    def select_text(
+        self,
+        selector: Union[
+            bool,
+            str,
+            TextPositionSelector,
+            TextQuoteSelector,
+            Sequence[
+                Union[str, Tuple[int, int], TextQuoteSelector, TextPositionSelector]
+            ],
+        ],
+        opinion_type: str = "",
+        opinion_author: str = "",
+    ) -> Optional[str]:
+        r"""
+        Get text using a :class:`.TextQuoteSelector`.
+
+        :param selector:
+            a selector referencing a text passage in the :class:`Opinion`.
+
+        :returns:
+            the text referenced by the selector, or ``None`` if the text
+            can't be found.
+        """
+        opinion = self.find_matching_opinion(opinion_type, opinion_author)
+        return opinion.select_text(selector) if opinion else None
+
+    def add_opinion_reading(self, opinion_reading: OpinionReading) -> None:
+        """Add an OpinionReading for an existing Opinion of the Decision."""
+        matching_opinion = self.find_opinion_matching_reading(opinion_reading)
+        if matching_opinion:
+            opinion_reading.opinion_type = (
+                matching_opinion.type or opinion_reading.opinion_type
+            )
+            opinion_reading.opinion_author = (
+                matching_opinion.author or opinion_reading.opinion_author
+            )
+        self.opinion_readings.append(opinion_reading)
+
+    def get_majority(self) -> Optional[OpinionReading]:
+        """Return the majority OpinionReading, creating it if needed."""
+        majority = self.majority
+        if majority:
+            return majority
+        for opinion in self.decision.opinions:
+            if opinion.type == "majority":
+                new_reading = OpinionReading(
+                    opinion_type=opinion.type, opinion_author=opinion.author
+                )
+                self.opinion_readings.append(new_reading)
+                return new_reading
+        return None
 
     @property
     def holdings(self) -> HoldingGroup:
-        if self.majority is None:
-            return HoldingGroup()
-        return HoldingGroup(self.majority.holdings)
+        """Get the holdings of this Decision's majority Opinion."""
+        if self.majority is not None:
+            return HoldingGroup(self.majority.holdings)
+        elif len(self.opinion_readings) == 1:
+            return HoldingGroup(self.opinion_readings[0].holdings)
+        return HoldingGroup()
+
+    def add_opinion(self, opinion: Opinion) -> None:
+        """Link an Opinion document to this Decision."""
+        if not self.decision.casebody:
+            self.decision.casebody = CaseBody(data=CaseData())
+        self.decision.casebody.data.opinions.append(opinion)
 
     def contradicts(self, other):
-        if isinstance(other, Decision):
+        """Check if a holding attributed to this decision contradicts a holding attributed in "other"."""
+        if isinstance(other, DecisionReading):
             if self.majority and other.majority:
                 return self.majority.contradicts(other.majority)
             return False
         return self.majority.contradicts(other)
 
     def explain_contradiction(
-        self, other: Union[Opinion, Holding, Rule]
+        self, other: Union[OpinionReading, Holding, Rule]
     ) -> Optional[Explanation]:
+        """Get the first generated explanation of how a Holding of self contradicts a Holding of other."""
         explanations = self.explanations_contradiction(other)
         try:
             explanation = next(explanations)
@@ -132,12 +169,13 @@ class Decision(Comparable):
 
     def explanations_contradiction(
         self,
-        other: Union[Decision, Opinion, Holding, Rule],
+        other: Union[DecisionReading, Opinion, Holding, Rule],
     ) -> Iterator[Explanation]:
-        if isinstance(other, Decision):
+        """Generate explanations of how a Holding of self contradicts a Holding of other."""
+        if isinstance(other, DecisionReading):
             if self.majority and other.majority:
                 yield from self.majority.explanations_contradiction(other.majority)
-        elif isinstance(other, (Rule, Holding, Opinion)):
+        elif isinstance(other, (Rule, Holding, OpinionReading)):
             if self.majority:
                 yield from self.majority.explanations_contradiction(other)
         else:
@@ -150,6 +188,7 @@ class Decision(Comparable):
         self,
         other: Union[Opinion, Holding, Rule],
     ) -> Optional[Explanation]:
+        """Get the first generated explanation of how a Holding of self implies a Holding of other."""
         explanations = self.explanations_implication(other)
         try:
             explanation = next(explanations)
@@ -158,14 +197,17 @@ class Decision(Comparable):
         return explanation
 
     def explanations_implication(
-        self, other: Union[Decision, Opinion, Holding, Rule]
+        self, other: Union[DecisionReading, Decision, Opinion, Holding, Rule]
     ) -> Iterator[Explanation]:
-        if isinstance(other, Decision):
-            if self.majority and other.majority:
-                yield from self.majority.explanations_implication(other.majority)
-        elif isinstance(other, (Rule, Holding, Opinion)):
-            if self.majority:
-                yield from self.majority.explanations_implication(other)
+        """Generate explanation of how self's Holdings can imply other."""
+        if isinstance(other, DecisionReading):
+            self_majority = self.get_majority()
+            if self_majority and other.get_majority():
+                yield from self_majority.explanations_implication(other.majority)
+        elif isinstance(other, (Rule, Holding, OpinionReading)):
+            self_majority = self.get_majority()
+            if self_majority:
+                yield from self_majority.explanations_implication(other)
         else:
             raise TypeError(
                 f"'Implication' test not implemented for types "
@@ -174,25 +216,39 @@ class Decision(Comparable):
 
     def posit(
         self,
-        holdings: Union[Holding, Iterable[Union[Holding, Rule]]],
-        holding_anchors: Optional[
-            List[Union[TextQuoteSelector, List[TextQuoteSelector]]]
-        ] = None,
-        named_anchors: Optional[TextLinkDict] = None,
+        holdings: Union[
+            AnchoredHoldings,
+            Holding,
+            Rule,
+            HoldingWithAnchors,
+            List[Union[HoldingWithAnchors, Holding, Rule]],
+        ],
+        holding_anchors: Optional[List[HoldingWithAnchors]] = None,
+        named_anchors: Optional[List[TermWithAnchors]] = None,
+        enactment_anchors: Optional[List[EnactmentWithAnchors]] = None,
         context: Optional[Sequence[Factor]] = None,
     ) -> None:
-        """
-        Add one or more Holdings to the majority Opinion of this Decision.
-        """
-        if self.majority is None:
+        """Add one or more Holdings to the majority Opinion of this Decision."""
+        majority = self.get_majority()
+        if majority is not None:
+            reading_to_use = majority
+        elif len(self.opinion_readings) == 1:
+            reading_to_use = self.opinion_readings[0]
+        elif not self.opinion_readings:
+            self.opinion_readings = [OpinionReading()]
+            reading_to_use = self.opinion_readings[0]
+        else:
             raise AttributeError(
-                "Cannot posit Holding because this Decision has no known majority Opinion."
-                " Try having an Opinion posit the Holding directly."
+                "Cannot determine how to posit the Holding because this DecisionReading "
+                "has multiple OpinionReadings, none of which is linked to a majority "
+                "Opinion. Try using the .posit() method of one of the OpinionReadings "
+                "on this object's `opinion_readings` attribute."
             )
-        self.majority.posit(
+        reading_to_use.posit(
             holdings=holdings,
             holding_anchors=holding_anchors,
             named_anchors=named_anchors,
+            enactment_anchors=enactment_anchors,
             context=context,
         )
 
@@ -200,11 +256,12 @@ class Decision(Comparable):
         return self.implies(other)
 
     def __gt__(self, other) -> bool:
-        return self.implies(other) and not self == other
+        return self.implies(other) and self != other
 
     def implied_by_holding(
         self, other: Holding, context: Optional[ContextRegister] = None
     ) -> Iterator[Explanation]:
+        """Check if a Holding implies all the Holdings of self."""
         if all(
             other.implies(self_holding, context=context)
             for self_holding in self.holdings
@@ -217,8 +274,9 @@ class Decision(Comparable):
     def explanations_implied_by(
         self, other: Comparable, context: Optional[ContextRegister] = None
     ) -> Iterator[Explanation]:
+        """Generate explanation of how other can imply all the Holdings of self."""
         context = context or ContextRegister()
-        if isinstance(other, Opinion):
+        if isinstance(other, OpinionReading):
             other = other.holdings
         if isinstance(other, HoldingGroup):
             yield from other.explanations_implication(
@@ -232,6 +290,7 @@ class Decision(Comparable):
     def implied_by(
         self, other: Optional[Comparable], context: Optional[ContextRegister] = None
     ) -> bool:
+        """Check if other implies all the Holdings of self."""
         if other is None:
             return False
         return any(self.explanations_implied_by(other, context))
@@ -239,6 +298,7 @@ class Decision(Comparable):
     def implies_holding(
         self, other: Holding, context: Optional[ContextRegister] = None
     ) -> bool:
+        """Check if a Holding of self implies a Holding made from other."""
         return any(
             self_holding.implies(other, context=context)
             for self_holding in self.holdings
@@ -247,20 +307,15 @@ class Decision(Comparable):
     def implies_rule(
         self, other: Rule, context: Optional[ContextRegister] = None
     ) -> bool:
-        return self.implies_holding(Holding(other), context=context)
+        """Check if a Holding of self implies a Holding made from other Rule."""
+        return self.implies_holding(Holding(rule=other), context=context)
 
     def implies(self, other, context: Optional[ContextRegister] = None) -> bool:
-        if isinstance(other, (Decision, Opinion)):
+        """Check if the Holdings of self imply other."""
+        if isinstance(other, (DecisionReading, OpinionReading)):
             return self.holdings.implies(other.holdings)
         elif isinstance(other, Holding):
             return self.implies_holding(other, context=context)
         elif isinstance(other, Rule):
             return self.implies_rule(other, context=context)
         return False
-
-    @property
-    def majority(self) -> Optional[Opinion]:
-        for opinion in self.opinions:
-            if opinion.position == "majority":
-                return opinion
-        return None

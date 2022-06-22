@@ -1,6 +1,10 @@
 import pytest
 
-from anchorpoint.textselectors import TextQuoteSelector
+from anchorpoint.textselectors import (
+    TextPositionSet,
+    TextQuoteSelector,
+    TextSelectionError,
+)
 
 from nettlesome.entities import Entity
 
@@ -10,12 +14,18 @@ from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
 from authorityspoke.io import loaders, readers
 from authorityspoke.io.fake_enactments import FakeClient
-from authorityspoke.opinions import Opinion, FactorIndex
+from authorityspoke.opinions import (
+    AnchoredHoldings,
+    Opinion,
+    FactorIndex,
+    OpinionReading,
+    TermWithAnchors,
+)
 
 
 class TestOpinions:
     def test_opinion_features(self, make_decision):
-        assert make_decision["watt"].court == "9th-cir"
+        assert make_decision["watt"].court.slug == "9th-cir"
         assert make_decision["watt"].citations[0].cite == "388 F.2d 853"
 
     def test_repr(self, make_opinion):
@@ -36,8 +46,8 @@ class TestOpinions:
             == "TOBRINER, J."
         )
 
-    def test_opinion_holding_list(self, make_opinion, real_holding):
-        watt = make_opinion["watt_majority"]
+    def test_opinion_holding_list(self, make_opinion_with_holding, real_holding):
+        watt = make_opinion_with_holding["watt_majority"]
         h3_specific = real_holding["h3"]
         watt.posit(h3_specific)
         assert h3_specific in watt.holdings
@@ -48,10 +58,10 @@ class TestOpinions:
         watt = make_opinion["watt_majority"]
         h = real_holding
         e = make_entity
-
-        watt.posit(h["h1"], context=(e["motel"], e["watt"]))
-        watt.posit(h["h2"], context=(e["trees"], e["motel"]))
-        watt.posit(
+        reading = OpinionReading(opinion_type=watt.type, opinion_author=watt.author)
+        reading.posit(h["h1"], context=(e["motel"], e["watt"]))
+        reading.posit(h["h2"], context=(e["trees"], e["motel"]))
+        reading.posit(
             h["h3"],
             context=(
                 make_evidence["generic"],
@@ -61,10 +71,10 @@ class TestOpinions:
                 e["tree_search"],
             ),
         )
-        watt.posit(
+        reading.posit(
             h["h4"], context=(e["trees"], e["tree_search"], e["motel"], e["watt"])
         )
-        assert make_entity["watt"] in make_opinion["watt_majority"].generic_terms()
+        assert make_entity["watt"] in reading.generic_terms()
 
     def test_opinion_date(self, make_decision):
         """
@@ -72,7 +82,7 @@ class TestOpinions:
         have the same date, because the date field has been moved to the
         Decision class.
         """
-        assert make_decision["watt"].date < make_decision["brad"].date
+        assert make_decision["watt"].decision_date < make_decision["brad"].decision_date
 
     def test_opinion_string(self, make_opinion):
         opinion = make_opinion["cardenas_majority"]
@@ -89,90 +99,97 @@ class TestOpinionText:
     def test_opinion_text_anchor(self, make_opinion_with_holding):
         feist = make_opinion_with_holding["feist_majority"]
         assert any(
-            "ideas" in anchor[0].exact for anchor in feist.factor_anchors.values()
+            "ideas" in factor.anchors.quotes[0].exact
+            for factor in feist.anchored_factors
         )
 
-    def test_select_opinion_text_for_factor(self, make_opinion_with_holding):
-        oracle = make_opinion_with_holding["oracle_majority"]
-        anchor = oracle.holdings[0].anchors[0]
-        selected = oracle.select_text(selector=anchor)
-        assert selected == "must be “original” to qualify"
+    def test_select_opinion_text_for_factor(self, make_opinion, make_anchored_holding):
+        opinion = make_opinion["oracle_majority"]
+        oracle = make_anchored_holding["oracle"]
+        anchor = oracle.get_term_anchors(
+            key="the fact that <the Java API> was copyrightable"
+        )
+        selected = opinion.select_text(selector=anchor)
+        assert str(selected).startswith("…copyright protection.")
 
-    def test_select_opinion_text_for_enactment(self, make_opinion_with_holding):
-        oracle = make_opinion_with_holding["oracle_majority"]
+    def test_select_opinion_text_for_enactment(self, make_decision_with_holding):
+        oracle = make_decision_with_holding["oracle"]
         enactment_name = str(oracle.holdings[0].enactments[0])
-        anchor = oracle.enactment_anchors[enactment_name][0]
-        selected = oracle.select_text(selector=anchor)
-        assert selected == "17 U.S.C. § 102(a)"
+        anchor = oracle.majority.get_enactment_anchors(enactment_name)
+        selected = oracle.select_text(selector=anchor, opinion_type="majority")
+        assert str(selected) == "…17 U.S.C. § 102(a)…"
 
-    def test_select_opinion_text_for_holding(self, make_opinion_with_holding):
-        oracle = make_opinion_with_holding["oracle_majority"]
-        holding = oracle.holdings[0]
-        anchor = holding.anchors[0]
-        selected = oracle.select_text(selector=anchor)
-        assert selected == "must be “original” to qualify"
+    def test_select_opinion_text_for_holding(self, make_opinion, make_anchored_holding):
+        opinion = make_opinion["oracle_majority"]
+        anchor = make_anchored_holding["oracle"].holdings[0].anchors
+        selected = opinion.select_text(selector=anchor)
+        assert str(selected) == "…must be “original” to qualify…"
 
-    def test_invalid_text_selector(self, make_opinion_with_holding):
-        oracle = make_opinion_with_holding["oracle_majority"]
+    def test_invalid_text_selector(self, make_decision_with_holding):
+        oracle = make_decision_with_holding["oracle"]
         anchor = TextQuoteSelector(exact="text not in opinion")
-        with pytest.raises(ValueError):
-            _ = oracle.select_text(selector=anchor)
+        with pytest.raises(TextSelectionError):
+            _ = oracle.decision.majority.select_text(selector=anchor)
 
 
 class TestOpinionHoldings:
-    def test_positing_non_rule_error(self, make_opinion, make_procedure):
+    def test_positing_non_rule_error(self, make_opinion_with_holding, make_procedure):
         with pytest.raises(TypeError):
-            make_opinion["watt_majority"].posit(make_procedure["c1"])
+            make_opinion_with_holding["watt_majority"].posit(make_procedure["c1"])
 
-    def test_error_posit_with_no_rule_source(self, make_opinion):
+    def test_error_posit_with_no_rule_source(self, make_opinion_with_holding):
         with pytest.raises(TypeError):
-            make_opinion["watt_majority"].posit()
+            make_opinion_with_holding["watt_majority"].posit()
 
-    def test_posit_rule(self, make_opinion, make_rule, make_holding):
+    def test_posit_rule(self, make_opinion_with_holding, make_rule, make_holding):
         """
         "Positing" a Rule causes the Rule to be converted to a Holding first.
         So the Opinion implies the corresponding Holding.
         """
 
-        watt = make_opinion["watt_majority"]
+        watt = make_opinion_with_holding["watt_majority"]
+        watt.clear_holdings()
         watt.posit(make_rule["h1"])
         assert watt.implies(make_holding["h1"])
 
-    def test_new_context_wrong_number_of_changes(self, make_opinion, make_holding):
-        """
-        The context here (a Factor outside an iterable) only changes the first
-        generic factor of the Rule being posited, which may not be what the user
-        expects.
-        """
-        brad = make_opinion["brad_majority"]
+    def test_new_context_wrong_number_of_changes(
+        self, make_opinion_with_holding, make_holding
+    ):
+        brad = make_opinion_with_holding["brad_majority"]
         with pytest.raises(ValueError):
-            brad.posit(make_holding["h1"], context=Entity("House on Haunted Hill"))
+            brad.posit(
+                make_holding["h1"], context=[Entity(name="House on Haunted Hill")]
+            )
 
-    def test_new_context_naming_nonexistent_factor(self, make_opinion, make_holding):
+    def test_new_context_naming_nonexistent_factor(
+        self, make_opinion_with_holding, make_holding
+    ):
         """
         The context here (a Factor outside an iterable) only changes the first
         generic factor of the Rule being posited, which may not be what the user
         expects.
         """
-        brad = make_opinion["brad_majority"]
+        brad = make_opinion_with_holding["brad_majority"]
         brad.clear_holdings()
         with pytest.raises(ValueError):
             brad.posit(
                 make_holding["h1"],
-                context=(Entity("House on Haunted Hill"), "nonexistent factor"),
+                context=(Entity(name="House on Haunted Hill"), "nonexistent factor"),
             )
 
-    def test_new_context_creates_equal_rule(self, make_opinion, make_response):
-        watt = make_opinion["watt_majority"]
-        brad = make_opinion["brad_majority"]
+    def test_new_context_creates_equal_rule(
+        self, make_opinion_with_holding, make_response
+    ):
+        watt = make_opinion_with_holding["watt_majority"]
+        brad = make_opinion_with_holding["brad_majority"]
         client = FakeClient(responses=make_response)
 
         watt.clear_holdings()
-        watt_raw = loaders.load_holdings("holding_watt.json")
+        watt_raw = loaders.load_holdings("holding_watt.yaml")
         watt.posit(readers.read_holdings(watt_raw, client=client))
 
         brad.clear_holdings()
-        brad_raw = loaders.load_holdings("holding_brad.json")
+        brad_raw = loaders.load_holdings("holding_brad.yaml")
         brad.posit(readers.read_holdings(brad_raw, client=client))
 
         context_pairs = {
@@ -184,32 +201,36 @@ class TestOpinionHoldings:
         watt.posit(brad.holdings[0], context_pairs)
         assert watt.holdings[-1].means(brad.holdings[0])
 
-    def test_getting_factors_from_opinion(self, make_opinion, make_response):
+    def test_getting_factors_from_opinion(
+        self, make_opinion_with_holding, make_response
+    ):
         client = FakeClient(responses=make_response)
 
-        watt = make_opinion["watt_majority"]
+        watt = make_opinion_with_holding["watt_majority"]
         watt.clear_holdings()
-        watt_raw = loaders.load_holdings("holding_watt.json")
+        watt_raw = loaders.load_holdings("holding_watt.yaml")
         holdings_to_posit = readers.read_holdings(watt_raw, client=client)
         watt.posit(holdings_to_posit)
         factors = watt.factors_by_name()
         assert "proof of Wattenburg's guilt" in factors.keys()
 
-    def test_new_context_inferring_factors_to_change(self, make_opinion, make_response):
+    def test_new_context_inferring_factors_to_change(
+        self, make_opinion_with_holding, make_response
+    ):
         """
         This changes watt's holdings; may break tests below.
         """
-        watt = make_opinion["watt_majority"]
-        brad = make_opinion["brad_majority"]
+        watt = make_opinion_with_holding["watt_majority"]
+        brad = make_opinion_with_holding["brad_majority"]
 
         client = FakeClient(responses=make_response)
 
         watt.clear_holdings()
-        watt_raw = loaders.load_holdings("holding_watt.json")
+        watt_raw = loaders.load_holdings("holding_watt.yaml")
         watt.posit(readers.read_holdings(watt_raw, client=client))
 
         brad.clear_holdings()
-        brad_raw = loaders.load_holdings("holding_brad.json")
+        brad_raw = loaders.load_holdings("holding_brad.yaml")
         brad.posit(readers.read_holdings(brad_raw, client=client))
 
         context_items = [
@@ -222,12 +243,15 @@ class TestOpinionHoldings:
         watt.posit(brad.holdings[0], context=context_items)
         assert watt.holdings[-1].means(brad.holdings[0])
 
-    def test_getting_factors_from_new_holding(self, make_opinion):
-        watt = make_opinion["watt_majority"]
-        elephants = Fact("$animal was an elephant", terms=Entity("the elephant"))
+    def test_getting_factors_from_new_holding(self, make_opinion_with_holding):
+        watt = make_opinion_with_holding["watt_majority"]
+        watt.clear_holdings()
+        elephants = Fact(
+            predicate="$animal was an elephant", terms=Entity(name="the elephant")
+        )
         mouseholes = Fact(
-            Predicate("$animal hides in mouseholes", truth=False),
-            terms=Entity("the elephant"),
+            predicate=Predicate(content="$animal hides in mouseholes", truth=False),
+            terms=Entity(name="the elephant"),
         )
         procedure = Procedure(inputs=elephants, outputs=mouseholes)
         rule = Rule(procedure=procedure)
@@ -258,21 +282,22 @@ class TestOpinionFactors:
 
     def test_insert_duplicate_anchor_in_factor_index(self):
         api = Entity(name="the Java API", generic=True, plural=False)
-        anchor = TextQuoteSelector(
+        quote_selector = TextQuoteSelector(
             exact="it possesses at least some minimal degree of creativity."
         )
+        anchors = TextPositionSet(quotes=quote_selector)
         fact = Fact(
             predicate=Predicate(
-                "$product possessed at least some minimal degree of creativity"
+                content="$product possessed at least some minimal degree of creativity"
             ),
             terms=[api],
-            anchors=[anchor],
         )
-        name = "the Java API possessed at least some minimal degree of creativity"
+        term = TermWithAnchors(term=fact, anchors=anchors)
+        index = AnchoredHoldings(holdings=[], named_anchors=[term])
 
-        factor_index = FactorIndex({name: fact})
-        factor_index.insert(key=name, value=fact)
-        assert len(factor_index[name].anchors) == 1
+        index.add_term(term=fact, anchors=anchors)
+        assert len(index.named_anchors) == 1
+        assert index.named_anchors[0].anchors.quotes == [quote_selector]
 
     def test_get_factor_from_opinion(self, make_opinion_with_holding):
         oracle = make_opinion_with_holding["oracle_majority"]
@@ -282,24 +307,45 @@ class TestOpinionFactors:
     def test_factors_by_name(self, make_opinion_with_holding):
         oracle = make_opinion_with_holding["oracle_majority"]
         factors = oracle.factors_by_name()
-        factor = factors[
-            "the fact it was false that <the Java API> was an original work"
-        ]
+        factor = factors["false the Java API was an original work"]
         assert factor.terms[0].name == "the Java API"
 
 
 class TestImplication:
+    def test_opinion_implies_holding_group(self, make_opinion_with_holding):
+        """Can be affected by order of tests."""
+        watt = make_opinion_with_holding["watt_majority"]
+        holdings = watt.holdings[:2]
+        assert isinstance(holdings, HoldingGroup)
+        assert watt.implies(holdings)
+        explanation = watt.explain_implication(holdings)
+        assert len(explanation.reasons) == 2
+
+    def test_opinion_implied_by_rule(
+        self, make_opinion_with_holding, make_holding, make_rule
+    ):
+        """Can be affected by order of tests."""
+        watt = make_opinion_with_holding["oracle_majority"]
+        watt.clear_holdings()
+        watt.posit(make_holding["h2"])
+        assert watt.implied_by(make_rule["h2_despite_due_process"])
+        assert not watt.implies(make_rule["h2_despite_due_process"])
+
     def test_no_implication(self, make_opinion_with_holding):
         watt = make_opinion_with_holding["watt_majority"]
         brad = make_opinion_with_holding["brad_majority"]
         assert not watt >= brad
         assert not watt.implies(brad.holdings)
 
-    def test_posit_list_of_holdings_and_imply(self, make_opinion, make_response):
-        watt = make_opinion["watt_majority"]
-        brad = make_opinion["brad_majority"]
+    def test_posit_list_of_holdings_and_imply(
+        self, make_opinion_with_holding, make_response
+    ):
+        watt = make_opinion_with_holding["watt_majority"]
+        brad = make_opinion_with_holding["brad_majority"]
+        watt.clear_holdings()
+        brad.clear_holdings()
         client = FakeClient(responses=make_response)
-        some_rules_raw = loaders.load_holdings(filename="holding_watt.json")
+        some_rules_raw = loaders.load_holdings(filename="holding_watt.yaml")
         some_rules = readers.read_holdings(some_rules_raw, client=client)
         for case in (watt, brad):
             case.clear_holdings()
@@ -308,47 +354,35 @@ class TestImplication:
         assert watt > brad
         assert not brad >= watt
 
-    def test_error_to_compare_to_str(self, make_opinion):
-        watt = make_opinion["watt_majority"]
+    def test_error_to_compare_to_str(self, make_opinion_with_holding):
+        watt = make_opinion_with_holding["watt_majority"]
         with pytest.raises(TypeError):
             watt.implies("this")
 
-    def test_error_to_check_contradiction_of_str(self, make_opinion):
-        watt = make_opinion["watt_majority"]
+    def test_error_to_check_contradiction_of_str(self, make_opinion_with_holding):
+        watt = make_opinion_with_holding["watt_majority"]
         with pytest.raises(TypeError):
             watt.contradicts("this")
 
-    def test_opinion_implies_None(self, make_opinion, make_holding):
-        watt = make_opinion["watt_majority"]
+    def test_opinion_implies_None(self, make_opinion_with_holding, make_holding):
+        watt = make_opinion_with_holding["watt_majority"]
         assert watt.implies(None)
 
-    def test_opinion_implies_holding(self, make_opinion, make_holding):
-        watt = make_opinion["watt_majority"]
+    def test_opinion_implies_holding(self, make_opinion_with_holding, make_holding):
+        watt = make_opinion_with_holding["watt_majority"]
+        watt.clear_holdings()
         watt.posit(make_holding["h2_invalid_undecided"])
         assert watt >= make_holding["h2_undecided"]
         assert watt > make_holding["h2_undecided"]
 
-    def test_opinion_does_not_imply_holding(self, make_opinion, make_holding):
-        watt = make_opinion["watt_majority"]
+    def test_opinion_does_not_imply_holding(
+        self, make_opinion_with_holding, make_holding
+    ):
+        watt = make_opinion_with_holding["watt_majority"]
         watt.clear_holdings()
         watt.posit(make_holding["h2_irrelevant_inputs_undecided"])
         assert not watt >= make_holding["h2_undecided"]
         assert not watt > make_holding["h2_undecided"]
-
-    def test_opinion_implied_by_rule(self, make_opinion, make_holding, make_rule):
-        watt = make_opinion["oracle_majority"]
-        watt.clear_holdings()
-        watt.posit(make_holding["h2"])
-        assert watt.implied_by(make_rule["h2_despite_due_process"])
-        assert not watt.implies(make_rule["h2_despite_due_process"])
-
-    def test_opinion_implies_holding_group(self, make_opinion_with_holding):
-        watt = make_opinion_with_holding["watt_majority"]
-        holdings = watt.holdings[:2]
-        assert isinstance(holdings, HoldingGroup)
-        assert watt.implies(holdings)
-        explanation = watt.explain_implication(holdings)
-        assert len(explanation.reasons) == 2
 
     def test_opinion_does_not_imply_holding_group(self, make_opinion_with_holding):
         watt = make_opinion_with_holding["watt_majority"]
@@ -362,9 +396,9 @@ class TestImplication:
         self, make_holding, make_decision_with_holding
     ):
         watt = make_decision_with_holding["watt"]
-        opinion = Opinion()
-        opinion.posit(watt.holdings[0])
-        assert opinion.implied_by(watt)
+        reading = OpinionReading()
+        reading.posit(watt.holdings[0])
+        assert reading.implied_by(watt)
 
 
 class TestContradiction:
@@ -373,9 +407,13 @@ class TestContradiction:
         oracle = make_opinion_with_holding["oracle_majority"]
         lotus = make_opinion_with_holding["lotus_majority"]
 
-        left = Opinion()
+        left = OpinionReading(
+            opinion_type="majority", opinion_author=oracle.opinion_author
+        )
         left.posit(lotus.holdings[6])
-        right = Opinion()
+        right = OpinionReading(
+            opinion_type="majority", opinion_author=lotus.opinion_author
+        )
         right.posit(oracle.holdings[10])
         explanation = left.explain_contradiction(right)
         assert len(explanation.reasons) == 1
@@ -428,6 +466,8 @@ class TestContradiction:
         explanation = watt.explain_contradiction(holdings)
         assert explanation is None
 
-    def test_error_contradiction_with_procedure(self, make_opinion, make_procedure):
+    def test_error_contradiction_with_procedure(
+        self, make_opinion_with_holding, make_procedure
+    ):
         with pytest.raises(TypeError):
-            make_opinion["watt_majority"].contradicts(make_procedure["c1"])
+            make_opinion_with_holding["watt_majority"].contradicts(make_procedure["c1"])

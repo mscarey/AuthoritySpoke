@@ -14,11 +14,8 @@ from copy import deepcopy
 from itertools import chain
 import operator
 from typing import Any, Callable, Dict, Iterable, Iterator, List
-from typing import Optional, Sequence, Tuple, TypeVar, Union
+from typing import Optional, Sequence, Union
 
-from dataclasses import dataclass, field
-
-from anchorpoint import TextQuoteSelector
 from legislice.enactments import Enactment
 
 from nettlesome.terms import (
@@ -35,12 +32,15 @@ from nettlesome.factors import Factor
 from nettlesome.formatting import indented, wrapped
 from nettlesome.groups import FactorGroup
 
+from pydantic import BaseModel, root_validator, validator
+
 from authorityspoke.procedures import Procedure
-from authorityspoke.rules import Rule
+from authorityspoke.rules import Rule, RawRule
+
+RawHolding = Dict[str, Union[RawRule, str, bool]]
 
 
-@dataclass()
-class Holding(Comparable):
+class Holding(Comparable, BaseModel):
     """
     An :class:`.Opinion`\'s announcement that it posits or rejects a legal :class:`.Rule`.
 
@@ -81,26 +81,53 @@ class Holding(Comparable):
     exclusive: bool = False
     generic: bool = False
     absent: bool = False
-    anchors: List[TextQuoteSelector] = field(default_factory=list)
 
-    def __post_init__(self):
-        if self.exclusive:
-            if not self.rule_valid:
-                raise NotImplementedError(
-                    "The ability to state that it is not 'valid' to assert "
-                    + "that a Rule is the 'exclusive' way to reach an output is "
-                    + "not implemented, so 'rule_valid' cannot be False while "
-                    + "'exclusive' is True. Try expressing this in another way "
-                    + "without the 'exclusive' keyword."
-                )
-            if not self.decided:
+    @root_validator(pre=True)
+    def nest_factor_fields(cls, values):
+        """Move misplaced fields that belong on Rule or Predicate models."""
+        for field_name in ["inputs", "outputs", "despite"]:
+            if field_name in values:
+                values["procedure"] = values.get("procedure", {})
+                values["procedure"][field_name] = values.pop(field_name)
+        values["rule"] = values.get("rule", {})
+
+        for field_to_nest in [
+            "procedure",
+            "enactments",
+            "enactments_despite",
+            "universal",
+            "mandatory",
+        ]:
+            if field_to_nest in values:
+                values["rule"][field_to_nest] = values.pop(field_to_nest)
+        return values
+
+    @validator("exclusive")
+    def not_invalid_and_exclusive(cls, v: bool, values) -> bool:
+        """Block "exclusive" flag from being used when "rule_valid" is False."""
+        if v and not values["rule_valid"]:
+            raise NotImplementedError(
+                "The ability to state that it is not 'valid' to assert "
+                + "that a Rule is the 'exclusive' way to reach an output is "
+                + "not implemented, so 'rule_valid' cannot be False while "
+                + "'exclusive' is True. Try expressing this in another way "
+                + "without the 'exclusive' keyword."
+            )
+        return v
+
+    @validator("exclusive")
+    def not_undecided_and_exclusive(cls, v: bool, values) -> bool:
+        """Block "exclusive" flag from being used when "decided" is False."""
+        if v:
+            if not values["decided"]:
                 raise NotImplementedError(
                     "The ability to state that it is not 'decided' whether "
                     + "a Rule is the 'exclusive' way to reach an output is "
                     + "not implemented. Try expressing this in another way "
                     + "without the 'exclusive' keyword."
                 )
-            self.rule.procedure.valid_for_exclusive_tag()
+            values["rule"].procedure.valid_for_exclusive_tag()
+        return v
 
     @classmethod
     def from_factors(
@@ -136,17 +163,17 @@ class Holding(Comparable):
     @property
     def despite(self):
         """Get Factors that specifically don't preclude application of the Holding."""
-        return self.rule.procedure.despite
+        return self.rule.procedure.despite_group
 
     @property
     def inputs(self):
         """Get inputs from Procedure."""
-        return self.rule.procedure.inputs
+        return self.rule.procedure.inputs_group
 
     @property
     def outputs(self):
         """Get outputs from Procedure."""
-        return self.rule.procedure.outputs
+        return self.rule.procedure.outputs_group
 
     @property
     def enactments(self):
@@ -387,7 +414,9 @@ class Holding(Comparable):
             raise TypeError(f"Type Holding cannot be compared with type {type(other)}.")
         if not isinstance(context, Explanation):
             context = Explanation.from_context(context)
-        if isinstance(other, (Rule, Procedure)):
+        if isinstance(other, Procedure):
+            other = Rule(procedure=other)
+        if isinstance(other, Rule):
             other = Holding(rule=other)
         if not isinstance(other, self.__class__):
             if context:
@@ -517,18 +546,23 @@ class Holding(Comparable):
         return HoldingGroup(holdings)
 
     def set_inputs(self, factors: Sequence[Factor]) -> None:
+        """Set inputs of this Holding."""
         self.rule.set_inputs(factors)
 
     def set_despite(self, factors: Sequence[Factor]) -> None:
+        """Set Factors that specifically do not preclude applying this Holding."""
         self.rule.set_despite(factors)
 
     def set_outputs(self, factors: Sequence[Factor]) -> None:
+        """Set outputs of this Holding."""
         self.rule.set_outputs(factors)
 
     def set_enactments(self, enactments: Sequence[Enactment]) -> None:
+        """Set Enactments required to apply this Holding."""
         self.rule.set_enactments(enactments)
 
     def set_enactments_despite(self, enactments: Sequence[Enactment]) -> None:
+        """Set Enactments that specifically do not preclude applying this Holding."""
         self.rule.set_enactments_despite(enactments)
 
     def _union_if_not_exclusive(
@@ -624,15 +658,20 @@ class Holding(Comparable):
 
 
 class HoldingMatch(FactorMatch):
+    """A logical relation between two holdings, e.g. implies, contradicts."""
+
     left: Holding
     operation: Callable
     right: Holding
 
 
 class HoldingGroup(FactorGroup):
+    """Group of Holdings that can be compared as a group with other Holdings."""
+
     term_class = Holding
 
     def __init__(self, holdings: Union[Sequence[Holding], Holding] = ()):
+        """Validate that HoldingGroup is created from a sequence of Holdings."""
         if isinstance(holdings, Iterable):
             holdings = tuple(holdings)
         else:
@@ -655,6 +694,7 @@ class HoldingGroup(FactorGroup):
         other: Comparable,
         context: Optional[Union[ContextRegister, Explanation]] = None,
     ) -> Iterator[Explanation]:
+        """Generate contexts in which all Holdings in other are implied by self."""
         if isinstance(other, Rule):
             other = Holding(rule=other)
         explanation = Explanation.from_context(

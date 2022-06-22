@@ -41,18 +41,18 @@ interactions:
       - Authorization
       Access-Control-Allow-Origin:
       - '*'
-      Age:
-      - '4366'
       Allow:
       - GET, HEAD, OPTIONS
       CF-Cache-Status:
-      - HIT
+      - MISS
       CF-RAY:
-      - 64a74ef80a609b7f-DFW
+      - 6701c8f08aa1ec7e-DFW
       Cache-Control:
       - s-maxage=86400, max-age=3600
       Connection:
       - keep-alive
+      Content-Disposition:
+      - attachment; filename="CAP_2021-07-17 07:33:56.064207.json"
       Content-Encoding:
       - gzip
       Content-Length:
@@ -60,16 +60,13 @@ interactions:
       Content-Type:
       - application/json
       Date:
-      - Wed, 05 May 2021 04:43:32 GMT
+      - Sat, 17 Jul 2021 07:33:56 GMT
       Expect-CT:
       - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
       Referrer-Policy:
       - same-origin
       Server:
       - cloudflare
-      Set-Cookie:
-      - __cfduid=debb48845c6c5c119de2e5e22361377eb1620189812; expires=Fri, 04-Jun-21
-        04:43:32 GMT; path=/; domain=.case.law; HttpOnly; SameSite=Lax
       Strict-Transport-Security:
       - max-age=15768000
       Vary:
@@ -78,8 +75,6 @@ interactions:
       - nosniff
       X-Frame-Options:
       - DENY
-      cf-request-id:
-      - 09dc6faf0700009b7fa5a01000000001
     status:
       code: 200
       message: OK

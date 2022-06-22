@@ -48,7 +48,7 @@ class TestRules:
 
     def test_new_concrete_context(self, make_holding):
         different = make_holding["h1"].new_context(
-            [Entity("Castle Grayskull"), Entity("He-Man")]
+            [Entity(name="Castle Grayskull"), Entity(name="He-Man")]
         )
         assert "<He-Man> operated" in str(different)
 
@@ -84,7 +84,7 @@ class TestRules:
         with pytest.raises(TypeError):
             make_holding["h1"].new_context(
                 {make_predicate["p1"]: make_predicate["p7"]},
-                terms_to_replace=[Entity("Bob")],
+                terms_to_replace=[Entity(name="Bob")],
             )
 
     def test_new_context_dict_must_be_dict(self, make_holding, make_predicate):
@@ -98,7 +98,7 @@ class TestRules:
         counterparty = transfer_rule.generic_terms()[2]
         defendant_rule = barber_rule.new_context(
             changes=[defendant, counterparty],
-            terms_to_replace=[Entity("the barber"), Entity("the customer")],
+            terms_to_replace=[Entity(name="the barber"), Entity(name="the customer")],
         )
         assert defendant_rule.generic_terms()[1].name == "the defendant"
 
@@ -329,7 +329,7 @@ class TestImplication:
         """
         small_reliable = make_complex_rule["accept_small_weight_reliable"]
         small_more_reliable_holding = Holding(
-            make_complex_rule["accept_small_weight_reliable_more_evidence"]
+            rule=make_complex_rule["accept_small_weight_reliable_more_evidence"]
         )
         assert small_reliable >= small_more_reliable_holding
 
@@ -340,11 +340,13 @@ class TestImplication:
         """
         small_reliable = make_complex_rule["accept_small_weight_reliable"]
         small_more_reliable_holding = Holding(
-            make_complex_rule["accept_small_weight_reliable_more_evidence"]
+            rule=make_complex_rule["accept_small_weight_reliable_more_evidence"]
         )
         assert not small_reliable.implies(
             small_more_reliable_holding,
-            context=ContextRegister.from_lists([Entity("Alice")], [Entity("Bob")]),
+            context=ContextRegister.from_lists(
+                [Entity(name="Alice")], [Entity(name="Bob")]
+            ),
         )
 
     def test_implication_interchangeable_terms(self):
@@ -352,13 +354,13 @@ class TestImplication:
         shot = Predicate(content="$attacker shot $victim")
         murder = Predicate(content="$attacker murdered $victim")
 
-        alice = Entity("Alice")
-        bob = Entity("Bob")
-        diane = Entity("Diane")
-        ed = Entity("Ed")
+        alice = Entity(name="Alice")
+        bob = Entity(name="Bob")
+        diane = Entity(name="Diane")
+        ed = Entity(name="Ed")
 
-        grove = Entity("Shady Grove")
-        magnolia = Entity("Magnolia Cafe")
+        grove = Entity(name="Shady Grove")
+        magnolia = Entity(name="Magnolia Cafe")
 
         alice_and_bob_rule = Rule(
             procedure=Procedure(
@@ -386,7 +388,8 @@ class TestImplication:
 
     def test_not_implied_by_statement(self, make_rule):
         assert not Statement(
-            Predicate("$person was a person"), terms=Entity("Alice")
+            predicate=Predicate(content="$person was a person"),
+            terms=Entity(name="Alice"),
         ).implies(make_rule["h1"])
 
     def test_not_implied_by_procedure(self, make_procedure, make_rule):
@@ -499,7 +502,8 @@ class TestContradiction:
         """
         stockpile_means_stockpile = ContextRegister()
         stockpile_means_stockpile.insert_pair(
-            key=Entity("the stockpile of trees"), value=Entity("the stockpile of trees")
+            key=Entity(name="the stockpile of trees"),
+            value=Entity(name="the stockpile of trees"),
         )
         assert not make_rule["h_output_distance_less"].contradicts(
             make_rule["h_output_farther_different_entity"],
@@ -679,27 +683,35 @@ class TestAddition:
         the operand on the left, but will give it the output from the operand
         on the right.
         """
-        context = Entity("the Pythagorean theorem")
-        three = Entity("the number three")
+        context = Entity(name="the Pythagorean theorem")
+        three = Entity(name="the number three")
 
         fact_not_original = Rule(
-            Procedure(
-                inputs=Fact(Predicate("$work was a fact"), terms=context),
+            procedure=Procedure(
+                inputs=Fact(
+                    predicate=Predicate(content="$work was a fact"), terms=context
+                ),
                 outputs=Fact(
-                    Predicate("$work was an original work", truth=False),
+                    predicate=Predicate(
+                        content="$work was an original work", truth=False
+                    ),
                     terms=context,
                 ),
             ),
             universal=True,
         )
         unoriginal_not_copyrightable = Rule(
-            Procedure(
+            procedure=Procedure(
                 inputs=Fact(
-                    Predicate("$work was an original work", truth=False),
+                    predicate=Predicate(
+                        content="$work was an original work", truth=False
+                    ),
                     terms=three,
                 ),
                 outputs=Fact(
-                    Predicate("${work} was copyrightable", truth=False),
+                    predicate=Predicate(
+                        content="${work} was copyrightable", truth=False
+                    ),
                     terms=three,
                 ),
             ),
@@ -713,7 +725,7 @@ class TestAddition:
         )
         assert len(facts_not_copyrightable.outputs) == 2
         assert "false that <the Pythagorean theorem> was copyrightable" in str(
-            facts_not_copyrightable.outputs
+            facts_not_copyrightable
         )
 
     def test_add_rules_with_duplicate_enactment_text(
@@ -790,14 +802,14 @@ class TestAddition:
         self, make_factor, make_exhibit, make_complex_fact
     ):
         accept_relevance_testimony_ALL = Rule(
-            Procedure(
+            procedure=Procedure(
                 inputs=make_exhibit["relevant_murder_testimony"],
                 outputs=make_complex_fact["f_relevant_murder"],
             ),
             universal=True,
         )
         accept_murder_fact_ALL = Rule(
-            Procedure(
+            procedure=Procedure(
                 inputs=make_complex_fact["f_relevant_murder"],
                 outputs=make_factor["f_murder"],
             ),
@@ -821,7 +833,9 @@ class TestAddition:
             make_complex_rule["accept_relevance_testimony_ALL"] + due_process_rule
         )
         assert len(combined.outputs) == 2
-        assert "the fact that <Alice> murdered <Bob>" in str(combined.outputs)
+        assert "the fact that <Alice> murdered <Bob>" in [
+            str(output) for output in combined.outputs
+        ]
         assert "ATTRIBUTED TO <Alice>" in str(combined)
 
 
@@ -1001,33 +1015,54 @@ class TestStatuteRules:
 
     def test_greater_than_implies_equal(self, beard_response, make_beard_rule):
         client = FakeClient(responses=beard_response)
-        beard_dictionary = loaders.load_holdings("beard_rules.json")
+        beard_dictionary = loaders.load_holdings("beard_rules.yaml")
         beard_dictionary[0]["inputs"][1][
             "content"
         ] = "the length of the suspected beard was = 8 millimetres"
-        longer_hair_rule = readers.read_rule(beard_dictionary[0], client=client)
-        assert make_beard_rule[0].implies(longer_hair_rule)
+        longer_hair_rule = readers.read_holdings([beard_dictionary[0]], client=client)
+        assert make_beard_rule[0].implies(longer_hair_rule[0])
+
+    def test_reset_inputs_to_create_contradiction(
+        self, beard_response, make_beard_rule
+    ):
+        """Test missing 'False' truth value in output of long_means_not_beard"""
+        ear_rule = make_beard_rule[1]
+        client = FakeClient(responses=beard_response)
+        beard_rule_data = loaders.load_holdings("beard_rules.yaml")[:2]
+        changed_holdings = readers.read_holdings(beard_rule_data, client=client)
+        long_means_not_beard = changed_holdings[1]
+        long_means_not_beard.set_despite([ear_rule.inputs[0], ear_rule.inputs[2]])
+        fact = Fact(
+            content="the length of ${the_suspected_beard} was >= 12 inches",
+            terms=[Entity(name="the suspected beard")],
+        )
+        long_means_not_beard.set_inputs(fact)
+        long_means_not_beard.set_outputs(long_means_not_beard.outputs[0].negated())
+        long_means_not_beard.rule.mandatory = True
+        assert long_means_not_beard.contradicts(ear_rule)
 
     def test_greater_than_contradicts_not_greater(
         self, beard_response, make_beard_rule
     ):
         client = FakeClient(responses=beard_response)
-        beard_dictionary = loaders.load_holdings("beard_rules.json")
+        beard_dictionary = loaders.load_holdings("beard_rules.yaml")
         beard_dictionary[1]["inputs"][1][
             "content"
         ] = "the length of the suspected beard was >= 12 inches"
         beard_dictionary[1]["outputs"][0]["truth"] = False
         beard_dictionary[1]["mandatory"] = True
-        long_hair_is_not_a_beard = readers.read_rule(beard_dictionary[1], client=client)
-        assert make_beard_rule[1].contradicts(long_hair_is_not_a_beard)
+        long_hair_is_not_a_beard = readers.read_holdings(
+            [beard_dictionary[1]], client=client
+        )
+        assert make_beard_rule[1].contradicts(long_hair_is_not_a_beard[0])
 
     def test_contradictory_fact_about_beard_length(
         self, fake_beard_client, make_beard_rule
     ):
-        beard_dictionary = loaders.load_holdings("beard_rules.json")
-        long_means_not_beard = readers.read_rule(
+        beard_dictionary = loaders.load_holdings("beard_rules.yaml")
+        long_means_not_beard = readers.read_holdings(
             beard_dictionary[1], client=fake_beard_client
-        )
+        )[0].rule
         long_means_not_beard.set_despite(
             [long_means_not_beard.inputs[0], long_means_not_beard.inputs[2]]
         )
@@ -1064,19 +1099,19 @@ class TestStatuteRules:
         fake_beard_client,
         make_beard_rule,
     ):
-        beard = Entity("a facial feature")
+        beard = Entity(name="a facial feature")
 
         sec_4 = fake_beard_client.read("/test/acts/47/4/")
 
-        was_facial_hair = Predicate("$thing was facial hair")
-        fact_was_facial_hair = Fact(was_facial_hair, terms=beard)
+        was_facial_hair = Predicate(content="$thing was facial hair")
+        fact_was_facial_hair = Fact(predicate=was_facial_hair, terms=beard)
         hypothetical = Rule(
             procedure=Procedure(
                 inputs=[
                     fact_was_facial_hair,
                     Fact(
-                        Comparison(
-                            "the length of $thing was",
+                        predicate=Comparison(
+                            content="the length of $thing was",
                             sign=">=",
                             expression=Q_("5 millimeters"),
                             truth=facial_hair_over_5mm,
@@ -1084,22 +1119,24 @@ class TestStatuteRules:
                         terms=beard,
                     ),
                     Fact(
-                        Predicate(
-                            "$thing occurred on or below the chin",
+                        predicate=Predicate(
+                            content="$thing occurred on or below the chin",
                             truth=facial_hair_on_or_below_chin,
                         ),
                         terms=beard,
                     ),
                     Fact(
-                        Predicate(
-                            "$thing existed in an uninterrupted line from the front "
+                        predicate=Predicate(
+                            content="$thing existed in an uninterrupted line from the front "
                             "of one ear to the front of the other ear below the nose",
                             truth=facial_hair_uninterrupted,
                         ),
                         terms=beard,
                     ),
                 ],
-                outputs=Fact(Predicate("$thing was a beard"), terms=beard),
+                outputs=Fact(
+                    predicate=Predicate(content="$thing was a beard"), terms=beard
+                ),
             ),
             enactments=sec_4,
         )

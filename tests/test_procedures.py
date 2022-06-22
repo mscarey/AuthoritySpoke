@@ -7,6 +7,7 @@ from nettlesome.entities import Entity
 from nettlesome.groups import FactorGroup
 from nettlesome.predicates import Predicate
 from nettlesome.quantities import Comparison, Q_
+from pydantic import ValidationError
 
 from authorityspoke.facts import Fact
 from authorityspoke.procedures import Procedure
@@ -14,12 +15,22 @@ from authorityspoke.procedures import Procedure
 
 class TestProcedures:
     def test_exception_for_wrong_type_for_procedure(self, make_predicate):
-        with pytest.raises(TypeError):
+        with pytest.raises(ValidationError):
             Procedure(inputs=make_predicate["p1"], outputs=make_predicate["p2"])
 
     def test_exception_for_wrong_type_in_tuple_for_procedure(self, make_predicate):
-        with pytest.raises(TypeError):
+        with pytest.raises(ValidationError):
             Procedure(inputs=(make_predicate["p1"]), outputs=(make_predicate["p2"]))
+
+    def test_make_procedure_with_evidence_output(self, make_evidence):
+        e = make_evidence
+        c3 = Procedure(outputs=[e["crime_absent"]])
+        assert "absence of <the evidence" in str(c3)
+
+    def test_make_procedure_with_output_without_context(self, make_predicate):
+        no_context = Fact(predicate=make_predicate["p_no_context"], terms=[])
+        c3 = Procedure(outputs=[no_context])
+        assert "the fact it was false that context was included" in str(c3)
 
     def test_get_terms(self, make_procedure):
         # motel, watt
@@ -41,12 +52,12 @@ class TestProcedures:
         )
 
     def test_cannot_add_nonfactor_as_input(self, make_factor):
-        with pytest.raises(TypeError):
+        with pytest.raises(ValidationError):
             Procedure(inputs="factor name", outputs=make_factor["f_shooting"])
 
-    def test_cannot_add_term_as_input(self, make_factor):
-        with pytest.raises(TypeError):
-            Procedure(inputs=Entity("Al"), outputs=make_factor["f_shooting"])
+    def test_cannot_add_entity_as_input(self, make_factor):
+        with pytest.raises(ValidationError):
+            Procedure(inputs=Entity(name="Al"), outputs=make_factor["f_shooting"])
 
     def test_generic_terms(self, make_entity, make_procedure, make_evidence):
         """
@@ -70,7 +81,7 @@ class TestProcedures:
 
     def test_repr(self, make_procedure):
         rep = repr(make_procedure["c3"])
-        assert "to_effect=Fact(predicate=Predicate(template='$person committed" in rep
+        assert "to_effect=Fact(predicate=Predicate(content='$person committed" in rep
 
     def test_entities_of_inputs_for_identical_procedure(
         self, watt_factor, make_procedure, watt_mentioned
@@ -80,10 +91,10 @@ class TestProcedures:
         c1_again = make_procedure["c1_again"]
         assert f["f1"] in c1.inputs
         assert f["f1"] in c1_again.inputs
-        assert f["f1"].terms == (watt_mentioned[0],)
+        assert f["f1"].terms == [watt_mentioned[0]]
         assert f["f2"] in c1.inputs
         assert f["f2"] in c1_again.inputs
-        assert f["f2"].terms == (watt_mentioned[1], watt_mentioned[0])
+        assert f["f2"].terms == [watt_mentioned[1], watt_mentioned[0]]
 
 
 class TestProcedureSameMeaning:
@@ -102,8 +113,12 @@ class TestProcedureSameMeaning:
     def test_unequal_after_swapping_nonreciprocal_entities(self, make_procedure):
         assert not make_procedure["c2"].means(make_procedure["c2_nonreciprocal_swap"])
 
-    def test_same_meaning_no_context(self, make_procedure):
-        assert make_procedure["c_no_context"].means(make_procedure["c_no_context"])
+    def test_same_meaning_no_context(self, make_predicate):
+
+        no_context = Fact(predicate=make_predicate["p_no_context"], terms=[])
+        c_no_context = Procedure(outputs=(no_context))
+
+        assert c_no_context.means(c_no_context)
 
     def test_explain_same_meaning(self, make_procedure):
         left = make_procedure["c1_factor_and_entity_order"]
@@ -290,21 +305,23 @@ class TestProcedureUnion:
 
 
 p_small_weight = Comparison(
-    "the amount of gold $person possessed was", sign="<", expression=Q_("1 gram")
+    content="the amount of gold $person possessed was",
+    sign="<",
+    expression=Q_("1 gram"),
 )
 p_large_weight = Comparison(
-    "the amount of gold $person possessed was",
+    content="the amount of gold $person possessed was",
     sign=">=",
     expression=Q_("100 kilograms"),
 )
-alice = Entity("Alice")
-bob = Entity("Bob")
-craig = Entity("Craig")
-dan = Entity("Dan")
-alice_rich = Fact(p_large_weight, terms=alice)
-bob_poor = Fact(p_small_weight, terms=bob)
-craig_rich = Fact(p_large_weight, terms=craig)
-dan_poor = Fact(p_small_weight, terms=dan)
+alice = Entity(name="Alice")
+bob = Entity(name="Bob")
+craig = Entity(name="Craig")
+dan = Entity(name="Dan")
+alice_rich = Fact(predicate=p_large_weight, terms=alice)
+bob_poor = Fact(predicate=p_small_weight, terms=bob)
+craig_rich = Fact(predicate=p_large_weight, terms=craig)
+dan_poor = Fact(predicate=p_small_weight, terms=dan)
 
 
 class TestFactorGroups:
@@ -376,20 +393,22 @@ class TestFactorGroups:
         """Test part of the process of checking contradiction."""
         rural = Entity(name="Rural's telephone directory")
         compilation = Predicate(
-            "${rural_s_telephone_directory} was a compilation of facts"
+            content="${rural_s_telephone_directory} was a compilation of facts"
         )
         idea = Predicate(content="${rural_s_telephone_directory} was an idea")
         copyrightable = Fact(
-            Predicate(content="${rural_s_telephone_directory} was copyrightable"),
+            predicate=Predicate(
+                content="${rural_s_telephone_directory} was copyrightable"
+            ),
             terms=rural,
         )
         left = Procedure(
             outputs=(copyrightable),
-            inputs=(Fact(compilation, terms=rural)),
+            inputs=(Fact(predicate=compilation, terms=rural)),
         )
         right = Procedure(
             outputs=(copyrightable),
-            inputs=(Fact(idea, terms=rural)),
+            inputs=(Fact(predicate=idea, terms=rural)),
         )
         context = ContextRegister()
         explanation = Explanation.from_context(context)

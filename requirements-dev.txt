@@ -7,7 +7,7 @@ mypy
 pydocstyle
 pytest-cov
 pytest-profiling
-pytest-vcr
+pytest-recording
 pytest>=6.0.0
 rope
 setuptools

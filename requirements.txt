@@ -6,8 +6,14 @@ git+git://github.com/mscarey/legislice.git@4e32dda4f7323b3478c181744e7dccb399332
 marshmallow>=3.10
 marshmallow-oneofschema
 nettlesome>=0.5.1
+anchorpoint~=0.7.0
+eyecite~=2.3.0
+justopinion~=0.2.5
+legislice~=0.7.0
+nettlesome~=0.6.1
 pint>=0.15
 python-dotenv
+python-ranges~=0.2.1
 python-slugify
 pyyaml
 requests

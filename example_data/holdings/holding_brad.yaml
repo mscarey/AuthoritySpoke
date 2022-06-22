@@ -1,5 +1,19 @@
-holdings:
-- inputs:
+
+- outputs:
+  - type: evidence
+    exhibit: 
+      offered_by:
+        type: entity
+        name: the prosecution
+      name: proof of Bradley's guilt
+      generic: true
+    to_effect:
+      type: fact
+      name: fact that Bradley committed a crime
+      content: Bradley committed a crime
+    name: absence of evidence of Bradley's guilt
+    absent: true
+  inputs:
   - type: fact
     content: '{officers'' search of the yard} was a warrantless search and seizure'
   - type: fact
@@ -25,28 +39,23 @@ holdings:
   - type: fact
     content: '{} was derived from {}'
     terms:
-    - type: exhibit
-      name: proof of Bradley's guilt
-      generic: true
+    - proof of Bradley's guilt
     - type: entity
       name: officers' search of the yard
-  outputs:
-    type: evidence
-    exhibit: proof of Bradley's guilt
-    to_effect:
-      type: fact
-      name: fact that Bradley committed a crime
-      content: Bradley committed a crime
-    name: absence of evidence of Bradley's guilt
-    absent: true
   enactments:
-  - node: /us/const/amendment/IV
-    suffix: ', and no Warrants shall issue'
-    name: search clause
-  - node: /us/const/amendment/XIV/1
-    prefix: 'immunities of citizens of the United States; '
-    suffix: ' nor deny to any person'
-    name: due process clause
+  - name: search clause
+    enactment:
+      node: /us/const/amendment/IV
+    selection:
+      quotes:
+        suffix: ', and no Warrants shall issue'
+  - name: due process clause
+    enactment:
+      node: /us/const/amendment/XIV/1
+    selection:
+      quotes:
+        prefix: 'immunities of citizens of the United States; '
+        suffix: ' nor deny to any person'
   mandatory: true
   universal: true
 - inputs:
@@ -201,8 +210,7 @@ holdings:
     content: the distance from which part of Bradley's marijuana patch could be seen
       plainly was >= 1 foot
   - type: fact
-    content: the distance between Bradley's marijuana patch and Bradley's house was
-      >= 20 feet
+    content: the distance between Bradley's marijuana patch and Bradley's house was >= 20 feet
   - type: fact
     content: a house that did not belong to Bradley had access to the rear yard where
       Bradley's marijuana patch was located

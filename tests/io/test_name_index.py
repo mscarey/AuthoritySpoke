@@ -4,8 +4,10 @@ from dotenv import load_dotenv
 
 from legislice.download import Client
 
-from authorityspoke.io import loaders, readers, schemas_yaml
+from authorityspoke import Fact
+from authorityspoke.io import loaders, readers
 from authorityspoke.io import name_index, text_expansion
+
 
 load_dotenv()
 
@@ -93,25 +95,31 @@ class TestCollectMentioned:
         shortest = mentioned.popitem()
         assert shortest[0] == "Short Name"
 
-    def test_name_inferred_from_content(self, fake_usc_client):
+    def test_name_inferred_from_content(self):
         """
         Test that a name field is generated for Factors without them.
 
         The Factors must be inserted in "mentioned" with the generated name.
         """
 
-        oracle_records = loaders.load_holdings("holding_oracle.json")
-        holdings = readers.read_holdings(oracle_records, client=fake_usc_client)
-        factor = holdings[2].inputs[0]
-        assert factor.predicate.content == "${the_java_api} was an original work"
+        oracle_records = loaders.load_holdings("holding_oracle.yaml")
+        for holding in oracle_records:
+            holding.pop("enactments", None)
+            holding.pop("enactments_despite", None)
+        holdings, mentioned = name_index.index_names(oracle_records)
+        assert holdings[2]["inputs"][0] == "the Java API was an original work"
+        assert (
+            mentioned["the Java API was an original work"]["predicate"]["content"]
+            == "${the_java_api} was an original work"
+        )
 
     def test_enactment_name_index(self):
         """
         Test error message:
         'Name "securing the right to writings" not found in the index of mentioned Factors'
         """
-        feist_records = loaders.load_holdings("holding_feist.json")
-        record, mentioned = name_index.index_names(feist_records)
+        feist_records = loaders.load_holdings("holding_feist.yaml")
+        record, mentioned = name_index.collect_enactments(feist_records)
         assert "securing the right to writings" in mentioned
 
     def test_context_factor_not_collapsed(self, fake_usc_client):
@@ -139,9 +147,13 @@ class TestCollectMentioned:
             },
         }
         holding = text_expansion.expand_shorthand(holding)
-        built = readers.read_holding(record=holding, client=fake_usc_client)
-        assert built.inputs[0].short_string.startswith(
-            "the fact that <Rural's telephone listings> were names"
+        built = readers.read_holdings(record=[holding], client=fake_usc_client)
+        assert (
+            built[0]
+            .inputs[0]
+            .short_string.startswith(
+                "the fact that <Rural's telephone listings> were names"
+            )
         )
 
     def test_enactment_name_in_holding(self, fake_usc_client):
@@ -149,9 +161,11 @@ class TestCollectMentioned:
         Test error message:
         'Name "securing for authors" not found in the index of mentioned Factors'
         """
-        feist_records = loaders.load_holdings("holding_feist.json")
-        feist_holding = readers.read_holding(feist_records[0], client=fake_usc_client)
-        assert "securing for limited Times" in feist_holding.short_string
+        feist_records = loaders.load_holdings("holding_feist.yaml")
+        feist_holdings = readers.read_holdings(
+            [feist_records[0]], client=fake_usc_client
+        )
+        assert "securing for limited Times" in feist_holdings[0].short_string
 
     def test_update_name_index_with_longer_factor(self):
         raw_fact = {
@@ -247,42 +261,12 @@ class TestRetrieveMentioned:
                 },
             ],
         }
-        relevant_fact = readers.read_fact(relevant_dict)
-        assert relevant_fact.terms[1].terms[1].name == "Bob"
+        record = readers.expand_shorthand(relevant_dict)
+        record, mentioned = readers.index_names(record)
+        expanded = readers.expand_factor(record, mentioned)
 
-    def test_get_references_without_changing_mentioned(self):
-        """
-        This isn't catching the bug where the mentioned dict is mutated.
-        """
-        schema = schemas_yaml.HoldingSchema()
-        schema.context["mentioned"] = name_index.Mentioned(
-            {
-                "Bradley": {"type": "entity"},
-                "fact that Bradley committed a crime": {
-                    "type": "fact",
-                    "content": "Bradley committed a crime",
-                },
-            }
-        )
-        assert (
-            schema.context["mentioned"]["fact that Bradley committed a crime"][
-                "content"
-            ]
-            == "Bradley committed a crime"
-        )
-        new = {
-            "inputs": "fact that Bradley committed a crime",
-            "outputs": {"type": "fact", "content": "Bradley committed a tort"},
-        }
-        holding = schema.load(new)
-        assert holding.inputs[0].terms[0].name == "Bradley"
-        # Making the same assertion again to show it's still true
-        assert (
-            schema.context["mentioned"]["fact that Bradley committed a crime"][
-                "content"
-            ]
-            == "Bradley committed a crime"
-        )
+        relevant_fact = Fact(**expanded)
+        assert relevant_fact.terms[1].terms[1].name == "Bob"
 
     overlapping_names_mentioned = {
         "Godzilla": {"type": "Entity"},
@@ -293,35 +277,23 @@ class TestRetrieveMentioned:
     def test_retrieve_references_with_substring(self):
         """
         The Mentioned object must be sorted longest to shortest.
-
-        Also, the name used as the key for the Mentioned dict will
-        have to be included in each Entity dict in the `context`
-        list created by `get_references_from_mentioned`.
         """
 
-        mentioned = name_index.Mentioned(self.overlapping_names_mentioned)
-        content = "Mecha Godzilla threw Mothra at Godzilla"
-        schema = schemas_yaml.FactSchema()
-        mentioned = mentioned.sorted_by_length()
-        schema.context["mentioned"] = mentioned
-        new_content, context = schema.get_references_from_mentioned(content)
-        assert new_content == "${mecha_godzilla} threw ${mothra} at ${godzilla}"
-        assert context[2] == {"name": "Godzilla", "type": "Entity"}
+        record = [
+            {
+                "outputs": [
+                    {
+                        "type": "fact",
+                        "predicate": {
+                            "content": "{Mecha Godzilla} threw {Mothra} at {Godzilla}"
+                        },
+                    }
+                ]
+            }
+        ]
 
-    def test_mentioned_object_string(self):
-        mentioned = name_index.Mentioned(self.overlapping_names_mentioned)
-        assert "Mentioned({'Godzilla'" in str(mentioned)
-        assert "Mentioned({'Godzilla'" in repr(mentioned)
+        obj, mentioned = name_index.collect_mentioned(record)
+        sorted_mentioned = mentioned.sorted_by_length()
 
-    def test_unmarked_factor_when_one_was_marked(self):
-        fact = {
-            "type": "fact",
-            "content": "$Hamlet lived at Elsinore",
-            "terms": [{"type": "Entity", "name": "Hamlet"}],
-        }
-        schema = schemas_yaml.FactSchema()
-        schema.context["mentioned"] = name_index.Mentioned(
-            {"Elsinore": {"type": "Entity"}}
-        )
-        loaded = schema.load(fact)
-        assert loaded.predicate.content == "$Hamlet lived at ${elsinore}"
+        assert obj[0]["outputs"][0] == "Mecha Godzilla threw Mothra at Godzilla"
+        assert list(sorted_mentioned.items())[2] == ("Godzilla", {"type": "Entity"})

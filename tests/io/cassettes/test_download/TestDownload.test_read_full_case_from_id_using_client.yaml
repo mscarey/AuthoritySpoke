@@ -1,0 +1,86 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.25.1
+      authorization:
+      - DUMMY
+    method: GET
+    uri: https://api.case.law/v1/cases/236682/?full_case=true
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAC/4VVwW7jNhD9FUJAgRZ1ZEm2Zdk9bdMC7fawwO4WPbSFQZG0xUQmBZKy1wgC9CP6
+        hf2SvqFkOy6Q5pDIJIczb96bGT4lWibrYlaWVTFJetcm66QJofPr6ZR3OhXcq7Tlx+khn9JvPx1s
+        p8kkMXyvYP6TOirPPom+bdnBp+y99apr2C/96VEZydt2NN3wunbqoHnQ1uDeeCO9tZRKaA+DjeSB
+        vOdVkd9lJZ1Y8ajCxvT7WjmcYGurnQ+bju/IcoWNlt+uhQ4xnE/Wvz8l4dTRgd1utdC8Hc5jEPbO
+        Pabss3IuZR9Vl7JV8vznJDnYtqccn95gZrDz01mRzefZsprPqtkyJ46GkyvoHHs1d8JKintrnzxP
+        Eqc66wKZvhXzbOmn5XJJobagczNq8jEeema37J5UQ367XknGjWQ/KNzaa4OlNiw0iv1qQINkn8AV
+        Kdl3ymnr2L3tXWBb/CIjIkcH607kFHRx47mfsK2zewaRMhYsvjNSikoKoJCOIBdv5xLN/JS7xztP
+        0e9EuMunr9RNlCqCTNl9SGHl236Hg9vrI45VPisupfqf1JDIq5mRGA+9015qMQR+iv5m8xFVa81u
+        QDPYv9U9L53FVKc3yLE4NpCh1R5aJOvgenXBTSkTICpXvwkW1YzqBPUmoHE2t4HJ6BqZSIHe7g71
+        Ms2nqxf9e7nfye3/+sD5+Vps2q+K7JDi37VxJ1jl+COg+MRGwpdaCZ8V/r6mRv4mhStE7khPdRzS
+        4Ia3J689MSy4kxprHU7JmiaSaLjboDwMqqhagnsraG22WiojwE2WLmYViGx4sSiRwVaUIivK2bLM
+        1DwTMl+ulvmiXnBRq9liJfN5XeeVWPBZLYtFlc8ylRV8UcpqoaTKKhJF7xvuG+rW9aoqy3ou5qts
+        VXAsSCbr5BlSvsifx6nTdzSxoFxSZDSy5nd5+Tmv1nm5XhRpvqqKYvltlq2zjOYOqK2tPFHOHm3X
+        e5pLVARwwmn3oZc75QeGOu6Cjou3h22a4ILttLlOPfUFSJMPwx6zKhZ97ICU/fPX3+wzlrEDWa1a
+        e2RS+732HhMhNNoz32s6Ebz38apT7Mg9RgmDyuilcYhYp3ckHTuimSaMt6Gx/a5huEzmxgbmlTso
+        OWF1H+g6ZMZBwyW8K8Oc2vUtdy3asA48zicaV8MlZocoUm0pTwPovwE1vHil4By3uYcNTasRvza7
+        eCXip/2XiHmEydByohnwqYNyY7CU/Ryib2uApiZ2jEfBOYKEzJloMUYEckWczsX3ClmdRnc3OInZ
+        Vsb0OwtQ9eARHQCFtaBgxP/AhcDQwOeK6pXkGWRBEgT5hMx9pwQFcg7fSWQtXDQlEUKMjwHd8INi
+        rbWPikg/WVjqQE8ePEFwGqbjI7nnD1AUbYgG7SElXiSDoqNXkQcMS6NOY3WOcYd6o1e5UVxu9rCK
+        L97bFfuHeTeI5JsLV6DoWobn4uNngq7FFFkiVY2yPTGHQrqU1mitvijRh1doHNF/R8JeSXuBhNg6
+        c0UG1OyxeID7fW/UhF6/HAtqpR9jfYHo87PA7rUTlFvstwliXx7fWqEoFftemQeOHRDTGCphku+d
+        kU4dwZoNuDTMArwAz8//Am4d4dWwCQAA
+    headers:
+      Accept-Ranges:
+      - bytes
+      Access-Control-Allow-Headers:
+      - Authorization
+      Access-Control-Allow-Origin:
+      - '*'
+      Allow:
+      - GET, HEAD, OPTIONS
+      CF-Cache-Status:
+      - EXPIRED
+      CF-RAY:
+      - 6701db7c9fc328d5-DFW
+      Cache-Control:
+      - s-maxage=0, max-age=0
+      Connection:
+      - keep-alive
+      Content-Disposition:
+      - attachment; filename="CAP_2021-07-17 07:46:35.876582.json"
+      Content-Encoding:
+      - gzip
+      Content-Length:
+      - '1221'
+      Content-Type:
+      - application/json
+      Date:
+      - Sat, 17 Jul 2021 07:46:35 GMT
+      Expect-CT:
+      - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - cloudflare
+      Strict-Transport-Security:
+      - max-age=15768000
+      Vary:
+      - Accept, Accept-Encoding
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+version: 1

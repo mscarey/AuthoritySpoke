@@ -1,20 +1,24 @@
-from authorityspoke.evidence import Evidence, Exhibit
-from authorityspoke.facts import build_fact
-
 from nettlesome.terms import TermSequence
+
+from authorityspoke.facts import Fact, build_fact, Evidence, Exhibit
+from authorityspoke import Entity
 
 
 class TestEvidence:
     def test_make_evidence_object(self, watt_factor):
-        e = Evidence(Exhibit(form="testimony"), to_effect=watt_factor["f2"])
+        e = Evidence(
+            exhibit=Exhibit(offered_by=Entity(name="Al"), form="testimony"),
+            to_effect=watt_factor["f2"],
+        )
         assert not e.absent
 
     def test_default_len_based_on_unique_entity_slots(self, make_entity, make_factor):
         """same as e["no_shooting"]"""
 
         e = Evidence(
-            Exhibit(
+            exhibit=Exhibit(
                 form="testimony",
+                offered_by=Entity(name="Al"),
                 statement=make_factor["f_no_shooting"],
                 statement_attribution=make_entity["alice"],
             ),
@@ -47,7 +51,10 @@ class TestEvidence:
         assert "Bob" in str(context[1])
 
     def test_get_entity_orders_no_statement(self, make_factor):
-        e = Evidence(Exhibit(form="testimony"), to_effect=make_factor["f_no_crime"])
+        e = Evidence(
+            exhibit=Exhibit(form="testimony", offered_by=Entity(name="Al")),
+            to_effect=make_factor["f_no_crime"],
+        )
         assert len(e.to_effect.terms) == 1
 
     def test_evidence_str_with_context(self, make_evidence):
@@ -57,7 +64,7 @@ class TestEvidence:
         )
 
     def test_type_of_terms(self, make_evidence):
-        assert isinstance(make_evidence["no_shooting"].terms, TermSequence)
+        assert isinstance(make_evidence["no_shooting"].term_sequence, TermSequence)
 
 
 class TestEvidenceSameMeaning:
@@ -71,6 +78,35 @@ class TestEvidenceSameMeaning:
     def test_unequal_due_to_entity_order(self, make_evidence):
         e = make_evidence
         assert not e["no_shooting"].means(e["no_shooting_different_witness"])
+
+    def test_implies_due_to_more_complex_entity_order(self, make_exhibit):
+        """Test the entire _registers_for_interchangeable_context function."""
+
+        hit = Fact(
+            predicate="$person1 hit $target1 and $target2",
+            terms=[Entity(name="Moe"), Entity(name="Curly"), Entity(name="Larry")],
+        )
+        hit2 = Fact(
+            predicate="$person1 hit $target1 and $target2",
+            terms=[
+                Entity(name="Joker"),
+                Entity(name="Batman"),
+                Entity(name="Superman"),
+            ],
+        )
+        exhibit = Exhibit(
+            form="testimony",
+            offered_by=Entity(name="Curly"),
+            statement=hit,
+            statement_attribution=Entity(name="Larry"),
+        )
+        exhibit2 = Exhibit(
+            form="testimony",
+            offered_by=Entity(name="Joker"),
+            statement=hit2,
+            statement_attribution=Entity(name="Batman"),
+        )
+        assert exhibit.implies(exhibit2)
 
     def test_unequal_different_attributes(self, make_evidence):
         assert not (

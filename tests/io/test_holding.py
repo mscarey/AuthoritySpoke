@@ -1,6 +1,7 @@
 from collections import OrderedDict
+from datetime import date
 import os
-from marshmallow import ValidationError
+from pydantic import ValidationError
 import pytest
 
 from anchorpoint.textselectors import TextQuoteSelector
@@ -11,19 +12,20 @@ from nettlesome.terms import ContextRegister
 from nettlesome.entities import Entity
 from nettlesome.predicates import Predicate
 
+from authorityspoke.decisions import Decision, DecisionReading
 from authorityspoke.facts import Fact
 from authorityspoke.holdings import Holding, HoldingGroup
-from authorityspoke.opinions import Opinion
-from authorityspoke.procedures import Procedure
-from authorityspoke.io import loaders, readers, dump, name_index
-from authorityspoke.io.fake_enactments import FakeClient
-from authorityspoke.io.loaders import (
-    load_holdings,
-    read_holdings_from_file,
-    load_anchored_holdings,
+from authorityspoke.opinions import (
+    HoldingWithAnchors,
+    Opinion,
+    OpinionReading,
+    AnchoredHoldings,
 )
+from authorityspoke.procedures import Procedure
+from authorityspoke.io import loaders, readers, name_index
+from authorityspoke.io.fake_enactments import FakeClient
+from authorityspoke.io.loaders import load_holdings, read_holdings_from_file
 from authorityspoke.io import filepaths, text_expansion
-from authorityspoke.io import schemas_json
 from authorityspoke.rules import Rule
 
 load_dotenv()
@@ -36,24 +38,31 @@ class TestHoldingDump:
     def test_dump_and_read_holding(self, fake_usc_client, make_holding):
         """Dump holding and read it as if it came from YAML."""
         holding = make_holding["h2"]
-        dumped = dump.to_dict(holding)
+        dumped = holding.dict()
         content = dumped["rule"]["procedure"]["inputs"][0]["predicate"]["content"]
         assert content == "$thing was on the premises of $place"
 
-        loaded = readers.read_holding(dumped, client=fake_usc_client)
-        loaded_content = loaded.despite[0].predicate.content
+        loaded = readers.read_holdings([dumped], client=fake_usc_client)
+        loaded_content = loaded[0].despite[0].predicate.content
         assert "the distance between $place1 and $place2 was" in loaded_content
 
     def test_dump_and_load_holding(self, fake_usc_client, make_holding):
         """Dump holding and load it as if it was a JSON API response."""
         holding = make_holding["h2"]
-        dumped = dump.to_dict(holding)
+        dumped = holding.dict()
         content = dumped["rule"]["procedure"]["inputs"][1]["predicate"]["content"]
         assert content == "$thing was a stockpile of Christmas trees"
-        schema = schemas_json.HoldingSchema()
-        loaded = schema.load(dumped)
+        loaded = Holding(**dumped)
         loaded_content = loaded.inputs[0].predicate.content
         assert "$thing was on the premises of $place" in loaded_content
+
+    def test_dump_holdings_with_comparison(self, fake_usc_client):
+
+        holdings = read_holdings_from_file("holding_watt.yaml", client=fake_usc_client)
+        assert "was no more than 35 foot" in str(holdings[1])
+        dumped = holdings[1].dict()
+        predicate = dumped["rule"]["procedure"]["inputs"][3]["predicate"]
+        assert predicate["quantity_range"]["quantity"] == "35 foot"
 
 
 class TestEntityImport:
@@ -103,93 +112,91 @@ class TestHoldingImport:
         is stored with that flag instead of generating Holdings that it
         implies.
         """
-        lotus_holdings = load_holdings("holding_lotus.json")
+        lotus_holdings = load_holdings("holding_lotus.yaml")
         assert len(lotus_holdings) == 10
 
-    def test_import_enactments_and_anchors(self, make_opinion, make_response):
+    def test_import_enactments_and_anchors(
+        self, make_opinion_with_holding, make_response
+    ):
         """
         Testing issue that caused enactment expansion to fail only when
         text anchors were loaded.
         """
-        raw_holdings = {
-            "factor_anchors": [
-                {
+        raw_holdings = [
+            {
+                "inputs": {
+                    "type": "fact",
+                    "content": "{Rural's telephone directory} was a fact",
                     "name": "Rural's telephone directory was a fact",
-                    "anchors": [
-                        {"exact": "facts", "prefix": "The first is that"},
-                        {
-                            "exact": "as to facts",
-                            "prefix": "No one may claim originality",
-                        },
-                        {"exact": "facts", "prefix": "no one may copyright"},
-                    ],
-                },
-                {
-                    "name": "Rural's telephone directory was copyrightable",
-                    "anchors": [
-                        {
-                            "exact": "copyrightable",
-                            "prefix": "first is that facts are not",
-                        },
-                        "The sine qua non of|copyright|",
-                        {"exact": "no one may copyright", "suffix": "facts"},
-                    ],
-                },
-            ],
-            "holdings": [
-                {
-                    "inputs": {
-                        "type": "fact",
-                        "content": "{Rural's telephone directory} was a fact",
+                    "anchors": {
+                        "quotes": [
+                            {"exact": "facts", "prefix": "The first is that"},
+                            {
+                                "exact": "as to facts",
+                                "prefix": "No one may claim originality",
+                            },
+                            {"exact": "facts", "prefix": "no one may copyright"},
+                        ]
                     },
-                    "outputs": {
-                        "type": "fact",
-                        "content": "Rural's telephone directory was copyrightable",
-                        "truth": False,
+                },
+                "outputs": {
+                    "type": "fact",
+                    "content": "Rural's telephone directory was copyrightable",
+                    "truth": False,
+                    "anchors": {
+                        "quotes": [
+                            {
+                                "exact": "copyrightable",
+                                "prefix": "first is that facts are not",
+                            },
+                            "The sine qua non of|copyright|",
+                            {"exact": "no one may copyright", "suffix": "facts"},
+                        ]
                     },
-                    "enactments": [
-                        {
+                },
+                "enactments": [
+                    {
+                        "name": "securing for authors",
+                        "enactment": {
                             "node": "/us/const/article/I/8/8",
                             "exact": (
                                 "To promote the Progress of Science and useful Arts, "
                                 "by securing for limited Times to Authors"
                             ),
-                            "name": "securing for authors",
                         },
-                        {
+                    },
+                    {
+                        "name": "right to writings",
+                        "enactment": {
                             "node": "/us/const/article/I/8/8",
                             "exact": "the exclusive Right to their respective Writings",
-                            "name": "right to writings",
                         },
-                    ],
-                    "mandatory": True,
-                    "universal": True,
-                },
-                {
-                    "outputs": {
-                        "type": "fact",
-                        "content": "Rural's telephone directory was copyrightable",
                     },
-                    "enactments": ["securing for authors", "right to writings"],
-                    "mandatory": True,
-                    "anchors": "compilations of facts|generally are|",
+                ],
+                "mandatory": True,
+                "universal": True,
+            },
+            {
+                "outputs": {
+                    "type": "fact",
+                    "content": "Rural's telephone directory was copyrightable",
                 },
-            ],
-        }
+                "enactments": ["securing for authors", "right to writings"],
+                "mandatory": True,
+                "anchors": {"quotes": ["compilations of facts|generally are|"]},
+            },
+        ]
         mock_client = FakeClient(responses=make_response)
-        (
-            feist_holdings,
-            holding_anchors,
-            named_anchors,
-            enactment_anchors,
-        ) = readers.read_holdings_with_anchors(record=raw_holdings, client=mock_client)
+        f_anchored_holdings = readers.read_holdings_with_anchors(
+            record=raw_holdings, client=mock_client
+        )
 
-        feist = make_opinion["feist_majority"]
+        feist = make_opinion_with_holding["feist_majority"]
+        feist.clear_holdings()
         feist.posit(
-            feist_holdings,
-            holding_anchors=holding_anchors,
-            named_anchors=named_anchors,
-            enactment_anchors=enactment_anchors,
+            f_anchored_holdings.holdings,
+            named_anchors=f_anchored_holdings.named_anchors,
+            enactment_anchors=f_anchored_holdings.enactment_anchors,
         )
         assert feist.holdings[0].enactments[0].node == "/us/const/article/I/8/8"
         assert feist.holdings[1].enactments[0].node == "/us/const/article/I/8/8"
@@ -200,71 +207,85 @@ class TestHoldingImport:
         impossible to get text anchors.
         """
         mock_client = FakeClient(responses=make_response)
-        raw_holdings = load_anchored_holdings(f"holding_oracle.json")
-        (
-            holdings,
-            holding_anchors,
-            named_anchors,
-            _,
-        ) = readers.read_holdings_with_anchors(raw_holdings, client=mock_client)
+        raw_holdings = load_holdings("holding_oracle.yaml")
+        loaded = readers.read_holdings_with_anchors(raw_holdings, client=mock_client)
 
-        assert isinstance(holdings[0], Holding)
-        assert isinstance(named_anchors.popitem()[1].pop(), TextQuoteSelector)
+        assert isinstance(loaded.holdings[0], HoldingWithAnchors)
+        assert isinstance(loaded.named_anchors[1].anchors.quotes[0], TextQuoteSelector)
 
-    def test_load_and_posit_holdings_with_anchors(self, make_opinion, make_response):
+    def test_load_and_posit_holdings_with_anchors(self, make_response):
         """
         Test that Opinion.posit can take a HoldingsIndexed as the only argument.
         Trying to combine several tasks that normally happen together, into a single command.
         """
         mock_client = FakeClient(responses=make_response)
-        oracle = make_opinion["oracle_majority"]
         oracle_holdings_with_anchors = loaders.read_anchored_holdings_from_file(
-            "holding_oracle.json", client=mock_client
+            "holding_oracle.yaml", client=mock_client
         )
-        oracle.posit(oracle_holdings_with_anchors)
-        assert len(oracle.holdings) == 20
+        reading = OpinionReading()
+        reading.posit(oracle_holdings_with_anchors)
+        assert len(reading.holdings) == 20
+
+    def test_decision_posits_holdings_with_anchors(self, make_response):
+        mock_client = FakeClient(responses=make_response)
+        oracle_holdings_with_anchors = loaders.read_anchored_holdings_from_file(
+            "holding_oracle.yaml", client=mock_client
+        )
+        reading = DecisionReading(decision=Decision(decision_date=date(2019, 1, 1)))
+        reading.posit(oracle_holdings_with_anchors)
+        assert len(reading.holdings) == 20
+
+    def test_pass_holdings_to_decision_reading_constructor(
+        self, make_decision, make_response
+    ):
+        mock_client = FakeClient(responses=make_response)
+        oracle = make_decision["oracle"]
+        oracle_holdings = read_holdings_from_file(
+            "holding_oracle.yaml", client=mock_client
+        )
+        oracle_reading = DecisionReading(decision=oracle)
+        oracle_reading.posit(oracle_holdings)
+        assert (
+            oracle_reading.opinion_readings[0].holdings[0].enactments[0].node
+            == "/us/usc/t17/s102/a"
+        )
 
 
 class TestTextAnchors:
     client = Client(api_token=TOKEN)
 
-    def test_read_holding_with_no_anchor(self, make_opinion, make_analysis):
-        oracle = make_opinion["oracle_majority"]
+    def test_read_holding_with_no_anchor(self, make_analysis):
         raw_analysis = make_analysis["no anchors"]
-        (
-            oracle_holdings,
-            holding_anchors,
-            named_anchors,
-            enactment_anchors,
-        ) = readers.read_holdings_with_anchors(raw_analysis)
-        oracle.posit(
-            oracle_holdings,
-            holding_anchors=holding_anchors,
-            named_anchors=named_anchors,
-            enactment_anchors=enactment_anchors,
+        reading = OpinionReading()
+        anchored_holdings = readers.read_holdings_with_anchors(raw_analysis)
+        reading.posit(
+            holdings=anchored_holdings.holdings,
+            named_anchors=anchored_holdings.named_anchors,
+            enactment_anchors=anchored_holdings.enactment_anchors,
         )
-        assert not oracle.holdings[0].anchors
+        assert not reading.holding_anchors[0].positions
+        assert not reading.holding_anchors[0].quotes
 
     def test_holding_without_enactments_or_regime(self, raw_holding):
         expanded = text_expansion.expand_shorthand(raw_holding["bradley_house"])
-        built = readers.read_holding(expanded)
-        new_factor = built.outputs[0].to_effect.terms[0]
+        built = readers.read_holdings([expanded])
+        new_factor = built[0].outputs[0].to_effect.terms[0]
         assert new_factor.name == "Bradley"
 
-    def test_posit_one_holding_with_anchor(
-        self, make_opinion, raw_holding, make_response
-    ):
+    def test_posit_one_holding_with_anchor(self, raw_holding, make_response):
         mock_client = FakeClient(responses=make_response)
-        holding = readers.read_holding(raw_holding["bradley_house"], client=mock_client)
-        cardenas = make_opinion["cardenas_majority"]
-        cardenas.posit_holding(
-            holding,
+        holdings = readers.read_holdings(
+            [raw_holding["bradley_house"]], client=mock_client
+        )
+        reading = OpinionReading()
+        reading.posit_holding(
+            holdings[0],
             holding_anchors=TextQuoteSelector(
                 exact="some text supporting this holding"
             ),
         )
         assert (
-            cardenas.holdings[-1].anchors[0].exact
+            reading.anchored_holdings.holdings[-1].anchors.quotes[0].exact
             == "some text supporting this holding"
         )
 
@@ -284,6 +305,7 @@ class TestTextAnchors:
                 },
                 "outputs": {
                     "type": "evidence",
+                    "exhibit": {"offered_by": {"type": "entity", "name": "the People"}},
                     "to_effect": {
                         "type": "fact",
                         "name": "fact that Bradley committed a crime",
@@ -325,6 +347,10 @@ class TestTextAnchors:
                         "type": "Exhibit",
                         "name": "officer's testimony that defendant was addicted to heroin",
                         "form": "testimony",
+                        "offered_by": {
+                            "type": "Entity",
+                            "name": "The People of California",
+                        },
                         "statement": {
                             "type": "Fact",
                             "name": "fact that defendant was addicted to heroin",
@@ -345,7 +371,7 @@ class TestTextAnchors:
                                 "name": "The People of California",
                             },
                         },
-                        "statement": {
+                        "fact": {
                             "type": "Fact",
                             "name": "fact that defendant committed an attempted robbery",
                             "content": "defendant committed an attempted robbery",
@@ -394,7 +420,7 @@ class TestTextAnchors:
         expanded = text_expansion.expand_shorthand(holdings)
         built = readers.read_holdings(expanded)
         allegation = built[0].inputs[1]
-        assert allegation.statement.terms[0].name == "defendant"
+        assert allegation.fact.terms[0].name == "defendant"
 
     def test_select_enactment_text_by_default(self, make_response):
         mock_client = FakeClient(responses=make_response)
@@ -405,20 +431,20 @@ class TestTextAnchors:
                     "content": "the Lotus menu command hierarchy was copyrightable",
                 }
             ],
-            "enactments": [{"node": "/us/usc/t17/s410/c"}],
+            "enactments": {"enactment": {"node": "/us/usc/t17/s410/c"}},
         }
-        holding = readers.read_holding(holding_dict, client=mock_client)
-        assert holding.enactments[0].selected_text().startswith("In any judicial")
+        holding = readers.read_holdings([holding_dict], client=mock_client)
+        assert holding[0].enactments[0].selected_text().startswith("In any judicial")
 
     def test_enactment_has_subsection(self, make_response):
         mock_client = FakeClient(responses=make_response)
-        to_read = load_holdings("holding_lotus.json")
+        to_read = load_holdings("holding_lotus.yaml")
         holdings = readers.read_holdings(to_read, client=mock_client)
         assert holdings[8].enactments[0].node.split("/")[-1] == "b"
 
     def test_enactment_text_limited_to_subsection(self, make_response):
         mock_client = FakeClient(responses=make_response)
-        to_read = load_holdings("holding_lotus.json")
+        to_read = load_holdings("holding_lotus.yaml")
         holdings = readers.read_holdings(to_read, client=mock_client)
         assert "architectural works" not in str(holdings[8].enactments[0])
 
@@ -430,7 +456,7 @@ class TestTextAnchors:
         """
 
         watt = make_opinion["watt_majority"]
-        watt.posit(load_holdings("holding_watt.json"))
+        watt.posit(load_holdings("holding_watt.yaml"))
         assert watt.holdings[0] == real_holding["h1"]
 
     def test_same_enactment_objects_equal(self, make_response):
@@ -439,16 +465,16 @@ class TestTextAnchors:
         exactly match the holdings created for testing in conftest.
         """
         mock_client = FakeClient(responses=make_response)
-        to_read = load_holdings("holding_watt.json")
+        to_read = load_holdings("holding_watt.yaml")
         holdings = readers.read_holdings(to_read, client=mock_client)
         assert holdings[0].enactments[0].means(holdings[1].enactments[0])
 
     def test_same_enactment_in_two_opinions(self, make_response):
         mock_client = FakeClient(responses=make_response)
-        to_read = load_holdings("holding_brad.json")
+        to_read = load_holdings("holding_brad.yaml")
         brad_holdings = readers.read_holdings(to_read, client=mock_client)
 
-        to_read = load_holdings("holding_watt.json")
+        to_read = load_holdings("holding_watt.yaml")
         watt_holdings = readers.read_holdings(to_read, client=mock_client)
 
         assert any(
@@ -463,12 +489,12 @@ class TestTextAnchors:
         This tests whether the loaded objects turn out equal.
         """
         mock_client = FakeClient(responses=make_response)
-        to_read = load_holdings("holding_brad.json")
+        to_read = load_holdings("holding_brad.yaml")
         holdings = readers.read_holdings(to_read, client=mock_client)
         assert any(holdings[6].inputs[0].means(x) for x in holdings[5].inputs)
 
     def test_fact_from_loaded_holding(self, make_response):
-        to_read = load_holdings("holding_watt.json")
+        to_read = load_holdings("holding_watt.yaml")
         mock_client = FakeClient(responses=make_response)
         holdings = readers.read_holdings(to_read, client=mock_client)
         new_fact = holdings[0].inputs[1]
@@ -476,92 +502,87 @@ class TestTextAnchors:
         assert isinstance(new_fact.terms[0], Entity)
 
     def test_fact_with_quantity(self, make_response):
-        to_read = load_holdings("holding_watt.json")
+        to_read = load_holdings("holding_watt.yaml")
         mock_client = FakeClient(responses=make_response)
         holdings = readers.read_holdings(to_read, client=mock_client)
         new_fact = holdings[1].inputs[3]
         assert "was no more than 35 foot" in str(new_fact)
 
-    def test_use_int_not_pint_without_dimension(self, make_opinion, make_response):
+    def test_use_int_not_pint_without_dimension(self, make_response):
         mock_client = FakeClient(responses=make_response)
-        brad = make_opinion["brad_majority"]
-        to_read = load_holdings("holding_brad.json")
-        holdings = readers.read_holdings(to_read, client=mock_client)
-        brad.posit(holdings)
-        expectation_not_reasonable = list(brad.holdings)[6]
+        to_read = load_holdings("holding_brad.yaml")
+        loaded_holdings = readers.read_holdings(to_read, client=mock_client)
+        anchored_holdings = AnchoredHoldings(
+            holdings=[HoldingWithAnchors(holding=item) for item in loaded_holdings]
+        )
+        reading = OpinionReading(anchored_holdings=anchored_holdings)
+        expectation_not_reasonable = list(reading.holdings)[6]
         assert "dimensionless" not in str(expectation_not_reasonable)
-        assert isinstance(expectation_not_reasonable.inputs[0].predicate.quantity, int)
+        assert expectation_not_reasonable.inputs[0].predicate.quantity == 3
 
-    def test_opinion_posits_holding(self, make_opinion, make_response):
+    def test_opinion_posits_holding(self, make_response):
         mock_client = FakeClient(responses=make_response)
-        brad = make_opinion["brad_majority"]
-        to_read = load_holdings("holding_brad.json")
+        to_read = load_holdings("holding_brad.yaml")
         holdings = readers.read_holdings(to_read, client=mock_client)
-        brad.posit(holdings)
-        assert "warrantless search and seizure" in brad.holdings[0].short_string
+        reading = OpinionReading()
+        reading.posit(holdings[0])
+        assert "warrantless search and seizure" in reading.holdings[0].short_string
 
-    def test_opinion_posits_holding_tuple_context(
-        self, make_opinion, make_entity, make_response
-    ):
+    def test_opinion_posits_holding_tuple_context(self, make_entity, make_response):
         """
         Having the Watt case posit a holding from the Brad
         case, but with generic factors from Watt.
         """
         mock_client = FakeClient(responses=make_response)
-        to_read = load_holdings("holding_brad.json")
+        to_read = load_holdings("holding_brad.yaml")
         brad_holdings = readers.read_holdings(to_read, client=mock_client)
         context_holding = brad_holdings[6].new_context(
             [make_entity["watt"], make_entity["trees"], make_entity["motel"]]
         )
-        watt = make_opinion["watt_majority"]
-        watt.posit(context_holding)
-        holding_string = watt.holdings[-1].short_string
+        reading = OpinionReading()
+        reading.posit(context_holding)
+        holding_string = reading.holdings[-1].short_string
         assert (
             "the number of marijuana plants in <the stockpile of trees> was at least 3"
             in holding_string
         )
 
-    def test_opinion_posits_holding_dict_context(
-        self, make_opinion, make_entity, make_response
-    ):
+    def test_opinion_posits_holding_dict_context(self, make_entity, make_response):
         """
         Having the Watt case posit a holding from the Brad
         case, but replacing one generic factor with a factor
         from Watt.
         """
         mock_client = FakeClient(responses=make_response)
-        watt = make_opinion["watt_majority"]
-        brad = make_opinion["brad_majority"]
-        to_read = load_holdings("holding_brad.json")
+        to_read = load_holdings("holding_brad.yaml")
         holdings = readers.read_holdings(to_read, client=mock_client)
-        brad.clear_holdings()
-        brad.posit(holdings)
-        expectation_not_reasonable = brad.holdings[6]
+        breading = OpinionReading()
+        breading.clear_holdings()
+        breading.posit(holdings)
+        expectation_not_reasonable = breading.holdings[6]
         changes = ContextRegister()
         changes.insert_pair(
             key=expectation_not_reasonable.generic_terms()[0],
             value=make_entity["watt"],
         )
         context_holding = expectation_not_reasonable.new_context(changes)
-
-        watt.clear_holdings()
-        watt.posit(context_holding)
+        wreading = OpinionReading()
+        wreading.clear_holdings()
+        wreading.posit(context_holding)
         string = str(context_holding)
         assert "<Wattenburg> lived at <Bradley's house>" in string
-        assert "<Wattenburg> lived at <Bradley's house>" in str(watt.holdings[-1])
+        assert "<Wattenburg> lived at <Bradley's house>" in str(wreading.holdings[-1])
 
-    def test_holding_with_non_generic_value(
-        self, make_opinion, make_entity, make_response
-    ):
+    def test_holding_with_non_generic_value(self, make_entity, make_response):
         """
         This test originally required a ValueError, but why should it?
         """
         mock_client = FakeClient(responses=make_response)
-        brad = make_opinion["brad_majority"]
-        to_read = load_holdings("holding_brad.json")
+        reading = OpinionReading()
+        to_read = load_holdings("holding_brad.yaml")
         holdings = readers.read_holdings(to_read, client=mock_client)
-        brad.posit(holdings)
-        expectation_not_reasonable = brad.holdings[6]
+        reading.posit(holdings)
+        expectation_not_reasonable = reading.holdings[6]
         generic_patch = expectation_not_reasonable.generic_terms()[1]
         changes = ContextRegister()
         changes.insert_pair(generic_patch, make_entity["trees_specific"])
@@ -573,12 +594,12 @@ class TestTextAnchors:
         rule_holding = {
             "inputs": ["this factor hasn't been mentioned"],
             "outputs": [{"type": "fact", "content": "{the dog} bit {the man}"}],
-            "enactments": [{"node": "/us/const/amendment/IV"}],
+            "enactments": [{"enactment": {"node": "/us/const/amendment/IV"}}],
             "mandatory": True,
         }
         mock_client = FakeClient(responses=make_response)
         with pytest.raises(ValidationError):
-            readers.read_holding(rule_holding, client=mock_client)
+            readers.read_holdings([rule_holding], client=mock_client)
 
     def test_error_classname_does_not_exist(self):
         rule_dict = {
@@ -589,30 +610,27 @@ class TestTextAnchors:
                 }
             ],
             "outputs": [{"type": "fact", "content": "the dog bit the man"}],
-            "enactments": [{"node": "/us/const/amendment/IV"}],
         }
         with pytest.raises(ValidationError):
-            readers.read_holding(rule_dict)
+            readers.read_holdings([rule_dict])
 
     def test_repeating_read_holdings_has_same_result(self, make_analysis):
         raw = make_analysis["minimal"]
         holdings = readers.read_holdings_with_anchors(raw).holdings
         holdings_again = readers.read_holdings_with_anchors(raw).holdings
-        assert all(left.means(right) for left, right in zip(holdings, holdings_again))
+        assert all(
+            left.holding.means(right.holding)
+            for left, right in zip(holdings, holdings_again)
+        )
 
     def test_posit_holding_with_selector(self, make_analysis, make_opinion):
 
-        (
-            holdings,
-            holding_anchors,
-            _,
-            _,
-        ) = readers.read_holdings_with_anchors(make_analysis["minimal"])
+        anchored_holdings = readers.read_holdings_with_anchors(make_analysis["minimal"])
 
         brad = make_opinion["brad_majority"]
-        brad.clear_holdings()
-        brad.posit(holdings, holding_anchors=holding_anchors)
-        assert brad.holdings[0].anchors[0].exact == "open fields or grounds"
+        reading = OpinionReading(opinion_type="majority", opinion_author=brad.author)
+        reading.posit(anchored_holdings.holdings)
+        assert reading.holding_anchors[0].quotes[0].exact == "open fields or grounds"
 
 
 class TestExclusiveFlag:
@@ -637,17 +655,21 @@ class TestExclusiveFlag:
         less Enactment text
         """
         fake_client = FakeClient(responses=make_response)
-        holdings = read_holdings_from_file("holding_feist.json", client=fake_client)
+        holdings = read_holdings_from_file("holding_feist.yaml", client=fake_client)
 
-        directory = Entity("Rural's telephone directory")
-        original = Fact(Predicate("$work was an original work"), directory)
-        copyrightable = Fact(Predicate("$work was copyrightable"), directory)
+        directory = Entity(name="Rural's telephone directory")
+        original = Fact(
+            predicate=Predicate(content="$work was an original work"), terms=directory
+        )
+        copyrightable = Fact(
+            predicate=Predicate(content="$work was copyrightable"), terms=directory
+        )
         originality_enactments = [
             e_securing_exclusive_right_to_writings,
             e_copyright_requires_originality,
         ]
         originality_rule = Rule(
-            Procedure(outputs=copyrightable, inputs=original),
+            procedure=Procedure(outputs=copyrightable, inputs=original),
             mandatory=False,
             universal=False,
             enactments=originality_enactments,
@@ -658,18 +680,16 @@ class TestExclusiveFlag:
 
     def test_fact_containing_wrong_type(self, make_response):
         mock_client = FakeClient(responses=make_response)
-        to_read = load_holdings("holding_feist.json")
-        holding = to_read[0]
-        holding["outputs"]["type"] = "wrong_type"
+        to_read = load_holdings("holding_feist.yaml")
+        to_read[0]["outputs"]["type"] = "wrong_type"
         with pytest.raises(ValidationError):
-            readers.read_holding(holding, client=mock_client)
+            readers.read_holdings([to_read[0]], client=mock_client)
 
     def test_type_field_removed_from_factor(self, make_response):
         mock_client = FakeClient(responses=make_response)
-        to_read = load_holdings("holding_feist.json")
-        holding = to_read[0]
-        holding = readers.read_holding(holding, client=mock_client)
-        assert holding.inputs[0].__dict__.get("type") is None
+        to_read = load_holdings("holding_feist.yaml")
+        holdings = readers.read_holdings([to_read[0]], client=mock_client)
+        assert holdings[0].inputs[0].__dict__.get("type") is None
 
     @pytest.mark.xfail
     def test_holding_inferred_from_exclusive(self, make_enactment, make_response):
@@ -689,15 +709,15 @@ class TestExclusiveFlag:
         inferred Rules that aren't expanded during data loading.
         """
         mock_client = FakeClient(responses=make_response)
-        to_read = load_holdings("holding_feist.json")
+        to_read = load_holdings("holding_feist.yaml")
         feist_holdings = readers.read_holdings(to_read["holdings"], client=mock_client)
 
-        directory = Entity("Rural's telephone directory")
+        directory = Entity(name="Rural's telephone directory")
         not_original = Fact(
-            Predicate("{} was an original work"), directory, absent=True
+            Predicate(content="{} was an original work"), directory, absent=True
         )
         not_copyrightable = Fact(
-            Predicate("{} was copyrightable"), directory, absent=True
+            Predicate(content="{} was copyrightable"), directory, absent=True
         )
         no_originality_procedure = Procedure(
             outputs=not_copyrightable, inputs=not_original
@@ -725,7 +745,7 @@ class TestExclusiveFlag:
         generated Rules as well as its original Rule.
         """
         mock_client = FakeClient(responses=make_response)
-        feist_json = load_holdings("holding_feist.json")
+        feist_json = load_holdings("holding_feist.yaml")
         feist_holdings = readers.read_holdings(feist_json, client=mock_client)
 
         assert len(feist_holdings) == len(feist_json)
@@ -743,6 +763,6 @@ class TestNestedFactorImport:
         concerning appellant’s use of narcotics was improper.
         """
         mock_client = FakeClient(responses=make_response)
-        cardenas_json = load_holdings("holding_cardenas.json")
-        cardenas_holdings = readers.read_holdings(cardenas_json, client=mock_client)
+        cardenas_dict = load_holdings("holding_cardenas.yaml")
+        cardenas_holdings = readers.read_holdings(cardenas_dict, client=mock_client)
         assert len(cardenas_holdings) == 2

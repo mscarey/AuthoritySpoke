@@ -1,13 +1,13 @@
+import datetime
 import os
 
 from dotenv import load_dotenv
 from legislice.download import Client
-from legislice.schemas import EnactmentSchema
+from legislice.enactments import EnactmentPassage
 import pytest
 
 from authorityspoke.io import name_index, readers
 from authorityspoke.io.loaders import load_holdings
-from authorityspoke.io.readers import read_holding
 
 
 load_dotenv()
@@ -19,7 +19,7 @@ class TestEnactmentImport:
     client = Client(api_token=TOKEN)
     test_enactment = {
         "heading": "",
-        "content": "Except as otherwise provided by statute, all relevant evidence is admissible.",
+        "text_version": "Except as otherwise provided by statute, all relevant evidence is admissible.",
         "name": "s351",
         "node": "/us-ca/code/evid/s351",
         "start_date": "1966-01-01",
@@ -33,35 +33,22 @@ class TestEnactmentImport:
         fourteenth_dp = make_response["/us/const/amendment/XIV"]["1868-07-28"][
             "children"
         ][0]
-        fourteenth_dp["exact"] = "nor shall any State deprive any person"
         enactment = fake_usc_client.read_from_json(fourteenth_dp)
+        passage = enactment.select("nor shall any State deprive any person")
 
-        assert enactment.selected_text().startswith("…nor shall any State")
+        assert passage.selected_text().startswith("…nor shall any State")
 
-    def test_enactment_import_from_dict(self, fake_usc_client):
-        holding_brad = load_holdings("holding_brad.json")
-        holdings = readers.read_holdings(holding_brad, client=fake_usc_client)
+    @pytest.mark.vcr
+    def test_enactment_import_from_yaml(self):
+        holding_brad = load_holdings("holding_brad.yaml")
+        holdings = readers.read_holdings(holding_brad, client=self.client)
         enactments = holdings[0].enactments
         assert any(
             law.selected_text().endswith("shall not be violated…") for law in enactments
         )
 
-    def test_false_as_selection(self, fake_usc_client):
-        input_enactment = self.test_enactment.copy()
-        input_enactment["selection"] = False
-
-        enactment = fake_usc_client.read_from_json(input_enactment)
-        assert enactment.selected_text() == ""
-
-    def test_true_as_selection(self, fake_usc_client):
-        input_enactment = self.test_enactment.copy()
-        input_enactment["selection"] = True
-
-        enactment = fake_usc_client.read_from_json(input_enactment)
-        assert enactment.selected_text() == enactment.text
-
     def test_enactment_import_from_holding(self):
-        holding_cardenas = load_holdings("holding_cardenas.json")
+        holding_cardenas = load_holdings("holding_cardenas.yaml")
         holdings = readers.read_holdings(holding_cardenas)
         enactment_list = holdings[0].enactments
         assert any(
@@ -69,6 +56,7 @@ class TestEnactmentImport:
             for enactment in enactment_list
         )
 
+    @pytest.mark.vcr
     def test_enactment_does_not_fail_for_excess_selector(self, fake_beard_client):
         """
         Test selector that extends into the text of a subnode.
@@ -80,8 +68,11 @@ class TestEnactmentImport:
             "In this Act, beard means any facial hair no shorter "
             "than 5 millimetres in length that: occurs on or below the chin"
         )
-        record = {"node": "/test/acts/47/4", "exact": exact}
-        client = fake_beard_client
-        enactment = client.read_from_json(record)
-        assert enactment.selected_text() == exact + "…"
-        assert "exists in an uninterrupted line" in enactment.children[1].content
+        record = {
+            "enactment": {"node": "/test/acts/47/4"},
+            "selection": {"quotes": {"exact": exact}},
+        }
+        client = self.client
+        passage = client.read_passage_from_json(record)
+        assert passage.selected_text() == exact + "…"
+        assert "in an uninterrupted line" in passage.enactment.children[1].content

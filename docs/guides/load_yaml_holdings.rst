@@ -47,11 +47,11 @@ getting decisions from the Caselaw Access Project. It has methods to
 which means to get them in standard JSON format, and
 also methods to :meth:`~authorityspoke.io.downloads.CAPClient.read`
 decisions, which means to fetch them and then
-convert them into AuthoritySpoke :class:`~authorityspoke.decisions.Decision` objects. Since we know the
+convert them into AuthoritySpoke :class:`~justopinion.decisions.Decision` objects. Since we know the
 citation of the case we want, we'll use the :meth:`~authorityspoke.io.downloads.CAPClient.read_cite` method.
 
-    >>> from authorityspoke.io.downloads import CAPClient
-    >>> from authorityspoke.decisions import Decision, Opinion, CAPCitation
+    >>> from authorityspoke.io import CAPClient
+    >>> from authorityspoke.decisions import DecisionReading, Decision, Opinion, CAPCitation
     >>> if USE_REAL_CASE_API:
     ...     client = CAPClient(api_token=CAP_API_KEY)
     ...     licensing_case = client.read_cite(
@@ -59,10 +59,10 @@ citation of the case we want, we'll use the :meth:`~authorityspoke.io.downloads.
     ...        full_case=False)
     ... else:
     ...     licensing_case = Decision(
-    ...        date=date(2010,9,22),
+    ...        decision_date=date(2010,9,22),
     ...        name_abbreviation="United States v. Mazza-Alaluf",
-    ...        citations=[CAPCitation(cite="621 F.3d 205")],
-    ...        opinions=Opinion())
+    ...        citations=[CAPCitation(cite="621 F.3d 205")])
+    ...     licensing_case.add_opinion(Opinion())
     >>> print(licensing_case)
     United States v. Mazza-Alaluf, 621 F.3d 205 (2010-09-22)
 
@@ -83,15 +83,15 @@ something about how one factual finding can lead to another.
 
     >>> from authorityspoke import Entity, Fact, Holding
     >>> new_york_offense = Fact(
-    ...     "$defendant used ${defendant}'s business $business to commit the New York offense "
+    ...     predicate="$defendant used ${defendant}'s business $business to commit the New York offense "
     ...     "of engaging in the business of receiving money "
     ...     "for transmission or transmitting the same, without a license therefor",
-    ...     terms=[Entity("Mazza-Alaluf"), Entity("Turismo Costa Brava")])
+    ...     terms=[Entity(name="Mazza-Alaluf"), Entity(name="Turismo Costa Brava")])
     >>> no_appropriate_state_license = Fact(
-    ...     ("$defendant operated $business without an appropriate money transmitting "
+    ...     predicate=("$defendant operated $business without an appropriate money transmitting "
     ...     "license in a State where such operation was punishable as a misdemeanor "
     ...     "or a felony under State law"),
-    ...     terms=[Entity("Mazza-Alaluf"), Entity("Turismo Costa Brava")])
+    ...     terms=[Entity(name="Mazza-Alaluf"), Entity(name="Turismo Costa Brava")])
     >>> new_york_holding = Holding.from_factors(
     ...     inputs=new_york_offense,
     ...     outputs=no_appropriate_state_license,
@@ -121,7 +121,7 @@ up for an API token <https://authorityspoke.com/account/signup/>`__,
 then save that API token in the ``.env`` file, and then load the API
 token using `dotenv <https://saurabh-kumar.com/python-dotenv/#getting-started>`__.
 
-    >>> from authorityspoke.io.downloads import LegisClient
+    >>> from authorityspoke import LegisClient
     >>> LEGISLICE_API_TOKEN = os.getenv("LEGISLICE_API_TOKEN")
     >>> LEGIS_CLIENT = LegisClient(api_token=LEGISLICE_API_TOKEN)
 
@@ -135,7 +135,9 @@ provision is "/us/usc/t18/s1960/b/1".
 
     >>> definition_statute = LEGIS_CLIENT.read("/us/usc/t18/s1960/b/1")
     >>> print(definition_statute)
-    "the term “unlicensed money transmitting business” means a money transmitting business which affects interstate or foreign commerce in any manner or degree and— is operated without an appropriate money transmitting license in a State where such operation is punishable as a misdemeanor or a felony under State law, whether or not the defendant knew that the operation was required to be licensed or that the operation was so punishable; fails to comply with the money transmitting business registration requirements under section 5330 of title 31, United States Code, or regulations prescribed under such section; or otherwise involves the transportation or transmission of funds that are known to the defendant to have been derived from a criminal offense or are intended to be used to promote or support unlawful activity;" (/us/usc/t18/s1960/b/1 2013-07-18)
+    /us/usc/t18/s1960/b/1 (2013-07-18)
+    >>> definition_statute.text[:99]
+    'the term “unlicensed money transmitting business” means a money transmitting business which affects'
 
 We don't have to use the entire text of this statute provision. Instead
 we can :meth:`~legislice.enactments.Enactment.select` just the part of the text we want. Using the ``end``
@@ -143,12 +145,13 @@ parameter, we can indicate that we want everything through the string
 we've identified as the ``end``, but that we don't want anything past
 that.
 
-    >>> definition_statute.select(end="or a felony under State law")
+    >>> felony_passage = definition_statute.select(
+    ...     end="or a felony under State law")
 
 One way to add this Enactment to the Holding is by using the addition
 operator (the plus sign).
 
-    >>> holding_from_python = new_york_holding + definition_statute
+    >>> holding_from_python = new_york_holding + felony_passage
     >>> print(holding_from_python)
     the Holding to ACCEPT
       the Rule that the court MAY ALWAYS impose the
@@ -432,7 +435,7 @@ the text anchors, we'll load the file using the
     >>> holding_and_anchors = read_anchored_holdings_from_file(
     ...     filename="holding_mazza_alaluf.yaml",
     ...     client=LEGIS_CLIENT)
-    >>> holding_from_yaml = holding_and_anchors.holdings[1]
+    >>> holding_from_yaml = holding_and_anchors.holdings[1].holding
 
 Next, we'll print the holding we loaded to see how AuthoritySpoke
 interpreted the YAML file.
@@ -586,11 +589,19 @@ Now when we load a file with this YAML, we'll get both Holdings.
     2
 
 Now that we generated this :class:`~authorityspoke.opinions.AnchoredHoldings` object
-containing the data from the YAML file, we can use the posit method to link those
-:class:`~authorityspoke.holdings.Holding`\s to the judicial :class:`~authorityspoke.decisions.Decision`
-we created from the data we downloaded from the CAP API. Then we can verify that
-those two Holdings are now considered the two holdings of the Decision.
+containing the data from the YAML file, we can link the :class:`~authorityspoke.holdings.Holding`\s
+to the :class:`~justopinion.decisions.Decision` with
+a :class:`~authorityspoke.decisions.DecisionReading` object.
+While a :class:`~justopinion.decisions.Decision` is a record of what a court actually published,
+a :class:`~authorityspoke.decisions.DecisionReading` represents the user's "reading" of the Decision.
+The DecisionReading indicates what Holdings are supported by the Decision,
+as well as what text passages support each Holding.
 
-    >>> licensing_case.posit(both_holdings_with_anchors)
-    >>> len(licensing_case.holdings)
+We'll use the :meth:`~authorityspoke.decisions.Decision.posit` method to
+link the Holdings to the Decision. Then we can verify that those two Holdings
+are now considered the two holdings of the Decision.
+
+    >>> licensing_case_reading = DecisionReading(decision=licensing_case)
+    >>> licensing_case_reading.posit(both_holdings_with_anchors)
+    >>> len(licensing_case_reading.holdings)
     2

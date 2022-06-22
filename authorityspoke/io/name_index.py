@@ -7,12 +7,11 @@ from copy import deepcopy
 from re import findall
 from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
+from legislice.types import RawEnactment
 from nettlesome.predicates import StatementTemplate
+from authorityspoke.facts import Exhibit, RawPredicate, RawFactor
+from authorityspoke.holdings import RawHolding
 from authorityspoke.io import text_expansion
-
-
-RawPredicate = Dict[str, Union[str, bool]]
-RawFactor = Dict[str, Union[RawPredicate, Sequence[Any], str, bool]]
 
 
 class Mentioned(OrderedDict):
@@ -35,12 +34,24 @@ class Mentioned(OrderedDict):
             the value stored at the key "name", plus a name field.
         """
         if not self.get(name):
-            raise ValueError(
-                f'Name "{name}" not found in the index of mentioned Factors'
-            )
+            raise KeyError(f'Name "{name}" not found in the index of mentioned Factors')
         value = {"name": name}
         value.update(self[name])
         return value
+
+    def get_if_present(self, name: str) -> Union[Dict, str]:
+        """
+        Retrieve a record from the index, if it exists.
+
+        :param name:
+            the name of the key where the record can be found in the Mentioned dict.
+
+        :returns:
+            the value stored at the key "name", plus a name field.
+        """
+        if isinstance(name, str) and name in self:
+            return self.get_by_name(name)
+        return name
 
     def sorted_by_length(self) -> Mentioned:
         """
@@ -50,11 +61,8 @@ class Mentioned(OrderedDict):
         """
         return Mentioned(sorted(self.items(), key=lambda t: len(t[0]), reverse=True))
 
-    def __str__(self):
-        return f"Mentioned({str(dict(self))})"
-
     def __repr__(self):
-        return f"Mentioned({repr(dict(self))})"
+        return f"{self.__class__.__name__}({repr(dict(self))})"
 
 
 def assign_name_from_content(obj: Dict) -> str:
@@ -116,6 +124,33 @@ def assign_name_for_pleading(obj: Dict) -> str:
     return name
 
 
+def create_name_for_enactment(obj: RawEnactment) -> str:
+    """Create unique name for unloaded Enactment data, for indexing."""
+    if "node" not in obj.keys():
+        return create_name_for_enactment(obj["enactment"])
+    name: str = obj["node"]
+    if obj.get("start_date"):
+        name += f'@{obj["start_date"]}'
+
+    for field_name in ["start", "end", "prefix", "exact", "suffix"]:
+        if obj.get(field_name):
+            name += f':{field_name}="{obj[field_name]}"'
+    return name
+
+
+def create_name_for_enactment_passage(obj: RawEnactment) -> str:
+    """Create unique name for unloaded Enactment data, for indexing."""
+    if isinstance(obj["enactment"], str):
+        name = obj["enactment"]
+    else:
+        name = create_name_for_enactment(obj["enactment"])
+
+    for field_name in ["start", "end", "prefix", "exact", "suffix"]:
+        if obj.get("selection", {}).get(field_name):
+            name += f':{field_name}="{obj["selection"][field_name]}"'
+    return name
+
+
 def create_name_for_factor(obj: Dict) -> str:
     """
     Determine what kind of RawFactor the input is and return an appropriate name.
@@ -133,14 +168,26 @@ def create_name_for_factor(obj: Dict) -> str:
         or obj.get("exact")
         or obj.get("prefix")
         or obj.get("suffix")  # Text Selectors don't need names
+        or obj.get("passages") is not None  # EnactmentGroups don't need names
+        or obj.get("factor_anchors")  # AnchoredHoldings doesn't need name
+        or obj.get("holdings")
+        or obj.get("passage")  # AnchoredPassages don't need names
     ):
         return ""
     elif obj.get("predicate", {}).get("content"):
         name = assign_name_from_content(obj)
+    elif obj.get("enactment"):
+        name = create_name_for_enactment_passage(obj)
+    elif obj.get("node"):
+        name = create_name_for_enactment(obj)
     elif obj.get("exhibit") or (obj.get("type") and obj["type"].lower()) == "evidence":
         name = assign_name_for_evidence(obj)
     elif obj.get("type") and obj["type"].lower() == "pleading":
         name = assign_name_for_pleading(obj)
+    elif (
+        obj.get("offered_by") or (obj.get("type") and obj["type"].lower()) == "exhibit"
+    ):
+        name = str(obj)  # obj is Exhibit
     else:
         raise NotImplementedError
     if obj.get("absent") is True:
@@ -156,7 +203,7 @@ def ensure_factor_has_name(obj: Dict) -> Dict:
 
     :returns: the same :class:`.Factor` with a name field added
     """
-    if not obj.get("name"):
+    if not (obj.get("name") or obj.get("holding")):
         new_name = create_name_for_factor(obj)
         if new_name:
             obj["name"] = new_name
@@ -188,9 +235,7 @@ def update_name_index_from_terms(terms: List[RawFactor], mentioned: Mentioned):
                     "It doesn't exist in the index of mentioned Factors."
                 )
         else:
-            factor_name = factor.get("name")
-            if factor_name and factor_name not in mentioned:
-                mentioned.insert_by_name(factor)
+            factor, mentioned = update_name_index_with_factor(factor, mentioned)
     return mentioned.sorted_by_length()
 
 
@@ -200,6 +245,7 @@ RawContextFactors = List[Union[RawFactor, str]]
 def update_name_index_from_bracketed_phrases(
     content: str, mentioned: Mentioned
 ) -> Mentioned:
+    """Find string template placeholders in content, and use them to create dicts to be loaded as Entities."""
     pattern = r"(?<!\$)\{([^\{]+)\}"  # matches bracketed text not preceded by $
     entities_as_text = findall(pattern, content)
     entities_as_text.sort(key=len, reverse=True)
@@ -270,11 +316,19 @@ def update_name_index_with_factor(
     :returns:
         both 'obj' and 'mentioned', as updated
     """
-    if obj.get("name"):
+    if obj.get("name") and not obj.get("node"):
         if obj["name"] in mentioned:
-            if obj.get("anchors"):
-                for anchor in obj["anchors"]:
-                    mentioned[obj["name"]]["anchors"].append(anchor)
+            if obj.get("anchors", {}).get("quotes"):
+                mentioned[obj["name"]]["anchors"] = (
+                    mentioned[obj["name"]]["anchors"] or {}
+                )
+                mentioned[obj["name"]]["anchors"]["quotes"] = (
+                    list(mentioned[obj["name"]]["anchors"].get("quotes")) or []
+                )
+
+                mentioned[obj["name"]]["anchors"]["quotes"].append(
+                    obj["anchors"]["quotes"][0]
+                )
         else:
             mentioned.insert_by_name(obj)
         obj = obj["name"]
@@ -284,49 +338,73 @@ def update_name_index_with_factor(
 def collect_mentioned(
     obj: Union[RawFactor, List[Union[RawFactor, str]]],
     mentioned: Optional[Mentioned] = None,
-    keys_to_ignore: Sequence[str] = (
+    ignore: Sequence[str] = (
         "predicate",
         "anchors",
         "factor_anchors",
         "enactment_anchors",
+        "enactments",
     ),
 ) -> Tuple[RawFactor, Mentioned]:
     """
     Make a dict of all nested objects labeled by name, creating names if needed.
+
     To be used during loading to expand name references to full objects.
     """
     mentioned = mentioned or Mentioned()
     if isinstance(obj, List):
         new_list = []
         for item in obj:
-            new_item, new_mentioned = collect_mentioned(item, mentioned)
+            new_item, new_mentioned = collect_mentioned(item, mentioned, ignore)
             mentioned.update(new_mentioned)
             new_list.append(new_item)
         obj = new_list
     if isinstance(obj, Dict):
-
         obj, mentioned = update_name_index_from_fact_content(obj, mentioned)
-
+        new_dict = {}
         for key, value in obj.items():
-            if key not in keys_to_ignore:
-                if isinstance(value, (Dict, List)):
-                    new_value, new_mentioned = collect_mentioned(value, mentioned)
-                    mentioned.update(new_mentioned)
-                    obj[key] = new_value
-        obj = ensure_factor_has_name(obj)
+            if key not in ignore and isinstance(value, (Dict, List)):
+                new_value, new_mentioned = collect_mentioned(value, mentioned, ignore)
+                mentioned.update(new_mentioned)
+                new_dict[key] = new_value
+            else:
+                new_dict[key] = value
+        new_dict = ensure_factor_has_name(new_dict)
 
         # Added because a top-level factor was not having its brackets replaced
-        if obj.get("predicate", {}).get("content"):
-            for factor in obj.get("terms", []):
-                if factor not in obj["predicate"]["content"]:
-                    obj["predicate"][
+        if new_dict.get("predicate", {}).get("content"):
+            for factor in new_dict.get("terms", []):
+                if factor not in new_dict["predicate"]["content"]:
+                    new_dict["predicate"][
                         "content"
                     ] = text_expansion.replace_brackets_with_placeholder(
-                        content=obj["predicate"]["content"], name=factor
+                        content=new_dict["predicate"]["content"], name=factor
                     )
 
-        obj, mentioned = update_name_index_with_factor(obj, mentioned)
+        new_dict, mentioned = update_name_index_with_factor(new_dict, mentioned)
+        obj = new_dict
     return obj, mentioned
+
+
+def collect_enactments(
+    obj: Union[RawFactor, List[Union[RawFactor, str]]],
+    mentioned: Optional[Mentioned] = None,
+    ignore: Sequence[str] = (
+        "predicate",
+        "anchors",
+        "children",
+        "inputs",
+        "despite",
+        "outputs",
+        "selection",
+    ),
+) -> Tuple[RawFactor, Mentioned]:
+    """
+    Make a dict of all nested objects labeled by name, creating names if needed.
+
+    To be used during loading to expand name references to full objects.
+    """
+    return collect_mentioned(obj=obj, mentioned=mentioned, ignore=ignore)
 
 
 def index_names(record: Union[List, Dict]) -> Mentioned:

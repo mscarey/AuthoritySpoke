@@ -1,9 +1,10 @@
 import os
 
-from marshmallow import ValidationError
 import pytest
 
 from authorityspoke import LegisClient
+from authorityspoke.opinions import AnchoredHoldings
+from authorityspoke.decisions import DecisionReading
 from authorityspoke.io import filepaths, loaders, readers
 from authorityspoke.io.fake_enactments import FakeClient
 from authorityspoke.io.loaders import (
@@ -20,7 +21,7 @@ class TestHoldingLoad:
     def test_get_json_filepath(self):
         directory = filepaths.get_directory_path("holdings")
         path = filepaths.make_filepath(
-            filename="holding_feist.json", directory=directory
+            filename="holding_feist.yaml", directory=directory
         )
         raw_holdings = loaders.load_holdings(filepath=path)
         assert raw_holdings[0]["outputs"]["type"] == "fact"
@@ -44,12 +45,10 @@ class TestHoldingLoad:
         fake_client = FakeClient.from_file("usc.json")
         filepath = filepaths.make_filepath(filename="holding_mazza_alaluf.yaml")
         result = read_anchored_holdings_from_file(filepath=filepath, client=fake_client)
-        selector = result.named_anchors[
-            "the fact it was false that <Turismo Costa Brava> was a domestic financial institution"
-        ][0]
-        assert (
-            selector.exact
-            == 'without respect to whether or not Turismo was a "domestic financial institution"'
+        key = "the fact it was false that <Turismo Costa Brava> was a domestic financial institution"
+        anchors = result.get_term_anchors(key)
+        assert anchors.quotes[0].exact.startswith(
+            "without respect to whether or not Turismo"
         )
         assert len(result.holdings) == 2
 
@@ -57,15 +56,12 @@ class TestHoldingLoad:
 class TestLoadAndReadFake:
     client = FakeClient.from_file("usc.json")
 
+    @pytest.mark.vcr
     def test_read_holdings_from_file(self):
         oracle_holdings = read_holdings_from_file(
-            "holding_oracle.json", client=self.client
+            "holding_oracle.yaml", client=self.client
         )
         assert oracle_holdings[0]
-
-    def test_read_holdings_in_nested_rule(self):
-        watt_holdings = read_holdings_from_file("holding_watt.yaml", client=self.client)
-        assert watt_holdings[4].inputs[0].terms[0].name == "Hideaway Lodge"
 
     def test_read_holdings_in_nested_rule(self):
         watt_holdings = read_holdings_from_file("holding_watt.yaml", client=self.client)
@@ -81,16 +77,28 @@ class TestLoadAndRead:
             "holding_mazza_alaluf.yaml", client=self.client
         )
         # factor anchor
+        key = "the fact that <Turismo Costa Brava> was a money transmitting business"
         assert (
             "Turismo conducted substantial money transmitting business"
-            in anchored.named_anchors[
-                "the fact that <Turismo Costa Brava> was a money transmitting business"
-            ][0].exact
+            in anchored.get_term_anchors(key).quotes[0].exact
+        )
+
+    @pytest.mark.vcr("TestLoadAndRead.test_read_holdings_from_yaml.yaml")
+    def test_read_holding_anchors_from_yaml(self):
+        anchored = read_anchored_holdings_from_file(
+            "holding_mazza_alaluf.yaml", client=self.client
         )
 
         # holding anchor
-        assert "In any event" in anchored.holding_anchors[1][0].suffix
+        assert "In any event" in anchored.holdings[1].anchors.quotes[0].suffix
+
+    @pytest.mark.vcr("TestLoadAndRead.test_read_holdings_from_yaml.yaml")
+    def test_read_enactment_anchors_from_yaml(self):
+        anchored = read_anchored_holdings_from_file(
+            "holding_mazza_alaluf.yaml", client=self.client
+        )
 
         # enactment anchor
-        key = str(anchored.holdings[1].enactments_despite[0])
-        assert "domestic financial" in anchored.enactment_anchors[key][0].exact
+        key = str(anchored.holdings[1].holding.enactments_despite[0])
+        quotes = anchored.get_enactment_anchors(key).quotes
+        assert "domestic financial" in quotes[0].exact

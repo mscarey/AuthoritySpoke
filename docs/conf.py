@@ -19,11 +19,11 @@ sys.path.insert(0, os.path.abspath(".."))
 # -- Project information -----------------------------------------------------
 
 project = "AuthoritySpoke"
-copyright = "2019-2021, Matt Carey"
-author = "Matt Carey"
+copyright = "2019-2021, Matthew Carey"
+author = "Matthew Carey"
 
 # The full version, including alpha/beta/rc tags
-release = "0.7.2"
+release = "0.9.0"
 
 
 # -- General configuration ---------------------------------------------------
@@ -72,6 +72,7 @@ html_static_path = ["_static"]
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
     "anchorpoint": ("https://anchorpoint.readthedocs.io/en/latest/", None),
+    "justopinion": ("https://justopinion.readthedocs.io/en/latest/", None),
     "legislice": ("https://legislice.readthedocs.io/en/latest/", None),
     "nettlesome": ("https://nettlesome.readthedocs.io/en/latest/", None),
     "pint": ("https://pint.readthedocs.io/en/stable/", None),

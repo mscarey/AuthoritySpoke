@@ -4,11 +4,11 @@ from __future__ import annotations
 
 import datetime
 import json
-from pathlib import Path
 from typing import Dict, Optional, Union
 
-from legislice.download import Client, normalize_path, LegislicePathError, RawEnactment
+from legislice.download import Client, normalize_path, LegislicePathError
 from legislice.enactments import CrossReference, Enactment
+from legislice.types import RawEnactment
 
 from authorityspoke.io import filepaths
 
@@ -26,6 +26,7 @@ class FakeClient(Client):
     """
 
     def __init__(self, responses: ResponsesByDateByPath):
+        """Populate fake client with fake response data."""
         self.responses = responses
         self.coverage: Dict[str, Dict[str, Union[datetime.date, str]]] = {
             "/us/const": {
@@ -50,6 +51,7 @@ class FakeClient(Client):
 
     @classmethod
     def from_file(cls, filename: str) -> FakeClient:
+        """Create new FakeClient from JSON data."""
         responses_filepath = filepaths.get_directory_path("responses")
         response_path = responses_filepath / filename
         with open(response_path, "r") as f:
@@ -57,6 +59,7 @@ class FakeClient(Client):
         return cls(responses)
 
     def get_entry_closest_to_cited_path(self, path: str) -> Optional[ResponsesByDate]:
+        """Get key from responses attribute that gets the closest to the given path."""
         path = normalize_path(path)
         if self.responses.get(path):
             return self.responses[path]
@@ -71,6 +74,7 @@ class FakeClient(Client):
     def search_tree_for_path(
         self, path: str, branch: Dict
     ) -> Optional[ResponsesByDate]:
+        """Search responses attribute for keys that are partial paths to the given path."""
         path = normalize_path(path)
         if branch["node"] == path:
             return branch
@@ -87,7 +91,7 @@ class FakeClient(Client):
 
     def fetch(self, query: str, date: Union[datetime.date, str] = "") -> RawEnactment:
         """
-        Fetches data about legislation at specified path and date from Client's assigned API root.
+        Fetch data about legislation at specified path and date from Client's assigned API root.
 
         :param path:
             A path to the desired legislation section using the United States Legislation Markup
@@ -140,9 +144,7 @@ class FakeClient(Client):
         query: Union[str, CrossReference],
         date: Union[datetime.date, str] = "",
     ) -> Enactment:
-        """
-        Use text expansion, unlike a real client.
-        """
+        """Use text expansion, unlike a real client."""
         raw_enactment = self.fetch(query=query, date=date)
         enactment = self.read_from_json(raw_enactment, use_text_expansion=True)
         enactment.select_all()

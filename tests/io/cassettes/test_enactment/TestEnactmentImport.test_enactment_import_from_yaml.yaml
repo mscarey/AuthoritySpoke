@@ -1,0 +1,101 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.26.0
+      authorization:
+      - DUMMY
+    method: GET
+    uri: https://authorityspoke.com/api/v1/us/const/amendment/IV/
+  response:
+    body:
+      string: '{"heading":"AMENDMENT IV.","start_date":"1791-12-15","node":"/us/const/amendment/IV","text_version":{"id":735706,"url":"https://authorityspoke.com/api/v1/textversions/735706/","content":"The
+        right of the people to be secure in their persons, houses, papers, and effects,
+        against unreasonable searches and seizures, shall not be violated, and no
+        Warrants shall issue, but upon probable cause, supported by Oath or affirmation,
+        and particularly describing the place to be searched, and the persons or things
+        to be seized."},"url":"https://authorityspoke.com/api/v1/us/const/amendment/IV/","end_date":null,"children":[],"citations":[],"parent":"https://authorityspoke.com/api/v1/us/const/amendment/"}'
+    headers:
+      Allow:
+      - GET, POST, PUT, PATCH, HEAD, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '697'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 14 Sep 2021 17:14:13 GMT
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - gunicorn
+      Vary:
+      - Accept, Cookie
+      Via:
+      - 1.1 vegur
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.26.0
+      authorization:
+      - DUMMY
+    method: GET
+    uri: https://authorityspoke.com/api/v1/us/const/amendment/XIV/1/
+  response:
+    body:
+      string: '{"heading":"Citizenship: security and equal protection of citizens.","start_date":"1868-07-28","node":"/us/const/amendment/XIV/1","text_version":{"id":735717,"url":"https://authorityspoke.com/api/v1/textversions/735717/","content":"All
+        persons born or naturalized in the United States, and subject to the jurisdiction
+        thereof, are citizens of the United States and of the State wherein they reside.
+        No State shall make or enforce any law which shall abridge the privileges
+        or immunities of citizens of the United States; nor shall any State deprive
+        any person of life, liberty, or property, without due process of law; nor
+        deny to any person within its jurisdiction the equal protection of the laws."},"url":"https://authorityspoke.com/api/v1/us/const/amendment/XIV/1/","end_date":null,"children":[],"citations":[],"parent":"https://authorityspoke.com/api/v1/us/const/amendment/XIV/"}'
+    headers:
+      Allow:
+      - GET, POST, PUT, PATCH, HEAD, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '884'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 14 Sep 2021 17:14:14 GMT
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - gunicorn
+      Vary:
+      - Accept, Cookie
+      Via:
+      - 1.1 vegur
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+version: 1

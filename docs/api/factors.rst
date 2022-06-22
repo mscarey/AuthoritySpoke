@@ -14,35 +14,35 @@ Facts
 Exhibits
 ==============
 
-.. inheritance-diagram:: authorityspoke.evidence.Exhibit
+.. inheritance-diagram:: authorityspoke.facts.Exhibit
     :top-classes: nettlesome.quantities.Comparable
     :parts: 1
 
-.. autoclass:: authorityspoke.evidence.Exhibit
+.. autoclass:: authorityspoke.facts.Exhibit
 
 Evidence
 ==============
 
-.. inheritance-diagram:: authorityspoke.evidence.Evidence
+.. inheritance-diagram:: authorityspoke.facts.Evidence
     :top-classes: nettlesome.quantities.Comparable
     :parts: 1
 
-.. autoclass:: authorityspoke.evidence.Evidence
+.. autoclass:: authorityspoke.facts.Evidence
 
 Pleadings
 ==============
 
-.. inheritance-diagram:: authorityspoke.pleadings.Pleading
+.. inheritance-diagram:: authorityspoke.facts.Pleading
     :top-classes: nettlesome.quantities.Comparable
     :parts: 1
 
-.. autoclass:: authorityspoke.pleadings.Pleading
+.. autoclass:: authorityspoke.facts.Pleading
 
 Allegations
 ================
 
-.. inheritance-diagram:: authorityspoke.pleadings.Allegation
+.. inheritance-diagram:: authorityspoke.facts.Allegation
     :top-classes: nettlesome.quantities.Comparable
     :parts: 1
 
-.. autoclass:: authorityspoke.pleadings.Allegation
+.. autoclass:: authorityspoke.facts.Allegation

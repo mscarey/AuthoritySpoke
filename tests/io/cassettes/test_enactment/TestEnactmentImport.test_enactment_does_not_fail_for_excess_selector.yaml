@@ -1,0 +1,95 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.26.0
+      authorization:
+      - DUMMY
+    method: GET
+    uri: https://authorityspoke.com/api/v1/test/acts/47/4/
+  response:
+    body:
+      string: '{"heading":"Beard, defined","start_date":"1935-04-01","node":"/test/acts/47/4","text_version":{"id":1142666,"url":"https://authorityspoke.com/api/v1/textversions/1142666/","content":"In
+        this Act, beard means any facial hair no shorter than 5 millimetres in length
+        that:"},"url":"https://authorityspoke.com/api/v1/test/acts/47/4/","end_date":null,"children":[{"heading":"","start_date":"1935-04-01","node":"/test/acts/47/4/a","text_version":{"id":1142664,"url":"https://authorityspoke.com/api/v1/textversions/1142664/","content":"occurs
+        on or below the chin, or"},"url":"https://authorityspoke.com/api/v1/test/acts/47/4/a/","end_date":null,"children":[],"citations":[]},{"heading":"","start_date":"1935-04-01","node":"/test/acts/47/4/b","text_version":{"id":1142665,"url":"https://authorityspoke.com/api/v1/textversions/1142665/","content":"exists
+        in an uninterrupted line from the front of one ear to the front of the other
+        ear below the nose."},"url":"https://authorityspoke.com/api/v1/test/acts/47/4/b/","end_date":null,"children":[],"citations":[]}],"citations":[],"parent":"https://authorityspoke.com/api/v1/test/acts/47/"}'
+    headers:
+      Allow:
+      - GET, POST, PUT, PATCH, HEAD, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '1127'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 14 Sep 2021 04:58:01 GMT
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - gunicorn
+      Vary:
+      - Accept, Cookie
+      Via:
+      - 1.1 vegur
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.26.0
+      authorization:
+      - DUMMY
+    method: GET
+    uri: https://authorityspoke.com/api/v1/coverage/test/acts/
+  response:
+    body:
+      string: '{"uri":"/test/acts","latest_heading":null,"first_published":"1935-04-01","earliest_in_db":"1935-04-01","latest_in_db":"2013-07-18"}'
+    headers:
+      Allow:
+      - GET, HEAD, OPTIONS
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '131'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 14 Sep 2021 04:58:01 GMT
+      Referrer-Policy:
+      - same-origin
+      Server:
+      - gunicorn
+      Vary:
+      - Accept, Cookie
+      Via:
+      - 1.1 vegur
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+version: 1

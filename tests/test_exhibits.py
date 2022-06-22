@@ -2,13 +2,12 @@ import logging
 
 from nettlesome import Entity
 
-from authorityspoke.evidence import Exhibit
-from authorityspoke.facts import Fact, Predicate
+from authorityspoke.facts import Fact, Predicate, Exhibit
 
 
 class TestExhibits:
     def test_make_exhibit_object(self):
-        e = Exhibit(form="testimony")
+        e = Exhibit(form="testimony", offered_by=Entity(name="Alice"))
         assert not e.absent
 
     def test_exhibit_short_string(self, make_exhibit):
@@ -22,14 +21,15 @@ class TestExhibits:
 
     def test_comma_when_exhibit_is_in_fact(self):
         coin = Exhibit(
+            offered_by=Entity(name="Alice"),
             form="token",
             statement=Fact(
                 predicate=Predicate(
-                    "$agency granted an exemption from the prohibition of wearing beards"
+                    content="$agency granted an exemption from the prohibition of wearing beards"
                 ),
-                terms=Entity("the Department of Beards"),
+                terms=Entity(name="the Department of Beards"),
             ),
-            statement_attribution=Entity("the Department of Beards"),
+            statement_attribution=Entity(name="the Department of Beards"),
         )
         counterfeit = Fact(predicate="$thing was counterfeit", terms=coin)
         assert str(counterfeit) == (

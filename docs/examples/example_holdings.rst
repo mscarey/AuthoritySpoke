@@ -30,9 +30,9 @@ Character Recognition errors.
     >>> from authorityspoke.io.loaders import load_decision, read_holdings_from_file
     >>> from authorityspoke.io.readers import read_decision
     >>> lotus_download = load_decision("lotus_h.json")
-    >>> lotus = read_decision(lotus_download)
+    >>> lotus = Decision(**lotus_download)
     >>> USE_REAL_LEGISLICE_API = False
-    >>> from authorityspoke.io.downloads import LegisClient
+    >>> from authorityspoke import LegisClient
     >>> from authorityspoke.io.fake_enactments import FakeClient
     >>> if USE_REAL_LEGISLICE_API:
     ...     LEGISLICE_API_TOKEN = os.getenv("LEGISLICE_API_TOKEN")
@@ -290,7 +290,7 @@ Character Recognition errors.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     >>> oracle_download = load_decision("oracle_h.json")
-    >>> oracle = read_decision(oracle_download)
+    >>> oracle = Decision(**oracle_download)
     >>> oracle_holdings = read_holdings_from_file("holding_oracle.yaml", client=legis_client)
     >>> oracle.posit(oracle_holdings)
 

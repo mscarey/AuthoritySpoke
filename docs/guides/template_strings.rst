@@ -30,7 +30,7 @@ a :class:`~nettlesome.predicates.Predicate` object
 in AuthoritySpoke version 0.5:
 
     >>> from authorityspoke import Predicate
-    >>> parent_sentence = Predicate("$mother was ${child}'s parent")
+    >>> parent_sentence = Predicate(content="$mother was ${child}'s parent")
 
 The phrase that we passed to
 the :class:`~nettlesome.predicates.Predicate` constructor is used to create
@@ -69,7 +69,7 @@ that the :meth:`~nettlesome.predicates.Predicate.means` method can still
 consider Predicates to have the same meaning even if they use different
 identifiers for their placeholders.
 
-    >>> another_parent_sentence = Predicate("$adult was ${kid}'s parent")
+    >>> another_parent_sentence = Predicate(content="$adult was ${kid}'s parent")
     >>> parent_sentence.template == another_parent_sentence.template
     False
 
@@ -83,7 +83,7 @@ relationships between the truth values of different Predicates
 with the same template text. If you omit a ``truth`` parameter when
 creating a Predicate, the default value is ``True``.
 
-    >>> not_parent_sentence = Predicate("$adult was ${kid}'s parent", truth=False)
+    >>> not_parent_sentence = Predicate(content="$adult was ${kid}'s parent", truth=False)
     >>> str(not_parent_sentence)
     "it was false that $adult was ${kid}'s parent"
 
@@ -137,7 +137,7 @@ a string when constructing the Comparison object, and it will be converted to a 
 
     >>> from authorityspoke import Comparison
     >>> drug_comparison = Comparison(
-    ...     "the weight of marijuana that $defendant possessed was",
+    ...     content="the weight of marijuana that $defendant possessed was",
     ...     sign=">=",
     ...     expression="0.5 kilograms")
     >>> str(drug_comparison)
@@ -153,7 +153,7 @@ one Comparison :meth:`~nettlesome.predicates.Comparison.implies` or
 :meth:`~nettlesome.predicates.Comparison.contradicts` another.
 
     >>> smaller_drug_comparison = Comparison(
-    ...     "the weight of marijuana that $defendant possessed was",
+    ...     content="the weight of marijuana that $defendant possessed was",
     ...     sign=">=",
     ...     expression="250 grams")
     >>> str(smaller_drug_comparison)
@@ -174,7 +174,7 @@ was more than 10 grams. AuthoritySpoke interprets this to mean it’s true
 that the weight was no more than 10 grams.
 
     >>> drug_comparison_with_upper_bound = Comparison(
-    ...     "the weight of marijuana that $defendant possessed was",
+    ...     content="the weight of marijuana that $defendant possessed was",
     ...     sign=">",
     ...     expression="10 grams",
     ...     truth=False)
@@ -207,7 +207,7 @@ describes. The template string will still need to end with the word
 floating point number, not a string to be parsed.
 
     >>> three_children = Comparison(
-    ...     "the number of children in ${taxpayer}'s household was",
+    ...     content="the number of children in ${taxpayer}'s household was",
     ...     sign="=",
     ...     expression=3)
     >>> str(three_children)
@@ -218,14 +218,19 @@ like :meth:`~nettlesome.predicates.Comparison.implies`
 or :meth:`~nettlesome.predicates.Comparison.contradicts`\,
 but no unit conversion will be available.
 
-    >>> at_least_two_children = Comparison("the number of children in ${taxpayer}'s household was", sign=">=", expression=2)
+    >>> at_least_two_children = Comparison(
+    ...     content="the number of children in ${taxpayer}'s household was",
+    ...     sign=">=",
+    ...     expression=2)
     >>> three_children.implies(at_least_two_children)
     True
 
-Floating point comparisons work similarly.
+Comparisons of decimal numbers work similarly.
 
-    >>> specific_tax_rate = Comparison("${taxpayer}'s marginal income tax rate was", sign="=", expression=.3)
-    >>> tax_rate_over_25 = Comparison("${taxpayer}'s marginal income tax rate was", sign=">", expression=.25)
+    >>> specific_tax_rate = Comparison(
+    ...     content="${taxpayer}'s marginal income tax rate was", sign="=", expression=.3)
+    >>> tax_rate_over_25 = Comparison(
+    ...     content="${taxpayer}'s marginal income tax rate was", sign=">", expression=.25)
     >>> specific_tax_rate.implies(tax_rate_over_25)
     True
 
@@ -237,7 +242,8 @@ The ``expression`` field of
 a :class:`~nettlesome.predicates.Comparison` can be a :py:class:`datetime.date`\.
 
     >>> from datetime import date
-    >>> copyright_date_range = Comparison("the date when $work was created was", sign=">=", expression = date(1978,1,1))
+    >>> copyright_date_range = Comparison(
+    ...     content="the date when $work was created was", sign=">=", expression = date(1978,1,1))
     >>> str(copyright_date_range)
     'that the date when $work was created was at least 1978-01-01'
 
@@ -245,7 +251,8 @@ a :class:`~nettlesome.predicates.Comparison` can be a :py:class:`datetime.date`\
 And :py:class:`~datetime.date`\s and :py:class:`~datetime.date` ranges can be compared with each other,
 similar to how numbers can be compared to number ranges.
 
-    >>> copyright_date_specific = Comparison("the date when $work was created was", sign="=", expression = date(1980,6,20))
+    >>> copyright_date_specific = Comparison(
+    ...     content="the date when $work was created was", sign="=", expression = date(1980,6,20))
     >>> copyright_date_specific.implies(copyright_date_range)
     True
 
@@ -263,10 +270,10 @@ or :class:`~nettlesome.predicates.Comparison` inside
 a :class:`~authorityspoke.facts.Fact` object.
 
     >>> from authorityspoke import Entity, Fact
-    >>> ann = Entity("Ann", generic=False)
-    >>> claude = Entity("Claude", generic=False)
-    >>> ann_tax_rate = Fact(specific_tax_rate, terms=ann)
-    >>> claude_tax_rate = Fact(tax_rate_over_25, terms=claude)
+    >>> ann = Entity(name="Ann", generic=False)
+    >>> claude = Entity(name="Claude", generic=False)
+    >>> ann_tax_rate = Fact(predicate=specific_tax_rate, terms=ann)
+    >>> claude_tax_rate = Fact(predicate=tax_rate_over_25, terms=claude)
     >>> str(ann_tax_rate)
     "the fact that Ann's marginal income tax rate was exactly equal to 0.3"
 
@@ -291,10 +298,10 @@ to many different people regardless of exactly who those people are. To
 illustrate that idea, let’s create two “generic” people and show that a
 Fact about one of them implies a Fact about the other.
 
-    >>> devon = Entity("Devon", generic=True)
-    >>> elaine = Entity("Elaine", generic=True)
-    >>> devon_tax_rate = Fact(specific_tax_rate, terms=devon)
-    >>> elaine_tax_rate = Fact(tax_rate_over_25, terms=elaine)
+    >>> devon = Entity(name="Devon", generic=True)
+    >>> elaine = Entity(name="Elaine", generic=True)
+    >>> devon_tax_rate = Fact(predicate=specific_tax_rate, terms=devon)
+    >>> elaine_tax_rate = Fact(predicate=tax_rate_over_25, terms=elaine)
     >>> devon_tax_rate.implies(elaine_tax_rate)
     True
 
@@ -333,7 +340,8 @@ that Predicate, only include each unique term once. The terms should be
 listed in the same order that they first appear in the template text.
 
     >>> opened_account = Fact(
-    ...     Predicate("$applicant opened a bank account for $applicant and $cosigner"),
+    ...     predicate=Predicate(
+    ...         content="$applicant opened a bank account for $applicant and $cosigner"),
     ...     terms=(devon, elaine))
     >>> str(opened_account)
     'the fact that <Devon> opened a bank account for <Devon> and <Elaine>'
@@ -349,13 +357,13 @@ string should use identical text for the placeholders for the
 interchangeable terms, except that the different placeholders should
 each end with a different digit.
 
-    >>> ann = Entity("Ann", generic=False)
-    >>> bob = Entity("Bob", generic=False)
+    >>> ann = Entity(name="Ann", generic=False)
+    >>> bob = Entity(name="Bob", generic=False)
     >>> ann_and_bob_were_family = Fact(
-    ...     predicate=Predicate("$relative1 and $relative2 both were members of the same family"),
+    ...     predicate=Predicate(content="$relative1 and $relative2 both were members of the same family"),
     ...     terms=(ann, bob))
     >>> bob_and_ann_were_family = Fact(
-    ...     predicate=Predicate("$relative1 and $relative2 both were members of the same family"),
+    ...     predicate=Predicate(content="$relative1 and $relative2 both were members of the same family"),
     ...     terms=(bob, ann))
     >>> str(ann_and_bob_were_family)
     'the fact that Ann and Bob both were members of the same family'
@@ -371,9 +379,9 @@ that don’t fit the pattern of being identical
 except for a final digit, then transposing two non-generic terms will
 change the meaning of the Fact.
 
-    >>> parent_sentence = Predicate("$mother was ${child}'s parent")
-    >>> ann_is_parent = Fact(parent_sentence, terms = (ann, bob))
-    >>> bob_is_parent = Fact(parent_sentence, terms = (bob, ann))
+    >>> parent_sentence = Predicate(content="$mother was ${child}'s parent")
+    >>> ann_is_parent = Fact(predicate=parent_sentence, terms = (ann, bob))
+    >>> bob_is_parent = Fact(predicate=parent_sentence, terms = (bob, ann))
     >>> str(ann_is_parent)
     "the fact that Ann was Bob's parent"
 
@@ -393,9 +401,9 @@ contain references to Facts as well as Entities. That mean they can
 include the text of other Predicates. This feature is intended for
 incorporating references to what people said, knew, or believed.
 
-    >>> statement = Predicate("$speaker told $listener $event")
-    >>> bob_had_drugs = Fact(smaller_drug_comparison, terms=bob)
-    >>> bob_told_ann_about_drugs = Fact(statement, terms=(bob, ann, bob_had_drugs))
+    >>> statement = Predicate(content="$speaker told $listener $event")
+    >>> bob_had_drugs = Fact(predicate=smaller_drug_comparison, terms=bob)
+    >>> bob_told_ann_about_drugs = Fact(predicate=statement, terms=(bob, ann, bob_had_drugs))
     >>> str(bob_told_ann_about_drugs)
     'the fact that Bob told Ann the fact that the weight of marijuana that Bob possessed was at least 250 gram'
 
@@ -407,8 +415,8 @@ said. In this example, the fact that Bob told Ann he possessed more than
 0.5 kilograms means he also told Ann that he possessed more than 250
 grams.
 
-    >>> bob_had_more_drugs = Fact(drug_comparison, terms=bob)
-    >>> bob_told_ann_about_more_drugs = Fact(statement, terms=(bob, ann, bob_had_more_drugs))
+    >>> bob_had_more_drugs = Fact(predicate=drug_comparison, terms=bob)
+    >>> bob_told_ann_about_more_drugs = Fact(predicate=statement, terms=(bob, ann, bob_had_more_drugs))
     >>> str(bob_told_ann_about_more_drugs)
     'the fact that Bob told Ann the fact that the weight of marijuana that Bob possessed was at least 0.5 kilogram'
 
@@ -421,8 +429,8 @@ Predicates doesn’t cause the first-order Facts to contradict one
 another. For example, it’s not contradictory to say that a person
 has said two contradictory things.
 
-    >>> bob_had_less_drugs = Fact(drug_comparison_with_upper_bound, terms=bob)
-    >>> bob_told_ann_about_less_drugs = Fact(statement, terms=(bob, ann, bob_had_less_drugs))
+    >>> bob_had_less_drugs = Fact(predicate=drug_comparison_with_upper_bound, terms=bob)
+    >>> bob_told_ann_about_less_drugs = Fact(predicate=statement, terms=(bob, ann, bob_had_less_drugs))
     >>> str(bob_told_ann_about_less_drugs)
     'the fact that Bob told Ann the fact that the weight of marijuana that Bob possessed was no more than 10 gram'
 
@@ -435,8 +443,8 @@ first-order Fact. AuthoritySpoke will recognize that the use of
 different terms in the second-order Fact changes the meaning of the
 first-order Fact.
 
-    >>> claude_had_drugs = Fact(smaller_drug_comparison, terms=claude)
-    >>> bob_told_ann_about_claude = Fact(statement, terms=(bob, ann, claude_had_drugs))
+    >>> claude_had_drugs = Fact(predicate=smaller_drug_comparison, terms=claude)
+    >>> bob_told_ann_about_claude = Fact(predicate=statement, terms=(bob, ann, claude_had_drugs))
     >>> str(bob_told_ann_about_claude)
     'the fact that Bob told Ann the fact that the weight of marijuana that Claude possessed was at least 250 gram'
 

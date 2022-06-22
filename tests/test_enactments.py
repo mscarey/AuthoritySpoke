@@ -1,3 +1,4 @@
+from authorityspoke.decisions import Decision, DecisionReading
 import datetime
 import os
 
@@ -8,14 +9,15 @@ from legislice.download import Client
 from legislice.citations import CodeLevel
 from legislice.enactments import Enactment
 from legislice.groups import EnactmentGroup
-from legislice.schemas import EnactmentSchema
 
 from nettlesome.entities import Entity
 from nettlesome.predicates import Predicate
-from nettlesome.statements import Statement
+
+from pydantic import ValidationError
 import pytest
 
-from authorityspoke.io import loaders, readers, schemas_yaml, dump
+from authorityspoke.facts import Fact
+from authorityspoke.io import loaders, readers
 from authorityspoke.io.fake_enactments import FakeClient
 
 
@@ -33,7 +35,7 @@ class TestEnactments:
 
     def test_create_enactment_with_init(self, fake_beard_client):
         """
-        Using the __init__ method of the Enactment class, insteaid of
+        Using the __init__ method of the Enactment class, instead of
         readers.read_enactment or the Enactment marshmallow schema.
         """
         beard_definition = fake_beard_client.read("/test/acts/47/4/")
@@ -42,41 +44,23 @@ class TestEnactments:
     def test_make_enactment_from_selector_without_code(self, fake_usc_client):
         selector = TextQuoteSelector(suffix=" to their respective")
         art_3 = fake_usc_client.read("/us/const/article/I/8/8")
-        art_3.select(selector)
-        assert art_3.text.startswith("To promote")
-        assert art_3.selected_text().endswith("exclusive Right…")
+        passage = art_3.select(selector)
+        assert passage.text.startswith("To promote")
+        assert passage.selected_text().endswith("exclusive Right…")
 
     def test_make_enactment_from_dict_with_reader(self, fake_usc_client):
         fourth_a = fake_usc_client.read_from_json({"node": "/us/const/amendment/IV"})
         assert fourth_a.text.endswith("and the persons or things to be seized.")
 
-    def test_make_enactment_from_dict_with_text_split(self, fake_usc_client):
-        fourth_a = fake_usc_client.read_from_json(
-            {
-                "node": "/us/const/amendment/IV",
-                "text": "and|the persons or things|to be seized.",
-            }
-        )
-        assert fourth_a.selected_text() == "…the persons or things…"
-
     def test_passage_from_imported_statute(self, fake_usc_client):
-        oracle_majority = loaders.load_and_read_decision(f"oracle_h.json").majority
-        loaded = loaders.load_holdings("holding_oracle.json")
+        oracle = loaders.load_decision("oracle_h.json")
+        oracle_decision = Decision(**oracle)
+        reading = DecisionReading(decision=oracle_decision)
+        loaded = loaders.load_holdings("holding_oracle.yaml")
         holdings = readers.read_holdings(loaded, client=fake_usc_client)
-        oracle_majority.posit(holdings)
-        despite_text = str(list(oracle_majority.holdings)[5])
+        reading.posit(holdings)
+        despite_text = str(list(reading.holdings)[5])
         assert "In no case does copyright protection " in despite_text
-
-    def test_short_passage_from_uslm_code(self, fake_usc_client):
-        """Also tests adding the missing initial "/" in ``path``."""
-        method = fake_usc_client.read_from_json(
-            {
-                "node": "us/usc/t17/s102/b",
-                "prefix": "process, system,",
-                "suffix": ", concept, principle",
-            },
-        )
-        assert method.selected_text() == "…method of operation…"
 
     def test_chapeau_and_subsections_from_uslm_code(self, fake_beard_client):
         definition = fake_beard_client.read_from_json({"node": "/test/acts/47/4"})
@@ -86,9 +70,10 @@ class TestEnactments:
         assert "/us/const/amendment/IV" in str(e_search_clause)
 
     def test_unequal_to_statement(self, watt_factor, e_copyright):
-        stole_predicate = Predicate("$defendant stole $object")
-        stole_fact = Statement(
-            stole_predicate, terms=[Entity("Alice"), Entity("the gold bar")]
+        stole_predicate = Predicate(content="$defendant stole $object")
+        stole_fact = Fact(
+            predicate=stole_predicate,
+            terms=[Entity(name="Alice"), Entity(name="the gold bar")],
         )
 
         assert not stole_fact.means(e_copyright)
@@ -155,14 +140,14 @@ class TestEnactments:
         assert e_due_process_14.start_date > e_due_process_5.start_date
 
     def test_invalid_selector_text(self, make_selector):
+        enactment = Enactment(
+            node="/us/const/amendment/IV",
+            heading="",
+            content="Not the same text as in the selector",
+            start_date="2000-01-01",
+        )
         with pytest.raises(TextSelectionError):
-            _ = Enactment(
-                node="/us/const/amendment/IV",
-                selection=make_selector["bad_selector"],
-                heading="",
-                content="Not the same text as in the selector",
-                start_date="2000-01-01",
-            )
+            enactment.select(make_selector["bad_selector"])
 
     # Addition
 
@@ -195,22 +180,20 @@ class TestEnactments:
         copyright_clause = client.read("/us/const/article/I/8/8")
         copyright_statute = client.read("/us/usc/t17/s102/b")
 
-        copyright_clause.select(None)
-        securing_for_authors = copyright_clause + (
+        passage = copyright_clause.select(None)
+        securing_for_authors = passage + (
             "To promote the Progress of Science and "
             "useful Arts, by securing for limited Times to Authors"
         )
-        and_inventors = copyright_clause + "and Inventors"
-        right_to_writings = (
-            copyright_clause + "the exclusive Right to their respective Writings"
-        )
+        and_inventors = passage + "and Inventors"
+        right_to_writings = passage + "the exclusive Right to their respective Writings"
         to_combine = [
             copyright_statute,
             securing_for_authors,
             and_inventors,
             right_to_writings,
         ]
-        combined = EnactmentGroup(to_combine)
+        combined = EnactmentGroup(passages=to_combine)
         assert len(combined) == 2
         assert any(
             law.selected_text().startswith("To promote the Progress")
@@ -227,25 +210,27 @@ class TestEnactments:
         due_process_5.select("life, liberty, or property, without due process of law")
         due_process_14.select("life, liberty, or property, without due process of law")
 
-        combined = EnactmentGroup([due_process_5, due_process_14])
+        combined = EnactmentGroup(passages=[due_process_5, due_process_14])
         assert len(combined) == 2
 
     def test_cannot_add_fact_to_enactment(self, watt_factor, e_search_clause):
-        with pytest.raises(TypeError):
+        with pytest.raises(ValidationError):
             print(e_search_clause + watt_factor["f3"])
 
     def test_cannot_add_enactment_to_statement(self, e_search_clause):
-        statement = Statement(
-            Predicate("$person committed a murder"), terms=Entity("Al")
+        statement = Fact(
+            predicate=Predicate(content="$person committed a murder"),
+            terms=Entity(name="Al"),
         )
         with pytest.raises(TypeError):
             statement + e_search_clause
 
     def test_cannot_add_statement_to_enactment(self, e_search_clause):
-        statement = Statement(
-            Predicate("$person committed a murder"), terms=Entity("Al")
+        statement = Fact(
+            predicate=Predicate(content="$person committed a murder"),
+            terms=Entity(name="Al"),
         )
-        with pytest.raises(TypeError):
+        with pytest.raises(ValidationError):
             e_search_clause + statement
 
     def test_cant_add_enactment_that_is_not_ancestor_or_descendant(
@@ -258,25 +243,16 @@ class TestEnactments:
 class TestDump:
     client = Client(api_token=TOKEN)
 
-    @pytest.mark.vcr
-    def test_dump_dict(self):
-        enactment = self.client.read("/us/const/article/I/8/8")
-        d = dump.to_dict(enactment)
-        start = d["selection"][0]["start"]
-        end = d["selection"][0]["end"]
-        text_selection = d["text_version"]["content"][start:end]
-        assert "Science and useful Arts" in text_selection
-
     def test_dump_json(self, fake_beard_client):
         provision = fake_beard_client.read_from_json({"node": "/test/acts/47/6A"})
-        dumped_provision = dump.to_json(provision)
+        dumped_provision = provision.json()
         assert '"node": "/test/acts/47/6A"' in dumped_provision
 
     @pytest.mark.vcr
     def test_round_trip_dict(self, fake_beard_client):
         provision = fake_beard_client.read_from_json({"node": "/test/acts/47/6A"})
-        dumped_provision = dump.to_dict(provision)
-        new = self.client.read_from_json(dumped_provision)
+        dumped_provision = provision.dict()
+        new = Enactment(**dumped_provision)
         assert new.node == "/test/acts/47/6A"
 
 
@@ -308,12 +284,6 @@ class TestTextSelection:
         )
         assert statute.node.startswith("/")
 
-    def test_selector_text_split(self):
-        data = {"text": "process, system,|method of operation|, concept, principle"}
-        schema = schemas_yaml.SelectorSchema()
-        selector = schema.load(data)
-        assert selector.exact.startswith("method")
-
     def test_whitespace_when_selecting_with_suffix(self, e_copyright):
         """Overwrite existing selector and test for trailing whitespace."""
         copyright_selector = TextQuoteSelector(suffix="idea, procedure,")
@@ -333,13 +303,14 @@ class TestTextSelection:
         )
 
     def test_exact_text_not_in_selection(self, fake_usc_client):
+        passage = fake_usc_client.read_from_json(
+            {
+                "node": "/us/const/amendment/XV/1",
+            }
+        )
+        selector = TextQuoteSelector(exact="due process")
         with pytest.raises(TextSelectionError):
-            _ = fake_usc_client.read_from_json(
-                {
-                    "node": "/us/const/amendment/XV/1",
-                    "exact": "due process",
-                }
-            )
+            passage.select(selector)
 
     def test_multiple_non_Factor_selectors_for_Holding(self):
         """
@@ -351,7 +322,7 @@ class TestTextSelection:
             ]
         """
         client = FakeClient.from_file("usc.json")
-        holdings, holding_anchors, _, _ = loaders.read_anchored_holdings_from_file(
-            "holding_feist.json", client=client
+        holdings = loaders.read_anchored_holdings_from_file(
+            "holding_feist.yaml", client=client
         )
-        assert len(holding_anchors[6]) == 2
+        assert len(holdings.holdings[6].anchors.quotes) == 2

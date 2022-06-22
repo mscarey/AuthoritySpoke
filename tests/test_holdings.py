@@ -1,3 +1,4 @@
+from authorityspoke.opinions import OpinionReading
 from copy import deepcopy
 from datetime import date
 import os
@@ -29,7 +30,7 @@ legislice_client = Client(api_token=TOKEN)
 
 class TestHolding:
     def test_complex_string(self, make_complex_rule):
-        holding = Holding(make_complex_rule["accept_murder_fact_from_relevance"])
+        holding = Holding(rule=make_complex_rule["accept_murder_fact_from_relevance"])
         string = " ".join(x.strip() for x in str(holding).splitlines())
         assert "is relevant to show the fact that <Alice>" in string.replace("/n", " ")
 
@@ -49,7 +50,8 @@ class TestHolding:
         Test that holding uses the Fact string method with line breaks.
         """
         lotus = make_opinion_with_holding["lotus_majority"]
-        assert "registered a copyright\n" in str(lotus.holdings[2])
+        assert "registered a copyright" in str(lotus.holdings[2])
+        assert "\n" in str(lotus.holdings[2])
 
     def test_case_class_name_for_fact_within_holding(self, make_opinion_with_holding):
         lotus = make_opinion_with_holding["lotus_majority"]
@@ -58,20 +60,27 @@ class TestHolding:
 
     def test_holding_without_inputs_not_exclusive(self, make_factor):
         with pytest.raises(ValueError):
-            Holding(Rule(Procedure(outputs=make_factor["f_no_crime"])), exclusive=True)
+            Holding(
+                rule=Rule(procedure=Procedure(outputs=make_factor["f_no_crime"])),
+                exclusive=True,
+            )
 
     def test_holding_with_absent_output_not_exclusive(self, make_exhibit):
         with pytest.raises(ValueError):
             Holding(
-                Rule(Procedure(outputs=make_exhibit["reciprocal_testimony_absent"])),
+                rule=Rule(
+                    procedure=Procedure(
+                        outputs=make_exhibit["reciprocal_testimony_absent"]
+                    )
+                ),
                 exclusive=True,
             )
 
     def test_holding_with_two_outputs_not_exclusive(self, make_factor):
         with pytest.raises(ValueError):
             Holding(
-                Rule(
-                    Procedure(
+                rule=Rule(
+                    procedure=Procedure(
                         outputs=[make_factor["f_no_crime"], make_factor["f_shooting"]]
                     )
                 ),
@@ -109,7 +118,7 @@ class TestHolding:
     def test_enactment_text_in_holding_str(self, make_opinion_with_holding):
         lotus = make_opinion_with_holding["lotus_majority"]
         holding = lotus.holdings[2]
-        assert holding.enactments[0].content.startswith("In any judicial")
+        assert holding.enactments[0].enactment.content.startswith("In any judicial")
         assert "In any judicial" in holding.enactments[0].selected_text()
 
     def test_holding_with_standard_of_proof(self, make_factor):
@@ -245,12 +254,13 @@ class TestImplication:
         self, make_opinion_with_holding, make_opinion
     ):
         lotus = make_opinion["lotus_majority"]
+        reading = OpinionReading()
         holding = make_opinion_with_holding["oracle_majority"].holdings[0]
         context = ContextRegister()
         context.insert_pair(
-            Entity("the Java API"), Entity("the Lotus menu command hierarchy")
+            Entity(name="the Java API"), Entity(name="the Lotus menu command hierarchy")
         )
-        assert holding.implies(lotus, context=context)
+        assert holding.implies(reading, context=context)
 
     def test_holding_implies_none(self, make_holding):
         assert make_holding["h3"] >= None
@@ -281,17 +291,18 @@ class TestImplication:
             inputs=FactorGroup(
                 [
                     Fact(
-                        "${work} was copyrightable", terms=Entity("the birthday song")
+                        predicate="${work} was copyrightable",
+                        terms=Entity(name="the birthday song"),
                     ),
                     Fact(
-                        "$person copied constituent elements of $work that were original",
-                        terms=[Entity("Eve"), Entity("the birthday song")],
+                        predicate="$person copied constituent elements of $work that were original",
+                        terms=[Entity(name="Eve"), Entity(name="the birthday song")],
                     ),
                 ]
             ),
             outputs=Fact(
-                "$person infringed the copyright in $work",
-                terms=[Entity("Eve"), Entity("the birthday song")],
+                predicate="$person infringed the copyright in $work",
+                terms=[Entity(name="Eve"), Entity(name="the birthday song")],
             ),
             enactments=e_copyright_protection,
         )
@@ -304,9 +315,9 @@ class TestImplication:
         """
         oracle = make_decision_with_holding["oracle"]
         context = ContextRegister()
-        language = Entity("the Java language")
+        language = Entity(name="the Java language")
 
-        context.insert_pair(Entity("the Java API"), language)
+        context.insert_pair(Entity(name="the Java API"), language)
 
         new_context = oracle.holdings[18].new_context(context)
         explanation = new_context.explain_implication(oracle.holdings[19])
@@ -314,7 +325,8 @@ class TestImplication:
 
     def test_not_implied_by_statement(self, make_holding):
         assert not Statement(
-            Predicate("$person was a person"), terms=Entity("Alice")
+            predicate=Predicate(content="$person was a person"),
+            terms=Entity(name="Alice"),
         ).implies(make_holding["h1"])
 
     def test_cannot_check_if_holding_implies_factor(self, make_holding, make_factor):
@@ -438,7 +450,7 @@ class TestContradiction:
         lotus = make_opinion_with_holding["lotus_majority"]
         context = ContextRegister()
         context.insert_pair(
-            Entity("the Lotus menu command hierarchy"), Entity("the Java API")
+            Entity(name="the Lotus menu command hierarchy"), Entity(name="the Java API")
         )
         assert lotus.holdings[6].contradicts(
             oracle,

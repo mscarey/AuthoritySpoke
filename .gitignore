@@ -9,6 +9,7 @@ AuthoritySpoke.egg-info
 .tox
 .vscode
 .mypy_cache/
+anchorpoint/
 ausvenv/
 build/
 dist/
@@ -18,6 +19,8 @@ htmlcov/
 example_data/holdings/unused
 example_data/cases/flf/
 example_data/cases/unused
+legislice/
+nettlesome/
 notebooks/.ipynb_checkpoints
 notebooks/path
 notebooks/unused

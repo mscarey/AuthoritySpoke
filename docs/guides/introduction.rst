@@ -45,7 +45,7 @@ up <https://authorityspoke.com/account/signup/>`__ for an account and
 then obtain a Legislice API key from your account page. The Legislice
 API key is not the same as the Caselaw Access Project API key.
 
-As of version 0.4, you mostly have to create your own procedural rule
+In the current version, you mostly have to create your own procedural rule
 annotations, but the ``example_data`` folder of the `GitHub repository
 for AuthoritySpoke <https://github.com/mscarey/AuthoritySpoke>`__
 contains example annotations for several cases. The rest of this
@@ -59,14 +59,62 @@ If you’ve installed AuthoritySpoke and you need access to the example
 data files, you'll need to download them from the `GitHub
 repository <https://github.com/mscarey/AuthoritySpoke>`__.
 
-Importing the Package
-------------------------
+Installing AuthoritySpoke
+-------------------------
+
+AuthoritySpoke is a `Python package <https://pypi.org/project/AuthoritySpoke/>`__ that
+should be installed
+with `pip <https://www.w3schools.com/python/python_pip.asp>`__.
+
+Because AuthoritySpoke installs many other Python packages
+as dependencies, you're strongly encouraged to install it
+in a virtual environment using a tool
+like `venv <https://docs.python.org/3.9/library/venv.html>`__.
+For example, to create a virtual environment called "myvenv", you
+could use your computer's terminal command line to navigate to the folder that
+you want to use as your project folder, and then type:
+
+.. code-block:: console
+
+    $ python3 -m venv myvenv
+
+Remember to activate the virtual environment you have created.
+
+.. code-block:: console
+
+    $ source myvenv/bin/activate
+
+And then install the package.
+
+.. code-block:: console
+
+    $ pip install AuthoritySpoke
+
+.. warning::
+    AuthoritySpoke may fail to install on Python version 3.10, especially on
+    MacOS. For now, the only work-around is to use Python version 3.9 or 3.8
+    instead. A `GitHub issue thread <https://github.com/mscarey/AuthoritySpoke/issues/111>`__
+    is available to track progress on diagnosing this problem.
+
+When you're done using your virtual environment, you can deactivate it with:
+
+.. code-block:: console
+
+    $ deactivate
+
+Deactivating the virtual environment does not delete it, so you can reactivate it
+without needing to create it again.
+
+Visit `the Python
+Package Index <https://packaging.python.org/tutorials/installing-packages/>`__ for more
+details on installing Python packages like AuthoritySpoke.
+
+Importing AuthoritySpoke in Python
+----------------------------------
 
 If you want to use AuthoritySpoke in your own Python environment, be
 sure you have installed AuthoritySpoke using a command like
-``pip install AuthoritySpoke`` on the command line. Visit `the Python
-Package Index <https://pypi.org/project/AuthoritySpoke/>`__ for more
-details.
+``pip install AuthoritySpoke`` on the command line.
 
 With a Python environment activated, let’s import AuthoritySpoke by
 running the cell below.
@@ -94,7 +142,7 @@ help on installing modules.
 Optional: Skip the Downloads and Load Decisions from a File
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To use the cell below to access :class:`authorityspoke.decisions.Decision`
+To use the cell below to access :class:`justopinion.decisions.Decision`
 objects from a file rather
 than an API, be sure the ``USE_REAL_CASE_API`` variable is set to
 ``False``. This should work if you’re running the tutorial in a notebook
@@ -106,16 +154,16 @@ notebook will try to find the data for the fake APIs in the
 notebook is running.
 
     >>> from authorityspoke.io.loaders import load_decision
-    >>> from authorityspoke.io.readers import read_decision
+    >>> from authorityspoke import Decision
     >>> if not USE_REAL_CASE_API:
-    ...     oracle_download = load_decision("oracle_h.json")
-    ...     lotus_download = load_decision("lotus_h.json")
+    ...     oracle_case = Decision(**load_decision("oracle_h.json"))
+    ...     lotus_case = Decision(**load_decision("lotus_h.json"))
 
 Downloading and Importing Decisions
 --------------------------------------
 
 If you didn’t load court opinions from the GitHub repository as
-described in section 1.1, then you’ll be using the Caselaw Access
+described above, then you’ll be using the Caselaw Access
 Project (CAP) API to get court opinions to load into AuthoritySpoke. To
 download full cases from CAP, you’ll need to `register for a CAP API
 key <https://case.law/user/register/>`__.
@@ -129,11 +177,6 @@ Python package to load the API key as an environment variable without
 ever writing the API key in the notebook. That makes it easier to keep
 your API key secret, even if you publish your copy of the notebook and
 make it visible on the internet.
-
-However, if you’re viewing this tutorial in a cloud environment like
-Binder, you probably won’t be able to create an environment variable.
-Instead, you could replace ``os.getenv('CAP_API_KEY')`` with a string
-containing your own API key.
 
     >>> import os
     >>> from dotenv import load_dotenv
@@ -160,23 +203,22 @@ uncopyrightable because it was a “method of operation” under the
 Copyright Act. As we’ll see, the Oracle case discusses and disagrees
 with the Lotus case.
 
-If you already loaded an :class:`~authorityspoke.opinions.Opinion`
+If you already loaded a :class:`~justopinion.decisions.Decision`
 from a file, running the cells
 below with ``USE_REAL_CASE_API`` set to True will attempt to overwrite
-them with data from the API. You should be able to run the rest of the
+it with data from the API. You should be able to run the rest of the
 tutorial code either way.
 
-    >>> from authorityspoke import LegisClient
-    >>> from authorityspoke.io.loaders import load_and_read_decision
+    >>> from authorityspoke import CAPClient
     >>> if USE_REAL_CASE_API:
-    ...     client = LegisClient(api_token=CAP_API_KEY)
-    ...     oracle_download = client.fetch(cite="750 F.3d 1339")
+    ...     case_client = CAPClient(api_token=CAP_API_KEY)
+    ...     oracle_case = case_client.read_cite(cite="750 F.3d 1339")
 
 Now we have a record representing the *Oracle* case, which can also be
 found in the “example_data/opinions” folder under the filename
 “oracle_h.json”. Let’s look at a field from the API response.
 
-    >>> oracle_download["name"]
+    >>> oracle_case.name
     'ORACLE AMERICA, INC., Plaintiff-Appellant, v. GOOGLE INC., Defendant-Cross-Appellant'
 
 Yes, this is the correct case name. But if we had provided the API key
@@ -186,42 +228,34 @@ case, and the names of the opinion authors. So let’s request the
 *Oracle* case with ``full_case=True``.
 
     >>> if USE_REAL_CASE_API:
-    ...     oracle_download = download_case(
+    ...     oracle_case = case_client.read_cite(
     ...     cite="750 F.3d 1339",
-    ...     full_case=True,
-    ...     api_key=CAP_API_KEY)
+    ...     full_case=True)
 
 And then do the same for the *Lotus* case.
 
     >>> if USE_REAL_CASE_API:
-    ...    lotus_download = download_case(
+    ...    lotus_case = case_client.read_cite(
     ...    cite="49 F.3d 807",
-    ...    full_case=True,
-    ...    api_key=CAP_API_KEY)
+    ...    full_case=True)
 
-Now let’s convert the *Oracle* API response to an AuthoritySpoke object.
+Now let’s look at the objects we made.
 
-    >>> from authorityspoke.io.readers import read_decision
-    >>> oracle = read_decision(oracle_download)
-
-And take a look at the object we made.
-
-    >>> print(oracle)
+    >>> print(oracle_case)
     Oracle America, Inc. v. Google Inc., 750 F.3d 1339 (2014-05-09)
 
-    >>> lotus = read_decision(lotus_download)
-    >>> print(lotus)
+    >>> print(lotus_case)
     Lotus Development Corp. v. Borland International, Inc., 49 F.3d 807 (1995-03-09)
 
-One judicial :class:`~authorityspoke.decisions.Decision` can include
+One judicial :class:`~justopinion.decisions.Decision` can include
 multiple :class:`~authorityspoke.opinions.Opinion`\s. The Lotus
-:class:`~authorityspoke.decisions.Decision` has a concurring opinion
+:class:`~justopinion.decisions.Decision` has a concurring opinion
 as well as a majority opinion.
-Access the ``majority`` attribute of the :class:`~authorityspoke.decisions.Decision`
+Access the ``majority`` attribute of the :class:`~justopinion.decisions.Decision`
 object to get the majority opinion.
 
-    >>> print(lotus.majority)
-    majority Opinion by STAHL, Circuit Judge.
+    >>> print(lotus_case.majority)
+    majority opinion by STAHL, Circuit Judge
 
 Downloading Enactments
 -------------------------
@@ -236,7 +270,7 @@ use :meth:`legislice.download.Client.read`, which also
 fetches the JSON but then loads it into an instance of
 the :class:`~legislice.enactments.Enactment` class.
 
-    >>> from authorityspoke.io.downloads import LegisClient
+    >>> from authorityspoke import LegisClient
     >>> from authorityspoke.io.fake_enactments import FakeClient
     >>> if USE_REAL_LEGISLICE_API:
     ...    LEGISLICE_API_TOKEN = os.getenv("LEGISLICE_API_TOKEN")
@@ -251,7 +285,7 @@ Importing and Exporting Legal Holdings
 
 Now we can link some legal analysis to each
 majority :class:`~authorityspoke.opinions.Opinion` by
-using :meth:`authorityspoke.decisions.Decision.posit`
+using :meth:`justopinion.decisions.Decision.posit`
 or :meth:`authorityspoke.opinions.Opinion.posit`. The parameter we pass to
 this function is a :class:`~authorityspoke.holdings.Holding` or list
 of :class:`~authorityspoke.holdings.Holding`\s posited by the
@@ -288,7 +322,7 @@ the statutes or other :class:`~legislice.enactments.Enactment`\s cited in
 the :class:`~authorityspoke.holdings.Holding`\.
 
     >>> from authorityspoke.io.loaders import read_holdings_from_file
-    >>> oracle_holdings = read_holdings_from_file("holding_oracle.json", client=legis_client)
+    >>> oracle_holdings = read_holdings_from_file("holding_oracle.yaml", client=legis_client)
     >>> print(oracle_holdings[0])
     the Holding to ACCEPT
       the Rule that the court MUST SOMETIMES impose the
@@ -300,36 +334,16 @@ the :class:`~authorityspoke.holdings.Holding`\.
           "Copyright protection subsists, in accordance with this title, in original works of authorship fixed in any tangible medium of expression, now known or later developed, from which they can be perceived, reproduced, or otherwise communicated, either directly or with the aid of a machine or device.…" (/us/usc/t17/s102/a 2013-07-18)
 
 You can also convert Holdings back to JSON, or to a Python dictionary,
-using the :mod:`~authorityspoke.io.dump` module.
+using the ``.dict()`` or ``.json()`` methods.
 
     >>> from pprint import pprint
-    >>> from authorityspoke.io.dump import to_json, to_dict
-    >>> pprint(to_dict(oracle_holdings[0])["rule"]["procedure"])
-    {'despite': [],
-     'inputs': [{'absent': False,
-                 'generic': False,
-                 'name': '',
-                 'predicate': {'content': '${the_java_api} was an original work',
-                               'expression': None,
-                               'truth': False},
-                 'standard_of_proof': None,
-                 'terms': [{'generic': True,
-                            'name': 'the Java API',
-                            'plural': False,
-                            'type': 'Entity'}],
-                 'type': 'Fact'}],
-     'outputs': [{'absent': False,
-                  'generic': False,
-                  'name': '',
-                  'predicate': {'content': '${the_java_api} was copyrightable',
-                                'expression': None,
-                                'truth': False},
-                  'standard_of_proof': None,
-                  'terms': [{'generic': True,
-                             'name': 'the Java API',
-                             'plural': False,
-                             'type': 'Entity'}],
-                  'type': 'Fact'}]}
+    >>> pprint(oracle_holdings[0].dict()["rule"]["procedure"]["outputs"])
+    [{'absent': False,
+      'generic': False,
+      'name': 'false the Java API was copyrightable',
+      'predicate': {'content': '${the_java_api} was copyrightable', 'truth': False},
+      'standard_of_proof': None,
+      'terms': [{'generic': True, 'name': 'the Java API', 'plural': False}]}]
 
 Linking Holdings to Opinions
 -------------------------------
@@ -340,23 +354,26 @@ the :func:`~authorityspoke.io.loaders.load_holdings_with_anchors` method. The
 result is type of :py:class:`~typing.NamedTuple` called
 :class:`~authorityspoke.opinions.AnchoredHoldings`\. You can pass
 this NamedTuple as the only argument
-to the :meth:`authorityspoke.decisions.Decision.posit` method
+to the :meth:`justopinion.decisions.Decision.posit` method
 to assign the :class:`~authorityspoke.holdings.Holding`\s to the
 majority :class:`~authorityspoke.opinions.Opinion` of a
-:class:`~authorityspoke.decisions.Decision`.
+:class:`~justopinion.decisions.Decision`.
 This will also link the correct text passages from
 the :class:`~authorityspoke.opinions.Opinion` to
 each :class:`~authorityspoke.holdings.Holding`\.
 
+    >>> from authorityspoke import Decision, DecisionReading
     >>> from authorityspoke.io.loaders import read_anchored_holdings_from_file
-    >>> oracle_holdings_with_anchors = read_anchored_holdings_from_file("holding_oracle.json", client=legis_client)
-    >>> lotus_holdings_with_anchors = read_anchored_holdings_from_file("holding_lotus.json", client=legis_client)
+    >>> oracle_holdings_with_anchors = read_anchored_holdings_from_file("holding_oracle.yaml", client=legis_client)
+    >>> lotus_holdings_with_anchors = read_anchored_holdings_from_file("holding_lotus.yaml", client=legis_client)
+    >>> oracle = DecisionReading(decision=oracle_case)
+    >>> lotus = DecisionReading(decision=lotus_case)
     >>> oracle.posit(oracle_holdings_with_anchors)
     >>> lotus.posit(lotus_holdings_with_anchors)
 
 You can pass either one Holding or a list of Holdings to
-:meth:`authorityspoke.decisions.Decision.posit`.
-The :meth:`~authorityspoke.decisions.Decision.posit` method also has a
+:meth:`justopinion.decisions.Decision.posit`.
+The :meth:`~justopinion.decisions.Decision.posit` method also has a
 ``text_links`` parameter that takes a dict indicating what text spans in
 the Opinion should be linked to which Holding.
 
@@ -371,7 +388,7 @@ holding. (In case you aren't familiar with how Python handles JSON, the outer
 square brackets represent the beginning and end of the list. The start and end of each
 :py:class:`dict` in the list is shown by a matched pair of curly brackets.)
 
-Let’s make sure that the :meth:`~authorityspoke.decisions.Decision.posit` method
+Let’s make sure that the :meth:`~justopinion.decisions.Decision.posit` method
 linked all of those holdings to
 our ``oracle`` :class:`~authorityspoke.holdings.Opinion` object.
 
@@ -432,8 +449,7 @@ indicate that the Java API is a generic :class:`nettlesome.entities.Entity` ment
 in the :class:`~authorityspoke.facts.Fact`\.
 
     >>> oracle.holdings[0].generic_terms()
-    [Entity(name='the Java API')]
-
+    [Entity(name='the Java API', generic=True, plural=False)]
 
 A generic :class:`~nettlesome.entities.Entity` is “generic”
 in the sense that in the context of
@@ -472,7 +488,7 @@ angle brackets in the string representation of
 the :class:`~authorityspoke.holdings.Holding`\.
 
     >>> lotus.holdings[0].generic_terms()
-    [Entity(name='Borland International'), Entity(name='the Lotus menu command hierarchy')]
+    [Entity(name='Borland International', generic=True, plural=False), Entity(name='the Lotus menu command hierarchy', generic=True, plural=False)]
 
 
 The same :class:`~authorityspoke.rules.Rule`\s and
@@ -498,9 +514,9 @@ followed by a list of their replacements.
     >>> from authorityspoke import Entity
     >>> seinfeld_holding = lotus.holdings[0].new_context(
     ...    terms_to_replace=[
-    ...        Entity("Borland International"),
-    ...        Entity("the Lotus menu command hierarchy")],
-    ...    changes=[Entity("Carol Publishing Group"), Entity("Seinfeld")])
+    ...        Entity(name="Borland International"),
+    ...        Entity(name="the Lotus menu command hierarchy")],
+    ...    changes=[Entity(name="Carol Publishing Group"), Entity(name="Seinfeld")])
 
 The :meth:`~authorityspoke.holdings.Holding.new_context` method
 returns a new :class:`~authorityspoke.holdings.Holding` object,
@@ -578,7 +594,7 @@ matches some text that can be found in subsection 102(a).
     ...     "Copyright protection subsists, in accordance with this title, "
     ...     + "in original works of authorship")
     >>> works_of_authorship_clause = legis_client.read("/us/usc/t17/s102/a")
-    >>> works_of_authorship_clause.select(works_of_authorship_passage)
+    >>> works_of_authorship_selection = works_of_authorship_clause.select(works_of_authorship_passage)
 
 Now we can create a new :class:`~authorityspoke.holdings.Holding` object
 that cites to our new :class:`~legislice.enactments.Enactment` object
@@ -594,7 +610,7 @@ cited by the new :class:`~authorityspoke.holdings.Holding`\.
 
     >>> from copy import deepcopy
     >>> holding_with_shorter_enactment = deepcopy(oracle.holdings[0])
-    >>> holding_with_shorter_enactment.set_enactments(works_of_authorship_clause)
+    >>> holding_with_shorter_enactment.set_enactments(works_of_authorship_selection)
     >>> print(holding_with_shorter_enactment)
     the Holding to ACCEPT
       the Rule that the court MUST SOMETIMES impose the
@@ -735,7 +751,7 @@ explanation of why they contradict.
             "Copyright protection subsists, in accordance with this title, in original works of authorship fixed in any tangible medium of expression, now known or later developed, from which they can be perceived, reproduced, or otherwise communicated, either directly or with the aid of a machine or device.…" (/us/usc/t17/s102/a 2013-07-18)
           DESPITE the ENACTMENTS:
             "In no case does copyright protection for an original work of authorship extend to any…method of operation…" (/us/usc/t17/s102/b 2013-07-18)
-            "The following are examples of works not subject to copyright and applications for registration of such works cannot be entertained: Words and short phrases such as names, titles, and slogans; familiar symbols or designs; mere variations of typographic ornamentation, lettering or coloring; mere listing of ingredients or contents; Ideas, plans, methods, systems, or devices, as distinguished from the particular manner in which they are expressed or described in a writing;  Blank forms, such as time cards, graph paper, account books, diaries, bank checks, scorecards, address books, report forms, order forms and the like, which are designed for recording information and do not in themselves convey information; Works consisting entirely of information that is common property containing no original authorship, such as, for example: Standard calendars, height and weight charts, tape measures and rulers, schedules of sporting events, and lists or tables taken from public documents or other common sources. Typeface as typeface." (/us/cfr/t37/s202.1 1992-02-21)
+            "The following are examples of works not subject to copyright and applications for registration of such works cannot be entertained: Words and short phrases such as names, titles, and slogans;…" (/us/cfr/t37/s202.1 1992-02-21)
 
 
 That’s a really complicated holding! Good thing we have AuthoritySpoke
@@ -827,8 +843,9 @@ Adding Holdings to One Another
 To try out the addition operation, let’s load another case from the
 ``example_data`` folder.
 
-    >>> feist = load_and_read_decision("feist_h.json")
-    >>> feist.posit(read_anchored_holdings_from_file("holding_feist.json", client=legis_client))
+    >>> from authorityspoke.io.loaders import load_decision_as_reading
+    >>> feist = load_decision_as_reading("feist_h.json")
+    >>> feist.posit(read_anchored_holdings_from_file("holding_feist.yaml", client=legis_client))
 
 
 `Feist Publications, Inc. v. Rural Telephone Service

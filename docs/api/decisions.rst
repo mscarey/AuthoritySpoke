@@ -2,6 +2,6 @@
 Decisions
 ==============
 
-.. autoclass:: authorityspoke.decisions.Decision
+.. autoclass:: authorityspoke.decisions.DecisionReading
    :members:
    :special-members:
