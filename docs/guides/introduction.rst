@@ -90,12 +90,6 @@ And then install the package.
 
     $ pip install AuthoritySpoke
 
-.. warning::
-    AuthoritySpoke may fail to install on Python version 3.10, especially on
-    MacOS. For now, the only work-around is to use Python version 3.9 or 3.8
-    instead. A `GitHub issue thread <https://github.com/mscarey/AuthoritySpoke/issues/111>`__
-    is available to track progress on diagnosing this problem.
-
 When you're done using your virtual environment, you can deactivate it with:
 
 .. code-block:: console

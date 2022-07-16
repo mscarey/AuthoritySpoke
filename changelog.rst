@@ -1,5 +1,10 @@
 Changelog
 =========
+0.9.1 (2022-07-15)
+------------------
+* update eyecite and lxml dependencies to avoid Python 3.10 build error
+* add 3.10 to supported Python versions
+
 0.9.0 (2021-10-27)
 ------------------
 * replace marshmallow serializers with pydantic
