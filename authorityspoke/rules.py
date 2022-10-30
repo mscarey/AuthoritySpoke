@@ -37,7 +37,7 @@ class Rule(Comparable, BaseModel):
     A statement of a legal doctrine about a :class:`.Procedure` for litigation.
 
     May decide some aspect of current litigation, and also potentially
-    may be cided and reused by future courts. When :class:`Rule`\s appear as
+    may be cited and reused by future courts. When :class:`Rule`\s appear as
     judicial holdings they are often hypothetical and don't necessarily
     imply that the court accepts the :class:`.Fact` assertions or other
     :class:`.Factor`\s that make up the inputs or outputs of the
