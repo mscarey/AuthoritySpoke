@@ -353,7 +353,6 @@ class Holding(Comparable, BaseModel):
     def _explanations_implies_if_not_exclusive(
         self, other: Factor, context: Explanation
     ) -> Iterator[Explanation]:
-
         if self.decided and other.decided:
             yield from self._implies_if_decided(other, context)
 
@@ -408,7 +407,7 @@ class Holding(Comparable, BaseModel):
         self,
         other: Comparable,
         context: Optional[Union[ContextRegister, Explanation]] = None,
-    ) -> Iterator[ContextRegister]:
+    ) -> Iterator[Explanation]:
         """Yield contexts that would cause self and other to have same meaning."""
         if not self.comparable_with(other):
             raise TypeError(f"Type Holding cannot be compared with type {type(other)}.")

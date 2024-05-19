@@ -1,4 +1,5 @@
 """Create models of assertions accepted as factual by courts."""
+
 from __future__ import annotations
 from copy import deepcopy
 import operator
@@ -98,32 +99,35 @@ class Fact(Factor, BaseModel):
     @root_validator(pre=True)
     def nest_predicate_fields(cls, values):
         """Move fields passed to the Fact model that really belong to the Predicate model."""
-        type_str = values.pop("type", "")
-        if type_str and type_str.lower() != "fact":
-            raise ValidationError(f"type {type_str} was passed to Fact model")
+        if isinstance(values, dict):
+            type_str = values.pop("type", "")
+            if type_str and type_str.lower() != "fact":
+                raise ValidationError(f"type {type_str} was passed to Fact model")
 
-        if isinstance(values.get("predicate"), str):
-            values["predicate"] = Predicate(content=values["predicate"])
-            if "truth" in values:
-                values["predicate"].truth = values.pop("truth")
+            if isinstance(values.get("predicate"), str):
+                values["predicate"] = Predicate(content=values["predicate"])
+                if "truth" in values:
+                    values["predicate"].truth = values.pop("truth")
 
-        for field_name in ["content", "truth", "sign", "expression"]:
-            if field_name in values:
-                values["predicate"] = values.get("predicate", {})
-                values["predicate"][field_name] = values.pop(field_name)
-        if isinstance(values.get("predicate"), dict) and values["predicate"].get(
-            "content"
-        ):
-            for sign in {
-                **QuantityRange.opposite_comparisons,
-                **QuantityRange.normalized_comparisons,
-            }:
-                if sign in values["predicate"]["content"]:
-                    content, quantity_text = values["predicate"]["content"].split(sign)
-                    values["predicate"]["content"] = content.strip()
-                    values["predicate"]["expression"] = quantity_text.strip()
-                    values["predicate"]["sign"] = sign
-                    break
+            for field_name in ["content", "truth", "sign", "expression"]:
+                if field_name in values:
+                    values["predicate"] = values.get("predicate", {})
+                    values["predicate"][field_name] = values.pop(field_name)
+            if isinstance(values.get("predicate"), dict) and values["predicate"].get(
+                "content"
+            ):
+                for sign in {
+                    **QuantityRange.opposite_comparisons,
+                    **QuantityRange.normalized_comparisons,
+                }:
+                    if sign in values["predicate"]["content"]:
+                        content, quantity_text = values["predicate"]["content"].split(
+                            sign
+                        )
+                        values["predicate"]["content"] = content.strip()
+                        values["predicate"]["expression"] = quantity_text.strip()
+                        values["predicate"]["sign"] = sign
+                        break
         return values
 
     @validator("terms", pre=True)
@@ -475,7 +479,7 @@ class Exhibit(Factor, BaseModel):
 
     def _means_if_concrete(
         self, other: Factor, context: ContextRegister
-    ) -> Iterator[ContextRegister]:
+    ) -> Iterator[Explanation]:
         if (
             isinstance(other, self.__class__)
             and self.form == other.form
@@ -485,7 +489,7 @@ class Exhibit(Factor, BaseModel):
 
     def _implies_if_concrete(
         self, other: Factor, context: Optional[ContextRegister] = None
-    ) -> Iterator[ContextRegister]:
+    ) -> Iterator[Explanation]:
         if isinstance(other, self.__class__) and (
             self.form == other.form or other.form is None
         ):

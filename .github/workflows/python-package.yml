@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.9", "3.10", "3.11"]
+        python-version: ["3.11", "3.12"]
 
     steps:
       - uses: actions/checkout@v2
@@ -33,7 +33,7 @@ jobs:
         run: |
           pytest tests/ --record-mode=none --cov=authorityspoke --cov-report=term-missing
       - name: Upload coverage data to coveralls.io
-        if: matrix.python-version == 3.10
+        if: matrix.python-version == 3.12
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: coveralls
