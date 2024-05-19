@@ -9,395 +9,879 @@ interactions:
       Connection:
       - keep-alive
       User-Agent:
-      - python-requests/2.25.1
+      - python-requests/2.31.0
       authorization:
       - DUMMY
     method: GET
     uri: https://api.case.law/v1/cases/?cite=49+F.3d+807&full_case=true
   response:
     body:
-      string: !!binary |
-        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
-        /rIXsF+P9376/ffff/r9/wWoYGe67ggBAA==
+      string: "{\"count\":1,\"next\":null,\"previous\":null,\"results\":[{\"id\":7416609,\"url\":\"https://api.case.law/v1/cases/7416609/\",\"name\":\"LOTUS
+        DEVELOPMENT CORPORATION, Plaintiff, Appellee, v. BORLAND INTERNATIONAL, INC.,
+        Defendant, Appellant\",\"name_abbreviation\":\"Lotus Development Corp. v.
+        Borland International, Inc.\",\"decision_date\":\"1995-03-09\",\"docket_number\":\"No.
+        93-2214\",\"first_page\":\"807\",\"last_page\":\"822\",\"citations\":[{\"type\":\"official\",\"cite\":\"49
+        F.3d 807\"}],\"volume\":{\"url\":\"https://api.case.law/v1/volumes/32044110573003/\",\"volume_number\":\"49\",\"barcode\":\"32044110573003\"},\"reporter\":{\"url\":\"https://api.case.law/v1/reporters/933/\",\"full_name\":\"Federal
+        Reporter 3d Series\",\"id\":933},\"court\":{\"url\":\"https://api.case.law/v1/courts/1st-cir/\",\"name_abbreviation\":\"1st
+        Cir.\",\"slug\":\"1st-cir\",\"id\":8809,\"name\":\"United States Court of
+        Appeals for the First Circuit\"},\"jurisdiction\":{\"id\":39,\"name_long\":\"United
+        States\",\"url\":\"https://api.case.law/v1/jurisdictions/us/\",\"slug\":\"us\",\"whitelisted\":false,\"name\":\"U.S.\"},\"cites_to\":[{\"cite\":\"121
+        L.Ed.2d 141\",\"category\":\"reporters:federal\",\"reporter\":\"L. Ed. 2d\",\"weight\":2,\"year\":1992,\"opinion_id\":0},{\"cite\":\"113
+        S.Ct. 198\",\"category\":\"reporters:federal\",\"reporter\":\"S. Ct.\",\"year\":1992,\"opinion_id\":0},{\"cite\":\"960
+        F.2d 1465\",\"category\":\"reporters:federal\",\"reporter\":\"F.2d\",\"case_ids\":[10525985],\"pin_cites\":[{\"page\":\"1477\"}],\"opinion_id\":0},{\"cite\":\"379
+        F.2d 675\",\"category\":\"reporters:federal\",\"reporter\":\"F.2d\",\"case_ids\":[2069440],\"weight\":2,\"pin_cites\":[{\"page\":\"678-79\"},{\"page\":\"678-79\"}],\"opinion_id\":0},{\"cite\":\"17
+        U.S.C. \xA7 101\",\"category\":\"laws:leg_statute\",\"reporter\":\"U.S.C.\",\"weight\":3,\"pin_cites\":[{\"parenthetical\":\"defining
+        \\\"literary works\\\" as \\\"works ... expressed in words, numbers, or other
+        verbal or numerical symbols or indicia, regardless of the nature of the material
+        objects, such as books, periodicals, phonorecords, film, tapes, disks, or
+        cards, in which they are embodied\\\" (emphasis added)\"}],\"opinion_id\":0},{\"cite\":\"9
+        F.3d 823\",\"category\":\"reporters:federal\",\"reporter\":\"F.3d\",\"case_ids\":[10513702],\"opinion_id\":0},{\"cite\":\"982
+        F.2d 693\",\"category\":\"reporters:federal\",\"reporter\":\"F.2d\",\"case_ids\":[36437],\"weight\":6,\"pin_cites\":[{\"page\":\"707\"},{\"page\":\"710\"},{\"page\":\"702\",\"parenthetical\":\"\\\"It
+        is now well settled that the literal elements of computer programs, i.e.,
+        their source and object codes, are the subject of copyright protection.\\\"\"}],\"opinion_id\":0},{\"cite\":\"25
+        L.Ed. 841\",\"category\":\"reporters:federal\",\"reporter\":\"L. Ed.\",\"case_ids\":[5632045,5630095],\"year\":1879,\"opinion_id\":0},{\"cite\":\"101
+        U.S. 99\",\"category\":\"reporters:federal\",\"reporter\":\"U.S.\",\"case_ids\":[5630095],\"weight\":2,\"year\":1879,\"pin_cites\":[{\"page\":\"104-05\"}],\"opinion_id\":0},{\"cite\":\"126
+        L.Ed.2d 254\",\"category\":\"reporters:federal\",\"reporter\":\"L. Ed. 2d\",\"year\":1993,\"opinion_id\":0},{\"cite\":\"114
+        S.Ct. 307\",\"category\":\"reporters:federal\",\"reporter\":\"S. Ct.\",\"case_ids\":[6531200],\"year\":1993,\"opinion_id\":0},{\"cite\":\"994
+        F.2d 1476\",\"category\":\"reporters:federal\",\"reporter\":\"F.2d\",\"case_ids\":[6525256,10518404],\"weight\":6,\"pin_cites\":[{\"page\":\"1481\"}],\"opinion_id\":0},{\"cite\":\"937
+        F.2d 759\",\"category\":\"reporters:federal\",\"reporter\":\"F.2d\",\"case_ids\":[10526236],\"pin_cites\":[{\"page\":\"763\"}],\"opinion_id\":0},{\"cite\":\"17
+        U.S.C. \xA7 410\",\"category\":\"laws:leg_statute\",\"reporter\":\"U.S.C.\",\"pin_cites\":[{\"page\":\"(c)\"}],\"opinion_id\":0},{\"cite\":\"893
+        F.2d 1104\",\"category\":\"reporters:federal\",\"reporter\":\"F.2d\",\"case_ids\":[11650492],\"pin_cites\":[{\"page\":\"1106\"}],\"opinion_id\":0},{\"cite\":\"26
+        F.3d 1335\",\"category\":\"reporters:federal\",\"reporter\":\"F.3d\",\"case_ids\":[10516011],\"weight\":3,\"pin_cites\":[{\"page\":\"1340\"},{\"page\":\"1340\"},{\"page\":\"1341\"}],\"opinion_id\":0},{\"cite\":\"843
+        F.2d 600\",\"category\":\"reporters:federal\",\"reporter\":\"F.2d\",\"case_ids\":[10544994],\"weight\":2,\"pin_cites\":[{\"page\":\"605\"},{\"page\":\"606\"}],\"opinion_id\":0},{\"cite\":\"36
+        F.3d 1147\",\"category\":\"reporters:federal\",\"reporter\":\"F.3d\",\"case_ids\":[10530360],\"opinion_id\":0},{\"cite\":\"499
+        U.S. 340\",\"category\":\"reporters:federal\",\"reporter\":\"U.S.\",\"case_ids\":[11318883],\"weight\":5,\"year\":1991,\"pin_cites\":[{\"page\":\"361\"},{\"page\":\"1296\"},{\"page\":\"349-50\"},{\"page\":\"1290\",\"parenthetical\":\"quotations
+        and citations omitted\"}],\"opinion_id\":0},{\"cite\":\"17 U.S.C. \xA7 102\",\"category\":\"laws:leg_statute\",\"reporter\":\"U.S.C.\",\"weight\":4,\"pin_cites\":[{\"page\":\"(b)\"},{\"page\":\"(b)\"},{\"page\":\"(a)\"},{\"page\":\"(a)(1)\",\"parenthetical\":\"granting
+        protection to \\\"literary works\\\"\"}],\"opinion_id\":0},{\"cite\":\"740
+        F.Supp. 37\",\"category\":\"reporters:federal\",\"reporter\":\"F. Supp.\",\"case_ids\":[4086167],\"pin_cites\":[{\"page\":\"68,
+        70\"}],\"opinion_id\":0},{\"cite\":\"831 F.Supp. 223\",\"category\":\"reporters:federal\",\"reporter\":\"F.
+        Supp.\",\"case_ids\":[571968],\"opinion_id\":0},{\"cite\":\"831 F.Supp. 202\",\"category\":\"reporters:federal\",\"reporter\":\"F.
+        Supp.\",\"case_ids\":[571966],\"opinion_id\":0},{\"cite\":\"799 F.Supp. 203\",\"category\":\"reporters:federal\",\"reporter\":\"F.
+        Supp.\",\"case_ids\":[3815938],\"weight\":7,\"pin_cites\":[{\"page\":\"217\"},{\"page\":\"223\",\"parenthetical\":\"emphasis
+        in original\"},{\"page\":\"222-23\"},{\"page\":\"216\"}],\"opinion_id\":0},{\"cite\":\"788
+        F.Supp. 78\",\"category\":\"reporters:federal\",\"reporter\":\"F. Supp.\",\"case_ids\":[7406680],\"weight\":3,\"pin_cites\":[{\"page\":\"80\"},{\"page\":\"82\"}],\"opinion_id\":0},{\"cite\":\"114
+        S.Ct. 1164\",\"category\":\"reporters:federal\",\"reporter\":\"S. Ct.\",\"case_ids\":[234489],\"weight\":2,\"year\":1994,\"pin_cites\":[{\"page\":\"1174\"}],\"opinion_id\":1},{\"cite\":\"471
+        U.S. 539\",\"category\":\"reporters:federal\",\"reporter\":\"U.S.\",\"case_ids\":[6206269],\"weight\":5,\"year\":1985,\"pin_cites\":[{\"page\":\"562\"},{\"page\":\"2231-32\"}],\"opinion_id\":1},{\"cite\":\"25
+        L.Ed. 841\",\"category\":\"reporters:federal\",\"reporter\":\"L. Ed.\",\"case_ids\":[5632045,5630095],\"year\":1879,\"opinion_id\":1},{\"cite\":\"101
+        U.S. 99\",\"category\":\"reporters:federal\",\"reporter\":\"U.S.\",\"case_ids\":[5630095],\"year\":1879,\"opinion_id\":1}],\"frontend_url\":\"https://cite.case.law/f3d/49/807/\",\"frontend_pdf_url\":\"https://cite.case.law/pdf/7416609/Lotus%20Development%20Corp.%20v.%20Borland%20International,%20Inc.,%2049%20F.3d%20807%20(1995).pdf\",\"preview\":[],\"analysis\":{\"word_count\":9247,\"random_bucket\":53025,\"sha256\":\"728f6b586be4914121ca4002706414f617c6a0c4d433147434e5af53ec74264e\",\"ocr_confidence\":0.681,\"char_count\":57323,\"random_id\":2548420385,\"pagerank\":{\"percentile\":0.9637525199345599,\"raw\":6.792335702795885e-07},\"cardinality\":2007,\"simhash\":\"1:2eef8007895ad901\"},\"last_updated\":\"2024-02-27T19:56:48.781900+00:00\",\"provenance\":{\"date_added\":\"2019-08-29\",\"batch\":\"2018\",\"source\":\"Harvard\"},\"casebody\":{\"status\":\"ok\",\"data\":{\"corrections\":\"\",\"parties\":[\"LOTUS
+        DEVELOPMENT CORPORATION, Plaintiff, Appellee, v. BORLAND INTERNATIONAL, INC.,
+        Defendant, Appellant.\"],\"attorneys\":[\"Gary L. Rebaek, with whom Peter
+        N. Det-kin, Michael Barclay, Isabella E. Fu, Wilson Sonsini Goodrich & Rosati,
+        P.C., Palo Alto, CA, Peter E. Gelhaar, Katherine L. Parks, and Donnelly Conroy
+        & Gelhaar, Boston, MA, were on brief for appellant.\",\"Matthew P. Poppel,
+        Boston, MA, et ah, were on brief for Computer Scientists, ami-cus curiae.\",\"Dennis
+        S. Karjala, Tempe, AZ, and Peter S. Menell, Berkeley, CA, on brief, amici
+        curiae.\",\"Jeffrey C. Cannon and Baker Keaton Sei-bel & Cannon, Walnut Creek,
+        CA, were on brief for Computer Software Industry Ass\u2019n, amicus curiae.\",\"Laureen
+        E. McGurk, David A. Rabin, Bryan G. Harrison and Morris Manning & Martin,
+        Atlanta, GA, were on brief for Chicago Computer Soc., Diablo Users Group,
+        Dan-bury Area Computer Soc., IBM AB Users Group, Kentucky-Indiana Personal
+        Computer Users Group, Long Island PC Users Group, Napa Valley PC Users Group,
+        Pacific Northwest PC Users Group, Palmetto Personal Computer Club, Philadelphia
+        Area Computer Soc., Inc., Phoenix IBM PC Users Group, Pinellas IBM PC Users
+        Group, Quad Cities Computer Soc., Quattro Pro Users Group, Sacramento PC Users
+        Group, San Francisco PC Users Group, Santa Barbara PC Users Group, Twin Cities
+        PC Users Group, and Warner Robbins Personal Computer Ass\u2019n, amici curiae.\",\"Diane
+        Marie O\u2019Malley and Hanson Bridgett Marcus Vlahos & Rudy, San Francisco,
+        CA, were on brief for Software Entrepreneurs\u2019 Forum, amicus curiae.\",\"Peter
+        M.C. Choy, Mountain View, CA, was on brief for American Committee for Interoperable
+        Systems, amicus curiae.\",\"Howard B. Abrams, Detroit, MI, Howard C. Anawalt,
+        Santa Clara, CA, Stephen R. Barnett, Berkeley, CA, Ralph S. Brown, Stephen
+        L. Carter, New Haven, CT, Amy B. Cohen, Longmeadow, MA, Paul J. Heald, Athens,
+        GA, Peter A. Jaszi, John A. Kidwell, Madison, WI, Edmund W. Kitch, Charlottes-ville,
+        VA, Roberta R. Kwall, Chicago, IL, David L. Lange, Durham, NC, Marshall Leafier,
+        Toledo, OH, Jessica D. Litman, Ann Arbor, MI, Charles R. McManis, St. Louis,
+        MO, L. Ray Patterson, Athens, GA, Jerome H. Reichman, David A. Rice, Chestnut
+        Hill, MA, Pamela Samuelson, Pittsburgh, PA, David J. Seipp, Boston, MA, David
+        E. Ship-ley, Lexington, KY, Lionel S. Sobel, Santa Monica, CA, Alfred C. Yen,
+        Newton, MA, and Diane L. Zimmerman, New York City, were on brief for Copyright
+        Law Professors, amicus curiae.\",\"Henry B. Gutman, Baker & Botts, LLP, with
+        whom Kerry L. Konrad, Joshua H. Epstein, Kimberly A. Caldwell, O\u2019Sullivan
+        Graev & Karabell, New York City, Thomas M. Lemberg, James C. Burling, and
+        Hale and Dorr, Boston, MA, were on brief for appellee.\",\"Morton David Goldberg,
+        June M. Besek, David 0. Carson, Jesse M. Feder, Schwab Goldberg Price & Dannay,
+        New York City, and Arthur R. Miller, Cambridge, MA, were on brief for Apple
+        Computer, Inc., Digital Equip. Corp., International Business Machines Corp.,
+        and Xerox Corp., amici curiae.\",\"Jon A. Baumgarten, Proskauer Rose Goetz
+        & Mendelsohn,\u2019 and Robert A. Gorman, New York City, were on brief for
+        Adobe Systems, Inc., Apple Computer, Inc., Computer Associates Intern., Inc.,
+        Digital Equip. Corp., and International Business Machines Corp., amici curiae.\",\"Herbert
+        F. Schwartz, Vincent N. Palladi-no, Susan Progoff, Fish & Neave, New York
+        City, William J. Cheeseman, and Foley Hoag & Eliot, Boston, MA, were on brief
+        for Computer and Business Equip. Mfrs. Ass\u2019n, ami-cus curiae.\"],\"opinions\":[{\"author\":\"STAHL,
+        Circuit Judge.\",\"text\":\"STAHL, Circuit Judge.\\nThis appeal requires us
+        to decide whether a computer menu command hierarchy is copyrightable subject
+        matter. In particular, we must decide whether, as the district court held,
+        plaintiff-appellee Lotus Development Corporation\u2019s copyright in Lotus
+        1-2-3, a computer spreadsheet program, was infringed by defendant-appellant
+        Borland International, Inc., when Borland copied the Lotus 1-2-3 menu command
+        hierarchy into its Quattro and Quattro Pro computer spreadsheet programs.
+        See Lotus Dev. Corp. v. Borland Int\u2019l, Inc., 788 F.Supp. 78 (D.Mass.1992)
+        (\u201CBorland I\u201D); Lotus Dev. Corp. v. Borland Int\u2019l, Inc., 799
+        F.Supp. 203 (D.Mass.1992) (\u201CBorland II\u201D); Lotus Dev. Corp. v. Borland
+        Int\u2019l, Inc., 831 F.Supp. 202 (D.Mass.1993) (\u201CBorland III\u201D);
+        Lotus Dev. Corp. v. Borland Int\u2019l, Inc., 831 F.Supp. 223 (D.Mass.1993)
+        (\u201CBorland IV\u201D).\\nI.\\nBackground\\nLotus 1-2-3 is a spreadsheet
+        program that enables users to perform accounting functions electronically
+        on a computer. Users manipulate and control the program via a series of menu
+        commands, such as \u201CCopy,\u201D \u201CPrint,\u201D and \u201CQuit.\u201D
+        Users choose commands either by highlighting them on the screen or by typing
+        their first letter. In all, Lotus 1-2-3 has 469 commands arranged into more
+        than 50 menus and submenus.\\nLotus 1-2-3, like many computer programs, allows
+        users to write what are called \u201Cmacros.\u201D By writing a macro, a user
+        can designate a series of command choices with a single macro keystroke. Then,
+        to execute that series of commands in multiple parts of the spreadsheet, rather
+        than typing the whole series each time, the user only needs to type the single
+        pre-programmed macro keystroke, causing the program to recall and perform
+        the designated series of commands automatically. Thus, Lotus 1-2-3 macros
+        shorten the time needed to set up and operate the program.\\nBorland released
+        its first Quattro program to the public in 1987, after Borland\u2019s engineers
+        had labored over its development for nearly three years. Borland\u2019s objective
+        was to develop a spreadsheet program far superi- or to existing programs,
+        including Lotus 1-2-3. In Borland\u2019s words, \u201C[flrom the time of its
+        initial release ... Quattro included enormous innovations over competing spreadsheet
+        products.\u201D\\nThe district court found, and Borland does not now contest,
+        that Borland included in its Quattro and Quattro Pro version 1.0 programs
+        \u201Ca virtually identical copy of the entire 1-2-3 menu tree.\u201D Borland
+        III, 831 F.Supp. at 212 (emphasis in original). In so doing, Borland did not
+        copy any of Lotus\u2019s underlying computer code; it copied only the words
+        and structure of Lotus\u2019s menu command hierarchy. Borland included the
+        Lotus menu command hierarchy in its programs to make them compatible with
+        Lotus 1-2-3 so that spreadsheet users who were already familiar with Lotus
+        1-2-3 would be able to switch to the Borland programs without having to learn
+        new commands or rewrite their Lotus macros.\\nIn its Quattro and Quattro Pro
+        version 1.0 programs, Borland achieved compatibility with Lotus 1-2-3 by offering
+        its users an alternate user interface, the \u201CLotus Emulation Interface.\u201D
+        By activating the Emulation Interface, Borland users would see the Lotus menu
+        commands on their screens and could interact with Quattro or Quattro Pro as
+        if using Lotus 1-2-3, albeit with a slightly different looking screen and
+        with many Bor-land options not available on Lotus 1-2-3. In effect, Borland
+        allowed users to choose how they wanted to communicate with Bor-land\u2019s
+        spreadsheet programs: either by using menu commands designed by Borland, or
+        by using the commands and command structure used in Lotus 1-2-3 augmented
+        by Bor-land-added commands.\\nLotus filed this action against Borland in the
+        District of Massachusetts on July 2,1990, four days after a district court
+        held that the Lotus 1-2-3 \u201Cmenu structure, taken as a whole \u2014 including
+        the choice of command terms [and] the structure and order of those terms,\u201D
+        was protected expression covered by Lotus\u2019s copyrights. Lotus Dev. Corp.
+        v. Paperback Software Int\u2019l, 740 F.Supp. 37, 68, 70 (D.Mass.1990) (\u201CPaperback\u201D).
+        Three days earlier, on the morning after the Paperback decision, Borland had
+        filed a declaratory judgment action against Lotus in the Northern District
+        of California, seeking a declaration of non-infringement. On September 10,
+        1990, the district court in California dismissed Borland\u2019s declaratory
+        judgment action in favor of this action.\\nLotus and Borland filed cross motions
+        for summary judgment; the district court denied both motions on March 20,
+        1992, concluding that \u201Cneither party\u2019s motion is supported by the
+        record.\u201D Borland I, 788 F.Supp. at 80. The district court invited the
+        parties to file renewed summary judgment motions that would \u201Cfocus their
+        arguments more precisely\u201D in light of rulings it had made in conjunction
+        with its denial of their summary judgment motions. Id. at 82. Both parties
+        filed renewed motions for summary judgment on April 24, 1992. In its motion,
+        Borland contended that the Lotus 1-2-3 menus were not copyrightable as a matter
+        of law and that no reasonable trier of fact could find that the similarity
+        between its products and Lotus 1-2-3 was sufficient to sustain a determination
+        of infringement. Lotus contended in its motion that Borland had copied Lotus
+        1-2-3\u2019s entire user interface and had thereby infringed Lotus\u2019s
+        copyrights.\\nOn July 31, 1992, the district court denied Borland\u2019s motion
+        and granted Lotus\u2019s motion in part. The district court ruled that the
+        Lotus menu command hierarchy was copyrightable expression because\\n[a] very
+        satisfactory spreadsheet menu tree can be constructed using different commands
+        and a different command structure from those of Lotus 1-2-3. In fact, Borland
+        has constructed just such an alternate tree for use in Quattro Pro\u2019s
+        native mode. Even if one holds the arrangement of menu commands constant,
+        it is possible to generate literally millions of satisfactory menu trees by
+        varying the menu commands employed.\\nBorland II, 799 F.Supp. at 217. The
+        district court demonstrated this by offering alternate command words for the
+        ten commands that appear in Lotus\u2019s main menu. Id. For example, the district
+        court stated that \u201C[t]he \u2018Quit\u2019 command could be named \u2018Exit\u2019
+        without any other modifications,\u201D and that \u201C[t]he \u2018Copy' command
+        could be called \u2018Clone,\u2019 \u2018Ditto,\u2019 \u2018Duplicate,\u2019
+        \u2018Imitate,\u2019 \u2018Mimic,\u2019 \u2018Replicate,\u2019 and \u2018Reproduce,\u2019
+        among others.\u201D Id. Because so many variations were possible, the district
+        court concluded that the Lotus developers\u2019 choice and arrangement of
+        command terms, reflected in the Lotus menu command hierarchy, constituted
+        copyrightable expression.\\nIn granting partial summary judgment to Lotus,
+        the district court held that Borland had infringed Lotus\u2019s copyright
+        in Lotus 1-2-8:\\n[A]s a matter of law, Borland\u2019s Quattro products infringe
+        the Lotus 1-2-3 copyright because of (1) the extent of copying of the \u201Cmenu
+        commands\u201D and \u201Cmenu structure\u201D that is not genuinely disputed
+        in this case, (2) the extent to which the copied elements of the \u201Cmenu
+        commands\u201D and \u201Cmenu structure\u201D contain expressive aspects separable
+        from the functions of the \u201Cmenu commands\u201D and \u201Cmenu structure,\u201D
+        and (3) the scope of those copied expressive aspects as an integral part of
+        Lotus 1-2-3.\\nBorland II, 799 F.Supp. at 223 (emphasis in original). The
+        court nevertheless concluded that while the Quattro and Quattro Pro programs
+        infringed Lotus\u2019s copyright, Borland had not copied the entire Lotus
+        1-2-3 user interface, as Lotus had contended. Accordingly, the court concluded
+        that a jury trial was necessary to determine the scope of Borland\u2019s infringement,
+        including whether Borland copied the long prompts of Lotus 1-2-3, whether
+        the long prompts contained expressive elements, and to what extent, if any,
+        functional constraints limited the number of possible ways that the Lotus
+        menu command hierarchy could have been arranged at the time of its creation.
+        See Borland III, 831 F.Supp. at 207. Additionally, the district court granted
+        Lotus summary judgment on Borland\u2019s affirmative defense of waiver, but
+        not on its affirmative defenses of laches and estoppel. Borland II, 799 F.Supp.
+        at 222-23.\\nImmediately following the district court\u2019s summary judgment
+        decision, Borland removed the Lotus Emulation Interface from its products.
+        Thereafter, Borland\u2019s spreadsheet programs no longer displayed the Lotus
+        1-2-3 menus to Borland users, and as a result Borland users could no longer
+        communicate with Borland\u2019s programs as if they were using a more sophisticated
+        version of Lotus 1-2-3. Nonetheless, Borland\u2019s programs continued to
+        be partially compatible with Lotus 1-2-3, for Borland retained what it called
+        the \u201CKey Reader\u201D in its Quattro Pro programs. Once turned on, the
+        Key Reader allowed Borland\u2019s programs to understand and perform some
+        Lotus 1-2-3 macros. With the Key Reader on, the Borland programs used Quattro
+        Pro menus for display, interaction, and macro execution, except when they
+        encountered a slash (\u201C/\u201D) key in a macro (the starting key for any
+        Lotus 1-2-3 macro), in which case they interpreted the macro as having been
+        written for Lotus 1-2-3. Accordingly, people who wrote or purchased macros
+        to shorten the time needed to perform an operation in Lotus 1-2-3 could still
+        use those macros in Borland\u2019s programs. The district court permitted
+        Lotus to file a supplemental complaint alleging that the Key Reader infringed
+        its copyright.\\nThe parties agreed to try the remaining liability issues
+        without a jury. The district court held two trials, the Phase I trial covering
+        all remaining issues raised in the original complaint (relating to the Emulation
+        Interface) and the Phase II trial covering all issues raised in the supplemental
+        complaint (relating to the Key Reader). At the Phase I trial, there were no
+        live witnesses, although considerable testimony was presented in the form
+        of affidavits and deposition excerpts. The district court ruled upon evidentiary
+        objections counsel interposed. At the Phase II trial, there were two live
+        witnesses, each of whom demonstrated the programs for the district court.\\nAfter
+        the close of the Phase I trial, the district court permitted Borland to amend
+        its answer to include the affirmative defense of \u201Cfair use.\u201D Because
+        Borland had presented all of the evidence supporting its fair-use defense
+        dining the Phase I trial, but Lotus had not presented any evidence on fair
+        use (as the defense had not been raised before the conclusion of the Phase
+        I trial), the district court considered Lotus\u2019s motion for judgment on
+        partial findings of fact. See Fed.R.Civ.P. 52(c). The district court held
+        that Borland had failed to show that its use of the Lotus 1-2-3 menu command
+        hierarchy in its Emulation Interface was a fair use. See Borland III, 831
+        F.Supp. at 208.\\nIn its Phase I-trial decision, the district court found
+        that \u201Ceach of the Borland emulation interfaces contains a virtually identical
+        copy of the 1-2-3 menu tree and that the 1-2-3 menu tree is capable of a wide
+        variety of expression.\u201D Borland III, 831 F.Supp. at 218. The district
+        court also rejected Bor-land\u2019s affirmative defenses of laches and es-toppel.
+        Id. at 218-23.\\nIn its Phase II-trial decision, the district court found
+        that Borland\u2019s Key Reader file included \u201Ca virtually identical copy
+        of the Lotus menu tree structure, but represented in a different form and
+        with first letters of menu command names in place of the full menu command
+        names.\u201D Borland TV, 831 F.Supp. at 228. In other words, Borland\u2019s
+        programs no longer included the Lotus command terms, but only their first
+        letters. The district court held that \u201Cthe Lotus menu structure, organization,
+        and first letters of the command names ... constitute part of the protectable
+        expression found in [Lotus 1-2-3].\u201D Id. at 233. Accordingly, the district
+        court held that with its Key Reader, Borland had infringed Lotus\u2019s copyright.
+        Id. at 245. The district court also rejected Borland\u2019s affirmative defenses
+        of waiver, laches, estoppel, and fair use. Id. at 235-45. The district court
+        then entered a permanent injunction against Borland, id. at 245, from which
+        Borland appeals.\\nThis appeal concerns only Borland\u2019s copying of the
+        Lotus menu command hierarchy into its Quattro programs and Borland\u2019s
+        affirmative defenses to such copying. Lotus has not cross-appealed; in other
+        words, Lotus does not contend on appeal that the district court erred in finding
+        that Borland had not copied other elements of Lotus 1-2-3, such as its screen
+        displays.\\nII.\\nDiscussion\\nOn appeal, Borland does not dispute that it
+        factually copied the words and arrangement of the Lotus menu command hierarchy.
+        Rather, Borland argues that it \u201Clawfully copied the unprotectable menus
+        of Lotus 1-2-3.\u201D Borland contends that the Lotus menu command hierarchy
+        is not copyrightable because it is a system, method of operation, process,
+        or procedure foreclosed from protection by 17 U.S.C. \xA7 102(b). Borland
+        also raises a number of affirmative defenses.\\nA Copyright Infringement Generally\\nTo
+        establish copyright infringement, a plaintiff must prove \u201C(1) ownership
+        of a valid copyright, and (2) copying of constituent elements of the work
+        that are original.\u201D Feist Publications, Inc. v. Rural Tel. Serv. Co.,
+        499 U.S. 340, 361, 111 S.Ct. 1282, 1296, 113 L.Ed.2d 358 (1991); see also
+        Data Gen. Corp. v. Grumman Sys. Support Corp., 36 F.3d 1147, 1160 n. 19 (1st
+        Cir.1994); Concrete Mach. Co. v. Classic Lawn Ornaments, Inc., 843 F.2d 600,
+        605 (1st Cir.1988). To, show ownership of a valid copyright and therefore
+        satisfy Feist\u2019s first prong, a plaintiff must prove that the work as
+        a whole is original and that the plaintiff complied with applicable statutory
+        formalities. See Engineering Dynamics, Inc. v. Structural Software, Inc.,
+        26 F.3d 1335, 1340 (5th Cir.1994). \u201CIn judicial proceedings, a certificate
+        of copyright registration constitutes prima facie evidence of copyrightability
+        and shifts the burden to the defendant to demonstrate why the copyright is
+        not valid.\u201D Bibbero Sys., Inc. v. Colwell Sys., Inc., 893 F.2d 1104,
+        1106 (9th Cir.1990); see also 17 U.S.C. \xA7 410(c); Folio Impressions, Inc.
+        v. Byer California, 937 F.2d 759, 763 (2d Cir.1991) (presumption of validity
+        may be rebutted).\\nTo show actionable copying and therefore satisfy Feist\u2019s
+        second prong, a plaintiff must first prove that the alleged infringer copied
+        plaintiffs copyrighted work as a factual matter; to do this, he or she may
+        either present direct evidence of factual copying or, if that is unavailable,
+        evidence that the alleged infringer had access to the copyrighted work and
+        that the offending and copyrighted works are so similar that the court may
+        infer that there was factual copying (i.e., probative similarity). Engineering
+        Dynamics, 26 F.3d at 1340; see also Concrete Mach., 843 F.2d at 606. The plaintiff
+        must then prove that the copying of copyrighted material was so extensive
+        that it rendered the offending and copyrighted works substantially similar.
+        See Engineering Dynamics, 26 F.3d at 1341.\\nIn this appeal, we are faced
+        only with whether the Lotus menu command hierarchy is copyrightable subject
+        matter in the first instance, for Borland concedes that Lotus has a valid
+        copyright in Lotus 1-2-3 as a whole and admits to factually copying the Lotus
+        menu command hierarchy. As a result, this appeal is in a very different posture
+        from most copyright-infringement cases, for copyright infringement generally
+        turns on whether the defendant has copied protected expression as a factual
+        matter. Because of this different posture, most copyright-infringement cases
+        provide only limited help to us in deciding this appeal. This is true even
+        with respect to those copyright-infringement cases that deal with computers
+        and computer software.\\nB. Matter of First Impression\\nWhether a computer
+        menu command hierarchy constitutes copyrightable subject matter is a matter
+        of first impression in this court. While some other courts appear to have
+        touched on it briefly in dicta, see, e.g., Autoskill, Inc. v. National Educ.
+        Support Sys., Inc., 994 F.2d 1476, 1495 n. 23 (10th Cir.), cert. denied, \u2014
+        U.S.-, 114 S.Ct. 307, 126 L.Ed.2d 254 (1993), we know of no cases that deal
+        with the copyrightability of a menu command hierarchy standing on its own
+        (i.e., without other elements of the user interface, such as screen displays,
+        in issue). Thus we are navigating in uncharted waters.\\nBorland vigorously
+        argues, however, that the Supreme Court charted our course more than 100 years
+        ago when it decided Baker v. Selden, 101 U.S. 99, 25 L.Ed. 841 (1879). In
+        Baker v. Selden, the Court held that Selden\u2019s copyright over the textbook
+        in which he explained his new way to do accounting did not grant him a monopoly
+        on the use of his accounting system. Borland argues:\\nThe facts of Baker
+        v. Selden, and even the arguments advanced by the parties in that case, are
+        identical to those in this case. The only difference is that the \u201Cuser
+        interface\u201D of Selden\u2019s system was implemented by pen and paper rather
+        than by computer.\\nTo demonstrate that Baker v. Selden and this appeal both
+        involve accounting systems, Borland even supplied this court with a video
+        that, with special effects, shows Selden\u2019s paper forms \u201Cmelting\u201D
+        into a computer screen and transforming into Lotus 1-2-3.\\nWe do not think
+        that Baker v. Selden is nearly as analogous to this appeal as Borland claims.
+        Of course, Lotus 1-2-3 is a computer spreadsheet, and as such its grid of
+        horizontal rows and vertical columns certainly resembles an accounting ledger
+        or any other paper spreadsheet. Those grids, however, are not at issue in
+        this appeal for, unlike Selden, Lotus does not claim to have a monopoly over
+        its accounting system. Rather, this appeal involves Lotus\u2019s monopoly
+        over the commands it uses to operate the computer. Accordingly, this appeal
+        is not, as Bor-land contends, \u201Cidentical\u201D to Baker v. Selden.\\nC.
+        Altai\\nBefore we analyze whether the Lotus menu command hierarchy is a system,
+        method of operation, process, or procedure, we first consider the applicability
+        of the test the Second Circuit set forth in Computer Assoc. Int'l, Inc. v.
+        Altai, Inc., 982 F.2d 693 (2d Cir.1992). The Second Circuit designed its Altai
+        test to deal with the fact that computer programs, copyrighted as \u201Cliterary
+        works,\u201D can be infringed by what is known as \u201Cnonliteral\u201D copying,
+        which is copying that is paraphrased or loosely paraphrased rather than word
+        for word. See id. at 701 (citing nonliteral-copying cases); see also 3 Melville
+        B. Nimmer & David Nimmer, Nimmer on Copyright \xA7 13.03[A][1] (1993). When
+        faced with nonliteral-copying eases, courts must determine whether similarities
+        are due merely to the fact that the two works share the same underlying idea
+        or whether they instead indicate that the second author copied the first author\u2019s
+        expression. The Second Circuit designed its Altai test to deal with this situation
+        in the computer context, specifically with whether one computer program copied
+        nonliteral expression from another program\u2019s code.\\nThe Altai test involves
+        three steps: abstraction, filtration, and comparison. The abstraction step
+        requires courts to \u201Cdissect the allegedly copied program\u2019s structure
+        and isolate each level of abstraction contained within it.\u201D Altai, 982
+        F.2d at 707. This step enables courts to identify the appropriate framework
+        within which to separate protect-able expression from unprotected ideas. Second,
+        courts apply a \u201Cfiltration\u201D step in which they examine \u201Cthe
+        structural components at each level of abstraction to determine whether their
+        particular inclusion at that level was \u2018idea\u2019 or was dictated by
+        considerations of efficiency, so as to be necessarily incidental to that idea;
+        required by factors external to the program itself; or taken from the public
+        domain.\u201D Id. Finally, courts compare the protected elements of the infringed
+        work (i.e., those that survived the filtration screening) to the corresponding
+        elements of the allegedly infringing work to determine whether there was sufficient
+        copying of protected material to constitute infringement. Id. at 710.\\nIn
+        the instant appeal, we are not confronted with alleged nonliteral copying
+        of computer code. Rather, we are faced with Borland\u2019s deliberate, literal
+        copying of the Lotus menu command hierarchy. Thus, we must determine not whether
+        nonliteral copying occurred in some amorphous sense, but rather whether the
+        literal copying of the Lotus menu command hierarchy constitutes copyright
+        infringement.\\nWhile the Altai test may provide a useful framework for assessing
+        the alleged nonliteral copying of computer code, we find it to be of little
+        help in assessing whether the literal copying of a menu command hierarchy
+        constitutes copyright infringement. In fact, we think that the Altai test
+        in this context may actually be misleading because, in instructing courts
+        to abstract the various levels, it seems to encourage them to find a base
+        level that includes copyrightable subject matter that, if literally copied,
+        would make the copier liable for copyright infringement. While that base (or
+        literal) level would not be at issue in a nonliteral-copying case like Altai,
+        it is precisely what is at issue in this appeal. We think that abstracting
+        menu command hierarchies down to their individual word and menu levels and
+        then filtering idea from expression at that stage, as both the Altai and the
+        district court tests require, obscures the more fundamental question of whether
+        a menu command hierarchy can be copyrighted at all. The initial inquiry should
+        not be whether individual components of a menu command hierarchy are expressive,
+        but rather whether the menu command hierarchy as a whole can be copyrighted.
+        But see Gates Rubber Co. v. Bando Chem. Indus., Ltd., 9 F.3d 823 (10th Cir.1993)
+        (endorsing Altai\u2019s abstraction-filtration-comparison test as a way of
+        determining whether \u201Cmenus and sorting criteria\u201D are copyrightable).\\nD.
+        The Lotus Menu Command Hierarchy: A \u201CMethod of Operation\u201D\\nBorland
+        argues that the Lotus menu command hierarchy is uneopyrightable because it
+        is a system, method of operation, process, or procedure foreclosed from copyright
+        protection by 17 U.S.C. \xA7 102(b). Section 102(b) states: \u201CIn no case
+        does copyright protection for an original work of authorship extend to any
+        idea, procedure, process, system, method of operation, concept, principle,
+        or discovery, regardless of the form in which it is described, explained,
+        illustrated, or embodied in such work.\u201D Because we conclude that the
+        Lotus menu command hierarchy is a method of operation, we do not consider
+        whether it could also be a system, process, or procedure.\\nWe think that
+        \u201Cmethod of operation,\u201D as that term is used in \xA7 102(b), refers
+        to the means by which a person operates something, whether it be a car, a
+        food processor, or a computer. Thus a text describing how to operate something
+        would not extend copyright protection to the method of operation itself; other
+        people would be free to employ that method and to describe it in their own
+        words. Similarly, if a new method of operation is used rather than described,
+        other people would still be free to employ or describe that method.\\nWe hold
+        that the Lotus menu command hierarchy is an uneopyrightable \u201Cmethod of
+        operation.\u201D The Lotus menu command hierarchy provides the means by which
+        users control and operate Lotus 1-2-3. If users wish to copy material, for
+        example, they use the \u201CCopy\u201D command. If users wish to print material,
+        they use the \u201CPrint\u201D command. Users must use the command terms to
+        tell the computer what to do. Without the menu command hierarchy, users would
+        not be able to access and control, or indeed make use of, Lotus 1-2-3\u2019s
+        functional capabilities.\\nThe Lotus menu command hierarchy does not merely
+        explain and present Lotus 1-2-3\u2019s functional capabilities to the user;
+        it also serves as the method by which the program is operated and controlled.
+        The Lotus menu command hierarchy is different from the Lotus long prompts,
+        for the long prompts are not necessary to the operation of the program; users
+        could operate Lotus 1-2-3 even if there were no long prompts. The Lotus menu
+        command hierarchy is also different from the Lotus screen displays, for users
+        need not \u201Cuse\u201D any expressive aspects of the screen displays in
+        order to operate Lotus 1-2-3; because the way the screens look has little
+        bearing on how users control the program, the screen displays are not part
+        of Lotus 1-2-3\u2019s \u201Cmethod of operation.\u201D The Lotus menu command
+        hierarchy is also different from the underlying computer code, because while
+        code is necessary for the program to work, its precise formulation is not.
+        In other words, to offer the same capabilities as Lotus 1-2-3, Borland did
+        not have to copy Lotus\u2019s underlying code (and indeed it did not); to
+        'allow users to operate its programs in substantially the same way, however,
+        Bor-land had to copy the Lotus menu command hierarchy. Thus the Lotus 1-2-3
+        code is not a uncopyrightable \u201Cmethod of operation.\u201D\\nThe district
+        court held that the Lotus menu command hierarchy, with its specific choice
+        and arrangement of command terms, constituted an \u201Cexpression\u201D of
+        the \u201Cidea\u201D of operating a computer program with commands arranged
+        hierarchically into menus and submenus. Borland II, 799 F.Supp. at 216. Under
+        the district court\u2019s reasoning, Lotus\u2019s decision to employ hierarchically
+        arranged command terms to operate its program could not foreclose its competitors
+        from also employing hierarchically arranged command terms to operate their
+        programs, but it did foreclose them from employing the specific command terms
+        and arrangement that Lotus had used. In effect, the district court limited
+        Lotus 1-2-3\u2019s \u201Cmethod of operation\u201D to an abstraction.\\nAccepting
+        the district court\u2019s finding that the Lotus developers made some expressive
+        choices in choosing and arranging the Lotus command terms, we nonetheless
+        hold that that expression is not copyrightable because it is part of Lotus
+        1-2-3\u2019s \u201Cmethod of operation.\u201D We do not think that \u201Cmethods
+        of operation\u201D are limited to abstractions; rather, they are the means
+        by which a user operates something. If specific words are essential to operating
+        something, then they are part of a \u201Cmethod of operation\u201D and, as
+        such, are unprotectable. This is so whether they must be highlighted, typed
+        in, or even spoken, as computer programs no doubt will soon be controlled
+        by spoken words.\\nThe fact that Lotus developers could have designed the
+        Lotus menu command hierarchy differently is immaterial to the question of
+        whether it is a \u201Cmethod of operation.\u201D In other words, our initial
+        inquiry is not whether the Lotus menu command hierarchy incorporates any expression.
+        Rather, our initial inquiry is whether the Lotus menu command hierarchy is
+        a \u201Cmethod of operation.\u201D Concluding, as we do, that users operate
+        Lotus 1-2-3 by using the Lotus menu command hierarchy, and that the entire
+        Lotus menu command hierarchy is essential to operating Lotus 1-2-3, we do
+        not inquire further whether that method of operation could have been designed
+        differently. The \u201Cexpressive\u201D choices of what to name the command
+        terms and how to arrange them do not magically change the uncopyrightable
+        menu command hierarchy into copyrightable subject matter.\\nOur holding that
+        \u201Cmethods of operation\u201D are not limited to mere abstractions is bolstered
+        by Baker v. Selden. In Baker, the Supreme Court explained that\\nthe teachings
+        of science and the rules and methods of useful art have their final end in
+        application and use; and this application and use are what the public derive
+        from the publication of a book which teaches them.... The description of the
+        art in a book, though entitled to the benefit of copyright, lays no foundation
+        for an exclusive claim to the art itself. The object of the one is explanation;
+        the object of the other is use. The'former may be secured by copyright. The
+        latter can only be secured, if it can be secured at all, by letters-patent.\\nBaker
+        v. Selden, 101 U.S. at 104-05. Lotus wrote its menu command hierarchy so that
+        people could learn it and use it. Accordingly, it falls squarely within the
+        prohibition on copyright protection established in Baker v. Selden and codified
+        by Congress in \xA7 102(b).\\nIn many ways, the Lotus menu command hierarchy
+        is like the buttons used to control, say, a video cassette recorder (\u201CVCR\u201D).
+        A VCR is a machine that enables one to watch and record video tapes. Users
+        operate VCRs by pressing a series of buttons that are typically labelled \u201CRecord,
+        Play, Reverse, Fast Forward, Pause, Stop/Eject.\u201D That the buttons are
+        arranged and labeled does not make them a \u201Cliterary work,\u201D nor does
+        it make them an \u201Cexpression\u201D of the abstract \u201Cmethod of operating\u201D
+        a VCR via a set of labeled buttons. Instead, the buttons are themselves the
+        \u201Cmethod of operating\u201D the VCR.\\nWhen a Lotus 1-2-3 user chooses
+        a command, either by highlighting it on the screen or by typing its first
+        letter, he or she effectively pushes a button. Highlighting the \u201CPrint\u201D
+        command on the screen, or typing the letter \u201CP,\u201D is analogous to
+        pressing a VCR button labeled \u201CPlay.\u201D\\nJust as one could not operate
+        a buttonless VCR, it would be impossible to operate Lotus 1-2-3 without employing
+        its menu command hierarchy. Thus the Lotus command terms are not equivalent
+        to the labels on the VCR\u2019s buttons, but are instead equivalent to the
+        buttons themselves. Unlike the labels on a VCR\u2019s buttons, which merely
+        make operating a VCR easier by indicating the buttons\u2019 functions, the
+        Lotus menu commands are essential to operating Lotus 1-2-3. Without the menu
+        commands, there would be no way to \u201Cpush\u201D the Lotus buttons, as
+        one could push unlabeled VCR buttons. While Lotus could probably have designed
+        a user interface for which the command terms were mere labels, it did not
+        do so here. Lotus 1-2-3 depends for its operation on use of the precise command
+        terms that make up the Lotus.menu \u25A0 command hierarchy.\\nOne might argue
+        that the buttons for operating a VCR are not analogous to the commands for
+        operating a computer program because VCRs are not copyrightable, whereas computer
+        programs are. VCRs may not be copyrighted because they do not fit within any
+        of the \xA7 102(a) categories of copyrightable works; the closest they come
+        is \u201Csculptural work.\u201D Sculptural works, however, are subject to
+        a \u201Cuseful-article\u201D exception whereby \u201Cthe design of a useful
+        article ... shall be considered a pictorial, graphic, or sculptural work only
+        if, and only to the extent that, such design incorporates pictorial, graphic,
+        or sculptural features that can be identified separately from, and are\\\"
+        capable of existing independently of, the utilitarian aspects of the article.\u201D
+        17 U.S.C. \xA7 101. A \u201Cuseful article\u201D is \u201Can article having
+        an intrinsic utilitarian function that is not merely to portray the appearance
+        of the article or to convey information.\u201D Id. Whatever expression there
+        may be in the arrangement of the parts of a VCR is not capable of existing
+        separately from the VCR itself, so an ordinary VCR would not be copyrightable.\\nComputer
+        programs, unlike VCRs, are copyrightable as \u201Cliterary works.\u201D 17
+        U.S.C. \xA7 102(a). Accordingly, one might argue, the \u201Cbuttons\u201D
+        used to operate a computer program are not like the buttons used to operate
+        a VCR, for they are not subject to a useful-article exception. The response,
+        of course, is that the arrangement of buttons on a VCR would not be- copyrightable
+        even without a useful-article exception, because the buttons are an uncopyrightable
+        \u201Cmethod of operation.\u201D Similarly, the \u201Cbuttons\u201D of a computer
+        program are also an uncopyrightable \u201Cmethod of operation.\u201D\\nThat
+        the Lotus menu command hierarchy is a \u201Cmethod of operation\u201D becomes
+        clearer when one considers program compatibility. Under Lotus\u2019s theory,
+        if a user uses several different programs, he or she must learn how to perform
+        the same operation in a different way for each program used. For example,
+        if the user wanted the computer to print material, then the user would have
+        to learn not just one method of operating the computer such that it prints,
+        but many different methods. We find this absurd. The fact that there may be
+        many different ways to operate a computer program, or even many different
+        ways to operate a computer program using a set of hierarchically arranged
+        command terms, does not make the actual method of operation chosen copyrightable;
+        it still functions as a method for operating the computer and as such is uncopyrightable.\\nConsider
+        also that users employ the Lotus menu command hierarchy in writing macros.
+        Under the district court\u2019s holding, if the user wrote a macro to shorten
+        the time needed to perform a certain operation in Lotus 1-2-3,, the user would
+        be unable to use that macro to shorten the time needed to perform that same
+        operation in another program. Rather, the user would have to rewrite his or
+        her macro using that other program\u2019s menu command hierarchy. This is
+        despite the fact that the macro is clearly the user\u2019s own work product.
+        We think that forcing the user to cause the computer to perform the same operation
+        in a different way ignores Congress\u2019s direction in \xA7 102(b) that \u201Cmethods
+        of operation\u201D are not copyrightable. That programs can offer users the
+        ability to write macros in many different ways does not change the fact that,
+        once written,- the macro allows the user to perform an operation automatically.
+        As the Lotus menu command hierarchy serves as the basis for Lotus 1-2-3 macros,
+        the Lotus menu command hierarchy is a \u201Cmethod of operation.\u201D\\nIn
+        holding that expression that is part of a \u201Cmethod of operation\u201D
+        cannot be copyrighted, we do not understand ourselves to go against the Supreme
+        Court\u2019s holding in Feist In Feist, the Court explained:\\nThe primary
+        objective of copyright is not to reward the labor of authors, but to promote
+        the Progress of Science and useful Arts. To this end, copyright assures authors
+        the right to their original expression, but encourages others to- build freely
+        upon the ideas and information conveyed by a work.\\nFeist, 499 U.S. at 349-50,
+        111 S.Ct. at 1290 (quotations and citations omitted). We do not think that
+        the Court\u2019s statement that \u201Ccopyright assures authors the right
+        to their original expression\u201D indicates that all expression is necessarily
+        copyrightable; while original expression is necessary for copyright protection,
+        we do not think that it is alone sufficient. Courts must still inquire whether
+        original expression falls within one of the categories foreclosed from copyright
+        protection by \xA7 102(b), such as being a \u201Cmethod of operation.\u201D\\nWe
+        also note that in most contexts, there is no need to \u201Cbuild\u201D upon
+        other people\u2019s expression, for the ideas conveyed by that expression
+        can be conveyed by someone else without copying the first author\u2019s expression.
+        In the context of methods of operation, however, \u201Cbuilding\u201D requires
+        the use of the precise method of operation already employed; otherwise, \u201Cbuilding\u201D
+        would require dismantling, too. Original developers are not the only people
+        entitled to build on the methods of operation they create; anyone can. Thus,
+        Borland may build on the method of operation that Lotus designed and may use
+        the Lotus menu command hierarchy in doing so.\\nOur holding that methods of
+        operation are not limited to abstractions goes against Autoskill, 994 F.2d
+        at 1495 n. 23, in which the Tenth Circuit rejected the defendant\u2019s argument
+        that the keying procedure used in a computer program was an uncopyrightable
+        \u201Cprocedure\u201D or \u201Cmethod of operation\u201D under \xA7 102(b).
+        The program at issue, which was designed t\xF3 test and train students with
+        reading deficiencies, id. at 1481, required students to select responses to
+        the program\u2019s queries \u201Cby pressing the 1, 2, or 3 keys.\u201D Id.
+        at 1495 n. 23. The Tenth Circuit held that, \u201Cfor purposes of the preliminary
+        injunction, ... the record showed that [this] keying procedure reflected at
+        least a minimal degree of creativity,\u201D as required by Feist for copyright
+        protection. Id. As an initial matter, we question whether a programmer\u2019s
+        decision to have users select a response by pressing the 1,\u20192, or 3 keys
+        is original. More importantly, however, we fail to see how \u201Ca student
+        selecting] a response by pressing the 1, 2, or 3 keys,\u201D id., can be anything
+        but an unprotectable method of operation.\\nIII.\\nConclusion\\nBecause we
+        hold that the Lotus menu command hierarchy is uneopyrightable subject matter,
+        we further hold that Borland did not infringe Lotus\u2019s copyright by copying
+        it. Accordingly, we need not consider any of Bor-land\u2019s affirmative defenses.
+        The judgment of the district court is\\nReversed.\\nConcurrence follows.\\n.
+        Judge Keeton presided over both the Paperback litigation and this case.\\n.
+        Lotas 1-2-3 utilizes a two-line menu; the top line lists the commands from
+        which the user may choose, and the bottom line displays what Lotus calls its
+        \\\"long prompts.\u201D The long prompts explain, as a sort of \u201Chelp
+        text,\u201D what the highlighted menu command will do if entered. For example,
+        the long prompt for the \\\"Worksheet\u201D command displays the submenu that
+        the \\\"Worksheet\u201D command calls up; it reads \\\"Global, Insert, Delete,
+        Column, Erase, Titles, Window, Status, Page.\\\" The long prompt for the \u201CCopy\u201D
+        command explains what function the \u201CCopy\u201D command will perform;
+        \u201CCopy a cell or range of cells.\u201D The long prompt for the \\\"Quit\\\"
+        command reads, \u201CEnd 1-2-3 session (Have you saved your work?).\u201D\\nPrior
+        to trial, the parties agreed to exclude the copying of the long prompts from
+        the case; Lotus agreed not to contend that Borland had copied the long prompts,
+        Borland agreed not to argue that it had not copied the long prompts, and both
+        sides agreed not to argue that the issue of whether Borland had copied the
+        long prompts was material to any other issue in the case. See Borland III,
+        831 F.Supp. at 208.\\n. Because Borland's programs could no longer display
+        the Lotus menu command hierarchy to users, the Key Reader did not allow debugging
+        or modification of macros, nor did it permit the execution of most interactive
+        macros.\\n. See Borland IV, 831 F.Supp. at 226-27, for a more detailed explanation
+        of macros and the Key Reader.\\n. Computer programs receive copyright protection
+        as \u201Cliterary works.\u201D See 17 U.S.C. \xA7 102(a)(1) (granting protection
+        to \u201Cliterary works\u201D) and 17 U.S.C. \xA7 101 (defining \\\"literary
+        works\u201D as \\\"works ... expressed in words, numbers, or other verbal
+        or numerical symbols or indicia, regardless of the nature of the material
+        objects, such as books, periodicals, phonorecords, film, tapes, disks, or
+        cards, in which they are embodied\\\" (emphasis added)); see also H.R.Rep.
+        No. 1476, 94th Cong., 2d Sess. 54 (1976), reprinted in 1976 U.S.C.C.A.N. 5659,
+        5667 (\\\"The term \u2018literary works' ... includes computer data bases,
+        and computer programs to the extent that they incorporate authorship in the
+        programmer\u2019s expression of original ideas, as distinguished from the
+        ideas themselves.\u201D).\\n. Selden's system of double-entry bookkeeping
+        is the now almost-universal T-accounts system.\\n. We consider the Altai test
+        because both parties and many of the amici focus on it so heavily. Borland,
+        in particular, is highly critical of the district court for not employing
+        the Altai test. Borland does not, however, indicate how using that test would
+        have been dispositive in Bor-land's favor. Interestingly, Borland appears
+        to contradict its own reasoning at times by criticizing the applicability
+        of the Altai test.\\n. We recognize that Altai never states that every work
+        contains a copyrightable \u201Cnugget\\\" of pro-tectable expression. Nonetheless,
+        the implication is that for literal copying, \\\"it is not necessary to determine
+        the level of abstraction at which similarity ceases to consist of an 'expression
+        of ideas,' because literal similarity by definition is always a similarity
+        as to the expression of ideas.\u201D 3 Melville B. Nimmer & David Nimmer,
+        Nimmer on Copyright \xA7 13.03[A](2) (1993).\\n. As the Lotus long prompts
+        are not before us on appeal, we take no position on their copyright-ability,
+        although we do note that a strong argument could be made that the brief explanations
+        they provide \\\"merge\u201D with the underlying idea of explaining such functions.
+        See Morrissey v. Procter & Gamble Co., 379 F.2d 675, 678-79 (1st Cir.1967)
+        (when the possible ways to express an idea are limited, the expression \\\"merges\u201D
+        with the idea and is therefore uncopyrightable; when merger occurs, identical
+        copying is permitted).\\n.As they are not before us on appeal, we take no
+        position on whether the Lotus 1-2-3 screen displays constitute original expression
+        capable of being copyrighted.\\n. Because the Lotus 1-2-3 code is not before
+        us on appeal, we take no position on whether it is copyrightable. We note,
+        however, that original computer codes generally are protected by copyright.
+        See, e.g., Altai, 982 F.2d at 702 (\\\"It is now well settled that the literal
+        elements of computer programs, i.e., their source and object codes, are the
+        subject of copyright protection.\u201D) (citing cases).\\n. We think that
+        the Altai test would contemplate this being the initial inquiry.\\n. When
+        there are a limited number of ways to express an idea, however, the expression
+        \u201Cmerges\u201D with the idea and becomes uncopyrightable. Morrissey, 379
+        F.2d at 678-79.\\n. The Ninth Circuit has also indicated in dicta that \\\"menus,
+        and keystrokes\u201D may be copyrightable. Brown Bag Software v. Symantec
+        Corp., 960 F.2d 1465, 1477 (9th Cir.), cert. denied, BB Asset Management,
+        Inc. v. Symantec Corp., \u2014 U.S. -, 113 S.Ct. 198, 121 L.Ed.2d 141 (1992).
+        In that case, however, the plaintiff did not show that the defendant had copied
+        the plaintiffs menus or keystrokes, so the court was not directly faced with
+        whether the menus or keystrokes constituted an unprotectable method of operation.
+        Id.\",\"type\":\"majority\"},{\"author\":\"BOUDIN, Circuit Judge,\",\"text\":\"BOUDIN,
+        Circuit Judge,\\nconcurring.\\nThe importance of this ease, and a slightly
+        different emphasis in my view of the underlying problem, prompt me to add
+        a few words to the majority\u2019s tightly focused discussion.\\nI.\\nMost
+        of the law of copyright and the \u201Ctools\u201D of analysis have developed
+        in the context of literary works such as novels, plays, and films. In this
+        milieu, the principal problem \u2014 simply stated, if difficult to resolve
+        \u2014 is to stimulate creative expression without unduly limiting access
+        by others to the broader themes and concepts deployed by the author. The middle
+        of the spectrum presents close cases; but a \u201Cmistake\u201D in providing
+        too much protection involves a small cost: subsequent authors treating the
+        same themes must take a few more steps away from the original expression.\\nThe
+        problem presented by computer programs is fundamentally different in one re-speet.
+        The computer program is a means for causing something to happen; it has a
+        mechanical utility, an instrumental role, in accomplishing the world\u2019s
+        work. Granting protection, in other words, can have some of the consequences
+        of patent protection in limiting other people\u2019s ability to perform a
+        task in the most efficient manner. Utility does not bar copyright (dictionaries
+        may be copyrighted), but it alters the calculus.\\nOf course, the argument
+        for protection is undiminished, perhaps even enhanced, by utility: if we want
+        more of an intellectual product, a temporary monopoly for the creator provides
+        incentives for others to create other, different items in this class. But
+        the \u201Ccost\u201D side of the equation may be different where one places
+        a very high value on public access to a useful innovation that may be the
+        most efficient means of performing a given task. Thus, the argument for extending
+        protection may be the same; but the stakes on the other side are much higher.\\nIt
+        is no accident that patent protection has preconditions that copyright protection
+        does not \u2014 notably, the requirements of novelty and non-obviousness \u2014
+        and that patents are granted for a shorter period than copyrights. This problem
+        of utility has sometimes manifested itself in copyright cases, such as Baker
+        v. Selden, 101 U.S. 99, 25 L.Ed. 841 (1879), and been dealt with through various
+        formulations that limit copyright or create limited rights to copy. But the
+        case law and doctrine addressed to utility in copyright have been brief detours
+        in the general march of copyright law.\\nRequests for the protection of computer
+        menus present the concern with fencing off access to the commons in an acute
+        form. A new menu may be a creative work, but over time its importance may
+        come to reside more in the investment that has been made by users in learning
+        the menu and in building their own mini-programs \u2014 macros\u2014in reliance
+        upon the menu. Better typewriter keyboard layouts may exist, but the familiar
+        QWERTY keyboard dominates the market because that is what everyone has learned
+        to use. See P. David, CLIO and the Economics of QWERTY, 75 Am.Econ.Rev. 332
+        (1985). The QWERTY keyboard is nothing other than a menu of letters.\\nThus,
+        to assume that computer programs are just one more new means of expression,
+        like a filmed play, may be quite wrong. The \u201Cform\u201D \u2014 the written
+        source code or the menu structure depicted on the screen \u2014 look hauntingly
+        like the familiar stuff of copyright; but the \u201Csubstance\u201D probably
+        has more to do with problems presented in patent law or, as already noted,
+        in those rare cases where copyright law has confronted industrially useful
+        expressions. Applying copyright law to computer programs is like assembling
+        a jigsaw puzzle whose pieces do not quite fit.\\nAll of this would make no
+        difference if Congress had squarely confronted the issue, and given explicit
+        directions as to what should be done. The Copyright Act of 1976 took a different
+        course. While Congress said that computer programs might be subject to copyright
+        protection, it said this in very general terms; and, especially in \xA7 102(b),
+        Congress adopted a string of exclusions that if taken literally might easily
+        seem to exclude most computer programs from protection. The only detailed
+        prescriptions for computers involve narrow issues (like back-up copies) of
+        no relevance here.\\nOf course, one could still read the statute as a congressional
+        command that the familiar doctrines of copyright law be taken and applied
+        to computer programs, in cookie cutter fashion, as if the programs were novels
+        or play scripts. Some of the eases involving computer programs embody this
+        approach. It seems to be mistaken on two different grounds: the tradition
+        of copyright law, and the likely intent of Congress.\\nThe broad-brush conception
+        of copyright protection, the time limits, and the formalities have long been
+        prescribed by statute. But the heart of copyright doctrine \u2014 what may
+        be protected and with what limitations and exceptions \u2014 has been developed
+        by the courts through experience with individual cases. B. Kaplan, An Unhurried
+        View of Copyright 40 (1967). Occasionally Congress addresses a problem in
+        detail. For the most part the interstitial development of copyright through
+        the courts is our tradition.\\nNothing in the language or legislative history
+        of the 1976 Act, or at least nothing brought to our attention, suggests that
+        Congress meant the courts to abandon this case-by-case approach. Indeed, by
+        setting up \xA7 102(b) as a counterpoint theme, Congress has arguably recognized
+        the tension and left it for the courts to resolve through the development
+        of ease law. And case law development is adaptive: it allows new problems
+        to be solved with help of earlier doctrine, but it does not preclude new doctrines
+        to meet new situations.\\nII.\\nIn this case, the raw facts are mostly, if
+        not entirely, undisputed. Although the inferences to be drawn may be more
+        debatable, it is very hard to see that Borland has shown any interest in the
+        Lotus menu except as a fall-back option for those users already committed
+        to it. by prior experience or in order to run their own macros using 1-2-3
+        commands. At least for the amateur, accessing the Lotus menu in the Borland
+        Quattro or Quattro Pro program takes some effort.\\nPut differently, it is
+        unlikely that users who value the Lotus menu for its own sake\u2014 independent
+        of any investment they have made themselves in learning Lotus\u2019 commands
+        or creating macros dependent upon them \u2014 would choose the Borland program
+        in order to secure access to the Lotus menu. Borland\u2019s success is due
+        primarily to other features. Its rationale for deploying the Lotus menu bears
+        the ring of truth.\\nNow, any use of the Lotus menu by Bor-land is a commercial
+        use and deprives Lotus of a portion of its \u201Creward,\u201D in the sense
+        that an infringement claim if allowed would increase Lotus\u2019 profits.
+        But this is circular reasoning: broadly speaking, every limitation on copyright
+        or privileged use diminishes the reward of the original creator. Yet not every
+        writing is copyrightable or every use an infringement. The provision of reward
+        is one concern of copyright law, but it is not the only one. If it were, copyrights
+        would be perpetual and there would be no exceptions.\\nThe present case is
+        an unattractive one for copyright protection of the menu. The menu, commands
+        (e.g., \u201Cprint,\u201D \u201Cquit\u201D) are largely for standard procedures
+        that Lotus did not invent and are common words that Lotus cannot monopolize.
+        What is left is the particular combination and sub-grouping of commands in
+        a pattern devised by Lotus. This arrangement may have a more appealing logic
+        and ease of use than some other configurations; but there is a certain arbitrariness
+        to many of the choices.\\nIf Lotus is granted a monopoly on this pattern,
+        users who have learned the command structure of Lotus 1-2-3 or devised their
+        own macros are locked into Lotus, just as a typist who has learned the QWERTY
+        keyboard would be the captive of anyone who had a monopoly on the production
+        of such a keyboard. Apparently, for a period Lotus 1-2-3 has had such sway
+        in the market that it has represented the de facto standard for electronic
+        spreadsheet commands. So long as Lotus is the superior spreadsheet \u2014
+        either in quality or in price \u2014 there may be nothing wrong with this
+        advantage.\\nBut if a better spreadsheet comes along, it is hard to see why
+        customers who have learned the Lotus menu and devised macros for it should
+        remain captives of Lotus because of an investment in learning made by the
+        users and not by Lotus. Lotus has already reaped a substantial reward for
+        being first; assuming that the Borland program is now better, good reasons
+        exist for freeing it to attract old Lotus customers: to enable the old customers
+        to take advantage of a new advance, and to reward Borland in turn for making
+        a better product. If Bor-land has not made a better product, then customers
+        will remain with Lotus anyway.\\nThus, for me the question is not whether
+        Borland should prevail but on what basis. Various avenues might be traveled,
+        but the main choices are between holding that the menu is not protectable
+        by copyright and devising a new doctrine that Borland\u2019s use is privileged.
+        No solution is perfect and no intermediate appellate court can make the final
+        choice.\\nTo call the menu a \u201Cmethod of operation\u201D is, in the common
+        use of those words, a defensible position. After all, the purpose of the menu
+        is not to be admired as a work of literary or pictorial art. It is to transmit
+        directions from the user to the computer, i.e., to operate the computer. The
+        menu is also a \u201Cmethod\u201D in the dictionary sense because it is a
+        \u201Cplanned way of doing something,\u201D an \u201Corder or system,\u201D
+        and (aptly here) an \u201Corderly or systematic arrangement, sequence or the
+        like.\u201D Random House Webster\u2019s College Dictionary 853 (1991).\\nA
+        different approach would be to say that Borland\u2019s use is privileged because,
+        in the context already described, it is not seeking to appropriate the advances
+        made by Lotus\u2019 menu; rather, having provided an arguably more attractive
+        menu of its own, Borland is merely trying to give former Lotus users an option
+        to exploit their own prior investment in learning or in macros. The difference
+        is that such a privileged use approach would not automatically protect Borland
+        if it had simply copied the Lotus menu (using different codes), contributed
+        nothing of its own, and resold Lotus under the Borland label.\\nThe closest
+        analogue in conventional copyright is the fair use doctrine. E.g., Harper
+        & Row, Publishers, Inc. v. Nation Enters., 471 U.S. 539, 105 S.Ct. 2218, 85
+        L.Ed.2d 588 (1985). Although invoked by Borland, it has largely been brushed
+        aside in this case because the Supreme Court has said that it is \u201Cpresumptively\u201D
+        unavailable where the use is a \u201Ccommercial\u201D one. See id. at 562,
+        105 S.Ct. at 2231-32. But see Campbell v. Acuff-Rose Music, Inc., \u2014 U.S.
+        -, -, 114 S.Ct. 1164, 1174; 127 L.Ed.2d 500 (1994). In my view, this is something
+        less than a definitive answer; \u201Cpresumptively\u201D does not mean \u201Calways\u201D
+        and, in any event, the doctrine of fair use was created by the courts and
+        can- be adapted to new purposes.\\nBut a privileged use doctrine would certainly
+        involve problems of its own. It might more closely tailor the limits on copyright
+        protection to the reasons for limiting that protection; but it would entail
+        a host of administrative problems that would cause cost and delay, and would
+        also reduce the ability of the industry to predict outcomes. Indeed, to the
+        extent that Lotus\u2019 menu is an important standard in the industry, it
+        might be argued that any use ought to be deemed privileged.\\nIn sum, the
+        majority\u2019s result persuades me and its formulation is as good, if not
+        better, than any other that occurs to me now as within the reach of courts.
+        Some solutions {e.g., a very short copyright period for menus) are not options
+        at all for courts but might be for Congress. In all events, the choices are
+        important ones of policy, not linguistics, and they should be made with the
+        underlying considerations in view.\",\"type\":\"concurrence\"}],\"judges\":[\"Before
+        TORRUELLA, Chief Judge, BOUDIN and STAHL, Circuit Judges.\"],\"head_matter\":\"LOTUS
+        DEVELOPMENT CORPORATION, Plaintiff, Appellee, v. BORLAND INTERNATIONAL, INC.,
+        Defendant, Appellant.\\nNo. 93-2214.\\nUnited States Court of Appeals, First
+        Circuit.\\nHeard Oct. 6, 1994.\\nDecided March 9, 1995.\\nGary L. Rebaek,
+        with whom Peter N. Det-kin, Michael Barclay, Isabella E. Fu, Wilson Sonsini
+        Goodrich & Rosati, P.C., Palo Alto, CA, Peter E. Gelhaar, Katherine L. Parks,
+        and Donnelly Conroy & Gelhaar, Boston, MA, were on brief for appellant.\\nMatthew
+        P. Poppel, Boston, MA, et ah, were on brief for Computer Scientists, ami-cus
+        curiae.\\nDennis S. Karjala, Tempe, AZ, and Peter S. Menell, Berkeley, CA,
+        on brief, amici curiae.\\nJeffrey C. Cannon and Baker Keaton Sei-bel & Cannon,
+        Walnut Creek, CA, were on brief for Computer Software Industry Ass\u2019n,
+        amicus curiae.\\nLaureen E. McGurk, David A. Rabin, Bryan G. Harrison and
+        Morris Manning & Martin, Atlanta, GA, were on brief for Chicago Computer Soc.,
+        Diablo Users Group, Dan-bury Area Computer Soc., IBM AB Users Group, Kentucky-Indiana
+        Personal Computer Users Group, Long Island PC Users Group, Napa Valley PC
+        Users Group, Pacific Northwest PC Users Group, Palmetto Personal Computer
+        Club, Philadelphia Area Computer Soc., Inc., Phoenix IBM PC Users Group, Pinellas
+        IBM PC Users Group, Quad Cities Computer Soc., Quattro Pro Users Group, Sacramento
+        PC Users Group, San Francisco PC Users Group, Santa Barbara PC Users Group,
+        Twin Cities PC Users Group, and Warner Robbins Personal Computer Ass\u2019n,
+        amici curiae.\\nDiane Marie O\u2019Malley and Hanson Bridgett Marcus Vlahos
+        & Rudy, San Francisco, CA, were on brief for Software Entrepreneurs\u2019
+        Forum, amicus curiae.\\nPeter M.C. Choy, Mountain View, CA, was on brief for
+        American Committee for Interoperable Systems, amicus curiae.\\nHoward B. Abrams,
+        Detroit, MI, Howard C. Anawalt, Santa Clara, CA, Stephen R. Barnett, Berkeley,
+        CA, Ralph S. Brown, Stephen L. Carter, New Haven, CT, Amy B. Cohen, Longmeadow,
+        MA, Paul J. Heald, Athens, GA, Peter A. Jaszi, John A. Kidwell, Madison, WI,
+        Edmund W. Kitch, Charlottes-ville, VA, Roberta R. Kwall, Chicago, IL, David
+        L. Lange, Durham, NC, Marshall Leafier, Toledo, OH, Jessica D. Litman, Ann
+        Arbor, MI, Charles R. McManis, St. Louis, MO, L. Ray Patterson, Athens, GA,
+        Jerome H. Reichman, David A. Rice, Chestnut Hill, MA, Pamela Samuelson, Pittsburgh,
+        PA, David J. Seipp, Boston, MA, David E. Ship-ley, Lexington, KY, Lionel S.
+        Sobel, Santa Monica, CA, Alfred C. Yen, Newton, MA, and Diane L. Zimmerman,
+        New York City, were on brief for Copyright Law Professors, amicus curiae.\\nHenry
+        B. Gutman, Baker & Botts, LLP, with whom Kerry L. Konrad, Joshua H. Epstein,
+        Kimberly A. Caldwell, O\u2019Sullivan Graev & Karabell, New York City, Thomas
+        M. Lemberg, James C. Burling, and Hale and Dorr, Boston, MA, were on brief
+        for appellee.\\nMorton David Goldberg, June M. Besek, David 0. Carson, Jesse
+        M. Feder, Schwab Goldberg Price & Dannay, New York City, and Arthur R. Miller,
+        Cambridge, MA, were on brief for Apple Computer, Inc., Digital Equip. Corp.,
+        International Business Machines Corp., and Xerox Corp., amici curiae.\\nJon
+        A. Baumgarten, Proskauer Rose Goetz & Mendelsohn,\u2019 and Robert A. Gorman,
+        New York City, were on brief for Adobe Systems, Inc., Apple Computer, Inc.,
+        Computer Associates Intern., Inc., Digital Equip. Corp., and International
+        Business Machines Corp., amici curiae.\\nHerbert F. Schwartz, Vincent N. Palladi-no,
+        Susan Progoff, Fish & Neave, New York City, William J. Cheeseman, and Foley
+        Hoag & Eliot, Boston, MA, were on brief for Computer and Business Equip. Mfrs.
+        Ass\u2019n, ami-cus curiae.\\nBefore TORRUELLA, Chief Judge, BOUDIN and STAHL,
+        Circuit Judges.\"}}}]}"
     headers:
       Accept-Ranges:
       - bytes
@@ -408,25 +892,25 @@ interactions:
       Allow:
       - GET, HEAD, OPTIONS
       CF-Cache-Status:
-      - EXPIRED
+      - MISS
       CF-RAY:
-      - 6701e7600f8e2f79-DFW
+      - 8861a8f4d8234752-DFW
       Cache-Control:
       - s-maxage=0, max-age=0
       Connection:
       - keep-alive
       Content-Disposition:
-      - attachment; filename="CAP_2021-07-17 07:54:42.840170.json"
+      - attachment; filename="CAP_2024-05-19 05:24:19.882927.json"
       Content-Encoding:
       - gzip
       Content-Length:
-      - '21685'
+      - '23258'
       Content-Type:
       - application/json
       Date:
-      - Sat, 17 Jul 2021 07:54:42 GMT
-      Expect-CT:
-      - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
+      - Sun, 19 May 2024 05:24:20 GMT
+      Last-Modified:
+      - Sun, 19 May 2024 05:24:19 GMT
       Referrer-Policy:
       - same-origin
       Server:
