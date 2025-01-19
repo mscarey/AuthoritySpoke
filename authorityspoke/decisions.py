@@ -40,6 +40,7 @@ class DecisionReading(BaseModel, Comparable):
     """An interpretation of what Holdings are supported by the Opinions of a Decision."""
 
     decision: Decision
+    generic: bool = False
     opinion_readings: List[OpinionReading] = []
 
     def __str__(self):
