@@ -104,9 +104,9 @@ def assign_name_for_evidence(obj: Dict) -> str:
     """
     name = "evidence"
     if obj.get("exhibit"):
-        name += f' of {obj["exhibit"]}'
+        name += f" of {obj['exhibit']}"
     if obj.get("to_effect"):
-        name += f' to the effect that {obj["to_effect"]}'
+        name += f" to the effect that {obj['to_effect']}"
     return name
 
 
@@ -120,7 +120,7 @@ def assign_name_for_pleading(obj: Dict) -> str:
     """
     name = "pleading"
     if obj.get("filer"):
-        name += f' filed by {obj["filer"]}'
+        name += f" filed by {obj['filer']}"
     return name
 
 
@@ -130,7 +130,7 @@ def create_name_for_enactment(obj: RawEnactment) -> str:
         return create_name_for_enactment(obj["enactment"])
     name: str = obj["node"]
     if obj.get("start_date"):
-        name += f'@{obj["start_date"]}'
+        name += f"@{obj['start_date']}"
 
     for field_name in ["start", "end", "prefix", "exact", "suffix"]:
         if obj.get(field_name):
@@ -284,7 +284,10 @@ def update_name_index_from_fact_content(
 
         for name in mentioned.keys():
             if name in content and name != content:
-                (content, terms,) = text_expansion.add_found_context(
+                (
+                    content,
+                    terms,
+                ) = text_expansion.add_found_context(
                     content=content,
                     terms=terms,
                     factor=mentioned.get_by_name(name),
@@ -375,10 +378,10 @@ def collect_mentioned(
         if new_dict.get("predicate", {}).get("content"):
             for factor in new_dict.get("terms", []):
                 if factor not in new_dict["predicate"]["content"]:
-                    new_dict["predicate"][
-                        "content"
-                    ] = text_expansion.replace_brackets_with_placeholder(
-                        content=new_dict["predicate"]["content"], name=factor
+                    new_dict["predicate"]["content"] = (
+                        text_expansion.replace_brackets_with_placeholder(
+                            content=new_dict["predicate"]["content"], name=factor
+                        )
                     )
 
         new_dict, mentioned = update_name_index_with_factor(new_dict, mentioned)

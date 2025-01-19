@@ -102,7 +102,7 @@ class Fact(Factor, BaseModel):
         if isinstance(values, dict):
             type_str = values.pop("type", "")
             if type_str and type_str.lower() != "fact":
-                raise ValidationError(f"type {type_str} was passed to Fact model")
+                raise ValueError(f"type {type_str} was passed to Fact model")
 
             if isinstance(values.get("predicate"), str):
                 values["predicate"] = Predicate(content=values["predicate"])
@@ -194,7 +194,7 @@ class Fact(Factor, BaseModel):
         TermSequence.validate_terms(v)
 
         if values.get("predicate") is None:
-            raise ValidationError("Predicate field is required.")
+            raise ValueError("Predicate field is required.")
 
         if len(v) != len(values["predicate"]):
             message = (
@@ -497,7 +497,7 @@ class Exhibit(Factor, BaseModel):
 
     def __str__(self):
         """Represent object as string without line breaks."""
-        string = f'{("attributed to " + self.statement_attribution.short_string) if self.statement_attribution else ""}'
+        string = f"{('attributed to ' + self.statement_attribution.short_string) if self.statement_attribution else ''}"
         if self.statement:
             string += ", asserting " + self.statement.short_string + ","
         string = super().__str__().format(string)
@@ -565,13 +565,13 @@ class Evidence(Factor, BaseModel):
         """Fail valitation if the input has a "type" field without the class name."""
         type_str = values.pop("type", "")
         if type_str and type_str.lower() != "evidence":
-            raise ValidationError(f"type {type_str} was passed to Evidence model")
+            raise ValueError(f"type {type_str} was passed to Evidence model")
         return values
 
     def __str__(self):
         string = (
-            f'{("of " + self.exhibit.short_string + " ") if self.exhibit else ""}'
-            + f'{("which supports " + self.to_effect.short_string) if self.to_effect else ""}'
+            f"{('of ' + self.exhibit.short_string + ' ') if self.exhibit else ''}"
+            + f"{('which supports ' + self.to_effect.short_string) if self.to_effect else ''}"
         )
         return super().__str__().format(string).strip().replace("Evidence", "evidence")
 
@@ -612,7 +612,7 @@ class Pleading(Factor, BaseModel):
     context_factor_names: ClassVar[Tuple[str]] = ("filer",)
 
     def __str__(self):
-        string = f'{("filed by " + self.filer.short_string if self.filer else "")}'
+        string = f"{('filed by ' + self.filer.short_string if self.filer else '')}"
         return super().__str__().format(string)
 
 
@@ -659,8 +659,8 @@ class Allegation(Factor, BaseModel):
 
     def __str__(self):
         string = (
-            f'{("in " + self.pleading.short_string + ",") if self.pleading else ""}'
-            + f'{("claiming " + self.fact.short_string + ",") if self.fact else ""}'
+            f"{('in ' + self.pleading.short_string + ',') if self.pleading else ''}"
+            + f"{('claiming ' + self.fact.short_string + ',') if self.fact else ''}"
         )
         string = string.strip(",")
         return super().__str__().format(string).replace("Allegation", "allegation")
