@@ -1,4 +1,5 @@
 from datetime import date
+from decimal import Decimal
 from typing import Type
 import pytest
 import sympy
@@ -25,7 +26,7 @@ class TestComparisons:
             sign=">",
             expression=Q_("20 miles"),
         )
-        assert comparison.interval == Interval(20, oo, left_open=True)
+        assert comparison.interval == Interval(Decimal("20"), oo, left_open=True)
 
     def test_comparison_not_equal(self):
         comparison = Comparison(
@@ -34,7 +35,7 @@ class TestComparisons:
             expression=Q_("20 miles"),
         )
         assert comparison.interval == sympy.Union(
-            Interval(0, 20, right_open=True), Interval(20, oo, left_open=True)
+            Interval.Ropen(0, Decimal("20")), Interval.open(Decimal("20"), oo)
         )
 
 
@@ -129,7 +130,7 @@ class TestPredicates:
         assert "distance between $place1 and $place2 was at least 20" in str(
             make_predicate["p8_int"]
         )
-        assert "distance between $place1 and $place2 was at least 20.0" in str(
+        assert "distance between $place1 and $place2 was at least 20" in str(
             make_predicate["p8_float"]
         )
         assert "distance between $place1 and $place2 was at least 20 foot" in str(
