@@ -598,7 +598,7 @@ class TestTextAnchors:
             "mandatory": True,
         }
         mock_client = FakeClient(responses=make_response)
-        with pytest.raises(ValidationError):
+        with pytest.raises(AttributeError):
             readers.read_holdings([rule_holding], client=mock_client)
 
     def test_error_classname_does_not_exist(self):

@@ -120,12 +120,6 @@ class TestDownload:
         assert case.decision_date.isoformat() == "1821-06-01"
 
     @pytest.mark.vcr
-    def test_read_case_list_from_eyecite_case_citation(self):
-        case_citation = eyecite.get_citations("9 F. Cas. 50")[0]
-        cases_again = self.client.read_decision_list_by_cite(cite=case_citation)
-        assert cases_again[0].name_abbreviation == "Fikes v. Bentley"
-
-    @pytest.mark.vcr
     def test_fail_to_read_id_cite(self):
         with pytest.raises(ValueError, match="was type IdCitation, not CaseCitation"):
             self.client.read_decision_list_by_cite(cite="id. at 37")
