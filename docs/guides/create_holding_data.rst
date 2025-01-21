@@ -26,7 +26,7 @@ into :class:`authorityspoke.decisions.Decision` objects.
     >>> from authorityspoke import Decision, DecisionReading
     >>> from authorityspoke.io.loaders import load_decision_as_reading
     >>> from authorityspoke.io import CAPClient
-    >>> load_dotenv()
+    >>> load_dotenv(dotenv_path=".env")
     True
     >>> if USE_REAL_CASE_API:
     ...     CAP_API_KEY = os.getenv('CAP_API_KEY')
@@ -123,7 +123,7 @@ the Holdings to the :class:`~authorityspoke.opinions.OpinionReading` using
 the :meth:`~authorityspoke.opinions.OpinionReading.posit` method. As we look at
 the parts of the JSON file, the code cells will show how fields from the
 JSON affect the structure of the :class:`~authorityspoke.holdings.Holding`.
-    
+
     >>> oracle.posit(oracle_holdings)
     >>> lotus.posit(lotus_holdings)
     >>> print(oracle.holdings[0])
@@ -163,7 +163,7 @@ becomes one of the input’s ``terms``. If such an object hasn’t
 been referenced before in the file, it will be created.
 
     >>> print(oracle.holdings[0].inputs[0].terms)
-    [Entity(name='the Java API', generic=True, plural=False)]
+    [Entity(generic=True, absent=False, name='the Java API', plural=False)]
 
 
 The JSON representation of a Rule can also have “mandatory” and
@@ -251,7 +251,7 @@ shows how to generate the schema as a Python dict and then view just the
     >>> from authorityspoke.holdings import Holding
     >>> schema = Holding.schema()
     >>> schema["properties"]
-    {'rule': {'$ref': '#/definitions/Rule'}, 'rule_valid': {'title': 'Rule Valid', 'default': True, 'type': 'boolean'}, 'decided': {'title': 'Decided', 'default': True, 'type': 'boolean'}, 'exclusive': {'title': 'Exclusive', 'default': False, 'type': 'boolean'}, 'generic': {'title': 'Generic', 'default': False, 'type': 'boolean'}, 'absent': {'title': 'Absent', 'default': False, 'type': 'boolean'}}
+    {'generic': {'default': False, 'title': 'Generic', 'type': 'boolean'}, 'absent': {'default': False, 'title': 'Absent', 'type': 'boolean'}, 'rule': {'$ref': '#/$defs/Rule'}, 'rule_valid': {'default': True, 'title': 'Rule Valid', 'type': 'boolean'}, 'decided': {'default': True, 'title': 'Decided', 'type': 'boolean'}, 'exclusive': {'default': False, 'title': 'Exclusive', 'type': 'boolean'}}
 
 The schema can also be exported as JSON using
 the :meth:`authorityspoke.holdings.Holding.schema_json` method.

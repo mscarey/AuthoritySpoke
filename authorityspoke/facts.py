@@ -1,4 +1,5 @@
 """Create models of assertions accepted as factual by courts."""
+
 from __future__ import annotations
 from copy import deepcopy
 import operator
@@ -98,32 +99,35 @@ class Fact(Factor, BaseModel):
     @root_validator(pre=True)
     def nest_predicate_fields(cls, values):
         """Move fields passed to the Fact model that really belong to the Predicate model."""
-        type_str = values.pop("type", "")
-        if type_str and type_str.lower() != "fact":
-            raise ValidationError(f"type {type_str} was passed to Fact model")
+        if isinstance(values, dict):
+            type_str = values.pop("type", "")
+            if type_str and type_str.lower() != "fact":
+                raise ValueError(f"type {type_str} was passed to Fact model")
 
-        if isinstance(values.get("predicate"), str):
-            values["predicate"] = Predicate(content=values["predicate"])
-            if "truth" in values:
-                values["predicate"].truth = values.pop("truth")
+            if isinstance(values.get("predicate"), str):
+                values["predicate"] = Predicate(content=values["predicate"])
+                if "truth" in values:
+                    values["predicate"].truth = values.pop("truth")
 
-        for field_name in ["content", "truth", "sign", "expression"]:
-            if field_name in values:
-                values["predicate"] = values.get("predicate", {})
-                values["predicate"][field_name] = values.pop(field_name)
-        if isinstance(values.get("predicate"), dict) and values["predicate"].get(
-            "content"
-        ):
-            for sign in {
-                **QuantityRange.opposite_comparisons,
-                **QuantityRange.normalized_comparisons,
-            }:
-                if sign in values["predicate"]["content"]:
-                    content, quantity_text = values["predicate"]["content"].split(sign)
-                    values["predicate"]["content"] = content.strip()
-                    values["predicate"]["expression"] = quantity_text.strip()
-                    values["predicate"]["sign"] = sign
-                    break
+            for field_name in ["content", "truth", "sign", "expression"]:
+                if field_name in values:
+                    values["predicate"] = values.get("predicate", {})
+                    values["predicate"][field_name] = values.pop(field_name)
+            if isinstance(values.get("predicate"), dict) and values["predicate"].get(
+                "content"
+            ):
+                for sign in {
+                    **QuantityRange.opposite_comparisons,
+                    **QuantityRange.normalized_comparisons,
+                }:
+                    if sign in values["predicate"]["content"]:
+                        content, quantity_text = values["predicate"]["content"].split(
+                            sign
+                        )
+                        values["predicate"]["content"] = content.strip()
+                        values["predicate"]["expression"] = quantity_text.strip()
+                        values["predicate"]["sign"] = sign
+                        break
         return values
 
     @validator("terms", pre=True)
@@ -190,7 +194,7 @@ class Fact(Factor, BaseModel):
         TermSequence.validate_terms(v)
 
         if values.get("predicate") is None:
-            raise ValidationError("Predicate field is required.")
+            raise ValueError("Predicate field is required.")
 
         if len(v) != len(values["predicate"]):
             message = (
@@ -475,7 +479,7 @@ class Exhibit(Factor, BaseModel):
 
     def _means_if_concrete(
         self, other: Factor, context: ContextRegister
-    ) -> Iterator[ContextRegister]:
+    ) -> Iterator[Explanation]:
         if (
             isinstance(other, self.__class__)
             and self.form == other.form
@@ -485,7 +489,7 @@ class Exhibit(Factor, BaseModel):
 
     def _implies_if_concrete(
         self, other: Factor, context: Optional[ContextRegister] = None
-    ) -> Iterator[ContextRegister]:
+    ) -> Iterator[Explanation]:
         if isinstance(other, self.__class__) and (
             self.form == other.form or other.form is None
         ):
@@ -493,7 +497,7 @@ class Exhibit(Factor, BaseModel):
 
     def __str__(self):
         """Represent object as string without line breaks."""
-        string = f'{("attributed to " + self.statement_attribution.short_string) if self.statement_attribution else ""}'
+        string = f"{('attributed to ' + self.statement_attribution.short_string) if self.statement_attribution else ''}"
         if self.statement:
             string += ", asserting " + self.statement.short_string + ","
         string = super().__str__().format(string)
@@ -561,13 +565,13 @@ class Evidence(Factor, BaseModel):
         """Fail valitation if the input has a "type" field without the class name."""
         type_str = values.pop("type", "")
         if type_str and type_str.lower() != "evidence":
-            raise ValidationError(f"type {type_str} was passed to Evidence model")
+            raise ValueError(f"type {type_str} was passed to Evidence model")
         return values
 
     def __str__(self):
         string = (
-            f'{("of " + self.exhibit.short_string + " ") if self.exhibit else ""}'
-            + f'{("which supports " + self.to_effect.short_string) if self.to_effect else ""}'
+            f"{('of ' + self.exhibit.short_string + ' ') if self.exhibit else ''}"
+            + f"{('which supports ' + self.to_effect.short_string) if self.to_effect else ''}"
         )
         return super().__str__().format(string).strip().replace("Evidence", "evidence")
 
@@ -608,7 +612,7 @@ class Pleading(Factor, BaseModel):
     context_factor_names: ClassVar[Tuple[str]] = ("filer",)
 
     def __str__(self):
-        string = f'{("filed by " + self.filer.short_string if self.filer else "")}'
+        string = f"{('filed by ' + self.filer.short_string if self.filer else '')}"
         return super().__str__().format(string)
 
 
@@ -655,8 +659,8 @@ class Allegation(Factor, BaseModel):
 
     def __str__(self):
         string = (
-            f'{("in " + self.pleading.short_string + ",") if self.pleading else ""}'
-            + f'{("claiming " + self.fact.short_string + ",") if self.fact else ""}'
+            f"{('in ' + self.pleading.short_string + ',') if self.pleading else ''}"
+            + f"{('claiming ' + self.fact.short_string + ',') if self.fact else ''}"
         )
         string = string.strip(",")
         return super().__str__().format(string).replace("Allegation", "allegation")

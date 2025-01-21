@@ -174,7 +174,7 @@ make it visible on the internet.
 
     >>> import os
     >>> from dotenv import load_dotenv
-    >>> load_dotenv()
+    >>> load_dotenv(".env")
     True
     >>> CAP_API_KEY = os.getenv('CAP_API_KEY')
 
@@ -337,7 +337,10 @@ using the ``.dict()`` or ``.json()`` methods.
       'name': 'false the Java API was copyrightable',
       'predicate': {'content': '${the_java_api} was copyrightable', 'truth': False},
       'standard_of_proof': None,
-      'terms': [{'generic': True, 'name': 'the Java API', 'plural': False}]}]
+      'terms': [{'absent': False,
+                 'generic': True,
+                 'name': 'the Java API',
+                 'plural': False}]}]
 
 Linking Holdings to Opinions
 -------------------------------
@@ -443,7 +446,7 @@ indicate that the Java API is a generic :class:`nettlesome.entities.Entity` ment
 in the :class:`~authorityspoke.facts.Fact`\.
 
     >>> oracle.holdings[0].generic_terms()
-    [Entity(name='the Java API', generic=True, plural=False)]
+    [Entity(generic=True, absent=False, name='the Java API', plural=False)]
 
 A generic :class:`~nettlesome.entities.Entity` is “generic”
 in the sense that in the context of
@@ -482,8 +485,7 @@ angle brackets in the string representation of
 the :class:`~authorityspoke.holdings.Holding`\.
 
     >>> lotus.holdings[0].generic_terms()
-    [Entity(name='Borland International', generic=True, plural=False), Entity(name='the Lotus menu command hierarchy', generic=True, plural=False)]
-
+    [Entity(generic=True, absent=False, name='Borland International', plural=False), Entity(generic=True, absent=False, name='the Lotus menu command hierarchy', plural=False)]
 
 The same :class:`~authorityspoke.rules.Rule`\s and
 :class:`~authorityspoke.holdings.Holding`\s may be relevant to more than one

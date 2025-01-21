@@ -134,6 +134,7 @@ class OpinionReading(Comparable, BaseModel):
     """An interpretation of what Holdings are supported by the text of an Opinion."""
 
     anchored_holdings: AnchoredHoldings = AnchoredHoldings()
+    generic: bool = False
     opinion_type: str = ""
     opinion_author: str = ""
 
@@ -417,7 +418,7 @@ class OpinionReading(Comparable, BaseModel):
                 )
         else:
             holding_anchors = holding_anchors or []
-            for (holding, selector_list) in zip_longest(holdings, holding_anchors):
+            for holding, selector_list in zip_longest(holdings, holding_anchors):
                 self.posit_holding(
                     holding=holding,
                     holding_anchors=selector_list,

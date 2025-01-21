@@ -1,4 +1,4 @@
-import json
+from decimal import Decimal
 import os
 import pathlib
 
@@ -39,7 +39,6 @@ class TestEntityLoad:
         assert george.generic is True
 
     def test_load_and_dump_entity_from_entity_schema(self):
-
         record = {"name": "John Adams"}
         john = Entity(**record)
         assert john.generic is True
@@ -131,7 +130,10 @@ class TestFactorLoad:
 class TestFactDump:
     def test_dump_with_quantity(self, watt_factor):
         f8_dict = watt_factor["f8"].dict()
-        assert f8_dict["predicate"]["quantity_range"]["quantity"] == "20 foot"
+        assert f8_dict["predicate"]["quantity_range"]["quantity_units"] == "foot"
+        assert f8_dict["predicate"]["quantity_range"]["quantity_magnitude"] == Decimal(
+            "20"
+        )
 
     def test_dump_complex_fact(self, make_complex_fact):
         relevant_fact = make_complex_fact["f_relevant_murder"]

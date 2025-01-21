@@ -101,7 +101,9 @@ class Rule(Comparable, BaseModel):
         """Convert EnactmentPassage to EnactmentGroup."""
         if isinstance(v, EnactmentPassage):
             v = {"passages": [v]}
-        elif v and not isinstance(v, EnactmentGroup):
+        elif not v:
+            return EnactmentGroup()
+        elif not isinstance(v, EnactmentGroup):
             if not isinstance(v, dict) or "passages" not in v:
                 try:
                     v = EnactmentGroup(passages=list(v)) if v else EnactmentGroup()
@@ -453,7 +455,6 @@ class Rule(Comparable, BaseModel):
             and self.mandatory >= other.mandatory
             and self.universal >= other.universal
         ):
-
             if self.universal > other.universal:
                 yield from self.procedure.explain_implication_all_to_some(
                     other.procedure, context

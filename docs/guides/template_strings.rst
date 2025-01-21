@@ -227,10 +227,11 @@ but no unit conversion will be available.
 
 Comparisons of decimal numbers work similarly.
 
+    >>> from decimal import Decimal
     >>> specific_tax_rate = Comparison(
-    ...     content="${taxpayer}'s marginal income tax rate was", sign="=", expression=.3)
+    ...     content="${taxpayer}'s marginal income tax rate was", sign="=", expression=Decimal(".3"))
     >>> tax_rate_over_25 = Comparison(
-    ...     content="${taxpayer}'s marginal income tax rate was", sign=">", expression=.25)
+    ...     content="${taxpayer}'s marginal income tax rate was", sign=">", expression=Decimal(".25"))
     >>> specific_tax_rate.implies(tax_rate_over_25)
     True
 

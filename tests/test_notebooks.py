@@ -2,13 +2,14 @@
 Tests of commands that appear in notebooks in
 the notebooks/ directory
 """
+
 from copy import deepcopy
 import os
 
 from dotenv import load_dotenv
 import pytest
 
-from justopinion import CAPClient
+from justopinion.download import CourtListenerClient
 
 from authorityspoke.facts import Fact
 
@@ -17,21 +18,25 @@ from authorityspoke import Entity, Predicate, Comparison
 load_dotenv()
 
 CAP_API_KEY = os.getenv("CAP_API_KEY") or "wrong key"
+COURTLISTENER_API_KEY = os.getenv("COURTLISTENER_API_KEY") or "wrong key"
 
 
 class TestIntroduction:
-
     """
     Tests of commands from the "Introduction to AuthoritySpoke" notebook
     """
 
-    client = CAPClient(api_token=CAP_API_KEY)
+    client = CourtListenerClient(api_token=COURTLISTENER_API_KEY)
 
     @pytest.mark.vcr
     def test_download_case(self):
-        oracle = self.client.read_cite(cite="750 F.3d 1339", full_case=True)
-        citations = [out_citation.cite for out_citation in oracle.cites_to]
-        assert "527 F.3d 1318" in citations
+        oracle = self.client.read_cite(cite="750 F.3d 1339")
+        cluster = oracle.clusters[0]
+        opinion = self.client.read_cluster_opinions(cluster)[0]
+        assert (
+            str(opinion.opinions_cited[0])
+            == "https://www.courtlistener.com/api/rest/v4/opinions/101754/"
+        )
 
     def test_oracle_20_holdings(self, make_opinion_with_holding):
         assert len(make_opinion_with_holding["oracle_majority"].holdings) == 20
@@ -99,7 +104,7 @@ class TestIntroduction:
         assert "<the Lotus menu command hierarchy> is like <the Java API>" in str(
             explanation
         )
-        assert "Entity(name='the Java API'" in repr(explanation)
+        assert "name='the Java API'" in repr(explanation)
 
     def test_decision_explain_contradiction(self, make_decision_with_holding):
         oracle = make_decision_with_holding["oracle"]
@@ -151,8 +156,7 @@ class TestIntroduction:
         )
         not_copyrightable = unoriginal_not_copyrightable.outputs[0]
         assert listings_not_copyrightable.outputs[1].short_string == (
-            "absence of the fact that <Rural's telephone"
-            " listings> were copyrightable"
+            "absence of the fact that <Rural's telephone listings> were copyrightable"
         )
         assert (
             "act that <Rural's telephone listings> were names, towns, "

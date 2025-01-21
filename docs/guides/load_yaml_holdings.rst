@@ -35,7 +35,7 @@ documentation <https://saurabh-kumar.com/python-dotenv/#getting-started>`__.
     >>> from datetime import date
     >>> import os
     >>> from dotenv import load_dotenv
-    >>> load_dotenv()
+    >>> load_dotenv(".env")
     True
     >>> CAP_API_KEY = os.getenv('CAP_API_KEY')
     >>> USE_REAL_CASE_API = False
