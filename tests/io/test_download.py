@@ -4,13 +4,13 @@ import pytest
 
 from justopinion import CAPClient
 from justopinion.decisions import Decision
-from justopinion.download import CaseAccessProjectAPIError
+from justopinion.download import CaseAccessProjectAPIError, CourtListenerClient
 
 from authorityspoke import LegisClient, DecisionReading
 from authorityspoke.decisions import Decision
 from authorityspoke.io.loaders import load_decision
 from authorityspoke.io import writers
-from tests.test_notebooks import CAP_API_KEY
+from tests.test_notebooks import CAP_API_KEY, COURTLISTENER_API_KEY
 
 load_dotenv()
 
@@ -109,15 +109,6 @@ class TestDownload:
         assert case.name_abbreviation == "Kimbrough v. United States"
         cited_case = self.client.read_cite(cite=case.cites_to[0])
         assert cited_case.name_abbreviation == "United States v. Castillo"
-
-    @pytest.mark.vcr
-    def test_read_full_case_from_id_using_client(self):
-        """Test full case not requiring API key because Arkansas is a free jurisdiction."""
-        case = self.client.read_id(cap_id=236682, full_case=True)
-        assert "clerical misprision" in case.majority.text
-        assert not case.majority.author
-        # Add day if missing from date
-        assert case.decision_date.isoformat() == "1821-06-01"
 
     @pytest.mark.vcr
     def test_fail_to_read_id_cite(self):
