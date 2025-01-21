@@ -9,103 +9,184 @@ interactions:
       Connection:
       - keep-alive
       User-Agent:
-      - python-requests/2.25.1
+      - python-requests/2.31.0
     method: GET
     uri: https://api.case.law/v1/cases/4066790/
   response:
     body:
-      string: !!binary |
-        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
+      string: "{\"id\":4066790,\"url\":\"https://api.case.law/v1/cases/4066790/\",\"name\":\"ORACLE
+        AMERICA, INC., Plaintiff-Appellant, v. GOOGLE INC., Defendant-Cross-Appellant\",\"name_abbreviation\":\"Oracle
+        America, Inc. v. Google Inc.\",\"decision_date\":\"2014-05-09\",\"docket_number\":\"Nos.
+        2013-1021, 2013-1022\",\"first_page\":\"1339\",\"last_page\":\"1381\",\"citations\":[{\"type\":\"official\",\"cite\":\"750
+        F.3d 1339\"}],\"volume\":{\"url\":\"https://api.case.law/v1/volumes/32044132273806/\",\"volume_number\":\"750\",\"barcode\":\"32044132273806\"},\"reporter\":{\"url\":\"https://api.case.law/v1/reporters/933/\",\"full_name\":\"Federal
+        Reporter 3d Series\",\"id\":933},\"court\":{\"url\":\"https://api.case.law/v1/courts/fed-cir/\",\"name_abbreviation\":\"Fed.
+        Cir.\",\"slug\":\"fed-cir\",\"id\":8955,\"name\":\"United States Court of
+        Appeals for the Federal Circuit\"},\"jurisdiction\":{\"id\":39,\"name_long\":\"United
+        States\",\"url\":\"https://api.case.law/v1/jurisdictions/us/\",\"slug\":\"us\",\"whitelisted\":false,\"name\":\"U.S.\"},\"cites_to\":[{\"cite\":\"2013
+        U.S. Dist. LEXIS 8113\",\"category\":\"reporters:specialty_lexis\",\"reporter\":\"U.S.
+        Dist. LEXIS\",\"year\":2013,\"pin_cites\":[{\"page\":\"*33\"}],\"opinion_id\":0},{\"cite\":\"2013
+        WL 831528\",\"category\":\"reporters:specialty_west\",\"reporter\":\"WL\",\"year\":2013,\"opinion_id\":0},{\"cite\":\"439
+        F.3d 1312\",\"category\":\"reporters:federal\",\"reporter\":\"F.3d\",\"case_ids\":[31308],\"pin_cites\":[{\"page\":\"1320\"}],\"opinion_id\":0},{\"cite\":\"283
+        U.S. 494\",\"category\":\"reporters:federal\",\"reporter\":\"U.S.\",\"case_ids\":[434013],\"weight\":4,\"year\":1931,\"pin_cites\":[{\"page\":\"500\",\"parenthetical\":\"\\\"Where
+        the practice permits a partial new trial, it may not properly be resorted
+        to unless it clearly appears that the issue to be retried is so distinct and
+        separable from the others that a trial of it alone may be had without injustice.\\\"\"},{\"parenthetical\":\"\\\"Where
+        the practice permits a partial new trial, it may not properly be resorted
+        to unless it clearly appears that the issue to be retried is so distinct and
+        separable from the others that a trial of it alone may be had without injustice.\\\"\"},{\"parenthetical\":\"\\\"Where
+        the practice permits a partial new trial, it may not properly be resorted
+        to unless it clearly appears that the issue to be retried is so distinct and
+        separable from the others that a trial of it alone may be had without injustice.\\\"\"}],\"opinion_id\":0},{\"cite\":\"2013
+        U.S. Dist. LEXIS 144061\",\"category\":\"reporters:specialty_lexis\",\"reporter\":\"U.S.
+        Dist. LEXIS\",\"year\":2013,\"opinion_id\":0},{\"cite\":\"720 F.2d 231\",\"category\":\"reporters:federal\",\"reporter\":\"F.2d\",\"case_ids\":[1903897],\"pin_cites\":[{\"page\":\"242\"}],\"opinion_id\":0},{\"cite\":\"263
+        F.3d 942\",\"category\":\"reporters:federal\",\"reporter\":\"F.3d\",\"case_ids\":[9486377],\"pin_cites\":[{\"page\":\"954\"}],\"opinion_id\":0},{\"cite\":\"517
+        U.S. 370\",\"category\":\"reporters:federal\",\"reporter\":\"U.S.\",\"case_ids\":[11744942],\"weight\":3,\"year\":1996,\"opinion_id\":0},{\"cite\":\"932
+        F.Supp. 220\",\"category\":\"reporters:federal\",\"reporter\":\"F. Supp.\",\"case_ids\":[3456548],\"pin_cites\":[{\"page\":\"225\"}],\"opinion_id\":0},{\"cite\":\"2009
+        U.S. Dist. LEXIS 57525\",\"category\":\"reporters:specialty_lexis\",\"reporter\":\"U.S.
+        Dist. LEXIS\",\"year\":2009,\"pin_cites\":[{\"page\":\"*2\"}],\"opinion_id\":0},{\"cite\":\"2011
+        U.S. Dist. LEXIS 37735\",\"category\":\"reporters:specialty_lexis\",\"reporter\":\"U.S.
+        Dist. LEXIS\",\"year\":2011,\"pin_cites\":[{\"page\":\"*7\"}],\"opinion_id\":0},{\"cite\":\"972
+        F.2d 1031\",\"category\":\"reporters:federal\",\"reporter\":\"F.2d\",\"case_ids\":[1871346],\"pin_cites\":[{\"page\":\"1035\"}],\"opinion_id\":0},{\"cite\":\"360
+        F.3d 644\",\"category\":\"reporters:federal\",\"reporter\":\"F.3d\",\"case_ids\":[2164121],\"pin_cites\":[{\"page\":\"648\"}],\"opinion_id\":0},{\"cite\":\"41
+        Stan. L.Rev. 1045\",\"category\":\"journals:journal\",\"reporter\":\"Stan.
+        L. Rev.\",\"year\":1989,\"pin_cites\":[{\"page\":\"1072\"}],\"opinion_id\":0},{\"cite\":\"1984
+        Duke L.J. 663\",\"category\":\"journals:journal\",\"reporter\":\"Duke L.J.\",\"year\":1984,\"pin_cites\":[{\"page\":\"764\"}],\"opinion_id\":0},{\"cite\":\"812
+        F.2d 421\",\"category\":\"reporters:federal\",\"reporter\":\"F.2d\",\"case_ids\":[1695112],\"pin_cites\":[{\"page\":\"425\"}],\"opinion_id\":0},{\"cite\":\"388
+        F.3d 1189\",\"category\":\"reporters:federal\",\"reporter\":\"F.3d\",\"case_ids\":[9152731],\"weight\":2,\"pin_cites\":[{\"page\":\"1192-93\"},{\"page\":\"1193\"}],\"opinion_id\":0},{\"cite\":\"991
+        F.2d 563\",\"category\":\"reporters:federal\",\"reporter\":\"F.2d\",\"case_ids\":[10513804],\"weight\":2,\"pin_cites\":[{\"page\":\"566\"},{\"page\":\"566\"}],\"opinion_id\":0},{\"cite\":\"575
+        F.3d 935\",\"category\":\"reporters:federal\",\"reporter\":\"F.3d\",\"case_ids\":[4034852],\"weight\":2,\"pin_cites\":[{\"page\":\"938\"},{\"page\":\"938-39\",\"parenthetical\":\"citation
+        and internal quotation marks omitted\"}],\"opinion_id\":0},{\"cite\":\"595
+        F.3d 1340\",\"category\":\"reporters:federal\",\"reporter\":\"F.3d\",\"case_ids\":[4215552],\"pin_cites\":[{\"page\":\"1357\"}],\"opinion_id\":0},{\"cite\":\"336
+        F.3d 811\",\"category\":\"reporters:federal\",\"reporter\":\"F.3d\",\"case_ids\":[1537834],\"pin_cites\":[{\"page\":\"820-21\"}],\"opinion_id\":0},{\"cite\":\"81
+        F.2d 49\",\"category\":\"reporters:federal\",\"reporter\":\"F.2d\",\"case_ids\":[938384],\"weight\":2,\"pin_cites\":[{\"page\":\"56\"}],\"opinion_id\":0},{\"cite\":\"868
+        F.2d 1313\",\"category\":\"reporters:federal\",\"reporter\":\"F.2d\",\"case_ids\":[10536060],\"pin_cites\":[{\"page\":\"1324\"}],\"opinion_id\":0},{\"cite\":\"227
+        F.3d 1110\",\"category\":\"reporters:federal\",\"reporter\":\"F.3d\",\"case_ids\":[11196040],\"weight\":3,\"pin_cites\":[{\"page\":\"1117\"},{\"page\":\"1118\"},{\"page\":\"1118\",\"parenthetical\":\"internal
+        citation and quotation omitted\"}],\"opinion_id\":0},{\"cite\":\"447 F.3d
+        769\",\"category\":\"reporters:federal\",\"reporter\":\"F.3d\",\"case_ids\":[5860008],\"weight\":2,\"pin_cites\":[{\"page\":\"778\"},{\"page\":\"778\",\"parenthetical\":\"\\\"The
+        Sheriffs Department created exact copies of RUMBA's software. It then put
+        those copies to the identical purpose as the original software. Such a use
+        cannot be considered transformative.\\\"\"}],\"opinion_id\":0},{\"cite\":\"508
+        F.3d 1146\",\"category\":\"reporters:federal\",\"reporter\":\"F.3d\",\"case_ids\":[6046751],\"pin_cites\":[{\"page\":\"1165\"}],\"opinion_id\":0},{\"cite\":\"562
+        F.3d 630\",\"category\":\"reporters:federal\",\"reporter\":\"F.3d\",\"case_ids\":[5897429],\"pin_cites\":[{\"page\":\"638\"}],\"opinion_id\":0},{\"cite\":\"619
+        F.3d 301\",\"category\":\"reporters:federal\",\"reporter\":\"F.3d\",\"case_ids\":[3779073,3777819],\"pin_cites\":[{\"page\":\"309-10\"}],\"opinion_id\":0},{\"cite\":\"654
+        F.3d 989\",\"category\":\"reporters:federal\",\"reporter\":\"F.3d\",\"case_ids\":[5875551],\"pin_cites\":[{\"page\":\"995\"}],\"opinion_id\":0},{\"cite\":\"349
+        F.3d 622\",\"category\":\"reporters:federal\",\"reporter\":\"F.3d\",\"case_ids\":[9069662],\"weight\":2,\"pin_cites\":[{\"page\":\"629\"},{\"page\":\"629\",\"parenthetical\":\"finding
+        that use of copyrighted clips of Elvis's television appearances was not transformative
+        where \\\"some of the clips [we]re played without much interruption, if any
+        ... [and] instead serve[d] the same intrinsic entertainment value that is
+        protected by Plaintiffs' copyrights.\\\"\"}],\"opinion_id\":0},{\"cite\":\"353
+        F.3d 792\",\"category\":\"reporters:federal\",\"reporter\":\"F.3d\",\"case_ids\":[9296948],\"pin_cites\":[{\"page\":\"800\"}],\"opinion_id\":0},{\"cite\":\"527
+        F.3d 1318\",\"category\":\"reporters:federal\",\"reporter\":\"F.3d\",\"case_ids\":[3567186],\"pin_cites\":[{\"page\":\"1323\"}],\"opinion_id\":0},{\"cite\":\"33
+        F.3d 1477\",\"category\":\"reporters:federal\",\"reporter\":\"F.3d\",\"case_ids\":[10534092],\"pin_cites\":[{\"page\":\"1504\"}],\"opinion_id\":0},{\"cite\":\"794
+        F.2d 432\",\"category\":\"reporters:federal\",\"reporter\":\"F.2d\",\"case_ids\":[1591029],\"pin_cites\":[{\"page\":\"436\"}],\"opinion_id\":0},{\"cite\":\"709
+        F.3d 1273\",\"category\":\"reporters:federal\",\"reporter\":\"F.3d\",\"case_ids\":[3546738],\"weight\":2,\"pin_cites\":[{\"page\":\"1277\"}],\"opinion_id\":0},{\"cite\":\"725
+        F.3d 1170\",\"category\":\"reporters:federal\",\"reporter\":\"F.3d\",\"case_ids\":[4071822],\"weight\":2,\"pin_cites\":[{\"page\":\"1175\"},{\"page\":\"1177\"}],\"opinion_id\":0},{\"cite\":\"471
+        U.S. 539\",\"category\":\"reporters:federal\",\"reporter\":\"U.S.\",\"case_ids\":[6206269],\"weight\":20,\"year\":1985,\"pin_cites\":[{\"page\":\"549\"},{\"page\":\"560\"},{\"page\":\"560\"},{\"page\":\"562\"},{\"page\":\"563\"},{\"page\":\"565\"},{\"page\":\"566\"},{\"page\":\"566-67\"},{\"page\":\"566\"}],\"opinion_id\":0},{\"cite\":\"495
+        U.S. 207\",\"category\":\"reporters:federal\",\"reporter\":\"U.S.\",\"case_ids\":[633900],\"weight\":3,\"year\":1990,\"pin_cites\":[{\"page\":\"236\"}],\"opinion_id\":0},{\"cite\":\"510
+        U.S. 569\",\"category\":\"reporters:federal\",\"reporter\":\"U.S.\",\"case_ids\":[234489],\"weight\":25,\"year\":1994,\"pin_cites\":[{\"page\":\"577\",\"parenthetical\":\"quoting
+        Stewart v. Abend, 495 U.S. 207, 236, 110 S.Ct. 1750, 109 L.Ed.2d 184 (1990)\"},{\"parenthetical\":\"quoting
+        Stewart v. Abend, 495 U.S. 207, 236, 110 S.Ct. 1750, 109 L.Ed.2d 184 (1990)\"},{\"parenthetical\":\"quoting
+        Stewart v. Abend, 495 U.S. 207, 236, 110 S.Ct. 1750, 109 L.Ed.2d 184 (1990)\"},{\"page\":\"578,
+        575\"},{\"page\":\"579\"},{\"parenthetical\":\"citations and internal quotation
+        marks omitted\"},{\"page\":\"578-79\"},{\"page\":\"579\"},{\"page\":\"579\"},{\"page\":\"586\"},{\"page\":\"586\"},{\"page\":\"586-87\"},{\"page\":\"590\"}],\"opinion_id\":0},{\"cite\":\"104
+        F.2d 661\",\"category\":\"reporters:federal\",\"reporter\":\"F.2d\",\"case_ids\":[1059737],\"pin_cites\":[{\"page\":\"662\"}],\"opinion_id\":0},{\"cite\":\"688
+        F.3d 1164\",\"category\":\"reporters:federal\",\"reporter\":\"F.3d\",\"case_ids\":[3496994],\"weight\":2,\"pin_cites\":[{\"page\":\"1170\"},{\"page\":\"1176\",\"parenthetical\":\"finding
+        that a magazine's publication of photographs of a secret celebrity wedding
+        \\\"sprinkled with written commentary\\\" was \\\"at best minimally transformative\\\"
+        where the magazine \\\"did not transform the photos into a new work ... or
+        incorporate the photos as part of a broader work\\\"\"}],\"opinion_id\":0},{\"cite\":\"17
+        U.S.C. \xA7 107\",\"category\":\"laws:leg_statute\",\"reporter\":\"U.S.C.\",\"weight\":5,\"pin_cites\":[{\"page\":\"(1)\"},{\"page\":\"(3)\"}],\"opinion_id\":0},{\"cite\":\"121
+        F.3d 516\",\"category\":\"reporters:federal\",\"reporter\":\"F.3d\",\"case_ids\":[285045],\"weight\":2,\"pin_cites\":[{\"page\":\"517-20\"}],\"opinion_id\":0},{\"cite\":\"307
+        F.3d 197\",\"category\":\"reporters:federal\",\"reporter\":\"F.3d\",\"case_ids\":[11343053],\"weight\":3,\"pin_cites\":[{\"page\":\"215\"},{\"page\":\"215\"},{\"page\":\"215\",\"parenthetical\":\"finding
+        an expert's testimony on interoperability \\\"wholly misplaced\\\" because
+        he \\\"looked at externalities from the eyes of the plagiarist, not the eyes
+        of the program's creator\\\"\"}],\"opinion_id\":0},{\"cite\":\"203 F.3d 596\",\"category\":\"reporters:federal\",\"reporter\":\"F.3d\",\"case_ids\":[11485830],\"weight\":5,\"pin_cites\":[{\"page\":\"602\"},{\"page\":\"603\"},{\"page\":\"598\"},{\"page\":\"606-07\"}],\"opinion_id\":0},{\"cite\":\"126
+        F.3d 977\",\"category\":\"reporters:federal\",\"reporter\":\"F.3d\",\"case_ids\":[943614],\"weight\":3,\"pin_cites\":[{\"page\":\"980\"},{\"page\":\"978-81\"}],\"opinion_id\":0},{\"cite\":\"787
+        F.2d 1208\",\"category\":\"reporters:federal\",\"reporter\":\"F.2d\",\"case_ids\":[1560508],\"pin_cites\":[{\"page\":\"1212\"}],\"opinion_id\":0},{\"cite\":\"714
+        F.2d 1240\",\"category\":\"reporters:federal\",\"reporter\":\"F.2d\",\"case_ids\":[1886426],\"weight\":5,\"pin_cites\":[{\"page\":\"1250-52\"},{\"page\":\"1250-51\"},{\"page\":\"1252\",\"parenthetical\":\"quoting
+        CONTU Report at 21\"},{\"page\":\"1253\"},{\"page\":\"1253\"}],\"opinion_id\":0},{\"cite\":\"116
+        S.Ct. 804\",\"category\":\"reporters:federal\",\"reporter\":\"S. Ct.\",\"case_ids\":[326312,6467711],\"weight\":2,\"year\":1996,\"opinion_id\":0},{\"cite\":\"516
+        U.S. 233\",\"category\":\"reporters:federal\",\"reporter\":\"U.S.\",\"case_ids\":[326312],\"weight\":3,\"year\":1996,\"pin_cites\":[{\"page\":\"233-34\"}],\"opinion_id\":0},{\"cite\":\"376
+        F.3d 841\",\"category\":\"reporters:federal\",\"reporter\":\"F.3d\",\"case_ids\":[9376372],\"pin_cites\":[{\"page\":\"850\"}],\"opinion_id\":0},{\"cite\":\"35
+        F.3d 1435\",\"category\":\"reporters:federal\",\"reporter\":\"F.3d\",\"case_ids\":[10532798],\"pin_cites\":[{\"page\":\"1444\"}],\"opinion_id\":0},{\"cite\":\"118
+        F.3d 955\",\"category\":\"reporters:federal\",\"reporter\":\"F.3d\",\"case_ids\":[508900],\"weight\":2,\"pin_cites\":[{\"page\":\"964\"},{\"page\":\"963\",\"parenthetical\":\"citation
+        omitted\"}],\"opinion_id\":0},{\"cite\":\"689 F.3d 29\",\"category\":\"reporters:federal\",\"reporter\":\"F.3d\",\"case_ids\":[3501293],\"pin_cites\":[{\"page\":\"52\"}],\"opinion_id\":0},{\"cite\":\"37
+        C.F.R. \xA7 202.1\",\"category\":\"laws:admin_compilation\",\"reporter\":\"C.F.R.\",\"pin_cites\":[{\"page\":\"(a)\"}],\"opinion_id\":0},{\"cite\":\"725
+        F.2d 521\",\"category\":\"reporters:federal\",\"reporter\":\"F.2d\",\"case_ids\":[1924593],\"pin_cites\":[{\"page\":\"524\"}],\"opinion_id\":0},{\"cite\":\"77
+        F.3d 909\",\"category\":\"reporters:federal\",\"reporter\":\"F.3d\",\"case_ids\":[7643147],\"pin_cites\":[{\"page\":\"914\"}],\"opinion_id\":0},{\"cite\":\"323
+        F.3d 805\",\"category\":\"reporters:federal\",\"reporter\":\"F.3d\",\"case_ids\":[9347873],\"weight\":4,\"opinion_id\":0},{\"cite\":\"977
+        F.2d 1510\",\"category\":\"reporters:federal\",\"reporter\":\"F.2d\",\"case_ids\":[10519250],\"weight\":11,\"pin_cites\":[{\"page\":\"1525\"},{\"page\":\"1514-15\"},{\"page\":\"1518\"},{\"page\":\"1520\"},{\"page\":\"1522-23\"},{\"page\":\"1524-25\"},{\"page\":\"1524\",\"parenthetical\":\"internal
+        citation omitted\"},{\"page\":\"1526\"},{\"page\":\"1524-25\",\"parenthetical\":\"discussing
+        the Second Circuit's approach to \\\"breaking] down a computer program into
+        its component subroutines and subsubroutines and then identifying] the idea
+        or core functional element of each\\\" in the context of the second fair use
+        factor: the nature of the copyrighted work\"}],\"opinion_id\":0},{\"cite\":\"797
+        F.2d 1222\",\"category\":\"reporters:federal\",\"reporter\":\"F.2d\",\"case_ids\":[1614977],\"pin_cites\":[{\"page\":\"1236\"}],\"opinion_id\":0},{\"cite\":\"124
+        F.3d 1366\",\"category\":\"reporters:federal\",\"reporter\":\"F.3d\",\"case_ids\":[11910925],\"weight\":13,\"pin_cites\":[{\"page\":\"1372\"},{\"page\":\"1372\",\"parenthetical\":\"rejecting
+        the Lotus court's formulation, and concluding that, \\\"although an element
+        of a work may be characterized as a method of operation, that element may
+        nevertheless contain expression that is eligible for copyright protection.\\\"\"},{\"page\":\"1372\",\"parenthetical\":\"\\\"Although
+        this core of expression is eligible for copyright protection, it is subject
+        to the rigors of filtration analysis which excludes from protection expression
+        that is in the public domain, otherwise unoriginal, or subject to the doctrines
+        of merger and scenes a faire.\\\"\"},{\"page\":\"1374\"},{\"page\":\"1375\",\"parenthetical\":\"finding
+        error to the extent the trial court discussed \\\"whether external factors
+        such as market forces and efficiency considerations justified Iqtel's copying
+        of the command codes\\\"\"},{\"page\":\"1372\"},{\"page\":\"1372\"},{\"page\":\"1375\"},{\"page\":\"1372-73\"}],\"opinion_id\":0},{\"cite\":\"387
+        F.3d 522\",\"category\":\"reporters:federal\",\"reporter\":\"F.3d\",\"case_ids\":[9153802],\"weight\":3,\"pin_cites\":[{\"page\":\"533\"},{\"page\":\"537-38\",\"parenthetical\":\"finding
+        that the district court erred in assessing principles of merger and scenes
+        a faire in the infringement analysis, rather than as a component of copyrightability\"},{\"page\":\"557\",\"parenthetical\":\"Feikens,
+        J., dissenting-in-part\"}],\"opinion_id\":0},{\"cite\":\"886 F.2d 1173\",\"category\":\"reporters:federal\",\"reporter\":\"F.2d\",\"case_ids\":[10537625],\"weight\":6,\"pin_cites\":[{\"page\":\"1175\"},{\"page\":\"1175\"},{\"page\":\"1175\"},{\"page\":\"1175-76\"},{\"page\":\"1175\"}],\"opinion_id\":0},{\"cite\":\"982
+        F.2d 693\",\"category\":\"reporters:federal\",\"reporter\":\"F.2d\",\"case_ids\":[36437],\"weight\":13,\"pin_cites\":[{\"page\":\"704-05\"},{\"page\":\"702\"},{\"page\":\"698\"},{\"page\":\"702\",\"parenthetical\":\"\\\"It
+        is now well settled that the literal elements of computer programs, i.e.,
+        their source and object codes, are the subject of copyright protection.\\\"\"},{\"page\":\"701-02\"},{\"page\":\"705-06\"},{\"page\":\"706\"},{\"page\":\"707-08\"},{\"page\":\"708\",\"parenthetical\":\"citation
+        omitted\"},{\"page\":\"707\"},{\"page\":\"714\"}],\"opinion_id\":0},{\"cite\":\"25
+        L.Ed. 841\",\"category\":\"reporters:federal\",\"reporter\":\"L. Ed.\",\"case_ids\":[5632045,5630095],\"year\":1879,\"opinion_id\":0},{\"cite\":\"11
+        Otto 99\",\"category\":\"reporters:federal\",\"reporter\":\"U.S.\",\"case_ids\":[572707,572691],\"year\":1879,\"opinion_id\":0},{\"cite\":\"101
+        U.S. 99\",\"category\":\"reporters:federal\",\"reporter\":\"U.S.\",\"case_ids\":[5630095],\"weight\":2,\"year\":1879,\"pin_cites\":[{\"page\":\"101\"},{\"page\":\"103-04\"}],\"opinion_id\":0},{\"cite\":\"132
+        S.Ct. 873\",\"category\":\"reporters:federal\",\"reporter\":\"S. Ct.\",\"case_ids\":[12186276,12446022],\"weight\":3,\"year\":2012,\"pin_cites\":[{\"page\":\"890\",\"parenthetical\":\"\\\"The
+        idea/expression dichotomy is codified at 17 U.S.C. \xA7 102(b).\\\"\"},{\"parenthetical\":\"\\\"The
+        idea/expression dichotomy is codified at 17 U.S.C. \xA7 102(b).\\\"\"},{\"page\":\"890\"}],\"opinion_id\":0},{\"cite\":\"98
+        L.Ed. 630\",\"category\":\"reporters:federal\",\"reporter\":\"L. Ed.\",\"weight\":2,\"year\":1954,\"pin_cites\":[{\"parenthetical\":\"\\\"Unlike
+        a patent, a copyright gives no exclusive right to the art disclosed; protection
+        is given only to the expression of the idea - not the idea itself.\\\"\"}],\"opinion_id\":0},{\"cite\":\"347
+        U.S. 201\",\"category\":\"reporters:federal\",\"reporter\":\"U.S.\",\"case_ids\":[11300002],\"weight\":4,\"year\":1954,\"pin_cites\":[{\"page\":\"217\",\"parenthetical\":\"\\\"Unlike
+        a patent, a copyright gives no exclusive right to the art disclosed; protection
+        is given only to the expression of the idea - not the idea itself.\\\"\"},{\"parenthetical\":\"\\\"Unlike
+        a patent, a copyright gives no exclusive right to the art disclosed; protection
+        is given only to the expression of the idea - not the idea itself.\\\"\"},{\"page\":\"217\"}],\"opinion_id\":0},{\"cite\":\"499
+        U.S. 340\",\"category\":\"reporters:federal\",\"reporter\":\"U.S.\",\"case_ids\":[11318883],\"weight\":7,\"year\":1991,\"pin_cites\":[{\"page\":\"358\"},{\"page\":\"345\"},{\"page\":\"356\"}],\"opinion_id\":0},{\"cite\":\"975
+        F.2d 832\",\"category\":\"reporters:federal\",\"reporter\":\"F.2d\",\"case_ids\":[10517242],\"weight\":12,\"pin_cites\":[{\"page\":\"838\"},{\"page\":\"839\"},{\"page\":\"839\"},{\"page\":\"840\"},{\"page\":\"836\"},{\"page\":\"840\"},{\"page\":\"840\"},{\"page\":\"840\"},{\"page\":\"839\"},{\"page\":\"840\",\"parenthetical\":\"\\\"External
+        factors did not dictate the design of the IONES program.\\\"\"}],\"opinion_id\":0},{\"cite\":\"17
+        U.S.C. \xA7 101\",\"category\":\"laws:leg_statute\",\"reporter\":\"U.S.C.\",\"weight\":3,\"pin_cites\":[{\"parenthetical\":\"defining
+        a \\\"computer program\\\" as \\\"a set of statements or instructions to be
+        used directly or indirectly in a computer in order to bring about a certain
+        result\\\"\"}],\"opinion_id\":0},{\"cite\":\"17 U.S.C. \xA7 102\",\"category\":\"laws:leg_statute\",\"reporter\":\"U.S.C.\",\"weight\":6,\"pin_cites\":[{\"page\":\"(a)\"},{\"page\":\"(a)\"},{\"page\":\"(b)\"},{\"page\":\"(b)\"},{\"page\":\"(b)\"},{\"page\":\"(b)\"}],\"opinion_id\":0},{\"cite\":\"49
+        F.3d 807\",\"category\":\"reporters:federal\",\"reporter\":\"F.3d\",\"case_ids\":[7416609],\"weight\":12,\"pin_cites\":[{\"page\":\"820\"},{\"page\":\"814\"},{\"page\":\"815\",\"parenthetical\":\"methods
+        of operation are means by which a user operates something and any words used
+        to effectuate that operation are unprotected expression\"},{\"page\":\"809\"},{\"page\":\"815\"},{\"page\":\"816\"},{\"page\":\"818\"}],\"opinion_id\":0},{\"cite\":\"225
+        F.3d 1068\",\"category\":\"reporters:federal\",\"reporter\":\"F.3d\",\"case_ids\":[11234798],\"weight\":6,\"pin_cites\":[{\"page\":\"1073\"},{\"page\":\"1082\"},{\"page\":\"1082\",\"parenthetical\":\"citations
+        omitted\"},{\"page\":\"1082\"},{\"page\":\"1073\"}],\"opinion_id\":0},{\"cite\":\"897
+        F.2d 1572\",\"category\":\"reporters:federal\",\"reporter\":\"F.2d\",\"case_ids\":[10540655],\"pin_cites\":[{\"page\":\"1575\"}],\"opinion_id\":0},{\"cite\":\"28
+        U.S.C. \xA7 1295\",\"category\":\"laws:leg_statute\",\"reporter\":\"U.S.C.\",\"weight\":2,\"pin_cites\":[{\"page\":\"(a)(1)\"}],\"opinion_id\":0},{\"cite\":\"2012
+        WL 9028839\",\"category\":\"reporters:specialty_west\",\"reporter\":\"WL\",\"year\":2012,\"opinion_id\":0},{\"cite\":\"872
+        F.Supp.2d 974\",\"category\":\"reporters:federal\",\"reporter\":\"F. Supp.
+        2d\",\"case_ids\":[3847700],\"weight\":57,\"pin_cites\":[{\"page\":\"977\"},{\"page\":\"982\",\"parenthetical\":\"describing
+        organization: \\\"[e]ach package [i]s broken into classes and those in turn
+        [are] broken into methods\\\"\"},{\"page\":\"977\"},{\"page\":\"982\"},{\"page\":\"979-80\"},{\"page\":\"980-82\"},{\"page\":\"978\"},{\"page\":\"999\"},{\"page\":\"983\"},{\"page\":\"978\"},{\"page\":\"998\"},{\"page\":\"999\"},{\"page\":\"999-1000\"},{\"page\":\"1001\"},{\"page\":\"976\",\"parenthetical\":\"\\\"The
+        overall name tree, of course, has creative elements----\\\"\"},{\"page\":\"999\",\"parenthetical\":\"\\\"Yes,
+        it is creative. Yes, it is original.\\\"\"},{\"page\":\"997\"},{\"page\":\"979\"},{\"page\":\"998\"},{\"parenthetical\":\"\\\"The
+        method specification is the idea. The method implementation is the expression.
+        No one may monopolize the idea.\\\"\"},{\"page\":\"976\"},{\"page\":\"998\"},{\"page\":\"976\"},{\"page\":\"976\"},{\"page\":\"976-77\"},{\"page\":\"999-1000\"},{\"page\":\"1002\"},{\"page\":\"976\"},{\"page\":\"977\"},{\"page\":\"1000\",\"parenthetical\":\"emphasis
+        omitted\"},{\"page\":\"1000\"},{\"page\":\"1000\",\"parenthetical\":\"\\\"Google
+        replicated what was necessary to achieve a degree of interoperability\\\"
+        with Java.\"},{\"page\":\"978\"},{\"page\":\"978\"},{\"page\":\"984\",\"parenthetical\":\"stating
+        that this case raises the question of \\\"whether the copyright holder is
+        more appropriately asserting an exclusive right to a functional system, process,
+        or method of operation that belongs in the realm of patents, not copyrights\\\"\"},{\"page\":\"999\"}],\"opinion_id\":0},{\"cite\":\"2012
+        U.S. Dist. LEXIS 66417\",\"category\":\"reporters:specialty_lexis\",\"reporter\":\"U.S.
+        Dist. LEXIS\",\"weight\":4,\"year\":2012,\"pin_cites\":[{\"parenthetical\":\"\\\"Order
+        Granting JMOL on Decompiled Files \\\"\"},{\"page\":\"*6\"},{\"page\":\"*6\"},{\"page\":\"*6\"}],\"opinion_id\":0}],\"frontend_url\":\"https://cite.case.law/f3d/750/1339/\",\"frontend_pdf_url\":\"https://cite.case.law/pdf/4066790/Oracle%20America,%20Inc.%20v.%20Google%20Inc.,%20750%20F.3d%201339%20(2014).pdf\",\"preview\":[],\"analysis\":{\"cardinality\":3160,\"char_count\":130766,\"ocr_confidence\":0.688,\"pagerank\":{\"raw\":1.76868362126849e-07,\"percentile\":0.7110642357913531},\"sha256\":\"da8e1dfda12c6161d92f1a2a0b02126a7cc9efdcd711a562a861b77cdc48de2f\",\"simhash\":\"1:be4a65a3e71e9df3\",\"word_count\":20719,\"random_id\":1261731144.0,\"random_bucket\":32072},\"last_updated\":\"2024-02-27T18:19:28.524578+00:00\",\"provenance\":{\"date_added\":\"2019-08-29\",\"source\":\"Harvard\",\"batch\":\"2018\"}}"
     headers:
       Accept-Ranges:
       - bytes
@@ -118,23 +199,23 @@ interactions:
       CF-Cache-Status:
       - MISS
       CF-RAY:
-      - 6701c8df198f0ba7-DFW
+      - 8861a8af8c24a91b-DFW
       Cache-Control:
       - s-maxage=86400, max-age=3600
       Connection:
       - keep-alive
       Content-Disposition:
-      - attachment; filename="CAP_2021-07-17 07:33:53.291817.json"
+      - attachment; filename="CAP_2024-05-19 05:24:08.418785.json"
       Content-Encoding:
       - gzip
       Content-Length:
-      - '5174'
+      - '5257'
       Content-Type:
       - application/json
       Date:
-      - Sat, 17 Jul 2021 07:33:53 GMT
-      Expect-CT:
-      - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
+      - Sun, 19 May 2024 05:24:08 GMT
+      Last-Modified:
+      - Sun, 19 May 2024 05:24:08 GMT
       Referrer-Policy:
       - same-origin
       Server:

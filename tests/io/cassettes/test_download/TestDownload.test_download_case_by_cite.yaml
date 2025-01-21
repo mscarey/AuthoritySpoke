@@ -9,31 +9,59 @@ interactions:
       Connection:
       - keep-alive
       User-Agent:
-      - python-requests/2.24.0
+      - python-requests/2.31.0
     method: GET
     uri: https://api.case.law/v1/cases/?cite=49+F.3d+807
   response:
     body:
-      string: !!binary |
-        H4sIAAAAAAAC/4VW227jNhD9FUJAgRa1JYqkRNJvaS7AAqkdJNm+FAuDFqmYXUUSSMnZIMi/dyjL
-        FwXd5sWSZubMmRs5fouKpq+7aJHOotr8gJe6r6pZ1Dqzs03vD9/O+L7q4PPvt8jqaMFZmudYzqLe
-        VdEi2nZd6xdJolobF8qbuFIvyS5NwrtPRuMkAg71bMD+dvX49QFdXf91fbu6+/N6+YguV/d3q/uL
-        xy+r5QzdVcrWnS3LGbpoW1NVxszQLkZ/rO5vL5ZX6Mvy8fp+ORhf3M7g8zKeoStTmlqrujuA4HVk
-        XKvNJiSkOtvUgb7peg+Anama9tnUHbpsXBsPFI0DoEZf6s64egCoCijqIgZn2hTWg2itVRfySKXM
-        5pjOsQzKpvhuunXdP2+MA+WyiZGkc0JSBtrSOt+tW/UUcAJzEFXqTEIISArbDZT7QnevbVA1ZWkL
-        q6q9PkiYRDcx1Si4ef82i3ZN1Ye6vn3Sjr2dTyjBjKUpzjjFmIa+7DWn2FlIaKNc0ehAOAVE72Eg
-        2sZ1wfYz0oOlTyQduEqYqPU4CDdGG6cqdD8aIcjqwThrPBiGQQMMsMGQuu5zqsHMJ6nv5oV1yU+6
-        D2p0aV3op6/6p70kAEZKIcJgjwF+raHkEBP0xXgYEyBATTlMmKo8KhuHuq1BN6G7wWvR2y7U55/e
-        Wa9tsefcHxo6ul1XTf300Xf02Vk69+iT3ien+PuAftmCt8p6cBktSgjOnJKIH+IQVBgfv+6aYbrG
-        WeIyDNND38L8k6G3RxXJ92OWUpqdyxlAgktEGT6XC0kBQACQYnaukILsFbmcEKQpQw/xZRcDIp8i
-        xgEnE3tB01OsUxU9xJoyPpFzOVLzSQ4iQ7fxtQ6aTIhpUPQQlJwoJOV7VzyTHwEHXzSb+iL8RIMn
-        xeJCHHPh4r+rQvEkF8HG+uZTV4yn+35kdBIYZ/hIQSeeUjwi5AQgJRsbyHg+zSM/5kEyNnWVjdHC
-        Rfch+fQISlk6mayx+khM5TLHhwDy7Kedx2RarvTQLyLIcB+WroHru9br6YkKgNORKqlOmEzgDh0u
-        pQOk1eX/wkB/XGjDHvmF4LNNAl/DLoHnLvyM+wTephtlEBRxeDIJP2F44QHRwO+vYa/8FgNVNK5i
-        8wJnFjJTgH311ocr5aVxej2ub0kyCtfBVpEsDxMhxIbnNGeiUFpJvQEWrE2WE5LJjaYbLSQrDd+Q
-        TJVY5IxsCq0LbbBWpdwUQNsUDpzXpdWmLqDOOM4F/EkotsodSGEbkBwChA3mVP09xNQaV0AVbDUg
-        JIQgOBeE05wSwWFtKEiExzjlGPLOZJ5nhHIzxzxcT8ppCwna7jVaEIzBt7fPW+W3oc0LYkwpMOZC
-        ZkpLHAZnv0L7NqxjHeYKEzzHYp6yRwIAsmAizgnFGf4d40U4Nd/e/wXkfRKk8wgAAA==
+      string: "{\"count\":1,\"next\":null,\"previous\":null,\"results\":[{\"id\":7416609,\"url\":\"https://api.case.law/v1/cases/7416609/\",\"name\":\"LOTUS
+        DEVELOPMENT CORPORATION, Plaintiff, Appellee, v. BORLAND INTERNATIONAL, INC.,
+        Defendant, Appellant\",\"name_abbreviation\":\"Lotus Development Corp. v.
+        Borland International, Inc.\",\"decision_date\":\"1995-03-09\",\"docket_number\":\"No.
+        93-2214\",\"first_page\":\"807\",\"last_page\":\"822\",\"citations\":[{\"type\":\"official\",\"cite\":\"49
+        F.3d 807\"}],\"volume\":{\"url\":\"https://api.case.law/v1/volumes/32044110573003/\",\"volume_number\":\"49\",\"barcode\":\"32044110573003\"},\"reporter\":{\"url\":\"https://api.case.law/v1/reporters/933/\",\"full_name\":\"Federal
+        Reporter 3d Series\",\"id\":933},\"court\":{\"url\":\"https://api.case.law/v1/courts/1st-cir/\",\"name_abbreviation\":\"1st
+        Cir.\",\"slug\":\"1st-cir\",\"id\":8809,\"name\":\"United States Court of
+        Appeals for the First Circuit\"},\"jurisdiction\":{\"id\":39,\"name_long\":\"United
+        States\",\"url\":\"https://api.case.law/v1/jurisdictions/us/\",\"slug\":\"us\",\"whitelisted\":false,\"name\":\"U.S.\"},\"cites_to\":[{\"cite\":\"121
+        L.Ed.2d 141\",\"category\":\"reporters:federal\",\"reporter\":\"L. Ed. 2d\",\"weight\":2,\"year\":1992,\"opinion_id\":0},{\"cite\":\"113
+        S.Ct. 198\",\"category\":\"reporters:federal\",\"reporter\":\"S. Ct.\",\"year\":1992,\"opinion_id\":0},{\"cite\":\"960
+        F.2d 1465\",\"category\":\"reporters:federal\",\"reporter\":\"F.2d\",\"case_ids\":[10525985],\"pin_cites\":[{\"page\":\"1477\"}],\"opinion_id\":0},{\"cite\":\"379
+        F.2d 675\",\"category\":\"reporters:federal\",\"reporter\":\"F.2d\",\"case_ids\":[2069440],\"weight\":2,\"pin_cites\":[{\"page\":\"678-79\"},{\"page\":\"678-79\"}],\"opinion_id\":0},{\"cite\":\"17
+        U.S.C. \xA7 101\",\"category\":\"laws:leg_statute\",\"reporter\":\"U.S.C.\",\"weight\":3,\"pin_cites\":[{\"parenthetical\":\"defining
+        \\\"literary works\\\" as \\\"works ... expressed in words, numbers, or other
+        verbal or numerical symbols or indicia, regardless of the nature of the material
+        objects, such as books, periodicals, phonorecords, film, tapes, disks, or
+        cards, in which they are embodied\\\" (emphasis added)\"}],\"opinion_id\":0},{\"cite\":\"9
+        F.3d 823\",\"category\":\"reporters:federal\",\"reporter\":\"F.3d\",\"case_ids\":[10513702],\"opinion_id\":0},{\"cite\":\"982
+        F.2d 693\",\"category\":\"reporters:federal\",\"reporter\":\"F.2d\",\"case_ids\":[36437],\"weight\":6,\"pin_cites\":[{\"page\":\"707\"},{\"page\":\"710\"},{\"page\":\"702\",\"parenthetical\":\"\\\"It
+        is now well settled that the literal elements of computer programs, i.e.,
+        their source and object codes, are the subject of copyright protection.\\\"\"}],\"opinion_id\":0},{\"cite\":\"25
+        L.Ed. 841\",\"category\":\"reporters:federal\",\"reporter\":\"L. Ed.\",\"case_ids\":[5632045,5630095],\"year\":1879,\"opinion_id\":0},{\"cite\":\"101
+        U.S. 99\",\"category\":\"reporters:federal\",\"reporter\":\"U.S.\",\"case_ids\":[5630095],\"weight\":2,\"year\":1879,\"pin_cites\":[{\"page\":\"104-05\"}],\"opinion_id\":0},{\"cite\":\"126
+        L.Ed.2d 254\",\"category\":\"reporters:federal\",\"reporter\":\"L. Ed. 2d\",\"year\":1993,\"opinion_id\":0},{\"cite\":\"114
+        S.Ct. 307\",\"category\":\"reporters:federal\",\"reporter\":\"S. Ct.\",\"case_ids\":[6531200],\"year\":1993,\"opinion_id\":0},{\"cite\":\"994
+        F.2d 1476\",\"category\":\"reporters:federal\",\"reporter\":\"F.2d\",\"case_ids\":[6525256,10518404],\"weight\":6,\"pin_cites\":[{\"page\":\"1481\"}],\"opinion_id\":0},{\"cite\":\"937
+        F.2d 759\",\"category\":\"reporters:federal\",\"reporter\":\"F.2d\",\"case_ids\":[10526236],\"pin_cites\":[{\"page\":\"763\"}],\"opinion_id\":0},{\"cite\":\"17
+        U.S.C. \xA7 410\",\"category\":\"laws:leg_statute\",\"reporter\":\"U.S.C.\",\"pin_cites\":[{\"page\":\"(c)\"}],\"opinion_id\":0},{\"cite\":\"893
+        F.2d 1104\",\"category\":\"reporters:federal\",\"reporter\":\"F.2d\",\"case_ids\":[11650492],\"pin_cites\":[{\"page\":\"1106\"}],\"opinion_id\":0},{\"cite\":\"26
+        F.3d 1335\",\"category\":\"reporters:federal\",\"reporter\":\"F.3d\",\"case_ids\":[10516011],\"weight\":3,\"pin_cites\":[{\"page\":\"1340\"},{\"page\":\"1340\"},{\"page\":\"1341\"}],\"opinion_id\":0},{\"cite\":\"843
+        F.2d 600\",\"category\":\"reporters:federal\",\"reporter\":\"F.2d\",\"case_ids\":[10544994],\"weight\":2,\"pin_cites\":[{\"page\":\"605\"},{\"page\":\"606\"}],\"opinion_id\":0},{\"cite\":\"36
+        F.3d 1147\",\"category\":\"reporters:federal\",\"reporter\":\"F.3d\",\"case_ids\":[10530360],\"opinion_id\":0},{\"cite\":\"499
+        U.S. 340\",\"category\":\"reporters:federal\",\"reporter\":\"U.S.\",\"case_ids\":[11318883],\"weight\":5,\"year\":1991,\"pin_cites\":[{\"page\":\"361\"},{\"page\":\"1296\"},{\"page\":\"349-50\"},{\"page\":\"1290\",\"parenthetical\":\"quotations
+        and citations omitted\"}],\"opinion_id\":0},{\"cite\":\"17 U.S.C. \xA7 102\",\"category\":\"laws:leg_statute\",\"reporter\":\"U.S.C.\",\"weight\":4,\"pin_cites\":[{\"page\":\"(b)\"},{\"page\":\"(b)\"},{\"page\":\"(a)\"},{\"page\":\"(a)(1)\",\"parenthetical\":\"granting
+        protection to \\\"literary works\\\"\"}],\"opinion_id\":0},{\"cite\":\"740
+        F.Supp. 37\",\"category\":\"reporters:federal\",\"reporter\":\"F. Supp.\",\"case_ids\":[4086167],\"pin_cites\":[{\"page\":\"68,
+        70\"}],\"opinion_id\":0},{\"cite\":\"831 F.Supp. 223\",\"category\":\"reporters:federal\",\"reporter\":\"F.
+        Supp.\",\"case_ids\":[571968],\"opinion_id\":0},{\"cite\":\"831 F.Supp. 202\",\"category\":\"reporters:federal\",\"reporter\":\"F.
+        Supp.\",\"case_ids\":[571966],\"opinion_id\":0},{\"cite\":\"799 F.Supp. 203\",\"category\":\"reporters:federal\",\"reporter\":\"F.
+        Supp.\",\"case_ids\":[3815938],\"weight\":7,\"pin_cites\":[{\"page\":\"217\"},{\"page\":\"223\",\"parenthetical\":\"emphasis
+        in original\"},{\"page\":\"222-23\"},{\"page\":\"216\"}],\"opinion_id\":0},{\"cite\":\"788
+        F.Supp. 78\",\"category\":\"reporters:federal\",\"reporter\":\"F. Supp.\",\"case_ids\":[7406680],\"weight\":3,\"pin_cites\":[{\"page\":\"80\"},{\"page\":\"82\"}],\"opinion_id\":0},{\"cite\":\"114
+        S.Ct. 1164\",\"category\":\"reporters:federal\",\"reporter\":\"S. Ct.\",\"case_ids\":[234489],\"weight\":2,\"year\":1994,\"pin_cites\":[{\"page\":\"1174\"}],\"opinion_id\":1},{\"cite\":\"471
+        U.S. 539\",\"category\":\"reporters:federal\",\"reporter\":\"U.S.\",\"case_ids\":[6206269],\"weight\":5,\"year\":1985,\"pin_cites\":[{\"page\":\"562\"},{\"page\":\"2231-32\"}],\"opinion_id\":1},{\"cite\":\"25
+        L.Ed. 841\",\"category\":\"reporters:federal\",\"reporter\":\"L. Ed.\",\"case_ids\":[5632045,5630095],\"year\":1879,\"opinion_id\":1},{\"cite\":\"101
+        U.S. 99\",\"category\":\"reporters:federal\",\"reporter\":\"U.S.\",\"case_ids\":[5630095],\"year\":1879,\"opinion_id\":1}],\"frontend_url\":\"https://cite.case.law/f3d/49/807/\",\"frontend_pdf_url\":\"https://cite.case.law/pdf/7416609/Lotus%20Development%20Corp.%20v.%20Borland%20International,%20Inc.,%2049%20F.3d%20807%20(1995).pdf\",\"preview\":[],\"analysis\":{\"word_count\":9247,\"random_bucket\":53025,\"sha256\":\"728f6b586be4914121ca4002706414f617c6a0c4d433147434e5af53ec74264e\",\"ocr_confidence\":0.681,\"char_count\":57323,\"random_id\":2548420385,\"pagerank\":{\"percentile\":0.9637525199345599,\"raw\":6.792335702795885e-07},\"cardinality\":2007,\"simhash\":\"1:2eef8007895ad901\"},\"last_updated\":\"2024-02-27T19:56:48.781900+00:00\",\"provenance\":{\"date_added\":\"2019-08-29\",\"batch\":\"2018\",\"source\":\"Harvard\"}}]}"
     headers:
       Accept-Ranges:
       - bytes
@@ -46,26 +74,27 @@ interactions:
       CF-Cache-Status:
       - MISS
       CF-RAY:
-      - 5c7c6077ab36e03f-DFW
+      - 8861a5dbbec1479d-DFW
       Cache-Control:
-      - max-age=14400, s-maxage=86400
+      - s-maxage=86400, max-age=3600
       Connection:
       - keep-alive
+      Content-Disposition:
+      - attachment; filename="CAP_2024-05-19 05:22:12.568024.json"
       Content-Encoding:
       - gzip
       Content-Length:
-      - '1075'
+      - '2011'
       Content-Type:
       - application/json
       Date:
-      - Mon, 24 Aug 2020 10:26:45 GMT
-      Expect-CT:
-      - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
+      - Sun, 19 May 2024 05:22:12 GMT
+      Last-Modified:
+      - Sun, 19 May 2024 05:22:12 GMT
+      Referrer-Policy:
+      - same-origin
       Server:
       - cloudflare
-      Set-Cookie:
-      - __cfduid=d1618c3d43dd14a41fbced776a573a78d1598264805; expires=Wed, 23-Sep-20
-        10:26:45 GMT; path=/; domain=.case.law; HttpOnly; SameSite=Lax
       Strict-Transport-Security:
       - max-age=15768000
       Vary:
@@ -73,9 +102,7 @@ interactions:
       X-Content-Type-Options:
       - nosniff
       X-Frame-Options:
-      - SAMEORIGIN
-      cf-request-id:
-      - 04c19a9ecd0000e03f94a31200000001
+      - DENY
     status:
       code: 200
       message: OK

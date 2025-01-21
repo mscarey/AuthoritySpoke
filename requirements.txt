@@ -1,10 +1,11 @@
 lxml>=4.9.1
 anchorpoint>=0.7.0
 eyecite>=2.4.0
-justopinion>=0.2.5
-legislice>=0.7.0
-nettlesome>=0.6.1
+git+https://github.com/mscarey/justopinion.git@cl-client
+git+https://github.com/mscarey/legislice.git@v0.8.0
+git+https://github.com/mscarey/nettlesome.git@5cee4d62e7241462089253b9cc71d1af26c000c0
 pint>=0.15
+pydantic==2.10.5
 python-dotenv
 python-ranges>=0.2.1
 python-slugify

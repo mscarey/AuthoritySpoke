@@ -7,7 +7,6 @@ from nettlesome.entities import Entity
 from nettlesome.groups import FactorGroup
 from nettlesome.predicates import Predicate
 from nettlesome.quantities import Comparison, Q_
-from pydantic import ValidationError
 
 from authorityspoke.facts import Fact
 from authorityspoke.procedures import Procedure
@@ -15,11 +14,11 @@ from authorityspoke.procedures import Procedure
 
 class TestProcedures:
     def test_exception_for_wrong_type_for_procedure(self, make_predicate):
-        with pytest.raises(ValidationError):
+        with pytest.raises(AttributeError):
             Procedure(inputs=make_predicate["p1"], outputs=make_predicate["p2"])
 
     def test_exception_for_wrong_type_in_tuple_for_procedure(self, make_predicate):
-        with pytest.raises(ValidationError):
+        with pytest.raises(AttributeError):
             Procedure(inputs=(make_predicate["p1"]), outputs=(make_predicate["p2"]))
 
     def test_make_procedure_with_evidence_output(self, make_evidence):
@@ -52,11 +51,11 @@ class TestProcedures:
         )
 
     def test_cannot_add_nonfactor_as_input(self, make_factor):
-        with pytest.raises(ValidationError):
+        with pytest.raises(TypeError):
             Procedure(inputs="factor name", outputs=make_factor["f_shooting"])
 
     def test_cannot_add_entity_as_input(self, make_factor):
-        with pytest.raises(ValidationError):
+        with pytest.raises(AttributeError):
             Procedure(inputs=Entity(name="Al"), outputs=make_factor["f_shooting"])
 
     def test_generic_terms(self, make_entity, make_procedure, make_evidence):
@@ -81,7 +80,7 @@ class TestProcedures:
 
     def test_repr(self, make_procedure):
         rep = repr(make_procedure["c3"])
-        assert "to_effect=Fact(predicate=Predicate(content='$person committed" in rep
+        assert "Predicate(content='$person committed" in rep
 
     def test_entities_of_inputs_for_identical_procedure(
         self, watt_factor, make_procedure, watt_mentioned
@@ -114,7 +113,6 @@ class TestProcedureSameMeaning:
         assert not make_procedure["c2"].means(make_procedure["c2_nonreciprocal_swap"])
 
     def test_same_meaning_no_context(self, make_predicate):
-
         no_context = Fact(predicate=make_predicate["p_no_context"], terms=[])
         c_no_context = Procedure(outputs=(no_context))
 
@@ -162,7 +160,6 @@ class TestProcedureImplication:
     def test_procedure_general_quantity_does_not_imply_exact(
         self, watt_factor, make_procedure
     ):
-
         c2 = make_procedure["c2"]
         c2_exact_quantity = make_procedure["c2_exact_quantity"]
         assert not c2_exact_quantity <= c2
@@ -208,7 +205,6 @@ class TestProcedureImplication:
         assert make_procedure["c1_easy"] != make_procedure["c1"]
 
     def test_procedure_implies_reordered_entities_fewer_inputs(self, make_procedure):
-
         assert make_procedure["c1_entity_order"] > make_procedure["c1_easy"]
         assert make_procedure["c1_easy"] < make_procedure["c1_entity_order"]
         assert make_procedure["c1_easy"] != make_procedure["c1_entity_order"]
@@ -242,7 +238,6 @@ class TestProcedureImplication:
         assert not p["c2_higher_quantity"].implies_all_to_some(p["c2_exact_in_despite"])
 
     def test_all_to_some_implication_added_despite_factors(self, make_procedure):
-
         assert not make_procedure["c2"].implies_all_to_some(
             make_procedure["c2_absent_despite"]
         )

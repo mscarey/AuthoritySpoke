@@ -9,51 +9,73 @@ interactions:
       Connection:
       - keep-alive
       User-Agent:
-      - python-requests/2.25.1
+      - python-requests/2.31.0
     method: GET
     uri: https://api.case.law/v1/cases/?cite=621+F.3d+205
   response:
     body:
-      string: !!binary |
-        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
+      string: "{\"count\":1,\"next\":null,\"previous\":null,\"results\":[{\"id\":3784332,\"url\":\"https://api.case.law/v1/cases/3784332/\",\"name\":\"UNITED
+        STATES of America, Appellee, v. Mauricio Alfonso MAZZA-ALALUF, Defendant-Appellant\",\"name_abbreviation\":\"United
+        States v. Mazza-Alaluf\",\"decision_date\":\"2010-09-22\",\"docket_number\":\"Docket
+        No. 09-3940-cr\",\"first_page\":\"205\",\"last_page\":\"215\",\"citations\":[{\"type\":\"official\",\"cite\":\"621
+        F.3d 205\"}],\"volume\":{\"url\":\"https://api.case.law/v1/volumes/32044132257692/\",\"volume_number\":\"621\",\"barcode\":\"32044132257692\"},\"reporter\":{\"url\":\"https://api.case.law/v1/reporters/933/\",\"full_name\":\"Federal
+        Reporter 3d Series\",\"id\":933},\"court\":{\"url\":\"https://api.case.law/v1/courts/2d-cir-2/\",\"name_abbreviation\":\"2d
+        Cir.\",\"slug\":\"2d-cir-2\",\"id\":8778,\"name\":\"United States Court of
+        Appeals for the Second Circuit\"},\"jurisdiction\":{\"id\":39,\"name_long\":\"United
+        States\",\"url\":\"https://api.case.law/v1/jurisdictions/us/\",\"slug\":\"us\",\"whitelisted\":false,\"name\":\"U.S.\"},\"cites_to\":[{\"cite\":\"18
+        U.S.C. \xA7 1960\",\"category\":\"laws:leg_statute\",\"reporter\":\"U.S.C.\",\"weight\":15,\"pin_cites\":[{\"page\":\"(b)(1)(A)\"},{\"page\":\"(b)(1)(A)\"},{\"page\":\"(b)(1)(A)\"},{\"page\":\"(b)(1)(B)\"},{\"page\":\"(a)\"},{\"page\":\"(a)\"},{\"page\":\"(b)(1)\"},{\"page\":\"(b)(1)(B)\"},{\"page\":\"(b)(2)\",\"parenthetical\":\"defining
+        \\\"money transmitting\\\" to mean \\\"transferring funds on behalf of the
+        public by any and all means including but not limited to transfers within
+        this country or to locations abroad by wire, check, draft, facsimile, or courier\\\"\"},{\"page\":\"(b)(1)(A)\"},{\"page\":\"(b)(2)\",\"parenthetical\":\"defining
+        \\\"money transmitting\\\" as \\\"transferring funds on behalf of the public
+        by any and all means\\\"\"},{\"page\":\"(b)(1)(A)\"},{\"page\":\"(b)(1)(A)\"}],\"opinion_id\":0},{\"cite\":\"616
+        F.3d 174\",\"category\":\"reporters:federal\",\"reporter\":\"F.3d\",\"case_ids\":[3768074],\"pin_cites\":[{\"page\":\"183\"}],\"opinion_id\":0},{\"cite\":\"531
+        F.3d 163\",\"category\":\"reporters:federal\",\"reporter\":\"F.3d\",\"case_ids\":[5870614],\"pin_cites\":[{\"page\":\"170-71\"}],\"opinion_id\":0},{\"cite\":\"502
+        F.3d 204\",\"category\":\"reporters:federal\",\"reporter\":\"F.3d\",\"case_ids\":[5523220],\"pin_cites\":[{\"page\":\"210\"}],\"opinion_id\":0},{\"cite\":\"551
+        U.S. 338\",\"category\":\"reporters:federal\",\"reporter\":\"U.S.\",\"case_ids\":[3573000],\"weight\":3,\"year\":2007,\"pin_cites\":[{\"page\":\"356\",\"parenthetical\":\"\\\"Sometimes
+        a judicial opinion responds to every argument; sometimes it does not.... The
+        law leaves much, in this respect, to the judge's own professional judgment.\\\"\"},{\"parenthetical\":\"\\\"Sometimes
+        a judicial opinion responds to every argument; sometimes it does not.... The
+        law leaves much, in this respect, to the judge's own professional judgment.\\\"\"},{\"parenthetical\":\"\\\"Sometimes
+        a judicial opinion responds to every argument; sometimes it does not.... The
+        law leaves much, in this respect, to the judge's own professional judgment.\\\"\"}],\"opinion_id\":0},{\"cite\":\"539
+        F.3d 97\",\"category\":\"reporters:federal\",\"reporter\":\"F.3d\",\"case_ids\":[3121455],\"pin_cites\":[{\"page\":\"101\"}],\"opinion_id\":0},{\"cite\":\"485
+        F.3d 674\",\"category\":\"reporters:federal\",\"reporter\":\"F.3d\",\"case_ids\":[4077319],\"pin_cites\":[{\"page\":\"679\"}],\"opinion_id\":0},{\"cite\":\"550
+        F.3d 180\",\"category\":\"reporters:federal\",\"reporter\":\"F.3d\",\"case_ids\":[5741803],\"weight\":3,\"pin_cites\":[{\"page\":\"191\"},{\"page\":\"188-89\"}],\"opinion_id\":0},{\"cite\":\"552
+        U.S. 85\",\"category\":\"reporters:federal\",\"reporter\":\"U.S.\",\"case_ids\":[3675682],\"weight\":3,\"year\":2007,\"pin_cites\":[{\"page\":\"90-91\"}],\"opinion_id\":0},{\"cite\":\"18
+        U.S.C. \xA7 1956\",\"category\":\"laws:leg_statute\",\"reporter\":\"U.S.C.\",\"opinion_id\":0},{\"cite\":\"8
+        U.S.C. \xA7 1182\",\"category\":\"laws:leg_statute\",\"reporter\":\"U.S.C.\",\"weight\":2,\"pin_cites\":[{\"page\":\"(a)(2)(A)(i)(II)\"},{\"page\":\"(a)(2)(I)\"}],\"opinion_id\":0},{\"cite\":\"192
+        F.3d 290\",\"category\":\"reporters:federal\",\"reporter\":\"F.3d\",\"case_ids\":[11568199],\"weight\":3,\"pin_cites\":[{\"page\":\"294\"},{\"page\":\"293\"}],\"opinion_id\":0},{\"cite\":\"475
+        F.3d 468\",\"category\":\"reporters:federal\",\"reporter\":\"F.3d\",\"case_ids\":[3752951],\"opinion_id\":0},{\"cite\":\"602
+        F.3d 492\",\"category\":\"reporters:federal\",\"reporter\":\"F.3d\",\"case_ids\":[3920260],\"weight\":2,\"pin_cites\":[{\"page\":\"494\"},{\"page\":\"494\"}],\"opinion_id\":0},{\"cite\":\"N.Y.
+        Banking Law \xA7 641\",\"category\":\"laws:leg_act\",\"reporter\":\"N.Y.\",\"weight\":2,\"pin_cites\":[{\"page\":\"(1)\"}],\"opinion_id\":0},{\"cite\":\"574
+        F.3d 106\",\"category\":\"reporters:federal\",\"reporter\":\"F.3d\",\"case_ids\":[3676709],\"weight\":4,\"pin_cites\":[{\"page\":\"112\"},{\"page\":\"109\"}],\"opinion_id\":0},{\"cite\":\"511
+        F.3d 324\",\"category\":\"reporters:federal\",\"reporter\":\"F.3d\",\"case_ids\":[4068515],\"pin_cites\":[{\"page\":\"331\"}],\"opinion_id\":0},{\"cite\":\"129
+        S.Ct. 1558\",\"category\":\"reporters:federal\",\"reporter\":\"S. Ct.\",\"case_ids\":[3653414],\"weight\":2,\"year\":2009,\"pin_cites\":[{\"page\":\"1566\",\"parenthetical\":\"noting
+        that \\\"statute should be construed so that effect is given to all its provisions,
+        so that no paid will be inoperative or superfluous, void or insignificant\\\"
+        (internal quotation marks omitted)\"},{\"parenthetical\":\"noting that \\\"statute
+        should be construed so that effect is given to all its provisions, so that
+        no paid will be inoperative or superfluous, void or insignificant\\\" (internal
+        quotation marks omitted)\"}],\"opinion_id\":0},{\"cite\":\"349 F.3d 27\",\"category\":\"reporters:federal\",\"reporter\":\"F.3d\",\"case_ids\":[9064287],\"pin_cites\":[{\"page\":\"36-37\"}],\"opinion_id\":0},{\"cite\":\"604
+        F.3d 673\",\"category\":\"reporters:federal\",\"reporter\":\"F.3d\",\"case_ids\":[6053907],\"pin_cites\":[{\"page\":\"678\"}],\"opinion_id\":0},{\"cite\":\"31
+        U.S.C. \xA7 5313\",\"category\":\"laws:leg_statute\",\"reporter\":\"U.S.C.\",\"opinion_id\":0},{\"cite\":\"617
+        F.3d 103\",\"category\":\"reporters:federal\",\"reporter\":\"F.3d\",\"case_ids\":[3771690],\"pin_cites\":[{\"page\":\"106\"}],\"opinion_id\":0},{\"cite\":\"871
+        F.2d 282\",\"category\":\"reporters:federal\",\"reporter\":\"F.2d\",\"case_ids\":[10528877],\"pin_cites\":[{\"page\":\"284,
+        286\"}],\"opinion_id\":0},{\"cite\":\"224 F.3d 158\",\"category\":\"reporters:federal\",\"reporter\":\"F.3d\",\"case_ids\":[11236128],\"pin_cites\":[{\"page\":\"164\"}],\"opinion_id\":0},{\"cite\":\"443
+        U.S. 307\",\"category\":\"reporters:federal\",\"reporter\":\"U.S.\",\"case_ids\":[6182418],\"weight\":3,\"year\":1979,\"pin_cites\":[{\"page\":\"319\",\"parenthetical\":\"emphasis
+        in Jackson\"},{\"parenthetical\":\"emphasis in Jackson\"},{\"parenthetical\":\"emphasis
+        in Jackson\"}],\"opinion_id\":0},{\"cite\":\"585 F.3d 652\",\"category\":\"reporters:federal\",\"reporter\":\"F.3d\",\"case_ids\":[3480700],\"pin_cites\":[{\"page\":\"656\"}],\"opinion_id\":0},{\"cite\":\"599
+        F.3d 215\",\"category\":\"reporters:federal\",\"reporter\":\"F.3d\",\"case_ids\":[4224029],\"pin_cites\":[{\"page\":\"241\"}],\"opinion_id\":0},{\"cite\":\"18
+        U.S.C. \xA7 3553\",\"category\":\"laws:leg_statute\",\"reporter\":\"U.S.C.\",\"weight\":2,\"pin_cites\":[{\"page\":\"(a)\"},{\"page\":\"(a)(6)\"}],\"opinion_id\":0},{\"cite\":\"31
+        C.F.R. \xA7 103.11\",\"category\":\"laws:admin_compilation\",\"reporter\":\"C.F.R.\",\"weight\":2,\"pin_cites\":[{\"page\":\"(n)\"}],\"opinion_id\":0},{\"cite\":\"31
+        U.S.C. \xA7 5330\",\"category\":\"laws:leg_statute\",\"reporter\":\"U.S.C.\",\"weight\":4,\"pin_cites\":[{\"page\":\"(d)(1)(B)\"},{\"page\":\"(d)(1)(B)\"},{\"page\":\"(d)(1)(B)\"}],\"opinion_id\":0},{\"cite\":\"607
+        F.Supp.2d 484\",\"category\":\"reporters:federal\",\"reporter\":\"F. Supp.
+        2d\",\"case_ids\":[4207056],\"weight\":3,\"pin_cites\":[{\"page\":\"492\"},{\"page\":\"492\"}],\"opinion_id\":0},{\"cite\":\"31
+        U.S.C. \xA7 5312\",\"category\":\"laws:leg_statute\",\"reporter\":\"U.S.C.\",\"weight\":6,\"pin_cites\":[{\"page\":\"(b)(1)\"},{\"page\":\"(b)(1)\"},{\"page\":\"(a)(2)(R)\",\"parenthetical\":\"defining
+        \\\"financial institution\\\" as, inter alicL, \\\"a licensed sender of money
+        or any other person who engages as a business in the transmission of funds\\\"\"}],\"opinion_id\":0},{\"cite\":\"18
+        U.S.C. \xA7\xA7 371\",\"category\":\"laws:leg_statute\",\"reporter\":\"U.S.C.\",\"weight\":2,\"opinion_id\":0}],\"frontend_url\":\"https://cite.case.law/f3d/621/205/\",\"frontend_pdf_url\":\"https://cite.case.law/pdf/3784332/United%20States%20v.%20Mazza-Alaluf,%20621%20F.3d%20205%20(2010).pdf\",\"preview\":[],\"analysis\":{\"word_count\":4287,\"random_bucket\":40336,\"sha256\":\"53ac84a9510f10947599dcb53cb8afc5e348d56725f9a8b092e1057c08770cb3\",\"ocr_confidence\":0.664,\"char_count\":27545,\"random_id\":662085008,\"pagerank\":{\"percentile\":0.9364810458061454,\"raw\":5.019699674842372e-07},\"cardinality\":1091,\"simhash\":\"1:f64ffb73d88dbb62\"},\"last_updated\":\"2024-02-27T16:36:39.463935+00:00\",\"provenance\":{\"date_added\":\"2019-08-29\",\"batch\":\"2018\",\"source\":\"Harvard\"}}]}"
     headers:
       Accept-Ranges:
       - bytes
@@ -66,23 +88,23 @@ interactions:
       CF-Cache-Status:
       - MISS
       CF-RAY:
-      - 6701c8e96a150e4e-DFW
+      - 8861b97f0f3b6c82-DFW
       Cache-Control:
       - s-maxage=86400, max-age=3600
       Connection:
       - keep-alive
       Content-Disposition:
-      - attachment; filename="CAP_2021-07-17 07:33:54.924693.json"
+      - attachment; filename="CAP_2024-05-19 05:35:36.945465.json"
       Content-Encoding:
       - gzip
       Content-Length:
-      - '2196'
+      - '2275'
       Content-Type:
       - application/json
       Date:
-      - Sat, 17 Jul 2021 07:33:54 GMT
-      Expect-CT:
-      - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
+      - Sun, 19 May 2024 05:35:37 GMT
+      Last-Modified:
+      - Sun, 19 May 2024 05:35:37 GMT
       Referrer-Policy:
       - same-origin
       Server:

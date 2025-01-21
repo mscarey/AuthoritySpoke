@@ -1,4 +1,5 @@
 """Functions for saving objects to file after they have been JSON serialized."""
+
 import json
 import pathlib
 
@@ -40,4 +41,4 @@ def case_to_file(
         filename, directory, filepath, default_folder="cases"
     )
     with open(validated_filepath, "w") as fp:
-        fp.write(case.json(indent=4))
+        fp.write(case.model_dump_json(indent=4))

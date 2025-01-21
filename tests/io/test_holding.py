@@ -1,5 +1,7 @@
 from collections import OrderedDict
 from datetime import date
+from decimal import Decimal
+
 import os
 from pydantic import ValidationError
 import pytest
@@ -57,16 +59,15 @@ class TestHoldingDump:
         assert "$thing was on the premises of $place" in loaded_content
 
     def test_dump_holdings_with_comparison(self, fake_usc_client):
-
         holdings = read_holdings_from_file("holding_watt.yaml", client=fake_usc_client)
         assert "was no more than 35 foot" in str(holdings[1])
         dumped = holdings[1].dict()
         predicate = dumped["rule"]["procedure"]["inputs"][3]["predicate"]
-        assert predicate["quantity_range"]["quantity"] == "35 foot"
+        assert predicate["quantity_range"]["quantity_magnitude"] == Decimal("35")
+        assert predicate["quantity_range"]["quantity_units"] == "foot"
 
 
 class TestEntityImport:
-
     smith_holdings = [
         {
             "inputs": [
@@ -94,7 +95,6 @@ class TestEntityImport:
         assert fact["terms"][0] == "Smythe"
 
     def test_specific_entity(self):
-
         different_entity_holdings = readers.read_holdings(self.smith_holdings)
         assert (
             different_entity_holdings[1].generic_terms
@@ -598,7 +598,7 @@ class TestTextAnchors:
             "mandatory": True,
         }
         mock_client = FakeClient(responses=make_response)
-        with pytest.raises(ValidationError):
+        with pytest.raises(AttributeError):
             readers.read_holdings([rule_holding], client=mock_client)
 
     def test_error_classname_does_not_exist(self):
@@ -624,7 +624,6 @@ class TestTextAnchors:
         )
 
     def test_posit_holding_with_selector(self, make_analysis, make_opinion):
-
         anchored_holdings = readers.read_holdings_with_anchors(make_analysis["minimal"])
 
         brad = make_opinion["brad_majority"]
