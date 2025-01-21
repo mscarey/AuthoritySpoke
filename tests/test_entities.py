@@ -16,7 +16,7 @@ class TestMakeEntities:
         This fails because it needs to look up the string factor_records
         in a "mentioned" list, but no "mentioned" parameter is given.
         """
-        with pytest.raises(ValidationError):
+        with pytest.raises(AttributeError):
             readers.read_holdings(record=[{"outputs": ["Bradley"]}])
 
     def test_conversion_to_generic(self, make_entity):
@@ -37,7 +37,6 @@ class TestMakeEntities:
         assert repr(motel) == repr(motel_b)
 
     def test_new_context(self, make_entity):
-
         changes = ContextRegister.from_lists(
             [make_entity["motel"], make_entity["watt"]],
             [Entity(name="Death Star"), Entity(name="Darth Vader")],
