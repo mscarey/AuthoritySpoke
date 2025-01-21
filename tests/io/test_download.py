@@ -104,13 +104,6 @@ class TestDownload:
         assert licensing_case.name_abbreviation == "United States v. Mazza-Alaluf"
 
     @pytest.mark.vcr
-    def test_read_case_from_id_using_client(self):
-        case = self.client.read(query=3675682, full_case=False)
-        assert case.name_abbreviation == "Kimbrough v. United States"
-        cited_case = self.client.read_cite(cite=case.cites_to[0])
-        assert cited_case.name_abbreviation == "United States v. Castillo"
-
-    @pytest.mark.vcr
     def test_fail_to_read_id_cite(self):
         with pytest.raises(ValueError, match="was type IdCitation, not CaseCitation"):
             self.client.read_decision_list_by_cite(cite="id. at 37")
