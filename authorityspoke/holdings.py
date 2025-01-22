@@ -32,7 +32,7 @@ from nettlesome.factors import Factor
 from nettlesome.formatting import indented, wrapped
 from nettlesome.groups import FactorGroup
 
-from pydantic import model_validator, BaseModel, validator
+from pydantic import field_validator, model_validator, BaseModel, validator
 
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule, RawRule
@@ -103,12 +103,10 @@ class Holding(Comparable, BaseModel):
                 values["rule"][field_to_nest] = values.pop(field_to_nest)
         return values
 
-    # TODO[pydantic]: We couldn't refactor the `validator`, please replace it by `field_validator` manually.
-    # Check https://docs.pydantic.dev/dev-v2/migration/#changes-to-validators for more information.
-    @validator("exclusive")
+    @field_validator("exclusive")
     def not_invalid_and_exclusive(cls, v: bool, values) -> bool:
         """Block "exclusive" flag from being used when "rule_valid" is False."""
-        if v and not values["rule_valid"]:
+        if v and not values.data["rule_valid"]:
             raise NotImplementedError(
                 "The ability to state that it is not 'valid' to assert "
                 + "that a Rule is the 'exclusive' way to reach an output is "
@@ -118,20 +116,18 @@ class Holding(Comparable, BaseModel):
             )
         return v
 
-    # TODO[pydantic]: We couldn't refactor the `validator`, please replace it by `field_validator` manually.
-    # Check https://docs.pydantic.dev/dev-v2/migration/#changes-to-validators for more information.
-    @validator("exclusive")
+    @field_validator("exclusive")
     def not_undecided_and_exclusive(cls, v: bool, values) -> bool:
         """Block "exclusive" flag from being used when "decided" is False."""
         if v:
-            if not values["decided"]:
+            if not values.data["decided"]:
                 raise NotImplementedError(
                     "The ability to state that it is not 'decided' whether "
                     + "a Rule is the 'exclusive' way to reach an output is "
                     + "not implemented. Try expressing this in another way "
                     + "without the 'exclusive' keyword."
                 )
-            values["rule"].procedure.valid_for_exclusive_tag()
+            values.data["rule"].procedure.valid_for_exclusive_tag()
         return v
 
     @classmethod

@@ -11,8 +11,7 @@ from pydantic import (
     model_validator,
     ConfigDict,
     BaseModel,
-    ValidationError,
-    validator,
+    ValidationInfo,
 )
 from slugify import slugify
 
@@ -134,13 +133,11 @@ class Fact(Factor, BaseModel):
                         break
         return values
 
-    # TODO[pydantic]: We couldn't refactor the `validator`, please replace it by `field_validator` manually.
-    # Check https://docs.pydantic.dev/dev-v2/migration/#changes-to-validators for more information.
-    @validator("terms", pre=True)
-    def terms_as_sequence(cls, v, values) -> Sequence[Any]:
+    @field_validator("terms", mode="before")
+    def terms_as_sequence(cls, v, values: ValidationInfo) -> Sequence[Any]:
         """Convert "terms" field to a sequence."""
         if isinstance(v, Mapping):
-            v = values["predicate"].template.get_term_sequence_from_mapping(v)
+            v = values.data["predicate"].template.get_term_sequence_from_mapping(v)
         if not v:
             v = []
         elif isinstance(v, Term):
@@ -192,23 +189,21 @@ class Fact(Factor, BaseModel):
         """Access :attr:`~Predicate.truth` attribute."""
         return self.predicate.truth
 
-    # TODO[pydantic]: We couldn't refactor the `validator`, please replace it by `field_validator` manually.
-    # Check https://docs.pydantic.dev/dev-v2/migration/#changes-to-validators for more information.
-    @validator("terms")
-    def _validate_terms(cls, v, values, **kwargs):
+    @field_validator("terms")
+    def _validate_terms(cls, v, values: ValidationInfo, **kwargs):
         """Normalize ``terms`` to initialize Statement."""
 
         # make TermSequence for validation, then ignore it
         TermSequence.validate_terms(v)
 
-        if values.get("predicate") is None:
+        if values.data.get("predicate") is None:
             raise ValueError("Predicate field is required.")
 
-        if len(v) != len(values["predicate"]):
+        if len(v) != len(values.data["predicate"]):
             message = (
                 "The number of items in 'terms' must be "
-                + f"{len(values['predicate'])}, not {len(v)}, "
-                + f"to match predicate.context_slots for '{values['predicate']}'"
+                + f"{len(values.data['predicate'])}, not {len(v)}, "
+                + f"to match predicate.context_slots for '{values.data['predicate']}'"
             )
             raise ValueError(message)
         return v
