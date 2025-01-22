@@ -86,7 +86,6 @@ class Fact(Factor, BaseModel):
         Union[Entity, "Fact", "Allegation", "Pleading", "Exhibit", "Evidence"]
     ] = []
     name: str = ""
-    absent: bool = False
     generic: bool = False
     standard_of_proof: Optional[str] = None
     standards_of_proof: ClassVar[Tuple[str, ...]] = (
@@ -474,7 +473,6 @@ class Exhibit(Factor, BaseModel):
     statement: Optional[Fact] = None
     statement_attribution: Optional[Entity] = None
     name: Optional[str] = None
-    absent: bool = False
     generic: bool = False
     context_factor_names: ClassVar[Tuple[str, ...]] = (
         "statement",
@@ -555,7 +553,6 @@ class Evidence(Factor, BaseModel):
     exhibit: Optional[Exhibit] = None
     to_effect: Optional[Fact] = None
     name: Optional[str] = None
-    absent: bool = False
     generic: bool = False
     context_factor_names: ClassVar[Tuple[str, ...]] = ("exhibit", "to_effect")
     model_config = ConfigDict(extra="forbid")
@@ -608,7 +605,6 @@ class Pleading(Factor, BaseModel):
 
     filer: Entity
     name: Optional[str] = None
-    absent: bool = False
     generic: bool = False
     context_factor_names: ClassVar[Tuple[str]] = ("filer",)
 
@@ -628,7 +624,7 @@ class Allegation(Factor, BaseModel):
         a :class:`Fact` being alleged
 
     :param pleading:
-        the :class:`Pleading` in where the allegation appears
+        the :class:`Pleading` where the allegation appears
 
     :param name:
 
@@ -640,7 +636,6 @@ class Allegation(Factor, BaseModel):
     fact: Fact
     pleading: Optional[Pleading] = None
     name: Optional[str] = None
-    absent: bool = False
     generic: bool = False
     context_factor_names: ClassVar[Tuple[str, ...]] = ("fact", "pleading")
 

@@ -85,7 +85,6 @@ class Rule(Comparable, BaseModel):
     mandatory: bool = False
     universal: bool = False
     generic: bool = False
-    absent: bool = False
     name: Optional[str] = None
     context_factor_names: ClassVar[Tuple[str, ...]] = ("procedure",)
     enactment_attr_names: ClassVar[Tuple[str, ...]] = (

@@ -80,7 +80,6 @@ class Holding(Comparable, BaseModel):
     decided: bool = True
     exclusive: bool = False
     generic: bool = False
-    absent: bool = False
 
     @model_validator(mode="before")
     @classmethod
