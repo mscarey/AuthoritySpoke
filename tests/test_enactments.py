@@ -245,13 +245,13 @@ class TestDump:
 
     def test_dump_json(self, fake_beard_client):
         provision = fake_beard_client.read_from_json({"node": "/test/acts/47/6A"})
-        dumped_provision = provision.json()
+        dumped_provision = provision.model_dump_json()
         assert '"node":"/test/acts/47/6A"' in dumped_provision
 
     @pytest.mark.vcr
     def test_round_trip_dict(self, fake_beard_client):
         provision = fake_beard_client.read_from_json({"node": "/test/acts/47/6A"})
-        dumped_provision = provision.dict()
+        dumped_provision = provision.model_dump()
         new = Enactment(**dumped_provision)
         assert new.node == "/test/acts/47/6A"
 

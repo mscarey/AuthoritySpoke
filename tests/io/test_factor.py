@@ -42,7 +42,7 @@ class TestEntityLoad:
         record = {"name": "John Adams"}
         john = Entity(**record)
         assert john.generic is True
-        john_dict = john.dict()
+        john_dict = john.model_dump()
         assert john_dict["generic"] is True
 
 
@@ -129,7 +129,7 @@ class TestFactorLoad:
 
 class TestFactDump:
     def test_dump_with_quantity(self, watt_factor):
-        f8_dict = watt_factor["f8"].dict()
+        f8_dict = watt_factor["f8"].model_dump()
         assert f8_dict["predicate"]["quantity_range"]["quantity_units"] == "foot"
         assert f8_dict["predicate"]["quantity_range"]["quantity_magnitude"] == Decimal(
             "20"
@@ -137,7 +137,7 @@ class TestFactDump:
 
     def test_dump_complex_fact(self, make_complex_fact):
         relevant_fact = make_complex_fact["f_relevant_murder"]
-        relevant_dict = relevant_fact.dict()
+        relevant_dict = relevant_fact.model_dump()
         shooting_dict = relevant_dict["terms"][0]
         assert shooting_dict["terms"][0]["name"] == "Alice"
 
@@ -168,12 +168,12 @@ class TestExhibitLoad:
 class TestExhibitDump:
     def test_dump_exhibit(self, make_exhibit):
         exhibit = make_exhibit["shooting_affidavit"]
-        dumped = exhibit.dict()
+        dumped = exhibit.model_dump()
         assert dumped["statement"]["terms"][0]["name"] == "Alice"
 
     def test_dump_and_load_exhibit(self, make_exhibit):
         exhibit = make_exhibit["no_shooting_entity_order_testimony"]
-        dumped = exhibit.dict()
+        dumped = exhibit.model_dump()
         loaded = Exhibit(**dumped)
         assert loaded.form == "testimony"
         assert loaded.statement_attribution.name == "Bob"
@@ -189,7 +189,7 @@ class TestEvidenceLoad:
 class TestEvidenceDump:
     def test_dump_evidence(self, make_evidence):
         evidence = make_evidence["shooting"]
-        dumped = evidence.dict()
+        dumped = evidence.model_dump()
         assert dumped["exhibit"]["statement_attribution"]["name"] == "Alice"
 
 
@@ -202,12 +202,12 @@ class TestPleading:
 class TestPleadingDump:
     def test_dump_pleading(self, make_pleading):
         pleading = make_pleading["craig"]
-        dumped = pleading.dict()
+        dumped = pleading.model_dump()
         assert dumped["filer"]["name"] == "Craig"
 
 
 class TestAllegationDump:
     def test_dump_allegation(self, make_allegation):
         allegation = make_allegation["shooting"]
-        dumped = allegation.dict()
+        dumped = allegation.model_dump()
         assert dumped["fact"]["terms"][0]["name"] == "Alice"

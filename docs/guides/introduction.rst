@@ -328,10 +328,10 @@ the :class:`~authorityspoke.holdings.Holding`\.
           "Copyright protection subsists, in accordance with this title, in original works of authorship fixed in any tangible medium of expression, now known or later developed, from which they can be perceived, reproduced, or otherwise communicated, either directly or with the aid of a machine or device.…" (/us/usc/t17/s102/a 2013-07-18)
 
 You can also convert Holdings back to JSON, or to a Python dictionary,
-using the ``.dict()`` or ``.json()`` methods.
+using the ``.model_dump()`` or ``.model_dump_json()`` methods.
 
     >>> from pprint import pprint
-    >>> pprint(oracle_holdings[0].dict()["rule"]["procedure"]["outputs"])
+    >>> pprint(oracle_holdings[0].model_dump()["rule"]["procedure"]["outputs"])
     [{'absent': False,
       'generic': False,
       'name': 'false the Java API was copyrightable',

@@ -40,7 +40,7 @@ class TestHoldingDump:
     def test_dump_and_read_holding(self, fake_usc_client, make_holding):
         """Dump holding and read it as if it came from YAML."""
         holding = make_holding["h2"]
-        dumped = holding.dict()
+        dumped = holding.model_dump()
         content = dumped["rule"]["procedure"]["inputs"][0]["predicate"]["content"]
         assert content == "$thing was on the premises of $place"
 
@@ -51,7 +51,7 @@ class TestHoldingDump:
     def test_dump_and_load_holding(self, fake_usc_client, make_holding):
         """Dump holding and load it as if it was a JSON API response."""
         holding = make_holding["h2"]
-        dumped = holding.dict()
+        dumped = holding.model_dump()
         content = dumped["rule"]["procedure"]["inputs"][1]["predicate"]["content"]
         assert content == "$thing was a stockpile of Christmas trees"
         loaded = Holding(**dumped)
@@ -61,7 +61,7 @@ class TestHoldingDump:
     def test_dump_holdings_with_comparison(self, fake_usc_client):
         holdings = read_holdings_from_file("holding_watt.yaml", client=fake_usc_client)
         assert "was no more than 35 foot" in str(holdings[1])
-        dumped = holdings[1].dict()
+        dumped = holdings[1].model_dump()
         predicate = dumped["rule"]["procedure"]["inputs"][3]["predicate"]
         assert predicate["quantity_range"]["quantity_magnitude"] == Decimal("35")
         assert predicate["quantity_range"]["quantity_units"] == "foot"

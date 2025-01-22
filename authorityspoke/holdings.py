@@ -650,10 +650,7 @@ class Holding(Comparable, BaseModel):
             else ("ACCEPT" if self.rule_valid else "REJECT")
         )
         exclusive = (
-            (
-                f" that the EXCLUSIVE way to reach "
-                f"{self.rule.outputs[0].short_string} is"
-            )
+            (f" that the EXCLUSIVE way to reach {self.rule.outputs[0].short_string} is")
             if self.exclusive
             else ""
         )

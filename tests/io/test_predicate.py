@@ -86,14 +86,14 @@ class TestPredicateDump:
             sign="<>",
             expression=Q_("35 feet"),
         )
-        dumped = predicate.dict()
+        dumped = predicate.model_dump()
         assert dumped["quantity_range"]["quantity_magnitude"] == Decimal("35")
 
     def test_round_trip(self):
         statement = Comparison(
             **{"content": "{}'s favorite number was", "expression": 42}
         )
-        dumped = statement.dict()
+        dumped = statement.model_dump()
         new_statement = Comparison(**dumped)
         assert "{}'s favorite number was exactly equal to 42" in str(new_statement)
 
@@ -103,5 +103,5 @@ class TestPredicateDump:
             sign=">=",
             expression=date(1978, 1, 1),
         )
-        dumped = copyright_date_range.dict()
+        dumped = copyright_date_range.model_dump()
         assert dumped["quantity_range"]["quantity"] == date(1978, 1, 1)

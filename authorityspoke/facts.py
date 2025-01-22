@@ -672,8 +672,8 @@ class Allegation(Factor, BaseModel):
         return super().__str__().format(string).replace("Allegation", "allegation")
 
 
-Fact.update_forward_refs()
-Exhibit.update_forward_refs()
-Evidence.update_forward_refs()
-Allegation.update_forward_refs()
-Pleading.update_forward_refs()
+Fact.model_rebuild()
+Exhibit.model_rebuild()
+Evidence.model_rebuild()
+Allegation.model_rebuild()
+Pleading.model_rebuild()
