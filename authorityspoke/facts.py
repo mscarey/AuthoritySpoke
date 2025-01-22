@@ -6,7 +6,13 @@ import operator
 from typing import Any, ClassVar, Dict, Iterator, List
 from typing import Mapping, Optional, Sequence, Tuple, Union
 
-from pydantic import BaseModel, Extra, ValidationError, validator, root_validator
+from pydantic import (
+    field_validator,
+    model_validator,
+    ConfigDict,
+    BaseModel,
+    ValidationInfo,
+)
 from slugify import slugify
 
 from nettlesome.entities import Entity
@@ -80,7 +86,6 @@ class Fact(Factor, BaseModel):
         Union[Entity, "Fact", "Allegation", "Pleading", "Exhibit", "Evidence"]
     ] = []
     name: str = ""
-    absent: bool = False
     generic: bool = False
     standard_of_proof: Optional[str] = None
     standards_of_proof: ClassVar[Tuple[str, ...]] = (
@@ -90,13 +95,10 @@ class Fact(Factor, BaseModel):
         "clear and convincing",
         "beyond reasonable doubt",
     )
+    model_config = ConfigDict(extra="forbid")
 
-    class Config:
-        """Fail validation if the input data has data not specified in the model."""
-
-        extra = Extra.forbid
-
-    @root_validator(pre=True)
+    @model_validator(mode="before")
+    @classmethod
     def nest_predicate_fields(cls, values):
         """Move fields passed to the Fact model that really belong to the Predicate model."""
         if isinstance(values, dict):
@@ -130,11 +132,11 @@ class Fact(Factor, BaseModel):
                         break
         return values
 
-    @validator("terms", pre=True)
-    def terms_as_sequence(cls, v, values) -> Sequence[Any]:
+    @field_validator("terms", mode="before")
+    def terms_as_sequence(cls, v, values: ValidationInfo) -> Sequence[Any]:
         """Convert "terms" field to a sequence."""
         if isinstance(v, Mapping):
-            v = values["predicate"].template.get_term_sequence_from_mapping(v)
+            v = values.data["predicate"].template.get_term_sequence_from_mapping(v)
         if not v:
             v = []
         elif isinstance(v, Term):
@@ -186,21 +188,21 @@ class Fact(Factor, BaseModel):
         """Access :attr:`~Predicate.truth` attribute."""
         return self.predicate.truth
 
-    @validator("terms")
-    def _validate_terms(cls, v, values, **kwargs):
+    @field_validator("terms")
+    def _validate_terms(cls, v, values: ValidationInfo, **kwargs):
         """Normalize ``terms`` to initialize Statement."""
 
         # make TermSequence for validation, then ignore it
         TermSequence.validate_terms(v)
 
-        if values.get("predicate") is None:
+        if values.data.get("predicate") is None:
             raise ValueError("Predicate field is required.")
 
-        if len(v) != len(values["predicate"]):
+        if len(v) != len(values.data["predicate"]):
             message = (
                 "The number of items in 'terms' must be "
-                + f"{len(values['predicate'])}, not {len(v)}, "
-                + f"to match predicate.context_slots for '{values['predicate']}'"
+                + f"{len(values.data['predicate'])}, not {len(v)}, "
+                + f"to match predicate.context_slots for '{values.data['predicate']}'"
             )
             raise ValueError(message)
         return v
@@ -215,7 +217,8 @@ class Fact(Factor, BaseModel):
             text += "\n" + indented(f"by the STANDARD {self.standard_of_proof}")
         return text
 
-    @validator("standard_of_proof")
+    @field_validator("standard_of_proof")
+    @classmethod
     def validate_standard_of_proof(cls, v: Optional[str]) -> Optional[str]:
         """
         Validate that standard of proof is one of the allowable values.
@@ -470,7 +473,6 @@ class Exhibit(Factor, BaseModel):
     statement: Optional[Fact] = None
     statement_attribution: Optional[Entity] = None
     name: Optional[str] = None
-    absent: bool = False
     generic: bool = False
     context_factor_names: ClassVar[Tuple[str, ...]] = (
         "statement",
@@ -551,16 +553,12 @@ class Evidence(Factor, BaseModel):
     exhibit: Optional[Exhibit] = None
     to_effect: Optional[Fact] = None
     name: Optional[str] = None
-    absent: bool = False
     generic: bool = False
     context_factor_names: ClassVar[Tuple[str, ...]] = ("exhibit", "to_effect")
+    model_config = ConfigDict(extra="forbid")
 
-    class Config:
-        """Fail validation if the input data has data not specified in the model."""
-
-        extra = Extra.forbid
-
-    @root_validator(pre=True)
+    @model_validator(mode="before")
+    @classmethod
     def check_type_field(cls, values):
         """Fail valitation if the input has a "type" field without the class name."""
         type_str = values.pop("type", "")
@@ -607,7 +605,6 @@ class Pleading(Factor, BaseModel):
 
     filer: Entity
     name: Optional[str] = None
-    absent: bool = False
     generic: bool = False
     context_factor_names: ClassVar[Tuple[str]] = ("filer",)
 
@@ -627,7 +624,7 @@ class Allegation(Factor, BaseModel):
         a :class:`Fact` being alleged
 
     :param pleading:
-        the :class:`Pleading` in where the allegation appears
+        the :class:`Pleading` where the allegation appears
 
     :param name:
 
@@ -639,7 +636,6 @@ class Allegation(Factor, BaseModel):
     fact: Fact
     pleading: Optional[Pleading] = None
     name: Optional[str] = None
-    absent: bool = False
     generic: bool = False
     context_factor_names: ClassVar[Tuple[str, ...]] = ("fact", "pleading")
 
@@ -666,8 +662,8 @@ class Allegation(Factor, BaseModel):
         return super().__str__().format(string).replace("Allegation", "allegation")
 
 
-Fact.update_forward_refs()
-Exhibit.update_forward_refs()
-Evidence.update_forward_refs()
-Allegation.update_forward_refs()
-Pleading.update_forward_refs()
+Fact.model_rebuild()
+Exhibit.model_rebuild()
+Evidence.model_rebuild()
+Allegation.model_rebuild()
+Pleading.model_rebuild()

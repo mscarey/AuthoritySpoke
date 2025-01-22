@@ -249,7 +249,7 @@ shows how to generate the schema as a Python dict and then view just the
 "properties" field for the Holding model.
 
     >>> from authorityspoke.holdings import Holding
-    >>> schema = Holding.schema()
+    >>> schema = Holding.model_json_schema()
     >>> schema["properties"]
     {'generic': {'default': False, 'title': 'Generic', 'type': 'boolean'}, 'absent': {'default': False, 'title': 'Absent', 'type': 'boolean'}, 'rule': {'$ref': '#/$defs/Rule'}, 'rule_valid': {'default': True, 'title': 'Rule Valid', 'type': 'boolean'}, 'decided': {'default': True, 'title': 'Decided', 'type': 'boolean'}, 'exclusive': {'default': False, 'title': 'Exclusive', 'type': 'boolean'}}
 

@@ -43,5 +43,5 @@ setuptools.setup(
         "roman",
         "sympy>=1.7.1",
     ],
-    python_requires=">=3.8",
+    python_requires=">=3.11",
 )

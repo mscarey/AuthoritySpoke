@@ -32,7 +32,7 @@ from nettlesome.factors import Factor
 from nettlesome.formatting import indented, wrapped
 from nettlesome.groups import FactorGroup
 
-from pydantic import BaseModel, root_validator, validator
+from pydantic import field_validator, model_validator, BaseModel, validator
 
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule, RawRule
@@ -80,9 +80,9 @@ class Holding(Comparable, BaseModel):
     decided: bool = True
     exclusive: bool = False
     generic: bool = False
-    absent: bool = False
 
-    @root_validator(pre=True)
+    @model_validator(mode="before")
+    @classmethod
     def nest_factor_fields(cls, values):
         """Move misplaced fields that belong on Rule or Predicate models."""
         for field_name in ["inputs", "outputs", "despite"]:
@@ -102,10 +102,10 @@ class Holding(Comparable, BaseModel):
                 values["rule"][field_to_nest] = values.pop(field_to_nest)
         return values
 
-    @validator("exclusive")
+    @field_validator("exclusive")
     def not_invalid_and_exclusive(cls, v: bool, values) -> bool:
         """Block "exclusive" flag from being used when "rule_valid" is False."""
-        if v and not values["rule_valid"]:
+        if v and not values.data["rule_valid"]:
             raise NotImplementedError(
                 "The ability to state that it is not 'valid' to assert "
                 + "that a Rule is the 'exclusive' way to reach an output is "
@@ -115,18 +115,18 @@ class Holding(Comparable, BaseModel):
             )
         return v
 
-    @validator("exclusive")
+    @field_validator("exclusive")
     def not_undecided_and_exclusive(cls, v: bool, values) -> bool:
         """Block "exclusive" flag from being used when "decided" is False."""
         if v:
-            if not values["decided"]:
+            if not values.data["decided"]:
                 raise NotImplementedError(
                     "The ability to state that it is not 'decided' whether "
                     + "a Rule is the 'exclusive' way to reach an output is "
                     + "not implemented. Try expressing this in another way "
                     + "without the 'exclusive' keyword."
                 )
-            values["rule"].procedure.valid_for_exclusive_tag()
+            values.data["rule"].procedure.valid_for_exclusive_tag()
         return v
 
     @classmethod
@@ -645,10 +645,7 @@ class Holding(Comparable, BaseModel):
             else ("ACCEPT" if self.rule_valid else "REJECT")
         )
         exclusive = (
-            (
-                f" that the EXCLUSIVE way to reach "
-                f"{self.rule.outputs[0].short_string} is"
-            )
+            (f" that the EXCLUSIVE way to reach {self.rule.outputs[0].short_string} is")
             if self.exclusive
             else ""
         )
