@@ -11,7 +11,7 @@ from copy import deepcopy
 from typing import Any, ClassVar, Dict, Iterator
 from typing import Optional, Sequence, Tuple, Union
 
-from pydantic import BaseModel, ValidationError
+from pydantic import field_validator, BaseModel, ValidationError
 from pydantic.class_validators import validator
 
 from legislice.enactments import Enactment, EnactmentPassage
@@ -93,7 +93,8 @@ class Rule(Comparable, BaseModel):
         "enactments_despite",
     )
 
-    @validator("enactments", "enactments_despite", pre=True)
+    @field_validator("enactments", "enactments_despite", mode="before")
+    @classmethod
     def validate_enactment_groups(
         cls,
         v: Union[Dict, EnactmentPassage, Sequence[EnactmentPassage], EnactmentGroup],
@@ -111,7 +112,8 @@ class Rule(Comparable, BaseModel):
                     v = EnactmentGroup(passages=[v])
         return v
 
-    @validator("enactments", "enactments_despite", pre=False)
+    @field_validator("enactments", "enactments_despite")
+    @classmethod
     def select_enactment_text(cls, v: EnactmentGroup) -> EnactmentGroup:
         """For Enactments with no text selection, select all text."""
         for enactment in v:

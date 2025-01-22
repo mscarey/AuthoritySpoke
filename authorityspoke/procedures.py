@@ -13,7 +13,7 @@ from itertools import chain
 from typing import ClassVar, Dict, Iterable, Iterator
 from typing import List, Optional, Sequence, Tuple, Union
 
-from pydantic import BaseModel, validator
+from pydantic import field_validator, BaseModel
 
 from nettlesome.terms import (
     Comparable,
@@ -110,7 +110,8 @@ class Procedure(Comparable, BaseModel):
         """Get input, output, and despite Factors as FactorGroups."""
         return [self.outputs_group, self.inputs_group, self.despite_group]
 
-    @validator("outputs", pre=True)
+    @field_validator("outputs", mode="before")
+    @classmethod
     def _validate_outputs(cls, v: Union[Factor, Sequence[Factor]]) -> List[Factor]:
         if not v:
             raise ValueError("Procedure must have at least one output")
@@ -120,7 +121,8 @@ class Procedure(Comparable, BaseModel):
             raise TypeError("outputs of Procedure cannot be type str")
         return list(v)
 
-    @validator("inputs", "despite", pre=True)
+    @field_validator("inputs", "despite", mode="before")
+    @classmethod
     def _validate_factor_groups(
         cls, v: Union[Factor, Sequence[Factor]]
     ) -> List[Factor]:

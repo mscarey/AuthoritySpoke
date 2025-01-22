@@ -17,7 +17,7 @@ from justopinion import Opinion
 from legislice.enactments import EnactmentPassage
 from nettlesome.terms import Comparable, ContextRegister, Explanation, Term
 from nettlesome.factors import Factor
-from pydantic import BaseModel, validator
+from pydantic import field_validator, BaseModel
 
 from authorityspoke.facts import Entity, Fact, Allegation, Pleading, Exhibit, Evidence
 from authorityspoke.holdings import Holding, HoldingGroup
@@ -34,7 +34,8 @@ class EnactmentWithAnchors(BaseModel):
     passage: EnactmentPassage
     anchors: TextPositionSet = TextPositionSet()
 
-    @validator("anchors", pre=True)
+    @field_validator("anchors", mode="before")
+    @classmethod
     def validate_anchors(cls, value: TextPositionSet) -> TextPositionSet:
         """Validate that the anchors are non-empty."""
 
@@ -49,7 +50,8 @@ class TermWithAnchors(BaseModel):
     term: Union[Entity, Fact, Allegation, Pleading, Exhibit, Evidence]
     anchors: TextPositionSet = TextPositionSet()
 
-    @validator("anchors", pre=True)
+    @field_validator("anchors", mode="before")
+    @classmethod
     def validate_anchors(cls, value: TextPositionSet) -> TextPositionSet:
         """Validate that the anchors are non-empty."""
 
@@ -64,7 +66,8 @@ class HoldingWithAnchors(BaseModel):
     holding: Holding
     anchors: TextPositionSet = TextPositionSet()
 
-    @validator("anchors", pre=True)
+    @field_validator("anchors", mode="before")
+    @classmethod
     def validate_anchors(cls, value: TextPositionSet) -> TextPositionSet:
         """Validate that the anchors are non-empty."""
         if value is None:

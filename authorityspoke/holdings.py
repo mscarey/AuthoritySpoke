@@ -32,7 +32,7 @@ from nettlesome.factors import Factor
 from nettlesome.formatting import indented, wrapped
 from nettlesome.groups import FactorGroup
 
-from pydantic import BaseModel, root_validator, validator
+from pydantic import model_validator, BaseModel, validator
 
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule, RawRule
@@ -82,7 +82,8 @@ class Holding(Comparable, BaseModel):
     generic: bool = False
     absent: bool = False
 
-    @root_validator(pre=True)
+    @model_validator(mode="before")
+    @classmethod
     def nest_factor_fields(cls, values):
         """Move misplaced fields that belong on Rule or Predicate models."""
         for field_name in ["inputs", "outputs", "despite"]:
@@ -102,6 +103,8 @@ class Holding(Comparable, BaseModel):
                 values["rule"][field_to_nest] = values.pop(field_to_nest)
         return values
 
+    # TODO[pydantic]: We couldn't refactor the `validator`, please replace it by `field_validator` manually.
+    # Check https://docs.pydantic.dev/dev-v2/migration/#changes-to-validators for more information.
     @validator("exclusive")
     def not_invalid_and_exclusive(cls, v: bool, values) -> bool:
         """Block "exclusive" flag from being used when "rule_valid" is False."""
@@ -115,6 +118,8 @@ class Holding(Comparable, BaseModel):
             )
         return v
 
+    # TODO[pydantic]: We couldn't refactor the `validator`, please replace it by `field_validator` manually.
+    # Check https://docs.pydantic.dev/dev-v2/migration/#changes-to-validators for more information.
     @validator("exclusive")
     def not_undecided_and_exclusive(cls, v: bool, values) -> bool:
         """Block "exclusive" flag from being used when "decided" is False."""
