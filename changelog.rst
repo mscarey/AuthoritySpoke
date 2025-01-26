@@ -1,5 +1,20 @@
 Changelog
 =========
+0.10.0 (2025-01-26)
+------------------
+* bump eyecite~=2.6.3
+* bump lxml>=4.9.1
+* "generic" param defaults to False for Reading classes
+* ignore dirs in pytest.ini
+* let models inherit "absent" field
+* pin justopinion==0.4.0
+* pin legislice==0.8.1
+* update github workflow
+* update tests to use CourtListener API
+* use pydantic 2 field_validator and model_json_schema
+* use ValueError instead of pydantic ValidationError
+* validate_enactment_groups returns early if v is falsy
+
 0.9.1 (2022-07-15)
 ------------------
 * update eyecite and lxml dependencies to avoid Python 3.10 build error

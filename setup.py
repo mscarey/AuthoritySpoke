@@ -5,7 +5,7 @@ with open("README.rst", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="AuthoritySpoke",
-    version="0.9.1",
+    version="0.10.0",
     author="Matthew Carey",
     author_email="matt@authorityspoke.com",
     description="legal authority automation",

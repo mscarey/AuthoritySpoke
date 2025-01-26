@@ -19,11 +19,11 @@ sys.path.insert(0, os.path.abspath(".."))
 # -- Project information -----------------------------------------------------
 
 project = "AuthoritySpoke"
-copyright = "2019-2022, Matthew Carey"
+copyright = "2019-2025, Matthew Carey"
 author = "Matthew Carey"
 
 # The full version, including alpha/beta/rc tags
-release = "0.9.1"
+release = "0.10.0"
 
 
 # -- General configuration ---------------------------------------------------
