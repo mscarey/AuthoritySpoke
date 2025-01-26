@@ -1,7 +1,7 @@
 lxml>=4.9.1
 anchorpoint>=0.7.0
 eyecite>=2.4.0
-git+https://github.com/mscarey/justopinion.git@cl-client
+justopinion==0.4.0
 legislice==0.8.1
 nettlesome==0.7.1
 pint>=0.15
