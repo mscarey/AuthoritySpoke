@@ -1,4 +1,3 @@
-black
 coveralls
 doc8
 flake8-comprehensions

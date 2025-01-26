@@ -16,7 +16,7 @@ from pydantic import (
 from slugify import slugify
 
 from nettlesome.entities import Entity
-from nettlesome.factors import Factor
+from nettlesome.factors import Factor, AbsenceOf
 from nettlesome.formatting import indented, wrapped
 from nettlesome.terms import (
     Comparable,
@@ -370,7 +370,7 @@ def build_fact(
     standard_of_proof: Optional[str] = None,
     absent: bool = False,
     generic: bool = False,
-):
+) -> Fact | AbsenceOf:
     r"""
     Build a :class:`.Fact` with generics selected from a list.
 
@@ -418,14 +418,16 @@ def build_fact(
         wrapped_factors = list(case_factors)
 
     terms = [wrapped_factors[i] for i in indices]
-    return Fact(
+    result = Fact(
         predicate=predicate,
         terms=terms,
         name=name or "",
         standard_of_proof=standard_of_proof,
-        absent=absent,
         generic=generic,
     )
+    if absent:
+        result = AbsenceOf(absent=result)
+    return result
 
 
 class Exhibit(Factor, BaseModel):
@@ -560,7 +562,7 @@ class Evidence(Factor, BaseModel):
     @model_validator(mode="before")
     @classmethod
     def check_type_field(cls, values):
-        """Fail valitation if the input has a "type" field without the class name."""
+        """Fail validation if the input has a "type" field without the class name."""
         type_str = values.pop("type", "")
         if type_str and type_str.lower() != "evidence":
             raise ValueError(f"type {type_str} was passed to Evidence model")

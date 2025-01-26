@@ -11,7 +11,7 @@ from legislice.enactments import Enactment
 
 from nettlesome.terms import ContextRegister
 from nettlesome.entities import Entity
-from nettlesome.factors import Factor
+from nettlesome.factors import Factor, AbsenceOf
 from nettlesome.predicates import Predicate
 from nettlesome.quantities import Comparison, Q_
 import pytest
@@ -233,7 +233,6 @@ def make_entity() -> Dict[str, Entity]:
 
 @pytest.fixture(scope="class")
 def make_predicate() -> Dict[str, Predicate]:
-
     return {
         "p1": Predicate(content="$place was a motel"),
         "p1_again": Predicate(content="$place was a motel"),
@@ -423,7 +422,9 @@ def watt_mentioned(make_entity) -> Tuple[Entity, ...]:
 
 
 @pytest.fixture(scope="class")
-def watt_factor(make_predicate, make_entity, watt_mentioned) -> Dict[str, Factor]:
+def watt_factor(
+    make_predicate, make_entity, watt_mentioned
+) -> Dict[str, AbsenceOf | Factor]:
     p = make_predicate
 
     c = watt_mentioned
@@ -823,7 +824,7 @@ def make_complex_rule(
 @pytest.fixture(scope="class")
 def make_evidence(
     make_predicate, make_factor, watt_factor, make_exhibit
-) -> Dict[str, Evidence]:
+) -> Dict[str, AbsenceOf | Evidence]:
     p = make_predicate
     f = make_factor
     w = watt_factor
@@ -834,8 +835,10 @@ def make_evidence(
         "no_shooting": Evidence(
             exhibit=x["no_shooting_testimony"], to_effect=f["f_no_crime"]
         ),
-        "no_shooting_absent": Evidence(
-            exhibit=x["no_shooting_testimony"], to_effect=f["f_no_crime"], absent=True
+        "no_shooting_absent": AbsenceOf(
+            absent=Evidence(
+                exhibit=x["no_shooting_testimony"], to_effect=f["f_no_crime"]
+            )
         ),
         "no_shooting_entity_order": Evidence(
             exhibit=x["no_shooting_entity_order_testimony"],
@@ -845,10 +848,11 @@ def make_evidence(
             exhibit=x["no_shooting_witness_unknown_testimony"],
             to_effect=f["f_no_crime"],
         ),
-        "no_shooting_witness_unknown_absent": Evidence(
-            exhibit=x["no_shooting_witness_unknown_testimony"],
-            to_effect=f["f_no_crime"],
-            absent=True,
+        "no_shooting_witness_unknown_absent": AbsenceOf(
+            absent=Evidence(
+                exhibit=x["no_shooting_witness_unknown_testimony"],
+                to_effect=f["f_no_crime"],
+            )
         ),
         # Here the Exhibit is absent, not the Evidence. Pointless distinction?
         "no_shooting_witness_unknown_absent_exhibit": Evidence(
@@ -868,15 +872,16 @@ def make_evidence(
         "crime": Evidence(
             exhibit=x["generic_exhibit"], to_effect=f["f_watt_crime"], generic=True
         ),
-        "crime_absent": Evidence(
-            exhibit=x["generic_exhibit"],
-            to_effect=f["f_watt_crime"],
-            absent=True,
-            generic=True,
+        "crime_absent": AbsenceOf(
+            absent=Evidence(
+                exhibit=x["generic_exhibit"],
+                to_effect=f["f_watt_crime"],
+                generic=True,
+            )
         ),
         "generic": Evidence(exhibit=x["generic_exhibit"], generic=True),
-        "generic_absent": Evidence(
-            exhibit=x["generic_exhibit"], absent=True, generic=True
+        "generic_absent": AbsenceOf(
+            absent=Evidence(exhibit=x["generic_exhibit"], generic=True),
         ),
     }
 
