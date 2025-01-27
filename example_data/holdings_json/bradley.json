@@ -1,0 +1,2299 @@
+{
+    "holdings": [
+        {
+            "holding": {
+                "generic": false,
+                "rule": {
+                    "generic": false,
+                    "procedure": {
+                        "outputs": [
+                            {
+                                "generic": false,
+                                "absent": true,
+                                "exhibit": {
+                                    "generic": true,
+                                    "offered_by": {
+                                        "generic": true,
+                                        "name": "the prosecution",
+                                        "plural": false
+                                    },
+                                    "form": null,
+                                    "statement": null,
+                                    "statement_attribution": null,
+                                    "name":"proof of Bradley\'s guilt"
+                                },
+                                "to_effect": {
+                                    "generic": false,
+                                    "predicate": {
+                                        "content": "Bradley committed a crime",
+                                        "truth": true
+                                    },
+                                    "terms": [],
+                                    "name": "fact that Bradley committed a crime",
+                                    "standard_of_proof": null
+                                },
+                                "name":"absence of evidence of Bradley\'s guilt"
+                            }
+                        ],
+                        "inputs": [
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "${officers_search_of_the_yard} was a warrantless search and seizure",
+                                    "truth": true
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "name":"officers\' search of the yard",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"officers\' search of the yard was a warrantless search and seizure",
+                                "standard_of_proof": null
+                            },
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "${bradley_s_house} was a house",
+                                    "truth": true
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "name":"Bradley\'s house",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"Bradley\'s house was a house",
+                                "standard_of_proof": null
+                            },
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "${bradley} lived at ${bradley_s_house}",
+                                    "truth": true
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "name": "Bradley",
+                                        "plural": false
+                                    },
+                                    {
+                                        "generic": true,
+                                        "name":"Bradley\'s house",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"Bradley lived at Bradley\'s house",
+                                "standard_of_proof": null
+                            },
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "${officers_search_of_the_yard} was performed by law enforcement officers",
+                                    "truth": true
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "name":"officers\' search of the yard",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"officers\' search of the yard was performed by law enforcement officers",
+                                "standard_of_proof": null
+                            },
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "${officers_search_of_the_yard} was performed in the grounds around ${bradley_s_house}",
+                                    "truth": true
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "name":"officers\' search of the yard",
+                                        "plural": false
+                                    },
+                                    {
+                                        "generic": true,
+                                        "name":"Bradley\'s house",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"officers\' search of the yard was performed in the grounds around Bradley\'s house",
+                                "standard_of_proof": null
+                            },
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "${bradley} exhibited an expectation of privacy in ${bradley_s_marijuana_patch}",
+                                    "truth": true
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "name": "Bradley",
+                                        "plural": false
+                                    },
+                                    {
+                                        "generic": true,
+                                        "name":"Bradley\'s marijuana patch",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"Bradley exhibited an expectation of privacy in Bradley\'s marijuana patch",
+                                "standard_of_proof": null
+                            },
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "it was reasonable for ${bradley} to hold an expectation of privacy in ${bradley_s_marijuana_patch}",
+                                    "truth": true
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "name": "Bradley",
+                                        "plural": false
+                                    },
+                                    {
+                                        "generic": true,
+                                        "name":"Bradley\'s marijuana patch",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"it was reasonable for Bradley to hold an expectation of privacy in Bradley\'s marijuana patch",
+                                "standard_of_proof": null
+                            },
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content":"${officers_search_of_the_yard} violated ${bradley}\'s expectation of privacy in ${bradley_s_marijuana_patch}",
+                                    "truth": true
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "name":"officers\' search of the yard",
+                                        "plural": false
+                                    },
+                                    {
+                                        "generic": true,
+                                        "name": "Bradley",
+                                        "plural": false
+                                    },
+                                    {
+                                        "generic": true,
+                                        "name":"Bradley\'s marijuana patch",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"officers\' search of the yard violated Bradley\'s expectation of privacy in Bradley\'s marijuana patch",
+                                "standard_of_proof": null
+                            },
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "${officers_search_of_the_yard} was an unreasonable governmental intrusion upon ${bradley_s_marijuana_patch}",
+                                    "truth": true
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "name":"officers\' search of the yard",
+                                        "plural": false
+                                    },
+                                    {
+                                        "generic": true,
+                                        "name":"Bradley\'s marijuana patch",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"officers\' search of the yard was an unreasonable governmental intrusion upon Bradley\'s marijuana patch",
+                                "standard_of_proof": null
+                            },
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "${proof_of_bradley_s_guilt} was derived from ${officers_search_of_the_yard}",
+                                    "truth": true
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "offered_by": {
+                                            "generic": true,
+                                            "name": "the prosecution",
+                                            "plural": false
+                                        },
+                                        "form": null,
+                                        "statement": null,
+                                        "statement_attribution": null,
+                                        "name":"proof of Bradley\'s guilt"
+                                    },
+                                    {
+                                        "generic": true,
+                                        "name":"officers\' search of the yard",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"proof of Bradley\'s guilt was derived from officers\' search of the yard",
+                                "standard_of_proof": null
+                            }
+                        ],
+                        "despite": [],
+                        "name": ""
+                    },
+                    "enactments": {
+                        "passages": [
+                            {
+                                "enactment": {
+                                    "node": "/us/const/amendment/IV",
+                                    "start_date": "1791-12-15",
+                                    "heading": "AMENDMENT IV.",
+                                    "text_version": {
+                                        "content": "The right of the people to be secure in their persons, houses, papers, and effects, against unreasonable searches and seizures, shall not be violated, and no Warrants shall issue, but upon probable cause, supported by Oath or affirmation, and particularly describing the place to be searched, and the persons or things to be seized.",
+                                        "url": "https://authorityspoke.com/api/v1/textversions/735706/",
+                                        "id": 735706
+                                    },
+                                    "end_date": null,
+                                    "first_published": null,
+                                    "earliest_in_db": null,
+                                    "anchors": [],
+                                    "citations": [],
+                                    "name": "/us/const/amendment/IV",
+                                    "children": []
+                                },
+                                "selection": {
+                                    "positions": [],
+                                    "quotes": [
+                                        {
+                                            "exact": "",
+                                            "prefix": "",
+                                            "suffix": ", and no Warrants shall issue"
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "enactment": {
+                                    "node": "/us/const/amendment/XIV/1",
+                                    "start_date": "1868-07-28",
+                                    "heading": "Citizenship: security and equal protection of citizens.",
+                                    "text_version": {
+                                        "content": "All persons born or naturalized in the United States, and subject to the jurisdiction thereof, are citizens of the United States and of the State wherein they reside. No State shall make or enforce any law which shall abridge the privileges or immunities of citizens of the United States; nor shall any State deprive any person of life, liberty, or property, without due process of law; nor deny to any person within its jurisdiction the equal protection of the laws.",
+                                        "url": "https://authorityspoke.com/api/v1/textversions/735717/",
+                                        "id": 735717
+                                    },
+                                    "end_date": null,
+                                    "first_published": null,
+                                    "earliest_in_db": null,
+                                    "anchors": [],
+                                    "citations": [],
+                                    "name": "/us/const/amendment/XIV/1",
+                                    "children": []
+                                },
+                                "selection": {
+                                    "positions": [],
+                                    "quotes": [
+                                        {
+                                            "exact": "",
+                                            "prefix": "immunities of citizens of the United States; ",
+                                            "suffix": " nor deny to any person"
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    "enactments_despite": {
+                        "passages": []
+                    },
+                    "mandatory": true,
+                    "universal": true,
+                    "name": null
+                },
+                "rule_valid": true,
+                "decided": true,
+                "exclusive": false
+            },
+            "anchors": {
+                "positions": [],
+                "quotes": []
+            }
+        },
+        {
+            "holding": {
+                "generic": false,
+                "rule": {
+                    "generic": false,
+                    "procedure": {
+                        "outputs": [
+                            {
+                                "generic": false,
+                                "absent": true,
+                                "exhibit": {
+                                    "generic": true,
+                                    "offered_by": {
+                                        "generic": true,
+                                        "name": "the prosecution",
+                                        "plural": false
+                                    },
+                                    "form": null,
+                                    "statement": null,
+                                    "statement_attribution": null,
+                                    "name":"proof of Bradley\'s guilt"
+                                },
+                                "to_effect": {
+                                    "generic": false,
+                                    "predicate": {
+                                        "content": "Bradley committed a crime",
+                                        "truth": true
+                                    },
+                                    "terms": [],
+                                    "name": "fact that Bradley committed a crime",
+                                    "standard_of_proof": null
+                                },
+                                "name":"absence of evidence of Bradley\'s guilt"
+                            }
+                        ],
+                        "inputs": [
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "${officers_search_of_the_yard} was a warrantless search and seizure",
+                                    "truth": true
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "name":"officers\' search of the yard",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"officers\' search of the yard was a warrantless search and seizure",
+                                "standard_of_proof": null
+                            },
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "${bradley_s_house} was a house",
+                                    "truth": true
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "name":"Bradley\'s house",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"Bradley\'s house was a house",
+                                "standard_of_proof": null
+                            },
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "${bradley} lived at ${bradley_s_house}",
+                                    "truth": true
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "name": "Bradley",
+                                        "plural": false
+                                    },
+                                    {
+                                        "generic": true,
+                                        "name":"Bradley\'s house",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"Bradley lived at Bradley\'s house",
+                                "standard_of_proof": null
+                            },
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "${officers_search_of_the_yard} was performed by law enforcement officers",
+                                    "truth": true
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "name":"officers\' search of the yard",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"officers\' search of the yard was performed by law enforcement officers",
+                                "standard_of_proof": null
+                            },
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "${officers_search_of_the_yard} was performed in the grounds around ${bradley_s_house}",
+                                    "truth": true
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "name":"officers\' search of the yard",
+                                        "plural": false
+                                    },
+                                    {
+                                        "generic": true,
+                                        "name":"Bradley\'s house",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"officers\' search of the yard was performed in the grounds around Bradley\'s house",
+                                "standard_of_proof": null
+                            },
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "it was reasonable for ${bradley} to hold an expectation of privacy in ${bradley_s_marijuana_patch}",
+                                    "truth": true
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "name": "Bradley",
+                                        "plural": false
+                                    },
+                                    {
+                                        "generic": true,
+                                        "name":"Bradley\'s marijuana patch",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"it was reasonable for Bradley to hold an expectation of privacy in Bradley\'s marijuana patch",
+                                "standard_of_proof": null
+                            },
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content":"${officers_search_of_the_yard} violated ${bradley}\'s expectation of privacy in ${bradley_s_marijuana_patch}",
+                                    "truth": true
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "name":"officers\' search of the yard",
+                                        "plural": false
+                                    },
+                                    {
+                                        "generic": true,
+                                        "name": "Bradley",
+                                        "plural": false
+                                    },
+                                    {
+                                        "generic": true,
+                                        "name":"Bradley\'s marijuana patch",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"officers\' search of the yard violated Bradley\'s expectation of privacy in Bradley\'s marijuana patch",
+                                "standard_of_proof": null
+                            },
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "${officers_search_of_the_yard} was an unreasonable governmental intrusion upon ${bradley_s_marijuana_patch}",
+                                    "truth": true
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "name":"officers\' search of the yard",
+                                        "plural": false
+                                    },
+                                    {
+                                        "generic": true,
+                                        "name":"Bradley\'s marijuana patch",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"officers\' search of the yard was an unreasonable governmental intrusion upon Bradley\'s marijuana patch",
+                                "standard_of_proof": null
+                            },
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "${proof_of_bradley_s_guilt} was derived from ${officers_search_of_the_yard}",
+                                    "truth": true
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "offered_by": {
+                                            "generic": true,
+                                            "name": "the prosecution",
+                                            "plural": false
+                                        },
+                                        "form": null,
+                                        "statement": null,
+                                        "statement_attribution": null,
+                                        "name":"proof of Bradley\'s guilt"
+                                    },
+                                    {
+                                        "generic": true,
+                                        "name":"officers\' search of the yard",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"proof of Bradley\'s guilt was derived from officers\' search of the yard",
+                                "standard_of_proof": null
+                            }
+                        ],
+                        "despite": [
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "${bradley} exhibited an expectation of privacy in ${bradley_s_marijuana_patch}",
+                                    "truth": false
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "name": "Bradley",
+                                        "plural": false
+                                    },
+                                    {
+                                        "generic": true,
+                                        "name":"Bradley\'s marijuana patch",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"false Bradley exhibited an expectation of privacy in Bradley\'s marijuana patch",
+                                "standard_of_proof": null
+                            }
+                        ],
+                        "name": ""
+                    },
+                    "enactments": {
+                        "passages": [
+                            {
+                                "enactment": {
+                                    "node": "/us/const/amendment/IV",
+                                    "start_date": "1791-12-15",
+                                    "heading": "AMENDMENT IV.",
+                                    "text_version": {
+                                        "content": "The right of the people to be secure in their persons, houses, papers, and effects, against unreasonable searches and seizures, shall not be violated, and no Warrants shall issue, but upon probable cause, supported by Oath or affirmation, and particularly describing the place to be searched, and the persons or things to be seized.",
+                                        "url": "https://authorityspoke.com/api/v1/textversions/735706/",
+                                        "id": 735706
+                                    },
+                                    "end_date": null,
+                                    "first_published": null,
+                                    "earliest_in_db": null,
+                                    "anchors": [],
+                                    "citations": [],
+                                    "name": "/us/const/amendment/IV",
+                                    "children": []
+                                },
+                                "selection": {
+                                    "positions": [],
+                                    "quotes": [
+                                        {
+                                            "exact": "",
+                                            "prefix": "",
+                                            "suffix": ", and no Warrants shall issue"
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "enactment": {
+                                    "node": "/us/const/amendment/XIV/1",
+                                    "start_date": "1868-07-28",
+                                    "heading": "Citizenship: security and equal protection of citizens.",
+                                    "text_version": {
+                                        "content": "All persons born or naturalized in the United States, and subject to the jurisdiction thereof, are citizens of the United States and of the State wherein they reside. No State shall make or enforce any law which shall abridge the privileges or immunities of citizens of the United States; nor shall any State deprive any person of life, liberty, or property, without due process of law; nor deny to any person within its jurisdiction the equal protection of the laws.",
+                                        "url": "https://authorityspoke.com/api/v1/textversions/735717/",
+                                        "id": 735717
+                                    },
+                                    "end_date": null,
+                                    "first_published": null,
+                                    "earliest_in_db": null,
+                                    "anchors": [],
+                                    "citations": [],
+                                    "name": "/us/const/amendment/XIV/1",
+                                    "children": []
+                                },
+                                "selection": {
+                                    "positions": [],
+                                    "quotes": [
+                                        {
+                                            "exact": "",
+                                            "prefix": "immunities of citizens of the United States; ",
+                                            "suffix": " nor deny to any person"
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    "enactments_despite": {
+                        "passages": []
+                    },
+                    "mandatory": true,
+                    "universal": true,
+                    "name": null
+                },
+                "rule_valid": false,
+                "decided": true,
+                "exclusive": false
+            },
+            "anchors": {
+                "positions": [],
+                "quotes": []
+            }
+        },
+        {
+            "holding": {
+                "generic": false,
+                "rule": {
+                    "generic": false,
+                    "procedure": {
+                        "outputs": [
+                            {
+                                "generic": false,
+                                "absent": true,
+                                "exhibit": {
+                                    "generic": true,
+                                    "offered_by": {
+                                        "generic": true,
+                                        "name": "the prosecution",
+                                        "plural": false
+                                    },
+                                    "form": null,
+                                    "statement": null,
+                                    "statement_attribution": null,
+                                    "name":"proof of Bradley\'s guilt"
+                                },
+                                "to_effect": {
+                                    "generic": false,
+                                    "predicate": {
+                                        "content": "Bradley committed a crime",
+                                        "truth": true
+                                    },
+                                    "terms": [],
+                                    "name": "fact that Bradley committed a crime",
+                                    "standard_of_proof": null
+                                },
+                                "name":"absence of evidence of Bradley\'s guilt"
+                            }
+                        ],
+                        "inputs": [
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "${officers_search_of_the_yard} was a warrantless search and seizure",
+                                    "truth": true
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "name":"officers\' search of the yard",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"officers\' search of the yard was a warrantless search and seizure",
+                                "standard_of_proof": null
+                            },
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "${bradley_s_house} was a house",
+                                    "truth": true
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "name":"Bradley\'s house",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"Bradley\'s house was a house",
+                                "standard_of_proof": null
+                            },
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "${bradley} lived at ${bradley_s_house}",
+                                    "truth": true
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "name": "Bradley",
+                                        "plural": false
+                                    },
+                                    {
+                                        "generic": true,
+                                        "name":"Bradley\'s house",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"Bradley lived at Bradley\'s house",
+                                "standard_of_proof": null
+                            },
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "${officers_search_of_the_yard} was performed by law enforcement officers",
+                                    "truth": true
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "name":"officers\' search of the yard",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"officers\' search of the yard was performed by law enforcement officers",
+                                "standard_of_proof": null
+                            },
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "${officers_search_of_the_yard} was performed in the grounds around ${bradley_s_house}",
+                                    "truth": true
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "name":"officers\' search of the yard",
+                                        "plural": false
+                                    },
+                                    {
+                                        "generic": true,
+                                        "name":"Bradley\'s house",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"officers\' search of the yard was performed in the grounds around Bradley\'s house",
+                                "standard_of_proof": null
+                            },
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "${bradley} exhibited an expectation of privacy in ${bradley_s_marijuana_patch}",
+                                    "truth": true
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "name": "Bradley",
+                                        "plural": false
+                                    },
+                                    {
+                                        "generic": true,
+                                        "name":"Bradley\'s marijuana patch",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"Bradley exhibited an expectation of privacy in Bradley\'s marijuana patch",
+                                "standard_of_proof": null
+                            },
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content":"${officers_search_of_the_yard} violated ${bradley}\'s expectation of privacy in ${bradley_s_marijuana_patch}",
+                                    "truth": true
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "name":"officers\' search of the yard",
+                                        "plural": false
+                                    },
+                                    {
+                                        "generic": true,
+                                        "name": "Bradley",
+                                        "plural": false
+                                    },
+                                    {
+                                        "generic": true,
+                                        "name":"Bradley\'s marijuana patch",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"officers\' search of the yard violated Bradley\'s expectation of privacy in Bradley\'s marijuana patch",
+                                "standard_of_proof": null
+                            },
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "${officers_search_of_the_yard} was an unreasonable intrusion upon ${bradley_s_marijuana_patch}",
+                                    "truth": true
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "name":"officers\' search of the yard",
+                                        "plural": false
+                                    },
+                                    {
+                                        "generic": true,
+                                        "name":"Bradley\'s marijuana patch",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"officers\' search of the yard was an unreasonable intrusion upon Bradley\'s marijuana patch",
+                                "standard_of_proof": null
+                            },
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "${proof_of_bradley_s_guilt} was derived from ${officers_search_of_the_yard}",
+                                    "truth": true
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "offered_by": {
+                                            "generic": true,
+                                            "name": "the prosecution",
+                                            "plural": false
+                                        },
+                                        "form": null,
+                                        "statement": null,
+                                        "statement_attribution": null,
+                                        "name":"proof of Bradley\'s guilt"
+                                    },
+                                    {
+                                        "generic": true,
+                                        "name":"officers\' search of the yard",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"proof of Bradley\'s guilt was derived from officers\' search of the yard",
+                                "standard_of_proof": null
+                            }
+                        ],
+                        "despite": [
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "it was reasonable for ${bradley} to hold an expectation of privacy in ${bradley_s_marijuana_patch}",
+                                    "truth": false
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "name": "Bradley",
+                                        "plural": false
+                                    },
+                                    {
+                                        "generic": true,
+                                        "name":"Bradley\'s marijuana patch",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"false it was reasonable for Bradley to hold an expectation of privacy in Bradley\'s marijuana patch",
+                                "standard_of_proof": null
+                            }
+                        ],
+                        "name": ""
+                    },
+                    "enactments": {
+                        "passages": [
+                            {
+                                "enactment": {
+                                    "node": "/us/const/amendment/IV",
+                                    "start_date": "1791-12-15",
+                                    "heading": "AMENDMENT IV.",
+                                    "text_version": {
+                                        "content": "The right of the people to be secure in their persons, houses, papers, and effects, against unreasonable searches and seizures, shall not be violated, and no Warrants shall issue, but upon probable cause, supported by Oath or affirmation, and particularly describing the place to be searched, and the persons or things to be seized.",
+                                        "url": "https://authorityspoke.com/api/v1/textversions/735706/",
+                                        "id": 735706
+                                    },
+                                    "end_date": null,
+                                    "first_published": null,
+                                    "earliest_in_db": null,
+                                    "anchors": [],
+                                    "citations": [],
+                                    "name": "/us/const/amendment/IV",
+                                    "children": []
+                                },
+                                "selection": {
+                                    "positions": [],
+                                    "quotes": [
+                                        {
+                                            "exact": "",
+                                            "prefix": "",
+                                            "suffix": ", and no Warrants shall issue"
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "enactment": {
+                                    "node": "/us/const/amendment/XIV/1",
+                                    "start_date": "1868-07-28",
+                                    "heading": "Citizenship: security and equal protection of citizens.",
+                                    "text_version": {
+                                        "content": "All persons born or naturalized in the United States, and subject to the jurisdiction thereof, are citizens of the United States and of the State wherein they reside. No State shall make or enforce any law which shall abridge the privileges or immunities of citizens of the United States; nor shall any State deprive any person of life, liberty, or property, without due process of law; nor deny to any person within its jurisdiction the equal protection of the laws.",
+                                        "url": "https://authorityspoke.com/api/v1/textversions/735717/",
+                                        "id": 735717
+                                    },
+                                    "end_date": null,
+                                    "first_published": null,
+                                    "earliest_in_db": null,
+                                    "anchors": [],
+                                    "citations": [],
+                                    "name": "/us/const/amendment/XIV/1",
+                                    "children": []
+                                },
+                                "selection": {
+                                    "positions": [],
+                                    "quotes": [
+                                        {
+                                            "exact": "",
+                                            "prefix": "immunities of citizens of the United States; ",
+                                            "suffix": " nor deny to any person"
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    "enactments_despite": {
+                        "passages": []
+                    },
+                    "mandatory": true,
+                    "universal": true,
+                    "name": null
+                },
+                "rule_valid": false,
+                "decided": true,
+                "exclusive": false
+            },
+            "anchors": {
+                "positions": [],
+                "quotes": []
+            }
+        },
+        {
+            "holding": {
+                "generic": false,
+                "rule": {
+                    "generic": false,
+                    "procedure": {
+                        "outputs": [
+                            {
+                                "generic": false,
+                                "absent": true,
+                                "exhibit": {
+                                    "generic": true,
+                                    "offered_by": {
+                                        "generic": true,
+                                        "name": "the prosecution",
+                                        "plural": false
+                                    },
+                                    "form": null,
+                                    "statement": null,
+                                    "statement_attribution": null,
+                                    "name":"proof of Bradley\'s guilt"
+                                },
+                                "to_effect": {
+                                    "generic": false,
+                                    "predicate": {
+                                        "content": "Bradley committed a crime",
+                                        "truth": true
+                                    },
+                                    "terms": [],
+                                    "name": "fact that Bradley committed a crime",
+                                    "standard_of_proof": null
+                                },
+                                "name":"absence of evidence of Bradley\'s guilt"
+                            }
+                        ],
+                        "inputs": [
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "${officers_search_of_the_yard} was a warrantless search and seizure",
+                                    "truth": true
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "name":"officers\' search of the yard",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"officers\' search of the yard was a warrantless search and seizure",
+                                "standard_of_proof": null
+                            },
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "${bradley_s_house} was a house",
+                                    "truth": true
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "name":"Bradley\'s house",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"Bradley\'s house was a house",
+                                "standard_of_proof": null
+                            },
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "${bradley} lived at ${bradley_s_house}",
+                                    "truth": true
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "name": "Bradley",
+                                        "plural": false
+                                    },
+                                    {
+                                        "generic": true,
+                                        "name":"Bradley\'s house",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"Bradley lived at Bradley\'s house",
+                                "standard_of_proof": null
+                            },
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "${officers_search_of_the_yard} was performed by law enforcement officers",
+                                    "truth": true
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "name":"officers\' search of the yard",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"officers\' search of the yard was performed by law enforcement officers",
+                                "standard_of_proof": null
+                            },
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "${officers_search_of_the_yard} was performed in the grounds around ${bradley_s_house}",
+                                    "truth": true
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "name":"officers\' search of the yard",
+                                        "plural": false
+                                    },
+                                    {
+                                        "generic": true,
+                                        "name":"Bradley\'s house",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"officers\' search of the yard was performed in the grounds around Bradley\'s house",
+                                "standard_of_proof": null
+                            },
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "${bradley} exhibited an expectation of privacy in ${bradley_s_marijuana_patch}",
+                                    "truth": true
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "name": "Bradley",
+                                        "plural": false
+                                    },
+                                    {
+                                        "generic": true,
+                                        "name":"Bradley\'s marijuana patch",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"Bradley exhibited an expectation of privacy in Bradley\'s marijuana patch",
+                                "standard_of_proof": null
+                            },
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "it was reasonable for ${bradley} to hold an expectation of privacy in ${bradley_s_marijuana_patch}",
+                                    "truth": true
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "name": "Bradley",
+                                        "plural": false
+                                    },
+                                    {
+                                        "generic": true,
+                                        "name":"Bradley\'s marijuana patch",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"it was reasonable for Bradley to hold an expectation of privacy in Bradley\'s marijuana patch",
+                                "standard_of_proof": null
+                            },
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "${officers_search_of_the_yard} was an unreasonable governmental intrusion upon ${bradley_s_marijuana_patch}",
+                                    "truth": true
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "name":"officers\' search of the yard",
+                                        "plural": false
+                                    },
+                                    {
+                                        "generic": true,
+                                        "name":"Bradley\'s marijuana patch",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"officers\' search of the yard was an unreasonable governmental intrusion upon Bradley\'s marijuana patch",
+                                "standard_of_proof": null
+                            },
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "${proof_of_bradley_s_guilt} was derived from ${officers_search_of_the_yard}",
+                                    "truth": true
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "offered_by": {
+                                            "generic": true,
+                                            "name": "the prosecution",
+                                            "plural": false
+                                        },
+                                        "form": null,
+                                        "statement": null,
+                                        "statement_attribution": null,
+                                        "name":"proof of Bradley\'s guilt"
+                                    },
+                                    {
+                                        "generic": true,
+                                        "name":"officers\' search of the yard",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"proof of Bradley\'s guilt was derived from officers\' search of the yard",
+                                "standard_of_proof": null
+                            }
+                        ],
+                        "despite": [
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content":"${officers_search_of_the_yard} violated ${bradley}\'s expectation of privacy in ${bradley_s_marijuana_patch}",
+                                    "truth": false
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "name":"officers\' search of the yard",
+                                        "plural": false
+                                    },
+                                    {
+                                        "generic": true,
+                                        "name": "Bradley",
+                                        "plural": false
+                                    },
+                                    {
+                                        "generic": true,
+                                        "name":"Bradley\'s marijuana patch",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"false officers\' search of the yard violated Bradley\'s expectation of privacy in Bradley\'s marijuana patch",
+                                "standard_of_proof": null
+                            }
+                        ],
+                        "name": ""
+                    },
+                    "enactments": {
+                        "passages": [
+                            {
+                                "enactment": {
+                                    "node": "/us/const/amendment/IV",
+                                    "start_date": "1791-12-15",
+                                    "heading": "AMENDMENT IV.",
+                                    "text_version": {
+                                        "content": "The right of the people to be secure in their persons, houses, papers, and effects, against unreasonable searches and seizures, shall not be violated, and no Warrants shall issue, but upon probable cause, supported by Oath or affirmation, and particularly describing the place to be searched, and the persons or things to be seized.",
+                                        "url": "https://authorityspoke.com/api/v1/textversions/735706/",
+                                        "id": 735706
+                                    },
+                                    "end_date": null,
+                                    "first_published": null,
+                                    "earliest_in_db": null,
+                                    "anchors": [],
+                                    "citations": [],
+                                    "name": "/us/const/amendment/IV",
+                                    "children": []
+                                },
+                                "selection": {
+                                    "positions": [],
+                                    "quotes": [
+                                        {
+                                            "exact": "",
+                                            "prefix": "",
+                                            "suffix": ", and no Warrants shall issue"
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "enactment": {
+                                    "node": "/us/const/amendment/XIV/1",
+                                    "start_date": "1868-07-28",
+                                    "heading": "Citizenship: security and equal protection of citizens.",
+                                    "text_version": {
+                                        "content": "All persons born or naturalized in the United States, and subject to the jurisdiction thereof, are citizens of the United States and of the State wherein they reside. No State shall make or enforce any law which shall abridge the privileges or immunities of citizens of the United States; nor shall any State deprive any person of life, liberty, or property, without due process of law; nor deny to any person within its jurisdiction the equal protection of the laws.",
+                                        "url": "https://authorityspoke.com/api/v1/textversions/735717/",
+                                        "id": 735717
+                                    },
+                                    "end_date": null,
+                                    "first_published": null,
+                                    "earliest_in_db": null,
+                                    "anchors": [],
+                                    "citations": [],
+                                    "name": "/us/const/amendment/XIV/1",
+                                    "children": []
+                                },
+                                "selection": {
+                                    "positions": [],
+                                    "quotes": [
+                                        {
+                                            "exact": "",
+                                            "prefix": "immunities of citizens of the United States; ",
+                                            "suffix": " nor deny to any person"
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    "enactments_despite": {
+                        "passages": []
+                    },
+                    "mandatory": true,
+                    "universal": true,
+                    "name": null
+                },
+                "rule_valid": false,
+                "decided": true,
+                "exclusive": false
+            },
+            "anchors": {
+                "positions": [],
+                "quotes": []
+            }
+        },
+        {
+            "holding": {
+                "generic": false,
+                "rule": {
+                    "generic": false,
+                    "procedure": {
+                        "outputs": [
+                            {
+                                "generic": false,
+                                "absent": true,
+                                "exhibit": {
+                                    "generic": true,
+                                    "offered_by": {
+                                        "generic": true,
+                                        "name": "the prosecution",
+                                        "plural": false
+                                    },
+                                    "form": null,
+                                    "statement": null,
+                                    "statement_attribution": null,
+                                    "name":"proof of Bradley\'s guilt"
+                                },
+                                "to_effect": {
+                                    "generic": false,
+                                    "predicate": {
+                                        "content": "Bradley committed a crime",
+                                        "truth": true
+                                    },
+                                    "terms": [],
+                                    "name": "fact that Bradley committed a crime",
+                                    "standard_of_proof": null
+                                },
+                                "name":"absence of evidence of Bradley\'s guilt"
+                            }
+                        ],
+                        "inputs": [
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "${officers_search_of_the_yard} was a warrantless search and seizure",
+                                    "truth": true
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "name":"officers\' search of the yard",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"officers\' search of the yard was a warrantless search and seizure",
+                                "standard_of_proof": null
+                            },
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "${bradley_s_house} was a house",
+                                    "truth": true
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "name":"Bradley\'s house",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"Bradley\'s house was a house",
+                                "standard_of_proof": null
+                            },
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "${bradley} lived at ${bradley_s_house}",
+                                    "truth": true
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "name": "Bradley",
+                                        "plural": false
+                                    },
+                                    {
+                                        "generic": true,
+                                        "name":"Bradley\'s house",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"Bradley lived at Bradley\'s house",
+                                "standard_of_proof": null
+                            },
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "${officers_search_of_the_yard} was performed by law enforcement officers",
+                                    "truth": true
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "name":"officers\' search of the yard",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"officers\' search of the yard was performed by law enforcement officers",
+                                "standard_of_proof": null
+                            },
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "${officers_search_of_the_yard} was performed in the grounds around ${bradley_s_house}",
+                                    "truth": true
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "name":"officers\' search of the yard",
+                                        "plural": false
+                                    },
+                                    {
+                                        "generic": true,
+                                        "name":"Bradley\'s house",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"officers\' search of the yard was performed in the grounds around Bradley\'s house",
+                                "standard_of_proof": null
+                            },
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "${bradley} exhibited an expectation of privacy in ${bradley_s_marijuana_patch}",
+                                    "truth": true
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "name": "Bradley",
+                                        "plural": false
+                                    },
+                                    {
+                                        "generic": true,
+                                        "name":"Bradley\'s marijuana patch",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"Bradley exhibited an expectation of privacy in Bradley\'s marijuana patch",
+                                "standard_of_proof": null
+                            },
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "it was reasonable for ${bradley} to hold an expectation of privacy in ${bradley_s_marijuana_patch}",
+                                    "truth": true
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "name": "Bradley",
+                                        "plural": false
+                                    },
+                                    {
+                                        "generic": true,
+                                        "name":"Bradley\'s marijuana patch",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"it was reasonable for Bradley to hold an expectation of privacy in Bradley\'s marijuana patch",
+                                "standard_of_proof": null
+                            },
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content":"${officers_search_of_the_yard} violated ${bradley}\'s expectation of privacy in ${bradley_s_marijuana_patch}",
+                                    "truth": true
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "name":"officers\' search of the yard",
+                                        "plural": false
+                                    },
+                                    {
+                                        "generic": true,
+                                        "name": "Bradley",
+                                        "plural": false
+                                    },
+                                    {
+                                        "generic": true,
+                                        "name":"Bradley\'s marijuana patch",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"officers\' search of the yard violated Bradley\'s expectation of privacy in Bradley\'s marijuana patch",
+                                "standard_of_proof": null
+                            },
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "${proof_of_bradley_s_guilt} was derived from ${officers_search_of_the_yard}",
+                                    "truth": true
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "offered_by": {
+                                            "generic": true,
+                                            "name": "the prosecution",
+                                            "plural": false
+                                        },
+                                        "form": null,
+                                        "statement": null,
+                                        "statement_attribution": null,
+                                        "name":"proof of Bradley\'s guilt"
+                                    },
+                                    {
+                                        "generic": true,
+                                        "name":"officers\' search of the yard",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"proof of Bradley\'s guilt was derived from officers\' search of the yard",
+                                "standard_of_proof": null
+                            }
+                        ],
+                        "despite": [
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "${officers_search_of_the_yard} was an unreasonable governmental intrusion upon ${bradley_s_marijuana_patch}",
+                                    "truth": false
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "name":"officers\' search of the yard",
+                                        "plural": false
+                                    },
+                                    {
+                                        "generic": true,
+                                        "name":"Bradley\'s marijuana patch",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"false officers\' search of the yard was an unreasonable governmental intrusion upon Bradley\'s marijuana patch",
+                                "standard_of_proof": null
+                            }
+                        ],
+                        "name": ""
+                    },
+                    "enactments": {
+                        "passages": [
+                            {
+                                "enactment": {
+                                    "node": "/us/const/amendment/IV",
+                                    "start_date": "1791-12-15",
+                                    "heading": "AMENDMENT IV.",
+                                    "text_version": {
+                                        "content": "The right of the people to be secure in their persons, houses, papers, and effects, against unreasonable searches and seizures, shall not be violated, and no Warrants shall issue, but upon probable cause, supported by Oath or affirmation, and particularly describing the place to be searched, and the persons or things to be seized.",
+                                        "url": "https://authorityspoke.com/api/v1/textversions/735706/",
+                                        "id": 735706
+                                    },
+                                    "end_date": null,
+                                    "first_published": null,
+                                    "earliest_in_db": null,
+                                    "anchors": [],
+                                    "citations": [],
+                                    "name": "/us/const/amendment/IV",
+                                    "children": []
+                                },
+                                "selection": {
+                                    "positions": [],
+                                    "quotes": [
+                                        {
+                                            "exact": "",
+                                            "prefix": "",
+                                            "suffix": ", and no Warrants shall issue"
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "enactment": {
+                                    "node": "/us/const/amendment/XIV/1",
+                                    "start_date": "1868-07-28",
+                                    "heading": "Citizenship: security and equal protection of citizens.",
+                                    "text_version": {
+                                        "content": "All persons born or naturalized in the United States, and subject to the jurisdiction thereof, are citizens of the United States and of the State wherein they reside. No State shall make or enforce any law which shall abridge the privileges or immunities of citizens of the United States; nor shall any State deprive any person of life, liberty, or property, without due process of law; nor deny to any person within its jurisdiction the equal protection of the laws.",
+                                        "url": "https://authorityspoke.com/api/v1/textversions/735717/",
+                                        "id": 735717
+                                    },
+                                    "end_date": null,
+                                    "first_published": null,
+                                    "earliest_in_db": null,
+                                    "anchors": [],
+                                    "citations": [],
+                                    "name": "/us/const/amendment/XIV/1",
+                                    "children": []
+                                },
+                                "selection": {
+                                    "positions": [],
+                                    "quotes": [
+                                        {
+                                            "exact": "",
+                                            "prefix": "immunities of citizens of the United States; ",
+                                            "suffix": " nor deny to any person"
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    "enactments_despite": {
+                        "passages": []
+                    },
+                    "mandatory": true,
+                    "universal": true,
+                    "name": null
+                },
+                "rule_valid": false,
+                "decided": true,
+                "exclusive": false
+            },
+            "anchors": {
+                "positions": [],
+                "quotes": []
+            }
+        },
+        {
+            "holding": {
+                "generic": false,
+                "rule": {
+                    "generic": false,
+                    "procedure": {
+                        "outputs": [
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "${bradley} exhibited an expectation of privacy in ${bradley_s_marijuana_patch}",
+                                    "truth": false
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "name": "Bradley",
+                                        "plural": false
+                                    },
+                                    {
+                                        "generic": true,
+                                        "name":"Bradley\'s marijuana patch",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"false Bradley exhibited an expectation of privacy in Bradley\'s marijuana patch",
+                                "standard_of_proof": null
+                            }
+                        ],
+                        "inputs": [
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "the number of marijuana plants in ${bradley_s_marijuana_patch} was",
+                                    "truth": true,
+                                    "quantity_range": {
+                                        "sign": ">=",
+                                        "include_negatives": null,
+                                        "quantity": "3"
+                                    }
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "name":"Bradley\'s marijuana patch",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"the number of marijuana plants in Bradley\'s marijuana patch was >= 3",
+                                "standard_of_proof": null
+                            },
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "${bradley_s_marijuana_patch} was in a yard accessible from a house that did not belong to ${bradley}",
+                                    "truth": true
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "name":"Bradley\'s marijuana patch",
+                                        "plural": false
+                                    },
+                                    {
+                                        "generic": true,
+                                        "name": "Bradley",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"Bradley\'s marijuana patch was in a yard accessible from a house that did not belong to Bradley",
+                                "standard_of_proof": null
+                            },
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "${bradley_s_marijuana_patch} was entirely hidden by foliage",
+                                    "truth": false
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "name":"Bradley\'s marijuana patch",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"false Bradley\'s marijuana patch was entirely hidden by foliage",
+                                "standard_of_proof": null
+                            },
+                            {
+                                "generic": false,
+                                "absent": true,
+                                "predicate": {
+                                    "content": "${bradley_s_marijuana_patch} was covered by nontransparent material",
+                                    "truth": true
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "name":"Bradley\'s marijuana patch",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"absent Bradley\'s marijuana patch was covered by nontransparent material",
+                                "standard_of_proof": null
+                            },
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "the distance from which part of ${bradley_s_marijuana_patch} could be seen plainly was",
+                                    "truth": true,
+                                    "quantity_range": {
+                                        "sign": ">=",
+                                        "include_negatives": null,
+                                        "quantity_magnitude": "1",
+                                        "quantity_units": "foot"
+                                    }
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "name":"Bradley\'s marijuana patch",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"the distance from which part of Bradley\'s marijuana patch could be seen plainly was >= 1 foot",
+                                "standard_of_proof": null
+                            },
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "the distance between ${bradley_s_marijuana_patch} and ${bradley_s_house} was",
+                                    "truth": true,
+                                    "quantity_range": {
+                                        "sign": ">=",
+                                        "include_negatives": null,
+                                        "quantity_magnitude": "20",
+                                        "quantity_units": "foot"
+                                    }
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "name":"Bradley\'s marijuana patch",
+                                        "plural": false
+                                    },
+                                    {
+                                        "generic": true,
+                                        "name":"Bradley\'s house",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"the distance between Bradley\'s marijuana patch and Bradley\'s house was >= 20 feet",
+                                "standard_of_proof": null
+                            },
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "a house that did not belong to ${bradley} had access to the rear yard where ${bradley_s_marijuana_patch} was located",
+                                    "truth": true
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "name": "Bradley",
+                                        "plural": false
+                                    },
+                                    {
+                                        "generic": true,
+                                        "name":"Bradley\'s marijuana patch",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"a house that did not belong to Bradley had access to the rear yard where Bradley\'s marijuana patch was located",
+                                "standard_of_proof": null
+                            }
+                        ],
+                        "despite": [
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "${bradley_s_house} was a house",
+                                    "truth": true
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "name":"Bradley\'s house",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"Bradley\'s house was a house",
+                                "standard_of_proof": null
+                            },
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "${bradley} lived at ${bradley_s_house}",
+                                    "truth": true
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "name": "Bradley",
+                                        "plural": false
+                                    },
+                                    {
+                                        "generic": true,
+                                        "name":"Bradley\'s house",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"Bradley lived at Bradley\'s house",
+                                "standard_of_proof": null
+                            },
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "${bradley_s_marijuana_patch} was partially hidden by foliage",
+                                    "truth": true
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "name":"Bradley\'s marijuana patch",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"Bradley\'s marijuana patch was partially hidden by foliage",
+                                "standard_of_proof": null
+                            },
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "${bradley_s_marijuana_patch} was in the fenced rear yard of ${bradley_s_house}",
+                                    "truth": true
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "name":"Bradley\'s marijuana patch",
+                                        "plural": false
+                                    },
+                                    {
+                                        "generic": true,
+                                        "name":"Bradley\'s house",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"Bradley\'s marijuana patch was in the fenced rear yard of Bradley\'s house",
+                                "standard_of_proof": null
+                            }
+                        ],
+                        "name": ""
+                    },
+                    "enactments": {
+                        "passages": [
+                            {
+                                "enactment": {
+                                    "node": "/us/const/amendment/IV",
+                                    "start_date": "1791-12-15",
+                                    "heading": "AMENDMENT IV.",
+                                    "text_version": {
+                                        "content": "The right of the people to be secure in their persons, houses, papers, and effects, against unreasonable searches and seizures, shall not be violated, and no Warrants shall issue, but upon probable cause, supported by Oath or affirmation, and particularly describing the place to be searched, and the persons or things to be seized.",
+                                        "url": "https://authorityspoke.com/api/v1/textversions/735706/",
+                                        "id": 735706
+                                    },
+                                    "end_date": null,
+                                    "first_published": null,
+                                    "earliest_in_db": null,
+                                    "anchors": [],
+                                    "citations": [],
+                                    "name": "/us/const/amendment/IV",
+                                    "children": []
+                                },
+                                "selection": {
+                                    "positions": [],
+                                    "quotes": [
+                                        {
+                                            "exact": "",
+                                            "prefix": "",
+                                            "suffix": ", and no Warrants shall issue"
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "enactment": {
+                                    "node": "/us/const/amendment/XIV/1",
+                                    "start_date": "1868-07-28",
+                                    "heading": "Citizenship: security and equal protection of citizens.",
+                                    "text_version": {
+                                        "content": "All persons born or naturalized in the United States, and subject to the jurisdiction thereof, are citizens of the United States and of the State wherein they reside. No State shall make or enforce any law which shall abridge the privileges or immunities of citizens of the United States; nor shall any State deprive any person of life, liberty, or property, without due process of law; nor deny to any person within its jurisdiction the equal protection of the laws.",
+                                        "url": "https://authorityspoke.com/api/v1/textversions/735717/",
+                                        "id": 735717
+                                    },
+                                    "end_date": null,
+                                    "first_published": null,
+                                    "earliest_in_db": null,
+                                    "anchors": [],
+                                    "citations": [],
+                                    "name": "/us/const/amendment/XIV/1",
+                                    "children": []
+                                },
+                                "selection": {
+                                    "positions": [],
+                                    "quotes": [
+                                        {
+                                            "exact": "",
+                                            "prefix": "immunities of citizens of the United States; ",
+                                            "suffix": " nor deny to any person"
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    "enactments_despite": {
+                        "passages": []
+                    },
+                    "mandatory": true,
+                    "universal": false,
+                    "name": null
+                },
+                "rule_valid": true,
+                "decided": true,
+                "exclusive": false
+            },
+            "anchors": {
+                "positions": [],
+                "quotes": []
+            }
+        },
+        {
+            "holding": {
+                "generic": false,
+                "rule": {
+                    "generic": false,
+                    "procedure": {
+                        "outputs": [
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "it was reasonable for ${bradley} to exhibit an expectation of privacy in ${bradley_s_marijuana_patch}",
+                                    "truth": false
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "name": "Bradley",
+                                        "plural": false
+                                    },
+                                    {
+                                        "generic": true,
+                                        "name":"Bradley\'s marijuana patch",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"false it was reasonable for Bradley to exhibit an expectation of privacy in Bradley\'s marijuana patch",
+                                "standard_of_proof": null
+                            }
+                        ],
+                        "inputs": [
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "the number of marijuana plants in ${bradley_s_marijuana_patch} was",
+                                    "truth": true,
+                                    "quantity_range": {
+                                        "sign": ">=",
+                                        "include_negatives": null,
+                                        "quantity": "3"
+                                    }
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "name":"Bradley\'s marijuana patch",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"the number of marijuana plants in Bradley\'s marijuana patch was >= 3",
+                                "standard_of_proof": null
+                            },
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "${bradley_s_marijuana_patch} was in a yard accessible from a house that did not belong to ${bradley}",
+                                    "truth": true
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "name":"Bradley\'s marijuana patch",
+                                        "plural": false
+                                    },
+                                    {
+                                        "generic": true,
+                                        "name": "Bradley",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"Bradley\'s marijuana patch was in a yard accessible from a house that did not belong to Bradley",
+                                "standard_of_proof": null
+                            },
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "${bradley_s_marijuana_patch} was entirely hidden by foliage",
+                                    "truth": false
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "name":"Bradley\'s marijuana patch",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"false Bradley\'s marijuana patch was entirely hidden by foliage",
+                                "standard_of_proof": null
+                            },
+                            {
+                                "generic": false,
+                                "absent": true,
+                                "predicate": {
+                                    "content": "${bradley_s_marijuana_patch} was covered by nontransparent material",
+                                    "truth": true
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "name":"Bradley\'s marijuana patch",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"absent Bradley\'s marijuana patch was covered by nontransparent material",
+                                "standard_of_proof": null
+                            },
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "the distance from which part of ${bradley_s_marijuana_patch} could be seen plainly was",
+                                    "truth": true,
+                                    "quantity_range": {
+                                        "sign": ">=",
+                                        "include_negatives": null,
+                                        "quantity_magnitude": "1",
+                                        "quantity_units": "foot"
+                                    }
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "name":"Bradley\'s marijuana patch",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"the distance from which part of Bradley\'s marijuana patch could be seen plainly was >= 1 foot",
+                                "standard_of_proof": null
+                            },
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "the distance between ${bradley_s_marijuana_patch} and ${bradley_s_house} was",
+                                    "truth": true,
+                                    "quantity_range": {
+                                        "sign": ">=",
+                                        "include_negatives": null,
+                                        "quantity_magnitude": "20",
+                                        "quantity_units": "foot"
+                                    }
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "name":"Bradley\'s marijuana patch",
+                                        "plural": false
+                                    },
+                                    {
+                                        "generic": true,
+                                        "name":"Bradley\'s house",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"the distance between Bradley\'s marijuana patch and Bradley\'s house was >= 20 feet",
+                                "standard_of_proof": null
+                            },
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "a house that did not belong to ${bradley} had access to the rear yard where ${bradley_s_marijuana_patch} was located",
+                                    "truth": true
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "name": "Bradley",
+                                        "plural": false
+                                    },
+                                    {
+                                        "generic": true,
+                                        "name":"Bradley\'s marijuana patch",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"a house that did not belong to Bradley had access to the rear yard where Bradley\'s marijuana patch was located",
+                                "standard_of_proof": null
+                            }
+                        ],
+                        "despite": [
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "${bradley_s_house} was a house",
+                                    "truth": true
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "name":"Bradley\'s house",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"Bradley\'s house was a house",
+                                "standard_of_proof": null
+                            },
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "${bradley} lived at ${bradley_s_house}",
+                                    "truth": true
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "name": "Bradley",
+                                        "plural": false
+                                    },
+                                    {
+                                        "generic": true,
+                                        "name":"Bradley\'s house",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"Bradley lived at Bradley\'s house",
+                                "standard_of_proof": null
+                            },
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "${bradley_s_marijuana_patch} was partially hidden by foliage",
+                                    "truth": true
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "name":"Bradley\'s marijuana patch",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"Bradley\'s marijuana patch was partially hidden by foliage",
+                                "standard_of_proof": null
+                            },
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "${bradley_s_marijuana_patch} was in the fenced rear yard of ${bradley_s_house}",
+                                    "truth": true
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "name":"Bradley\'s marijuana patch",
+                                        "plural": false
+                                    },
+                                    {
+                                        "generic": true,
+                                        "name":"Bradley\'s house",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"Bradley\'s marijuana patch was in the fenced rear yard of Bradley\'s house",
+                                "standard_of_proof": null
+                            }
+                        ],
+                        "name": ""
+                    },
+                    "enactments": {
+                        "passages": [
+                            {
+                                "enactment": {
+                                    "node": "/us/const/amendment/IV",
+                                    "start_date": "1791-12-15",
+                                    "heading": "AMENDMENT IV.",
+                                    "text_version": {
+                                        "content": "The right of the people to be secure in their persons, houses, papers, and effects, against unreasonable searches and seizures, shall not be violated, and no Warrants shall issue, but upon probable cause, supported by Oath or affirmation, and particularly describing the place to be searched, and the persons or things to be seized.",
+                                        "url": "https://authorityspoke.com/api/v1/textversions/735706/",
+                                        "id": 735706
+                                    },
+                                    "end_date": null,
+                                    "first_published": null,
+                                    "earliest_in_db": null,
+                                    "anchors": [],
+                                    "citations": [],
+                                    "name": "/us/const/amendment/IV",
+                                    "children": []
+                                },
+                                "selection": {
+                                    "positions": [],
+                                    "quotes": [
+                                        {
+                                            "exact": "",
+                                            "prefix": "",
+                                            "suffix": ", and no Warrants shall issue"
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "enactment": {
+                                    "node": "/us/const/amendment/XIV/1",
+                                    "start_date": "1868-07-28",
+                                    "heading": "Citizenship: security and equal protection of citizens.",
+                                    "text_version": {
+                                        "content": "All persons born or naturalized in the United States, and subject to the jurisdiction thereof, are citizens of the United States and of the State wherein they reside. No State shall make or enforce any law which shall abridge the privileges or immunities of citizens of the United States; nor shall any State deprive any person of life, liberty, or property, without due process of law; nor deny to any person within its jurisdiction the equal protection of the laws.",
+                                        "url": "https://authorityspoke.com/api/v1/textversions/735717/",
+                                        "id": 735717
+                                    },
+                                    "end_date": null,
+                                    "first_published": null,
+                                    "earliest_in_db": null,
+                                    "anchors": [],
+                                    "citations": [],
+                                    "name": "/us/const/amendment/XIV/1",
+                                    "children": []
+                                },
+                                "selection": {
+                                    "positions": [],
+                                    "quotes": [
+                                        {
+                                            "exact": "",
+                                            "prefix": "immunities of citizens of the United States; ",
+                                            "suffix": " nor deny to any person"
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    "enactments_despite": {
+                        "passages": []
+                    },
+                    "mandatory": true,
+                    "universal": false,
+                    "name": null
+                },
+                "rule_valid": true,
+                "decided": true,
+                "exclusive": false
+            },
+            "anchors": {
+                "positions": [],
+                "quotes": []
+            }
+        }
+    ],
+    "named_anchors": [],
+    "enactment_anchors": []
+}

@@ -1,0 +1,687 @@
+{
+    "holdings": [
+        {
+            "holding": {
+                "generic": false,
+                "rule": {
+                    "generic": false,
+                    "procedure": {
+                        "outputs": [
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "${mazza_alaluf} operated ${turismo_costa_brava} without an appropriate money transmitting license in a State where such operation was punishable as a misdemeanor or a felony under State law",
+                                    "truth": true
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "name": "Mazza-Alaluf",
+                                        "plural": false
+                                    },
+                                    {
+                                        "generic": true,
+                                        "name": "Turismo Costa Brava",
+                                        "plural": false
+                                    }
+                                ],
+                                "name": "operated without license",
+                                "standard_of_proof": null
+                            }
+                        ],
+                        "inputs": [
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content":"${mazza_alaluf} used ${mazza_alaluf}\'s business ${turismo_costa_brava} to commit the New York offense of engaging in the business of receiving money for transmission or transmitting the same, without a license therefor",
+                                    "truth": true
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "name": "Mazza-Alaluf",
+                                        "plural": false
+                                    },
+                                    {
+                                        "generic": true,
+                                        "name": "Turismo Costa Brava",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"Mazza-Alaluf used Mazza-Alaluf\'s business Turismo Costa Brava to commit the New York offense of engaging in the business of receiving money for transmission or transmitting the same, without a license therefor",
+                                "standard_of_proof": null
+                            }
+                        ],
+                        "despite": [],
+                        "name": ""
+                    },
+                    "enactments": {
+                        "passages": [
+                            {
+                                "enactment": {
+                                    "node": "/us/usc/t18/s1960/b/1",
+                                    "start_date": "2013-07-18",
+                                    "heading": "",
+                                    "text_version": {
+                                        "content": "the term “unlicensed money transmitting business” means a money transmitting business which affects interstate or foreign commerce in any manner or degree and—",
+                                        "url": "https://authorityspoke.com/api/v1/textversions/943740/",
+                                        "id": 943740
+                                    },
+                                    "end_date": null,
+                                    "first_published": null,
+                                    "earliest_in_db": null,
+                                    "anchors": [],
+                                    "citations": [],
+                                    "name": "/us/usc/t18/s1960/b/1",
+                                    "children": [
+                                        {
+                                            "node": "/us/usc/t18/s1960/b/1/A",
+                                            "start_date": "2013-07-18",
+                                            "heading": "",
+                                            "text_version": {
+                                                "content": "is operated without an appropriate money transmitting license in a State where such operation is punishable as a misdemeanor or a felony under State law, whether or not the defendant knew that the operation was required to be licensed or that the operation was so punishable;",
+                                                "url": "https://authorityspoke.com/api/v1/textversions/943737/",
+                                                "id": 943737
+                                            },
+                                            "end_date": null,
+                                            "first_published": null,
+                                            "earliest_in_db": null,
+                                            "anchors": [],
+                                            "citations": [],
+                                            "name": "",
+                                            "children": []
+                                        },
+                                        {
+                                            "node": "/us/usc/t18/s1960/b/1/B",
+                                            "start_date": "2013-07-18",
+                                            "heading": "",
+                                            "text_version": {
+                                                "content": "fails to comply with the money transmitting business registration requirements under section 5330 of title 31, United States Code, or regulations prescribed under such section; or",
+                                                "url": "https://authorityspoke.com/api/v1/textversions/943738/",
+                                                "id": 943738
+                                            },
+                                            "end_date": null,
+                                            "first_published": null,
+                                            "earliest_in_db": null,
+                                            "anchors": [],
+                                            "citations": [],
+                                            "name": "",
+                                            "children": []
+                                        },
+                                        {
+                                            "node": "/us/usc/t18/s1960/b/1/C",
+                                            "start_date": "2013-07-18",
+                                            "heading": "",
+                                            "text_version": {
+                                                "content": "otherwise involves the transportation or transmission of funds that are known to the defendant to have been derived from a criminal offense or are intended to be used to promote or support unlawful activity;",
+                                                "url": "https://authorityspoke.com/api/v1/textversions/943739/",
+                                                "id": 943739
+                                            },
+                                            "end_date": null,
+                                            "first_published": null,
+                                            "earliest_in_db": null,
+                                            "anchors": [],
+                                            "citations": [],
+                                            "name": "",
+                                            "children": []
+                                        }
+                                    ]
+                                },
+                                "selection": {
+                                    "positions": [],
+                                    "quotes": [
+                                        {
+                                            "exact": "is operated without an appropriate money transmitting license in a State where such operation is punishable as a misdemeanor or a felony under State law, whether or not the defendant knew that the operation was required to be licensed or that the operation was so punishable",
+                                            "prefix": "",
+                                            "suffix": ""
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    "enactments_despite": {
+                        "passages": []
+                    },
+                    "mandatory": false,
+                    "universal": true,
+                    "name": null
+                },
+                "rule_valid": true,
+                "decided": true,
+                "exclusive": false
+            },
+            "anchors": {
+                "positions": [],
+                "quotes": []
+            }
+        },
+        {
+            "holding": {
+                "generic": false,
+                "rule": {
+                    "generic": false,
+                    "procedure": {
+                        "outputs": [
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "${mazza_alaluf} committed the offense of conducting a money transmitting business without a license required by state law",
+                                    "truth": true
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "name": "Mazza-Alaluf",
+                                        "plural": false
+                                    }
+                                ],
+                                "name": "Mazza-Alaluf committed the offense of conducting a money transmitting business without a license required by state law",
+                                "standard_of_proof": null
+                            }
+                        ],
+                        "inputs": [
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "${mazza_alaluf} operated ${turismo_costa_brava} without an appropriate money transmitting license in a State where such operation was punishable as a misdemeanor or a felony under State law",
+                                    "truth": true
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "name": "Mazza-Alaluf",
+                                        "plural": false
+                                    },
+                                    {
+                                        "generic": true,
+                                        "name": "Turismo Costa Brava",
+                                        "plural": false
+                                    }
+                                ],
+                                "name": "operated without license",
+                                "standard_of_proof": null
+                            },
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "${mazza_alaluf} operated ${turismo_costa_brava} as a business",
+                                    "truth": true
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "name": "Mazza-Alaluf",
+                                        "plural": false
+                                    },
+                                    {
+                                        "generic": true,
+                                        "name": "Turismo Costa Brava",
+                                        "plural": false
+                                    }
+                                ],
+                                "name": "Mazza-Alaluf operated Turismo Costa Brava as a business",
+                                "standard_of_proof": null
+                            },
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "${turismo_costa_brava} was a money transmitting business",
+                                    "truth": true
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "name": "Turismo Costa Brava",
+                                        "plural": false
+                                    }
+                                ],
+                                "name": "Turismo Costa Brava was a money transmitting business",
+                                "standard_of_proof": null
+                            }
+                        ],
+                        "despite": [
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "${turismo_costa_brava} was a domestic financial institution",
+                                    "truth": false
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "name": "Turismo Costa Brava",
+                                        "plural": false
+                                    }
+                                ],
+                                "name": "false Turismo Costa Brava was a domestic financial institution",
+                                "standard_of_proof": null
+                            }
+                        ],
+                        "name": ""
+                    },
+                    "enactments": {
+                        "passages": [
+                            {
+                                "enactment": {
+                                    "node": "/us/usc/t18/s1960/b/1",
+                                    "start_date": "2013-07-18",
+                                    "heading": "",
+                                    "text_version": {
+                                        "content": "the term “unlicensed money transmitting business” means a money transmitting business which affects interstate or foreign commerce in any manner or degree and—",
+                                        "url": "https://authorityspoke.com/api/v1/textversions/943740/",
+                                        "id": 943740
+                                    },
+                                    "end_date": null,
+                                    "first_published": null,
+                                    "earliest_in_db": null,
+                                    "anchors": [],
+                                    "citations": [],
+                                    "name": "/us/usc/t18/s1960/b/1",
+                                    "children": [
+                                        {
+                                            "node": "/us/usc/t18/s1960/b/1/A",
+                                            "start_date": "2013-07-18",
+                                            "heading": "",
+                                            "text_version": {
+                                                "content": "is operated without an appropriate money transmitting license in a State where such operation is punishable as a misdemeanor or a felony under State law, whether or not the defendant knew that the operation was required to be licensed or that the operation was so punishable;",
+                                                "url": "https://authorityspoke.com/api/v1/textversions/943737/",
+                                                "id": 943737
+                                            },
+                                            "end_date": null,
+                                            "first_published": null,
+                                            "earliest_in_db": null,
+                                            "anchors": [],
+                                            "citations": [],
+                                            "name": "",
+                                            "children": []
+                                        },
+                                        {
+                                            "node": "/us/usc/t18/s1960/b/1/B",
+                                            "start_date": "2013-07-18",
+                                            "heading": "",
+                                            "text_version": {
+                                                "content": "fails to comply with the money transmitting business registration requirements under section 5330 of title 31, United States Code, or regulations prescribed under such section; or",
+                                                "url": "https://authorityspoke.com/api/v1/textversions/943738/",
+                                                "id": 943738
+                                            },
+                                            "end_date": null,
+                                            "first_published": null,
+                                            "earliest_in_db": null,
+                                            "anchors": [],
+                                            "citations": [],
+                                            "name": "",
+                                            "children": []
+                                        },
+                                        {
+                                            "node": "/us/usc/t18/s1960/b/1/C",
+                                            "start_date": "2013-07-18",
+                                            "heading": "",
+                                            "text_version": {
+                                                "content": "otherwise involves the transportation or transmission of funds that are known to the defendant to have been derived from a criminal offense or are intended to be used to promote or support unlawful activity;",
+                                                "url": "https://authorityspoke.com/api/v1/textversions/943739/",
+                                                "id": 943739
+                                            },
+                                            "end_date": null,
+                                            "first_published": null,
+                                            "earliest_in_db": null,
+                                            "anchors": [],
+                                            "citations": [],
+                                            "name": "",
+                                            "children": []
+                                        }
+                                    ]
+                                },
+                                "selection": {
+                                    "positions": [],
+                                    "quotes": [
+                                        {
+                                            "exact": "is operated without an appropriate money transmitting license in a State where such operation is punishable as a misdemeanor or a felony under State law, whether or not the defendant knew that the operation was required to be licensed or that the operation was so punishable",
+                                            "prefix": "",
+                                            "suffix": ""
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    "enactments_despite": {
+                        "passages": [
+                            {
+                                "enactment": {
+                                    "node": "/us/usc/t31/s5312/b/1",
+                                    "start_date": "2013-07-18",
+                                    "heading": "",
+                                    "text_version": {
+                                        "content": "“domestic financial agency” and “domestic financial institution” apply to an action in the United States of a financial agency or institution.",
+                                        "url": "https://authorityspoke.com/api/v1/textversions/1267044/",
+                                        "id": 1267044
+                                    },
+                                    "end_date": null,
+                                    "first_published": null,
+                                    "earliest_in_db": null,
+                                    "anchors": [],
+                                    "citations": [],
+                                    "name": "/us/usc/t31/s5312/b/1",
+                                    "children": []
+                                },
+                                "selection": {
+                                    "positions": [
+                                        {
+                                            "start": 0,
+                                            "end": null
+                                        }
+                                    ],
+                                    "quotes": []
+                                }
+                            }
+                        ]
+                    },
+                    "mandatory": true,
+                    "universal": true,
+                    "name": null
+                },
+                "rule_valid": true,
+                "decided": true,
+                "exclusive": false
+            },
+            "anchors": {
+                "positions": [],
+                "quotes": [
+                    {
+                        "exact": "",
+                        "prefix": "Accordingly, we conclude that the",
+                        "suffix": "In any event"
+                    }
+                ]
+            }
+        }
+    ],
+    "named_anchors": [
+        {
+            "term": {
+                "generic": false,
+                "predicate": {
+                    "content": "${mazza_alaluf} committed the offense of conducting a money transmitting business without a license required by state law",
+                    "truth": true
+                },
+                "terms": [
+                    {
+                        "generic": true,
+                        "name": "Mazza-Alaluf",
+                        "plural": false
+                    }
+                ],
+                "name": "",
+                "standard_of_proof": null
+            },
+            "anchors": {
+                "positions": [],
+                "quotes": [
+                    {
+                        "exact": "a crime to operate a money transmitting business without appropriate state licenses,",
+                        "prefix": "",
+                        "suffix": ""
+                    }
+                ]
+            }
+        },
+        {
+            "term": {
+                "generic": false,
+                "predicate": {
+                    "content": "${turismo_costa_brava} was a domestic financial institution",
+                    "truth": false
+                },
+                "terms": [
+                    {
+                        "generic": true,
+                        "name": "Turismo Costa Brava",
+                        "plural": false
+                    }
+                ],
+                "name": "",
+                "standard_of_proof": null
+            },
+            "anchors": {
+                "positions": [],
+                "quotes": [
+                    {
+                        "exact": "without respect to whether or not Turismo was a \"domestic financial institution\"",
+                        "prefix": "",
+                        "suffix": ""
+                    }
+                ]
+            }
+        },
+        {
+            "term": {
+                "generic": false,
+                "predicate": {
+                    "content": "${mazza_alaluf} operated ${turismo_costa_brava} as a business",
+                    "truth": true
+                },
+                "terms": [
+                    {
+                        "generic": true,
+                        "name": "Mazza-Alaluf",
+                        "plural": false
+                    },
+                    {
+                        "generic": true,
+                        "name": "Turismo Costa Brava",
+                        "plural": false
+                    }
+                ],
+                "name": "",
+                "standard_of_proof": null
+            },
+            "anchors": {
+                "positions": [],
+                "quotes": [
+                    {
+                        "exact": "Mazza-Alaluf does not contest that he owned and managed Turismo",
+                        "prefix": "",
+                        "suffix": ""
+                    }
+                ]
+            }
+        },
+        {
+            "term": {
+                "generic": false,
+                "predicate": {
+                    "content": "${turismo_costa_brava} was a money transmitting business",
+                    "truth": true
+                },
+                "terms": [
+                    {
+                        "generic": true,
+                        "name": "Turismo Costa Brava",
+                        "plural": false
+                    }
+                ],
+                "name": "",
+                "standard_of_proof": null
+            },
+            "anchors": {
+                "positions": [],
+                "quotes": [
+                    {
+                        "exact": "record evidence that Turismo conducted substantial money transmitting business in the three states",
+                        "prefix": "",
+                        "suffix": ""
+                    }
+                ]
+            }
+        },
+        {
+            "term": {
+                "generic": false,
+                "predicate": {
+                    "content": "${mazza_alaluf} operated ${turismo_costa_brava} without an appropriate money transmitting license in a State where such operation was punishable as a misdemeanor or a felony under State law",
+                    "truth": true
+                },
+                "terms": [
+                    {
+                        "generic": true,
+                        "name": "Mazza-Alaluf",
+                        "plural": false
+                    },
+                    {
+                        "generic": true,
+                        "name": "Turismo Costa Brava",
+                        "plural": false
+                    }
+                ],
+                "name": "",
+                "standard_of_proof": null
+            },
+            "anchors": {
+                "positions": [],
+                "quotes": [
+                    {
+                        "exact":"we conclude that sufficient evidence supports Mazza-Alaluf\'s convictions under 18 U.S.C. § 1960(b)(1)(A) for conspiring to operate and operating a money transmitting business without appropriate state licenses.",
+                        "prefix": "",
+                        "suffix": ""
+                    }
+                ]
+            }
+        }
+    ],
+    "enactment_anchors": [
+        {
+            "passage": {
+                "enactment": {
+                    "node": "/us/usc/t18/s1960/b/1",
+                    "start_date": "2013-07-18",
+                    "heading": "",
+                    "text_version": {
+                        "content": "the term “unlicensed money transmitting business” means a money transmitting business which affects interstate or foreign commerce in any manner or degree and—",
+                        "url": "https://authorityspoke.com/api/v1/textversions/943740/",
+                        "id": 943740
+                    },
+                    "end_date": null,
+                    "first_published": null,
+                    "earliest_in_db": null,
+                    "anchors": [],
+                    "citations": [],
+                    "name": "/us/usc/t18/s1960/b/1",
+                    "children": [
+                        {
+                            "node": "/us/usc/t18/s1960/b/1/A",
+                            "start_date": "2013-07-18",
+                            "heading": "",
+                            "text_version": {
+                                "content": "is operated without an appropriate money transmitting license in a State where such operation is punishable as a misdemeanor or a felony under State law, whether or not the defendant knew that the operation was required to be licensed or that the operation was so punishable;",
+                                "url": "https://authorityspoke.com/api/v1/textversions/943737/",
+                                "id": 943737
+                            },
+                            "end_date": null,
+                            "first_published": null,
+                            "earliest_in_db": null,
+                            "anchors": [],
+                            "citations": [],
+                            "name": "",
+                            "children": []
+                        },
+                        {
+                            "node": "/us/usc/t18/s1960/b/1/B",
+                            "start_date": "2013-07-18",
+                            "heading": "",
+                            "text_version": {
+                                "content": "fails to comply with the money transmitting business registration requirements under section 5330 of title 31, United States Code, or regulations prescribed under such section; or",
+                                "url": "https://authorityspoke.com/api/v1/textversions/943738/",
+                                "id": 943738
+                            },
+                            "end_date": null,
+                            "first_published": null,
+                            "earliest_in_db": null,
+                            "anchors": [],
+                            "citations": [],
+                            "name": "",
+                            "children": []
+                        },
+                        {
+                            "node": "/us/usc/t18/s1960/b/1/C",
+                            "start_date": "2013-07-18",
+                            "heading": "",
+                            "text_version": {
+                                "content": "otherwise involves the transportation or transmission of funds that are known to the defendant to have been derived from a criminal offense or are intended to be used to promote or support unlawful activity;",
+                                "url": "https://authorityspoke.com/api/v1/textversions/943739/",
+                                "id": 943739
+                            },
+                            "end_date": null,
+                            "first_published": null,
+                            "earliest_in_db": null,
+                            "anchors": [],
+                            "citations": [],
+                            "name": "",
+                            "children": []
+                        }
+                    ]
+                },
+                "selection": {
+                    "positions": [],
+                    "quotes": [
+                        {
+                            "exact": "is operated without an appropriate money transmitting license in a State where such operation is punishable as a misdemeanor or a felony under State law, whether or not the defendant knew that the operation was required to be licensed or that the operation was so punishable",
+                            "prefix": "",
+                            "suffix": ""
+                        }
+                    ]
+                }
+            },
+            "anchors": {
+                "positions": [],
+                "quotes": [
+                    {
+                        "exact": "18 U.S.C. § 1960(b)(1)(A)",
+                        "prefix": "state money transmitting licenses, see ",
+                        "suffix": ""
+                    }
+                ]
+            }
+        },
+        {
+            "passage": {
+                "enactment": {
+                    "node": "/us/usc/t31/s5312/b/1",
+                    "start_date": "2013-07-18",
+                    "heading": "",
+                    "text_version": {
+                        "content": "“domestic financial agency” and “domestic financial institution” apply to an action in the United States of a financial agency or institution.",
+                        "url": "https://authorityspoke.com/api/v1/textversions/1267044/",
+                        "id": 1267044
+                    },
+                    "end_date": null,
+                    "first_published": null,
+                    "earliest_in_db": null,
+                    "anchors": [],
+                    "citations": [],
+                    "name": "/us/usc/t31/s5312/b/1",
+                    "children": []
+                },
+                "selection": {
+                    "positions": [
+                        {
+                            "start": 0,
+                            "end": null
+                        }
+                    ],
+                    "quotes": []
+                }
+            },
+            "anchors": {
+                "positions": [],
+                "quotes": [
+                    {
+                        "exact": "§ 5312(b)(1) (defining \"domestic financial institution\")",
+                        "prefix": "",
+                        "suffix": ""
+                    }
+                ]
+            }
+        }
+    ]
+}

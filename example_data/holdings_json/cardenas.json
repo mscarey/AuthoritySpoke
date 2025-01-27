@@ -1,0 +1,709 @@
+{
+    "holdings": [
+        {
+            "holding": {
+                "generic": false,
+                "rule": {
+                    "generic": false,
+                    "procedure": {
+                        "outputs": [
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "the probative value of ${officer_s_testimony_that_the_defendant_was_addicted_to_heroin}, in showing ${fact_that_the_defendant_committed_an_attempted_robbery}, was outweighed by unfair prejudice to ${the_defendant}",
+                                    "truth": true
+                                },
+                                "terms": [
+                                    {
+                                        "generic": false,
+                                        "offered_by": {
+                                            "generic": true,
+                                            "name": "The People of California",
+                                            "plural": false
+                                        },
+                                        "form": "testimony",
+                                        "statement": {
+                                            "generic": false,
+                                            "predicate": {
+                                                "content": "${the_defendant} was addicted to heroin",
+                                                "truth": true
+                                            },
+                                            "terms": [
+                                                {
+                                                    "generic": true,
+                                                    "name": "the defendant",
+                                                    "plural": false
+                                                }
+                                            ],
+                                            "name": "fact that the defendant was addicted to heroin",
+                                            "standard_of_proof": null
+                                        },
+                                        "statement_attribution": {
+                                            "generic": true,
+                                            "name": "parole officer",
+                                            "plural": false
+                                        },
+                                        "name":"officer\'s testimony that the defendant was addicted to heroin"
+                                    },
+                                    {
+                                        "generic": false,
+                                        "predicate": {
+                                            "content": "${the_defendant} committed an attempted robbery",
+                                            "truth": true
+                                        },
+                                        "terms": [
+                                            {
+                                                "generic": true,
+                                                "name": "the defendant",
+                                                "plural": false
+                                            }
+                                        ],
+                                        "name": "fact that the defendant committed an attempted robbery",
+                                        "standard_of_proof": null
+                                    },
+                                    {
+                                        "generic": true,
+                                        "name": "the defendant",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"the probative value of officer\'s testimony that the defendant was addicted to heroin, in showing fact that the defendant committed an attempted robbery, was outweighed by unfair prejudice to the defendant",
+                                "standard_of_proof": null
+                            }
+                        ],
+                        "inputs": [
+                            {
+                                "generic": false,
+                                "offered_by": {
+                                    "generic": true,
+                                    "name": "The People of California",
+                                    "plural": false
+                                },
+                                "form": "testimony",
+                                "statement": {
+                                    "generic": false,
+                                    "predicate": {
+                                        "content": "${the_defendant} was addicted to heroin",
+                                        "truth": true
+                                    },
+                                    "terms": [
+                                        {
+                                            "generic": true,
+                                            "name": "the defendant",
+                                            "plural": false
+                                        }
+                                    ],
+                                    "name": "fact that the defendant was addicted to heroin",
+                                    "standard_of_proof": null
+                                },
+                                "statement_attribution": {
+                                    "generic": true,
+                                    "name": "parole officer",
+                                    "plural": false
+                                },
+                                "name":"officer\'s testimony that the defendant was addicted to heroin"
+                            },
+                            {
+                                "generic": false,
+                                "fact": {
+                                    "generic": false,
+                                    "predicate": {
+                                        "content": "${the_defendant} committed an attempted robbery",
+                                        "truth": true
+                                    },
+                                    "terms": [
+                                        {
+                                            "generic": true,
+                                            "name": "the defendant",
+                                            "plural": false
+                                        }
+                                    ],
+                                    "name": "fact that the defendant committed an attempted robbery",
+                                    "standard_of_proof": null
+                                },
+                                "pleading": {
+                                    "generic": false,
+                                    "filer": {
+                                        "generic": true,
+                                        "name": "The People of California",
+                                        "plural": false
+                                    },
+                                    "name": "pleading filed by The People of California"
+                                },
+                                "name": "the attempted robbery charge"
+                            }
+                        ],
+                        "despite": [
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "${officer_s_testimony_that_the_defendant_was_addicted_to_heroin} was relevant to show ${the_defendant} had a motive to commit an attempted robbery",
+                                    "truth": true
+                                },
+                                "terms": [
+                                    {
+                                        "generic": false,
+                                        "offered_by": {
+                                            "generic": true,
+                                            "name": "The People of California",
+                                            "plural": false
+                                        },
+                                        "form": "testimony",
+                                        "statement": {
+                                            "generic": false,
+                                            "predicate": {
+                                                "content": "${the_defendant} was addicted to heroin",
+                                                "truth": true
+                                            },
+                                            "terms": [
+                                                {
+                                                    "generic": true,
+                                                    "name": "the defendant",
+                                                    "plural": false
+                                                }
+                                            ],
+                                            "name": "fact that the defendant was addicted to heroin",
+                                            "standard_of_proof": null
+                                        },
+                                        "statement_attribution": {
+                                            "generic": true,
+                                            "name": "parole officer",
+                                            "plural": false
+                                        },
+                                        "name":"officer\'s testimony that the defendant was addicted to heroin"
+                                    },
+                                    {
+                                        "generic": true,
+                                        "name": "the defendant",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"officer\'s testimony that the defendant was addicted to heroin was relevant to show the defendant had a motive to commit an attempted robbery",
+                                "standard_of_proof": null
+                            }
+                        ],
+                        "name": ""
+                    },
+                    "enactments": {
+                        "passages": [
+                            {
+                                "enactment": {
+                                    "node": "/us-ca/code/evid/s351",
+                                    "start_date": "1966-01-01",
+                                    "heading": "",
+                                    "text_version": {
+                                        "content": "Except as otherwise provided by statute, all relevant evidence is admissible.",
+                                        "url": null,
+                                        "id": null
+                                    },
+                                    "end_date": null,
+                                    "first_published": null,
+                                    "earliest_in_db": null,
+                                    "anchors": [],
+                                    "citations": [],
+                                    "name": "/us-ca/code/evid/s351@1966-01-01",
+                                    "children": []
+                                },
+                                "selection": {
+                                    "positions": [
+                                        {
+                                            "start": 0,
+                                            "end": null
+                                        }
+                                    ],
+                                    "quotes": []
+                                }
+                            },
+                            {
+                                "enactment": {
+                                    "node": "/us-ca/code/evid/s352",
+                                    "start_date": "1966-01-01",
+                                    "heading": "",
+                                    "text_version": {
+                                        "content": "The court in its discretion may exclude evidence if its probative value is substantially outweighed by the probability that its admission will",
+                                        "url": null,
+                                        "id": null
+                                    },
+                                    "end_date": null,
+                                    "first_published": null,
+                                    "earliest_in_db": null,
+                                    "anchors": [],
+                                    "citations": [],
+                                    "name": "/us-ca/code/evid/s352@1966-01-01",
+                                    "children": [
+                                        {
+                                            "node": "/us-ca/code/evid/s352/a",
+                                            "start_date": "1966-01-01",
+                                            "heading": "",
+                                            "text_version": {
+                                                "content": "necessitate undue consumption of time or",
+                                                "url": null,
+                                                "id": null
+                                            },
+                                            "end_date": null,
+                                            "first_published": null,
+                                            "earliest_in_db": null,
+                                            "anchors": [],
+                                            "citations": [],
+                                            "name": "",
+                                            "children": []
+                                        },
+                                        {
+                                            "node": "/us-ca/code/evid/s352/b",
+                                            "start_date": "1966-01-01",
+                                            "heading": "",
+                                            "text_version": {
+                                                "content": "create substantial danger of undue prejudice, of confusing the issues, or of misleading the jury.",
+                                                "url": null,
+                                                "id": null
+                                            },
+                                            "end_date": null,
+                                            "first_published": null,
+                                            "earliest_in_db": null,
+                                            "anchors": [],
+                                            "citations": [],
+                                            "name": "",
+                                            "children": []
+                                        }
+                                    ]
+                                },
+                                "selection": {
+                                    "positions": [],
+                                    "quotes": [
+                                        {
+                                            "exact": "",
+                                            "prefix": "",
+                                            "suffix": "necessitate undue"
+                                        },
+                                        {
+                                            "exact": "create substantial danger of undue prejudice",
+                                            "prefix": "",
+                                            "suffix": ""
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "enactment": {
+                                    "node": "/us-ca/code/pen/s211",
+                                    "start_date": "1873-01-01",
+                                    "heading": "",
+                                    "text_version": {
+                                        "content": "Robbery is the felonious taking of personal property in the possession of another, from his person or immediate presence, and against his will, accomplished by means of force or fear.",
+                                        "url": null,
+                                        "id": null
+                                    },
+                                    "end_date": null,
+                                    "first_published": null,
+                                    "earliest_in_db": null,
+                                    "anchors": [],
+                                    "citations": [],
+                                    "name": "/us-ca/code/pen/s211@1873-01-01",
+                                    "children": []
+                                },
+                                "selection": {
+                                    "positions": [
+                                        {
+                                            "start": 0,
+                                            "end": null
+                                        }
+                                    ],
+                                    "quotes": []
+                                }
+                            },
+                            {
+                                "enactment": {
+                                    "node": "/us-ca/code/pen/s664",
+                                    "start_date": "2011-04-04",
+                                    "heading": "",
+                                    "text_version": {
+                                        "content": "Every person who attempts to commit any crime, but fails, or is prevented or intercepted in its perpetration, shall be punished where no provision is made by law for the punishment of those attempts, [text omitted]",
+                                        "url": null,
+                                        "id": null
+                                    },
+                                    "end_date": null,
+                                    "first_published": null,
+                                    "earliest_in_db": null,
+                                    "anchors": [],
+                                    "citations": [],
+                                    "name": "/us-ca/code/pen/s664@2011-04-04",
+                                    "children": []
+                                },
+                                "selection": {
+                                    "positions": [],
+                                    "quotes": [
+                                        {
+                                            "exact": "",
+                                            "prefix": "",
+                                            "suffix": "where no provision is"
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    "enactments_despite": {
+                        "passages": []
+                    },
+                    "mandatory": true,
+                    "universal": false,
+                    "name": null
+                },
+                "rule_valid": true,
+                "decided": true,
+                "exclusive": false
+            },
+            "anchors": {
+                "positions": [],
+                "quotes": []
+            }
+        },
+        {
+            "holding": {
+                "generic": false,
+                "rule": {
+                    "generic": false,
+                    "procedure": {
+                        "outputs": [
+                            {
+                                "generic": false,
+                                "absent": true,
+                                "exhibit": {
+                                    "generic": false,
+                                    "offered_by": {
+                                        "generic": true,
+                                        "name": "The People of California",
+                                        "plural": false
+                                    },
+                                    "form": "testimony",
+                                    "statement": {
+                                        "generic": false,
+                                        "predicate": {
+                                            "content": "${the_defendant} was addicted to heroin",
+                                            "truth": true
+                                        },
+                                        "terms": [
+                                            {
+                                                "generic": true,
+                                                "name": "the defendant",
+                                                "plural": false
+                                            }
+                                        ],
+                                        "name": "fact that the defendant was addicted to heroin",
+                                        "standard_of_proof": null
+                                    },
+                                    "statement_attribution": {
+                                        "generic": true,
+                                        "name": "parole officer",
+                                        "plural": false
+                                    },
+                                    "name":"officer\'s testimony that the defendant was addicted to heroin"
+                                },
+                                "to_effect": {
+                                    "generic": false,
+                                    "predicate": {
+                                        "content": "${the_defendant} committed an attempted robbery",
+                                        "truth": true
+                                    },
+                                    "terms": [
+                                        {
+                                            "generic": true,
+                                            "name": "the defendant",
+                                            "plural": false
+                                        }
+                                    ],
+                                    "name": "fact that the defendant committed an attempted robbery",
+                                    "standard_of_proof": null
+                                },
+                                "name":"evidence of officer\'s testimony that the defendant was addicted to heroin"
+                            }
+                        ],
+                        "inputs": [
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "the probative value of ${officer_s_testimony_that_the_defendant_was_addicted_to_heroin}, in showing ${fact_that_the_defendant_committed_an_attempted_robbery}, was outweighed by unfair prejudice to defendant",
+                                    "truth": true
+                                },
+                                "terms": [
+                                    {
+                                        "generic": false,
+                                        "offered_by": {
+                                            "generic": true,
+                                            "name": "The People of California",
+                                            "plural": false
+                                        },
+                                        "form": "testimony",
+                                        "statement": {
+                                            "generic": false,
+                                            "predicate": {
+                                                "content": "${the_defendant} was addicted to heroin",
+                                                "truth": true
+                                            },
+                                            "terms": [
+                                                {
+                                                    "generic": true,
+                                                    "name": "the defendant",
+                                                    "plural": false
+                                                }
+                                            ],
+                                            "name": "fact that the defendant was addicted to heroin",
+                                            "standard_of_proof": null
+                                        },
+                                        "statement_attribution": {
+                                            "generic": true,
+                                            "name": "parole officer",
+                                            "plural": false
+                                        },
+                                        "name":"officer\'s testimony that the defendant was addicted to heroin"
+                                    },
+                                    {
+                                        "generic": false,
+                                        "predicate": {
+                                            "content": "${the_defendant} committed an attempted robbery",
+                                            "truth": true
+                                        },
+                                        "terms": [
+                                            {
+                                                "generic": true,
+                                                "name": "the defendant",
+                                                "plural": false
+                                            }
+                                        ],
+                                        "name": "fact that the defendant committed an attempted robbery",
+                                        "standard_of_proof": null
+                                    }
+                                ],
+                                "name":"the probative value of officer\'s testimony that the defendant was addicted to heroin, in showing fact that the defendant committed an attempted robbery, was outweighed by unfair prejudice to defendant",
+                                "standard_of_proof": null
+                            }
+                        ],
+                        "despite": [
+                            {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "${officer_s_testimony_that_the_defendant_was_addicted_to_heroin} was relevant to show ${the_defendant} had a motive to commit an attempted robbery",
+                                    "truth": true
+                                },
+                                "terms": [
+                                    {
+                                        "generic": false,
+                                        "offered_by": {
+                                            "generic": true,
+                                            "name": "The People of California",
+                                            "plural": false
+                                        },
+                                        "form": "testimony",
+                                        "statement": {
+                                            "generic": false,
+                                            "predicate": {
+                                                "content": "${the_defendant} was addicted to heroin",
+                                                "truth": true
+                                            },
+                                            "terms": [
+                                                {
+                                                    "generic": true,
+                                                    "name": "the defendant",
+                                                    "plural": false
+                                                }
+                                            ],
+                                            "name": "fact that the defendant was addicted to heroin",
+                                            "standard_of_proof": null
+                                        },
+                                        "statement_attribution": {
+                                            "generic": true,
+                                            "name": "parole officer",
+                                            "plural": false
+                                        },
+                                        "name":"officer\'s testimony that the defendant was addicted to heroin"
+                                    },
+                                    {
+                                        "generic": true,
+                                        "name": "the defendant",
+                                        "plural": false
+                                    }
+                                ],
+                                "name":"officer\'s testimony that the defendant was addicted to heroin was relevant to show the defendant had a motive to commit an attempted robbery",
+                                "standard_of_proof": null
+                            }
+                        ],
+                        "name": ""
+                    },
+                    "enactments": {
+                        "passages": [
+                            {
+                                "enactment": {
+                                    "node": "/us-ca/code/evid/s351",
+                                    "start_date": "1966-01-01",
+                                    "heading": "",
+                                    "text_version": {
+                                        "content": "Except as otherwise provided by statute, all relevant evidence is admissible.",
+                                        "url": null,
+                                        "id": null
+                                    },
+                                    "end_date": null,
+                                    "first_published": null,
+                                    "earliest_in_db": null,
+                                    "anchors": [],
+                                    "citations": [],
+                                    "name": "/us-ca/code/evid/s351@1966-01-01",
+                                    "children": []
+                                },
+                                "selection": {
+                                    "positions": [
+                                        {
+                                            "start": 0,
+                                            "end": null
+                                        }
+                                    ],
+                                    "quotes": []
+                                }
+                            },
+                            {
+                                "enactment": {
+                                    "node": "/us-ca/code/evid/s352",
+                                    "start_date": "1966-01-01",
+                                    "heading": "",
+                                    "text_version": {
+                                        "content": "The court in its discretion may exclude evidence if its probative value is substantially outweighed by the probability that its admission will",
+                                        "url": null,
+                                        "id": null
+                                    },
+                                    "end_date": null,
+                                    "first_published": null,
+                                    "earliest_in_db": null,
+                                    "anchors": [],
+                                    "citations": [],
+                                    "name": "/us-ca/code/evid/s352@1966-01-01",
+                                    "children": [
+                                        {
+                                            "node": "/us-ca/code/evid/s352/a",
+                                            "start_date": "1966-01-01",
+                                            "heading": "",
+                                            "text_version": {
+                                                "content": "necessitate undue consumption of time or",
+                                                "url": null,
+                                                "id": null
+                                            },
+                                            "end_date": null,
+                                            "first_published": null,
+                                            "earliest_in_db": null,
+                                            "anchors": [],
+                                            "citations": [],
+                                            "name": "",
+                                            "children": []
+                                        },
+                                        {
+                                            "node": "/us-ca/code/evid/s352/b",
+                                            "start_date": "1966-01-01",
+                                            "heading": "",
+                                            "text_version": {
+                                                "content": "create substantial danger of undue prejudice, of confusing the issues, or of misleading the jury.",
+                                                "url": null,
+                                                "id": null
+                                            },
+                                            "end_date": null,
+                                            "first_published": null,
+                                            "earliest_in_db": null,
+                                            "anchors": [],
+                                            "citations": [],
+                                            "name": "",
+                                            "children": []
+                                        }
+                                    ]
+                                },
+                                "selection": {
+                                    "positions": [],
+                                    "quotes": [
+                                        {
+                                            "exact": "",
+                                            "prefix": "",
+                                            "suffix": "necessitate undue"
+                                        },
+                                        {
+                                            "exact": "create substantial danger of undue prejudice",
+                                            "prefix": "",
+                                            "suffix": ""
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                "enactment": {
+                                    "node": "/us-ca/code/pen/s211",
+                                    "start_date": "1873-01-01",
+                                    "heading": "",
+                                    "text_version": {
+                                        "content": "Robbery is the felonious taking of personal property in the possession of another, from his person or immediate presence, and against his will, accomplished by means of force or fear.",
+                                        "url": null,
+                                        "id": null
+                                    },
+                                    "end_date": null,
+                                    "first_published": null,
+                                    "earliest_in_db": null,
+                                    "anchors": [],
+                                    "citations": [],
+                                    "name": "/us-ca/code/pen/s211@1873-01-01",
+                                    "children": []
+                                },
+                                "selection": {
+                                    "positions": [
+                                        {
+                                            "start": 0,
+                                            "end": null
+                                        }
+                                    ],
+                                    "quotes": []
+                                }
+                            },
+                            {
+                                "enactment": {
+                                    "node": "/us-ca/code/pen/s664",
+                                    "start_date": "2011-04-04",
+                                    "heading": "",
+                                    "text_version": {
+                                        "content": "Every person who attempts to commit any crime, but fails, or is prevented or intercepted in its perpetration, shall be punished where no provision is made by law for the punishment of those attempts, [text omitted]",
+                                        "url": null,
+                                        "id": null
+                                    },
+                                    "end_date": null,
+                                    "first_published": null,
+                                    "earliest_in_db": null,
+                                    "anchors": [],
+                                    "citations": [],
+                                    "name": "/us-ca/code/pen/s664@2011-04-04",
+                                    "children": []
+                                },
+                                "selection": {
+                                    "positions": [],
+                                    "quotes": [
+                                        {
+                                            "exact": "",
+                                            "prefix": "",
+                                            "suffix": "where no provision is"
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    "enactments_despite": {
+                        "passages": []
+                    },
+                    "mandatory": true,
+                    "universal": false,
+                    "name": null
+                },
+                "rule_valid": true,
+                "decided": true,
+                "exclusive": false
+            },
+            "anchors": {
+                "positions": [],
+                "quotes": []
+            }
+        }
+    ],
+    "named_anchors": [],
+    "enactment_anchors": []
+}
