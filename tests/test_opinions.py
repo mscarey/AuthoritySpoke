@@ -185,11 +185,11 @@ class TestOpinionHoldings:
         client = FakeClient(responses=make_response)
 
         watt.clear_holdings()
-        watt_raw = loaders.load_holdings("holding_watt.yaml")
+        watt_raw = loaders.load_holdings("holding_watt.json")
         watt.posit(readers.read_holdings(watt_raw, client=client))
 
         brad.clear_holdings()
-        brad_raw = loaders.load_holdings("holding_brad.yaml")
+        brad_raw = loaders.load_holdings("holding_brad.json")
         brad.posit(readers.read_holdings(brad_raw, client=client))
 
         context_pairs = {
@@ -208,7 +208,7 @@ class TestOpinionHoldings:
 
         watt = make_opinion_with_holding["watt_majority"]
         watt.clear_holdings()
-        watt_raw = loaders.load_holdings("holding_watt.yaml")
+        watt_raw = loaders.load_holdings("holding_watt.json")
         holdings_to_posit = readers.read_holdings(watt_raw, client=client)
         watt.posit(holdings_to_posit)
         factors = watt.factors_by_name()
@@ -226,11 +226,11 @@ class TestOpinionHoldings:
         client = FakeClient(responses=make_response)
 
         watt.clear_holdings()
-        watt_raw = loaders.load_holdings("holding_watt.yaml")
+        watt_raw = loaders.load_holdings("holding_watt.json")
         watt.posit(readers.read_holdings(watt_raw, client=client))
 
         brad.clear_holdings()
-        brad_raw = loaders.load_holdings("holding_brad.yaml")
+        brad_raw = loaders.load_holdings("holding_brad.json")
         brad.posit(readers.read_holdings(brad_raw, client=client))
 
         context_items = [
@@ -345,7 +345,7 @@ class TestImplication:
         watt.clear_holdings()
         brad.clear_holdings()
         client = FakeClient(responses=make_response)
-        some_rules_raw = loaders.load_holdings(filename="holding_watt.yaml")
+        some_rules_raw = loaders.load_holdings(filename="holding_watt.json")
         some_rules = readers.read_holdings(some_rules_raw, client=client)
         for case in (watt, brad):
             case.clear_holdings()

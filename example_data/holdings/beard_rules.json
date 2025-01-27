@@ -421,7 +421,7 @@
                                         "plural": false
                                     }
                                 ],
-                                "name":"the defendant\'s act of wearing the suspected beard",
+                                "name": "the defendant's act of wearing the suspected beard",
                                 "standard_of_proof": null
                             },
                             {
@@ -454,11 +454,11 @@
                                                 "plural": false
                                             }
                                         ],
-                                        "name":"the defendant\'s act of wearing the suspected beard",
+                                        "name": "the defendant's act of wearing the suspected beard",
                                         "standard_of_proof": null
                                     }
                                 ],
-                                "name":"false the office of the Department of Beards granted an exemption authorizing the defendant\'s act of wearing the suspected beard",
+                                "name": "false the office of the Department of Beards granted an exemption authorizing the defendant's act of wearing the suspected beard",
                                 "standard_of_proof": null
                             }
                         ],
@@ -656,11 +656,11 @@
                                                 "plural": false
                                             }
                                         ],
-                                        "name":"the defendant\'s act of wearing the suspected beard",
+                                        "name": "the defendant's act of wearing the suspected beard",
                                         "standard_of_proof": null
                                     }
                                 ],
-                                "name":"the Department of Beards granted the defendant\'s beard exemption",
+                                "name": "the Department of Beards granted the defendant's beard exemption",
                                 "standard_of_proof": null
                             }
                         ],
@@ -762,11 +762,11 @@
                                                         "plural": false
                                                     }
                                                 ],
-                                                "name":"the defendant\'s act of wearing the suspected beard",
+                                                "name": "the defendant's act of wearing the suspected beard",
                                                 "standard_of_proof": null
                                             }
                                         ],
-                                        "name":"the Department of Beards granted the defendant\'s beard exemption",
+                                        "name": "the Department of Beards granted the defendant's beard exemption",
                                         "standard_of_proof": null
                                     },
                                     "statement_attribution": {
@@ -774,7 +774,7 @@
                                         "name": "the Department of Beards",
                                         "plural": false
                                     },
-                                    "name":"the defendant\'s beardcoin"
+                                    "name": "the defendant's beardcoin"
                                 },
                                 "to_effect": {
                                     "generic": false,
@@ -806,14 +806,14 @@
                                                     "plural": false
                                                 }
                                             ],
-                                            "name":"the defendant\'s act of wearing the suspected beard",
+                                            "name": "the defendant's act of wearing the suspected beard",
                                             "standard_of_proof": null
                                         }
                                     ],
-                                    "name":"the Department of Beards granted the defendant\'s beard exemption",
+                                    "name": "the Department of Beards granted the defendant's beard exemption",
                                     "standard_of_proof": null
                                 },
-                                "name":"evidence of the defendant\'s beardcoin to the effect that the Department of Beards granted the defendant\'s beard exemption"
+                                "name": "evidence of the defendant's beardcoin to the effect that the Department of Beards granted the defendant's beard exemption"
                             }
                         ],
                         "inputs": [
@@ -855,11 +855,11 @@
                                                     "plural": false
                                                 }
                                             ],
-                                            "name":"the defendant\'s act of wearing the suspected beard",
+                                            "name": "the defendant's act of wearing the suspected beard",
                                             "standard_of_proof": null
                                         }
                                     ],
-                                    "name":"the Department of Beards granted the defendant\'s beard exemption",
+                                    "name": "the Department of Beards granted the defendant's beard exemption",
                                     "standard_of_proof": null
                                 },
                                 "statement_attribution": {
@@ -867,7 +867,7 @@
                                     "name": "the Department of Beards",
                                     "plural": false
                                 },
-                                "name":"the defendant\'s beardcoin"
+                                "name": "the defendant's beardcoin"
                             }
                         ],
                         "despite": [],
@@ -914,7 +914,7 @@
                                             "start_date": "2013-07-18",
                                             "heading": "",
                                             "text_version": {
-                                                "content":"The beardcoin\'s blockchain shall be in substantially the following form. WHEREAS this beardcoin is approved by the Department of Beards under section 6,\\n                     it is secured by the following blockchain: □□□□□□□□□□.",
+                                                "content": "The beardcoin's blockchain shall be in substantially the following form. WHEREAS this beardcoin is approved by the Department of Beards under section 6,\\n                     it is secured by the following blockchain: □□□□□□□□□□.",
                                                 "url": null,
                                                 "id": null
                                             },
@@ -994,7 +994,7 @@
                             {
                                 "generic": false,
                                 "predicate": {
-                                    "content":"${the_beardcoin_transaction} was ${the_defendant}\'s purchase of ${any_beardcoin} from ${the_counterparty}",
+                                    "content": "${the_beardcoin_transaction} was ${the_defendant}'s purchase of ${any_beardcoin} from ${the_counterparty}",
                                     "truth": true
                                 },
                                 "terms": [
@@ -1045,7 +1045,7 @@
                                         "plural": false
                                     }
                                 ],
-                                "name":"the beardcoin transaction was the defendant\'s purchase of any beardcoin from the counterparty",
+                                "name": "the beardcoin transaction was the defendant's purchase of any beardcoin from the counterparty",
                                 "standard_of_proof": null
                             }
                         ],
@@ -1138,7 +1138,7 @@
                             {
                                 "generic": false,
                                 "predicate": {
-                                    "content":"${the_beardcoin_transaction} was ${the_counterparty}\'s purchase of ${any_beardcoin} from ${the_defendant}",
+                                    "content": "${the_beardcoin_transaction} was ${the_counterparty}'s purchase of ${any_beardcoin} from ${the_defendant}",
                                     "truth": true
                                 },
                                 "terms": [
@@ -1189,7 +1189,7 @@
                                         "plural": false
                                     }
                                 ],
-                                "name":"the beardcoin transaction was the counterparty\'s purchase of any beardcoin from the defendant",
+                                "name": "the beardcoin transaction was the counterparty's purchase of any beardcoin from the defendant",
                                 "standard_of_proof": null
                             }
                         ],
@@ -1282,7 +1282,7 @@
                             {
                                 "generic": false,
                                 "predicate": {
-                                    "content":"${the_beardcoin_transaction} was ${the_defendant}\'s loan of ${any_beardcoin} to ${the_counterparty}",
+                                    "content": "${the_beardcoin_transaction} was ${the_defendant}'s loan of ${any_beardcoin} to ${the_counterparty}",
                                     "truth": true
                                 },
                                 "terms": [
@@ -1333,7 +1333,7 @@
                                         "plural": false
                                     }
                                 ],
-                                "name":"the beardcoin transaction was the defendant\'s loan of any beardcoin to the counterparty",
+                                "name": "the beardcoin transaction was the defendant's loan of any beardcoin to the counterparty",
                                 "standard_of_proof": null
                             }
                         ],
@@ -1426,7 +1426,7 @@
                             {
                                 "generic": false,
                                 "predicate": {
-                                    "content":"${the_beardcoin_transaction} was ${the_defendant}\'s lease of ${any_beardcoin} to ${the_counterparty}",
+                                    "content": "${the_beardcoin_transaction} was ${the_defendant}'s lease of ${any_beardcoin} to ${the_counterparty}",
                                     "truth": true
                                 },
                                 "terms": [
@@ -1477,7 +1477,7 @@
                                         "plural": false
                                     }
                                 ],
-                                "name":"the beardcoin transaction was the defendant\'s lease of any beardcoin to the counterparty",
+                                "name": "the beardcoin transaction was the defendant's lease of any beardcoin to the counterparty",
                                 "standard_of_proof": null
                             }
                         ],
@@ -1570,7 +1570,7 @@
                             {
                                 "generic": false,
                                 "predicate": {
-                                    "content":"${the_beardcoin_transaction} was ${the_defendant}\'s gift of ${any_beardcoin} to ${the_counterparty}",
+                                    "content": "${the_beardcoin_transaction} was ${the_defendant}'s gift of ${any_beardcoin} to ${the_counterparty}",
                                     "truth": true
                                 },
                                 "terms": [
@@ -1621,7 +1621,7 @@
                                         "plural": false
                                     }
                                 ],
-                                "name":"the beardcoin transaction was the defendant\'s gift of any beardcoin to the counterparty",
+                                "name": "the beardcoin transaction was the defendant's gift of any beardcoin to the counterparty",
                                 "standard_of_proof": null
                             }
                         ],
@@ -1714,7 +1714,7 @@
                             {
                                 "generic": false,
                                 "predicate": {
-                                    "content":"${the_beardcoin_transaction} was ${the_defendant}\'s receipt of ${any_beardcoin} from ${the_counterparty}",
+                                    "content": "${the_beardcoin_transaction} was ${the_defendant}'s receipt of ${any_beardcoin} from ${the_counterparty}",
                                     "truth": true
                                 },
                                 "terms": [
@@ -1765,7 +1765,7 @@
                                         "plural": false
                                     }
                                 ],
-                                "name":"the beardcoin transaction was the defendant\'s receipt of any beardcoin from the counterparty",
+                                "name": "the beardcoin transaction was the defendant's receipt of any beardcoin from the counterparty",
                                 "standard_of_proof": null
                             }
                         ],
@@ -2285,7 +2285,7 @@
                             {
                                 "generic": false,
                                 "predicate": {
-                                    "content":"${the_beardcoin_transaction} was ${the_barber}\'s purchase of ${any_beardcoin} from ${the_customer}",
+                                    "content": "${the_beardcoin_transaction} was ${the_barber}'s purchase of ${any_beardcoin} from ${the_customer}",
                                     "truth": true
                                 },
                                 "terms": [
@@ -2336,13 +2336,13 @@
                                         "plural": false
                                     }
                                 ],
-                                "name":"the beardcoin transaction was the barber\'s purchase of any beardcoin from the customer",
+                                "name": "the beardcoin transaction was the barber's purchase of any beardcoin from the customer",
                                 "standard_of_proof": null
                             },
                             {
                                 "generic": false,
                                 "predicate": {
-                                    "content":"${the_barber} removed ${the_customer}\'s beard with barbering, hairdressing, or other male grooming services",
+                                    "content": "${the_barber} removed ${the_customer}'s beard with barbering, hairdressing, or other male grooming services",
                                     "truth": true
                                 },
                                 "terms": [
@@ -2357,7 +2357,7 @@
                                         "plural": false
                                     }
                                 ],
-                                "name":"the barber removed the customer\'s beard with barbering, hairdressing, or other male grooming services",
+                                "name": "the barber removed the customer's beard with barbering, hairdressing, or other male grooming services",
                                 "standard_of_proof": null
                             },
                             {

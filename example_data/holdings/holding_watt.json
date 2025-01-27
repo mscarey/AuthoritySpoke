@@ -375,7 +375,7 @@
                                 "terms": [
                                     {
                                         "generic": true,
-                                        "name":"officers\' search of the stockpile",
+                                        "name": "officers' search of the stockpile",
                                         "plural": false
                                     },
                                     {
@@ -384,7 +384,7 @@
                                         "plural": false
                                     }
                                 ],
-                                "name":"officers\' search of the stockpile constituted an intrusion upon the stockpile of trees",
+                                "name": "officers' search of the stockpile constituted an intrusion upon the stockpile of trees",
                                 "standard_of_proof": null
                             }
                         ],
@@ -451,11 +451,11 @@
                                 "terms": [
                                     {
                                         "generic": true,
-                                        "name":"officers\' search of the stockpile",
+                                        "name": "officers' search of the stockpile",
                                         "plural": false
                                     }
                                 ],
-                                "name":"officers\' search of the stockpile was a warrantless search and seizure",
+                                "name": "officers' search of the stockpile was a warrantless search and seizure",
                                 "standard_of_proof": null
                             },
                             {
@@ -467,11 +467,11 @@
                                 "terms": [
                                     {
                                         "generic": true,
-                                        "name":"officers\' search of the stockpile",
+                                        "name": "officers' search of the stockpile",
                                         "plural": false
                                     }
                                 ],
-                                "name":"officers\' search of the stockpile was performed by law enforcement officers",
+                                "name": "officers' search of the stockpile was performed by law enforcement officers",
                                 "standard_of_proof": null
                             },
                             {
@@ -483,11 +483,11 @@
                                 "terms": [
                                     {
                                         "generic": true,
-                                        "name":"officers\' search of the stockpile",
+                                        "name": "officers' search of the stockpile",
                                         "plural": false
                                     }
                                 ],
-                                "name":"officers\' search of the stockpile was performed by federal officers",
+                                "name": "officers' search of the stockpile was performed by federal officers",
                                 "standard_of_proof": null
                             },
                             {
@@ -499,7 +499,7 @@
                                 "terms": [
                                     {
                                         "generic": true,
-                                        "name":"officers\' search of the stockpile",
+                                        "name": "officers' search of the stockpile",
                                         "plural": false
                                     },
                                     {
@@ -508,7 +508,7 @@
                                         "plural": false
                                     }
                                 ],
-                                "name":"in officers\' search of the stockpile, several law enforcement officials meticulously went through the stockpile of trees",
+                                "name": "in officers' search of the stockpile, several law enforcement officials meticulously went through the stockpile of trees",
                                 "standard_of_proof": null
                             },
                             {
@@ -526,11 +526,11 @@
                                 "terms": [
                                     {
                                         "generic": true,
-                                        "name":"officers\' search of the stockpile",
+                                        "name": "officers' search of the stockpile",
                                         "plural": false
                                     }
                                 ],
-                                "name":"the time duration of officers\' search of the stockpile was >= 385 minutes",
+                                "name": "the time duration of officers' search of the stockpile was >= 385 minutes",
                                 "standard_of_proof": null
                             }
                         ],
@@ -817,7 +817,7 @@
                                     "form": null,
                                     "statement": null,
                                     "statement_attribution": null,
-                                    "name":"proof of Wattenburg\'s guilt"
+                                    "name": "proof of Wattenburg's guilt"
                                 },
                                 "to_effect": {
                                     "generic": false,
@@ -835,7 +835,7 @@
                                     "name": "Wattenburg committed a crime",
                                     "standard_of_proof": null
                                 },
-                                "name":"absent evidence of proof of Wattenburg\'s guilt to the effect that Wattenburg committed a crime"
+                                "name": "absent evidence of proof of Wattenburg's guilt to the effect that Wattenburg committed a crime"
                             }
                         ],
                         "inputs": [
@@ -869,11 +869,11 @@
                                 "terms": [
                                     {
                                         "generic": true,
-                                        "name":"officers\' search of the stockpile",
+                                        "name": "officers' search of the stockpile",
                                         "plural": false
                                     }
                                 ],
-                                "name":"officers\' search of the stockpile was a warrantless search and seizure",
+                                "name": "officers' search of the stockpile was a warrantless search and seizure",
                                 "standard_of_proof": null
                             },
                             {
@@ -885,11 +885,11 @@
                                 "terms": [
                                     {
                                         "generic": true,
-                                        "name":"officers\' search of the stockpile",
+                                        "name": "officers' search of the stockpile",
                                         "plural": false
                                     }
                                 ],
-                                "name":"officers\' search of the stockpile was performed by law enforcement officers",
+                                "name": "officers' search of the stockpile was performed by law enforcement officers",
                                 "standard_of_proof": null
                             },
                             {
@@ -901,11 +901,11 @@
                                 "terms": [
                                     {
                                         "generic": true,
-                                        "name":"officers\' search of the stockpile",
+                                        "name": "officers' search of the stockpile",
                                         "plural": false
                                     }
                                 ],
-                                "name":"officers\' search of the stockpile was performed by federal officers",
+                                "name": "officers' search of the stockpile was performed by federal officers",
                                 "standard_of_proof": null
                             },
                             {
@@ -917,7 +917,7 @@
                                 "terms": [
                                     {
                                         "generic": true,
-                                        "name":"officers\' search of the stockpile",
+                                        "name": "officers' search of the stockpile",
                                         "plural": false
                                     },
                                     {
@@ -926,7 +926,7 @@
                                         "plural": false
                                     }
                                 ],
-                                "name":"officers\' search of the stockpile constituted an intrusion upon the stockpile of trees",
+                                "name": "officers' search of the stockpile constituted an intrusion upon the stockpile of trees",
                                 "standard_of_proof": null
                             },
                             {
@@ -1015,15 +1015,15 @@
                                         "form": null,
                                         "statement": null,
                                         "statement_attribution": null,
-                                        "name":"proof of Wattenburg\'s guilt"
+                                        "name": "proof of Wattenburg's guilt"
                                     },
                                     {
                                         "generic": true,
-                                        "name":"officers\' search of the stockpile",
+                                        "name": "officers' search of the stockpile",
                                         "plural": false
                                     }
                                 ],
-                                "name":"proof of Wattenburg\'s guilt was derived from officers\' search of the stockpile",
+                                "name": "proof of Wattenburg's guilt was derived from officers' search of the stockpile",
                                 "standard_of_proof": null
                             }
                         ],

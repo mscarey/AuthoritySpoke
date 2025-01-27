@@ -33,7 +33,7 @@
                             {
                                 "generic": false,
                                 "predicate": {
-                                    "content":"${mazza_alaluf} used ${mazza_alaluf}\'s business ${turismo_costa_brava} to commit the New York offense of engaging in the business of receiving money for transmission or transmitting the same, without a license therefor",
+                                    "content": "${mazza_alaluf} used ${mazza_alaluf}'s business ${turismo_costa_brava} to commit the New York offense of engaging in the business of receiving money for transmission or transmitting the same, without a license therefor",
                                     "truth": true
                                 },
                                 "terms": [
@@ -48,7 +48,7 @@
                                         "plural": false
                                     }
                                 ],
-                                "name":"Mazza-Alaluf used Mazza-Alaluf\'s business Turismo Costa Brava to commit the New York offense of engaging in the business of receiving money for transmission or transmitting the same, without a license therefor",
+                                "name": "Mazza-Alaluf used Mazza-Alaluf's business Turismo Costa Brava to commit the New York offense of engaging in the business of receiving money for transmission or transmitting the same, without a license therefor",
                                 "standard_of_proof": null
                             }
                         ],
@@ -541,7 +541,7 @@
                 "positions": [],
                 "quotes": [
                     {
-                        "exact":"we conclude that sufficient evidence supports Mazza-Alaluf\'s convictions under 18 U.S.C. § 1960(b)(1)(A) for conspiring to operate and operating a money transmitting business without appropriate state licenses.",
+                        "exact": "we conclude that sufficient evidence supports Mazza-Alaluf's convictions under 18 U.S.C. § 1960(b)(1)(A) for conspiring to operate and operating a money transmitting business without appropriate state licenses.",
                         "prefix": "",
                         "suffix": ""
                     }

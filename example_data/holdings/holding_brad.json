@@ -20,7 +20,7 @@
                                     "form": null,
                                     "statement": null,
                                     "statement_attribution": null,
-                                    "name":"proof of Bradley\'s guilt"
+                                    "name": "proof of Bradley's guilt"
                                 },
                                 "to_effect": {
                                     "generic": false,
@@ -32,7 +32,7 @@
                                     "name": "fact that Bradley committed a crime",
                                     "standard_of_proof": null
                                 },
-                                "name":"absence of evidence of Bradley\'s guilt"
+                                "name": "absence of evidence of Bradley's guilt"
                             }
                         ],
                         "inputs": [
@@ -45,11 +45,11 @@
                                 "terms": [
                                     {
                                         "generic": true,
-                                        "name":"officers\' search of the yard",
+                                        "name": "officers' search of the yard",
                                         "plural": false
                                     }
                                 ],
-                                "name":"officers\' search of the yard was a warrantless search and seizure",
+                                "name": "officers' search of the yard was a warrantless search and seizure",
                                 "standard_of_proof": null
                             },
                             {
@@ -61,11 +61,11 @@
                                 "terms": [
                                     {
                                         "generic": true,
-                                        "name":"Bradley\'s house",
+                                        "name": "Bradley's house",
                                         "plural": false
                                     }
                                 ],
-                                "name":"Bradley\'s house was a house",
+                                "name": "Bradley's house was a house",
                                 "standard_of_proof": null
                             },
                             {
@@ -82,11 +82,11 @@
                                     },
                                     {
                                         "generic": true,
-                                        "name":"Bradley\'s house",
+                                        "name": "Bradley's house",
                                         "plural": false
                                     }
                                 ],
-                                "name":"Bradley lived at Bradley\'s house",
+                                "name": "Bradley lived at Bradley's house",
                                 "standard_of_proof": null
                             },
                             {
@@ -98,11 +98,11 @@
                                 "terms": [
                                     {
                                         "generic": true,
-                                        "name":"officers\' search of the yard",
+                                        "name": "officers' search of the yard",
                                         "plural": false
                                     }
                                 ],
-                                "name":"officers\' search of the yard was performed by law enforcement officers",
+                                "name": "officers' search of the yard was performed by law enforcement officers",
                                 "standard_of_proof": null
                             },
                             {
@@ -114,16 +114,16 @@
                                 "terms": [
                                     {
                                         "generic": true,
-                                        "name":"officers\' search of the yard",
+                                        "name": "officers' search of the yard",
                                         "plural": false
                                     },
                                     {
                                         "generic": true,
-                                        "name":"Bradley\'s house",
+                                        "name": "Bradley's house",
                                         "plural": false
                                     }
                                 ],
-                                "name":"officers\' search of the yard was performed in the grounds around Bradley\'s house",
+                                "name": "officers' search of the yard was performed in the grounds around Bradley's house",
                                 "standard_of_proof": null
                             },
                             {
@@ -140,11 +140,11 @@
                                     },
                                     {
                                         "generic": true,
-                                        "name":"Bradley\'s marijuana patch",
+                                        "name": "Bradley's marijuana patch",
                                         "plural": false
                                     }
                                 ],
-                                "name":"Bradley exhibited an expectation of privacy in Bradley\'s marijuana patch",
+                                "name": "Bradley exhibited an expectation of privacy in Bradley's marijuana patch",
                                 "standard_of_proof": null
                             },
                             {
@@ -161,23 +161,23 @@
                                     },
                                     {
                                         "generic": true,
-                                        "name":"Bradley\'s marijuana patch",
+                                        "name": "Bradley's marijuana patch",
                                         "plural": false
                                     }
                                 ],
-                                "name":"it was reasonable for Bradley to hold an expectation of privacy in Bradley\'s marijuana patch",
+                                "name": "it was reasonable for Bradley to hold an expectation of privacy in Bradley's marijuana patch",
                                 "standard_of_proof": null
                             },
                             {
                                 "generic": false,
                                 "predicate": {
-                                    "content":"${officers_search_of_the_yard} violated ${bradley}\'s expectation of privacy in ${bradley_s_marijuana_patch}",
+                                    "content": "${officers_search_of_the_yard} violated ${bradley}'s expectation of privacy in ${bradley_s_marijuana_patch}",
                                     "truth": true
                                 },
                                 "terms": [
                                     {
                                         "generic": true,
-                                        "name":"officers\' search of the yard",
+                                        "name": "officers' search of the yard",
                                         "plural": false
                                     },
                                     {
@@ -187,11 +187,11 @@
                                     },
                                     {
                                         "generic": true,
-                                        "name":"Bradley\'s marijuana patch",
+                                        "name": "Bradley's marijuana patch",
                                         "plural": false
                                     }
                                 ],
-                                "name":"officers\' search of the yard violated Bradley\'s expectation of privacy in Bradley\'s marijuana patch",
+                                "name": "officers' search of the yard violated Bradley's expectation of privacy in Bradley's marijuana patch",
                                 "standard_of_proof": null
                             },
                             {
@@ -203,16 +203,16 @@
                                 "terms": [
                                     {
                                         "generic": true,
-                                        "name":"officers\' search of the yard",
+                                        "name": "officers' search of the yard",
                                         "plural": false
                                     },
                                     {
                                         "generic": true,
-                                        "name":"Bradley\'s marijuana patch",
+                                        "name": "Bradley's marijuana patch",
                                         "plural": false
                                     }
                                 ],
-                                "name":"officers\' search of the yard was an unreasonable governmental intrusion upon Bradley\'s marijuana patch",
+                                "name": "officers' search of the yard was an unreasonable governmental intrusion upon Bradley's marijuana patch",
                                 "standard_of_proof": null
                             },
                             {
@@ -232,15 +232,15 @@
                                         "form": null,
                                         "statement": null,
                                         "statement_attribution": null,
-                                        "name":"proof of Bradley\'s guilt"
+                                        "name": "proof of Bradley's guilt"
                                     },
                                     {
                                         "generic": true,
-                                        "name":"officers\' search of the yard",
+                                        "name": "officers' search of the yard",
                                         "plural": false
                                     }
                                 ],
-                                "name":"proof of Bradley\'s guilt was derived from officers\' search of the yard",
+                                "name": "proof of Bradley's guilt was derived from officers' search of the yard",
                                 "standard_of_proof": null
                             }
                         ],
@@ -345,7 +345,7 @@
                                     "form": null,
                                     "statement": null,
                                     "statement_attribution": null,
-                                    "name":"proof of Bradley\'s guilt"
+                                    "name": "proof of Bradley's guilt"
                                 },
                                 "to_effect": {
                                     "generic": false,
@@ -357,7 +357,7 @@
                                     "name": "fact that Bradley committed a crime",
                                     "standard_of_proof": null
                                 },
-                                "name":"absence of evidence of Bradley\'s guilt"
+                                "name": "absence of evidence of Bradley's guilt"
                             }
                         ],
                         "inputs": [
@@ -370,11 +370,11 @@
                                 "terms": [
                                     {
                                         "generic": true,
-                                        "name":"officers\' search of the yard",
+                                        "name": "officers' search of the yard",
                                         "plural": false
                                     }
                                 ],
-                                "name":"officers\' search of the yard was a warrantless search and seizure",
+                                "name": "officers' search of the yard was a warrantless search and seizure",
                                 "standard_of_proof": null
                             },
                             {
@@ -386,11 +386,11 @@
                                 "terms": [
                                     {
                                         "generic": true,
-                                        "name":"Bradley\'s house",
+                                        "name": "Bradley's house",
                                         "plural": false
                                     }
                                 ],
-                                "name":"Bradley\'s house was a house",
+                                "name": "Bradley's house was a house",
                                 "standard_of_proof": null
                             },
                             {
@@ -407,11 +407,11 @@
                                     },
                                     {
                                         "generic": true,
-                                        "name":"Bradley\'s house",
+                                        "name": "Bradley's house",
                                         "plural": false
                                     }
                                 ],
-                                "name":"Bradley lived at Bradley\'s house",
+                                "name": "Bradley lived at Bradley's house",
                                 "standard_of_proof": null
                             },
                             {
@@ -423,11 +423,11 @@
                                 "terms": [
                                     {
                                         "generic": true,
-                                        "name":"officers\' search of the yard",
+                                        "name": "officers' search of the yard",
                                         "plural": false
                                     }
                                 ],
-                                "name":"officers\' search of the yard was performed by law enforcement officers",
+                                "name": "officers' search of the yard was performed by law enforcement officers",
                                 "standard_of_proof": null
                             },
                             {
@@ -439,16 +439,16 @@
                                 "terms": [
                                     {
                                         "generic": true,
-                                        "name":"officers\' search of the yard",
+                                        "name": "officers' search of the yard",
                                         "plural": false
                                     },
                                     {
                                         "generic": true,
-                                        "name":"Bradley\'s house",
+                                        "name": "Bradley's house",
                                         "plural": false
                                     }
                                 ],
-                                "name":"officers\' search of the yard was performed in the grounds around Bradley\'s house",
+                                "name": "officers' search of the yard was performed in the grounds around Bradley's house",
                                 "standard_of_proof": null
                             },
                             {
@@ -465,23 +465,23 @@
                                     },
                                     {
                                         "generic": true,
-                                        "name":"Bradley\'s marijuana patch",
+                                        "name": "Bradley's marijuana patch",
                                         "plural": false
                                     }
                                 ],
-                                "name":"it was reasonable for Bradley to hold an expectation of privacy in Bradley\'s marijuana patch",
+                                "name": "it was reasonable for Bradley to hold an expectation of privacy in Bradley's marijuana patch",
                                 "standard_of_proof": null
                             },
                             {
                                 "generic": false,
                                 "predicate": {
-                                    "content":"${officers_search_of_the_yard} violated ${bradley}\'s expectation of privacy in ${bradley_s_marijuana_patch}",
+                                    "content": "${officers_search_of_the_yard} violated ${bradley}'s expectation of privacy in ${bradley_s_marijuana_patch}",
                                     "truth": true
                                 },
                                 "terms": [
                                     {
                                         "generic": true,
-                                        "name":"officers\' search of the yard",
+                                        "name": "officers' search of the yard",
                                         "plural": false
                                     },
                                     {
@@ -491,11 +491,11 @@
                                     },
                                     {
                                         "generic": true,
-                                        "name":"Bradley\'s marijuana patch",
+                                        "name": "Bradley's marijuana patch",
                                         "plural": false
                                     }
                                 ],
-                                "name":"officers\' search of the yard violated Bradley\'s expectation of privacy in Bradley\'s marijuana patch",
+                                "name": "officers' search of the yard violated Bradley's expectation of privacy in Bradley's marijuana patch",
                                 "standard_of_proof": null
                             },
                             {
@@ -507,16 +507,16 @@
                                 "terms": [
                                     {
                                         "generic": true,
-                                        "name":"officers\' search of the yard",
+                                        "name": "officers' search of the yard",
                                         "plural": false
                                     },
                                     {
                                         "generic": true,
-                                        "name":"Bradley\'s marijuana patch",
+                                        "name": "Bradley's marijuana patch",
                                         "plural": false
                                     }
                                 ],
-                                "name":"officers\' search of the yard was an unreasonable governmental intrusion upon Bradley\'s marijuana patch",
+                                "name": "officers' search of the yard was an unreasonable governmental intrusion upon Bradley's marijuana patch",
                                 "standard_of_proof": null
                             },
                             {
@@ -536,15 +536,15 @@
                                         "form": null,
                                         "statement": null,
                                         "statement_attribution": null,
-                                        "name":"proof of Bradley\'s guilt"
+                                        "name": "proof of Bradley's guilt"
                                     },
                                     {
                                         "generic": true,
-                                        "name":"officers\' search of the yard",
+                                        "name": "officers' search of the yard",
                                         "plural": false
                                     }
                                 ],
-                                "name":"proof of Bradley\'s guilt was derived from officers\' search of the yard",
+                                "name": "proof of Bradley's guilt was derived from officers' search of the yard",
                                 "standard_of_proof": null
                             }
                         ],
@@ -563,11 +563,11 @@
                                     },
                                     {
                                         "generic": true,
-                                        "name":"Bradley\'s marijuana patch",
+                                        "name": "Bradley's marijuana patch",
                                         "plural": false
                                     }
                                 ],
-                                "name":"false Bradley exhibited an expectation of privacy in Bradley\'s marijuana patch",
+                                "name": "false Bradley exhibited an expectation of privacy in Bradley's marijuana patch",
                                 "standard_of_proof": null
                             }
                         ],
@@ -671,7 +671,7 @@
                                     "form": null,
                                     "statement": null,
                                     "statement_attribution": null,
-                                    "name":"proof of Bradley\'s guilt"
+                                    "name": "proof of Bradley's guilt"
                                 },
                                 "to_effect": {
                                     "generic": false,
@@ -683,7 +683,7 @@
                                     "name": "fact that Bradley committed a crime",
                                     "standard_of_proof": null
                                 },
-                                "name":"absence of evidence of Bradley\'s guilt"
+                                "name": "absence of evidence of Bradley's guilt"
                             }
                         ],
                         "inputs": [
@@ -696,11 +696,11 @@
                                 "terms": [
                                     {
                                         "generic": true,
-                                        "name":"officers\' search of the yard",
+                                        "name": "officers' search of the yard",
                                         "plural": false
                                     }
                                 ],
-                                "name":"officers\' search of the yard was a warrantless search and seizure",
+                                "name": "officers' search of the yard was a warrantless search and seizure",
                                 "standard_of_proof": null
                             },
                             {
@@ -712,11 +712,11 @@
                                 "terms": [
                                     {
                                         "generic": true,
-                                        "name":"Bradley\'s house",
+                                        "name": "Bradley's house",
                                         "plural": false
                                     }
                                 ],
-                                "name":"Bradley\'s house was a house",
+                                "name": "Bradley's house was a house",
                                 "standard_of_proof": null
                             },
                             {
@@ -733,11 +733,11 @@
                                     },
                                     {
                                         "generic": true,
-                                        "name":"Bradley\'s house",
+                                        "name": "Bradley's house",
                                         "plural": false
                                     }
                                 ],
-                                "name":"Bradley lived at Bradley\'s house",
+                                "name": "Bradley lived at Bradley's house",
                                 "standard_of_proof": null
                             },
                             {
@@ -749,11 +749,11 @@
                                 "terms": [
                                     {
                                         "generic": true,
-                                        "name":"officers\' search of the yard",
+                                        "name": "officers' search of the yard",
                                         "plural": false
                                     }
                                 ],
-                                "name":"officers\' search of the yard was performed by law enforcement officers",
+                                "name": "officers' search of the yard was performed by law enforcement officers",
                                 "standard_of_proof": null
                             },
                             {
@@ -765,16 +765,16 @@
                                 "terms": [
                                     {
                                         "generic": true,
-                                        "name":"officers\' search of the yard",
+                                        "name": "officers' search of the yard",
                                         "plural": false
                                     },
                                     {
                                         "generic": true,
-                                        "name":"Bradley\'s house",
+                                        "name": "Bradley's house",
                                         "plural": false
                                     }
                                 ],
-                                "name":"officers\' search of the yard was performed in the grounds around Bradley\'s house",
+                                "name": "officers' search of the yard was performed in the grounds around Bradley's house",
                                 "standard_of_proof": null
                             },
                             {
@@ -791,23 +791,23 @@
                                     },
                                     {
                                         "generic": true,
-                                        "name":"Bradley\'s marijuana patch",
+                                        "name": "Bradley's marijuana patch",
                                         "plural": false
                                     }
                                 ],
-                                "name":"Bradley exhibited an expectation of privacy in Bradley\'s marijuana patch",
+                                "name": "Bradley exhibited an expectation of privacy in Bradley's marijuana patch",
                                 "standard_of_proof": null
                             },
                             {
                                 "generic": false,
                                 "predicate": {
-                                    "content":"${officers_search_of_the_yard} violated ${bradley}\'s expectation of privacy in ${bradley_s_marijuana_patch}",
+                                    "content": "${officers_search_of_the_yard} violated ${bradley}'s expectation of privacy in ${bradley_s_marijuana_patch}",
                                     "truth": true
                                 },
                                 "terms": [
                                     {
                                         "generic": true,
-                                        "name":"officers\' search of the yard",
+                                        "name": "officers' search of the yard",
                                         "plural": false
                                     },
                                     {
@@ -817,11 +817,11 @@
                                     },
                                     {
                                         "generic": true,
-                                        "name":"Bradley\'s marijuana patch",
+                                        "name": "Bradley's marijuana patch",
                                         "plural": false
                                     }
                                 ],
-                                "name":"officers\' search of the yard violated Bradley\'s expectation of privacy in Bradley\'s marijuana patch",
+                                "name": "officers' search of the yard violated Bradley's expectation of privacy in Bradley's marijuana patch",
                                 "standard_of_proof": null
                             },
                             {
@@ -833,16 +833,16 @@
                                 "terms": [
                                     {
                                         "generic": true,
-                                        "name":"officers\' search of the yard",
+                                        "name": "officers' search of the yard",
                                         "plural": false
                                     },
                                     {
                                         "generic": true,
-                                        "name":"Bradley\'s marijuana patch",
+                                        "name": "Bradley's marijuana patch",
                                         "plural": false
                                     }
                                 ],
-                                "name":"officers\' search of the yard was an unreasonable intrusion upon Bradley\'s marijuana patch",
+                                "name": "officers' search of the yard was an unreasonable intrusion upon Bradley's marijuana patch",
                                 "standard_of_proof": null
                             },
                             {
@@ -862,15 +862,15 @@
                                         "form": null,
                                         "statement": null,
                                         "statement_attribution": null,
-                                        "name":"proof of Bradley\'s guilt"
+                                        "name": "proof of Bradley's guilt"
                                     },
                                     {
                                         "generic": true,
-                                        "name":"officers\' search of the yard",
+                                        "name": "officers' search of the yard",
                                         "plural": false
                                     }
                                 ],
-                                "name":"proof of Bradley\'s guilt was derived from officers\' search of the yard",
+                                "name": "proof of Bradley's guilt was derived from officers' search of the yard",
                                 "standard_of_proof": null
                             }
                         ],
@@ -889,11 +889,11 @@
                                     },
                                     {
                                         "generic": true,
-                                        "name":"Bradley\'s marijuana patch",
+                                        "name": "Bradley's marijuana patch",
                                         "plural": false
                                     }
                                 ],
-                                "name":"false it was reasonable for Bradley to hold an expectation of privacy in Bradley\'s marijuana patch",
+                                "name": "false it was reasonable for Bradley to hold an expectation of privacy in Bradley's marijuana patch",
                                 "standard_of_proof": null
                             }
                         ],
@@ -997,7 +997,7 @@
                                     "form": null,
                                     "statement": null,
                                     "statement_attribution": null,
-                                    "name":"proof of Bradley\'s guilt"
+                                    "name": "proof of Bradley's guilt"
                                 },
                                 "to_effect": {
                                     "generic": false,
@@ -1009,7 +1009,7 @@
                                     "name": "fact that Bradley committed a crime",
                                     "standard_of_proof": null
                                 },
-                                "name":"absence of evidence of Bradley\'s guilt"
+                                "name": "absence of evidence of Bradley's guilt"
                             }
                         ],
                         "inputs": [
@@ -1022,11 +1022,11 @@
                                 "terms": [
                                     {
                                         "generic": true,
-                                        "name":"officers\' search of the yard",
+                                        "name": "officers' search of the yard",
                                         "plural": false
                                     }
                                 ],
-                                "name":"officers\' search of the yard was a warrantless search and seizure",
+                                "name": "officers' search of the yard was a warrantless search and seizure",
                                 "standard_of_proof": null
                             },
                             {
@@ -1038,11 +1038,11 @@
                                 "terms": [
                                     {
                                         "generic": true,
-                                        "name":"Bradley\'s house",
+                                        "name": "Bradley's house",
                                         "plural": false
                                     }
                                 ],
-                                "name":"Bradley\'s house was a house",
+                                "name": "Bradley's house was a house",
                                 "standard_of_proof": null
                             },
                             {
@@ -1059,11 +1059,11 @@
                                     },
                                     {
                                         "generic": true,
-                                        "name":"Bradley\'s house",
+                                        "name": "Bradley's house",
                                         "plural": false
                                     }
                                 ],
-                                "name":"Bradley lived at Bradley\'s house",
+                                "name": "Bradley lived at Bradley's house",
                                 "standard_of_proof": null
                             },
                             {
@@ -1075,11 +1075,11 @@
                                 "terms": [
                                     {
                                         "generic": true,
-                                        "name":"officers\' search of the yard",
+                                        "name": "officers' search of the yard",
                                         "plural": false
                                     }
                                 ],
-                                "name":"officers\' search of the yard was performed by law enforcement officers",
+                                "name": "officers' search of the yard was performed by law enforcement officers",
                                 "standard_of_proof": null
                             },
                             {
@@ -1091,16 +1091,16 @@
                                 "terms": [
                                     {
                                         "generic": true,
-                                        "name":"officers\' search of the yard",
+                                        "name": "officers' search of the yard",
                                         "plural": false
                                     },
                                     {
                                         "generic": true,
-                                        "name":"Bradley\'s house",
+                                        "name": "Bradley's house",
                                         "plural": false
                                     }
                                 ],
-                                "name":"officers\' search of the yard was performed in the grounds around Bradley\'s house",
+                                "name": "officers' search of the yard was performed in the grounds around Bradley's house",
                                 "standard_of_proof": null
                             },
                             {
@@ -1117,11 +1117,11 @@
                                     },
                                     {
                                         "generic": true,
-                                        "name":"Bradley\'s marijuana patch",
+                                        "name": "Bradley's marijuana patch",
                                         "plural": false
                                     }
                                 ],
-                                "name":"Bradley exhibited an expectation of privacy in Bradley\'s marijuana patch",
+                                "name": "Bradley exhibited an expectation of privacy in Bradley's marijuana patch",
                                 "standard_of_proof": null
                             },
                             {
@@ -1138,11 +1138,11 @@
                                     },
                                     {
                                         "generic": true,
-                                        "name":"Bradley\'s marijuana patch",
+                                        "name": "Bradley's marijuana patch",
                                         "plural": false
                                     }
                                 ],
-                                "name":"it was reasonable for Bradley to hold an expectation of privacy in Bradley\'s marijuana patch",
+                                "name": "it was reasonable for Bradley to hold an expectation of privacy in Bradley's marijuana patch",
                                 "standard_of_proof": null
                             },
                             {
@@ -1154,16 +1154,16 @@
                                 "terms": [
                                     {
                                         "generic": true,
-                                        "name":"officers\' search of the yard",
+                                        "name": "officers' search of the yard",
                                         "plural": false
                                     },
                                     {
                                         "generic": true,
-                                        "name":"Bradley\'s marijuana patch",
+                                        "name": "Bradley's marijuana patch",
                                         "plural": false
                                     }
                                 ],
-                                "name":"officers\' search of the yard was an unreasonable governmental intrusion upon Bradley\'s marijuana patch",
+                                "name": "officers' search of the yard was an unreasonable governmental intrusion upon Bradley's marijuana patch",
                                 "standard_of_proof": null
                             },
                             {
@@ -1183,15 +1183,15 @@
                                         "form": null,
                                         "statement": null,
                                         "statement_attribution": null,
-                                        "name":"proof of Bradley\'s guilt"
+                                        "name": "proof of Bradley's guilt"
                                     },
                                     {
                                         "generic": true,
-                                        "name":"officers\' search of the yard",
+                                        "name": "officers' search of the yard",
                                         "plural": false
                                     }
                                 ],
-                                "name":"proof of Bradley\'s guilt was derived from officers\' search of the yard",
+                                "name": "proof of Bradley's guilt was derived from officers' search of the yard",
                                 "standard_of_proof": null
                             }
                         ],
@@ -1199,13 +1199,13 @@
                             {
                                 "generic": false,
                                 "predicate": {
-                                    "content":"${officers_search_of_the_yard} violated ${bradley}\'s expectation of privacy in ${bradley_s_marijuana_patch}",
+                                    "content": "${officers_search_of_the_yard} violated ${bradley}'s expectation of privacy in ${bradley_s_marijuana_patch}",
                                     "truth": false
                                 },
                                 "terms": [
                                     {
                                         "generic": true,
-                                        "name":"officers\' search of the yard",
+                                        "name": "officers' search of the yard",
                                         "plural": false
                                     },
                                     {
@@ -1215,11 +1215,11 @@
                                     },
                                     {
                                         "generic": true,
-                                        "name":"Bradley\'s marijuana patch",
+                                        "name": "Bradley's marijuana patch",
                                         "plural": false
                                     }
                                 ],
-                                "name":"false officers\' search of the yard violated Bradley\'s expectation of privacy in Bradley\'s marijuana patch",
+                                "name": "false officers' search of the yard violated Bradley's expectation of privacy in Bradley's marijuana patch",
                                 "standard_of_proof": null
                             }
                         ],
@@ -1323,7 +1323,7 @@
                                     "form": null,
                                     "statement": null,
                                     "statement_attribution": null,
-                                    "name":"proof of Bradley\'s guilt"
+                                    "name": "proof of Bradley's guilt"
                                 },
                                 "to_effect": {
                                     "generic": false,
@@ -1335,7 +1335,7 @@
                                     "name": "fact that Bradley committed a crime",
                                     "standard_of_proof": null
                                 },
-                                "name":"absence of evidence of Bradley\'s guilt"
+                                "name": "absence of evidence of Bradley's guilt"
                             }
                         ],
                         "inputs": [
@@ -1348,11 +1348,11 @@
                                 "terms": [
                                     {
                                         "generic": true,
-                                        "name":"officers\' search of the yard",
+                                        "name": "officers' search of the yard",
                                         "plural": false
                                     }
                                 ],
-                                "name":"officers\' search of the yard was a warrantless search and seizure",
+                                "name": "officers' search of the yard was a warrantless search and seizure",
                                 "standard_of_proof": null
                             },
                             {
@@ -1364,11 +1364,11 @@
                                 "terms": [
                                     {
                                         "generic": true,
-                                        "name":"Bradley\'s house",
+                                        "name": "Bradley's house",
                                         "plural": false
                                     }
                                 ],
-                                "name":"Bradley\'s house was a house",
+                                "name": "Bradley's house was a house",
                                 "standard_of_proof": null
                             },
                             {
@@ -1385,11 +1385,11 @@
                                     },
                                     {
                                         "generic": true,
-                                        "name":"Bradley\'s house",
+                                        "name": "Bradley's house",
                                         "plural": false
                                     }
                                 ],
-                                "name":"Bradley lived at Bradley\'s house",
+                                "name": "Bradley lived at Bradley's house",
                                 "standard_of_proof": null
                             },
                             {
@@ -1401,11 +1401,11 @@
                                 "terms": [
                                     {
                                         "generic": true,
-                                        "name":"officers\' search of the yard",
+                                        "name": "officers' search of the yard",
                                         "plural": false
                                     }
                                 ],
-                                "name":"officers\' search of the yard was performed by law enforcement officers",
+                                "name": "officers' search of the yard was performed by law enforcement officers",
                                 "standard_of_proof": null
                             },
                             {
@@ -1417,16 +1417,16 @@
                                 "terms": [
                                     {
                                         "generic": true,
-                                        "name":"officers\' search of the yard",
+                                        "name": "officers' search of the yard",
                                         "plural": false
                                     },
                                     {
                                         "generic": true,
-                                        "name":"Bradley\'s house",
+                                        "name": "Bradley's house",
                                         "plural": false
                                     }
                                 ],
-                                "name":"officers\' search of the yard was performed in the grounds around Bradley\'s house",
+                                "name": "officers' search of the yard was performed in the grounds around Bradley's house",
                                 "standard_of_proof": null
                             },
                             {
@@ -1443,11 +1443,11 @@
                                     },
                                     {
                                         "generic": true,
-                                        "name":"Bradley\'s marijuana patch",
+                                        "name": "Bradley's marijuana patch",
                                         "plural": false
                                     }
                                 ],
-                                "name":"Bradley exhibited an expectation of privacy in Bradley\'s marijuana patch",
+                                "name": "Bradley exhibited an expectation of privacy in Bradley's marijuana patch",
                                 "standard_of_proof": null
                             },
                             {
@@ -1464,23 +1464,23 @@
                                     },
                                     {
                                         "generic": true,
-                                        "name":"Bradley\'s marijuana patch",
+                                        "name": "Bradley's marijuana patch",
                                         "plural": false
                                     }
                                 ],
-                                "name":"it was reasonable for Bradley to hold an expectation of privacy in Bradley\'s marijuana patch",
+                                "name": "it was reasonable for Bradley to hold an expectation of privacy in Bradley's marijuana patch",
                                 "standard_of_proof": null
                             },
                             {
                                 "generic": false,
                                 "predicate": {
-                                    "content":"${officers_search_of_the_yard} violated ${bradley}\'s expectation of privacy in ${bradley_s_marijuana_patch}",
+                                    "content": "${officers_search_of_the_yard} violated ${bradley}'s expectation of privacy in ${bradley_s_marijuana_patch}",
                                     "truth": true
                                 },
                                 "terms": [
                                     {
                                         "generic": true,
-                                        "name":"officers\' search of the yard",
+                                        "name": "officers' search of the yard",
                                         "plural": false
                                     },
                                     {
@@ -1490,11 +1490,11 @@
                                     },
                                     {
                                         "generic": true,
-                                        "name":"Bradley\'s marijuana patch",
+                                        "name": "Bradley's marijuana patch",
                                         "plural": false
                                     }
                                 ],
-                                "name":"officers\' search of the yard violated Bradley\'s expectation of privacy in Bradley\'s marijuana patch",
+                                "name": "officers' search of the yard violated Bradley's expectation of privacy in Bradley's marijuana patch",
                                 "standard_of_proof": null
                             },
                             {
@@ -1514,15 +1514,15 @@
                                         "form": null,
                                         "statement": null,
                                         "statement_attribution": null,
-                                        "name":"proof of Bradley\'s guilt"
+                                        "name": "proof of Bradley's guilt"
                                     },
                                     {
                                         "generic": true,
-                                        "name":"officers\' search of the yard",
+                                        "name": "officers' search of the yard",
                                         "plural": false
                                     }
                                 ],
-                                "name":"proof of Bradley\'s guilt was derived from officers\' search of the yard",
+                                "name": "proof of Bradley's guilt was derived from officers' search of the yard",
                                 "standard_of_proof": null
                             }
                         ],
@@ -1536,16 +1536,16 @@
                                 "terms": [
                                     {
                                         "generic": true,
-                                        "name":"officers\' search of the yard",
+                                        "name": "officers' search of the yard",
                                         "plural": false
                                     },
                                     {
                                         "generic": true,
-                                        "name":"Bradley\'s marijuana patch",
+                                        "name": "Bradley's marijuana patch",
                                         "plural": false
                                     }
                                 ],
-                                "name":"false officers\' search of the yard was an unreasonable governmental intrusion upon Bradley\'s marijuana patch",
+                                "name": "false officers' search of the yard was an unreasonable governmental intrusion upon Bradley's marijuana patch",
                                 "standard_of_proof": null
                             }
                         ],
@@ -1650,11 +1650,11 @@
                                     },
                                     {
                                         "generic": true,
-                                        "name":"Bradley\'s marijuana patch",
+                                        "name": "Bradley's marijuana patch",
                                         "plural": false
                                     }
                                 ],
-                                "name":"false Bradley exhibited an expectation of privacy in Bradley\'s marijuana patch",
+                                "name": "false Bradley exhibited an expectation of privacy in Bradley's marijuana patch",
                                 "standard_of_proof": null
                             }
                         ],
@@ -1673,11 +1673,11 @@
                                 "terms": [
                                     {
                                         "generic": true,
-                                        "name":"Bradley\'s marijuana patch",
+                                        "name": "Bradley's marijuana patch",
                                         "plural": false
                                     }
                                 ],
-                                "name":"the number of marijuana plants in Bradley\'s marijuana patch was >= 3",
+                                "name": "the number of marijuana plants in Bradley's marijuana patch was >= 3",
                                 "standard_of_proof": null
                             },
                             {
@@ -1689,7 +1689,7 @@
                                 "terms": [
                                     {
                                         "generic": true,
-                                        "name":"Bradley\'s marijuana patch",
+                                        "name": "Bradley's marijuana patch",
                                         "plural": false
                                     },
                                     {
@@ -1698,7 +1698,7 @@
                                         "plural": false
                                     }
                                 ],
-                                "name":"Bradley\'s marijuana patch was in a yard accessible from a house that did not belong to Bradley",
+                                "name": "Bradley's marijuana patch was in a yard accessible from a house that did not belong to Bradley",
                                 "standard_of_proof": null
                             },
                             {
@@ -1710,11 +1710,11 @@
                                 "terms": [
                                     {
                                         "generic": true,
-                                        "name":"Bradley\'s marijuana patch",
+                                        "name": "Bradley's marijuana patch",
                                         "plural": false
                                     }
                                 ],
-                                "name":"false Bradley\'s marijuana patch was entirely hidden by foliage",
+                                "name": "false Bradley's marijuana patch was entirely hidden by foliage",
                                 "standard_of_proof": null
                             },
                             {
@@ -1727,11 +1727,11 @@
                                 "terms": [
                                     {
                                         "generic": true,
-                                        "name":"Bradley\'s marijuana patch",
+                                        "name": "Bradley's marijuana patch",
                                         "plural": false
                                     }
                                 ],
-                                "name":"absent Bradley\'s marijuana patch was covered by nontransparent material",
+                                "name": "absent Bradley's marijuana patch was covered by nontransparent material",
                                 "standard_of_proof": null
                             },
                             {
@@ -1749,11 +1749,11 @@
                                 "terms": [
                                     {
                                         "generic": true,
-                                        "name":"Bradley\'s marijuana patch",
+                                        "name": "Bradley's marijuana patch",
                                         "plural": false
                                     }
                                 ],
-                                "name":"the distance from which part of Bradley\'s marijuana patch could be seen plainly was >= 1 foot",
+                                "name": "the distance from which part of Bradley's marijuana patch could be seen plainly was >= 1 foot",
                                 "standard_of_proof": null
                             },
                             {
@@ -1771,16 +1771,16 @@
                                 "terms": [
                                     {
                                         "generic": true,
-                                        "name":"Bradley\'s marijuana patch",
+                                        "name": "Bradley's marijuana patch",
                                         "plural": false
                                     },
                                     {
                                         "generic": true,
-                                        "name":"Bradley\'s house",
+                                        "name": "Bradley's house",
                                         "plural": false
                                     }
                                 ],
-                                "name":"the distance between Bradley\'s marijuana patch and Bradley\'s house was >= 20 feet",
+                                "name": "the distance between Bradley's marijuana patch and Bradley's house was >= 20 feet",
                                 "standard_of_proof": null
                             },
                             {
@@ -1797,11 +1797,11 @@
                                     },
                                     {
                                         "generic": true,
-                                        "name":"Bradley\'s marijuana patch",
+                                        "name": "Bradley's marijuana patch",
                                         "plural": false
                                     }
                                 ],
-                                "name":"a house that did not belong to Bradley had access to the rear yard where Bradley\'s marijuana patch was located",
+                                "name": "a house that did not belong to Bradley had access to the rear yard where Bradley's marijuana patch was located",
                                 "standard_of_proof": null
                             }
                         ],
@@ -1815,11 +1815,11 @@
                                 "terms": [
                                     {
                                         "generic": true,
-                                        "name":"Bradley\'s house",
+                                        "name": "Bradley's house",
                                         "plural": false
                                     }
                                 ],
-                                "name":"Bradley\'s house was a house",
+                                "name": "Bradley's house was a house",
                                 "standard_of_proof": null
                             },
                             {
@@ -1836,11 +1836,11 @@
                                     },
                                     {
                                         "generic": true,
-                                        "name":"Bradley\'s house",
+                                        "name": "Bradley's house",
                                         "plural": false
                                     }
                                 ],
-                                "name":"Bradley lived at Bradley\'s house",
+                                "name": "Bradley lived at Bradley's house",
                                 "standard_of_proof": null
                             },
                             {
@@ -1852,11 +1852,11 @@
                                 "terms": [
                                     {
                                         "generic": true,
-                                        "name":"Bradley\'s marijuana patch",
+                                        "name": "Bradley's marijuana patch",
                                         "plural": false
                                     }
                                 ],
-                                "name":"Bradley\'s marijuana patch was partially hidden by foliage",
+                                "name": "Bradley's marijuana patch was partially hidden by foliage",
                                 "standard_of_proof": null
                             },
                             {
@@ -1868,16 +1868,16 @@
                                 "terms": [
                                     {
                                         "generic": true,
-                                        "name":"Bradley\'s marijuana patch",
+                                        "name": "Bradley's marijuana patch",
                                         "plural": false
                                     },
                                     {
                                         "generic": true,
-                                        "name":"Bradley\'s house",
+                                        "name": "Bradley's house",
                                         "plural": false
                                     }
                                 ],
-                                "name":"Bradley\'s marijuana patch was in the fenced rear yard of Bradley\'s house",
+                                "name": "Bradley's marijuana patch was in the fenced rear yard of Bradley's house",
                                 "standard_of_proof": null
                             }
                         ],
@@ -1982,11 +1982,11 @@
                                     },
                                     {
                                         "generic": true,
-                                        "name":"Bradley\'s marijuana patch",
+                                        "name": "Bradley's marijuana patch",
                                         "plural": false
                                     }
                                 ],
-                                "name":"false it was reasonable for Bradley to exhibit an expectation of privacy in Bradley\'s marijuana patch",
+                                "name": "false it was reasonable for Bradley to exhibit an expectation of privacy in Bradley's marijuana patch",
                                 "standard_of_proof": null
                             }
                         ],
@@ -2005,11 +2005,11 @@
                                 "terms": [
                                     {
                                         "generic": true,
-                                        "name":"Bradley\'s marijuana patch",
+                                        "name": "Bradley's marijuana patch",
                                         "plural": false
                                     }
                                 ],
-                                "name":"the number of marijuana plants in Bradley\'s marijuana patch was >= 3",
+                                "name": "the number of marijuana plants in Bradley's marijuana patch was >= 3",
                                 "standard_of_proof": null
                             },
                             {
@@ -2021,7 +2021,7 @@
                                 "terms": [
                                     {
                                         "generic": true,
-                                        "name":"Bradley\'s marijuana patch",
+                                        "name": "Bradley's marijuana patch",
                                         "plural": false
                                     },
                                     {
@@ -2030,7 +2030,7 @@
                                         "plural": false
                                     }
                                 ],
-                                "name":"Bradley\'s marijuana patch was in a yard accessible from a house that did not belong to Bradley",
+                                "name": "Bradley's marijuana patch was in a yard accessible from a house that did not belong to Bradley",
                                 "standard_of_proof": null
                             },
                             {
@@ -2042,11 +2042,11 @@
                                 "terms": [
                                     {
                                         "generic": true,
-                                        "name":"Bradley\'s marijuana patch",
+                                        "name": "Bradley's marijuana patch",
                                         "plural": false
                                     }
                                 ],
-                                "name":"false Bradley\'s marijuana patch was entirely hidden by foliage",
+                                "name": "false Bradley's marijuana patch was entirely hidden by foliage",
                                 "standard_of_proof": null
                             },
                             {
@@ -2059,11 +2059,11 @@
                                 "terms": [
                                     {
                                         "generic": true,
-                                        "name":"Bradley\'s marijuana patch",
+                                        "name": "Bradley's marijuana patch",
                                         "plural": false
                                     }
                                 ],
-                                "name":"absent Bradley\'s marijuana patch was covered by nontransparent material",
+                                "name": "absent Bradley's marijuana patch was covered by nontransparent material",
                                 "standard_of_proof": null
                             },
                             {
@@ -2081,11 +2081,11 @@
                                 "terms": [
                                     {
                                         "generic": true,
-                                        "name":"Bradley\'s marijuana patch",
+                                        "name": "Bradley's marijuana patch",
                                         "plural": false
                                     }
                                 ],
-                                "name":"the distance from which part of Bradley\'s marijuana patch could be seen plainly was >= 1 foot",
+                                "name": "the distance from which part of Bradley's marijuana patch could be seen plainly was >= 1 foot",
                                 "standard_of_proof": null
                             },
                             {
@@ -2103,16 +2103,16 @@
                                 "terms": [
                                     {
                                         "generic": true,
-                                        "name":"Bradley\'s marijuana patch",
+                                        "name": "Bradley's marijuana patch",
                                         "plural": false
                                     },
                                     {
                                         "generic": true,
-                                        "name":"Bradley\'s house",
+                                        "name": "Bradley's house",
                                         "plural": false
                                     }
                                 ],
-                                "name":"the distance between Bradley\'s marijuana patch and Bradley\'s house was >= 20 feet",
+                                "name": "the distance between Bradley's marijuana patch and Bradley's house was >= 20 feet",
                                 "standard_of_proof": null
                             },
                             {
@@ -2129,11 +2129,11 @@
                                     },
                                     {
                                         "generic": true,
-                                        "name":"Bradley\'s marijuana patch",
+                                        "name": "Bradley's marijuana patch",
                                         "plural": false
                                     }
                                 ],
-                                "name":"a house that did not belong to Bradley had access to the rear yard where Bradley\'s marijuana patch was located",
+                                "name": "a house that did not belong to Bradley had access to the rear yard where Bradley's marijuana patch was located",
                                 "standard_of_proof": null
                             }
                         ],
@@ -2147,11 +2147,11 @@
                                 "terms": [
                                     {
                                         "generic": true,
-                                        "name":"Bradley\'s house",
+                                        "name": "Bradley's house",
                                         "plural": false
                                     }
                                 ],
-                                "name":"Bradley\'s house was a house",
+                                "name": "Bradley's house was a house",
                                 "standard_of_proof": null
                             },
                             {
@@ -2168,11 +2168,11 @@
                                     },
                                     {
                                         "generic": true,
-                                        "name":"Bradley\'s house",
+                                        "name": "Bradley's house",
                                         "plural": false
                                     }
                                 ],
-                                "name":"Bradley lived at Bradley\'s house",
+                                "name": "Bradley lived at Bradley's house",
                                 "standard_of_proof": null
                             },
                             {
@@ -2184,11 +2184,11 @@
                                 "terms": [
                                     {
                                         "generic": true,
-                                        "name":"Bradley\'s marijuana patch",
+                                        "name": "Bradley's marijuana patch",
                                         "plural": false
                                     }
                                 ],
-                                "name":"Bradley\'s marijuana patch was partially hidden by foliage",
+                                "name": "Bradley's marijuana patch was partially hidden by foliage",
                                 "standard_of_proof": null
                             },
                             {
@@ -2200,16 +2200,16 @@
                                 "terms": [
                                     {
                                         "generic": true,
-                                        "name":"Bradley\'s marijuana patch",
+                                        "name": "Bradley's marijuana patch",
                                         "plural": false
                                     },
                                     {
                                         "generic": true,
-                                        "name":"Bradley\'s house",
+                                        "name": "Bradley's house",
                                         "plural": false
                                     }
                                 ],
-                                "name":"Bradley\'s marijuana patch was in the fenced rear yard of Bradley\'s house",
+                                "name": "Bradley's marijuana patch was in the fenced rear yard of Bradley's house",
                                 "standard_of_proof": null
                             }
                         ],

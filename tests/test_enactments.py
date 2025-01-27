@@ -56,7 +56,7 @@ class TestEnactments:
         oracle = loaders.load_decision("oracle_h.json")
         oracle_decision = Decision(**oracle)
         reading = DecisionReading(decision=oracle_decision)
-        loaded = loaders.load_holdings("holding_oracle.yaml")
+        loaded = loaders.load_holdings("holding_oracle.json")
         holdings = readers.read_holdings(loaded, client=fake_usc_client)
         reading.posit(holdings)
         despite_text = str(list(reading.holdings)[5])
@@ -323,6 +323,6 @@ class TestTextSelection:
         """
         client = FakeClient.from_file("usc.json")
         holdings = loaders.read_anchored_holdings_from_file(
-            "holding_feist.yaml", client=client
+            "holding_feist.json", client=client
         )
         assert len(holdings.holdings[6].anchors.quotes) == 2

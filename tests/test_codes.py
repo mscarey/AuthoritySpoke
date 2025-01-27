@@ -23,7 +23,7 @@ class TestCodes:
     client = Client(api_token=TOKEN)
 
     def test_cfr_repr(self):
-        oracle_dictionary = loaders.load_holdings("holding_oracle.yaml")
+        oracle_dictionary = loaders.load_holdings("holding_oracle.json")
         regulation = oracle_dictionary[10]["enactments_despite"][1]
         enactment = EnactmentPassage(**regulation)
 
@@ -31,28 +31,27 @@ class TestCodes:
         assert "/cfr/" in repr(enactment)
 
     @pytest.mark.vcr
-    @pytest.mark.default_cassette("test_us_code_title.yaml")
+    @pytest.mark.default_cassette("test_us_code_title.json")
     def test_us_code_title(self):
         enactment = self.client.read("/us/usc")
         assert enactment.heading.startswith("United States Code")
         assert enactment.level == CodeLevel.STATUTE
 
     @pytest.mark.vcr
-    @pytest.mark.default_cassette("test_const_code_title.yaml")
+    @pytest.mark.default_cassette("test_const_code_title.json")
     def test_const_code_title(self):
         enactment = self.client.read("/us/const")
         assert enactment.heading.startswith("United States Constitution")
         assert enactment.level == CodeLevel.CONSTITUTION
 
     @pytest.mark.vcr
-    @pytest.mark.default_cassette("test_acts_code_title.yaml")
+    @pytest.mark.default_cassette("test_acts_code_title.json")
     def test_acts_code_title(self):
         enactment = self.client.read("/test/acts")
         assert enactment.heading.startswith("Acts of Australia")
         assert enactment.level == CodeLevel.STATUTE
 
     def test_code_select_text(self, fake_beard_client):
-
         enactment = fake_beard_client.read("/test/acts/47/1")
         assert enactment.text.startswith("This Act may be cited")
 

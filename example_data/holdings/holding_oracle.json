@@ -2189,7 +2189,10 @@
                                         "id": 1030580
                                     },
                                     "end_date": null,
-                                    "fir...ea, procedure, process, system, method of operation, concept, principle, or discovery, regardless of the form in which it is described, explained, illustrated, or embodied in such work.",
+                                    "first_published": null,
+                                    "earliest_in_db": null,
+                                    "anchors": [],
+                                    "citations": [],
                                     "url": "https://authorityspoke.com/api/v1/textversions/1030580/",
                                     "id": 1030580
                                 },

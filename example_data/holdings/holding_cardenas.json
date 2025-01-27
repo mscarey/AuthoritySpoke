@@ -43,7 +43,7 @@
                                             "name": "parole officer",
                                             "plural": false
                                         },
-                                        "name":"officer\'s testimony that the defendant was addicted to heroin"
+                                        "name": "officer's testimony that the defendant was addicted to heroin"
                                     },
                                     {
                                         "generic": false,
@@ -67,7 +67,7 @@
                                         "plural": false
                                     }
                                 ],
-                                "name":"the probative value of officer\'s testimony that the defendant was addicted to heroin, in showing fact that the defendant committed an attempted robbery, was outweighed by unfair prejudice to the defendant",
+                                "name": "the probative value of officer's testimony that the defendant was addicted to heroin, in showing fact that the defendant committed an attempted robbery, was outweighed by unfair prejudice to the defendant",
                                 "standard_of_proof": null
                             }
                         ],
@@ -101,7 +101,7 @@
                                     "name": "parole officer",
                                     "plural": false
                                 },
-                                "name":"officer\'s testimony that the defendant was addicted to heroin"
+                                "name": "officer's testimony that the defendant was addicted to heroin"
                             },
                             {
                                 "generic": false,
@@ -170,7 +170,7 @@
                                             "name": "parole officer",
                                             "plural": false
                                         },
-                                        "name":"officer\'s testimony that the defendant was addicted to heroin"
+                                        "name": "officer's testimony that the defendant was addicted to heroin"
                                     },
                                     {
                                         "generic": true,
@@ -178,7 +178,7 @@
                                         "plural": false
                                     }
                                 ],
-                                "name":"officer\'s testimony that the defendant was addicted to heroin was relevant to show the defendant had a motive to commit an attempted robbery",
+                                "name": "officer's testimony that the defendant was addicted to heroin was relevant to show the defendant had a motive to commit an attempted robbery",
                                 "standard_of_proof": null
                             }
                         ],
@@ -397,7 +397,7 @@
                                         "name": "parole officer",
                                         "plural": false
                                     },
-                                    "name":"officer\'s testimony that the defendant was addicted to heroin"
+                                    "name": "officer's testimony that the defendant was addicted to heroin"
                                 },
                                 "to_effect": {
                                     "generic": false,
@@ -415,7 +415,7 @@
                                     "name": "fact that the defendant committed an attempted robbery",
                                     "standard_of_proof": null
                                 },
-                                "name":"evidence of officer\'s testimony that the defendant was addicted to heroin"
+                                "name": "evidence of officer's testimony that the defendant was addicted to heroin"
                             }
                         ],
                         "inputs": [
@@ -455,7 +455,7 @@
                                             "name": "parole officer",
                                             "plural": false
                                         },
-                                        "name":"officer\'s testimony that the defendant was addicted to heroin"
+                                        "name": "officer's testimony that the defendant was addicted to heroin"
                                     },
                                     {
                                         "generic": false,
@@ -474,7 +474,7 @@
                                         "standard_of_proof": null
                                     }
                                 ],
-                                "name":"the probative value of officer\'s testimony that the defendant was addicted to heroin, in showing fact that the defendant committed an attempted robbery, was outweighed by unfair prejudice to defendant",
+                                "name": "the probative value of officer's testimony that the defendant was addicted to heroin, in showing fact that the defendant committed an attempted robbery, was outweighed by unfair prejudice to defendant",
                                 "standard_of_proof": null
                             }
                         ],
@@ -515,7 +515,7 @@
                                             "name": "parole officer",
                                             "plural": false
                                         },
-                                        "name":"officer\'s testimony that the defendant was addicted to heroin"
+                                        "name": "officer's testimony that the defendant was addicted to heroin"
                                     },
                                     {
                                         "generic": true,
@@ -523,7 +523,7 @@
                                         "plural": false
                                     }
                                 ],
-                                "name":"officer\'s testimony that the defendant was addicted to heroin was relevant to show the defendant had a motive to commit an attempted robbery",
+                                "name": "officer's testimony that the defendant was addicted to heroin was relevant to show the defendant had a motive to commit an attempted robbery",
                                 "standard_of_proof": null
                             }
                         ],

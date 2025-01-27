@@ -414,7 +414,6 @@ class TestContradiction:
         assert not make_rule["h2_output_absent_false"].contradicts(make_rule["h2"])
 
     def test_contradicts_if_valid_some_vs_all(self, make_rule):
-
         """
         This test and the one below show that you can change whether two
         holdings contradict one another by exchanging the SOME/MAY from one
@@ -440,7 +439,6 @@ class TestContradiction:
         )
 
     def test_contradicts_if_valid_some_vs_all_no_contradiction(self, make_rule):
-
         """
         This test and the one above show that you can change whether two
         holdings contradict one another by exchanging the SOME/MAY from one
@@ -466,7 +464,6 @@ class TestContradiction:
         )
 
     def test_contradicts_if_valid_all_vs_some(self, make_rule):
-
         """
         The assertion here is:
         In ALL cases where the distance between A and B is less than 35 feet
@@ -819,7 +816,6 @@ class TestAddition:
         assert result.universal is True
 
     def test_add_universal_to_universal_irrelevant(self, make_procedure):
-
         result = make_procedure["c3"] + make_procedure["c2_irrelevant_inputs"]
         assert result is None
 
@@ -1015,10 +1011,10 @@ class TestStatuteRules:
 
     def test_greater_than_implies_equal(self, beard_response, make_beard_rule):
         client = FakeClient(responses=beard_response)
-        beard_dictionary = loaders.load_holdings("beard_rules.yaml")
-        beard_dictionary[0]["inputs"][1][
-            "content"
-        ] = "the length of the suspected beard was = 8 millimetres"
+        beard_dictionary = loaders.load_holdings("beard_rules.json")
+        beard_dictionary[0]["inputs"][1]["content"] = (
+            "the length of the suspected beard was = 8 millimetres"
+        )
         longer_hair_rule = readers.read_holdings([beard_dictionary[0]], client=client)
         assert make_beard_rule[0].implies(longer_hair_rule[0])
 
@@ -1028,7 +1024,7 @@ class TestStatuteRules:
         """Test missing 'False' truth value in output of long_means_not_beard"""
         ear_rule = make_beard_rule[1]
         client = FakeClient(responses=beard_response)
-        beard_rule_data = loaders.load_holdings("beard_rules.yaml")[:2]
+        beard_rule_data = loaders.load_holdings("beard_rules.json")[:2]
         changed_holdings = readers.read_holdings(beard_rule_data, client=client)
         long_means_not_beard = changed_holdings[1]
         long_means_not_beard.set_despite([ear_rule.inputs[0], ear_rule.inputs[2]])
@@ -1045,10 +1041,10 @@ class TestStatuteRules:
         self, beard_response, make_beard_rule
     ):
         client = FakeClient(responses=beard_response)
-        beard_dictionary = loaders.load_holdings("beard_rules.yaml")
-        beard_dictionary[1]["inputs"][1][
-            "content"
-        ] = "the length of the suspected beard was >= 12 inches"
+        beard_dictionary = loaders.load_holdings("beard_rules.json")
+        beard_dictionary[1]["inputs"][1]["content"] = (
+            "the length of the suspected beard was >= 12 inches"
+        )
         beard_dictionary[1]["outputs"][0]["truth"] = False
         beard_dictionary[1]["mandatory"] = True
         long_hair_is_not_a_beard = readers.read_holdings(
@@ -1059,7 +1055,7 @@ class TestStatuteRules:
     def test_contradictory_fact_about_beard_length(
         self, fake_beard_client, make_beard_rule
     ):
-        beard_dictionary = loaders.load_holdings("beard_rules.yaml")
+        beard_dictionary = loaders.load_holdings("beard_rules.json")
         long_means_not_beard = readers.read_holdings(
             beard_dictionary[1], client=fake_beard_client
         )[0].rule

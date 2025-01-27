@@ -72,7 +72,7 @@ class TestDecision:
 
     def test_decision_posits_holding(self, fake_usc_client, make_decision):
         lotus_analysis = read_anchored_holdings_from_file(
-            "holding_lotus.yaml", client=fake_usc_client
+            "holding_lotus.json", client=fake_usc_client
         )
         lotus_reading = DecisionReading(decision=make_decision["lotus"])
         lotus_reading.posit(lotus_analysis)
@@ -81,7 +81,7 @@ class TestDecision:
 
     def test_decision_with_opinion_reading_posits_holding(self, fake_usc_client):
         lotus_analysis = read_anchored_holdings_from_file(
-            "holding_lotus.yaml", client=fake_usc_client
+            "holding_lotus.json", client=fake_usc_client
         )
         decision_reading = DecisionReading(
             decision=Decision(decision_date=date(2000, 2, 2)),
@@ -92,7 +92,7 @@ class TestDecision:
 
     def test_error_decision_with_no_majority_posits_holding(self, fake_usc_client):
         lotus_analysis = read_anchored_holdings_from_file(
-            "holding_lotus.yaml", client=fake_usc_client
+            "holding_lotus.json", client=fake_usc_client
         )
         reading1 = OpinionReading(opinion_type="plurality")
         reading2 = OpinionReading(opinion_type="concurring")

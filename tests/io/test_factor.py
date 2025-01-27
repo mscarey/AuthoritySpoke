@@ -22,7 +22,7 @@ class TestFactorFileLoad:
         directory = pathlib.Path.cwd() / "tests"
         if directory.exists():
             os.chdir(directory)
-        input_directory = filepaths.get_directory_path("holdings") / "holding_watt.yaml"
+        input_directory = filepaths.get_directory_path("holdings") / "holding_watt.json"
         assert input_directory.exists()
 
 
@@ -118,7 +118,7 @@ class TestFactorLoad:
         assert str(fact) == "the fact it was false that pigs flew"
 
     def test_import_facts_with_factor_schema(self):
-        loaded = load_holdings("holding_cardenas.yaml")
+        loaded = load_holdings("holding_cardenas.json")
         holdings = readers.read_holdings(loaded)
         factor = holdings[0].inputs[1].fact
         assert (
@@ -181,7 +181,7 @@ class TestExhibitDump:
 
 class TestEvidenceLoad:
     def test_wrong_schema(self, make_evidence):
-        fact_dict = load_holdings("holding_cardenas.yaml")[1]["inputs"][0]
+        fact_dict = load_holdings("holding_cardenas.json")[1]["inputs"][0]
         with pytest.raises(ValidationError):
             Evidence(**fact_dict)
 

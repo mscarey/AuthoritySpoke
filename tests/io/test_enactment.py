@@ -40,7 +40,7 @@ class TestEnactmentImport:
 
     @pytest.mark.vcr
     def test_enactment_import_from_yaml(self):
-        holding_brad = load_holdings("holding_brad.yaml")
+        holding_brad = load_holdings("holding_brad.json")
         holdings = readers.read_holdings(holding_brad, client=self.client)
         enactments = holdings[0].enactments
         assert any(
@@ -48,7 +48,7 @@ class TestEnactmentImport:
         )
 
     def test_enactment_import_from_holding(self):
-        holding_cardenas = load_holdings("holding_cardenas.yaml")
+        holding_cardenas = load_holdings("holding_cardenas.json")
         holdings = readers.read_holdings(holding_cardenas)
         enactment_list = holdings[0].enactments
         assert any(

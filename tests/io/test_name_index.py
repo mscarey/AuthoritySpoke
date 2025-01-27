@@ -102,7 +102,7 @@ class TestCollectMentioned:
         The Factors must be inserted in "mentioned" with the generated name.
         """
 
-        oracle_records = loaders.load_holdings("holding_oracle.yaml")
+        oracle_records = loaders.load_holdings("holding_oracle.json")
         for holding in oracle_records:
             holding.pop("enactments", None)
             holding.pop("enactments_despite", None)
@@ -118,7 +118,7 @@ class TestCollectMentioned:
         Test error message:
         'Name "securing the right to writings" not found in the index of mentioned Factors'
         """
-        feist_records = loaders.load_holdings("holding_feist.yaml")
+        feist_records = loaders.load_holdings("holding_feist.json")
         record, mentioned = name_index.collect_enactments(feist_records)
         assert "securing the right to writings" in mentioned
 
@@ -161,7 +161,7 @@ class TestCollectMentioned:
         Test error message:
         'Name "securing for authors" not found in the index of mentioned Factors'
         """
-        feist_records = loaders.load_holdings("holding_feist.yaml")
+        feist_records = loaders.load_holdings("holding_feist.json")
         feist_holdings = readers.read_holdings(
             [feist_records[0]], client=fake_usc_client
         )

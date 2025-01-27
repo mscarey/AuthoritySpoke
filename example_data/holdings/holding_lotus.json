@@ -527,7 +527,7 @@
                                     "form": "certificate of copyright registration",
                                     "statement": null,
                                     "statement_attribution": null,
-                                    "name":"Lotus\'s copyright registration"
+                                    "name": "Lotus's copyright registration"
                                 },
                                 "to_effect": {
                                     "generic": false,
@@ -550,7 +550,7 @@
                                     "name": "Lotus Development Corporation registered a copyright covering the Lotus menu command hierarchy",
                                     "standard_of_proof": null
                                 },
-                                "name":"evidence of Lotus\'s copyright registration"
+                                "name": "evidence of Lotus's copyright registration"
                             },
                             {
                                 "generic": false,
@@ -631,7 +631,7 @@
                             {
                                 "generic": false,
                                 "predicate": {
-                                    "content":"${borland_international} copied ${the_lotus_menu_command_hierarchy} in creating Quattro\'s Lotus Emulation Interface",
+                                    "content": "${borland_international} copied ${the_lotus_menu_command_hierarchy} in creating Quattro's Lotus Emulation Interface",
                                     "truth": true
                                 },
                                 "terms": [
@@ -646,7 +646,7 @@
                                         "plural": false
                                     }
                                 ],
-                                "name":"Borland International copied the Lotus menu command hierarchy in creating Quattro\'s Lotus Emulation Interface",
+                                "name": "Borland International copied the Lotus menu command hierarchy in creating Quattro's Lotus Emulation Interface",
                                 "standard_of_proof": null
                             }
                         ],
@@ -663,12 +663,12 @@
                                     "form": null,
                                     "statement": null,
                                     "statement_attribution": null,
-                                    "name":"{\'offered_by\': \'Lotus Development Corporation\'}"
+                                    "name": "{'offered_by': 'Lotus Development Corporation'}"
                                 },
                                 "to_effect": {
                                     "generic": false,
                                     "predicate": {
-                                        "content":"${borland_international} copied ${the_lotus_menu_command_hierarchy} in creating Quattro\'s Lotus Emulation Interface",
+                                        "content": "${borland_international} copied ${the_lotus_menu_command_hierarchy} in creating Quattro's Lotus Emulation Interface",
                                         "truth": true
                                     },
                                     "terms": [
@@ -683,10 +683,10 @@
                                             "plural": false
                                         }
                                     ],
-                                    "name":"Borland International copied the Lotus menu command hierarchy in creating Quattro\'s Lotus Emulation Interface",
+                                    "name": "Borland International copied the Lotus menu command hierarchy in creating Quattro's Lotus Emulation Interface",
                                     "standard_of_proof": null
                                 },
-                                "name":"evidence of {\'offered_by\': \'Lotus Development Corporation\'} to the effect that Borland International copied the Lotus menu command hierarchy in creating Quattro\'s Lotus Emulation Interface"
+                                "name": "evidence of {'offered_by': 'Lotus Development Corporation'} to the effect that Borland International copied the Lotus menu command hierarchy in creating Quattro's Lotus Emulation Interface"
                             }
                         ],
                         "despite": [],
@@ -888,7 +888,7 @@
                             {
                                 "generic": false,
                                 "predicate": {
-                                    "content":"${borland_international} copied ${the_lotus_menu_command_hierarchy} in creating Quattro\'s Lotus Emulation Interface",
+                                    "content": "${borland_international} copied ${the_lotus_menu_command_hierarchy} in creating Quattro's Lotus Emulation Interface",
                                     "truth": true
                                 },
                                 "terms": [
@@ -903,7 +903,7 @@
                                         "plural": false
                                     }
                                 ],
-                                "name":"Borland International copied the Lotus menu command hierarchy in creating Quattro\'s Lotus Emulation Interface",
+                                "name": "Borland International copied the Lotus menu command hierarchy in creating Quattro's Lotus Emulation Interface",
                                 "standard_of_proof": null
                             }
                         ],
@@ -920,7 +920,7 @@
                                     "form": null,
                                     "statement": null,
                                     "statement_attribution": null,
-                                    "name":"{\'offered_by\': \'Lotus Development Corporation\'}"
+                                    "name": "{'offered_by': 'Lotus Development Corporation'}"
                                 },
                                 "to_effect": {
                                     "generic": false,
@@ -943,7 +943,7 @@
                                     "name": "Borland International had access to the Lotus menu command hierarchy",
                                     "standard_of_proof": null
                                 },
-                                "name":"evidence of {\'offered_by\': \'Lotus Development Corporation\'} to the effect that Borland International had access to the Lotus menu command hierarchy"
+                                "name": "evidence of {'offered_by': 'Lotus Development Corporation'} to the effect that Borland International had access to the Lotus menu command hierarchy"
                             },
                             {
                                 "generic": false,
@@ -959,11 +959,11 @@
                                     },
                                     {
                                         "generic": true,
-                                        "name":"Quattro\'s Lotus Emulation Interface",
+                                        "name": "Quattro's Lotus Emulation Interface",
                                         "plural": false
                                     }
                                 ],
-                                "name":"Borland International published Quattro\'s Lotus Emulation Interface",
+                                "name": "Borland International published Quattro's Lotus Emulation Interface",
                                 "standard_of_proof": null
                             },
                             {
@@ -978,7 +978,7 @@
                                     "form": null,
                                     "statement": null,
                                     "statement_attribution": null,
-                                    "name":"{\'offered_by\': \'Lotus Development Corporation\'}"
+                                    "name": "{'offered_by': 'Lotus Development Corporation'}"
                                 },
                                 "to_effect": {
                                     "generic": false,
@@ -989,7 +989,7 @@
                                     "terms": [
                                         {
                                             "generic": true,
-                                            "name":"Quattro\'s Lotus Emulation Interface",
+                                            "name": "Quattro's Lotus Emulation Interface",
                                             "plural": false
                                         },
                                         {
@@ -998,10 +998,10 @@
                                             "plural": false
                                         }
                                     ],
-                                    "name":"Quattro\'s Lotus Emulation Interface was very similar to the Lotus menu command hierarchy",
+                                    "name": "Quattro's Lotus Emulation Interface was very similar to the Lotus menu command hierarchy",
                                     "standard_of_proof": null
                                 },
-                                "name":"evidence of {\'offered_by\': \'Lotus Development Corporation\'} to the effect that Quattro\'s Lotus Emulation Interface was very similar to the Lotus menu command hierarchy"
+                                "name": "evidence of {'offered_by': 'Lotus Development Corporation'} to the effect that Quattro's Lotus Emulation Interface was very similar to the Lotus menu command hierarchy"
                             }
                         ],
                         "despite": [],
@@ -1226,7 +1226,7 @@
                             {
                                 "generic": false,
                                 "predicate": {
-                                    "content":"${borland_international} copied ${the_lotus_menu_command_hierarchy} in creating Quattro\'s Lotus Emulation Interface",
+                                    "content": "${borland_international} copied ${the_lotus_menu_command_hierarchy} in creating Quattro's Lotus Emulation Interface",
                                     "truth": true
                                 },
                                 "terms": [
@@ -1241,7 +1241,7 @@
                                         "plural": false
                                     }
                                 ],
-                                "name":"Borland International copied the Lotus menu command hierarchy in creating Quattro\'s Lotus Emulation Interface",
+                                "name": "Borland International copied the Lotus menu command hierarchy in creating Quattro's Lotus Emulation Interface",
                                 "standard_of_proof": null
                             },
                             {
@@ -1253,7 +1253,7 @@
                                 "terms": [
                                     {
                                         "generic": true,
-                                        "name":"Quattro\'s Lotus Emulation Interface",
+                                        "name": "Quattro's Lotus Emulation Interface",
                                         "plural": false
                                     },
                                     {
@@ -1262,7 +1262,7 @@
                                         "plural": false
                                     }
                                 ],
-                                "name":"the copying of Quattro\'s Lotus Emulation Interface in the Lotus menu command hierarchy was so extensive that it rendered them substantially similar",
+                                "name": "the copying of Quattro's Lotus Emulation Interface in the Lotus menu command hierarchy was so extensive that it rendered them substantially similar",
                                 "standard_of_proof": null
                             }
                         ],
@@ -1936,7 +1936,7 @@
                             {
                                 "generic": false,
                                 "predicate": {
-                                    "content":"the precise formulation of ${lotus_1_2_3}\'s code was necessary for ${lotus_1_2_3} to work",
+                                    "content": "the precise formulation of ${lotus_1_2_3}'s code was necessary for ${lotus_1_2_3} to work",
                                     "truth": false
                                 },
                                 "terms": [
@@ -1946,7 +1946,7 @@
                                         "plural": false
                                     }
                                 ],
-                                "name":"false the precise formulation of Lotus 1-2-3\'s code was necessary for Lotus 1-2-3 to work",
+                                "name": "false the precise formulation of Lotus 1-2-3's code was necessary for Lotus 1-2-3 to work",
                                 "standard_of_proof": null
                             }
                         ],

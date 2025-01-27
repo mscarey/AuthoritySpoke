@@ -1,6 +1,7 @@
 import datetime
 import json
 import os
+from pathlib import Path
 from typing import Any, Dict, List, Text, Tuple
 
 from anchorpoint.textselectors import TextQuoteSelector
@@ -1497,7 +1498,7 @@ def make_rule(
 def make_beard_rule(beard_response) -> List[Rule]:
     """Rules from the "Beard Tax Act" example statutes."""
     client = FakeClient(responses=beard_response)
-    beard_dictionary = loaders.load_holdings("beard_rules.yaml")
+    beard_dictionary = loaders.load_holdings("beard_rules.json")
     holdings = readers.read_holdings(beard_dictionary, client=client)
     return [holding.rule for holding in holdings]
 
@@ -1576,7 +1577,8 @@ def make_anchored_holding(make_response, make_decision):
     holdings = {}
     for name in make_decision.keys():
         holdings[name] = loaders.read_anchored_holdings_from_file(
-            f"holding_{name}.yaml",
+            f"holding_{name}.json",
+            directory=Path("example_data/holdings"),
             client=client_without_api_access,
         )
     return holdings

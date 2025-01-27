@@ -27,9 +27,9 @@ class TestReadme:
         lotus = Decision(**lotus_dict)
 
         oracle_ah = read_anchored_holdings_from_file(
-            "holding_oracle.yaml", client=client
+            "holding_oracle.json", client=client
         )
-        lotus_ah = read_anchored_holdings_from_file("holding_lotus.yaml", client=client)
+        lotus_ah = read_anchored_holdings_from_file("holding_lotus.json", client=client)
 
         oracle_reading = DecisionReading(decision=oracle)
         lotus_reading = DecisionReading(decision=lotus)
@@ -55,8 +55,8 @@ class TestReadme:
         oracle = Decision(**oracle_dict)
         lotus = Decision(**lotus_dict)
 
-        oracle_h = read_holdings_from_file("holding_oracle.yaml", client=client)
-        lotus_h = read_holdings_from_file("holding_lotus.yaml", client=client)
+        oracle_h = read_holdings_from_file("holding_oracle.json", client=client)
+        lotus_h = read_holdings_from_file("holding_lotus.json", client=client)
 
         oracle_reading = DecisionReading(decision=oracle)
         lotus_reading = DecisionReading(decision=lotus)

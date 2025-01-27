@@ -59,7 +59,7 @@ class TestHoldingDump:
         assert "$thing was on the premises of $place" in loaded_content
 
     def test_dump_holdings_with_comparison(self, fake_usc_client):
-        holdings = read_holdings_from_file("holding_watt.yaml", client=fake_usc_client)
+        holdings = read_holdings_from_file("holding_watt.json", client=fake_usc_client)
         assert "was no more than 35 foot" in str(holdings[1])
         dumped = holdings[1].model_dump()
         predicate = dumped["rule"]["procedure"]["inputs"][3]["predicate"]
@@ -112,7 +112,7 @@ class TestHoldingImport:
         is stored with that flag instead of generating Holdings that it
         implies.
         """
-        lotus_holdings = load_holdings("holding_lotus.yaml")
+        lotus_holdings = load_holdings("holding_lotus.json")
         assert len(lotus_holdings) == 10
 
     def test_import_enactments_and_anchors(
@@ -207,7 +207,7 @@ class TestHoldingImport:
         impossible to get text anchors.
         """
         mock_client = FakeClient(responses=make_response)
-        raw_holdings = load_holdings("holding_oracle.yaml")
+        raw_holdings = load_holdings("holding_oracle.json")
         loaded = readers.read_holdings_with_anchors(raw_holdings, client=mock_client)
 
         assert isinstance(loaded.holdings[0], HoldingWithAnchors)
@@ -220,7 +220,7 @@ class TestHoldingImport:
         """
         mock_client = FakeClient(responses=make_response)
         oracle_holdings_with_anchors = loaders.read_anchored_holdings_from_file(
-            "holding_oracle.yaml", client=mock_client
+            "holding_oracle.json", client=mock_client
         )
         reading = OpinionReading()
         reading.posit(oracle_holdings_with_anchors)
@@ -229,7 +229,7 @@ class TestHoldingImport:
     def test_decision_posits_holdings_with_anchors(self, make_response):
         mock_client = FakeClient(responses=make_response)
         oracle_holdings_with_anchors = loaders.read_anchored_holdings_from_file(
-            "holding_oracle.yaml", client=mock_client
+            "holding_oracle.json", client=mock_client
         )
         reading = DecisionReading(decision=Decision(decision_date=date(2019, 1, 1)))
         reading.posit(oracle_holdings_with_anchors)
@@ -241,7 +241,7 @@ class TestHoldingImport:
         mock_client = FakeClient(responses=make_response)
         oracle = make_decision["oracle"]
         oracle_holdings = read_holdings_from_file(
-            "holding_oracle.yaml", client=mock_client
+            "holding_oracle.json", client=mock_client
         )
         oracle_reading = DecisionReading(decision=oracle)
         oracle_reading.posit(oracle_holdings)
@@ -438,13 +438,13 @@ class TestTextAnchors:
 
     def test_enactment_has_subsection(self, make_response):
         mock_client = FakeClient(responses=make_response)
-        to_read = load_holdings("holding_lotus.yaml")
+        to_read = load_holdings("holding_lotus.json")
         holdings = readers.read_holdings(to_read, client=mock_client)
         assert holdings[8].enactments[0].node.split("/")[-1] == "b"
 
     def test_enactment_text_limited_to_subsection(self, make_response):
         mock_client = FakeClient(responses=make_response)
-        to_read = load_holdings("holding_lotus.yaml")
+        to_read = load_holdings("holding_lotus.json")
         holdings = readers.read_holdings(to_read, client=mock_client)
         assert "architectural works" not in str(holdings[8].enactments[0])
 
@@ -456,7 +456,7 @@ class TestTextAnchors:
         """
 
         watt = make_opinion["watt_majority"]
-        watt.posit(load_holdings("holding_watt.yaml"))
+        watt.posit(load_holdings("holding_watt.json"))
         assert watt.holdings[0] == real_holding["h1"]
 
     def test_same_enactment_objects_equal(self, make_response):
@@ -465,16 +465,16 @@ class TestTextAnchors:
         exactly match the holdings created for testing in conftest.
         """
         mock_client = FakeClient(responses=make_response)
-        to_read = load_holdings("holding_watt.yaml")
+        to_read = load_holdings("holding_watt.json")
         holdings = readers.read_holdings(to_read, client=mock_client)
         assert holdings[0].enactments[0].means(holdings[1].enactments[0])
 
     def test_same_enactment_in_two_opinions(self, make_response):
         mock_client = FakeClient(responses=make_response)
-        to_read = load_holdings("holding_brad.yaml")
+        to_read = load_holdings("holding_brad.json")
         brad_holdings = readers.read_holdings(to_read, client=mock_client)
 
-        to_read = load_holdings("holding_watt.yaml")
+        to_read = load_holdings("holding_watt.json")
         watt_holdings = readers.read_holdings(to_read, client=mock_client)
 
         assert any(
@@ -489,12 +489,12 @@ class TestTextAnchors:
         This tests whether the loaded objects turn out equal.
         """
         mock_client = FakeClient(responses=make_response)
-        to_read = load_holdings("holding_brad.yaml")
+        to_read = load_holdings("holding_brad.json")
         holdings = readers.read_holdings(to_read, client=mock_client)
         assert any(holdings[6].inputs[0].means(x) for x in holdings[5].inputs)
 
     def test_fact_from_loaded_holding(self, make_response):
-        to_read = load_holdings("holding_watt.yaml")
+        to_read = load_holdings("holding_watt.json")
         mock_client = FakeClient(responses=make_response)
         holdings = readers.read_holdings(to_read, client=mock_client)
         new_fact = holdings[0].inputs[1]
@@ -502,7 +502,7 @@ class TestTextAnchors:
         assert isinstance(new_fact.terms[0], Entity)
 
     def test_fact_with_quantity(self, make_response):
-        to_read = load_holdings("holding_watt.yaml")
+        to_read = load_holdings("holding_watt.json")
         mock_client = FakeClient(responses=make_response)
         holdings = readers.read_holdings(to_read, client=mock_client)
         new_fact = holdings[1].inputs[3]
@@ -510,7 +510,7 @@ class TestTextAnchors:
 
     def test_use_int_not_pint_without_dimension(self, make_response):
         mock_client = FakeClient(responses=make_response)
-        to_read = load_holdings("holding_brad.yaml")
+        to_read = load_holdings("holding_brad.json")
         loaded_holdings = readers.read_holdings(to_read, client=mock_client)
         anchored_holdings = AnchoredHoldings(
             holdings=[HoldingWithAnchors(holding=item) for item in loaded_holdings]
@@ -522,7 +522,7 @@ class TestTextAnchors:
 
     def test_opinion_posits_holding(self, make_response):
         mock_client = FakeClient(responses=make_response)
-        to_read = load_holdings("holding_brad.yaml")
+        to_read = load_holdings("holding_brad.json")
         holdings = readers.read_holdings(to_read, client=mock_client)
         reading = OpinionReading()
         reading.posit(holdings[0])
@@ -534,7 +534,7 @@ class TestTextAnchors:
         case, but with generic factors from Watt.
         """
         mock_client = FakeClient(responses=make_response)
-        to_read = load_holdings("holding_brad.yaml")
+        to_read = load_holdings("holding_brad.json")
         brad_holdings = readers.read_holdings(to_read, client=mock_client)
         context_holding = brad_holdings[6].new_context(
             [make_entity["watt"], make_entity["trees"], make_entity["motel"]]
@@ -554,7 +554,7 @@ class TestTextAnchors:
         from Watt.
         """
         mock_client = FakeClient(responses=make_response)
-        to_read = load_holdings("holding_brad.yaml")
+        to_read = load_holdings("holding_brad.json")
         holdings = readers.read_holdings(to_read, client=mock_client)
         breading = OpinionReading()
         breading.clear_holdings()
@@ -579,7 +579,7 @@ class TestTextAnchors:
         """
         mock_client = FakeClient(responses=make_response)
         reading = OpinionReading()
-        to_read = load_holdings("holding_brad.yaml")
+        to_read = load_holdings("holding_brad.json")
         holdings = readers.read_holdings(to_read, client=mock_client)
         reading.posit(holdings)
         expectation_not_reasonable = reading.holdings[6]
@@ -654,7 +654,7 @@ class TestExclusiveFlag:
         less Enactment text
         """
         fake_client = FakeClient(responses=make_response)
-        holdings = read_holdings_from_file("holding_feist.yaml", client=fake_client)
+        holdings = read_holdings_from_file("holding_feist.json", client=fake_client)
 
         directory = Entity(name="Rural's telephone directory")
         original = Fact(
@@ -679,14 +679,14 @@ class TestExclusiveFlag:
 
     def test_fact_containing_wrong_type(self, make_response):
         mock_client = FakeClient(responses=make_response)
-        to_read = load_holdings("holding_feist.yaml")
+        to_read = load_holdings("holding_feist.json")
         to_read[0]["outputs"]["type"] = "wrong_type"
         with pytest.raises(ValidationError):
             readers.read_holdings([to_read[0]], client=mock_client)
 
     def test_type_field_removed_from_factor(self, make_response):
         mock_client = FakeClient(responses=make_response)
-        to_read = load_holdings("holding_feist.yaml")
+        to_read = load_holdings("holding_feist.json")
         holdings = readers.read_holdings([to_read[0]], client=mock_client)
         assert holdings[0].inputs[0].__dict__.get("type") is None
 
@@ -708,7 +708,7 @@ class TestExclusiveFlag:
         inferred Rules that aren't expanded during data loading.
         """
         mock_client = FakeClient(responses=make_response)
-        to_read = load_holdings("holding_feist.yaml")
+        to_read = load_holdings("holding_feist.json")
         feist_holdings = readers.read_holdings(to_read["holdings"], client=mock_client)
 
         directory = Entity(name="Rural's telephone directory")
@@ -744,7 +744,7 @@ class TestExclusiveFlag:
         generated Rules as well as its original Rule.
         """
         mock_client = FakeClient(responses=make_response)
-        feist_json = load_holdings("holding_feist.yaml")
+        feist_json = load_holdings("holding_feist.json")
         feist_holdings = readers.read_holdings(feist_json, client=mock_client)
 
         assert len(feist_holdings) == len(feist_json)
@@ -762,6 +762,6 @@ class TestNestedFactorImport:
         concerning appellant’s use of narcotics was improper.
         """
         mock_client = FakeClient(responses=make_response)
-        cardenas_dict = load_holdings("holding_cardenas.yaml")
+        cardenas_dict = load_holdings("holding_cardenas.json")
         cardenas_holdings = readers.read_holdings(cardenas_dict, client=mock_client)
         assert len(cardenas_holdings) == 2
