@@ -23,7 +23,7 @@ from nettlesome.terms import (
     Term,
     TermSequence,
 )
-from nettlesome.factors import Factor
+from nettlesome.factors import Factor, AbsenceOf
 from nettlesome.groups import FactorGroup
 from nettlesome.formatting import indented
 
@@ -253,7 +253,6 @@ class Procedure(Comparable, BaseModel):
         return len(self.generic_terms())
 
     def __str__(self):
-
         text = "RESULT:"
         for f in self.outputs:
             text += "\n" + indented(f.wrapped_string)
@@ -773,10 +772,10 @@ class Procedure(Comparable, BaseModel):
                 + "'outputs', consider making a separate 'exclusive' Rule "
                 + "for each output."
             )
-        if self.outputs[0].absent:
+        if isinstance(self.outputs[0], AbsenceOf):
             raise ValueError(
                 "The 'exclusive' attribute is not allowed for Holdings "
-                + "with an 'absent' 'output' Factor. This would indicate "
+                + "with an 'AbsenceOf' as an 'output'. This would indicate "
                 + "that the output can or must be present in every litigation "
                 + "unless specified inputs are present, which is unlikely."
             )

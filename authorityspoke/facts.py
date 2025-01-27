@@ -541,18 +541,13 @@ class Evidence(Factor, BaseModel):
     :param name:
         a string identifier
 
-    :param absent:
-        if True, indicates that no evidence meeting the description has been
-        admitted, regardless of whether a corresponding :class:`Exhibit` has
-        been presented
-
     :param generic:
         if True, indicates that the specific attributes of the evidence
         are irrelevant in the context of the :class:`.Holding` where
         the evidence is being referenced.
     """
 
-    exhibit: Optional[Exhibit] = None
+    exhibit: Optional[Exhibit | AbsenceOf] = None
     to_effect: Optional[Fact] = None
     name: Optional[str] = None
     generic: bool = False

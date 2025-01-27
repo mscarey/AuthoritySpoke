@@ -616,8 +616,10 @@ def make_exhibit(
         "no_shooting_witness_unknown_testimony": Exhibit(
             offered_by=al, form="testimony", statement=f["f_no_shooting"]
         ),
-        "no_shooting_witness_unknown_absent_testimony": Exhibit(
-            offered_by=al, form="testimony", statement=f["f_no_shooting"], absent=True
+        "no_shooting_witness_unknown_absent_testimony": AbsenceOf(
+            absent=Exhibit(
+                offered_by=al, form="testimony", statement=f["f_no_shooting"]
+            )
         ),
         "no_shooting_different_witness_testimony": Exhibit(
             offered_by=al,
@@ -637,12 +639,13 @@ def make_exhibit(
             statement=w["f8"],
             statement_attribution=e["craig"],
         ),
-        "reciprocal_testimony_absent": Exhibit(
-            offered_by=al,
-            form="testimony",
-            statement=w["f8"],
-            statement_attribution=e["craig"],
-            absent=True,
+        "reciprocal_testimony_absent": AbsenceOf(
+            absent=Exhibit(
+                offered_by=al,
+                form="testimony",
+                statement=w["f8"],
+                statement_attribution=e["craig"],
+            )
         ),
         "reciprocal_testimony_less": Exhibit(
             offered_by=al,
@@ -656,12 +659,13 @@ def make_exhibit(
             statement=w["f8_meters"],
             statement_attribution=e["craig"],
         ),
-        "reciprocal_testimony_specific_absent": Exhibit(
-            offered_by=al,
-            form="testimony",
-            statement=w["f8_meters"],
-            statement_attribution=e["craig"],
-            absent=True,
+        "reciprocal_testimony_specific_absent": AbsenceOf(
+            absent=Exhibit(
+                offered_by=al,
+                form="testimony",
+                statement=w["f8_meters"],
+                statement_attribution=e["craig"],
+            )
         ),
         "relevant_murder_testimony": Exhibit(
             offered_by=al,
