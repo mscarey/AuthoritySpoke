@@ -2256,9 +2256,5 @@
         "rule_valid": true,
         "decided": true,
         "exclusive": false
-    },
-    "anchors": {
-        "positions": [],
-        "quotes": []
     }
 ]
