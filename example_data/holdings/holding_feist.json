@@ -1,1974 +1,1898 @@
-{
-    "holdings": [
-        {
-            "holding": {
-                "generic": false,
-                "rule": {
-                    "generic": false,
-                    "procedure": {
-                        "outputs": [
+[
+    {
+        "generic": false,
+        "rule": {
+            "generic": false,
+            "procedure": {
+                "outputs": [
+                    {
+                        "generic": false,
+                        "predicate": {
+                            "content": "${rural_s_telephone_directory} was copyrightable",
+                            "truth": false
+                        },
+                        "terms": [
                             {
-                                "generic": false,
-                                "predicate": {
-                                    "content": "${rural_s_telephone_directory} was copyrightable",
-                                    "truth": false
-                                },
-                                "terms": [
-                                    {
-                                        "generic": true,
-                                        "name": "Rural's telephone directory",
-                                        "plural": false
-                                    }
-                                ],
-                                "name": "false Rural's telephone directory was copyrightable",
-                                "standard_of_proof": null
+                                "generic": true,
+                                "name": "Rural's telephone directory",
+                                "plural": false
                             }
                         ],
-                        "inputs": [
+                        "name": "false Rural's telephone directory was copyrightable",
+                        "standard_of_proof": null
+                    }
+                ],
+                "inputs": [
+                    {
+                        "generic": false,
+                        "predicate": {
+                            "content": "${rural_s_telephone_directory} was a fact",
+                            "truth": true
+                        },
+                        "terms": [
                             {
-                                "generic": false,
-                                "predicate": {
-                                    "content": "${rural_s_telephone_directory} was a fact",
-                                    "truth": true
-                                },
-                                "terms": [
-                                    {
-                                        "generic": true,
-                                        "name": "Rural's telephone directory",
-                                        "plural": false
-                                    }
-                                ],
-                                "name": "Rural's telephone directory was a fact",
-                                "standard_of_proof": null
+                                "generic": true,
+                                "name": "Rural's telephone directory",
+                                "plural": false
                             }
                         ],
-                        "despite": [],
-                        "name": ""
-                    },
-                    "enactments": {
-                        "passages": [
-                            {
-                                "enactment": {
-                                    "node": "/us/const/article/I/8/8",
-                                    "start_date": "1788-09-13",
-                                    "heading": "Patents and copyrights.",
-                                    "text_version": {
-                                        "content": "To promote the Progress of Science and useful Arts, by securing for limited Times to Authors and Inventors the exclusive Right to their respective Writings and Discoveries;",
-                                        "url": "https://authorityspoke.com/api/v1/textversions/735650/",
-                                        "id": 735650
-                                    },
-                                    "end_date": null,
-                                    "first_published": null,
-                                    "earliest_in_db": null,
-                                    "anchors": [],
-                                    "citations": [],
-                                    "name": "/us/const/article/I/8/8",
-                                    "children": []
-                                },
-                                "selection": {
-                                    "positions": [],
-                                    "quotes": [
-                                        {
-                                            "exact": "To promote the Progress of Science and useful Arts, by securing for limited Times to Authors",
-                                            "prefix": "",
-                                            "suffix": ""
-                                        },
-                                        {
-                                            "exact": "the exclusive Right to their respective Writings",
-                                            "prefix": "",
-                                            "suffix": ""
-                                        }
-                                    ]
-                                }
+                        "name": "Rural's telephone directory was a fact",
+                        "standard_of_proof": null
+                    }
+                ],
+                "despite": [],
+                "name": ""
+            },
+            "enactments": {
+                "passages": [
+                    {
+                        "enactment": {
+                            "node": "/us/const/article/I/8/8",
+                            "start_date": "1788-09-13",
+                            "heading": "Patents and copyrights.",
+                            "text_version": {
+                                "content": "To promote the Progress of Science and useful Arts, by securing for limited Times to Authors and Inventors the exclusive Right to their respective Writings and Discoveries;",
+                                "url": "https://authorityspoke.com/api/v1/textversions/735650/",
+                                "id": 735650
                             },
+                            "end_date": null,
+                            "first_published": null,
+                            "earliest_in_db": null,
+                            "anchors": [],
+                            "citations": [],
+                            "name": "/us/const/article/I/8/8",
+                            "children": []
+                        },
+                        "selection": {
+                            "positions": [],
+                            "quotes": [
+                                {
+                                    "exact": "To promote the Progress of Science and useful Arts, by securing for limited Times to Authors",
+                                    "prefix": "",
+                                    "suffix": ""
+                                },
+                                {
+                                    "exact": "the exclusive Right to their respective Writings",
+                                    "prefix": "",
+                                    "suffix": ""
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "enactment": {
+                            "node": "/us/usc/t17/s103/b",
+                            "start_date": "2013-07-18",
+                            "heading": "",
+                            "text_version": {
+                                "content": "The copyright in a compilation or derivative work extends only to the material contributed by the author of such work, as distinguished from the preexisting material employed in the work, and does not imply any exclusive right in the preexisting material. The copyright in such work is independent of, and does not affect or enlarge the scope, duration, ownership, or subsistence of, any copyright protection in the preexisting material.",
+                                "url": "https://authorityspoke.com/api/v1/textversions/1030582/",
+                                "id": 1030582
+                            },
+                            "end_date": null,
+                            "first_published": null,
+                            "earliest_in_db": null,
+                            "anchors": [],
+                            "citations": [],
+                            "name": "/us/usc/t17/s103/b",
+                            "children": []
+                        },
+                        "selection": {
+                            "positions": [],
+                            "quotes": [
+                                {
+                                    "exact": "The copyright in a compilation",
+                                    "prefix": "",
+                                    "suffix": ""
+                                },
+                                {
+                                    "exact": "extends only to the material contributed by the author of such work, as distinguished from the preexisting material employed in the work, and does not imply any exclusive right in the preexisting material.",
+                                    "prefix": "",
+                                    "suffix": ""
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            "enactments_despite": {
+                "passages": []
+            },
+            "mandatory": true,
+            "universal": true,
+            "name": null
+        },
+        "rule_valid": true,
+        "decided": true,
+        "exclusive": false
+    },
+    {
+        "generic": false,
+        "rule": {
+            "generic": false,
+            "procedure": {
+                "outputs": [
+                    {
+                        "generic": false,
+                        "predicate": {
+                            "content": "${rural_s_telephone_directory} was copyrightable",
+                            "truth": true
+                        },
+                        "terms": [
                             {
-                                "enactment": {
-                                    "node": "/us/usc/t17/s103/b",
+                                "generic": true,
+                                "name": "Rural's telephone directory",
+                                "plural": false
+                            }
+                        ],
+                        "name": "Rural's telephone directory was copyrightable",
+                        "standard_of_proof": null
+                    }
+                ],
+                "inputs": [
+                    {
+                        "generic": false,
+                        "predicate": {
+                            "content": "${rural_s_telephone_directory} was a compilation of facts",
+                            "truth": true
+                        },
+                        "terms": [
+                            {
+                                "generic": true,
+                                "name": "Rural's telephone directory",
+                                "plural": false
+                            }
+                        ],
+                        "name": "Rural's telephone directory was a compilation of facts",
+                        "standard_of_proof": null
+                    }
+                ],
+                "despite": [],
+                "name": ""
+            },
+            "enactments": {
+                "passages": [
+                    {
+                        "enactment": {
+                            "node": "/us/const/article/I/8/8",
+                            "start_date": "1788-09-13",
+                            "heading": "Patents and copyrights.",
+                            "text_version": {
+                                "content": "To promote the Progress of Science and useful Arts, by securing for limited Times to Authors and Inventors the exclusive Right to their respective Writings and Discoveries;",
+                                "url": "https://authorityspoke.com/api/v1/textversions/735650/",
+                                "id": 735650
+                            },
+                            "end_date": null,
+                            "first_published": null,
+                            "earliest_in_db": null,
+                            "anchors": [],
+                            "citations": [],
+                            "name": "/us/const/article/I/8/8",
+                            "children": []
+                        },
+                        "selection": {
+                            "positions": [],
+                            "quotes": [
+                                {
+                                    "exact": "To promote the Progress of Science and useful Arts, by securing for limited Times to Authors",
+                                    "prefix": "",
+                                    "suffix": ""
+                                },
+                                {
+                                    "exact": "the exclusive Right to their respective Writings",
+                                    "prefix": "",
+                                    "suffix": ""
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            "enactments_despite": {
+                "passages": []
+            },
+            "mandatory": true,
+            "universal": false,
+            "name": null
+        },
+        "rule_valid": true,
+        "decided": true,
+        "exclusive": false
+    },
+    {
+        "generic": false,
+        "rule": {
+            "generic": false,
+            "procedure": {
+                "outputs": [
+                    {
+                        "generic": false,
+                        "predicate": {
+                            "content": "${rural_s_telephone_directory} was copyrightable",
+                            "truth": false
+                        },
+                        "terms": [
+                            {
+                                "generic": true,
+                                "name": "Rural's telephone directory",
+                                "plural": false
+                            }
+                        ],
+                        "name": "false Rural's telephone directory was copyrightable",
+                        "standard_of_proof": null
+                    }
+                ],
+                "inputs": [
+                    {
+                        "generic": false,
+                        "predicate": {
+                            "content": "${rural_s_telephone_directory} was an idea",
+                            "truth": true
+                        },
+                        "terms": [
+                            {
+                                "generic": true,
+                                "name": "Rural's telephone directory",
+                                "plural": false
+                            }
+                        ],
+                        "name": "Rural's telephone directory was an idea",
+                        "standard_of_proof": null
+                    }
+                ],
+                "despite": [],
+                "name": ""
+            },
+            "enactments": {
+                "passages": [
+                    {
+                        "enactment": {
+                            "node": "/us/const/article/I/8/8",
+                            "start_date": "1788-09-13",
+                            "heading": "Patents and copyrights.",
+                            "text_version": {
+                                "content": "To promote the Progress of Science and useful Arts, by securing for limited Times to Authors and Inventors the exclusive Right to their respective Writings and Discoveries;",
+                                "url": "https://authorityspoke.com/api/v1/textversions/735650/",
+                                "id": 735650
+                            },
+                            "end_date": null,
+                            "first_published": null,
+                            "earliest_in_db": null,
+                            "anchors": [],
+                            "citations": [],
+                            "name": "/us/const/article/I/8/8",
+                            "children": []
+                        },
+                        "selection": {
+                            "positions": [],
+                            "quotes": [
+                                {
+                                    "exact": "To promote the Progress of Science and useful Arts, by securing for limited Times to Authors",
+                                    "prefix": "",
+                                    "suffix": ""
+                                },
+                                {
+                                    "exact": "the exclusive Right to their respective Writings",
+                                    "prefix": "",
+                                    "suffix": ""
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            "enactments_despite": {
+                "passages": []
+            },
+            "mandatory": true,
+            "universal": true,
+            "name": null
+        },
+        "rule_valid": true,
+        "decided": true,
+        "exclusive": false
+    },
+    {
+        "generic": false,
+        "rule": {
+            "generic": false,
+            "procedure": {
+                "outputs": [
+                    {
+                        "generic": false,
+                        "predicate": {
+                            "content": "${rural_s_telephone_directory} was copyrightable",
+                            "truth": true
+                        },
+                        "terms": [
+                            {
+                                "generic": true,
+                                "name": "Rural's telephone directory",
+                                "plural": false
+                            }
+                        ],
+                        "name": "Rural's telephone directory was copyrightable",
+                        "standard_of_proof": null
+                    }
+                ],
+                "inputs": [
+                    {
+                        "generic": false,
+                        "predicate": {
+                            "content": "${rural_s_telephone_directory} was an original work",
+                            "truth": true
+                        },
+                        "terms": [
+                            {
+                                "generic": true,
+                                "name": "Rural's telephone directory",
+                                "plural": false
+                            }
+                        ],
+                        "name": "Rural's telephone directory was an original work",
+                        "standard_of_proof": null
+                    }
+                ],
+                "despite": [],
+                "name": ""
+            },
+            "enactments": {
+                "passages": [
+                    {
+                        "enactment": {
+                            "node": "/us/const/article/I/8/8",
+                            "start_date": "1788-09-13",
+                            "heading": "Patents and copyrights.",
+                            "text_version": {
+                                "content": "To promote the Progress of Science and useful Arts, by securing for limited Times to Authors and Inventors the exclusive Right to their respective Writings and Discoveries;",
+                                "url": "https://authorityspoke.com/api/v1/textversions/735650/",
+                                "id": 735650
+                            },
+                            "end_date": null,
+                            "first_published": null,
+                            "earliest_in_db": null,
+                            "anchors": [],
+                            "citations": [],
+                            "name": "/us/const/article/I/8/8",
+                            "children": []
+                        },
+                        "selection": {
+                            "positions": [],
+                            "quotes": [
+                                {
+                                    "exact": "To promote the Progress of Science and useful Arts, by securing for limited Times to Authors",
+                                    "prefix": "",
+                                    "suffix": ""
+                                },
+                                {
+                                    "exact": "the exclusive Right to their respective Writings",
+                                    "prefix": "",
+                                    "suffix": ""
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "enactment": {
+                            "node": "/us/usc/t17/s102/a",
+                            "start_date": "2013-07-18",
+                            "heading": "",
+                            "text_version": {
+                                "content": "Copyright protection subsists, in accordance with this title, in original works of authorship fixed in any tangible medium of expression, now known or later developed, from which they can be perceived, reproduced, or otherwise communicated, either directly or with the aid of a machine or device. Works of authorship include the following categories:",
+                                "url": "https://authorityspoke.com/api/v1/textversions/1030579/",
+                                "id": 1030579
+                            },
+                            "end_date": null,
+                            "first_published": null,
+                            "earliest_in_db": null,
+                            "anchors": [],
+                            "citations": [],
+                            "name": "/us/usc/t17/s102/a",
+                            "children": [
+                                {
+                                    "node": "/us/usc/t17/s102/a/1",
                                     "start_date": "2013-07-18",
                                     "heading": "",
                                     "text_version": {
-                                        "content": "The copyright in a compilation or derivative work extends only to the material contributed by the author of such work, as distinguished from the preexisting material employed in the work, and does not imply any exclusive right in the preexisting material. The copyright in such work is independent of, and does not affect or enlarge the scope, duration, ownership, or subsistence of, any copyright protection in the preexisting material.",
-                                        "url": "https://authorityspoke.com/api/v1/textversions/1030582/",
-                                        "id": 1030582
+                                        "content": "literary works;",
+                                        "url": "https://authorityspoke.com/api/v1/textversions/1030571/",
+                                        "id": 1030571
                                     },
                                     "end_date": null,
                                     "first_published": null,
                                     "earliest_in_db": null,
                                     "anchors": [],
                                     "citations": [],
-                                    "name": "/us/usc/t17/s103/b",
+                                    "name": "",
                                     "children": []
                                 },
-                                "selection": {
-                                    "positions": [],
-                                    "quotes": [
-                                        {
-                                            "exact": "The copyright in a compilation",
-                                            "prefix": "",
-                                            "suffix": ""
-                                        },
-                                        {
-                                            "exact": "extends only to the material contributed by the author of such work, as distinguished from the preexisting material employed in the work, and does not imply any exclusive right in the preexisting material.",
-                                            "prefix": "",
-                                            "suffix": ""
-                                        }
-                                    ]
-                                }
-                            }
-                        ]
-                    },
-                    "enactments_despite": {
-                        "passages": []
-                    },
-                    "mandatory": true,
-                    "universal": true,
-                    "name": null
-                },
-                "rule_valid": true,
-                "decided": true,
-                "exclusive": false
-            },
-            "anchors": {
-                "positions": [],
-                "quotes": []
-            }
-        },
-        {
-            "holding": {
-                "generic": false,
-                "rule": {
-                    "generic": false,
-                    "procedure": {
-                        "outputs": [
-                            {
-                                "generic": false,
-                                "predicate": {
-                                    "content": "${rural_s_telephone_directory} was copyrightable",
-                                    "truth": true
-                                },
-                                "terms": [
-                                    {
-                                        "generic": true,
-                                        "name": "Rural's telephone directory",
-                                        "plural": false
-                                    }
-                                ],
-                                "name": "Rural's telephone directory was copyrightable",
-                                "standard_of_proof": null
-                            }
-                        ],
-                        "inputs": [
-                            {
-                                "generic": false,
-                                "predicate": {
-                                    "content": "${rural_s_telephone_directory} was a compilation of facts",
-                                    "truth": true
-                                },
-                                "terms": [
-                                    {
-                                        "generic": true,
-                                        "name": "Rural's telephone directory",
-                                        "plural": false
-                                    }
-                                ],
-                                "name": "Rural's telephone directory was a compilation of facts",
-                                "standard_of_proof": null
-                            }
-                        ],
-                        "despite": [],
-                        "name": ""
-                    },
-                    "enactments": {
-                        "passages": [
-                            {
-                                "enactment": {
-                                    "node": "/us/const/article/I/8/8",
-                                    "start_date": "1788-09-13",
-                                    "heading": "Patents and copyrights.",
-                                    "text_version": {
-                                        "content": "To promote the Progress of Science and useful Arts, by securing for limited Times to Authors and Inventors the exclusive Right to their respective Writings and Discoveries;",
-                                        "url": "https://authorityspoke.com/api/v1/textversions/735650/",
-                                        "id": 735650
-                                    },
-                                    "end_date": null,
-                                    "first_published": null,
-                                    "earliest_in_db": null,
-                                    "anchors": [],
-                                    "citations": [],
-                                    "name": "/us/const/article/I/8/8",
-                                    "children": []
-                                },
-                                "selection": {
-                                    "positions": [],
-                                    "quotes": [
-                                        {
-                                            "exact": "To promote the Progress of Science and useful Arts, by securing for limited Times to Authors",
-                                            "prefix": "",
-                                            "suffix": ""
-                                        },
-                                        {
-                                            "exact": "the exclusive Right to their respective Writings",
-                                            "prefix": "",
-                                            "suffix": ""
-                                        }
-                                    ]
-                                }
-                            }
-                        ]
-                    },
-                    "enactments_despite": {
-                        "passages": []
-                    },
-                    "mandatory": true,
-                    "universal": false,
-                    "name": null
-                },
-                "rule_valid": true,
-                "decided": true,
-                "exclusive": false
-            },
-            "anchors": {
-                "positions": [],
-                "quotes": []
-            }
-        },
-        {
-            "holding": {
-                "generic": false,
-                "rule": {
-                    "generic": false,
-                    "procedure": {
-                        "outputs": [
-                            {
-                                "generic": false,
-                                "predicate": {
-                                    "content": "${rural_s_telephone_directory} was copyrightable",
-                                    "truth": false
-                                },
-                                "terms": [
-                                    {
-                                        "generic": true,
-                                        "name": "Rural's telephone directory",
-                                        "plural": false
-                                    }
-                                ],
-                                "name": "false Rural's telephone directory was copyrightable",
-                                "standard_of_proof": null
-                            }
-                        ],
-                        "inputs": [
-                            {
-                                "generic": false,
-                                "predicate": {
-                                    "content": "${rural_s_telephone_directory} was an idea",
-                                    "truth": true
-                                },
-                                "terms": [
-                                    {
-                                        "generic": true,
-                                        "name": "Rural's telephone directory",
-                                        "plural": false
-                                    }
-                                ],
-                                "name": "Rural's telephone directory was an idea",
-                                "standard_of_proof": null
-                            }
-                        ],
-                        "despite": [],
-                        "name": ""
-                    },
-                    "enactments": {
-                        "passages": [
-                            {
-                                "enactment": {
-                                    "node": "/us/const/article/I/8/8",
-                                    "start_date": "1788-09-13",
-                                    "heading": "Patents and copyrights.",
-                                    "text_version": {
-                                        "content": "To promote the Progress of Science and useful Arts, by securing for limited Times to Authors and Inventors the exclusive Right to their respective Writings and Discoveries;",
-                                        "url": "https://authorityspoke.com/api/v1/textversions/735650/",
-                                        "id": 735650
-                                    },
-                                    "end_date": null,
-                                    "first_published": null,
-                                    "earliest_in_db": null,
-                                    "anchors": [],
-                                    "citations": [],
-                                    "name": "/us/const/article/I/8/8",
-                                    "children": []
-                                },
-                                "selection": {
-                                    "positions": [],
-                                    "quotes": [
-                                        {
-                                            "exact": "To promote the Progress of Science and useful Arts, by securing for limited Times to Authors",
-                                            "prefix": "",
-                                            "suffix": ""
-                                        },
-                                        {
-                                            "exact": "the exclusive Right to their respective Writings",
-                                            "prefix": "",
-                                            "suffix": ""
-                                        }
-                                    ]
-                                }
-                            }
-                        ]
-                    },
-                    "enactments_despite": {
-                        "passages": []
-                    },
-                    "mandatory": true,
-                    "universal": true,
-                    "name": null
-                },
-                "rule_valid": true,
-                "decided": true,
-                "exclusive": false
-            },
-            "anchors": {
-                "positions": [],
-                "quotes": []
-            }
-        },
-        {
-            "holding": {
-                "generic": false,
-                "rule": {
-                    "generic": false,
-                    "procedure": {
-                        "outputs": [
-                            {
-                                "generic": false,
-                                "predicate": {
-                                    "content": "${rural_s_telephone_directory} was copyrightable",
-                                    "truth": true
-                                },
-                                "terms": [
-                                    {
-                                        "generic": true,
-                                        "name": "Rural's telephone directory",
-                                        "plural": false
-                                    }
-                                ],
-                                "name": "Rural's telephone directory was copyrightable",
-                                "standard_of_proof": null
-                            }
-                        ],
-                        "inputs": [
-                            {
-                                "generic": false,
-                                "predicate": {
-                                    "content": "${rural_s_telephone_directory} was an original work",
-                                    "truth": true
-                                },
-                                "terms": [
-                                    {
-                                        "generic": true,
-                                        "name": "Rural's telephone directory",
-                                        "plural": false
-                                    }
-                                ],
-                                "name": "Rural's telephone directory was an original work",
-                                "standard_of_proof": null
-                            }
-                        ],
-                        "despite": [],
-                        "name": ""
-                    },
-                    "enactments": {
-                        "passages": [
-                            {
-                                "enactment": {
-                                    "node": "/us/const/article/I/8/8",
-                                    "start_date": "1788-09-13",
-                                    "heading": "Patents and copyrights.",
-                                    "text_version": {
-                                        "content": "To promote the Progress of Science and useful Arts, by securing for limited Times to Authors and Inventors the exclusive Right to their respective Writings and Discoveries;",
-                                        "url": "https://authorityspoke.com/api/v1/textversions/735650/",
-                                        "id": 735650
-                                    },
-                                    "end_date": null,
-                                    "first_published": null,
-                                    "earliest_in_db": null,
-                                    "anchors": [],
-                                    "citations": [],
-                                    "name": "/us/const/article/I/8/8",
-                                    "children": []
-                                },
-                                "selection": {
-                                    "positions": [],
-                                    "quotes": [
-                                        {
-                                            "exact": "To promote the Progress of Science and useful Arts, by securing for limited Times to Authors",
-                                            "prefix": "",
-                                            "suffix": ""
-                                        },
-                                        {
-                                            "exact": "the exclusive Right to their respective Writings",
-                                            "prefix": "",
-                                            "suffix": ""
-                                        }
-                                    ]
-                                }
-                            },
-                            {
-                                "enactment": {
-                                    "node": "/us/usc/t17/s102/a",
+                                {
+                                    "node": "/us/usc/t17/s102/a/2",
                                     "start_date": "2013-07-18",
                                     "heading": "",
                                     "text_version": {
-                                        "content": "Copyright protection subsists, in accordance with this title, in original works of authorship fixed in any tangible medium of expression, now known or later developed, from which they can be perceived, reproduced, or otherwise communicated, either directly or with the aid of a machine or device. Works of authorship include the following categories:",
-                                        "url": "https://authorityspoke.com/api/v1/textversions/1030579/",
-                                        "id": 1030579
+                                        "content": "musical works, including any accompanying words;",
+                                        "url": "https://authorityspoke.com/api/v1/textversions/1030572/",
+                                        "id": 1030572
                                     },
                                     "end_date": null,
                                     "first_published": null,
                                     "earliest_in_db": null,
                                     "anchors": [],
                                     "citations": [],
-                                    "name": "/us/usc/t17/s102/a",
-                                    "children": [
-                                        {
-                                            "node": "/us/usc/t17/s102/a/1",
-                                            "start_date": "2013-07-18",
-                                            "heading": "",
-                                            "text_version": {
-                                                "content": "literary works;",
-                                                "url": "https://authorityspoke.com/api/v1/textversions/1030571/",
-                                                "id": 1030571
-                                            },
-                                            "end_date": null,
-                                            "first_published": null,
-                                            "earliest_in_db": null,
-                                            "anchors": [],
-                                            "citations": [],
-                                            "name": "",
-                                            "children": []
-                                        },
-                                        {
-                                            "node": "/us/usc/t17/s102/a/2",
-                                            "start_date": "2013-07-18",
-                                            "heading": "",
-                                            "text_version": {
-                                                "content": "musical works, including any accompanying words;",
-                                                "url": "https://authorityspoke.com/api/v1/textversions/1030572/",
-                                                "id": 1030572
-                                            },
-                                            "end_date": null,
-                                            "first_published": null,
-                                            "earliest_in_db": null,
-                                            "anchors": [],
-                                            "citations": [],
-                                            "name": "",
-                                            "children": []
-                                        },
-                                        {
-                                            "node": "/us/usc/t17/s102/a/3",
-                                            "start_date": "2013-07-18",
-                                            "heading": "",
-                                            "text_version": {
-                                                "content": "dramatic works, including any accompanying music;",
-                                                "url": "https://authorityspoke.com/api/v1/textversions/1030573/",
-                                                "id": 1030573
-                                            },
-                                            "end_date": null,
-                                            "first_published": null,
-                                            "earliest_in_db": null,
-                                            "anchors": [],
-                                            "citations": [],
-                                            "name": "",
-                                            "children": []
-                                        },
-                                        {
-                                            "node": "/us/usc/t17/s102/a/4",
-                                            "start_date": "2013-07-18",
-                                            "heading": "",
-                                            "text_version": {
-                                                "content": "pantomimes and choreographic works;",
-                                                "url": "https://authorityspoke.com/api/v1/textversions/1030574/",
-                                                "id": 1030574
-                                            },
-                                            "end_date": null,
-                                            "first_published": null,
-                                            "earliest_in_db": null,
-                                            "anchors": [],
-                                            "citations": [],
-                                            "name": "",
-                                            "children": []
-                                        },
-                                        {
-                                            "node": "/us/usc/t17/s102/a/5",
-                                            "start_date": "2013-07-18",
-                                            "heading": "",
-                                            "text_version": {
-                                                "content": "pictorial, graphic, and sculptural works;",
-                                                "url": "https://authorityspoke.com/api/v1/textversions/1030575/",
-                                                "id": 1030575
-                                            },
-                                            "end_date": null,
-                                            "first_published": null,
-                                            "earliest_in_db": null,
-                                            "anchors": [],
-                                            "citations": [],
-                                            "name": "",
-                                            "children": []
-                                        },
-                                        {
-                                            "node": "/us/usc/t17/s102/a/6",
-                                            "start_date": "2013-07-18",
-                                            "heading": "",
-                                            "text_version": {
-                                                "content": "motion pictures and other audiovisual works;",
-                                                "url": "https://authorityspoke.com/api/v1/textversions/1030576/",
-                                                "id": 1030576
-                                            },
-                                            "end_date": null,
-                                            "first_published": null,
-                                            "earliest_in_db": null,
-                                            "anchors": [],
-                                            "citations": [],
-                                            "name": "",
-                                            "children": []
-                                        },
-                                        {
-                                            "node": "/us/usc/t17/s102/a/7",
-                                            "start_date": "2013-07-18",
-                                            "heading": "",
-                                            "text_version": {
-                                                "content": "sound recordings; and",
-                                                "url": "https://authorityspoke.com/api/v1/textversions/1030577/",
-                                                "id": 1030577
-                                            },
-                                            "end_date": null,
-                                            "first_published": null,
-                                            "earliest_in_db": null,
-                                            "anchors": [],
-                                            "citations": [],
-                                            "name": "",
-                                            "children": []
-                                        },
-                                        {
-                                            "node": "/us/usc/t17/s102/a/8",
-                                            "start_date": "2013-07-18",
-                                            "heading": "",
-                                            "text_version": {
-                                                "content": "architectural works.",
-                                                "url": "https://authorityspoke.com/api/v1/textversions/1030578/",
-                                                "id": 1030578
-                                            },
-                                            "end_date": null,
-                                            "first_published": null,
-                                            "earliest_in_db": null,
-                                            "anchors": [],
-                                            "citations": [],
-                                            "name": "",
-                                            "children": []
-                                        }
-                                    ]
-                                },
-                                "selection": {
-                                    "positions": [],
-                                    "quotes": [
-                                        {
-                                            "exact": "",
-                                            "prefix": "",
-                                            "suffix": "fixed in any tangible"
-                                        }
-                                    ]
-                                }
-                            }
-                        ]
-                    },
-                    "enactments_despite": {
-                        "passages": []
-                    },
-                    "mandatory": false,
-                    "universal": false,
-                    "name": null
-                },
-                "rule_valid": true,
-                "decided": true,
-                "exclusive": true
-            },
-            "anchors": {
-                "positions": [],
-                "quotes": []
-            }
-        },
-        {
-            "holding": {
-                "generic": false,
-                "rule": {
-                    "generic": false,
-                    "procedure": {
-                        "outputs": [
-                            {
-                                "generic": false,
-                                "predicate": {
-                                    "content": "${rural_s_telephone_directory} was an original work",
-                                    "truth": true
-                                },
-                                "terms": [
-                                    {
-                                        "generic": true,
-                                        "name": "Rural's telephone directory",
-                                        "plural": false
-                                    }
-                                ],
-                                "name": "Rural's telephone directory was an original work",
-                                "standard_of_proof": null
-                            }
-                        ],
-                        "inputs": [
-                            {
-                                "generic": false,
-                                "predicate": {
-                                    "content": "${rural_s_telephone_directory} was independently created by ${rural_telephone_service_company}, as opposed to copied from other works",
-                                    "truth": true
-                                },
-                                "terms": [
-                                    {
-                                        "generic": true,
-                                        "name": "Rural's telephone directory",
-                                        "plural": false
-                                    },
-                                    {
-                                        "generic": true,
-                                        "name": "Rural Telephone Service Company",
-                                        "plural": false
-                                    }
-                                ],
-                                "name": "Rural's telephone directory was independently created by Rural Telephone Service Company, as opposed to copied from other works",
-                                "standard_of_proof": null
-                            },
-                            {
-                                "generic": false,
-                                "predicate": {
-                                    "content": "${rural_s_telephone_directory} possessed at least some minimal degree of creativity",
-                                    "truth": true
-                                },
-                                "terms": [
-                                    {
-                                        "generic": true,
-                                        "name": "Rural's telephone directory",
-                                        "plural": false
-                                    }
-                                ],
-                                "name": "Rural's telephone directory possessed at least some minimal degree of creativity",
-                                "standard_of_proof": null
-                            }
-                        ],
-                        "despite": [
-                            {
-                                "generic": false,
-                                "predicate": {
-                                    "content": "${rural_s_telephone_directory} closely resembled other works",
-                                    "truth": true
-                                },
-                                "terms": [
-                                    {
-                                        "generic": true,
-                                        "name": "Rural's telephone directory",
-                                        "plural": false
-                                    }
-                                ],
-                                "name": "Rural's telephone directory closely resembled other works",
-                                "standard_of_proof": null
-                            }
-                        ],
-                        "name": ""
-                    },
-                    "enactments": {
-                        "passages": [
-                            {
-                                "enactment": {
-                                    "node": "/us/const/article/I/8/8",
-                                    "start_date": "1788-09-13",
-                                    "heading": "Patents and copyrights.",
-                                    "text_version": {
-                                        "content": "To promote the Progress of Science and useful Arts, by securing for limited Times to Authors and Inventors the exclusive Right to their respective Writings and Discoveries;",
-                                        "url": "https://authorityspoke.com/api/v1/textversions/735650/",
-                                        "id": 735650
-                                    },
-                                    "end_date": null,
-                                    "first_published": null,
-                                    "earliest_in_db": null,
-                                    "anchors": [],
-                                    "citations": [],
-                                    "name": "/us/const/article/I/8/8",
+                                    "name": "",
                                     "children": []
                                 },
-                                "selection": {
-                                    "positions": [],
-                                    "quotes": [
-                                        {
-                                            "exact": "To promote the Progress of Science and useful Arts, by securing for limited Times to Authors",
-                                            "prefix": "",
-                                            "suffix": ""
-                                        },
-                                        {
-                                            "exact": "the exclusive Right to their respective Writings",
-                                            "prefix": "",
-                                            "suffix": ""
-                                        }
-                                    ]
-                                }
-                            }
-                        ]
-                    },
-                    "enactments_despite": {
-                        "passages": []
-                    },
-                    "mandatory": false,
-                    "universal": true,
-                    "name": null
-                },
-                "rule_valid": true,
-                "decided": true,
-                "exclusive": false
-            },
-            "anchors": {
-                "positions": [],
-                "quotes": []
-            }
-        },
-        {
-            "holding": {
-                "generic": false,
-                "rule": {
-                    "generic": false,
-                    "procedure": {
-                        "outputs": [
-                            {
-                                "generic": false,
-                                "predicate": {
-                                    "content": "${rural_s_telephone_directory} was an original work",
-                                    "truth": false
-                                },
-                                "terms": [
-                                    {
-                                        "generic": true,
-                                        "name": "Rural's telephone directory",
-                                        "plural": false
-                                    }
-                                ],
-                                "name": "false Rural's telephone directory was an original work",
-                                "standard_of_proof": null
-                            }
-                        ],
-                        "inputs": [
-                            {
-                                "generic": false,
-                                "predicate": {
-                                    "content": "${rural_s_telephone_directory} was a fact",
-                                    "truth": true
-                                },
-                                "terms": [
-                                    {
-                                        "generic": true,
-                                        "name": "Rural's telephone directory",
-                                        "plural": false
-                                    }
-                                ],
-                                "name": "Rural's telephone directory was a fact",
-                                "standard_of_proof": null
-                            }
-                        ],
-                        "despite": [],
-                        "name": ""
-                    },
-                    "enactments": {
-                        "passages": [
-                            {
-                                "enactment": {
-                                    "node": "/us/const/article/I/8/8",
-                                    "start_date": "1788-09-13",
-                                    "heading": "Patents and copyrights.",
-                                    "text_version": {
-                                        "content": "To promote the Progress of Science and useful Arts, by securing for limited Times to Authors and Inventors the exclusive Right to their respective Writings and Discoveries;",
-                                        "url": "https://authorityspoke.com/api/v1/textversions/735650/",
-                                        "id": 735650
-                                    },
-                                    "end_date": null,
-                                    "first_published": null,
-                                    "earliest_in_db": null,
-                                    "anchors": [],
-                                    "citations": [],
-                                    "name": "/us/const/article/I/8/8",
-                                    "children": []
-                                },
-                                "selection": {
-                                    "positions": [],
-                                    "quotes": [
-                                        {
-                                            "exact": "To promote the Progress of Science and useful Arts, by securing for limited Times to Authors",
-                                            "prefix": "",
-                                            "suffix": ""
-                                        },
-                                        {
-                                            "exact": "the exclusive Right to their respective Writings",
-                                            "prefix": "",
-                                            "suffix": ""
-                                        }
-                                    ]
-                                }
-                            },
-                            {
-                                "enactment": {
-                                    "node": "/us/usc/t17/s102/b",
+                                {
+                                    "node": "/us/usc/t17/s102/a/3",
                                     "start_date": "2013-07-18",
                                     "heading": "",
                                     "text_version": {
-                                        "content": "In no case does copyright protection for an original work of authorship extend to any idea, procedure, process, system, method of operation, concept, principle, or discovery, regardless of the form in which it is described, explained, illustrated, or embodied in such work.",
-                                        "url": "https://authorityspoke.com/api/v1/textversions/1030580/",
-                                        "id": 1030580
+                                        "content": "dramatic works, including any accompanying music;",
+                                        "url": "https://authorityspoke.com/api/v1/textversions/1030573/",
+                                        "id": 1030573
                                     },
                                     "end_date": null,
                                     "first_published": null,
                                     "earliest_in_db": null,
                                     "anchors": [],
                                     "citations": [],
-                                    "name": "/us/usc/t17/s102/b",
+                                    "name": "",
                                     "children": []
                                 },
-                                "selection": {
-                                    "positions": [
-                                        {
-                                            "start": 0,
-                                            "end": null
-                                        }
-                                    ],
-                                    "quotes": []
-                                }
-                            }
-                        ]
-                    },
-                    "enactments_despite": {
-                        "passages": []
-                    },
-                    "mandatory": true,
-                    "universal": true,
-                    "name": null
-                },
-                "rule_valid": true,
-                "decided": true,
-                "exclusive": false
-            },
-            "anchors": {
-                "positions": [],
-                "quotes": []
-            }
-        },
-        {
-            "holding": {
-                "generic": false,
-                "rule": {
-                    "generic": false,
-                    "procedure": {
-                        "outputs": [
-                            {
-                                "generic": false,
-                                "predicate": {
-                                    "content": "${rural_s_telephone_directory} was an original work",
-                                    "truth": true
-                                },
-                                "terms": [
-                                    {
-                                        "generic": true,
-                                        "name": "Rural's telephone directory",
-                                        "plural": false
-                                    }
-                                ],
-                                "name": "Rural's telephone directory was an original work",
-                                "standard_of_proof": null
-                            }
-                        ],
-                        "inputs": [
-                            {
-                                "generic": false,
-                                "predicate": {
-                                    "content": "${rural_s_telephone_directory} was a compilation of facts",
-                                    "truth": true
-                                },
-                                "terms": [
-                                    {
-                                        "generic": true,
-                                        "name": "Rural's telephone directory",
-                                        "plural": false
-                                    }
-                                ],
-                                "name": "Rural's telephone directory was a compilation of facts",
-                                "standard_of_proof": null
-                            },
-                            {
-                                "generic": false,
-                                "predicate": {
-                                    "content": "${rural_telephone_service_company} was the compiler of ${rural_s_telephone_directory}",
-                                    "truth": true
-                                },
-                                "terms": [
-                                    {
-                                        "generic": true,
-                                        "name": "Rural Telephone Service Company",
-                                        "plural": false
-                                    },
-                                    {
-                                        "generic": true,
-                                        "name": "Rural's telephone directory",
-                                        "plural": false
-                                    }
-                                ],
-                                "name": "Rural Telephone Service Company was the compiler of Rural's telephone directory",
-                                "standard_of_proof": null
-                            },
-                            {
-                                "generic": false,
-                                "predicate": {
-                                    "content": "${rural_telephone_service_company} independently used a degree of creativity to choose which facts to include in ${rural_s_telephone_directory}",
-                                    "truth": true
-                                },
-                                "terms": [
-                                    {
-                                        "generic": true,
-                                        "name": "Rural Telephone Service Company",
-                                        "plural": false
-                                    },
-                                    {
-                                        "generic": true,
-                                        "name": "Rural's telephone directory",
-                                        "plural": false
-                                    }
-                                ],
-                                "name": "Rural Telephone Service Company independently used a degree of creativity to choose which facts to include in Rural's telephone directory",
-                                "standard_of_proof": null
-                            },
-                            {
-                                "generic": false,
-                                "predicate": {
-                                    "content": "${rural_telephone_service_company} independently used a degree of creativity to choose in what order to place the facts in ${rural_s_telephone_directory}, and how to arrange the collected data so that they could be used effectively by readers",
-                                    "truth": true
-                                },
-                                "terms": [
-                                    {
-                                        "generic": true,
-                                        "name": "Rural Telephone Service Company",
-                                        "plural": false
-                                    },
-                                    {
-                                        "generic": true,
-                                        "name": "Rural's telephone directory",
-                                        "plural": false
-                                    }
-                                ],
-                                "name": "Rural Telephone Service Company independently used a degree of creativity to choose in what order to place the facts in Rural's telephone directory, and how to arrange the collected data so that they could be used effectively by readers",
-                                "standard_of_proof": null
-                            }
-                        ],
-                        "despite": [],
-                        "name": ""
-                    },
-                    "enactments": {
-                        "passages": [
-                            {
-                                "enactment": {
-                                    "node": "/us/const/article/I/8/8",
-                                    "start_date": "1788-09-13",
-                                    "heading": "Patents and copyrights.",
-                                    "text_version": {
-                                        "content": "To promote the Progress of Science and useful Arts, by securing for limited Times to Authors and Inventors the exclusive Right to their respective Writings and Discoveries;",
-                                        "url": "https://authorityspoke.com/api/v1/textversions/735650/",
-                                        "id": 735650
-                                    },
-                                    "end_date": null,
-                                    "first_published": null,
-                                    "earliest_in_db": null,
-                                    "anchors": [],
-                                    "citations": [],
-                                    "name": "/us/const/article/I/8/8",
-                                    "children": []
-                                },
-                                "selection": {
-                                    "positions": [],
-                                    "quotes": [
-                                        {
-                                            "exact": "To promote the Progress of Science and useful Arts, by securing for limited Times to Authors",
-                                            "prefix": "",
-                                            "suffix": ""
-                                        },
-                                        {
-                                            "exact": "the exclusive Right to their respective Writings",
-                                            "prefix": "",
-                                            "suffix": ""
-                                        }
-                                    ]
-                                }
-                            }
-                        ]
-                    },
-                    "enactments_despite": {
-                        "passages": []
-                    },
-                    "mandatory": false,
-                    "universal": false,
-                    "name": null
-                },
-                "rule_valid": true,
-                "decided": true,
-                "exclusive": false
-            },
-            "anchors": {
-                "positions": [],
-                "quotes": []
-            }
-        },
-        {
-            "holding": {
-                "generic": false,
-                "rule": {
-                    "generic": false,
-                    "procedure": {
-                        "outputs": [
-                            {
-                                "generic": false,
-                                "predicate": {
-                                    "content": "${rural_s_telephone_directory} was copyrightable",
-                                    "truth": false
-                                },
-                                "terms": [
-                                    {
-                                        "generic": true,
-                                        "name": "Rural's telephone directory",
-                                        "plural": false
-                                    }
-                                ],
-                                "name": "false Rural's telephone directory was copyrightable",
-                                "standard_of_proof": null
-                            }
-                        ],
-                        "inputs": [
-                            {
-                                "generic": false,
-                                "predicate": {
-                                    "content": "${rural_s_telephone_directory} was a compilation of facts",
-                                    "truth": true
-                                },
-                                "terms": [
-                                    {
-                                        "generic": true,
-                                        "name": "Rural's telephone directory",
-                                        "plural": false
-                                    }
-                                ],
-                                "name": "Rural's telephone directory was a compilation of facts",
-                                "standard_of_proof": null
-                            },
-                            {
-                                "generic": false,
-                                "predicate": {
-                                    "content": "${rural_s_telephone_directory} contained written expression protectable by copyright",
-                                    "truth": false
-                                },
-                                "terms": [
-                                    {
-                                        "generic": true,
-                                        "name": "Rural's telephone directory",
-                                        "plural": false
-                                    }
-                                ],
-                                "name": "false Rural's telephone directory contained written expression protectable by copyright",
-                                "standard_of_proof": null
-                            }
-                        ],
-                        "despite": [
-                            {
-                                "generic": false,
-                                "predicate": {
-                                    "content": "${rural_telephone_service_company} independently used a degree of creativity to choose which facts to include in ${rural_s_telephone_directory}",
-                                    "truth": true
-                                },
-                                "terms": [
-                                    {
-                                        "generic": true,
-                                        "name": "Rural Telephone Service Company",
-                                        "plural": false
-                                    },
-                                    {
-                                        "generic": true,
-                                        "name": "Rural's telephone directory",
-                                        "plural": false
-                                    }
-                                ],
-                                "name": "Rural Telephone Service Company independently used a degree of creativity to choose which facts to include in Rural's telephone directory",
-                                "standard_of_proof": null
-                            },
-                            {
-                                "generic": false,
-                                "predicate": {
-                                    "content": "${rural_telephone_service_company} independently used a degree of creativity to choose in what order to place the facts in ${rural_s_telephone_directory}, and how to arrange the collected data so that they could be used effectively by readers",
-                                    "truth": true
-                                },
-                                "terms": [
-                                    {
-                                        "generic": true,
-                                        "name": "Rural Telephone Service Company",
-                                        "plural": false
-                                    },
-                                    {
-                                        "generic": true,
-                                        "name": "Rural's telephone directory",
-                                        "plural": false
-                                    }
-                                ],
-                                "name": "Rural Telephone Service Company independently used a degree of creativity to choose in what order to place the facts in Rural's telephone directory, and how to arrange the collected data so that they could be used effectively by readers",
-                                "standard_of_proof": null
-                            }
-                        ],
-                        "name": ""
-                    },
-                    "enactments": {
-                        "passages": [
-                            {
-                                "enactment": {
-                                    "node": "/us/const/article/I/8/8",
-                                    "start_date": "1788-09-13",
-                                    "heading": "Patents and copyrights.",
-                                    "text_version": {
-                                        "content": "To promote the Progress of Science and useful Arts, by securing for limited Times to Authors and Inventors the exclusive Right to their respective Writings and Discoveries;",
-                                        "url": "https://authorityspoke.com/api/v1/textversions/735650/",
-                                        "id": 735650
-                                    },
-                                    "end_date": null,
-                                    "first_published": null,
-                                    "earliest_in_db": null,
-                                    "anchors": [],
-                                    "citations": [],
-                                    "name": "/us/const/article/I/8/8",
-                                    "children": []
-                                },
-                                "selection": {
-                                    "positions": [],
-                                    "quotes": [
-                                        {
-                                            "exact": "To promote the Progress of Science and useful Arts, by securing for limited Times to Authors",
-                                            "prefix": "",
-                                            "suffix": ""
-                                        },
-                                        {
-                                            "exact": "the exclusive Right to their respective Writings",
-                                            "prefix": "",
-                                            "suffix": ""
-                                        }
-                                    ]
-                                }
-                            }
-                        ]
-                    },
-                    "enactments_despite": {
-                        "passages": []
-                    },
-                    "mandatory": false,
-                    "universal": true,
-                    "name": null
-                },
-                "rule_valid": false,
-                "decided": true,
-                "exclusive": false
-            },
-            "anchors": {
-                "positions": [],
-                "quotes": []
-            }
-        },
-        {
-            "holding": {
-                "generic": false,
-                "rule": {
-                    "generic": false,
-                    "procedure": {
-                        "outputs": [
-                            {
-                                "generic": false,
-                                "predicate": {
-                                    "content": "${feist_publications} infringed the copyright on ${rural_s_telephone_directory}",
-                                    "truth": false
-                                },
-                                "terms": [
-                                    {
-                                        "generic": true,
-                                        "name": "Feist Publications",
-                                        "plural": false
-                                    },
-                                    {
-                                        "generic": true,
-                                        "name": "Rural's telephone directory",
-                                        "plural": false
-                                    }
-                                ],
-                                "name": "false Feist Publications infringed the copyright on Rural's telephone directory",
-                                "standard_of_proof": null
-                            }
-                        ],
-                        "inputs": [
-                            {
-                                "generic": false,
-                                "predicate": {
-                                    "content": "${rural_s_telephone_directory} was a compilation of facts",
-                                    "truth": true
-                                },
-                                "terms": [
-                                    {
-                                        "generic": true,
-                                        "name": "Rural's telephone directory",
-                                        "plural": false
-                                    }
-                                ],
-                                "name": "Rural's telephone directory was a compilation of facts",
-                                "standard_of_proof": null
-                            },
-                            {
-                                "generic": false,
-                                "predicate": {
-                                    "content": "${feist_s_telephone_directory} did not feature the same selection and arrangement of facts as ${rural_s_telephone_directory}",
-                                    "truth": true
-                                },
-                                "terms": [
-                                    {
-                                        "generic": true,
-                                        "name": "Feist's telephone directory",
-                                        "plural": false
-                                    },
-                                    {
-                                        "generic": true,
-                                        "name": "Rural's telephone directory",
-                                        "plural": false
-                                    }
-                                ],
-                                "name": "Feist's telephone directory did not feature the same selection and arrangement of facts as Rural's telephone directory",
-                                "standard_of_proof": null
-                            }
-                        ],
-                        "despite": [
-                            {
-                                "generic": false,
-                                "predicate": {
-                                    "content": "${rural_s_telephone_directory} was copyrightable",
-                                    "truth": true
-                                },
-                                "terms": [
-                                    {
-                                        "generic": true,
-                                        "name": "Rural's telephone directory",
-                                        "plural": false
-                                    }
-                                ],
-                                "name": "Rural's telephone directory was copyrightable",
-                                "standard_of_proof": null
-                            },
-                            {
-                                "generic": false,
-                                "predicate": {
-                                    "content": "${feist_publications} freely copied the facts contained in ${rural_s_telephone_directory}, in preparing ${feist_s_telephone_directory}",
-                                    "truth": true
-                                },
-                                "terms": [
-                                    {
-                                        "generic": true,
-                                        "name": "Feist Publications",
-                                        "plural": false
-                                    },
-                                    {
-                                        "generic": true,
-                                        "name": "Rural's telephone directory",
-                                        "plural": false
-                                    },
-                                    {
-                                        "generic": true,
-                                        "name": "Feist's telephone directory",
-                                        "plural": false
-                                    }
-                                ],
-                                "name": "Feist Publications freely copied the facts contained in Rural's telephone directory, in preparing Feist's telephone directory",
-                                "standard_of_proof": null
-                            }
-                        ],
-                        "name": ""
-                    },
-                    "enactments": {
-                        "passages": [
-                            {
-                                "enactment": {
-                                    "node": "/us/const/article/I/8/8",
-                                    "start_date": "1788-09-13",
-                                    "heading": "Patents and copyrights.",
-                                    "text_version": {
-                                        "content": "To promote the Progress of Science and useful Arts, by securing for limited Times to Authors and Inventors the exclusive Right to their respective Writings and Discoveries;",
-                                        "url": "https://authorityspoke.com/api/v1/textversions/735650/",
-                                        "id": 735650
-                                    },
-                                    "end_date": null,
-                                    "first_published": null,
-                                    "earliest_in_db": null,
-                                    "anchors": [],
-                                    "citations": [],
-                                    "name": "/us/const/article/I/8/8",
-                                    "children": []
-                                },
-                                "selection": {
-                                    "positions": [],
-                                    "quotes": [
-                                        {
-                                            "exact": "To promote the Progress of Science and useful Arts, by securing for limited Times to Authors",
-                                            "prefix": "",
-                                            "suffix": ""
-                                        },
-                                        {
-                                            "exact": "the exclusive Right to their respective Writings",
-                                            "prefix": "",
-                                            "suffix": ""
-                                        }
-                                    ]
-                                }
-                            },
-                            {
-                                "enactment": {
-                                    "node": "/us/usc/t17/s103/b",
+                                {
+                                    "node": "/us/usc/t17/s102/a/4",
                                     "start_date": "2013-07-18",
                                     "heading": "",
                                     "text_version": {
-                                        "content": "The copyright in a compilation or derivative work extends only to the material contributed by the author of such work, as distinguished from the preexisting material employed in the work, and does not imply any exclusive right in the preexisting material. The copyright in such work is independent of, and does not affect or enlarge the scope, duration, ownership, or subsistence of, any copyright protection in the preexisting material.",
-                                        "url": "https://authorityspoke.com/api/v1/textversions/1030582/",
-                                        "id": 1030582
+                                        "content": "pantomimes and choreographic works;",
+                                        "url": "https://authorityspoke.com/api/v1/textversions/1030574/",
+                                        "id": 1030574
                                     },
                                     "end_date": null,
                                     "first_published": null,
                                     "earliest_in_db": null,
                                     "anchors": [],
                                     "citations": [],
-                                    "name": "/us/usc/t17/s103/b",
+                                    "name": "",
                                     "children": []
                                 },
-                                "selection": {
-                                    "positions": [],
-                                    "quotes": [
-                                        {
-                                            "exact": "The copyright in a compilation",
-                                            "prefix": "",
-                                            "suffix": ""
-                                        },
-                                        {
-                                            "exact": "extends only to the material contributed by the author of such work, as distinguished from the preexisting material employed in the work, and does not imply any exclusive right in the preexisting material.",
-                                            "prefix": "",
-                                            "suffix": ""
-                                        }
-                                    ]
+                                {
+                                    "node": "/us/usc/t17/s102/a/5",
+                                    "start_date": "2013-07-18",
+                                    "heading": "",
+                                    "text_version": {
+                                        "content": "pictorial, graphic, and sculptural works;",
+                                        "url": "https://authorityspoke.com/api/v1/textversions/1030575/",
+                                        "id": 1030575
+                                    },
+                                    "end_date": null,
+                                    "first_published": null,
+                                    "earliest_in_db": null,
+                                    "anchors": [],
+                                    "citations": [],
+                                    "name": "",
+                                    "children": []
+                                },
+                                {
+                                    "node": "/us/usc/t17/s102/a/6",
+                                    "start_date": "2013-07-18",
+                                    "heading": "",
+                                    "text_version": {
+                                        "content": "motion pictures and other audiovisual works;",
+                                        "url": "https://authorityspoke.com/api/v1/textversions/1030576/",
+                                        "id": 1030576
+                                    },
+                                    "end_date": null,
+                                    "first_published": null,
+                                    "earliest_in_db": null,
+                                    "anchors": [],
+                                    "citations": [],
+                                    "name": "",
+                                    "children": []
+                                },
+                                {
+                                    "node": "/us/usc/t17/s102/a/7",
+                                    "start_date": "2013-07-18",
+                                    "heading": "",
+                                    "text_version": {
+                                        "content": "sound recordings; and",
+                                        "url": "https://authorityspoke.com/api/v1/textversions/1030577/",
+                                        "id": 1030577
+                                    },
+                                    "end_date": null,
+                                    "first_published": null,
+                                    "earliest_in_db": null,
+                                    "anchors": [],
+                                    "citations": [],
+                                    "name": "",
+                                    "children": []
+                                },
+                                {
+                                    "node": "/us/usc/t17/s102/a/8",
+                                    "start_date": "2013-07-18",
+                                    "heading": "",
+                                    "text_version": {
+                                        "content": "architectural works.",
+                                        "url": "https://authorityspoke.com/api/v1/textversions/1030578/",
+                                        "id": 1030578
+                                    },
+                                    "end_date": null,
+                                    "first_published": null,
+                                    "earliest_in_db": null,
+                                    "anchors": [],
+                                    "citations": [],
+                                    "name": "",
+                                    "children": []
                                 }
-                            }
-                        ]
-                    },
-                    "enactments_despite": {
-                        "passages": []
-                    },
-                    "mandatory": false,
-                    "universal": false,
-                    "name": null
-                },
-                "rule_valid": true,
-                "decided": true,
-                "exclusive": false
+                            ]
+                        },
+                        "selection": {
+                            "positions": [],
+                            "quotes": [
+                                {
+                                    "exact": "",
+                                    "prefix": "",
+                                    "suffix": "fixed in any tangible"
+                                }
+                            ]
+                        }
+                    }
+                ]
             },
-            "anchors": {
-                "positions": [],
-                "quotes": []
-            }
+            "enactments_despite": {
+                "passages": []
+            },
+            "mandatory": false,
+            "universal": false,
+            "name": null
         },
-        {
-            "holding": {
-                "generic": false,
-                "rule": {
-                    "generic": false,
-                    "procedure": {
-                        "outputs": [
+        "rule_valid": true,
+        "decided": true,
+        "exclusive": true
+    },
+    {
+        "generic": false,
+        "rule": {
+            "generic": false,
+            "procedure": {
+                "outputs": [
+                    {
+                        "generic": false,
+                        "predicate": {
+                            "content": "${rural_s_telephone_directory} was an original work",
+                            "truth": true
+                        },
+                        "terms": [
                             {
-                                "generic": false,
-                                "predicate": {
-                                    "content": "${rural_s_telephone_directory} was copyrightable",
-                                    "truth": false
-                                },
-                                "terms": [
-                                    {
-                                        "generic": true,
-                                        "name": "Rural's telephone directory",
-                                        "plural": false
-                                    }
-                                ],
-                                "name": "false Rural's telephone directory was copyrightable",
-                                "standard_of_proof": null
+                                "generic": true,
+                                "name": "Rural's telephone directory",
+                                "plural": false
                             }
                         ],
-                        "inputs": [
+                        "name": "Rural's telephone directory was an original work",
+                        "standard_of_proof": null
+                    }
+                ],
+                "inputs": [
+                    {
+                        "generic": false,
+                        "predicate": {
+                            "content": "${rural_s_telephone_directory} was independently created by ${rural_telephone_service_company}, as opposed to copied from other works",
+                            "truth": true
+                        },
+                        "terms": [
                             {
-                                "generic": false,
-                                "predicate": {
-                                    "content": "${rural_s_telephone_directory} was a compilation of facts",
-                                    "truth": true
-                                },
-                                "terms": [
-                                    {
-                                        "generic": true,
-                                        "name": "Rural's telephone directory",
-                                        "plural": false
-                                    }
-                                ],
-                                "name": "Rural's telephone directory was a compilation of facts",
-                                "standard_of_proof": null
-                            }
-                        ],
-                        "despite": [],
-                        "name": ""
-                    },
-                    "enactments": {
-                        "passages": [
-                            {
-                                "enactment": {
-                                    "node": "/us/const/article/I/8/8",
-                                    "start_date": "1788-09-13",
-                                    "heading": "Patents and copyrights.",
-                                    "text_version": {
-                                        "content": "To promote the Progress of Science and useful Arts, by securing for limited Times to Authors and Inventors the exclusive Right to their respective Writings and Discoveries;",
-                                        "url": "https://authorityspoke.com/api/v1/textversions/735650/",
-                                        "id": 735650
-                                    },
-                                    "end_date": null,
-                                    "first_published": null,
-                                    "earliest_in_db": null,
-                                    "anchors": [],
-                                    "citations": [],
-                                    "name": "/us/const/article/I/8/8",
-                                    "children": []
-                                },
-                                "selection": {
-                                    "positions": [],
-                                    "quotes": [
-                                        {
-                                            "exact": "To promote the Progress of Science and useful Arts, by securing for limited Times to Authors",
-                                            "prefix": "",
-                                            "suffix": ""
-                                        },
-                                        {
-                                            "exact": "the exclusive Right to their respective Writings",
-                                            "prefix": "",
-                                            "suffix": ""
-                                        }
-                                    ]
-                                }
+                                "generic": true,
+                                "name": "Rural's telephone directory",
+                                "plural": false
                             },
                             {
-                                "enactment": {
-                                    "node": "/us/usc/t17/s103/b",
-                                    "start_date": "2013-07-18",
-                                    "heading": "",
-                                    "text_version": {
-                                        "content": "The copyright in a compilation or derivative work extends only to the material contributed by the author of such work, as distinguished from the preexisting material employed in the work, and does not imply any exclusive right in the preexisting material. The copyright in such work is independent of, and does not affect or enlarge the scope, duration, ownership, or subsistence of, any copyright protection in the preexisting material.",
-                                        "url": "https://authorityspoke.com/api/v1/textversions/1030582/",
-                                        "id": 1030582
-                                    },
-                                    "end_date": null,
-                                    "first_published": null,
-                                    "earliest_in_db": null,
-                                    "anchors": [],
-                                    "citations": [],
-                                    "name": "/us/usc/t17/s103/b",
-                                    "children": []
-                                },
-                                "selection": {
-                                    "positions": [],
-                                    "quotes": [
-                                        {
-                                            "exact": "The copyright in a compilation",
-                                            "prefix": "",
-                                            "suffix": ""
-                                        },
-                                        {
-                                            "exact": "extends only to the material contributed by the author of such work, as distinguished from the preexisting material employed in the work, and does not imply any exclusive right in the preexisting material.",
-                                            "prefix": "",
-                                            "suffix": ""
-                                        }
-                                    ]
-                                }
+                                "generic": true,
+                                "name": "Rural Telephone Service Company",
+                                "plural": false
                             }
-                        ]
+                        ],
+                        "name": "Rural's telephone directory was independently created by Rural Telephone Service Company, as opposed to copied from other works",
+                        "standard_of_proof": null
                     },
-                    "enactments_despite": {
-                        "passages": []
-                    },
-                    "mandatory": false,
-                    "universal": false,
-                    "name": null
-                },
-                "rule_valid": true,
-                "decided": true,
-                "exclusive": false
+                    {
+                        "generic": false,
+                        "predicate": {
+                            "content": "${rural_s_telephone_directory} possessed at least some minimal degree of creativity",
+                            "truth": true
+                        },
+                        "terms": [
+                            {
+                                "generic": true,
+                                "name": "Rural's telephone directory",
+                                "plural": false
+                            }
+                        ],
+                        "name": "Rural's telephone directory possessed at least some minimal degree of creativity",
+                        "standard_of_proof": null
+                    }
+                ],
+                "despite": [
+                    {
+                        "generic": false,
+                        "predicate": {
+                            "content": "${rural_s_telephone_directory} closely resembled other works",
+                            "truth": true
+                        },
+                        "terms": [
+                            {
+                                "generic": true,
+                                "name": "Rural's telephone directory",
+                                "plural": false
+                            }
+                        ],
+                        "name": "Rural's telephone directory closely resembled other works",
+                        "standard_of_proof": null
+                    }
+                ],
+                "name": ""
             },
-            "anchors": {
-                "positions": [],
-                "quotes": []
-            }
+            "enactments": {
+                "passages": [
+                    {
+                        "enactment": {
+                            "node": "/us/const/article/I/8/8",
+                            "start_date": "1788-09-13",
+                            "heading": "Patents and copyrights.",
+                            "text_version": {
+                                "content": "To promote the Progress of Science and useful Arts, by securing for limited Times to Authors and Inventors the exclusive Right to their respective Writings and Discoveries;",
+                                "url": "https://authorityspoke.com/api/v1/textversions/735650/",
+                                "id": 735650
+                            },
+                            "end_date": null,
+                            "first_published": null,
+                            "earliest_in_db": null,
+                            "anchors": [],
+                            "citations": [],
+                            "name": "/us/const/article/I/8/8",
+                            "children": []
+                        },
+                        "selection": {
+                            "positions": [],
+                            "quotes": [
+                                {
+                                    "exact": "To promote the Progress of Science and useful Arts, by securing for limited Times to Authors",
+                                    "prefix": "",
+                                    "suffix": ""
+                                },
+                                {
+                                    "exact": "the exclusive Right to their respective Writings",
+                                    "prefix": "",
+                                    "suffix": ""
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            "enactments_despite": {
+                "passages": []
+            },
+            "mandatory": false,
+            "universal": true,
+            "name": null
         },
-        {
-            "holding": {
-                "generic": false,
-                "rule": {
-                    "generic": false,
-                    "procedure": {
-                        "outputs": [
+        "rule_valid": true,
+        "decided": true,
+        "exclusive": false
+    },
+    {
+        "generic": false,
+        "rule": {
+            "generic": false,
+            "procedure": {
+                "outputs": [
+                    {
+                        "generic": false,
+                        "predicate": {
+                            "content": "${rural_s_telephone_directory} was an original work",
+                            "truth": false
+                        },
+                        "terms": [
                             {
-                                "generic": false,
-                                "predicate": {
-                                    "content": "${rural_s_telephone_listings} were an original work",
-                                    "truth": false
-                                },
-                                "terms": [
-                                    {
-                                        "generic": true,
-                                        "name": "Rural's telephone listings",
-                                        "plural": true
-                                    }
-                                ],
-                                "name": "false Rural's telephone listings were an original work",
-                                "standard_of_proof": null
+                                "generic": true,
+                                "name": "Rural's telephone directory",
+                                "plural": false
                             }
                         ],
-                        "inputs": [
+                        "name": "false Rural's telephone directory was an original work",
+                        "standard_of_proof": null
+                    }
+                ],
+                "inputs": [
+                    {
+                        "generic": false,
+                        "predicate": {
+                            "content": "${rural_s_telephone_directory} was a fact",
+                            "truth": true
+                        },
+                        "terms": [
                             {
-                                "generic": false,
-                                "predicate": {
-                                    "content": "${rural_s_telephone_listings} were names, towns, and telephone numbers of telephone subscribers",
-                                    "truth": true
-                                },
-                                "terms": [
-                                    {
-                                        "generic": true,
-                                        "name": "Rural's telephone listings",
-                                        "plural": true
-                                    }
-                                ],
-                                "name": "Rural's telephone listings were names, towns, and telephone numbers of telephone subscribers",
-                                "standard_of_proof": null
+                                "generic": true,
+                                "name": "Rural's telephone directory",
+                                "plural": false
                             }
                         ],
-                        "despite": [],
-                        "name": ""
-                    },
-                    "enactments": {
-                        "passages": [
-                            {
-                                "enactment": {
-                                    "node": "/us/const/article/I/8/8",
-                                    "start_date": "1788-09-13",
-                                    "heading": "Patents and copyrights.",
-                                    "text_version": {
-                                        "content": "To promote the Progress of Science and useful Arts, by securing for limited Times to Authors and Inventors the exclusive Right to their respective Writings and Discoveries;",
-                                        "url": "https://authorityspoke.com/api/v1/textversions/735650/",
-                                        "id": 735650
-                                    },
-                                    "end_date": null,
-                                    "first_published": null,
-                                    "earliest_in_db": null,
-                                    "anchors": [],
-                                    "citations": [],
-                                    "name": "/us/const/article/I/8/8",
-                                    "children": []
-                                },
-                                "selection": {
-                                    "positions": [],
-                                    "quotes": [
-                                        {
-                                            "exact": "To promote the Progress of Science and useful Arts, by securing for limited Times to Authors",
-                                            "prefix": "",
-                                            "suffix": ""
-                                        },
-                                        {
-                                            "exact": "the exclusive Right to their respective Writings",
-                                            "prefix": "",
-                                            "suffix": ""
-                                        }
-                                    ]
-                                }
-                            },
-                            {
-                                "enactment": {
-                                    "node": "/us/usc/t17/s102/a",
-                                    "start_date": "2013-07-18",
-                                    "heading": "",
-                                    "text_version": {
-                                        "content": "Copyright protection subsists, in accordance with this title, in original works of authorship fixed in any tangible medium of expression, now known or later developed, from which they can be perceived, reproduced, or otherwise communicated, either directly or with the aid of a machine or device. Works of authorship include the following categories:",
-                                        "url": "https://authorityspoke.com/api/v1/textversions/1030579/",
-                                        "id": 1030579
-                                    },
-                                    "end_date": null,
-                                    "first_published": null,
-                                    "earliest_in_db": null,
-                                    "anchors": [],
-                                    "citations": [],
-                                    "name": "/us/usc/t17/s102/a",
-                                    "children": [
-                                        {
-                                            "node": "/us/usc/t17/s102/a/1",
-                                            "start_date": "2013-07-18",
-                                            "heading": "",
-                                            "text_version": {
-                                                "content": "literary works;",
-                                                "url": "https://authorityspoke.com/api/v1/textversions/1030571/",
-                                                "id": 1030571
-                                            },
-                                            "end_date": null,
-                                            "first_published": null,
-                                            "earliest_in_db": null,
-                                            "anchors": [],
-                                            "citations": [],
-                                            "name": "",
-                                            "children": []
-                                        },
-                                        {
-                                            "node": "/us/usc/t17/s102/a/2",
-                                            "start_date": "2013-07-18",
-                                            "heading": "",
-                                            "text_version": {
-                                                "content": "musical works, including any accompanying words;",
-                                                "url": "https://authorityspoke.com/api/v1/textversions/1030572/",
-                                                "id": 1030572
-                                            },
-                                            "end_date": null,
-                                            "first_published": null,
-                                            "earliest_in_db": null,
-                                            "anchors": [],
-                                            "citations": [],
-                                            "name": "",
-                                            "children": []
-                                        },
-                                        {
-                                            "node": "/us/usc/t17/s102/a/3",
-                                            "start_date": "2013-07-18",
-                                            "heading": "",
-                                            "text_version": {
-                                                "content": "dramatic works, including any accompanying music;",
-                                                "url": "https://authorityspoke.com/api/v1/textversions/1030573/",
-                                                "id": 1030573
-                                            },
-                                            "end_date": null,
-                                            "first_published": null,
-                                            "earliest_in_db": null,
-                                            "anchors": [],
-                                            "citations": [],
-                                            "name": "",
-                                            "children": []
-                                        },
-                                        {
-                                            "node": "/us/usc/t17/s102/a/4",
-                                            "start_date": "2013-07-18",
-                                            "heading": "",
-                                            "text_version": {
-                                                "content": "pantomimes and choreographic works;",
-                                                "url": "https://authorityspoke.com/api/v1/textversions/1030574/",
-                                                "id": 1030574
-                                            },
-                                            "end_date": null,
-                                            "first_published": null,
-                                            "earliest_in_db": null,
-                                            "anchors": [],
-                                            "citations": [],
-                                            "name": "",
-                                            "children": []
-                                        },
-                                        {
-                                            "node": "/us/usc/t17/s102/a/5",
-                                            "start_date": "2013-07-18",
-                                            "heading": "",
-                                            "text_version": {
-                                                "content": "pictorial, graphic, and sculptural works;",
-                                                "url": "https://authorityspoke.com/api/v1/textversions/1030575/",
-                                                "id": 1030575
-                                            },
-                                            "end_date": null,
-                                            "first_published": null,
-                                            "earliest_in_db": null,
-                                            "anchors": [],
-                                            "citations": [],
-                                            "name": "",
-                                            "children": []
-                                        },
-                                        {
-                                            "node": "/us/usc/t17/s102/a/6",
-                                            "start_date": "2013-07-18",
-                                            "heading": "",
-                                            "text_version": {
-                                                "content": "motion pictures and other audiovisual works;",
-                                                "url": "https://authorityspoke.com/api/v1/textversions/1030576/",
-                                                "id": 1030576
-                                            },
-                                            "end_date": null,
-                                            "first_published": null,
-                                            "earliest_in_db": null,
-                                            "anchors": [],
-                                            "citations": [],
-                                            "name": "",
-                                            "children": []
-                                        },
-                                        {
-                                            "node": "/us/usc/t17/s102/a/7",
-                                            "start_date": "2013-07-18",
-                                            "heading": "",
-                                            "text_version": {
-                                                "content": "sound recordings; and",
-                                                "url": "https://authorityspoke.com/api/v1/textversions/1030577/",
-                                                "id": 1030577
-                                            },
-                                            "end_date": null,
-                                            "first_published": null,
-                                            "earliest_in_db": null,
-                                            "anchors": [],
-                                            "citations": [],
-                                            "name": "",
-                                            "children": []
-                                        },
-                                        {
-                                            "node": "/us/usc/t17/s102/a/8",
-                                            "start_date": "2013-07-18",
-                                            "heading": "",
-                                            "text_version": {
-                                                "content": "architectural works.",
-                                                "url": "https://authorityspoke.com/api/v1/textversions/1030578/",
-                                                "id": 1030578
-                                            },
-                                            "end_date": null,
-                                            "first_published": null,
-                                            "earliest_in_db": null,
-                                            "anchors": [],
-                                            "citations": [],
-                                            "name": "",
-                                            "children": []
-                                        }
-                                    ]
-                                },
-                                "selection": {
-                                    "positions": [],
-                                    "quotes": [
-                                        {
-                                            "exact": "",
-                                            "prefix": "",
-                                            "suffix": "fixed in any tangible"
-                                        }
-                                    ]
-                                }
-                            },
-                            {
-                                "enactment": {
-                                    "node": "/us/usc/t17/s103/b",
-                                    "start_date": "2013-07-18",
-                                    "heading": "",
-                                    "text_version": {
-                                        "content": "The copyright in a compilation or derivative work extends only to the material contributed by the author of such work, as distinguished from the preexisting material employed in the work, and does not imply any exclusive right in the preexisting material. The copyright in such work is independent of, and does not affect or enlarge the scope, duration, ownership, or subsistence of, any copyright protection in the preexisting material.",
-                                        "url": "https://authorityspoke.com/api/v1/textversions/1030582/",
-                                        "id": 1030582
-                                    },
-                                    "end_date": null,
-                                    "first_published": null,
-                                    "earliest_in_db": null,
-                                    "anchors": [],
-                                    "citations": [],
-                                    "name": "/us/usc/t17/s103/b",
-                                    "children": []
-                                },
-                                "selection": {
-                                    "positions": [],
-                                    "quotes": [
-                                        {
-                                            "exact": "The copyright in a compilation",
-                                            "prefix": "",
-                                            "suffix": ""
-                                        },
-                                        {
-                                            "exact": "extends only to the material contributed by the author of such work, as distinguished from the preexisting material employed in the work, and does not imply any exclusive right in the preexisting material.",
-                                            "prefix": "",
-                                            "suffix": ""
-                                        }
-                                    ]
-                                }
-                            }
-                        ]
-                    },
-                    "enactments_despite": {
-                        "passages": []
-                    },
-                    "mandatory": false,
-                    "universal": false,
-                    "name": null
-                },
-                "rule_valid": true,
-                "decided": true,
-                "exclusive": false
+                        "name": "Rural's telephone directory was a fact",
+                        "standard_of_proof": null
+                    }
+                ],
+                "despite": [],
+                "name": ""
             },
-            "anchors": {
-                "positions": [],
-                "quotes": []
-            }
+            "enactments": {
+                "passages": [
+                    {
+                        "enactment": {
+                            "node": "/us/const/article/I/8/8",
+                            "start_date": "1788-09-13",
+                            "heading": "Patents and copyrights.",
+                            "text_version": {
+                                "content": "To promote the Progress of Science and useful Arts, by securing for limited Times to Authors and Inventors the exclusive Right to their respective Writings and Discoveries;",
+                                "url": "https://authorityspoke.com/api/v1/textversions/735650/",
+                                "id": 735650
+                            },
+                            "end_date": null,
+                            "first_published": null,
+                            "earliest_in_db": null,
+                            "anchors": [],
+                            "citations": [],
+                            "name": "/us/const/article/I/8/8",
+                            "children": []
+                        },
+                        "selection": {
+                            "positions": [],
+                            "quotes": [
+                                {
+                                    "exact": "To promote the Progress of Science and useful Arts, by securing for limited Times to Authors",
+                                    "prefix": "",
+                                    "suffix": ""
+                                },
+                                {
+                                    "exact": "the exclusive Right to their respective Writings",
+                                    "prefix": "",
+                                    "suffix": ""
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "enactment": {
+                            "node": "/us/usc/t17/s102/b",
+                            "start_date": "2013-07-18",
+                            "heading": "",
+                            "text_version": {
+                                "content": "In no case does copyright protection for an original work of authorship extend to any idea, procedure, process, system, method of operation, concept, principle, or discovery, regardless of the form in which it is described, explained, illustrated, or embodied in such work.",
+                                "url": "https://authorityspoke.com/api/v1/textversions/1030580/",
+                                "id": 1030580
+                            },
+                            "end_date": null,
+                            "first_published": null,
+                            "earliest_in_db": null,
+                            "anchors": [],
+                            "citations": [],
+                            "name": "/us/usc/t17/s102/b",
+                            "children": []
+                        },
+                        "selection": {
+                            "positions": [
+                                {
+                                    "start": 0,
+                                    "end": null
+                                }
+                            ],
+                            "quotes": []
+                        }
+                    }
+                ]
+            },
+            "enactments_despite": {
+                "passages": []
+            },
+            "mandatory": true,
+            "universal": true,
+            "name": null
         },
-        {
-            "holding": {
-                "generic": false,
-                "rule": {
-                    "generic": false,
-                    "procedure": {
-                        "outputs": [
+        "rule_valid": true,
+        "decided": true,
+        "exclusive": false
+    },
+    {
+        "generic": false,
+        "rule": {
+            "generic": false,
+            "procedure": {
+                "outputs": [
+                    {
+                        "generic": false,
+                        "predicate": {
+                            "content": "${rural_s_telephone_directory} was an original work",
+                            "truth": true
+                        },
+                        "terms": [
                             {
-                                "generic": false,
-                                "predicate": {
-                                    "content": "${rural_s_arragement_of_its_telephone_listings} was an original work",
-                                    "truth": false
-                                },
-                                "terms": [
-                                    {
-                                        "generic": true,
-                                        "name": "Rural's arragement of its telephone listings",
-                                        "plural": false
-                                    }
-                                ],
-                                "name": "false Rural's arragement of its telephone listings was an original work",
-                                "standard_of_proof": null
+                                "generic": true,
+                                "name": "Rural's telephone directory",
+                                "plural": false
                             }
                         ],
-                        "inputs": [
+                        "name": "Rural's telephone directory was an original work",
+                        "standard_of_proof": null
+                    }
+                ],
+                "inputs": [
+                    {
+                        "generic": false,
+                        "predicate": {
+                            "content": "${rural_s_telephone_directory} was a compilation of facts",
+                            "truth": true
+                        },
+                        "terms": [
                             {
-                                "generic": false,
-                                "predicate": {
-                                    "content": "${rural_s_telephone_directory} was a telephone directory",
-                                    "truth": true
-                                },
-                                "terms": [
-                                    {
-                                        "generic": true,
-                                        "name": "Rural's telephone directory",
-                                        "plural": false
-                                    }
-                                ],
-                                "name": "Rural's telephone directory was a telephone directory",
-                                "standard_of_proof": null
-                            },
-                            {
-                                "generic": false,
-                                "predicate": {
-                                    "content": "${rural_s_arragement_of_its_telephone_listings} was the method of listing subscribers alphabetically by surname in ${rural_s_telephone_directory}",
-                                    "truth": true
-                                },
-                                "terms": [
-                                    {
-                                        "generic": true,
-                                        "name": "Rural's arragement of its telephone listings",
-                                        "plural": false
-                                    },
-                                    {
-                                        "generic": true,
-                                        "name": "Rural's telephone directory",
-                                        "plural": false
-                                    }
-                                ],
-                                "name": "Rural's arragement of its telephone listings was the method of listing subscribers alphabetically by surname in Rural's telephone directory",
-                                "standard_of_proof": null
+                                "generic": true,
+                                "name": "Rural's telephone directory",
+                                "plural": false
                             }
                         ],
-                        "despite": [],
-                        "name": ""
+                        "name": "Rural's telephone directory was a compilation of facts",
+                        "standard_of_proof": null
                     },
-                    "enactments": {
-                        "passages": [
+                    {
+                        "generic": false,
+                        "predicate": {
+                            "content": "${rural_telephone_service_company} was the compiler of ${rural_s_telephone_directory}",
+                            "truth": true
+                        },
+                        "terms": [
                             {
-                                "enactment": {
-                                    "node": "/us/const/article/I/8/8",
-                                    "start_date": "1788-09-13",
-                                    "heading": "Patents and copyrights.",
-                                    "text_version": {
-                                        "content": "To promote the Progress of Science and useful Arts, by securing for limited Times to Authors and Inventors the exclusive Right to their respective Writings and Discoveries;",
-                                        "url": "https://authorityspoke.com/api/v1/textversions/735650/",
-                                        "id": 735650
-                                    },
-                                    "end_date": null,
-                                    "first_published": null,
-                                    "earliest_in_db": null,
-                                    "anchors": [],
-                                    "citations": [],
-                                    "name": "/us/const/article/I/8/8",
-                                    "children": []
-                                },
-                                "selection": {
-                                    "positions": [],
-                                    "quotes": [
-                                        {
-                                            "exact": "To promote the Progress of Science and useful Arts, by securing for limited Times to Authors",
-                                            "prefix": "",
-                                            "suffix": ""
-                                        },
-                                        {
-                                            "exact": "the exclusive Right to their respective Writings",
-                                            "prefix": "",
-                                            "suffix": ""
-                                        }
-                                    ]
-                                }
+                                "generic": true,
+                                "name": "Rural Telephone Service Company",
+                                "plural": false
                             },
                             {
-                                "enactment": {
-                                    "node": "/us/usc/t17/s103/b",
+                                "generic": true,
+                                "name": "Rural's telephone directory",
+                                "plural": false
+                            }
+                        ],
+                        "name": "Rural Telephone Service Company was the compiler of Rural's telephone directory",
+                        "standard_of_proof": null
+                    },
+                    {
+                        "generic": false,
+                        "predicate": {
+                            "content": "${rural_telephone_service_company} independently used a degree of creativity to choose which facts to include in ${rural_s_telephone_directory}",
+                            "truth": true
+                        },
+                        "terms": [
+                            {
+                                "generic": true,
+                                "name": "Rural Telephone Service Company",
+                                "plural": false
+                            },
+                            {
+                                "generic": true,
+                                "name": "Rural's telephone directory",
+                                "plural": false
+                            }
+                        ],
+                        "name": "Rural Telephone Service Company independently used a degree of creativity to choose which facts to include in Rural's telephone directory",
+                        "standard_of_proof": null
+                    },
+                    {
+                        "generic": false,
+                        "predicate": {
+                            "content": "${rural_telephone_service_company} independently used a degree of creativity to choose in what order to place the facts in ${rural_s_telephone_directory}, and how to arrange the collected data so that they could be used effectively by readers",
+                            "truth": true
+                        },
+                        "terms": [
+                            {
+                                "generic": true,
+                                "name": "Rural Telephone Service Company",
+                                "plural": false
+                            },
+                            {
+                                "generic": true,
+                                "name": "Rural's telephone directory",
+                                "plural": false
+                            }
+                        ],
+                        "name": "Rural Telephone Service Company independently used a degree of creativity to choose in what order to place the facts in Rural's telephone directory, and how to arrange the collected data so that they could be used effectively by readers",
+                        "standard_of_proof": null
+                    }
+                ],
+                "despite": [],
+                "name": ""
+            },
+            "enactments": {
+                "passages": [
+                    {
+                        "enactment": {
+                            "node": "/us/const/article/I/8/8",
+                            "start_date": "1788-09-13",
+                            "heading": "Patents and copyrights.",
+                            "text_version": {
+                                "content": "To promote the Progress of Science and useful Arts, by securing for limited Times to Authors and Inventors the exclusive Right to their respective Writings and Discoveries;",
+                                "url": "https://authorityspoke.com/api/v1/textversions/735650/",
+                                "id": 735650
+                            },
+                            "end_date": null,
+                            "first_published": null,
+                            "earliest_in_db": null,
+                            "anchors": [],
+                            "citations": [],
+                            "name": "/us/const/article/I/8/8",
+                            "children": []
+                        },
+                        "selection": {
+                            "positions": [],
+                            "quotes": [
+                                {
+                                    "exact": "To promote the Progress of Science and useful Arts, by securing for limited Times to Authors",
+                                    "prefix": "",
+                                    "suffix": ""
+                                },
+                                {
+                                    "exact": "the exclusive Right to their respective Writings",
+                                    "prefix": "",
+                                    "suffix": ""
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            "enactments_despite": {
+                "passages": []
+            },
+            "mandatory": false,
+            "universal": false,
+            "name": null
+        },
+        "rule_valid": true,
+        "decided": true,
+        "exclusive": false
+    },
+    {
+        "generic": false,
+        "rule": {
+            "generic": false,
+            "procedure": {
+                "outputs": [
+                    {
+                        "generic": false,
+                        "predicate": {
+                            "content": "${rural_s_telephone_directory} was copyrightable",
+                            "truth": false
+                        },
+                        "terms": [
+                            {
+                                "generic": true,
+                                "name": "Rural's telephone directory",
+                                "plural": false
+                            }
+                        ],
+                        "name": "false Rural's telephone directory was copyrightable",
+                        "standard_of_proof": null
+                    }
+                ],
+                "inputs": [
+                    {
+                        "generic": false,
+                        "predicate": {
+                            "content": "${rural_s_telephone_directory} was a compilation of facts",
+                            "truth": true
+                        },
+                        "terms": [
+                            {
+                                "generic": true,
+                                "name": "Rural's telephone directory",
+                                "plural": false
+                            }
+                        ],
+                        "name": "Rural's telephone directory was a compilation of facts",
+                        "standard_of_proof": null
+                    },
+                    {
+                        "generic": false,
+                        "predicate": {
+                            "content": "${rural_s_telephone_directory} contained written expression protectable by copyright",
+                            "truth": false
+                        },
+                        "terms": [
+                            {
+                                "generic": true,
+                                "name": "Rural's telephone directory",
+                                "plural": false
+                            }
+                        ],
+                        "name": "false Rural's telephone directory contained written expression protectable by copyright",
+                        "standard_of_proof": null
+                    }
+                ],
+                "despite": [
+                    {
+                        "generic": false,
+                        "predicate": {
+                            "content": "${rural_telephone_service_company} independently used a degree of creativity to choose which facts to include in ${rural_s_telephone_directory}",
+                            "truth": true
+                        },
+                        "terms": [
+                            {
+                                "generic": true,
+                                "name": "Rural Telephone Service Company",
+                                "plural": false
+                            },
+                            {
+                                "generic": true,
+                                "name": "Rural's telephone directory",
+                                "plural": false
+                            }
+                        ],
+                        "name": "Rural Telephone Service Company independently used a degree of creativity to choose which facts to include in Rural's telephone directory",
+                        "standard_of_proof": null
+                    },
+                    {
+                        "generic": false,
+                        "predicate": {
+                            "content": "${rural_telephone_service_company} independently used a degree of creativity to choose in what order to place the facts in ${rural_s_telephone_directory}, and how to arrange the collected data so that they could be used effectively by readers",
+                            "truth": true
+                        },
+                        "terms": [
+                            {
+                                "generic": true,
+                                "name": "Rural Telephone Service Company",
+                                "plural": false
+                            },
+                            {
+                                "generic": true,
+                                "name": "Rural's telephone directory",
+                                "plural": false
+                            }
+                        ],
+                        "name": "Rural Telephone Service Company independently used a degree of creativity to choose in what order to place the facts in Rural's telephone directory, and how to arrange the collected data so that they could be used effectively by readers",
+                        "standard_of_proof": null
+                    }
+                ],
+                "name": ""
+            },
+            "enactments": {
+                "passages": [
+                    {
+                        "enactment": {
+                            "node": "/us/const/article/I/8/8",
+                            "start_date": "1788-09-13",
+                            "heading": "Patents and copyrights.",
+                            "text_version": {
+                                "content": "To promote the Progress of Science and useful Arts, by securing for limited Times to Authors and Inventors the exclusive Right to their respective Writings and Discoveries;",
+                                "url": "https://authorityspoke.com/api/v1/textversions/735650/",
+                                "id": 735650
+                            },
+                            "end_date": null,
+                            "first_published": null,
+                            "earliest_in_db": null,
+                            "anchors": [],
+                            "citations": [],
+                            "name": "/us/const/article/I/8/8",
+                            "children": []
+                        },
+                        "selection": {
+                            "positions": [],
+                            "quotes": [
+                                {
+                                    "exact": "To promote the Progress of Science and useful Arts, by securing for limited Times to Authors",
+                                    "prefix": "",
+                                    "suffix": ""
+                                },
+                                {
+                                    "exact": "the exclusive Right to their respective Writings",
+                                    "prefix": "",
+                                    "suffix": ""
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            "enactments_despite": {
+                "passages": []
+            },
+            "mandatory": false,
+            "universal": true,
+            "name": null
+        },
+        "rule_valid": false,
+        "decided": true,
+        "exclusive": false
+    },
+    {
+        "generic": false,
+        "rule": {
+            "generic": false,
+            "procedure": {
+                "outputs": [
+                    {
+                        "generic": false,
+                        "predicate": {
+                            "content": "${feist_publications} infringed the copyright on ${rural_s_telephone_directory}",
+                            "truth": false
+                        },
+                        "terms": [
+                            {
+                                "generic": true,
+                                "name": "Feist Publications",
+                                "plural": false
+                            },
+                            {
+                                "generic": true,
+                                "name": "Rural's telephone directory",
+                                "plural": false
+                            }
+                        ],
+                        "name": "false Feist Publications infringed the copyright on Rural's telephone directory",
+                        "standard_of_proof": null
+                    }
+                ],
+                "inputs": [
+                    {
+                        "generic": false,
+                        "predicate": {
+                            "content": "${rural_s_telephone_directory} was a compilation of facts",
+                            "truth": true
+                        },
+                        "terms": [
+                            {
+                                "generic": true,
+                                "name": "Rural's telephone directory",
+                                "plural": false
+                            }
+                        ],
+                        "name": "Rural's telephone directory was a compilation of facts",
+                        "standard_of_proof": null
+                    },
+                    {
+                        "generic": false,
+                        "predicate": {
+                            "content": "${feist_s_telephone_directory} did not feature the same selection and arrangement of facts as ${rural_s_telephone_directory}",
+                            "truth": true
+                        },
+                        "terms": [
+                            {
+                                "generic": true,
+                                "name": "Feist's telephone directory",
+                                "plural": false
+                            },
+                            {
+                                "generic": true,
+                                "name": "Rural's telephone directory",
+                                "plural": false
+                            }
+                        ],
+                        "name": "Feist's telephone directory did not feature the same selection and arrangement of facts as Rural's telephone directory",
+                        "standard_of_proof": null
+                    }
+                ],
+                "despite": [
+                    {
+                        "generic": false,
+                        "predicate": {
+                            "content": "${rural_s_telephone_directory} was copyrightable",
+                            "truth": true
+                        },
+                        "terms": [
+                            {
+                                "generic": true,
+                                "name": "Rural's telephone directory",
+                                "plural": false
+                            }
+                        ],
+                        "name": "Rural's telephone directory was copyrightable",
+                        "standard_of_proof": null
+                    },
+                    {
+                        "generic": false,
+                        "predicate": {
+                            "content": "${feist_publications} freely copied the facts contained in ${rural_s_telephone_directory}, in preparing ${feist_s_telephone_directory}",
+                            "truth": true
+                        },
+                        "terms": [
+                            {
+                                "generic": true,
+                                "name": "Feist Publications",
+                                "plural": false
+                            },
+                            {
+                                "generic": true,
+                                "name": "Rural's telephone directory",
+                                "plural": false
+                            },
+                            {
+                                "generic": true,
+                                "name": "Feist's telephone directory",
+                                "plural": false
+                            }
+                        ],
+                        "name": "Feist Publications freely copied the facts contained in Rural's telephone directory, in preparing Feist's telephone directory",
+                        "standard_of_proof": null
+                    }
+                ],
+                "name": ""
+            },
+            "enactments": {
+                "passages": [
+                    {
+                        "enactment": {
+                            "node": "/us/const/article/I/8/8",
+                            "start_date": "1788-09-13",
+                            "heading": "Patents and copyrights.",
+                            "text_version": {
+                                "content": "To promote the Progress of Science and useful Arts, by securing for limited Times to Authors and Inventors the exclusive Right to their respective Writings and Discoveries;",
+                                "url": "https://authorityspoke.com/api/v1/textversions/735650/",
+                                "id": 735650
+                            },
+                            "end_date": null,
+                            "first_published": null,
+                            "earliest_in_db": null,
+                            "anchors": [],
+                            "citations": [],
+                            "name": "/us/const/article/I/8/8",
+                            "children": []
+                        },
+                        "selection": {
+                            "positions": [],
+                            "quotes": [
+                                {
+                                    "exact": "To promote the Progress of Science and useful Arts, by securing for limited Times to Authors",
+                                    "prefix": "",
+                                    "suffix": ""
+                                },
+                                {
+                                    "exact": "the exclusive Right to their respective Writings",
+                                    "prefix": "",
+                                    "suffix": ""
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "enactment": {
+                            "node": "/us/usc/t17/s103/b",
+                            "start_date": "2013-07-18",
+                            "heading": "",
+                            "text_version": {
+                                "content": "The copyright in a compilation or derivative work extends only to the material contributed by the author of such work, as distinguished from the preexisting material employed in the work, and does not imply any exclusive right in the preexisting material. The copyright in such work is independent of, and does not affect or enlarge the scope, duration, ownership, or subsistence of, any copyright protection in the preexisting material.",
+                                "url": "https://authorityspoke.com/api/v1/textversions/1030582/",
+                                "id": 1030582
+                            },
+                            "end_date": null,
+                            "first_published": null,
+                            "earliest_in_db": null,
+                            "anchors": [],
+                            "citations": [],
+                            "name": "/us/usc/t17/s103/b",
+                            "children": []
+                        },
+                        "selection": {
+                            "positions": [],
+                            "quotes": [
+                                {
+                                    "exact": "The copyright in a compilation",
+                                    "prefix": "",
+                                    "suffix": ""
+                                },
+                                {
+                                    "exact": "extends only to the material contributed by the author of such work, as distinguished from the preexisting material employed in the work, and does not imply any exclusive right in the preexisting material.",
+                                    "prefix": "",
+                                    "suffix": ""
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            "enactments_despite": {
+                "passages": []
+            },
+            "mandatory": false,
+            "universal": false,
+            "name": null
+        },
+        "rule_valid": true,
+        "decided": true,
+        "exclusive": false
+    },
+    {
+        "generic": false,
+        "rule": {
+            "generic": false,
+            "procedure": {
+                "outputs": [
+                    {
+                        "generic": false,
+                        "predicate": {
+                            "content": "${rural_s_telephone_directory} was copyrightable",
+                            "truth": false
+                        },
+                        "terms": [
+                            {
+                                "generic": true,
+                                "name": "Rural's telephone directory",
+                                "plural": false
+                            }
+                        ],
+                        "name": "false Rural's telephone directory was copyrightable",
+                        "standard_of_proof": null
+                    }
+                ],
+                "inputs": [
+                    {
+                        "generic": false,
+                        "predicate": {
+                            "content": "${rural_s_telephone_directory} was a compilation of facts",
+                            "truth": true
+                        },
+                        "terms": [
+                            {
+                                "generic": true,
+                                "name": "Rural's telephone directory",
+                                "plural": false
+                            }
+                        ],
+                        "name": "Rural's telephone directory was a compilation of facts",
+                        "standard_of_proof": null
+                    }
+                ],
+                "despite": [],
+                "name": ""
+            },
+            "enactments": {
+                "passages": [
+                    {
+                        "enactment": {
+                            "node": "/us/const/article/I/8/8",
+                            "start_date": "1788-09-13",
+                            "heading": "Patents and copyrights.",
+                            "text_version": {
+                                "content": "To promote the Progress of Science and useful Arts, by securing for limited Times to Authors and Inventors the exclusive Right to their respective Writings and Discoveries;",
+                                "url": "https://authorityspoke.com/api/v1/textversions/735650/",
+                                "id": 735650
+                            },
+                            "end_date": null,
+                            "first_published": null,
+                            "earliest_in_db": null,
+                            "anchors": [],
+                            "citations": [],
+                            "name": "/us/const/article/I/8/8",
+                            "children": []
+                        },
+                        "selection": {
+                            "positions": [],
+                            "quotes": [
+                                {
+                                    "exact": "To promote the Progress of Science and useful Arts, by securing for limited Times to Authors",
+                                    "prefix": "",
+                                    "suffix": ""
+                                },
+                                {
+                                    "exact": "the exclusive Right to their respective Writings",
+                                    "prefix": "",
+                                    "suffix": ""
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "enactment": {
+                            "node": "/us/usc/t17/s103/b",
+                            "start_date": "2013-07-18",
+                            "heading": "",
+                            "text_version": {
+                                "content": "The copyright in a compilation or derivative work extends only to the material contributed by the author of such work, as distinguished from the preexisting material employed in the work, and does not imply any exclusive right in the preexisting material. The copyright in such work is independent of, and does not affect or enlarge the scope, duration, ownership, or subsistence of, any copyright protection in the preexisting material.",
+                                "url": "https://authorityspoke.com/api/v1/textversions/1030582/",
+                                "id": 1030582
+                            },
+                            "end_date": null,
+                            "first_published": null,
+                            "earliest_in_db": null,
+                            "anchors": [],
+                            "citations": [],
+                            "name": "/us/usc/t17/s103/b",
+                            "children": []
+                        },
+                        "selection": {
+                            "positions": [],
+                            "quotes": [
+                                {
+                                    "exact": "The copyright in a compilation",
+                                    "prefix": "",
+                                    "suffix": ""
+                                },
+                                {
+                                    "exact": "extends only to the material contributed by the author of such work, as distinguished from the preexisting material employed in the work, and does not imply any exclusive right in the preexisting material.",
+                                    "prefix": "",
+                                    "suffix": ""
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            "enactments_despite": {
+                "passages": []
+            },
+            "mandatory": false,
+            "universal": false,
+            "name": null
+        },
+        "rule_valid": true,
+        "decided": true,
+        "exclusive": false
+    },
+    {
+        "generic": false,
+        "rule": {
+            "generic": false,
+            "procedure": {
+                "outputs": [
+                    {
+                        "generic": false,
+                        "predicate": {
+                            "content": "${rural_s_telephone_listings} were an original work",
+                            "truth": false
+                        },
+                        "terms": [
+                            {
+                                "generic": true,
+                                "name": "Rural's telephone listings",
+                                "plural": true
+                            }
+                        ],
+                        "name": "false Rural's telephone listings were an original work",
+                        "standard_of_proof": null
+                    }
+                ],
+                "inputs": [
+                    {
+                        "generic": false,
+                        "predicate": {
+                            "content": "${rural_s_telephone_listings} were names, towns, and telephone numbers of telephone subscribers",
+                            "truth": true
+                        },
+                        "terms": [
+                            {
+                                "generic": true,
+                                "name": "Rural's telephone listings",
+                                "plural": true
+                            }
+                        ],
+                        "name": "Rural's telephone listings were names, towns, and telephone numbers of telephone subscribers",
+                        "standard_of_proof": null
+                    }
+                ],
+                "despite": [],
+                "name": ""
+            },
+            "enactments": {
+                "passages": [
+                    {
+                        "enactment": {
+                            "node": "/us/const/article/I/8/8",
+                            "start_date": "1788-09-13",
+                            "heading": "Patents and copyrights.",
+                            "text_version": {
+                                "content": "To promote the Progress of Science and useful Arts, by securing for limited Times to Authors and Inventors the exclusive Right to their respective Writings and Discoveries;",
+                                "url": "https://authorityspoke.com/api/v1/textversions/735650/",
+                                "id": 735650
+                            },
+                            "end_date": null,
+                            "first_published": null,
+                            "earliest_in_db": null,
+                            "anchors": [],
+                            "citations": [],
+                            "name": "/us/const/article/I/8/8",
+                            "children": []
+                        },
+                        "selection": {
+                            "positions": [],
+                            "quotes": [
+                                {
+                                    "exact": "To promote the Progress of Science and useful Arts, by securing for limited Times to Authors",
+                                    "prefix": "",
+                                    "suffix": ""
+                                },
+                                {
+                                    "exact": "the exclusive Right to their respective Writings",
+                                    "prefix": "",
+                                    "suffix": ""
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "enactment": {
+                            "node": "/us/usc/t17/s102/a",
+                            "start_date": "2013-07-18",
+                            "heading": "",
+                            "text_version": {
+                                "content": "Copyright protection subsists, in accordance with this title, in original works of authorship fixed in any tangible medium of expression, now known or later developed, from which they can be perceived, reproduced, or otherwise communicated, either directly or with the aid of a machine or device. Works of authorship include the following categories:",
+                                "url": "https://authorityspoke.com/api/v1/textversions/1030579/",
+                                "id": 1030579
+                            },
+                            "end_date": null,
+                            "first_published": null,
+                            "earliest_in_db": null,
+                            "anchors": [],
+                            "citations": [],
+                            "name": "/us/usc/t17/s102/a",
+                            "children": [
+                                {
+                                    "node": "/us/usc/t17/s102/a/1",
                                     "start_date": "2013-07-18",
                                     "heading": "",
                                     "text_version": {
-                                        "content": "The copyright in a compilation or derivative work extends only to the material contributed by the author of such work, as distinguished from the preexisting material employed in the work, and does not imply any exclusive right in the preexisting material. The copyright in such work is independent of, and does not affect or enlarge the scope, duration, ownership, or subsistence of, any copyright protection in the preexisting material.",
-                                        "url": "https://authorityspoke.com/api/v1/textversions/1030582/",
-                                        "id": 1030582
+                                        "content": "literary works;",
+                                        "url": "https://authorityspoke.com/api/v1/textversions/1030571/",
+                                        "id": 1030571
                                     },
                                     "end_date": null,
                                     "first_published": null,
                                     "earliest_in_db": null,
                                     "anchors": [],
                                     "citations": [],
-                                    "name": "/us/usc/t17/s103/b",
+                                    "name": "",
                                     "children": []
                                 },
-                                "selection": {
-                                    "positions": [],
-                                    "quotes": [
-                                        {
-                                            "exact": "The copyright in a compilation",
-                                            "prefix": "",
-                                            "suffix": ""
-                                        },
-                                        {
-                                            "exact": "extends only to the material contributed by the author of such work, as distinguished from the preexisting material employed in the work, and does not imply any exclusive right in the preexisting material.",
-                                            "prefix": "",
-                                            "suffix": ""
-                                        }
-                                    ]
+                                {
+                                    "node": "/us/usc/t17/s102/a/2",
+                                    "start_date": "2013-07-18",
+                                    "heading": "",
+                                    "text_version": {
+                                        "content": "musical works, including any accompanying words;",
+                                        "url": "https://authorityspoke.com/api/v1/textversions/1030572/",
+                                        "id": 1030572
+                                    },
+                                    "end_date": null,
+                                    "first_published": null,
+                                    "earliest_in_db": null,
+                                    "anchors": [],
+                                    "citations": [],
+                                    "name": "",
+                                    "children": []
+                                },
+                                {
+                                    "node": "/us/usc/t17/s102/a/3",
+                                    "start_date": "2013-07-18",
+                                    "heading": "",
+                                    "text_version": {
+                                        "content": "dramatic works, including any accompanying music;",
+                                        "url": "https://authorityspoke.com/api/v1/textversions/1030573/",
+                                        "id": 1030573
+                                    },
+                                    "end_date": null,
+                                    "first_published": null,
+                                    "earliest_in_db": null,
+                                    "anchors": [],
+                                    "citations": [],
+                                    "name": "",
+                                    "children": []
+                                },
+                                {
+                                    "node": "/us/usc/t17/s102/a/4",
+                                    "start_date": "2013-07-18",
+                                    "heading": "",
+                                    "text_version": {
+                                        "content": "pantomimes and choreographic works;",
+                                        "url": "https://authorityspoke.com/api/v1/textversions/1030574/",
+                                        "id": 1030574
+                                    },
+                                    "end_date": null,
+                                    "first_published": null,
+                                    "earliest_in_db": null,
+                                    "anchors": [],
+                                    "citations": [],
+                                    "name": "",
+                                    "children": []
+                                },
+                                {
+                                    "node": "/us/usc/t17/s102/a/5",
+                                    "start_date": "2013-07-18",
+                                    "heading": "",
+                                    "text_version": {
+                                        "content": "pictorial, graphic, and sculptural works;",
+                                        "url": "https://authorityspoke.com/api/v1/textversions/1030575/",
+                                        "id": 1030575
+                                    },
+                                    "end_date": null,
+                                    "first_published": null,
+                                    "earliest_in_db": null,
+                                    "anchors": [],
+                                    "citations": [],
+                                    "name": "",
+                                    "children": []
+                                },
+                                {
+                                    "node": "/us/usc/t17/s102/a/6",
+                                    "start_date": "2013-07-18",
+                                    "heading": "",
+                                    "text_version": {
+                                        "content": "motion pictures and other audiovisual works;",
+                                        "url": "https://authorityspoke.com/api/v1/textversions/1030576/",
+                                        "id": 1030576
+                                    },
+                                    "end_date": null,
+                                    "first_published": null,
+                                    "earliest_in_db": null,
+                                    "anchors": [],
+                                    "citations": [],
+                                    "name": "",
+                                    "children": []
+                                },
+                                {
+                                    "node": "/us/usc/t17/s102/a/7",
+                                    "start_date": "2013-07-18",
+                                    "heading": "",
+                                    "text_version": {
+                                        "content": "sound recordings; and",
+                                        "url": "https://authorityspoke.com/api/v1/textversions/1030577/",
+                                        "id": 1030577
+                                    },
+                                    "end_date": null,
+                                    "first_published": null,
+                                    "earliest_in_db": null,
+                                    "anchors": [],
+                                    "citations": [],
+                                    "name": "",
+                                    "children": []
+                                },
+                                {
+                                    "node": "/us/usc/t17/s102/a/8",
+                                    "start_date": "2013-07-18",
+                                    "heading": "",
+                                    "text_version": {
+                                        "content": "architectural works.",
+                                        "url": "https://authorityspoke.com/api/v1/textversions/1030578/",
+                                        "id": 1030578
+                                    },
+                                    "end_date": null,
+                                    "first_published": null,
+                                    "earliest_in_db": null,
+                                    "anchors": [],
+                                    "citations": [],
+                                    "name": "",
+                                    "children": []
                                 }
-                            }
-                        ]
+                            ]
+                        },
+                        "selection": {
+                            "positions": [],
+                            "quotes": [
+                                {
+                                    "exact": "",
+                                    "prefix": "",
+                                    "suffix": "fixed in any tangible"
+                                }
+                            ]
+                        }
                     },
-                    "enactments_despite": {
-                        "passages": []
-                    },
-                    "mandatory": false,
-                    "universal": false,
-                    "name": null
-                },
-                "rule_valid": true,
-                "decided": true,
-                "exclusive": false
+                    {
+                        "enactment": {
+                            "node": "/us/usc/t17/s103/b",
+                            "start_date": "2013-07-18",
+                            "heading": "",
+                            "text_version": {
+                                "content": "The copyright in a compilation or derivative work extends only to the material contributed by the author of such work, as distinguished from the preexisting material employed in the work, and does not imply any exclusive right in the preexisting material. The copyright in such work is independent of, and does not affect or enlarge the scope, duration, ownership, or subsistence of, any copyright protection in the preexisting material.",
+                                "url": "https://authorityspoke.com/api/v1/textversions/1030582/",
+                                "id": 1030582
+                            },
+                            "end_date": null,
+                            "first_published": null,
+                            "earliest_in_db": null,
+                            "anchors": [],
+                            "citations": [],
+                            "name": "/us/usc/t17/s103/b",
+                            "children": []
+                        },
+                        "selection": {
+                            "positions": [],
+                            "quotes": [
+                                {
+                                    "exact": "The copyright in a compilation",
+                                    "prefix": "",
+                                    "suffix": ""
+                                },
+                                {
+                                    "exact": "extends only to the material contributed by the author of such work, as distinguished from the preexisting material employed in the work, and does not imply any exclusive right in the preexisting material.",
+                                    "prefix": "",
+                                    "suffix": ""
+                                }
+                            ]
+                        }
+                    }
+                ]
             },
-            "anchors": {
-                "positions": [],
-                "quotes": []
-            }
-        }
-    ],
-    "named_anchors": [],
-    "enactment_anchors": []
-}
+            "enactments_despite": {
+                "passages": []
+            },
+            "mandatory": false,
+            "universal": false,
+            "name": null
+        },
+        "rule_valid": true,
+        "decided": true,
+        "exclusive": false
+    },
+    {
+        "generic": false,
+        "rule": {
+            "generic": false,
+            "procedure": {
+                "outputs": [
+                    {
+                        "generic": false,
+                        "predicate": {
+                            "content": "${rural_s_arragement_of_its_telephone_listings} was an original work",
+                            "truth": false
+                        },
+                        "terms": [
+                            {
+                                "generic": true,
+                                "name": "Rural's arragement of its telephone listings",
+                                "plural": false
+                            }
+                        ],
+                        "name": "false Rural's arragement of its telephone listings was an original work",
+                        "standard_of_proof": null
+                    }
+                ],
+                "inputs": [
+                    {
+                        "generic": false,
+                        "predicate": {
+                            "content": "${rural_s_telephone_directory} was a telephone directory",
+                            "truth": true
+                        },
+                        "terms": [
+                            {
+                                "generic": true,
+                                "name": "Rural's telephone directory",
+                                "plural": false
+                            }
+                        ],
+                        "name": "Rural's telephone directory was a telephone directory",
+                        "standard_of_proof": null
+                    },
+                    {
+                        "generic": false,
+                        "predicate": {
+                            "content": "${rural_s_arragement_of_its_telephone_listings} was the method of listing subscribers alphabetically by surname in ${rural_s_telephone_directory}",
+                            "truth": true
+                        },
+                        "terms": [
+                            {
+                                "generic": true,
+                                "name": "Rural's arragement of its telephone listings",
+                                "plural": false
+                            },
+                            {
+                                "generic": true,
+                                "name": "Rural's telephone directory",
+                                "plural": false
+                            }
+                        ],
+                        "name": "Rural's arragement of its telephone listings was the method of listing subscribers alphabetically by surname in Rural's telephone directory",
+                        "standard_of_proof": null
+                    }
+                ],
+                "despite": [],
+                "name": ""
+            },
+            "enactments": {
+                "passages": [
+                    {
+                        "enactment": {
+                            "node": "/us/const/article/I/8/8",
+                            "start_date": "1788-09-13",
+                            "heading": "Patents and copyrights.",
+                            "text_version": {
+                                "content": "To promote the Progress of Science and useful Arts, by securing for limited Times to Authors and Inventors the exclusive Right to their respective Writings and Discoveries;",
+                                "url": "https://authorityspoke.com/api/v1/textversions/735650/",
+                                "id": 735650
+                            },
+                            "end_date": null,
+                            "first_published": null,
+                            "earliest_in_db": null,
+                            "anchors": [],
+                            "citations": [],
+                            "name": "/us/const/article/I/8/8",
+                            "children": []
+                        },
+                        "selection": {
+                            "positions": [],
+                            "quotes": [
+                                {
+                                    "exact": "To promote the Progress of Science and useful Arts, by securing for limited Times to Authors",
+                                    "prefix": "",
+                                    "suffix": ""
+                                },
+                                {
+                                    "exact": "the exclusive Right to their respective Writings",
+                                    "prefix": "",
+                                    "suffix": ""
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "enactment": {
+                            "node": "/us/usc/t17/s103/b",
+                            "start_date": "2013-07-18",
+                            "heading": "",
+                            "text_version": {
+                                "content": "The copyright in a compilation or derivative work extends only to the material contributed by the author of such work, as distinguished from the preexisting material employed in the work, and does not imply any exclusive right in the preexisting material. The copyright in such work is independent of, and does not affect or enlarge the scope, duration, ownership, or subsistence of, any copyright protection in the preexisting material.",
+                                "url": "https://authorityspoke.com/api/v1/textversions/1030582/",
+                                "id": 1030582
+                            },
+                            "end_date": null,
+                            "first_published": null,
+                            "earliest_in_db": null,
+                            "anchors": [],
+                            "citations": [],
+                            "name": "/us/usc/t17/s103/b",
+                            "children": []
+                        },
+                        "selection": {
+                            "positions": [],
+                            "quotes": [
+                                {
+                                    "exact": "The copyright in a compilation",
+                                    "prefix": "",
+                                    "suffix": ""
+                                },
+                                {
+                                    "exact": "extends only to the material contributed by the author of such work, as distinguished from the preexisting material employed in the work, and does not imply any exclusive right in the preexisting material.",
+                                    "prefix": "",
+                                    "suffix": ""
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            "enactments_despite": {
+                "passages": []
+            },
+            "mandatory": false,
+            "universal": false,
+            "name": null
+        },
+        "rule_valid": true,
+        "decided": true,
+        "exclusive": false
+    }
+]
