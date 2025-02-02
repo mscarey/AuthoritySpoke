@@ -31,6 +31,7 @@ prof/
 schemas/
 tests/__pycache__/
 tests/.pytest_cache/
+tests/outputs/
 tests/prof/
 venv/
 venv-39/

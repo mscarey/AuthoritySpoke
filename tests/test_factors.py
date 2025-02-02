@@ -5,6 +5,7 @@ import pytest
 from nettlesome.terms import ContextRegister, DuplicateTermError
 from nettlesome.terms import Explanation, TermSequence, means
 from nettlesome.entities import Entity
+from nettlesome.factors import AbsenceOf
 from nettlesome.groups import FactorGroup
 from nettlesome.predicates import Predicate
 from nettlesome.quantities import Comparison, Q_
@@ -324,7 +325,6 @@ class TestSameMeaning:
             e_copyright.means(watt_factor["f1"])
 
     def test_standard_of_proof_inequality(self, watt_factor):
-
         f = watt_factor
         assert not f["f2_clear_and_convincing"].means(f["f2_preponderance_of_evidence"])
         assert not f["f2_clear_and_convincing"].means(f["f2"])
@@ -610,19 +610,20 @@ class TestContradiction:
         )
 
     def test_false_does_not_contradict_absent(self):
-        absent_fact = Fact(
-            predicate=Predicate(
-                content="${rural_s_telephone_directory} was copyrightable", truth=True
-            ),
-            terms=(Entity(name="Rural's telephone directory")),
-            absent=True,
+        absent_fact = AbsenceOf(
+            absent=Fact(
+                predicate=Predicate(
+                    content="${rural_s_telephone_directory} was copyrightable",
+                    truth=True,
+                ),
+                terms=(Entity(name="Rural's telephone directory")),
+            )
         )
         false_fact = Fact(
             predicate=Predicate(
                 content="${the_java_api} was copyrightable", truth=False
             ),
             terms=(Entity(name="the Java API", generic=True, plural=False)),
-            absent=False,
         )
         assert not false_fact.contradicts(absent_fact)
         assert not absent_fact.contradicts(false_fact)
@@ -709,7 +710,6 @@ class TestContradiction:
         assert not any(register is not None for register in update)
 
     def test_entity_consistency_identity_not_equality(self, make_entity, make_factor):
-
         register = ContextRegister()
         register.insert_pair(make_entity["dan"], make_entity["dan"])
         update = make_factor["f_irrelevant_3"].update_context_register(

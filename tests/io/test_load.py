@@ -23,8 +23,12 @@ class TestHoldingLoad:
         path = filepaths.make_filepath(
             filename="holding_feist.json", directory=directory
         )
-        raw_holdings = loaders.load_holdings(filepath=path)
-        assert raw_holdings[0]["outputs"]["type"] == "fact"
+        raw_holdings = loaders.load_holdings(filepath=path)["holdings"]
+        name = "false Rural's telephone directory was copyrightable"
+        assert (
+            raw_holdings[0]["holding"]["rule"]["procedure"]["outputs"][0]["name"]
+            == name
+        )
 
     def test_get_yaml_filepath(self):
         directory = filepaths.get_directory_path("holdings")
@@ -74,7 +78,7 @@ class TestLoadAndRead:
     @pytest.mark.vcr
     def test_read_holdings_from_yaml(self):
         anchored = read_anchored_holdings_from_file(
-            "holding_mazza_alaluf.json", client=self.client
+            "holding_mazza_alaluf.yaml", client=self.client
         )
         # factor anchor
         key = "the fact that <Turismo Costa Brava> was a money transmitting business"
@@ -86,7 +90,7 @@ class TestLoadAndRead:
     @pytest.mark.vcr("TestLoadAndRead.test_read_holdings_from_yaml.json")
     def test_read_holding_anchors_from_yaml(self):
         anchored = read_anchored_holdings_from_file(
-            "holding_mazza_alaluf.json", client=self.client
+            "holding_mazza_alaluf.yaml", client=self.client
         )
 
         # holding anchor
@@ -95,7 +99,7 @@ class TestLoadAndRead:
     @pytest.mark.vcr("TestLoadAndRead.test_read_holdings_from_yaml.json")
     def test_read_enactment_anchors_from_yaml(self):
         anchored = read_anchored_holdings_from_file(
-            "holding_mazza_alaluf.json", client=self.client
+            "holding_mazza_alaluf.yaml", client=self.client
         )
 
         # enactment anchor

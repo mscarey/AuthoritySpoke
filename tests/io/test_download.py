@@ -53,7 +53,7 @@ class TestDownload:
 
     @pytest.mark.vcr
     def test_download_case_by_cite(self):
-        case = self.client.read_cite("49 F.3d 807")
+        case = self.client.read_cite("49 F.3d 807", full_case=False)
         assert case.decision_date.isoformat() == "1995-03-09"
 
     @pytest.mark.default_cassette("TestDownload.test_download_case_by_cite.json")

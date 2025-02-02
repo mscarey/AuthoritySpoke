@@ -163,7 +163,7 @@ becomes one of the input’s ``terms``. If such an object hasn’t
 been referenced before in the file, it will be created.
 
     >>> print(oracle.holdings[0].inputs[0].terms)
-    [Entity(generic=True, absent=False, name='the Java API', plural=False)]
+    [Entity(generic=True, name='the Java API', plural=False)]
 
 
 The JSON representation of a Rule can also have “mandatory” and
