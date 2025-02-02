@@ -181,7 +181,8 @@ class TestExhibitDump:
 
 class TestEvidenceLoad:
     def test_wrong_schema(self, make_evidence):
-        fact_dict = load_holdings("holding_cardenas.json")[1]["inputs"][0]
+        case_data = load_holdings("holding_cardenas.json")
+        fact_dict = case_data[1]["rule"]["procedure"]["inputs"][0]
         with pytest.raises(ValidationError):
             Evidence(**fact_dict)
 
