@@ -172,6 +172,7 @@ def create_name_for_factor(obj: Dict) -> str:
         or obj.get("factor_anchors")  # AnchoredHoldings doesn't need name
         or obj.get("holdings")
         or obj.get("passage")  # AnchoredPassages don't need names
+        or obj.get("absent")
     ):
         return ""
     elif obj.get("predicate", {}).get("content"):

@@ -82,11 +82,10 @@ class Procedure(Comparable, BaseModel):
         other :class:`Procedure`.
     """
 
-    outputs: List[Union[Fact, Allegation, Pleading, Exhibit, Evidence]]
-    inputs: List[Union[Fact, Allegation, Pleading, Exhibit, Evidence]] = []
-    despite: List[Union[Fact, Allegation, Pleading, Exhibit, Evidence]] = []
+    outputs: List[Union[AbsenceOf, Fact, Allegation, Pleading, Exhibit, Evidence]]
+    inputs: List[Union[AbsenceOf, Fact, Allegation, Pleading, Exhibit, Evidence]] = []
+    despite: List[Union[AbsenceOf, Fact, Allegation, Pleading, Exhibit, Evidence]] = []
     name: str = ""
-    absent: ClassVar[bool] = False
     generic: ClassVar[bool] = False
     context_factor_names: ClassVar[Tuple[str, ...]] = ("outputs", "inputs", "despite")
 

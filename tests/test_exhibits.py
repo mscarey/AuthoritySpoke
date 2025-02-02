@@ -8,7 +8,7 @@ from authorityspoke.facts import Fact, Predicate, Exhibit
 class TestExhibits:
     def test_make_exhibit_object(self):
         e = Exhibit(form="testimony", offered_by=Entity(name="Alice"))
-        assert not e.absent
+        assert not e.generic
 
     def test_exhibit_short_string(self, make_exhibit):
         assert (
