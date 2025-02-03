@@ -153,7 +153,7 @@ class Rule(Comparable, BaseModel):
     ) -> Optional[Rule]:
         """Create new Rule by using the outputs of self as inputs of other."""
         if not isinstance(other, Rule):
-            if isinstance(other, Factor):
+            if isinstance(other, (AbsenceOf, Factor)):
                 return self.with_factor(other)
             if isinstance(other, (Enactment, EnactmentPassage)):
                 return self.with_enactment(other)
@@ -290,7 +290,7 @@ class Rule(Comparable, BaseModel):
         new_enactments = self.enactments_despite + incoming
         self.set_enactments_despite(new_enactments)
 
-    def with_enactment(self, incoming: Enactment) -> Rule:
+    def with_enactment(self, incoming: Enactment | EnactmentPassage) -> Rule:
         r"""
         Create new Rule with added Enactment.
 
