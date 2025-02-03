@@ -40,7 +40,7 @@ class TestDownload:
         case = self.client.fetch(4066790)
         assert case.json()["name_abbreviation"] == "Oracle America, Inc. v. Google Inc."
 
-    @pytest.mark.default_cassette("TestDownload.test_download_case_by_id.json")
+    @pytest.mark.default_cassette("TestDownload.test_download_case_by_id.yaml")
     @pytest.mark.vcr
     def test_download_case_by_string_id(self):
         response = self.client.fetch("4066790")
@@ -58,7 +58,7 @@ class TestDownload:
         lotus = self.client.read_decision_from_response(response)
         assert lotus.casebody.data.opinions[0].author.startswith("STAHL")
 
-    @pytest.mark.default_cassette("TestDownload.test_full_case_download.json")
+    @pytest.mark.default_cassette("TestDownload.test_full_case_download.yaml")
     @pytest.mark.vcr
     def test_download_and_make_opinion(self):
         response = self.client.read_decision_list_by_cite(
@@ -73,7 +73,7 @@ class TestDownload:
         case = self.client.read_cite("49 F.3d 807", full_case=False)
         assert case.decision_date.isoformat() == "1995-03-09"
 
-    @pytest.mark.default_cassette("TestDownload.test_download_case_by_cite.json")
+    @pytest.mark.default_cassette("TestDownload.test_download_case_by_cite.yaml")
     @pytest.mark.vcr
     def test_decision_without_opinion_posits_holding(self, make_holding):
         """Test that a blank OpinionReading is created for a decision's Holding."""
@@ -83,7 +83,7 @@ class TestDownload:
         assert len(reading.holdings) == 1
         assert len(reading.opinion_readings[0].holdings) == 1
 
-    @pytest.mark.default_cassette("TestDownload.test_full_case_download.json")
+    @pytest.mark.default_cassette("TestDownload.test_full_case_download.yaml")
     @pytest.mark.vcr
     def test_download_save_and_make_opinion(self, tmp_path):
         to_file = "lotus_h.json"
