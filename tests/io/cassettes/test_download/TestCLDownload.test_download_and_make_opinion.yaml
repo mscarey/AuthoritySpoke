@@ -1,0 +1,472 @@
+interactions:
+- request:
+    body: reporter=F.3d&volume=49&page=807
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '32'
+      Content-Type:
+      - application/x-www-form-urlencoded
+      User-Agent:
+      - python-requests/2.31.0
+    method: GET
+    uri: https://www.courtlistener.com/api/rest/v4/citation-lookup/
+  response:
+    body:
+      string: "[{\"citation\":\"49 F.3d 807\",\"normalized_citations\":[\"49 F.3d
+        807\"],\"start_index\":0,\"end_index\":11,\"status\":200,\"error_message\":\"\",\"clusters\":[{\"resource_uri\":\"https://www.courtlistener.com/api/rest/v4/clusters/691310/\",\"id\":691310,\"absolute_url\":\"/opinion/691310/lotus-development-corporation-v-borland-international-inc/\",\"panel\":[],\"non_participating_judges\":[],\"docket_id\":2034691,\"docket\":\"https://www.courtlistener.com/api/rest/v4/dockets/2034691/\",\"sub_opinions\":[\"https://www.courtlistener.com/api/rest/v4/opinions/691310/\",\"https://www.courtlistener.com/api/rest/v4/opinions/9487893/\",\"https://www.courtlistener.com/api/rest/v4/opinions/9487894/\"],\"citations\":[{\"volume\":49,\"reporter\":\"F.3d\",\"page\":\"807\",\"type\":1},{\"volume\":34,\"reporter\":\"U.S.P.Q.
+        2d (BNA)\",\"page\":\"1014\",\"type\":4},{\"volume\":1995,\"reporter\":\"U.S.
+        App. LEXIS\",\"page\":\"4618\",\"type\":6},{\"volume\":1995,\"reporter\":\"WL\",\"page\":\"94669\",\"type\":7}],\"date_created\":\"2015-11-03T12:48:12.601703-08:00\",\"date_modified\":\"2024-11-04T19:03:08.867144-08:00\",\"judges\":\"Torruella,
+        Boudin, Stahl\",\"date_filed\":\"1995-03-09\",\"date_filed_is_approximate\":false,\"slug\":\"lotus-development-corporation-v-borland-international-inc\",\"case_name_short\":\"\",\"case_name\":\"Lotus
+        Development Corporation v. Borland International, Inc.\",\"case_name_full\":\"LOTUS
+        DEVELOPMENT CORPORATION, Plaintiff, Appellee, v. BORLAND INTERNATIONAL, INC.,
+        Defendant, Appellant\",\"scdb_id\":\"\",\"scdb_decision_direction\":null,\"scdb_votes_majority\":null,\"scdb_votes_minority\":null,\"source\":\"RU\",\"procedural_history\":\"\",\"attorneys\":\"Gary
+        L. Rebaek, with whom Peter N. Det-kin, Michael Barclay, Isabella E. Fu, Wilson
+        Sonsini Goodrich & Rosati, P.C., Palo Alto, CA, Peter E. Gelhaar, Katherine
+        L. Parks, and Donnelly Conroy & Gelhaar, Boston, MA, were on brief for appellant.,
+        Matthew P. Poppel, Boston, MA, et ah, were on brief for Computer Scientists,
+        ami-cus curiae., Dennis S. Karjala, Tempe, AZ, and Peter S. Menell, Berkeley,
+        CA, on brief, amici curiae., Jeffrey C. Cannon and Baker Keaton Sei-bel &
+        Cannon, Walnut Creek, CA, were on brief for Computer Software Industry Ass\u2019n,
+        amicus curiae., Laureen E. McGurk, David A. Rabin, Bryan G. Harrison and Morris
+        Manning & Martin, Atlanta, GA, were on brief for Chicago Computer Soc., Diablo
+        Users Group, Dan-bury Area Computer Soc., IBM AB Users Group, Kentucky-Indiana
+        Personal Computer Users Group, Long Island PC Users Group, Napa Valley PC
+        Users Group, Pacific Northwest PC Users Group, Palmetto Personal Computer
+        Club, Philadelphia Area Computer Soc., Inc., Phoenix IBM PC Users Group, Pinellas
+        IBM PC Users Group, Quad Cities Computer Soc., Quattro Pro Users Group, Sacramento
+        PC Users Group, San Francisco PC Users Group, Santa Barbara PC Users Group,
+        Twin Cities PC Users Group, and Warner Robbins Personal Computer Ass\u2019n,
+        amici curiae., Diane Marie O\u2019Malley and Hanson Bridgett Marcus Vlahos
+        & Rudy, San Francisco, CA, were on brief for Software Entrepreneurs\u2019
+        Forum, amicus curiae., Peter M.C. Choy, Mountain View, CA, was on brief for
+        American Committee for Interoperable Systems, amicus curiae., Howard B. Abrams,
+        Detroit, MI, Howard C. Anawalt, Santa Clara, CA, Stephen R. Barnett, Berkeley,
+        CA, Ralph S. Brown, Stephen L. Carter, New Haven, CT, Amy B. Cohen, Longmeadow,
+        MA, Paul J. Heald, Athens, GA, Peter A. Jaszi, John A. Kidwell, Madison, WI,
+        Edmund W. Kitch, Charlottes-ville, VA, Roberta R. Kwall, Chicago, IL, David
+        L. Lange, Durham, NC, Marshall Leafier, Toledo, OH, Jessica D. Litman, Ann
+        Arbor, MI, Charles R. McManis, St. Louis, MO, L. Ray Patterson, Athens, GA,
+        Jerome H. Reichman, David A. Rice, Chestnut Hill, MA, Pamela Samuelson, Pittsburgh,
+        PA, David J. Seipp, Boston, MA, David E. Ship-ley, Lexington, KY, Lionel S.
+        Sobel, Santa Monica, CA, Alfred C. Yen, Newton, MA, and Diane L. Zimmerman,
+        New York City, were on brief for Copyright Law Professors, amicus curiae.,
+        Henry B. Gutman, Baker & Botts, LLP, with whom Kerry L. Konrad, Joshua H.
+        Epstein, Kimberly A. Caldwell, O\u2019Sullivan Graev & Karabell, New York
+        City, Thomas M. Lemberg, James C. Burling, and Hale and Dorr, Boston, MA,
+        were on brief for appellee., Morton David Goldberg, June M. Besek, David 0.
+        Carson, Jesse M. Feder, Schwab Goldberg Price & Dannay, New York City, and
+        Arthur R. Miller, Cambridge, MA, were on brief for Apple Computer, Inc., Digital
+        Equip. Corp., International Business Machines Corp., and Xerox Corp., amici
+        curiae., Jon A. Baumgarten, Proskauer Rose Goetz & Mendelsohn,\u2019 and Robert
+        A. Gorman, New York City, were on brief for Adobe Systems, Inc., Apple Computer,
+        Inc., Computer Associates Intern., Inc., Digital Equip. Corp., and International
+        Business Machines Corp., amici curiae., Herbert F. Schwartz, Vincent N. Palladi-no,
+        Susan Progoff, Fish & Neave, New York City, William J. Cheeseman, and Foley
+        Hoag & Eliot, Boston, MA, were on brief for Computer and Business Equip. Mfrs.
+        Ass\u2019n, ami-cus curiae.\",\"nature_of_suit\":\"\",\"posture\":\"\",\"syllabus\":\"\",\"headnotes\":\"\",\"summary\":\"\",\"disposition\":\"\",\"history\":\"\",\"other_dates\":\"Heard
+        Oct. 6, 1994.\",\"cross_reference\":\"\",\"correction\":\"\",\"citation_count\":84,\"precedential_status\":\"Published\",\"date_blocked\":null,\"blocked\":false,\"filepath_json_harvard\":\"law.free.cap.f3d.49/807.7416609.json\",\"filepath_pdf_harvard\":\"harvard_pdf/691310.pdf\",\"arguments\":\"\",\"headmatter\":\"<parties
+        id=\\\"b865-3\\\">\\n    LOTUS DEVELOPMENT CORPORATION, Plaintiff, Appellee,
+        v. BORLAND INTERNATIONAL, INC., Defendant, Appellant.\\n   </parties><br><docketnumber
+        id=\\\"b865-6\\\">\\n    No. 93-2214.\\n   </docketnumber><br><court id=\\\"b865-7\\\">\\n
+        \   United States Court of Appeals, First Circuit.\\n   </court><br><otherdate
+        id=\\\"b865-9\\\">\\n    Heard Oct. 6, 1994.\\n   </otherdate><br><decisiondate
+        id=\\\"b865-10\\\">\\n    Decided March 9, 1995.\\n   </decisiondate><br><attorneys
+        id=\\\"b866-23\\\">\\n<span citation-index=\\\"1\\\" class=\\\"star-pagination\\\"
+        label=\\\"808\\\"> \\n     *808\\n     </span>\\n    Gary L. Rebaek, with
+        whom Peter N. Det-kin, Michael Barclay, Isabella E. Fu, Wilson Sonsini Goodrich
+        &amp; Rosati, P.C., Palo Alto, CA, Peter E. Gelhaar, Katherine L. Parks, and
+        Donnelly Conroy\\n    <em>\\n     &amp;\\n    </em>\\n    Gelhaar, Boston,
+        MA, were on brief for appellant.\\n   </attorneys><br><attorneys id=\\\"b866-24\\\">\\n
+        \   Matthew P. Poppel, Boston, MA, et ah, were on brief for Computer Scientists,
+        ami-cus curiae.\\n   </attorneys><br><attorneys id=\\\"b866-25\\\">\\n    Dennis
+        S. Karjala, Tempe, AZ, and Peter S. Menell, Berkeley, CA, on brief, amici
+        curiae.\\n   </attorneys><br><attorneys id=\\\"b866-26\\\">\\n    Jeffrey
+        C. Cannon and Baker Keaton Sei-bel &amp; Cannon, Walnut Creek, CA, were on
+        brief for Computer Software Industry Ass\u2019n, amicus curiae.\\n   </attorneys><br><attorneys
+        id=\\\"b866-27\\\">\\n    Laureen E. McGurk, David A. Rabin, Bryan G. Harrison
+        and Morris Manning &amp; Martin, Atlanta, GA, were on brief for Chicago Computer
+        Soc., Diablo Users Group, Dan-bury Area Computer Soc., IBM AB Users Group,
+        Kentucky-Indiana Personal Computer Users Group, Long Island PC Users Group,
+        Napa Valley PC Users Group, Pacific Northwest PC Users Group, Palmetto Personal
+        Computer Club, Philadelphia Area Computer Soc., Inc., Phoenix IBM PC Users
+        Group, Pinellas IBM PC Users Group, Quad Cities Computer Soc., Quattro Pro
+        Users Group, Sacramento PC Users Group, San Francisco PC Users Group, Santa
+        Barbara PC Users Group, Twin Cities PC Users Group, and Warner Robbins Personal
+        Computer Ass\u2019n, amici curiae.\\n   </attorneys><br><attorneys id=\\\"b866-28\\\">\\n
+        \   Diane Marie O\u2019Malley and Hanson Bridgett Marcus Vlahos &amp; Rudy,
+        San Francisco,\\n    <span citation-index=\\\"1\\\" class=\\\"star-pagination\\\"
+        label=\\\"809\\\"> \\n     *809\\n     </span>\\n    CA, were on brief for
+        Software Entrepreneurs\u2019 Forum, amicus curiae.\\n   </attorneys><br><attorneys
+        id=\\\"b867-4\\\">\\n    Peter M.C. Choy, Mountain View, CA, was on brief
+        for American Committee for Interoperable Systems, amicus curiae.\\n   </attorneys><br><attorneys
+        id=\\\"b867-5\\\">\\n    Howard B. Abrams, Detroit, MI, Howard C. Anawalt,
+        Santa Clara, CA, Stephen R. Barnett, Berkeley, CA, Ralph S. Brown, Stephen
+        L. Carter, New Haven, CT, Amy B. Cohen, Longmeadow, MA, Paul J. Heald, Athens,
+        GA, Peter A. Jaszi, John A. Kidwell, Madison, WI, Edmund W. Kitch, Charlottes-ville,
+        VA, Roberta R. Kwall, Chicago, IL, David L. Lange, Durham, NC, Marshall Leafier,
+        Toledo, OH, Jessica D. Litman, Ann Arbor, MI, Charles R. McManis, St. Louis,
+        MO, L. Ray Patterson, Athens, GA, Jerome H. Reichman, David A. Rice, Chestnut
+        Hill, MA, Pamela Samuelson, Pittsburgh, PA, David J. Seipp, Boston, MA, David
+        E. Ship-ley, Lexington, KY, Lionel S. Sobel, Santa Monica, CA, Alfred C. Yen,
+        Newton, MA, and Diane L. Zimmerman, New York City, were on brief for Copyright
+        Law Professors, amicus curiae.\\n   </attorneys><br><attorneys id=\\\"b867-6\\\">\\n
+        \   Henry B. Gutman, Baker &amp; Botts, LLP, with whom Kerry L. Konrad, Joshua
+        H. Epstein, Kimberly A. Caldwell, O\u2019Sullivan Graev &amp; Karabell, New
+        York City, Thomas M. Lemberg, James C. Burling, and Hale and Dorr, Boston,
+        MA, were on brief for appellee.\\n   </attorneys><br><attorneys id=\\\"b867-7\\\">\\n
+        \   Morton David Goldberg, June M. Besek, David 0. Carson, Jesse M. Feder,
+        Schwab Goldberg Price &amp; Dannay, New York City, and Arthur R. Miller, Cambridge,
+        MA, were on brief for Apple Computer, Inc., Digital Equip. Corp., International
+        Business Machines Corp., and Xerox Corp., amici curiae.\\n   </attorneys><br><attorneys
+        id=\\\"b867-8\\\">\\n    Jon A. Baumgarten, Proskauer Rose Goetz &amp; Mendelsohn,\u2019
+        and Robert A. Gorman, New York City, were on brief for Adobe Systems, Inc.,
+        Apple Computer, Inc., Computer Associates Intern., Inc., Digital Equip. Corp.,
+        and International Business Machines Corp., amici curiae.\\n   </attorneys><br><attorneys
+        id=\\\"b867-9\\\">\\n    Herbert F. Schwartz, Vincent N. Palladi-no, Susan
+        Progoff, Fish &amp; Neave, New York City, William J. Cheeseman, and Foley
+        Hoag &amp; Eliot, Boston, MA, were on brief for Computer and Business Equip.
+        Mfrs. Ass\u2019n, ami-cus curiae.\\n   </attorneys><br><judges id=\\\"b867-10\\\">\\n
+        \   Before TORRUELLA, Chief Judge, BOUDIN and STAHL, Circuit Judges.\\n   </judges>\"}]}]"
+    headers:
+      Alt-Svc:
+      - h3=":443"; ma=86400
+      Connection:
+      - close
+      Content-Length:
+      - '915'
+      Content-Type:
+      - text/html
+      Date:
+      - Sun, 19 Jan 2025 06:10:05 GMT
+      Server:
+      - CloudFront
+      Via:
+      - 1.1 e9bcf307d6ed54e3e501e39bc538dcfc.cloudfront.net (CloudFront)
+      X-Amz-Cf-Id:
+      - HXTg_hC6e8bUnnDIg5AwVOjDe2FruknsqxTBlvtwjX90Nv2M_4_cUA==
+      X-Amz-Cf-Pop:
+      - DFW57-P1
+      X-Cache:
+      - Error from cloudfront
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.31.0
+      authorization:
+      - DUMMY
+    method: GET
+    uri: https://www.courtlistener.com/api/rest/v4/opinions/691310/
+  response:
+    body:
+      string: '{"resource_uri":"https://www.courtlistener.com/api/rest/v4/opinions/691310/","id":691310,"absolute_url":"/opinion/691310/lotus-development-corporation-v-borland-international-inc/","cluster_id":691310,"cluster":"https://www.courtlistener.com/api/rest/v4/clusters/691310/","author_id":null,"author":null,"joined_by":[],"date_created":"2012-04-16T21:46:56-07:00","date_modified":"2022-03-07T21:30:53.145326-08:00","author_str":"","per_curiam":false,"joined_by_str":"","type":"010combined","sha1":"de7f0f0eb0e6295ee56d6c68abceadb98217a421","page_count":null,"download_url":"http://bulk.resource.org/courts.gov/c/F3/49/49.F3d.807.93-2214.html","local_path":null,"plain_text":"","html":"<p
+        class=\"case_cite\">49 F.3d 807</p>\n    <p class=\"case_cite\">63 USLW 2565,
+        1995 Copr.L.Dec. P 27,367,<br>34 U.S.P.Q.2d 1014</p>\n    <p class=\"parties\">LOTUS
+        DEVELOPMENT CORPORATION, Plaintiff, Appellee,<br>v.<br>BORLAND INTERNATIONAL,
+        INC., Defendant, Appellant.</p>\n    <p class=\"docket\">No. 93-2214.</p>\n    <p
+        class=\"court\">United States Court of Appeals,<br>First Circuit.</p>\n    <p
+        class=\"date\">Heard Oct. 6, 1994.<br>Decided March 9, 1995.</p>\n    <div
+        class=\"prelims\">\n      <p class=\"indent\">Gary L. Reback, with whom Peter
+        N. Detkin, Michael Barclay, Isabella E. Fu, Wilson Sonsini Goodrich &amp;
+        Rosati, P.C., Palo Alto, CA, Peter E. Gelhaar, Katherine L. Parks, and Donnelly
+        Conroy &amp; Gelhaar, Boston, MA, were on brief for appellant.</p>\n      <p
+        class=\"indent\">Matthew P. Poppel, Boston, MA, et al., were on brief for
+        Computer Scientists, amicus curiae.</p>\n      <p class=\"indent\">Dennis
+        S. Karjala, Tempe, AZ, and Peter S. Menell, Berkeley, CA, on brief, amici
+        curiae.</p>\n      <p class=\"indent\">Jeffrey C. Cannon and Baker Keaton
+        Seibel &amp; Cannon, Walnut Creek, CA, were on brief for Computer Software
+        Industry Ass''n, amicus curiae.</p>\n      <p class=\"indent\">Laureen E.
+        McGurk, David A. Rabin, Bryan G. Harrison and Morris Manning &amp; Martin,
+        Atlanta, GA, were on brief for Chicago Computer Soc., Diablo Users Group,
+        Danbury Area Computer Soc., IBM AB Users Group, Kentucky-Indiana Personal
+        Computer Users Group, Long Island PC Users Group, Napa Valley PC Users Group,
+        Pacific Northwest PC Users Group, Palmetto Personal Computer Club, Philadelphia
+        Area Computer Soc., Inc., Phoenix IBM PC Users Group, Pinellas IBM PC Users
+        Group, Quad Cities Computer Soc., Quattro Pro Users Group, Sacramento PC Users
+        Group, San Francisco PC Users Group, Santa Barbara PC Users Group, Twin Cities
+        PC Users Group, and Warner Robbins Personal Computer Ass''n, amici curiae.</p>\n      <p
+        class=\"indent\">Diane Marie O''Malley and Hanson Bridgett Marcus Vlahos &amp;
+        Rudy, San Francisco, CA, were on brief for Software Entrepreneurs'' Forum,
+        amicus curiae.</p>\n      <p class=\"indent\">Peter M.C. Choy, Mountain View,
+        CA, was on brief for American Committee for Interoperable Systems, amicus
+        curiae.</p>\n      <p class=\"indent\">Howard B. Abrams, Detroit, MI, Howard
+        C. Anawalt, Santa Clara, CA, Stephen R. Barnett, Berkeley, CA, Ralph S. Brown,
+        Stephen L. Carter, New Haven, CT, Amy B. Cohen, Longmeadow, MA, Paul J. Heald,
+        Athens, GA, Peter A. Jaszi, John A. Kidwell, Madison, WI, Edmund W. Kitch,
+        Charlottesville, VA, Roberta R. Kwall, Chicago, IL, David L. Lange, Durham,
+        NC, Marshall Leaffer, Toledo, OH, Jessica D. Litman, Ann Arbor, MI, Charles
+        R. McManis, St. Louis, MO, L. Ray Patterson, Athens, GA, Jerome H. Reichman,
+        David A. Rice, Chestnut Hill, MA, Pamela Samuelson, Pittsburgh, PA, David
+        J. Seipp, Boston, MA, David E. Shipley, Lexington, KY, Lionel S. Sobel, Santa
+        Monica, CA, Alfred C. Yen, Newton, MA, and Diane L. Zimmerman, New York City,
+        were on brief for Copyright Law Professors, amicus curiae.</p>\n      <p class=\"indent\">Henry
+        B. Gutman, Baker &amp; Botts, LLP, with whom Kerry L. Konrad, Joshua H. Epstein,
+        Kimberly A. Caldwell, O''Sullivan Graev &amp; Karabell, New York City, Thomas
+        M. Lemberg, James C. Burling, and Hale and Dorr, Boston, MA, were on brief
+        for appellee.</p>\n      <p class=\"indent\">Morton David Goldberg, June M.
+        Besek, David O. Carson, Jesse M. Feder, Schwab Goldberg Price &amp; Dannay,
+        New York City, and Arthur R. Miller, Cambridge, MA, were on brief for Apple
+        Computer, Inc., Digital Equip.  Corp., International Business Machines Corp.,
+        and Xerox Corp., amici curiae.</p>\n      <p class=\"indent\">Jon A. Baumgarten,
+        Proskauer Rose Goetz &amp; Mendelsohn, and Robert A. Gorman, New York City,
+        were on brief for Adobe Systems, Inc., Apple Computer, Inc., Computer Associates
+        Intern., Inc., Digital Equip.  Corp., and International Business Machines
+        Corp., amici curiae.</p>\n      <p class=\"indent\">Herbert F. Schwartz, Vincent
+        N. Palladino, Susan Progoff, Fish &amp; Neave, New York City, William J. Cheeseman,
+        and Foley Hoag &amp; Eliot, Boston, MA, were on brief for Computer and Business
+        Equip.  Mfrs. Ass''n, amicus curiae.</p>\n      <p class=\"indent\">Before
+        TORRUELLA, Chief Judge, BOUDIN and STAHL, Circuit Judges.</p>\n      <p class=\"indent\">STAHL,
+        Circuit Judge.</p>\n    </div>\n    <div class=\"num\" id=\"p1\">\n      <span
+        class=\"num\">1</span>\n      <p class=\"indent\">This appeal requires us
+        to decide whether a computer menu command hierarchy is copyrightable subject
+        matter.  In particular, we must decide whether, as the district court held,
+        plaintiff-appellee Lotus Development Corporation''s copyright in Lotus 1-2-3,
+        a computer spreadsheet program, was infringed by defendant-appellant Borland
+        International, Inc., when Borland copied the Lotus 1-2-3 menu command hierarchy
+        into its Quattro and Quattro Pro computer spreadsheet programs.  See Lotus
+        Dev.  Corp. v. Borland Int''l, Inc., 788 F.Supp. 78 (D.Mass.1992) (\"Borland
+        I \");  Lotus Dev.  Corp. v. Borland Int''l, Inc., 799 F.Supp. 203 (D.Mass.1992)
+        (\"Borland II \");  Lotus Dev.  Corp. v. Borland Int''l, Inc., 831 F.Supp.
+        202 (D.Mass.1993) (\"Borland III \");  Lotus Dev.  Corp. v. Borland Int''l,
+        Inc., 831 F.Supp. 223 (D.Mass.1993) (\"Borland IV \").</p>\n    </div>\n    <p>I.</p>\n    <p>Background</p>\n    <div
+        class=\"num\" id=\"p2\">\n      <span class=\"num\">2</span>\n      <p class=\"indent\">Lotus
+        1-2-3 is a spreadsheet program that enables users to perform accounting functions
+        electronically on a computer.  Users manipulate and control the program via
+        a series of menu commands, such as \"Copy,\" \"Print,\" and \"Quit.\"   Users
+        choose commands either by highlighting them on the screen or by typing their
+        first letter.  In all, Lotus 1-2-3 has 469 commands arranged into more than
+        50 menus and submenus.</p>\n    </div>\n    <div class=\"num\" id=\"p3\">\n      <span
+        class=\"num\">3</span>\n      <p class=\"indent\">Lotus 1-2-3, like many computer
+        programs, allows users to write what are called \"macros.\"...In that case,
+        however, the plaintiff did not show that the defendant had copied the plaintiff''s
+        menus or keystrokes, so the court was not directly faced with whether the
+        menus or keystrokes constituted an unprotectable method of operation.  Id</p>\n      </div>\n    </div>\n    ","extracted_by_ocr":false,"ordering_key":null,"opinions_cited":["https://www.courtlistener.com/api/rest/v4/opinions/111432/","https://www.courtlistener.com/api/rest/v4/opinions/112568/","https://www.courtlistener.com/api/rest/v4/opinions/112936/","https://www.courtlistener.com/api/rest/v4/opinions/195601/","https://www.courtlistener.com/api/rest/v4/opinions/608143/","https://www.courtlistener.com/api/rest/v4/opinions/657247/","https://www.courtlistener.com/api/rest/v4/opinions/672323/","https://www.courtlistener.com/api/rest/v4/opinions/1379188/","https://www.courtlistener.com/api/rest/v4/opinions/1599920/","https://www.courtlistener.com/api/rest/v4/opinions/1801801/","https://www.courtlistener.com/api/rest/v4/opinions/1802132/","https://www.courtlistener.com/api/rest/v4/opinions/1952439/"]}'
+    headers:
+      Alt-Svc:
+      - h3=":443"; ma=86400
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json
+      Date:
+      - Mon, 03 Feb 2025 05:07:30 GMT
+      Transfer-Encoding:
+      - chunked
+      Via:
+      - 1.1 995d6494814d695ff2add6899f970080.cloudfront.net (CloudFront)
+      X-Amz-Cf-Id:
+      - q9LwhBdhvhB1RJvoI_pxQXELqzyKLG5bFO59uGwqkzDt5hCD4H6eDA==
+      X-Amz-Cf-Pop:
+      - DFW57-P1
+      X-Cache:
+      - Miss from cloudfront
+      allow:
+      - GET, PUT, PATCH, DELETE, HEAD, OPTIONS
+      content-encoding:
+      - gzip
+      content-security-policy:
+      - img-src 'self' https://storage.courtlistener.com/ https://portraits.free.law/
+        https://seals.free.law/ data:; connect-src 'self' https://storage.courtlistener.com/
+        https://hcaptcha.com/ https://*.hcaptcha.com/ https://plausible.io/; style-src
+        'self' 'report-sample' https://storage.courtlistener.com/ https://hcaptcha.com/
+        https://*.hcaptcha.com/ 'unsafe-inline'; script-src 'self' 'report-sample'
+        https://storage.courtlistener.com/ https://hcaptcha.com/ https://*.hcaptcha.com/
+        https://plausible.io/; media-src 'self' https://storage.courtlistener.com/
+        data:; frame-src 'self' https://storage.courtlistener.com/ https://hcaptcha.com/
+        https://*.hcaptcha.com/; font-src 'self' https://storage.courtlistener.com/
+        data:; default-src 'self' https://storage.courtlistener.com/; object-src 'self'
+        https://storage.courtlistener.com/; base-uri 'self'; upgrade-insecure-requests
+      cross-origin-opener-policy:
+      - same-origin
+      permissions-policy:
+      - browsing-topics=()
+      referrer-policy:
+      - same-origin
+      server:
+      - uvicorn
+      strict-transport-security:
+      - max-age=63072000; includeSubDomains; preload
+      vary:
+      - Accept, origin, Cookie
+      - accept-encoding
+      x-content-type-options:
+      - nosniff
+      x-frame-options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.31.0
+      authorization:
+      - DUMMY
+    method: GET
+    uri: https://www.courtlistener.com/api/rest/v4/opinions/9487893/
+  response:
+    body:
+      string: "{\"resource_uri\":\"https://www.courtlistener.com/api/rest/v4/opinions/9487893/\",\"id\":9487893,\"absolute_url\":\"/opinion/691310/lotus-development-corporation-v-borland-international-inc/\",\"cluster_id\":691310,\"cluster\":\"https://www.courtlistener.com/api/rest/v4/clusters/691310/\",\"author_id\":null,\"author\":null,\"joined_by\":[],\"date_created\":\"2023-08-05T05:29:24.049295-07:00\",\"date_modified\":\"2024-09-05T10:20:13.136588-07:00\",\"author_str\":\"Stahl\",\"per_curiam\":false,\"joined_by_str\":\"\",\"type\":\"020lead\",\"sha1\":\"\",\"page_count\":null,\"download_url\":null,\"local_path\":null,\"plain_text\":\"\",\"html\":\"\",\"html_lawbox\":\"\",\"html_columbia\":\"\",\"html_anon_2020\":\"\",\"xml_harvard\":\"<opinion
+        type=\\\"majority\\\">\\n<author id=\\\"b867-11\\\">STAHL, Circuit Judge.</author>\\n<p
+        id=\\\"b867-12\\\">This appeal requires us to decide whether a computer menu
+        command hierarchy is copyrightable subject matter. In particular...an unprotectable method
+        of operation. <em>Id.</em></p>\\n</footnote>\\n</opinion>\",\"html_with_citations\":\"\",\"extracted_by_ocr\":false,\"ordering_key\":1,\"opinions_cited\":[]}"
+    headers:
+      Alt-Svc:
+      - h3=":443"; ma=86400
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json
+      Date:
+      - Mon, 03 Feb 2025 05:07:30 GMT
+      Transfer-Encoding:
+      - chunked
+      Via:
+      - 1.1 b3ac893abff0a2c3dda216fe4cd9157a.cloudfront.net (CloudFront)
+      X-Amz-Cf-Id:
+      - lbcTFmk8M-Zv8Z6mj3CAKuimDiJiyWv2cfAbGo0ddrVgvC58fhGW1w==
+      X-Amz-Cf-Pop:
+      - DFW57-P1
+      X-Cache:
+      - Miss from cloudfront
+      allow:
+      - GET, PUT, PATCH, DELETE, HEAD, OPTIONS
+      content-encoding:
+      - gzip
+      content-security-policy:
+      - frame-src 'self' https://storage.courtlistener.com/ https://hcaptcha.com/
+        https://*.hcaptcha.com/; script-src 'self' 'report-sample' https://storage.courtlistener.com/
+        https://hcaptcha.com/ https://*.hcaptcha.com/ https://plausible.io/; media-src
+        'self' https://storage.courtlistener.com/ data:; base-uri 'self'; font-src
+        'self' https://storage.courtlistener.com/ data:; default-src 'self' https://storage.courtlistener.com/;
+        img-src 'self' https://storage.courtlistener.com/ https://portraits.free.law/
+        https://seals.free.law/ data:; upgrade-insecure-requests; connect-src 'self'
+        https://storage.courtlistener.com/ https://hcaptcha.com/ https://*.hcaptcha.com/
+        https://plausible.io/; style-src 'self' 'report-sample' https://storage.courtlistener.com/
+        https://hcaptcha.com/ https://*.hcaptcha.com/ 'unsafe-inline'; object-src
+        'self' https://storage.courtlistener.com/
+      cross-origin-opener-policy:
+      - same-origin
+      permissions-policy:
+      - browsing-topics=()
+      referrer-policy:
+      - same-origin
+      server:
+      - uvicorn
+      strict-transport-security:
+      - max-age=63072000; includeSubDomains; preload
+      vary:
+      - Accept, origin, Cookie
+      - accept-encoding
+      x-content-type-options:
+      - nosniff
+      x-frame-options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.31.0
+      authorization:
+      - DUMMY
+    method: GET
+    uri: https://www.courtlistener.com/api/rest/v4/opinions/9487894/
+  response:
+    body:
+      string: "{\"resource_uri\":\"https://www.courtlistener.com/api/rest/v4/opinions/9487894/\",\"id\":9487894,\"absolute_url\":\"/opinion/691310/lotus-development-corporation-v-borland-international-inc/\",\"cluster_id\":691310,\"cluster\":\"https://www.courtlistener.com/api/rest/v4/clusters/691310/\",\"author_id\":null,\"author\":null,\"joined_by\":[],\"date_created\":\"2023-08-05T05:29:24.058511-07:00\",\"date_modified\":\"2024-09-05T10:20:13.143656-07:00\",\"author_str\":\"Boudin\",\"per_curiam\":false,\"joined_by_str\":\"\",\"type\":\"030concurrence\",\"sha1\":\"\",\"page_count\":null,\"download_url\":null,\"local_path\":null,\"plain_text\":\"\",\"html\":\"\",\"html_lawbox\":\"\",\"html_columbia\":\"\",\"html_anon_2020\":\"\",\"xml_harvard\":\"<opinion
+        type=\\\"concurrence\\\">\\n<author id=\\\"b877-9\\\">BOUDIN, <em>Circuit
+        Judge,</em></author>\\n<p id=\\\"Alf\\\">concurring.</p>\\n<p id=\\\"b877-10\\\">The
+        importance of this ease, and a slightly different emphasis in my view of the
+        underlying problem, prompt me to add a few words to the majority\u2019s tightly
+        focused discussion...In all events, the choices are important ones of policy, not
+        linguistics, and they should be made with the underlying considerations in
+        view.</p>\\n</opinion>\",\"html_with_citations\":\"\",\"extracted_by_ocr\":false,\"ordering_key\":2,\"opinions_cited\":[]}"
+    headers:
+      Alt-Svc:
+      - h3=":443"; ma=86400
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json
+      Date:
+      - Mon, 03 Feb 2025 05:07:30 GMT
+      Transfer-Encoding:
+      - chunked
+      Via:
+      - 1.1 aa3674a12327640af71c59263be8ffc6.cloudfront.net (CloudFront)
+      X-Amz-Cf-Id:
+      - gXAjnkYYq6EVf2ghJAMX2yVbpEMhpWWxTMfzAflheRYXPv4VQIZ9Cw==
+      X-Amz-Cf-Pop:
+      - DFW57-P1
+      X-Cache:
+      - Miss from cloudfront
+      allow:
+      - GET, PUT, PATCH, DELETE, HEAD, OPTIONS
+      content-encoding:
+      - gzip
+      content-security-policy:
+      - 'font-src ''self'' https://storage.courtlistener.com/ data:; frame-src ''self''
+        https://storage.courtlistener.com/ https://hcaptcha.com/ https://*.hcaptcha.com/;
+        upgrade-insecure-requests; object-src ''self'' https://storage.courtlistener.com/;
+        connect-src ''self'' https://storage.courtlistener.com/ https://hcaptcha.com/
+        https://*.hcaptcha.com/ https://plausible.io/; script-src ''self'' ''report-sample''
+        https://storage.courtlistener.com/ https://hcaptcha.com/ https://*.hcaptcha.com/
+        https://plausible.io/; img-src ''self'' https://storage.courtlistener.com/
+        https://portraits.free.law/ https://seals.free.law/ data:; base-uri ''self'';
+        default-src ''self'' https://storage.courtlistener.com/; style-src ''self''
+        ''report-sample'' https://storage.courtlistener.com/ https://hcaptcha.com/
+        https://*.hcaptcha.com/ ''unsafe-inline''; media-src ''self'' https://storage.courtlistener.com/
+        data:'
+      cross-origin-opener-policy:
+      - same-origin
+      permissions-policy:
+      - browsing-topics=()
+      referrer-policy:
+      - same-origin
+      server:
+      - uvicorn
+      strict-transport-security:
+      - max-age=63072000; includeSubDomains; preload
+      vary:
+      - Accept, origin, Cookie
+      - accept-encoding
+      x-content-type-options:
+      - nosniff
+      x-frame-options:
+      - DENY
+    status:
+      code: 200
+      message: OK
+version: 1

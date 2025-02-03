@@ -3,8 +3,13 @@ import eyecite
 import pytest
 
 from justopinion import CAPClient
-from justopinion.decisions import Decision
-from justopinion.download import CaseAccessProjectAPIError, CourtListenerClient
+from justopinion.decisions import CitationResponse, Decision
+from justopinion.download import (
+    CaseAccessProjectAPIError,
+    CourtListenerClient,
+    OpinionCluster,
+    OpinionCL,
+)
 
 from authorityspoke import LegisClient, DecisionReading
 from authorityspoke.decisions import Decision
@@ -13,6 +18,18 @@ from authorityspoke.io import writers
 from tests.test_notebooks import CAP_API_KEY, COURTLISTENER_API_KEY
 
 load_dotenv()
+
+
+class TestCLDownload:
+    client = CourtListenerClient(api_token=COURTLISTENER_API_KEY)
+
+    @pytest.mark.vcr
+    def test_download_and_make_opinion(self):
+        response: CitationResponse = self.client.read_cite(cite="49 F.3d 807")
+        cluster: OpinionCluster = response.clusters[0]
+        opinion: OpinionCL = self.client.read_cluster_opinions(cluster)[0]
+        assert opinion.sha1 == "de7f0f0eb0e6295ee56d6c68abceadb98217a421"
+        assert "BORLAND INTERNATIONAL, INC." in opinion.html
 
 
 class TestDownload:
