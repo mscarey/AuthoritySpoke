@@ -257,40 +257,42 @@
             "procedure": {
                 "outputs": [
                     {
-                        "generic": false,
-                        "absent": true,
-                        "predicate": {
-                            "content": "${the_lotus_menu_command_hierarchy} was copyrightable",
-                            "truth": true
-                        },
-                        "terms": [
-                            {
-                                "generic": true,
-                                "name": "the Lotus menu command hierarchy",
-                                "plural": false
-                            }
-                        ],
-                        "name": "absent the Lotus menu command hierarchy was copyrightable",
-                        "standard_of_proof": null
+                        "absent": {
+                            "generic": false,
+                            "predicate": {
+                                "content": "${the_lotus_menu_command_hierarchy} was copyrightable",
+                                "truth": true
+                            },
+                            "terms": [
+                                {
+                                    "generic": true,
+                                    "name": "the Lotus menu command hierarchy",
+                                    "plural": false
+                                }
+                            ],
+                            "name": "absent the Lotus menu command hierarchy was copyrightable",
+                            "standard_of_proof": null
+                        }
                     }
                 ],
                 "inputs": [
                     {
-                        "generic": false,
-                        "absent": true,
-                        "predicate": {
-                            "content": "${the_lotus_menu_command_hierarchy} was an original work",
-                            "truth": true
-                        },
-                        "terms": [
-                            {
-                                "generic": true,
-                                "name": "the Lotus menu command hierarchy",
-                                "plural": false
-                            }
-                        ],
-                        "name": "absent the Lotus menu command hierarchy was an original work",
-                        "standard_of_proof": null
+                        "absent": {
+                            "generic": false,
+                            "predicate": {
+                                "content": "${the_lotus_menu_command_hierarchy} was an original work",
+                                "truth": true
+                            },
+                            "terms": [
+                                {
+                                    "generic": true,
+                                    "name": "the Lotus menu command hierarchy",
+                                    "plural": false
+                                }
+                            ],
+                            "name": "absent the Lotus menu command hierarchy was an original work",
+                            "standard_of_proof": null
+                        }
                     }
                 ],
                 "despite": [],
@@ -539,21 +541,22 @@
                         "name": "evidence of Lotus's copyright registration"
                     },
                     {
-                        "generic": false,
-                        "absent": true,
-                        "predicate": {
-                            "content": "${the_lotus_menu_command_hierarchy} was copyrightable",
-                            "truth": false
-                        },
-                        "terms": [
-                            {
-                                "generic": true,
-                                "name": "the Lotus menu command hierarchy",
-                                "plural": false
-                            }
-                        ],
-                        "name": "absent false the Lotus menu command hierarchy was copyrightable",
-                        "standard_of_proof": null
+                        "absent": {
+                            "generic": false,
+                            "predicate": {
+                                "content": "${the_lotus_menu_command_hierarchy} was copyrightable",
+                                "truth": false
+                            },
+                            "terms": [
+                                {
+                                    "generic": true,
+                                    "name": "the Lotus menu command hierarchy",
+                                    "plural": false
+                                }
+                            ],
+                            "name": "absent false the Lotus menu command hierarchy was copyrightable",
+                            "standard_of_proof": null
+                        }
                     }
                 ],
                 "despite": [],

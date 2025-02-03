@@ -4,6 +4,7 @@ Converting simple structured data from XML or JSON into authorityspoke objects.
 These functions will usually be called by functions from the io.loaders module
 after they import some data from a file.
 """
+
 from typing import Any, NamedTuple
 from typing import Dict, List, Optional, Tuple, Sequence, Union
 
@@ -133,7 +134,6 @@ def expand_names(
     result = []
 
     for name in record:
-
         result.append(expand_factor(name, factor_index=factor_index))
 
     return result
@@ -178,7 +178,6 @@ def walk_tree_and_expand(
         obj = [mentioned.get_if_present(item) for item in obj]
         return [walk_tree_and_expand(item, mentioned, ignore) for item in obj]
     if isinstance(obj, Dict):
-
         obj_dict: Dict = {}
         for key, value in obj.items():
             if key not in ignore:

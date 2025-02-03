@@ -779,37 +779,38 @@
             "procedure": {
                 "outputs": [
                     {
-                        "generic": false,
-                        "absent": true,
-                        "exhibit": {
-                            "generic": true,
-                            "offered_by": {
-                                "generic": true,
-                                "name": "prosecutor",
-                                "plural": false
-                            },
-                            "form": null,
-                            "statement": null,
-                            "statement_attribution": null,
-                            "name": "proof of Wattenburg's guilt"
-                        },
-                        "to_effect": {
+                        "absent": {
                             "generic": false,
-                            "predicate": {
-                                "content": "${wattenburg} committed a crime",
-                                "truth": true
-                            },
-                            "terms": [
-                                {
+                            "exhibit": {
+                                "generic": true,
+                                "offered_by": {
                                     "generic": true,
-                                    "name": "Wattenburg",
+                                    "name": "prosecutor",
                                     "plural": false
-                                }
-                            ],
-                            "name": "Wattenburg committed a crime",
-                            "standard_of_proof": null
-                        },
-                        "name": "absent evidence of proof of Wattenburg's guilt to the effect that Wattenburg committed a crime"
+                                },
+                                "form": null,
+                                "statement": null,
+                                "statement_attribution": null,
+                                "name": "proof of Wattenburg's guilt"
+                            },
+                            "to_effect": {
+                                "generic": false,
+                                "predicate": {
+                                    "content": "${wattenburg} committed a crime",
+                                    "truth": true
+                                },
+                                "terms": [
+                                    {
+                                        "generic": true,
+                                        "name": "Wattenburg",
+                                        "plural": false
+                                    }
+                                ],
+                                "name": "Wattenburg committed a crime",
+                                "standard_of_proof": null
+                            },
+                            "name": "absent evidence of proof of Wattenburg's guilt to the effect that Wattenburg committed a crime"
+                        }
                     }
                 ],
                 "inputs": [

@@ -1804,21 +1804,22 @@
                         "standard_of_proof": null
                     },
                     {
-                        "generic": false,
-                        "absent": true,
-                        "predicate": {
-                            "content": "${the_beardcoin_transaction} was a licensed beardcoin repurchase",
-                            "truth": true
-                        },
-                        "terms": [
-                            {
-                                "generic": true,
-                                "name": "the beardcoin transaction",
-                                "plural": false
-                            }
-                        ],
-                        "name": "absent the beardcoin transaction was a licensed beardcoin repurchase",
-                        "standard_of_proof": null
+                        "absent": {
+                            "generic": false,
+                            "predicate": {
+                                "content": "${the_beardcoin_transaction} was a licensed beardcoin repurchase",
+                                "truth": true
+                            },
+                            "terms": [
+                                {
+                                    "generic": true,
+                                    "name": "the beardcoin transaction",
+                                    "plural": false
+                                }
+                            ],
+                            "name": "absent the beardcoin transaction was a licensed beardcoin repurchase",
+                            "standard_of_proof": null
+                        }
                     },
                     {
                         "generic": false,

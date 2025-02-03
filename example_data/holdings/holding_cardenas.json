@@ -358,20 +358,43 @@
             "procedure": {
                 "outputs": [
                     {
-                        "generic": false,
-                        "absent": true,
-                        "exhibit": {
+                        "absent": {
                             "generic": false,
-                            "offered_by": {
-                                "generic": true,
-                                "name": "The People of California",
-                                "plural": false
+                            "exhibit": {
+                                "generic": false,
+                                "offered_by": {
+                                    "generic": true,
+                                    "name": "The People of California",
+                                    "plural": false
+                                },
+                                "form": "testimony",
+                                "statement": {
+                                    "generic": false,
+                                    "predicate": {
+                                        "content": "${the_defendant} was addicted to heroin",
+                                        "truth": true
+                                    },
+                                    "terms": [
+                                        {
+                                            "generic": true,
+                                            "name": "the defendant",
+                                            "plural": false
+                                        }
+                                    ],
+                                    "name": "fact that the defendant was addicted to heroin",
+                                    "standard_of_proof": null
+                                },
+                                "statement_attribution": {
+                                    "generic": true,
+                                    "name": "parole officer",
+                                    "plural": false
+                                },
+                                "name": "officer's testimony that the defendant was addicted to heroin"
                             },
-                            "form": "testimony",
-                            "statement": {
+                            "to_effect": {
                                 "generic": false,
                                 "predicate": {
-                                    "content": "${the_defendant} was addicted to heroin",
+                                    "content": "${the_defendant} committed an attempted robbery",
                                     "truth": true
                                 },
                                 "terms": [
@@ -381,33 +404,11 @@
                                         "plural": false
                                     }
                                 ],
-                                "name": "fact that the defendant was addicted to heroin",
+                                "name": "fact that the defendant committed an attempted robbery",
                                 "standard_of_proof": null
                             },
-                            "statement_attribution": {
-                                "generic": true,
-                                "name": "parole officer",
-                                "plural": false
-                            },
-                            "name": "officer's testimony that the defendant was addicted to heroin"
-                        },
-                        "to_effect": {
-                            "generic": false,
-                            "predicate": {
-                                "content": "${the_defendant} committed an attempted robbery",
-                                "truth": true
-                            },
-                            "terms": [
-                                {
-                                    "generic": true,
-                                    "name": "the defendant",
-                                    "plural": false
-                                }
-                            ],
-                            "name": "fact that the defendant committed an attempted robbery",
-                            "standard_of_proof": null
-                        },
-                        "name": "evidence of officer's testimony that the defendant was addicted to heroin"
+                            "name": "evidence of officer's testimony that the defendant was addicted to heroin"
+                        }
                     }
                 ],
                 "inputs": [

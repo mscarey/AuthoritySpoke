@@ -3949,38 +3949,40 @@
                         "standard_of_proof": null
                     },
                     {
-                        "generic": false,
-                        "absent": true,
-                        "predicate": {
-                            "content": "${the_java_api} was essentially the only way to express the idea that it embodied",
-                            "truth": true
-                        },
-                        "terms": [
-                            {
-                                "generic": true,
-                                "name": "the Java API",
-                                "plural": false
-                            }
-                        ],
-                        "name": "absent essentially the only way",
-                        "standard_of_proof": null
+                        "absent": {
+                            "generic": false,
+                            "predicate": {
+                                "content": "${the_java_api} was essentially the only way to express the idea that it embodied",
+                                "truth": true
+                            },
+                            "terms": [
+                                {
+                                    "generic": true,
+                                    "name": "the Java API",
+                                    "plural": false
+                                }
+                            ],
+                            "name": "absent essentially the only way",
+                            "standard_of_proof": null
+                        }
                     },
                     {
-                        "generic": false,
-                        "absent": true,
-                        "predicate": {
-                            "content": "${the_java_api} was a scene a faire",
-                            "truth": true
-                        },
-                        "terms": [
-                            {
-                                "generic": true,
-                                "name": "the Java API",
-                                "plural": false
-                            }
-                        ],
-                        "name": "absent scene a faire",
-                        "standard_of_proof": null
+                        "absent": {
+                            "generic": false,
+                            "predicate": {
+                                "content": "${the_java_api} was a scene a faire",
+                                "truth": true
+                            },
+                            "terms": [
+                                {
+                                    "generic": true,
+                                    "name": "the Java API",
+                                    "plural": false
+                                }
+                            ],
+                            "name": "absent scene a faire",
+                            "standard_of_proof": null
+                        }
                     }
                 ],
                 "despite": [],
