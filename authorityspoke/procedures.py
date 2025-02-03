@@ -330,7 +330,7 @@ class Procedure(Comparable, BaseModel):
         }
         return generic_dict
 
-    def add_factor(self, incoming: Factor) -> None:
+    def add_factor(self, incoming: Factor | AbsenceOf) -> None:
         """
         Add an input :class:`.Factor`.
 

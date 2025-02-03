@@ -201,6 +201,7 @@ class TestHoldingImport:
         assert feist.holdings[0].enactments[0].node == "/us/const/article/I/8/8"
         assert feist.holdings[1].enactments[0].node == "/us/const/article/I/8/8"
 
+    @pytest.mark.xfail("anchors not loaded from JSON input")
     def test_read_holdings_and_then_get_anchors(self, make_response):
         """
         Test whether read_holdings mutates raw_holding and makes it

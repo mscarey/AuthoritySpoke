@@ -58,7 +58,11 @@
                             "end_date": null,
                             "first_published": null,
                             "earliest_in_db": null,
-                            "anchors": [],
+                            "anchors": [
+                                {
+                                    "quotes": "qualify for copyright protection. |17 U.S.C. § 102(a)|."
+                                }
+                            ],
                             "citations": [],
                             "name": "/us/usc/t17/s102/a",
                             "children": [

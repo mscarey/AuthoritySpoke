@@ -25,7 +25,7 @@ from nettlesome.terms import (
     Term,
     TermSequence,
 )
-from nettlesome.factors import Factor
+from nettlesome.factors import AbsenceOf, Factor
 from nettlesome.formatting import indented
 from authorityspoke.procedures import Procedure, RawProcedure
 
@@ -326,7 +326,7 @@ class Rule(Comparable, BaseModel):
         result.set_enactments_despite(new_enactments)
         return result
 
-    def add_factor(self, incoming: Factor) -> None:
+    def add_factor(self, incoming: Factor | AbsenceOf) -> None:
         """
         Add a :class:`.Factor` to self.inputs.
 
@@ -336,7 +336,7 @@ class Rule(Comparable, BaseModel):
         self.procedure.add_factor(incoming)
         return None
 
-    def with_factor(self, incoming: Factor) -> Optional[Rule]:
+    def with_factor(self, incoming: Factor | AbsenceOf) -> Optional[Rule]:
         """
         Make new version of ``self`` with an added input :class:`.Factor`.
 

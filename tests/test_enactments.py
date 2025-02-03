@@ -323,6 +323,6 @@ class TestTextSelection:
         """
         client = FakeClient.from_file("usc.json")
         holdings = loaders.read_anchored_holdings_from_file(
-            "holding_feist.json", client=client
+            "holding_feist.yaml", client=client
         )
         assert len(holdings.holdings[6].anchors.quotes) == 2
