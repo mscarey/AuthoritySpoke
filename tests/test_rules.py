@@ -1012,7 +1012,7 @@ class TestStatuteRules:
     def test_greater_than_implies_equal(self, beard_response, make_beard_rule):
         client = FakeClient(responses=beard_response)
         beard_dictionary = loaders.load_holdings("beard_rules.json")
-        beard_dictionary[0]["inputs"][1]["content"] = (
+        beard_dictionary[0]["rule"]["procedure"]["inputs"][1]["content"] = (
             "the length of the suspected beard was = 8 millimetres"
         )
         longer_hair_rule = readers.read_holdings([beard_dictionary[0]], client=client)
@@ -1042,11 +1042,11 @@ class TestStatuteRules:
     ):
         client = FakeClient(responses=beard_response)
         beard_dictionary = loaders.load_holdings("beard_rules.json")
-        beard_dictionary[1]["inputs"][1]["content"] = (
+        beard_dictionary[1]["rule"]["procedure"]["inputs"][1]["content"] = (
             "the length of the suspected beard was >= 12 inches"
         )
-        beard_dictionary[1]["outputs"][0]["truth"] = False
-        beard_dictionary[1]["mandatory"] = True
+        beard_dictionary[1]["rule"]["procedure"]["outputs"][0]["truth"] = False
+        beard_dictionary[1]["rule"]["mandatory"] = True
         long_hair_is_not_a_beard = readers.read_holdings(
             [beard_dictionary[1]], client=client
         )

@@ -87,7 +87,7 @@ Now we can have AuthoritySpoke read this JSON and convert it to a list
 of :class:`~authorityspoke.rules.Rule` objects. In particular, we’ll look at the first two Rules, which
 describe two ways that an object can be defined to be a “beard”.
 
-    >>> beard_holdings = loaders.read_holdings_from_file("beard_rules.yaml", client=legis_client)
+    >>> beard_holdings = loaders.read_holdings_from_file("beard_rules.json", client=legis_client)
     >>> print(beard_holdings[0])
     the Holding to ACCEPT
       the Rule that the court MAY ALWAYS impose the
@@ -138,7 +138,7 @@ contradict one another.
 For instance, if we create a new Rule that’s identical to the first Rule
 in the Beard Tax Act except that it applies to facial hair that’s
 exactly 8 millimeters long instead of “no shorter than 5 millimetres”,
-we can determine that the original “chin rule” 
+we can determine that the original “chin rule”
 :meth:`~authorityspoke.rules.Rule.implies` our new :class:`~authorityspoke.rules.Rule`\.
 
     >>> from authorityspoke.io import readers

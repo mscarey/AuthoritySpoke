@@ -77,8 +77,8 @@ the :func:`~authorityspoke.io.loaders.read_holdings_from_file` function.
 
     >>> from authorityspoke.io.loaders import read_holdings_from_file
 
-    >>> oracle_holdings = read_holdings_from_file("holding_oracle.yaml", client=legis_client)
-    >>> lotus_holdings = read_holdings_from_file("holding_lotus.yaml", client=legis_client)
+    >>> oracle_holdings = read_holdings_from_file("holding_oracle.json", client=legis_client)
+    >>> lotus_holdings = read_holdings_from_file("holding_lotus.json", client=legis_client)
 
 If we want to open one of the input YAML files in a text editor
 for comparison, they can be found in the folder
@@ -251,7 +251,7 @@ shows how to generate the schema as a Python dict and then view just the
     >>> from authorityspoke.holdings import Holding
     >>> schema = Holding.model_json_schema()
     >>> schema["properties"]
-    {'generic': {'default': False, 'title': 'Generic', 'type': 'boolean'}, 'absent': {'default': False, 'title': 'Absent', 'type': 'boolean'}, 'rule': {'$ref': '#/$defs/Rule'}, 'rule_valid': {'default': True, 'title': 'Rule Valid', 'type': 'boolean'}, 'decided': {'default': True, 'title': 'Decided', 'type': 'boolean'}, 'exclusive': {'default': False, 'title': 'Exclusive', 'type': 'boolean'}}
+    {'generic': {'default': False, 'title': 'Generic', 'type': 'boolean'}, 'rule': {'$ref': '#/$defs/Rule'}, 'rule_valid': {'default': True, 'title': 'Rule Valid', 'type': 'boolean'}, 'decided': {'default': True, 'title': 'Decided', 'type': 'boolean'}, 'exclusive': {'default': False, 'title': 'Exclusive', 'type': 'boolean'}}
 
 The schema can also be exported as JSON using
 the :meth:`authorityspoke.holdings.Holding.schema_json` method.
