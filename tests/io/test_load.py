@@ -23,12 +23,9 @@ class TestHoldingLoad:
         path = filepaths.make_filepath(
             filename="holding_feist.json", directory=directory
         )
-        raw_holdings = loaders.load_holdings(filepath=path)["holdings"]
+        raw_holdings = loaders.load_holdings(filepath=path)
         name = "false Rural's telephone directory was copyrightable"
-        assert (
-            raw_holdings[0]["holding"]["rule"]["procedure"]["outputs"][0]["name"]
-            == name
-        )
+        assert raw_holdings[0]["rule"]["procedure"]["outputs"][0]["name"] == name
 
     def test_get_yaml_filepath(self):
         directory = filepaths.get_directory_path("holdings")
@@ -36,7 +33,10 @@ class TestHoldingLoad:
             filename="holding_feist.json", directory=directory
         )
         raw_holdings = loaders.load_holdings(filepath=path)
-        assert raw_holdings[0]["outputs"]["type"] == "fact"
+        assert (
+            raw_holdings[0]["rule"]["procedure"]["outputs"][0]["name"]
+            == "false Rural's telephone directory was copyrightable"
+        )
 
     @pytest.mark.vcr
     def test_load_and_read_yaml(self):
