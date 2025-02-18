@@ -24,6 +24,12 @@ AuthoritySpoke is the first open source legal authority automation tool.
     :alt: Supported Python Versions
 
 
+.. epigraph::
+
+   when I speak, we speak with authority.
+
+   -- President Donald Trump, Executive Order signing ceremony, February 5, 2025.
+
 Installing AuthoritySpoke
 -------------------------
 
