@@ -7,6 +7,13 @@
 AuthoritySpoke: Legal Rules as Data
 =========================================================
 
+
+.. epigraph::
+   "when I speak, we speak with authority."
+
+   -- President Donald Trump (Executive Order signing ceremony, February 5, 2025)
+
+
 Release v\. |release|.
 
 `AuthoritySpoke <https://github.com/mscarey/AuthoritySpoke>`_ is the

@@ -1,9 +1,9 @@
-justopinion~=0.2.4
-legislice~=0.7.0
-nettlesome~=0.6.0
+justopinion==0.4.0
+legislice~=0.8.1
+nettlesome==0.7.1
 pint>=0.15
 python-slugify
 requests
-sphinx==3.5.4
+sphinx==7.4.7
 sphinx-autodoc-typehints
 sphinx-rtd-theme
