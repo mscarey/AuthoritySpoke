@@ -1,12 +1,10 @@
-import datetime
 import os
 
 from dotenv import load_dotenv
 from legislice.download import Client
-from legislice.enactments import EnactmentPassage
 import pytest
 
-from authorityspoke.io import name_index, readers
+from authorityspoke.io import readers
 from authorityspoke.io.loaders import load_holdings
 
 

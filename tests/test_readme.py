@@ -1,12 +1,11 @@
 """Tests for any commands in readme.md."""
 
 from authorityspoke.decisions import DecisionReading
-import os
 from dotenv import load_dotenv
 
 load_dotenv()
 
-from authorityspoke import CAPClient, Decision, LegisClient
+from authorityspoke import Decision
 from authorityspoke.io.fake_enactments import FakeClient
 
 from authorityspoke.io.loaders import (
@@ -14,7 +13,6 @@ from authorityspoke.io.loaders import (
     read_holdings_from_file,
     read_anchored_holdings_from_file,
 )
-from authorityspoke.io.loaders import read_holdings_from_file
 
 
 class TestReadme:

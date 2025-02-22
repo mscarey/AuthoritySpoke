@@ -24,16 +24,10 @@ from nettlesome.terms import (
     TermSequence,
 )
 from nettlesome.factors import Factor
-from nettlesome.groups import FactorGroup
+from authorityspoke.groups import FactorGroup
 from nettlesome.formatting import indented
 
 from authorityspoke.facts import (
-    Fact,
-    Allegation,
-    Pleading,
-    Exhibit,
-    Evidence,
-    AbsenceOfFactor,
     FactorOrAbsence,
 )
 from authorityspoke.facts import RawFactor

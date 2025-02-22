@@ -12,7 +12,6 @@ from typing import Any, ClassVar, Dict, Iterator
 from typing import Optional, Sequence, Tuple, Union
 
 from pydantic import field_validator, BaseModel, ValidationError
-from pydantic.class_validators import validator
 
 from legislice.enactments import Enactment, EnactmentPassage
 from legislice.groups import EnactmentGroup
@@ -28,6 +27,7 @@ from nettlesome.terms import (
 from nettlesome.factors import Factor
 from nettlesome.formatting import indented
 from authorityspoke.procedures import Procedure, RawProcedure
+from authorityspoke.facts import AbsenceOfFactor
 
 RawRule = Dict[str, Union[RawProcedure, Sequence[RawEnactment], str, bool]]
 
@@ -153,7 +153,7 @@ class Rule(Comparable, BaseModel):
     ) -> Optional[Rule]:
         """Create new Rule by using the outputs of self as inputs of other."""
         if not isinstance(other, Rule):
-            if isinstance(other, Factor):
+            if isinstance(other, (Factor, AbsenceOfFactor)):
                 return self.with_factor(other)
             if isinstance(other, (Enactment, EnactmentPassage)):
                 return self.with_enactment(other)

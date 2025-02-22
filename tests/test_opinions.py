@@ -16,8 +16,6 @@ from authorityspoke.io import loaders, readers
 from authorityspoke.io.fake_enactments import FakeClient
 from authorityspoke.opinions import (
     AnchoredHoldings,
-    Opinion,
-    FactorIndex,
     OpinionReading,
     TermWithAnchors,
 )

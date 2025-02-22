@@ -1,15 +1,13 @@
 from copy import deepcopy
 import logging
 import os
-from typing import Type
 
 
 from dotenv import load_dotenv
 from legislice.download import Client
 from legislice.groups import EnactmentGroup
-from nettlesome.terms import ContextRegister, means
+from nettlesome.terms import ContextRegister
 from nettlesome.entities import Entity
-from nettlesome.terms import Explanation
 from nettlesome.groups import FactorGroup
 from nettlesome.predicates import Predicate
 from nettlesome.quantities import Comparison, Q_

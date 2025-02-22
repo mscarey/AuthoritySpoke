@@ -14,7 +14,7 @@ from typing import Dict, Iterator, List
 from typing import Optional, Sequence, Tuple, Union
 
 from anchorpoint.textselectors import TextQuoteSelector, TextPositionSelector
-from justopinion.decisions import Decision, CaseBody, CaseData, Opinion, CAPCitation
+from justopinion.decisions import Decision, CaseBody, CaseData, Opinion
 
 from nettlesome.terms import Comparable, ContextRegister, Explanation
 from nettlesome.factors import Factor

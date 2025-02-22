@@ -3,9 +3,7 @@ import os
 import pytest
 
 from authorityspoke import LegisClient
-from authorityspoke.opinions import AnchoredHoldings
-from authorityspoke.decisions import DecisionReading
-from authorityspoke.io import filepaths, loaders, readers
+from authorityspoke.io import filepaths, loaders
 from authorityspoke.io.fake_enactments import FakeClient
 from authorityspoke.io.loaders import (
     read_holdings_from_file,

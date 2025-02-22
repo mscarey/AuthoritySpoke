@@ -61,10 +61,6 @@ class Fact(Factor, BaseModel):
         a descriptor for the degree of certainty associated
         with the assertion in the ``predicate``.
 
-    :param absent:
-        whether the absence, rather than the presence, of the legal
-        fact described above is being asserted.
-
     :param generic:
         whether this object could be replaced by another generic
         object of the same class without changing the truth of the
@@ -560,7 +556,7 @@ class Evidence(Factor, BaseModel):
     @model_validator(mode="before")
     @classmethod
     def check_type_field(cls, values):
-        """Fail valitation if the input has a "type" field without the class name."""
+        """Fail validation if the input has a "type" field without the class name."""
         type_str = values.pop("type", "")
         if type_str and type_str.lower() != "evidence":
             raise ValueError(f"type {type_str} was passed to Evidence model")
@@ -662,7 +658,7 @@ class Allegation(Factor, BaseModel):
         return super().__str__().format(string).replace("Allegation", "allegation")
 
 
-class AbsenceOfFactor(Comparable, BaseModel):
+class AbsenceOfFactor(Term, BaseModel):
     generic: bool = False
     absent: Fact | Evidence | Exhibit | Pleading | Allegation
     context_factor_names: ClassVar[Tuple[str, ...]] = ("absent",)
@@ -714,4 +710,4 @@ class AbsenceOfFactor(Comparable, BaseModel):
                     )
 
 
-FactorOrAbsence = Union[Fact, Evidence, Exhibit, Pleading, Allegation, AbsenceOfFactor]
+FactorOrAbsence = Union[Fact, AbsenceOfFactor, Exhibit, Pleading, Allegation, Evidence]

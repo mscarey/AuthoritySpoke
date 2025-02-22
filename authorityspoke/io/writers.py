@@ -1,9 +1,8 @@
 """Functions for saving objects to file after they have been JSON serialized."""
 
-import json
 import pathlib
 
-from typing import Dict, List, Optional, Union
+from typing import Optional, Union
 
 from justopinion.decisions import Decision
 

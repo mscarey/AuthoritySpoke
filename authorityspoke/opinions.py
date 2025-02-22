@@ -13,7 +13,6 @@ from anchorpoint.textselectors import (
     TextPositionSet,
     TextPositionSelector,
 )
-from justopinion import Opinion
 from legislice.enactments import EnactmentPassage
 from nettlesome.terms import Comparable, ContextRegister, Explanation, Term
 from nettlesome.factors import Factor

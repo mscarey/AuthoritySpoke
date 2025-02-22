@@ -2,7 +2,6 @@ from authorityspoke.opinions import OpinionReading
 from copy import deepcopy
 from datetime import date
 import os
-from typing import Type
 from legislice.enactments import Enactment
 
 import pytest

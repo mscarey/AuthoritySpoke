@@ -12,8 +12,7 @@ import yaml
 
 from legislice.download import Client
 
-from authorityspoke.decisions import Decision, DecisionReading, RawDecision
-from authorityspoke.facts import RawFactor
+from authorityspoke.decisions import DecisionReading, RawDecision
 from authorityspoke.holdings import Holding, RawHolding
 from authorityspoke.opinions import AnchoredHoldings
 

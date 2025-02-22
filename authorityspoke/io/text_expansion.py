@@ -1,6 +1,5 @@
 """For expanding text in input JSON into a format Marshmallow can load."""
 
-from nettlesome.predicates import StatementTemplate
 from re import findall
 from string import Template
 from typing import Any, Dict, List, Optional, Sequence, Tuple, Union

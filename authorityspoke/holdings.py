@@ -30,9 +30,9 @@ from nettlesome.terms import (
 )
 from nettlesome.factors import Factor
 from nettlesome.formatting import indented, wrapped
-from nettlesome.groups import FactorGroup
+from authorityspoke.groups import FactorGroup
 
-from pydantic import field_validator, model_validator, BaseModel, validator
+from pydantic import field_validator, model_validator, BaseModel
 
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule, RawRule

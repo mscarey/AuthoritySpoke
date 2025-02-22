@@ -1,4 +1,4 @@
-from nettlesome.terms import ContextRegister, means, Explanation
+from nettlesome.terms import ContextRegister, means
 from nettlesome.entities import Entity
 from nettlesome import Predicate
 

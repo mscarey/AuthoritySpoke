@@ -1,16 +1,15 @@
 from dotenv import load_dotenv
-import eyecite
 import pytest
 
 from justopinion import CAPClient
 from justopinion.decisions import Decision
-from justopinion.download import CaseAccessProjectAPIError, CourtListenerClient
+from justopinion.download import CaseAccessProjectAPIError
 
-from authorityspoke import LegisClient, DecisionReading
+from authorityspoke import DecisionReading
 from authorityspoke.decisions import Decision
 from authorityspoke.io.loaders import load_decision
 from authorityspoke.io import writers
-from tests.test_notebooks import CAP_API_KEY, COURTLISTENER_API_KEY
+from tests.test_notebooks import CAP_API_KEY
 
 load_dotenv()
 

@@ -1,7 +1,7 @@
 import datetime
 import json
 import os
-from typing import Any, Dict, List, Text, Tuple
+from typing import Dict, List, Tuple
 
 from anchorpoint.textselectors import TextQuoteSelector
 from dotenv import load_dotenv
@@ -20,7 +20,7 @@ from authorityspoke.decisions import DecisionReading
 from authorityspoke.facts import Allegation, Fact, build_fact, Evidence, RawFactor
 from authorityspoke.facts import Exhibit, Pleading
 from authorityspoke.holdings import Holding, RawHolding
-from authorityspoke.opinions import Opinion, OpinionReading, AnchoredHoldings
+from authorityspoke.opinions import OpinionReading
 from authorityspoke.rules import Procedure, Rule
 
 from authorityspoke.io import loaders, readers
@@ -233,7 +233,6 @@ def make_entity() -> Dict[str, Entity]:
 
 @pytest.fixture(scope="class")
 def make_predicate() -> Dict[str, Predicate]:
-
     return {
         "p1": Predicate(content="$place was a motel"),
         "p1_again": Predicate(content="$place was a motel"),

@@ -1,6 +1,6 @@
 from authorityspoke.procedures import Procedure
 
-from authorityspoke.io import text_expansion, readers
+from authorityspoke.io import readers
 
 
 class TestProcedureDump:

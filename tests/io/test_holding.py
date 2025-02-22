@@ -1,4 +1,3 @@
-from collections import OrderedDict
 from datetime import date
 from decimal import Decimal
 
@@ -8,7 +7,6 @@ import pytest
 
 from anchorpoint.textselectors import TextQuoteSelector
 from dotenv import load_dotenv
-from legislice import Enactment
 from legislice.download import Client
 from nettlesome.terms import ContextRegister
 from nettlesome.entities import Entity
@@ -16,10 +14,9 @@ from nettlesome.predicates import Predicate
 
 from authorityspoke.decisions import Decision, DecisionReading
 from authorityspoke.facts import Fact
-from authorityspoke.holdings import Holding, HoldingGroup
+from authorityspoke.holdings import Holding
 from authorityspoke.opinions import (
     HoldingWithAnchors,
-    Opinion,
     OpinionReading,
     AnchoredHoldings,
 )
@@ -27,7 +24,7 @@ from authorityspoke.procedures import Procedure
 from authorityspoke.io import loaders, readers, name_index
 from authorityspoke.io.fake_enactments import FakeClient
 from authorityspoke.io.loaders import load_holdings, read_holdings_from_file
-from authorityspoke.io import filepaths, text_expansion
+from authorityspoke.io import text_expansion
 from authorityspoke.rules import Rule
 
 load_dotenv()

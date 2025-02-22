@@ -1,10 +1,8 @@
 import pytest
 
-from pydantic import ValidationError
 
 from nettlesome.terms import ContextRegister
 from nettlesome.entities import Entity
-from nettlesome.statements import Statement
 
 from authorityspoke.facts import Fact
 from authorityspoke.io import readers

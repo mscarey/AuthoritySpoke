@@ -1,6 +1,5 @@
 from datetime import date
 from decimal import Decimal
-from typing import Type
 import pytest
 import sympy
 from sympy import Interval, oo

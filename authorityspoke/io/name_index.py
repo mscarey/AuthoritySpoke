@@ -5,12 +5,11 @@ from __future__ import annotations
 from collections import OrderedDict
 from copy import deepcopy
 from re import findall
-from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
+from typing import Dict, List, Optional, Sequence, Tuple, Union
 
 from legislice.types import RawEnactment
 from nettlesome.predicates import StatementTemplate
-from authorityspoke.facts import Exhibit, RawPredicate, RawFactor
-from authorityspoke.holdings import RawHolding
+from authorityspoke.facts import RawPredicate, RawFactor
 from authorityspoke.io import text_expansion
 
 
@@ -189,7 +188,7 @@ def create_name_for_factor(obj: Dict) -> str:
     ):
         name = str(obj)  # obj is Exhibit
     elif obj.get("absent"):
-        factor_name = create_name_for_factor(obj["absent"])
+        factor_name = obj["absent"]
         name = f"absent {factor_name}"
     else:
         raise NotImplementedError
