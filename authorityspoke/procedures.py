@@ -27,7 +27,15 @@ from nettlesome.factors import Factor
 from nettlesome.groups import FactorGroup
 from nettlesome.formatting import indented
 
-from authorityspoke.facts import Fact, Allegation, Pleading, Exhibit, Evidence
+from authorityspoke.facts import (
+    Fact,
+    Allegation,
+    Pleading,
+    Exhibit,
+    Evidence,
+    AbsenceOfFactor,
+    FactorOrAbsence,
+)
 from authorityspoke.facts import RawFactor
 
 
@@ -82,9 +90,9 @@ class Procedure(Comparable, BaseModel):
         other :class:`Procedure`.
     """
 
-    outputs: List[Union[Fact, Allegation, Pleading, Exhibit, Evidence]]
-    inputs: List[Union[Fact, Allegation, Pleading, Exhibit, Evidence]] = []
-    despite: List[Union[Fact, Allegation, Pleading, Exhibit, Evidence]] = []
+    outputs: List[FactorOrAbsence]
+    inputs: List[FactorOrAbsence] = []
+    despite: List[FactorOrAbsence] = []
     name: str = ""
     absent: ClassVar[bool] = False
     generic: ClassVar[bool] = False
@@ -253,7 +261,6 @@ class Procedure(Comparable, BaseModel):
         return len(self.generic_terms())
 
     def __str__(self):
-
         text = "RESULT:"
         for f in self.outputs:
             text += "\n" + indented(f.wrapped_string)
