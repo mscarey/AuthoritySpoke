@@ -3,7 +3,7 @@ eyecite~=2.6.3
 justopinion==0.4.0
 legislice==0.8.1
 lxml>=4.9.1
-nettlesome==0.7.1
+git+https://github.com/mscarey/nettlesome.git@absent-class
 pint>=0.15
 pydantic==2.10.5
 python-dotenv

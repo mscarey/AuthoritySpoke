@@ -188,10 +188,12 @@ def create_name_for_factor(obj: Dict) -> str:
         obj.get("offered_by") or (obj.get("type") and obj["type"].lower()) == "exhibit"
     ):
         name = str(obj)  # obj is Exhibit
+    elif obj.get("absent"):
+        factor_name = create_name_for_factor(obj["absent"])
+        name = f"absent {factor_name}"
     else:
         raise NotImplementedError
-    if obj.get("absent") is True:
-        name = f"absent {name}"
+
     return name
 
 
@@ -424,5 +426,5 @@ def index_names(record: Union[List, Dict]) -> Mentioned:
     obj = deepcopy(record)
     obj = text_expansion.expand_shorthand(obj)
     obj, mentioned = collect_mentioned(obj)
-    sorted_mentioned = mentioned.sorted_by_length()
+    sorted_mentioned: Mentioned = mentioned.sorted_by_length()
     return obj, sorted_mentioned
