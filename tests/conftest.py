@@ -17,7 +17,14 @@ from nettlesome.quantities import Comparison, Q_
 import pytest
 
 from authorityspoke.decisions import DecisionReading
-from authorityspoke.facts import Allegation, Fact, build_fact, Evidence, RawFactor
+from authorityspoke.facts import (
+    AbsenceOfFactor,
+    Allegation,
+    Fact,
+    build_fact,
+    Evidence,
+    RawFactor,
+)
 from authorityspoke.facts import Exhibit, Pleading
 from authorityspoke.holdings import Holding, RawHolding
 from authorityspoke.opinions import OpinionReading
@@ -579,7 +586,7 @@ def make_factor(make_predicate, make_entity) -> Dict[str, Factor]:
 @pytest.fixture(scope="class")
 def make_exhibit(
     make_entity, make_predicate, make_factor, watt_factor, make_complex_fact
-) -> Dict[str, Exhibit]:
+) -> Dict[str, Exhibit | AbsenceOfFactor]:
     e = make_entity
     f = make_factor
     w = watt_factor
@@ -614,8 +621,12 @@ def make_exhibit(
         "no_shooting_witness_unknown_testimony": Exhibit(
             offered_by=al, form="testimony", statement=f["f_no_shooting"]
         ),
-        "no_shooting_witness_unknown_absent_testimony": Exhibit(
-            offered_by=al, form="testimony", statement=f["f_no_shooting"], absent=True
+        "no_shooting_witness_unknown_absent_testimony": AbsenceOfFactor(
+            absent=Exhibit(
+                offered_by=al,
+                form="testimony",
+                statement=f["f_no_shooting"],
+            )
         ),
         "no_shooting_different_witness_testimony": Exhibit(
             offered_by=al,
@@ -635,12 +646,13 @@ def make_exhibit(
             statement=w["f8"],
             statement_attribution=e["craig"],
         ),
-        "reciprocal_testimony_absent": Exhibit(
-            offered_by=al,
-            form="testimony",
-            statement=w["f8"],
-            statement_attribution=e["craig"],
-            absent=True,
+        "reciprocal_testimony_absent": AbsenceOfFactor(
+            absent=Exhibit(
+                offered_by=al,
+                form="testimony",
+                statement=w["f8"],
+                statement_attribution=e["craig"],
+            )
         ),
         "reciprocal_testimony_less": Exhibit(
             offered_by=al,
@@ -654,12 +666,13 @@ def make_exhibit(
             statement=w["f8_meters"],
             statement_attribution=e["craig"],
         ),
-        "reciprocal_testimony_specific_absent": Exhibit(
-            offered_by=al,
-            form="testimony",
-            statement=w["f8_meters"],
-            statement_attribution=e["craig"],
-            absent=True,
+        "reciprocal_testimony_specific_absent": AbsenceOfFactor(
+            absent=Exhibit(
+                offered_by=al,
+                form="testimony",
+                statement=w["f8_meters"],
+                statement_attribution=e["craig"],
+            )
         ),
         "relevant_murder_testimony": Exhibit(
             offered_by=al,
@@ -822,7 +835,7 @@ def make_complex_rule(
 @pytest.fixture(scope="class")
 def make_evidence(
     make_predicate, make_factor, watt_factor, make_exhibit
-) -> Dict[str, Evidence]:
+) -> Dict[str, Evidence | AbsenceOfFactor]:
     p = make_predicate
     f = make_factor
     w = watt_factor
@@ -833,8 +846,10 @@ def make_evidence(
         "no_shooting": Evidence(
             exhibit=x["no_shooting_testimony"], to_effect=f["f_no_crime"]
         ),
-        "no_shooting_absent": Evidence(
-            exhibit=x["no_shooting_testimony"], to_effect=f["f_no_crime"], absent=True
+        "no_shooting_absent": AbsenceOfFactor(
+            absent=Evidence(
+                exhibit=x["no_shooting_testimony"], to_effect=f["f_no_crime"]
+            )
         ),
         "no_shooting_entity_order": Evidence(
             exhibit=x["no_shooting_entity_order_testimony"],
@@ -844,10 +859,11 @@ def make_evidence(
             exhibit=x["no_shooting_witness_unknown_testimony"],
             to_effect=f["f_no_crime"],
         ),
-        "no_shooting_witness_unknown_absent": Evidence(
-            exhibit=x["no_shooting_witness_unknown_testimony"],
-            to_effect=f["f_no_crime"],
-            absent=True,
+        "no_shooting_witness_unknown_absent": AbsenceOfFactor(
+            absent=Evidence(
+                exhibit=x["no_shooting_witness_unknown_testimony"],
+                to_effect=f["f_no_crime"],
+            )
         ),
         # Here the Exhibit is absent, not the Evidence. Pointless distinction?
         "no_shooting_witness_unknown_absent_exhibit": Evidence(
@@ -867,15 +883,16 @@ def make_evidence(
         "crime": Evidence(
             exhibit=x["generic_exhibit"], to_effect=f["f_watt_crime"], generic=True
         ),
-        "crime_absent": Evidence(
-            exhibit=x["generic_exhibit"],
-            to_effect=f["f_watt_crime"],
-            absent=True,
-            generic=True,
+        "crime_absent": AbsenceOfFactor(
+            absent=Evidence(
+                exhibit=x["generic_exhibit"],
+                to_effect=f["f_watt_crime"],
+                generic=True,
+            )
         ),
         "generic": Evidence(exhibit=x["generic_exhibit"], generic=True),
-        "generic_absent": Evidence(
-            exhibit=x["generic_exhibit"], absent=True, generic=True
+        "generic_absent": AbsenceOfFactor(
+            absent=Evidence(exhibit=x["generic_exhibit"], generic=True)
         ),
     }
 
