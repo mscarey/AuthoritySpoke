@@ -1,18 +1,19 @@
 
 - outputs:
-  - type: evidence
-    exhibit: 
-      offered_by:
-        type: entity
-        name: the prosecution
-      name: proof of Bradley's guilt
-      generic: true
-    to_effect:
-      type: fact
-      name: fact that Bradley committed a crime
-      content: Bradley committed a crime
-    name: absence of evidence of Bradley's guilt
-    absent: true
+  - type: absence
+    absent:
+      type: evidence
+      exhibit:
+        offered_by:
+          type: entity
+          name: the prosecution
+        name: proof of Bradley's guilt
+        generic: true
+      to_effect:
+        type: fact
+        name: fact that Bradley committed a crime
+        content: Bradley committed a crime
+      name: absence of evidence of Bradley's guilt
   inputs:
   - type: fact
     content: '{officers'' search of the yard} was a warrantless search and seizure'
@@ -203,9 +204,10 @@
   - type: fact
     content: Bradley's marijuana patch was entirely hidden by foliage
     truth: false
-  - type: fact
-    content: Bradley's marijuana patch was covered by nontransparent material
-    absent: true
+  - type: absence
+    absent:
+      type: fact
+      content: Bradley's marijuana patch was covered by nontransparent material
   - type: fact
     content: the distance from which part of Bradley's marijuana patch could be seen
       plainly was >= 1 foot

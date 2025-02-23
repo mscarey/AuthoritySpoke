@@ -5,7 +5,7 @@
     form: testimony
     offered_by:
       type: Entity
-      name: The People of California      
+      name: The People of California
     statement:
       type: Fact
       name: fact that the defendant was addicted to heroin
@@ -99,11 +99,12 @@
     content: officer's testimony that the defendant was addicted to heroin was relevant
       to show the defendant had a motive to commit an attempted robbery
   outputs:
-  - type: Evidence
-    name: evidence of officer's testimony that the defendant was addicted to heroin
-    exhibit: officer's testimony that the defendant was addicted to heroin
-    to_effect: fact that the defendant committed an attempted robbery
-    absent: true
+  - type: absence
+    absent:
+      type: Evidence
+      name: evidence of officer's testimony that the defendant was addicted to heroin
+      exhibit: officer's testimony that the defendant was addicted to heroin
+      to_effect: fact that the defendant committed an attempted robbery
   mandatory: true
   enactments:
   - s351

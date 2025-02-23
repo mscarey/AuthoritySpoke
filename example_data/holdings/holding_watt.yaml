@@ -136,9 +136,10 @@
   - type: evidence
     exhibit: proof of Wattenburg's guilt
     to_effect:
-      type: fact
-      content: Wattenburg committed a crime
-    absent: true
+      type: absence
+      absent:
+        type: fact
+        content: Wattenburg committed a crime
   enactments:
   - search clause
   mandatory: true

@@ -171,9 +171,9 @@
         language
       name: the Java API was the sequence, structure, and organization of the Java language
       anchors:
-        quotes: 
-        - prefix: include, among other things, 
-          exact: the program’s sequence, structure, and organization, 
+        quotes:
+        - prefix: include, among other things,
+          exact: the program’s sequence, structure, and organization,
           suffix: as well as
   outputs:
     type: fact
@@ -394,20 +394,22 @@
 - inputs:
     - type: fact
       content: the Java API was copyrightable
-    - type: fact
-      content:
-        the Java API was essentially the only way to express the idea that it
-        embodied
-      absent: true
+    - type: absence
       name: absent essentially the only way
-      anchors:
-        quotes: "|concepts of merger| and scenes a faire are affirmative defenses "
-    - type: fact
-      content: the Java API was a scene a faire
-      absent: true
+      absent:
+        type: fact
+        content:
+          the Java API was essentially the only way to express the idea that it
+          embodied
+        anchors:
+          quotes: "|concepts of merger| and scenes a faire are affirmative defenses "
+    - type: absent
       name: absent scene a faire
-      anchors:
-        quotes: "concepts of merger and |scenes a faire| are affirmative defenses "
+      absent:
+        type: fact
+        content: the Java API was a scene a faire
+        anchors:
+          quotes: "concepts of merger and |scenes a faire| are affirmative defenses "
   outputs:
     type: fact
     content: Google infringed the copyright on the Java API
