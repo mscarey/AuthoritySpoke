@@ -13,7 +13,7 @@ from nettlesome.entities import Entity
 from nettlesome.predicates import Predicate
 
 from authorityspoke.decisions import Decision, DecisionReading
-from authorityspoke.facts import Fact
+from authorityspoke.facts import Fact, AbsenceOfFactor
 from authorityspoke.holdings import Holding
 from authorityspoke.opinions import (
     HoldingWithAnchors,
@@ -296,20 +296,26 @@ class TestTextAnchors:
         """
         holdings = [
             {
-                "inputs": {
-                    "type": "fact",
-                    "content": "{Bradley} lived at Bradley's house",
-                },
-                "outputs": {
-                    "type": "evidence",
-                    "exhibit": {"offered_by": {"type": "entity", "name": "the People"}},
-                    "to_effect": {
+                "inputs": [
+                    {
                         "type": "fact",
-                        "name": "fact that Bradley committed a crime",
-                        "content": "Bradley committed a crime",
+                        "content": "{Bradley} lived at Bradley's house",
+                    }
+                ],
+                "outputs": {
+                    "type": "absence",
+                    "absent": {
+                        "type": "evidence",
+                        "exhibit": {
+                            "offered_by": {"type": "entity", "name": "the People"}
+                        },
+                        "to_effect": {
+                            "type": "fact",
+                            "name": "fact that Bradley committed a crime",
+                            "content": "Bradley committed a crime",
+                        },
+                        "name": "evidence of Bradley's guilt",
                     },
-                    "name": "evidence of Bradley's guilt",
-                    "absent": True,
                 },
             },
             {
@@ -404,11 +410,12 @@ class TestTextAnchors:
                 ],
                 "outputs": [
                     {
-                        "type": "Evidence",
-                        "name": "evidence of officer's testimony that defendant was addicted to heroin",
-                        "exhibit": "officer's testimony that defendant was addicted to heroin",
-                        "to_effect": "fact that defendant committed an attempted robbery",
-                        "absent": True,
+                        "absence": {
+                            "type": "Evidence",
+                            "name": "evidence of officer's testimony that defendant was addicted to heroin",
+                            "exhibit": "officer's testimony that defendant was addicted to heroin",
+                            "to_effect": "fact that defendant committed an attempted robbery",
+                        }
                     }
                 ],
                 "mandatory": True,
@@ -709,11 +716,11 @@ class TestExclusiveFlag:
         feist_holdings = readers.read_holdings(to_read["holdings"], client=mock_client)
 
         directory = Entity(name="Rural's telephone directory")
-        not_original = Fact(
-            Predicate(content="{} was an original work"), directory, absent=True
+        not_original = AbsenceOfFactor(
+            absent=Fact(Predicate(content="{} was an original work"), directory)
         )
-        not_copyrightable = Fact(
-            Predicate(content="{} was copyrightable"), directory, absent=True
+        not_copyrightable = AbsenceOfFactor(
+            absent=Fact(Predicate(content="{} was copyrightable"), directory)
         )
         no_originality_procedure = Procedure(
             outputs=not_copyrightable, inputs=not_original

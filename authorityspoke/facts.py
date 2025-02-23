@@ -419,7 +419,6 @@ def build_fact(
         terms=terms,
         name=name or "",
         standard_of_proof=standard_of_proof,
-        absent=absent,
         generic=generic,
     )
     if absent:
