@@ -78,7 +78,7 @@
   mandatory: true
 - inputs:
   - type: fact
-    content: Hideaway Lodge was Wattenburg’s abode
+    content: Hideaway Lodge was Wattenburg's abode
   - type: fact
     content: the stockpile of trees was on the premises of Hideaway Lodge
   - type: fact
@@ -133,11 +133,11 @@
     - type: entity
       name: Hideaway Lodge
   outputs:
-  - type: evidence
-    exhibit: proof of Wattenburg's guilt
-    to_effect:
-      type: absence
-      absent:
+  - type: absence
+    absent:
+      type: evidence
+      exhibit: proof of Wattenburg's guilt
+      to_effect:
         type: fact
         content: Wattenburg committed a crime
   enactments:
