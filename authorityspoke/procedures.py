@@ -29,6 +29,7 @@ from nettlesome.formatting import indented
 
 from authorityspoke.facts import (
     FactorOrAbsence,
+    AbsenceOfFactor,
 )
 from authorityspoke.facts import RawFactor
 
@@ -774,7 +775,7 @@ class Procedure(Comparable, BaseModel):
                 + "'outputs', consider making a separate 'exclusive' Rule "
                 + "for each output."
             )
-        if self.outputs[0].absent:
+        if isinstance(self.outputs[0], AbsenceOfFactor):
             raise ValueError(
                 "The 'exclusive' attribute is not allowed for Holdings "
                 + "with an 'absent' 'output' Factor. This would indicate "
