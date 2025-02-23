@@ -410,12 +410,13 @@ class TestTextAnchors:
                 ],
                 "outputs": [
                     {
-                        "absence": {
+                        "type": "absence",
+                        "absent": {
                             "type": "Evidence",
                             "name": "evidence of officer's testimony that defendant was addicted to heroin",
                             "exhibit": "officer's testimony that defendant was addicted to heroin",
                             "to_effect": "fact that defendant committed an attempted robbery",
-                        }
+                        },
                     }
                 ],
                 "mandatory": True,

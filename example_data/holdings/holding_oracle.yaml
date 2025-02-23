@@ -85,16 +85,14 @@
       anchors:
         quotes:
           - concepts of|merger|and scenes a faire
-          - "|concepts of merger| and scenes a faire are affirmative defenses to claims of
-            infringement."
+          - "|concepts of merger| and scenes a faire are affirmative defenses to claims of infringement."
     - type: fact
       content: the Java API was a scene a faire
       name: the Java API was a scene a faire
       anchors:
         quotes:
-          - concepts of merger and |scenes a faire|
-          - concepts of merger and |scenes a faire| are affirmative defenses to claims of
-            infringement.
+          - "concepts of merger and |scenes a faire|"
+          - concepts of merger and |scenes a faire| are affirmative defenses to claims of infringement.
           - the scene a faire doctrine denies protection
   outputs:
     type: fact
@@ -372,7 +370,10 @@
     truth: false
     name: false Google infringed the copyright on the Java API
     anchors:
-      quotes: concepts of merger and scenes a faire are |affirmative defenses to claims of infringement.|
+      quotes:
+        prefix: concepts of merger and scenes a faire are
+        exact: affirmative defenses to claims of infringement.
+        suffix:
   mandatory: true
   enactments: copyright exceptions full
   enactments_despite: copyright protection provision
@@ -401,8 +402,8 @@
         content:
           the Java API was essentially the only way to express the idea that it
           embodied
-        anchors:
-          quotes: "|concepts of merger| and scenes a faire are affirmative defenses "
+      anchors:
+        quotes: "|concepts of merger| and scenes a faire are affirmative defenses "
     - type: absent
       name: absent scene a faire
       absent:
