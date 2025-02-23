@@ -366,7 +366,7 @@ def build_fact(
     standard_of_proof: Optional[str] = None,
     absent: bool = False,
     generic: bool = False,
-):
+) -> Fact | AbsenceOfFactor:
     r"""
     Build a :class:`.Fact` with generics selected from a list.
 
@@ -414,7 +414,7 @@ def build_fact(
         wrapped_factors = list(case_factors)
 
     terms = [wrapped_factors[i] for i in indices]
-    return Fact(
+    result = Fact(
         predicate=predicate,
         terms=terms,
         name=name or "",
@@ -422,6 +422,9 @@ def build_fact(
         absent=absent,
         generic=generic,
     )
+    if absent:
+        return AbsenceOfFactor(absent=result)
+    return result
 
 
 class Exhibit(Factor, BaseModel):

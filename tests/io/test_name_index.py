@@ -261,7 +261,7 @@ class TestRetrieveMentioned:
                 },
             ],
         }
-        record = readers.expand_shorthand(relevant_dict)
+        record = text_expansion.expand_shorthand(relevant_dict)
         record, mentioned = readers.index_names(record)
         expanded = readers.expand_factor(record, mentioned)
 
