@@ -8,7 +8,7 @@ from nettlesome.predicates import Predicate
 from nettlesome.quantities import Comparison, Q_
 from nettlesome.statements import Statement
 
-from authorityspoke.facts import Fact
+from authorityspoke.facts import Fact, AbsenceOfFactor
 
 
 class TestStatements:
@@ -29,7 +29,9 @@ class TestStatements:
 
     def test_string_representation_of_absent_factor(self):
         predicate = Predicate(content="$company was the best brand")
-        statement = Fact(predicate=predicate, terms=Entity(name="Acme"), absent=True)
+        statement = AbsenceOfFactor(
+            absent=Fact(predicate=predicate, terms=Entity(name="Acme"))
+        )
         assert "absence of the fact" in str(statement).lower()
 
     def test_string_no_truth_value(self):
@@ -625,7 +627,6 @@ class TestImplication:
     relevant_whether = Fact(predicate=predicate_whether, terms=[shot_fact, murder_fact])
 
     def test_implication_complex_whether(self):
-
         assert self.relevant_fact > self.relevant_whether
 
     def test_implication_complex_explain(self):
@@ -734,8 +735,10 @@ class TestContradiction:
             expression=Q_("30 miles"),
         )
         terms = [Entity(name="New York"), Entity(name="Los Angeles")]
-        fact = Fact(predicate=predicate, terms=terms, absent=True)
-        fact_opposite = Fact(predicate=predicate_opposite, terms=terms, absent=True)
+        fact = AbsenceOfFactor(absent=Fact(predicate=predicate, terms=terms))
+        fact_opposite = AbsenceOfFactor(
+            absent=Fact(predicate=predicate_opposite, terms=terms)
+        )
 
         assert not fact.contradicts(fact_opposite)
         assert not fact_opposite.contradicts(fact)
@@ -764,7 +767,9 @@ class TestContradiction:
             expression=Q_("60 miles per hour"),
         )
         terms = [Entity(name="the car")]
-        absent_general_fact = Fact(predicate=predicate_less, terms=terms, absent=True)
+        absent_general_fact = AbsenceOfFactor(
+            absent=Fact(predicate=predicate_less, terms=terms)
+        )
         specific_fact = Fact(predicate=predicate_more, terms=terms)
 
         assert absent_general_fact.contradicts(specific_fact)
@@ -782,7 +787,9 @@ class TestContradiction:
             expression=Q_("60 miles per hour"),
         )
         terms = [Entity(name="the car")]
-        absent_general_fact = Fact(predicate=predicate_more, terms=terms, absent=True)
+        absent_general_fact = AbsenceOfFactor(
+            absent=Fact(predicate=predicate_more, terms=terms)
+        )
         specific_fact = Fact(predicate=predicate_less, terms=terms)
 
         assert absent_general_fact.contradicts(specific_fact)
@@ -801,7 +808,9 @@ class TestContradiction:
         )
         terms = [Entity(name="the car")]
         general_fact = Fact(predicate=predicate_more, terms=terms)
-        absent_specific_fact = Fact(predicate=predicate_less, terms=terms, absent=True)
+        absent_specific_fact = AbsenceOfFactor(
+            absent=Fact(predicate=predicate_less, terms=terms)
+        )
 
         assert not general_fact.contradicts(absent_specific_fact)
         assert not absent_specific_fact.contradicts(general_fact)
@@ -881,28 +890,30 @@ class TestContradiction:
             predicate=Predicate(content="$shooter shot $victim"),
             terms=[Entity(name="Alice"), Entity(name="Bob")],
         )
-        shot_false = Fact(
-            predicate=Predicate(content="$shooter shot $victim", truth=False),
-            terms=[Entity(name="Alice"), Entity(name="Bob")],
-            absent=True,
+        shot_false = AbsenceOfFactor(
+            absent=Fact(
+                predicate=Predicate(content="$shooter shot $victim", truth=False),
+                terms=[Entity(name="Alice"), Entity(name="Bob")],
+            )
         )
         assert shot_fact._contradicts_if_present(shot_false, ContextRegister())
         assert shot_false._contradicts_if_present(shot_fact, ContextRegister())
 
     def test_false_does_not_contradict_absent(self):
-        absent_fact = Fact(
-            predicate=Predicate(
-                content="${rural_s_telephone_directory} was copyrightable", truth=True
-            ),
-            terms=(Entity(name="Rural's telephone directory")),
-            absent=True,
+        absent_fact = AbsenceOfFactor(
+            absent=Fact(
+                predicate=Predicate(
+                    content="${rural_s_telephone_directory} was copyrightable",
+                    truth=True,
+                ),
+                terms=(Entity(name="Rural's telephone directory")),
+            )
         )
         false_fact = Fact(
             predicate=Predicate(
                 content="${the_java_api} was copyrightable", truth=False
             ),
             terms=(Entity(name="the Java API", generic=True, plural=False)),
-            absent=False,
         )
         assert not false_fact.contradicts(absent_fact)
         assert not absent_fact.contradicts(false_fact)
@@ -1048,7 +1059,6 @@ class TestConsistent:
 
 
 class TestAddition:
-
     predicate_less = Comparison(
         content="${vehicle}'s speed was",
         sign=">",

@@ -559,9 +559,10 @@ class Evidence(Factor, BaseModel):
     @classmethod
     def check_type_field(cls, values):
         """Fail validation if the input has a "type" field without the class name."""
-        type_str = values.pop("type", "")
-        if type_str and type_str.lower() != "evidence":
-            raise ValueError(f"type {type_str} was passed to Evidence model")
+        if isinstance(values, dict):
+            type_str = values.pop("type", "")
+            if type_str and type_str.lower() != "evidence":
+                raise ValueError(f"type {type_str} was passed to Evidence model")
         return values
 
     def __str__(self):
@@ -660,7 +661,7 @@ class Allegation(Factor, BaseModel):
         return super().__str__().format(string).replace("Allegation", "allegation")
 
 
-class AbsenceOfFactor(Term, BaseModel):
+class AbsenceOfFactor(Comparable, BaseModel):
     generic: bool = False
     absent: Fact | Evidence | Exhibit | Pleading | Allegation
     context_factor_names: ClassVar[Tuple[str, ...]] = ("absent",)
