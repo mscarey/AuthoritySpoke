@@ -42,13 +42,14 @@ class TestCollectAnchors:
     }
 
     def test_load_absent_term(self):
+        name = "the Java API was essentially the only way to express the idea that it embodied"
         data = {
             "anchors": {
                 "quotes": "|concepts of merger| and scenes a faire are affirmative defenses "
             },
             "term": {
                 "absent": {
-                    "name": "the Java API was essentially the only way to express the idea that it embodied",
+                    "name": name,
                     "type": "fact",
                     "predicate": {
                         "content": "${the_java_api} was essentially the only way to express the idea that it embodied"
@@ -58,7 +59,4 @@ class TestCollectAnchors:
             },
         }
         result = TermWithAnchors(**data)
-        assert (
-            result.absent.name
-            == "the Java API was essentially the only way to express the idea that it embodied"
-        )
+        assert result.term.absent.name == name

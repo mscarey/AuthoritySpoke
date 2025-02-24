@@ -242,9 +242,10 @@
   - type: fact
     content: Bradley's marijuana patch was entirely hidden by foliage
     truth: false
-  - type: fact
-    content: Bradley's marijuana patch was covered by nontransparent material
-    absent: true
+  - type: absence
+    absent:
+      type: fact
+      content: Bradley's marijuana patch was covered by nontransparent material
   - type: fact
     content: the distance from which part of Bradley's marijuana patch could be seen
       plainly was >= 1 foot
