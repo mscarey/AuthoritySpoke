@@ -10,7 +10,7 @@ class TestEvidence:
             exhibit=Exhibit(offered_by=Entity(name="Al"), form="testimony"),
             to_effect=watt_factor["f2"],
         )
-        assert not e.absent
+        assert e.exhibit.offered_by.name == "Al"
 
     def test_default_len_based_on_unique_entity_slots(self, make_entity, make_factor):
         """same as e["no_shooting"]"""

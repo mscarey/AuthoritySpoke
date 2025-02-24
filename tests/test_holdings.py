@@ -95,7 +95,6 @@ class TestHolding:
         inferred = exclusive_holding.inferred_from_exclusive[0]
         lower = "absence of the fact that <Borland International> infringed the copyright in <the Lotus menu command hierarchy>".lower()
         assert inferred.outputs[0].short_string.lower() == lower
-        assert inferred.outputs[0].absent
 
     def test_infer_from_not_exclusive(self, make_holding):
         """
@@ -188,7 +187,6 @@ class TestSameMeaning:
 
 class TestImplication:
     def test_undecided_holding_no_implication_more_inputs(self, make_holding):
-
         """h2 beind undecided doesn't imply that a version of
         h2 with more supporting factors is undecided"""
 
@@ -198,7 +196,6 @@ class TestImplication:
         )
 
     def test_undecided_holding_no_implication_fewer_inputs(self, make_holding):
-
         """h2_irrelevant_inputs being undecided does not imply that h2
         is undecided. If courts SOMEtimes MAY use the procedure in h2,
         it may or may not be decided whether any court has been allowed
@@ -212,21 +209,18 @@ class TestImplication:
         )
 
     def test_no_undecided_holding_implication_by_MUST(self, make_holding):
-
         """If it's undecided whether courts MUST follow the procedure in h2,
         it still could be decided that they MAY do so"""
 
         assert not make_holding["h2_MUST_undecided"] >= make_holding["h2_undecided"]
 
     def test_no_undecided_holding_implication_of_MUST(self, make_holding):
-
         """If it's undecided whether courts MAY follow the procedure in h2,
         the rule that they MUST do so still could have been decided to be not valid."""
 
         assert not make_holding["h2_undecided"] >= make_holding["h2_MUST_undecided"]
 
     def test_no_undecided_holding_implication_with_ALL(self, make_holding):
-
         """If it's undecided whether courts ALWAYS MAY follow the procedure in h2,
         it still could be decided (in the negative) whether they ALWAYS MAY
         follow a version with fewer supporting inputs."""
@@ -344,7 +338,6 @@ class TestContradiction:
         assert make_holding["h2"] >= make_holding["h2_invalid"].negated()
 
     def test_contradicts_if_valid(self, make_holding):
-
         assert make_holding["h2_ALL"].contradicts(
             make_holding["h2_SOME_MUST_output_false"]
         )
@@ -353,7 +346,6 @@ class TestContradiction:
         )
 
     def test_contradicts_if_valid_invalid_holding(self, make_holding):
-
         """
         In the current design, Holding.contradicts calls implies;
         implies calls Rule.contradicts.
@@ -402,7 +394,6 @@ class TestContradiction:
         )
 
     def test_invalidity_of_implying_holding_contradicts_implied(self, make_holding):
-
         # You NEVER MUST follow X
         # will contradict
         # You SOMEtimes MUST follow Y
@@ -416,7 +407,6 @@ class TestContradiction:
         )
 
     def test_contradiction_with_ALL_MUST_and_invalid_SOME_MUST(self, make_holding):
-
         # You ALWAYS MUST follow X
         # will contradict
         # You NEVER MUST follow Y
@@ -430,7 +420,6 @@ class TestContradiction:
         )
 
     def test_contradiction_with_ALL_MUST_and_invalid_ALL_MAY(self, make_holding):
-
         # You ALWAYS MUST follow X
         # will contradict
         # You MAY NOT ALWAYS follow Y
@@ -482,7 +471,6 @@ class TestContradiction:
             _ = make_holding["h1"].contradicts(ContextRegister({}))
 
     def test_contradiction_with_ALL_MUST_and_false_output_ALL_MAY(self, make_holding):
-
         # You ALWAYS MUST follow X
         # will contradict
         # You MAY NOT ALWAYS follow Y

@@ -266,7 +266,7 @@ class TestTextAnchors:
     def test_holding_without_enactments_or_regime(self, raw_holding):
         expanded = text_expansion.expand_shorthand(raw_holding["bradley_house"])
         built = readers.read_holdings([expanded])
-        new_factor = built[0].outputs[0].to_effect.terms[0]
+        new_factor = built[0].outputs[0].absent.to_effect.terms[0]
         assert new_factor.name == "Bradley"
 
     def test_posit_one_holding_with_anchor(self, raw_holding, make_response):
@@ -325,7 +325,7 @@ class TestTextAnchors:
         ]
         expanded = text_expansion.expand_shorthand(holdings)
         built = readers.read_holdings(expanded)
-        new_factor = built[0].outputs[0].to_effect.terms[0]
+        new_factor = built[0].outputs[0].absent.to_effect.terms[0]
         assert new_factor.name == "Bradley"
 
     def test_holdings_with_allegation_and_exhibit(self):
@@ -603,7 +603,7 @@ class TestTextAnchors:
             "mandatory": True,
         }
         mock_client = FakeClient(responses=make_response)
-        with pytest.raises(AttributeError):
+        with pytest.raises(ValidationError):
             readers.read_holdings([rule_holding], client=mock_client)
 
     def test_error_classname_does_not_exist(self):

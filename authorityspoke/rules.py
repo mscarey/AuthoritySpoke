@@ -228,9 +228,13 @@ class Rule(Comparable, BaseModel):
         for input_factor in self.inputs:
             result = deepcopy(self)
             next_input = deepcopy(input_factor)
-            next_input.absent = not next_input.absent
+            if isinstance(next_input, AbsenceOfFactor):
+                next_input = next_input.absent
+            else:
+                next_input = AbsenceOfFactor(absent=next_input)
             next_output = deepcopy(self.outputs[0])
-            next_output.absent = True
+            if not isinstance(next_output, AbsenceOfFactor):
+                next_output = AbsenceOfFactor(absent=next_output)
             result.set_inputs(next_input)
             result.set_outputs(next_output)
             result.mandatory = not self.mandatory

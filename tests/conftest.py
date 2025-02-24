@@ -1680,16 +1680,20 @@ def raw_holding() -> RawHolding:
     return {
         "bradley_house": {
             "inputs": {"type": "fact", "content": "{Bradley} lived at Bradley's house"},
-            "outputs": {
-                "type": "evidence",
-                "to_effect": {
-                    "type": "fact",
-                    "name": "fact that Bradley committed a crime",
-                    "content": "Bradley committed a crime",
-                },
-                "name": "evidence of Bradley's guilt",
-                "absent": True,
-            },
+            "outputs": [
+                {
+                    "type": "absence",
+                    "absent": {
+                        "type": "evidence",
+                        "to_effect": {
+                            "type": "fact",
+                            "name": "fact that Bradley committed a crime",
+                            "content": "Bradley committed a crime",
+                        },
+                        "name": "evidence of Bradley's guilt",
+                    },
+                }
+            ],
         },
         "stolen watch": {
             "anchors": {
