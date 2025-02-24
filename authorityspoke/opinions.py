@@ -18,7 +18,15 @@ from nettlesome.terms import Comparable, ContextRegister, Explanation, Term
 from nettlesome.factors import Factor
 from pydantic import field_validator, BaseModel
 
-from authorityspoke.facts import Entity, Fact, Allegation, Pleading, Exhibit, Evidence
+from authorityspoke.facts import (
+    AbsenceOfFactor,
+    Entity,
+    Fact,
+    Allegation,
+    Pleading,
+    Exhibit,
+    Evidence,
+)
 from authorityspoke.holdings import Holding, HoldingGroup
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
@@ -46,7 +54,7 @@ class EnactmentWithAnchors(BaseModel):
 class TermWithAnchors(BaseModel):
     """A term with a set of anchors."""
 
-    term: Union[Entity, Fact, Allegation, Pleading, Exhibit, Evidence]
+    term: AbsenceOfFactor | Entity | Fact | Allegation | Pleading | Exhibit | Evidence
     anchors: TextPositionSet = TextPositionSet()
 
     @field_validator("anchors", mode="before")
