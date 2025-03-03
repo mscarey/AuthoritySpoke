@@ -4,7 +4,7 @@ import pytest
 
 from nettlesome.terms import ContextRegister, means
 from nettlesome.entities import Entity
-from nettlesome.groups import FactorGroup
+from authorityspoke.groups import FactorGroup
 
 from authorityspoke.facts import Fact
 
@@ -191,7 +191,7 @@ class TestLikelyContext:
         """
         lotus = make_opinion_with_holding["lotus_majority"]
         oracle = make_opinion_with_holding["oracle_majority"]
-        left = FactorGroup(lotus.holdings[7].inputs[:2])
+        left = lotus.holdings[7].inputs[:2]
         right = FactorGroup(
             [oracle.holdings[3].outputs[0], oracle.holdings[3].inputs[0]]
         )

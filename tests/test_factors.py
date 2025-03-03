@@ -5,7 +5,7 @@ import pytest
 from nettlesome.terms import ContextRegister, DuplicateTermError
 from nettlesome.terms import Explanation, TermSequence, means
 from nettlesome.entities import Entity
-from nettlesome.groups import FactorGroup
+from authorityspoke.groups import FactorGroup
 from nettlesome.predicates import Predicate
 from nettlesome.quantities import Comparison, Q_
 

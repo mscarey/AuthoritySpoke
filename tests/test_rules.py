@@ -8,7 +8,7 @@ from legislice.download import Client
 from legislice.groups import EnactmentGroup
 from nettlesome.terms import ContextRegister
 from nettlesome.entities import Entity
-from nettlesome.groups import FactorGroup
+from authorityspoke.groups import FactorGroup
 from nettlesome.predicates import Predicate
 from nettlesome.quantities import Comparison, Q_
 from nettlesome.statements import Statement
@@ -412,7 +412,6 @@ class TestContradiction:
         assert not make_rule["h2_output_absent_false"].contradicts(make_rule["h2"])
 
     def test_contradicts_if_valid_some_vs_all(self, make_rule):
-
         """
         This test and the one below show that you can change whether two
         holdings contradict one another by exchanging the SOME/MAY from one
@@ -438,7 +437,6 @@ class TestContradiction:
         )
 
     def test_contradicts_if_valid_some_vs_all_no_contradiction(self, make_rule):
-
         """
         This test and the one above show that you can change whether two
         holdings contradict one another by exchanging the SOME/MAY from one
@@ -464,7 +462,6 @@ class TestContradiction:
         )
 
     def test_contradicts_if_valid_all_vs_some(self, make_rule):
-
         """
         The assertion here is:
         In ALL cases where the distance between A and B is less than 35 feet
@@ -817,7 +814,6 @@ class TestAddition:
         assert result.universal is True
 
     def test_add_universal_to_universal_irrelevant(self, make_procedure):
-
         result = make_procedure["c3"] + make_procedure["c2_irrelevant_inputs"]
         assert result is None
 
@@ -1014,9 +1010,9 @@ class TestStatuteRules:
     def test_greater_than_implies_equal(self, beard_response, make_beard_rule):
         client = FakeClient(responses=beard_response)
         beard_dictionary = loaders.load_holdings("beard_rules.yaml")
-        beard_dictionary[0]["inputs"][1][
-            "content"
-        ] = "the length of the suspected beard was = 8 millimetres"
+        beard_dictionary[0]["inputs"][1]["content"] = (
+            "the length of the suspected beard was = 8 millimetres"
+        )
         longer_hair_rule = readers.read_holdings([beard_dictionary[0]], client=client)
         assert make_beard_rule[0].implies(longer_hair_rule[0])
 
@@ -1044,9 +1040,9 @@ class TestStatuteRules:
     ):
         client = FakeClient(responses=beard_response)
         beard_dictionary = loaders.load_holdings("beard_rules.yaml")
-        beard_dictionary[1]["inputs"][1][
-            "content"
-        ] = "the length of the suspected beard was >= 12 inches"
+        beard_dictionary[1]["inputs"][1]["content"] = (
+            "the length of the suspected beard was >= 12 inches"
+        )
         beard_dictionary[1]["outputs"][0]["truth"] = False
         beard_dictionary[1]["mandatory"] = True
         long_hair_is_not_a_beard = readers.read_holdings(

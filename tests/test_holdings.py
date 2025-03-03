@@ -18,7 +18,7 @@ from nettlesome.terms import ContextRegister, TermSequence
 from nettlesome.entities import Entity
 from nettlesome.predicates import Predicate
 from nettlesome.statements import Statement
-from nettlesome.groups import FactorGroup
+from authorityspoke.groups import FactorGroup
 
 
 load_dotenv()
