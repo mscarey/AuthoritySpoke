@@ -261,8 +261,8 @@ class Fact(Factor, BaseModel):
         return len(self.generic_terms())
 
     def _implies_if_concrete(
-        self, other: Comparable, context: ContextRegister
-    ) -> Iterator[ContextRegister]:
+        self, other: Comparable, context: Explanation
+    ) -> Iterator[Explanation]:
         """
         Test if ``self`` implies ``other``, assuming they are not ``generic``.
 
@@ -478,7 +478,7 @@ class Exhibit(Factor, BaseModel):
     )
 
     def _means_if_concrete(
-        self, other: Factor, context: ContextRegister
+        self, other: Comparable, context: Explanation
     ) -> Iterator[Explanation]:
         if (
             isinstance(other, self.__class__)
@@ -488,7 +488,7 @@ class Exhibit(Factor, BaseModel):
             yield from super()._means_if_concrete(other, context)
 
     def _implies_if_concrete(
-        self, other: Factor, context: Optional[ContextRegister] = None
+        self, other: Comparable, context: Explanation
     ) -> Iterator[Explanation]:
         if isinstance(other, self.__class__) and (
             self.form == other.form or other.form is None
