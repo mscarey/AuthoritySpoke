@@ -57,7 +57,7 @@ class TestProcedures:
             Procedure(inputs="factor name", outputs=make_factor["f_shooting"])
 
     def test_cannot_add_entity_as_input(self, make_factor):
-        with pytest.raises(AttributeError):
+        with pytest.raises(ValidationError):
             Procedure(inputs=Entity(name="Al"), outputs=make_factor["f_shooting"])
 
     def test_generic_terms(self, make_entity, make_procedure, make_evidence):
