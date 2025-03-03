@@ -1109,12 +1109,12 @@ def make_problem_procedure(
 
     return {
         "c3": Procedure(
-            outputs=(e["crime_absent"]),
+            outputs=([e["crime_absent"]]),
             inputs=(f["f3"], f["f11"], f["f12"], f["f13"], f["f14"], f["f15"]),
             despite=(f["f16"]),
         ),
         "c3_fewer_inputs": Procedure(
-            outputs=(e["crime_absent"]),
+            outputs=([e["crime_absent"]]),
             inputs=(f["f3"], f["f11"], f["f12"], f["f15"]),
             despite=(f["f16"]),
         ),

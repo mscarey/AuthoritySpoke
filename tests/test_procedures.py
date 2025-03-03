@@ -28,6 +28,11 @@ class TestProcedures:
         c3 = Procedure(outputs=[e["crime_absent"]])
         assert "absence of <the evidence" in str(c3)
 
+    def test_make_procedure_with_absent_evidence_output(self, make_evidence):
+        e = make_evidence
+        c3 = Procedure(outputs=[AbsenceOfFactor(absent=e["crime"])])
+        assert "absence of <the evidence of" in str(c3)
+
     def test_make_procedure_with_output_without_context(self, make_predicate):
         no_context = Fact(predicate=make_predicate["p_no_context"], terms=[])
         c3 = Procedure(outputs=[no_context])
