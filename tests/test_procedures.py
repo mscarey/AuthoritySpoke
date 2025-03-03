@@ -10,7 +10,7 @@ from authorityspoke.groups import FactorGroup
 from nettlesome.predicates import Predicate
 from nettlesome.quantities import Comparison, Q_
 
-from authorityspoke.facts import Fact
+from authorityspoke.facts import AbsenceOfFactor, Fact
 from authorityspoke.procedures import Procedure
 
 
@@ -60,14 +60,14 @@ class TestProcedures:
         with pytest.raises(ValidationError):
             Procedure(inputs=Entity(name="Al"), outputs=make_factor["f_shooting"])
 
-    def test_generic_terms(self, make_entity, make_procedure, make_evidence):
+    def test_generic_terms(self, make_entity, make_problem_procedure, make_evidence):
         """
         Finds that for factor f["f7"], it would be consistent with the
         other group of factors for f["f7"]'s two slots to be assigned
         (0, 1) or (1, 0).
         """
         e = make_entity
-        factors = make_procedure["c3"].generic_terms()
+        factors = make_problem_procedure["c3"].generic_terms()
         for factor in (
             e["motel"],
             e["tree_search"],
@@ -77,11 +77,11 @@ class TestProcedures:
         ):
             assert factor in factors
 
-    def test_type_of_terms(self, make_procedure):
-        assert isinstance(make_procedure["c3"].terms, TermSequence)
+    def test_type_of_terms(self, make_problem_procedure):
+        assert isinstance(make_problem_procedure["c3"].terms, TermSequence)
 
-    def test_repr(self, make_procedure):
-        rep = repr(make_procedure["c3"])
+    def test_repr(self, make_problem_procedure):
+        rep = repr(make_problem_procedure["c3"])
         assert "Predicate(content='$person committed" in rep
 
     def test_entities_of_inputs_for_identical_procedure(
@@ -248,9 +248,13 @@ class TestProcedureImplication:
         p = make_procedure
         assert p["c2_irrelevant_outputs"].implies_all_to_all(p["c2"])
 
-    def test_fewer_inputs_implies_all_to_all(self, make_procedure):
+    def test_fewer_inputs_implies_all_to_all(
+        self, make_procedure, make_problem_procedure
+    ):
         c = make_procedure
-        assert c["c3_fewer_inputs"].implies_all_to_all(c["c3"])
+        assert make_problem_procedure["c3_fewer_inputs"].implies_all_to_all(
+            make_problem_procedure["c3"]
+        )
 
     def test_all_to_all_implies_reciprocal(self, make_procedure, caplog):
         """
@@ -420,5 +424,5 @@ class TestEvolve:
     def test_evolve_context_to_absent(self, make_procedure):
         procedure = make_procedure["c1"]
         evolved = deepcopy(procedure)
-        evolved.outputs[0].absent = True
+        evolved.outputs[0] = AbsenceOfFactor(absent=evolved.outputs[0])
         assert procedure.outputs[0].contradicts(evolved.outputs[0])

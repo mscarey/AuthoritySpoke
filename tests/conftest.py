@@ -1100,6 +1100,28 @@ def e_preexisting_material(make_response):
 
 
 @pytest.fixture(scope="class")
+def make_problem_procedure(
+    make_evidence, make_factor, watt_factor
+) -> Dict[str, Procedure]:
+    e = make_evidence
+    f = watt_factor
+    m = make_factor
+
+    return {
+        "c3": Procedure(
+            outputs=(e["crime_absent"]),
+            inputs=(f["f3"], f["f11"], f["f12"], f["f13"], f["f14"], f["f15"]),
+            despite=(f["f16"]),
+        ),
+        "c3_fewer_inputs": Procedure(
+            outputs=(e["crime_absent"]),
+            inputs=(f["f3"], f["f11"], f["f12"], f["f15"]),
+            despite=(f["f16"]),
+        ),
+    }
+
+
+@pytest.fixture(scope="class")
 def make_procedure(make_evidence, make_factor, watt_factor) -> Dict[str, Procedure]:
     e = make_evidence
     f = watt_factor
@@ -1111,11 +1133,6 @@ def make_procedure(make_evidence, make_factor, watt_factor) -> Dict[str, Procedu
             outputs=(f["f10"],),
             inputs=(f["f4"], f["f5"], f["f6"], f["f7"], f["f9"]),
             despite=(f["f8"],),
-        ),
-        "c3": Procedure(
-            outputs=(e["crime_absent"]),
-            inputs=(f["f3"], f["f11"], f["f12"], f["f13"], f["f14"], f["f15"]),
-            despite=(f["f16"]),
         ),
         "c4": Procedure(
             outputs=(f["f13"]),
@@ -1257,11 +1274,6 @@ def make_procedure(make_evidence, make_factor, watt_factor) -> Dict[str, Procedu
         "c_far_means_no_curtilage": Procedure(
             outputs=(f["f10_false"],), inputs=(f["f8"]), despite=(f["f7"])
         ),
-        "c3_fewer_inputs": Procedure(
-            outputs=(e["crime_absent"]),
-            inputs=(f["f3"], f["f11"], f["f12"], f["f15"]),
-            despite=(f["f16"]),
-        ),
         "c_output_distance_less": Procedure(outputs=(f["f9"]), inputs=(f["f1"])),
         "c_output_farther_different_entity": Procedure(
             outputs=(f["f9_more_different_entity"]), inputs=(f["f1"])
@@ -1270,7 +1282,9 @@ def make_procedure(make_evidence, make_factor, watt_factor) -> Dict[str, Procedu
 
 
 @pytest.fixture(scope="class")
-def real_holding(make_procedure, e_search_clause) -> Dict[str, Rule]:
+def real_holding(
+    make_procedure, make_problem_procedure, e_search_clause
+) -> Dict[str, Rule]:
     """These holdings can be changed in case they don't accurately reflect
     what's in real cases, or in case there are API improvements that
     allow them to become more accurate. I'll try not to write any tests
@@ -1286,7 +1300,11 @@ def real_holding(make_procedure, e_search_clause) -> Dict[str, Rule]:
             rule=Rule(procedure=c["c2"], enactments=e_search_clause, mandatory=True)
         ),
         "h3": Holding(
-            rule=Rule(procedure=c["c3"], enactments=e_search_clause, mandatory=True)
+            rule=Rule(
+                procedure=make_problem_procedure["c3"],
+                enactments=e_search_clause,
+                mandatory=True,
+            )
         ),
         "h4": Holding(
             rule=Rule(procedure=c["c4"], enactments=e_search_clause, mandatory=True)
@@ -1296,14 +1314,14 @@ def real_holding(make_procedure, e_search_clause) -> Dict[str, Rule]:
 
 @pytest.fixture(scope="class")
 def make_rule(
-    make_procedure, e_fourth_a, e_search_clause, e_due_process_5
+    make_procedure, make_problem_procedure, e_fourth_a, e_search_clause, e_due_process_5
 ) -> Dict[str, Rule]:
     c = make_procedure
 
     return {
         "h1": Rule(procedure=c["c1"], enactments=e_search_clause),
         "h2": Rule(procedure=c["c2"], enactments=e_search_clause),
-        "h3": Rule(procedure=c["c3"], enactments=e_search_clause),
+        "h3": Rule(procedure=make_problem_procedure["c3"], enactments=e_search_clause),
         "h1_again": Rule(procedure=c["c1"], enactments=e_search_clause),
         "h1_entity_order": Rule(
             procedure=c["c1_entity_order"], enactments=e_search_clause
@@ -1428,12 +1446,19 @@ def make_rule(
             mandatory=True,
             universal=False,
         ),
-        "h3_ALL": Rule(procedure=c["c3"], enactments=e_search_clause, universal=True),
+        "h3_ALL": Rule(
+            procedure=make_problem_procedure["c3"],
+            enactments=e_search_clause,
+            universal=True,
+        ),
         "h3_fewer_inputs": Rule(
-            procedure=c["c3_fewer_inputs"], enactments=e_search_clause
+            procedure=make_problem_procedure["c3_fewer_inputs"],
+            enactments=e_search_clause,
         ),
         "h3_fewer_inputs_ALL": Rule(
-            procedure=c["c3_fewer_inputs"], enactments=e_search_clause, universal=True
+            procedure=make_problem_procedure["c3_fewer_inputs"],
+            enactments=e_search_clause,
+            universal=True,
         ),
         "h_near_means_curtilage": Rule(
             procedure=c["c_near_means_curtilage"], enactments=e_search_clause

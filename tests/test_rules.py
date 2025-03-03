@@ -813,8 +813,10 @@ class TestAddition:
         result = accept_relevance_testimony_ALL + accept_murder_fact_ALL
         assert result.universal is True
 
-    def test_add_universal_to_universal_irrelevant(self, make_procedure):
-        result = make_procedure["c3"] + make_procedure["c2_irrelevant_inputs"]
+    def test_add_universal_to_universal_irrelevant(
+        self, make_problem_procedure, make_procedure
+    ):
+        result = make_problem_procedure["c3"] + make_procedure["c2_irrelevant_inputs"]
         assert result is None
 
     def test_rule_requiring_more_enactments_will_add(
