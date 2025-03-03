@@ -109,7 +109,7 @@ class TestHolding:
     def test_get_evidence_by_name_from_holding(self, make_opinion_with_holding):
         watt = make_opinion_with_holding["watt_majority"]
         holding = watt.holdings[4]
-        assert holding.outputs[0].exhibit.name == "proof of Wattenburg's guilt"
+        assert holding.outputs[0].absent.exhibit.name == "proof of Wattenburg's guilt"
         factor = holding.get_factor_by_name("proof of Wattenburg's guilt")
         assert factor.name == "proof of Wattenburg's guilt"
 

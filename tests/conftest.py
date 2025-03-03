@@ -865,11 +865,6 @@ def make_evidence(
                 to_effect=f["f_no_crime"],
             )
         ),
-        # Here the Exhibit is absent, not the Evidence. Pointless distinction?
-        "no_shooting_witness_unknown_absent_exhibit": Evidence(
-            exhibit=x["no_shooting_witness_unknown_absent_testimony"],
-            to_effect=f["f_no_crime"],
-        ),
         "no_shooting_no_effect_entity_order": Evidence(
             exhibit=x["no_shooting_entity_order_testimony"]
         ),

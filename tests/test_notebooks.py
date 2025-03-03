@@ -11,7 +11,7 @@ import pytest
 
 from justopinion.download import CourtListenerClient
 
-from authorityspoke.facts import Fact
+from authorityspoke.facts import Fact, AbsenceOfFactor
 
 from authorityspoke import Entity, Predicate, Comparison
 
@@ -63,8 +63,8 @@ class TestIntroduction:
         the original holding, are added later.
         """
         lotus_majority = make_opinion_with_holding["lotus_majority"]
-        assert lotus_majority.holdings[0].outputs[0].absent is False
-        assert lotus_majority.holdings[1].outputs[0].absent is True
+        assert isinstance(lotus_majority.holdings[0].outputs[0], Fact)
+        assert isinstance(lotus_majority.holdings[1].outputs[0], AbsenceOfFactor)
 
     def test_change_rule_replacing_enactment(
         self, fake_usc_client, make_opinion_with_holding

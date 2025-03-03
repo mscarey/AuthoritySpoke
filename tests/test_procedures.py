@@ -2,6 +2,8 @@ from copy import deepcopy
 import logging
 import pytest
 
+from pydantic import ValidationError
+
 from nettlesome.terms import ContextRegister, Explanation, TermSequence
 from nettlesome.entities import Entity
 from authorityspoke.groups import FactorGroup
@@ -14,11 +16,11 @@ from authorityspoke.procedures import Procedure
 
 class TestProcedures:
     def test_exception_for_wrong_type_for_procedure(self, make_predicate):
-        with pytest.raises(AttributeError):
+        with pytest.raises(ValidationError):
             Procedure(inputs=make_predicate["p1"], outputs=make_predicate["p2"])
 
     def test_exception_for_wrong_type_in_tuple_for_procedure(self, make_predicate):
-        with pytest.raises(AttributeError):
+        with pytest.raises(ValidationError):
             Procedure(inputs=(make_predicate["p1"]), outputs=(make_predicate["p2"]))
 
     def test_make_procedure_with_evidence_output(self, make_evidence):
