@@ -310,9 +310,12 @@ class Procedure(Comparable, BaseModel):
             can be used for comparing objects using :meth:`consistent_with`
         """
         result: List[Term] = []
-        result.extend(self.outputs)
-        result.extend(self.inputs)
-        result.extend(self.despite)
+        for group in (self.outputs, self.inputs, self.despite):
+            for factor in group:
+                if isinstance(factor, Term):
+                    result.append(factor)
+                else:
+                    result.append(factor.absent)
         return TermSequence(result)
 
     def generic_terms_by_str(self) -> Dict[str, Term]:

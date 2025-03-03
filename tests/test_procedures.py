@@ -78,7 +78,7 @@ class TestProcedures:
             e["tree_search"],
             e["trees"],
             e["watt"],
-            make_evidence["crime_absent"],
+            make_evidence["crime_absent"].absent,
         ):
             assert factor in factors
 
