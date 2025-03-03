@@ -323,10 +323,10 @@ class TestSameMeaning:
     def test_unequal_because_one_factor_is_absent(self):
         predicate = Predicate(content="$shooter shot $victim")
         fact = Fact(predicate=predicate, terms=[Entity(name="Al"), Entity(name="Meg")])
-        fact_b = Fact(
-            predicate=predicate,
-            terms=[Entity(name="Al"), Entity(name="Meg")],
-            absent=True,
+        fact_b = AbsenceOfFactor(
+            absent=Fact(
+                predicate=predicate, terms=[Entity(name="Al"), Entity(name="Meg")]
+            )
         )
         assert not fact.means(fact_b)
 
@@ -581,23 +581,25 @@ class TestImplication:
     def test_absent_factor_implies_absent_factor_with_lesser_quantity(
         self, watt_factor
     ):
-        absent_broader = Fact(
-            predicate=Comparison(
-                content="the distance north from $south to $north was",
-                sign="<",
-                expression="200 miles",
-            ),
-            terms=[Entity(name="Austin"), Entity(name="Dallas")],
-            absent=True,
+        absent_broader = AbsenceOfFactor(
+            absent=Fact(
+                predicate=Comparison(
+                    content="the distance north from $south to $north was",
+                    sign="<",
+                    expression="200 miles",
+                ),
+                terms=[Entity(name="Austin"), Entity(name="Dallas")],
+            )
         )
-        absent_narrower = Fact(
-            predicate=Comparison(
-                content="the distance north from $south to $north was",
-                sign="<",
-                expression="50 miles",
-            ),
-            terms=[Entity(name="Austin"), Entity(name="Dallas")],
-            absent=True,
+        absent_narrower = AbsenceOfFactor(
+            absent=Fact(
+                predicate=Comparison(
+                    content="the distance north from $south to $north was",
+                    sign="<",
+                    expression="50 miles",
+                ),
+                terms=[Entity(name="Austin"), Entity(name="Dallas")],
+            )
         )
         assert absent_broader >= absent_narrower
         assert not absent_narrower >= absent_broader
@@ -718,7 +720,9 @@ class TestContradiction:
     def test_factor_contradiction_absent_predicate(self):
         predicate = Predicate(content="$person was a person")
         fact = Fact(predicate=predicate, terms=Entity(name="Alice"))
-        absent_fact = Fact(predicate=predicate, terms=Entity(name="Alice"), absent=True)
+        absent_fact = AbsenceOfFactor(
+            absent=Fact(predicate=predicate, terms=Entity(name="Alice"))
+        )
 
         assert fact.contradicts(absent_fact)
         assert absent_fact.contradicts(fact)

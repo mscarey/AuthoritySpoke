@@ -1,5 +1,6 @@
 import pytest
 
+from pydantic import ValidationError
 
 from nettlesome.terms import ContextRegister
 from nettlesome.entities import Entity
@@ -14,7 +15,7 @@ class TestMakeEntities:
         This fails because it needs to look up the string factor_records
         in a "mentioned" list, but no "mentioned" parameter is given.
         """
-        with pytest.raises(AttributeError):
+        with pytest.raises(ValidationError):
             readers.read_holdings(record=[{"outputs": ["Bradley"]}])
 
     def test_conversion_to_generic(self, make_entity):
