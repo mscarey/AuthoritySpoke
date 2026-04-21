@@ -27,7 +27,7 @@ setuptools.setup(
     ],
     packages=setuptools.find_packages(exclude=["tests"]),
     install_requires=[
-        "lxml==4.9.1",
+        "lxml==6.1.0",
         "anchorpoint~=0.7.0",
         "eyecite~=2.3.4",
         "justopinion~=0.2.5",
