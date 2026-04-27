@@ -503,8 +503,8 @@ class Holding(Comparable, BaseModel):
         return []
 
     def explanations_same_meaning(
-        self, other: Factor, context: Optional[ContextRegister] = None
-    ) -> Iterator[ContextRegister]:
+        self, other: Comparable, context: Explanation | ContextRegister | None = None
+    ) -> Iterator[Explanation]:
         """Yield contexts that would cause self and other to have same meaning."""
         if (
             isinstance(other, self.__class__)

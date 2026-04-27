@@ -317,7 +317,7 @@ class Fact(Factor, BaseModel):
         """
         result = deepcopy(self)
         new_terms = TermSequence(
-            [factor.new_context(changes) for factor in self.terms_without_nulls]
+            [factor.new_context(changes=changes) for factor in self.terms_without_nulls]
         )
         result.terms = list(new_terms)
         return result

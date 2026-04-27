@@ -542,8 +542,10 @@ class Rule(Comparable, BaseModel):
         return True
 
     def explanations_same_meaning(
-        self, other: Optional[Factor], context: Optional[ContextRegister] = None
-    ) -> Iterator[ContextRegister]:
+        self,
+        other: Optional[Factor],
+        context: Explanation | ContextRegister | None = None,
+    ) -> Iterator[Explanation]:
         """Find context matches that would result in self and other meaning the same."""
         if (
             isinstance(other, Rule)

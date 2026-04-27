@@ -657,7 +657,7 @@ class Procedure(Comparable, BaseModel):
     def explanations_same_meaning(
         self,
         other: Comparable,
-        context: Optional[Union[ContextRegister, Explanation]] = None,
+        context: Explanation | ContextRegister | None = None,
     ) -> Iterator[Explanation]:
         """Yield contexts that could cause self to have the same meaning as other."""
 
