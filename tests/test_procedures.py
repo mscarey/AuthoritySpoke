@@ -87,7 +87,7 @@ class TestProcedures:
 
     def test_repr(self, make_problem_procedure):
         rep = repr(make_problem_procedure["c3"])
-        assert "Predicate(content='$person committed" in rep
+        assert "Predicate(content='{person} committed" in rep
 
     def test_entities_of_inputs_for_identical_procedure(
         self, watt_factor, make_procedure, watt_mentioned
@@ -173,7 +173,7 @@ class TestProcedureImplication:
 
     def test_implied_procedure_with_reciprocal_entities(self, make_procedure):
         """
-        Because both procedures have a form of "the distance between $place1 and $place2 was"
+        Because both procedures have a form of "the distance between {place1} and {place2} was"
         factor and those factors are reciprocal, the entities of one of them in reversed
         order can be used as the entities of the other, and one will still imply the other.
         (But if there had been more than two entities, only the first two would have been
@@ -310,13 +310,13 @@ class TestProcedureUnion:
         assert procedure_from_union.means(procedure_from_adding)
 
 
-p_small_weight = Comparison(
-    content="the amount of gold $person possessed was",
+p_small_weight = Comparison.new(
+    content="the amount of gold {person} possessed was",
     sign="<",
     expression=Q_("1 gram"),
 )
-p_large_weight = Comparison(
-    content="the amount of gold $person possessed was",
+p_large_weight = Comparison.new(
+    content="the amount of gold {person} possessed was",
     sign=">=",
     expression=Q_("100 kilograms"),
 )

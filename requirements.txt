@@ -3,9 +3,9 @@ eyecite~=2.6.3
 justopinion==0.4.0
 legislice==0.8.1
 lxml>=4.9.1
-git+https://github.com/mscarey/nettlesome.git@absent-class
+git+https://github.com/mscarey/nettlesome.git@termsequence-items
 pint>=0.15
-pydantic==2.10.5
+pydantic==2.13.3
 python-dotenv
 python-ranges>=0.2.1
 python-slugify

@@ -202,7 +202,7 @@ class TestRetrieveMentioned:
     def test_add_found_context_to_content(self):
         fact = {
             "type": "fact",
-            "predicate": {"content": "$moe threw a pie at Larry but it hit $curly"},
+            "predicate": {"content": "{moe} threw a pie at Larry but it hit {curly}"},
             "terms": [
                 {"type": "Entity", "name": "Moe"},
                 {"type": "Entity", "name": "Curly"},
@@ -217,7 +217,7 @@ class TestRetrieveMentioned:
         )
         assert (
             fact["predicate"]["content"]
-            == "$moe threw a pie at ${larry} but it hit $curly"
+            == "{moe} threw a pie at ${larry} but it hit {curly}"
         )
         assert fact["terms"][1]["name"] == "Larry"
 

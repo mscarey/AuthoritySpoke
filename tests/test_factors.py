@@ -119,7 +119,7 @@ class TestFacts:
         elaine = Entity(name="Elaine", generic=True)
         opened_account = Fact(
             predicate=Predicate(
-                content="$applicant opened a bank account for $applicant and $cosigner"
+                content="{applicant} opened a bank account for {applicant} and {cosigner}"
             ),
             terms=(devon, elaine),
         )
@@ -305,13 +305,13 @@ class TestSameMeaning:
 
         ann_and_bob_were_family = Fact(
             predicate=Predicate(
-                content="$relative1 and $relative2 both were members of the same family"
+                content="{relative1} and {relative2} both were members of the same family"
             ),
             terms=(ann, bob),
         )
         bob_and_ann_were_family = Fact(
             predicate=Predicate(
-                content="$relative1 and $relative2 both were members of the same family"
+                content="{relative1} and {relative2} both were members of the same family"
             ),
             terms=(bob, ann),
         )
@@ -335,10 +335,10 @@ class TestSameMeaning:
         directory = Entity(name="Rural's telephone directory", plural=False)
         listings = Entity(name="Rural's telephone listings", plural=True)
         directory_original = Fact(
-            predicate=Predicate(content="$thing was original"), terms=directory
+            predicate=Predicate(content="{thing} was original"), terms=directory
         )
         listings_original = Fact(
-            predicate=Predicate(content="$thing were original"), terms=listings
+            predicate=Predicate(content="{thing} were original"), terms=listings
         )
         assert directory_original.means(listings_original)
 
@@ -504,11 +504,11 @@ class TestImplication:
 
     def test_some_interchangeable_entities(self):
         hit = Fact(
-            predicate="$person1 hit $target1 and $target2",
+            predicate="{person1} hit {target1} and {target2}",
             terms=[Entity(name="Moe"), Entity(name="Curly"), Entity(name="Larry")],
         )
         hit2 = Fact(
-            predicate="$person1 hit $target1 and $target2",
+            predicate="{person1} hit {target1} and {target2}",
             terms=[
                 Entity(name="Joker"),
                 Entity(name="Batman"),
@@ -519,15 +519,15 @@ class TestImplication:
 
     def test_interchangeable_entities_in_group(self):
         fought = Fact(
-            predicate="$person1, $person2, and $person3 fought each other",
+            predicate="{person1}, {person2}, and {person3} fought each other",
             terms=[Entity(name="Larry"), Entity(name="Moe"), Entity(name="Curly")],
         )
         hit = Fact(
-            predicate="$person1 hit $target1 and $target2",
+            predicate="{person1} hit {target1} and {target2}",
             terms=[Entity(name="Moe"), Entity(name="Curly"), Entity(name="Larry")],
         )
         fought2 = Fact(
-            predicate="$person1, $person2, and $person3 fought each other",
+            predicate="{person1}, {person2}, and {person3} fought each other",
             terms=[
                 Entity(name="Superman"),
                 Entity(name="Batman"),
@@ -535,7 +535,7 @@ class TestImplication:
             ],
         )
         hit2 = Fact(
-            predicate="$person1 hit $target1 and $target2",
+            predicate="{person1} hit {target1} and {target2}",
             terms=[
                 Entity(name="Joker"),
                 Entity(name="Batman"),
@@ -633,12 +633,12 @@ class TestContradiction:
         contradiction if you assume they correspond to one another.
         """
         p_small_weight = Comparison(
-            content="the amount of gold $person possessed was",
+            content="the amount of gold {person} possessed was",
             sign="<",
             expression=Q_("1 gram"),
         )
         p_large_weight = Comparison(
-            content="the amount of gold $person possessed was",
+            content="the amount of gold {person} possessed was",
             sign=">=",
             expression=Q_("100 kilograms"),
         )
@@ -655,12 +655,12 @@ class TestContradiction:
         So there's no contradiction.
         """
         p_small_weight = Comparison(
-            content="the amount of gold $person possessed was",
+            content="the amount of gold {person} possessed was",
             sign="<",
             expression=Q_("1 gram"),
         )
         p_large_weight = Comparison(
-            content="the amount of gold $person possessed was",
+            content="the amount of gold {person} possessed was",
             sign=">=",
             expression=Q_("100 kilograms"),
         )

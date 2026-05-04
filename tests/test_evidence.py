@@ -83,11 +83,11 @@ class TestEvidenceSameMeaning:
         """Test the entire _registers_for_interchangeable_context function."""
 
         hit = Fact(
-            predicate="$person1 hit $target1 and $target2",
+            predicate="{person1} hit {target1} and {target2}",
             terms=[Entity(name="Moe"), Entity(name="Curly"), Entity(name="Larry")],
         )
         hit2 = Fact(
-            predicate="$person1 hit $target1 and $target2",
+            predicate="{person1} hit {target1} and {target2}",
             terms=[
                 Entity(name="Joker"),
                 Entity(name="Batman"),

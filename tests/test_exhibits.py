@@ -25,13 +25,13 @@ class TestExhibits:
             form="token",
             statement=Fact(
                 predicate=Predicate(
-                    content="$agency granted an exemption from the prohibition of wearing beards"
+                    content="{agency} granted an exemption from the prohibition of wearing beards"
                 ),
                 terms=Entity(name="the Department of Beards"),
             ),
             statement_attribution=Entity(name="the Department of Beards"),
         )
-        counterfeit = Fact(predicate="$thing was counterfeit", terms=coin)
+        counterfeit = Fact(predicate="{thing} was counterfeit", terms=coin)
         assert str(counterfeit) == (
             "the fact that the token attributed to <the Department of Beards>, "
             "asserting the fact that <the Department of Beards> granted an "

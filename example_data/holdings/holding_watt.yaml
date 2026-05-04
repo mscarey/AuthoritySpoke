@@ -26,7 +26,7 @@
   - type: fact
     content: the stockpile of trees was among some standing trees
   - type: fact
-    content: the distance between $place1 and $place2 was > 35 feet
+    content: the distance between {place1} and {place2} was > 35 feet
     terms:
     - type: entity
       name: the stockpile of trees
@@ -39,7 +39,7 @@
       personnel and patrons of Hideaway Lodge was <= 5 feet
   despite:
   - type: fact
-    content: the distance between $place1 and $place2 was >= 20 feet
+    content: the distance between {place1} and {place2} was >= 20 feet
     terms:
     - type: entity
       name: the stockpile of trees
@@ -126,7 +126,7 @@
   - type: fact
     content: the stockpile of trees was in an area accessible to the public
   - type: fact
-    content: the distance between the $place1 and $place2 was >= 20 feet
+    content: the distance between the {place1} and {place2} was >= 20 feet
     terms:
     - type: entity
       name: the stockpile of trees
