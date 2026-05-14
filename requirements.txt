@@ -5,7 +5,7 @@ legislice==0.8.1
 lxml>=4.9.1
 git+https://github.com/mscarey/nettlesome.git@absent-class
 pint>=0.15
-pydantic==2.10.5
+pydantic
 python-dotenv
 python-ranges>=0.2.1
 python-slugify
