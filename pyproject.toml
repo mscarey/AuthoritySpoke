@@ -1,6 +1,27 @@
-[build-system]
-requires = [
-    "setuptools>=42",
-    "wheel"
+[project]
+name = "authorityspoke"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "anchorpoint>=0.7.0",
+    "eyecite~=2.6.3",
+    "justopinion==0.4.0",
+    "legislice==0.8.1",
+    "lxml>=4.9.1",
+    "nettlesome",
+    "pint>=0.15",
+    "pydantic",
+    "python-dotenv",
+    "python-ranges>=0.2.1",
+    "python-slugify",
+    "pyyaml",
+    "requests",
+    "roman",
+    "sympy>=1.7.1",
 ]
-build-backend = "setuptools.build_meta"
+
+[tool.uv.sources]
+nettlesome = { git = "https://github.com/mscarey/nettlesome.git", rev = "absent-class" }
+

@@ -10,7 +10,7 @@ from nettlesome.terms import ContextRegister
 from nettlesome.entities import Entity
 from authorityspoke.groups import FactorGroup
 from nettlesome.predicates import Predicate
-from nettlesome.quantities import Comparison, Q_
+from nettlesome.quantities import Comparison, Q_, UnitRange
 from nettlesome.statements import Statement
 import pytest
 
@@ -19,7 +19,6 @@ from authorityspoke.facts import Fact
 from authorityspoke.holdings import Holding
 from authorityspoke.procedures import Procedure
 from authorityspoke.rules import Rule
-from authorityspoke.io import loaders, readers
 from authorityspoke.io.fake_enactments import FakeClient
 
 load_dotenv()
@@ -89,9 +88,11 @@ class TestRules:
         with pytest.raises(TypeError):
             make_holding["h1"].new_context([make_predicate["p1"], make_predicate["p2"]])
 
-    def test_new_context_choose_factor_to_replace_by_name(self, make_beard_rule):
-        transfer_rule = make_beard_rule[11]
-        barber_rule = make_beard_rule[-1]
+    def test_new_context_choose_factor_to_replace_by_name(
+        self, make_beard_rule_with_python
+    ):
+        transfer_rule = make_beard_rule_with_python[11]
+        barber_rule = make_beard_rule_with_python[-1]
         defendant = transfer_rule.generic_terms()[0]
         counterparty = transfer_rule.generic_terms()[2]
         defendant_rule = barber_rule.new_context(
@@ -1009,56 +1010,71 @@ class TestStatuteRules:
 
     client = Client(api_token=TOKEN)
 
-    def test_greater_than_implies_equal(self, beard_response, make_beard_rule):
-        client = FakeClient(responses=beard_response)
-        beard_dictionary = loaders.load_holdings("beard_rules.yaml")
-        beard_dictionary[0]["inputs"][1]["content"] = (
-            "the length of the suspected beard was = 8 millimetres"
+    def test_greater_than_implies_equal(self, make_beard_rule_with_python):
+        longer_hair_rule = deepcopy(make_beard_rule_with_python[0])
+        longer_hair_rule.set_inputs(
+            [
+                longer_hair_rule.inputs[0],
+                Fact(
+                    predicate=Comparison(
+                        content="the length of ${the_suspected_beard} was",
+                        quantity_range=UnitRange(
+                            sign="==",
+                            quantity_magnitude=8,
+                            quantity_units="millimetres",
+                        ),
+                    ),
+                    terms=[Entity(name="the suspected beard")],
+                ),
+                longer_hair_rule.inputs[2],
+            ]
         )
-        longer_hair_rule = readers.read_holdings([beard_dictionary[0]], client=client)
-        assert make_beard_rule[0].implies(longer_hair_rule[0])
+        assert make_beard_rule_with_python[0].implies(longer_hair_rule)
 
-    def test_reset_inputs_to_create_contradiction(
-        self, beard_response, make_beard_rule
-    ):
+    def test_reset_inputs_to_create_contradiction(self, make_beard_rule_with_python):
         """Test missing 'False' truth value in output of long_means_not_beard"""
-        ear_rule = make_beard_rule[1]
-        client = FakeClient(responses=beard_response)
-        beard_rule_data = loaders.load_holdings("beard_rules.yaml")[:2]
-        changed_holdings = readers.read_holdings(beard_rule_data, client=client)
-        long_means_not_beard = changed_holdings[1]
+        ear_rule = make_beard_rule_with_python[1]
+        long_means_not_beard = deepcopy(make_beard_rule_with_python[1])
         long_means_not_beard.set_despite([ear_rule.inputs[0], ear_rule.inputs[2]])
         fact = Fact(
-            content="the length of ${the_suspected_beard} was >= 12 inches",
+            predicate=Comparison(
+                content="the length of ${the_suspected_beard} was",
+                quantity_range=UnitRange(
+                    sign=">=", quantity_magnitude=12, quantity_units="inches"
+                ),
+            ),
             terms=[Entity(name="the suspected beard")],
         )
         long_means_not_beard.set_inputs(fact)
-        long_means_not_beard.set_outputs(long_means_not_beard.outputs[0].negated())
-        long_means_not_beard.rule.mandatory = True
+        long_means_not_beard.set_outputs([long_means_not_beard.outputs[0].negated()])
+        long_means_not_beard.mandatory = True
         assert long_means_not_beard.contradicts(ear_rule)
 
-    def test_greater_than_contradicts_not_greater(
-        self, beard_response, make_beard_rule
-    ):
-        client = FakeClient(responses=beard_response)
-        beard_dictionary = loaders.load_holdings("beard_rules.yaml")
-        beard_dictionary[1]["inputs"][1]["content"] = (
-            "the length of the suspected beard was >= 12 inches"
+    def test_greater_than_contradicts_not_greater(self, make_beard_rule_with_python):
+        long_hair_is_not_a_beard = deepcopy(make_beard_rule_with_python[1])
+        long_hair_is_not_a_beard.set_inputs(
+            [
+                long_hair_is_not_a_beard.inputs[0],
+                Fact(
+                    predicate=Comparison(
+                        content="the length of ${the_suspected_beard} was",
+                        quantity_range=UnitRange(
+                            sign=">=", quantity_magnitude=12, quantity_units="inches"
+                        ),
+                    ),
+                    terms=[Entity(name="the suspected beard")],
+                ),
+                long_hair_is_not_a_beard.inputs[2],
+            ]
         )
-        beard_dictionary[1]["outputs"][0]["truth"] = False
-        beard_dictionary[1]["mandatory"] = True
-        long_hair_is_not_a_beard = readers.read_holdings(
-            [beard_dictionary[1]], client=client
+        long_hair_is_not_a_beard.set_outputs(
+            [long_hair_is_not_a_beard.outputs[0].negated()]
         )
-        assert make_beard_rule[1].contradicts(long_hair_is_not_a_beard[0])
+        long_hair_is_not_a_beard.mandatory = True
+        assert make_beard_rule_with_python[1].contradicts(long_hair_is_not_a_beard)
 
-    def test_contradictory_fact_about_beard_length(
-        self, fake_beard_client, make_beard_rule
-    ):
-        beard_dictionary = loaders.load_holdings("beard_rules.yaml")
-        long_means_not_beard = readers.read_holdings(
-            beard_dictionary[1], client=fake_beard_client
-        )[0].rule
+    def test_contradictory_fact_about_beard_length(self, make_beard_rule_with_python):
+        long_means_not_beard = deepcopy(make_beard_rule_with_python[1])
         long_means_not_beard.set_despite(
             [long_means_not_beard.inputs[0], long_means_not_beard.inputs[2]]
         )
@@ -1066,8 +1082,8 @@ class TestStatuteRules:
         long_means_not_beard.set_outputs([long_means_not_beard.outputs[0].negated()])
         long_means_not_beard.mandatory = True
 
-        assert make_beard_rule[1].contradicts(long_means_not_beard)
-        assert long_means_not_beard.contradicts(make_beard_rule[1])
+        assert make_beard_rule_with_python[1].contradicts(long_means_not_beard)
+        assert long_means_not_beard.contradicts(make_beard_rule_with_python[1])
 
     @pytest.mark.parametrize(
         (
@@ -1093,7 +1109,7 @@ class TestStatuteRules:
         facial_hair_uninterrupted,
         outcome,
         fake_beard_client,
-        make_beard_rule,
+        make_beard_rule_with_python,
     ):
         beard = Entity(name="a facial feature")
 
@@ -1137,13 +1153,13 @@ class TestStatuteRules:
             enactments=sec_4,
         )
 
-        meets_chin_test = make_beard_rule[0].implies(hypothetical)
-        meets_ear_test = make_beard_rule[1].implies(hypothetical)
+        meets_chin_test = make_beard_rule_with_python[0].implies(hypothetical)
+        meets_ear_test = make_beard_rule_with_python[1].implies(hypothetical)
         assert outcome == meets_chin_test or meets_ear_test
 
-    def test_adding_definition_of_transfer(self, make_beard_rule):
-        loan_is_transfer = make_beard_rule[7]
-        elements_of_offense = make_beard_rule[11]
+    def test_adding_definition_of_transfer(self, make_beard_rule_with_python):
+        loan_is_transfer = make_beard_rule_with_python[7]
+        elements_of_offense = make_beard_rule_with_python[11]
         loan_without_exceptions = (
             loan_is_transfer
             + elements_of_offense.inputs[1]

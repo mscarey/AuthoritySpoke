@@ -1764,7 +1764,8 @@ def make_beard_rule_with_python(beard_response) -> List[Rule]:
     return [
         Rule(
             procedure=Procedure(
-                inputs=[fact_facial_hair, fact_length, fact_chin], outputs=[fact_is_beard]
+                inputs=[fact_facial_hair, fact_length, fact_chin],
+                outputs=[fact_is_beard],
             ),
             enactments=passage(
                 "/test/acts/47/4",
@@ -1809,12 +1810,16 @@ def make_beard_rule_with_python(beard_response) -> List[Rule]:
             mandatory=True,
         ),
         Rule(
-            procedure=Procedure(inputs=[defendant_beardcoin], outputs=[evidence_beardcoin]),
+            procedure=Procedure(
+                inputs=[defendant_beardcoin], outputs=[evidence_beardcoin]
+            ),
             enactments=passage("/test/acts/47/6C"),
             universal=True,
         ),
         Rule(
-            procedure=Procedure(inputs=[purchase_transfer], outputs=[beardcoin_transfer]),
+            procedure=Procedure(
+                inputs=[purchase_transfer], outputs=[beardcoin_transfer]
+            ),
             enactments=passage("/test/acts/47/7A"),
             universal=True,
             mandatory=True,
@@ -1846,7 +1851,9 @@ def make_beard_rule_with_python(beard_response) -> List[Rule]:
             mandatory=True,
         ),
         Rule(
-            procedure=Procedure(inputs=[defendant_receipt], outputs=[beardcoin_transfer]),
+            procedure=Procedure(
+                inputs=[defendant_receipt], outputs=[beardcoin_transfer]
+            ),
             enactments=passage("/test/acts/47/7A"),
             universal=True,
             mandatory=True,
@@ -1867,7 +1874,9 @@ def make_beard_rule_with_python(beard_response) -> List[Rule]:
             universal=True,
         ),
         Rule(
-            procedure=Procedure(inputs=[counterfeit_tokens], outputs=[counterfeit_offense]),
+            procedure=Procedure(
+                inputs=[counterfeit_tokens], outputs=[counterfeit_offense]
+            ),
             enactments=passage("/test/acts/47/7B/1"),
         ),
         Rule(
