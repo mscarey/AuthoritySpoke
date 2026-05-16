@@ -7,7 +7,7 @@ from anchorpoint.textselectors import TextQuoteSelector
 from dotenv import load_dotenv
 from justopinion.decisions import Decision, Opinion
 from legislice.download import Client
-from legislice.enactments import Enactment
+from legislice.enactments import Enactment, EnactmentPassage
 
 from nettlesome.terms import ContextRegister
 from nettlesome.entities import Entity
@@ -28,6 +28,7 @@ from authorityspoke.facts import (
 from authorityspoke.facts import Exhibit, Pleading
 from authorityspoke.holdings import Holding, RawHolding
 from authorityspoke.opinions import OpinionReading
+from authorityspoke.passages import passage_from_quotes
 from authorityspoke.rules import Procedure, Rule
 
 from authorityspoke.io import loaders, readers
@@ -1525,7 +1526,10 @@ def make_beard_rule(beard_response) -> List[Rule]:
     """Rules from the "Beard Tax Act" example statutes."""
     client = FakeClient(responses=beard_response)
     beard_dictionary = loaders.load_holdings("beard_rules.yaml")
-    holdings = readers.read_holdings(beard_dictionary, client=client)
+    holdings = readers.read_holdings(
+        beard_dictionary,
+        client=client,
+    )
     return [holding.rule for holding in holdings]
 
 
@@ -1533,15 +1537,6 @@ def make_beard_rule(beard_response) -> List[Rule]:
 def make_beard_rule_with_python(beard_response) -> List[Rule]:
     """Rules from the Beard Tax Act built directly from Python model objects."""
     client = FakeClient(responses=beard_response)
-
-    def passage(node: str, quotes: List[str] | None = None):
-        enactment = client.read(node)
-        if not quotes:
-            return enactment.select_all()
-        selection = enactment.select(TextQuoteSelector(exact=quotes[0]))
-        for quote in quotes[1:]:
-            selection.select_more(TextQuoteSelector(exact=quote))
-        return selection
 
     suspected_beard = Entity(name="the suspected beard")
     defendant = Entity(name="the defendant")
@@ -1767,7 +1762,8 @@ def make_beard_rule_with_python(beard_response) -> List[Rule]:
                 inputs=[fact_facial_hair, fact_length, fact_chin],
                 outputs=[fact_is_beard],
             ),
-            enactments=passage(
+            enactments=passage_from_quotes(
+                client,
                 "/test/acts/47/4",
                 [
                     "In this Act, beard means any facial hair no shorter than 5 millimetres in length that: occurs on or below the chin"
@@ -1781,14 +1777,15 @@ def make_beard_rule_with_python(beard_response) -> List[Rule]:
                 outputs=[fact_is_beard],
             ),
             enactments=[
-                passage(
+                passage_from_quotes(
+                    client,
                     "/test/acts/47/4",
                     [
                         "In this Act, beard means any facial hair no shorter than 5 millimetres in length that:",
                         "exists in an uninterrupted line from the front of one ear to the front of the other ear below the nose.",
                     ],
                 ),
-                passage("/test/acts/47/4/b"),
+                passage_from_quotes(client, "/test/acts/47/4/b"),
             ],
             universal=True,
         ),
@@ -1797,15 +1794,18 @@ def make_beard_rule_with_python(beard_response) -> List[Rule]:
                 inputs=[fact_is_beard, fact_wore_beard, fact_no_exemption],
                 outputs=[offense_wearing_without_exemption],
             ),
-            enactments=[passage("/test/acts/47/5"), passage("/test/acts/47/7")],
-            enactments_despite=[passage("/test/acts/47/6")],
+            enactments=[
+                passage_from_quotes(client, "/test/acts/47/5"),
+                passage_from_quotes(client, "/test/acts/47/7"),
+            ],
+            enactments_despite=[passage_from_quotes(client, "/test/acts/47/6")],
             universal=True,
         ),
         Rule(
             procedure=Procedure(
                 inputs=[fact_defendant_exemption], outputs=[fact_general_exemption]
             ),
-            enactments=passage("/test/acts/47/6/1"),
+            enactments=passage_from_quotes(client, "/test/acts/47/6/1"),
             universal=True,
             mandatory=True,
         ),
@@ -1813,14 +1813,14 @@ def make_beard_rule_with_python(beard_response) -> List[Rule]:
             procedure=Procedure(
                 inputs=[defendant_beardcoin], outputs=[evidence_beardcoin]
             ),
-            enactments=passage("/test/acts/47/6C"),
+            enactments=passage_from_quotes(client, "/test/acts/47/6C"),
             universal=True,
         ),
         Rule(
             procedure=Procedure(
                 inputs=[purchase_transfer], outputs=[beardcoin_transfer]
             ),
-            enactments=passage("/test/acts/47/7A"),
+            enactments=passage_from_quotes(client, "/test/acts/47/7A"),
             universal=True,
             mandatory=True,
         ),
@@ -1828,25 +1828,25 @@ def make_beard_rule_with_python(beard_response) -> List[Rule]:
             procedure=Procedure(
                 inputs=[counterparty_purchase], outputs=[beardcoin_transfer]
             ),
-            enactments=passage("/test/acts/47/7A"),
+            enactments=passage_from_quotes(client, "/test/acts/47/7A"),
             universal=True,
             mandatory=True,
         ),
         Rule(
             procedure=Procedure(inputs=[defendant_loan], outputs=[beardcoin_transfer]),
-            enactments=passage("/test/acts/47/7A"),
+            enactments=passage_from_quotes(client, "/test/acts/47/7A"),
             universal=True,
             mandatory=True,
         ),
         Rule(
             procedure=Procedure(inputs=[defendant_lease], outputs=[beardcoin_transfer]),
-            enactments=passage("/test/acts/47/7A"),
+            enactments=passage_from_quotes(client, "/test/acts/47/7A"),
             universal=True,
             mandatory=True,
         ),
         Rule(
             procedure=Procedure(inputs=[defendant_gift], outputs=[beardcoin_transfer]),
-            enactments=passage("/test/acts/47/7A"),
+            enactments=passage_from_quotes(client, "/test/acts/47/7A"),
             universal=True,
             mandatory=True,
         ),
@@ -1854,7 +1854,7 @@ def make_beard_rule_with_python(beard_response) -> List[Rule]:
             procedure=Procedure(
                 inputs=[defendant_receipt], outputs=[beardcoin_transfer]
             ),
-            enactments=passage("/test/acts/47/7A"),
+            enactments=passage_from_quotes(client, "/test/acts/47/7A"),
             universal=True,
             mandatory=True,
         ),
@@ -1868,8 +1868,11 @@ def make_beard_rule_with_python(beard_response) -> List[Rule]:
                 despite=[counterfeit_beardcoin],
                 outputs=[improper_transfer_offense],
             ),
-            enactments=[passage("/test/acts/47/7A"), passage("/test/acts/47/7B/2")],
-            enactments_despite=[passage("/test/acts/47/11")],
+            enactments=[
+                passage_from_quotes(client, "/test/acts/47/7A"),
+                passage_from_quotes(client, "/test/acts/47/7B/2"),
+            ],
+            enactments_despite=[passage_from_quotes(client, "/test/acts/47/11")],
             mandatory=True,
             universal=True,
         ),
@@ -1877,14 +1880,14 @@ def make_beard_rule_with_python(beard_response) -> List[Rule]:
             procedure=Procedure(
                 inputs=[counterfeit_tokens], outputs=[counterfeit_offense]
             ),
-            enactments=passage("/test/acts/47/7B/1"),
+            enactments=passage_from_quotes(client, "/test/acts/47/7B/1"),
         ),
         Rule(
             procedure=Procedure(
                 inputs=[barber_purchase, barber_removed_beard, barber_licensed],
                 outputs=[licensed_repurchase],
             ),
-            enactments=passage("/test/acts/47/11"),
+            enactments=passage_from_quotes(client, "/test/acts/47/11"),
         ),
     ]
 
