@@ -301,8 +301,8 @@ class TestProcedureContradiction:
 
 
 class TestProcedureUnion:
-    def test_simple_union(self, make_opinion_with_holding):
-        feist = make_opinion_with_holding["feist_majority"]
+    def test_simple_union(self, make_opinion_with_holding_python_feist):
+        feist = make_opinion_with_holding_python_feist["feist_majority"]
         procedure_from_union = feist.holdings[0].procedure | feist.holdings[2].procedure
         procedure_from_adding = (
             feist.holdings[0].procedure + feist.holdings[2].procedure.inputs[0]

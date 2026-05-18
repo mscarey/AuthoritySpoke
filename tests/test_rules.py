@@ -14,7 +14,6 @@ from nettlesome.quantities import Comparison, Q_, UnitRange
 from nettlesome.statements import Statement
 import pytest
 
-
 from authorityspoke.facts import Fact
 from authorityspoke.holdings import Holding
 from authorityspoke.procedures import Procedure
@@ -115,16 +114,16 @@ class TestRules:
         generics = make_holding["h1"].generic_terms()
         assert list(generics) == [make_entity["motel"], make_entity["watt"]]
 
-    def test_string_with_line_breaks(self, make_opinion_with_holding):
-        cardenas = make_opinion_with_holding["cardenas_majority"]
+    def test_string_with_line_breaks(self, make_opinion_with_holding_python_feist):
+        cardenas = make_opinion_with_holding_python_feist["cardenas_majority"]
         assert "was addicted to heroin,\n" in str(cardenas.holdings[0])
 
-    def test_string_mentions_absence(self, make_opinion_with_holding):
-        cardenas = make_opinion_with_holding["cardenas_majority"]
+    def test_string_mentions_absence(self, make_opinion_with_holding_python_feist):
+        cardenas = make_opinion_with_holding_python_feist["cardenas_majority"]
         assert "absence of the evidence" in str(cardenas.holdings[1]).lower()
 
-    def test_factor_properties_for_rule(self, make_opinion_with_holding):
-        cardenas = make_opinion_with_holding["cardenas_majority"]
+    def test_factor_properties_for_rule(self, make_opinion_with_holding_python_feist):
+        cardenas = make_opinion_with_holding_python_feist["cardenas_majority"]
         assert len(cardenas.holdings[1].inputs) == 1
         assert len(cardenas.holdings[1].outputs) == 1
         assert len(cardenas.holdings[1].despite) == 1
@@ -568,9 +567,9 @@ class TestContradiction:
         assert not make_rule["h2"].contradicts(make_rule["h2_MUST"])
 
     def test_abbreviated_contradiction_with_distance(
-        self, make_opinion_with_holding, make_holding
+        self, make_opinion_with_holding_python_feist, make_holding
     ):
-        watt = make_opinion_with_holding["watt_majority"]
+        watt = make_opinion_with_holding_python_feist["watt_majority"]
         watt_rule = list(watt.holdings)[1].rule
         must_not_rule = make_holding["h2_output_false_ALL_MUST"]
         watt_rule.procedure.inputs = FactorGroup([watt_rule.inputs[3]])
@@ -725,7 +724,7 @@ class TestAddition:
         )
 
     def test_add_rules_with_duplicate_enactment_text(
-        self, e_copyright_requires_originality, make_opinion_with_holding
+        self, e_copyright_requires_originality, make_opinion_with_holding_python_feist
     ):
         """
         test implication between
@@ -739,7 +738,7 @@ class TestAddition:
         on its own. The addition expression should not result in
         duplicated text.
         """
-        feist = make_opinion_with_holding["feist_majority"]
+        feist = make_opinion_with_holding_python_feist["feist_majority"]
         listings_not_original = feist.holdings[10].rule
         inferred_holding = feist.holdings[3].inferred_from_exclusive[0]
         unoriginal_not_copyrightable = inferred_holding.rule
@@ -841,18 +840,18 @@ class TestUnion:
         rule = make_rule["h2"]
         assert rule | None == rule
 
-    def test_union_contradictory_outputs(self, make_opinion_with_holding):
+    def test_union_contradictory_outputs(self, make_opinion_with_holding_python_feist):
         """
         Test that even when two Rules don't contradict each other,
         their union will be None if any of their outputs contradict.
         """
-        feist = make_opinion_with_holding["feist_majority"]
+        feist = make_opinion_with_holding_python_feist["feist_majority"]
         assert not feist.holdings[1].contradicts(feist.holdings[2])
         assert feist.holdings[1].outputs[0].contradicts(feist.holdings[2].outputs[0])
         assert feist.holdings[1] | feist.holdings[2] is None
 
-    def test_union_basic(self, make_opinion_with_holding):
-        feist = make_opinion_with_holding["feist_majority"]
+    def test_union_basic(self, make_opinion_with_holding_python_feist):
+        feist = make_opinion_with_holding_python_feist["feist_majority"]
         new_rule = feist.holdings[0].rule | feist.holdings[2].rule
         assert len(new_rule.inputs) == 2
         assert len(new_rule.outputs) == 1
@@ -868,21 +867,21 @@ class TestUnion:
         # imply any exclusive right in the preexisting material....'
         assert len(new_rule.enactments) == 2
 
-    def test_union_of_rule_and_holding(self, make_opinion_with_holding):
-        feist = make_opinion_with_holding["feist_majority"]
+    def test_union_of_rule_and_holding(self, make_opinion_with_holding_python_feist):
+        feist = make_opinion_with_holding_python_feist["feist_majority"]
         new_holding = feist.holdings[0].rule | feist.holdings[2]
         assert isinstance(new_holding, Holding)
         assert len(new_holding.inputs) == 2
         assert len(new_holding.outputs) == 1
         assert len(new_holding.enactments) == 2
 
-    def test_union_rule_and_fact(self, make_opinion_with_holding, make_factor):
-        feist = make_opinion_with_holding["feist_majority"]
+    def test_union_rule_and_fact(self, make_opinion_with_holding_python_feist, make_factor):
+        feist = make_opinion_with_holding_python_feist["feist_majority"]
         with pytest.raises(TypeError):
             feist.holdings[0].rule | make_factor["f_irrelevant_0"]
 
-    def test_union_longer(self, make_opinion_with_holding):
-        feist = make_opinion_with_holding["feist_majority"]
+    def test_union_longer(self, make_opinion_with_holding_python_feist):
+        feist = make_opinion_with_holding_python_feist["feist_majority"]
         new_rule = feist.holdings[4].rule | feist.holdings[6].rule
         assert len(new_rule.inputs) == 6
         assert len(new_rule.outputs) == 1
@@ -890,7 +889,7 @@ class TestUnion:
         assert new_rule.universal is False
         assert new_rule.mandatory is False
 
-    def test_union_same_output(self, make_opinion_with_holding):
+    def test_union_same_output(self, make_opinion_with_holding_python_feist):
         """
         The two Rules being combined both same the same output
         Factor (and they both have only one output Factor).
@@ -898,9 +897,9 @@ class TestUnion:
         output Factor.
         """
 
-        lotus = make_opinion_with_holding["lotus_majority"]
+        lotus = make_opinion_with_holding_python_feist["lotus_majority"]
         lotus_not_copyrightable = lotus.holdings[6].rule
-        feist = make_opinion_with_holding["feist_majority"]
+        feist = make_opinion_with_holding_python_feist["feist_majority"]
         feist_not_copyrightable = feist.holdings[0].rule
         new_rule = lotus_not_copyrightable | feist_not_copyrightable
         assert len(new_rule.outputs) == 1
@@ -939,15 +938,15 @@ class TestUnion:
             original_on_right
         )
 
-    def test_union_change_context(self, make_opinion_with_holding):
+    def test_union_change_context(self, make_opinion_with_holding_python_feist):
         """
         When the union operation is applied to the Rules, a fact that
         related to <the Java API> in the original is mentioned relating
         to <the Lotus menu command hierarchy> instead.
         """
 
-        lotus = make_opinion_with_holding["lotus_majority"]
-        oracle = make_opinion_with_holding["oracle_majority"]
+        lotus = make_opinion_with_holding_python_feist["lotus_majority"]
+        oracle = make_opinion_with_holding_python_feist["oracle_majority"]
         # changing one of the Rules to universal because otherwise
         # nothing can be inferred by their union.
         lotus_rule = deepcopy(lotus.holdings[2].rule)
@@ -959,7 +958,7 @@ class TestUnion:
             in new.short_string
         )
 
-    def test_union_one_generic_not_matched(self, make_opinion_with_holding):
+    def test_union_one_generic_not_matched(self, make_opinion_with_holding_python_feist):
         """
         Here, both Rules have the input "fact that <> was a computer program".
         But they each have another generic that can't be matched:
@@ -968,8 +967,8 @@ class TestUnion:
         fact that <the Lotus menu command hierarchy> provided the means by
         which users controlled and operated <Lotus 1-2-3>
         """
-        lotus = make_opinion_with_holding["lotus_majority"]
-        oracle = make_opinion_with_holding["oracle_majority"]
+        lotus = make_opinion_with_holding_python_feist["lotus_majority"]
+        oracle = make_opinion_with_holding_python_feist["oracle_majority"]
         new = lotus.holdings[7].rule | oracle.holdings[3].rule
         text = (
             "that <the Lotus menu command hierarchy> was a "
@@ -988,7 +987,7 @@ class TestUnion:
         assert len(new_rule.enactments) == 2
         assert new_rule.universal
 
-    def test_union_inconsistent_outputs(self, make_opinion_with_holding):
+    def test_union_inconsistent_outputs(self, make_opinion_with_holding_python_feist):
         """
         The union operator should return a rule with all the inputs of both Rules
         (including input Enactments) and all the outputs of both Rules.
@@ -996,9 +995,9 @@ class TestUnion:
         This returns None because the outputs are inconsistent
         (True and False versions of the same Rule)
         """
-        feist = make_opinion_with_holding["feist_majority"]
+        feist = make_opinion_with_holding_python_feist["feist_majority"]
         feist_copyrightable = feist.holdings[3].rule
-        oracle = make_opinion_with_holding["oracle_majority"]
+        oracle = make_opinion_with_holding_python_feist["oracle_majority"]
         oracle_copyrightable = oracle.holdings[0].rule
         assert feist_copyrightable | oracle_copyrightable is None
 

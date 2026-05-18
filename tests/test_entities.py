@@ -84,12 +84,12 @@ class TestImplication:
         assert make_entity["tree_search_specific"] >= make_entity["motel"]
         assert make_entity["tree_search"] > make_entity["motel"]
 
-    def test_plural_true(self, make_opinion_with_holding):
+    def test_plural_true(self, make_opinion_with_holding_python_feist):
         """
         holding_feist.json has an entity with the name "Rural's telephone listings"
         and "plural": true
         """
-        feist = make_opinion_with_holding["feist_majority"]
+        feist = make_opinion_with_holding_python_feist["feist_majority"]
         assert any(entity.plural is True for entity in feist.generic_terms())
 
     def test_implies_concrete_with_same_name(self):

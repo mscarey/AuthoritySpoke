@@ -113,7 +113,7 @@ class TestHoldingImport:
         assert len(lotus_holdings) == 10
 
     def test_import_enactments_and_anchors(
-        self, make_opinion_with_holding, make_response
+        self, make_opinion_with_holding_python_feist, make_response
     ):
         """
         Testing issue that caused enactment expansion to fail only when
@@ -188,7 +188,7 @@ class TestHoldingImport:
             record=raw_holdings, client=mock_client
         )
 
-        feist = make_opinion_with_holding["feist_majority"]
+        feist = make_opinion_with_holding_python_feist["feist_majority"]
         feist.clear_holdings()
         feist.posit(
             f_anchored_holdings.holdings,
